@@ -34,25 +34,23 @@ Author: Daniel Kroening, kroening@kroening.com
 class remove_function_pointerst
 {
 public:
-  explicit remove_function_pointerst(symbol_tablet &_symbol_table):
-    ns(_symbol_table),
-    symbol_table(_symbol_table)
-  {
-  }
+  remove_function_pointerst(
+    symbol_tablet &_symbol_table,
+    bool _add_safety_assertion,
+    const goto_functionst &goto_functions);
 
   void operator()(goto_functionst &goto_functions);
-  
-  bool add_safety_assertion;
+
+  bool remove_function_pointers(goto_programt &goto_program);
 
 protected:
   const namespacet ns;
   symbol_tablet &symbol_table;
+  bool add_safety_assertion;
 
   void remove_function_pointer(
     goto_programt &goto_program,
     goto_programt::targett target);
-
-  bool remove_function_pointers(goto_programt &goto_program);
 
   std::set<irep_idt> address_taken;
   
@@ -73,6 +71,36 @@ protected:
 
   symbolt &new_tmp_symbol();
 };
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::remove_function_pointerst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+remove_function_pointerst::remove_function_pointerst(
+  symbol_tablet &_symbol_table,
+  bool _add_safety_assertion,
+  const goto_functionst &goto_functions):
+  ns(_symbol_table),
+  symbol_table(_symbol_table),
+  add_safety_assertion(_add_safety_assertion)
+{
+  compute_address_taken_functions(goto_functions, address_taken);
+
+  // build type map
+  for(goto_functionst::function_mapt::const_iterator f_it=
+      goto_functions.function_map.begin();
+      f_it!=goto_functions.function_map.end();
+      f_it++)
+    type_map[f_it->first]=f_it->second.type;
+}
 
 /*******************************************************************\
 
@@ -424,7 +452,7 @@ void remove_function_pointerst::remove_function_pointer(
 
 /*******************************************************************\
 
-Function: remove_function_pointerst::operator()
+Function: remove_function_pointerst::remove_function_pointers
 
   Inputs:
 
@@ -477,15 +505,6 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
 {
   bool did_something=false;
   
-  compute_address_taken_functions(functions, address_taken);
-
-  // build type map
-  for(goto_functionst::function_mapt::iterator f_it=
-      functions.function_map.begin();
-      f_it!=functions.function_map.end();
-      f_it++)
-    type_map[f_it->first]=f_it->second.type;
-  
   for(goto_functionst::function_mapt::iterator f_it=
       functions.function_map.begin();
       f_it!=functions.function_map.end();
@@ -513,13 +532,38 @@ Function: remove_function_pointers
 
 \*******************************************************************/
 
+bool remove_function_pointers(
+  symbol_tablet &symbol_table,
+  const goto_functionst &goto_functions,
+  goto_programt &goto_program,
+  bool add_safety_assertion)
+{
+  remove_function_pointerst
+    rfp(symbol_table, add_safety_assertion, goto_functions);
+
+  return rfp.remove_function_pointers(goto_program);
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointers
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void remove_function_pointers(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   bool add_safety_assertion)
 {
-  remove_function_pointerst rfp(symbol_table);
-  rfp.add_safety_assertion=add_safety_assertion;
+  remove_function_pointerst
+    rfp(symbol_table, add_safety_assertion, goto_functions);
+
   rfp(goto_functions);
 }
 
