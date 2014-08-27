@@ -97,7 +97,6 @@ void ansi_c_internal_additions(std::string &code)
     "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
     "void __CPROVER_assume(__CPROVER_bool assumption);\n"
     "void __VERIFIER_assume(__CPROVER_bool assumption);\n"
-    "void assert(__CPROVER_bool assertion);\n"
     "void __CPROVER_assert(__CPROVER_bool assertion, const char *description);\n"
     "__CPROVER_bool __CPROVER_equal();\n"
     "__CPROVER_bool __CPROVER_same_object(const void *, const void *);\n"

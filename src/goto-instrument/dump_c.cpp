@@ -3423,8 +3423,7 @@ void goto2sourcet::convert_function_declaration(
      symbol.name=="c::__builtin_va_end")
     system_headers.insert("stdarg.h");
   else if(symbol.name!=ID_main &&
-          symbol.name!="c::main" &&
-          symbol.name!="c::assert")
+          symbol.name!="c::main")
   {
     os_decl << "// " << symbol.name << std::endl;
     os_decl << "// " << symbol.location << std::endl;

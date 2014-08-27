@@ -995,7 +995,8 @@ void goto_convertt::do_function_call_symbol(
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);    
   }
-  else if(identifier=="c::assert")
+  else if(identifier=="c::assert" &&
+          !ns.lookup(identifier).location.get_function().empty())
   {
     if(arguments.size()!=1)
     {
