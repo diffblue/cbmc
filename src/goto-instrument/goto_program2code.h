@@ -17,8 +17,6 @@ class goto_program2codet
   typedef std::list<irep_idt> id_listt;
   typedef hash_set_cont<irep_idt,irep_id_hash> id_sett;
   typedef std::map<goto_programt::const_targett, goto_programt::const_targett> loopt;
-  typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> tag_mapt;
-  typedef std::multimap<irep_idt, irep_idt> r_tag_mapt;
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> dead_mapt;
   typedef std::list<std::pair<goto_programt::const_targett, bool> >
     loop_last_stackt;
@@ -46,7 +44,6 @@ public:
       const irep_idt &identifier,
       const goto_programt &_goto_program,
       symbol_tablet &_symbol_table,
-      const tag_mapt &_tag_map,
       code_blockt &_dest,
       id_listt &_local_static,
       id_listt &_type_names,
@@ -54,7 +51,6 @@ public:
     func_name(identifier),
     goto_program(_goto_program),
     symbol_table(_symbol_table),
-    tag_map(_tag_map),
     ns(_symbol_table),
     toplevel_block(_dest),
     local_static(_local_static),
@@ -76,7 +72,6 @@ protected:
   const irep_idt &func_name;
   const goto_programt &goto_program;
   symbol_tablet &symbol_table;
-  const tag_mapt &tag_map;
   const namespacet ns;
   code_blockt &toplevel_block;
   id_listt &local_static;
@@ -88,8 +83,6 @@ protected:
   loopt loop_map;
   id_sett labels_in_use;
   replace_symbolt replace_symbols;
-  r_tag_mapt reverse_tag_map;
-  id_sett expanded_symbols;
   dead_mapt dead_map;
   loop_last_stackt loop_last_stack;
   id_sett local_static_set;
@@ -110,8 +103,6 @@ protected:
     codet &code,
     const irep_idt parent_stmt);
 
-  void expand_reverse_tag_map(const irep_idt identifier);
-  void expand_reverse_tag_map(const typet &type);
   void cleanup_expr(exprt &expr, bool no_typecast);
 
   void add_local_types(const typet &type);

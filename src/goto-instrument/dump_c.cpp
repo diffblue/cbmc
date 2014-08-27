@@ -59,7 +59,6 @@ void dump_ct::operator()(std::ostream &os)
   std::stringstream global_var_stream;
   std::stringstream func_body_stream;
   local_static_declst local_static_decls;
-  hash_map_cont<irep_idt, irep_idt, irep_id_hash> original_tags;
 
   // add copies of struct types when ID_C_transparent_union is only
   // annotated to parameter
@@ -121,7 +120,6 @@ void dump_ct::operator()(std::ostream &os)
     if(symbol.is_type && !symbol.type.get(ID_tag).empty())
     {
       irep_idt original_tag=symbol.type.get(ID_tag);
-      original_tags[it->first]=original_tag;
       std::string new_tag=id2string(original_tag);
 
       std::string::size_type tag_pos=new_tag.rfind("tag-");
@@ -178,8 +176,7 @@ void dump_ct::operator()(std::ostream &os)
       convert_global_variable(
           symbol,
           global_var_stream,
-          local_static_decls,
-          original_tags);
+          local_static_decls);
     else if(symbol.type.id()==ID_code)
     {
       goto_functionst::function_mapt::const_iterator func_entry=
@@ -208,8 +205,7 @@ void dump_ct::operator()(std::ostream &os)
       skip_function_main,
       func_decl_stream,
       func_body_stream,
-      local_static_decls,
-      original_tags);
+      local_static_decls);
   }
 
   // (possibly modified) compound types
@@ -542,8 +538,7 @@ Purpose:
 void dump_ct::cleanup_decl(
   code_declt &decl,
   std::list<irep_idt> &local_static,
-  std::list<irep_idt> &local_type_decls,
-  const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags)
+  std::list<irep_idt> &local_type_decls)
 {
   exprt value=nil_exprt();
 
@@ -570,7 +565,6 @@ void dump_ct::cleanup_decl(
     irep_idt(),
     tmp,
     copied_symbol_table,
-    original_tags,
     b,
     local_static,
     local_type_decls,
@@ -596,8 +590,7 @@ Purpose:
 void dump_ct::convert_global_variable(
     const symbolt &symbol,
     std::ostream &os,
-    local_static_declst &local_static_decls,
-    const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags)
+    local_static_declst &local_static_decls)
 {
   // we suppress some declarations
   if(ignore(symbol.name))
@@ -641,7 +634,7 @@ void dump_ct::convert_global_variable(
     {
       const symbolt &sym=ns.lookup(*it);
       if(!sym.is_type && sym.is_static_lifetime && sym.type.id()!=ID_code)
-        convert_global_variable(sym, os, local_static_decls, original_tags);
+        convert_global_variable(sym, os, local_static_decls);
     }
 
     d.copy_to_operands(symbol.value);
@@ -655,7 +648,7 @@ void dump_ct::convert_global_variable(
     os << "// " << symbol.location << std::endl;
 
     std::list<irep_idt> empty_static, empty_types;
-    cleanup_decl(d, empty_static, empty_types, original_tags);
+    cleanup_decl(d, empty_static, empty_types);
     assert(empty_static.empty());
     os << expr_to_string(d) << std::endl;
   }
@@ -678,8 +671,7 @@ void dump_ct::convert_function_declaration(
     const bool skip_main,
     std::ostream &os_decl,
     std::ostream &os_body,
-    local_static_declst &local_static_decls,
-    const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags)
+    local_static_declst &local_static_decls)
 {
   if(ignore(symbol.name))
     return;
@@ -720,7 +712,6 @@ void dump_ct::convert_function_declaration(
       symbol.name,
       func_entry->second.body,
       copied_symbol_table,
-      original_tags,
       b,
       local_static,
       type_decls,
@@ -731,8 +722,7 @@ void dump_ct::convert_function_declaration(
       b,
       local_static,
       local_static_decls,
-      type_decls,
-      original_tags);
+      type_decls);
 
     convertedt converted_bak(converted);
     insert_local_type_decls(
@@ -862,8 +852,7 @@ void dump_ct::insert_local_static_decls(
   code_blockt &b,
   const std::list<irep_idt> &local_static,
   local_static_declst &local_static_decls,
-  std::list<irep_idt> &type_decls,
-  const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags)
+  std::list<irep_idt> &type_decls)
 {
   // look up last identifier first as its value may introduce the
   // other ones
@@ -878,7 +867,7 @@ void dump_ct::insert_local_static_decls(
 
     code_declt d=d_it->second;
     std::list<irep_idt> redundant;
-    cleanup_decl(d, redundant, type_decls, original_tags);
+    cleanup_decl(d, redundant, type_decls);
 
     code_blockt* dest_ptr=0;
     exprt::operandst::iterator before=b.operands().end();
