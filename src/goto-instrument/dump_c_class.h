@@ -18,15 +18,16 @@ class dump_ct
 public:
   dump_ct(
     const goto_functionst &_goto_functions,
-    const bool _use_system_headers,
+    const bool use_system_headers,
     const namespacet &_ns,
     language_factoryt factory):
     goto_functions(_goto_functions),
-    use_system_headers(_use_system_headers),
     copied_symbol_table(_ns.get_symbol_table()),
     ns(copied_symbol_table),
     language(factory())
   {
+    if(use_system_headers)
+      init_system_library_map();
   }
 
   virtual ~dump_ct()
@@ -38,7 +39,6 @@ public:
 
 protected:
   const goto_functionst &goto_functions;
-  const bool use_system_headers;
   symbol_tablet copied_symbol_table;
   const namespacet ns;
   languaget *language;
@@ -47,6 +47,12 @@ protected:
   convertedt converted;
 
   std::set<std::string> system_headers;
+
+  typedef hash_map_cont<irep_idt, std::string, irep_id_hash>
+    system_library_mapt;
+  system_library_mapt system_library_map;
+
+  void init_system_library_map();
 
   std::string type_to_string(const typet &type);
   std::string expr_to_string(const exprt &expr);

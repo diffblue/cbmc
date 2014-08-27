@@ -524,7 +524,183 @@ void dump_ct::convert_compound(
 
 /*******************************************************************\
 
-Function: dump_ct::supress
+Function: dump_ct::init_system_library_map
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+#define ADD_TO_SYSTEM_LIBRARY(v, header) \
+  for(int i=0; i<sizeof(v)/sizeof(char*); ++i) \
+    system_library_map.insert( \
+      std::make_pair(std::string("c::")+v[i], header))
+
+void dump_ct::init_system_library_map()
+{
+  // ctype.h
+  const char* ctype_syms[]={
+    "isalnum", "isalpha", "isblank", "iscntrl", "isdigit", "isgraph",
+    "islower", "isprint", "ispunct", "isspace", "isupper", "isxdigit",
+    "tolower", "toupper"
+  };
+  ADD_TO_SYSTEM_LIBRARY(ctype_syms, "ctype.h");
+
+  // fcntl.h
+  const char* fcntl_syms[]={
+    "creat", "fcntl", "open"
+  };
+  ADD_TO_SYSTEM_LIBRARY(fcntl_syms, "fcntl.h");
+
+  // locale.h
+  const char* locale_syms[]={
+    "setlocale"
+  };
+  ADD_TO_SYSTEM_LIBRARY(locale_syms, "locale.h");
+
+  // math.h
+  const char* math_syms[]={
+    "acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh",
+    "cbrt", "ceil", "copysign", "cos", "cosh", "erf", "erfc", "exp",
+    "exp2", "expm1", "fabs", "fdim", "floor", "fma", "fmax", "fmin",
+    "fmod", "fpclassify", "frexp", "hypot", "ilogb", "isfinite",
+    "isinf", "isnan", "isnormal", "j0", "j1", "jn", "ldexp", "lgamma",
+    "llrint", "llround", "log", "log10", "log1p", "log2", "logb",
+    "lrint", "lround", "modf", "nan", "nearbyint", "nextafter", "pow",
+    "remainder", "remquo", "rint", "round", "scalbln", "scalbn",
+    "signbit", "sin", "sinh", "sqrt", "tan", "tanh", "tgamma",
+    "trunc", "y0", "y1", "yn"
+  };
+  ADD_TO_SYSTEM_LIBRARY(math_syms, "math.h");
+
+  // pthread.h
+  const char* pthread_syms[]={
+    "pthread_cleanup_pop", "pthread_cleanup_push",
+    "pthread_cond_broadcast", "pthread_cond_destroy",
+    "pthread_cond_init", "pthread_cond_signal",
+    "pthread_cond_timedwait", "pthread_cond_wait", "pthread_create",
+    "pthread_detach", "pthread_equal", "pthread_exit",
+    "pthread_getspecific", "pthread_join", "pthread_key_delete",
+    "pthread_mutex_destroy", "pthread_mutex_init",
+    "pthread_mutex_lock", "pthread_mutex_trylock",
+    "pthread_mutex_unlock", "pthread_once", "pthread_rwlock_destroy",
+    "pthread_rwlock_init", "pthread_rwlock_rdlock",
+    "pthread_rwlock_unlock", "pthread_rwlock_wrlock",
+    "pthread_rwlockattr_destroy", "pthread_rwlockattr_getpshared",
+    "pthread_rwlockattr_init", "pthread_rwlockattr_setpshared",
+    "pthread_self", "pthread_setspecific"
+  };
+  ADD_TO_SYSTEM_LIBRARY(pthread_syms, "pthread.h");
+
+  // setjmp.h
+  const char* setjmp_syms[]={
+    "_longjmp", "_setjmp", "longjmp", "longjmperror", "setjmp",
+    "siglongjmp", "sigsetjmp"
+  };
+  ADD_TO_SYSTEM_LIBRARY(setjmp_syms, "setjmp.h");
+
+  // stdio.h
+  const char* stdio_syms[]={
+    "asprintf", "clearerr", "fclose", "fdopen", "feof", "ferror",
+    "fflush", "fgetc", "fgetln", "fgetpos", "fgets", "fgetwc",
+    "fgetws", "fileno", "fopen", "fprintf", "fpurge", "fputc",
+    "fputs", "fputwc", "fputws", "fread", "freopen", "fropen",
+    "fscanf", "fseek", "fsetpos", "ftell", "funopen", "fwide",
+    "fwopen", "fwprintf", "fwrite", "getc", "getchar", "getdelim",
+    "getline", "gets", "getw", "getwc", "getwchar", "mkdtemp",
+    "mkstemp", "mktemp", "perror", "printf", "putc", "putchar",
+    "puts", "putw", "putwc", "putwchar", "remove", "rewind", "scanf",
+    "setbuf", "setbuffer", "setlinebuf", "setvbuf", "snprintf",
+    "sprintf", "sscanf", "strerror", "swprintf", "sys_errlist",
+    "sys_nerr", "tempnam", "tmpfile", "tmpnam", "ungetc", "ungetwc",
+    "vasprintf", "vfprintf", "vfscanf", "vfwprintf", "vprintf",
+    "vscanf", "vsnprintf", "vsprintf", "vsscanf", "vswprintf",
+    "vwprintf", "wprintf",
+    /* non-public struct types */
+    "tag-__sFILE", "tag-__sbuf", // OS X
+    "tag-_IO_FILE", "tag-_IO_marker", // Linux
+  };
+  ADD_TO_SYSTEM_LIBRARY(stdio_syms, "stdio.h");
+
+  // stdlib.h
+  const char* stdlib_syms[]={
+    "abort", "abs", "atexit", "atof", "atoi", "atol", "atoll",
+    "bsearch", "calloc", "div", "exit", "free", "getenv", "labs",
+    "ldiv", "llabs", "lldiv", "malloc", "mblen", "mbstowcs", "mbtowc",
+    "qsort", "rand", "realloc", "srand", "strtod", "strtof", "strtol",
+    "strtold", "strtoll", "strtoul", "strtoull", "system", "wcstombs",
+    "wctomb"
+  };
+  ADD_TO_SYSTEM_LIBRARY(stdlib_syms, "stdlib.h");
+
+  // string.h
+  const char* string_syms[]={
+    "strcat", "strncat", "strchr", "strrchr", "strcmp", "strncmp",
+    "strcpy", "strncpy", "strerror", "strlen", "strpbrk", "strspn",
+    "strcspn", "strstr", "strtok"
+  };
+  ADD_TO_SYSTEM_LIBRARY(string_syms, "string.h");
+
+  // time.h
+  const char* time_syms[]={
+    "asctime", "asctime_r", "ctime", "ctime_r", "difftime", "gmtime",
+    "gmtime_r", "localtime", "localtime_r", "mktime",
+    /* non-public struct types */
+    "tag-timespec", "tag-timeval"
+  };
+  ADD_TO_SYSTEM_LIBRARY(time_syms, "time.h");
+
+  // unistd.h
+  const char* unistd_syms[]={
+    "_exit", "access", "alarm", "chdir", "chown", "close", "dup",
+    "dup2", "execl", "execle", "execlp", "execv", "execve", "execvp",
+    "fork", "fpathconf", "getcwd", "getegid", "geteuid", "getgid",
+    "getgroups", "getlogin", "getpgrp", "getpid", "getppid", "getuid",
+    "isatty", "link", "lseek", "pathconf", "pause", "pipe", "read",
+    "rmdir", "setgid", "setpgid", "setsid", "setuid", "sleep",
+    "sysconf", "tcgetpgrp", "tcsetpgrp", "ttyname", "ttyname_r",
+    "unlink", "write"
+  };
+  ADD_TO_SYSTEM_LIBRARY(unistd_syms, "unistd.h");
+
+  // sys/select.h
+  const char* sys_select_syms[]={
+    "select"
+  };
+  ADD_TO_SYSTEM_LIBRARY(sys_select_syms, "sys/select.h");
+
+  // sys/socket.h
+  const char* sys_socket_syms[]={
+    "accept", "bind", "connect"
+  };
+  ADD_TO_SYSTEM_LIBRARY(sys_socket_syms, "sys/socket.h");
+
+  // sys/stat.h
+  const char* sys_stat_syms[]={
+    "fstat", "lstat", "stat"
+  };
+  ADD_TO_SYSTEM_LIBRARY(sys_stat_syms, "sys/stat.h");
+
+  /*
+  // sys/types.h
+  const char* sys_types_syms[]={
+  };
+  ADD_TO_SYSTEM_LIBRARY(sys_types_syms, "sys/types.h");
+  */
+
+  // sys/wait.h
+  const char* sys_wait_syms[]={
+    "wait", "waitpid"
+  };
+  ADD_TO_SYSTEM_LIBRARY(sys_wait_syms, "sys/wait.h");
+}
+
+/*******************************************************************\
+
+Function: dump_ct::ignore
 
 Inputs:
 
@@ -568,115 +744,15 @@ bool dump_ct::ignore(const symbolt &symbol)
     return true;
   }
 
-  if(!use_system_headers ||
-     name_str.find("$link")!=std::string::npos)
+  if(name_str.find("$link")!=std::string::npos)
     return false;
 
-  if(!has_prefix(file_str, "/usr/include/"))
-    return false;
+  system_library_mapt::const_iterator it=
+    system_library_map.find(symbol.name);
 
-  if(file_str=="/usr/include/ctype.h")
+  if(it!=system_library_map.end())
   {
-    system_headers.insert("ctype.h");
-    return true;
-  }
-
-  if(file_str=="/usr/include/fcntl.h" ||
-     has_suffix(file_str, "/bits/fcntl2.h"))
-  {
-    system_headers.insert("fcntl.h");
-    return true;
-  }
-
-  if(file_str=="/usr/include/math.h" ||
-     has_suffix(file_str, "/bits/mathinline.h"))
-  {
-    system_headers.insert("math.h");
-    return true;
-  }
-
-  if(file_str=="/usr/include/pthread.h" ||
-     has_suffix(file_str, "/bits/pthreadtypes.h"))
-  {
-    system_headers.insert("pthread.h");
-    return true;
-  }
-
-  if(file_str=="/usr/include/setjmp.h")
-  {
-    system_headers.insert("setjmp.h");
-    return true;
-  }
-
-  if(file_str=="/usr/include/stdio.h" ||
-     file_str=="/usr/include/libio.h" ||
-     has_suffix(file_str, "/bits/stdio.h") ||
-     has_suffix(file_str, "/bits/stdio2.h"))
-  {
-    system_headers.insert("stdio.h");
-    return true;
-  }
-
-  if(file_str=="/usr/include/stdlib.h" ||
-     has_suffix(file_str, "/bits/stdlib-float.h"))
-  {
-    system_headers.insert("stdlib.h");
-    return true;
-  }
-
-  if(file_str=="/usr/include/string.h" ||
-     has_suffix(file_str, "/bits/string2.h") ||
-     has_suffix(file_str, "/bits/string3.h"))
-  {
-    system_headers.insert("string.h");
-    return true;
-  }
-
-  if(file_str=="/usr/include/time.h" ||
-     has_suffix(file_str, "/bits/time.h"))
-  {
-    system_headers.insert("time.h");
-    return true;
-  }
-
-  if(file_str=="/usr/include/unistd.h" ||
-     has_suffix(file_str, "/bits/unistd.h"))
-  {
-    system_headers.insert("unistd.h");
-    return true;
-  }
-
-  if(has_suffix(file_str, "/sys/select.h") ||
-     has_suffix(file_str, "/bits/select.h"))
-  {
-    system_headers.insert("sys/select.h");
-    return true;
-  }
-
-  if(has_suffix(file_str, "/sys/socket.h") ||
-     has_suffix(file_str, "/bits/socket.h"))
-  {
-    system_headers.insert("sys/socket.h");
-    return true;
-  }
-
-  if(has_suffix(file_str, "/sys/stat.h") ||
-     has_suffix(file_str, "/bits/stat.h"))
-  {
-    system_headers.insert("sys/stat.h");
-    return true;
-  }
-
-  if(has_suffix(file_str, "/sys/types.h") ||
-     has_suffix(file_str, "/bits/types.h"))
-  {
-    system_headers.insert("sys/types.h");
-    return true;
-  }
-
-  if(has_suffix(file_str, "/sys/wait.h"))
-  {
-    system_headers.insert("sys/wait.h");
+    system_headers.insert(it->second);
     return true;
   }
 
