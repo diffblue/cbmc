@@ -23,7 +23,7 @@ public:
     previous_line_no=0;
     column=1;
     stack.clear();
-    location.clear();
+    source_location.clear();
     last_line.clear();
   }
   
@@ -74,12 +74,12 @@ public:
   
   inline void set_file(const irep_idt &file)
   {
-    location.set_file(file);
+    source_location.set_file(file);
   }
   
   inline irep_idt get_file() const
   {
-    return location.get_file();
+    return source_location.get_file();
   }
   
   inline unsigned get_line_no() const
@@ -87,21 +87,21 @@ public:
     return line_no;
   }
 
-  inline void set_location(exprt &e)
+  inline void set_source_location(exprt &e)
   {
     // Only set line number when needed, as this destroys sharing.
     if(previous_line_no!=line_no)
     {
       previous_line_no=line_no;
-      location.set_line(line_no);
+      source_location.set_line(line_no);
     }
     
-    e.location()=location;
+    e.add_source_location()=source_location;
   }
   
   inline void set_function(const irep_idt &function)
   {
-    location.set_function(function);
+    source_location.set_function(function);
   }
   
   inline void advance_column(unsigned token_width)
@@ -110,7 +110,7 @@ public:
   }
   
 protected:
-  locationt location;
+  source_locationt source_location;
   unsigned line_no, previous_line_no;
   unsigned column;
 };
