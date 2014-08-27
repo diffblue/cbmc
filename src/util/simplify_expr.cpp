@@ -4780,11 +4780,16 @@ exprt simplify_exprt::bits2expr(
 
   if(type.id()==ID_unsignedbv ||
      type.id()==ID_signedbv ||
-     type.id()==ID_c_enum ||
      type.id()==ID_floatbv ||
      type.id()==ID_fixedbv)
   {
     unsigned width=to_bitvector_type(type).get_width();
+    if(bits.size()==width)
+      return constant_exprt(bits, type);
+  }
+  else if(type.id()==ID_c_enum)
+  {
+    unsigned width=to_bitvector_type(type.subtype()).get_width();
     if(bits.size()==width)
       return constant_exprt(bits, type);
   }

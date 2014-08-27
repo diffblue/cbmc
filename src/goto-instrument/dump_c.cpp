@@ -3144,7 +3144,10 @@ void goto2sourcet::convert_compound(
     assert(s.find("NO/SUCH/NS")==std::string::npos);
 
     if(comp.get_is_bit_field() &&
-       to_bitvector_type(comp_type).get_width()==0)
+       ((comp_type.id()!=ID_c_enum &&
+         to_bitvector_type(comp_type).get_width()==0) ||
+        (comp_type.id()==ID_c_enum &&
+         to_bitvector_type(comp_type.subtype()).get_width()==0)))
     {
       comp_name="";
       s=type_to_string(comp_type);
@@ -3153,8 +3156,10 @@ void goto2sourcet::convert_compound(
     if(s.find("__CPROVER_bitvector")==std::string::npos)
     {
       struct_body << s;
-      if(comp.get_is_bit_field())
+      if(comp.get_is_bit_field() && comp_type.id()!=ID_c_enum)
         struct_body << " : " << to_bitvector_type(comp_type).get_width();
+      else if(comp.get_is_bit_field() && comp_type.id()==ID_c_enum)
+        struct_body << " : " << to_bitvector_type(comp_type.subtype()).get_width();
     }
     else if(comp_type.id()==ID_signedbv)
     {
@@ -3688,9 +3693,14 @@ void goto2sourcet::cleanup_expr(exprt &expr)
         it!=old_components.end();
         ++it)
     {
+      const typet &comp_type=ns.follow(it->type());
+
       const bool is_zero_bit_field=
         it->get_is_bit_field() &&
-        to_bitvector_type(ns.follow(it->type())).get_width()==0;
+        ((comp_type.id()!=ID_c_enum &&
+          to_bitvector_type(comp_type).get_width()==0) ||
+         (comp_type.id()==ID_c_enum &&
+          to_bitvector_type(comp_type.subtype()).get_width()==0));
 
       if(!it->get_is_padding() && !is_zero_bit_field)
       {
