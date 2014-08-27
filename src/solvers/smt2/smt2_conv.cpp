@@ -4515,6 +4515,7 @@ void smt2_convt::convert_type(const typet &type)
     const typet &subtype=ns.follow(array_type.subtype());
 
     out << "(Array ";
+    assert(array_type.size().is_not_nil());
     convert_type(array_type.size().type());
     out << " ";
 
