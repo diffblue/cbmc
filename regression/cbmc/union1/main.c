@@ -4,7 +4,14 @@ union u_type
   char ch;
 };
 
-int main() {
+// rest of my_U should be zero
+union u_type my_U = { .ch = 1 }; 
+
+int main()
+{
+  // little and big endian case, assuming sizeof(int)==4
+  assert(my_U.i==1 || my_U.i==0x01000000);   
+
   union u_type u;
   
   u.i=1;
