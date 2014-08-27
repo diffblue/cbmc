@@ -590,6 +590,10 @@ std::string expr2ct::convert_rec(
 
     return q+dest+d;
   }
+  else if(src.id()==ID_gcc_builtin_va_list)
+  {
+    return q+"__builtin_va_list"+d;
+  }
 
   {
     lispexprt lisp;

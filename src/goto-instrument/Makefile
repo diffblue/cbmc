@@ -19,7 +19,7 @@ SRC = goto_instrument_main.cpp goto_instrument_parseoptions.cpp \
       accelerate/disjunctive_polynomial_acceleration.cpp \
       accelerate/cone_of_influence.cpp accelerate/overflow_instrumenter.cpp\
       accelerate/path.cpp accelerate/acceleration_utils.cpp \
-      count_eloc.cpp reachability_slicer.cpp
+      count_eloc.cpp reachability_slicer.cpp goto_program2code.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
