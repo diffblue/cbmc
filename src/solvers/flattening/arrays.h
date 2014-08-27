@@ -51,7 +51,9 @@ protected:
   };
 
   // the list of all equalities between arrays
-  typedef std::vector<array_equalityt> array_equalitiest;
+  // references to objects in this container need to be stable as
+  // elements are added while references are held
+  typedef std::list<array_equalityt> array_equalitiest;
   array_equalitiest array_equalities;
   
   // this is used to find the clusters of arrays being compared
@@ -59,7 +61,9 @@ protected:
   
   // this tracks the array indicies for each array
   typedef std::set<exprt> index_sett;
-  typedef std::vector<index_sett> index_mapt;
+  // references to values in this container need to be stable as
+  // elements are added while references are held
+  typedef std::map<unsigned, index_sett> index_mapt;
   index_mapt index_map;
   
   // adds all the constraints eagerly
@@ -74,6 +78,7 @@ protected:
   void add_array_constraints_array_of(const index_sett &index_set, const array_of_exprt &exprt);
 
   void build_index_map();
+  void update_index_map();
   void collect_arrays(const exprt &a);
 };
 
