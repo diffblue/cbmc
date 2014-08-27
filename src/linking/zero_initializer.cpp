@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/pointer_offset_size.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/expr2c.h>
@@ -219,8 +220,9 @@ exprt zero_initializert::zero_initializer_rec(
 
     union_typet::componentt component;
     bool found=false;
+    mp_integer component_size=0;
     
-    // get the first non-method member
+    // we need to find the largest member
 
     for(struct_typet::componentst::const_iterator
         it=components.begin();
@@ -228,14 +230,15 @@ exprt zero_initializert::zero_initializer_rec(
         it++)
     {
       // skip methods
-      if(it->type().id()==ID_code)
-      {
-      }
-      else
+      if(it->type().id()==ID_code) continue;
+
+      mp_integer size=pointer_offset_size(ns, it->type());
+      
+      if(size>component_size)
       {
         component=*it;
         found=true;
-        break;
+        component_size=size;
       }
     }
 
