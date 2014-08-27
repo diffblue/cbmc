@@ -208,6 +208,7 @@ protected:
   std::string convert_initializer_list(const exprt &src, unsigned &precedence);
   std::string convert_designated_initializer(const exprt &src, unsigned &precedence);
   std::string convert_concatenation(const exprt &src, unsigned &precedence);
+  std::string convert_sizeof(const exprt &src, unsigned &precedence);
 };
 
 #endif
