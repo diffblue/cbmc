@@ -115,41 +115,5 @@ protected:
     std::list<irep_idt> &local_static,
     std::list<irep_idt> &local_type_decls,
     const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
-
-#if 0
-  std::string implicit_declarations(const exprt &expr);
-  
-  std::string nondet_suffix(const typet &type);
-
-  irep_idt unique_name(const irep_idt name);
-
-  irep_idt get_global_constant(irep_idt cst, irep_idt type_id)
-  {
-    irep_idt key = id2string(type_id)+"("+id2string(cst)+")";
-
-    std::map<irep_idt, irep_idt>::const_iterator
-      it_find=global_constants.find(key);
-
-    if(it_find != global_constants.end())
-      return it_find->second;
-
-    irep_idt new_cst_id = unique_name( "__SCOOT_constant");
-
-    global_constants[key] = new_cst_id;
-    global_constant_stream << "const " <<
-        id2string(type_id) <<" "<< new_cst_id
-        <<"(\"" << id2string(cst) << "\");" << std::endl;
-
-    return new_cst_id;
-  }
-
-  std::map<irep_idt, irep_idt> global_constants;
-  std::map<irep_idt, irep_idt> global_renaming;
-  std::map<irep_idt, irep_idt> local_renaming;
-
-  std::stringstream typedef_stream;          // for types
-  std::stringstream global_constant_stream;  // for numerical constants
-
-#endif
 };
 
