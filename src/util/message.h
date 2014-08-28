@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <sstream>
 
-#include "location.h"
+#include "source_location.h"
 
 class message_handlert
 {

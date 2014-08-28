@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include "location.h"
+#include "source_location.h"
 
 /*******************************************************************\
 
