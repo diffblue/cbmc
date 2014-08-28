@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 #include "symbol.h"
-#include "location.h"
+#include "source_location.h"
 #include "std_expr.h"
 
 /*******************************************************************\
