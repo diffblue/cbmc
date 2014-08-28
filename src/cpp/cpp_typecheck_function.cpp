@@ -51,7 +51,7 @@ void cpp_typecheckt::convert_argument(
 
   symbol.name=identifier;
   symbol.base_name=parameter.get_base_name();
-  symbol.location=parameter.location();
+  symbol.location=parameter.source_location();
   symbol.mode=mode;
   symbol.module=module;
   symbol.type=parameter.type();

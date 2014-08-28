@@ -3275,11 +3275,11 @@ std::string expr2ct::convert_code(
   unsigned indent)
 {
   static bool comment_done=false;
-  if(!comment_done && !src.location().get_comment().empty())
+  if(!comment_done && !src.source_location().get_comment().empty())
   {
     comment_done=true;
     std::string dest=indent_str(indent);
-    dest+="/* "+id2string(src.location().get_comment())+" */\n";
+    dest+="/* "+id2string(src.source_location().get_comment())+" */\n";
     dest+=convert_code(src, indent);
     comment_done=false;
     return dest;

@@ -299,7 +299,7 @@ void remove_function_pointerst::fix_return_type(
 
   symbolt &tmp_symbol=new_tmp_symbol();
   tmp_symbol.type=code_type.return_type();
-  tmp_symbol.location=function_call.location();
+  tmp_symbol.location=function_call.source_location();
 
   symbol_exprt tmp_symbol_expr;
   tmp_symbol_expr.type()=tmp_symbol.type;
@@ -453,7 +453,7 @@ void remove_function_pointerst::remove_function_pointer(
   // We preserve the original dereferencing to possibly catch
   // further pointer-related errors.
   code_expressiont code_expression;
-  code_expression.add_source_location()=function.location();
+  code_expression.add_source_location()=function.source_location();
   code_expression.expression()=function;
   target->code.swap(code_expression);
   target->type=OTHER;

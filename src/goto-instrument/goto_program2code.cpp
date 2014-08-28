@@ -2168,10 +2168,10 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       const symbolt &symbol=ns.lookup(id);
       
       symbol_exprt symbol_expr(symbol.name, symbol.type);
-      symbol_expr.add_source_location()=expr.location();
+      symbol_expr.add_source_location()=expr.source_location();
       
       side_effect_exprt call(ID_function_call);
-      call.add_source_location()=expr.location();
+      call.add_source_location()=expr.source_location();
       call.operands().resize(2);
       call.op0()=symbol_expr;
       call.type()=expr.type();

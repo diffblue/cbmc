@@ -77,7 +77,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     symbol.name=identifier;
     symbol.base_name=final_name;
     symbol.value.make_nil();
-    symbol.location=namespace_spec.location();
+    symbol.location=namespace_spec.source_location();
     symbol.mode=ID_cpp;
     symbol.module=module;
     symbol.type=typet(ID_namespace);

@@ -628,7 +628,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         func_symb.pretty_name = component.get(ID_base_name);
         func_symb.mode=ID_cpp;
         func_symb.module=module;
-        func_symb.location=component.location();
+        func_symb.location=component.source_location();
         func_symb.type=component.type();
 
         // change the type of the 'this' pointer
@@ -1176,7 +1176,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
     // build declaration
     cpp_declarationt ctor;
-    default_ctor(symbol.type.location(), symbol.base_name, ctor);
+    default_ctor(symbol.type.source_location(), symbol.base_name, ctor);
     body.move_to_operands(ctor);
   }
 
@@ -1410,7 +1410,7 @@ void cpp_typecheckt::typecheck_member_function(
   symbol.type=type;
   symbol.is_type=false;
   symbol.is_macro=false;
-  symbol.location=component.location();
+  symbol.location=component.source_location();
 
   // move early, it must be visible before doing any value
   symbolt *new_symbol;
@@ -1503,7 +1503,7 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
   {
     if(it->type().id()==ID_code)
     {
-      err_location(struct_union_symbol.type.location());
+      err_location(struct_union_symbol.type.source_location());
       str << "anonymous struct/union member `"
           << struct_union_symbol.base_name
           << "' shall not have function members";
@@ -1559,13 +1559,13 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   if(declaration.storage_spec().is_static() ||
      declaration.storage_spec().is_mutable())
   {
-    err_location(struct_union_symbol.type.location());
+    err_location(struct_union_symbol.type.source_location());
     throw "storage class is not allowed here";
   }
 
   if(!cpp_is_pod(struct_union_symbol.type))
   {
-    err_location(struct_union_symbol.type.location());
+    err_location(struct_union_symbol.type.source_location());
     str << "anonymous struct/union member is not POD";
     throw 0;
   }
@@ -1588,7 +1588,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   component.set_base_name(base_name);
   component.set_pretty_name(base_name);
   component.set_anonymous(true);
-  component.add_source_location()=declaration.location();
+  component.add_source_location()=declaration.source_location();
 
   components.push_back(component);
   

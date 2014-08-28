@@ -508,7 +508,7 @@ void cpp_typecheckt::default_assignop_value(
   cpp_declaratort &declarator)
 {
   // save source location
-  source_locationt source_location=declarator.location();
+  source_locationt source_location=declarator.source_location();
   declarator.make_nil();
 
   declarator.value().add_source_location()=source_location;

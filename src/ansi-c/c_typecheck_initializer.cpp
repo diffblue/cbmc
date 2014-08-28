@@ -251,7 +251,7 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       // these must have a constant value
       assert(symbol.value.is_not_nil());
       typecheck_expr(symbol.value);
-      source_locationt location=symbol.value.location();
+      source_locationt location=symbol.value.source_location();
       do_initializer(symbol.value, symbol.type, true);
       make_constant(symbol.value);
     }
@@ -432,7 +432,7 @@ void c_typecheck_baset::do_designated_initializer(
             to_array_type(full_type).size().is_nil()))
         {
           // we are willing to grow an incomplete or zero-sized array
-          exprt zero=zero_initializer(full_type.subtype(), value.location(), *this, get_message_handler());
+          exprt zero=zero_initializer(full_type.subtype(), value.source_location(), *this, get_message_handler());
           dest->operands().resize(integer2long(index)+1, zero);
           
           // todo: adjust type!
@@ -489,8 +489,8 @@ void c_typecheck_baset::do_designated_initializer(
         // Note that gcc issues a warning if the union component is switched.
         // Build a union expression from given component.
         union_exprt union_expr(type);
-        union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
-        union_expr.add_source_location()=value.location();
+        union_expr.op()=zero_initializer(component.type(), value.source_location(), *this, get_message_handler());
+        union_expr.add_source_location()=value.source_location();
         union_expr.set_component_name(component.get_name());
         *dest=union_expr;
       }
@@ -546,8 +546,8 @@ void c_typecheck_baset::do_designated_initializer(
         const union_typet::componentt &component=union_type.components().front();
 
         union_exprt union_expr(type);
-        union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
-        union_expr.add_source_location()=value.location();
+        union_expr.op()=zero_initializer(component.type(), value.source_location(), *this, get_message_handler());
+        union_expr.add_source_location()=value.source_location();
         union_expr.set_component_name(component.get_name());
         *dest=union_expr;
       }
@@ -849,7 +849,7 @@ exprt c_typecheck_baset::do_initializer_list(
      full_type.id()==ID_vector)
   {
     // start with zero everywhere
-    result=zero_initializer(type, value.location(), *this, get_message_handler());
+    result=zero_initializer(type, value.source_location(), *this, get_message_handler());
   }
   else if(full_type.id()==ID_array)
   {
@@ -857,12 +857,12 @@ exprt c_typecheck_baset::do_initializer_list(
     {
       // start with empty array
       result=exprt(ID_array, full_type);
-      result.add_source_location()=value.location();
+      result.add_source_location()=value.source_location();
     }
     else
     {
       // start with zero everywhere
-      result=zero_initializer(type, value.location(), *this, get_message_handler());
+      result=zero_initializer(type, value.source_location(), *this, get_message_handler());
     }
 
     // 6.7.9, 14: An array of character type may be initialized by a character

@@ -399,7 +399,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   {
     // rewrite (_Bool)x to x!=0
     equal_exprt equality;
-    equality.add_source_location()=expr.location();
+    equality.add_source_location()=expr.source_location();
     equality.lhs()=expr.op0();
     equality.rhs()=gen_zero(ns.follow(expr.op0().type()));
     assert(equality.rhs().is_not_nil());

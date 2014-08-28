@@ -369,7 +369,7 @@ offsetof_member_designator:
           init($$, ID_designated_initializer);
           stack($$).operands().resize(1);
           stack($$).op0().id(ID_member);
-          stack($$).op0().add_source_location()=stack($1).location();
+          stack($$).op0().add_source_location()=stack($1).source_location();
           stack($$).op0().set(ID_component_name, stack($1).get(ID_C_base_name));
         }
         | offsetof_member_designator '.' member_name
@@ -486,7 +486,7 @@ postfix_expression:
         | '(' type_name ')' '{' initializer_list_opt '}'
         {
           exprt tmp(ID_initializer_list);
-          tmp.add_source_location()=stack($4).location();
+          tmp.add_source_location()=stack($4).source_location();
           tmp.operands().swap(stack($5).operands());
           $$=$1;
           set($$, ID_typecast);
@@ -497,7 +497,7 @@ postfix_expression:
         {
           // same as above
           exprt tmp(ID_initializer_list);
-          tmp.add_source_location()=stack($4).location();
+          tmp.add_source_location()=stack($4).source_location();
           tmp.operands().swap(stack($5).operands());
           $$=$1;
           set($$, ID_typecast);
@@ -2065,14 +2065,14 @@ compound_statement:
         {
           $$=$2;
           statement($$, ID_block);
-          stack($$).set(ID_C_end_location, stack($3).location());
+          stack($$).set(ID_C_end_location, stack($3).source_location());
           PARSER.pop_scope();
         }
         | compound_scope '{' statement_list '}'
         {
           $$=$2;
           statement($$, ID_block);
-          stack($$).set(ID_C_end_location, stack($4).location());
+          stack($$).set(ID_C_end_location, stack($4).source_location());
           stack($$).operands().swap(stack($3).operands());
           PARSER.pop_scope();
         }
@@ -2080,7 +2080,7 @@ compound_statement:
         {
           $$=$2;
           statement($$, ID_asm);
-          stack($$).set(ID_C_end_location, stack($4).location());
+          stack($$).set(ID_C_end_location, stack($4).source_location());
           mto($$, $3);
           PARSER.pop_scope();
         }

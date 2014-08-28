@@ -402,7 +402,7 @@ void goto_convertt::clean_expr(
         code_assignt assignment;
         assignment.lhs()=lhs;
         assignment.rhs()=expr.op1();
-        assignment.add_source_location()=expr.location();
+        assignment.add_source_location()=expr.source_location();
         convert_assign(assignment, dest);
 
         if(result_is_used)
@@ -561,7 +561,7 @@ void goto_convertt::remove_gcc_conditional_expression(
   if_expr.true_case()=expr.op0();
   if_expr.false_case()=expr.op1();
   if_expr.type()=expr.type();
-  if_expr.add_source_location()=expr.location();
+  if_expr.add_source_location()=expr.source_location();
 
   if(if_expr.cond().type()!=bool_typet())
     if_expr.cond().make_typecast(bool_typet());
