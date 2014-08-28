@@ -654,7 +654,7 @@ void cpp_typecheckt::convert_class_template_specialization(
   // only one should be left
   if(id_set.empty())
   {
-    err_location(type.location());
+    err_location(type.source_location());
     str << "class template `" << base_name << "' not found";
     throw 0;
   }
@@ -685,7 +685,7 @@ void cpp_typecheckt::convert_class_template_specialization(
     // typecheck arguments -- these are for the 'primary' template!
     cpp_template_args_tct template_args_tc=
       typecheck_template_args(
-        declaration.location(),
+        declaration.source_location(),
         to_cpp_declaration(template_symbol.type).template_type(),
         template_args_non_tc);
     
@@ -788,7 +788,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
 
     cpp_template_args_tct template_args=
       typecheck_template_args(
-        declaration.location(),
+        declaration.source_location(),
         template_symbol,
         to_cpp_template_args_non_tc(cpp_name.get_sub()[1]));
 

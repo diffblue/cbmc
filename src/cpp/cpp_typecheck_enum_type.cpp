@@ -166,7 +166,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     symbol.name=symbol_name;
     symbol.base_name=base_name;
     symbol.value.make_nil();
-    symbol.location=type.location();
+    symbol.location=type.source_location();
     symbol.mode=ID_cpp;
     symbol.module=module;
     symbol.type.swap(type);

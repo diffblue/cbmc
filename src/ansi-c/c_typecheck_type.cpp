@@ -621,7 +621,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     symbolt compound_symbol;
     compound_symbol.is_type=true;
     compound_symbol.type=type;
-    compound_symbol.location=type.location();
+    compound_symbol.location=type.source_location();
 
     typecheck_compound_body(compound_symbol);
 
@@ -659,7 +659,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       compound_symbol.name=identifier;
       compound_symbol.base_name=base_name;
       compound_symbol.type=type;
-      compound_symbol.location=type.location();
+      compound_symbol.location=type.source_location();
       compound_symbol.pretty_name=id2string(type.id())+" "+id2string(base_name);
 
       if(have_body)
@@ -711,7 +711,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   }
 
   symbol_typet symbol_type;
-  symbol_type.add_source_location()=type.location();
+  symbol_type.add_source_location()=type.source_location();
   symbol_type.set_identifier(identifier);
 
   type.swap(symbol_type);
@@ -753,7 +753,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
     {
       struct_union_typet::componentt new_component;
       new_component.id(ID_static_assert);
-      new_component.add_source_location()=declaration.location();
+      new_component.add_source_location()=declaration.source_location();
       new_component.operands().swap(declaration.operands());
       assert(new_component.operands().size()==2);
       components.push_back(new_component);
@@ -771,7 +771,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
       {
         struct_union_typet::componentt new_component;
 
-        new_component.add_source_location()=d_it->location();
+        new_component.add_source_location()=d_it->source_location();
         new_component.set(ID_name, d_it->get_base_name());
         new_component.set(ID_pretty_name, d_it->get_base_name());
         new_component.type()=declaration.full_type(*d_it);

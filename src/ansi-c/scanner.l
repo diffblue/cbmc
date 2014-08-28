@@ -263,7 +263,7 @@ void ansi_c_scanner_init()
 <STRING_LITERAL>"/*" { BEGIN(STRING_LITERAL_COMMENT); /* C comment, ignore */ }
 <STRING_LITERAL>"//".*\n	{ /* C++ comment, ignore */ }
 <STRING_LITERAL>. { // anything else: back to normal
-                  source_locationt l=stack(yyansi_clval).location();
+                  source_locationt l=stack(yyansi_clval).source_location();
                   stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
                   stack(yyansi_clval).add_source_location().swap(l);
                   BEGIN(GRAMMAR); // back to normal

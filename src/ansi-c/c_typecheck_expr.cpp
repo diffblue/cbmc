@@ -323,7 +323,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       {
         // __imag__ x is simply a zero constant
         exprt result=gen_zero(op_type);
-        result.add_source_location()=expr.location();
+        result.add_source_location()=expr.source_location();
         expr=result;
       }
     }
@@ -467,9 +467,9 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
 
   // turn into function call
   side_effect_expr_function_callt result;
-  result.add_source_location()=expr.location();
+  result.add_source_location()=expr.source_location();
   result.function()=symbol_exprt(ID_gcc_builtin_va_arg);
-  result.function().add_source_location()=expr.location();
+  result.function().add_source_location()=expr.source_location();
   result.function().type()=new_type;
   result.arguments().push_back(arg);
   result.type()=new_type.return_type();
@@ -681,7 +681,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
   // We make an effort to produce a constant,
   // but this may depend on variables
   simplify(result, *this);
-  result.add_source_location()=expr.location();
+  result.add_source_location()=expr.source_location();
 
   expr.swap(result);
 }
@@ -756,7 +756,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
     }
     
     code_declt decl;
-    decl.add_source_location()=declaration.location();
+    decl.add_source_location()=declaration.source_location();
     decl.symbol()=symbol_expr(symbol);
 
     expr.op0()=decl;    

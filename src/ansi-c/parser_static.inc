@@ -13,7 +13,7 @@
 #define mto(x, y) stack(x).move_to_operands(stack(y))
 #define mts(x, y) ((typet &)stack(x)).move_to_subtypes((typet &)stack(y))
 #define binary(x, y, l, id, z) { init(x, id); \
-  stack(x).add_source_location()=stack(l).location(); \
+  stack(x).add_source_location()=stack(l).source_location(); \
   stack(x).reserve_operands(2); mto(x, y); mto(x, z); }
 
 /*******************************************************************\
@@ -117,7 +117,7 @@ static void merge_types(irept &dest, irept &src)
 
   if(dest.id()!=ID_merged_type)
   {
-    source_locationt location=static_cast<const exprt &>(dest).location();
+    source_locationt location=static_cast<const exprt &>(dest).source_location();
     typet new_type(ID_merged_type);
     new_type.move_to_subtypes((typet &)(dest));
     dest.swap(new_type);

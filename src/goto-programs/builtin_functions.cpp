@@ -60,7 +60,7 @@ void goto_convertt::do_prob_uniform(
   }
 
   exprt rhs=side_effect_exprt("prob_uniform", lhs.type());
-  rhs.add_source_location()=function.location();
+  rhs.add_source_location()=function.source_location();
 
   if(lhs.type().id()!=ID_unsignedbv &&
      lhs.type().id()!=ID_signedbv)
@@ -101,7 +101,7 @@ void goto_convertt::do_prob_uniform(
   rhs.copy_to_operands(arguments[0], arguments[1]);
 
   code_assignt assignment(lhs, rhs);
-  assignment.add_source_location()=function.location();
+  assignment.add_source_location()=function.source_location();
   copy(assignment, ASSIGN, dest);
 }
 
@@ -139,7 +139,7 @@ void goto_convertt::do_prob_coin(
   }
 
   exprt rhs=side_effect_exprt("prob_coin", lhs.type());
-  rhs.add_source_location()=function.location();
+  rhs.add_source_location()=function.source_location();
 
   if(lhs.type()!=bool_typet())
   {
@@ -182,7 +182,7 @@ void goto_convertt::do_prob_coin(
   rhs.copy_to_operands(from_rational(prob));
 
   code_assignt assignment(lhs, rhs);
-  assignment.add_source_location()=function.location();
+  assignment.add_source_location()=function.source_location();
   copy(assignment, ASSIGN, dest);
 }
 
@@ -213,12 +213,12 @@ void goto_convertt::do_printf(
     side_effect_exprt printf_code(ID_printf, return_type);
 
     printf_code.operands()=arguments;
-    printf_code.add_source_location()=function.location();
+    printf_code.add_source_location()=function.source_location();
 
     if(lhs.is_not_nil())
     {
       code_assignt assignment(lhs, printf_code);
-      assignment.add_source_location()=function.location();
+      assignment.add_source_location()=function.source_location();
       copy(assignment, ASSIGN, dest);
     }
     else
@@ -253,7 +253,7 @@ void goto_convertt::do_input(
   codet input_code;
   input_code.set_statement(ID_input);
   input_code.operands()=arguments;
-  input_code.add_source_location()=function.location();
+  input_code.add_source_location()=function.source_location();
   
   if(arguments.size()<2)
   {
@@ -284,7 +284,7 @@ void goto_convertt::do_cover(
 {
   codet output_code;
   output_code.set_statement(ID_output);
-  output_code.add_source_location()=function.location();
+  output_code.add_source_location()=function.source_location();
 
   if(arguments.size()!=1)
   {
@@ -332,7 +332,7 @@ void goto_convertt::do_output(
   codet output_code;
   output_code.set_statement(ID_output);
   output_code.operands()=arguments;
-  output_code.add_source_location()=function.location();
+  output_code.add_source_location()=function.source_location();
   
   if(arguments.size()<2)
   {
@@ -374,7 +374,7 @@ void goto_convertt::do_atomic_begin(
   }
 
   goto_programt::targett t=dest.add_instruction(ATOMIC_BEGIN);
-  t->location=function.location();
+  t->location=function.source_location();
 }
 
 /*******************************************************************\
@@ -408,7 +408,7 @@ void goto_convertt::do_atomic_end(
   }
 
   goto_programt::targett t=dest.add_instruction(ATOMIC_END);
-  t->location=function.location();
+  t->location=function.source_location();
 }
 
 /*******************************************************************\
@@ -469,7 +469,7 @@ void goto_convertt::do_cpp_new(
            code_type.parameters().size()==2);
 
     const symbolt &tmp_symbol=
-      new_tmp_symbol(return_type, "new", dest, rhs.location());
+      new_tmp_symbol(return_type, "new", dest, rhs.source_location());
     
     tmp_symbol_expr=tmp_symbol.symbol_expr();
     
@@ -479,7 +479,7 @@ void goto_convertt::do_cpp_new(
     new_call.arguments().push_back(object_size);
     new_call.set("#type", lhs.type().subtype());
     new_call.lhs()=tmp_symbol_expr;
-    new_call.add_source_location()=rhs.location();
+    new_call.add_source_location()=rhs.source_location();
     
     convert(new_call, dest);
   }
@@ -498,7 +498,7 @@ void goto_convertt::do_cpp_new(
            code_type.parameters().size()==3);
 
     const symbolt &tmp_symbol=
-      new_tmp_symbol(return_type, "new", dest, rhs.location());
+      new_tmp_symbol(return_type, "new", dest, rhs.source_location());
 
     tmp_symbol_expr=tmp_symbol.symbol_expr();
 
@@ -509,7 +509,7 @@ void goto_convertt::do_cpp_new(
     new_call.arguments().push_back(rhs.op0()); // memory location
     new_call.set("#type", lhs.type().subtype());
     new_call.lhs()=tmp_symbol_expr;
-    new_call.add_source_location()=rhs.location();
+    new_call.add_source_location()=rhs.source_location();
 
     for(unsigned i=0; i<code_type.parameters().size(); i++)
       if(new_call.arguments()[i].type()!=code_type.parameters()[i].type())
@@ -901,7 +901,7 @@ void goto_convertt::do_function_call_symbol(
     }
 
     goto_programt::targett t = dest.add_instruction(OTHER);
-    t->location = function.location();
+    t->location = function.source_location();
     t->location.set("user-provided", true);
     if(identifier==CPROVER_PREFIX "parameter_predicates")
     {
@@ -924,7 +924,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(OTHER);
     t->guard=arguments.front();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->code=codet(ID_user_specified_predicate);
   }
@@ -939,7 +939,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSUME);
     t->guard=arguments.front();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     
     // let's double-check the type of the argument
@@ -962,7 +962,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);
 
@@ -979,7 +979,7 @@ void goto_convertt::do_function_call_symbol(
     function_call.lhs()=lhs;
     function_call.function()=function;
     function_call.arguments()=arguments;
-    function_call.add_source_location()=function.location();
+    function_call.add_source_location()=function.source_location();
 
     copy(function_call, FUNCTION_CALL, dest);
 
@@ -991,7 +991,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);    
   }
@@ -1006,7 +1006,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=arguments.front();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);
     t->location.set_comment("assertion "+id2string(from_expr(ns, "", t->guard)));
@@ -1034,7 +1034,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=arguments[0];
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);
     t->location.set_comment(description);
@@ -1093,11 +1093,11 @@ void goto_convertt::do_function_call_symbol(
     if(lhs.is_nil()) return;
 
     exprt rhs=side_effect_expr_nondett(lhs.type());
-    rhs.add_source_location()=function.location();
+    rhs.add_source_location()=function.source_location();
     rhs.set(ID_C_identifier, identifier);
 
     code_assignt assignment(lhs, rhs);
-    assignment.add_source_location()=function.location();
+    assignment.add_source_location()=function.source_location();
     copy(assignment, ASSIGN, dest);
   }
   else if(has_prefix(id2string(identifier), CPROVER_PREFIX "uninterpreted_"))
@@ -1107,12 +1107,12 @@ void goto_convertt::do_function_call_symbol(
 
     function_application_exprt rhs;
     rhs.type()=lhs.type();
-    rhs.add_source_location()=function.location();
+    rhs.add_source_location()=function.source_location();
     rhs.function()=function;
     rhs.arguments()=arguments;
 
     code_assignt assignment(lhs, rhs);
-    assignment.add_source_location()=function.location();
+    assignment.add_source_location()=function.source_location();
     copy(assignment, ASSIGN, dest);
   }
   else if(has_prefix(id2string(identifier), CPROVER_PREFIX "array_set"))
@@ -1155,7 +1155,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);
     t->location.set_comment(description);
@@ -1179,7 +1179,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);
     t->location.set_comment(description);
@@ -1202,7 +1202,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);
     t->location.set_comment(description);
@@ -1225,7 +1225,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);
     t->location.set_comment(description);
@@ -1247,7 +1247,7 @@ void goto_convertt::do_function_call_symbol(
       goto_programt::targett t=dest.add_instruction(ASSERT);
 
     t->guard=false_exprt();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);
     t->location.set_comment(description);
@@ -1269,7 +1269,7 @@ void goto_convertt::do_function_call_symbol(
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
-    t->location=function.location();
+    t->location=function.source_location();
     t->location.set("user-provided", true);
     t->location.set_property_class(ID_assertion);
     t->location.set_comment(description);
@@ -1284,7 +1284,7 @@ void goto_convertt::do_function_call_symbol(
     }
 
     goto_programt::targett t=dest.add_instruction(OTHER);
-    t->location=function.location();
+    t->location=function.source_location();
     t->code.set(ID_statement, ID_fence);
 
     forall_expr(it, arguments)
@@ -1322,7 +1322,7 @@ void goto_convertt::do_function_call_symbol(
       rhs.copy_to_operands(list_arg);
       rhs.set(ID_C_va_arg_type, to_code_type(function.type()).return_type());
       goto_programt::targett t1=dest.add_instruction(ASSIGN);
-      t1->location=function.location();
+      t1->location=function.source_location();
       t1->code=code_assignt(list_arg, rhs);
     }
 
@@ -1332,9 +1332,9 @@ void goto_convertt::do_function_call_symbol(
       t.subtype()=lhs.type();
       dereference_exprt rhs(lhs.type());
       rhs.op0()=typecast_exprt(list_arg, t);
-      rhs.add_source_location()=function.location();
+      rhs.add_source_location()=function.source_location();
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
-      t2->location=function.location();
+      t2->location=function.source_location();
       t2->code=code_assignt(lhs, rhs);
     }
   }
@@ -1356,7 +1356,7 @@ void goto_convertt::do_function_call_symbol(
     }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
-    t->location=function.location();
+    t->location=function.source_location();
     t->code=code_assignt(dest_expr, src_expr);
   }
   else if(identifier=="c::__builtin_va_start")
@@ -1380,7 +1380,7 @@ void goto_convertt::do_function_call_symbol(
     }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
-    t->location=function.location();
+    t->location=function.source_location();
     t->code=code_assignt(dest_expr, src_expr);
   }
   else if(identifier=="c::__builtin_va_end")
@@ -1401,7 +1401,7 @@ void goto_convertt::do_function_call_symbol(
     }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
-    t->location=function.location();
+    t->location=function.source_location();
     t->code=code_assignt(dest_expr, gen_zero(dest_expr.type()));
   }
   else if(identifier=="c::__sync_fetch_and_add" ||
@@ -1430,13 +1430,13 @@ void goto_convertt::do_function_call_symbol(
     dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
 
     goto_programt::targett t1=dest.add_instruction(ATOMIC_BEGIN);
-    t1->location=function.location();
+    t1->location=function.source_location();
 
     if(lhs.is_not_nil())
     {
       // return *ptr
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
-      t2->location=function.location();
+      t2->location=function.source_location();
       t2->code=code_assignt(lhs, deref_ptr);
       if(t2->code.op0().type()!=t2->code.op1().type())
         t2->code.op1().make_typecast(t2->code.op0().type());
@@ -1457,17 +1457,17 @@ void goto_convertt::do_function_call_symbol(
       op_expr.op1().make_typecast(op_expr.type());
 
     goto_programt::targett t3=dest.add_instruction(ASSIGN);
-    t3->location=function.location();
+    t3->location=function.source_location();
     t3->code=code_assignt(deref_ptr, op_expr);
     
     // this instruction implies an mfence, i.e., WRfence
     goto_programt::targett t4=dest.add_instruction(OTHER);
-    t4->location=function.location();
+    t4->location=function.source_location();
     t4->code=codet(ID_fence);
     t4->code.set(ID_WRfence, true);
 
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
-    t5->location=function.location();
+    t5->location=function.source_location();
   }
   else if(identifier=="c::__sync_add_and_fetch" ||
           identifier=="c::__sync_sub_and_fetch" ||
@@ -1495,7 +1495,7 @@ void goto_convertt::do_function_call_symbol(
     dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
 
     goto_programt::targett t1=dest.add_instruction(ATOMIC_BEGIN);
-    t1->location=function.location();
+    t1->location=function.source_location();
 
     irep_idt op_id=
       identifier=="c::__sync_add_and_fetch"?ID_plus:
@@ -1512,14 +1512,14 @@ void goto_convertt::do_function_call_symbol(
       op_expr.op1().make_typecast(op_expr.type());
 
     goto_programt::targett t3=dest.add_instruction(ASSIGN);
-    t3->location=function.location();
+    t3->location=function.source_location();
     t3->code=code_assignt(deref_ptr, op_expr);
     
     if(lhs.is_not_nil())
     {
       // return *ptr
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
-      t2->location=function.location();
+      t2->location=function.source_location();
       t2->code=code_assignt(lhs, deref_ptr);
       if(t2->code.op0().type()!=t2->code.op1().type())
         t2->code.op1().make_typecast(t2->code.op0().type());
@@ -1527,12 +1527,12 @@ void goto_convertt::do_function_call_symbol(
 
     // this instruction implies an mfence, i.e., WRfence
     goto_programt::targett t4=dest.add_instruction(OTHER);
-    t4->location=function.location();
+    t4->location=function.source_location();
     t4->code=codet(ID_fence);
     t4->code.set(ID_WRfence, true);
     
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
-    t5->location=function.location();
+    t5->location=function.source_location();
   }
   else if(identifier=="c::__sync_bool_compare_and_swap")
   {
@@ -1563,7 +1563,7 @@ void goto_convertt::do_function_call_symbol(
     dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
 
     goto_programt::targett t1=dest.add_instruction(ATOMIC_BEGIN);
-    t1->location=function.location();
+    t1->location=function.source_location();
 
     // build *ptr==oldval    
     equal_exprt equal(deref_ptr, arguments[1]);
@@ -1574,7 +1574,7 @@ void goto_convertt::do_function_call_symbol(
     {
       // return *ptr==oldval
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
-      t2->location=function.location();
+      t2->location=function.source_location();
       t2->code=code_assignt(lhs, equal);
       if(t2->code.op0().type()!=t2->code.op1().type())
         t2->code.op1().make_typecast(t2->code.op0().type());
@@ -1586,17 +1586,17 @@ void goto_convertt::do_function_call_symbol(
       if_expr.op1().make_typecast(if_expr.type());
 
     goto_programt::targett t3=dest.add_instruction(ASSIGN);
-    t3->location=function.location();
+    t3->location=function.source_location();
     t3->code=code_assignt(deref_ptr, if_expr);
     
     // this instruction implies an mfence, i.e., WRfence
     goto_programt::targett t4=dest.add_instruction(OTHER);
-    t4->location=function.location();
+    t4->location=function.source_location();
     t4->code=codet(ID_fence);
     t4->code.set(ID_WRfence, true);
     
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
-    t5->location=function.location();
+    t5->location=function.source_location();
   }
   else if(identifier=="c::__sync_val_compare_and_swap")
   {
@@ -1617,13 +1617,13 @@ void goto_convertt::do_function_call_symbol(
     dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
 
     goto_programt::targett t1=dest.add_instruction(ATOMIC_BEGIN);
-    t1->location=function.location();
+    t1->location=function.source_location();
 
     if(lhs.is_not_nil())
     {
       // return *ptr
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
-      t2->location=function.location();
+      t2->location=function.source_location();
       t2->code=code_assignt(lhs, deref_ptr);
       if(t2->code.op0().type()!=t2->code.op1().type())
         t2->code.op1().make_typecast(t2->code.op0().type());
@@ -1640,17 +1640,17 @@ void goto_convertt::do_function_call_symbol(
       if_expr.op1().make_typecast(if_expr.type());
 
     goto_programt::targett t3=dest.add_instruction(ASSIGN);
-    t3->location=function.location();
+    t3->location=function.source_location();
     t3->code=code_assignt(deref_ptr, if_expr);
     
     // this instruction implies an mfence, i.e., WRfence
     goto_programt::targett t4=dest.add_instruction(OTHER);
-    t4->location=function.location();
+    t4->location=function.source_location();
     t4->code=codet(ID_fence);
     t4->code.set(ID_WRfence, true);
     
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
-    t5->location=function.location();
+    t5->location=function.source_location();
   }
   else if(identifier=="c::__sync_lock_test_and_set")
   {
@@ -1684,7 +1684,7 @@ void goto_convertt::do_function_call_symbol(
     function_call.lhs()=lhs;
     function_call.function()=function;
     function_call.arguments()=arguments;
-    function_call.add_source_location()=function.location();
+    function_call.add_source_location()=function.source_location();
 
     copy(function_call, FUNCTION_CALL, dest);
   }

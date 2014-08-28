@@ -647,7 +647,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     p_symbol.is_thread_local=true;
     p_symbol.is_file_local=true;
     p_symbol.is_parameter=true;
-    p_symbol.location=p_it->location();
+    p_symbol.location=p_it->source_location();
 
     symbolt *new_p_symbol;
     move_symbol(p_symbol, new_p_symbol);

@@ -38,7 +38,7 @@ void ansi_c_declaratort::build(irept &src)
     if(t.id()==ID_symbol)
     {
       set_base_name(t.get(ID_C_base_name));
-      add_source_location()=t.location();
+      add_source_location()=t.source_location();
       t.make_nil();
       break;
     }
@@ -164,7 +164,7 @@ void ansi_c_declarationt::to_symbol(
   symbol.name="c::"+id2string(declarator.get_name());
   symbol.base_name=declarator.get_base_name();
   symbol.is_type=get_is_typedef();
-  symbol.location=declarator.location();
+  symbol.location=declarator.source_location();
   symbol.is_extern=get_is_extern();
   symbol.is_macro=get_is_typedef() || get_is_enum_constant();
   symbol.is_parameter=get_is_parameter();

@@ -311,7 +311,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   {
     assert(declaration.operands().size()==2);
     codet new_code(ID_static_assert);
-    new_code.add_source_location()=code.location();
+    new_code.add_source_location()=code.source_location();
     new_code.operands().swap(declaration.operands());
     code.swap(new_code);
     typecheck_code(code);
@@ -527,7 +527,7 @@ void c_typecheck_baset::typecheck_for(codet &code)
       if(to_code(code.op3()).get_statement()==ID_decl_block)
       {
         code_blockt code_block;
-        code_block.add_source_location()=code.op3().location();
+        code_block.add_source_location()=code.op3().source_location();
 
         code_block.move_to_operands(code.op3());
         code.op3().swap(code_block);
@@ -542,7 +542,7 @@ void c_typecheck_baset::typecheck_for(codet &code)
   else
   {
     code_blockt code_block;
-    code_block.add_source_location()=code.location();
+    code_block.add_source_location()=code.source_location();
     if(to_code(code.op3()).get_statement()==ID_block)
       code_block.set(
         ID_C_end_location,
@@ -550,7 +550,7 @@ void c_typecheck_baset::typecheck_for(codet &code)
     else
       code_block.set(
         ID_C_end_location,
-        code.op3().location());;
+        code.op3().source_location());;
 
     code_block.reserve_operands(2);
     code_block.move_to_operands(code.op0());
@@ -765,7 +765,7 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
   if(to_code(code.then_case()).get_statement()==ID_decl_block)
   {
     code_blockt code_block;
-    code_block.add_source_location()=code.then_case().location();
+    code_block.add_source_location()=code.then_case().source_location();
 
     code_block.move_to_operands(code.then_case());
     code.then_case().swap(code_block);
@@ -778,7 +778,7 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
     if(to_code(code.else_case()).get_statement()==ID_decl_block)
     {
       code_blockt code_block;
-      code_block.add_source_location()=code.else_case().location();
+      code_block.add_source_location()=code.else_case().source_location();
 
       code_block.move_to_operands(code.else_case());
       code.else_case().swap(code_block);
@@ -828,7 +828,7 @@ void c_typecheck_baset::typecheck_return(codet &code)
     {
       // gcc doesn't actually complain, it just warns!
       // We'll put a zero here, which is dubious.
-      exprt zero=zero_initializer(return_type, code.location(), *this, get_message_handler());
+      exprt zero=zero_initializer(return_type, code.source_location(), *this, get_message_handler());
       code.copy_to_operands(zero);
     }
   }
@@ -920,7 +920,7 @@ void c_typecheck_baset::typecheck_while(code_whilet &code)
   if(code.body().get_statement()==ID_decl_block)
   {
     code_blockt code_block;
-    code_block.add_source_location()=code.body().location();
+    code_block.add_source_location()=code.body().source_location();
 
     code_block.move_to_operands(code.body());
     code.body().swap(code_block);
@@ -961,7 +961,7 @@ void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
   if(code.body().get_statement()==ID_decl_block)
   {
     code_blockt code_block;
-    code_block.add_source_location()=code.body().location();
+    code_block.add_source_location()=code.body().source_location();
 
     code_block.move_to_operands(code.body());
     code.body().swap(code_block);

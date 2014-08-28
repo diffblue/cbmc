@@ -331,14 +331,14 @@ void template_mapt::build_unassigned(
     {
       typet tmp(ID_unassigned);
       tmp.set(ID_identifier, t.type().get(ID_identifier));
-      tmp.add_source_location()=t.location();
+      tmp.add_source_location()=t.source_location();
       type_map[t.type().get(ID_identifier)]=tmp;
     }
     else
     {
       exprt tmp(ID_unassigned, t.type());
       tmp.set(ID_identifier, t.get(ID_identifier));
-      tmp.add_source_location()=t.location();
+      tmp.add_source_location()=t.source_location();
       expr_map[t.get(ID_identifier)]=tmp;
     }    
   }
