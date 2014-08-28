@@ -180,7 +180,7 @@ protected:
   unsigned l;  
 };
 
-inline std::ostream & operator << (std::ostream &out, literalt l);
+std::ostream & operator << (std::ostream &out, literalt l);
 
 // constants
 literalt const_literal(bool value);
