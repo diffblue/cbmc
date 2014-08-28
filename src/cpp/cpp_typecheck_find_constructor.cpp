@@ -28,7 +28,7 @@ void cpp_typecheckt::find_constructor(
 {
   constructor_expr.make_nil();
 
-  locationt location=start_dest_type.location();
+  source_locationt source_location=start_dest_type.source_location();
   typet dest_type(start_dest_type);
   follow_symbol(dest_type);
 
@@ -70,7 +70,7 @@ void cpp_typecheckt::find_constructor(
 
           constructor_expr=exprt(ID_symbol, type);
           constructor_expr.set(ID_identifier, identifier);
-          constructor_expr.add_source_location()=location;
+          constructor_expr.add_source_location()=source_location;
           return;
         }
       }

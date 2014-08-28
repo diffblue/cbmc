@@ -351,9 +351,9 @@ bool Parser::SyntaxError()
 
   if(t[0].kind!='\0')
   {
-    locationt location;
-    location.set_file(t[0].filename);
-    location.set_line(i2string(t[0].line_no));
+    source_locationt source_location;
+    source_location.set_file(t[0].filename);
+    source_location.set_line(i2string(t[0].line_no));
 
     std::string message="parse error before `";
 
@@ -366,7 +366,7 @@ bool Parser::SyntaxError()
 
     message+="'";
 
-    parser.print(1, message, -1, location);
+    parser.print(1, message, -1, source_location);
   }
 
   return bool(++number_of_errors < max_errors);

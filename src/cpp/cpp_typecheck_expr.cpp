@@ -467,13 +467,13 @@ void cpp_typecheckt::typecheck_function_expr(
       // turn this into a function call
       side_effect_expr_function_callt function_call;
       function_call.arguments().reserve(expr.operands().size());
-      function_call.add_source_location()=expr.location();
+      function_call.add_source_location()=expr.source_location();
 
       // first do function/operator
       cpp_namet cpp_name;
       cpp_name.get_sub().push_back(irept(ID_name));
       cpp_name.get_sub().back().set(ID_identifier, op_name);
-      cpp_name.get_sub().back().add(ID_C_source_location)=expr.location();
+      cpp_name.get_sub().back().add(ID_C_source_location)=expr.source_location();
 
       function_call.function()=
         static_cast<const exprt &>(
@@ -599,12 +599,12 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     // turn this into a function call
     side_effect_expr_function_callt function_call;
     function_call.arguments().reserve(expr.operands().size());
-    function_call.add_source_location()=expr.location();
+    function_call.add_source_location()=expr.source_location();
 
     cpp_namet cpp_name;
     cpp_name.get_sub().push_back(irept(ID_name));
     cpp_name.get_sub().back().set(ID_identifier, op_name);
-    cpp_name.get_sub().back().add(ID_C_source_location)=expr.location();
+    cpp_name.get_sub().back().add(ID_C_source_location)=expr.source_location();
 
     // See if the struct decalares the cast operator as a member
     bool found_in_struct = false;
@@ -686,12 +686,12 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       cpp_namet cpp_name;
       cpp_name.get_sub().push_back(irept(ID_name));
       cpp_name.get_sub().back().set(ID_identifier, op_name);
-      cpp_name.get_sub().back().add(ID_C_source_location)=expr.location();
+      cpp_name.get_sub().back().add(ID_C_source_location)=expr.source_location();
 
       // turn this into a function call
       side_effect_expr_function_callt function_call;
       function_call.arguments().reserve(expr.operands().size());
-      function_call.add_source_location()=expr.location();
+      function_call.add_source_location()=expr.source_location();
 
       // There are two options to overload an operator:
       //
@@ -824,7 +824,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 
   if(!op.get_bool(ID_C_lvalue) && expr.type().id()==ID_code)
   {
-    err_location(expr.location());
+    err_location(expr.source_location());
     str << "expr not an lvalue";
     throw 0;
   }
@@ -857,7 +857,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 
       if(code_type.get_bool(ID_C_is_virtual))
       {
-        err_location(expr.location());
+        err_location(expr.source_location());
         str << "error: pointers to virtual methods"
             << " are currently not implemented";
         throw 0;
@@ -980,7 +980,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 
   exprt code=
     cpp_constructor(
-      expr.find_location(),
+      expr.find_source_location(),
       object_expr,
       initializer.operands());
 
@@ -1040,7 +1040,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       throw 0;
     }
 
-    new_expr.add_source_location()=expr.location();
+    new_expr.add_source_location()=expr.source_location();
     expr=new_expr;
   }
   else if(expr.operands().size()==1)
@@ -1070,7 +1070,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
         // become a comma expression, and that these are already typechecked.
         side_effect_expr_function_callt f_call;
 
-        f_call.add_source_location()=expr.location();
+        f_call.add_source_location()=expr.source_location();
         f_call.function().swap(expr.type());
         f_call.arguments()=collect_comma_expression(expr.op0()).operands();
         
@@ -1132,10 +1132,10 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 
     typet symb(ID_symbol);
     symb.set(ID_identifier, expr.type().get(ID_name));
-    symb.add_source_location()=expr.location();
+    symb.add_source_location()=expr.source_location();
     
     exprt e=expr;
-    new_temporary(e.location(), symb, e.operands(), expr);
+    new_temporary(e.source_location(), symb, e.operands(), expr);
   }
 }
 
@@ -1161,13 +1161,13 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
   }
 
   const exprt &this_expr=cpp_scopes.current_scope().this_expr;
-  const locationt location=expr.find_location();
+  const source_locationt source_location=expr.find_source_location();
 
   assert(this_expr.is_not_nil());
   assert(this_expr.type().id()==ID_pointer);
 
   expr=this_expr;
-  expr.add_source_location()=location;
+  expr.add_source_location()=source_location;
 }
 
 /*******************************************************************\
@@ -1218,13 +1218,13 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   // we provide the right destructor, for the convenience
   // of later stages
   exprt new_object(ID_new_object, pointer_type.subtype());
-  new_object.add_source_location()=expr.location();
+  new_object.add_source_location()=expr.source_location();
   new_object.set(ID_C_lvalue, true);
   
   already_typechecked(new_object);
 
   codet destructor_code=cpp_destructor(
-    expr.location(),
+    expr.source_location(),
     pointer_type.subtype(),
     new_object);
     
@@ -1292,7 +1292,7 @@ void cpp_typecheckt::typecheck_expr_member(
      follow(op0.type()).id()!=ID_struct)
   {
     exprt tmp("cpp_dummy_destructor");
-    tmp.add_source_location()=expr.location();
+    tmp.add_source_location()=expr.source_location();
     expr.swap(tmp);
     return;
   }
@@ -1414,7 +1414,7 @@ void cpp_typecheckt::typecheck_expr_member(
 
   exprt member;
 
-  if(get_component(expr.location(),
+  if(get_component(expr.source_location(),
                    expr.op0(),
                    component_name,
                    member))
@@ -1561,7 +1561,7 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
 
   typecheck_type(type);
 
-  locationt location=expr.location();
+  source_locationt source_location=expr.source_location();
 
   exprt new_expr;
   if(id==ID_const_cast)
@@ -1630,7 +1630,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   exprt &expr,
   const cpp_typecheck_fargst &fargs)
 {
-  locationt location=
+  source_locationt source_location=
     to_cpp_name(expr).location();
 
   if(expr.get_sub().size()==1 &&
@@ -1660,7 +1660,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       // adjust return type of function to match pointer subtype
       if(fargs.operands.size()<1)
       {
-        err_location(location);
+        err_location(source_location);
         throw "__sync_* primitives take as least one argument";
       }
 
@@ -1668,12 +1668,12 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
       if(ptr_arg.type().id()!=ID_pointer)
       {
-        err_location(location);
+        err_location(source_location);
         throw "__sync_* primitives take pointer as first argument";
       }
 
       symbol_exprt result;
-      result.add_source_location()=location;
+      result.add_source_location()=source_location;
       result.set_identifier(language_prefix+id2string(identifier));
       code_typet t;
       t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
@@ -1696,7 +1696,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
       typet name(ID_name);
       name.set(ID_identifier, tmp);
-      name.add_source_location()=location;
+      name.add_source_location()=source_location;
       
       type=name;
     }
@@ -1737,7 +1737,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         {
           if(symbol_expr.type().id()!=ID_code)
           {
-            err_location(location);
+            err_location(source_location);
             str << "object missing";
             throw 0;
           }
@@ -1753,7 +1753,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
           ptrmem.add("component_cpp_name") = expr;
 
-          ptrmem.add_source_location()=location;
+          ptrmem.add_source_location()=source_location;
           typecheck_expr_ptrmember(ptrmem, fargs);
           symbol_expr.swap(ptrmem);
         }
@@ -1761,7 +1761,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
     }
   }
 
-  symbol_expr.add_source_location()=location;
+  symbol_expr.add_source_location()=source_location;
   expr=symbol_expr;
 
   if(expr.id()==ID_symbol)
@@ -1789,7 +1789,7 @@ void cpp_typecheckt::add_implicit_dereference(exprt &expr)
     // add implicit dereference
     exprt tmp(ID_dereference, expr.type().subtype());
     tmp.set(ID_C_implicit, true);
-    tmp.add_source_location()=expr.location();
+    tmp.add_source_location()=expr.source_location();
     tmp.move_to_operands(expr);
     tmp.set(ID_C_lvalue, true);
     expr.swap(tmp);
@@ -1855,21 +1855,21 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       tmp_object_expr.set(ID_statement, ID_temporary_object);
       tmp_object_expr.set(ID_C_lvalue, true);
       tmp_object_expr.set(ID_mode, ID_cpp);
-      tmp_object_expr.add_source_location()=expr.location();
+      tmp_object_expr.add_source_location()=expr.source_location();
       expr.swap(tmp_object_expr);
     }
     else if(expr.arguments().size()==1)
     {
       exprt typecast("explicit-typecast");
       typecast.type()=pod;
-      typecast.add_source_location() = expr.location();
+      typecast.add_source_location() = expr.source_location();
       typecast.copy_to_operands(expr.arguments().front());
       typecheck_expr_explicit_typecast(typecast);
       expr.swap(typecast);
     }
     else
     {
-      err_location(expr.location());
+      err_location(expr.source_location());
       str << "zero or one argument excpected\n";
       throw 0;
     }
@@ -1905,7 +1905,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
       if(bound.is_nil())
       {
-        err_location(expr.location());
+        err_location(expr.source_location());
         str << "pointer-to-member not bound";
         throw 0;
       }
@@ -1931,7 +1931,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     {
       assert(expr.function().type().id()==ID_pointer);
       exprt tmp(ID_dereference, expr.function().type().subtype());
-      tmp.add_source_location()=expr.op0().location();
+      tmp.add_source_location()=expr.op0().source_location();
       tmp.move_to_operands(expr.function());
       expr.function().swap(tmp);
     }
@@ -1987,7 +1987,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
       {
         exprt tmp(ID_dereference, vtentry_member.type().subtype());
-        tmp.add_source_location()=expr.op0().location();
+        tmp.add_source_location()=expr.op0().source_location();
         tmp.move_to_operands(vtentry_member);
         vtentry_member.swap(tmp);
       }
@@ -2012,7 +2012,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   {
     irept name(ID_name);
     name.set(ID_identifier, "operator()");
-    name.set(ID_C_source_location, expr.location());
+    name.set(ID_C_source_location, expr.source_location());
 
     cpp_namet cppname;
     cppname.get_sub().push_back(name);
@@ -2058,7 +2058,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     tmp_object_expr.set(ID_statement, ID_temporary_object);
     tmp_object_expr.set(ID_C_lvalue, true);
     tmp_object_expr.set(ID_mode, ID_cpp);
-    tmp_object_expr.add_source_location()=expr.location();
+    tmp_object_expr.add_source_location()=expr.source_location();
 
     exprt member;
 
@@ -2067,7 +2067,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     
     assert(follow(tmp_object_expr.type()).id()==ID_struct);
 
-    get_component(expr.location(),
+    get_component(expr.source_location(),
                   new_object,
                   expr.function().get(ID_identifier),
                   member);
@@ -2121,7 +2121,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       {
         exprt tmp(ID_address_of, typet(ID_pointer));
         tmp.type().subtype()=operand.type();
-        tmp.add_source_location()=operand.location();
+        tmp.add_source_location()=operand.source_location();
         tmp.move_to_operands(operand);
         operand.swap(tmp);
       }
@@ -2189,7 +2189,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
         arg.copy_to_operands(expr.arguments()[i]);
 
         exprt temporary;
-        new_temporary(expr.arguments()[i].location(),
+        new_temporary(expr.arguments()[i].source_location(),
                       parameters[i].type().subtype(),
                       arg,
                       temporary);
@@ -2273,7 +2273,7 @@ void cpp_typecheckt::typecheck_method_application(
 
   // build new function expression
   exprt new_function(cpp_symbol_expr(symbol));
-  new_function.add_source_location()=member_expr.location();
+  new_function.add_source_location()=member_expr.source_location();
   expr.function().swap(new_function);
 
   if(!expr.function().type().get_bool("#is_static"))
@@ -2383,7 +2383,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
   cpp_namet cpp_name;
   cpp_name.get_sub().push_back(irept(ID_name));
   cpp_name.get_sub().front().set(ID_identifier, strop);
-  cpp_name.get_sub().front().set(ID_C_source_location, expr.location());
+  cpp_name.get_sub().front().set(ID_C_source_location, expr.source_location());
 
   // expr.op0() is already typechecked
   exprt already_typechecked("already_typechecked");
@@ -2396,7 +2396,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
   side_effect_expr_function_callt new_expr;
   new_expr.function().swap(member);
   new_expr.arguments().push_back(expr.op1());
-  new_expr.add_source_location()=expr.location();
+  new_expr.add_source_location()=expr.source_location();
 
   typecheck_side_effect_function_call(new_expr);
 
@@ -2466,7 +2466,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   cpp_namet cpp_name;
   cpp_name.get_sub().push_back(irept(ID_name));
   cpp_name.get_sub().front().set(ID_identifier, str_op);
-  cpp_name.get_sub().front().set(ID_C_source_location, expr.location());
+  cpp_name.get_sub().front().set(ID_C_source_location, expr.source_location());
 
   exprt already_typechecked("already_typechecked");
   already_typechecked.move_to_operands(expr.op0());
@@ -2477,7 +2477,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
 
   side_effect_expr_function_callt new_expr;
   new_expr.function().swap(member);
-  new_expr.add_source_location()=expr.location();
+  new_expr.add_source_location()=expr.source_location();
 
   // the odd C++ way to denote the post-inc/dec operator
   if(post)
@@ -2544,7 +2544,7 @@ void cpp_typecheckt::convert_pmop(exprt& expr)
   if(expr.op1().type().id()!=ID_pointer
      || expr.op1().type().find("to-member").is_nil())
   {
-    err_location(expr.location());
+    err_location(expr.source_location());
     str << "pointer-to-member expected\n";
     throw 0;
   }
@@ -2559,7 +2559,7 @@ void cpp_typecheckt::convert_pmop(exprt& expr)
 
   if(t0.id()!=ID_struct)
   {
-    err_location(expr.location());
+    err_location(expr.source_location());
     str << "pointer-to-member type error";
     throw 0;
   }
@@ -2569,7 +2569,7 @@ void cpp_typecheckt::convert_pmop(exprt& expr)
 
   if(!subtype_typecast(from_struct, to_struct))
   {
-    err_location(expr.location());
+    err_location(expr.source_location());
     str << "pointer-to-member type error";
     throw 0;
   }
@@ -2732,7 +2732,7 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
       else if(op0_id==ID_dereference)
         new_binary_expr.id(ID_mult);
         
-      new_binary_expr.add_source_location()=expr.op0().location();
+      new_binary_expr.add_source_location()=expr.op0().source_location();
       expr.swap(new_binary_expr);
     }
   }

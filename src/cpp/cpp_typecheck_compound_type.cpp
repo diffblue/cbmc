@@ -222,7 +222,7 @@ void cpp_typecheckt::typecheck_compound_type(
       }
       else
       {
-        err_location(type.location());
+        err_location(type);
         str << "error: compound tag `" << base_name
             << "' declared previously" << std::endl;
         str << "location of previous definition: "
@@ -239,7 +239,7 @@ void cpp_typecheckt::typecheck_compound_type(
     symbol.name=symbol_name;
     symbol.base_name=base_name;
     symbol.value.make_nil();
-    symbol.location=type.location();
+    symbol.location=type.source_location();
     symbol.mode=ID_cpp;
     symbol.module=module;
     symbol.type.swap(type);
@@ -772,7 +772,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         exprt::operandst ops;
         ops.push_back(value);
         codet defcode =
-          cpp_constructor(locationt(), symexpr, ops);
+          cpp_constructor(source_locationt(), symexpr, ops);
 
         new_symbol->value.swap(defcode);
       }
@@ -921,7 +921,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
   if(declaration.is_template())
   {
     return; // TODO
-    err_location(declaration.type().location());
+    err_location(declaration.type());
     str << "friend template not supported";
     throw 0;
   }
@@ -1612,7 +1612,7 @@ Purpose:
 \*******************************************************************/
 
 bool cpp_typecheckt::get_component(
-  const locationt &location,
+  const source_locationt &source_location,
   const exprt &object,
   const irep_idt &component_name,
   exprt &member)
@@ -1637,7 +1637,7 @@ bool cpp_typecheckt::get_component(
 
     exprt tmp(ID_member, component.type());
     tmp.set(ID_component_name, component.get_name());
-    tmp.add_source_location()=location;
+    tmp.add_source_location()=source_location;
     tmp.copy_to_operands(object);
 
     if(component.get_name()==component_name)
@@ -1655,7 +1655,7 @@ bool cpp_typecheckt::get_component(
         else
         {
           #if 0
-          err_location(location);
+          err_location(source_location);
           str << "error: member `" << component_name
               << "' is not accessible (" << component.get(ID_access) << ")";
           str << std::endl
@@ -1672,7 +1672,7 @@ bool cpp_typecheckt::get_component(
          !component.get_bool("is_mutable"))
         member.type().set(ID_C_constant, true);
 
-      member.add_source_location() = location;
+      member.add_source_location() = source_location;
 
       return true; // component found
     }
@@ -1687,12 +1687,12 @@ bool cpp_typecheckt::get_component(
          component_type.id()==ID_struct)
       {
         // recursive call!
-        if(get_component(location, tmp, component_name, member))
+        if(get_component(source_location, tmp, component_name, member))
         {
           if(check_component_access(component, final_type))
           {
             #if 0
-            err_location(location);
+            err_location(source_location);
             str << "error: member `" << component_name
                 << "' is not accessible";
             throw 0;
@@ -1706,7 +1706,7 @@ bool cpp_typecheckt::get_component(
              !component.get_bool("is_mutable"))
             member.type().set(ID_C_constant, true);
 
-          member.add_source_location() = location;
+          member.add_source_location() = source_location;
           return true; // component found
         }
       }

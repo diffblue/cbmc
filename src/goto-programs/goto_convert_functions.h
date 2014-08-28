@@ -55,8 +55,8 @@ protected:
   // function calls  
   //
   void add_return(
-    goto_functionst::goto_functiont &f,
-    const locationt &location);
+    goto_functionst::goto_functiont &,
+    const source_locationt &);
 };
 
 #endif

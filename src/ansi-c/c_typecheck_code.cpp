@@ -389,9 +389,9 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   
   if(new_code.empty())
   {
-    locationt location=code.location();
+    source_locationt source_location=code.source_location();
     code=code_skipt();
-    code.add_source_location()=location;
+    code.add_source_location()=source_location;
   }
   else if(new_code.size()==1)
   {

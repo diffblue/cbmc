@@ -38,7 +38,7 @@ public:
 
 protected:
   cpp_typecheckt &cpp_typecheck;
-  locationt location;
+  source_locationt source_location;
   cpp_scopet *original_scope;
   
   typedef std::vector<exprt> resolve_identifierst;

@@ -32,7 +32,7 @@ Function: goto_inlinet::parameter_assignments
 \*******************************************************************/
 
 void goto_inlinet::parameter_assignments(
-  const locationt &location,
+  const source_locationt &source_location,
   const irep_idt &function_name,
   const code_typet &code_type,
   const exprt::operandst &arguments,
@@ -53,7 +53,7 @@ void goto_inlinet::parameter_assignments(
     // if you run out of actual arguments there was a mismatch
     if(it1==arguments.end())
     {
-      err_location(location);
+      err_location(source_location);
       str << "call to `" << function_name << "': not enough arguments";
       throw 0;
     }
@@ -67,7 +67,7 @@ void goto_inlinet::parameter_assignments(
 
     if(identifier==irep_idt())
     {
-      err_location(location);
+      err_location(source_location);
       throw "no identifier for function parameter";
     }
 
@@ -77,8 +77,8 @@ void goto_inlinet::parameter_assignments(
       goto_programt::targett decl=dest.add_instruction();
       decl->make_decl();
       decl->code=code_declt(symbol.symbol_expr());
-      decl->code.add_source_location()=location;
-      decl->location=location;
+      decl->code.add_source_location()=source_location;
+      decl->location=source_location;
       decl->function=function_name; 
     }
 
@@ -132,10 +132,10 @@ void goto_inlinet::parameter_assignments(
 
       // adds an assignment of the actual parameter to the formal parameter
       code_assignt assignment(symbol_exprt(identifier, arg_type), actual);
-      assignment.add_source_location()=location;
+      assignment.add_source_location()=source_location;
 
       dest.add_instruction(ASSIGN);
-      dest.instructions.back().location=location;
+      dest.instructions.back().location=source_location;
       dest.instructions.back().code.swap(assignment);
       dest.instructions.back().function=function_name;      
     }
@@ -240,7 +240,9 @@ Function: replace_location
 
 \*******************************************************************/
 
-void replace_location(locationt &dest, const locationt &new_location)
+void replace_location(
+  source_locationt &dest,
+  const source_locationt &new_location)
 {
   // can't just copy, e.g., due to comments field
   dest.id(irep_idt()); // not NIL
@@ -262,7 +264,9 @@ Function: replace_location
 
 \*******************************************************************/
 
-void replace_location(exprt &dest, const locationt &new_location)
+void replace_location(
+  exprt &dest,
+  const source_locationt &new_location)
 {
   Forall_operands(it, dest)
     replace_location(*it, new_location);
@@ -372,16 +376,17 @@ void goto_inlinet::expand_function_call(
 
     if(f.type.get_bool("#hide"))
     {
-      const locationt &new_location=function.find_location();
+      const source_locationt &new_source_location=
+        function.find_source_location();
     
-      if(new_location.is_not_nil())
+      if(new_source_location.is_not_nil())
       {
         Forall_goto_program_instructions(it, tmp)
           if(it->function==identifier)
           {
-            replace_location(it->location, new_location);
-            replace_location(it->guard, new_location);
-            replace_location(it->code, new_location);
+            replace_location(it->location, new_source_location);
+            replace_location(it->guard, new_source_location);
+            replace_location(it->code, new_source_location);
             it->function=target->function;
           }
       }

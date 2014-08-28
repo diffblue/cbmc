@@ -39,7 +39,7 @@ public:
   exprt value;
   
   /// Source code location of definition of symbol
-  locationt location;
+  source_locationt location;
   
   /// The unique identifier
   irep_idt name;

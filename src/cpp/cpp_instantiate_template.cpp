@@ -119,7 +119,7 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
         out << to_string(*a_it);
     }
 
-    out << "> at " << s_it->location << std::endl;
+    out << "> at " << s_it->source_location << std::endl;
   }
 }
 
@@ -136,7 +136,7 @@ Function: cpp_typecheckt::class_template_symbol
 \*******************************************************************/
 
 const symbolt &cpp_typecheckt::class_template_symbol(
-  const locationt &location,
+  const source_locationt &source_location,
   const symbolt &template_symbol,
   const cpp_template_args_tct &specialization_template_args,
   const cpp_template_args_tct &full_template_args)
@@ -147,7 +147,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   // do we have args?
   if(full_template_args.arguments().empty())
   {
-    err_location(location);
+    err_location(source_location);
     str << "`" << template_symbol.base_name
         << "' is a template; thus, expected template arguments";
     throw 0;
@@ -229,7 +229,7 @@ void cpp_typecheckt::elaborate_class_template(
      t_type.get_bool(ID_template_class_instance))
   {
     instantiate_template(
-      type.location(),
+      type.source_location(),
       lookup(t_type.get(ID_identifier)),
       static_cast<const cpp_template_args_tct &>(t_type.find("specialization_template_args")),
       static_cast<const cpp_template_args_tct &>(t_type.find("full_template_args")));
@@ -252,7 +252,7 @@ Function: cpp_typecheckt::instantiate_template
 \*******************************************************************/
 
 const symbolt &cpp_typecheckt::instantiate_template(
-  const locationt &location,
+  const source_locationt &source_location,
   const symbolt &template_symbol,
   const cpp_template_args_tct &specialization_template_args,
   const cpp_template_args_tct &full_template_args,
@@ -260,17 +260,17 @@ const symbolt &cpp_typecheckt::instantiate_template(
 {
   if(instantiation_stack.size()==50)
   {
-    err_location(location);
+    err_location(source_location);
     throw "reached maximum template recursion depth";
   }
   
   instantiation_levelt i_level(instantiation_stack);
-  instantiation_stack.back().location=location;
+  instantiation_stack.back().source_location=source_location;
   instantiation_stack.back().identifier=template_symbol.name;
   instantiation_stack.back().full_template_args=full_template_args;
   
   #if 0
-  std::cout << "L: " << location << std::endl;
+  std::cout << "L: " << source_location << std::endl;
   std::cout << "I: " << template_symbol.name << std::endl;
   #endif
 
@@ -299,7 +299,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // do we have arguments?
   if(full_template_args.arguments().empty())
   {
-    err_location(location);
+    err_location(source_location);
     str << "`" << template_symbol.base_name
         << "' is a template; thus, expected template arguments";
     throw 0;
@@ -314,7 +314,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(template_scope==NULL)
   {
-    err_location(location);
+    err_location(source_location);
     str << "identifier: " << template_symbol.name << std::endl;
     throw "template instantiation error: scope not found";
   }
@@ -423,7 +423,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       if(declaration_type.id()==ID_struct)
       {
         declaration_type=specialization;
-        declaration_type.add_source_location()=location;
+        declaration_type.add_source_location()=source_location;
       }
       else
       {

@@ -185,8 +185,8 @@ public:
   /* TODO: those maps are here to interface easily with weak_mem.cpp, 
      but a rewriting of weak_mem can eliminate them */
   std::set<irep_idt> var_to_instr;
-  std::multimap<irep_idt,locationt> id2loc;
-  std::multimap<irep_idt,locationt> id2cycloc;
+  std::multimap<irep_idt,source_locationt> id2loc;
+  std::multimap<irep_idt,source_locationt> id2cycloc;
 
   instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f)
     :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true), 

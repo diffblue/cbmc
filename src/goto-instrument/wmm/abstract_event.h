@@ -34,7 +34,7 @@ public:
   unsigned thread;
   irep_idt variable;
   unsigned id;
-  locationt location;
+  source_locationt source_location;
   bool local;
 
   // for ASMfence
@@ -52,17 +52,17 @@ public:
 
   abstract_eventt(
     operationt _op, unsigned _th, irep_idt _var,
-    unsigned _id, locationt _loc, bool _local)
+    unsigned _id, source_locationt _loc, bool _local)
     :operation(_op), thread(_th), variable(_var), id(_id),
-    location(_loc), local(_local)
+    source_location(_loc), local(_local)
   {
   }
 
   abstract_eventt(operationt _op, unsigned _th, irep_idt _var,
-    unsigned _id, locationt _loc, bool _local,
+    unsigned _id, source_locationt _loc, bool _local,
     bool WRf, bool WWf, bool RRf, bool RWf, bool WWc, bool RWc, bool RRc)
     :operation(_op), thread(_th), variable(_var), id(_id),
-      location(_loc), local(_local), WRfence(RWf), WWfence(WWf), RRfence(RRf),
+      source_location(_loc), local(_local), WRfence(RWf), WWfence(WWf), RRfence(RRf),
       RWfence(WRf), WWcumul(WWc), RWcumul(RWc), RRcumul(RRc)
   {
   }
@@ -74,7 +74,7 @@ public:
     thread=other.thread;
     variable=other.variable;
     id=other.id;
-    location=other.location;
+    source_location=other.source_location;
     local=other.local;
   }
 

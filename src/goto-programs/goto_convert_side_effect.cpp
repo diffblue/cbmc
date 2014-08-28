@@ -132,13 +132,13 @@ void goto_convertt::remove_assignment(
       rhs.id(new_id);
       rhs.copy_to_operands(expr.op0(), expr.op1());
       rhs.type()=expr.op0().type();
-      rhs.add_source_location()=expr.location();
+      rhs.add_source_location()=expr.source_location();
     }
     
     exprt lhs=expr.op0();
     
     code_assignt assignment(lhs, rhs);
-    assignment.add_source_location()=expr.location();
+    assignment.add_source_location()=expr.source_location();
     
     convert(assignment, dest);
   }
@@ -182,7 +182,7 @@ void goto_convertt::remove_pre(
          statement==ID_predecrement);
 
   exprt rhs;
-  rhs.add_source_location()=expr.location();
+  rhs.add_source_location()=expr.source_location();
 
   if(statement==ID_preincrement)
     rhs.id(ID_plus);
@@ -236,7 +236,7 @@ void goto_convertt::remove_pre(
   }
 
   code_assignt assignment(expr.op0(), rhs);
-  assignment.add_source_location()=expr.find_location();
+  assignment.add_source_location()=expr.find_source_location();
   
   convert(assignment, dest);
 
@@ -280,7 +280,7 @@ void goto_convertt::remove_post(
          statement==ID_postdecrement);
 
   exprt rhs;
-  rhs.add_source_location()=expr.location();
+  rhs.add_source_location()=expr.source_location();
 
   if(statement==ID_postincrement)
     rhs.id(ID_plus);
@@ -334,7 +334,7 @@ void goto_convertt::remove_post(
   }
 
   code_assignt assignment(expr.op0(), rhs);
-  assignment.add_source_location()=expr.find_location();
+  assignment.add_source_location()=expr.find_source_location();
   
   convert(assignment, tmp2);
 
@@ -376,7 +376,7 @@ void goto_convertt::remove_function_call(
     code_function_callt call;
     call.function()=expr.op0();
     call.arguments()=expr.op1().operands();
-    call.add_source_location()=expr.location();
+    call.add_source_location()=expr.source_location();
     call.lhs().make_nil();
     convert_function_call(call, dest);
     expr.make_nil();
@@ -391,7 +391,7 @@ void goto_convertt::remove_function_call(
   new_symbol.is_file_local=true;
   new_symbol.is_thread_local=true;
   new_symbol.type=expr.type();
-  new_symbol.location=expr.find_location();
+  new_symbol.location=expr.find_source_location();
 
   // get name of function, if available
 
@@ -528,7 +528,7 @@ void goto_convertt::remove_cpp_delete(
   codet tmp;
   
   tmp.set_statement(expr.get_statement());
-  tmp.add_source_location()=expr.location();
+  tmp.add_source_location()=expr.source_location();
   tmp.copy_to_operands(expr.op0());
   tmp.set(ID_destructor, expr.find(ID_destructor));
 
@@ -604,7 +604,7 @@ void goto_convertt::remove_temporary_object(
     throw "temporary_object takes 0 or 1 operands";
 
   symbolt &new_symbol=
-    new_tmp_symbol(expr.type(), "obj", dest, expr.find_location());
+    new_tmp_symbol(expr.type(), "obj", dest, expr.find_source_location());
 
   new_symbol.mode=expr.get(ID_mode);
   
@@ -676,26 +676,26 @@ void goto_convertt::remove_statement_expression(
   // get last statement from block, following labels
   codet &last=to_code_block(code).find_last_statement();
 
-  locationt location=last.find_location();
+  source_locationt source_location=last.find_source_location();
 
   symbolt &new_symbol=
-    new_tmp_symbol(expr.type(), "statement_expression", dest, location);
+    new_tmp_symbol(expr.type(), "statement_expression", dest, source_location);
     
   symbol_exprt tmp_symbol_expr(new_symbol.name, new_symbol.type);
-  tmp_symbol_expr.add_source_location()=location;
+  tmp_symbol_expr.add_source_location()=source_location;
 
   if(last.get(ID_statement)==ID_expression)
   {
     // we turn this into an assignment
     exprt e=to_code_expression(last).expression();
     last=code_assignt(tmp_symbol_expr, e);
-    last.add_source_location()=location;
+    last.add_source_location()=source_location;
   }
   else if(last.get(ID_statement)==ID_assign)
   {
     exprt e=to_code_assign(last).lhs();
     code_assignt assignment(tmp_symbol_expr, e);
-    assignment.add_source_location()=location;
+    assignment.add_source_location()=source_location;
     code.operands().push_back(assignment);
   }
   else
@@ -783,8 +783,8 @@ void goto_convertt::remove_side_effect(
     goto_programt::targett t=dest.add_instruction(THROW);
     t->code=code_expressiont(side_effect_expr_throwt(expr.find(ID_exception_list)));
     t->code.op0().operands().swap(expr.operands());
-    t->code.add_source_location()=expr.location();
-    t->location=expr.location();
+    t->code.add_source_location()=expr.source_location();
+    t->location=expr.source_location();
  
     // the result can't be used, these are void
     expr.make_nil();

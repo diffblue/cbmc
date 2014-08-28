@@ -721,7 +721,7 @@ Function: exprt::find_source_location
 
 \*******************************************************************/
 
-const locationt &exprt::find_source_location() const
+const source_locationt &exprt::find_source_location() const
 {
   const source_locationt &l=source_location();
 

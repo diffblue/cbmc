@@ -28,7 +28,7 @@ public:
   class instructiont
   {
   public:
-    locationt location;
+    source_locationt source_location;
     unsigned address;
     irep_idt statement;
     std::vector<exprt> args;

@@ -131,8 +131,8 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
         i_it!=instructions.end();
         i_it++)
     {
-      if(i_it->location.get_line()!=irep_idt())
-        out << "    // " << i_it->location << "\n";
+      if(i_it->source_location.get_line()!=irep_idt())
+        out << "    // " << i_it->source_location << "\n";
 
       out << "    " << i_it->address << ": ";
       out << i_it->statement;

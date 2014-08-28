@@ -110,7 +110,7 @@ void cpp_typecheckt::typecheck_class_template(
 
   if(cpp_name.is_nil())
   {
-    err_location(type.location());
+    err_location(type.source_location());
     throw "class templates must not be anonymous";
   }
 
@@ -974,7 +974,7 @@ Function: cpp_typecheckt::typecheck_template_args
 \*******************************************************************/
 
 cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
-  const locationt &location,
+  const source_locationt &source_location,
   const symbolt &template_symbol,
   const cpp_template_args_non_tct &template_args)
 {
@@ -998,7 +998,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     
   if(parameters.size()<args.size())
   {
-    err_location(location);
+    err_location(source_location);
     str << "too many template arguments (expected "
         << parameters.size() << ", but got "
         << args.size() << ")";
@@ -1021,7 +1021,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // These may depend on previous arguments.
       if(!parameter.has_default_argument())
       {
-        err_location(location);
+        err_location(source_location);
         str << "not enough template arguments (expected "
             << parameters.size() << ", but got " << args.size() << ")";
         throw 0;

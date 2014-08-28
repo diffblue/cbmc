@@ -58,7 +58,7 @@ protected:
     const typet &type,
     const std::string &suffix,
     goto_programt &dest,
-    const locationt &location);
+    const source_locationt &);
   
   symbol_exprt make_compound_literal(
     const exprt &expr,
@@ -215,7 +215,7 @@ protected:
   
   symbol_exprt exception_flag();
   void unwind_destructor_stack(
-    const locationt &location,
+    const source_locationt &,
     unsigned stack_size,
     goto_programt &dest,
     bool do_dead=true);
@@ -414,7 +414,7 @@ protected:
     const exprt &cond,
     goto_programt &true_case,
     goto_programt &false_case,
-    const locationt &location,
+    const source_locationt &,
     goto_programt &dest);
 
   // if(guard) goto target_true; else goto target_false;
@@ -422,14 +422,14 @@ protected:
     const exprt &guard,
     goto_programt::targett target_true,
     goto_programt::targett target_false,
-    const locationt &location,
+    const source_locationt &,
     goto_programt &dest);
 
   // if(guard) goto target;
   void generate_conditional_branch(
     const exprt &guard,
     goto_programt::targett target_true,
-    const locationt &location,
+    const source_locationt &,
     goto_programt &dest);
     
   // turn a OP b OP c into a list a, b, c

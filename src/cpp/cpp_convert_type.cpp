@@ -266,7 +266,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
     if(parameter_expr.id()==ID_cpp_declaration)
     {
       cpp_declarationt &declaration=to_cpp_declaration(parameter_expr);
-      locationt type_location=declaration.type().location();
+      source_locationt type_location=declaration.type().source_location();
 
       cpp_convert_plain_type(declaration.type());
 

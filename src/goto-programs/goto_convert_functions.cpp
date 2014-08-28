@@ -150,7 +150,7 @@ Function: goto_convert_functionst::add_return
 
 void goto_convert_functionst::add_return(
   goto_functionst::goto_functiont &f,
-  const locationt &location)
+  const source_locationt &source_location)
 {
   #if 0
   if(!f.body.instructions.empty() &&
@@ -196,7 +196,7 @@ void goto_convert_functionst::add_return(
   goto_programt::targett t=f.body.add_instruction();
   t->make_return();
   t->code=code_returnt();
-  t->location=location;
+  t->location=source_location;
 
   side_effect_expr_nondett rhs(f.type.return_type());
   t->code.move_to_operands(rhs);
@@ -238,7 +238,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   
   const codet &code=to_code(symbol.value);
   
-  locationt end_location;
+  source_locationt end_location;
 
   if(code.get_statement()==ID_block)
     end_location=to_code_block(code).end_location();

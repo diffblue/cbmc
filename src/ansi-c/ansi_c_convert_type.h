@@ -44,7 +44,7 @@ public:
   void read(const typet &type);
   void write(typet &type);
   
-  locationt location;
+  source_locationt source_location;
   
   std::list<typet> other;
   

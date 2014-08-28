@@ -260,7 +260,7 @@ Function: cpp_declarator_convertert::combine_types
 \*******************************************************************/
 
 void cpp_declarator_convertert::combine_types(
-  const locationt &location,
+  const source_locationt &source_location,
   const typet &decl_type,
   symbolt &symbol)
 {
@@ -289,7 +289,7 @@ void cpp_declarator_convertert::combine_types(
           // The 'this' parameter of virtual functions mismatches
           if(i!=0 || !symbol_code_type.get_bool("#is_virtual"))
           {
-            cpp_typecheck.err_location(location);
+            cpp_typecheck.err_location(source_location);
             cpp_typecheck.str << "symbol `" << symbol.display_name()
                               << "': parameter " << (i+1) << " type mismatch"
                               << std::endl;
@@ -305,7 +305,7 @@ void cpp_declarator_convertert::combine_types(
         {
           symbol_parameter.set_base_name(decl_parameter.get_base_name());
           symbol_parameter.set_identifier(decl_parameter.get_identifier());
-          symbol_parameter.add_source_location()=decl_parameter.location();
+          symbol_parameter.add_source_location()=decl_parameter.source_location();
         }
       }
 
@@ -324,7 +324,7 @@ void cpp_declarator_convertert::combine_types(
     return; // ok
   }
 
-  cpp_typecheck.err_location(location);
+  cpp_typecheck.err_location(source_location);
   cpp_typecheck.str << "symbol `" << symbol.display_name()
                     << "' already declared with different type:"
                     << std::endl;

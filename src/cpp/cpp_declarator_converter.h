@@ -85,7 +85,7 @@ protected:
   }
 
   void combine_types(
-    const locationt &location,
+    const source_locationt &source_location,
     const typet &decl_type,
     symbolt &symbol);
 };
