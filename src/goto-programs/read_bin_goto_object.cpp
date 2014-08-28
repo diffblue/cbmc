@@ -105,7 +105,7 @@ bool read_bin_goto_object_v2(
       
       irepconverter.reference_convert(in, instruction.code);
       instruction.function = irepconverter.read_string_ref(in);      
-      irepconverter.reference_convert(in, instruction.location);
+      irepconverter.reference_convert(in, instruction.source_location);
       instruction.type = (goto_program_instruction_typet) 
                               irepconverter.read_gb_word(in);
       instruction.guard.make_nil();

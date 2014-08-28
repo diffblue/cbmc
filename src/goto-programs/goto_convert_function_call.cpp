@@ -169,7 +169,7 @@ void goto_convertt::do_function_call_if(
   v->make_goto(y);
   v->guard=function.op0();
   v->guard.make_not();
-  v->location=function.op0().source_location();
+  v->source_location=function.op0().source_location();
 
   // w: f();
   goto_programt tmp_w;
@@ -216,6 +216,6 @@ void goto_convertt::do_function_call_dereference(
   function_call.function()=function;
   function_call.arguments()=arguments;
   
-  t->location=function.source_location();
+  t->source_location=function.source_location();
   t->code.swap(function_call);
 }

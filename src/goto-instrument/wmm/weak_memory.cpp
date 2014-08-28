@@ -515,7 +515,7 @@ void shared_bufferst::assignment(
     t->type=ASSIGN;
     t->code=code_assignt(symbol, value);
     t->code.add_source_location()=source_location;
-    t->location=source_location;
+    t->source_location=source_location;
  
     //instrumentations.insert((const irep_idt) (t->code.id()));
  
@@ -613,7 +613,7 @@ void shared_bufferst::flush_read(
   target->type=ASSUME;
   target->guard=if_expr;
   target->guard.source_location()=source_location;
-  target->location=source_location;
+  target->source_location=source_location;
 
   target++;
 
@@ -671,7 +671,7 @@ void shared_bufferst::write(
   target->type=ASSERT;
   target->code=code_assertt();
   target->code.add_source_location()=source_location;
-  target->location=source_location;
+  target->source_location=source_location;
   target++;
 
   // We update writers ownership of the values in the buffer
@@ -1646,11 +1646,12 @@ void shared_bufferst::cfg_visitort::weak_memory(
       
           goto_programt::instructiont original_instruction;
           original_instruction.swap(instruction);
-          const source_locationt &source_location=original_instruction.location;
+          const source_locationt &source_location=
+            original_instruction.source_location;
 
           // ATOMIC_BEGIN: we make the whole thing atomic      
           instruction.make_atomic_begin();
-          instruction.location=source_location;
+          instruction.source_location=source_location;
           i_it++;
  
           // we first perform (non-deterministically) up to 2 writes for
@@ -1772,7 +1773,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
             // ATOMIC_END
             i_it=goto_program.insert_before(i_it);
             i_it->make_atomic_end();
-            i_it->location=source_location;
+            i_it->source_location=source_location;
             i_it++;
        
             i_it--; // the for loop already counts us up
@@ -1791,11 +1792,12 @@ void shared_bufferst::cfg_visitort::weak_memory(
     {
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
-      const source_locationt &source_location=original_instruction.location;
+      const source_locationt &source_location=
+        original_instruction.source_location;
 
       // ATOMIC_BEGIN
       instruction.make_atomic_begin();
-      instruction.location=source_location;
+      instruction.source_location=source_location;
       i_it++;
 
       // does it for all the previous statements
@@ -1810,7 +1812,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
       // ATOMIC_END
       i_it=goto_program.insert_before(i_it);
       i_it->make_atomic_end();
-      i_it->location=source_location;
+      i_it->source_location=source_location;
       i_it++;
       
       i_it--; // the for loop already counts us up
@@ -1853,7 +1855,7 @@ void introduce_temporaries(
   {
     goto_programt::instructiont &instruction=*i_it;
 
-    DEBUG_MESSAGE(std::cout<<instruction.location<<std::endl);
+    DEBUG_MESSAGE(std::cout<<instruction.source_location<<std::endl);
 
     if(instruction.is_goto() ||
        instruction.is_assert() ||
@@ -1878,7 +1880,7 @@ void introduce_temporaries(
       goto_programt::instructiont new_i;
       new_i.make_assignment();
       new_i.code=code_assignt(symbol_expr, instruction.guard);
-      new_i.location=instruction.location;
+      new_i.source_location=instruction.source_location;
       new_i.function=instruction.function;
 
       // replace guard

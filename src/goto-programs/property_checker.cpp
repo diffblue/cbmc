@@ -83,7 +83,7 @@ void property_checkert::initialize_property_map(
         if(!it->is_assert())
           continue;
       
-        const source_locationt &source_location=it->location;
+        const source_locationt &source_location=it->source_location;
       
         irep_idt property_id=source_location.get_property_id();
         

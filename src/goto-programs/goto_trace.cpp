@@ -82,8 +82,8 @@ void goto_trace_stept::output(
 
   out << "\n";
 
-  if(!pc->location.is_nil())
-    out << pc->location << "\n";
+  if(!pc->source_location.is_nil())
+    out << pc->source_location << "\n";
 
   if(pc->is_goto())
     out << "GOTO   ";
@@ -118,8 +118,8 @@ void goto_trace_stept::output(
     if(!cond_value)
     {
       out << "Violated property:" << "\n";
-      if(pc->location.is_nil())
-        out << "  " << pc->location << "\n";
+      if(pc->source_location.is_nil())
+        out << "  " << pc->source_location << "\n";
       
       if(comment!="")
         out << "  " << comment << "\n";
@@ -323,8 +323,8 @@ void show_goto_trace(
       {
         out << "\n";
         out << "Violated property:" << "\n";
-        if(!it->pc->location.is_nil())
-          out << "  " << it->pc->location << "\n";
+        if(!it->pc->source_location.is_nil())
+          out << "  " << it->pc->source_location << "\n";
         out << "  " << it->comment << "\n";
 
         if(it->pc->is_assert())
@@ -350,7 +350,7 @@ void show_goto_trace(
         {
           first_step=false;
           prev_step_nr=it->step_nr;
-          show_state_header(out, *it, it->pc->location, it->step_nr);
+          show_state_header(out, *it, it->pc->source_location, it->step_nr);
         }
 
         // see if the full lhs is something clean
@@ -366,7 +366,7 @@ void show_goto_trace(
       {
         first_step=false;
         prev_step_nr=it->step_nr;
-        show_state_header(out, *it, it->pc->location, it->step_nr);
+        show_state_header(out, *it, it->pc->source_location, it->step_nr);
       }
 
       counterexample_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
@@ -382,7 +382,7 @@ void show_goto_trace(
       }
       else
       {
-        show_state_header(out, *it, it->pc->location, it->step_nr);
+        show_state_header(out, *it, it->pc->source_location, it->step_nr);
         out << "  OUTPUT " << it->io_id << ":";
 
         for(std::list<exprt>::const_iterator
@@ -402,7 +402,7 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::INPUT:
-      show_state_header(out, *it, it->pc->location, it->step_nr);
+      show_state_header(out, *it, it->pc->source_location, it->step_nr);
       out << "  INPUT " << it->io_id << ":";
 
       for(std::list<exprt>::const_iterator

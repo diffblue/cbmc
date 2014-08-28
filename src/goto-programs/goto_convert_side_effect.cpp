@@ -784,7 +784,7 @@ void goto_convertt::remove_side_effect(
     t->code=code_expressiont(side_effect_expr_throwt(expr.find(ID_exception_list)));
     t->code.op0().operands().swap(expr.operands());
     t->code.add_source_location()=expr.source_location();
-    t->location=expr.source_location();
+    t->source_location=expr.source_location();
  
     // the result can't be used, these are void
     expr.make_nil();

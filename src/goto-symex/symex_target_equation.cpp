@@ -944,8 +944,8 @@ void symex_target_equationt::SSA_stept::output(
   {
     out << "Thread " << source.thread_nr;
 
-    if(source.pc->location.is_not_nil())
-      out << " " << source.pc->location << std::endl;
+    if(source.pc->source_location.is_not_nil())
+      out << " " << source.pc->source_location << std::endl;
     else
       out << std::endl;
   }

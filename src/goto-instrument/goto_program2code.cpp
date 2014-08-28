@@ -271,7 +271,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       system_headers.insert("assert.h");
       dest.copy_to_operands(code_assertt(target->guard));
       dest.operands().back().add_source_location().set_comment(
-          target->location.get_comment());
+          target->source_location.get_comment());
       return target;
 
     case ASSUME:
@@ -343,7 +343,7 @@ void goto_program2codet::convert_labels(
     std::stringstream label;
     label << "__CPROVER_DUMP_L" << target->target_number;
     code_labelt l(label.str(), code_blockt());
-    l.add_source_location()=target->location;
+    l.add_source_location()=target->source_location;
     target_label=l.get_label();
     latest_block->move_to_operands(l);
     latest_block=&to_code_label(
@@ -363,7 +363,7 @@ void goto_program2codet::convert_labels(
     labels_in_use.insert(*it);
 
     code_labelt l(*it, code_blockt());
-    l.add_source_location()=target->location;
+    l.add_source_location()=target->source_location;
     latest_block->move_to_operands(l);
     latest_block=&to_code_label(
         to_code(latest_block->operands().back())).code();
@@ -1475,7 +1475,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
         code_labelt l(*it);
         l.code().swap(b);
-        l.add_source_location()=target->location;
+        l.add_source_location()=target->source_location;
         b.swap(l);
       }
 
@@ -1545,7 +1545,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
       code_labelt l(*it);
       l.code().swap(b);
-      l.add_source_location()=target->location;
+      l.add_source_location()=target->source_location;
       b.swap(l);
     }
 

@@ -62,7 +62,7 @@ void show_loop_ids(
       {
         xmlt xml_loop("loop");
         xml_loop.new_element("loop-id").data=id2string(it->function)+"."+i2string(loop_id);
-        xml_loop.new_element()=xml(it->location);
+        xml_loop.new_element()=xml(it->source_location);
         std::cout << xml_loop << std::endl;
       }
       else if(ui==ui_message_handlert::PLAIN)
@@ -70,7 +70,7 @@ void show_loop_ids(
         std::cout << "Loop "
                   << it->function << "." << loop_id << ":" << std::endl;
 
-        std::cout << "  " << it->location << std::endl;
+        std::cout << "  " << it->source_location << std::endl;
         std::cout << std::endl;
       }
       else

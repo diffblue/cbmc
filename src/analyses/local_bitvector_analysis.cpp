@@ -406,7 +406,7 @@ void local_bitvector_analysist::output(
 
   forall_goto_program_instructions(i_it, goto_function.body)
   {
-    out << "**** " << i_it->location << "\n";
+    out << "**** " << i_it->source_location << "\n";
 
     const loc_infot &loc_info=loc_infos[l];
 

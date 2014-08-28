@@ -33,7 +33,7 @@ void goto_convertt::convert_msc_try_finally(
   }
   
   goto_programt tmp;
-  tmp.add_instruction(SKIP)->location=code.source_location();
+  tmp.add_instruction(SKIP)->source_location=code.source_location();
 
   {  
     // save 'leave' target
@@ -120,7 +120,7 @@ void goto_convertt::convert_msc_leave(
 
   goto_programt::targett t=dest.add_instruction();
   t->make_goto(targets.leave_target);
-  t->location=code.source_location();
+  t->source_location=code.source_location();
 }
 
 /*******************************************************************\
@@ -145,7 +145,7 @@ void goto_convertt::convert_catch(
   goto_programt::targett catch_push_instruction=dest.add_instruction();
   catch_push_instruction->make_catch();
   catch_push_instruction->code.set_statement(ID_catch);
-  catch_push_instruction->location=code.source_location();
+  catch_push_instruction->source_location=code.source_location();
   
   // the CATCH-push instruction is annotated with a list of IDs,
   // one per target
@@ -212,7 +212,7 @@ void goto_convertt::convert_CPROVER_try_catch(
 
   // this is where we go after 'throw'
   goto_programt tmp;
-  tmp.add_instruction(SKIP)->location=code.source_location();
+  tmp.add_instruction(SKIP)->source_location=code.source_location();
 
   // set 'throw' target
   throw_targett throw_target(targets);
@@ -257,7 +257,7 @@ void goto_convertt::convert_CPROVER_throw(
     goto_programt::targett t_set_exception=
       dest.add_instruction(ASSIGN);
 
-    t_set_exception->location=code.source_location();
+    t_set_exception->source_location=code.source_location();
     t_set_exception->code=code_assignt(exception_flag(), true_exprt());
   }
 
@@ -270,7 +270,7 @@ void goto_convertt::convert_CPROVER_throw(
     // add goto
     goto_programt::targett t=dest.add_instruction();
     t->make_goto(targets.throw_target);
-    t->location=code.source_location();
+    t->source_location=code.source_location();
   }
   else // otherwise, we do a return
   {
@@ -289,7 +289,7 @@ void goto_convertt::convert_CPROVER_throw(
     }
 
     goto_programt::targett t=dest.add_instruction(RETURN);
-    t->location=code.source_location();
+    t->source_location=code.source_location();
     t->code=code_returnt();
   }
 }

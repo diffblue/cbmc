@@ -300,7 +300,7 @@ void goto_symext::symex_step(
   case ASSERT:
     if(!state.guard.is_false())
     {
-      std::string msg=id2string(state.source.pc->location.get_comment());
+      std::string msg=id2string(state.source.pc->source_location.get_comment());
       if(msg=="") msg="assertion";
       exprt tmp(instruction.guard);
       clean_expr(tmp, state, false);

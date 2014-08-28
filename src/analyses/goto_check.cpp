@@ -1233,10 +1233,10 @@ void goto_checkt::add_guarded_claim(
     std::string source_string=from_expr(ns, "", src_expr);
 
     t->guard.swap(new_expr);
-    t->location=source_location;
-    t->location.set_comment(comment);
-    t->location.set_property_class(property_class);
-    t->location.set_source(source_string);
+    t->source_location=source_location;
+    t->source_location.set_comment(comment);
+    t->source_location.set_property_class(property_class);
+    t->source_location.set_source(source_string);
   }
 }
 
@@ -1463,10 +1463,10 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
       goto_programt::targett t=new_code.add_instruction(type);
 
       t->guard=false_exprt();
-      t->location=i.location;
-      t->location.set_property_class("error label");
-      t->location.set_comment("error label");
-      t->location.set("user-provided", true);
+      t->source_location=i.source_location;
+      t->source_location.set_property_class("error label");
+      t->source_location.set_comment("error label");
+      t->source_location.set("user-provided", true);
     }
     
     if(i.is_other())
@@ -1519,8 +1519,8 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     }
     else if(i.is_assert())
     {
-      if(i.location.get_bool("user-provided") &&
-         i.location.get_property_class()!="error label" &&
+      if(i.source_location.get_bool("user-provided") &&
+         i.source_location.get_property_class()!="error label" &&
          !enable_assertions)
         i.type=SKIP;
     }
@@ -1545,9 +1545,9 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
           exprt lhs=symbol_expr(ns.lookup(CPROVER_PREFIX "dead_object"));
           exprt rhs=if_exprt(
             side_effect_expr_nondett(bool_typet()), address_of_expr, lhs, lhs.type());
-          t->location=i.location;
+          t->source_location=i.source_location;
           t->code=code_assignt(lhs, rhs);
-          t->code.add_source_location()=i.location;
+          t->code.add_source_location()=i.source_location;
         }
       }
     }
@@ -1583,7 +1583,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         i_it!=new_code.instructions.end();
         i_it++)
     {
-      if(i_it->location.is_nil()) i_it->location=it->location;
+      if(i_it->source_location.is_nil()) i_it->source_location=it->source_location;
       if(i_it->function==irep_idt()) i_it->function=it->function;
     }
       

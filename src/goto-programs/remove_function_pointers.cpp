@@ -423,8 +423,8 @@ void remove_function_pointerst::remove_function_pointer(
   {
     goto_programt::targett t=new_code_gotos.add_instruction();
     t->make_assertion(false_exprt());
-    t->location.set(ID_property, "pointer dereference");
-    t->location.set(ID_comment, "invalid function pointer");
+    t->source_location.set_property_class("pointer dereference");
+    t->source_location.set_comment("invalid function pointer");
   }
   
   goto_programt new_code;
@@ -437,12 +437,12 @@ void remove_function_pointerst::remove_function_pointer(
   // set locations
   Forall_goto_program_instructions(it, new_code)
   {
-    irep_idt property_class=it->location.get_property_class();
-    irep_idt comment=it->location.get_comment();
-    it->location=target->location;
+    irep_idt property_class=it->source_location.get_property_class();
+    irep_idt comment=it->source_location.get_comment();
+    it->source_location=target->source_location;
     it->function=target->function;
-    if(!property_class.empty()) it->location.set_property_class(property_class);
-    if(!comment.empty()) it->location.set_comment(comment);
+    if(!property_class.empty()) it->source_location.set_property_class(property_class);
+    if(!comment.empty()) it->source_location.set_comment(comment);
   }
   
   goto_programt::targett next_target=target;

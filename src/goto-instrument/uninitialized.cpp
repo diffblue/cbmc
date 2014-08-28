@@ -149,11 +149,11 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
         symbol_expr.set_identifier(new_identifier);
         symbol_expr.type()=bool_typet();
         i1->type=DECL;
-        i1->location=instruction.location;
+        i1->source_location=instruction.source_location;
         i1->code=code_declt(symbol_expr);
 
         i2->type=ASSIGN;
-        i2->location=instruction.location;
+        i2->source_location=instruction.source_location;
         i2->code=code_assignt(symbol_expr, false_exprt());        
       }
     }
@@ -186,9 +186,9 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
             goto_programt::instructiont assertion;
             assertion.type=ASSERT;
             assertion.guard=symbol_exprt(new_identifier, bool_typet());
-            assertion.location=instruction.location;
-            assertion.location.set_comment("use of uninitialized local variable");
-            assertion.location.set_property_class("uninitialized local");
+            assertion.source_location=instruction.source_location;
+            assertion.source_location.set_comment("use of uninitialized local variable");
+            assertion.source_location.set_property_class("uninitialized local");
             
             goto_program.insert_before_swap(i_it, assertion);
             i_it++;
@@ -211,7 +211,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
             assignment.type=ASSIGN;
             assignment.code=code_assignt(
               symbol_exprt(new_identifier, bool_typet()), true_exprt());
-            assignment.location=instruction.location;
+            assignment.source_location=instruction.source_location;
             
             goto_program.insert_before_swap(i_it, assignment);
             i_it++;

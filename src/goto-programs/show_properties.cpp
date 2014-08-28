@@ -44,7 +44,7 @@ void show_properties(
     if(!it->is_assert())
       continue;
       
-    const source_locationt &source_location=it->location;
+    const source_locationt &source_location=it->source_location;
       
     const irep_idt &comment=source_location.get_comment();
     //const irep_idt &function=location.get_function();
@@ -65,7 +65,7 @@ void show_properties(
         xml_claim.set_attribute("name", id2string(property_id)); // use this one
         
         xmlt &l=xml_claim.new_element();
-        l=xml(it->location);
+        l=xml(it->source_location);
         
         xml_claim.new_element("description").data=id2string(description);        
         xml_claim.new_element("property").data=id2string(property_class);
@@ -79,7 +79,7 @@ void show_properties(
     case ui_message_handlert::PLAIN:
       std::cout << "Property " << property_id << ":" << std::endl;
 
-      std::cout << "  " << it->location << std::endl
+      std::cout << "  " << it->source_location << std::endl
                 << "  " << description << std::endl
                 << "  " << from_expr(ns, identifier, it->guard) << std::endl;
 

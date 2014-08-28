@@ -78,7 +78,7 @@ void goto_inlinet::parameter_assignments(
       decl->make_decl();
       decl->code=code_declt(symbol.symbol_expr());
       decl->code.add_source_location()=source_location;
-      decl->location=source_location;
+      decl->source_location=source_location;
       decl->function=function_name; 
     }
 
@@ -135,7 +135,7 @@ void goto_inlinet::parameter_assignments(
       assignment.add_source_location()=source_location;
 
       dest.add_instruction(ASSIGN);
-      dest.instructions.back().location=source_location;
+      dest.instructions.back().source_location=source_location;
       dest.instructions.back().code.swap(assignment);
       dest.instructions.back().function=function_name;      
     }
@@ -195,7 +195,7 @@ void goto_inlinet::replace_return(
           code_assign.rhs().make_typecast(code_assign.lhs().type());
 
         assignment->code=code_assign;
-        assignment->location=it->location;
+        assignment->source_location=it->source_location;
         assignment->function=it->function;
         
         if(constrain.is_not_nil() && !constrain.is_true())
@@ -216,7 +216,7 @@ void goto_inlinet::replace_return(
         
         expression->code=codet(ID_expression);
         expression->code.move_to_operands(it->code.op0());
-        expression->location=it->location;
+        expression->source_location=it->source_location;
         expression->function=it->function;
         
         dest.insert_before_swap(it, *expression);
@@ -371,7 +371,7 @@ void goto_inlinet::expand_function_call(
     replace_return(tmp2, lhs, constrain);
 
     goto_programt tmp;
-    parameter_assignments(target->location, identifier, f.type, arguments, tmp);
+    parameter_assignments(target->source_location, identifier, f.type, arguments, tmp);
     tmp.destructive_append(tmp2);
 
     if(f.type.get_bool("#hide"))
@@ -384,7 +384,7 @@ void goto_inlinet::expand_function_call(
         Forall_goto_program_instructions(it, tmp)
           if(it->function==identifier)
           {
-            replace_location(it->location, new_source_location);
+            replace_location(it->source_location, new_source_location);
             replace_location(it->guard, new_source_location);
             replace_location(it->code, new_source_location);
             it->function=target->function;
@@ -422,7 +422,7 @@ void goto_inlinet::expand_function_call(
     {
       goto_programt::targett t=tmp.add_instruction();
       t->make_other();
-      t->location=target->location;
+      t->source_location=target->source_location;
       t->function=target->function;
       t->code=codet(ID_expression);
       t->code.copy_to_operands(*it);
@@ -432,13 +432,13 @@ void goto_inlinet::expand_function_call(
     if(lhs.is_not_nil())
     {
       side_effect_expr_nondett rhs(lhs.type());
-      rhs.add_source_location()=target->location;
+      rhs.add_source_location()=target->source_location;
 
       code_assignt code(lhs, rhs);
-      code.add_source_location()=target->location;
+      code.add_source_location()=target->source_location;
     
       goto_programt::targett t=tmp.add_instruction(ASSIGN);
-      t->location=target->location;
+      t->source_location=target->source_location;
       t->function=target->function;
       t->code.swap(code);
     }

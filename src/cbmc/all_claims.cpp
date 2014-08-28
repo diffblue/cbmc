@@ -38,7 +38,7 @@ struct goalt
 
   explicit goalt(const goto_programt::instructiont &instruction)
   {
-    description=id2string(instruction.location.get_comment());
+    description=id2string(instruction.source_location.get_comment());
   }
   
   goalt()
@@ -67,7 +67,7 @@ bool bmct::all_claims(
   forall_goto_functions(f_it, goto_functions)
     forall_goto_program_instructions(i_it, f_it->second.body)
       if(i_it->is_assert())
-        goal_map[i_it->location.get_property_id()]=goalt(*i_it);
+        goal_map[i_it->source_location.get_property_id()]=goalt(*i_it);
 
   // get the conditions for these goals from formula
   
@@ -84,7 +84,7 @@ bool bmct::all_claims(
       irep_idt property_id;
 
       if(it->source.pc->is_assert())
-        property_id=it->source.pc->location.get_property_id();
+        property_id=it->source.pc->source_location.get_property_id();
       else
       {
         // need new property ID, say for an unwinding assertion
