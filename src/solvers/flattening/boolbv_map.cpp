@@ -15,6 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#define DEBUG
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 /*******************************************************************\
 
 Function: boolbv_mapt::map_entryt::get_value
