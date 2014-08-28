@@ -4,16 +4,25 @@ use subs;
 use strict;
 use warnings;
 
+my $has_thread_pool = eval
+{
+  # "http://www.cpan.org/authors/id/J/JW/JWU/Thread-Pool-Simple/Thread-Pool-Simple-0.25.tar.gz"
+  # Debian/Ubuntu: libthread-pool-simple-perl
+  require Thread::Pool::Simple;
+  Thread::Pool::Simple->import();
+  1;
+};
+
 # test.pl
 #
 # runs a test and check its output
 
-sub run($$$$) {
-  my ($input, $cmd, $options, $output) = @_;
+sub run($$$$$) {
+  my ($name, $input, $cmd, $options, $output) = @_;
   my $cmdline = "$cmd $options $input >$output 2>&1";
 
   print LOG "Running $cmdline\n";
-  system $cmdline;
+  system("bash", "-c", "cd $name ; $cmdline");
   my $exit_value = $? >> 8;
   my $signal_num = $? & 127;
   my $dumped_core = $? & 128;
@@ -31,8 +40,8 @@ sub run($$$$) {
     }
   }
 
-  system "echo EXIT=$exit_value >>$output";
-  system "echo SIGNAL=$signal_num >>$output";
+  system "echo EXIT=$exit_value >>$name/$output";
+  system "echo SIGNAL=$signal_num >>$name/$output";
 
   return $failed;
 }
@@ -50,7 +59,7 @@ sub load($) {
 
 sub test($$$$$) {
   my ($name, $test, $t_level, $cmd, $ign) = @_;
-  my ($level, $input, $options, @results) = load($test);
+  my ($level, $input, $options, @results) = load("$name/$test");
   $options =~ s/$ign//g if(defined($ign));
 
   my $output = $input;
@@ -83,9 +92,9 @@ sub test($$$$$) {
     die "Level must be one of CORE, THOROUGH, FUTURE or KNOWNBUG\n";
   }
 
-  my $failed = -1;
+  my $failed = 2;
   if($level & $t_level) {
-    $failed = run($input, $cmd, $options, $output);
+    $failed = run($name, $input, $cmd, $options, $output);
 
     if(!$failed) {
       print LOG "Execution [OK]\n";
@@ -98,7 +107,7 @@ sub test($$$$$) {
           my $r;
           $result =~ s/\\/\\\\/g;
           $result =~ s/([^\\])\$/$1\\r\\\\?\$/;
-          system("bash", "-c", "grep \$'$result' '$output' >/dev/null");
+          system("bash", "-c", "grep \$'$result' '$name/$output' >/dev/null");
           $r = ($included ? $? != 0 : $? == 0);
           if($r) {
             print LOG "$result [FAILED]\n";
@@ -150,6 +159,7 @@ Usage: test.pl -c CMD [OPTIONS] [DIRECTORIES ...]
 
   -c CMD     run tests on CMD - required option
   -i <regex> options in test.desc matching the specified perl regex are ignored
+  -j <num>   run <num> tests in parallel (requires Thread::Pool::Simple)
   -h         show this help and exit
   -C         core: run all essential tests (default if none of C/T/F/K are given)
   -T         thorough: run expensive tests
@@ -184,9 +194,11 @@ EOF
 use Getopt::Std;
 $main::VERSION = 0.1;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
-our ($opt_c, $opt_i, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K); # the variables for getopt
-getopts('c:i:hCTFK') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+our ($opt_c, $opt_i, $opt_j, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K); # the variables for getopt
+$opt_j = 0;
+getopts('c:i:j:hCTFK') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+(!$opt_j || $has_thread_pool) or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_h and &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 my $t_level = 0;
 $t_level += 2 if($opt_T);
@@ -204,18 +216,22 @@ my $count = @tests;
 print "  $count " . (1==$count?"test":"tests") . " found\n\n";
 
 use Cwd qw(getcwd);
-my $failures = 0;
-my $skips = 0;
-print "Running tests\n";
-foreach my $test (@tests) {
-  print "  Running $test";
+my $cwd = getcwd;
+my $failures :shared = 0;
+my $skips :shared = 0;
+my $pool :shared = undef;
 
-  my $cwd = getcwd;
-  chdir $test;
-  my $failed_skipped = test($test, "test.desc", $t_level, $opt_c, $opt_i);
-  chdir $cwd;
+sub do_test($)
+{
+  my ($test) = @_;
+  my $failed_skipped = 0;
 
-  if($failed_skipped < 0) {
+  defined($pool) or print "  Running $test";
+  $failed_skipped = test($test, "test.desc", $t_level, $opt_c, $opt_i);
+
+  lock($skips);
+  defined($pool) and print "  Running $test";
+  if(2 == $failed_skipped) {
     $skips++;
     print "  [SKIPPED]\n";
   } elsif(0 == $failed_skipped) {
@@ -225,6 +241,31 @@ foreach my $test (@tests) {
     print "  [FAILED]\n";
   }
 }
+
+if($opt_j>1 && $has_thread_pool && $count>1)
+{
+  $pool = Thread::Pool::Simple->new(
+    min => 2,
+    max => $opt_j,
+    load => 3,
+    do => [\&do_test]
+  );
+}
+
+print "Running tests\n";
+foreach my $test (@tests) {
+  if(defined($pool))
+  {
+    $pool->add($test);
+  }
+  else
+  {
+    do_test($test);
+  }
+}
+
+defined($pool) and $pool->join();
+
 print "\n";
 
 if($failures == 0) {
