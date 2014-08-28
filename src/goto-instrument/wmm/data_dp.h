@@ -24,15 +24,15 @@ class abstract_eventt;
 struct datat
 {
   irep_idt id;
-  locationt loc;
+  source_locationt loc;
   mutable unsigned eq_class;
 
-  datat(irep_idt _id, locationt _loc, unsigned _eq_class)
+  datat(irep_idt _id, source_locationt _loc, unsigned _eq_class)
   : id(_id), loc(_loc), eq_class(_eq_class)
   {
   }
 
-  datat(irep_idt _id, locationt _loc)
+  datat(irep_idt _id, source_locationt _loc)
   : id(_id), loc(_loc), eq_class(0)
   {
   }

@@ -1059,7 +1059,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
     --e_it;
 
     const abstract_eventt& current_event = egraph[*e_it];
-    const locationt& current_location = current_event.location;
+    const source_locationt& current_location = current_event.source_location;
 
     /* select relevant thread (po) -- or function contained in this thread */
     goto_programt* current_po=0;
@@ -1120,7 +1120,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
 
       /* find the portion of the thread to add */
       const abstract_eventt& next_event = egraph[*(++e_it--)];
-      const locationt& next_location = next_event.location;
+      const source_locationt& next_location = next_event.source_location;
 
       bool in_cycle = false;
       Forall_goto_program_instructions(it, *current_po)
@@ -1310,9 +1310,9 @@ void inline instrumentert::print_outputs_local(
       if(render_po_aligned)
         same_po[ev.thread].insert(*it_e);
       if(render_by_function)
-        same_file[ev.location.get_function()].insert(*it_e);
+        same_file[ev.source_location.get_function()].insert(*it_e);
       else if(render_by_file)
-        same_file[ev.location.get_file()].insert(*it_e);
+        same_file[ev.source_location.get_file()].insert(*it_e);
       if(ev.thread>max_thread)
         max_thread = ev.thread;
 

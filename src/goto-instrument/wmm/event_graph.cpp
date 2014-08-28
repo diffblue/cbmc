@@ -1058,7 +1058,7 @@ std::string event_grapht::critical_cyclet::print_output() const
   {
     const abstract_eventt& it_evt=egraph[*it];
     cycle += id2string(it_evt.variable) + " ("; 
-    cycle += it_evt.location.as_string();
+    cycle += it_evt.source_location.as_string();
     cycle += " thread " + i2string(it_evt.thread) + ") ";
   }
   return cycle;
@@ -1087,7 +1087,7 @@ std::string event_grapht::critical_cyclet::print_detail(
   {
     const abstract_eventt& it_evt=egraph[*it];
     const std::string var_name = id2string(it_evt.variable)
-      + " (" + it_evt.location.as_string()  + ")";
+      + " (" + it_evt.source_location.as_string()  + ")";
     if(map_var2id.find(var_name)!=map_var2id.end())
     {
       cycle += "t" + i2string(it_evt.thread) + " (";

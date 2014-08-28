@@ -117,7 +117,7 @@ static void merge_types(irept &dest, irept &src)
 
   if(dest.id()!=ID_merged_type)
   {
-    locationt location=static_cast<const exprt &>(dest).location();
+    source_locationt location=static_cast<const exprt &>(dest).location();
     typet new_type(ID_merged_type);
     new_type.move_to_subtypes((typet &)(dest));
     dest.swap(new_type);

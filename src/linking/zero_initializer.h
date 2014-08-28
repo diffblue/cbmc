@@ -12,6 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt zero_initializer(
   const typet &type,
-  const locationt &location,
+  const source_locationt &location,
   const namespacet &ns,
   message_handlert &message_handler);

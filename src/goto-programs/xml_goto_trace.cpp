@@ -40,18 +40,18 @@ void convert(
   
   dest.new_element("mode").data=id2string(goto_trace.mode);
 
-  locationt previous_location;
+  source_locationt previous_source_location;
 
   for(goto_tracet::stepst::const_iterator
       it=goto_trace.steps.begin();
       it!=goto_trace.steps.end();
       it++)
   {
-    const locationt &location=it->pc->location;
+    const source_locationt &source_location=it->pc->location;
 
     xmlt xml_location;
-    if(location.is_not_nil() && location.get_file()!="")
-      xml_location=xml(location);
+    if(source_location.is_not_nil() && source_location.get_file()!="")
+      xml_location=xml(source_location);
     
     switch(it->type)
     {
@@ -209,9 +209,9 @@ void convert(
       break;
       
     default:
-      if(location!=previous_location)
+      if(source_location!=previous_source_location)
       {
-        // just the location
+        // just the source location
         if(xml_location.name!="")
         {
           xmlt &xml_location_only=dest.new_element("location-only");
@@ -227,7 +227,7 @@ void convert(
       }
     }
 
-    if(location.is_not_nil() && location.get_file()!="")
-      previous_location=location;
+    if(source_location.is_not_nil() && source_location.get_file()!="")
+      previous_source_location=source_location;
   }
 }

@@ -33,7 +33,7 @@ symbol_exprt goto_convertt::make_compound_literal(
   const exprt &expr,
   goto_programt &dest)
 {
-  const locationt location=expr.find_location();
+  const source_locationt source_location=expr.find_source_location();
   
   symbolt new_symbol;
   symbolt *symbol_ptr;
@@ -44,11 +44,11 @@ symbol_exprt goto_convertt::make_compound_literal(
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.is_lvalue=true;
     new_symbol.is_thread_local=true;
-    new_symbol.is_static_lifetime=location.get_function().empty();
+    new_symbol.is_static_lifetime=source_location.get_function().empty();
     new_symbol.is_file_local=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
-    new_symbol.location=location;
+    new_symbol.location=source_location;
   }
   while(symbol_table.move(new_symbol, symbol_ptr));    
 
@@ -56,14 +56,14 @@ symbol_exprt goto_convertt::make_compound_literal(
   // generate code for this.
 
   symbol_exprt result=symbol_ptr->symbol_expr();
-  result.add_source_location()=location;
+  result.add_source_location()=source_location;
 
   // The lifetime of compound literals is really that of
   // the block they are in.
   copy(code_declt(result), DECL, dest);
   
   code_assignt code_assign(result, expr);
-  code_assign.add_source_location()=location;
+  code_assign.add_source_location()=source_location;
   convert(code_assign, dest);
 
   // now create a 'dead' instruction
@@ -240,7 +240,7 @@ void goto_convertt::clean_expr(
       throw "first argument of `if' must be boolean, but got "
         +if_expr.cond().to_string();
 
-    const locationt location=expr.find_location();
+    const source_locationt source_location=expr.find_source_location();
   
     // We do some constant-folding here, to mimic
     // what typical compilers do.
@@ -270,18 +270,18 @@ void goto_convertt::clean_expr(
     if(result_is_used)
     {
       symbolt &new_symbol=
-        new_tmp_symbol(expr.type(), "if_expr", dest, location);
+        new_tmp_symbol(expr.type(), "if_expr", dest, source_location);
 
       code_assignt assignment_true;
       assignment_true.lhs()=new_symbol.symbol_expr();
       assignment_true.rhs()=if_expr.true_case();
-      assignment_true.add_source_location()=location;
+      assignment_true.add_source_location()=source_location;
       convert(assignment_true, tmp_true);
 
       code_assignt assignment_false;
       assignment_false.lhs()=new_symbol.symbol_expr();
       assignment_false.rhs()=if_expr.false_case();
-      assignment_false.add_source_location()=location;
+      assignment_false.add_source_location()=source_location;
       convert(assignment_false, tmp_false);
 
       // overwrites expr
@@ -308,7 +308,7 @@ void goto_convertt::clean_expr(
     // generate guard for argument side-effects    
     generate_ifthenelse(
       if_expr.cond(), tmp_true, tmp_false,
-      location, dest);
+      source_location, dest);
 
     return;
   }

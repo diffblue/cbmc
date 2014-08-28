@@ -251,7 +251,7 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       // these must have a constant value
       assert(symbol.value.is_not_nil());
       typecheck_expr(symbol.value);
-      locationt location=symbol.value.location();
+      source_locationt location=symbol.value.location();
       do_initializer(symbol.value, symbol.type, true);
       make_constant(symbol.value);
     }

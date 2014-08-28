@@ -252,7 +252,7 @@ Function: show_state_header
 void show_state_header(
   std::ostream &out,
   const goto_trace_stept &state,
-  const locationt &location,
+  const source_locationt &source_location,
   unsigned step_nr)
 {
   out << "\n";
@@ -262,7 +262,7 @@ void show_state_header(
   else
     out << "State " << step_nr;
   
-  out << " " << location
+  out << " " << source_location
       << " thread " << state.thread_nr << "\n";
   out << "----------------------------------------------------" << "\n";
 }

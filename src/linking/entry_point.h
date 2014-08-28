@@ -20,7 +20,7 @@ bool entry_point(
 
 bool static_lifetime_init(
   symbol_tablet &symbol_table,
-  const locationt &location,
+  const source_locationt &source_location,
   message_handlert &message_handler);
 
 #endif

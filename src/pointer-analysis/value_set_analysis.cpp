@@ -68,11 +68,11 @@ void value_set_analysist::convert(
   const irep_idt &identifier,
   xmlt &dest) const
 {
-  ::locationt previous_location;
+  source_locationt previous_location;
 
   forall_goto_program_instructions(i_it, goto_program)
   {
-    const ::locationt &location=i_it->location;
+    const source_locationt &location=i_it->location;
     
     if(location==previous_location) continue;
 

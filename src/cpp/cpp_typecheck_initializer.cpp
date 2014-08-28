@@ -172,7 +172,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     ops.push_back(symbol.value);
 
     symbol.value = cpp_constructor(
-      symbol.value.location(),
+      symbol.value.source_location(),
       expr_symbol,
       ops);
   }
@@ -193,7 +193,7 @@ Function: cpp_typecheckt::zero_initializer
 void cpp_typecheckt::zero_initializer(
   const exprt &object,
   const typet &type,
-  const locationt &location,
+  const source_locationt &source_location,
   exprt::operandst &ops)
 {
   const typet &final_type=follow(type);
@@ -220,7 +220,7 @@ void cpp_typecheckt::zero_initializer(
       member.set(ID_component_name, component.get(ID_name));
 
       // recursive call
-      zero_initializer(member, component.type(), location, ops);
+      zero_initializer(member, component.type(), source_location, ops);
     }
   }
   else if(final_type.id()==ID_array)
@@ -228,7 +228,7 @@ void cpp_typecheckt::zero_initializer(
     if(cpp_is_pod(final_type.subtype()))
     {
       exprt value=
-        ::zero_initializer(final_type, location, *this, get_message_handler());
+        ::zero_initializer(final_type, source_location, *this, get_message_handler());
 
       exprt obj=object;
       typecheck_expr(obj);
@@ -236,7 +236,7 @@ void cpp_typecheckt::zero_initializer(
       code_assignt assign;
       assign.lhs()=obj;
       assign.rhs()=value;
-      assign.add_source_location()=location;
+      assign.add_source_location()=source_location;
       ops.push_back(assign);
     }
     else
@@ -258,7 +258,7 @@ void cpp_typecheckt::zero_initializer(
       {
         exprt index(ID_index);
         index.copy_to_operands(object, from_integer(i, index_type()));
-        zero_initializer(index, array_type.subtype(), location, ops);
+        zero_initializer(index, array_type.subtype(), source_location, ops);
       }
     }
   }
@@ -297,7 +297,7 @@ void cpp_typecheckt::zero_initializer(
     {
       irept name(ID_name);
       name.set(ID_identifier, comp.get(ID_base_name));
-      name.set(ID_C_source_location, location);
+      name.set(ID_C_source_location, source_location);
       
       cpp_namet cpp_name;
       cpp_name.move_to_sub(name);
@@ -305,7 +305,7 @@ void cpp_typecheckt::zero_initializer(
       exprt member(ID_member);
       member.copy_to_operands(object);
       member.set("component_cpp_name", cpp_name);
-      zero_initializer(member, comp.type(), location, ops);
+      zero_initializer(member, comp.type(), source_location, ops);
     }
   }
   else if(final_type.id()==ID_c_enum)
@@ -320,7 +320,7 @@ void cpp_typecheckt::zero_initializer(
     code_assignt assign;
     assign.lhs()=object;
     assign.rhs()=zero;
-    assign.add_source_location()=location;
+    assign.add_source_location()=source_location;
 
     typecheck_expr(assign.lhs());
     assign.lhs().type().set(ID_C_constant, false);
@@ -332,7 +332,7 @@ void cpp_typecheckt::zero_initializer(
   else if(final_type.id()==ID_incomplete_struct ||
           final_type.id()==ID_incomplete_union)
   {
-    err_location(location);
+    err_location(source_location);
     str << "cannot zero-initialize incomplete compound";
     throw 0;
   }
@@ -343,7 +343,7 @@ void cpp_typecheckt::zero_initializer(
     code_assignt assign;
     assign.lhs()=object;
     assign.rhs()=gen_zero(final_type);
-    assign.add_source_location()=location;
+    assign.add_source_location()=source_location;
 
     typecheck_expr(assign.op0());
     assign.lhs().type().set(ID_C_constant, false);

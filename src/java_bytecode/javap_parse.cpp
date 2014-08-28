@@ -466,8 +466,8 @@ void javap_parsert::rcode(membert &dest_member)
   // do we have a line number?
   if(address_to_line.find(instruction.address)!=address_to_line.end())
   {
-    instruction.location.set_line(address_to_line[instruction.address]);
-    instruction.location.set_file(source_location.get_file());
+    instruction.source_location.set_line(address_to_line[instruction.address]);
+    instruction.source_location.set_file(source_location.get_file());
   }
 }
 

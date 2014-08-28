@@ -50,16 +50,16 @@ void symex_bmct::symex_step(
   const goto_functionst &goto_functions,
   statet &state)
 {
-  const locationt &location=state.source.pc->location;
+  const source_locationt &source_location=state.source.pc->location;
 
-  if(!location.is_nil() && last_location!=location)
+  if(!source_location.is_nil() && last_source_location!=source_location)
   {
-    debug() << "BMC at file " << location.get_file()
-            << " line " << location.get_line()
-            << " function " << location.get_function()
+    debug() << "BMC at file " << source_location.get_file()
+            << " line " << source_location.get_line()
+            << " function " << source_location.get_function()
             << eom;
 
-    last_location=location;
+    last_source_location=source_location;
   }
 
   goto_symext::symex_step(goto_functions, state);

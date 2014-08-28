@@ -46,13 +46,13 @@ void data_dpt::dp_analysis(
   {
     if(local_read && it->id==read.id)
     {
-      insert(datat(write.id, (local_write?locationt():write.loc), it->eq_class));
+      insert(datat(write.id, (local_write?source_locationt():write.loc), it->eq_class));
       continue;
     }
 
     if(local_write && it->id==write.id)
     {
-      insert(datat(read.id, (local_read?locationt():read.loc), it->eq_class));
+      insert(datat(read.id, (local_read?source_locationt():read.loc), it->eq_class));
       continue;
     }
   }
@@ -60,8 +60,8 @@ void data_dpt::dp_analysis(
   if(it==end())
   {
     ++class_nb;
-    insert(datat(read.id, (local_read?locationt():read.loc), class_nb));
-    insert(datat(write.id, (local_write?locationt():write.loc), class_nb));
+    insert(datat(read.id, (local_read?source_locationt():read.loc), class_nb));
+    insert(datat(write.id, (local_write?source_locationt():write.loc), class_nb));
   }
 }
 
@@ -80,8 +80,8 @@ Function: data_dpt::dp_analysis
 void data_dpt::dp_analysis(const abstract_eventt& read, 
   const abstract_eventt& write)
 {
-  datat d_read(read.variable,read.location);
-  datat d_write(write.variable,write.location);
+  datat d_read(read.variable,read.source_location);
+  datat d_write(write.variable,write.source_location);
   dp_analysis(d_read,read.local,d_write,write.local);
 }
 
@@ -113,7 +113,7 @@ bool data_dpt::dp(const abstract_eventt& e1, const abstract_eventt& e2) const
     }
     else
     {
-      if(it1->id!=e1.variable || it1->loc!=e1.location)
+      if(it1->id!=e1.variable || it1->loc!=e1.source_location)
         continue;
     }
 
@@ -126,7 +126,7 @@ bool data_dpt::dp(const abstract_eventt& e1, const abstract_eventt& e2) const
       }
       else
       {
-        if(it2->id!=e2.variable || it2->loc!=e2.location)
+        if(it2->id!=e2.variable || it2->loc!=e2.source_location)
           continue;
       }
       /* or else, same class */
@@ -212,13 +212,13 @@ void data_dpt::print()
 {
 #ifdef DEBUG
   const_iterator it;
-  std::map<unsigned,std::set<locationt> > classed;
+  std::map<unsigned,std::set<source_locationt> > classed;
 
   for(it=begin(); it!=end(); ++it)
   {
     if(classed.find(it->eq_class)==classed.end())
     {
-      std::set<locationt> s;
+      std::set<source_locationt> s;
       s.insert(it->loc);
       classed[it->eq_class]=s;
     }
@@ -226,11 +226,11 @@ void data_dpt::print()
       classed[it->eq_class].insert(it->loc);
   }
 
-  for(std::map<unsigned,std::set<locationt> >::const_iterator m_it=classed.begin();
+  for(std::map<unsigned,std::set<source_locationt> >::const_iterator m_it=classed.begin();
     m_it!=classed.end(); ++m_it)
   {
     DEBUG_MESSAGE("class #"<<m_it->first);
-    std::set<locationt>::const_iterator l_it;
+    std::set<source_locationt>::const_iterator l_it;
     for(l_it=m_it->second.begin(); l_it!=m_it->second.end(); ++l_it)
       DEBUG_MESSAGE("loc: "<<*l_it);
   }

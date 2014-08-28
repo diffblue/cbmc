@@ -63,7 +63,7 @@ Function: static_lifetime_init
 
 bool static_lifetime_init(
   symbol_tablet &symbol_table,
-  const locationt &location,
+  const source_locationt &source_location,
   message_handlert &message_handler)
 {
   namespacet ns(symbol_table);
@@ -76,7 +76,7 @@ bool static_lifetime_init(
   symbolt &init_symbol=s_it->second;
   
   init_symbol.value=code_blockt();
-  init_symbol.value.add_source_location()=location;
+  init_symbol.value.add_source_location()=source_location;
 
   code_blockt &dest=to_code_block(to_code(init_symbol.value));
   
@@ -175,7 +175,7 @@ bool static_lifetime_init(
     {
       code_function_callt function_call;      
       function_call.function()=it->second.symbol_expr();
-      function_call.add_source_location()=location;
+      function_call.add_source_location()=source_location;
       dest.move_to_operands(function_call);
     }
   }

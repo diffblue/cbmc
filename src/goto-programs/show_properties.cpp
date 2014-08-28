@@ -44,16 +44,16 @@ void show_properties(
     if(!it->is_assert())
       continue;
       
-    const locationt &location=it->location;
+    const source_locationt &source_location=it->location;
       
-    const irep_idt &comment=location.get_comment();
+    const irep_idt &comment=source_location.get_comment();
     //const irep_idt &function=location.get_function();
-    const irep_idt &property_class=location.get_property_class();
-    const irep_idt &source=location.get_source();
+    const irep_idt &property_class=source_location.get_property_class();
+    const irep_idt &source=source_location.get_source();
     const irep_idt description=
       (comment==""?"assertion":comment);
       
-    irep_idt property_id=location.get_property_id();
+    irep_idt property_id=source_location.get_property_id();
     
     switch(ui)
     {

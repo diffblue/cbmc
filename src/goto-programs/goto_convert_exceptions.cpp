@@ -33,7 +33,7 @@ void goto_convertt::convert_msc_try_finally(
   }
   
   goto_programt tmp;
-  tmp.add_instruction(SKIP)->location=code.location();
+  tmp.add_instruction(SKIP)->location=code.source_location();
 
   {  
     // save 'leave' target
@@ -114,13 +114,13 @@ void goto_convertt::convert_msc_leave(
       d--)
   {
     codet d_code=targets.destructor_stack[d-1];
-    d_code.add_source_location()=code.location();
+    d_code.add_source_location()=code.source_location();
     convert(d_code, dest);
   }
 
   goto_programt::targett t=dest.add_instruction();
   t->make_goto(targets.leave_target);
-  t->location=code.location();
+  t->location=code.source_location();
 }
 
 /*******************************************************************\
@@ -145,7 +145,7 @@ void goto_convertt::convert_catch(
   goto_programt::targett catch_push_instruction=dest.add_instruction();
   catch_push_instruction->make_catch();
   catch_push_instruction->code.set_statement(ID_catch);
-  catch_push_instruction->location=code.location();
+  catch_push_instruction->location=code.source_location();
   
   // the CATCH-push instruction is annotated with a list of IDs,
   // one per target
@@ -212,7 +212,7 @@ void goto_convertt::convert_CPROVER_try_catch(
 
   // this is where we go after 'throw'
   goto_programt tmp;
-  tmp.add_instruction(SKIP)->location=code.location();
+  tmp.add_instruction(SKIP)->location=code.source_location();
 
   // set 'throw' target
   throw_targett throw_target(targets);
@@ -221,7 +221,7 @@ void goto_convertt::convert_CPROVER_try_catch(
   // now put 'catch' code onto destructor stack
   code_ifthenelset catch_code;
   catch_code.cond()=exception_flag();
-  catch_code.add_source_location()=code.location();
+  catch_code.add_source_location()=code.source_location();
   catch_code.then_case()=to_code(code.op1());
 
   targets.destructor_stack.push_back(catch_code);
@@ -257,7 +257,7 @@ void goto_convertt::convert_CPROVER_throw(
     goto_programt::targett t_set_exception=
       dest.add_instruction(ASSIGN);
 
-    t_set_exception->location=code.location();
+    t_set_exception->location=code.source_location();
     t_set_exception->code=code_assignt(exception_flag(), true_exprt());
   }
 
@@ -265,12 +265,12 @@ void goto_convertt::convert_CPROVER_throw(
   if(targets.throw_set)
   {
     // need to process destructor stack
-    unwind_destructor_stack(code.location(), targets.throw_stack_size, dest);
+    unwind_destructor_stack(code.source_location(), targets.throw_stack_size, dest);
 
     // add goto
     goto_programt::targett t=dest.add_instruction();
     t->make_goto(targets.throw_target);
-    t->location=code.location();
+    t->location=code.source_location();
   }
   else // otherwise, we do a return
   {
@@ -284,12 +284,12 @@ void goto_convertt::convert_CPROVER_throw(
         d_it++)
     {
       codet d_code=*d_it;
-      d_code.add_source_location()=code.location();
+      d_code.add_source_location()=code.source_location();
       convert(d_code, dest);
     }
 
     goto_programt::targett t=dest.add_instruction(RETURN);
-    t->location=code.location();
+    t->location=code.source_location();
     t->code=code_returnt();
   }
 }
@@ -376,7 +376,7 @@ Function: goto_convertt::unwind_destructor_stack
 \*******************************************************************/
 
 void goto_convertt::unwind_destructor_stack(
-  const locationt &location,
+  const source_locationt &source_location,
   unsigned stack_size,
   goto_programt &dest,
   bool do_dead)
@@ -389,7 +389,7 @@ void goto_convertt::unwind_destructor_stack(
   while(targets.destructor_stack.size()>stack_size)
   {
     codet d_code=targets.destructor_stack.back();
-    d_code.add_source_location()=location;
+    d_code.add_source_location()=source_location;
     
     // pop now to avoid doing this again
     targets.destructor_stack.pop_back();

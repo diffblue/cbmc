@@ -35,7 +35,7 @@ public:
 
   void err_location(const exprt &expr) { saved_error_location=expr.find_source_location(); }
   void err_location(const typet &type) { saved_error_location=type.source_location(); }
-  void err_location(const irept &irep) { saved_error_location=static_cast<const locationt &>(irep.find(ID_C_source_location)); }
+  void err_location(const irept &irep) { saved_error_location=static_cast<const source_locationt &>(irep.find(ID_C_source_location)); }
   void err_location(const source_locationt &_location) { saved_error_location=_location; }
 
   void error(const std::string &message)

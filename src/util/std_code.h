@@ -83,9 +83,9 @@ public:
   }
   
   // This is the closing '}' or 'END' at the end of a block
-  locationt end_location() const
+  source_locationt end_location() const
   {
-    return static_cast<const locationt &>(find(ID_C_end_location));
+    return static_cast<const source_locationt &>(find(ID_C_end_location));
   }
 
   codet &find_last_statement()

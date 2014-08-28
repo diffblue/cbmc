@@ -25,7 +25,7 @@ public:
     symex_targett &_target);
 
   // To show progress
-  irept last_location;
+  irept last_source_location;
 
   // Control unwinding.
   

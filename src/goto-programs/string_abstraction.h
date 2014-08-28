@@ -51,7 +51,7 @@ protected:
   void replace_string_macros(
     exprt &expr,
     bool lhs,
-    const locationt &location);
+    const source_locationt &);
 
   void move_lhs_arithmetic(exprt &lhs, exprt &rhs);
 
@@ -113,7 +113,7 @@ protected:
     const exprt &pointer,
     whatt what,
     bool write,
-    const locationt &location);
+    const source_locationt &);
 
   bool build(const exprt &object, exprt &dest, bool write);
   bool build_wrap(const exprt &object, exprt &dest, bool write);

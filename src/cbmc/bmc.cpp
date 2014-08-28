@@ -326,7 +326,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 
   status() << "Starting Bounded Model Checking" << eom;
 
-  symex.last_location.make_nil();
+  symex.last_source_location.make_nil();
 
   try
   {
@@ -347,7 +347,7 @@ bool bmct::run(const goto_functionst &goto_functions)
   catch(std::string &error_str)
   {
     message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_location);
+    message_stream.err_location(symex.last_source_location);
     message_stream.error(error_str);
     return true;
   }
@@ -355,7 +355,7 @@ bool bmct::run(const goto_functionst &goto_functions)
   catch(const char *error_str)
   {
     message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_location);
+    message_stream.err_location(symex.last_source_location);
     message_stream.error(error_str);
     return true;
   }

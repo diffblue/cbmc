@@ -81,11 +81,13 @@ Function: convert
 
 \*******************************************************************/
 
-void convert(const irept &irep, goto_programt::instructiont &instruction)
+void convert(
+  const irept &irep,
+  goto_programt::instructiont &instruction)
 {
   instruction.code=static_cast<const codet &>(irep.find(ID_code));
   instruction.function = irep.find(ID_function).id();
-  instruction.location = static_cast<const locationt&>(irep.find(ID_location));    
+  instruction.location = static_cast<const source_locationt &>(irep.find(ID_location));
   instruction.type = static_cast<goto_program_instruction_typet>(
                   unsafe_string2unsigned(irep.find(ID_type).id_string()));
   instruction.guard = static_cast<const exprt&>(irep.find(ID_guard));

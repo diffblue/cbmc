@@ -30,7 +30,7 @@ Function: xml
 
 \*******************************************************************/
 
-xmlt xml(const locationt &location)
+xmlt xml(const source_locationt &location)
 {
   xmlt result;
 

@@ -137,7 +137,7 @@ void symbolt::from_irep(const irept &src)
 {
   type=static_cast<const typet &>(src.find(ID_type));
   value=static_cast<const exprt &>(src.find(ID_value));
-  location=static_cast<const locationt &>(src.find(ID_location));
+  location=static_cast<const source_locationt &>(src.find(ID_location));
 
   name=src.get(ID_name);
   module=src.get(ID_module);

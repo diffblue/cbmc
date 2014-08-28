@@ -338,7 +338,7 @@ void string_abstractiont::add_argument(
   symbolt new_symbol;
   new_symbol.type=final_type;
   new_symbol.value.make_nil();
-  new_symbol.location=str_args.back().location();
+  new_symbol.location=str_args.back().source_location();
   new_symbol.name=str_args.back().get_identifier();
   new_symbol.module=fct_symbol.module;
   new_symbol.base_name=str_args.back().get_base_name();
@@ -944,29 +944,29 @@ Function: string_abstractiont::replace_string_macros
 void string_abstractiont::replace_string_macros(
   exprt &expr,
   bool lhs,
-  const locationt &location)
+  const source_locationt &source_location)
 {
   if(expr.id()=="is_zero_string")
   {
     assert(expr.operands().size()==1);
-    exprt tmp=build(expr.op0(), IS_ZERO, lhs, location);
+    exprt tmp=build(expr.op0(), IS_ZERO, lhs, source_location);
     expr.swap(tmp);
   }
   else if(expr.id()=="zero_string_length")
   {
     assert(expr.operands().size()==1);
-    exprt tmp=build(expr.op0(), LENGTH, lhs, location);
+    exprt tmp=build(expr.op0(), LENGTH, lhs, source_location);
     expr.swap(tmp);
   }
   else if(expr.id()=="buffer_size")
   {
     assert(expr.operands().size()==1);
-    exprt tmp=build(expr.op0(), SIZE, false, location);
+    exprt tmp=build(expr.op0(), SIZE, false, source_location);
     expr.swap(tmp);
   }
   else
     Forall_operands(it, expr)
-      replace_string_macros(*it, lhs, location);
+      replace_string_macros(*it, lhs, source_location);
 }
 
 /*******************************************************************\
@@ -985,7 +985,7 @@ exprt string_abstractiont::build(
   const exprt &pointer,
   whatt what,
   bool write,
-  const locationt &location)
+  const source_locationt &source_location)
 {
   // take care of pointer typecasts now
   if(pointer.id()==ID_typecast)
@@ -996,7 +996,7 @@ exprt string_abstractiont::build(
       return build_unknown(what, write);
 
     // recursive call
-    return build(pointer.op0(), what, write, location);
+    return build(pointer.op0(), what, write, source_location);
   }
 
   exprt str_struct;
