@@ -77,7 +77,7 @@ void unwind(
       goto_programt::targett t_goto=goto_program.insert_before(loop_exit);
   
       t_goto->make_goto(loop_exit);
-      t_goto->location=loop_exit->location;
+      t_goto->source_location=loop_exit->source_location;
       t_goto->function=loop_exit->function;
       t_goto->guard=true_exprt();
     }
@@ -87,7 +87,7 @@ void unwind(
   goto_programt::targett loop_iter=t_skip;
   
   t_skip->make_skip();
-  t_skip->location=loop_head->location;
+  t_skip->source_location=loop_head->source_location;
   t_skip->function=loop_head->function;
   
   // record the exit point of first iteration

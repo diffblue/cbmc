@@ -86,7 +86,7 @@ public:
     irep_idt function;
     
     //! the location of the instruction in the source file
-    source_locationt location;
+    source_locationt source_location;
     
     //! what kind of instruction?
     goto_program_instruction_typet type;
@@ -180,7 +180,7 @@ public:
     inline bool is_end_function () const { return type==END_FUNCTION;  }
 
     inline instructiont():
-      location(static_cast<const source_locationt &>(get_nil_irep())),
+      source_location(static_cast<const source_locationt &>(get_nil_irep())),
       type(NO_INSTRUCTION_TYPE),
       guard(true_exprt()),
       location_number(0),
@@ -189,7 +189,7 @@ public:
     }
 
     inline instructiont(goto_program_instruction_typet _type):
-      location(static_cast<const source_locationt &>(get_nil_irep())),
+      source_location(static_cast<const source_locationt &>(get_nil_irep())),
       type(_type),
       guard(true_exprt()),
       location_number(0),
@@ -201,7 +201,7 @@ public:
     void swap(instructiont &instruction)
     {
       instruction.code.swap(code);
-      instruction.location.swap(location);
+      instruction.source_location.swap(source_location);
       std::swap(instruction.type, type);
       instruction.guard.swap(guard);
       instruction.targets.swap(targets);

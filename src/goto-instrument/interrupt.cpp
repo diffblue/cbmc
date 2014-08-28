@@ -115,7 +115,8 @@ void interrupt(
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
 
-      const source_locationt &source_location=original_instruction.location;
+      const source_locationt &source_location=
+        original_instruction.source_location;
       
       code_function_callt isr_call;
       isr_call.add_source_location()=source_location;
@@ -126,12 +127,12 @@ void interrupt(
       goto_programt::targett t_orig=goto_program.insert_after(t_call);
 
       t_goto->make_goto(t_orig);
-      t_goto->location=source_location;
+      t_goto->source_location=source_location;
       t_goto->guard=side_effect_expr_nondett(bool_typet());
       t_goto->function=original_instruction.function;
 
       t_call->make_function_call(isr_call);
-      t_call->location=source_location;
+      t_call->source_location=source_location;
       t_call->function=original_instruction.function;
 
       t_orig->swap(original_instruction);
@@ -148,19 +149,19 @@ void interrupt(
       goto_programt::targett t_goto=goto_program.insert_after(i_it);
       goto_programt::targett t_call=goto_program.insert_after(t_goto);
       
-      const source_locationt &source_location=i_it->location;
+      const source_locationt &source_location=i_it->source_location;
       
       code_function_callt isr_call;
       isr_call.add_source_location()=source_location;
       isr_call.function()=interrupt_handler;
       
       t_goto->make_goto(t_orig);
-      t_goto->location=source_location;
+      t_goto->source_location=source_location;
       t_goto->guard=side_effect_expr_nondett(bool_typet());
       t_goto->function=i_it->function;
 
       t_call->make_function_call(isr_call);
-      t_call->location=source_location;
+      t_call->source_location=source_location;
       t_call->function=i_it->function;
 
       i_it=t_call; // the for loop already counts us up      

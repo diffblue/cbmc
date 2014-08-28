@@ -117,9 +117,9 @@ void goto_program_dereferencet::dereference_failure(
 
       goto_programt::targett t=new_code.add_instruction(type);
       t->guard.swap(guard_expr);
-      t->location=dereference_location;
-      t->location.set(ID_property, property);
-      t->location.set(ID_comment, "dereference failure: "+msg);
+      t->source_location=dereference_location;
+      t->source_location.set_property_class(property);
+      t->source_location.set_comment("dereference failure: "+msg);
     }
   }
 }

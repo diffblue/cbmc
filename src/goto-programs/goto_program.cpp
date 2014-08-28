@@ -35,8 +35,8 @@ std::ostream& goto_programt::output_instruction(
 {
   out << "        // " << it->location_number << " ";
 
-  if(!it->location.is_nil())
-    out << it->location.as_string();
+  if(!it->source_location.is_nil())
+    out << it->source_location.as_string();
   else
     out << "no location";
 
@@ -108,7 +108,7 @@ std::ostream& goto_programt::output_instruction(
     {
       out << from_expr(ns, identifier, it->guard);
     
-      const irep_idt &comment=it->location.get(ID_comment);
+      const irep_idt &comment=it->source_location.get_comment();
       if(comment!="") out << " // " << comment;
     }
       
@@ -533,7 +533,7 @@ std::string as_string(
     result+=from_expr(ns, i.function, i.guard);
 
     {
-      const irep_idt &comment=i.location.get(ID_comment);
+      const irep_idt &comment=i.source_location.get_comment();
       if(comment!="") result+=" /* "+id2string(comment)+" */";
     }
     return result;

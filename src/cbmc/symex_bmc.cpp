@@ -50,7 +50,7 @@ void symex_bmct::symex_step(
   const goto_functionst &goto_functions,
   statet &state)
 {
-  const source_locationt &source_location=state.source.pc->location;
+  const source_locationt &source_location=state.source.pc->source_location;
 
   if(!source_location.is_nil() && last_source_location!=source_location)
   {
@@ -112,7 +112,7 @@ bool symex_bmct::get_unwind(
   if(this_loop_limit!=std::numeric_limits<unsigned>::max())
     statistics() << " (" << this_loop_limit << " max)";
 
-  statistics() << " " << source.pc->location
+  statistics() << " " << source.pc->source_location
                << " thread " << source.thread_nr << eom;
 
   return abort;

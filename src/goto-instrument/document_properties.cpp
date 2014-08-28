@@ -350,12 +350,12 @@ void document_propertiest::doit()
       {
         source_locationt new_source_location;
 
-        new_source_location.set_file(i_it->location.get_file());
-        new_source_location.set_line(i_it->location.get_line());
-        new_source_location.set_function(i_it->location.get_function());
+        new_source_location.set_file(i_it->source_location.get_file());
+        new_source_location.set_line(i_it->source_location.get_line());
+        new_source_location.set_function(i_it->source_location.get_function());
 
         claim_set[new_source_location].comment_set.
-          insert(i_it->location.get_comment());
+          insert(i_it->source_location.get_comment());
       }
     }
   }

@@ -158,7 +158,7 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
         goto_program.insert_after(*g_it);
 
       t->make_goto(l_it->second);
-      t->location=i.location;
+      t->source_location=i.source_location;
       t->guard=guard;
     }
   }
@@ -224,7 +224,7 @@ void goto_convertt::copy(
 {
   goto_programt::targett t=dest.add_instruction(type);
   t->code=code;
-  t->location=code.source_location();
+  t->source_location=code.source_location();
 }
 
 /*******************************************************************\
@@ -935,9 +935,9 @@ void goto_convertt::convert_assert(
   
   goto_programt::targett t=dest.add_instruction(ASSERT);
   t->guard.swap(cond);
-  t->location=code.source_location();
-  t->location.set(ID_property, ID_assertion);
-  t->location.set("user-provided", true);
+  t->source_location=code.source_location();
+  t->source_location.set(ID_property, ID_assertion);
+  t->source_location.set("user-provided", true);
 }
 
 /*******************************************************************\
@@ -957,7 +957,7 @@ void goto_convertt::convert_skip(
   goto_programt &dest)
 {
   goto_programt::targett t=dest.add_instruction(SKIP);
-  t->location=code.source_location();
+  t->source_location=code.source_location();
   t->code=code;
 }
 
@@ -983,7 +983,7 @@ void goto_convertt::convert_assume(
 
   goto_programt::targett t=dest.add_instruction(ASSUME);
   t->guard.swap(op);
-  t->location=code.source_location();
+  t->source_location=code.source_location();
 }
 
 /*******************************************************************\
@@ -1063,7 +1063,7 @@ void goto_convertt::convert_for(
   v->make_goto(z);
   v->guard=cond;
   v->guard.make_not();
-  v->location=cond.source_location();
+  v->source_location=cond.source_location();
 
   // do the w label
   goto_programt tmp_w;
@@ -1074,7 +1074,7 @@ void goto_convertt::convert_for(
   goto_programt::targett y=tmp_y.add_instruction();
   y->make_goto(u);
   y->guard=true_exprt();
-  y->location=code.source_location();
+  y->source_location=code.source_location();
 
   dest.destructive_append(sideeffects);
   dest.destructive_append(tmp_v);
@@ -1143,7 +1143,7 @@ void goto_convertt::convert_while(
   // y: if(c) goto v;
   y->make_goto(v);
   y->guard=true_exprt();
-  y->location=code.source_location();
+  y->source_location=code.source_location();
 
   dest.destructive_append(tmp_branch);
   dest.destructive_append(tmp_x);
@@ -1222,7 +1222,7 @@ void goto_convertt::convert_dowhile(
   // y: if(c) goto w;
   y->make_goto(w);
   y->guard=cond;
-  y->location=condition_location;
+  y->source_location=condition_location;
 
   dest.destructive_append(tmp_w);
   dest.destructive_append(sideeffects);
@@ -1349,13 +1349,13 @@ void goto_convertt::convert_switch(
     goto_programt::targett x=tmp_cases.add_instruction();
     x->make_goto(it->first);
     x->guard.swap(guard_expr);
-    x->location=case_ops.front().find_source_location();
+    x->source_location=case_ops.front().find_source_location();
   }
 
   {
     goto_programt::targett d_jump=tmp_cases.add_instruction();
     d_jump->make_goto(targets.default_target);
-    d_jump->location=targets.default_target->location;
+    d_jump->source_location=targets.default_target->source_location;
   }
 
   dest.destructive_append(sideeffects);
@@ -1395,7 +1395,7 @@ void goto_convertt::convert_break(
   // add goto
   goto_programt::targett t=dest.add_instruction();
   t->make_goto(targets.break_target);
-  t->location=code.source_location();
+  t->source_location=code.source_location();
 }
 
 /*******************************************************************\
@@ -1470,7 +1470,7 @@ void goto_convertt::convert_return(
   goto_programt::targett t=dest.add_instruction();
   t->make_return();
   t->code=new_code;
-  t->location=new_code.source_location();
+  t->source_location=new_code.source_location();
 }
 
 /*******************************************************************\
@@ -1501,7 +1501,7 @@ void goto_convertt::convert_continue(
   // add goto
   goto_programt::targett t=dest.add_instruction();
   t->make_goto(targets.continue_target);
-  t->location=code.source_location();
+  t->source_location=code.source_location();
 }
 
 /*******************************************************************\
@@ -1522,7 +1522,7 @@ void goto_convertt::convert_goto(
 {
   goto_programt::targett t=dest.add_instruction();
   t->make_goto();
-  t->location=code.source_location();
+  t->source_location=code.source_location();
   t->code=code;
 
   // remember it to do target later
@@ -1547,7 +1547,7 @@ void goto_convertt::convert_gcc_computed_goto(
 {
   goto_programt::targett t=dest.add_instruction();
   t->make_skip();
-  t->location=code.source_location();
+  t->source_location=code.source_location();
   t->code=code;
 
   // remember it to do this later
@@ -1596,7 +1596,7 @@ void goto_convertt::convert_specc_notify(
     convert_specc_event(*it, t->events);
 
   t->code.swap(code);
-  t->location=code.source_location();
+  t->source_location=code.source_location();
   #endif
 
   copy(code, OTHER, dest);
@@ -1672,7 +1672,7 @@ void goto_convertt::convert_specc_wait(
   convert_specc_event(op, t->events);
 
   t->code.swap(code);
-  t->location=code.source_location();
+  t->source_location=code.source_location();
   #endif
 
   copy(code, OTHER, dest);
@@ -1722,7 +1722,7 @@ void goto_convertt::convert_start_thread(
   goto_programt::targett start_thread=
     dest.add_instruction(START_THREAD);
 
-  start_thread->location=code.source_location();
+  start_thread->source_location=code.source_location();
   
   {
     // start_thread label;
@@ -1733,12 +1733,12 @@ void goto_convertt::convert_start_thread(
     
     goto_programt::targett goto_instruction=dest.add_instruction(GOTO);
     goto_instruction->guard=true_exprt();
-    goto_instruction->location=code.source_location();
+    goto_instruction->source_location=code.source_location();
 
     goto_programt tmp;
     convert(to_code(code.op0()), tmp);
     goto_programt::targett end_thread=tmp.add_instruction(END_THREAD);
-    end_thread->location=code.source_location();
+    end_thread->source_location=code.source_location();
     
     start_thread->targets.push_back(tmp.instructions.begin());
     dest.destructive_append(tmp);
@@ -1851,7 +1851,7 @@ void goto_convertt::convert_bp_enforce(
 
   goto_programt::targett t=dest.add_instruction(ASSUME);
   t->guard=op;
-  t->location=code.source_location();
+  t->source_location=code.source_location();
 
   // change the assignments
   
@@ -1923,7 +1923,7 @@ void goto_convertt::convert_bp_abortif(
 
   goto_programt::targett t=dest.add_instruction(ASSERT);
   t->guard.swap(op);
-  t->location=code.source_location();
+  t->source_location=code.source_location();
 }
 
 /*******************************************************************\
@@ -2105,7 +2105,7 @@ void goto_convertt::generate_ifthenelse(
   // x: goto z;
   x->make_goto(z);
   if(!tmp_w.instructions.empty())
-    x->location=tmp_w.instructions.back().location;
+    x->source_location=tmp_w.instructions.back().source_location;
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
@@ -2174,7 +2174,7 @@ void goto_convertt::generate_conditional_branch(
     goto_programt::targett g=tmp.add_instruction();
     g->make_goto(target_true);
     g->guard=cond;
-    g->location=source_location;
+    g->source_location=source_location;
     dest.destructive_append(tmp);
   }
 }
@@ -2226,7 +2226,7 @@ void goto_convertt::generate_conditional_branch(
     goto_programt::targett t_true=dest.add_instruction();
     t_true->make_goto(target_true);
     t_true->guard=true_exprt();
-    t_true->location=source_location;
+    t_true->source_location=source_location;
     
     return;
   }
@@ -2249,7 +2249,7 @@ void goto_convertt::generate_conditional_branch(
     goto_programt::targett t_false=dest.add_instruction();
     t_false->make_goto(target_false);
     t_false->guard=true_exprt();
-    t_false->location=guard.source_location();
+    t_false->source_location=guard.source_location();
     
     return;
   }
@@ -2260,12 +2260,12 @@ void goto_convertt::generate_conditional_branch(
   goto_programt::targett t_true=dest.add_instruction();
   t_true->make_goto(target_true);
   t_true->guard=cond;
-  t_true->location=source_location;
+  t_true->source_location=source_location;
 
   goto_programt::targett t_false=dest.add_instruction();
   t_false->make_goto(target_false);
   t_false->guard=true_exprt();
-  t_false->location=source_location;
+  t_false->source_location=source_location;
 }
 
 /*******************************************************************\
@@ -2399,7 +2399,7 @@ symbolt &goto_convertt::new_tmp_symbol(
   
   goto_programt::targett t=dest.add_instruction(DECL);
   t->code=code_declt(symbol_ptr->symbol_expr());
-  t->location=source_location;
+  t->source_location=source_location;
 
   return *symbol_ptr;  
 }

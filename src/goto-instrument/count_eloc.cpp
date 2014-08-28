@@ -31,9 +31,9 @@ unsigned count_eloc(const goto_programt &goto_program)
   hash_set_cont<irep_idt, irep_id_hash> lines;
 
   forall_goto_program_instructions(it, goto_program)
-    if(it->location.is_not_nil() &&
-        !has_prefix(id2string(it->location.get_file()), "<built-in-"))
-      lines.insert(it->location.get_line());
+    if(it->source_location.is_not_nil() &&
+        !has_prefix(id2string(it->source_location.get_file()), "<built-in-"))
+      lines.insert(it->source_location.get_line());
 
   return lines.size();
 }

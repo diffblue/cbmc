@@ -47,7 +47,7 @@ void convert(
       it!=goto_trace.steps.end();
       it++)
   {
-    const source_locationt &source_location=it->pc->location;
+    const source_locationt &source_location=it->pc->source_location;
 
     xmlt xml_location;
     if(source_location.is_not_nil() && source_location.get_file()!="")

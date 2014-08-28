@@ -72,7 +72,7 @@ void value_set_analysist::convert(
 
   forall_goto_program_instructions(i_it, goto_program)
   {
-    const source_locationt &location=i_it->location;
+    const source_locationt &location=i_it->source_location;
     
     if(location==previous_location) continue;
 

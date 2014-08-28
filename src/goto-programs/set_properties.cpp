@@ -34,7 +34,7 @@ void set_properties(
   {
     if(!it->is_assert()) continue;
     
-    irep_idt property_id=it->location.get_property_id();
+    irep_idt property_id=it->source_location.get_property_id();
 
     hash_set_cont<irep_idt, irep_id_hash>::iterator
       c_it=property_set.find(property_id);
@@ -86,7 +86,7 @@ void label_properties(
   {
     if(!it->is_assert()) continue;
     
-    irep_idt function=it->location.get_function();
+    irep_idt function=it->source_location.get_function();
     unsigned &count=property_counters[function];
     
     count++;
@@ -95,7 +95,7 @@ void label_properties(
       function==""?i2string(count):
       id2string(function)+"."+i2string(count);
     
-    it->location.set_property_id(property_id);
+    it->source_location.set_property_id(property_id);
   }
 }
 

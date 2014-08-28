@@ -259,7 +259,7 @@ void race_check(
           w_guards.get_w_guard_expr(e_it->second),
           e_it->second.guard);
 
-        t->location=original_instruction.location;
+        t->source_location=original_instruction.source_location;
         i_it=++t;
       }
 
@@ -282,7 +282,7 @@ void race_check(
           w_guards.get_w_guard_expr(e_it->second),
           false_exprt());
 
-        t->location=original_instruction.location;
+        t->source_location=original_instruction.source_location;
         i_it=++t;
       }
 
@@ -294,8 +294,8 @@ void race_check(
         goto_programt::targett t=goto_program.insert_before(i_it);
 
         t->make_assertion(w_guards.get_assertion(e_it->second));
-        t->location=original_instruction.location;
-        t->location.set_comment(comment(e_it->second, false));
+        t->source_location=original_instruction.source_location;
+        t->source_location.set_comment(comment(e_it->second, false));
         i_it=++t;
       }
 
@@ -306,8 +306,8 @@ void race_check(
         goto_programt::targett t=goto_program.insert_before(i_it);
 
         t->make_assertion(w_guards.get_assertion(e_it->second));
-        t->location=original_instruction.location;
-        t->location.set_comment(comment(e_it->second, true));
+        t->source_location=original_instruction.source_location;
+        t->source_location.set_comment(comment(e_it->second, true));
         i_it=++t;
       }
 

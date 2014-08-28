@@ -106,10 +106,10 @@ void bmct::cover_assertions(
       xmlt xml_result("result");
       
       // will go away
-      xml_result.set_attribute("claim", id2string(it->first->location.get_property_id()));
+      xml_result.set_attribute("claim", id2string(it->first->source_location.get_property_id()));
       
       // use this one
-      xml_result.set_attribute("name", id2string(it->first->location.get_property_id()));
+      xml_result.set_attribute("name", id2string(it->first->source_location.get_property_id()));
 
       xml_result.set_attribute("status",
         g_it->covered?"COVERED":"NOT_COVERED");
@@ -119,7 +119,7 @@ void bmct::cover_assertions(
     else
     {
       if(!g_it->covered)
-        warning() << "!! failed to cover " << it->first->location;
+        warning() << "!! failed to cover " << it->first->source_location;
     }
   }
 

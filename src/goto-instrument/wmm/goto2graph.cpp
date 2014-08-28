@@ -136,11 +136,11 @@ void instrumentert::extract_events_rw(
 
     const abstract_eventt new_read_event(abstract_eventt::Read,
       thread, read, unique_id++,
-      instruction.location, local(read));
+      instruction.source_location, local(read));
     const unsigned new_read_node=egraph.add_node();
     egraph[new_read_node]=new_read_event;
     DEBUG_MESSAGE("new Read"<<read<<" @thread"
-      <<(thread)<<"("<<instruction.location<<","
+      <<(thread)<<"("<<instruction.source_location<<","
       <<(local(read)?"local":"shared")<<") #"<<new_read_node);
 
     const unsigned new_read_gnode=egraph_alt.add_node();
@@ -170,11 +170,11 @@ void instrumentert::extract_events_rw(
     /* creates Write */
     const abstract_eventt new_write_event(abstract_eventt::Write,
       thread, write, unique_id++,
-      instruction.location, local(write));
+      instruction.source_location, local(write));
     const unsigned new_write_node=egraph.add_node();
     egraph[new_write_node](new_write_event);
     DEBUG_MESSAGE("new Write "<<write<<" @thread"<<(thread)
-      <<"("<<instruction.location<<","
+      <<"("<<instruction.source_location<<","
       << (local(write)?"local":"shared")<<") #"<<new_write_node);
 
     const unsigned new_write_gnode=egraph_alt.add_node();
@@ -197,8 +197,8 @@ void instrumentert::extract_events_rw(
         const irep_idt& write=write_it->second.object;
         const irep_idt& read=read_it->second.object;
         DEBUG_MESSAGE("dp: Write:"<<write<<"; Read:"<<read);
-        const datat read_p(read,instruction.location);
-        const datat write_p(write,instruction.location);
+        const datat read_p(read,instruction.source_location);
+        const datat write_p(write,instruction.source_location);
           data_dp.dp_analysis(read_p,local(read),write_p,local(write));
         }
     data_dp.dp_merge();
@@ -210,8 +210,8 @@ void instrumentert::extract_events_rw(
         const irep_idt& read=read_it->second.object;
         if(read2==read)
           continue;
-        const datat read_p(read,instruction.location);
-        const datat read2_p(read2,instruction.location);
+        const datat read_p(read,instruction.source_location);
+        const datat read2_p(read2,instruction.source_location);
         data_dp.dp_analysis(read_p,local(read),read2_p,local(read2));
       }
     data_dp.dp_merge();
@@ -240,7 +240,7 @@ void instrumentert::extract_events_fence(
   if(is_fence(instruction, ns))
   {
     const abstract_eventt new_fence_event(abstract_eventt::Fence,
-      thread, "F", unique_id++, instruction.location, false);
+      thread, "F", unique_id++, instruction.source_location, false);
     const unsigned new_fence_node=egraph.add_node();
     egraph[new_fence_node](new_fence_event);
     const unsigned new_fence_gnode=egraph_alt.add_node();
@@ -255,7 +255,7 @@ void instrumentert::extract_events_fence(
     if(model!=TSO)
     {
       const abstract_eventt new_fence_event(abstract_eventt::Lwfence,
-        thread, "f", unique_id++, instruction.location, false);
+        thread, "f", unique_id++, instruction.source_location, false);
       const unsigned new_fence_node=egraph.add_node();
       egraph[new_fence_node](new_fence_event);
       const unsigned new_fence_gnode=egraph_alt.add_node();
@@ -277,7 +277,7 @@ void instrumentert::extract_events_fence(
     bool RRcumul=instruction.code.get_bool(ID_RRcumul);
     bool RWcumul=instruction.code.get_bool(ID_RWcumul);
     const abstract_eventt new_fence_event(abstract_eventt::ASMfence,
-      thread, "asm", unique_id++, instruction.location,
+      thread, "asm", unique_id++, instruction.source_location,
       false, WRfence, WWfence, RRfence, RWfence, WWcumul, RWcumul, RRcumul);
     const unsigned new_fence_node=egraph.add_node();
     egraph[new_fence_node](new_fence_event);
@@ -1068,7 +1068,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
     Forall_goto_functions(f_it, goto_functions)
     {
       forall_goto_program_instructions(p_it, f_it->second.body)
-        if(p_it->location==current_location)
+        if(p_it->source_location==current_location)
         {
           current_po = &f_it->second.body;
           thread_found = true;
@@ -1103,12 +1103,12 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
 
       /* add this instruction to the interleaving */
       Forall_goto_program_instructions(i_it, *current_po)
-        if(i_it->location==current_location)
+        if(i_it->source_location==current_location)
         {
           /* add all the instructions of this line */
           for(goto_programt::instructionst::iterator same_loc=i_it;
             same_loc!=current_po->instructions.end() 
-            && same_loc->location==i_it->location;
+            && same_loc->source_location==i_it->source_location;
             same_loc++)
             add_instr_to_interleaving(same_loc, interleaving);
           break;
@@ -1125,12 +1125,12 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
       bool in_cycle = false;
       Forall_goto_program_instructions(it, *current_po)
       {
-        if(it->location==current_location)
+        if(it->source_location==current_location)
           in_cycle = true;
 
         /* do not add the last instruction now -- will be done at 
            the next iteration */
-        if(it->location==next_location)
+        if(it->source_location==next_location)
           break;
 
         if(in_cycle)

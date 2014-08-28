@@ -170,11 +170,11 @@ void path_searcht::do_show_vcc(
     
   mstreamt &out=result();
 
-  if(instruction.location.is_not_nil())
-    out << instruction.location << "\n";
+  if(instruction.source_location.is_not_nil())
+    out << instruction.source_location << "\n";
   
-  if(instruction.location.get_comment()!="")
-    out << instruction.location.get_comment() << "\n";
+  if(instruction.source_location.get_comment()!="")
+    out << instruction.source_location.get_comment() << "\n";
     
   unsigned count=1;
   
@@ -282,7 +282,7 @@ void path_searcht::check_assertion(
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
 
-  irep_idt property_name=instruction.location.get_property_id();
+  irep_idt property_name=instruction.source_location.get_property_id();
   property_entryt &property_entry=property_map[property_name];
   
   if(property_entry.status==FAIL)
@@ -351,13 +351,13 @@ void path_searcht::initialize_property_map(
         if(!it->is_assert())
           continue;
       
-        const locationt &location=it->location;
+        const source_locationt &source_location=it->source_location;
       
-        irep_idt property_name=location.get_property_id();
+        irep_idt property_name=source_location.get_property_id();
         
         property_entryt &property_entry=property_map[property_name];
         property_entry.status=NOT_REACHED;
-        property_entry.description=location.get_comment();
+        property_entry.description=source_location.get_comment();
       }
     }    
 }

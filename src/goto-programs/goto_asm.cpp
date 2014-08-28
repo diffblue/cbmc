@@ -91,10 +91,10 @@ void goto_convertt::convert_asm(
       if(x86_32_locked_atomic)
       {
         goto_programt::targett ab=tmp_dest.add_instruction(ATOMIC_BEGIN);
-        ab->location=code.source_location();
+        ab->source_location=code.source_location();
 
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
-        t->location=code.source_location();
+        t->source_location=code.source_location();
         t->code=codet(ID_fence);
         t->code.add_source_location()=code.source_location();
         t->code.set(ID_WWfence, true);
@@ -108,7 +108,7 @@ void goto_convertt::convert_asm(
          command=="sfence") // x86
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
-        t->location=code.source_location();
+        t->source_location=code.source_location();
         t->code=codet(ID_fence);
         t->code.add_source_location()=code.source_location();
         t->code.set(ID_WWfence, true);
@@ -119,7 +119,7 @@ void goto_convertt::convert_asm(
       else if(command=="sync") // Power
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
-        t->location=code.source_location();
+        t->source_location=code.source_location();
         t->code=codet(ID_fence);
         t->code.add_source_location()=code.source_location();
         t->code.set(ID_WWfence, true);
@@ -134,7 +134,7 @@ void goto_convertt::convert_asm(
       else if(command=="lwsync") // Power
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
-        t->location=code.source_location();
+        t->source_location=code.source_location();
         t->code=codet(ID_fence);
         t->code.add_source_location()=code.source_location();
         t->code.set(ID_WWfence, true);
@@ -147,7 +147,7 @@ void goto_convertt::convert_asm(
       else if(command=="isync") // Power
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
-        t->location=code.source_location();
+        t->source_location=code.source_location();
         t->code=codet(ID_fence);
         t->code.add_source_location()=code.source_location();
         // doesn't do anything by itself,
@@ -156,7 +156,7 @@ void goto_convertt::convert_asm(
       else if(command=="dmb" || command=="dsb") // ARM
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
-        t->location=code.source_location();
+        t->source_location=code.source_location();
         t->code=codet(ID_fence);
         t->code.add_source_location()=code.source_location();
         t->code.set(ID_WWfence, true);
@@ -171,7 +171,7 @@ void goto_convertt::convert_asm(
       else if(command=="isb") // ARM
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
-        t->location=code.source_location();
+        t->source_location=code.source_location();
         t->code=codet(ID_fence);
         t->code.add_source_location()=code.source_location();
         // doesn't do anything by itself,
@@ -183,7 +183,7 @@ void goto_convertt::convert_asm(
       if(x86_32_locked_atomic)
       {
         goto_programt::targett ae=tmp_dest.add_instruction(ATOMIC_END);
-        ae->location=code.source_location();
+        ae->source_location=code.source_location();
 
         x86_32_locked_atomic=false;
       }

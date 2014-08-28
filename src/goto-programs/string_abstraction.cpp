@@ -450,10 +450,10 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
 
   goto_programt::targett decl1=dest.add_instruction();
   decl1->make_decl();
-  decl1->location=ref_instr->location;
+  decl1->source_location=ref_instr->source_location;
   decl1->function=ref_instr->function;
   decl1->code=code_declt(sym_expr);
-  decl1->code.add_source_location()=ref_instr->location;
+  decl1->code.add_source_location()=ref_instr->source_location;
 
   exprt val=symbol.value;
   // initialize pointers with suitable objects
@@ -468,10 +468,10 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
   {
     goto_programt::targett assignment1=dest.add_instruction();
     assignment1->make_assignment();
-    assignment1->location=ref_instr->location;
+    assignment1->source_location=ref_instr->source_location;
     assignment1->function=ref_instr->function;
     assignment1->code=code_assignt(sym_expr, val);
-    assignment1->code.add_source_location()=ref_instr->location;
+    assignment1->code.add_source_location()=ref_instr->source_location;
   }
 }
 
@@ -540,10 +540,10 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
 
         goto_programt::targett assignment1=dest.add_instruction();
         assignment1->make_assignment();
-        assignment1->location=ref_instr->location;
+        assignment1->source_location=ref_instr->source_location;
         assignment1->function=ref_instr->function;
         assignment1->code=code_assignt(member, sym_expr);
-        assignment1->code.add_source_location()=ref_instr->location;
+        assignment1->code.add_source_location()=ref_instr->source_location;
       }
 
       ++seen;
@@ -585,7 +585,7 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   symbolt new_symbol;
   new_symbol.type=type;
   new_symbol.value.make_nil();
-  new_symbol.location=ref_instr->location;
+  new_symbol.location=ref_instr->source_location;
   new_symbol.name=dummy_identifier;
   new_symbol.module=symbol.module;
   new_symbol.base_name=id2string(symbol.base_name)+suffix;
@@ -603,10 +603,10 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   // make sure it is declared before the recursive call
   goto_programt::targett decl=dest.add_instruction();
   decl->make_decl();
-  decl->location=ref_instr->location;
+  decl->source_location=ref_instr->source_location;
   decl->function=ref_instr->function;
   decl->code=code_declt(sym_expr);
-  decl->code.add_source_location()=ref_instr->location;
+  decl->code.add_source_location()=ref_instr->source_location;
 
   // set the value - may be nil
   if(source_type.id()==ID_array && is_char_type(source_type.subtype()) &&
@@ -627,10 +627,10 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   {
     goto_programt::targett assignment1=dest.add_instruction();
     assignment1->make_assignment();
-    assignment1->location=ref_instr->location;
+    assignment1->source_location=ref_instr->source_location;
     assignment1->function=ref_instr->function;
     assignment1->code=code_assignt(sym_expr, new_symbol.value);
-    assignment1->code.add_source_location()=ref_instr->location;
+    assignment1->code.add_source_location()=ref_instr->source_location;
   }
 
   symbol_table.move(new_symbol);
@@ -664,7 +664,7 @@ goto_programt::targett string_abstractiont::abstract(
   case ASSERT:
   case ASSUME:
     if(has_string_macros(it->guard))
-      replace_string_macros(it->guard, false, it->location);
+      replace_string_macros(it->guard, false, it->source_location);
     break;
 
   case FUNCTION_CALL:
@@ -719,12 +719,12 @@ goto_programt::targett string_abstractiont::abstract_assign(
 
   if(has_string_macros(lhs))
   {
-    replace_string_macros(lhs, true, target->location);
+    replace_string_macros(lhs, true, target->source_location);
     move_lhs_arithmetic(lhs, rhs);
   }
 
   if(has_string_macros(rhs))
-    replace_string_macros(rhs, false, target->location);
+    replace_string_macros(rhs, false, target->source_location);
 
   const typet &type=ns.follow(lhs.type());
   if(type.id()==ID_pointer || type.id()==ID_array)
@@ -769,7 +769,7 @@ void string_abstractiont::abstract_function_call(
 
     if(it1==arguments.end())
     {
-      err_location(target->location);
+      err_location(target->source_location);
       throw "function call: not enough arguments";
     }
 
@@ -847,7 +847,7 @@ goto_programt::targett string_abstractiont::abstract_return(
 
   exprt &retval=ret.return_value();
 
-  replace_string_macros(retval, false, target->location);
+  replace_string_macros(retval, false, target->source_location);
 
   const symbolt &fct_symbol=ns.lookup(target->function);
   const typet &abstract_ret_type=build_abstraction_type(
@@ -861,7 +861,7 @@ goto_programt::targett string_abstractiont::abstract_return(
 
   goto_programt::instructiont is_null;
   is_null.function=target->function;
-  is_null.location=target->location;
+  is_null.source_location=target->source_location;
   dest.insert_before_swap(target, is_null);
   goto_programt::targett next=target;
   ++next;
@@ -1473,7 +1473,7 @@ void string_abstractiont::build_new_symbol(const symbolt &symbol,
   if(symbol.is_static_lifetime)
   {
     goto_programt::targett dummy_loc=initialization.add_instruction();
-    dummy_loc->location=symbol.location;
+    dummy_loc->source_location=symbol.location;
     make_decl_and_def(initialization, dummy_loc, identifier, symbol.name);
     initialization.instructions.erase(dummy_loc);
   }
@@ -1600,10 +1600,10 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
   {
     goto_programt::instructiont assignment;
     assignment.make_assignment();
-    assignment.location=target->location;
+    assignment.source_location=target->source_location;
     assignment.function=target->function;
     assignment.code=code_assignt(new_lhs, new_rhs);
-    assignment.code.add_source_location()=target->location;
+    assignment.code.add_source_location()=target->source_location;
     dest.insert_before_swap(target, assignment);
     ++target;
 
@@ -1707,17 +1707,17 @@ goto_programt::targett string_abstractiont::char_assign(
 
   goto_programt::targett assignment1=tmp.add_instruction();
   assignment1->make_assignment();
-  assignment1->location=target->location;
+  assignment1->source_location=target->source_location;
   assignment1->function=target->function;
   assignment1->code=code_assignt(i1, true_exprt());
-  assignment1->code.add_source_location()=target->location;
+  assignment1->code.add_source_location()=target->source_location;
 
   goto_programt::targett assignment2=tmp.add_instruction();
   assignment2->make_assignment();
-  assignment2->location=target->location;
+  assignment2->source_location=target->source_location;
   assignment2->function=target->function;
   assignment2->code=code_assignt(lhs, rhs);
-  assignment2->code.add_source_location()=target->location;
+  assignment2->code.add_source_location()=target->source_location;
 
   move_lhs_arithmetic(
       assignment2->code.op0(),
@@ -1816,19 +1816,19 @@ goto_programt::targett string_abstractiont::value_assignments_if(
   goto_programt::targett out_target=tmp.add_instruction(SKIP);
 
   goto_else->function=target->function;
-  goto_else->location=target->location;
+  goto_else->source_location=target->source_location;
   goto_else->make_goto(else_target, rhs.cond());
   goto_else->guard.make_not();
 
   goto_out->function=target->function;
-  goto_out->location=target->location;
+  goto_out->source_location=target->source_location;
   goto_out->make_goto(out_target, true_exprt());
 
   else_target->function=target->function;
-  else_target->location=target->location;
+  else_target->source_location=target->source_location;
 
   out_target->function=target->function;
-  out_target->location=target->location;
+  out_target->source_location=target->source_location;
 
   value_assignments(tmp, goto_out, lhs, rhs.true_case());
   value_assignments(tmp, else_target, lhs, rhs.false_case());
@@ -1866,9 +1866,9 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
     assignment->code=code_assignt(
         member(lhs, IS_ZERO),
         member(rhs, IS_ZERO));
-    assignment->code.add_source_location()=target->location;
+    assignment->code.add_source_location()=target->source_location;
     assignment->function=target->function;
-    assignment->location=target->location;
+    assignment->source_location=target->source_location;
   }
 
   {
@@ -1876,9 +1876,9 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
     assignment->code=code_assignt(
         member(lhs, LENGTH),
         member(rhs, LENGTH));
-    assignment->code.add_source_location()=target->location;
+    assignment->code.add_source_location()=target->source_location;
     assignment->function=target->function;
-    assignment->location=target->location;
+    assignment->source_location=target->source_location;
   }
 
   {
@@ -1886,9 +1886,9 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
     assignment->code=code_assignt(
         member(lhs, SIZE),
         member(rhs, SIZE));
-    assignment->code.add_source_location()=target->location;
+    assignment->code.add_source_location()=target->source_location;
     assignment->function=target->function;
-    assignment->location=target->location;
+    assignment->source_location=target->source_location;
   }
 
   goto_programt::targett last=target;
