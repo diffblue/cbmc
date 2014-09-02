@@ -335,11 +335,16 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
 {
   if(subarch=="powerpc")
     set_ILP32();
-  else // ppc64
+  else // ppc64 or ppc64le
     set_LP64();
 
   arch=ARCH_POWER;
-  endianness=IS_BIG_ENDIAN;
+
+  if(subarch=="ppc64le")
+    endianness=IS_LITTLE_ENDIAN;
+  else
+    endianness=IS_BIG_ENDIAN;
+
   long_double_width=16*8;
   char_is_unsigned=true;
   NULL_is_zero=true;
@@ -352,16 +357,38 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
     defines.push_back("__powerpc__");
     defines.push_back("__POWERPC__");
     defines.push_back("__ppc__");
+
     if(os==OS_MACOS)
       defines.push_back("__BIG_ENDIAN__");
+
+    if(subarch!="powerpc")
+    {
+      defines.push_back("__powerpc64");
+      defines.push_back("__powerpc64__");
+      defines.push_back("__PPC64__");
+      defines.push_back("__ppc64__");
+      if(subarch=="ppc64le")
+      {
+        defines.push_back("_CALL_ELF=2");
+        defines.push_back("__LITTLE_ENDIAN__");
+      }
+      else
+      {
+        defines.push_back("_CALL_ELF=1");
+        defines.push_back("__BIG_ENDIAN__");
+      }
+    }
     break;
+
   case MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_PPC");
     break;
+
   case MODE_CODEWARRIOR_C_CPP:
   case MODE_ARM_C_CPP:
   case MODE_ANSI_C_CPP:
     break;
+
   case NO_MODE:
     assert(false);
   }
@@ -899,7 +926,8 @@ bool configt::set(const cmdlinet &cmdline)
           arch=="mips")
     ansi_c.set_arch_spec_mips(arch);
   else if(arch=="powerpc" ||
-          arch=="ppc64")
+          arch=="ppc64" ||
+          arch=="ppc64le")
     ansi_c.set_arch_spec_power(arch);
   else if(arch=="sparc" ||
           arch=="sparc64")
@@ -1158,7 +1186,11 @@ irep_idt configt::this_architecture()
     #endif
   #elif __powerpc__
     #ifdef __ppc64__
-    this_arch="ppc64";
+      #ifdef __LITTLE_ENDIAN__
+      this_arch="ppc64le";
+      #else
+      this_arch="ppc64";
+      #endif
     #else
     this_arch="powerpc";
     #endif
