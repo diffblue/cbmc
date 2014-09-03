@@ -445,7 +445,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 	{
 	  report_success();
 
-          if(symex.is_incremental)
+          if(symex.is_incremental && !options.get_bool_option("stop-when-unsat"))
           {
             if(symex.add_loop_check())
 	    {
