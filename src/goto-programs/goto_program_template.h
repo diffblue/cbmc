@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /*! \defgroup gr_goto_programs Goto programs */
 
 #include <cassert>
-#include <ostream>
+#include <iostream>
 #include <set>
 
 #include <util/namespace.h>
@@ -616,9 +616,15 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
       it!=instructions.end();
       it++)
   {
+#if 0
+    std::cout << "instruction: " << it->location_number << std::endl;
+#endif
     if(it->is_target())
     {
       it->target_number=++cnt;
+#if 0
+      std::cout << "target set: " << it->target_number << std::endl;
+#endif
       assert(it->target_number!=0);
     }
   }
@@ -631,6 +637,9 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
       it!=instructions.end();
       it++)
   {
+#if 0
+    std::cout << "instruction: " << it->location_number << std::endl;
+#endif
     for(typename instructiont::targetst::const_iterator
         t_it=it->targets.begin();
         t_it!=it->targets.end();
@@ -639,6 +648,9 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
       targett t=*t_it;
       if(t!=instructions.end())
       {
+#if 0
+	std::cout << "target: " << t->target_number << std::endl;
+#endif
         assert(t->target_number!=0);
         assert(t->target_number!=unsigned(-1));
       }
