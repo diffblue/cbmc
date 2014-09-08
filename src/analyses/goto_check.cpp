@@ -1227,16 +1227,15 @@ void goto_checkt::add_guarded_claim(
   {
     goto_program_instruction_typet type=
       enable_assert_to_assume?ASSUME:ASSERT;
-
+    
     goto_programt::targett t=new_code.add_instruction(type);
     
-    std::string source_string=from_expr(ns, "", src_expr);
+    std::string source_expr_string=from_expr(ns, "", src_expr);
 
     t->guard.swap(new_expr);
     t->source_location=source_location;
-    t->source_location.set_comment(comment);
+    t->source_location.set_comment(comment+" in "+source_expr_string);
     t->source_location.set_property_class(property_class);
-    t->source_location.set_source(source_string);
   }
 }
 
