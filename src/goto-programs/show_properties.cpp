@@ -49,7 +49,6 @@ void show_properties(
     const irep_idt &comment=source_location.get_comment();
     //const irep_idt &function=location.get_function();
     const irep_idt &property_class=source_location.get_property_class();
-    const irep_idt &source=source_location.get_source();
     const irep_idt description=
       (comment==""?"assertion":comment);
       
@@ -59,7 +58,7 @@ void show_properties(
     {
     case ui_message_handlert::XML_UI:
       {
-        xmlt xml_claim("claim");
+        xmlt xml_claim("claim"); // this will go away, use below
         xml_claim.new_element("number").data=id2string(property_id); // will go away
         xml_claim.new_element("name").data=id2string(property_id); // will go away
         xml_claim.set_attribute("name", id2string(property_id)); // use this one
@@ -70,9 +69,22 @@ void show_properties(
         xml_claim.new_element("description").data=id2string(description);        
         xml_claim.new_element("property").data=id2string(property_class);
         xml_claim.new_element("expression").data=from_expr(ns, identifier, it->guard);
-        xml_claim.new_element("source").data=id2string(source);
+        xml_claim.new_element("source").data="";
 
         std::cout << xml_claim << std::endl;
+
+        // use me instead
+        xmlt xml_property("property");
+        xml_property.set_attribute("name", id2string(property_id)); // use this one
+        xml_property.set_attribute("class", id2string(property_class)); // use this one
+        
+        xmlt &property_l=xml_property.new_element();
+        property_l=xml(it->source_location);
+        
+        xml_property.new_element("description").data=id2string(description);        
+        xml_property.new_element("expression").data=from_expr(ns, identifier, it->guard);
+
+        std::cout << xml_property << std::endl;
       }
       break;
       
@@ -82,9 +94,6 @@ void show_properties(
       std::cout << "  " << it->source_location << std::endl
                 << "  " << description << std::endl
                 << "  " << from_expr(ns, identifier, it->guard) << std::endl;
-
-      if(source!="")
-        std::cout << "  in \"" << source << "\"" << std::endl;
 
       std::cout << std::endl;
       break;

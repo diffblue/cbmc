@@ -67,6 +67,7 @@ void convert(
         xml_failure.set_attribute("thread", i2string(it->thread_nr));
         xml_failure.set_attribute("step_nr", i2string(it->step_nr));
         xml_failure.set_attribute("reason", id2string(it->comment));
+        xml_failure.set_attribute("property", id2string(source_location.get_property_id()));
 
         if(xml_location.name!="")
           xml_failure.new_element().swap(xml_location);
