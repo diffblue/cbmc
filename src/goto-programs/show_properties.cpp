@@ -58,6 +58,7 @@ void show_properties(
     {
     case ui_message_handlert::XML_UI:
       {
+        #if 0
         xmlt xml_claim("claim"); // this will go away, use below
         xml_claim.new_element("number").data=id2string(property_id); // will go away
         xml_claim.new_element("name").data=id2string(property_id); // will go away
@@ -72,6 +73,7 @@ void show_properties(
         xml_claim.new_element("source").data="";
 
         std::cout << xml_claim << std::endl;
+        #endif
 
         // use me instead
         xmlt xml_property("property");

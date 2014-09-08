@@ -59,9 +59,11 @@ void convert(
       if(!it->cond_value)
       {
         xmlt &xml_failure=dest.new_element("failure");
+        #if 0
         xml_failure.new_element("reason").data=id2string(it->comment);
         xml_failure.new_element("step_nr").data=i2string(it->step_nr);        
         xml_failure.new_element("thread").data=i2string(it->thread_nr);
+        #endif
 
         // new, to replace above
         xml_failure.set_attribute("thread", i2string(it->thread_nr));
@@ -111,19 +113,23 @@ void convert(
           xml_assignment.new_element("mode").data=id2string(symbol->mode);
         }
 
+        #if 0
         xml_assignment.new_element("thread").data=i2string(it->thread_nr);
         xml_assignment.new_element("identifier").data=id2string(identifier);
         xml_assignment.new_element("base_name").data=id2string(base_name);
         xml_assignment.new_element("display_name").data=id2string(display_name);
-        xml_assignment.new_element("value").data=value_string;
+        xml_assignment.new_element("step_nr").data=i2string(it->step_nr);
+        #endif
+
+        xml_assignment.new_element("type").data=type_string;
         xml_assignment.new_element("full_lhs").data=full_lhs_string;
         xml_assignment.new_element("full_lhs_value").data=full_lhs_value_string;
-        xml_assignment.new_element("type").data=type_string;
-        xml_assignment.new_element("step_nr").data=i2string(it->step_nr);
+        xml_assignment.new_element("value").data=value_string;
         
         // new, to replace above
         xml_assignment.set_attribute("thread", i2string(it->thread_nr));
         xml_assignment.set_attribute("identifier", id2string(identifier));
+        xml_assignment.set_attribute("base_name", id2string(base_name));
         xml_assignment.set_attribute("display_name", id2string(display_name));
         xml_assignment.set_attribute("step_nr", i2string(it->step_nr));
 
@@ -138,8 +144,12 @@ void convert(
         printf_formatter(id2string(it->format_string), it->io_args);
         std::string text=printf_formatter.as_string();
         xmlt &xml_output=dest.new_element("output");
+        
+        #if 0
         xml_output.new_element("step_nr").data=i2string(it->step_nr);
         xml_output.new_element("thread").data=i2string(it->thread_nr);
+        #endif
+        
         xml_output.new_element("text").data=text;
 
         // new, to replace above
@@ -165,8 +175,11 @@ void convert(
       {
         xmlt &xml_input=dest.new_element("input");
         xml_input.new_element("input_id").data=id2string(it->io_id);
+        
+        #if 0
         xml_input.new_element("step_nr").data=i2string(it->step_nr);
         xml_input.new_element("thread").data=i2string(it->thread_nr);
+        #endif
 
         // new, to replace above
         xml_input.set_attribute("thread", i2string(it->thread_nr));
@@ -193,8 +206,11 @@ void convert(
         std::string tag=
           (it->type==goto_trace_stept::FUNCTION_CALL)?"function_call":"function_return";
         xmlt &xml_function=dest.new_element(tag);
+        
+        #if 0
         xml_function.new_element("step_nr").data=i2string(it->step_nr);
         xml_function.new_element("thread").data=i2string(it->thread_nr);
+        #endif
 
         // new, to replace above
         xml_function.set_attribute("thread", i2string(it->thread_nr));
@@ -216,8 +232,11 @@ void convert(
         if(xml_location.name!="")
         {
           xmlt &xml_location_only=dest.new_element("location-only");
+          
+          #if 0
           xml_location_only.new_element("step_nr").data=i2string(it->step_nr);
           xml_location_only.new_element("thread").data=i2string(it->thread_nr);
+          #endif
 
           // new, to replace above
           xml_location_only.set_attribute("thread", i2string(it->thread_nr));
