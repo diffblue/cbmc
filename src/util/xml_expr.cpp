@@ -37,9 +37,11 @@ xmlt xml(const source_locationt &location)
   result.name="location";
   
   // these will go away
+  #if 0
   result.new_element("file").data=id2string(location.get_file());
   result.new_element("line").data=id2string(location.get_line());
   result.new_element("function").data=id2string(location.get_function());
+  #endif
   
   // these are to stay
   if(location.get_file()!="")
