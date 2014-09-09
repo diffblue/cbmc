@@ -38,8 +38,6 @@ void convert(
 {
   dest=xmlt("goto_trace");
   
-  dest.new_element("mode").data=id2string(goto_trace.mode);
-
   source_locationt previous_source_location;
 
   for(goto_tracet::stepst::const_iterator
@@ -110,7 +108,7 @@ void convert(
           if(type_string=="")
             type_string=from_type(ns, identifier, symbol->type);
 
-          xml_assignment.new_element("mode").data=id2string(symbol->mode);
+          xml_assignment.set_attribute("mode", id2string(symbol->mode));
         }
 
         #if 0
