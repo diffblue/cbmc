@@ -187,6 +187,7 @@ const char *gcc_options_without_argument[]=
   "--static", 
   "-shared",
   "--shared",
+  "-shared-libgcc",
   "-symbolic",
   "-EB",
   "-EL",
