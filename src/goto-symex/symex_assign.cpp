@@ -69,8 +69,16 @@ void goto_symext::symex_assign(
   }
   else
   {
+    visibilityt visibility=VISIBLE;
+
+    // let's hide return value assignments    
+    if(lhs.id()==ID_symbol &&
+       id2string(to_symbol_expr(lhs).get_identifier()).find(
+                  "#return_value!")!=std::string::npos)
+      visibility=HIDDEN;
+  
     guardt guard; // NOT the state guard!
-    symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
+    symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, visibility);
   }
 }
 
@@ -257,7 +265,7 @@ void goto_symext::symex_assign_symbol(
     ssa_full_lhs, add_to_lhs(full_lhs, original_lhs),
     ssa_rhs, 
     state.source,
-    symex_targett::STATE);
+    visibility==HIDDEN?symex_targett::HIDDEN:symex_targett::STATE);
 }
 
 /*******************************************************************\
