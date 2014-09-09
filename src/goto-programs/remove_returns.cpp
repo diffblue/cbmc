@@ -44,7 +44,8 @@ Inputs:
 Outputs:
 
 Purpose: turns 'return x' into an assignment to fkt#return_value,
-         if needed, and a 'goto the_end_of_the_function'
+         unless the function returns void,
+         and a 'goto the_end_of_the_function'.
 
 \*******************************************************************/
 
