@@ -325,8 +325,8 @@ void c_typecheck_baset::typecheck_redefinition_type(
       {
         err_location(new_symbol.location);
         str << "error: type symbol `" << new_symbol.display_name()
-            << "' defined twice:" << std::endl;
-        str << "Original: " << to_string(old_symbol.type) << std::endl;
+            << "' defined twice:" << "\n";
+        str << "Original: " << to_string(old_symbol.type) << "\n";
         str << "     New: " << to_string(new_symbol.type);
         throw 0;
       }
@@ -394,8 +394,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     {
       err_location(new_symbol.location);
       str << "error: function symbol `" << new_symbol.display_name()
-          << "' defined twice with different types:" << std::endl;
-      str << "Original: " << to_string(old_symbol.type) << std::endl;
+          << "' redefined with a different type:" << "\n";
+      str << "Original: " << to_string(old_symbol.type) << "\n";
       str << "     New: " << to_string(new_symbol.type);
       throw 0;
     }
@@ -526,8 +526,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     {
       err_location(new_symbol.location);
       str << "error: symbol `" << new_symbol.display_name()
-          << "' defined twice with different types:" << std::endl;
-      str << "Original: " << to_string(old_symbol.type) << std::endl;
+          << "' redefined with a different type:" << "\n";
+      str << "Original: " << to_string(old_symbol.type) << "\n";
       str << "     New: " << to_string(new_symbol.type);
       throw 0;
     }
