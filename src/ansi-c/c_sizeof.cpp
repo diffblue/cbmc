@@ -55,6 +55,11 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
     // check the subtype
     dest=sizeof_rec(type.subtype());
   }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    // follow the tag
+    dest=sizeof_rec(ns.follow_tag(to_c_enum_tag_type(type)));
+  }
   else if(type.id()==ID_pointer)
   {
     // the following is an MS extension
