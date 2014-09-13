@@ -996,6 +996,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     // track min and max to find a nice base type
     mp_integer min_value=0, max_value=0;
     
+    std::list<enum_constantt> enum_constants;
+    
     Forall_operands(it, as_expr)
     {
       ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
@@ -1011,14 +1013,21 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
       typecheck_declaration(declaration);
       
-      // produce value for next constant
-      const symbolt &symbol=
-        lookup(language_prefix+id2string(declaration.declarator().get_name()));
+      irep_idt identifier=
+        language_prefix+id2string(declaration.declarator().get_name());
+        
+      // get value
+      const symbolt &symbol=lookup(identifier);
+
       to_integer(symbol.value, value);
+
+      // store      
+      enum_constants.push_back(enum_constantt(identifier, value));
       
       if(value<min_value) min_value=value;
       if(value>max_value) max_value=value;
       
+      // produce value for next constant
       ++value;
     }
     
@@ -1092,6 +1101,17 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       enum_tag_symbol.is_file_local=true;
       enum_tag_symbol.base_name=base_name;
       enum_tag_symbol.name=identifier;
+      
+      // throw in the enum constants
+      for(std::list<enum_constantt>::const_iterator
+          it=enum_constants.begin();
+          it!=enum_constants.end();
+          it++)
+      {
+        enum_tag_symbol.type.get_sub().push_back(irept());
+        enum_tag_symbol.type.get_sub().back().set(ID_identifier, it->identifier);
+        enum_tag_symbol.type.get_sub().back().set(ID_value, integer2string(it->value));
+      }
     
       // is it in the symbol table already?
       symbol_tablet::symbolst::iterator s_it=
