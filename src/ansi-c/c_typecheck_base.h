@@ -271,6 +271,17 @@ protected:
   {
     return language_prefix+id2string(id);
   }
+
+  struct enum_constantt
+  {
+    irep_idt identifier;
+    mp_integer value;
+    enum_constantt(irep_idt _identifier, mp_integer _value):
+      identifier(_identifier), value(_value)
+    {
+    }
+  };
+    
 };
 
 #endif
