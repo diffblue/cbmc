@@ -3134,7 +3134,8 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
        (type1.id()==ID_bool ||
         type1.id()==ID_unsignedbv ||
         type1.id()==ID_signedbv ||
-        type1.id()==ID_c_enum))
+        type1.id()==ID_c_enum ||
+        type1.id()==ID_c_enum_tag))
     {
       typecheck_arithmetic_pointer(op0);
       make_index_type(op1);
@@ -3165,7 +3166,8 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     if(int_op_type.id()==ID_bool ||
        int_op_type.id()==ID_unsignedbv ||
        int_op_type.id()==ID_signedbv ||
-       int_op_type.id()==ID_c_enum)
+       int_op_type.id()==ID_c_enum ||
+       int_op_type.id()==ID_c_enum_tag)
     {
       typecheck_arithmetic_pointer(*p_op);
       make_index_type(*int_op);
@@ -3318,7 +3320,8 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
           return;
         }
         else if(final_type0.id()==ID_signedbv ||
-                final_type0.id()==ID_c_enum)
+                final_type0.id()==ID_c_enum ||
+                final_type0.id()==ID_c_enum_tag)
         {
           expr.set(ID_statement, ID_assign_ashr);
           return;
@@ -3337,6 +3340,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
     else if(final_type0.id()==ID_bool ||
             final_type0.get(ID_C_c_type)==ID_bool ||
             final_type0.id()==ID_c_enum ||
+            final_type0.id()==ID_c_enum_tag ||
             final_type0.id()==ID_incomplete_c_enum)
     {      
       // promote
