@@ -549,38 +549,38 @@ extern inline union_tag_typet &to_union_tag_type(typet &type)
 /*! \brief An enum tag type
 */
 
-class enum_tag_typet:public tag_typet
+class c_enum_tag_typet:public tag_typet
 {
 public:
-  explicit inline enum_tag_typet(const irep_idt &identifier):
-    tag_typet(ID_enum_tag, identifier)
+  explicit inline c_enum_tag_typet(const irep_idt &identifier):
+    tag_typet(ID_c_enum_tag, identifier)
   {
   }
 };
 
-/*! \brief Cast a generic typet to a \ref enum_tag_typet
+/*! \brief Cast a generic typet to a \ref c_enum_tag_typet
  *
  * This is an unchecked conversion. \a type must be known to be \ref
- * enum_tag_typet.
+ * c_enum_tag_typet.
  *
  * \param type Source type
- * \return Object of type \ref enum_tag_typet
+ * \return Object of type \ref c_enum_tag_typet
  *
  * \ingroup gr_std_types
 */
-extern inline const enum_tag_typet &to_enum_tag_type(const typet &type)
+extern inline const c_enum_tag_typet &to_c_enum_tag_type(const typet &type)
 {
-  assert(type.id()==ID_enum_tag);
-  return static_cast<const enum_tag_typet &>(type);
+  assert(type.id()==ID_c_enum_tag);
+  return static_cast<const c_enum_tag_typet &>(type);
 }
 
 /*! \copydoc to_enum_tag_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline enum_tag_typet &to_enum_tag_type(typet &type)
+extern inline c_enum_tag_typet &to_c_enum_tag_type(typet &type)
 {
-  assert(type.id()==ID_enum_tag);
-  return static_cast<enum_tag_typet &>(type);
+  assert(type.id()==ID_c_enum_tag);
+  return static_cast<c_enum_tag_typet &>(type);
 }
 
 /*! \brief Base type of functions

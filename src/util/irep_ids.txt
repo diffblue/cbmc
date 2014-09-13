@@ -552,7 +552,7 @@ C_offset #offset
 C_tag_only_declaration #tag_only_declaration
 struct_tag
 union_tag
-enum_tag
+c_enum_tag
 enum_constant
 generate_block
 generate_case
