@@ -35,7 +35,9 @@ exprt gen_zero(const typet &type)
      type_id==ID_real ||
      type_id==ID_integer ||
      type_id==ID_natural ||
-     type_id==ID_c_enum)
+     type_id==ID_c_enum ||
+     type_id==ID_c_enum_tag ||
+     type_id==ID_incomplete_c_enum)
   {
     return constant_exprt(ID_0, type);
   }
@@ -126,7 +128,9 @@ exprt gen_one(const typet &type)
 
     return constant_exprt(value, type);
   }
-  else if(type_id==ID_c_enum)
+  else if(type_id==ID_c_enum ||
+          type_id==ID_c_enum_tag ||
+          type_id==ID_incomplete_c_enum)
   {
     return constant_exprt(ID_1, type);
   }

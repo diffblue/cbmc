@@ -88,11 +88,16 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   // check qualifiers first
   if(c_qualifierst(type1)!=c_qualifierst(type2))
     return false;
+    
+  if(type1.id()==ID_c_enum_tag)
+    return gcc_types_compatible_p(follow_tag(to_c_enum_tag_type(type1)), type2);
+  else if(type2.id()==ID_c_enum_tag)
+    return gcc_types_compatible_p(type1, follow_tag(to_c_enum_tag_type(type2)));
 
   if(type1.id()==ID_c_enum)
   {
     if(type2.id()==ID_c_enum) // both are enums
-      return type1==type2; // compares the tag 
+      return type1==type2; // compares the tag
     else if(type2==type1.subtype())
       return true;
   }
@@ -1196,6 +1201,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
      expr_type.id()!=ID_pointer &&
      expr_type.id()!=ID_array &&
      expr_type.id()!=ID_c_enum &&
+     expr_type.id()!=ID_c_enum_tag &&
      expr_type.id()!=ID_incomplete_c_enum)
   {
     err_location(expr);
@@ -1207,6 +1213,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
   if(is_number(op_type) ||
      op_type.id()==ID_c_enum ||
+     op_type.id()==ID_c_enum_tag ||
      op_type.id()==ID_incomplete_c_enum ||
      op_type.id()==ID_bool ||
      op_type.id()==ID_pointer)
@@ -2058,6 +2065,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
        final_type0.get(ID_C_c_type)==ID_bool ||
        is_number(final_type0) ||
        final_type0.id()==ID_c_enum ||
+       final_type0.id()==ID_c_enum_tag ||
        final_type0.id()==ID_incomplete_c_enum)
     {
       expr.type()=type0;

@@ -132,8 +132,9 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp.type()=type;
-        tmp.operands().resize(integer2long(array_size),
-          gen_zero(full_type.subtype()));
+        exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
+                                    *this, get_message_handler());
+        tmp.operands().resize(integer2long(array_size), zero);
       }
     }
     
@@ -181,8 +182,9 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp2.type()=type;
-        tmp2.operands().resize(integer2long(array_size),
-          gen_zero(full_type.subtype()));
+        exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
+                                    *this, get_message_handler());
+        tmp2.operands().resize(integer2long(array_size), zero);
       }
     }
     

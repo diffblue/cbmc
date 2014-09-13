@@ -96,7 +96,8 @@ exprt zero_initializert::zero_initializer_rec(
     throw 0;
   }
   else if(type_id==ID_c_enum ||
-          type_id==ID_incomplete_c_enum)
+          type_id==ID_incomplete_c_enum ||
+          type_id==ID_c_enum_tag)
   {
     constant_exprt value(type);
     value.set_value(ID_0);

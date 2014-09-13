@@ -254,9 +254,17 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
     // do the size -- the subtype is already done
     find_symbols(kind, to_array_type(src).size(), dest);
   }
-  else if(src.id()==ID_c_enum)
+  else if(src.id()==ID_c_enum_tag)
   {
-    dest.insert(src.get(ID_identifier));
+    dest.insert(to_c_enum_tag_type(src).get_identifier());
+  }
+  else if(src.id()==ID_struct_tag)
+  {
+    dest.insert(to_struct_tag_type(src).get_identifier());
+  }
+  else if(src.id()==ID_union_tag)
+  {
+    dest.insert(to_union_tag_type(src).get_identifier());
   }
 }
 

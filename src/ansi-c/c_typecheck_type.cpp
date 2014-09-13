@@ -927,11 +927,11 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   
   if(as_expr.operands().empty())
   {
-    // tag only
+    // It's just a tag.
     if(type.find(ID_tag).is_nil())
     {
       err_location(source_location);
-      throw "anon enum tag without members";
+      throw "anonymous enum tag without members";
     }
     
     irept &tag=type.add(ID_tag);
@@ -981,6 +981,12 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       symbolt *new_symbol;
       move_symbol(enum_tag_symbol, new_symbol);
     }
+    
+    // We produce a c_enum_tag as the resulting type.
+    type.id(ID_c_enum_tag);
+    type.remove(ID_tag);
+    type.remove(ID_subtype);
+    type.set(ID_identifier, identifier);
   }
   else
   {
@@ -1066,7 +1072,11 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     type.subtype().set(ID_width, bits);
     
     // tag?
-    if(type.find(ID_tag).is_not_nil())
+    if(type.find(ID_tag).is_nil())
+    {
+      // none
+    }
+    else
     {
       irept &tag=type.add(ID_tag);
       irep_idt base_name=tag.get(ID_C_base_name);
@@ -1083,7 +1093,6 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       enum_tag_symbol.base_name=base_name;
       enum_tag_symbol.name=identifier;
     
-
       // is it in the symbol table already?
       symbol_tablet::symbolst::iterator s_it=
         symbol_table.symbols.find(identifier);
@@ -1115,6 +1124,12 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
         symbolt *new_symbol;
         move_symbol(enum_tag_symbol, new_symbol);
       }
+
+      // We produce a c_enum_tag as the resulting type.
+      type.id(ID_c_enum_tag);
+      type.remove(ID_tag);
+      type.remove(ID_subtype);
+      type.set(ID_identifier, identifier);
     }
   }
 }
@@ -1198,6 +1213,26 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
     }
 
     typet tmp=subtype;
+    type.swap(tmp);
+    type.subtype().set(ID_width, integer2string(i));
+    type.add_source_location()=source_location;
+  }
+  else if(subtype.id()==ID_c_enum_tag)
+  {
+    // These have a sub-subtype, which we need to adjust.
+    const typet &c_enum_type=
+      follow_tag(to_c_enum_tag_type(subtype));
+    
+    unsigned width=
+      c_enum_type.subtype().get_int(ID_width);
+
+    if(i>width)
+    {
+      err_location(type);
+      throw "bit field width too large";
+    }
+
+    typet tmp=c_enum_type;
     type.swap(tmp);
     type.subtype().set(ID_width, integer2string(i));
     type.add_source_location()=source_location;

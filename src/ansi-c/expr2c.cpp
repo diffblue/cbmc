@@ -451,6 +451,15 @@ std::string expr2ct::convert_rec(
       return result;
     }
   }
+  else if(src.id()==ID_c_enum_tag)
+  {
+    const c_enum_tag_typet &c_enum_tag_type=to_c_enum_tag_type(src);
+    const symbolt &symbol=ns.lookup(c_enum_tag_type);
+    std::string result=q+"enum";
+    result+=" "+id2string(symbol.base_name);
+    result+=d;
+    return result;
+  }
   else if(src.id()==ID_pointer)
   {
     c_qualifierst sub_qualifiers;
