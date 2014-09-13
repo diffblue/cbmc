@@ -254,6 +254,10 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
     // do the size -- the subtype is already done
     find_symbols(kind, to_array_type(src).size(), dest);
   }
+  else if(src.id()==ID_c_enum)
+  {
+    dest.insert(src.get(ID_identifier));
+  }
 }
 
 /*******************************************************************\

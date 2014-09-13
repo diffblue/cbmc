@@ -429,14 +429,27 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_c_enum ||
           src.id()==ID_incomplete_c_enum)
   {
-    /* until we have more information about enums in the context we go for a
-     * hack
-    std::string result=q+"enum";
-    if(!src.get(ID_tag).empty()) result+=" "+src.get_string(ID_tag);
-    result+=d;
-    return result;
-    */
-    return q+"int"+d;
+    // do we have a tag?
+    const irept &tag=src.find(ID_tag);
+    
+    if(tag.is_nil())
+    {
+      /* until we have more information about enums in the context we go for a
+       * hack
+      std::string result=q+"enum";
+      if(!src.get(ID_tag).empty()) result+=" "+src.get_string(ID_tag);
+      result+=d;
+      return result;
+      */
+      return q+"int"+d;
+    }
+    else
+    {
+      std::string result=q+"enum";
+      result+=" "+tag.get_string(ID_C_base_name);
+      result+=d;
+      return result;
+    }
   }
   else if(src.id()==ID_pointer)
   {
