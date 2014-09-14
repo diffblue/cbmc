@@ -203,23 +203,25 @@ void convert(
       {
         std::string tag=
           (it->type==goto_trace_stept::FUNCTION_CALL)?"function_call":"function_return";
-        xmlt &xml_function=dest.new_element(tag);
+        xmlt &xml_call_return=dest.new_element(tag);
         
         #if 0
-        xml_function.new_element("step_nr").data=i2string(it->step_nr);
-        xml_function.new_element("thread").data=i2string(it->thread_nr);
+        xml_call_return.new_element("step_nr").data=i2string(it->step_nr);
+        xml_call_return.new_element("thread").data=i2string(it->thread_nr);
         #endif
 
         // new, to replace above
-        xml_function.set_attribute("thread", i2string(it->thread_nr));
-        xml_function.set_attribute("step_nr", i2string(it->step_nr));
-        xml_function.set_attribute("identifier", id2string(it->identifier));
+        xml_call_return.set_attribute("thread", i2string(it->thread_nr));
+        xml_call_return.set_attribute("step_nr", i2string(it->step_nr));
 
         const symbolt &symbol=ns.lookup(it->identifier);
+        xmlt &xml_function=xml_call_return.new_element("function");
         xml_function.set_attribute("display_name", id2string(symbol.display_name()));
+        xml_function.set_attribute("identifier", id2string(it->identifier));
+        xml_function.new_element()=xml(symbol.location);
 
         if(xml_location.name!="")
-          xml_function.new_element().swap(xml_location);
+          xml_call_return.new_element().swap(xml_location);
       }
       break;
       
