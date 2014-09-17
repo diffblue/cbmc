@@ -95,17 +95,20 @@ bool boolbvt::literal(
     {
       const member_exprt &member_expr=to_member_expr(expr);
 
-      const irept &components=expr.type().find(ID_components);
+      const struct_typet::componentst &components=
+        to_struct_type(expr.type()).components();
       const irep_idt &component_name=member_expr.get_component_name();
 
       unsigned offset=0;
 
-      forall_irep(it, components.get_sub())
+      for(struct_typet::componentst::const_iterator
+          it=components.begin();
+          it!=components.end();
+          it++)
       {
-        const typet &subtype=
-          static_cast<const typet &>(it->find(ID_type));
+        const typet &subtype=it->type();
 
-        if(it->get(ID_name)==component_name)
+        if(it->get_name()==component_name)
           return literal(expr.op0(), bit+offset, dest);
 
         unsigned element_width=boolbv_width(subtype);
