@@ -589,14 +589,17 @@ unsigned interpretert::get_size(const typet &type) const
 {
   if(type.id()==ID_struct)
   {
-    const irept::subt &components=
-      type.find(ID_components).get_sub();
+    const struct_typet::componentst &components=
+      to_struct_type(type).components();
 
     unsigned sum=0;
 
-    forall_irep(it, components)
+    for(struct_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
     {
-      const typet &sub_type=static_cast<const typet &>(it->find(ID_type));
+      const typet &sub_type=it->type();
 
       if(sub_type.id()!=ID_code)
         sum+=get_size(sub_type);
@@ -606,14 +609,17 @@ unsigned interpretert::get_size(const typet &type) const
   }
   else if(type.id()==ID_union)
   {
-    const irept::subt &components=
-      type.find(ID_components).get_sub();
+    const union_typet::componentst &components=
+      to_union_type(type).components();
 
     unsigned max_size=0;
 
-    forall_irep(it, components)
+    for(union_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
     {
-      const typet &sub_type=static_cast<const typet &>(it->find(ID_type));
+      const typet &sub_type=it->type();
 
       if(sub_type.id()!=ID_code)
         max_size=std::max(max_size, get_size(sub_type));

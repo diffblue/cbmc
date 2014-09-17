@@ -55,12 +55,15 @@ void base_type_rec(
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    irept::subt &components=type.add(ID_components).get_sub();
+    struct_union_typet::componentst &components=
+      to_struct_union_type(type).components();
 
-    Forall_irep(it, components)
+    for(struct_union_typet::componentst::iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
     {
-      typet &subtype=static_cast<typet &>(it->add(ID_type));
-      base_type_rec(subtype, ns, symb);
+      base_type_rec(it->type(), ns, symb);
     }
   }
   else if(type.id()==ID_pointer)
