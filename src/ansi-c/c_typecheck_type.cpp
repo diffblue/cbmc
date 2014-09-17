@@ -607,7 +607,7 @@ Function: c_typecheck_baset::typecheck_compound_type
 
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
-  // These get replaced by symbol types.
+  // These get replaced by symbol types later.
   irep_idt identifier;
   
   bool have_body=type.find(ID_components).is_not_nil();
