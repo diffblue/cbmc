@@ -1,0 +1,7 @@
+KNOWNBUG
+rfi008.c
+SC SAFE
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

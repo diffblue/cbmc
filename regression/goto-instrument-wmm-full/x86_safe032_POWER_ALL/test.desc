@@ -1,0 +1,7 @@
+CORE
+safe032.c
+POWER ALL
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
