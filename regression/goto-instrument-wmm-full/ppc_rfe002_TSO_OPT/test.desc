@@ -1,0 +1,7 @@
+THOROUGH
+rfe002.c
+TSO OPT
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring

@@ -1,0 +1,7 @@
+THOROUGH
+safe005.c
+TSO ALL
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
