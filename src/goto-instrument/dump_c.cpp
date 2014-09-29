@@ -169,7 +169,8 @@ void dump_ct::operator()(std::ostream &os)
         (symbol.type.id()==ID_struct ||
          symbol.type.id()==ID_incomplete_struct ||
          symbol.type.id()==ID_union ||
-         symbol.type.id()==ID_incomplete_union))
+         symbol.type.id()==ID_incomplete_union ||
+         symbol.type.id()==ID_c_enum))
     {
       if(symbol.location.get_function().empty())
       {
@@ -227,7 +228,8 @@ void dump_ct::operator()(std::ostream &os)
         (symbol.type.id()==ID_struct ||
          symbol.type.id()==ID_incomplete_struct ||
          symbol.type.id()==ID_union ||
-         symbol.type.id()==ID_incomplete_union))
+         symbol.type.id()==ID_incomplete_union ||
+         symbol.type.id()==ID_c_enum))
       convert_compound_declaration(
           symbol,
           compound_body_stream);
@@ -295,12 +297,10 @@ void dump_ct::convert_compound_declaration(
     return;
 
   // do compound type body
-  if(symbol.type.id()!=ID_incomplete_struct &&
-      symbol.type.id()!=ID_incomplete_union)
-    convert_compound(
-        to_struct_union_type(symbol.type),
-        true,
-        os_body);
+  if(symbol.type.id()==ID_struct ||
+     symbol.type.id()==ID_union ||
+     symbol.type.id()==ID_c_enum)
+    convert_compound(symbol.type, true, os_body);
 }
 
 /*******************************************************************\
@@ -350,6 +350,8 @@ void dump_ct::convert_compound(
   }
   else if(type.id()==ID_struct || type.id()==ID_union)
     convert_compound(to_struct_union_type(type), recursive, os);
+  else if(type.id()==ID_c_enum)
+    convert_compound_enum(type, os);
 }
 
 /*******************************************************************\
@@ -520,6 +522,59 @@ void dump_ct::convert_compound(
   os << ";";
   os << std::endl;
   os << std::endl;
+}
+
+/*******************************************************************\
+
+Function: dump_ct::convert_compound_enum
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void dump_ct::convert_compound_enum(
+  const typet &type,
+  std::ostream &os)
+{
+  assert(type.id()==ID_c_enum);
+
+  const irept &tag=type.find(ID_tag);
+  const irep_idt &name=tag.get(ID_C_base_name);
+
+  if(tag.is_not_nil() &&
+     !converted.insert(name).second)
+    return;
+
+  os << type_to_string(type) << '\n';
+  os << "{\n";
+
+  const irept::subt &elements=type.get_sub();
+  forall_irep(it, elements)
+  {
+    std::string name=it->get_string(ID_identifier);
+    std::string::size_type pos=name.rfind("::");
+    if(pos!=std::string::npos)
+      name.erase(0, pos+2);
+
+    os << indent(1) << name << '=' << it->get(ID_value);
+
+    irept::subt::const_iterator next=it;
+    if(++next!=elements.end())
+      os << ',';
+
+    os << '\n';
+  }
+
+
+  os << '}';
+
+  if(type.get_bool(ID_C_packed))
+    os << " __attribute__ ((__packed__))";
+  os << ";\n\n";
 }
 
 /*******************************************************************\

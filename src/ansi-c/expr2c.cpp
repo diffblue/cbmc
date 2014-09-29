@@ -2024,6 +2024,11 @@ std::string expr2ct::convert_constant(
   const exprt &src,
   unsigned &precedence)
 {
+  const irep_idt &cformat=src.get(ID_C_cformat);
+
+  if(!cformat.empty())
+    return id2string(cformat);
+
   const typet &type=ns.follow(src.type());
   const irep_idt value=src.get(ID_value);
   std::string dest;

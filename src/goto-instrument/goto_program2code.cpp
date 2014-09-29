@@ -1645,6 +1645,18 @@ void goto_program2codet::add_local_types(const typet &type)
       type_names.push_back(identifier);
     }
   }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    const irep_idt &identifier=to_c_enum_tag_type(type).get_identifier();
+    const symbolt &symbol=ns.lookup(identifier);
+
+    if(symbol.location.get_function().empty() ||
+       !type_names_set.insert(identifier).second)
+      return;
+
+    assert(!identifier.empty());
+    type_names.push_back(identifier);
+  }
   else if(type.id()==ID_pointer ||
           type.id()==ID_array)
   {
