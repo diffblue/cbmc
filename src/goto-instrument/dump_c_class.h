@@ -89,6 +89,9 @@ protected:
       const struct_union_typet &type,
       bool recursive,
       std::ostream &os);
+  void convert_compound_enum(
+    const typet &type,
+    std::ostream &os);
 
   typedef hash_map_cont<irep_idt, code_declt, irep_id_hash>
           local_static_declst;

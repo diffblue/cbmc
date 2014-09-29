@@ -831,7 +831,14 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
 
   if(symbol.is_macro)
   {
+    // preserve enum key
+    irep_idt base_name=expr.get(ID_C_base_name);
+
     expr=symbol.value;
+
+    if(expr.id()==ID_constant &&
+       !base_name.empty())
+      expr.set(ID_C_cformat, base_name);
 
     // preserve location
     expr.add_source_location()=source_location;
