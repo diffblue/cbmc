@@ -245,13 +245,13 @@ int symex_parseoptionst::doit()
     path_search.set_message_handler(get_message_handler());
 
     if(cmdline.isset("depth"))
-      path_search.depth_limit=unsafe_string2unsigned(cmdline.getval("depth"));
+      path_search.set_depth_limit(unsafe_string2unsigned(cmdline.getval("depth")));
 
     if(cmdline.isset("context-bound"))
-      path_search.context_bound=unsafe_string2unsigned(cmdline.getval("context-bound"));
+      path_search.set_context_bound(unsafe_string2unsigned(cmdline.getval("context-bound")));
 
     if(cmdline.isset("unwind"))
-      path_search.unwind_limit=unsafe_string2unsigned(cmdline.getval("unwind"));
+      path_search.set_unwind_limit(unsafe_string2unsigned(cmdline.getval("unwind")));
 
     if(cmdline.isset("show-vcc"))
     {
