@@ -241,14 +241,14 @@ Function: path_searcht::drop_state
 
 bool path_searcht::drop_state(const statet &state) const
 {
-  // depth
-  if(depth_limit!=-1 && state.get_depth()>depth_limit) return true;
+  // depth limit
+  if(depth_limit_set && state.get_depth()>depth_limit) return true;
   
   // context bound
-  if(context_bound!=-1 && state.get_no_thread_interleavings()) return true;
+  if(context_bound_set && state.get_no_thread_interleavings()) return true;
   
   // unwinding limit -- loops
-  if(unwind_limit!=-1 && state.get_instruction()->is_backwards_goto())
+  if(unwind_limit_set && state.get_instruction()->is_backwards_goto())
   {
     for(path_symex_statet::unwinding_mapt::const_iterator
         it=state.unwinding_map.begin();
@@ -259,7 +259,7 @@ bool path_searcht::drop_state(const statet &state) const
   }
   
   // unwinding limit -- recursion
-  if(unwind_limit!=-1 && state.get_instruction()->is_function_call())
+  if(unwind_limit_set && state.get_instruction()->is_function_call())
   {
     for(path_symex_statet::recursion_mapt::const_iterator
         it=state.recursion_map.begin();
