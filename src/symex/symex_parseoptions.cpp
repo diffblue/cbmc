@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 #include <util/string2int.h>
 #include <util/config.h>
