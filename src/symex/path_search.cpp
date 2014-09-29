@@ -43,7 +43,9 @@ path_searcht::resultt path_searcht::operator()(
   
   // set up the statistics
   number_of_dropped_states=0;
+  number_of_paths=0;
   number_of_VCCs=0;
+  number_of_steps=0;
   number_of_VCCs_after_simplification=0;
   number_of_failed_properties=0;
 
@@ -54,6 +56,8 @@ path_searcht::resultt path_searcht::operator()(
   
   while(!queue.empty())
   {
+    number_of_steps++;
+  
     // Pick a state from the queue,
     // according to some heuristic.
     queuet::iterator state=pick_state();
@@ -61,20 +65,25 @@ path_searcht::resultt path_searcht::operator()(
     if(drop_state(*state))
     {
       number_of_dropped_states++;
+      number_of_paths++;
       queue.erase(state);
       continue;
     }
     
     if(!state->is_executable())
     {
+      number_of_paths++;
       queue.erase(state);
       continue;
     }
     
-    status() << "Queue " << queue.size()
-             << " thread " << state->get_current_thread()
-             << "/" << state->threads.size()
-             << " PC " << state->pc() << messaget::eom;
+    if(number_of_steps%1000==0)
+    {
+      status() << "Queue " << queue.size()
+               << " thread " << state->get_current_thread()
+               << "/" << state->threads.size()
+               << " PC " << state->pc() << messaget::eom;
+    }
 
     // an error, possibly?
     if(state->get_instruction()->is_assert())
@@ -117,6 +126,9 @@ void path_searcht::report_statistics()
   // report a bit
   status() << "Number of dropped states: "
            << number_of_dropped_states << messaget::eom;
+
+  status() << "Number of paths: "
+           << number_of_paths << messaget::eom;
 
   status() << "Generated " << number_of_VCCs << " VCC(s), "
            << number_of_VCCs_after_simplification
