@@ -455,10 +455,6 @@ void c_typecheck_baset::do_designated_initializer(
       const struct_typet::componentst &components=
         to_struct_type(full_type).components();
 
-      assert(index<components.size());
-      assert(components[index].type().id()!=ID_code &&
-             !components[index].get_is_padding());
-
       if(index>=dest->operands().size())
       {
         err_location(value);
@@ -466,6 +462,10 @@ void c_typecheck_baset::do_designated_initializer(
             << " out of bounds (" << dest->operands().size() << ")";
         throw 0;
       }
+
+      assert(index<components.size());
+      assert(components[index].type().id()!=ID_code &&
+             !components[index].get_is_padding());
 
       dest=&(dest->operands()[index]);
     }
