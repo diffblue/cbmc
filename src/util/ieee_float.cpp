@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // <cstdint> is yet to come
 #include <stdint.h>
 
+#include <ostream>
 #include <cassert>
 #include <cmath>
 #include <limits>
