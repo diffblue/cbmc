@@ -6,15 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cctype>
-#include <stack>
 #include <istream>
+#include <ostream>
 
-#include "parse_smt2.h"
+#include "smt2_parser.h"
 
 /*******************************************************************\
 
-Function: get_simple_symbol()
+Function: smt2_parsert::get_simple_symbol()
 
   Inputs:
 
@@ -24,14 +23,14 @@ Function: get_simple_symbol()
 
 \*******************************************************************/
 
-std::string get_simple_symbol(char first, std::istream &in)
+void smt2_parsert::get_simple_symbol(char first)
 {
   // any non-empty sequence of letters, digits and the characters
   // ~ ! @ $ % ^ & * _ - + = < > . ? /
   // that does not start with a digit and is not a reserved word.
 
-  std::string result;
-  result+=first;
+  buffer.clear();
+  buffer+=first;
 
   char ch;
   while(in.get(ch))
@@ -41,21 +40,22 @@ std::string get_simple_symbol(char first, std::istream &in)
        ch=='^' || ch=='&' || ch=='*' || ch=='_' || ch=='-' ||
        ch=='+' || ch=='=' || ch=='<' || ch=='>' || ch=='.' ||
        ch=='?' || ch=='/')
-      result+=ch;
+    {
+      buffer+=ch;
+    }
     else
     {
       in.unget(); // put back
-      return result;
+      return;
     }
   }
   
-  // eof is just ok here
-  return result;
+  // eof -- this is ok here
 }
 
 /*******************************************************************\
 
-Function: get_quoted_symbol
+Function: smt2_parsert::get_quoted_symbol
 
   Inputs:
 
@@ -65,29 +65,28 @@ Function: get_quoted_symbol
 
 \*******************************************************************/
 
-std::string get_quoted_symbol(std::istream &in)
+void smt2_parsert::get_quoted_symbol()
 {
   // any sequence of printable ASCII characters (including space,
   // tab, and line-breaking characters) except for the backslash
   // character \, that starts and ends with | and does not otherwise
   // contain |
 
-  std::string result;
+  buffer.clear();
   
   char ch;
   while(in.get(ch))
   {
-    if(ch=='|') return result;
-    result+=ch;
+    if(ch=='|') return; // done
+    buffer+=ch;
   }
 
-  // Hmpf. Eof before end of quoted string.  
-  return result;
+  // Hmpf. Eof before end of quoted string. This is an error.
 }
 
 /*******************************************************************\
 
-Function: get_string_literal
+Function: smt2_parsert::get_string_literal
 
   Inputs:
 
@@ -97,29 +96,28 @@ Function: get_string_literal
 
 \*******************************************************************/
 
-std::string get_string_literal(std::istream &in)
+void smt2_parsert::get_string_literal()
 {
   // any sequence of printable ASCII characters delimited by
   // double quotes (") and possibly containing the C-style escape
   // sequences \" and double-backslash
-  
-  std::string result;
+
+  buffer.clear();
   
   char ch;
   while(in.get(ch))
   {
-    if(ch=='"') return result;
+    if(ch=='"') return; // done 
     if(ch=='\\') in.get(ch); // quote
-    result+=ch;
+    buffer+=ch;
   }
 
-  // Hmpf. Eof before end of string literal.
-  return result;
+  // Hmpf. Eof before end of string literal. This is an error.
 }
 
 /*******************************************************************\
 
-Function: parse_smt2
+Function: smt2_parsert::operator()
 
   Inputs:
 
@@ -129,10 +127,10 @@ Function: parse_smt2
 
 \*******************************************************************/
 
-irept parse_smt2(std::istream &in)
+void smt2_parsert::operator()()
 {
-  std::stack<irept> stack;
   char ch;
+  unsigned open_parentheses=0;
 
   while(in.get(ch))
   {
@@ -152,57 +150,106 @@ irept parse_smt2(std::istream &in)
       break;
     
     case '(':
-      // produce sub-irep
-      stack.push(irept());
+      // produce sub-expression
+      open_parentheses++;
+      open_expression();
       break;
       
     case ')':
-      {
-        // done with sub-irep
-        if(stack.empty()) return irept(); // unexpected )
-        irept tmp=stack.top();
-        stack.pop();
+      // done with sub-expression
+      if(open_parentheses==0) // unexpected ')'. This is an error;
+        return;
+      
+      open_parentheses--;
 
-        if(stack.empty())
-          return tmp;
-        else
-          stack.top().get_sub().push_back(tmp);
-      }
+      close_expression();
+      
+      if(open_parentheses==0)
+        return; // done        
+
       break;
       
     case '|': // quoted symbol
-      {
-        irep_idt symbol=get_quoted_symbol(in);
-
-        if(stack.empty())
-          return irept(symbol);
-        else
-          stack.top().get_sub().push_back(irept(symbol));
-      }
+      get_quoted_symbol();
+      symbol();
+      if(open_parentheses==0) return; // done
       break;
       
     case '"': // string literal
-      {
-        irep_idt literal=get_string_literal(in);
-
-        if(stack.empty())
-          return irept(literal);
-        else
-          stack.top().get_sub().push_back(irept(literal));
-      }
+      get_string_literal();
+      symbol();
+      if(open_parentheses==0) return; // done
+      break;
 
     default: // likely a simple symbol
-      {
-        irep_idt symbol=get_simple_symbol(ch, in);
-
-        if(stack.empty())
-          return irept(symbol);
-        else
-          stack.top().get_sub().push_back(irept(symbol));
-      }
+      get_simple_symbol(ch);
+      symbol();
+      if(open_parentheses==0) return; // done
     }
   }
+
+  if(open_parentheses==0)
+  {  
+    // Hmpf, eof before we got anything. Blank file!
+  }
+  else
+  {
+    // Eof before end of expression. Error!
+  }
+}
+
+/*******************************************************************\
+
+Function: smt2_parser_test
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+class smt2_parser_testt:public smt2_parsert
+{
+public:
+  smt2_parser_testt(std::istream &_in, std::ostream &_out):
+    smt2_parsert(_in), out(_out), first(true)
+  {
+  }
   
-  // Hmpf, eof before we got anything
-  return irept();
+protected:
+  std::ostream &out;
+  bool first;
+
+  // overload from smt2_parsert
+
+  virtual void symbol()
+  {
+    if(first)
+      first=false;
+    else
+      out << ' ';
+
+    out << buffer;
+  }
+  
+  virtual void open_expression() // '('
+  {
+    if(!first)
+      out << ' ';
+      
+    out << '(';
+    first=true;
+  }
+  
+  virtual void close_expression() // ')'
+  {
+    out << ')';
+  }
+};
+
+void smt2_parser_test(std::istream &in, std::ostream &out)
+{
+  smt2_parser_testt(in, out)();
 }

@@ -6,11 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVER_PARSE_SMT2_H
-#define CPROVER_SOLVER_PARSE_SMT2_H
+#ifndef CPROVER_SOLVER_SMT2IREP_H
+#define CPROVER_SOLVER_SMT2IREP_H
+
+#include <iosfwd>
 
 #include <util/irep.h>
 
-irept parse_smt2(std::istream &);
+irept smt2irep(std::istream &);
 
 #endif
