@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cctype>
 #include <stack>
+#include <istream>
 
 #include "parse_smt2.h"
 
@@ -22,8 +23,6 @@ Function: get_simple_symbol()
  Purpose:
 
 \*******************************************************************/
-
-#include <iostream>
 
 std::string get_simple_symbol(char first, std::istream &in)
 {
