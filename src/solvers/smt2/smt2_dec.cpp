@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 
 #include "smt2_dec.h"
-#include "parse_smt2.h"
+#include "smt2irep.h"
 
 /*******************************************************************\
 
@@ -235,7 +235,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 
   while(in)
   {
-    irept parsed=parse_smt2(in);
+    irept parsed=smt2irep(in);
     
     if(parsed.id()=="sat")
       res=D_SATISFIABLE;
