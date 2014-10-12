@@ -13,7 +13,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../goto-symex/adjust_float_expressions$(OBJEXT) \
        ../goto-symex/rewrite_union$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
-       ../path-symex/path-symex$(LIBEXT)
+       ../goto-instrument/dump_c$(OBJEXT) \
+       ../goto-instrument/goto_program2code$(OBJEXT)
 
 INCLUDES= -I ..
 

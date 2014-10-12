@@ -28,15 +28,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
 
+#include <goto-instrument/dump_c.h>
+
 #include <analyses/goto_check.h>
 
 #include <langapi/mode.h>
 
 #include <cbmc/version.h>
 
-#include <path-symex/locs.h>
-
 #include "clobber_parseoptions.h"
+#include "clobber_instrumenter.h"
 
 /*******************************************************************\
 
@@ -225,58 +226,22 @@ int clobber_parseoptionst::doit()
   if(set_properties(goto_functions))
     return 7;
     
-  if(cmdline.isset("show-locs"))
-  {
-    const namespacet ns(symbol_table);
-    locst locs(ns);
-    locs.build(goto_functions);
-    locs.output(std::cout);    
-    return 0;
-  }
-
-  // do actual Symex
+  // do instrumentation
 
   try
   {
-    #if 0
     const namespacet ns(symbol_table);
-    path_searcht path_search(ns);
     
-    path_search.set_message_handler(get_message_handler());
-
-    if(cmdline.isset("depth"))
-      path_search.set_depth_limit(unsafe_string2unsigned(cmdline.getval("depth")));
-
-    if(cmdline.isset("context-bound"))
-      path_search.set_context_bound(unsafe_string2unsigned(cmdline.getval("context-bound")));
-
-    if(cmdline.isset("unwind"))
-      path_search.set_unwind_limit(unsafe_string2unsigned(cmdline.getval("unwind")));
-
-    if(cmdline.isset("show-vcc"))
-    {
-      path_search.show_vcc=true;
-      path_search(goto_functions);
-      return 0;
-    }
-
-    // do actual symex
-    switch(path_search(goto_functions))
-    {
-    case safety_checkert::SAFE:
-      report_properties(path_search.property_map);
-      report_success();
-      return 0;
+    std::ofstream out("simulator.c");
     
-    case safety_checkert::UNSAFE:
-      report_properties(path_search.property_map);
-      report_failure();
-      return 10;
+    if(!out)
+      throw std::string("failed to create file simulator.c");
     
-    default:
-      return 8;
-    }
-    #endif
+    dump_c(goto_functions, true, ns, out);
+    
+    status() << "instrumentation complete; compile and execute simulator.c" << eom;
+    
+    return 0;
   }
   
   catch(const std::string error_msg)
@@ -461,8 +426,10 @@ bool clobber_parseoptionst::get_goto_program(
     }
 
     // finally add the library
+    #if 0
     status() << "Adding CPROVER library" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
+    #endif
 
     if(process_goto_program(options, goto_functions))
       return true;
