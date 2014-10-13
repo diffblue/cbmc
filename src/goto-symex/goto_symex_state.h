@@ -76,7 +76,7 @@ public:
       expr.set_identifier(operator()(expr.get_identifier()));
     }
     
-    irep_idt rename(const irep_idt &identifier, unsigned count)
+    irep_idt rename_identifier(const irep_idt &identifier, unsigned count)
     {
       current_names[identifier]=count;
       irep_idt new_name=name(identifier, count);
@@ -86,7 +86,7 @@ public:
     
     irep_idt increase_counter(const irep_idt &identifier)
     {
-      return rename(identifier, current_names[identifier]+1);
+      return rename_identifier(identifier, current_names[identifier]+1);
     }
     
     inline bool is_renamed(const irep_idt &identifier) const
@@ -216,7 +216,7 @@ public:
   typedef enum { L0=0, L1=1, L2=2 } levelt;
 
   // performs renaming _up to_ the given level
-  irep_idt rename(const irep_idt &identifier, const namespacet &ns, levelt level=L2);
+  irep_idt rename_identifier(const irep_idt &identifier, const namespacet &ns, levelt level=L2);
   void rename(exprt &expr, const namespacet &ns, levelt level=L2);
   void rename(typet &type, const namespacet &ns, levelt level=L2);
   

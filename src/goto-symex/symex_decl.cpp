@@ -50,14 +50,14 @@ void goto_symext::symex_decl(statet &state)
     to_symbol_expr(code.op0()).get_identifier();
     
   const irep_idt l1_identifier=
-    state.rename(identifier, ns, goto_symex_statet::L1);
+    state.rename_identifier(identifier, ns, goto_symex_statet::L1);
     
   // prevent propagation
   state.propagation.remove(l1_identifier);
 
   // L2 renaming
   unsigned new_count=state.level2.current_count(l1_identifier)+1;
-  state.level2.rename(l1_identifier, new_count);
+  state.level2.rename_identifier(l1_identifier, new_count);
     
   // in case of pointers, put something into the value set
   if(ns.follow(code.op0().type()).id()==ID_pointer)

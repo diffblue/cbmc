@@ -446,7 +446,7 @@ void goto_symext::locality(
       it++)
   {
     // get L0 name
-    irep_idt l0_name=state.rename(*it, ns, goto_symex_statet::L0);
+    irep_idt l0_name=state.rename_identifier(*it, ns, goto_symex_statet::L0);
 
     // save old L1 name for popping the frame
     statet::level1t::current_namest::const_iterator c_it=
@@ -464,7 +464,7 @@ void goto_symext::locality(
     
     do
     {
-      state.level1.rename(l0_name, frame_nr+offset);
+      state.level1.rename_identifier(l0_name, frame_nr+offset);
       l1_name=state.level1(l0_name);
       offset++;
     }
