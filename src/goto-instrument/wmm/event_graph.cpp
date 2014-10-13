@@ -15,6 +15,8 @@ Date: 2012
 
 //#define DEBUG
 
+#include <iostream>
+
 #ifdef DEBUG
 #include <iostream>
 #define DEBUG_MESSAGE(a) std::cout<<a<<std::endl
