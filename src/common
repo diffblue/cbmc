@@ -45,9 +45,9 @@ ifeq ($(BUILD_ENV_),OSX_Universal)
   LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
   LINKLIB = /usr/bin/libtool -static -o $@ $^
 else
-  LINKLIB = ld -r -o $@ $^
+  LINKLIB = ar rcT $@ $^
 endif
-  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
 ifeq ($(origin CC),default)
   CC     = gcc
