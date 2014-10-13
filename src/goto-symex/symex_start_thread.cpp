@@ -65,10 +65,10 @@ void goto_symext::symex_start_thread(statet &state)
     irep_idt original_name=state.get_original_name(*it);
   
     // get L0 name for current thread
-    irep_idt l0_name=state.level0.rename(original_name, t);
+    irep_idt l0_name=state.level0.rename_identifier(original_name, t);
     
     // setup L1 name
-    state.level1.rename(l0_name, 0);
+    state.level1.rename_identifier(l0_name, 0);
     irep_idt l1_name=state.level1.current_name(l0_name);
     state.l1_history.insert(l1_name);
 
@@ -100,7 +100,7 @@ void goto_symext::symex_start_thread(statet &state)
     irep_idt original_name=symbol.name;
 
     // get L0 name for current thread
-    irep_idt l0_name=state.level0.rename(original_name, t);
+    irep_idt l0_name=state.level0.rename_identifier(original_name, t);
 
     symbol_exprt lhs=symbol.symbol_expr();
     lhs.set_identifier(l0_name);
