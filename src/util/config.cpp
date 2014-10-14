@@ -1185,7 +1185,7 @@ irep_idt configt::this_architecture()
     this_arch="mips64";
     #endif
   #elif __powerpc__
-    #ifdef __ppc64__
+    #if defined(__ppc64__) || defined(__PPC64__) || defined(__powerpc64__) || defined(__POWERPC64__)
       #ifdef __LITTLE_ENDIAN__
       this_arch="ppc64le";
       #else
