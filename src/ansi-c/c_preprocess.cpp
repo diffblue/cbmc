@@ -201,7 +201,7 @@ bool c_preprocess(
   FILE *tmp=fopen(file.c_str(), "wt");
 
   char ch;
-  while(instream.read(&ch, 1)!=0)
+  while(instream.read(&ch, 1))
     fputc(ch, tmp);
 
   fclose(tmp);
@@ -398,7 +398,7 @@ bool c_preprocess_visual_studio(
   {
     std::ifstream stderr_stream(stderr_file.c_str());
     char ch;
-    while((stderr_stream.read(&ch, 1))!=0)
+    while(stderr_stream.read(&ch, 1))
       message_stream.str << ch;
   }
 
@@ -547,7 +547,7 @@ bool c_preprocess_codewarrior(
   {
     std::ifstream stderr_stream(stderr_file.c_str());
     char ch;
-    while((stderr_stream.read(&ch, 1))!=0)
+    while(stderr_stream.read(&ch, 1))
       message_stream.str << ch;
   }
 
@@ -994,7 +994,7 @@ bool c_preprocess_arm(
   {
     std::ifstream stderr_stream(stderr_file.c_str());
     char ch;
-    while((stderr_stream.read(&ch, 1))!=0)
+    while(stderr_stream.read(&ch, 1))
       message_stream.str << ch;
   }
 
