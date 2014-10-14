@@ -152,9 +152,9 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("all-claims") || // will go away
      cmdline.isset("all-properties")) // use this one
-    options.set_option("all-claims", true);
+    options.set_option("all-properties", true);
   else
-    options.set_option("all-claims", false);
+    options.set_option("all-properties", false);
 
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.getval("unwind"));
