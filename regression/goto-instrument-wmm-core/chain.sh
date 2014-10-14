@@ -54,6 +54,6 @@ else
   flag=
 fi
 
-timeout 180.0s $goto_cc -o $name.gb $name.c 2>/dev/null
-timeout 180.0s $goto_instrument $flag $name.gb ${name}_$arch.gb $strat 2>/dev/null
+timeout 180.0s $goto_cc -o $name.gb $name.c
+timeout 180.0s $goto_instrument $flag $name.gb ${name}_$arch.gb $strat
 timeout 180.0s $cbmc ${name}_$arch.gb
