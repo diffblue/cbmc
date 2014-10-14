@@ -70,9 +70,6 @@ bool bmct::all_properties(
         goal_map[i_it->source_location.get_property_id()]=goalt(*i_it);
 
   // get the conditions for these goals from formula
-  
-  unsigned property_counter=0;
-
   // collect all 'instances' of the properties
   for(symex_target_equationt::SSA_stepst::iterator
       it=equation.SSA_steps.begin();
@@ -85,13 +82,15 @@ bool bmct::all_properties(
 
       if(it->source.pc->is_assert())
         property_id=it->source.pc->source_location.get_property_id();
-      else
+      else if(it->source.pc->is_goto())
       {
-        // need new property ID, say for an unwinding assertion
-        property_counter++;
-        property_id=i2string(property_counter);
+        // this is likely an unwinding assertion
+        property_id=id2string(it->source.pc->source_location.get_function())+".unwind."+
+                    i2string(it->source.pc->loop_number);
         goal_map[property_id].description=it->comment;
       }
+      else
+        continue;
       
       goal_map[property_id].conjuncts.push_back(
         literal_exprt(it->cond_literal));
