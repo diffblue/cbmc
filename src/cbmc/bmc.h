@@ -93,7 +93,7 @@ protected:
   prop_convt *solver_factory();
 
   virtual void show_vcc();
-  virtual bool all_claims(
+  virtual bool all_properties(
     const goto_functionst &goto_functions,
     prop_convt &solver);
   virtual void show_vcc(std::ostream &out);

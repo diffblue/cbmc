@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: bmct::all_claims
+Function: bmct::all_properties
 
   Inputs:
 
@@ -46,7 +46,7 @@ struct goalt
   }
 };
 
-bool bmct::all_claims(
+bool bmct::all_properties(
   const goto_functionst &goto_functions,
   prop_convt &solver)
 {
@@ -60,7 +60,7 @@ bool bmct::all_claims(
   do_conversion(solver);  
   
   // Collect _all_ goals in `goal_map'.
-  // This maps claim IDs to 'goalt'
+  // This maps property IDs to 'goalt'
   typedef std::map<irep_idt, goalt> goal_mapt;
   goal_mapt goal_map;
   

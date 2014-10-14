@@ -1,7 +1,7 @@
 SRC = cbmc_main.cpp cbmc_parseoptions.cpp bmc.cpp dimacs.cpp \
       cbmc_languages.cpp counterexample_beautification.cpp \
       bv_cbmc.cpp symex_bmc.cpp show_vcc.cpp cbmc_solvers.cpp \
-      xml_interface.cpp cover.cpp all_claims.cpp      
+      xml_interface.cpp cover.cpp all_properties.cpp      
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \

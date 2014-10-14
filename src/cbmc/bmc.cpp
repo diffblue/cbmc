@@ -439,7 +439,7 @@ bool bmct::run(const goto_functionst &goto_functions)
       return false;
     }
 
-    if(options.get_bool_option("all-claims"))
+    if(options.get_bool_option("all-properties"))
     {
       satcheckt satcheck;
       satcheck.set_message_handler(get_message_handler());
@@ -451,7 +451,7 @@ bool bmct::run(const goto_functionst &goto_functions)
       else if(options.get_option("arrays-uf")=="always")
         bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
 
-      return all_claims(goto_functions, bv_cbmc);
+      return all_properties(goto_functions, bv_cbmc);
     }
     
     if(options.get_bool_option("smt1"))
