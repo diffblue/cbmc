@@ -35,7 +35,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I ..
 
-LIBS =
+LIBS = $(LIB_GLPK)
 
 CLEANFILES = goto-instrument$(EXEEXT)
 
@@ -46,7 +46,7 @@ all: goto-instrument$(EXEEXT)
 
 ifneq ($(wildcard ../cpp/Makefile),)
   OBJ += ../cpp/cpp$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_CPP
+  CP_CXXFLAGS += -DHAVE_CPP $(FLAG_GLPK)
 endif
 
 ifneq ($(wildcard ../java/Makefile),)
