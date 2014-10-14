@@ -14,9 +14,7 @@ Date: 2012
 
 #include "goto2graph.h"
 
-//#define USE_GLPK
-
-#ifdef USE_GLPK
+#ifdef HAVE_GLPK
 #include <glpk.h>
 #include <cstdlib>
 #endif
@@ -300,7 +298,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
      single IRIW.
   */
   
-#ifdef USE_GLPK
+#ifdef HAVE_GLPK
   /* first, identify all the unsafe pairs */
   std::set<event_grapht::critical_cyclet::delayt> edges;
   for(std::set<event_grapht::critical_cyclet>::iterator 
@@ -428,8 +426,8 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   free(jmat);
   free(vmat);
 #else
-  throw "Sorry, minimum interference option requires glpk; please recompile\
-    goto-instrument with glpk.";
+  throw "Sorry, minimum interference option requires glpk; "
+        "please recompile goto-instrument with glpk.";
 #endif
 }
 

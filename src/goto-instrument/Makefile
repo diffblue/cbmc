@@ -35,7 +35,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I ..
 
-LIBS = $(LIB_GLPK)
+LIBS = 
 
 CLEANFILES = goto-instrument$(EXEEXT)
 
@@ -62,6 +62,11 @@ endif
 ifneq ($(wildcard ../php/Makefile),)
   OBJ += ../php/php$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_PHP
+endif
+
+ifneq ($(LIB_GLPK),)
+  LIBS += $(LIB_GLPK)
+  CP_CXXFLAGS += -DHAVE_GLPK
 endif
 
 ###############################################################################
