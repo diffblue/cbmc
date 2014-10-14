@@ -73,7 +73,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   else if(statement==ID_break)
     typecheck_break(code);
   else if(statement==ID_goto)
-    typecheck_goto(code);
+    typecheck_goto(to_code_goto(code));
   else if(statement==ID_gcc_computed_goto)
     typecheck_gcc_computed_goto(code);
   else if(statement==ID_continue)
@@ -575,11 +575,8 @@ Function: c_typecheck_baset::typecheck_label
 
 void c_typecheck_baset::typecheck_label(code_labelt &code)
 {
-  if(code.operands().size()!=1)
-  {
-    err_location(code);
-    throw "label expected to have one operand";
-  }
+  // record the label
+  labels_defined[code.get_label()]=code.source_location();
 
   typecheck_code(code.code());
 }
@@ -692,8 +689,10 @@ Function: c_typecheck_baset::typecheck_goto
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_goto(codet &code)
+void c_typecheck_baset::typecheck_goto(code_gotot &code)
 {
+  // we record the label used
+  labels_used[code.get_destination()]=code.source_location();
 }
 
 /*******************************************************************\

@@ -606,6 +606,10 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   code_typet &code_type=to_code_type(symbol.type);
   
   assert(symbol.value.is_not_nil());
+  
+  // reset labels
+  labels_used.clear();
+  labels_defined.clear();
 
   // fix type
   symbol.value.type()=code_type;
@@ -659,6 +663,19 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   // special case for main()  
   if(symbol.name=="c::main")
     add_argc_argv(symbol);
+
+  // check the labels
+  for(std::map<irep_idt, source_locationt>::const_iterator
+      it=labels_used.begin(); it!=labels_used.end(); it++)
+  {
+    if(labels_defined.find(it->first)==labels_defined.end())
+    {
+      err_location(it->second);
+      str << "branching label `" << it->first
+          << "' is not defined in function";
+      throw 0;
+    }
+  }
 }
 
 /*******************************************************************\

@@ -703,8 +703,6 @@ Function: c_typecheck_baset::typecheck_expr_operands
 
 \*******************************************************************/
 
-#include <iostream>
-
 void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
 {
   if(expr.id()==ID_side_effect &&
@@ -1894,6 +1892,9 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   if(op.id()==ID_label)
   {
     expr.type()=pointer_typet(empty_typet());
+    
+    // remember the label
+    labels_used[op.get(ID_identifier)]=op.source_location();
     return;
   }
 
