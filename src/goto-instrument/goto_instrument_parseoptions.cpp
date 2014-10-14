@@ -686,6 +686,8 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     string_abstraction(symbol_table,
       get_message_handler(), goto_functions);
   }
+  
+  // some analyses require function pointer removal and partial inlining
 
   if(cmdline.isset("remove-pointers") ||
      cmdline.isset("race-check") ||
