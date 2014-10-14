@@ -11,18 +11,10 @@ Date: 2012
 #include "event_graph.h"
 
 #include <util/i2string.h>
+#include <util/message.h>
+
 #include <fstream>
 
-//#define DEBUG
-
-#include <iostream>
-
-#ifdef DEBUG
-#include <iostream>
-#define DEBUG_MESSAGE(a) std::cout<<a<<std::endl
-#else
-#define DEBUG_MESSAGE(a)
-#endif
 
 #define NB_COLOURS 14
 std::string colour_map[NB_COLOURS] = {"red", "blue", "black", "green", "yellow",
@@ -178,7 +170,7 @@ Function: event_grapht::critical_cyclet::is_unsafe
 
 bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
 {
-  DEBUG_MESSAGE("cycle is safe?");
+  egraph.message.debug() << "cycle is safe?" << messaget::eom;
   bool unsafe_met=false;
 
   /* critical cycles contain at least 4 events */
@@ -465,7 +457,7 @@ Function: event_grapht::critical_cyclet::is_unsafe_asm
 bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model, 
   bool fast)
 {
-  DEBUG_MESSAGE("cycle is safe?");
+  egraph.message.debug() << "cycle is safe?" << messaget::eom;
   bool unsafe_met = false;
   unsigned char fences_met = 0;
 

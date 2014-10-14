@@ -16,6 +16,7 @@ Date: 2012
 #include <util/source_location.h>
 
 class abstract_eventt;
+class messaget;
 
 /*******************************************************************\
                           data dependencies
@@ -65,7 +66,7 @@ public:
   void dp_merge();
 
   /* printing */
-  void print();
+  void print(messaget& message);
 };
 
 #endif

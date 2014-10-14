@@ -22,6 +22,8 @@ Date: 2012
 #include "data_dp.h"
 #include "wmm.h"
 
+class messaget;
+
 /*******************************************************************\
                      graph of abstract events
 \*******************************************************************/
@@ -311,14 +313,16 @@ protected:
   };
 
 public:
-  event_grapht():
+  event_grapht(messaget& _message):
     filter_thin_air(true),
-    filter_uniproc(true)
+    filter_uniproc(true),
+    message(_message)
   {
   }
 
   bool filter_thin_air;
   bool filter_uniproc;
+  messaget& message;
 
   /* data dependencies per thread */
   std::map<unsigned,data_dpt> map_data_dp;

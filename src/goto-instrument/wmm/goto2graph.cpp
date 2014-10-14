@@ -11,7 +11,6 @@ Date: 2012
 #include <vector>
 #include <string>
 #include <fstream>
-#include <iostream>
 
 #ifndef _WIN32
 #include <cstdlib>
@@ -28,14 +27,8 @@ Date: 2012
 #include "fence.h"
 #include "goto2graph.h"
 
-//#define DEBUG
 //#define PRINT_UNSAFES
 
-#ifdef DEBUG
-#define DEBUG_MESSAGE(a) std::cout<<a<<std::endl
-#else
-#define DEBUG_MESSAGE(a)
-#endif
 
 /*******************************************************************\
 
@@ -92,7 +85,7 @@ bool inline instrumentert::local(const irep_idt& id)
   }
   catch(std::string exception)
   {
-    DEBUG_MESSAGE("Exception: "<<exception);
+    message.debug()<<"Exception: "<<exception << messaget::eom;
     return false;
   }
 }
@@ -122,7 +115,7 @@ unsigned instrumentert::goto2graph_cfg(
   bool no_dependencies)
 {
   if(!no_dependencies)
-    std::cout << "Dependencies analysis enabled" << std::endl;
+    message.status() << "Dependencies analysis enabled" << messaget::eom;
 
   if(goto_functions.main_id()=="")
     throw "Main function not found";
@@ -144,7 +137,7 @@ unsigned instrumentert::goto2graph_cfg(
     egraph_SCCs[sg].insert(it->first);
   }
 
-  std::cout<<"Number of threads detected: "<<visitor.max_thread<<std::endl;
+  message.status() <<"Number of threads detected: "<<visitor.max_thread<< messaget::eom;
 
   /* SCCs which could host critical cycles */
   unsigned interesting_sccs = 0;
@@ -152,19 +145,19 @@ unsigned instrumentert::goto2graph_cfg(
     if(egraph_SCCs[i].size()>3)
       interesting_sccs++;
 
-  std::cout<<"Graph with "<<egraph_alt.size()<<" nodes has "
-    <<interesting_sccs<<" interesting SCCs"<<std::endl;
+  message.statistics() <<"Graph with "<<egraph_alt.size()<<" nodes has "
+    <<interesting_sccs<<" interesting SCCs"<<messaget::eom;
 
-  std::cout<<"Number of reads: "<<visitor.read_counter<<std::endl;
-  std::cout<<"Number of writes: "<<visitor.write_counter<<std::endl;
-  std::cout<<"Number of wse: "<<visitor.ws_counter<<std::endl;
-  std::cout<<"Number of rfe/fre: "<<visitor.fr_rf_counter<<std::endl;
+  message.statistics() <<"Number of reads: "<<visitor.read_counter<<messaget::eom;
+  message.statistics() <<"Number of writes: "<<visitor.write_counter<<messaget::eom;
+  message.statistics() <<"Number of wse: "<<visitor.ws_counter<<messaget::eom;
+  message.statistics() <<"Number of rfe/fre: "<<visitor.fr_rf_counter<<messaget::eom;
   unsigned instr_counter=0;
   for(goto_functionst::function_mapt::const_iterator it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       ++it)
     instr_counter+=it->second.body.instructions.size();
-  std::cout<<"Number of goto-instructions: "<<instr_counter<<std::endl;
+  message.statistics() <<"Number of goto-instructions: "<<instr_counter<<messaget::eom;
 
   return visitor.max_thread;
 }
@@ -195,7 +188,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
 {
   /* flow: egraph */
 
-  DEBUG_MESSAGE("visit function "<<function);
+  instrumenter.message.debug() << "visit function "<<function << messaget::eom;
 
   if(function==CPROVER_PREFIX "initialize")
   {
@@ -219,7 +212,8 @@ void instrumentert::cfg_visitort::visit_cfg_function(
       current_thread=coming_from;
     thread=current_thread;
 
-    DEBUG_MESSAGE("visit instruction "<<instruction.type);
+    instrumenter.message.debug() << "visit instruction "<<instruction.type
+      << messaget::eom;
 
     if(instruction.is_start_thread() || instruction.is_end_thread())
     {
@@ -298,7 +292,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
 
   std::pair<unsigned,data_dpt> new_dp(thread, data_dp);
   egraph.map_data_dp.insert(new_dp);
-  data_dp.print();
+  data_dp.print(instrumenter.message);
 
   if(instrumenter.goto_functions.function_map[function].body
     .instructions.size() <= 0)
@@ -418,17 +412,17 @@ void inline instrumentert::cfg_visitort::visit_cfg_reference_function (
     }
     else
     {
-      DEBUG_MESSAGE("else case");
+      instrumenter.message.debug() << "else case" << messaget::eom;
       /* connects NEXT nodes following the targets -- bwd analysis */
       for(goto_programt::instructionst::iterator cur=i_it;
         cur!=targ; --cur)
       {
-        DEBUG_MESSAGE("i");
+        instrumenter.message.debug() << "i" << messaget::eom;
         for(std::set<goto_programt::instructiont::targett>::const_iterator
           t=cur->incoming_edges.begin();
           t!=cur->incoming_edges.end(); ++t)
         {
-          DEBUG_MESSAGE("t");
+          instrumenter.message.debug() << "t" << messaget::eom;
           if(in_pos.find(*t)!=in_pos.end()
             && updated.find(*t)!=updated.end())
           {
@@ -527,7 +521,7 @@ void instrumentert::cfg_visitort::visit_cfg_goto(
      be connected. We do a backward analysis. */
   if(instruction.is_backwards_goto())
   {
-    DEBUG_MESSAGE("backward goto");          
+    instrumenter.message.debug() << "backward goto" << messaget::eom;          
     visit_cfg_body(i_it, value_sets
     );
   }
@@ -603,8 +597,8 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
     #endif
   }
   catch(std::string s) {
-    std::cout << "Sorry, doesn't handle recursion (function "
-      << fun_id << "; .cpp) " << s<< std::endl;
+    instrumenter.message.warning() << "Sorry, doesn't handle recursion (function "
+      << fun_id << "; .cpp) " << s<< messaget::eom;
   }
 }
 
@@ -639,7 +633,8 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
       for(std::set<nodet>::const_iterator s_it=in_pos[*prev].begin();
         s_it!=in_pos[*prev].end(); ++s_it)
       {
-        DEBUG_MESSAGE(s_it->first<<"-po->"<<new_fence_node);
+        instrumenter.message.debug() << s_it->first<<"-po->"<<new_fence_node
+          << messaget::eom;
         egraph.add_po_edge(s_it->first,new_fence_node);
         egraph_alt.add_edge(s_it->second,new_fence_gnode);
       }
@@ -688,7 +683,8 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
       for(std::set<nodet>::const_iterator s_it=in_pos[*prev].begin();
         s_it!=in_pos[*prev].end(); ++s_it)
       {
-        DEBUG_MESSAGE(s_it->first<<"-po->"<<new_fence_node);
+        instrumenter.message.debug() << s_it->first<<"-po->"<<new_fence_node
+          << messaget::eom;
         egraph.add_po_edge(s_it->first,new_fence_node);
         egraph_alt.add_edge(s_it->second,new_fence_gnode);
       }
@@ -758,14 +754,15 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     if(ref.find(&r_it->second)!=ref.end())
     {
       const rw_set_baset::entryt& entry=*ref[&r_it->second];
-      DEBUG_MESSAGE("sh: (through "
-        <<id2string(r_it->second.object)<<") "<<entry.object);
+      instrumenter.message.debug() << "sh: (through "
+        <<id2string(r_it->second.object)<<") "<<entry.object
+        << messaget::eom;
       read_expr=&entry.symbol_expr;
       stars=entry.stars;
     }
     else {
-      DEBUG_MESSAGE("sh: "<<id2string(r_it->second.object)
-        << " -> " <<&r_it->second.object);
+      instrumenter.message.debug() << "sh: "<<id2string(r_it->second.object)
+        << " -> " <<&r_it->second.object << messaget::eom;
       read_expr=&r_it->second.symbol_expr;
     }
 #endif
@@ -783,9 +780,10 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 #endif
     const unsigned new_read_node=egraph.add_node();
     egraph[new_read_node]=new_read_event;
-    DEBUG_MESSAGE("new Read"<<read<<" @thread"
+    instrumenter.message.debug() << "new Read"<<read<<" @thread"
       <<(thread)<<"("<<instruction.source_location<<","
-      <<(local(read)?"local":"shared")<<") #"<<new_read_node);
+      <<(local(read)?"local":"shared")<<") #"<<new_read_node
+      << messaget::eom;
 
     const unsigned new_read_gnode=egraph_alt.add_node();
     egraph_alt[new_read_gnode]=new_read_event;
@@ -802,7 +800,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
           s_it!=in_pos[*prev].end();
           ++s_it)
         {
-           DEBUG_MESSAGE(s_it->first<<"-po->"<<new_read_node);
+           instrumenter.message.debug() << s_it->first<<"-po->"
+             <<new_read_node << messaget::eom;
            egraph.add_po_edge(s_it->first,new_read_node);
            egraph_alt.add_edge(s_it->second,new_read_gnode);
         }
@@ -819,7 +818,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       id_it!=with_same_var.second; id_it++)
       if(egraph[id_it->second].thread != new_read_event.thread)
       {
-        DEBUG_MESSAGE(id_it->second<<"<-com->"<<new_read_node);
+        instrumenter.message.debug() << id_it->second<<"<-com->"
+          <<new_read_node << messaget::eom;
         std::map<unsigned,unsigned>::const_iterator entry=
           instrumenter.map_vertex_gnode.find(id_it->second);
         assert(entry!=instrumenter.map_vertex_gnode.end());
@@ -855,14 +855,15 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     if(ref.find(&w_it->second)!=ref.end())
     {
       const rw_set_baset::entryt& entry=*ref[&w_it->second];
-      DEBUG_MESSAGE("sh: (through "
-        <<id2string(w_it->second.object)<<") "<<entry.object);
+      instrumenter.message.debug() << "sh: (through "
+        <<id2string(w_it->second.object)<<") "<<entry.object
+        << messaget::eom;
       write_expr=&entry.symbol_expr;
       stars=entry.stars;
     }
     else {
-      DEBUG_MESSAGE("sh: "<<id2string(w_it->second.object)
-        << " -> " <<&w_it->second.object);
+      instrumenter.message.debug() << "sh: "<<id2string(w_it->second.object)
+        << " -> " <<&w_it->second.object) << messaget::eom;
       write_expr=&w_it->second.symbol_expr;
     }
 #endif
@@ -879,9 +880,10 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 #endif
     const unsigned new_write_node=egraph.add_node();
     egraph[new_write_node](new_write_event);
-    DEBUG_MESSAGE("new Write "<<write<<" @thread"<<(thread)
+    instrumenter.message.debug() << "new Write "<<write<<" @thread"<<(thread)
       <<"("<<instruction.source_location<<","
-      << (local(write)?"local":"shared")<<") #"<<new_write_node);
+      << (local(write)?"local":"shared")<<") #"<<new_write_node
+      << messaget::eom;
 
     const unsigned new_write_gnode=egraph_alt.add_node();
     egraph_alt[new_write_gnode]=new_write_event;
@@ -891,7 +893,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     /* creates Read -po-> Write */
     if(previous!=(unsigned)-1)
     {
-      DEBUG_MESSAGE(previous<<"-po->"<<new_write_node);
+      instrumenter.message.debug() << previous<<"-po->"<<new_write_node
+        << messaget::eom;
       egraph.add_po_edge(previous,new_write_node);
       egraph_alt.add_edge(previous_gnode,new_write_gnode);
     }
@@ -905,7 +908,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
             s_it!=in_pos[*prev].end();
             ++s_it)
           {
-            DEBUG_MESSAGE(s_it->first<<"-po->"<<new_write_node);
+            instrumenter.message.debug() << s_it->first<<"-po->"
+              <<new_write_node << messaget::eom;
             egraph.add_po_edge(s_it->first,new_write_node);
             egraph_alt.add_edge(s_it->second,new_write_gnode);
           }
@@ -918,7 +922,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       idr_it!=r_with_same_var.second; idr_it++)
       if(egraph[idr_it->second].thread != new_write_event.thread)
       {
-        DEBUG_MESSAGE(idr_it->second<<"<-com->"<<new_write_node);
+        instrumenter.message.debug() <<idr_it->second<<"<-com->" 
+          <<new_write_node << messaget::eom;
         std::map<unsigned,unsigned>::const_iterator entry=
           instrumenter.map_vertex_gnode.find(idr_it->second);
         assert(entry!=instrumenter.map_vertex_gnode.end());
@@ -936,7 +941,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       idw_it!=w_with_same_var.second; idw_it++)
       if(egraph[idw_it->second].thread!=new_write_event.thread)
       {
-        DEBUG_MESSAGE(idw_it->second<<"<-com->"<<new_write_node);
+        instrumenter.message.debug() << idw_it->second<<"<-com->"
+          <<new_write_node << messaget::eom;
         std::map<unsigned,unsigned>::const_iterator entry=
           instrumenter.map_vertex_gnode.find(idw_it->second);
         assert(entry!=instrumenter.map_vertex_gnode.end());
@@ -972,7 +978,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       {
         const irep_idt& write=write_it->second.object;
         const irep_idt& read=read_it->second.object;
-        DEBUG_MESSAGE("dp: Write:"<<write<<"; Read:"<<read);
+        instrumenter.message.debug() << "dp: Write:"<<write<<"; Read:"<<read
+          << messaget::eom;
         const datat read_p(read,instruction.source_location);
         const datat write_p(write,instruction.source_location);
           data_dp.dp_analysis(read_p,local(read),write_p,local(write));
@@ -1027,7 +1034,8 @@ void instrumentert::cfg_visitort::visit_cfg_fence(
         s_it!=in_pos[*prev].end();
         ++s_it)
       {
-        DEBUG_MESSAGE(s_it->first<<"-po->"<<new_fence_node);
+        instrumenter.message.debug() << s_it->first<<"-po->"<<new_fence_node
+          << messaget::eom;
         egraph.add_po_edge(s_it->first,new_fence_node);
         egraph_alt.add_edge(s_it->second,new_fence_gnode);
       }
@@ -1122,7 +1130,7 @@ Function: instrumentert::is_cfg_spurious
 
 bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
 {
-  DEBUG_MESSAGE("spurious by CFG? ");
+  message.debug() << "spurious by CFG? " << messaget::eom;
   goto_programt interleaving;
 
   for(event_grapht::critical_cyclet::const_iterator e_it=cyc.begin(); 
@@ -1260,7 +1268,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
 
   bool is_spurious = bmc.run(this_interleaving);
   
-  DEBUG_MESSAGE("CFG:"<<is_spurious);
+  message.debug() << "CFG:"<<is_spurious << messaget::eom;
   return is_spurious;
   #else
   
@@ -1324,7 +1332,7 @@ void instrumentert::cfg_cycles_filter()
       }
   }
   else
-    DEBUG_MESSAGE("No cycle to filter");
+    message.status() << "No cycle to filter" << messaget::eom;
 }
 
 /*******************************************************************\
@@ -1365,7 +1373,7 @@ void inline instrumentert::print_outputs_local(
     set.begin(); it!=set.end(); it++)
   {
 #ifdef PRINT_UNSAFES
-    std::cout << it->print_unsafes() << std::endl;
+    message.debug() << it->print_unsafes() << messaget::eom;
 #endif
     it->print_dot(dot,colour++,model);
     ref << it->print_name(model, hide_internals) << std::endl;
@@ -1481,7 +1489,7 @@ void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
     }
   }
   else
-    DEBUG_MESSAGE("no cycles to output");
+    message.debug() << "no cycles to output" << messaget::eom;
 
   dot << "}" << std::endl;
 
@@ -1570,16 +1578,16 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
       unsigned rc = pthread_create(&threads[scc++], NULL,
         collect_cycles_in_thread, (void*) &arg);
 
-      std::cout<<(rc!=0?"Failure ":"Success ")
-        <<"in creating thread for SCC #"<<scc-1<<std::endl;
+      message.status()<<(rc!=0?"Failure ":"Success ")
+        <<"in creating thread for SCC #"<<scc-1<<messaget::eom;
     }
 
   for(unsigned i=0; i<number_of_sccs; i++)
     if(interesting_SCCs.find(i)!=interesting_SCCs.end())
     {
       unsigned rc = pthread_join(threads[i],NULL);
-      std::cout<<(rc!=0?"Failure ":"Success ")
-        <<"in joining thread for SCC #"<<i<<std::endl;
+      message.status()<<(rc!=0?"Failure ":"Success ")
+        <<"in joining thread for SCC #"<<i<<messaget::eom;
     }
 }
 #endif

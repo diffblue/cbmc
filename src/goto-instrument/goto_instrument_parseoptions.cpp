@@ -797,7 +797,8 @@ void goto_instrument_parseoptionst::instrument_goto_program(
           cmdline.isset("render-cluster-file"),
           cmdline.isset("render-cluster-function"),
           cmdline.isset("cav11"),
-          cmdline.isset("hide-internals"));
+          cmdline.isset("hide-internals"),
+          get_message_handler());
     }
 
     // Interrupt handler

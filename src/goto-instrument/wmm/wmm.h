@@ -19,11 +19,6 @@ typedef enum {
   Power=3
 } memory_modelt;
 
-#endif
-
-#ifndef INSTRUMENTATION_STRATEGY
-#define INSTRUMENTATION_STRATEGY
-
 typedef enum {
   all=0,
   min_interference=1,
