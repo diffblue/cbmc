@@ -87,13 +87,21 @@ void label_properties(
     if(!it->is_assert()) continue;
     
     irep_idt function=it->source_location.get_function();
-    unsigned &count=property_counters[function];
+    
+    std::string prefix=id2string(function);
+    if(it->source_location.get_property_class()!="")
+    {
+      if(prefix!="") prefix+=".";
+      prefix+=id2string(it->source_location.get_property_class());
+    }
+
+    if(prefix!="") prefix+=".";
+    
+    unsigned &count=property_counters[prefix];
     
     count++;
     
-    std::string property_id=
-      function==""?i2string(count):
-      id2string(function)+"."+i2string(count);
+    std::string property_id=prefix+i2string(count);
     
     it->source_location.set_property_id(property_id);
   }
