@@ -10,9 +10,9 @@ CPROVER compiles in the following environments:
 - Solaris 11
 
 - Cygwin
-  (We recommend g++-3. Don't use the i686-pc-mingw32-g++ cross compiler.)
+  (We recommend the i686-pc-mingw32-g++ cross compiler, version 4.7 or above.)
 
-- Microsoft's Visual Studio 2010 or 2012 (older versions won't work)
+- Microsoft's Visual Studio 2010, 2012 or 2013 (older versions won't work)
 
 The rest of this document is split up into three parts: compilation on
 Linux, MacOS, Windows.  Please read the section appropriate for your
@@ -30,12 +30,12 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    apt-get install g++ gcc flex bison make subversion libz-dev libwww-perl patch
 
-   On Red Hat/Fedora, do
+   On Red Hat/Fedora or derivates, do
 
    yum install gcc gcc-c++ flex bison perl-libwww-perl patch
 
    WARNING: g++ 4.5.x has been observed to mis-optimize code in
-   MiniSat with -O3. Use a different version (or -O1).
+   MiniSat with -O3. You must use a newer version.
 
 1) You need a SAT solver (in source). We recommend MiniSat2. Do
 
@@ -112,7 +112,7 @@ Follow these instructions:
    Cygwin.
 
    WARNING: g++ 4.5.x has been observed to mis-optimize code in
-   MiniSat with -O3. Use a different version (or -O1).
+   MiniSat with -O3. Use a newer version.
 
 1) You need a SAT solver (in source). We recommend MiniSat2. Using a
    browser, download from
