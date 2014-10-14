@@ -9,6 +9,7 @@ Date: 2012
 \*******************************************************************/
 
 #include <string>
+#include <fstream>
 
 #include <util/i2string.h>
 
@@ -17,13 +18,6 @@ Date: 2012
 #ifdef HAVE_GLPK
 #include <glpk.h>
 #include <cstdlib>
-#endif
-
-#ifdef DEBUG
-#include <iostream>
-#define DEBUG_MESSAGE(a) std::cout<<a<<std::endl
-#else
-#define DEBUG_MESSAGE(a)
 #endif
 
 /*******************************************************************\
@@ -94,7 +88,7 @@ void instrumentert::instrument_with_strategy(instrumentation_strategyt strategy)
     }
   }
   else
-    DEBUG_MESSAGE("no cycles to instrument");
+    message.debug() << "no cycles to instrument" << messaget::eom;
 }
 
 /*******************************************************************\
@@ -321,7 +315,8 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   glp_set_prob_name(lp, "instrumentation optimisation");
   glp_set_obj_dir(lp, GLP_MIN);
   
-  DEBUG_MESSAGE("edges: "<<edges.size()<<" cycles:"<<set_of_cycles.size());
+  message.debug() << "edges: "<<edges.size()<<" cycles:"<<set_of_cycles.size()
+    << messaget::eom;
 
   /* sets the variables and coefficients */
   glp_add_cols(lp, edges.size());
@@ -354,7 +349,8 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   }
 
   const unsigned mat_size=set_of_cycles.size()*edges.size();
-  DEBUG_MESSAGE("size of the system: " << mat_size);
+  message.debug() << "size of the system: " << mat_size
+    << messaget::eom;
   int* imat=(int*)malloc(sizeof(int)*(mat_size+1));
   int* jmat=(int*)malloc(sizeof(int)*(mat_size+1));
   double* vmat=(double*)malloc(sizeof(double)*(mat_size+1));
@@ -389,7 +385,8 @@ void inline instrumentert::instrument_minimum_interference_inserter(
 
 #ifdef DEBUG
   for(i=1; i<=mat_size; ++i)
-    std::cout<<i<<"["<<imat[i]<<","<<jmat[i]<<"]="<<vmat[i]<<std::endl;
+    message.statistics() <<i<<"["<<imat[i]<<","<<jmat[i]<<"]="<<vmat[i]
+      << messaget::eom;
 #endif
 
   /* solves MIP by branch-and-cut */
@@ -397,7 +394,8 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   glp_intopt(lp, &parm);
 
   /* loads results (x_i) */
-  std::cout << "minimal cost: " << glp_mip_obj_val(lp) << std::endl;
+  message.statistics() << "minimal cost: " << glp_mip_obj_val(lp) 
+    << messaget::eom;
   i=0;
   for(std::set<event_grapht::critical_cyclet::delayt>::iterator
     e_i=edges.begin();
@@ -500,6 +498,39 @@ void instrumentert::instrument_my_events(const std::set<unsigned>& my_events)
       instrument_my_events_inserter(set_of_cycles_per_SCC[i], my_events);
   }
   else
-    DEBUG_MESSAGE("no cycles to instrument");
+    message.debug() << "no cycles to instrument" << messaget::eom;
 }
 
+/*******************************************************************\
+
+Function: extract_my_events
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::set<unsigned> instrumentert::extract_my_events()
+{
+  std::ifstream file;
+  file.open("inst.evt");
+  std::set<unsigned> this_set;
+
+  unsigned size;
+  file >> size;
+
+  unsigned tmp;
+
+  for(unsigned i=0; i<size; i++)
+  {
+    file>>tmp;
+    this_set.insert(tmp);
+  }
+
+  file.close();
+
+  return this_set;
+}

@@ -8,19 +8,10 @@ Date: 2012
 
 \*******************************************************************/
 
+#include <util/message.h>
+
 #include "data_dp.h"
-
 #include "abstract_event.h"
-
-//#define DEBUG
-
-#ifdef DEBUG
-#include <iostream>
-#include <map>
-#define DEBUG_MESSAGE(a) std::cout<<a<<std::endl
-#else
-#define DEBUG_MESSAGE(a)
-#endif
 
 /*******************************************************************\
 
@@ -132,12 +123,12 @@ bool data_dpt::dp(const abstract_eventt& e1, const abstract_eventt& e2) const
       /* or else, same class */
       if(it1->eq_class==it2->eq_class)
       {
-        DEBUG_MESSAGE(e1<<"-dp->"<<e2);
+        //message.debug() << e1<<"-dp->"<<e2 << messaget::eom;
         return true;
       }
     }
   }
-  DEBUG_MESSAGE(e1<<"-x->"<<e2);
+  //message.debug() << e1<<"-x->"<<e2 << messaget::eom;
   return false;
 }
 
@@ -208,7 +199,7 @@ Function: data_dpt::print
 
 \*******************************************************************/
 
-void data_dpt::print()
+void data_dpt::print(messaget& message)
 {
 #ifdef DEBUG
   const_iterator it;
@@ -229,10 +220,10 @@ void data_dpt::print()
   for(std::map<unsigned,std::set<source_locationt> >::const_iterator m_it=classed.begin();
     m_it!=classed.end(); ++m_it)
   {
-    DEBUG_MESSAGE("class #"<<m_it->first);
+    message.debug() << "class #"<<m_it->first << messaget::eom;
     std::set<source_locationt>::const_iterator l_it;
     for(l_it=m_it->second.begin(); l_it!=m_it->second.end(); ++l_it)
-      DEBUG_MESSAGE("loc: "<<*l_it);
+      message.debug()<< "loc: "<<*l_it << messaget::eom;
   }
 #endif
 }

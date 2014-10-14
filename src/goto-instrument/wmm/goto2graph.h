@@ -12,10 +12,10 @@ Date: 2012
 #define INSTRUMENTER_H
 
 #include <map>
-#include <iostream>
 
 #include <util/graph.h>
 #include <util/namespace.h>
+#include <util/message.h>
 
 #include <goto-programs/goto_program.h>
 
@@ -218,8 +218,8 @@ protected:
           function, empty_in, end_out);
         leave_function(function);
       }
-      catch(...) {
-        std::cout << "Sorry, doesn't handle recursion (.h)" << std::endl;
+      catch(std::string s) {
+        instrumenter.message.warning() << s << messaget::eom;
       }
     }
 
@@ -240,6 +240,9 @@ protected:
   };
 
 public:
+  /* message */
+  messaget& message;
+
   /* graph */
   event_grapht egraph;
 
@@ -264,19 +267,19 @@ public:
        it!=map_function_graph.end();
        ++it)
     {
-       std::cout << "FUNCTION " << it->first << ": " << std::endl;
-       std::cout << "Start nodes: ";
+       message.debug() << "FUNCTION " << it->first << ": " << messaget::eom;
+       message.debug() << "Start nodes: ";
        for(std::set<unsigned>::const_iterator in_it=it->second.first.begin();
          in_it!=it->second.first.end();
          ++in_it)
-         std::cout << *in_it << " ";
-       std::cout << std::endl;
-       std::cout << "End nodes: ";
+         message.debug() << *in_it << " ";
+       message.debug() << messaget::eom;
+       message.debug() << "End nodes: ";
        for(std::set<unsigned>::const_iterator in_it=it->second.second.begin();
          in_it!=it->second.second.end();
          ++in_it)
-         std::cout << *in_it << " ";
-       std::cout << std::endl;
+         message.debug() << *in_it << " ";
+       message.debug() << messaget::eom;
     }
   }
 
@@ -288,9 +291,11 @@ public:
   std::multimap<irep_idt,source_locationt> id2loc;
   std::multimap<irep_idt,source_locationt> id2cycloc;
 
-  instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f)
+  instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f, 
+    messaget& _message)
     :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true), 
-      render_by_file(false), render_by_function(false)
+      render_by_file(false), render_by_function(false), message(_message),
+      egraph(_message)
   {
   }
 
@@ -328,6 +333,10 @@ public:
   /* strategies for instrumentation */
   void instrument_with_strategy(instrumentation_strategyt strategy);
   void instrument_my_events(const std::set<unsigned>& events);
+
+  /* retrieves events to filter in the instrumentation choice
+     with option --my-events */
+  static std::set<unsigned> extract_my_events();
 
   /* sets rendering options */
   void set_rendering_options(bool aligned, bool file, bool function)
