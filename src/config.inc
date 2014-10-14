@@ -5,9 +5,8 @@ BUILD_ENV = AUTO
 #CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 #CXXFLAGS = -std=c++11
 
-# If GLPK is available
+# If GLPK is available; this is used by goto-instrument.
 #LIB_GLPK = -lglpk 
-#FLAG_GLPK = -DUSE_GLPK
 
 # SAT-solvers we have
 #PRECOSAT = ../../precosat-576-7e5e66f-120112
