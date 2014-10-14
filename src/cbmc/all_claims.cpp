@@ -141,7 +141,7 @@ bool bmct::all_claims(
     if(ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
-      xml_result.set_attribute("claim", id2string(it->first));
+      //xml_result.set_attribute("claim", id2string(it->first));
       xml_result.set_attribute("property", id2string(it->first));
 
       xml_result.set_attribute("status",
