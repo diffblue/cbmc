@@ -56,6 +56,17 @@ void convert(
     case goto_trace_stept::ASSERT:
       if(!it->cond_value)
       {
+        irep_idt property_id;
+        
+        if(it->pc->is_assert())
+          property_id=source_location.get_property_id();
+        else if(it->pc->is_goto()) // unwinding, we suspect
+        {
+          property_id=
+            id2string(it->pc->source_location.get_function())+".unwind."+
+            i2string(it->pc->loop_number);
+        }
+      
         xmlt &xml_failure=dest.new_element("failure");
         #if 0
         xml_failure.new_element("reason").data=id2string(it->comment);
@@ -67,7 +78,7 @@ void convert(
         xml_failure.set_attribute("thread", i2string(it->thread_nr));
         xml_failure.set_attribute("step_nr", i2string(it->step_nr));
         xml_failure.set_attribute("reason", id2string(it->comment));
-        xml_failure.set_attribute("property", id2string(source_location.get_property_id()));
+        xml_failure.set_attribute("property", id2string(property_id));
 
         if(xml_location.name!="")
           xml_failure.new_element().swap(xml_location);
