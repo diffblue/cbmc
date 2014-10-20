@@ -101,7 +101,7 @@ Function: build_identifier_rec
 
 \*******************************************************************/
 
-static void build_identifier_rec(
+static void build_ssa_identifier_rec(
   const exprt &expr,
   const irep_idt &l0,
   const irep_idt &l1,
@@ -111,7 +111,7 @@ static void build_identifier_rec(
   {
     const member_exprt &member=to_member_expr(expr);
 
-    build_identifier_rec(member.struct_op(), l0, l1, oss);
+    build_ssa_identifier_rec(member.struct_op(), l0, l1, oss);
 
     oss << '.' << member.get_component_name();
   }
@@ -119,7 +119,7 @@ static void build_identifier_rec(
   {
     const index_exprt &index=to_index_expr(expr);
 
-    build_identifier_rec(index.array(), l0, l1, oss);
+    build_ssa_identifier_rec(index.array(), l0, l1, oss);
 
     mp_integer idx;
     if(to_integer(to_constant_expr(index.index()), idx))
@@ -161,7 +161,7 @@ void ssa_exprt::update_identifier()
   const irep_idt &l1=get_level_1();
   const irep_idt &l2=get_level_2();
 
-  build_identifier_rec(get_original_expr(), l0, l1, oss);
+  build_ssa_identifier_rec(get_original_expr(), l0, l1, oss);
 
   if(!l2.empty())
     oss << '#' << l2;
