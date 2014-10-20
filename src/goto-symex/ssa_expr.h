@@ -102,7 +102,20 @@ public:
     return get(ID_L2);
   }
 
-  void update_identifier();
+  void update_identifier()
+  {
+    const irep_idt &l0=get_level_0();
+    const irep_idt &l1=get_level_1();
+    const irep_idt &l2=get_level_2();
+
+    set_identifier(build_identifier(get_original_expr(), l0, l1, l2));
+  }
+  
+  static irep_idt build_identifier(
+    const exprt &src,
+    const irep_idt &l0,
+    const irep_idt &l1,
+    const irep_idt &l2);
 };
 
 /*! \brief Cast a generic exprt to an \ref ssa_exprt

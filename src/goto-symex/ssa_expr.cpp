@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <sstream>
+#include <cassert>
 
 #include <util/arith_tools.h>
 
@@ -28,13 +29,14 @@ static void build_ssa_identifier_rec(
   const exprt &expr,
   const irep_idt &l0,
   const irep_idt &l1,
+  const irep_idt &l2,
   std::ostream &os)
 {
   if(expr.id()==ID_member)
   {
     const member_exprt &member=to_member_expr(expr);
 
-    build_ssa_identifier_rec(member.struct_op(), l0, l1, os);
+    build_ssa_identifier_rec(member.struct_op(), l0, l1, l2, os);
 
     os << '.' << member.get_component_name();
   }
@@ -42,7 +44,7 @@ static void build_ssa_identifier_rec(
   {
     const index_exprt &index=to_index_expr(expr);
 
-    build_ssa_identifier_rec(index.array(), l0, l1, os);
+    build_ssa_identifier_rec(index.array(), l0, l1, l2, os);
 
     mp_integer idx;
     if(to_integer(to_constant_expr(index.index()), idx))
@@ -59,6 +61,9 @@ static void build_ssa_identifier_rec(
 
     if(!l1.empty())
       os << '@' << l1;
+
+    if(!l2.empty())
+      os << '#' << l2;
   }
   else
     assert(false);
@@ -66,7 +71,7 @@ static void build_ssa_identifier_rec(
 
 /*******************************************************************\
 
-Function: ssa_exprt::update_identifier
+Function: ssa_exprt::build_identifier
 
   Inputs:
 
@@ -76,18 +81,16 @@ Function: ssa_exprt::update_identifier
 
 \*******************************************************************/
 
-void ssa_exprt::update_identifier()
+irep_idt ssa_exprt::build_identifier(
+  const exprt &expr,
+  const irep_idt &l0,
+  const irep_idt &l1,
+  const irep_idt &l2)
 {
   std::ostringstream oss;
 
-  const irep_idt &l0=get_level_0();
-  const irep_idt &l1=get_level_1();
-  const irep_idt &l2=get_level_2();
+  build_ssa_identifier_rec(expr, l0, l1, l2, oss);
 
-  build_ssa_identifier_rec(get_original_expr(), l0, l1, oss);
-
-  if(!l2.empty())
-    oss << '#' << l2;
-
-  set_identifier(oss.str());
+  return oss.str();
 }
+
