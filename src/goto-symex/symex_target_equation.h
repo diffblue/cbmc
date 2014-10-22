@@ -305,6 +305,7 @@ public:
   
 protected:
   const namespacet &ns;
+  unsigned io_count;
 
   // for enforcing sharing in the expressions stored
   merge_irept merge_irep;
