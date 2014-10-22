@@ -35,7 +35,7 @@ Function: symex_target_equationt::symex_target_equationt
 \*******************************************************************/
 
 symex_target_equationt::symex_target_equationt(
-  const namespacet &_ns):is_incremental(false),ns(_ns)
+  const namespacet &_ns):is_incremental(false),ns(_ns),io_count(0)
 {
 }
 
@@ -970,8 +970,6 @@ Function: symex_target_equationt::convert_io
 void symex_target_equationt::convert_io(
   decision_proceduret &dec_proc)
 {
-  unsigned io_count=0;
-
   for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++)
     if(!it->ignore && !it->converted)

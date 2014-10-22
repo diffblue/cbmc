@@ -452,7 +452,7 @@ Function: cbmc_parseoptionst::options_inclusive
 
 bool cbmc_parseoptionst::options_inclusive(const char *opt1, const char *opt2)
 {
-  if(cmdline.isset(opt1) && cmdline.isset(opt2)) 
+  if(cmdline.isset(opt1) && !cmdline.isset(opt2)) 
   {
     error() << "--" << opt1 << " can only be used with --" << opt2 << eom;
     return true;
@@ -510,7 +510,7 @@ int cbmc_parseoptionst::doit()
 
   if(options_exclusive("incremental","unwind") ||
      options_exclusive("incremental","incremental-check") ||
-     options_inclusive("incremental","earliest-loop-exit")
+     options_inclusive("earliest-loop-exit","incremental")
     ) 
   {
     return 1;
