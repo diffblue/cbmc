@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/location.h>
+#include <util/source_location.h>
 
 #include "cpp_typecheck.h"
 
@@ -73,7 +73,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
     else // declaration
     {
       // we copy all 'normal' identifiers into the current scope
-      if((*it)->id_class!=cpp_idt::TEMPLATE_ARGUMENT &&
+      if((*it)->id_class!=cpp_idt::TEMPLATE_PARAMETER &&
          (*it)->id_class!=cpp_idt::NAMESPACE)
         cpp_scopes.current_scope().insert(**it);
     }

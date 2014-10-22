@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/find_symbols.h>
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/base_type.h>
 #include <util/i2string.h>
 #include <util/std_expr.h>
@@ -139,6 +139,37 @@ Function: linkingt::link_error
 
 \*******************************************************************/
 
+void linkingt::show_struct_diff(
+  const struct_typet &old_type, const struct_typet &new_type)
+{
+  if(old_type.components().size()!=new_type.components().size())
+    str << "number of members is different";
+  else
+  {
+    for(unsigned i=0; i<old_type.components().size(); i++)
+    {
+      if(old_type.components()[i].get_name()!=new_type.components()[i].get_name())
+      {
+        str << "name of member differs: "
+            << old_type.components()[i].get_name() << " vs. "
+            << new_type.components()[i].get_name();
+        break;
+      }
+      
+      if(!base_type_eq(old_type.components()[i].type(), new_type.components()[i].type(), ns))
+      {
+        str << "type of member "
+            << old_type.components()[i].get_name() << " differs: "
+            << type_to_string(ns, "", old_type.components()[i].type()) << " vs. "
+            << type_to_string(ns, "", new_type.components()[i].type());
+        str << "\n" << old_type.components()[i].type().pretty() << "\n";
+        str << "\n" << new_type.components()[i].type().pretty() << "\n";
+        break;
+      }
+    }
+  }
+}
+
 void linkingt::link_error(
     const symbolt &old_symbol,
     const symbolt &new_symbol,
@@ -148,14 +179,23 @@ void linkingt::link_error(
 
   str << "error: " << msg << " `"
       << old_symbol.display_name()
-      << "'" << std::endl;
+      << "'" << "\n";
   str << "old definition in module `" << old_symbol.module
-      << "' " << old_symbol.location << std::endl
-      << type_to_string_verbose(ns, old_symbol) << std::endl;
+      << "' " << old_symbol.location << "\n"
+      << type_to_string_verbose(ns, old_symbol) << "\n";
   str << "new definition in module `" << new_symbol.module
-      << "' " << new_symbol.location << std::endl
+      << "' " << new_symbol.location << "\n"
       << type_to_string_verbose(ns, new_symbol);
 
+  if(ns.follow(old_symbol.type).id()==ID_struct &&
+     ns.follow(new_symbol.type).id()==ID_struct)
+  {
+    str << "\n";
+    str << "Difference between struct types:\n";
+    show_struct_diff(to_struct_type(ns.follow(old_symbol.type)), 
+                     to_struct_type(ns.follow(new_symbol.type)));
+  }
+  
   throw 0;
 }
 
@@ -201,7 +241,7 @@ Function: linkingt::rename
 
 \*******************************************************************/
 
-irep_idt linkingt::rename(irep_idt id)
+irep_idt linkingt::rename(const irep_idt id)
 {
   unsigned cnt=0;
 
@@ -216,6 +256,10 @@ irep_idt linkingt::rename(irep_idt id)
     
     if(!renamed_ids.insert(new_identifier).second)
       continue; // used this for renaming already
+
+    if(src_symbol_table.symbols.find(new_identifier)!=
+       src_symbol_table.symbols.end())
+      continue; // used by some earlier linking call already
 
     return new_identifier;
   }
@@ -763,7 +807,7 @@ bool linkingt::needs_renaming_type(
        to_array_type(old_symbol.type).size().is_not_nil())
       return false; // not different
   }
-  
+
   return true; // different
 }
 
@@ -976,7 +1020,7 @@ void linkingt::typecheck()
   // renaming types may trigger further renaming
   do_type_dependencies(needs_to_be_renamed);
   
-  // PHASE 2: rename them
+  // PHASE 2: actually rename them
   rename_symbols(needs_to_be_renamed);
 
   // PHASE 3: copy new symbols to main table

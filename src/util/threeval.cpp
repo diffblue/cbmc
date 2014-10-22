@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include "threeval.h"
 
 const char *tvt::to_string() const
@@ -19,3 +21,7 @@ const char *tvt::to_string() const
   }
 }
 
+std::ostream &operator << (std::ostream &out, const tvt &a)
+{
+  return out << a.to_string();
+}

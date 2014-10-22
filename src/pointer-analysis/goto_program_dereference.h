@@ -76,7 +76,7 @@ protected:
   void dereference_expr(exprt &expr, const bool checks_only, const value_set_dereferencet::modet mode);
   
   const std::set<irep_idt> *valid_local_variables;
-  locationt dereference_location;
+  source_locationt dereference_location;
   goto_programt::const_targett current_target;
   
   std::set<exprt> assertions;

@@ -161,7 +161,7 @@ protected:
   virtual void typecheck_decl(codet &code);
   virtual void typecheck_expression(codet &code);
   virtual void typecheck_for(codet &code);
-  virtual void typecheck_goto(codet &code);
+  virtual void typecheck_goto(code_gotot &code);
   virtual void typecheck_ifthenelse(code_ifthenelset &code);
   virtual void typecheck_label(code_labelt &code);
   virtual void typecheck_switch_case(code_switch_caset &code);
@@ -179,6 +179,9 @@ protected:
   bool case_is_allowed;
   typet switch_op_type;
   typet return_type;
+  
+  // to check that all labels used are also defined
+  std::map<irep_idt, source_locationt> labels_defined, labels_used;
   
   // expressions
   virtual void typecheck_expr_builtin_va_arg(exprt &expr);
@@ -271,6 +274,17 @@ protected:
   {
     return language_prefix+id2string(id);
   }
+
+  struct enum_constantt
+  {
+    irep_idt identifier;
+    mp_integer value;
+    enum_constantt(irep_idt _identifier, mp_integer _value):
+      identifier(_identifier), value(_value)
+    {
+    }
+  };
+    
 };
 
 #endif

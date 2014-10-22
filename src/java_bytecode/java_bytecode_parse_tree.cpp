@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include "java_bytecode_parse_tree.h"
 
 /*******************************************************************\
@@ -80,7 +82,7 @@ Function: java_bytecode_parse_treet::classt::output
 
 void java_bytecode_parse_treet::classt::output(std::ostream &out) const
 {
-  out << "class " << name << " {" << std::endl;
+  out << "class " << name << " {" << "\n";
 
   for(memberst::const_iterator
       it=members.begin();
@@ -90,8 +92,8 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
     it->output(out);
   }
   
-  out << "}" << std::endl;
-  out << std::endl;
+  out << "}" << "\n";
+  out << "\n";
 }
 
 /*******************************************************************\
@@ -120,17 +122,17 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
 
   if(is_method)
   {
-    out << std::endl;
+    out << "\n";
 
-    out << "  {" << std::endl;
+    out << "  {" << "\n";
 
     for(instructionst::const_iterator
         i_it=instructions.begin();
         i_it!=instructions.end();
         i_it++)
     {
-      if(i_it->location.get_line()!=irep_idt())
-        out << "    // " << i_it->location << std::endl;
+      if(i_it->source_location.get_line()!=irep_idt())
+        out << "    // " << i_it->source_location << "\n";
 
       out << "    " << i_it->address << ": ";
       out << i_it->statement;
@@ -142,15 +144,15 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
         out << " " << *a_it;
       }
 
-      out << std::endl;
+      out << "\n";
     }
 
-    out << "  }" << std::endl;
+    out << "  }" << "\n";
   }
   else
   {
     out << ";";
   }
 
-  out << std::endl;
+  out << "\n";
 }

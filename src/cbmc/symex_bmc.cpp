@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <limits>
 
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/i2string.h>
 #include <util/xml.h>
 #include <goto-programs/goto_trace.h>
@@ -83,16 +83,16 @@ bool symex_bmct::symex_step(
   const goto_functionst &goto_functions,
   statet &state)
 {
-  const locationt &location=state.source.pc->location;
+  const source_locationt &source_location=state.source.pc->source_location;
 
-  if(!location.is_nil() && last_location!=location)
+  if(!source_location.is_nil() && last_source_location!=source_location)
   {
-    debug() << "BMC at file " << location.get_file()
-            << " line " << location.get_line()
-            << " function " << location.get_function()
+    debug() << "BMC at file " << source_location.get_file()
+            << " line " << source_location.get_line()
+            << " function " << source_location.get_function()
             << eom;
 
-    last_location=location;
+    last_source_location=source_location;
   }
 
   return goto_symext::symex_step(goto_functions, state);
@@ -277,7 +277,7 @@ bool symex_bmct::get_unwind(
   if(this_loop_limit!=std::numeric_limits<unsigned>::max())
     statistics() << " (" << this_loop_limit << " max)";
 
-  statistics() << " " << source.pc->location
+  statistics() << " " << source.pc->source_location
                << " thread " << source.thread_nr << eom;
   return abort;
 }

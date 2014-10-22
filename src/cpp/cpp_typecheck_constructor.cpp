@@ -32,7 +32,7 @@ Function: copy_parent
 \*******************************************************************/
 
 static void copy_parent(
-  const locationt &location,
+  const source_locationt &source_location,
   const irep_idt &parent_base_name,
   const irep_idt &arg_name,
   exprt &block)
@@ -40,7 +40,7 @@ static void copy_parent(
   block.operands().push_back(codet());
 
   codet &code=to_code(block.operands().back());
-  code.location()=location;
+  code.add_source_location()=source_location;
 
   code.set_statement(ID_assign);
   code.operands().push_back(exprt(ID_dereference));
@@ -54,8 +54,8 @@ static void copy_parent(
   op0.type().add(ID_subtype).id(ID_cpp_name);
   op0.type().add(ID_subtype).get_sub().push_back(irept(ID_name));
   op0.type().add(ID_subtype).get_sub().back().set(ID_identifier, parent_base_name);
-  op0.type().add(ID_subtype).get_sub().back().set(ID_C_location, location);
-  op0.location() = location;
+  op0.type().add(ID_subtype).get_sub().back().set(ID_C_source_location, source_location);
+  op0.add_source_location() = source_location;
 
   code.operands().push_back(exprt("explicit-typecast"));
   exprt &op1 = code.op1();
@@ -66,13 +66,13 @@ static void copy_parent(
   op1.type().add(ID_subtype).id(ID_cpp_name);
   op1.type().add(ID_subtype).get_sub().push_back(irept(ID_name));
   op1.type().add(ID_subtype).get_sub().back().set(ID_identifier, parent_base_name);
-  op1.type().add(ID_subtype).get_sub().back().set(ID_C_location, location);
+  op1.type().add(ID_subtype).get_sub().back().set(ID_C_source_location, source_location);
 
   op1.operands().push_back(exprt(ID_cpp_name));
   op1.op0().get_sub().push_back(irept(ID_name));
   op1.op0().get_sub().back().set(ID_identifier, arg_name);
-  op1.op0().get_sub().back().set(ID_C_location, location);
-  op1.location() = location;
+  op1.op0().get_sub().back().set(ID_C_source_location, source_location);
+  op1.add_source_location() = source_location;
 }
 
 /*******************************************************************\
@@ -91,7 +91,7 @@ Function: copy_member
 \*******************************************************************/
 
 static void copy_member(
-  const locationt &location,
+  const source_locationt &source_location,
   const irep_idt &member_base_name,
   const irep_idt &arg_name,
   exprt &block)
@@ -104,14 +104,14 @@ static void copy_member(
   code.operands().push_back(exprt(ID_side_effect));
   code.op0().set(ID_statement, ID_assign);
   code.op0().operands().push_back(exprt(ID_cpp_name));
-  code.location() = location;
+  code.add_source_location() = source_location;
 
   exprt& op0 = code.op0().op0();
-  op0.location() = location;
+  op0.add_source_location() = source_location;
 
   op0.get_sub().push_back(irept(ID_name));
   op0.get_sub().back().set(ID_identifier, member_base_name);
-  op0.get_sub().back().set(ID_C_location, location);
+  op0.get_sub().back().set(ID_C_source_location, source_location);
 
   code.op0().operands().push_back(exprt(ID_member));
 
@@ -120,13 +120,13 @@ static void copy_member(
   op1.add("component_cpp_name").id(ID_cpp_name);
   op1.add("component_cpp_name").get_sub().push_back(irept(ID_name));
   op1.add("component_cpp_name").get_sub().back().set(ID_identifier, member_base_name);
-  op1.add("component_cpp_name").get_sub().back().set(ID_C_location, location);
+  op1.add("component_cpp_name").get_sub().back().set(ID_C_source_location, source_location);
 
   op1.operands().push_back(exprt(ID_cpp_name));
   op1.op0().get_sub().push_back(irept(ID_name));
   op1.op0().get_sub().back().set(ID_identifier, arg_name);
-  op1.op0().get_sub().back().set(ID_C_location, location);
-  op1.location() = location;
+  op1.op0().get_sub().back().set(ID_C_source_location, source_location);
+  op1.add_source_location() = source_location;
 }
 
 /*******************************************************************\
@@ -146,7 +146,7 @@ Function: copy_array
 \*******************************************************************/
 
 static void copy_array(
-  const locationt& location,
+  const source_locationt& source_location,
   const irep_idt &member_base_name,
   mp_integer i,
   const irep_idt &arg_name,
@@ -157,7 +157,7 @@ static void copy_array(
 
   block.operands().push_back(exprt(ID_code));
   exprt& code = block.operands().back();
-  code.location() = location;
+  code.add_source_location() = source_location;
 
   code.set(ID_statement, ID_expression);
   code.add(ID_type)=typet(ID_code);
@@ -166,11 +166,11 @@ static void copy_array(
   code.op0().operands().push_back(exprt(ID_index));
   exprt& op0 = code.op0().op0();
   op0.operands().push_back(exprt(ID_cpp_name));
-  op0.location() = location;
+  op0.add_source_location() = source_location;
 
   op0.op0().get_sub().push_back(irept(ID_name));
   op0.op0().get_sub().back().set(ID_identifier, member_base_name);
-  op0.op0().get_sub().back().set(ID_C_location, location);
+  op0.op0().get_sub().back().set(ID_C_source_location, source_location);
   op0.copy_to_operands(constant);
 
   code.op0().operands().push_back(exprt(ID_index));
@@ -180,15 +180,15 @@ static void copy_array(
   op1.op0().add("component_cpp_name").id(ID_cpp_name);
   op1.op0().add("component_cpp_name").get_sub().push_back(irept(ID_name));
   op1.op0().add("component_cpp_name").get_sub().back().set(ID_identifier, member_base_name);
-  op1.op0().add("component_cpp_name").get_sub().back().set(ID_C_location, location);
+  op1.op0().add("component_cpp_name").get_sub().back().set(ID_C_source_location, source_location);
 
   op1.op0().operands().push_back(exprt(ID_cpp_name));
   op1.op0().op0().get_sub().push_back(irept(ID_name));
   op1.op0().op0().get_sub().back().set(ID_identifier, arg_name);
-  op1.op0().op0().get_sub().back().set(ID_C_location, location);
+  op1.op0().op0().get_sub().back().set(ID_C_source_location, source_location);
   op1.copy_to_operands(constant);
 
-  op1.location() = location;
+  op1.add_source_location() = source_location;
 }
 
 /*******************************************************************\
@@ -204,21 +204,21 @@ Function: cpp_typecheckt::default_ctor
 \*******************************************************************/
 
 void cpp_typecheckt::default_ctor(
-  const locationt &location,
+  const source_locationt &source_location,
   const irep_idt &base_name,
   cpp_declarationt &ctor) const
 {
   exprt name;
   name.id(ID_name);
   name.set(ID_identifier, base_name);
-  name.location() = location;
+  name.add_source_location() = source_location;
 
   cpp_declaratort decl;
   decl.name().id(ID_cpp_name);
   decl.name().move_to_sub(name);
   decl.type()=typet("function_type");
   decl.type().subtype().make_nil();
-  decl.location() = location;
+  decl.add_source_location() = source_location;
 
   decl.value().id(ID_code);
   decl.value().type()=typet(ID_code);
@@ -229,7 +229,7 @@ void cpp_typecheckt::default_ctor(
   ctor.type().id(ID_constructor);
   ctor.add(ID_storage_spec).id(ID_cpp_storage_spec);
   ctor.move_to_operands(decl);
-  ctor.location() = location;
+  ctor.add_source_location() = source_location;
 }
 
 /*******************************************************************\
@@ -248,15 +248,15 @@ void cpp_typecheckt::default_cpctor(
   const symbolt &symbol,
   cpp_declarationt &cpctor) const
 {
-  locationt location = symbol.type.location();
+  source_locationt source_location = symbol.type.source_location();
 
-  location.set_function(
+  source_location.set_function(
     id2string(symbol.base_name)+
     "::"+id2string(symbol.base_name)+
     "(const "+id2string(symbol.base_name)+" &)");
 
   // Produce default constructor first
-  default_ctor(location, symbol.base_name, cpctor);
+  default_ctor(source_location, symbol.base_name, cpctor);
   cpp_declaratort &decl0 = cpctor.declarators()[0];
 
   std::string param_identifier("ref");
@@ -264,14 +264,14 @@ void cpp_typecheckt::default_cpctor(
   // Compound name
   irept comp_name(ID_name);
   comp_name.set(ID_identifier, symbol.base_name);
-  comp_name.set(ID_C_location, location);
+  comp_name.set(ID_C_source_location, source_location);
 
   cpp_namet cppcomp;
   cppcomp.move_to_sub(comp_name);
 
   // Parameter name
   exprt param_name(ID_name);
-  param_name.location()=location;
+  param_name.add_source_location()=source_location;
   param_name.set(ID_identifier, param_identifier);
   
   cpp_namet cpp_parameter;
@@ -284,7 +284,7 @@ void cpp_typecheckt::default_cpctor(
   parameter_tor.type()=reference_typet();
   parameter_tor.type().subtype().make_nil();
   parameter_tor.type().add(ID_C_qualifier).make_nil();
-  parameter_tor.location() = location;
+  parameter_tor.add_source_location() = source_location;
 
   // Parameter declaration
   cpp_declarationt parameter_decl;
@@ -294,11 +294,11 @@ void cpp_typecheckt::default_cpctor(
   irept constnd(ID_const);
   subt.get_sub().push_back(constnd);
   parameter_decl.move_to_operands(parameter_tor);
-  parameter_decl.location() = location;
+  parameter_decl.add_source_location() = source_location;
 
   // Add parameter to function type
   decl0.add(ID_type).add(ID_parameters).get_sub().push_back(parameter_decl);
-  decl0.location() = location;
+  decl0.add_source_location() = source_location;
 
   irept &initializers = decl0.add(ID_member_initializers);
   initializers.id(ID_member_initializers);
@@ -317,7 +317,7 @@ void cpp_typecheckt::default_cpctor(
       lookup(parent_it->find(ID_type).get(ID_identifier));
 
     if(cpp_is_pod(parsymb.type))
-      copy_parent(location, parsymb.base_name, param_identifier, block);
+      copy_parent(source_location, parsymb.base_name, param_identifier, block);
     else
     {
       irep_idt ctor_name = parsymb.base_name;
@@ -325,13 +325,13 @@ void cpp_typecheckt::default_cpctor(
       // Call the parent default copy constructor
       exprt name(ID_name);
       name.set(ID_identifier, ctor_name);
-      name.location() = location;
+      name.add_source_location() = source_location;
 
       cpp_namet cppname;
       cppname.move_to_sub(name);
 
       codet mem_init(ID_member_initializer);
-      mem_init.location() = location;
+      mem_init.add_source_location() = source_location;
       mem_init.set(ID_member, cppname);
       mem_init.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
       initializers.move_to_sub(mem_init);
@@ -348,7 +348,7 @@ void cpp_typecheckt::default_cpctor(
     {
       exprt name(ID_name);
       name.set(ID_identifier,mem_it->get(ID_base_name));
-      name.location()=location;
+      name.add_source_location()=source_location;
       
       cpp_namet cppname;
       cppname.move_to_sub(name);
@@ -385,19 +385,19 @@ void cpp_typecheckt::default_cpctor(
 
     exprt name(ID_name);
     name.set(ID_identifier, mem_name);
-    name.location() = location;
+    name.add_source_location() = source_location;
 
     cpp_namet cppname;
     cppname.move_to_sub(name);
 
     codet mem_init(ID_member_initializer);
     mem_init.set(ID_member, cppname);
-    mem_init.location() = location;
+    mem_init.add_source_location() = source_location;
 
     exprt memberexpr(ID_member);
     memberexpr.set("component_cpp_name", cppname);
     memberexpr.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
-    memberexpr.location() = location;
+    memberexpr.add_source_location() = source_location;
 
     if(mem_it->type().id()==ID_array)
       memberexpr.set("#array_ini", true);
@@ -424,9 +424,9 @@ void cpp_typecheckt::default_assignop(
   const symbolt& symbol,
   cpp_declarationt& cpctor)
 {
-  locationt location = symbol.type.location();
+  source_locationt source_location = symbol.type.source_location();
 
-  location.set_function(
+  source_location.set_function(
     id2string(symbol.base_name)
     + "& "+
     id2string(symbol.base_name)+
@@ -438,15 +438,15 @@ void cpp_typecheckt::default_assignop(
   cpctor.type().id(ID_symbol);
   cpctor.type().add(ID_identifier).id(symbol.name);
   cpctor.operands().push_back(exprt(ID_cpp_declarator));
-  cpctor.location() = location;
+  cpctor.add_source_location() = source_location;
 
   cpp_declaratort &declarator = (cpp_declaratort&) cpctor.op0();
-  declarator.location() = location;
+  declarator.add_source_location() = source_location;
 
   cpp_namet &declarator_name = declarator.name();
   typet &declarator_type = declarator.type();
 
-  declarator_type.location() = location;
+  declarator_type.add_source_location() = source_location;
 
   declarator_name.id(ID_cpp_name);
   declarator_name.get_sub().push_back(irept(ID_operator));
@@ -458,7 +458,7 @@ void cpp_typecheckt::default_assignop(
   declarator_type.subtype().subtype().make_nil();
 
   exprt& args = (exprt&) declarator.type().add(ID_parameters);
-  args.location() = location;
+  args.add_source_location() = source_location;
 
   args.get_sub().push_back(irept(ID_cpp_declaration));
 
@@ -470,11 +470,11 @@ void cpp_typecheckt::default_assignop(
   args_decl_type_sub.get_sub().push_back(irept(ID_cpp_name));
   args_decl_type_sub.get_sub().back().get_sub().push_back(irept(ID_name));
   args_decl_type_sub.get_sub().back().get_sub().back().set(ID_identifier, symbol.base_name);
-  args_decl_type_sub.get_sub().back().get_sub().back().set(ID_C_location, location);
+  args_decl_type_sub.get_sub().back().get_sub().back().set(ID_C_source_location, source_location);
 
   args_decl_type_sub.get_sub().push_back(irept(ID_const));
   args_decl.operands().push_back(exprt(ID_cpp_declarator));
-  args_decl.location() = location;
+  args_decl.add_source_location() = source_location;
 
   cpp_declaratort &args_decl_declor=
     (cpp_declaratort&) args_decl.operands().back();
@@ -482,7 +482,7 @@ void cpp_typecheckt::default_assignop(
   args_decl_declor.name().id(ID_cpp_name);
   args_decl_declor.name().get_sub().push_back(irept(ID_name));
   args_decl_declor.name().get_sub().back().add(ID_identifier).id(arg_name);
-  args_decl_declor.location() = location;
+  args_decl_declor.add_source_location() = source_location;
 
   args_decl_declor.type().id(ID_pointer);
   args_decl_declor.type().set("#reference", true);
@@ -507,11 +507,11 @@ void cpp_typecheckt::default_assignop_value(
   const symbolt &symbol,
   cpp_declaratort &declarator)
 {
-  // save location
-  locationt location=declarator.location();
+  // save source location
+  source_locationt source_location=declarator.source_location();
   declarator.make_nil();
 
-  declarator.value().location()=location;
+  declarator.value().add_source_location()=source_location;
   declarator.value().id(ID_code);
   declarator.value().set(ID_statement, ID_block);
   declarator.value().type()=code_typet();
@@ -531,7 +531,7 @@ void cpp_typecheckt::default_assignop_value(
     const symbolt &symb=
       lookup(parent_it->find(ID_type).get(ID_identifier));
 
-    copy_parent(location, symb.base_name, arg_name, block);
+    copy_parent(source_location, symb.base_name, arg_name, block);
   }
 
   // Then, we copy the members
@@ -568,10 +568,10 @@ void cpp_typecheckt::default_assignop_value(
 
       exprt::operandst empty_operands;
       for(mp_integer i = 0; i < size; ++i)
-        copy_array(location, mem_name,i,arg_name,block);
+        copy_array(source_location, mem_name,i,arg_name,block);
     }
     else
-      copy_member(location, mem_name, arg_name, block);
+      copy_member(source_location, mem_name, arg_name, block);
   }
 
   // Finally we add the return statement
@@ -916,7 +916,7 @@ void cpp_typecheckt::full_member_initialization(
     {
       exprt name(ID_name);
       name.set(ID_identifier,mem_it->get(ID_base_name));
-      name.location() = mem_it->location();
+      name.add_source_location() = mem_it->source_location();
 
       cpp_namet cppname;
       cppname.move_to_sub(name);
@@ -1177,7 +1177,7 @@ void cpp_typecheckt::default_dtor(
   irept name;
   name.id(ID_name);
   name.set(ID_identifier, "~"+id2string(symb.base_name));
-  name.set(ID_C_location, symb.location);
+  name.set(ID_C_source_location, symb.location);
 
   cpp_declaratort decl;
   decl.name().id(ID_cpp_name);
@@ -1214,9 +1214,9 @@ codet cpp_typecheckt::dtor(const symbolt &symb)
 {
   assert(symb.type.id() == ID_struct);
 
-  locationt location=symb.type.location();
+  source_locationt source_location=symb.type.source_location();
 
-  location.set_function(
+  source_location.set_function(
     id2string(symb.base_name)+
     "::~"+id2string(symb.base_name)+"()");
 
@@ -1281,7 +1281,7 @@ codet cpp_typecheckt::dtor(const symbolt &symb)
 
     irept name(ID_name);
     name.set(ID_identifier, cit->get(ID_base_name));
-    name.set(ID_C_location, location);
+    name.set(ID_C_source_location, source_location);
 
     cpp_namet cppname;
     cppname.get_sub().push_back(name);
@@ -1289,10 +1289,10 @@ codet cpp_typecheckt::dtor(const symbolt &symb)
     exprt member(ID_ptrmember);
     member.set("component_cpp_name", cppname);
     member.operands().push_back(exprt("cpp-this"));
-    member.location() = location;
+    member.add_source_location() = source_location;
 
     codet dtor_code=
-      cpp_destructor(location, cit->type(), member);
+      cpp_destructor(source_location, cit->type(), member);
 
     if(dtor_code.is_not_nil())
       block.move_to_operands(dtor_code);
@@ -1312,10 +1312,10 @@ codet cpp_typecheckt::dtor(const symbolt &symb)
 
     exprt object(ID_dereference);
     object.operands().push_back(exprt("cpp-this"));
-    object.location() = location;
+    object.add_source_location() = source_location;
 
     exprt dtor_code =
-      cpp_destructor(location, psymb.type, object);
+      cpp_destructor(source_location, psymb.type, object);
 
     if(dtor_code.is_not_nil())
       block.move_to_operands(dtor_code);

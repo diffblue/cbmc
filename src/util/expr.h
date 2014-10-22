@@ -130,16 +130,25 @@ public:
   
   friend bool operator<(const exprt &X, const exprt &Y);
   
-  const locationt &find_location() const;
+  // will go away
+  inline const source_locationt &find_location() const { return find_source_location(); }
 
-  inline const locationt &location() const
+  const source_locationt &find_source_location() const;
+
+  // will go away
+  inline const source_locationt &location() const
   {
-    return static_cast<const locationt &>(find(ID_C_location));
+    return static_cast<const source_locationt &>(find(ID_C_source_location));
   }
 
-  inline locationt &location()
+  inline const source_locationt &source_location() const
   {
-    return static_cast<locationt &>(add(ID_C_location));
+    return static_cast<const source_locationt &>(find(ID_C_source_location));
+  }
+
+  inline source_locationt &add_source_location()
+  {
+    return static_cast<source_locationt &>(add(ID_C_source_location));
   }
   
   inline exprt &add_expr(const irep_idt &name)

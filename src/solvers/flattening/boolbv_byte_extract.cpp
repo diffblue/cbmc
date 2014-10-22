@@ -97,6 +97,9 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
   mp_integer index;
   if(!to_integer(op1, index))
   {
+    if(index<0)
+      throw "byte_extract flatting with negative offset: "+expr.pretty();
+
     mp_integer offset=index*byte_width;
     
     unsigned offset_i=integer2unsigned(offset);

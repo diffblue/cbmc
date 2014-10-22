@@ -50,7 +50,7 @@ void goto_symext::replace_nondet(exprt &expr)
   {
     exprt new_expr(ID_nondet_symbol, expr.type());
     new_expr.set(ID_identifier, "symex::nondet"+i2string(nondet_count++));
-    new_expr.location()=expr.location();
+    new_expr.add_source_location()=expr.source_location();
     expr.swap(new_expr);
   }
   else

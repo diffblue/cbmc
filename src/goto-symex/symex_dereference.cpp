@@ -228,9 +228,7 @@ exprt goto_symext::address_arithmetic(
     result=address_of_exprt(result);
   }
   else
-  {
-    assert(false);
-  }
+    throw "goto_symext::address_arithmetic does not handle "+expr.id_string();
 
   const typet &expr_type=ns.follow(expr.type());
   assert((expr_type.id()==ID_array && !keep_array) ||
@@ -310,7 +308,7 @@ void goto_symext::dereference_rec(
     dereference_exprt tmp;
     tmp.pointer()=plus_exprt(address_of_expr, index_expr.index());
     tmp.type()=expr.type();
-    tmp.location()=expr.location();
+    tmp.add_source_location()=expr.source_location();
 
     // recursive call
     dereference_rec(tmp, state, guard, write);

@@ -16,11 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <cassert>
 
-class empty_nodet
+class empty_edget
 {
 };
 
-template<class E=empty_nodet>
+template<class E=empty_edget>
 class graph_nodet
 {
 public:
@@ -158,7 +158,7 @@ public:
   
   void remove_edge(unsigned a, unsigned b)
   {
-    nodes[a].erase_out(a);
+    nodes[a].erase_out(b);
     nodes[b].erase_in(a);
   }
   

@@ -97,7 +97,7 @@ public:
   bool cpp_is_pod(const typet &type) const;
 
   codet cpp_constructor(
-    const locationt &location,
+    const source_locationt &source_location,
     const exprt &object,
     const exprt::operandst &operands);
 
@@ -132,7 +132,7 @@ protected:
   //
   // Templates
   //
-  void salvage_default_parameters(
+  void salvage_default_arguments(
     const template_typet &old_type,
     template_typet &new_type);
 
@@ -168,14 +168,15 @@ protected:
     const typet &function_type);
 
   cpp_template_args_tct typecheck_template_args(
-    const locationt &location,
+    const source_locationt &source_location,
     const symbolt &template_symbol,
     const cpp_template_args_non_tct &template_args);
-    
+
+  // template instantiations    
   class instantiationt
   {
   public:
-    locationt location;
+    source_locationt source_location;
     irep_idt identifier;
     cpp_template_args_tct full_template_args;
   };
@@ -205,7 +206,7 @@ protected:
   };
   
   const symbolt &class_template_symbol(
-    const locationt &location,
+    const source_locationt &source_location,
     const symbolt &template_symbol,
     const cpp_template_args_tct &specialization_template_args,
     const cpp_template_args_tct &full_template_args);  
@@ -214,14 +215,14 @@ protected:
     const typet &type);
 
   const symbolt &instantiate_template(
-    const locationt &location,
+    const source_locationt &source_location,
     const symbolt &symbol,
     const cpp_template_args_tct &specialization_template_args,
     const cpp_template_args_tct &full_template_args,
     const typet &specialization=typet(ID_nil));
 
   void elaborate_class_template(
-    const locationt &location,
+    const source_locationt &source_location,
     const symbol_typet &type);
 
   unsigned template_counter;
@@ -249,9 +250,9 @@ protected:
     exprt &symbol_expr);
 
   void default_ctor(
-    const locationt& location,
+    const source_locationt &source_location,
     const irep_idt &base_name,
-    cpp_declarationt& ctor) const;
+    cpp_declarationt &ctor) const;
 
   void default_cpctor(
     const symbolt&, cpp_declarationt& cpctor) const;
@@ -289,17 +290,17 @@ protected:
     irep_idt &identifier);
 
   bool get_component(
-      const locationt& location,
-      const exprt& object,
-      const irep_idt& component_name,
-      exprt& member);
+    const source_locationt &source_location,
+    const exprt& object,
+    const irep_idt& component_name,
+    exprt& member);
 
-  void new_temporary(const locationt &location,
+  void new_temporary(const source_locationt &source_location,
                      const typet &,
                      const exprt::operandst &ops,
                      exprt &temporary);
 
-  void new_temporary(const locationt &location,
+  void new_temporary(const source_locationt &source_location,
                      const typet &,
                      const exprt &op,
                      exprt &temporary);
@@ -417,7 +418,7 @@ protected:
   void zero_initializer(
     const exprt &object,
     const typet &type,
-    const locationt &location,
+    const source_locationt &source_location,
     exprt::operandst &ops);
 
   // code conversion
@@ -433,7 +434,7 @@ protected:
   const struct_typet &this_struct_type();
 
   codet cpp_destructor(
-      const locationt &location,
+      const source_locationt &source_location,
       const typet &type,
       const exprt &object);
 

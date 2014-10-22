@@ -463,7 +463,7 @@ void ansi_c_convertt::convert_type(
 
         parameter.type().swap(declaration.type());
         parameter.set_base_name(base_name);
-        parameter.location()=declaration.location();
+        parameter.add_source_location()=declaration.location();
         parameter.set_identifier(declaration.get_name());
 
         it->swap(parameter);
@@ -521,7 +521,7 @@ void ansi_c_convertt::convert_type(
   
         exprt new_component(ID_component);
 
-        new_component.location()=component.location();
+        new_component.add_source_location()=component.location();
         new_component.set(ID_name, component.get_base_name());
         new_component.set(ID_pretty_name, component.get_base_name());
         new_component.type().swap(component.type());

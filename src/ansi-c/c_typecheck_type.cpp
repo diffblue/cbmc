@@ -189,7 +189,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     exprt f_expr=
       static_cast<const exprt &>(type.find(ID_f));
 
-    locationt location=f_expr.find_location();
+    source_locationt source_location=f_expr.find_source_location();
 
     typecheck_expr(f_expr);
     
@@ -198,13 +198,13 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(f_expr, f_int))
     {
-      err_location(location);
+      err_location(source_location);
       throw "failed to convert number of fraction bits to constant";
     }
 
     if(f_int<0 || f_int>size_int)
     {
-      err_location(location);
+      err_location(source_location);
       error("fixedbv fraction width invalid");
       throw 0;
     }
@@ -219,7 +219,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     exprt f_expr=
       static_cast<const exprt &>(type.find(ID_f));
       
-    locationt location=f_expr.find_location();
+    source_locationt source_location=f_expr.find_source_location();
 
     typecheck_expr(f_expr);
     
@@ -228,13 +228,13 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(f_expr, f_int))
     {
-      err_location(location);
+      err_location(source_location);
       throw "failed to convert number of fraction bits to constant";
     }
 
     if(f_int<1 || f_int+1>=size_int)
     {
-      err_location(location);
+      err_location(source_location);
       error("floatbv fraction width invalid");
       throw 0;
     }
@@ -310,7 +310,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         if(identifier==irep_idt())
         {
           // abstract
-          parameter.location()=declaration.type().location();
+          parameter.add_source_location()=declaration.type().source_location();
         }
         else
         {
@@ -319,7 +319,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
           // make visible now, later parameters might use it
           parameter_map[identifier]=type;
           parameter.set_base_name(declaration.declarator().get_base_name());
-          parameter.location()=declaration.declarator().location();
+          parameter.add_source_location()=declaration.declarator().source_location();
         }
         
         // put the parameter in place of the declaration
@@ -373,7 +373,7 @@ Function: c_typecheck_baset::typecheck_array_type
 void c_typecheck_baset::typecheck_array_type(array_typet &type)
 {
   exprt &size=type.size();
-  locationt location=size.find_location();
+  source_locationt source_location=size.find_source_location();
 
   // check subtype
   typecheck_type(type.subtype());
@@ -404,7 +404,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       mp_integer s;
       if(to_integer(tmp_size, s))
       {
-        err_location(location);
+        err_location(source_location);
         str << "failed to convert constant: "
             << tmp_size.pretty();
         throw 0;
@@ -412,7 +412,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
 
       if(s<0)
       {
-        err_location(location);
+        err_location(source_location);
         str << "array size must not be negative, "
                "but got " << s;
         throw 0;
@@ -448,7 +448,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
           current_symbol_id);
       
       // Need to pull out! We insert new symbol.
-      locationt location=size.find_location();
+      source_locationt source_location=size.find_source_location();
       unsigned count=0;
       irep_idt temp_identifier;
       std::string suffix;
@@ -473,7 +473,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       new_symbol.is_thread_local=true;
       new_symbol.is_static_lifetime=false;
       new_symbol.value.make_nil();
-      new_symbol.location=location;
+      new_symbol.location=source_location;
       
       symbol_table.add(new_symbol);
 
@@ -483,12 +483,12 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       symbol_expr.type()=new_symbol.type;
       
       code_declt declaration(symbol_expr);
-      declaration.location()=location;
+      declaration.add_source_location()=source_location;
 
       code_assignt assignment;
       assignment.lhs()=symbol_expr;
       assignment.rhs()=size;
-      assignment.location()=location;
+      assignment.add_source_location()=source_location;
 
       // store the code
       clean_code.push_back(declaration);
@@ -515,7 +515,7 @@ Function: c_typecheck_baset::typecheck_vector_type
 void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 {
   exprt &size=type.size();
-  locationt size_location=size.find_location();
+  source_locationt size_location=size.find_source_location();
 
   typecheck_expr(size);
   
@@ -607,7 +607,7 @@ Function: c_typecheck_baset::typecheck_compound_type
 
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
-  // These get replaced by symbol types.
+  // These get replaced by symbol types later.
   irep_idt identifier;
   
   bool have_body=type.find(ID_components).is_not_nil();
@@ -621,7 +621,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     symbolt compound_symbol;
     compound_symbol.is_type=true;
     compound_symbol.type=type;
-    compound_symbol.location=type.location();
+    compound_symbol.location=type.source_location();
 
     typecheck_compound_body(compound_symbol);
 
@@ -659,7 +659,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       compound_symbol.name=identifier;
       compound_symbol.base_name=base_name;
       compound_symbol.type=type;
-      compound_symbol.location=type.location();
+      compound_symbol.location=type.source_location();
       compound_symbol.pretty_name=id2string(type.id())+" "+id2string(base_name);
 
       if(have_body)
@@ -711,7 +711,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   }
 
   symbol_typet symbol_type;
-  symbol_type.location()=type.location();
+  symbol_type.add_source_location()=type.source_location();
   symbol_type.set_identifier(identifier);
 
   type.swap(symbol_type);
@@ -753,7 +753,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
     {
       struct_union_typet::componentt new_component;
       new_component.id(ID_static_assert);
-      new_component.location()=declaration.location();
+      new_component.add_source_location()=declaration.source_location();
       new_component.operands().swap(declaration.operands());
       assert(new_component.operands().size()==2);
       components.push_back(new_component);
@@ -771,7 +771,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
       {
         struct_union_typet::componentt new_component;
 
-        new_component.location()=d_it->location();
+        new_component.add_source_location()=d_it->source_location();
         new_component.set(ID_name, d_it->get_base_name());
         new_component.set(ID_pretty_name, d_it->get_base_name());
         new_component.type()=declaration.full_type(*d_it);
@@ -923,15 +923,15 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   // of the enum constants as operands.
   
   exprt &as_expr=static_cast<exprt &>(static_cast<irept &>(type));
-  locationt location=type.location();
+  source_locationt source_location=type.source_location();
   
   if(as_expr.operands().empty())
   {
-    // tag only
+    // It's just a tag.
     if(type.find(ID_tag).is_nil())
     {
-      err_location(location);
-      throw "anon enum tag without members";
+      err_location(source_location);
+      throw "anonymous enum tag without members";
     }
     
     irept &tag=type.add(ID_tag);
@@ -959,7 +959,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       }
       else
       {
-        err_location(location);
+        err_location(source_location);
         throw "use of tag that does not match previous declaration";
       }
     }
@@ -973,7 +973,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     
       enum_tag_symbol.is_type=true;
       enum_tag_symbol.type=type;
-      enum_tag_symbol.location=location;
+      enum_tag_symbol.location=source_location;
       enum_tag_symbol.is_file_local=true;
       enum_tag_symbol.base_name=base_name;
       enum_tag_symbol.name=identifier;
@@ -981,6 +981,12 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       symbolt *new_symbol;
       move_symbol(enum_tag_symbol, new_symbol);
     }
+    
+    // We produce a c_enum_tag as the resulting type.
+    type.id(ID_c_enum_tag);
+    type.remove(ID_tag);
+    type.remove(ID_subtype);
+    type.set(ID_identifier, identifier);
   }
   else
   {
@@ -989,6 +995,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     
     // track min and max to find a nice base type
     mp_integer min_value=0, max_value=0;
+    
+    std::list<enum_constantt> enum_constants;
     
     Forall_operands(it, as_expr)
     {
@@ -1005,14 +1013,21 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
       typecheck_declaration(declaration);
       
-      // produce value for next constant
-      const symbolt &symbol=
-        lookup(language_prefix+id2string(declaration.declarator().get_name()));
+      irep_idt identifier=
+        language_prefix+id2string(declaration.declarator().get_name());
+        
+      // get value
+      const symbolt &symbol=lookup(identifier);
+
       to_integer(symbol.value, value);
+
+      // store      
+      enum_constants.push_back(enum_constantt(identifier, value));
       
       if(value<min_value) min_value=value;
       if(value>max_value) max_value=value;
       
+      // produce value for next constant
       ++value;
     }
     
@@ -1066,7 +1081,11 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     type.subtype().set(ID_width, bits);
     
     // tag?
-    if(type.find(ID_tag).is_not_nil())
+    if(type.find(ID_tag).is_nil())
+    {
+      // none
+    }
+    else
     {
       irept &tag=type.add(ID_tag);
       irep_idt base_name=tag.get(ID_C_base_name);
@@ -1078,12 +1097,22 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     
       enum_tag_symbol.is_type=true;
       enum_tag_symbol.type=type;
-      enum_tag_symbol.location=location;
+      enum_tag_symbol.location=source_location;
       enum_tag_symbol.is_file_local=true;
       enum_tag_symbol.base_name=base_name;
       enum_tag_symbol.name=identifier;
+      
+      // throw in the enum constants
+      for(std::list<enum_constantt>::const_iterator
+          it=enum_constants.begin();
+          it!=enum_constants.end();
+          it++)
+      {
+        enum_tag_symbol.type.get_sub().push_back(irept());
+        enum_tag_symbol.type.get_sub().back().set(ID_identifier, it->identifier);
+        enum_tag_symbol.type.get_sub().back().set(ID_value, integer2string(it->value));
+      }
     
-
       // is it in the symbol table already?
       symbol_tablet::symbolst::iterator s_it=
         symbol_table.symbols.find(identifier);
@@ -1106,7 +1135,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
         }
         else
         {
-          err_location(location);
+          err_location(source_location);
           throw "use of tag that does not match previous declaration";
         }
       }
@@ -1115,6 +1144,12 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
         symbolt *new_symbol;
         move_symbol(enum_tag_symbol, new_symbol);
       }
+
+      // We produce a c_enum_tag as the resulting type.
+      type.id(ID_c_enum_tag);
+      type.remove(ID_tag);
+      type.remove(ID_subtype);
+      type.set(ID_identifier, identifier);
     }
   }
 }
@@ -1153,7 +1188,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
     throw "bit field width is negative";
   }
   
-  locationt location=type.location();
+  source_locationt source_location=type.source_location();
   
   const typet &subtype=follow(type.subtype());
 
@@ -1168,7 +1203,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
     // We don't use bool, as it's really a byte long.
     type=unsignedbv_typet(1);
     type.set(ID_C_c_type, ID_bool);
-    type.location()=location;
+    type.add_source_location()=source_location;
   }
   else if(subtype.id()==ID_signedbv ||
           subtype.id()==ID_unsignedbv)
@@ -1184,7 +1219,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
     typet tmp(subtype);
     type.swap(tmp);
     type.set(ID_width, integer2string(i));
-    type.location()=location;
+    type.add_source_location()=source_location;
   }
   else if(subtype.id()==ID_c_enum)
   {
@@ -1200,7 +1235,27 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
     typet tmp=subtype;
     type.swap(tmp);
     type.subtype().set(ID_width, integer2string(i));
-    type.location()=location;
+    type.add_source_location()=source_location;
+  }
+  else if(subtype.id()==ID_c_enum_tag)
+  {
+    // These have a sub-subtype, which we need to adjust.
+    const typet &c_enum_type=
+      follow_tag(to_c_enum_tag_type(subtype));
+    
+    unsigned width=
+      c_enum_type.subtype().get_int(ID_width);
+
+    if(i>width)
+    {
+      err_location(type);
+      throw "bit field width too large";
+    }
+
+    typet tmp=c_enum_type;
+    type.swap(tmp);
+    type.subtype().set(ID_width, integer2string(i));
+    type.add_source_location()=source_location;
   }
   else
   {
@@ -1226,7 +1281,7 @@ Function: c_typecheck_baset::typecheck_typeof_type
 void c_typecheck_baset::typecheck_typeof_type(typet &type)
 {
   // save location
-  locationt location=type.location();
+  source_locationt source_location=type.source_location();
 
   // retain the qualifiers as is
   c_qualifierst c_qualifiers;
@@ -1256,7 +1311,7 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
     type.swap(expr.type());
   }
   
-  type.location()=location;
+  type.add_source_location()=source_location;
   c_qualifiers.write(type);
 }
 

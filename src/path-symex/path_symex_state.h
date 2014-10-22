@@ -200,6 +200,9 @@ protected:
     const exprt &src,
     bool propagate);
 
+  exprt expand_structs_and_arrays(const exprt &src);
+  exprt array_theory(const exprt &src, bool propagate);
+
   exprt instantiate_rec_address(
     const exprt &src,
     bool propagate);
@@ -207,6 +210,8 @@ protected:
   exprt read_symbol_member_index(
     const exprt &src,
     bool propagate);
+
+  bool is_symbol_member_index(const exprt &src) const;
 };
 
 path_symex_statet initial_state(

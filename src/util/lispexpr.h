@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 #include <vector>
-#include <ostream>
+#include <iosfwd>
 
 class lispsymbolt:public std::string
 {

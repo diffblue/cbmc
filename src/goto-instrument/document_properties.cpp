@@ -53,7 +53,7 @@ private:
   static void strip_space(std::list<linet> &lines);
 
   void get_code(
-    const locationt &location,
+    const source_locationt &source_location,
     std::string &dest);
     
   struct doc_claimt
@@ -204,13 +204,13 @@ Function: document_propertiest::get_code
 \*******************************************************************/
 
 void document_propertiest::get_code(
-  const locationt &location,
+  const source_locationt &source_location,
   std::string &dest)
 {
   dest="";
 
-  const irep_idt &file=location.get_file();
-  const irep_idt &line=location.get_line();
+  const irep_idt &file=source_location.get_file();
+  const irep_idt &line=source_location.get_line();
 
   if(file=="" || line=="") return;
 
@@ -337,7 +337,7 @@ Function: document_propertiest::doit
 
 void document_propertiest::doit()
 {
-  typedef std::map<locationt, doc_claimt> claim_sett;
+  typedef std::map<source_locationt, doc_claimt> claim_sett;
   claim_sett claim_set;
 
   forall_goto_functions(f_it, goto_functions)
@@ -348,14 +348,14 @@ void document_propertiest::doit()
     {
       if(i_it->is_assert())
       {
-        locationt new_location;
+        source_locationt new_source_location;
 
-        new_location.set_file(i_it->location.get_file());
-        new_location.set_line(i_it->location.get_line());
-        new_location.set_function(i_it->location.get_function());
+        new_source_location.set_file(i_it->source_location.get_file());
+        new_source_location.set_line(i_it->source_location.get_line());
+        new_source_location.set_function(i_it->source_location.get_function());
 
-        claim_set[new_location].comment_set.
-          insert(i_it->location.get_comment());
+        claim_set[new_source_location].comment_set.
+          insert(i_it->source_location.get_comment());
       }
     }
   }
@@ -364,17 +364,17 @@ void document_propertiest::doit()
       it!=claim_set.end(); it++)
   {
     std::string code;
-    const locationt &location=it->first;
+    const source_locationt &source_location=it->first;
 
-    get_code(location, code);
+    get_code(source_location, code);
 
     switch(format)
     {
     case LATEX:
       out << "\\claimlocation{File "
-          << escape_latex(location.get_string("file"), false)
+          << escape_latex(source_location.get_string("file"), false)
           << " function "
-          << escape_latex(location.get_string("function"), false)
+          << escape_latex(source_location.get_string("function"), false)
           << "}" << std::endl;
 
       out << std::endl;
@@ -399,9 +399,9 @@ void document_propertiest::doit()
     case HTML:
       out << "<div class=\"claim\">" << std::endl
           << "<div class=\"location\">File "
-          << escape_html(location.get_string("file"))
+          << escape_html(source_location.get_string("file"))
           << " function "
-          << escape_html(location.get_string("function"))
+          << escape_html(source_location.get_string("function"))
           << "</div>" << std::endl;
 
       out << std::endl;

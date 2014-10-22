@@ -112,7 +112,7 @@ void ui_message_handlert::print(
   {
     if(get_ui()==XML_UI)
     {
-      locationt location;
+      source_locationt location;
       location.make_nil();
       print(level, message, -1, location);
     }
@@ -140,7 +140,7 @@ void ui_message_handlert::print(
   unsigned level,
   const std::string &message,
   int sequence_number,
-  const locationt &location)
+  const source_locationt &location)
 {
   if(verbosity>=level)
   {
@@ -182,7 +182,7 @@ void ui_message_handlert::ui_msg(
   const std::string &type,
   const std::string &msg1,
   const std::string &msg2,
-  const locationt &location)
+  const source_locationt &location)
 {
   xml_ui_msg(type, msg1, msg2, location);
 }
@@ -203,7 +203,7 @@ void ui_message_handlert::xml_ui_msg(
   const std::string &type,
   const std::string &msg1,
   const std::string &msg2,
-  const locationt &location)
+  const source_locationt &location)
 {
   xmlt result;
   result.name="message";

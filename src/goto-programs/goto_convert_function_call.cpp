@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/replace_expr.h>
 #include <util/expr_util.h>
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
@@ -169,7 +169,7 @@ void goto_convertt::do_function_call_if(
   v->make_goto(y);
   v->guard=function.op0();
   v->guard.make_not();
-  v->location=function.op0().location();
+  v->source_location=function.op0().source_location();
 
   // w: f();
   goto_programt tmp_w;
@@ -211,11 +211,11 @@ void goto_convertt::do_function_call_dereference(
   goto_programt::targett t=dest.add_instruction(FUNCTION_CALL);
 
   code_function_callt function_call;
-  function_call.location()=function.location();
+  function_call.add_source_location()=function.source_location();
   function_call.lhs()=lhs;
   function_call.function()=function;
   function_call.arguments()=arguments;
   
-  t->location=function.location();
+  t->source_location=function.source_location();
   t->code.swap(function_call);
 }

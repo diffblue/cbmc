@@ -38,17 +38,21 @@ else
   CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
 endif
   #LINKFLAGS = -static
-ifeq ($(BUILD_ENV_),OSX_Universal)
-  # MacOS Fat Binaries
-  CP_CXXFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
-  CP_CFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
-  LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
+ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
+  ifeq ($(BUILD_ENV_),OSX_Universal)
+    # MacOS Fat Binaries
+    CP_CXXFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
+    CP_CFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
+    LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
+  endif
   LINKLIB = /usr/bin/libtool -static -o $@ $^
-else
-  LINKLIB = ld -r -o $@ $^
-endif
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
+else
+  LINKLIB = ar rcT $@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
+  LINKNATIVE = $(HOSTCXX) -o $@ $^
+endif
 ifeq ($(origin CC),default)
   CC     = gcc
   #CC     = icc
@@ -73,21 +77,19 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   EXEEXT = .exe
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
-  CP_CFLAGS = -MMD -MP -mno-cygwin
-  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_GNU -mno-cygwin
-  LINKFLAGS = -static -mno-cygwin
-  LINKLIB = ld -r -o $@ $^
-  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
-  LINKNATIVE = $(HOSTCXX) -o $@ $^
+  CP_CFLAGS = -MMD -MP
+  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
+  LINKFLAGS = -static
+  LINKLIB = ar rcT $@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
+  LINKNATIVE = $(HOSTCXX) -o $@ $^ -static
 ifeq ($(origin CC),default)
-  CC     = gcc
-  #GCC 4.5.3 is broken
-	#CC = i686-pc-mingw32-gcc
+  #CC = gcc
+  CC = i686-pc-mingw32-gcc
 endif
 ifeq ($(origin CXX),default)
-  CXX    = g++
-  #GCC 4.5.3 is broken
-  #CXX = i686-pc-mingw32-g++
+  #CXX    = g++
+  CXX = i686-pc-mingw32-g++
 endif
 ifeq ($(origin YACC),default)
   YACC   = bison -y

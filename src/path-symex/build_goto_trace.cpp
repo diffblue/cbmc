@@ -111,7 +111,7 @@ void build_goto_trace(
     trace_step.type=goto_trace_stept::ASSERT;
 
     const irep_idt &comment=
-      instruction.location.get_comment();
+      instruction.source_location.get_comment();
 
     if(comment!=irep_idt())
       trace_step.comment=id2string(comment);

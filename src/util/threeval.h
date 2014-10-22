@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_THREEVAL_H
 #define CPROVER_THREEVAL_H
 
-#include <ostream>
+#include <iosfwd>
 
 //
 // three valued logic
@@ -80,14 +80,10 @@ public:
     return tvt(TV_TRUE);
   }
 
-  inline friend std::ostream &operator << (std::ostream &out, const tvt &a)
-  {
-    return out << a.to_string();
-  }
-
 protected:
   tv_enumt value;
 };
 
+std::ostream &operator << (std::ostream &out, const tvt &a);
 
 #endif

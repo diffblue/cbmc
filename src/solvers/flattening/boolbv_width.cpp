@@ -229,6 +229,12 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   }
   else if(type_id==ID_symbol)
     entry=get_entry(ns.follow(type));
+  else if(type_id==ID_struct_tag)
+    entry=get_entry(ns.follow_tag(to_struct_tag_type(type)));
+  else if(type_id==ID_union_tag)
+    entry=get_entry(ns.follow_tag(to_union_tag_type(type)));
+  else if(type_id==ID_c_enum_tag)
+    entry=get_entry(ns.follow_tag(to_c_enum_tag_type(type)));
   
   return entry;
 }

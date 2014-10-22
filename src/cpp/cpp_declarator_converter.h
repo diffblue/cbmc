@@ -27,7 +27,7 @@ public:
 
   bool is_typedef;
   bool is_template;
-  bool is_template_argument;
+  bool is_template_parameter;
   bool is_friend;
   irep_idt linkage_spec;
 
@@ -85,7 +85,7 @@ protected:
   }
 
   void combine_types(
-    const locationt &location,
+    const source_locationt &source_location,
     const typet &decl_type,
     symbolt &symbol);
 };

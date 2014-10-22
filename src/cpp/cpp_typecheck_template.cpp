@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::salvage_default_parameters
+Function: cpp_typecheckt::salvage_default_arguments
 
   Inputs:
 
@@ -30,7 +30,7 @@ Function: cpp_typecheckt::salvage_default_parameters
 
 \*******************************************************************/
 
-void cpp_typecheckt::salvage_default_parameters(
+void cpp_typecheckt::salvage_default_arguments(
   const template_typet &old_type,
   template_typet &new_type)
 {
@@ -40,11 +40,11 @@ void cpp_typecheckt::salvage_default_parameters(
   for(unsigned i=0; i<new_parameters.size(); i++)
   {
     if(i<old_parameters.size() &&
-       old_parameters[i].has_default_parameter() &&
-       !new_parameters[i].has_default_parameter())
+       old_parameters[i].has_default_argument() &&
+       !new_parameters[i].has_default_argument())
     {
       // TODO! The default may depend on previous parameters!!
-      new_parameters[i].default_parameter()=old_parameters[i].default_parameter();
+      new_parameters[i].default_argument()=old_parameters[i].default_argument();
     }
   }
 }
@@ -110,7 +110,7 @@ void cpp_typecheckt::typecheck_class_template(
 
   if(cpp_name.is_nil())
   {
-    err_location(type.location());
+    err_location(type.source_location());
     throw "class templates must not be anonymous";
   }
 
@@ -184,7 +184,7 @@ void cpp_typecheckt::typecheck_class_template(
     {
       // We replace the template!
       // We have to retain any default parameters from the previous declaration.
-      salvage_default_parameters(
+      salvage_default_arguments(
         previous_declaration.template_type(),
         declaration.template_type());
       
@@ -205,8 +205,8 @@ void cpp_typecheckt::typecheck_class_template(
     }
     else
     {
-      // just update any default parameters
-      salvage_default_parameters(
+      // just update any default arguments
+      salvage_default_arguments(
         declaration.template_type(),
         previous_declaration.template_type());
     }
@@ -532,6 +532,9 @@ std::string cpp_typecheckt::class_template_identifier(
         it++, counter++)
     {  
       if(counter!=0) identifier+=',';
+      
+      // These are not yet typechecked, as they may depend
+      // on unassigned template parameters.
 
       if(it->id()==ID_type || it->id()=="ambiguous")
         identifier+=cpp_type2name(it->type());
@@ -651,7 +654,7 @@ void cpp_typecheckt::convert_class_template_specialization(
   // only one should be left
   if(id_set.empty())
   {
-    err_location(type.location());
+    err_location(type.source_location());
     str << "class template `" << base_name << "' not found";
     throw 0;
   }
@@ -682,7 +685,7 @@ void cpp_typecheckt::convert_class_template_specialization(
     // typecheck arguments -- these are for the 'primary' template!
     cpp_template_args_tct template_args_tc=
       typecheck_template_args(
-        declaration.location(),
+        declaration.source_location(),
         to_cpp_declaration(template_symbol.type).template_type(),
         template_args_non_tc);
     
@@ -698,19 +701,10 @@ void cpp_typecheckt::convert_class_template_specialization(
   #endif
   
   {
-    // partial -- we typecheck
+    // partial specialization -- we typecheck
     declaration.partial_specialization_args()=template_args_non_tc;
     declaration.set_specialization_of(template_symbol.name);
 
-    // We can't typecheck arguments yet, they are used
-    // for guessing later. But we can check the number.
-    if(template_args_non_tc.arguments().size()!=
-       to_cpp_declaration(template_symbol.type).template_type().template_parameters().size())
-    {
-      err_location(cpp_name.location());
-      throw "template specialization with wrong number of arguments";
-    }    
-    
     typecheck_class_template(declaration);
   }
 }
@@ -794,7 +788,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
 
     cpp_template_args_tct template_args=
       typecheck_template_args(
-        declaration.location(),
+        declaration.source_location(),
         template_symbol,
         to_cpp_template_args_non_tc(cpp_name.get_sub()[1]));
 
@@ -857,7 +851,8 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
   cpp_scopes.go_to(template_scope);
 
   // put template parameters into this scope
-  template_typet::template_parameterst &parameters=type.template_parameters();
+  template_typet::template_parameterst &parameters=
+    type.template_parameters();
 
   unsigned anon_count=0;
 
@@ -887,12 +882,56 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
       declarator.name().get_sub().push_back(name);
     }
 
-    cpp_declarator_converter.is_typedef=declaration.get_bool(ID_is_type);
-    cpp_declarator_converter.is_template_argument=true;
+    #if 1
+    // The declarator needs to be just a name
+    if(declarator.name().get_sub().size()!=1 ||
+       declarator.name().get_sub().front().id()!=ID_name)
+    {
+      err_location(declaration);
+      throw "template parameter must be simple name";
+    }
+    
+    cpp_scopet &scope=cpp_scopes.current_scope();
+    
+    irep_idt base_name=declarator.name().get_sub().front().get(ID_identifier);
+    irep_idt identifier="c::"+scope.prefix+id2string(base_name);
+    
+    // add to scope
+    cpp_idt &id=scope.insert(base_name);
+    id.identifier=identifier;
+    id.id_class=cpp_idt::TEMPLATE_PARAMETER;
+    
+    // is it a type or not?
+    if(declaration.get_bool(ID_is_type))
+    {
+      parameter=exprt(ID_type, typet(ID_symbol));
+      parameter.type().set(ID_identifier, identifier);
+      parameter.type().add_source_location()=declaration.find_location();
+    }
+    else
+    {
+      // The type is not checked, as it might depend
+      // on earlier parameters.
+      typet type=declaration.type();
+      parameter=symbol_exprt(identifier, type);
+    }
 
-    // There might be a default type or value.
+    // There might be a default type or default value.
     // We store it for later, as it can't be typechecked now
-    // because of dependencies on earlier parameters!
+    // because of possible dependencies on earlier parameters!
+    if(declarator.value().is_not_nil())
+      parameter.add(ID_C_default_value)=declarator.value();
+    
+    #else    
+    // is it a type or not?
+    cpp_declarator_converter.is_typedef=declaration.get_bool(ID_is_type);
+
+    // say it a template parameter
+    cpp_declarator_converter.is_template_parameter=true;
+
+    // There might be a default type or default value.
+    // We store it for later, as it can't be typechecked now
+    // because of possible dependencies on earlier parameters!
     exprt default_value=declarator.value();
     declarator.value().make_nil();
 
@@ -903,7 +942,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     {
       parameter=exprt(ID_type, typet(ID_symbol));
       parameter.type().set(ID_identifier, symbol.name);
-      parameter.type().location()=declaration.find_location();
+      parameter.type().add_source_location()=declaration.find_location();
     }
     else
       parameter=symbol.symbol_expr();
@@ -912,7 +951,8 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     if(default_value.is_not_nil())
       parameter.add(ID_C_default_value)=default_value;
 
-    parameter.location()=declaration.find_location();
+    parameter.add_source_location()=declaration.find_location();
+    #endif
   }
 
   // continue without adding to the prefix
@@ -934,7 +974,7 @@ Function: cpp_typecheckt::typecheck_template_args
 \*******************************************************************/
 
 cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
-  const locationt &location,
+  const source_locationt &source_location,
   const symbolt &template_symbol,
   const cpp_template_args_non_tct &template_args)
 {
@@ -958,7 +998,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     
   if(parameters.size()<args.size())
   {
-    err_location(location);
+    err_location(source_location);
     str << "too many template arguments (expected "
         << parameters.size() << ", but got "
         << args.size() << ")";
@@ -969,7 +1009,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   template_mapt old_template_map;
   old_template_map=template_map;
 
-  // check for default parameters
+  // check for default arguments
   for(unsigned i=0; i<parameters.size(); i++)
   {
     const template_parametert &parameter=parameters[i];
@@ -977,17 +1017,17 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     
     if(i>=args.size())
     {
-      // Check for default parameter.
+      // Check for default argument for the parameter.
       // These may depend on previous arguments.
-      if(!parameter.has_default_parameter())
+      if(!parameter.has_default_argument())
       {
-        err_location(location);
+        err_location(source_location);
         str << "not enough template arguments (expected "
             << parameters.size() << ", but got " << args.size() << ")";
         throw 0;
       }
 
-      args.push_back(parameter.default_parameter());
+      args.push_back(parameter.default_argument());
       
       // these need to be typechecked in the scope of the template,
       // not in the current scope!
@@ -1034,13 +1074,28 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         arg.swap(e);
       }
 
+      typet type=parameter.type();
+
+      // First check the parameter type (might have ealier
+      // type parameters in it). Needs to be checked in scope
+      // of template.
+      {
+        cpp_save_scopet cpp_saved_scope(cpp_scopes);
+        cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
+        assert(template_scope!=NULL);
+        cpp_scopes.go_to(*template_scope);
+        typecheck_type(type);
+      }
+      
+      // Now check the argument to match that.
       typecheck_expr(arg);
       simplify(arg, *this);
-      implicit_typecast(arg, parameter.type());
+      implicit_typecast(arg, type);
     }
     
-    // set right away -- this is for the benefit of default
-    // parameters
+    // Set right away -- this is for the benefit of default
+    // arguments and later parameters whose type might
+    // depend on an earlier parameter.
     
     template_map.set(parameter, arg);
   }
@@ -1090,7 +1145,8 @@ void cpp_typecheckt::convert_template_declaration(
   // there are
   // 1) function templates
   // 2) class templates
-  // 3) members of class templates (static or methods)
+  // 3) template members of class templates (static or methods)
+  // 4) variable templates (C++14)
 
   if(declaration.is_class_template())
   {
@@ -1121,13 +1177,13 @@ void cpp_typecheckt::convert_template_declaration(
     typecheck_class_template(declaration);
     return;
   }
-  else // maybe function template, maybe class template member
+  else // maybe function template, maybe class template member, maye template variable
   {
     // there should be declarators in either case
     if(declaration.declarators().empty())
     {
       err_location(declaration);
-      throw "function template or class template member expected to have declarator";
+      throw "non-class template is expected to have a declarator";
     }
 
     // Is it function template specialization?

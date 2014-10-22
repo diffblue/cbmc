@@ -77,17 +77,17 @@ void stack_depth(
   binary_relation_exprt guard(symbol, ID_le, max_depth);
   goto_programt::targett assert_ins=goto_program.insert_before(first);
   assert_ins->make_assertion(guard);
-  assert_ins->location=first->location;
+  assert_ins->source_location=first->source_location;
   assert_ins->function=first->function;
 
-  assert_ins->location.set_comment("Stack depth exceeds "+i2string(i_depth));
-  assert_ins->location.set_property_class("stack-depth");
+  assert_ins->source_location.set_comment("Stack depth exceeds "+i2string(i_depth));
+  assert_ins->source_location.set_property_class("stack-depth");
 
   goto_programt::targett plus_ins=goto_program.insert_before(first);
   plus_ins->make_assignment();
   plus_ins->code=code_assignt(symbol,
       plus_exprt(symbol, from_integer(1, symbol.type())));
-  plus_ins->location=first->location;
+  plus_ins->source_location=first->source_location;
   plus_ins->function=first->function;
 
   goto_programt::targett last=--goto_program.instructions.end();
@@ -97,7 +97,7 @@ void stack_depth(
   minus_ins.make_assignment();
   minus_ins.code=code_assignt(symbol,
       minus_exprt(symbol, from_integer(1, symbol.type())));
-  minus_ins.location=last->location;
+  minus_ins.source_location=last->source_location;
   minus_ins.function=last->function;
 
   goto_program.insert_before_swap(last, minus_ins);
@@ -139,7 +139,7 @@ void stack_depth(
   goto_programt::targett it=init.insert_before(first);
   it->make_assignment();
   it->code=code_assignt(sym, from_integer(0, sym.type()));
-  it->location=first->location;
+  it->source_location=first->source_location;
   it->function=first->function;
 
   // update counters etc.

@@ -187,11 +187,13 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
     if(dest_type.id()==ID_c_enum) return false;
+    if(dest_type.id()==ID_c_enum_tag) return false;
     if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_unsignedbv ||
           src_type_id==ID_signedbv ||
           src_type_id==ID_c_enum ||
+          src_type_id==ID_c_enum_tag ||
           src_type_id==ID_incomplete_c_enum)
   {
     if(dest_type.id()==ID_unsignedbv) return false;
@@ -204,6 +206,7 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_fixedbv) return false;
     if(dest_type.id()==ID_pointer) return false;
     if(dest_type.id()==ID_c_enum) return false;
+    if(dest_type.id()==ID_c_enum_tag) return false;
     if(dest_type.id()==ID_incomplete_c_enum) return false;
     if(dest_type.id()==ID_complex) return false;
   }
@@ -388,6 +391,7 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     return PTR;
   }
   else if(type.id()==ID_c_enum ||
+          type.id()==ID_c_enum_tag ||
           type.id()==ID_incomplete_c_enum)
   {
     return INT;
@@ -602,8 +606,8 @@ void c_typecastt::implicit_typecast_followed(
       {
         // ok
       }
-      else if((is_number(src_sub) || src_sub.id()==ID_c_enum) &&
-              (is_number(dest_sub) || dest_sub.id()==ID_c_enum))
+      else if((is_number(src_sub) || src_sub.id()==ID_c_enum || src_sub.id()==ID_c_enum_tag) &&
+              (is_number(dest_sub) || dest_sub.id()==ID_c_enum || src_sub.id()==ID_c_enum_tag))
       {
         // Also generous: between any to scalar types it's ok.
         // We should probably check the size.

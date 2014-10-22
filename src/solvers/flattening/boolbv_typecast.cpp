@@ -105,6 +105,7 @@ bool boolbvt::type_conversion(
        dest_type.id()==ID_floatbv ||
        dest_type.id()==ID_fixedbv ||
        dest_type.id()==ID_c_enum ||
+       dest_type.id()==ID_c_enum_tag ||
        dest_type.id()==ID_bool)
     {
       // A cast from complex x to real T

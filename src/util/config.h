@@ -88,7 +88,7 @@ public:
     void set_arch_spec_mips(const irep_idt &subarch);
     void set_arch_spec_s390();
     void set_arch_spec_s390x();
-    void set_arch_spec_sparc();
+    void set_arch_spec_sparc(const irep_idt &subarch);
     void set_arch_spec_ia64();
     void set_arch_spec_x32();
     

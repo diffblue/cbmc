@@ -659,7 +659,7 @@ inline void *memmove(void *dest, const void *src, size_t n)
 inline int memcmp(const void *s1, const void *s2, size_t n)
 {
   __CPROVER_HIDE:;
-  int res;
+  int res=0;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_buffer_size(s1)>=n, "memcmp buffer overflow of 1st argument");
   __CPROVER_assert(__CPROVER_buffer_size(s2)>=n, "memcmp buffer overflow of 2nd argument");

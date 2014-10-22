@@ -1754,7 +1754,8 @@ void smt2_convt::convert_expr(const exprt &expr)
                       "((_ extract " << (width-1) << " " << (width-1) << ") ?sum)";
       out << ")))"; // =, not, let
     }
-    else if(op_type.id()==ID_unsignedbv)
+    else if(op_type.id()==ID_unsignedbv ||
+            op_type.id()==ID_pointer)
     {
       // overflow is simply carry-out
       out << "(= ";
@@ -4421,7 +4422,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       irep_idt id="string."+i2string(defined_expressions.size());
       out << "; the following is a substitute for a string" << "\n";
       out << "(declare-fun " << id << " () ";
-      convert_type(expr.type());
+      convert_type(array_type);
       out << ")" << "\n";
 
       for(unsigned i=0; i<tmp.operands().size(); i++)
@@ -4514,6 +4515,7 @@ void smt2_convt::convert_type(const typet &type)
     const typet &subtype=ns.follow(array_type.subtype());
 
     out << "(Array ";
+    assert(array_type.size().is_not_nil());
     convert_type(array_type.size().type());
     out << " ";
 

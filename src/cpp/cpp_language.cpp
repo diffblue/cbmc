@@ -150,36 +150,33 @@ bool cpp_languaget::parse(
   cpp_parser.set_file(path);
   cpp_parser.in=&i_preprocessed;
   cpp_parser.set_message_handler(get_message_handler());
-  cpp_parser.grammar=cpp_parsert::LANGUAGE;
 
   switch(config.ansi_c.mode)
   {
   case configt::ansi_ct::MODE_CODEWARRIOR_C_CPP:
-    cpp_parser.mode=cpp_parsert::CW;
+    cpp_parser.mode=ansi_c_parsert::CW;
     break;
    
   case configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP:
-    cpp_parser.mode=cpp_parsert::MSC;
+    cpp_parser.mode=ansi_c_parsert::MSC;
     break;
     
   case configt::ansi_ct::MODE_ANSI_C_CPP:
-    cpp_parser.mode=cpp_parsert::ANSI;
+    cpp_parser.mode=ansi_c_parsert::ANSI;
     break;
     
   case configt::ansi_ct::MODE_GCC_C:
   case configt::ansi_ct::MODE_GCC_CPP:
-    cpp_parser.mode=cpp_parsert::GCC;
+    cpp_parser.mode=ansi_c_parsert::GCC;
     break;
     
   case configt::ansi_ct::MODE_ARM_C_CPP:
-    cpp_parser.mode=cpp_parsert::ARM;
+    cpp_parser.mode=ansi_c_parsert::ARM;
     break;
     
   default:
     assert(false);
   }
-
-  cpp_scanner_init();
 
   bool result=cpp_parser.parse();
 
@@ -414,8 +411,6 @@ bool cpp_languaget::to_expr(
   cpp_parser.set_file(irep_idt());
   cpp_parser.in=&i_preprocessed;
   cpp_parser.set_message_handler(get_message_handler());
-  cpp_parser.grammar=cpp_parsert::EXPRESSION;
-  cpp_scanner_init();
 
   bool result=cpp_parser.parse();
 

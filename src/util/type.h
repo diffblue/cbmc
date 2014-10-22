@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include <util/location.h>
+#include <util/source_location.h>
 
 /*! \brief The type of an expression
 */
@@ -47,24 +47,30 @@ public:
 
   void copy_to_subtypes(const typet &type);
 
-  const locationt &location() const
+  // will go away
+  const source_locationt &location() const
   {
-    return (const locationt &)find(ID_C_location);
+    return (const source_locationt &)find(ID_C_source_location);
   }
 
-  locationt &location()
+  const source_locationt &source_location() const
   {
-    return (locationt &)add(ID_C_location);
+    return (const source_locationt &)find(ID_C_source_location);
+  }
+
+  source_locationt &add_source_location()
+  {
+    return static_cast<source_locationt &>(add(ID_C_source_location));
   }
   
   typet &add_type(const irep_namet &name)
   {
-    return (typet &)add(name);
+    return static_cast<typet &>(add(name));
   }
 
   const typet &find_type(const irep_namet &name) const
   {
-    return (const typet &)find(name);
+    return static_cast<const typet &>(find(name));
   }
 };
 

@@ -132,8 +132,9 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp.type()=type;
-        tmp.operands().resize(integer2long(array_size),
-          gen_zero(full_type.subtype()));
+        exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
+                                    *this, get_message_handler());
+        tmp.operands().resize(integer2long(array_size), zero);
       }
     }
     
@@ -181,8 +182,9 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp2.type()=type;
-        tmp2.operands().resize(integer2long(array_size),
-          gen_zero(full_type.subtype()));
+        exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
+                                    *this, get_message_handler());
+        tmp2.operands().resize(integer2long(array_size), zero);
       }
     }
     
@@ -251,7 +253,7 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       // these must have a constant value
       assert(symbol.value.is_not_nil());
       typecheck_expr(symbol.value);
-      locationt location=symbol.value.location();
+      source_locationt location=symbol.value.source_location();
       do_initializer(symbol.value, symbol.type, true);
       make_constant(symbol.value);
     }
@@ -292,12 +294,12 @@ void c_typecheck_baset::designator_enter(
   
   if(full_type.id()==ID_struct)
   {
-    const struct_union_typet &struct_type=to_struct_type(full_type);
+    const struct_typet &struct_type=to_struct_type(full_type);
 
     entry.size=struct_type.components().size();
     entry.subtype.make_nil();
 
-    for(struct_union_typet::componentst::const_iterator
+    for(struct_typet::componentst::const_iterator
         it=struct_type.components().begin();
         it!=struct_type.components().end();
         ++it)
@@ -323,6 +325,8 @@ void c_typecheck_baset::designator_enter(
     }
     else
     {
+      // The default is to unitialize using the first member of the
+      // union.
       entry.size=1;
       entry.subtype=union_type.components().front().type();
     }
@@ -430,7 +434,7 @@ void c_typecheck_baset::do_designated_initializer(
             to_array_type(full_type).size().is_nil()))
         {
           // we are willing to grow an incomplete or zero-sized array
-          exprt zero=zero_initializer(full_type.subtype(), value.location(), *this, get_message_handler());
+          exprt zero=zero_initializer(full_type.subtype(), value.source_location(), *this, get_message_handler());
           dest->operands().resize(integer2long(index)+1, zero);
           
           // todo: adjust type!
@@ -451,10 +455,6 @@ void c_typecheck_baset::do_designated_initializer(
       const struct_typet::componentst &components=
         to_struct_type(full_type).components();
 
-      assert(index<components.size());
-      assert(components[index].type().id()!=ID_code &&
-             !components[index].get_is_padding());
-
       if(index>=dest->operands().size())
       {
         err_location(value);
@@ -462,6 +462,10 @@ void c_typecheck_baset::do_designated_initializer(
             << " out of bounds (" << dest->operands().size() << ")";
         throw 0;
       }
+
+      assert(index<components.size());
+      assert(components[index].type().id()!=ID_code &&
+             !components[index].get_is_padding());
 
       dest=&(dest->operands()[index]);
     }
@@ -475,20 +479,21 @@ void c_typecheck_baset::do_designated_initializer(
       assert(index<components.size());
 
       const union_typet::componentt &component=union_type.components()[index];
-      
+
       if(dest->id()==ID_union &&
          dest->get(ID_component_name)==component.get_name())
       {
-        // already right union component (can initialize multiple submembers)
+        // Already right union component. We can initialize multiple submembers,
+        // so do not overwrite this.
       }
       else
       {
         // Note that gcc issues a warning if the union component is switched.
         // Build a union expression from given component.
         union_exprt union_expr(type);
-        union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
-        union_expr.location()=value.location();
-        union_expr.set(ID_component_name, component.get_name());
+        union_expr.op()=zero_initializer(component.type(), value.source_location(), *this, get_message_handler());
+        union_expr.add_source_location()=value.source_location();
+        union_expr.set_component_name(component.get_name());
         *dest=union_expr;
       }
 
@@ -527,6 +532,27 @@ void c_typecheck_baset::do_designated_initializer(
       assert(full_type==follow(dest->type()));
       
       return; // done
+    }
+    
+    // union? The component in the zero initializer might
+    // not be the first one.
+    if(full_type.id()==ID_union)
+    {
+      const union_typet &union_type=to_union_type(full_type);
+
+      const union_typet::componentst &components=
+        union_type.components();
+
+      if(!components.empty())
+      {
+        const union_typet::componentt &component=union_type.components().front();
+
+        union_exprt union_expr(type);
+        union_expr.op()=zero_initializer(component.type(), value.source_location(), *this, get_message_handler());
+        union_expr.add_source_location()=value.source_location();
+        union_expr.set_component_name(component.get_name());
+        *dest=union_expr;
+      }
     }
 
     // see what initializer we are given
@@ -575,8 +601,9 @@ void c_typecheck_baset::do_designated_initializer(
     if(dest->operands().empty())
     {
       err_location(value);
-      str << "cannot initialize compound type "
-          << to_string(dest_type) << " using " << to_string(value);
+      str << "cannot initialize type `"
+          << to_string(dest_type) << "' using value `"
+          << to_string(value) << "'";
       throw 0;
     }
 
@@ -824,7 +851,7 @@ exprt c_typecheck_baset::do_initializer_list(
      full_type.id()==ID_vector)
   {
     // start with zero everywhere
-    result=zero_initializer(type, value.location(), *this, get_message_handler());
+    result=zero_initializer(type, value.source_location(), *this, get_message_handler());
   }
   else if(full_type.id()==ID_array)
   {
@@ -832,16 +859,16 @@ exprt c_typecheck_baset::do_initializer_list(
     {
       // start with empty array
       result=exprt(ID_array, full_type);
-      result.location()=value.location();
+      result.add_source_location()=value.source_location();
     }
     else
     {
       // start with zero everywhere
-      result=zero_initializer(type, value.location(), *this, get_message_handler());
+      result=zero_initializer(type, value.source_location(), *this, get_message_handler());
     }
 
     // 6.7.9, 14: An array of character type may be initialized by a character
-    // string literal or UTF−8 string literal, optionally enclosed in braces.
+    // string literal or UTF-8 string literal, optionally enclosed in braces.
     if(value.operands().size()>=1 &&
        value.op0().id()==ID_string_constant &&
        (full_type.subtype().id()==ID_signedbv ||
@@ -851,7 +878,7 @@ exprt c_typecheck_baset::do_initializer_list(
       if(value.operands().size()>1)
       {
         err_location(value);
-        warning("ignoring excess operands");
+        warning("ignoring excess initializers");
       }
 
       return do_initializer_rec(value.op0(), type, force_constant);
@@ -890,11 +917,11 @@ exprt c_typecheck_baset::do_initializer_list(
     assert(result.operands().size()==
            to_struct_type(full_type).components().size());
 
-    const struct_union_typet::componentst &components=
+    const struct_typet::componentst &components=
       to_struct_type(full_type).components();
 
     exprt::operandst::const_iterator o_it=result.operands().begin();
-    for(struct_union_typet::componentst::const_iterator
+    for(struct_typet::componentst::const_iterator
         c_it=components.begin();
         c_it!=components.end();
         c_it++, ++o_it)

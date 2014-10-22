@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 #include <util/string2int.h>
 #include <util/config.h>
@@ -135,6 +136,12 @@ void symex_parseoptionst::get_command_line_options(optionst &options)
   else
     options.set_option("unsigned-overflow-check", false);
 
+  // check overflow
+  if(cmdline.isset("float-overflow-check"))
+    options.set_option("float-overflow-check", true);
+  else
+    options.set_option("float-overflow-check", false);
+
   // check for NaN (not a number)
   if(cmdline.isset("nan-check"))
     options.set_option("nan-check", true);
@@ -238,13 +245,13 @@ int symex_parseoptionst::doit()
     path_search.set_message_handler(get_message_handler());
 
     if(cmdline.isset("depth"))
-      path_search.depth_limit=unsafe_string2unsigned(cmdline.getval("depth"));
+      path_search.set_depth_limit(unsafe_string2unsigned(cmdline.getval("depth")));
 
     if(cmdline.isset("context-bound"))
-      path_search.context_bound=unsafe_string2unsigned(cmdline.getval("context-bound"));
+      path_search.set_context_bound(unsafe_string2unsigned(cmdline.getval("context-bound")));
 
     if(cmdline.isset("unwind"))
-      path_search.unwind_limit=unsafe_string2unsigned(cmdline.getval("unwind"));
+      path_search.set_unwind_limit(unsafe_string2unsigned(cmdline.getval("unwind")));
 
     if(cmdline.isset("show-vcc"))
     {

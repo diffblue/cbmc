@@ -44,7 +44,8 @@ Inputs:
 Outputs:
 
 Purpose: turns 'return x' into an assignment to fkt#return_value,
-         if needed, and a 'goto the_end_of_the_function'
+         unless the function returns void,
+         and a 'goto the_end_of_the_function'.
 
 \*******************************************************************/
 
@@ -119,7 +120,7 @@ void remove_returnst::replace_returns(
         goto_programt::instructiont tmp_i;
         tmp_i.make_assignment();
         tmp_i.code=assignment;
-        tmp_i.location=i_it->location;
+        tmp_i.source_location=i_it->source_location;
         tmp_i.function=i_it->function;
 
         // inserts the assignment
@@ -194,7 +195,7 @@ void remove_returnst::do_function_calls(
 
             goto_programt::targett t=goto_program.insert_after(i_it);
             t->make_assignment();
-            t->location=i_it->location;
+            t->source_location=i_it->source_location;
             t->code=code_assignt(function_call.lhs(), rhs);
             t->function=i_it->function;
 
@@ -214,7 +215,7 @@ void remove_returnst::do_function_calls(
         {
           goto_programt::targett t=tmp.add_instruction();
           t->make_other();
-          t->location=i_it->location;
+          t->source_location=i_it->source_location;
           t->function=i_it->function;
           t->code=codet(ID_expression);
           t->code.copy_to_operands(*a_it);
@@ -224,13 +225,13 @@ void remove_returnst::do_function_calls(
         if(function_call.lhs().is_not_nil())
         {
           exprt rhs=side_effect_expr_nondett(function_call.lhs().type());
-          rhs.location()=i_it->location;
+          rhs.add_source_location()=i_it->source_location;
 
           code_assignt code(function_call.lhs(), rhs);
-          code.location()=i_it->location;
+          code.add_source_location()=i_it->source_location;
 
           goto_programt::targett t=tmp.add_instruction(ASSIGN);
-          t->location=i_it->location;
+          t->source_location=i_it->source_location;
           t->function=i_it->function;
           t->code.swap(code);
         }

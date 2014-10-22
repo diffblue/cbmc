@@ -47,8 +47,6 @@ void bv_refinementt::arrays_overapproximated()
   // build index_map with values
   index_mapt value_index_map;
 
-  value_index_map.resize(index_map.size());  
-
   #if 0
   // iterate over *roots*
   for(unsigned i=0; i<arrays.size(); i++)

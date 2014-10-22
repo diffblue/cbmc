@@ -345,7 +345,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 
   status() << "Starting Bounded Model Checking" << eom;
 
-  symex.last_location.make_nil();
+  symex.last_source_location.make_nil();
 
   try
   {
@@ -467,10 +467,10 @@ bool bmct::run(const goto_functionst &goto_functions)
 	}
 
         //call decision procedure
-	if(options.get_bool_option("all-claims")) 
+	if(options.get_bool_option("all-properties")) 
         {
-	  if(all_claims(goto_functions,symex.prop_conv)) 
-            return true; //all claims FAILED, exit
+	  if(all_properties(goto_functions,symex.prop_conv)) 
+            return true; //all properties FAILED, exit
 	}
         else 
         {
@@ -511,14 +511,14 @@ bool bmct::run(const goto_functionst &goto_functions)
   catch(std::string &error_str)
   {
     message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_location);
+    message_stream.err_location(symex.last_source_location);
     message_stream.error(error_str);
     return true;
   }
   catch(const char *error_str)
   {
     message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_location);
+    message_stream.err_location(symex.last_source_location);
     message_stream.error(error_str);
     return true;
   }

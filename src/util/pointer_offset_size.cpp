@@ -177,10 +177,16 @@ mp_integer pointer_offset_size(
           type.id()==ID_unsignedbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
-          type.id()==ID_bv ||
-          type.id()==ID_c_enum)
+          type.id()==ID_bv)
   {
     unsigned width=to_bitvector_type(type).get_width();
+    unsigned bytes=width/8;
+    if(bytes*8!=width) bytes++;
+    return bytes;
+  }
+  else if(type.id()==ID_c_enum)
+  {
+    unsigned width=to_bitvector_type(type.subtype()).get_width();
     unsigned bytes=width/8;
     if(bytes*8!=width) bytes++;
     return bytes;
@@ -407,10 +413,16 @@ exprt size_of_expr(
           type.id()==ID_unsignedbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
-          type.id()==ID_bv ||
-          type.id()==ID_c_enum)
+          type.id()==ID_bv)
   {
     unsigned width=to_bitvector_type(type).get_width();
+    unsigned bytes=width/8;
+    if(bytes*8!=width) bytes++;
+    return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
+  }
+  else if(type.id()==ID_c_enum)
+  {
+    unsigned width=to_bitvector_type(type.subtype()).get_width();
     unsigned bytes=width/8;
     if(bytes*8!=width) bytes++;
     return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
@@ -501,4 +513,58 @@ mp_integer compute_pointer_offset(
     return 0;
 
   return -1; // don't know
+}
+
+/*******************************************************************\
+
+Function: build_sizeof_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt build_sizeof_expr(
+  const constant_exprt &expr,
+  const namespacet &ns)
+{
+  const typet &type=
+    static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
+
+  mp_integer type_size=-1, val=-1;
+
+  if(type.is_not_nil()) type_size=pointer_offset_size(ns, type);
+
+  if(type_size<0 ||
+     to_integer(expr, val) ||
+     val<type_size ||
+     (type_size==0 && val>0))
+    return nil_exprt();
+
+  assert(address_bits(val+1)<=config.ansi_c.pointer_width);
+  const unsignedbv_typet t(config.ansi_c.pointer_width);
+
+  mp_integer remainder=0;
+  if(type_size!=0)
+  {
+    remainder=val%type_size;
+    val-=remainder;
+    val/=type_size;
+  }
+
+  exprt result(ID_sizeof, t);
+  result.set(ID_type_arg, type);
+
+  if(val>1)
+    result=mult_exprt(result, from_integer(val, t));
+  if(remainder>0)
+    result=plus_exprt(result, from_integer(remainder, t));
+
+  if(result.type()!=expr.type())
+    result.make_typecast(expr.type());
+
+  return result;
 }

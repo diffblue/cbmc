@@ -2,7 +2,7 @@
 #define CPROVER_TIMER_H
 
 #include <string>
-#include <ostream>
+#include <iosfwd>
 
 #include "time_stopping.h"
 

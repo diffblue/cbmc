@@ -81,12 +81,12 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       qbf/qbf_skizzo.cpp qbf/qdimacs_core.cpp qbf/qbf_qube.cpp \
       qbf/qbf_qube_core.cpp \
       prop/prop.cpp prop/prop_conv.cpp prop/prop_conv_store.cpp \
-      prop/cover_goals.cpp \
+      prop/cover_goals.cpp prop/literal.cpp \
       prop/aig.cpp prop/aig_prop.cpp prop/minimize.cpp \
       prop/prop_assignment.cpp \
       cvc/cvc_conv.cpp cvc/cvc_dec.cpp \
       smt1/smt1_dec.cpp smt1/smt1_conv.cpp \
-      smt2/smt2_dec.cpp smt2/smt2_conv.cpp smt2/parse_smt2.cpp \
+      smt2/smt2_dec.cpp smt2/smt2_conv.cpp smt2/smt2_parser.cpp smt2/smt2irep.cpp \
       flattening/equality.cpp flattening/arrays.cpp \
       flattening/functions.cpp flattening/bv_minimize.cpp \
       flattening/boolbv_width.cpp flattening/boolbv.cpp \

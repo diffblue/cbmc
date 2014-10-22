@@ -482,17 +482,32 @@ public:
     tag_typet(ID_struct_tag, identifier)
   {
   }
-
-  inline void set_identifier(const irep_idt &identifier)
-  {
-    set(ID_identifier, identifier);
-  }
-
-  inline const irep_idt &get_identifier() const
-  {
-    return get(ID_identifier);
-  }  
 };
+
+/*! \brief Cast a generic typet to a \ref union_tag_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * union_tag_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref union_tag_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const struct_tag_typet &to_struct_tag_type(const typet &type)
+{
+  assert(type.id()==ID_struct_tag);
+  return static_cast<const struct_tag_typet &>(type);
+}
+
+/*! \copydoc to_struct_tag_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline struct_tag_typet &to_struct_tag_type(typet &type)
+{
+  assert(type.id()==ID_struct_tag);
+  return static_cast<struct_tag_typet &>(type);
+}
 
 /*! \brief A union tag type
 */
@@ -504,39 +519,69 @@ public:
     tag_typet(ID_union_tag, identifier)
   {
   }
-
-  inline void set_identifier(const irep_idt &identifier)
-  {
-    set(ID_identifier, identifier);
-  }
-
-  inline const irep_idt &get_identifier() const
-  {
-    return get(ID_identifier);
-  }  
 };
+
+/*! \brief Cast a generic typet to a \ref union_tag_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * union_tag_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref union_tag_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const union_tag_typet &to_union_tag_type(const typet &type)
+{
+  assert(type.id()==ID_union_tag);
+  return static_cast<const union_tag_typet &>(type);
+}
+
+/*! \copydoc to_union_tag_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline union_tag_typet &to_union_tag_type(typet &type)
+{
+  assert(type.id()==ID_union_tag);
+  return static_cast<union_tag_typet &>(type);
+}
 
 /*! \brief An enum tag type
 */
 
-class enum_tag_typet:public tag_typet
+class c_enum_tag_typet:public tag_typet
 {
 public:
-  explicit inline enum_tag_typet(const irep_idt &identifier):
-    tag_typet(ID_enum_tag, identifier)
+  explicit inline c_enum_tag_typet(const irep_idt &identifier):
+    tag_typet(ID_c_enum_tag, identifier)
   {
   }
-
-  inline void set_identifier(const irep_idt &identifier)
-  {
-    set(ID_identifier, identifier);
-  }
-
-  inline const irep_idt &get_identifier() const
-  {
-    return get(ID_identifier);
-  }  
 };
+
+/*! \brief Cast a generic typet to a \ref c_enum_tag_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * c_enum_tag_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref c_enum_tag_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const c_enum_tag_typet &to_c_enum_tag_type(const typet &type)
+{
+  assert(type.id()==ID_c_enum_tag);
+  return static_cast<const c_enum_tag_typet &>(type);
+}
+
+/*! \copydoc to_enum_tag_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline c_enum_tag_typet &to_c_enum_tag_type(typet &type)
+{
+  assert(type.id()==ID_c_enum_tag);
+  return static_cast<c_enum_tag_typet &>(type);
+}
 
 /*! \brief Base type of functions
 */
@@ -612,6 +657,11 @@ public:
   inline void make_ellipsis()
   {
     add(ID_parameters).set(ID_ellipsis, true);
+  }
+
+  inline void remove_ellipsis()
+  {
+    add(ID_parameters).remove(ID_ellipsis);
   }
 
   typedef std::vector<parametert> parameterst;
@@ -780,6 +830,12 @@ public:
 */
 inline const bitvector_typet &to_bitvector_type(const typet &type)
 {
+  assert(type.id()==ID_signedbv ||
+         type.id()==ID_unsignedbv ||
+         type.id()==ID_fixedbv ||
+         type.id()==ID_floatbv ||
+         type.id()==ID_bv ||
+         type.id()==ID_pointer);
   return static_cast<const bitvector_typet &>(type);
 }
 

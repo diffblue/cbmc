@@ -57,8 +57,8 @@ void bmct::show_vcc(std::ostream &out)
   {
     if(!s_it->is_assert() /* || s_it->ignore || s_it->converted*/) continue;
     
-    if(s_it->source.pc->location.is_not_nil())
-      out << s_it->source.pc->location << "\n";
+    if(s_it->source.pc->source_location.is_not_nil())
+      out << s_it->source.pc->source_location << "\n";
     
     if(s_it->comment!="")
       out << s_it->comment << "\n";

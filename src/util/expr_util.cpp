@@ -35,7 +35,9 @@ exprt gen_zero(const typet &type)
      type_id==ID_real ||
      type_id==ID_integer ||
      type_id==ID_natural ||
-     type_id==ID_c_enum)
+     type_id==ID_c_enum ||
+     type_id==ID_c_enum_tag ||
+     type_id==ID_incomplete_c_enum)
   {
     return constant_exprt(ID_0, type);
   }
@@ -126,7 +128,9 @@ exprt gen_one(const typet &type)
 
     return constant_exprt(value, type);
   }
-  else if(type_id==ID_c_enum)
+  else if(type_id==ID_c_enum ||
+          type_id==ID_c_enum_tag ||
+          type_id==ID_incomplete_c_enum)
   {
     return constant_exprt(ID_1, type);
   }
@@ -380,7 +384,7 @@ exprt is_not_zero(
   assert(zero.is_not_nil());
 
   binary_exprt comparison(src, id, zero, bool_typet());
-  comparison.location()=src.location();
+  comparison.add_source_location()=src.source_location();
   
   return comparison;
 }

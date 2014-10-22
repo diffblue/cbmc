@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_BASIC_SYMEX_EQUATION_H
 
 #include <list>
-#include <ostream>
+#include <iosfwd>
 #include <iostream> 
 
 #include <util/merge_irep.h>

@@ -38,7 +38,7 @@ void show_locations(
       it!=goto_program.instructions.end();
       it++)
   {
-    const locationt &location=it->location;
+    const source_locationt &source_location=it->source_location;
       
     switch(ui)
     {
@@ -51,9 +51,9 @@ void show_locations(
         xmlt &l=xml.new_element();
         l.name="location";
         
-        l.new_element("line").data=id2string(location.get_line());
-        l.new_element("file").data=id2string(location.get_file());
-        l.new_element("function").data=id2string(location.get_function());
+        l.new_element("line").data=id2string(source_location.get_line());
+        l.new_element("file").data=id2string(source_location.get_file());
+        l.new_element("function").data=id2string(source_location.get_function());
         
         std::cout << xml << std::endl;
       }
@@ -62,7 +62,7 @@ void show_locations(
     case ui_message_handlert::PLAIN:
       std::cout << function_id << " "
                 << it->location_number << " "
-                << it->location << std::endl;
+                << it->source_location << std::endl;
       break;
 
     default:

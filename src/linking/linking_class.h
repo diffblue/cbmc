@@ -107,6 +107,10 @@ protected:
     const symbolt &new_symbol,
     const std::string &msg);
 
+  void show_struct_diff(
+    const struct_typet &old_type,
+    const struct_typet &new_type);
+
   symbol_tablet &main_symbol_table;
   symbol_tablet &src_symbol_table;
 

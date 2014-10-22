@@ -884,8 +884,12 @@ void symex_target_equationt::convert_assertions(
     else if(it->is_assume())
     {
       // the assumptions have been converted before
-      assumption=
-        and_exprt(assumption, literal_exprt(it->cond_literal));
+      // avoid deep nesting of ID_and expressions
+      if(assumption.id()==ID_and)
+        assumption.copy_to_operands(literal_exprt(it->cond_literal));
+      else
+        assumption=
+          and_exprt(assumption, literal_exprt(it->cond_literal));
     }
   }
 
@@ -1078,8 +1082,8 @@ void symex_target_equationt::SSA_stept::output(
   {
     out << "Thread " << source.thread_nr;
 
-    if(source.pc->location.is_not_nil())
-      out << " " << source.pc->location << std::endl;
+    if(source.pc->source_location.is_not_nil())
+      out << " " << source.pc->source_location << std::endl;
     else
       out << std::endl;
   }

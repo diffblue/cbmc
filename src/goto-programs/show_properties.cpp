@@ -44,47 +44,58 @@ void show_properties(
     if(!it->is_assert())
       continue;
       
-    const locationt &location=it->location;
+    const source_locationt &source_location=it->source_location;
       
-    const irep_idt &comment=location.get_comment();
+    const irep_idt &comment=source_location.get_comment();
     //const irep_idt &function=location.get_function();
-    const irep_idt &property_class=location.get_property_class();
-    const irep_idt &source=location.get_source();
+    const irep_idt &property_class=source_location.get_property_class();
     const irep_idt description=
       (comment==""?"assertion":comment);
       
-    irep_idt property_id=location.get_property_id();
+    irep_idt property_id=source_location.get_property_id();
     
     switch(ui)
     {
     case ui_message_handlert::XML_UI:
       {
-        xmlt xml_claim("claim");
+        #if 0
+        xmlt xml_claim("claim"); // this will go away, use below
         xml_claim.new_element("number").data=id2string(property_id); // will go away
         xml_claim.new_element("name").data=id2string(property_id); // will go away
         xml_claim.set_attribute("name", id2string(property_id)); // use this one
         
         xmlt &l=xml_claim.new_element();
-        l=xml(it->location);
+        l=xml(it->source_location);
         
         xml_claim.new_element("description").data=id2string(description);        
         xml_claim.new_element("property").data=id2string(property_class);
         xml_claim.new_element("expression").data=from_expr(ns, identifier, it->guard);
-        xml_claim.new_element("source").data=id2string(source);
+        xml_claim.new_element("source").data="";
 
         std::cout << xml_claim << std::endl;
+        #endif
+
+        // use me instead
+        xmlt xml_property("property");
+        xml_property.set_attribute("name", id2string(property_id)); // use this one
+        xml_property.set_attribute("class", id2string(property_class)); // use this one
+        
+        xmlt &property_l=xml_property.new_element();
+        property_l=xml(it->source_location);
+        
+        xml_property.new_element("description").data=id2string(description);        
+        xml_property.new_element("expression").data=from_expr(ns, identifier, it->guard);
+
+        std::cout << xml_property << std::endl;
       }
       break;
       
     case ui_message_handlert::PLAIN:
       std::cout << "Property " << property_id << ":" << std::endl;
 
-      std::cout << "  " << it->location << std::endl
+      std::cout << "  " << it->source_location << std::endl
                 << "  " << description << std::endl
                 << "  " << from_expr(ns, identifier, it->guard) << std::endl;
-
-      if(source!="")
-        std::cout << "  in \"" << source << "\"" << std::endl;
 
       std::cout << std::endl;
       break;

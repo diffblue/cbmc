@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/irep.h>
 
 // A data structures for template arguments, i.e.,
-// expressions of the form <E1, T2, ...>.
+// a sequence of types/expressions of the form <E1, T2, ...>.
 // Not to be confused with the template parameters!
 
 class cpp_template_args_baset:public irept

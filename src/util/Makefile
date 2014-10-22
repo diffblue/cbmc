@@ -1,6 +1,6 @@
 SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       expr.cpp expr_util.cpp i2string.cpp irep.cpp language.cpp \
-      lispexpr.cpp lispirep.cpp location.cpp message.cpp language_file.cpp \
+      lispexpr.cpp lispirep.cpp source_location.cpp message.cpp language_file.cpp \
       mp_arith.cpp namespace.cpp parseoptions.cpp rename.cpp \
       replace_expr.cpp threeval.cpp typecheck.cpp graph.cpp \
       type.cpp cnf_simplify.cpp pointer_predicates.cpp merge_irep.cpp \

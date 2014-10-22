@@ -399,7 +399,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   {
     // rewrite (_Bool)x to x!=0
     equal_exprt equality;
-    equality.location()=expr.location();
+    equality.add_source_location()=expr.source_location();
     equality.lhs()=expr.op0();
     equality.rhs()=gen_zero(ns.follow(expr.op0().type()));
     assert(equality.rhs().is_not_nil());
@@ -1604,6 +1604,34 @@ bool simplify_exprt::simplify_plus(exprt &expr)
       }
     }
     
+    // search for a and -a
+    // first gather all the a's with -a
+    typedef hash_map_cont<exprt, exprt::operandst::iterator, irep_hash>
+      expr_mapt;
+    expr_mapt expr_map;
+
+    Forall_expr(it, operands)
+      if(it->id()==ID_unary_minus &&
+         it->operands().size()==1)
+        expr_map.insert(std::make_pair(it->op0(), it));
+
+    // now search for a
+    Forall_expr(it, operands)
+    {
+      if(expr_map.empty()) break;
+      else if(it->id()==ID_unary_minus) continue;
+
+      expr_mapt::iterator itm=expr_map.find(*it);
+
+      if(itm!=expr_map.end())
+      {
+        *(itm->second)=gen_zero(expr.type());
+        *it=gen_zero(expr.type());
+        expr_map.erase(itm);
+        result=false;
+      }
+    }
+
     // delete zeros
     // (can't do for floats, as the result of 0.0 + (-0.0)
     // need not be -0.0 in std rounding)
@@ -2964,7 +2992,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     {
       // first gather all the a's with !a
 
-      std::set<exprt> expr_set;
+      hash_set_cont<exprt, irep_hash> expr_set;
 
       forall_operands(it, expr)
         if(it->id()==ID_not &&
@@ -2974,11 +3002,15 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
       // now search for a
 
-      forall_operands(it, expr)
-        if(expr_set.find(*it)!=expr_set.end())
+      if(!expr_set.empty())
+        forall_operands(it, expr)
         {
-          expr.make_bool(expr.id()==ID_or);
-          return false;
+          if(it->id()!=ID_not &&
+             expr_set.find(*it)!=expr_set.end())
+          {
+            expr.make_bool(expr.id()==ID_or);
+            return false;
+          }
         }
     }
 
@@ -4780,11 +4812,16 @@ exprt simplify_exprt::bits2expr(
 
   if(type.id()==ID_unsignedbv ||
      type.id()==ID_signedbv ||
-     type.id()==ID_c_enum ||
      type.id()==ID_floatbv ||
      type.id()==ID_fixedbv)
   {
     unsigned width=to_bitvector_type(type).get_width();
+    if(bits.size()==width)
+      return constant_exprt(bits, type);
+  }
+  else if(type.id()==ID_c_enum)
+  {
+    unsigned width=to_bitvector_type(type.subtype()).get_width();
     if(bits.size()==width)
       return constant_exprt(bits, type);
   }
@@ -4869,6 +4906,25 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
 {
   byte_extract_exprt &be=to_byte_extract_expr(expr);
 
+  // don't do any of the following if endianness doesn't match, as
+  // bytes need to be swapped
+  if(byte_extract_id()!=expr.id())
+    return true;
+
+  // byte_extract(byte_update(root, offset, value), offset) =>
+  // value
+  if(((be.id()==ID_byte_extract_big_endian &&
+       be.op().id()==ID_byte_update_big_endian) ||
+      (be.id()==ID_byte_extract_little_endian &&
+       be.op().id()==ID_byte_update_little_endian)) &&
+     be.offset()==be.op().op1() &&
+     base_type_eq(be.type(), be.op().op2().type(), ns))
+  {
+    expr=be.op().op2();
+    return false;
+  }
+
+  // the following require a constant offset
   mp_integer offset;
   if(to_integer(be.offset(), offset) || offset<0)
     return true;
@@ -4997,6 +5053,18 @@ Function: simplify_exprt::simplify_byte_update
 
 bool simplify_exprt::simplify_byte_update(exprt &expr)
 {
+  if(expr.operands().size()!=3) return true;
+
+  // byte_update(byte_update(root, offset, value), offset, value2) =>
+  // byte_update(root, offset, value2)
+  if(expr.id()==expr.op0().id() &&
+     expr.op1()==expr.op0().op1() &&
+     base_type_eq(expr.op2().type(), expr.op0().op2().type(), ns))
+  {
+    expr.op0()=expr.op0().op0();
+    return false;
+  }
+
   /*
    * byte_update(root, offset, 
    *             extract(root, offset) WITH component:=value)
@@ -5005,7 +5073,6 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
    *             value)
    */
 
-  if(expr.operands().size()!=3) return true;
   if(expr.id()!=ID_byte_update_little_endian) return true;
 
   exprt &root=expr.op0();

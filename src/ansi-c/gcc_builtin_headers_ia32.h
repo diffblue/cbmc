@@ -7,14 +7,12 @@ __gcc_v2si __builtin_ia32_vec_init_v2si(int, int);
 __gcc_v4hi __builtin_ia32_vec_init_v4hi(short, short, short, short);
 __gcc_v8qi __builtin_ia32_vec_init_v8qi(char, char, char, char, char, char, char, char);
 int __builtin_ia32_vec_ext_v2si(__gcc_v2si, int);
-__gcc_v8si __builtin_ia32_paddusw128(__gcc_v8si, __gcc_v8si);
-__gcc_v8si __builtin_ia32_psubusw128(__gcc_v8si, __gcc_v8si);
+__gcc_v8hi __builtin_ia32_paddusw128(__gcc_v8hi, __gcc_v8hi);
+__gcc_v8hi __builtin_ia32_psubusw128(__gcc_v8hi, __gcc_v8hi);
 void __builtin_ia32_ldmxcsr(unsigned);
 unsigned __builtin_ia32_stmxcsr(void);
-__gcc_v4hi __builtin_ia32_paddsw128(__gcc_v4hi,__gcc_v4hi);
-__gcc_v4hi __builtin_ia32_psubsw128(__gcc_v4hi,__gcc_v4hi);
-//__gcc_v4hi __builtin_ia32_paddusw128(__gcc_v4hi,__gcc_v4hi);
-//__gcc_v4hi __builtin_ia32_psubusw128(__gcc_v4hi,__gcc_v4hi);
+__gcc_v8hi __builtin_ia32_paddsw128(__gcc_v8hi,__gcc_v8hi);
+__gcc_v8hi __builtin_ia32_psubsw128(__gcc_v8hi,__gcc_v8hi);
 __gcc_v16qi __builtin_ia32_paddsb128(__gcc_v16qi,__gcc_v16qi);
 __gcc_v16qi __builtin_ia32_psubsb128(__gcc_v16qi,__gcc_v16qi);
 __gcc_v16qi __builtin_ia32_paddusb128(__gcc_v16qi,__gcc_v16qi);
@@ -1014,7 +1012,7 @@ __gcc_v2si __builtin_ia32_pswapdsi(__gcc_v2si);
 
 // unknown!
 
-int __builtin_ia32_cmpnltss();
+__gcc_v4sf __builtin_ia32_cmpnltss(__gcc_v4sf, __gcc_v4sf);
 int __builtin_ia32_comeqpd();
 int __builtin_ia32_comeqps();
 int __builtin_ia32_comeqsd();

@@ -60,18 +60,21 @@ void show_loop_ids(
 
       if(ui==ui_message_handlert::XML_UI)
       {
+        std::string id=id2string(it->function)+"."+i2string(loop_id);
+      
         xmlt xml_loop("loop");
-        xml_loop.new_element("loop-id").data=id2string(it->function)+"."+i2string(loop_id);
-        xml_loop.new_element()=xml(it->location);
-        std::cout << xml_loop << std::endl;
+        xml_loop.set_attribute("name", id);
+        xml_loop.new_element("loop-id").data=id;
+        xml_loop.new_element()=xml(it->source_location);
+        std::cout << xml_loop << "\n";
       }
       else if(ui==ui_message_handlert::PLAIN)
       {
         std::cout << "Loop "
-                  << it->function << "." << loop_id << ":" << std::endl;
+                  << it->function << "." << loop_id << ":" << "\n";
 
-        std::cout << "  " << it->location << std::endl;
-        std::cout << std::endl;
+        std::cout << "  " << it->source_location << "\n";
+        std::cout << "\n";
       }
       else
         assert(false);

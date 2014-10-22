@@ -38,7 +38,7 @@ void boolbvt::convert_if(const exprt &expr, bvt &bv)
   const bvt &op2_bv=convert_bv(operands[2]);
 
   if(op1_bv.size()!=width || op2_bv.size()!=width)
-    throw "operand size mismatch for if";
+    throw "operand size mismatch for if "+expr.pretty();
 
   bv=bv_utils.select(op0, op1_bv, op2_bv);
 }

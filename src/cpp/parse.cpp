@@ -5,7 +5,8 @@
 #include <util/std_types.h>
 #include <util/i2string.h>
 
-#include "tokens.h"
+#include <ansi-c/ansi_c_y.tab.h>
+
 #include "cpp_token_buffer.h"
 #include "cpp_parser.h"
 #include "cpp_member_spec.h"
@@ -17,6 +18,80 @@
 #include <iostream>
 #endif
 
+class new_scopet
+{
+public:
+  typedef enum { MEMBER, FUNCTION, VARIABLE, TAG,
+                 NAMESPACE, TEMPLATE, BLOCK } kindt;
+  kindt kind;
+  
+  typedef std::map<irep_idt, new_scopet> id_mapt;
+  id_mapt id_map;
+  
+  void print(std::ostream &out) const
+  {
+    print_rec(out, 0);
+  }
+ 
+protected:
+  void print_rec(std::ostream &, unsigned indent) const;
+};
+
+class save_scopet
+{
+public:
+  inline save_scopet(new_scopet *&_scope):
+    scope_ptr(_scope), old_scope(_scope)
+  {
+  }
+  
+  inline ~save_scopet()
+  {
+    scope_ptr=old_scope;
+  }
+  
+protected:
+  new_scopet *&scope_ptr;
+  new_scopet *old_scope;
+};
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void new_scopet::print_rec(std::ostream &out, unsigned indent) const
+{
+  for(id_mapt::const_iterator
+      it=id_map.begin();
+      it!=id_map.end();
+      it++)
+  {
+    out << std::string(' ', indent) << it->first << ": ";
+
+    switch(it->second.kind)
+    {
+    case MEMBER: out << "MEMBER"; break;
+    case FUNCTION: out << "FUNCTION"; break;
+    case VARIABLE: out << "VARIABLE"; break;
+    case TAG: out << "TAG"; break;
+    case NAMESPACE: out << "NAMESPACE"; break;
+    case TEMPLATE: out << "TEMPLATE"; break;
+    case BLOCK: out << "BLOCK"; break;
+    }
+
+    out << "\n";
+    it->second.print_rec(out, indent+2);
+  }
+}
+
 class Parser
 {
 public:
@@ -24,15 +99,18 @@ public:
     lex(_cpp_parser.token_buffer),
     parser(_cpp_parser)
   {
+    root_scope.kind=new_scopet::NAMESPACE;
+    current_scope=&root_scope;
   }
 
-  bool parse();
+  bool operator()();
 
 protected:
   cpp_token_buffert &lex;
   cpp_parsert &parser;
-
-  typedef irept Ptree;
+  
+  new_scopet root_scope;
+  new_scopet *current_scope;
 
   enum DeclKind { kDeclarator, kArgDeclarator, kCastDeclarator };
   enum TemplateDeclKind { tdk_unknown, tdk_decl, tdk_instantiation,
@@ -43,7 +121,6 @@ protected:
   bool rProgram(cpp_itemt &item);
 
   bool SyntaxError();
-  void ShowMessageHead(char*);
 
   bool rDefinition(cpp_itemt &);
   bool rNullDeclaration(cpp_declarationt &);
@@ -76,7 +153,7 @@ protected:
   bool optCvQualify(typet &);
   bool rAttribute();
   bool optIntegralTypeOrClassSpec(typet &);
-  bool rConstructorDecl(cpp_declaratort &, typet &);
+  bool rConstructorDecl(cpp_declaratort &, typet &, typet &trailing_return_type);
   bool optThrowDecl(irept &);
 
   bool rDeclarators(cpp_declarationt::declaratorst &, bool, bool=false);
@@ -137,9 +214,6 @@ protected:
   bool rAllocateInitializer(exprt &);
   bool rPostfixExpr(exprt &);
   bool rPrimaryExpr(exprt &);
-  bool rMSCTypePredicate(exprt &);
-  bool rMSCuuidof(exprt &);
-  bool rMSC_if_existsExpr(exprt &);
   bool rVarName(exprt &);
   bool rVarNameCore(exprt &);
   bool isTemplateArgs();
@@ -153,11 +227,6 @@ protected:
   bool rDoStatement(codet &);
   bool rForStatement(codet &);
   bool rTryStatement(codet &);
-  bool rMSC_tryStatement(codet &);
-  bool rMSC_leaveStatement(codet &);
-  bool rGCCAsmStatement(codet &);
-  bool rMSCAsmStatement(codet &);
-  bool rMSC_if_existsStatement(codet &);
 
   bool rExprStatement(codet &);
   bool rDeclarationStatement(codet &);
@@ -169,6 +238,18 @@ protected:
   bool moreVarName();
 
   bool rString(Token &tk);
+  
+  // GCC extensions
+  bool rGCCAsmStatement(codet &);
+  
+  // MSC extensions
+  bool rMSC_tryStatement(codet &);
+  bool rMSC_leaveStatement(codet &);
+  bool rMSCAsmStatement(codet &);
+  bool rMSC_if_existsStatement(codet &);
+  bool rMSCTypePredicate(exprt &);
+  bool rMSCuuidof(exprt &);
+  bool rMSC_if_existsExpr(exprt &);
 
   unsigned number_of_errors;
   irep_idt current_function;
@@ -177,11 +258,12 @@ protected:
 
   void set_location(irept &dest, const cpp_tokent &token)
   {
-    locationt &location=(locationt &)dest.add(ID_C_location);
-    location.set_file(token.filename);
-    location.set_line(token.line_no);
+    source_locationt &source_location=
+      static_cast<source_locationt &>(dest.add(ID_C_source_location));
+    source_location.set_file(token.filename);
+    source_location.set_line(token.line_no);
     if(!current_function.empty())
-      location.set_function(current_function);
+      source_location.set_function(current_function);
   }
 
   void make_subtype(typet &src, typet &dest)
@@ -191,9 +273,21 @@ protected:
       p=&p->subtype();
     p->swap(src);
   }
+
+  unsigned int max_errors;
 };
 
-const unsigned int MaxErrors=10;
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rString(Token &tk)
 {
@@ -202,6 +296,18 @@ bool Parser::rString(Token &tk)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void Parser::merge_types(typet &src, typet &dest)
 {
@@ -222,6 +328,18 @@ void Parser::merge_types(typet &src, typet &dest)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::SyntaxError()
 {
   #define ERROR_TOKENS 4
@@ -233,9 +351,9 @@ bool Parser::SyntaxError()
 
   if(t[0].kind!='\0')
   {
-    locationt location;
-    location.set_file(t[0].filename);
-    location.set_line(i2string(t[0].line_no));
+    source_locationt source_location;
+    source_location.set_file(t[0].filename);
+    source_location.set_line(i2string(t[0].line_no));
 
     std::string message="parse error before `";
 
@@ -248,11 +366,23 @@ bool Parser::SyntaxError()
 
     message+="'";
 
-    parser.print(1, message, -1, location);
+    parser.print(1, message, -1, source_location);
   }
 
-  return bool(++number_of_errors < MaxErrors);
+  return bool(++number_of_errors < max_errors);
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rProgram(cpp_itemt &item)
 {
@@ -273,6 +403,18 @@ bool Parser::rProgram(cpp_itemt &item)
   return false;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   definition
   : null.declaration
@@ -286,33 +428,41 @@ bool Parser::rProgram(cpp_itemt &item)
 */
 bool Parser::rDefinition(cpp_itemt &item)
 {
-  bool res;
-
   int t=lex.LookAhead(0);
 
   if(t==';')
-    res=rNullDeclaration(item.make_declaration());
+    return rNullDeclaration(item.make_declaration());
   else if(t==TOK_TYPEDEF)
-    res=rTypedef(item.make_declaration());
+    return rTypedef(item.make_declaration());
   else if(t==TOK_TEMPLATE)
-    res=rTemplateDecl(item.make_declaration());
+    return rTemplateDecl(item.make_declaration());
   else if(t==TOK_EXTERN && lex.LookAhead(1)==TOK_STRING)
-    res=rLinkageSpec(item.make_linkage_spec());
+    return rLinkageSpec(item.make_linkage_spec());
   else if(t==TOK_EXTERN && lex.LookAhead(1)==TOK_TEMPLATE)
-    res=rExternTemplateDecl(item.make_declaration());
+    return rExternTemplateDecl(item.make_declaration());
   else if(t==TOK_NAMESPACE)
-    res=rNamespaceSpec(item.make_namespace_spec());
+    return rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_INLINE && lex.LookAhead(1)==TOK_NAMESPACE)
-    res=rNamespaceSpec(item.make_namespace_spec());
+    return rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_USING)
-    res=rUsing(item.make_using());
+    return rUsing(item.make_using());
   else if(t==TOK_STATIC_ASSERT)
-    res=rStaticAssert(item.make_static_assert());
+    return rStaticAssert(item.make_static_assert());
   else
-    res=rDeclaration(item.make_declaration());
-
-  return res;
+    return rDeclaration(item.make_declaration());
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rNullDeclaration(cpp_declarationt &decl)
 {
@@ -325,6 +475,18 @@ bool Parser::rNullDeclaration(cpp_declarationt &decl)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   typedef
@@ -369,12 +531,36 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rTypedefStatement(codet &statement)
 {
   statement=codet(ID_decl);
   statement.operands().resize(1);
   return rTypedef((cpp_declarationt &)statement.op0());
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   type.specifier
@@ -413,6 +599,18 @@ bool Parser::rTypeSpecifier(typet &tspec, bool check)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 // isTypeSpecifier() returns true if the next is probably a type specifier.
 
 bool Parser::isTypeSpecifier()
@@ -420,7 +618,7 @@ bool Parser::isTypeSpecifier()
   int t=lex.LookAhead(0);
 
   if(t==TOK_IDENTIFIER || t==TOK_SCOPE
-       || t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT
+       || t==TOK_CONSTEXPR || t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT
        || t==TOK_CHAR || t==TOK_INT || t==TOK_SHORT || t==TOK_LONG
        || t==TOK_WCHAR_T || t==TOK_COMPLEX // new !!!
        || t==TOK_SIGNED || t==TOK_UNSIGNED || t==TOK_FLOAT || t==TOK_DOUBLE
@@ -431,11 +629,24 @@ bool Parser::isTypeSpecifier()
        || t==TOK_TYPENAME
        || t==TOK_TYPEOF
        || t==TOK_DECLTYPE
+       || t==TOK_MSC_UNDERLYING_TYPE
      )
     return true;
 
   return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   linkage.spec
@@ -474,6 +685,18 @@ bool Parser::rLinkageSpec(cpp_linkage_spect &linkage_spec)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   namespace.spec
@@ -526,10 +749,19 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
     namespace_spec.items().push_back(cpp_itemt());
     return rDefinition(namespace_spec.items().back());
   }
-
-  // unreachable
-  return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   using.declaration : USING { NAMESPACE } name ';'
@@ -558,6 +790,18 @@ bool Parser::rUsing(cpp_usingt &cpp_using)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   static_assert.declaration : STATIC_ASSERT ( expression , expression ) ';'
@@ -593,6 +837,18 @@ bool Parser::rStaticAssert(cpp_static_assertt &cpp_static_assert)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   linkage.body : '{' (definition)* '}'
 
@@ -627,6 +883,18 @@ bool Parser::rLinkageBody(cpp_linkage_spect::itemst &items)
   lex.GetToken(cp);
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   template.decl
@@ -709,6 +977,18 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
 {
   Token tk;
@@ -763,6 +1043,18 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   temp.arg.list
   : empty
@@ -794,6 +1086,18 @@ bool Parser::rTempArgList(irept &args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   temp.arg.declaration
@@ -843,7 +1147,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
       lex.GetToken(tk1);
       if(!rTypeName(default_type))
-          return false;
+        return false;
 
       declarator.value()=exprt(ID_type);
       declarator.value().type().swap(default_type);
@@ -912,6 +1216,18 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
    extern.template.decl
    : EXTERN TEMPLATE declaration
@@ -934,6 +1250,18 @@ bool Parser::rExternTemplateDecl(irept &decl)
   //                               Ptree::List(new Leaf(tk2), body));
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   declaration
@@ -1043,6 +1371,18 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /* single declaration, for use in a condition (controlling
    expression of switch/while/if) */
 bool Parser::rSimpleDeclaration(cpp_declarationt &declaration)
@@ -1102,6 +1442,18 @@ bool Parser::rSimpleDeclaration(cpp_declarationt &declaration)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rIntegralDeclaration(
   cpp_declarationt &declaration,
@@ -1208,6 +1560,18 @@ bool Parser::rIntegralDeclaration(
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rConstDeclaration(
   cpp_declarationt &declaration,
   cpp_storage_spect &storage_spec,
@@ -1231,6 +1595,18 @@ bool Parser::rConstDeclaration(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rOtherDeclaration(
   cpp_declarationt &declaration,
@@ -1299,7 +1675,8 @@ bool Parser::rOtherDeclaration(
     type.get_sub().erase(type.get_sub().begin());
 
     cpp_declaratort conv_operator_declarator;
-    if(!rConstructorDecl(conv_operator_declarator, type_name))
+    typet trailing_return_type;
+    if(!rConstructorDecl(conv_operator_declarator, type_name, trailing_return_type))
       return false;
 
     type_name=typet("cpp-cast-operator");
@@ -1319,16 +1696,20 @@ bool Parser::rOtherDeclaration(
       if(it->id()=="~") { is_destructor=true; break; }
 
     cpp_declaratort constructor_declarator;
-    if(!rConstructorDecl(constructor_declarator, type_name))
+    typet trailing_return_type;
+    if(!rConstructorDecl(constructor_declarator, type_name, trailing_return_type))
       return false;
 
     #ifdef DEBUG
     std::cout << "Parser::rOtherDeclaration 7\n";
     #endif
 
-    // it's the name (declarator), not the return type
-
-    type_name=typet(is_destructor?ID_destructor:ID_constructor);
+    // type_name above is the name declarator, not the return type
+    if(storage_spec.is_auto())
+      type_name=trailing_return_type;
+    else
+      type_name=typet(is_destructor?ID_destructor:ID_constructor);
+      
     declaration.declarators().push_back(constructor_declarator);
   }
   else if(!member_spec.is_empty() && lex.LookAhead(0)==';')
@@ -1384,7 +1765,7 @@ bool Parser::rOtherDeclaration(
   else
   {
     #ifdef DEBUG
-    std::cout << "Parser::rOtherDeclaration 12;\n";
+    std::cout << "Parser::rOtherDeclaration 12\n";
     #endif
 
     if(declaration.declarators().size()!=1)
@@ -1396,6 +1777,18 @@ bool Parser::rOtherDeclaration(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   This returns true for an declaration like:
@@ -1434,6 +1827,18 @@ bool Parser::isConstructorDecl()
     return true;
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   ptr.to.member
@@ -1492,6 +1897,18 @@ bool Parser::isPtrToMember(int i)
   return false;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   member.spec
   : (FRIEND | INLINE | VIRTUAL | EXPLICIT)+
@@ -1521,6 +1938,18 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   storage.spec : STATIC | EXTERN | AUTO | REGISTER | MUTABLE | ASM | THREAD_LOCAL
@@ -1558,15 +1987,28 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
-  cv.qualify : (CONST | VOLATILE | RESTRICT)+
+  cv.qualify : (CONSTEXPR | CONST | VOLATILE | RESTRICT)+
 */
 bool Parser::optCvQualify(typet &cv)
 {
   for(;;)
   {
     int t=lex.LookAhead(0);
-    if(t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT ||
+    if(t==TOK_CONSTEXPR ||
+       t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT ||
        t==TOK_PTR32 || t==TOK_PTR64 ||
        t==TOK_GCC_ATTRIBUTE)
     {
@@ -1576,6 +2018,12 @@ bool Parser::optCvQualify(typet &cv)
 
       switch(t)
       {
+      case TOK_CONSTEXPR:
+        p=typet(ID_constexpr);
+        set_location(p, tk);
+        merge_types(p, cv);
+        break;
+
       case TOK_CONST:
         p=typet(ID_const);
         set_location(p, tk);
@@ -1623,6 +2071,18 @@ bool Parser::optCvQualify(typet &cv)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rAttribute()
 {
   Token tk;
@@ -1646,9 +2106,19 @@ bool Parser::rAttribute()
   return true;
 }
 
-/*
+/*******************************************************************\
 
-  !!! added WCHAR_T
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+/*
 
   integral.or.class.spec
   : (CHAR | WCHAR_T | INT | SHORT | LONG | SIGNED | UNSIGNED | FLOAT | DOUBLE
@@ -1666,6 +2136,13 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
   #ifdef DEBUG
   std::cout << "Parser::optIntegralTypeOrClassSpec 0\n";
   #endif // DEBUG
+
+  // This makes no sense, but is used in Visual Studio header files.
+  if(lex.LookAhead(0)==TOK_TYPENAME)
+  {
+    Token tk;
+    lex.GetToken(tk);
+  }
 
   is_integral=false;
   p.make_nil();
@@ -1812,12 +2289,50 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 
     return true;
   }
+  else if(t==TOK_MSC_UNDERLYING_TYPE)
+  {
+    // A Visual Studio extension that returns the underlying
+    // type of an enum.
+    Token underlying_type_tk;
+    lex.GetToken(underlying_type_tk);
+
+    p=typet(ID_msc_underlying_type);
+    set_location(p, underlying_type_tk);
+
+    Token tk;
+    if(lex.GetToken(tk)!='(') return false;
+    
+    // the argument is always a type
+    
+    typet tname;
+
+    if(!rTypeName(tname))
+      return false;
+
+    if(lex.GetToken(tk)!=')') return false;
+
+    p.add(ID_type_arg).swap(tname);
+
+    return true;
+  }
   else
   {
     p.make_nil();
     return true;
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   constructor.decl
@@ -1826,11 +2341,14 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 */
 bool Parser::rConstructorDecl(
   cpp_declaratort &constructor,
-  typet &type_name)
+  typet &type_name,
+  typet &trailing_return_type)
 {
   #ifdef DEBUG
   std::cout << "Parser::rConstructorDecl 0\n";
   #endif
+  
+  trailing_return_type.make_nil();
 
   constructor=cpp_declaratort(typet("function_type"));
   constructor.type().subtype().make_nil();
@@ -1839,6 +2357,10 @@ bool Parser::rConstructorDecl(
   Token op;
   if(lex.GetToken(op)!='(')
     return false;
+
+  #ifdef DEBUG
+  std::cout << "Parser::rConstructorDecl 1\n";
+  #endif
 
   irept &parameters=constructor.type().add(ID_parameters);
 
@@ -1849,11 +2371,33 @@ bool Parser::rConstructorDecl(
   Token cp;
   lex.GetToken(cp);
 
+  #ifdef DEBUG
+  std::cout << "Parser::rConstructorDecl 2\n";
+  #endif
+
   typet &cv=(typet &)constructor.add(ID_method_qualifier);
   cv.make_nil();
   optCvQualify(cv);
 
   optThrowDecl(constructor.throw_decl());
+
+  if(lex.LookAhead(0)==TOK_ARROW)
+  {
+    #ifdef DEBUG
+    std::cout << "Parser::rConstructorDecl 3\n";
+    #endif
+
+    // C++11 trailing return type
+    Token arrow;
+    lex.GetToken(arrow);
+    
+    if(!rTypeSpecifier(trailing_return_type, false))
+      return false;
+  }
+
+  #ifdef DEBUG
+  std::cout << "Parser::rConstructorDecl 4\n";
+  #endif
 
   if(lex.LookAhead(0)==':')
   {
@@ -1864,6 +2408,10 @@ bool Parser::rConstructorDecl(
     else
       return false;
   }
+
+  #ifdef DEBUG
+  std::cout << "Parser::rConstructorDecl 5\n";
+  #endif
 
   if(lex.LookAhead(0)=='=')
   {
@@ -1903,6 +2451,18 @@ bool Parser::rConstructorDecl(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   throw.decl : THROW '(' (name {','})* {name} ')'
@@ -1962,6 +2522,18 @@ bool Parser::optThrowDecl(irept &throw_decl)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   declarators : declarator.with.init (',' declarator.with.init)*
 
@@ -1988,6 +2560,18 @@ bool Parser::rDeclarators(
       return true;
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   declarator.with.init
@@ -2091,6 +2675,18 @@ bool Parser::rDeclaratorWithInit(
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /* __stdcall, __fastcall, __clrcall, __cdecl 
 
    These are Visual-Studio specific.
@@ -2112,6 +2708,18 @@ bool Parser::rDeclaratorQualifier()
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   declarator
@@ -2180,6 +2788,10 @@ bool Parser::rDeclarator(
     if(!rDeclarator(declarator2, kind, true, true, false))
       return false;
 
+    #ifdef DEBUG
+    std::cout << "Parser::rDeclarator2 4\n";
+    #endif
+
     Token cp;
 
     if(lex.GetToken(cp)!=')')
@@ -2193,6 +2805,10 @@ bool Parser::rDeclarator(
           return false;
       }
 
+    #ifdef DEBUG
+    std::cout << "Parser::rDeclarator2 5\n";
+    #endif
+
     d_inner.swap(declarator2.type());
     name.swap(declarator2.name());
   }
@@ -2200,7 +2816,7 @@ bool Parser::rDeclarator(
           (kind==kDeclarator || t==TOK_IDENTIFIER || t==TOK_SCOPE))
   {
     #ifdef DEBUG
-    std::cout << "Parser::rDeclarator2 4\n";
+    std::cout << "Parser::rDeclarator2 6\n";
     #endif
     
     // if this is an argument declarator, "int (*)()" is valid.
@@ -2209,7 +2825,7 @@ bool Parser::rDeclarator(
   }
 
   #ifdef DEBUG
-  std::cout << "Parser::rDeclarator2 5\n";
+  std::cout << "Parser::rDeclarator2 7\n";
   #endif
 
   exprt init_args(static_cast<const exprt &>(get_nil_irep()));
@@ -2220,6 +2836,10 @@ bool Parser::rDeclarator(
     t=lex.LookAhead(0);
     if(t=='(') // function
     {
+      #ifdef DEBUG
+      std::cout << "Parser::rDeclarator2 8\n";
+      #endif
+
       Token op, cp;
       exprt args;
       bool is_args=true;
@@ -2253,15 +2873,40 @@ bool Parser::rDeclarator(
         // loop should end here
       }
 
+      #ifdef DEBUG
+      std::cout << "Parser::rDeclarator2 9\n";
+      #endif
+
       irept throw_decl;
       optThrowDecl(throw_decl); // ignore in this version
+      
+      if(lex.LookAhead(0)==TOK_ARROW)
+      {
+        #ifdef DEBUG
+        std::cout << "Parser::rDeclarator2 10\n";
+        #endif
+
+        // C++11 trailing return type, but we already have
+        // a return type. We should report this as an error.
+        Token arrow;
+        lex.GetToken(arrow);
+        
+        typet return_type;
+        if(!rTypeSpecifier(return_type, false))
+          return false;
+      }
 
       if(lex.LookAhead(0)==':')
       {
-        Ptree mi;
+        #ifdef DEBUG
+        std::cout << "Parser::rDeclarator2 11\n";
+        #endif
+
+        irept mi;
         if(rMemberInitializers(mi))
         {
-          // TODO
+          // TODO: these are only meant to show up in a
+          // constructor!
         }
         else
           return false;
@@ -2271,6 +2916,10 @@ bool Parser::rDeclarator(
     }
     else if(t=='[')         // array
     {
+      #ifdef DEBUG
+      std::cout << "Parser::rDeclarator2 12\n";
+      #endif
+
       Token ob, cb;
       exprt expr;
       lex.GetToken(ob);
@@ -2283,28 +2932,32 @@ bool Parser::rDeclarator(
       if(lex.GetToken(cb)!=']')
         return false;
 
-        std::list<typet> tl;
-        tl.push_back(d_outer);
-        while(tl.back().id() == ID_array)
-        {
-          tl.push_back(tl.back().subtype());
-        }
+      std::list<typet> tl;
+      tl.push_back(d_outer);
+      while(tl.back().id() == ID_array)
+      {
+        tl.push_back(tl.back().subtype());
+      }
 
-        typet array_type(ID_array);
-        array_type.add(ID_size).swap(expr);
-        array_type.subtype().swap(tl.back());
+      typet array_type(ID_array);
+      array_type.add(ID_size).swap(expr);
+      array_type.subtype().swap(tl.back());
+      tl.pop_back();
+      d_outer.swap(array_type);
+      while(!tl.empty())
+      {
+        tl.back().subtype().swap(d_outer);
+        d_outer.swap(tl.back());
         tl.pop_back();
-        d_outer.swap(array_type);
-        while(!tl.empty())
-        {
-          tl.back().subtype().swap(d_outer);
-          d_outer.swap(tl.back());
-          tl.pop_back();
-        }
+      }
     }
     else
       break;
   }
+
+  #ifdef DEBUG
+  std::cout << "Parser::rDeclarator2 13\n";
+  #endif
 
   declarator=cpp_declaratort();
 
@@ -2320,6 +2973,18 @@ bool Parser::rDeclarator(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   ptr.operator
@@ -2422,6 +3087,18 @@ bool Parser::optPtrOperator(typet &ptrs)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   member.initializers
   : ':' member.init (',' member.init)*
@@ -2453,6 +3130,18 @@ bool Parser::rMemberInitializers(irept &init)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   member.init
@@ -2513,6 +3202,18 @@ bool Parser::rMemberInit(exprt &init)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   name : {'::'} name2 ('::' name2)*
 
@@ -2555,7 +3256,7 @@ bool Parser::rName(irept &name)
     Token tk;
 
     #ifdef DEBUG
-    std::cout << "Parser::rName 2 " << "\n";
+    std::cout << "Parser::rName 2 " << lex.LookAhead(0) << "\n";
     #endif
 
     switch(lex.LookAhead(0))
@@ -2646,9 +3347,21 @@ bool Parser::rName(irept &name)
 
     default:
       return false;
+    }
   }
 }
-}
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   operator.name
@@ -2761,6 +3474,18 @@ bool Parser::rOperatorName(irept &name)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   cast.operator.name
   : {cv.qualify} (integral.or.class.spec | name) {cv.qualify}
@@ -2823,6 +3548,18 @@ bool Parser::rCastOperatorName(irept &name)
     return true;
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   ptr.to.member
@@ -2914,6 +3651,18 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
   return false;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   template.args
   : '<' '>'
@@ -2973,7 +3722,7 @@ bool Parser::rTemplateArgs(irept &template_args)
 
       // ok
       exp=exprt(ID_type);
-      exp.location()=a.location();
+      exp.add_source_location()=a.source_location();
       exp.type().swap(a);
 
       // but could also be an expr
@@ -3028,6 +3777,18 @@ bool Parser::rTemplateArgs(irept &template_args)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   arg.decl.list.or.init
     : arg.decl.list
@@ -3073,6 +3834,18 @@ bool Parser::rArgDeclListOrInit(
     }
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   arg.decl.list
@@ -3124,6 +3897,18 @@ bool Parser::rArgDeclList(irept &arglist)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   arg.declaration
     : {userdef.keyword | REGISTER} type.specifier arg.declarator
@@ -3166,6 +3951,18 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   initialize.expr
@@ -3249,6 +4046,18 @@ bool Parser::rInitializeExpr(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   function.arguments
   : empty
@@ -3278,6 +4087,18 @@ bool Parser::rFunctionArguments(exprt &args)
       lex.GetToken(tk);
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   enum.spec
@@ -3327,6 +4148,18 @@ bool Parser::rEnumSpec(typet &spec)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   enum.body
@@ -3378,6 +4211,18 @@ bool Parser::rEnumBody(irept &body)
     lex.GetToken(tk);
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   class.spec
@@ -3481,6 +4326,18 @@ bool Parser::rClassSpec(typet &spec)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   base.specifiers
   : ':' base.specifier (',' base.specifier)*
@@ -3549,6 +4406,18 @@ bool Parser::rBaseSpecifiers(irept &bases)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   class.body : '{' (class.members)* '}'
 */
@@ -3593,6 +4462,18 @@ bool Parser::rClassBody(exprt &body)
   body.swap(members);
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   class.member
@@ -3668,6 +4549,18 @@ bool Parser::rClassMember(cpp_itemt &member)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   access.decl
   : name ';'                e.g. <qualified class>::<member name>;
@@ -3687,6 +4580,18 @@ bool Parser::rAccessDecl(irept &mem)
   //                           Ptree::List(new Leaf(tk)));
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   comma.expression
@@ -3730,6 +4635,18 @@ bool Parser::rCommaExpression(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   expression
@@ -3811,6 +4728,18 @@ bool Parser::rExpression(exprt &exp)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   conditional.expr
   : logical.or.expr {'?' comma.expression ':' conditional.expr}  right-to-left
@@ -3858,6 +4787,18 @@ bool Parser::rConditionalExpr(exprt &exp)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   logical.or.expr
   : logical.and.expr
@@ -3895,6 +4836,18 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool temp_args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   logical.and.expr
@@ -3934,6 +4887,18 @@ bool Parser::rLogicalAndExpr(exprt &exp, bool temp_args)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   inclusive.or.expr
   : exclusive.or.expr
@@ -3971,6 +4936,18 @@ bool Parser::rInclusiveOrExpr(exprt &exp, bool temp_args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   exclusive.or.expr
@@ -4010,6 +4987,18 @@ bool Parser::rExclusiveOrExpr(exprt &exp, bool temp_args)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   and.expr
   : equality.expr
@@ -4047,6 +5036,18 @@ bool Parser::rAndExpr(exprt &exp, bool temp_args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   equality.expr
@@ -4086,6 +5087,18 @@ bool Parser::rEqualityExpr(exprt &exp, bool temp_args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   relational.expr
@@ -4138,6 +5151,18 @@ bool Parser::rRelationalExpr(exprt &exp, bool temp_args)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   shift.expr
   : additive.expr
@@ -4176,6 +5201,18 @@ bool Parser::rShiftExpr(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   additive.expr
@@ -4222,6 +5259,18 @@ bool Parser::rAdditiveExpr(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   multiply.expr
@@ -4274,6 +5323,18 @@ bool Parser::rMultiplyExpr(exprt &exp)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   pm.expr        (pointer to member .*, ->*)
   : cast.expr
@@ -4317,6 +5378,18 @@ bool Parser::rPmExpr(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   cast.expr
@@ -4378,6 +5451,18 @@ bool Parser::rCastExpr(exprt &exp)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   type.name
   : type.specifier cast.declarator
@@ -4401,6 +5486,18 @@ bool Parser::rTypeName(typet &tname)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   unary.expr
@@ -4511,6 +5608,18 @@ bool Parser::rUnaryExpr(exprt &exp)
     return rPostfixExpr(exp);
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   throw.expression
   : THROW {expression}
@@ -4547,6 +5656,18 @@ bool Parser::rThrowExpr(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   typeid.expr
@@ -4606,6 +5727,18 @@ bool Parser::rTypeidExpr(exprt &exp)
   return false;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   sizeof.expr
   : SIZEOF unary.expr
@@ -4654,6 +5787,18 @@ bool Parser::rSizeofExpr(exprt &exp)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   alignof.expr
   | ALIGNOF '(' type.name ')'
@@ -4690,6 +5835,18 @@ bool Parser::isAllocateExpr(int t)
 
   return t==TOK_NEW || t==TOK_DELETE;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   allocate.expr
@@ -4777,6 +5934,18 @@ bool Parser::rAllocateExpr(exprt &exp)
   else
     return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   allocate.type
@@ -4869,6 +6038,18 @@ bool Parser::rAllocateType(
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   new.declarator
   : empty
@@ -4903,6 +6084,18 @@ bool Parser::rNewDeclarator(typet &decl)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   allocate.initializer
@@ -4944,6 +6137,18 @@ bool Parser::rAllocateInitializer(exprt &init)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   postfix.exp
@@ -5095,9 +6300,22 @@ bool Parser::rPostfixExpr(exprt &exp)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   __uuidof( expression )
   __uuidof( type )
+  This is a Visual Studio Extension.
 */  
 
 bool Parser::rMSCuuidof(exprt &expr)
@@ -5143,6 +6361,18 @@ bool Parser::rMSCuuidof(exprt &expr)
   set_location(expr, tk);
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   __if_exists ( identifier ) { token stream }
@@ -5193,6 +6423,18 @@ bool Parser::rMSC_if_existsExpr(exprt &expr)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rMSC_if_existsStatement(codet &code)
 {
@@ -5246,6 +6488,18 @@ bool Parser::rMSC_if_existsStatement(codet &code)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   __is_base_of ( base, derived )
   __is_convertible_to ( from, to )
@@ -5289,6 +6543,18 @@ bool Parser::rMSCTypePredicate(exprt &expr)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   primary.exp
@@ -5430,6 +6696,18 @@ bool Parser::rPrimaryExpr(exprt &exp)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   var.name : {'::'} name2 ('::' name2)*
 
@@ -5451,6 +6729,18 @@ bool Parser::rVarName(exprt &name)
   else
     return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rVarNameCore(exprt &name)
 {
@@ -5489,9 +6779,19 @@ bool Parser::rVarNameCore(exprt &name)
 
     switch(lex.LookAhead(0))
     {
-    case TOK_IDENTIFIER:
+    case TOK_TEMPLATE:
+      // this may be a template member function, for example
       #ifdef DEBUG
       std::cout << "Parser::rVarNameCore 2\n";
+      #endif
+      lex.GetToken(tk);
+      // Skip template token, next will be identifier
+      if(lex.LookAhead(0)!=TOK_IDENTIFIER) return false;
+      break;
+    
+    case TOK_IDENTIFIER:
+      #ifdef DEBUG
+      std::cout << "Parser::rVarNameCore 3\n";
       #endif
 
       lex.GetToken(tk);
@@ -5503,7 +6803,7 @@ bool Parser::rVarNameCore(exprt &name)
       if(isTemplateArgs())
       {
         #ifdef DEBUG
-        std::cout << "Parser::rVarNameCore 3\n";
+        std::cout << "Parser::rVarNameCore 4\n";
         #endif
 
         irept args;
@@ -5519,7 +6819,7 @@ bool Parser::rVarNameCore(exprt &name)
 
     case TOK_SCOPE:
       #ifdef DEBUG
-      std::cout << "Parser::rVarNameCore 4\n";
+      std::cout << "Parser::rVarNameCore 5\n";
       #endif
 
       lex.GetToken(tk);
@@ -5529,7 +6829,7 @@ bool Parser::rVarNameCore(exprt &name)
 
     case '~':
       #ifdef DEBUG
-      std::cout << "Parser::rVarNameCore 5\n";
+      std::cout << "Parser::rVarNameCore 6\n";
       #endif
 
       lex.GetToken(tk);
@@ -5543,7 +6843,7 @@ bool Parser::rVarNameCore(exprt &name)
 
     case TOK_OPERATOR:
       #ifdef DEBUG
-      std::cout << "Parser::rVarNameCore 6\n";
+      std::cout << "Parser::rVarNameCore 7\n";
       #endif
 
       lex.GetToken(tk);
@@ -5566,6 +6866,18 @@ bool Parser::rVarNameCore(exprt &name)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::moreVarName()
 {
   if(lex.LookAhead(0)==TOK_SCOPE)
@@ -5577,6 +6889,18 @@ bool Parser::moreVarName()
 
   return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   template.args : '<' any* '>'
@@ -5659,6 +6983,18 @@ bool Parser::isTemplateArgs()
   return false;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   function.body  : compound.statement
                  | { asm }
@@ -5707,6 +7043,18 @@ bool Parser::rFunctionBody(cpp_declaratort &declarator)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   compound.statement
   : '{' (statement)* '}'
@@ -5751,6 +7099,18 @@ bool Parser::rCompoundStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   statement
@@ -6007,7 +7367,7 @@ bool Parser::rStatement(codet &statement)
         return false;
         
       statement.set_statement(ID_static_assert);
-      statement.location()=cpp_static_assert.location();
+      statement.add_source_location()=cpp_static_assert.source_location();
       statement.operands().swap(cpp_static_assert.operands());
       
       return true;
@@ -6017,6 +7377,18 @@ bool Parser::rStatement(codet &statement)
     return rExprStatement(statement);
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   if.statement
@@ -6066,6 +7438,18 @@ bool Parser::rIfStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   switch.statement
   : SWITCH '(' comma.expression ')' statement
@@ -6099,6 +7483,18 @@ bool Parser::rSwitchStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   while.statement
   : WHILE '(' comma.expression ')' statement
@@ -6131,6 +7527,18 @@ bool Parser::rWhileStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   do.statement
@@ -6170,6 +7578,18 @@ bool Parser::rDoStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   for.statement
@@ -6231,6 +7651,18 @@ bool Parser::rForStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   try.statement
@@ -6318,6 +7750,18 @@ bool Parser::rTryStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rMSC_tryStatement(codet &statement)
 {
   // These are for 'structured exception handling',
@@ -6373,6 +7817,18 @@ bool Parser::rMSC_tryStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rMSC_leaveStatement(codet &statement)
 {
   // These are for 'structured exception handling',
@@ -6388,6 +7844,18 @@ bool Parser::rMSC_leaveStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rGCCAsmStatement(codet &statement)
 {
@@ -6476,6 +7944,18 @@ bool Parser::rGCCAsmStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rMSCAsmStatement(codet &statement)
 {
   Token tk;
@@ -6540,6 +8020,18 @@ bool Parser::rMSCAsmStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   expr.statement
@@ -6612,12 +8104,24 @@ bool Parser::rExprStatement(codet &statement)
       #endif
 
       statement=codet(ID_expression);
-      statement.location()=exp.location();
+      statement.add_source_location()=exp.source_location();
       statement.move_to_operands(exp);
       return true;
     }
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rCondition(exprt &statement)
 {
@@ -6643,6 +8147,18 @@ bool Parser::rCondition(exprt &statement)
     return true;
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   declaration.statement
@@ -6717,6 +8233,18 @@ bool Parser::rDeclarationStatement(codet &statement)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   integral.decl.statement
   : decl.head integral.or.class.spec {cv.qualify} {declarators} ';'
@@ -6761,6 +8289,18 @@ bool Parser::rIntegralDeclStatement(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
    other.decl.statement
@@ -6815,10 +8355,34 @@ bool Parser::rOtherDeclStatement(
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::MaybeTypeNameOrClassTemplate(Token&)
 {
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void Parser::SkipTo(int token)
 {
@@ -6836,7 +8400,7 @@ void Parser::SkipTo(int token)
 
 /*******************************************************************\
 
-Function: Parser::parse
+Function: Parser::operator()
 
   Inputs:
 
@@ -6846,9 +8410,10 @@ Function: Parser::parse
 
 \*******************************************************************/
 
-bool Parser::parse()
+bool Parser::operator()()
 {
   number_of_errors=0;
+  max_errors=10;
 
   #if 1
   cpp_itemt item;
@@ -6886,5 +8451,5 @@ Function: cpp_parse
 bool cpp_parse()
 {
   Parser parser(cpp_parser);
-  return parser.parse();
+  return parser();
 }

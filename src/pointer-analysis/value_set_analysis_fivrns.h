@@ -49,7 +49,7 @@ public:
   {
     forall_goto_program_instructions(it, goto_program)
     {
-      out << "**** " << it->location << std::endl;      
+      out << "**** " << it->source_location << std::endl;      
       output(it, out);
       out << std::endl;
       goto_program.output_instruction(ns, "", out, it);

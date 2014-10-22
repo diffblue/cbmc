@@ -214,6 +214,24 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
 
     return true;
   }
+  else if(expr.id()==ID_union)
+  {
+    forall_operands(it, expr)
+      if(!constant_propagation(*it))
+        return false;
+
+    return true;
+  }
+  // byte_update works, byte_extract may be out-of-bounds
+  else if(expr.id()==ID_byte_update_big_endian ||
+          expr.id()==ID_byte_update_little_endian)
+  {
+    forall_operands(it, expr)
+      if(!constant_propagation(*it))
+        return false;
+
+    return true;
+  }
 
   return false;
 }
@@ -359,7 +377,7 @@ void goto_symex_statet::propagationt::operator()(exprt &expr)
 
 /*******************************************************************\
 
-Function: goto_symex_statet::rename
+Function: goto_symex_statet::rename_identifier
 
   Inputs:
 
@@ -369,7 +387,7 @@ Function: goto_symex_statet::rename
 
 \*******************************************************************/
 
-irep_idt goto_symex_statet::rename(
+irep_idt goto_symex_statet::rename_identifier(
   const irep_idt &identifier,
   const namespacet &ns,
   levelt level)
@@ -431,7 +449,7 @@ void goto_symex_statet::rename(
 
     if(level==L0 || level==L1)
     {
-      const irep_idt new_name=rename(identifier, ns, level);
+      const irep_idt new_name=rename_identifier(identifier, ns, level);
       to_symbol_expr(expr).set_identifier(new_name);
     }  
     else if(level==L2)
@@ -446,7 +464,7 @@ void goto_symex_statet::rename(
       }
       else
       {
-        irep_idt l1_identifier=rename(identifier, ns, L1);
+        irep_idt l1_identifier=rename_identifier(identifier, ns, L1);
 
         // We also consider propagation if we go up to L2.
         // L1 identifiers are used for propagation!
@@ -508,7 +526,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
      !ns.lookup(orig_identifier).is_shared())
     return false;
 
-  const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
+  const irep_idt l1_identifier=rename_identifier(orig_identifier, ns, L1);
   symbol_exprt ssa_l1=expr;
   ssa_l1.set_identifier(l1_identifier);
 
@@ -641,7 +659,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
   // see whether we are within an atomic section
   if(atomic_section_id!=0)
   {
-    const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
+    const irep_idt l1_identifier=rename_identifier(orig_identifier, ns, L1);
     symbol_exprt ssa_l1=expr;
     ssa_l1.set_identifier(l1_identifier);
 
@@ -686,7 +704,7 @@ void goto_symex_statet::rename_address(
   {
     // only do L1!
     irep_idt identifier=to_symbol_expr(expr).get_identifier();
-    identifier=rename(identifier, ns, L1);
+    identifier=rename_identifier(identifier, ns, L1);
     to_symbol_expr(expr).set_identifier(identifier);
   }
   else

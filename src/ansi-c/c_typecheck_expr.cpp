@@ -88,11 +88,16 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   // check qualifiers first
   if(c_qualifierst(type1)!=c_qualifierst(type2))
     return false;
+    
+  if(type1.id()==ID_c_enum_tag)
+    return gcc_types_compatible_p(follow_tag(to_c_enum_tag_type(type1)), type2);
+  else if(type2.id()==ID_c_enum_tag)
+    return gcc_types_compatible_p(type1, follow_tag(to_c_enum_tag_type(type2)));
 
   if(type1.id()==ID_c_enum)
   {
     if(type2.id()==ID_c_enum) // both are enums
-      return type1==type2; // compares the tag 
+      return type1==type2; // compares the tag
     else if(type2==type1.subtype())
       return true;
   }
@@ -229,7 +234,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     assert(subtypes.size()==2);
     typecheck_type(subtypes[0]);
     typecheck_type(subtypes[1]);
-    locationt location=expr.location();
+    source_locationt source_location=expr.source_location();
     
     // ignores top-level qualifiers
     subtypes[0].remove(ID_C_constant);
@@ -240,7 +245,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     subtypes[1].remove(ID_C_restricted);
     
     expr.make_bool(gcc_types_compatible_p(subtypes[0], subtypes[1]));
-    expr.location()=location;
+    expr.add_source_location()=source_location;
   }
   else if(expr.id()==ID_builtin_offsetof)
     typecheck_expr_builtin_offsetof(expr);
@@ -323,7 +328,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       {
         // __imag__ x is simply a zero constant
         exprt result=gen_zero(op_type);
-        result.location()=expr.location();
+        result.add_source_location()=expr.source_location();
         expr=result;
       }
     }
@@ -467,9 +472,9 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
 
   // turn into function call
   side_effect_expr_function_callt result;
-  result.location()=expr.location();
+  result.add_source_location()=expr.source_location();
   result.function()=symbol_exprt(ID_gcc_builtin_va_arg);
-  result.function().location()=expr.location();
+  result.function().add_source_location()=expr.source_location();
   result.function().type()=new_type;
   result.arguments().push_back(arg);
   result.type()=new_type.return_type();
@@ -681,7 +686,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
   // We make an effort to produce a constant,
   // but this may depend on variables
   simplify(result, *this);
-  result.location()=expr.location();
+  result.add_source_location()=expr.source_location();
 
   expr.swap(result);
 }
@@ -697,8 +702,6 @@ Function: c_typecheck_baset::typecheck_expr_operands
  Purpose:
 
 \*******************************************************************/
-
-#include <iostream>
 
 void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
 {
@@ -756,7 +759,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
     }
     
     code_declt decl;
-    decl.location()=declaration.location();
+    decl.add_source_location()=declaration.source_location();
     decl.symbol()=symbol_expr(symbol);
 
     expr.op0()=decl;    
@@ -821,22 +824,29 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     throw 0;
   }
 
-  // save location
-  locationt location=expr.location();
+  // save the source location
+  source_locationt source_location=expr.source_location();
 
   if(symbol.is_macro)
   {
+    // preserve enum key
+    irep_idt base_name=expr.get(ID_C_base_name);
+
     expr=symbol.value;
 
-    // put it back
-    expr.location()=location;
+    if(expr.id()==ID_constant &&
+       !base_name.empty())
+      expr.set(ID_C_cformat, base_name);
+
+    // preserve location
+    expr.add_source_location()=source_location;
   }
   else if(has_prefix(id2string(identifier), CPROVER_PREFIX "constant_infinity"))
   {
     expr=infinity_exprt(symbol.type);
 
     // put it back
-    expr.location()=location;
+    expr.add_source_location()=source_location;
   }
   else if(identifier=="c::__func__" ||
           identifier=="c::__FUNCTION__" ||
@@ -844,8 +854,8 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   {
     // __func__ is an ANSI-C standard compliant hack to get the function name
     // __FUNCTION__ and __PRETTY_FUNCTION__ are GCC-specific
-    string_constantt s(location.get_function());
-    s.location()=location;
+    string_constantt s(source_location.get_function());
+    s.add_source_location()=source_location;
     s.set(ID_C_lvalue, true);
     expr.swap(s);
   }
@@ -854,7 +864,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     expr=symbol.symbol_expr();
 
     // put it back
-    expr.location()=location;
+    expr.add_source_location()=source_location;
 
     if(symbol.is_lvalue)
       expr.set(ID_C_lvalue, true);
@@ -864,7 +874,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
       exprt tmp(ID_address_of, pointer_typet());
       tmp.set("#implicit", true);
       tmp.type().subtype()=expr.type();
-      tmp.location()=expr.location();
+      tmp.add_source_location()=expr.source_location();
       tmp.move_to_operands(expr);
       expr.swap(tmp);
     }
@@ -895,54 +905,38 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
   codet &code=to_code(expr.op0());
 
-  assert(code.get(ID_statement)==ID_block);
-
   // the type is the type of the last statement in the
   // block, but do worry about labels!
   
-  codet *last=&code;
+  codet &last=to_code_block(code).find_last_statement();
   
-  while(true)
-  {
-    const irep_idt &statement=last->get_statement();
-    
-    if(statement==ID_block)
-    {
-      if(last->operands().size()==0)
-      {
-        expr.type()=typet(ID_empty);
-        return;
-      }
-      
-      last=&to_code(last->operands().back());
-    }
-    else if(statement==ID_label)
-    {
-      assert(last->operands().size()==1);
-      last=&(to_code(last->op0()));
-    }
-    else
-      break;
-  }
-  
-  irep_idt last_statement=last->get_statement();
+  irep_idt last_statement=last.get_statement();
 
   if(last_statement==ID_expression)
   {
-    assert(last->operands().size()==1);
-    expr.type()=last->op0().type();
+    assert(last.operands().size()==1);
+    exprt &op=last.op0();
+
+    // arrays here turn into pointers (array decay)
+    if(op.type().id()==ID_array)
+      implicit_typecast(op, pointer_typet(op.type().subtype()));
+
+    expr.type()=op.type();    
   }
   else if(last_statement==ID_function_call)
   {
+    // this is suspected to be dead
+    assert(false);
+  
     // make the last statement an expression
 
-    code_function_callt &fc=to_code_function_call(*last);
+    code_function_callt &fc=to_code_function_call(last);
 
     side_effect_expr_function_callt sideeffect;
 
     sideeffect.function()=fc.function();
     sideeffect.arguments()=fc.arguments();
-    sideeffect.location()=fc.location();
+    sideeffect.add_source_location()=fc.source_location();
 
     sideeffect.type()=
       static_cast<const typet &>(fc.function().type().find(ID_return_type));
@@ -952,23 +946,23 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
     if(fc.lhs().is_nil())
     {
       codet code_expr(ID_expression);
-      code_expr.location() = fc.location();
+      code_expr.add_source_location() = fc.source_location();
       code_expr.move_to_operands(sideeffect);
-      last->swap(code_expr);
+      last.swap(code_expr);
     }
     else
     {
       codet code_expr(ID_expression);
-      code_expr.location() = fc.location();
+      code_expr.add_source_location() = fc.source_location();
 
       exprt assign(ID_side_effect);
       assign.set(ID_statement, ID_assign);
-      assign.location()=fc.location();
+      assign.add_source_location()=fc.source_location();
       assign.move_to_operands(fc.lhs(), sideeffect);
       assign.type()=assign.op1().type();
 
       code_expr.move_to_operands(assign);
-      last->swap(code_expr);
+      last.swap(code_expr);
     }
   }
   else
@@ -1072,7 +1066,7 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
   mp_integer a=alignment(argument_type, *this);
   
   exprt tmp=from_integer(a, size_type());
-  tmp.location()=expr.location();
+  tmp.add_source_location()=expr.source_location();
   
   expr.swap(tmp);
 }
@@ -1150,7 +1144,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       {
         // found! build union constructor
         union_exprt union_expr(expr.type());
-        union_expr.location()=expr.location();
+        union_expr.add_source_location()=expr.source_location();
         union_expr.op()=op;
         union_expr.set_component_name(it->get_name());
         expr=union_expr;
@@ -1212,6 +1206,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
      expr_type.id()!=ID_pointer &&
      expr_type.id()!=ID_array &&
      expr_type.id()!=ID_c_enum &&
+     expr_type.id()!=ID_c_enum_tag &&
      expr_type.id()!=ID_incomplete_c_enum)
   {
     err_location(expr);
@@ -1223,6 +1218,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
   if(is_number(op_type) ||
      op_type.id()==ID_c_enum ||
+     op_type.id()==ID_c_enum_tag ||
      op_type.id()==ID_incomplete_c_enum ||
      op_type.id()==ID_bool ||
      op_type.id()==ID_pointer)
@@ -1279,9 +1275,9 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   if(expr_type.get(ID_C_c_type)==ID_bool)
   {
     // we replace (_Bool)x by x!=0; use ieee_float_notequal for floats
-    locationt l=expr.location();
+    source_locationt l=expr.source_location();
     expr=is_not_zero(expr.op0(), *this);
-    expr.location()=l;
+    expr.add_source_location()=l;
     return;
   }
 
@@ -1625,7 +1621,7 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
 
   exprt deref(ID_dereference);
   deref.move_to_operands(expr.op0());
-  deref.location()=expr.location();
+  deref.add_source_location()=expr.source_location();
 
   typecheck_expr_dereference(deref);
 
@@ -1859,7 +1855,7 @@ void c_typecheck_baset::typecheck_side_effect_gcc_conditional_expression(
   if_expr.cond()=operands[0];
   if_expr.true_case()=operands[0];
   if_expr.false_case()=operands[1];
-  if_expr.location()=expr.location();
+  if_expr.add_source_location()=expr.source_location();
 
   typecheck_expr_trinary(if_expr);
 
@@ -1896,6 +1892,9 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   if(op.id()==ID_label)
   {
     expr.type()=pointer_typet(empty_typet());
+    
+    // remember the label
+    labels_used[op.get(ID_identifier)]=op.source_location();
     return;
   }
 
@@ -2017,7 +2016,7 @@ void c_typecheck_baset::typecheck_expr_function_identifier(exprt &expr)
     exprt tmp(ID_address_of, pointer_typet());
     tmp.set(ID_C_implicit, true);
     tmp.type().subtype()=expr.type();
-    tmp.location()=expr.location();
+    tmp.add_source_location()=expr.source_location();
     tmp.move_to_operands(expr);
     expr.swap(tmp);
   }
@@ -2074,6 +2073,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
        final_type0.get(ID_C_c_type)==ID_bool ||
        is_number(final_type0) ||
        final_type0.id()==ID_c_enum ||
+       final_type0.id()==ID_c_enum_tag ||
        final_type0.id()==ID_incomplete_c_enum)
     {
       expr.type()=type0;
@@ -2159,7 +2159,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       new_symbol.name=identifier;
       new_symbol.base_name=
         std::string(id2string(identifier), language_prefix.size(), std::string::npos);
-      new_symbol.location=expr.location();
+      new_symbol.location=expr.source_location();
       new_symbol.type=code_typet();
       new_symbol.type.set(ID_C_incomplete, true);
       new_symbol.type.add(ID_return_type)=return_type;
@@ -2201,7 +2201,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   {
     exprt tmp(ID_dereference, f_op_type.subtype());
     tmp.set(ID_C_implicit, true);
-    tmp.location()=f_op.location();
+    tmp.add_source_location()=f_op.source_location();
     tmp.move_to_operands(f_op);
     f_op.swap(tmp);
   }
@@ -2237,7 +2237,7 @@ void c_typecheck_baset::do_special_functions(
   side_effect_expr_function_callt &expr)
 {
   const exprt &f_op=expr.function();
-  const locationt &location=expr.location();
+  const source_locationt &source_location=expr.source_location();
 
   // some built-in functions
   if(f_op.id()==ID_symbol)
@@ -2253,7 +2253,7 @@ void c_typecheck_baset::do_special_functions(
       }
 
       exprt same_object_expr=same_object(expr.arguments()[0], expr.arguments()[1]);
-      same_object_expr.location()=location;
+      same_object_expr.add_source_location()=source_location;
       expr.swap(same_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "invalid_pointer")
@@ -2266,7 +2266,7 @@ void c_typecheck_baset::do_special_functions(
 
       predicate_exprt same_object_expr(ID_invalid_pointer);
       same_object_expr.operands()=expr.arguments();
-      same_object_expr.location()=location;
+      same_object_expr.add_source_location()=source_location;
       expr.swap(same_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "buffer_size")
@@ -2279,7 +2279,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt buffer_size_expr("buffer_size", size_type());
       buffer_size_expr.operands()=expr.arguments();
-      buffer_size_expr.location()=location;
+      buffer_size_expr.add_source_location()=source_location;
       expr.swap(buffer_size_expr);
     }
     else if(identifier==CPROVER_PREFIX "is_zero_string")
@@ -2293,7 +2293,7 @@ void c_typecheck_baset::do_special_functions(
       predicate_exprt is_zero_string_expr("is_zero_string");
       is_zero_string_expr.operands()=expr.arguments();
       is_zero_string_expr.set(ID_C_lvalue, true); // make it an lvalue
-      is_zero_string_expr.location()=location;
+      is_zero_string_expr.add_source_location()=source_location;
       expr.swap(is_zero_string_expr);
     }
     else if(identifier==CPROVER_PREFIX "zero_string_length")
@@ -2307,7 +2307,7 @@ void c_typecheck_baset::do_special_functions(
       exprt zero_string_length_expr("zero_string_length", size_type());
       zero_string_length_expr.operands()=expr.arguments();
       zero_string_length_expr.set(ID_C_lvalue, true); // make it an lvalue
-      zero_string_length_expr.location()=location;
+      zero_string_length_expr.add_source_location()=source_location;
       expr.swap(zero_string_length_expr);
     }
     else if(identifier==CPROVER_PREFIX "DYNAMIC_OBJECT")
@@ -2317,7 +2317,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt dynamic_object_expr=exprt(ID_dynamic_object, expr.type());
       dynamic_object_expr.operands()=expr.arguments();
-      dynamic_object_expr.location()=location;
+      dynamic_object_expr.add_source_location()=source_location;
       expr.swap(dynamic_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "POINTER_OFFSET")
@@ -2327,7 +2327,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt pointer_offset_expr=exprt(ID_pointer_offset, expr.type());
       pointer_offset_expr.operands()=expr.arguments();
-      pointer_offset_expr.location()=location;
+      pointer_offset_expr.add_source_location()=source_location;
       expr.swap(pointer_offset_expr);
     }
     else if(identifier==CPROVER_PREFIX "POINTER_OBJECT")
@@ -2337,7 +2337,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt pointer_object_expr=exprt(ID_pointer_object, expr.type());
       pointer_object_expr.operands()=expr.arguments();
-      pointer_object_expr.location()=location;
+      pointer_object_expr.add_source_location()=source_location;
       expr.swap(pointer_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "isnanf" || 
@@ -2353,7 +2353,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isnan_expr(ID_isnan, bool_typet());
       isnan_expr.operands()=expr.arguments();
-      isnan_expr.location()=location;
+      isnan_expr.add_source_location()=source_location;
       expr.swap(isnan_expr);
     }
     else if(identifier==CPROVER_PREFIX "isfinitef" ||
@@ -2368,7 +2368,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isfinite_expr(ID_isfinite, bool_typet());
       isfinite_expr.operands()=expr.arguments();
-      isfinite_expr.location()=location;
+      isfinite_expr.add_source_location()=source_location;
       expr.swap(isfinite_expr);
     }
     else if(identifier==CPROVER_PREFIX "inf" ||
@@ -2376,14 +2376,14 @@ void c_typecheck_baset::do_special_functions(
     {
       constant_exprt inf_expr=
         ieee_floatt::plus_infinity(ieee_float_spect::double_precision()).to_expr();
-      inf_expr.location()=location;
+      inf_expr.add_source_location()=source_location;
       expr.swap(inf_expr);
     }
     else if(identifier==CPROVER_PREFIX "inff")
     {
       constant_exprt inff_expr=
         ieee_floatt::plus_infinity(ieee_float_spect::single_precision()).to_expr();
-      inff_expr.location()=location;
+      inff_expr.add_source_location()=source_location;
       expr.swap(inff_expr);
     }
     else if(identifier==CPROVER_PREFIX "infl")
@@ -2391,7 +2391,7 @@ void c_typecheck_baset::do_special_functions(
       floatbv_typet type=to_floatbv_type(long_double_type());
       constant_exprt infl_expr=
         ieee_floatt::plus_infinity(ieee_float_spect(type)).to_expr();
-      infl_expr.location()=location;
+      infl_expr.add_source_location()=source_location;
       expr.swap(infl_expr);
     }
     else if(identifier==CPROVER_PREFIX "abs" ||
@@ -2408,7 +2408,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt abs_expr(ID_abs, expr.type());
       abs_expr.operands()=expr.arguments();
-      abs_expr.location()=location;
+      abs_expr.add_source_location()=source_location;
       expr.swap(abs_expr);
     }
     else if(identifier==CPROVER_PREFIX "malloc")
@@ -2421,7 +2421,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt malloc_expr=side_effect_exprt(ID_malloc);
       malloc_expr.type()=expr.type();
-      malloc_expr.location()=location;
+      malloc_expr.add_source_location()=source_location;
       malloc_expr.operands()=expr.arguments();
       expr.swap(malloc_expr);
     }
@@ -2438,7 +2438,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isinf_expr(ID_isinf, bool_typet());
       isinf_expr.operands()=expr.arguments();
-      isinf_expr.location()=location;
+      isinf_expr.add_source_location()=source_location;
       expr.swap(isinf_expr);
     }
     else if(identifier==CPROVER_PREFIX "isnormalf" ||
@@ -2453,7 +2453,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isnormal_expr(ID_isnormal, bool_typet());
       isnormal_expr.operands()=expr.arguments();
-      isnormal_expr.location()=location;
+      isnormal_expr.add_source_location()=source_location;
       expr.swap(isnormal_expr);
     }
     else if(identifier==CPROVER_PREFIX "signf" ||            
@@ -2469,7 +2469,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt sign_expr(ID_sign, bool_typet());
       sign_expr.operands()=expr.arguments();
-      sign_expr.location()=location;
+      sign_expr.add_source_location()=source_location;
       expr.swap(sign_expr);
     }
     else if(identifier==CPROVER_PREFIX "equal")
@@ -2482,7 +2482,7 @@ void c_typecheck_baset::do_special_functions(
       
       equal_exprt equality_expr;
       equality_expr.operands()=expr.arguments();
-      equality_expr.location()=location;
+      equality_expr.add_source_location()=source_location;
       
       if(!base_type_eq(equality_expr.lhs().type(),
                        equality_expr.rhs().type(), *this))
@@ -2544,12 +2544,12 @@ void c_typecheck_baset::do_special_functions(
       if(arg1==0 || arg1==1)
       {
         tmp=from_integer(-1, size_type());
-        tmp.location()=f_op.location();
+        tmp.add_source_location()=f_op.source_location();
       }
       else
       {
         tmp=from_integer(0, size_type());
-        tmp.location()=f_op.location();
+        tmp.add_source_location()=f_op.source_location();
       }
       
       tmp.swap(expr);
@@ -2609,7 +2609,7 @@ void c_typecheck_baset::do_special_functions(
         is_constant=tmp1.is_constant();
       
       exprt tmp2=from_integer(is_constant, expr.type());
-      tmp2.location()=location;
+      tmp2.add_source_location()=source_location;
       expr.swap(tmp2);
     }
     else if(identifier=="c::__builtin_classify_type")
@@ -2627,7 +2627,7 @@ void c_typecheck_baset::do_special_functions(
       unsigned type_number=1;
       
       exprt tmp=from_integer(type_number, expr.type());
-      tmp.location()=location;
+      tmp.add_source_location()=source_location;
       expr.swap(tmp);
     }
     else if(identifier==CPROVER_PREFIX "float_debug1" ||
@@ -2644,7 +2644,7 @@ void c_typecheck_baset::do_special_functions(
         "float_debug1":"float_debug2";
       exprt float_debug_expr(id, expr.type());
       float_debug_expr.operands()=expr.arguments();
-      float_debug_expr.location()=location;
+      float_debug_expr.add_source_location()=source_location;
       expr.swap(float_debug_expr);
     }
     else if(identifier=="c::__sync_fetch_and_add" ||
@@ -3142,7 +3142,8 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
        (type1.id()==ID_bool ||
         type1.id()==ID_unsignedbv ||
         type1.id()==ID_signedbv ||
-        type1.id()==ID_c_enum))
+        type1.id()==ID_c_enum ||
+        type1.id()==ID_c_enum_tag))
     {
       typecheck_arithmetic_pointer(op0);
       make_index_type(op1);
@@ -3173,7 +3174,8 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     if(int_op_type.id()==ID_bool ||
        int_op_type.id()==ID_unsignedbv ||
        int_op_type.id()==ID_signedbv ||
-       int_op_type.id()==ID_c_enum)
+       int_op_type.id()==ID_c_enum ||
+       int_op_type.id()==ID_c_enum_tag)
     {
       typecheck_arithmetic_pointer(*p_op);
       make_index_type(*int_op);
@@ -3326,7 +3328,8 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
           return;
         }
         else if(final_type0.id()==ID_signedbv ||
-                final_type0.id()==ID_c_enum)
+                final_type0.id()==ID_c_enum ||
+                final_type0.id()==ID_c_enum_tag)
         {
           expr.set(ID_statement, ID_assign_ashr);
           return;
@@ -3345,6 +3348,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
     else if(final_type0.id()==ID_bool ||
             final_type0.get(ID_C_c_type)==ID_bool ||
             final_type0.id()==ID_c_enum ||
+            final_type0.id()==ID_c_enum_tag ||
             final_type0.id()==ID_incomplete_c_enum)
     {      
       // promote
@@ -3395,7 +3399,7 @@ void c_typecheck_baset::make_constant(exprt &expr)
   if(!expr.is_constant() &&
      expr.id()!=ID_infinity)
   {
-    err_location(expr.find_location());
+    err_location(expr.find_source_location());
     str << "expected constant expression, but got `"
         << to_string(expr) << "'";
     throw 0;
@@ -3423,7 +3427,7 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
   if(!expr.is_constant() &&
      expr.id()!=ID_infinity)
   {
-    err_location(expr.find_location());
+    err_location(expr.find_source_location());
     throw "conversion to integer failed";
   }
 }

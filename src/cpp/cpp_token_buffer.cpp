@@ -8,8 +8,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cassert>
 
+#include <ansi-c/ansi_c_y.tab.h>
+
 #include "cpp_token_buffer.h"
-#include "tokens.h"
 
 /*******************************************************************\
 
@@ -129,7 +130,6 @@ int yyansi_clex();
 extern char *yyansi_ctext;
 
 #include <ansi-c/ansi_c_parser.h>
-#include "cpp_parser.h"
 
 void cpp_token_buffert::read_token()
 {
@@ -138,15 +138,10 @@ void cpp_token_buffert::read_token()
 
   int kind;
   
-  #if 1
+  #if 0
   kind=yycpplex();
   #else
-  ansi_c_parser.cpp=true;
-  ansi_c_parser.in=cpp_parser.in;
-  if(cpp_parser.mode==cpp_parsert::MSC)
-    ansi_c_parser.mode=ansi_c_parsert::MSC;
-  else
-    ansi_c_parser.mode=ansi_c_parsert::GCC;
+  ansi_c_parser.stack.clear();
   kind=yyansi_clex();
   tokens.back().text=yyansi_ctext;
   if(ansi_c_parser.stack.size()==1)
@@ -154,9 +149,7 @@ void cpp_token_buffert::read_token()
     tokens.back().data=ansi_c_parser.stack.front();
     tokens.back().line_no=ansi_c_parser.get_line_no();
     tokens.back().filename=ansi_c_parser.get_file();
-    ansi_c_parser.stack.pop_back();
-  }
-  
+  }  
   #endif
 
   //std::cout << "TOKEN: " << kind << " " << tokens.back().text << std::endl;

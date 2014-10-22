@@ -63,7 +63,7 @@ Function: static_lifetime_init
 
 bool static_lifetime_init(
   symbol_tablet &symbol_table,
-  const locationt &location,
+  const source_locationt &source_location,
   message_handlert &message_handler)
 {
   namespacet ns(symbol_table);
@@ -76,7 +76,7 @@ bool static_lifetime_init(
   symbolt &init_symbol=s_it->second;
   
   init_symbol.value=code_blockt();
-  init_symbol.value.location()=location;
+  init_symbol.value.add_source_location()=source_location;
 
   code_blockt &dest=to_code_block(to_code(init_symbol.value));
   
@@ -161,7 +161,7 @@ bool static_lifetime_init(
     symbol_exprt symbol(it->second.name, it->second.type);
  
     code_assignt code(symbol, rhs);
-    code.location()=it->second.location;
+    code.add_source_location()=it->second.location;
 
     dest.move_to_operands(code);
   }
@@ -175,7 +175,7 @@ bool static_lifetime_init(
     {
       code_function_callt function_call;      
       function_call.function()=it->second.symbol_expr();
-      function_call.location()=location;
+      function_call.add_source_location()=source_location;
       dest.move_to_operands(function_call);
     }
   }
@@ -277,7 +277,7 @@ bool entry_point(
   
     code_function_callt call_init;
     call_init.lhs().make_nil();
-    call_init.location()=symbol.location;
+    call_init.add_source_location()=symbol.location;
     call_init.function()=init_it->second.symbol_expr();
 
     init_code.move_to_operands(call_init);
@@ -286,9 +286,9 @@ bool entry_point(
   // build call to main function
   
   code_function_callt call_main;
-  call_main.location()=symbol.location;
+  call_main.add_source_location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
-  call_main.function().location()=symbol.location;
+  call_main.function().add_source_location()=symbol.location;
 
   const code_typet::parameterst &parameters=
     to_code_type(symbol.type).parameters();

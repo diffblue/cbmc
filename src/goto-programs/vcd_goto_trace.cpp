@@ -9,6 +9,7 @@ Date: June 2011
 \*******************************************************************/
 
 #include <ctime>
+#include <ostream>
 #include <cassert>
 
 #include <util/arith_tools.h>

@@ -72,6 +72,8 @@ const char *gcc_options_with_separated_argument[]=
   "-specs",
   "--sysroot",
   "--include", // undocumented
+  "-current_version", // on the Mac
+  "-compatibility_version",  // on the Mac
   NULL
 };
 
@@ -185,6 +187,7 @@ const char *gcc_options_without_argument[]=
   "--static", 
   "-shared",
   "--shared",
+  "-shared-libgcc",
   "-symbolic",
   "-EB",
   "-EL",

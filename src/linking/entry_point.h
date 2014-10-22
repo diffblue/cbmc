@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/message.h>
-#include <util/location.h>
+#include <util/source_location.h>
 
 bool entry_point(
   symbol_tablet &symbol_table,
@@ -20,7 +20,7 @@ bool entry_point(
 
 bool static_lifetime_init(
   symbol_tablet &symbol_table,
-  const locationt &location,
+  const source_locationt &source_location,
   message_handlert &message_handler);
 
 #endif

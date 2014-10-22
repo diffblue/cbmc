@@ -25,12 +25,12 @@ Function: cpp_typecheckt::cpp_destructor
 \*******************************************************************/
 
 codet cpp_typecheckt::cpp_destructor(
-  const locationt &location,
+  const source_locationt &source_location,
   const typet &type,
   const exprt &object)
 {
   codet new_code;
-  new_code.location()=location;
+  new_code.add_source_location()=source_location;
 
   typet tmp_type(type);
   follow_symbol(tmp_type);
@@ -62,29 +62,29 @@ codet cpp_typecheckt::cpp_destructor(
     mp_integer s;
     if(to_integer(tmp_size, s))
     {
-      err_location(location);
+      err_location(source_location);
       str << "array size `" << to_string(size_expr)
           << "' is not a constant";
       throw 0;
     }
 
     new_code.type().id(ID_code);
-    new_code.location()=location;
+    new_code.add_source_location()=source_location;
     new_code.set_statement(ID_block);
 
     // for each element of the array, call the destructor
     for(mp_integer i = 0; i < s; ++i)
     {
       exprt constant=from_integer(i, index_type());
-      constant.location()=location;
+      constant.add_source_location()=source_location;
 
       exprt index(ID_index);
       index.copy_to_operands(object);
       index.copy_to_operands(constant);
-      index.location()=location;
+      index.add_source_location()=source_location;
 
       exprt i_code =
-        cpp_destructor(location, tmp_type.subtype(), index);
+        cpp_destructor(source_location, tmp_type.subtype(), index);
 
       new_code.move_to_operands(i_code);
     }
@@ -125,26 +125,26 @@ codet cpp_typecheckt::cpp_destructor(
 
     cpp_name.get_sub().push_back(irept(ID_name));
     cpp_name.get_sub().back().set(ID_identifier, symb.base_name);
-    cpp_name.get_sub().back().set(ID_C_location, location);
+    cpp_name.get_sub().back().set(ID_C_source_location, source_location);
 
     cpp_name.get_sub().push_back(irept("::"));
 
     cpp_name.get_sub().push_back(irept(ID_name));
     cpp_name.get_sub().back().set(ID_identifier, dtor_name);
-    cpp_name.get_sub().back().set(ID_C_location, location);
+    cpp_name.get_sub().back().set(ID_C_source_location, source_location);
 
     exprt member_expr(ID_member);
     member_expr.copy_to_operands(object);
     member_expr.op0().type().set(ID_C_constant, false);
     member_expr.add("component_cpp_name").swap(cpp_name);
-    member_expr.location()=location;
+    member_expr.add_source_location()=source_location;
 
     side_effect_expr_function_callt function_call;
     function_call.function()=member_expr;
-    function_call.location()=location;
+    function_call.add_source_location()=source_location;
 
     new_code.set_statement(ID_expression);
-    new_code.location()=location;
+    new_code.add_source_location()=source_location;
     new_code.move_to_operands(function_call);
   }
 

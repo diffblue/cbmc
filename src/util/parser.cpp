@@ -59,11 +59,11 @@ void parsert::parse_error(
   if(before!="") tmp+=" before `"+before+"'";
   
   #if 0
-  locationt tmp_location=location;
-  tmp_location.set_column(column-before.size());
-  print(1, tmp, -1, tmp_location);
+  source_locationt tmp_source_location=source_location;
+  tmp_source_location.set_column(column-before.size());
+  print(1, tmp, -1, tmp_source_location);
   #else
-  print(1, tmp, -1, location);
+  print(1, tmp, -1, source_location);
   #endif
 }
 

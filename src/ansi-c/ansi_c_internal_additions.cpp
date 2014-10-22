@@ -20,6 +20,9 @@ const char gcc_builtin_headers_ia32[]=
 "# 1 \"gcc_builtin_headers_ia32.h\"\n"
 #include "gcc_builtin_headers_ia32.inc"
 ;
+const char gcc_builtin_headers_ia32_2[]=
+#include "gcc_builtin_headers_ia32-2.inc"
+;
 
 const char gcc_builtin_headers_alpha[]=
 "# 1 \"gcc_builtin_headers_alpha.h\"\n"
@@ -94,7 +97,6 @@ void ansi_c_internal_additions(std::string &code)
     "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
     "void __CPROVER_assume(__CPROVER_bool assumption);\n"
     "void __VERIFIER_assume(__CPROVER_bool assumption);\n"
-    "void assert(__CPROVER_bool assertion);\n"
     "void __CPROVER_assert(__CPROVER_bool assertion, const char *description);\n"
     "__CPROVER_bool __CPROVER_equal();\n"
     "__CPROVER_bool __CPROVER_same_object(const void *, const void *);\n"
@@ -216,6 +218,7 @@ void ansi_c_internal_additions(std::string &code)
     case configt::ansi_ct::ARCH_X86_64:
     case configt::ansi_ct::ARCH_X32:
       code+=gcc_builtin_headers_ia32;
+      code+=gcc_builtin_headers_ia32_2;
       break;
       
     case configt::ansi_ct::ARCH_ARM:

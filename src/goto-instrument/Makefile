@@ -9,6 +9,7 @@ SRC = goto_instrument_main.cpp goto_instrument_parseoptions.cpp \
       wmm/weak_memory.cpp wmm/fence.cpp wmm/event_graph.cpp \
       wmm/goto2graph.cpp wmm/data_dp.cpp wmm/abstract_event.cpp \
       wmm/instrumenter_strategies.cpp wmm/cycle_collection.cpp \
+      wmm/shared_buffers.cpp \
       call_sequences.cpp unwind.cpp function_modifies.cpp \
       accelerate/accelerate.cpp accelerate/polynomial.cpp \
       accelerate/scratch_program.cpp accelerate/polynomial_accelerator.cpp \
@@ -19,7 +20,7 @@ SRC = goto_instrument_main.cpp goto_instrument_parseoptions.cpp \
       accelerate/disjunctive_polynomial_acceleration.cpp \
       accelerate/cone_of_influence.cpp accelerate/overflow_instrumenter.cpp\
       accelerate/path.cpp accelerate/acceleration_utils.cpp \
-      count_eloc.cpp reachability_slicer.cpp
+      count_eloc.cpp reachability_slicer.cpp goto_program2code.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
@@ -35,7 +36,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I ..
 
-LIBS =
+LIBS = 
 
 CLEANFILES = goto-instrument$(EXEEXT)
 
@@ -46,7 +47,7 @@ all: goto-instrument$(EXEEXT)
 
 ifneq ($(wildcard ../cpp/Makefile),)
   OBJ += ../cpp/cpp$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_CPP
+  CP_CXXFLAGS += -DHAVE_CPP $(FLAG_GLPK)
 endif
 
 ifneq ($(wildcard ../java/Makefile),)
@@ -62,6 +63,11 @@ endif
 ifneq ($(wildcard ../php/Makefile),)
   OBJ += ../php/php$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_PHP
+endif
+
+ifneq ($(LIB_GLPK),)
+  LIBS += $(LIB_GLPK)
+  CP_CXXFLAGS += -DHAVE_GLPK
 endif
 
 ###############################################################################

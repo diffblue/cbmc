@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/pointer_offset_size.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/expr2c.h>
@@ -30,9 +31,9 @@ public:
   
   exprt operator()(
     const typet &type,
-    const locationt &location)
+    const source_locationt &source_location)
   {
-    return zero_initializer_rec(type, location);
+    return zero_initializer_rec(type, source_location);
   }
 
 protected:
@@ -50,7 +51,7 @@ protected:
 
   exprt zero_initializer_rec(
     const typet &type,
-    const locationt &location);
+    const source_locationt &source_location);
 };
 
 /*******************************************************************\
@@ -67,14 +68,14 @@ Function: zero_initializert::zero_initializer_rec
 
 exprt zero_initializert::zero_initializer_rec(
   const typet &type,
-  const locationt &location)
+  const source_locationt &source_location)
 {
   const irep_idt &type_id=type.id();
   
   if(type_id==ID_bool)
   {
     exprt result=false_exprt();
-    result.location()=location;
+    result.add_source_location()=source_location;
     return result;
   }
   else if(type_id==ID_unsignedbv ||
@@ -85,21 +86,22 @@ exprt zero_initializert::zero_initializer_rec(
           type_id==ID_complex)
   {
     exprt result=gen_zero(type);
-    result.location()=location;
+    result.add_source_location()=source_location;
     return result;
   }
   else if(type_id==ID_code)
   {
-    err_location(location);
+    err_location(source_location);
     error("cannot zero-initialize code-type");
     throw 0;
   }
   else if(type_id==ID_c_enum ||
-          type_id==ID_incomplete_c_enum)
+          type_id==ID_incomplete_c_enum ||
+          type_id==ID_c_enum_tag)
   {
     constant_exprt value(type);
     value.set_value(ID_0);
-    value.location()=location;
+    value.add_source_location()=source_location;
     return value;
   }
   else if(type_id==ID_array)
@@ -113,12 +115,12 @@ exprt zero_initializert::zero_initializer_rec(
       array_exprt value(array_type);
       value.type().id(ID_array);
       value.type().set(ID_size, gen_zero(size_type()));
-      value.location()=location;
+      value.add_source_location()=source_location;
       return value;
     }
     else
     {
-      exprt tmpval=zero_initializer_rec(array_type.subtype(), location);
+      exprt tmpval=zero_initializer_rec(array_type.subtype(), source_location);
 
       mp_integer array_size;
 
@@ -126,12 +128,12 @@ exprt zero_initializert::zero_initializer_rec(
       {
         exprt value(ID_array_of, type);
         value.copy_to_operands(tmpval);
-        value.location()=location;
+        value.add_source_location()=source_location;
         return value;
       }
       else if(to_integer(array_type.size(), array_size))
       {
-        err_location(location);
+        err_location(source_location);
         str << "failed to zero-initialize array of non-fixed size `"
             << to_string(array_type.size()) << "'";
         error();
@@ -140,14 +142,14 @@ exprt zero_initializert::zero_initializer_rec(
         
       if(array_size<0)
       {
-        err_location(location);
+        err_location(source_location);
         error("failed to zero-initialize array of with negative size");
         throw 0;
       }
 
       array_exprt value(array_type);
       value.operands().resize(integer2unsigned(array_size), tmpval);
-      value.location()=location;
+      value.add_source_location()=source_location;
       return value;
     }
   }
@@ -155,13 +157,13 @@ exprt zero_initializert::zero_initializer_rec(
   {
     const vector_typet &vector_type=to_vector_type(type);
     
-    exprt tmpval=zero_initializer_rec(vector_type.subtype(), location);
+    exprt tmpval=zero_initializer_rec(vector_type.subtype(), source_location);
 
     mp_integer vector_size;
 
     if(to_integer(vector_type.size(), vector_size))
     {
-      err_location(location);
+      err_location(source_location);
       str << "failed to zero-initialize vector of non-fixed size `"
           << to_string(vector_type.size()) << "'";
       error();
@@ -170,14 +172,14 @@ exprt zero_initializert::zero_initializer_rec(
       
     if(vector_size<0)
     {
-      err_location(location);
+      err_location(source_location);
       error("failed to zero-initialize vector of with negative size");
       throw 0;
     }
 
     vector_exprt value(vector_type);
     value.operands().resize(integer2unsigned(vector_size), tmpval);
-    value.location()=location;
+    value.add_source_location()=source_location;
 
     return value;
   }
@@ -199,14 +201,14 @@ exprt zero_initializert::zero_initializer_rec(
       {
         constant_exprt code_value(it->type());
         code_value.set_value(ID_nil);
-        code_value.location()=location;
+        code_value.add_source_location()=source_location;
         value.copy_to_operands(code_value);
       }
       else
-        value.copy_to_operands(zero_initializer_rec(it->type(), location));
+        value.copy_to_operands(zero_initializer_rec(it->type(), source_location));
     }
 
-    value.location()=location;
+    value.add_source_location()=source_location;
 
     return value;
   }
@@ -219,8 +221,9 @@ exprt zero_initializert::zero_initializer_rec(
 
     union_typet::componentt component;
     bool found=false;
+    mp_integer component_size=0;
     
-    // get the first non-method member
+    // we need to find the largest member
 
     for(struct_typet::componentst::const_iterator
         it=components.begin();
@@ -228,14 +231,15 @@ exprt zero_initializert::zero_initializer_rec(
         it++)
     {
       // skip methods
-      if(it->type().id()==ID_code)
-      {
-      }
-      else
+      if(it->type().id()==ID_code) continue;
+
+      mp_integer size=pointer_offset_size(ns, it->type());
+      
+      if(size>component_size)
       {
         component=*it;
         found=true;
-        break;
+        component_size=size;
       }
     }
 
@@ -244,14 +248,14 @@ exprt zero_initializert::zero_initializer_rec(
 
     value.set(ID_component_name, component.get_name());
     value.copy_to_operands(
-      zero_initializer_rec(component.type(), location));
-    value.location()=location;
+      zero_initializer_rec(component.type(), source_location));
+    value.add_source_location()=source_location;
 
     return value;
   }
   else if(type_id==ID_symbol)
   {
-    exprt result=zero_initializer_rec(ns.follow(type), location);
+    exprt result=zero_initializer_rec(ns.follow(type), source_location);
     // we might have mangled the type for arrays, so keep that
     if(ns.follow(type).id()!=ID_array)
       result.type()=type;
@@ -260,7 +264,7 @@ exprt zero_initializert::zero_initializer_rec(
   }
   else
   {
-    err_location(location);
+    err_location(source_location);
     str << "failed to zero-initialize `" << to_string(type)
         << "'";
     error();
@@ -282,10 +286,10 @@ Function: zero_initializer
 
 exprt zero_initializer(
   const typet &type,
-  const locationt &location,
+  const source_locationt &source_location,
   const namespacet &ns,
   message_handlert &message_handler)
 {
   zero_initializert z_i(ns, message_handler);
-  return z_i(type, location);
+  return z_i(type, source_location);
 }

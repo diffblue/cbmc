@@ -38,7 +38,7 @@ public:
 
 protected:
   cpp_typecheckt &cpp_typecheck;
-  locationt location;
+  source_locationt source_location;
   cpp_scopet *original_scope;
   
   typedef std::vector<exprt> resolve_identifierst;
@@ -49,7 +49,7 @@ protected:
     const cpp_typecheck_fargst &fargs,
     resolve_identifierst &identifiers);
     
-  exprt convert_template_argument(
+  exprt convert_template_parameter(
     const cpp_idt &id);
     
   exprt convert_identifier(

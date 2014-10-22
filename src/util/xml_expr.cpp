@@ -30,16 +30,18 @@ Function: xml
 
 \*******************************************************************/
 
-xmlt xml(const locationt &location)
+xmlt xml(const source_locationt &location)
 {
   xmlt result;
 
   result.name="location";
   
   // these will go away
+  #if 0
   result.new_element("file").data=id2string(location.get_file());
   result.new_element("line").data=id2string(location.get_line());
   result.new_element("function").data=id2string(location.get_function());
+  #endif
   
   // these are to stay
   if(location.get_file()!="")
@@ -47,6 +49,9 @@ xmlt xml(const locationt &location)
 
   if(location.get_line()!="")
     result.set_attribute("line", id2string(location.get_line()));
+
+  if(location.get_column()!="")
+    result.set_attribute("column", id2string(location.get_line()));
 
   if(location.get_function()!="")
     result.set_attribute("function", id2string(location.get_function()));

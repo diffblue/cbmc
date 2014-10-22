@@ -61,7 +61,7 @@ bool symex_dereference_statet::has_failed_symbol(
     {
       symbolt sym=*symbol;
       symbolt *sym_ptr=0;
-      sym.name=state.rename(sym.name, renaming_ns, goto_symex_statet::L1);
+      sym.name=state.rename_identifier(sym.name, renaming_ns, goto_symex_statet::L1);
       goto_symex.new_symbol_table.move(sym, sym_ptr);
       symbol=sym_ptr;
       return true;

@@ -11,10 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_MESSAGE_H
 
 #include <string>
-#include <ostream>
+#include <iosfwd>
 #include <sstream>
 
-#include "location.h"
+#include "source_location.h"
 
 class message_handlert
 {
@@ -29,7 +29,7 @@ public:
     unsigned level,
     const std::string &message,
     int sequence_number,
-    const locationt &location);
+    const source_locationt &location);
 
   virtual ~message_handlert()
   {
@@ -53,7 +53,7 @@ public:
     unsigned level,
     const std::string &message,
     int sequence_number,
-    const locationt &location)
+    const source_locationt &location)
   {
   }
 };
@@ -157,7 +157,7 @@ public:
     const std::string &message,
     const std::string &file)
   {
-    locationt location;
+    source_locationt location;
     location.set_file(file);
     print(6, message, -1, location);
   }
@@ -172,7 +172,7 @@ public:
     const std::string &message,
     const std::string &file)
   {
-    locationt location;
+    source_locationt location;
     location.set_file(file);
     print(1, message, -1, location);
   }
@@ -183,7 +183,7 @@ public:
     unsigned level,
     const std::string &message,
     int sequence_number, // -1: no sequence information
-    const locationt &location);
+    const source_locationt &location);
   
   // New interface
   

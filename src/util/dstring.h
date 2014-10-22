@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef DSTRING_H
 #define DSTRING_H
 
-#include <ostream>
+#include <iosfwd>
 
 #include "string_container.h"
 

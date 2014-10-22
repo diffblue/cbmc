@@ -9,8 +9,7 @@ unsignedbv
 verilogbv
 floatbv
 fixedbv
-C_location #location
-C_source_loc #source_loc
+C_source_location #source_location
 C_end_location #end_location
 C_is_padding #is_padding
 is_bit_field
@@ -22,7 +21,6 @@ comment
 property
 property_class
 property_id
-source
 function
 subtype
 subtypes
@@ -177,6 +175,7 @@ protected
 virtual
 volatile
 const
+constexpr
 inline
 forall
 exists
@@ -319,6 +318,7 @@ alignof
 gcc_builtin_va_arg
 gcc_builtin_types_compatible_p
 gcc_builtin_va_arg_next
+gcc_builtin_va_list
 gcc_float128
 gcc_int128
 gcc_decimal32
@@ -390,6 +390,7 @@ dummy
 init
 cprover_atomic
 atomic
+atomic_type_specifier
 atomic_begin
 atomic_end
 start_thread
@@ -551,7 +552,7 @@ C_offset #offset
 C_tag_only_declaration #tag_only_declaration
 struct_tag
 union_tag
-enum_tag
+c_enum_tag
 enum_constant
 generate_block
 generate_case
@@ -580,6 +581,7 @@ msc_leave
 msc_uuidof
 msc_if_exists
 msc_if_not_exists
+msc_underlying_type
 msc_based
 alias
 auto_object
@@ -640,3 +642,4 @@ L0
 L1
 L2
 already_typechecked
+C_va_arg_type #va_arg_type

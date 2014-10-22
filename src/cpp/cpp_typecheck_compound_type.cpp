@@ -222,7 +222,7 @@ void cpp_typecheckt::typecheck_compound_type(
       }
       else
       {
-        err_location(type.location());
+        err_location(type);
         str << "error: compound tag `" << base_name
             << "' declared previously" << std::endl;
         str << "location of previous definition: "
@@ -239,7 +239,7 @@ void cpp_typecheckt::typecheck_compound_type(
     symbol.name=symbol_name;
     symbol.base_name=base_name;
     symbol.value.make_nil();
-    symbol.location=type.location();
+    symbol.location=type.source_location();
     symbol.mode=ID_cpp;
     symbol.module=module;
     symbol.type.swap(type);
@@ -446,7 +446,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   component.set(ID_access, access);
   component.set(ID_base_name, base_name);
   component.set(ID_pretty_name, base_name);
-  component.location()=cpp_name.location();
+  component.add_source_location()=cpp_name.location();
 
   if(cpp_name.is_operator())
   {
@@ -613,7 +613,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       vt_entry.set(ID_base_name, virtual_name);
       vt_entry.set(ID_pretty_name, virtual_name);
       vt_entry.set(ID_access, ID_public);
-      vt_entry.location() = symbol.location;
+      vt_entry.add_source_location() = symbol.location;
       virtual_table.components().push_back(vt_entry);
 
       // take care of overloading
@@ -628,7 +628,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         func_symb.pretty_name = component.get(ID_base_name);
         func_symb.mode=ID_cpp;
         func_symb.module=module;
-        func_symb.location=component.location();
+        func_symb.location=component.source_location();
         func_symb.type=component.type();
 
         // change the type of the 'this' pointer
@@ -772,7 +772,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         exprt::operandst ops;
         ops.push_back(value);
         codet defcode =
-          cpp_constructor(locationt(), symexpr, ops);
+          cpp_constructor(source_locationt(), symexpr, ops);
 
         new_symbol->value.swap(defcode);
       }
@@ -921,7 +921,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
   if(declaration.is_template())
   {
     return; // TODO
-    err_location(declaration.type().location());
+    err_location(declaration.type());
     str << "friend template not supported";
     throw 0;
   }
@@ -1176,7 +1176,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
     // build declaration
     cpp_declarationt ctor;
-    default_ctor(symbol.type.location(), symbol.base_name, ctor);
+    default_ctor(symbol.type.source_location(), symbol.base_name, ctor);
     body.move_to_operands(ctor);
   }
 
@@ -1410,7 +1410,7 @@ void cpp_typecheckt::typecheck_member_function(
   symbol.type=type;
   symbol.is_type=false;
   symbol.is_macro=false;
-  symbol.location=component.location();
+  symbol.location=component.source_location();
 
   // move early, it must be visible before doing any value
   symbolt *new_symbol;
@@ -1503,7 +1503,7 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
   {
     if(it->type().id()==ID_code)
     {
-      err_location(struct_union_symbol.type.location());
+      err_location(struct_union_symbol.type.source_location());
       str << "anonymous struct/union member `"
           << struct_union_symbol.base_name
           << "' shall not have function members";
@@ -1559,13 +1559,13 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   if(declaration.storage_spec().is_static() ||
      declaration.storage_spec().is_mutable())
   {
-    err_location(struct_union_symbol.type.location());
+    err_location(struct_union_symbol.type.source_location());
     throw "storage class is not allowed here";
   }
 
   if(!cpp_is_pod(struct_union_symbol.type))
   {
-    err_location(struct_union_symbol.type.location());
+    err_location(struct_union_symbol.type.source_location());
     str << "anonymous struct/union member is not POD";
     throw 0;
   }
@@ -1588,7 +1588,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   component.set_base_name(base_name);
   component.set_pretty_name(base_name);
   component.set_anonymous(true);
-  component.location()=declaration.location();
+  component.add_source_location()=declaration.source_location();
 
   components.push_back(component);
   
@@ -1612,7 +1612,7 @@ Purpose:
 \*******************************************************************/
 
 bool cpp_typecheckt::get_component(
-  const locationt &location,
+  const source_locationt &source_location,
   const exprt &object,
   const irep_idt &component_name,
   exprt &member)
@@ -1637,7 +1637,7 @@ bool cpp_typecheckt::get_component(
 
     exprt tmp(ID_member, component.type());
     tmp.set(ID_component_name, component.get_name());
-    tmp.location()=location;
+    tmp.add_source_location()=source_location;
     tmp.copy_to_operands(object);
 
     if(component.get_name()==component_name)
@@ -1655,7 +1655,7 @@ bool cpp_typecheckt::get_component(
         else
         {
           #if 0
-          err_location(location);
+          err_location(source_location);
           str << "error: member `" << component_name
               << "' is not accessible (" << component.get(ID_access) << ")";
           str << std::endl
@@ -1672,7 +1672,7 @@ bool cpp_typecheckt::get_component(
          !component.get_bool("is_mutable"))
         member.type().set(ID_C_constant, true);
 
-      member.location() = location;
+      member.add_source_location() = source_location;
 
       return true; // component found
     }
@@ -1687,12 +1687,12 @@ bool cpp_typecheckt::get_component(
          component_type.id()==ID_struct)
       {
         // recursive call!
-        if(get_component(location, tmp, component_name, member))
+        if(get_component(source_location, tmp, component_name, member))
         {
           if(check_component_access(component, final_type))
           {
             #if 0
-            err_location(location);
+            err_location(source_location);
             str << "error: member `" << component_name
                 << "' is not accessible";
             throw 0;
@@ -1706,7 +1706,7 @@ bool cpp_typecheckt::get_component(
              !component.get_bool("is_mutable"))
             member.type().set(ID_C_constant, true);
 
-          member.location() = location;
+          member.add_source_location() = source_location;
           return true; // component found
         }
       }

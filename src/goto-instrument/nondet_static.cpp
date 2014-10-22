@@ -65,7 +65,7 @@ void nondet_static(
       i_it=init.insert_before(++i_it);
       i_it->make_assignment();
       i_it->code=code_assignt(sym, side_effect_expr_nondett(sym.type()));
-      i_it->location=instruction.location;
+      i_it->source_location=instruction.source_location;
       i_it->function=instruction.function;
     }
     else if(instruction.is_function_call())

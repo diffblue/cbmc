@@ -16,6 +16,7 @@ Date: September 2011
 class value_setst;
 class goto_functionst;
 class symbol_tablet;
+class message_handlert;
 
 void weak_memory(
   memory_modelt model,
@@ -33,6 +34,7 @@ void weak_memory(
   bool render_file,
   bool render_function,
   bool cav11_option,
-  bool hide_internals);
+  bool hide_internals,
+  message_handlert& message);
 
 #endif

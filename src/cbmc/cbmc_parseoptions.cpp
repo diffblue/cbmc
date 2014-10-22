@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -156,9 +157,9 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("all-claims") || // will go away
      cmdline.isset("all-properties")) // use this one
-    options.set_option("all-claims", true);
+    options.set_option("all-properties", true);
   else
-    options.set_option("all-claims", false);
+    options.set_option("all-properties", false);
 
   if(cmdline.isset("unwind-max"))
     options.set_option("unwind-max", cmdline.getval("unwind-max"));
@@ -846,6 +847,7 @@ bool cbmc_parseoptionst::process_goto_program(
       string_instrumentation(
         symbol_table, get_message_handler(), goto_functions);
 
+    // remove function pointers
     status() << "Function Pointer Removal" << eom;
     remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
@@ -853,6 +855,9 @@ bool cbmc_parseoptionst::process_goto_program(
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
+    
+    // remove returns
+    remove_returns(symbol_table, goto_functions);
     
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;

@@ -119,7 +119,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     most_derived.set_name(language_prefix+
                      cpp_scopes.current_scope().prefix+"::"+"@most_derived");
     most_derived.set(ID_pretty_name, "@most_derived");
-    most_derived.location()=type.location();
+    most_derived.add_source_location()=type.source_location();
     put_compound_into_scope(most_derived);
 
     to_struct_type(type).components().push_back(most_derived);

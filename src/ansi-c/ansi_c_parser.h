@@ -19,9 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mp_arith.h>
 
 #include "ansi_c_parse_tree.h"
-
-typedef enum { ANSI_C_UNKNOWN, ANSI_C_SYMBOL, ANSI_C_TYPEDEF,
-               ANSI_C_TAG, ANSI_C_LOCAL_LABEL } ansi_c_id_classt;
+#include "ansi_c_scope.h"
 
 int yyansi_cparse();
 
@@ -55,8 +53,6 @@ public:
     
     // setup global scope
     scopes.clear();
-
-    // this is the global scope
     scopes.push_back(scopet());
   }
 
@@ -67,7 +63,8 @@ public:
   std::string string_literal;
   mp_integer pragma_pack;
   
-  enum { ANSI, GCC, MSC, ICC, CW, ARM } mode;
+  typedef enum { ANSI, GCC, MSC, ICC, CW, ARM } modet;
+  modet mode;
   // ANSI is strict ANSI-C
   // GCC is, well, gcc
   // MSC is Microsoft Visual Studio
@@ -81,43 +78,9 @@ public:
   // in C99 and upwards, for(;;) has a scope
   bool for_has_scope;
 
-  class identifiert
-  {
-  public:
-    ansi_c_id_classt id_class;
-    irep_idt base_name;
-    
-    identifiert():id_class(ANSI_C_UNKNOWN)
-    {
-    }
-  };
- 
-  class scopet
-  {
-  public:
-    typedef hash_map_cont<irep_idt, identifiert, irep_id_hash> name_mapt;
-    name_mapt name_map;
-    
-    std::string prefix;
-    irep_idt last_declarator;
-    
-    // for(;;) and { } scopes are numbered
-    unsigned compound_counter;
-    unsigned anon_counter;
-    
-    scopet():compound_counter(0), anon_counter(0) { }
-    
-    void swap(scopet &scope)
-    {
-      name_map.swap(scope.name_map);
-      prefix.swap(scope.prefix);
-      last_declarator.swap(scope.last_declarator);
-      std::swap(compound_counter, scope.compound_counter);
-    }
-    
-    void print(std::ostream &out) const;
-  };
-   
+  typedef ansi_c_identifiert identifiert;  
+  typedef ansi_c_scopet scopet;
+
   typedef std::list<scopet> scopest;
   scopest scopes;
   

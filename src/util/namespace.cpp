@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include "string2int.h"
-#include "namespace.h"
 #include "symbol_table.h"
 #include "prefix.h"
+#include "std_types.h"
+#include "namespace.h"
 
 /*******************************************************************\
 
@@ -116,6 +117,65 @@ const typet &namespace_baset::follow(const typet &src) const
     if(symbol->type.id()!=ID_symbol) return symbol->type;
     symbol=&lookup(symbol->type);
   }
+}
+
+/*******************************************************************\
+
+Function: namespace_baset::follow_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const union_typet &namespace_baset::follow_tag(const union_tag_typet &src) const
+{
+  const symbolt &symbol=lookup(src.get_identifier());
+  assert(symbol.is_type);
+  assert(symbol.type.id()==ID_union);
+  return to_union_type(symbol.type);
+}
+
+/*******************************************************************\
+
+Function: namespace_baset::follow_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const struct_typet &namespace_baset::follow_tag(const struct_tag_typet &src) const
+{
+  const symbolt &symbol=lookup(src.get_identifier());
+  assert(symbol.is_type);
+  assert(symbol.type.id()==ID_struct);
+  return to_struct_type(symbol.type);
+}
+
+/*******************************************************************\
+
+Function: namespace_baset::follow_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const typet &namespace_baset::follow_tag(const c_enum_tag_typet &src) const
+{
+  const symbolt &symbol=lookup(src.get_identifier());
+  assert(symbol.is_type);
+  return symbol.type;
 }
 
 /*******************************************************************\

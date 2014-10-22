@@ -78,7 +78,7 @@ protected:
     const exprt &expr,
     const std::string &comment,
     const std::string &property_class,
-    const locationt &location,
+    const source_locationt &,
     const exprt &src_expr,
     const guardt &guard);
   
@@ -197,7 +197,7 @@ void goto_checkt::div_by_zero_check(
     inequality,
     "division by zero",
     "division-by-zero",
-    expr.find_location(),
+    expr.find_source_location(),
     expr,
     guard);
 }
@@ -236,7 +236,7 @@ void goto_checkt::undefined_shift_check(
       inequality,
       "shift distance is negative",
       "undefined-shift",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
   }
@@ -259,7 +259,7 @@ void goto_checkt::undefined_shift_check(
       inequality,
       "shift distance too large",
       "undefined-shift",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
   }
@@ -298,7 +298,7 @@ void goto_checkt::mod_by_zero_check(
     inequality,
     "division by zero",
     "division-by-zero",
-    expr.find_location(),
+    expr.find_source_location(),
     expr,
     guard);
 }
@@ -363,7 +363,7 @@ void goto_checkt::integer_overflow_check(
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on signed type conversion",
           "overflow",
-          expr.find_location(),
+          expr.find_source_location(),
           expr,
           guard);
       }
@@ -381,7 +381,7 @@ void goto_checkt::integer_overflow_check(
           no_overflow_upper,
           "arithmetic overflow on unsigned to signed type conversion",
           "overflow",
-          expr.find_location(),
+          expr.find_source_location(),
           expr,
           guard);
       }
@@ -406,7 +406,7 @@ void goto_checkt::integer_overflow_check(
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on float to signed integer type conversion",
           "overflow",
-          expr.find_location(),
+          expr.find_source_location(),
           expr,
           guard);
       }
@@ -429,7 +429,7 @@ void goto_checkt::integer_overflow_check(
             no_overflow_lower,
             "arithmetic overflow on signed to unsigned type conversion",
             "overflow",
-            expr.find_location(),
+            expr.find_source_location(),
             expr,
             guard);
         }
@@ -448,7 +448,7 @@ void goto_checkt::integer_overflow_check(
             and_exprt(no_overflow_lower, no_overflow_upper),
             "arithmetic overflow on signed to unsigned type conversion",
             "overflow",
-            expr.find_location(),
+            expr.find_source_location(),
             expr,
             guard);
         }
@@ -467,7 +467,7 @@ void goto_checkt::integer_overflow_check(
           no_overflow_upper,
           "arithmetic overflow on unsigned to unsigned type conversion",
           "overflow",
-          expr.find_location(),
+          expr.find_source_location(),
           expr,
           guard);
       }
@@ -492,7 +492,7 @@ void goto_checkt::integer_overflow_check(
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on float to unsigned integer type conversion",
           "overflow",
-          expr.find_location(),
+          expr.find_source_location(),
           expr,
           guard);
       }
@@ -517,7 +517,7 @@ void goto_checkt::integer_overflow_check(
         not_exprt(and_exprt(int_min_eq, minus_one_eq)),
         "arithmetic overflow on signed division",
         "overflow",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
     }
@@ -543,7 +543,7 @@ void goto_checkt::integer_overflow_check(
         not_exprt(int_min_eq),
         "arithmetic overflow on signed unary minus",
         "overflow",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
     }
@@ -582,7 +582,7 @@ void goto_checkt::integer_overflow_check(
         not_exprt(overflow),
         "arithmetic overflow on "+kind+" "+expr.id_string(),
         "overflow",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
     }
@@ -647,7 +647,7 @@ void goto_checkt::float_overflow_check(
         overflow_check,
         "arithmetic overflow on floating-point typecast",
         "overflow",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
     }
@@ -660,7 +660,7 @@ void goto_checkt::float_overflow_check(
         not_exprt(new_inf),
         "arithmetic overflow on floating-point typecast",
         "overflow",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
     }
@@ -681,7 +681,7 @@ void goto_checkt::float_overflow_check(
       overflow_check,
       "arithmetic overflow on floating-point division",
       "overflow",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
 
@@ -718,7 +718,7 @@ void goto_checkt::float_overflow_check(
         overflow_check,
         "arithmetic overflow on floating-point "+kind,
         "overflow",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
 
@@ -842,7 +842,7 @@ void goto_checkt::nan_check(
     isnan,
     "NaN on "+expr.id_string(),
     "NaN",
-    expr.find_location(),
+    expr.find_source_location(),
     expr,
     guard);
 }
@@ -879,7 +879,7 @@ void goto_checkt::pointer_rel_check(
         same_object,
         "same object violation",
         "pointer",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
     }
@@ -915,7 +915,7 @@ void goto_checkt::pointer_validity_check(
     good_pointer(expr.pointer()),
     "dereference failure: pointer not valid",
     "pointer dereference",
-    expr.find_location(),
+    expr.find_source_location(),
     expr,
     guard);    
   #else
@@ -931,7 +931,7 @@ void goto_checkt::pointer_validity_check(
       not_exprt(null_pointer(pointer)),
       "dereference failure: pointer NULL",
       "pointer dereference",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
   }
@@ -941,7 +941,7 @@ void goto_checkt::pointer_validity_check(
       not_exprt(invalid_pointer(pointer)),
       "dereference failure: pointer invalid",
       "pointer dereference",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
 
@@ -950,7 +950,7 @@ void goto_checkt::pointer_validity_check(
       not_exprt(invalid_pointer(pointer)),
       "dereference failure: pointer uninitialized",
       "pointer dereference",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
 
@@ -959,7 +959,7 @@ void goto_checkt::pointer_validity_check(
       not_exprt(deallocated(pointer, ns)),
       "dereference failure: deallocated dynamic object",
       "pointer dereference",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
 
@@ -968,7 +968,7 @@ void goto_checkt::pointer_validity_check(
       not_exprt(dead_object(pointer, ns)),
       "dereference failure: dead object",
       "pointer dereference",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
 
@@ -984,7 +984,7 @@ void goto_checkt::pointer_validity_check(
         implies_exprt(malloc_object(pointer, ns), not_exprt(dynamic_bounds)),
         "dereference failure: dynamic object bounds",
         "pointer dereference",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
     }
@@ -1004,7 +1004,7 @@ void goto_checkt::pointer_validity_check(
         or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
         "dereference failure: object bounds",
         "pointer dereference",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
     }
@@ -1107,7 +1107,7 @@ void goto_checkt::bounds_check(
           inequality,
           name+" lower bound",
           "array bounds",
-          expr.find_location(),
+          expr.find_source_location(),
           expr,
           guard);
       }
@@ -1141,7 +1141,7 @@ void goto_checkt::bounds_check(
       precond,
       name+" upper bound",
       "array bounds",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
   }
@@ -1174,7 +1174,7 @@ void goto_checkt::bounds_check(
         inequality,
         name+" upper bound",
         "array bounds",
-        expr.find_location(),
+        expr.find_source_location(),
         expr,
         guard);
     }
@@ -1197,7 +1197,7 @@ void goto_checkt::add_guarded_claim(
   const exprt &_expr,
   const std::string &comment,
   const std::string &property_class,
-  const locationt &location,
+  const source_locationt &source_location,
   const exprt &src_expr,
   const guardt &guard)
 {
@@ -1227,16 +1227,15 @@ void goto_checkt::add_guarded_claim(
   {
     goto_program_instruction_typet type=
       enable_assert_to_assume?ASSUME:ASSERT;
-
+    
     goto_programt::targett t=new_code.add_instruction(type);
     
-    std::string source_string=from_expr(ns, "", src_expr);
+    std::string source_expr_string=from_expr(ns, "", src_expr);
 
     t->guard.swap(new_expr);
-    t->location=location;
-    t->location.set_comment(comment);
-    t->location.set_property_class(property_class);
-    t->location.set_source(source_string);
+    t->source_location=source_location;
+    t->source_location.set_comment(comment+" in "+source_expr_string);
+    t->source_location.set_property_class(property_class);
   }
 }
 
@@ -1463,10 +1462,10 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
       goto_programt::targett t=new_code.add_instruction(type);
 
       t->guard=false_exprt();
-      t->location=i.location;
-      t->location.set_property_class("error label");
-      t->location.set_comment("error label");
-      t->location.set("user-provided", true);
+      t->source_location=i.source_location;
+      t->source_location.set_property_class("error label");
+      t->source_location.set_comment("error label");
+      t->source_location.set("user-provided", true);
     }
     
     if(i.is_other())
@@ -1519,8 +1518,8 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     }
     else if(i.is_assert())
     {
-      if(i.location.get_bool("user-provided") &&
-         i.location.get_property_class()!="error label" &&
+      if(i.source_location.get_bool("user-provided") &&
+         i.source_location.get_property_class()!="error label" &&
          !enable_assertions)
         i.type=SKIP;
     }
@@ -1545,9 +1544,9 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
           exprt lhs=symbol_expr(ns.lookup(CPROVER_PREFIX "dead_object"));
           exprt rhs=if_exprt(
             side_effect_expr_nondett(bool_typet()), address_of_expr, lhs, lhs.type());
-          t->location=i.location;
+          t->source_location=i.source_location;
           t->code=code_assignt(lhs, rhs);
-          t->code.location()=i.location;
+          t->code.add_source_location()=i.source_location;
         }
       }
     }
@@ -1564,15 +1563,15 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         t->make_assignment();
         t->code=code_assignt(leak_expr, leak_expr);
         
-        locationt location;
-        location.set_function(ID_main);
+        source_locationt source_location;
+        source_location.set_function(ID_main);
 
         equal_exprt eq(leak_expr, gen_zero(ns.follow(leak.type)));
         add_guarded_claim(
           eq,
           "dynamically allocated memory never freed",
           "memory-leak",
-          location,
+          source_location,
           eq,
           guardt());
       }
@@ -1583,7 +1582,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         i_it!=new_code.instructions.end();
         i_it++)
     {
-      if(i_it->location.is_nil()) i_it->location=it->location;
+      if(i_it->source_location.is_nil()) i_it->source_location=it->source_location;
       if(i_it->function==irep_idt()) i_it->function=it->function;
     }
       

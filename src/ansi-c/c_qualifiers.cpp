@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include "c_qualifiers.h"
 
 /*******************************************************************\
@@ -32,6 +34,9 @@ std::string c_qualifierst::as_string() const
 
   if(is_restricted)
     qualifiers+="restrict ";
+    
+  if(is_atomic)
+    qualifiers+="_Atomic ";
     
   if(is_ptr32)
     qualifiers+="__ptr32 ";
@@ -64,6 +69,9 @@ void c_qualifierst::read(const typet &src)
 
   if(src.get_bool(ID_C_restricted))
     is_restricted=true;
+
+  if(src.get_bool(ID_C_atomic))
+    is_atomic=true;
 
   if(src.get_bool(ID_C_ptr32))
     is_ptr32=true;
@@ -103,6 +111,11 @@ void c_qualifierst::write(typet &dest) const
     dest.set(ID_C_restricted, true);
   else
     dest.remove(ID_C_restricted);
+
+  if(is_atomic)
+    dest.set(ID_C_atomic, true);
+  else
+    dest.remove(ID_C_atomic);
 
   if(is_ptr32)
     dest.set(ID_C_ptr32, true);

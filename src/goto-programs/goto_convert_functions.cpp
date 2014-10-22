@@ -150,7 +150,7 @@ Function: goto_convert_functionst::add_return
 
 void goto_convert_functionst::add_return(
   goto_functionst::goto_functiont &f,
-  const locationt &location)
+  const source_locationt &source_location)
 {
   #if 0
   if(!f.body.instructions.empty() &&
@@ -196,7 +196,7 @@ void goto_convert_functionst::add_return(
   goto_programt::targett t=f.body.add_instruction();
   t->make_return();
   t->code=code_returnt();
-  t->location=location;
+  t->source_location=source_location;
 
   side_effect_expr_nondett rhs(f.type.return_type());
   t->code.move_to_operands(rhs);
@@ -238,7 +238,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   
   const codet &code=to_code(symbol.value);
   
-  locationt end_location;
+  source_locationt end_location;
 
   if(code.get_statement()==ID_block)
     end_location=to_code_block(code).end_location();
@@ -264,7 +264,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   {
     goto_programt::instructiont a_begin;
     a_begin.make_atomic_begin();
-    a_begin.location=f.body.instructions.front().location;
+    a_begin.source_location=f.body.instructions.front().source_location;
     f.body.insert_before_swap(f.body.instructions.begin(), a_begin);
 
     bool last_is_return=false;
@@ -275,7 +275,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
       {
         goto_programt::instructiont a_end;
         a_end.make_atomic_end();
-        a_end.location=i_it->location;
+        a_end.source_location=i_it->source_location;
         f.body.insert_before_swap(i_it, a_end);
         ++i_it;
       }
@@ -285,14 +285,14 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
     {
       goto_programt::targett t=f.body.add_instruction();
       t->make_atomic_end();
-      t->location=end_location;
+      t->source_location=end_location;
     }
   }
 
   // add "end of function"
   goto_programt::targett t=f.body.add_instruction();
   t->type=END_FUNCTION;
-  t->location=end_location;
+  t->source_location=end_location;
   t->code.set(ID_identifier, identifier);
 
   // do function tags

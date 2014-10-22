@@ -18,11 +18,14 @@ INCLUDES= -I ..
 
 LIBS =
 
-CLEANFILES = goto-cc$(EXEEXT)
+CLEANFILES = goto-cc$(EXEEXT) goto-cl$(EXEEXT)
 
 include ../config.inc
 include ../common
 
+ifeq ($(BUILD_ENV_),MSVC)
+all: goto-cl$(EXEEXT)
+endif
 all: goto-cc$(EXEEXT)
 
 ifneq ($(wildcard ../cpp/Makefile),)
@@ -33,6 +36,9 @@ endif
 ###############################################################################
 
 goto-cc$(EXEEXT): $(OBJ)
+	$(LINKBIN)
+
+goto-cl$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
 .PHONY: goto-cc-mac-signed

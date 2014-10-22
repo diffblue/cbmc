@@ -34,8 +34,8 @@ void convert(const goto_programt::instructiont &instruction, irept &irep)
   if(instruction.function!="")
     irep.set(ID_function, instruction.function);
     
-  if(instruction.location.is_not_nil())
-    irep.set(ID_location, instruction.location);
+  if(instruction.source_location.is_not_nil())
+    irep.set(ID_location, instruction.source_location);
     
   irep.set(ID_type, (long) instruction.type);    
 
@@ -81,11 +81,13 @@ Function: convert
 
 \*******************************************************************/
 
-void convert(const irept &irep, goto_programt::instructiont &instruction)
+void convert(
+  const irept &irep,
+  goto_programt::instructiont &instruction)
 {
   instruction.code=static_cast<const codet &>(irep.find(ID_code));
   instruction.function = irep.find(ID_function).id();
-  instruction.location = static_cast<const locationt&>(irep.find(ID_location));    
+  instruction.source_location = static_cast<const source_locationt &>(irep.find(ID_location));
   instruction.type = static_cast<goto_program_instruction_typet>(
                   unsafe_string2unsigned(irep.find(ID_type).id_string()));
   instruction.guard = static_cast<const exprt&>(irep.find(ID_guard));

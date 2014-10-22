@@ -14,13 +14,15 @@ Date: 2012
 #include <list>
 #include <set>
 #include <map>
-#include <ostream>
+#include <iosfwd>
 
 #include <util/graph.h>
 
 #include "abstract_event.h"
 #include "data_dp.h"
 #include "wmm.h"
+
+class messaget;
 
 /*******************************************************************\
                      graph of abstract events
@@ -311,14 +313,16 @@ protected:
   };
 
 public:
-  event_grapht():
+  event_grapht(messaget& _message):
     filter_thin_air(true),
-    filter_uniproc(true)
+    filter_uniproc(true),
+    message(_message)
   {
   }
 
   bool filter_thin_air;
   bool filter_uniproc;
+  messaget& message;
 
   /* data dependencies per thread */
   std::map<unsigned,data_dpt> map_data_dp;

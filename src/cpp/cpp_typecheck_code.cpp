@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/i2string.h>
 #include <util/expr_util.h>
-#include <util/location.h>
+#include <util/source_location.h>
 
 #include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
@@ -220,7 +220,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     side_effect_expr_function_callt function_call;
     
     function_call.function()=symbol_expr;
-    function_call.location()=code.location();
+    function_call.add_source_location()=code.source_location();
     function_call.arguments().reserve(code.operands().size()+1);
 
     // we have to add 'this'
@@ -250,7 +250,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       if(access==ID_private || access=="noaccess")
       {
         #if 0
-        err_location(code.location());
+        err_location(code.source_location());
         str << "error: constructor of `"
             << to_string(symbol_expr)
             << "' is not accessible";
@@ -324,7 +324,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         code.op0().type().remove("#reference");
 
         side_effect_exprt assign(ID_assign);
-        assign.location() = code.location();
+        assign.add_source_location() = code.source_location();
         assign.copy_to_operands(symbol_expr, code.op0());
         typecheck_side_effect_assignment(assign);
         code_expressiont new_code;
@@ -340,12 +340,12 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           already_typechecked(*it);
 
         exprt call=
-          cpp_constructor(code.location(), symbol_expr, code.operands());
+          cpp_constructor(code.source_location(), symbol_expr, code.operands());
 
         if(call.is_nil())
         {
           call=codet(ID_skip);
-          call.location()=code.location();
+          call.add_source_location()=code.source_location();
         }
 
         code.swap(call);
@@ -422,7 +422,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
 
     codet decl_statement(ID_decl);
     decl_statement.reserve_operands(2);
-    decl_statement.location()=symbol.location;
+    decl_statement.add_source_location()=symbol.location;
     decl_statement.copy_to_operands(cpp_symbol_expr(symbol));
 
     // Do we have an initializer that's not code?
@@ -507,7 +507,7 @@ void cpp_typecheckt::typecheck_assign(codet &code)
 
   code_expressiont code_expr;
   code_expr.expression()=expr;
-  code_expr.location() = code.location();
+  code_expr.add_source_location() = code.source_location();
 
   code.swap(code_expr);
 }

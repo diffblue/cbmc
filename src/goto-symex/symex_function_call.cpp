@@ -77,7 +77,7 @@ void goto_symext::argument_assignments(
       std::string error=
         "call to `"+id2string(function_identifier)+"': "
         "not enough arguments";
-      throw error;
+      throw state.source.pc->source_location.as_string()+": "+error;
     }
 
     const code_typet::parametert &parameter=*it2;
@@ -310,7 +310,7 @@ bool goto_symext::symex_function_call_code(
     if(call.lhs().is_not_nil())
     {
       side_effect_expr_nondett rhs(call.lhs().type());
-      rhs.location()=call.location();
+      rhs.add_source_location()=call.source_location();
       state.rename(rhs, ns, goto_symex_statet::L1);
       code_assignt code(call.lhs(), rhs);
       symex_assign(state, to_code_assign(code)); /* TODO: clean_expr? */
@@ -450,7 +450,7 @@ void goto_symext::locality(
       it++)
   {
     // get L0 name
-    irep_idt l0_name=state.rename(*it, ns, goto_symex_statet::L0);
+    irep_idt l0_name=state.rename_identifier(*it, ns, goto_symex_statet::L0);
 
     // save old L1 name for popping the frame
     statet::level1t::current_namest::const_iterator c_it=
@@ -468,7 +468,7 @@ void goto_symext::locality(
     
     do
     {
-      state.level1.rename(l0_name, frame_nr+offset);
+      state.level1.rename_identifier(l0_name, frame_nr+offset);
       l1_name=state.level1(l0_name);
       offset++;
     }
@@ -512,8 +512,13 @@ void goto_symext::return_assignment(statet &state)
     {
       code_assignt assignment(frame.return_value, value);
 
-      assert(base_type_eq(assignment.lhs().type(),
-            assignment.rhs().type(), ns));
+      if(!base_type_eq(assignment.lhs().type(),
+                       assignment.rhs().type(), ns))
+        throw "goto_symext::return_assignment type mismatch at "+
+              instruction.source_location.as_string()+":\n"+
+              "assignment.lhs().type():\n"+assignment.lhs().type().pretty()+"\n"+
+              "assignment.rhs().type():\n"+assignment.rhs().type().pretty();
+
       symex_assign(state, assignment);
     }
   }

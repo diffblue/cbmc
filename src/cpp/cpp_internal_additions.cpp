@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include <util/config.h>
 
 #include <ansi-c/ansi_c_internal_additions.h>

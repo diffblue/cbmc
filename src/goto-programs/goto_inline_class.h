@@ -64,7 +64,7 @@ protected:
     const exprt &constrain);
     
   void parameter_assignments(
-    const locationt &location,
+    const source_locationt &source_location,
     const irep_idt &function_name,
     const code_typet &code_type,
     const exprt::operandst &arguments,

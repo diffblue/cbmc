@@ -170,7 +170,8 @@ extern char *yyansi_ctext;
 %token TOK_REAL        "__real__"
 %token TOK_IMAG        "__imag__"
 %token TOK_ALIGNAS     "_Alignas"
-%token TOK_ATOMIC      "_Atomic"
+%token TOK_ATOMIC_TYPE_QUALIFIER "_Atomic"
+%token TOK_ATOMIC_TYPE_SPECIFIER "_Atomic()"
 %token TOK_GENERIC     "_Generic"
 %token TOK_IMAGINARY   "_Imaginary"
 %token TOK_NORETURN    "_Noreturn"
@@ -215,6 +216,7 @@ extern char *yyansi_ctext;
 %token TOK_MSC_UUIDOF  "__uuidof"
 %token TOK_MSC_IF_EXISTS "__if_exists"
 %token TOK_MSC_IF_NOT_EXISTS "__if_not_exists"
+%token TOK_MSC_UNDERLYING_TYPE "__underlying_type"
 
 /*** priority, associativity, etc. definitions **************************/
 
@@ -367,7 +369,7 @@ offsetof_member_designator:
           init($$, ID_designated_initializer);
           stack($$).operands().resize(1);
           stack($$).op0().id(ID_member);
-          stack($$).op0().location()=stack($1).location();
+          stack($$).op0().add_source_location()=stack($1).source_location();
           stack($$).op0().set(ID_component_name, stack($1).get(ID_C_base_name));
         }
         | offsetof_member_designator '.' member_name
@@ -484,7 +486,7 @@ postfix_expression:
         | '(' type_name ')' '{' initializer_list_opt '}'
         {
           exprt tmp(ID_initializer_list);
-          tmp.location()=stack($4).location();
+          tmp.add_source_location()=stack($4).source_location();
           tmp.operands().swap(stack($5).operands());
           $$=$1;
           set($$, ID_typecast);
@@ -495,7 +497,7 @@ postfix_expression:
         {
           // same as above
           exprt tmp(ID_initializer_list);
-          tmp.location()=stack($4).location();
+          tmp.add_source_location()=stack($4).source_location();
           tmp.operands().swap(stack($5).operands());
           $$=$1;
           set($$, ID_typecast);
@@ -923,6 +925,7 @@ declaration_specifier:
         | sue_declaration_specifier
         | typedef_declaration_specifier
         | typeof_declaration_specifier
+        | atomic_declaration_specifier
         ;
 
 type_specifier:
@@ -930,6 +933,7 @@ type_specifier:
         | sue_type_specifier
         | typedef_type_specifier
         | typeof_type_specifier
+        | atomic_type_specifier
         ;
 
 declaration_qualifier_list:
@@ -978,13 +982,13 @@ declaration_qualifier:
         ;
 
 type_qualifier:
-          TOK_ATOMIC   { $$=$1; set($$, ID_atomic); }
-        | TOK_CONST    { $$=$1; set($$, ID_const); }
-        | TOK_RESTRICT { $$=$1; set($$, ID_restrict); }
-        | TOK_VOLATILE { $$=$1; set($$, ID_volatile); }
-        | TOK_CPROVER_ATOMIC { $$=$1; set($$, ID_cprover_atomic); }
-        | TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
-        | TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
+          TOK_ATOMIC_TYPE_QUALIFIER { $$=$1; set($$, ID_atomic); }
+        | TOK_CONST                 { $$=$1; set($$, ID_const); }
+        | TOK_RESTRICT              { $$=$1; set($$, ID_restrict); }
+        | TOK_VOLATILE              { $$=$1; set($$, ID_volatile); }
+        | TOK_CPROVER_ATOMIC        { $$=$1; set($$, ID_cprover_atomic); }
+        | TOK_PTR32                 { $$=$1; set($$, ID_ptr32); }
+        | TOK_PTR64                 { $$=$1; set($$, ID_ptr64); }
         | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); mto($$, $3); }
         ;
 
@@ -1090,6 +1094,21 @@ typeof_declaration_specifier:
         }
         ;
 
+atomic_declaration_specifier:
+          atomic_type_specifier storage_class gcc_type_attribute_opt
+        {
+          $$=merge($1, merge($2, $3));
+        }
+        | declaration_qualifier_list atomic_specifier gcc_type_attribute_opt
+        {
+          $$=merge($1, merge($2, $3));
+        }
+        | atomic_declaration_specifier declaration_qualifier gcc_type_attribute_opt
+        {
+          $$=merge($1, merge($2, $3));
+        }
+        ;
+
 typedef_type_specifier:
           typedef_name gcc_type_attribute_opt
         {
@@ -1129,6 +1148,31 @@ typeof_type_specifier:
           $$=merge($1, merge($2, $3));
         }
         | typeof_specifier type_qualifier_list
+        {
+          $$=merge($1, $2);
+        }
+        ;
+
+atomic_specifier:
+          TOK_ATOMIC_TYPE_SPECIFIER '(' type_name ')'
+        {
+          $$=$1;
+          stack($$).id(ID_atomic_type_specifier);
+          stack($$).add(ID_subtype)=stack($3);
+        }
+        ;
+
+atomic_type_specifier:
+          atomic_specifier
+        | type_qualifier_list atomic_specifier
+        {
+          $$=merge($1, $2);
+        }
+        | type_qualifier_list atomic_specifier type_qualifier_list
+        {
+          $$=merge($1, merge($2, $3));
+        }
+        | atomic_specifier type_qualifier_list
         {
           $$=merge($1, $2);
         }
@@ -1358,8 +1402,23 @@ gcc_attribute:
         {
           init($$);
         }
+        | TOK_CONST
+        {
+          $$=$1;
+          stack($$).id(ID_gcc_attribute);
+          stack($$).set(ID_identifier, ID_const);
+        }
         | identifier
+        {
+          $$=$1;
+          stack($$).id(ID_gcc_attribute);
+        }
         | identifier '(' gcc_attribute_expression_list_opt ')'
+        {
+          $$=$1;
+          stack($$).id(ID_gcc_attribute);
+          stack($$).operands().swap(stack($3).operands());
+        }
         ;
 
 gcc_attribute_list:
@@ -1603,12 +1662,12 @@ enumerator_list:
         ;
 
 enumerator_declaration:
-          identifier_or_typedef_name enumerator_value_opt
+          identifier_or_typedef_name gcc_type_attribute_opt enumerator_value_opt
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_enum_constant(true);
           PARSER.add_declarator(stack($$), stack($1));
-          to_ansi_c_declaration(stack($$)).add_initializer(stack($2));
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($3));
         }
         ;
 
@@ -2006,14 +2065,14 @@ compound_statement:
         {
           $$=$2;
           statement($$, ID_block);
-          stack($$).set(ID_C_end_location, stack($3).location());
+          stack($$).set(ID_C_end_location, stack($3).source_location());
           PARSER.pop_scope();
         }
         | compound_scope '{' statement_list '}'
         {
           $$=$2;
           statement($$, ID_block);
-          stack($$).set(ID_C_end_location, stack($4).location());
+          stack($$).set(ID_C_end_location, stack($4).source_location());
           stack($$).operands().swap(stack($3).operands());
           PARSER.pop_scope();
         }
@@ -2021,7 +2080,7 @@ compound_statement:
         {
           $$=$2;
           statement($$, ID_asm);
-          stack($$).set(ID_C_end_location, stack($4).location());
+          stack($$).set(ID_C_end_location, stack($4).source_location());
           mto($$, $3);
           PARSER.pop_scope();
         }

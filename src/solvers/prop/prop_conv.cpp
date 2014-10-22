@@ -493,8 +493,6 @@ Function: prop_conv_solvert::set_to
 
 void prop_conv_solvert::set_to(const exprt &expr, bool value)
 {
-  //std::cout << "set to: " << expr << std::endl; 
-
   if(expr.type().id()!=ID_bool)
   {
     std::string msg="prop_convt::set_to got "

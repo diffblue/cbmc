@@ -335,11 +335,16 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
 {
   if(subarch=="powerpc")
     set_ILP32();
-  else // ppc64
+  else // ppc64 or ppc64le
     set_LP64();
 
   arch=ARCH_POWER;
-  endianness=IS_BIG_ENDIAN;
+
+  if(subarch=="ppc64le")
+    endianness=IS_LITTLE_ENDIAN;
+  else
+    endianness=IS_BIG_ENDIAN;
+
   long_double_width=16*8;
   char_is_unsigned=true;
   NULL_is_zero=true;
@@ -352,16 +357,38 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
     defines.push_back("__powerpc__");
     defines.push_back("__POWERPC__");
     defines.push_back("__ppc__");
+
     if(os==OS_MACOS)
       defines.push_back("__BIG_ENDIAN__");
+
+    if(subarch!="powerpc")
+    {
+      defines.push_back("__powerpc64");
+      defines.push_back("__powerpc64__");
+      defines.push_back("__PPC64__");
+      defines.push_back("__ppc64__");
+      if(subarch=="ppc64le")
+      {
+        defines.push_back("_CALL_ELF=2");
+        defines.push_back("__LITTLE_ENDIAN__");
+      }
+      else
+      {
+        defines.push_back("_CALL_ELF=1");
+        defines.push_back("__BIG_ENDIAN__");
+      }
+    }
     break;
+
   case MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_PPC");
     break;
+
   case MODE_CODEWARRIOR_C_CPP:
   case MODE_ARM_C_CPP:
   case MODE_ANSI_C_CPP:
     break;
+
   case NO_MODE:
     assert(false);
   }
@@ -605,12 +632,21 @@ Function: configt::ansi_ct::set_arch_spec_sparc
 
 \*******************************************************************/
 
-void configt::ansi_ct::set_arch_spec_sparc()
+void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
 {
-  set_ILP32();
+  if(subarch=="sparc64")
+  {
+    set_LP64();
+    long_double_width=16*8;
+  }
+  else
+  {
+    set_ILP32();
+    long_double_width=8*8;
+  }
+
   arch=ARCH_SPARC;
   endianness=IS_BIG_ENDIAN;
-  long_double_width=16*8;
   char_is_unsigned=false;
   NULL_is_zero=true;
 
@@ -619,6 +655,8 @@ void configt::ansi_ct::set_arch_spec_sparc()
   case MODE_GCC_C:
   case MODE_GCC_CPP:
     defines.push_back("__sparc__");
+    if(subarch=="sparc64")
+      defines.push_back("__arch64__");
     break;
   case MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
@@ -746,8 +784,8 @@ bool configt::set(const cmdlinet &cmdline)
   // Default is ROUND_TO_EVEN, justified by C99:
   // 1 At program startup the floating-point environment is initialized as
   // prescribed by IEC 60559:
-  // — All floating-point exception status flags are cleared.
-  //  — The rounding direction mode is rounding to nearest.
+  // - All floating-point exception status flags are cleared.
+  // - The rounding direction mode is rounding to nearest.
   ansi_c.rounding_mode=ieee_floatt::ROUND_TO_EVEN;
 
   if(cmdline.isset("function"))
@@ -888,10 +926,12 @@ bool configt::set(const cmdlinet &cmdline)
           arch=="mips")
     ansi_c.set_arch_spec_mips(arch);
   else if(arch=="powerpc" ||
-          arch=="ppc64")
+          arch=="ppc64" ||
+          arch=="ppc64le")
     ansi_c.set_arch_spec_power(arch);
-  else if(arch=="sparc")
-    ansi_c.set_arch_spec_sparc();
+  else if(arch=="sparc" ||
+          arch=="sparc64")
+    ansi_c.set_arch_spec_sparc(arch);
   else if(arch=="ia64")
     ansi_c.set_arch_spec_ia64();
   else if(arch=="s390x")
@@ -1145,13 +1185,21 @@ irep_idt configt::this_architecture()
     this_arch="mips64";
     #endif
   #elif __powerpc__
-    #ifdef __ppc64__
-    this_arch="ppc64";
+    #if defined(__ppc64__) || defined(__PPC64__) || defined(__powerpc64__) || defined(__POWERPC64__)
+      #ifdef __LITTLE_ENDIAN__
+      this_arch="ppc64le";
+      #else
+      this_arch="ppc64";
+      #endif
     #else
     this_arch="powerpc";
     #endif
   #elif __sparc__
-  this_arch="sparc";
+    #ifdef __arch64__
+    this_arch="sparc64";
+    #else
+    this_arch="sparc";
+    #endif
   #elif __ia64__
   this_arch="ia64";
   #elif __s390x__

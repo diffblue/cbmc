@@ -9,11 +9,11 @@ Author: Alex Groce
 #ifndef CPROVER_PBS_DIMACS_CNF_H
 #define CPROVER_PBS_DIMACS_CNF_H
 
-#include "dimacs_cnf.h"
-
 #include <set>
 #include <map>
-#include <ostream>
+#include <iosfwd>
+
+#include "dimacs_cnf.h"
 
 class pbs_dimacs_cnft:public dimacs_cnft
 {

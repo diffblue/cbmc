@@ -70,7 +70,7 @@ void ai_baset::output(
   forall_goto_program_instructions(i_it, goto_program)
   {
     out << "**** " << i_it->location_number << " "
-        << i_it->location << "\n";
+        << i_it->source_location << "\n";
 
     find_state(i_it).output(out, *this, ns);
     out << "\n";

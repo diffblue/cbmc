@@ -22,7 +22,7 @@ class cpp_convert_typet
 {
 public:
   unsigned unsigned_cnt, signed_cnt, char_cnt, int_cnt, short_cnt,
-           long_cnt, const_cnt, typedef_cnt, volatile_cnt,
+           long_cnt, const_cnt, constexpr_cnt, typedef_cnt, volatile_cnt,
            double_cnt, float_cnt, complex_cnt, cpp_bool_cnt, proper_bool_cnt,
            extern_cnt, wchar_t_cnt,
            int8_cnt, int16_cnt, int32_cnt, int64_cnt, ptr32_cnt, ptr64_cnt,
@@ -57,7 +57,7 @@ Function: cpp_convert_typet::read
 void cpp_convert_typet::read(const typet &type)
 {
   unsigned_cnt=signed_cnt=char_cnt=int_cnt=short_cnt=
-  long_cnt=const_cnt=typedef_cnt=volatile_cnt=
+  long_cnt=const_cnt=constexpr_cnt=typedef_cnt=volatile_cnt=
   double_cnt=float_cnt=complex_cnt=cpp_bool_cnt=proper_bool_cnt=
   extern_cnt=wchar_t_cnt=int8_cnt=int16_cnt=int32_cnt=
   int64_cnt=ptr32_cnt=ptr64_cnt=float128_cnt=int128_cnt=0;
@@ -139,6 +139,8 @@ void cpp_convert_typet::read_rec(const typet &type)
     ptr64_cnt++;
   else if(type.id()==ID_const)
     const_cnt++;
+  else if(type.id()==ID_constexpr)
+    constexpr_cnt++;
   else if(type.id()==ID_extern)
     extern_cnt++;
   else if(type.id()=="function_type")
@@ -264,7 +266,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
     if(parameter_expr.id()==ID_cpp_declaration)
     {
       cpp_declarationt &declaration=to_cpp_declaration(parameter_expr);
-      locationt type_location=declaration.type().location();
+      source_locationt type_location=declaration.type().source_location();
 
       cpp_convert_plain_type(declaration.type());
 
@@ -278,7 +280,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
       if(declarator.is_nil())
       {
         parameter_expr=exprt(ID_parameter, declaration.type());
-        parameter_expr.location()=type_location;
+        parameter_expr.add_source_location()=type_location;
       }
       else
       {
@@ -296,7 +298,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
 
         if(cpp_name.is_nil())
         {
-          new_parameter.location()=type_location;
+          new_parameter.add_source_location()=type_location;
         }
         else if(cpp_name.is_simple_name())
         {
@@ -304,7 +306,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
           assert(!base_name.empty());
           new_parameter.set_identifier(base_name);
           new_parameter.set_base_name(base_name);
-          new_parameter.location()=cpp_name.location();
+          new_parameter.add_source_location()=cpp_name.location();
         }
         else
         {
@@ -553,7 +555,7 @@ void cpp_convert_typet::write(typet &type)
   }
 
   // is it constant?
-  if(const_cnt)
+  if(const_cnt || constexpr_cnt)
     type.set(ID_C_constant, true);
 
   // is it volatile?

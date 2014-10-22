@@ -104,7 +104,7 @@ bool write_goto_binary_v2(
         
         irepconverter.reference_convert(instruction.code, out);
         irepconverter.write_string_ref(out, instruction.function);
-        irepconverter.reference_convert(instruction.location, out);
+        irepconverter.reference_convert(instruction.source_location, out);
         write_gb_word(out, (long)instruction.type);
         irepconverter.reference_convert(instruction.guard, out);        
         irepconverter.write_string_ref(out, irep_idt()); // former event

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 
 exprt zero_initializer(
-  const typet &type,
-  const locationt &location,
-  const namespacet &ns,
-  message_handlert &message_handler);
+  const typet &,
+  const source_locationt &,
+  const namespacet &,
+  message_handlert &);

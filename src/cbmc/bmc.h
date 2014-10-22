@@ -102,7 +102,7 @@ protected:
     const goto_functionst &goto_functions,
     prop_convt &solver);
 
-  // all claims
+  // all properties
   struct goalt
   {
     exprt::operandst conjuncts;
@@ -111,7 +111,7 @@ protected:
 
     explicit goalt(const goto_programt::instructiont &instruction)
     {
-      description=id2string(instruction.location.get_comment());
+      description=id2string(instruction.source_location.get_comment());
       covered = false;
     }
   
@@ -125,7 +125,8 @@ protected:
   typedef std::map<irep_idt, goalt> goal_mapt;
   goal_mapt goal_map;
  
-  virtual bool all_claims(const goto_functionst &goto_functions, prop_convt &solver);
+  virtual bool all_properties(const goto_functionst &goto_functions, 
+			      prop_convt &solver);
 
 };
 

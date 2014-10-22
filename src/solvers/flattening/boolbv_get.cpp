@@ -384,7 +384,9 @@ exprt boolbvt::bv_get_unbounded_array(
     number=arrays.find_number(number);
     
     assert(number<index_map.size());
-    const index_sett &index_set=index_map[number];
+    index_mapt::const_iterator it=index_map.find(number);
+    assert(it!=index_map.end());
+    const index_sett &index_set=it->second;
     
     for(index_sett::const_iterator it1=
         index_set.begin();

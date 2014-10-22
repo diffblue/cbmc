@@ -43,7 +43,9 @@ path_searcht::resultt path_searcht::operator()(
   
   // set up the statistics
   number_of_dropped_states=0;
+  number_of_paths=0;
   number_of_VCCs=0;
+  number_of_steps=0;
   number_of_VCCs_after_simplification=0;
   number_of_failed_properties=0;
 
@@ -54,6 +56,8 @@ path_searcht::resultt path_searcht::operator()(
   
   while(!queue.empty())
   {
+    number_of_steps++;
+  
     // Pick a state from the queue,
     // according to some heuristic.
     queuet::iterator state=pick_state();
@@ -61,20 +65,25 @@ path_searcht::resultt path_searcht::operator()(
     if(drop_state(*state))
     {
       number_of_dropped_states++;
+      number_of_paths++;
       queue.erase(state);
       continue;
     }
     
     if(!state->is_executable())
     {
+      number_of_paths++;
       queue.erase(state);
       continue;
     }
     
-    status() << "Queue " << queue.size()
-             << " thread " << state->get_current_thread()
-             << "/" << state->threads.size()
-             << " PC " << state->pc() << messaget::eom;
+    if(number_of_steps%1000==0)
+    {
+      status() << "Queue " << queue.size()
+               << " thread " << state->get_current_thread()
+               << "/" << state->threads.size()
+               << " PC " << state->pc() << messaget::eom;
+    }
 
     // an error, possibly?
     if(state->get_instruction()->is_assert())
@@ -117,6 +126,9 @@ void path_searcht::report_statistics()
   // report a bit
   status() << "Number of dropped states: "
            << number_of_dropped_states << messaget::eom;
+
+  status() << "Number of paths: "
+           << number_of_paths << messaget::eom;
 
   status() << "Generated " << number_of_VCCs << " VCC(s), "
            << number_of_VCCs_after_simplification
@@ -170,11 +182,11 @@ void path_searcht::do_show_vcc(
     
   mstreamt &out=result();
 
-  if(instruction.location.is_not_nil())
-    out << instruction.location << "\n";
+  if(instruction.source_location.is_not_nil())
+    out << instruction.source_location << "\n";
   
-  if(instruction.location.get_comment()!="")
-    out << instruction.location.get_comment() << "\n";
+  if(instruction.source_location.get_comment()!="")
+    out << instruction.source_location.get_comment() << "\n";
     
   unsigned count=1;
   
@@ -229,14 +241,14 @@ Function: path_searcht::drop_state
 
 bool path_searcht::drop_state(const statet &state) const
 {
-  // depth
-  if(depth_limit!=-1 && state.get_depth()>depth_limit) return true;
+  // depth limit
+  if(depth_limit_set && state.get_depth()>depth_limit) return true;
   
   // context bound
-  if(context_bound!=-1 && state.get_no_thread_interleavings()) return true;
+  if(context_bound_set && state.get_no_thread_interleavings()) return true;
   
   // unwinding limit -- loops
-  if(unwind_limit!=-1 && state.get_instruction()->is_backwards_goto())
+  if(unwind_limit_set && state.get_instruction()->is_backwards_goto())
   {
     for(path_symex_statet::unwinding_mapt::const_iterator
         it=state.unwinding_map.begin();
@@ -247,7 +259,7 @@ bool path_searcht::drop_state(const statet &state) const
   }
   
   // unwinding limit -- recursion
-  if(unwind_limit!=-1 && state.get_instruction()->is_function_call())
+  if(unwind_limit_set && state.get_instruction()->is_function_call())
   {
     for(path_symex_statet::recursion_mapt::const_iterator
         it=state.recursion_map.begin();
@@ -282,7 +294,7 @@ void path_searcht::check_assertion(
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
 
-  irep_idt property_name=instruction.location.get_property_id();
+  irep_idt property_name=instruction.source_location.get_property_id();
   property_entryt &property_entry=property_map[property_name];
   
   if(property_entry.status==FAIL)
@@ -351,13 +363,13 @@ void path_searcht::initialize_property_map(
         if(!it->is_assert())
           continue;
       
-        const locationt &location=it->location;
+        const source_locationt &source_location=it->source_location;
       
-        irep_idt property_name=location.get_property_id();
+        irep_idt property_name=source_location.get_property_id();
         
         property_entryt &property_entry=property_map[property_name];
         property_entry.status=NOT_REACHED;
-        property_entry.description=location.get_comment();
+        property_entry.description=source_location.get_comment();
       }
     }    
 }

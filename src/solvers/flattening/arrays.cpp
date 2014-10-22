@@ -54,7 +54,6 @@ Function: arrayst::record_array_index
 void arrayst::record_array_index(const index_exprt &index)
 {
   std::size_t number=arrays.number(index.array());
-  if(number>=index_map.size()) index_map.resize(number+1);
   index_map[number].insert(index.index());
 }
 
@@ -222,6 +221,12 @@ void arrayst::collect_arrays(const exprt &a)
     else
       throw "unexpected array type cast from "+a.op0().type().id_string();
   }
+  else if(a.id()==ID_index)
+  {
+    // nested unbounded arrays
+    arrays.make_union(a, a.op0());
+    collect_arrays(a.op0());
+  }
   else
     throw "unexpected array expression (collect_arrays): `"+a.id_string()+"'";
 }
@@ -245,9 +250,15 @@ void arrayst::add_array_constraints()
   
   // add constraints for if, with, array_of
   for(std::size_t i=0; i<arrays.size(); i++)
-    add_array_constraints(
-      index_map[arrays.find_number(i)],
-      arrays[i]);
+  {
+    update_index_map();
+
+    // take a copy as arrays may get modified by add_array_constraints
+    // in case of nested unbounded arrays
+    exprt a=arrays[i];
+
+    add_array_constraints(index_map[arrays.find_number(i)], a);
+  }
 
   // add constraints for equalities
   for(array_equalitiest::const_iterator it=
@@ -348,15 +359,45 @@ void arrayst::build_index_map()
 {
   // merge the indices into the root
   
-  if(index_map.size()<arrays.size())
-    index_map.resize(arrays.size());
-
   // iterate over non-roots
   for(std::size_t i=0; i<arrays.size(); i++)
   {
     if(arrays.is_root_number(i)) continue;
 
     std::size_t root_number=arrays.find_number(i);
+    assert(root_number!=i);
+
+    index_sett &root_index_set=index_map[root_number];
+    index_sett &index_set=index_map[i];
+
+    root_index_set.insert(index_set.begin(), index_set.end());
+  }
+}
+
+/*******************************************************************\
+
+Function: arrayst::update_index_map
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void arrayst::update_index_map()
+{
+  // merge the indices into the root
+  
+  const unsigned size_before=index_map.size();
+
+  // iterate over non-roots
+  for(unsigned i=size_before; i<arrays.size(); i++)
+  {
+    if(arrays.is_root_number(i)) continue;
+
+    unsigned root_number=arrays.find_number(i);
     assert(root_number!=i);
 
     index_sett &root_index_set=index_map[root_number];
@@ -478,6 +519,9 @@ void arrayst::add_array_constraints(
       // add constraint
       set_to(equal_exprt(index_expr1, index_expr2), true);
     }
+  }
+  else if(expr.id()==ID_index)
+  {
   }
   else
     throw "unexpected array expression (add_array_constraints): `"+expr.id_string()+"'";

@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/std_types.h>
 
 #include <ansi-c/c_types.h>
@@ -31,7 +31,7 @@ cpp_declarator_convertert::cpp_declarator_convertert(
   class cpp_typecheckt &_cpp_typecheck):
   is_typedef(false),
   is_template(false),
-  is_template_argument(false),
+  is_template_parameter(false),
   is_friend(false),
   linkage_spec(_cpp_typecheck.current_linkage_spec),
   cpp_typecheck(_cpp_typecheck)
@@ -233,13 +233,13 @@ symbolt &cpp_declarator_convertert::convert(
     {
       cpp_scopet::id_sett id_set;
 
-      scope->lookup_identifier(symbol.name, cpp_idt::TEMPLATE_ARGUMENT, id_set);
+      scope->lookup_identifier(symbol.name, cpp_idt::TEMPLATE_PARAMETER, id_set);
 
       if(id_set.empty())
       {
         cpp_idt &identifier=
           cpp_typecheck.cpp_scopes.put_into_scope(symbol,*scope);
-        identifier.id_class=cpp_idt::TEMPLATE_ARGUMENT;
+        identifier.id_class=cpp_idt::TEMPLATE_PARAMETER;
       }
     }
 
@@ -260,7 +260,7 @@ Function: cpp_declarator_convertert::combine_types
 \*******************************************************************/
 
 void cpp_declarator_convertert::combine_types(
-  const locationt &location,
+  const source_locationt &source_location,
   const typet &decl_type,
   symbolt &symbol)
 {
@@ -289,7 +289,7 @@ void cpp_declarator_convertert::combine_types(
           // The 'this' parameter of virtual functions mismatches
           if(i!=0 || !symbol_code_type.get_bool("#is_virtual"))
           {
-            cpp_typecheck.err_location(location);
+            cpp_typecheck.err_location(source_location);
             cpp_typecheck.str << "symbol `" << symbol.display_name()
                               << "': parameter " << (i+1) << " type mismatch"
                               << std::endl;
@@ -305,7 +305,7 @@ void cpp_declarator_convertert::combine_types(
         {
           symbol_parameter.set_base_name(decl_parameter.get_base_name());
           symbol_parameter.set_identifier(decl_parameter.get_identifier());
-          symbol_parameter.location()=decl_parameter.location();
+          symbol_parameter.add_source_location()=decl_parameter.source_location();
         }
       }
 
@@ -324,7 +324,7 @@ void cpp_declarator_convertert::combine_types(
     return; // ok
   }
 
-  cpp_typecheck.err_location(location);
+  cpp_typecheck.err_location(source_location);
   cpp_typecheck.str << "symbol `" << symbol.display_name()
                     << "' already declared with different type:"
                     << std::endl;
@@ -508,7 +508,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.module=cpp_typecheck.module;
   symbol.type=final_type;
   symbol.is_type=is_typedef;
-  symbol.is_macro=is_typedef && !is_template_argument;
+  symbol.is_macro=is_typedef && !is_template_parameter;
   symbol.pretty_name=pretty_name;
   
   // Constant? These are propagated.
@@ -599,8 +599,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
   if(is_template)
     identifier.id_class=cpp_idt::TEMPLATE;
-  else if(is_template_argument)
-    identifier.id_class=cpp_idt::TEMPLATE_ARGUMENT;
+  else if(is_template_parameter)
+    identifier.id_class=cpp_idt::TEMPLATE_PARAMETER;
   else if(is_typedef)
     identifier.id_class=cpp_idt::TYPEDEF;
   else

@@ -25,7 +25,7 @@ void message_handlert::print(
   unsigned level,
   const std::string &message,
   int sequence_number,
-  const locationt &location)
+  const source_locationt &location)
 {
   std::string dest;
   
@@ -79,7 +79,7 @@ void messaget::print(
   unsigned level,
   const std::string &message,
   int sequence_number,
-  const locationt &location)
+  const source_locationt &location)
 {
   if(message_handler!=NULL)
     message_handler->print(level, message, sequence_number,

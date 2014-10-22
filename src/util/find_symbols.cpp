@@ -190,6 +190,11 @@ void find_symbols(kindt kind, const exprt &src, find_symbols_sett &dest)
 
   if(c_sizeof_type.is_not_nil())
     find_symbols(kind, static_cast<const typet &>(c_sizeof_type), dest);
+
+  const irept &va_arg_type=src.find(ID_C_va_arg_type);
+
+  if(va_arg_type.is_not_nil())
+    find_symbols(kind, static_cast<const typet &>(va_arg_type), dest);
 }
 
 /*******************************************************************\
@@ -248,6 +253,18 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
   {
     // do the size -- the subtype is already done
     find_symbols(kind, to_array_type(src).size(), dest);
+  }
+  else if(src.id()==ID_c_enum_tag)
+  {
+    dest.insert(to_c_enum_tag_type(src).get_identifier());
+  }
+  else if(src.id()==ID_struct_tag)
+  {
+    dest.insert(to_struct_tag_type(src).get_identifier());
+  }
+  else if(src.id()==ID_union_tag)
+  {
+    dest.insert(to_union_tag_type(src).get_identifier());
   }
 }
 

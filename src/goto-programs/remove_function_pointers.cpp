@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/replace_expr.h>
 #include <util/expr_util.h>
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/std_expr.h>
 #include <util/config.h>
 #include <util/std_expr.h>
@@ -34,25 +34,23 @@ Author: Daniel Kroening, kroening@kroening.com
 class remove_function_pointerst
 {
 public:
-  explicit remove_function_pointerst(symbol_tablet &_symbol_table):
-    ns(_symbol_table),
-    symbol_table(_symbol_table)
-  {
-  }
+  remove_function_pointerst(
+    symbol_tablet &_symbol_table,
+    bool _add_safety_assertion,
+    const goto_functionst &goto_functions);
 
   void operator()(goto_functionst &goto_functions);
-  
-  bool add_safety_assertion;
+
+  bool remove_function_pointers(goto_programt &goto_program);
 
 protected:
   const namespacet ns;
   symbol_tablet &symbol_table;
+  bool add_safety_assertion;
 
   void remove_function_pointer(
     goto_programt &goto_program,
     goto_programt::targett target);
-
-  bool remove_function_pointers(goto_programt &goto_program);
 
   std::set<irep_idt> address_taken;
   
@@ -73,6 +71,36 @@ protected:
 
   symbolt &new_tmp_symbol();
 };
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::remove_function_pointerst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+remove_function_pointerst::remove_function_pointerst(
+  symbol_tablet &_symbol_table,
+  bool _add_safety_assertion,
+  const goto_functionst &goto_functions):
+  ns(_symbol_table),
+  symbol_table(_symbol_table),
+  add_safety_assertion(_add_safety_assertion)
+{
+  compute_address_taken_functions(goto_functions, address_taken);
+
+  // build type map
+  for(goto_functionst::function_mapt::const_iterator f_it=
+      goto_functions.function_map.begin();
+      f_it!=goto_functions.function_map.end();
+      f_it++)
+    type_map[f_it->first]=f_it->second.type;
+}
 
 /*******************************************************************\
 
@@ -271,7 +299,7 @@ void remove_function_pointerst::fix_return_type(
 
   symbolt &tmp_symbol=new_tmp_symbol();
   tmp_symbol.type=code_type.return_type();
-  tmp_symbol.location=function_call.location();
+  tmp_symbol.location=function_call.source_location();
 
   symbol_exprt tmp_symbol_expr;
   tmp_symbol_expr.type()=tmp_symbol.type;
@@ -308,7 +336,16 @@ void remove_function_pointerst::remove_function_pointer(
   const exprt &function=code.function();
   
   // this better have the right type
-  const code_typet &call_type=to_code_type(function.type());
+  code_typet call_type=to_code_type(function.type());
+  // refine the type in case the forward declaration was incomplete
+  if(call_type.has_ellipsis() &&
+     call_type.parameters().empty())
+  {
+    call_type.remove_ellipsis();
+    forall_expr(it, code.arguments())
+      call_type.parameters().push_back(
+        code_typet::parametert(it->type()));
+  }
   
   assert(function.id()==ID_dereference);
   assert(function.operands().size()==1);
@@ -386,8 +423,8 @@ void remove_function_pointerst::remove_function_pointer(
   {
     goto_programt::targett t=new_code_gotos.add_instruction();
     t->make_assertion(false_exprt());
-    t->location.set(ID_property, "pointer dereference");
-    t->location.set(ID_comment, "invalid function pointer");
+    t->source_location.set_property_class("pointer dereference");
+    t->source_location.set_comment("invalid function pointer");
   }
   
   goto_programt new_code;
@@ -400,12 +437,12 @@ void remove_function_pointerst::remove_function_pointer(
   // set locations
   Forall_goto_program_instructions(it, new_code)
   {
-    irep_idt property_class=it->location.get_property_class();
-    irep_idt comment=it->location.get_comment();
-    it->location=target->location;
+    irep_idt property_class=it->source_location.get_property_class();
+    irep_idt comment=it->source_location.get_comment();
+    it->source_location=target->source_location;
     it->function=target->function;
-    if(!property_class.empty()) it->location.set_property_class(property_class);
-    if(!comment.empty()) it->location.set_comment(comment);
+    if(!property_class.empty()) it->source_location.set_property_class(property_class);
+    if(!comment.empty()) it->source_location.set_comment(comment);
   }
   
   goto_programt::targett next_target=target;
@@ -416,7 +453,7 @@ void remove_function_pointerst::remove_function_pointer(
   // We preserve the original dereferencing to possibly catch
   // further pointer-related errors.
   code_expressiont code_expression;
-  code_expression.location()=function.location();
+  code_expression.add_source_location()=function.source_location();
   code_expression.expression()=function;
   target->code.swap(code_expression);
   target->type=OTHER;
@@ -424,7 +461,7 @@ void remove_function_pointerst::remove_function_pointer(
 
 /*******************************************************************\
 
-Function: remove_function_pointerst::operator()
+Function: remove_function_pointerst::remove_function_pointers
 
   Inputs:
 
@@ -477,15 +514,6 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
 {
   bool did_something=false;
   
-  compute_address_taken_functions(functions, address_taken);
-
-  // build type map
-  for(goto_functionst::function_mapt::iterator f_it=
-      functions.function_map.begin();
-      f_it!=functions.function_map.end();
-      f_it++)
-    type_map[f_it->first]=f_it->second.type;
-  
   for(goto_functionst::function_mapt::iterator f_it=
       functions.function_map.begin();
       f_it!=functions.function_map.end();
@@ -513,13 +541,38 @@ Function: remove_function_pointers
 
 \*******************************************************************/
 
+bool remove_function_pointers(
+  symbol_tablet &symbol_table,
+  const goto_functionst &goto_functions,
+  goto_programt &goto_program,
+  bool add_safety_assertion)
+{
+  remove_function_pointerst
+    rfp(symbol_table, add_safety_assertion, goto_functions);
+
+  return rfp.remove_function_pointers(goto_program);
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointers
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void remove_function_pointers(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   bool add_safety_assertion)
 {
-  remove_function_pointerst rfp(symbol_table);
-  rfp.add_safety_assertion=add_safety_assertion;
+  remove_function_pointerst
+    rfp(symbol_table, add_safety_assertion, goto_functions);
+
   rfp(goto_functions);
 }
 
