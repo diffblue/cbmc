@@ -225,8 +225,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
     std::ofstream out(filename.c_str());
     if(!out)
     {
-      std::cerr << "failed to open " << filename << std::endl;
-      return 0;
+      throw "failed to open "+filename;
     }
     smt1_convt* smt1_conv = new smt1_convt(
       ns,
@@ -293,8 +292,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
     std::ofstream out(filename.c_str());
     if(!out)
     {
-      std::cerr << "failed to open " << filename << std::endl;
-      return 0;
+      throw "failed to open "+filename;
     }
     smt2_convt* smt2_conv = new smt2_convt(
       ns,
