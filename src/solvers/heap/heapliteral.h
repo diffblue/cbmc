@@ -5,97 +5,126 @@
 **
 */
 
+#include <util/expr.h>
 #include "heaputil.h"
 
 #ifndef TRP_HEAPLIT
 #define TRP_HEAPLIT
 
-
-
-/** heap theory terms **/
-typedef enum { NO_TERM = 0,
-               NEW = 1,     // e.g. m' = new(m,x); --> m' is the memory configuration obtained from m after allocating a new memory location pointed by x
-	       STORE = 2,   // e.g. m' = st(m,x,f,y); --> m' is the memory configuration obtained from m after the field update x.f=y
-	       FREE = 3,    // e.g. m' = free(m,x); --> m' is the memory configuration obtained from m after freeing x
-	       PATH = 4,    // e.g. path(m,x,y,f); --> there is a list segment between x and y via field f
-	       EQ = 5,      // e.g. x=y; --> x and y are aliases
-	       DISJ = 6,    // e.g. disj(m,x,y,z,t,f); --> the list segment between x and y is disjoint from the list segment between z and t (both via f)
-	       MEMEQ = 7,   // e.g. m' = m; --> two memory configurations are equal
-	       DANGLING = 8,
-	       ONPATH = 9
-} heap_term_typet;
-
 // choice of abstract domain
 extern domaint mode;
 
-class heapvar {
+
+class heap_exprt : public exprt {
  public:
-  std::string name;
+   heap_exprt(const irep_idt &_id) : exprt(id) {}
+}
+
+class heap_vart : public symbol_exprt {
  
  public:
-  heapvar() {
-    name = "NULL";
-  }
-  heapvar(std::string _name) {
-    name = _name; 
-  }
-  ~heapvar() {}
+  heap_vart() : symbol_exprt(NULLPTR) {}
 
-  bool operator< (heapvar const &v) const {
-    return name.std::string::compare(v.name) < 0;
-  }
+ heap_vart(const irep_idt &identifier) : symbol_exprt(identifier) {}
 
-  bool operator== (heapvar const &v) const {
-    return name.std::string::compare(v.name) == 0;
+  /*
+  bool operator< (heap_vart const &v) const {
+    return id2string(get_identifier()).std::string::compare(id2string(v.get_identifier())) < 0;
+    }
+
+  bool operator== (heap_vart const &v) const {
+    return id2string(get_identifier()).std::string::compare(id2string(v.get_identifier())) == 0;
   }
+  */
 
   bool is_nil() const {
-    return name.std::string::compare("NULL") == 0;
+    return id2string(get_identifier()).std::string::compare(NULLPTR) == 0;
   }
 
-  void rename(std::string new_name) {
-    name = new_name;
+  const irep_idt& v() {
+    return get_identifier();
+  }
+
+  void set_x(const irep_idt &identifier) {
+    set_identifier(identifier);
+  }
+};
+
+class heap_mvart : public heap_vart {
+  heap_mvart(const irep_idt &identifier) heap_vart(identifier) {}
+}
+
+class heap_fieldt : public heap_vart {
+  heap_fieldt(const irep_idt &identifier) heap_vart(identifier) {}
+}
+
+std::ostream& operator << (std::ostream&, const heap_vart&);
+std::ostream& operator << (std::ostream&, const ssa_countst&);
+std::ostream& operator << (std::ostream&, const std::set<heap_vart>&);
+
+
+class heap_varexprt : public heap_exprt {
+ public:
+  heap_selexprt(const heap_vart _x) :
+    heap_exprt(ID_heap_var)
+  {
+    copy_to_operands(_x);
+  }
+
+  inline heap_vart& x()
+  {
+    return static_cast<heap_vart&>op0();
   }
 
 };
 
-std::ostream& operator << (std::ostream&, const heapvar&);
-std::ostream& operator << (std::ostream&, const ssa_countst&);
-std::ostream& operator << (std::ostream&, const std::set<heapvar>&);
+inline bool is_heap_varexpr(const heap_exprt &expr) 
+{
+  return expr.id()==ID_symbol;
+}
 
-class heapexpr {
+inline const heap_vart &to_heap_varexpr(const heap_exprt &expr)
+{
+  assert(expr.id()==ID_symbol && expr.operands().size()==0);
+  return static_cast<const heap_vart &>(expr);
+}
+
+class heap_selexprt : public heap_exprt {
  public:
-  typedef enum {VAR, NIL, SEL} typet;
-  typet type;  
-  heapvar v;
-  heapvar m;
-  heapvar f; 
-
- public:
- heapexpr(): type(VAR), v(heapvar()), m(heapvar()), f(heapvar()) {}
- heapexpr(heapvar _v):  type(VAR), v(_v), m(heapvar()), f(heapvar()) {}
- heapexpr(heapvar _v, heapvar _m, heapvar _f) {
-   if (_m.is_nil()) {
-     type = VAR;
-     v = _v;
-   }
-   else {
-     type = SEL;
-     v = _v;
-     m = _m;
-     f = _f; 
-   }
- }
-
- heapexpr(const heapexpr& other) {
-    type = other.type;
-    v = heapvar(other.v);
-    m = heapvar(other.m);
-    f = heapvar(other.f);
+  heap_selexprt(const heap_vart _x, const heap_mvart _m, const heap_fieldt _f) :
+    heap_exprt(ID_heap_select)
+  {
+    copy_to_operands(_x, _m, _f);
   }
- ~heapexpr() {}
 
-  std::set<heapvar> get_vars() const {
+  inline heap_vart &v()
+  {
+    return static_cast<heap_vart&>op0();
+  }
+
+  inline heap_mvart &m()
+  {
+    return static_cast<heap_mvart&>op1();
+  }
+
+  inline heap_fieldt &f()
+  {
+    return static_cast<heap_fieldt&>op2();
+  }
+
+  inline void set_x(const heap_vart _x) {
+    operands()[0] = _x;
+  }
+
+  inline void set_m(const heap_mvart _m) {
+    operands()[1] = _m;
+  }
+
+  inline void set_f(const heap_fieldt _f) {
+    operands()[2] = _f;
+  }
+
+  /*  std::set<heapvar> get_vars() const {
     std::set<heapvar> res;
 
     switch(type) {
@@ -151,7 +180,7 @@ class heapexpr {
 
   bool is_sel() const {
     return type == SEL;
-  }
+    } 
 
   void rename_vars(std::string name, std::string new_name) {
     if (v.name.std::string::compare(name) == 0)
@@ -216,165 +245,82 @@ class heapexpr {
       return true;
 
     return false;
-  }
+  }*/
 
   friend std::ostream& operator<< (std::ostream&, const heapexpr&); 
 };
 
+inline bool is_heap_selexpr(const heap_exprt &expr) 
+{
+  return expr.id()==ID_heap_select;
+}
+
+inline const heap_selexprt &to_heap_selexpr(const heap_exprt &expr)
+{
+  assert(expr.id()==ID_heap_selexpr && expr.operands().size()==3);
+  return static_cast<const heap_selexprt &>(expr);
+}
 
 // heap theory literals                                                          
-class heaplit {
+class heap_litt : public exprt {
  public:
-  uint8_t state;
-  heap_term_typet type;
-  heapvar x, y, z, t; 
-  heapvar m, mnew;
-  heapvar f;
-  heapexpr rhs;
-  // dummy eq_lit's are introduced during SSA in order to reach the same SSA-number on different branches
-  // this will disappear after CBMC integration 
-  bool dummy;
-
- public:
- heaplit(): x(heapvar()), 
-    y(heapvar()), 
-    z(heapvar()), 
-    t(heapvar()), 
-    m(heapvar()), 
-    mnew(heapvar()), 
-    f(heapvar()), 
-    rhs(heapexpr()) {
-    state = stateTop; 
-    type = NO_TERM;
-    dummy = false;
+ heap_litt(const irep_idt &_id, tlit_statet _state) : exprt(_id) {
+    set_state(_state);
   }
 
- heaplit(uint8_t _state):  x(heapvar()), 
-    y(heapvar()), 
-    z(heapvar()), 
-    t(heapvar()), 
-    m(heapvar()), 
-    mnew(heapvar()), 
-    f(heapvar()), 
-    rhs(heapexpr()) {
-    state = _state; 
-    type = NO_TERM;
-    dummy = false;
+  inline void set_state(lit_statet _state)
+  {
+    set(ID_state, _state);
   }
 
-  virtual ~heaplit() {}
-
-  virtual void set_m(const heapvar _m) {
-    if (type == EQ)
-      rhs.m = _m;
-    else
-      m = _m;
+  inline lit_statet get_state() const
+  {
+    return get(ID_state);
   }
 
-  void rename_vars(std::string name, std::string new_name) {
-    if (x.name.std::string::compare(name) == 0)
-      x.name = new_name;
-    if (y.name.std::string::compare(name) == 0)
-      y.name = new_name;
-    if (z.name.std::string::compare(name) == 0)
-      z.name = new_name;
-    if (t.name.std::string::compare(name) == 0)
-      t.name = new_name;
-    rhs.rename_vars(name, new_name);
+  // return the set of pointer vars in the literal
+  virtual std::set<heapvar> get_vars() const { 
+    std::set<heapvar> lvars = get_lhs_vars();
+    std::set<heapvar> rvars = get_rhs_vars();
+    lvars.insert(rvars.begin(),rvars.end());
+    return lvars;
   }
 
-  virtual void rename_vars_rhs(std::string name, std::string new_name) = 0;
+  virtual std::set<heapvar> get_lhs_vars() const { assert(false); }
 
-  virtual void rename_vars_lhs(std::string name, std::string new_name) = 0;
+  virtual std::set<heapvar> get_rhs_vars() const { assert(false); }
 
-  void rename_rhs_mems(std::string name, std::string new_name) {
-    if (m.name.std::string::compare(name) == 0)
-      m.name = new_name;
-
-    debugc("[rename_rhs_mems] : new_name = " << new_name, 0);
-    rhs.rename_mems(name, new_name);
+  // return the set of memory variables in the literal
+  std::set<heapvar> get_mems() const { 
+    std::set<heapvar> lmems = get_lhs_mems();
+    std::set<heapvar> rmems = get_rhs_mems();
+    lmems.insert(rmems.begin(),rmems.end());
+    return lmems;
   }
 
-  void rename_lhs_mems(std::string name, std::string new_name) {
-    if (mnew.name.std::string::compare(name) == 0)
-      mnew.name = new_name;
-  }
+  virtual std::set<heapvar> get_lhs_mems() const { assert(false); }
 
-  virtual std::set<heapvar> get_rhs_vars() const = 0;
-
-  std::set<heapvar> get_rhs_mems() const {
-    std::set<heapvar> res, tmp;
-    if(!m.is_nil())
-      res.insert(m);
-
-    tmp = rhs.get_mems();
-    res.insert(tmp.begin(), tmp.end());
-
-    return res;
-  }
-
-  std::set<heapvar> get_lhs_mems() const {
-    std::set<heapvar> res;
-    if(!mnew.is_nil())
-      res.insert(mnew);
-
-    return res;
-  }
-
-  virtual std::set<heapvar> get_lhs_vars() const = 0;
+  virtual std::set<heapvar> get_rhs_mems() const { assert(false); }
 
   virtual void complement() {
-    switch(state) {
+    switch(get_state()) {
     case stateTrue:
-      state = stateFalse;
+      set_state(stateFalse);
       break;
     case stateFalse:
-      state = stateTrue;
+      set_state(stateTrue);
       break;
     case stateTop:
-      state = stateBottom;
+      set_state(stateBottom);
       break;
     case stateBottom:
-      state = stateTop;
+      set_state(stateTop);
       break;
     }
   }
 
-  // return the set of pointer vars in the literal
-  virtual std::set<heapvar> get_vars() const = 0;
-
-  // return the set of memory variables in the literal
-  virtual std::set<heapvar> get_mems() const = 0;
-
-  bool operator== (const heaplit& other) const { 
-    return state == other.state && 
-    type == other.type && 
-    x == other.x && 
-    y == other.y && 
-    z == other.z && 
-    t == other.t && 
-    f == other.f && 
-    m == other.m && 
-    mnew == other.mnew && 
-    rhs == other.rhs;
-  }
-
-  bool operator< (const heaplit& other) const { 
-
-    bool ret = state < other.state || (state == other.state &&   
-	      (type < other.type || (type == other.type &&
-	      (x < other.x || (x == other.x &&
-	      (y < other.y || (y == other.y &&
-	      (z < other.z || (z == other.z &&
-	      (t < other.t || (t == other.t &&
-	      (f < other.f || (f == other.f &&
-	      (m < other.m || (m == other.m &&
-	      (mnew < other.mnew || (mnew == other.mnew && rhs < other.rhs))))))))))))))))); 
-
-    return ret;
-  }
-
-  virtual bool is_pure() const = 0;
+  // used for loop invariants
+  //  virtual bool is_pure() const = 0;
 
   friend std::ostream& operator<< (std::ostream& s, const heaplit& hl) {
     if (hl.state == stateFalse)
@@ -383,251 +329,37 @@ class heaplit {
     return s;
   }
 
-  friend std::ostream& operator<< (std::ostream& s, const heaplit* hl) {
-    if (hl->state == stateFalse)
-      s << "¬";
-
-    hl->print(s);
-    return s;
-  }
-
  protected:
-  virtual bool equal_to(const heaplit& other) const {
-    return state == other.state && 
-      type == other.type && 
-      x == other.x && 
-      y == other.y && 
-      z == other.z && 
-      t == other.t && 
-      f == other.f && 
-      m == other.m && 
-      mnew == other.mnew && 
-      rhs == other.rhs;
-  }
-
- protected:
-  virtual void print(std::ostream& s) const {
-    return;
-  }
-};
-
-
-// literals that mutate the heap                                                
-class heap_update_lit : public heaplit {
- public:
-  
- public:
- heap_update_lit() : heaplit() {}
-
- heap_update_lit(heapvar _mnew, heapvar _m, uint8_t _state) : heaplit(_state) {
-    m = _m; 
-    mnew = _mnew;
-  }
-
-  virtual std::set<heapvar> get_mems() const {
-    std::set<heapvar> res;
-    
-    res.insert(m);
-    res.insert(mnew);
-    return res;
-  }
-
-  virtual bool is_pure() const {
-    return false;
-  }
-
-};
-
-
-/*********************************************************************************\
- * mnew = st(m,x,f,y)                                                            *
-\*********************************************************************************/
-class store_lit : public heap_update_lit {
- public:
- store_lit(heapvar _mnew, 
-	   heapvar _m, 
-	   heapvar _x, 
-	   heapvar _f, 
-	   heapvar _y, 
-	   uint8_t _state) : heap_update_lit(_mnew, _m, _state) {
-    type = STORE; 
-    x = _x; 
-    f = _f; 
-    y = _y; 
-  }
-
-  store_lit(const heaplit& other) {
-    state = other.state;
-    type = other.type;
-    x = heapvar(other.x);
-    y = heapvar(other.y);
-    t = heapvar(other.t);
-    f = heapvar(other.f);
-    m = heapvar(other.m);
-    mnew = heapvar(other.mnew);
-    rhs = heapexpr(other.rhs);
-    dummy = other.dummy;
-  }
-
-  virtual std::set<heapvar> get_vars() const {
-    std::set<heapvar> res;
-    res.insert(x);
-    res.insert(y);
-    return res;
-  }
-
-  virtual std::set<heapvar> get_rhs_vars() const {
-    std::set<heapvar> res;
-    if(!x.is_nil())
-      res.insert(x);
-    if(!y.is_nil())
-      res.insert(y);
-
-    return res;
-  }
-
-  virtual std::set<heapvar> get_lhs_vars() const {
-    std::set<heapvar> res;
-    res.clear();
-
-    return res;
-  }
-
-  void rename_vars_rhs(std::string name, std::string new_name) {
-    if (x.name.std::string::compare(name) == 0)
-      x.name = new_name;
-    if (y.name.std::string::compare(name) == 0)
-      y.name = new_name;
-  }
-
-  void rename_vars_lhs(std::string name, std::string new_name) {}
-
- protected:
-  virtual void print(std::ostream& s) const {
-    s << this->mnew << "=" << "STORE(" << this->m << "," << this->x << "," << this->f << "," << this->y << ")";
-  }
-
+  virtual void print(std::ostream& s) const = 0;
 };
 
 /*********************************************************************************\
- * mnew = new(m,x)                                                               *
+ * x = y                                                                      *
 \*********************************************************************************/
-class new_lit : public heap_update_lit {
+class heap_eqlitt : public heap_litt {
  public:
- new_lit(heapvar _mnew, 
-	 heapvar _m, 
-	 heapvar _x, 
-	 uint8_t _state) : heap_update_lit(_mnew, _m, _state) {
-    type = NEW; 
-    x = _x; 
+  heap_eqt(const heap_vart _lhs, const heap_exprt _rhs, lit_statet _state) :
+    heap_litt(ID_heap_eq, _state)
+  {
+    copy_to_operands(_lhs, _rhs);
   }
 
-  new_lit(const heaplit& other) {
-    state = other.state;
-    type = other.type;
-    x = heapvar(other.x);
-    y = heapvar(other.y);
-    t = heapvar(other.t);
-    f = heapvar(other.f);
-    m = heapvar(other.m);
-    mnew = heapvar(other.mnew);
-    rhs = heapexpr(other.rhs);
-    dummy = other.dummy;
+  inline heap_vart &lhs()
+  {
+    return static_cast<heap_vart&>op0();
   }
 
-  virtual std::set<heapvar> get_vars() const {
-    std::set<heapvar> res;
-    res.insert(x);
-    return res;
+  inline heap_exprt &rhs()
+  {
+    return static_cast<heap_exprt&>op1();
   }
 
-  virtual std::set<heapvar> get_lhs_vars() const {
-    std::set<heapvar> res;
-    if(!x.is_nil())
-      res.insert(x);
-
-    return res;
+  inline void set_lhs(const heap_vart _lhs) {
+    operands()[0] = _lhs;
   }
 
-  virtual std::set<heapvar> get_rhs_vars() const {
-    std::set<heapvar> res;
-    res.clear();
-
-    return res;
-  }
-
-  void rename_vars_lhs(std::string name, std::string new_name) {
-    if (x.name.std::string::compare(name) == 0)
-      x.name = new_name;
-  }
-
-  void rename_vars_rhs(std::string name, std::string new_name) {}
-
- protected:
-  virtual void print(std::ostream& s) const {
-    s << this->mnew << "=" << "NEW(" << this->m << "," << this->x << ")";
-  }
-
-};
-
-/*********************************************************************************\
- * mnew = free(m,x)                                                              *
-\*********************************************************************************/
-class free_lit : public heap_update_lit {
- public:
- free_lit(heapvar _mnew, 
-	  heapvar _m, 
-	  heapvar _x, 
-	  uint8_t _state) : heap_update_lit(_mnew, _m, _state) {
-    type = FREE; 
-    x = _x; 
-  }
-
-  free_lit(const heaplit& other) {
-    state = other.state;
-    type = other.type;
-    x = heapvar(other.x);
-    y = heapvar(other.y);
-    t = heapvar(other.t);
-    f = heapvar(other.f);
-    m = heapvar(other.m);
-    mnew = heapvar(other.mnew);
-    rhs = heapexpr(other.rhs);
-    dummy = other.dummy;
-  }
-
-  virtual std::set<heapvar> get_vars() const {
-    std::set<heapvar> res;
-
-    res.insert(x);
-    return res;
-  }
-
-  virtual std::set<heapvar> get_lhs_vars() const {
-    std::set<heapvar> res;
-    if(!x.is_nil())
-      res.insert(x);
-
-    return res;
-  }
-
-  virtual std::set<heapvar> get_rhs_vars() const {
-    std::set<heapvar> res;
-    res.clear();
-
-    return res;
-  }
-
-  void rename_vars_lhs(std::string name, std::string new_name) {
-    if (x.name.std::string::compare(name) == 0)
-      x.name = new_name;
-  }
-
-  void rename_vars_rhs(std::string name, std::string new_name) {}
-
- protected:
-  virtual void print(std::ostream& s) const {
-    s << this->mnew << "=" << "FREE(" << this->m << "," << this->x << ")";
+  inline void set_rhs(const heap_exprt _rhs) {
+    operands()[1] = _rhs;
   }
 
 };
@@ -635,136 +367,290 @@ class free_lit : public heap_update_lit {
 /*********************************************************************************\
  * mnew = m                                                                      *
 \*********************************************************************************/
-class mem_eq_lit : public heap_update_lit {
+class heap_meqt : public heap_litt {
  public:
- mem_eq_lit(heapvar _mnew, 
-	    heapvar _m, 
-	    uint8_t _state) : heap_update_lit(_mnew, _m, _state) {
-    type = MEMEQ;
+  heap_meqt(const heap_mvart _lhs, const heap_mvart _rhs, lit_statet _state) : 
+      heap_litt(ID_heap_meq,_state)
+  {
+    copy_to_operands(_lhs, _rhs);
+  }
+
+  inline heap_mvart &lhs()
+  {
+    return static_cast<heap_mvart&>op0();
+  }
+
+  inline heap_mvart &rhs()
+  {
+    return static_cast<heap_mvart&>op1();
+  }
+
+  inline void set_lhs(const heap_mvart _lhs) {
+    operands()[0] = _lhs;
+  }
+
+  inline void set_rhs(const heap_mvart _rhs) {
+    operands()[1] = _rhs;
+  }
+
+  virtual std::set<heapvar> get_lhs_vars() const {
+    std::set<heapvar> res;
+    res.clear();
+    return res;
+  }
+
+  virtual std::set<heapvar> get_rhs_vars() const {
+    std::set<heapvar> res;
+    res.clear();
+    return res;
+  }
+
+protected:
+  virtual void print(std::ostream& s) const {
+    s << mnew() << "=" << m();
+  }
+
+
+};
+
+class heap_danglingt : public heap_litt {
+ public:
+  heap_danglingt(const heap_mvart _m, const heap_vart _v, lit_statet _state) : 
+    heap_litt(ID_heap_dangling, _state)
+  {
+    copy_to_operands(_m, _v);
+  }
+
+  inline heap_mvart &m()
+  {
+    return static_cast<heap_mvart&>op0();
+  }
+
+  inline heap_vart &v()
+  {
+    return static_cast<heap_vart&>op1();
+  }
+
+  inline void set_m(const heap_mvart _m) {
+    operands()[0] = _lhs;
+  }
+
+  inline void set_v(const heap_vart _v) {
+    operands()[1] = _v;
+  }
+
+};
+
+/*********************************************************************************\
+ * mnew = new(m,x)                                                               *
+\*********************************************************************************/
+class heap_newt : public heap_litt {
+ public:
+  heap_newt(const heap_mxart _mnew, const heap_mxart _m, const heap_xart _x, lit_statet _state) : heap_litt(ID_heap_new, _state)
+  {
+    copy_to_operands(_mnew, _m, _x);
+  }
+
+  inline heap_mxart &mnew()
+  {
+    return static_cast<heap_mvart&>op0();
+  }
+  inline heap_mxart &m()
+  {
+    return static_cast<heap_mvart&>op1();
+  }
+  inline heap_xart &x()
+  {
+    return static_cast<heap_vart&>op2();
+  }
+
+  inline xoid set_mnew(const heap_mxart _mnew) {
+    operands()[0] = _mnew;
+  }
+  inline xoid set_m(const heap_mxart _m) {
+    operands()[1] = _m;
+  }
+  inline xoid set_x(const heap_xart _x) {
+    operands()[2] = _x;
+  }
+
+  virtual std::set<heapvar> get_lhs_vars() const {
+    std::set<heapxar> res;
+    if(!x().is_nil())
+      res.insert(x());
+    return res;
+  }
+
+  virtual std::set<heapvar> get_rhs_vars() const {
+    std::set<heapvar> res;
+    res.clear();
+    return res;
   }
 
  protected:
   virtual void print(std::ostream& s) const {
-    s << this->mnew << "=" << this->m;
+    s << mnew() << "=" << "NEW(" << m() << "," << x() << ")";
   }
-
-
- public: 
-  virtual std::set<heapvar> get_vars() const {
-    std::set<heapvar> res;
-
-    res.insert(x);
-    return res;
-  }
-
-  virtual std::set<heapvar> get_lhs_vars() const {
-    std::set<heapvar> res;
-    res.clear();
-
-    return res;
-  }
-
-  virtual std::set<heapvar> get_rhs_vars() const {
-    std::set<heapvar> res;
-    res.clear();
-
-    return res;
-  }
-
-  void rename_vars_lhs(std::string name, std::string new_name) {}
-
-  void rename_vars_rhs(std::string name, std::string new_name) {}
-
 };
-
 
 /*********************************************************************************\
- * literals that do not mutate the heap                                          *
+ * mnew = free(m,x)                                                              *
 \*********************************************************************************/
-class heap_lookup_lit : public heaplit {
+class heap_freet : public heap_litt {
  public:
- heap_lookup_lit() : heaplit() {}
-
- heap_lookup_lit(heapvar _x, uint8_t _state) : heaplit(_state) {
-    x = _x;
+  heap_freet(const heap_mvart _mnew, const heap_mvart _m, const heap_vart _x, lit_statet _state) : heap_litt(ID_heap_free, _state)
+  {
+    copy_to_operands(_mnew, _m, _x);
   }
 
-  heap_lookup_lit(const heaplit& other) {
-    state = other.state;
-    type = other.type;
-    x = heapvar(other.x);
-    y = heapvar(other.y);
-    z = heapvar(other.z);
-    t = heapvar(other.t);
-    f = heapvar(other.f);
-    m = heapvar(other.m);
-    mnew = heapvar(other.mnew);
-    rhs = heapexpr(other.rhs);
+  inline heap_mxart &mnew()
+  {
+    return static_cast<heap_mvart&>op0();
+  }
+  inline heap_mxart &m()
+  {
+    return static_cast<heap_mvart&>op1();
+  }
+  inline heap_xart &x()
+  {
+    return static_cast<heap_vart&>op2();
   }
 
-
-  friend std::ostream& operator<< (std::ostream& s, const heap_lookup_lit& hl) {
-    if (hl.state == stateFalse)
-      s << "¬";
-    hl.print(s);
-    return s;
+  inline xoid set_mnew(const heap_mxart _mnew) {
+    operands()[0] = _mnew;
+  }
+  inline xoid set_m(const heap_mxart _m) {
+    operands()[1] = _m;
+  }
+  inline xoid set_x(const heap_xart _x) {
+    operands()[2] = _x;
   }
 
-  virtual std::set<heapvar> get_vars() const {
-    std::set<heapvar> res;
-    res.insert(x);
-    return res;
-  }
-
-  virtual std::set<heapvar> get_mems() const {
-    std::set<heapvar> res;
-
-    res.insert(m);
+  virtual std::set<heapvar> get_lhs_vars() const {
+    std::set<heapxar> res;
+    if(!x().is_nil())
+      res.insert(x());
     return res;
   }
 
   virtual std::set<heapvar> get_rhs_vars() const {
     std::set<heapvar> res;
-    if(!x.is_nil())
-      res.insert(x);
-    if(!y.is_nil())
-      res.insert(y);
-    if(!z.is_nil())
-      res.insert(z);
-    if(!t.is_nil())
-      res.insert(t);
+    res.clear();
+    return res;
+  }
 
-    std::set<heapvar> tmp = rhs.get_vars();
-    res.insert(tmp.begin(), tmp.end());
+ protected:
+  virtual void print(std::ostream& s) const {
+    s << mnew() << "=" << "NEW(" << m() << "," << x() << ")";
+  }
+};
 
+/*********************************************************************************\
+ * mnew = st(m,x,f,y)                                                            *
+\*********************************************************************************/
+class heap_storet : public heap_litt {
+ public:
+  heap_storet(const heap_mvart _mnew, const heap_mvart _m, const heap_vart _x, const heap_fieldt _f, const heap_vart _y, lit_statet _state) : heap_litt(ID_heap_store, _state)
+  {
+    copy_to_operands(_mnew, _m, _x, _f, _y);
+  }
+
+  inline heap_mvart &mnew()
+  {
+    return static_cast<heap_mvart&>op0();
+  }
+  inline heap_mvart &m()
+  {
+    return static_cast<heap_mvart&>op1();
+  }
+  inline heap_vart &x()
+  {
+    return static_cast<heap_vart&>op2();
+  }
+  inline heap_fieldt &f()
+  {
+    return static_cast<heap_fieldt&>op3();
+  }
+  inline heap_vart &y()
+  {
+    return static_cast<heap_vart&>op4();
+  }
+
+  inline void set_mnew(const heap_mvart _mnew) {
+    operands()[0] = _mnew;
+  }
+  inline void set_m(const heap_mvart _m) {
+    operands()[1] = _m;
+  }
+  inline void set_x(const heap_vart _x) {
+    operands()[2] = _x;
+  }
+  inline void set_f(const heap_fieldt _f) {
+    operands()[3] = _f;
+  }
+  inline void set_y(const heap_vart _y) {
+    operands()[4] = _y;
+  }
+
+  virtual std::set<heapvar> get_rhs_vars() const {
+    std::set<heapvar> res;
+    if(!x().is_nil())
+      res.insert(x());
+    if(!y().is_nil())
+      res.insert(y());
     return res;
   }
 
   virtual std::set<heapvar> get_lhs_vars() const {
     std::set<heapvar> res;
     res.clear();
-
     return res;
   }
 
-  void rename_vars_rhs(std::string name, std::string new_name) {
-    if (x.name.std::string::compare(name) == 0)
-      x.name = new_name;
-    if (y.name.std::string::compare(name) == 0)
-      y.name = new_name;
-    if (z.name.std::string::compare(name) == 0)
-      z.name = new_name;
-    if (t.name.std::string::compare(name) == 0)
-      t.name = new_name;
-  }
-
-  void rename_vars_lhs(std::string name, std::string new_name) {}
-
-  virtual bool is_pure() const {
-    return true;
+ protected:
+  virtual void print(std::ostream& s) const {
+    s << mnew() << "=" << "STORE(" << m() << "," << x() << "," << f() << "," << y() << ")";
   }
 
 };
+
+class heap_patht : public heap_litt {
+ public:
+  heap_patht(const heap_mvart _m, const heap_vart _x, const heap_vart _y, const heap_fieldt _f, lit_statet _state) : heap_litt(_state)
+    copy_to_operands(_m, _x, _y, _f);
+  }
+
+  inline heap_mvart &m()
+  {
+    return static_cast<heap_mvart&>op0();
+  }
+  inline heap_vart &x()
+  {
+    return static_cast<heap_vart&>op1();
+  }
+  inline heap_vart &y()
+  {
+    return static_cast<heap_vart&>op2();
+  }
+  inline heap_fieldt &f()
+  {
+    return static_cast<heap_fieldt&>op3();
+  }
+
+  inline void set_m(const heap_mvart _m) {
+    operands()01] = _m;
+  }
+  inline void set_x(const heap_vart _x) {
+    operands()[1] = _x;
+  }
+  inline void set_y(const heap_vart _y) {
+    operands()[2] = _y;
+  }
+  inline void set_f(const heap_fieldt _f) {
+    operands()[3] = _f;
+  }
+};
+
 
 /*********************************************************************************\
  * path(m,x,y,f)                                                                 *

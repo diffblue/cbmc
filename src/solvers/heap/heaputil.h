@@ -11,6 +11,9 @@
 #ifndef HEAPUTIL
 #define HEAPUTIL
 
+#define NULLPTR "NULL"
+
+
 #if 0
 
 #define debugc(s, cond) if (cond) std::cout << s << std::endl;
@@ -48,6 +51,8 @@ struct hint_comp;
 struct inferenceRecord_comp;
 class meetIrreducible;
 
+typedef uint8_t lit_statet;
+
 typedef heap_lookup_lit heapelem;
 typedef meetIrreducible* meetIrreduciblep;
 typedef std::set< meetIrreduciblep, meetIrreducible_comp> solutiont;
@@ -74,10 +79,95 @@ namespace hintPriority {
 typedef std::pair<solutiont, /*hintPriority::s*/unsigned int> hintt;
 typedef std::set< hintt, hint_comp > hintst;
 
-typedef heapelem* heapelemp;
-typedef heaplit* heaplitp;
-typedef std::vector< heaplit* > clauset;
-typedef std::vector< clauset* > formulat;
+//typedef heapelem* heapelemp;
+//typedef heaplit* heaplitp;
+
+class clauset:public exprt
+{
+public:
+  inline clauset():exprt(ID_or)
+  {
+  }
+
+  inline clauset(const exprt &op0):exprt(ID_or)
+  {
+    copy_to_operands(op0);
+  }
+
+  inline clauset(const exprt &op0, const exprt &op1):exprt(ID_or)
+  {
+    copy_to_operands(op0, op1);
+  }
+
+  inline clauset(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_or)
+  {
+    copy_to_operands(op0, op1, op2);
+  }
+
+  inline clauset(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_or)
+  {
+    exprt::operandst &op=operands();
+    op.resize(4);
+    op[0]=op0;
+    op[1]=op1;
+    op[2]=op2;
+    op[3]=op3;
+  }
+
+  inline void pop_back() {
+    operands().pop_back();
+  }
+
+  inline void push_back(const exprt &op0) {
+    operands().push_back(op0);
+  }
+
+};
+
+class formulat:public exprt
+{
+public:
+  inline formulat():exprt(ID_and)
+  {
+  }
+
+  inline formulat(const exprt &op0):exprt(ID_and)
+  {
+    copy_to_operands(op0);
+  }
+
+  inline formulat(const exprt &op0, const exprt &op1):exprt(ID_and)
+  {
+    copy_to_operands(op0, op1);
+  }
+
+  inline formulat(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_and)
+  {
+    copy_to_operands(op0, op1, op2);
+  }
+
+  inline formulat(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_and)
+  {
+    exprt::operandst &op=operands();
+    op.resize(4);
+    op[0]=op0;
+    op[1]=op1;
+    op[2]=op2;
+    op[3]=op3;
+  }
+
+  inline void pop_back() {
+    operands().pop_back();
+  }
+
+  inline void push_back(const exprt &op0) {
+    operands().push_back(op0);
+  }
+
+};
+
+//typedef std::vector< heaplit* > clauset;
+//typedef std::vector< clauset* > formulat;
 
 typedef std::pair<heapvar, int> ssa_countt;
 typedef std::vector<ssa_countt> ssa_countst;

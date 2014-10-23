@@ -36,8 +36,8 @@ void main()
 	y = malloc(sizeof(*y));
 	free(y);
 	not_null(y);	
-	//y->pData = y->data;
-	aux = y->data;
-	y->pData = aux;
+	y->pData = y->data;
+	//aux = y->data;
+	//y->pData = aux;
 	assert(res!=err);
 }
