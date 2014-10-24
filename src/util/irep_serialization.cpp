@@ -323,27 +323,22 @@ Function: irep_serializationt::read_gb_string
 irep_idt irep_serializationt::read_gb_string(std::istream &in)
 {  
   char c;
-  size_t i=0;
+  size_t length=0;
 
   while((c = in.get()) != 0)
   {
-    if(i>=read_buffer.size())
+    if(length>=read_buffer.size())
       read_buffer.resize(read_buffer.size()*2, 0);
 
     if(c=='\\') // escaped chars
-      read_buffer[i] = in.get();
+      read_buffer[length] = in.get();
     else
-      read_buffer[i] = c;
+      read_buffer[length] = c;
 
-    i++;    
+    length++;
   }
-
-  if(i>=read_buffer.size())
-    read_buffer.resize(read_buffer.size()*2, 0);
-
-  read_buffer[i] = 0;
-
-  return irep_idt(&(read_buffer[0]));
+  
+  return irep_idt(std::string(read_buffer.data(), length));
 }
 
 /*******************************************************************\
