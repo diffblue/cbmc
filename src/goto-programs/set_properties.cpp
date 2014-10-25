@@ -92,7 +92,14 @@ void label_properties(
     if(it->source_location.get_property_class()!="")
     {
       if(prefix!="") prefix+=".";
-      prefix+=id2string(it->source_location.get_property_class());
+
+      std::string class_infix=
+        id2string(it->source_location.get_property_class());
+
+      // replace the spaces by underscores        
+      std::replace(class_infix.begin(), class_infix.end(), ' ', '_');
+      
+      prefix+=class_infix;
     }
 
     if(prefix!="") prefix+=".";
