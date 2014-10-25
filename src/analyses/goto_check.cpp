@@ -43,7 +43,7 @@ public:
     enable_float_overflow_check=_options.get_bool_option("float-overflow-check");
     enable_simplify=_options.get_bool_option("simplify");
     enable_nan_check=_options.get_bool_option("nan-check");
-    generate_all_claims=_options.get_bool_option("all-claims");
+    retain_trivial=_options.get_bool_option("retain-trivial");
     enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
     enable_assertions=_options.get_bool_option("assertions");
     enable_assumptions=_options.get_bool_option("assumptions");    
@@ -111,7 +111,7 @@ protected:
   bool enable_float_overflow_check;
   bool enable_simplify;
   bool enable_nan_check;
-  bool generate_all_claims;
+  bool retain_trivial;
   bool enable_assert_to_assume;
   bool enable_assertions;
   bool enable_assumptions;
@@ -1207,7 +1207,8 @@ void goto_checkt::add_guarded_claim(
   if(enable_simplify)
     simplify(expr, ns);
 
-  if(!generate_all_claims && expr.is_true())
+  // throw away trivial properties?
+  if(!retain_trivial && expr.is_true())
     return;
 
   // add the guard
@@ -1446,7 +1447,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     // we clear all recorded assertions if
     // 1) we want to generate all assertions or
     // 2) the instruction is a branch target
-    if(generate_all_claims ||
+    if(retain_trivial ||
        i.is_target())
       assertions.clear();
     
