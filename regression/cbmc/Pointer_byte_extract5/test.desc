@@ -3,7 +3,7 @@ main.c
 --all-properties --bounds-check --32
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main\.array_bounds\.11\] array.List upper bound in .*: FAILED$
+^\[main\.array_bounds\.5\] array.List upper bound in .*: FAILED$
 ^\*\* 1 of 9 failed (2 iterations)$
 --
 ^warning: ignoring
