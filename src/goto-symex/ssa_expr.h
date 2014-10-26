@@ -46,15 +46,11 @@ public:
 
   inline const irep_idt get_l1_object_identifier() const
   {
-    object_descriptor_exprt ode;
-    ode.object()=get_original_expr();
-
-    ssa_exprt root(ode.root_object());
-    root.set(ID_L0, get(ID_L0));
-    root.set(ID_L1, get(ID_L1));
-    root.update_identifier();
-
-    return root.get_identifier();
+    return build_identifier(
+             get_original_expr(),
+             get_level_0(),
+             get_level_1(),
+             irep_idt()); // intentionally blank
   }
 
   inline const irep_idt get_original_name() const
