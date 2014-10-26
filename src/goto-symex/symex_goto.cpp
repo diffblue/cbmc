@@ -300,7 +300,7 @@ void goto_symext::phi_function(
   // go over all variables to see what changed
   std::set<irep_idt> variables;
 
-  goto_state.level2.get_variables(variables);
+  goto_state.level2_get_variables(variables);
   dest_state.level2.get_variables(variables);
   
   for(std::set<irep_idt>::const_iterator
@@ -313,7 +313,7 @@ void goto_symext::phi_function(
     if(l1_identifier==guard_identifier)
       continue; // just a guard, don't bother
       
-    if(goto_state.level2.current_count(l1_identifier)==
+    if(goto_state.level2_current_count(l1_identifier)==
        dest_state.level2.current_count(l1_identifier))
       continue; // not at all changed
 
@@ -344,7 +344,7 @@ void goto_symext::phi_function(
       if(p_it!=goto_state.propagation.values.end())
         goto_state_rhs=p_it->second;
       else
-        goto_state_rhs=symbol_exprt(goto_state.level2.current_name(l1_identifier), type);
+        goto_state_rhs=symbol_exprt(goto_state.level2_current_name(l1_identifier), type);
     }
     
     {
