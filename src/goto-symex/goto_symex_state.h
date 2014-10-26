@@ -245,7 +245,7 @@ public:
   {
   public:
     unsigned depth;
-    level2t level2;
+    level2t::current_namest level2_current_names;
     value_sett value_set;
     guardt guard;
     propagationt propagation;
@@ -253,12 +253,34 @@ public:
     
     explicit goto_statet(const goto_symex_statet &s):
       depth(s.depth),
-      level2(s.level2),
+      level2_current_names(s.level2.current_names),
       value_set(s.value_set),
       guard(s.guard),
       propagation(s.propagation),
       atomic_section_id(s.atomic_section_id)
     {
+    }
+
+    // the below replicate levelt2 member functions
+    void level2_get_variables(std::set<irep_idt> &vars) const
+    {
+      for(level2t::current_namest::const_iterator
+          it=level2_current_names.begin();
+          it!=level2_current_names.end();
+          it++)
+        vars.insert(it->first);
+    }
+
+    unsigned level2_current_count(const irep_idt &identifier) const
+    {
+      level2t::current_namest::const_iterator it=
+        level2_current_names.find(identifier);
+      return it==level2_current_names.end()?0:it->second;
+    }
+
+    irep_idt level2_current_name(const irep_idt &identifier) const
+    {
+      return id2string(identifier)+"#"+i2string(level2_current_count(identifier));
     }
   };
 
