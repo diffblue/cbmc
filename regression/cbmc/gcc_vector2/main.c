@@ -5,10 +5,14 @@
 
 #ifdef __GNUC__
 typedef int v4si __attribute__ ((vector_size (16)));
+#endif
 
 int main()
 {
-  v4si a = { 0, 1, 2, 3} , b;
+  #ifdef __GNUC__
+
+  v4si a = { 0, 1, 2, 3 }, b;
+
   b[0] = 0;
   b[1] = 1;
   b[2] = 2;
@@ -26,14 +30,8 @@ int main()
     assert(((int*) &a)[i]==((int*) &b)[i]);
     assert(((int*) &b)[i]==b[i]);
   }
+  
+  #endif
 
   return 0;
 }
-
-#else
-
-int main()
-{
-}
-
-#endif

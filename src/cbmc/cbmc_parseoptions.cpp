@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_vector.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -776,6 +777,9 @@ bool cbmc_parseoptionst::process_goto_program(
     
     // remove returns
     remove_returns(symbol_table, goto_functions);
+    
+    // remove gcc vectors
+    remove_vector(symbol_table, goto_functions);
     
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
