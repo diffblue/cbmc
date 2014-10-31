@@ -1,10 +1,13 @@
+#include <assert.h>
 #include <math.h>
 #include <float.h>
 
 int main() {
   double xxx;
 
-  #if defined(_WIN32) && !defined(__CYGWIN__)
+  // Visual Studio needs to be 2013 onwards
+  #if defined(_MSC_VER) && !defined(__CYGWIN__) && _MSC_VER < 1800
+  
   // see http://www.johndcook.com/math_h.html
 
   #else
