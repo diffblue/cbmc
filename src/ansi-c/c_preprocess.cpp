@@ -800,7 +800,7 @@ bool c_preprocess_gcc(
   {
     std::ifstream stderr_stream(stderr_file.c_str());
     char ch;
-    while((stderr_stream.read(&ch, 1))!=NULL)
+    while(stderr_stream.read(&ch, 1))
       message_stream.str << ch;
   }
 
