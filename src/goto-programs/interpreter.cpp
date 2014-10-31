@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cctype>
 #include <cstdio>
 #include <iostream>
+#include <algorithm>
 
 #include <util/std_types.h>
 #include <util/symbol_table.h>
