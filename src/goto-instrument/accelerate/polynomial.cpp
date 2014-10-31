@@ -1,4 +1,5 @@
 #include <vector>
+#include <algorithm>
 
 #include <util/std_expr.h>
 #include <util/replace_expr.h>
