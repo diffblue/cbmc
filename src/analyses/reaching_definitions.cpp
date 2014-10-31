@@ -10,6 +10,7 @@ Date: February 2013
 \*******************************************************************/
 
 #include <limits>
+#include <algorithm>
 
 #include <util/std_code.h>
 #include <util/std_expr.h>
