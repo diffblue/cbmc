@@ -138,13 +138,13 @@ inline long double __builtin_huge_vall(void) { return 1.0l/0.0l; }
 
 inline int _dsign(double d) { return __CPROVER_signd(d); }
 
-/* FUNCTION: _lsign */
+/* FUNCTION: _ldsign */
 
-inline int _lsign(long double ld) { return __CPROVER_signld(d); }
+inline int _ldsign(long double ld) { return __CPROVER_signld(d); }
 
-/* FUNCTION: _fsign */
+/* FUNCTION: _fdsign */
 
-inline int _fsign(float f) { return __CPROVER_signf(d); }
+inline int _fdsign(float f) { return __CPROVER_signf(d); }
 
 /* FUNCTION: signbit */
 
@@ -178,14 +178,14 @@ inline short _dclass(double d) {
          FP_SUBNORMAL;
 }
 
-/* FUNCTION: _lclass */
+/* FUNCTION: _ldclass */
 
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-inline short _lclass(long double ld) {
+inline short _ldclass(long double ld) {
   __CPROVER_HIDE:
   return __CPROVER_isnanld(ld)?FP_NAN:
          __CPROVER_isinfld(ld)?FP_INFINITE:
@@ -194,14 +194,14 @@ inline short _lclass(long double ld) {
          FP_SUBNORMAL;
 }
 
-/* FUNCTION: _fclass */
+/* FUNCTION: _fdclass */
 
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-inline short _fclass(float f) {
+inline short _fdclass(float f) {
   __CPROVER_HIDE:
   return __CPROVER_isnanf(f)?FP_NAN:
          __CPROVER_isinff(f)?FP_INFINITE:
