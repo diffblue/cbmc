@@ -8,8 +8,8 @@ Date:   September 2014
 
 \*******************************************************************/
 
-#ifndef CPROVER_COMPLEX_H
-#define CPROVER_COMPLEX_H
+#ifndef CPROVER_GOTO_PROGRAMS_REMOVE_VECTOR_H
+#define CPROVER_GOTO_PROGRAMS_REMOVE_VECTOR_H
 
 #include <goto-programs/goto_model.h>
 
