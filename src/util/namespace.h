@@ -19,6 +19,7 @@ class union_tag_typet;
 class union_typet;
 class struct_tag_typet;
 class struct_typet;
+class c_enum_typet;
 class c_enum_tag_typet;
 
 class namespace_baset
@@ -46,7 +47,7 @@ public:
 
   const union_typet &follow_tag(const union_tag_typet &src) const;
   const struct_typet &follow_tag(const struct_tag_typet &src) const;
-  const typet &follow_tag(const c_enum_tag_typet &src) const;
+  const c_enum_typet &follow_tag(const c_enum_tag_typet &src) const;
 
   // these do the actual lookup
   virtual unsigned get_max(const std::string &prefix) const=0;
