@@ -780,8 +780,17 @@ Function: value_set_dereferencet::memory_model
 
 \*******************************************************************/
 
-inline static unsigned bv_width(const typet &type)
+inline static unsigned bv_width(
+  const typet &type,
+  const namespacet &ns)
 {
+  if(type.id()==ID_c_enum_tag)
+  {
+    const typet &t=ns.follow_tag(to_c_enum_tag_type(type));
+    assert(t.id()==ID_c_enum);
+    return bv_width(t.subtype(), ns);
+  }
+
   return unsafe_string2unsigned(type.get_string(ID_width));
 }
 
@@ -791,7 +800,8 @@ static bool is_a_bv_type(const typet &type)
          type.id()==ID_signedbv ||
          type.id()==ID_bv ||
          type.id()==ID_fixedbv ||
-         type.id()==ID_floatbv;
+         type.id()==ID_floatbv ||
+         type.id()==ID_c_enum_tag;
 }
 
 bool value_set_dereferencet::memory_model(
@@ -810,7 +820,7 @@ bool value_set_dereferencet::memory_model(
   if(is_a_bv_type(from_type) &&
      is_a_bv_type(to_type))
   {
-    if(bv_width(from_type)==bv_width(to_type))
+    if(bv_width(from_type, ns)==bv_width(to_type, ns))
     {
       // avoid semantic conversion in case of
       // cast to float or fixed-point,
@@ -830,7 +840,7 @@ bool value_set_dereferencet::memory_model(
   if(from_type.id()==ID_pointer &&
      to_type.id()==ID_pointer)
   {
-    if(bv_width(from_type)==bv_width(to_type))
+    if(bv_width(from_type, ns)==bv_width(to_type, ns))
       return memory_model_conversion(value, to_type, guard, offset);
   }
 
