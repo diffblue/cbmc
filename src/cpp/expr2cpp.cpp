@@ -41,7 +41,7 @@ protected:
   virtual std::string convert_code_cpp_delete(const exprt &src, unsigned precedence);
   virtual std::string convert_struct(const exprt &src, unsigned &precedence);
   virtual std::string convert_code(const codet &src, unsigned indent);
-  virtual std::string convert_constant(const exprt &src, unsigned &precedence);
+  virtual std::string convert_constant(const constant_exprt &src, unsigned &precedence);
 
   virtual std::string convert_rec(
     const typet &src,
@@ -140,7 +140,7 @@ Function: expr2cppt::convert_constant
 \*******************************************************************/
 
 std::string expr2cppt::convert_constant(
-  const exprt &src,
+  const constant_exprt &src,
   unsigned &precedence)
 {
   if(src.type().id()==ID_bool)
