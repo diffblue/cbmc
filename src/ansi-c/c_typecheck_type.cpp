@@ -1225,27 +1225,17 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
     type.set(ID_width, integer2string(i));
     type.add_source_location()=source_location;
   }
-  else if(subtype.id()==ID_c_enum)
-  {
-    // These have a sub-subtype, which we need to adjust.
-    unsigned width=subtype.subtype().get_int(ID_width);
-
-    if(i>width)
-    {
-      err_location(type);
-      throw "bit field width too large";
-    }
-
-    typet tmp=subtype;
-    type.swap(tmp);
-    type.subtype().set(ID_width, integer2string(i));
-    type.add_source_location()=source_location;
-  }
   else if(subtype.id()==ID_c_enum_tag)
   {
     // These have a sub-subtype, which we need to adjust.
     const typet &c_enum_type=
       follow_tag(to_c_enum_tag_type(subtype));
+
+    if(c_enum_type.id()==ID_incomplete_c_enum)
+    {
+      err_location(type);
+      throw "bit field has incomplete enum type";
+    }
     
     unsigned width=
       c_enum_type.subtype().get_int(ID_width);
