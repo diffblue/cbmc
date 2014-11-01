@@ -157,7 +157,8 @@ std::string counterexample_value_binary(
        type.id()==ID_fixedbv ||
        type.id()==ID_floatbv ||
        type.id()==ID_pointer ||
-       type.id()==ID_c_enum)
+       type.id()==ID_c_enum ||
+       type.id()==ID_c_enum_tag)
     {
       return expr.get_string(ID_value);
     }

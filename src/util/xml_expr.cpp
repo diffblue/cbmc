@@ -90,6 +90,22 @@ xmlt xml(
       if(!to_integer(expr, i))
         result.data=integer2string(i);
     }
+    else if(type.id()==ID_c_enum)
+    {
+      result.name="integer";
+      result.set_attribute("binary", expr.get_string(ID_value));
+
+      mp_integer i;
+      if(!to_integer(expr, i))
+        result.data=integer2string(i);
+    }
+    else if(type.id()==ID_c_enum_tag)
+    {
+      constant_exprt tmp;
+      tmp.type()=ns.follow_tag(to_c_enum_tag_type(type));
+      tmp.set_value(to_constant_expr(expr).get_value());
+      return xml(tmp, ns);
+    }
     else if(type.id()==ID_bv)
     {
       result.name="bitvector";
