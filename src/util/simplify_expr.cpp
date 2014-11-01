@@ -543,25 +543,16 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       }
 
       if(expr_type_id==ID_unsignedbv ||
-         expr_type_id==ID_signedbv)
+         expr_type_id==ID_signedbv ||
+         expr_type_id==ID_c_enum)
       {
-        unsigned expr_width=to_bitvector_type(expr_type).get_width();
-        new_expr.set_value(integer2binary(int_value, expr_width));
-        expr.swap(new_expr);
+        expr=from_integer(int_value, expr_type);
         return false;
       }
 
       if(expr_type_id==ID_integer)
       {
         new_expr.set_value(value);
-        expr.swap(new_expr);
-        return false;
-      }
-      
-      if(expr_type_id==ID_c_enum ||
-         expr_type_id==ID_incomplete_c_enum)
-      {
-        new_expr.set_value(integer2string(int_value));
         expr.swap(new_expr);
         return false;
       }
