@@ -46,8 +46,9 @@ exprt gen_zero(const typet &type)
   }
   else if(type_id==ID_c_enum_tag)
   {
-    // can't do without namespace
-    return nil_exprt();
+    // Ha! We generate a typecast.
+    exprt tmp=gen_zero(unsignedbv_typet(1));
+    return typecast_exprt(tmp, type);
   }
   else if(type_id==ID_unsignedbv ||
           type_id==ID_signedbv ||
@@ -141,6 +142,12 @@ exprt gen_one(const typet &type)
     exprt tmp=gen_one(type.subtype());
     tmp.type()=type;
     return tmp;
+  }
+  else if(type_id==ID_c_enum_tag)
+  {
+    // Ha! We generate a typecast.
+    exprt tmp=gen_one(unsignedbv_typet(1));
+    return typecast_exprt(tmp, type);
   }
   else if(type_id==ID_fixedbv)
   {
