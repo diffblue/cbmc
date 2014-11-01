@@ -52,6 +52,8 @@ protected:
     system_library_mapt;
   system_library_mapt system_library_map;
 
+  hash_set_cont<irep_idt, irep_id_hash> declared_enum_constants;
+
   void init_system_library_map();
 
   std::string type_to_string(const typet &type);

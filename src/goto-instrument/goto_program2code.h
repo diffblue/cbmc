@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include <util/replace_symbol.h>
-
 #include <analyses/natural_loops.h>
 
 class goto_program2codet
@@ -82,7 +80,6 @@ protected:
   natural_loopst loops;
   loopt loop_map;
   id_sett labels_in_use;
-  replace_symbolt replace_symbols;
   dead_mapt dead_map;
   loop_last_stackt loop_last_stack;
   id_sett local_static_set;
