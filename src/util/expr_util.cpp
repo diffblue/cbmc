@@ -34,12 +34,20 @@ exprt gen_zero(const typet &type)
   if(type_id==ID_rational ||
      type_id==ID_real ||
      type_id==ID_integer ||
-     type_id==ID_natural ||
-     type_id==ID_c_enum ||
-     type_id==ID_c_enum_tag ||
-     type_id==ID_incomplete_c_enum)
+     type_id==ID_natural)
   {
     return constant_exprt(ID_0, type);
+  }
+  else if(type_id==ID_c_enum)
+  {
+    exprt tmp=gen_zero(type.subtype());
+    tmp.type()=type;
+    return tmp;
+  }
+  else if(type_id==ID_c_enum_tag)
+  {
+    // can't do without namespace
+    return nil_exprt();
   }
   else if(type_id==ID_unsignedbv ||
           type_id==ID_signedbv ||
@@ -128,11 +136,11 @@ exprt gen_one(const typet &type)
 
     return constant_exprt(value, type);
   }
-  else if(type_id==ID_c_enum ||
-          type_id==ID_c_enum_tag ||
-          type_id==ID_incomplete_c_enum)
+  else if(type_id==ID_c_enum)
   {
-    return constant_exprt(ID_1, type);
+    exprt tmp=gen_one(type.subtype());
+    tmp.type()=type;
+    return tmp;
   }
   else if(type_id==ID_fixedbv)
   {
