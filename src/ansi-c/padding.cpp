@@ -77,6 +77,10 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   {
     return alignment(type.subtype(), ns);
   }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    return alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
+  }
   else if(type.id()==ID_pointer)
   {
     unsigned width=config.ansi_c.pointer_width;

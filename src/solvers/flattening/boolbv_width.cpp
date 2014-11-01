@@ -217,12 +217,15 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     entry.total_width=integer2unsigned(address_bits(size));
     assert(entry.total_width!=0);
   }
-  else if(type_id==ID_c_enum ||
-          type_id==ID_incomplete_c_enum)
+  else if(type_id==ID_c_enum)
   {
     // these have a subtype
     entry.total_width=type.subtype().get_int(ID_width);
     assert(entry.total_width!=0);
+  }
+  else if(type_id==ID_incomplete_c_enum)
+  {
+    // no width
   }
   else if(type_id==ID_pointer ||
           type_id==ID_reference)

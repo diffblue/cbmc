@@ -4835,6 +4835,11 @@ exprt simplify_exprt::bits2expr(
     if(bits.size()==width)
       return constant_exprt(bits, type);
   }
+  else if(type.id()==ID_c_enum_tag)
+    return
+      bits2expr(
+        bits,
+        ns.follow_tag(to_c_enum_tag_type(type)));
   else if(type.id()==ID_union)
   {
     // need to find full-size member
@@ -4872,6 +4877,7 @@ std::string simplify_exprt::expr2bits(const exprt &expr)
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||
        type.id()==ID_c_enum ||
+       type.id()==ID_c_enum_tag ||
        type.id()==ID_floatbv ||
        type.id()==ID_fixedbv)
     {

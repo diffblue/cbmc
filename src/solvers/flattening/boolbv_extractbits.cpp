@@ -35,6 +35,7 @@ void boolbvt::convert_extractbits(const extractbits_exprt &expr, bvt &bv)
   if(type_id!=ID_signedbv &&
      type_id!=ID_unsignedbv &&
      type_id!=ID_c_enum &&
+     type_id!=ID_c_enum_tag &&
      type_id!=ID_bv)
     return conversion_failed(expr, bv);
 
