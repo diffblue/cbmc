@@ -569,7 +569,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv ||
          expr_type_id==ID_integer ||
          expr_type_id==ID_natural ||
-         expr_type_id==ID_rational)
+         expr_type_id==ID_rational ||
+         expr_type_id==ID_c_enum)
       {
         if(operand.is_true())
         {
@@ -581,6 +582,18 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         {
           expr=gen_zero(expr_type);
           assert(expr.is_not_nil());
+          return false;
+        }
+      }
+      else if(expr_type_id==ID_c_enum_tag)
+      {
+        const typet &c_enum_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
+        if(c_enum_type.id()==ID_c_enum) // possibly incomplete
+        {
+          unsigned int_value=operand.is_true();
+          new_expr=from_integer(int_value, c_enum_type);
+          new_expr.type()=expr_type; // we maintain the tag type
+          expr.swap(new_expr);
           return false;
         }
       }
@@ -3227,6 +3240,12 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   
   ns.follow_symbol(tmp0.type());
   ns.follow_symbol(tmp1.type());
+  
+  if(tmp0.type().id()==ID_c_enum_tag)
+    tmp0.type()=ns.follow_tag(to_c_enum_tag_type(tmp0.type()));
+
+  if(tmp1.type().id()==ID_c_enum_tag)
+    tmp1.type()=ns.follow_tag(to_c_enum_tag_type(tmp1.type()));
 
   // are _both_ constant?  
   if(op0_is_const && op1_is_const)
