@@ -996,7 +996,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     // track min and max to find a nice base type
     mp_integer min_value=0, max_value=0;
     
-    std::list<enum_constantt> enum_constants;
+    std::list<c_enum_typet::c_enum_membert> enum_members;
     
     Forall_operands(it, as_expr)
     {
@@ -1013,8 +1013,11 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
       typecheck_declaration(declaration);
       
+      irep_idt base_name=
+        declaration.declarator().get_name();
+      
       irep_idt identifier=
-        language_prefix+id2string(declaration.declarator().get_name());
+        language_prefix+id2string(base_name);
         
       // get value
       const symbolt &symbol=lookup(identifier);
@@ -1022,7 +1025,11 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       to_integer(symbol.value, value);
 
       // store      
-      enum_constants.push_back(enum_constantt(identifier, value));
+      c_enum_typet::c_enum_membert member;
+      member.set_identifier(identifier);
+      member.set_base_name(base_name);
+      member.set_value(integer2string(value));
+      enum_members.push_back(member);
       
       if(value<min_value) min_value=value;
       if(value>max_value) max_value=value;
@@ -1102,16 +1109,12 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       enum_tag_symbol.base_name=base_name;
       enum_tag_symbol.name=identifier;
       
-      // throw in the enum constants
-      for(std::list<enum_constantt>::const_iterator
-          it=enum_constants.begin();
-          it!=enum_constants.end();
+      // throw in the enum members
+      for(std::list<c_enum_typet::c_enum_membert>::const_iterator
+          it=enum_members.begin();
+          it!=enum_members.end();
           it++)
-      {
-        enum_tag_symbol.type.get_sub().push_back(irept());
-        enum_tag_symbol.type.get_sub().back().set(ID_identifier, it->identifier);
-        enum_tag_symbol.type.get_sub().back().set(ID_value, integer2string(it->value));
-      }
+        enum_tag_symbol.type.get_sub().push_back(*it);
     
       // is it in the symbol table already?
       symbol_tablet::symbolst::iterator s_it=
