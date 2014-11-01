@@ -2072,11 +2072,23 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
     if(final_type0.id()==ID_bool ||
        final_type0.get(ID_C_c_type)==ID_bool ||
        is_number(final_type0) ||
-       final_type0.id()==ID_c_enum ||
-       final_type0.id()==ID_c_enum_tag ||
-       final_type0.id()==ID_incomplete_c_enum)
+       final_type0.id()==ID_c_enum)
     {
       expr.type()=type0;
+    }
+    else if(final_type0.id()==ID_c_enum_tag)
+    {
+      if(follow_tag(to_c_enum_tag_type(final_type0)).id()==
+         ID_incomplete_c_enum)
+      {
+        err_location(expr);
+        str << "operator `" << statement
+            << "' given incomplete type `"
+            << to_string(type0) << "'";
+        throw 0;
+      }
+      else
+        expr.type()=type0;
     }
     else if(final_type0.id()==ID_pointer)
     {
