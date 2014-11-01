@@ -529,9 +529,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       static_cast<const typet &>(operand.find(ID_C_c_sizeof_type));
       
     if(op_type_id==ID_integer ||
-       op_type_id==ID_natural ||
-       op_type_id==ID_c_enum ||
-       op_type_id==ID_incomplete_c_enum)
+       op_type_id==ID_natural)
     {
       // from integer to ...
     
@@ -578,7 +576,6 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     {
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv ||
-         expr_type_id==ID_c_enum ||
          expr_type_id==ID_integer ||
          expr_type_id==ID_natural ||
          expr_type_id==ID_rational)
@@ -641,10 +638,18 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         return false;
       }
       
-      if(expr_type_id==ID_c_enum ||
-         expr_type_id==ID_incomplete_c_enum)
+      if(expr_type_id==ID_c_enum_tag)
       {
-        new_expr.set(ID_value, integer2string(int_value));
+        const c_enum_typet &c_enum_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
+        new_expr=from_integer(int_value, c_enum_type);
+        new_expr.type()=expr_type; // we maintain the tag type
+        expr.swap(new_expr);
+        return false;
+      }
+      
+      if(expr_type_id==ID_c_enum)
+      {
+        new_expr=from_integer(int_value, expr_type);
         expr.swap(new_expr);
         return false;
       }
@@ -734,6 +739,17 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
           id2string(value), false);
         new_expr.set(ID_value, integer2binary(int_value, expr_width));
         expr.swap(new_expr);
+        return false;
+      }
+    }
+    else if(op_type_id==ID_c_enum_tag) // enum to int
+    {
+      const typet &base_type=ns.follow_tag(to_c_enum_tag_type(op_type)).subtype();
+      if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
+      {
+        // enum constants use the representation of their base type
+        expr.op0().type()=base_type;
+        simplify_typecast(expr);
         return false;
       }
     }
