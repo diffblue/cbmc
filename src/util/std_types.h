@@ -546,6 +546,18 @@ extern inline union_tag_typet &to_union_tag_type(typet &type)
   return static_cast<union_tag_typet &>(type);
 }
 
+/*! \brief The type of C enums
+*/
+
+class c_enum_typet:public typet
+{
+public:
+  explicit c_enum_typet(const typet &_subtype):typet(ID_c_enum)
+  {
+    subtype()=_subtype;
+  }
+};
+
 /*! \brief An enum tag type
 */
 
