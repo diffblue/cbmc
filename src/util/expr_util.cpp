@@ -285,39 +285,6 @@ void make_next_state(exprt &expr)
 
 /*******************************************************************\
 
-Function: make_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt make_binary(const exprt &expr)
-{
-  const exprt::operandst &operands=expr.operands();
-
-  if(operands.size()<=2) return expr;
-
-  exprt previous=operands[0];
-  
-  for(unsigned i=1; i<operands.size(); i++)
-  {
-    exprt tmp=expr;
-    tmp.operands().clear();
-    tmp.operands().resize(2);
-    tmp.op0().swap(previous);
-    tmp.op1()=operands[i];
-    previous.swap(tmp);
-  }
-  
-  return previous;
-}
-
-/*******************************************************************\
-
 Function: make_with_expr
 
   Inputs:
