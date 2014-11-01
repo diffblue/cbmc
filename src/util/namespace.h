@@ -45,9 +45,11 @@ public:
   void follow_macros(exprt &expr) const;
   const typet &follow(const typet &src) const;
 
-  const union_typet &follow_tag(const union_tag_typet &src) const;
-  const struct_typet &follow_tag(const struct_tag_typet &src) const;
-  const c_enum_typet &follow_tag(const c_enum_tag_typet &src) const;
+  // These produce union_typet, struct_typet, c_enum_typet or
+  // the incomplete version.  
+  const typet &follow_tag(const union_tag_typet &src) const;
+  const typet &follow_tag(const struct_tag_typet &src) const;
+  const typet &follow_tag(const c_enum_tag_typet &src) const;
 
   // these do the actual lookup
   virtual unsigned get_max(const std::string &prefix) const=0;

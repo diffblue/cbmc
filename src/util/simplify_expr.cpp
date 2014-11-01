@@ -631,11 +631,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       
       if(expr_type_id==ID_c_enum_tag)
       {
-        const c_enum_typet &c_enum_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
-        new_expr=from_integer(int_value, c_enum_type);
-        new_expr.type()=expr_type; // we maintain the tag type
-        expr.swap(new_expr);
-        return false;
+        const typet &c_enum_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
+        if(c_enum_type.id()==ID_c_enum) // possibly incomplete
+        {
+          new_expr=from_integer(int_value, c_enum_type);
+          new_expr.type()=expr_type; // we maintain the tag type
+          expr.swap(new_expr);
+          return false;
+        }
       }
       
       if(expr_type_id==ID_c_enum)

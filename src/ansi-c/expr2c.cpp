@@ -2042,9 +2042,12 @@ std::string expr2ct::convert_constant(
   else if(type.id()==ID_c_enum ||
           type.id()==ID_c_enum_tag)
   {
-    c_enum_typet c_enum_type=
+    typet c_enum_type=
       type.id()==ID_c_enum?to_c_enum_type(type):
                            ns.follow_tag(to_c_enum_tag_type(type));
+
+    if(c_enum_type.id()!=ID_c_enum)
+      return convert_norep(src, precedence);
 
     bool is_signed=c_enum_type.subtype().id()==ID_signedbv;
 
@@ -2053,7 +2056,8 @@ std::string expr2ct::convert_constant(
     
     irep_idt int_value_string=integer2string(int_value);
 
-    const c_enum_typet::memberst &members=c_enum_type.members();
+    const c_enum_typet::memberst &members=
+      to_c_enum_type(c_enum_type).members();
     
     for(c_enum_typet::memberst::const_iterator
         it=members.begin();
@@ -2065,9 +2069,7 @@ std::string expr2ct::convert_constant(
     }
 
     // failed...
-    dest="/*enum*/"+integer2string(int_value);
-
-    return dest;
+    return "/*enum*/"+integer2string(int_value);
   }
   else if(type.id()==ID_rational)
     return convert_norep(src, precedence);
