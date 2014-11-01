@@ -123,6 +123,11 @@ void endianness_mapt::build_rec(
 
   if(src.id()==ID_symbol)
     build_rec(ns.follow(src), little_endian, bit_field_bits);
+  else if(src.id()==ID_c_enum_tag)
+    build_rec(
+      ns.follow_tag(to_c_enum_tag_type(src)),
+      little_endian,
+      bit_field_bits);
   else if(src.id()==ID_unsignedbv ||
           src.id()==ID_signedbv ||
           src.id()==ID_fixedbv ||
