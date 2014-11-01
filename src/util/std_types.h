@@ -556,6 +556,21 @@ public:
   {
     subtype()=_subtype;
   }
+  
+  class c_enum_membert:public irept
+  {
+  public:
+    inline irep_idt get_value() const { return get(ID_value); }
+    inline irep_idt get_identifier() const { return get(ID_identifier); }
+    inline irep_idt get_base_name() const { return get(ID_base_name); }    
+  };
+  
+  typedef std::vector<c_enum_membert> memberst;
+
+  inline const memberst &members() const
+  {
+    return (const memberst &)(get_sub());
+  }
 };
 
 /*! \brief Cast a generic typet to a \ref c_enum_typet
