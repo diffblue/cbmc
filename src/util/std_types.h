@@ -561,8 +561,11 @@ public:
   {
   public:
     inline irep_idt get_value() const { return get(ID_value); }
+    inline void set_value(const irep_idt &value) { set(ID_value, value); }
     inline irep_idt get_identifier() const { return get(ID_identifier); }
+    inline void set_identifier(const irep_idt &identifier) { set(ID_identifier, identifier); }
     inline irep_idt get_base_name() const { return get(ID_base_name); }    
+    inline void set_base_name(const irep_idt &base_name) { set(ID_base_name, base_name); }
   };
   
   typedef std::vector<c_enum_membert> memberst;
