@@ -140,11 +140,11 @@ inline int _dsign(double d) { return __CPROVER_signd(d); }
 
 /* FUNCTION: _ldsign */
 
-inline int _ldsign(long double ld) { return __CPROVER_signld(d); }
+inline int _ldsign(long double ld) { return __CPROVER_signld(ld); }
 
 /* FUNCTION: _fdsign */
 
-inline int _fdsign(float f) { return __CPROVER_signf(d); }
+inline int _fdsign(float f) { return __CPROVER_signf(f); }
 
 /* FUNCTION: signbit */
 
