@@ -1130,6 +1130,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
           // ok, overwrite the default subtype
           symbol.type.id(ID_c_enum);
           symbol.type.subtype()=type.subtype();
+          symbol.type.get_sub()=enum_tag_symbol.type.get_sub();
         }
         else if(symbol.type.id()==ID_c_enum)
         {
