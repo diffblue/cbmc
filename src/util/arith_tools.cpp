@@ -45,7 +45,8 @@ Function: to_integer
 bool to_integer(const constant_exprt &expr, mp_integer &int_value)
 {
   const irep_idt &value=expr.get_value();
-  const irep_idt &type_id=expr.type().id();
+  const typet &type=expr.type();
+  const irep_idt &type_id=type.id();
 
   if(type_id==ID_pointer)
   {
@@ -56,9 +57,7 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
     }
   }
   else if(type_id==ID_integer ||
-          type_id==ID_natural ||
-          type_id==ID_c_enum ||
-          type_id==ID_incomplete_c_enum)
+          type_id==ID_natural)
   {
     int_value=string2integer(id2string(value));
     return false;
@@ -72,6 +71,19 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   {
     int_value=binary2integer(id2string(value), true);
     return false;
+  }
+  else if(type_id==ID_c_enum)
+  {
+    if(type.subtype().id()==ID_signedbv)
+    {
+      int_value=binary2integer(id2string(value), true);
+      return false;
+    }
+    else if(type.subtype().id()==ID_unsignedbv)
+    {
+      int_value=binary2integer(id2string(value), false);
+      return false;
+    }
   }
 
   return true;
@@ -131,7 +143,7 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_c_enum)
   {
-    unsigned width=type.get_int(ID_width);
+    unsigned width=type.subtype().get_int(ID_width);
     constant_exprt result(type);
     result.set_value(integer2binary(int_value, width));
     return result;
