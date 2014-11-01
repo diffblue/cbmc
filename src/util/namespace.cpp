@@ -173,11 +173,12 @@ Function: namespace_baset::follow_tag
 
 \*******************************************************************/
 
-const typet &namespace_baset::follow_tag(const c_enum_tag_typet &src) const
+const c_enum_typet &namespace_baset::follow_tag(const c_enum_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   assert(symbol.is_type);
-  return symbol.type;
+  assert(symbol.type.id()==ID_c_enum);
+  return to_c_enum_type(symbol.type);
 }
 
 /*******************************************************************\
