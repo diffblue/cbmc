@@ -558,6 +558,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref c_enum_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * c_enum_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref c_enum_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const c_enum_typet &to_c_enum_type(const typet &type)
+{
+  assert(type.id()==ID_c_enum);
+  return static_cast<const c_enum_typet &>(type);
+}
+
+/*! \copydoc to_enum_tag_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline c_enum_typet &to_c_enum_type(typet &type)
+{
+  assert(type.id()==ID_c_enum);
+  return static_cast<c_enum_typet &>(type);
+}
+
 /*! \brief An enum tag type
 */
 
