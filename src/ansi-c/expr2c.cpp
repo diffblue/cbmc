@@ -2021,7 +2021,7 @@ Function: expr2ct::convert_constant
 \*******************************************************************/
 
 std::string expr2ct::convert_constant(
-  const exprt &src,
+  const constant_exprt &src,
   unsigned &precedence)
 {
   const irep_idt &cformat=src.get(ID_C_cformat);
@@ -2030,46 +2030,42 @@ std::string expr2ct::convert_constant(
     return id2string(cformat);
 
   const typet &type=ns.follow(src.type());
-  const irep_idt value=src.get(ID_value);
+  const irep_idt value=src.get_value();
   std::string dest;
 
-  if(src.id()==ID_string_constant)
-  {
-    dest='"'+MetaString(id2string(value))+'"';
-  }
-  else if(type.id()==ID_integer ||
+  if(type.id()==ID_integer ||
           type.id()==ID_natural ||
           type.id()==ID_rational)
   {
     dest=id2string(value);
   }
   else if(type.id()==ID_c_enum ||
-          type.id()==ID_incomplete_c_enum)
+          type.id()==ID_c_enum_tag)
   {
-    mp_integer int_value=string2integer(id2string(value));
+    c_enum_typet c_enum_type=
+      type.id()==ID_c_enum?to_c_enum_type(type):
+                           ns.follow_tag(to_c_enum_tag_type(type));
+
+    bool is_signed=c_enum_type.subtype().id()==ID_signedbv;
+
+    mp_integer int_value=binary2integer(id2string(value), is_signed);
     mp_integer i=0;
-    const irept &body=type.find(ID_body);
+    
+    irep_idt int_value_string=integer2string(int_value);
 
-    forall_irep(it, body.get_sub())
+    const c_enum_typet::memberst &members=c_enum_type.members();
+    
+    for(c_enum_typet::memberst::const_iterator
+        it=members.begin();
+        it!=members.end();
+        it++)
     {
-      if(i==int_value)
-      {
-        dest=it->get_string(ID_name);
-        return dest;
-      }
-
-      const exprt &v=
-        static_cast<const exprt &>(it->find(ID_value));
-        
-      if(v.is_not_nil())
-        if(to_integer(v, i))
-          break;
-
-      ++i;
+      if(it->get_value()==int_value_string)
+        return "/*enum*/"+id2string(it->get_base_name());
     }
 
     // failed...
-    dest="/*enum*/"+id2string(value);
+    dest="/*enum*/"+integer2string(int_value);
 
     return dest;
   }
@@ -4437,10 +4433,10 @@ std::string expr2ct::convert(
     return convert_code(to_code(src));
 
   else if(src.id()==ID_constant)
-    return convert_constant(src, precedence);
+    return convert_constant(to_constant_expr(src), precedence);
 
   else if(src.id()==ID_string_constant)
-    return convert_constant(src, precedence);
+    return '"'+MetaString(src.get_string(ID_value))+'"';
 
   else if(src.id()==ID_struct)
     return convert_struct(src, precedence);
