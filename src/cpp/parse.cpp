@@ -4117,7 +4117,8 @@ bool Parser::rEnumSpec(typet &spec)
     
   spec=cpp_enum_typet();
   set_location(spec, tk);
-  
+
+  // C++11 enum classes  
   if(lex.LookAhead(0)==TOK_CLASS)
   {
     lex.GetToken(tk);
@@ -4135,12 +4136,11 @@ bool Parser::rEnumSpec(typet &spec)
 
     spec.add(ID_tag).swap(name);
     
-    // enum classes have an optional underlying type
+    // C++11 enum classes have an optional underlying type
     if(lex.LookAhead(0)==':' && is_enum_class)
     {
-      lex.GetToken(tk); // read colon
-      typet underlying_type;
-      if(!rTypeName(underlying_type)) return false;
+      lex.GetToken(tk); // read the colon
+      if(!rTypeName(spec.subtype())) return false;
     }
   }
 
