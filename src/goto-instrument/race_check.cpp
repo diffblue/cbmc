@@ -363,7 +363,7 @@ void race_check(
   w_guardst w_guards(symbol_table);
 
   Forall_goto_functions(f_it, goto_functions)
-    if(f_it->first!=ID_main &&
+    if(f_it->first!=goto_functionst::entry_point() &&
        f_it->first!="c::__CPROVER_initialize")
       race_check(value_sets, symbol_table, f_it->second.body, w_guards);
 

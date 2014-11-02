@@ -1553,7 +1553,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     }
     else if(i.is_end_function())
     {
-      if(i.function==ID_main &&
+      if(i.function==goto_functionst::entry_point() &&
          enable_memory_leak_check)
       {
         const symbolt &leak=ns.lookup("c::__CPROVER_memory_leak");
@@ -1565,7 +1565,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         t->code=code_assignt(leak_expr, leak_expr);
         
         source_locationt source_location;
-        source_location.set_function(ID_main);
+        source_location.set_function(i.function);
 
         equal_exprt eq(leak_expr, gen_zero(ns.follow(leak.type)));
         add_guarded_claim(

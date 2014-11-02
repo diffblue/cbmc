@@ -34,7 +34,7 @@ void interpretert::operator()()
   build_memory_map();
   
   const goto_functionst::function_mapt::const_iterator
-    main_it=goto_functions.function_map.find(ID_main);
+    main_it=goto_functions.function_map.find(goto_functionst::entry_point());
 
   if(main_it==goto_functions.function_map.end())
     throw "main not found";

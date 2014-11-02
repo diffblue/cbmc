@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 
+#include <goto-programs/goto_functions.h>
+
 #include "entry_point.h"
 #include "zero_initializer.h"
 
@@ -201,7 +203,8 @@ bool entry_point(
   message_handlert &message_handler)
 {
   // check if main is already there
-  if(symbol_table.symbols.find(ID_main)!=symbol_table.symbols.end())
+  if(symbol_table.symbols.find(goto_functionst::entry_point())!=
+     symbol_table.symbols.end())
     return false; // silently ignore
 
   irep_idt main_symbol;
@@ -491,7 +494,7 @@ bool entry_point(
   code_typet main_type;
   main_type.return_type()=empty_typet();
   
-  new_symbol.name=ID_main;
+  new_symbol.name=goto_functionst::entry_point();
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
   

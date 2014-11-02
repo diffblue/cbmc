@@ -142,10 +142,11 @@ void weak_memory(
   // all access to shared variables is pushed into assignments
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
-      f_it->first!=ID_main)
+      f_it->first!=goto_functionst::entry_point())
       introduce_temporaries(value_sets, symbol_table, f_it->first, 
         f_it->second.body, message);
-  message.status()<<"Temp added"<<messaget::eom;
+
+  message.status() << "Temp added" << messaget::eom;
 
   unsigned max_thds = 0;
   instrumentert instrumenter(symbol_table, goto_functions, message);

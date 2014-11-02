@@ -117,13 +117,10 @@ unsigned instrumentert::goto2graph_cfg(
   if(!no_dependencies)
     message.status() << "Dependencies analysis enabled" << messaget::eom;
 
-  if(goto_functions.main_id()=="")
-    throw "Main function not found";
-
   /* builds the graph following the CFG */
   cfg_visitort visitor(ns, *this);
   visitor.visit_cfg(value_sets, model, no_dependencies, 
-    goto_functions.main_id());
+    goto_functions.entry_point());
 
   std::vector<unsigned> subgraph_index;
   num_sccs = egraph_alt.SCCs(subgraph_index);
@@ -1254,7 +1251,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
   one_interleaving.body.copy_from(interleaving);
 
   std::pair<irep_idt,goto_function_templatet<goto_programt> > p(
-    ID_main, one_interleaving);
+    goto_functionst::entry_point(), one_interleaving);
   goto_functionst::function_mapt map;
   map.insert(p);
 
