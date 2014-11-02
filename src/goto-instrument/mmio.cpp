@@ -157,7 +157,7 @@ void mmio(
 
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
-       f_it->first!=ID_main)
+       f_it->first!=goto_functionst::entry_point())
       mmio(value_sets, symbol_table, f_it->second.body);
 
   goto_functions.update();

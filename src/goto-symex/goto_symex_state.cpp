@@ -52,10 +52,10 @@ Function: goto_symex_statet::initialize
 void goto_symex_statet::initialize(const goto_functionst &goto_functions)
 {
   goto_functionst::function_mapt::const_iterator it=
-    goto_functions.function_map.find(ID_main);
+    goto_functions.function_map.find(goto_functionst::entry_point());
 
   if(it==goto_functions.function_map.end())
-    throw "main symbol not found; please set an entry point";
+    throw "program has no entry point";
 
   const goto_programt &body=it->second.body;
 

@@ -28,7 +28,7 @@ void remove_unused_functions(
 {
   std::set<irep_idt> used_functions;
   std::list<goto_functionst::function_mapt::iterator> unused_functions;
-  find_used_functions(ID_main, functions, used_functions);
+  find_used_functions(goto_functionst::entry_point(), functions, used_functions);
     
   for(goto_functionst::function_mapt::iterator it=
         functions.function_map.begin();

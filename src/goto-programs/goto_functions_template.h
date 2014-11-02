@@ -110,17 +110,10 @@ public:
     compute_location_numbers();
   }
 
-  // will go away, use below
-  inline irep_idt main_id() const
+  static inline irep_idt entry_point()
   {
-    return ID_main;
-  }
-  
-  inline irep_idt entry_point() const
-  {
-    // will change to ID__start to avoid confusion
-    // with C's main() function
-    return ID_main;
+    // do not confuse with C's "int main()"
+    return ID__start;
   }
   
   inline void swap(goto_functions_templatet &other)

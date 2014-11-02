@@ -69,10 +69,11 @@ void locst::build(const goto_functionst &goto_functions)
       function_entry.first_loc=loc_reft::nil();
   }
   
-  if(function_map.find(ID_main)==function_map.end())
+  if(function_map.find(goto_functionst::entry_point())==
+     function_map.end())
     throw "no entry point";
   
-  entry_loc=function_map[ID_main].first_loc;
+  entry_loc=function_map[goto_functionst::entry_point()].first_loc;
     
   // build branch targets
   for(unsigned l=0; l<loc_vector.size(); l++)

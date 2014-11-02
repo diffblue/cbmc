@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/config.h>
 
+#include <goto-programs/goto_functions.h>
+
 #include "java_entry_point.h"
 //#include "zero_initializer.h"
 
@@ -61,8 +63,9 @@ bool java_entry_point(
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  // check if main is already there
-  if(symbol_table.symbols.find(ID_main)!=symbol_table.symbols.end())
+  // check if the entry point is already there
+  if(symbol_table.symbols.find(goto_functionst::entry_point())!=
+     symbol_table.symbols.end())
     return false; // silently ignore
 
   // are we given anything?
@@ -161,7 +164,7 @@ bool java_entry_point(
   code_typet main_type;
   main_type.return_type()=empty_typet();
   
-  new_symbol.name=ID_main;
+  new_symbol.name=goto_functionst::entry_point();
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
   

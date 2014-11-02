@@ -613,9 +613,9 @@ void goto_inline(
 
   try
   {
-    // find main
+    // find entry point
     goto_functionst::function_mapt::iterator it=
-      goto_functions.function_map.find(ID_main);
+      goto_functions.function_map.find(goto_functionst::entry_point());
       
     if(it==goto_functions.function_map.end())
       return;
@@ -646,7 +646,7 @@ void goto_inline(
       it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       it++)
-    if(it->first!=ID_main)
+    if(it->first!=goto_functionst::entry_point())
     {
       it->second.body_available=false;
       it->second.body.clear();

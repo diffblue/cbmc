@@ -982,7 +982,7 @@ void dump_ct::convert_function_declaration(
     local_static_declst &local_static_decls)
 {
   // don't dump artificial main
-  if(skip_main && symbol.name==ID_main)
+  if(skip_main && symbol.name==goto_functionst::entry_point())
     return;
 
   // convert the goto program back to code - this might change
@@ -1024,7 +1024,7 @@ void dump_ct::convert_function_declaration(
     os_body << std::endl << std::endl;
   }
 
-  if(symbol.name!=ID_main &&
+  if(symbol.name!=goto_functionst::entry_point() &&
      symbol.name!="c::main")
   {
     os_decl << "// " << symbol.name << std::endl;
