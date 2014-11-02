@@ -29,7 +29,7 @@ Function: cpp_typecheckt::typecheck_enum_body
 
 void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
 {
-  typet &type=enum_symbol.type;
+  c_enum_typet &type=to_c_enum_type(enum_symbol.type);
   
   exprt &body=static_cast<exprt &>(type.add(ID_body));
   irept::subt &components=body.get_sub();
@@ -47,19 +47,17 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     {
       exprt &value=static_cast<exprt &>(it->add(ID_value));
       typecheck_expr(value);
-      make_constant_index(value);
+      implicit_typecast(value, type.subtype());
+      make_constant(value);
       if(to_integer(value, i))
-        throw "failed to produce integer for enum";
+        throw "failed to produce integer for enum constant";
     }
-    
-    exprt final_value(ID_constant, enum_type);
-    final_value.set(ID_value, integer2string(i));
     
     symbolt symbol;
 
     symbol.name=id2string(enum_symbol.name)+"::"+id2string(name);
     symbol.base_name=name;
-    symbol.value.swap(final_value);
+    symbol.value=from_integer(i, type);
     symbol.location=static_cast<const source_locationt &>(it->find(ID_C_source_location));
     symbol.mode=ID_cpp;
     symbol.module=module;
@@ -97,9 +95,6 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   // first save qualifiers
   c_qualifierst qualifiers;
   qualifiers.read(type);
-  
-  // These behave like special struct types.
-  // replace by type symbol
   
   cpp_enum_typet &enum_type=to_cpp_enum_type(type);
   bool anonymous=!enum_type.has_tag();
@@ -158,7 +153,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     std::string pretty_name=
       cpp_scopes.current_scope().prefix+id2string(base_name);
       
-    // these have a subtype
+    // these have a subtype, which defaults to int
     type.subtype()=int_type();
 
     symbolt symbol;

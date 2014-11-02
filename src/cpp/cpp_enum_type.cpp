@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/config.h>
+#include <ansi-c/c_types.h>
 
 #include "cpp_enum_type.h"
 
@@ -24,7 +24,6 @@ Function: cpp_enum_typet::cpp_enum_typet
 
 cpp_enum_typet::cpp_enum_typet():typet(ID_c_enum)
 {
-  set(ID_width, config.ansi_c.int_width);
 }
 
 /*******************************************************************\
