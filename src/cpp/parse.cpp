@@ -4104,16 +4104,25 @@ Function:
   enum.spec
   : ENUM Identifier
   | ENUM {Identifier} '{' {enum.body} '}'
+  | ENUM CLASS Identifier '{' {enum.body} '}'
+  | ENUM CLASS Identifier ':' Type '{' {enum.body} '}'
 */
 bool Parser::rEnumSpec(typet &spec)
 {
   Token tk;
+  bool is_enum_class=false;
 
   if(lex.GetToken(tk)!=TOK_ENUM)
     return false;
-
+    
   spec=cpp_enum_typet();
   set_location(spec, tk);
+  
+  if(lex.LookAhead(0)==TOK_CLASS)
+  {
+    lex.GetToken(tk);
+    is_enum_class=true;
+  }
 
   if(lex.LookAhead(0)!='{')
   {
@@ -4125,6 +4134,14 @@ bool Parser::rEnumSpec(typet &spec)
       return false;
 
     spec.add(ID_tag).swap(name);
+    
+    // enum classes have an optional underlying type
+    if(lex.LookAhead(0)==':' && is_enum_class)
+    {
+      lex.GetToken(tk); // read colon
+      typet underlying_type;
+      if(!rTypeName(underlying_type)) return false;
+    }
   }
 
   if(lex.LookAhead(0)!='{')
