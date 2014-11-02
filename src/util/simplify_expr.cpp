@@ -3643,13 +3643,18 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       }
       else if(expr.op0().id()==ID_typecast &&
               expr.op0().operands().size()==1 &&
-              expr.op0().type().id()==ID_pointer)
+              expr.op0().type().id()==ID_pointer &&
+              (expr.op0().op0().type().id()==ID_pointer ||
+               config.ansi_c.NULL_is_zero))
       {
         // (type)ptr == NULL -> ptr == NULL
         // note that 'ptr' may be an integer
         exprt op=expr.op0().op0();
         expr.op0().swap(op);
-        expr.op1().type()=expr.op0().type();
+        if(expr.op0().type().id()!=ID_pointer)
+          expr.op1()=gen_zero(expr.op0().type());
+        else
+          expr.op1().type()=expr.op0().type();
         simplify_inequality(expr); // do again!
         return false;
       }
