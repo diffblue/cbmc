@@ -517,11 +517,11 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
   unsigned expr_width=bv_width(expr_type);
   unsigned op_width=bv_width(operand.type());
-
+  
   if(operand.is_constant())
   {
     const irep_idt &value=to_constant_expr(operand).get_value();
-
+    
     constant_exprt new_expr(expr.type());
 
     // preserve the sizeof type annotation
@@ -752,6 +752,17 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     else if(op_type_id==ID_c_enum_tag) // enum to int
     {
       const typet &base_type=ns.follow_tag(to_c_enum_tag_type(op_type)).subtype();
+      if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
+      {
+        // enum constants use the representation of their base type
+        expr.op0().type()=base_type;
+        simplify_typecast(expr);
+        return false;
+      }
+    }
+    else if(op_type_id==ID_c_enum) // enum to int
+    {
+      const typet &base_type=to_c_enum_type(op_type).subtype();
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type
