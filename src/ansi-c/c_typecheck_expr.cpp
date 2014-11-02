@@ -3440,7 +3440,7 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
      expr.id()!=ID_infinity)
   {
     err_location(expr.find_source_location());
-    throw "conversion to integer failed";
+    throw "conversion to integer constant failed";
   }
 }
 
