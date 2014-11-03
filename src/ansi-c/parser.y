@@ -544,7 +544,8 @@ unary_expression:
           mto($$, $2);
         }
         | TOK_ANDAND identifier_or_typedef_name
-        { $$=$1;
+        { // this takes the address of a label (a gcc extension)
+          $$=$1;
           irep_idt identifier=PARSER.lookup_label(stack($2).get(ID_C_base_name));
           set($$, ID_address_of);
           stack($$).operands().resize(1);
