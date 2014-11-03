@@ -168,7 +168,24 @@ void cpp_typecheckt::typecheck_switch(code_switcht &code)
   
   if(code.value().id()==ID_code)
   {
-    typecheck_code(to_code(code.value()));
+    // we shall rewrite that into
+    // { int i=....; switch(i) .... }
+    
+    codet decl=to_code(code.value());
+    typecheck_decl(decl);
+    
+    assert(decl.get_statement()==ID_decl_block);
+    assert(decl.operands().size()==1);
+    
+    // replace declaration by its symbol    
+    assert(decl.op0().op0().id()==ID_symbol);
+    code.value()=decl.op0().op0();
+
+    c_typecheck_baset::typecheck_switch(code);
+    
+    code_blockt code_block;
+    code_block.move_to_operands(decl.op0(), code);
+    code.swap(code_block);
   }
   else
     c_typecheck_baset::typecheck_switch(code);
