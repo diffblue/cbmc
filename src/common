@@ -48,18 +48,24 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   LINKLIB = /usr/bin/libtool -static -o $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
+  ifeq ($(origin CC),default)
+    CC     = clang
+  endif
+  ifeq ($(origin CXX),default)
+    CXX    = clang++
+  endif
 else
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
-endif
-ifeq ($(origin CC),default)
-  CC     = gcc
-  #CC     = icc
-endif
-ifeq ($(origin CXX),default)
-  CXX    = g++
-  #CXX    = icpc
+  ifeq ($(origin CC),default)
+    CC     = gcc
+    #CC     = icc
+  endif
+  ifeq ($(origin CXX),default)
+    CXX    = g++
+    #CXX    = icpc
+  endif
 endif
 ifeq ($(origin YACC),default)
   YACC   = bison -y
