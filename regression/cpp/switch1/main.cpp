@@ -18,13 +18,11 @@ int main()
   int z=0;
   
   // a declaration is ok here
-  #if 0
   switch(int z=123)
   {
   case 123: assert(z==123); break;
   default: assert(0);
   }
-  #endif
   
   assert(z==0);
 }
