@@ -176,6 +176,9 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     typecheck_enum_type(type);
   }
+  else if(type.id()==ID_c_enum_tag)
+  {
+  }
   else if(type.id()==ID_c_bitfield)
   {
     typecheck_c_bit_field_type(type);
@@ -258,7 +261,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
   else
   {
     err_location(type);
-    str << "unexpected type: " << type.pretty();
+    str << "unexpected cpp type: " << type.pretty();
     throw 0;
   }
   

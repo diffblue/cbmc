@@ -34,8 +34,7 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
   exprt &body=static_cast<exprt &>(type.add(ID_body));
   irept::subt &components=body.get_sub();
   
-  typet enum_type(ID_symbol);
-  enum_type.set(ID_identifier, enum_symbol.name);
+  c_enum_tag_typet enum_tag_type(enum_symbol.name);
   
   mp_integer i=0;
   
@@ -61,7 +60,7 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     symbol.location=static_cast<const source_locationt &>(it->find(ID_C_source_location));
     symbol.mode=ID_cpp;
     symbol.module=module;
-    symbol.type=enum_type;
+    symbol.type=enum_tag_type;
     symbol.is_type=false;
     symbol.is_macro=true;
     
@@ -190,8 +189,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     throw 0;
   }
 
-  // create type symbol
-  type=typet(ID_symbol);
-  type.set(ID_identifier, symbol_name);
+  // create enum tag expression, and add the qualifiers
+  type=c_enum_tag_typet(symbol_name);
   qualifiers.write(type);
 }
