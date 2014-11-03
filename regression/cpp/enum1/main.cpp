@@ -1,4 +1,3 @@
-
 enum { E1, E2, E3 } a;
 
 class Z
@@ -21,3 +20,9 @@ int main()
   int integer;
   integer=a;
 }
+
+// They can go into namespaces
+namespace whereever { enum some_tag { something }; }
+
+enum whereever::some_tag whatnot = whereever::something;
+
