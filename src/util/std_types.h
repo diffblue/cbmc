@@ -592,7 +592,7 @@ extern inline const c_enum_typet &to_c_enum_type(const typet &type)
   return static_cast<const c_enum_typet &>(type);
 }
 
-/*! \copydoc to_enum_tag_type(const typet &)
+/*! \copydoc to_c_enum_type(const typet &)
  * \ingroup gr_std_types
 */
 extern inline c_enum_typet &to_c_enum_type(typet &type)
