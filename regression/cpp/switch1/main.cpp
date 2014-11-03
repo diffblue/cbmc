@@ -23,6 +23,7 @@ int main()
   case 123: assert(z==123); break;
   default: assert(0);
   }
-  
+
+  // and there is scope!  
   assert(z==0);
 }
