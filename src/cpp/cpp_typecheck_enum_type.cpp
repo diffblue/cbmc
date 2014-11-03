@@ -29,9 +29,9 @@ Function: cpp_typecheckt::typecheck_enum_body
 
 void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
 {
-  c_enum_typet &type=to_c_enum_type(enum_symbol.type);
+  c_enum_typet &c_enum_type=to_c_enum_type(enum_symbol.type);
   
-  exprt &body=static_cast<exprt &>(type.add(ID_body));
+  exprt &body=static_cast<exprt &>(c_enum_type.add(ID_body));
   irept::subt &components=body.get_sub();
   
   c_enum_tag_typet enum_tag_type(enum_symbol.name);
@@ -46,17 +46,20 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     {
       exprt &value=static_cast<exprt &>(it->add(ID_value));
       typecheck_expr(value);
-      implicit_typecast(value, type.subtype());
+      implicit_typecast(value, c_enum_type.subtype());
       make_constant(value);
       if(to_integer(value, i))
         throw "failed to produce integer for enum constant";
     }
     
+    exprt value_expr=from_integer(i, c_enum_type.subtype());
+    value_expr.type()=enum_tag_type; // override type
+    
     symbolt symbol;
 
     symbol.name=id2string(enum_symbol.name)+"::"+id2string(name);
     symbol.base_name=name;
-    symbol.value=from_integer(i, type);
+    symbol.value=value_expr;
     symbol.location=static_cast<const source_locationt &>(it->find(ID_C_source_location));
     symbol.mode=ID_cpp;
     symbol.module=module;
