@@ -419,6 +419,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref binary_relation_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * binary_relation_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref binary_relation_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const binary_relation_exprt &to_binary_relation_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<const binary_relation_exprt &>(expr);
+}
+
+/*! \copydoc to_binary_relation_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<binary_relation_exprt &>(expr);
+}
+
 /*! \brief A generic base class for binary expressions
 */
 class binary_exprt:public exprt
