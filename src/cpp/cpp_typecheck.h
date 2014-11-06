@@ -469,8 +469,8 @@ protected:
   void typecheck_side_effect_assignment(exprt &expr);
   void typecheck_side_effect_inc_dec(side_effect_exprt &expr);
   void typecheck_expr_typecast(exprt &expr);
-  void typecheck_expr_index(exprt& expr);
-  void typecheck_expr_rel(exprt& expr);
+  void typecheck_expr_index(exprt &expr);
+  void typecheck_expr_rel(binary_relation_exprt &expr);
   void typecheck_expr_comma(exprt &expr);
 
   void typecheck_function_call_arguments(

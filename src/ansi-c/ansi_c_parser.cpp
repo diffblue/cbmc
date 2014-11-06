@@ -64,6 +64,33 @@ ansi_c_id_classt ansi_c_parsert::lookup(
 
 /*******************************************************************\
 
+Function: ansi_c_parsert::add_tag_with_body
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ansi_c_parsert::add_tag_with_body(irept &tag)
+{
+  const std::string scope_name=
+    "tag-"+tag.get_string(ID_C_base_name);
+
+  irep_idt identifier=current_scope().prefix+scope_name;
+  
+  if(identifier!=tag.get(ID_identifier))
+  {
+    // re-defined in a deeper scope
+    current_scope().name_map[scope_name].id_class=ANSI_C_TAG;
+    tag.set(ID_identifier, identifier);
+  }
+}
+
+/*******************************************************************\
+
 Function: yyansi_cerror
 
   Inputs:

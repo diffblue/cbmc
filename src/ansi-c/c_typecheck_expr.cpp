@@ -197,7 +197,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
           expr.id()==ID_le ||
           expr.id()==ID_gt  ||
           expr.id()==ID_ge)
-    typecheck_expr_rel(expr);
+    typecheck_expr_rel(to_binary_relation_expr(expr));
   else if(expr.id()==ID_index)
     typecheck_expr_index(expr);
   else if(expr.id()==ID_typecast)
@@ -1434,16 +1434,9 @@ Function: c_typecheck_baset::typecheck_expr_rel
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
+void c_typecheck_baset::typecheck_expr_rel(
+  binary_relation_exprt &expr)
 {
-  if(expr.operands().size()!=2)
-  {
-    err_location(expr);
-    str << "operator `" << expr.id()
-        << "' expects two operands";
-    throw 0;
-  }
-
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
 
@@ -1559,10 +1552,9 @@ Function: c_typecheck_baset::typecheck_expr_rel_vector
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_expr_rel_vector(exprt &expr)
+void c_typecheck_baset::typecheck_expr_rel_vector(
+  binary_relation_exprt &expr)
 {
-  assert(expr.operands().size()==2);
-
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
 
@@ -1581,6 +1573,8 @@ void c_typecheck_baset::typecheck_expr_rel_vector(exprt &expr)
     throw 0;
   }
 
+  // Comparisons between vectors produce a vector
+  // of integers with the same dimension.
   expr.type()=vector_typet(int_type(), to_vector_type(o_type0).size());
 }
 
@@ -2896,6 +2890,39 @@ void c_typecheck_baset::typecheck_expr_unary_boolean(exprt &expr)
 
 /*******************************************************************\
 
+Function: c_typecheck_baset::gcc_vector_types_compatible
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool c_typecheck_baset::gcc_vector_types_compatible(
+  const vector_typet &type0,
+  const vector_typet &type1)
+{
+  // This is relatively restrictive!
+
+  // compare dimension
+  mp_integer s0, s1;
+  if(to_integer(type0.size(), s0)) return false;
+  if(to_integer(type1.size(), s1)) return false;
+  if(s0!=s1) return false;
+  
+  // comparse subtype
+  if((type0.subtype().id()==ID_signedbv || type0.subtype().id()==ID_unsignedbv) &&
+     (type1.subtype().id()==ID_signedbv || type1.subtype().id()==ID_unsignedbv) &&
+     to_bitvector_type(type0.subtype()).get_width()==to_bitvector_type(type1.subtype()).get_width())
+    return true;
+  
+  return type0.subtype()==type1.subtype();
+}
+
+/*******************************************************************\
+
 Function: c_typecheck_baset::typecheck_expr_binary_arithmetic
 
   Inputs:
@@ -2925,11 +2952,11 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
   if(o_type0.id()==ID_vector &&
      o_type1.id()==ID_vector)
   {
-    if(follow(o_type0.subtype())==follow(o_type1.subtype()) &&
+    if(gcc_vector_types_compatible(to_vector_type(o_type0), to_vector_type(o_type1)) &&
        is_number(follow(o_type0.subtype())))
     {
-      // Vector arithmetic
-      // Fairly strict typing rules, no promotion
+      // Vector arithmetic has fairly strict typing rules, no promotion
+      if(o_type0!=o_type1) op1.make_typecast(op0.type());
       expr.type()=op0.type();
       return;
     }
@@ -3278,7 +3305,9 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
   const typet o_type1=op1.type();
 
   const typet &type0=op0.type();
+  const typet &type1=op1.type();
   const typet &final_type0=follow(type0);
+  const typet &final_type1=follow(type1);
 
   expr.type()=type0;
   
@@ -3324,7 +3353,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
   {
     implicit_typecast_arithmetic(op1);
 
-    if(is_number(op1.type()))
+    if(is_number(type1))
     {
       expr.type()=type0;
 
@@ -3366,13 +3395,20 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
       // promote
       implicit_typecast_arithmetic(op1);
 
-      if(is_number(op1.type()))
+      if(is_number(type1))
         return;
     }
     else if(final_type0.id()==ID_vector &&
-            final_type0==follow(op1.type()))
+            final_type1.id()==ID_vector)
     {
-      return;
+      // We are willing to do a modest amount of conversion
+      if(gcc_vector_types_compatible(
+           to_vector_type(final_type0), to_vector_type(final_type1)))
+      {
+        if(final_type0!=final_type1)
+          op1.make_typecast(final_type0);
+        return;
+      }
     }
     else
     {

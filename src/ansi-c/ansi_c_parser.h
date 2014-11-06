@@ -110,6 +110,9 @@ public:
   // convert a declarator and then add it to existing an declaration
   void add_declarator(exprt &declaration, irept &declarator);
 
+  // adds a tag to the current scope
+  void add_tag_with_body(irept &tag);
+
   void copy_item(const ansi_c_declarationt &declaration)
   {
     assert(declaration.id()==ID_declaration);
@@ -129,13 +132,6 @@ public:
     bool label);
 
   static ansi_c_id_classt get_class(const typet &type);
-  
-  std::string get_anon_name()
-  {
-    std::string n="#anon";
-    n+=i2string(current_scope().anon_counter++);
-    return n;
-  }
   
   irep_idt lookup_label(const irep_idt id)
   {
