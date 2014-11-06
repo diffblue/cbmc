@@ -139,6 +139,8 @@ protected:
   void increment_designator(designatort &designator);
 
   // typecasts
+  
+  bool gcc_vector_types_compatible(const vector_typet &, const vector_typet &);
 
   virtual void implicit_typecast(exprt &expr, const typet &type);
   virtual void implicit_typecast_arithmetic(exprt &expr);
@@ -204,8 +206,8 @@ protected:
   virtual void typecheck_expr_dereference(exprt &expr);
   virtual void typecheck_expr_member(exprt &expr);
   virtual void typecheck_expr_ptrmember(exprt &expr);
-  virtual void typecheck_expr_rel(exprt &expr);
-  virtual void typecheck_expr_rel_vector(exprt &expr);
+  virtual void typecheck_expr_rel(binary_relation_exprt &expr);
+  virtual void typecheck_expr_rel_vector(binary_relation_exprt &expr);
   virtual void adjust_float_rel(exprt &expr);
   virtual void typecheck_expr_index(exprt &expr);
   virtual void typecheck_expr_typecast(exprt &expr);
@@ -225,7 +227,7 @@ protected:
   virtual void make_constant_index(exprt &expr);
   virtual void make_constant_rec(exprt &expr);
   
-  virtual bool gcc_types_compatible_p(const typet &type1, const typet &type2);
+  virtual bool gcc_types_compatible_p(const typet &, const typet &);
   
   // types
   virtual void typecheck_type(typet &type);

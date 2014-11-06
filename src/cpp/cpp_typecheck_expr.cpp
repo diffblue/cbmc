@@ -2824,16 +2824,8 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_expr_rel(exprt &expr)
+void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 {
-  if(expr.operands().size() != 2)
-  {
-    err_location(expr);
-    str << "operator `" << expr.id()
-        << "' expects two operands";
-    throw 0;
-  }
-
   c_typecheck_baset::typecheck_expr_rel(expr);
 }
 

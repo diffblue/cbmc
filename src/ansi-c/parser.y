@@ -1325,7 +1325,7 @@ aggregate_name:
           gcc_type_attribute_opt
           msc_declspec_opt
           {
-            // an anon struct/union
+            // an anon struct/union with body
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
@@ -1343,7 +1343,8 @@ aggregate_name:
           msc_declspec_opt
           identifier_or_typedef_name
           {
-            // a struct/union with tag
+            // A struct/union with tag and body.
+            PARSER.add_tag_with_body(stack($4));
             stack($1).set(ID_tag, stack($4));
           }
           '{' member_declaration_list_opt '}'
@@ -1361,12 +1362,15 @@ aggregate_name:
           gcc_type_attribute_opt
           msc_declspec_opt
           identifier_or_typedef_name
+          {
+            // a struct/union with tag but without body
+            stack($1).set(ID_tag, stack($4));
+          }
           gcc_type_attribute_opt
         {
-          stack($1).set(ID_tag, stack($4));
           stack($1).set(ID_components, ID_nil);
           // type attributes
-          $$=merge($1, merge($2, $5));
+          $$=merge($1, merge($2, $6));
         }
         ;
 
