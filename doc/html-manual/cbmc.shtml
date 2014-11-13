@@ -293,14 +293,16 @@ some significant program before attempting to verify it.
 <h4>Windows</h4>
 
 <p class="justified">
-On Microsoft Windows, CBMC is pre-configured to use the compiler
-shipped with Microsoft's Visual Studio. Visual Studio Express is sufficient,
-and is available for download for free from the Microsoft webpage.
-Visual Studio installs the usual set of header files together with the
-compiler. However, Visual Studio requires a large set of environment
-variables for the compiler to function correctly. It is therefore
-required to run CBMC from the <i>Visual Studio Command Prompt</i>,
-which can be found in the menu <i>Visual Studio Tools</i>.
+On Microsoft Windows, CBMC is pre-configured to use the compiler that is
+part of Microsoft's Visual Studio.  Microsoft's <a
+href="http://www.visualstudio.com/en-us/products/visual-studio-community-vs">
+Visual Studio Community</a> is fully featured and available for download for
+free from the Microsoft webpage.  Visual Studio installs the usual set of
+header files together with the compiler.  However, the Visual Studio
+compiler requires a large set of environment variables to function
+correctly.  It is therefore required to run CBMC from the <i>Visual Studio
+Command Prompt</i>, which can be found in the menu <i>Visual Studio
+Tools</i>.
 </p>
 
 <p class="justified">
