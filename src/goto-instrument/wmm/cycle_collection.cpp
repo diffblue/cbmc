@@ -386,9 +386,7 @@ bool event_grapht::graph_explorert::backtrack(
         w_it!=egraph.po_out(vertex).end(); w_it++)
       {
         const unsigned w = w_it->first;
-        if(w < source)
-          egraph.remove_po_edge(vertex,w);
-        else if(w == source && point_stack.size()>=4
+        if(w == source && point_stack.size()>=4
           && (unsafe_met_updated
             || this_vertex.unsafe_pair(egraph[source],model)) )
         {
@@ -403,8 +401,8 @@ bool event_grapht::graph_explorert::backtrack(
           }
           if((!egraph.filter_uniproc || new_cycle.is_not_uniproc(model)) && not_thin_air 
             && new_cycle.is_cycle() &&
-            new_cycle.is_unsafe(model) &&
-            new_cycle.is_unsafe_asm(model))
+            new_cycle.is_unsafe(model) /*&&
+            new_cycle.is_unsafe_asm(model)*/)
           {
             egraph.message.debug() << new_cycle.print_name(model,false) 
               << messaget::eom;
