@@ -2709,6 +2709,7 @@ bool simplify_exprt::simplify_if(exprt &expr)
       tmp.swap(cond.op0());
       cond.swap(tmp);
       truevalue.swap(falsevalue);
+      result=false;
     }
 
     #if 0
