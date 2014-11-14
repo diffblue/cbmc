@@ -1161,9 +1161,18 @@ void shared_bufferst::affected_by_delay(
   namespacet ns(symbol_table);
 
   Forall_goto_functions(f_it, goto_functions)
+  {
+#ifdef LOCAL_MAY
+    local_may_aliast local_may(f_it->second);
+#endif
+
     Forall_goto_program_instructions(i_it, f_it->second.body)
     {
-        rw_set_loct rw_set(ns, value_sets, i_it);
+        rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+        , local_may
+#endif
+        );
         forall_rw_set_w_entries(w_it, rw_set)
           forall_rw_set_r_entries(r_it, rw_set)
           {
@@ -1175,6 +1184,7 @@ void shared_bufferst::affected_by_delay(
               affected_by_delay_set.insert(w_it->second.object);
           }
     }
+  }
 }
 
 /*******************************************************************\
@@ -1203,6 +1213,10 @@ void shared_bufferst::cfg_visitort::weak_memory(
   namespacet ns(symbol_table);
   goto_programt& goto_program = goto_functions.function_map[function].body;
 
+#ifdef LOCAL_MAY
+  local_may_aliast local_may(goto_functions.function_map[function]);
+#endif
+
   Forall_goto_program_instructions(i_it, goto_program)
   {
     goto_programt::instructiont &instruction=*i_it;
@@ -1223,7 +1237,11 @@ void shared_bufferst::cfg_visitort::weak_memory(
     {
         try
         {
-          rw_set_loct rw_set(ns, value_sets, i_it);
+          rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+          , local_may
+#endif
+          );
 
           if(rw_set.empty()) continue;
   

@@ -14,11 +14,18 @@ Date: February 2006
 #include <util/symbol_table.h>
 #include <util/prefix.h>
 
+#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_functions.h>
+
 #include <pointer-analysis/value_sets.h>
 #include <goto-programs/remove_skip.h>
 
 #include "race_check.h"
 #include "rw_set.h"
+
+#ifdef LOCAL_MAY
+#include <analyses/local_may_alias.h>
+#endif
 
 class w_guardst
 {
@@ -225,10 +232,17 @@ Function: race_check
 void race_check(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
+#ifdef LOCAL_MAY
+  const goto_functionst::goto_functiont& goto_function,
+#endif
   goto_programt &goto_program,
   w_guardst &w_guards)
 {
   namespacet ns(symbol_table);
+
+#ifdef LOCAL_MAY
+  local_may_aliast local_may(goto_function);
+#endif
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
@@ -236,7 +250,11 @@ void race_check(
     
     if(instruction.is_assign())
     {
-      rw_set_loct rw_set(ns, value_sets, i_it);
+      rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+      , local_may
+#endif
+      );
       
       if(!has_shared_entries(ns, rw_set))
         continue;
@@ -333,11 +351,18 @@ Function: race_check
 void race_check(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
+#ifdef LOCAL_MAY
+  const goto_functionst::goto_functiont& goto_function,
+#endif
   goto_programt &goto_program)
 {
   w_guardst w_guards(symbol_table);
 
-  race_check(value_sets, symbol_table, goto_program, w_guards);
+  race_check(value_sets, symbol_table, 
+#ifdef LOCAL_MAY
+    goto_function, 
+#endif
+    goto_program, w_guards);
 
   w_guards.add_initialization(goto_program);
   goto_program.update();
@@ -365,7 +390,11 @@ void race_check(
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=goto_functionst::entry_point() &&
        f_it->first!="c::__CPROVER_initialize")
-      race_check(value_sets, symbol_table, f_it->second.body, w_guards);
+      race_check(value_sets, symbol_table, 
+#ifdef LOCAL_MAY
+        f_it->second, 
+#endif
+        f_it->second.body, w_guards);
 
   // get "main"
   goto_functionst::function_mapt::iterator

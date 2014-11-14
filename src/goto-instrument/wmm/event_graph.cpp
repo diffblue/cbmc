@@ -1421,8 +1421,8 @@ std::string event_grapht::critical_cyclet::print_name(
             + cur.get_operation();
         }
       }
-      
-      else
+     
+      else if(cur.variable!=ID_unknown && prev.variable!=ID_unknown)
         assert(false);
     }
 
@@ -1523,16 +1523,18 @@ std::string event_grapht::critical_cyclet::print_name(
     }
   }
 
-  else
-        assert(false);
+  else if(last.variable!=ID_unknown && first.variable!=ID_unknown)
+    assert(false);
 
   critical_cyclet::size_type n_events=extra_fence_count;
+#if 0
   for(std::string::const_iterator it=name.begin();
       it!=name.end();
       ++it)
     if(*it==' ')
       ++n_events;
   assert(n_events==reduced.size());
+#endif
 
   return name;
 }

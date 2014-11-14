@@ -192,6 +192,11 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     return;
   }
 
+#ifdef LOCAL_MAY
+  local_may_aliast local_may(
+    instrumenter.goto_functions.function_map[function]);
+#endif
+
   /* goes through the function */
   Forall_goto_program_instructions(i_it, 
     instrumenter.goto_functions.function_map[function].body)
@@ -235,6 +240,9 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     else if(instruction.is_assign())
     {
       visit_cfg_assign(value_sets, ns, i_it, no_dependencies
+#ifdef LOCAL_MAY
+        , local_may
+#endif
       );
     }
 
@@ -269,16 +277,19 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     else if(instruction.is_goto())
     {
       visit_cfg_goto(i_it, value_sets
+#ifdef LOCAL_MAY
+        , local_may
+#endif
       );
     }
 
-    #ifdef CONTEXT_INSENSITIVE
+#ifdef CONTEXT_INSENSITIVE
     else if(instruction.is_return())
     {
       visit_cfg_propagate(i_it);
       add_all_pos(it, out_nodes[function], in_pos[i_it]); 
     }
-    #endif
+#endif
 
     else
     {
@@ -472,6 +483,9 @@ unsigned alt_copy_segment(graph<abstract_eventt>& alt_egraph, unsigned begin, un
 void inline instrumentert::cfg_visitort::visit_cfg_body(
   goto_programt::instructionst::iterator i_it, 
   value_setst& value_sets
+#ifdef LOCAL_MAY
+  , local_may_aliast& local_may
+#endif
 ) 
 {
   const goto_programt::instructiont& instruction=*i_it;
@@ -505,6 +519,9 @@ Function: instrumentert::visit_cfg_goto
 void instrumentert::cfg_visitort::visit_cfg_goto(
   goto_programt::instructionst::iterator i_it,
   value_setst& value_sets
+#ifdef LOCAL_MAY
+  , local_may_aliast& local_may
+#endif
 )
 {
   const goto_programt::instructiont& instruction=*i_it;
@@ -520,6 +537,9 @@ void instrumentert::cfg_visitort::visit_cfg_goto(
   {
     instrumenter.message.debug() << "backward goto" << messaget::eom;          
     visit_cfg_body(i_it, value_sets
+#ifdef LOCAL_MAY
+    , local_may
+#endif
     );
   }
 }
@@ -708,12 +728,18 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
   namespacet& ns,
   goto_programt::instructionst::iterator& i_it,
   bool no_dependencies
+#ifdef LOCAL_MAY
+  , local_may_aliast &local_may
+#endif
   )
 {
   goto_programt::instructiont& instruction=*i_it;
 
   /* Read (Rb) */
   rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+    , local_may
+#endif
   );
 
   unsigned previous=(unsigned)-1;
@@ -735,34 +761,10 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
        new_read_event is the corresponding abstract event;
        new_read_node is the node in the graph */
     const irep_idt& read=r_it->second.object;
-#if 0
-    const symbol_exprt* read_expr=NULL;
-    unsigned stars=0;
-#endif
 
     /* skip local variables */
     if(local(read))
       continue;
-
-#if 0
-    /* gets the original pointer rather than the var pointed */
-    std::map<const rw_set_baset::entryt*, const rw_set_baset::entryt*>&
-      ref=rw_set.dereferenced_from;
-    if(ref.find(&r_it->second)!=ref.end())
-    {
-      const rw_set_baset::entryt& entry=*ref[&r_it->second];
-      instrumenter.message.debug() << "sh: (through "
-        <<id2string(r_it->second.object)<<") "<<entry.object
-        << messaget::eom;
-      read_expr=&entry.symbol_expr;
-      stars=entry.stars;
-    }
-    else {
-      instrumenter.message.debug() << "sh: "<<id2string(r_it->second.object)
-        << " -> " <<&r_it->second.object << messaget::eom;
-      read_expr=&r_it->second.symbol_expr;
-    }
-#endif
 
     read_counter++;
 #if 0
@@ -772,15 +774,16 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     const abstract_eventt new_read_event(abstract_eventt::Read,
       thread, id2string(read), instrumenter.unique_id++,
       instruction.source_location, local(read));
-#if 0
-      instruction.source_location, local(read), *read_expr, stars);
-#endif
+
     const unsigned new_read_node=egraph.add_node();
     egraph[new_read_node]=new_read_event;
     instrumenter.message.debug() << "new Read"<<read<<" @thread"
       <<(thread)<<"("<<instruction.source_location<<","
       <<(local(read)?"local":"shared")<<") #"<<new_read_node
       << messaget::eom;
+
+    if(read==ID_unknown)
+      unknown_read_nodes.insert(new_read_node);
 
     const unsigned new_read_gnode=egraph_alt.add_node();
     egraph_alt[new_read_gnode]=new_read_event;
@@ -826,6 +829,25 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
         egraph_alt.add_edge(entry->second,new_read_gnode);
         ++fr_rf_counter;
       }
+
+    /* for unknown writes */
+    for(std::set<unsigned>::const_iterator id_it=
+      unknown_write_nodes.begin();
+      id_it!=unknown_write_nodes.end(); 
+      ++id_it)
+      if(egraph[*id_it].thread != new_read_event.thread)
+      {
+        instrumenter.message.debug() << *id_it<<"<-com->"
+          <<new_read_node << messaget::eom;
+        std::map<unsigned,unsigned>::const_iterator entry=
+          instrumenter.map_vertex_gnode.find(*id_it);
+        assert(entry!=instrumenter.map_vertex_gnode.end());
+        egraph.add_com_edge(new_read_node,*id_it);
+        egraph_alt.add_edge(new_read_gnode,entry->second);
+        egraph.add_com_edge(*id_it,new_read_node);
+        egraph_alt.add_edge(entry->second,new_read_gnode);
+        ++fr_rf_counter;
+      }
   }
 
   /* Write (Wa) */
@@ -836,34 +858,12 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
        new_write_event is the corresponding abstract event;
        new_write_node is the node in the graph */
     const irep_idt& write = w_it->second.object;
-#if 0
-    const symbol_exprt* write_expr;
-    unsigned stars=0;
-#endif
+
+    instrumenter.message.debug() << "WRITE: " << write << messaget::eom;
 
     /* skip local variables */
     if(local(write))
       continue;
-
-#if 0
-    /* gets the original pointer rather than the var pointed */
-    std::map<const rw_set_baset::entryt*, const rw_set_baset::entryt*>&
-      ref=rw_set.dereferenced_from;
-    if(ref.find(&w_it->second)!=ref.end())
-    {
-      const rw_set_baset::entryt& entry=*ref[&w_it->second];
-      instrumenter.message.debug() << "sh: (through "
-        <<id2string(w_it->second.object)<<") "<<entry.object
-        << messaget::eom;
-      write_expr=&entry.symbol_expr;
-      stars=entry.stars;
-    }
-    else {
-      instrumenter.message.debug() << "sh: "<<id2string(w_it->second.object)
-        << " -> " <<&w_it->second.object) << messaget::eom;
-      write_expr=&w_it->second.symbol_expr;
-    }
-#endif
 
     ++write_counter;
     //assert(write_expr);
@@ -872,15 +872,16 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     const abstract_eventt new_write_event(abstract_eventt::Write,
       thread, id2string(write), instrumenter.unique_id++,
       instruction.source_location, local(write));
-#if 0
-      instruction.source_location, local(write), *write_expr, stars);
-#endif
+
     const unsigned new_write_node=egraph.add_node();
     egraph[new_write_node](new_write_event);
     instrumenter.message.debug() << "new Write "<<write<<" @thread"<<(thread)
       <<"("<<instruction.source_location<<","
       << (local(write)?"local":"shared")<<") #"<<new_write_node
       << messaget::eom;
+
+    if(write==ID_unknown)
+      unknown_read_nodes.insert(new_write_node);
 
     const unsigned new_write_gnode=egraph_alt.add_node();
     egraph_alt[new_write_gnode]=new_write_event;
@@ -949,6 +950,45 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
         egraph_alt.add_edge(entry->second,new_write_gnode);
         ++ws_counter;
       }
+
+    /* for unknown writes */
+    for(std::set<unsigned>::const_iterator id_it=
+      unknown_write_nodes.begin();
+      id_it!=unknown_write_nodes.end();
+      ++id_it)
+      if(egraph[*id_it].thread != new_write_event.thread)
+      {
+        instrumenter.message.debug() << *id_it<<"<-com->"
+          <<new_write_node << messaget::eom;
+        std::map<unsigned,unsigned>::const_iterator entry=
+          instrumenter.map_vertex_gnode.find(*id_it);
+        assert(entry!=instrumenter.map_vertex_gnode.end());
+        egraph.add_com_edge(new_write_node,*id_it);
+        egraph_alt.add_edge(new_write_gnode,entry->second);
+        egraph.add_com_edge(*id_it,new_write_node);
+        egraph_alt.add_edge(entry->second,new_write_gnode);
+        ++fr_rf_counter;
+      }
+
+    /* for unknown reads */
+    for(std::set<unsigned>::const_iterator id_it=
+      unknown_read_nodes.begin();
+      id_it!=unknown_read_nodes.end();
+      ++id_it)
+      if(egraph[*id_it].thread != new_write_event.thread)
+      {
+        instrumenter.message.debug() << *id_it<<"<-com->"
+          <<new_write_node << messaget::eom;
+        std::map<unsigned,unsigned>::const_iterator entry=
+          instrumenter.map_vertex_gnode.find(*id_it);
+        assert(entry!=instrumenter.map_vertex_gnode.end());
+        egraph.add_com_edge(new_write_node,*id_it);
+        egraph_alt.add_edge(new_write_gnode,entry->second);
+        egraph.add_com_edge(*id_it,new_write_node);
+        egraph_alt.add_edge(entry->second,new_write_gnode);
+        ++fr_rf_counter;
+      }
+
 
     map_writes.insert(id2node_pairt(write,new_write_node));
     previous = new_write_node;

@@ -11,10 +11,11 @@ Date: September 2011
 #ifndef CPROVER_GOTO_INSTRUMENT_INTERRUPT_H
 #define CPROVER_GOTO_INSTRUMENT_INTERRUPT_H
 
-#include <pointer-analysis/value_sets.h>
+class symbol_tablet;
+class goto_functionst;
 
-#include <goto-programs/goto_functions.h>
-
+#include "rw_set.h"
+ 
 void interrupt(
   value_setst &value_sets,
   const class symbol_tablet &symbol_table,

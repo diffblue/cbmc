@@ -22,6 +22,10 @@ Date: February 2006
 #include <goto-programs/goto_functions.h>
 #include <pointer-analysis/value_sets.h>
 
+#ifdef LOCAL_MAY
+#include <analyses/local_may_alias.h>
+#endif
+
 // a container for read/write sets
 
 class rw_set_baset
@@ -101,10 +105,17 @@ class rw_set_loct:public rw_set_baset
 public:
   inline rw_set_loct(const namespacet &_ns,
                      value_setst &_value_sets,
-                     goto_programt::const_targett _target):
+                     goto_programt::const_targett _target
+#ifdef LOCAL_MAY
+                     , local_may_aliast &may
+#endif
+  ):
     rw_set_baset(_ns),
     value_sets(_value_sets),
     target(_target)
+#ifdef LOCAL_MAY
+    , local_may(may)
+#endif
   {
     compute();
   }
@@ -112,6 +123,10 @@ public:
 protected:
   value_setst &value_sets;
   const goto_programt::const_targett target;
+
+#ifdef LOCAL_MAY
+  local_may_aliast& local_may;
+#endif
 
   inline void read(const exprt &expr)
   {

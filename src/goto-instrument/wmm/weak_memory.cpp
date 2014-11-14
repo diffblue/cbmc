@@ -48,11 +48,18 @@ void introduce_temporaries(
   symbol_tablet &symbol_table,
   const irep_idt &function,
   goto_programt &goto_program,
+#ifdef LOCAL_MAY
+  const goto_functionst::goto_functiont &goto_function,
+#endif
   messaget& message)
 {
   namespacet ns(symbol_table);
   unsigned tmp_counter=0;
 
+#ifdef LOCAL_MAY
+  local_may_aliast local_may(goto_function);
+#endif
+	
   Forall_goto_program_instructions(i_it, goto_program)
   {
     goto_programt::instructiont &instruction=*i_it;
@@ -63,7 +70,11 @@ void introduce_temporaries(
        instruction.is_assert() ||
        instruction.is_assume())
     {
-      rw_set_loct rw_set(ns, value_sets, i_it);
+      rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+      , local_may
+#endif
+      );
       if(rw_set.empty()) continue;
       
       symbolt new_symbol;
@@ -144,7 +155,11 @@ void weak_memory(
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
       f_it->first!=goto_functionst::entry_point())
       introduce_temporaries(value_sets, symbol_table, f_it->first, 
-        f_it->second.body, message);
+        f_it->second.body, 
+#ifdef LOCAL_MAY
+        f_it->second,
+#endif
+        message);
 
   message.status() << "Temp added" << messaget::eom;
 
