@@ -93,8 +93,8 @@ void goto_instrument_parseoptionst::eval_verbosity()
     v=unsafe_string2int(cmdline.getval("verbosity"));
     if(v<0)
       v=0;
-    else if(v>9)
-      v=9;
+    else if(v>10)
+      v=10;
   }
   
   ui_message_handler.set_verbosity(v);
