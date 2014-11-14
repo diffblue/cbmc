@@ -18,17 +18,17 @@ public:
   {
   }
   
-  void operator()(
+  virtual void operator()(
     path_symex_statet &state,
     std::list<path_symex_statet> &furter_states);
 
-  void operator()(path_symex_statet &state);
+  virtual void operator()(path_symex_statet &state);
 
   void do_goto(
     path_symex_statet &state,
     bool taken);
     
-  void do_assert_fail(path_symex_statet &state)
+  virtual void do_assert_fail(path_symex_statet &state)
   {
     const goto_programt::instructiont &instruction=
       *state.get_instruction();
