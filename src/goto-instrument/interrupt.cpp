@@ -14,8 +14,14 @@ Date: September 2011
 #include <util/prefix.h>
 #include <util/symbol_table.h>
 
+#include <goto-programs/goto_functions.h>
+
 #include "interrupt.h"
 #include "rw_set.h"
+
+#ifdef LOCAL_MAY
+#include <analyses/local_may_alias.h>
+#endif
 
 /*******************************************************************\
 
@@ -87,6 +93,9 @@ Function: interrupt
 void interrupt(
   value_setst &value_sets,
   const symbol_tablet &symbol_table,
+#ifdef LOCAL_MAY
+  const goto_functionst::goto_functiont& goto_function,
+#endif
   goto_programt &goto_program,
   const symbol_exprt &interrupt_handler,
   const rw_set_baset &isr_rw_set)
@@ -97,7 +106,14 @@ void interrupt(
   {
     goto_programt::instructiont &instruction=*i_it;
 
-    rw_set_loct rw_set(ns, value_sets, i_it);
+#ifdef LOCAL_MAY
+  local_may_aliast local_may(goto_function);
+#endif
+    rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+      , local_may
+#endif
+    );
 
     // potential race?
     bool race_on_read=potential_race_on_read(rw_set, isr_rw_set);
@@ -247,7 +263,11 @@ void interrupt(
        f_it->first!=goto_functionst::entry_point() &&
        f_it->first!=isr.get_identifier())
       interrupt(
-        value_sets, symbol_table, f_it->second.body, isr, isr_rw_set);
+        value_sets, symbol_table, 
+#ifdef LOCAL_MAY
+        f_it->second,
+#endif
+        f_it->second.body, isr, isr_rw_set);
 
   goto_functions.update();
 }

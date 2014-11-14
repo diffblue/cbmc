@@ -25,6 +25,7 @@ Date: 2012
 class symbol_tablet;
 class goto_functionst;
 class value_setst;
+class local_may_aliast;
 
 class instrumentert
 {
@@ -103,6 +104,9 @@ protected:
     void visit_cfg_body(
       goto_programt::instructionst::iterator i_it, 
       value_setst& value_sets
+      #ifdef LOCAL_MAY
+      , local_may_aliast& local_may
+      #endif
     ); // deprecated
     void inline visit_cfg_backedge(goto_programt::targett targ, 
       goto_programt::targett i_it);
@@ -110,6 +114,9 @@ protected:
       goto_programt::targett i_it);
     void visit_cfg_assign(value_setst& value_sets, namespacet& ns,
       goto_programt::instructionst::iterator& i_it, bool no_dependencies
+      #ifdef LOCAL_MAY
+      , local_may_aliast& local_may
+      #endif
     );
     void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
@@ -122,6 +129,9 @@ protected:
     void visit_cfg_goto(
       goto_programt::instructionst::iterator i_it,
       value_setst& value_sets
+      #ifdef LOCAL_MAY
+      , local_may_aliast& local_may
+      #endif
     );
     void visit_cfg_reference_function (irep_idt id_function);
 
@@ -171,6 +181,10 @@ protected:
 
     /* dependencies */
     data_dpt data_dp;
+
+    /* writes and reads to unknown addresses -- conservative */
+    std::set<unsigned> unknown_read_nodes;
+    std::set<unsigned> unknown_write_nodes;
 
     /* set of functions visited so far -- we don't handle recursive functions */
     std::set<irep_idt> functions_met;

@@ -174,9 +174,35 @@ void rw_set_loct::read_write_rec(
     read(expr.op0(), guard);
 
     exprt tmp=expr;
+    #ifdef LOCAL_MAY
+    const std::set<exprt> aliases=local_may.get(target, expr);
+    for(std::set<exprt>::const_iterator it=aliases.begin();
+      it!=aliases.end();
+      ++it)
+    {
+      #ifndef LOCAL_MAY_SOUND
+      if(it->id()==ID_unknown)
+      {
+        /* as an under-approximation */
+        //std::cout << "Sorry, LOCAL_MAY too imprecise. Omitting some variables."
+        //  << std::endl;
+        irep_idt object=ID_unknown;
+
+        entryt &entry=r_entries[object];
+        entry.object=object;
+        entry.symbol_expr=symbol_exprt(ID_unknown);
+        entry.guard=guard.as_expr(); // should 'OR'
+
+        continue;
+      }
+      #endif
+      read_write_rec(*it, r, w, suffix, guard);
+    }
+    #else
     dereference(target, tmp, ns, value_sets);
     
     read_write_rec(tmp, r, w, suffix, guard);
+    #endif    
   }
   else if(expr.id()==ID_typecast)
   {
@@ -233,9 +259,22 @@ void rw_set_functiont::compute_rec(const exprt &function)
     {
       const goto_programt &body=f_it->second.body;
 
+#ifdef LOCAL_MAY
+      local_may_aliast local_may(f_it->second);
+#if 0
+      for(goto_functionst::function_mapt::const_iterator g_it=goto_functions.function_map.begin();
+        g_it!=goto_functions.function_map.end(); ++g_it)
+        local_may(g_it->second);
+#endif
+#endif
+
       forall_goto_program_instructions(i_it, body)
       {
-        *this+=rw_set_loct(ns, value_sets, i_it);
+        *this+=rw_set_loct(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+        , local_may
+#endif
+        );
       }
     }
   }
