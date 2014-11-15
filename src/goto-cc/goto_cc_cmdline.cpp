@@ -119,14 +119,14 @@ int goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
   else
   {
     assert(false);
-    return -1;
+    return -1; // not found
   }
 
   if(optnr==-1)
   {
     // new
     options.push_back(option);
-    return options.size()-1;
+    return (int)(options.size()-1);
   }
   
   return optnr;
