@@ -63,7 +63,7 @@ int run(
 
   std::wstring wide_what=widen(what);
 
-  int status=_wspawnvp(_P_WAIT, wide_what.c_str(), _argv);
+  int status=(int)_wspawnvp(_P_WAIT, wide_what.c_str(), _argv);
 
   delete[] _argv;  
 
