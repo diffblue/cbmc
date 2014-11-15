@@ -549,7 +549,7 @@ void goto_convertt::convert_block(
   const source_locationt &end_location=code.end_location();
 
   // this saves the size of the destructor stack
-  unsigned old_stack_size=targets.destructor_stack.size();
+  std::size_t old_stack_size=targets.destructor_stack.size();
   
   // now convert block  
   forall_operands(it, code)

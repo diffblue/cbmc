@@ -216,7 +216,7 @@ protected:
   symbol_exprt exception_flag();
   void unwind_destructor_stack(
     const source_locationt &,
-    unsigned stack_size,
+    std::size_t stack_size,
     goto_programt &dest,
     bool do_dead=true);
 
@@ -354,7 +354,7 @@ protected:
     goto_programt::targett break_target;
     goto_programt::targett default_target;
     bool break_set, default_set;  
-    unsigned break_stack_size;
+    std::size_t break_stack_size;
 
     casest cases;
     cases_mapt cases_map;
@@ -379,7 +379,7 @@ protected:
 
     goto_programt::targett throw_target;
     bool throw_set;
-    unsigned throw_stack_size;
+    std::size_t throw_stack_size;
   };
   
   struct leave_targett
@@ -401,7 +401,7 @@ protected:
 
     goto_programt::targett leave_target;
     bool leave_set;
-    unsigned leave_stack_size;
+    std::size_t leave_stack_size;
   };
   
   void case_guard(
