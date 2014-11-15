@@ -102,7 +102,7 @@ decision_proceduret::resultt cvc_dect::dec_solve()
   int res=system(command.c_str());
   assert(0 == res);
   
-  status("Reading result from CVCL");
+  status() << "Reading result from CVCL" << eom;
 
   return read_cvcl_result();
 }
@@ -212,7 +212,7 @@ decision_proceduret::resultt cvc_dect::read_cvcl_result()
       return D_UNSATISFIABLE;
   }
   
-  error("Unexpected result from CVC-Lite");
+  error() << "Unexpected result from CVC-Lite" << eom;
   
   return D_ERROR;
 }

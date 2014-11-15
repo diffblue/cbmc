@@ -426,9 +426,9 @@ int cbmc_parseoptionst::doit()
   //
   // Print a banner
   //
-  status("CBMC version " CBMC_VERSION " "+
-         i2string(sizeof(void *)*8)+"-bit "+
-         id2string(config.this_operating_system()));
+  status() << "CBMC version " CBMC_VERSION " "
+           << sizeof(void *)*8 << "-bit "
+           << config.this_operating_system() << eom;
 
   //
   // Unwinding of transition systems is done by hw-cbmc.
@@ -499,13 +499,13 @@ bool cbmc_parseoptionst::set_properties(goto_functionst &goto_functions)
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
   
@@ -650,13 +650,13 @@ bool cbmc_parseoptionst::get_goto_program(
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
   
@@ -724,12 +724,12 @@ void cbmc_parseoptionst::preprocessing()
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
   }
   
   catch(int)
@@ -826,13 +826,13 @@ bool cbmc_parseoptionst::process_goto_program(
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
   

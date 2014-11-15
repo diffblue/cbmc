@@ -116,13 +116,13 @@ int goto_cc_modet::main(int argc, const char **argv)
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return EX_SOFTWARE;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return EX_SOFTWARE;
   }
 

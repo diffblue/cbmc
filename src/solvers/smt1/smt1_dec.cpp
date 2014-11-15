@@ -314,7 +314,7 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
   else if(line=="unsat")
     return D_UNSATISFIABLE;
   else
-    error("Unexpected result from SMT-Solver: "+line);
+    error() << "Unexpected result from SMT-Solver: " << line << eom;
 
   return D_ERROR;
 }
@@ -363,7 +363,7 @@ decision_proceduret::resultt smt1_dect::read_result_yices(std::istream &in)
       return D_UNSATISFIABLE;
   }
 
-  error("Unexpected result from SMT-Solver");
+  error() << "Unexpected result from SMT-Solver" << eom;
 
   return D_ERROR;
 }

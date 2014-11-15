@@ -91,14 +91,16 @@ bool java_entry_point(
   if(matches.empty())
   {
     messaget message(message_handler);
-    message.error("main method `"+id2string(config.main)+"' not in symbol table");
+    message.error() << "main method `" << config.main
+                    << "' not in symbol table" << messaget::eom;
     return true; // give up with error, no main
   }
     
   if(matches.size()>=2)
   {
     messaget message(message_handler);
-    message.error("main method `"+id2string(config.main)+"' is ambiguous");
+    message.error() << "main method `" << config.main 
+                    << "' is ambiguous" << messaget::eom;
     return true; // give up with error, no main
   }
   
@@ -109,7 +111,8 @@ bool java_entry_point(
   if(symbol.value.is_nil())
   {
     messaget message(message_handler);
-    message.error("main method `"+id2string(config.main)+"' has no body");
+    message.error() << "main method `" << config.main 
+                    << "' has no body" << messaget::eom;
     return true; // give up with error
   }
 
@@ -172,7 +175,7 @@ bool java_entry_point(
   {
     messaget message;
     message.set_message_handler(message_handler);
-    message.error("failed to move main symbol");
+    message.error() << "failed to move main symbol" << messaget::eom;
     return true;
   }
   

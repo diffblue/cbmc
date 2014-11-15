@@ -478,13 +478,13 @@ bool bmct::run(const goto_functionst &goto_functions)
 
   catch(std::string &error_str)
   {
-    error(error_str);
+    error() << error_str << eom;
     return true;
   }
 
   catch(const char *error_str)
   {
-    error(error_str);
+    error() << error_str << eom;
     return true;
   }
 

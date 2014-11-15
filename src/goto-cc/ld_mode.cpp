@@ -45,15 +45,15 @@ bool ld_modet::doit()
     // This a) prints the version and b) increases verbosity.
     // Linking continues, don't exit!
     
-    print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
+    std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
     
     // 'V' should also print some supported "emulations".
   }
 
   if(cmdline.isset("version"))
   {
-    print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
-    print("Copyright (C) 2006-2013 Daniel Kroening, Christoph Wintersteiger");
+    std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
+    std::cout << "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n";
     return false; // Exit!
   }
 
@@ -64,9 +64,9 @@ bool ld_modet::doit()
   ui_message_handler.set_verbosity(verbosity);
 
   if(produce_hybrid_binary)
-    debug("LD mode (hybrid)");
+    debug() << "LD mode (hybrid)" << eom;
   else
-    debug("LD mode");
+    debug() << "LD mode" << eom;
   
   // get configuration
   config.set(cmdline);

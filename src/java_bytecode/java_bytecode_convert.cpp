@@ -877,12 +877,12 @@ bool java_bytecode_convert(
 
   catch(const char *e)
   {
-    java_bytecode_convert.error(e);
+    java_bytecode_convert.error() << e << messaget::eom;
   }
 
   catch(const std::string &e)
   {
-    java_bytecode_convert.error(e);
+    java_bytecode_convert.error() << e << messaget::eom;
   }
 
   return true;
