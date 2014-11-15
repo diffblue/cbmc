@@ -104,7 +104,7 @@ void cbmc_parseoptionst::eval_verbosity()
   
   if(cmdline.isset("verbosity"))
   {
-    v=unsafe_string2int(cmdline.getval("verbosity"));
+    v=unsafe_string2int(cmdline.get_value("verbosity"));
     if(v<0)
       v=0;
     else if(v>10)
@@ -144,7 +144,7 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("cover-assertions", true);
 
   if(cmdline.isset("mm"))
-    options.set_option("mm", cmdline.getval("mm"));
+    options.set_option("mm", cmdline.get_value("mm"));
 
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
@@ -158,19 +158,19 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("all-properties", false);
 
   if(cmdline.isset("unwind"))
-    options.set_option("unwind", cmdline.getval("unwind"));
+    options.set_option("unwind", cmdline.get_value("unwind"));
 
   if(cmdline.isset("depth"))
-    options.set_option("depth", cmdline.getval("depth"));
+    options.set_option("depth", cmdline.get_value("depth"));
 
   if(cmdline.isset("debug-level"))
-    options.set_option("debug-level", cmdline.getval("debug-level"));
+    options.set_option("debug-level", cmdline.get_value("debug-level"));
 
   if(cmdline.isset("slice-by-trace"))
-    options.set_option("slice-by-trace", cmdline.getval("slice-by-trace"));
+    options.set_option("slice-by-trace", cmdline.get_value("slice-by-trace"));
 
   if(cmdline.isset("unwindset"))
-    options.set_option("unwindset", cmdline.getval("unwindset"));
+    options.set_option("unwindset", cmdline.get_value("unwindset"));
 
   // constant propagation
   if(cmdline.isset("no-propagation"))
@@ -240,7 +240,7 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
   // magic error label
   if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.getval("error-label"));
+    options.set_option("error-label", cmdline.get_value("error-label"));
 
   // generate unwinding assertions
   if(cmdline.isset("cover-assertions"))
@@ -277,7 +277,7 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("refine", true);
 
   if(cmdline.isset("max-node-refinement"))
-    options.set_option("max-node-refinement", cmdline.getval("max-node-refinement"));
+    options.set_option("max-node-refinement", cmdline.get_value("max-node-refinement"));
 
   if(cmdline.isset("aig"))
     options.set_option("aig", true);
@@ -392,7 +392,7 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
                      !cmdline.isset("no-pretty-names"));
 
   if(cmdline.isset("outfile"))
-    options.set_option("outfile", cmdline.getval("outfile"));
+    options.set_option("outfile", cmdline.get_value("outfile"));
 }
 
 /*******************************************************************\

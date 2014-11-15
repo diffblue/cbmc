@@ -113,7 +113,7 @@ bool gcc_modet::doit()
     verbosity=2;
 
   if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2int(cmdline.getval("verbosity"));
+    verbosity=unsafe_string2int(cmdline.get_value("verbosity"));
 
   ui_message_handler.set_verbosity(verbosity);
 
@@ -234,7 +234,7 @@ bool gcc_modet::doit()
   
   if(cmdline.isset("std"))
   {
-    std::string std_string=cmdline.getval("std");
+    std::string std_string=cmdline.get_value("std");
     if(std_string=="gnu99" || std_string=="c99" || std_string=="iso9899:1999" ||
        std_string=="gnu9x" || std_string=="c9x" || std_string=="iso9899:199x" ||
        std_string=="gnu11" || std_string=="c11" ||
@@ -543,7 +543,7 @@ int gcc_modet::gcc_hybrid_binary()
     if(cmdline.isset('o'))
     {
       // there should be only one input file
-      output_files.push_back(cmdline.getval('o'));
+      output_files.push_back(cmdline.get_value('o'));
     }
     else
     {
@@ -562,7 +562,7 @@ int gcc_modet::gcc_hybrid_binary()
   {
     // -c is not given
     if(cmdline.isset('o'))
-      output_files.push_back(cmdline.getval('o'));
+      output_files.push_back(cmdline.get_value('o'));
     else
       output_files.push_back("a.out");      
   }

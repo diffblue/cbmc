@@ -18,8 +18,9 @@ class cmdlinet
 public:
   virtual bool parse(int argc, const char **argv, const char *optstring);
 
-  const char *getval(char option) const;
-  const char *getval(const char *option) const;
+  std::string get_value(char option) const;
+  std::string get_value(const char *option) const;
+
   const std::list<std::string> &get_values(const std::string &option) const;
   const std::list<std::string> &get_values(char option) const;
 

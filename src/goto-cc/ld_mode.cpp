@@ -58,7 +58,7 @@ bool ld_modet::doit()
   }
 
   if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2int(cmdline.getval("verbosity"));
+    verbosity=unsafe_string2int(cmdline.get_value("verbosity"));
 
   compiler.ui_message_handler.set_verbosity(verbosity);
   ui_message_handler.set_verbosity(verbosity);
@@ -150,7 +150,7 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     if(cmdline.isset('o'))
     {
       // there should be only one input file
-      output_files.push_back(cmdline.getval('o'));
+      output_files.push_back(cmdline.get_value('o'));
     }
     else
     {
@@ -168,7 +168,7 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
   {
     // -c is not given
     if(cmdline.isset('o'))
-      output_files.push_back(cmdline.getval('o'));
+      output_files.push_back(cmdline.get_value('o'));
     else
       output_files.push_back("a.out");      
   }
