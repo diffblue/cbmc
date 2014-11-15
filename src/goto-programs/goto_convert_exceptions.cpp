@@ -377,7 +377,7 @@ Function: goto_convertt::unwind_destructor_stack
 
 void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
-  unsigned stack_size,
+  std::size_t stack_size,
   goto_programt &dest,
   bool do_dead)
 {
