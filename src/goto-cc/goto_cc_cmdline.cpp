@@ -79,7 +79,7 @@ Function: goto_cc_cmdlinet::get_optnr
 
 \*******************************************************************/
 
-int goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
+std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
 {
   int optnr;
   cmdlinet::optiont option;
@@ -119,16 +119,15 @@ int goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
   else
   {
     assert(false);
-    return -1; // not found
+    return -1;
   }
 
+  // new?
   if(optnr==-1)
   {
-    // new
     options.push_back(option);
-    return (int)(options.size()-1);
+    return options.size()-1;
   }
   
   return optnr;
 }
-

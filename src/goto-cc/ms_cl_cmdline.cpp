@@ -337,22 +337,7 @@ Function: ms_cl_cmdlinet::process_non_cl_option
 void ms_cl_cmdlinet::process_non_cl_option(
   const std::string &s)
 {
-  cmdlinet::optiont option;
-
-  option.isset=true;
-  option.islong=true;
-  option.optstring=std::string(s, 2, std::string::npos);
-  option.optchar=0;
-
-  int optnr=getoptnr(s);
-
-  if(optnr==-1)
-  {
-    options.push_back(option);
-    optnr=options.size()-1;
-  }
-
-  options[optnr].isset=true;
+  set(s);
       
   for(unsigned j=0; non_ms_cl_options[j]!=NULL; j++)
     if(s==non_ms_cl_options[j])

@@ -26,11 +26,12 @@ public:
     const char **list,
     std::string &prefix);
 
-  int get_optnr(const std::string &option);
+  // never fails, will add if not found
+  std::size_t get_optnr(const std::string &option);
 
   void set(const std::string &opt, const std::string &value)
   {
-    int nr=get_optnr(opt);
+    std::size_t nr=get_optnr(opt);
     options[nr].isset=true;
     options[nr].values.push_back(value);
   }
