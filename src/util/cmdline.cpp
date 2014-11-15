@@ -103,7 +103,7 @@ bool cmdlinet::isset(const char *option) const
 
 /*******************************************************************\
 
-Function: cmdlinet::getval
+Function: cmdlinet::get_value
 
   Inputs:
 
@@ -113,12 +113,12 @@ Function: cmdlinet::getval
 
 \*******************************************************************/
 
-const char *cmdlinet::getval(char option) const
+std::string cmdlinet::get_value(char option) const
 {
   int i=getoptnr(option);
   if(i<0) return "";
   if(options[i].values.empty()) return "";
-  return options[i].values.front().c_str();
+  return options[i].values.front();
 }
 
 /*******************************************************************\
@@ -181,7 +181,7 @@ const std::list<std::string> &cmdlinet::get_values(char option) const
 
 /*******************************************************************\
 
-Function: cmdlinet::getval
+Function: cmdlinet::get_value
 
   Inputs:
 
@@ -191,12 +191,12 @@ Function: cmdlinet::getval
 
 \*******************************************************************/
 
-const char *cmdlinet::getval(const char *option) const
+std::string cmdlinet::get_value(const char *option) const
 {
   int i=getoptnr(option);
   if(i<0) return "";
   if(options[i].values.empty()) return "";
-  return options[i].values.front().c_str();
+  return options[i].values.front();
 }
 
 /*******************************************************************\

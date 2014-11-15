@@ -789,7 +789,7 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.rounding_mode=ieee_floatt::ROUND_TO_EVEN;
 
   if(cmdline.isset("function"))
-    main=cmdline.getval("function");
+    main=cmdline.get_value("function");
     
   if(cmdline.isset('D'))
     ansi_c.defines=cmdline.get_values('D');

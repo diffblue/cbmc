@@ -542,13 +542,13 @@ bool compilet::parse(const std::string &file_name)
 
     if(cmdline.isset('o'))
     {
-      ofs.open(cmdline.getval('o'));
+      ofs.open(cmdline.get_value('o').c_str());
       os = &ofs;
 
       if(!ofs.is_open())
       {
         error() << "failed to open output file `" 
-                << cmdline.getval('o') << "'" << eom;
+                << cmdline.get_value('o') << "'" << eom;
         return true;
       }
     }
@@ -598,13 +598,13 @@ bool compilet::parse_stdin()
 
     if(cmdline.isset('o'))
     {
-      ofs.open(cmdline.getval('o'));
+      ofs.open(cmdline.get_value('o').c_str());
       os = &ofs;
 
       if(!ofs.is_open())
       {
         error() << "failed to open output file `"
-                << cmdline.getval('o') << "'" << eom;
+                << cmdline.get_value('o') << "'" << eom;
         return true;
       }
     }

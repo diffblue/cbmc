@@ -90,7 +90,7 @@ void goto_instrument_parseoptionst::eval_verbosity()
   
   if(cmdline.isset("verbosity"))
   {
-    v=unsafe_string2int(cmdline.getval("verbosity"));
+    v=unsafe_string2int(cmdline.get_value("verbosity"));
     if(v<0)
       v=0;
     else if(v>10)
@@ -624,13 +624,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   // magic error label
   if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.getval("error-label"));
+    options.set_option("error-label", cmdline.get_value("error-label"));
 
   // unwind loops 
   if(cmdline.isset("unwind"))
   {
     status() << "Unwinding loops" << eom;
-    options.set_option("unwind", cmdline.getval("unwind"));
+    options.set_option("unwind", cmdline.get_value("unwind"));
   }
 
   // we add the library in some cases, as some analyses benefit
@@ -669,7 +669,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   {
     status() << "Adding check for maximum call stack size" << eom;
     stack_depth(symbol_table, goto_functions,
-        unsafe_string2unsigned(cmdline.getval("stack-depth")));
+        unsafe_string2unsigned(cmdline.get_value("stack-depth")));
   }
 
   // ignore default/user-specified initialization of variables with static
@@ -728,7 +728,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
     if(cmdline.isset("mm"))
     {
-      std::string mm=cmdline.getval("mm");
+      std::string mm=cmdline.get_value("mm");
       memory_modelt model;
 
       // strategy of instrumentation
@@ -748,11 +748,11 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         inst_strategy=all;
       
       const unsigned unwind_loops = 
-        ( cmdline.isset("unwind")?unsafe_string2unsigned(cmdline.getval("unwind")):0 );
+        ( cmdline.isset("unwind")?unsafe_string2unsigned(cmdline.get_value("unwind")):0 );
       const unsigned max_var =
-        ( cmdline.isset("max-var")?unsafe_string2unsigned(cmdline.getval("max-var")):0 );
+        ( cmdline.isset("max-var")?unsafe_string2unsigned(cmdline.get_value("max-var")):0 );
       const unsigned max_po_trans =
-        ( cmdline.isset("max-po-trans")?unsafe_string2unsigned(cmdline.getval("max-po-trans")):0 );
+        ( cmdline.isset("max-po-trans")?unsafe_string2unsigned(cmdline.get_value("max-po-trans")):0 );
 
       if(mm=="tso")
       {
@@ -809,7 +809,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         value_set_analysis,
         symbol_table,
         goto_functions,
-        cmdline.getval("isr"));
+        cmdline.get_value("isr"));
     }
 
     // Memory-mapped I/O
@@ -854,7 +854,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     else if(!step_case && !base_case)
       throw "please specify one of --step-case and --base-case";
 
-    unsigned k=unsafe_string2unsigned(cmdline.getval("k-induction"));
+    unsigned k=unsafe_string2unsigned(cmdline.get_value("k-induction"));
     
     if(k==0)
       throw "please give k>=1";
@@ -871,7 +871,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     function_enter(
       symbol_table,
       goto_functions,
-      cmdline.getval("function-enter"));
+      cmdline.get_value("function-enter"));
   }
 
   if(cmdline.isset("function-exit"))
@@ -880,7 +880,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     function_exit(
       symbol_table,
       goto_functions,
-      cmdline.getval("function-exit"));
+      cmdline.get_value("function-exit"));
   }
 
   if(cmdline.isset("branch"))
@@ -889,7 +889,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     branch(
       symbol_table,
       goto_functions,
-      cmdline.getval("branch"));
+      cmdline.get_value("branch"));
   }
 
   // add failed symbols
