@@ -86,7 +86,7 @@ bool compilet::doit()
   add_compiler_specific_defines(config);
 
   // Parse commandline for source and object file names
-  for(unsigned i=0; i<_cmdline.args.size(); i++)
+  for(std::size_t i=0; i<_cmdline.args.size(); i++)
     if(add_input_file(_cmdline.args[i]))
       return true;
 
@@ -363,7 +363,7 @@ bool compilet::is_elf_file(const std::string &file_name)
   if(in.is_open())
   {
     char buf[4];
-    for (unsigned i=0; i<4; i++)
+    for(std::size_t i=0; i<4; i++)
       buf[i] = in.get();
     if(buf[0]==0x7f && buf[1]=='E' &&
         buf[2]=='L' && buf[3]=='F')

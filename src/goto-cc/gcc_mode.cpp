@@ -459,7 +459,7 @@ int gcc_modet::preprocess(
   
   #if 0
   std::cout << "RUN:";
-  for(unsigned i=0; i<new_argv.size(); i++)
+  for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
@@ -500,7 +500,7 @@ int gcc_modet::run_gcc()
   
   #if 0
   std::cout << "RUN:";
-  for(unsigned i=0; i<new_argv.size(); i++)
+  for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
@@ -619,7 +619,7 @@ int gcc_modet::gcc_hybrid_binary()
   
   #if 0
   std::cout << "RUN:";
-  for(unsigned i=0; i<new_argv.size(); i++)
+  for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif

@@ -55,7 +55,7 @@ const char *non_ms_cl_options[]=
 
 bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
 {
-  for(unsigned i=0; i<options.size(); i++)
+  for(std::size_t i=0; i<options.size(); i++)
   {
     // is it a non-cl option?
     if(std::string(options[i], 0, 2)=="--")

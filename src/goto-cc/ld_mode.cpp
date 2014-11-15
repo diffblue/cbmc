@@ -218,7 +218,7 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
   
   #if 0
   std::cout << "RUN:";
-  for(unsigned i=0; i<new_argv.size(); i++)
+  for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
