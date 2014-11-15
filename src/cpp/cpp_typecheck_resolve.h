@@ -140,7 +140,7 @@ protected:
     matcht(cpp_template_args_tct _s_args,
            cpp_template_args_tct _f_args,
            irep_idt _id):
-      cost(_s_args.arguments().size()),
+      cost((unsigned)_s_args.arguments().size()),
            specialization_args(_s_args),
            full_args(_f_args),
            id(_id)
