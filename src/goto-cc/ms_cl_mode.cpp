@@ -63,7 +63,7 @@ bool ms_cl_modet::doit()
   compiler.ui_message_handler.set_verbosity(verbosity);
   ui_message_handler.set_verbosity(verbosity);
 
-  debug("Visual Studio mode");
+  debug() << "Visual Studio mode" << eom;
   
   // get configuration
   config.set(cmdline);

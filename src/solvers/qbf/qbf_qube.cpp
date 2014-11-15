@@ -10,8 +10,6 @@ Author: CM Wintersteiger
 #include <cstdlib>
 #include <fstream>
 
-#include <util/i2string.h>
-
 #include "qbf_qube.h"
 
 /*******************************************************************\
@@ -102,11 +100,10 @@ propt::resultt qbf_qubet::prop_solve()
     return P_SATISFIABLE;
 
   {
-    std::string msg=
-      "QuBE: "+
-      i2string(no_variables())+" variables, "+
-      i2string(no_clauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() << 
+      "QuBE: " <<
+      no_variables() << " variables, " <<
+      no_clauses() << " clauses" << eom;
   }
 
   std::string qbf_tmp_file="qube.qdimacs";
@@ -160,19 +157,19 @@ propt::resultt qbf_qubet::prop_solve()
 
     if(!result_found)
     {
-      messaget::error("QuBE failed: unknown result");
+      messaget::error() << "QuBE failed: unknown result" << eom;
       return P_ERROR;
     }
   }
 
   if(result)
   {
-    messaget::status("QuBE: TRUE");
+    messaget::status() << "QuBE: TRUE" << eom;
     return P_SATISFIABLE;
   }
   else
   {
-    messaget::status("QuBE: FALSE");
+    messaget::status() << "QuBE: FALSE" << eom;
     return P_UNSATISFIABLE;
   }
 

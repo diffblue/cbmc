@@ -11,8 +11,6 @@ Author: Alex Groce
 #include <fstream>
 #include <iostream>
 
-#include <util/i2string.h>
-
 #include "pbs_dimacs_cnf.h"
 
 /*******************************************************************\
@@ -137,10 +135,10 @@ bool pbs_dimacs_cnft::pbs_solve()
   bool satisfied = false;
 
   if(file.fail())
-    {
-      error("Unable to read SAT results!\n");
-      return false;
-    }
+  {
+    error() << "Unable to read SAT results!" << eom;
+    return false;
+  }
    
   opt_sum = -1;
 
@@ -221,26 +219,26 @@ propt::resultt pbs_dimacs_cnft::prop_solve()
   file.close();
   pbfile.close();
 
-  std::string msg=
-    i2string(no_variables())+" variables, "+
-    i2string(clauses.size())+" clauses";
-  messaget::status(msg);
+  messaget::status() << 
+    no_variables() << " variables, " <<
+    clauses.size() << " clauses" << eom;
 
   bool result=pbs_solve();
   
-  if (!result)
-    {
-      msg="PBS checker: system is UNSATISFIABLE";
-    }
+  if(!result)
+  {
+    messaget::status() <<
+      "PBS checker: system is UNSATISFIABLE" << eom;
+  }
   else
-    {
-      msg="PBS checker: system is SATISFIABLE"; 
-      if (optimize)
-	msg += " (distance " + i2string(opt_sum) + ")";
-    }
+  {
+    messaget::status() <<
+      "PBS checker: system is SATISFIABLE"; 
+    if(optimize)
+      messaget::status() << " (distance " << opt_sum << ")";
+    messaget::status() << eom;
+  }
   
-  messaget::status(msg);
-
   if(result)
     return P_SATISFIABLE;
   else

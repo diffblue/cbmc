@@ -193,20 +193,17 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
   assert(status!=ERROR);
 
   {
-    std::string msg=
-      i2string(_no_variables)+" variables, "+
-      i2string(solver->nClauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() <<
+      _no_variables << " variables, " <<
+      solver->nClauses() << " clauses" << eom;
   }
   
   add_variables();
   
-  std::string msg;
-
   if(!solver->okay())
   {
-    msg="SAT checker inconsistent: negated claim is UNSATISFIABLE, i.e., holds";
-    messaget::status(msg);
+    messaget::status() <<
+      "SAT checker inconsistent: negated claim is UNSATISFIABLE, i.e., holds" << eom;
   }
   else
   {
@@ -215,16 +212,16 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 
     if(solver->solve(MiniSat_assumptions))
     {
-      msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
-      messaget::status(msg);
+      messaget::status() << 
+        "SAT checker: negated claim is SATISFIABLE, i.e., does not hold" << eom;
       assert(solver->model.size()!=0);
       status=SAT;
       return P_SATISFIABLE;
     }
     else
     {
-      msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
-      messaget::status(msg);
+      messaget::status() <<
+        "SAT checker: negated claim is UNSATISFIABLE, i.e., holds" << eom;
     }
   }
 

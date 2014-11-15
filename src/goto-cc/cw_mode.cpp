@@ -54,7 +54,7 @@ bool cw_modet::doit()
   compiler.ui_message_handler.set_verbosity(verbosity);
   ui_message_handler.set_verbosity(verbosity);
 
-  debug("CodeWarrior mode");
+  debug() << "CodeWarrior mode" << eom;
   
   // get configuration
   config.set(cmdline);

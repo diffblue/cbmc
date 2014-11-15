@@ -17,7 +17,6 @@ Date: June 2006
 #include <util/config.h>
 #include <util/tempdir.h>
 #include <util/base_type.h>
-#include <util/i2string.h>
 #include <util/cmdline.h>
 #include <util/file_util.h>
 #include <util/unicode.h>
@@ -96,15 +95,13 @@ bool compilet::doit()
       it++)
   {
     if(!find_library(*it))
-      warning(std::string("Library not found: ") + *it + " (ignoring)");
+      warning() << "Library not found: " << *it << " (ignoring)" << eom;
   }
 
-  // Work through the given source files
-  print(8, "No. of source files: " +
-    i2string((unsigned long) source_files.size()));
+  statistics() << "No. of source files: " << source_files.size() << eom;
+  statistics() << "No. of object files: " << object_files.size() << eom;
 
-  print(8, "No. of object files: " +
-    i2string((unsigned long) object_files.size()));
+  // Work through the given source files
 
   if(source_files.size()==0 && object_files.size()==0)
   {
@@ -336,7 +333,7 @@ bool compilet::find_library(const std::string &name)
         return !add_input_file(libname);
       else if(is_elf_file(libname))
       {
-        warning("Warning: Cannot read ELF library "+libname);
+        warning() << "Warning: Cannot read ELF library " << libname << eom;
         return false;
       }
     }
@@ -443,7 +440,7 @@ bool compilet::compile()
     
     // Visual Studio always prints the name of the file it's doing
     if(echo_file_name)
-      status(file_name);
+      status() << file_name << eom;
 
     bool r=parse_source(file_name); // don't break the program!
 
@@ -666,11 +663,12 @@ bool compilet::write_bin_object_file(
   const symbol_tablet &lsymbol_table,
   goto_functionst &functions)
 {
-  print(8, "Writing binary format object `" + file_name + "'");
+  statistics() << "Writing binary format object `" 
+               << file_name << "'" << eom;
 
   // symbols
-  print(8, "Symbols in table: "+
-           i2string((unsigned long)lsymbol_table.symbols.size()));
+  statistics() << "Symbols in table: "
+               << lsymbol_table.symbols.size() << eom;
 
   std::ofstream outfile(file_name.c_str(), std::ios::binary);
 
@@ -685,8 +683,8 @@ bool compilet::write_bin_object_file(
 
   unsigned cnt=function_body_count(functions);
 
-  debug("Functions: "+i2string(functions.function_map.size())+"; "+
-        i2string(cnt)+" have a body.");
+  debug() << "Functions: " << functions.function_map.size()
+          << "; " << cnt << " have a body." << eom;
 
   outfile.close();
 

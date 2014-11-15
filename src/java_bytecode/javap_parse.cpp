@@ -173,7 +173,7 @@ bool javap_parsert::parse()
   
   catch(const parsing_errort &p)
   {
-    error(p.msg);
+    error() << p.msg << eom;
     return true;
   }
   

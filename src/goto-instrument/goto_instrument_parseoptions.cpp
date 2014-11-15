@@ -480,13 +480,13 @@ int goto_instrument_parseoptionst::doit()
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return 11;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return 11;
   }
   

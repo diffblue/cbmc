@@ -82,22 +82,23 @@ bool gcc_modet::doit()
     // Compilation continues, don't exit!
     
     if(act_as_ld)
-      print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
+      std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
     else
-      print("gcc version 3.4.4 (goto-cc " CBMC_VERSION ")");
+      std::cout << "gcc version 3.4.4 (goto-cc " CBMC_VERSION ")\n";
   }
 
   if(cmdline.isset("version"))
   {
     if(act_as_ld)
-      print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
+      std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
     else
-      print("gcc (GCC) 3.4.4 (goto-cc " CBMC_VERSION ")\n");
+      std::cout << "gcc (GCC) 3.4.4 (goto-cc " CBMC_VERSION ")\n\n";
 
-    print("Copyright (C) 2006-2013 Daniel Kroening, Christoph Wintersteiger\n");
-    print("CBMC version: " CBMC_VERSION);
-    print("Architecture: "+id2string(config.this_architecture()));
-    print("OS: "+id2string(config.this_operating_system()));
+    std::cout << 
+      "Copyright (C) 2006-2013 Daniel Kroening, Christoph Wintersteiger\n" <<
+      "CBMC version: " CBMC_VERSION << '\n' <<
+      "Architecture: " << config.this_architecture() << '\n' <<
+      "OS: " << config.this_operating_system() << '\n';
 
     return false; // Exit!
   }
@@ -119,16 +120,16 @@ bool gcc_modet::doit()
   if(act_as_ld)
   {
     if(produce_hybrid_binary)
-      debug("LD mode (hybrid)");
+      debug() << "LD mode (hybrid)" << eom;
     else
-      debug("LD mode");
+      debug() << "LD mode" << eom;
   }
   else
   {
     if(produce_hybrid_binary)
-      debug("GCC mode (hybrid)");
+      debug() << "GCC mode (hybrid)" << eom;
     else
-      debug("GCC mode");
+      debug() << "GCC mode" << eom;
   }
 
   // In gcc mode, we have just pass on to gcc to handle the following:
@@ -207,12 +208,12 @@ bool gcc_modet::doit()
 
   switch(compiler.mode)
   {
-  case compilet::LINK_LIBRARY: debug("Linking a library only"); break;
-  case compilet::COMPILE_ONLY: debug("Compiling only"); break;
-  case compilet::ASSEMBLE_ONLY: debug("Assembling only"); break;
-  case compilet::PREPROCESS_ONLY: debug("Preprocessing only"); break;
-  case compilet::COMPILE_LINK: debug("Compiling and linking a library"); break;
-  case compilet::COMPILE_LINK_EXECUTABLE: debug("Compiling and linking an executable"); break;
+  case compilet::LINK_LIBRARY: debug() << "Linking a library only" << eom; break;
+  case compilet::COMPILE_ONLY: debug() << "Compiling only" << eom; break;
+  case compilet::ASSEMBLE_ONLY: debug() << "Assembling only" << eom; break;
+  case compilet::PREPROCESS_ONLY: debug() << "Preprocessing only" << eom; break;
+  case compilet::COMPILE_LINK: debug() << "Compiling and linking a library" << eom; break;
+  case compilet::COMPILE_LINK_EXECUTABLE: debug() << "Compiling and linking an executable" << eom; break;
   default: assert(false);
   }
 
@@ -221,7 +222,7 @@ bool gcc_modet::doit()
   {
     // We may wish to reconsider the below.
     config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
-    debug("Enabling Visual Studio syntax");
+    debug() << "Enabling Visual Studio syntax" << eom;
   }
   else
     config.ansi_c.mode=configt::ansi_ct::MODE_GCC_C;
@@ -569,9 +570,9 @@ int gcc_modet::gcc_hybrid_binary()
   if(output_files.empty()) return 0;
 
   if(act_as_ld)
-    debug("Running ld to generate hybrid binary");
+    debug() << "Running ld to generate hybrid binary" << eom;
   else
-    debug("Running gcc to generate hybrid binary");
+    debug() << "Running gcc to generate hybrid binary" << eom;
   
   // save the goto-cc output files
   for(std::list<std::string>::const_iterator
@@ -632,7 +633,7 @@ int gcc_modet::gcc_hybrid_binary()
       it!=output_files.end();
       it++)
   {
-    debug("merging "+*it);
+    debug() << "merging " << *it << eom;
     std::string saved=*it+".goto-cc-saved";
 
     #ifdef __linux__

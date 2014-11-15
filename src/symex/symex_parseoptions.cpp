@@ -320,13 +320,13 @@ bool symex_parseoptionst::set_properties(goto_functionst &goto_functions)
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
   
@@ -469,13 +469,13 @@ bool symex_parseoptionst::get_goto_program(
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
   
@@ -550,13 +550,13 @@ bool symex_parseoptionst::process_goto_program(
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
   

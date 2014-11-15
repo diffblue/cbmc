@@ -228,14 +228,16 @@ bool entry_point(
     if(matches.empty())
     {
       messaget message(message_handler);
-      message.error("main symbol `"+config.main+"' not found");
+      message.error() << "main symbol `" << config.main 
+                      << "' not found" << messaget::eom;
       return true; // give up
     }
     
     if(matches.size()>=2)
     {
       messaget message(message_handler);
-      message.error("main symbol `"+config.main+"' is ambiguous");
+      message.error() << "main symbol `" << config.main 
+                      << "' is ambiguous" << messaget::eom;
       return true;
     }
 
@@ -250,7 +252,8 @@ bool entry_point(
   if(s_it==symbol_table.symbols.end())
   {
     messaget message(message_handler);
-    message.error("main symbol `"+id2string(main_symbol)+"' not in symbol table");
+    message.error() << "main symbol `" << id2string(main_symbol) 
+                    << "' not in symbol table" << messaget::eom;
     return true; // give up, no main
   }
     
@@ -260,7 +263,8 @@ bool entry_point(
   if(symbol.value.is_nil())
   {
     messaget message(message_handler);
-    message.error("main symbol `"+id2string(main_symbol)+"' has no body");
+    message.error() << "main symbol `" << id2string(main_symbol)
+                    << "' has no body" << messaget::eom;
     return false; // give up
   }
 
@@ -502,7 +506,7 @@ bool entry_point(
   {
     messaget message;
     message.set_message_handler(message_handler);
-    message.error("failed to move main symbol");
+    message.error() << "failed to move main symbol" << messaget::eom;
     return true;
   }
   

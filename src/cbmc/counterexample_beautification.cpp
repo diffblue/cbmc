@@ -126,7 +126,8 @@ void counterexample_beautificationt::operator()(
   bv_cbmc.set_to(literal_exprt(failed->cond_literal), false);
 
   {
-    bv_cbmc.status("Beautifying counterexample (guards)");
+    bv_cbmc.status() << "Beautifying counterexample (guards)"
+                     << messaget::eom;
 
     // compute weights for guards
     typedef std::map<literalt, unsigned> guard_countt;
@@ -163,7 +164,8 @@ void counterexample_beautificationt::operator()(
   }
 
   {
-    bv_cbmc.status("Beautifying counterexample (values)");
+    bv_cbmc.status() << "Beautifying counterexample (values)"
+                     << messaget::eom;
 
     // get symbols we care about
     minimization_listt minimization_list;
