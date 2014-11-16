@@ -95,7 +95,7 @@ bool gcc_modet::doit()
       std::cout << "gcc (GCC) 3.4.4 (goto-cc " CBMC_VERSION ")\n\n";
 
     std::cout << 
-      "Copyright (C) 2006-2013 Daniel Kroening, Christoph Wintersteiger\n" <<
+      "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
       "CBMC version: " CBMC_VERSION << '\n' <<
       "Architecture: " << config.this_architecture() << '\n' <<
       "OS: " << config.this_operating_system() << '\n';
