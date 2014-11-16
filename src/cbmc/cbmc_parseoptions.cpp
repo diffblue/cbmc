@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/memory_info.h>
 #include <util/i2string.h>
 
+#include <ansi-c/c_preprocess.h>
+
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
@@ -354,17 +356,16 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
       options.set_option("smt1", true), version_set = true;
   }
 
-
-  if (version_set && !solver_set)
+  if(version_set && !solver_set)
   {
-    if (cmdline.isset("outfile"))
+    if(cmdline.isset("outfile"))
     {
       // outfile and no solver should give standard compliant SMT-LIB
       options.set_option("generic", true), solver_set = true;
     }
     else
     {
-      if (options.get_bool_option("smt1"))
+      if(options.get_bool_option("smt1"))
       {
 	options.set_option("boolector", true), solver_set = true;
       }
@@ -377,8 +378,6 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   }
   // Either have solver and standard version set, or neither.
   assert(version_set == solver_set);
-
-
 
   if(cmdline.isset("beautify"))
     options.set_option("beautify", true);
@@ -444,7 +443,10 @@ int cbmc_parseoptionst::doit()
   }
   
   register_languages();
-
+  
+  if(cmdline.isset("test-preprocessor"))
+    return test_c_preprocessor(ui_message_handler)?8:0;
+  
   if(cmdline.isset("preprocess"))
   {
     preprocessing();

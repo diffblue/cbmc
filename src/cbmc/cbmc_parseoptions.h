@@ -24,7 +24,7 @@ class optionst;
   "(program-only)(function):(preprocess)(slice-by-trace):" \
   "(no-simplify)(unwind):(unwindset):(slice-formula)" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
-  "(document-subgoals)(outfile):" \
+  "(document-subgoals)(outfile):(test-preprocessor)" \
   "D:I:" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
