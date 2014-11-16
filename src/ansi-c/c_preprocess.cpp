@@ -1057,3 +1057,28 @@ bool c_preprocess_none(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: test_c_preprocessor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: tests ANSI-C preprocessing
+
+\*******************************************************************/
+
+const char c_test_program[]=
+  "#include <stdlib.h>\n"
+  "\n"
+  "int main() { }\n";
+
+bool test_c_preprocessor(message_handlert &message_handler)
+{
+  std::ostringstream out;
+  std::istringstream in(c_test_program);
+  
+  return c_preprocess(in, out, message_handler);
+}
