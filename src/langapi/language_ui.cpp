@@ -143,7 +143,7 @@ bool language_uit::parse(const std::string &filename)
   languaget &language=*lf.language;
   language.set_message_handler(get_message_handler());
 
-  status() << "Parsing" << filename << eom;
+  status() << "Parsing " << filename << eom;
 
   if(language.parse(infile, filename))
   {
