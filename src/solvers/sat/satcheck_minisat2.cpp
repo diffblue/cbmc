@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <stack>
 
-#include <util/i2string.h>
 #include <util/threeval.h>
 
 #include "satcheck_minisat2.h"
