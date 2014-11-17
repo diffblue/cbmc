@@ -1157,6 +1157,12 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "&="		{ loc(); return TOK_ANDASSIGN; }
 "^="		{ loc(); return TOK_XORASSIGN; }
 "|="		{ loc(); return TOK_ORASSIGN; }
+
+  /* digraphs */
+"<:"            { loc(); return '['; }
+":>"            { loc(); return ']'; }
+"<%"            { loc(); return '{'; }
+"%>"            { loc(); return '}'; }
 }
 
 <GRAMMAR>{
