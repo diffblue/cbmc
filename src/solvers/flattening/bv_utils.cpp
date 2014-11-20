@@ -535,7 +535,7 @@ literalt bv_utilst::overflow_sub(
   else if(rep==UNSIGNED)
   {
     // overflow is simply _negated_ carry-out
-    return prop.lnot(carry_out(op0, inverted(op1), const_literal(true)));
+    return !carry_out(op0, inverted(op1), const_literal(true));
   }
   else
     assert(false);
@@ -751,7 +751,7 @@ literalt bv_utilst::overflow_negate(const bvt &bv)
   bvt zeros(bv);
   zeros.erase(--zeros.end());
 
-  return prop.land(bv[bv.size()-1], prop.lnot(prop.lor(zeros)));
+  return prop.land(bv[bv.size()-1], !prop.lor(zeros));
 }
 
 /*******************************************************************\
@@ -817,7 +817,7 @@ bvt bv_utilst::inverted(const bvt &bv)
 {
   bvt result=bv;
   Forall_literals(it, result)
-    *it=prop.lnot(*it);
+    *it=!*it;
   return result;
 }
 
@@ -1097,7 +1097,7 @@ Function: bv_utilst::cond_negate_no_overflow
 bvt bv_utilst::cond_negate_no_overflow(const bvt &bv, literalt cond)
 {
   prop.l_set_to(
-    prop.limplies(cond, prop.lnot(overflow_negate(bv))),
+    prop.limplies(cond, !overflow_negate(bv)),
     true);
 
   return cond_negate(bv, cond);
@@ -1602,7 +1602,7 @@ literalt bv_utilst::lt_or_le(
   if(rep==SIGNED)
     result=prop.lxor(prop.lequal(top0, top1), carry);
   else if(rep==UNSIGNED)
-    result=prop.lnot(carry);
+    result=!carry;
   else
     assert(false);
 
@@ -1631,11 +1631,10 @@ literalt bv_utilst::unsigned_less_than(
   const bvt &op1)
 {
 #ifdef NEW_ENCODING
-  return lt_or_le(false,op0,op1,UNSIGNED);
+  return lt_or_le(false, op0, op1, UNSIGNED);
 #else
   // A <= B  iff  there is an overflow on A-B
-  return prop.lnot(
-    carry_out(op0, inverted(op1), const_literal(true)));
+  return !carry_out(op0, inverted(op1), const_literal(true));
 #endif
 }
 
@@ -1702,16 +1701,16 @@ void bv_utilst::cond_implies_equal(
   {
     bvt clause1;
 
-    clause1.push_back(prop.lnot(cond));
+    clause1.push_back(!cond);
     clause1.push_back(a[i]);
-    clause1.push_back(prop.lnot(b[i]));
+    clause1.push_back(!b[i]);
 
     prop.lcnf(clause1);
 
     bvt clause2;
 
-    clause2.push_back(prop.lnot(cond));
-    clause2.push_back(prop.lnot(a[i]));
+    clause2.push_back(!cond);
+    clause2.push_back(!a[i]);
     clause2.push_back(b[i]);
 
     prop.lcnf(clause2);

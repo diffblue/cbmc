@@ -333,11 +333,7 @@ void arrayst::add_array_Ackermann_constraints()
           
             equal_exprt values_equal(index_expr1, index_expr2);
 
-            bvt implication;
-            implication.reserve(2);
-            implication.push_back(prop.lnot(indices_equal_lit));
-            implication.push_back(convert(values_equal));
-            prop.lcnf(implication);
+            prop.lcnf(!indices_equal_lit, convert(values_equal));
           }
         }
   }
@@ -445,10 +441,7 @@ void arrayst::add_array_constraints(
     equal_exprt equality_expr(index_expr1, index_expr2);
     
     // add constraint
-    bvt bv;
-    bv.push_back(prop.lnot(array_equality.l));
-    bv.push_back(convert(equality_expr));
-    prop.lcnf(bv);
+    prop.lcnf(!array_equality.l, convert(equality_expr));
   }
 }  
 
@@ -779,10 +772,7 @@ void arrayst::add_array_constraints_if(
     assert(index_expr1.type()==index_expr2.type());
 
     // add implication
-    bvt bv;
-    bv.push_back(prop.lnot(cond_lit));
-    bv.push_back(convert(equal_exprt(index_expr1, index_expr2)));
-    prop.lcnf(bv);
+    prop.lcnf(!cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
   }
 
   // now the false case
@@ -805,9 +795,6 @@ void arrayst::add_array_constraints_if(
     assert(index_expr1.type()==index_expr2.type());
 
     // add implication
-    bvt bv;
-    bv.push_back(cond_lit);
-    bv.push_back(convert(equal_exprt(index_expr1, index_expr2)));
-    prop.lcnf(bv);
+    prop.lcnf(cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
   }
 }
