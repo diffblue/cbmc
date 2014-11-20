@@ -21,9 +21,9 @@ of CBMC.
 
 <li><p class="justified">
 <b>Windows:</b> The Windows version of CBMC requires the preprocessor 
-<code>cl.exe</code>, which is part of Microsoft Visual Studio (including
-the free <a href="http://www.microsoft.com/visualstudio/eng/products/visual-studio-2010-express">Visual
-Studio 2010 Express</a>).
+<code>cl.exe</code>, which is part of Microsoft Visual Studio. We recommend
+the free <a href="http://www.visualstudio.com/en-us/products/visual-studio-community-vs">Visual
+Studio Community 2013</a>.
 </p></li>
 
 <li><p class="justified">
