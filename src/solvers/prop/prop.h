@@ -50,6 +50,10 @@ public:
   { l_set_to(a, false); }
 
   // constraints
+  inline void lcnf(literalt l1, literalt l2)
+  { bvt b; b.push_back(l1); b.push_back(l2); lcnf(b); }
+  inline void lcnf(literalt l1, literalt l2, literalt l3)
+  { bvt b; b.push_back(l1); b.push_back(l2); b.push_back(l3); lcnf(b); }
   virtual void lcnf(const bvt &bv)=0;
   virtual bool has_set_to() const { return true; }
   

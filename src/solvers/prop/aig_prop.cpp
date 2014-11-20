@@ -590,16 +590,19 @@ void aig_prop_solvert::convert_node(
       const aigt::nodet &left = aig.nodes[body[0].var_no()];
       const aigt::nodet &right = aig.nodes[body[1].var_no()];
       
-      if (left.is_and() && right.is_and()) {
-	if (left.a == neg(right.a)) {
+      if(left.is_and() && right.is_and())
+      {
+	if(left.a == neg(right.a))
+	{
 	  if (p_usage_count[body[0].var_no()] == 0 &&
 	      n_usage_count[body[0].var_no()] == 1 &&
 	      p_usage_count[body[1].var_no()] == 0 &&
-	      n_usage_count[body[1].var_no()] == 1) {
-	    
+	      n_usage_count[body[1].var_no()] == 1)
+          {
 	    bvt lits(3);
 
-	    if (n_neg) {
+	    if (n_neg)
+	    {
 	      lits[0] = left.a;
 	      lits[1] = right.b;
 	      lits[2] = o;
@@ -611,7 +614,8 @@ void aig_prop_solvert::convert_node(
 	      solver.lcnf(lits);
 	    }
 
-	    if (n_pos) {
+	    if (n_pos)
+	    {
 	      lits[0] = left.a;
 	      lits[1] = neg(right.b);
 	      lits[2] = neg(o);
@@ -628,7 +632,6 @@ void aig_prop_solvert::convert_node(
 	    --n_usage_count[body[1].var_no()];
 	    
 	    return;
-	    
 	  }
 	}
       }      
@@ -659,7 +662,8 @@ void aig_prop_solvert::convert_node(
 	    // A (negative) carry -- 1 if at most one input is 1
 	    bvt lits(3);
 
-	    if (n_neg) {
+	    if (n_neg)
+	    {
 	      lits[0] = a;
 	      lits[1] = b;
 	      lits[2] = o;
@@ -676,7 +680,8 @@ void aig_prop_solvert::convert_node(
 	      solver.lcnf(lits);
 	    }
 
-	    if (n_pos) {
+	    if (n_pos)
+	    {
 	      lits[0] = neg(a);
 	      lits[1] = neg(b);
 	      lits[2] = neg(o);
@@ -717,7 +722,8 @@ void aig_prop_solvert::convert_node(
 	bvt lits(2);
 	lits[1]=neg(o);
 	
-	forall_literals(it, body) {
+	forall_literals(it, body)
+	{
 	  lits[0]=pos(*it);
 	  solver.lcnf(lits);
 	}
@@ -727,9 +733,9 @@ void aig_prop_solvert::convert_node(
       {
 	bvt lits;
 	
-	forall_literals(it, body) {
+	forall_literals(it, body)
 	  lits.push_back(neg(*it));
-	}
+
 	lits.push_back(pos(o));
 	solver.lcnf(lits);
       }
