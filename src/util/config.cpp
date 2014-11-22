@@ -869,13 +869,13 @@ bool configt::set(const cmdlinet &cmdline)
       // but we recognize the Visual Studio language,
       // which is somewhat inconsistent.
       #ifndef _WIN32
-      ansi_c.preprocessor=ansi_ct::PP_GCC;
+      ansi_c.preprocessor=ansi_ct::PP_VISUAL_STUDIO;
       ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #elif __FreeBSD__
       ansi_c.preprocessor=ansi_ct::PP_CLANG;
       ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #else
-      ansi_c.preprocessor=ansi_ct::PP_VISUAL_STUDIO;
+      ansi_c.preprocessor=ansi_ct::PP_GCC;
       ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #endif
     }
