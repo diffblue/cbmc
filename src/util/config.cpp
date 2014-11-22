@@ -864,11 +864,15 @@ bool configt::set(const cmdlinet &cmdline)
     else
     {
       // On Windows, our default is Visual Studio.
+      // On FreeBSD, it's clang.
       // On anything else, it's GCC as the preprocessor,
       // but we recognize the Visual Studio language,
       // which is somewhat inconsistent.
       #ifndef _WIN32
       ansi_c.preprocessor=ansi_ct::PP_GCC;
+      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
+      #elif __FreeBSD__
+      ansi_c.preprocessor=ansi_ct::PP_CLANG;
       ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #else
       ansi_c.preprocessor=ansi_ct::PP_VISUAL_STUDIO;
