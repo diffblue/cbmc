@@ -233,6 +233,98 @@ bvt bv_utilst::extension(
   return result;
 }
 
+
+/*******************************************************************\
+
+Function: bv_utilst::full_adder
+
+  Inputs: a, b, carry_in are the literals representing inputs
+
+ Outputs: return value is the literal for the sum, carry_out gets the output carry
+
+ Purpose: Generates the encoding of a full adder.  The optimal encoding is the default.
+
+\*******************************************************************/
+
+// The optimal encoding is the default
+#define OPTIMAL_FULL_ADDER
+
+literalt bv_utilst::full_adder(const literalt a, const literalt b, const literalt carry_in, literalt &carry_out) {
+  literalt sum;
+
+#ifdef OPTIMAL_FULL_ADDER
+  literalt x;
+  literalt y;
+  int constantProp = -1;
+  if (a.is_constant()) {
+    x = b;
+    y = carry_in;
+    constantProp = (a.is_true()) ? 1 : 0;
+    
+  } else if (b.is_constant()) {
+    x = a;
+    y = carry_in;
+    constantProp = (b.is_true()) ? 1 : 0;
+    
+  } else if (carry_in.is_constant()) {
+    x = a;
+    y = b;
+    constantProp = (carry_in.is_true()) ? 1 : 0;
+  }
+
+  // Rely on prop.l* to do further constant propagation
+  if (constantProp == 1) {
+    // At least one input bit is 1
+    carry_out = prop.lor(x, y);
+    sum = prop.lequal(x, y);
+    
+  } else if (constantProp == 0) {
+    // At least one input bit is 0
+    carry_out = prop.land(x,y);
+    sum = prop.lxor(x,y);
+    
+  } else {
+    carry_out = prop.new_variable();
+    sum = prop.new_variable();
+    
+    // Any two inputs 1 will set the carry_out to 1
+    prop.lcnf(!a,        !b, carry_out);
+    prop.lcnf(!a, !carry_in, carry_out);
+    prop.lcnf(!b, !carry_in, carry_out);
+    
+    // Any two inputs 0 will set the carry_out to 0
+    prop.lcnf(a,        b, !carry_out);
+    prop.lcnf(a, carry_in, !carry_out);
+    prop.lcnf(b, carry_in, !carry_out);
+    
+    // If both carry out and sum are 1 then all inputs are 1
+    prop.lcnf(       a, !sum, !carry_out);
+    prop.lcnf(       b, !sum, !carry_out);
+    prop.lcnf(carry_in, !sum, !carry_out);
+    
+    // If both carry out and sum are 0 then all inputs are 0
+    prop.lcnf(       !a, sum, carry_out);
+    prop.lcnf(       !b, sum, carry_out);
+    prop.lcnf(!carry_in, sum, carry_out);
+    
+    // If all of the inputs are 1 or all are 0 it sets the sum
+    prop.lcnf(!a, !b, !carry_in,  sum);
+    prop.lcnf( a,  b,  carry_in, !sum);
+  }
+
+  return sum;
+
+#else
+
+    carry_out=carry(a, b, carry_out);
+
+    return prop.lxor(
+           prop.lxor(a, b), carry_out);
+#endif
+
+}
+
+
 /*******************************************************************\
 
 Function: bv_utilst::carry
@@ -245,9 +337,14 @@ Function: bv_utilst::carry
 
 \*******************************************************************/
 
+// Compact carry is the default when not using AIGs
+#ifndef USE_AIG
+#define COMPACT_CARRY
+#endif
+
 literalt bv_utilst::carry(literalt a, literalt b, literalt c)
 {
-  #ifndef USE_AIG
+  #ifdef COMPACT_CARRY
   // propagation possible?
   unsigned const_count=
     a.is_constant() + b.is_constant() + c.is_constant();
@@ -286,45 +383,12 @@ literalt bv_utilst::carry(literalt a, literalt b, literalt c)
     (x=((a AND b) OR (a AND c) OR (b AND c)));
   */
 
-  clause.resize(3);
-  clause[0]=a;
-  clause[1]=b;
-  clause[2]=neg(x);
-  prop.lcnf(clause);
-
-  clause.resize(4);
-  clause[0]=a;
-  clause[1]=neg(b);
-  clause[2]=c;
-  clause[3]=neg(x);
-  prop.lcnf(clause);
-
-  clause.resize(4);
-  clause[0]=a;
-  clause[1]=neg(b);
-  clause[2]=neg(c);
-  clause[3]=x;
-  prop.lcnf(clause);
-
-  clause.resize(4);
-  clause[0]=neg(a);
-  clause[1]=b;
-  clause[2]=c;
-  clause[3]=neg(x);
-  prop.lcnf(clause);
-
-  clause.resize(4);
-  clause[0]=neg(a);
-  clause[1]=b;
-  clause[2]=neg(c);
-  clause[3]=x;
-  prop.lcnf(clause);
-
-  clause.resize(3);
-  clause[0]=neg(a);
-  clause[1]=neg(b);
-  clause[2]=x;
-  prop.lcnf(clause);
+  prop.lcnf( a,  b,     !x);
+  prop.lcnf( a, !b,  c, !x);
+  prop.lcnf( a, !b, !c,  x);
+  prop.lcnf(!a,  b,  c, !x);
+  prop.lcnf(!a,  b, !c,  x);
+  prop.lcnf(!a, !b,      x);
 
   return x;
 
@@ -364,13 +428,7 @@ void bv_utilst::adder(
 
   for(unsigned i=0; i<sum.size(); i++)
   {
-    literalt op0_bit=sum[i];
-    literalt op1_bit=op[i];
-
-    sum[i]=prop.lxor(
-           prop.lxor(op0_bit, op1_bit), carry_out);
-
-    carry_out=carry(op0_bit, op1_bit, carry_out);
+    sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
   }
 }
 
@@ -602,15 +660,7 @@ void bv_utilst::adder_no_overflow(bvt &sum, const bvt &op)
 {
   literalt carry_out=const_literal(false);
 
-  for(unsigned i=0; i<sum.size(); i++)
-  {
-    literalt op0_bit=sum[i];
-
-    sum[i]=prop.lxor(
-           prop.lxor(op0_bit, op[i]), carry_out);
-
-    carry_out=carry(op0_bit, op[i], carry_out);
-  }
+  adder(sum, op, carry_out, carry_out);
 
   prop.l_set_to_false(carry_out); // enforce no overflow
 }
@@ -859,6 +909,7 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
       
       for(unsigned bit=0; bit<a.size(); bit++)
       {
+	// \todo reformulate using full_adder
         s[bit]=prop.lxor(a[bit], prop.lxor(b[bit], c[bit]));
         t[bit]=(bit==0)?const_literal(false):
                carry(a[bit-1], b[bit-1], c[bit-1]);
@@ -1409,7 +1460,6 @@ literalt bv_utilst::lt_or_le(
 {
   assert(bv0.size() == bv1.size());
 
-  bvt clause;
   literalt top0=bv0[bv0.size()-1],
     top1=bv1[bv1.size()-1];
   
@@ -1433,68 +1483,26 @@ literalt bv_utilst::lt_or_le(
 
     // When comparing signs we are comparing the top bit
 #ifdef INCLUDE_REDUNDANT_CLAUSES
-    clause.resize(1);
-    clause[0] = compareBelow[start + 1];
-    prop.lcnf(clause);
+    prop.l_set_to_true(compareBelow[start + 1])
 #endif    
 
     // Four cases...
-    // + +        compare needed
-    clause.resize(3);
-    clause[0] = top0;
-    clause[1] = top1;
-    clause[2] = firstComp;
-    prop.lcnf(clause);
-
-
-    //   + -        result false and no compare needed
-    clause.resize(3);
-    clause[0] = top0;
-    clause[1] = neg(top1);
-    clause[2] = neg(result);
-    prop.lcnf(clause);
+    prop.lcnf( top0,  top1, firstComp);  // + +   compare needed
+    prop.lcnf( top0, !top1,   !result);  // + -   result false and no compare needed
+    prop.lcnf(!top0,  top1,    result);  // - +   result true and no compare needed
+    prop.lcnf(!top0, !top1, firstComp);  // - -   negated compare needed
 
 #ifdef INCLUDE_REDUNDANT_CLAUSES
-    clause.resize(3);
-    clause[0] = top0;
-    clause[1] = neg(top1);
-    clause[2] = neg(firstComp);
-    prop.lcnf(clause);
+    prop.lcnf( top0, !top1, !firstComp);
+    prop.lcnf(!top0,  top1, !firstComp);
 #endif
-
-
-    //   - +        result true
-    clause.resize(3);
-    clause[0] = neg(top0);
-    clause[1] = top1;
-    clause[2] = result;
-    prop.lcnf(clause);
-
-#ifdef INCLUDE_REDUNDANT_CLAUSES
-    clause.resize(3);
-    clause[0] = neg(top0);
-    clause[1] = top1;
-    clause[2] = neg(firstComp);
-    prop.lcnf(clause);
-#endif
-
-
-    //   - -        negated compare needed
-    clause.resize(3);
-    clause[0] = neg(top0);
-    clause[1] = neg(top1);
-    clause[2] = firstComp;
-    prop.lcnf(clause);
 
   }
   else
   {
     // Unsigned is much easier
     start = compareBelow.size() - 1;
-
-    clause.resize(1);
-    clause[0] = compareBelow[start];
-    prop.lcnf(clause);
+    prop.l_set_to_true(compareBelow[start]);
   }
 
 
@@ -1504,95 +1512,42 @@ literalt bv_utilst::lt_or_le(
   i = start;
   do
   {
-    clause.resize(4);
-    clause[0] = neg(compareBelow[i]);
-    clause[1] = bv0[i];
-    clause[2] = neg(bv1[i]);
-    clause[3] = result;
-    prop.lcnf(clause);
-
-    clause.resize(4);
-    clause[0] = neg(compareBelow[i]);
-    clause[1] = neg(bv0[i]);
-    clause[2] = bv1[i];
-    clause[3] = neg(result);
-    prop.lcnf(clause);
+    prop.lcnf(!compareBelow[i],  bv0[i], !bv1[i],  result);
+    prop.lcnf(!compareBelow[i], !bv0[i],  bv1[i], !result);
   }
   while (i-- != 0);
-
 
   // Chain the comparison bit
   //  \forall i != 0 . cb[i] &  a[i] &  b[i] => cb[i-1]
   //  \forall i != 0 . cb[i] & -a[i] & -b[i] => cb[i-1]
   for (i = start; i > 0; i--)
   {
-    clause.resize(4);
-    clause[0] = neg(compareBelow[i]);
-    clause[1] = neg(bv0[i]);
-    clause[2] = neg(bv1[i]);
-    clause[3] = compareBelow[i-1];
-    prop.lcnf(clause);
-    
-    clause.resize(4);
-    clause[0] = neg(compareBelow[i]);
-    clause[1] = bv0[i];
-    clause[2] = bv1[i];
-    clause[3] = compareBelow[i-1];
-    prop.lcnf(clause);
+    prop.lcnf(!compareBelow[i], !bv0[i], !bv1[i], compareBelow[i-1]);
+    prop.lcnf(!compareBelow[i],  bv0[i],  bv1[i], compareBelow[i-1]);
   }
 
 
 #ifdef INCLUDE_REDUNDANT_CLAUSES
-  
 // Optional zeroing of the comparison bit when not needed
 //  \forall i != 0 . -c[i] => -c[i-1]
 //  \forall i != 0 .  c[i] & -a[i] &  b[i] => -c[i-1]
 //  \forall i != 0 .  c[i] &  a[i] & -b[i] => -c[i-1]
   for (i = start; i > 0; i--)
   {
-    clause.resize(2);
-    clause[0] = compareBelow[i];
-    clause[1] = neg(compareBelow[i-1]);
-    prop.lcnf(clause);
-
-    clause.resize(4);
-    clause[0] = neg(compareBelow[i]);
-    clause[1] = bv0[i];
-    clause[2] = neg(bv1[i]);
-    clause[3] = neg(compareBelow[i-1]);
-    prop.lcnf(clause);
-
-    clause.resize(4);
-    clause[0] = neg(compareBelow[i]);
-    clause[1] = neg(bv0[i]);
-    clause[2] = bv1[i];
-    clause[3] = neg(compareBelow[i-1]);
-    prop.lcnf(clause);
+    prop.lcnf( compareBelow[i],                   !compareBelow[i-1]);
+    prop.lcnf(!compareBelow[i],  bv0[i], !bv1[i], !compareBelow[i-1]);
+    prop.lcnf(!compareBelow[i], !bv0[i],  bv1[i], !compareBelow[i-1]);
   }
 #endif
 
 
   // The 'base case' of the induction is the case when they are equal
-  clause.resize(4);
-  clause[0] = neg(compareBelow[0]);
-  clause[1] = neg(bv0[0]);
-  clause[2] = neg(bv1[0]);
-  clause[3] = (or_equal) ? result : neg(result);
-  prop.lcnf(clause);
-
-  clause.resize(4);
-  clause[0] = neg(compareBelow[0]);
-  clause[1] = bv0[0];
-  clause[2] = bv1[0];
-  clause[3] = (or_equal) ? result : neg(result);
-  prop.lcnf(clause);
-
+  prop.lcnf(!compareBelow[0], !bv0[0], !bv1[0], (or_equal) ? result : !result);
+  prop.lcnf(!compareBelow[0],  bv0[0],  bv1[0], (or_equal) ? result : !result);
 
   return result;
 
-
 #else
-
 
   literalt carry=
     carry_out(bv0, inverted(bv1), const_literal(true));
@@ -1699,20 +1654,7 @@ void bv_utilst::cond_implies_equal(
 
   for(unsigned i=0; i<a.size(); i++)
   {
-    bvt clause1;
-
-    clause1.push_back(!cond);
-    clause1.push_back(a[i]);
-    clause1.push_back(!b[i]);
-
-    prop.lcnf(clause1);
-
-    bvt clause2;
-
-    clause2.push_back(!cond);
-    clause2.push_back(!a[i]);
-    clause2.push_back(b[i]);
-
-    prop.lcnf(clause2);
+    prop.lcnf(!cond,  a[i], !b[i]);
+    prop.lcnf(!cond, !a[i],  b[i]);
   }
 }

@@ -36,6 +36,7 @@ public:
   // bit-wise negation
   bvt inverted(const bvt &op);
 
+  literalt full_adder(const literalt a, const literalt b, const literalt carry_in, literalt &carry_out);
   literalt carry(literalt a, literalt b, literalt c);
 
   bvt add_sub(const bvt &op0, const bvt &op1, bool subtract);
