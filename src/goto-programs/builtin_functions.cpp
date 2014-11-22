@@ -1208,10 +1208,12 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set_comment(description);
     // we ignore any LHS
   }
-  else if(identifier=="c::__assert_rtn")
+  else if(identifier=="c::__assert_rtn" ||
+          identifier=="c::__assert")
   {
-    // __assert_rtn has been seen on MacOS    
-    // It takes four arguments:
+    // __assert_rtn has been seen on MacOS;
+    // __assert is FreeBSD.
+    // These take four arguments:
     // __func__, "file.c", line, "expression"
 
     if(arguments.size()!=4)
