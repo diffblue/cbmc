@@ -68,6 +68,8 @@ class aig_prop_constraintt:public aig_prop_baset
 public:
   inline aig_prop_constraintt():aig_prop_baset(aig)
   {
+    // Todo: Note that aig may not be constructed before
+    // it is passed to aig_prop_baset.  Proceed with caution.
   }
 
   aigt aig;
