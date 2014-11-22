@@ -248,7 +248,7 @@ Function: c_preprocess
 
 bool c_preprocess_codewarrior(const std::string &, std::ostream &, message_handlert &);
 bool c_preprocess_arm(const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_gcc(const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_gcc_clang(const std::string &, std::ostream &, message_handlert &, configt::ansi_ct::preprocessort);
 bool c_preprocess_none(const std::string &, std::ostream &, message_handlert &);
 bool c_preprocess_visual_studio(const std::string &, std::ostream &, message_handlert &);
 
@@ -263,7 +263,10 @@ bool c_preprocess(
     return c_preprocess_codewarrior(path, outstream, message_handler);
   
   case configt::ansi_ct::PP_GCC:
-    return c_preprocess_gcc(path, outstream, message_handler);
+    return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
+  
+  case configt::ansi_ct::PP_CLANG:
+    return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
   
   case configt::ansi_ct::PP_VISUAL_STUDIO:
     return c_preprocess_visual_studio(path, outstream, message_handler);
@@ -567,7 +570,7 @@ bool c_preprocess_codewarrior(
 
 /*******************************************************************\
 
-Function: c_preprocess_gcc
+Function: c_preprocess_gcc_clang
 
   Inputs:
 
@@ -577,10 +580,11 @@ Function: c_preprocess_gcc
 
 \*******************************************************************/
 
-bool c_preprocess_gcc(
+bool c_preprocess_gcc_clang(
   const std::string &file,
   std::ostream &outstream,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  configt::ansi_ct::preprocessort preprocessor)
 {
   // check extension
   if(is_dot_i_file(file))
@@ -593,7 +597,12 @@ bool c_preprocess_gcc(
 
   std::string command;
   
-  command="gcc -E -undef -D__CPROVER__";
+  if(preprocessor==configt::ansi_ct::PP_CLANG)
+    command="clang";
+  else
+    command="gcc";
+  
+  command +=" -E -undef -D__CPROVER__";
 
   command+=" -D__null=0";
   command+=" -D__WORDSIZE="+i2string(config.ansi_c.pointer_width);
