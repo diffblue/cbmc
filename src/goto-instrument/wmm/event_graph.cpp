@@ -1526,8 +1526,8 @@ std::string event_grapht::critical_cyclet::print_name(
   else if(last.variable!=ID_unknown && first.variable!=ID_unknown)
     assert(false);
 
-  critical_cyclet::size_type n_events=extra_fence_count;
 #if 0
+  critical_cyclet::size_type n_events=extra_fence_count;
   for(std::string::const_iterator it=name.begin();
       it!=name.end();
       ++it)
