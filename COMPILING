@@ -9,6 +9,8 @@ CPROVER compiles in the following environments:
 
 - Solaris 11
 
+- FreeBSD 10
+
 - Cygwin
   (We recommend the i686-pc-mingw32-g++ cross compiler, version 4.7 or above.)
 
@@ -76,6 +78,35 @@ COMPILATION ON SOLARIS 11
 
    Do not attempt to compile with gcc-45 that comes with Solaris 11.
    It will mis-optimize MiniSat2.
+
+
+COMPILATION ON FREEBSD 10
+-------------------------
+
+1) As root, get the necessary tools:
+
+   pkg install bash gmake subversion www/p5-libwww patch flex bison
+
+2) As a user, get the CBMC source via
+
+   svn co http://www.cprover.org/svn/cbmc/trunk cbmc-trunk
+
+3) Do
+
+   cd cbmc-trunk/src
+
+4) Change line 38 in the file "common" to say
+
+   CP_CXXFLAGS = -MMD -MP -DSTL_HASH_STD
+
+   Change line 66 to say
+
+   CXX = clang++
+
+5) Do
+
+   gmake minisat2-download
+   gmake
 
 
 COMPILATION ON MACOS X

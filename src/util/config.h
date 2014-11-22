@@ -97,7 +97,7 @@ public:
                    MODE_CODEWARRIOR_C_CPP, MODE_ARM_C_CPP } flavourt;
     flavourt mode; // the syntax of source files
 
-    typedef enum { NO_PP, PP_GCC, PP_VISUAL_STUDIO,
+    typedef enum { NO_PP, PP_GCC, PP_CLANG, PP_VISUAL_STUDIO,
                    PP_CODEWARRIOR, PP_ARM } preprocessort;
     preprocessort preprocessor; // the preprocessor to use
 

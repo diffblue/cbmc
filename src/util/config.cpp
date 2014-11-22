@@ -890,6 +890,13 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode=ansi_ct::MODE_GCC_C;
     ansi_c.preprocessor=ansi_ct::PP_GCC;
   }
+  else if(os=="freebsd")
+  {
+    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::OS_LINUX;
+    ansi_c.mode=ansi_ct::MODE_GCC_C;
+    ansi_c.preprocessor=ansi_ct::PP_CLANG;
+  }
   else
   {
     ansi_c.lib=configt::ansi_ct::LIB_NONE;
@@ -1246,8 +1253,12 @@ irep_idt configt::this_operating_system()
   this_os="windows";
   #elif __APPLE__
   this_os="macos";
-  #else
+  #elif __FreeBSD__
+  this_os="freebsd";
+  #elif __linux__
   this_os="linux";
+  #else
+  this_os="unknown";
   #endif
 
   return this_os;
