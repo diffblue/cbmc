@@ -868,7 +868,7 @@ bool configt::set(const cmdlinet &cmdline)
       // On anything else, it's GCC as the preprocessor,
       // but we recognize the Visual Studio language,
       // which is somewhat inconsistent.
-      #ifndef _WIN32
+      #ifdef _WIN32
       ansi_c.preprocessor=ansi_ct::PP_VISUAL_STUDIO;
       ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #elif __FreeBSD__
