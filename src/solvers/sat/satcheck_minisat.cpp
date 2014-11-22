@@ -267,7 +267,7 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
     if(solver->solve(MiniSat_assumptions))
     {
       msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
-      messaget::status(msg);
+      messaget::status() << msg << messaget::eom;
       status=SAT;
       return P_SATISFIABLE;
     }
