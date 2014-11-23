@@ -90,6 +90,10 @@ inline int __isnanl(long double ld) { return __CPROVER_isnanld(ld); }
 
 inline int isnormal(double d) { return __CPROVER_isnormald(d); }
 
+/* FUNCTION: __isnormalf */
+
+inline int __isnormalf(float f) { return __CPROVER_isnormalf(f); }
+
 /* FUNCTION: __builtin_inff */
 
 inline float __builtin_inff(void) { return 1.0f/0.0f; }
