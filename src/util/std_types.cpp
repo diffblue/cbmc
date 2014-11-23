@@ -27,7 +27,7 @@ unsigned fixedbv_typet::get_integer_bits() const
 {
   const irep_idt integer_bits=get(ID_integer_bits);
   assert(integer_bits!=irep_idt());
-  return unsafe_string2unsigned(integer_bits.c_str());
+  return unsafe_string2unsigned(id2string(integer_bits));
 }
 
 /*******************************************************************\
@@ -46,7 +46,7 @@ unsigned floatbv_typet::get_f() const
 {
   const irep_idt &f=get(ID_f);
   assert(f!=irep_idt());
-  return unsafe_string2unsigned(f.c_str());
+  return unsafe_string2unsigned(id2string(f));
 }
 
 /*******************************************************************\
