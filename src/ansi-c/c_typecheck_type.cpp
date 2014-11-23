@@ -79,7 +79,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_compound_type(to_struct_union_type(type));
   else if(type.id()==ID_c_enum)
     typecheck_c_enum_type(type);
-  else if(type.id()==ID_c_bitfield)
+  else if(type.id()==ID_c_bit_field)
     typecheck_c_bit_field_type(type);
   else if(type.id()==ID_typeof)
     typecheck_typeof_type(type);
@@ -777,7 +777,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
         new_component.type()=declaration.full_type(*d_it);
 
         // mark bit-fields as such
-        if(new_component.type().id()==ID_c_bitfield)
+        if(new_component.type().id()==ID_c_bit_field)
         {
           new_component.set_is_bit_field(true);
           typet tmp=new_component.type().subtype();

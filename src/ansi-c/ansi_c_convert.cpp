@@ -411,7 +411,7 @@ void ansi_c_convertt::convert_type(
     convert_type(type.subtype(), sub_storage_spec);
     c_storage_spec|=sub_storage_spec;
   }
-  else if(type.id()==ID_c_bitfield)
+  else if(type.id()==ID_c_bit_field)
   {
     convert_type(type.subtype());
     convert_expr(static_cast<exprt &>(type.add(ID_size)));

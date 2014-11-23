@@ -193,7 +193,7 @@ static void make_subtype(typet &dest, typet &src)
          src.id()==ID_pointer ||
          src.id()==ID_code ||
          src.id()==ID_merged_type ||
-         src.id()==ID_c_bitfield);
+         src.id()==ID_c_bit_field);
 
   typet *p=&dest;
 
