@@ -1006,7 +1006,7 @@ Purpose:
 
 \*******************************************************************/
 
-exprt collect_comma_expression(const exprt &src)
+static exprt collect_comma_expression(const exprt &src)
 {
   exprt result;
 
@@ -1095,8 +1095,8 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     else
     {
       err_location(expr);
-      str << "invalid explicit cast:" << std::endl;
-      str << "operand type: `" << to_string(expr.op0().type()) << "'" << std::endl;
+      str << "invalid explicit cast:\n";
+      str << "operand type: `" << to_string(expr.op0().type()) << "'\n";
       str << "casting to: `" << to_string(expr.type()) << "'";
       throw 0;
     }
