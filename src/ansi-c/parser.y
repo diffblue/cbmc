@@ -1602,7 +1602,7 @@ bit_field_size:
         ':' constant_expression
         {
           $$=$1;
-          set($$, ID_c_bitfield);
+          set($$, ID_c_bit_field);
           stack($$).set(ID_size, stack($2));
           stack($$).add(ID_subtype).id(ID_abstract);
         }

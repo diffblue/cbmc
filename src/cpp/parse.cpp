@@ -2657,7 +2657,7 @@ bool Parser::rDeclaratorWithInit(
       if(!rExpression(e))
         return false;
         
-      typet bit_field_type(ID_c_bitfield);
+      typet bit_field_type(ID_c_bit_field);
       bit_field_type.set(ID_size, e);
       bit_field_type.subtype().make_nil();
       set_location(bit_field_type, tk);

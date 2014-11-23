@@ -179,7 +179,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
   else if(type.id()==ID_c_enum_tag)
   {
   }
-  else if(type.id()==ID_c_bitfield)
+  else if(type.id()==ID_c_bit_field)
   {
     typecheck_c_bit_field_type(type);
   }
