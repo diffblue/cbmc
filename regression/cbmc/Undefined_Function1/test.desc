@@ -2,6 +2,7 @@ CORE
 main.c
 
 ^SIGNAL=0$
+^\*\*\*\* WARNING: no body for function c::f$
 ^Counterexample:$
 ^VERIFICATION FAILED$
 --
