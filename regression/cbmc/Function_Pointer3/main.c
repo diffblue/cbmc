@@ -1,7 +1,6 @@
+#include <assert.h>
 
 int nondet_int();
-void assert(_Bool b);
-
 
 typedef int (*FuncType)(int, int);
 
