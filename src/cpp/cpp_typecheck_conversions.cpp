@@ -248,8 +248,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
   c_qualifierst qual_from;
   qual_from.read(expr.type());
 
-  typet int_type(ID_signedbv);
-  int_type.set(ID_width, config.ansi_c.int_width);
+  typet int_type=signed_int_type();
   qual_from.write(int_type);
 
   if(expr.type().id()==ID_signedbv)
@@ -274,7 +273,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     return true;
   }
 
-  if(follow(expr.type()).id()==ID_c_enum)
+  if(expr.type().id()==ID_c_enum_tag)
   {
     new_expr=expr;
     new_expr.make_typecast(int_type);
@@ -376,7 +375,7 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
   if(expr.type().id()!=ID_signedbv &&
      expr.type().id()!=ID_unsignedbv &&
      expr.type().id()!=ID_bool &&
-     follow(expr.type()).id()!=ID_c_enum)
+     expr.type().id()!=ID_c_enum_tag)
     return false;
 
   if(expr.get_bool(ID_C_lvalue))
@@ -436,10 +435,10 @@ bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
   }
   else if(expr.type().id()==ID_signedbv ||
           expr.type().id()==ID_unsignedbv ||
-          follow(expr.type()).id()==ID_c_enum)
+          expr.type().id()==ID_c_enum_tag)
   {
-    if(type.id() != ID_fixedbv &&
-       type.id() != ID_floatbv)
+    if(type.id()!=ID_fixedbv &&
+       type.id()!=ID_floatbv)
       return false;
   }
   else
@@ -745,10 +744,10 @@ bool cpp_typecheckt::standard_conversion_boolean(
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
-  if(expr.type().id() != ID_signedbv &&
-     expr.type().id() != ID_unsignedbv &&
-     expr.type().id() != ID_pointer && 
-     follow(expr.type()).id() != ID_c_enum)
+  if(expr.type().id()!=ID_signedbv &&
+     expr.type().id()!=ID_unsignedbv &&
+     expr.type().id()!=ID_pointer && 
+     expr.type().id()!=ID_c_enum_tag)
     return false;
 
   c_qualifierst qual_from;
@@ -2147,13 +2146,13 @@ Function: cpp_typecheckt::static_typecast
 \*******************************************************************/
 
 bool cpp_typecheckt::static_typecast(
-  const exprt &expr,
-  const typet &type,
+  const exprt &expr, // source expression
+  const typet &type, // destination type
   exprt &new_expr,
   bool check_constantness)
 {
   exprt e=expr;
-
+  
   if(check_constantness && type.id()==ID_pointer)
   {
     if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
@@ -2218,16 +2217,16 @@ bool cpp_typecheckt::static_typecast(
     new_expr.make_typecast(type);
     return true;
   }
-
-  if(follow(type).id()==ID_c_enum && (
+  
+  // int/enum to enum
+  if(type.id()==ID_c_enum_tag && (
                 e.type().id()==ID_signedbv
              || e.type().id()==ID_unsignedbv
-             || follow(e.type()).id()==ID_c_enum))
+             || e.type().id()==ID_c_enum_tag))
   {
-    new_expr = e;
+    new_expr=e;
     new_expr.make_typecast(type);
-    if(new_expr.get_bool(ID_C_lvalue))
-      new_expr.remove(ID_C_lvalue);
+    new_expr.remove(ID_C_lvalue);
     return true;
   }
 
@@ -2235,7 +2234,7 @@ bool cpp_typecheckt::static_typecast(
   {
     if(!cpp_is_pod(type))
     {
-      exprt tc("already_typechecked");
+      exprt tc(ID_already_typechecked);
       tc.copy_to_operands(new_expr);
       exprt temporary;
       new_temporary(e.source_location(), type, tc, temporary);
