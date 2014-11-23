@@ -13,23 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: bitvector_typet::get_width
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-unsigned bitvector_typet::get_width() const
-{
-  return get_int(ID_width);
-}
-
-/*******************************************************************\
-
 Function: fixedbv_typet::get_integer_bits
 
   Inputs:
@@ -42,9 +25,9 @@ Function: fixedbv_typet::get_integer_bits
 
 unsigned fixedbv_typet::get_integer_bits() const
 {
-  const std::string &integer_bits=get_string("integer_bits");
-  assert(integer_bits!="");
-  return unsafe_string2unsigned(integer_bits);
+  const irep_idt integer_bits=get(ID_integer_bits);
+  assert(integer_bits!=irep_idt());
+  return unsafe_string2unsigned(integer_bits.c_str());
 }
 
 /*******************************************************************\
@@ -61,9 +44,9 @@ Function: floatbv_typet::get_f
 
 unsigned floatbv_typet::get_f() const
 {
-  const std::string &f=get_string(ID_f);
-  assert(f!="");
-  return unsafe_string2unsigned(f);
+  const irep_idt &f=get(ID_f);
+  assert(f!=irep_idt());
+  return unsafe_string2unsigned(f.c_str());
 }
 
 /*******************************************************************\
@@ -449,7 +432,7 @@ unsigned struct_union_typet::componentt::get_bit_field_bits() const
      t.id()==ID_unsignedbv)
     return to_bitvector_type(t).get_width();
   else if(t.id()==ID_c_enum)
-    return t.subtype().get_int(ID_width);
+    return t.subtype().get_unsigned_int(ID_width);
   else
     return 0;
 }

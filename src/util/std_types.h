@@ -865,7 +865,10 @@ public:
   {
   }
 
-  unsigned get_width() const;
+  inline unsigned get_width() const
+  {
+    return get_unsigned_int(ID_width);
+  }
 
   inline void set_width(unsigned width)
   {
