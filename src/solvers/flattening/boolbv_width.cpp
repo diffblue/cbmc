@@ -143,7 +143,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_verilogbv)
   {
     // we encode with two bits
-    entry.total_width=type.get_int(ID_width)*2;
+    entry.total_width=type.get_unsigned_int(ID_width)*2;
     assert(entry.total_width!=0);
   }
   else if(type_id==ID_range)
@@ -220,7 +220,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_c_enum)
   {
     // these have a subtype
-    entry.total_width=type.subtype().get_int(ID_width);
+    entry.total_width=type.subtype().get_unsigned_int(ID_width);
     assert(entry.total_width!=0);
   }
   else if(type_id==ID_incomplete_c_enum)

@@ -1134,7 +1134,7 @@ public:
   
   inline unsigned get_component_number() const
   {
-    return get_int(ID_component_number);
+    return get_unsigned_int(ID_component_number);
   }
 
   inline void set_component_number(unsigned component_number)
@@ -2665,7 +2665,7 @@ public:
   
   inline unsigned get_component_number() const
   {
-    return get_int(ID_component_number);
+    return get_unsigned_int(ID_component_number);
   }
 
   inline void set_component_number(unsigned component_number)
