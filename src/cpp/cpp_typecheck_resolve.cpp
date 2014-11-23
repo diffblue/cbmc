@@ -417,13 +417,19 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     {
       e=type_exprt();
 
-      if(symbol.is_macro)
+      if(symbol.is_macro) // includes typedefs
       {
         e.type()=symbol.type;
         assert(symbol.type.is_not_nil());
       }
-      else
+      else if(symbol.type.id()==ID_c_enum)
+      {
+        e.type()=c_enum_tag_typet(symbol.name);
+      }
+      else // will need to do struct, union
+      {
         e.type()=symbol_typet(symbol.name);
+      }
     }
     else if(symbol.is_macro)
     {
