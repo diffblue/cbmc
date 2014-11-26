@@ -5,7 +5,7 @@ BUILD_ENV = AUTO
 #CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 #CXXFLAGS = -std=c++11
 
-# If GLPK is available; this is used by goto-instrument.
+# If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk 
 
 # SAT-solvers we have
