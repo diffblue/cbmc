@@ -2777,7 +2777,7 @@ bool simplify_exprt::simplify_if(exprt &expr)
       }
     }
 
-    #if 0
+    #if 1
     // a ? b : c  --> a ? b[a/true] : c
     exprt tmp_true=truevalue;
     replace_expr(cond, true_exprt(), tmp_true);
