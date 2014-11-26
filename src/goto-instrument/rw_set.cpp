@@ -145,6 +145,11 @@ void rw_set_loct::read_write_rec(
       entry.object=object;
       entry.symbol_expr=symbol_expr;
       entry.guard=guard.as_expr(); // should 'OR'
+
+      if(dereferencing && dereferenced==NULL) 
+        dereferenced=&entry;
+      else if(dereferencing && dereferenced!=NULL)
+        dereferenced_from.insert(std::make_pair(&entry, dereferenced));
     }
     
     if(w)
@@ -153,6 +158,11 @@ void rw_set_loct::read_write_rec(
       entry.object=object;
       entry.symbol_expr=symbol_expr;
       entry.guard=guard.as_expr(); // should 'OR'
+
+      if(dereferencing && dereferenced==NULL) 
+        dereferenced=&entry;
+      else if(dereferencing && dereferenced!=NULL)
+        dereferenced_from.insert(std::make_pair(&entry, dereferenced));
     }
   }
   else if(expr.id()==ID_member)
@@ -171,6 +181,7 @@ void rw_set_loct::read_write_rec(
   else if(expr.id()==ID_dereference)
   {
     assert(expr.operands().size()==1);
+    dereferencing=true;
     read(expr.op0(), guard);
 
     exprt tmp=expr;
@@ -203,6 +214,9 @@ void rw_set_loct::read_write_rec(
     
     read_write_rec(tmp, r, w, suffix, guard);
     #endif    
+
+    dereferencing=false;
+    dereferenced=NULL;
   }
   else if(expr.id()==ID_typecast)
   {
