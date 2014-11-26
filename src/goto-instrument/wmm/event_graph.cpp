@@ -808,6 +808,12 @@ bool event_grapht::critical_cyclet::is_not_uniproc() const
     return false;
 
   const irep_idt& var=egraph[*it].variable;
+
+  /* if it is an array access, by over-approximation, we don't have
+     uniproc in the cycle (tab[]) */
+  if(!egraph.ignore_arrays && id2string(var).find("[]")!=std::string::npos)
+    return true;
+
   for(; it!=end(); ++it)
   {
     const abstract_eventt& it_evt=egraph[*it];

@@ -98,6 +98,15 @@ protected:
     unsigned current_thread;
     unsigned coming_from;
 
+    bool contains_shared_array(
+      goto_programt::const_targett targ,
+      goto_programt::const_targett i_it,
+      value_setst& value_sets
+      #ifdef LOCAL_MAY
+      , local_may_aliast local_may
+      #endif
+    ) const;
+
     /* transformers */
     void visit_cfg_thread() const;
     void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
@@ -336,9 +345,10 @@ public:
   /* sets parameters for collection, if required */
   void set_parameters_collection(
     unsigned _max_var = 0,
-    unsigned _max_po_trans = 0)
+    unsigned _max_po_trans = 0,
+    bool _ignore_arrays = false)
   {
-    egraph.set_parameters_collection(_max_var,_max_po_trans);
+    egraph.set_parameters_collection(_max_var,_max_po_trans,_ignore_arrays);
   }
 
   /* builds the relations between unsafe pairs in the critical cycles and

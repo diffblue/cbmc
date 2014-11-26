@@ -138,7 +138,8 @@ void weak_memory(
   bool render_function,
   bool cav11_option,
   bool hide_internals, 
-  message_handlert& message_handler)
+  message_handlert& message_handler,
+  bool ignore_arrays)
 {
   messaget message(message_handler);
 
@@ -170,9 +171,10 @@ void weak_memory(
 
   // collects cycles, directly or by SCCs
   if(input_max_var!=0 || input_max_po_trans!=0)
-    instrumenter.set_parameters_collection(input_max_var,input_max_po_trans);
+    instrumenter.set_parameters_collection(input_max_var,
+      input_max_po_trans, ignore_arrays);
   else
-    instrumenter.set_parameters_collection(max_thds);
+    instrumenter.set_parameters_collection(max_thds, ignore_arrays);
   
   if(SCC)
   {
