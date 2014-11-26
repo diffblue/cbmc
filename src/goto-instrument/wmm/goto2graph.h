@@ -29,10 +29,11 @@ class local_may_aliast;
 
 class instrumentert
 {
-protected:
+public:
   /* reference to goto-functions and symbol_table */
   namespacet ns;
 
+protected:
   goto_functionst &goto_functions; 
 
   /* alternative representation of graph (SCC) */

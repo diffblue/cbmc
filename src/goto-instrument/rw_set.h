@@ -31,7 +31,8 @@ Date: February 2006
 class rw_set_baset
 {
 public:
-  rw_set_baset(const namespacet &_ns):ns(_ns)
+  rw_set_baset(const namespacet &_ns)
+    :dereferencing(false), dereferenced(NULL), ns(_ns)
   {
   }
 
@@ -48,7 +49,17 @@ public:
   
   typedef hash_map_cont<irep_idt, entryt, irep_id_hash> entriest;
   entriest r_entries, w_entries;
-  
+ 
+  /* keeps track of who is dereferenced from who. 
+     E.g., y=&z; x=*y;
+     reads(x=*y;)={y,z} 
+     dereferenced_from={z|->y} */
+  std::map<const entryt*, const entryt*> dereferenced_from;
+
+  /* flag and variable in the expression, from which we dereference */
+  bool dereferencing;
+  entryt* dereferenced;
+ 
   void swap(rw_set_baset &other)
   {
     std::swap(other.r_entries, r_entries);
