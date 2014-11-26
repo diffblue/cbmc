@@ -35,6 +35,7 @@ void weak_memory(
   bool render_function,
   bool cav11_option,
   bool hide_internals,
-  message_handlert& message);
+  message_handlert& message,
+  bool ignore_arrays);
 
 #endif

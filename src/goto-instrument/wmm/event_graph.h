@@ -202,6 +202,7 @@ protected:
   /* parameters limiting the exploration */
   unsigned max_var;
   unsigned max_po_trans;
+  bool ignore_arrays;
 
   /* graph explorer (for each cycles collection) */
   class graph_explorert
@@ -484,11 +485,14 @@ public:
     exploration.collect_cycles(set_of_cycles,model);
   }
 
-  void set_parameters_collection(unsigned _max_var=0, 
-    unsigned _max_po_trans=0)
+  void set_parameters_collection(
+    unsigned _max_var=0, 
+    unsigned _max_po_trans=0,
+    bool _ignore_arrays=false)
   {
     max_var = _max_var;
     max_po_trans = _max_po_trans;
+    ignore_arrays = _ignore_arrays;
   }
 };
 
