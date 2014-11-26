@@ -23,6 +23,7 @@ Date: 2012
 #include "wmm.h"
 
 class messaget;
+class namespacet;
 
 /*******************************************************************\
                      graph of abstract events
@@ -55,8 +56,10 @@ public:
   public:
     unsigned id;
 
+    bool has_user_defined_fence;
+
     critical_cyclet(event_grapht& _egraph, unsigned _id)
-      :egraph(_egraph),id(_id)
+      :egraph(_egraph),id(_id), has_user_defined_fence(false)
     {
     }
 
@@ -65,6 +68,7 @@ public:
       clear();
       for(const_iterator it=cyc.begin(); it!=cyc.end(); it++)
         push_back(*it);
+      has_user_defined_fence=cyc.has_user_defined_fence;
     }
     
     bool is_cycle()
@@ -313,6 +317,25 @@ protected:
     }
   };
 
+  /* explorer for pairs collection a la Pensieve */
+  class graph_pensieve_explorert:public graph_explorert
+  {
+  protected:
+    std::set<unsigned> visited_nodes;
+    bool naive;
+
+    bool find_second_event(unsigned source);
+
+  public:
+    graph_pensieve_explorert(event_grapht& _egraph, unsigned _max_var,
+      unsigned _max_po_trans)
+      :graph_explorert(_egraph,_max_var,_max_po_trans), naive(false) 
+    {}
+
+    void set_naive() {naive=true;}
+    void collect_pairs(namespacet& ns);
+  };
+
 public:
   event_grapht(messaget& _message):
     filter_thin_air(true),
@@ -499,6 +522,20 @@ public:
     max_po_trans = _max_po_trans;
     ignore_arrays = _ignore_arrays;
   }
-};
 
+  /* collects all the pairs of events with respectively at least one cmp, 
+     regardless of the architecture (Pensieve'05 strategy) */
+  void collect_pairs(namespacet& ns)
+  {
+    graph_pensieve_explorert exploration(*this, max_var, max_po_trans);
+    exploration.collect_pairs(ns);
+  }
+
+  void collect_pairs_naive(namespacet& ns)
+  {
+    graph_pensieve_explorert exploration(*this, max_var, max_po_trans);
+    exploration.set_naive();
+    exploration.collect_pairs(ns);
+  }
+};
 #endif

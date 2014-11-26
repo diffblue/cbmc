@@ -154,6 +154,11 @@ event_grapht::critical_cyclet event_grapht::graph_explorert::extract_cycle(
       << egraph[current_vertex].thread << "~" << egraph[current_vertex].local
       << messaget::eom;
 
+    if(!new_cycle.has_user_defined_fence)
+    {
+      new_cycle.has_user_defined_fence=egraph[current_vertex].is_fence();
+    }
+
     if(current_vertex==vertex)
       incycle=true;
 
