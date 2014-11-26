@@ -24,6 +24,70 @@ std::string colour_map[NB_COLOURS] = {"red", "blue", "black", "green", "yellow",
 
 /*******************************************************************\
 
+Function: event_grapht::print_rec_graph
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void event_grapht::print_rec_graph(std::ofstream& file, unsigned node_id, 
+  std::set<unsigned>& visited) 
+{
+  const abstract_eventt& node=operator[](node_id);
+  file << node_id << "[label=\"" << node << ", " << node.source_location << 
+    "\"];" << std::endl;
+  visited.insert(node_id);
+
+  for(graph<abstract_eventt>::edgest::const_iterator
+    it=po_out(node_id).begin();
+    it!=po_out(node_id).end(); ++it)
+  {
+    file << node_id << "->" << it->first << "[]" << std::endl;
+    file << "{rank=same; " << node_id << "; " << it->first << "}" << std::endl;
+    if(visited.find(it->first)==visited.end())
+      print_rec_graph(file, it->first, visited);
+  }
+
+  for(graph<abstract_eventt>::edgest::const_iterator
+    it=com_out(node_id).begin();
+    it!=com_out(node_id).end(); ++it)
+  {
+    file << node_id << "->" << it->first << "[style=\"dotted\"]" << std::endl;
+    if(visited.find(it->first)==visited.end())
+      print_rec_graph(file, it->first, visited);
+  }
+}
+
+/*******************************************************************\
+
+Function: event_grapht::print_graph
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void event_grapht::print_graph() {
+  assert(po_order.size()>0);
+  std::set<unsigned> visited;
+  unsigned root=po_order.front();
+  std::ofstream file;
+  file.open("graph.dot");
+  file << "digraph G {" << std::endl;
+  file << "rankdir=LR;" << std::endl;
+  print_rec_graph(file, root, visited);
+  file << "}" << std::endl;
+}
+
+/*******************************************************************\
+
 Function: event_grapht::copy_segment
 
   Inputs:

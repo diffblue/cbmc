@@ -469,6 +469,11 @@ public:
     map_data_dp.clear();
   }
 
+  /* prints to graph.dot */
+  void print_graph();
+  void print_rec_graph(std::ofstream& file, unsigned node_id,
+    std::set<unsigned>& visited);
+
   /* Tarjan 1972 adapted and modified for events + po-transitivity */
   void collect_cycles(std::set<critical_cyclet>& set_of_cycles, 
     memory_modelt model,
