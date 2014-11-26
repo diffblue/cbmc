@@ -1081,7 +1081,9 @@ bool shared_bufferst::is_buffered(
      identifier=="c::stderr" ||
      identifier=="c::sys_nerr" ||
      has_prefix(id2string(identifier), "__unbuffered_") ||
-     has_prefix(id2string(identifier), "c::__unbuffered_") )
+     has_prefix(id2string(identifier), "c::__unbuffered_")  ||
+     has_prefix(id2string(identifier), "__CPROVER") ||
+     has_prefix(id2string(identifier), "c::__CPROVER") )
     return false; // not buffered
 
   const symbolt &symbol=ns.lookup(identifier);
