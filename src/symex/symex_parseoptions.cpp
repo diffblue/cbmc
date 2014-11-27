@@ -76,7 +76,7 @@ void symex_parseoptionst::eval_verbosity()
   
   if(cmdline.isset("verbosity"))
   {
-    v=unsafe_string2int(cmdline.getval("verbosity"));
+    v=unsafe_string2int(cmdline.get_value("verbosity"));
     if(v<0)
       v=0;
     else if(v>10)
@@ -107,10 +107,10 @@ void symex_parseoptionst::get_command_line_options(optionst &options)
   }
 
   if(cmdline.isset("debug-level"))
-    options.set_option("debug-level", cmdline.getval("debug-level"));
+    options.set_option("debug-level", cmdline.get_value("debug-level"));
 
   if(cmdline.isset("unwindset"))
-    options.set_option("unwindset", cmdline.getval("unwindset"));
+    options.set_option("unwindset", cmdline.get_value("unwindset"));
 
   // check array bounds
   if(cmdline.isset("bounds-check"))
@@ -174,7 +174,7 @@ void symex_parseoptionst::get_command_line_options(optionst &options)
 
   // magic error label
   if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.getval("error-label"));
+    options.set_option("error-label", cmdline.get_value("error-label"));
 }
 
 /*******************************************************************\
@@ -245,13 +245,13 @@ int symex_parseoptionst::doit()
     path_search.set_message_handler(get_message_handler());
 
     if(cmdline.isset("depth"))
-      path_search.set_depth_limit(unsafe_string2unsigned(cmdline.getval("depth")));
+      path_search.set_depth_limit(unsafe_string2unsigned(cmdline.get_value("depth")));
 
     if(cmdline.isset("context-bound"))
-      path_search.set_context_bound(unsafe_string2unsigned(cmdline.getval("context-bound")));
+      path_search.set_context_bound(unsafe_string2unsigned(cmdline.get_value("context-bound")));
 
     if(cmdline.isset("unwind"))
-      path_search.set_unwind_limit(unsafe_string2unsigned(cmdline.getval("unwind")));
+      path_search.set_unwind_limit(unsafe_string2unsigned(cmdline.get_value("unwind")));
 
     if(cmdline.isset("show-vcc"))
     {
