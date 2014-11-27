@@ -28,4 +28,10 @@ typedef enum {
   one_event_per_cycle=5
 } instrumentation_strategyt;
 
+typedef enum {
+  arrays_only=0,
+  all_loops=1,
+  no_loop=2
+} loop_strategyt;
+
 #endif

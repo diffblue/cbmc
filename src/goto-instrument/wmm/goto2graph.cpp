@@ -112,14 +112,15 @@ Function: instrumentert::goto2graph_cfg
 unsigned instrumentert::goto2graph_cfg(
   value_setst& value_sets,
   memory_modelt model,
-  bool no_dependencies)
+  bool no_dependencies,
+  loop_strategyt duplicate_body)
 {
   if(!no_dependencies)
     message.status() << "Dependencies analysis enabled" << messaget::eom;
 
   /* builds the graph following the CFG */
   cfg_visitort visitor(ns, *this);
-  visitor.visit_cfg(value_sets, model, no_dependencies, 
+  visitor.visit_cfg(value_sets, model, no_dependencies, duplicate_body, 
     goto_functions.entry_point());
 
   std::vector<unsigned> subgraph_index;
@@ -176,6 +177,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     value_setst& value_sets,
     memory_modelt model,
     bool no_dependencies,
+    loop_strategyt replicate_body,
     /* function to analyse */
     const irep_idt& function,
     /* incoming edges */
@@ -271,12 +273,12 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     else if(instruction.is_function_call())
     {
       visit_cfg_function_call(value_sets, i_it, model, 
-        no_dependencies);
+        no_dependencies, replicate_body);
     }
 
     else if(instruction.is_goto())
     {
-      visit_cfg_goto(i_it, value_sets
+      visit_cfg_goto(i_it, replicate_body, value_sets
 #ifdef LOCAL_MAY
         , local_may
 #endif
@@ -464,7 +466,88 @@ void inline instrumentert::cfg_visitort::visit_cfg_reference_function (
 
 /*******************************************************************\
 
-Function: instrumentert::visit_cfg_body
+Function: alt_copy_segment
+  
+  Inputs:
+  
+ Outputs:
+  
+ Purpose:
+  
+\*******************************************************************/
+
+unsigned alt_copy_segment(graph<abstract_eventt>& alt_egraph, 
+  unsigned begin, unsigned end)
+{
+  /* no need to duplicate the loop nodes for the SCC-detection graph -- a 
+     single back-edge will ensure the same connectivity */
+  alt_egraph.add_edge(end, begin);
+  return end;
+}
+
+/*******************************************************************\
+
+Function: instrumentert::visit_cfg_visitort::contains_shared_array
+  
+  Inputs:
+  
+ Outputs:
+  
+ Purpose:
+  
+\*******************************************************************/
+
+bool instrumentert::cfg_visitort::contains_shared_array(
+  goto_programt::const_targett targ, 
+  goto_programt::const_targett i_it,
+  value_setst& value_sets
+  #ifdef LOCAL_MAY
+  , local_may_aliast local_may
+  #endif
+) const
+{
+  instrumenter.message.debug() << "contains_shared_array called for " 
+    << targ->source_location.get_line() << " and " 
+    << i_it->source_location.get_line() << messaget::eom;
+  for(goto_programt::const_targett cur=targ; cur!=i_it; ++cur)
+  {   
+    instrumenter.message.debug() << "Do we have an array at line "
+      <<cur->source_location.get_line()<<"?" << messaget::eom;
+    rw_set_loct rw_set(ns, value_sets, cur
+      #ifdef LOCAL_MAY
+      , local_may
+      #endif
+    );
+    instrumenter.message.debug() << "Writes: "<<rw_set.w_entries.size()
+      <<"; Reads:"<<rw_set.r_entries.size() << messaget::eom;
+
+    forall_rw_set_r_entries(r_it, rw_set)
+    {
+      const irep_idt var=r_it->second.object;
+      instrumenter.message.debug() << "Is "<<var<<" an array?" 
+        << messaget::eom;
+      if(id2string(var).find("[]")!=std::string::npos 
+        && !instrumenter.local(var))
+        return true;
+    }
+
+    forall_rw_set_w_entries(w_it, rw_set)
+    { 
+      const irep_idt var=w_it->second.object;
+      instrumenter.message.debug()<<"Is "<<var<<" an array?"<<messaget::eom;
+      if(id2string(var).find("[]")!=std::string::npos 
+        && !instrumenter.local(var))
+        return true;
+    }
+  }
+
+  return false;
+}
+
+
+/*******************************************************************\
+
+Function: instrumentert::visit_cfg_visitort::visit_cfg_body
   
   Inputs:
   
@@ -474,14 +557,9 @@ Function: instrumentert::visit_cfg_body
   
 \*******************************************************************/
 
-unsigned alt_copy_segment(graph<abstract_eventt>& alt_egraph, unsigned begin, unsigned end)
-{
-  alt_egraph.add_edge(end, begin);
-  return end;
-}
-
 void inline instrumentert::cfg_visitort::visit_cfg_body(
   goto_programt::instructionst::iterator i_it, 
+  loop_strategyt replicate_body,
   value_setst& value_sets
 #ifdef LOCAL_MAY
   , local_may_aliast& local_may
@@ -500,7 +578,174 @@ void inline instrumentert::cfg_visitort::visit_cfg_body(
     {
       if(in_pos[i_it].empty())
         continue;
+
+      bool duplicate_this=false;
+
+      switch(replicate_body) {
+        case arrays_only:
+          duplicate_this=contains_shared_array(*targ, i_it, value_sets
+            #ifdef LOCAL_MAY
+            , local_may
+            #endif
+          );
+          break;
+        case all_loops:
+          duplicate_this=true;
+          break;
+        case no_loop:
+          duplicate_this=false;
+          break;
+      } 
+
+      if(duplicate_this)
+        visit_cfg_duplicate(*targ, i_it);
+      else
+        visit_cfg_backedge(*targ, i_it);
     }
+  }
+}
+
+/*******************************************************************\
+
+Function: instrumentert::visit_cfg_visitort::visit_cfg_duplicate
+  
+  Inputs:
+  
+ Outputs:
+  
+ Purpose: 
+  
+\*******************************************************************/
+
+void inline instrumentert::cfg_visitort::visit_cfg_duplicate(
+  goto_programt::targett targ, goto_programt::targett i_it)
+{
+  instrumenter.message.status() << "Duplication..." << messaget::eom;
+  const goto_functionst::goto_functiont& fun=instrumenter.goto_functions.function_map[i_it->function];
+ 
+  bool found_pos=false;
+  goto_programt::instructiont::targett new_targ=targ;
+
+  if(in_pos[targ].empty())
+  {
+    /* tries to find the next node after the back edge */
+    for(; new_targ!=fun.body.instructions.end(); 
+      ++new_targ)
+    {
+      if(in_pos.find(new_targ)!=in_pos.end() && !in_pos[new_targ].empty())
+      {
+        found_pos=true;
+        break;
+      }
+    }
+
+    if(!found_pos 
+      || new_targ->source_location.get_function()
+        !=targ->source_location.get_function()
+      || new_targ->source_location.get_file()
+        !=targ->source_location.get_file())
+      return;
+  }
+
+  /* appends the body once more */
+  const std::set<nodet>& up_set=in_pos[(found_pos ? new_targ : targ)];
+  const std::set<nodet>& down_set=in_pos[i_it];
+
+  for(std::set<nodet>::const_iterator begin_it=up_set.begin();
+    begin_it!=up_set.end(); ++begin_it)
+    instrumenter.message.debug() << "Up " << begin_it->first << messaget::eom;
+
+  for(std::set<nodet>::const_iterator begin_it=down_set.begin();
+    begin_it!=down_set.end(); ++begin_it)
+    instrumenter.message.debug() << "Down " << begin_it->first <<messaget::eom;
+
+  for(std::set<nodet>::const_iterator begin_it=up_set.begin();
+    begin_it!=up_set.end(); ++begin_it)
+  {
+    for(std::set<nodet>::const_iterator end_it=down_set.begin();
+      end_it!=down_set.end(); ++end_it)
+    {
+      egraph.copy_segment(begin_it->first, end_it->first);
+      alt_copy_segment(egraph_alt, begin_it->second, end_it->second);
+#if 0
+      const unsigned end=egraph.copy_segment(begin_it->first, end_it->first);
+      const unsigned alt_end=alt_copy_segment(egraph_alt, begin_it->second, end_it->second);
+      //in_pos[i_it].insert(nodet(end, alt_end)); // copied; no need for back-edge!
+#endif
+    }
+  }
+} 
+
+/*******************************************************************\
+
+Function: instrumentert::visit_cfg_visitort::visit_cfg_backedge
+  
+  Inputs:
+  
+ Outputs:
+  
+ Purpose: strategy: fwd/bwd alternation
+  
+\*******************************************************************/
+
+void inline instrumentert::cfg_visitort::visit_cfg_backedge(
+  goto_programt::targett targ, goto_programt::targett i_it)
+{   
+  /* if in_pos was updated at this program point */
+  if(updated.find(targ)!=updated.end())
+  {
+    /* connects the previous nodes to those ones */
+    for(std::set<nodet>::const_iterator to=in_pos[targ].begin();
+      to!=in_pos[targ].end(); ++to)
+      for(std::set<nodet>::const_iterator from=in_pos[i_it].begin();
+        from!=in_pos[i_it].end(); ++from)
+        if(from->first!=to->first)
+        {
+          instrumenter.message.debug() << from->first<<"-po->"
+            <<to->first << messaget::eom;
+          egraph.add_po_back_edge(from->first,to->first);
+          egraph_alt.add_edge(from->second,to->second);
+        }
+  }
+  else
+  {
+    instrumenter.message.debug() << "else case" << messaget::eom;
+
+    /* connects NEXT nodes following the targets -- bwd analysis */
+    for(goto_programt::instructionst::iterator cur=i_it;
+      cur!=targ; --cur)
+    {
+      for(std::set<goto_programt::instructiont::targett>::const_iterator 
+        t=cur->incoming_edges.begin();
+        t!=cur->incoming_edges.end(); ++t)
+      {
+        if(in_pos.find(*t)!=in_pos.end() 
+          && updated.find(*t)!=updated.end())
+        {
+          /* out_pos[*t].insert(in_pos[*t])*/
+          add_all_pos(it1, out_pos[*t], in_pos[*t]);
+        }
+        else if(in_pos.find(*t)!=in_pos.end())
+        {
+          /* out_pos[*t].insert(in_pos[cur])*/
+          add_all_pos(it2, out_pos[*t], out_pos[cur]);
+        }
+      }
+    }
+
+    /* connects the previous nodes to those ones */
+    if(out_pos.find(targ)!=out_pos.end())
+      for(std::set<nodet>::const_iterator to=out_pos[targ].begin();
+        to!=out_pos[targ].end(); ++to)
+        for(std::set<nodet>::const_iterator from=in_pos[i_it].begin();
+          from!=in_pos[i_it].end(); ++from)
+          if(from->first!=to->first)
+          {
+            instrumenter.message.debug() << from->first<<"-po->"
+              <<to->first << messaget::eom;
+            egraph.add_po_back_edge(from->first,to->first);
+            egraph_alt.add_edge(from->second,to->second);
+          }
   }
 }
 
@@ -518,6 +763,7 @@ Function: instrumentert::visit_cfg_goto
 
 void instrumentert::cfg_visitort::visit_cfg_goto(
   goto_programt::instructionst::iterator i_it,
+  loop_strategyt replicate_body,
   value_setst& value_sets
 #ifdef LOCAL_MAY
   , local_may_aliast& local_may
@@ -536,7 +782,7 @@ void instrumentert::cfg_visitort::visit_cfg_goto(
   if(instruction.is_backwards_goto())
   {
     instrumenter.message.debug() << "backward goto" << messaget::eom;          
-    visit_cfg_body(i_it, value_sets
+    visit_cfg_body(i_it, replicate_body, value_sets
 #ifdef LOCAL_MAY
     , local_may
 #endif
@@ -560,7 +806,8 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
   value_setst& value_sets, 
   goto_programt::instructionst::iterator i_it,
   memory_modelt model,
-  bool no_dependencies)
+  bool no_dependencies,
+  loop_strategyt replicate_body)
 {
   const goto_programt::instructiont& instruction=*i_it;
   std::set<nodet> s;
@@ -603,7 +850,7 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
     #endif
     {
       /* normal inlining strategy */
-      visit_cfg_function(value_sets, model, no_dependencies, 
+      visit_cfg_function(value_sets, model, no_dependencies, replicate_body, 
         fun_id, s, in_pos[i_it]);
       updated.insert(i_it);
     }

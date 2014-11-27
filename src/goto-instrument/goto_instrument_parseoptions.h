@@ -33,7 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(minimum-interference)" \
   "(mm):(my-events)(unwind):" \
   "(max-var):(max-po-trans):(ignore-arrays)" \
-  "(cfg-kill)(no-dependencies)" \
+  "(cfg-kill)(no-dependencies)(force-loop-duplication)" \
   "(call-graph)" \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \

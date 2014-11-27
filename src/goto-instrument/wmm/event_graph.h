@@ -457,14 +457,19 @@ public:
 
   /* copies the sub-graph G between begin and end into G', connects
      G.end with G'.begin, and returns G'.end */
+  void explore_copy_segment(std::set<unsigned>& explored, unsigned begin, 
+    unsigned end) const;
   unsigned copy_segment(unsigned begin, unsigned end);
+
+  /* to keep track of the loop already copied */
+  std::set<std::pair<const abstract_eventt&, const abstract_eventt&> > duplicated_bodies;
 
   bool is_local(unsigned a)
   {
     return operator[](a).local;
   }
 
-  /* a -po-> b */
+  /* a -po-> b  -- transitive */
   bool are_po_ordered(unsigned a, unsigned b)
   {
     if(operator[](a).thread!=operator[](b).thread)
