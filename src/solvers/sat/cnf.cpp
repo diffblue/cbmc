@@ -562,9 +562,8 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
   if(a.is_constant()) return a.sign() ? b : c;
   if(b==c) return b;
 
-  if (b.is_constant()) return b.sign() ? lor(a,c) : land(!a,c);
-  if (c.is_constant()) return c.sign() ? lor(!a,b) : land(a,b);
-
+  if(b.is_constant()) return b.sign() ? lor(a, c) : land(!a, c);
+  if(c.is_constant()) return c.sign() ? lor(!a, b) : land(a, b);
 
   #ifdef COMPACT_ITE
 
@@ -580,17 +579,15 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
   lcnf(!a,  b, !o);
 
   #ifdef OPTIMAL_COMPACT_ITE
-
+  // additional clauses to enable better propagation
   lcnf( b,  c, !o);
   lcnf(!b, !c,  o);
-
   #endif
 
   return o;
 
   #else
   return lor(land(a, b), land(!a, c));
-
   #endif
 }
 
