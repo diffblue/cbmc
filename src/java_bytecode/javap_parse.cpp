@@ -117,7 +117,7 @@ protected:
   {
     // follow a #number
     assert(!ref.empty() && ref[0]=='#');
-    return constants[unsafe_str2unsigned(ref.c_str()+1)].value_string;
+    return constants[unsafe_c_str2unsigned(ref.c_str()+1)].value_string;
   }
   
   typedef std::map<unsigned, unsigned> address_to_linet;

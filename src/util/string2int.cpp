@@ -15,7 +15,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 /*******************************************************************\
 
-Function: safe_str2number
+Function: safe_c_str2number
 
   Inputs:
 
@@ -52,7 +52,7 @@ inline T str2number(const char *str, int base, bool safe)
 
 /*******************************************************************\
 
-Function: safe_str2int
+Function: safe_c_str2int
 
   Inputs:
 
@@ -62,14 +62,14 @@ Function: safe_str2int
 
 \*******************************************************************/
 
-int safe_str2int(const char *str, int base)
+int safe_c_str2int(const char *str, int base)
 {
   return str2number<int>(str, base, true);
 }
 
 /*******************************************************************\
 
-Function: safe_str2unsigned
+Function: safe_c_str2unsigned
 
   Inputs:
 
@@ -79,7 +79,7 @@ Function: safe_str2unsigned
 
 \*******************************************************************/
 
-unsigned safe_str2unsigned(const char *str, int base)
+unsigned safe_c_str2unsigned(const char *str, int base)
 {
   return str2number<unsigned>(str, base, true);
 }
@@ -120,7 +120,7 @@ unsigned safe_string2unsigned(const std::string &str, int base)
 
 /*******************************************************************\
 
-Function: unsafe_str2int
+Function: unsafe_c_str2int
 
   Inputs:
 
@@ -130,14 +130,14 @@ Function: unsafe_str2int
 
 \*******************************************************************/
 
-int unsafe_str2int(const char *str, int base)
+int unsafe_c_str2int(const char *str, int base)
 {
   return str2number<int>(str, base, false);
 }
 
 /*******************************************************************\
 
-Function: unsafe_str2unsigned
+Function: unsafe_c_str2unsigned
 
   Inputs:
 
@@ -147,7 +147,7 @@ Function: unsafe_str2unsigned
 
 \*******************************************************************/
 
-unsigned unsafe_str2unsigned(const char *str, int base)
+unsigned unsafe_c_str2unsigned(const char *str, int base)
 {
   return str2number<unsigned>(str, base, false);
 }
