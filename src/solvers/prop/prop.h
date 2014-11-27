@@ -50,12 +50,15 @@ public:
   { l_set_to(a, false); }
 
   // constraints
-  inline void lcnf(literalt l1, literalt l2)
-  { bvt b; b.push_back(l1); b.push_back(l2); lcnf(b); }
-  inline void lcnf(literalt l1, literalt l2, literalt l3)
-  { bvt b; b.push_back(l1); b.push_back(l2); b.push_back(l3); lcnf(b); }
-  inline void lcnf(literalt l1, literalt l2, literalt l3, literalt l4)
-  { bvt b; b.push_back(l1); b.push_back(l2); b.push_back(l3); b.push_back(l4); lcnf(b); }
+  inline void lcnf(literalt l0, literalt l1)
+  { lcnf_bv.resize(2); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf(lcnf_bv); }
+
+  inline void lcnf(literalt l0, literalt l1, literalt l2)
+  { lcnf_bv.resize(3); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf_bv[2]=l2; lcnf(lcnf_bv); }
+
+  inline void lcnf(literalt l0, literalt l1, literalt l2, literalt l3)
+  { lcnf_bv.resize(4); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf_bv[2]=l2; lcnf_bv[3]=l3; lcnf(lcnf_bv); }
+
   virtual void lcnf(const bvt &bv)=0;
   virtual bool has_set_to() const { return true; }
   
@@ -87,6 +90,10 @@ public:
   
   // an incremental solver may remove any variables that aren't frozen
   virtual void set_frozen(literalt a) { }
+
+protected:
+  // to avoid a temporary for lcnf(...)
+  bvt lcnf_bv;
 };
 
 #endif
