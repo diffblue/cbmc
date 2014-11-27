@@ -113,6 +113,7 @@ protected:
     void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
     void visit_cfg_body(
       goto_programt::instructionst::iterator i_it, 
+      loop_strategyt replicate_body,
       value_setst& value_sets
       #ifdef LOCAL_MAY
       , local_may_aliast& local_may
@@ -135,9 +136,13 @@ protected:
     void visit_cfg_function_call(value_setst& value_sets, 
       goto_programt::instructionst::iterator i_it, 
       memory_modelt model,
-      bool no_dependencies);
+      bool no_dependenciess,
+      loop_strategyt duplicate_body);
     void visit_cfg_goto(
       goto_programt::instructionst::iterator i_it,
+      /* forces the duplication of all the loops, with array or not
+         otherwise, duplication of loops with array accesses only */
+      loop_strategyt replicate_body,
       value_setst& value_sets
       #ifdef LOCAL_MAY
       , local_may_aliast& local_may
@@ -230,6 +235,7 @@ protected:
       value_setst &value_sets,
       memory_modelt model,
       bool no_dependencies,
+      loop_strategyt duplicate_body,
       const irep_idt& function)
     {
       /* ignore recursive calls -- underapproximation */
@@ -238,7 +244,7 @@ protected:
         enter_function(function);
         const std::set<nodet> empty_in;
         std::set<nodet> end_out;
-        visit_cfg_function(value_sets, model, no_dependencies, 
+        visit_cfg_function(value_sets, model, no_dependencies, duplicate_body,
           function, empty_in, end_out);
         leave_function(function);
       }
@@ -253,6 +259,7 @@ protected:
       value_setst& value_sets,
       memory_modelt model,
       bool no_dependencies,
+      loop_strategyt duplicate_body,
       /* functino to analyse */
       const irep_idt& function,
       /* incoming edges */
@@ -328,7 +335,9 @@ public:
   unsigned goto2graph_cfg(
     value_setst& value_sets,
     memory_modelt model,
-    bool no_dependencies);
+    bool no_dependencies,
+    /* forces the duplication, with arrays or not; otherwise, arrays only */
+    loop_strategyt duplicate_body);
 
   /* collects directly all the cycles in the graph */
   void collect_cycles(memory_modelt model)

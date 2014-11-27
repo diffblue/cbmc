@@ -28,6 +28,7 @@ void weak_memory(
   unsigned unwinding_bound,
   bool no_cfg_kill,
   bool no_dependencies,
+  loop_strategyt duplicate_body,
   unsigned max_var,
   unsigned max_po_trans,
   bool render_po,

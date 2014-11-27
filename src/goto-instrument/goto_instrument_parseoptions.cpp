@@ -780,6 +780,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         model=Unknown;
       }
 
+      loop_strategyt loops=arrays_only;
+
+      if(cmdline.isset("force-loop-duplication"))
+        loops=all_loops;
+      if(cmdline.isset("no-loop-duplication"))
+        loops=no_loop;
+
       if(model!=Unknown)
         weak_memory(
           model,
@@ -791,6 +798,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
           unwind_loops,
           !cmdline.isset("cfg-kill"),
           cmdline.isset("no-dependencies"),
+          loops,
           max_var,
           max_po_trans,
           !cmdline.isset("no-po-rendering"),
