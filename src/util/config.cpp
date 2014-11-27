@@ -887,7 +887,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode=ansi_ct::MODE_GCC_C;
     ansi_c.preprocessor=ansi_ct::PP_GCC;
   }
-  else if(os=="linux")
+  else if(os=="linux" || os=="solaris")
   {
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.os=configt::ansi_ct::OS_LINUX;
@@ -903,8 +903,9 @@ bool configt::set(const cmdlinet &cmdline)
   }
   else
   {
-    ansi_c.lib=configt::ansi_ct::LIB_NONE;
-    ansi_c.os=configt::ansi_ct::NO_OS;
+    // give up, but use reasonable defaults
+    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::OS_LINUX;
     ansi_c.mode=ansi_ct::MODE_GCC_C;
     ansi_c.preprocessor=ansi_ct::PP_GCC;
   }
@@ -1261,6 +1262,8 @@ irep_idt configt::this_operating_system()
   this_os="freebsd";
   #elif __linux__
   this_os="linux";
+  #elif __SVR4
+  this_os="solaris";
   #else
   this_os="unknown";
   #endif
