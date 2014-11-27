@@ -1212,18 +1212,29 @@ void goto_convertt::do_function_call_symbol(
           identifier=="c::__assert")
   {
     // __assert_rtn has been seen on MacOS;
-    // __assert is FreeBSD.
+    // __assert is FreeBSD and Solaris 11.
     // These take four arguments:
     // __func__, "file.c", line, "expression"
-
-    if(arguments.size()!=4)
+    // On Solaris 11, it's three arguments:
+    // "expression", "file", line
+    
+    irep_idt description;
+    
+    if(arguments.size()==4)
+    {
+      description=
+        "assertion "+id2string(get_string_constant(arguments[3]));
+    }
+    else if(arguments.size()==3)
+    {
+      description=
+        "assertion "+id2string(get_string_constant(arguments[1]));
+    }
+    else
     {
       err_location(function);
       throw "`"+id2string(identifier)+"' expected to have four arguments";
     }
-    
-    const irep_idt description=
-      "assertion "+id2string(get_string_constant(arguments[3]));
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
