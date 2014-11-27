@@ -167,7 +167,7 @@ void cvc_dect::read_assert(std::istream &in, std::string &line)
     
     if(line[0]=='l')
     {
-      unsigned number=unsafe_str2unsigned(line.c_str()+1);
+      unsigned number=unsafe_c_str2unsigned(line.c_str()+1);
       assert(number<no_boolean_variables);
       assert(no_boolean_variables==boolean_assignment.size());
       boolean_assignment[number]=value;
