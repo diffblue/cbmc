@@ -323,7 +323,7 @@ void fence_all_sharedt::compute()
         if(i_it->is_function_call())
           continue;
 
-        rw_set_loct rw_set(ns, value_sets, i_it
+        rw_set_with_trackt rw_set(ns, value_sets, i_it
 #ifdef LOCAL_MAY
         , local_may
 #endif
@@ -343,11 +343,16 @@ void fence_all_sharedt::compute()
             {
               /* this variable has perhaps been discovered after dereferencing
                  a pointer. We want to report this pointer */
-              std::map<const rw_set_baset::entryt*, const rw_set_baset::entryt*>&
-                ref=rw_set.dereferenced_from;
-              if(ref.find(&w_it->second)!=ref.end())
+              std::map<const irep_idt, const irep_idt>& ref=
+                rw_set.dereferenced_from;
+              if(ref.find(w_it->second.object)!=ref.end())
               {
-                const rw_set_baset::entryt& entry=*ref[&w_it->second];
+                const irep_idt from=ref[w_it->second.object];
+                const rw_set_baset::entryt& entry= ( 
+                  rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
+                  rw_set.r_entries[from] :
+                  rw_set.w_entries[from]
+                );
                 message.debug() << "shared: (through "
                   << id2string(w_it->second.object) << ") " << entry.object
                   << messaget::eom;
@@ -356,7 +361,7 @@ void fence_all_sharedt::compute()
               else {
                 message.debug() << "shared: "
                   << id2string(w_it->second.object) << " -> " 
-                  << &w_it->second.object << messaget::eom;
+                  << w_it->second.object << messaget::eom;
                 fenced_edges.writes.push_front(w_it->second.symbol_expr);
               }
             }
@@ -381,11 +386,17 @@ void fence_all_sharedt::compute()
             {
               /* this variable has perhaps been discovered after dereferencing
                  a pointer. We want to report this pointer */
-              std::map<const rw_set_baset::entryt*, const rw_set_baset::entryt*>&
+              std::map<const irep_idt, const irep_idt>&
                 ref=rw_set.dereferenced_from;
-              if(ref.find(&r_it->second)!=ref.end())
+              if(ref.find(r_it->second.object)!=ref.end())
               {
-                const rw_set_baset::entryt& entry=*ref[&r_it->second];
+                const irep_idt from=ref[r_it->second.object];
+                const rw_set_baset::entryt& entry=(
+                  rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
+                  rw_set.r_entries[from] :
+                  rw_set.w_entries[from]
+                );
+
                 message.debug() << "shared: (through "
                   << id2string(r_it->second.object) << ") " << entry.object
                   << messaget::eom;
@@ -394,7 +405,7 @@ void fence_all_sharedt::compute()
               else {
                 message.debug() << "shared: " 
                   << id2string(r_it->second.object) << " -> " 
-                  << &r_it->second.object << messaget::eom;
+                  << r_it->second.object << messaget::eom;
                 fenced_edges.reads.push_front(r_it->second.symbol_expr);
               }
             }
@@ -464,7 +475,7 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
       visited_functions.erase(fun_id);
     }
 
-    rw_set_loct rw_set(ns, value_sets, i_it
+    rw_set_with_trackt rw_set(ns, value_sets, i_it
       #ifdef LOCAL_MAY
       , local_may
       #endif
@@ -484,11 +495,17 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
         {
           /* this variable has perhaps been discovered after dereferencing
              a pointer. We want to report this pointer */
-          std::map<const rw_set_baset::entryt*, const rw_set_baset::entryt*>&
+          std::map<const irep_idt, const irep_idt>&
             ref=rw_set.dereferenced_from;
-          if(ref.find(&w_it->second)!=ref.end())
+          if(ref.find(w_it->second.object)!=ref.end())
           {
-            const rw_set_baset::entryt& entry=*ref[&w_it->second];
+            const irep_idt from=ref[w_it->second.object];
+            const rw_set_baset::entryt& entry=(
+                rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
+                rw_set.r_entries[from] :
+                rw_set.w_entries[from]
+            );
+
             message.debug() << "shared: (through "
               << id2string(w_it->second.object) << ") " << entry.object
               << messaget::eom;
@@ -497,7 +514,7 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
           else {
             message.debug() << "shared: "
               << id2string(w_it->second.object) << " -> " 
-              << &w_it->second.object << messaget::eom;
+              << w_it->second.object << messaget::eom;
             fenced_edges.writes.push_front(w_it->second.symbol_expr);
           }
         }
@@ -522,11 +539,17 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
         {
           /* this variable has perhaps been discovered after dereferencing
              a pointer. We want to report this pointer */
-          std::map<const rw_set_baset::entryt*, const rw_set_baset::entryt*>&
+          std::map<const irep_idt, const irep_idt>&
             ref=rw_set.dereferenced_from;
-          if(ref.find(&r_it->second)!=ref.end())
+          if(ref.find(r_it->second.object)!=ref.end())
           {
-            const rw_set_baset::entryt& entry=*ref[&r_it->second];
+            const irep_idt from=ref[r_it->second.object];
+            const rw_set_baset::entryt& entry=(
+              rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
+              rw_set.r_entries[from] :
+              rw_set.w_entries[from]
+            );
+
             message.debug() << "shared: (through "
               << id2string(r_it->second.object) << ") " << entry.object
               << messaget::eom;
@@ -535,7 +558,7 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
           else {
             message.debug() << "shared: "
               << id2string(r_it->second.object) << " -> " 
-              << &r_it->second.object << messaget::eom;
+              << r_it->second.object << messaget::eom;
             fenced_edges.reads.push_front(r_it->second.symbol_expr);
           }
         }

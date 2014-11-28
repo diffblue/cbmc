@@ -22,6 +22,40 @@ Author: Vincent Nimal
 
 /*******************************************************************\
 
+Function: mode selection
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+fence_insertert choose_mode(instrumentert& instrumenter, memory_modelt model,
+   infer_modet mode)
+{
+  switch(mode) {
+    default:
+    case INFER:
+    {
+      return fence_insertert(instrumenter, model);
+    }
+    case USER_DEF:
+    {
+      return static_cast<fence_insertert>( fence_user_def_insertert(
+        instrumenter, model) );
+    }
+    case USER_ASSERT:
+    {
+      return static_cast<fence_insertert>( fence_assert_insertert(instrumenter, 
+        model) );
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: fencer
 
   Inputs:
@@ -142,41 +176,19 @@ void fence_weak_memory(
     instrumenter.cfg_cycles_filter();
 
   /* infers fences */
-  fence_insertert* fence_inserter;
-
-  // allocates and init relevant fence_inserter
-  switch(mode) {
-    case INFER:
-    {
-      fence_inserter=new fence_insertert(instrumenter, model);
-      break;
-    }
-    case USER_DEF:
-    {
-      fence_inserter=new fence_user_def_insertert(instrumenter, model);
-      break;
-    }
-    case USER_ASSERT:
-    {
-      fence_inserter=new fence_assert_insertert(instrumenter, model);
-      break;
-    }
-  }
+  fence_insertert fence_inserter=choose_mode(instrumenter, model, mode);
 
   // computes the set of fences
-  fence_inserter->compute();
+  fence_inserter.compute();
 
   // prints outputs
-  fence_inserter->print_to_file_3();
+  fence_inserter.print_to_file_3();
 
   // additional outputs
 #if 0
   instrumenter.set_rendering_options(render_po, render_file, render_function);
   instrumenter.print_outputs(model, hide_internals);
 #endif
-
-  // deletes fence_inserter
-  delete fence_inserter;
 
   /* TODO: insert the fences into the actual code or call script directly 
      from here*/

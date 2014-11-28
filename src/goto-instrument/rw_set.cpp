@@ -65,7 +65,7 @@ Function: rw_set_loct::compute
 
 \*******************************************************************/
 
-void rw_set_loct::compute()
+void _rw_set_loct::compute()
 {
   if(target->is_assign())
   {
@@ -109,7 +109,7 @@ Function: rw_set_loct::assign
 
 \*******************************************************************/
 
-void rw_set_loct::assign(const exprt &lhs, const exprt &rhs)
+void _rw_set_loct::assign(const exprt &lhs, const exprt &rhs)
 {
   read(rhs);
   read_write_rec(lhs, false, true, "", guardt());
@@ -127,7 +127,7 @@ Function: rw_set_loct::read_write_rec
 
 \*******************************************************************/
 
-void rw_set_loct::read_write_rec(
+void _rw_set_loct::read_write_rec(
   const exprt &expr,
   bool r, bool w,
   const std::string &suffix,
@@ -146,10 +146,7 @@ void rw_set_loct::read_write_rec(
       entry.symbol_expr=symbol_expr;
       entry.guard=guard.as_expr(); // should 'OR'
 
-      if(dereferencing && dereferenced==NULL) 
-        dereferenced=&entry;
-      else if(dereferencing && dereferenced!=NULL)
-        dereferenced_from.insert(std::make_pair(&entry, dereferenced));
+      track_deref(entry);
     }
     
     if(w)
@@ -159,10 +156,7 @@ void rw_set_loct::read_write_rec(
       entry.symbol_expr=symbol_expr;
       entry.guard=guard.as_expr(); // should 'OR'
 
-      if(dereferencing && dereferenced==NULL) 
-        dereferenced=&entry;
-      else if(dereferencing && dereferenced!=NULL)
-        dereferenced_from.insert(std::make_pair(&entry, dereferenced));
+      track_deref(entry);
     }
   }
   else if(expr.id()==ID_member)
@@ -181,7 +175,7 @@ void rw_set_loct::read_write_rec(
   else if(expr.id()==ID_dereference)
   {
     assert(expr.operands().size()==1);
-    dereferencing=true;
+    set_track_deref();
     read(expr.op0(), guard);
 
     exprt tmp=expr;
@@ -215,8 +209,7 @@ void rw_set_loct::read_write_rec(
     read_write_rec(tmp, r, w, suffix, guard);
     #endif    
 
-    dereferencing=false;
-    dereferenced=NULL;
+    reset_track_deref();
   }
   else if(expr.id()==ID_typecast)
   {
