@@ -146,7 +146,7 @@ void _rw_set_loct::read_write_rec(
       entry.symbol_expr=symbol_expr;
       entry.guard=guard.as_expr(); // should 'OR'
 
-      track_deref(entry);
+      track_deref(entry, true);
     }
     
     if(w)
@@ -156,7 +156,7 @@ void _rw_set_loct::read_write_rec(
       entry.symbol_expr=symbol_expr;
       entry.guard=guard.as_expr(); // should 'OR'
 
-      track_deref(entry);
+      track_deref(entry, false);
     }
   }
   else if(expr.id()==ID_member)

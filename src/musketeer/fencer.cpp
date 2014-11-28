@@ -22,40 +22,6 @@ Author: Vincent Nimal
 
 /*******************************************************************\
 
-Function: mode selection
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-fence_insertert choose_mode(instrumentert& instrumenter, memory_modelt model,
-   infer_modet mode)
-{
-  switch(mode) {
-    default:
-    case INFER:
-    {
-      return fence_insertert(instrumenter, model);
-    }
-    case USER_DEF:
-    {
-      return static_cast<fence_insertert>( fence_user_def_insertert(
-        instrumenter, model) );
-    }
-    case USER_ASSERT:
-    {
-      return static_cast<fence_insertert>( fence_assert_insertert(instrumenter, 
-        model) );
-    }
-  }
-}
-
-/*******************************************************************\
-
 Function: fencer
 
   Inputs:
@@ -175,14 +141,30 @@ void fence_weak_memory(
   if(!no_cfg_kill)
     instrumenter.cfg_cycles_filter();
 
-  /* infers fences */
-  fence_insertert fence_inserter=choose_mode(instrumenter, model, mode);
-
-  // computes the set of fences
-  fence_inserter.compute();
-
-  // prints outputs
-  fence_inserter.print_to_file_3();
+  /* selects method, infers fences then outputs them */ 
+  switch(mode) {
+    case INFER:
+    {
+      fence_insertert fence_inserter(instrumenter, model);
+      fence_inserter.compute();
+      fence_inserter.print_to_file_3();
+      break;
+    }
+    case USER_DEF:
+    {
+      fence_user_def_insertert fence_inserter(instrumenter, model);
+      fence_inserter.compute();
+      fence_inserter.print_to_file_3();
+      break;
+    }
+    case USER_ASSERT:
+    {
+      fence_assert_insertert fence_inserter(instrumenter, model);
+      fence_inserter.compute();
+      fence_inserter.print_to_file_3();
+      break;
+    }
+  }
 
   // additional outputs
 #if 0

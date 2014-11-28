@@ -85,7 +85,7 @@ public:
   void output(std::ostream &out) const;
   
 protected:
-  virtual void track_deref(const entryt& entry) {}
+  virtual void track_deref(const entryt& entry, bool read) {}
   virtual void set_track_deref() {}
   virtual void reset_track_deref() {}
 
