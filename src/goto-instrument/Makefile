@@ -1,15 +1,12 @@
-SRC = goto_instrument_main.cpp goto_instrument_parseoptions.cpp \
+# for goto-instrument
+SRC2 = goto_instrument_parseoptions.cpp \
       document_properties.cpp goto_instrument_languages.cpp \
       uninitialized.cpp full_slicer.cpp k_induction.cpp \
       object_id.cpp show_locations.cpp points_to.cpp \
-      alignment_checks.cpp race_check.cpp rw_set.cpp \
+      alignment_checks.cpp race_check.cpp \
       nondet_volatile.cpp interrupt.cpp function.cpp branch.cpp \
       mmio.cpp stack_depth.cpp nondet_static.cpp \
       concurrency.cpp dump_c.cpp dot.cpp havoc_loops.cpp \
-      wmm/weak_memory.cpp wmm/fence.cpp wmm/event_graph.cpp \
-      wmm/goto2graph.cpp wmm/data_dp.cpp wmm/abstract_event.cpp \
-      wmm/instrumenter_strategies.cpp wmm/cycle_collection.cpp \
-      wmm/shared_buffers.cpp wmm/pair_collection.cpp \
       call_sequences.cpp unwind.cpp function_modifies.cpp \
       accelerate/accelerate.cpp accelerate/polynomial.cpp \
       accelerate/scratch_program.cpp accelerate/polynomial_accelerator.cpp \
@@ -20,7 +17,15 @@ SRC = goto_instrument_main.cpp goto_instrument_parseoptions.cpp \
       accelerate/disjunctive_polynomial_acceleration.cpp \
       accelerate/cone_of_influence.cpp accelerate/overflow_instrumenter.cpp\
       accelerate/path.cpp accelerate/acceleration_utils.cpp \
-      count_eloc.cpp reachability_slicer.cpp goto_program2code.cpp
+      count_eloc.cpp reachability_slicer.cpp goto_program2code.cpp \
+      goto_instrument_main.cpp
+
+# for wmm-cycles.a
+SRC = wmm/weak_memory.cpp wmm/fence.cpp wmm/event_graph.cpp \
+      wmm/goto2graph.cpp wmm/data_dp.cpp wmm/abstract_event.cpp \
+      wmm/instrumenter_strategies.cpp wmm/cycle_collection.cpp \
+      wmm/shared_buffers.cpp wmm/pair_collection.cpp \
+      rw_set.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
@@ -38,7 +43,12 @@ INCLUDES= -I ..
 
 LIBS = 
 
-CLEANFILES = goto-instrument$(EXEEXT)
+CLEANFILES = goto-instrument$(EXEEXT) wmm-cycles$(LIBEXT) \
+  $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC2))) \
+  $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC2))) \
+  $(patsubst %.cpp, %.d, $(filter %.cpp, $(SRC2))) \
+  $(patsubst %.cc, %.d, $(filter %.cc, $(SRC2)))
+
 
 include ../config.inc
 include ../common
@@ -72,8 +82,13 @@ endif
 
 ###############################################################################
 
-goto-instrument$(EXEEXT): $(OBJ)
+goto-instrument$(EXEEXT): $(OBJ) wmm-cycles$(LIBEXT) \
+  $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC2))) \
+  $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC2)))
 	$(LINKBIN)
+
+wmm-cycles$(LIBEXT): $(OBJ) 
+	$(LINKLIB)
 
 .PHONY: goto-instrument-mac-signed
 
