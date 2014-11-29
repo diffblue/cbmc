@@ -52,7 +52,8 @@ Function:
 
 \*******************************************************************/
 
-void inline fence_user_def_insertert::process_cycles_selection () {
+void fence_user_def_insertert::process_cycles_selection()
+{
   for(std::set<event_grapht::critical_cyclet>::const_iterator
     C_j=instrumenter.set_of_cycles.begin();
     C_j!=instrumenter.set_of_cycles.end();
