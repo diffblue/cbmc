@@ -130,7 +130,7 @@ protected:
   std::map<edget,fence_typet> fenced_edges;
 
 public:
-  fence_insertert(instrumentert &instr)
+  explicit fence_insertert(instrumentert &instr)
     :instrumenter(instr), map_to_e(var.map_to_e), map_from_e(var.map_from_e), 
       constraints_number(0), model(TSO),  const_graph_visitor(*this), 
       unique(var.unique), fence_options(0), cycles_visitor(*this), 

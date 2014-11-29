@@ -32,7 +32,7 @@ protected:
   }
 
 public:
-  fence_user_def_insertert(instrumentert &instr)
+  explicit fence_user_def_insertert(instrumentert &instr)
     :fence_insertert(instr) {
   }
 
