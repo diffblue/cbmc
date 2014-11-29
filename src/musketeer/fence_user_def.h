@@ -23,11 +23,14 @@ class fence_user_def_insertert : public fence_insertert
 protected:
   std::set<unsigned> selected_cycles;
 
-  bool contains_user_def(const event_grapht::critical_cyclet& cycle) const;
+  bool contains_user_def(const event_grapht::critical_cyclet &cycle) const;
 
-  void process_cycles_selection ();
+  // overload for base class
+  virtual void process_cycles_selection();
 
-  inline bool filter_cycles (unsigned cycles_id) const {
+  // overload for base class
+  virtual bool filter_cycles (unsigned cycles_id) const
+  {
     return selected_cycles.find(cycles_id)==selected_cycles.end();
   }
 
