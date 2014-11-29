@@ -32,7 +32,7 @@ protected:
   }
 
 public:
-  fence_assert_insertert(instrumentert &instr)
+  explicit fence_assert_insertert(instrumentert &instr)
     :fence_insertert(instr) {}
 
   fence_assert_insertert(instrumentert &instr, memory_modelt _model)
