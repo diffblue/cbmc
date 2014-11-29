@@ -35,7 +35,8 @@ struct mip_vart
   std::map<unsigned, edget> map_to_e;
   std::map<edget, unsigned> map_from_e;
 
-  unsigned add_edge(const edget& e) {
+  unsigned add_edge(const edget &e)
+  {
     if(map_from_e.find(e) != map_from_e.end())
       return map_from_e[e];
     else
@@ -47,7 +48,9 @@ struct mip_vart
     }
   }
 
-  mip_vart():unique(0){}
+  mip_vart():unique(0)
+  {
+  }
 };
 
 /* in essence: cycles + goto-prog -> ilp */
@@ -130,19 +133,21 @@ protected:
   std::map<edget,fence_typet> fenced_edges;
 
 public:
-  explicit fence_insertert(instrumentert &instr)
-    :instrumenter(instr), map_to_e(var.map_to_e), map_from_e(var.map_from_e), 
-      constraints_number(0), model(TSO),  const_graph_visitor(*this), 
-      unique(var.unique), fence_options(0), cycles_visitor(*this), 
-      epsilon(0.001), with_freq(false)
-  {}
+  explicit fence_insertert(instrumentert &instr):
+    instrumenter(instr), map_to_e(var.map_to_e), map_from_e(var.map_from_e), 
+    constraints_number(0), model(TSO),  const_graph_visitor(*this), 
+    unique(var.unique), fence_options(0), cycles_visitor(*this), 
+    epsilon(0.001), with_freq(false)
+  {
+  }
 
-  fence_insertert(instrumentert &instr, memory_modelt _model)
-    :instrumenter(instr), map_to_e(var.map_to_e), map_from_e(var.map_from_e),
-      constraints_number(0), model(_model),  const_graph_visitor(*this),
-      unique(var.unique), fence_options(0), cycles_visitor(*this), 
-      epsilon(0.001), with_freq(false)
-  {}
+  fence_insertert(instrumentert &instr, memory_modelt _model):
+    instrumenter(instr), map_to_e(var.map_to_e), map_from_e(var.map_from_e),
+    constraints_number(0), model(_model),  const_graph_visitor(*this),
+    unique(var.unique), fence_options(0), cycles_visitor(*this), 
+    epsilon(0.001), with_freq(false)
+  {
+  }
 
   /* do it */
   void compute(); 
@@ -150,8 +155,8 @@ public:
   /* selection methods */
   // Note: process_selection updates the selection of cycles in instrumenter,
   // whereas filter just ignores some
-  virtual inline void process_cycles_selection() {}
-  virtual inline bool filter_cycles(unsigned cycle_id) const { return false; }
+  virtual void process_cycles_selection() { }
+  virtual bool filter_cycles(unsigned cycle_id) const { return false; }
 
   /* prints final results */
   void print_to_file();
