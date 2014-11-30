@@ -381,7 +381,9 @@ typet char16_t_type()
 {
   typet result;
 
-  // these are unsigned on all platforms I have seen
+  // Types char16_t and char32_t denote distinct types with the same size,
+  // signedness, and alignment as uint_least16_t and uint_least32_t,
+  // respectively, in <stdint.h>, called the underlying types.
   result=unsignedbv_typet(16);
 
   result.set(ID_C_c_type, ID_char16_t);
@@ -404,7 +406,9 @@ typet char32_t_type()
 {
   typet result;
   
-  // these are unsigned on all platforms I have seen
+  // Types char16_t and char32_t denote distinct types with the same size,
+  // signedness, and alignment as uint_least16_t and uint_least32_t,
+  // respectively, in <stdint.h>, called the underlying types.
   result=unsignedbv_typet(32);
 
   result.set(ID_C_c_type, ID_char32_t);
