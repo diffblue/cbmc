@@ -621,3 +621,58 @@ typet gcc_signed_int128_type()
   return result;
 }
 
+/*******************************************************************\
+
+Function: c_type_as_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string c_type_as_string(const irep_idt &c_type)
+{
+  if(c_type==ID_signed_int)
+    return "signed int";
+  else if(c_type==ID_signed_short_int)
+    return "signed short int";
+  else if(c_type==ID_unsigned_int)
+    return "unsigned int";
+  else if(c_type==ID_unsigned_short_int)
+    return "unsigned short int";
+  else if(c_type==ID_signed_long_int)
+    return "signed long int";
+  else if(c_type==ID_signed_long_long_int)
+    return "signed long long int";
+  else if(c_type==ID_unsigned_long_int)
+    return "unsigned long int";
+  else if(c_type==ID_unsigned_long_long_int)
+    return "unsigned long long int";
+  else if(c_type==ID_bool)
+    return "bool";
+  else if(c_type==ID_char)
+    return "char";
+  else if(c_type==ID_unsigned_char)
+    return "unsigned char";
+  else if(c_type==ID_signed_char)
+    return "signed char";
+  else if(c_type==ID_wchar_t)
+    return "wchar_t";
+  else if(c_type==ID_float)
+    return "float";
+  else if(c_type==ID_double)
+    return "double";
+  else if(c_type==ID_long_double)
+    return "long double";
+  else if(c_type==ID_gcc_float128)
+    return "__float128";
+  else if(c_type==ID_unsigned_int128)
+    return "unsigned __int128";
+  else if(c_type==ID_signed_int128)
+    return "signed __int128";
+  else
+    return "";
+}

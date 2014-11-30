@@ -38,4 +38,8 @@ typet size_type();
 typet signed_size_type();
 typet pointer_diff_type();
 
+// Turns an ID_C_c_type into a string, e.g.,
+// ID_signed_int gets "signed int".
+std::string c_type_as_string(const irep_idt &);
+
 #endif
