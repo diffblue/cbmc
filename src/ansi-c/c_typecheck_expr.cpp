@@ -1575,7 +1575,7 @@ void c_typecheck_baset::typecheck_expr_rel_vector(
 
   // Comparisons between vectors produce a vector
   // of integers with the same dimension.
-  expr.type()=vector_typet(int_type(), to_vector_type(o_type0).size());
+  expr.type()=vector_typet(signed_int_type(), to_vector_type(o_type0).size());
 }
 
 /*******************************************************************\

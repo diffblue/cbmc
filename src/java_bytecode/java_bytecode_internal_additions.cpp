@@ -31,7 +31,7 @@ void java_internal_additions(symbol_tablet &dest)
     symbolt symbol;
     symbol.base_name="__CPROVER_rounding_mode";
     symbol.name="c::__CPROVER_rounding_mode";
-    symbol.type=int_type();
+    symbol.type=signed_int_type();
     symbol.mode=ID_C;
     symbol.is_lvalue=true;
     symbol.is_state_var=true;

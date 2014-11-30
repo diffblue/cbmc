@@ -31,36 +31,20 @@ typet index_type()
 
 /*******************************************************************\
 
-Function: enum_type
+Function: enum_constant_type
 
   Inputs:
 
  Outputs:
 
- Purpose:
+ Purpose: return type of enum constants
 
 \*******************************************************************/
 
-typet enum_type()
+typet enum_constant_type()
 {
-  // same as 'int', but might be unsigned, or shorter than 'int'
-  return signed_int_type();
-}
-
-/*******************************************************************\
-
-Function: int_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-typet int_type()
-{
+  // usually same as 'int',
+  // but might be unsigned, or shorter than 'int'
   return signed_int_type();
 }
 
@@ -100,23 +84,6 @@ typet signed_short_int_type()
   typet result=signedbv_typet(config.ansi_c.short_int_width);
   result.set(ID_C_c_type, ID_signed_short_int);
   return result;
-}
-
-/*******************************************************************\
-
-Function: uint_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-typet uint_type()
-{
-  return unsigned_int_type();
 }
 
 /*******************************************************************\
@@ -205,23 +172,6 @@ typet signed_size_type()
 
 /*******************************************************************\
 
-Function: long_int_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-typet long_int_type()
-{
-  return signed_long_int_type();
-}
-
-/*******************************************************************\
-
 Function: signed_long_int_type
 
   Inputs:
@@ -237,23 +187,6 @@ typet signed_long_int_type()
   typet result=signedbv_typet(config.ansi_c.long_int_width);
   result.set(ID_C_c_type, ID_signed_long_int);
   return result;
-}
-
-/*******************************************************************\
-
-Function: long_long_int_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-typet long_long_int_type()
-{
-  return signed_long_long_int_type();
 }
 
 /*******************************************************************\
@@ -277,23 +210,6 @@ typet signed_long_long_int_type()
 
 /*******************************************************************\
 
-Function: long_uint_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-typet long_uint_type()
-{
-  return unsigned_long_int_type();
-}
-
-/*******************************************************************\
-
 Function: unsigned_long_int_type
 
   Inputs:
@@ -309,23 +225,6 @@ typet unsigned_long_int_type()
   typet result=unsignedbv_typet(config.ansi_c.long_int_width);  
   result.set(ID_C_c_type, ID_unsigned_long_int);
   return result;
-}
-
-/*******************************************************************\
-
-Function: long_long_uint_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-typet long_long_uint_type()
-{
-  return unsigned_long_long_int_type();
 }
 
 /*******************************************************************\
@@ -361,7 +260,8 @@ Function: c_bool_type
 
 typet c_bool_type()
 {
-  // we model it as unsigned, but this doesn't matter
+  // We model it as unsigned, but this doesn't matter,
+  // as we really only want 0 and 1.
   typet result=unsignedbv_typet(config.ansi_c.bool_width);
   result.set(ID_C_c_type, ID_bool);
   return result;

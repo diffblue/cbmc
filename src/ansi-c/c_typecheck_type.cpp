@@ -967,7 +967,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     {
       // no, add it as an incomplete c_enum
       type.id(ID_incomplete_c_enum);
-      type.subtype()=int_type(); // default
+      type.subtype()=signed_int_type(); // default
 
       symbolt enum_tag_symbol;
     
@@ -1009,7 +1009,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       exprt &v=declaration.declarator().value();
 
       if(v.is_nil()) // no value given
-        v=from_integer(value, int_type());
+        v=from_integer(value, signed_int_type());
 
       typecheck_declaration(declaration);
       
