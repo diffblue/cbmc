@@ -16,7 +16,7 @@ Author: Daniel Kroening
 #include "fixedbv.h"
 #include "std_expr.h"
 
-#include <ansi-c/c_types.h>
+#include <ansi-c/expr2c.h>
 
 #include "xml_expr.h"
 
@@ -73,10 +73,6 @@ xmlt xml(
     return xml(ns.follow(type), ns);
 
   xmlt result;
-
-  // is there a C-type annotation?
-  std::string c_type=c_type_as_string(type.get(ID_C_c_type));
-  if(c_type!="") result.new_element("c_type").data=c_type;
 
   if(type.id()==ID_unsignedbv)
   {
@@ -182,8 +178,7 @@ xmlt xml(
 
   if(expr.id()==ID_constant)
   {
-    // is there a C-type annotation?
-    std::string c_type=c_type_as_string(type.get(ID_C_c_type));
+    std::string c_type=type2c(expr.type(), ns);
     if(c_type!="") result.set_attribute("c_type", c_type);
 
     if(type.id()==ID_unsignedbv ||
