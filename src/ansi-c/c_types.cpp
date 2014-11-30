@@ -381,16 +381,10 @@ typet char16_t_type()
 {
   typet result;
 
-  /*  
-  if(config.ansi_c.wchar_t_is_unsigned)
-    result=unsignedbv_typet(config.ansi_c.wchar_t_width);
-  else
-    result=signedbv_typet(config.ansi_c.wchar_t_width);
-  */
-
+  // these are unsigned on all platforms I have seen
   result=unsignedbv_typet(16);
 
-  //result.set(ID_C_c_type, ID_wchar_t);
+  result.set(ID_C_c_type, ID_char16_t);
   return result;
 }
 
@@ -410,16 +404,10 @@ typet char32_t_type()
 {
   typet result;
   
-  /*
-  if(config.ansi_c.wchar_t_is_unsigned)
-    result=unsignedbv_typet(config.ansi_c.wchar_t_width);
-  else
-    result=signedbv_typet(config.ansi_c.wchar_t_width);
-  */
-
+  // these are unsigned on all platforms I have seen
   result=unsignedbv_typet(32);
 
-  //result.set(ID_C_c_type, ID_wchar_t);
+  result.set(ID_C_c_type, ID_char32_t);
   return result;
 }
 
@@ -661,6 +649,10 @@ std::string c_type_as_string(const irep_idt &c_type)
     return "signed char";
   else if(c_type==ID_wchar_t)
     return "wchar_t";
+  else if(c_type==ID_char16_t)
+    return "char16_t";
+  else if(c_type==ID_char32_t)
+    return "char32_t";
   else if(c_type==ID_float)
     return "float";
   else if(c_type==ID_double)

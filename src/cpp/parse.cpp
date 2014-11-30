@@ -620,6 +620,7 @@ bool Parser::isTypeSpecifier()
   if(t==TOK_IDENTIFIER || t==TOK_SCOPE
        || t==TOK_CONSTEXPR || t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT
        || t==TOK_CHAR || t==TOK_INT || t==TOK_SHORT || t==TOK_LONG
+       || t==TOK_CHAR16_T || t==TOK_CHAR32_T
        || t==TOK_WCHAR_T || t==TOK_COMPLEX // new !!!
        || t==TOK_SIGNED || t==TOK_UNSIGNED || t==TOK_FLOAT || t==TOK_DOUBLE
        || t==TOK_INT8 || t==TOK_INT16 || t==TOK_INT32 || t==TOK_INT64 || t==TOK_PTR32 || t==TOK_PTR64
@@ -2121,7 +2122,8 @@ Function:
 /*
 
   integral.or.class.spec
-  : (CHAR | WCHAR_T | INT | SHORT | LONG | SIGNED | UNSIGNED | FLOAT | DOUBLE
+  : (CHAR | CHAR16_T | CHAR32_T | WCHAR_T
+     | INT | SHORT | LONG | SIGNED | UNSIGNED | FLOAT | DOUBLE
      | VOID | BOOLEAN | COMPLEX)+
   | class.spec
   | enum.spec
@@ -2160,6 +2162,8 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     switch(t)
     {
     case TOK_CHAR: type_id=ID_char; break;
+    case TOK_CHAR16_T: type_id=ID_char16_t; break;
+    case TOK_CHAR32_T: type_id=ID_char32_t; break;
     case TOK_INT: type_id=ID_int; break;
     case TOK_SHORT: type_id=ID_short; break;
     case TOK_LONG: type_id=ID_long; break;
