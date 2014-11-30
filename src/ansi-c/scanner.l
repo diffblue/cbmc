@@ -575,9 +575,16 @@ void ansi_c_scanner_init()
 /* C++ Keywords and Operators */
 %}
 
+alignas             { return cpp_keyword(TOK_ALIGNAS); } // C++11
+alignof             { return cpp_keyword(TOK_ALIGNOF); } // C++11
+and                 { return cpp_keyword(TOK_ANDAND); }
+and_eq              { return cpp_keyword(TOK_ANDASSIGN); }
 bool                { return cpp_keyword(TOK_BOOL); }
 catch               { return cpp_keyword(TOK_CATCH); }
+char16_t            { return cpp_keyword(TOK_CHAR16_T); } // C++11
+char32_t            { return cpp_keyword(TOK_CHAR16_T); } // C++11
 class               { return cpp_keyword(TOK_CLASS); }
+compl               { return cpp_keyword('~'); }
 constexpr           { return cpp_keyword(TOK_CONSTEXPR); } // C++11
 delete              { return cpp_keyword(TOK_DELETE); }
 decltype            { return cpp_keyword(TOK_DECLTYPE); } // C++11
@@ -586,8 +593,13 @@ friend              { return cpp_keyword(TOK_FRIEND); }
 mutable             { return cpp_keyword(TOK_MUTABLE); }
 namespace           { return cpp_keyword(TOK_NAMESPACE); }
 new                 { return cpp_keyword(TOK_NEW); }
+noexcept            { return cpp_keyword(TOK_NOEXCEPT); } // C++11
+not                 { return cpp_keyword('!'); }
+not_eq              { return cpp_keyword(TOK_NE); }
 nullptr             { return cpp_keyword(TOK_NULLPTR); } // C++11
 operator            { return cpp_keyword(TOK_OPERATOR); }
+or                  { return cpp_keyword(TOK_OROR); }
+or_eq               { return cpp_keyword(TOK_ORASSIGN); }
 private             { return cpp_keyword(TOK_PRIVATE); }
 protected           { return cpp_keyword(TOK_PROTECTED); }
 public              { return cpp_keyword(TOK_PUBLIC); }
@@ -607,6 +619,8 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in,
                       else
                         return cpp_keyword(TOK_WCHAR_T);
                     }
+xor                 { return cpp_keyword('^'); }
+xor_eq              { return cpp_keyword(TOK_XORASSIGN); }
 ".*"                { return cpp_operator(TOK_DOTPM); }
 "->*"               { return cpp_operator(TOK_ARROWPM); }
 "::"                { if(PARSER.cpp)

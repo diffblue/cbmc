@@ -188,6 +188,8 @@ extern char *yyansi_ctext;
 /*** these exist only for the benefit of the C++ frontend */
 
 %token TOK_CATCH       "catch"
+%token TOK_CHAR16_T    "char16_t"
+%token TOK_CHAR32_T    "char32_t"
 %token TOK_CLASS       "class"
 %token TOK_DELETE      "delete"
 %token TOK_DECLTYPE    "decltype"
@@ -196,6 +198,7 @@ extern char *yyansi_ctext;
 %token TOK_MUTABLE     "mutable"
 %token TOK_NAMESPACE   "namespace"
 %token TOK_NEW         "new"
+%token TOK_NOEXCEPT    "noexcept"
 %token TOK_OPERATOR    "operator"
 %token TOK_PRIVATE     "private"
 %token TOK_PROTECTED   "protected"
