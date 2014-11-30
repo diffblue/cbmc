@@ -765,7 +765,7 @@ void cpp_typecheck_resolvet::make_constructors(
       }
       
       // enums, in addition, can also be constructed from int
-      if(symbol_type.id()==ID_c_enum)
+      if(symbol_type.id()==ID_c_enum_tag)
       {
         code_typet t3;
         t3.return_type()=it->type();
