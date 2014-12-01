@@ -15,8 +15,7 @@ Author: Daniel Kroening
 #include "ieee_float.h"
 #include "fixedbv.h"
 #include "std_expr.h"
-
-#include <ansi-c/expr2c.h>
+#include "config.h"
 
 #include "xml_expr.h"
 
@@ -178,15 +177,28 @@ xmlt xml(
 
   if(expr.id()==ID_constant)
   {
-    std::string c_type=type2c(expr.type(), ns);
-    if(c_type!="") result.set_attribute("c_type", c_type);
-
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv)
     {
+      unsigned width=to_bitvector_type(type).get_width();
+    
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));
-      result.set_attribute("width", type.get_string(ID_width));
+      result.set_attribute("width", width);
+
+      bool is_signed=type.id()==ID_signedbv;      
+      std::string sig=is_signed?"":"unsigned ";
+
+      if(width==config.ansi_c.char_width)
+        result.set_attribute("c_type", sig+"char");
+      else if(width==config.ansi_c.int_width)
+        result.set_attribute("c_type", sig+"int");
+      else if(width==config.ansi_c.short_int_width)
+        result.set_attribute("c_type", sig+"short int");
+      else if(width==config.ansi_c.long_int_width)
+        result.set_attribute("c_type", sig+"long int");
+      else if(width==config.ansi_c.long_long_int_width)
+        result.set_attribute("c_type", sig+"long long int");
 
       mp_integer i;
       if(!to_integer(expr, i))
@@ -196,6 +208,8 @@ xmlt xml(
     {
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));
+      result.set_attribute("width", type.subtype().get_string(ID_width));
+      result.set_attribute("c_type", "enum");
 
       mp_integer i;
       if(!to_integer(expr, i))
