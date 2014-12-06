@@ -203,7 +203,7 @@ protected:
   void convert_CPROVER_try_catch(const codet &code, goto_programt &dest);
   void convert_CPROVER_try_finally(const codet &code, goto_programt &dest);
   void convert_CPROVER_throw(const codet &code, goto_programt &dest);
-  void convert_asm(const codet &code, goto_programt &dest);
+  void convert_asm(const code_asmt &code, goto_programt &dest);
 
   void convert(const codet &code, goto_programt &dest);
 

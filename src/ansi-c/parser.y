@@ -546,7 +546,7 @@ unary_expression:
           set($$, ID_address_of);
           mto($$, $2);
         }
-        | TOK_ANDAND identifier_or_typedef_name
+        | TOK_ANDAND gcc_local_label
         { // this takes the address of a label (a gcc extension)
           $$=$1;
           irep_idt identifier=PARSER.lookup_label(stack($2).get(ID_C_base_name));
@@ -2534,8 +2534,10 @@ gcc_asm_labels:
 gcc_asm_labels_list:
           gcc_local_label
         {
-          init($$);
-          mto($$, $1);
+          irep_idt identifier=PARSER.lookup_label(stack($1).get(ID_C_base_name));
+          $$=$1;
+          stack($$).id(ID_label);
+          stack($$).set(ID_identifier, identifier);
         }
         | gcc_asm_labels_list ',' gcc_local_label
         {
