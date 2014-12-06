@@ -86,15 +86,12 @@ Function: goto_instrument_parseoptionst::eval_verbosity
 
 void goto_instrument_parseoptionst::eval_verbosity()
 {
-  int v=8;
+  unsigned int v=8;
   
   if(cmdline.isset("verbosity"))
   {
-    v=unsafe_string2int(cmdline.get_value("verbosity"));
-    if(v<0)
-      v=0;
-    else if(v>10)
-      v=10;
+    v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
+    if(v>10) v=10;
   }
   
   ui_message_handler.set_verbosity(v);

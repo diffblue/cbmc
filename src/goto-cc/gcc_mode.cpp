@@ -74,7 +74,7 @@ bool gcc_modet::doit()
     return false;
   }
 
-  int verbosity=1;
+  unsigned int verbosity=1;
 
   if(cmdline.isset('v'))
   {
@@ -113,7 +113,7 @@ bool gcc_modet::doit()
     verbosity=2;
 
   if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2int(cmdline.get_value("verbosity"));
+    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
 
   ui_message_handler.set_verbosity(verbosity);
 
