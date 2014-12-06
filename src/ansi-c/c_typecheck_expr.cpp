@@ -405,6 +405,11 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // still need to typecheck the result
     typecheck_expr(expr);
   }
+  else if(expr.id()==ID_gcc_asm_input ||
+          expr.id()==ID_gcc_asm_output ||
+          expr.id()==ID_gcc_asm_clobbered_register)
+  {
+  }
   else
   {
     err_location(expr);
