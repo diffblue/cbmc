@@ -176,7 +176,7 @@ public:
   ):
     _rw_set_loct(_ns, _value_sets, _target
 #ifdef LOCAL_MAY
-                , local_may_aliast &may
+      , may
 #endif
    )
   {
