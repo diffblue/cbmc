@@ -16,7 +16,7 @@ Author:
 #include <goto-programs/goto_functions.h>
 
 #define GOTO_FENCE_INSERTER_OPTIONS \
-  "(scc)(one-event-per-cycle)" \
+  "(scc)(one-event-per-cycle)(verbosity):" \
   "(mm):(my-events)(unwind):" \
   "(max-var):(max-po-trans):(ignore-arrays)(remove-function-pointers)" \
   "(cfg-kill)(no-dependencies)(force-loop-duplication)(no-loop-duplication)" \
