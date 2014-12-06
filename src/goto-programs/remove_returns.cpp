@@ -165,23 +165,23 @@ void remove_returnst::do_function_calls(
     {
       code_function_callt &function_call=to_code_function_call(i_it->code);
 
-      assert(function_call.function().id()==ID_symbol);
-
-      const irep_idt function_id=
-        to_symbol_expr(function_call.function()).get_identifier();
-
-      // see if we have a body
-      goto_functionst::function_mapt::const_iterator
-        f_it=goto_functions.function_map.find(function_id);
-
-      if(f_it==goto_functions.function_map.end())
-        throw "failed to find function in function map";
-
       // replace "lhs=f(...)" by "f(...); lhs=f#return_value;"
       code_typet old_type=to_code_type(function_call.function().type());
 
       if(old_type.return_type()!=empty_typet())
       {
+        assert(function_call.function().id()==ID_symbol);
+
+        const irep_idt function_id=
+          to_symbol_expr(function_call.function()).get_identifier();
+
+        // see if we have a body
+        goto_functionst::function_mapt::const_iterator
+          f_it=goto_functions.function_map.find(function_id);
+
+        if(f_it==goto_functions.function_map.end())
+          throw "failed to find function `"+id2string(function_id)+"' in function map";
+
         // fix the type
         to_code_type(function_call.function().type()).return_type()=empty_typet();
 
