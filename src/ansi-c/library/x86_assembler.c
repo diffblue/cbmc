@@ -20,7 +20,7 @@ inline void __asm_fstcw(unsigned short *dest)
 inline void __asm_fldcw(const unsigned short *src)
 {
   // the rounding mode is bits 10 and 11 in the control word
-  __CPROVER_rounding_mode=((*src)>>10)&2;
+  __CPROVER_rounding_mode=((*src)>>10)&3;
 }
 
 /* FUNCTION: __asm_mfence */
