@@ -149,7 +149,7 @@ protected:
   virtual std::string convert_code(const codet &src, unsigned indent);
   std::string convert_code_label(const code_labelt &src, unsigned indent);
   std::string convert_code_switch_case(const code_switch_caset &src, unsigned indent);
-  std::string convert_code_asm(const codet &src, unsigned indent);
+  std::string convert_code_asm(const code_asmt &src, unsigned indent);
   std::string convert_code_assign(const code_assignt &src, unsigned indent);
   std::string convert_code_free(const codet &src, unsigned indent);
   std::string convert_code_init(const codet &src, unsigned indent);
