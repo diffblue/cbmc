@@ -1,6 +1,8 @@
 
 /* FUNCTION: __asm_fnstcw */
 
+extern int __CPROVER_rounding_mode;
+
 inline void __asm_fnstcw(unsigned short *dest)
 {
   // the rounding mode is bits 10 and 11 in the control word
@@ -9,6 +11,8 @@ inline void __asm_fnstcw(unsigned short *dest)
 
 /* FUNCTION: __asm_fstcw */
 
+extern int __CPROVER_rounding_mode;
+
 inline void __asm_fstcw(unsigned short *dest)
 {
   // the rounding mode is bits 10 and 11 in the control word
@@ -16,6 +20,8 @@ inline void __asm_fstcw(unsigned short *dest)
 }
 
 /* FUNCTION: __asm_fldcw */
+
+extern int __CPROVER_rounding_mode;
 
 inline void __asm_fldcw(const unsigned short *src)
 {
