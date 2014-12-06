@@ -25,6 +25,7 @@ Purpose: removes assembler
 
 void remove_asm(
   goto_programt::instructiont &instruction,
+  goto_programt &dest,
   symbol_tablet &symbol_table)
 {
 }
@@ -47,7 +48,17 @@ void remove_asm(
 {
   Forall_goto_program_instructions(it, goto_function.body)
   {
-    remove_asm(*it, symbol_table);
+    if(it->is_other() && it->code.get_statement()==ID_asm)
+    {
+      goto_programt tmp_dest;
+      remove_asm(*it, tmp_dest, symbol_table);
+      it->make_skip();
+      
+      goto_programt::targett next=it;
+      next++;
+      
+      goto_function.body.destructive_insert(next, tmp_dest);
+    }
   }
 }
 
@@ -68,7 +79,9 @@ void remove_asm(
   goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
+  {
     remove_asm(it->second, symbol_table);
+  }
 }
 
 /*******************************************************************\
