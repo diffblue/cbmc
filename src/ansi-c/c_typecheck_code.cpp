@@ -159,7 +159,7 @@ Function: c_typecheck_baset::typecheck_asm
 
 void c_typecheck_baset::typecheck_asm(codet &code)
 {
-  const irep_idt flavor=code.get(ID_flavor);
+  const irep_idt flavor=to_code_asm(code).get_flavor();
   
   if(flavor==ID_gcc)
   {
