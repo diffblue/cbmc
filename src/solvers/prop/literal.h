@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 // sign='false' means positive
 // sign='true' means negative
 //
+// The top bit is used to indicate that the literal is constant
+// true or false.
 
 class literalt
 {
@@ -102,8 +104,8 @@ public:
   }
 
   //
-  // Returns a literal in the dimacs CNF encoding
-  // A negative integer denotes a negated literal
+  // Returns a literal in the dimacs CNF encoding.
+  // A negative integer denotes a negated literal.
   //
   int dimacs() const
   {
@@ -177,6 +179,9 @@ public:
   }
   
 protected:
+  // We deliberately don't use size_t here to save some memory
+  // on 64-bit machines; i.e., in practice, we restrict ourselves
+  // to SAT instances with no more than 2^31 variables.
   unsigned l;  
 };
 
