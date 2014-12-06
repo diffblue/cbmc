@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/language.h>
 #include <util/options.h>
 #include <util/memory_info.h>
+#include <util/unicode.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
