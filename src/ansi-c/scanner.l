@@ -24,6 +24,7 @@ static int isatty(int) { return 0; }
 
 #include "c_types.h"
 #include "preprocessor_line.h"
+#include "string_constant.h"
 
 #include "literals/convert_float_literal.h"
 #include "literals/convert_integer_literal.h"
@@ -1228,15 +1229,17 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
 <MSC_ASM>{ws}"{" { BEGIN(ASM_BLOCK); loc(); return '{'; }
 <MSC_ASM>[^{^}^\n]* { loc();
-                  stack(yyansi_clval).set(ID_value, yytext);
-                  stack(yyansi_clval).id(ID_string_constant);
+                  source_locationt l=stack(yyansi_clval).source_location();
+                  stack(yyansi_clval)=string_constantt(yytext);
+                  stack(yyansi_clval).add_source_location()=l;
                   BEGIN(GRAMMAR);
                   return TOK_ASM_STRING;
                 }
 
 <ASM_BLOCK>[^}]* { loc();
-                  stack(yyansi_clval).set(ID_value, yytext);
-                  stack(yyansi_clval).id(ID_string_constant);
+                  source_locationt l=stack(yyansi_clval).source_location();
+                  stack(yyansi_clval)=string_constantt(yytext);
+                  stack(yyansi_clval).add_source_location()=l;
                   return TOK_ASM_STRING; }
 <ASM_BLOCK>"}"  { PARSER.asm_block_following=false;
                   BEGIN(GRAMMAR); loc(); return '}'; }
