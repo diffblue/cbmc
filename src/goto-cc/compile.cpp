@@ -261,7 +261,7 @@ bool compilet::add_input_file(const std::string &file_name)
       {
         if(ch!='\n')
         {
-          line+=ch;
+          line+=(char)ch;
         }
         else
         {
