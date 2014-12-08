@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_util.h>
 #include <util/byte_operators.h>
+#include <util/cprover_prefix.h>
 
 #include <ansi-c/c_types.h>
 
@@ -71,10 +72,15 @@ void goto_symext::symex_assign(
   {
     visibilityt visibility=VISIBLE;
 
-    // let's hide return value assignments    
+    // Let's hide return value assignments.
     if(lhs.id()==ID_symbol &&
        id2string(to_symbol_expr(lhs).get_identifier()).find(
                   "#return_value!")!=std::string::npos)
+      visibility=HIDDEN;
+
+    // We also hide all those evil things that happen
+    // in __CPROVER_initialize.
+    if(state.source.pc->function==CPROVER_PREFIX "initialize")
       visibility=HIDDEN;
   
     guardt guard; // NOT the state guard!

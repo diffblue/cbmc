@@ -258,6 +258,7 @@ void symex_target_equationt::assignment(
 
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
   SSA_step.type=goto_trace_stept::ASSIGNMENT;
+  SSA_step.hidden=(assignment_type!=STATE);
   SSA_step.source=source;
 
   merge_ireps(SSA_step);

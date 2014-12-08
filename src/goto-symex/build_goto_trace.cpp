@@ -212,9 +212,10 @@ void build_goto_trace(
       continue;
     }
 
-    // drop hidden assignments
+    // drop PHI and GUARD assignments altogether
     if(it->is_assignment() &&
-       SSA_step.assignment_type!=symex_target_equationt::STATE)
+       SSA_step.assignment_type!=symex_target_equationt::STATE &&
+       SSA_step.assignment_type!=symex_target_equationt::HIDDEN)
       continue;
 
     goto_tracet::stepst &steps=time_map[current_time];
@@ -226,6 +227,7 @@ void build_goto_trace(
     goto_trace_step.comment=SSA_step.comment;
     goto_trace_step.lhs_object=SSA_step.original_lhs_object;
     goto_trace_step.type=SSA_step.type;
+    goto_trace_step.hidden=SSA_step.hidden;
     goto_trace_step.format_string=SSA_step.format_string;
     goto_trace_step.io_id=SSA_step.io_id;
     goto_trace_step.formatted=SSA_step.formatted;
