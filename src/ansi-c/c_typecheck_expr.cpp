@@ -3383,6 +3383,29 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
       }
     }
   }
+  else if(statement==ID_assign_bitxor ||
+          statement==ID_assign_bitand ||
+          statement==ID_assign_bitor)
+  {
+    // these are more restrictive
+    if(final_type0.id()==ID_bool ||
+       final_type0.get(ID_C_c_type)==ID_bool)
+    {
+      implicit_typecast_arithmetic(op1);
+      if(op1.type().id()==ID_bool ||
+         op1.type().id()==ID_c_enum_tag ||
+         op1.type().id()==ID_unsignedbv ||
+         op1.type().id()==ID_signedbv)
+        return;
+    }
+    else if(final_type0.id()==ID_c_enum_tag ||
+            final_type0.id()==ID_unsignedbv ||
+            final_type0.id()==ID_signedbv)
+    {
+      implicit_typecast(op1, final_type0);
+      return;
+    }
+  }
   else
   {
     if(final_type0.id()==ID_pointer &&
@@ -3400,8 +3423,15 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
       // promote
       implicit_typecast_arithmetic(op1);
 
-      if(is_number(type1))
+      if(is_number(op1.type()) ||
+         type1.id()==ID_bool ||
+         type1.id()==ID_c_enum_tag)
         return;
+      else
+      {
+        str << "type1: " << type1.pretty();
+        throw 0;
+      }
     }
     else if(final_type0.id()==ID_vector &&
             final_type1.id()==ID_vector)
