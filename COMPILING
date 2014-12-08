@@ -39,12 +39,15 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    WARNING: g++ 4.5.x has been observed to mis-optimize code in
    MiniSat with -O3. You must use a newer version.
 
-1) You need a SAT solver (in source). We recommend MiniSat2. Do
+1) As a user, get the CBMC source via
 
-   cd src
+   svn co http://www.cprover.org/svn/cbmc/trunk cbmc-trunk
+
+2) Do
+
+   cd cbmc-trunk/src
    make minisat2-download
-
-2) Type make - that should do it.
+   make
 
 
 COMPILATION ON SOLARIS 11
@@ -120,12 +123,15 @@ Follow these instructions:
 
    https://developer.apple.com/downloads/
 
-1) You need a SAT solver (in source). We recommend MiniSat2. Do
+1) In a terminal window, get the CBMC source via
 
-   cd src
+   svn co http://www.cprover.org/svn/cbmc/trunk cbmc-trunk
+
+2) Then type
+
+   cd cbmc-trunk/src
    make minisat2-download
-
-2) Type cd src; make - that should do it.
+   make
 
 
 COMPILATION ON WINDOWS
@@ -185,8 +191,8 @@ can be used for building with MSBuild.  Note that you still need to run
 flex/bison using "make generated_files" before opening the project.
 
 
-ECLIPSE
--------
+WORKING WITH ECLIPSE
+--------------------
 
 To work with Eclipse, do the following:
 
