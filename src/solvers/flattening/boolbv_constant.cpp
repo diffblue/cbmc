@@ -65,27 +65,14 @@ void boolbvt::convert_constant(const exprt &expr, bvt &bv)
 
     return;
   }
-  else if(expr.type().id()==ID_c_enum ||
-          expr.type().id()==ID_c_enum_tag ||
-          expr.type().id()==ID_incomplete_c_enum)
-  {
-    mp_integer value=string2integer(expr.get_string(ID_value));
-    std::string binary=integer2binary(value, width);
-    assert(width!=0);
-
-    for(unsigned i=0; i<width; i++)
-    {
-      bool bit=(binary[binary.size()-i-1]=='1');
-      bv[i]=const_literal(bit);
-    }
-
-    return;
-  }
   else if(expr.type().id()==ID_unsignedbv ||
           expr.type().id()==ID_signedbv ||
           expr.type().id()==ID_bv ||
           expr.type().id()==ID_fixedbv ||
-          expr.type().id()==ID_floatbv)
+          expr.type().id()==ID_floatbv ||
+          expr.type().id()==ID_c_enum ||
+          expr.type().id()==ID_c_enum_tag ||
+          expr.type().id()==ID_incomplete_c_enum)
   {
     const std::string &binary=expr.get_string(ID_value);
 
