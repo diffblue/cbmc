@@ -65,7 +65,7 @@ bool read_bin_goto_object_v2(
     sym.is_output = (flags & (1 << 10))!=0;
     sym.is_state_var = (flags & (1 << 9))!=0;
     sym.is_parameter = (flags & (1 << 8))!=0;
-    //sym.free_var = (flags & (1 << 7))!=0;
+    sym.is_auxiliary = (flags & (1 << 7))!=0;
     //sym.binding = (flags & (1 << 6))!=0;
     sym.is_lvalue = (flags & (1 << 5))!=0;
     sym.is_static_lifetime = (flags & (1 << 4))!=0;
