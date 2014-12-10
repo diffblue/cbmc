@@ -3315,6 +3315,34 @@ std::string expr2ct::convert_code_block(
 
 /*******************************************************************\
 
+Function: expr2ct::convert_code_decl_block
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_code_decl_block(
+  const codet &src,
+  unsigned indent)
+{
+  assert(indent>=0);
+  std::string dest;
+
+  forall_operands(it, src)
+  {
+    dest+=convert_code(to_code(*it), indent);
+    dest+="\n";
+  }
+
+  return dest;
+}
+
+/*******************************************************************\
+
 Function: expr2ct::convert_code_expression
 
   Inputs:
@@ -3431,6 +3459,9 @@ std::string expr2ct::convert_code(
 
   if(statement==ID_decl)
     return convert_code_decl(src, indent);
+
+  if(statement==ID_decl_block)
+    return convert_code_decl_block(src, indent);
 
   if(statement==ID_dead)
     return convert_code_dead(src, indent);
