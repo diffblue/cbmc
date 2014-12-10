@@ -246,6 +246,9 @@ void goto_symext::symex_assign_symbol(
   
   symbol_exprt original_lhs=lhs;
   state.get_original_name(original_lhs);
+
+  const symbolt &symbol=ns.lookup(original_lhs);
+  if(symbol.is_auxiliary) visibility=HIDDEN;
   
   state.rename(ssa_rhs, ns);
   do_simplify(ssa_rhs);
