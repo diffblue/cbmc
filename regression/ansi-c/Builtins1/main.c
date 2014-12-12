@@ -14,11 +14,14 @@
 #include <time.h>
 
 #ifndef _WIN32
-#include <alloca.h>
 #include <complex.h>
 #include <stdbool.h>
 #include <unistd.h>
 #include <pthread.h>
+#endif
+
+#ifdef __linux__
+#include <alloca.h>
 #endif
 
 int main()
