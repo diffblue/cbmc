@@ -475,7 +475,7 @@ Function: gcc_modet::run_gcc
 
  Outputs:
 
- Purpose: run gcc with original command line
+ Purpose: run gcc or clang with original command line
 
 \*******************************************************************/
 
@@ -493,10 +493,16 @@ int gcc_modet::run_gcc()
   {
     new_argv.push_back(it->arg);
   }
+  
+  #ifdef __FreeBSD__
+  const char *compiler="clang";
+  #else
+  const char *compiler="gcc";
+  #endif
 
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]="gcc";
+  new_argv[0]=compiler;
   
   #if 0
   std::cout << "RUN:";
@@ -505,7 +511,7 @@ int gcc_modet::run_gcc()
   std::cout << std::endl;
   #endif
   
-  return run("gcc", new_argv);
+  return run(compiler, new_argv);
 }
 
 /*******************************************************************\
