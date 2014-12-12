@@ -455,7 +455,7 @@ int gcc_modet::preprocess(
   
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]="gcc";
+  new_argv[0]=compiler_name();
   
   #if 0
   std::cout << "RUN:";
@@ -464,7 +464,7 @@ int gcc_modet::preprocess(
   std::cout << std::endl;
   #endif
   
-  return run("gcc", new_argv);
+  return run(compiler_name(), new_argv);
 }
 
 /*******************************************************************\
@@ -494,11 +494,7 @@ int gcc_modet::run_gcc()
     new_argv.push_back(it->arg);
   }
   
-  #ifdef __FreeBSD__
-  const char *compiler="clang";
-  #else
-  const char *compiler="gcc";
-  #endif
+  const char *compiler=compiler_name();
 
   // overwrite argv[0]
   assert(new_argv.size()>=1);
@@ -621,7 +617,7 @@ int gcc_modet::gcc_hybrid_binary()
   if(act_as_ld)
     new_argv[0]="ld";
   else
-    new_argv[0]="gcc";
+    new_argv[0]=compiler_name();
   
   #if 0
   std::cout << "RUN:";
