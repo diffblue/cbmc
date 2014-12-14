@@ -63,7 +63,8 @@ public:
     const exprt &guard,
     const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs_object,
-    const sourcet &source);
+    const sourcet &source,
+    assignment_typet assignment_type);
 
   // note the death of a variable - lhs must be symbol
   virtual void dead(
