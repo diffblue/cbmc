@@ -758,7 +758,8 @@ bool cbmc_parseoptionst::process_goto_program(
   {
     namespacet ns(symbol_table);
     
-    // remove inline assembler
+    // Remove inline assembler; this needs to happen before
+    // adding the library.
     remove_asm(symbol_table, goto_functions);
 
     // add the library
