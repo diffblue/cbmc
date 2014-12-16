@@ -83,7 +83,10 @@ exprt zero_initializert::zero_initializer_rec(
           type_id==ID_floatbv ||
           type_id==ID_fixedbv ||
           type_id==ID_pointer ||
-          type_id==ID_complex)
+          type_id==ID_complex ||
+          type_id==ID_c_enum ||
+          type_id==ID_incomplete_c_enum ||
+          type_id==ID_c_enum_tag)
   {
     exprt result=gen_zero(type);
     result.add_source_location()=source_location;
@@ -94,15 +97,6 @@ exprt zero_initializert::zero_initializer_rec(
     err_location(source_location);
     error("cannot zero-initialize code-type");
     throw 0;
-  }
-  else if(type_id==ID_c_enum ||
-          type_id==ID_incomplete_c_enum ||
-          type_id==ID_c_enum_tag)
-  {
-    constant_exprt value(type);
-    value.set_value(ID_0);
-    value.add_source_location()=source_location;
-    return value;
   }
   else if(type_id==ID_array)
   {

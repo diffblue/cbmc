@@ -252,15 +252,16 @@ bool compilet::add_input_file(const std::string &file_name)
     }
 
     stream=popen(cmd.str().c_str(), "r");
+
     if(stream!=NULL)
     {
       std::string line;
-      char ch;
+      int ch; // fgetc returns an int, not char
       while((ch=fgetc(stream))!=EOF)
       {
-        if(ch!='\n' && ch!=EOF)
+        if(ch!='\n')
         {
-          line += ch;
+          line+=(char)ch;
         }
         else
         {
@@ -273,11 +274,14 @@ bool compilet::add_input_file(const std::string &file_name)
 
           if(is_goto_binary(t))
             object_files.push_back(t);
+
           line = "";
         }
       }
+
+      pclose(stream);
     }
-    pclose(stream);
+
     cmd.str("");
 
     if(chdir(working_directory.c_str())!=0)

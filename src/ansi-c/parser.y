@@ -188,6 +188,8 @@ extern char *yyansi_ctext;
 /*** these exist only for the benefit of the C++ frontend */
 
 %token TOK_CATCH       "catch"
+%token TOK_CHAR16_T    "char16_t"
+%token TOK_CHAR32_T    "char32_t"
 %token TOK_CLASS       "class"
 %token TOK_DELETE      "delete"
 %token TOK_DECLTYPE    "decltype"
@@ -196,6 +198,7 @@ extern char *yyansi_ctext;
 %token TOK_MUTABLE     "mutable"
 %token TOK_NAMESPACE   "namespace"
 %token TOK_NEW         "new"
+%token TOK_NOEXCEPT    "noexcept"
 %token TOK_OPERATOR    "operator"
 %token TOK_PRIVATE     "private"
 %token TOK_PROTECTED   "protected"
@@ -543,7 +546,7 @@ unary_expression:
           set($$, ID_address_of);
           mto($$, $2);
         }
-        | TOK_ANDAND identifier_or_typedef_name
+        | TOK_ANDAND gcc_local_label
         { // this takes the address of a label (a gcc extension)
           $$=$1;
           irep_idt identifier=PARSER.lookup_label(stack($2).get(ID_C_base_name));
@@ -2288,7 +2291,8 @@ gcc_asm_statement:
           $$=$1;
           statement($$, ID_asm);
           stack($$).set(ID_flavor, ID_gcc);
-          mto($$, $4);
+          stack($$).operands().resize(5);
+          stack($$).op0()=stack($4);
         }
         ;
 
@@ -2374,30 +2378,45 @@ volatile_or_goto_opt:
 
 gcc_asm_commands:
           gcc_asm_assembler_template
-          {
-            init($$);
-            mto($$, $1);
-          }
+        {
+          init($$);
+          stack($$).operands().resize(5);
+          stack($$).operands()[0]=stack($1);
+        }
         | gcc_asm_assembler_template gcc_asm_outputs
-          {
-            init($$);
-            mto($$, $1);
-          }
+        {
+          init($$);
+          stack($$).operands().resize(5);
+          stack($$).operands()[0]=stack($1);
+          stack($$).operands()[1]=stack($2);
+        }
         | gcc_asm_assembler_template gcc_asm_outputs gcc_asm_inputs
-          {
-            init($$);
-            mto($$, $1);
-          }
+        {
+          init($$);
+          stack($$).operands().resize(5);
+          stack($$).operands()[0]=stack($1);
+          stack($$).operands()[1]=stack($2);
+          stack($$).operands()[2]=stack($3);
+        }
         | gcc_asm_assembler_template gcc_asm_outputs gcc_asm_inputs gcc_asm_clobbered_registers
-          {
-            init($$);
-            mto($$, $1);
-          }
+        {
+          init($$);
+          stack($$).operands().resize(5);
+          stack($$).operands()[0]=stack($1);
+          stack($$).operands()[1]=stack($2);
+          stack($$).operands()[2]=stack($3);
+          stack($$).operands()[3]=stack($4);
+        }
         | gcc_asm_assembler_template gcc_asm_outputs gcc_asm_inputs gcc_asm_clobbered_registers gcc_asm_labels
-          {
-            init($$);
-            mto($$, $1);
-          }
+        {
+          init($$);
+          stack($$).operands().resize(5);
+          stack($$).operands()[0]=stack($1);
+          stack($$).operands()[1]=stack($2);
+          stack($$).operands()[2]=stack($3);
+          stack($$).operands()[3]=stack($4);
+          stack($$).operands()[4]=stack($5);
+        }
         ;
 
 gcc_asm_assembler_template: string
@@ -2405,57 +2424,126 @@ gcc_asm_assembler_template: string
 
 gcc_asm_outputs:
           ':' gcc_asm_output_list
+        {
+          $$=$2;
+        }
         | ':'
         ;
 
 gcc_asm_output:
           string '(' comma_expression ')'
+        {
+          $$=$2;
+          stack($$).id(ID_gcc_asm_output);
+          stack($$).move_to_operands(stack($1), stack($3)); 
+        }
         | '[' identifier_or_typedef_name ']'
           string '(' comma_expression ')'
+        {
+          $$=$5;
+          stack($$).move_to_operands(stack($4), stack($6)); 
+        }
         ;
 
 gcc_asm_output_list:
           gcc_asm_output
+        {
+          init($$, irep_idt());
+          mto($$, $1);
+        }
         | gcc_asm_output_list ',' gcc_asm_output
+        {
+          $$=$1;
+          mto($$, $3);
+        }
         ;
 
 gcc_asm_inputs:
           ':' gcc_asm_input_list
+        {
+          $$=$2;
+        }
         | ':'
         ;
 
 gcc_asm_input:
           string '(' comma_expression ')'
+        {
+          $$=$2;
+          stack($$).id(ID_gcc_asm_input);
+          stack($$).move_to_operands(stack($1), stack($3)); 
+        }
         | '[' identifier_or_typedef_name ']'
           string '(' comma_expression ')'
+        {
+          $$=$5;
+          stack($$).move_to_operands(stack($4), stack($6)); 
+        }
         ;
 
 gcc_asm_input_list:
           gcc_asm_input
+        {
+          init($$, irep_idt());
+          mto($$, $1);
+        }
         | gcc_asm_input_list ',' gcc_asm_input
+        {
+          $$=$1;
+          mto($$, $3);
+        }
+        ;
 
 gcc_asm_clobbered_registers:
           ':' gcc_asm_clobbered_registers_list
+        {
+          $$=$2;
+        }
         | ':'
         ;
 
 gcc_asm_clobbered_register:
           string
+        {
+          init($$, ID_gcc_asm_clobbered_register);
+          mto($$, $1);
+        }
         ;
 
 gcc_asm_clobbered_registers_list:
           gcc_asm_clobbered_register
+        {
+          init($$, irep_idt());
+          mto($$, $1);
+        }
         | gcc_asm_clobbered_registers_list ',' gcc_asm_clobbered_register
+        {
+          $$=$1;
+          mto($$, $3);
+        }
         ;
 
 gcc_asm_labels:
           ':' gcc_asm_labels_list
+        {
+          $$=$2;
+        }
         | ':'
         ;
 
 gcc_asm_labels_list:
           gcc_local_label
+        {
+          irep_idt identifier=PARSER.lookup_label(stack($1).get(ID_C_base_name));
+          $$=$1;
+          stack($$).id(ID_label);
+          stack($$).set(ID_identifier, identifier);
+        }
         | gcc_asm_labels_list ',' gcc_local_label
+        {
+          $$=$1;
+          mto($$, $3);
+        }
         ;
 
 translation_unit:

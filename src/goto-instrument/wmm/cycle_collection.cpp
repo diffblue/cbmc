@@ -458,8 +458,8 @@ bool event_grapht::graph_explorert::backtrack(
         }
         if((!egraph.filter_uniproc || new_cycle.is_not_uniproc(model)) && not_thin_air 
           && new_cycle.is_cycle() &&
-          new_cycle.is_unsafe(model) &&
-          new_cycle.is_unsafe_asm(model))
+          new_cycle.is_unsafe(model) /*&&
+          new_cycle.is_unsafe_asm(model)*/)
         {
           egraph.message.debug() << new_cycle.print_name(model,false) 
             << messaget::eom;

@@ -317,6 +317,10 @@ void show_goto_trace(
       it!=goto_trace.steps.end();
       it++)
   {
+    // hide the hidden ones
+    if(it->hidden)
+      continue;
+  
     switch(it->type)
     {
     case goto_trace_stept::ASSERT:

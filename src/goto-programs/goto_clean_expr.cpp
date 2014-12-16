@@ -46,6 +46,7 @@ symbol_exprt goto_convertt::make_compound_literal(
     new_symbol.is_thread_local=true;
     new_symbol.is_static_lifetime=source_location.get_function().empty();
     new_symbol.is_file_local=true;
+    new_symbol.is_auxiliary=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
     new_symbol.location=source_location;

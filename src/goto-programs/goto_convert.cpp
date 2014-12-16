@@ -489,7 +489,7 @@ void goto_convertt::convert(
   else if(statement==ID_CPROVER_try_finally)
     convert_CPROVER_try_finally(code, dest);
   else if(statement==ID_asm)
-    convert_asm(code, dest);
+    convert_asm(to_code_asm(code), dest);
   else if(statement==ID_static_assert)
   {
     assert(code.operands().size()==2);
@@ -2391,6 +2391,7 @@ symbolt &goto_convertt::new_tmp_symbol(
     new_symbol.is_lvalue=true;
     new_symbol.is_thread_local=true;
     new_symbol.is_file_local=true;
+    new_symbol.is_auxiliary=true;
     new_symbol.type=type;    
     new_symbol.location=source_location;
   } while(symbol_table.move(new_symbol, symbol_ptr));    

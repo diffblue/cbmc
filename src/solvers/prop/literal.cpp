@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: cover_goalst::~cover_goalst
+Function: operator <<
 
   Inputs:
 

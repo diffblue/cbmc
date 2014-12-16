@@ -156,7 +156,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
       cpp_scopes.current_scope().prefix+id2string(base_name);
       
     // these have a subtype, which defaults to int
-    type.subtype()=int_type();
+    type.subtype()=signed_int_type();
 
     symbolt symbol;
 

@@ -88,9 +88,14 @@ void goto_symext::symex_decl(statet &state)
   symbol_exprt original_lhs=to_symbol_expr(code.op0());
   symbol_exprt ssa_lhs=original_lhs;
   state.rename(ssa_lhs, ns);
+
+  // we hide the declaration of auxiliary variables
+  bool hidden=
+    ns.lookup(original_lhs.get_identifier()).is_auxiliary;
   
   target.decl(
     state.guard.as_expr(),
     ssa_lhs, original_lhs,
-    state.source);
+    state.source,
+    hidden?symex_targett::HIDDEN:symex_targett::STATE);
 }

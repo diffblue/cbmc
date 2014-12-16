@@ -42,6 +42,15 @@ protected:
   int gcc_hybrid_binary();
   
   static bool needs_preprocessing(const std::string &);
+  
+  static inline const char *compiler_name()
+  {
+    #ifdef __FreeBSD__
+    return "clang";
+    #else
+    return "gcc";
+    #endif
+  }
 };
 
 #endif /* GOTO_CC_GCC_MODE_H */

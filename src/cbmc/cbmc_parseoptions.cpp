@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_asm.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -102,15 +103,12 @@ Function: cbmc_parseoptionst::eval_verbosity
 void cbmc_parseoptionst::eval_verbosity()
 {
   // this is our default verbosity
-  int v=messaget::M_STATISTICS;
+  unsigned int v=messaget::M_STATISTICS;
   
   if(cmdline.isset("verbosity"))
   {
-    v=unsafe_string2int(cmdline.get_value("verbosity"));
-    if(v<0)
-      v=0;
-    else if(v>10)
-      v=10;
+    v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
+    if(v>10) v=10;
   }
   
   ui_message_handler.set_verbosity(v);
@@ -642,10 +640,6 @@ bool cbmc_parseoptionst::get_goto_program(
       goto_convert(symbol_table, goto_functions, ui_message_handler);
     }
 
-    // finally add the library
-    status() << "Adding CPROVER library" << eom;
-    link_to_library(symbol_table, goto_functions, ui_message_handler);
-
     if(process_goto_program(options, goto_functions))
       return true;
   }
@@ -763,6 +757,14 @@ bool cbmc_parseoptionst::process_goto_program(
   try
   {
     namespacet ns(symbol_table);
+    
+    // Remove inline assembler; this needs to happen before
+    // adding the library.
+    remove_asm(symbol_table, goto_functions);
+
+    // add the library
+    status() << "Adding CPROVER library" << eom;
+    link_to_library(symbol_table, goto_functions, ui_message_handler);
 
     if(cmdline.isset("string-abstraction"))
       string_instrumentation(
@@ -777,10 +779,8 @@ bool cbmc_parseoptionst::process_goto_program(
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
     
-    // remove returns
+    // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
-    
-    // remove gcc vectors and complex
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
     

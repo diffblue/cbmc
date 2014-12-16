@@ -115,6 +115,9 @@ complex
 signed
 unsigned
 asm
+gcc_asm_input
+gcc_asm_output
+gcc_asm_clobbered_register
 incomplete_array
 incomplete_struct
 incomplete_union
@@ -463,6 +466,8 @@ pmos
 rnmos
 rpmos
 wchar_t
+char16_t
+char32_t
 size_t
 ssize_t
 inst

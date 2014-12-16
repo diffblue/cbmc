@@ -59,17 +59,14 @@ Function: goto_fence_inserter_parseoptionst::set_verbosity
 
 void goto_fence_inserter_parseoptionst::set_verbosity()
 {
-  int v=8;
+  unsigned int v=8; // default
   
   if(cmdline.isset("verbosity"))
   {
     v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-    if(v<0)
-      v=0;
-    else if(v>10)
-      v=10;
+    if(v>10) v=10;
   }
-  
+
   ui_message_handler.set_verbosity(v);
 }
 
@@ -295,6 +292,7 @@ void goto_fence_inserter_parseoptionst::instrument_goto_program(
       const unsigned unwind_loops =
         ( cmdline.isset("unwind") ? 
           unsafe_string2unsigned(cmdline.get_value("unwind")) : 0 );
+
       const unsigned max_po_trans =
         ( cmdline.isset("max-po-trans") ?
           unsafe_string2unsigned(cmdline.get_value("max-po-trans")) : 0 );
@@ -341,9 +339,11 @@ void goto_fence_inserter_parseoptionst::instrument_goto_program(
       const unsigned unwind_loops = 
         ( cmdline.isset("unwind") ? 
           unsafe_string2unsigned(cmdline.get_value("unwind")) : 0 );
+
       const unsigned max_var =
         ( cmdline.isset("max-var") ?
           unsafe_string2unsigned(cmdline.get_value("max-var")) : 0 );
+
       const unsigned max_po_trans =
         ( cmdline.isset("max-po-trans") ?
           unsafe_string2unsigned(cmdline.get_value("max-po-trans")) : 0 );

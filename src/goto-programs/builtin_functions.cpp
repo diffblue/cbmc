@@ -1091,10 +1091,24 @@ void goto_convertt::do_function_call_symbol(
   {
     // make it a side effect if there is an LHS
     if(lhs.is_nil()) return;
-
-    exprt rhs=side_effect_expr_nondett(lhs.type());
-    rhs.add_source_location()=function.source_location();
-    rhs.set(ID_C_identifier, identifier);
+    
+    exprt rhs;
+    
+    // We need to special-case for _Bool, which
+    // can only be 0 or 1.
+    if(lhs.type().get(ID_C_c_type)==ID_bool)
+    {
+      rhs=side_effect_expr_nondett(bool_typet());
+      rhs.add_source_location()=function.source_location();
+      rhs.set(ID_C_identifier, identifier);
+      rhs=typecast_exprt(rhs, lhs.type());
+    } 
+    else
+    {
+      rhs=side_effect_expr_nondett(lhs.type());
+      rhs.add_source_location()=function.source_location();
+      rhs.set(ID_C_identifier, identifier);
+    }
 
     code_assignt assignment(lhs, rhs);
     assignment.add_source_location()=function.source_location();
@@ -1212,18 +1226,29 @@ void goto_convertt::do_function_call_symbol(
           identifier=="c::__assert")
   {
     // __assert_rtn has been seen on MacOS;
-    // __assert is FreeBSD.
+    // __assert is FreeBSD and Solaris 11.
     // These take four arguments:
     // __func__, "file.c", line, "expression"
-
-    if(arguments.size()!=4)
+    // On Solaris 11, it's three arguments:
+    // "expression", "file", line
+    
+    irep_idt description;
+    
+    if(arguments.size()==4)
+    {
+      description=
+        "assertion "+id2string(get_string_constant(arguments[3]));
+    }
+    else if(arguments.size()==3)
+    {
+      description=
+        "assertion "+id2string(get_string_constant(arguments[1]));
+    }
+    else
     {
       err_location(function);
       throw "`"+id2string(identifier)+"' expected to have four arguments";
     }
-    
-    const irep_idt description=
-      "assertion "+id2string(get_string_constant(arguments[3]));
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();

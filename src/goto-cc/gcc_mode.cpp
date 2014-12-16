@@ -74,7 +74,7 @@ bool gcc_modet::doit()
     return false;
   }
 
-  int verbosity=1;
+  unsigned int verbosity=1;
 
   if(cmdline.isset('v'))
   {
@@ -113,7 +113,7 @@ bool gcc_modet::doit()
     verbosity=2;
 
   if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2int(cmdline.get_value("verbosity"));
+    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
 
   ui_message_handler.set_verbosity(verbosity);
 
@@ -455,7 +455,7 @@ int gcc_modet::preprocess(
   
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]="gcc";
+  new_argv[0]=compiler_name();
   
   #if 0
   std::cout << "RUN:";
@@ -464,7 +464,7 @@ int gcc_modet::preprocess(
   std::cout << std::endl;
   #endif
   
-  return run("gcc", new_argv);
+  return run(compiler_name(), new_argv);
 }
 
 /*******************************************************************\
@@ -475,7 +475,7 @@ Function: gcc_modet::run_gcc
 
  Outputs:
 
- Purpose: run gcc with original command line
+ Purpose: run gcc or clang with original command line
 
 \*******************************************************************/
 
@@ -493,10 +493,12 @@ int gcc_modet::run_gcc()
   {
     new_argv.push_back(it->arg);
   }
+  
+  const char *compiler=compiler_name();
 
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]="gcc";
+  new_argv[0]=compiler;
   
   #if 0
   std::cout << "RUN:";
@@ -505,7 +507,7 @@ int gcc_modet::run_gcc()
   std::cout << std::endl;
   #endif
   
-  return run("gcc", new_argv);
+  return run(compiler, new_argv);
 }
 
 /*******************************************************************\
@@ -615,7 +617,7 @@ int gcc_modet::gcc_hybrid_binary()
   if(act_as_ld)
     new_argv[0]="ld";
   else
-    new_argv[0]="gcc";
+    new_argv[0]=compiler_name();
   
   #if 0
   std::cout << "RUN:";

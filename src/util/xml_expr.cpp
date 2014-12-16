@@ -15,6 +15,7 @@ Author: Daniel Kroening
 #include "ieee_float.h"
 #include "fixedbv.h"
 #include "std_expr.h"
+#include "config.h"
 
 #include "xml_expr.h"
 
@@ -36,14 +37,6 @@ xmlt xml(const source_locationt &location)
 
   result.name="location";
   
-  // these will go away
-  #if 0
-  result.new_element("file").data=id2string(location.get_file());
-  result.new_element("line").data=id2string(location.get_line());
-  result.new_element("function").data=id2string(location.get_function());
-  #endif
-  
-  // these are to stay
   if(location.get_file()!="")
     result.set_attribute("file", id2string(location.get_file()));
 
@@ -72,19 +65,140 @@ Function: xml
 \*******************************************************************/
 
 xmlt xml(
+  const typet &type,
+  const namespacet &ns)
+{
+  if(type.id()==ID_symbol)
+    return xml(ns.follow(type), ns);
+
+  xmlt result;
+
+  if(type.id()==ID_unsignedbv)
+  {
+    result.name="integer";
+    result.set_attribute("width", to_unsignedbv_type(type).get_width());
+  }
+  else if(type.id()==ID_signedbv)
+  {
+    result.name="integer";
+    result.set_attribute("width", to_signedbv_type(type).get_width());
+  }
+  else if(type.id()==ID_floatbv)
+  {
+    result.name="float";
+    result.set_attribute("width", to_floatbv_type(type).get_width());
+  }
+  else if(type.id()==ID_bv)
+  {
+    result.name="integer";
+    result.set_attribute("width", to_bv_type(type).get_width());
+  }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    // we return the base type
+    return xml(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns);
+  }
+  else if(type.id()==ID_fixedbv)
+  {
+    result.name="fixed";
+    result.set_attribute("width", to_fixedbv_type(type).get_width());
+  }
+  else if(type.id()==ID_pointer)
+  {
+    result.name="pointer";
+    result.new_element("subtype").new_element()=xml(type.subtype(), ns);
+  }
+  else if(type.id()==ID_bool)
+  {
+    result.name="boolean";
+  }
+  else if(type.id()==ID_array)
+  {
+    result.name="array";
+    result.new_element("subtype").new_element()=xml(type.subtype(), ns);
+  }
+  else if(type.id()==ID_vector)
+  {
+    result.name="vector";
+    result.new_element("subtype").new_element()=xml(type.subtype(), ns);
+    result.new_element("size").new_element()=xml(to_vector_type(type).size(), ns);
+  }
+  else if(type.id()==ID_struct)
+  {
+    result.name="struct";
+    const struct_typet::componentst &components=
+      to_struct_type(type).components();
+    for(struct_typet::componentst::const_iterator
+        it=components.begin(); it!=components.end(); it++)
+    {
+      xmlt &e=result.new_element("member");
+      e.set_attribute("name", id2string(it->get_name()));
+      e.new_element("type").new_element()=xml(it->type(), ns);
+    }
+  }
+  else if(type.id()==ID_union)
+  {
+    result.name="union";
+    const union_typet::componentst &components=
+      to_union_type(type).components();
+    for(union_typet::componentst::const_iterator
+        it=components.begin(); it!=components.end(); it++)
+    {
+      xmlt &e=result.new_element("member");
+      e.set_attribute("name", id2string(it->get_name()));
+      e.new_element("type").new_element()=xml(it->type(), ns);
+    }
+  }
+  else
+    result.name="unknown";
+
+  return result;
+}
+
+/*******************************************************************\
+
+Function: xml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+xmlt xml(
   const exprt &expr,
   const namespacet &ns)
 {
-  const typet &type=ns.follow(expr.type());
   xmlt result;
   
+  const typet &type=ns.follow(expr.type());
+
   if(expr.id()==ID_constant)
   {
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv)
     {
+      unsigned width=to_bitvector_type(type).get_width();
+    
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));
+      result.set_attribute("width", width);
+
+      bool is_signed=type.id()==ID_signedbv;      
+      std::string sig=is_signed?"":"unsigned ";
+
+      if(width==config.ansi_c.char_width)
+        result.set_attribute("c_type", sig+"char");
+      else if(width==config.ansi_c.int_width)
+        result.set_attribute("c_type", sig+"int");
+      else if(width==config.ansi_c.short_int_width)
+        result.set_attribute("c_type", sig+"short int");
+      else if(width==config.ansi_c.long_int_width)
+        result.set_attribute("c_type", sig+"long int");
+      else if(width==config.ansi_c.long_long_int_width)
+        result.set_attribute("c_type", sig+"long long int");
 
       mp_integer i;
       if(!to_integer(expr, i))
@@ -94,6 +208,8 @@ xmlt xml(
     {
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));
+      result.set_attribute("width", type.subtype().get_string(ID_width));
+      result.set_attribute("c_type", "enum");
 
       mp_integer i;
       if(!to_integer(expr, i))
@@ -110,17 +226,18 @@ xmlt xml(
     {
       result.name="bitvector";
       result.set_attribute("binary", expr.get_string(ID_value));
-      result.data=expr.get_string(ID_value);
     }
     else if(type.id()==ID_fixedbv)
     {
       result.name="fixed";
+      result.set_attribute("width", type.get_string(ID_width));
       result.set_attribute("binary", expr.get_string(ID_value));
       result.data=fixedbvt(to_constant_expr(expr)).to_ansi_c_string();
     }
     else if(type.id()==ID_floatbv)
     {
       result.name="float";
+      result.set_attribute("width", type.get_string(ID_width));
       result.set_attribute("binary", expr.get_string(ID_value));
       result.data=ieee_floatt(to_constant_expr(expr)).to_ansi_c_string();
     }
@@ -159,11 +276,20 @@ xmlt xml(
   else if(expr.id()==ID_struct)
   {
     result.name="struct";
-  
-    forall_operands(it, expr)
+    
+    // these are expected to have a struct type
+    if(type.id()==ID_struct)
     {
-      xmlt &e=result.new_element("member");
-      e.new_element(xml(*it, ns));
+      const struct_typet &struct_type=to_struct_type(type);
+      const struct_typet::componentst &components=struct_type.components();
+      assert(components.size()==expr.operands().size());
+
+      for(unsigned m=0; m<expr.operands().size(); m++)
+      {
+        xmlt &e=result.new_element("member");
+        e.new_element()=xml(expr.operands()[m], ns);
+        e.set_attribute("name", id2string(components[m].get_name()));
+      }
     }
   }
   else if(expr.id()==ID_union)
@@ -174,6 +300,8 @@ xmlt xml(
     
     xmlt &e=result.new_element("member");
     e.new_element(xml(expr.op0(), ns));
+    e.set_attribute("member_name",
+      id2string(to_union_expr(expr).get_component_name()));
   }
   else
     result.name="unknown";

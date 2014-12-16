@@ -2790,14 +2790,77 @@ Function: expr2ct::convert_code_asm
 \*******************************************************************/
 
 std::string expr2ct::convert_code_asm(
-  const codet &src,
+  const code_asmt &src,
   unsigned indent)
 {
   std::string dest=indent_str(indent);
-  dest+="asm(";
-  if(src.operands().size()==1)
-    dest+=convert(src.op0());
-  dest+=");";
+
+  if(src.get_flavor()==ID_gcc)
+  {
+    if(src.operands().size()==5)
+    {
+      dest+="asm(";
+      dest+=convert(src.op0());
+      if(!src.operands()[1].operands().empty() ||
+         !src.operands()[2].operands().empty() ||
+         !src.operands()[3].operands().empty() ||
+         !src.operands()[4].operands().empty())
+      {
+        // need extended syntax
+
+        // outputs
+        dest+=" : ";
+        forall_operands(it, src.op1())
+        {
+          if(it->operands().size()==2)
+          {
+            if(it!=src.op1().operands().begin())
+              dest+=", ";
+            dest+=convert(it->op0());
+            dest+="(";
+            dest+=convert(it->op1());
+            dest+=")";
+          }
+        }
+
+        // inputs
+        dest+=" : ";
+        forall_operands(it, src.op2())
+        {
+          if(it->operands().size()==2)
+          {
+            if(it!=src.op2().operands().begin())
+              dest+=", ";
+            dest+=convert(it->op0());
+            dest+="(";
+            dest+=convert(it->op1());
+            dest+=")";
+          }
+        }
+
+        // clobbered registers
+        dest+=" : ";
+        forall_operands(it, src.op3())
+        {
+          if(it!=src.op3().operands().begin())
+            dest+=", ";
+          dest+=convert(*it);
+        }
+      }
+      dest+=");";
+    }
+  }
+  else if(src.get_flavor()==ID_msc)
+  {
+    if(src.operands().size()==1)
+    {
+      dest+="__asm {\n";
+      dest+=indent_str(indent);
+      dest+=convert(src.op0());
+      dest+="\n}";
+    }
+  }
+
   return dest;
 }
 
@@ -3252,6 +3315,34 @@ std::string expr2ct::convert_code_block(
 
 /*******************************************************************\
 
+Function: expr2ct::convert_code_decl_block
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_code_decl_block(
+  const codet &src,
+  unsigned indent)
+{
+  assert(indent>=0);
+  std::string dest;
+
+  forall_operands(it, src)
+  {
+    dest+=convert_code(to_code(*it), indent);
+    dest+="\n";
+  }
+
+  return dest;
+}
+
+/*******************************************************************\
+
 Function: expr2ct::convert_code_expression
 
   Inputs:
@@ -3328,7 +3419,7 @@ std::string expr2ct::convert_code(
     return convert_code_while(to_code_while(src), indent);
 
   if(statement==ID_asm)
-    return convert_code_asm(src, indent);
+    return convert_code_asm(to_code_asm(src), indent);
 
   if(statement==ID_skip)
     return indent_str(indent)+";";
@@ -3368,6 +3459,9 @@ std::string expr2ct::convert_code(
 
   if(statement==ID_decl)
     return convert_code_decl(src, indent);
+
+  if(statement==ID_decl_block)
+    return convert_code_decl_block(src, indent);
 
   if(statement==ID_dead)
     return convert_code_dead(src, indent);

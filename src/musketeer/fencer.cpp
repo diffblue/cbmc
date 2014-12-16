@@ -141,42 +141,36 @@ void fence_weak_memory(
   if(!no_cfg_kill)
     instrumenter.cfg_cycles_filter();
 
-  /* infers fences */
-  fence_insertert* fence_inserter;
-
-  // allocates and init relevant fence_inserter
+  /* selects method, infers fences then outputs them */ 
   switch(mode) {
     case INFER:
     {
-      fence_inserter=new fence_insertert(instrumenter, model);
+      fence_insertert fence_inserter(instrumenter, model);
+      fence_inserter.compute();
+      fence_inserter.print_to_file_3();
       break;
     }
     case USER_DEF:
     {
-      fence_inserter=new fence_user_def_insertert(instrumenter, model);
+      fence_user_def_insertert fence_inserter(instrumenter, model);
+      fence_inserter.compute();
+      fence_inserter.print_to_file_3();
       break;
     }
     case USER_ASSERT:
     {
-      fence_inserter=new fence_assert_insertert(instrumenter, model);
+      fence_assert_insertert fence_inserter(instrumenter, model);
+      fence_inserter.compute();
+      fence_inserter.print_to_file_3();
       break;
     }
   }
-
-  // computes the set of fences
-  fence_inserter->compute();
-
-  // prints outputs
-  fence_inserter->print_to_file_3();
 
   // additional outputs
 #if 0
   instrumenter.set_rendering_options(render_po, render_file, render_function);
   instrumenter.print_outputs(model, hide_internals);
 #endif
-
-  // deletes fence_inserter
-  delete fence_inserter;
 
   /* TODO: insert the fences into the actual code or call script directly 
      from here*/

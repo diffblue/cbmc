@@ -58,6 +58,9 @@ public:
                  SHARED_READ, SHARED_WRITE,
                  SPAWN, MEMORY_BARRIER, ATOMIC_BEGIN, ATOMIC_END } typet;
   typet type;
+  
+  // we may choose to hide
+  bool hidden;
     
   goto_programt::const_targett pc;
 
@@ -101,6 +104,7 @@ public:
   goto_trace_stept():
     step_nr(0),
     type(NONE),
+    hidden(false),
     thread_nr(0),
     cond_value(false),
     formatted(false)

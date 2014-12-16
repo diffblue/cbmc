@@ -63,7 +63,8 @@ public:
     const exprt &guard,
     const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs_object,
-    const sourcet &source);
+    const sourcet &source,
+    assignment_typet assignment_type);
 
   // note the death of a variable - lhs must be symbol
   virtual void dead(
@@ -182,6 +183,9 @@ public:
     bool is_memory_barrier() const  { return type==goto_trace_stept::MEMORY_BARRIER; }
     bool is_atomic_begin() const    { return type==goto_trace_stept::ATOMIC_BEGIN; }
     bool is_atomic_end() const      { return type==goto_trace_stept::ATOMIC_END; }
+
+    // we may choose to hide
+    bool hidden;
     
     exprt guard;
     literalt guard_literal;
@@ -213,6 +217,8 @@ public:
     bool ignore;
     
     SSA_stept():
+      type(goto_trace_stept::NONE),
+      hidden(false),
       guard(static_cast<const exprt &>(get_nil_irep())),
       ssa_lhs(static_cast<const symbol_exprt &>(get_nil_irep())),
       original_lhs_object(static_cast<const symbol_exprt &>(get_nil_irep())),

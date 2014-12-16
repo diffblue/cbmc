@@ -159,6 +159,30 @@ Function: c_typecheck_baset::typecheck_asm
 
 void c_typecheck_baset::typecheck_asm(codet &code)
 {
+  const irep_idt flavor=to_code_asm(code).get_flavor();
+  
+  if(flavor==ID_gcc)
+  {
+    // These have 5 operands.
+    // The first parameter is a string.
+    // Parameters 1, 2, 3, 4 are lists of expressions.
+
+    assert(code.operands().size()==5);
+  
+    typecheck_expr(code.op0());
+  
+    for(unsigned i=1; i<code.operands().size(); i++)
+    {
+      exprt &list=code.operands()[i];
+      Forall_operands(it, list)
+        typecheck_expr(*it);
+    }
+  }
+  else if(flavor==ID_msc)
+  {
+    assert(code.operands().size()==1);
+    typecheck_expr(code.op0());
+  }
 }
 
 /*******************************************************************\

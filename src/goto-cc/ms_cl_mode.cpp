@@ -47,7 +47,7 @@ bool ms_cl_modet::doit()
     return false;
   }
 
-  int verbosity=1;
+  unsigned int verbosity=1;
 
   compilet compiler(cmdline);
 
@@ -58,7 +58,7 @@ bool ms_cl_modet::doit()
   #endif
 
   if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2int(cmdline.get_value("verbosity"));
+    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
 
   compiler.ui_message_handler.set_verbosity(verbosity);
   ui_message_handler.set_verbosity(verbosity);

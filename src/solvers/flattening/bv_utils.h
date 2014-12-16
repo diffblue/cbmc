@@ -20,6 +20,16 @@ public:
 
   typedef enum { SIGNED, UNSIGNED } representationt;
 
+  typedef enum { TSEITIN_NAIVE_CIRCUIT,     // Original CBMC
+                 TSEITIN_SHARED_CIRCUIT,
+		 AIG_NAIVE_CIRCUIT,
+		 AIG_SHARED_CIRCUIT,        // CVC4
+		 MINISAT_SUM_AND_CARRY,
+		 MINISAT_COMPLETE,          // With the 6 additional clauses
+		 DANIEL_COMPACT_CARRY,      // CBMC old default
+		 MARTIN_OPTIMAL             // Current CBMC
+                 } fullAdderEncoding;
+
   bvt build_constant(const mp_integer &i, std::size_t width);
 
   bvt incrementer(const bvt &op, literalt carry_in);
