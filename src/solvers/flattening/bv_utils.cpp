@@ -246,81 +246,138 @@ Function: bv_utilst::full_adder
 
 \*******************************************************************/
 
-// The optimal encoding is the default
-#define OPTIMAL_FULL_ADDER
 
 literalt bv_utilst::full_adder(const literalt a, const literalt b, const literalt carry_in, literalt &carry_out) {
   literalt sum;
 
-#ifdef OPTIMAL_FULL_ADDER
-  literalt x;
-  literalt y;
-  int constantProp = -1;
-  if (a.is_constant()) {
-    x = b;
-    y = carry_in;
-    constantProp = (a.is_true()) ? 1 : 0;
-    
-  } else if (b.is_constant()) {
-    x = a;
-    y = carry_in;
-    constantProp = (b.is_true()) ? 1 : 0;
-    
-  } else if (carry_in.is_constant()) {
-    x = a;
-    y = b;
-    constantProp = (carry_in.is_true()) ? 1 : 0;
-  }
+  if (full_adder_style == TSEITIN_NAIVE_AB_CIRCUIT ||
+      full_adder_style == DANIEL_COMPACT_CARRY) {
 
-  // Rely on prop.l* to do further constant propagation
-  if (constantProp == 1) {
-    // At least one input bit is 1
-    carry_out = prop.lor(x, y);
-    sum = prop.lequal(x, y);
-    
-  } else if (constantProp == 0) {
-    // At least one input bit is 0
-    carry_out = prop.land(x,y);
-    sum = prop.lxor(x,y);
+    carry_out=carry(a, b, carry_in);
+
+    return prop.lxor(
+           prop.lxor(a, b), carry_in);
+
+
+  } else if (full_adder_style == TSEITIN_SHARED_AC_CIRCUIT) {
+    carry_out=carry(a, b, carry_in);
+
+    return prop.lxor(
+           prop.lxor(a, carry_in), b);
+
+
+  } else if (full_adder_style == TSEITIN_SHARED_BC_CIRCUIT) {
+    carry_out=carry(a, b, carry_in);
+
+    return prop.lxor(
+           prop.lxor(b, carry_in), a);
+
+
+  } else if (full_adder_style == TSEITIN_SHARED_AB_CIRCUIT) {
+    literalt cross = prop.lxor(a, b);
+
+    carry_out = prop.lor( prop.land(a, b),
+			  prop.land(cross, carry_in));
+    return prop.lxor(cross, carry_in);
+
+
+  } else if (full_adder_style == TSEITIN_SHARED_AC_CIRCUIT) {
+    literalt cross = prop.lxor(a, carry_in);
+
+    carry_out = prop.lor( prop.land(a, carry_in),
+			  prop.land(cross, b));
+    return prop.lxor(cross, b);
+
+
+  } else if (full_adder_style == TSEITIN_SHARED_BC_CIRCUIT) {
+    literalt cross = prop.lxor(b, carry_in);
+
+    carry_out = prop.lor( prop.land(b, carry_in),
+			  prop.land(cross, a));
+    return prop.lxor(cross, a);
+
+
+    // TODO : Implement AIG_*
+    // AIG versions are as above but with the lxor's replaced with
+    // lor(land(x,!y), land(!x,y))
+    //} else if (full_adder_style == AIG_) {
+
     
   } else {
-    carry_out = prop.new_variable();
-    sum = prop.new_variable();
+    // Simplification for all clause based encodings
+
+    literalt x;
+    literalt y;
+    int constantProp = -1;
+    if (a.is_constant()) {
+      x = b;
+      y = carry_in;
+      constantProp = (a.is_true()) ? 1 : 0;
+      
+    } else if (b.is_constant()) {
+      x = a;
+      y = carry_in;
+      constantProp = (b.is_true()) ? 1 : 0;
+      
+    } else if (carry_in.is_constant()) {
+      x = a;
+      y = b;
+      constantProp = (carry_in.is_true()) ? 1 : 0;
+    }
     
-    // Any two inputs 1 will set the carry_out to 1
-    prop.lcnf(!a,        !b, carry_out);
-    prop.lcnf(!a, !carry_in, carry_out);
-    prop.lcnf(!b, !carry_in, carry_out);
+    // Rely on prop.l* to do further constant propagation
+    if (constantProp == 1) {
+      // At least one input bit is 1
+      carry_out = prop.lor(x, y);
+      sum = prop.lequal(x, y);
+      
+    } else if (constantProp == 0) {
+      // At least one input bit is 0
+      carry_out = prop.land(x,y);
+      sum = prop.lxor(x,y);
+      
+    } else {
+      carry_out = prop.new_variable();
+      sum = prop.new_variable();
     
-    // Any two inputs 0 will set the carry_out to 0
-    prop.lcnf(a,        b, !carry_out);
-    prop.lcnf(a, carry_in, !carry_out);
-    prop.lcnf(b, carry_in, !carry_out);
-    
-    // If both carry out and sum are 1 then all inputs are 1
-    prop.lcnf(       a, !sum, !carry_out);
-    prop.lcnf(       b, !sum, !carry_out);
-    prop.lcnf(carry_in, !sum, !carry_out);
-    
-    // If both carry out and sum are 0 then all inputs are 0
-    prop.lcnf(       !a, sum, carry_out);
-    prop.lcnf(       !b, sum, carry_out);
-    prop.lcnf(!carry_in, sum, carry_out);
-    
-    // If all of the inputs are 1 or all are 0 it sets the sum
-    prop.lcnf(!a, !b, !carry_in,  sum);
-    prop.lcnf( a,  b,  carry_in, !sum);
+      if (full_adder_style == MINISAT_SUM_AND_CARRY ||
+	  full_adder_style == MINISAT_COMPLETE) {
+	// TODO : implement
+	assert(0);
+
+      } else {
+	assert(full_adder_style == MARTIN_OPTIMAL);
+
+	// Any two inputs 1 will set the carry_out to 1
+	prop.lcnf(!a,        !b, carry_out);
+	prop.lcnf(!a, !carry_in, carry_out);
+	prop.lcnf(!b, !carry_in, carry_out);
+	
+	// Any two inputs 0 will set the carry_out to 0
+	prop.lcnf(a,        b, !carry_out);
+	prop.lcnf(a, carry_in, !carry_out);
+	prop.lcnf(b, carry_in, !carry_out);
+	
+	// If both carry out and sum are 1 then all inputs are 1
+	prop.lcnf(       a, !sum, !carry_out);
+	prop.lcnf(       b, !sum, !carry_out);
+	prop.lcnf(carry_in, !sum, !carry_out);
+	
+	// If both carry out and sum are 0 then all inputs are 0
+	prop.lcnf(       !a, sum, carry_out);
+	prop.lcnf(       !b, sum, carry_out);
+	prop.lcnf(!carry_in, sum, carry_out);
+	
+	// If all of the inputs are 1 or all are 0 it sets the sum
+	prop.lcnf(!a, !b, !carry_in,  sum);
+	prop.lcnf( a,  b,  carry_in, !sum);
+      }
+    }
   }
 
   return sum;
 
-#else
 
-    carry_out=carry(a, b, carry_out);
-
-    return prop.lxor(
-           prop.lxor(a, b), carry_out);
-#endif
 
 }
 
@@ -337,71 +394,66 @@ Function: bv_utilst::carry
 
 \*******************************************************************/
 
-// Compact carry is the default when not using AIGs
-#ifndef USE_AIG
-#define COMPACT_CARRY
-#endif
 
 literalt bv_utilst::carry(literalt a, literalt b, literalt c)
 {
-  #ifdef COMPACT_CARRY
-  // propagation possible?
-  unsigned const_count=
-    a.is_constant() + b.is_constant() + c.is_constant();
-  
-  // propagation is possible if two or three inputs are constant
-  if(const_count>=2)
-    return prop.lor(prop.lor(
-        prop.land(a, b),
-        prop.land(a, c)),
-        prop.land(b, c));
-        
-  // it's also possible if two of a,b,c are the same
-  if(a==b)
-    return a;
-  else if(a==c)
-    return a;
-  else if(b==c)
-    return b;
-        
-  // the below yields fewer clauses and variables,
-  // but doesn't propagate anything at all
+  if (full_adder_style == DANIEL_COMPACT_CARRY) {
+    // propagation possible?
+    unsigned const_count=
+      a.is_constant() + b.is_constant() + c.is_constant();
+    
+    // propagation is possible if two or three inputs are constant
+    if(const_count>=2)
+      return prop.lor(prop.lor(
+			       prop.land(a, b),
+			       prop.land(a, c)),
+		      prop.land(b, c));
+    
+    // it's also possible if two of a,b,c are the same
+    if(a==b)
+      return a;
+    else if(a==c)
+      return a;
+    else if(b==c)
+      return b;
+    
+    // the below yields fewer clauses and variables,
+    // but doesn't propagate anything at all
+    
+    bvt clause;
+    
+    literalt x=prop.new_variable();
+    
+    /*
+      carry_correct: LEMMA
+      (    a OR     b OR          NOT x) AND
+      (    a OR NOT b OR     c OR NOT x) AND
+      (    a OR NOT b OR NOT c OR     x) AND
+      (NOT a OR     b OR     c OR NOT x) AND
+      (NOT a OR     b OR NOT c OR     x) AND
+      (NOT a OR NOT b OR              x)
+      IFF
+      (x=((a AND b) OR (a AND c) OR (b AND c)));
+    */
+    
+    prop.lcnf( a,  b,     !x);
+    prop.lcnf( a, !b,  c, !x);
+    prop.lcnf( a, !b, !c,  x);
+    prop.lcnf(!a,  b,  c, !x);
+    prop.lcnf(!a,  b, !c,  x);
+    prop.lcnf(!a, !b,      x);
+    
+    return x;
 
-  bvt clause;
-
-  literalt x=prop.new_variable();
-
-  /*
-  carry_correct: LEMMA
-    (    a OR     b OR          NOT x) AND
-    (    a OR NOT b OR     c OR NOT x) AND
-    (    a OR NOT b OR NOT c OR     x) AND
-    (NOT a OR     b OR     c OR NOT x) AND
-    (NOT a OR     b OR NOT c OR     x) AND
-    (NOT a OR NOT b OR              x)
-    IFF
-    (x=((a AND b) OR (a AND c) OR (b AND c)));
-  */
-
-  prop.lcnf( a,  b,     !x);
-  prop.lcnf( a, !b,  c, !x);
-  prop.lcnf( a, !b, !c,  x);
-  prop.lcnf(!a,  b,  c, !x);
-  prop.lcnf(!a,  b, !c,  x);
-  prop.lcnf(!a, !b,      x);
-
-  return x;
-
-  #else
-
-  bvt tmp;
-
-  tmp.push_back(prop.land(a, b));
-  tmp.push_back(prop.land(a, c));
-  tmp.push_back(prop.land(b, c));
-
-  return prop.lor(tmp);
-  #endif
+  } else {    
+    bvt tmp;
+    
+    tmp.push_back(prop.land(a, b));
+    tmp.push_back(prop.land(a, c));
+    tmp.push_back(prop.land(b, c));
+    
+    return prop.lor(tmp);
+  }
 }
 
 /*******************************************************************\
@@ -416,6 +468,8 @@ Function: bv_utilst::adder
 
 \*******************************************************************/
 
+// TODO : make sure that all other encodings that add use this
+
 void bv_utilst::adder(
   bvt &sum,
   const bvt &op,
@@ -424,12 +478,50 @@ void bv_utilst::adder(
 {
   assert(sum.size()==op.size());
 
-  carry_out=carry_in;
-
-  for(unsigned i=0; i<sum.size(); i++)
-  {
-    sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
+  if (sum.size() > carry_select_minimum) {
+    // TODO : implement carry_select via recursion
+    assert(0);
   }
+
+  if (addition_style == RIPPLE_CARRY) {
+    carry_out=carry_in;
+    
+    for(unsigned i=0; i<sum.size(); i++)
+    {
+      sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
+    }
+
+  } else {
+    assert(addition_style == CARRY_LOOKAHEAD);
+    // TODO : Implement carry lookahead, note that the description in the paper is not complete!
+    assert(0);
+  }
+
+}
+/*******************************************************************\
+
+Function: bv_utilst::adder3
+
+  Inputs: Three bit-vectors (sum, op1 and op2) to sum, a carry_in bit
+          and a location for the carry out.
+
+ Outputs: A bit-vector giving the sum of all three.
+
+ Purpose: Adds the three vectors with only one carry chain.  A very
+          simple carry-save adder.  Sort of.
+
+\*******************************************************************/
+
+void bv_utilst::adder3(
+  bvt &sum,
+  const bvt &op1,
+  const bvt &op2,
+  literalt carry_in,
+  literalt &carry_out)
+{
+  // TODO : Implement as a full-adder across the inputs with sum and carry
+  // forming two arrays and then add these using adder.
+  assert(0);
 }
 
 /*******************************************************************\
@@ -942,12 +1034,72 @@ Function: bv_utilst::unsigned_multiplier
 
 bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 {
-  #if 1
   bvt op0=_op0, op1=_op1;
 
+  // TODO : check this is the 'right' way around
   if(is_constant(op1))
     std::swap(op0, op1);
 
+  if (op0.size() > recursive_multiply_minimum) {
+    // TODO : split into low and high, four recursive calls, shift, or together high / high and low / low and then add3
+    assert(0);
+  }
+
+  std::vector<bvt> pps;
+
+  if (partial_product_style == CONVENTIONAL) {
+    // TODO :  pps[i][j] == land(op0[i], op1[j])
+    assert(0);
+  } else if (partial_product_sytle == BLOCK2) {
+    std::vector<bvt> block;
+    block.resize(4);
+
+    // TODO : implement
+    assert(0);
+    /*
+    block[0] = zeros(op1.size());
+    block[1] = op1;
+    block[2] = op1 << 1;
+    block[3] = block[1] + block[2];
+
+    // TODO : find a better encoding for this kind of mux?
+    pps[i][j] = ite(op0[2*i + 1], 
+                    ite(op0[2*i], block[3][j], block[2][j]),
+		    ite(op0[2*i], block[1][j], block[0][j]));
+    */
+  } else if (partial_product_sytle == BLOCK3) {
+    // TODO : implement
+    assert(0);
+    // Only need a normal adder for these
+
+  } else if (partial_product_sytle == BLOCK4) {
+    // TODO : implement
+    assert(0);
+    // A few entries will require an add3
+
+  } else if (partial_product_sytle == BLOCK5) {
+    // TODO : implement
+    assert(0);
+    // Several block entries will require an add3
+
+  } else {
+    assert(0);
+  }
+
+
+  // Now reduce ...
+
+  if (reduction_style == LINEAR_REDUCTION) {
+    // TODO : The usual
+    assert(0);
+
+  } else {
+    // TODO : The rest of the reductions
+    assert(0);
+  }
+
+
+  #ifdef OLD
   bvt product;
   product.resize(op0.size());
 
@@ -971,7 +1123,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     }
 
   return product;
-  #else
+
   // Wallace tree multiplier. This is disabled, as runtimes have
   // been observed to go up by 5%-10%, and on some models even by 20%.
   

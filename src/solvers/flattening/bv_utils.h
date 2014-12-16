@@ -16,19 +16,89 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_utilst
 {
 public:
-  bv_utilst(propt &_prop):prop(_prop) { }
+  typedef enum { 
+    /** Operation based **/
+    TSEITIN_NAIVE_AB_CIRCUIT,     // Original CBMC
+    TSEITIN_NAIVE_AC_CIRCUIT,
+    TSEITIN_NAIVE_BC_CIRCUIT,
+    TSEITIN_SHARED_AB_CIRCUIT,
+    TSEITIN_SHARED_AC_CIRCUIT,
+    TSEITIN_SHARED_BC_CIRCUIT,
+    AIG_NAIVE_AB_CIRCUIT,         // Probably the worst...
+    AIG_NAIVE_AC_CIRCUIT,
+    AIG_NAIVE_BC_CIRCUIT,
+    AIG_SHARED_AB_CIRCUIT,        // CVC4
+    AIG_SHARED_AC_CIRCUIT,
+    AIG_SHARED_BC_CIRCUIT,
+
+    /** Mixed **/
+    DANIEL_COMPACT_CARRY,      // CBMC old default
+
+    /** Clause based **/
+    MINISAT_SUM_AND_CARRY,
+    MINISAT_COMPLETE,          // With the 6 additional clauses
+    MARTIN_OPTIMAL             // Current CBMC
+  } full_adder_encodingt;
+  full_adder_encodingt full_adder_style;
+
+
+  // TODO : optimal adders for N-bits
+
+
+  typedef enum {
+    RIPPLE_CARRY,         // A common default
+    CARRY_LOOKAHEAD
+  } addition_encodingt;
+  addition_encodingt addition_style;
+
+  // Use carry-select to break into adders of at most this many bits
+  int carry_select_minimum;  
+
+
+
+  // Use the recursive multiply relation to break into multiplier of at most this many bits
+  int recursive_multiply_minimum;
+
+  // TODO : optimal multipliers for N-bits
+
+  // TODO : what about Booth encoding?
+
+  typedef enum {
+    CONVENTIONAL,
+    BLOCK2,
+    BLOCK3,
+    BLOCK4,
+    BLOCK5
+  } partial_product_encodingt;
+  partial_product_generationt partial_product_style;
+
+
+  typedef enum {
+    /** Word level reductions **/
+    LINEAR_REDUCTION,           // Most solvers
+    TREE_REDUCTION,
+    ADD3_LINEAR_REDUCTION,
+    ADD3_TREE_REDUCTION,
+    CARRY_SAVE_LINEAR_REDUCTION, // Needs more parameters
+    CARRY_SAVE_TREE_REDUCTION,  // Needs more parameters
+
+    /** Bit level reductions **/
+    WALLACE_TREE,
+    DADDA_TREE,
+    UNARY_TO_BINARY_REDUCTION   // Not sure about how best to use this
+  } reduction_encodingt;
+  reduction_encodingt reduction_style;
+
+
+ bv_utilst(propt &_prop):prop(_prop),
+    full_adder_style(TSEITIN_NAIVE_CIRCUIT),
+    addition_style(RIPPLE_CARRY),
+    carry_select_minimum(INT_MAX),
+    recursive_multiply_minimum(INT_MAX),
+    partial_product_style(CONVENTIONAL),
+    reduction_style(LINEAR_REDUCTION)  { }
 
   typedef enum { SIGNED, UNSIGNED } representationt;
-
-  typedef enum { TSEITIN_NAIVE_CIRCUIT,     // Original CBMC
-                 TSEITIN_SHARED_CIRCUIT,
-		 AIG_NAIVE_CIRCUIT,
-		 AIG_SHARED_CIRCUIT,        // CVC4
-		 MINISAT_SUM_AND_CARRY,
-		 MINISAT_COMPLETE,          // With the 6 additional clauses
-		 DANIEL_COMPACT_CARRY,      // CBMC old default
-		 MARTIN_OPTIMAL             // Current CBMC
-                 } fullAdderEncoding;
 
   bvt build_constant(const mp_integer &i, std::size_t width);
 
@@ -160,6 +230,9 @@ protected:
 
   void adder(bvt &sum, const bvt &op,
              literalt carry_in, literalt &carry_out);
+  void adder3(bvt &sum, const bvt &op1, const bvt &op2,
+             literalt carry_in, literalt &carry_out);
+
 
   void adder_no_overflow(
     bvt &sum,
