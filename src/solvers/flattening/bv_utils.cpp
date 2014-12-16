@@ -316,10 +316,10 @@ literalt bv_utilst::full_adder(const literalt a, const literalt b, const literal
 
 #else
 
-    carry_out=carry(a, b, carry_out);
+    carry_out=carry(a, b, carry_in);
 
     return prop.lxor(
-           prop.lxor(a, b), carry_out);
+           prop.lxor(a, b), carry_in);
 #endif
 
 }
