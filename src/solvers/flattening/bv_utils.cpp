@@ -249,41 +249,51 @@ Function: bv_utilst::full_adder
 // The optimal encoding is the default
 #define OPTIMAL_FULL_ADDER
 
-literalt bv_utilst::full_adder(const literalt a, const literalt b, const literalt carry_in, literalt &carry_out) {
-  literalt sum;
-
+literalt bv_utilst::full_adder(
+  const literalt a, const literalt b,
+  const literalt carry_in, literalt &carry_out)
+{
 #ifdef OPTIMAL_FULL_ADDER
   literalt x;
   literalt y;
   int constantProp = -1;
-  if (a.is_constant()) {
+
+  if (a.is_constant())
+  {
     x = b;
     y = carry_in;
-    constantProp = (a.is_true()) ? 1 : 0;
-    
-  } else if (b.is_constant()) {
+    constantProp = (a.is_true()) ? 1 : 0;    
+  }
+  else if (b.is_constant())
+  {
     x = a;
     y = carry_in;
-    constantProp = (b.is_true()) ? 1 : 0;
-    
-  } else if (carry_in.is_constant()) {
+    constantProp = (b.is_true()) ? 1 : 0;    
+  }
+  else if (carry_in.is_constant())
+  {
     x = a;
     y = b;
     constantProp = (carry_in.is_true()) ? 1 : 0;
   }
 
+  literalt sum;
+
   // Rely on prop.l* to do further constant propagation
-  if (constantProp == 1) {
+  if (constantProp == 1)
+  {
     // At least one input bit is 1
     carry_out = prop.lor(x, y);
-    sum = prop.lequal(x, y);
-    
-  } else if (constantProp == 0) {
+    sum = prop.lequal(x, y);    
+  }
+  else if (constantProp == 0)
+  {
     // At least one input bit is 0
     carry_out = prop.land(x,y);
-    sum = prop.lxor(x,y);
-    
-  } else {
+    sum = prop.lxor(x,y);    
+  }
+  else
+  {
     carry_out = prop.new_variable();
     sum = prop.new_variable();
     
