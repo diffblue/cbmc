@@ -711,6 +711,8 @@ bool c_preprocess_gcc_clang(
       command+=" -D__WCHAR_TYPE__=\""+sig+" short int\"";
     else if(config.ansi_c.wchar_t_width==config.ansi_c.int_width)
       command+=" -D__WCHAR_TYPE__=\""+sig+" int\"";
+    else if(config.ansi_c.wchar_t_width==config.ansi_c.long_int_width)
+      command+=" -D__WCHAR_TYPE__=\""+sig+" long int\"";
     else
       assert(false);
   }
