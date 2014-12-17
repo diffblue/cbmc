@@ -318,7 +318,11 @@ bool bmct::run(const goto_functionst &goto_functions)
   else if(mm=="pso")
     memory_model.reset(new memory_model_psot(ns));
   else
-    throw "Invalid memory model "+mm+" -- use one of sc, tso, pso";
+  {
+    error() << "Invalid memory model " << mm
+            << " -- use one of sc, tso, pso" << eom;
+    return true;
+  }
 
   //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
@@ -344,7 +348,7 @@ bool bmct::run(const goto_functionst &goto_functions)
     }
   }
 
-  catch(std::string &error_str)
+  catch(const std::string &error_str)
   {
     message_streamt message_stream(get_message_handler());
     message_stream.err_location(symex.last_source_location);
