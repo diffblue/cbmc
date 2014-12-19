@@ -216,7 +216,7 @@ protected:
     const unsigned thread_nr,
     unsigned unwind);
 
-  void argument_assignments(
+  void parameter_assignments(
     const irep_idt function_identifier,
     const code_typet &function_type,
     statet &state,
