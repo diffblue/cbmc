@@ -214,8 +214,8 @@ void build_goto_trace(
 
     // drop PHI and GUARD assignments altogether
     if(it->is_assignment() &&
-       SSA_step.assignment_type!=symex_target_equationt::STATE &&
-       SSA_step.assignment_type!=symex_target_equationt::HIDDEN)
+       (SSA_step.assignment_type!=symex_target_equationt::PHI &&
+        SSA_step.assignment_type!=symex_target_equationt::GUARD))
       continue;
 
     goto_tracet::stepst &steps=time_map[current_time];

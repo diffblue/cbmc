@@ -128,7 +128,9 @@ void goto_symext::symex_malloc(
       new_symbol_table.add(size_symbol);
 
       guardt guard;
-      symex_assign_rec(state, size_symbol.symbol_expr(), nil_exprt(), size, guard, VISIBLE);
+      symex_assign_rec(
+        state, size_symbol.symbol_expr(), nil_exprt(), size, guard,
+        symex_targett::HIDDEN);
 
       size=size_symbol.symbol_expr();
     }
@@ -168,7 +170,7 @@ void goto_symext::symex_malloc(
   state.rename(rhs, ns);
   
   guardt guard;
-  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
+  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, symex_targett::STATE);
 }
 
 /*******************************************************************\
@@ -245,7 +247,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
   }
 
   guardt guard;
-  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
+  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, symex_targett::STATE);
 }
 
 /*******************************************************************\
@@ -483,7 +485,7 @@ void goto_symext::symex_cpp_new(
   state.rename(rhs, ns);
 
   guardt guard;
-  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
+  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, symex_targett::STATE);
 }
 
 /*******************************************************************\
