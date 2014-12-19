@@ -240,16 +240,16 @@ protected:
   
   //virtual void symex_block(statet &state, const codet &code);
   virtual void symex_assign(statet &state, const code_assignt &code);
+
+  typedef symex_targett::assignment_typet assignment_typet;
   
-  typedef enum { VISIBLE, HIDDEN } visibilityt;
-  
-  void symex_assign_rec(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_symbol(statet &state, const symbol_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_typecast(statet &state, const typecast_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_array(statet &state, const index_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_struct_member(statet &state, const member_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_if(statet &state, const if_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_byte_extract(statet &state, const byte_extract_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_rec(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_symbol(statet &state, const symbol_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_typecast(statet &state, const typecast_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_array(statet &state, const index_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_struct_member(statet &state, const member_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_if(statet &state, const if_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_byte_extract(statet &state, const byte_extract_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
   
   static exprt add_to_lhs(const exprt &lhs, const exprt &what);
   

@@ -59,11 +59,12 @@ void goto_symext::parameter_assignments(
   statet &state,
   const exprt::operandst &arguments)
 {
-  // iterates over the operands
+  // iterates over the arguments
   exprt::operandst::const_iterator it1=arguments.begin();
 
-  // these are the types of the arguments
-  const code_typet::parameterst &parameter_types=function_type.parameters();
+  // these are the types of the parameters
+  const code_typet::parameterst &parameter_types=
+    function_type.parameters();
 
   // iterates over the types of the parameters
   for(code_typet::parameterst::const_iterator
@@ -82,7 +83,7 @@ void goto_symext::parameter_assignments(
 
     const code_typet::parametert &parameter=*it2;
 
-    // this is the type the n-th argument should be
+    // this is the type that the n-th argument should have
     const typet &parameter_type=parameter.type();
 
     const irep_idt &identifier=parameter.get_identifier();
@@ -101,13 +102,14 @@ void goto_symext::parameter_assignments(
     {
       exprt rhs=*it1;
 
-      // it should be the same exact type
+      // It should be the same exact type.
       if(!base_type_eq(parameter_type, rhs.type(), ns))
       {
         const typet &f_parameter_type=ns.follow(parameter_type);
         const typet &f_rhs_type=ns.follow(rhs.type());
       
-        // we are willing to do some limited conversion
+        // But we are willing to do some limited conversion.
+        // This is highly dubious, obviously.
         if((f_parameter_type.id()==ID_signedbv ||
             f_parameter_type.id()==ID_unsignedbv ||
             f_parameter_type.id()==ID_bool ||
@@ -131,7 +133,7 @@ void goto_symext::parameter_assignments(
       
       guardt guard;
       state.rename(lhs, ns, goto_symex_statet::L1);
-      symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
+      symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::ACTUAL_PARAMETER);
     }
 
     it1++;
@@ -162,7 +164,7 @@ void goto_symext::parameter_assignments(
 
       guardt guard;
       state.rename(lhs, ns, goto_symex_statet::L1);
-      symex_assign_symbol(state, lhs, nil_exprt(), *it1, guard, VISIBLE);
+      symex_assign_symbol(state, lhs, nil_exprt(), *it1, guard, symex_targett::ACTUAL_PARAMETER);
     }
   }
   else if(it1!=arguments.end())

@@ -81,7 +81,7 @@ void goto_symext::symex_start_thread(statet &state)
     symbol_exprt rhs(*it, type);
 
     guardt guard;
-    symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, HIDDEN);
+    symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
   }
 
   // initialize all variables marked thread-local
@@ -113,7 +113,7 @@ void goto_symext::symex_start_thread(statet &state)
     }
 
     guardt guard;
-    symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, HIDDEN);
+    symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
   }
 }
 
