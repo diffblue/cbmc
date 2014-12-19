@@ -43,7 +43,7 @@ bool goto_symext::get_unwind_recursion(
 
 /*******************************************************************\
 
-Function: goto_symext::argument_assignments
+Function: goto_symext::parameter_assignments
 
   Inputs:
 
@@ -53,7 +53,7 @@ Function: goto_symext::argument_assignments
 
 \*******************************************************************/
 
-void goto_symext::argument_assignments(
+void goto_symext::parameter_assignments(
   const irep_idt function_identifier,
   const code_typet &function_type,
   statet &state,
@@ -83,7 +83,7 @@ void goto_symext::argument_assignments(
     const code_typet::parametert &parameter=*it2;
 
     // this is the type the n-th argument should be
-    const typet &arg_type=parameter.type();
+    const typet &parameter_type=parameter.type();
 
     const irep_idt &identifier=parameter.get_identifier();
     
@@ -102,29 +102,29 @@ void goto_symext::argument_assignments(
       exprt rhs=*it1;
 
       // it should be the same exact type
-      if(!base_type_eq(arg_type, rhs.type(), ns))
+      if(!base_type_eq(parameter_type, rhs.type(), ns))
       {
-        const typet &f_arg_type=ns.follow(arg_type);
+        const typet &f_parameter_type=ns.follow(parameter_type);
         const typet &f_rhs_type=ns.follow(rhs.type());
       
         // we are willing to do some limited conversion
-        if((f_arg_type.id()==ID_signedbv ||
-            f_arg_type.id()==ID_unsignedbv ||
-            f_arg_type.id()==ID_bool ||
-            f_arg_type.id()==ID_pointer) &&
+        if((f_parameter_type.id()==ID_signedbv ||
+            f_parameter_type.id()==ID_unsignedbv ||
+            f_parameter_type.id()==ID_bool ||
+            f_parameter_type.id()==ID_pointer) &&
            (f_rhs_type.id()==ID_signedbv ||
             f_rhs_type.id()==ID_unsignedbv ||
             f_rhs_type.id()==ID_bool ||
             f_rhs_type.id()==ID_pointer))
         {
-          rhs.make_typecast(arg_type);
+          rhs.make_typecast(parameter_type);
         }
         else
         {
-          std::string error="function call: argument \""+
+          std::string error="function call: parameter \""+
             id2string(identifier)+"\" type mismatch: got "+
             it1->type().to_string()+", expected "+
-            arg_type.to_string();
+            parameter_type.to_string();
           throw error;
         }
       }
@@ -330,8 +330,8 @@ void goto_symext::symex_function_call_code(
   // preserve locality of local variables
   locality(identifier, state, goto_function);
 
-  // assign arguments
-  argument_assignments(identifier, goto_function.type, state, arguments);
+  // assign actuals to formal parameters
+  parameter_assignments(identifier, goto_function.type, state, arguments);
 
   frame.end_of_function=--goto_function.body.instructions.end();
   frame.return_value=call.lhs();
