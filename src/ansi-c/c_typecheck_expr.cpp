@@ -3405,6 +3405,18 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
       implicit_typecast(op1, final_type0);
       return;
     }
+    else if(final_type0.id()==ID_vector &&
+            final_type1.id()==ID_vector)
+    {
+      // We are willing to do a modest amount of conversion
+      if(gcc_vector_types_compatible(
+           to_vector_type(final_type0), to_vector_type(final_type1)))
+      {
+        if(final_type0!=final_type1)
+          op1.make_typecast(final_type0);
+        return;
+      }
+    }
   }
   else
   {
