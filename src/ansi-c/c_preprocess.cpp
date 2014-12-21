@@ -71,6 +71,19 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__INTMAX_TYPE__=\"long int\""\
   " -D__UINTMAX_TYPE__=\"long unsigned int\""
 
+#define GCC_DEFINES_LLP64 \
+  " -D__INT_MAX__=2147483647"\
+  " -D__CHAR_BIT__=8"\
+  " -D__SCHAR_MAX__=127"\
+  " -D__SHRT_MAX__=32767"\
+  " -D__LONG_LONG_MAX__=9223372036854775807LL"\
+  " -D__LONG_MAX__=2147483647"\
+  " -D__SIZE_TYPE__=\"long long unsigned int\""\
+  " -D__PTRDIFF_TYPE__=long long"\
+  " -D__WINT_TYPE__=\"unsigned int\""\
+  " -D__INTMAX_TYPE__=\"long long int\""\
+  " -D__UINTMAX_TYPE__=\"long long unsigned int\""
+
 /*******************************************************************\
 
 Function: type_max
@@ -696,7 +709,12 @@ bool c_preprocess_gcc_clang(
   else if(config.ansi_c.int_width==32)
   {
     if(config.ansi_c.pointer_width==64)
-      command+=GCC_DEFINES_LP64;
+    {
+      if(config.ansi_c.long_int_width==32)
+        command+=GCC_DEFINES_LLP64; // Windows, for instance
+      else
+        command+=GCC_DEFINES_LP64;
+    }
     else
       command+=GCC_DEFINES_32;
   }
