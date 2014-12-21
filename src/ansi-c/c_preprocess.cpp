@@ -79,7 +79,7 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__LONG_LONG_MAX__=9223372036854775807LL"\
   " -D__LONG_MAX__=2147483647"\
   " -D__SIZE_TYPE__=\"long long unsigned int\""\
-  " -D__PTRDIFF_TYPE__=long long"\
+  " -D__PTRDIFF_TYPE__=\"long long\""\
   " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long long int\""\
   " -D__UINTMAX_TYPE__=\"long long unsigned int\""
