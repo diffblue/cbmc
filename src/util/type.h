@@ -21,7 +21,7 @@ public:
   typet() { }
    
   explicit typet(const irep_idt &_id):irept(_id) { }
-  typet(const irep_idt &_id, const typet &_subtype):irept(_id) { add(ID_subtype, _subtype); }
+  typet(const irep_idt &_id, const typet &_subtype):irept(_id) { subtype()=_subtype; }
   
   const typet &subtype() const
   { return (typet &)find(ID_subtype); }
@@ -80,7 +80,7 @@ public:
   type_with_subtypet() { }
    
   explicit type_with_subtypet(const irep_idt &_id):typet(_id) { }
-  type_with_subtypet(const irep_idt &_id, const typet &_subtype):typet(_id) { add(ID_subtype, _subtype); }
+  type_with_subtypet(const irep_idt &_id, const typet &_subtype):typet(_id) { subtype()=_subtype; }
 
   #if 0  
   const typet &subtype() const
