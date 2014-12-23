@@ -262,7 +262,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
 {
   // the return type is still 'subtype()'
   type.return_type()=type.subtype();
-  type.remove(ID_subtype);
+  type.remove_subtype();
 
   code_typet::parameterst &parameters=type.parameters();
   
@@ -985,7 +985,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     // We produce a c_enum_tag as the resulting type.
     type.id(ID_c_enum_tag);
     type.remove(ID_tag);
-    type.remove(ID_subtype);
+    type.remove_subtype();
     type.set(ID_identifier, identifier);
   }
   else
@@ -1152,7 +1152,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       // We produce a c_enum_tag as the resulting type.
       type.id(ID_c_enum_tag);
       type.remove(ID_tag);
-      type.remove(ID_subtype);
+      type.remove_subtype();
       type.set(ID_identifier, identifier);
     }
   }
