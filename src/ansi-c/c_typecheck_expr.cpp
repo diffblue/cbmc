@@ -63,7 +63,7 @@ void c_typecheck_baset::typecheck_expr(exprt &expr)
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::typecheck_expr_main
+Function: c_typecheck_baset::gcc_types_compatible_p
 
   Inputs:
 
