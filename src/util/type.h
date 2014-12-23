@@ -74,6 +74,41 @@ public:
   }
 };
 
+class type_with_subtypet:public typet
+{
+public:
+  type_with_subtypet() { }
+   
+  explicit type_with_subtypet(const irep_idt &_id):typet(_id) { }
+  type_with_subtypet(const irep_idt &_id, const typet &_subtype):typet(_id) { add(ID_subtype, _subtype); }
+  
+  const typet &subtype() const
+  { return (typet &)find(ID_subtype); }
+   
+  typet &subtype()
+  { return (typet &)add(ID_subtype); }
+};
+
+class type_with_subtypest:public typet
+{
+public:
+  type_with_subtypest() { }
+   
+  explicit type_with_subtypest(const irep_idt &_id):typet(_id) { }
+  
+  typedef std::vector<typet> subtypest;
+
+  subtypest &subtypes()
+  { return (subtypest &)add(ID_subtypes).get_sub(); }
+  
+  const subtypest &subtypes() const
+  { return (const subtypest &)find(ID_subtypes).get_sub(); }
+   
+  void move_to_subtypes(typet &type); // destroys expr
+
+  void copy_to_subtypes(const typet &type);
+};
+
 typedef std::list<typet> type_listt;
 
 #define forall_type_list(it, type) \
