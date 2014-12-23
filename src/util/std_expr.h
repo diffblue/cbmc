@@ -884,7 +884,7 @@ public:
   }
   
   inline index_exprt(const exprt &_array, const exprt &_index):
-    exprt(ID_index, _array.type().subtype())
+    exprt(ID_index, to_array_type(_array.type()).subtype())
   {
     copy_to_operands(_array, _index);
   }
