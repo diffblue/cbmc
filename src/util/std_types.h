@@ -1108,6 +1108,41 @@ public:
 */
 const floatbv_typet &to_floatbv_type(const typet &type);
 
+/*! \brief Type for c bit fields
+*/
+class c_bit_field_typet:public bitvector_typet
+{
+public:
+  inline c_bit_field_typet():bitvector_typet(ID_c_bit_field)
+  {
+  }
+
+  inline explicit c_bit_field_typet(unsigned width):bitvector_typet(ID_c_bit_field)
+  {
+    set_width(width);
+  }
+
+  inline friend const c_bit_field_typet &to_c_bit_field_type(const typet &type)
+  {
+    assert(type.id()==ID_c_bit_field);
+    return static_cast<const c_bit_field_typet &>(type);
+  }
+
+  // These have a sub-type
+};
+
+/*! \brief Cast a generic typet to a \ref c_bit_field_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * c_bit_field_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref c_bit_field_typet
+ *
+ * \ingroup gr_std_types
+*/
+const c_bit_field_typet &to_c_bit_field_type(const typet &type);
+
 /*! \brief The pointer type
 */
 class pointer_typet:public bitvector_typet
