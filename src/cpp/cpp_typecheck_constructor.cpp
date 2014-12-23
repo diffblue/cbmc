@@ -51,10 +51,10 @@ static void copy_parent(
 
   op0.operands().push_back(exprt("cpp-this"));
   op0.type().id(ID_pointer);
-  op0.type().add(ID_subtype).id(ID_cpp_name);
-  op0.type().add(ID_subtype).get_sub().push_back(irept(ID_name));
-  op0.type().add(ID_subtype).get_sub().back().set(ID_identifier, parent_base_name);
-  op0.type().add(ID_subtype).get_sub().back().set(ID_C_source_location, source_location);
+  op0.type().subtype().id(ID_cpp_name);
+  op0.type().subtype().get_sub().push_back(irept(ID_name));
+  op0.type().subtype().get_sub().back().set(ID_identifier, parent_base_name);
+  op0.type().subtype().get_sub().back().set(ID_C_source_location, source_location);
   op0.add_source_location() = source_location;
 
   code.operands().push_back(exprt("explicit-typecast"));
@@ -62,11 +62,11 @@ static void copy_parent(
 
   op1.type().id(ID_pointer);
   op1.type().set("#reference", true);
-  op1.type().add(ID_subtype).set("#constant", true);
-  op1.type().add(ID_subtype).id(ID_cpp_name);
-  op1.type().add(ID_subtype).get_sub().push_back(irept(ID_name));
-  op1.type().add(ID_subtype).get_sub().back().set(ID_identifier, parent_base_name);
-  op1.type().add(ID_subtype).get_sub().back().set(ID_C_source_location, source_location);
+  op1.type().subtype().set(ID_C_constant, true);
+  op1.type().subtype().id(ID_cpp_name);
+  op1.type().subtype().get_sub().push_back(irept(ID_name));
+  op1.type().subtype().get_sub().back().set(ID_identifier, parent_base_name);
+  op1.type().subtype().get_sub().back().set(ID_C_source_location, source_location);
 
   op1.operands().push_back(exprt(ID_cpp_name));
   op1.op0().get_sub().push_back(irept(ID_name));
@@ -289,10 +289,10 @@ void cpp_typecheckt::default_cpctor(
   // Parameter declaration
   cpp_declarationt parameter_decl;
   parameter_decl.set(ID_type, ID_merged_type);
-  irept &subt = parameter_decl.add(ID_type).add(ID_subtypes);
-  subt.get_sub().push_back(cppcomp);
+  typet::subtypest &sub = parameter_decl.type().subtypes();
+  sub.push_back((const typet &)(cppcomp));
   irept constnd(ID_const);
-  subt.get_sub().push_back(constnd);
+  sub.push_back((const typet &)(constnd));
   parameter_decl.move_to_operands(parameter_tor);
   parameter_decl.add_source_location() = source_location;
 
@@ -464,15 +464,15 @@ void cpp_typecheckt::default_assignop(
 
   cpp_declarationt& args_decl = (cpp_declarationt&) args.get_sub().back();
 
-  irept& args_decl_type_sub = args_decl.type().add(ID_subtypes);
+  typet::subtypest & args_decl_type_sub = args_decl.type().subtypes();
 
   args_decl.type().id(ID_merged_type);
-  args_decl_type_sub.get_sub().push_back(irept(ID_cpp_name));
-  args_decl_type_sub.get_sub().back().get_sub().push_back(irept(ID_name));
-  args_decl_type_sub.get_sub().back().get_sub().back().set(ID_identifier, symbol.base_name);
-  args_decl_type_sub.get_sub().back().get_sub().back().set(ID_C_source_location, source_location);
+  args_decl_type_sub.push_back(typet(ID_cpp_name));
+  args_decl_type_sub.back().get_sub().push_back(irept(ID_name));
+  args_decl_type_sub.back().get_sub().back().set(ID_identifier, symbol.base_name);
+  args_decl_type_sub.back().get_sub().back().set(ID_C_source_location, source_location);
 
-  args_decl_type_sub.get_sub().push_back(irept(ID_const));
+  args_decl_type_sub.push_back(typet(ID_const));
   args_decl.operands().push_back(exprt(ID_cpp_declarator));
   args_decl.add_source_location() = source_location;
 
