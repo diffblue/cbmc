@@ -18,29 +18,29 @@ Author: Daniel Kroening, kroening@kroening.com
 class typet:public irept
 {
 public:
-  typet() { }
+  inline typet() { }
    
-  explicit typet(const irep_idt &_id):irept(_id) { }
-  typet(const irep_idt &_id, const typet &_subtype):irept(_id) { subtype()=_subtype; }
+  inline explicit typet(const irep_idt &_id):irept(_id) { }
+  inline typet(const irep_idt &_id, const typet &_subtype):irept(_id) { subtype()=_subtype; }
   
-  const typet &subtype() const
+  inline const typet &subtype() const
   { return (typet &)find(ID_subtype); }
    
-  typet &subtype()
+  inline typet &subtype()
   { return (typet &)add(ID_subtype); }
    
   typedef std::vector<typet> subtypest;
 
-  subtypest &subtypes()
+  inline subtypest &subtypes()
   { return (subtypest &)add(ID_subtypes).get_sub(); }
   
-  const subtypest &subtypes() const
+  inline const subtypest &subtypes() const
   { return (const subtypest &)find(ID_subtypes).get_sub(); }
    
-  bool has_subtypes() const
+  inline bool has_subtypes() const
   { return !find(ID_subtypes).is_nil(); }
    
-  bool has_subtype() const
+  inline bool has_subtype() const
   { return !find(ID_subtype).is_nil(); }
 
   void move_to_subtypes(typet &type); // destroys expr
@@ -48,27 +48,27 @@ public:
   void copy_to_subtypes(const typet &type);
 
   // will go away
-  const source_locationt &location() const
+  inline const source_locationt &location() const
   {
     return (const source_locationt &)find(ID_C_source_location);
   }
 
-  const source_locationt &source_location() const
+  inline const source_locationt &source_location() const
   {
     return (const source_locationt &)find(ID_C_source_location);
   }
 
-  source_locationt &add_source_location()
+  inline source_locationt &add_source_location()
   {
     return static_cast<source_locationt &>(add(ID_C_source_location));
   }
   
-  typet &add_type(const irep_namet &name)
+  inline typet &add_type(const irep_namet &name)
   {
     return static_cast<typet &>(add(name));
   }
 
-  const typet &find_type(const irep_namet &name) const
+  inline const typet &find_type(const irep_namet &name) const
   {
     return static_cast<const typet &>(find(name));
   }
@@ -77,16 +77,16 @@ public:
 class type_with_subtypet:public typet
 {
 public:
-  type_with_subtypet() { }
+  inline type_with_subtypet() { }
    
-  explicit type_with_subtypet(const irep_idt &_id):typet(_id) { }
-  type_with_subtypet(const irep_idt &_id, const typet &_subtype):typet(_id) { subtype()=_subtype; }
+  inline explicit type_with_subtypet(const irep_idt &_id):typet(_id) { }
+  inline type_with_subtypet(const irep_idt &_id, const typet &_subtype):typet(_id) { subtype()=_subtype; }
 
   #if 0  
-  const typet &subtype() const
+  inline const typet &subtype() const
   { return (typet &)find(ID_subtype); }
    
-  typet &subtype()
+  inline typet &subtype()
   { return (typet &)add(ID_subtype); }
   #endif
 };
@@ -94,17 +94,17 @@ public:
 class type_with_subtypest:public typet
 {
 public:
-  type_with_subtypest() { }
+  inline type_with_subtypest() { }
    
-  explicit type_with_subtypest(const irep_idt &_id):typet(_id) { }
+  inline explicit type_with_subtypest(const irep_idt &_id):typet(_id) { }
 
   #if 0  
   typedef std::vector<typet> subtypest;
 
-  subtypest &subtypes()
+  inline subtypest &subtypes()
   { return (subtypest &)add(ID_subtypes).get_sub(); }
   
-  const subtypest &subtypes() const
+  inline const subtypest &subtypes() const
   { return (const subtypest &)find(ID_subtypes).get_sub(); }
    
   void move_to_subtypes(typet &type); // destroys expr
