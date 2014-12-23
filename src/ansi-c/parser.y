@@ -342,7 +342,8 @@ gcc_builtin_expressions:
         {
           $$=$1;
           stack($$).id(ID_gcc_builtin_types_compatible_p);
-          typet::subtypest &subtypes=stack_type($$).subtypes();
+          typet &type_arg=(typet &)(stack($$).add(ID_type_arg));
+          typet::subtypest &subtypes=type_arg.subtypes();
           subtypes.resize(2);
           subtypes[0].swap(stack($3));
           subtypes[1].swap(stack($5));
