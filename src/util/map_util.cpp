@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "replace_expr.h"
 #include "map_util.h"
 
+#if 0
 /*******************************************************************\
 
 Function: mapping_to_lambda
@@ -149,3 +150,5 @@ void expand_map(exprt &expr)
   replace_expr(replace_map, new_expr);
   expr.swap(new_expr);
 }
+
+#endif

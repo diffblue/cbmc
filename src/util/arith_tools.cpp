@@ -74,12 +74,12 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   }
   else if(type_id==ID_c_enum)
   {
-    if(type.subtype().id()==ID_signedbv)
+    if(to_c_enum_type(type).subtype().id()==ID_signedbv)
     {
       int_value=binary2integer(id2string(value), true);
       return false;
     }
-    else if(type.subtype().id()==ID_unsignedbv)
+    else if(to_c_enum_type(type).subtype().id()==ID_unsignedbv)
     {
       int_value=binary2integer(id2string(value), false);
       return false;
@@ -143,7 +143,7 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_c_enum)
   {
-    unsigned width=type.subtype().get_int(ID_width);
+    unsigned width=to_c_enum_type(type).subtype().get_int(ID_width);
     constant_exprt result(type);
     result.set_value(integer2binary(int_value, width));
     return result;

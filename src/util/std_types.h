@@ -549,12 +549,11 @@ extern inline union_tag_typet &to_union_tag_type(typet &type)
 /*! \brief The type of C enums
 */
 
-class c_enum_typet:public typet
+class c_enum_typet:public type_with_subtypet
 {
 public:
-  explicit c_enum_typet(const typet &_subtype):typet(ID_c_enum)
+  explicit c_enum_typet(const typet &_subtype):type_with_subtypet(ID_c_enum, _subtype)
   {
-    subtype()=_subtype;
   }
   
   class c_enum_membert:public irept
@@ -791,15 +790,15 @@ extern inline code_typet &to_code_type(typet &type)
 
 /*! \brief arrays with given size
 */
-class array_typet:public typet
+class array_typet:public type_with_subtypet
 {
 public:
-  inline array_typet():typet(ID_array)
+  inline array_typet():type_with_subtypet(ID_array)
   {
   }
   
   inline array_typet(const typet &_subtype,
-                     const exprt &_size):typet(ID_array, _subtype)
+                     const exprt &_size):type_with_subtypet(ID_array, _subtype)
   {
     size()=_size;
   }
@@ -851,17 +850,57 @@ extern inline array_typet &to_array_type(typet &type)
   return static_cast<array_typet &>(type);
 }
 
-/*! \brief Base class of bitvector types
+/*! \brief arrays without size
 */
-class bitvector_typet:public typet
+class incomplete_array_typet:public type_with_subtypet
 {
 public:
-  inline explicit bitvector_typet(const irep_idt &_id):typet(_id)
+  inline incomplete_array_typet():type_with_subtypet(ID_incomplete_array)
+  {
+  }
+  
+  inline incomplete_array_typet(const typet &_subtype):
+    type_with_subtypet(ID_array, _subtype)
+  {
+  }
+};
+
+/*! \brief Cast a generic typet to an \ref incomplete_array_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * incomplete_array_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref incomplete_array_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const incomplete_array_typet &to_incomplete_array_type(const typet &type)
+{
+  assert(type.id()==ID_array);
+  return static_cast<const incomplete_array_typet &>(type);
+}
+
+/*! \copydoc to_incomplete_array_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline incomplete_array_typet &to_incomplete_array_type(typet &type)
+{
+  assert(type.id()==ID_array);
+  return static_cast<incomplete_array_typet &>(type);
+}
+
+/*! \brief Base class of bitvector types
+*/
+class bitvector_typet:public type_with_subtypet
+{
+public:
+  inline explicit bitvector_typet(const irep_idt &_id):type_with_subtypet(_id)
   {
   }
 
   inline bitvector_typet(const irep_idt &_id, const typet &_subtype):
-    typet(_id, _subtype)
+    type_with_subtypet(_id, _subtype)
   {
   }
 
@@ -1286,15 +1325,15 @@ const range_typet &to_range_type(const typet &type);
 
 /*! \brief A constant-size array type
 */
-class vector_typet:public typet
+class vector_typet:public type_with_subtypet
 {
 public:
-  inline vector_typet():typet(ID_vector)
+  inline vector_typet():type_with_subtypet(ID_vector)
   {
   }
   
   inline vector_typet(const typet &_subtype,
-                      const exprt &_size):typet(ID_vector, _subtype)
+                      const exprt &_size):type_with_subtypet(ID_vector, _subtype)
   {
     size()=_size;
   }
@@ -1338,14 +1377,15 @@ extern inline vector_typet &to_vector_type(typet &type)
 
 /*! \brief Complex numbers made of pair of given subtype
 */
-class complex_typet:public typet
+class complex_typet:public type_with_subtypet
 {
 public:
-  inline complex_typet():typet(ID_complex)
+  inline complex_typet():type_with_subtypet(ID_complex)
   {
   }
   
-  explicit inline complex_typet(const typet &_subtype):typet(ID_complex, _subtype)
+  explicit inline complex_typet(const typet &_subtype):
+    type_with_subtypet(ID_complex, _subtype)
   {
   }
 };

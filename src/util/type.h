@@ -81,12 +81,14 @@ public:
    
   explicit type_with_subtypet(const irep_idt &_id):typet(_id) { }
   type_with_subtypet(const irep_idt &_id, const typet &_subtype):typet(_id) { add(ID_subtype, _subtype); }
-  
+
+  #if 0  
   const typet &subtype() const
   { return (typet &)find(ID_subtype); }
    
   typet &subtype()
   { return (typet &)add(ID_subtype); }
+  #endif
 };
 
 class type_with_subtypest:public typet
@@ -95,7 +97,8 @@ public:
   type_with_subtypest() { }
    
   explicit type_with_subtypest(const irep_idt &_id):typet(_id) { }
-  
+
+  #if 0  
   typedef std::vector<typet> subtypest;
 
   subtypest &subtypes()
@@ -107,6 +110,7 @@ public:
   void move_to_subtypes(typet &type); // destroys expr
 
   void copy_to_subtypes(const typet &type);
+  #endif
 };
 
 typedef std::list<typet> type_listt;
