@@ -248,7 +248,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
     static_cast<typet &>(t.add(ID_return_type));
 
   return_type.swap(t.subtype());
-  t.remove(ID_subtype);
+  t.remove_subtype();
 
   if(return_type.is_not_nil())
     cpp_convert_plain_type(return_type);

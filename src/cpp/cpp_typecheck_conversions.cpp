@@ -1831,7 +1831,7 @@ bool cpp_typecheckt::cast_away_constness(
   std::vector<typet> snt1;
   snt1.push_back(nt1);
 
-  while(snt1.back().find(ID_subtype).is_not_nil())
+  while(snt1.back().has_subtype())
   {
     snt1.reserve(snt1.size()+1);
     snt1.push_back(snt1.back().subtype());
@@ -1846,7 +1846,7 @@ bool cpp_typecheckt::cast_away_constness(
 
   std::vector<typet> snt2;
   snt2.push_back(nt2);
-  while(snt2.back().find(ID_subtype).is_not_nil())
+  while(snt2.back().has_subtype())
   {
     snt2.reserve(snt2.size()+1);
     snt2.push_back(snt2.back().subtype());
