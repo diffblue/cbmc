@@ -7892,6 +7892,7 @@ bool Parser::rGCCAsmStatement(codet &statement)
 
   statement=codet(ID_asm);
   statement.set(ID_flavor, ID_gcc);
+  statement.operands().resize(5); // always has 5 operands
   set_location(statement, tk);
 
   if(lex.LookAhead(0)==TOK_VOLATILE)
@@ -7904,7 +7905,7 @@ bool Parser::rGCCAsmStatement(codet &statement)
   if(lex.GetToken(tk)!='(') return false;
   if(!rString(tk)) return false;
 
-  statement.move_to_operands(tk.data);
+  statement.op0()=tk.data;
 
   #ifdef DEBUG
   std::cout << "Parser::rGCCAsmStatement 3\n";
