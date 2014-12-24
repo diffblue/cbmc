@@ -44,8 +44,8 @@ protected:
   
   typedef hash_map_cont<typet, entryt, irep_hash> cachet;
 
-  // the pointer is allow const methods above
-  cachet *cache;
+  // the 'mutable' is allow const methods above
+  mutable cachet cache;
 
   const entryt &get_entry(const typet &type) const;
 };
