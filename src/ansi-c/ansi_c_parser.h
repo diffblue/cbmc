@@ -29,7 +29,7 @@ public:
   ansi_c_parse_treet parse_tree;
   
   ansi_c_parsert():
-    cpp(false),
+    cpp98(false), cpp11(false),
     for_has_scope(false)
   {
   }
@@ -72,8 +72,8 @@ public:
   // CW is CodeWarrior (with GCC extensions enabled)
   // ARM is ARM's RealView
 
-  // recognize C++ keywords  
-  bool cpp;
+  // recognize C++98 and C++11 keywords  
+  bool cpp98, cpp11;
   
   // in C99 and upwards, for(;;) has a scope
   bool for_has_scope;
