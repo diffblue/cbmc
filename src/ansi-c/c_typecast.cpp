@@ -140,6 +140,12 @@ bool check_c_implicit_typecast(
   
   const irep_idt &src_type_id=src_type.id();
 
+  if(src_type_id==ID_c_bit_field)
+    return check_c_implicit_typecast(src_type.subtype(), dest_type);
+
+  if(dest_type.id()==ID_c_bit_field)
+    return check_c_implicit_typecast(src_type, dest_type.subtype());
+
   if(src_type_id==ID_natural)
   {
     if(dest_type.id()==ID_bool) return false;
@@ -406,6 +412,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     return REAL;
   else if(type.id()==ID_complex)
     return COMPLEX;
+  else if(type.id()==ID_c_bit_field)
+    return get_c_type(to_c_bit_field_type(type).subtype());
     
   return OTHER;  
 }

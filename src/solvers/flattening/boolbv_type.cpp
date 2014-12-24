@@ -40,6 +40,8 @@ bvtypet get_bvtype(const typet &type)
     return IS_VERILOGBV;
   else if(type.id()==ID_range)
     return IS_RANGE;
+  else if(type.id()==ID_c_bit_field)
+    return IS_C_BIT_FIELD;
 
   return IS_UNKNOWN;
 }

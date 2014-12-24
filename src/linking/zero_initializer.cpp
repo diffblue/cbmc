@@ -86,7 +86,8 @@ exprt zero_initializert::zero_initializer_rec(
           type_id==ID_complex ||
           type_id==ID_c_enum ||
           type_id==ID_incomplete_c_enum ||
-          type_id==ID_c_enum_tag)
+          type_id==ID_c_enum_tag ||
+          type_id==ID_c_bit_field)
   {
     exprt result=gen_zero(type);
     result.add_source_location()=source_location;

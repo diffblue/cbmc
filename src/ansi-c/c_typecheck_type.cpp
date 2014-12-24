@@ -80,7 +80,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
   else if(type.id()==ID_c_enum)
     typecheck_c_enum_type(type);
   else if(type.id()==ID_c_bit_field)
-    typecheck_c_bit_field_type(type);
+    typecheck_c_bit_field_type(to_c_bit_field_type(type));
   else if(type.id()==ID_typeof)
     typecheck_typeof_type(type);
   else if(type.id()==ID_symbol)
@@ -776,15 +776,6 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
         new_component.set(ID_pretty_name, d_it->get_base_name());
         new_component.type()=declaration.full_type(*d_it);
 
-        // mark bit-fields as such
-        if(new_component.type().id()==ID_c_bit_field)
-        {
-          new_component.set_is_bit_field(true);
-          typet tmp=new_component.type().subtype();
-          typecheck_type(tmp);
-          new_component.set_bit_field_type(tmp);
-        }
-        
         typecheck_type(new_component.type());
 
         components.push_back(new_component);
@@ -866,8 +857,8 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
       it!=components.end();
       ) // blank
   {
-    if(it->get_is_bit_field() &&
-       it->get_bit_field_bits()==0)
+    if(it->type().id()==ID_c_bit_field &&
+       to_c_bit_field_type(it->type()).get_width()==0)
       it=components.erase(it);
     else
       it++;
@@ -1170,64 +1161,50 @@ Function: c_typecheck_baset::typecheck_c_bit_field_type
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
+void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 {
   typecheck_type(type.subtype());
 
-  exprt &width_expr=static_cast<exprt &>(type.add(ID_size));
-
-  typecheck_expr(width_expr);
-  make_constant_index(width_expr);
-
   mp_integer i;
-  if(to_integer(width_expr, i))
-  {
-    err_location(type);
-    throw "failed to convert bit field width";
-  }
 
-  if(i<0)
   {
-    err_location(type);
-    throw "bit field width is negative";
-  }
+    exprt &width_expr=static_cast<exprt &>(type.add(ID_size));
+
+    typecheck_expr(width_expr);
+    make_constant_index(width_expr);
+
+    if(to_integer(width_expr, i))
+    {
+      err_location(type);
+      throw "failed to convert bit field width";
+    }
+
+    if(i<0)
+    {
+      err_location(type);
+      throw "bit field width is negative";
+    }
   
-  source_locationt source_location=type.source_location();
+    type.set_width(integer2long(i));
+    type.remove(ID_size);
+  }
   
   const typet &subtype=follow(type.subtype());
+  
+  unsigned sub_width=0;
 
   if(subtype.id()==ID_bool)
   {
-    if(i!=1)
-    {
-      err_location(type);
-      throw "wrong width for Boolean bit field";
-    }
-
-    // We don't use bool, as it's really a byte long.
-    type=unsignedbv_typet(1);
-    type.set(ID_C_c_type, ID_bool);
-    type.add_source_location()=source_location;
+    sub_width=1;
   }
   else if(subtype.id()==ID_signedbv ||
           subtype.id()==ID_unsignedbv)
   {
-    unsigned width=to_bitvector_type(subtype).get_width();
-
-    if(i>width)
-    {
-      err_location(type);
-      throw "bit field width too large";
-    }
-
-    typet tmp(subtype);
-    type.swap(tmp);
-    type.set(ID_width, integer2string(i));
-    type.add_source_location()=source_location;
+    sub_width=to_bitvector_type(subtype).get_width();
   }
   else if(subtype.id()==ID_c_enum_tag)
   {
-    // These have a sub-subtype, which we need to adjust.
+    // These have a sub-subtype, which we need to check.
     const typet &c_enum_type=
       follow_tag(to_c_enum_tag_type(subtype));
 
@@ -1237,25 +1214,21 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
       throw "bit field has incomplete enum type";
     }
     
-    unsigned width=
-      c_enum_type.subtype().get_int(ID_width);
-
-    if(i>width)
-    {
-      err_location(type);
-      throw "bit field width too large";
-    }
-
-    typet tmp=c_enum_type;
-    type.swap(tmp);
-    type.subtype().set(ID_width, integer2string(i));
-    type.add_source_location()=source_location;
+    sub_width=c_enum_type.subtype().get_int(ID_width);
   }
   else
   {
     err_location(type);
     str << "bit field with non-integer type: "
         << to_string(subtype);
+    throw 0;
+  }
+
+  if(i>sub_width)
+  {
+    err_location(type);
+    str << "bit field (" << i
+        << " bits) larger than type (" << sub_width << " bits)";
     throw 0;
   }
 }

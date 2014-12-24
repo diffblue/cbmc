@@ -238,6 +238,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     entry=get_entry(ns.follow_tag(to_union_tag_type(type)));
   else if(type_id==ID_c_enum_tag)
     entry=get_entry(ns.follow_tag(to_c_enum_tag_type(type)));
+  else if(type_id==ID_c_bit_field)
+  {
+    entry.total_width=to_c_bit_field_type(type).get_width();
+  }
   
   return entry;
 }

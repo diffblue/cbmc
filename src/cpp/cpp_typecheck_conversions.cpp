@@ -801,6 +801,14 @@ bool cpp_typecheckt::standard_conversion_sequence(
   assert(!is_reference(expr.type()) && !is_reference(type));
 
   exprt curr_expr=expr;
+
+  // bit fields are converted like their underlying type
+  if(type.id()==ID_c_bit_field)
+    return standard_conversion_sequence(expr, type.subtype(), new_expr, rank);
+
+  // we turn bit fields into their underlying type  
+  if(curr_expr.type().id()==ID_c_bit_field)
+    curr_expr.make_typecast(curr_expr.type().subtype());
   
   if(curr_expr.type().id()==ID_array)
   {

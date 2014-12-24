@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 #include "boolbv_type.h"
+#include "c_bit_field_replacement_type.h"
 
 #include "../floatbv/float_utils.h"
 
@@ -43,7 +44,7 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
 
 /*******************************************************************\
 
-Function: boolbvt::convert_typecast
+Function: boolbvt::type_conversion
 
   Inputs:
 
@@ -59,8 +60,16 @@ bool boolbvt::type_conversion(
 {
   bvtypet dest_bvtype=get_bvtype(dest_type);
   bvtypet src_bvtype=get_bvtype(src_type);
-  unsigned src_width=src.size();
+  
+  if(src_bvtype==IS_C_BIT_FIELD)
+    return type_conversion(
+      c_bit_field_replacement_type(to_c_bit_field_type(src_type), ns), src, dest_type, dest);
 
+  if(dest_bvtype==IS_C_BIT_FIELD)
+    return type_conversion(
+      src_type, src, c_bit_field_replacement_type(to_c_bit_field_type(dest_type), ns), dest);
+
+  unsigned src_width=src.size();
   unsigned dest_width=boolbv_width(dest_type);
   
   if(dest_width==0 || src_width==0)

@@ -214,28 +214,6 @@ public:
     {
       return set(ID_C_is_padding, is_padding);
     }
-
-    inline const bool get_is_bit_field() const
-    {
-      return get_bool(ID_is_bit_field);
-    }
-
-    inline void set_is_bit_field(bool is_bit_field)
-    {
-      return set(ID_is_bit_field, is_bit_field);
-    }
-
-    inline const typet &get_bit_field_type() const
-    {
-      return static_cast<const typet &>(find(ID_C_bit_field_type));
-    }
-
-    inline void set_bit_field_type(const typet &_type)
-    {
-      set(ID_C_bit_field_type, _type);
-    }
-    
-    unsigned get_bit_field_bits() const;
   };
 
   typedef std::vector<componentt> componentst;
@@ -904,6 +882,12 @@ public:
   {
   }
 
+  inline bitvector_typet(const irep_idt &_id, const typet &_subtype, unsigned width):
+    type_with_subtypet(_id, _subtype)
+  {
+    set_width(width);
+  }
+
   inline unsigned get_width() const
   {
     return get_unsigned_int(ID_width);
@@ -1156,15 +1140,21 @@ public:
   {
   }
 
-  inline explicit c_bit_field_typet(unsigned width):bitvector_typet(ID_c_bit_field)
+  inline explicit c_bit_field_typet(const typet &subtype, unsigned width):
+    bitvector_typet(ID_c_bit_field, subtype, width)
   {
-    set_width(width);
   }
 
   inline friend const c_bit_field_typet &to_c_bit_field_type(const typet &type)
   {
     assert(type.id()==ID_c_bit_field);
     return static_cast<const c_bit_field_typet &>(type);
+  }
+
+  inline friend c_bit_field_typet &to_c_bit_field_type(typet &type)
+  {
+    assert(type.id()==ID_c_bit_field);
+    return static_cast<c_bit_field_typet &>(type);
   }
 
   // These have a sub-type
@@ -1182,6 +1172,18 @@ public:
 */
 const c_bit_field_typet &to_c_bit_field_type(const typet &type);
 
+/*! \brief Cast a generic typet to a \ref c_bit_field_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * c_bit_field_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref c_bit_field_typet
+ *
+ * \ingroup gr_std_types
+*/
+c_bit_field_typet &to_c_bit_field_type(typet &type);
+
 /*! \brief The pointer type
 */
 class pointer_typet:public bitvector_typet
@@ -1197,9 +1199,8 @@ public:
   }
 
   inline explicit pointer_typet(const typet &_subtype, unsigned width):
-    bitvector_typet(ID_pointer, _subtype)
+    bitvector_typet(ID_pointer, _subtype, width)
   {
-    set_width(width);
   }
   
   inline signedbv_typet difference_type() const
