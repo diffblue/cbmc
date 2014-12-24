@@ -8,6 +8,7 @@ typedef enum _INTEL_CACHE_TYPE {
 struct bft {
   unsigned int a:3;
   unsigned int b:1;
+  signed int c:2;
 
   // an anonymous bitfield
   signed int :2;
@@ -31,6 +32,7 @@ int main() {
    
   assert(bf.a<=7);
   assert(bf.b<=1);
+  assert(bf.c<=1);
   
   bf.Type=IntelCacheTrace;
 }
