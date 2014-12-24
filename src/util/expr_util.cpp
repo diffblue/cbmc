@@ -50,6 +50,12 @@ exprt gen_zero(const typet &type)
     exprt tmp=gen_zero(unsignedbv_typet(1));
     return typecast_exprt(tmp, type);
   }
+  else if(type_id==ID_c_bit_field)
+  {
+    // Ha! We generate a typecast.
+    exprt tmp=gen_zero(to_c_bit_field_type(type).subtype());
+    return typecast_exprt(tmp, type);
+  }
   else if(type_id==ID_unsignedbv ||
           type_id==ID_signedbv ||
           type_id==ID_verilogbv ||

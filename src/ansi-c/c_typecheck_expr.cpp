@@ -1007,6 +1007,13 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
     throw 0;
   }
   
+  if(type.id()==ID_c_bit_field)
+  {
+    err_location(expr);
+    str << "sizeof cannot be applied to bit fields";
+    throw 0;
+  }
+  
   exprt new_expr=c_sizeof(type, *this);
 
   if(new_expr.is_nil())
@@ -1659,7 +1666,15 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   if(type.id()==ID_incomplete_struct)
   {
     err_location(expr);
-    str << "member operator got incomplete structure type "
+    str << "member operator got incomplete struct type "
+           "on left hand side";
+    throw 0;
+  }
+
+  if(type.id()==ID_incomplete_union)
+  {
+    err_location(expr);
+    str << "member operator got incomplete union type "
            "on left hand side";
     throw 0;
   }
@@ -1706,7 +1721,7 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   }
 
   expr.type()=component.type();
-
+  
   if(op0.get_bool(ID_C_lvalue))
     expr.set(ID_C_lvalue, true);
 
@@ -1886,6 +1901,13 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   }
 
   exprt &op=expr.op0();
+  
+  if(op.type().id()==ID_c_bit_field)
+  {
+    err_location(expr);
+    error("cannot take address of a bit field");
+    throw 0;
+  }
   
   // special case: address of label
   if(op.id()==ID_label)

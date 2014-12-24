@@ -4765,7 +4765,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
       const struct_typet::componentt &component=
         struct_type.get_component(component_name);
 
-      if(component.is_nil() || component.get_is_bit_field())
+      if(component.is_nil() || component.type().id()==ID_c_bit_field)
         return true;
 
       // add member offset to index
@@ -5141,7 +5141,7 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
         const irep_idt &component_name=with.op1().get(ID_component_name);
         
         // is this a bit field?
-        if(struct_type.get_component(component_name).get_is_bit_field())
+        if(struct_type.get_component(component_name).type().id()==ID_c_bit_field)
         {
           // don't touch -- might not be byte-aligned
         }

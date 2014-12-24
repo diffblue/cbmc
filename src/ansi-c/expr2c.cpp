@@ -304,6 +304,11 @@ std::string expr2ct::convert_rec(
     else
       assert(false);
   }
+  else if(src.id()==ID_c_bit_field)
+  {
+    std::string width=i2string(to_c_bit_field_type(src).get_width());
+    return q+convert(src.subtype())+d+" : "+width;
+  }
   else if(src.id()==ID_signedbv ||
           src.id()==ID_unsignedbv)
   {

@@ -412,27 +412,3 @@ constant_exprt unsignedbv_typet::largest_expr() const
 {
   return to_constant_expr(from_integer(largest(), *this));
 }
-
-/*******************************************************************\
-
-Function: struct_union_typet::componentt::get_bit_field_bits
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-unsigned struct_union_typet::componentt::get_bit_field_bits() const
-{
-  const typet &t=type();
-  if(t.id()==ID_signedbv ||
-     t.id()==ID_unsignedbv)
-    return to_bitvector_type(t).get_width();
-  else if(t.id()==ID_c_enum)
-    return t.subtype().get_unsigned_int(ID_width);
-  else
-    return 0;
-}

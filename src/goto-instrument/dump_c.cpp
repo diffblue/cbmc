@@ -468,8 +468,8 @@ void dump_ct::convert_compound(
     std::string s=make_decl(fake_unique_name, comp_type);
     assert(s.find("NO/SUCH/NS")==std::string::npos);
 
-    if(comp.get_is_bit_field() &&
-       comp.get_bit_field_bits()==0)
+    if(comp_type.id()==ID_c_bit_field &&
+       to_c_bit_field_type(comp_type).get_width()==0)
     {
       comp_name="";
       s=type_to_string(comp_type);
@@ -478,8 +478,8 @@ void dump_ct::convert_compound(
     if(s.find("__CPROVER_bitvector")==std::string::npos)
     {
       struct_body << s;
-      if(comp.get_is_bit_field())
-        struct_body << " : " << comp.get_bit_field_bits();
+      if(comp_type.id()==ID_c_bit_field)
+        struct_body << " : " << to_c_bit_field_type(comp_type).get_width();
     }
     else if(comp_type.id()==ID_signedbv)
     {
@@ -1256,8 +1256,8 @@ void dump_ct::cleanup_expr(exprt &expr)
         ++it)
     {
       const bool is_zero_bit_field=
-        it->get_is_bit_field() &&
-        it->get_bit_field_bits()==0;
+        it->type().id()==ID_c_bit_field &&
+        to_c_bit_field_type(it->type()).get_width()==0;
 
       if(!it->get_is_padding() && !is_zero_bit_field)
       {
