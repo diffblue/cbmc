@@ -50,17 +50,4 @@ protected:
   const entryt &get_entry(const typet &type) const;
 };
 
-#if 0
-bool boolbv_member_offset(
-  const struct_typet &type,
-  const irep_idt &member,
-  std::size_t &offset,
-  const namespacet &ns);
-
-bool boolbv_get_width(
-  const typet &type,
-  std::size_t &width,
-  const namespacet &ns);
-#endif
-
 #endif
