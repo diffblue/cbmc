@@ -13,6 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/source_location.h>
 
+//#define SUBTYPE_IN_GETSUB
+//#define SUBTYPES_IN_GETSUB
+
 /*! \brief The type of an expression
 */
 class typet:public irept
@@ -24,25 +27,63 @@ public:
   inline typet(const irep_idt &_id, const typet &_subtype):irept(_id) { subtype()=_subtype; }
   
   inline const typet &subtype() const
+  #ifdef SUBTYPE_IN_GETSUB
+  { 
+    if(get_sub().empty()) return static_cast<const typet &>(get_nil_irep());
+    return static_cast<const typet &>(get_sub().front());
+  }
+  #else
   { return (typet &)find(ID_subtype); }
+  #endif
    
   inline typet &subtype()
+  #ifdef SUBTYPE_IN_GETSUB
+  {
+    subt &sub=get_sub();
+    if(sub.empty()) sub.resize(1);
+    return static_cast<typet &>(sub.front());
+  }
+  #else
   { return (typet &)add(ID_subtype); }
+  #endif
    
   typedef std::vector<typet> subtypest;
 
   inline subtypest &subtypes()
+  #ifdef SUBTYPES_IN_GETSUB
+  { return (subtypest &)get_sub(); }
+  #else
   { return (subtypest &)add(ID_subtypes).get_sub(); }
+  #endif
   
   inline const subtypest &subtypes() const
+  #ifdef SUBTYPES_IN_GETSUB
+  { return (const subtypest &)get_sub(); }
+  #else
   { return (const subtypest &)find(ID_subtypes).get_sub(); }
+  #endif
    
   inline bool has_subtypes() const
+  #ifdef SUBTYPES_IN_GETSUB
+  { return !get_sub().empty(); }
+  #else
   { return !find(ID_subtypes).is_nil(); }
+  #endif
    
   inline bool has_subtype() const
+  #ifdef SUBTYPE_IN_GETSUB
+  { return !get_sub().empty(); }
+  #else
   { return !find(ID_subtype).is_nil(); }
-
+  #endif
+  
+  inline void remove_subtype()
+  #ifdef SUBTYPE_IN_GETSUB
+  { get_sub().clear(); }
+  #else
+  { remove(ID_subtype); }  
+  #endif
+   
   void move_to_subtypes(typet &type); // destroys expr
 
   void copy_to_subtypes(const typet &type);
