@@ -29,7 +29,6 @@ Function: boolbv_widtht::boolbv_widtht
 
 boolbv_widtht::boolbv_widtht(const namespacet &_ns):ns(_ns)
 {
-  cache=new cachet;
 }
 
 /*******************************************************************\
@@ -46,7 +45,6 @@ Function: boolbv_widtht::~boolbv_widtht
 
 boolbv_widtht::~boolbv_widtht()
 {
-  delete cache;
 }
 
 /*******************************************************************\
@@ -66,7 +64,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   // check cache first
 
   std::pair<cachet::iterator, bool> cache_result=
-    cache->insert(std::pair<typet, entryt>(type, entryt()));
+    cache.insert(std::pair<typet, entryt>(type, entryt()));
     
   entryt &entry=cache_result.first->second;
 
