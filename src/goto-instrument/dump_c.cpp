@@ -611,7 +611,7 @@ Purpose:
 \*******************************************************************/
 
 #define ADD_TO_SYSTEM_LIBRARY(v, header) \
-  for(int i=0; i<sizeof(v)/sizeof(char*); ++i) \
+  for(size_t i=0; i<sizeof(v)/sizeof(char*); ++i) \
     system_library_map.insert( \
       std::make_pair(std::string("c::")+v[i], header))
 
