@@ -79,6 +79,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_compound_type(to_struct_union_type(type));
   else if(type.id()==ID_c_enum)
     typecheck_c_enum_type(type);
+  else if(type.id()==ID_c_enum_tag)
+    typecheck_c_enum_tag_type(to_c_enum_tag_type(type));
   else if(type.id()==ID_c_bit_field)
     typecheck_c_bit_field_type(to_c_bit_field_type(type));
   else if(type.id()==ID_typeof)
@@ -910,43 +912,166 @@ Function: c_typecheck_baset::typecheck_c_enum_type
 
 void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 {
-  // This can be just a tag, or it can have the declarations
+  // These come with the declarations
   // of the enum constants as operands.
   
   exprt &as_expr=static_cast<exprt &>(static_cast<irept &>(type));
   source_locationt source_location=type.source_location();
-  
+
+  // We allow empty enums in the grammar to get better
+  // error messages.  
   if(as_expr.operands().empty())
   {
-    // It's just a tag.
-    if(type.find(ID_tag).is_nil())
-    {
-      err_location(source_location);
-      throw "anonymous enum tag without members";
-    }
+    err_location(source_location);
+    throw "empty enum";
+  }
+  
+  // enums start at zero
+  mp_integer value=0;
+  
+  // track min and max to find a nice base type
+  mp_integer min_value=0, max_value=0;
+  
+  std::list<c_enum_typet::c_enum_membert> enum_members;
+  
+  Forall_operands(it, as_expr)
+  {
+    ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
     
+    // In C, enum constants always have type "int". They do not
+    // have the enum type.
+    declaration.type()=typet(ID_int);
+
+    exprt &v=declaration.declarator().value();
+
+    if(v.is_nil()) // no value given
+      v=from_integer(value, signed_int_type());
+
+    typecheck_declaration(declaration);
+    
+    irep_idt base_name=
+      declaration.declarator().get_name();
+    
+    irep_idt identifier=
+      language_prefix+id2string(base_name);
+      
+    // get value
+    const symbolt &symbol=lookup(identifier);
+
+    to_integer(symbol.value, value);
+
+    // store      
+    c_enum_typet::c_enum_membert member;
+    member.set_identifier(identifier);
+    member.set_base_name(base_name);
+    member.set_value(integer2string(value));
+    enum_members.push_back(member);
+    
+    if(value<min_value) min_value=value;
+    if(value>max_value) max_value=value;
+    
+    // produce value for next constant
+    ++value;
+  }
+  
+  // remove these now
+  #ifdef OPERANDS_IN_GETSUB
+  as_expr.operands().clear();
+  #else
+  type.remove(ID_operands);
+  #endif
+
+  // We need to determine a width, and a signedness.
+  // We just do int, but gcc might pick smaller widths
+  // if the type is marked as 'packed'.
+
+  unsigned bits=0;
+  bool is_signed=min_value<0;
+  
+  if(is_signed)
+  {
+    if(max_value<(1<<7) && min_value>=-(1<<7))
+      bits=1*8;
+    else if(max_value<(1<<15) && min_value>=-(1<<15))
+      bits=2*8;
+    else if(max_value<(mp_integer(1)<<31) && min_value>=-(mp_integer(1)<<31))
+      bits=4*8;
+    else
+      bits=8*8;
+  }
+  else // unsigned
+  {
+    if(max_value<(1<<8))
+      bits=1*8;
+    else if(max_value<(1<<16))
+      bits=2*8;
+    else if(max_value<(mp_integer(1)<<32))
+      bits=4*8;
+    else
+      bits=8*8;
+  }
+
+  if(!type.get_bool(ID_C_packed))
+  {
+    // If it's not packed we do int as a minimum.
+    if(bits<config.ansi_c.int_width)
+      bits=config.ansi_c.int_width;
+  }
+  
+  // We use a subtype to store signed and width
+
+  type.subtype().id(is_signed?ID_signedbv:ID_unsignedbv);
+  type.subtype().set(ID_width, bits);
+  
+  // tag?
+  if(type.find(ID_tag).is_nil())
+  {
+    // none
+  }
+  else
+  {
     irept &tag=type.add(ID_tag);
     irep_idt base_name=tag.get(ID_C_base_name);
     irep_idt identifier=add_language_prefix(tag.get(ID_identifier));
     tag.set(ID_identifier, identifier);
+  
+    // Put into symbol table
+    symbolt enum_tag_symbol;
+  
+    enum_tag_symbol.is_type=true;
+    enum_tag_symbol.type=type;
+    enum_tag_symbol.location=source_location;
+    enum_tag_symbol.is_file_local=true;
+    enum_tag_symbol.base_name=base_name;
+    enum_tag_symbol.name=identifier;
     
-    // is it in the symbol table?    
-    symbol_tablet::symbolst::const_iterator s_it=
+    // throw in the enum members
+    for(std::list<c_enum_typet::c_enum_membert>::const_iterator
+        it=enum_members.begin();
+        it!=enum_members.end();
+        it++)
+      enum_tag_symbol.type.get_sub().push_back(*it);
+  
+    // is it in the symbol table already?
+    symbol_tablet::symbolst::iterator s_it=
       symbol_table.symbols.find(identifier);
     
     if(s_it!=symbol_table.symbols.end())
     {
       // Yes.
-      const symbolt &symbol=s_it->second;
+      symbolt &symbol=s_it->second;
       
-      if(symbol.type.id()==ID_c_enum)
+      if(symbol.type.id()==ID_incomplete_c_enum)
       {
-        // get subtype
-        type.subtype()=symbol.type.subtype();
+        // ok, overwrite the default subtype
+        symbol.type.id(ID_c_enum);
+        symbol.type.subtype()=type.subtype();
+        symbol.type.get_sub()=enum_tag_symbol.type.get_sub();
       }
-      else if(symbol.type.id()==ID_incomplete_c_enum)
+      else if(symbol.type.id()==ID_c_enum)
       {
-        // do nothing, still incomplete
+        err_location(type);
+        throw "redeclaration of enum tag";
       }
       else
       {
@@ -956,197 +1081,95 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     }
     else
     {
-      // no, add it as an incomplete c_enum
-      type.id(ID_incomplete_c_enum);
-      type.subtype()=signed_int_type(); // default
-
-      symbolt enum_tag_symbol;
-    
-      enum_tag_symbol.is_type=true;
-      enum_tag_symbol.type=type;
-      enum_tag_symbol.location=source_location;
-      enum_tag_symbol.is_file_local=true;
-      enum_tag_symbol.base_name=base_name;
-      enum_tag_symbol.name=identifier;
-      
       symbolt *new_symbol;
       move_symbol(enum_tag_symbol, new_symbol);
     }
-    
+
     // We produce a c_enum_tag as the resulting type.
     type.id(ID_c_enum_tag);
     type.remove(ID_tag);
     type.remove_subtype();
     type.set(ID_identifier, identifier);
   }
-  else
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_c_enum_tag_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
+{
+  // It's just a tag.
+
+  if(type.find(ID_tag).is_nil())
   {
-    // enums start at zero
-    mp_integer value=0;
+    err_location(type);
+    throw "anonymous enum tag without members";
+  }
+  
+  source_locationt source_location=type.source_location();
+  
+  irept &tag=type.add(ID_tag);
+  irep_idt base_name=tag.get(ID_C_base_name);
+  irep_idt identifier=add_language_prefix(tag.get(ID_identifier));
+  tag.set(ID_identifier, identifier);
+  
+  // is it in the symbol table?    
+  symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table.symbols.find(identifier);
+  
+  if(s_it!=symbol_table.symbols.end())
+  {
+    // Yes.
+    const symbolt &symbol=s_it->second;
     
-    // track min and max to find a nice base type
-    mp_integer min_value=0, max_value=0;
-    
-    std::list<c_enum_typet::c_enum_membert> enum_members;
-    
-    Forall_operands(it, as_expr)
+    if(symbol.type.id()==ID_c_enum)
     {
-      ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
-      
-      // In C, enum constants always have type "int". They do not
-      // have the enum type.
-      declaration.type()=typet(ID_int);
-
-      exprt &v=declaration.declarator().value();
-
-      if(v.is_nil()) // no value given
-        v=from_integer(value, signed_int_type());
-
-      typecheck_declaration(declaration);
-      
-      irep_idt base_name=
-        declaration.declarator().get_name();
-      
-      irep_idt identifier=
-        language_prefix+id2string(base_name);
-        
-      // get value
-      const symbolt &symbol=lookup(identifier);
-
-      to_integer(symbol.value, value);
-
-      // store      
-      c_enum_typet::c_enum_membert member;
-      member.set_identifier(identifier);
-      member.set_base_name(base_name);
-      member.set_value(integer2string(value));
-      enum_members.push_back(member);
-      
-      if(value<min_value) min_value=value;
-      if(value>max_value) max_value=value;
-      
-      // produce value for next constant
-      ++value;
+      // get subtype
+      type.subtype()=symbol.type.subtype();
     }
-    
-    // remove these now
-    #ifdef OPERANDS_IN_GETSUB
-    as_expr.operands().clear();
-    #else
-    type.remove(ID_operands);
-    #endif
-
-    // We need to determine a width, and a signedness.
-    // We just do int, but gcc might pick smaller widths
-    // if the type is marked as 'packed'.
-
-    unsigned bits=0;
-    bool is_signed=min_value<0;
-    
-    if(is_signed)
+    else if(symbol.type.id()==ID_incomplete_c_enum)
     {
-      if(max_value<(1<<7) && min_value>=-(1<<7))
-        bits=1*8;
-      else if(max_value<(1<<15) && min_value>=-(1<<15))
-        bits=2*8;
-      else if(max_value<(mp_integer(1)<<31) && min_value>=-(mp_integer(1)<<31))
-        bits=4*8;
-      else
-        bits=8*8;
-    }
-    else // unsigned
-    {
-      if(max_value<(1<<8))
-        bits=1*8;
-      else if(max_value<(1<<16))
-        bits=2*8;
-      else if(max_value<(mp_integer(1)<<32))
-        bits=4*8;
-      else
-        bits=8*8;
-    }
-
-    if(!type.get_bool(ID_C_packed))
-    {
-      // If it's not packed we do int as a minimum.
-      if(bits<config.ansi_c.int_width)
-        bits=config.ansi_c.int_width;
-    }
-    
-    // We use a subtype to store signed and width
-
-    type.subtype().id(is_signed?ID_signedbv:ID_unsignedbv);
-    type.subtype().set(ID_width, bits);
-    
-    // tag?
-    if(type.find(ID_tag).is_nil())
-    {
-      // none
+      // do nothing, still incomplete
     }
     else
     {
-      irept &tag=type.add(ID_tag);
-      irep_idt base_name=tag.get(ID_C_base_name);
-      irep_idt identifier=add_language_prefix(tag.get(ID_identifier));
-      tag.set(ID_identifier, identifier);
-    
-      // Put into symbol table
-      symbolt enum_tag_symbol;
-    
-      enum_tag_symbol.is_type=true;
-      enum_tag_symbol.type=type;
-      enum_tag_symbol.location=source_location;
-      enum_tag_symbol.is_file_local=true;
-      enum_tag_symbol.base_name=base_name;
-      enum_tag_symbol.name=identifier;
-      
-      // throw in the enum members
-      for(std::list<c_enum_typet::c_enum_membert>::const_iterator
-          it=enum_members.begin();
-          it!=enum_members.end();
-          it++)
-        enum_tag_symbol.type.get_sub().push_back(*it);
-    
-      // is it in the symbol table already?
-      symbol_tablet::symbolst::iterator s_it=
-        symbol_table.symbols.find(identifier);
-      
-      if(s_it!=symbol_table.symbols.end())
-      {
-        // Yes.
-        symbolt &symbol=s_it->second;
-        
-        if(symbol.type.id()==ID_incomplete_c_enum)
-        {
-          // ok, overwrite the default subtype
-          symbol.type.id(ID_c_enum);
-          symbol.type.subtype()=type.subtype();
-          symbol.type.get_sub()=enum_tag_symbol.type.get_sub();
-        }
-        else if(symbol.type.id()==ID_c_enum)
-        {
-          err_location(type);
-          throw "redeclaration of enum tag";
-        }
-        else
-        {
-          err_location(source_location);
-          throw "use of tag that does not match previous declaration";
-        }
-      }
-      else
-      {
-        symbolt *new_symbol;
-        move_symbol(enum_tag_symbol, new_symbol);
-      }
-
-      // We produce a c_enum_tag as the resulting type.
-      type.id(ID_c_enum_tag);
-      type.remove(ID_tag);
-      type.remove_subtype();
-      type.set(ID_identifier, identifier);
+      err_location(source_location);
+      throw "use of tag that does not match previous declaration";
     }
   }
+  else
+  {
+    // no, add it as an incomplete c_enum
+    type.id(ID_incomplete_c_enum);
+    type.subtype()=signed_int_type(); // default
+
+    symbolt enum_tag_symbol;
+  
+    enum_tag_symbol.is_type=true;
+    enum_tag_symbol.type=type;
+    enum_tag_symbol.location=source_location;
+    enum_tag_symbol.is_file_local=true;
+    enum_tag_symbol.base_name=base_name;
+    enum_tag_symbol.name=identifier;
+    
+    symbolt *new_symbol;
+    move_symbol(enum_tag_symbol, new_symbol);
+  }
+  
+  // We produce a c_enum_tag as the resulting type.
+  type.id(ID_c_enum_tag);
+  type.remove(ID_tag);
+  type.remove_subtype();
+  type.set(ID_identifier, identifier);
 }
 
 /*******************************************************************\
@@ -1204,7 +1227,8 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
   }
   else if(subtype.id()==ID_c_enum_tag)
   {
-    // These have a sub-subtype, which we need to check.
+    // These point to an enum, which has a sub-subtype,
+    // which we need to check.
     const typet &c_enum_type=
       follow_tag(to_c_enum_tag_type(subtype));
 
