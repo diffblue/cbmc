@@ -1620,7 +1620,7 @@ enum_name:
           {
             // an anon enum
           }
-          '{' enumerator_list '}'
+          '{' enumerator_list_opt '}'
           gcc_type_attribute_opt
         {
           stack($1).operands().swap(stack($5).operands());
@@ -1633,7 +1633,7 @@ enum_name:
             // an enum with tag
             stack($1).set(ID_tag, stack($3));
           }
-          '{' enumerator_list '}'
+          '{' enumerator_list_opt '}'
           gcc_type_attribute_opt
         {
           stack($1).operands().swap(stack($6).operands());
@@ -1643,6 +1643,7 @@ enum_name:
           gcc_type_attribute_opt
           identifier_or_typedef_name
         {
+          stack($1).id(ID_c_enum_tag); // tag only
           stack($1).set(ID_tag, stack($3));
           $$=merge($1, $2);
         }
@@ -1653,6 +1654,14 @@ enum_key: TOK_ENUM
           $$=$1;
           set($$, ID_c_enum);
         }
+        ;
+
+enumerator_list_opt:
+          /* nothing */
+        {
+          init($$, ID_declaration_list);
+        }
+        | enumerator_list
         ;
 
 enumerator_list:
@@ -1666,7 +1675,7 @@ enumerator_list:
           $$=$1;
           mto($$, $3);
         }
-        | enumerator_list ','
+        | enumerator_list ',' // trailing comma ok
         {
           $$=$1;
         }
