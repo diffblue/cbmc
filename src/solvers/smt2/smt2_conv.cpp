@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/flatten_byte_operators.h>
+#include <solvers/flattening/c_bit_field_replacement_type.h>
 
 #include "smt2_conv.h"
 
@@ -2219,6 +2220,19 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       assert(boolbv_width(src_type)==boolbv_width(dest_type));
       convert_expr(src); // nothing else to do!
     }
+    else if(src_type.id()==ID_c_bit_field)
+    {
+      std::size_t from_width=boolbv_width(src_type);
+
+      if(from_width==to_width)
+        convert_expr(src); // ignore
+      else
+      {
+        typet t=c_bit_field_replacement_type(to_c_bit_field_type(src_type), ns);
+        typecast_exprt tmp(typecast_exprt(src, t), dest_type);
+        convert_typecast(tmp);
+      }
+    }
     else
     {
       throw "TODO typecast2 "+src_type.id_string()+
@@ -2431,6 +2445,20 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else
       throw "TODO typecast7 "+src_type.id_string()+" -> floatbv";
+  }
+  else if(dest_type.id()==ID_c_bit_field)
+  {
+    std::size_t from_width=boolbv_width(src_type);
+    std::size_t to_width=boolbv_width(dest_type);
+
+    if(from_width==to_width)
+      convert_expr(src); // ignore
+    else
+    {
+      typet t=c_bit_field_replacement_type(to_c_bit_field_type(dest_type), ns);
+      typecast_exprt tmp(typecast_exprt(src, t), dest_type);
+      convert_typecast(tmp);
+    }  
   }
   else
     throw "TODO typecast8 "+src_type.id_string()+" -> "+dest_type.id_string();
@@ -4656,6 +4684,10 @@ void smt2_convt::convert_type(const typet &type)
 
       out << "(_ BitVec " << width << ")";
     }
+  }
+  else if(type.id()==ID_c_bit_field)
+  {
+    convert_type(c_bit_field_replacement_type(to_c_bit_field_type(type), ns));
   }
   else
   {
