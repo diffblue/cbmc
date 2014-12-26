@@ -59,13 +59,16 @@ public:
   typedef std::vector<var_statet> var_valt;
   var_valt shared_vars;
   
+  // save+restore procedure-local variables
+  typedef std::map<unsigned, var_statet> var_state_mapt;
+  
   // procedure frame
   struct framet
   {
     irep_idt current_function;
     loc_reft return_location;
     exprt return_lhs;
-    var_valt saved_local_vars;
+    var_state_mapt saved_local_vars;
   };
 
   // call stack  

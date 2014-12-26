@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <analyses/locals.h>
+
 #include "locs.h"
 
 /*******************************************************************\
@@ -64,6 +66,14 @@ void locst::build(const goto_functionst &goto_functions)
         target_map[i_it]=end();
         loc_vector.push_back(loct(i_it, f_it->first));
       }
+      
+      // get the identifiers of the local variables
+      localst locals(goto_function);
+      for(localst::locals_mapt::const_iterator
+          it=locals.locals_map.begin();
+          it!=locals.locals_map.end();
+          it++)
+        function_entry.local_variables.push_back(it->first);
     }
     else
       function_entry.first_loc=loc_reft::nil();
