@@ -1026,71 +1026,86 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   // tag?
   if(type.find(ID_tag).is_nil())
   {
-    // none
-  }
-  else
-  {
-    irept &tag=type.add(ID_tag);
-    irep_idt base_name=tag.get(ID_C_base_name);
-    irep_idt identifier=add_language_prefix(tag.get(ID_identifier));
-    tag.set(ID_identifier, identifier);
-  
-    // Put into symbol table
-    symbolt enum_tag_symbol;
-  
-    enum_tag_symbol.is_type=true;
-    enum_tag_symbol.type=type;
-    enum_tag_symbol.location=source_location;
-    enum_tag_symbol.is_file_local=true;
-    enum_tag_symbol.base_name=base_name;
-    enum_tag_symbol.name=identifier;
-    
-    // throw in the enum members
+    // None, it's anonymous. We generate a tag.
+    std::string anon_identifier="#anon_enum";
+
     for(std::list<c_enum_typet::c_enum_membert>::const_iterator
         it=enum_members.begin();
         it!=enum_members.end();
         it++)
-      enum_tag_symbol.type.get_sub().push_back(*it);
-  
-    // is it in the symbol table already?
-    symbol_tablet::symbolst::iterator s_it=
-      symbol_table.symbols.find(identifier);
-    
-    if(s_it!=symbol_table.symbols.end())
     {
-      // Yes.
-      symbolt &symbol=s_it->second;
-      
-      if(symbol.type.id()==ID_incomplete_c_enum)
-      {
-        // ok, overwrite the default subtype
-        symbol.type.id(ID_c_enum);
-        symbol.type.subtype()=type.subtype();
-        symbol.type.get_sub()=enum_tag_symbol.type.get_sub();
-      }
-      else if(symbol.type.id()==ID_c_enum)
-      {
-        err_location(type);
-        throw "redeclaration of enum tag";
-      }
-      else
-      {
-        err_location(source_location);
-        throw "use of tag that does not match previous declaration";
-      }
+      anon_identifier+='$';
+      anon_identifier+=id2string(it->get_base_name());
+      anon_identifier+='=';
+      anon_identifier+=id2string(it->get_value());
+    }
+    
+    if(type.get_bool(ID_C_packed))
+      anon_identifier+="#packed";
+
+    type.add(ID_tag).set(ID_identifier, anon_identifier);
+  }
+
+  irept &tag=type.add(ID_tag);
+  irep_idt base_name=tag.get(ID_C_base_name);
+  irep_idt identifier=add_language_prefix(tag.get(ID_identifier));
+  tag.set(ID_identifier, identifier);
+
+  // Put into symbol table
+  symbolt enum_tag_symbol;
+
+  enum_tag_symbol.is_type=true;
+  enum_tag_symbol.type=type;
+  enum_tag_symbol.location=source_location;
+  enum_tag_symbol.is_file_local=true;
+  enum_tag_symbol.base_name=base_name;
+  enum_tag_symbol.name=identifier;
+  
+  // throw in the enum members
+  for(std::list<c_enum_typet::c_enum_membert>::const_iterator
+      it=enum_members.begin();
+      it!=enum_members.end();
+      it++)
+    enum_tag_symbol.type.get_sub().push_back(*it);
+
+  // is it in the symbol table already?
+  symbol_tablet::symbolst::iterator s_it=
+    symbol_table.symbols.find(identifier);
+  
+  if(s_it!=symbol_table.symbols.end())
+  {
+    // Yes.
+    symbolt &symbol=s_it->second;
+    
+    if(symbol.type.id()==ID_incomplete_c_enum)
+    {
+      // ok, overwrite the default subtype
+      symbol.type.id(ID_c_enum);
+      symbol.type.subtype()=type.subtype();
+      symbol.type.get_sub()=enum_tag_symbol.type.get_sub();
+    }
+    else if(symbol.type.id()==ID_c_enum)
+    {
+      err_location(type);
+      throw "redeclaration of enum tag";
     }
     else
     {
-      symbolt *new_symbol;
-      move_symbol(enum_tag_symbol, new_symbol);
+      err_location(source_location);
+      throw "use of tag that does not match previous declaration";
     }
-
-    // We produce a c_enum_tag as the resulting type.
-    type.id(ID_c_enum_tag);
-    type.remove(ID_tag);
-    type.remove_subtype();
-    type.set(ID_identifier, identifier);
   }
+  else
+  {
+    symbolt *new_symbol;
+    move_symbol(enum_tag_symbol, new_symbol);
+  }
+
+  // We produce a c_enum_tag as the resulting type.
+  type.id(ID_c_enum_tag);
+  type.remove(ID_tag);
+  type.remove_subtype();
+  type.set(ID_identifier, identifier);
 }
 
 /*******************************************************************\
