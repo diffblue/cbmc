@@ -1131,14 +1131,10 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     // Yes.
     const symbolt &symbol=s_it->second;
     
-    if(symbol.type.id()==ID_c_enum)
+    if(symbol.type.id()==ID_c_enum ||
+       symbol.type.id()==ID_incomplete_c_enum)
     {
-      // get subtype
-      type.subtype()=symbol.type.subtype();
-    }
-    else if(symbol.type.id()==ID_incomplete_c_enum)
-    {
-      // do nothing, still incomplete
+      // do nothing
     }
     else
     {
@@ -1149,13 +1145,14 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
   else
   {
     // no, add it as an incomplete c_enum
-    type.id(ID_incomplete_c_enum);
-    type.subtype()=signed_int_type(); // default
+    typet new_type(ID_incomplete_c_enum);
+    new_type.subtype()=signed_int_type(); // default
+    new_type.add(ID_tag)=tag;
 
     symbolt enum_tag_symbol;
   
     enum_tag_symbol.is_type=true;
-    enum_tag_symbol.type=type;
+    enum_tag_symbol.type=new_type;
     enum_tag_symbol.location=source_location;
     enum_tag_symbol.is_file_local=true;
     enum_tag_symbol.base_name=base_name;
@@ -1165,11 +1162,9 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     move_symbol(enum_tag_symbol, new_symbol);
   }
   
-  // We produce a c_enum_tag as the resulting type.
-  type.id(ID_c_enum_tag);
+  // Clean up resulting type
   type.remove(ID_tag);
-  type.remove_subtype();
-  type.set(ID_identifier, identifier);
+  type.set_identifier(identifier);
 }
 
 /*******************************************************************\
