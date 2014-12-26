@@ -3422,7 +3422,8 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
     }
     else if(final_type0.id()==ID_c_enum_tag ||
             final_type0.id()==ID_unsignedbv ||
-            final_type0.id()==ID_signedbv)
+            final_type0.id()==ID_signedbv ||
+            final_type0.id()==ID_c_bit_field)
     {
       implicit_typecast(op1, final_type0);
       return;
@@ -3450,9 +3451,8 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
     }
     else if(final_type0.id()==ID_bool ||
             final_type0.get(ID_C_c_type)==ID_bool ||
-            final_type0.id()==ID_c_enum ||
             final_type0.id()==ID_c_enum_tag ||
-            final_type0.id()==ID_incomplete_c_enum)
+            final_type0.id()==ID_c_bit_field)
     {      
       // promote
       implicit_typecast_arithmetic(op1);
