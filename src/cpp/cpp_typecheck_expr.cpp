@@ -2313,10 +2313,10 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
+void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 {
   if(expr.operands().size()!=2)
-    throw "assignment side-effect expected to have two operands";
+    throw "assignment side effect expected to have two operands";
     
   typet type0=expr.op0().type();
 
@@ -2378,7 +2378,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
   cpp_name.get_sub().front().set(ID_C_source_location, expr.source_location());
 
   // expr.op0() is already typechecked
-  exprt already_typechecked("already_typechecked");
+  exprt already_typechecked(ID_already_typechecked);
   already_typechecked.move_to_operands(expr.op0());
 
   exprt member(ID_member);
@@ -2392,7 +2392,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
 
   typecheck_side_effect_function_call(new_expr);
 
-  expr.swap(new_expr);
+  expr=new_expr;
 }
 
 /*******************************************************************\

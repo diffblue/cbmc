@@ -217,7 +217,7 @@ protected:
   virtual void typecheck_expr_function_identifier(exprt &expr);
   virtual void typecheck_side_effect_gcc_conditional_expression(side_effect_exprt &expr);
   virtual void typecheck_side_effect_function_call(side_effect_expr_function_callt &expr);
-  virtual void typecheck_side_effect_assignment(exprt &expr);
+  virtual void typecheck_side_effect_assignment(side_effect_exprt &expr);
   virtual void typecheck_side_effect_statement_expression(side_effect_exprt &expr);
   virtual void typecheck_function_call_arguments(side_effect_expr_function_callt &expr);
   virtual void do_special_functions(side_effect_expr_function_callt &expr);
