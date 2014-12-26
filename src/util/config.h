@@ -43,6 +43,7 @@ public:
     bool use_fixed_for_float;
     bool for_has_scope;
     bool single_precision_constant;
+    bool cpp11;
     
     ieee_floatt::rounding_modet rounding_mode;
 
