@@ -29,7 +29,7 @@ public:
   ansi_c_parse_treet parse_tree;
   
   ansi_c_parsert():
-    cpp98(false), cpp11(true),
+    cpp98(false), cpp11(false),
     for_has_scope(false)
   {
   }
