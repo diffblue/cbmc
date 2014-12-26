@@ -119,15 +119,17 @@ void goto_convertt::remove_assignment(
     }
 
     exprt rhs;
+    
+    const typet &op0_type=ns.follow(expr.op0().type());
 
     // C/C++ Booleans get very special treatment.
-    if(ns.follow(expr.op0().type()).get(ID_C_c_type)==ID_bool)
+    if(op0_type.get(ID_C_c_type)==ID_bool)
     {
       binary_exprt tmp(expr.op0(), new_id, expr.op1(), expr.op1().type());
       tmp.op0().make_typecast(expr.op1().type());
       rhs=typecast_exprt(is_not_zero(tmp, ns), expr.op0().type());
     }
-    else
+    else 
     {
       rhs.id(new_id);
       rhs.copy_to_operands(expr.op0(), expr.op1());
@@ -135,9 +137,7 @@ void goto_convertt::remove_assignment(
       rhs.add_source_location()=expr.source_location();
     }
     
-    exprt lhs=expr.op0();
-    
-    code_assignt assignment(lhs, rhs);
+    code_assignt assignment(expr.op0(), rhs);
     assignment.add_source_location()=expr.source_location();
     
     convert(assignment, dest);
