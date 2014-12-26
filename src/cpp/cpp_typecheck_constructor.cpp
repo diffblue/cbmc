@@ -61,7 +61,7 @@ static void copy_parent(
   exprt &op1 = code.op1();
 
   op1.type().id(ID_pointer);
-  op1.type().set("#reference", true);
+  op1.type().set(ID_C_reference, true);
   op1.type().subtype().set(ID_C_constant, true);
   op1.type().subtype().id(ID_cpp_name);
   op1.type().subtype().get_sub().push_back(irept(ID_name));
@@ -485,9 +485,9 @@ void cpp_typecheckt::default_assignop(
   args_decl_declor.add_source_location() = source_location;
 
   args_decl_declor.type().id(ID_pointer);
-  args_decl_declor.type().set("#reference", true);
-  args_decl_declor.type().add("#qualifier").make_nil();
-  args_decl_declor.type().add("subtype").make_nil();
+  args_decl_declor.type().set(ID_C_reference, true);
+  args_decl_declor.type().add(ID_C_qualifier).make_nil();
+  args_decl_declor.type().subtype().make_nil();
   args_decl_declor.value().make_nil();
 }
 
@@ -660,7 +660,7 @@ void cpp_typecheckt::check_member_initializers(
       if(c_it->get(ID_base_name)!=base_name ) continue;
 
       // Data member
-      if(!c_it->get_bool("from_base") &&
+      if(!c_it->get_bool(ID_from_base) &&
          !c_it->get_bool("is_static") &&
          c_it->get(ID_type) != ID_code)
       {
@@ -693,7 +693,7 @@ void cpp_typecheckt::check_member_initializers(
       }
 
       // Parent constructor
-      if( c_it->get_bool("from_base")
+      if( c_it->get_bool(ID_from_base)
         && !c_it->get_bool("is_type")
         && !c_it->get_bool("is_static")
         && c_it->get(ID_type) == ID_code
@@ -756,7 +756,7 @@ void cpp_typecheckt::full_member_initialization(
 
   assert(initializers.id() == ID_member_initializers);
 
-  irept final_initializers("member_initializers");
+  irept final_initializers(ID_member_initializers);
 
   // First, if we are the most-derived object, then
   // we need to construct the virtual bases
@@ -765,7 +765,7 @@ void cpp_typecheckt::full_member_initialization(
 
   if(!vbases.empty())
   {
-    codet cond("ifthenelse");
+    codet cond(ID_ifthenelse);
 
     {
       cpp_namet most_derived;
@@ -886,7 +886,7 @@ void cpp_typecheckt::full_member_initialization(
 
     if(parent_it->get_bool(ID_virtual))
     {
-      codet cond("ifthenelse");
+      codet cond(ID_ifthenelse);
 
       {
         cpp_namet most_derived;
