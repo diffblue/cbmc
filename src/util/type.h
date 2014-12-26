@@ -13,8 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/source_location.h>
 
-//#define SUBTYPE_IN_GETSUB
-//#define SUBTYPES_IN_GETSUB
+#define SUBTYPE_IN_GETSUB
+#define SUBTYPES_IN_GETSUB
 
 /*! \brief The type of an expression
 */
