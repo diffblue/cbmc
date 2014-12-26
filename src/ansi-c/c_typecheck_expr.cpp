@@ -3208,7 +3208,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
        (type1.id()==ID_bool ||
         type1.id()==ID_unsignedbv ||
         type1.id()==ID_signedbv ||
-        type1.id()==ID_c_enum ||
+        type1.id()==ID_c_bit_field ||
         type1.id()==ID_c_enum_tag))
     {
       typecheck_arithmetic_pointer(op0);
@@ -3240,7 +3240,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     if(int_op_type.id()==ID_bool ||
        int_op_type.id()==ID_unsignedbv ||
        int_op_type.id()==ID_signedbv ||
-       int_op_type.id()==ID_c_enum ||
+       int_op_type.id()==ID_c_bit_field ||
        int_op_type.id()==ID_c_enum_tag)
     {
       typecheck_arithmetic_pointer(*p_op);
@@ -3249,9 +3249,16 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
       return;
     }
   }
+  
+  irep_idt op_name;
+  
+  if(expr.id()==ID_side_effect)
+    op_name=to_side_effect_expr(expr).get_statement();
+  else
+    op_name=expr.id();
 
   err_location(expr);
-  str << "operator `" << expr.id()
+  str << "operator `" << op_name
       << "' not defined for types `"
       << to_string(type0) << "' and `"
       << to_string(type1) << "'";
