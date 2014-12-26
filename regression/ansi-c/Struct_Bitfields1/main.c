@@ -41,4 +41,10 @@ int main()
   s1.my_bit&=1;
   s1.my_bit^=1;
   s1.my_bit<<=1;
+  
+  int *p;
+  p=p+s1.my_bit;
+  p=p-s1.my_bit;
+  p+=s1.my_bit;
+  p-=s1.my_bit;
 }
