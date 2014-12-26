@@ -3310,7 +3310,7 @@ Function: c_typecheck_baset::typecheck_side_effect_assignment
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
+void c_typecheck_baset::typecheck_side_effect_assignment(side_effect_exprt &expr)
 {
   if(expr.operands().size()!=2)
   {
@@ -3325,57 +3325,51 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
 
-  // se if we have a typecast on the LHS
-  if(op0.id()==ID_typecast)
   {
-    assert(op0.operands().size()==1);
+    const typet &type0=op0.type();
+    
+    if(type0.id()==ID_empty)
+    {
+      err_location(expr);
+      str << "cannot assign void";
+      throw 0;
+    }
 
-    // set #lvalue and #constant
-    op0.set(ID_C_lvalue, op0.op0().get_bool(ID_C_lvalue));
-    op0.set(ID_C_constant, op0.op0().get_bool(ID_C_constant));
+    if(!op0.get_bool(ID_C_lvalue))
+    {
+      err_location(expr);
+      str << "assignment error: `" << to_string(op0)
+          << "' not an lvalue";
+      throw 0;
+    }
+
+    if(type0.get_bool(ID_C_constant))
+    {
+      err_location(expr);
+      str << "error: `" << to_string(op0)
+          << "' is constant";
+      throw 0;
+    }
+    
+    // refuse to assign arrays
+    if(type0.id()==ID_array ||
+       type0.id()==ID_incomplete_array)
+    {
+      err_location(expr);
+      str << "error: direct assignments to arrays not permitted";
+      throw 0;
+    }
   }
+
+  // Add a cast to the underlying type for bit fields.
+  // In particular, sizeof(s.f=1) works for bit fields.
+  if(op0.type().id()==ID_c_bit_field)
+    op0.make_typecast(op0.type().subtype());
 
   const typet o_type0=op0.type();
   const typet o_type1=op1.type();
 
-  const typet &type0=op0.type();
-  const typet &type1=op1.type();
-  const typet &final_type0=follow(type0);
-  const typet &final_type1=follow(type1);
-
-  expr.type()=type0;
-  
-  if(final_type0.id()==ID_empty)
-  {
-    err_location(expr);
-    str << "cannot assign void";
-    throw 0;
-  }
-
-  if(!op0.get_bool(ID_C_lvalue))
-  {
-    err_location(expr);
-    str << "assignment error: `" << to_string(op0)
-        << "' not an lvalue";
-    throw 0;
-  }
-
-  if(o_type0.get_bool(ID_C_constant))
-  {
-    err_location(expr);
-    str << "error: `" << to_string(op0)
-        << "' is constant";
-    throw 0;
-  }
-  
-  // refuse to assign arrays
-  if(final_type0.id()==ID_array ||
-     final_type0.id()==ID_incomplete_array)
-  {
-    err_location(expr);
-    str << "error: direct assignments to arrays not permitted";
-    throw 0;
-  }
+  expr.type()=o_type0;
 
   if(statement==ID_assign)
   {
@@ -3387,24 +3381,31 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
   {
     implicit_typecast_arithmetic(op1);
 
-    if(is_number(type1))
+    if(is_number(op1.type()))
     {
-      expr.type()=type0;
-
       if(statement==ID_assign_shl)
       {
         return;
       }
-      else
+      else // assign_shr
       {
-        if(final_type0.id()==ID_unsignedbv)
+        // distinguish arithmetic from logical shifts by looking at type
+        
+        typet underlying_type=op0.type();
+        
+        if(underlying_type.id()==ID_c_enum_tag)
+        {
+          const typet &c_enum_type=
+            follow_tag(to_c_enum_tag_type(underlying_type));
+          underlying_type=c_enum_type.subtype();
+        }
+
+        if(underlying_type.id()==ID_unsignedbv)
         {
           expr.set(ID_statement, ID_assign_lshr);
           return;
         }
-        else if(final_type0.id()==ID_signedbv ||
-                final_type0.id()==ID_c_enum ||
-                final_type0.id()==ID_c_enum_tag)
+        else if(underlying_type.id()==ID_signedbv)
         {
           expr.set(ID_statement, ID_assign_ashr);
           return;
@@ -3417,8 +3418,8 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
           statement==ID_assign_bitor)
   {
     // these are more restrictive
-    if(final_type0.id()==ID_bool ||
-       final_type0.get(ID_C_c_type)==ID_bool)
+    if(o_type0.id()==ID_bool ||
+       o_type0.get(ID_C_c_type)==ID_bool)
     {
       implicit_typecast_arithmetic(op1);
       if(op1.type().id()==ID_bool ||
@@ -3427,69 +3428,64 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
          op1.type().id()==ID_signedbv)
         return;
     }
-    else if(final_type0.id()==ID_c_enum_tag ||
-            final_type0.id()==ID_unsignedbv ||
-            final_type0.id()==ID_signedbv ||
-            final_type0.id()==ID_c_bit_field)
+    else if(o_type0.id()==ID_c_enum_tag ||
+            o_type0.id()==ID_unsignedbv ||
+            o_type0.id()==ID_signedbv ||
+            o_type0.id()==ID_c_bit_field)
     {
-      implicit_typecast(op1, final_type0);
+      implicit_typecast(op1, o_type0);
       return;
     }
-    else if(final_type0.id()==ID_vector &&
-            final_type1.id()==ID_vector)
+    else if(o_type0.id()==ID_vector &&
+            o_type1.id()==ID_vector)
     {
       // We are willing to do a modest amount of conversion
       if(gcc_vector_types_compatible(
-           to_vector_type(final_type0), to_vector_type(final_type1)))
+           to_vector_type(o_type0), to_vector_type(o_type1)))
       {
-        if(final_type0!=final_type1)
-          op1.make_typecast(final_type0);
+        if(o_type0!=o_type1)
+          op1.make_typecast(o_type0);
         return;
       }
     }
   }
   else
   {
-    if(final_type0.id()==ID_pointer &&
+    if(o_type0.id()==ID_pointer &&
        (statement==ID_assign_minus || statement==ID_assign_plus))
     {
       typecheck_expr_pointer_arithmetic(expr);
       return;
     }
-    else if(final_type0.id()==ID_bool ||
-            final_type0.get(ID_C_c_type)==ID_bool ||
-            final_type0.id()==ID_c_enum_tag ||
-            final_type0.id()==ID_c_bit_field)
-    {      
-      // promote
-      implicit_typecast_arithmetic(op1);
-
-      if(is_number(op1.type()) ||
-         type1.id()==ID_bool ||
-         type1.id()==ID_c_enum_tag)
-        return;
-      else
-      {
-        str << "type1: " << type1.pretty();
-        throw 0;
-      }
-    }
-    else if(final_type0.id()==ID_vector &&
-            final_type1.id()==ID_vector)
+    else if(o_type0.id()==ID_vector &&
+            o_type1.id()==ID_vector)
     {
       // We are willing to do a modest amount of conversion
       if(gcc_vector_types_compatible(
-           to_vector_type(final_type0), to_vector_type(final_type1)))
+           to_vector_type(o_type0), to_vector_type(o_type1)))
       {
-        if(final_type0!=final_type1)
-          op1.make_typecast(final_type0);
+        if(o_type0!=o_type1)
+          op1.make_typecast(o_type0);
         return;
       }
     }
-    else
+    else if(o_type0.id()==ID_bool ||
+            o_type0.get(ID_C_c_type)==ID_bool)
     {
-      implicit_typecast(op1, op0.type());
-      if(is_number(op0.type()))
+      implicit_typecast_arithmetic(op1);
+      if(op1.type().id()==ID_bool ||
+         op1.type().id()==ID_c_enum_tag ||
+         op1.type().id()==ID_unsignedbv ||
+         op1.type().id()==ID_signedbv)
+        return;
+    }
+    else
+    {      
+      implicit_typecast(op1, o_type0);
+
+      if(is_number(op1.type()) ||
+         op1.type().id()==ID_bool ||
+         op1.type().id()==ID_c_enum_tag)
         return;
     }
   }

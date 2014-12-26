@@ -466,7 +466,7 @@ protected:
   void typecheck_expr_sizeof(exprt &expr);
   void typecheck_expr_delete(exprt &expr);
   void typecheck_expr_side_effect(side_effect_exprt &expr);
-  void typecheck_side_effect_assignment(exprt &expr);
+  void typecheck_side_effect_assignment(side_effect_exprt &expr);
   void typecheck_side_effect_inc_dec(side_effect_exprt &expr);
   void typecheck_expr_typecast(exprt &expr);
   void typecheck_expr_index(exprt &expr);
