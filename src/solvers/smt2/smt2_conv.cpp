@@ -2641,38 +2641,35 @@ Function: smt2_convt::convert_constant
 
 void smt2_convt::convert_constant(const constant_exprt &expr)
 {
-  if(expr.type().id()==ID_unsignedbv ||
-     expr.type().id()==ID_signedbv ||
-     expr.type().id()==ID_bv ||
-     expr.type().id()==ID_c_enum ||
-     expr.type().id()==ID_c_enum_tag ||
-     expr.type().id()==ID_incomplete_c_enum)
+  const typet &expr_type=expr.type();
+
+  if(expr_type.id()==ID_unsignedbv ||
+     expr_type.id()==ID_signedbv ||
+     expr_type.id()==ID_bv ||
+     expr_type.id()==ID_c_enum ||
+     expr_type.id()==ID_c_enum_tag ||
+     expr_type.id()==ID_incomplete_c_enum)
   {
-    mp_integer value;
+    mp_integer value=binary2integer(id2string(expr.get_value()), false);
 
-    if(to_integer(expr, value))
-      throw "failed to convert bitvector constant";
-
-    std::size_t width=boolbv_width(expr.type());
-
-    if(value<0) value=power(2, width)+value;
+    std::size_t width=boolbv_width(expr_type);
 
     out << "(_ bv" << value
         << " " << width << ")";
   }
-  else if(expr.type().id()==ID_fixedbv)
+  else if(expr_type.id()==ID_fixedbv)
   {
-    fixedbv_spect spec(to_fixedbv_type(expr.type()));
+    fixedbv_spect spec(to_fixedbv_type(expr_type));
 
-    std::string v_str=id2string(expr.get(ID_value));
+    std::string v_str=id2string(expr.get_value());
     mp_integer v=binary2integer(v_str, false);
 
     out << "(_ bv" << v << " " << spec.width << ")";
   }
-  else if(expr.type().id()==ID_floatbv)
+  else if(expr_type.id()==ID_floatbv)
   {
     const floatbv_typet &floatbv_type=
-      to_floatbv_type(expr.type());
+      to_floatbv_type(expr_type);
   
     if(use_FPA_theory)
     {
@@ -2728,19 +2725,19 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       out << "(_ bv" << v << " " << spec.width() << ")";
     }
   }
-  else if(expr.type().id()==ID_pointer)
+  else if(expr_type.id()==ID_pointer)
   {
     const irep_idt &value=expr.get(ID_value);
 
     if(value==ID_NULL)
     {
-      out << "(_ bv0 " << boolbv_width(expr.type())
+      out << "(_ bv0 " << boolbv_width(expr_type)
           << ")";
     }
     else
       throw "unknown pointer constant: "+id2string(value);
   }
-  else if(expr.type().id()==ID_bool)
+  else if(expr_type.id()==ID_bool)
   {
     if(expr.is_true())
       out << "true";
@@ -2749,15 +2746,15 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     else
       throw "unknown boolean constant";
   }
-  else if(expr.type().id()==ID_array)
+  else if(expr_type.id()==ID_array)
   {
     defined_expressionst::const_iterator it=defined_expressions.find(expr);
     assert(it!=defined_expressions.end());
     out << it->second;
   }
-  else if(expr.type().id()==ID_rational)
+  else if(expr_type.id()==ID_rational)
   {
-    std::string value=id2string(expr.get(ID_value));
+    std::string value=id2string(expr.get_value());
     size_t pos=value.find("/");
 
     if(pos==std::string::npos)
@@ -2768,12 +2765,12 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
                    << value.substr(pos+1) << ".0)";
     }
   }
-  else if(expr.type().id()==ID_integer)
+  else if(expr_type.id()==ID_integer)
   {
-    out << expr.get(ID_value);
+    out << expr.get_value();
   }
   else
-    throw "unknown constant: "+expr.type().id_string();
+    throw "unknown constant: "+expr_type.id_string();
 }
 
 /*******************************************************************\
