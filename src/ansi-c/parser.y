@@ -2696,6 +2696,7 @@ KnR_sue_declaration_specifier:
         }
         | KnR_declaration_qualifier_list enum_key identifier_or_typedef_name gcc_type_attribute_opt
         {
+          stack($2).id(ID_c_enum_tag);
           stack($2).set(ID_tag, stack($3));
           $$=merge($1, merge($2, $4));
         }
