@@ -976,7 +976,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.wchar_t_width=2*8;
     ansi_c.wchar_t_is_unsigned=true;
 
-    // In 32-bit mode, long double is the same as double in Visual Studio,
+    // long double is the same as double in Visual Studio,
     // but it's 16 bytes with GCC with the 64-bit target.
     if(arch=="x64_64" && cmdline.isset("gcc"))
       ansi_c.long_double_width=16*8;
