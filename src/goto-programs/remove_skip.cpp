@@ -47,8 +47,26 @@ static bool is_skip(goto_programt::instructionst::iterator it)
   
   if(it->is_other())
   {
-    return it->code.is_nil() ||
-           it->code.get(ID_statement)==ID_skip;
+    if(it->code.is_nil()) return true;
+  
+    const irep_idt &statement=it->code.get_statement();
+    
+    if(statement==ID_skip)
+      return true;
+    else if(statement==ID_expression)
+    {
+      const code_expressiont &code_expression=to_code_expression(it->code);
+      const exprt &expr=code_expression.expression();
+      if(expr.id()==ID_typecast &&
+         expr.type().id()==ID_empty &&
+         to_typecast_expr(expr).op().is_constant())
+      {
+        // something like (void)0
+        return true;
+      }
+    }
+      
+    return false;
   }
   
   return false;
