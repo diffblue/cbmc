@@ -12,13 +12,13 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
   
   // non-derministically record the object size for bounds checking
-  _Bool record_malloc;
+  __CPROVER_bool record_malloc;
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
   
   // detect memory leaks
-  _Bool record_may_leak;
+  __CPROVER_bool record_may_leak;
   __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
 
   return res;
@@ -41,13 +41,13 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
   
   // non-deterministically record the object size for bounds checking
-  _Bool record_malloc;
+  __CPROVER_bool record_malloc;
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?size*count:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?1:__CPROVER_malloc_is_new_array;
   
   // detect memory leaks
-  _Bool record_may_leak;
+  __CPROVER_bool record_may_leak;
   __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
 
   return res;
@@ -88,7 +88,7 @@ inline void __delete(void *ptr)
                      "delete of array object");
     
     // non-deterministically record as deallocated
-    _Bool record;
+    __CPROVER_bool record;
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
   }
 }
@@ -117,7 +117,7 @@ inline void __delete_array(void *ptr)
                      "delete[] of non-array object");
 
     // non-deterministically record as deallocated
-    _Bool record;
+    __CPROVER_bool record;
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
   }
 }

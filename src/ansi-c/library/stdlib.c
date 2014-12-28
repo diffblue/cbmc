@@ -80,13 +80,13 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
   
   // record the object size for non-determistic bounds checking
-  _Bool record_malloc;
+  __CPROVER_bool record_malloc;
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
   
   // detect memory leaks
-  _Bool record_may_leak;
+  __CPROVER_bool record_may_leak;
   __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
 
   return res;
@@ -119,7 +119,7 @@ inline void free(void *ptr)
                      "free called for new[] object");
     
     // non-deterministically record as deallocated
-    _Bool record;
+    __CPROVER_bool record;
     if(record) __CPROVER_deallocated=ptr;
 
     // detect memory leaks
@@ -267,7 +267,7 @@ inline char *getenv(const char *name)
     "zero-termination of argument of getenv");
   #endif
 
-  _Bool found;
+  __CPROVER_bool found;
   if(!found) return 0;
 
   char *buffer;
@@ -278,7 +278,7 @@ inline char *getenv(const char *name)
   buffer[buf_size-1]=0;
 
   // detect memory leaks
-  _Bool record_may_leak;
+  __CPROVER_bool record_may_leak;
   __CPROVER_memory_leak=record_may_leak?buffer:__CPROVER_memory_leak;
 
   return buffer;
