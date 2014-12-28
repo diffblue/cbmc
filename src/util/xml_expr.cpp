@@ -93,6 +93,11 @@ xmlt xml(
     result.name="integer";
     result.set_attribute("width", to_bv_type(type).get_width());
   }
+  else if(type.id()==ID_c_bit_field)
+  {
+    result.name="integer";
+    result.set_attribute("width", to_c_bit_field_type(type).get_width());
+  }
   else if(type.id()==ID_c_enum_tag)
   {
     // we return the base type
@@ -178,15 +183,21 @@ xmlt xml(
   if(expr.id()==ID_constant)
   {
     if(type.id()==ID_unsignedbv ||
-       type.id()==ID_signedbv)
+       type.id()==ID_signedbv ||
+       type.id()==ID_c_bit_field)
     {
       unsigned width=to_bitvector_type(type).get_width();
     
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));
       result.set_attribute("width", width);
+      
+      const typet &underlying_type=
+        type.id()==ID_c_bit_field?type.subtype():
+        type;
 
-      bool is_signed=type.id()==ID_signedbv;      
+      bool is_signed=underlying_type.id()==ID_signedbv;
+        
       std::string sig=is_signed?"":"unsigned ";
 
       if(width==config.ansi_c.char_width)

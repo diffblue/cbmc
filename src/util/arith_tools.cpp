@@ -181,8 +181,7 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_c_bit_field)
   {
-    unsigned width=
-      to_c_bit_field_type(type).subtype().get_unsigned_int(ID_width);
+    unsigned width=to_c_bit_field_type(type).get_width();
     constant_exprt result(type);
     result.set_value(integer2binary(int_value, width));
     return result;
