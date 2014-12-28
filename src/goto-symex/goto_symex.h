@@ -218,7 +218,7 @@ protected:
 
   void parameter_assignments(
     const irep_idt function_identifier,
-    const code_typet &function_type,
+    const goto_functionst::goto_functiont &goto_function,
     statet &state,
     const exprt::operandst &arguments);
 

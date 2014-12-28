@@ -300,13 +300,16 @@ public:
 
     goto_programt::const_targett end_of_function;
     exprt return_value;
+    bool hidden_function;
 
     renaming_levelt::current_namest old_level1;
     
     typedef std::set<irep_idt> local_variablest;
     local_variablest local_variables;
     
-    framet():return_value(nil_exprt())
+    framet():
+      return_value(nil_exprt()),
+      hidden_function(false)
     {
     }
 

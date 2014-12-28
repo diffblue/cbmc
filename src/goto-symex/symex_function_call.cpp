@@ -55,10 +55,12 @@ Function: goto_symext::parameter_assignments
 
 void goto_symext::parameter_assignments(
   const irep_idt function_identifier,
-  const code_typet &function_type,
+  const goto_functionst::goto_functiont &goto_function,
   statet &state,
   const exprt::operandst &arguments)
 {
+  const code_typet &function_type=goto_function.type;
+
   // iterates over the arguments
   exprt::operandst::const_iterator it1=arguments.begin();
 
@@ -112,10 +114,13 @@ void goto_symext::parameter_assignments(
         // This is highly dubious, obviously.
         if((f_parameter_type.id()==ID_signedbv ||
             f_parameter_type.id()==ID_unsignedbv ||
+            f_parameter_type.id()==ID_c_enum_tag ||
             f_parameter_type.id()==ID_bool ||
             f_parameter_type.id()==ID_pointer) &&
            (f_rhs_type.id()==ID_signedbv ||
             f_rhs_type.id()==ID_unsignedbv ||
+            f_rhs_type.id()==ID_c_bit_field ||
+            f_rhs_type.id()==ID_c_enum_tag ||
             f_rhs_type.id()==ID_bool ||
             f_rhs_type.id()==ID_pointer))
         {
@@ -133,7 +138,13 @@ void goto_symext::parameter_assignments(
       
       guardt guard;
       state.rename(lhs, ns, goto_symex_statet::L1);
-      symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::ACTUAL_PARAMETER);
+      
+      symex_targett::assignment_typet assignment_type=
+        goto_function.is_hidden()?
+        symex_targett::HIDDEN_ACTUAL_PARAMETER:
+        symex_targett::VISIBLE_ACTUAL_PARAMETER;
+        
+      symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, assignment_type);
     }
 
     it1++;
@@ -164,7 +175,13 @@ void goto_symext::parameter_assignments(
 
       guardt guard;
       state.rename(lhs, ns, goto_symex_statet::L1);
-      symex_assign_symbol(state, lhs, nil_exprt(), *it1, guard, symex_targett::ACTUAL_PARAMETER);
+
+      symex_targett::assignment_typet assignment_type=
+        goto_function.is_hidden()?
+        symex_targett::HIDDEN_ACTUAL_PARAMETER:
+        symex_targett::VISIBLE_ACTUAL_PARAMETER;
+        
+      symex_assign_symbol(state, lhs, nil_exprt(), *it1, guard, assignment_type);
     }
   }
   else if(it1!=arguments.end())
@@ -333,12 +350,13 @@ void goto_symext::symex_function_call_code(
   locality(identifier, state, goto_function);
 
   // assign actuals to formal parameters
-  parameter_assignments(identifier, goto_function.type, state, arguments);
+  parameter_assignments(identifier, goto_function, state, arguments);
 
   frame.end_of_function=--goto_function.body.instructions.end();
   frame.return_value=call.lhs();
   frame.calling_location=state.source;
   frame.function_identifier=identifier;
+  frame.hidden_function=goto_function.is_hidden();
 
   const goto_symex_statet::framet &p_frame=state.previous_frame();
   for(goto_symex_statet::framet::loop_iterationst::const_iterator
@@ -347,6 +365,7 @@ void goto_symext::symex_function_call_code(
       ++it)
     if(it->second.is_recursion)
       frame.loop_iterations.insert(*it);
+
   // increase unwinding counter
   frame.loop_iterations[identifier].is_recursion=true;
   frame.loop_iterations[identifier].count++;
