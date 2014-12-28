@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cmdline.h"
 #include "simplify_expr.h"
 #include "i2string.h"
+#include "std_expr.h"
 
 configt config;
 
@@ -1093,9 +1094,12 @@ static unsigned from_ns(
   exprt tmp=symbol->value;
   simplify(tmp, ns);
   
+  if(tmp.id()!=ID_constant)
+    throw "symbol table configuration entry `"+id2string(id)+"' is not a constant";
+  
   mp_integer int_value;
   
-  if(to_integer(tmp, int_value))
+  if(to_integer(to_constant_expr(tmp), int_value))
     throw "failed to convert symbol table configuration entry `"+id2string(id)+"'";
     
   return integer2unsigned(int_value);
