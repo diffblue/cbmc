@@ -155,6 +155,12 @@ exprt gen_one(const typet &type)
     exprt tmp=gen_one(unsignedbv_typet(1));
     return typecast_exprt(tmp, type);
   }
+  else if(type_id==ID_c_bit_field)
+  {
+    // Ha! We generate a typecast.
+    exprt tmp=gen_one(to_c_bit_field_type(type).subtype());
+    return typecast_exprt(tmp, type);
+  }
   else if(type_id==ID_fixedbv)
   {
     fixedbvt fixedbv;
