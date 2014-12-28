@@ -91,7 +91,8 @@ void goto_symext::symex_decl(statet &state)
 
   // we hide the declaration of auxiliary variables
   bool hidden=
-    ns.lookup(original_lhs.get_identifier()).is_auxiliary;
+    ns.lookup(original_lhs.get_identifier()).is_auxiliary ||
+    state.top().hidden_function;
   
   target.decl(
     state.guard.as_expr(),

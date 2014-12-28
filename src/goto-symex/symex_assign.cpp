@@ -78,6 +78,10 @@ void goto_symext::symex_assign(
                   "#return_value!")!=std::string::npos)
       assignment_type=symex_targett::HIDDEN;
 
+    // We hide if we are in a hidden function.
+    if(state.top().hidden_function)
+      assignment_type=symex_targett::HIDDEN;
+
     // We also hide all those evil things that happen
     // in __CPROVER_initialize.
     if(state.source.pc->function==CPROVER_PREFIX "initialize")
