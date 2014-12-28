@@ -277,10 +277,6 @@ inline char *getenv(const char *name)
   buffer=(char *)__CPROVER_malloc(buf_size);
   buffer[buf_size-1]=0;
 
-  // detect memory leaks
-  __CPROVER_bool record_may_leak;
-  __CPROVER_memory_leak=record_may_leak?buffer:__CPROVER_memory_leak;
-
   return buffer;
 }
 
