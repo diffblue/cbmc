@@ -1217,7 +1217,6 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
      expr_type.id()!=ID_bool &&
      expr_type.id()!=ID_pointer &&
      expr_type.id()!=ID_array &&
-     expr_type.id()!=ID_c_enum &&
      expr_type.id()!=ID_c_enum_tag &&
      expr_type.id()!=ID_incomplete_c_enum)
   {
@@ -1229,11 +1228,11 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
 
   if(is_number(op_type) ||
-     op_type.id()==ID_c_enum ||
      op_type.id()==ID_c_enum_tag ||
      op_type.id()==ID_incomplete_c_enum ||
      op_type.id()==ID_bool ||
-     op_type.id()==ID_pointer)
+     op_type.id()==ID_pointer ||
+     op_type.id()==ID_c_bit_field)
   {
   }
   else if(op_type.id()==ID_array)
@@ -2092,8 +2091,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
 
     if(final_type0.id()==ID_bool ||
        final_type0.get(ID_C_c_type)==ID_bool ||
-       is_number(final_type0) ||
-       final_type0.id()==ID_c_enum)
+       is_number(final_type0))
     {
       expr.type()=type0;
     }
@@ -2115,6 +2113,13 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
     {
       expr.type()=type0;
       typecheck_arithmetic_pointer(op0);
+    }
+    else if(final_type0.id()==ID_c_bit_field)
+    {
+      // promote to underlying type
+      typet underlying_type=to_c_bit_field_type(final_type0).subtype();
+      expr.op0().make_typecast(underlying_type);
+      expr.type()=underlying_type;
     }
     else
     {
