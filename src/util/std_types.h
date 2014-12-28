@@ -916,7 +916,8 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
          type.id()==ID_fixedbv ||
          type.id()==ID_floatbv ||
          type.id()==ID_bv ||
-         type.id()==ID_pointer);
+         type.id()==ID_pointer ||
+         type.id()==ID_c_bit_field);
   return static_cast<const bitvector_typet &>(type);
 }
 

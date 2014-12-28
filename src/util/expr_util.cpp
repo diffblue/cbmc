@@ -50,17 +50,12 @@ exprt gen_zero(const typet &type)
     exprt tmp=gen_zero(unsignedbv_typet(1));
     return typecast_exprt(tmp, type);
   }
-  else if(type_id==ID_c_bit_field)
-  {
-    // Ha! We generate a typecast.
-    exprt tmp=gen_zero(to_c_bit_field_type(type).subtype());
-    return typecast_exprt(tmp, type);
-  }
   else if(type_id==ID_unsignedbv ||
           type_id==ID_signedbv ||
           type_id==ID_verilogbv ||
           type_id==ID_floatbv ||
-          type_id==ID_fixedbv)
+          type_id==ID_fixedbv ||
+          type_id==ID_c_bit_field)
   {
     std::string value;
     unsigned width=to_bitvector_type(type).get_width();
@@ -128,7 +123,8 @@ exprt gen_one(const typet &type)
     return constant_exprt(ID_1, type);
   }
   else if(type_id==ID_unsignedbv ||
-          type_id==ID_signedbv)
+          type_id==ID_signedbv ||
+          type_id==ID_c_bit_field)
   {
     std::string value;
     unsigned width=to_bitvector_type(type).get_width();
@@ -153,12 +149,6 @@ exprt gen_one(const typet &type)
   {
     // Ha! We generate a typecast.
     exprt tmp=gen_one(unsignedbv_typet(1));
-    return typecast_exprt(tmp, type);
-  }
-  else if(type_id==ID_c_bit_field)
-  {
-    // Ha! We generate a typecast.
-    exprt tmp=gen_one(to_c_bit_field_type(type).subtype());
     return typecast_exprt(tmp, type);
   }
   else if(type_id==ID_fixedbv)

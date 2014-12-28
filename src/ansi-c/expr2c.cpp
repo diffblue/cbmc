@@ -2039,8 +2039,8 @@ std::string expr2ct::convert_constant(
   std::string dest;
 
   if(type.id()==ID_integer ||
-          type.id()==ID_natural ||
-          type.id()==ID_rational)
+     type.id()==ID_natural ||
+     type.id()==ID_rational)
   {
     dest=id2string(value);
   }
@@ -2092,11 +2092,16 @@ std::string expr2ct::convert_constant(
       dest="FALSE";
   }
   else if(type.id()==ID_unsignedbv ||
-          type.id()==ID_signedbv)
+          type.id()==ID_signedbv ||
+          type.id()==ID_c_bit_field)
   {
     mp_integer int_value=binary2integer(id2string(value), type.id()==ID_signedbv);
+    
+    const irep_idt &c_type=
+      type.id()==ID_c_bit_field?type.subtype().get(ID_C_c_type):
+                 type.get(ID_C_c_type);
 
-    if(type.get(ID_C_c_type)==ID_bool)
+    if(c_type==ID_bool)
     {
       // C doesn't really have these
       if(int_value!=0)
@@ -2107,8 +2112,6 @@ std::string expr2ct::convert_constant(
     else
     {
       dest=integer2string(int_value);
-
-      irep_idt c_type=type.get(ID_C_c_type);
 
       if(c_type==ID_unsigned_int)
         dest+='u';

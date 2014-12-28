@@ -74,6 +74,7 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
           expr_type.id()==ID_floatbv ||
           expr_type.id()==ID_c_enum ||
           expr_type.id()==ID_c_enum_tag ||
+          expr_type.id()==ID_c_bit_field ||
           expr_type.id()==ID_incomplete_c_enum)
   {
     const std::string &binary=id2string(expr.get_value());
