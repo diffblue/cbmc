@@ -23,7 +23,7 @@ Function: boolbvt::convert_struct
 
 \*******************************************************************/
 
-void boolbvt::convert_struct(const exprt &expr, bvt &bv)
+void boolbvt::convert_struct(const struct_exprt &expr, bvt &bv)
 {
   const struct_typet &struct_type=to_struct_type(ns.follow(expr.type()));
 

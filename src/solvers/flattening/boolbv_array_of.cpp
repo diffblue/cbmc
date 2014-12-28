@@ -23,13 +23,10 @@ Function: boolbvt::convert_array_of
 
 \*******************************************************************/
 
-void boolbvt::convert_array_of(const exprt &expr, bvt &bv)
+void boolbvt::convert_array_of(const array_of_exprt &expr, bvt &bv)
 {
-  if(expr.operands().size()!=1)
-    throw "array_of takes one operand";
-
   if(expr.type().id()!=ID_array)
-    throw "array_of takes array-typed operand";
+    throw "array_of must be array-typed";
   
   const array_typet &array_type=to_array_type(expr.type());
   

@@ -319,7 +319,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
   }
   else if(expr.id()==ID_if)
   {
-    return SUB::convert_if(expr, bv);
+    return SUB::convert_if(to_if_expr(expr), bv);
   }
   else if(expr.id()==ID_index)
   {

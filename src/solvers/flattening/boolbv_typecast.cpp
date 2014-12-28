@@ -28,13 +28,10 @@ Function: boolbvt::convert_typecast
 
 \*******************************************************************/
 
-void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
+void boolbvt::convert_typecast(const typecast_exprt &expr, bvt &bv)
 {
-  if(expr.operands().size()!=1)
-    throw "typecast takes one operand";
-
   const typet &expr_type=ns.follow(expr.type());
-  const exprt &op=expr.op0();
+  const exprt &op=expr.op();
   const typet &op_type=ns.follow(op.type());
   const bvt &op_bv=convert_bv(op);  
 
