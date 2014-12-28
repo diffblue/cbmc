@@ -8,7 +8,7 @@
 
 inline int putchar(int c)
 {
-  _Bool error;
+  __CPROVER_bool error;
   __CPROVER_HIDE: printf("%c", c);
   return (error?-1:c);
 }
@@ -23,7 +23,7 @@ inline int putchar(int c)
 inline int puts(const char *s)
 {
   __CPROVER_HIDE:;
-  _Bool error;
+  __CPROVER_bool error;
   int ret;
   printf("%s\n", s);
   if(error) ret=-1; else __CPROVER_assume(ret>=0);
@@ -109,7 +109,7 @@ inline FILE *fdopen(int handle, const char *mode)
 inline char *fgets(char *str, int size, FILE *stream)
 {
   __CPROVER_HIDE:;
-  _Bool error;
+  __CPROVER_bool error;
 
   (void)size;
   (void)*stream;
