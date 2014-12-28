@@ -541,15 +541,11 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv ||
-         expr_type_id==ID_c_enum)
+         expr_type_id==ID_c_enum ||
+         expr_type_id==ID_c_bit_field ||
+         expr_type_id==ID_integer)
       {
         expr=from_integer(int_value, expr_type);
-        return false;
-      }
-
-      if(expr_type_id==ID_integer)
-      {
-        expr=constant_exprt(value, expr_type);
         return false;
       }
     }
@@ -566,7 +562,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_integer ||
          expr_type_id==ID_natural ||
          expr_type_id==ID_rational ||
-         expr_type_id==ID_c_enum)
+         expr_type_id==ID_c_enum ||
+         expr_type_id==ID_c_bit_field)
       {
         if(operand.is_true())
         {
@@ -595,10 +592,13 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       }
     }
     else if(op_type_id==ID_unsignedbv ||
-            op_type_id==ID_signedbv)
+            op_type_id==ID_signedbv ||
+            op_type_id==ID_c_bit_field)
     {
-      mp_integer int_value=binary2integer(
-        id2string(value), op_type_id==ID_signedbv);
+      mp_integer int_value;
+      
+      if(to_integer(to_constant_expr(operand), int_value))
+        return true;
 
       if(expr_type_id==ID_bool)
       {
@@ -623,7 +623,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv ||
-         expr_type_id==ID_bv)
+         expr_type_id==ID_bv ||
+         expr_type_id==ID_c_bit_field)
       {
         expr=from_integer(int_value, expr_type);
 

@@ -74,12 +74,27 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   }
   else if(type_id==ID_c_enum)
   {
-    if(to_c_enum_type(type).subtype().id()==ID_signedbv)
+    const typet &subtype=to_c_enum_type(type).subtype();
+    if(subtype.id()==ID_signedbv)
     {
       int_value=binary2integer(id2string(value), true);
       return false;
     }
-    else if(to_c_enum_type(type).subtype().id()==ID_unsignedbv)
+    else if(subtype.id()==ID_unsignedbv)
+    {
+      int_value=binary2integer(id2string(value), false);
+      return false;
+    }
+  }
+  else if(type_id==ID_c_bit_field)
+  {
+    const typet &subtype=type.subtype();
+    if(subtype.id()==ID_signedbv)
+    {
+      int_value=binary2integer(id2string(value), true);
+      return false;
+    }
+    else if(subtype.id()==ID_unsignedbv)
     {
       int_value=binary2integer(id2string(value), false);
       return false;
@@ -143,7 +158,7 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_c_enum)
   {
-    unsigned width=to_c_enum_type(type).subtype().get_int(ID_width);
+    unsigned width=to_c_enum_type(type).subtype().get_unsigned_int(ID_width);
     constant_exprt result(type);
     result.set_value(integer2binary(int_value, width));
     return result;
@@ -163,6 +178,14 @@ constant_exprt from_integer(
       result.set_value(ID_NULL);
       return result;
     }
+  }
+  else if(type_id==ID_c_bit_field)
+  {
+    unsigned width=
+      to_c_bit_field_type(type).subtype().get_unsigned_int(ID_width);
+    constant_exprt result(type);
+    result.set_value(integer2binary(int_value, width));
+    return result;
   }
 
   {
