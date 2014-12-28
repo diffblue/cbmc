@@ -374,7 +374,7 @@ void goto_inlinet::expand_function_call(
     parameter_assignments(target->source_location, identifier, f.type, arguments, tmp);
     tmp.destructive_append(tmp2);
 
-    if(f.type.get_bool("#hide"))
+    if(f.is_hidden())
     {
       const source_locationt &new_source_location=
         function.find_source_location();

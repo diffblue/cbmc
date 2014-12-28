@@ -307,7 +307,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   f.body.update();
 
   if(hide(f.body))
-    f.type.set("#hide", true);
+    f.make_hidden();
 }
 
 /*******************************************************************\
