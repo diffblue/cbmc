@@ -82,11 +82,10 @@ void goto_symext::symex_assign(
     if(state.top().hidden_function)
       assignment_type=symex_targett::HIDDEN;
 
-    // We also hide all those evil things that happen
-    // in __CPROVER_initialize.
-    if(state.source.pc->function==CPROVER_PREFIX "initialize")
+    // We hide if we are executing a hidden instruction.
+    if(state.source.pc->source_location.get_hide())
       assignment_type=symex_targett::HIDDEN;
-  
+
     guardt guard; // NOT the state guard!
     symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, assignment_type);
   }
