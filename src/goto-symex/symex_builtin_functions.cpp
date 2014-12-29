@@ -170,7 +170,7 @@ void goto_symext::symex_malloc(
   state.rename(rhs, ns);
   
   guardt guard;
-  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, symex_targett::STATE);
+  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
 }
 
 /*******************************************************************\

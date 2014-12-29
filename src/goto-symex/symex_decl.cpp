@@ -90,9 +90,11 @@ void goto_symext::symex_decl(statet &state)
   state.rename(ssa_lhs, ns);
 
   // we hide the declaration of auxiliary variables
+  // and if the statement itself is hidden
   bool hidden=
     ns.lookup(original_lhs.get_identifier()).is_auxiliary ||
-    state.top().hidden_function;
+    state.top().hidden_function ||
+    state.source.pc->source_location.get_hide();
   
   target.decl(
     state.guard.as_expr(),
