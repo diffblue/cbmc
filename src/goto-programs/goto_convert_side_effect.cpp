@@ -390,6 +390,7 @@ void goto_convertt::remove_function_call(
   new_symbol.is_state_var=true;
   new_symbol.is_file_local=true;
   new_symbol.is_thread_local=true;
+  new_symbol.is_auxiliary=true;
   new_symbol.type=expr.type();
   new_symbol.location=expr.find_source_location();
 
@@ -560,7 +561,7 @@ void goto_convertt::remove_malloc(
   {
     symbolt new_symbol;
 
-    new_symbol.base_name="new_value$"+i2string(++temporary_counter);
+    new_symbol.base_name="malloc_value$"+i2string(++temporary_counter);
     new_symbol.is_lvalue=true;
     new_symbol.is_file_local=true;
     new_symbol.type=expr.type();
@@ -570,6 +571,7 @@ void goto_convertt::remove_malloc(
     tmp_symbols.push_back(new_symbol.name);
 
     call=code_assignt(new_symbol.symbol_expr(), expr);
+    call.add_source_location()=expr.source_location();
     
     static_cast<exprt &>(expr)=new_symbol.symbol_expr();
   }
