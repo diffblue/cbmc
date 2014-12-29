@@ -81,6 +81,9 @@ bool static_lifetime_init(
   init_symbol.value.add_source_location()=source_location;
 
   code_blockt &dest=to_code_block(to_code(init_symbol.value));
+
+  // add the magic label to hide
+  dest.add(code_labelt("__CPROVER_HIDE", code_skipt()));
   
   // do assignments based on "value"
 
