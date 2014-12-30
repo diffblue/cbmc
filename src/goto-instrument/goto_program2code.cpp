@@ -963,23 +963,11 @@ bool goto_program2codet::set_block_end_points(
       if(n.dominators.empty())
         continue;
 
-      // is this instruction dominated by at least one of the cases
-      bool some_goto_dom=
-        n.dominators.find(it->case_selector)!=n.dominators.end();
-      for(cases_listt::const_iterator it2=cases.begin();
-          it2!=it && !some_goto_dom;
-          ++it2)
-        some_goto_dom=
-          n.dominators.find(it2->case_selector)!=n.dominators.end();
+      // find the last instruction dominated by the case start
+      if(n.dominators.find(it->case_start)==n.dominators.end())
+        break;
 
-      // for code that has jumps into one of the cases from outside the
-      // switch/case we better use convert_goto_if
-      if(n.dominators.find(it->case_start)==n.dominators.end() ||
-         !some_goto_dom)
-      {
-        return true;
-      }
-      else if(!processed_locations.insert(case_end->location_number).second)
+      if(!processed_locations.insert(case_end->location_number).second)
         assert(false);
 
       it->case_last=case_end;
@@ -1203,7 +1191,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     {
       // only emit the jump out of the switch if it's not the last case
       // this improves convergence
-      if(it!=--cases.end())
+      if(it->case_start!=(--cases.end())->case_start)
       {
         assert(false);
         goto_programt::instructiont i=*(it->case_selector);
