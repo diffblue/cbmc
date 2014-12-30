@@ -431,24 +431,52 @@ std::string expr2ct::convert_rec(
 
     return dest;
   }
-  else if(src.id()==ID_c_enum ||
-          src.id()==ID_incomplete_c_enum)
+  else if(src.id()==ID_c_enum)
   {
+    std::string result;
+    result+=q;
+    result+="enum";
+
     // do we have a tag?
     const irept &tag=src.find(ID_tag);
     
     if(tag.is_nil())
     {
-      /* until we have more information about enums in the context we go for a
-       * hack
-      std::string result=q+"enum";
-      if(!src.get(ID_tag).empty()) result+=" "+src.get_string(ID_tag);
-      result+=d;
-      return result;
-      */
-      return q+"int"+d;
     }
     else
+    {
+      result+=' ';
+      result+=tag.get_string(ID_C_base_name);
+    }
+    
+    result+=' ';
+    result+='{';
+    
+    // add members
+    const c_enum_typet::memberst &members=to_c_enum_type(src).members();
+    
+    for(c_enum_typet::memberst::const_iterator
+        it=members.begin();
+        it!=members.end();
+        it++)
+    {
+      if(it!=members.begin()) result+=',';
+      result+=' ';
+      result+=id2string(it->get_base_name());
+      result+='=';
+      result+=id2string(it->get_value());
+    }
+
+    result+=" }";
+
+    result+=d;
+    return result;
+  }
+  else if(src.id()==ID_incomplete_c_enum)
+  {
+    const irept &tag=src.find(ID_tag);
+    
+    if(tag.is_not_nil())
     {
       std::string result=q+"enum";
       result+=" "+tag.get_string(ID_C_base_name);
