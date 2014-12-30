@@ -814,7 +814,7 @@ bool dump_ct::ignore(const symbolt &symbol)
 
   if(name_str=="c::__builtin_va_start" ||
      name_str=="c::__builtin_va_end" ||
-     has_prefix(name_str, id2string(ID_gcc_builtin_va_arg)))
+     symbol.name==ID_gcc_builtin_va_arg)
   {
     system_headers.insert("stdarg.h");
     return true;
