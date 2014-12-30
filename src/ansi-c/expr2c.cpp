@@ -257,15 +257,10 @@ std::string expr2ct::convert_rec(
     // annotated?
     
     irep_idt c_type=src.get(ID_C_c_type);
+    const std::string c_type_str=c_type_as_string(c_type);
 
-    if(c_type==ID_double)
-      return q+"double"+d;
-    else if(c_type==ID_long_double)
-      return q+"long double"+d;
-    else if(c_type==ID_float)
-      return q+"float"+d;
-    else if(c_type==ID_gcc_float128)
-      return q+"__float128"+d; // gcc 4.3 or later
+    if(!c_type_str.empty())
+      return q+c_type_str+d;
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
@@ -285,15 +280,10 @@ std::string expr2ct::convert_rec(
     // annotated?
     
     irep_idt c_type=src.get(ID_C_c_type);
+    const std::string c_type_str=c_type_as_string(c_type);
 
-    if(c_type==ID_double)
-      return q+"double"+d;
-    else if(c_type==ID_long_double)
-      return q+"long double"+d;
-    else if(c_type==ID_float)
-      return q+"float"+d;
-    else if(c_type==ID_gcc_float128)
-      return q+"__float128"+d; // gcc 4.3 or later
+    if(!c_type_str.empty())
+      return q+c_type_str+d;
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
@@ -315,46 +305,18 @@ std::string expr2ct::convert_rec(
     // annotated?
     
     irep_idt c_type=src.get(ID_C_c_type);
+    const std::string c_type_str=c_type_as_string(c_type);
 
-    if(c_type==ID_unsigned_char)
-      return q+"unsigned char"+d;
-    else if(c_type==ID_signed_char)
-      return q+"signed char"+d;
-    else if(c_type==ID_char)
+    if(c_type==ID_char &&
+       config.ansi_c.char_is_unsigned!=(src.id()==ID_unsignedbv))
     {
-      if(config.ansi_c.char_is_unsigned==
-         (src.id()==ID_unsignedbv))
-        return q+"char"+d;
+      if(src.id()==ID_signedbv)
+        return q+"signed char"+d;
       else
-      {
-        if(src.id()==ID_signedbv)
-          return q+"signed char"+d;
-        else
-          return q+"unsigned char"+d;
-      }
+        return q+"unsigned char"+d;
     }
-    else if(c_type==ID_unsigned_short_int)
-      return q+"unsigned short int"+d;
-    else if(c_type==ID_signed_short_int)
-      return q+"signed short int"+d;
-    else if(c_type==ID_unsigned_int)
-      return q+"unsigned int"+d;
-    else if(c_type==ID_signed_int)
-      return q+"signed int"+d;
-    else if(c_type==ID_unsigned_long_int)
-      return q+"unsigned long int"+d;
-    else if(c_type==ID_signed_long_int)
-      return q+"signed long int"+d;
-    else if(c_type==ID_unsigned_long_long_int)
-      return q+"unsigned long long int"+d;
-    else if(c_type==ID_signed_long_long_int)
-      return q+"signed long long int"+d;
-    else if(c_type==ID_bool)
-      return q+"_Bool"+d;
-    else if(c_type==ID_signed_int128)
-      return q+"signed __int128"+d;
-    else if(c_type==ID_unsigned_int128)
-      return q+"unsigned __int128"+d;
+    else if(c_type!=ID_wchar_t && !c_type_str.empty())
+      return q+c_type_str+d;
       
     // There is also wchar_t among the above, but this isn't a C type.
 
