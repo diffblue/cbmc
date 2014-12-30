@@ -2352,6 +2352,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref index_designatort
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * index_designatort.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref index_designatort
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const index_designatort &to_index_designator(const exprt &expr)
+{
+  assert(expr.id()==ID_index_designator && expr.operands().size()==1);
+  return static_cast<const index_designatort &>(expr);
+}
+
+/*! \copydoc to_index_designator(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline index_designatort &to_index_designator(exprt &expr)
+{
+  assert(expr.id()==ID_index_designator && expr.operands().size()==1);
+  return static_cast<index_designatort &>(expr);
+}
+
 class member_designatort:public exprt
 {
 public:
@@ -2366,6 +2391,31 @@ public:
     return get(ID_component_name);
   }
 };
+
+/*! \brief Cast a generic exprt to an \ref member_designatort
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * member_designatort.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref member_designatort
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const member_designatort &to_member_designator(const exprt &expr)
+{
+  assert(expr.id()==ID_member_designator && expr.operands().size()==0);
+  return static_cast<const member_designatort &>(expr);
+}
+
+/*! \copydoc to_member_designator(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline member_designatort &to_member_designator(exprt &expr)
+{
+  assert(expr.id()==ID_member_designator && expr.operands().size()==0);
+  return static_cast<member_designatort &>(expr);
+}
 
 /*! \brief Operator to update elements in structs and arrays
 */
@@ -2403,47 +2453,6 @@ public:
     return op0();
   }
   
-  class member_designatort:public exprt
-  {
-  public:
-    inline member_designatort():exprt(ID_member_designator)
-    {
-    }
-    
-    inline irep_idt get_component_name() const
-    {
-      return get(ID_component_name);
-    }
-
-    inline void set_component_name(const irep_idt &name)
-    {
-      return set(ID_component_name, name);
-    }
-  };
-
-  class index_designatort:public unary_exprt
-  {
-  public:
-    inline index_designatort():unary_exprt(ID_index_designator)
-    {
-    }
-
-    inline explicit index_designatort(const exprt &_index):
-      unary_exprt(ID_index_designator, _index)
-    {
-    }
-    
-    inline exprt index()
-    {
-      return op0();
-    }
-
-    inline const exprt &index() const
-    {
-      return op0();
-    }
-  };
-
   // the designator operands are either
   // 1) member_designator or
   // 2) index_designator
@@ -2492,56 +2501,6 @@ extern inline update_exprt &to_update_expr(exprt &expr)
 {
   assert(expr.id()==ID_update && expr.operands().size()==3);
   return static_cast<update_exprt &>(expr);
-}
-
-/*! \brief Cast a generic exprt to an \ref index_designatort
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * update_exprt::index_designatort.
- *
- * \param expr Source expression
- * \return Object of type \ref update_exprt::index_designatort
- *
- * \ingroup gr_std_expr
-*/
-extern inline const update_exprt::index_designatort &to_index_designator(const exprt &expr)
-{
-  assert(expr.id()==ID_index_designator && expr.operands().size()==1);
-  return static_cast<const update_exprt::index_designatort &>(expr);
-}
-
-/*! \copydoc to_index_designator(const exprt &)
- * \ingroup gr_std_expr
-*/
-extern inline update_exprt::index_designatort &to_index_designator(exprt &expr)
-{
-  assert(expr.id()==ID_index_designator && expr.operands().size()==1);
-  return static_cast<update_exprt::index_designatort &>(expr);
-}
-
-/*! \brief Cast a generic exprt to an \ref member_designatort
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * update_exprt::member_designatort.
- *
- * \param expr Source expression
- * \return Object of type \ref update_exprt::member_designatort
- *
- * \ingroup gr_std_expr
-*/
-extern inline const update_exprt::member_designatort &to_member_designator(const exprt &expr)
-{
-  assert(expr.id()==ID_member_designator && expr.operands().size()==0);
-  return static_cast<const update_exprt::member_designatort &>(expr);
-}
-
-/*! \copydoc to_member_designator(const exprt &)
- * \ingroup gr_std_expr
-*/
-extern inline update_exprt::member_designatort &to_member_designator(exprt &expr)
-{
-  assert(expr.id()==ID_member_designator && expr.operands().size()==0);
-  return static_cast<update_exprt::member_designatort &>(expr);
 }
 
 #if 0
