@@ -33,6 +33,14 @@ void ansi_c_convert_typet::read(const typet &type)
   clear();
   source_location=type.source_location();
   read_rec(type);
+
+  if(!aligned &&
+     type.find(ID_C_alignment).is_not_nil())
+  {
+    aligned=true;
+
+    alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
+  }
 }
 
 /*******************************************************************\

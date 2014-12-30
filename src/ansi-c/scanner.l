@@ -18,10 +18,6 @@
 static int isatty(int) { return 0; }
 #endif
 
-#include <util/expr.h>
-#include <util/arith_tools.h>
-#include <util/config.h>
-
 #include "c_types.h"
 #include "preprocessor_line.h"
 #include "string_constant.h"
@@ -291,23 +287,51 @@ void ansi_c_scanner_init()
                   PARSER.set_line_no(PARSER.get_line_no()-1);
 		 }
 
-<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{integer_s}")"{ws}{newline} {
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"push"{ws}")"{ws}{newline} {
                    // Done by Visual Studio and gcc
-                   std::string tmp(yytext);
-                   std::size_t p=tmp.find('(')+1;
-                   std::string value=std::string(tmp, p, tmp.rfind(')')-p);
-                   exprt l=convert_integer_literal(value);
-                   to_integer(l, PARSER.pragma_pack);
-                   // needs push, pop
                    // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   // push, pop could also use identifiers
+                   if(PARSER.pragma_pack.empty())
+                     PARSER.pragma_pack.push_back(convert_integer_literal("0"));
+                   else
+                     PARSER.pragma_pack.push_back(PARSER.pragma_pack.back());
+		 }
+
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"push"{ws}","{ws}{integer_s}{ws}")"{ws}{newline} {
+                   // Done by Visual Studio and gcc
+                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   // push, pop could also use identifiers
+                   std::string tmp(yytext);
+                   std::string::size_type p=tmp.find(',')+1;
+                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
+                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
+                   exprt n=convert_integer_literal(value);
+                   PARSER.pragma_pack.push_back(n);
+		 }
+
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}{integer_s}{ws}")"{ws}{newline} {
+                   // Done by Visual Studio and gcc
+                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   std::string tmp(yytext);
+                   std::string::size_type p=tmp.find('(')+1;
+                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
+                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
+                   exprt n=convert_integer_literal(value);
+                   PARSER.pragma_pack.push_back(n);
+		 }
+
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"pop"{ws}")"{ws}{newline} {
+                   // Done by Visual Studio and gcc
+                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   // push, pop could also use identifiers
+                   if(!PARSER.pragma_pack.empty()) PARSER.pragma_pack.pop_back();
 		 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}")"{ws}{newline} {
                    // Done by Visual Studio and gcc
-                   // should be equivalent to pop-all
-                   PARSER.pragma_pack=0;
-                   // needs push, pop
                    // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   // should be equivalent to pop-all
+                   PARSER.pragma_pack.clear();
 		 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}.* {

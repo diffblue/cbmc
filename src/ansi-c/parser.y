@@ -1322,7 +1322,9 @@ array_of_construct:
 pragma_packed:
         {
           init($$);
-          if(PARSER.pragma_pack!=0) set($$, ID_packed);
+          if(!PARSER.pragma_pack.empty() &&
+             PARSER.pragma_pack.back().is_one())
+            set($$, ID_packed);
         }
         ;
 
@@ -1537,6 +1539,10 @@ member_declaring_list:
           type_specifier
           member_declarator
         {
+          if(!PARSER.pragma_pack.empty() &&
+             !PARSER.pragma_pack.back().is_zero())
+            stack($2).set(ID_C_alignment, PARSER.pragma_pack.back());
+
           $2=merge($2, $1);
 
           init($$, ID_declaration);
