@@ -2208,22 +2208,7 @@ std::string expr2ct::convert_constant(
   else if(type.id()==ID_array ||
           type.id()==ID_incomplete_array)
   {
-    dest="{ ";
-
-    forall_operands(it, src)
-    {
-      std::string tmp=convert(*it);
-
-      if((it+1)!=src.operands().end())
-      {
-        tmp+=", ";
-        if(tmp.size()>40) tmp+="\n    ";
-      }
-
-      dest+=tmp;
-    }
-
-    dest+=" }";
+    dest=convert_array(src, precedence);
   }
   else if(type.id()==ID_pointer)
   {
