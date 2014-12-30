@@ -478,8 +478,6 @@ void dump_ct::convert_compound(
     if(s.find("__CPROVER_bitvector")==std::string::npos)
     {
       struct_body << s;
-      if(comp_type.id()==ID_c_bit_field)
-        struct_body << " : " << to_c_bit_field_type(comp_type).get_width();
     }
     else if(comp_type.id()==ID_signedbv)
     {
