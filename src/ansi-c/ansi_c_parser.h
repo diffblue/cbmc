@@ -49,7 +49,7 @@ public:
     asm_block_following=false;
     parenthesis_counter=0;
     string_literal.clear();
-    pragma_pack=0;
+    pragma_pack.clear();
     
     // setup global scope
     scopes.clear();
@@ -61,7 +61,7 @@ public:
   bool asm_block_following;
   unsigned parenthesis_counter;
   std::string string_literal;
-  mp_integer pragma_pack;
+  std::list<exprt> pragma_pack;
   
   typedef enum { ANSI, GCC, MSC, ICC, CW, ARM } modet;
   modet mode;
