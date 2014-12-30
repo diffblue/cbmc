@@ -549,7 +549,7 @@ public:
 
   inline const memberst &members() const
   {
-    return (const memberst &)(get_sub());
+    return (const memberst &)(find(ID_body).get_sub());
   }
 };
 
