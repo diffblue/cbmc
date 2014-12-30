@@ -950,10 +950,13 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     typecheck_declaration(declaration);
     
     irep_idt base_name=
+      declaration.declarator().get_base_name();
+    
+    irep_idt name=
       declaration.declarator().get_name();
     
     irep_idt identifier=
-      language_prefix+id2string(base_name);
+      language_prefix+id2string(name);
       
     // get value
     const symbolt &symbol=lookup(identifier);
@@ -974,7 +977,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     ++value;
   }
   
-  // remove these now
+  // Remove these now; we add them to the
+  // c_enum symbol later.
   #ifdef OPERANDS_IN_GETSUB
   as_expr.operands().clear();
   #else
@@ -1061,12 +1065,14 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   enum_tag_symbol.base_name=base_name;
   enum_tag_symbol.name=identifier;
   
-  // throw in the enum members
+  // throw in the enum members as 'body'
+  irept::subt &body=enum_tag_symbol.type.add(ID_body).get_sub();
+  
   for(std::list<c_enum_typet::c_enum_membert>::const_iterator
       it=enum_members.begin();
       it!=enum_members.end();
       it++)
-    enum_tag_symbol.type.get_sub().push_back(*it);
+    body.push_back(*it);
 
   // is it in the symbol table already?
   symbol_tablet::symbolst::iterator s_it=
@@ -1079,10 +1085,9 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     
     if(symbol.type.id()==ID_incomplete_c_enum)
     {
-      // ok, overwrite the default subtype
-      symbol.type.id(ID_c_enum);
-      symbol.type.subtype()=type.subtype();
-      symbol.type.get_sub()=enum_tag_symbol.type.get_sub();
+      // Ok, overwrite the type.
+      // This gives us the members and the subtype.
+      symbol.type=enum_tag_symbol.type;
     }
     else if(symbol.type.id()==ID_c_enum)
     {
