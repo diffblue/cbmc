@@ -114,11 +114,12 @@ array_exprt string_constantt::to_array_expr() const
 
     if(ch>=32 && ch<=126)
     {
-      char ch_str[2];
-      ch_str[0]=ch;
-      ch_str[1]=0;
+      std::string ch_str="'";
+      if(ch=='\'' || ch=='\\') ch_str+='\\';
+      ch_str+=(char)ch;
+      ch_str+="'";
 
-      op.set(ID_C_cformat, "'"+std::string(ch_str)+"'");
+      op.set(ID_C_cformat, ch_str);
     }
   }
   
