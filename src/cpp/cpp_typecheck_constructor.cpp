@@ -102,7 +102,7 @@ static void copy_member(
   code.op0().operands().push_back(exprt(ID_cpp_name));
   code.add_source_location() = source_location;
 
-  exprt& op0 = code.op0().op0();
+  exprt &op0 = code.op0().op0();
   op0.add_source_location() = source_location;
 
   op0.get_sub().push_back(irept(ID_name));
@@ -111,7 +111,7 @@ static void copy_member(
 
   code.op0().operands().push_back(exprt(ID_member));
 
-  exprt& op1 = code.op0().op1();
+  exprt &op1 = code.op0().op1();
 
   op1.add("component_cpp_name").id(ID_cpp_name);
   op1.add("component_cpp_name").get_sub().push_back(irept(ID_name));
@@ -140,7 +140,7 @@ Function: copy_array
 \*******************************************************************/
 
 static void copy_array(
-  const source_locationt& source_location,
+  const source_locationt &source_location,
   const irep_idt &member_base_name,
   mp_integer i,
   const irep_idt &arg_name,
@@ -202,8 +202,7 @@ void cpp_typecheckt::default_ctor(
   const irep_idt &base_name,
   cpp_declarationt &ctor) const
 {
-  exprt name;
-  name.id(ID_name);
+  exprt name(ID_name);
   name.set(ID_identifier, base_name);
   name.add_source_location() = source_location;
 
