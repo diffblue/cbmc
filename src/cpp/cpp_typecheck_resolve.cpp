@@ -999,7 +999,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   assert(!cpp_name.get_sub().empty());
 
   original_scope=&cpp_typecheck.cpp_scopes.current_scope();
-  source_location=cpp_name.location();
+  source_location=cpp_name.source_location();
 
   irept::subt::const_iterator pos=cpp_name.get_sub().begin();
   
@@ -1382,7 +1382,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
   cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
   resolve_scope(cpp_name, base_name, template_args);
 
-  const source_locationt &source_location=cpp_name.location();
+  const source_locationt &source_location=cpp_name.source_location();
   bool qualified=cpp_name.is_qualified();
 
   cpp_scopest::id_sett id_set;
@@ -1551,7 +1551,7 @@ exprt cpp_typecheck_resolvet::resolve(
   // this changes the scope
   resolve_scope(cpp_name, base_name, template_args);
 
-  const source_locationt &source_location=cpp_name.location();
+  const source_locationt &source_location=cpp_name.source_location();
   bool qualified=cpp_name.is_qualified();
 
   // do __CPROVER scope

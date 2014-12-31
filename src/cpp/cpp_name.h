@@ -25,7 +25,7 @@ public:
     sub.front().set(ID_identifier, base_name);
   }
 
-  const source_locationt &location() const
+  const source_locationt &source_location() const
   {
     if(get_sub().empty())
       return static_cast<const source_locationt &>(get_nil_irep());
