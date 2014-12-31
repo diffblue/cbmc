@@ -155,9 +155,9 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     std::string pretty_name=
       cpp_scopes.current_scope().prefix+id2string(base_name);
       
-    // C++11 scoped enumerations have a subtype,
+    // C++11 enumerations have an underlying type,
     // which defaults to int.
-    // Regular enums may be 'packed'.
+    // enums without underlying type may be 'packed'.
     if(type.subtype().is_nil())
       type.subtype()=signed_int_type();
     else

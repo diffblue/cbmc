@@ -4142,8 +4142,8 @@ bool Parser::rEnumSpec(typet &spec)
 
     spec.add(ID_tag).swap(name);
     
-    // C++11 enum classes have an optional underlying type
-    if(lex.LookAhead(0)==':' && is_enum_class)
+    // C++11 enums have an optional underlying type
+    if(lex.LookAhead(0)==':')
     {
       lex.GetToken(tk); // read the colon
       if(!rTypeName(spec.subtype())) return false;
