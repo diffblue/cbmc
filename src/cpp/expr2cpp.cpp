@@ -398,6 +398,10 @@ std::string expr2cppt::convert_rec(
 
     return dest;
   }
+  else if(src.id()==ID_nullptr)
+  {
+    return "std::nullptr_t";
+  }
   else
     return expr2ct::convert_rec(src, qualifiers, declarator);
 }
