@@ -1,9 +1,8 @@
-KNOWNBUG
+CORE
 main.c
 
-^EXIT=6$
+^EXIT=64$
 ^SIGNAL=0$
-syntax error
 ^PARSING ERROR$
 --
 --
