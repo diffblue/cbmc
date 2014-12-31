@@ -4118,9 +4118,11 @@ bool Parser::rEnumSpec(typet &spec)
 
   if(lex.GetToken(tk)!=TOK_ENUM)
     return false;
-    
+
   spec=cpp_enum_typet();
   set_location(spec, tk);
+
+  spec.subtype().make_nil();
 
   // C++11 enum classes  
   if(lex.LookAhead(0)==TOK_CLASS)
