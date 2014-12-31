@@ -3016,6 +3016,7 @@ array_abstract_declarator:
         }
         | '[' '*' ']'
         {
+          // these should be allowed in prototypes only
           $$=$1;
           set($$, ID_array);
           stack_type($$).subtype()=typet(ID_abstract);
@@ -3056,6 +3057,7 @@ array_abstract_declarator:
         }
         | array_abstract_declarator '[' '*' ']'
         {
+          // these should be allowed in prototypes only
           // we need to push this down
           $$=$1;
           set($2, ID_array);
