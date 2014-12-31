@@ -1184,8 +1184,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   access=
     type.get_bool(ID_C_class)?ID_private:ID_public;
 
-  // All the data members are known now.
-  // So let's deal with the constructors that we are given.
+  // All the data members are now known.
+  // We now deal with the constructors that we are given.
   Forall_operands(it, body)
   {
     if(it->id()==ID_cpp_declaration)
@@ -1205,7 +1205,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           declarator.name().get_base_name();
         #endif
         
-        if(declarator.value().is_not_nil())
+        if(declarator.value().is_not_nil()) // body?
         {
           if(declarator.find(ID_member_initializers).is_nil())
             declarator.set(ID_member_initializers, ID_member_initializers);
@@ -1217,7 +1217,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             );
 
           full_member_initialization(
-            to_struct_type(type),
+            type,
             declarator.member_initializers()
             );
         }
