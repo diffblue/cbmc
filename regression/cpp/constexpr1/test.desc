@@ -1,6 +1,6 @@
 KNOWNBUG
 main.cpp
-
+-std=c++11
 ^EXIT=0$
 ^SIGNAL=0$
 --
