@@ -618,7 +618,7 @@ and_eq              { return cpp98_keyword(TOK_ANDASSIGN); }
 bool                { return cpp98_keyword(TOK_BOOL); }
 catch               { return cpp98_keyword(TOK_CATCH); }
 char16_t            { return cpp11_keyword(TOK_CHAR16_T); } // C++11
-char32_t            { return cpp11_keyword(TOK_CHAR16_T); } // C++11
+char32_t            { return cpp11_keyword(TOK_CHAR32_T); } // C++11
 class               { return cpp98_keyword(TOK_CLASS); }
 compl               { return cpp98_keyword('~'); }
 constexpr           { return cpp11_keyword(TOK_CONSTEXPR); } // C++11
@@ -733,6 +733,18 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 	             PARSER.tag_following=false;
 	             return yytext[0]; // returns the [
 	           }
+                 }
+
+"__char16_t"     { if(PARSER.mode==ansi_c_parsert::GCC)
+                     return cpp98_keyword(TOK_CHAR16_T); // GNU extension
+                   else
+                     return make_identifier();
+                 }
+
+"__char32_t"     { if(PARSER.mode==ansi_c_parsert::GCC)
+                     return cpp98_keyword(TOK_CHAR32_T); // GNU extension
+                   else
+                     return make_identifier();
                  }
 
 "__declspec" |
