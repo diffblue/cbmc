@@ -533,9 +533,9 @@ void cpp_typecheckt::default_assignop_value(
 
   forall_irep(mem_it, components.get_sub())
   {
-    if(mem_it->get_bool("from_base") ||
-       mem_it->get_bool("is_type") ||
-       mem_it->get_bool("is_static") ||
+    if(mem_it->get_bool(ID_from_base) ||
+       mem_it->get_bool(ID_is_type) ||
+       mem_it->get_bool(ID_is_static) ||
        mem_it->get_bool("is_vtptr") ||
        mem_it->get(ID_type)==ID_code)
       continue;
@@ -655,7 +655,7 @@ void cpp_typecheckt::check_member_initializers(
 
       // Data member
       if(!c_it->get_bool(ID_from_base) &&
-         !c_it->get_bool("is_static") &&
+         !c_it->get_bool(ID_is_static) &&
          c_it->get(ID_type) != ID_code)
       {
         ok = true;
@@ -688,8 +688,8 @@ void cpp_typecheckt::check_member_initializers(
 
       // Parent constructor
       if( c_it->get_bool(ID_from_base)
-        && !c_it->get_bool("is_type")
-        && !c_it->get_bool("is_static")
+        && !c_it->get_bool(ID_is_type)
+        && !c_it->get_bool(ID_is_static)
         && c_it->get(ID_type) == ID_code
         && c_it->find(ID_type).get(ID_return_type) == ID_constructor)
       {
@@ -785,7 +785,7 @@ void cpp_typecheckt::full_member_initialization(
         cpp_namet cppname;
         cppname.move_to_sub(name);
 
-        codet mem_init("member_initializer");
+        codet mem_init(ID_member_initializer);
         mem_init.set(ID_member, cppname);
         block.move_to_sub(mem_init);
       }
@@ -836,7 +836,7 @@ void cpp_typecheckt::full_member_initialization(
         {
           if(c_it->get(ID_base_name)==base_name && 
              c_it->get(ID_type)!=ID_code &&
-             !c_it->get_bool("is_type"))
+             !c_it->get_bool(ID_is_type))
           {
             is_data = true;
             break;
@@ -873,7 +873,7 @@ void cpp_typecheckt::full_member_initialization(
       cpp_namet cppname;
       cppname.move_to_sub(name);
 
-      codet mem_init("member_initializer");
+      codet mem_init(ID_member_initializer);
       mem_init.set(ID_member, cppname);
       final_initializers.move_to_sub(mem_init);
     }
@@ -893,7 +893,7 @@ void cpp_typecheckt::full_member_initialization(
       }
 
       {
-        codet tmp("member_initializer");
+        codet tmp(ID_member_initializer);
         tmp.swap(final_initializers.get_sub().back());
         cond.move_to_operands(tmp);
         final_initializers.get_sub().back().swap(cond);
@@ -937,10 +937,10 @@ void cpp_typecheckt::full_member_initialization(
       continue;
     }
 
-    if( mem_it->get_bool("from_base")
+    if( mem_it->get_bool(ID_from_base)
       || mem_it->type().id() == ID_code
-      || mem_it->get_bool("is_type")
-      || mem_it->get_bool("is_static"))
+      || mem_it->get_bool(ID_is_type)
+      || mem_it->get_bool(ID_is_static))
         continue;
 
     irep_idt mem_name = mem_it->get(ID_base_name);
@@ -1095,7 +1095,7 @@ bool cpp_typecheckt::find_assignop(const symbolt& symbol) const
     if(component.get(ID_base_name)!="operator=")
       continue;
 
-    if(component.get_bool("is_static"))
+    if(component.get_bool(ID_is_static))
       continue;
 
     if(component.get_bool(ID_from_base))
@@ -1267,9 +1267,9 @@ codet cpp_typecheckt::dtor(const symbolt &symb)
   {
     const typet &type=cit->type();
 
-    if(cit->get_bool("from_base") ||
-       cit->get_bool("is_type") ||
-       cit->get_bool("is_static") ||
+    if(cit->get_bool(ID_from_base) ||
+       cit->get_bool(ID_is_type) ||
+       cit->get_bool(ID_is_static) ||
        type.id()==ID_code ||
        is_reference(type) ||
        cpp_is_pod(type))
