@@ -79,7 +79,7 @@ void cpp_typecheckt::default_dtor(
 
 /*******************************************************************\
 
-Function: dtor
+Function: cpp_typecheckt::dtor
 
   Inputs:
 
@@ -93,7 +93,8 @@ Function: dtor
 
 codet cpp_typecheckt::dtor(const symbolt &symbol)
 {
-  assert(symbol.type.id() == ID_struct);
+  assert(symbol.type.id()==ID_struct ||
+         symbol.type.id()==ID_union);
 
   source_locationt source_location=symbol.type.source_location();
 
@@ -103,11 +104,11 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
 
   code_blockt block;
 
-  const struct_typet::componentst &components =
-    to_struct_type(symbol.type).components();
+  const struct_union_typet::componentst &components =
+    to_struct_union_type(symbol.type).components();
 
   // take care of virtual methods
-  for(struct_typet::componentst::const_iterator
+  for(struct_union_typet::componentst::const_iterator
       cit=components.begin();
       cit!=components.end();
       cit++)
@@ -145,7 +146,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
   }
 
   // call the data member destructors in the reverse order
-  for(struct_typet::componentst::const_reverse_iterator
+  for(struct_union_typet::componentst::const_reverse_iterator
       cit=components.rbegin();
       cit!=components.rend();
       cit++)
