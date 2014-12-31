@@ -1,5 +1,6 @@
 int main()
 {
-	int a;
-	union {int  a;};
+  // 'a' is a duplicate
+  int a;
+  union {int  a;};
 }
