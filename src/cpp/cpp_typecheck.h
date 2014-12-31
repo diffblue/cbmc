@@ -277,7 +277,7 @@ protected:
     const struct_union_typet &struct_union_type);
 
   void full_member_initialization(
-    const struct_typet &struct_type,
+    const struct_union_typet &struct_union_type,
     irept &initializers);
 
   bool find_cpctor(const symbolt& symbol)const;
