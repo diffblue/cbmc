@@ -20,12 +20,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 Function: copy_parent
 
-  Inputs:
-    parent_base_name: base name of typechecked parent
-    block: non-typechecked block
+  Inputs: parent_base_name: base name of typechecked parent
+          block: non-typechecked block
 
- Outputs:
-    generate code to copy the parent
+ Outputs: generate code to copy the parent
 
  Purpose:
 
@@ -79,12 +77,10 @@ static void copy_parent(
 
 Function: copy_member
 
-  Inputs:
-    member_base_name: name of a member
-    block: non-typechecked block
+  Inputs: member_base_name: name of a member
+          block: non-typechecked block
 
- Outputs:
-    generate code to copy the member
+ Outputs: generate code to copy the member
 
  Purpose:
 
@@ -133,13 +129,11 @@ static void copy_member(
 
 Function: copy_array
 
-  Inputs:
-    member_base_name: name of array member
-    index: index to copy
-    block: non-typechecked block
+  Inputs: member_base_name: name of array member
+          index: index to copy
+          block: non-typechecked block
 
- Outputs:
-    generate code to copy the member
+ Outputs: generate code to copy the member
 
  Purpose:
 
@@ -416,7 +410,7 @@ Function: cpp_typecheckt::default_assignop
  Outputs:
 
  Purpose: Generate declarartion of the implicit default assignment
- operator
+          operator
 
 \*******************************************************************/
 
@@ -587,7 +581,7 @@ void cpp_typecheckt::default_assignop_value(
 
 Function: check_member_initializers
 
-Inputs:   bases: the parents of the class
+  Inputs: bases: the parents of the class
           components: the components of the class
           initializers: the constructor initializers
 
@@ -741,7 +735,7 @@ Function: full_member_initialization
           First, all the direct-parent constructors are called.
           Second, all the non-pod data members are initialized.
 
- Note: The initialization order follows the decalration order.
+    Note: The initialization order follows the decalration order.
 
 \*******************************************************************/
 
@@ -1009,7 +1003,8 @@ void cpp_typecheckt::full_member_initialization(
 Function: find_cpctor
 
   Inputs: typechecked compound symbol
-  Outputs: return true if a copy constructor is found
+
+ Outputs: return true if a copy constructor is found
 
   Note:
     "A non-template constructor for class X is a copy constructor
@@ -1082,9 +1077,9 @@ Function: cpp_typecheckt::find_assignop
 
   Inputs:
 
-  Outputs:
+ Outputs:
 
-  Note:
+    Note:
 
 \*******************************************************************/
 
@@ -1134,9 +1129,10 @@ bool cpp_typecheckt::find_assignop(const symbolt& symbol) const
 Function: cpp_typecheckt::find_dtor
 
   Inputs:
-  Outputs:
 
-  Note:
+ Outputs:
+
+    Note:
 
 \*******************************************************************/
 
@@ -1158,13 +1154,13 @@ bool cpp_typecheckt::find_dtor(const symbolt& symbol) const
 
 Function: default_dtor
 
- Inputs:
+  Inputs:
 
  Outputs:
 
  Purpose:
 
- Note:
+    Note:
 
 \*******************************************************************/
 
@@ -1200,13 +1196,13 @@ void cpp_typecheckt::default_dtor(
 
 Function: dtor
 
- Inputs:
+  Inputs:
 
  Outputs:
 
  Purpose: produces destructor code for a class object
 
- Note:
+    Note:
 
 \*******************************************************************/
 
