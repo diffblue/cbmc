@@ -1623,7 +1623,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   const cpp_typecheck_fargst &fargs)
 {
   source_locationt source_location=
-    to_cpp_name(expr).location();
+    to_cpp_name(expr).source_location();
 
   if(expr.get_sub().size()==1 &&
      expr.get_sub()[0].id()==ID_name)

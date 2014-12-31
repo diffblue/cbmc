@@ -146,7 +146,7 @@ symbolt &cpp_declarator_convertert::convert(
 
     symbolt &symbol=c_it->second;
 
-    combine_types(declarator.name().location(), final_type, symbol);
+    combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
 
     // If it is a constructor, we take care of the
@@ -164,7 +164,7 @@ symbolt &cpp_declarator_convertert::convert(
       if(symbol_expr.id()!=ID_type ||
          symbol_expr.type().id()!=ID_symbol)
       {
-        cpp_typecheck.err_location(name.location());
+        cpp_typecheck.err_location(name.source_location());
         cpp_typecheck.str << "error: expected type";
         throw 0;
       }
@@ -203,7 +203,7 @@ symbolt &cpp_declarator_convertert::convert(
     if(final_type.id()==ID_code &&
        to_code_type(final_type).return_type().id()==ID_constructor)
     {
-      cpp_typecheck.err_location(declarator.name().location());
+      cpp_typecheck.err_location(declarator.name().source_location());
       cpp_typecheck.str << "function must have return type";
       throw 0;
     }
@@ -223,7 +223,7 @@ symbolt &cpp_declarator_convertert::convert(
     if(declarator.get_bool("#template_case"))
       return symbol;
 
-    combine_types(declarator.name().location(), final_type, symbol);
+    combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
 
     // initializer?
@@ -503,7 +503,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.name=final_identifier;
   symbol.base_name=base_name;
   symbol.value=declarator.value();
-  symbol.location=declarator.name().location();
+  symbol.location=declarator.name().source_location();
   symbol.mode=linkage_spec==ID_auto?ID_cpp:linkage_spec;
   symbol.module=cpp_typecheck.module;
   symbol.type=final_type;

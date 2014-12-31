@@ -116,7 +116,7 @@ void cpp_typecheckt::typecheck_class_template(
 
   if(!cpp_name.is_simple_name())
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     throw "simple name expected as class template tag";
   }
 
@@ -145,7 +145,7 @@ void cpp_typecheckt::typecheck_class_template(
       const symbolt &previous=lookup((*id_set.begin())->identifier);
       if(previous.name!=symbol_name || id_set.size()>1)
       {
-        err_location(cpp_name.location());
+        err_location(cpp_name.source_location());
         str << "template declaration of `" << base_name.c_str()
             << " does not match previous declaration\n";
         str << "location of previous definition: " << previous.location;
@@ -172,7 +172,7 @@ void cpp_typecheckt::typecheck_class_template(
     // check if we have 2 bodies
     if(has_body && previous_has_body)
     {
-      err_location(cpp_name.location());
+      err_location(cpp_name.source_location());
       str << "template struct `" << base_name
           << "' defined previously" << std::endl;
       str << "location of previous definition: "
@@ -221,7 +221,7 @@ void cpp_typecheckt::typecheck_class_template(
 
   symbol.name=symbol_name;
   symbol.base_name=base_name;
-  symbol.location=cpp_name.location();
+  symbol.location=cpp_name.source_location();
   symbol.mode=ID_cpp;
   symbol.module=module;
   symbol.type.swap(declaration);
@@ -308,7 +308,7 @@ void cpp_typecheckt::typecheck_function_template(
 
     if(has_value && previous_has_value)
     {
-      err_location(cpp_name.location());
+      err_location(cpp_name.source_location());
       str << "function template symbol `" << base_name
           << "' declared previously" << std::endl;
       str << "location of previous definition: "
@@ -330,7 +330,7 @@ void cpp_typecheckt::typecheck_function_template(
   symbolt symbol;
   symbol.name=symbol_name;
   symbol.base_name=base_name;
-  symbol.location=cpp_name.location();
+  symbol.location=cpp_name.source_location();
   symbol.mode=ID_cpp;
   symbol.module=module;
   symbol.value.make_nil();
@@ -603,7 +603,7 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   if(cpp_name.is_qualified())
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "qualifiers not expected here";
     throw 0;
   }
@@ -614,7 +614,7 @@ void cpp_typecheckt::convert_class_template_specialization(
   {
     // currently we are more restrictive
     // than the standard
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "bad template-class-sepcialization name";                                                
     throw 0;
   }
@@ -692,7 +692,7 @@ void cpp_typecheckt::convert_class_template_specialization(
     // Full specialization, i.e., template<>.
     // We instantiate.
     instantiate_template(
-      cpp_name.location(),
+      cpp_name.source_location(),
       template_symbol,
       template_args_tc,
       type);
@@ -740,7 +740,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
 
   if(cpp_name.is_qualified())
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "qualifiers not expected here";
     throw 0;
   }
@@ -759,7 +759,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
     {
       // currently we are more restrictive
       // than the standard
-      err_location(cpp_name.location());
+      err_location(cpp_name.source_location());
       str << "bad template-function-specialization name";
       throw 0;
     }
@@ -773,13 +773,13 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
 
     if(id_set.empty())
     {
-      err_location(cpp_name.location());
+      err_location(cpp_name.source_location());
       str << "template function `" << base_name << "' not found";
       throw 0;
     }
     else if(id_set.size()>1)
     {
-      err_location(cpp_name.location());
+      err_location(cpp_name.source_location());
       str << "template function `" << base_name << "' is ambiguous";
     }
     
@@ -798,7 +798,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
     specialization.swap(declarator);
 
     instantiate_template(
-      cpp_name.location(),
+      cpp_name.source_location(),
       template_symbol,
       template_args,
       template_args,
