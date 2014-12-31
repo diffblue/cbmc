@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_NAME_H
 #define CPROVER_CPP_CPP_NAME_H
 
-#include <util/source_location.h>
+#include <util/expr.h>
 
 class cpp_namet:public irept
 {
@@ -125,6 +125,16 @@ public:
   }
 
   std::string to_string() const;
+  
+  const exprt &as_expr() const
+  {
+    return static_cast<const exprt &>(static_cast<const irept &>(*this));
+  }
+
+  const typet &as_type() const
+  {
+    return static_cast<const typet &>(static_cast<const irept &>(*this));
+  }
 };
 
 inline cpp_namet &to_cpp_name(irept &cpp_name)
