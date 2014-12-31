@@ -1563,31 +1563,9 @@ exprt cpp_typecheck_resolvet::resolve(
   }
   else
   {
-    if(base_name==ID_true)
-    {
-      exprt result=true_exprt();
-      result.add_source_location()=source_location;
-      return result;
-    }
-    else if(base_name==ID_false)
-    {
-      exprt result=false_exprt();
-      result.add_source_location()=source_location;
-      return result;
-    }
-    else if(base_name=="__nullptr" ||
-            base_name=="nullptr") // this is c++0x
-    {
-      constant_exprt result;
-      result.set_value(ID_NULL);
-      result.type()=pointer_typet();
-      result.type().subtype()=empty_typet();
-      result.add_source_location()=source_location;
-      return result;
-    }
-    else if(base_name=="__func__" ||
-            base_name=="__FUNCTION__" ||
-            base_name=="__PRETTY_FUNCTION__")
+    if(base_name=="__func__" ||
+       base_name=="__FUNCTION__" ||
+       base_name=="__PRETTY_FUNCTION__")
     {
       // __func__ is an ANSI-C standard compliant hack to get the function name
       // __FUNCTION__ and __PRETTY_FUNCTION__ are GCC-specific

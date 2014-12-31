@@ -258,6 +258,9 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // This is an Apple extension for lambda-like constructs.
     // http://thirdcog.eu/pwcblocks/
   }
+  else if(type.id()==ID_nullptr)
+  {
+  }
   else
   {
     err_location(type);

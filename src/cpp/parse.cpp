@@ -2,6 +2,7 @@
 
 #include <util/expr.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/i2string.h>
 
@@ -6591,6 +6592,9 @@ Function:
   | '(' comma.expression ')'
   | integral.or.class.spec '(' function.arguments ')'
   | typeid.expr
+  | true
+  | false
+  | nullptr
 */
 bool Parser::rPrimaryExpr(exprt &exp)
 {
@@ -6619,6 +6623,24 @@ bool Parser::rPrimaryExpr(exprt &exp)
   case TOK_THIS:
     lex.GetToken(tk);
     exp=exprt("cpp-this");
+    set_location(exp, tk);
+    return true;
+
+  case TOK_TRUE:
+    lex.GetToken(tk);
+    exp=true_exprt();
+    set_location(exp, tk);
+    return true;
+
+  case TOK_FALSE:
+    lex.GetToken(tk);
+    exp=false_exprt();
+    set_location(exp, tk);
+    return true;
+
+  case TOK_NULLPTR:
+    lex.GetToken(tk);
+    exp=constant_exprt(ID_nullptr, typet(ID_nullptr));
     set_location(exp, tk);
     return true;
 

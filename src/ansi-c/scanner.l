@@ -625,6 +625,7 @@ constexpr           { return cpp11_keyword(TOK_CONSTEXPR); } // C++11
 delete              { return cpp98_keyword(TOK_DELETE); }
 decltype            { return cpp11_keyword(TOK_DECLTYPE); } // C++11
 explicit            { return cpp98_keyword(TOK_EXPLICIT); }
+false               { return cpp98_keyword(TOK_FALSE); }
 friend              { return cpp98_keyword(TOK_FRIEND); }
 mutable             { return cpp98_keyword(TOK_MUTABLE); }
 namespace           { return cpp98_keyword(TOK_NAMESPACE); }
@@ -644,6 +645,7 @@ template            { return cpp98_keyword(TOK_TEMPLATE); }
 this                { return cpp98_keyword(TOK_THIS); }
 thread_local        { return cpp11_keyword(TOK_THREAD_LOCAL); } // C++11
 throw               { return cpp98_keyword(TOK_THROW); }
+true                { return cpp98_keyword(TOK_TRUE); }
 typeid              { return cpp98_keyword(TOK_TYPEID); }
 typename            { return cpp98_keyword(TOK_TYPENAME); }
 using               { return cpp98_keyword(TOK_USING); }
@@ -737,6 +739,12 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 
 "__char16_t"     { if(PARSER.mode==ansi_c_parsert::GCC)
                      return cpp98_keyword(TOK_CHAR16_T); // GNU extension
+                   else
+                     return make_identifier();
+                 }
+
+"__nullptr"     { if(PARSER.mode==ansi_c_parsert::GCC)
+                     return cpp98_keyword(TOK_NULLPTR); // GNU extension
                    else
                      return make_identifier();
                  }
