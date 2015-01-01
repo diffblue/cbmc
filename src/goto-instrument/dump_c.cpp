@@ -177,8 +177,13 @@ void dump_ct::operator()(std::ostream &os)
       {
         os << "// " << symbol.name << std::endl;
         os << "// " << symbol.location << std::endl;
-        os << type_to_string(symbol.type) << ";" << std::endl;
-        os << std::endl;
+        os << type_to_string(symbol.type);
+
+        if(symbol.type.id()==ID_c_enum &&
+           symbol.type.get_bool(ID_C_packed))
+          os << " __attribute__ ((__packed__))";
+
+        os << ";\n\n";
       }
     }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
@@ -197,21 +202,6 @@ void dump_ct::operator()(std::ostream &os)
           (!config.main.empty() && symbol.name==config.main)))
         skip_function_main=true;
     }
-  }
-
-  // enum types
-  for(std::set<std::string>::const_iterator
-      it=symbols_sorted.begin();
-      it!=symbols_sorted.end();
-      ++it)
-  {
-    const symbolt &symbol=ns.lookup(*it);
-
-    if(symbol.is_type &&
-       symbol.type.id()==ID_c_enum)
-      convert_compound_declaration(
-          symbol,
-          compound_body_stream);
   }
 
   // function declarations and definitions
@@ -566,34 +556,20 @@ void dump_ct::convert_compound_enum(
      !converted.insert(name).second)
     return;
 
-  os << type_to_string(type) << '\n';
-  os << "{\n";
-
-  const irept::subt &elements=type.get_sub();
-  forall_irep(it, elements)
-  {
-    std::string name=it->get_string(ID_identifier);
-    std::string::size_type pos=name.rfind("::");
-    if(pos!=std::string::npos)
-      name.erase(0, pos+2);
-
-    os << indent(1) << name << '=' << it->get(ID_value);
-
-    irept::subt::const_iterator next=it;
-    if(++next!=elements.end())
-      os << ',';
-
-    os << '\n';
-
-    declared_enum_constants.insert(name);
-  }
-
-
-  os << '}';
+  os << type_to_string(type);
 
   if(type.get_bool(ID_C_packed))
     os << " __attribute__ ((__packed__))";
+
   os << ";\n\n";
+
+  const c_enum_typet::memberst &members=
+    to_c_enum_type(type).members();
+  for(c_enum_typet::memberst::const_iterator
+      it=members.begin();
+      it!=members.end();
+      ++it)
+    declared_enum_constants.insert(it->get_base_name());
 }
 
 /*******************************************************************\
