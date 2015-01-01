@@ -644,7 +644,7 @@ std::string c_type_as_string(const irep_idt &c_type)
   else if(c_type==ID_unsigned_long_long_int)
     return "unsigned long long int";
   else if(c_type==ID_bool)
-    return "bool";
+    return "_Bool";
   else if(c_type==ID_char)
     return "char";
   else if(c_type==ID_unsigned_char)
