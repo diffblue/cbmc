@@ -4115,7 +4115,7 @@ Function:
 bool Parser::rEnumSpec(typet &spec)
 {
   Token tk;
-  bool is_enum_class=false;
+  //bool is_enum_class=false;
 
   if(lex.GetToken(tk)!=TOK_ENUM)
     return false;
@@ -4129,7 +4129,7 @@ bool Parser::rEnumSpec(typet &spec)
   if(lex.LookAhead(0)==TOK_CLASS)
   {
     lex.GetToken(tk);
-    is_enum_class=true;
+    //is_enum_class=true;
   }
 
   if(lex.LookAhead(0)!='{')
