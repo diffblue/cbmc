@@ -576,6 +576,10 @@ bool cpp_typecheckt::standard_conversion_pointer(
   typet sub_from = follow(expr.type().subtype());
   typet sub_to = follow(type.subtype());
 
+  // std::nullptr_t to _any_ pointer type
+  if(sub_from.id()==ID_nullptr)
+    return true;
+
   // anything but function pointer to void *
   if(sub_from.id()!=ID_code && sub_to.id()==ID_empty)
   {
@@ -608,7 +612,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
 
 /*******************************************************************\
 
-Function: standard_conversion_pointer
+Function: standard_conversion_pointer_to_member
 
   Inputs: A typechecked expression 'expr', a destination
           type 'type'
@@ -888,11 +892,16 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
     else if(type.id()==ID_pointer)
     {
-      if(!standard_conversion_pointer(curr_expr, type, new_expr))
+      if(follow(expr.type()).id()==ID_nullptr)
+      {
+        // std::nullptr_t to _any_ pointer type is ok
+      }
+      else if(!standard_conversion_pointer(curr_expr, type, new_expr))
       {
         if(!standard_conversion_pointer_to_member(curr_expr, type, new_expr))
           return false;
       }
+
       rank += 3;
     }
     else if(type.id()==ID_bool)
