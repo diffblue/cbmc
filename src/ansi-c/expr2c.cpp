@@ -2827,7 +2827,10 @@ std::string expr2ct::convert_code_asm(
         {
           if(it!=src.op3().operands().begin())
             dest+=", ";
-          dest+=convert(*it);
+          if(it->id()==ID_gcc_asm_clobbered_register)
+            dest+=convert(it->op0());
+          else
+            dest+=convert(*it);
         }
       }
       dest+=");";
