@@ -1004,6 +1004,20 @@ attribute_or_type_qualifier:
         | gcc_type_attribute
         ;
 
+attribute_or_type_qualifier_or_storage_class:
+          type_qualifier
+        | gcc_type_attribute
+        | storage_class
+        ;
+
+attribute_type_qualifier_storage_class_list:
+          attribute_or_type_qualifier_or_storage_class
+        | attribute_type_qualifier_storage_class_list attribute_or_type_qualifier_or_storage_class
+        {
+          $$=merge($1, $2);
+        }
+        ;
+
 basic_declaration_specifier:
           declaration_qualifier_list basic_type_name gcc_type_attribute_opt
         {
@@ -3004,7 +3018,7 @@ array_abstract_declarator:
           stack_type($$).subtype()=typet(ID_abstract);
           stack_type($$).add(ID_size).make_nil();
         }
-        | '[' attribute_type_qualifier_list ']'
+        | '[' attribute_type_qualifier_storage_class_list ']'
         {
           // this is C99: e.g., restrict, const, etc
           // The type qualifier belongs to the array, not the
@@ -3029,15 +3043,7 @@ array_abstract_declarator:
           stack_type($$).add(ID_size).swap(stack($2));
           stack_type($$).subtype()=typet(ID_abstract);
         }
-        | '[' TOK_STATIC constant_expression ']'
-        {
-          // this is C99 and the constant_expression is a minimum size
-          $$=$1;
-          set($$, ID_array);
-          stack_type($$).add(ID_size).swap(stack($2));
-          stack_type($$).subtype()=typet(ID_abstract);
-        }
-        | '[' attribute_type_qualifier_list constant_expression ']'
+        | '[' attribute_type_qualifier_storage_class_list constant_expression ']'
         {
           // The type qualifier belongs to the array, not the
           // contents of the array, nor the size.
