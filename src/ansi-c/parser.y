@@ -859,6 +859,8 @@ post_declarator_attribute:
         {
           $$=$1;
           stack($$).id(ID_asm);
+          stack($$).set(ID_flavor, ID_gcc);
+          stack($$).operands().swap(stack($4).operands());
         }
         | gcc_type_attribute
         ;
