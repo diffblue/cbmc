@@ -1781,10 +1781,16 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
      operands[2].type().id()==ID_pointer &&
      operands[1].type()!=operands[2].type())
   {
-    if(operands[1].type().subtype().id()!=ID_code ||
-       operands[2].type().subtype().id()!=ID_code)
+    // is one of them void *? Convert that to the other.
+    if(operands[1].type().subtype().id()==ID_empty)
+      implicit_typecast(operands[1], operands[2].type());
+    else if(operands[2].type().subtype().id()==ID_empty)
+      implicit_typecast(operands[2], operands[1].type());
+    else if(operands[1].type().subtype().id()!=ID_code ||
+            operands[2].type().subtype().id()!=ID_code)
     {
-      // make it void *
+      // Make it void *.
+      // gcc and clang issue a warning for this.
       expr.type()=typet(ID_pointer);
       expr.type().subtype()=typet(ID_empty);
       implicit_typecast(operands[1], expr.type());
