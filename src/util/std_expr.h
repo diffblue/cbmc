@@ -1202,7 +1202,7 @@ const struct_exprt &to_struct_expr(const exprt &expr);
 */
 struct_exprt &to_struct_expr(exprt &expr);
 
-/*! \brief complex constructor from list of elements
+/*! \brief complex constructor from a pair of numbers
 */
 class complex_exprt:public binary_exprt
 {
