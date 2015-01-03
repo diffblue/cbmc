@@ -74,6 +74,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_qualifiers.is_volatile=true;
   else if(type.id()==ID_asm)
   {
+    // These are called 'asm labels' by GCC.
     // ignore for now
   }
   else if(type.id()==ID_const)
