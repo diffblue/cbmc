@@ -220,7 +220,7 @@ protected:
   virtual void typecheck_side_effect_assignment(side_effect_exprt &expr);
   virtual void typecheck_side_effect_statement_expression(side_effect_exprt &expr);
   virtual void typecheck_function_call_arguments(side_effect_expr_function_callt &expr);
-  virtual void do_special_functions(side_effect_expr_function_callt &expr);
+  virtual exprt do_special_functions(side_effect_expr_function_callt &expr);
 
   virtual void make_index_type(exprt &expr);
   virtual void make_constant(exprt &expr);
