@@ -104,7 +104,7 @@ void dump_ct::operator()(std::ostream &os)
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> unique_tagst;
   unique_tagst unique_tags;
 
-  // add tags to anonymous union/struct,
+  // add tags to anonymous union/struct/enum,
   // and prepare lexicographic order
   std::set<std::string> symbols_sorted;
   Forall_symbols(it, copied_symbol_table.symbols)
@@ -119,34 +119,45 @@ void dump_ct::operator()(std::ostream &os)
       symbol.type.set(ID_tag, ID_anonymous);
       tag_added=true;
     }
+    else if(symbol.type.id()==ID_c_enum &&
+            symbol.type.find(ID_tag).get(ID_C_base_name).empty())
+    {
+      assert(symbol.is_type);
+      symbol.type.add(ID_tag).set(ID_C_base_name, ID_anonymous);
+      tag_added=true;
+    }
 
     const std::string name_str=id2string(it->first);
-    if(symbol.is_type && !symbol.type.get(ID_tag).empty())
+    if(symbol.is_type &&
+       (symbol.type.id()==ID_union ||
+        symbol.type.id()==ID_struct ||
+        symbol.type.id()==ID_c_enum))
     {
-      irep_idt original_tag=symbol.type.get(ID_tag);
-      std::string new_tag=id2string(original_tag);
+      std::string new_tag=symbol.type.id()==ID_c_enum?
+        symbol.type.find(ID_tag).get_string(ID_C_base_name):
+        symbol.type.get_string(ID_tag);
 
       std::string::size_type tag_pos=new_tag.rfind("tag-");
-      if(tag_pos!=std::string::npos)
+      if(tag_pos!=std::string::npos) new_tag.erase(0, tag_pos+4);
+      const std::string new_tag_base=new_tag;
+
+      for(std::pair<unique_tagst::iterator, bool>
+          unique_entry=unique_tags.insert(std::make_pair(new_tag, 0));
+          !unique_entry.second;
+          unique_entry=unique_tags.insert(std::make_pair(new_tag, 0)))
       {
-        new_tag.erase(0, tag_pos+4);
-        symbol.type.set(ID_tag, new_tag);
+        new_tag=new_tag_base+"$"+
+          i2string(unique_entry.first->second);
+        ++(unique_entry.first->second);
       }
 
-      std::pair<unique_tagst::iterator, bool> unique_entry=
-        unique_tags.insert(std::make_pair(symbol.type.get(ID_tag), 0));
-      if(!unique_entry.second)
+      if(symbol.type.id()==ID_c_enum)
       {
-        do
-        {
-          symbol.type.set(
-            ID_tag,
-            new_tag+"$"+i2string(unique_entry.first->second));
-          ++(unique_entry.first->second);
-        }
-        while(!unique_tags.insert(std::make_pair(
-              symbol.type.get(ID_tag), 0)).second);
+        symbol.type.add(ID_tag).set(ID_C_base_name, new_tag);
+        symbol.base_name=new_tag;
       }
+      else
+        symbol.type.set(ID_tag, new_tag);
     }
 
     // we don't want to dump in full all definitions
@@ -167,24 +178,23 @@ void dump_ct::operator()(std::ostream &os)
     const symbolt &symbol=ns.lookup(*it);
 
     if(symbol.is_type &&
-        (symbol.type.id()==ID_struct ||
-         symbol.type.id()==ID_incomplete_struct ||
-         symbol.type.id()==ID_union ||
-         symbol.type.id()==ID_incomplete_union ||
-         symbol.type.id()==ID_c_enum))
+       symbol.location.get_function().empty() &&
+       (symbol.type.id()==ID_struct ||
+        symbol.type.id()==ID_incomplete_struct ||
+        symbol.type.id()==ID_union ||
+        symbol.type.id()==ID_incomplete_union))
     {
-      if(symbol.location.get_function().empty())
-      {
-        os << "// " << symbol.name << std::endl;
-        os << "// " << symbol.location << std::endl;
-        os << type_to_string(symbol.type);
-
-        if(symbol.type.id()==ID_c_enum &&
-           symbol.type.get_bool(ID_C_packed))
-          os << " __attribute__ ((__packed__))";
-
-        os << ";\n\n";
-      }
+      os << "// " << symbol.name << std::endl;
+      os << "// " << symbol.location << std::endl;
+      os << type_to_string(symbol.type) << ";\n\n";
+    }
+    else if(symbol.is_type &&
+            symbol.location.get_function().empty() &&
+            symbol.type.id()==ID_c_enum)
+    {
+      os << "// " << symbol.name << std::endl;
+      os << "// " << symbol.location << std::endl;
+      convert_compound_enum(symbol.type, os);
     }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
       convert_global_variable(
