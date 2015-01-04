@@ -13,6 +13,7 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 #include <ostream>
 #include <string>
 
+#include <util/irep.h>
 #include <util/graph.h>
 #include <util/xml.h>
 
