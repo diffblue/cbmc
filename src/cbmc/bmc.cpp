@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/graphml_goto_trace.h>
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/slice.h>
@@ -100,6 +101,21 @@ void bmct::error_trace(const prop_convt &prop_conv)
   
   default:
     assert(false);
+  }
+
+  const std::string graphml=options.get_option("graphml-cex");
+  if(!graphml.empty())
+  {
+    graphmlt cex_graph;
+    convert(ns, goto_trace, cex_graph);
+
+    if(graphml=="-")
+      write_graphml(cex_graph, std::cout);
+    else
+    {
+      std::ofstream out(graphml.c_str());
+      write_graphml(cex_graph, out);
+    }
   }
 }
 

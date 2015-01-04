@@ -33,6 +33,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../pointer-analysis/pointer-analysis$(LIBEXT) \
       ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
+      ../xmllang/xmllang$(LIBEXT) \
       ../util/util$(LIBEXT) \
       ../solvers/solvers$(LIBEXT)
 
