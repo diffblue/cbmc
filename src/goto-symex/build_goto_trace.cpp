@@ -277,6 +277,25 @@ void build_goto_trace(
       goto_trace_step.cond_value=
         prop_conv.l_get(SSA_step.cond_literal).is_true();
     }
+    else if(SSA_step.is_location() &&
+            SSA_step.source.pc->is_goto())
+    {
+      goto_trace_step.cond_expr=SSA_step.source.pc->guard;
+
+      const bool backwards=SSA_step.source.pc->is_backwards_goto();
+
+      symex_target_equationt::SSA_stepst::const_iterator next=it;
+      ++next;
+      assert(next!=target.SSA_steps.end());
+
+      // goto was taken if backwards and next is enabled or forward
+      // and next is not active;
+      // there is an ambiguity here if a forward goto is to the next
+      // instruction, which we simply ignore for now
+      goto_trace_step.goto_taken=
+        backwards==
+        (prop_conv.l_get(next->guard_literal)==tvt(true));
+    }
   }
   
   // Now assemble into a single goto_trace.
