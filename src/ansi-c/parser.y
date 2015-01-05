@@ -1659,15 +1659,16 @@ enum_name:
           gcc_type_attribute_opt
         {
           stack($1).operands().swap(stack($6).operands());
-          $$=merge($1, merge($2, $8)); // throw in the gcc attribute
+          $$=merge($1, merge($2, $8)); // throw in the gcc attributes
         }
         | enum_key
           gcc_type_attribute_opt
           identifier_or_typedef_name
+          gcc_type_attribute_opt
         {
           stack($1).id(ID_c_enum_tag); // tag only
           stack($1).set(ID_tag, stack($3));
-          $$=merge($1, $2);
+          $$=merge($1, merge($2, $4)); // throw in the gcc attributes
         }
         ;
         
