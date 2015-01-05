@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_asm.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -725,6 +726,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
     if(cmdline.isset("mm"))
     {
+      // TODO: move to wmm/weak_mem, and copy goto_functions AFTER some of the
+      // modifications. Do the analysis on the copy, after remove_asm, and 
+      // instrument the original (without remove_asm)
+      remove_asm(symbol_table, goto_functions);
+      goto_functions.update();
+
       std::string mm=cmdline.get_value("mm");
       memory_modelt model;
 
