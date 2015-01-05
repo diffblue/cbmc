@@ -55,7 +55,8 @@ exprt gen_zero(const typet &type)
           type_id==ID_verilogbv ||
           type_id==ID_floatbv ||
           type_id==ID_fixedbv ||
-          type_id==ID_c_bit_field)
+          type_id==ID_c_bit_field ||
+          type_id==ID_c_bool)
   {
     std::string value;
     unsigned width=to_bitvector_type(type).get_width();
@@ -124,7 +125,8 @@ exprt gen_one(const typet &type)
   }
   else if(type_id==ID_unsignedbv ||
           type_id==ID_signedbv ||
-          type_id==ID_c_bit_field)
+          type_id==ID_c_bit_field ||
+          type_id==ID_c_bool)
   {
     std::string value;
     unsigned width=to_bitvector_type(type).get_width();

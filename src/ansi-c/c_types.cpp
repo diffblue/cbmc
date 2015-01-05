@@ -260,9 +260,7 @@ Function: c_bool_type
 
 typet c_bool_type()
 {
-  // We model it as unsigned, but this doesn't matter,
-  // as we really only want 0 and 1.
-  typet result=unsignedbv_typet(config.ansi_c.bool_width);
+  typet result=c_bool_typet(config.ansi_c.bool_width);
   result.set(ID_C_c_type, ID_bool);
   return result;
 }

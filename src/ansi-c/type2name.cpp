@@ -47,7 +47,8 @@ std::string type2name(const typet &type)
     result+="S" + type.get_string(ID_width);
   else if(type.id()==ID_unsignedbv)
     result+="U" + type.get_string(ID_width);
-  else if(type.id()==ID_bool) 
+  else if(type.id()==ID_bool ||
+          type.id()==ID_c_bool) 
     result+='B';
   else if(type.id()==ID_integer) 
     result+='I';

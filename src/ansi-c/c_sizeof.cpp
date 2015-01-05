@@ -36,7 +36,8 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
      type.id()==ID_floatbv ||
-     type.id()==ID_fixedbv)
+     type.id()==ID_fixedbv ||
+     type.id()==ID_c_bool)
   {
     // We round up to bytes.
     // See special treatment for bit-fields below.
@@ -74,6 +75,7 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   else if(type.id()==ID_bool)
   {
     // We fit booleans into a byte.
+    // Don't confuse with c_bool, which is a bit-vector type.
     dest=from_integer(1, size_type());
   }
   else if(type.id()==ID_array)

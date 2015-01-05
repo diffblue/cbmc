@@ -339,7 +339,7 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   const typet &type)
 {
   unsigned width=type.get_int(ID_width);
-  
+
   if(type.id()==ID_signedbv)
   {
     if(width<=config.ansi_c.char_width)
@@ -357,9 +357,6 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   }
   else if(type.id()==ID_unsignedbv)
   {
-    if(type.get(ID_C_c_type)==ID_bool)
-      return BOOL;
-  
     if(width<=config.ansi_c.char_width)
       return UCHAR;
     else if(width<=config.ansi_c.short_int_width)
@@ -374,6 +371,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
       return LARGE_UNSIGNED_INT;
   }
   else if(type.id()==ID_bool)
+    return BOOL;
+  else if(type.id()==ID_c_bool)
     return BOOL;
   else if(type.id()==ID_floatbv ||
           type.id()==ID_fixedbv)
@@ -449,7 +448,7 @@ void c_typecastt::implicit_typecast_arithmetic(
     }
     return;
 
-  case BOOL:       new_type=bool_typet(); break;
+  case BOOL:       assert(false); // should always be promoted to int
   case CHAR:       assert(false); // should always be promoted to int
   case UCHAR:      assert(false); // should always be promoted to int
   case SHORT:      assert(false); // should always be promoted to int

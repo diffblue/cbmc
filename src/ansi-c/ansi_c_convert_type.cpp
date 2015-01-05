@@ -158,7 +158,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     double_cnt++;
   else if(type.id()==ID_float)
     float_cnt++;
-  else if(type.id()==ID_bool)
+  else if(type.id()==ID_c_bool)
     c_bool_cnt++;
   else if(type.id()==ID_proper_bool)
     proper_bool_cnt++;
