@@ -100,34 +100,60 @@ void c_typecheck_baset::typecheck_type(typet &type)
     // http://www.delorie.com/gnu/docs/gcc/gccint_53.html
     typecheck_type(type.subtype());
     
-    bool is_signed=type.subtype().id()==ID_signedbv;
-    
-    // get width
-    irep_idt mode=type.get(ID_size);
-    
-    if(mode=="__QI__") // 8 bits
-      type=is_signed?signed_char_type():unsigned_char_type();
-    else if(mode=="__HI__") // 16 bits
-      type=is_signed?signed_short_int_type():unsigned_short_int_type();
-    else if(mode=="__SI__") // 32 bits
-      type=is_signed?signed_int_type():unsigned_int_type();
-    else if(mode=="__DI__") // 64 bits
+    typet underlying_type=type.subtype();
+  
+    if(underlying_type.id()==ID_signedbv ||
+       underlying_type.id()==ID_unsignedbv)
     {
-      if(config.ansi_c.long_int_width==64)
-        type=is_signed?signed_long_int_type():unsigned_long_int_type();
-      else
+      bool is_signed=underlying_type.id()==ID_signedbv;
+      
+      // get width
+      irep_idt mode=type.get(ID_size);
+      
+      typet result;
+      
+      if(mode=="__QI__") // 8 bits
+        result=is_signed?signed_char_type():unsigned_char_type();
+      else if(mode=="__HI__") // 16 bits
+        result=is_signed?signed_short_int_type():unsigned_short_int_type();
+      else if(mode=="__SI__") // 32 bits
+        result=is_signed?signed_int_type():unsigned_int_type();
+      else if(mode=="__DI__") // 64 bits
       {
-        assert(config.ansi_c.long_long_int_width==64);
-        type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+        if(config.ansi_c.long_int_width==64)
+          result=is_signed?signed_long_int_type():unsigned_long_int_type();
+        else
+        {
+          assert(config.ansi_c.long_long_int_width==64);
+          result=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+        }
       }
+      else if(mode=="__TI__") // 128 bits
+        result=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
+      else // give up, just use subtype
+        result=type.subtype();
+
+      // save the location
+      result.add_source_location()=type.source_location();
+
+      type=result;
     }
-    else if(mode=="__TI__") // 128 bits
-      type=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
-    else // give up, use base
+    else if(underlying_type.id()==ID_c_enum_tag)
+    {
+      // gcc allows this, but clang doesn't.
+      // We ignore for now.
       type=type.subtype();
+    }
+    else
+    {
+      err_location(type);
+      str << "attribute mode applied to inappropriate type `"
+          << to_string(type) << "'";
+      throw 0;
+    }
   }
 
-  // do a bit of rule checking
+  // do a mild bit of rule checking
 
   if(type.get_bool(ID_C_restricted) &&
      type.id()!=ID_pointer &&
@@ -1243,7 +1269,8 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
   else if(subtype.id()==ID_c_enum_tag)
   {
     // These point to an enum, which has a sub-subtype,
-    // which we need to check.
+    // which may be smaller or larger than int, and we thus have
+    // to check.
     const typet &c_enum_type=
       follow_tag(to_c_enum_tag_type(subtype));
 
