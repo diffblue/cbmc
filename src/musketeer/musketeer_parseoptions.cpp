@@ -20,6 +20,7 @@ Author:
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/remove_asm.h>
 
 #ifdef POINTER_ANALYSIS_FI
 #include <pointer-analysis/value_set_analysis_fi.h>
@@ -260,6 +261,10 @@ void goto_fence_inserter_parseoptionst::instrument_goto_program(
 #ifndef LOCAL_MAY
     value_set_analysis(goto_functions);
 #endif
+
+    status() << "Removing asm code" << eom;
+    remove_asm(symbol_table, goto_functions);
+    goto_functions.update();
 
     if(cmdline.isset("all-shared")) {
       status() << "Shared variables accesses detection" << eom;
