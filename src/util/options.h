@@ -19,14 +19,15 @@ public:
   
   option_mapt option_map; // input
   
-  virtual const std::string get_option(const std::string &option) const;
-  virtual bool get_bool_option(const std::string &option) const;
-  virtual signed int get_signed_int_option(const std::string &option) const;
-  virtual unsigned int get_unsigned_int_option(const std::string &option) const;
-  virtual void set_option(const std::string &option, const bool value);
-  virtual void set_option(const std::string &option, const int value);
-  virtual void set_option(const std::string &option, const unsigned value);
-  virtual void set_option(const std::string &option, const std::string &value);
+  const std::string get_option(const std::string &option) const;
+  bool get_bool_option(const std::string &option) const;
+  signed int get_signed_int_option(const std::string &option) const;
+  unsigned int get_unsigned_int_option(const std::string &option) const;
+  unsigned int get_list_option(const std::string &option) const;
+  void set_option(const std::string &option, const bool value);
+  void set_option(const std::string &option, const int value);
+  void set_option(const std::string &option, const unsigned value);
+  void set_option(const std::string &option, const std::string &value);
   
   optionst() { }
   virtual ~optionst() { }
