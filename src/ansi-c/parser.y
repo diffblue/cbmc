@@ -118,6 +118,7 @@ extern char *yyansi_ctext;
 %token TOK_PTR64       "__ptr64"
 %token TOK_TYPEOF      "typeof"
 %token TOK_GCC_AUTO_TYPE "__auto_type"
+%token TOK_GCC_FLOAT80 "__float80"
 %token TOK_GCC_FLOAT128 "__float128"
 %token TOK_GCC_INT128 "__int128"
 %token TOK_GCC_DECIMAL32 "_Decimal32"
@@ -1290,6 +1291,7 @@ basic_type_name:
         | TOK_SHORT    { $$=$1; set($$, ID_short); }
         | TOK_LONG     { $$=$1; set($$, ID_long); }
         | TOK_FLOAT    { $$=$1; set($$, ID_float); }
+        | TOK_GCC_FLOAT80 { $$=$1; set($$, ID_gcc_float80); }
         | TOK_GCC_FLOAT128 { $$=$1; set($$, ID_gcc_float128); }
         | TOK_GCC_INT128 { $$=$1; set($$, ID_gcc_int128); }
         | TOK_GCC_DECIMAL32 { $$=$1; set($$, ID_gcc_decimal32); }
