@@ -240,7 +240,7 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
   // magic error label
   if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_value("error-label"));
+    options.set_option("error-label", cmdline.get_values("error-label"));
 
   // generate unwinding assertions
   if(cmdline.isset("cover-assertions"))

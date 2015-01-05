@@ -47,7 +47,7 @@ public:
     enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
     enable_assertions=_options.get_bool_option("assertions");
     enable_assumptions=_options.get_bool_option("assumptions");    
-    error_label=_options.get_option("error-label");
+    error_labels=_options.get_list_option("error-label");
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
@@ -115,7 +115,9 @@ protected:
   bool enable_assert_to_assume;
   bool enable_assertions;
   bool enable_assumptions;
-  irep_idt error_label;
+
+  typedef optionst::value_listt error_labelst;
+  error_labelst error_labels;
 };
 
 /*******************************************************************\
@@ -1454,19 +1456,24 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     check(i.guard);
 
     // magic ERROR label?
-    if(error_label!=irep_idt() &&
-       std::find(i.labels.begin(), i.labels.end(), error_label)!=i.labels.end())
+    for(optionst::value_listt::const_iterator
+        l_it=error_labels.begin();
+        l_it!=error_labels.end();
+        l_it++)
     {
-      goto_program_instruction_typet type=
-        enable_assert_to_assume?ASSUME:ASSERT;
+      if(std::find(i.labels.begin(), i.labels.end(), *l_it)!=i.labels.end())
+      {
+        goto_program_instruction_typet type=
+          enable_assert_to_assume?ASSUME:ASSERT;
 
-      goto_programt::targett t=new_code.add_instruction(type);
+        goto_programt::targett t=new_code.add_instruction(type);
 
-      t->guard=false_exprt();
-      t->source_location=i.source_location;
-      t->source_location.set_property_class("error label");
-      t->source_location.set_comment("error label");
-      t->source_location.set("user-provided", true);
+        t->guard=false_exprt();
+        t->source_location=i.source_location;
+        t->source_location.set_property_class("error label");
+        t->source_location.set_comment("error label "+*l_it);
+        t->source_location.set("user-provided", true);
+      }
     }
     
     if(i.is_other())
