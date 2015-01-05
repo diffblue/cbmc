@@ -158,6 +158,7 @@ std::string counterexample_value_binary(
        type.id()==ID_floatbv ||
        type.id()==ID_pointer ||
        type.id()==ID_c_bit_field ||
+       type.id()==ID_c_bool ||
        type.id()==ID_c_enum ||
        type.id()==ID_c_enum_tag)
     {

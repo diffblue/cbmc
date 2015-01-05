@@ -1274,7 +1274,8 @@ public:
   {
   }
 
-  explicit inline c_bool_typet(unsigned width):bitvector_typet(ID_c_bool)
+  explicit inline c_bool_typet(unsigned width):
+    bitvector_typet(ID_c_bool, width)
   {
   }
 };

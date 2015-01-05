@@ -115,11 +115,12 @@ exprt gen_one(const typet &type)
 {
   const irep_idt type_id=type.id();
 
-  if(type_id==ID_bool ||
-     type_id==ID_rational ||
-     type_id==ID_real ||
-     type_id==ID_integer ||
-     type_id==ID_natural)
+  if(type_id==ID_bool)
+    return true_exprt();
+  else if(type_id==ID_rational ||
+          type_id==ID_real ||
+          type_id==ID_integer ||
+          type_id==ID_natural)
   {
     return constant_exprt(ID_1, type);
   }

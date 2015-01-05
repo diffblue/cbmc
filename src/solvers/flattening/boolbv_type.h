@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // new stuff
 typedef enum
 {
-  IS_BV, IS_SIGNED, IS_UNSIGNED, IS_FLOAT, IS_FIXED,
+  IS_BV, IS_SIGNED, IS_UNSIGNED, IS_FLOAT, IS_FIXED, IS_C_BOOL,
   IS_VERILOGBV, IS_RANGE, IS_UNKNOWN, IS_C_ENUM, IS_C_BIT_FIELD
 } bvtypet;
 
