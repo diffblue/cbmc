@@ -24,13 +24,25 @@ public:
   signed int get_signed_int_option(const std::string &option) const;
   unsigned int get_unsigned_int_option(const std::string &option) const;
   const value_listt &get_list_option(const std::string &option) const;
+
   void set_option(const std::string &option, const bool value);
   void set_option(const std::string &option, const int value);
   void set_option(const std::string &option, const unsigned value);
   void set_option(const std::string &option, const std::string &value);
+
+  inline void set_option(const std::string &option, const value_listt &values)
+  {
+    option_map[option]=values;
+  }
   
   optionst() { }
   ~optionst() { }
+  
+  inline optionst &operator=(const optionst &other)
+  {
+    option_map=other.option_map;
+    return *this;
+  }
 
 protected:
   option_mapt option_map;  
