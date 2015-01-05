@@ -68,7 +68,8 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
           type.id()==ID_fixedbv ||
-          type.id()==ID_floatbv)
+          type.id()==ID_floatbv ||
+          type.id()==ID_c_bool)
   {
     unsigned width=to_bitvector_type(type).get_width();
     return width%8?width/8+1:width/8;

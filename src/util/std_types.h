@@ -27,7 +27,7 @@ class constant_exprt;
  *  Conversion to subclasses of @ref typet
 */
 
-/*! \brief The Booleans
+/*! \brief The proper Booleans
 */
 class bool_typet:public typet
 {
@@ -888,6 +888,12 @@ public:
     set_width(width);
   }
 
+  inline bitvector_typet(const irep_idt &_id, unsigned width):
+    type_with_subtypet(_id)
+  {
+    set_width(width);
+  }
+
   inline unsigned get_width() const
   {
     return get_unsigned_int(ID_width);
@@ -917,7 +923,9 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
          type.id()==ID_floatbv ||
          type.id()==ID_bv ||
          type.id()==ID_pointer ||
-         type.id()==ID_c_bit_field);
+         type.id()==ID_c_bit_field ||
+         type.id()==ID_c_bool);
+
   return static_cast<const bitvector_typet &>(type);
 }
 
@@ -1256,6 +1264,45 @@ bool is_reference(const typet &type);
 /*! \brief TO_BE_DOCUMENTED
 */
 bool is_rvalue_reference(const typet &type);
+
+/*! \brief The C/C++ Booleans
+*/
+class c_bool_typet:public bitvector_typet
+{
+public:
+  inline c_bool_typet():bitvector_typet(ID_c_bool)
+  {
+  }
+
+  explicit inline c_bool_typet(unsigned width):bitvector_typet(ID_c_bool)
+  {
+  }
+};
+
+/*! \brief Cast a generic typet to a \ref c_bool_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * c_bool_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref c_bool_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const c_bool_typet &to_c_bool_type(const typet &type)
+{
+  assert(type.id()==ID_c_bool);
+  return static_cast<const c_bool_typet &>(type);
+}
+
+/*! \copydoc to_c_bool_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline c_bool_typet &to_c_bool_type(typet &type)
+{
+  assert(type.id()==ID_c_bool);
+  return static_cast<c_bool_typet &>(type);
+}
 
 /*! \brief TO_BE_DOCUMENTED
 */

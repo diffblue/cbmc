@@ -237,6 +237,10 @@ std::string expr2ct::convert_rec(
   {
     return q+"_Bool"+d;
   }
+  else if(src.id()==ID_c_bool)
+  {
+    return q+"_Bool"+d;
+  }
   else if(src.id()==ID_natural ||
           src.id()==ID_integer ||
           src.id()==ID_rational)

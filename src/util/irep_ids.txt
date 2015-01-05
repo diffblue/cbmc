@@ -3,6 +3,7 @@ nil
 type
 operands
 bool
+c_bool
 proper_bool
 signedbv
 unsignedbv

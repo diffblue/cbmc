@@ -1301,7 +1301,7 @@ basic_type_name:
         | TOK_SIGNED   { $$=$1; set($$, ID_signed); }
         | TOK_UNSIGNED { $$=$1; set($$, ID_unsigned); }
         | TOK_VOID     { $$=$1; set($$, ID_void); }
-        | TOK_BOOL     { $$=$1; set($$, ID_bool); }
+        | TOK_BOOL     { $$=$1; set($$, ID_c_bool); }
         | TOK_COMPLEX  { $$=$1; set($$, ID_complex); }
         | TOK_CPROVER_BITVECTOR '[' comma_expression ']'
         {

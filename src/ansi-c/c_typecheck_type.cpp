@@ -1283,7 +1283,8 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
     sub_width=1;
   }
   else if(subtype.id()==ID_signedbv ||
-          subtype.id()==ID_unsignedbv)
+          subtype.id()==ID_unsignedbv ||
+          subtype.id()==ID_c_bool)
   {
     sub_width=to_bitvector_type(subtype).get_width();
   }
