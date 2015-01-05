@@ -144,6 +144,27 @@ void c_typecheck_baset::typecheck_type(typet &type)
       // We ignore for now.
       type=type.subtype();
     }
+    else if(underlying_type.id()==ID_floatbv)
+    {
+      // get width
+      irep_idt mode=type.get(ID_size);
+      
+      typet result;
+      
+      if(mode=="__SF__") // 32 bits
+        result=float_type();
+      else if(mode=="__DF__") // 64 bits
+        result=double_type();
+      else if(mode=="__TF__") // 128 bits
+        result=gcc_float128_type();
+      else // give up, just use subtype
+        result=type.subtype();
+
+      // save the location
+      result.add_source_location()=type.source_location();
+
+      type=result;
+    }
     else
     {
       err_location(type);
