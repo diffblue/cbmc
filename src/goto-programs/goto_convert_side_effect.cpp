@@ -123,7 +123,7 @@ void goto_convertt::remove_assignment(
     const typet &op0_type=ns.follow(expr.op0().type());
 
     // C/C++ Booleans get very special treatment.
-    if(op0_type.get(ID_C_c_type)==ID_bool)
+    if(op0_type.id()==ID_c_bool)
     {
       binary_exprt tmp(expr.op0(), new_id, expr.op1(), expr.op1().type());
       tmp.op0().make_typecast(expr.op1().type());
@@ -198,7 +198,7 @@ void goto_convertt::remove_pre(
     rhs.type()=signed_int_type();
     rhs=is_not_zero(rhs, ns);
   }
-  else if(op_type.get(ID_C_c_type)==ID_bool)
+  else if(op_type.id()==ID_c_bool)
   {
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
@@ -220,7 +220,7 @@ void goto_convertt::remove_pre(
 
     if(op_type.id()==ID_pointer)
       constant_type=index_type();
-    else if(is_number(op_type))
+    else if(is_number(op_type) || op_type.id()==ID_c_bool)
       constant_type=op_type;
     else
     {
@@ -296,7 +296,7 @@ void goto_convertt::remove_post(
     rhs.type()=signed_int_type();
     rhs=is_not_zero(rhs, ns);
   }
-  else if(op_type.get(ID_C_c_type)==ID_bool)
+  else if(op_type.id()==ID_c_bool)
   {
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
@@ -318,7 +318,7 @@ void goto_convertt::remove_post(
 
     if(op_type.id()==ID_pointer)
       constant_type=index_type();
-    else if(is_number(op_type))
+    else if(is_number(op_type) || op_type.id()==ID_c_bool)
       constant_type=op_type;
     else
     {

@@ -1534,6 +1534,7 @@ void smt1_convt::convert_typecast(
     if(src_type.id()==ID_signedbv ||
        src_type.id()==ID_unsignedbv ||
        src_type.id()==ID_fixedbv ||
+       src_type.id()==ID_c_bit_field ||
        src_type.id()==ID_pointer)
     {
       out << "(not (= ";
@@ -1550,6 +1551,32 @@ void smt1_convt::convert_typecast(
     // boolean typecasts may have to be converted
     from_bool_end(dest_type, bool_as_bv);
   }
+  else if(dest_type.id()==ID_c_bool)
+  {
+    // this is comparison with zero
+    if(src_type.id()==ID_signedbv ||
+       src_type.id()==ID_unsignedbv ||
+       src_type.id()==ID_fixedbv ||
+       src_type.id()==ID_c_bit_field ||
+       src_type.id()==ID_pointer)
+    {
+      std::size_t to_width=boolbv_width(dest_type);
+
+      out << "(ite ";
+      out << "(not (= ";
+      convert_expr(src, true);
+      out << " ";
+      convert_expr(gen_zero(src_type), true);
+      out << ")) "; // not, =
+      out << " bv1[" << to_width << "]";
+      out << " bv0[" << to_width << "]";
+      out << ")"; // ite
+    }
+    else
+    {
+      throw "TODO typecast1 "+src_type.id_string()+" -> bool";
+    }
+  }
   else if(dest_type.id()==ID_signedbv ||
           dest_type.id()==ID_unsignedbv ||
           dest_type.id()==ID_c_enum)
@@ -1558,6 +1585,7 @@ void smt1_convt::convert_typecast(
 
     if(src_type.id()==ID_signedbv || // from signedbv
        src_type.id()==ID_unsignedbv || // from unsigedbv
+       src_type.id()==ID_c_bool ||
        src_type.id()==ID_c_enum)
     {
       std::size_t from_width=boolbv_width(src_type);
@@ -1978,7 +2006,9 @@ void smt1_convt::convert_constant(
      expr.type().id()==ID_signedbv ||
      expr.type().id()==ID_bv ||
      expr.type().id()==ID_c_enum ||
-     expr.type().id()==ID_c_enum_tag)
+     expr.type().id()==ID_c_enum_tag ||
+     expr.type().id()==ID_c_bool ||
+     expr.type().id()==ID_c_bit_field)
   {
     mp_integer value;
 
@@ -3353,6 +3383,7 @@ void smt1_convt::convert_type(const typet &type)
           type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
           type.id()==ID_c_enum ||
+          type.id()==ID_c_bool ||
           type.id()==ID_vector)
   {
     out << "BitVec[" << boolbv_width(type) << "]";

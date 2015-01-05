@@ -106,15 +106,18 @@ bool c_typecheck_baset::gcc_types_compatible_p(
     if(type1==type2.subtype())
       return true;
   }
-  else if(type1.id()==ID_pointer && type2.id()==ID_pointer)
+  else if(type1.id()==ID_pointer &&
+          type2.id()==ID_pointer)
   {
     return gcc_types_compatible_p(type1.subtype(), type2.subtype());
   }
-  else if(type1.id()==ID_array && type2.id()==ID_array)
+  else if(type1.id()==ID_array &&
+          type2.id()==ID_array)
   {
     return gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
   }
-  else if(type1.id()==ID_code && type2.id()==ID_code)
+  else if(type1.id()==ID_code &&
+          type2.id()==ID_code)
   {
     const code_typet &c_type1=to_code_type(type1);
     const code_typet &c_type2=to_code_type(type2);
@@ -1203,30 +1206,19 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       return;
   }
   
-  // cast to same type?
-  if(base_type_eq(expr_type, op_type, *this))
-    return; // it's ok
-  
-  if(!is_number(expr_type) &&
-     expr_type.id()!=ID_bool &&
-     expr_type.id()!=ID_pointer &&
-     expr_type.id()!=ID_array &&
-     expr_type.id()!=ID_c_enum_tag &&
-     expr_type.id()!=ID_incomplete_c_enum)
+  if(!is_numeric_type(expr_type) && expr_type.id()!=ID_pointer)
   {
     err_location(expr);
     str << "type cast to `"
-        << to_string(expr_type) << "' from `"
-        << to_string(op_type) << "' not permitted";
+        << to_string(expr_type) << "' is not permitted";
     throw 0;
   }
 
-  if(is_number(op_type) ||
-     op_type.id()==ID_c_enum_tag ||
-     op_type.id()==ID_incomplete_c_enum ||
-     op_type.id()==ID_bool ||
-     op_type.id()==ID_pointer ||
-     op_type.id()==ID_c_bit_field)
+  // cast to same type?
+  if(base_type_eq(expr_type, op_type, *this))
+    return; // it's ok
+
+  if(is_numeric_type(op_type) || op_type.id()==ID_pointer)
   {
   }
   else if(op_type.id()==ID_array)
@@ -1274,26 +1266,6 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     str << "type cast from `"
         << to_string(op_type) << "' not permitted";
     throw 0;
-  }
-
-  // Casts to C/C++ booleans have particular meaning
-  if(expr_type.get(ID_C_c_type)==ID_bool)
-  {
-    // we replace (_Bool)x by x!=0; use ieee_float_notequal for floats
-    source_locationt l=expr.source_location();
-    expr=is_not_zero(expr.op0(), *this);
-    expr.add_source_location()=l;
-    return;
-  }
-
-  // special case: NULL
-  if(expr_type.id()==ID_pointer &&
-     simplify_expr(op, *this).is_zero())
-  {
-    // zero typecasted to a pointer is NULL
-    constant_exprt result(ID_NULL, expr.type());
-    expr=result;
-    return;
   }
 
   // The new thing is an lvalue if the previous one is
@@ -2089,13 +2061,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       throw 0;
     }
 
-    if(final_type0.id()==ID_bool ||
-       final_type0.get(ID_C_c_type)==ID_bool ||
-       is_number(final_type0))
-    {
-      expr.type()=type0;
-    }
-    else if(final_type0.id()==ID_c_enum_tag)
+    if(final_type0.id()==ID_c_enum_tag)
     {
       if(follow_tag(to_c_enum_tag_type(final_type0)).id()==
          ID_incomplete_c_enum)
@@ -2109,17 +2075,21 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       else
         expr.type()=type0;
     }
-    else if(final_type0.id()==ID_pointer)
-    {
-      expr.type()=type0;
-      typecheck_arithmetic_pointer(op0);
-    }
     else if(final_type0.id()==ID_c_bit_field)
     {
       // promote to underlying type
       typet underlying_type=to_c_bit_field_type(final_type0).subtype();
       expr.op0().make_typecast(underlying_type);
       expr.type()=underlying_type;
+    }
+    else if(is_numeric_type(final_type0))
+    {
+      expr.type()=type0;
+    }
+    else if(final_type0.id()==ID_pointer)
+    {
+      expr.type()=type0;
+      typecheck_arithmetic_pointer(op0);
     }
     else
     {
@@ -2685,7 +2655,7 @@ exprt c_typecheck_baset::do_special_functions(
     unsigned type_number=
       type.id()==ID_empty?0:
       type.id()==ID_c_enum_tag?3:
-      type.get(ID_C_c_type)==ID_bool?4:
+      (type.id()==ID_bool || type.id()==ID_c_bool)?4:
       type.id()==ID_pointer?5:
       type.id()==ID_floatbv?8:
       (type.id()==ID_complex && type.subtype().id()==ID_floatbv)?9:
@@ -3250,6 +3220,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
 
     if(type0.id()==ID_pointer &&
        (type1.id()==ID_bool ||
+        type1.id()==ID_c_bool ||
         type1.id()==ID_unsignedbv ||
         type1.id()==ID_signedbv ||
         type1.id()==ID_c_bit_field ||
@@ -3282,6 +3253,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     const typet &int_op_type=follow(int_op->type());
 
     if(int_op_type.id()==ID_bool ||
+       int_op_type.id()==ID_c_bool ||
        int_op_type.id()==ID_unsignedbv ||
        int_op_type.id()==ID_signedbv ||
        int_op_type.id()==ID_c_bit_field ||
@@ -3444,7 +3416,8 @@ void c_typecheck_baset::typecheck_side_effect_assignment(side_effect_exprt &expr
           underlying_type=c_enum_type.subtype();
         }
 
-        if(underlying_type.id()==ID_unsignedbv)
+        if(underlying_type.id()==ID_unsignedbv ||
+           underlying_type.id()==ID_c_bool)
         {
           expr.set(ID_statement, ID_assign_lshr);
           return;
@@ -3463,10 +3436,11 @@ void c_typecheck_baset::typecheck_side_effect_assignment(side_effect_exprt &expr
   {
     // these are more restrictive
     if(o_type0.id()==ID_bool ||
-       o_type0.get(ID_C_c_type)==ID_bool)
+       o_type0.id()==ID_c_bool)
     {
       implicit_typecast_arithmetic(op1);
       if(op1.type().id()==ID_bool ||
+         op1.type().id()==ID_c_bool ||
          op1.type().id()==ID_c_enum_tag ||
          op1.type().id()==ID_unsignedbv ||
          op1.type().id()==ID_signedbv)
@@ -3514,10 +3488,11 @@ void c_typecheck_baset::typecheck_side_effect_assignment(side_effect_exprt &expr
       }
     }
     else if(o_type0.id()==ID_bool ||
-            o_type0.get(ID_C_c_type)==ID_bool)
+            o_type0.id()==ID_c_bool)
     {
       implicit_typecast_arithmetic(op1);
       if(op1.type().id()==ID_bool ||
+         op1.type().id()==ID_c_bool ||
          op1.type().id()==ID_c_enum_tag ||
          op1.type().id()==ID_unsignedbv ||
          op1.type().id()==ID_signedbv)
@@ -3529,6 +3504,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(side_effect_exprt &expr
 
       if(is_number(op1.type()) ||
          op1.type().id()==ID_bool ||
+         op1.type().id()==ID_c_bool ||
          op1.type().id()==ID_c_enum_tag)
         return;
     }

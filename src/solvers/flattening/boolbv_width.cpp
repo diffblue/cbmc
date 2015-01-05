@@ -113,6 +113,11 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   }
   else if(type_id==ID_bool)
     entry.total_width=1;
+  else if(type_id==ID_c_bool)
+  {
+    entry.total_width=to_c_bool_type(type).get_width();
+    assert(entry.total_width!=0);
+  }
   else if(type_id==ID_signedbv)
   {
     entry.total_width=to_signedbv_type(type).get_width();

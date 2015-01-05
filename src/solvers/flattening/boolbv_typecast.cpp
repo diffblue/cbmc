@@ -125,7 +125,9 @@ bool boolbvt::type_conversion(
   switch(dest_bvtype)
   {
   case IS_RANGE:
-    if(src_bvtype==IS_UNSIGNED || src_bvtype==IS_SIGNED)
+    if(src_bvtype==IS_UNSIGNED ||
+       src_bvtype==IS_SIGNED ||
+       src_bvtype==IS_C_BOOL)
     {
       mp_integer dest_from=to_range_type(dest_type).get_from();
 
@@ -178,6 +180,7 @@ bool boolbvt::type_conversion(
         return false;
 
       case IS_UNSIGNED: // unsigned to float
+      case IS_C_BOOL: // _Bool to float
         float_utils.spec=to_floatbv_type(dest_type);
         dest=float_utils.from_unsigned_integer(src);
         return false;
@@ -258,6 +261,7 @@ bool boolbvt::type_conversion(
     }
     else if(src_bvtype==IS_UNSIGNED ||
             src_bvtype==IS_SIGNED ||
+            src_bvtype==IS_C_BOOL ||
             src_bvtype==IS_C_ENUM)
     {
       // integer to fixed
@@ -357,6 +361,7 @@ bool boolbvt::type_conversion(
     case IS_UNSIGNED: // integer to integer
     case IS_SIGNED:
     case IS_C_ENUM:
+    case IS_C_BOOL:
       {
         // We do sign extension for any source type
         // that is signed, independently of the
@@ -399,7 +404,8 @@ bool boolbvt::type_conversion(
     break;
     
   case IS_VERILOGBV:
-    if(src_bvtype==IS_UNSIGNED)
+    if(src_bvtype==IS_UNSIGNED ||
+       src_bvtype==IS_C_BOOL)
     {
       for(unsigned i=0, j=0; i<dest_width; i+=2, j++)
       {
@@ -418,6 +424,22 @@ bool boolbvt::type_conversion(
   case IS_BV:
     assert(src_width==dest_width);
     dest=src;
+    return false;
+    
+  case IS_C_BOOL:
+    dest.resize(dest_width, const_literal(false));
+
+    if(src_bvtype==IS_FLOAT)
+    {
+      float_utilst float_utils(prop);
+      float_utils.spec=to_floatbv_type(src_type);
+      dest[0]=!float_utils.is_zero(src);
+    }
+    else if(src_bvtype==IS_C_BOOL)
+      dest[0]=src[0];
+    else
+      dest[0]=!bv_utils.is_zero(src);
+
     return false;
     
   default:

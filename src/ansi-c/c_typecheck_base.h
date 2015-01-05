@@ -277,6 +277,19 @@ protected:
   {
     return language_prefix+id2string(id);
   }
+  
+  inline static bool is_numeric_type(const typet &src)
+  {
+    return src.id()==ID_complex ||
+           src.id()==ID_unsignedbv ||
+           src.id()==ID_signedbv ||
+           src.id()==ID_floatbv || 
+           src.id()==ID_fixedbv || 
+           src.id()==ID_c_bool ||
+           src.id()==ID_bool ||
+           src.id()==ID_c_enum_tag ||
+           src.id()==ID_c_bit_field;
+  }
 };
 
 #endif

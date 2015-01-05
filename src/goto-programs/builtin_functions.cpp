@@ -1096,7 +1096,7 @@ void goto_convertt::do_function_call_symbol(
     
     // We need to special-case for _Bool, which
     // can only be 0 or 1.
-    if(lhs.type().get(ID_C_c_type)==ID_bool)
+    if(lhs.type().id()==ID_c_bool)
     {
       rhs=side_effect_expr_nondett(bool_typet());
       rhs.add_source_location()=function.source_location();

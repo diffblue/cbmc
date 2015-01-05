@@ -27,7 +27,8 @@ typet c_bit_field_replacement_type(
   const typet &subtype=src.subtype();
   
   if(subtype.id()==ID_unsignedbv ||
-     subtype.id()==ID_signedbv)
+     subtype.id()==ID_signedbv ||
+     subtype.id()==ID_c_bool)
   {
     bitvector_typet result=to_bitvector_type(subtype);
     result.set_width(src.get_width());

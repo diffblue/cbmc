@@ -389,7 +389,8 @@ constant_exprt smt2_convt::parse_literal(
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
      type.id()==ID_bv ||
-     type.id()==ID_c_enum)
+     type.id()==ID_c_enum ||
+     type.id()==ID_c_bool)
   {
     return from_integer(value, type);
   }
@@ -2035,6 +2036,19 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       throw "TODO typecast1 "+src_type.id_string()+" -> bool";
     }
   }
+  else if(dest_type.id()==ID_c_bool)
+  {
+    std::size_t to_width=boolbv_width(dest_type);
+    out << "(ite ";
+    out << "(not (= ";
+    convert_expr(src);
+    out << " ";
+    convert_expr(gen_zero(src_type));
+    out << ")) "; // not, =
+    out << " (_ bv1 " << to_width << ")";
+    out << " (_ bv0 " << to_width << ")";
+    out << ")"; // ite
+  }
   else if(dest_type.id()==ID_signedbv ||
           dest_type.id()==ID_unsignedbv ||
           dest_type.id()==ID_c_enum ||
@@ -2044,6 +2058,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
     if(src_type.id()==ID_signedbv || // from signedbv
        src_type.id()==ID_unsignedbv || // from unsigedbv
+       src_type.id()==ID_c_bool ||
        src_type.id()==ID_c_enum)
     {
       std::size_t from_width=boolbv_width(src_type);
@@ -2458,7 +2473,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       typet t=c_bit_field_replacement_type(to_c_bit_field_type(dest_type), ns);
       typecast_exprt tmp(typecast_exprt(src, t), dest_type);
       convert_typecast(tmp);
-    }  
+    }
   }
   else
     throw "TODO typecast8 "+src_type.id_string()+" -> "+dest_type.id_string();
@@ -2648,7 +2663,9 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
      expr_type.id()==ID_bv ||
      expr_type.id()==ID_c_enum ||
      expr_type.id()==ID_c_enum_tag ||
-     expr_type.id()==ID_incomplete_c_enum)
+     expr_type.id()==ID_c_bool ||
+     expr_type.id()==ID_incomplete_c_enum ||
+     expr_type.id()==ID_c_bit_field)
   {
     mp_integer value=binary2integer(id2string(expr.get_value()), false);
 
@@ -4630,7 +4647,8 @@ void smt2_convt::convert_type(const typet &type)
   else if(type.id()==ID_bv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_unsignedbv ||
-          type.id()==ID_signedbv)
+          type.id()==ID_signedbv ||
+          type.id()==ID_c_bool)
   {
     out << "(_ BitVec "
         << to_bitvector_type(type).get_width() << ")";

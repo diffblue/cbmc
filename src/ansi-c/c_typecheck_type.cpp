@@ -1280,6 +1280,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 
   if(subtype.id()==ID_bool)
   {
+    // This is the 'proper' bool.
     sub_width=1;
   }
   else if(subtype.id()==ID_signedbv ||

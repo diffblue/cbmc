@@ -650,14 +650,12 @@ std::string expr2ct::convert_typecast(
   const typet &to_type=ns.follow(src.type());
   const typet &from_type=ns.follow(src.op().type());
   
-  if(to_type.id()==ID_unsignedbv &&
-     to_type.get(ID_C_c_type)==ID_bool &&
+  if(to_type.id()==ID_c_bool &&
      from_type.id()==ID_bool)
     return convert(src.op(), precedence);
      
   if(to_type.id()==ID_bool &&
-     from_type.get(ID_C_c_type)==ID_bool &&
-     from_type.id()==ID_unsignedbv)
+     from_type.id()==ID_c_bool)
     return convert(src.op(), precedence);
 
   std::string dest="("+convert(to_type)+")";
@@ -2087,7 +2085,8 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
-          type.id()==ID_c_bit_field)
+          type.id()==ID_c_bit_field ||
+          type.id()==ID_c_bool)
   {
     mp_integer int_value=binary2integer(id2string(value), type.id()==ID_signedbv);
     
@@ -2095,7 +2094,7 @@ std::string expr2ct::convert_constant(
       type.id()==ID_c_bit_field?type.subtype().get(ID_C_c_type):
                  type.get(ID_C_c_type);
 
-    if(c_type==ID_bool)
+    if(type.id()==ID_c_bool)
     {
       // C doesn't really have these
       if(int_value!=0)
