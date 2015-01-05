@@ -320,6 +320,7 @@ gcc_builtin_va_arg
 gcc_builtin_types_compatible_p
 gcc_builtin_va_arg_next
 gcc_builtin_va_list
+gcc_float80
 gcc_float128
 gcc_int128
 gcc_decimal32

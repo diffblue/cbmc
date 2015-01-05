@@ -399,6 +399,12 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
+"__float80"	{ if(PARSER.mode==ansi_c_parsert::GCC)
+                    { loc(); return TOK_GCC_FLOAT80; }
+                  else
+                    return make_identifier();
+                }
+
 "__float128"	{ if(PARSER.mode==ansi_c_parsert::GCC)
                     { loc(); return TOK_GCC_FLOAT128; }
                   else
