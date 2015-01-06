@@ -981,6 +981,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_typecast(to_typecast_expr(expr));
   }
+  else if(expr.id()==ID_floatbv_typecast)
+  {
+    convert_floatbv_typecast(to_floatbv_typecast_expr(expr));
+  }
   else if(expr.id()==ID_struct)
   {
     convert_struct(to_struct_expr(expr));
@@ -2477,6 +2481,66 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else
     throw "TODO typecast8 "+src_type.id_string()+" -> "+dest_type.id_string();
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::convert_floatbv_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
+{
+  const exprt &src=expr.op();
+  //const exprt &rounding_mode=expr.rounding_mode();
+  const typet &src_type=src.type();
+  const typet &dest_type=expr.type();
+
+  if(dest_type.id()==ID_floatbv)
+  {
+    if(src_type.id()==ID_floatbv)
+    {
+      // float to float
+
+      const floatbv_typet &dst=to_floatbv_type(dest_type);
+
+      if(use_FPA_theory)
+      {
+        out << "((_ to_fp " << dst.get_e() << " "
+            << dst.get_f() + 1 << ") roundNearestTiesToEven ";
+        convert_expr(src);
+        out << ")";
+      }
+      else
+        throw "TODO typecast9 "+src_type.id_string()+" -> "+dest_type.id_string();
+    }
+    else if(src_type.id()==ID_unsignedbv)
+    {
+      // unsigned to float
+
+      const floatbv_typet &dst=to_floatbv_type(dest_type);
+
+      if(use_FPA_theory)
+      {
+        out << "((_ to_fp " << dst.get_e() << " "
+            << dst.get_f() + 1 << ") roundNearestTiesToEven ";
+        convert_expr(src);
+        out << ")";
+      }
+      else
+        throw "TODO typecast10 "+src_type.id_string()+" -> "+dest_type.id_string();
+    }
+    else
+      throw "TODO typecast11 "+src_type.id_string()+" -> "+dest_type.id_string();
+  }
+  else
+    throw "TODO typecast12 "+src_type.id_string()+" -> "+dest_type.id_string();
 }
 
 /*******************************************************************\
