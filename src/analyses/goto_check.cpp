@@ -1586,7 +1586,23 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         i_it!=new_code.instructions.end();
         i_it++)
     {
-      if(i_it->source_location.is_nil()) i_it->source_location=it->source_location;
+      if(i_it->source_location.is_nil())
+      {
+        i_it->source_location.id(irep_idt());
+
+        if(it->source_location.get_file()!=irep_idt())
+          i_it->source_location.set_file(it->source_location.get_file());
+
+        if(it->source_location.get_line()!=irep_idt())
+          i_it->source_location.set_line(it->source_location.get_line());
+
+        if(it->source_location.get_function()!=irep_idt())
+          i_it->source_location.set_function(it->source_location.get_function());
+
+        if(it->source_location.get_column()!=irep_idt())
+          i_it->source_location.set_column(it->source_location.get_column());
+      }
+      
       if(i_it->function==irep_idt()) i_it->function=it->function;
     }
       
