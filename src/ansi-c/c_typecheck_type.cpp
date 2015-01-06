@@ -114,10 +114,16 @@ void c_typecheck_baset::typecheck_type(typet &type)
       
       if(mode=="__QI__") // 8 bits
         result=is_signed?signed_char_type():unsigned_char_type();
+      else if(mode=="__byte__") // 8 bits
+        result=is_signed?signed_char_type():unsigned_char_type();
       else if(mode=="__HI__") // 16 bits
         result=is_signed?signed_short_int_type():unsigned_short_int_type();
       else if(mode=="__SI__") // 32 bits
         result=is_signed?signed_int_type():unsigned_int_type();
+      else if(mode=="__word__") // 32 bits, we think
+        result=is_signed?signed_int_type():unsigned_int_type();
+      else if(mode=="__pointer__") // we think this is size_t/ssize_t
+        result=is_signed?signed_size_type():size_type();
       else if(mode=="__DI__") // 64 bits
       {
         if(config.ansi_c.long_int_width==64)
