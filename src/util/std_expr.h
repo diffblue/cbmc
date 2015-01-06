@@ -1465,6 +1465,69 @@ extern inline typecast_exprt &to_typecast_expr(exprt &expr)
   return static_cast<typecast_exprt &>(expr);
 }
 
+/*! \brief semantic type conversion from/to floating-point formats
+*/
+class floatbv_typecast_exprt:public binary_exprt
+{
+public:
+  inline floatbv_typecast_exprt():binary_exprt(ID_floatbv_typecast)
+  {
+  }
+
+  inline floatbv_typecast_exprt(
+    const exprt &op,
+    const exprt &rounding,
+    const typet &_type):binary_exprt(ID_floatbv_typecast, _type)
+  {
+    copy_to_operands(op, rounding);
+  }
+
+  inline exprt &op()
+  {
+    return op0();
+  }
+
+  inline const exprt &op() const
+  {
+    return op0();
+  }
+
+  inline exprt &rounding_mode()
+  {
+    return op1();
+  }
+
+  inline const exprt &rounding_mode() const
+  {
+    return op1();
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref floatbv_typecast_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * floatbv_typecast_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref floatbv_typecast_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_floatbv_typecast && expr.operands().size()==2);
+  return static_cast<const floatbv_typecast_exprt &>(expr);
+}
+
+/*! \copydoc to_floatbv_typecast_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
+{
+  assert(expr.id()==ID_floatbv_typecast && expr.operands().size()==2);
+  return static_cast<floatbv_typecast_exprt &>(expr);
+}
+
 /*! \brief boolean AND
 */
 class and_exprt:public exprt
@@ -1502,7 +1565,7 @@ public:
 
 exprt conjunction(const exprt::operandst &op);
 
-/*! \brief Cast a generic exprt to a \ref typecast_exprt
+/*! \brief Cast a generic exprt to a \ref and_exprt
  *
  * This is an unchecked conversion. \a expr must be known to be \ref
  * and_exprt.

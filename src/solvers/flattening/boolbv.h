@@ -142,7 +142,7 @@ protected:
   virtual void convert_div(const exprt &expr, bvt &bv);
   virtual void convert_mod(const exprt &expr, bvt &bv);
   virtual void convert_floatbv_op(const exprt &expr, bvt &bv);
-  virtual void convert_floatbv_typecast(const exprt &expr, bvt &bv);
+  virtual void convert_floatbv_typecast(const floatbv_typecast_exprt &expr, bvt &bv);
   virtual void convert_member(const member_exprt &expr, bvt &bv);
   virtual void convert_with(const exprt &expr, bvt &bv);
   virtual void convert_update(const exprt &expr, bvt &bv);
