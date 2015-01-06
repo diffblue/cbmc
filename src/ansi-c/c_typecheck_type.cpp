@@ -120,8 +120,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
         result=is_signed?signed_short_int_type():unsigned_short_int_type();
       else if(mode=="__SI__") // 32 bits
         result=is_signed?signed_int_type():unsigned_int_type();
-      else if(mode=="__word__") // 32 bits, we think
-        result=is_signed?signed_int_type():unsigned_int_type();
+      else if(mode=="__word__") // long int, we think
+        result=is_signed?signed_long_int_type():unsigned_long_int_type();
       else if(mode=="__pointer__") // we think this is size_t/ssize_t
         result=is_signed?signed_size_type():size_type();
       else if(mode=="__DI__") // 64 bits
