@@ -24,7 +24,7 @@ of the architecture.</li>
 <p class="justified">
 In general, the CPROVER tools attempt to adopt the settings of the
 particular architecture the tool itself was compiled for. For example,
-when running a 64 bit binary of CBMC, the program will be processed
+when running a 64 bit binary of CBMC on Linux, the program will be processed
 assuming that <code>sizeof(long int)==8</code>.</p>
 
 <p class="justified">
