@@ -136,6 +136,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
       }
       else if(mode=="__TI__") // 128 bits
         result=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
+      else if(mode=="__V2SI__") // vector of 2 ints, deprecated by gcc
+        result=vector_typet(is_signed?signed_int_type():unsigned_int_type(), from_integer(2, size_type()));
+      else if(mode=="__V4SI__") // vector of 4 ints, deprecated by gcc
+        result=vector_typet(is_signed?signed_int_type():unsigned_int_type(), from_integer(4, size_type()));
       else // give up, just use subtype
         result=type.subtype();
 
@@ -163,6 +167,14 @@ void c_typecheck_baset::typecheck_type(typet &type)
         result=double_type();
       else if(mode=="__TF__") // 128 bits
         result=gcc_float128_type();
+      else if(mode=="__V2SF__") // vector of 2 floats, deprecated by gcc
+        result=vector_typet(float_type(), from_integer(2, size_type()));
+      else if(mode=="__V2DF__") // vector of 2 doubles, deprecated by gcc
+        result=vector_typet(double_type(), from_integer(2, size_type()));
+      else if(mode=="__V4SF__") // vector of 4 floats, deprecated by gcc
+        result=vector_typet(float_type(), from_integer(4, size_type()));
+      else if(mode=="__V4DF__") // vector of 4 doubles, deprecated by gcc
+        result=vector_typet(double_type(), from_integer(4, size_type()));
       else // give up, just use subtype
         result=type.subtype();
 
