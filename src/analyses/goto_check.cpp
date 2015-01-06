@@ -347,10 +347,11 @@ void goto_checkt::integer_overflow_check(
     
     if(type.id()==ID_signedbv)
     {
+      unsigned new_width=to_signedbv_type(type).get_width();
+
       if(old_type.id()==ID_signedbv) // signed -> signed
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
+        unsigned old_width=to_signedbv_type(old_type).get_width();
         if(new_width>=old_width) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -371,8 +372,7 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_unsignedbv) // unsigned -> signed
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
+        unsigned old_width=to_unsignedbv_type(old_type).get_width();
         if(new_width>=old_width+1) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -389,8 +389,6 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_floatbv) // float -> signed
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-
         // Note that the fractional part is truncated!
         ieee_floatt upper(to_floatbv_type(old_type));
         upper.from_integer(power(2, new_width-1));
@@ -415,10 +413,11 @@ void goto_checkt::integer_overflow_check(
     }
     else if(type.id()==ID_unsignedbv)
     {
+      unsigned new_width=to_unsignedbv_type(type).get_width();
+
       if(old_type.id()==ID_signedbv) // signed -> unsigned
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
+        unsigned old_width=to_signedbv_type(old_type).get_width();
 
         if(new_width>=old_width-1)
         {
@@ -457,8 +456,7 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_unsignedbv) // unsigned -> unsigned
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
+        unsigned old_width=to_unsignedbv_type(old_type).get_width();
         if(new_width>=old_width) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -475,8 +473,6 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_floatbv) // float -> unsigned
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-
         // Note that the fractional part is truncated!
         ieee_floatt upper(to_floatbv_type(old_type));
         upper.from_integer(power(2, new_width)-1);
