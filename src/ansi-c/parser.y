@@ -2478,6 +2478,7 @@ gcc_asm_output:
           string '(' comma_expression ')'
         {
           $$=$5;
+          stack($$).id(ID_gcc_asm_output);
           stack($$).move_to_operands(stack($4), stack($6)); 
         }
         ;
