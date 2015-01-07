@@ -71,7 +71,7 @@ bool static_lifetime_init(
   namespacet ns(symbol_table);
       
   symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find("c::__CPROVER_initialize");
+    symbol_table.symbols.find(CPROVER_PREFIX "initialize");
 
   if(s_it==symbol_table.symbols.end()) return false;
 
@@ -280,10 +280,10 @@ bool entry_point(
 
   {
     symbol_tablet::symbolst::iterator init_it=
-      symbol_table.symbols.find("c::__CPROVER_initialize");
+      symbol_table.symbols.find(CPROVER_PREFIX "initialize");
 
     if(init_it==symbol_table.symbols.end())
-      throw "failed to find __CPROVER_initialize symbol";
+      throw "failed to find " CPROVER_PREFIX "initialize symbol";
   
     code_function_callt call_init;
     call_init.lhs().make_nil();

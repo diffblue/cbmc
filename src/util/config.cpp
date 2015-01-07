@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr.h"
 #include "i2string.h"
 #include "std_expr.h"
+#include "cprover_prefix.h"
 
 configt config;
 
@@ -1085,7 +1086,7 @@ static unsigned from_ns(
   const namespacet &ns,
   const std::string &what)
 {
-  const irep_idt id="c::__CPROVER_architecture_"+what;
+  const irep_idt id=CPROVER_PREFIX "architecture_"+what;
   const symbolt *symbol;
 
   if(ns.lookup(id, symbol))

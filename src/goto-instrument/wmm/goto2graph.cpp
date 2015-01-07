@@ -53,8 +53,8 @@ bool inline instrumentert::local(const irep_idt& id)
     return true;
   }
 
-  if(identifier=="c::__CPROVER_alloc" ||
-    identifier=="c::__CPROVER_alloc_size" ||
+  if(identifier==CPROVER_PREFIX "alloc" ||
+    identifier==CPROVER_PREFIX "alloc_size" ||
     identifier=="c::stdin" ||
     identifier=="c::stdout" ||
     identifier=="c::stderr" ||

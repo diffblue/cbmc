@@ -1074,8 +1074,8 @@ bool shared_bufferst::is_buffered(
 {
   const irep_idt &identifier=symbol_expr.get_identifier();
 
-  if(identifier=="c::__CPROVER_alloc" ||
-     identifier=="c::__CPROVER_alloc_size" ||
+  if(identifier==CPROVER_PREFIX "alloc" ||
+     identifier==CPROVER_PREFIX "alloc_size" ||
      identifier=="c::stdin" ||
      identifier=="c::stdout" ||
      identifier=="c::stderr" ||

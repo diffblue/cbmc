@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/base_type.h>
 #include <util/i2string.h>
+#include <util/cprover_prefix.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
@@ -774,7 +775,7 @@ bool dump_ct::ignore(const symbolt &symbol)
 {
   const std::string &name_str=id2string(symbol.name);
 
-  if(has_prefix(name_str, "c::__CPROVER_") ||
+  if(has_prefix(name_str, CPROVER_PREFIX) ||
      name_str=="c::__func__" ||
      name_str=="c::__FUNCTION__" ||
      name_str=="c::__PRETTY_FUNCTION__" ||
