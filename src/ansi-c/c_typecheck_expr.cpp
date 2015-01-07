@@ -1194,6 +1194,10 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
   const typet op_type=follow(op.type());
   
+  // cast to same type?
+  if(base_type_eq(expr_type, op_type, *this))
+    return; // it's ok
+
   // vectors?
   
   if(expr_type.id()==ID_vector)
@@ -1213,10 +1217,6 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
         << to_string(expr_type) << "' is not permitted";
     throw 0;
   }
-
-  // cast to same type?
-  if(base_type_eq(expr_type, op_type, *this))
-    return; // it's ok
 
   if(is_numeric_type(op_type) || op_type.id()==ID_pointer)
   {
