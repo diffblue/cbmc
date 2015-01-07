@@ -1559,7 +1559,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
       if(i.function==goto_functionst::entry_point() &&
          enable_memory_leak_check)
       {
-        const symbolt &leak=ns.lookup("c::__CPROVER_memory_leak");
+        const symbolt &leak=ns.lookup(CPROVER_PREFIX "memory_leak");
         const symbol_exprt leak_expr=leak.symbol_expr();
 
         // add self-assignment to get helpful counterexample output
