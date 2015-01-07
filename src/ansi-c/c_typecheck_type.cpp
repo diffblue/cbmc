@@ -1150,7 +1150,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     
     if(symbol.type.id()==ID_incomplete_c_enum)
     {
-      // Ok, overwrite the type.
+      // Ok, overwrite the type in the symbol table.
       // This gives us the members and the subtype.
       symbol.type=enum_tag_symbol.type;
     }
@@ -1172,9 +1172,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   }
 
   // We produce a c_enum_tag as the resulting type.
+  // This retains the subtype; we may want to have
+  // that differ from the subtype of the c_enum type.
   type.id(ID_c_enum_tag);
   type.remove(ID_tag);
-  type.remove_subtype();
   type.set(ID_identifier, identifier);
 }
 
@@ -1219,7 +1220,8 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     if(symbol.type.id()==ID_c_enum ||
        symbol.type.id()==ID_incomplete_c_enum)
     {
-      // do nothing
+      // copy subtype into tag
+      type.subtype()=symbol.type.subtype();
     }
     else
     {
@@ -1245,6 +1247,8 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     
     symbolt *new_symbol;
     move_symbol(enum_tag_symbol, new_symbol);
+    
+    type.subtype()=new_type.subtype();
   }
   
   // Clean up resulting type
