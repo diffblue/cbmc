@@ -2569,19 +2569,26 @@ gcc_asm_labels:
         ;
 
 gcc_asm_labels_list:
-          gcc_local_label
+          gcc_asm_label
         {
-          irep_idt identifier=PARSER.lookup_label(stack($1).get(ID_C_base_name));
-          $$=$1;
-          stack($$).id(ID_label);
-          stack($$).set(ID_identifier, identifier);
+          init($$);
+          mto($$, $1);
         }
-        | gcc_asm_labels_list ',' gcc_local_label
+        | gcc_asm_labels_list ',' gcc_asm_label
         {
           $$=$1;
           mto($$, $3);
         }
         ;
+
+gcc_asm_label:
+          gcc_local_label
+        {
+          $$=$1;
+          irep_idt identifier=PARSER.lookup_label(stack($$).get(ID_C_base_name));
+          stack($$).id(ID_label);
+          stack($$).set(ID_identifier, identifier);
+        }
 
 translation_unit:
         /* nothing */
