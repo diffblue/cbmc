@@ -35,7 +35,7 @@ void goto_symext::new_name(symbolt &symbol)
 
 /*******************************************************************\
 
-Function: goto_symext::claim
+Function: goto_symext::vcc
 
   Inputs:
 
@@ -45,14 +45,14 @@ Function: goto_symext::claim
 
 \*******************************************************************/
 
-void goto_symext::claim(
-  const exprt &claim_expr,
+void goto_symext::vcc(
+  const exprt &vcc_expr,
   const std::string &msg,
   statet &state)
 {
-  total_claims++;
+  total_vccs++;
 
-  exprt expr=claim_expr;
+  exprt expr=vcc_expr;
 
   // we are willing to re-write some quantified expressions
   rewrite_quantifiers(expr, state);
@@ -67,7 +67,7 @@ void goto_symext::claim(
   
   state.guard.guard_expr(expr);
   
-  remaining_claims++;
+  remaining_vccs++;
   target.assertion(state.guard.as_expr(), expr, msg, state.source);
 }
 
@@ -304,7 +304,7 @@ void goto_symext::symex_step(
       if(msg=="") msg="assertion";
       exprt tmp(instruction.guard);
       clean_expr(tmp, state, false);
-      claim(tmp, msg, state);
+      vcc(tmp, msg, state);
     }
 
     state.source.pc++;

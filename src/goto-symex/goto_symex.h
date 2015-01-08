@@ -45,8 +45,8 @@ public:
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
     symex_targett &_target):
-    total_claims(0),
-    remaining_claims(0),
+    total_vccs(0),
+    remaining_vccs(0),
     constant_propagation(true),
     new_symbol_table(_new_symbol_table),
     ns(_ns),
@@ -89,7 +89,7 @@ public:
   virtual void symex_step_goto(statet &state, bool taken);
   
   // statistics
-  unsigned total_claims, remaining_claims;
+  unsigned total_vccs, remaining_vccs;
 
   bool constant_propagation;
 
@@ -160,10 +160,11 @@ protected:
     const goto_functionst &goto_functions,
     statet &state);    
     
-  virtual void claim(
+  virtual void vcc(
     const exprt &expr,
     const std::string &msg,
     statet &state);
+    
   virtual void symex_assume(statet &state, const exprt &cond);
     
   // gotos

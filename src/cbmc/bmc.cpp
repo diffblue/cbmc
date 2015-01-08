@@ -340,7 +340,6 @@ bool bmct::run(const goto_functionst &goto_functions)
     return true;
   }
 
-  //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
   symex.options=options;
 
@@ -424,8 +423,8 @@ bool bmct::run(const goto_functionst &goto_functions)
     }
 
     {
-      statistics() << "Generated " << symex.total_claims
-                   << " VCC(s), " << symex.remaining_claims
+      statistics() << "Generated " << symex.total_vccs
+                   << " VCC(s), " << symex.remaining_vccs
                    << " remaining after simplification" << eom;
     }
 
@@ -453,7 +452,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 
     // any properties to check at all?
     if(!options.get_bool_option("program-only") &&
-       symex.remaining_claims==0)
+       symex.remaining_vccs==0)
     {
       report_success();
       return false;
