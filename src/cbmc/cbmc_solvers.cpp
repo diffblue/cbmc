@@ -314,6 +314,7 @@ bool bmct::decide_bv_refinement()
   solver->set_message_handler(get_message_handler());
 
   bv_refinementt bv_refinement(ns, *solver);
+  bv_refinement.set_ui(ui);
 
   // we allow setting some parameters  
   if(options.get_option("max-node-refinement")!="")
