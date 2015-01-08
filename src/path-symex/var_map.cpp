@@ -19,6 +19,45 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: var_mapt::var_infot::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+var_mapt::var_infot & var_mapt::operator()(
+  const irep_idt &symbol,
+  const irep_idt &suffix,
+  const typet &type)
+{
+  assert(symbol!=irep_idt());
+
+  std::string full_identifier=
+    id2string(symbol)+id2string(suffix);
+
+  std::pair<id_mapt::iterator, bool> result;
+
+  result=id_map.insert(std::pair<irep_idt, var_infot>(
+    full_identifier, var_infot()));
+
+  if(result.second) // inserted?
+  {
+    result.first->second.full_identifier=full_identifier;
+    result.first->second.symbol=symbol;
+    result.first->second.suffix=suffix;
+    result.first->second.type=type;
+    init(result.first->second);
+  }
+  
+  return result.first->second;
+}
+
+/*******************************************************************\
+
 Function: var_mapt::var_infot::output
 
   Inputs:
@@ -118,4 +157,28 @@ irep_idt var_mapt::var_infot::ssa_identifier() const
 {
   return id2string(full_identifier)+
          "#"+i2string(ssa_counter);
+}
+
+/*******************************************************************\
+
+Function: var_mapt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void var_mapt::output(std::ostream &out) const
+{
+  for(id_mapt::const_iterator
+      it=id_map.begin();
+      it!=id_map.end();
+      it++)
+  {
+    out << it->first << ":\n";
+    it->second.output(out);
+  }
 }
