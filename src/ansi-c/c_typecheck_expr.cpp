@@ -735,9 +735,8 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
       throw "expected one declarator exactly";
     }
 
-    // add prefix
     irep_idt identifier=
-      add_language_prefix(declaration.declarators().front().get_name());
+      declaration.declarators().front().get_name();
 
     // look it up
     symbol_tablet::symbolst::iterator s_it=
@@ -789,12 +788,6 @@ Function: c_typecheck_baset::typecheck_expr_symbol
 
 void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
 {
-  // first add prefix
-  {
-    symbol_exprt &symbol_expr=to_symbol_expr(expr);
-    symbol_expr.set_identifier(add_language_prefix(symbol_expr.get_identifier()));
-  }
-
   const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
   
   // Is it a parameter? We do this while checking parameter lists.
@@ -850,9 +843,9 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     // put it back
     expr.add_source_location()=source_location;
   }
-  else if(identifier=="c::__func__" ||
-          identifier=="c::__FUNCTION__" ||
-          identifier=="c::__PRETTY_FUNCTION__")
+  else if(identifier=="__func__" ||
+          identifier=="__FUNCTION__" ||
+          identifier=="__PRETTY_FUNCTION__")
   {
     // __func__ is an ANSI-C standard compliant hack to get the function name
     // __FUNCTION__ and __PRETTY_FUNCTION__ are GCC-specific
@@ -2145,7 +2138,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   if(f_op.id()==ID_symbol)
   {
     const irep_idt &identifier=
-      add_language_prefix(to_symbol_expr(f_op).get_identifier());
+      to_symbol_expr(f_op).get_identifier();
 
     if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {
@@ -2156,17 +2149,16 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       // The following isn't really right and sound, but there
       // are too many idiots out there who use malloc and the like
       // without the right header file.
-      if(identifier=="c::malloc" ||
-         identifier=="c::realloc" ||
-         identifier=="c::reallocf" ||
-         identifier=="c::valloc")
+      if(identifier=="malloc" ||
+         identifier=="realloc" ||
+         identifier=="reallocf" ||
+         identifier=="valloc")
         return_type=pointer_typet(empty_typet()); // void *
 
       symbolt new_symbol;
 
       new_symbol.name=identifier;
-      new_symbol.base_name=
-        std::string(id2string(identifier), language_prefix.size(), std::string::npos);
+      new_symbol.base_name=identifier;
       new_symbol.location=expr.source_location();
       new_symbol.type=code_typet();
       new_symbol.type.set(ID_C_incomplete, true);
@@ -2363,7 +2355,7 @@ exprt c_typecheck_baset::do_special_functions(
   else if(identifier==CPROVER_PREFIX "isnanf" || 
           identifier==CPROVER_PREFIX "isnand" ||
           identifier==CPROVER_PREFIX "isnanld" ||
-          identifier=="c::__builtin_isnan")
+          identifier=="__builtin_isnan")
   {
     if(expr.arguments().size()!=1)
     {
@@ -2394,7 +2386,7 @@ exprt c_typecheck_baset::do_special_functions(
     return isfinite_expr;
   }
   else if(identifier==CPROVER_PREFIX "inf" ||
-          identifier=="c::__builtin_inf")
+          identifier=="__builtin_inf")
   {
     constant_exprt inf_expr=
       ieee_floatt::plus_infinity(ieee_float_spect::double_precision()).to_expr();
@@ -2455,7 +2447,7 @@ exprt c_typecheck_baset::do_special_functions(
   else if(identifier==CPROVER_PREFIX "isinff" ||
           identifier==CPROVER_PREFIX "isinfd" ||
           identifier==CPROVER_PREFIX "isinfld" ||
-          identifier=="c::__builtin_isinf")
+          identifier=="__builtin_isinf")
   {
     if(expr.arguments().size()!=1)
     {
@@ -2488,7 +2480,7 @@ exprt c_typecheck_baset::do_special_functions(
   else if(identifier==CPROVER_PREFIX "signf" ||            
           identifier==CPROVER_PREFIX "signd" ||
           identifier==CPROVER_PREFIX "signld" ||
-          identifier=="c::__builtin_signbit")
+          identifier=="__builtin_signbit")
   {
     if(expr.arguments().size()!=1)
     {
@@ -2523,7 +2515,7 @@ exprt c_typecheck_baset::do_special_functions(
 
     return equality_expr;
   }
-  else if(identifier=="c::__builtin_expect")
+  else if(identifier=="__builtin_expect")
   {
     // This is a gcc extension to provide branch prediction.
     // We compile it away, but adding some IR instruction for
@@ -2539,7 +2531,7 @@ exprt c_typecheck_baset::do_special_functions(
 
     return typecast_exprt(expr.arguments()[0], expr.type());
   }
-  else if(identifier=="c::__builtin_object_size")
+  else if(identifier=="__builtin_object_size")
   {
     // this is a gcc extension to provide information about
     // object sizes at compile time
@@ -2583,7 +2575,7 @@ exprt c_typecheck_baset::do_special_functions(
     
     return tmp;
   }
-  else if(identifier=="c::__builtin_choose_expr")
+  else if(identifier=="__builtin_choose_expr")
   {
     // this is a gcc extension similar to ?:
     if(expr.arguments().size()!=3)
@@ -2600,7 +2592,7 @@ exprt c_typecheck_baset::do_special_functions(
     else
       return expr.arguments()[2];
   }
-  else if(identifier=="c::__builtin_constant_p")
+  else if(identifier=="__builtin_constant_p")
   {
     // this is a gcc extension to tell whether the argument
     // is known to be a compile-time constant
@@ -2636,7 +2628,7 @@ exprt c_typecheck_baset::do_special_functions(
 
     return tmp2;
   }
-  else if(identifier=="c::__builtin_classify_type")
+  else if(identifier=="__builtin_classify_type")
   {
     // This is a gcc extension that produces an integer
     // constant for the type of the argument expression.
@@ -2691,21 +2683,21 @@ exprt c_typecheck_baset::do_special_functions(
 
     return float_debug_expr;
   }
-  else if(identifier=="c::__sync_fetch_and_add" ||
-          identifier=="c::__sync_fetch_and_sub" ||
-          identifier=="c::__sync_fetch_and_or" ||
-          identifier=="c::__sync_fetch_and_and" ||
-          identifier=="c::__sync_fetch_and_xor" ||
-          identifier=="c::__sync_fetch_and_nand" ||
-          identifier=="c::__sync_add_and_fetch" ||
-          identifier=="c::__sync_sub_and_fetch" ||
-          identifier=="c::__sync_or_and_fetch" ||
-          identifier=="c::__sync_and_and_fetch" ||
-          identifier=="c::__sync_xor_and_fetch" ||
-          identifier=="c::__sync_nand_and_fetch" ||
-          identifier=="c::__sync_val_compare_and_swap" ||
-          identifier=="c::__sync_lock_test_and_set" ||
-          identifier=="c::__sync_lock_release")
+  else if(identifier=="__sync_fetch_and_add" ||
+          identifier=="__sync_fetch_and_sub" ||
+          identifier=="__sync_fetch_and_or" ||
+          identifier=="__sync_fetch_and_and" ||
+          identifier=="__sync_fetch_and_xor" ||
+          identifier=="__sync_fetch_and_nand" ||
+          identifier=="__sync_add_and_fetch" ||
+          identifier=="__sync_sub_and_fetch" ||
+          identifier=="__sync_or_and_fetch" ||
+          identifier=="__sync_and_and_fetch" ||
+          identifier=="__sync_xor_and_fetch" ||
+          identifier=="__sync_nand_and_fetch" ||
+          identifier=="__sync_val_compare_and_swap" ||
+          identifier=="__sync_lock_test_and_set" ||
+          identifier=="__sync_lock_release")
   {
     // These are polymorphic, see
     // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html

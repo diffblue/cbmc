@@ -1557,8 +1557,7 @@ exprt cpp_typecheck_resolvet::resolve(
   // do __CPROVER scope
   if(qualified)
   {
-    if(cpp_typecheck.cpp_scopes.current_scope().identifier==
-       "c::__CPROVER")
+    if(cpp_typecheck.cpp_scopes.current_scope().identifier=="__CPROVER")
       return do_builtin(base_name, template_args);
   }
   else

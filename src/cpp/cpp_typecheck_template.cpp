@@ -496,7 +496,6 @@ std::string cpp_typecheckt::class_template_identifier(
   const cpp_template_args_non_tct &partial_specialization_args)
 {
   std::string identifier=
-    language_prefix+
     cpp_scopes.current_scope().prefix+
     "template."+id2string(base_name) + "<";
 
@@ -894,7 +893,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     cpp_scopet &scope=cpp_scopes.current_scope();
     
     irep_idt base_name=declarator.name().get_sub().front().get(ID_identifier);
-    irep_idt identifier="c::"+scope.prefix+id2string(base_name);
+    irep_idt identifier=scope.prefix+id2string(base_name);
     
     // add to scope
     cpp_idt &id=scope.insert(base_name);

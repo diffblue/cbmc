@@ -248,8 +248,9 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       const irept &s0=parsed.get_sub().front().get_sub()[0];
       const irept &s1=parsed.get_sub().front().get_sub()[1];
 
+      // Examples:
       // ( (B0 true) )
-      // ( (|c::__CPROVER_pipe_count#1| (_ bv0 32)) )
+      // ( (|__CPROVER_pipe_count#1| (_ bv0 32)) )
       
       values[s0.id()]=s1;
     }

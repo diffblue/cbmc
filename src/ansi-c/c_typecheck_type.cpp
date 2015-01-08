@@ -381,8 +381,6 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         }
         else
         {
-          identifier=add_language_prefix(identifier);
-    
           // make visible now, later parameters might use it
           parameter_map[identifier]=type;
           parameter.set_base_name(declaration.declarator().get_base_name());
@@ -694,7 +692,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
     std::string typestr=type2name(compound_symbol.type);
     compound_symbol.base_name="#anon-"+typestr;
-    compound_symbol.name=add_language_prefix("tag-#anon#"+typestr);
+    compound_symbol.name="tag-#anon#"+typestr;
     identifier=compound_symbol.name;
     
     // We might already have the same anonymous union/struct,
@@ -708,7 +706,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   }
   else
   {
-    identifier=add_language_prefix(type.find(ID_tag).get(ID_identifier));
+    identifier=type.find(ID_tag).get(ID_identifier);
     
     // does it exist already?
     symbol_tablet::symbolst::iterator s_it=
@@ -1017,11 +1015,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     irep_idt base_name=
       declaration.declarator().get_base_name();
     
-    irep_idt name=
-      declaration.declarator().get_name();
-    
     irep_idt identifier=
-      language_prefix+id2string(name);
+      declaration.declarator().get_name();
       
     // get value
     const symbolt &symbol=lookup(identifier);
@@ -1117,8 +1112,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
   irept &tag=type.add(ID_tag);
   irep_idt base_name=tag.get(ID_C_base_name);
-  irep_idt identifier=add_language_prefix(tag.get(ID_identifier));
-  tag.set(ID_identifier, identifier);
+  irep_idt identifier=tag.get(ID_identifier);
 
   // Put into symbol table
   symbolt enum_tag_symbol;
@@ -1205,8 +1199,7 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
   
   irept &tag=type.add(ID_tag);
   irep_idt base_name=tag.get(ID_C_base_name);
-  irep_idt identifier=add_language_prefix(tag.get(ID_identifier));
-  tag.set(ID_identifier, identifier);
+  irep_idt identifier=tag.get(ID_identifier);
   
   // is it in the symbol table?    
   symbol_tablet::symbolst::const_iterator s_it=
@@ -1407,12 +1400,6 @@ Function: c_typecheck_baset::typecheck_symbol_type
 
 void c_typecheck_baset::typecheck_symbol_type(typet &type)
 {
-  {
-    // add prefix
-    symbol_typet &symbol_type=to_symbol_type(type);
-    symbol_type.set_identifier(add_language_prefix(symbol_type.get_identifier()));
-  }
-
   const irep_idt &identifier=
     to_symbol_type(type).get_identifier();
 

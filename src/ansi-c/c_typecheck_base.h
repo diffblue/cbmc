@@ -32,8 +32,7 @@ public:
     namespacet(_symbol_table),
     symbol_table(_symbol_table),
     module(_module),
-    mode("C"),
-    language_prefix("c::")
+    mode("C")
   {
   }
 
@@ -46,8 +45,7 @@ public:
     namespacet(_symbol_table1, _symbol_table2),
     symbol_table(_symbol_table1),
     module(_module),
-    mode("C"),
-    language_prefix("c::")
+    mode("C")
   {
   }
 
@@ -60,7 +58,6 @@ protected:
   symbol_tablet &symbol_table;
   const irep_idt module;
   const irep_idt mode;
-  const std::string language_prefix;
   irep_idt current_symbol_id;
 
   typedef hash_map_cont<irep_idt, typet, irep_id_hash> id_type_mapt;
@@ -272,11 +269,6 @@ protected:
   void typecheck_function_body(symbolt &symbol);
 
   virtual void do_initializer(symbolt &symbol);
-  
-  inline irep_idt add_language_prefix(const irep_idt id) const
-  {
-    return language_prefix+id2string(id);
-  }
   
   inline static bool is_numeric_type(const typet &src)
   {

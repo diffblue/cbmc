@@ -358,9 +358,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
       d_it!=declaration.declarators().end();
       d_it++)
   {
-    // add prefix
-    irep_idt identifier=
-      add_language_prefix(d_it->get_name());
+    irep_idt identifier=d_it->get_name();
 
     // look it up
     symbol_tablet::symbolst::iterator s_it=

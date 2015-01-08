@@ -95,10 +95,10 @@ void remove_internal_symbols(
 
   // we retain certain special ones
   find_symbols_sett special;
-  special.insert("c::argc'");  
-  special.insert("c::argv'");  
-  special.insert("c::envp'");  
-  special.insert("c::envp_size'");  
+  special.insert("argc'");  
+  special.insert("argv'");  
+  special.insert("envp'");  
+  special.insert("envp_size'");  
   special.insert(CPROVER_PREFIX "memory");  
   special.insert(CPROVER_PREFIX "initialize");
   special.insert(CPROVER_PREFIX "malloc_size");

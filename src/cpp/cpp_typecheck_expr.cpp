@@ -139,7 +139,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   {
     // these appear to have type "struct _GUID"
     // and they are lvalues!
-    expr.type()=symbol_typet("c::tag._GUID");
+    expr.type()=symbol_typet("tag._GUID");
     follow(expr.type());
     expr.set(ID_C_lvalue, true);
   }
@@ -1666,7 +1666,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
       symbol_exprt result;
       result.add_source_location()=source_location;
-      result.set_identifier(language_prefix+id2string(identifier));
+      result.set_identifier(identifier);
       code_typet t;
       t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
       t.make_ellipsis();

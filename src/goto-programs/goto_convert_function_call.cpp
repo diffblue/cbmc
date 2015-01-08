@@ -75,7 +75,7 @@ void goto_convertt::do_function_call(
   
   // the arguments of __noop do not get evaluated
   if(new_function.id()==ID_symbol &&
-     to_symbol_expr(new_function).get_identifier()=="c::__noop")
+     to_symbol_expr(new_function).get_identifier()=="__noop")
   {
     new_arguments.clear();
   }

@@ -96,9 +96,6 @@ static std::string clean_identifier(const irep_idt &id)
 {
   std::string dest=id2string(id);
 
-  if(has_prefix(dest, "c::"))
-    dest.erase(0,3);
-
   std::string::size_type c_pos=dest.find("::");
   if(c_pos!=std::string::npos &&
      dest.rfind("::")==c_pos)
@@ -170,7 +167,7 @@ void expr2ct::get_shorthands(const exprt &expr)
     if(!has_collision)
     {
       const symbolt *symbol;
-      has_collision=!ns.lookup("c::"+id2string(sh), symbol);
+      has_collision=!ns.lookup(sh, symbol);
     }
 
     if(!has_collision)

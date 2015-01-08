@@ -456,7 +456,7 @@ void cpp_declarator_convertert::get_final_identifier()
       // Is there already an `extern "C"' function with the same name
       // and the same signature?
       symbol_tablet::symbolst::const_iterator
-        c_it=cpp_typecheck.symbol_table.symbols.find("c::"+identifier);
+        c_it=cpp_typecheck.symbol_table.symbols.find(identifier);
         
       if(c_it!=cpp_typecheck.symbol_table.symbols.end() &&
          c_it->second.type.id()==ID_code &&
@@ -474,7 +474,6 @@ void cpp_declarator_convertert::get_final_identifier()
   }
 
   final_identifier=
-    "c::"+
     scope->prefix+
     identifier;
 }
@@ -693,7 +692,7 @@ Function: cpp_declarator_convertert::main_function_rules
 void cpp_declarator_convertert::main_function_rules(
   const symbolt &symbol)
 {
-  if(symbol.name=="c::main")
+  if(symbol.name==ID_main)
   {
     if(symbol.type.id()!=ID_code)
     {

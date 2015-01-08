@@ -128,7 +128,7 @@ bool java_entry_point(
   #if 0
   {
     symbol_tablet::symbolst::iterator init_it=
-      symbol_table.symbols.find("c::__CPROVER_initialize");
+      symbol_table.symbols.find("__CPROVER_initialize");
 
     if(init_it==symbol_table.symbols.end())
       throw "failed to find __CPROVER_initialize symbol";

@@ -98,13 +98,13 @@ bool static_lifetime_init(
     // special values
     if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
        identifier==CPROVER_PREFIX "memory" ||
-       identifier=="c::__func__" ||
-       identifier=="c::__FUNCTION__" ||
-       identifier=="c::__PRETTY_FUNCTION__" ||
-       identifier=="c::argc'" ||
-       identifier=="c::argv'" ||
-       identifier=="c::envp'" ||
-       identifier=="c::envp_size'")
+       identifier=="__func__" ||
+       identifier=="__FUNCTION__" ||
+       identifier=="__PRETTY_FUNCTION__" ||
+       identifier=="argc'" ||
+       identifier=="argv'" ||
+       identifier=="envp'" ||
+       identifier=="envp_size'")
       continue;
       
     // just for linking
@@ -313,8 +313,8 @@ bool entry_point(
     {
       namespacet ns(symbol_table);
 
-      const symbolt &argc_symbol=ns.lookup("c::argc'");
-      const symbolt &argv_symbol=ns.lookup("c::argv'");
+      const symbolt &argc_symbol=ns.lookup("argc'");
+      const symbolt &argv_symbol=ns.lookup("argv'");
       
       {
         // assume argc is at least one
@@ -347,7 +347,7 @@ bool entry_point(
       
       if(parameters.size()==3)
       {        
-        const symbolt &envp_size_symbol=ns.lookup("c::envp_size'");
+        const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         // assume envp_size is INTMAX-1
         mp_integer max;
@@ -417,8 +417,8 @@ bool entry_point(
 
       if(parameters.size()==3)
       {        
-        const symbolt &envp_symbol=ns.lookup("c::envp'");
-        const symbolt &envp_size_symbol=ns.lookup("c::envp_size'");
+        const symbolt &envp_symbol=ns.lookup("envp'");
+        const symbolt &envp_size_symbol=ns.lookup("envp_size'");
         
         // assume envp[envp_size] is NULL
         exprt null(ID_constant, envp_symbol.type.subtype());
@@ -470,7 +470,7 @@ bool entry_point(
         // do we need envp?
         if(parameters.size()==3)
         {
-          const symbolt &envp_symbol=ns.lookup("c::envp'");
+          const symbolt &envp_symbol=ns.lookup("envp'");
           exprt &op2=operands[2];
 
           const exprt &arg2=parameters[2];

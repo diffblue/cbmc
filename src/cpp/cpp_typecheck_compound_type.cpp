@@ -193,7 +193,6 @@ void cpp_typecheckt::typecheck_compound_type(
   }
 
   const irep_idt symbol_name=
-    language_prefix+
     dest_scope->prefix+
     "tag."+id2string(base_name);
 
@@ -431,7 +430,6 @@ void cpp_typecheckt::typecheck_compound_declarator(
     // Identifiers for methods include the scope prefix.
     // Identifiers for static members include the scope prefix.
     identifier=
-      language_prefix+
       cpp_scopes.current_scope().prefix+
       id2string(base_name);
   }
@@ -1574,7 +1572,6 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   irep_idt base_name="#anon_member"+i2string(components.size());
 
   irep_idt identifier=
-    language_prefix+
     cpp_scopes.current_scope().prefix+
     base_name.c_str();
 

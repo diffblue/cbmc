@@ -254,7 +254,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       continue;
       
     // magic value
-    if(symbol.name=="c::__CPROVER::constant_infinity_uint")
+    if(symbol.name=="__CPROVER::constant_infinity_uint")
       continue;
 
     // it has a non-code initializer already?
@@ -336,7 +336,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
   // Create the dynamic initialization procedure
   symbolt init_symbol;
 
-  init_symbol.name="c::#cpp_dynamic_initialization#"+id2string(module);
+  init_symbol.name="#cpp_dynamic_initialization#"+id2string(module);
   init_symbol.base_name="#cpp_dynamic_initialization#"+id2string(module);
   init_symbol.value.swap(init_block);
   init_symbol.mode=ID_cpp;

@@ -35,10 +35,8 @@ code_function_callt function_to_call(
 {
   // already there?
   
-  irep_idt full_id="c::"+id2string(id);
-
   symbol_tablet::symbolst::const_iterator s_it=
-    symbol_table.symbols.find(full_id);
+    symbol_table.symbols.find(id);
     
   if(s_it==symbol_table.symbols.end())
   {
@@ -52,13 +50,13 @@ code_function_callt function_to_call(
       code_typet::parametert(p));
 
     symbolt new_symbol;
-    new_symbol.name=full_id;
+    new_symbol.name=id;
     new_symbol.base_name=id;
     new_symbol.type=function_type;
     
     symbol_table.move(new_symbol);
 
-    s_it=symbol_table.symbols.find(full_id);
+    s_it=symbol_table.symbols.find(id);
     assert(s_it!=symbol_table.symbols.end());
   }
 
@@ -113,7 +111,7 @@ void function_enter(
     
     // don't instrument the function to be called,
     // or otherwise this will be recursive
-    if(f_it->first=="c::"+id2string(id))
+    if(f_it->first==id)
       continue;
     
     // patch in a call to `id' at the entry point
@@ -152,7 +150,7 @@ void function_exit(
     
     // don't instrument the function to be called,
     // or otherwise this will be recursive
-    if(f_it->first=="c::"+id2string(id))
+    if(f_it->first==id)
       continue;
     
     // patch in a call to `id' at the exit points
