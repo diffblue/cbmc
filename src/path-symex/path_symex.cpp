@@ -857,7 +857,9 @@ void path_symext::operator()(
     *state.get_instruction();
     
   #ifdef DEBUG
-  std::cout << "path_symext::operator(): " << instruction.type
+  std::cout << "path_symext::operator(): "
+            << state.pc() << " "
+            << instruction.type
             << std::endl;
   #endif
 
