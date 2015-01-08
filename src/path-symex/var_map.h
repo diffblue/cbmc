@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PATH_SYMEX_VAR_MAP_H
 #define CPROVER_PATH_SYMEX_VAR_MAP_H
 
+#include <iosfwd>
 #include <map>
 
 #include <util/namespace.h>
@@ -67,30 +68,10 @@ public:
   typedef std::map<irep_idt, var_infot> id_mapt;
   id_mapt id_map;
 
-  inline var_infot &operator()(
+  var_infot &operator()(
     const irep_idt &symbol,
     const irep_idt &suffix,
-    const typet &type)
-  {
-    std::string full_identifier=
-      id2string(symbol)+id2string(suffix);
-
-    std::pair<id_mapt::iterator, bool> result;
-
-    result=id_map.insert(std::pair<irep_idt, var_infot>(
-      full_identifier, var_infot()));
-  
-    if(result.second) // inserted?
-    {
-      result.first->second.full_identifier=full_identifier;
-      result.first->second.symbol=symbol;
-      result.first->second.suffix=suffix;
-      result.first->second.type=type;
-      init(result.first->second);
-    }
-    
-    return result.first->second;
-  }
+    const typet &type);
   
   inline var_infot &operator[](const irep_idt &full_identifier)
   {
@@ -100,6 +81,8 @@ public:
   void init(var_infot &var_info);
 
   const namespacet &ns;
+  
+  void output(std::ostream &) const;
 
 protected:
   unsigned shared_count, local_count;
