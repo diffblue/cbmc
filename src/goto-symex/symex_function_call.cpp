@@ -304,7 +304,7 @@ void goto_symext::symex_function_call_code(
     else
     {
       if(options.get_bool_option("unwinding-assertions"))
-        claim(false_exprt(), "recursion unwinding assertion", state);
+        vcc(false_exprt(), "recursion unwinding assertion", state);
       
       // add to state guard to prevent further assignments
       state.guard.add(false_exprt());

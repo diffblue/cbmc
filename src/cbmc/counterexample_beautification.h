@@ -39,11 +39,11 @@ protected:
     const exprt &expr,
     class prop_minimizet &prop_minimize);
 
-  symex_target_equationt::SSA_stepst::const_iterator get_failed_claim(
+  symex_target_equationt::SSA_stepst::const_iterator get_failed_property(
     const bv_cbmct &bv_cbmc,
     const symex_target_equationt &equation);
 
-  // the failed claim
+  // the failed property
   symex_target_equationt::SSA_stepst::const_iterator failed;
 };
 
