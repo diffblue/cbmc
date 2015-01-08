@@ -39,14 +39,11 @@ public:
   loc_vectort loc_vector;
   loc_reft entry_loc;
   
-  typedef std::vector<irep_idt> local_variablest;
-  
   class function_entryt
   {
   public:
     loc_reft first_loc;
     code_typet type;
-    local_variablest local_variables;
   };
   
   typedef std::map<irep_idt, function_entryt> function_mapt;
