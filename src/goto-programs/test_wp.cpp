@@ -22,13 +22,14 @@ int main(int argc, const char **argv)
 
     register_language(new_ansi_c_language);
     
-    ansi_c_languaget language;
     console_message_handlert message_handler;
+    ansi_c_languaget language;
+    language.set_message_handler(message_handler);
     
-    language.parse(std::cin, "", message_handler);
+    language.parse(std::cin, "");
     
     symbol_tablet symbol_table;
-    language.typecheck(symbol_table, "cin", message_handler);
+    language.typecheck(symbol_table, "cin");
 
     goto_functionst goto_functions;
 
