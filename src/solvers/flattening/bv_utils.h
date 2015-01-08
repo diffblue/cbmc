@@ -59,8 +59,6 @@ public:
   // Use the recursive multiply relation to break into multiplier of at most this many bits
   int recursive_multiply_minimum;
 
-  // TODO : optimal multipliers for N-bits
-
   // TODO : what about Booth encoding?
 
   typedef enum {
@@ -69,6 +67,7 @@ public:
     BLOCK3,
     BLOCK4,
     BLOCK5
+    // TODO : optimal multipliers for N-bits
   } partial_product_encodingt;
   partial_product_generationt partial_product_style;
 
@@ -79,13 +78,15 @@ public:
     TREE_REDUCTION,
     ADD3_LINEAR_REDUCTION,
     ADD3_TREE_REDUCTION,
-    CARRY_SAVE_LINEAR_REDUCTION, // Needs more parameters
-    CARRY_SAVE_TREE_REDUCTION,  // Needs more parameters
 
     /** Bit level reductions **/
     WALLACE_TREE,
     DADDA_TREE,
-    UNARY_TO_BINARY_REDUCTION   // Not sure about how best to use this
+
+    /** Carry-save reductions **/
+    UNARY_TO_BINARY_REDUCTION,   // Not sure about how best to use this
+    CARRY_SAVE_LINEAR_REDUCTION, // Needs more parameters
+    CARRY_SAVE_TREE_REDUCTION    // Needs more parameters
   } reduction_encodingt;
   reduction_encodingt reduction_style;
 
