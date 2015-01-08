@@ -264,7 +264,7 @@ int goto_instrument_parseoptionst::doit()
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_functions);
       
-      const symbolt &symbol=ns.lookup("c::main");
+      const symbolt &symbol=ns.lookup(ID_main);
       symbol_exprt main(symbol.name, symbol.type);
       
       std::cout << rw_set_functiont(value_set_analysis, ns, goto_functions, main);

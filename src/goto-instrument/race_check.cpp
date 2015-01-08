@@ -173,10 +173,10 @@ bool is_shared(
 
   if(identifier==CPROVER_PREFIX "alloc" ||
      identifier==CPROVER_PREFIX "alloc_size" ||
-     identifier=="c::stdin" ||
-     identifier=="c::stdout" ||
-     identifier=="c::stderr" ||
-     identifier=="c::sys_nerr" ||
+     identifier=="stdin" ||
+     identifier=="stdout" ||
+     identifier=="stderr" ||
+     identifier=="sys_nerr" ||
      has_prefix(id2string(identifier), "symex::invalid_object") ||
      has_prefix(id2string(identifier), "symex_dynamic::dynamic_object"))
     return false; // no race check

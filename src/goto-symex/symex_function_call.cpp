@@ -243,7 +243,7 @@ void goto_symext::symex_function_call_symbol(
   const irep_idt &identifier=
     to_symbol_expr(code.function()).get_identifier();
     
-  if(identifier=="c::CBMC_trace")
+  if(identifier=="CBMC_trace")
   {
     symex_trace(state, code);
   }

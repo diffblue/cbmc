@@ -2216,7 +2216,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
           irep_idt suffix;
           suffix=expr.type().get(ID_C_c_type);
 
-          if(symbol_table.symbols.find("c::nondet_"+id2string(suffix))==
+          if(symbol_table.symbols.find("nondet_"+id2string(suffix))==
              symbol_table.symbols.end())
             base_name="nondet_"+id2string(suffix);
         }
@@ -2225,7 +2225,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
         {
           unsigned count;
           for(count=0;
-              symbol_table.symbols.find("c::nondet_"+i2string(count))!=
+              symbol_table.symbols.find("nondet_"+i2string(count))!=
               symbol_table.symbols.end();
               count++);
           base_name="nondet_"+i2string(count);
@@ -2236,7 +2236,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
         
         symbolt symbol;
         symbol.base_name=base_name;
-        symbol.name="c::"+id2string(base_name);
+        symbol.name=base_name;
         symbol.type=code_type;
         id=symbol.name;
         

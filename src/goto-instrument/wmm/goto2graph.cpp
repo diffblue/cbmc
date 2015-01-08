@@ -55,12 +55,11 @@ bool inline instrumentert::local(const irep_idt& id)
 
   if(identifier==CPROVER_PREFIX "alloc" ||
     identifier==CPROVER_PREFIX "alloc_size" ||
-    identifier=="c::stdin" ||
-    identifier=="c::stdout" ||
-    identifier=="c::stderr" ||
-    identifier=="c::sys_nerr" ||
-    has_prefix(identifier, "__unbuffered_") ||
-    has_prefix(identifier, "c::__unbuffered_") )
+    identifier=="stdin" ||
+    identifier=="stdout" ||
+    identifier=="stderr" ||
+    identifier=="sys_nerr" ||
+    has_prefix(identifier, "__unbuffered_"))
     return true;
  
   const size_t pos = identifier.find("[]");

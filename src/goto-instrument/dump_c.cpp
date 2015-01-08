@@ -209,7 +209,7 @@ void dump_ct::operator()(std::ostream &os)
 
       if(func_entry!=goto_functions.function_map.end() &&
          func_entry->second.body_available &&
-         (symbol.name=="c::main" ||
+         (symbol.name==ID_main ||
           (!config.main.empty() && symbol.name==config.main)))
         skip_function_main=true;
     }
@@ -598,7 +598,7 @@ Purpose:
 #define ADD_TO_SYSTEM_LIBRARY(v, header) \
   for(size_t i=0; i<sizeof(v)/sizeof(char*); ++i) \
     system_library_map.insert( \
-      std::make_pair(std::string("c::")+v[i], header))
+      std::make_pair(v[i], header))
 
 void dump_ct::init_system_library_map()
 {
@@ -776,13 +776,13 @@ bool dump_ct::ignore(const symbolt &symbol)
   const std::string &name_str=id2string(symbol.name);
 
   if(has_prefix(name_str, CPROVER_PREFIX) ||
-     name_str=="c::__func__" ||
-     name_str=="c::__FUNCTION__" ||
-     name_str=="c::__PRETTY_FUNCTION__" ||
-     name_str=="c::argc'" ||
-     name_str=="c::argv'" ||
-     name_str=="c::envp'" ||
-     name_str=="c::envp_size'")
+     name_str=="__func__" ||
+     name_str=="__FUNCTION__" ||
+     name_str=="__PRETTY_FUNCTION__" ||
+     name_str=="argc'" ||
+     name_str=="argv'" ||
+     name_str=="envp'" ||
+     name_str=="envp_size'")
     return true;
 
   const std::string &file_str=id2string(symbol.location.get_file());
@@ -794,11 +794,11 @@ bool dump_ct::ignore(const symbolt &symbol)
       file_str=="gcc_builtin_headers_mips.h" ||
       file_str=="gcc_builtin_headers_power.h" ||
       file_str=="gcc_builtin_headers_generic.h") &&
-     has_prefix(name_str, "c::__builtin_"))
+     has_prefix(name_str, "__builtin_"))
     return true;
 
-  if(name_str=="c::__builtin_va_start" ||
-     name_str=="c::__builtin_va_end" ||
+  if(name_str=="__builtin_va_start" ||
+     name_str=="__builtin_va_end" ||
      symbol.name==ID_gcc_builtin_va_arg)
   {
     system_headers.insert("stdarg.h");
@@ -1010,7 +1010,7 @@ void dump_ct::convert_function_declaration(
   }
 
   if(symbol.name!=goto_functionst::entry_point() &&
-     symbol.name!="c::main")
+     symbol.name!=ID_main)
   {
     os_decl << "// " << symbol.name << std::endl;
     os_decl << "// " << symbol.location << std::endl;

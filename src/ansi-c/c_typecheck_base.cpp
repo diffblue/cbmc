@@ -99,7 +99,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   // set a few flags
   symbol.is_lvalue=!symbol.is_type && !symbol.is_macro;
   
-  irep_idt root_name=add_language_prefix(symbol.base_name);
+  irep_idt root_name=symbol.base_name;
   irep_idt new_name=symbol.name;
 
   if(symbol.is_file_local)
@@ -141,9 +141,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
   else
   {
-    // just strip the c::
-    symbol.pretty_name=
-      std::string(id2string(new_name), language_prefix.size(), std::string::npos);
+    symbol.pretty_name=new_name;
   }
   
   // see if we have it already
@@ -676,7 +674,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   typecheck_code(to_code(symbol.value));
 
   // special case for main()  
-  if(symbol.name=="c::main")
+  if(symbol.name==ID_main)
     add_argc_argv(symbol);
 
   // check the labels

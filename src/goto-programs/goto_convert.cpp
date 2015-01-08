@@ -869,9 +869,9 @@ void goto_convertt::convert_cpp_delete(
   irep_idt delete_identifier;
   
   if(code.get_statement()==ID_cpp_delete_array)
-    delete_identifier="c::__delete_array";
+    delete_identifier="__delete_array";
   else if(code.get_statement()==ID_cpp_delete)
-    delete_identifier="c::__delete";
+    delete_identifier="__delete";
   else
     assert(false);
   
