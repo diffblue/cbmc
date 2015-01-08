@@ -29,7 +29,6 @@ Function: boolbv_widtht::boolbv_widtht
 
 boolbv_widtht::boolbv_widtht(const namespacet &_ns):ns(_ns)
 {
-  cache=new cachet;
 }
 
 /*******************************************************************\
@@ -46,7 +45,6 @@ Function: boolbv_widtht::~boolbv_widtht
 
 boolbv_widtht::~boolbv_widtht()
 {
-  delete cache;
 }
 
 /*******************************************************************\
@@ -66,7 +64,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   // check cache first
 
   std::pair<cachet::iterator, bool> cache_result=
-    cache->insert(std::pair<typet, entryt>(type, entryt()));
+    cache.insert(std::pair<typet, entryt>(type, entryt()));
     
   entryt &entry=cache_result.first->second;
 
@@ -115,6 +113,11 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   }
   else if(type_id==ID_bool)
     entry.total_width=1;
+  else if(type_id==ID_c_bool)
+  {
+    entry.total_width=to_c_bool_type(type).get_width();
+    assert(entry.total_width!=0);
+  }
   else if(type_id==ID_signedbv)
   {
     entry.total_width=to_signedbv_type(type).get_width();
@@ -240,6 +243,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     entry=get_entry(ns.follow_tag(to_union_tag_type(type)));
   else if(type_id==ID_c_enum_tag)
     entry=get_entry(ns.follow_tag(to_c_enum_tag_type(type)));
+  else if(type_id==ID_c_bit_field)
+  {
+    entry.total_width=to_c_bit_field_type(type).get_width();
+  }
   
   return entry;
 }
@@ -264,49 +271,3 @@ const boolbv_widtht::membert &boolbv_widtht::get_member(
 
   return get_entry(type).members[component_number];
 }
-
-/*******************************************************************\
-
-Function: boolbv_get_width
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-bool boolbv_get_width(
-  const typet &type,
-  std::size_t &width,
-  const namespacet &ns)
-{
-  boolbv_widtht boolbv_width(ns);
-  width=boolbv_width(type);
-  return false;
-}
-
-/*******************************************************************\
-
-Function: boolbv_member_offset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool boolbv_member_offset(
-  const struct_typet &type,
-  const irep_idt &member,
-  std::size_t &width,
-  const namespacet &ns)
-{
-  boolbv_widtht boolbv_width(ns);
-  return boolbv_width.get_member(type, member).offset;
-}
-#endif

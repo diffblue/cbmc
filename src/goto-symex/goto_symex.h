@@ -45,8 +45,8 @@ public:
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
     symex_targett &_target):
-    total_claims(0),
-    remaining_claims(0),
+    total_vccs(0),
+    remaining_vccs(0),
     constant_propagation(true),
     new_symbol_table(_new_symbol_table),
     ns(_ns),
@@ -89,7 +89,7 @@ public:
   virtual void symex_step_goto(statet &state, bool taken);
   
   // statistics
-  unsigned total_claims, remaining_claims;
+  unsigned total_vccs, remaining_vccs;
 
   bool constant_propagation;
 
@@ -160,10 +160,11 @@ protected:
     const goto_functionst &goto_functions,
     statet &state);    
     
-  virtual void claim(
+  virtual void vcc(
     const exprt &expr,
     const std::string &msg,
     statet &state);
+    
   virtual void symex_assume(statet &state, const exprt &cond);
     
   // gotos
@@ -216,9 +217,9 @@ protected:
     const unsigned thread_nr,
     unsigned unwind);
 
-  void argument_assignments(
+  void parameter_assignments(
     const irep_idt function_identifier,
-    const code_typet &function_type,
+    const goto_functionst::goto_functiont &goto_function,
     statet &state,
     const exprt::operandst &arguments);
 
@@ -240,16 +241,16 @@ protected:
   
   //virtual void symex_block(statet &state, const codet &code);
   virtual void symex_assign(statet &state, const code_assignt &code);
+
+  typedef symex_targett::assignment_typet assignment_typet;
   
-  typedef enum { VISIBLE, HIDDEN } visibilityt;
-  
-  void symex_assign_rec(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_symbol(statet &state, const symbol_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_typecast(statet &state, const typecast_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_array(statet &state, const index_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_struct_member(statet &state, const member_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_if(statet &state, const if_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_byte_extract(statet &state, const byte_extract_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_rec(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_symbol(statet &state, const symbol_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_typecast(statet &state, const typecast_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_array(statet &state, const index_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_struct_member(statet &state, const member_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_if(statet &state, const if_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_byte_extract(statet &state, const byte_extract_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
   
   static exprt add_to_lhs(const exprt &lhs, const exprt &what);
   

@@ -139,7 +139,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   {
     // these appear to have type "struct _GUID"
     // and they are lvalues!
-    expr.type()=symbol_typet("c::tag._GUID");
+    expr.type()=symbol_typet("tag._GUID");
     follow(expr.type());
     expr.set(ID_C_lvalue, true);
   }
@@ -1623,7 +1623,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   const cpp_typecheck_fargst &fargs)
 {
   source_locationt source_location=
-    to_cpp_name(expr).location();
+    to_cpp_name(expr).source_location();
 
   if(expr.get_sub().size()==1 &&
      expr.get_sub()[0].id()==ID_name)
@@ -1666,7 +1666,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
       symbol_exprt result;
       result.add_source_location()=source_location;
-      result.set_identifier(language_prefix+id2string(identifier));
+      result.set_identifier(identifier);
       code_typet t;
       t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
       t.make_ellipsis();
@@ -2313,10 +2313,10 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
+void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 {
   if(expr.operands().size()!=2)
-    throw "assignment side-effect expected to have two operands";
+    throw "assignment side effect expected to have two operands";
     
   typet type0=expr.op0().type();
 
@@ -2378,7 +2378,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
   cpp_name.get_sub().front().set(ID_C_source_location, expr.source_location());
 
   // expr.op0() is already typechecked
-  exprt already_typechecked("already_typechecked");
+  exprt already_typechecked(ID_already_typechecked);
   already_typechecked.move_to_operands(expr.op0());
 
   exprt member(ID_member);
@@ -2392,7 +2392,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
 
   typecheck_side_effect_function_call(new_expr);
 
-  expr.swap(new_expr);
+  expr=new_expr;
 }
 
 /*******************************************************************\

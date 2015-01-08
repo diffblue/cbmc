@@ -277,7 +277,7 @@ protected:
     const struct_union_typet &struct_union_type);
 
   void full_member_initialization(
-    const struct_typet &struct_type,
+    const struct_union_typet &struct_union_type,
     irept &initializers);
 
   bool find_cpctor(const symbolt& symbol)const;
@@ -466,7 +466,7 @@ protected:
   void typecheck_expr_sizeof(exprt &expr);
   void typecheck_expr_delete(exprt &expr);
   void typecheck_expr_side_effect(side_effect_exprt &expr);
-  void typecheck_side_effect_assignment(exprt &expr);
+  void typecheck_side_effect_assignment(side_effect_exprt &expr);
   void typecheck_side_effect_inc_dec(side_effect_exprt &expr);
   void typecheck_expr_typecast(exprt &expr);
   void typecheck_expr_index(exprt &expr);

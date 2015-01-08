@@ -689,7 +689,7 @@ inline char *strchr(const char *src, int c)
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(src), "strchr zero-termination of string argument");
-  _Bool found;
+  __CPROVER_bool found;
   __CPROVER_size_t i;
   return found?src+i:0;
   #else
@@ -715,7 +715,7 @@ inline char *strrchr(const char *src, int c)
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(src), "strrchr zero-termination of string argument");
-  _Bool found;
+  __CPROVER_bool found;
   __CPROVER_size_t i;
   return found?((char *)src)+i:0;
   #else

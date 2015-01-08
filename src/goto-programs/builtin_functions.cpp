@@ -207,7 +207,7 @@ void goto_convertt::do_printf(
   const irep_idt &f_id=function.get(ID_identifier);
 
   if(f_id==CPROVER_PREFIX "printf" ||
-     f_id=="c::printf")
+     f_id=="printf")
   {
     typet return_type=static_cast<const typet &>(function.type().find(ID_return_type));
     side_effect_exprt printf_code(ID_printf, return_type);
@@ -457,7 +457,7 @@ void goto_convertt::do_cpp_new(
   {
     // call __new or __new_array
     exprt new_symbol=
-      ns.lookup(new_array?"c::__new_array":"c::__new").symbol_expr();
+      ns.lookup(new_array?"__new_array":"__new").symbol_expr();
     
     const code_typet &code_type=
       to_code_type(new_symbol.type());
@@ -487,7 +487,7 @@ void goto_convertt::do_cpp_new(
   {
     // call __placement_new
     exprt new_symbol=
-      ns.lookup(new_array?"c::__placement_new_array":"c::__placement_new").symbol_expr();
+      ns.lookup(new_array?"__placement_new_array":"__placement_new").symbol_expr();
     
     const code_typet &code_type=
       to_code_type(new_symbol.type());
@@ -929,7 +929,7 @@ void goto_convertt::do_function_call_symbol(
     t->code=codet(ID_user_specified_predicate);
   }
   else if(identifier==CPROVER_PREFIX "assume" ||
-          identifier=="c::__VERIFIER_assume")
+          identifier=="__VERIFIER_assume")
   {
     if(arguments.size()!=1)
     {
@@ -952,7 +952,7 @@ void goto_convertt::do_function_call_symbol(
       throw id2string(identifier)+" expected not to have LHS";
     }
   }
-  else if(identifier=="c::__VERIFIER_error")
+  else if(identifier=="__VERIFIER_error")
   {
     if(!arguments.empty())
     {
@@ -995,7 +995,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set("user-provided", true);
     t->source_location.set_property_class(ID_assertion);    
   }
-  else if(identifier=="c::assert" &&
+  else if(identifier=="assert" &&
           !ns.lookup(identifier).location.get_function().empty())
   {
     if(arguments.size()!=1)
@@ -1054,27 +1054,27 @@ void goto_convertt::do_function_call_symbol(
     do_printf(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "input" ||
-          identifier=="c::__CPROVER::input")
+          identifier=="__CPROVER::input")
   {
     do_input(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "cover" ||
-          identifier=="c::__CPROVER::cover")
+          identifier=="__CPROVER::cover")
   {
     do_cover(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "output" ||
-          identifier=="c::__CPROVER::output")
+          identifier=="__CPROVER::output")
   {
     do_output(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "atomic_begin" ||
-          identifier=="c::__CPROVER::atomic_begin")
+          identifier=="__CPROVER::atomic_begin")
   {
     do_atomic_begin(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "atomic_end" ||
-          identifier=="c::__CPROVER::atomic_end")
+          identifier=="__CPROVER::atomic_end")
   {
     do_atomic_end(lhs, function, arguments, dest);
   }
@@ -1086,8 +1086,8 @@ void goto_convertt::do_function_call_symbol(
   {
     do_prob_uniform(lhs, function, arguments, dest);
   }
-  else if(has_prefix(id2string(identifier), "c::nondet_") ||
-          has_prefix(id2string(identifier), "c::__VERIFIER_nondet_"))
+  else if(has_prefix(id2string(identifier), "nondet_") ||
+          has_prefix(id2string(identifier), "__VERIFIER_nondet_"))
   {
     // make it a side effect if there is an LHS
     if(lhs.is_nil()) return;
@@ -1096,7 +1096,7 @@ void goto_convertt::do_function_call_symbol(
     
     // We need to special-case for _Bool, which
     // can only be 0 or 1.
-    if(lhs.type().get(ID_C_c_type)==ID_bool)
+    if(lhs.type().id()==ID_c_bool)
     {
       rhs=side_effect_expr_nondett(bool_typet());
       rhs.add_source_location()=function.source_location();
@@ -1134,25 +1134,25 @@ void goto_convertt::do_function_call_symbol(
     do_array_set(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "array_equal" ||
-          identifier=="c::__CPROVER::array_equal")
+          identifier=="__CPROVER::array_equal")
   {
     do_array_equal(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "array_copy" ||
-          identifier=="c::__CPROVER::array_equal")
+          identifier=="__CPROVER::array_equal")
   {
     do_array_copy(lhs, function, arguments, dest);
   }
-  else if(identifier=="c::printf")
+  else if(identifier=="printf")
   /*
-          identifier=="c::fprintf" ||
-          identifier=="c::sprintf" ||
-          identifier=="c::snprintf")
+          identifier=="fprintf" ||
+          identifier=="sprintf" ||
+          identifier=="snprintf")
   */
   {
     do_printf(lhs, function, arguments, dest);
   }
-  else if(identifier=="c::__assert_fail")
+  else if(identifier=="__assert_fail")
   {
     // __assert_fail is Linux
     // These take four arguments:
@@ -1175,7 +1175,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set_comment(description);
     // we ignore any LHS
   }
-  else if(identifier=="c::_assert")
+  else if(identifier=="_assert")
   {
     // MingW has
     // void _assert (const char*, const char*, int);
@@ -1199,7 +1199,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set_comment(description);
     // we ignore any LHS
   }
-  else if(identifier=="c::__assert_c99")
+  else if(identifier=="__assert_c99")
   {
     // This has been seen in Solaris 11.
     // Signature:
@@ -1222,8 +1222,8 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set_comment(description);
     // we ignore any LHS
   }
-  else if(identifier=="c::__assert_rtn" ||
-          identifier=="c::__assert")
+  else if(identifier=="__assert_rtn" ||
+          identifier=="__assert")
   {
     // __assert_rtn has been seen on MacOS;
     // __assert is FreeBSD and Solaris 11.
@@ -1258,7 +1258,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set_comment(description);
     // we ignore any LHS
   }
-  else if(identifier=="c::__assert_func")
+  else if(identifier=="__assert_func")
   {
     // __assert_func is newlib (used by, e.g., cygwin)
     // These take four arguments:
@@ -1280,7 +1280,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set_comment(description);
     // we ignore any LHS
   }
-  else if(identifier=="c::_wassert")
+  else if(identifier=="_wassert")
   {
     // This is Windows. The arguments are
     // L"expression", L"file.c", line
@@ -1320,11 +1320,11 @@ void goto_convertt::do_function_call_symbol(
       t->code.set(kind, true);
     }
   }
-  else if(identifier=="c::__builtin_prefetch")
+  else if(identifier=="__builtin_prefetch")
   {
     // does nothing
   }
-  else if(identifier=="c::__builtin_unreachable")
+  else if(identifier=="__builtin_unreachable")
   {
     // says something like assert(false);
   }
@@ -1365,7 +1365,7 @@ void goto_convertt::do_function_call_symbol(
       t2->code=code_assignt(lhs, rhs);
     }
   }
-  else if(identifier=="c::__builtin_va_copy")
+  else if(identifier=="__builtin_va_copy")
   {
     if(arguments.size()!=2)
     {
@@ -1386,7 +1386,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location=function.source_location();
     t->code=code_assignt(dest_expr, src_expr);
   }
-  else if(identifier=="c::__builtin_va_start")
+  else if(identifier=="__builtin_va_start")
   {
     // Set the list argument to be the address of the
     // parameter argument.
@@ -1410,7 +1410,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location=function.source_location();
     t->code=code_assignt(dest_expr, src_expr);
   }
-  else if(identifier=="c::__builtin_va_end")
+  else if(identifier=="__builtin_va_end")
   {
     // Invalidates the argument. We do so by setting it to NULL.
     if(arguments.size()!=1)
@@ -1431,12 +1431,12 @@ void goto_convertt::do_function_call_symbol(
     t->source_location=function.source_location();
     t->code=code_assignt(dest_expr, gen_zero(dest_expr.type()));
   }
-  else if(identifier=="c::__sync_fetch_and_add" ||
-          identifier=="c::__sync_fetch_and_sub" ||
-          identifier=="c::__sync_fetch_and_or" ||
-          identifier=="c::__sync_fetch_and_and" ||
-          identifier=="c::__sync_fetch_and_xor" ||
-          identifier=="c::__sync_fetch_and_nand")
+  else if(identifier=="__sync_fetch_and_add" ||
+          identifier=="__sync_fetch_and_sub" ||
+          identifier=="__sync_fetch_and_or" ||
+          identifier=="__sync_fetch_and_and" ||
+          identifier=="__sync_fetch_and_xor" ||
+          identifier=="__sync_fetch_and_nand")
   {
     // type __sync_fetch_and_OP(type *ptr, type value, ...)
     // { tmp = *ptr; *ptr OP= value; return tmp; }
@@ -1470,12 +1470,12 @@ void goto_convertt::do_function_call_symbol(
     }
     
     irep_idt op_id=
-      identifier=="c::__sync_fetch_and_add"?ID_plus:
-      identifier=="c::__sync_fetch_and_sub"?ID_minus:
-      identifier=="c::__sync_fetch_and_or"?ID_bitor:
-      identifier=="c::__sync_fetch_and_and"?ID_bitand:
-      identifier=="c::__sync_fetch_and_xor"?ID_bitxor:
-      identifier=="c::__sync_fetch_and_nand"?ID_bitnand:
+      identifier=="__sync_fetch_and_add"?ID_plus:
+      identifier=="__sync_fetch_and_sub"?ID_minus:
+      identifier=="__sync_fetch_and_or"?ID_bitor:
+      identifier=="__sync_fetch_and_and"?ID_bitand:
+      identifier=="__sync_fetch_and_xor"?ID_bitxor:
+      identifier=="__sync_fetch_and_nand"?ID_bitnand:
       ID_nil;
     
     // build *ptr=*ptr OP arguments[1];
@@ -1496,12 +1496,12 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->source_location=function.source_location();
   }
-  else if(identifier=="c::__sync_add_and_fetch" ||
-          identifier=="c::__sync_sub_and_fetch" ||
-          identifier=="c::__sync_or_and_fetch" ||
-          identifier=="c::__sync_and_and_fetch" ||
-          identifier=="c::__sync_xor_and_fetch" ||
-          identifier=="c::__sync_nand_and_fetch")
+  else if(identifier=="__sync_add_and_fetch" ||
+          identifier=="__sync_sub_and_fetch" ||
+          identifier=="__sync_or_and_fetch" ||
+          identifier=="__sync_and_and_fetch" ||
+          identifier=="__sync_xor_and_fetch" ||
+          identifier=="__sync_nand_and_fetch")
   {
     // type __sync_OP_and_fetch (type *ptr, type value, ...)
     // { *ptr OP= value; return *ptr; }
@@ -1525,12 +1525,12 @@ void goto_convertt::do_function_call_symbol(
     t1->source_location=function.source_location();
 
     irep_idt op_id=
-      identifier=="c::__sync_add_and_fetch"?ID_plus:
-      identifier=="c::__sync_sub_and_fetch"?ID_minus:
-      identifier=="c::__sync_or_and_fetch"?ID_bitor:
-      identifier=="c::__sync_and_and_fetch"?ID_bitand:
-      identifier=="c::__sync_xor_and_fetch"?ID_bitxor:
-      identifier=="c::__sync_nand_and_fetch"?ID_bitnand:
+      identifier=="__sync_add_and_fetch"?ID_plus:
+      identifier=="__sync_sub_and_fetch"?ID_minus:
+      identifier=="__sync_or_and_fetch"?ID_bitor:
+      identifier=="__sync_and_and_fetch"?ID_bitand:
+      identifier=="__sync_xor_and_fetch"?ID_bitxor:
+      identifier=="__sync_nand_and_fetch"?ID_bitnand:
       ID_nil;
     
     // build *ptr=*ptr OP arguments[1];
@@ -1561,7 +1561,7 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->source_location=function.source_location();
   }
-  else if(identifier=="c::__sync_bool_compare_and_swap")
+  else if(identifier=="__sync_bool_compare_and_swap")
   {
     // These builtins perform an atomic compare and swap. That is, if the
     // current value of *ptr is oldval, then write newval into *ptr.  The
@@ -1625,7 +1625,7 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->source_location=function.source_location();
   }
-  else if(identifier=="c::__sync_val_compare_and_swap")
+  else if(identifier=="__sync_val_compare_and_swap")
   {
     // type __sync_val_compare_and_swap (type *ptr, type oldval, type newval, ...)
     if(arguments.size()<3)
@@ -1679,7 +1679,7 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->source_location=function.source_location();
   }
-  else if(identifier=="c::__sync_lock_test_and_set")
+  else if(identifier=="__sync_lock_test_and_set")
   {
     // type __sync_lock_test_and_set (type *ptr, type value, ...)
     
@@ -1692,7 +1692,7 @@ void goto_convertt::do_function_call_symbol(
     // value to store is the immediate constant 1.  The exact value
     // actually stored in *ptr is implementation defined.
   }
-  else if(identifier=="c::__sync_lock_release")
+  else if(identifier=="__sync_lock_release")
   {
     // This builtin is not a full barrier, but rather an acquire barrier.
     // This means that references after the builtin cannot move to (or be

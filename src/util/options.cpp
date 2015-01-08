@@ -25,28 +25,9 @@ Function: optionst::set_option
 void optionst::set_option(const std::string &option,
                           const std::string &value)
 {
-  std::pair<option_mapt::iterator, bool>
-    result=option_map.insert(option_mapt::value_type(option, value));
-
-  if(!result.second) result.first->second=value;
-}
-
-/*******************************************************************\
-
-Function: optionst::set_option
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void optionst::set_option(const std::string &option,
-                          const char *value)
-{
-  set_option(option, std::string(value));
+  value_listt &value_list=option_map[option];
+  value_list.clear();
+  value_list.push_back(value);
 }
 
 /*******************************************************************\
@@ -171,11 +152,37 @@ Function: optionst::get_option
 
 const std::string optionst::get_option(const std::string &option) const
 {
-  std::map<std::string, std::string>::const_iterator it=
+  option_mapt::const_iterator it=
     option_map.find(option);
 
-  if(it!=option_map.end()) return it->second;
-
-  return "";
+  if(it==option_map.end())
+    return std::string();
+  else if(it->second.empty())
+    return std::string();
+  else
+    return it->second.front();
 }
 
+/*******************************************************************\
+
+Function: optionst::get_list_option
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const optionst::value_listt &optionst::get_list_option(
+  const std::string &option) const
+{
+  option_mapt::const_iterator it=
+    option_map.find(option);
+
+  if(it==option_map.end())
+    return empty_list;
+  else
+    return it->second;
+}

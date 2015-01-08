@@ -43,7 +43,7 @@ bool goto_symext::get_unwind_recursion(
 
 /*******************************************************************\
 
-Function: goto_symext::argument_assignments
+Function: goto_symext::parameter_assignments
 
   Inputs:
 
@@ -53,17 +53,20 @@ Function: goto_symext::argument_assignments
 
 \*******************************************************************/
 
-void goto_symext::argument_assignments(
+void goto_symext::parameter_assignments(
   const irep_idt function_identifier,
-  const code_typet &function_type,
+  const goto_functionst::goto_functiont &goto_function,
   statet &state,
   const exprt::operandst &arguments)
 {
-  // iterates over the operands
+  const code_typet &function_type=goto_function.type;
+
+  // iterates over the arguments
   exprt::operandst::const_iterator it1=arguments.begin();
 
-  // these are the types of the arguments
-  const code_typet::parameterst &parameter_types=function_type.parameters();
+  // these are the types of the parameters
+  const code_typet::parameterst &parameter_types=
+    function_type.parameters();
 
   // iterates over the types of the parameters
   for(code_typet::parameterst::const_iterator
@@ -82,8 +85,8 @@ void goto_symext::argument_assignments(
 
     const code_typet::parametert &parameter=*it2;
 
-    // this is the type the n-th argument should be
-    const typet &arg_type=parameter.type();
+    // this is the type that the n-th argument should have
+    const typet &parameter_type=parameter.type();
 
     const irep_idt &identifier=parameter.get_identifier();
     
@@ -101,37 +104,47 @@ void goto_symext::argument_assignments(
     {
       exprt rhs=*it1;
 
-      // it should be the same exact type
-      if(!base_type_eq(arg_type, rhs.type(), ns))
+      // It should be the same exact type.
+      if(!base_type_eq(parameter_type, rhs.type(), ns))
       {
-        const typet &f_arg_type=ns.follow(arg_type);
+        const typet &f_parameter_type=ns.follow(parameter_type);
         const typet &f_rhs_type=ns.follow(rhs.type());
       
-        // we are willing to do some limited conversion
-        if((f_arg_type.id()==ID_signedbv ||
-            f_arg_type.id()==ID_unsignedbv ||
-            f_arg_type.id()==ID_bool ||
-            f_arg_type.id()==ID_pointer) &&
+        // But we are willing to do some limited conversion.
+        // This is highly dubious, obviously.
+        if((f_parameter_type.id()==ID_signedbv ||
+            f_parameter_type.id()==ID_unsignedbv ||
+            f_parameter_type.id()==ID_c_enum_tag ||
+            f_parameter_type.id()==ID_bool ||
+            f_parameter_type.id()==ID_pointer) &&
            (f_rhs_type.id()==ID_signedbv ||
             f_rhs_type.id()==ID_unsignedbv ||
+            f_rhs_type.id()==ID_c_bit_field ||
+            f_rhs_type.id()==ID_c_enum_tag ||
             f_rhs_type.id()==ID_bool ||
             f_rhs_type.id()==ID_pointer))
         {
-          rhs.make_typecast(arg_type);
+          rhs.make_typecast(parameter_type);
         }
         else
         {
-          std::string error="function call: argument \""+
+          std::string error="function call: parameter \""+
             id2string(identifier)+"\" type mismatch: got "+
             it1->type().to_string()+", expected "+
-            arg_type.to_string();
+            parameter_type.to_string();
           throw error;
         }
       }
       
       guardt guard;
       state.rename(lhs, ns, goto_symex_statet::L1);
-      symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
+      
+      symex_targett::assignment_typet assignment_type=
+        goto_function.is_hidden()?
+        symex_targett::HIDDEN_ACTUAL_PARAMETER:
+        symex_targett::VISIBLE_ACTUAL_PARAMETER;
+        
+      symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, assignment_type);
     }
 
     it1++;
@@ -162,7 +175,13 @@ void goto_symext::argument_assignments(
 
       guardt guard;
       state.rename(lhs, ns, goto_symex_statet::L1);
-      symex_assign_symbol(state, lhs, nil_exprt(), *it1, guard, VISIBLE);
+
+      symex_targett::assignment_typet assignment_type=
+        goto_function.is_hidden()?
+        symex_targett::HIDDEN_ACTUAL_PARAMETER:
+        symex_targett::VISIBLE_ACTUAL_PARAMETER;
+        
+      symex_assign_symbol(state, lhs, nil_exprt(), *it1, guard, assignment_type);
     }
   }
   else if(it1!=arguments.end())
@@ -224,7 +243,7 @@ void goto_symext::symex_function_call_symbol(
   const irep_idt &identifier=
     to_symbol_expr(code.function()).get_identifier();
     
-  if(identifier=="c::CBMC_trace")
+  if(identifier=="CBMC_trace")
   {
     symex_trace(state, code);
   }
@@ -285,7 +304,7 @@ void goto_symext::symex_function_call_code(
     else
     {
       if(options.get_bool_option("unwinding-assertions"))
-        claim(false_exprt(), "recursion unwinding assertion", state);
+        vcc(false_exprt(), "recursion unwinding assertion", state);
       
       // add to state guard to prevent further assignments
       state.guard.add(false_exprt());
@@ -330,13 +349,14 @@ void goto_symext::symex_function_call_code(
   // preserve locality of local variables
   locality(identifier, state, goto_function);
 
-  // assign arguments
-  argument_assignments(identifier, goto_function.type, state, arguments);
+  // assign actuals to formal parameters
+  parameter_assignments(identifier, goto_function, state, arguments);
 
   frame.end_of_function=--goto_function.body.instructions.end();
   frame.return_value=call.lhs();
   frame.calling_location=state.source;
   frame.function_identifier=identifier;
+  frame.hidden_function=goto_function.is_hidden();
 
   const goto_symex_statet::framet &p_frame=state.previous_frame();
   for(goto_symex_statet::framet::loop_iterationst::const_iterator
@@ -345,6 +365,7 @@ void goto_symext::symex_function_call_code(
       ++it)
     if(it->second.is_recursion)
       frame.loop_iterations.insert(*it);
+
   // increase unwinding counter
   frame.loop_iterations[identifier].is_recursion=true;
   frame.loop_iterations[identifier].count++;

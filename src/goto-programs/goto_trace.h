@@ -59,8 +59,12 @@ public:
                  SPAWN, MEMORY_BARRIER, ATOMIC_BEGIN, ATOMIC_END } typet;
   typet type;
   
-  // we may choose to hide
+  // we may choose to hide a step
   bool hidden;
+  
+  // we categorize
+  typedef enum { STATE, ACTUAL_PARAMETER } assignment_typet;
+  assignment_typet assignment_type;
     
   goto_programt::const_targett pc;
 
@@ -105,6 +109,7 @@ public:
     step_nr(0),
     type(NONE),
     hidden(false),
+    assignment_type(STATE),
     thread_nr(0),
     cond_value(false),
     formatted(false)

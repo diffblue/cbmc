@@ -214,8 +214,8 @@ void build_goto_trace(
 
     // drop PHI and GUARD assignments altogether
     if(it->is_assignment() &&
-       SSA_step.assignment_type!=symex_target_equationt::STATE &&
-       SSA_step.assignment_type!=symex_target_equationt::HIDDEN)
+       (SSA_step.assignment_type==symex_target_equationt::PHI ||
+        SSA_step.assignment_type==symex_target_equationt::GUARD))
       continue;
 
     goto_tracet::stepst &steps=time_map[current_time];
@@ -232,6 +232,12 @@ void build_goto_trace(
     goto_trace_step.io_id=SSA_step.io_id;
     goto_trace_step.formatted=SSA_step.formatted;
     goto_trace_step.identifier=SSA_step.identifier;
+
+    goto_trace_step.assignment_type=
+      (SSA_step.assignment_type==symex_targett::VISIBLE_ACTUAL_PARAMETER ||
+       SSA_step.assignment_type==symex_targett::HIDDEN_ACTUAL_PARAMETER)?
+      goto_trace_stept::ACTUAL_PARAMETER:
+      goto_trace_stept::STATE;
     
     if(SSA_step.original_full_lhs.is_not_nil())
       goto_trace_step.full_lhs=
@@ -270,6 +276,25 @@ void build_goto_trace(
 
       goto_trace_step.cond_value=
         prop_conv.l_get(SSA_step.cond_literal).is_true();
+    }
+    else if(SSA_step.is_location() &&
+            SSA_step.source.pc->is_goto())
+    {
+      goto_trace_step.cond_expr=SSA_step.source.pc->guard;
+
+      const bool backwards=SSA_step.source.pc->is_backwards_goto();
+
+      symex_target_equationt::SSA_stepst::const_iterator next=it;
+      ++next;
+      assert(next!=target.SSA_steps.end());
+
+      // goto was taken if backwards and next is enabled or forward
+      // and next is not active;
+      // there is an ambiguity here if a forward goto is to the next
+      // instruction, which we simply ignore for now
+      goto_trace_step.goto_taken=
+        backwards==
+        (prop_conv.l_get(next->guard_literal)==tvt(true));
     }
   }
   

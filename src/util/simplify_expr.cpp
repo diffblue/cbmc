@@ -394,19 +394,35 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     return false;
   }
 
-  // elminiate casts to bool
-  if(expr_type==bool_typet())
+  // elminiate casts to proper bool
+  if(expr_type.id()==ID_bool)
   {
-    // rewrite (_Bool)x to x!=0
-    equal_exprt equality;
-    equality.add_source_location()=expr.source_location();
-    equality.lhs()=expr.op0();
-    equality.rhs()=gen_zero(ns.follow(expr.op0().type()));
-    assert(equality.rhs().is_not_nil());
-    simplify_node(equality);
-    equality.make_not();
-    simplify_node(equality);
-    expr.swap(equality);
+    // rewrite (bool)x to x!=0
+    binary_relation_exprt inequality;
+    inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
+    inequality.add_source_location()=expr.source_location();
+    inequality.lhs()=expr.op0();
+    inequality.rhs()=gen_zero(ns.follow(expr.op0().type()));
+    assert(inequality.rhs().is_not_nil());
+    simplify_node(inequality);
+    expr.swap(inequality);
+    return false;
+  }
+  
+  // elminiate casts to _Bool
+  if(expr_type.id()==ID_c_bool &&
+     op_type.id()!=ID_bool)
+  {
+    // rewrite (_Bool)x to (_Bool)(x!=0)
+    binary_relation_exprt inequality;
+    inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
+    inequality.add_source_location()=expr.source_location();
+    inequality.lhs()=expr.op0();
+    inequality.rhs()=gen_zero(ns.follow(expr.op0().type()));
+    assert(inequality.rhs().is_not_nil());
+    simplify_node(inequality);
+    expr.op0()=inequality;
+    simplify_typecast(expr); // recursive call
     return false;
   }
   
@@ -541,15 +557,11 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv ||
-         expr_type_id==ID_c_enum)
+         expr_type_id==ID_c_enum ||
+         expr_type_id==ID_c_bit_field ||
+         expr_type_id==ID_integer)
       {
         expr=from_integer(int_value, expr_type);
-        return false;
-      }
-
-      if(expr_type_id==ID_integer)
-      {
-        expr=constant_exprt(value, expr_type);
         return false;
       }
     }
@@ -566,7 +578,9 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_integer ||
          expr_type_id==ID_natural ||
          expr_type_id==ID_rational ||
-         expr_type_id==ID_c_enum)
+         expr_type_id==ID_c_bool ||
+         expr_type_id==ID_c_enum ||
+         expr_type_id==ID_c_bit_field)
       {
         if(operand.is_true())
         {
@@ -595,10 +609,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       }
     }
     else if(op_type_id==ID_unsignedbv ||
-            op_type_id==ID_signedbv)
+            op_type_id==ID_signedbv ||
+            op_type_id==ID_c_bit_field ||
+            op_type_id==ID_c_bool)
     {
-      mp_integer int_value=binary2integer(
-        id2string(value), op_type_id==ID_signedbv);
+      mp_integer int_value;
+      
+      if(to_integer(to_constant_expr(operand), int_value))
+        return true;
 
       if(expr_type_id==ID_bool)
       {
@@ -606,6 +624,12 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         return false;
       }
 
+      if(expr_type_id==ID_c_bool)
+      {
+        expr=from_integer(int_value!=0, expr_type);
+        return false;
+      }
+      
       if(expr_type_id==ID_integer)
       {
         expr=from_integer(int_value, expr_type);
@@ -623,7 +647,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv ||
-         expr_type_id==ID_bv)
+         expr_type_id==ID_bv ||
+         expr_type_id==ID_c_bit_field)
       {
         expr=from_integer(int_value, expr_type);
 
@@ -4765,7 +4790,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
       const struct_typet::componentt &component=
         struct_type.get_component(component_name);
 
-      if(component.is_nil() || component.get_is_bit_field())
+      if(component.is_nil() || component.type().id()==ID_c_bit_field)
         return true;
 
       // add member offset to index
@@ -5141,7 +5166,7 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
         const irep_idt &component_name=with.op1().get(ID_component_name);
         
         // is this a bit field?
-        if(struct_type.get_component(component_name).get_is_bit_field())
+        if(struct_type.get_component(component_name).type().id()==ID_c_bit_field)
         {
           // don't touch -- might not be byte-aligned
         }

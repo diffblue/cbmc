@@ -11,7 +11,7 @@
 #define YYSTYPE_IS_TRIVIAL 1
 
 #define mto(x, y) stack(x).move_to_operands(stack(y))
-#define mts(x, y) ((typet &)stack(x)).move_to_subtypes((typet &)stack(y))
+#define mts(x, y) (stack_type(x).move_to_subtypes(stack_type(y)))
 #define binary(x, y, l, id, z) { init(x, id); \
   stack(x).add_source_location()=stack(l).source_location(); \
   stack(x).reserve_operands(2); mto(x, y); mto(x, z); }
@@ -275,7 +275,7 @@ Function: make_subtype
 
 static void make_subtype(YYSTYPE dest, YYSTYPE src)
 {
-  make_subtype((typet &)stack(dest), (typet &)stack(src));
+  make_subtype(stack_type(dest), stack_type(src));
 }
     
 /*******************************************************************\
@@ -293,7 +293,7 @@ Function: make_pointer
 static void make_pointer(const YYSTYPE dest)
 {
   set(dest, ID_pointer);
-  stack(dest).add(ID_subtype)=irept(ID_abstract);
+  stack_type(dest).subtype()=typet(ID_abstract);
 }
 
 /*******************************************************************\

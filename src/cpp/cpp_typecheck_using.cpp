@@ -45,7 +45,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
 
   if(id_set.empty())
   {
-    err_location(cpp_using.name().location());
+    err_location(cpp_using.name().source_location());
     str << "using "
         << (using_directive?"namespace":"identifier")
         << " `"

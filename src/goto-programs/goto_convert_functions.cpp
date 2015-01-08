@@ -260,7 +260,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
       
   // handle SV-COMP's __VERIFIER_atomic_
   if(!f.body.instructions.empty() &&
-      has_prefix(id2string(identifier), "c::__VERIFIER_atomic_"))
+      has_prefix(id2string(identifier), "__VERIFIER_atomic_"))
   {
     goto_programt::instructiont a_begin;
     a_begin.make_atomic_begin();
@@ -307,7 +307,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   f.body.update();
 
   if(hide(f.body))
-    f.type.set("#hide", true);
+    f.make_hidden();
 }
 
 /*******************************************************************\

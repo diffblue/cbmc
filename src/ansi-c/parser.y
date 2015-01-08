@@ -17,6 +17,8 @@
 int yyansi_clex();
 extern char *yyansi_ctext;
 
+#define stack_type(x) ((typet &)stack(x))
+
 #include "parser_static.inc"
 
 #include "ansi_c_y.tab.h"
@@ -116,6 +118,7 @@ extern char *yyansi_ctext;
 %token TOK_PTR64       "__ptr64"
 %token TOK_TYPEOF      "typeof"
 %token TOK_GCC_AUTO_TYPE "__auto_type"
+%token TOK_GCC_FLOAT80 "__float80"
 %token TOK_GCC_FLOAT128 "__float128"
 %token TOK_GCC_INT128 "__int128"
 %token TOK_GCC_DECIMAL32 "_Decimal32"
@@ -340,7 +343,8 @@ gcc_builtin_expressions:
         {
           $$=$1;
           stack($$).id(ID_gcc_builtin_types_compatible_p);
-          irept::subt &subtypes=stack($$).add(ID_subtypes).get_sub();
+          typet &type_arg=(typet &)(stack($$).add(ID_type_arg));
+          typet::subtypest &subtypes=type_arg.subtypes();
           subtypes.resize(2);
           subtypes[0].swap(stack($3));
           subtypes[1].swap(stack($5));
@@ -856,6 +860,8 @@ post_declarator_attribute:
         {
           $$=$1;
           stack($$).id(ID_asm);
+          stack($$).set(ID_flavor, ID_gcc);
+          stack($$).operands().swap(stack($4).operands());
         }
         | gcc_type_attribute
         ;
@@ -999,6 +1005,20 @@ type_qualifier:
 attribute_or_type_qualifier:
           type_qualifier
         | gcc_type_attribute
+        ;
+
+attribute_or_type_qualifier_or_storage_class:
+          type_qualifier
+        | gcc_type_attribute
+        | storage_class
+        ;
+
+attribute_type_qualifier_storage_class_list:
+          attribute_or_type_qualifier_or_storage_class
+        | attribute_type_qualifier_storage_class_list attribute_or_type_qualifier_or_storage_class
+        {
+          $$=merge($1, $2);
+        }
         ;
 
 basic_declaration_specifier:
@@ -1162,7 +1182,7 @@ atomic_specifier:
         {
           $$=$1;
           stack($$).id(ID_atomic_type_specifier);
-          stack($$).add(ID_subtype)=stack($3);
+          stack_type($$).subtype()=stack_type($3);
         }
         ;
 
@@ -1271,6 +1291,7 @@ basic_type_name:
         | TOK_SHORT    { $$=$1; set($$, ID_short); }
         | TOK_LONG     { $$=$1; set($$, ID_long); }
         | TOK_FLOAT    { $$=$1; set($$, ID_float); }
+        | TOK_GCC_FLOAT80 { $$=$1; set($$, ID_gcc_float80); }
         | TOK_GCC_FLOAT128 { $$=$1; set($$, ID_gcc_float128); }
         | TOK_GCC_INT128 { $$=$1; set($$, ID_gcc_int128); }
         | TOK_GCC_DECIMAL32 { $$=$1; set($$, ID_gcc_decimal32); }
@@ -1280,7 +1301,7 @@ basic_type_name:
         | TOK_SIGNED   { $$=$1; set($$, ID_signed); }
         | TOK_UNSIGNED { $$=$1; set($$, ID_unsigned); }
         | TOK_VOID     { $$=$1; set($$, ID_void); }
-        | TOK_BOOL     { $$=$1; set($$, ID_bool); }
+        | TOK_BOOL     { $$=$1; set($$, ID_c_bool); }
         | TOK_COMPLEX  { $$=$1; set($$, ID_complex); }
         | TOK_CPROVER_BITVECTOR '[' comma_expression ']'
         {
@@ -1313,13 +1334,15 @@ elaborated_type_name:
         
 array_of_construct:
           TOK_ARRAY_OF '<' type_name '>'
-        { $$=$1; ((typet &)stack($$)).subtype().swap(stack($2)); }
+        { $$=$1; stack_type($$).subtype().swap(stack($2)); }
         ;
 
 pragma_packed:
         {
           init($$);
-          if(PARSER.pragma_pack!=0) set($$, ID_packed);
+          if(!PARSER.pragma_pack.empty() &&
+             PARSER.pragma_pack.back().is_one())
+            set($$, ID_packed);
         }
         ;
 
@@ -1534,6 +1557,10 @@ member_declaring_list:
           type_specifier
           member_declarator
         {
+          if(!PARSER.pragma_pack.empty() &&
+             !PARSER.pragma_pack.back().is_zero())
+            stack($2).set(ID_C_alignment, PARSER.pragma_pack.back());
+
           $2=merge($2, $1);
 
           init($$, ID_declaration);
@@ -1566,7 +1593,7 @@ member_declarator:
         | bit_field_size gcc_type_attribute_opt
         {
           $$=$1;
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack_type($$).subtype()=typet(ID_abstract);
 
           if(stack($2).is_not_nil()) // type attribute
             $$=merge($2, $$);
@@ -1586,7 +1613,7 @@ member_identifier_declarator:
         | bit_field_size gcc_type_attribute_opt
         {
           $$=$1;
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack_type($$).subtype()=typet(ID_abstract);
 
           if(stack($2).is_not_nil()) // type attribute
             $$=merge($2, $$);
@@ -1606,8 +1633,8 @@ bit_field_size:
         {
           $$=$1;
           set($$, ID_c_bit_field);
-          stack($$).set(ID_size, stack($2));
-          stack($$).add(ID_subtype).id(ID_abstract);
+          stack_type($$).set(ID_size, stack($2));
+          stack_type($$).subtype().id(ID_abstract);
         }
         ;
 
@@ -1617,7 +1644,7 @@ enum_name:
           {
             // an anon enum
           }
-          '{' enumerator_list '}'
+          '{' enumerator_list_opt '}'
           gcc_type_attribute_opt
         {
           stack($1).operands().swap(stack($5).operands());
@@ -1630,18 +1657,20 @@ enum_name:
             // an enum with tag
             stack($1).set(ID_tag, stack($3));
           }
-          '{' enumerator_list '}'
+          '{' enumerator_list_opt '}'
           gcc_type_attribute_opt
         {
           stack($1).operands().swap(stack($6).operands());
-          $$=merge($1, merge($2, $8)); // throw in the gcc attribute
+          $$=merge($1, merge($2, $8)); // throw in the gcc attributes
         }
         | enum_key
           gcc_type_attribute_opt
           identifier_or_typedef_name
+          gcc_type_attribute_opt
         {
+          stack($1).id(ID_c_enum_tag); // tag only
           stack($1).set(ID_tag, stack($3));
-          $$=merge($1, $2);
+          $$=merge($1, merge($2, $4)); // throw in the gcc attributes
         }
         ;
         
@@ -1650,6 +1679,14 @@ enum_key: TOK_ENUM
           $$=$1;
           set($$, ID_c_enum);
         }
+        ;
+
+enumerator_list_opt:
+          /* nothing */
+        {
+          init($$, ID_declaration_list);
+        }
+        | enumerator_list
         ;
 
 enumerator_list:
@@ -1663,7 +1700,7 @@ enumerator_list:
           $$=$1;
           mto($$, $3);
         }
-        | enumerator_list ','
+        | enumerator_list ',' // trailing comma ok
         {
           $$=$1;
         }
@@ -1697,7 +1734,7 @@ parameter_type_list:
         {
           typet tmp(ID_ellipsis);
           $$=$1;
-          ((typet &)stack($$)).move_to_subtypes(tmp);
+          stack_type($$).move_to_subtypes(tmp);
         }
         ;
 
@@ -2441,6 +2478,7 @@ gcc_asm_output:
           string '(' comma_expression ')'
         {
           $$=$5;
+          stack($$).id(ID_gcc_asm_output);
           stack($$).move_to_operands(stack($4), stack($6)); 
         }
         ;
@@ -2477,6 +2515,7 @@ gcc_asm_input:
           string '(' comma_expression ')'
         {
           $$=$5;
+          stack($$).id(ID_gcc_asm_input);
           stack($$).move_to_operands(stack($4), stack($6)); 
         }
         ;
@@ -2532,19 +2571,26 @@ gcc_asm_labels:
         ;
 
 gcc_asm_labels_list:
-          gcc_local_label
+          gcc_asm_label
         {
-          irep_idt identifier=PARSER.lookup_label(stack($1).get(ID_C_base_name));
-          $$=$1;
-          stack($$).id(ID_label);
-          stack($$).set(ID_identifier, identifier);
+          init($$);
+          mto($$, $1);
         }
-        | gcc_asm_labels_list ',' gcc_local_label
+        | gcc_asm_labels_list ',' gcc_asm_label
         {
           $$=$1;
           mto($$, $3);
         }
         ;
+
+gcc_asm_label:
+          gcc_local_label
+        {
+          $$=$1;
+          irep_idt identifier=PARSER.lookup_label(stack($$).get(ID_C_base_name));
+          stack($$).id(ID_label);
+          stack($$).set(ID_identifier, identifier);
+        }
 
 translation_unit:
         /* nothing */
@@ -2684,6 +2730,7 @@ KnR_sue_declaration_specifier:
         }
         | KnR_declaration_qualifier_list enum_key identifier_or_typedef_name gcc_type_attribute_opt
         {
+          stack($2).id(ID_c_enum_tag);
           stack($2).set(ID_tag, stack($3));
           $$=merge($1, merge($2, $4));
         }
@@ -2865,8 +2912,8 @@ unary_identifier_declarator:
         {
           // the type_qualifier_list is for the pointer,
           // and not the identifier_declarator
-          stack($1).id(ID_pointer);
-          stack($1).add(ID_subtype)=irept(ID_abstract);
+          stack_type($1).id(ID_pointer);
+          stack_type($1).subtype()=typet(ID_abstract);
           $2=merge($2, $1); // dest=$2
           make_subtype($3, $2); // dest=$3
           $$=$3;
@@ -2923,9 +2970,9 @@ postfixing_abstract_declarator:
         {
           $$=$1;
           set($$, ID_code);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_parameters);
-          stack($$).set(ID_C_KnR, true);
+          stack_type($$).subtype()=typet(ID_abstract);
+          stack_type($$).add(ID_parameters);
+          stack_type($$).set(ID_C_KnR, true);
         }
         | '('
           {
@@ -2940,9 +2987,9 @@ postfixing_abstract_declarator:
         {
           $$=$1;
           set($$, ID_code);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_parameters).get_sub().
-            swap(stack($3).add(ID_subtypes).get_sub());
+          stack_type($$).subtype()=typet(ID_abstract);
+          stack_type($$).add(ID_parameters).get_sub().
+            swap((irept::subt &)(stack_type($3).subtypes()));
           PARSER.pop_scope();
           adjust_KnR_parameters(stack($$).add(ID_parameters), stack($5));
           stack($$).set(ID_C_KnR, true);
@@ -2955,8 +3002,8 @@ parameter_postfixing_abstract_declarator:
         {
           $$=$1;
           set($$, ID_code);
-          stack($$).add(ID_parameters);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack_type($$).add(ID_parameters);
+          stack_type($$).subtype()=typet(ID_abstract);
         }
         | '('
           {
@@ -2970,9 +3017,9 @@ parameter_postfixing_abstract_declarator:
         {
           $$=$1;
           set($$, ID_code);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_parameters).get_sub().
-            swap(stack($3).add(ID_subtypes).get_sub());
+          stack_type($$).subtype()=typet(ID_abstract);
+          stack_type($$).add(ID_parameters).get_sub().
+            swap((irept::subt &)(stack_type($3).subtypes()));
           PARSER.pop_scope();
         }
         ;
@@ -2982,48 +3029,41 @@ array_abstract_declarator:
         {
           $$=$1;
           set($$, ID_array);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_size).make_nil();
+          stack_type($$).subtype()=typet(ID_abstract);
+          stack_type($$).add(ID_size).make_nil();
         }
-        | '[' attribute_type_qualifier_list ']'
+        | '[' attribute_type_qualifier_storage_class_list ']'
         {
           // this is C99: e.g., restrict, const, etc
           // The type qualifier belongs to the array, not the
           // contents of the array, nor the size.
           set($1, ID_array);
-          stack($1).add(ID_subtype)=irept(ID_abstract);
-          stack($1).add(ID_size).make_nil();
+          stack_type($1).subtype()=typet(ID_abstract);
+          stack_type($1).add(ID_size).make_nil();
           $$=merge($2, $1);
         }
         | '[' '*' ']'
         {
+          // these should be allowed in prototypes only
           $$=$1;
           set($$, ID_array);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_size).make_nil();
+          stack_type($$).subtype()=typet(ID_abstract);
+          stack_type($$).add(ID_size).make_nil();
         }
         | '[' constant_expression ']'
         {
           $$=$1;
           set($$, ID_array);
-          stack($$).add(ID_size).swap(stack($2));
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack_type($$).add(ID_size).swap(stack($2));
+          stack_type($$).subtype()=typet(ID_abstract);
         }
-        | '[' TOK_STATIC constant_expression ']'
-        {
-          // this is C99 and the constant_expression is a minimum size
-          $$=$1;
-          set($$, ID_array);
-          stack($$).add(ID_size).swap(stack($2));
-          stack($$).add(ID_subtype)=irept(ID_abstract);
-        }
-        | '[' attribute_type_qualifier_list constant_expression ']'
+        | '[' attribute_type_qualifier_storage_class_list constant_expression ']'
         {
           // The type qualifier belongs to the array, not the
           // contents of the array, nor the size.
           set($1, ID_array);
-          stack($1).add(ID_size).swap(stack($3));
-          stack($1).add(ID_subtype)=irept(ID_abstract);
+          stack_type($1).add(ID_size).swap(stack($3));
+          stack_type($1).subtype()=typet(ID_abstract);
           $$=merge($2, $1); // dest=$2
         }
         | array_abstract_declarator '[' constant_expression ']'
@@ -3031,17 +3071,18 @@ array_abstract_declarator:
           // we need to push this down
           $$=$1;
           set($2, ID_array);
-          stack($2).add(ID_size).swap(stack($3));
-          stack($2).add(ID_subtype)=irept(ID_abstract);
+          stack_type($2).add(ID_size).swap(stack($3));
+          stack_type($2).subtype()=typet(ID_abstract);
           make_subtype($1, $2);
         }
         | array_abstract_declarator '[' '*' ']'
         {
+          // these should be allowed in prototypes only
           // we need to push this down
           $$=$1;
           set($2, ID_array);
-          stack($2).add(ID_size).make_nil();
-          stack($2).add(ID_subtype)=irept(ID_abstract);
+          stack_type($2).add(ID_size).make_nil();
+          stack_type($2).subtype()=typet(ID_abstract);
           make_subtype($1, $2);
         }
         ;
@@ -3051,14 +3092,14 @@ unary_abstract_declarator:
         {
           $$=$1;
           set($$, ID_pointer);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack_type($$).subtype()=typet(ID_abstract);
         }
         | '*' attribute_type_qualifier_list
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
           set($1, ID_pointer);
-          stack($1).add(ID_subtype)=irept(ID_abstract);
+          stack_type($1).subtype()=typet(ID_abstract);
           $$=merge($2, $1);
         }
         | '*' abstract_declarator
@@ -3070,8 +3111,8 @@ unary_abstract_declarator:
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the abstract declarator.
-          stack($1).id(ID_pointer);
-          stack($1).add(ID_subtype)=irept(ID_abstract);
+          stack_type($1).id(ID_pointer);
+          stack_type($1).subtype()=typet(ID_abstract);
           $2=merge($2, $1); // dest=$2
           make_subtype($3, $2); // dest=$3
           $$=$3;
@@ -3082,7 +3123,7 @@ unary_abstract_declarator:
           // http://en.wikipedia.org/wiki/Blocks_(C_language_extension)
           $$=$1;
           set($$, ID_block_pointer);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack_type($$).subtype()=typet(ID_abstract);
         }
         ;
 
@@ -3091,14 +3132,14 @@ parameter_unary_abstract_declarator:
         {
           $$=$1;
           set($$, ID_pointer);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack_type($$).subtype()=typet(ID_abstract);
         }
         | '*' attribute_type_qualifier_list
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
           set($1, ID_pointer);
-          stack($1).add(ID_subtype)=irept(ID_abstract);
+          stack_type($1).subtype()=typet(ID_abstract);
           $$=merge($2, $1);
         }
         | '*' parameter_abstract_declarator
@@ -3111,7 +3152,7 @@ parameter_unary_abstract_declarator:
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
           stack($1).id(ID_pointer);
-          stack($1).add(ID_subtype)=irept(ID_abstract);
+          stack_type($1).subtype()=typet(ID_abstract);
           $2=merge($2, $1); // dest=$2
           make_subtype($3, $2); // dest=$3
           $$=$3;
@@ -3122,7 +3163,7 @@ parameter_unary_abstract_declarator:
           // http://en.wikipedia.org/wiki/Blocks_(C_language_extension)
           $$=$1;
           set($$, ID_block_pointer);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack_type($$).subtype()=typet(ID_abstract);
         }
         ;
 

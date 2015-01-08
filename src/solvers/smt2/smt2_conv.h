@@ -129,6 +129,7 @@ protected:
   void convert_byte_update(const byte_update_exprt &expr);
   void convert_byte_extract(const byte_extract_exprt &expr);
   void convert_typecast(const typecast_exprt &expr);
+  void convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
   void convert_struct(const struct_exprt &expr);
   void convert_union(const union_exprt &expr);
   void convert_constant(const constant_exprt &expr);

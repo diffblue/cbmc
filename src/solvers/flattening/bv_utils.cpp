@@ -247,12 +247,12 @@ Function: bv_utilst::full_adder
 \*******************************************************************/
 
 
-literalt bv_utilst::full_adder(const literalt a, const literalt b, const literalt carry_in, literalt &carry_out) {
-  literalt sum;
-
+literalt bv_utilst::full_adder(
+  const literalt a, const literalt b,
+  const literalt carry_in, literalt &carry_out)
+{
   if (full_adder_style == TSEITIN_NAIVE_AB_CIRCUIT ||
       full_adder_style == DANIEL_COMPACT_CARRY) {
-
     carry_out=carry(a, b, carry_in);
 
     return prop.lxor(
@@ -376,9 +376,6 @@ literalt bv_utilst::full_adder(const literalt a, const literalt b, const literal
   }
 
   return sum;
-
-
-
 }
 
 

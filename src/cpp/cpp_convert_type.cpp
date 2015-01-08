@@ -248,7 +248,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
     static_cast<typet &>(t.add(ID_return_type));
 
   return_type.swap(t.subtype());
-  t.remove(ID_subtype);
+  t.remove_subtype();
 
   if(return_type.is_not_nil())
     cpp_convert_plain_type(return_type);
@@ -311,7 +311,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
           assert(!base_name.empty());
           new_parameter.set_identifier(base_name);
           new_parameter.set_base_name(base_name);
-          new_parameter.add_source_location()=cpp_name.location();
+          new_parameter.add_source_location()=cpp_name.source_location();
         }
         else
         {

@@ -68,7 +68,8 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
           type.id()==ID_fixedbv ||
-          type.id()==ID_floatbv)
+          type.id()==ID_floatbv ||
+          type.id()==ID_c_bool)
   {
     unsigned width=to_bitvector_type(type).get_width();
     return width%8?width/8+1:width/8;
@@ -120,11 +121,11 @@ void add_padding(struct_typet &type, const namespacet &ns)
         it!=components.end();
         it++)
     {
-      if(it->get_is_bit_field() &&
-         it->get_bit_field_bits()!=0)
+      if(it->type().id()==ID_c_bit_field &&
+         to_c_bit_field_type(it->type()).get_width()!=0)
       {
         // count the bits
-        unsigned width=it->get_bit_field_bits();
+        unsigned width=to_c_bit_field_type(it->type()).get_width();
         bit_field_bits+=width;
       }
       else if(bit_field_bits!=0)
@@ -133,14 +134,12 @@ void add_padding(struct_typet &type, const namespacet &ns)
         if((bit_field_bits%8)!=0)
         {
           unsigned pad=8-bit_field_bits%8;
-          unsignedbv_typet padding_type;
-          padding_type.set_width(pad);
+          c_bit_field_typet padding_type(unsignedbv_typet(pad), pad);
           
           struct_typet::componentt component;
           component.type()=padding_type;
           component.set_name("$bit_field_pad"+i2string(padding_counter++));
           component.set_is_padding(true);
-          component.set_is_bit_field(true);
           
           it=components.insert(it, component);
           it++; // skip over
@@ -156,14 +155,12 @@ void add_padding(struct_typet &type, const namespacet &ns)
     if((bit_field_bits%8)!=0)
     {
       unsigned pad=8-bit_field_bits%8;
-      unsignedbv_typet padding_type;
-      padding_type.set_width(pad);
+      c_bit_field_typet padding_type(unsignedbv_typet(pad), pad);
       
       struct_typet::componentt component;
       component.type()=padding_type;
       component.set_name("$bit_field_pad"+i2string(padding_counter++));
       component.set_is_padding(true);
-      component.set_is_bit_field(true);
       
       components.push_back(component);
     }  
@@ -186,12 +183,12 @@ void add_padding(struct_typet &type, const namespacet &ns)
     const typet &it_type=it->type();
     mp_integer a=1;
     
-    if(it->get_is_bit_field())
+    if(it_type.id()==ID_c_bit_field)
     {
-      a=alignment(it->get_bit_field_type(), ns);
+      a=alignment(to_c_bit_field_type(it_type).subtype(), ns);
       
       // A zero-width bit-field causes alignment to the base-type.
-      if(it->get_bit_field_bits()==0)
+      if(to_c_bit_field_type(it_type).get_width()==0)
       {
       }
       else
@@ -201,7 +198,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
         if(max_alignment<a) 
           max_alignment=a;
         
-        unsigned w=it->get_bit_field_bits();
+        unsigned w=to_c_bit_field_type(it_type).get_width();
         unsigned bytes;
         for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
         bit_field_bits-=w;

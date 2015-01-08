@@ -144,9 +144,9 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     {
       err_location(type);
       str << "error: enum symbol `" << base_name
-          << "' declared previously" << std::endl;
+          << "' declared previously\n";
       str << "location of previous definition: "
-          << symbol.location << std::endl;
+          << symbol.location;
       throw 0;
     }
   }
@@ -155,8 +155,25 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     std::string pretty_name=
       cpp_scopes.current_scope().prefix+id2string(base_name);
       
-    // these have a subtype, which defaults to int
-    type.subtype()=signed_int_type();
+    // C++11 enumerations have an underlying type,
+    // which defaults to int.
+    // enums without underlying type may be 'packed'.
+    if(type.subtype().is_nil())
+      type.subtype()=signed_int_type();
+    else
+    {
+      typecheck_type(type.subtype());
+      if(type.subtype().id()==ID_signedbv ||
+         type.subtype().id()==ID_unsignedbv)
+      {
+      }
+      else
+      {
+        err_location(type);
+        str << "underlying type must be integral";
+        throw 0;
+      }
+    }
 
     symbolt symbol;
 

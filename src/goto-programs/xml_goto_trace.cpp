@@ -129,6 +129,10 @@ void convert(
         xml_assignment.set_attribute("display_name", id2string(display_name));
         xml_assignment.set_attribute("step_nr", i2string(it->step_nr));
 
+        xml_assignment.set_attribute("assignment_type", 
+          it->assignment_type==goto_trace_stept::ACTUAL_PARAMETER?"actual_parameter":
+          "state");
+
         if(it->lhs_object_value.is_not_nil())
           xml_assignment.new_element("value_expression").new_element(xml(it->lhs_object_value, ns));
       }

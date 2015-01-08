@@ -409,7 +409,7 @@ bool compilet::link()
   
   if(mode==COMPILE_LINK_EXECUTABLE)
   {
-    if(entry_point(symbol_table, "c::main", ui_message_handler))
+    if(entry_point(symbol_table, "main", ui_message_handler))
       return true;
 
     // entry_point may (should) add some more functions.

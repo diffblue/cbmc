@@ -105,9 +105,6 @@ void bmct::cover_assertions(
     {
       xmlt xml_result("result");
       
-      // will go away
-      xml_result.set_attribute("claim", id2string(it->first->source_location.get_property_id()));
-      
       // use this one
       xml_result.set_attribute("name", id2string(it->first->source_location.get_property_id()));
 

@@ -72,7 +72,7 @@ void counterexample_beautificationt::get_minimization_list(
 
 /*******************************************************************\
 
-Function: counterexample_beautificationt::get_failed_claim
+Function: counterexample_beautificationt::get_failed_property
 
   Inputs:
 
@@ -83,11 +83,11 @@ Function: counterexample_beautificationt::get_failed_claim
 \*******************************************************************/
 
 symex_target_equationt::SSA_stepst::const_iterator
-counterexample_beautificationt::get_failed_claim(
+counterexample_beautificationt::get_failed_property(
   const bv_cbmct &bv_cbmc,
   const symex_target_equationt &equation)
 {
-  // find failed claim
+  // find failed property
 
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=equation.SSA_steps.begin();
@@ -118,9 +118,9 @@ void counterexample_beautificationt::operator()(
   const symex_target_equationt &equation,
   const namespacet &ns)
 {
-  // find failed claim
+  // find failed property
 
-  failed=get_failed_claim(bv_cbmc, equation);
+  failed=get_failed_property(bv_cbmc, equation);
   
   // lock the failed assertion
   bv_cbmc.set_to(literal_exprt(failed->cond_literal), false);

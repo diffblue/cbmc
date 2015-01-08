@@ -50,10 +50,10 @@ mp_integer member_offset(
     if(it->get_name()==member)
       break;
 
-    if(it->get_is_bit_field())
+    if(it->type().id()==ID_c_bit_field)
     {
       // take the extra bytes needed
-      unsigned w=it->type().get_int(ID_width);
+      unsigned w=to_c_bit_field_type(it->type()).get_width();
       for(; w>bit_field_bits; ++result, bit_field_bits+=8);
       bit_field_bits-=w;
     }
@@ -134,9 +134,9 @@ mp_integer pointer_offset_size(
         it!=components.end();
         it++)
     {
-      if(it->get_is_bit_field())
+      if(it->type().id()==ID_c_bit_field)
       {
-        unsigned w=it->type().get_int(ID_width);
+        unsigned w=to_c_bit_field_type(it->type()).get_width();
         for(; w>bit_field_bits; ++result, bit_field_bits+=8);
         bit_field_bits-=w;
       }
@@ -177,7 +177,8 @@ mp_integer pointer_offset_size(
           type.id()==ID_unsignedbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
-          type.id()==ID_bv)
+          type.id()==ID_bv ||
+          type.id()==ID_c_bool)
   {
     unsigned width=to_bitvector_type(type).get_width();
     unsigned bytes=width/8;
@@ -266,9 +267,9 @@ exprt member_offset_expr(
   {
     if(it->get_name()==member) break;
 
-    if(it->get_is_bit_field())
+    if(it->type().id()==ID_c_bit_field)
     {
-      unsigned w=it->get_bit_field_bits();
+      unsigned w=to_c_bit_field_type(it->type()).get_width();
       unsigned bytes;
       for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
       bit_field_bits-=w;
@@ -367,9 +368,9 @@ exprt size_of_expr(
         it!=components.end();
         it++)
     {
-      if(it->get_is_bit_field())
+      if(it->type().id()==ID_c_bit_field)
       {
-        unsigned w=it->get_bit_field_bits();
+        unsigned w=to_c_bit_field_type(it->type()).get_width();
         unsigned bytes;
         for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
         bit_field_bits-=w;
@@ -415,7 +416,8 @@ exprt size_of_expr(
           type.id()==ID_unsignedbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
-          type.id()==ID_bv)
+          type.id()==ID_bv ||
+          type.id()==ID_c_bool)
   {
     unsigned width=to_bitvector_type(type).get_width();
     unsigned bytes=width/8;

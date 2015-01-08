@@ -416,7 +416,7 @@ void goto_convertt::clean_expr(
     else if(statement==ID_function_call)
     {
       if(to_side_effect_expr_function_call(expr).function().id()==ID_symbol &&
-         to_symbol_expr(to_side_effect_expr_function_call(expr).function()).get_identifier()=="c::__noop")
+         to_symbol_expr(to_side_effect_expr_function_call(expr).function()).get_identifier()=="__noop")
       {
         // __noop needs special treatment, as arguments are not
         // evaluated

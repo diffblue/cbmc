@@ -162,7 +162,6 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   assert(template_scope!=NULL);
   
   irep_idt identifier=
-    language_prefix+
     id2string(template_scope->prefix)+
     id2string(suffix)+
     "tag."+id2string(template_symbol.base_name);

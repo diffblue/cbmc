@@ -613,10 +613,16 @@ void path_symext::function_call_rec(
     thread.call_stack.back().current_function=function_identifier;
     thread.call_stack.back().return_location=thread.pc.next_loc();
     thread.call_stack.back().return_lhs=call.lhs();
-    thread.call_stack.back().saved_local_vars=thread.local_vars;
     
-    // update statistics
-    state.recursion_map[function_identifier]++;
+    // save the locals into the frame
+    for(locst::local_variablest::const_iterator
+        it=function_entry.local_variables.begin();
+        it!=function_entry.local_variables.end();
+        it++)
+    {
+      unsigned nr=state.var_map[*it].number;
+      thread.call_stack.back().saved_local_vars[nr]=thread.local_vars[nr];
+    }    
 
     const code_typet &code_type=function_entry.type;
 
@@ -624,7 +630,7 @@ void path_symext::function_call_rec(
 
     const exprt::operandst &call_arguments=call.arguments();
   
-    // now assign the argument values
+    // now assign the argument values to parameters
     for(unsigned i=0; i<call_arguments.size(); i++)
     {
       if(i<function_parameters.size())
@@ -637,11 +643,12 @@ void path_symext::function_call_rec(
 
         symbol_exprt lhs(identifier, function_parameter.type());
             
-        // TODO: need to save+restore
-
         assign(state, lhs, call_arguments[i]);
       }
     }
+
+    // update statistics
+    state.recursion_map[function_identifier]++;
 
     // set the new PC
     thread.pc=function_entry_point;
@@ -713,6 +720,14 @@ void path_symext::return_from_function(
        thread.call_stack.back().return_lhs.is_not_nil())
       assign(state, thread.call_stack.back().return_lhs, return_value);
 
+    // restore the local variables
+    for(path_symex_statet::var_state_mapt::const_iterator
+        it=thread.call_stack.back().saved_local_vars.begin();
+        it!=thread.call_stack.back().saved_local_vars.end();
+        it++)
+      thread.local_vars[it->first]=it->second;
+
+    // kill the frame
     thread.call_stack.pop_back();
   }
 }

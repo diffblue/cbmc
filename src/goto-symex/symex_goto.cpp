@@ -426,10 +426,10 @@ void goto_symext::loop_bound_exceeded(
   {
     if(unwinding_assertions)
     {
-      // Generate unwinding assertion.
-      claim(negated_cond,
-            "unwinding assertion loop "+i2string(loop_number),
-            state);
+      // Generate VCC for unwinding assertion.
+      vcc(negated_cond,
+          "unwinding assertion loop "+i2string(loop_number),
+          state);
 
       // add to state guard to prevent further assignments
       state.guard.add(negated_cond);

@@ -305,38 +305,38 @@ void string_instrumentationt::do_function_call(
     const irep_idt &identifier=
       to_symbol_expr(function).get_identifier();
 
-    if(identifier=="c::strcoll")
+    if(identifier=="strcoll")
     {
     }
-    else if(identifier=="c::strncmp")
+    else if(identifier=="strncmp")
       do_strncmp(dest, target, call);
-    else if(identifier=="c::strxfrm")
+    else if(identifier=="strxfrm")
     {
     }
-    else if(identifier=="c::strchr")
+    else if(identifier=="strchr")
       do_strchr(dest, target, call);
-    else if(identifier=="c::strcspn")
+    else if(identifier=="strcspn")
     {
     }
-    else if(identifier=="c::strpbrk")
+    else if(identifier=="strpbrk")
     {
     }
-    else if(identifier=="c::strrchr")
+    else if(identifier=="strrchr")
       do_strrchr(dest, target, call);
-    else if(identifier=="c::strspn")
+    else if(identifier=="strspn")
     {
     }
-    else if(identifier=="c::strerror")
+    else if(identifier=="strerror")
       do_strerror(dest, target, call);
-    else if(identifier=="c::strstr")
+    else if(identifier=="strstr")
       do_strstr(dest, target, call);
-    else if(identifier=="c::strtok")
+    else if(identifier=="strtok")
       do_strtok(dest, target, call);
-    else if(identifier=="c::sprintf")
+    else if(identifier=="sprintf")
       do_sprintf(dest, target, call);
-    else if(identifier=="c::snprintf")
+    else if(identifier=="snprintf")
       do_snprintf(dest, target, call);
-    else if(identifier=="c::fscanf")
+    else if(identifier=="fscanf")
       do_fscanf(dest, target, call);
     
     dest.update();
@@ -968,8 +968,8 @@ void string_instrumentationt::do_strerror(
     return;
   }
 
-  irep_idt identifier_buf="c::__strerror_buffer";
-  irep_idt identifier_size="c::__strerror_buffer_size";
+  irep_idt identifier_buf="__strerror_buffer";
+  irep_idt identifier_size="__strerror_buffer_size";
 
   if(symbol_table.symbols.find(identifier_buf)==symbol_table.symbols.end())
   {
@@ -994,7 +994,7 @@ void string_instrumentationt::do_strerror(
     new_symbol_buf.is_static_lifetime=true;
     new_symbol_buf.base_name="__strerror_buffer";
     new_symbol_buf.pretty_name=new_symbol_buf.base_name;
-    new_symbol_buf.name="c::"+id2string(new_symbol_buf.base_name);
+    new_symbol_buf.name=new_symbol_buf.base_name;
 
     symbol_table.move(new_symbol_buf);
     symbol_table.move(new_symbol_size);

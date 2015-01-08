@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <cctype>
-
 #include <util/i2string.h>
 #include <util/std_types.h>
+#include <util/arith_tools.h>
 
 #include "type2name.h"
 
@@ -47,7 +46,8 @@ std::string type2name(const typet &type)
     result+="S" + type.get_string(ID_width);
   else if(type.id()==ID_unsignedbv)
     result+="U" + type.get_string(ID_width);
-  else if(type.id()==ID_bool) 
+  else if(type.id()==ID_bool ||
+          type.id()==ID_c_bool) 
     result+='B';
   else if(type.id()==ID_integer) 
     result+='I';
@@ -92,10 +92,11 @@ std::string type2name(const typet &type)
   else if(type.id()==ID_array)
   {
     const array_typet &t=to_array_type(type);
-    if(t.size().is_nil())
+    mp_integer size;
+    if(to_integer(t.size(), size))
       result+="ARR?";
     else
-      result+="ARR"+t.size().get_string(ID_value);
+      result+="ARR"+integer2string(size);
   }
   else if(type.id()==ID_symbol)
   {

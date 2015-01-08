@@ -8,7 +8,7 @@ BOOL QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency)
   __CPROVER_HIDE:;
   __int64 result;
   lpFrequency->QuadPart=result;
-  _Bool error;
+  __CPROVER_bool error;
   if(error) return 0;
   __CPROVER_assume(result!=0);
   return 1;

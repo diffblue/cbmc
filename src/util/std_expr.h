@@ -1202,7 +1202,7 @@ const struct_exprt &to_struct_expr(const exprt &expr);
 */
 struct_exprt &to_struct_expr(exprt &expr);
 
-/*! \brief complex constructor from list of elements
+/*! \brief complex constructor from a pair of numbers
 */
 class complex_exprt:public binary_exprt
 {
@@ -1465,6 +1465,69 @@ extern inline typecast_exprt &to_typecast_expr(exprt &expr)
   return static_cast<typecast_exprt &>(expr);
 }
 
+/*! \brief semantic type conversion from/to floating-point formats
+*/
+class floatbv_typecast_exprt:public binary_exprt
+{
+public:
+  inline floatbv_typecast_exprt():binary_exprt(ID_floatbv_typecast)
+  {
+  }
+
+  inline floatbv_typecast_exprt(
+    const exprt &op,
+    const exprt &rounding,
+    const typet &_type):binary_exprt(ID_floatbv_typecast, _type)
+  {
+    copy_to_operands(op, rounding);
+  }
+
+  inline exprt &op()
+  {
+    return op0();
+  }
+
+  inline const exprt &op() const
+  {
+    return op0();
+  }
+
+  inline exprt &rounding_mode()
+  {
+    return op1();
+  }
+
+  inline const exprt &rounding_mode() const
+  {
+    return op1();
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref floatbv_typecast_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * floatbv_typecast_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref floatbv_typecast_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_floatbv_typecast && expr.operands().size()==2);
+  return static_cast<const floatbv_typecast_exprt &>(expr);
+}
+
+/*! \copydoc to_floatbv_typecast_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
+{
+  assert(expr.id()==ID_floatbv_typecast && expr.operands().size()==2);
+  return static_cast<floatbv_typecast_exprt &>(expr);
+}
+
 /*! \brief boolean AND
 */
 class and_exprt:public exprt
@@ -1502,7 +1565,7 @@ public:
 
 exprt conjunction(const exprt::operandst &op);
 
-/*! \brief Cast a generic exprt to a \ref typecast_exprt
+/*! \brief Cast a generic exprt to a \ref and_exprt
  *
  * This is an unchecked conversion. \a expr must be known to be \ref
  * and_exprt.
@@ -2352,6 +2415,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref index_designatort
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * index_designatort.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref index_designatort
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const index_designatort &to_index_designator(const exprt &expr)
+{
+  assert(expr.id()==ID_index_designator && expr.operands().size()==1);
+  return static_cast<const index_designatort &>(expr);
+}
+
+/*! \copydoc to_index_designator(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline index_designatort &to_index_designator(exprt &expr)
+{
+  assert(expr.id()==ID_index_designator && expr.operands().size()==1);
+  return static_cast<index_designatort &>(expr);
+}
+
 class member_designatort:public exprt
 {
 public:
@@ -2366,6 +2454,31 @@ public:
     return get(ID_component_name);
   }
 };
+
+/*! \brief Cast a generic exprt to an \ref member_designatort
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * member_designatort.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref member_designatort
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const member_designatort &to_member_designator(const exprt &expr)
+{
+  assert(expr.id()==ID_member_designator && expr.operands().size()==0);
+  return static_cast<const member_designatort &>(expr);
+}
+
+/*! \copydoc to_member_designator(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline member_designatort &to_member_designator(exprt &expr)
+{
+  assert(expr.id()==ID_member_designator && expr.operands().size()==0);
+  return static_cast<member_designatort &>(expr);
+}
 
 /*! \brief Operator to update elements in structs and arrays
 */
@@ -2403,47 +2516,6 @@ public:
     return op0();
   }
   
-  class member_designatort:public exprt
-  {
-  public:
-    inline member_designatort():exprt(ID_member_designator)
-    {
-    }
-    
-    inline irep_idt get_component_name() const
-    {
-      return get(ID_component_name);
-    }
-
-    inline void set_component_name(const irep_idt &name)
-    {
-      return set(ID_component_name, name);
-    }
-  };
-
-  class index_designatort:public unary_exprt
-  {
-  public:
-    inline index_designatort():unary_exprt(ID_index_designator)
-    {
-    }
-
-    inline explicit index_designatort(const exprt &_index):
-      unary_exprt(ID_index_designator, _index)
-    {
-    }
-    
-    inline exprt index()
-    {
-      return op0();
-    }
-
-    inline const exprt &index() const
-    {
-      return op0();
-    }
-  };
-
   // the designator operands are either
   // 1) member_designator or
   // 2) index_designator
@@ -2492,56 +2564,6 @@ extern inline update_exprt &to_update_expr(exprt &expr)
 {
   assert(expr.id()==ID_update && expr.operands().size()==3);
   return static_cast<update_exprt &>(expr);
-}
-
-/*! \brief Cast a generic exprt to an \ref index_designatort
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * update_exprt::index_designatort.
- *
- * \param expr Source expression
- * \return Object of type \ref update_exprt::index_designatort
- *
- * \ingroup gr_std_expr
-*/
-extern inline const update_exprt::index_designatort &to_index_designator(const exprt &expr)
-{
-  assert(expr.id()==ID_index_designator && expr.operands().size()==1);
-  return static_cast<const update_exprt::index_designatort &>(expr);
-}
-
-/*! \copydoc to_index_designator(const exprt &)
- * \ingroup gr_std_expr
-*/
-extern inline update_exprt::index_designatort &to_index_designator(exprt &expr)
-{
-  assert(expr.id()==ID_index_designator && expr.operands().size()==1);
-  return static_cast<update_exprt::index_designatort &>(expr);
-}
-
-/*! \brief Cast a generic exprt to an \ref member_designatort
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * update_exprt::member_designatort.
- *
- * \param expr Source expression
- * \return Object of type \ref update_exprt::member_designatort
- *
- * \ingroup gr_std_expr
-*/
-extern inline const update_exprt::member_designatort &to_member_designator(const exprt &expr)
-{
-  assert(expr.id()==ID_member_designator && expr.operands().size()==0);
-  return static_cast<const update_exprt::member_designatort &>(expr);
-}
-
-/*! \copydoc to_member_designator(const exprt &)
- * \ingroup gr_std_expr
-*/
-extern inline update_exprt::member_designatort &to_member_designator(exprt &expr)
-{
-  assert(expr.id()==ID_member_designator && expr.operands().size()==0);
-  return static_cast<update_exprt::member_designatort &>(expr);
 }
 
 #if 0

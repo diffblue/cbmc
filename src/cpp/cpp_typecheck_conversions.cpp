@@ -576,6 +576,10 @@ bool cpp_typecheckt::standard_conversion_pointer(
   typet sub_from = follow(expr.type().subtype());
   typet sub_to = follow(type.subtype());
 
+  // std::nullptr_t to _any_ pointer type
+  if(sub_from.id()==ID_nullptr)
+    return true;
+
   // anything but function pointer to void *
   if(sub_from.id()!=ID_code && sub_to.id()==ID_empty)
   {
@@ -608,7 +612,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
 
 /*******************************************************************\
 
-Function: standard_conversion_pointer
+Function: standard_conversion_pointer_to_member
 
   Inputs: A typechecked expression 'expr', a destination
           type 'type'
@@ -801,6 +805,14 @@ bool cpp_typecheckt::standard_conversion_sequence(
   assert(!is_reference(expr.type()) && !is_reference(type));
 
   exprt curr_expr=expr;
+
+  // bit fields are converted like their underlying type
+  if(type.id()==ID_c_bit_field)
+    return standard_conversion_sequence(expr, type.subtype(), new_expr, rank);
+
+  // we turn bit fields into their underlying type  
+  if(curr_expr.type().id()==ID_c_bit_field)
+    curr_expr.make_typecast(curr_expr.type().subtype());
   
   if(curr_expr.type().id()==ID_array)
   {
@@ -880,11 +892,16 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
     else if(type.id()==ID_pointer)
     {
-      if(!standard_conversion_pointer(curr_expr, type, new_expr))
+      if(follow(expr.type()).id()==ID_nullptr)
+      {
+        // std::nullptr_t to _any_ pointer type is ok
+      }
+      else if(!standard_conversion_pointer(curr_expr, type, new_expr))
       {
         if(!standard_conversion_pointer_to_member(curr_expr, type, new_expr))
           return false;
       }
+
       rank += 3;
     }
     else if(type.id()==ID_bool)
@@ -1831,7 +1848,7 @@ bool cpp_typecheckt::cast_away_constness(
   std::vector<typet> snt1;
   snt1.push_back(nt1);
 
-  while(snt1.back().find(ID_subtype).is_not_nil())
+  while(snt1.back().has_subtype())
   {
     snt1.reserve(snt1.size()+1);
     snt1.push_back(snt1.back().subtype());
@@ -1846,7 +1863,7 @@ bool cpp_typecheckt::cast_away_constness(
 
   std::vector<typet> snt2;
   snt2.push_back(nt2);
-  while(snt2.back().find(ID_subtype).is_not_nil())
+  while(snt2.back().has_subtype())
   {
     snt2.reserve(snt2.size()+1);
     snt2.push_back(snt2.back().subtype());

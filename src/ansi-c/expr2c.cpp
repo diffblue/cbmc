@@ -96,9 +96,6 @@ static std::string clean_identifier(const irep_idt &id)
 {
   std::string dest=id2string(id);
 
-  if(has_prefix(dest, "c::"))
-    dest.erase(0,3);
-
   std::string::size_type c_pos=dest.find("::");
   if(c_pos!=std::string::npos &&
      dest.rfind("::")==c_pos)
@@ -170,7 +167,7 @@ void expr2ct::get_shorthands(const exprt &expr)
     if(!has_collision)
     {
       const symbolt *symbol;
-      has_collision=!ns.lookup("c::"+id2string(sh), symbol);
+      has_collision=!ns.lookup(sh, symbol);
     }
 
     if(!has_collision)
@@ -237,6 +234,10 @@ std::string expr2ct::convert_rec(
   {
     return q+"_Bool"+d;
   }
+  else if(src.id()==ID_c_bool)
+  {
+    return q+"_Bool"+d;
+  }
   else if(src.id()==ID_natural ||
           src.id()==ID_integer ||
           src.id()==ID_rational)
@@ -257,15 +258,10 @@ std::string expr2ct::convert_rec(
     // annotated?
     
     irep_idt c_type=src.get(ID_C_c_type);
+    const std::string c_type_str=c_type_as_string(c_type);
 
-    if(c_type==ID_double)
-      return q+"double"+d;
-    else if(c_type==ID_long_double)
-      return q+"long double"+d;
-    else if(c_type==ID_float)
-      return q+"float"+d;
-    else if(c_type==ID_gcc_float128)
-      return q+"__float128"+d; // gcc 4.3 or later
+    if(!c_type_str.empty())
+      return q+c_type_str+d;
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
@@ -285,15 +281,10 @@ std::string expr2ct::convert_rec(
     // annotated?
     
     irep_idt c_type=src.get(ID_C_c_type);
+    const std::string c_type_str=c_type_as_string(c_type);
 
-    if(c_type==ID_double)
-      return q+"double"+d;
-    else if(c_type==ID_long_double)
-      return q+"long double"+d;
-    else if(c_type==ID_float)
-      return q+"float"+d;
-    else if(c_type==ID_gcc_float128)
-      return q+"__float128"+d; // gcc 4.3 or later
+    if(!c_type_str.empty())
+      return q+c_type_str+d;
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
@@ -304,52 +295,29 @@ std::string expr2ct::convert_rec(
     else
       assert(false);
   }
+  else if(src.id()==ID_c_bit_field)
+  {
+    std::string width=i2string(to_c_bit_field_type(src).get_width());
+    return q+convert(src.subtype())+d+" : "+width;
+  }
   else if(src.id()==ID_signedbv ||
           src.id()==ID_unsignedbv)
   {
     // annotated?
     
     irep_idt c_type=src.get(ID_C_c_type);
+    const std::string c_type_str=c_type_as_string(c_type);
 
-    if(c_type==ID_unsigned_char)
-      return q+"unsigned char"+d;
-    else if(c_type==ID_signed_char)
-      return q+"signed char"+d;
-    else if(c_type==ID_char)
+    if(c_type==ID_char &&
+       config.ansi_c.char_is_unsigned!=(src.id()==ID_unsignedbv))
     {
-      if(config.ansi_c.char_is_unsigned==
-         (src.id()==ID_unsignedbv))
-        return q+"char"+d;
+      if(src.id()==ID_signedbv)
+        return q+"signed char"+d;
       else
-      {
-        if(src.id()==ID_signedbv)
-          return q+"signed char"+d;
-        else
-          return q+"unsigned char"+d;
-      }
+        return q+"unsigned char"+d;
     }
-    else if(c_type==ID_unsigned_short_int)
-      return q+"unsigned short int"+d;
-    else if(c_type==ID_signed_short_int)
-      return q+"signed short int"+d;
-    else if(c_type==ID_unsigned_int)
-      return q+"unsigned int"+d;
-    else if(c_type==ID_signed_int)
-      return q+"signed int"+d;
-    else if(c_type==ID_unsigned_long_int)
-      return q+"unsigned long int"+d;
-    else if(c_type==ID_signed_long_int)
-      return q+"signed long int"+d;
-    else if(c_type==ID_unsigned_long_long_int)
-      return q+"unsigned long long int"+d;
-    else if(c_type==ID_signed_long_long_int)
-      return q+"signed long long int"+d;
-    else if(c_type==ID_bool)
-      return q+"_Bool"+d;
-    else if(c_type==ID_signed_int128)
-      return q+"signed __int128"+d;
-    else if(c_type==ID_unsigned_int128)
-      return q+"unsigned __int128"+d;
+    else if(c_type!=ID_wchar_t && !c_type_str.empty())
+      return q+c_type_str+d;
       
     // There is also wchar_t among the above, but this isn't a C type.
 
@@ -426,24 +394,52 @@ std::string expr2ct::convert_rec(
 
     return dest;
   }
-  else if(src.id()==ID_c_enum ||
-          src.id()==ID_incomplete_c_enum)
+  else if(src.id()==ID_c_enum)
   {
+    std::string result;
+    result+=q;
+    result+="enum";
+
     // do we have a tag?
     const irept &tag=src.find(ID_tag);
     
     if(tag.is_nil())
     {
-      /* until we have more information about enums in the context we go for a
-       * hack
-      std::string result=q+"enum";
-      if(!src.get(ID_tag).empty()) result+=" "+src.get_string(ID_tag);
-      result+=d;
-      return result;
-      */
-      return q+"int"+d;
     }
     else
+    {
+      result+=' ';
+      result+=tag.get_string(ID_C_base_name);
+    }
+    
+    result+=' ';
+    result+='{';
+    
+    // add members
+    const c_enum_typet::memberst &members=to_c_enum_type(src).members();
+    
+    for(c_enum_typet::memberst::const_iterator
+        it=members.begin();
+        it!=members.end();
+        it++)
+    {
+      if(it!=members.begin()) result+=',';
+      result+=' ';
+      result+=id2string(it->get_base_name());
+      result+='=';
+      result+=id2string(it->get_value());
+    }
+
+    result+=" }";
+
+    result+=d;
+    return result;
+  }
+  else if(src.id()==ID_incomplete_c_enum)
+  {
+    const irept &tag=src.find(ID_tag);
+    
+    if(tag.is_not_nil())
     {
       std::string result=q+"enum";
       result+=" "+tag.get_string(ID_C_base_name);
@@ -651,14 +647,12 @@ std::string expr2ct::convert_typecast(
   const typet &to_type=ns.follow(src.type());
   const typet &from_type=ns.follow(src.op().type());
   
-  if(to_type.id()==ID_unsignedbv &&
-     to_type.get(ID_C_c_type)==ID_bool &&
+  if(to_type.id()==ID_c_bool &&
      from_type.id()==ID_bool)
     return convert(src.op(), precedence);
      
   if(to_type.id()==ID_bool &&
-     from_type.get(ID_C_c_type)==ID_bool &&
-     from_type.id()==ID_unsignedbv)
+     from_type.id()==ID_c_bool)
     return convert(src.op(), precedence);
 
   std::string dest="("+convert(to_type)+")";
@@ -2034,8 +2028,8 @@ std::string expr2ct::convert_constant(
   std::string dest;
 
   if(type.id()==ID_integer ||
-          type.id()==ID_natural ||
-          type.id()==ID_rational)
+     type.id()==ID_natural ||
+     type.id()==ID_rational)
   {
     dest=id2string(value);
   }
@@ -2087,11 +2081,17 @@ std::string expr2ct::convert_constant(
       dest="FALSE";
   }
   else if(type.id()==ID_unsignedbv ||
-          type.id()==ID_signedbv)
+          type.id()==ID_signedbv ||
+          type.id()==ID_c_bit_field ||
+          type.id()==ID_c_bool)
   {
     mp_integer int_value=binary2integer(id2string(value), type.id()==ID_signedbv);
+    
+    const irep_idt &c_type=
+      type.id()==ID_c_bit_field?type.subtype().get(ID_C_c_type):
+                 type.get(ID_C_c_type);
 
-    if(type.get(ID_C_c_type)==ID_bool)
+    if(type.id()==ID_c_bool)
     {
       // C doesn't really have these
       if(int_value!=0)
@@ -2102,8 +2102,6 @@ std::string expr2ct::convert_constant(
     else
     {
       dest=integer2string(int_value);
-
-      irep_idt c_type=type.get(ID_C_c_type);
 
       if(c_type==ID_unsigned_int)
         dest+='u';
@@ -2172,22 +2170,7 @@ std::string expr2ct::convert_constant(
   else if(type.id()==ID_array ||
           type.id()==ID_incomplete_array)
   {
-    dest="{ ";
-
-    forall_operands(it, src)
-    {
-      std::string tmp=convert(*it);
-
-      if((it+1)!=src.operands().end())
-      {
-        tmp+=", ";
-        if(tmp.size()>40) tmp+="\n    ";
-      }
-
-      dest+=tmp;
-    }
-
-    dest+=" }";
+    dest=convert_array(src, precedence);
   }
   else if(type.id()==ID_pointer)
   {
@@ -2844,7 +2827,10 @@ std::string expr2ct::convert_code_asm(
         {
           if(it!=src.op3().operands().begin())
             dest+=", ";
-          dest+=convert(*it);
+          if(it->id()==ID_gcc_asm_clobbered_register)
+            dest+=convert(it->op0());
+          else
+            dest+=convert(*it);
         }
       }
       dest+=");";

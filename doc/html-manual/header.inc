@@ -16,7 +16,7 @@
 
 <div id="nav">
 <ul>
-<li>FV Group Home</li>
+<li>SV Group Home</li>
 <li><a href="/software/">Software Verification</a></li>
 <li><a href="/hardware/">Hardware Verification</a></li>
 </ul>

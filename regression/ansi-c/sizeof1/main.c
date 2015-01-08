@@ -1,7 +1,11 @@
 #include <wchar.h>
+#include <stdlib.h> // for size_t
 
 #define STATIC_ASSERT(condition) \
   int some_array##__LINE__[(condition) ? 1 : -1];    
+
+// check size_t
+STATIC_ASSERT(sizeof(void *)==sizeof(size_t));
 
 #ifdef _WIN32
 

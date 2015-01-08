@@ -41,8 +41,7 @@ void cpp_typecheckt::convert_argument(
     parameter.set_base_name(identifier);
   }
 
-  identifier=language_prefix+
-             cpp_scopes.current_scope().prefix+
+  identifier=cpp_scopes.current_scope().prefix+
              id2string(identifier);
 
   parameter.set_identifier(identifier);

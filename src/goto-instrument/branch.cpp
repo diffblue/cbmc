@@ -37,7 +37,7 @@ void branch(
     
     // don't instrument the function to be called,
     // or otherwise this will be recursive
-    if(f_it->first=="c::"+id2string(id))
+    if(f_it->first==id)
       continue;
     
     // patch in a call to `id' at the branch points

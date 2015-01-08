@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cmdline.h"
 #include "simplify_expr.h"
 #include "i2string.h"
+#include "std_expr.h"
+#include "cprover_prefix.h"
 
 configt config;
 
@@ -774,6 +776,7 @@ bool configt::set(const cmdlinet &cmdline)
   
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=false; // ealier than C99
+  ansi_c.cpp11=false;
   ansi_c.use_fixed_for_float=false;
   ansi_c.endianness=ansi_ct::NO_ENDIANNESS;
   ansi_c.os=ansi_ct::NO_OS;
@@ -975,7 +978,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.wchar_t_width=2*8;
     ansi_c.wchar_t_is_unsigned=true;
 
-    // In 32-bit mode, long double is the same as double in Visual Studio,
+    // long double is the same as double in Visual Studio,
     // but it's 16 bytes with GCC with the 64-bit target.
     if(arch=="x64_64" && cmdline.isset("gcc"))
       ansi_c.long_double_width=16*8;
@@ -1083,7 +1086,7 @@ static unsigned from_ns(
   const namespacet &ns,
   const std::string &what)
 {
-  const irep_idt id="c::__CPROVER_architecture_"+what;
+  const irep_idt id=CPROVER_PREFIX "architecture_"+what;
   const symbolt *symbol;
 
   if(ns.lookup(id, symbol))
@@ -1092,9 +1095,12 @@ static unsigned from_ns(
   exprt tmp=symbol->value;
   simplify(tmp, ns);
   
+  if(tmp.id()!=ID_constant)
+    throw "symbol table configuration entry `"+id2string(id)+"' is not a constant";
+  
   mp_integer int_value;
   
-  if(to_integer(tmp, int_value))
+  if(to_integer(to_constant_expr(tmp), int_value))
     throw "failed to convert symbol table configuration entry `"+id2string(id)+"'";
     
   return integer2unsigned(int_value);

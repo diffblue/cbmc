@@ -42,15 +42,9 @@ void base_type_rec(
       return;
     }
   }
-  else if(type.id()==ID_subtype)
-  {
-    typet tmp;
-    tmp.swap(type.subtype());
-    type.swap(tmp);
-  }
   else if(type.id()==ID_array)
   {
-    base_type_rec(type.subtype(), ns, symb);
+    base_type_rec(to_array_type(type).subtype(), ns, symb);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
@@ -68,7 +62,7 @@ void base_type_rec(
   }
   else if(type.id()==ID_pointer)
   {
-    typet &subtype=type.subtype();
+    typet &subtype=to_pointer_type(type).subtype();
 
     // we need to avoid running into an infinite loop
     if(subtype.id()==ID_symbol)
@@ -245,11 +239,13 @@ bool base_type_eqt::base_type_eq_rec(
   }
   else if(type1.id()==ID_pointer)
   {
-    return base_type_eq_rec(type1.subtype(), type2.subtype());
+    return base_type_eq_rec(
+      to_pointer_type(type1).subtype(), to_pointer_type(type2).subtype());
   }
   else if(type1.id()==ID_array)
   {
-    if(!base_type_eq_rec(type1.subtype(), type2.subtype()))
+    if(!base_type_eq_rec(
+      to_array_type(type1).subtype(), to_array_type(type2).subtype()))
       return false;
 
     if(to_array_type(type1).size()!=to_array_type(type2).size())
@@ -259,7 +255,9 @@ bool base_type_eqt::base_type_eq_rec(
   }
   else if(type1.id()==ID_incomplete_array)
   {
-    return base_type_eq_rec(type1.subtype(), type2.subtype());
+    return base_type_eq_rec(
+      to_incomplete_array_type(type1).subtype(),
+      to_incomplete_array_type(type2).subtype());
   }
 
   // the below will go away

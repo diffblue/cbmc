@@ -18,10 +18,6 @@
 static int isatty(int) { return 0; }
 #endif
 
-#include <util/expr.h>
-#include <util/arith_tools.h>
-#include <util/config.h>
-
 #include "c_types.h"
 #include "preprocessor_line.h"
 #include "string_constant.h"
@@ -49,7 +45,7 @@ int make_identifier()
   // this hashes the identifier
   irep_idt base_name=yytext;
   
-  if(PARSER.cpp)
+  if(PARSER.cpp98)
   {
     stack(yyansi_clval).id(ID_symbol);
     stack(yyansi_clval).set(ID_C_base_name, base_name);
@@ -89,9 +85,20 @@ int MSC_Keyword(int token)
     return make_identifier();
 }
 
-int cpp_keyword(int token)
+int cpp98_keyword(int token)
 {
-  if(PARSER.cpp)
+  if(PARSER.cpp98)
+  {
+    loc();
+    return token;
+  }
+  else
+    return make_identifier();
+}
+
+int cpp11_keyword(int token)
+{
+  if(PARSER.cpp11)
   {
     loc();
     return token;
@@ -102,7 +109,7 @@ int cpp_keyword(int token)
 
 int MSC_cpp_keyword(int token)
 {
-  if(PARSER.cpp && PARSER.mode==ansi_c_parsert::MSC)
+  if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::MSC)
   {
     loc();
     return token;
@@ -113,7 +120,7 @@ int MSC_cpp_keyword(int token)
 
 int cpp_operator(int token)
 {
-  if(PARSER.cpp)
+  if(PARSER.cpp98)
   {
     loc();
     return token;
@@ -280,23 +287,51 @@ void ansi_c_scanner_init()
                   PARSER.set_line_no(PARSER.get_line_no()-1);
 		 }
 
-<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{integer_s}")"{ws}{newline} {
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"push"{ws}")"{ws}{newline} {
                    // Done by Visual Studio and gcc
-                   std::string tmp(yytext);
-                   std::size_t p=tmp.find('(')+1;
-                   std::string value=std::string(tmp, p, tmp.rfind(')')-p);
-                   exprt l=convert_integer_literal(value);
-                   to_integer(l, PARSER.pragma_pack);
-                   // needs push, pop
                    // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   // push, pop could also use identifiers
+                   if(PARSER.pragma_pack.empty())
+                     PARSER.pragma_pack.push_back(convert_integer_literal("0"));
+                   else
+                     PARSER.pragma_pack.push_back(PARSER.pragma_pack.back());
+		 }
+
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"push"{ws}","{ws}{integer_s}{ws}")"{ws}{newline} {
+                   // Done by Visual Studio and gcc
+                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   // push, pop could also use identifiers
+                   std::string tmp(yytext);
+                   std::string::size_type p=tmp.find(',')+1;
+                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
+                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
+                   exprt n=convert_integer_literal(value);
+                   PARSER.pragma_pack.push_back(n);
+		 }
+
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}{integer_s}{ws}")"{ws}{newline} {
+                   // Done by Visual Studio and gcc
+                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   std::string tmp(yytext);
+                   std::string::size_type p=tmp.find('(')+1;
+                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
+                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
+                   exprt n=convert_integer_literal(value);
+                   PARSER.pragma_pack.push_back(n);
+		 }
+
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"pop"{ws}")"{ws}{newline} {
+                   // Done by Visual Studio and gcc
+                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   // push, pop could also use identifiers
+                   if(!PARSER.pragma_pack.empty()) PARSER.pragma_pack.pop_back();
 		 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}")"{ws}{newline} {
                    // Done by Visual Studio and gcc
-                   // should be equivalent to pop-all
-                   PARSER.pragma_pack=0;
-                   // needs push, pop
                    // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                   // should be equivalent to pop-all
+                   PARSER.pragma_pack.clear();
 		 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}.* {
@@ -318,7 +353,7 @@ void ansi_c_scanner_init()
 
 <GRAMMAR,GCC_ATTRIBUTE3>{
 "auto"		{ loc(); return TOK_AUTO; }
-"_Bool"		{ if(PARSER.cpp)
+"_Bool"		{ if(PARSER.cpp98)
                     return make_identifier();
                   else
                   { loc(); return TOK_BOOL; }
@@ -358,8 +393,14 @@ void ansi_c_scanner_init()
 "volatile"	{ loc(); return TOK_VOLATILE; }
 "while"		{ loc(); return TOK_WHILE; }
 
-"__auto_type"   { if(PARSER.mode==ansi_c_parsert::GCC && !PARSER.cpp)
+"__auto_type"   { if(PARSER.mode==ansi_c_parsert::GCC && !PARSER.cpp98)
                     { loc(); return TOK_GCC_AUTO_TYPE; }
+                  else
+                    return make_identifier();
+                }
+
+"__float80"	{ if(PARSER.mode==ansi_c_parsert::GCC)
+                    { loc(); return TOK_GCC_FLOAT80; }
                   else
                     return make_identifier();
                 }
@@ -514,7 +555,7 @@ void ansi_c_scanner_init()
                     BEGIN(MSC_ASM);
                     return TOK_MSC_ASM;
                   }
-                  else if(PARSER.cpp)
+                  else if(PARSER.cpp98)
                   {
                     loc();
                     return TOK_GCC_ASM;
@@ -526,7 +567,7 @@ void ansi_c_scanner_init()
 "asm"           { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::CW)
                   {
-                    if(PARSER.cpp)
+                    if(PARSER.cpp98)
                     {
                       loc();
                       return TOK_GCC_ASM;
@@ -542,7 +583,7 @@ void ansi_c_scanner_init()
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    if(PARSER.cpp)
+                    if(PARSER.cpp98)
                     {
                       loc();
                       return TOK_GCC_ASM;
@@ -576,55 +617,57 @@ void ansi_c_scanner_init()
 /* C++ Keywords and Operators */
 %}
 
-alignas             { return cpp_keyword(TOK_ALIGNAS); } // C++11
-alignof             { return cpp_keyword(TOK_ALIGNOF); } // C++11
-and                 { return cpp_keyword(TOK_ANDAND); }
-and_eq              { return cpp_keyword(TOK_ANDASSIGN); }
-bool                { return cpp_keyword(TOK_BOOL); }
-catch               { return cpp_keyword(TOK_CATCH); }
-char16_t            { return cpp_keyword(TOK_CHAR16_T); } // C++11
-char32_t            { return cpp_keyword(TOK_CHAR16_T); } // C++11
-class               { return cpp_keyword(TOK_CLASS); }
-compl               { return cpp_keyword('~'); }
-constexpr           { return cpp_keyword(TOK_CONSTEXPR); } // C++11
-delete              { return cpp_keyword(TOK_DELETE); }
-decltype            { return cpp_keyword(TOK_DECLTYPE); } // C++11
-explicit            { return cpp_keyword(TOK_EXPLICIT); }
-friend              { return cpp_keyword(TOK_FRIEND); }
-mutable             { return cpp_keyword(TOK_MUTABLE); }
-namespace           { return cpp_keyword(TOK_NAMESPACE); }
-new                 { return cpp_keyword(TOK_NEW); }
-noexcept            { return cpp_keyword(TOK_NOEXCEPT); } // C++11
-not                 { return cpp_keyword('!'); }
-not_eq              { return cpp_keyword(TOK_NE); }
-nullptr             { return cpp_keyword(TOK_NULLPTR); } // C++11
-operator            { return cpp_keyword(TOK_OPERATOR); }
-or                  { return cpp_keyword(TOK_OROR); }
-or_eq               { return cpp_keyword(TOK_ORASSIGN); }
-private             { return cpp_keyword(TOK_PRIVATE); }
-protected           { return cpp_keyword(TOK_PROTECTED); }
-public              { return cpp_keyword(TOK_PUBLIC); }
-static_assert       { return cpp_keyword(TOK_STATIC_ASSERT); } // C++11
-template            { return cpp_keyword(TOK_TEMPLATE); }
-this                { return cpp_keyword(TOK_THIS); }
-thread_local        { return cpp_keyword(TOK_THREAD_LOCAL); } // C++11
-throw               { return cpp_keyword(TOK_THROW); }
-typeid              { return cpp_keyword(TOK_TYPEID); }
-typename            { return cpp_keyword(TOK_TYPENAME); }
-using               { return cpp_keyword(TOK_USING); }
-virtual             { return cpp_keyword(TOK_VIRTUAL); }
+alignas             { return cpp11_keyword(TOK_ALIGNAS); } // C++11
+alignof             { return cpp11_keyword(TOK_ALIGNOF); } // C++11
+and                 { return cpp98_keyword(TOK_ANDAND); }
+and_eq              { return cpp98_keyword(TOK_ANDASSIGN); }
+bool                { return cpp98_keyword(TOK_BOOL); }
+catch               { return cpp98_keyword(TOK_CATCH); }
+char16_t            { return cpp11_keyword(TOK_CHAR16_T); } // C++11
+char32_t            { return cpp11_keyword(TOK_CHAR32_T); } // C++11
+class               { return cpp98_keyword(TOK_CLASS); }
+compl               { return cpp98_keyword('~'); }
+constexpr           { return cpp11_keyword(TOK_CONSTEXPR); } // C++11
+delete              { return cpp98_keyword(TOK_DELETE); }
+decltype            { return cpp11_keyword(TOK_DECLTYPE); } // C++11
+explicit            { return cpp98_keyword(TOK_EXPLICIT); }
+false               { return cpp98_keyword(TOK_FALSE); }
+friend              { return cpp98_keyword(TOK_FRIEND); }
+mutable             { return cpp98_keyword(TOK_MUTABLE); }
+namespace           { return cpp98_keyword(TOK_NAMESPACE); }
+new                 { return cpp98_keyword(TOK_NEW); }
+noexcept            { return cpp11_keyword(TOK_NOEXCEPT); } // C++11
+not                 { return cpp98_keyword('!'); }
+not_eq              { return cpp98_keyword(TOK_NE); }
+nullptr             { return cpp11_keyword(TOK_NULLPTR); } // C++11
+operator            { return cpp98_keyword(TOK_OPERATOR); }
+or                  { return cpp98_keyword(TOK_OROR); }
+or_eq               { return cpp98_keyword(TOK_ORASSIGN); }
+private             { return cpp98_keyword(TOK_PRIVATE); }
+protected           { return cpp98_keyword(TOK_PROTECTED); }
+public              { return cpp98_keyword(TOK_PUBLIC); }
+static_assert       { return cpp11_keyword(TOK_STATIC_ASSERT); } // C++11
+template            { return cpp98_keyword(TOK_TEMPLATE); }
+this                { return cpp98_keyword(TOK_THIS); }
+thread_local        { return cpp11_keyword(TOK_THREAD_LOCAL); } // C++11
+throw               { return cpp98_keyword(TOK_THROW); }
+true                { return cpp98_keyword(TOK_TRUE); }
+typeid              { return cpp98_keyword(TOK_TYPEID); }
+typename            { return cpp98_keyword(TOK_TYPENAME); }
+using               { return cpp98_keyword(TOK_USING); }
+virtual             { return cpp98_keyword(TOK_VIRTUAL); }
 wchar_t	            { // CodeWarrior doesn't have wchar_t built in,
-                      // and in MSC, there is a command-line option to turn it off
+                      // and MSC has a command-line option to turn it off
                       if(PARSER.mode==ansi_c_parsert::CW)
                         return make_identifier();
                       else
-                        return cpp_keyword(TOK_WCHAR_T);
+                        return cpp98_keyword(TOK_WCHAR_T);
                     }
-xor                 { return cpp_keyword('^'); }
-xor_eq              { return cpp_keyword(TOK_XORASSIGN); }
+xor                 { return cpp98_keyword('^'); }
+xor_eq              { return cpp98_keyword(TOK_XORASSIGN); }
 ".*"                { return cpp_operator(TOK_DOTPM); }
 "->*"               { return cpp_operator(TOK_ARROWPM); }
-"::"                { if(PARSER.cpp)
+"::"                { if(PARSER.cpp98)
                         return cpp_operator(TOK_SCOPE);
                       else
                       {
@@ -635,8 +678,8 @@ xor_eq              { return cpp_keyword(TOK_XORASSIGN); }
                       }
                     }
 
-__decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
-                        return cpp_keyword(TOK_DECLTYPE);
+__decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
+                        return cpp98_keyword(TOK_DECLTYPE);
                       else
                         return make_identifier();
                     }
@@ -700,8 +743,26 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 	           }
                  }
 
+"__char16_t"     { if(PARSER.mode==ansi_c_parsert::GCC)
+                     return cpp98_keyword(TOK_CHAR16_T); // GNU extension
+                   else
+                     return make_identifier();
+                 }
+
+"__nullptr"     { if(PARSER.mode==ansi_c_parsert::GCC)
+                     return cpp98_keyword(TOK_NULLPTR); // GNU extension
+                   else
+                     return make_identifier();
+                 }
+
+"__char32_t"     { if(PARSER.mode==ansi_c_parsert::GCC)
+                     return cpp98_keyword(TOK_CHAR32_T); // GNU extension
+                   else
+                     return make_identifier();
+                 }
+
 "__declspec" |
-"_declspec"     { if(PARSER.cpp)
+"_declspec"     { if(PARSER.cpp98)
                   {
                     BEGIN(IGNORE_PARENS);
                   }
@@ -736,7 +797,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                      PARSER.mode==ansi_c_parsert::ARM)
                   {
                     #if 1
-                    if(PARSER.cpp)
+                    if(PARSER.cpp98)
                       BEGIN(IGNORE_PARENS);
                     else
                       BEGIN(GCC_ATTRIBUTE1);
@@ -909,7 +970,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                     return make_identifier();
                 }
 
-"typeof"        { if(PARSER.cpp ||
+"typeof"        { if(PARSER.cpp98 ||
                      PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ICC ||
                      PARSER.mode==ansi_c_parsert::CW ||
@@ -958,7 +1019,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                     return make_identifier();
                 }
 
-"try"           { if(PARSER.cpp) // C++?
+"try"           { if(PARSER.cpp98) // C++?
                     { loc(); return TOK_TRY; }
                   else
                     return make_identifier();
@@ -1048,7 +1109,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Alignas"      { if(!PARSER.cpp &&
+"_Alignas"      { if(!PARSER.cpp98 &&
                      (PARSER.mode==ansi_c_parsert::GCC ||
                       PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_ALIGNAS; }
@@ -1058,7 +1119,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Alignof"      { if(!PARSER.cpp &&
+"_Alignof"      { if(!PARSER.cpp98 &&
                      (PARSER.mode==ansi_c_parsert::GCC ||
                       PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_ALIGNOF; }
@@ -1078,7 +1139,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "_Atomic"{ws}"(" { // put back all but _Atomic
                    yyless(7);
 
-                   if(!PARSER.cpp &&
+                   if(!PARSER.cpp98 &&
                       (PARSER.mode==ansi_c_parsert::GCC ||
                        PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_ATOMIC_TYPE_SPECIFIER; }
@@ -1086,7 +1147,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                     return make_identifier();
                 }
 
-"_Atomic"       { if(!PARSER.cpp &&
+"_Atomic"       { if(!PARSER.cpp98 &&
                      (PARSER.mode==ansi_c_parsert::GCC ||
                       PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_ATOMIC_TYPE_QUALIFIER; }
@@ -1096,7 +1157,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Generic"      { if(!PARSER.cpp &&
+"_Generic"      { if(!PARSER.cpp98 &&
                      (PARSER.mode==ansi_c_parsert::GCC ||
                       PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_GENERIC; }
@@ -1106,7 +1167,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Imaginary"    { if(!PARSER.cpp &&
+"_Imaginary"    { if(!PARSER.cpp98 &&
                      (PARSER.mode==ansi_c_parsert::GCC ||
                       PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_IMAGINARY; }
@@ -1116,7 +1177,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Noreturn"     { if(!PARSER.cpp &&
+"_Noreturn"     { if(!PARSER.cpp98 &&
                      (PARSER.mode==ansi_c_parsert::GCC ||
                       PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_NORETURN; }
@@ -1126,7 +1187,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Static_assert" { if(!PARSER.cpp &&
+"_Static_assert" { if(!PARSER.cpp98 &&
                       (PARSER.mode==ansi_c_parsert::GCC ||
                        PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_STATIC_ASSERT; }
@@ -1136,7 +1197,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Thread_local" { if(!PARSER.cpp &&
+"_Thread_local" { if(!PARSER.cpp98 &&
                      (PARSER.mode==ansi_c_parsert::GCC ||
                       PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_THREAD_LOCAL; }

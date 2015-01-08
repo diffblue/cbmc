@@ -235,11 +235,18 @@ bool gcc_modet::doit()
   if(cmdline.isset("std"))
   {
     std::string std_string=cmdline.get_value("std");
+
     if(std_string=="gnu99" || std_string=="c99" || std_string=="iso9899:1999" ||
        std_string=="gnu9x" || std_string=="c9x" || std_string=="iso9899:199x" ||
        std_string=="gnu11" || std_string=="c11" ||
        std_string=="gnu1x" || std_string=="c1x")
       config.ansi_c.for_has_scope=true;
+
+    if(std_string=="c++11" || std_string=="c++1x" ||
+       std_string=="gnu++11" || std_string=="gnu++1x" || 
+       std_string=="c++1y" ||
+       std_string=="gnu++1y")
+      config.ansi_c.cpp11=true;
   }
 
   // gcc's default is 32 bits for wchar_t

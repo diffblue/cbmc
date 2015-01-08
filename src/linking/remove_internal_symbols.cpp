@@ -10,6 +10,7 @@ Author: Daniel Kroening
 #include <util/namespace.h>
 #include <util/find_symbols.h>
 #include <util/std_types.h>
+#include <util/cprover_prefix.h>
 
 #include "remove_internal_symbols.h"
 
@@ -94,16 +95,16 @@ void remove_internal_symbols(
 
   // we retain certain special ones
   find_symbols_sett special;
-  special.insert("c::argc'");  
-  special.insert("c::argv'");  
-  special.insert("c::envp'");  
-  special.insert("c::envp_size'");  
-  special.insert("c::__CPROVER_memory");  
-  special.insert("c::__CPROVER_initialize");
-  special.insert("c::__CPROVER_malloc_size");
-  special.insert("c::__CPROVER_deallocated");
-  special.insert("c::__CPROVER_dead_object");
-  special.insert("c::__CPROVER_rounding_mode");
+  special.insert("argc'");  
+  special.insert("argv'");  
+  special.insert("envp'");  
+  special.insert("envp_size'");  
+  special.insert(CPROVER_PREFIX "memory");  
+  special.insert(CPROVER_PREFIX "initialize");
+  special.insert(CPROVER_PREFIX "malloc_size");
+  special.insert(CPROVER_PREFIX "deallocated");
+  special.insert(CPROVER_PREFIX "dead_object");
+  special.insert(CPROVER_PREFIX "rounding_mode");
 
   for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();

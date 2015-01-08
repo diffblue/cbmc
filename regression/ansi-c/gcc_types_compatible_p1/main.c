@@ -75,6 +75,7 @@ STATIC_ASSERT(!__builtin_types_compatible_p(int[], int *));
 STATIC_ASSERT(!__builtin_types_compatible_p(long int, int));
 STATIC_ASSERT(!__builtin_types_compatible_p(long long int, long int));
 STATIC_ASSERT(!__builtin_types_compatible_p(unsigned, signed));
+STATIC_ASSERT(!__builtin_types_compatible_p(__float80, double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__float128, long double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__float128, double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__int128, unsigned __int128));

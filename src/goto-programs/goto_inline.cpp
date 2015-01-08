@@ -244,12 +244,18 @@ void replace_location(
   source_locationt &dest,
   const source_locationt &new_location)
 {
-  // can't just copy, e.g., due to comments field
-  dest.id(irep_idt()); // not NIL
-  dest.set_file(new_location.get_file());
-  dest.set_line(new_location.get_line());
-  dest.set_column(new_location.get_column());
-  dest.set_function(new_location.get_function());
+  // we copy, and then adjust for property_id, property_class
+  // and comment, if necessary
+
+  irep_idt comment=dest.get_comment();
+  irep_idt property_class=dest.get_property_class();
+  irep_idt property_id=dest.get_property_id();
+
+  dest=new_location;
+  
+  if(comment!=irep_idt()) dest.set_comment(comment);
+  if(property_class!=irep_idt()) dest.set_property_class(property_class);
+  if(property_id!=irep_idt()) dest.set_property_id(property_id);
 }
 
 /*******************************************************************\
@@ -374,13 +380,15 @@ void goto_inlinet::expand_function_call(
     parameter_assignments(target->source_location, identifier, f.type, arguments, tmp);
     tmp.destructive_append(tmp2);
 
-    if(f.type.get_bool("#hide"))
+    if(f.is_hidden())
     {
-      const source_locationt &new_source_location=
+      source_locationt new_source_location=
         function.find_source_location();
     
       if(new_source_location.is_not_nil())
       {
+        new_source_location.set_hide();
+      
         Forall_goto_program_instructions(it, tmp)
           if(it->function==identifier)
           {

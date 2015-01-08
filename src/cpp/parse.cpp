@@ -2,6 +2,7 @@
 
 #include <util/expr.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/i2string.h>
 
@@ -4114,19 +4115,21 @@ Function:
 bool Parser::rEnumSpec(typet &spec)
 {
   Token tk;
-  bool is_enum_class=false;
+  //bool is_enum_class=false;
 
   if(lex.GetToken(tk)!=TOK_ENUM)
     return false;
-    
+
   spec=cpp_enum_typet();
   set_location(spec, tk);
+
+  spec.subtype().make_nil();
 
   // C++11 enum classes  
   if(lex.LookAhead(0)==TOK_CLASS)
   {
     lex.GetToken(tk);
-    is_enum_class=true;
+    //is_enum_class=true;
   }
 
   if(lex.LookAhead(0)!='{')
@@ -4140,8 +4143,8 @@ bool Parser::rEnumSpec(typet &spec)
 
     spec.add(ID_tag).swap(name);
     
-    // C++11 enum classes have an optional underlying type
-    if(lex.LookAhead(0)==':' && is_enum_class)
+    // C++11 enums have an optional underlying type
+    if(lex.LookAhead(0)==':')
     {
       lex.GetToken(tk); // read the colon
       if(!rTypeName(spec.subtype())) return false;
@@ -6589,6 +6592,9 @@ Function:
   | '(' comma.expression ')'
   | integral.or.class.spec '(' function.arguments ')'
   | typeid.expr
+  | true
+  | false
+  | nullptr
 */
 bool Parser::rPrimaryExpr(exprt &exp)
 {
@@ -6617,6 +6623,24 @@ bool Parser::rPrimaryExpr(exprt &exp)
   case TOK_THIS:
     lex.GetToken(tk);
     exp=exprt("cpp-this");
+    set_location(exp, tk);
+    return true;
+
+  case TOK_TRUE:
+    lex.GetToken(tk);
+    exp=true_exprt();
+    set_location(exp, tk);
+    return true;
+
+  case TOK_FALSE:
+    lex.GetToken(tk);
+    exp=false_exprt();
+    set_location(exp, tk);
+    return true;
+
+  case TOK_NULLPTR:
+    lex.GetToken(tk);
+    exp=constant_exprt(ID_nullptr, typet(ID_nullptr));
     set_location(exp, tk);
     return true;
 
@@ -7892,6 +7916,7 @@ bool Parser::rGCCAsmStatement(codet &statement)
 
   statement=codet(ID_asm);
   statement.set(ID_flavor, ID_gcc);
+  statement.operands().resize(5); // always has 5 operands
   set_location(statement, tk);
 
   if(lex.LookAhead(0)==TOK_VOLATILE)
@@ -7904,7 +7929,7 @@ bool Parser::rGCCAsmStatement(codet &statement)
   if(lex.GetToken(tk)!='(') return false;
   if(!rString(tk)) return false;
 
-  statement.move_to_operands(tk.data);
+  statement.op0()=tk.data;
 
   #ifdef DEBUG
   std::cout << "Parser::rGCCAsmStatement 3\n";

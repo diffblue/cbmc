@@ -166,6 +166,11 @@ void c_typecheck_baset::typecheck_asm(codet &code)
     // These have 5 operands.
     // The first parameter is a string.
     // Parameters 1, 2, 3, 4 are lists of expressions.
+    
+    // Parameter 1: OutputOperands
+    // Parameter 2: InputOperands
+    // Parameter 3: Clobbers
+    // Parameter 4: GotoLabels
 
     assert(code.operands().size()==5);
   
@@ -353,9 +358,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
       d_it!=declaration.declarators().end();
       d_it++)
   {
-    // add prefix
-    irep_idt identifier=
-      add_language_prefix(d_it->get_name());
+    irep_idt identifier=d_it->get_name();
 
     // look it up
     symbol_tablet::symbolst::iterator s_it=

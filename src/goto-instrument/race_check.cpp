@@ -13,6 +13,7 @@ Date: February 2006
 #include <util/guard.h>
 #include <util/symbol_table.h>
 #include <util/prefix.h>
+#include <util/cprover_prefix.h>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
@@ -170,12 +171,12 @@ bool is_shared(
 {
   const irep_idt &identifier=symbol_expr.get_identifier();
 
-  if(identifier=="c::__CPROVER_alloc" ||
-     identifier=="c::__CPROVER_alloc_size" ||
-     identifier=="c::stdin" ||
-     identifier=="c::stdout" ||
-     identifier=="c::stderr" ||
-     identifier=="c::sys_nerr" ||
+  if(identifier==CPROVER_PREFIX "alloc" ||
+     identifier==CPROVER_PREFIX "alloc_size" ||
+     identifier=="stdin" ||
+     identifier=="stdout" ||
+     identifier=="stderr" ||
+     identifier=="sys_nerr" ||
      has_prefix(id2string(identifier), "symex::invalid_object") ||
      has_prefix(id2string(identifier), "symex_dynamic::dynamic_object"))
     return false; // no race check
@@ -389,7 +390,7 @@ void race_check(
 
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=goto_functionst::entry_point() &&
-       f_it->first!="c::__CPROVER_initialize")
+       f_it->first!=CPROVER_PREFIX "initialize")
       race_check(value_sets, symbol_table, 
 #ifdef LOCAL_MAY
         f_it->second, 

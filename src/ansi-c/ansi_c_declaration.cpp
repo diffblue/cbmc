@@ -161,7 +161,7 @@ void ansi_c_declarationt::to_symbol(
   symbol.clear();    
   symbol.value=declarator.value();
   symbol.type=full_type(declarator);
-  symbol.name="c::"+id2string(declarator.get_name());
+  symbol.name=declarator.get_name();
   symbol.base_name=declarator.get_base_name();
   symbol.is_type=get_is_typedef();
   symbol.location=declarator.source_location();

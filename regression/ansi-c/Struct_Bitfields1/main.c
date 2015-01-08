@@ -34,4 +34,20 @@ STATIC_ASSERT(sizeof(struct S3)==sizeof(int)+sizeof(int)+sizeof(int));
 
 int main()
 {
+  // check some operators
+  struct S1 s1;
+  s1.my_bit+=1;
+  s1.my_bit|=1;
+  s1.my_bit&=1;
+  s1.my_bit^=1;
+  s1.my_bit<<=1;
+  s1.my_bit++;
+  ++s1.my_bit;
+  (unsigned)s1.my_bit;
+  
+  int *p;
+  p=p+s1.my_bit;
+  p=p-s1.my_bit;
+  p+=s1.my_bit;
+  p-=s1.my_bit;
 }

@@ -65,7 +65,7 @@ void remove_asmt::gcc_asm_function_call(
   const codet &code,
   goto_programt &dest)
 {
-  irep_idt function_identifier="c::"+id2string(function_base_name);
+  irep_idt function_identifier=function_base_name;
   
   code_function_callt function_call;
   function_call.lhs().make_nil();

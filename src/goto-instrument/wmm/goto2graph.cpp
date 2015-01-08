@@ -53,14 +53,13 @@ bool inline instrumentert::local(const irep_idt& id)
     return true;
   }
 
-  if(identifier=="c::__CPROVER_alloc" ||
-    identifier=="c::__CPROVER_alloc_size" ||
-    identifier=="c::stdin" ||
-    identifier=="c::stdout" ||
-    identifier=="c::stderr" ||
-    identifier=="c::sys_nerr" ||
-    has_prefix(identifier, "__unbuffered_") ||
-    has_prefix(identifier, "c::__unbuffered_") )
+  if(identifier==CPROVER_PREFIX "alloc" ||
+    identifier==CPROVER_PREFIX "alloc_size" ||
+    identifier=="stdin" ||
+    identifier=="stdout" ||
+    identifier=="stderr" ||
+    identifier=="sys_nerr" ||
+    has_prefix(identifier, "__unbuffered_"))
     return true;
  
   const size_t pos = identifier.find("[]");
@@ -250,6 +249,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
 
     else if(is_fence(instruction,instrumenter.ns))
     {
+      instrumenter.message.debug() << "Constructing a fence" << messaget::eom;
       visit_cfg_fence(i_it);
     }
 
@@ -315,7 +315,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
       .goto_functions.function_map[function].body.instructions.end();
     --it;
     ending_vertex=in_pos[it];
-  }  
+  } 
 }
 
 /*******************************************************************\
@@ -701,6 +701,8 @@ void inline instrumentert::cfg_visitort::visit_cfg_backedge(
         from!=in_pos[i_it].end(); ++from)
         if(from->first!=to->first)
         {
+          if(egraph[from->first].thread!=egraph[to->first].thread)
+             continue;
           instrumenter.message.debug() << from->first<<"-po->"
             <<to->first << messaget::eom;
           egraph.add_po_back_edge(from->first,to->first);
@@ -741,6 +743,8 @@ void inline instrumentert::cfg_visitort::visit_cfg_backedge(
           from!=in_pos[i_it].end(); ++from)
           if(from->first!=to->first)
           {
+            if(egraph[from->first].thread!=egraph[to->first].thread)
+              continue;
             instrumenter.message.debug() << from->first<<"-po->"
               <<to->first << messaget::eom;
             egraph.add_po_back_edge(from->first,to->first);
@@ -897,6 +901,8 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
       for(std::set<nodet>::const_iterator s_it=in_pos[*prev].begin();
         s_it!=in_pos[*prev].end(); ++s_it)
       {
+        if(egraph[s_it->first].thread!=thread)
+             continue;
         instrumenter.message.debug() << s_it->first<<"-po->"<<new_fence_node
           << messaget::eom;
         egraph.add_po_edge(s_it->first,new_fence_node);
@@ -947,6 +953,8 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
       for(std::set<nodet>::const_iterator s_it=in_pos[*prev].begin();
         s_it!=in_pos[*prev].end(); ++s_it)
       {
+        if(egraph[s_it->first].thread!=thread)
+           continue;
         instrumenter.message.debug() << s_it->first<<"-po->"<<new_fence_node
           << messaget::eom;
         egraph.add_po_edge(s_it->first,new_fence_node);
@@ -1047,6 +1055,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
           s_it!=in_pos[*prev].end();
           ++s_it)
         {
+           if(egraph[s_it->first].thread!=thread)
+             continue;
            instrumenter.message.debug() << s_it->first<<"-po->"
              <<new_read_node << messaget::eom;
            egraph.add_po_edge(s_it->first,new_read_node);
@@ -1153,6 +1163,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
             s_it!=in_pos[*prev].end();
             ++s_it)
           {
+           if(egraph[s_it->first].thread!=thread)
+             continue;
             instrumenter.message.debug() << s_it->first<<"-po->"
               <<new_write_node << messaget::eom;
             egraph.add_po_edge(s_it->first,new_write_node);

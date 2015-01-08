@@ -130,7 +130,7 @@ protected:
   void print_vars() const;
 
   /* storing final results */
-  std::map<edget,fence_typet> fenced_edges;
+  std::map<edget, fence_typet> fenced_edges;
 
 public:
   explicit fence_insertert(instrumentert &instr):
@@ -165,19 +165,24 @@ public:
   void print_to_file_4();
   
   /* TODO: to be replaced eventually by ns.lookup and basename */
-  static std::string remove_extra(const irep_idt& id) {
+  static std::string remove_extra(const irep_idt& id)
+  {
      const std::string copy=id2string(id);
      return remove_extra(copy);
   }
-  static std::string remove_extra(std::string copy) {
+
+  static std::string remove_extra(std::string copy)
+  {
      if(copy.find("::")==std::string::npos)
        return copy;
      return copy.substr(copy.find_last_of("::")+1);
   }
 
-  typet get_type(const irep_idt& id);
-  typet type_component(std::list<std::string>::const_iterator it, 
-    std::list<std::string>::const_iterator end, const typet& type);
+  typet get_type(const irep_idt &id);
+  typet type_component(
+    std::list<std::string>::const_iterator it, 
+    std::list<std::string>::const_iterator end,
+    const typet &type);
 };
 
 #endif

@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/graphml_goto_trace.h>
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/slice.h>
@@ -100,6 +101,21 @@ void bmct::error_trace(const prop_convt &prop_conv)
   
   default:
     assert(false);
+  }
+
+  const std::string graphml=options.get_option("graphml-cex");
+  if(!graphml.empty())
+  {
+    graphmlt cex_graph;
+    convert(ns, goto_trace, cex_graph);
+
+    if(graphml=="-")
+      write_graphml(cex_graph, std::cout);
+    else
+    {
+      std::ofstream out(graphml.c_str());
+      write_graphml(cex_graph, out);
+    }
   }
 }
 
@@ -318,9 +334,12 @@ bool bmct::run(const goto_functionst &goto_functions)
   else if(mm=="pso")
     memory_model.reset(new memory_model_psot(ns));
   else
-    throw "Invalid memory model "+mm+" -- use one of sc, tso, pso";
+  {
+    error() << "Invalid memory model " << mm
+            << " -- use one of sc, tso, pso" << eom;
+    return true;
+  }
 
-  //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
   symex.options=options;
 
@@ -344,7 +363,7 @@ bool bmct::run(const goto_functionst &goto_functions)
     }
   }
 
-  catch(std::string &error_str)
+  catch(const std::string &error_str)
   {
     message_streamt message_stream(get_message_handler());
     message_stream.err_location(symex.last_source_location);
@@ -404,8 +423,8 @@ bool bmct::run(const goto_functionst &goto_functions)
     }
 
     {
-      statistics() << "Generated " << symex.total_claims
-                   << " VCC(s), " << symex.remaining_claims
+      statistics() << "Generated " << symex.total_vccs
+                   << " VCC(s), " << symex.remaining_vccs
                    << " remaining after simplification" << eom;
     }
 
@@ -433,7 +452,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 
     // any properties to check at all?
     if(!options.get_bool_option("program-only") &&
-       symex.remaining_claims==0)
+       symex.remaining_vccs==0)
     {
       report_success();
       return false;

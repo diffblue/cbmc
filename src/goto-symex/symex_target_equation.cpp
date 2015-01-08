@@ -258,7 +258,8 @@ void symex_target_equationt::assignment(
 
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
   SSA_step.type=goto_trace_stept::ASSIGNMENT;
-  SSA_step.hidden=(assignment_type!=STATE);
+  SSA_step.hidden=(assignment_type!=STATE &&
+                   assignment_type!=VISIBLE_ACTUAL_PARAMETER);
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -972,6 +973,8 @@ void symex_target_equationt::SSA_stept::output(
     {
     case HIDDEN: out << "HIDDEN"; break;
     case STATE: out << "STATE"; break;
+    case VISIBLE_ACTUAL_PARAMETER: out << "VISIBLE_ACTUAL_PARAMETER"; break;
+    case HIDDEN_ACTUAL_PARAMETER: out << "HIDDEN_ACTUAL_PARAMETER"; break;
     case PHI: out << "PHI"; break;
     case GUARD: out << "GUARD"; break; 
     default:;

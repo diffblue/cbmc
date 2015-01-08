@@ -181,7 +181,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_c_bit_field)
   {
-    typecheck_c_bit_field_type(type);
+    typecheck_c_bit_field_type(to_c_bit_field_type(type));
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -257,6 +257,9 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     // This is an Apple extension for lambda-like constructs.
     // http://thirdcog.eu/pwcblocks/
+  }
+  else if(type.id()==ID_nullptr)
+  {
   }
   else
   {

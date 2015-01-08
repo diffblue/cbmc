@@ -260,10 +260,7 @@ Function: c_bool_type
 
 typet c_bool_type()
 {
-  // We model it as unsigned, but this doesn't matter,
-  // as we really only want 0 and 1.
-  typet result=unsignedbv_typet(config.ansi_c.bool_width);
-  result.set(ID_C_c_type, ID_bool);
+  typet result=c_bool_typet(config.ansi_c.bool_width);
   return result;
 }
 
@@ -362,6 +359,7 @@ typet wchar_t_type()
     result=signedbv_typet(config.ansi_c.wchar_t_width);
 
   result.set(ID_C_c_type, ID_wchar_t);
+
   return result;
 }
 
@@ -387,6 +385,7 @@ typet char16_t_type()
   result=unsignedbv_typet(16);
 
   result.set(ID_C_c_type, ID_char16_t);
+
   return result;
 }
 
@@ -412,6 +411,7 @@ typet char32_t_type()
   result=unsignedbv_typet(32);
 
   result.set(ID_C_c_type, ID_char32_t);
+
   return result;
 }
 
@@ -442,6 +442,7 @@ typet float_type()
     result=ieee_float_spect::single_precision().to_type();
 
   result.set(ID_C_c_type, ID_float);
+
   return result;
 }
 
@@ -472,6 +473,7 @@ typet double_type()
     result=ieee_float_spect::double_precision().to_type();
   
   result.set(ID_C_c_type, ID_double);
+
   return result;
 }
 
@@ -512,6 +514,7 @@ typet long_double_type()
   }
   
   result.set(ID_C_c_type, ID_long_double);
+
   return result;
 }
 
@@ -545,6 +548,7 @@ typet gcc_float128_type()
 
   // not same as long double!  
   result.set(ID_C_c_type, ID_gcc_float128);
+
   return result;
 }
 
@@ -644,7 +648,7 @@ std::string c_type_as_string(const irep_idt &c_type)
   else if(c_type==ID_unsigned_long_long_int)
     return "unsigned long long int";
   else if(c_type==ID_bool)
-    return "bool";
+    return "_Bool";
   else if(c_type==ID_char)
     return "char";
   else if(c_type==ID_unsigned_char)

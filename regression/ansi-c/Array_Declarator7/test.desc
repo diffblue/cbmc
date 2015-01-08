@@ -1,0 +1,9 @@
+KNOWNBUG
+main.c
+
+^EXIT=64$
+^SIGNAL=0$
+^PARSING ERROR$
+--
+--
+Tests a parsing issue regarding array declarators, see Array_Declarator1

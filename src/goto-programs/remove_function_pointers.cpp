@@ -58,6 +58,7 @@ protected:
   type_mapt type_map;
 
   bool is_type_compatible(
+    bool return_value_used,
     const code_typet &call_type,
     const code_typet &function_type);
 
@@ -189,12 +190,16 @@ Function: remove_function_pointerst::is_type_compatible
 \*******************************************************************/
 
 bool remove_function_pointerst::is_type_compatible(
+  bool return_value_used,
   const code_typet &call_type,
   const code_typet &function_type)
 {
   // we are willing to ignore anything that's returned
   // if we call with 'void'
-  if(type_eq(call_type.return_type(), empty_typet(), ns))
+  if(!return_value_used)
+  {
+  }
+  else if(type_eq(call_type.return_type(), empty_typet(), ns))
   {
     // ok
   }
@@ -339,6 +344,7 @@ void remove_function_pointerst::remove_function_pointer(
   
   // this better have the right type
   code_typet call_type=to_code_type(function.type());
+
   // refine the type in case the forward declaration was incomplete
   if(call_type.has_ellipsis() &&
      call_type.parameters().empty())
@@ -357,6 +363,8 @@ void remove_function_pointerst::remove_function_pointer(
   typedef std::list<exprt> functionst;
   functionst functions;
   
+  bool return_value_used=code.lhs().is_not_nil();
+  
   // get all type-compatible functions
   // whose address is ever taken
   for(type_mapt::const_iterator f_it=
@@ -369,7 +377,7 @@ void remove_function_pointerst::remove_function_pointer(
       continue;
 
     // type-compatible?
-    if(!is_type_compatible(call_type, f_it->second))
+    if(!is_type_compatible(return_value_used, call_type, f_it->second))
       continue;
     
     symbol_exprt expr;

@@ -305,7 +305,7 @@ bool flow_insensitive_analysis_baset::visit(
   }
   
 //  if (id2string(l->function).find("debug")!=std::string::npos)
-//    std::cout << l->function << std::endl; //=="c::messages::debug")
+//    std::cout << l->function << std::endl; //=="messages::debug")
   
 //  {
 //    static unsigned state_cntr=0;

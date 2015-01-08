@@ -126,23 +126,23 @@ protected:
   virtual void convert_byte_extract(const exprt &expr, bvt &bv);
   virtual void convert_byte_update(const exprt &expr, bvt &bv);
   virtual void convert_constraint_select_one(const exprt &expr, bvt &bv);
-  virtual void convert_if(const exprt &expr, bvt &bv);
-  virtual void convert_struct(const exprt &expr, bvt &bv);
+  virtual void convert_if(const if_exprt &expr, bvt &bv);
+  virtual void convert_struct(const struct_exprt &expr, bvt &bv);
   virtual void convert_array(const exprt &expr, bvt &bv);
   virtual void convert_vector(const exprt &expr, bvt &bv);
   virtual void convert_complex(const exprt &expr, bvt &bv);
   virtual void convert_complex_real(const exprt &expr, bvt &bv);
   virtual void convert_complex_imag(const exprt &expr, bvt &bv);
   virtual void convert_lambda(const exprt &expr, bvt &bv);
-  virtual void convert_array_of(const exprt &expr, bvt &bv);
-  virtual void convert_union(const exprt &expr, bvt &bv);
-  virtual void convert_typecast(const exprt &expr, bvt &bv);
+  virtual void convert_array_of(const array_of_exprt &expr, bvt &bv);
+  virtual void convert_union(const union_exprt &expr, bvt &bv);
+  virtual void convert_typecast(const typecast_exprt &expr, bvt &bv);
   virtual void convert_add_sub(const exprt &expr, bvt &bv);
   virtual void convert_mult(const exprt &expr, bvt &bv);
   virtual void convert_div(const exprt &expr, bvt &bv);
   virtual void convert_mod(const exprt &expr, bvt &bv);
   virtual void convert_floatbv_op(const exprt &expr, bvt &bv);
-  virtual void convert_floatbv_typecast(const exprt &expr, bvt &bv);
+  virtual void convert_floatbv_typecast(const floatbv_typecast_exprt &expr, bvt &bv);
   virtual void convert_member(const member_exprt &expr, bvt &bv);
   virtual void convert_with(const exprt &expr, bvt &bv);
   virtual void convert_update(const exprt &expr, bvt &bv);
@@ -155,7 +155,7 @@ protected:
   virtual void convert_concatenation(const exprt &expr, bvt &bv);
   virtual void convert_replication(const exprt &expr, bvt &bv);
   virtual void convert_bv_literals(const exprt &expr, bvt &bv);
-  virtual void convert_constant(const exprt &expr, bvt &bv);
+  virtual void convert_constant(const constant_exprt &expr, bvt &bv);
   virtual void convert_extractbits(const extractbits_exprt &expr, bvt &bv);
   virtual void convert_symbol(const exprt &expr, bvt &bv);
 

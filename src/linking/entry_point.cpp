@@ -71,7 +71,7 @@ bool static_lifetime_init(
   namespacet ns(symbol_table);
       
   symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find("c::__CPROVER_initialize");
+    symbol_table.symbols.find(CPROVER_PREFIX "initialize");
 
   if(s_it==symbol_table.symbols.end()) return false;
 
@@ -81,6 +81,9 @@ bool static_lifetime_init(
   init_symbol.value.add_source_location()=source_location;
 
   code_blockt &dest=to_code_block(to_code(init_symbol.value));
+
+  // add the magic label to hide
+  dest.add(code_labelt("__CPROVER_HIDE", code_skipt()));
   
   // do assignments based on "value"
 
@@ -95,13 +98,13 @@ bool static_lifetime_init(
     // special values
     if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
        identifier==CPROVER_PREFIX "memory" ||
-       identifier=="c::__func__" ||
-       identifier=="c::__FUNCTION__" ||
-       identifier=="c::__PRETTY_FUNCTION__" ||
-       identifier=="c::argc'" ||
-       identifier=="c::argv'" ||
-       identifier=="c::envp'" ||
-       identifier=="c::envp_size'")
+       identifier=="__func__" ||
+       identifier=="__FUNCTION__" ||
+       identifier=="__PRETTY_FUNCTION__" ||
+       identifier=="argc'" ||
+       identifier=="argv'" ||
+       identifier=="envp'" ||
+       identifier=="envp_size'")
       continue;
       
     // just for linking
@@ -277,10 +280,10 @@ bool entry_point(
 
   {
     symbol_tablet::symbolst::iterator init_it=
-      symbol_table.symbols.find("c::__CPROVER_initialize");
+      symbol_table.symbols.find(CPROVER_PREFIX "initialize");
 
     if(init_it==symbol_table.symbols.end())
-      throw "failed to find __CPROVER_initialize symbol";
+      throw "failed to find " CPROVER_PREFIX "initialize symbol";
   
     code_function_callt call_init;
     call_init.lhs().make_nil();
@@ -310,8 +313,8 @@ bool entry_point(
     {
       namespacet ns(symbol_table);
 
-      const symbolt &argc_symbol=ns.lookup("c::argc'");
-      const symbolt &argv_symbol=ns.lookup("c::argv'");
+      const symbolt &argc_symbol=ns.lookup("argc'");
+      const symbolt &argv_symbol=ns.lookup("argv'");
       
       {
         // assume argc is at least one
@@ -344,7 +347,7 @@ bool entry_point(
       
       if(parameters.size()==3)
       {        
-        const symbolt &envp_size_symbol=ns.lookup("c::envp_size'");
+        const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         // assume envp_size is INTMAX-1
         mp_integer max;
@@ -414,8 +417,8 @@ bool entry_point(
 
       if(parameters.size()==3)
       {        
-        const symbolt &envp_symbol=ns.lookup("c::envp'");
-        const symbolt &envp_size_symbol=ns.lookup("c::envp_size'");
+        const symbolt &envp_symbol=ns.lookup("envp'");
+        const symbolt &envp_size_symbol=ns.lookup("envp_size'");
         
         // assume envp[envp_size] is NULL
         exprt null(ID_constant, envp_symbol.type.subtype());
@@ -467,7 +470,7 @@ bool entry_point(
         // do we need envp?
         if(parameters.size()==3)
         {
-          const symbolt &envp_symbol=ns.lookup("c::envp'");
+          const symbolt &envp_symbol=ns.lookup("envp'");
           exprt &op2=operands[2];
 
           const exprt &arg2=parameters[2];

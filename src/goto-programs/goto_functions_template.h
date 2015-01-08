@@ -29,9 +29,19 @@ public:
 
   bool body_available;
 
-  bool is_inlined() const
+  inline bool is_inlined() const
   {
     return type.get_bool(ID_C_inlined);
+  }
+  
+  inline bool is_hidden() const
+  {
+    return type.get_bool(ID_C_hide);
+  }
+  
+  inline void make_hidden()
+  {
+    type.set(ID_C_hide, true);
   }
   
   goto_function_templatet():body_available(false)

@@ -51,6 +51,7 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
+  "(graphml-cex):" \
   "(decide)" // legacy, and will eventually disappear
 
 class cbmc_parseoptionst:
