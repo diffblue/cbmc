@@ -2480,7 +2480,9 @@ exprt c_typecheck_baset::do_special_functions(
   else if(identifier==CPROVER_PREFIX "signf" ||            
           identifier==CPROVER_PREFIX "signd" ||
           identifier==CPROVER_PREFIX "signld" ||
-          identifier=="__builtin_signbit")
+          identifier=="__builtin_signbit" ||
+          identifier=="__builtin_signbitf" ||
+          identifier=="__builtin_signbitl")
   {
     if(expr.arguments().size()!=1)
     {
