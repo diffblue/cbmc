@@ -17,8 +17,6 @@
 int yyansi_clex();
 extern char *yyansi_ctext;
 
-#define stack_type(x) ((typet &)stack(x))
-
 #include "parser_static.inc"
 
 #include "ansi_c_y.tab.h"
