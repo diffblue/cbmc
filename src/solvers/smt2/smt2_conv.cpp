@@ -3061,49 +3061,45 @@ Function: smt2_convt::convert_plus
 
 void smt2_convt::convert_plus(const plus_exprt &expr)
 {
-  assert(expr.operands().size()>=2);
-
-  if(expr.type().id()==ID_unsignedbv ||
-     expr.type().id()==ID_signedbv ||
-     expr.type().id()==ID_fixedbv)
+  if(expr.operands().size()==0)
   {
-    out << "(bvadd";
-
-    forall_operands(it, expr)
-    {
-      out << " ";
-      convert_expr(*it);
-    }
-
-    out << ")";
+    assert(false);
   }
-  else if(expr.type().id()==ID_floatbv)
+  else if(expr.operands().size()==1)
   {
-    // really ought to be binary only
-    
-    if(use_FPA_theory)
+    convert_expr(expr.op0());
+  }
+  else if(expr.operands().size()==2)
+  {
+    if(expr.type().id()==ID_unsignedbv ||
+       expr.type().id()==ID_signedbv ||
+       expr.type().id()==ID_fixedbv)
     {
-      out << "(fp.add roundNearestTiesToEven ";
-
-      forall_operands(it, expr)
-      {
-        out << " ";
-        convert_expr(*it);
-      }
-
+      // These could be chained, i.e., need not be binary,
+      // but at least MathSat doesn't like that.
+      out << "(bvadd ";
+      convert_expr(expr.op0());
+      out << " ";
+      convert_expr(expr.op1());
       out << ")";
     }
-    else
+    else if(expr.type().id()==ID_floatbv)
     {
-      TODO("for floatbv");
+      if(use_FPA_theory)
+      {
+        // really need a rounding mode
+        out << "(fp.add roundNearestTiesToEven ";
+        convert_expr(expr.op0());
+        out << " ";
+        convert_expr(expr.op1());
+        out << ")";
+      }
+      else
+      {
+        TODO("+ for floatbv");
+      }
     }
-  }
-  else if(expr.type().id()==ID_pointer)
-  {
-    if(expr.operands().size()<2)
-      throw "pointer arithmetic with less than two operands";
-
-    if(expr.operands().size()==2)
+    else if(expr.type().id()==ID_pointer)
     {
       exprt p=expr.op0(), i=expr.op1();
 
@@ -3132,79 +3128,57 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 
       out << ")";
     }
-    else
+    else if(expr.type().id()==ID_rational)
     {
-      // more than two operands
-      exprt p;
-      typet integer_type=signedbv_typet(boolbv_width(expr.type()));
-      exprt integer_sum(ID_plus, integer_type);
-      
-      forall_operands(it, expr)
+      out << "(+";
+      convert_expr(expr.op0());
+      out << " ";
+      convert_expr(expr.op1());
+      out << ")";
+    }
+    else if(expr.type().id()==ID_vector)
+    {
+      const vector_typet &vector_type=to_vector_type(expr.type());
+     
+      mp_integer size;
+      if(to_integer(vector_type.size(), size))
+        throw "failed to convert vector size to constant";
+        
+      typet index_type=vector_type.size().type();
+
+      if(use_datatypes)
       {
-        if(it->type().id()==ID_pointer)
-          p=*it;
-        else
-          integer_sum.copy_to_operands(*it);
+        assert(datatype_map.find(vector_type)!=datatype_map.end());
+
+        const std::string smt_typename=
+          datatype_map.find(vector_type)->second;
+        
+        out << "(mk-" << smt_typename;
       }
-          
-      Forall_operands(it, integer_sum)
-        if(it->type()!=integer_type)
-          it->make_typecast(integer_type);
+      else
+        out << "(concat";
+        
+      // add component-by-component
+      for(mp_integer i=0; i!=size; ++i)
+      {
+        exprt tmp(ID_plus, vector_type.subtype());
+        forall_operands(it, expr)
+          tmp.copy_to_operands(
+            index_exprt(*it, from_integer(size-i-1, index_type), vector_type.subtype()));
 
-      plus_exprt pointer_arithmetic(p, integer_sum, expr.type());
-      convert_plus(pointer_arithmetic); // recursive call
-    }
-  }
-  else if(expr.type().id()==ID_rational)
-  {
-    out << "(+";
+        out << " ";
+        convert_expr(tmp);
+      }
 
-    forall_operands(it, expr)
-    {
-      out << " ";
-      convert_expr(*it);
-    }
-
-    out << ")";
-  }
-  else if(expr.type().id()==ID_vector)
-  {
-    const vector_typet &vector_type=to_vector_type(expr.type());
-   
-    mp_integer size;
-    if(to_integer(vector_type.size(), size))
-      throw "failed to convert vector size to constant";
-      
-    typet index_type=vector_type.size().type();
-
-    if(use_datatypes)
-    {
-      assert(datatype_map.find(vector_type)!=datatype_map.end());
-
-      const std::string smt_typename=
-        datatype_map.find(vector_type)->second;
-      
-      out << "(mk-" << smt_typename;
+      out << ")"; // mk-... or concat
     }
     else
-      out << "(concat";
-      
-    // add component-by-component
-    for(mp_integer i=0; i!=size; ++i)
-    {
-      exprt tmp(ID_plus, vector_type.subtype());
-      forall_operands(it, expr)
-        tmp.copy_to_operands(
-          index_exprt(*it, from_integer(size-i-1, index_type), vector_type.subtype()));
-
-      out << " ";
-      convert_expr(tmp);
-    }
-
-    out << ")"; // mk-... or concat
+      throw "unsupported type for +: "+expr.type().id_string();
   }
   else
-    throw "unsupported type for +: "+expr.type().id_string();
+  {
+    convert_plus(to_plus_expr(make_binary(expr)));
+  }
 }
 
 /*******************************************************************\
