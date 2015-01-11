@@ -1,0 +1,6 @@
+fence|test.c|thr1|14|c::flag1|test.c|thr1|10|c::flag2
+fence|test.c|thr1|9|c::flag1|test.c|thr1|10|c::flag2
+fence|test.c|thr2|26|c::flag2|test.c|thr2|27|c::flag1
+fence|test.c|thr2|26|c::flag2|test.c|thr2|30|c::turn
+fence|test.c|thr2|29|c::flag2|test.c|thr2|30|c::turn
+fence|test.c|thr2|31|c::flag2|test.c|thr2|27|c::flag1
