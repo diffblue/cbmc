@@ -213,7 +213,7 @@ exprt zero_initializert::zero_initializer_rec(
     const union_typet::componentst &components=
       to_union_type(type).components();
 
-    exprt value(ID_union, type);
+    union_exprt value(type);
 
     union_typet::componentt component;
     bool found=false;
@@ -229,7 +229,12 @@ exprt zero_initializert::zero_initializer_rec(
       // skip methods
       if(it->type().id()==ID_code) continue;
 
-      mp_integer size=pointer_offset_size(ns, it->type());
+      mp_integer size; // in bits
+      
+      if(it->type().id()==ID_c_bit_field)
+        size=to_c_bit_field_type(it->type()).get_width();
+      else
+        size=pointer_offset_size(ns, it->type())*8;
       
       if(size>component_size)
       {
@@ -239,13 +244,19 @@ exprt zero_initializert::zero_initializer_rec(
       }
     }
 
-    if(!found)
-      return value; // stupid empty union
-
-    value.set(ID_component_name, component.get_name());
-    value.copy_to_operands(
-      zero_initializer_rec(component.type(), source_location));
     value.add_source_location()=source_location;
+
+    if(!found)
+    {
+      // stupid empty union
+      value.op()=nil_exprt();
+    }
+    else
+    {
+      value.set_component_name(component.get_name());
+      value.op()=
+        zero_initializer_rec(component.type(), source_location);
+    }
 
     return value;
   }
