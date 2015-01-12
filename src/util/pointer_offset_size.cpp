@@ -167,7 +167,17 @@ mp_integer pointer_offset_size(
         it++)
     {
       const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      mp_integer sub_size;
+
+      if(subtype.id()==ID_c_bit_field)
+      {
+        unsigned bits=to_c_bit_field_type(subtype).get_width();
+        sub_size=bits/8;
+        if((bits%8)!=0) ++sub_size;
+      }
+      else
+        sub_size=pointer_offset_size(ns, subtype);
+
       if(sub_size>result) result=sub_size;
     }
     
@@ -406,7 +416,17 @@ exprt size_of_expr(
         it++)
     {
       const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      mp_integer sub_size;
+
+      if(subtype.id()==ID_c_bit_field)
+      {
+        unsigned bits=to_c_bit_field_type(subtype).get_width();
+        sub_size=bits/8;
+        if((bits%8)!=0) ++sub_size;
+      }
+      else
+        sub_size=pointer_offset_size(ns, subtype);
+
       if(sub_size>result) result=sub_size;
     }
     
