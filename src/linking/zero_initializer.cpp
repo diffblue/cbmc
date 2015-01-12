@@ -229,18 +229,13 @@ exprt zero_initializert::zero_initializer_rec(
       // skip methods
       if(it->type().id()==ID_code) continue;
 
-      mp_integer size; // in bits
+      mp_integer bits=pointer_offset_bits(ns, it->type());
       
-      if(it->type().id()==ID_c_bit_field)
-        size=to_c_bit_field_type(it->type()).get_width();
-      else
-        size=pointer_offset_size(ns, it->type())*8;
-      
-      if(size>component_size)
+      if(bits>component_size)
       {
         component=*it;
         found=true;
-        component_size=size;
+        component_size=bits;
       }
     }
 
