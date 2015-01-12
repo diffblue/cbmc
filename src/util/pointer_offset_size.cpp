@@ -107,7 +107,7 @@ mp_integer pointer_offset_bits(
 {
   if(type.id()==ID_array)
   {
-    mp_integer sub=pointer_offset_size(ns, type.subtype());
+    mp_integer sub=pointer_offset_bits(ns, type.subtype());
   
     // get size
     const exprt &size=to_array_type(type).size();
@@ -122,7 +122,7 @@ mp_integer pointer_offset_bits(
   }
   else if(type.id()==ID_vector)
   {
-    mp_integer sub=pointer_offset_size(ns, type.subtype());
+    mp_integer sub=pointer_offset_bits(ns, type.subtype());
   
     // get size
     const exprt &size=to_vector_type(type).size();
@@ -137,7 +137,7 @@ mp_integer pointer_offset_bits(
   }
   else if(type.id()==ID_complex)
   {
-    mp_integer sub=pointer_offset_size(ns, type.subtype());
+    mp_integer sub=pointer_offset_bits(ns, type.subtype());
     return sub*2;
   }
   else if(type.id()==ID_struct)
@@ -154,7 +154,7 @@ mp_integer pointer_offset_bits(
         it++)
     {
       const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      mp_integer sub_size=pointer_offset_bits(ns, subtype);
       if(sub_size==-1) return -1;
       result+=sub_size;
     }
@@ -177,7 +177,7 @@ mp_integer pointer_offset_bits(
         it++)
     {
       const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      mp_integer sub_size=pointer_offset_bits(ns, subtype);
       if(sub_size>result) result=sub_size;
     }
     
@@ -202,7 +202,7 @@ mp_integer pointer_offset_bits(
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    return pointer_offset_size(ns, ns.follow_tag(to_c_enum_tag_type(type)));
+    return pointer_offset_bits(ns, ns.follow_tag(to_c_enum_tag_type(type)));
   }
   else if(type.id()==ID_bool)
   {
@@ -214,7 +214,7 @@ mp_integer pointer_offset_bits(
   }
   else if(type.id()==ID_symbol)
   {
-    return pointer_offset_size(ns, ns.follow(type));
+    return pointer_offset_bits(ns, ns.follow(type));
   }
   else if(type.id()==ID_code)
   {
