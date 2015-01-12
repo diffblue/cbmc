@@ -52,7 +52,8 @@ void boolbvt::convert_byte_update(
   std::size_t update_width=value_bv.size();
   std::size_t byte_width=8;
   
-  if(update_width>bv.size()) update_width=bv.size();
+  if(update_width>bv.size())
+    update_width=bv.size();
 
   // see if the byte number is constant
 
@@ -75,8 +76,8 @@ void boolbvt::convert_byte_update(
       }
       else
       {
-        endianness_mapt map_op(op.type(), little_endian, ns);
-        endianness_mapt map_value(value.type(), little_endian, ns);
+        endianness_mapt map_op(op.type(), false, ns);
+        endianness_mapt map_value(value.type(), false, ns);
         
         std::size_t offset_i=integer2unsigned(offset);
         
