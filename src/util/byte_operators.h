@@ -225,7 +225,10 @@ extern inline byte_update_big_endian_exprt &to_byte_update_big_endian_expr(exprt
 class endianness_mapt
 {
 public:
-  endianness_mapt(const typet &type, bool little_endian, const namespacet &_ns):ns(_ns)
+  endianness_mapt(
+    const typet &type,
+    bool little_endian,
+    const namespacet &_ns):ns(_ns)
   {
     build(type, little_endian);
   }
@@ -265,7 +268,9 @@ protected:
   void build_big_endian(const typet &type);
 };
 
-extern inline std::ostream &operator << (std::ostream &out, const endianness_mapt &m)
+extern inline std::ostream &operator << (
+  std::ostream &out,
+  const endianness_mapt &m)
 {
   m.output(out);
   return out;
