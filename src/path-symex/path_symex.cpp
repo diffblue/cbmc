@@ -613,6 +613,17 @@ void path_symext::function_call_rec(
     thread.call_stack.back().current_function=function_identifier;
     thread.call_stack.back().return_location=thread.pc.next_loc();
     thread.call_stack.back().return_lhs=call.lhs();
+
+    #if 0
+    for(loc_reft l=function_entry_point; ; ++l)
+    {
+      if(locs[l].target->is_end_function()) break;
+      if(locs[l].target->is_decl())
+      {
+        // make sure we have the local in the var_map
+        state.
+      }
+    }
     
     // save the locals into the frame
     for(locst::local_variablest::const_iterator
@@ -623,6 +634,7 @@ void path_symext::function_call_rec(
       unsigned nr=state.var_map[*it].number;
       thread.call_stack.back().saved_local_vars[nr]=thread.local_vars[nr];
     }    
+    #endif
 
     const code_typet &code_type=function_entry.type;
 
@@ -857,7 +869,9 @@ void path_symext::operator()(
     *state.get_instruction();
     
   #ifdef DEBUG
-  std::cout << "path_symext::operator(): " << instruction.type
+  std::cout << "path_symext::operator(): "
+            << state.pc() << " "
+            << instruction.type
             << std::endl;
   #endif
 

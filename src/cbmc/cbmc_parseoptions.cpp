@@ -282,6 +282,10 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("aig"))
     options.set_option("aig", true);
 
+  // Encoding Options
+  if(cmdline.isset("ite"))
+    options.set_option("ite", cmdline.get_value("ite"));
+
   // SMT Options
   bool version_set = false;
 
@@ -980,8 +984,13 @@ void cbmc_parseoptionst::help()
     " --no-pretty-names            do not simplify identifiers\n"
     " --graphml-cex filename       write the counterexample in GraphML format to filename\n"
     "\n"
+    "Encodings options:\n"
+    " --ite ENC                    ite encodings (optimal-compact,compact,tseitin)\n"
+    ""
+    "\n"
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"
+    " --no-sat-preprocessor        disable SAT preprocessing\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n"
     " --smt1                       output subgoals in SMT1 syntax (experimental)\n"
     " --smt2                       output subgoals in SMT2 syntax (experimental)\n"

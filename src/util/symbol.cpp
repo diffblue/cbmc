@@ -197,6 +197,7 @@ void symbolt::swap(symbolt &b)
   SYM_SWAP2(is_input);
   SYM_SWAP2(is_output);
   SYM_SWAP2(is_state_var);
+  SYM_SWAP2(is_property);
   SYM_SWAP2(is_parameter);
   SYM_SWAP2(is_auxiliary);
   SYM_SWAP2(is_lvalue);

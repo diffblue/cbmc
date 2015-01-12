@@ -91,9 +91,30 @@ public:
   // an incremental solver may remove any variables that aren't frozen
   virtual void set_frozen(literalt a) { }
 
+  typedef enum { OPTIMAL_COMPACT_ITE, COMPACT_ITE, TSEITIN_ITE } ite_encodingt; 
+  void set_ite (ite_encodingt _ite) { ite_style = _ite; }
+  std::string get_ite()
+  {
+    std::string output;
+    if (ite_style == OPTIMAL_COMPACT_ITE)
+      output = "OPTIMAL_COMPACT_ITE";
+    else if (ite_style == COMPACT_ITE)
+      output = "COMPACT_ITE";
+    else if (ite_style == TSEITIN_ITE)
+      output = "TSEITIN_ITE";
+    else output = "UNKNOWN ITE ENCODING";
+
+    return output;
+  }
+
 protected:
   // to avoid a temporary for lcnf(...)
   bvt lcnf_bv;
+
+  // ite encoding
+  ite_encodingt ite_style;
+  
+
 };
 
 #endif

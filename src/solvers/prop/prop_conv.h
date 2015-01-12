@@ -92,7 +92,7 @@ public:
   virtual literalt convert(const exprt &expr);
   virtual bool is_in_conflict(literalt l) const { return prop.is_in_conflict(l); }
   virtual bool has_is_in_conflict() const { return prop.has_is_in_conflict(); }
-
+  
   // get literal for expression, if available
   virtual bool literal(const exprt &expr, literalt &literal) const;
   

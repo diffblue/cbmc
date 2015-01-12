@@ -1769,7 +1769,8 @@ void goto_program2codet::cleanup_code(
     code_function_callt::argumentst &arguments=call.arguments();
 
     // don't edit function calls we might have introduced
-    if(has_prefix(id2string(fn.get_identifier()), "c::"))
+    const symbolt *s;
+    if(!ns.lookup(fn.get_identifier(), s))
     {
       const symbolt &fn_sym=ns.lookup(fn.get_identifier());
       const code_typet &code_type=to_code_type(fn_sym.type);
@@ -2269,19 +2270,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     }
     else if(expr.type().id()==ID_pointer)
       add_local_types(expr.type());
-    else if(expr.type().id()==ID_bool)
+    else if(expr.type().id()==ID_bool ||
+            expr.type().id()==ID_c_bool)
     {
       expr=from_integer(
         expr.is_true()?1:0,
-        signedbv_typet(config.ansi_c.int_width));
-      expr.make_typecast(bool_typet());
-    }
-    else if((expr.type().id()==ID_unsignedbv ||
-             expr.type().id()==ID_signedbv) &&
-            expr.type().get(ID_C_c_type)==ID_bool)
-    {
-      expr=from_integer(
-        expr.is_zero()?0:1,
         signedbv_typet(config.ansi_c.int_width));
       expr.make_typecast(bool_typet());
     }

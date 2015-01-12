@@ -56,7 +56,8 @@ public:
 
 
 
-  // Use the recursive multiply relation to break into multiplier of at most this many bits
+  // Use the recursive multiply relation to break into multiplier 
+  // of at most this many bits
   int recursive_multiply_minimum;
 
   // TODO : what about Booth encoding?
@@ -69,7 +70,7 @@ public:
     BLOCK5
     // TODO : optimal multipliers for N-bits
   } partial_product_encodingt;
-  partial_product_generationt partial_product_style;
+  partial_product_encodingt partial_product_style;
 
 
   typedef enum {
@@ -91,13 +92,13 @@ public:
   reduction_encodingt reduction_style;
 
 
- bv_utilst(propt &_prop):prop(_prop),
-    full_adder_style(TSEITIN_NAIVE_CIRCUIT),
+ bv_utilst(propt &_prop): full_adder_style(TSEITIN_NAIVE_AB_CIRCUIT),
     addition_style(RIPPLE_CARRY),
     carry_select_minimum(INT_MAX),
     recursive_multiply_minimum(INT_MAX),
     partial_product_style(CONVENTIONAL),
-    reduction_style(LINEAR_REDUCTION)  { }
+    reduction_style(LINEAR_REDUCTION),
+    prop(_prop)  { }
 
   typedef enum { SIGNED, UNSIGNED } representationt;
 
@@ -117,12 +118,18 @@ public:
   // bit-wise negation
   bvt inverted(const bvt &op);
 
-  literalt full_adder(const literalt a, const literalt b, const literalt carry_in, literalt &carry_out);
+  literalt full_adder(const literalt a, 
+                      const literalt b, 
+                      const literalt carry_in, 
+                      literalt &carry_out);
   literalt carry(literalt a, literalt b, literalt c);
 
   bvt add_sub(const bvt &op0, const bvt &op1, bool subtract);
   bvt add_sub(const bvt &op0, const bvt &op1, literalt subtract);
-  bvt add_sub_no_overflow(const bvt &op0, const bvt &op1, bool subtract, representationt rep);
+  bvt add_sub_no_overflow(const bvt &op0, 
+                          const bvt &op1, 
+                          bool subtract, 
+                          representationt rep);
   bvt add(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, false); }
   bvt sub(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, true); }
   literalt overflow_add(const bvt &op0, const bvt &op1, representationt rep);

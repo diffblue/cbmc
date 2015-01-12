@@ -205,6 +205,21 @@ bool bmct::decide_default()
     solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
 
   solver->set_message_handler(get_message_handler());
+  const std::string ite=options.get_option("ite");
+  if (ite.empty() || ite=="optimal-compact")
+    solver->set_ite(propt::OPTIMAL_COMPACT_ITE);
+  else if (ite=="compact")
+    solver->set_ite(propt::COMPACT_ITE);
+  else if (ite=="tseitin")
+    solver->set_ite(propt::TSEITIN_ITE);
+  else 
+  {
+    error() << "Invalid ite encoding " << ite
+            << " -- use one of optimal-compact, compact, tseitin" << eom;
+    return true;
+  }
+
+  std::cout << "ITE Encoding: " << solver->get_ite() << std::endl;
     
   bv_cbmct bv_cbmc(ns, *solver);
     
@@ -314,6 +329,7 @@ bool bmct::decide_bv_refinement()
   solver->set_message_handler(get_message_handler());
 
   bv_refinementt bv_refinement(ns, *solver);
+  bv_refinement.set_ui(ui);
 
   // we allow setting some parameters  
   if(options.get_option("max-node-refinement")!="")

@@ -52,6 +52,7 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-cex):" \
+  "(ite):"\
   "(decide)" // legacy, and will eventually disappear
 
 class cbmc_parseoptionst:

@@ -26,9 +26,9 @@ Function: cnft::cnft
 
 \*******************************************************************/
 
-cnft::cnft() :
-  _no_variables(1) // for CNF, we don't use 0 as a matter of principle
+cnft::cnft() :_no_variables(1) // for CNF, we don't use 0 as a matter of principle
 {
+  ite_style = propt::OPTIMAL_COMPACT_ITE;
 }
 
 /*******************************************************************\
@@ -553,42 +553,40 @@ Function: cnft::lselect
 
 \*******************************************************************/
 
-#define COMPACT_ITE
-//#define OPTIMAL_COMPACT_ITE
-
 literalt cnft::lselect(literalt a, literalt b, literalt c)
 { // a?b:c = (a AND b) OR (/a AND c)
-
   if(a.is_constant()) return a.sign() ? b : c;
   if(b==c) return b;
-
   if(b.is_constant()) return b.sign() ? lor(a, c) : land(!a, c);
   if(c.is_constant()) return c.sign() ? lor(!a, b) : land(a, b);
 
-  #ifdef COMPACT_ITE
+  if (ite_style == COMPACT_ITE || ite_style == OPTIMAL_COMPACT_ITE)
+  {
+    // (a+c'+o) (a+c+o') (a'+b'+o) (a'+b+o')
 
-  // (a+c'+o) (a+c+o') (a'+b'+o) (a'+b+o')
+    literalt o=new_variable();
 
-  literalt o=new_variable();
-
-  bvt lits;
+    bvt lits;
   
-  lcnf( a, !c,  o);
-  lcnf( a,  c, !o);
-  lcnf(!a, !b,  o);
-  lcnf(!a,  b, !o);
+    lcnf( a, !c,  o);
+    lcnf( a,  c, !o);
+    lcnf(!a, !b,  o);
+    lcnf(!a,  b, !o);
 
-  #ifdef OPTIMAL_COMPACT_ITE
-  // additional clauses to enable better propagation
-  lcnf( b,  c, !o);
-  lcnf(!b, !c,  o);
-  #endif
+    if (ite_style == OPTIMAL_COMPACT_ITE) 
+    {
+      // additional clauses to enable better propagation
+      lcnf( b,  c, !o);
+      lcnf(!b, !c,  o); 
+    }
 
-  return o;
-
-  #else
-  return lor(land(a, b), land(!a, c));
-  #endif
+    return o;
+  } 
+  else 
+  {
+    assert (ite_style == TSEITIN_ITE);
+    return lor(land(a, b), land(!a, c));
+  }
 }
 
 /*******************************************************************\

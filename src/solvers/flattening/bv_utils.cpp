@@ -251,6 +251,8 @@ literalt bv_utilst::full_adder(
   const literalt a, const literalt b,
   const literalt carry_in, literalt &carry_out)
 {
+  literalt sum;
+
   if (full_adder_style == TSEITIN_NAIVE_AB_CIRCUIT ||
       full_adder_style == DANIEL_COMPACT_CARRY) {
     carry_out=carry(a, b, carry_in);
@@ -1037,6 +1039,8 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   if(is_constant(op1))
     std::swap(op0, op1);
 
+#define OLD
+#ifndef OLD
   if (op0.size() > recursive_multiply_minimum) {
     // TODO : split into low and high, four recursive calls, shift, or together high / high and low / low and then add3
     assert(0);
@@ -1047,7 +1051,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   if (partial_product_style == CONVENTIONAL) {
     // TODO :  pps[i][j] == land(op0[i], op1[j])
     assert(0);
-  } else if (partial_product_sytle == BLOCK2) {
+  } else if (partial_product_style == BLOCK2) {
     std::vector<bvt> block;
     block.resize(4);
 
@@ -1064,17 +1068,17 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
                     ite(op0[2*i], block[3][j], block[2][j]),
 		    ite(op0[2*i], block[1][j], block[0][j]));
     */
-  } else if (partial_product_sytle == BLOCK3) {
+  } else if (partial_product_style == BLOCK3) {
     // TODO : implement
     assert(0);
     // Only need a normal adder for these
 
-  } else if (partial_product_sytle == BLOCK4) {
+  } else if (partial_product_style == BLOCK4) {
     // TODO : implement
     assert(0);
     // A few entries will require an add3
 
-  } else if (partial_product_sytle == BLOCK5) {
+  } else if (partial_product_style == BLOCK5) {
     // TODO : implement
     assert(0);
     // Several block entries will require an add3
@@ -1095,8 +1099,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     assert(0);
   }
 
-
-  #ifdef OLD
+  #else
   bvt product;
   product.resize(op0.size());
 
@@ -1126,35 +1129,35 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   
   // build the usual quadratic number of partial products
 
-  bvt op0=_op0, op1=_op1;
+  // bvt op0=_op0, op1=_op1;
 
-  if(is_constant(op1))
-    std::swap(op0, op1);
+  // if(is_constant(op1))
+  //   std::swap(op0, op1);
     
-  std::vector<bvt> pps;
-  pps.reserve(op0.size());
+  // std::vector<bvt> pps;
+  // pps.reserve(op0.size());
 
-  for(unsigned bit=0; bit<op0.size(); bit++)
-    if(op0[bit]!=const_literal(false))
-    {
-      bvt pp;
+  // for(unsigned bit=0; bit<op0.size(); bit++)
+  //   if(op0[bit]!=const_literal(false))
+  //   {
+  //     bvt pp;
 
-      pp.reserve(op0.size());
+  //     pp.reserve(op0.size());
 
-      // zeros according to weight
-      for(unsigned idx=0; idx<bit; idx++)
-        pp.push_back(const_literal(false));
+  //     // zeros according to weight
+  //     for(unsigned idx=0; idx<bit; idx++)
+  //       pp.push_back(const_literal(false));
 
-      for(unsigned idx=bit; idx<op0.size(); idx++)
-        pp.push_back(prop.land(op1[idx-bit], op0[bit]));
+  //     for(unsigned idx=bit; idx<op0.size(); idx++)
+  //       pp.push_back(prop.land(op1[idx-bit], op0[bit]));
 
-      pps.push_back(pp);
-    }
+  //     pps.push_back(pp);
+  //   }
 
-  if(pps.empty())
-    return zeros(op0.size());
-  else
-    return wallace_tree(pps);
+  // if(pps.empty())
+  //   return zeros(op0.size());
+  // else
+  //   return wallace_tree(pps);
   
   #endif
 }

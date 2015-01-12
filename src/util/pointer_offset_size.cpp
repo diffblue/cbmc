@@ -85,6 +85,26 @@ mp_integer pointer_offset_size(
   const namespacet &ns,
   const typet &type)
 {
+  mp_integer bits=pointer_offset_bits(ns, type);
+  return bits/8+(((bits%8)==0)?1:0);
+}
+
+/*******************************************************************\
+
+Function: pointer_offset_bits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer pointer_offset_bits(
+  const namespacet &ns,
+  const typet &type)
+{
   if(type.id()==ID_array)
   {
     mp_integer sub=pointer_offset_size(ns, type.subtype());
@@ -127,26 +147,16 @@ mp_integer pointer_offset_size(
       struct_type.components();
       
     mp_integer result=0;
-    unsigned bit_field_bits=0;
     
     for(struct_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
         it++)
     {
-      if(it->type().id()==ID_c_bit_field)
-      {
-        unsigned w=to_c_bit_field_type(it->type()).get_width();
-        for(; w>bit_field_bits; ++result, bit_field_bits+=8);
-        bit_field_bits-=w;
-      }
-      else
-      {
-        const typet &subtype=it->type();
-        mp_integer sub_size=pointer_offset_size(ns, subtype);
-        if(sub_size==-1) return -1;
-        result+=sub_size;
-      }
+      const typet &subtype=it->type();
+      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      if(sub_size==-1) return -1;
+      result+=sub_size;
     }
 
     return result;
@@ -180,33 +190,36 @@ mp_integer pointer_offset_size(
           type.id()==ID_bv ||
           type.id()==ID_c_bool)
   {
-    unsigned width=to_bitvector_type(type).get_width();
-    unsigned bytes=width/8;
-    if(bytes*8!=width) bytes++;
-    return bytes;
+    return to_bitvector_type(type).get_width();
+  }
+  else if(type.id()==ID_c_bit_field)
+  {
+    return to_c_bit_field_type(type).get_width();
   }
   else if(type.id()==ID_c_enum)
   {
-    unsigned width=to_bitvector_type(type.subtype()).get_width();
-    unsigned bytes=width/8;
-    if(bytes*8!=width) bytes++;
-    return bytes;
+    return to_bitvector_type(type.subtype()).get_width();
   }
   else if(type.id()==ID_c_enum_tag)
+  {
     return pointer_offset_size(ns, ns.follow_tag(to_c_enum_tag_type(type)));
+  }
   else if(type.id()==ID_bool)
+  {
     return 1;
+  }
   else if(type.id()==ID_pointer)
   {
-    unsigned width=config.ansi_c.pointer_width;
-    unsigned bytes=width/8;
-    if(bytes*8!=width) bytes++;
-    return bytes;
+    return config.ansi_c.pointer_width;
   }
   else if(type.id()==ID_symbol)
+  {
     return pointer_offset_size(ns, ns.follow(type));
+  }
   else if(type.id()==ID_code)
+  {
     return 0;
+  }
   else
     return mp_integer(-1);
 }
@@ -406,7 +419,17 @@ exprt size_of_expr(
         it++)
     {
       const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      mp_integer sub_size;
+
+      if(subtype.id()==ID_c_bit_field)
+      {
+        unsigned bits=to_c_bit_field_type(subtype).get_width();
+        sub_size=bits/8;
+        if((bits%8)!=0) ++sub_size;
+      }
+      else
+        sub_size=pointer_offset_size(ns, subtype);
+
       if(sub_size>result) result=sub_size;
     }
     
