@@ -86,6 +86,7 @@ mp_integer pointer_offset_size(
   const typet &type)
 {
   mp_integer bits=pointer_offset_bits(ns, type);
+  if(bits==-1) return -1;
   return bits/8+(((bits%8)==0)?0:1);
 }
 
