@@ -107,7 +107,7 @@ Function: endianness_mapt::build_little_endian
 
 void endianness_mapt::build_little_endian(const typet &src)
 {
-  mp_integer s=pointer_offset_size(ns, src); // error is -1
+  mp_integer s=pointer_offset_bits(ns, src); // error is -1
 
   while(s>0)
   {
@@ -141,7 +141,7 @@ void endianness_mapt::build_big_endian(const typet &src)
           src.id()==ID_floatbv ||
           src.id()==ID_c_enum)
   {
-    mp_integer s=pointer_offset_size(ns, src); // error is -1
+    mp_integer s=pointer_offset_bits(ns, src); // error is -1
     assert(s>=0);
 
     size_t s_int=integer2long(s), base=map.size();
@@ -208,7 +208,7 @@ void endianness_mapt::build_big_endian(const typet &src)
   {
     // everything else (unions in particular)
     // is treated like a byte-array
-    mp_integer s=pointer_offset_size(ns, src); // error is -1
+    mp_integer s=pointer_offset_bits(ns, src); // error is -1
     while(s>0)
     {
       map.push_back(map.size());

@@ -225,7 +225,7 @@ extern inline byte_update_big_endian_exprt &to_byte_update_big_endian_expr(exprt
 class endianness_mapt
 {
 public:
-  endianness_mapt(
+  inline endianness_mapt(
     const typet &type,
     bool little_endian,
     const namespacet &_ns):ns(_ns)
@@ -235,17 +235,10 @@ public:
 
   inline size_t map_bit(size_t bit) const
   {
-    size_t byte=bit/8;
-    return map_byte(byte)*8+bit%8;
+    return map[bit];
   }
   
-  inline size_t map_byte(size_t byte) const
-  {
-    assert(byte<map.size());
-    return map[byte];
-  }
-  
-  size_t size() const
+  inline size_t number_of_bits() const
   {
     return map.size();
   }
@@ -262,7 +255,7 @@ public:
 
 protected:
   const namespacet &ns;
-  std::vector<size_t> map;
+  std::vector<size_t> map; // bit-nr to bit-nr
 
   void build_little_endian(const typet &type);
   void build_big_endian(const typet &type);
