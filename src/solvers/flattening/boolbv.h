@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BOOLBV_H
-#define CPROVER_BOOLBV_H
+#ifndef CPROVER_SOLVERS_FLATTENING_BOOLBV_H
+#define CPROVER_SOLVERS_FLATTENING_BOOLBV_H
 
 //
 // convert expression to boolean formula
@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/hash_cont.h>
 #include <util/mp_arith.h>
 #include <util/expr.h>
+#include <util/byte_operators.h>
 
 #include "bv_utils.h"
 #include "boolbv_width.h"
@@ -123,8 +124,8 @@ protected:
 
   virtual void convert_index(const exprt &array, const mp_integer &index, bvt &bv);
   virtual void convert_index(const index_exprt &expr, bvt &bv);
-  virtual void convert_byte_extract(const exprt &expr, bvt &bv);
-  virtual void convert_byte_update(const exprt &expr, bvt &bv);
+  virtual void convert_byte_extract(const byte_extract_exprt &expr, bvt &bv);
+  virtual void convert_byte_update(const byte_update_exprt &expr, bvt &bv);
   virtual void convert_constraint_select_one(const exprt &expr, bvt &bv);
   virtual void convert_if(const if_exprt &expr, bvt &bv);
   virtual void convert_struct(const struct_exprt &expr, bvt &bv);

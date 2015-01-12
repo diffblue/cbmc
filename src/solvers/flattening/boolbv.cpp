@@ -309,10 +309,10 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return convert_abs(expr, bv);
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
-    return convert_byte_extract(expr, bv);
+    return convert_byte_extract(to_byte_extract_expr(expr), bv);
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
-    return convert_byte_update(expr, bv);
+    return convert_byte_update(to_byte_update_expr(expr), bv);
   else if(expr.id()==ID_nondet_symbol ||
           expr.id()=="quant_symbol")
     return convert_symbol(expr, bv);

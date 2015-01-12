@@ -450,7 +450,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
     return SUB::convert_concatenation(expr, bv);
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
-    return SUB::convert_byte_extract(expr, bv);
+    return SUB::convert_byte_extract(to_byte_extract_expr(expr), bv);
 
   return conversion_failed(expr, bv);
 }
