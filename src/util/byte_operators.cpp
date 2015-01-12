@@ -139,54 +139,34 @@ void endianness_mapt::build_big_endian(const typet &src)
           src.id()==ID_signedbv ||
           src.id()==ID_fixedbv ||
           src.id()==ID_floatbv ||
-          src.id()==ID_c_enum)
+          src.id()==ID_c_enum ||
+          src.id()==ID_c_bit_field)
   {
-    mp_integer s=pointer_offset_bits(ns, src); // error is -1
-    assert(s>=0);
+    // these do get re-ordered!
+    mp_integer bits=pointer_offset_bits(ns, src); // error is -1
+    assert(bits>=0);
 
-    size_t s_int=integer2long(s), base=map.size();
+    size_t bits_int=integer2long(bits), base=map.size();
+    size_t bytes_int=bits_int/8+((bits_int%8)!=0?1:0);
 
-    for(size_t i=0; i<s_int; i++)
-      map.push_back(base+s_int-i-1); // these do get re-ordered!
+    for(size_t bit=0; bit<bits_int; bit++)
+    {
+      size_t byte=bit/8;
+      size_t mapped_byte=bytes_int-1-byte;
+      map.push_back(base+mapped_byte*8+bit%8);
+    }
   }
   else if(src.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(src);
     
-    size_t bit_field_bits=0;
-
     // todo: worry about padding being in wrong order
     for(struct_typet::componentst::const_iterator
         it=struct_type.components().begin();
         it!=struct_type.components().end();
         it++)
     {
-      if(it->type().id()==ID_c_bit_field)
-      {
-        unsigned bits=to_c_bit_field_type(it->type()).get_width();
-        unsigned bytes=0;
-
-        assert(bit_field_bits<8);
-
-        if(bit_field_bits+bits<8)
-        {
-          // keep accumulating
-          bit_field_bits+=bits;
-        }
-        else
-        {
-          bit_field_bits+=bits;
-          bytes=bit_field_bits/8;
-          bit_field_bits-=bytes*8;
-
-          size_t base=map.size();
-
-          for(size_t i=0; i<bytes; i++)
-            map.push_back(base+bytes-i-1); // these do get re-ordered!
-        }
-      }
-      else
-        build_big_endian(it->type());
+      build_big_endian(it->type());
     }
   }
   else if(src.id()==ID_array)
