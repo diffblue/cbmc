@@ -139,6 +139,7 @@ exprt goto_symext::address_arithmetic(
 
     const byte_extract_exprt &be=to_byte_extract_expr(expr);
 
+    // recursive call
     result=address_arithmetic(be.op(), state, guard, keep_array);
 
     if(ns.follow(be.op().type()).id()==ID_array &&
@@ -184,6 +185,7 @@ exprt goto_symext::address_arithmetic(
     be.op()=ode.root_object();
     be.offset()=ode.offset();
 
+    // recursive call
     result=address_arithmetic(be, state, guard, keep_array);
 
     do_simplify(result);
@@ -203,7 +205,8 @@ exprt goto_symext::address_arithmetic(
 
     // the condition is not an address
     dereference_rec(if_expr.cond(), state, guard, false);
-
+    
+    // recursive call
     if_expr.true_case()=
       address_arithmetic(if_expr.true_case(), state, guard, keep_array);
     if_expr.false_case()=
