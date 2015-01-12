@@ -1769,7 +1769,8 @@ void goto_program2codet::cleanup_code(
     code_function_callt::argumentst &arguments=call.arguments();
 
     // don't edit function calls we might have introduced
-    if(has_prefix(id2string(fn.get_identifier()), "c::"))
+    const symbolt *s;
+    if(!ns.lookup(fn.get_identifier(), s))
     {
       const symbolt &fn_sym=ns.lookup(fn.get_identifier());
       const code_typet &code_type=to_code_type(fn_sym.type);
