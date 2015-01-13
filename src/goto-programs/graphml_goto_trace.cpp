@@ -26,17 +26,17 @@ Function: convert_assign_rec
 
 \*******************************************************************/
 
-static void convert_assign_rec(
+static std::string convert_assign_rec(
   const namespacet &ns,
   const irep_idt &identifier,
-  const code_assignt &assign,
-  std::string &dest)
+  const code_assignt &assign)
 {
   if(assign.rhs().id()==ID_array)
   {
     const array_typet &type=
       to_array_type(ns.follow(assign.rhs().type()));
 
+    std::string result;
     unsigned i=0;
     forall_operands(it, assign.rhs())
     {
@@ -44,8 +44,11 @@ static void convert_assign_rec(
           assign.lhs(),
           from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
           type.subtype());
-      convert_assign_rec(ns, identifier, code_assignt(index, *it), dest);
+      if(!result.empty()) result+=' ';
+      result+=convert_assign_rec(ns, identifier, code_assignt(index, *it));
     }
+
+    return result;
   }
   else if(assign.rhs().id()==ID_struct ||
           assign.rhs().id()==ID_union)
@@ -55,6 +58,7 @@ static void convert_assign_rec(
     const struct_union_typet::componentst &components=
       type.components();
 
+    std::string result;
     struct_union_typet::componentst::const_iterator c_it=
       components.begin();
     forall_operands(it, assign.rhs())
@@ -71,15 +75,17 @@ static void convert_assign_rec(
           assign.lhs(),
           c_it->get_name(),
           it->type());
-      convert_assign_rec(ns, identifier, code_assignt(member, *it), dest);
+      if(!result.empty()) result+=' ';
+      result+=convert_assign_rec(ns, identifier, code_assignt(member, *it));
       ++c_it;
     }
+
+    return result;
   }
   else
   {
-    if(!dest.empty()) dest+=' ';
-    dest+=from_expr(ns, identifier, assign.lhs())+" = "+
-          from_expr(ns, identifier, assign.rhs())+";";
+    return from_expr(ns, identifier, assign.lhs())+" = "+
+           from_expr(ns, identifier, assign.rhs())+";";
   }
 }
 
@@ -196,7 +202,7 @@ void convert(
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "assumption");
           code_assignt assign(it->lhs_object, it->lhs_object_value);
-          convert_assign_rec(ns, identifier, assign, val.data);
+          val.data=convert_assign_rec(ns, identifier, assign);
         }
         else if(it->type==goto_trace_stept::LOCATION &&
                 it->pc->is_goto())
