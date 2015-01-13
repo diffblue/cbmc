@@ -113,7 +113,8 @@ void convert(
 
   // prepare all nodes
   std::map<unsigned, unsigned> pc_to_node;
-  std::vector<unsigned> step_to_node(goto_trace.steps.size(), 0);
+  // step numbers start at 1
+  std::vector<unsigned> step_to_node(goto_trace.steps.size()+1, 0);
 
   for(goto_tracet::stepst::const_iterator
       it=goto_trace.steps.begin();
