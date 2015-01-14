@@ -531,6 +531,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     if(op_type_id==ID_integer ||
        op_type_id==ID_natural ||
        op_type_id==ID_c_enum ||
+       op_type_id==ID_c_enum_tag ||
        op_type_id==ID_incomplete_c_enum)
     {
       // from integer to ...
@@ -561,6 +562,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       }
       
       if(expr_type_id==ID_c_enum ||
+         expr_type_id==ID_c_enum_tag ||
          expr_type_id==ID_incomplete_c_enum)
       {
         new_expr.set_value(integer2string(int_value));
@@ -579,6 +581,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv ||
          expr_type_id==ID_c_enum ||
+         expr_type_id==ID_c_enum_tag ||
          expr_type_id==ID_integer ||
          expr_type_id==ID_natural ||
          expr_type_id==ID_rational)
@@ -642,6 +645,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       }
       
       if(expr_type_id==ID_c_enum ||
+         expr_type_id==ID_c_enum_tag ||
          expr_type_id==ID_incomplete_c_enum)
       {
         new_expr.set(ID_value, integer2string(int_value));
@@ -4825,6 +4829,11 @@ exprt simplify_exprt::bits2expr(
     if(bits.size()==width)
       return constant_exprt(bits, type);
   }
+  else if(type.id()==ID_c_enum_tag)
+    return
+      bits2expr(
+        bits,
+        ns.follow_tag(to_c_enum_tag_type(type)));
   else if(type.id()==ID_union)
   {
     // need to find full-size member
@@ -4862,6 +4871,7 @@ std::string simplify_exprt::expr2bits(const exprt &expr)
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||
        type.id()==ID_c_enum ||
+       type.id()==ID_c_enum_tag ||
        type.id()==ID_floatbv ||
        type.id()==ID_fixedbv)
     {

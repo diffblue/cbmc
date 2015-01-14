@@ -867,7 +867,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
       ) // blank
   {
     if(it->get_is_bit_field() &&
-       it->get_bit_field_bits()==0)
+       it->get_bit_field_bits(*this)==0)
       it=components.erase(it);
     else
       it++;

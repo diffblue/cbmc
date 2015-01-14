@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "std_types.h"
 #include "std_expr.h"
+#include "namespace.h"
 
 /*******************************************************************\
 
@@ -442,7 +443,8 @@ Function: struct_union_typet::componentt::get_bit_field_bits
 
 \*******************************************************************/
 
-unsigned struct_union_typet::componentt::get_bit_field_bits() const
+unsigned struct_union_typet::componentt::get_bit_field_bits(
+  const namespacet &ns) const
 {
   const typet &t=type();
   if(t.id()==ID_signedbv ||
@@ -450,6 +452,9 @@ unsigned struct_union_typet::componentt::get_bit_field_bits() const
     return to_bitvector_type(t).get_width();
   else if(t.id()==ID_c_enum)
     return t.subtype().get_int(ID_width);
+  else if(t.id()==ID_c_enum_tag)
+    return
+      ns.follow_tag(to_c_enum_tag_type(t)).subtype().get_int(ID_width);
   else
     return 0;
 }

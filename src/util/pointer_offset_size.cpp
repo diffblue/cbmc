@@ -191,6 +191,8 @@ mp_integer pointer_offset_size(
     if(bytes*8!=width) bytes++;
     return bytes;
   }
+  else if(type.id()==ID_c_enum_tag)
+    return pointer_offset_size(ns, ns.follow_tag(to_c_enum_tag_type(type)));
   else if(type.id()==ID_bool)
     return 1;
   else if(type.id()==ID_pointer)
@@ -266,7 +268,7 @@ exprt member_offset_expr(
 
     if(it->get_is_bit_field())
     {
-      unsigned w=it->type().get_int(ID_width);
+      unsigned w=it->get_bit_field_bits(ns);
       unsigned bytes;
       for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
       bit_field_bits-=w;
@@ -367,7 +369,7 @@ exprt size_of_expr(
     {
       if(it->get_is_bit_field())
       {
-        unsigned w=it->type().get_int(ID_width);
+        unsigned w=it->get_bit_field_bits(ns);
         unsigned bytes;
         for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
         bit_field_bits-=w;
@@ -426,6 +428,10 @@ exprt size_of_expr(
     unsigned bytes=width/8;
     if(bytes*8!=width) bytes++;
     return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
+  }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    return size_of_expr(ns.follow_tag(to_c_enum_tag_type(type)), ns);
   }
   else if(type.id()==ID_bool)
   {

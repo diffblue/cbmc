@@ -58,6 +58,7 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   else if(type_id==ID_integer ||
           type_id==ID_natural ||
           type_id==ID_c_enum ||
+          type_id==ID_c_enum_tag ||
           type_id==ID_incomplete_c_enum)
   {
     int_value=string2integer(id2string(value));
@@ -131,7 +132,7 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_c_enum)
   {
-    unsigned width=type.get_int(ID_width);
+    unsigned width=type.subtype().get_int(ID_width);
     constant_exprt result(type);
     result.set_value(integer2binary(int_value, width));
     return result;

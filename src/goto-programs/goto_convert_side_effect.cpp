@@ -207,6 +207,7 @@ void goto_convertt::remove_pre(
     rhs.make_typecast(op_type);
   }
   else if(op_type.id()==ID_c_enum ||
+          op_type.id()==ID_c_enum_tag ||
           op_type.id()==ID_incomplete_c_enum)
   {
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
@@ -305,6 +306,7 @@ void goto_convertt::remove_post(
     rhs.make_typecast(op_type);
   }
   else if(op_type.id()==ID_c_enum ||
+          op_type.id()==ID_c_enum_tag ||
           op_type.id()==ID_incomplete_c_enum)
   {
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));

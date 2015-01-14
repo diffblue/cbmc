@@ -35,6 +35,7 @@ void bv_minimizet::add_objective(
   if(type.id()==ID_bool ||
      type.id()==ID_unsignedbv ||
      type.id()==ID_c_enum ||
+     type.id()==ID_c_enum_tag ||
      type.id()==ID_signedbv ||
      type.id()==ID_fixedbv)
   {    

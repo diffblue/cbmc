@@ -392,6 +392,11 @@ constant_exprt smt2_convt::parse_literal(
   {
     return from_integer(value, type);
   }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    return from_integer(value,
+                        ns.follow_tag(to_c_enum_tag_type(type)));
+  }
   else if(type.id()==ID_fixedbv ||
           type.id()==ID_floatbv)
   {
@@ -2001,8 +2006,14 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 {
   assert(expr.operands().size()==1);
   const exprt &src=expr.op0();
-  const typet &dest_type=ns.follow(expr.type());
-  const typet &src_type=ns.follow(src.type());
+
+  typet dest_type=ns.follow(expr.type());
+  if(dest_type.id()==ID_c_enum_tag)
+    dest_type=ns.follow_tag(to_c_enum_tag_type(dest_type));
+
+  typet src_type=ns.follow(src.type());
+  if(src_type.id()==ID_c_enum_tag)
+    src_type=ns.follow_tag(to_c_enum_tag_type(src_type));
 
   if(dest_type.id()==ID_bool)
   {
@@ -2606,6 +2617,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
      expr.type().id()==ID_signedbv ||
      expr.type().id()==ID_bv ||
      expr.type().id()==ID_c_enum ||
+     expr.type().id()==ID_c_enum_tag ||
      expr.type().id()==ID_incomplete_c_enum)
   {
     mp_integer value;
@@ -2613,7 +2625,9 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     if(to_integer(expr, value))
       throw "failed to convert bitvector constant";
 
-    unsigned width=boolbv_width(expr.type());
+    unsigned width=expr.type().id()==ID_c_enum_tag ?
+      boolbv_width(ns.follow_tag(to_c_enum_tag_type(expr.type()))) :
+      boolbv_width(expr.type());
 
     if(value<0) value=power(2, width)+value;
 
@@ -4605,6 +4619,8 @@ void smt2_convt::convert_type(const typet &type)
     out << "(_ BitVec "
         << to_bitvector_type(type.subtype()).get_width() << ")";
   }
+  else if(type.id()==ID_c_enum_tag)
+    convert_type(ns.follow_tag(to_c_enum_tag_type(type)));
   else if(type.id()==ID_floatbv)
   {
     const floatbv_typet &floatbv_type=to_floatbv_type(type);

@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mp_arith.h"
 
 class constant_exprt;
+class namespacet;
 
 /*! \defgroup gr_std_types Conversion to specific types
  *  Conversion to subclasses of @ref typet
@@ -235,7 +236,7 @@ public:
       set(ID_C_bit_field_type, _type);
     }
     
-    unsigned get_bit_field_bits() const;
+    unsigned get_bit_field_bits(const namespacet &ns) const;
   };
 
   typedef std::vector<componentt> componentst;

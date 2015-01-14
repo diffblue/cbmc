@@ -1515,8 +1515,14 @@ void smt1_convt::convert_typecast(
 {
   assert(expr.operands().size()==1);
   const exprt &op=expr.op0();
-  const typet &expr_type=ns.follow(expr.type());
-  const typet &op_type=ns.follow(op.type());
+
+  typet expr_type=ns.follow(expr.type());
+  if(expr_type.id()==ID_c_enum_tag)
+    expr_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
+
+  typet op_type=ns.follow(op.type());
+  if(op_type.id()==ID_c_enum_tag)
+    op_type=ns.follow_tag(to_c_enum_tag_type(op_type));
 
   if(expr_type.id()==ID_bool)
   {
@@ -1943,14 +1949,17 @@ void smt1_convt::convert_constant(
   if(expr.type().id()==ID_unsignedbv ||
      expr.type().id()==ID_signedbv ||
      expr.type().id()==ID_bv ||
-     expr.type().id()==ID_c_enum)
+     expr.type().id()==ID_c_enum ||
+     expr.type().id()==ID_c_enum_tag)
   {
     mp_integer value;
 
     if(to_integer(expr, value))
       throw "failed to convert bitvector constant";
 
-    unsigned width=boolbv_width(expr.type());
+    unsigned width=expr.type().id()==ID_c_enum_tag ?
+      boolbv_width(ns.follow_tag(to_c_enum_tag_type(expr.type()))) :
+      boolbv_width(expr.type());
 
     if(value<0) value=power(2, width)+value;
 
@@ -3322,6 +3331,8 @@ void smt1_convt::convert_type(const typet &type)
   {
     out << "BitVec[" << boolbv_width(type) << "]";
   }
+  else if(type.id()==ID_c_enum_tag)
+    convert_type(ns.follow_tag(to_c_enum_tag_type(type)));
   else if(type.id()==ID_rational)
     out << "Real";
   else if(type.id()==ID_integer)

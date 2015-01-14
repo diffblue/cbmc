@@ -138,12 +138,13 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
         // this needs to be a signedbv/unsignedbv/enum
         if(sub_type.id()!=ID_signedbv &&
            sub_type.id()!=ID_unsignedbv &&
-           sub_type.id()!=ID_c_enum)
+           sub_type.id()!=ID_c_enum &&
+           sub_type.id()!=ID_c_enum_tag)
           return nil_exprt();
           
         // We just sum them up.
         // This assumes they are properly padded.
-        bit_field_width+=it->get_bit_field_bits();
+        bit_field_width+=it->get_bit_field_bits(ns);
       }
       else
       {
@@ -310,12 +311,13 @@ exprt c_sizeoft::c_offsetof(
       // or an enum
       if(sub_type.id()!=ID_signedbv &&
          sub_type.id()!=ID_unsignedbv &&
-         sub_type.id()!=ID_c_enum)
+         sub_type.id()!=ID_c_enum &&
+         sub_type.id()!=ID_c_enum_tag)
         return nil_exprt();
         
       // We just sum them up.
       // This assumes they are properly padded.
-      bit_field_width+=it->get_bit_field_bits();
+      bit_field_width+=it->get_bit_field_bits(ns);
     }
     else
     {

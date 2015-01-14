@@ -77,6 +77,10 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   {
     return alignment(type.subtype(), ns);
   }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    return alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
+  }
   else if(type.id()==ID_pointer)
   {
     unsigned width=config.ansi_c.pointer_width;
@@ -117,10 +121,10 @@ void add_padding(struct_typet &type, const namespacet &ns)
         it++)
     {
       if(it->get_is_bit_field() &&
-         it->get_bit_field_bits()!=0)
+         it->get_bit_field_bits(ns)!=0)
       {
         // count the bits
-        unsigned width=it->get_bit_field_bits();
+        unsigned width=it->get_bit_field_bits(ns);
         bit_field_bits+=width;
       }
       else if(bit_field_bits!=0)
@@ -187,7 +191,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       a=alignment(it->get_bit_field_type(), ns);
       
       // A zero-width bit-field causes alignment to the base-type.
-      if(it->get_bit_field_bits()==0)
+      if(it->get_bit_field_bits(ns)==0)
       {
       }
       else
@@ -197,7 +201,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
         if(max_alignment<a) 
           max_alignment=a;
         
-        unsigned w=it->get_bit_field_bits();
+        unsigned w=it->get_bit_field_bits(ns);
         unsigned bytes;
         for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
         bit_field_bits-=w;
