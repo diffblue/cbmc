@@ -31,11 +31,11 @@ endif
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
-  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1 -mmacosx-version-min=10.6
+  CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.6
   LINKFLAGS += -mmacosx-version-min=10.6
   LINKNATIVE += -mmacosx-version-min=10.6
 else
-  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
+  CP_CXXFLAGS = -MMD -MP
 endif
   #LINKFLAGS = -static
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
@@ -84,7 +84,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
-  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
+  CP_CXXFLAGS = -MMD -MP
   LINKFLAGS = -static
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
@@ -114,7 +114,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   CFLAGS ?= /W3 /O2 /GF
   CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF
   CP_CFLAGS =
-  CP_CXXFLAGS = -DSTL_HASH_TR1
+  CP_CXXFLAGS = 
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ $^ $(LIBS)
   LINKNATIVE = $(HOSTCXX) /Fe$@ $^
