@@ -74,16 +74,6 @@ void goto_program2codet::operator()()
         goto_program.instructions.end(),
         toplevel_block);
 
-  replace_symbols.replace(toplevel_block);
-  for(id_listt::const_iterator
-      it=type_names.begin();
-      it!=type_names.end();
-      ++it)
-  {
-    symbolt &symbol=symbol_table.lookup(*it);
-    replace_symbols.replace(symbol.type);
-  }
-
   cleanup_code(toplevel_block, ID_nil);
 }
 
