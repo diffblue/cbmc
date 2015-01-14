@@ -2044,28 +2044,21 @@ std::string expr2ct::convert_constant(
     dest=id2string(value);
   }
   else if(type.id()==ID_c_enum ||
+          type.id()==ID_c_enum_tag ||
           type.id()==ID_incomplete_c_enum)
   {
-    mp_integer int_value=string2integer(id2string(value));
-    mp_integer i=0;
-    const irept &body=type.find(ID_body);
-
-    forall_irep(it, body.get_sub())
+    if(type.id()==ID_c_enum_tag)
     {
-      if(i==int_value)
+      const symbolt &enum_type_sym=
+        ns.lookup(to_c_enum_tag_type(type).get_identifier());
+
+      const irept &body=enum_type_sym.type;
+
+      forall_irep(it, body.get_sub())
       {
-        dest=it->get_string(ID_name);
-        return dest;
+        if(it->get(ID_value)==value)
+          return clean_identifier(it->get(ID_identifier));
       }
-
-      const exprt &v=
-        static_cast<const exprt &>(it->find(ID_value));
-        
-      if(v.is_not_nil())
-        if(to_integer(v, i))
-          break;
-
-      ++i;
     }
 
     // failed...
