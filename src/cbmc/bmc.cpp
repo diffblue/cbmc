@@ -105,12 +105,18 @@ void bmct::error_trace(const prop_convt &prop_conv)
   const std::string graphml=options.get_option("graphml-cex");
   if(!graphml.empty())
   {
+#if 0
     cfg_baset<empty_cfg_nodet> cfg;
     assert(gf_ptr);
     cfg(*gf_ptr);
+#endif
 
     graphmlt cex_graph;
+#if 0
     convert(ns, goto_trace, cfg, cex_graph);
+#else
+    convert(ns, goto_trace, cex_graph);
+#endif
 
     if(graphml=="-")
       write_graphml(cex_graph, std::cout);

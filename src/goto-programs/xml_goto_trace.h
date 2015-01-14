@@ -26,7 +26,9 @@ void convert(
 void convert(
   const namespacet &ns,
   const goto_tracet &goto_trace,
+#if 0
   const cfg_baset<empty_cfg_nodet> &cfg,
+#endif
   graphmlt &graphml);
 
 #endif
