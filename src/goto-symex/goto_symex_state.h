@@ -250,6 +250,7 @@ public:
     guardt guard;
     propagationt propagation;
     unsigned atomic_section_id;
+    std::set<unsigned> cex_graph_nodes;
     
     explicit goto_statet(const goto_symex_statet &s):
       depth(s.depth),
@@ -257,7 +258,8 @@ public:
       value_set(s.value_set),
       guard(s.guard),
       propagation(s.propagation),
-      atomic_section_id(s.atomic_section_id)
+      atomic_section_id(s.atomic_section_id),
+      cex_graph_nodes(s.cex_graph_nodes)
     {
     }
 
@@ -393,6 +395,8 @@ public:
 
   void switch_to_thread(unsigned t);
   bool record_events;
+
+  std::set<unsigned> cex_graph_nodes;
 };
 
 #endif

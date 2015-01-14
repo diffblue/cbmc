@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rename.h>
 #include <util/symbol_table.h>
 #include <util/replace_symbol.h>
+#include <util/string2int.h>
 
 #include "goto_symex.h"
 
@@ -162,6 +163,48 @@ void goto_symext::operator()(
   
   assert(state.top().end_of_function->is_end_function());
 
+  const std::string cex_file=options.get_option("verify-cex");
+  if(!cex_file.empty())
+  {
+    unsigned entry_node=0;
+    if(read_graphml(cex_file, cex_graph, entry_node))
+      throw "Failed to parse counterexample graph "+cex_file;
+
+    state.cex_graph_nodes.insert(entry_node);
+
+    forall_goto_functions(f_it, goto_functions)
+    {
+      if(!f_it->second.body_available) continue;
+
+      unsigned lb=0;
+      forall_goto_program_instructions(i_it, f_it->second.body)
+      {
+        irep_idt line_no=i_it->source_location.get_line();
+        if(line_no.empty()) continue;
+
+        unsigned cur=safe_string2unsigned(id2string(line_no));
+
+        if(lb==0 || lb>cur) lb=cur>5 ? cur-5 : cur;
+
+        goto_programt::const_targett next=i_it;
+        ++next;
+        unsigned ub=cur;
+        if(next!=f_it->second.body.instructions.end() &&
+           !next->source_location.get_line().empty())
+        {
+          irep_idt next_line_no=next->source_location.get_line();
+          ub=safe_string2unsigned(id2string(next_line_no));
+          --ub;
+          if(ub<cur) ub=cur;
+        }
+
+        token_map[i_it->location_number]=std::make_pair(lb, ub);
+
+        lb=cur+1;
+      }
+    }
+  }
+
   while(!state.call_stack().empty())
   {
     symex_step(goto_functions, state);
@@ -258,6 +301,129 @@ void goto_symext::symex_step(
     if(max_depth!=0 && state.depth>max_depth)
       state.guard.add(false_exprt());
     state.depth++;
+  }
+
+  if(cex_graph.size()!=0 &&
+     !state.guard.is_false())
+  {
+    // simulate epsilon transitions
+    std::list<unsigned> worklist;
+    for(std::set<unsigned>::const_iterator
+        it=state.cex_graph_nodes.begin();
+        it!=state.cex_graph_nodes.end();
+        ++it)
+      worklist.push_back(*it);
+
+    while(!worklist.empty())
+    {
+      const unsigned n=worklist.back();
+      worklist.pop_back();
+
+      const graphmlt::nodet &node=cex_graph[n];
+
+      for(graphmlt::edgest::const_iterator
+          it=node.out.begin();
+          it!=node.out.end();
+          ++it)
+      {
+        const xmlt &xml_node=it->second.xml_node;
+        bool has_epsilon=true;
+        for(xmlt::elementst::const_iterator
+            x_it=xml_node.elements.begin();
+            has_epsilon && x_it!=xml_node.elements.end();
+            ++x_it)
+        {
+          if(x_it->get_attribute("key")=="tokens")
+            has_epsilon=x_it->data.empty();
+        }
+
+        if(has_epsilon &&
+           state.cex_graph_nodes.insert(it->first).second)
+          worklist.push_back(it->first);
+      }
+    }
+
+    std::map<unsigned, std::pair<unsigned, unsigned> >::const_iterator
+      t_m_it=token_map.end();
+    if(state.source.pc->source_location.get_file()!="<built-in-additions>")
+      t_m_it=token_map.find(state.source.pc->location_number);
+#if 0
+    if(t_m_it!=token_map.end())
+      std::cerr << "Token range: [" << t_m_it->second.first
+        << ":" << t_m_it->second.second << "]" << std::endl;
+    std::cerr << "# nodes: " << state.cex_graph_nodes.size() << std::endl;
+#endif
+
+    std::set<unsigned> before;
+    if(t_m_it!=token_map.end()) before.swap(state.cex_graph_nodes);
+
+    // greedily make transitions
+    for(std::set<unsigned>::const_iterator
+        it=before.begin();
+        it!=before.end();
+        ++it)
+    {
+      const graphmlt::nodet &node=cex_graph[*it];
+#if 0
+      std::cerr << "Testing node " << node.node_name << std::endl;
+#endif
+
+      bool taken=false;
+      for(graphmlt::edgest::const_iterator
+          e_it=node.out.begin();
+          e_it!=node.out.end() && !taken;
+          ++e_it)
+      {
+        const xmlt &xml_node=e_it->second.xml_node;
+        for(xmlt::elementst::const_iterator
+            x_it=xml_node.elements.begin();
+            x_it!=xml_node.elements.end();
+            ++x_it)
+        {
+          if(x_it->get_attribute("key")!="tokens") continue;
+
+          std::string data=x_it->data;
+          while(!data.empty())
+          {
+            std::string::size_type c=data.find(',');
+            const unsigned t=safe_string2unsigned(data.substr(0, c));
+
+            if(t_m_it->second.first<=t && t<=t_m_it->second.second)
+            {
+              state.cex_graph_nodes.insert(e_it->first);
+              taken=true;
+#if 0
+              std::cerr << "Transition " << *it << " --> " << e_it->first << std::endl;
+              std::cerr << e_it->second.xml_node;
+#endif
+            }
+
+            if(c==std::string::npos)
+              break;
+
+            data.erase(0, c+1);
+          }
+        }
+      }
+
+      if(!taken)
+        state.cex_graph_nodes.insert(*it);
+    }
+
+    // see whether we have only sink nodes left
+    bool all_sinks=!before.empty();
+    for(std::set<unsigned>::const_iterator
+        it=before.begin();
+        it!=before.end() && all_sinks;
+        ++it)
+    {
+      const graphmlt::nodet &node=cex_graph[*it];
+
+      all_sinks=node.is_violation;
+    }
+
+    if(all_sinks)
+      state.guard.add(false_exprt());
   }
 
   // actually do instruction

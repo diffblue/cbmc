@@ -38,6 +38,7 @@ public:
     ns(_symbol_table, new_symbol_table),
     equation(ns),
     symex(ns, new_symbol_table, equation),
+    gf_ptr(0),
     ui(ui_message_handlert::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
@@ -61,6 +62,7 @@ protected:
   namespacet ns;
   symex_target_equationt equation;
   symex_bmct symex;
+  const goto_functionst *gf_ptr;
  
   // use gui format
   language_uit::uit ui;

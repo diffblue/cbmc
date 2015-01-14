@@ -13,11 +13,20 @@ Date: November 2005
 
 #include <util/xml.h>
 
+#include <xmllang/graphml.h>
+
 #include "goto_trace.h"
+#include "cfg.h"
 
 void convert(
   const namespacet &ns,
   const goto_tracet &goto_trace,
   xmlt &xml);
+
+void convert(
+  const namespacet &ns,
+  const goto_tracet &goto_trace,
+  const cfg_baset<empty_cfg_nodet> &cfg,
+  graphmlt &graphml);
 
 #endif

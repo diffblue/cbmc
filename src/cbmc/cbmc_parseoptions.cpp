@@ -394,6 +394,12 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("outfile"))
     options.set_option("outfile", cmdline.getval("outfile"));
+
+  if(cmdline.isset("verify-cex"))
+    options.set_option("verify-cex", cmdline.getval("verify-cex"));
+
+  if(cmdline.isset("graphml-cex"))
+    options.set_option("graphml-cex", cmdline.getval("graphml-cex"));
 }
 
 /*******************************************************************\
@@ -974,6 +980,8 @@ void cbmc_parseoptionst::help()
     " --no-unwinding-assertions    do not generate unwinding assertions\n"
     " --partial-loops              permit paths with partial loops\n"
     " --no-pretty-names            do not simplify identifiers\n"
+    " --verify-cex filename        verify that the counterexample given in filename exists\n"
+    " --graphml-cex filename       write the counterexample in GraphML format to filename\n"
     "\n"
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"

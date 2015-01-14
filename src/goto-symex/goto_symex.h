@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
+#include <xmllang/graphml.h>
+
 #include "goto_symex_state.h"
 
 class typet;
@@ -100,6 +102,8 @@ protected:
   const namespacet &ns;
   symex_targett &target;  
   unsigned atomic_section_counter;
+  graphmlt cex_graph;
+  std::map<unsigned, std::pair<unsigned, unsigned> > token_map;
 
   friend class symex_dereference_statet;
   

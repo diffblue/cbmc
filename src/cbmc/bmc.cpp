@@ -101,6 +101,25 @@ void bmct::error_trace(const prop_convt &prop_conv)
   default:
     assert(false);
   }
+
+  const std::string graphml=options.get_option("graphml-cex");
+  if(!graphml.empty())
+  {
+    cfg_baset<empty_cfg_nodet> cfg;
+    assert(gf_ptr);
+    cfg(*gf_ptr);
+
+    graphmlt cex_graph;
+    convert(ns, goto_trace, cfg, cex_graph);
+
+    if(graphml=="-")
+      write_graphml(cex_graph, std::cout);
+    else
+    {
+      std::ofstream out(graphml.c_str());
+      write_graphml(cex_graph, out);
+    }
+  }
 }
 
 /*******************************************************************\
@@ -309,6 +328,8 @@ Function: bmct::run
 
 bool bmct::run(const goto_functionst &goto_functions)
 {
+  gf_ptr=&goto_functions;
+
   const std::string mm=options.get_option("mm");
   std::auto_ptr<memory_model_baset> memory_model(0);
   if(mm.empty() || mm=="sc")
