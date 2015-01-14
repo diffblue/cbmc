@@ -14,6 +14,7 @@ Author: Daniel Kroening
 #include <util/i2string.h>
 #include <util/symbol.h>
 #include <util/config.h>
+#include <util/arith_tools.h>
 
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
@@ -276,6 +277,63 @@ Function: convert
 
 \*******************************************************************/
 
+static void convert_assign_rec(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const code_assignt &assign,
+  std::string &dest)
+{
+  if(assign.rhs().id()==ID_array)
+  {
+    const array_typet &type=
+      to_array_type(ns.follow(assign.rhs().type()));
+
+    unsigned i=0;
+    forall_operands(it, assign.rhs())
+    {
+      index_exprt index(
+          assign.lhs(),
+          from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
+          type.subtype());
+      convert_assign_rec(ns, identifier, code_assignt(index, *it), dest);
+    }
+  }
+  else if(assign.rhs().id()==ID_struct ||
+          assign.rhs().id()==ID_union)
+  {
+    const struct_union_typet &type=
+      to_struct_union_type(ns.follow(assign.lhs().type()));
+    const struct_union_typet::componentst &components=
+      type.components();
+
+    struct_union_typet::componentst::const_iterator c_it=
+      components.begin();
+    forall_operands(it, assign.rhs())
+    {
+      if(c_it->type().id()==ID_code ||
+         c_it->get_is_padding())
+      {
+        ++c_it;
+        continue;
+      }
+
+      assert(c_it!=components.end());
+      member_exprt member(
+          assign.lhs(),
+          c_it->get_name(),
+          it->type());
+      convert_assign_rec(ns, identifier, code_assignt(member, *it), dest);
+      ++c_it;
+    }
+  }
+  else
+  {
+    if(!dest.empty()) dest+=' ';
+    dest+=from_expr(ns, identifier, assign.lhs())+" = "+
+          from_expr(ns, identifier, assign.rhs())+";";
+  }
+}
+
 void convert(
   const namespacet &ns,
   const goto_tracet &goto_trace,
@@ -352,6 +410,9 @@ void convert(
     case goto_trace_stept::ASSIGNMENT:
     case goto_trace_stept::ASSERT:
     case goto_trace_stept::LOCATION:
+    case goto_trace_stept::FUNCTION_CALL:
+      if(it->type!=goto_trace_stept::LOCATION ||
+         from!=to)
       {
         xmlt edge("edge");
         edge.set_attribute("source", graphml[from].node_name);
@@ -384,9 +445,8 @@ void convert(
 
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "assumption");
-          val.data=
-            from_expr(ns, identifier, it->full_lhs)+" = "+
-            from_expr(ns, identifier, it->lhs_object_value)+";";
+          code_assignt assign(it->lhs_object, it->lhs_object_value);
+          convert_assign_rec(ns, identifier, assign, val.data);
         }
         else if(it->type==goto_trace_stept::LOCATION &&
                 it->pc->is_goto())
@@ -435,7 +495,6 @@ void convert(
       }
       break;
 
-    case goto_trace_stept::FUNCTION_CALL:
     case goto_trace_stept::FUNCTION_RETURN:
     case goto_trace_stept::ASSUME:
     case goto_trace_stept::INPUT:
