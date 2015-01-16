@@ -553,6 +553,8 @@ Function: cnft::lselect
 
 \*******************************************************************/
 
+// Tino observed slow-downs up to 50% with OPTIMAL_COMPACT_ITE.
+
 #define COMPACT_ITE
 //#define OPTIMAL_COMPACT_ITE
 
