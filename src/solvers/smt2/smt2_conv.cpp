@@ -3735,7 +3735,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
       if(m.width==struct_width)
       {
         // the struct is the same as the member, no concat needed
-        out << "withop?";
+        out << "?withop";
       }
       else if(m.offset==0)
       {
