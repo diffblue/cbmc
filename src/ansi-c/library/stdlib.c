@@ -92,6 +92,26 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   return res;
 }
 
+/* FUNCTION: __builtin_alloca */
+
+inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
+{
+  __CPROVER_HIDE:;
+  void *res;
+  res=__CPROVER_malloc(alloca_size);
+
+  // make sure it's not recorded as deallocated
+  __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
+  
+  // record the object size for non-determistic bounds checking
+  __CPROVER_bool record_malloc;
+  __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
+  __CPROVER_malloc_size=record_malloc?alloca_size:__CPROVER_malloc_size;
+  __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
+
+  return res;
+}
+
 /* FUNCTION: free */
 
 #undef free
