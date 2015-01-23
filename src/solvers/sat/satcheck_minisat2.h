@@ -37,6 +37,9 @@ public:
 
   // extra MiniSat feature: solve with assumptions
   virtual void set_assumptions(const bvt &_assumptions);
+  
+  // extra MiniSat feature: default branching decision
+  void set_polarity(literalt a, bool value);
 
   virtual bool is_in_conflict(literalt a) const;
   virtual bool has_set_assumptions() const { return true; }

@@ -86,6 +86,25 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 
 /*******************************************************************\
 
+Function: satcheck_minisat2_baset::set_polarity
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+template<typename T>
+void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
+{
+  assert(!a.is_constant());
+  solver->setPolarity(a.var_no(), value);
+}
+
+/*******************************************************************\
+
 Function: satcheck_minisat_no_simplifiert::solver_text
 
   Inputs:
