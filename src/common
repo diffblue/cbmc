@@ -59,7 +59,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
 else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
   CP_CXXFLAGS += -DSTL_HASH_STD
   LINKLIB = ar rcT $@ $^
-  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
   ifeq ($(origin CC),default)
     CC     = clang
