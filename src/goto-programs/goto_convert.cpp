@@ -480,8 +480,8 @@ void goto_convertt::convert(
     convert_msc_try_finally(code, dest);
   else if(statement==ID_msc_leave)
     convert_msc_leave(code, dest);
-  else if(statement==ID_catch) // C++ try/catch
-    convert_catch(code, dest);
+  else if(statement==ID_try_catch) // C++ try/catch
+    convert_try_catch(code, dest);
   else if(statement==ID_CPROVER_try_catch) // CPROVER-homemade
     convert_CPROVER_try_catch(code, dest);
   else if(statement==ID_CPROVER_throw) // CPROVER-homemade

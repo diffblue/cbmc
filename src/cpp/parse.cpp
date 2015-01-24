@@ -7718,15 +7718,17 @@ Function:
 */
 bool Parser::rTryStatement(codet &statement)
 {
-  Token tk;
-
-  if(lex.GetToken(tk)!=TOK_TRY)
-    return false;
-
-  statement=codet(ID_catch);
-  set_location(statement, tk);
-
   {
+    Token try_token;
+
+    // The 'try' block
+    if(lex.GetToken(try_token)!=TOK_TRY)
+      return false;
+
+    statement=codet(ID_try_catch);
+    statement.operands().reserve(2);
+    set_location(statement, try_token);
+
     codet body;
 
     if(!rCompoundStatement(body))
@@ -7738,23 +7740,28 @@ bool Parser::rTryStatement(codet &statement)
   // iterate while there are catch clauses
   do
   {
-    Token op, cp;
+    Token catch_token, op_token, cp_token;
     
-    if(lex.GetToken(tk)!=TOK_CATCH)
+    if(lex.GetToken(catch_token)!=TOK_CATCH)
       return false;
 
-    if(lex.GetToken(op)!='(')
+    if(lex.GetToken(op_token)!='(')
       return false;
 
-    cpp_declarationt declaration;
+    codet catch_op;
 
     if(lex.LookAhead(0)==TOK_ELLIPSIS)
     {
-      lex.GetToken(cp);
-      // TODO
+      Token ellipsis_token;
+      lex.GetToken(ellipsis_token);
+      codet ellipsis(ID_ellipsis);
+      set_location(ellipsis, ellipsis_token);
+      catch_op=ellipsis;
     }
     else
     {
+      cpp_declarationt declaration;
+
       if(!rArgDeclaration(declaration))
         return false;
         
@@ -7768,26 +7775,27 @@ bool Parser::rTryStatement(codet &statement)
         declaration.declarators().front().name()=cpp_namet();
         declaration.declarators().front().name().get_sub().push_back(name);
       }
+      
+      codet code_decl;
+      code_decl.set_statement(ID_decl);
+      code_decl.move_to_operands(declaration);
+      set_location(code_decl, catch_token);
+      
+      catch_op=code_decl;
     }
 
-    if(lex.GetToken(cp)!=')')
+    if(lex.GetToken(cp_token)!=')')
       return false;
-  
+      
     codet body;
-
+  
     if(!rCompoundStatement(body))
       return false;
-
-    // We prepend the declaration to the body
-    // as a declaration statement
+    
     assert(body.get_statement()==ID_block);
     
-    code_declt code_decl;
-    code_decl.op0().swap(declaration);
+    body.operands().insert(body.operands().begin(), catch_op);
 
-    codet::operandst &ops=body.operands();
-    ops.insert(ops.begin(), code_decl);
-    
     statement.move_to_operands(body);
   }
   while(lex.LookAhead(0)==TOK_CATCH);

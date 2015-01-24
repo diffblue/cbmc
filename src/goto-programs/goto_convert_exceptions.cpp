@@ -125,7 +125,7 @@ void goto_convertt::convert_msc_leave(
 
 /*******************************************************************\
 
-Function: goto_convertt::convert_catch
+Function: goto_convertt::convert_try_catch
 
   Inputs:
 
@@ -135,7 +135,7 @@ Function: goto_convertt::convert_catch
 
 \*******************************************************************/
 
-void goto_convertt::convert_catch(
+void goto_convertt::convert_try_catch(
   const codet &code,
   goto_programt &dest)
 {
@@ -184,7 +184,7 @@ void goto_convertt::convert_catch(
     dest.add_instruction()->make_goto(end_target);
   }
 
-  // add end-target  
+  // add the end-target  
   dest.destructive_append(end);
 }
 
