@@ -98,15 +98,7 @@ COMPILATION ON FREEBSD 10
 
    cd cbmc-trunk/src
 
-4) Change line 38 in the file "common" to say
-
-   CP_CXXFLAGS = -MMD -MP -DSTL_HASH_STD
-
-   Change line 66 to say
-
-   CXX = clang++
-
-5) Do
+4) Do
 
    gmake minisat2-download
    gmake

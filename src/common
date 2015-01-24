@@ -7,6 +7,8 @@ ifeq ($(uname),windows32)
   BUILD_ENV_ := MSVC
 else ifeq ($(uname),Darwin)
   BUILD_ENV_ := OSX
+else ifeq ($(uname),FreeBSD)
+  BUILD_ENV_ := FreeBSD
 else ifeq ($(filter-out MINGW32_%, $(uname)),)
   BUILD_ENV_ := MinGW
 else ifeq ($(filter-out CYGWIN_%, $(uname)),)
@@ -18,7 +20,7 @@ else
   BUILD_ENV_ := $(BUILD_ENV)
 endif
 
-ifeq ($(filter-out Unix MinGW OSX OSX_Universal,$(BUILD_ENV_)),)
+ifeq ($(filter-out Unix MinGW OSX OSX_Universal FreeBSD,$(BUILD_ENV_)),)
   # Linux-ish
   LIBEXT = .a
   OBJEXT = .o
@@ -46,6 +48,17 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
     LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
   endif
   LINKLIB = /usr/bin/libtool -static -o $@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
+  LINKNATIVE = $(HOSTCXX) -o $@ $^
+  ifeq ($(origin CC),default)
+    CC     = clang
+  endif
+  ifeq ($(origin CXX),default)
+    CXX    = clang++
+  endif
+else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
+  CP_CXXFLAGS += -DSTL_HASH_STD
+  LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
   ifeq ($(origin CC),default)
