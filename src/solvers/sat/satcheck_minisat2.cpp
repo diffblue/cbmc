@@ -100,6 +100,7 @@ template<typename T>
 void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
 {
   assert(!a.is_constant());
+  add_variables();
   solver->setPolarity(a.var_no(), value);
 }
 
