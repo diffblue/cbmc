@@ -199,7 +199,7 @@ protected:
   void convert_msc_try_finally(const codet &code, goto_programt &dest);
   void convert_msc_try_except(const codet &code, goto_programt &dest);
   void convert_msc_leave(const codet &code, goto_programt &dest);
-  void convert_catch(const codet &code, goto_programt &dest);
+  void convert_try_catch(const codet &code, goto_programt &dest);
   void convert_CPROVER_try_catch(const codet &code, goto_programt &dest);
   void convert_CPROVER_try_finally(const codet &code, goto_programt &dest);
   void convert_CPROVER_throw(const codet &code, goto_programt &dest);
