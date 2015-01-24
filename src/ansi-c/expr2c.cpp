@@ -4377,6 +4377,8 @@ std::string expr2ct::convert(
       return convert_statement_expression(src, precedence=15);
     else if(statement==ID_gcc_builtin_va_arg_next)
       return convert_function(src, "gcc_builtin_va_arg_next", precedence=16);
+    else if(statement==ID_throw)
+      return convert_function(src, "throw", precedence=16);
     else
       return convert_norep(src, precedence);
   }
