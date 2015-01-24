@@ -95,30 +95,35 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
       else
       {
         // turn references into non-references
-        assert(to_code(code.op0()).get_statement()==ID_decl);
-        cpp_declarationt &cpp_declaration=
-          to_cpp_declaration(to_code_decl(to_code(code.op0())).symbol());
+        {
+          assert(to_code(code.op0()).get_statement()==ID_decl);
+          cpp_declarationt &cpp_declaration=
+            to_cpp_declaration(to_code_decl(to_code(code.op0())).symbol());
           
-        assert(cpp_declaration.declarators().size()==1);
-        cpp_declaratort &declarator=cpp_declaration.declarators().front();
+          assert(cpp_declaration.declarators().size()==1);
+          cpp_declaratort &declarator=cpp_declaration.declarators().front();
         
-        if(is_reference(declarator.type()))
-          declarator.type()=declarator.type().subtype();
+          if(is_reference(declarator.type()))
+            declarator.type()=declarator.type().subtype();
+        }
 
         // typecheck the body
         typecheck_code(code);
+        
+        // the declaration is now in a decl_block
+        
+        assert(!code.operands().empty());
+        assert(to_code(code.op0()).get_statement()==ID_decl_block);
 
-        #if 0
         // get the declaration
         const code_declt &code_decl=
-          to_code_decl(first_instruction);
+          to_code_decl(to_code(code.op0().op0()));
 
         // get the type
         const typet &type=code_decl.op0().type();
         
         // annotate exception ID
         it->set(ID_exception_id, cpp_exception_id(type, *this));
-        #endif
       }
     }
   }
