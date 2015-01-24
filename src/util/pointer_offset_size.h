@@ -30,6 +30,10 @@ mp_integer pointer_offset_size(
   const namespacet &ns,
   const typet &type);
 
+mp_integer pointer_offset_bits(
+  const namespacet &ns,
+  const typet &type);
+
 mp_integer compute_pointer_offset(
   const namespacet &ns,
   const exprt &expr);

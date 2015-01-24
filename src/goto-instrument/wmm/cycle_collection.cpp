@@ -154,6 +154,11 @@ event_grapht::critical_cyclet event_grapht::graph_explorert::extract_cycle(
       << egraph[current_vertex].thread << "~" << egraph[current_vertex].local
       << messaget::eom;
 
+    if(!new_cycle.has_user_defined_fence)
+    {
+      new_cycle.has_user_defined_fence=egraph[current_vertex].is_fence();
+    }
+
     if(current_vertex==vertex)
       incycle=true;
 
@@ -257,39 +262,46 @@ bool event_grapht::graph_explorert::backtrack(
     if(lwfence_met && this_vertex.operation!=abstract_eventt::Read)
       return false; //{no_comm=true;get_com_only=false;}//return false;
 
-    /* no more than 4 events per thread */
-    if(this_vertex.operation!=abstract_eventt::Fence
-      && this_vertex.operation!=abstract_eventt::Lwfence
-      && this_vertex.operation!=abstract_eventt::ASMfence)
+    bool has_to_be_unsafe_updated=false;
+    // TODO: propagate this constraint within the optimisation 
+    // -- no optimisation can strongly affect performances
+    /* tab[] can appear several times */
+    if(egraph.ignore_arrays || id2string(this_vertex.variable).find("[]")==std::string::npos) 
     {
-      if(events_per_thread[this_vertex.thread]==4)
-        return false;
-      else
-        events_per_thread[this_vertex.thread]++;
+      /* no more than 4 events per thread */
+      if(this_vertex.operation!=abstract_eventt::Fence
+        && this_vertex.operation!=abstract_eventt::Lwfence
+        && this_vertex.operation!=abstract_eventt::ASMfence)
+      {
+        if(events_per_thread[this_vertex.thread]==4)
+          return false;
+        else
+          events_per_thread[this_vertex.thread]++;
+      }
+
+      /* Multiple re-orderings constraint: if the thread on this cycles contains 
+         more than one, ensure that an unsafe pair is not protected by another 
+         relation in the thread. E.g., in Wx Rx Wy, under TSO, the rfi cannot be 
+         delayed, since the only way to make this transformation matter is to 
+         re-order also the two writes, which is not permitted on TSO. */
+      if(has_to_be_unsafe && point_stack.size() >= 2)
+      {
+        const unsigned previous = point_stack.top();
+        point_stack.pop();
+        const unsigned preprevious = point_stack.top();
+        point_stack.push(previous);
+        if(!egraph[preprevious].unsafe_pair(this_vertex,model)
+          && !(this_vertex.operation==abstract_eventt::Fence
+            || egraph[preprevious].operation==abstract_eventt::Fence
+            || this_vertex.operation==abstract_eventt::Lwfence
+            || egraph[preprevious].operation==abstract_eventt::Lwfence
+            || this_vertex.operation==abstract_eventt::ASMfence
+            || egraph[preprevious].operation==abstract_eventt::ASMfence))
+          return false;
+      }
     }
 
-    /* Multiple re-orderings constraint: if the thread on this cycles contains 
-       more than one, ensure that an unsafe pair is not protected by another 
-       relation in the thread. E.g., in Wx Rx Wy, under TSO, the rfi cannot be 
-       delayed, since the only way to make this transformation matter is to 
-       re-order also the two writes, which is not permitted on TSO. */
-    if(has_to_be_unsafe && point_stack.size() >= 2)
-    {
-      const unsigned previous = point_stack.top();
-      point_stack.pop();
-      const unsigned preprevious = point_stack.top();
-      point_stack.push(previous);
-      if(!egraph[preprevious].unsafe_pair(this_vertex,model)
-        && !(this_vertex.operation==abstract_eventt::Fence
-          || egraph[preprevious].operation==abstract_eventt::Fence
-          || this_vertex.operation==abstract_eventt::Lwfence
-          || egraph[preprevious].operation==abstract_eventt::Lwfence
-          || this_vertex.operation==abstract_eventt::ASMfence
-          || egraph[preprevious].operation==abstract_eventt::ASMfence))
-        return false;
-    }
-
-    bool has_to_be_unsafe_updated = has_to_be_unsafe;
+    has_to_be_unsafe_updated = has_to_be_unsafe;
 
     /* constraint 1.a: there is at most one pair of events per thread
        with different variables. Given that we cannot have more than
@@ -386,9 +398,7 @@ bool event_grapht::graph_explorert::backtrack(
         w_it!=egraph.po_out(vertex).end(); w_it++)
       {
         const unsigned w = w_it->first;
-        if(w < source)
-          egraph.remove_po_edge(vertex,w);
-        else if(w == source && point_stack.size()>=4
+        if(w == source && point_stack.size()>=4
           && (unsafe_met_updated
             || this_vertex.unsafe_pair(egraph[source],model)) )
         {
@@ -403,8 +413,8 @@ bool event_grapht::graph_explorert::backtrack(
           }
           if((!egraph.filter_uniproc || new_cycle.is_not_uniproc(model)) && not_thin_air 
             && new_cycle.is_cycle() &&
-            new_cycle.is_unsafe(model) &&
-            new_cycle.is_unsafe_asm(model))
+            new_cycle.is_unsafe(model) /*&&
+            new_cycle.is_unsafe_asm(model)*/)
           {
             egraph.message.debug() << new_cycle.print_name(model,false) 
               << messaget::eom;
@@ -448,8 +458,8 @@ bool event_grapht::graph_explorert::backtrack(
         }
         if((!egraph.filter_uniproc || new_cycle.is_not_uniproc(model)) && not_thin_air 
           && new_cycle.is_cycle() &&
-          new_cycle.is_unsafe(model) &&
-          new_cycle.is_unsafe_asm(model))
+          new_cycle.is_unsafe(model) /*&&
+          new_cycle.is_unsafe_asm(model)*/)
         {
           egraph.message.debug() << new_cycle.print_name(model,false) 
             << messaget::eom;
@@ -544,7 +554,10 @@ bool event_grapht::graph_explorert::backtrack(
 
     if(!egraph[point_stack.top()].unsafe_pair(this_vertex, model))
     {
-      avoid_at_the_end = this_vertex.variable;
+      /* tab[] should never be avoided */
+      if(egraph.ignore_arrays 
+        || id2string(this_vertex.variable).find("[]")==std::string::npos)
+        avoid_at_the_end = this_vertex.variable;
     }
 
     /* skip lwfence by po-transition only if we consider a WR */

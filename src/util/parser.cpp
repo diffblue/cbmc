@@ -30,7 +30,7 @@ Function: _newstack
 
 exprt &_newstack(parsert &parser, unsigned &x)
 {
-  x=parser.stack.size();
+  x=(unsigned)parser.stack.size();
 
   if(x>=parser.stack.capacity())
     parser.stack.reserve(x*2);

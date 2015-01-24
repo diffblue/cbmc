@@ -263,13 +263,13 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
   else if(expr.id()==ID_cond)
     return convert_cond(expr, bv);
   else if(expr.id()==ID_if)
-    return convert_if(expr, bv);
+    return convert_if(to_if_expr(expr), bv);
   else if(expr.id()==ID_constant)
-    return convert_constant(expr, bv);
+    return convert_constant(to_constant_expr(expr), bv);
   else if(expr.id()==ID_typecast)
-    return convert_typecast(expr, bv);
+    return convert_typecast(to_typecast_expr(expr), bv);
   else if(expr.id()==ID_symbol)
-    return convert_symbol(expr, bv);
+    return convert_symbol(to_symbol_expr(expr), bv);
   else if(expr.id()==ID_bv_literals)
     return convert_bv_literals(expr, bv);
   else if(expr.id()==ID_plus || expr.id()==ID_minus ||
@@ -289,7 +289,7 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
           expr.id()==ID_floatbv_mult || expr.id()==ID_floatbv_div)
     return convert_floatbv_op(expr, bv);
   else if(expr.id()==ID_floatbv_typecast)
-    return convert_floatbv_typecast(expr, bv);
+    return convert_floatbv_typecast(to_floatbv_typecast_expr(expr), bv);
   else if(expr.id()==ID_concatenation)
     return convert_concatenation(expr, bv);
   else if(expr.id()==ID_replication)
@@ -311,17 +311,17 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return convert_abs(expr, bv);
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
-    return convert_byte_extract(expr, bv);
+    return convert_byte_extract(to_byte_extract_expr(expr), bv);
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
-    return convert_byte_update(expr, bv);
+    return convert_byte_update(to_byte_update_expr(expr), bv);
   else if(expr.id()==ID_nondet_symbol ||
           expr.id()=="quant_symbol")
     return convert_symbol(expr, bv);
   else if(expr.id()==ID_struct)
-    return convert_struct(expr, bv);
+    return convert_struct(to_struct_expr(expr), bv);
   else if(expr.id()==ID_union)
-    return convert_union(expr, bv);
+    return convert_union(to_union_expr(expr), bv);
   else if(expr.id()==ID_string_constant)
     return convert_bitvector(
       to_string_constant(expr).to_array_expr(), bv);
@@ -338,7 +338,7 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
   else if(expr.id()==ID_lambda)
     return convert_lambda(expr, bv);
   else if(expr.id()==ID_array_of)
-    return convert_array_of(expr, bv);
+    return convert_array_of(to_array_of_expr(expr), bv);
   else if(expr.id()==ID_function_application)
   {
     // make it free bits

@@ -180,7 +180,7 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
       ((char *)buf)[i]=nondet_char;
     }
 
-    _Bool error;
+    __CPROVER_bool error;
     return error ? -1 : nread;
   }
 

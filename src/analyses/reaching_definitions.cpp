@@ -10,6 +10,7 @@ Date: February 2013
 \*******************************************************************/
 
 #include <limits>
+#include <algorithm>
 
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -211,12 +212,16 @@ void rd_range_domaint::assign_byte_extract(
     assign(ns, from, be.op(), -1, 1);
   else
   {
+    #if 0
     endianness_mapt map(
       be.op().type(),
       be.id()==ID_byte_extract_little_endian,
       ns);
     assert(index<std::numeric_limits<unsigned>::max());
     op_offset+=map.map_byte(integer2long(index));
+    #else
+    op_offset+=index;
+    #endif
     assign(ns, from, be.op(), op_offset, 1);
   }
 }

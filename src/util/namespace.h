@@ -19,6 +19,7 @@ class union_tag_typet;
 class union_typet;
 class struct_tag_typet;
 class struct_typet;
+class c_enum_typet;
 class c_enum_tag_typet;
 
 class namespace_baset
@@ -44,8 +45,10 @@ public:
   void follow_macros(exprt &expr) const;
   const typet &follow(const typet &src) const;
 
-  const union_typet &follow_tag(const union_tag_typet &src) const;
-  const struct_typet &follow_tag(const struct_tag_typet &src) const;
+  // These produce union_typet, struct_typet, c_enum_typet or
+  // the incomplete version.  
+  const typet &follow_tag(const union_tag_typet &src) const;
+  const typet &follow_tag(const struct_tag_typet &src) const;
   const typet &follow_tag(const c_enum_tag_typet &src) const;
 
   // these do the actual lookup

@@ -12,19 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type.h>
 
 typet index_type();
-typet enum_type();
-typet int_type(); // will go away
-typet uint_type(); // will go away
+typet enum_constant_type();
 typet signed_int_type();
 typet unsigned_int_type();
-typet long_int_type(); // will go away
 typet signed_long_int_type();
 typet signed_short_int_type();
 typet unsigned_short_int_type();
-typet long_long_int_type(); // will go away
 typet signed_long_long_int_type();
-typet long_uint_type(); // will go away
-typet long_long_uint_type(); // will go away
 typet unsigned_long_int_type();
 typet unsigned_long_long_int_type();
 typet c_bool_type();
@@ -43,5 +37,9 @@ typet gcc_signed_int128_type();
 typet size_type();
 typet signed_size_type();
 typet pointer_diff_type();
+
+// Turns an ID_C_c_type into a string, e.g.,
+// ID_signed_int gets "signed int".
+std::string c_type_as_string(const irep_idt &);
 
 #endif

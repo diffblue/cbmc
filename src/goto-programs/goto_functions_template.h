@@ -29,9 +29,19 @@ public:
 
   bool body_available;
 
-  bool is_inlined() const
+  inline bool is_inlined() const
   {
     return type.get_bool(ID_C_inlined);
+  }
+  
+  inline bool is_hidden() const
+  {
+    return type.get_bool(ID_C_hide);
+  }
+  
+  inline void make_hidden()
+  {
+    type.set(ID_C_hide, true);
   }
   
   goto_function_templatet():body_available(false)
@@ -110,17 +120,10 @@ public:
     compute_location_numbers();
   }
 
-  // will go away, use below
-  inline irep_idt main_id() const
+  static inline irep_idt entry_point()
   {
-    return ID_main;
-  }
-  
-  inline irep_idt entry_point() const
-  {
-    // will change to ID__start to avoid confusion
-    // with C's main() function
-    return ID_main;
+    // do not confuse with C's "int main()"
+    return ID__start;
   }
   
   inline void swap(goto_functions_templatet &other)

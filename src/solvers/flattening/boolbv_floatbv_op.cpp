@@ -27,15 +27,11 @@ Function: boolbvt::convert_floatbv_typecast
 
 \*******************************************************************/
 
-void boolbvt::convert_floatbv_typecast(const exprt &expr, bvt &bv)
+void boolbvt::convert_floatbv_typecast(
+  const floatbv_typecast_exprt &expr, bvt &bv)
 {
-  const exprt::operandst &operands=expr.operands();
-  
-  if(operands.size()!=2)
-    throw "operator "+expr.id_string()+" takes two operands";
-
-  const exprt &op0=expr.op0(); // number to convert
-  const exprt &op1=expr.op1(); // rounding mode
+  const exprt &op0=expr.op(); // number to convert
+  const exprt &op1=expr.rounding_mode(); // rounding mode
 
   bvt bv0=convert_bv(op0);
   bvt bv1=convert_bv(op1);

@@ -43,6 +43,7 @@ public:
     bool use_fixed_for_float;
     bool for_has_scope;
     bool single_precision_constant;
+    bool cpp11;
     
     ieee_floatt::rounding_modet rounding_mode;
 
@@ -97,7 +98,7 @@ public:
                    MODE_CODEWARRIOR_C_CPP, MODE_ARM_C_CPP } flavourt;
     flavourt mode; // the syntax of source files
 
-    typedef enum { NO_PP, PP_GCC, PP_VISUAL_STUDIO,
+    typedef enum { NO_PP, PP_GCC, PP_CLANG, PP_VISUAL_STUDIO,
                    PP_CODEWARRIOR, PP_ARM } preprocessort;
     preprocessort preprocessor; // the preprocessor to use
 

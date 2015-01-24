@@ -85,7 +85,7 @@ protected:
 
   virtual std::string main_symbol()
   {
-    return "c::main";
+    return "main";
   }
 };
 

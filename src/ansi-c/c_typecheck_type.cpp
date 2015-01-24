@@ -79,8 +79,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_compound_type(to_struct_union_type(type));
   else if(type.id()==ID_c_enum)
     typecheck_c_enum_type(type);
-  else if(type.id()==ID_c_bitfield)
-    typecheck_c_bit_field_type(type);
+  else if(type.id()==ID_c_enum_tag)
+    typecheck_c_enum_tag_type(to_c_enum_tag_type(type));
+  else if(type.id()==ID_c_bit_field)
+    typecheck_c_bit_field_type(to_c_bit_field_type(type));
   else if(type.id()==ID_typeof)
     typecheck_typeof_type(type);
   else if(type.id()==ID_symbol)
@@ -98,34 +100,99 @@ void c_typecheck_baset::typecheck_type(typet &type)
     // http://www.delorie.com/gnu/docs/gcc/gccint_53.html
     typecheck_type(type.subtype());
     
-    bool is_signed=type.subtype().id()==ID_signedbv;
-    
-    // get width
-    irep_idt mode=type.get(ID_size);
-    
-    if(mode=="__QI__") // 8 bits
-      type=is_signed?signed_char_type():unsigned_char_type();
-    else if(mode=="__HI__") // 16 bits
-      type=is_signed?signed_short_int_type():unsigned_short_int_type();
-    else if(mode=="__SI__") // 32 bits
-      type=is_signed?signed_int_type():unsigned_int_type();
-    else if(mode=="__DI__") // 64 bits
+    typet underlying_type=type.subtype();
+  
+    if(underlying_type.id()==ID_signedbv ||
+       underlying_type.id()==ID_unsignedbv)
     {
-      if(config.ansi_c.long_int_width==64)
-        type=is_signed?signed_long_int_type():unsigned_long_int_type();
-      else
+      bool is_signed=underlying_type.id()==ID_signedbv;
+      
+      // get width
+      irep_idt mode=type.get(ID_size);
+      
+      typet result;
+      
+      if(mode=="__QI__") // 8 bits
+        result=is_signed?signed_char_type():unsigned_char_type();
+      else if(mode=="__byte__") // 8 bits
+        result=is_signed?signed_char_type():unsigned_char_type();
+      else if(mode=="__HI__") // 16 bits
+        result=is_signed?signed_short_int_type():unsigned_short_int_type();
+      else if(mode=="__SI__") // 32 bits
+        result=is_signed?signed_int_type():unsigned_int_type();
+      else if(mode=="__word__") // long int, we think
+        result=is_signed?signed_long_int_type():unsigned_long_int_type();
+      else if(mode=="__pointer__") // we think this is size_t/ssize_t
+        result=is_signed?signed_size_type():size_type();
+      else if(mode=="__DI__") // 64 bits
       {
-        assert(config.ansi_c.long_long_int_width==64);
-        type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+        if(config.ansi_c.long_int_width==64)
+          result=is_signed?signed_long_int_type():unsigned_long_int_type();
+        else
+        {
+          assert(config.ansi_c.long_long_int_width==64);
+          result=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+        }
       }
+      else if(mode=="__TI__") // 128 bits
+        result=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
+      else if(mode=="__V2SI__") // vector of 2 ints, deprecated by gcc
+        result=vector_typet(is_signed?signed_int_type():unsigned_int_type(), from_integer(2, size_type()));
+      else if(mode=="__V4SI__") // vector of 4 ints, deprecated by gcc
+        result=vector_typet(is_signed?signed_int_type():unsigned_int_type(), from_integer(4, size_type()));
+      else // give up, just use subtype
+        result=type.subtype();
+
+      // save the location
+      result.add_source_location()=type.source_location();
+
+      type=result;
     }
-    else if(mode=="__TI__") // 128 bits
-      type=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
-    else // give up, use base
+    else if(underlying_type.id()==ID_c_enum_tag)
+    {
+      // gcc allows this, but clang doesn't.
+      // We ignore for now.
       type=type.subtype();
+    }
+    else if(underlying_type.id()==ID_floatbv)
+    {
+      // get width
+      irep_idt mode=type.get(ID_size);
+      
+      typet result;
+      
+      if(mode=="__SF__") // 32 bits
+        result=float_type();
+      else if(mode=="__DF__") // 64 bits
+        result=double_type();
+      else if(mode=="__TF__") // 128 bits
+        result=gcc_float128_type();
+      else if(mode=="__V2SF__") // vector of 2 floats, deprecated by gcc
+        result=vector_typet(float_type(), from_integer(2, size_type()));
+      else if(mode=="__V2DF__") // vector of 2 doubles, deprecated by gcc
+        result=vector_typet(double_type(), from_integer(2, size_type()));
+      else if(mode=="__V4SF__") // vector of 4 floats, deprecated by gcc
+        result=vector_typet(float_type(), from_integer(4, size_type()));
+      else if(mode=="__V4DF__") // vector of 4 doubles, deprecated by gcc
+        result=vector_typet(double_type(), from_integer(4, size_type()));
+      else // give up, just use subtype
+        result=type.subtype();
+
+      // save the location
+      result.add_source_location()=type.source_location();
+
+      type=result;
+    }
+    else
+    {
+      err_location(type);
+      str << "attribute mode applied to inappropriate type `"
+          << to_string(type) << "'";
+      throw 0;
+    }
   }
 
-  // do a bit of rule checking
+  // do a mild bit of rule checking
 
   if(type.get_bool(ID_C_restricted) &&
      type.id()!=ID_pointer &&
@@ -262,7 +329,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
 {
   // the return type is still 'subtype()'
   type.return_type()=type.subtype();
-  type.remove(ID_subtype);
+  type.remove_subtype();
 
   code_typet::parameterst &parameters=type.parameters();
   
@@ -314,8 +381,6 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         }
         else
         {
-          identifier=add_language_prefix(identifier);
-    
           // make visible now, later parameters might use it
           parameter_map[identifier]=type;
           parameter.set_base_name(declaration.declarator().get_base_name());
@@ -627,7 +692,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
     std::string typestr=type2name(compound_symbol.type);
     compound_symbol.base_name="#anon-"+typestr;
-    compound_symbol.name=add_language_prefix("tag-#anon#"+typestr);
+    compound_symbol.name="tag-#anon#"+typestr;
     identifier=compound_symbol.name;
     
     // We might already have the same anonymous union/struct,
@@ -641,7 +706,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   }
   else
   {
-    identifier=add_language_prefix(type.find(ID_tag).get(ID_identifier));
+    identifier=type.find(ID_tag).get(ID_identifier);
     
     // does it exist already?
     symbol_tablet::symbolst::iterator s_it=
@@ -776,15 +841,6 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
         new_component.set(ID_pretty_name, d_it->get_base_name());
         new_component.type()=declaration.full_type(*d_it);
 
-        // mark bit-fields as such
-        if(new_component.type().id()==ID_c_bitfield)
-        {
-          new_component.set_is_bit_field(true);
-          typet tmp=new_component.type().subtype();
-          typecheck_type(tmp);
-          new_component.set_bit_field_type(tmp);
-        }
-        
         typecheck_type(new_component.type());
 
         components.push_back(new_component);
@@ -866,8 +922,8 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
       it!=components.end();
       ) // blank
   {
-    if(it->get_is_bit_field() &&
-       it->get_bit_field_bits()==0)
+    if(it->type().id()==ID_c_bit_field &&
+       to_c_bit_field_type(it->type()).get_width()==0)
       it=components.erase(it);
     else
       it++;
@@ -919,239 +975,278 @@ Function: c_typecheck_baset::typecheck_c_enum_type
 
 void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 {
-  // This can be just a tag, or it can have the declarations
+  // These come with the declarations
   // of the enum constants as operands.
   
   exprt &as_expr=static_cast<exprt &>(static_cast<irept &>(type));
   source_locationt source_location=type.source_location();
-  
+
+  // We allow empty enums in the grammar to get better
+  // error messages.  
   if(as_expr.operands().empty())
   {
-    // It's just a tag.
-    if(type.find(ID_tag).is_nil())
+    err_location(source_location);
+    throw "empty enum";
+  }
+  
+  // enums start at zero
+  mp_integer value=0;
+  
+  // track min and max to find a nice base type
+  mp_integer min_value=0, max_value=0;
+  
+  std::list<c_enum_typet::c_enum_membert> enum_members;
+  
+  Forall_operands(it, as_expr)
+  {
+    ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
+    
+    // In C, enum constants always have type "int". They do not
+    // have the enum type.
+    declaration.type()=typet(ID_int);
+
+    exprt &v=declaration.declarator().value();
+
+    if(v.is_nil()) // no value given
+      v=from_integer(value, signed_int_type());
+
+    typecheck_declaration(declaration);
+    
+    irep_idt base_name=
+      declaration.declarator().get_base_name();
+    
+    irep_idt identifier=
+      declaration.declarator().get_name();
+      
+    // get value
+    const symbolt &symbol=lookup(identifier);
+
+    to_integer(symbol.value, value);
+
+    // store      
+    c_enum_typet::c_enum_membert member;
+    member.set_identifier(identifier);
+    member.set_base_name(base_name);
+    member.set_value(integer2string(value));
+    enum_members.push_back(member);
+    
+    if(value<min_value) min_value=value;
+    if(value>max_value) max_value=value;
+    
+    // produce value for next constant
+    ++value;
+  }
+  
+  // Remove these now; we add them to the
+  // c_enum symbol later.
+  #ifdef OPERANDS_IN_GETSUB
+  as_expr.operands().clear();
+  #else
+  type.remove(ID_operands);
+  #endif
+
+  // We need to determine a width, and a signedness.
+  // We just do int, but gcc might pick smaller widths
+  // if the type is marked as 'packed'.
+
+  unsigned bits=0;
+  bool is_signed=min_value<0;
+  
+  if(is_signed)
+  {
+    if(max_value<(1<<7) && min_value>=-(1<<7))
+      bits=1*8;
+    else if(max_value<(1<<15) && min_value>=-(1<<15))
+      bits=2*8;
+    else if(max_value<(mp_integer(1)<<31) && min_value>=-(mp_integer(1)<<31))
+      bits=4*8;
+    else
+      bits=8*8;
+  }
+  else // unsigned
+  {
+    if(max_value<(1<<8))
+      bits=1*8;
+    else if(max_value<(1<<16))
+      bits=2*8;
+    else if(max_value<(mp_integer(1)<<32))
+      bits=4*8;
+    else
+      bits=8*8;
+  }
+
+  if(!type.get_bool(ID_C_packed))
+  {
+    // If it's not packed we do int as a minimum.
+    if(bits<config.ansi_c.int_width)
+      bits=config.ansi_c.int_width;
+  }
+  
+  // We use a subtype to store signed and width
+
+  type.subtype().id(is_signed?ID_signedbv:ID_unsignedbv);
+  type.subtype().set(ID_width, bits);
+  
+  // tag?
+  if(type.find(ID_tag).is_nil())
+  {
+    // None, it's anonymous. We generate a tag.
+    std::string anon_identifier="#anon_enum";
+
+    for(std::list<c_enum_typet::c_enum_membert>::const_iterator
+        it=enum_members.begin();
+        it!=enum_members.end();
+        it++)
     {
-      err_location(source_location);
-      throw "anonymous enum tag without members";
+      anon_identifier+='$';
+      anon_identifier+=id2string(it->get_base_name());
+      anon_identifier+='=';
+      anon_identifier+=id2string(it->get_value());
     }
     
-    irept &tag=type.add(ID_tag);
-    irep_idt base_name=tag.get(ID_C_base_name);
-    irep_idt identifier=add_language_prefix(tag.get(ID_identifier));
-    tag.set(ID_identifier, identifier);
+    if(type.get_bool(ID_C_packed))
+      anon_identifier+="#packed";
+
+    type.add(ID_tag).set(ID_identifier, anon_identifier);
+  }
+
+  irept &tag=type.add(ID_tag);
+  irep_idt base_name=tag.get(ID_C_base_name);
+  irep_idt identifier=tag.get(ID_identifier);
+
+  // Put into symbol table
+  symbolt enum_tag_symbol;
+
+  enum_tag_symbol.is_type=true;
+  enum_tag_symbol.type=type;
+  enum_tag_symbol.location=source_location;
+  enum_tag_symbol.is_file_local=true;
+  enum_tag_symbol.base_name=base_name;
+  enum_tag_symbol.name=identifier;
+  
+  // throw in the enum members as 'body'
+  irept::subt &body=enum_tag_symbol.type.add(ID_body).get_sub();
+  
+  for(std::list<c_enum_typet::c_enum_membert>::const_iterator
+      it=enum_members.begin();
+      it!=enum_members.end();
+      it++)
+    body.push_back(*it);
+
+  // is it in the symbol table already?
+  symbol_tablet::symbolst::iterator s_it=
+    symbol_table.symbols.find(identifier);
+  
+  if(s_it!=symbol_table.symbols.end())
+  {
+    // Yes.
+    symbolt &symbol=s_it->second;
     
-    // is it in the symbol table?    
-    symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(identifier);
-    
-    if(s_it!=symbol_table.symbols.end())
+    if(symbol.type.id()==ID_incomplete_c_enum)
     {
-      // Yes.
-      const symbolt &symbol=s_it->second;
-      
-      if(symbol.type.id()==ID_c_enum)
-      {
-        // get subtype
-        type.subtype()=symbol.type.subtype();
-      }
-      else if(symbol.type.id()==ID_incomplete_c_enum)
-      {
-        // do nothing, still incomplete
-      }
-      else
-      {
-        err_location(source_location);
-        throw "use of tag that does not match previous declaration";
-      }
+      // Ok, overwrite the type in the symbol table.
+      // This gives us the members and the subtype.
+      symbol.type=enum_tag_symbol.type;
+    }
+    else if(symbol.type.id()==ID_c_enum)
+    {
+      err_location(type);
+      throw "redeclaration of enum tag";
     }
     else
     {
-      // no, add it as an incomplete c_enum
-      type.id(ID_incomplete_c_enum);
-      type.subtype()=int_type(); // default
-
-      symbolt enum_tag_symbol;
-    
-      enum_tag_symbol.is_type=true;
-      enum_tag_symbol.type=type;
-      enum_tag_symbol.location=source_location;
-      enum_tag_symbol.is_file_local=true;
-      enum_tag_symbol.base_name=base_name;
-      enum_tag_symbol.name=identifier;
-      
-      symbolt *new_symbol;
-      move_symbol(enum_tag_symbol, new_symbol);
+      err_location(source_location);
+      throw "use of tag that does not match previous declaration";
     }
-    
-    // We produce a c_enum_tag as the resulting type.
-    type.id(ID_c_enum_tag);
-    type.remove(ID_tag);
-    type.remove(ID_subtype);
-    type.set(ID_identifier, identifier);
   }
   else
   {
-    // enums start at zero
-    mp_integer value=0;
+    symbolt *new_symbol;
+    move_symbol(enum_tag_symbol, new_symbol);
+  }
+
+  // We produce a c_enum_tag as the resulting type.
+  // This retains the subtype; we may want to have
+  // that differ from the subtype of the c_enum type.
+  type.id(ID_c_enum_tag);
+  type.remove(ID_tag);
+  type.set(ID_identifier, identifier);
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_c_enum_tag_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
+{
+  // It's just a tag.
+
+  if(type.find(ID_tag).is_nil())
+  {
+    err_location(type);
+    throw "anonymous enum tag without members";
+  }
+  
+  source_locationt source_location=type.source_location();
+  
+  irept &tag=type.add(ID_tag);
+  irep_idt base_name=tag.get(ID_C_base_name);
+  irep_idt identifier=tag.get(ID_identifier);
+  
+  // is it in the symbol table?    
+  symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table.symbols.find(identifier);
+  
+  if(s_it!=symbol_table.symbols.end())
+  {
+    // Yes.
+    const symbolt &symbol=s_it->second;
     
-    // track min and max to find a nice base type
-    mp_integer min_value=0, max_value=0;
-    
-    std::list<enum_constantt> enum_constants;
-    
-    Forall_operands(it, as_expr)
+    if(symbol.type.id()==ID_c_enum ||
+       symbol.type.id()==ID_incomplete_c_enum)
     {
-      ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
-      
-      // In C, enum constants always have type "int". They do not
-      // have the enum type.
-      declaration.type()=typet(ID_int);
-
-      exprt &v=declaration.declarator().value();
-
-      if(v.is_nil()) // no value given
-        v=from_integer(value, int_type());
-
-      typecheck_declaration(declaration);
-      
-      irep_idt identifier=
-        language_prefix+id2string(declaration.declarator().get_name());
-        
-      // get value
-      const symbolt &symbol=lookup(identifier);
-
-      to_integer(symbol.value, value);
-
-      // store      
-      enum_constants.push_back(enum_constantt(identifier, value));
-      
-      if(value<min_value) min_value=value;
-      if(value>max_value) max_value=value;
-      
-      // produce value for next constant
-      ++value;
-    }
-    
-    // remove these now
-    #ifdef OPERANDS_IN_GETSUB
-    as_expr.operands().clear();
-    #else
-    type.remove(ID_operands);
-    #endif
-
-    // We need to determine a width, and a signedness.
-    // We just do int, but gcc might pick smaller widths
-    // if the type is marked as 'packed'.
-
-    unsigned bits=0;
-    bool is_signed=min_value<0;
-    
-    if(is_signed)
-    {
-      if(max_value<(1<<7) && min_value>=-(1<<7))
-        bits=1*8;
-      else if(max_value<(1<<15) && min_value>=-(1<<15))
-        bits=2*8;
-      else if(max_value<(mp_integer(1)<<31) && min_value>=-(mp_integer(1)<<31))
-        bits=4*8;
-      else
-        bits=8*8;
-    }
-    else // unsigned
-    {
-      if(max_value<(1<<8))
-        bits=1*8;
-      else if(max_value<(1<<16))
-        bits=2*8;
-      else if(max_value<(mp_integer(1)<<32))
-        bits=4*8;
-      else
-        bits=8*8;
-    }
-
-    if(!type.get_bool(ID_C_packed))
-    {
-      // If it's not packed we do int as a minimum.
-      if(bits<config.ansi_c.int_width)
-        bits=config.ansi_c.int_width;
-    }
-    
-    // We use a subtype to store signed and width
-
-    type.subtype().id(is_signed?ID_signedbv:ID_unsignedbv);
-    type.subtype().set(ID_width, bits);
-    
-    // tag?
-    if(type.find(ID_tag).is_nil())
-    {
-      // none
+      // copy subtype into tag
+      type.subtype()=symbol.type.subtype();
     }
     else
     {
-      irept &tag=type.add(ID_tag);
-      irep_idt base_name=tag.get(ID_C_base_name);
-      irep_idt identifier=add_language_prefix(tag.get(ID_identifier));
-      tag.set(ID_identifier, identifier);
-    
-      // Put into symbol table
-      symbolt enum_tag_symbol;
-    
-      enum_tag_symbol.is_type=true;
-      enum_tag_symbol.type=type;
-      enum_tag_symbol.location=source_location;
-      enum_tag_symbol.is_file_local=true;
-      enum_tag_symbol.base_name=base_name;
-      enum_tag_symbol.name=identifier;
-      
-      // throw in the enum constants
-      for(std::list<enum_constantt>::const_iterator
-          it=enum_constants.begin();
-          it!=enum_constants.end();
-          it++)
-      {
-        enum_tag_symbol.type.get_sub().push_back(irept());
-        enum_tag_symbol.type.get_sub().back().set(ID_identifier, it->identifier);
-        enum_tag_symbol.type.get_sub().back().set(ID_value, integer2string(it->value));
-      }
-    
-      // is it in the symbol table already?
-      symbol_tablet::symbolst::iterator s_it=
-        symbol_table.symbols.find(identifier);
-      
-      if(s_it!=symbol_table.symbols.end())
-      {
-        // Yes.
-        symbolt &symbol=s_it->second;
-        
-        if(symbol.type.id()==ID_incomplete_c_enum)
-        {
-          // ok, overwrite the default subtype
-          symbol.type.id(ID_c_enum);
-          symbol.type.subtype()=type.subtype();
-        }
-        else if(symbol.type.id()==ID_c_enum)
-        {
-          err_location(type);
-          throw "redeclaration of enum tag";
-        }
-        else
-        {
-          err_location(source_location);
-          throw "use of tag that does not match previous declaration";
-        }
-      }
-      else
-      {
-        symbolt *new_symbol;
-        move_symbol(enum_tag_symbol, new_symbol);
-      }
-
-      // We produce a c_enum_tag as the resulting type.
-      type.id(ID_c_enum_tag);
-      type.remove(ID_tag);
-      type.remove(ID_subtype);
-      type.set(ID_identifier, identifier);
+      err_location(source_location);
+      throw "use of tag that does not match previous declaration";
     }
   }
+  else
+  {
+    // no, add it as an incomplete c_enum
+    typet new_type(ID_incomplete_c_enum);
+    new_type.subtype()=signed_int_type(); // default
+    new_type.add(ID_tag)=tag;
+
+    symbolt enum_tag_symbol;
+  
+    enum_tag_symbol.is_type=true;
+    enum_tag_symbol.type=new_type;
+    enum_tag_symbol.location=source_location;
+    enum_tag_symbol.is_file_local=true;
+    enum_tag_symbol.base_name=base_name;
+    enum_tag_symbol.name=identifier;
+    
+    symbolt *new_symbol;
+    move_symbol(enum_tag_symbol, new_symbol);
+    
+    type.subtype()=new_type.subtype();
+  }
+  
+  // Clean up resulting type
+  type.remove(ID_tag);
+  type.set_identifier(identifier);
 }
 
 /*******************************************************************\
@@ -1166,102 +1261,78 @@ Function: c_typecheck_baset::typecheck_c_bit_field_type
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
+void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 {
   typecheck_type(type.subtype());
 
-  exprt &width_expr=static_cast<exprt &>(type.add(ID_size));
-
-  typecheck_expr(width_expr);
-  make_constant_index(width_expr);
-
   mp_integer i;
-  if(to_integer(width_expr, i))
-  {
-    err_location(type);
-    throw "failed to convert bit field width";
-  }
 
-  if(i<0)
   {
-    err_location(type);
-    throw "bit field width is negative";
-  }
+    exprt &width_expr=static_cast<exprt &>(type.add(ID_size));
+
+    typecheck_expr(width_expr);
+    make_constant_index(width_expr);
+
+    if(to_integer(width_expr, i))
+    {
+      err_location(type);
+      throw "failed to convert bit field width";
+    }
+
+    if(i<0)
+    {
+      err_location(type);
+      throw "bit field width is negative";
+    }
   
-  source_locationt source_location=type.source_location();
+    type.set_width(integer2long(i));
+    type.remove(ID_size);
+  }
   
   const typet &subtype=follow(type.subtype());
+  
+  unsigned sub_width=0;
 
   if(subtype.id()==ID_bool)
   {
-    if(i!=1)
-    {
-      err_location(type);
-      throw "wrong width for Boolean bit field";
-    }
-
-    // We don't use bool, as it's really a byte long.
-    type=unsignedbv_typet(1);
-    type.set(ID_C_c_type, ID_bool);
-    type.add_source_location()=source_location;
+    // This is the 'proper' bool.
+    sub_width=1;
   }
   else if(subtype.id()==ID_signedbv ||
-          subtype.id()==ID_unsignedbv)
+          subtype.id()==ID_unsignedbv ||
+          subtype.id()==ID_c_bool)
   {
-    unsigned width=to_bitvector_type(subtype).get_width();
-
-    if(i>width)
-    {
-      err_location(type);
-      throw "bit field width too large";
-    }
-
-    typet tmp(subtype);
-    type.swap(tmp);
-    type.set(ID_width, integer2string(i));
-    type.add_source_location()=source_location;
-  }
-  else if(subtype.id()==ID_c_enum)
-  {
-    // These have a sub-subtype, which we need to adjust.
-    unsigned width=subtype.subtype().get_int(ID_width);
-
-    if(i>width)
-    {
-      err_location(type);
-      throw "bit field width too large";
-    }
-
-    typet tmp=subtype;
-    type.swap(tmp);
-    type.subtype().set(ID_width, integer2string(i));
-    type.add_source_location()=source_location;
+    sub_width=to_bitvector_type(subtype).get_width();
   }
   else if(subtype.id()==ID_c_enum_tag)
   {
-    // These have a sub-subtype, which we need to adjust.
+    // These point to an enum, which has a sub-subtype,
+    // which may be smaller or larger than int, and we thus have
+    // to check.
     const typet &c_enum_type=
       follow_tag(to_c_enum_tag_type(subtype));
-    
-    unsigned width=
-      c_enum_type.subtype().get_int(ID_width);
 
-    if(i>width)
+    if(c_enum_type.id()==ID_incomplete_c_enum)
     {
       err_location(type);
-      throw "bit field width too large";
+      throw "bit field has incomplete enum type";
     }
-
-    typet tmp=c_enum_type;
-    type.swap(tmp);
-    type.subtype().set(ID_width, integer2string(i));
-    type.add_source_location()=source_location;
+    
+    sub_width=c_enum_type.subtype().get_int(ID_width);
   }
   else
   {
     err_location(type);
     str << "bit field with non-integer type: "
         << to_string(subtype);
+    throw 0;
+  }
+
+  if(i>sub_width)
+  {
+    err_location(type);
+    str << "bit field (" << i
+        << " bits) larger than type (" << sub_width << " bits)";
     throw 0;
   }
 }
@@ -1329,12 +1400,6 @@ Function: c_typecheck_baset::typecheck_symbol_type
 
 void c_typecheck_baset::typecheck_symbol_type(typet &type)
 {
-  {
-    // add prefix
-    symbol_typet &symbol_type=to_symbol_type(type);
-    symbol_type.set_identifier(add_language_prefix(symbol_type.get_identifier()));
-  }
-
   const irep_idt &identifier=
     to_symbol_type(type).get_identifier();
 

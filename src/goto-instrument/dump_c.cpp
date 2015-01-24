@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <sstream>
+#include <cctype>
 
 #include <util/config.h>
 #include <util/prefix.h>
@@ -14,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/base_type.h>
 #include <util/i2string.h>
+#include <util/cprover_prefix.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
@@ -103,7 +105,7 @@ void dump_ct::operator()(std::ostream &os)
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> unique_tagst;
   unique_tagst unique_tags;
 
-  // add tags to anonymous union/struct,
+  // add tags to anonymous union/struct/enum,
   // and prepare lexicographic order
   std::set<std::string> symbols_sorted;
   Forall_symbols(it, copied_symbol_table.symbols)
@@ -118,34 +120,45 @@ void dump_ct::operator()(std::ostream &os)
       symbol.type.set(ID_tag, ID_anonymous);
       tag_added=true;
     }
+    else if(symbol.type.id()==ID_c_enum &&
+            symbol.type.find(ID_tag).get(ID_C_base_name).empty())
+    {
+      assert(symbol.is_type);
+      symbol.type.add(ID_tag).set(ID_C_base_name, ID_anonymous);
+      tag_added=true;
+    }
 
     const std::string name_str=id2string(it->first);
-    if(symbol.is_type && !symbol.type.get(ID_tag).empty())
+    if(symbol.is_type &&
+       (symbol.type.id()==ID_union ||
+        symbol.type.id()==ID_struct ||
+        symbol.type.id()==ID_c_enum))
     {
-      irep_idt original_tag=symbol.type.get(ID_tag);
-      std::string new_tag=id2string(original_tag);
+      std::string new_tag=symbol.type.id()==ID_c_enum?
+        symbol.type.find(ID_tag).get_string(ID_C_base_name):
+        symbol.type.get_string(ID_tag);
 
       std::string::size_type tag_pos=new_tag.rfind("tag-");
-      if(tag_pos!=std::string::npos)
+      if(tag_pos!=std::string::npos) new_tag.erase(0, tag_pos+4);
+      const std::string new_tag_base=new_tag;
+
+      for(std::pair<unique_tagst::iterator, bool>
+          unique_entry=unique_tags.insert(std::make_pair(new_tag, 0));
+          !unique_entry.second;
+          unique_entry=unique_tags.insert(std::make_pair(new_tag, 0)))
       {
-        new_tag.erase(0, tag_pos+4);
-        symbol.type.set(ID_tag, new_tag);
+        new_tag=new_tag_base+"$"+
+          i2string(unique_entry.first->second);
+        ++(unique_entry.first->second);
       }
 
-      std::pair<unique_tagst::iterator, bool> unique_entry=
-        unique_tags.insert(std::make_pair(symbol.type.get(ID_tag), 0));
-      if(!unique_entry.second)
+      if(symbol.type.id()==ID_c_enum)
       {
-        do
-        {
-          symbol.type.set(
-            ID_tag,
-            new_tag+"$"+i2string(unique_entry.first->second));
-          ++(unique_entry.first->second);
-        }
-        while(!unique_tags.insert(std::make_pair(
-              symbol.type.get(ID_tag), 0)).second);
+        symbol.type.add(ID_tag).set(ID_C_base_name, new_tag);
+        symbol.base_name=new_tag;
       }
+      else
+        symbol.type.set(ID_tag, new_tag);
     }
 
     // we don't want to dump in full all definitions
@@ -166,19 +179,23 @@ void dump_ct::operator()(std::ostream &os)
     const symbolt &symbol=ns.lookup(*it);
 
     if(symbol.is_type &&
-        (symbol.type.id()==ID_struct ||
-         symbol.type.id()==ID_incomplete_struct ||
-         symbol.type.id()==ID_union ||
-         symbol.type.id()==ID_incomplete_union ||
-         symbol.type.id()==ID_c_enum))
+       symbol.location.get_function().empty() &&
+       (symbol.type.id()==ID_struct ||
+        symbol.type.id()==ID_incomplete_struct ||
+        symbol.type.id()==ID_union ||
+        symbol.type.id()==ID_incomplete_union))
     {
-      if(symbol.location.get_function().empty())
-      {
-        os << "// " << symbol.name << std::endl;
-        os << "// " << symbol.location << std::endl;
-        os << type_to_string(symbol.type) << ";" << std::endl;
-        os << std::endl;
-      }
+      os << "// " << symbol.name << std::endl;
+      os << "// " << symbol.location << std::endl;
+      os << type_to_string(symbol.type) << ";\n\n";
+    }
+    else if(symbol.is_type &&
+            symbol.location.get_function().empty() &&
+            symbol.type.id()==ID_c_enum)
+    {
+      os << "// " << symbol.name << std::endl;
+      os << "// " << symbol.location << std::endl;
+      convert_compound_enum(symbol.type, os);
     }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
       convert_global_variable(
@@ -192,7 +209,7 @@ void dump_ct::operator()(std::ostream &os)
 
       if(func_entry!=goto_functions.function_map.end() &&
          func_entry->second.body_available &&
-         (symbol.name=="c::main" ||
+         (symbol.name==ID_main ||
           (!config.main.empty() && symbol.name==config.main)))
         skip_function_main=true;
     }
@@ -228,8 +245,7 @@ void dump_ct::operator()(std::ostream &os)
         (symbol.type.id()==ID_struct ||
          symbol.type.id()==ID_incomplete_struct ||
          symbol.type.id()==ID_union ||
-         symbol.type.id()==ID_incomplete_union ||
-         symbol.type.id()==ID_c_enum))
+         symbol.type.id()==ID_incomplete_union))
       convert_compound_declaration(
           symbol,
           compound_body_stream);
@@ -324,6 +340,15 @@ void dump_ct::convert_compound(
   {
     const symbolt &symbol=
       ns.lookup(to_symbol_type(type).get_identifier());
+    assert(symbol.is_type);
+
+    if(!ignore(symbol))
+      convert_compound(symbol.type, recursive, os);
+  }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    const symbolt &symbol=
+      ns.lookup(to_c_enum_tag_type(type).get_identifier());
     assert(symbol.is_type);
 
     if(!ignore(symbol))
@@ -444,11 +469,8 @@ void dump_ct::convert_compound(
     std::string s=make_decl(fake_unique_name, comp_type);
     assert(s.find("NO/SUCH/NS")==std::string::npos);
 
-    if(comp.get_is_bit_field() &&
-       ((comp_type.id()!=ID_c_enum &&
-         to_bitvector_type(comp_type).get_width()==0) ||
-        (comp_type.id()==ID_c_enum &&
-         to_bitvector_type(comp_type.subtype()).get_width()==0)))
+    if(comp_type.id()==ID_c_bit_field &&
+       to_c_bit_field_type(comp_type).get_width()==0)
     {
       comp_name="";
       s=type_to_string(comp_type);
@@ -457,10 +479,6 @@ void dump_ct::convert_compound(
     if(s.find("__CPROVER_bitvector")==std::string::npos)
     {
       struct_body << s;
-      if(comp.get_is_bit_field() && comp_type.id()!=ID_c_enum)
-        struct_body << " : " << to_bitvector_type(comp_type).get_width();
-      else if(comp.get_is_bit_field() && comp_type.id()==ID_c_enum)
-        struct_body << " : " << to_bitvector_type(comp_type.subtype()).get_width();
     }
     else if(comp_type.id()==ID_signedbv)
     {
@@ -545,36 +563,24 @@ void dump_ct::convert_compound_enum(
   const irept &tag=type.find(ID_tag);
   const irep_idt &name=tag.get(ID_C_base_name);
 
-  if(tag.is_not_nil() &&
+  if(tag.is_nil() ||
      !converted.insert(name).second)
     return;
 
-  os << type_to_string(type) << '\n';
-  os << "{\n";
-
-  const irept::subt &elements=type.get_sub();
-  forall_irep(it, elements)
-  {
-    std::string name=it->get_string(ID_identifier);
-    std::string::size_type pos=name.rfind("::");
-    if(pos!=std::string::npos)
-      name.erase(0, pos+2);
-
-    os << indent(1) << name << '=' << it->get(ID_value);
-
-    irept::subt::const_iterator next=it;
-    if(++next!=elements.end())
-      os << ',';
-
-    os << '\n';
-  }
-
-
-  os << '}';
+  os << type_to_string(type);
 
   if(type.get_bool(ID_C_packed))
     os << " __attribute__ ((__packed__))";
+
   os << ";\n\n";
+
+  const c_enum_typet::memberst &members=
+    to_c_enum_type(type).members();
+  for(c_enum_typet::memberst::const_iterator
+      it=members.begin();
+      it!=members.end();
+      ++it)
+    declared_enum_constants.insert(it->get_base_name());
 }
 
 /*******************************************************************\
@@ -590,9 +596,9 @@ Purpose:
 \*******************************************************************/
 
 #define ADD_TO_SYSTEM_LIBRARY(v, header) \
-  for(int i=0; i<sizeof(v)/sizeof(char*); ++i) \
+  for(size_t i=0; i<sizeof(v)/sizeof(char*); ++i) \
     system_library_map.insert( \
-      std::make_pair(std::string("c::")+v[i], header))
+      std::make_pair(v[i], header))
 
 void dump_ct::init_system_library_map()
 {
@@ -769,14 +775,14 @@ bool dump_ct::ignore(const symbolt &symbol)
 {
   const std::string &name_str=id2string(symbol.name);
 
-  if(has_prefix(name_str, "c::__CPROVER_") ||
-     name_str=="c::__func__" ||
-     name_str=="c::__FUNCTION__" ||
-     name_str=="c::__PRETTY_FUNCTION__" ||
-     name_str=="c::argc'" ||
-     name_str=="c::argv'" ||
-     name_str=="c::envp'" ||
-     name_str=="c::envp_size'")
+  if(has_prefix(name_str, CPROVER_PREFIX) ||
+     name_str=="__func__" ||
+     name_str=="__FUNCTION__" ||
+     name_str=="__PRETTY_FUNCTION__" ||
+     name_str=="argc'" ||
+     name_str=="argv'" ||
+     name_str=="envp'" ||
+     name_str=="envp_size'")
     return true;
 
   const std::string &file_str=id2string(symbol.location.get_file());
@@ -788,12 +794,12 @@ bool dump_ct::ignore(const symbolt &symbol)
       file_str=="gcc_builtin_headers_mips.h" ||
       file_str=="gcc_builtin_headers_power.h" ||
       file_str=="gcc_builtin_headers_generic.h") &&
-     has_prefix(name_str, "c::__builtin_"))
+     has_prefix(name_str, "__builtin_"))
     return true;
 
-  if(name_str=="c::__builtin_va_start" ||
-     name_str=="c::__builtin_va_end" ||
-     has_prefix(name_str, id2string(ID_gcc_builtin_va_arg)))
+  if(name_str=="__builtin_va_start" ||
+     name_str=="__builtin_va_end" ||
+     symbol.name==ID_gcc_builtin_va_arg)
   {
     system_headers.insert("stdarg.h");
     return true;
@@ -961,7 +967,7 @@ void dump_ct::convert_function_declaration(
     local_static_declst &local_static_decls)
 {
   // don't dump artificial main
-  if(skip_main && symbol.name==ID_main)
+  if(skip_main && symbol.name==goto_functionst::entry_point())
     return;
 
   // convert the goto program back to code - this might change
@@ -1003,8 +1009,8 @@ void dump_ct::convert_function_declaration(
     os_body << std::endl << std::endl;
   }
 
-  if(symbol.name!=ID_main &&
-     symbol.name!="c::main")
+  if(symbol.name!=goto_functionst::entry_point() &&
+     symbol.name!=ID_main)
   {
     os_decl << "// " << symbol.name << std::endl;
     os_decl << "// " << symbol.location << std::endl;
@@ -1234,14 +1240,9 @@ void dump_ct::cleanup_expr(exprt &expr)
         it!=old_components.end();
         ++it)
     {
-      const typet &comp_type=ns.follow(it->type());
-
       const bool is_zero_bit_field=
-        it->get_is_bit_field() &&
-        ((comp_type.id()!=ID_c_enum &&
-          to_bitvector_type(comp_type).get_width()==0) ||
-         (comp_type.id()==ID_c_enum &&
-          to_bitvector_type(comp_type.subtype()).get_width()==0));
+        it->type().id()==ID_c_bit_field &&
+        to_c_bit_field_type(it->type()).get_width()==0;
 
       if(!it->get_is_padding() && !is_zero_bit_field)
       {
@@ -1295,7 +1296,8 @@ void dump_ct::cleanup_expr(exprt &expr)
     code_function_callt::argumentst &arguments=call.arguments();
 
     // don't edit function calls we might have introduced
-    if(has_prefix(id2string(fn.get_identifier()), "c::"))
+    const symbolt *s;
+    if(!ns.lookup(fn.get_identifier(), s))
     {
       const symbolt &fn_sym=ns.lookup(fn.get_identifier());
       const code_typet &code_type=to_code_type(fn_sym.type);
@@ -1330,6 +1332,17 @@ void dump_ct::cleanup_expr(exprt &expr)
         }
       }
     }
+  }
+  else if(expr.id()==ID_constant &&
+          expr.type().id()==ID_signedbv)
+  {
+    const irep_idt &cformat=expr.get(ID_C_cformat);
+
+    if(!cformat.empty() &&
+       declared_enum_constants.find(cformat)==
+       declared_enum_constants.end() &&
+       !std::isdigit(id2string(cformat)[0]))
+      expr.remove(ID_C_cformat);
   }
 }
 

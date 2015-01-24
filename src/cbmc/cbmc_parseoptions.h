@@ -25,7 +25,7 @@ class optionst;
   "(no-simplify)(unwind):(unwindset):(slice-formula)" \
   "(unwind-max):(unwind-min):" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
-  "(document-subgoals)(outfile):" \
+  "(document-subgoals)(outfile):(test-preprocessor)" \
   "D:I:" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
@@ -55,6 +55,7 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
+  "(graphml-cex):" \
   "(decide)" // legacy, and will eventually disappear
 
 class cbmc_parseoptionst:

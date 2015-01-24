@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/graphml_goto_trace.h>
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/slice.h>
@@ -110,6 +111,21 @@ void bmct::error_trace(const prop_convt &prop_conv)
   
   default:
     assert(false);
+  }
+
+  const std::string graphml=options.get_option("graphml-cex");
+  if(!graphml.empty())
+  {
+    graphmlt cex_graph;
+    convert(ns, goto_trace, cex_graph);
+
+    if(graphml=="-")
+      write_graphml(cex_graph, std::cout);
+    else
+    {
+      std::ofstream out(graphml.c_str());
+      write_graphml(cex_graph, out);
+    }
   }
 }
 
@@ -338,7 +354,11 @@ bool bmct::run(const goto_functionst &goto_functions)
   else if(mm=="pso")
     memory_model.reset(new memory_model_psot(ns));
   else
-    throw "Invalid memory model "+mm+" -- use one of sc, tso, pso";
+  {
+    error() << "Invalid memory model " << mm
+            << " -- use one of sc, tso, pso" << eom;
+    return true;
+  }
 
   symex.set_message_handler(get_message_handler());
   symex.options=options;
@@ -367,8 +387,8 @@ bool bmct::run(const goto_functionst &goto_functions)
     //THE MAIN LOOP FOR INCREMENTAL UNWINDING
     while(!symex_done) { 
 
-      symex.total_claims=0;
-      symex.remaining_claims=0;
+      symex.total_vccs=0;
+      symex.remaining_vccs=0;
       symex_done = symex(symex_state,goto_functions,body);
 
       undo_slice(equation); //undo all previous slicings
@@ -428,8 +448,8 @@ bool bmct::run(const goto_functionst &goto_functions)
 	}
 
 	{
-	  statistics() << "Generated " << symex.total_claims
-			 << " VCC(s), " << symex.remaining_claims
+	  statistics() << "Generated " << symex.total_vccs
+			 << " VCC(s), " << symex.remaining_vccs
 			 << " remaining after simplification" << eom;
 	}
 
@@ -447,7 +467,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 	  return false;
 	}
 
-	if(symex.remaining_claims==0)
+	if(symex.remaining_vccs==0)
 	{
 	  report_success();
 
@@ -474,7 +494,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 	}
         else 
         {
-         if(symex.remaining_claims>0)
+         if(symex.remaining_vccs>0)
 	  {
              verification_result = decide(symex.prop_conv);
             if(options.get_bool_option("stop-when-unsat") ? 
@@ -495,12 +515,12 @@ bool bmct::run(const goto_functionst &goto_functions)
       }
       catch(std::string &error_str)
       {
-        error(error_str);
+        error() << error_str << eom;
         return true;
       }
       catch(const char *error_str)
       {
-        error(error_str);
+        error() << error_str << eom;
         return true;
       }
 
@@ -510,16 +530,12 @@ bool bmct::run(const goto_functionst &goto_functions)
   }
   catch(std::string &error_str)
   {
-    message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_source_location);
-    message_stream.error(error_str);
+    error() << error_str << eom;
     return true;
   }
   catch(const char *error_str)
   {
-    message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_source_location);
-    message_stream.error(error_str);
+    error() << error_str << eom;
     return true;
   }
   catch(std::bad_alloc)
@@ -633,7 +649,7 @@ void bmct::setup_unwind()
     if(val.rfind(":")!=std::string::npos)
     {
       id=val.substr(0, val.rfind(":"));
-      uw=safe_str2unsigned(val.substr(val.rfind(":")+1).c_str());
+      uw=safe_string2unsigned(val.substr(val.rfind(":")+1).c_str());
     }
 
     if(thread_nr_set)

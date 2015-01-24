@@ -71,7 +71,7 @@ void remove_vector(exprt &expr)
       mp_integer dimension;
       to_integer(array_type.size(), dimension);
     
-      assert(expr.operands().size()==2);
+      assert(expr.operands().size()==1);
       const typet subtype=array_type.subtype();
       // do component-wise:
       // -x -> vector(-x[0],-x[1],...)
@@ -90,11 +90,8 @@ void remove_vector(exprt &expr)
     }
     else if(expr.id()==ID_vector)
     {
-      assert(expr.operands().size()==2);
       expr.id(ID_array);
     }
-    else
-      assert(false);
   }
 
   remove_vector(expr.type());
@@ -118,6 +115,7 @@ void remove_vector(typet &type)
   {
     struct_union_typet &struct_union_type=
       to_struct_union_type(type);
+
     for(struct_union_typet::componentst::iterator
         it=struct_union_type.components().begin();
         it!=struct_union_type.components().end();
@@ -127,7 +125,7 @@ void remove_vector(typet &type)
     }
   }
   else if(type.id()==ID_pointer ||
-          type.id()==ID_vector ||
+          type.id()==ID_complex ||
           type.id()==ID_array)
   {
     remove_vector(type.subtype());
@@ -198,7 +196,10 @@ void remove_vector(goto_functionst::goto_functiont &goto_function)
   remove_vector(goto_function.type);
 
   Forall_goto_program_instructions(it, goto_function.body)
+  {
     remove_vector(it->code);
+    remove_vector(it->guard);
+  }
 }
 
 /*******************************************************************\

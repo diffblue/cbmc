@@ -22,17 +22,14 @@ Function: boolbvt::convert_union
 
 \*******************************************************************/
 
-void boolbvt::convert_union(const exprt &expr, bvt &bv)
+void boolbvt::convert_union(const union_exprt &expr, bvt &bv)
 {
   unsigned width=boolbv_width(expr.type());
 
   if(width==0)
     return conversion_failed(expr, bv);
 
-  if(expr.operands().size()!=1)
-    throw "union expects one argument";
-
-  const bvt &op_bv=convert_bv(expr.op0());
+  const bvt &op_bv=convert_bv(expr.op());
 
   if(width<op_bv.size())
     throw "union: unexpected operand op width";

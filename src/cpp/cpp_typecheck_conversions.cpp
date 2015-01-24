@@ -248,8 +248,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
   c_qualifierst qual_from;
   qual_from.read(expr.type());
 
-  typet int_type(ID_signedbv);
-  int_type.set(ID_width, config.ansi_c.int_width);
+  typet int_type=signed_int_type();
   qual_from.write(int_type);
 
   if(expr.type().id()==ID_signedbv)
@@ -274,7 +273,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     return true;
   }
 
-  if(follow(expr.type()).id()==ID_c_enum)
+  if(expr.type().id()==ID_c_enum_tag)
   {
     new_expr=expr;
     new_expr.make_typecast(int_type);
@@ -376,7 +375,7 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
   if(expr.type().id()!=ID_signedbv &&
      expr.type().id()!=ID_unsignedbv &&
      expr.type().id()!=ID_bool &&
-     follow(expr.type()).id()!=ID_c_enum)
+     expr.type().id()!=ID_c_enum_tag)
     return false;
 
   if(expr.get_bool(ID_C_lvalue))
@@ -436,10 +435,10 @@ bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
   }
   else if(expr.type().id()==ID_signedbv ||
           expr.type().id()==ID_unsignedbv ||
-          follow(expr.type()).id()==ID_c_enum)
+          expr.type().id()==ID_c_enum_tag)
   {
-    if(type.id() != ID_fixedbv &&
-       type.id() != ID_floatbv)
+    if(type.id()!=ID_fixedbv &&
+       type.id()!=ID_floatbv)
       return false;
   }
   else
@@ -577,6 +576,10 @@ bool cpp_typecheckt::standard_conversion_pointer(
   typet sub_from = follow(expr.type().subtype());
   typet sub_to = follow(type.subtype());
 
+  // std::nullptr_t to _any_ pointer type
+  if(sub_from.id()==ID_nullptr)
+    return true;
+
   // anything but function pointer to void *
   if(sub_from.id()!=ID_code && sub_to.id()==ID_empty)
   {
@@ -609,7 +612,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
 
 /*******************************************************************\
 
-Function: standard_conversion_pointer
+Function: standard_conversion_pointer_to_member
 
   Inputs: A typechecked expression 'expr', a destination
           type 'type'
@@ -745,10 +748,10 @@ bool cpp_typecheckt::standard_conversion_boolean(
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
-  if(expr.type().id() != ID_signedbv &&
-     expr.type().id() != ID_unsignedbv &&
-     expr.type().id() != ID_pointer && 
-     follow(expr.type()).id() != ID_c_enum)
+  if(expr.type().id()!=ID_signedbv &&
+     expr.type().id()!=ID_unsignedbv &&
+     expr.type().id()!=ID_pointer && 
+     expr.type().id()!=ID_c_enum_tag)
     return false;
 
   c_qualifierst qual_from;
@@ -802,6 +805,14 @@ bool cpp_typecheckt::standard_conversion_sequence(
   assert(!is_reference(expr.type()) && !is_reference(type));
 
   exprt curr_expr=expr;
+
+  // bit fields are converted like their underlying type
+  if(type.id()==ID_c_bit_field)
+    return standard_conversion_sequence(expr, type.subtype(), new_expr, rank);
+
+  // we turn bit fields into their underlying type  
+  if(curr_expr.type().id()==ID_c_bit_field)
+    curr_expr.make_typecast(curr_expr.type().subtype());
   
   if(curr_expr.type().id()==ID_array)
   {
@@ -881,11 +892,16 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
     else if(type.id()==ID_pointer)
     {
-      if(!standard_conversion_pointer(curr_expr, type, new_expr))
+      if(follow(expr.type()).id()==ID_nullptr)
+      {
+        // std::nullptr_t to _any_ pointer type is ok
+      }
+      else if(!standard_conversion_pointer(curr_expr, type, new_expr))
       {
         if(!standard_conversion_pointer_to_member(curr_expr, type, new_expr))
           return false;
       }
+
       rank += 3;
     }
     else if(type.id()==ID_bool)
@@ -1832,7 +1848,7 @@ bool cpp_typecheckt::cast_away_constness(
   std::vector<typet> snt1;
   snt1.push_back(nt1);
 
-  while(snt1.back().find(ID_subtype).is_not_nil())
+  while(snt1.back().has_subtype())
   {
     snt1.reserve(snt1.size()+1);
     snt1.push_back(snt1.back().subtype());
@@ -1847,7 +1863,7 @@ bool cpp_typecheckt::cast_away_constness(
 
   std::vector<typet> snt2;
   snt2.push_back(nt2);
-  while(snt2.back().find(ID_subtype).is_not_nil())
+  while(snt2.back().has_subtype())
   {
     snt2.reserve(snt2.size()+1);
     snt2.push_back(snt2.back().subtype());
@@ -2147,13 +2163,13 @@ Function: cpp_typecheckt::static_typecast
 \*******************************************************************/
 
 bool cpp_typecheckt::static_typecast(
-  const exprt &expr,
-  const typet &type,
+  const exprt &expr, // source expression
+  const typet &type, // destination type
   exprt &new_expr,
   bool check_constantness)
 {
   exprt e=expr;
-
+  
   if(check_constantness && type.id()==ID_pointer)
   {
     if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
@@ -2218,16 +2234,16 @@ bool cpp_typecheckt::static_typecast(
     new_expr.make_typecast(type);
     return true;
   }
-
-  if(follow(type).id()==ID_c_enum && (
+  
+  // int/enum to enum
+  if(type.id()==ID_c_enum_tag && (
                 e.type().id()==ID_signedbv
              || e.type().id()==ID_unsignedbv
-             || follow(e.type()).id()==ID_c_enum))
+             || e.type().id()==ID_c_enum_tag))
   {
-    new_expr = e;
+    new_expr=e;
     new_expr.make_typecast(type);
-    if(new_expr.get_bool(ID_C_lvalue))
-      new_expr.remove(ID_C_lvalue);
+    new_expr.remove(ID_C_lvalue);
     return true;
   }
 
@@ -2235,7 +2251,7 @@ bool cpp_typecheckt::static_typecast(
   {
     if(!cpp_is_pod(type))
     {
-      exprt tc("already_typechecked");
+      exprt tc(ID_already_typechecked);
       tc.copy_to_operands(new_expr);
       exprt temporary;
       new_temporary(e.source_location(), type, tc, temporary);

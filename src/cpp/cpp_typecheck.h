@@ -277,7 +277,7 @@ protected:
     const struct_union_typet &struct_union_type);
 
   void full_member_initialization(
-    const struct_typet &struct_type,
+    const struct_union_typet &struct_union_type,
     irept &initializers);
 
   bool find_cpctor(const symbolt& symbol)const;
@@ -423,7 +423,7 @@ protected:
 
   // code conversion
   virtual void typecheck_code(codet &code);
-  virtual void typecheck_catch(codet &code);
+  virtual void typecheck_try_catch(codet &code);
   virtual void typecheck_member_initializer(codet &code);
   virtual void typecheck_decl(codet &code);
   virtual void typecheck_block(codet &code);
@@ -466,11 +466,11 @@ protected:
   void typecheck_expr_sizeof(exprt &expr);
   void typecheck_expr_delete(exprt &expr);
   void typecheck_expr_side_effect(side_effect_exprt &expr);
-  void typecheck_side_effect_assignment(exprt &expr);
+  void typecheck_side_effect_assignment(side_effect_exprt &expr);
   void typecheck_side_effect_inc_dec(side_effect_exprt &expr);
   void typecheck_expr_typecast(exprt &expr);
-  void typecheck_expr_index(exprt& expr);
-  void typecheck_expr_rel(exprt& expr);
+  void typecheck_expr_index(exprt &expr);
+  void typecheck_expr_rel(binary_relation_exprt &expr);
   void typecheck_expr_comma(exprt &expr);
 
   void typecheck_function_call_arguments(

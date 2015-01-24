@@ -75,8 +75,8 @@ bool read_goto_binary(
   if(!in)
   {
     messaget message(message_handler);
-    message.error(
-      std::string("Failed to open `")+filename+"'");
+    message.error() << "Failed to open `" << filename << "'"
+                    << messaget::eom;
     return true;
   }
   
@@ -109,12 +109,13 @@ bool read_goto_binary(
         }
         
       // section not found
-      messaget(message_handler).error("failed to find goto-cc section in ELF binary");
+      messaget(message_handler).error() <<
+        "failed to find goto-cc section in ELF binary" << messaget::eom;
     }
     
     catch(const char *s)
     {
-      messaget(message_handler).error(s);
+      messaget(message_handler).error() << s << messaget::eom;
     }
   }
   else if(is_osx_fat_magic(hdr))
@@ -133,7 +134,7 @@ bool read_goto_binary(
 
         std::ifstream temp_in(tempname.c_str(), std::ios::binary);
         if(!temp_in)
-          messaget(message_handler).error("failed to read temp binary");
+          messaget(message_handler).error() << "failed to read temp binary" << messaget::eom;
         const bool read_err=read_bin_goto_object(
           temp_in, filename, symbol_table, goto_functions, message_handler);
         temp_in.close();
@@ -143,19 +144,21 @@ bool read_goto_binary(
       }
 
       // architecture not found
-      messaget(message_handler).error("failed to find goto binary in Mach-O file");
+      messaget(message_handler).error() <<
+        "failed to find goto binary in Mach-O file" << messaget::eom;
     }
 
     catch(const char *s)
     {
       if(!tempname.empty())
         unlink(tempname.c_str());
-      messaget(message_handler).error(s);
+      messaget(message_handler).error() << s << messaget::eom;
     }
   }
   else
   {
-    messaget(message_handler).error("not a goto binary");
+    messaget(message_handler).error() <<
+      "not a goto binary" << messaget::eom;
   }
   
   return true;

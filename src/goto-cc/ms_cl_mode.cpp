@@ -47,7 +47,7 @@ bool ms_cl_modet::doit()
     return false;
   }
 
-  int verbosity=1;
+  unsigned int verbosity=1;
 
   compilet compiler(cmdline);
 
@@ -58,12 +58,12 @@ bool ms_cl_modet::doit()
   #endif
 
   if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2int(cmdline.getval("verbosity"));
+    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
 
   compiler.ui_message_handler.set_verbosity(verbosity);
   ui_message_handler.set_verbosity(verbosity);
 
-  debug("Visual Studio mode");
+  debug() << "Visual Studio mode" << eom;
   
   // get configuration
   config.set(cmdline);
@@ -84,7 +84,7 @@ bool ms_cl_modet::doit()
 
   if(cmdline.isset("Fo"))
   {
-    compiler.output_file_object=cmdline.getval("Fo");
+    compiler.output_file_object=cmdline.get_value("Fo");
 
     // this could be a directory
     if(is_directory(compiler.output_file_object))
@@ -96,7 +96,7 @@ bool ms_cl_modet::doit()
 
   if(cmdline.isset("Fe"))
   {
-    compiler.output_file_executable=cmdline.getval("Fe");
+    compiler.output_file_executable=cmdline.get_value("Fe");
 
     // this could be a directory
     if(is_directory(compiler.output_file_executable))

@@ -17,7 +17,6 @@ Date: June 2006
 #include <util/config.h>
 #include <util/tempdir.h>
 #include <util/base_type.h>
-#include <util/i2string.h>
 #include <util/cmdline.h>
 #include <util/file_util.h>
 #include <util/unicode.h>
@@ -87,7 +86,7 @@ bool compilet::doit()
   add_compiler_specific_defines(config);
 
   // Parse commandline for source and object file names
-  for(unsigned i=0; i<_cmdline.args.size(); i++)
+  for(std::size_t i=0; i<_cmdline.args.size(); i++)
     if(add_input_file(_cmdline.args[i]))
       return true;
 
@@ -96,15 +95,13 @@ bool compilet::doit()
       it++)
   {
     if(!find_library(*it))
-      warning(std::string("Library not found: ") + *it + " (ignoring)");
+      warning() << "Library not found: " << *it << " (ignoring)" << eom;
   }
 
-  // Work through the given source files
-  print(8, "No. of source files: " +
-    i2string((unsigned long) source_files.size()));
+  statistics() << "No. of source files: " << source_files.size() << eom;
+  statistics() << "No. of object files: " << object_files.size() << eom;
 
-  print(8, "No. of object files: " +
-    i2string((unsigned long) object_files.size()));
+  // Work through the given source files
 
   if(source_files.size()==0 && object_files.size()==0)
   {
@@ -255,15 +252,16 @@ bool compilet::add_input_file(const std::string &file_name)
     }
 
     stream=popen(cmd.str().c_str(), "r");
+
     if(stream!=NULL)
     {
       std::string line;
-      char ch;
+      int ch; // fgetc returns an int, not char
       while((ch=fgetc(stream))!=EOF)
       {
-        if(ch!='\n' && ch!=EOF)
+        if(ch!='\n')
         {
-          line += ch;
+          line+=(char)ch;
         }
         else
         {
@@ -276,11 +274,14 @@ bool compilet::add_input_file(const std::string &file_name)
 
           if(is_goto_binary(t))
             object_files.push_back(t);
+
           line = "";
         }
       }
+
+      pclose(stream);
     }
-    pclose(stream);
+
     cmd.str("");
 
     if(chdir(working_directory.c_str())!=0)
@@ -336,7 +337,7 @@ bool compilet::find_library(const std::string &name)
         return !add_input_file(libname);
       else if(is_elf_file(libname))
       {
-        warning("Warning: Cannot read ELF library "+libname);
+        warning() << "Warning: Cannot read ELF library " << libname << eom;
         return false;
       }
     }
@@ -366,7 +367,7 @@ bool compilet::is_elf_file(const std::string &file_name)
   if(in.is_open())
   {
     char buf[4];
-    for (unsigned i=0; i<4; i++)
+    for(std::size_t i=0; i<4; i++)
       buf[i] = in.get();
     if(buf[0]==0x7f && buf[1]=='E' &&
         buf[2]=='L' && buf[3]=='F')
@@ -408,7 +409,7 @@ bool compilet::link()
   
   if(mode==COMPILE_LINK_EXECUTABLE)
   {
-    if(entry_point(symbol_table, "c::main", ui_message_handler))
+    if(entry_point(symbol_table, "main", ui_message_handler))
       return true;
 
     // entry_point may (should) add some more functions.
@@ -443,7 +444,7 @@ bool compilet::compile()
     
     // Visual Studio always prints the name of the file it's doing
     if(echo_file_name)
-      status(file_name);
+      status() << file_name << eom;
 
     bool r=parse_source(file_name); // don't break the program!
 
@@ -545,13 +546,13 @@ bool compilet::parse(const std::string &file_name)
 
     if(cmdline.isset('o'))
     {
-      ofs.open(cmdline.getval('o'));
+      ofs.open(cmdline.get_value('o').c_str());
       os = &ofs;
 
       if(!ofs.is_open())
       {
         error() << "failed to open output file `" 
-                << cmdline.getval('o') << "'" << eom;
+                << cmdline.get_value('o') << "'" << eom;
         return true;
       }
     }
@@ -601,13 +602,13 @@ bool compilet::parse_stdin()
 
     if(cmdline.isset('o'))
     {
-      ofs.open(cmdline.getval('o'));
+      ofs.open(cmdline.get_value('o').c_str());
       os = &ofs;
 
       if(!ofs.is_open())
       {
         error() << "failed to open output file `"
-                << cmdline.getval('o') << "'" << eom;
+                << cmdline.get_value('o') << "'" << eom;
         return true;
       }
     }
@@ -666,11 +667,12 @@ bool compilet::write_bin_object_file(
   const symbol_tablet &lsymbol_table,
   goto_functionst &functions)
 {
-  print(8, "Writing binary format object `" + file_name + "'");
+  statistics() << "Writing binary format object `" 
+               << file_name << "'" << eom;
 
   // symbols
-  print(8, "Symbols in table: "+
-           i2string((unsigned long)lsymbol_table.symbols.size()));
+  statistics() << "Symbols in table: "
+               << lsymbol_table.symbols.size() << eom;
 
   std::ofstream outfile(file_name.c_str(), std::ios::binary);
 
@@ -685,8 +687,8 @@ bool compilet::write_bin_object_file(
 
   unsigned cnt=function_body_count(functions);
 
-  debug("Functions: "+i2string(functions.function_map.size())+"; "+
-        i2string(cnt)+" have a body.");
+  debug() << "Functions: " << functions.function_map.size()
+          << "; " << cnt << " have a body." << eom;
 
   outfile.close();
 

@@ -29,7 +29,7 @@ Function: goto_cc_cmdlinet::in_list
 
 bool goto_cc_cmdlinet::in_list(const char *option, const char **list)
 {
-  for(unsigned i=0; list[i]!=NULL; i++)
+  for(std::size_t i=0; list[i]!=NULL; i++)
   {
     if(strcmp(option, list[i])==0)
       return true;
@@ -55,7 +55,7 @@ bool goto_cc_cmdlinet::prefix_in_list(
   const char **list,
   std::string &prefix)
 {
-  for(unsigned i=0; list[i]!=NULL; i++)
+  for(std::size_t i=0; list[i]!=NULL; i++)
   {
     if(strncmp(option, list[i], strlen(list[i]))==0)
     {
@@ -79,7 +79,7 @@ Function: goto_cc_cmdlinet::get_optnr
 
 \*******************************************************************/
 
-int goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
+std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
 {
   int optnr;
   cmdlinet::optiont option;
@@ -122,13 +122,12 @@ int goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
     return -1;
   }
 
+  // new?
   if(optnr==-1)
   {
-    // new
     options.push_back(option);
     return options.size()-1;
   }
   
   return optnr;
 }
-

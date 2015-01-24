@@ -159,6 +159,35 @@ Function: c_typecheck_baset::typecheck_asm
 
 void c_typecheck_baset::typecheck_asm(codet &code)
 {
+  const irep_idt flavor=to_code_asm(code).get_flavor();
+  
+  if(flavor==ID_gcc)
+  {
+    // These have 5 operands.
+    // The first parameter is a string.
+    // Parameters 1, 2, 3, 4 are lists of expressions.
+    
+    // Parameter 1: OutputOperands
+    // Parameter 2: InputOperands
+    // Parameter 3: Clobbers
+    // Parameter 4: GotoLabels
+
+    assert(code.operands().size()==5);
+  
+    typecheck_expr(code.op0());
+  
+    for(unsigned i=1; i<code.operands().size(); i++)
+    {
+      exprt &list=code.operands()[i];
+      Forall_operands(it, list)
+        typecheck_expr(*it);
+    }
+  }
+  else if(flavor==ID_msc)
+  {
+    assert(code.operands().size()==1);
+    typecheck_expr(code.op0());
+  }
 }
 
 /*******************************************************************\
@@ -329,9 +358,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
       d_it!=declaration.declarators().end();
       d_it++)
   {
-    // add prefix
-    irep_idt identifier=
-      add_language_prefix(d_it->get_name());
+    irep_idt identifier=d_it->get_name();
 
     // look it up
     symbol_tablet::symbolst::iterator s_it=

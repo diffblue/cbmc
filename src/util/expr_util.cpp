@@ -34,18 +34,29 @@ exprt gen_zero(const typet &type)
   if(type_id==ID_rational ||
      type_id==ID_real ||
      type_id==ID_integer ||
-     type_id==ID_natural ||
-     type_id==ID_c_enum ||
-     type_id==ID_c_enum_tag ||
-     type_id==ID_incomplete_c_enum)
+     type_id==ID_natural)
   {
     return constant_exprt(ID_0, type);
+  }
+  else if(type_id==ID_c_enum)
+  {
+    exprt tmp=gen_zero(type.subtype());
+    tmp.type()=type;
+    return tmp;
+  }
+  else if(type_id==ID_c_enum_tag)
+  {
+    // Ha! We generate a typecast.
+    exprt tmp=gen_zero(unsignedbv_typet(1));
+    return typecast_exprt(tmp, type);
   }
   else if(type_id==ID_unsignedbv ||
           type_id==ID_signedbv ||
           type_id==ID_verilogbv ||
           type_id==ID_floatbv ||
-          type_id==ID_fixedbv)
+          type_id==ID_fixedbv ||
+          type_id==ID_c_bit_field ||
+          type_id==ID_c_bool)
   {
     std::string value;
     unsigned width=to_bitvector_type(type).get_width();
@@ -104,16 +115,19 @@ exprt gen_one(const typet &type)
 {
   const irep_idt type_id=type.id();
 
-  if(type_id==ID_bool ||
-     type_id==ID_rational ||
-     type_id==ID_real ||
-     type_id==ID_integer ||
-     type_id==ID_natural)
+  if(type_id==ID_bool)
+    return true_exprt();
+  else if(type_id==ID_rational ||
+          type_id==ID_real ||
+          type_id==ID_integer ||
+          type_id==ID_natural)
   {
     return constant_exprt(ID_1, type);
   }
   else if(type_id==ID_unsignedbv ||
-          type_id==ID_signedbv)
+          type_id==ID_signedbv ||
+          type_id==ID_c_bit_field ||
+          type_id==ID_c_bool)
   {
     std::string value;
     unsigned width=to_bitvector_type(type).get_width();
@@ -128,11 +142,17 @@ exprt gen_one(const typet &type)
 
     return constant_exprt(value, type);
   }
-  else if(type_id==ID_c_enum ||
-          type_id==ID_c_enum_tag ||
-          type_id==ID_incomplete_c_enum)
+  else if(type_id==ID_c_enum)
   {
-    return constant_exprt(ID_1, type);
+    exprt tmp=gen_one(type.subtype());
+    tmp.type()=type;
+    return tmp;
+  }
+  else if(type_id==ID_c_enum_tag)
+  {
+    // Ha! We generate a typecast.
+    exprt tmp=gen_one(unsignedbv_typet(1));
+    return typecast_exprt(tmp, type);
   }
   else if(type_id==ID_fixedbv)
   {

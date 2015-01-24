@@ -45,7 +45,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol_expr.id()!=ID_type)
     {
-      err_location(name.location());
+      err_location(name.source_location());
       str << "expected type as struct/class base";
       throw 0;
     }
@@ -55,7 +55,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol_expr.type().id()!=ID_symbol)
     {
-      err_location(name.location());
+      err_location(name.source_location());
       str << "expected type symbol as struct/class base";
       throw 0;
     }
@@ -65,13 +65,13 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol.type.id()==ID_incomplete_struct)
     {
-      err_location(name.location());
+      err_location(name.source_location());
       str << "base type is incomplete";
       throw 0;
     }
     else if(base_symbol.type.id()!=ID_struct)
     {
-      err_location(name.location());
+      err_location(name.source_location());
       str << "expected struct or class as base, but got `"
           << to_string(base_symbol.type) << "'";
       throw 0;
@@ -116,8 +116,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     most_derived.type()=bool_typet();
     most_derived.set_access(ID_public);
     most_derived.set(ID_base_name, "@most_derived");
-    most_derived.set_name(language_prefix+
-                     cpp_scopes.current_scope().prefix+"::"+"@most_derived");
+    most_derived.set_name(cpp_scopes.current_scope().prefix+"::"+"@most_derived");
     most_derived.set(ID_pretty_name, "@most_derived");
     most_derived.add_source_location()=type.source_location();
     put_compound_into_scope(most_derived);

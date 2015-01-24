@@ -250,7 +250,7 @@ Function: cpp_scopet::new_scope
 cpp_scopet &cpp_scopet::new_scope(const irep_idt &new_scope_name)
 {
   cpp_idt &id=insert(new_scope_name);
-  id.identifier="c::"+prefix+id2string(new_scope_name);
+  id.identifier=prefix+id2string(new_scope_name);
   id.prefix=prefix+id2string(new_scope_name)+"::";
   id.this_expr=this_expr;
   id.class_identifier=class_identifier;

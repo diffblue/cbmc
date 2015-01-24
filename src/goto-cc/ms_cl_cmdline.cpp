@@ -55,7 +55,7 @@ const char *non_ms_cl_options[]=
 
 bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
 {
-  for(unsigned i=0; i<options.size(); i++)
+  for(std::size_t i=0; i<options.size(); i++)
   {
     // is it a non-cl option?
     if(std::string(options[i], 0, 2)=="--")
@@ -300,8 +300,7 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
   std::vector<std::string> options;
   std::string option;
   bool in_quotes=false;
-
-  for(unsigned i=0; i<line.size(); i++)
+  for(std::size_t i=0; i<line.size(); i++)
   {
     char ch=line[i];
     
@@ -338,22 +337,7 @@ Function: ms_cl_cmdlinet::process_non_cl_option
 void ms_cl_cmdlinet::process_non_cl_option(
   const std::string &s)
 {
-  cmdlinet::optiont option;
-
-  option.isset=true;
-  option.islong=true;
-  option.optstring=std::string(s, 2, std::string::npos);
-  option.optchar=0;
-
-  int optnr=getoptnr(s);
-
-  if(optnr==-1)
-  {
-    options.push_back(option);
-    optnr=options.size()-1;
-  }
-
-  options[optnr].isset=true;
+  set(s);
       
   for(unsigned j=0; non_ms_cl_options[j]!=NULL; j++)
     if(s==non_ms_cl_options[j])
@@ -510,7 +494,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     return;
   }
 
-  for(unsigned j=0; ms_cl_flags[j]!=NULL; j++)
+  for(std::size_t j=0; ms_cl_flags[j]!=NULL; j++)
   {
     if(std::string(s, 1, std::string::npos)==ms_cl_flags[j])
     {
@@ -543,7 +527,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     }
   }
   
-  for(unsigned j=0; ms_cl_prefixes[j]!=NULL; j++)
+  for(std::size_t j=0; ms_cl_prefixes[j]!=NULL; j++)
   {
     std::string ms_cl_prefix=ms_cl_prefixes[j];
 

@@ -14,6 +14,6 @@ int kill(pid_t pid, int sig)
 {
   (void)pid;
   (void)sig;
-  _Bool error;
+  __CPROVER_bool error;
   return error ? -1 : 0;
 }

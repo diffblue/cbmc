@@ -24,7 +24,7 @@ public:
   unsigned unsigned_cnt, signed_cnt, char_cnt, int_cnt, short_cnt,
            long_cnt, const_cnt, constexpr_cnt, typedef_cnt, volatile_cnt,
            double_cnt, float_cnt, complex_cnt, cpp_bool_cnt, proper_bool_cnt,
-           extern_cnt, wchar_t_cnt,
+           extern_cnt, wchar_t_cnt, char16_t_cnt, char32_t_cnt,
            int8_cnt, int16_cnt, int32_cnt, int64_cnt, ptr32_cnt, ptr64_cnt,
            float128_cnt, int128_cnt;
 
@@ -59,8 +59,9 @@ void cpp_convert_typet::read(const typet &type)
   unsigned_cnt=signed_cnt=char_cnt=int_cnt=short_cnt=
   long_cnt=const_cnt=constexpr_cnt=typedef_cnt=volatile_cnt=
   double_cnt=float_cnt=complex_cnt=cpp_bool_cnt=proper_bool_cnt=
-  extern_cnt=wchar_t_cnt=int8_cnt=int16_cnt=int32_cnt=
-  int64_cnt=ptr32_cnt=ptr64_cnt=float128_cnt=int128_cnt=0;
+  extern_cnt=wchar_t_cnt=char16_t_cnt=char32_t_cnt=
+  int8_cnt=int16_cnt=int32_cnt=int64_cnt=
+  ptr32_cnt=ptr64_cnt=float128_cnt=int128_cnt=0;
 
   other.clear();
   
@@ -125,6 +126,10 @@ void cpp_convert_typet::read_rec(const typet &type)
     proper_bool_cnt++;
   else if(type.id()==ID_wchar_t)
     wchar_t_cnt++;
+  else if(type.id()==ID_char16_t)
+    char16_t_cnt++;
+  else if(type.id()==ID_char32_t)
+    char32_t_cnt++;
   else if(type.id()==ID_int8)
     int8_cnt++;
   else if(type.id()==ID_int16)
@@ -243,7 +248,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
     static_cast<typet &>(t.add(ID_return_type));
 
   return_type.swap(t.subtype());
-  t.remove(ID_subtype);
+  t.remove_subtype();
 
   if(return_type.is_not_nil())
     cpp_convert_plain_type(return_type);
@@ -306,7 +311,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
           assert(!base_name.empty());
           new_parameter.set_identifier(base_name);
           new_parameter.set_base_name(base_name);
-          new_parameter.add_source_location()=cpp_name.location();
+          new_parameter.add_source_location()=cpp_name.source_location();
         }
         else
         {
@@ -356,6 +361,7 @@ void cpp_convert_typet::write(typet &type)
     if(double_cnt || float_cnt || signed_cnt ||
        unsigned_cnt || int_cnt || cpp_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || wchar_t_cnt ||
+       char16_t_cnt || char32_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || float128_cnt || int128_cnt)
       throw "type modifier not applicable";
@@ -369,7 +375,9 @@ void cpp_convert_typet::write(typet &type)
   {
     if(signed_cnt || unsigned_cnt || int_cnt ||
        cpp_bool_cnt || proper_bool_cnt ||
-       short_cnt || char_cnt || wchar_t_cnt || float_cnt ||
+       short_cnt || char_cnt || wchar_t_cnt ||
+       char16_t_cnt || char32_t_cnt ||
+       float_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || ptr32_cnt || ptr64_cnt ||
        float128_cnt || int128_cnt)
@@ -385,6 +393,7 @@ void cpp_convert_typet::write(typet &type)
     if(signed_cnt || unsigned_cnt || int_cnt ||
        cpp_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || wchar_t_cnt || double_cnt ||
+       char16_t_cnt || char32_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || ptr32_cnt || ptr64_cnt || float128_cnt || int128_cnt)
       throw "illegal type modifier for float";
@@ -399,6 +408,7 @@ void cpp_convert_typet::write(typet &type)
     if(signed_cnt || unsigned_cnt || int_cnt ||
        cpp_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || wchar_t_cnt || double_cnt ||
+       char16_t_cnt || char32_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
       throw "illegal type modifier for __float128";
@@ -413,6 +423,7 @@ void cpp_convert_typet::write(typet &type)
   {
     if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
        char_cnt || wchar_t_cnt || proper_bool_cnt ||
+       char16_t_cnt || char32_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
       throw "illegal type modifier for C++ bool";
@@ -423,6 +434,7 @@ void cpp_convert_typet::write(typet &type)
   {
     if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
        char_cnt || wchar_t_cnt ||
+       char16_t_cnt || char32_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
       throw "illegal type modifier for __CPROVER_bool";
@@ -432,6 +444,7 @@ void cpp_convert_typet::write(typet &type)
   else if(char_cnt)
   {
     if(int_cnt || short_cnt || wchar_t_cnt || long_cnt ||
+       char16_t_cnt || char32_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
       throw "illegal type modifier for char";
@@ -450,11 +463,35 @@ void cpp_convert_typet::write(typet &type)
     // This is tolerated by most compilers, however.
 
     if(int_cnt || short_cnt || char_cnt || long_cnt ||
+       char16_t_cnt || char32_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || ptr32_cnt || ptr64_cnt)
       throw "illegal type modifier for wchar_t";
 
     type=wchar_t_type();
+  }
+  else if(char16_t_cnt)
+  {
+    // This is a distinct type, and can't be made signed/unsigned.
+    if(int_cnt || short_cnt || char_cnt || long_cnt ||
+       char32_t_cnt ||
+       int8_cnt || int16_cnt || int32_cnt ||
+       int64_cnt || ptr32_cnt || ptr64_cnt ||
+       signed_cnt || unsigned_cnt)
+      throw "illegal type modifier for char16_t";
+
+    type=char16_t_type();
+  }
+  else if(char32_t_cnt)
+  {
+    // This is a distinct type, and can't be made signed/unsigned.
+    if(int_cnt || short_cnt || char_cnt || long_cnt ||
+       int8_cnt || int16_cnt || int32_cnt ||
+       int64_cnt || ptr32_cnt || ptr64_cnt ||
+       signed_cnt || unsigned_cnt)
+      throw "illegal type modifier for char32_t";
+
+    type=char32_t_type();
   }
   else
   {

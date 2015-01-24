@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 #include <ostream>
 #include <cassert>
+#include <algorithm>
 
 class empty_edget
 {

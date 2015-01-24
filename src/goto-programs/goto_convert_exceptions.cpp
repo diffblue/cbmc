@@ -125,7 +125,7 @@ void goto_convertt::convert_msc_leave(
 
 /*******************************************************************\
 
-Function: goto_convertt::convert_catch
+Function: goto_convertt::convert_try_catch
 
   Inputs:
 
@@ -135,7 +135,7 @@ Function: goto_convertt::convert_catch
 
 \*******************************************************************/
 
-void goto_convertt::convert_catch(
+void goto_convertt::convert_try_catch(
   const codet &code,
   goto_programt &dest)
 {
@@ -184,7 +184,7 @@ void goto_convertt::convert_catch(
     dest.add_instruction()->make_goto(end_target);
   }
 
-  // add end-target  
+  // add the end-target  
   dest.destructive_append(end);
 }
 
@@ -343,7 +343,7 @@ Function: goto_convertt::exception_flag
 
 symbol_exprt goto_convertt::exception_flag()
 {
-  irep_idt id="c::$exception_flag";
+  irep_idt id="$exception_flag";
 
   symbol_tablet::symbolst::const_iterator s_it=
     symbol_table.symbols.find(id);
@@ -377,7 +377,7 @@ Function: goto_convertt::unwind_destructor_stack
 
 void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
-  unsigned stack_size,
+  std::size_t stack_size,
   goto_programt &dest,
   bool do_dead)
 {

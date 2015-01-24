@@ -121,7 +121,7 @@ bool language_uit::parse(const std::string &filename)
 
   if(!infile)
   {
-    error("failed to open input file", filename);
+    error() << "failed to open input file `" << filename << "'" << eom;
     return true;
   }
 
@@ -143,7 +143,7 @@ bool language_uit::parse(const std::string &filename)
   languaget &language=*lf.language;
   language.set_message_handler(get_message_handler());
 
-  status("Parsing", filename);
+  status() << "Parsing " << filename << eom;
 
   if(language.parse(infile, filename))
   {
@@ -172,7 +172,7 @@ Function: language_uit::typecheck
 
 bool language_uit::typecheck()
 {
-  status("Converting");
+  status() << "Converting" << eom;
   
   language_files.set_message_handler(*message_handler);
 
@@ -239,7 +239,7 @@ void language_uit::show_symbol_table(bool brief)
     break;
 
   default:
-    error("cannot show symbol table in this format");
+    error() << "cannot show symbol table in this format" << eom;
   }
 }
 
@@ -257,7 +257,7 @@ Function: language_uit::show_symbol_table_xml_ui
 
 void language_uit::show_symbol_table_xml_ui(bool brief)
 {
-  error("cannot show symbol table in this format");
+  error() << "cannot show symbol table in this format" << eom;
 }
 
 /*******************************************************************\

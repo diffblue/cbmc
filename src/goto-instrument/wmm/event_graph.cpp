@@ -24,7 +24,7 @@ std::string colour_map[NB_COLOURS] = {"red", "blue", "black", "green", "yellow",
 
 /*******************************************************************\
 
-Function: event_grapht::copy_segment
+Function: event_grapht::print_rec_graph
 
   Inputs:
 
@@ -34,10 +34,181 @@ Function: event_grapht::copy_segment
 
 \*******************************************************************/
 
+void event_grapht::print_rec_graph(std::ofstream& file, unsigned node_id, 
+  std::set<unsigned>& visited) 
+{
+  const abstract_eventt& node=operator[](node_id);
+  file << node_id << "[label=\"" << node << ", " << node.source_location << 
+    "\"];" << std::endl;
+  visited.insert(node_id);
+
+  for(graph<abstract_eventt>::edgest::const_iterator
+    it=po_out(node_id).begin();
+    it!=po_out(node_id).end(); ++it)
+  {
+    file << node_id << "->" << it->first << "[]" << std::endl;
+    file << "{rank=same; " << node_id << "; " << it->first << "}" << std::endl;
+    if(visited.find(it->first)==visited.end())
+      print_rec_graph(file, it->first, visited);
+  }
+
+  for(graph<abstract_eventt>::edgest::const_iterator
+    it=com_out(node_id).begin();
+    it!=com_out(node_id).end(); ++it)
+  {
+    file << node_id << "->" << it->first << "[style=\"dotted\"]" << std::endl;
+    if(visited.find(it->first)==visited.end())
+      print_rec_graph(file, it->first, visited);
+  }
+}
+
+/*******************************************************************\
+
+Function: event_grapht::print_graph
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void event_grapht::print_graph() {
+  assert(po_order.size()>0);
+  std::set<unsigned> visited;
+  unsigned root=po_order.front();
+  std::ofstream file;
+  file.open("graph.dot");
+  file << "digraph G {" << std::endl;
+  file << "rankdir=LR;" << std::endl;
+  print_rec_graph(file, root, visited);
+  file << "}" << std::endl;
+}
+
+/*******************************************************************\
+
+Function: event_grapht::copy_segment
+
+  Inputs: begin: top of the subgraph
+          end: bottom of the subgraph
+
+ Outputs:
+
+ Purpose: copies the segment
+
+\*******************************************************************/
+
+void event_grapht::explore_copy_segment(std::set<unsigned>& explored, 
+  unsigned begin, unsigned end) const
+{
+  //std::cout << "explores " << begin << " against " << end << std::endl;
+  if(explored.find(begin)!=explored.end())
+    return;
+
+  explored.insert(begin);
+
+  if(begin==end)
+    return;
+
+  for(graph<abstract_eventt>::edgest::const_iterator it=po_out(begin).begin(); 
+    it!=po_out(begin).end();
+    ++it)
+    explore_copy_segment(explored, it->first, end);
+}
+
 unsigned event_grapht::copy_segment(unsigned begin, unsigned end)
 {
-  // TODO
-  return end;  
+  const abstract_eventt& begin_event=operator[](begin);
+  const abstract_eventt& end_event=operator[](end);
+
+  /* not sure -- we should allow cross function cycles */
+  if(begin_event.source_location.get_file()!=end_event.source_location
+    .get_file()
+    || begin_event.source_location.get_function()!=end_event.source_location
+    .get_function())
+    return end;
+
+  if(duplicated_bodies.find(std::make_pair(begin_event, end_event))
+    !=duplicated_bodies.end())
+    return end;
+
+  duplicated_bodies.insert(std::make_pair(begin_event, end_event));
+
+  message.status() << "tries to duplicate between " << begin_event.source_location
+    << " and " << end_event.source_location << messaget::eom;
+  std::set<unsigned> covered;
+
+  /* collects the nodes of the subgraph */
+  explore_copy_segment(covered, begin, end);
+
+  if(covered.size()==0)
+    return end;
+ 
+//  for(std::set<unsigned>::const_iterator it=covered.begin(); it!=covered.end(); ++it)
+//    std::cout << "covered: " << *it << std::endl;
+
+  std::map<unsigned, unsigned> orig2copy;
+
+  /* duplicates nodes */
+  for(std::set<unsigned>::const_iterator it=covered.begin();
+    it!=covered.end();
+    ++it)
+  {
+    const unsigned new_node=add_node();
+    operator[](new_node)(operator[](*it));
+    orig2copy[*it]=new_node;
+  }
+
+  /* nested loops -- replicates the po_s back-edges */
+  // actually not necessary, as they have been treated before
+  // (working on back-edges...)
+
+  /* replicates the po_s forward-edges -- O(#E^2) */
+  for(std::set<unsigned>::const_iterator it_i=covered.begin();
+    it_i!=covered.end();
+    ++it_i)
+  {
+    for(std::set<unsigned>::const_iterator it_j=covered.begin();
+      it_j!=covered.end();
+      ++it_j)
+    {
+      /* skips potential back-edges */
+      if(*it_j >= *it_i)
+        continue;
+
+      if(has_po_edge(*it_j, *it_i))
+        add_po_edge(orig2copy[*it_j], orig2copy[*it_i]);
+    }
+  }
+
+  /* appends the copy to the original, and returns the end of the copy */
+  add_po_edge(end, orig2copy[begin]);
+
+  // TODO: to move to goto2graph, after po_s construction
+  /* replicates the cmp-edges -- O(#E x #G) */
+  for(std::set<unsigned>::const_iterator it_i=covered.begin();
+    it_i!=covered.end();
+    ++it_i)
+  {
+    for(unsigned it_j=0;
+      it_j<size();
+      ++it_j)
+    {
+      /* skips potential back-edges */
+      if(it_j >= *it_i)
+        continue;
+
+      if(has_com_edge(it_j, *it_i))
+      {
+        add_com_edge(it_j, orig2copy[*it_i]);
+        add_com_edge(orig2copy[*it_i], it_j);
+      }
+    }
+  }
+  // end
+
+  return orig2copy[end];
 }
 
 /*******************************************************************\
@@ -808,6 +979,12 @@ bool event_grapht::critical_cyclet::is_not_uniproc() const
     return false;
 
   const irep_idt& var=egraph[*it].variable;
+
+  /* if it is an array access, by over-approximation, we don't have
+     uniproc in the cycle (tab[]) */
+  if(!egraph.ignore_arrays && id2string(var).find("[]")!=std::string::npos)
+    return true;
+
   for(; it!=end(); ++it)
   {
     const abstract_eventt& it_evt=egraph[*it];
@@ -1421,8 +1598,8 @@ std::string event_grapht::critical_cyclet::print_name(
             + cur.get_operation();
         }
       }
-      
-      else
+     
+      else if(cur.variable!=ID_unknown && prev.variable!=ID_unknown)
         assert(false);
     }
 
@@ -1523,9 +1700,10 @@ std::string event_grapht::critical_cyclet::print_name(
     }
   }
 
-  else
-        assert(false);
+  else if(last.variable!=ID_unknown && first.variable!=ID_unknown)
+    assert(false);
 
+#if 0
   critical_cyclet::size_type n_events=extra_fence_count;
   for(std::string::const_iterator it=name.begin();
       it!=name.end();
@@ -1533,6 +1711,7 @@ std::string event_grapht::critical_cyclet::print_name(
     if(*it==' ')
       ++n_events;
   assert(n_events==reduced.size());
+#endif
 
   return name;
 }

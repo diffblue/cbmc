@@ -149,7 +149,7 @@ protected:
   virtual std::string convert_code(const codet &src, unsigned indent);
   std::string convert_code_label(const code_labelt &src, unsigned indent);
   std::string convert_code_switch_case(const code_switch_caset &src, unsigned indent);
-  std::string convert_code_asm(const codet &src, unsigned indent);
+  std::string convert_code_asm(const code_asmt &src, unsigned indent);
   std::string convert_code_assign(const code_assignt &src, unsigned indent);
   std::string convert_code_free(const codet &src, unsigned indent);
   std::string convert_code_init(const codet &src, unsigned indent);
@@ -167,6 +167,7 @@ protected:
   std::string convert_code_switch(const codet &src, unsigned indent);
   std::string convert_code_continue(const codet &src, unsigned indent);
   std::string convert_code_decl(const codet &src, unsigned indent);
+  std::string convert_code_decl_block(const codet &src, unsigned indent);
   std::string convert_code_dead(const codet &src, unsigned indent);
   std::string convert_code_function_call(const code_function_callt &src, unsigned indent);
   std::string convert_code_lock(const codet &src, unsigned indent);
@@ -196,7 +197,7 @@ protected:
   std::string convert_nondet_bool(const exprt &src, unsigned &precedence);
   std::string convert_object_descriptor(const exprt &src, unsigned &precedence);
   std::string convert_literal(const exprt &src, unsigned &precedence);
-  virtual std::string convert_constant(const exprt &src, unsigned &precedence);
+  virtual std::string convert_constant(const constant_exprt &src, unsigned &precedence);
 
   std::string convert_norep(const exprt &src, unsigned &precedence);
 

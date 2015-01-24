@@ -32,8 +32,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(race-check)(scc)(one-event-per-cycle)" \
   "(minimum-interference)" \
   "(mm):(my-events)(unwind):" \
-  "(max-var):(max-po-trans):" \
-  "(cfg-kill)(no-dependencies)" \
+  "(max-var):(max-po-trans):(ignore-arrays)" \
+  "(cfg-kill)(no-dependencies)(force-loop-duplication)" \
   "(call-graph)" \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \

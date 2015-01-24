@@ -193,7 +193,6 @@ void cpp_typecheckt::typecheck_compound_type(
   }
 
   const irep_idt symbol_name=
-    language_prefix+
     dest_scope->prefix+
     "tag."+id2string(base_name);
 
@@ -343,7 +342,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   }
   else
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "declarator in compound needs to be simple name";
     throw 0;
   }
@@ -361,42 +360,42 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   if(is_virtual && !is_method)
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "only methods can be virtual";
     throw 0;
   }
 
   if(is_inline && !is_method)
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "only methods can be inlined";
     throw 0;
   }
 
   if(is_virtual && is_static)
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "static methods cannot be virtual";
     throw 0;
   }
 
   if(is_cast_operator && is_static)
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "cast operators cannot be static`";
     throw 0;
   }
 
   if(is_constructor && is_virtual)
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "constructors cannot be virtual";
     throw 0;
   }
 
   if(!is_constructor && is_explicit)
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "only constructors can be explicit";
     throw 0;
   }
@@ -404,7 +403,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(is_constructor &&
      base_name!=id2string(symbol.base_name))
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "member function must return a value or void";
     throw 0;
   }
@@ -412,7 +411,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(is_destructor &&
      base_name!="~"+id2string(symbol.base_name))
   {
-    err_location(cpp_name.location());
+    err_location(cpp_name.source_location());
     str << "destructor with wrong name";
     throw 0;
   }
@@ -431,7 +430,6 @@ void cpp_typecheckt::typecheck_compound_declarator(
     // Identifiers for methods include the scope prefix.
     // Identifiers for static members include the scope prefix.
     identifier=
-      language_prefix+
       cpp_scopes.current_scope().prefix+
       id2string(base_name);
   }
@@ -446,7 +444,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   component.set(ID_access, access);
   component.set(ID_base_name, base_name);
   component.set(ID_pretty_name, base_name);
-  component.add_source_location()=cpp_name.location();
+  component.add_source_location()=cpp_name.source_location();
 
   if(cpp_name.is_operator())
   {
@@ -528,7 +526,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
       if(!value.is_nil() && !is_static)
       {
-        err_location(cpp_name.location());
+        err_location(cpp_name.source_location());
         str << "no initialization allowed here";
         throw 0;
       }
@@ -547,7 +545,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           to_integer(value, i);
           if(i!=0)
           {
-            err_location(declarator.name().location());
+            err_location(declarator.name().source_location());
             str << "expected 0 to mark pure virtual method, got " << i;
           }
           component.set("is_pure_virtual", true);
@@ -734,7 +732,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     static_symbol.base_name=component.get(ID_base_name);
     static_symbol.is_lvalue=true;
     static_symbol.is_static_lifetime=true;
-    static_symbol.location=cpp_name.location();
+    static_symbol.location=cpp_name.source_location();
     static_symbol.is_extern=true;
     
     // TODO: not sure about this: should be defined separately!
@@ -743,7 +741,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     symbolt *new_symbol;
     if(symbol_table.move(static_symbol, new_symbol))
     {
-      err_location(cpp_name.location());
+      err_location(cpp_name.source_location());
 	str << "redeclaration of static member `" 
 	    << static_symbol.base_name
 	    << "'";
@@ -1184,8 +1182,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   access=
     type.get_bool(ID_C_class)?ID_private:ID_public;
 
-  // All the data members are known now.
-  // So let's deal with the constructors that we are given.
+  // All the data members are now known.
+  // We now deal with the constructors that we are given.
   Forall_operands(it, body)
   {
     if(it->id()==ID_cpp_declaration)
@@ -1205,7 +1203,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           declarator.name().get_base_name();
         #endif
         
-        if(declarator.value().is_not_nil())
+        if(declarator.value().is_not_nil()) // body?
         {
           if(declarator.find(ID_member_initializers).is_nil())
             declarator.set(ID_member_initializers, ID_member_initializers);
@@ -1217,7 +1215,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             );
 
           full_member_initialization(
-            to_struct_type(type),
+            type,
             declarator.member_initializers()
             );
         }
@@ -1574,7 +1572,6 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   irep_idt base_name="#anon_member"+i2string(components.size());
 
   irep_idt identifier=
-    language_prefix+
     cpp_scopes.current_scope().prefix+
     base_name.c_str();
 

@@ -36,7 +36,7 @@ bool cw_modet::doit()
     return false;
   }
 
-  int verbosity=1;
+  unsigned int verbosity=1;
 
   compilet compiler(cmdline);
 
@@ -49,12 +49,12 @@ bool cw_modet::doit()
   #endif
 
   if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2int(cmdline.getval("verbosity"));
+    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
 
   compiler.ui_message_handler.set_verbosity(verbosity);
   ui_message_handler.set_verbosity(verbosity);
 
-  debug("CodeWarrior mode");
+  debug() << "CodeWarrior mode" << eom;
   
   // get configuration
   config.set(cmdline);

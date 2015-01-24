@@ -157,7 +157,10 @@ std::string counterexample_value_binary(
        type.id()==ID_fixedbv ||
        type.id()==ID_floatbv ||
        type.id()==ID_pointer ||
-       type.id()==ID_c_enum)
+       type.id()==ID_c_bit_field ||
+       type.id()==ID_c_bool ||
+       type.id()==ID_c_enum ||
+       type.id()==ID_c_enum_tag)
     {
       return expr.get_string(ID_value);
     }
@@ -316,6 +319,10 @@ void show_goto_trace(
       it!=goto_trace.steps.end();
       it++)
   {
+    // hide the hidden ones
+    if(it->hidden)
+      continue;
+  
     switch(it->type)
     {
     case goto_trace_stept::ASSERT:

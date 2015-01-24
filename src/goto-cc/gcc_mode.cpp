@@ -74,7 +74,7 @@ bool gcc_modet::doit()
     return false;
   }
 
-  int verbosity=1;
+  unsigned int verbosity=1;
 
   if(cmdline.isset('v'))
   {
@@ -82,22 +82,23 @@ bool gcc_modet::doit()
     // Compilation continues, don't exit!
     
     if(act_as_ld)
-      print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
+      std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
     else
-      print("gcc version 3.4.4 (goto-cc " CBMC_VERSION ")");
+      std::cout << "gcc version 3.4.4 (goto-cc " CBMC_VERSION ")\n";
   }
 
   if(cmdline.isset("version"))
   {
     if(act_as_ld)
-      print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
+      std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
     else
-      print("gcc (GCC) 3.4.4 (goto-cc " CBMC_VERSION ")\n");
+      std::cout << "gcc (GCC) 3.4.4 (goto-cc " CBMC_VERSION ")\n\n";
 
-    print("Copyright (C) 2006-2013 Daniel Kroening, Christoph Wintersteiger\n");
-    print("CBMC version: " CBMC_VERSION);
-    print("Architecture: "+id2string(config.this_architecture()));
-    print("OS: "+id2string(config.this_operating_system()));
+    std::cout << 
+      "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
+      "CBMC version: " CBMC_VERSION << '\n' <<
+      "Architecture: " << config.this_architecture() << '\n' <<
+      "OS: " << config.this_operating_system() << '\n';
 
     return false; // Exit!
   }
@@ -112,23 +113,23 @@ bool gcc_modet::doit()
     verbosity=2;
 
   if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2int(cmdline.getval("verbosity"));
+    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
 
   ui_message_handler.set_verbosity(verbosity);
 
   if(act_as_ld)
   {
     if(produce_hybrid_binary)
-      debug("LD mode (hybrid)");
+      debug() << "LD mode (hybrid)" << eom;
     else
-      debug("LD mode");
+      debug() << "LD mode" << eom;
   }
   else
   {
     if(produce_hybrid_binary)
-      debug("GCC mode (hybrid)");
+      debug() << "GCC mode (hybrid)" << eom;
     else
-      debug("GCC mode");
+      debug() << "GCC mode" << eom;
   }
 
   // In gcc mode, we have just pass on to gcc to handle the following:
@@ -207,12 +208,12 @@ bool gcc_modet::doit()
 
   switch(compiler.mode)
   {
-  case compilet::LINK_LIBRARY: debug("Linking a library only"); break;
-  case compilet::COMPILE_ONLY: debug("Compiling only"); break;
-  case compilet::ASSEMBLE_ONLY: debug("Assembling only"); break;
-  case compilet::PREPROCESS_ONLY: debug("Preprocessing only"); break;
-  case compilet::COMPILE_LINK: debug("Compiling and linking a library"); break;
-  case compilet::COMPILE_LINK_EXECUTABLE: debug("Compiling and linking an executable"); break;
+  case compilet::LINK_LIBRARY: debug() << "Linking a library only" << eom; break;
+  case compilet::COMPILE_ONLY: debug() << "Compiling only" << eom; break;
+  case compilet::ASSEMBLE_ONLY: debug() << "Assembling only" << eom; break;
+  case compilet::PREPROCESS_ONLY: debug() << "Preprocessing only" << eom; break;
+  case compilet::COMPILE_LINK: debug() << "Compiling and linking a library" << eom; break;
+  case compilet::COMPILE_LINK_EXECUTABLE: debug() << "Compiling and linking an executable" << eom; break;
   default: assert(false);
   }
 
@@ -221,7 +222,7 @@ bool gcc_modet::doit()
   {
     // We may wish to reconsider the below.
     config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
-    debug("Enabling Visual Studio syntax");
+    debug() << "Enabling Visual Studio syntax" << eom;
   }
   else
     config.ansi_c.mode=configt::ansi_ct::MODE_GCC_C;
@@ -233,12 +234,19 @@ bool gcc_modet::doit()
   
   if(cmdline.isset("std"))
   {
-    std::string std_string=cmdline.getval("std");
+    std::string std_string=cmdline.get_value("std");
+
     if(std_string=="gnu99" || std_string=="c99" || std_string=="iso9899:1999" ||
        std_string=="gnu9x" || std_string=="c9x" || std_string=="iso9899:199x" ||
        std_string=="gnu11" || std_string=="c11" ||
        std_string=="gnu1x" || std_string=="c1x")
       config.ansi_c.for_has_scope=true;
+
+    if(std_string=="c++11" || std_string=="c++1x" ||
+       std_string=="gnu++11" || std_string=="gnu++1x" || 
+       std_string=="c++1y" ||
+       std_string=="gnu++1y")
+      config.ansi_c.cpp11=true;
   }
 
   // gcc's default is 32 bits for wchar_t
@@ -454,16 +462,16 @@ int gcc_modet::preprocess(
   
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]="gcc";
+  new_argv[0]=compiler_name();
   
   #if 0
   std::cout << "RUN:";
-  for(unsigned i=0; i<new_argv.size(); i++)
+  for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
   
-  return run("gcc", new_argv);
+  return run(compiler_name(), new_argv);
 }
 
 /*******************************************************************\
@@ -474,7 +482,7 @@ Function: gcc_modet::run_gcc
 
  Outputs:
 
- Purpose: run gcc with original command line
+ Purpose: run gcc or clang with original command line
 
 \*******************************************************************/
 
@@ -492,19 +500,21 @@ int gcc_modet::run_gcc()
   {
     new_argv.push_back(it->arg);
   }
+  
+  const char *compiler=compiler_name();
 
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]="gcc";
+  new_argv[0]=compiler;
   
   #if 0
   std::cout << "RUN:";
-  for(unsigned i=0; i<new_argv.size(); i++)
+  for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
   
-  return run("gcc", new_argv);
+  return run(compiler, new_argv);
 }
 
 /*******************************************************************\
@@ -542,7 +552,7 @@ int gcc_modet::gcc_hybrid_binary()
     if(cmdline.isset('o'))
     {
       // there should be only one input file
-      output_files.push_back(cmdline.getval('o'));
+      output_files.push_back(cmdline.get_value('o'));
     }
     else
     {
@@ -561,7 +571,7 @@ int gcc_modet::gcc_hybrid_binary()
   {
     // -c is not given
     if(cmdline.isset('o'))
-      output_files.push_back(cmdline.getval('o'));
+      output_files.push_back(cmdline.get_value('o'));
     else
       output_files.push_back("a.out");      
   }
@@ -569,9 +579,9 @@ int gcc_modet::gcc_hybrid_binary()
   if(output_files.empty()) return 0;
 
   if(act_as_ld)
-    debug("Running ld to generate hybrid binary");
+    debug() << "Running ld to generate hybrid binary" << eom;
   else
-    debug("Running gcc to generate hybrid binary");
+    debug() << "Running gcc to generate hybrid binary" << eom;
   
   // save the goto-cc output files
   for(std::list<std::string>::const_iterator
@@ -614,11 +624,11 @@ int gcc_modet::gcc_hybrid_binary()
   if(act_as_ld)
     new_argv[0]="ld";
   else
-    new_argv[0]="gcc";
+    new_argv[0]=compiler_name();
   
   #if 0
   std::cout << "RUN:";
-  for(unsigned i=0; i<new_argv.size(); i++)
+  for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
@@ -632,7 +642,7 @@ int gcc_modet::gcc_hybrid_binary()
       it!=output_files.end();
       it++)
   {
-    debug("merging "+*it);
+    debug() << "merging " << *it << eom;
     std::string saved=*it+".goto-cc-saved";
 
     #ifdef __linux__

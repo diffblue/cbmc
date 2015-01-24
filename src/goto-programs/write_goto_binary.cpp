@@ -64,7 +64,7 @@ bool write_goto_binary_v2(
     flags = (flags << 1) | (int)sym.is_output;
     flags = (flags << 1) | (int)sym.is_state_var;
     flags = (flags << 1) | (int)sym.is_parameter;
-    flags = (flags << 1) | (int)false; // sym.free_var;
+    flags = (flags << 1) | (int)sym.is_auxiliary;
     flags = (flags << 1) | (int)false; // sym.binding;
     flags = (flags << 1) | (int)sym.is_lvalue;
     flags = (flags << 1) | (int)sym.is_static_lifetime;
@@ -200,8 +200,8 @@ bool write_goto_binary(
   if(!out)
   {
     messaget message(message_handler);
-    message.error(
-      std::string("Failed to open `")+filename+"'");
+    message.error() << 
+      "Failed to open `" << filename << "'";
     return true;
   }
 

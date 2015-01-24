@@ -33,6 +33,14 @@ void ansi_c_convert_typet::read(const typet &type)
   clear();
   source_location=type.source_location();
   read_rec(type);
+
+  if(!aligned &&
+     type.find(ID_C_alignment).is_not_nil())
+  {
+    aligned=true;
+
+    alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
+  }
 }
 
 /*******************************************************************\
@@ -66,6 +74,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_qualifiers.is_volatile=true;
   else if(type.id()==ID_asm)
   {
+    // These are called 'asm labels' by GCC.
     // ignore for now
   }
   else if(type.id()==ID_const)
@@ -149,7 +158,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     double_cnt++;
   else if(type.id()==ID_float)
     float_cnt++;
-  else if(type.id()==ID_bool)
+  else if(type.id()==ID_c_bool)
     c_bool_cnt++;
   else if(type.id()==ID_proper_bool)
     proper_bool_cnt++;

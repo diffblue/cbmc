@@ -163,8 +163,9 @@ void dott::write_dot_subgraph(
         function_calls.push_back(fc);
       }
       else if(it->is_assign() ||
-               it->is_return() ||
-               it->is_other())      
+              it->is_decl() ||
+              it->is_return() ||
+              it->is_other())      
       {
         std::string t = from_expr(ns, "", it->code);
         while (t[ t.size()-1 ]=='\n')

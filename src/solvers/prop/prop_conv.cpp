@@ -554,11 +554,9 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
         {
           if(expr.operands().size()==2)
           {
-            bvt bv;
-            bv.resize(2);
-            bv[0]=prop.lnot(convert(expr.op0()));
-            bv[1]=convert(expr.op1());
-            prop.lcnf(bv);
+            literalt l0=convert(expr.op0());
+            literalt l1=convert(expr.op1());
+            prop.lcnf(!l0, l1);
             return;
           }
         }

@@ -43,11 +43,11 @@ public:
     enable_float_overflow_check=_options.get_bool_option("float-overflow-check");
     enable_simplify=_options.get_bool_option("simplify");
     enable_nan_check=_options.get_bool_option("nan-check");
-    generate_all_claims=_options.get_bool_option("all-claims");
+    retain_trivial=_options.get_bool_option("retain-trivial");
     enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
     enable_assertions=_options.get_bool_option("assertions");
     enable_assumptions=_options.get_bool_option("assumptions");    
-    error_label=_options.get_option("error-label");
+    error_labels=_options.get_list_option("error-label");
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
@@ -111,11 +111,13 @@ protected:
   bool enable_float_overflow_check;
   bool enable_simplify;
   bool enable_nan_check;
-  bool generate_all_claims;
+  bool retain_trivial;
   bool enable_assert_to_assume;
   bool enable_assertions;
   bool enable_assumptions;
-  irep_idt error_label;
+
+  typedef optionst::value_listt error_labelst;
+  error_labelst error_labels;
 };
 
 /*******************************************************************\
@@ -345,10 +347,11 @@ void goto_checkt::integer_overflow_check(
     
     if(type.id()==ID_signedbv)
     {
+      unsigned new_width=to_signedbv_type(type).get_width();
+
       if(old_type.id()==ID_signedbv) // signed -> signed
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
+        unsigned old_width=to_signedbv_type(old_type).get_width();
         if(new_width>=old_width) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -369,8 +372,7 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_unsignedbv) // unsigned -> signed
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
+        unsigned old_width=to_unsignedbv_type(old_type).get_width();
         if(new_width>=old_width+1) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -387,8 +389,6 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_floatbv) // float -> signed
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-
         // Note that the fractional part is truncated!
         ieee_floatt upper(to_floatbv_type(old_type));
         upper.from_integer(power(2, new_width-1));
@@ -413,10 +413,11 @@ void goto_checkt::integer_overflow_check(
     }
     else if(type.id()==ID_unsignedbv)
     {
+      unsigned new_width=to_unsignedbv_type(type).get_width();
+
       if(old_type.id()==ID_signedbv) // signed -> unsigned
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
+        unsigned old_width=to_signedbv_type(old_type).get_width();
 
         if(new_width>=old_width-1)
         {
@@ -455,8 +456,7 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_unsignedbv) // unsigned -> unsigned
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
+        unsigned old_width=to_unsignedbv_type(old_type).get_width();
         if(new_width>=old_width) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -473,8 +473,6 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_floatbv) // float -> unsigned
       {
-        unsigned new_width=expr.type().get_int(ID_width);
-
         // Note that the fractional part is truncated!
         ieee_floatt upper(to_floatbv_type(old_type));
         upper.from_integer(power(2, new_width)-1);
@@ -1207,7 +1205,8 @@ void goto_checkt::add_guarded_claim(
   if(enable_simplify)
     simplify(expr, ns);
 
-  if(!generate_all_claims && expr.is_true())
+  // throw away trivial properties?
+  if(!retain_trivial && expr.is_true())
     return;
 
   // add the guard
@@ -1446,26 +1445,31 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     // we clear all recorded assertions if
     // 1) we want to generate all assertions or
     // 2) the instruction is a branch target
-    if(generate_all_claims ||
+    if(retain_trivial ||
        i.is_target())
       assertions.clear();
     
     check(i.guard);
 
     // magic ERROR label?
-    if(error_label!=irep_idt() &&
-       std::find(i.labels.begin(), i.labels.end(), error_label)!=i.labels.end())
+    for(optionst::value_listt::const_iterator
+        l_it=error_labels.begin();
+        l_it!=error_labels.end();
+        l_it++)
     {
-      goto_program_instruction_typet type=
-        enable_assert_to_assume?ASSUME:ASSERT;
+      if(std::find(i.labels.begin(), i.labels.end(), *l_it)!=i.labels.end())
+      {
+        goto_program_instruction_typet type=
+          enable_assert_to_assume?ASSUME:ASSERT;
 
-      goto_programt::targett t=new_code.add_instruction(type);
+        goto_programt::targett t=new_code.add_instruction(type);
 
-      t->guard=false_exprt();
-      t->source_location=i.source_location;
-      t->source_location.set_property_class("error label");
-      t->source_location.set_comment("error label");
-      t->source_location.set("user-provided", true);
+        t->guard=false_exprt();
+        t->source_location=i.source_location;
+        t->source_location.set_property_class("error label");
+        t->source_location.set_comment("error label "+*l_it);
+        t->source_location.set("user-provided", true);
+      }
     }
     
     if(i.is_other())
@@ -1552,10 +1556,10 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     }
     else if(i.is_end_function())
     {
-      if(i.function==ID_main &&
+      if(i.function==goto_functionst::entry_point() &&
          enable_memory_leak_check)
       {
-        const symbolt &leak=ns.lookup("c::__CPROVER_memory_leak");
+        const symbolt &leak=ns.lookup(CPROVER_PREFIX "memory_leak");
         const symbol_exprt leak_expr=leak.symbol_expr();
 
         // add self-assignment to get helpful counterexample output
@@ -1564,7 +1568,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         t->code=code_assignt(leak_expr, leak_expr);
         
         source_locationt source_location;
-        source_location.set_function(ID_main);
+        source_location.set_function(i.function);
 
         equal_exprt eq(leak_expr, gen_zero(ns.follow(leak.type)));
         add_guarded_claim(
@@ -1582,7 +1586,23 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         i_it!=new_code.instructions.end();
         i_it++)
     {
-      if(i_it->source_location.is_nil()) i_it->source_location=it->source_location;
+      if(i_it->source_location.is_nil())
+      {
+        i_it->source_location.id(irep_idt());
+
+        if(it->source_location.get_file()!=irep_idt())
+          i_it->source_location.set_file(it->source_location.get_file());
+
+        if(it->source_location.get_line()!=irep_idt())
+          i_it->source_location.set_line(it->source_location.get_line());
+
+        if(it->source_location.get_function()!=irep_idt())
+          i_it->source_location.set_function(it->source_location.get_function());
+
+        if(it->source_location.get_column()!=irep_idt())
+          i_it->source_location.set_column(it->source_location.get_column());
+      }
+      
       if(i_it->function==irep_idt()) i_it->function=it->function;
     }
       

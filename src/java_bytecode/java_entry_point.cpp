@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/config.h>
 
+#include <goto-programs/goto_functions.h>
+
 #include "java_entry_point.h"
 //#include "zero_initializer.h"
 
@@ -61,8 +63,9 @@ bool java_entry_point(
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  // check if main is already there
-  if(symbol_table.symbols.find(ID_main)!=symbol_table.symbols.end())
+  // check if the entry point is already there
+  if(symbol_table.symbols.find(goto_functionst::entry_point())!=
+     symbol_table.symbols.end())
     return false; // silently ignore
 
   // are we given anything?
@@ -88,14 +91,16 @@ bool java_entry_point(
   if(matches.empty())
   {
     messaget message(message_handler);
-    message.error("main method `"+id2string(config.main)+"' not in symbol table");
+    message.error() << "main method `" << config.main
+                    << "' not in symbol table" << messaget::eom;
     return true; // give up with error, no main
   }
     
   if(matches.size()>=2)
   {
     messaget message(message_handler);
-    message.error("main method `"+id2string(config.main)+"' is ambiguous");
+    message.error() << "main method `" << config.main 
+                    << "' is ambiguous" << messaget::eom;
     return true; // give up with error, no main
   }
   
@@ -106,7 +111,8 @@ bool java_entry_point(
   if(symbol.value.is_nil())
   {
     messaget message(message_handler);
-    message.error("main method `"+id2string(config.main)+"' has no body");
+    message.error() << "main method `" << config.main 
+                    << "' has no body" << messaget::eom;
     return true; // give up with error
   }
 
@@ -122,7 +128,7 @@ bool java_entry_point(
   #if 0
   {
     symbol_tablet::symbolst::iterator init_it=
-      symbol_table.symbols.find("c::__CPROVER_initialize");
+      symbol_table.symbols.find("__CPROVER_initialize");
 
     if(init_it==symbol_table.symbols.end())
       throw "failed to find __CPROVER_initialize symbol";
@@ -161,7 +167,7 @@ bool java_entry_point(
   code_typet main_type;
   main_type.return_type()=empty_typet();
   
-  new_symbol.name=ID_main;
+  new_symbol.name=goto_functionst::entry_point();
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
   
@@ -169,7 +175,7 @@ bool java_entry_point(
   {
     messaget message;
     message.set_message_handler(message_handler);
-    message.error("failed to move main symbol");
+    message.error() << "failed to move main symbol" << messaget::eom;
     return true;
   }
   

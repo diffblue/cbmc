@@ -165,84 +165,54 @@ void remove_returnst::do_function_calls(
     {
       code_function_callt &function_call=to_code_function_call(i_it->code);
 
-      assert(function_call.function().id()==ID_symbol);
+      // replace "lhs=f(...)" by "f(...); lhs=f#return_value;"
+      code_typet old_type=to_code_type(function_call.function().type());
 
-      const irep_idt function_id=
-        to_symbol_expr(function_call.function()).get_identifier();
-
-      // see if we have a body
-      goto_functionst::function_mapt::const_iterator
-        f_it=goto_functions.function_map.find(function_id);
-
-      if(f_it==goto_functions.function_map.end())
-        throw "failed to find function in function map";
-
-      if(f_it->second.body_available)
+      if(old_type.return_type()!=empty_typet())
       {
-        // replace "lhs=f(...)" by "f(...); lhs=f#return_value;"
-        code_typet old_type=to_code_type(function_call.function().type());
+        assert(function_call.function().id()==ID_symbol);
 
-        if(old_type.return_type()!=empty_typet())
-        {
-          // fix the type
-          to_code_type(function_call.function().type()).return_type()=empty_typet();
+        const irep_idt function_id=
+          to_symbol_expr(function_call.function()).get_identifier();
 
-          if(function_call.lhs().is_not_nil())
-          {
-            symbol_exprt rhs;
-            rhs.type()=function_call.lhs().type();
-            rhs.set_identifier(id2string(function_id)+"#return_value");
+        // see if we have a body
+        goto_functionst::function_mapt::const_iterator
+          f_it=goto_functions.function_map.find(function_id);
 
-            goto_programt::targett t=goto_program.insert_after(i_it);
-            t->make_assignment();
-            t->source_location=i_it->source_location;
-            t->code=code_assignt(function_call.lhs(), rhs);
-            t->function=i_it->function;
+        if(f_it==goto_functions.function_map.end())
+          throw "failed to find function `"+id2string(function_id)+"' in function map";
 
-            // fry the previous assignment
-            function_call.lhs().make_nil();
-          }
-        }
-      }
-      else // no body available
-      {
-        goto_programt tmp;
+        // fix the type
+        to_code_type(function_call.function().type()).return_type()=empty_typet();
 
-        // evaluate function arguments -- they might have
-        // pointer dereferencing or the like
-        const exprt::operandst &arguments=function_call.arguments();
-        forall_expr(a_it, arguments)
-        {
-          goto_programt::targett t=tmp.add_instruction();
-          t->make_other();
-          t->source_location=i_it->source_location;
-          t->function=i_it->function;
-          t->code=codet(ID_expression);
-          t->code.copy_to_operands(*a_it);
-        }
-
-        // return value
         if(function_call.lhs().is_not_nil())
         {
-          exprt rhs=side_effect_expr_nondett(function_call.lhs().type());
-          rhs.add_source_location()=i_it->source_location;
+          exprt rhs;
+          
+          if(f_it->second.body_available)
+          {
+            symbol_exprt return_value;
+            return_value.type()=function_call.lhs().type();
+            return_value.set_identifier(id2string(function_id)+"#return_value");
+            rhs=return_value;
+          }
+          else
+          {
+            // no body available
+            exprt nondet_value=side_effect_expr_nondett(function_call.lhs().type());
+            nondet_value.add_source_location()=i_it->source_location;
+            rhs=nondet_value;
+          }
 
-          code_assignt code(function_call.lhs(), rhs);
-          code.add_source_location()=i_it->source_location;
-
-          goto_programt::targett t=tmp.add_instruction(ASSIGN);
+          goto_programt::targett t=goto_program.insert_after(i_it);
+          t->make_assignment();
           t->source_location=i_it->source_location;
+          t->code=code_assignt(function_call.lhs(), rhs);
           t->function=i_it->function;
-          t->code.swap(code);
+
+          // fry the previous assignment
+          function_call.lhs().make_nil();
         }
-
-        // now just kill call
-        i_it->type=LOCATION;
-        i_it->code.clear();        
-
-        // insert tmp
-        goto_programt::targett next=i_it; next++;
-        goto_program.destructive_insert(next, tmp);
       }
     }
   }

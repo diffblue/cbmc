@@ -9,13 +9,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_HASH_CONT_H
 #define CPROVER_HASH_CONT_H
 
-// you need to pick one of the following three options
-
+// You need to pick one of the following options:
+//
 // #define STL_HASH_NONE
 // #define STL_HASH_STDEXT
 // #define STL_HASH_GNU
 // #define STL_HASH_TR1
 // #define STL_HASH_STD
+//
+// The default is 'STL_HASH_TR1', which will hopefully
+// change one day to 'STL_HASH_STD'.
+
+#if !defined(STL_HASH_NONE) && !defined(STL_HASH_STDEXT) && \
+    !defined(STL_HASH_GNU) && !defined(STL_HASH_TR1) && \
+    !defined(STL_HASH_STD)
+#define STL_HASH_TR1
+#endif
 
 #if defined(STL_HASH_NONE)
 

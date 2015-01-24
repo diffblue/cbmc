@@ -99,7 +99,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   // set a few flags
   symbol.is_lvalue=!symbol.is_type && !symbol.is_macro;
   
-  irep_idt root_name=add_language_prefix(symbol.base_name);
+  irep_idt root_name=symbol.base_name;
   irep_idt new_name=symbol.name;
 
   if(symbol.is_file_local)
@@ -141,9 +141,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
   else
   {
-    // just strip the c::
-    symbol.pretty_name=
-      std::string(id2string(new_name), language_prefix.size(), std::string::npos);
+    symbol.pretty_name=new_name;
   }
   
   // see if we have it already
@@ -430,6 +428,21 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
           // overwrite "extern inline" properties
           old_symbol.is_extern=new_symbol.is_extern;
           old_symbol.is_file_local=new_symbol.is_file_local;
+
+          // remove parameter declarations to avoid conflicts
+          const code_typet::parameterst &old_p=old_ct.parameters();
+          for(code_typet::parameterst::const_iterator
+              p_it=old_p.begin();
+              p_it!=old_p.end();
+              p_it++)
+          {
+            const irep_idt &identifier=p_it->get_identifier();
+
+            symbol_tablet::symbolst::iterator p_s_it=
+              symbol_table.symbols.find(identifier);
+            if(p_s_it!=symbol_table.symbols.end())
+              symbol_table.symbols.erase(p_s_it);
+          }
         }
         else
         {
@@ -661,7 +674,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   typecheck_code(to_code(symbol.value));
 
   // special case for main()  
-  if(symbol.name=="c::main")
+  if(symbol.name==ID_main)
     add_argc_argv(symbol);
 
   // check the labels

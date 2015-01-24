@@ -11,10 +11,9 @@ Date: September 2011
 #ifndef CPROVER_GOTO_INSTRUMENT_MMIO_H
 #define CPROVER_GOTO_INSTRUMENT_MMIO_H
 
-#include <pointer-analysis/value_sets.h>
-
-#include <goto-programs/goto_program.h>
-#include <goto-programs/goto_functions.h>
+class value_setst;
+class symbol_tablet;
+class goto_functionst;
 
 void mmio(
   value_setst &value_sets,

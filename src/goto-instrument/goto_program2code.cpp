@@ -74,16 +74,6 @@ void goto_program2codet::operator()()
         goto_program.instructions.end(),
         toplevel_block);
 
-  replace_symbols.replace(toplevel_block);
-  for(id_listt::const_iterator
-      it=type_names.begin();
-      it!=type_names.end();
-      ++it)
-  {
-    symbolt &symbol=symbol_table.lookup(*it);
-    replace_symbols.replace(symbol.type);
-  }
-
   cleanup_code(toplevel_block, ID_nil);
 }
 
@@ -818,7 +808,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
 /*******************************************************************\
 
-Function: goto_program2codet::convert_goto_switch
+Function: goto_program2codet::get_cases
 
 Inputs:
 
@@ -828,43 +818,16 @@ Purpose:
 
 \*******************************************************************/
 
-goto_programt::const_targett goto_program2codet::convert_goto_switch(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+goto_programt::const_targett goto_program2codet::get_cases(
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  const exprt &switch_var,
+  cases_listt &cases,
+  goto_programt::const_targett &first_target,
+  goto_programt::const_targett &default_target)
 {
-  // try to figure out whether this was a switch/case
-  exprt eq_cand=target->guard;
-  if(eq_cand.id()==ID_or) eq_cand=eq_cand.op0();
-
-  if(target->is_backwards_goto() ||
-     eq_cand.id()!=ID_equal ||
-     !skip_typecast(to_equal_expr(eq_cand).rhs()).is_constant())
-    return convert_goto_if(target, upper_bound, dest);
-
-  const cfg_dominatorst &dominators=loops.get_dominator_info();
-
-  // always use convert_goto_if for dead code as the construction below relies
-  // on effective dominator information 
-  cfg_dominatorst::node_mapt::const_iterator t_entry=
-    dominators.node_map.find(target);
-  assert(t_entry!=dominators.node_map.end());
-  if(t_entry->second.dominators.empty())
-    return convert_goto_if(target, upper_bound, dest);
-
-  // maybe, let's try some more
-  code_switcht s;
-  s.value()=to_equal_expr(eq_cand).lhs();
-  s.body()=code_blockt();
-
-  // find the cases or fall back to convert_goto_if
-  goto_programt::const_targett first_target=goto_program.instructions.end();
   goto_programt::const_targett last_target=goto_program.instructions.end();
   std::set<goto_programt::const_targett> unique_targets;
-
-  cases_listt cases;
-  goto_programt::const_targett default_target=
-    goto_program.instructions.end();
 
   goto_programt::const_targett cases_it=target;
   for( ;
@@ -914,8 +877,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       {
         if(e_it->id()!=ID_equal ||
            !skip_typecast(to_equal_expr(*e_it).rhs()).is_constant() ||
-           s.value()!=to_equal_expr(*e_it).lhs())
-          return convert_goto_if(target, upper_bound, dest);
+           switch_var!=to_equal_expr(*e_it).lhs())
+          return target;
 
         cases.push_back(caset(
             goto_program,
@@ -935,13 +898,13 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       }
     }
     else
-      return convert_goto_if(target, upper_bound, dest);
+      return target;
   }
 
   // if there are less than 3 targets, we revert to if/else instead; this should
   // help convergence
   if(unique_targets.size()<3)
-    return convert_goto_if(target, upper_bound, dest);
+    return target;
 
   // make sure we don't have some overlap of gotos and switch/case
   if(cases_it==upper_bound ||
@@ -950,20 +913,31 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
      (last_target!=goto_program.instructions.end() &&
       last_target->location_number > default_target->location_number) ||
      target->get_target()==default_target)
-    return convert_goto_if(target, upper_bound, dest);
+    return target;
 
-  // backup the top-level block as we might have to backtrack
-  code_blockt toplevel_block_bak=toplevel_block;
+  return cases_it;
+}
 
-  // add any instructions that go in the body of the switch before any cases
-  goto_programt::const_targett orig_target=target;
-  for(target=cases_it; target!=first_target; ++target)
-    target=convert_instruction(target, first_target, s.body());
+/*******************************************************************\
 
-  std::set<unsigned> processed_locations;
+Function: goto_program2codet::set_block_end_points
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+bool goto_program2codet::set_block_end_points(
+  goto_programt::const_targett upper_bound,
+  const cfg_dominatorst &dominators,
+  cases_listt &cases,
+  std::set<unsigned> &processed_locations)
+{
   std::map<goto_programt::const_targett, unsigned> targets_done;
 
-  // iterate over all cases to identify block end points
   for(cases_listt::iterator it=cases.begin();
       it!=cases.end();
       ++it)
@@ -989,24 +963,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       if(n.dominators.empty())
         continue;
 
-      // is this instruction dominated by at least one of the cases
-      bool some_goto_dom=
-        n.dominators.find(it->case_selector)!=n.dominators.end();
-      for(cases_listt::const_iterator it2=cases.begin();
-          it2!=it && !some_goto_dom;
-          ++it2)
-        some_goto_dom=
-          n.dominators.find(it2->case_selector)!=n.dominators.end();
+      // find the last instruction dominated by the case start
+      if(n.dominators.find(it->case_start)==n.dominators.end())
+        break;
 
-      // for code that has jumps into one of the cases from outside the
-      // switch/case we better use convert_goto_if
-      if(n.dominators.find(it->case_start)==n.dominators.end() ||
-         !some_goto_dom)
-      {
-        toplevel_block.swap(toplevel_block_bak);
-        return convert_goto_if(orig_target, upper_bound, dest);
-      }
-      else if(!processed_locations.insert(case_end->location_number).second)
+      if(!processed_locations.insert(case_end->location_number).second)
         assert(false);
 
       it->case_last=case_end;
@@ -1015,8 +976,26 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     targets_done[it->case_start]=1;
   }
 
-  // figure out whether we really had a default target by testing
-  // whether all cases eventually jump to the default case
+  return false;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::remove_default
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+bool goto_program2codet::remove_default(
+  const cfg_dominatorst &dominators,
+  const cases_listt &cases,
+  goto_programt::const_targett default_target)
+{
   for(cases_listt::const_iterator it=cases.begin();
       it!=cases.end();
       ++it)
@@ -1052,8 +1031,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       {
         // if there is no goto here, yet we got here, all others would
         // branch to this - we don't need default
-        cases.pop_back();
-        default_target=goto_program.instructions.end();
+        return true;
       }
     }
 
@@ -1066,7 +1044,95 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     // fall-through is ok
     if(!it->case_last->is_goto()) continue;
 
-    break;
+    return false;
+  }
+
+  return false;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_goto_switch
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_goto_switch(
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    codet &dest)
+{
+  // try to figure out whether this was a switch/case
+  exprt eq_cand=target->guard;
+  if(eq_cand.id()==ID_or) eq_cand=eq_cand.op0();
+
+  if(target->is_backwards_goto() ||
+     eq_cand.id()!=ID_equal ||
+     !skip_typecast(to_equal_expr(eq_cand).rhs()).is_constant())
+    return convert_goto_if(target, upper_bound, dest);
+
+  const cfg_dominatorst &dominators=loops.get_dominator_info();
+
+  // always use convert_goto_if for dead code as the construction below relies
+  // on effective dominator information 
+  cfg_dominatorst::node_mapt::const_iterator t_entry=
+    dominators.node_map.find(target);
+  assert(t_entry!=dominators.node_map.end());
+  if(t_entry->second.dominators.empty())
+    return convert_goto_if(target, upper_bound, dest);
+
+  // maybe, let's try some more
+  code_switcht s;
+  s.value()=to_equal_expr(eq_cand).lhs();
+  s.body()=code_blockt();
+
+  // find the cases or fall back to convert_goto_if
+  cases_listt cases;
+  goto_programt::const_targett first_target=
+    goto_program.instructions.end();
+  goto_programt::const_targett default_target=
+    goto_program.instructions.end();
+
+  goto_programt::const_targett cases_start=
+    get_cases(
+      target,
+      upper_bound,
+      s.value(),
+      cases,
+      first_target,
+      default_target);
+
+  if(cases_start==target)
+    return convert_goto_if(target, upper_bound, dest);
+
+  // backup the top-level block as we might have to backtrack
+  code_blockt toplevel_block_bak=toplevel_block;
+
+  // add any instructions that go in the body of the switch before any cases
+  goto_programt::const_targett orig_target=target;
+  for(target=cases_start; target!=first_target; ++target)
+    target=convert_instruction(target, first_target, s.body());
+
+  std::set<unsigned> processed_locations;
+
+  // iterate over all cases to identify block end points
+  if(set_block_end_points(upper_bound, dominators, cases, processed_locations))
+  {
+    toplevel_block.swap(toplevel_block_bak);
+    return convert_goto_if(orig_target, upper_bound, dest);
+  }
+
+  // figure out whether we really had a default target by testing
+  // whether all cases eventually jump to the default case
+  if(remove_default(dominators, cases, default_target))
+  {
+    cases.pop_back();
+    default_target=goto_program.instructions.end();
   }
 
   // find the last instruction belonging to any of the cases
@@ -1078,7 +1144,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
        it->case_last->location_number > max_target->location_number)
       max_target=it->case_last;
 
-  targets_done.clear();
+  std::map<goto_programt::const_targett, unsigned> targets_done;
   loop_last_stack.push_back(std::make_pair(max_target, false));
 
   // iterate over all <branch conditions, branch instruction, branch target>
@@ -1125,7 +1191,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     {
       // only emit the jump out of the switch if it's not the last case
       // this improves convergence
-      if(it!=--cases.end())
+      if(it->case_start!=(--cases.end())->case_start)
       {
         assert(false);
         goto_programt::instructiont i=*(it->case_selector);
@@ -1703,7 +1769,8 @@ void goto_program2codet::cleanup_code(
     code_function_callt::argumentst &arguments=call.arguments();
 
     // don't edit function calls we might have introduced
-    if(has_prefix(id2string(fn.get_identifier()), "c::"))
+    const symbolt *s;
+    if(!ns.lookup(fn.get_identifier(), s))
     {
       const symbolt &fn_sym=ns.lookup(fn.get_identifier());
       const code_typet &code_type=to_code_type(fn_sym.type);
@@ -2150,7 +2217,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
           irep_idt suffix;
           suffix=expr.type().get(ID_C_c_type);
 
-          if(symbol_table.symbols.find("c::nondet_"+id2string(suffix))==
+          if(symbol_table.symbols.find("nondet_"+id2string(suffix))==
              symbol_table.symbols.end())
             base_name="nondet_"+id2string(suffix);
         }
@@ -2159,7 +2226,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
         {
           unsigned count;
           for(count=0;
-              symbol_table.symbols.find("c::nondet_"+i2string(count))!=
+              symbol_table.symbols.find("nondet_"+i2string(count))!=
               symbol_table.symbols.end();
               count++);
           base_name="nondet_"+i2string(count);
@@ -2170,7 +2237,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
         
         symbolt symbol;
         symbol.base_name=base_name;
-        symbol.name="c::"+id2string(base_name);
+        symbol.name=base_name;
         symbol.type=code_type;
         id=symbol.name;
         
@@ -2203,19 +2270,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     }
     else if(expr.type().id()==ID_pointer)
       add_local_types(expr.type());
-    else if(expr.type().id()==ID_bool)
+    else if(expr.type().id()==ID_bool ||
+            expr.type().id()==ID_c_bool)
     {
       expr=from_integer(
         expr.is_true()?1:0,
-        signedbv_typet(config.ansi_c.int_width));
-      expr.make_typecast(bool_typet());
-    }
-    else if((expr.type().id()==ID_unsignedbv ||
-             expr.type().id()==ID_signedbv) &&
-            expr.type().get(ID_C_c_type)==ID_bool)
-    {
-      expr=from_integer(
-        expr.is_zero()?0:1,
         signedbv_typet(config.ansi_c.int_width));
       expr.make_typecast(bool_typet());
     }
@@ -2226,7 +2285,12 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       add_local_types(static_cast<const typet &>(c_sizeof_type));
   }
   else if(expr.id()==ID_typecast)
-    add_local_types(expr.type());
+  {
+    if(ns.follow(expr.type()).id()==ID_c_bit_field)
+      expr=to_typecast_expr(expr).op();
+    else
+      add_local_types(expr.type());
+  }
   else if(expr.id()==ID_symbol)
   {
     if(expr.type().id()!=ID_code)

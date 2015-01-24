@@ -3,6 +3,7 @@ nil
 type
 operands
 bool
+c_bool
 proper_bool
 signedbv
 unsignedbv
@@ -12,8 +13,6 @@ fixedbv
 C_source_location #source_location
 C_end_location #end_location
 C_is_padding #is_padding
-is_bit_field
-C_bit_field_type #bit_field_type
 file
 line
 column
@@ -22,8 +21,6 @@ property
 property_class
 property_id
 function
-subtype
-subtypes
 code
 typecast
 static_cast
@@ -115,6 +112,9 @@ complex
 signed
 unsigned
 asm
+gcc_asm_input
+gcc_asm_output
+gcc_asm_clobbered_register
 incomplete_array
 incomplete_struct
 incomplete_union
@@ -129,7 +129,7 @@ declaration
 declaration_list
 declarator
 struct
-c_bitfield
+c_bit_field
 union
 class
 merged_type
@@ -210,6 +210,7 @@ output_register
 inout
 nondet
 NULL
+nullptr
 c_enum
 enum
 elements
@@ -281,6 +282,7 @@ casez
 case_item
 C_inlined #inlined
 C_hide #hide
+hide
 abs
 sign
 access
@@ -319,6 +321,7 @@ gcc_builtin_va_arg
 gcc_builtin_types_compatible_p
 gcc_builtin_va_arg_next
 gcc_builtin_va_list
+gcc_float80
 gcc_float128
 gcc_int128
 gcc_decimal32
@@ -463,6 +466,8 @@ pmos
 rnmos
 rpmos
 wchar_t
+char16_t
+char32_t
 size_t
 ssize_t
 inst
@@ -575,6 +580,7 @@ unassigned
 new_object
 complex_real
 complex_imag
+imag
 msc_try_except
 msc_try_finally
 msc_leave

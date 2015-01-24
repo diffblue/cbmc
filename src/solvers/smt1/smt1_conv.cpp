@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
 #include <solvers/flattening/flatten_byte_operators.h>
+#include <solvers/flattening/c_bit_field_replacement_type.h>
 
 #include "smt1_conv.h"
 
@@ -44,7 +45,7 @@ void smt1_convt::print_assignment(std::ostream &out) const
 {
   // Boolean stuff
   
-  for(unsigned v=0; v<boolean_assignment.size(); v++)
+  for(std::size_t v=0; v<boolean_assignment.size(); v++)
     out << "b" << v << "=" << boolean_assignment[v] << "\n";
 
   // others
@@ -255,14 +256,14 @@ exprt smt1_convt::ce_value(
         
       if(!to_integer(to_array_type(type).size(), size))
       {
-        unsigned size_int=integer2unsigned(size);
-        unsigned sub_width=value.size()/size_int;
+        std::size_t size_int=integer2unsigned(size);
+        std::size_t sub_width=value.size()/size_int;
         exprt array_list(ID_array, type);
         array_list.operands().resize(size_int);
         
-        unsigned offset=value.size();
+        std::size_t offset=value.size();
         
-        for(unsigned i=0; i!=size_int; i++)
+        for(std::size_t i=0; i!=size_int; i++)
         {
           offset-=sub_width;
           std::string sub_value=value.substr(offset, sub_width);
@@ -503,14 +504,14 @@ void smt1_convt::convert_byte_update(
   if(to_integer(expr.op1(), i))
     throw "byte_update takes constant as second operand";
 
-  unsigned w=boolbv_width(expr.op0().type());
+  std::size_t w=boolbv_width(expr.op0().type());
 
   if(w==0)
     throw "failed to get width of byte_update operand";
 
   mp_integer upper, lower; // of the byte
   mp_integer max=w-1;
-  unsigned op_w = boolbv_width(expr.op2().type());
+  std::size_t op_w = boolbv_width(expr.op2().type());
 
   if(expr.id()==ID_byte_update_little_endian)
   {
@@ -1011,8 +1012,8 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
       // SMT1 requires the shift distance to have the same width as
       // the value that is shifted -- odd!
 
-      unsigned width_op0=boolbv_width(expr.op0().type());
-      unsigned width_op1=boolbv_width(expr.op1().type());
+      std::size_t width_op0=boolbv_width(expr.op0().type());
+      std::size_t width_op1=boolbv_width(expr.op1().type());
 
       if(width_op0==width_op1)
         convert_expr(expr.op1(), true);
@@ -1051,7 +1052,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    unsigned op_width=boolbv_width(expr.op0().type());
+    std::size_t op_width=boolbv_width(expr.op0().type());
     out << "(zero_extend[" << BV_ADDR_BITS << "] (extract["
         << (op_width-1-BV_ADDR_BITS)
         << ":0] ";
@@ -1063,7 +1064,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    unsigned op_width=boolbv_width(expr.op0().type());
+    std::size_t op_width=boolbv_width(expr.op0().type());
     signed int ext=(int)boolbv_width(expr.type())-(int)BV_ADDR_BITS;
 
     if(ext>0)
@@ -1088,7 +1089,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    unsigned op_width=boolbv_width(expr.op0().type());
+    std::size_t op_width=boolbv_width(expr.op0().type());
 
     // this may have to be converted
     from_bool_begin(type, bool_as_bv);
@@ -1190,7 +1191,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_width)
   {
-    unsigned result_width=boolbv_width(expr.type());
+    std::size_t result_width=boolbv_width(expr.type());
     
     if(result_width==0)
       throw "conversion failed";
@@ -1198,7 +1199,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     if(expr.operands().size()!=1)
       throw "width expects 1 operand";
 
-    unsigned op_width=boolbv_width(expr.op0().type());
+    std::size_t op_width=boolbv_width(expr.op0().type());
     
     if(op_width==0)
       throw "conversion failed";
@@ -1212,7 +1213,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     assert(expr.operands().size()==1);
     const exprt &op0=expr.op0();
 
-    unsigned result_width=boolbv_width(type);
+    std::size_t result_width=boolbv_width(type);
     
     if(result_width==0)
       throw "conversion failed";
@@ -1321,7 +1322,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     const typet &op_type=expr.op0().type();
 
-    unsigned width=boolbv_width(op_type);
+    std::size_t width=boolbv_width(op_type);
 
     if(op_type.id()==ID_signedbv)
     {
@@ -1367,7 +1368,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     // with max value.
     
     const typet &op_type=expr.op0().type();
-    unsigned width=boolbv_width(op_type);
+    std::size_t width=boolbv_width(op_type);
 
     if(op_type.id()==ID_signedbv)
     {
@@ -1474,7 +1475,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     out << it->second;
 
-    unsigned i=0;
+    std::size_t i=0;
     forall_expr(it, operands)
     {
       exprt index=from_integer(i, unsignedbv_typet(array_index_bits));
@@ -1514,98 +1515,132 @@ void smt1_convt::convert_typecast(
   bool bool_as_bv)
 {
   assert(expr.operands().size()==1);
-  const exprt &op=expr.op0();
-  const typet &expr_type=ns.follow(expr.type());
-  const typet &op_type=ns.follow(op.type());
+  const exprt &src=expr.op0();
 
-  if(expr_type.id()==ID_bool)
+  typet dest_type=ns.follow(expr.type());
+  if(dest_type.id()==ID_c_enum_tag)
+    dest_type=ns.follow_tag(to_c_enum_tag_type(dest_type));
+
+  typet src_type=ns.follow(src.type());
+  if(src_type.id()==ID_c_enum_tag)
+    src_type=ns.follow_tag(to_c_enum_tag_type(src_type));
+
+  if(dest_type.id()==ID_bool)
   {
     // boolean typecasts may have to be converted
-    from_bool_begin(expr_type, bool_as_bv);
+    from_bool_begin(dest_type, bool_as_bv);
 
     // this is comparison with zero
-    if(op_type.id()==ID_signedbv ||
-       op_type.id()==ID_unsignedbv ||
-       op_type.id()==ID_fixedbv ||
-       op_type.id()==ID_pointer)
+    if(src_type.id()==ID_signedbv ||
+       src_type.id()==ID_unsignedbv ||
+       src_type.id()==ID_fixedbv ||
+       src_type.id()==ID_c_bit_field ||
+       src_type.id()==ID_pointer)
     {
       out << "(not (= ";
-      convert_expr(op, true);
+      convert_expr(src, true);
       out << " ";
-      convert_expr(gen_zero(op_type), true);
+      convert_expr(gen_zero(src_type), true);
       out << "))";
     }
     else
     {
-      throw "TODO typecast1 "+op_type.id_string()+" -> bool";
+      throw "TODO typecast1 "+src_type.id_string()+" -> bool";
     }
 
     // boolean typecasts may have to be converted
-    from_bool_end(expr_type, bool_as_bv);
+    from_bool_end(dest_type, bool_as_bv);
   }
-  else if(expr_type.id()==ID_signedbv ||
-          expr_type.id()==ID_unsignedbv ||
-          expr_type.id()==ID_c_enum)
+  else if(dest_type.id()==ID_c_bool)
   {
-    unsigned to_width=boolbv_width(expr_type);
-
-    if(op_type.id()==ID_signedbv || // from signedbv
-       op_type.id()==ID_unsignedbv || // from unsigedbv
-       op_type.id()==ID_c_enum)
+    // this is comparison with zero
+    if(src_type.id()==ID_signedbv ||
+       src_type.id()==ID_unsignedbv ||
+       src_type.id()==ID_fixedbv ||
+       src_type.id()==ID_c_bit_field ||
+       src_type.id()==ID_pointer)
     {
-      unsigned from_width=boolbv_width(op_type);
+      std::size_t to_width=boolbv_width(dest_type);
+
+      out << "(ite ";
+      out << "(not (= ";
+      convert_expr(src, true);
+      out << " ";
+      convert_expr(gen_zero(src_type), true);
+      out << ")) "; // not, =
+      out << " bv1[" << to_width << "]";
+      out << " bv0[" << to_width << "]";
+      out << ")"; // ite
+    }
+    else
+    {
+      throw "TODO typecast1 "+src_type.id_string()+" -> bool";
+    }
+  }
+  else if(dest_type.id()==ID_signedbv ||
+          dest_type.id()==ID_unsignedbv ||
+          dest_type.id()==ID_c_enum)
+  {
+    std::size_t to_width=boolbv_width(dest_type);
+
+    if(src_type.id()==ID_signedbv || // from signedbv
+       src_type.id()==ID_unsignedbv || // from unsigedbv
+       src_type.id()==ID_c_bool ||
+       src_type.id()==ID_c_enum)
+    {
+      std::size_t from_width=boolbv_width(src_type);
 
       if(from_width==to_width)
-        convert_expr(op, true); // ignore
+        convert_expr(src, true); // ignore
       else if(from_width<to_width) // extend
       {
-        if(op_type.id()==ID_signedbv)
+        if(src_type.id()==ID_signedbv)
           out << "(sign_extend[";
         else
           out << "(zero_extend[";
 
         out << (to_width-from_width)
             << "] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")";
       }
       else // chop off extra bits
       {
         out << "(extract[" << (to_width-1) << ":0] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")";
       }
     }
-    else if(op_type.id()==ID_fixedbv) // from fixedbv to integer
+    else if(src_type.id()==ID_fixedbv) // from fixedbv to integer
     {
-      const fixedbv_typet &fixedbv_op_type=to_fixedbv_type(op_type);
+      const fixedbv_typet &fixedbv_src_type=to_fixedbv_type(src_type);
 
-      unsigned from_width=fixedbv_op_type.get_width();
-      unsigned from_integer_bits=fixedbv_op_type.get_integer_bits();
-      unsigned from_fraction_bits=fixedbv_op_type.get_fraction_bits();
+      std::size_t from_width=fixedbv_src_type.get_width();
+      std::size_t from_integer_bits=fixedbv_src_type.get_integer_bits();
+      std::size_t from_fraction_bits=fixedbv_src_type.get_fraction_bits();
 
       if(to_width>from_integer_bits)
       {
         out << "(sign_extend[" << (to_width-from_integer_bits) << "] ";
         out << "(extract[" << (from_width-1) << ":"
             << from_fraction_bits << "] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << "))";
       }
       else
       {
         out << "(extract[" << (from_fraction_bits+to_width-1)
             << ":" << from_fraction_bits << "] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")";
       }
     }
-    else if(op_type.id()==ID_bool) // from boolean
+    else if(src_type.id()==ID_bool) // from boolean
     {
       out << "(ite ";
-      convert_expr(op, false);
+      convert_expr(src, false);
 
-      if(expr_type.id()==ID_fixedbv)
+      if(dest_type.id()==ID_fixedbv)
       {
         fixedbv_spect spec(to_fixedbv_type(expr.type()));
         out << " (concat bv1[" << spec.integer_bits << "] " <<
@@ -1620,84 +1655,97 @@ void smt1_convt::convert_typecast(
 
       out << ")";
     }
-    else if(op_type.id()==ID_pointer) // from pointer to int
+    else if(src_type.id()==ID_pointer) // from pointer to int
     {
-      unsigned from_width=boolbv_width(op_type);
+      std::size_t from_width=boolbv_width(src_type);
 
       if(from_width<to_width) // extend
       {
         out << "(zero_extend[";
         out << (to_width-from_width)
             << "] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")";
       }
       else // chop off extra bits
       {
         out << "(extract[" << (to_width-1) << ":0] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")";
       }
     }
-    else if(op_type.id()==ID_integer) // from integer to bit-vector
+    else if(src_type.id()==ID_integer) // from integer to bit-vector
     {
       // must be constant
-      if(op.is_constant())
+      if(src.is_constant())
       {
         mp_integer i;
-        to_integer(op, i);
+        to_integer(src, i);
         out << "bv" << i << "[" << to_width << "]";
       }
       else
         throw "can't convert non-constant integer to bitvector";
     }
+    else if(src_type.id()==ID_c_bit_field)
+    {
+      std::size_t from_width=boolbv_width(src_type);
+
+      if(from_width==to_width)
+        convert_expr(src, bool_as_bv); // ignore
+      else
+      {
+        typet t=c_bit_field_replacement_type(to_c_bit_field_type(src_type), ns);
+        typecast_exprt tmp(typecast_exprt(src, t), dest_type);
+        convert_typecast(tmp, bool_as_bv);
+      }
+    }
     else
     {
-      throw "TODO typecast2 "+op_type.id_string()+
-            " -> "+expr_type.id_string();
+      throw "TODO typecast2 "+src_type.id_string()+
+            " -> "+dest_type.id_string();
     }
   }
-  else if(expr_type.id()==ID_fixedbv) // to fixedbv
+  else if(dest_type.id()==ID_fixedbv) // to fixedbv
   {
-    const fixedbv_typet &fixedbv_type=to_fixedbv_type(expr_type);
-    unsigned to_fraction_bits=fixedbv_type.get_fraction_bits();
-    unsigned to_integer_bits=fixedbv_type.get_integer_bits();
+    const fixedbv_typet &fixedbv_type=to_fixedbv_type(dest_type);
+    std::size_t to_fraction_bits=fixedbv_type.get_fraction_bits();
+    std::size_t to_integer_bits=fixedbv_type.get_integer_bits();
 
-    if(op_type.id()==ID_unsignedbv ||
-       op_type.id()==ID_signedbv ||
-       op_type.id()==ID_c_enum)
+    if(src_type.id()==ID_unsignedbv ||
+       src_type.id()==ID_signedbv ||
+       src_type.id()==ID_c_enum)
     {
       // integer to fixedbv
-      unsigned from_width=to_bitvector_type(op_type).get_width();
+      std::size_t from_width=to_bitvector_type(src_type).get_width();
       
       // we just concatenate a zero-valued fractional part
       out << "(concat";
 
       if(from_width==to_integer_bits)
-        convert_expr(op, true);
+        convert_expr(src, true);
       else if(from_width>to_integer_bits)
       {
         // too many integer bits, chop some off
         out << " (extract[" << (to_integer_bits-1) << ":0] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")";
       }
       else
       {
         // too few integer bits
         assert(from_width<to_integer_bits);
-        if(expr_type.id()==ID_unsignedbv)
+        if(dest_type.id()==ID_unsignedbv)
         {
           out << " (zero_extend["
               << (to_integer_bits-from_width) << "] ";
-          convert_expr(op, true);
+          convert_expr(src, true);
           out << ")";
         }
         else
         {
           out << " (sign_extend["
               << (to_integer_bits-from_width) << "] ";
-          convert_expr(op, true);
+          convert_expr(src, true);
           out << ")";
         }
       }
@@ -1705,23 +1753,23 @@ void smt1_convt::convert_typecast(
       out << " bv0[" << to_fraction_bits << "]";
       out << ")"; // concat
     }
-    else if(op_type.id()==ID_bool)
+    else if(src_type.id()==ID_bool)
     {
       // bool to fixedbv
       out << "(concat (concat bv0[" << (to_integer_bits-1) << "]"
           << " ";
-      convert_expr(op, true); // this returns a 1-bit bit-vector
+      convert_expr(src, true); // this returns a 1-bit bit-vector
       out << ")"; // concat
       out << " bv0[" << to_fraction_bits << "]";
       out << ")"; // concat
     }
-    else if(op_type.id()==ID_fixedbv)
+    else if(src_type.id()==ID_fixedbv)
     {
       // fixedbv to fixedbv
-      const fixedbv_typet &from_fixedbv_type=to_fixedbv_type(op_type);
-      unsigned from_fraction_bits=from_fixedbv_type.get_fraction_bits();
-      unsigned from_integer_bits=from_fixedbv_type.get_integer_bits();
-      unsigned from_width=from_fixedbv_type.get_width();
+      const fixedbv_typet &from_fixedbv_type=to_fixedbv_type(src_type);
+      std::size_t from_fraction_bits=from_fixedbv_type.get_fraction_bits();
+      std::size_t from_integer_bits=from_fixedbv_type.get_integer_bits();
+      std::size_t from_width=from_fixedbv_type.get_width();
 
       // let is only allowed in formulas...
       out << "(concat ";
@@ -1732,7 +1780,7 @@ void smt1_convt::convert_typecast(
             << (from_fraction_bits+to_integer_bits-1) << ":"
             << from_fraction_bits
             << "] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")";
       }
       else
@@ -1744,7 +1792,7 @@ void smt1_convt::convert_typecast(
             << (from_width-1) << ":"
             << from_fraction_bits
             << "] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << "))";
       }
 
@@ -1756,7 +1804,7 @@ void smt1_convt::convert_typecast(
             << (from_fraction_bits-1) << ":"
             << (from_fraction_bits-to_fraction_bits)
             << "] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")";
       }
       else
@@ -1764,7 +1812,7 @@ void smt1_convt::convert_typecast(
         assert(to_fraction_bits>from_fraction_bits);
         out << "(concat (extract["
             << (from_fraction_bits-1) << ":0] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")"
             << " bv0[" << to_fraction_bits-from_fraction_bits
             << "])";
@@ -1775,28 +1823,28 @@ void smt1_convt::convert_typecast(
     else
       throw "unexpected typecast to fixedbv";
   }
-  else if(expr_type.id()==ID_pointer)
+  else if(dest_type.id()==ID_pointer)
   {
-    unsigned to_width=boolbv_width(expr_type);
+    std::size_t to_width=boolbv_width(dest_type);
   
-    if(op_type.id()==ID_pointer)
+    if(src_type.id()==ID_pointer)
     {
       // this just passes through
-      convert_expr(op, true);
+      convert_expr(src, true);
     }
-    else if(op_type.id()==ID_unsignedbv ||
-            op_type.id()==ID_signedbv)
+    else if(src_type.id()==ID_unsignedbv ||
+            src_type.id()==ID_signedbv)
     {
-      unsigned from_width=boolbv_width(op_type);
+      std::size_t from_width=boolbv_width(src_type);
 
       if(from_width==to_width)
-        convert_expr(op, true); // pass through
+        convert_expr(src, true); // pass through
       else if(from_width<to_width)
       {
         out << "(zero_extend["
             << (to_width-from_width)
             << "] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")"; // zero_extend
       }
       else // from_width>to_width
@@ -1804,19 +1852,33 @@ void smt1_convt::convert_typecast(
         out << "(extract["
             << to_width
             << ":0] ";
-        convert_expr(op, true);
+        convert_expr(src, true);
         out << ")"; // extract
       }
     }
     else
-      throw "TODO typecast3 "+op_type.id_string()+" -> pointer";
+      throw "TODO typecast3 "+src_type.id_string()+" -> pointer";
   }
-  else if(expr_type.id()==ID_range)
+  else if(dest_type.id()==ID_range)
   {
     throw "TODO range typecast";
   }
+  else if(dest_type.id()==ID_c_bit_field)
+  {
+    std::size_t from_width=boolbv_width(src_type);
+    std::size_t to_width=boolbv_width(dest_type);
+
+    if(from_width==to_width)
+      convert_expr(src, bool_as_bv); // ignore
+    else
+    {
+      typet t=c_bit_field_replacement_type(to_c_bit_field_type(dest_type), ns);
+      typecast_exprt tmp(typecast_exprt(src, t), dest_type);
+      convert_typecast(tmp, bool_as_bv);
+    }  
+  }
   else
-    throw "TODO typecast4 ? -> "+expr_type.id_string();
+    throw "TODO typecast4 ? -> "+dest_type.id_string();
 }
 
 /*******************************************************************\
@@ -1853,17 +1915,17 @@ void smt1_convt::convert_struct(const exprt &expr)
   }
   else
   {
-    unsigned nr_ops=0;
+    std::size_t nr_ops=0;
 
-    for(unsigned i=0; i<components.size(); i++)
+    for(std::size_t i=0; i<components.size(); i++)
       if(expr.operands()[i].type().id()!=ID_code)
         nr_ops++;
 
-    for(unsigned i=1; i<nr_ops; i++) // one less
+    for(std::size_t i=1; i<nr_ops; i++) // one less
       out << "(concat ";
 
     bool first=true;
-    for(unsigned i=0; i<components.size(); i++)
+    for(std::size_t i=0; i<components.size(); i++)
     {
       const exprt &op=expr.operands()[i];
 
@@ -1902,8 +1964,8 @@ void smt1_convt::convert_union(const exprt &expr)
   assert(expr.operands().size()==1);
   const exprt &op=expr.op0();
 
-  unsigned total_width=boolbv_width(union_type);  
-  unsigned member_width=boolbv_width(op.type());
+  std::size_t total_width=boolbv_width(union_type);  
+  std::size_t member_width=boolbv_width(op.type());
 
   if(total_width==0)
     throw "failed to get union width for union";
@@ -1943,14 +2005,17 @@ void smt1_convt::convert_constant(
   if(expr.type().id()==ID_unsignedbv ||
      expr.type().id()==ID_signedbv ||
      expr.type().id()==ID_bv ||
-     expr.type().id()==ID_c_enum)
+     expr.type().id()==ID_c_enum ||
+     expr.type().id()==ID_c_enum_tag ||
+     expr.type().id()==ID_c_bool ||
+     expr.type().id()==ID_c_bit_field)
   {
     mp_integer value;
 
     if(to_integer(expr, value))
       throw "failed to convert bitvector constant";
 
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
 
     if(value<0) value=power(2, width)+value;
 
@@ -2087,7 +2152,7 @@ void smt1_convt::convert_is_dynamic_object(
 
   assert(expr.operands().size()==1);
   assert(expr.op0().type().id()==ID_pointer);
-  unsigned op_width=boolbv_width(expr.op0().type());
+  std::size_t op_width=boolbv_width(expr.op0().type());
 
   // this may have to be converted
   from_bool_begin(expr.type(), bool_as_bv);
@@ -2422,7 +2487,7 @@ void smt1_convt::convert_div(const div_exprt &expr)
   else if(expr.type().id()==ID_fixedbv)
   {
     fixedbv_spect spec(to_fixedbv_type(expr.type()));
-    unsigned fraction_bits=spec.get_fraction_bits();
+    std::size_t fraction_bits=spec.get_fraction_bits();
 
     out << "(extract[" << spec.width-1 << ":0] ";
     out << "(bvsdiv ";
@@ -2505,7 +2570,7 @@ void smt1_convt::convert_mult(const mult_exprt &expr)
   else if(expr.type().id()==ID_fixedbv)
   {
     fixedbv_spect spec(to_fixedbv_type(expr.type()));
-    unsigned fraction_bits=spec.get_fraction_bits();
+    std::size_t fraction_bits=spec.get_fraction_bits();
 
     // strip away faction_bits off the result
     out << "(extract[" << spec.width+fraction_bits-1 << ":"
@@ -2576,7 +2641,7 @@ void smt1_convt::convert_with(const exprt &expr)
   
   if(expr.operands().size()>3)
   {
-    unsigned s=expr.operands().size();
+    std::size_t s=expr.operands().size();
   
     // strip of the trailing two operands
     exprt tmp=expr;
@@ -2612,12 +2677,12 @@ void smt1_convt::convert_with(const exprt &expr)
       
       const typet &struct_op_type=ns.follow(struct_op.type());
 
-      unsigned total_width=boolbv_width(struct_op_type);
+      std::size_t total_width=boolbv_width(struct_op_type);
       
       if(total_width==0)
         throw "failed to get struct width";
 
-      unsigned offset;
+      std::size_t offset;
       
       if(struct_op_type.id()==ID_struct)
         offset=boolbv_width.get_member(
@@ -2627,17 +2692,17 @@ void smt1_convt::convert_with(const exprt &expr)
       else
         assert(false);
 
-      unsigned width=boolbv_width(expr.type());
+      std::size_t width=boolbv_width(expr.type());
 
       if(width==0)
         throw "failed to get struct member width";
 
-      unsigned elem_width=boolbv_width(elem_type);
+      std::size_t elem_width=boolbv_width(elem_type);
 
       if(elem_width==0)
         throw "failed to get struct width";
 
-      unsigned array_bits=(offset+width) - offset;
+      std::size_t array_bits=(offset+width) - offset;
 
       assert(expr.operands().size()==3);
       const exprt &index=expr.operands()[1];
@@ -2698,12 +2763,12 @@ void smt1_convt::convert_with(const exprt &expr)
 
       const index_exprt &index_expr=to_index_expr(array);
 
-      unsigned width=boolbv_width(expr.type());
+      std::size_t width=boolbv_width(expr.type());
 
       if(width==0)
         throw "failed to get width of 2nd dimension array";
 
-      unsigned elem_width=boolbv_width(elem_type);
+      std::size_t elem_width=boolbv_width(elem_type);
 
       if(elem_width==0)
         throw "failed to get array element width";
@@ -2778,17 +2843,17 @@ void smt1_convt::convert_with(const exprt &expr)
     const exprt &index=expr.op1();
     const exprt &value=expr.op2();
 
-    unsigned total_width=boolbv_width(expr.type());
+    std::size_t total_width=boolbv_width(expr.type());
 
     if(total_width==0)
       throw "failed to get struct width for with";
 
-    unsigned width=boolbv_width(value.type());
+    std::size_t width=boolbv_width(value.type());
 
     if(width==0)
       throw "failed to get member width for with";
 
-    unsigned offset=boolbv_width.get_member(
+    std::size_t offset=boolbv_width.get_member(
       struct_type, index.get(ID_component_name)).offset;
 
     if(total_width==width)
@@ -2825,12 +2890,12 @@ void smt1_convt::convert_with(const exprt &expr)
 
     const exprt &value=expr.op2();
 
-    unsigned total_width=boolbv_width(union_type);
+    std::size_t total_width=boolbv_width(union_type);
     
     if(total_width==0)
       throw "failed to get union width for with";
 
-    unsigned member_width=boolbv_width(value.type());
+    std::size_t member_width=boolbv_width(value.type());
 
     if(member_width==0)
       throw "failed to get union member width for with";
@@ -2856,7 +2921,7 @@ void smt1_convt::convert_with(const exprt &expr)
   {
     // Update bits in a bit-vector. We will use masking and shifts.
 
-    unsigned total_width=boolbv_width(expr_type);
+    std::size_t total_width=boolbv_width(expr_type);
     
     if(total_width==0)
       throw "failed to get total width";
@@ -2865,7 +2930,7 @@ void smt1_convt::convert_with(const exprt &expr)
     const exprt &index=expr.operands()[1];
     const exprt &value=expr.operands()[2];
 
-    unsigned value_width=boolbv_width(value.type());
+    std::size_t value_width=boolbv_width(value.type());
 
     if(value_width==0)
       throw "failed to get value width";
@@ -2951,11 +3016,11 @@ void smt1_convt::convert_index(const index_exprt &expr, bool bool_as_bv)
     const typet &array_type=to_array_type(expr.array().type());
     const typet &elem_type=array_type.subtype();
 
-    unsigned width=boolbv_width(expr.array().type());
+    std::size_t width=boolbv_width(expr.array().type());
     if(width==0)
       throw "failed to get array width";
 
-    unsigned elem_width=boolbv_width(elem_type);
+    std::size_t elem_width=boolbv_width(elem_type);
 
     if(elem_width==0)
       throw "failed to get struct width";
@@ -3015,10 +3080,10 @@ void smt1_convt::convert_member(const member_exprt &expr, bool bool_as_bv)
 
   if(struct_op_type.id()==ID_struct)
   {
-    unsigned offset=boolbv_width.get_member(
-                      to_struct_type(struct_op_type), name).offset;
+    std::size_t offset=boolbv_width.get_member(
+                       to_struct_type(struct_op_type), name).offset;
 
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
     
     if(width==0)
       throw "failed to get struct member width";
@@ -3033,7 +3098,7 @@ void smt1_convt::convert_member(const member_exprt &expr, bool bool_as_bv)
   }
   else if(struct_op_type.id()==ID_union)
   {
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
 
     if(width==0)
       throw "failed to get union member width";
@@ -3281,7 +3346,7 @@ void smt1_convt::convert_type(const typet &type)
     
     out << "Array[" << array_index_bits << ":";
 
-    unsigned width=boolbv_width(array_type.subtype());
+    std::size_t width=boolbv_width(array_type.subtype());
     
     if(width==0)
       throw "failed to get width of array subtype";
@@ -3295,7 +3360,7 @@ void smt1_convt::convert_type(const typet &type)
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    unsigned width=boolbv_width(type);
+    std::size_t width=boolbv_width(type);
     
     if(width==0)
       throw "failed to get width of struct/union";
@@ -3305,7 +3370,7 @@ void smt1_convt::convert_type(const typet &type)
   else if(type.id()==ID_pointer ||
           type.id()==ID_reference)
   {
-    unsigned width=boolbv_width(type);
+    std::size_t width=boolbv_width(type);
 
     if(width==0)
       throw "failed to get width of pointer/reference";
@@ -3318,10 +3383,13 @@ void smt1_convt::convert_type(const typet &type)
           type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
           type.id()==ID_c_enum ||
+          type.id()==ID_c_bool ||
           type.id()==ID_vector)
   {
     out << "BitVec[" << boolbv_width(type) << "]";
   }
+  else if(type.id()==ID_c_enum_tag)
+    convert_type(ns.follow_tag(to_c_enum_tag_type(type)));
   else if(type.id()==ID_rational)
     out << "Real";
   else if(type.id()==ID_integer)
@@ -3484,7 +3552,7 @@ void smt1_convt::find_symbols_rec(
     const struct_union_typet::componentst &components=
       to_struct_union_type(type).components();
 
-    for(unsigned i=0; i<components.size(); i++)
+    for(std::size_t i=0; i<components.size(); i++)
       find_symbols_rec(components[i].type(), recstack);
   }
   else if(type.id()==ID_code)
@@ -3492,7 +3560,7 @@ void smt1_convt::find_symbols_rec(
     const code_typet::parameterst &parameters=
       to_code_type(type).parameters();
 
-    for(unsigned i=0; i<parameters.size(); i++)
+    for(std::size_t i=0; i<parameters.size(); i++)
       find_symbols_rec(parameters[i].type(), recstack);
 
     find_symbols_rec(to_code_type(type).return_type(), recstack);
@@ -3536,7 +3604,7 @@ exprt smt1_convt::binary2struct(
 {
   const struct_typet::componentst &components=type.components();
 
-  unsigned total_width=boolbv_width(type);
+  std::size_t total_width=boolbv_width(type);
 
   if(total_width==0)
     throw "failed to get struct width";
@@ -3544,13 +3612,13 @@ exprt smt1_convt::binary2struct(
   exprt e(ID_struct, type);
   e.operands().resize(components.size());
 
-  unsigned index=binary.size();
-  for(unsigned i=0; i<components.size(); i++)
+  std::size_t index=binary.size();
+  for(std::size_t i=0; i<components.size(); i++)
   {
     const struct_typet::componentt &comp=components[i];
     const typet &sub_type=ns.follow(comp.type());
 
-    unsigned sub_size=boolbv_width(sub_type);
+    std::size_t sub_size=boolbv_width(sub_type);
     
     if(sub_size==0)
       throw "failed to get component width";
@@ -3580,8 +3648,7 @@ exprt smt1_convt::binary2union(
   const union_typet &type,
   const std::string &binary) const
 {
-
-  unsigned total_width=boolbv_width(type);
+  std::size_t total_width=boolbv_width(type);
 
   if(total_width==0)
     throw "failed to get union width";
@@ -3590,7 +3657,7 @@ exprt smt1_convt::binary2union(
 
   // Taking the first component should work.
   // Maybe a better idea is to take a largest component
-  unsigned component_nr=0;
+  std::size_t component_nr=0;
  
   // construct a union expr  
   union_exprt e(type);
@@ -3598,7 +3665,7 @@ exprt smt1_convt::binary2union(
   e.set_component_name(components[component_nr].get_name());
 
   const typet &sub_type=ns.follow(components[component_nr].type());
-  unsigned comp_width=boolbv_width(sub_type);
+  std::size_t comp_width=boolbv_width(sub_type);
   assert(comp_width<=total_width);
 
   std::string cval=binary.substr(total_width-comp_width, comp_width);
@@ -3632,7 +3699,7 @@ void smt1_convt::flatten_array(const exprt &op)
   if(to_integer(size, sizei))
     throw "array with non-constant size";
 
-  unsigned elem_width=boolbv_width(elem_type);
+  std::size_t elem_width=boolbv_width(elem_type);
   
   if(elem_width==0)
     throw "failed to get width of array subtype";
@@ -3682,7 +3749,7 @@ void smt1_convt::convert_nary(
   const irep_idt op_string,
   bool bool_as_bv)
 {
-  unsigned num_ops=expr.operands().size();
+  std::size_t num_ops=expr.operands().size();
 
   assert(num_ops>0);
 
@@ -3693,7 +3760,7 @@ void smt1_convt::convert_nary(
     exprt::operandst::const_iterator it=
       expr.operands().begin();
 
-    for(unsigned i=0; i<num_ops-1; ++i, ++it)
+    for(std::size_t i=0; i<num_ops-1; ++i, ++it)
     {
       out << "(" << op_string << " ";
       convert_expr(*it, bool_as_bv);

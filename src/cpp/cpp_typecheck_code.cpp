@@ -31,12 +31,12 @@ Function: cpp_typecheckt::typecheck_code
 
 void cpp_typecheckt::typecheck_code(codet &code)
 {
-  const irep_idt &statement=code.get(ID_statement);
+  const irep_idt &statement=code.get_statement();
 
-  if(statement==ID_catch)
+  if(statement==ID_try_catch)
   {
     code.type()=code_typet();
-    typecheck_catch(code);
+    typecheck_try_catch(code);
   }
   else if(statement==ID_member_initializer)
   {
@@ -53,7 +53,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::typecheck_catch
+Function: cpp_typecheckt::typecheck_try_catch
 
   Inputs:
 
@@ -63,35 +63,68 @@ Function: cpp_typecheckt::typecheck_catch
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_catch(codet &code)
+void cpp_typecheckt::typecheck_try_catch(codet &code)
 {
   codet::operandst &operands=code.operands();
-
+  
   for(codet::operandst::iterator
       it=operands.begin();
       it!=operands.end();
       it++)
   {
-    code_blockt &block=to_code_block(to_code(*it));
-
-    typecheck_code(block);
-
-    // is it a catch block?
-    if(it!=operands.begin())
+    if(it==operands.begin())
     {
-      const code_blockt &code_block=to_code_block(block);
-      assert(code_block.operands().size()>=1);
-      const codet &first_instruction=to_code(code_block.op0());
-      assert(first_instruction.get_statement()==ID_decl);
-
-      // get the declaration
-      const code_declt &code_decl=to_code_decl(first_instruction);
-
-      // get the type
-      const typet &type=code_decl.op0().type();
+      // this is the 'try'
+      typecheck_code(to_code(*it));
+    }
+    else
+    {
+      // This is (one of) the catch clauses.
+      codet &code=to_code_block(to_code(*it));
       
-      // annotate exception ID
-      it->set(ID_exception_id, cpp_exception_id(type, *this));
+      // look at the catch operand
+      assert(!code.operands().empty());
+      
+      if(to_code(code.op0()).get_statement()==ID_ellipsis)
+      {
+        code.operands().erase(code.operands().begin());
+
+        // do body
+        typecheck_code(code);
+      }
+      else
+      {
+        // turn references into non-references
+        {
+          assert(to_code(code.op0()).get_statement()==ID_decl);
+          cpp_declarationt &cpp_declaration=
+            to_cpp_declaration(to_code_decl(to_code(code.op0())).symbol());
+          
+          assert(cpp_declaration.declarators().size()==1);
+          cpp_declaratort &declarator=cpp_declaration.declarators().front();
+        
+          if(is_reference(declarator.type()))
+            declarator.type()=declarator.type().subtype();
+        }
+
+        // typecheck the body
+        typecheck_code(code);
+        
+        // the declaration is now in a decl_block
+        
+        assert(!code.operands().empty());
+        assert(to_code(code.op0()).get_statement()==ID_decl_block);
+
+        // get the declaration
+        const code_declt &code_decl=
+          to_code_decl(to_code(code.op0().op0()));
+
+        // get the type
+        const typet &type=code_decl.op0().type();
+        
+        // annotate exception ID
+        it->set(ID_exception_id, cpp_exception_id(type, *this));
+      }
     }
   }
 }
@@ -168,7 +201,24 @@ void cpp_typecheckt::typecheck_switch(code_switcht &code)
   
   if(code.value().id()==ID_code)
   {
-    typecheck_code(to_code(code.value()));
+    // we shall rewrite that into
+    // { int i=....; switch(i) .... }
+    
+    codet decl=to_code(code.value());
+    typecheck_decl(decl);
+    
+    assert(decl.get_statement()==ID_decl_block);
+    assert(decl.operands().size()==1);
+    
+    // replace declaration by its symbol    
+    assert(decl.op0().op0().id()==ID_symbol);
+    code.value()=decl.op0().op0();
+
+    c_typecheck_baset::typecheck_switch(code);
+    
+    code_blockt code_block;
+    code_block.move_to_operands(decl.op0(), code);
+    code.swap(code_block);
   }
   else
     c_typecheck_baset::typecheck_switch(code);

@@ -7,6 +7,8 @@ ifeq ($(uname),windows32)
   BUILD_ENV_ := MSVC
 else ifeq ($(uname),Darwin)
   BUILD_ENV_ := OSX
+else ifeq ($(uname),FreeBSD)
+  BUILD_ENV_ := FreeBSD
 else ifeq ($(filter-out MINGW32_%, $(uname)),)
   BUILD_ENV_ := MinGW
 else ifeq ($(filter-out CYGWIN_%, $(uname)),)
@@ -18,7 +20,7 @@ else
   BUILD_ENV_ := $(BUILD_ENV)
 endif
 
-ifeq ($(filter-out Unix MinGW OSX OSX_Universal,$(BUILD_ENV_)),)
+ifeq ($(filter-out Unix MinGW OSX OSX_Universal FreeBSD,$(BUILD_ENV_)),)
   # Linux-ish
   LIBEXT = .a
   OBJEXT = .o
@@ -31,11 +33,11 @@ endif
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
-  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1 -mmacosx-version-min=10.6
+  CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.6
   LINKFLAGS += -mmacosx-version-min=10.6
   LINKNATIVE += -mmacosx-version-min=10.6
 else
-  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
+  CP_CXXFLAGS = -MMD -MP
 endif
   #LINKFLAGS = -static
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
@@ -48,18 +50,35 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   LINKLIB = /usr/bin/libtool -static -o $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
+  ifeq ($(origin CC),default)
+    CC     = clang
+  endif
+  ifeq ($(origin CXX),default)
+    CXX    = clang++
+  endif
+else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
+  CP_CXXFLAGS += -DSTL_HASH_STD
+  LINKLIB = ar rcT $@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
+  LINKNATIVE = $(HOSTCXX) -o $@ $^
+  ifeq ($(origin CC),default)
+    CC     = clang
+  endif
+  ifeq ($(origin CXX),default)
+    CXX    = clang++
+  endif
 else
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
-endif
-ifeq ($(origin CC),default)
-  CC     = gcc
-  #CC     = icc
-endif
-ifeq ($(origin CXX),default)
-  CXX    = g++
-  #CXX    = icpc
+  ifeq ($(origin CC),default)
+    CC     = gcc
+    #CC     = icc
+  endif
+  ifeq ($(origin CXX),default)
+    CXX    = g++
+    #CXX    = icpc
+  endif
 endif
 ifeq ($(origin YACC),default)
   YACC   = bison -y
@@ -78,7 +97,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
-  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
+  CP_CXXFLAGS = -MMD -MP
   LINKFLAGS = -static
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
@@ -108,7 +127,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   CFLAGS ?= /W3 /O2 /GF
   CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF
   CP_CFLAGS =
-  CP_CXXFLAGS = -DSTL_HASH_TR1
+  CP_CXXFLAGS = 
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ $^ $(LIBS)
   LINKNATIVE = $(HOSTCXX) /Fe$@ $^

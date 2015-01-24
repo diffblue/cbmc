@@ -2,6 +2,7 @@
 
 #include <util/expr.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/i2string.h>
 
@@ -620,6 +621,7 @@ bool Parser::isTypeSpecifier()
   if(t==TOK_IDENTIFIER || t==TOK_SCOPE
        || t==TOK_CONSTEXPR || t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT
        || t==TOK_CHAR || t==TOK_INT || t==TOK_SHORT || t==TOK_LONG
+       || t==TOK_CHAR16_T || t==TOK_CHAR32_T
        || t==TOK_WCHAR_T || t==TOK_COMPLEX // new !!!
        || t==TOK_SIGNED || t==TOK_UNSIGNED || t==TOK_FLOAT || t==TOK_DOUBLE
        || t==TOK_INT8 || t==TOK_INT16 || t==TOK_INT32 || t==TOK_INT64 || t==TOK_PTR32 || t==TOK_PTR64
@@ -2121,7 +2123,8 @@ Function:
 /*
 
   integral.or.class.spec
-  : (CHAR | WCHAR_T | INT | SHORT | LONG | SIGNED | UNSIGNED | FLOAT | DOUBLE
+  : (CHAR | CHAR16_T | CHAR32_T | WCHAR_T
+     | INT | SHORT | LONG | SIGNED | UNSIGNED | FLOAT | DOUBLE
      | VOID | BOOLEAN | COMPLEX)+
   | class.spec
   | enum.spec
@@ -2160,6 +2163,8 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     switch(t)
     {
     case TOK_CHAR: type_id=ID_char; break;
+    case TOK_CHAR16_T: type_id=ID_char16_t; break;
+    case TOK_CHAR32_T: type_id=ID_char32_t; break;
     case TOK_INT: type_id=ID_int; break;
     case TOK_SHORT: type_id=ID_short; break;
     case TOK_LONG: type_id=ID_long; break;
@@ -2657,7 +2662,7 @@ bool Parser::rDeclaratorWithInit(
       if(!rExpression(e))
         return false;
         
-      typet bit_field_type(ID_c_bitfield);
+      typet bit_field_type(ID_c_bit_field);
       bit_field_type.set(ID_size, e);
       bit_field_type.subtype().make_nil();
       set_location(bit_field_type, tk);
@@ -4104,16 +4109,28 @@ Function:
   enum.spec
   : ENUM Identifier
   | ENUM {Identifier} '{' {enum.body} '}'
+  | ENUM CLASS Identifier '{' {enum.body} '}'
+  | ENUM CLASS Identifier ':' Type '{' {enum.body} '}'
 */
 bool Parser::rEnumSpec(typet &spec)
 {
   Token tk;
+  //bool is_enum_class=false;
 
   if(lex.GetToken(tk)!=TOK_ENUM)
     return false;
 
   spec=cpp_enum_typet();
   set_location(spec, tk);
+
+  spec.subtype().make_nil();
+
+  // C++11 enum classes  
+  if(lex.LookAhead(0)==TOK_CLASS)
+  {
+    lex.GetToken(tk);
+    //is_enum_class=true;
+  }
 
   if(lex.LookAhead(0)!='{')
   {
@@ -4125,6 +4142,13 @@ bool Parser::rEnumSpec(typet &spec)
       return false;
 
     spec.add(ID_tag).swap(name);
+    
+    // C++11 enums have an optional underlying type
+    if(lex.LookAhead(0)==':')
+    {
+      lex.GetToken(tk); // read the colon
+      if(!rTypeName(spec.subtype())) return false;
+    }
   }
 
   if(lex.LookAhead(0)!='{')
@@ -6568,6 +6592,9 @@ Function:
   | '(' comma.expression ')'
   | integral.or.class.spec '(' function.arguments ')'
   | typeid.expr
+  | true
+  | false
+  | nullptr
 */
 bool Parser::rPrimaryExpr(exprt &exp)
 {
@@ -6596,6 +6623,24 @@ bool Parser::rPrimaryExpr(exprt &exp)
   case TOK_THIS:
     lex.GetToken(tk);
     exp=exprt("cpp-this");
+    set_location(exp, tk);
+    return true;
+
+  case TOK_TRUE:
+    lex.GetToken(tk);
+    exp=true_exprt();
+    set_location(exp, tk);
+    return true;
+
+  case TOK_FALSE:
+    lex.GetToken(tk);
+    exp=false_exprt();
+    set_location(exp, tk);
+    return true;
+
+  case TOK_NULLPTR:
+    lex.GetToken(tk);
+    exp=constant_exprt(ID_nullptr, typet(ID_nullptr));
     set_location(exp, tk);
     return true;
 
@@ -7673,15 +7718,17 @@ Function:
 */
 bool Parser::rTryStatement(codet &statement)
 {
-  Token tk;
-
-  if(lex.GetToken(tk)!=TOK_TRY)
-    return false;
-
-  statement=codet(ID_catch);
-  set_location(statement, tk);
-
   {
+    Token try_token;
+
+    // The 'try' block
+    if(lex.GetToken(try_token)!=TOK_TRY)
+      return false;
+
+    statement=codet(ID_try_catch);
+    statement.operands().reserve(2);
+    set_location(statement, try_token);
+
     codet body;
 
     if(!rCompoundStatement(body))
@@ -7693,23 +7740,28 @@ bool Parser::rTryStatement(codet &statement)
   // iterate while there are catch clauses
   do
   {
-    Token op, cp;
+    Token catch_token, op_token, cp_token;
     
-    if(lex.GetToken(tk)!=TOK_CATCH)
+    if(lex.GetToken(catch_token)!=TOK_CATCH)
       return false;
 
-    if(lex.GetToken(op)!='(')
+    if(lex.GetToken(op_token)!='(')
       return false;
 
-    cpp_declarationt declaration;
+    codet catch_op;
 
     if(lex.LookAhead(0)==TOK_ELLIPSIS)
     {
-      lex.GetToken(cp);
-      // TODO
+      Token ellipsis_token;
+      lex.GetToken(ellipsis_token);
+      codet ellipsis(ID_ellipsis);
+      set_location(ellipsis, ellipsis_token);
+      catch_op=ellipsis;
     }
     else
     {
+      cpp_declarationt declaration;
+
       if(!rArgDeclaration(declaration))
         return false;
         
@@ -7723,26 +7775,27 @@ bool Parser::rTryStatement(codet &statement)
         declaration.declarators().front().name()=cpp_namet();
         declaration.declarators().front().name().get_sub().push_back(name);
       }
+      
+      codet code_decl;
+      code_decl.set_statement(ID_decl);
+      code_decl.move_to_operands(declaration);
+      set_location(code_decl, catch_token);
+      
+      catch_op=code_decl;
     }
 
-    if(lex.GetToken(cp)!=')')
+    if(lex.GetToken(cp_token)!=')')
       return false;
-  
+      
     codet body;
-
+  
     if(!rCompoundStatement(body))
       return false;
-
-    // We prepend the declaration to the body
-    // as a declaration statement
+    
     assert(body.get_statement()==ID_block);
     
-    code_declt code_decl;
-    code_decl.op0().swap(declaration);
+    body.operands().insert(body.operands().begin(), catch_op);
 
-    codet::operandst &ops=body.operands();
-    ops.insert(ops.begin(), code_decl);
-    
     statement.move_to_operands(body);
   }
   while(lex.LookAhead(0)==TOK_CATCH);
@@ -7871,6 +7924,7 @@ bool Parser::rGCCAsmStatement(codet &statement)
 
   statement=codet(ID_asm);
   statement.set(ID_flavor, ID_gcc);
+  statement.operands().resize(5); // always has 5 operands
   set_location(statement, tk);
 
   if(lex.LookAhead(0)==TOK_VOLATILE)
@@ -7883,7 +7937,7 @@ bool Parser::rGCCAsmStatement(codet &statement)
   if(lex.GetToken(tk)!='(') return false;
   if(!rString(tk)) return false;
 
-  statement.move_to_operands(tk.data);
+  statement.op0()=tk.data;
 
   #ifdef DEBUG
   std::cout << "Parser::rGCCAsmStatement 3\n";

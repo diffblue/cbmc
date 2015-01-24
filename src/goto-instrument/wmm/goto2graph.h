@@ -25,13 +25,15 @@ Date: 2012
 class symbol_tablet;
 class goto_functionst;
 class value_setst;
+class local_may_aliast;
 
 class instrumentert
 {
-protected:
+public:
   /* reference to goto-functions and symbol_table */
   namespacet ns;
 
+protected:
   goto_functionst &goto_functions; 
 
   /* alternative representation of graph (SCC) */
@@ -97,12 +99,25 @@ protected:
     unsigned current_thread;
     unsigned coming_from;
 
+    bool contains_shared_array(
+      goto_programt::const_targett targ,
+      goto_programt::const_targett i_it,
+      value_setst& value_sets
+      #ifdef LOCAL_MAY
+      , local_may_aliast local_may
+      #endif
+    ) const;
+
     /* transformers */
     void visit_cfg_thread() const;
     void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
     void visit_cfg_body(
       goto_programt::instructionst::iterator i_it, 
+      loop_strategyt replicate_body,
       value_setst& value_sets
+      #ifdef LOCAL_MAY
+      , local_may_aliast& local_may
+      #endif
     ); // deprecated
     void inline visit_cfg_backedge(goto_programt::targett targ, 
       goto_programt::targett i_it);
@@ -110,6 +125,9 @@ protected:
       goto_programt::targett i_it);
     void visit_cfg_assign(value_setst& value_sets, namespacet& ns,
       goto_programt::instructionst::iterator& i_it, bool no_dependencies
+      #ifdef LOCAL_MAY
+      , local_may_aliast& local_may
+      #endif
     );
     void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
@@ -118,10 +136,17 @@ protected:
     void visit_cfg_function_call(value_setst& value_sets, 
       goto_programt::instructionst::iterator i_it, 
       memory_modelt model,
-      bool no_dependencies);
+      bool no_dependenciess,
+      loop_strategyt duplicate_body);
     void visit_cfg_goto(
       goto_programt::instructionst::iterator i_it,
+      /* forces the duplication of all the loops, with array or not
+         otherwise, duplication of loops with array accesses only */
+      loop_strategyt replicate_body,
       value_setst& value_sets
+      #ifdef LOCAL_MAY
+      , local_may_aliast& local_may
+      #endif
     );
     void visit_cfg_reference_function (irep_idt id_function);
 
@@ -172,6 +197,10 @@ protected:
     /* dependencies */
     data_dpt data_dp;
 
+    /* writes and reads to unknown addresses -- conservative */
+    std::set<unsigned> unknown_read_nodes;
+    std::set<unsigned> unknown_write_nodes;
+
     /* set of functions visited so far -- we don't handle recursive functions */
     std::set<irep_idt> functions_met;
 
@@ -206,6 +235,7 @@ protected:
       value_setst &value_sets,
       memory_modelt model,
       bool no_dependencies,
+      loop_strategyt duplicate_body,
       const irep_idt& function)
     {
       /* ignore recursive calls -- underapproximation */
@@ -214,7 +244,7 @@ protected:
         enter_function(function);
         const std::set<nodet> empty_in;
         std::set<nodet> end_out;
-        visit_cfg_function(value_sets, model, no_dependencies, 
+        visit_cfg_function(value_sets, model, no_dependencies, duplicate_body,
           function, empty_in, end_out);
         leave_function(function);
       }
@@ -229,6 +259,7 @@ protected:
       value_setst& value_sets,
       memory_modelt model,
       bool no_dependencies,
+      loop_strategyt duplicate_body,
       /* functino to analyse */
       const irep_idt& function,
       /* incoming edges */
@@ -304,7 +335,9 @@ public:
   unsigned goto2graph_cfg(
     value_setst& value_sets,
     memory_modelt model,
-    bool no_dependencies);
+    bool no_dependencies,
+    /* forces the duplication, with arrays or not; otherwise, arrays only */
+    loop_strategyt duplicate_body);
 
   /* collects directly all the cycles in the graph */
   void collect_cycles(memory_modelt model)
@@ -322,9 +355,10 @@ public:
   /* sets parameters for collection, if required */
   void set_parameters_collection(
     unsigned _max_var = 0,
-    unsigned _max_po_trans = 0)
+    unsigned _max_po_trans = 0,
+    bool _ignore_arrays = false)
   {
-    egraph.set_parameters_collection(_max_var,_max_po_trans);
+    egraph.set_parameters_collection(_max_var,_max_po_trans,_ignore_arrays);
   }
 
   /* builds the relations between unsafe pairs in the critical cycles and

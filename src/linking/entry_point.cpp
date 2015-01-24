@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 
+#include <goto-programs/goto_functions.h>
+
 #include "entry_point.h"
 #include "zero_initializer.h"
 
@@ -69,7 +71,7 @@ bool static_lifetime_init(
   namespacet ns(symbol_table);
       
   symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find("c::__CPROVER_initialize");
+    symbol_table.symbols.find(CPROVER_PREFIX "initialize");
 
   if(s_it==symbol_table.symbols.end()) return false;
 
@@ -79,6 +81,9 @@ bool static_lifetime_init(
   init_symbol.value.add_source_location()=source_location;
 
   code_blockt &dest=to_code_block(to_code(init_symbol.value));
+
+  // add the magic label to hide
+  dest.add(code_labelt("__CPROVER_HIDE", code_skipt()));
   
   // do assignments based on "value"
 
@@ -93,13 +98,13 @@ bool static_lifetime_init(
     // special values
     if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
        identifier==CPROVER_PREFIX "memory" ||
-       identifier=="c::__func__" ||
-       identifier=="c::__FUNCTION__" ||
-       identifier=="c::__PRETTY_FUNCTION__" ||
-       identifier=="c::argc'" ||
-       identifier=="c::argv'" ||
-       identifier=="c::envp'" ||
-       identifier=="c::envp_size'")
+       identifier=="__func__" ||
+       identifier=="__FUNCTION__" ||
+       identifier=="__PRETTY_FUNCTION__" ||
+       identifier=="argc'" ||
+       identifier=="argv'" ||
+       identifier=="envp'" ||
+       identifier=="envp_size'")
       continue;
       
     // just for linking
@@ -201,7 +206,8 @@ bool entry_point(
   message_handlert &message_handler)
 {
   // check if main is already there
-  if(symbol_table.symbols.find(ID_main)!=symbol_table.symbols.end())
+  if(symbol_table.symbols.find(goto_functionst::entry_point())!=
+     symbol_table.symbols.end())
     return false; // silently ignore
 
   irep_idt main_symbol;
@@ -225,14 +231,16 @@ bool entry_point(
     if(matches.empty())
     {
       messaget message(message_handler);
-      message.error("main symbol `"+config.main+"' not found");
+      message.error() << "main symbol `" << config.main 
+                      << "' not found" << messaget::eom;
       return true; // give up
     }
     
     if(matches.size()>=2)
     {
       messaget message(message_handler);
-      message.error("main symbol `"+config.main+"' is ambiguous");
+      message.error() << "main symbol `" << config.main 
+                      << "' is ambiguous" << messaget::eom;
       return true;
     }
 
@@ -247,7 +255,8 @@ bool entry_point(
   if(s_it==symbol_table.symbols.end())
   {
     messaget message(message_handler);
-    message.error("main symbol `"+id2string(main_symbol)+"' not in symbol table");
+    message.error() << "main symbol `" << id2string(main_symbol) 
+                    << "' not in symbol table" << messaget::eom;
     return true; // give up, no main
   }
     
@@ -257,7 +266,8 @@ bool entry_point(
   if(symbol.value.is_nil())
   {
     messaget message(message_handler);
-    message.error("main symbol `"+id2string(main_symbol)+"' has no body");
+    message.error() << "main symbol `" << id2string(main_symbol)
+                    << "' has no body" << messaget::eom;
     return false; // give up
   }
 
@@ -270,10 +280,10 @@ bool entry_point(
 
   {
     symbol_tablet::symbolst::iterator init_it=
-      symbol_table.symbols.find("c::__CPROVER_initialize");
+      symbol_table.symbols.find(CPROVER_PREFIX "initialize");
 
     if(init_it==symbol_table.symbols.end())
-      throw "failed to find __CPROVER_initialize symbol";
+      throw "failed to find " CPROVER_PREFIX "initialize symbol";
   
     code_function_callt call_init;
     call_init.lhs().make_nil();
@@ -303,8 +313,8 @@ bool entry_point(
     {
       namespacet ns(symbol_table);
 
-      const symbolt &argc_symbol=ns.lookup("c::argc'");
-      const symbolt &argv_symbol=ns.lookup("c::argv'");
+      const symbolt &argc_symbol=ns.lookup("argc'");
+      const symbolt &argv_symbol=ns.lookup("argv'");
       
       {
         // assume argc is at least one
@@ -337,7 +347,7 @@ bool entry_point(
       
       if(parameters.size()==3)
       {        
-        const symbolt &envp_size_symbol=ns.lookup("c::envp_size'");
+        const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         // assume envp_size is INTMAX-1
         mp_integer max;
@@ -407,8 +417,8 @@ bool entry_point(
 
       if(parameters.size()==3)
       {        
-        const symbolt &envp_symbol=ns.lookup("c::envp'");
-        const symbolt &envp_size_symbol=ns.lookup("c::envp_size'");
+        const symbolt &envp_symbol=ns.lookup("envp'");
+        const symbolt &envp_size_symbol=ns.lookup("envp_size'");
         
         // assume envp[envp_size] is NULL
         exprt null(ID_constant, envp_symbol.type.subtype());
@@ -460,7 +470,7 @@ bool entry_point(
         // do we need envp?
         if(parameters.size()==3)
         {
-          const symbolt &envp_symbol=ns.lookup("c::envp'");
+          const symbolt &envp_symbol=ns.lookup("envp'");
           exprt &op2=operands[2];
 
           const exprt &arg2=parameters[2];
@@ -491,7 +501,7 @@ bool entry_point(
   code_typet main_type;
   main_type.return_type()=empty_typet();
   
-  new_symbol.name=ID_main;
+  new_symbol.name=goto_functionst::entry_point();
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
   
@@ -499,7 +509,7 @@ bool entry_point(
   {
     messaget message;
     message.set_message_handler(message_handler);
-    message.error("failed to move main symbol");
+    message.error() << "failed to move main symbol" << messaget::eom;
     return true;
   }
   

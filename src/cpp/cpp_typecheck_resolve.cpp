@@ -417,13 +417,19 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     {
       e=type_exprt();
 
-      if(symbol.is_macro)
+      if(symbol.is_macro) // includes typedefs
       {
         e.type()=symbol.type;
         assert(symbol.type.is_not_nil());
       }
-      else
+      else if(symbol.type.id()==ID_c_enum)
+      {
+        e.type()=c_enum_tag_typet(symbol.name);
+      }
+      else // will need to do struct, union
+      {
         e.type()=symbol_typet(symbol.name);
+      }
     }
     else if(symbol.is_macro)
     {
@@ -759,7 +765,7 @@ void cpp_typecheck_resolvet::make_constructors(
       }
       
       // enums, in addition, can also be constructed from int
-      if(symbol_type.id()==ID_c_enum)
+      if(symbol_type.id()==ID_c_enum_tag)
       {
         code_typet t3;
         t3.return_type()=it->type();
@@ -993,7 +999,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   assert(!cpp_name.get_sub().empty());
 
   original_scope=&cpp_typecheck.cpp_scopes.current_scope();
-  source_location=cpp_name.location();
+  source_location=cpp_name.source_location();
 
   irept::subt::const_iterator pos=cpp_name.get_sub().begin();
   
@@ -1376,7 +1382,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
   cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
   resolve_scope(cpp_name, base_name, template_args);
 
-  const source_locationt &source_location=cpp_name.location();
+  const source_locationt &source_location=cpp_name.source_location();
   bool qualified=cpp_name.is_qualified();
 
   cpp_scopest::id_sett id_set;
@@ -1545,43 +1551,20 @@ exprt cpp_typecheck_resolvet::resolve(
   // this changes the scope
   resolve_scope(cpp_name, base_name, template_args);
 
-  const source_locationt &source_location=cpp_name.location();
+  const source_locationt &source_location=cpp_name.source_location();
   bool qualified=cpp_name.is_qualified();
 
   // do __CPROVER scope
   if(qualified)
   {
-    if(cpp_typecheck.cpp_scopes.current_scope().identifier==
-       "c::__CPROVER")
+    if(cpp_typecheck.cpp_scopes.current_scope().identifier=="__CPROVER")
       return do_builtin(base_name, template_args);
   }
   else
   {
-    if(base_name==ID_true)
-    {
-      exprt result=true_exprt();
-      result.add_source_location()=source_location;
-      return result;
-    }
-    else if(base_name==ID_false)
-    {
-      exprt result=false_exprt();
-      result.add_source_location()=source_location;
-      return result;
-    }
-    else if(base_name=="__nullptr" ||
-            base_name=="nullptr") // this is c++0x
-    {
-      constant_exprt result;
-      result.set_value(ID_NULL);
-      result.type()=pointer_typet();
-      result.type().subtype()=empty_typet();
-      result.add_source_location()=source_location;
-      return result;
-    }
-    else if(base_name=="__func__" ||
-            base_name=="__FUNCTION__" ||
-            base_name=="__PRETTY_FUNCTION__")
+    if(base_name=="__func__" ||
+       base_name=="__FUNCTION__" ||
+       base_name=="__PRETTY_FUNCTION__")
     {
       // __func__ is an ANSI-C standard compliant hack to get the function name
       // __FUNCTION__ and __PRETTY_FUNCTION__ are GCC-specific

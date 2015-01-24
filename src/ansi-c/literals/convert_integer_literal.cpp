@@ -51,7 +51,7 @@ exprt convert_integer_literal(const std::string &src)
       // and "10i" (imaginary) for GCC.
       // If it's followed by a number, we do MS mode.
       if((i+1)<src.size() && isdigit(src[i+1]))
-        width_suffix=unsafe_str2int(src.c_str()+i+1);
+        width_suffix=unsafe_c_str2int(src.c_str()+i+1);
       else 
         is_imaginary=true;
     }

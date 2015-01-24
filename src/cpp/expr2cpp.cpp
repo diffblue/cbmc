@@ -41,7 +41,7 @@ protected:
   virtual std::string convert_code_cpp_delete(const exprt &src, unsigned precedence);
   virtual std::string convert_struct(const exprt &src, unsigned &precedence);
   virtual std::string convert_code(const codet &src, unsigned indent);
-  virtual std::string convert_constant(const exprt &src, unsigned &precedence);
+  virtual std::string convert_constant(const constant_exprt &src, unsigned &precedence);
 
   virtual std::string convert_rec(
     const typet &src,
@@ -140,7 +140,7 @@ Function: expr2cppt::convert_constant
 \*******************************************************************/
 
 std::string expr2cppt::convert_constant(
-  const exprt &src,
+  const constant_exprt &src,
   unsigned &precedence)
 {
   if(src.type().id()==ID_bool)
@@ -398,6 +398,10 @@ std::string expr2cppt::convert_rec(
 
     return dest;
   }
+  else if(src.id()==ID_nullptr)
+  {
+    return "std::nullptr_t";
+  }
   else
     return expr2ct::convert_rec(src, qualifiers, declarator);
 }
@@ -517,6 +521,8 @@ std::string expr2cppt::convert(
     return convert_cpp_new(src, precedence=15);
   else if(src.is_constant() && src.type().id() == ID_verilogbv)
     return "'" + id2string(src.get(ID_value)) + "'";
+  else if(src.is_constant() && to_constant_expr(src).get_value()==ID_nullptr)
+    return "nullptr";
   else if(src.id()==ID_unassigned)
     return "?";
   else if(src.id()=="pod_constructor")

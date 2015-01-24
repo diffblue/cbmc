@@ -49,12 +49,12 @@ int run(
   
   wargv.resize(argv.size());
   
-  for(unsigned i=0; i<argv.size(); i++)
+  for(std::size_t i=0; i<argv.size(); i++)
     wargv[i]=widen(argv[i]);
 
   const wchar_t **_argv=new const wchar_t * [argv.size()+1];
 
-  for(unsigned i=0; i<wargv.size(); i++)
+  for(std::size_t i=0; i<wargv.size(); i++)
     _argv[i]=wargv[i].c_str();
   
   _argv[argv.size()]=NULL;
@@ -63,7 +63,7 @@ int run(
 
   std::wstring wide_what=widen(what);
 
-  int status=_wspawnvp(_P_WAIT, wide_what.c_str(), _argv);
+  int status=(int)_wspawnvp(_P_WAIT, wide_what.c_str(), _argv);
 
   delete[] _argv;  
 
@@ -80,7 +80,7 @@ int run(
     if(childpid==0) /* fork() returns 0 to the child process */
     {
       char **_argv=new char * [argv.size()+1];
-      for(unsigned i=0; i<argv.size(); i++)
+      for(std::size_t i=0; i<argv.size(); i++)
         _argv[i]=strdup(argv[i].c_str());
 
       _argv[argv.size()]=NULL;

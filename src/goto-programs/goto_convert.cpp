@@ -480,8 +480,8 @@ void goto_convertt::convert(
     convert_msc_try_finally(code, dest);
   else if(statement==ID_msc_leave)
     convert_msc_leave(code, dest);
-  else if(statement==ID_catch) // C++ try/catch
-    convert_catch(code, dest);
+  else if(statement==ID_try_catch) // C++ try/catch
+    convert_try_catch(code, dest);
   else if(statement==ID_CPROVER_try_catch) // CPROVER-homemade
     convert_CPROVER_try_catch(code, dest);
   else if(statement==ID_CPROVER_throw) // CPROVER-homemade
@@ -489,7 +489,7 @@ void goto_convertt::convert(
   else if(statement==ID_CPROVER_try_finally)
     convert_CPROVER_try_finally(code, dest);
   else if(statement==ID_asm)
-    convert_asm(code, dest);
+    convert_asm(to_code_asm(code), dest);
   else if(statement==ID_static_assert)
   {
     assert(code.operands().size()==2);
@@ -549,7 +549,7 @@ void goto_convertt::convert_block(
   const source_locationt &end_location=code.end_location();
 
   // this saves the size of the destructor stack
-  unsigned old_stack_size=targets.destructor_stack.size();
+  std::size_t old_stack_size=targets.destructor_stack.size();
   
   // now convert block  
   forall_operands(it, code)
@@ -869,9 +869,9 @@ void goto_convertt::convert_cpp_delete(
   irep_idt delete_identifier;
   
   if(code.get_statement()==ID_cpp_delete_array)
-    delete_identifier="c::__delete_array";
+    delete_identifier="__delete_array";
   else if(code.get_statement()==ID_cpp_delete)
-    delete_identifier="c::__delete";
+    delete_identifier="__delete";
   else
     assert(false);
   
@@ -2391,6 +2391,7 @@ symbolt &goto_convertt::new_tmp_symbol(
     new_symbol.is_lvalue=true;
     new_symbol.is_thread_local=true;
     new_symbol.is_file_local=true;
+    new_symbol.is_auxiliary=true;
     new_symbol.type=type;    
     new_symbol.location=source_location;
   } while(symbol_table.move(new_symbol, symbol_ptr));    

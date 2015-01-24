@@ -83,7 +83,12 @@ exprt zero_initializert::zero_initializer_rec(
           type_id==ID_floatbv ||
           type_id==ID_fixedbv ||
           type_id==ID_pointer ||
-          type_id==ID_complex)
+          type_id==ID_complex ||
+          type_id==ID_c_enum ||
+          type_id==ID_incomplete_c_enum ||
+          type_id==ID_c_enum_tag ||
+          type_id==ID_c_bit_field ||
+          type_id==ID_c_bool)
   {
     exprt result=gen_zero(type);
     result.add_source_location()=source_location;
@@ -94,15 +99,6 @@ exprt zero_initializert::zero_initializer_rec(
     err_location(source_location);
     error("cannot zero-initialize code-type");
     throw 0;
-  }
-  else if(type_id==ID_c_enum ||
-          type_id==ID_incomplete_c_enum ||
-          type_id==ID_c_enum_tag)
-  {
-    constant_exprt value(type);
-    value.set_value(ID_0);
-    value.add_source_location()=source_location;
-    return value;
   }
   else if(type_id==ID_array)
   {
@@ -217,7 +213,7 @@ exprt zero_initializert::zero_initializer_rec(
     const union_typet::componentst &components=
       to_union_type(type).components();
 
-    exprt value(ID_union, type);
+    union_exprt value(type);
 
     union_typet::componentt component;
     bool found=false;
@@ -233,23 +229,29 @@ exprt zero_initializert::zero_initializer_rec(
       // skip methods
       if(it->type().id()==ID_code) continue;
 
-      mp_integer size=pointer_offset_size(ns, it->type());
+      mp_integer bits=pointer_offset_bits(ns, it->type());
       
-      if(size>component_size)
+      if(bits>component_size)
       {
         component=*it;
         found=true;
-        component_size=size;
+        component_size=bits;
       }
     }
 
-    if(!found)
-      return value; // stupid empty union
-
-    value.set(ID_component_name, component.get_name());
-    value.copy_to_operands(
-      zero_initializer_rec(component.type(), source_location));
     value.add_source_location()=source_location;
+
+    if(!found)
+    {
+      // stupid empty union
+      value.op()=nil_exprt();
+    }
+    else
+    {
+      value.set_component_name(component.get_name());
+      value.op()=
+        zero_initializer_rec(component.type(), source_location);
+    }
 
     return value;
   }

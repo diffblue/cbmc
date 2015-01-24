@@ -138,6 +138,7 @@ public:
   
   // old interface, will go away
 
+  #if 0
   inline void print(const std::string &message)
   { print(1, message); }
 
@@ -152,6 +153,7 @@ public:
    
   inline void debug(const std::string &message)
   { print(9, message); }
+  #endif
    
   inline void status(
     const std::string &message,
@@ -162,11 +164,13 @@ public:
     print(6, message, -1, location);
   }
    
+  #if 0
   inline void error(const std::string &message)
   { print(1, message); }
 
   inline void statistics(const std::string &message)
   { print(8, message); }
+  #endif
 
   inline void error(
     const std::string &message,

@@ -95,6 +95,16 @@ public:
   {
     set(ID_comment, comment);
   }
+  
+  inline void set_hide()
+  {
+    set(ID_hide, true);
+  }
+
+  inline bool get_hide() const
+  {
+    return get_bool(ID_hide);
+  }
 };
 
 // will go away

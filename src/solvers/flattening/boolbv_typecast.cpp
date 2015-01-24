@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 #include "boolbv_type.h"
+#include "c_bit_field_replacement_type.h"
 
 #include "../floatbv/float_utils.h"
 
@@ -27,13 +28,10 @@ Function: boolbvt::convert_typecast
 
 \*******************************************************************/
 
-void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
+void boolbvt::convert_typecast(const typecast_exprt &expr, bvt &bv)
 {
-  if(expr.operands().size()!=1)
-    throw "typecast takes one operand";
-
   const typet &expr_type=ns.follow(expr.type());
-  const exprt &op=expr.op0();
+  const exprt &op=expr.op();
   const typet &op_type=ns.follow(op.type());
   const bvt &op_bv=convert_bv(op);  
 
@@ -43,7 +41,7 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
 
 /*******************************************************************\
 
-Function: boolbvt::convert_typecast
+Function: boolbvt::type_conversion
 
   Inputs:
 
@@ -59,8 +57,16 @@ bool boolbvt::type_conversion(
 {
   bvtypet dest_bvtype=get_bvtype(dest_type);
   bvtypet src_bvtype=get_bvtype(src_type);
-  unsigned src_width=src.size();
+  
+  if(src_bvtype==IS_C_BIT_FIELD)
+    return type_conversion(
+      c_bit_field_replacement_type(to_c_bit_field_type(src_type), ns), src, dest_type, dest);
 
+  if(dest_bvtype==IS_C_BIT_FIELD)
+    return type_conversion(
+      src_type, src, c_bit_field_replacement_type(to_c_bit_field_type(dest_type), ns), dest);
+
+  unsigned src_width=src.size();
   unsigned dest_width=boolbv_width(dest_type);
   
   if(dest_width==0 || src_width==0)
@@ -119,7 +125,9 @@ bool boolbvt::type_conversion(
   switch(dest_bvtype)
   {
   case IS_RANGE:
-    if(src_bvtype==IS_UNSIGNED || src_bvtype==IS_SIGNED)
+    if(src_bvtype==IS_UNSIGNED ||
+       src_bvtype==IS_SIGNED ||
+       src_bvtype==IS_C_BOOL)
     {
       mp_integer dest_from=to_range_type(dest_type).get_from();
 
@@ -172,6 +180,7 @@ bool boolbvt::type_conversion(
         return false;
 
       case IS_UNSIGNED: // unsigned to float
+      case IS_C_BOOL: // _Bool to float
         float_utils.spec=to_floatbv_type(dest_type);
         dest=float_utils.from_unsigned_integer(src);
         return false;
@@ -252,6 +261,7 @@ bool boolbvt::type_conversion(
     }
     else if(src_bvtype==IS_UNSIGNED ||
             src_bvtype==IS_SIGNED ||
+            src_bvtype==IS_C_BOOL ||
             src_bvtype==IS_C_ENUM)
     {
       // integer to fixed
@@ -351,6 +361,7 @@ bool boolbvt::type_conversion(
     case IS_UNSIGNED: // integer to integer
     case IS_SIGNED:
     case IS_C_ENUM:
+    case IS_C_BOOL:
       {
         // We do sign extension for any source type
         // that is signed, independently of the
@@ -393,7 +404,8 @@ bool boolbvt::type_conversion(
     break;
     
   case IS_VERILOGBV:
-    if(src_bvtype==IS_UNSIGNED)
+    if(src_bvtype==IS_UNSIGNED ||
+       src_bvtype==IS_C_BOOL)
     {
       for(unsigned i=0, j=0; i<dest_width; i+=2, j++)
       {
@@ -412,6 +424,22 @@ bool boolbvt::type_conversion(
   case IS_BV:
     assert(src_width==dest_width);
     dest=src;
+    return false;
+    
+  case IS_C_BOOL:
+    dest.resize(dest_width, const_literal(false));
+
+    if(src_bvtype==IS_FLOAT)
+    {
+      float_utilst float_utils(prop);
+      float_utils.spec=to_floatbv_type(src_type);
+      dest[0]=!float_utils.is_zero(src);
+    }
+    else if(src_bvtype==IS_C_BOOL)
+      dest[0]=src[0];
+    else
+      dest[0]=!bv_utils.is_zero(src);
+
     return false;
     
   default:

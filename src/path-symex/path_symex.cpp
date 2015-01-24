@@ -18,93 +18,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/dereference.h>
 
-#include "path_symex.h"
+#include "path_symex_class.h"
 
 //#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
 #endif
-
-class path_symext
-{
-public:
-  inline path_symext()
-  {
-  }
-  
-  void operator()(
-    path_symex_statet &state,
-    std::list<path_symex_statet> &furter_states);
-
-  void operator()(path_symex_statet &state);
-
-  void do_goto(
-    path_symex_statet &state,
-    bool taken);
-    
-  void do_assert_fail(path_symex_statet &state)
-  {
-    const goto_programt::instructiont &instruction=
-      *state.get_instruction();
-    
-    state.record_step();
-    state.next_pc();
-    exprt guard=state.read(not_exprt(instruction.guard));
-    state.history->guard=guard;
-  }  
-  
-  typedef path_symex_stept stept;
-
-protected:
-  void do_goto(
-    path_symex_statet &state,
-    std::list<path_symex_statet> &further_states);
-
-  void function_call(
-    path_symex_statet &state,
-    const code_function_callt &call,
-    std::list<path_symex_statet> &further_states)
-  {
-    exprt f=state.read(call.function());
-    function_call_rec(state, call, f, further_states);
-  }
-    
-  void function_call_rec(
-    path_symex_statet &state,
-    const code_function_callt &function_call,
-    const exprt &function,
-    std::list<path_symex_statet> &further_states);
-    
-  void return_from_function(
-    path_symex_statet &state,
-    const exprt &return_value);
-
-  void symex_malloc(
-    path_symex_statet &state,
-    const exprt &lhs,
-    const side_effect_exprt &code);
-
-  void assign(
-    path_symex_statet &state,
-    const exprt &lhs,
-    const exprt &rhs);
-
-  inline void assign(
-    path_symex_statet &state,
-    const code_assignt &assignment)
-  {
-    assign(state, assignment.lhs(), assignment.rhs());
-  }
-
-  void assign_rec(
-    path_symex_statet &state,
-    exprt::operandst &guard, // instantiated
-    const exprt &ssa_lhs, // instantiated, recursion here
-    const exprt &ssa_rhs); // instantiated
-
-  static bool propagate(const exprt &src);
-};
 
 /*******************************************************************\
 
@@ -693,10 +613,28 @@ void path_symext::function_call_rec(
     thread.call_stack.back().current_function=function_identifier;
     thread.call_stack.back().return_location=thread.pc.next_loc();
     thread.call_stack.back().return_lhs=call.lhs();
-    thread.call_stack.back().saved_local_vars=thread.local_vars;
+
+    #if 0
+    for(loc_reft l=function_entry_point; ; ++l)
+    {
+      if(locs[l].target->is_end_function()) break;
+      if(locs[l].target->is_decl())
+      {
+        // make sure we have the local in the var_map
+        state.
+      }
+    }
     
-    // update statistics
-    state.recursion_map[function_identifier]++;
+    // save the locals into the frame
+    for(locst::local_variablest::const_iterator
+        it=function_entry.local_variables.begin();
+        it!=function_entry.local_variables.end();
+        it++)
+    {
+      unsigned nr=state.var_map[*it].number;
+      thread.call_stack.back().saved_local_vars[nr]=thread.local_vars[nr];
+    }    
+    #endif
 
     const code_typet &code_type=function_entry.type;
 
@@ -704,7 +642,7 @@ void path_symext::function_call_rec(
 
     const exprt::operandst &call_arguments=call.arguments();
   
-    // now assign the argument values
+    // now assign the argument values to parameters
     for(unsigned i=0; i<call_arguments.size(); i++)
     {
       if(i<function_parameters.size())
@@ -717,11 +655,12 @@ void path_symext::function_call_rec(
 
         symbol_exprt lhs(identifier, function_parameter.type());
             
-        // TODO: need to save+restore
-
         assign(state, lhs, call_arguments[i]);
       }
     }
+
+    // update statistics
+    state.recursion_map[function_identifier]++;
 
     // set the new PC
     thread.pc=function_entry_point;
@@ -793,6 +732,14 @@ void path_symext::return_from_function(
        thread.call_stack.back().return_lhs.is_not_nil())
       assign(state, thread.call_stack.back().return_lhs, return_value);
 
+    // restore the local variables
+    for(path_symex_statet::var_state_mapt::const_iterator
+        it=thread.call_stack.back().saved_local_vars.begin();
+        it!=thread.call_stack.back().saved_local_vars.end();
+        it++)
+      thread.local_vars[it->first]=it->second;
+
+    // kill the frame
     thread.call_stack.pop_back();
   }
 }
@@ -922,7 +869,9 @@ void path_symext::operator()(
     *state.get_instruction();
     
   #ifdef DEBUG
-  std::cout << "path_symext::operator(): " << instruction.type
+  std::cout << "path_symext::operator(): "
+            << state.pc() << " "
+            << instruction.type
             << std::endl;
   #endif
 

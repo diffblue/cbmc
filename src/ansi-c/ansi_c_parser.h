@@ -29,7 +29,7 @@ public:
   ansi_c_parse_treet parse_tree;
   
   ansi_c_parsert():
-    cpp(false),
+    cpp98(false), cpp11(false),
     for_has_scope(false)
   {
   }
@@ -49,7 +49,7 @@ public:
     asm_block_following=false;
     parenthesis_counter=0;
     string_literal.clear();
-    pragma_pack=0;
+    pragma_pack.clear();
     
     // setup global scope
     scopes.clear();
@@ -61,7 +61,7 @@ public:
   bool asm_block_following;
   unsigned parenthesis_counter;
   std::string string_literal;
-  mp_integer pragma_pack;
+  std::list<exprt> pragma_pack;
   
   typedef enum { ANSI, GCC, MSC, ICC, CW, ARM } modet;
   modet mode;
@@ -72,8 +72,8 @@ public:
   // CW is CodeWarrior (with GCC extensions enabled)
   // ARM is ARM's RealView
 
-  // recognize C++ keywords  
-  bool cpp;
+  // recognize C++98 and C++11 keywords  
+  bool cpp98, cpp11;
   
   // in C99 and upwards, for(;;) has a scope
   bool for_has_scope;
@@ -110,6 +110,9 @@ public:
   // convert a declarator and then add it to existing an declaration
   void add_declarator(exprt &declaration, irept &declarator);
 
+  // adds a tag to the current scope
+  void add_tag_with_body(irept &tag);
+
   void copy_item(const ansi_c_declarationt &declaration)
   {
     assert(declaration.id()==ID_declaration);
@@ -129,13 +132,6 @@ public:
     bool label);
 
   static ansi_c_id_classt get_class(const typet &type);
-  
-  std::string get_anon_name()
-  {
-    std::string n="#anon";
-    n+=i2string(current_scope().anon_counter++);
-    return n;
-  }
   
   irep_idt lookup_label(const irep_idt id)
   {

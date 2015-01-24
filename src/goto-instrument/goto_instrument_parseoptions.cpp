@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_asm.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -86,15 +87,12 @@ Function: goto_instrument_parseoptionst::eval_verbosity
 
 void goto_instrument_parseoptionst::eval_verbosity()
 {
-  int v=8;
+  unsigned int v=8;
   
   if(cmdline.isset("verbosity"))
   {
-    v=unsafe_string2int(cmdline.getval("verbosity"));
-    if(v<0)
-      v=0;
-    else if(v>9)
-      v=9;
+    v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
+    if(v>10) v=10;
   }
   
   ui_message_handler.set_verbosity(v);
@@ -266,7 +264,7 @@ int goto_instrument_parseoptionst::doit()
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_functions);
       
-      const symbolt &symbol=ns.lookup("c::main");
+      const symbolt &symbol=ns.lookup(ID_main);
       symbol_exprt main(symbol.name, symbol.type);
       
       std::cout << rw_set_functiont(value_set_analysis, ns, goto_functions, main);
@@ -480,13 +478,13 @@ int goto_instrument_parseoptionst::doit()
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return 11;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return 11;
   }
   
@@ -624,13 +622,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   // magic error label
   if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.getval("error-label"));
+    options.set_option("error-label", cmdline.get_value("error-label"));
 
   // unwind loops 
   if(cmdline.isset("unwind"))
   {
     status() << "Unwinding loops" << eom;
-    options.set_option("unwind", cmdline.getval("unwind"));
+    options.set_option("unwind", cmdline.get_value("unwind"));
   }
 
   // we add the library in some cases, as some analyses benefit
@@ -669,7 +667,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   {
     status() << "Adding check for maximum call stack size" << eom;
     stack_depth(symbol_table, goto_functions,
-        unsafe_string2unsigned(cmdline.getval("stack-depth")));
+        unsafe_string2unsigned(cmdline.get_value("stack-depth")));
   }
 
   // ignore default/user-specified initialization of variables with static
@@ -728,7 +726,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
     if(cmdline.isset("mm"))
     {
-      std::string mm=cmdline.getval("mm");
+      // TODO: move to wmm/weak_mem, and copy goto_functions AFTER some of the
+      // modifications. Do the analysis on the copy, after remove_asm, and 
+      // instrument the original (without remove_asm)
+      remove_asm(symbol_table, goto_functions);
+      goto_functions.update();
+
+      std::string mm=cmdline.get_value("mm");
       memory_modelt model;
 
       // strategy of instrumentation
@@ -748,11 +752,11 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         inst_strategy=all;
       
       const unsigned unwind_loops = 
-        ( cmdline.isset("unwind")?unsafe_string2unsigned(cmdline.getval("unwind")):0 );
+        ( cmdline.isset("unwind")?unsafe_string2unsigned(cmdline.get_value("unwind")):0 );
       const unsigned max_var =
-        ( cmdline.isset("max-var")?unsafe_string2unsigned(cmdline.getval("max-var")):0 );
+        ( cmdline.isset("max-var")?unsafe_string2unsigned(cmdline.get_value("max-var")):0 );
       const unsigned max_po_trans =
-        ( cmdline.isset("max-po-trans")?unsafe_string2unsigned(cmdline.getval("max-po-trans")):0 );
+        ( cmdline.isset("max-po-trans")?unsafe_string2unsigned(cmdline.get_value("max-po-trans")):0 );
 
       if(mm=="tso")
       {
@@ -780,6 +784,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         model=Unknown;
       }
 
+      loop_strategyt loops=arrays_only;
+
+      if(cmdline.isset("force-loop-duplication"))
+        loops=all_loops;
+      if(cmdline.isset("no-loop-duplication"))
+        loops=no_loop;
+
       if(model!=Unknown)
         weak_memory(
           model,
@@ -791,6 +802,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
           unwind_loops,
           !cmdline.isset("cfg-kill"),
           cmdline.isset("no-dependencies"),
+          loops,
           max_var,
           max_po_trans,
           !cmdline.isset("no-po-rendering"),
@@ -798,7 +810,8 @@ void goto_instrument_parseoptionst::instrument_goto_program(
           cmdline.isset("render-cluster-function"),
           cmdline.isset("cav11"),
           cmdline.isset("hide-internals"),
-          get_message_handler());
+          get_message_handler(),
+          cmdline.isset("ignore-arrays"));
     }
 
     // Interrupt handler
@@ -809,7 +822,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         value_set_analysis,
         symbol_table,
         goto_functions,
-        cmdline.getval("isr"));
+        cmdline.get_value("isr"));
     }
 
     // Memory-mapped I/O
@@ -854,7 +867,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     else if(!step_case && !base_case)
       throw "please specify one of --step-case and --base-case";
 
-    unsigned k=unsafe_string2unsigned(cmdline.getval("k-induction"));
+    unsigned k=unsafe_string2unsigned(cmdline.get_value("k-induction"));
     
     if(k==0)
       throw "please give k>=1";
@@ -871,7 +884,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     function_enter(
       symbol_table,
       goto_functions,
-      cmdline.getval("function-enter"));
+      cmdline.get_value("function-enter"));
   }
 
   if(cmdline.isset("function-exit"))
@@ -880,7 +893,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     function_exit(
       symbol_table,
       goto_functions,
-      cmdline.getval("function-exit"));
+      cmdline.get_value("function-exit"));
   }
 
   if(cmdline.isset("branch"))
@@ -889,7 +902,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     branch(
       symbol_table,
       goto_functions,
-      cmdline.getval("branch"));
+      cmdline.get_value("branch"));
   }
 
   // add failed symbols

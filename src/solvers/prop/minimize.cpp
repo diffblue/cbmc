@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/threeval.h>
-#include <util/i2string.h>
 
 #include "literal_expr.h"
 #include "minimize.h"
@@ -146,7 +145,7 @@ void prop_minimizet::operator()()
       current!=objectives.rend();
       current++)
   {
-    status("weight "+i2string(current->first));
+    status() << "weight " << current->first << eom;
 
     decision_proceduret::resultt dec_result;
     do
@@ -177,7 +176,7 @@ void prop_minimizet::operator()()
           break;
 
         default:
-          error("decision procedure failed");
+          error() << "decision procedure failed" << eom;
           last_was_SAT=false;
           return;
         }

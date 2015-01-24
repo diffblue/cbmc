@@ -251,14 +251,6 @@ exprt boolbvt::bv_get_rec(
 
   switch(bvtype)
   {
-  case IS_C_ENUM:
-    {
-      constant_exprt value_expr(type);
-      value_expr.set_value(integer2string(binary2integer(value, true)));
-      return value_expr;
-    }
-    break;
-  
   case IS_UNKNOWN:
     break;
     
@@ -274,6 +266,7 @@ exprt boolbvt::bv_get_rec(
     break;
     
   default:
+  case IS_C_ENUM:
     constant_exprt value_expr(type);
     value_expr.set_value(value);
     return value_expr;

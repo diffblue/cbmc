@@ -80,14 +80,34 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
   
   // record the object size for non-determistic bounds checking
-  _Bool record_malloc;
+  __CPROVER_bool record_malloc;
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
   
   // detect memory leaks
-  _Bool record_may_leak;
+  __CPROVER_bool record_may_leak;
   __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
+
+  return res;
+}
+
+/* FUNCTION: __builtin_alloca */
+
+inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
+{
+  __CPROVER_HIDE:;
+  void *res;
+  res=__CPROVER_malloc(alloca_size);
+
+  // make sure it's not recorded as deallocated
+  __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
+  
+  // record the object size for non-determistic bounds checking
+  __CPROVER_bool record_malloc;
+  __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
+  __CPROVER_malloc_size=record_malloc?alloca_size:__CPROVER_malloc_size;
+  __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
 
   return res;
 }
@@ -119,7 +139,7 @@ inline void free(void *ptr)
                      "free called for new[] object");
     
     // non-deterministically record as deallocated
-    _Bool record;
+    __CPROVER_bool record;
     if(record) __CPROVER_deallocated=ptr;
 
     // detect memory leaks
@@ -267,7 +287,7 @@ inline char *getenv(const char *name)
     "zero-termination of argument of getenv");
   #endif
 
-  _Bool found;
+  __CPROVER_bool found;
   if(!found) return 0;
 
   char *buffer;
@@ -276,10 +296,6 @@ inline char *getenv(const char *name)
   __CPROVER_assume(buf_size>=1);
   buffer=(char *)__CPROVER_malloc(buf_size);
   buffer[buf_size-1]=0;
-
-  // detect memory leaks
-  _Bool record_may_leak;
-  __CPROVER_memory_leak=record_may_leak?buffer:__CPROVER_memory_leak;
 
   return buffer;
 }

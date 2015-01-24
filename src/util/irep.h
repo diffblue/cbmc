@@ -202,7 +202,8 @@ public:
   
   const irep_idt &get(const irep_namet &name) const;
   bool get_bool(const irep_namet &name) const;
-  int get_int(const irep_namet &name) const;
+  signed int get_int(const irep_namet &name) const;
+  unsigned int get_unsigned_int(const irep_namet &name) const;
   long long get_long_long(const irep_namet &name) const;
 
   inline void set(const irep_namet &name, const irep_idt &value)

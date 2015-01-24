@@ -86,14 +86,6 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_expr_explicit_typecast(expr);
   else if(expr.id()=="explicit-constructor-call")
     typecheck_expr_explicit_constructor_call(expr);
-  else if(expr.id()==ID_string_constant)
-  {
-    c_typecheck_baset::typecheck_expr_main(expr);
-
-    // we need to adjust the subtype to 'char'
-    assert(expr.type().id()==ID_array);
-    expr.type().subtype().set(ID_C_c_type, ID_char);
-  }
   else if(expr.is_nil())
   {
     #if 0
@@ -147,7 +139,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   {
     // these appear to have type "struct _GUID"
     // and they are lvalues!
-    expr.type()=symbol_typet("c::tag._GUID");
+    expr.type()=symbol_typet("tag._GUID");
     follow(expr.type());
     expr.set(ID_C_lvalue, true);
   }
@@ -1006,7 +998,7 @@ Purpose:
 
 \*******************************************************************/
 
-exprt collect_comma_expression(const exprt &src)
+static exprt collect_comma_expression(const exprt &src)
 {
   exprt result;
 
@@ -1095,8 +1087,8 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     else
     {
       err_location(expr);
-      str << "invalid explicit cast:" << std::endl;
-      str << "operand type: `" << to_string(expr.op0().type()) << "'" << std::endl;
+      str << "invalid explicit cast:\n";
+      str << "operand type: `" << to_string(expr.op0().type()) << "'\n";
       str << "casting to: `" << to_string(expr.type()) << "'";
       throw 0;
     }
@@ -1631,7 +1623,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   const cpp_typecheck_fargst &fargs)
 {
   source_locationt source_location=
-    to_cpp_name(expr).location();
+    to_cpp_name(expr).source_location();
 
   if(expr.get_sub().size()==1 &&
      expr.get_sub()[0].id()==ID_name)
@@ -1674,7 +1666,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
       symbol_exprt result;
       result.add_source_location()=source_location;
-      result.set_identifier(language_prefix+id2string(identifier));
+      result.set_identifier(identifier);
       code_typet t;
       t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
       t.make_ellipsis();
@@ -2321,10 +2313,10 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
+void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 {
   if(expr.operands().size()!=2)
-    throw "assignment side-effect expected to have two operands";
+    throw "assignment side effect expected to have two operands";
     
   typet type0=expr.op0().type();
 
@@ -2386,7 +2378,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
   cpp_name.get_sub().front().set(ID_C_source_location, expr.source_location());
 
   // expr.op0() is already typechecked
-  exprt already_typechecked("already_typechecked");
+  exprt already_typechecked(ID_already_typechecked);
   already_typechecked.move_to_operands(expr.op0());
 
   exprt member(ID_member);
@@ -2400,7 +2392,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
 
   typecheck_side_effect_function_call(new_expr);
 
-  expr.swap(new_expr);
+  expr=new_expr;
 }
 
 /*******************************************************************\
@@ -2824,16 +2816,8 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_expr_rel(exprt &expr)
+void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 {
-  if(expr.operands().size() != 2)
-  {
-    err_location(expr);
-    str << "operator `" << expr.id()
-        << "' expects two operands";
-    throw 0;
-  }
-
   c_typecheck_baset::typecheck_expr_rel(expr);
 }
 

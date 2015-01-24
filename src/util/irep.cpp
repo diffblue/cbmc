@@ -422,6 +422,23 @@ int irept::get_int(const irep_namet &name) const
 
 /*******************************************************************\
 
+Function: irept::get_unsigned_int
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+unsigned int irept::get_unsigned_int(const irep_namet &name) const
+{
+  return unsafe_string2unsigned(get_string(name));
+}
+
+/*******************************************************************\
+
 Function: irept::get_long_long
 
   Inputs:

@@ -394,19 +394,35 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     return false;
   }
 
-  // elminiate casts to bool
-  if(expr_type==bool_typet())
+  // elminiate casts to proper bool
+  if(expr_type.id()==ID_bool)
   {
-    // rewrite (_Bool)x to x!=0
-    equal_exprt equality;
-    equality.add_source_location()=expr.source_location();
-    equality.lhs()=expr.op0();
-    equality.rhs()=gen_zero(ns.follow(expr.op0().type()));
-    assert(equality.rhs().is_not_nil());
-    simplify_node(equality);
-    equality.make_not();
-    simplify_node(equality);
-    expr.swap(equality);
+    // rewrite (bool)x to x!=0
+    binary_relation_exprt inequality;
+    inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
+    inequality.add_source_location()=expr.source_location();
+    inequality.lhs()=expr.op0();
+    inequality.rhs()=gen_zero(ns.follow(expr.op0().type()));
+    assert(inequality.rhs().is_not_nil());
+    simplify_node(inequality);
+    expr.swap(inequality);
+    return false;
+  }
+  
+  // elminiate casts to _Bool
+  if(expr_type.id()==ID_c_bool &&
+     op_type.id()!=ID_bool)
+  {
+    // rewrite (_Bool)x to (_Bool)(x!=0)
+    binary_relation_exprt inequality;
+    inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
+    inequality.add_source_location()=expr.source_location();
+    inequality.lhs()=expr.op0();
+    inequality.rhs()=gen_zero(ns.follow(expr.op0().type()));
+    assert(inequality.rhs().is_not_nil());
+    simplify_node(inequality);
+    expr.op0()=inequality;
+    simplify_typecast(expr); // recursive call
     return false;
   }
   
@@ -517,21 +533,17 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
   unsigned expr_width=bv_width(expr_type);
   unsigned op_width=bv_width(operand.type());
-
+  
   if(operand.is_constant())
   {
     const irep_idt &value=to_constant_expr(operand).get_value();
-
-    constant_exprt new_expr(expr.type());
-
+    
     // preserve the sizeof type annotation
     typet c_sizeof_type=
       static_cast<const typet &>(operand.find(ID_C_c_sizeof_type));
       
     if(op_type_id==ID_integer ||
-       op_type_id==ID_natural ||
-       op_type_id==ID_c_enum ||
-       op_type_id==ID_incomplete_c_enum)
+       op_type_id==ID_natural)
     {
       // from integer to ...
     
@@ -539,32 +551,17 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_bool)
       {
-        new_expr.set_value((int_value!=0)?ID_true:ID_false);
-        expr.swap(new_expr);
+        expr.make_bool(int_value!=0);
         return false;
       }
 
       if(expr_type_id==ID_unsignedbv ||
-         expr_type_id==ID_signedbv)
+         expr_type_id==ID_signedbv ||
+         expr_type_id==ID_c_enum ||
+         expr_type_id==ID_c_bit_field ||
+         expr_type_id==ID_integer)
       {
-        unsigned expr_width=to_bitvector_type(expr_type).get_width();
-        new_expr.set_value(integer2binary(int_value, expr_width));
-        expr.swap(new_expr);
-        return false;
-      }
-
-      if(expr_type_id==ID_integer)
-      {
-        new_expr.set_value(value);
-        expr.swap(new_expr);
-        return false;
-      }
-      
-      if(expr_type_id==ID_c_enum ||
-         expr_type_id==ID_incomplete_c_enum)
-      {
-        new_expr.set_value(integer2string(int_value));
-        expr.swap(new_expr);
+        expr=from_integer(int_value, expr_type);
         return false;
       }
     }
@@ -578,10 +575,12 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     {
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv ||
-         expr_type_id==ID_c_enum ||
          expr_type_id==ID_integer ||
          expr_type_id==ID_natural ||
-         expr_type_id==ID_rational)
+         expr_type_id==ID_rational ||
+         expr_type_id==ID_c_bool ||
+         expr_type_id==ID_c_enum ||
+         expr_type_id==ID_c_bit_field)
       {
         if(operand.is_true())
         {
@@ -596,24 +595,44 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
           return false;
         }
       }
+      else if(expr_type_id==ID_c_enum_tag)
+      {
+        const typet &c_enum_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
+        if(c_enum_type.id()==ID_c_enum) // possibly incomplete
+        {
+          unsigned int_value=operand.is_true();
+          exprt tmp=from_integer(int_value, c_enum_type);
+          tmp.type()=expr_type; // we maintain the tag type
+          expr=tmp;
+          return false;
+        }
+      }
     }
     else if(op_type_id==ID_unsignedbv ||
-            op_type_id==ID_signedbv)
+            op_type_id==ID_signedbv ||
+            op_type_id==ID_c_bit_field ||
+            op_type_id==ID_c_bool)
     {
-      mp_integer int_value=binary2integer(
-        id2string(value), op_type_id==ID_signedbv);
+      mp_integer int_value;
+      
+      if(to_integer(to_constant_expr(operand), int_value))
+        return true;
 
       if(expr_type_id==ID_bool)
       {
-        new_expr.make_bool(int_value!=0);
-        expr.swap(new_expr);
+        expr.make_bool(int_value!=0);
         return false;
       }
 
+      if(expr_type_id==ID_c_bool)
+      {
+        expr=from_integer(int_value!=0, expr_type);
+        return false;
+      }
+      
       if(expr_type_id==ID_integer)
       {
-        new_expr=from_integer(int_value, expr_type);
-        expr.swap(new_expr);
+        expr=from_integer(int_value, expr_type);
         return false;
       }
 
@@ -621,19 +640,17 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       {
         if(int_value>=0)
         {
-          new_expr=from_integer(int_value, expr_type);
-          expr.swap(new_expr);
+          expr=from_integer(int_value, expr_type);
           return false;
         }
       }
 
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv ||
-         expr_type_id==ID_bv)
+         expr_type_id==ID_bv ||
+         expr_type_id==ID_c_bit_field)
       {
-        unsigned expr_width=to_bitvector_type(expr_type).get_width();
-        new_expr.set(ID_value, integer2binary(int_value, expr_width));
-        expr.swap(new_expr);
+        expr=from_integer(int_value, expr_type);
 
         if(c_sizeof_type.is_not_nil())
           expr.set(ID_C_c_sizeof_type, c_sizeof_type);
@@ -641,11 +658,21 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         return false;
       }
       
-      if(expr_type_id==ID_c_enum ||
-         expr_type_id==ID_incomplete_c_enum)
+      if(expr_type_id==ID_c_enum_tag)
       {
-        new_expr.set(ID_value, integer2string(int_value));
-        expr.swap(new_expr);
+        const typet &c_enum_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
+        if(c_enum_type.id()==ID_c_enum) // possibly incomplete
+        {
+          exprt tmp=from_integer(int_value, c_enum_type);
+          tmp.type()=expr_type; // we maintain the tag type
+          expr=tmp;
+          return false;
+        }
+      }
+      
+      if(expr_type_id==ID_c_enum)
+      {
+        expr=from_integer(int_value, expr_type);
         return false;
       }
       
@@ -729,11 +756,30 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv ||
          expr_type_id==ID_floatbv)
       {
-        unsigned expr_width=to_bitvector_type(expr_type).get_width();
-        mp_integer int_value=binary2integer(
-          id2string(value), false);
-        new_expr.set(ID_value, integer2binary(int_value, expr_width));
-        expr.swap(new_expr);
+        mp_integer int_value=binary2integer(id2string(value), false);
+        expr=from_integer(int_value, expr_type);
+        return false;
+      }
+    }
+    else if(op_type_id==ID_c_enum_tag) // enum to int
+    {
+      const typet &base_type=ns.follow_tag(to_c_enum_tag_type(op_type)).subtype();
+      if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
+      {
+        // enum constants use the representation of their base type
+        expr.op0().type()=base_type;
+        simplify_typecast(expr);
+        return false;
+      }
+    }
+    else if(op_type_id==ID_c_enum) // enum to int
+    {
+      const typet &base_type=to_c_enum_type(op_type).subtype();
+      if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
+      {
+        // enum constants use the representation of their base type
+        expr.op0().type()=base_type;
+        simplify_typecast(expr);
         return false;
       }
     }
@@ -2688,6 +2734,7 @@ bool simplify_exprt::simplify_if(exprt &expr)
       tmp.swap(cond.op0());
       cond.swap(tmp);
       truevalue.swap(falsevalue);
+      result=false;
     }
 
     #if 0
@@ -3217,6 +3264,12 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   
   ns.follow_symbol(tmp0.type());
   ns.follow_symbol(tmp1.type());
+  
+  if(tmp0.type().id()==ID_c_enum_tag)
+    tmp0.type()=ns.follow_tag(to_c_enum_tag_type(tmp0.type()));
+
+  if(tmp1.type().id()==ID_c_enum_tag)
+    tmp1.type()=ns.follow_tag(to_c_enum_tag_type(tmp1.type()));
 
   // are _both_ constant?  
   if(op0_is_const && op1_is_const)
@@ -3614,13 +3667,18 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       }
       else if(expr.op0().id()==ID_typecast &&
               expr.op0().operands().size()==1 &&
-              expr.op0().type().id()==ID_pointer)
+              expr.op0().type().id()==ID_pointer &&
+              (expr.op0().op0().type().id()==ID_pointer ||
+               config.ansi_c.NULL_is_zero))
       {
         // (type)ptr == NULL -> ptr == NULL
         // note that 'ptr' may be an integer
         exprt op=expr.op0().op0();
         expr.op0().swap(op);
-        expr.op1().type()=expr.op0().type();
+        if(expr.op0().type().id()!=ID_pointer)
+          expr.op1()=gen_zero(expr.op0().type());
+        else
+          expr.op1().type()=expr.op0().type();
         simplify_inequality(expr); // do again!
         return false;
       }
@@ -4732,7 +4790,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
       const struct_typet::componentt &component=
         struct_type.get_component(component_name);
 
-      if(component.is_nil() || component.get_is_bit_field())
+      if(component.is_nil() || component.type().id()==ID_c_bit_field)
         return true;
 
       // add member offset to index
@@ -4825,6 +4883,11 @@ exprt simplify_exprt::bits2expr(
     if(bits.size()==width)
       return constant_exprt(bits, type);
   }
+  else if(type.id()==ID_c_enum_tag)
+    return
+      bits2expr(
+        bits,
+        ns.follow_tag(to_c_enum_tag_type(type)));
   else if(type.id()==ID_union)
   {
     // need to find full-size member
@@ -4862,6 +4925,7 @@ std::string simplify_exprt::expr2bits(const exprt &expr)
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||
        type.id()==ID_c_enum ||
+       type.id()==ID_c_enum_tag ||
        type.id()==ID_floatbv ||
        type.id()==ID_fixedbv)
     {
@@ -5102,7 +5166,7 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
         const irep_idt &component_name=with.op1().get(ID_component_name);
         
         // is this a bit field?
-        if(struct_type.get_component(component_name).get_is_bit_field())
+        if(struct_type.get_component(component_name).type().id()==ID_c_bit_field)
         {
           // don't touch -- might not be byte-aligned
         }

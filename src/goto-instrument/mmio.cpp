@@ -10,6 +10,9 @@ Date: September 2011
 
 #include <util/cprover_prefix.h>
 
+#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_functions.h>
+
 #if 0
 #include <util/hash_cont.h>
 #include <util/std_expr.h>
@@ -22,6 +25,10 @@ Date: September 2011
 
 #include "interrupt.h"
 #include "rw_set.h"
+
+#ifdef LOCAL_MAY
+#include <analyses/local_may_alias.h>
+#endif
 
 /*******************************************************************\
 
@@ -38,9 +45,16 @@ Function: mmio
 void mmio(
   value_setst &value_sets,
   const symbol_tablet &symbol_table,
+#ifdef LOCAL_MAY
+  const goto_functionst::goto_functiont& goto_function,
+#endif
   goto_programt &goto_program)
 {
   namespacet ns(symbol_table);
+
+#ifdef LOCAL_MAY
+  local_may_aliast local_may(goto_function);
+#endif
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
@@ -48,7 +62,11 @@ void mmio(
     
     if(instruction.is_assign())
     {
-      rw_set_loct rw_set(ns, value_sets, i_it);
+      rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+        , local_may
+#endif
+      );
       
       if(rw_set.empty()) continue;
   
@@ -157,8 +175,12 @@ void mmio(
 
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
-       f_it->first!=ID_main)
-      mmio(value_sets, symbol_table, f_it->second.body);
+       f_it->first!=goto_functionst::entry_point())
+      mmio(value_sets, symbol_table, 
+#ifdef LOCAL_MAY
+        f_it->second,
+#endif
+        f_it->second.body);
 
   goto_functions.update();
 }

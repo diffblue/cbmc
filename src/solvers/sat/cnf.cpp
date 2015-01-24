@@ -553,51 +553,43 @@ Function: cnft::lselect
 
 \*******************************************************************/
 
+// Tino observed slow-downs up to 50% with OPTIMAL_COMPACT_ITE.
+
+#define COMPACT_ITE
+//#define OPTIMAL_COMPACT_ITE
+
 literalt cnft::lselect(literalt a, literalt b, literalt c)
 { // a?b:c = (a AND b) OR (/a AND c)
 
   if(a.is_constant()) return a.sign() ? b : c;
   if(b==c) return b;
 
-  #if 0
-  return lor(land(a, b), land(lnot(a), c));
+  if(b.is_constant()) return b.sign() ? lor(a, c) : land(!a, c);
+  if(c.is_constant()) return c.sign() ? lor(!a, b) : land(a, b);
 
-  #else
+  #ifdef COMPACT_ITE
+
   // (a+c'+o) (a+c+o') (a'+b'+o) (a'+b+o')
 
   literalt o=new_variable();
 
   bvt lits;
   
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(a);
-  lits.push_back(lnot(c));
-  lits.push_back(o);
-  lcnf(lits);
-  
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(a);
-  lits.push_back(c);
-  lits.push_back(lnot(o));
-  lcnf(lits);
-  
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(lnot(a));
-  lits.push_back(lnot(b));
-  lits.push_back(o);
-  lcnf(lits);
-  
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(lnot(a));
-  lits.push_back(b);
-  lits.push_back(lnot(o));
-  lcnf(lits);
+  lcnf( a, !c,  o);
+  lcnf( a,  c, !o);
+  lcnf(!a, !b,  o);
+  lcnf(!a,  b, !o);
+
+  #ifdef OPTIMAL_COMPACT_ITE
+  // additional clauses to enable better propagation
+  lcnf( b,  c, !o);
+  lcnf(!b, !c,  o);
+  #endif
 
   return o;
+
+  #else
+  return lor(land(a, b), land(!a, c));
   #endif
 }
 

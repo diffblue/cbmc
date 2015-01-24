@@ -32,8 +32,7 @@ public:
     namespacet(_symbol_table),
     symbol_table(_symbol_table),
     module(_module),
-    mode("C"),
-    language_prefix("c::")
+    mode("C")
   {
   }
 
@@ -46,8 +45,7 @@ public:
     namespacet(_symbol_table1, _symbol_table2),
     symbol_table(_symbol_table1),
     module(_module),
-    mode("C"),
-    language_prefix("c::")
+    mode("C")
   {
   }
 
@@ -60,7 +58,6 @@ protected:
   symbol_tablet &symbol_table;
   const irep_idt module;
   const irep_idt mode;
-  const std::string language_prefix;
   irep_idt current_symbol_id;
 
   typedef hash_map_cont<irep_idt, typet, irep_id_hash> id_type_mapt;
@@ -139,6 +136,8 @@ protected:
   void increment_designator(designatort &designator);
 
   // typecasts
+  
+  bool gcc_vector_types_compatible(const vector_typet &, const vector_typet &);
 
   virtual void implicit_typecast(exprt &expr, const typet &type);
   virtual void implicit_typecast_arithmetic(exprt &expr);
@@ -204,8 +203,8 @@ protected:
   virtual void typecheck_expr_dereference(exprt &expr);
   virtual void typecheck_expr_member(exprt &expr);
   virtual void typecheck_expr_ptrmember(exprt &expr);
-  virtual void typecheck_expr_rel(exprt &expr);
-  virtual void typecheck_expr_rel_vector(exprt &expr);
+  virtual void typecheck_expr_rel(binary_relation_exprt &expr);
+  virtual void typecheck_expr_rel_vector(binary_relation_exprt &expr);
   virtual void adjust_float_rel(exprt &expr);
   virtual void typecheck_expr_index(exprt &expr);
   virtual void typecheck_expr_typecast(exprt &expr);
@@ -215,26 +214,27 @@ protected:
   virtual void typecheck_expr_function_identifier(exprt &expr);
   virtual void typecheck_side_effect_gcc_conditional_expression(side_effect_exprt &expr);
   virtual void typecheck_side_effect_function_call(side_effect_expr_function_callt &expr);
-  virtual void typecheck_side_effect_assignment(exprt &expr);
+  virtual void typecheck_side_effect_assignment(side_effect_exprt &expr);
   virtual void typecheck_side_effect_statement_expression(side_effect_exprt &expr);
   virtual void typecheck_function_call_arguments(side_effect_expr_function_callt &expr);
-  virtual void do_special_functions(side_effect_expr_function_callt &expr);
+  virtual exprt do_special_functions(side_effect_expr_function_callt &expr);
 
   virtual void make_index_type(exprt &expr);
   virtual void make_constant(exprt &expr);
   virtual void make_constant_index(exprt &expr);
   virtual void make_constant_rec(exprt &expr);
   
-  virtual bool gcc_types_compatible_p(const typet &type1, const typet &type2);
+  virtual bool gcc_types_compatible_p(const typet &, const typet &);
   
   // types
   virtual void typecheck_type(typet &type);
   virtual void typecheck_compound_type(struct_union_typet &type);
   virtual void typecheck_compound_body(symbolt &);
   virtual void typecheck_c_enum_type(typet &type);
+  virtual void typecheck_c_enum_tag_type(c_enum_tag_typet &type);
   virtual void typecheck_code_type(code_typet &type);
   virtual void typecheck_symbol_type(typet &type);
-  virtual void typecheck_c_bit_field_type(typet &type);
+  virtual void typecheck_c_bit_field_type(c_bit_field_typet &type);
   virtual void typecheck_typeof_type(typet &type);
   virtual void typecheck_array_type(array_typet &type);
   virtual void typecheck_vector_type(vector_typet &type);
@@ -270,21 +270,18 @@ protected:
 
   virtual void do_initializer(symbolt &symbol);
   
-  inline irep_idt add_language_prefix(const irep_idt id) const
+  inline static bool is_numeric_type(const typet &src)
   {
-    return language_prefix+id2string(id);
+    return src.id()==ID_complex ||
+           src.id()==ID_unsignedbv ||
+           src.id()==ID_signedbv ||
+           src.id()==ID_floatbv || 
+           src.id()==ID_fixedbv || 
+           src.id()==ID_c_bool ||
+           src.id()==ID_bool ||
+           src.id()==ID_c_enum_tag ||
+           src.id()==ID_c_bit_field;
   }
-
-  struct enum_constantt
-  {
-    irep_idt identifier;
-    mp_integer value;
-    enum_constantt(irep_idt _identifier, mp_integer _value):
-      identifier(_identifier), value(_value)
-    {
-    }
-  };
-    
 };
 
 #endif

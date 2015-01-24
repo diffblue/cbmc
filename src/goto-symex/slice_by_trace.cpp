@@ -611,18 +611,25 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
 {
   std::set<exprt> s;
 
-  if (e.id() == ID_symbol) { // Guard or merge
+  if (e.id() == ID_symbol)
+  { // Guard or merge
     const char* merge_loc = strstr(e.get(ID_identifier).c_str(),"merge#");
-    if (merge_loc == NULL) {
+    if(merge_loc == NULL)
+    {
       exprt e_copy (e);
       simplify(e_copy, ns);
       s.insert(e_copy);
       return s;
-    } else {
-      int i = unsafe_str2int(merge_loc+1);
-      if (merge_impl_cache_back[i].first) {
+    }
+    else
+    {
+      int i = unsafe_c_str2int(merge_loc+1);
+      if (merge_impl_cache_back[i].first)
+      {
 	return merge_impl_cache_back[i].second;
-      } else {
+      }
+      else
+      {
 	merge_impl_cache_back[i].first = true;
 	exprt merge_copy (merge_map_back[i]);
 	merge_impl_cache_back[i].second = implied_guards(merge_copy);

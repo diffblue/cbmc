@@ -19,9 +19,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/memory_info.h>
 #include <util/i2string.h>
 
+#include <ansi-c/c_preprocess.h>
+
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_vector.h>
+#include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_asm.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -31,7 +36,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 
-#include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/goto_check.h>
@@ -104,15 +108,12 @@ Function: cbmc_parseoptionst::eval_verbosity
 void cbmc_parseoptionst::eval_verbosity()
 {
   // this is our default verbosity
-  int v=messaget::M_STATISTICS;
+  unsigned int v=messaget::M_STATISTICS;
   
   if(cmdline.isset("verbosity"))
   {
-    v=unsafe_string2int(cmdline.getval("verbosity"));
-    if(v<0)
-      v=0;
-    else if(v>10)
-      v=10;
+    v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
+    if(v>10) v=10;
   }
   
   ui_message_handler.set_verbosity(v);
@@ -148,7 +149,7 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("cover-assertions", true);
 
   if(cmdline.isset("mm"))
-    options.set_option("mm", cmdline.getval("mm"));
+    options.set_option("mm", cmdline.get_value("mm"));
 
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
@@ -162,11 +163,11 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("all-properties", false);
 
   if(cmdline.isset("unwind-max"))
-    options.set_option("unwind-max", cmdline.getval("unwind-max"));
+    options.set_option("unwind-max", cmdline.get_value("unwind-max"));
   if(cmdline.isset("unwind-min"))
-    options.set_option("unwind-min", cmdline.getval("unwind-min"));
+    options.set_option("unwind-min", cmdline.get_value("unwind-min"));
   if(cmdline.isset("unwind")) 
-    options.set_option("unwind", cmdline.getval("unwind"));
+    options.set_option("unwind", cmdline.get_value("unwind"));
 
   if(cmdline.isset("ignore-assertions-before-unwind-min"))
     options.set_option("ignore-assertions-before-unwind-min", true);
@@ -174,21 +175,21 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("stop-when-unsat", true);
 
   if(cmdline.isset("depth"))
-    options.set_option("depth", cmdline.getval("depth"));
+    options.set_option("depth", cmdline.get_value("depth"));
 
   if(cmdline.isset("debug-level"))
-    options.set_option("debug-level", cmdline.getval("debug-level"));
+    options.set_option("debug-level", cmdline.get_value("debug-level"));
 
   if(cmdline.isset("slice-by-trace"))
-    options.set_option("slice-by-trace", cmdline.getval("slice-by-trace"));
+    options.set_option("slice-by-trace", cmdline.get_value("slice-by-trace"));
 
   if(cmdline.isset("unwindset"))
-    options.set_option("unwindset", cmdline.getval("unwindset"));
+    options.set_option("unwindset", cmdline.get_value("unwindset"));
 
   if(cmdline.isset("incremental"))
     options.set_option("incremental", true);
   if(cmdline.isset("incremental-check"))
-    options.set_option("incremental-check", cmdline.getval("incremental-check"));
+    options.set_option("incremental-check", cmdline.get_value("incremental-check"));
   if(cmdline.isset("earliest-loop-exit"))
     options.set_option("earliest-loop-exit", true);
   if(cmdline.isset("magic-numbers"))
@@ -262,7 +263,7 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
   // magic error label
   if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.getval("error-label"));
+    options.set_option("error-label", cmdline.get_values("error-label"));
 
   // generate unwinding assertions
   if(cmdline.isset("cover-assertions"))
@@ -299,7 +300,7 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("refine", true);
 
   if(cmdline.isset("max-node-refinement"))
-    options.set_option("max-node-refinement", cmdline.getval("max-node-refinement"));
+    options.set_option("max-node-refinement", cmdline.get_value("max-node-refinement"));
 
   if(cmdline.isset("aig"))
     options.set_option("aig", true);
@@ -376,17 +377,16 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
       options.set_option("smt1", true), version_set = true;
   }
 
-
-  if (version_set && !solver_set)
+  if(version_set && !solver_set)
   {
-    if (cmdline.isset("outfile"))
+    if(cmdline.isset("outfile"))
     {
       // outfile and no solver should give standard compliant SMT-LIB
       options.set_option("generic", true), solver_set = true;
     }
     else
     {
-      if (options.get_bool_option("smt1"))
+      if(options.get_bool_option("smt1"))
       {
 	options.set_option("boolector", true), solver_set = true;
       }
@@ -400,8 +400,6 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   // Either have solver and standard version set, or neither.
   assert(version_set == solver_set);
 
-
-
   if(cmdline.isset("beautify"))
     options.set_option("beautify", true);
 
@@ -414,7 +412,10 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
                      !cmdline.isset("no-pretty-names"));
 
   if(cmdline.isset("outfile"))
-    options.set_option("outfile", cmdline.getval("outfile"));
+    options.set_option("outfile", cmdline.get_value("outfile"));
+
+  if(cmdline.isset("graphml-cex"))
+    options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
 }
 
 /*******************************************************************\
@@ -492,9 +493,9 @@ int cbmc_parseoptionst::doit()
   //
   // Print a banner
   //
-  status("CBMC version " CBMC_VERSION " "+
-         i2string(sizeof(void *)*8)+"-bit "+
-         id2string(config.this_operating_system()));
+  status() << "CBMC version " CBMC_VERSION " "
+           << sizeof(void *)*8 << "-bit "
+           << config.this_operating_system() << eom;
 
   //
   // Unwinding of transition systems is done by hw-cbmc.
@@ -518,7 +519,10 @@ int cbmc_parseoptionst::doit()
   }
   
   register_languages();
-
+  
+  if(cmdline.isset("test-preprocessor"))
+    return test_c_preprocessor(ui_message_handler)?8:0;
+  
   //get solver
   cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
   cbmc_solvers.set_ui(get_ui());
@@ -580,13 +584,13 @@ bool cbmc_parseoptionst::set_properties(goto_functionst &goto_functions)
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
   
@@ -721,23 +725,19 @@ bool cbmc_parseoptionst::get_goto_program(
       goto_convert(symbol_table, goto_functions, ui_message_handler);
     }
 
-    // finally add the library
-    status() << "Adding CPROVER library" << eom;
-    link_to_library(symbol_table, goto_functions, ui_message_handler);
-
     if(process_goto_program(options, goto_functions))
       return true;
   }
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
   
@@ -805,12 +805,12 @@ void cbmc_parseoptionst::preprocessing()
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
   }
   
   catch(int)
@@ -842,6 +842,14 @@ bool cbmc_parseoptionst::process_goto_program(
   try
   {
     namespacet ns(symbol_table);
+    
+    // Remove inline assembler; this needs to happen before
+    // adding the library.
+    remove_asm(symbol_table, goto_functions);
+
+    // add the library
+    status() << "Adding CPROVER library" << eom;
+    link_to_library(symbol_table, goto_functions, ui_message_handler);
 
     if(cmdline.isset("string-abstraction"))
       string_instrumentation(
@@ -856,8 +864,10 @@ bool cbmc_parseoptionst::process_goto_program(
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
     
-    // remove returns
+    // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
+    remove_vector(symbol_table, goto_functions);
+    remove_complex(symbol_table, goto_functions);
     
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
@@ -903,13 +913,13 @@ bool cbmc_parseoptionst::process_goto_program(
 
   catch(const char *e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
 
   catch(const std::string e)
   {
-    error(e);
+    error() << e << eom;
     return true;
   }
   
@@ -1057,6 +1067,7 @@ void cbmc_parseoptionst::help()
     " --no-unwinding-assertions    do not generate unwinding assertions\n"
     " --partial-loops              permit paths with partial loops\n"
     " --no-pretty-names            do not simplify identifiers\n"
+    " --graphml-cex filename       write the counterexample in GraphML format to filename\n"
     "\n"
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"

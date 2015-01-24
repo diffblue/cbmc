@@ -124,7 +124,7 @@ typet ansi_c_declarationt::full_type(
   while(p->is_not_nil())
   {
     if(p->id()==ID_pointer || p->id()==ID_array || 
-       p->id()==ID_vector || p->id()==ID_c_bitfield ||
+       p->id()==ID_vector || p->id()==ID_c_bit_field ||
        p->id()==ID_block_pointer || p->id()==ID_code)
       p=&p->subtype();
     else if(p->id()==ID_merged_type)
@@ -161,7 +161,7 @@ void ansi_c_declarationt::to_symbol(
   symbol.clear();    
   symbol.value=declarator.value();
   symbol.type=full_type(declarator);
-  symbol.name="c::"+id2string(declarator.get_name());
+  symbol.name=declarator.get_name();
   symbol.base_name=declarator.get_base_name();
   symbol.is_type=get_is_typedef();
   symbol.location=declarator.source_location();

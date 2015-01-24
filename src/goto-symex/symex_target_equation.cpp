@@ -260,6 +260,8 @@ void symex_target_equationt::assignment(
 
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
   SSA_step.type=goto_trace_stept::ASSIGNMENT;
+  SSA_step.hidden=(assignment_type!=STATE &&
+                   assignment_type!=VISIBLE_ACTUAL_PARAMETER);
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -281,7 +283,8 @@ void symex_target_equationt::decl(
   const exprt &guard,
   const symbol_exprt &ssa_lhs,
   const symbol_exprt &original_lhs_object,
-  const sourcet &source)
+  const sourcet &source,
+  assignment_typet assignment_type)
 {
   assert(ssa_lhs.is_not_nil());
   
@@ -295,6 +298,7 @@ void symex_target_equationt::decl(
   SSA_step.original_full_lhs=original_lhs_object;
   SSA_step.type=goto_trace_stept::DECL;
   SSA_step.source=source;
+  SSA_step.hidden=(assignment_type!=STATE);
 
   // the condition is trivially true, and only
   // there so we see the symbols
@@ -1107,6 +1111,8 @@ void symex_target_equationt::SSA_stept::output(
     {
     case HIDDEN: out << "HIDDEN"; break;
     case STATE: out << "STATE"; break;
+    case VISIBLE_ACTUAL_PARAMETER: out << "VISIBLE_ACTUAL_PARAMETER"; break;
+    case HIDDEN_ACTUAL_PARAMETER: out << "HIDDEN_ACTUAL_PARAMETER"; break;
     case PHI: out << "PHI"; break;
     case GUARD: out << "GUARD"; break; 
     default:;

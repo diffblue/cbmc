@@ -90,6 +90,10 @@ inline int __isnanl(long double ld) { return __CPROVER_isnanld(ld); }
 
 inline int isnormal(double d) { return __CPROVER_isnormald(d); }
 
+/* FUNCTION: __isnormalf */
+
+inline int __isnormalf(float f) { return __CPROVER_isnormalf(f); }
+
 /* FUNCTION: __builtin_inff */
 
 inline float __builtin_inff(void) { return 1.0f/0.0f; }
@@ -134,6 +138,18 @@ inline double __builtin_huge_val(void) { return 1.0/0.0; }
 
 inline long double __builtin_huge_vall(void) { return 1.0l/0.0l; }
 
+/* FUNCTION: _dsign */
+
+inline int _dsign(double d) { return __CPROVER_signd(d); }
+
+/* FUNCTION: _ldsign */
+
+inline int _ldsign(long double ld) { return __CPROVER_signld(ld); }
+
+/* FUNCTION: _fdsign */
+
+inline int _fdsign(float f) { return __CPROVER_signf(f); }
+
 /* FUNCTION: signbit */
 
 inline int signbit(double d) { return __CPROVER_signd(d); }
@@ -149,6 +165,54 @@ inline int __signbitf(float f) { return __CPROVER_signf(f); }
 /* FUNCTION: __signbit */
 
 inline int __signbit(double ld) { return __CPROVER_signld(ld); }
+
+/* FUNCTION: _dclass */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+inline short _dclass(double d) {
+  __CPROVER_HIDE:
+  return __CPROVER_isnand(d)?FP_NAN:
+         __CPROVER_isinfd(d)?FP_INFINITE:
+         d==0?FP_ZERO:
+         __CPROVER_isnormald(d)?FP_NORMAL:
+         FP_SUBNORMAL;
+}
+
+/* FUNCTION: _ldclass */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+inline short _ldclass(long double ld) {
+  __CPROVER_HIDE:
+  return __CPROVER_isnanld(ld)?FP_NAN:
+         __CPROVER_isinfld(ld)?FP_INFINITE:
+         ld==0?FP_ZERO:
+         __CPROVER_isnormalld(ld)?FP_NORMAL:
+         FP_SUBNORMAL;
+}
+
+/* FUNCTION: _fdclass */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+inline short _fdclass(float f) {
+  __CPROVER_HIDE:
+  return __CPROVER_isnanf(f)?FP_NAN:
+         __CPROVER_isinff(f)?FP_INFINITE:
+         f==0?FP_ZERO:
+         __CPROVER_isnormalf(f)?FP_NORMAL:
+         FP_SUBNORMAL;
+}
 
 /* FUNCTION: __fpclassifyd */
 

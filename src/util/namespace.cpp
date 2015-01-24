@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <algorithm>
+
 #include <cassert>
 
 #include "string2int.h"
@@ -35,7 +37,7 @@ unsigned get_max(
   forall_symbols(it, symbols)
     if(has_prefix(id2string(it->first), prefix))
       max_nr=
-        std::max(unsafe_str2unsigned(it->first.c_str()+prefix.size()),
+        std::max(unsafe_c_str2unsigned(it->first.c_str()+prefix.size()),
                  max_nr);
 
   return max_nr;
@@ -131,12 +133,12 @@ Function: namespace_baset::follow_tag
 
 \*******************************************************************/
 
-const union_typet &namespace_baset::follow_tag(const union_tag_typet &src) const
+const typet &namespace_baset::follow_tag(const union_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   assert(symbol.is_type);
-  assert(symbol.type.id()==ID_union);
-  return to_union_type(symbol.type);
+  assert(symbol.type.id()==ID_union || symbol.type.id()==ID_incomplete_union);
+  return symbol.type;
 }
 
 /*******************************************************************\
@@ -151,12 +153,12 @@ Function: namespace_baset::follow_tag
 
 \*******************************************************************/
 
-const struct_typet &namespace_baset::follow_tag(const struct_tag_typet &src) const
+const typet &namespace_baset::follow_tag(const struct_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   assert(symbol.is_type);
-  assert(symbol.type.id()==ID_struct);
-  return to_struct_type(symbol.type);
+  assert(symbol.type.id()==ID_struct || symbol.type.id()==ID_incomplete_struct);
+  return symbol.type;
 }
 
 /*******************************************************************\
@@ -175,6 +177,7 @@ const typet &namespace_baset::follow_tag(const c_enum_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   assert(symbol.is_type);
+  assert(symbol.type.id()==ID_c_enum || symbol.type.id()==ID_incomplete_c_enum);
   return symbol.type;
 }
 

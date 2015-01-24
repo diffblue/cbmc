@@ -298,7 +298,7 @@ void __actual_thread_spawn(
   __CPROVER_ASYNC_1: __CPROVER_thread_id=id,
                        start_routine(arg),
                        __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
-                                         "WWcumul", "RRcumul", "RWcumul", "WRcumul"),
+                                       "WWcumul", "RRcumul", "RWcumul", "WRcumul"),
                        __CPROVER_threads_exited[id]=1;
 }
 

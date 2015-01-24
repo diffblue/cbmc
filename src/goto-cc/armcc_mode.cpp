@@ -36,7 +36,7 @@ bool armcc_modet::doit()
     return false;
   }
 
-  int verbosity=1;
+  unsigned int verbosity=1;
 
   compilet compiler(cmdline);
 
@@ -49,12 +49,12 @@ bool armcc_modet::doit()
   #endif
 
   if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2int(cmdline.getval("verbosity"));
+    verbosity=unsafe_string2int(cmdline.get_value("verbosity"));
 
   compiler.ui_message_handler.set_verbosity(verbosity);
   ui_message_handler.set_verbosity(verbosity);
 
-  debug("ARM mode");
+  debug() << "ARM mode" << eom;
   
   // get configuration
   config.set(cmdline);
@@ -106,7 +106,7 @@ bool armcc_modet::doit()
   // armcc's default is .o    
   if(cmdline.isset("default_extension="))
     compiler.object_file_extension=
-      cmdline.getval("default_extension=");
+      cmdline.get_value("default_extension=");
   else
     compiler.object_file_extension="o";
       

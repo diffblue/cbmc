@@ -71,6 +71,19 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__INTMAX_TYPE__=\"long int\""\
   " -D__UINTMAX_TYPE__=\"long unsigned int\""
 
+#define GCC_DEFINES_LLP64 \
+  " -D__INT_MAX__=2147483647"\
+  " -D__CHAR_BIT__=8"\
+  " -D__SCHAR_MAX__=127"\
+  " -D__SHRT_MAX__=32767"\
+  " -D__LONG_LONG_MAX__=9223372036854775807LL"\
+  " -D__LONG_MAX__=2147483647"\
+  " -D__SIZE_TYPE__=\"long long unsigned int\""\
+  " -D__PTRDIFF_TYPE__=\"long long\""\
+  " -D__WINT_TYPE__=\"unsigned int\""\
+  " -D__INTMAX_TYPE__=\"long long int\""\
+  " -D__UINTMAX_TYPE__=\"long long unsigned int\""
+
 /*******************************************************************\
 
 Function: type_max
@@ -248,7 +261,7 @@ Function: c_preprocess
 
 bool c_preprocess_codewarrior(const std::string &, std::ostream &, message_handlert &);
 bool c_preprocess_arm(const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_gcc(const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_gcc_clang(const std::string &, std::ostream &, message_handlert &, configt::ansi_ct::preprocessort);
 bool c_preprocess_none(const std::string &, std::ostream &, message_handlert &);
 bool c_preprocess_visual_studio(const std::string &, std::ostream &, message_handlert &);
 
@@ -263,7 +276,10 @@ bool c_preprocess(
     return c_preprocess_codewarrior(path, outstream, message_handler);
   
   case configt::ansi_ct::PP_GCC:
-    return c_preprocess_gcc(path, outstream, message_handler);
+    return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
+  
+  case configt::ansi_ct::PP_CLANG:
+    return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
   
   case configt::ansi_ct::PP_VISUAL_STUDIO:
     return c_preprocess_visual_studio(path, outstream, message_handler);
@@ -567,7 +583,7 @@ bool c_preprocess_codewarrior(
 
 /*******************************************************************\
 
-Function: c_preprocess_gcc
+Function: c_preprocess_gcc_clang
 
   Inputs:
 
@@ -577,10 +593,11 @@ Function: c_preprocess_gcc
 
 \*******************************************************************/
 
-bool c_preprocess_gcc(
+bool c_preprocess_gcc_clang(
   const std::string &file,
   std::ostream &outstream,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  configt::ansi_ct::preprocessort preprocessor)
 {
   // check extension
   if(is_dot_i_file(file))
@@ -593,7 +610,12 @@ bool c_preprocess_gcc(
 
   std::string command;
   
-  command="gcc -E -undef -D__CPROVER__";
+  if(preprocessor==configt::ansi_ct::PP_CLANG)
+    command="clang";
+  else
+    command="gcc";
+  
+  command +=" -E -undef -D__CPROVER__";
 
   command+=" -D__null=0";
   command+=" -D__WORDSIZE="+i2string(config.ansi_c.pointer_width);
@@ -687,7 +709,12 @@ bool c_preprocess_gcc(
   else if(config.ansi_c.int_width==32)
   {
     if(config.ansi_c.pointer_width==64)
-      command+=GCC_DEFINES_LP64;
+    {
+      if(config.ansi_c.long_int_width==32)
+        command+=GCC_DEFINES_LLP64; // Windows, for instance
+      else
+        command+=GCC_DEFINES_LP64;
+    }
     else
       command+=GCC_DEFINES_32;
   }
@@ -702,6 +729,8 @@ bool c_preprocess_gcc(
       command+=" -D__WCHAR_TYPE__=\""+sig+" short int\"";
     else if(config.ansi_c.wchar_t_width==config.ansi_c.int_width)
       command+=" -D__WCHAR_TYPE__=\""+sig+" int\"";
+    else if(config.ansi_c.wchar_t_width==config.ansi_c.long_int_width)
+      command+=" -D__WCHAR_TYPE__=\""+sig+" long int\"";
     else
       assert(false);
   }
@@ -800,7 +829,7 @@ bool c_preprocess_gcc(
   {
     std::ifstream stderr_stream(stderr_file.c_str());
     char ch;
-    while((stderr_stream.read(&ch, 1))!=NULL)
+    while(stderr_stream.read(&ch, 1))
       message_stream.str << ch;
   }
 
@@ -1056,4 +1085,29 @@ bool c_preprocess_none(
   }
 
   return false;
+}
+
+/*******************************************************************\
+
+Function: test_c_preprocessor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: tests ANSI-C preprocessing
+
+\*******************************************************************/
+
+const char c_test_program[]=
+  "#include <stdlib.h>\n"
+  "\n"
+  "int main() { }\n";
+
+bool test_c_preprocessor(message_handlert &message_handler)
+{
+  std::ostringstream out;
+  std::istringstream in(c_test_program);
+  
+  return c_preprocess(in, out, message_handler);
 }

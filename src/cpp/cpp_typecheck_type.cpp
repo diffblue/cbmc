@@ -75,7 +75,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     if(type.get_bool(ID_C_constant))
       qualifiers.is_constant = true;
 
-     qualifiers.write(type);
+    qualifiers.write(type);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
@@ -176,9 +176,12 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     typecheck_enum_type(type);
   }
-  else if(type.id()==ID_c_bitfield)
+  else if(type.id()==ID_c_enum_tag)
   {
-    typecheck_c_bit_field_type(type);
+  }
+  else if(type.id()==ID_c_bit_field)
+  {
+    typecheck_c_bit_field_type(to_c_bit_field_type(type));
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -255,10 +258,13 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // This is an Apple extension for lambda-like constructs.
     // http://thirdcog.eu/pwcblocks/
   }
+  else if(type.id()==ID_nullptr)
+  {
+  }
   else
   {
     err_location(type);
-    str << "unexpected type: " << type.pretty();
+    str << "unexpected cpp type: " << type.pretty();
     throw 0;
   }
   

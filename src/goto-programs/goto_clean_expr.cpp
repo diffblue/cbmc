@@ -46,6 +46,7 @@ symbol_exprt goto_convertt::make_compound_literal(
     new_symbol.is_thread_local=true;
     new_symbol.is_static_lifetime=source_location.get_function().empty();
     new_symbol.is_file_local=true;
+    new_symbol.is_auxiliary=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
     new_symbol.location=source_location;
@@ -415,7 +416,7 @@ void goto_convertt::clean_expr(
     else if(statement==ID_function_call)
     {
       if(to_side_effect_expr_function_call(expr).function().id()==ID_symbol &&
-         to_symbol_expr(to_side_effect_expr_function_call(expr).function()).get_identifier()=="c::__noop")
+         to_symbol_expr(to_side_effect_expr_function_call(expr).function()).get_identifier()=="__noop")
       {
         // __noop needs special treatment, as arguments are not
         // evaluated

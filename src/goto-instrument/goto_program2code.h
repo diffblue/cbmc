@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include <util/replace_symbol.h>
-
 #include <analyses/natural_loops.h>
 
 class goto_program2codet
@@ -82,7 +80,6 @@ protected:
   natural_loopst loops;
   loopt loop_map;
   id_sett labels_in_use;
-  replace_symbolt replace_symbols;
   dead_mapt dead_map;
   loop_last_stackt loop_last_stack;
   id_sett local_static_set;
@@ -160,6 +157,25 @@ protected:
       goto_programt::const_targett target,
       goto_programt::const_targett upper_bound,
       codet &dest);
+
+  goto_programt::const_targett get_cases(
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    const exprt &switch_var,
+    cases_listt &cases,
+    goto_programt::const_targett &first_target,
+    goto_programt::const_targett &default_target);
+
+  bool set_block_end_points(
+    goto_programt::const_targett upper_bound,
+    const cfg_dominatorst &dominators,
+    cases_listt &cases,
+    std::set<unsigned> &processed_locations);
+
+  bool remove_default(
+    const cfg_dominatorst &dominators,
+    const cases_listt &cases,
+    goto_programt::const_targett default_target);
 
   goto_programt::const_targett convert_goto_if(
       goto_programt::const_targett target,

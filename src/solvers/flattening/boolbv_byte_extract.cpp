@@ -29,7 +29,7 @@ Function: map_bv
 
 bvt map_bv(const endianness_mapt &map, const bvt &src)
 {
-  assert(map.size()*8>=src.size());
+  assert(map.number_of_bits()==src.size());
 
   bvt result;
   result.resize(src.size(), const_literal(false));
@@ -52,13 +52,15 @@ Function: boolbvt::convert_byte_extract
 
 \*******************************************************************/
 
-void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
+void boolbvt::convert_byte_extract(
+  const byte_extract_exprt &expr,
+  bvt &bv)
 {
   if(expr.operands().size()!=2)
     throw "byte_extract takes two operands";
 
   // if we extract from an unbounded array, call the flattening code
-  if(is_unbounded_array(expr.op0().type()))
+  if(is_unbounded_array(expr.op().type()))
   {
     exprt tmp=flatten_byte_extract(expr, ns);
     bv=convert_bv(tmp);
@@ -70,8 +72,8 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
   if(width==0)
     return conversion_failed(expr, bv);    
     
-  const exprt &op0=expr.op0();
-  const exprt &op1=expr.op1();
+  const exprt &op=expr.op();
+  const exprt &offset=expr.offset();
   
   bool little_endian;
   
@@ -84,8 +86,8 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
 
   // first do op0
   
-  endianness_mapt op0_map(op0.type(), little_endian, ns);
-  const bvt op0_bv=map_bv(op0_map, convert_bv(op0));
+  endianness_mapt op_map(op.type(), little_endian, ns);
+  const bvt op_bv=map_bv(op_map, convert_bv(op));
 
   // do result
   endianness_mapt result_map(expr.type(), little_endian, ns);
@@ -95,7 +97,7 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
   unsigned byte_width=8;
 
   mp_integer index;
-  if(!to_integer(op1, index))
+  if(!to_integer(offset, index))
   {
     if(index<0)
       throw "byte_extract flatting with negative offset: "+expr.pretty();
@@ -106,14 +108,14 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
 
     for(unsigned i=0; i<width; i++)
       // out of bounds?
-      if(offset<0 || offset_i+i>=op0_bv.size())
+      if(offset<0 || offset_i+i>=op_bv.size())
         bv[i]=prop.new_variable();
       else
-        bv[i]=op0_bv[offset_i+i];
+        bv[i]=op_bv[offset_i+i];
   }
   else
   {
-    unsigned bytes=op0_bv.size()/byte_width;
+    unsigned bytes=op_bv.size()/byte_width;
     
     if(prop.has_set_to())
     {
@@ -124,9 +126,9 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
       // add implications
 
       equal_exprt equality;
-      equality.lhs()=op1; // index operand
+      equality.lhs()=offset; // index operand
 
-      typet constant_type=op1.type(); // type of index operand
+      typet constant_type=offset.type(); // type of index operand
 
       bvt equal_bv;
       equal_bv.resize(width);
@@ -138,8 +140,8 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
         unsigned offset=i*byte_width;
 
         for(unsigned j=0; j<width; j++)
-          if(offset+j<op0_bv.size())
-            equal_bv[j]=prop.lequal(bv[j], op0_bv[offset+j]);
+          if(offset+j<op_bv.size())
+            equal_bv[j]=prop.lequal(bv[j], op_bv[offset+j]);
           else
             equal_bv[j]=const_literal(true);
 
@@ -150,9 +152,9 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
     else
     {
       equal_exprt equality;
-      equality.lhs()=op1; // index operand
+      equality.lhs()=offset; // index operand
 
-      typet constant_type(op1.type()); // type of index operand
+      typet constant_type(offset.type()); // type of index operand
       
       for(unsigned i=0; i<bytes; i++)
       {
@@ -166,8 +168,8 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
         {
           literalt l;
           
-          if(offset+j<op0_bv.size())
-            l=op0_bv[offset+j];
+          if(offset+j<op_bv.size())
+            l=op_bv[offset+j];
           else
             l=const_literal(false);
 

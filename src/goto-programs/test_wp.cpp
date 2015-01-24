@@ -22,20 +22,21 @@ int main(int argc, const char **argv)
 
     register_language(new_ansi_c_language);
     
-    ansi_c_languaget language;
     console_message_handlert message_handler;
+    ansi_c_languaget language;
+    language.set_message_handler(message_handler);
     
-    language.parse(std::cin, "", message_handler);
+    language.parse(std::cin, "");
     
     symbol_tablet symbol_table;
-    language.typecheck(symbol_table, "cin", message_handler);
+    language.typecheck(symbol_table, "cin");
 
     goto_functionst goto_functions;
 
     goto_convert(symbol_table, goto_functions, message_handler);
 
     goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.find("c::f");
+      f_it=goto_functions.function_map.find("f");
       
     if(f_it==goto_functions.function_map.end())
     {
@@ -45,7 +46,7 @@ int main(int argc, const char **argv)
     
     const goto_programt &p=f_it->second.body;
     
-    //p.output(namespacet(symbol_table), "c::f", std::cout);
+    //p.output(namespacet(symbol_table), "f", std::cout);
 
     forall_goto_program_instructions(it, p)
     {

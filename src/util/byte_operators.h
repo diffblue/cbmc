@@ -225,47 +225,45 @@ extern inline byte_update_big_endian_exprt &to_byte_update_big_endian_expr(exprt
 class endianness_mapt
 {
 public:
-  endianness_mapt(const typet &type, bool little_endian, const namespacet &_ns):ns(_ns)
+  inline endianness_mapt(
+    const typet &type,
+    bool little_endian,
+    const namespacet &_ns):ns(_ns)
   {
     build(type, little_endian);
   }
 
   inline size_t map_bit(size_t bit) const
   {
-    size_t byte=bit/8;
-    return map_byte(byte)*8+bit%8;
+    return map[bit];
   }
   
-  inline size_t map_byte(size_t byte) const
-  {
-    assert(byte<map.size());
-    return map[byte];
-  }
-  
-  size_t size() const
+  inline size_t number_of_bits() const
   {
     return map.size();
   }
   
   inline void build(const typet &type, bool little_endian)
   {
-    size_t bit_field_bits=0;
-    build_rec(type, little_endian, bit_field_bits);
+    if(little_endian)
+      build_little_endian(type);
+    else
+      build_big_endian(type);
   }
   
   void output(std::ostream &) const;
 
 protected:
   const namespacet &ns;
-  std::vector<size_t> map;
+  std::vector<size_t> map; // bit-nr to bit-nr
 
-  void build_rec(
-    const typet &type,
-    bool little_endian,
-    size_t &bit_field_bits);
+  void build_little_endian(const typet &type);
+  void build_big_endian(const typet &type);
 };
 
-extern inline std::ostream &operator << (std::ostream &out, const endianness_mapt &m)
+extern inline std::ostream &operator << (
+  std::ostream &out,
+  const endianness_mapt &m)
 {
   m.output(out);
   return out;
