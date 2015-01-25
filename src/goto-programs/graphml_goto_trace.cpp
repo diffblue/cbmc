@@ -11,6 +11,7 @@ Author: Daniel Kroening
 #include <util/config.h>
 #include <util/i2string.h>
 #include <util/arith_tools.h>
+#include <util/prefix.h>
 
 #include "graphml_goto_trace.h"
 
@@ -64,7 +65,9 @@ static std::string convert_assign_rec(
     forall_operands(it, assign.rhs())
     {
       if(c_it->type().id()==ID_code ||
-         c_it->get_is_padding())
+         c_it->get_is_padding() ||
+         // for some reason #is_padding gets lost in *some* cases
+         has_prefix(id2string(c_it->get_name()), "$pad"))
       {
         ++c_it;
         continue;
