@@ -519,6 +519,9 @@ std::string expr2cppt::convert(
           (src.get(ID_statement)==ID_cpp_new ||
            src.get(ID_statement)==ID_cpp_new_array))
     return convert_cpp_new(src, precedence=15);
+  else if(src.id()==ID_side_effect &&
+          src.get(ID_statement)==ID_throw)
+    return convert_function(src, "throw", precedence=16);
   else if(src.is_constant() && src.type().id() == ID_verilogbv)
     return "'" + id2string(src.get(ID_value)) + "'";
   else if(src.is_constant() && to_constant_expr(src).get_value()==ID_nullptr)
