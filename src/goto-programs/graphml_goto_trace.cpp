@@ -167,7 +167,8 @@ void convert(
   {
     const source_locationt &source_location=it->pc->source_location;
 
-    if(source_location.is_nil() ||
+    if(it->hidden ||
+       source_location.is_nil() ||
        source_location.get_file().empty() ||
        source_location.get_file()=="<built-in-additions>" ||
        source_location.get_line().empty())
@@ -204,7 +205,7 @@ void convert(
     if(from==sink) continue;
 
     goto_tracet::stepst::const_iterator next=it;
-    ++next;
+    for(++next; next!=goto_trace.steps.end() && next->hidden; ++next) ;
     const unsigned to=
       next==goto_trace.steps.end()?
       sink:step_to_node[next->step_nr];
