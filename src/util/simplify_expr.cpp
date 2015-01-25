@@ -5234,10 +5234,12 @@ Function: sort_and_join
 \*******************************************************************/
 
 // The entries
-//  { "+",      "floatbv"    },
-//  { "*",      "floatbv"    },
+//  { ID_plus,   ID_floatbv  },
+//  { ID_mult,   ID_floatbv  },
+//  { ID_plus,   ID_pointer  },
 // are deliberately missing, as FP-addition and multiplication
-// aren't associative
+// aren't associative. Addition to pointers isn't really
+// associative.
 
 struct saj_tablet
 {
@@ -5253,7 +5255,6 @@ struct saj_tablet
   { ID_plus,   ID_unsignedbv },
   { ID_plus,   ID_signedbv   },
   { ID_plus,   ID_fixedbv    },
-  { ID_plus,   ID_pointer    },
   { ID_mult,   ID_integer    },
   { ID_mult,   ID_natural    },
   { ID_mult,   ID_real       },
