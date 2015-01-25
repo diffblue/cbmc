@@ -1,6 +1,6 @@
-THOROUGH
+CORE
 main.c
---unwind 17
+--unwind 7
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

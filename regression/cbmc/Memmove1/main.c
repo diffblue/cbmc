@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include <assert.h>
 
 void sort_items_by_criteria( int * item, int left, int right )
