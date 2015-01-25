@@ -13,7 +13,47 @@ Author: Daniel Kroening
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 
+#include <goto-symex/ssa_expr.h>
+
 #include "graphml_goto_trace.h"
+
+/*******************************************************************\
+
+Function: remove_l0_l1
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static void remove_l0_l1(exprt &expr)
+{
+  if(expr.id()==ID_symbol)
+  {
+    if(is_ssa_expr(expr))
+      expr=to_ssa_expr(expr).get_original_expr();
+    else
+    {
+      std::string identifier=
+        id2string(to_symbol_expr(expr).get_identifier());
+
+      std::string::size_type l0_l1=identifier.find_first_of("!@");
+      if(l0_l1!=std::string::npos)
+      {
+        identifier.resize(l0_l1);
+        to_symbol_expr(expr).set_identifier(identifier);
+      }
+    }
+
+    return;
+  }
+
+  Forall_operands(it, expr)
+    remove_l0_l1(*it);
+}
 
 /*******************************************************************\
 
@@ -32,12 +72,13 @@ static std::string convert_assign_rec(
   const irep_idt &identifier,
   const code_assignt &assign)
 {
+  std::string result;
+
   if(assign.rhs().id()==ID_array)
   {
     const array_typet &type=
       to_array_type(ns.follow(assign.rhs().type()));
 
-    std::string result;
     unsigned i=0;
     forall_operands(it, assign.rhs())
     {
@@ -48,8 +89,6 @@ static std::string convert_assign_rec(
       if(!result.empty()) result+=' ';
       result+=convert_assign_rec(ns, identifier, code_assignt(index, *it));
     }
-
-    return result;
   }
   else if(assign.rhs().id()==ID_struct ||
           assign.rhs().id()==ID_union)
@@ -59,7 +98,6 @@ static std::string convert_assign_rec(
     const struct_union_typet::componentst &components=
       type.components();
 
-    std::string result;
     struct_union_typet::componentst::const_iterator c_it=
       components.begin();
     forall_operands(it, assign.rhs())
@@ -82,14 +120,17 @@ static std::string convert_assign_rec(
       result+=convert_assign_rec(ns, identifier, code_assignt(member, *it));
       ++c_it;
     }
-
-    return result;
   }
   else
   {
-    return from_expr(ns, identifier, assign.lhs())+" = "+
-           from_expr(ns, identifier, assign.rhs())+";";
+    exprt clean_rhs=assign.rhs();
+    remove_l0_l1(clean_rhs);
+
+    result=from_expr(ns, identifier, assign.lhs())+" = "+
+           from_expr(ns, identifier, clean_rhs)+";";
   }
+
+  return result;
 }
 
 /*******************************************************************\
