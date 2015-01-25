@@ -96,6 +96,9 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_custom_type(type);
   else if(type.id()==ID_gcc_attribute_mode)
   {
+    // get that mode
+    irep_idt mode=type.get(ID_size);
+    
     // A list of all modes ist at
     // http://www.delorie.com/gnu/docs/gcc/gccint_53.html
     typecheck_type(type.subtype());
@@ -106,9 +109,6 @@ void c_typecheck_baset::typecheck_type(typet &type)
        underlying_type.id()==ID_unsignedbv)
     {
       bool is_signed=underlying_type.id()==ID_signedbv;
-      
-      // get width
-      irep_idt mode=type.get(ID_size);
       
       typet result;
       
@@ -156,9 +156,6 @@ void c_typecheck_baset::typecheck_type(typet &type)
     }
     else if(underlying_type.id()==ID_floatbv)
     {
-      // get width
-      irep_idt mode=type.get(ID_size);
-      
       typet result;
       
       if(mode=="__SF__") // 32 bits
@@ -186,7 +183,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
     else
     {
       err_location(type);
-      str << "attribute mode applied to inappropriate type `"
+      str << "attribute mode `" << mode
+          << "' applied to inappropriate type `"
           << to_string(type) << "'";
       throw 0;
     }
