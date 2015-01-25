@@ -47,10 +47,12 @@ exprt flatten_byte_extract(
   if(src.id()==ID_byte_extract_big_endian) 
     throw "byte_extract flattening of big endian not done yet";
 
-  mp_integer size=pointer_offset_size(ns, src.type());
-  if(size<0)
+  mp_integer size_bits=pointer_offset_bits(ns, src.type());
+  if(size_bits<0)
     throw "byte_extract flatting with non-constant size: "+src.pretty();
-  unsigned width=integer2unsigned(size);
+  unsigned width_bits=integer2unsigned(size_bits);
+
+  unsigned width_bytes=width_bits/8+(width_bits%8==0?0:1);
   
   const typet &t=src.op0().type();
   
@@ -66,13 +68,13 @@ exprt flatten_byte_extract(
     {
       // get 'width'-many bytes, and concatenate
       exprt::operandst op;
-      op.resize(width);
+      op.resize(width_bytes);
       
-      for(unsigned i=0; i<width; i++)
+      for(unsigned i=0; i<width_bytes; i++)
       {
         // the most significant byte comes first in the concatenation!
         unsigned offset_i=
-          little_endian?(width-i-1):i;
+          little_endian?(width_bytes-i-1):i;
         
         plus_exprt offset(from_integer(offset_i, src.op1().type()), src.op1());
         index_exprt index_expr(subtype);
@@ -81,9 +83,9 @@ exprt flatten_byte_extract(
         op[i]=index_expr;
       }
       
-      if(width==1)
+      if(width_bytes==1)
         return op[0];
-      else // width>=2
+      else // width_bytes>=2
       {
         concatenation_exprt concatenation(src.type());
         concatenation.operands().swap(op);
@@ -143,12 +145,12 @@ exprt flatten_byte_extract(
 
     mult_exprt times_eight(offset, from_integer(8, offset_type));
 
-    mp_integer op0_bytes=pointer_offset_size(ns, src.op0().type());
-    if(op0_bytes<0)
+    mp_integer op0_bits=pointer_offset_bits(ns, src.op0().type());
+    if(op0_bits<0)
       throw "byte_extract flatting of non-constant source size: "+src.pretty();
 
     // cast to generic bit-vector
-    unsigned op0_width=integer2unsigned(op0_bytes*8);
+    unsigned op0_width=integer2unsigned(op0_bits);
     typecast_exprt src_op0_tc(src.op0(), bv_typet(op0_width));
     lshr_exprt left_shift(src_op0_tc, times_eight);
 
@@ -156,7 +158,7 @@ exprt flatten_byte_extract(
     
     extractbits.src()=left_shift;
     extractbits.type()=src.type();
-    extractbits.upper()=from_integer(width*8-1, offset_type);
+    extractbits.upper()=from_integer(width_bits-1, offset_type);
     extractbits.lower()=from_integer(0, offset_type);
       
     return extractbits;
