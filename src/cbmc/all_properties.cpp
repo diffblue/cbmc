@@ -79,7 +79,8 @@ bool bmct::all_properties(
       it!=equation.SSA_steps.end();
       it++)
   {
-    if(it->is_assert())
+    if(it->is_assert() &&
+       it->comment!="loop_condition_check")
     {
       irep_idt property_id;
 
