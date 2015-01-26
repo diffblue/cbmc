@@ -1,9 +1,9 @@
 CORE
 main.c
---all-claims --bounds-check --32
+--all-properties --bounds-check --32
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main\.11\] array.List upper bound: FAILED$
-^\*\* 1 of 11 failed (2 iterations)$
+^\[main\.array bounds\.5\] array.List upper bound in p->List\[2\]: FAILED$
+^\*\* 1 of 9 failed (2 iterations)$
 --
 ^warning: ignoring

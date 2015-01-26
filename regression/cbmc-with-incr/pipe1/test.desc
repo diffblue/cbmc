@@ -3,7 +3,7 @@ main.c
 --all-properties
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main\.4\] assertion data\[1\]==31: FAILED$
+^\[main\.assertion\.4\] assertion data\[1\]==31: FAILED$
 ^\*\* 1 of 5 failed (2 iterations)$
 --
 ^warning: ignoring

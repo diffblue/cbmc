@@ -5,6 +5,6 @@ main.c
 ^EXIT=10$
 ^Counterexample:$
 ^VERIFICATION FAILED$
-^  dereference failure: object bounds$
+^  dereference failure: object bounds in \*p$
 --
 ^warning: ignoring
