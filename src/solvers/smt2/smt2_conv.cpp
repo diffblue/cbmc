@@ -1162,6 +1162,30 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << ")";
     }
   }
+  else if(expr.id()==ID_unary_plus)
+  {
+    // A no-op (apart from type promotion)
+    assert(expr.operands().size()==1);
+    convert_expr(expr.op0());
+  }
+  else if(expr.id()==ID_sign)
+  {
+    assert(expr.operands().size() == 1);
+
+    if (expr.op0().type().id()==ID_floatbv)
+    {
+      if(use_FPA_theory)
+      {
+	out << "(fp.isNegative ";
+	convert_expr(expr.op0());
+	out << ")";
+      }
+      else
+	FPCONVTODO("sign for floatbv");
+    } 
+    else
+      UNEXPECTEDCASE("sign applied to type " + expr.type().id_string());
+  }
   else if(expr.id()==ID_if)
   {
     assert(expr.operands().size()==3);
@@ -2031,6 +2055,17 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       convert_expr(gen_zero(src_type));
       out << "))";
     }
+    else if (src_type.id()==ID_floatbv)
+    {
+      if(use_FPA_theory)
+      {
+	out << "(not (fp.isZero ";
+	convert_expr(src);
+	out << "))";
+      }
+      else
+       FPCONVTODO("floatbv -> bool");
+    }
     else
     {
       UNEXPECTEDCASE("TODO typecast1 "+src_type.id_string()+" -> bool");
@@ -2430,68 +2465,46 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else if(dest_type.id()==ID_floatbv)
   {
-    // Obsoleted by smt2_convt::convert_floatbv_typecast
-    UNREACHABLE;
+    // Typecast from integer to floating-point should have be been
+    // converted to ID_floatbv_typecast during symbolic execution,
+    // adding the rounding mode.  See
+    // smt2_convt::convert_floatbv_typecast.
+    // The exception is bool to float.
 
-    if(src_type.id()==ID_floatbv)
+    if (src_type.id()==ID_bool)
     {
+      constant_exprt val(dest_type);
 
-//      const floatbv_typet &src=to_floatbv_type(src_type);
-      const floatbv_typet &dst=to_floatbv_type(dest_type);
+      ieee_floatt a;
+      a.spec = to_floatbv_type(dest_type);
 
-      if(use_FPA_theory)
-      {
-        out << "((_ to_fp " << dst.get_e() << " "
-            << dst.get_f() + 1 << ") ";
-	convert_rounding_mode(expr.op1());
-	out << " ";
-        convert_expr(src);
-        out << ")";
-      }
-      else
-      {
-        FPCONVTODO("typecast4 floatbv -> floatbv");
-      }
-    }
-    else if(src_type.id()==ID_signedbv)
-    {
-      const floatbv_typet &dst=to_floatbv_type(dest_type);
+      mp_integer significand;
+      mp_integer exponent;
 
-      if(use_FPA_theory)
-      {
-        out << "((_ to_fp " << dst.get_e() << " "
-            << dst.get_f() + 1 << ") ";
-	convert_rounding_mode(expr.op1());
-	out << " ";
-        convert_expr(src);
-        out << ")";
-      }
-      else
-      {
-        FPCONVTODO("typecast5 floatbv -> int");
-      }
-    }
-    else if(src_type.id()==ID_unsignedbv)
-    {
-      // unsignedbv to floatbv
-      const floatbv_typet &dst=to_floatbv_type(dest_type);
 
-      if(use_FPA_theory)
-      {
-        out << "((_ to_fp_unsigned " << dst.get_e() << " "
-            << dst.get_f() + 1 << ") ";
-	convert_rounding_mode(expr.op1());
-	out << " ";
-        convert_expr(src);
-        out << ")";
-      }
-      else
-      {
-        FPCONVTODO("typecast6 int -> floatbv");
-      }
+      out << "(ite ";
+      convert_expr(src);
+      out << " ";
+
+      significand = 1;
+      exponent = 0;
+      a.build(significand, exponent);
+      val.set(ID_value, integer2binary(a.pack(), a.spec.width()));
+
+      convert_constant(val);
+      out << " ";
+
+      significand = 0;
+      exponent = 0;
+      a.build(significand, exponent);
+      val.set(ID_value, integer2binary(a.pack(), a.spec.width()));
+
+      convert_constant(val);
+      out << ")";
     }
     else
-      UNEXPECTEDCASE("TODO typecast7 "+src_type.id_string()+" -> floatbv");
+      UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
+
   }
   else if(dest_type.id()==ID_c_bit_field)
   {
@@ -3166,21 +3179,10 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
     }
     else if(expr.type().id()==ID_floatbv)
     {
-      // This code is obsoleted by smt2_convt::convert_floatbv_plus
+      // Floating-point additions should have be been converted
+      // to ID_floatbv_plus during symbolic execution, adding 
+      // the rounding mode.  See smt2_convt::convert_floatbv_plus.
       UNREACHABLE;
-
-      if(use_FPA_theory)
-      {
-        out << "(fp.add roundNearestTiesToEven ";
-        convert_expr(expr.op0());
-        out << " ";
-        convert_expr(expr.op1());
-        out << ")";
-      }
-      else
-      {
-        FPCONVTODO("+ for floatbv");
-      }
     }
     else if(expr.type().id()==ID_pointer)
     {
@@ -3436,21 +3438,10 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
   }
   else if(expr.type().id()==ID_floatbv)
   {
-    // This code is obsoleted by smt2_convt::convert_floatbv_minus
+    // Floating-point subtraction should have be been converted
+    // to ID_floatbv_minus during symbolic execution, adding 
+    // the rounding mode.  See smt2_convt::convert_floatbv_minus.
     UNREACHABLE;
-
-    if(use_FPA_theory)
-    {
-      out << "(fp.sub roundNearestTiesToEven ";
-      convert_expr(expr.op0());
-      out << " ";
-      convert_expr(expr.op1());
-      out << ")";
-    }
-    else
-    {
-      FPCONVTODO(" - for floatbv");
-    }
   }
   else if(expr.type().id()==ID_pointer)
   {
@@ -3578,21 +3569,10 @@ void smt2_convt::convert_div(const div_exprt &expr)
   }
   else if(expr.type().id()==ID_floatbv)
   {
-    // This code is obsoleted by smt2_convt::convert_floatbv_div
+    // Floating-point division should have be been converted
+    // to ID_floatbv_div during symbolic execution, adding 
+    // the rounding mode.  See smt2_convt::convert_floatbv_div.
     UNREACHABLE;
-
-    if(use_FPA_theory)
-    {
-      out << "(fp.div roundNearestTiesToEven ";
-      convert_expr(expr.op0());
-      out << " ";
-      convert_expr(expr.op1());
-      out << ")";
-    }
-    else
-    {
-      FPCONVTODO(" / for floatbv");
-    }
   }
   else
     UNEXPECTEDCASE("unsupported type for /: "+expr.type().id_string());
@@ -3674,24 +3654,10 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
   }
   else if(expr.type().id()==ID_floatbv)
   {
-    // This code is obsoleted by smt2_convt::convert_floatbv_mult
+    // Floating-point multiplication should have be been converted
+    // to ID_floatbv_mult during symbolic execution, adding 
+    // the rounding mode.  See smt2_convt::convert_floatbv_mult.
     UNREACHABLE;
-
-    if(use_FPA_theory)
-    {
-      forall_operands(it, expr)
-        if(it!=expr.operands().begin())
-          out << "(fp.mul roundNearestTiesToEven ";
-
-      convert_expr(expr.op0());
-      out << " ";
-      convert_expr(expr.op1());
-      out << ")";
-    }
-    else
-    {
-      FPCONVTODO(" * for floatbv");
-    }
   }
   else if(expr.type().id()==ID_fixedbv)
   {
