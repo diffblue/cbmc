@@ -139,6 +139,7 @@ protected:
   void convert_minus(const minus_exprt &expr);
   void convert_div(const div_exprt &expr);
   void convert_mult(const mult_exprt &expr);
+  void convert_rounding_mode(const exprt &expr);
   void convert_floatbv_plus(const exprt &expr);
   void convert_floatbv_minus(const exprt &expr);
   void convert_floatbv_div(const exprt &expr);
