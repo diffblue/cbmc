@@ -1,4 +1,4 @@
-void assert(_Bool cond);
+#include <assert.h>
 
 #ifdef PRINT
 #include <stdio.h>

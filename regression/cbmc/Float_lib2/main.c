@@ -13,6 +13,7 @@
 int main (void)
 {
   #ifdef __GNUC__
+  // Visual Studio won't parse the hexadecimal floating-point literal
   float largestSubnormalFloat = 0x1.fffffcp-127f;
 
   assert(fpclassify(largestSubnormalFloat) != FP_NAN);

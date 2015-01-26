@@ -1,3 +1,5 @@
+#include <assert.h>
+
 enum flags { FLAG1, FLAG2, FLAG3, FLAG4 };
 
 enum bool {false, true};

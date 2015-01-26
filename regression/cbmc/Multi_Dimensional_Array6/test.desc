@@ -1,0 +1,10 @@
+CORE
+main.c
+--unwind 3 --no-unwinding-assertions --all-properties
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] : OK$
+^\[main\.assertion\.2\] : FAILED$
+^\*\* 1 of 2 failed (2 iterations)$
+--
+^warning: ignoring
