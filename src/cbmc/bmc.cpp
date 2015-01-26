@@ -374,10 +374,10 @@ bool bmct::run(const goto_functionst &goto_functions)
 
     bool verification_result = false; //true = "FAILED"
 
+    irep_idt entry_point=goto_functions.entry_point();
     goto_functionst::function_mapt::const_iterator it=
-      goto_functions.function_map.find(ID_main);
-    if(it==goto_functions.function_map.end())
-      throw "main symbol not found; please set an entry point";
+      goto_functions.function_map.find(entry_point);
+    assert(it!=goto_functions.function_map.end());
     const goto_programt &body=it->second.body;
     goto_symext::statet symex_state;
 
