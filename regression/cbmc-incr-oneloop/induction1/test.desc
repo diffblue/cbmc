@@ -1,6 +1,6 @@
 CORE
 main.c
---incremental-check c::main.0 --stop-when-unsat --no-unwinding-assertions
+--incremental-check main.0 --stop-when-unsat --no-unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
