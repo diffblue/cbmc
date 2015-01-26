@@ -67,18 +67,20 @@ void adjust_float_expressions(
       const typecast_exprt &typecast_expr=to_typecast_expr(expr);
 
       if(typecast_expr.type().id()==ID_floatbv &&
-         typecast_expr.op().type().id()==ID_floatbv &&
-         to_floatbv_type(typecast_expr.type()).get_width()<
-         to_floatbv_type(typecast_expr.op().type()).get_width())
+         typecast_expr.op().type().id()==ID_floatbv)
       {
-        // casts from bigger to smaller float-type might round
+        // Casts from bigger to smaller float-type might round.
+	// For smaller to bigger it is strictly redundant but
+	// we leave this optimisation until later to simplify
+	// the representation.
         expr.id(ID_floatbv_typecast);
         expr.operands().resize(2);
         expr.op1()=rounding_mode;
       }
       else if(typecast_expr.type().id()==ID_floatbv &&
               (typecast_expr.op().type().id()==ID_signedbv ||
-               typecast_expr.op().type().id()==ID_unsignedbv))
+               typecast_expr.op().type().id()==ID_unsignedbv ||
+               typecast_expr.op().type().id()==ID_c_enum))
       {
         // casts from integer to float-type might round
         expr.id(ID_floatbv_typecast);
