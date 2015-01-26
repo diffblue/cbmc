@@ -54,6 +54,12 @@
   supports <code>-fsingle-precision-constant</code>, which allows the
   (non-standard) treatment of constants as floats.
   </p></li>
+
+<li><p class="justified">
+  Casts from int to float and float to float make use of the current
+  rounding mode.  Note that the standard requires that casts from
+  float to int use round-to-zero (i.e. truncation).
+  </p></li>
 </ul>
 
 <h3>x86 and Other Platform-specific Issues</h3>
