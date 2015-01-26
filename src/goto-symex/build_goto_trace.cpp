@@ -290,15 +290,18 @@ void build_goto_trace(
 
       symex_target_equationt::SSA_stepst::const_iterator next=it;
       ++next;
-      assert(next!=target.SSA_steps.end());
-
-      // goto was taken if backwards and next is enabled or forward
-      // and next is not active;
-      // there is an ambiguity here if a forward goto is to the next
-      // instruction, which we simply ignore for now
-      goto_trace_step.goto_taken=
-        backwards==
-        (prop_conv.l_get(next->guard_literal)==tvt(true));
+      if(next==target.SSA_steps.end()) //goto was definitely taken
+	 goto_trace_step.goto_taken = true;
+      else
+      {
+        // goto was taken if backwards and next is enabled or forward
+        // and next is not active;
+        // there is an ambiguity here if a forward goto is to the next
+        // instruction, which we simply ignore for now
+        goto_trace_step.goto_taken=
+          backwards==
+          (prop_conv.l_get(next->guard_literal)==tvt(true));
+      }
     }
   }
   
