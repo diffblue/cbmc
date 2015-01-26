@@ -457,13 +457,15 @@ Function: c_typecheck_baset::typecheck_expr_builtin_va_arg
 
 void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
 {
-  // this comes with a type, which will need to be fixed
-  // and checked
-  typet type=expr.type();
-  typecheck_type(type);
+  // The first parameter is the va_list, and the second
+  // is the type, which will need to be fixed and checked.
+  // The type is given by the parser as type of the expression.
+
+  typet arg_type=expr.type();
+  typecheck_type(arg_type);
   
   code_typet new_type;
-  new_type.return_type().swap(type);
+  new_type.return_type().swap(arg_type);
   new_type.parameters().resize(1);
   new_type.parameters()[0].type()=pointer_typet(empty_typet());
 
