@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/byte_operators.h>
+#include <util/endianness_map.h>
 
 #include "boolbv.h"
 #include "flatten_byte_operators.h"
