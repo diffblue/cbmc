@@ -65,6 +65,7 @@ protected:
 
   void build_little_endian(const typet &type);
   void build_big_endian(const typet &type);
+  void build_big_endian_rec(const typet &type);
 };
 
 extern inline std::ostream &operator << (
