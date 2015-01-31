@@ -1243,8 +1243,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // an integer/float of the same size
     if((expr_type.id()==ID_signedbv ||
         expr_type.id()==ID_unsignedbv) &&
-       pointer_offset_size(*this, expr_type)==
-       pointer_offset_size(*this, op_vector_type))
+       pointer_offset_size(expr_type, *this)==
+       pointer_offset_size(op_vector_type, *this))
     {
     }
     else

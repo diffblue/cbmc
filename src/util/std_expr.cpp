@@ -131,9 +131,8 @@ static void build_object_descriptor_rec(
       return;
 
     mp_integer offset=
-      member_offset(ns,
-                    to_struct_type(struct_type),
-                    member.get_component_name());
+      member_offset(to_struct_type(struct_type),
+                    member.get_component_name(), ns);
     assert(offset>=0);
 
     dest.offset()=

@@ -82,7 +82,7 @@ std::string as_vcd_binary(
      type.id()==ID_bv)
     width=string2integer(type.get_string(ID_width));
   else
-    width=pointer_offset_size(ns, type)*8;
+    width=pointer_offset_size(type, ns)*8;
 
   if(width>=0)
   {
@@ -141,15 +141,8 @@ void output_vcd(
 
       if(type.id()==ID_bool)
         width=1;
-      else if(type.id()==ID_unsignedbv ||
-              type.id()==ID_signedbv ||
-              type.id()==ID_floatbv ||
-              type.id()==ID_fixedbv ||
-              type.id()==ID_pointer ||
-              type.id()==ID_bv)
-        width=string2integer(type.get_string(ID_width));
       else
-        width=pointer_offset_size(ns, type)*8;
+        width=pointer_offset_bits(type, ns);
         
       if(width>=1)
         out << "$var reg " << width << " V" << number << " "

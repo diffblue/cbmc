@@ -369,7 +369,7 @@ void value_sett::eval_pointer_offset(
       else
       {
         const exprt &object=object_numbering[it->first];
-        mp_integer ptr_offset=compute_pointer_offset(ns, object);
+        mp_integer ptr_offset=compute_pointer_offset(object, ns);
         exprt offset=from_integer(it->second.offset, index_type());
 
         if(ptr_offset<0 || offset.id()!=ID_constant)
@@ -706,7 +706,7 @@ void value_sett::get_value_set_rec(
         
       if(i_is_set)
       {
-        i*=pointer_offset_size(ns, ptr_operand.type().subtype());
+        i*=pointer_offset_size(ptr_operand.type().subtype(), ns);
 
         if(expr.id()==ID_minus) i.negate();
       }
@@ -1131,7 +1131,7 @@ void value_sett::get_reference_set_rec(
         }
         else if(!to_integer(offset, i) &&
                 o.offset_is_zero())
-          o.offset=i*pointer_offset_size(ns, array_type.subtype());
+          o.offset=i*pointer_offset_size(array_type.subtype(), ns);
         else
           o.offset_is_set=false;
           

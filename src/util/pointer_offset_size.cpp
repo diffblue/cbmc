@@ -33,9 +33,9 @@ Function: member_offset
 \*******************************************************************/
 
 mp_integer member_offset(
-  const namespacet &ns,
   const struct_typet &type,
-  const irep_idt &member)
+  const irep_idt &member,
+  const namespacet &ns)
 {
   const struct_typet::componentst &components=type.components();
   
@@ -60,7 +60,7 @@ mp_integer member_offset(
     else
     {
       const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      mp_integer sub_size=pointer_offset_size(subtype, ns);
       if(sub_size==-1) return -1; // give up
       result+=sub_size;
     }
@@ -82,10 +82,10 @@ Function: pointer_offset_size
 \*******************************************************************/
 
 mp_integer pointer_offset_size(
-  const namespacet &ns,
-  const typet &type)
+  const typet &type,
+  const namespacet &ns)
 {
-  mp_integer bits=pointer_offset_bits(ns, type);
+  mp_integer bits=pointer_offset_bits(type, ns);
   if(bits==-1) return -1;
   return bits/8+(((bits%8)==0)?0:1);
 }
@@ -103,12 +103,12 @@ Function: pointer_offset_bits
 \*******************************************************************/
 
 mp_integer pointer_offset_bits(
-  const namespacet &ns,
-  const typet &type)
+  const typet &type,
+  const namespacet &ns)
 {
   if(type.id()==ID_array)
   {
-    mp_integer sub=pointer_offset_bits(ns, type.subtype());
+    mp_integer sub=pointer_offset_bits(type.subtype(), ns);
   
     // get size
     const exprt &size=to_array_type(type).size();
@@ -123,7 +123,7 @@ mp_integer pointer_offset_bits(
   }
   else if(type.id()==ID_vector)
   {
-    mp_integer sub=pointer_offset_bits(ns, type.subtype());
+    mp_integer sub=pointer_offset_bits(type.subtype(), ns);
   
     // get size
     const exprt &size=to_vector_type(type).size();
@@ -138,7 +138,7 @@ mp_integer pointer_offset_bits(
   }
   else if(type.id()==ID_complex)
   {
-    mp_integer sub=pointer_offset_bits(ns, type.subtype());
+    mp_integer sub=pointer_offset_bits(type.subtype(), ns);
     return sub*2;
   }
   else if(type.id()==ID_struct)
@@ -155,7 +155,7 @@ mp_integer pointer_offset_bits(
         it++)
     {
       const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_bits(ns, subtype);
+      mp_integer sub_size=pointer_offset_bits(subtype, ns);
       if(sub_size==-1) return -1;
       result+=sub_size;
     }
@@ -178,7 +178,7 @@ mp_integer pointer_offset_bits(
         it++)
     {
       const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_bits(ns, subtype);
+      mp_integer sub_size=pointer_offset_bits(subtype, ns);
       if(sub_size>result) result=sub_size;
     }
     
@@ -203,7 +203,7 @@ mp_integer pointer_offset_bits(
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    return pointer_offset_bits(ns, ns.follow_tag(to_c_enum_tag_type(type)));
+    return pointer_offset_bits(ns.follow_tag(to_c_enum_tag_type(type)), ns);
   }
   else if(type.id()==ID_bool)
   {
@@ -215,7 +215,7 @@ mp_integer pointer_offset_bits(
   }
   else if(type.id()==ID_symbol)
   {
-    return pointer_offset_bits(ns, ns.follow(type));
+    return pointer_offset_bits(ns.follow(type), ns);
   }
   else if(type.id()==ID_code)
   {
@@ -429,7 +429,7 @@ exprt size_of_expr(
         if((bits%8)!=0) ++sub_size;
       }
       else
-        sub_size=pointer_offset_size(ns, subtype);
+        sub_size=pointer_offset_size(subtype, ns);
 
       if(sub_size>result) result=sub_size;
     }
@@ -495,8 +495,8 @@ Function: compute_pointer_offset
 \*******************************************************************/
 
 mp_integer compute_pointer_offset(
-  const namespacet &ns,
-  const exprt &expr)
+  const exprt &expr,
+  const namespacet &ns)
 {
   if(expr.id()==ID_symbol)
     return 0;
@@ -507,12 +507,12 @@ mp_integer compute_pointer_offset(
     const typet &array_type=ns.follow(expr.op0().type());
     assert(array_type.id()==ID_array);
 
-    mp_integer o=compute_pointer_offset(ns, expr.op0());
+    mp_integer o=compute_pointer_offset(expr.op0(), ns);
     
     if(o!=-1)
     {
       mp_integer sub_size=
-        pointer_offset_size(ns, array_type.subtype());
+        pointer_offset_size(array_type.subtype(), ns);
 
       mp_integer i;
 
@@ -530,7 +530,7 @@ mp_integer compute_pointer_offset(
     assert(type.id()==ID_struct ||
            type.id()==ID_union);
 
-    mp_integer o=compute_pointer_offset(ns, expr.op0());
+    mp_integer o=compute_pointer_offset(expr.op0(), ns);
 
     if(o!=-1)
     {    
@@ -538,7 +538,7 @@ mp_integer compute_pointer_offset(
         return o;
     
       return o+member_offset(
-        ns, to_struct_type(type), expr.get(ID_component_name));
+        to_struct_type(type), expr.get(ID_component_name), ns);
     }
   }
   else if(expr.id()==ID_string_constant)
@@ -568,7 +568,7 @@ exprt build_sizeof_expr(
 
   mp_integer type_size=-1, val=-1;
 
-  if(type.is_not_nil()) type_size=pointer_offset_size(ns, type);
+  if(type.is_not_nil()) type_size=pointer_offset_size(type, ns);
 
   if(type_size<0 ||
      to_integer(expr, val) ||

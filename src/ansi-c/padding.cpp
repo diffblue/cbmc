@@ -245,7 +245,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       }
     }
 
-    mp_integer size=pointer_offset_size(ns, it_type);
+    mp_integer size=pointer_offset_size(it_type, ns);
 
     if(size!=-1)
       offset+=size;
