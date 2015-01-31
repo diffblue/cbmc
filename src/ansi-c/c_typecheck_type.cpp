@@ -906,12 +906,14 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
     }  
   }
 
-  // we may add some minimal padding inside structs (not unions)
-  // unless there is an attribute that says that the struct is
-  // 'packed'
+  // We may add some minimal padding inside and at
+  // the end of structs and
+  // as additional member for unions.
 
   if(symbol.type.id()==ID_struct)
     add_padding(to_struct_type(symbol.type), *this);
+  else if(symbol.type.id()==ID_union)
+    add_padding(to_union_type(symbol.type), *this);
 
   // Now remove zero-width bit-fields, these are just
   // for adjusting alignment.

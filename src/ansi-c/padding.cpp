@@ -89,6 +89,11 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_symbol)
     return alignment(ns.follow(type), ns);
+  else if(type.id()==ID_c_bit_field)
+  {
+    // we align these according to the 'underlying type'
+    return alignment(type.subtype(), ns);
+  }
 
   return 1;
 }
@@ -297,4 +302,49 @@ void add_padding(struct_typet &type, const namespacet &ns)
     }
   }
 
+}
+
+/*******************************************************************\
+
+Function: add_padding
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void add_padding(union_typet &type, const namespacet &ns)
+{
+  mp_integer max_alignment=alignment(type, ns)*8;
+  mp_integer size_bits=pointer_offset_bits(type, ns);
+
+  union_typet::componentst &components=type.components();
+
+  // Is the union packed?
+  if(type.get_bool(ID_C_packed))
+  {
+    // The size needs to be a multiple of 8 only.
+    max_alignment=8;
+  }
+  
+  // The size must be a multiple of the alignment, or
+  // we add a padding member to the union.
+  
+  if(size_bits%max_alignment!=0)
+  {
+    mp_integer padding=max_alignment-(size_bits%max_alignment);
+
+    unsignedbv_typet padding_type;
+    padding_type.set_width(integer2unsigned(size_bits+padding));
+
+    struct_typet::componentt component;
+    component.type()=padding_type;
+    component.set_name("$pad");
+    component.set_is_padding(true);
+    
+    components.push_back(component);
+  }
 }
