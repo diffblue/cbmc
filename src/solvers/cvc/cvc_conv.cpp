@@ -289,9 +289,9 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
     const irep_idt &component_name=
       to_member_expr(expr).get_component_name();
       
-    mp_integer offset=member_offset(ns,
+    mp_integer offset=member_offset(
       to_struct_type(struct_op.type()),
-      component_name);
+      component_name, ns);
     
     typet index_type(ID_unsignedbv);
     index_type.set(ID_width, config.ansi_c.pointer_width);

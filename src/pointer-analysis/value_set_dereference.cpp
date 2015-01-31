@@ -557,7 +557,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       
       // are we doing a byte?
       mp_integer element_size=
-        pointer_offset_size(ns, dereference_type);
+        pointer_offset_size(dereference_type, ns);
           
       if(element_size==1)
       {
@@ -924,8 +924,8 @@ bool value_set_dereferencet::memory_model_bytes(
   // See if we have an array of bytes already,
   // and we want something byte-sized.
   if(ns.follow(from_type).id()==ID_array &&
-     pointer_offset_size(ns, ns.follow(from_type).subtype())==1 &&
-     pointer_offset_size(ns, to_type)==1 &&
+     pointer_offset_size(ns.follow(from_type).subtype(), ns)==1 &&
+     pointer_offset_size(to_type, ns)==1 &&
      is_a_bv_type(ns.follow(from_type).subtype()) &&
      is_a_bv_type(to_type))
   {
@@ -950,8 +950,8 @@ bool value_set_dereferencet::memory_model_bytes(
   {
     // upper bound
     {
-      mp_integer from_width=pointer_offset_size(ns, from_type);
-      mp_integer to_width=pointer_offset_size(ns, to_type);
+      mp_integer from_width=pointer_offset_size(from_type, ns);
+      mp_integer to_width=pointer_offset_size(to_type, ns);
     
       exprt bound=from_integer(from_width-to_width, offset.type());
 

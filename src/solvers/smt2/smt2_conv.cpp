@@ -46,9 +46,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // Needs expression level floating-point to bit-vector conversion
 #define FPCONVTODO(S) throw "TODO: floating-point to bit-vector conversion (try --fpa): " S
 
-
-
-
 /*******************************************************************\
 
 Function: smt2_convt::print_assignment
@@ -704,7 +701,7 @@ void smt2_convt::convert_address_of_rec(
       const irep_idt &component_name=
         member_expr.get_component_name();
 
-      mp_integer offset=member_offset(ns, struct_type, component_name);
+      mp_integer offset=member_offset(struct_type, component_name, ns);
 
       unsignedbv_typet index_type;
       index_type.set_width(boolbv_width(result_type));
@@ -3195,7 +3192,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
         INVALIDEXPR("unexpected mixture in pointer arithmetic");
 
       mp_integer element_size=
-        pointer_offset_size(ns, expr.type().subtype());
+        pointer_offset_size(expr.type().subtype(), ns);
 
       out << "(bvadd ";
       convert_expr(p);
@@ -3410,7 +3407,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
     {
       // Pointer difference. 
       mp_integer element_size=
-        pointer_offset_size(ns, expr.op0().type().subtype());
+        pointer_offset_size(expr.op0().type().subtype(), ns);
 
       if(element_size>=2)
         out << "(bvsdiv ";
@@ -4160,7 +4157,7 @@ void smt2_convt::convert_member(const member_exprt &expr)
     {
       // we extract
       std::size_t member_width=boolbv_width(expr.type());
-      mp_integer member_offset=::member_offset(ns, struct_type, name);
+      mp_integer member_offset=::member_offset(struct_type, name, ns);
       if(member_offset==-1)
         INVALIDEXPR("failed to get struct member offset");
         

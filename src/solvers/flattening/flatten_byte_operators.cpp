@@ -47,7 +47,7 @@ exprt flatten_byte_extract(
   if(src.id()==ID_byte_extract_big_endian) 
     throw "byte_extract flattening of big endian not done yet";
 
-  mp_integer size_bits=pointer_offset_bits(ns, src.type());
+  mp_integer size_bits=pointer_offset_bits(src.type(), ns);
   if(size_bits<0)
     throw "byte_extract flatting with non-constant size: "+src.pretty();
   unsigned width_bits=integer2unsigned(size_bits);
@@ -99,12 +99,12 @@ exprt flatten_byte_extract(
       const typet &array_type=ns.follow(root.type());
       const typet &offset_type=ns.follow(offset.type());
       const typet &element_type=ns.follow(array_type.subtype());
-      mp_integer element_width=pointer_offset_size(ns, element_type);
+      mp_integer element_width=pointer_offset_size(element_type, ns);
       
       if(element_width==-1) // failed
         throw "failed to flatten non-byte array with unknown element width";
 
-      mp_integer result_width=pointer_offset_size(ns, src.type());
+      mp_integer result_width=pointer_offset_size(src.type(), ns);
       mp_integer num_elements=(element_width+result_width-2)/element_width+1;
 
       // compute new root and offset
@@ -145,7 +145,7 @@ exprt flatten_byte_extract(
 
     mult_exprt times_eight(offset, from_integer(8, offset_type));
 
-    mp_integer op0_bits=pointer_offset_bits(ns, src.op0().type());
+    mp_integer op0_bits=pointer_offset_bits(src.op0().type(), ns);
     if(op0_bits<0)
       throw "byte_extract flatting of non-constant source size: "+src.pretty();
 
@@ -186,7 +186,7 @@ exprt flatten_byte_update(
   assert(src.operands().size()==3);
 
   mp_integer element_size=
-    pointer_offset_size(ns, src.op2().type());
+    pointer_offset_size(src.op2().type(), ns);
   
   const typet &t=ns.follow(src.op0().type());
   
@@ -200,7 +200,7 @@ exprt flatten_byte_update(
        subtype.id()==ID_signedbv ||
        subtype.id()==ID_floatbv)
     {
-      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      mp_integer sub_size=pointer_offset_size(subtype, ns);
       
       if(sub_size==-1)
         throw "can't flatten byte_update for sub-type without size";

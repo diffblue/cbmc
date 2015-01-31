@@ -929,7 +929,7 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         
         mp_integer step_size, index;
         
-        step_size=pointer_offset_size(ns, expr.type());
+        step_size=pointer_offset_size(expr.type(), ns);
         
         if(!to_integer(expr.op1(), index) &&
            step_size!=-1)
@@ -967,7 +967,7 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         {
           const struct_typet &struct_type=to_struct_type(op_type);
           const irep_idt &member=to_member_expr(expr).get_component_name();
-          mp_integer offset=member_offset(ns, struct_type, member);
+          mp_integer offset=member_offset(struct_type, member, ns);
           if(offset!=-1)
           {
             unsignedbv_typet int_type(config.ansi_c.pointer_width);
@@ -1098,7 +1098,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   {
     if(ptr.operands().size()!=1) return true;
 
-    mp_integer offset=compute_pointer_offset(ns, ptr.op0());
+    mp_integer offset=compute_pointer_offset(ptr.op0(), ns);
 
     if(offset!=-1)
     {
@@ -1200,7 +1200,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     typet pointer_type=ptr_expr.front().type();
 
     mp_integer element_size=
-      pointer_offset_size(ns, pointer_type.subtype());
+      pointer_offset_size(pointer_type.subtype(), ns);
     
     if(element_size==0) return true;
     
@@ -4256,7 +4256,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
       // This rewrites byte_extract(s, o, array_type)[i]
       // to byte_extract(s, o+offset, sub_type)
 
-      mp_integer sub_size=pointer_offset_size(ns, array_type.subtype());
+      mp_integer sub_size=pointer_offset_size(array_type.subtype(), ns);
       if(sub_size==-1) return true;
 
       // add offset to index
@@ -4794,7 +4794,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         return true;
 
       // add member offset to index
-      mp_integer offset_int=member_offset(ns, struct_type, component_name);
+      mp_integer offset_int=member_offset(struct_type, component_name, ns);
       if(offset_int==-1) return true;
  
       const exprt &struct_offset=op.op1();
@@ -4823,7 +4823,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
     
     // need to convert!
     mp_integer target_size=
-      pointer_offset_size(ns, expr.type());
+      pointer_offset_size(expr.type(), ns);
 
     if(target_size!=-1)
     {
@@ -5002,7 +5002,7 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     return false;
   }
 
-  const mp_integer el_size=pointer_offset_size(ns, be.type());
+  const mp_integer el_size=pointer_offset_size(be.type(), ns);
   // no proper simplification for be.type()==void
   // or types of unknown size
   if(be.type().id()==ID_empty ||
@@ -5040,7 +5040,7 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     }
     else
     {
-      mp_integer sub_size=pointer_offset_size(ns, op_type->subtype());
+      mp_integer sub_size=pointer_offset_size(op_type->subtype(), ns);
 
       if(sub_size>0)
       {
@@ -5069,9 +5069,9 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
         ++it)
     {
       mp_integer m_offset=
-        member_offset(ns, struct_type, it->get_name());
+        member_offset(struct_type, it->get_name(), ns);
       mp_integer m_size=
-        pointer_offset_size(ns, it->type());
+        pointer_offset_size(it->type(), ns);
 
       if(m_offset>=0 &&
          m_size>=0 &&
@@ -5173,8 +5173,8 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
         else
         {
           // new offset = offset + component offset
-          mp_integer i = member_offset(ns, struct_type, 
-                                       component_name);
+          mp_integer i = member_offset(struct_type, 
+                                       component_name, ns);
           if(i != -1) 
           {
             exprt compo_offset = from_integer(i, offset.type());
@@ -5190,7 +5190,7 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
       }
       else if(tp.id()==ID_array)
       {
-        mp_integer i = pointer_offset_size(ns, tp.subtype());
+        mp_integer i = pointer_offset_size(tp.subtype(), ns);
         if(i != -1)
         {
           exprt& index = with.op1();
