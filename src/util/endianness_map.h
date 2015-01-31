@@ -49,13 +49,7 @@ public:
     return map.size();
   }
   
-  inline void build(const typet &type, bool little_endian)
-  {
-    if(little_endian)
-      build_little_endian(type);
-    else
-      build_big_endian(type);
-  }
+  void build(const typet &type, bool little_endian);
   
   void output(std::ostream &) const;
 
@@ -65,7 +59,6 @@ protected:
 
   void build_little_endian(const typet &type);
   void build_big_endian(const typet &type);
-  void build_big_endian_rec(const typet &type);
 };
 
 extern inline std::ostream &operator << (

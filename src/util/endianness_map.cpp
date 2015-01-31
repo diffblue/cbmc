@@ -40,6 +40,26 @@ void endianness_mapt::output(std::ostream &out) const
 
 /*******************************************************************\
 
+Function: endianness_mapt::build
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void endianness_mapt::build(const typet &src, bool little_endian)
+{
+  if(little_endian)
+    build_little_endian(src);
+  else
+    build_big_endian(src);
+}
+
+/*******************************************************************\
+
 Function: endianness_mapt::build_little_endian
 
   Inputs:
@@ -59,12 +79,6 @@ void endianness_mapt::build_little_endian(const typet &src)
     map.push_back(map.size());
     --s;
   }
-
-  #if 0
-  // we make sure we have byte granularity
-  while(map.size()%8!=0)
-    map.push_back(map.size());
-  #endif
 }
 
 /*******************************************************************\
@@ -80,29 +94,6 @@ Function: endianness_mapt::build_big_endian
 \*******************************************************************/
 
 void endianness_mapt::build_big_endian(const typet &src)
-{
-  build_big_endian_rec(src);
-
-  #if 0
-  // we make sure we have byte granularity
-  while(map.size()%8!=0)
-    map.push_back(map.size());
-  #endif
-}
-
-/*******************************************************************\
-
-Function: endianness_mapt::build_big_endian_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void endianness_mapt::build_big_endian_rec(const typet &src)
 {
   if(src.id()==ID_symbol)
     build_big_endian(ns.follow(src));
