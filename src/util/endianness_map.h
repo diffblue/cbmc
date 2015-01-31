@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
+#include <cassert>
 #include <vector>
 
 #include "expr.h"
@@ -37,7 +38,10 @@ public:
 
   inline size_t map_bit(size_t bit) const
   {
-    return map[bit];
+    assert(bit<map.size());
+    size_t result=map[bit];
+    assert(result<map.size());
+    return result;
   }
   
   inline size_t number_of_bits() const
