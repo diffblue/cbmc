@@ -503,6 +503,7 @@ Function: configt::ansi_ct::set_arch_spec_mips
 void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
 {
   arch=ARCH_MIPS;
+
   if(subarch=="mipsel" ||
      subarch=="mips" ||
      subarch=="mipsn32el" ||
@@ -516,12 +517,14 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
     set_LP64();
     long_double_width=16*8;
   }
+
   if(subarch=="mipsel" ||
      subarch=="mipsn32el" ||
      subarch=="mips64el")
     endianness=IS_LITTLE_ENDIAN;
   else
     endianness=IS_BIG_ENDIAN;
+
   char_is_unsigned=false;
   NULL_is_zero=true;
 
