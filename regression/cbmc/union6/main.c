@@ -8,6 +8,7 @@ union U
 
 int main()
 {
+  assert(sizeof(u)==sizeof(int));
   assert(u.j==0);
   u.i=10;
   assert(u.j==10);
