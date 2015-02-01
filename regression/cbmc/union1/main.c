@@ -1,3 +1,5 @@
+#include <assert.h>
+
 union u_type
 {
   int i;
