@@ -111,13 +111,10 @@ void endianness_mapt::build_big_endian(const typet &src)
     assert(bits>=0);
 
     size_t bits_int=integer2long(bits), base=map.size();
-    size_t bytes_int=bits_int/8+((bits_int%8)!=0?1:0);
 
     for(size_t bit=0; bit<bits_int; bit++)
     {
-      size_t byte=bit/8;
-      size_t mapped_byte=bytes_int-1-byte;
-      map.push_back(base+mapped_byte*8+bit%8);
+      map.push_back(base+bits_int-1-bit);
     }
   }
   else if(src.id()==ID_struct)

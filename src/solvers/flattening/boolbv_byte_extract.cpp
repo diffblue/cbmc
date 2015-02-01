@@ -76,6 +76,7 @@ void boolbvt::convert_byte_extract(
   
   // special treatment for bit-fields and big-endian:
   // we need byte granularity
+  #if 0
   if(expr.id()==ID_byte_extract_big_endian &&
      expr.type().id()==ID_c_bit_field &&
      (width%8)!=0)
@@ -87,6 +88,7 @@ void boolbvt::convert_byte_extract(
     bv.resize(width); // chop down
     return;
   }
+  #endif
 
   if(width==0)
     return conversion_failed(expr, bv);    
