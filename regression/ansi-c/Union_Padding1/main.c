@@ -41,10 +41,14 @@ STATIC_ASSERT(sizeof(union some_union3)==sizeof(int));
 #ifdef _MSC_VER
 
 // bit-fields are evil
-__declspec(align(packed)) union some_union4
+#pragma pack(1)
+union some_union4
 {
   int i:23;
 };
+
+// Visual Studio ignores the 'packed'
+STATIC_ASSERT(sizeof(union some_union4)==sizeof(int));
 
 #else
 
@@ -54,9 +58,9 @@ union some_union4
   int i:23;
 } __attribute__((__packed__));
 
-#endif
-
 STATIC_ASSERT(sizeof(union some_union4)==3);
+
+#endif
 
 int main()
 {
