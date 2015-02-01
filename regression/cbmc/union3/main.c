@@ -1,6 +1,7 @@
 int my_func(int stat_loc)
 {
-  // this is a 'temporary union', yet another gcc extension
+  // This is a 'temporary union', yet another gcc extension.
+  // Visual Studio won't do it.
   return ((union { __typeof__(stat_loc) __in; int __i; })
     { .__in =(stat_loc) }).__i;
 }
@@ -10,7 +11,6 @@ int main(void)
   int x;
   assert(my_func(x)==x);
   
-  // this is yet another gcc extension
   union my_U
   {
     int z;
@@ -20,6 +20,9 @@ int main(void)
   
   float some_float=1.5f;
   
+  // This is the 'union constructor', which is
+  // yet another gcc extension.
+  // Visual Studio won't do it.
   union_object=(union my_U)some_float;
   
   assert(union_object.f==1.5f);
