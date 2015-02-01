@@ -18,8 +18,6 @@ STATIC_ASSERT(sizeof(e4) == sizeof(int));
 // STATIC_ASSERT(sizeof(e5) == 8); // todo
 STATIC_ASSERT(E6 == 1001);
 
-#endif
-
 int main()
 {
   e5+=1;
@@ -30,3 +28,12 @@ int main()
   e5^=(_Bool)1;
   e5<<=1;
 }
+
+#else
+
+int main()
+{
+}
+
+#endif
+
