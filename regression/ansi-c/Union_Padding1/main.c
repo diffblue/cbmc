@@ -43,7 +43,7 @@ STATIC_ASSERT(sizeof(union some_union3)==sizeof(int));
 // bit-fields are evil
 __declspec(align(packed)) union some_union4
 {
-  int i:3;
+  int i:23;
 };
 
 #else
@@ -51,12 +51,12 @@ __declspec(align(packed)) union some_union4
 // bit-fields are evil
 union some_union4
 {
-  int i:3;
+  int i:23;
 } __attribute__((__packed__));
 
 #endif
 
-STATIC_ASSERT(sizeof(union some_union4)==sizeof(char));
+STATIC_ASSERT(sizeof(union some_union4)==3);
 
 int main()
 {
