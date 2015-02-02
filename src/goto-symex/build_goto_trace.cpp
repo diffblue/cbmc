@@ -145,6 +145,7 @@ Function: build_goto_trace
 
 void build_goto_trace(
   const symex_target_equationt &target,
+  symex_target_equationt::SSA_stepst::const_iterator end_step,
   const prop_convt &prop_conv,
   const namespacet &ns,
   goto_tracet &goto_trace)
@@ -160,7 +161,7 @@ void build_goto_trace(
   
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=target.SSA_steps.begin();
-      it!=target.SSA_steps.end();
+      it!=end_step;
       it++)
   {
     const symex_target_equationt::SSA_stept &SSA_step=*it;
@@ -314,8 +315,30 @@ void build_goto_trace(
       s_it!=goto_trace.steps.end();
       s_it++)
     s_it->step_nr=++step_nr;
-  
-  // Now delete anything after failed assertion
+}
+
+/*******************************************************************\
+
+Function: build_goto_trace
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void build_goto_trace(
+  const symex_target_equationt &target,
+  const prop_convt &prop_conv,
+  const namespacet &ns,
+  goto_tracet &goto_trace)
+{
+  build_goto_trace(
+    target, target.SSA_steps.end(), prop_conv, ns, goto_trace);
+
+  // Now delete anything after first failed assertion
   for(goto_tracet::stepst::iterator
       s_it1=goto_trace.steps.begin();
       s_it1!=goto_trace.steps.end();
@@ -332,3 +355,4 @@ void build_goto_trace(
       break;
     }
 }
+
