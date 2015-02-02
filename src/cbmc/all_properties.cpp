@@ -190,6 +190,8 @@ bool bmc_all_propertiest::operator()()
   
   cover_goalst cover_goals(solver);
   
+  cover_goals.register_observer(*this);
+  
   for(goal_mapt::const_iterator
       it=goal_map.begin();
       it!=goal_map.end();
