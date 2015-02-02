@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/literal_expr.h>
 
 #include <goto-symex/build_goto_trace.h>
+#include <goto-programs/xml_goto_trace.h>
 
 #include "bmc.h"
 #include "bv_cbmc.h"
@@ -232,6 +233,10 @@ bool bmc_all_propertiest::operator()()
       xmlt xml_result("result");
       xml_result.set_attribute("property", id2string(it->first));
       xml_result.set_attribute("status", it->second.failed?"FAILURE":"SUCCESS");
+
+      if(it->second.failed)
+        convert(bmc.ns, it->second.goto_trace, xml_result.new_element());
+
       std::cout << xml_result << "\n";
     }
     else
