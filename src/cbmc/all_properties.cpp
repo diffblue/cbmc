@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
 
+#include <goto-symex/build_goto_trace.h>
+
 #include "bmc.h"
 #include "bv_cbmc.h"
 
@@ -35,19 +37,28 @@ class bmc_all_propertiest:
   public messaget
 {
 public:
-  bool operator()(
-    const goto_functionst &goto_functions,
-    prop_convt &solver,
-    bmct &bmc);
+  bmc_all_propertiest(
+    const goto_functionst &_goto_functions,
+    prop_convt &_solver,
+    bmct &_bmc):
+    goto_functions(_goto_functions), solver(_solver), bmc(_bmc)
+  {
+  }
+
+  bool operator()();
 
   virtual void goal_covered(const cover_goalst::goalt &);
 
   struct goalt
   {
     // a property holds if all instances of it are true
-    std::vector<literalt> conjuncts;
+    typedef std::vector<symex_target_equationt::SSA_stepst::iterator> instancest;
+    instancest instances;
     std::string description;
+    
+    // if failed, we compute a goto_trace for the first failing instance
     bool failed;
+    goto_tracet goto_trace;
     
     explicit goalt(
       const goto_programt::instructiont &instruction):
@@ -63,17 +74,22 @@ public:
     exprt as_expr() const
     {
       std::vector<exprt> tmp;
-      for(std::vector<literalt>::const_iterator
-          it=conjuncts.begin();
-          it!=conjuncts.end();
+      for(instancest::const_iterator
+          it=instances.begin();
+          it!=instances.end();
           it++)
-        tmp.push_back(literal_exprt(*it));
+        tmp.push_back(literal_exprt((*it)->cond_literal));
       return conjunction(tmp);
     }
   };
 
   typedef std::map<irep_idt, goalt> goal_mapt;
   goal_mapt goal_map;
+
+protected:
+  const goto_functionst &goto_functions;
+  prop_convt &solver;
+  bmct &bmc;
 };
 
 /*******************************************************************\
@@ -98,11 +114,19 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
     goalt &g=g_it->second;
   
     // check whether failed
-    for(std::vector<literalt>::const_iterator
-        c_it=g.conjuncts.begin();
-        c_it!=g.conjuncts.end();
+    for(goalt::instancest::const_iterator
+        c_it=g.instances.begin();
+        c_it!=g.instances.end();
         c_it++)
     {
+      literalt cond=(*c_it)->cond_literal;
+      
+      if(solver.l_get(cond).is_false())
+      {
+        g.failed=true;
+        build_goto_trace(bmc.equation, *c_it, solver, bmc.ns, g.goto_trace);
+        break;
+      }
     }
   }
 }
@@ -119,10 +143,7 @@ Function: bmc_all_propertiest::operator()
 
 \*******************************************************************/
 
-bool bmc_all_propertiest::operator()(
-  const goto_functionst &goto_functions,
-  prop_convt &solver,
-  bmct &bmc)
+bool bmc_all_propertiest::operator()()
 {
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
@@ -163,7 +184,7 @@ bool bmc_all_propertiest::operator()(
       else
         continue;
       
-      goal_map[property_id].conjuncts.push_back(it->cond_literal);
+      goal_map[property_id].instances.push_back(it);
     }
   }
   
@@ -244,7 +265,7 @@ bool bmct::all_properties(
   const goto_functionst &goto_functions,
   prop_convt &solver)
 {
-  bmc_all_propertiest bmc_all_properties;
+  bmc_all_propertiest bmc_all_properties(goto_functions, solver, *this);
   bmc_all_properties.set_message_handler(get_message_handler());
-  return bmc_all_properties(goto_functions, solver, *this);
+  return bmc_all_properties();
 }

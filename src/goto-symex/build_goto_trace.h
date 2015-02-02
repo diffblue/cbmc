@@ -21,4 +21,12 @@ void build_goto_trace(
   const namespacet &ns,
   goto_tracet &goto_trace);
 
+// builds a trace that stops after given step
+void build_goto_trace(
+  const symex_target_equationt &target,
+  symex_target_equationt::SSA_stepst::const_iterator stop,
+  const prop_convt &prop_conv,
+  const namespacet &ns,
+  goto_tracet &goto_trace);
+
 #endif
