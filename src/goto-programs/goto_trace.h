@@ -155,6 +155,16 @@ public:
   {
     steps.push_back(step);
   }
+
+  // delete all steps after (not including) s  
+  void trim_after(stepst::iterator s)
+  {
+    assert(s!=steps.end());
+    s++;
+    for(;
+        s!=steps.end(); 
+        s=steps.erase(s));
+  }
 };
 
 void show_goto_trace(
