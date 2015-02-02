@@ -162,7 +162,7 @@ void show_goto_trace(
   const namespacet &ns,
   const goto_tracet &goto_trace);
 
-void counterexample_value(
+void trace_value(
   std::ostream &out,
   const namespacet &ns,
   const symbol_exprt &lhs_object,
