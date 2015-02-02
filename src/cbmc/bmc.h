@@ -108,6 +108,8 @@ protected:
   void cover_assertions(
     const goto_functionst &goto_functions,
     prop_convt &solver);
+
+  friend class bmc_all_propertiest;
 };
 
 #endif
