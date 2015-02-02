@@ -20,6 +20,29 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+   Class: bmc_all_propertiest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+class bmc_all_propertiest:public cover_goalst
+{
+public:
+  explicit inline bmc_all_propertiest(prop_convt &_prop_conv):
+    cover_goalst(_prop_conv)
+  {
+  }
+
+  virtual void assignment();
+};
+
+/*******************************************************************\
+
 Function: bmct::all_properties
 
   Inputs:
@@ -129,7 +152,7 @@ bool bmct::all_properties(
     status() << "** Results:" << eom;
   }
   
-  std::list<cover_goalst::cover_goalt>::const_iterator g_it=
+  std::list<cover_goalst::goalt>::const_iterator g_it=
     cover_goals.goals.begin();
     
   for(goal_mapt::const_iterator
