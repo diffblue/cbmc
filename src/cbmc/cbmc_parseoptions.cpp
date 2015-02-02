@@ -428,6 +428,7 @@ int cbmc_parseoptionst::doit()
   //
   status() << "CBMC version " CBMC_VERSION " "
            << sizeof(void *)*8 << "-bit "
+           << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
   //
