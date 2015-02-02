@@ -41,7 +41,7 @@ Function: cover_goalst::mark
 
 void cover_goalst::mark()
 {
-  for(std::list<cover_goalt>::iterator
+  for(std::list<goalt>::iterator
       g_it=goals.begin();
       g_it!=goals.end();
       g_it++)
@@ -50,6 +50,13 @@ void cover_goalst::mark()
     {
       g_it->covered=true;
       _number_covered++;
+      
+      // notify observers
+      for(observerst::const_iterator o_it=observers.begin();
+          o_it!=observers.end(); o_it++)
+      {
+        (*o_it)->goal_covered(*g_it);
+      }
     }
 }
   
@@ -69,7 +76,7 @@ void cover_goalst::constraint()
 {
   exprt::operandst disjuncts;
 
-  for(std::list<cover_goalt>::const_iterator
+  for(std::list<goalt>::const_iterator
       g_it=goals.begin();
       g_it!=goals.end();
       g_it++)
@@ -94,7 +101,7 @@ Function: cover_goalst::freeze_goal_variables
 
 void cover_goalst::freeze_goal_variables()
 {
-  for(std::list<cover_goalt>::const_iterator
+  for(std::list<goalt>::const_iterator
       g_it=goals.begin();
       g_it!=goals.end();
       g_it++)
@@ -138,11 +145,8 @@ void cover_goalst::operator()()
       break;
 
     case decision_proceduret::D_SATISFIABLE:
-      // mark the goals we got
+      // mark the goals we got, and notify observers
       mark(); 
-      
-      // notify
-      assignment();
       break;
 
     default:

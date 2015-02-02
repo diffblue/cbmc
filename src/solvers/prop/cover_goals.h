@@ -37,17 +37,17 @@ public:
 
   // the goals
 
-  struct cover_goalt
+  struct goalt
   {
     literalt condition;
     bool covered;
     
-    cover_goalt():covered(false)
+    goalt():covered(false)
     {
     }
   };
 
-  typedef std::list<cover_goalt> goalst;
+  typedef std::list<goalt> goalst;
   goalst goals;
   
   // statistics
@@ -71,18 +71,30 @@ public:
 
   inline void add(const literalt condition)
   {
-    goals.push_back(cover_goalt());
+    goals.push_back(goalt());
     goals.back().condition=condition;
+  }
+  
+  // register an observer if you want to be told
+  // about satisfying assignments
+  
+  class observert
+  {
+  public:
+    virtual void goal_covered(const goalt &)=0;
+  };
+  
+  inline void register_observer(observert &o)
+  {
+    observers.push_back(&o);
   }
   
 protected:
   unsigned _number_covered, _iterations;
   prop_convt &prop_conv;
 
-  // this method is called for each satisfying assignment
-  virtual void assignment()
-  {
-  }
+  typedef std::vector<observert *> observerst;
+  observerst observers;
 
 private:
   void mark();

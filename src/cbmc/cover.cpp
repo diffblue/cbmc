@@ -93,7 +93,7 @@ void bmct::cover_assertions(
   cover_goals();
 
   // report
-  std::list<cover_goalst::cover_goalt>::const_iterator g_it=
+  std::list<cover_goalst::goalt>::const_iterator g_it=
     cover_goals.goals.begin();
       
   for(goal_mapt::const_iterator
