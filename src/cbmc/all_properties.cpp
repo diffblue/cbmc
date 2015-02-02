@@ -30,20 +30,55 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-class bmc_all_propertiest:public cover_goalst
+class bmc_all_propertiest:
+  public cover_goalst::observert,
+  public messaget
 {
 public:
-  explicit inline bmc_all_propertiest(prop_convt &_prop_conv):
-    cover_goalst(_prop_conv)
-  {
-  }
+  bool operator()(
+    const goto_functionst &goto_functions,
+    prop_convt &solver,
+    bmct &bmc);
 
-  virtual void assignment();
+  virtual void goal_covered(const cover_goalst::goalt &);
+
+  struct goalt
+  {
+    // a property holds if all instances of it are true
+    std::vector<literalt> conjuncts;
+    std::string description;
+    bool failed;
+    
+    explicit goalt(
+      const goto_programt::instructiont &instruction):
+      failed(false)
+    {
+      description=id2string(instruction.source_location.get_comment());
+    }
+    
+    goalt():failed(false)
+    {
+    }
+    
+    exprt as_expr() const
+    {
+      std::vector<exprt> tmp;
+      for(std::vector<literalt>::const_iterator
+          it=conjuncts.begin();
+          it!=conjuncts.end();
+          it++)
+        tmp.push_back(literal_exprt(*it));
+      return conjunction(tmp);
+    }
+  };
+
+  typedef std::map<irep_idt, goalt> goal_mapt;
+  goal_mapt goal_map;
 };
 
 /*******************************************************************\
 
-Function: bmct::all_properties
+Function: bmc_all_propertiest::goal_covered
 
   Inputs:
 
@@ -53,25 +88,41 @@ Function: bmct::all_properties
 
 \*******************************************************************/
 
-struct goalt
+void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
 {
-  // a property holds if all instances of it are true
-  exprt::operandst conjuncts;
-  std::string description;
-
-  explicit goalt(const goto_programt::instructiont &instruction)
+  for(goal_mapt::iterator
+      g_it=goal_map.begin();
+      g_it!=goal_map.end();
+      g_it++)
   {
-    description=id2string(instruction.source_location.get_comment());
-  }
+    goalt &g=g_it->second;
   
-  goalt()
-  {
+    // check whether failed
+    for(std::vector<literalt>::const_iterator
+        c_it=g.conjuncts.begin();
+        c_it!=g.conjuncts.end();
+        c_it++)
+    {
+    }
   }
-};
+}
 
-bool bmct::all_properties(
+/*******************************************************************\
+
+Function: bmc_all_propertiest::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool bmc_all_propertiest::operator()(
   const goto_functionst &goto_functions,
-  prop_convt &solver)
+  prop_convt &solver,
+  bmct &bmc)
 {
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
@@ -80,13 +131,10 @@ bool bmct::all_properties(
   // stop the time
   absolute_timet sat_start=current_time();
   
-  do_conversion(solver);  
+  bmc.do_conversion(solver);  
   
   // Collect _all_ goals in `goal_map'.
   // This maps property IDs to 'goalt'
-  typedef std::map<irep_idt, goalt> goal_mapt;
-  goal_mapt goal_map;
-  
   forall_goto_functions(f_it, goto_functions)
     forall_goto_program_instructions(i_it, f_it->second.body)
       if(i_it->is_assert())
@@ -95,8 +143,8 @@ bool bmct::all_properties(
   // get the conditions for these goals from formula
   // collect all 'instances' of the properties
   for(symex_target_equationt::SSA_stepst::iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
+      it=bmc.equation.SSA_steps.begin();
+      it!=bmc.equation.SSA_steps.end();
       it++)
   {
     if(it->is_assert())
@@ -115,8 +163,7 @@ bool bmct::all_properties(
       else
         continue;
       
-      goal_map[property_id].conjuncts.push_back(
-        literal_exprt(it->cond_literal));
+      goal_map[property_id].conjuncts.push_back(it->cond_literal);
     }
   }
   
@@ -127,9 +174,9 @@ bool bmct::all_properties(
       it!=goal_map.end();
       it++)
   {
-    // Our goal is to falsify a property.
-    // The following is TRUE if the conjunction is empty.
-    literalt p=!solver.convert(conjunction(it->second.conjuncts));
+    // Our goal is to falsify a property, i.e., we will
+    // add the negation of the property as goal.
+    literalt p=!solver.convert(it->second.as_expr());
     cover_goals.add(p);
   }
 
@@ -146,34 +193,28 @@ bool bmct::all_properties(
   }
   
   // report
-  if(ui!=ui_message_handlert::XML_UI)
+  if(bmc.ui!=ui_message_handlert::XML_UI)
   {
     status() << eom;
     status() << "** Results:" << eom;
   }
   
-  std::list<cover_goalst::goalt>::const_iterator g_it=
-    cover_goals.goals.begin();
-    
   for(goal_mapt::const_iterator
       it=goal_map.begin();
       it!=goal_map.end();
-      it++, g_it++)
+      it++)
   {
-    if(ui==ui_message_handlert::XML_UI)
+    if(bmc.ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
       xml_result.set_attribute("property", id2string(it->first));
-
-      xml_result.set_attribute("status",
-        g_it->covered?"FAILURE":"SUCCESS");
-    
+      xml_result.set_attribute("status", it->second.failed?"FAILURE":"SUCCESS");
       std::cout << xml_result << "\n";
     }
     else
     {
       status() << "[" << it->first << "] "
-               << it->second.description << ": " << (g_it->covered?"FAILED":"OK")
+               << it->second.description << ": " << (it->second.failed?"FAILED":"OK")
                << eom;
     }
   }
@@ -187,3 +228,23 @@ bool bmct::all_properties(
   return false;
 }
 
+/*******************************************************************\
+
+Function: bmct::all_properties
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool bmct::all_properties(
+  const goto_functionst &goto_functions,
+  prop_convt &solver)
+{
+  bmc_all_propertiest bmc_all_properties;
+  bmc_all_properties.set_message_handler(get_message_handler());
+  return bmc_all_properties(goto_functions, solver, *this);
+}
