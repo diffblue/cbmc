@@ -11,5 +11,6 @@ int main()
   assert(sizeof(u)==sizeof(int));
   assert(u.j==0);
   u.i=10;
-  assert(u.j==10<<8); // this assumes big endian
+  int z=u.j;
+  assert(z==10<<9); // this assumes big endian
 }
