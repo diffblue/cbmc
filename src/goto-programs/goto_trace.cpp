@@ -133,7 +133,7 @@ void goto_trace_stept::output(
 
 /*******************************************************************\
 
-Function: counterexample_value_binary
+Function: trace_value_binary
 
   Inputs:
 
@@ -143,7 +143,7 @@ Function: counterexample_value_binary
 
 \*******************************************************************/
 
-std::string counterexample_value_binary(
+std::string trace_value_binary(
   const exprt &expr,
   const namespacet &ns)
 {
@@ -176,7 +176,7 @@ std::string counterexample_value_binary(
     forall_operands(it, expr)
     {
       if(result=="") result="{ "; else result+=", ";
-      result+=counterexample_value_binary(*it, ns);
+      result+=trace_value_binary(*it, ns);
     }
       
     return result+" }";
@@ -188,7 +188,7 @@ std::string counterexample_value_binary(
     forall_operands(it, expr)
     {
       if(it!=expr.operands().begin()) result+=", ";
-      result+=counterexample_value_binary(*it, ns);
+      result+=trace_value_binary(*it, ns);
     }
       
     return result+" }";
@@ -196,7 +196,7 @@ std::string counterexample_value_binary(
   else if(expr.id()==ID_union)
   { 
     assert(expr.operands().size()==1);
-    return counterexample_value_binary(expr.op0(), ns);
+    return trace_value_binary(expr.op0(), ns);
   }
 
   return "?";
@@ -204,7 +204,7 @@ std::string counterexample_value_binary(
 
 /*******************************************************************\
 
-Function: counterexample_value
+Function: trace_value
 
   Inputs:
 
@@ -214,7 +214,7 @@ Function: counterexample_value
 
 \*******************************************************************/
 
-void counterexample_value(
+void trace_value(
   std::ostream &out,
   const namespacet &ns,
   const symbol_exprt &lhs_object,
@@ -231,7 +231,7 @@ void counterexample_value(
     value_string=from_expr(ns, identifier, value);
 
     // the binary representation
-    value_string+=" ("+counterexample_value_binary(value, ns)+")";
+    value_string+=" ("+trace_value_binary(value, ns)+")";
   }
 
   out << "  "
@@ -362,9 +362,9 @@ void show_goto_trace(
 
         // see if the full lhs is something clean
         if(is_index_member_symbol(it->full_lhs))
-          counterexample_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
+          trace_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
         else
-          counterexample_value(out, ns, it->lhs_object, it->lhs_object, it->lhs_object_value);
+          trace_value(out, ns, it->lhs_object, it->lhs_object, it->lhs_object_value);
       }
       break;
 
@@ -376,7 +376,7 @@ void show_goto_trace(
         show_state_header(out, *it, it->pc->source_location, it->step_nr);
       }
 
-      counterexample_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
+      trace_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
       break;
 
     case goto_trace_stept::OUTPUT:
@@ -401,7 +401,7 @@ void show_goto_trace(
           out << " " << from_expr(ns, "", *l_it);
 
           // the binary representation
-          out << " (" << counterexample_value_binary(*l_it, ns) << ")";
+          out << " (" << trace_value_binary(*l_it, ns) << ")";
         }
       
         out << "\n";
@@ -421,7 +421,7 @@ void show_goto_trace(
         out << " " << from_expr(ns, "", *l_it);
 
         // the binary representation
-        out << " (" << counterexample_value_binary(*l_it, ns) << ")";
+        out << " (" << trace_value_binary(*l_it, ns) << ")";
       }
       
       out << "\n";
