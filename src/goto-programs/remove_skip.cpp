@@ -94,6 +94,7 @@ void remove_skip(goto_programt &goto_program)
   {
     old_size=goto_program.instructions.size();
   
+    // maps deleted instructions to their replacement
     typedef std::map<goto_programt::targett, goto_programt::targett> new_targetst;
     new_targetst new_targets;
 
@@ -127,12 +128,8 @@ void remove_skip(goto_programt &goto_program)
 
       if(new_target!=old_target)
       {
-        while(new_target!=old_target)
-        {
-          // remember the old targets
-          new_targets[old_target]=new_target;
-          old_target=goto_program.instructions.erase(old_target);
-        }
+        for(; old_target!=new_target; ++old_target)
+          new_targets[old_target]=new_target; // remember the old targets
       }
       else
         it++;
@@ -155,6 +152,12 @@ void remove_skip(goto_programt &goto_program)
             *t_it=result->second;
         }
       }
+
+    // now delete the skips -- we do so after adjusting the
+    // gotos to avoid dangling targets    
+    for(new_targetst::const_iterator
+        it=new_targets.begin(); it!=new_targets.end(); it++)
+      goto_program.instructions.erase(it->first);
 
     // remove the last skip statement unless it's a target
     goto_program.compute_incoming_edges();
