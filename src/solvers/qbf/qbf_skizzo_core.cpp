@@ -104,7 +104,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
       "Skizzo: "+
       i2string(no_variables())+" variables, "+
       i2string(no_clauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   std::string result_tmp_file="sKizzo.out";
@@ -156,7 +156,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
 
     if(!result_found)
     {
-      messaget::error("Skizzo failed: unknown result");
+      messaget::error() << "Skizzo failed: unknown result" << messaget::eom;
       return P_ERROR;
     }
   }
@@ -166,7 +166,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
 
   if(result)
   {
-    messaget::status("Skizzo: TRUE");
+    messaget::status() << "Skizzo: TRUE" << messaget::eom;
 
     if(get_certificate())
       return P_ERROR;
@@ -175,7 +175,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
   }
   else
   {
-    messaget::status("Skizzo: FALSE");
+    messaget::status() << "Skizzo: FALSE" << messaget::eom;
     return P_UNSATISFIABLE;
   }
 }
@@ -260,7 +260,7 @@ bool qbf_skizzo_coret::get_certificate(void)
 
   if(!result)
   {
-    messaget::error("Skizzo failed: unknown result");
+    messaget::error() << "Skizzo failed: unknown result" << messaget::eom;
     return true;
   }
 

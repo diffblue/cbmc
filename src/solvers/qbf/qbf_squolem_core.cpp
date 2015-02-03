@@ -168,7 +168,7 @@ propt::resultt qbf_squolem_coret::prop_solve()
       "Squolem: "+
       i2string(no_variables())+" variables, "+
       i2string(no_clauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   squolem->endOfOriginals();
@@ -176,12 +176,12 @@ propt::resultt qbf_squolem_coret::prop_solve()
 
   if(result)
   {
-    messaget::status("Squolem: VALID");
+    messaget::status() << "Squolem: VALID" << messaget::eom;
     return P_SATISFIABLE;
   }
   else
   {
-    messaget::status("Squolem: INVALID");
+    messaget::status() << "Squolem: INVALID" << messaget::eom;
     return P_UNSATISFIABLE;
   }
 

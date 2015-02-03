@@ -118,7 +118,7 @@ propt::resultt satcheck_lingelingt::prop_solve()
     std::string msg=
       i2string(_no_variables)+" variables, "+
       i2string(clause_counter)+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
   
   std::string msg;
@@ -130,7 +130,7 @@ propt::resultt satcheck_lingelingt::prop_solve()
   if(res==10)
   {
     msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
     status=SAT;
     return P_SATISFIABLE;
   }
@@ -138,7 +138,7 @@ propt::resultt satcheck_lingelingt::prop_solve()
   {
     assert(res==20);
     msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   status=UNSAT;

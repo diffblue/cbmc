@@ -158,7 +158,7 @@ propt::resultt satcheck_limmatt::prop_solve()
     std::string msg=
       i2string(maxvar_Limmat(solver))+" variables, "+
       i2string(clauses_Limmat(solver))+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   int status=sat_Limmat(solver, -1);
@@ -181,7 +181,7 @@ propt::resultt satcheck_limmatt::prop_solve()
       break;    
     }
 
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   if(status==0)
