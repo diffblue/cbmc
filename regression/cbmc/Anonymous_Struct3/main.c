@@ -14,10 +14,12 @@ fields_t x;
  
 int main()
 {
+  unsigned word=1;
+
   x.f1 = 1;
-  #ifdef __BIG_ENDIAN__
-  assert(x.raw==64);
-  #else
-  assert(x.raw==2);
-  #endif
+
+  if(*(char *)&word==1)
+    assert(x.raw==2);
+  else
+    assert(x.raw==64);
 }
