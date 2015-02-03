@@ -194,7 +194,7 @@ propt::resultt qbf_bdd_coret::prop_solve()
       solver_text() + ": "+
       i2string(no_variables())+" variables, "+
       i2string(matrix->nodeCount())+" nodes";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   model_bdds.resize(no_variables()+1, NULL);
@@ -419,7 +419,7 @@ Function: qbf_bdd_coret::compress_certificate
 
 void qbf_bdd_coret::compress_certificate(void)
 {
-  status("Compressing Certificate");
+  status() << "Compressing Certificate" << eom;
 
   for(quantifierst::const_iterator it=quantifiers.begin();
       it!=quantifiers.end();
