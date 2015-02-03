@@ -1,3 +1,6 @@
+// The member without name is a Visual Studio feature
+// https://msdn.microsoft.com/en-us/library/z2cx9y4f.aspx
+
 struct X
 {
   struct
