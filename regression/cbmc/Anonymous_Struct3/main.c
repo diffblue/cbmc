@@ -19,7 +19,7 @@ int main()
   x.f1 = 1;
 
   if(*(char *)&word==1)
-    assert(x.raw==2);
+    assert(x.raw==2); // little endian
   else
-    assert(x.raw==64);
+    assert(x.raw==64); // big endian
 }
