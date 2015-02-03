@@ -1,3 +1,5 @@
+#include <assert.h>
+
 int my_func(int stat_loc)
 {
   // This is a 'temporary union', yet another gcc extension.
