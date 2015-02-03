@@ -15,5 +15,9 @@ fields_t x;
 int main()
 {
   x.f1 = 1;
+  #ifdef __BIG_ENDIAN__
+  assert(x.raw==64);
+  #else
   assert(x.raw==2);
+  #endif
 }
