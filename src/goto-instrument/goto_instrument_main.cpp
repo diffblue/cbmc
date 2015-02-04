@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "goto_instrument_parseoptions.h"
+#include "goto_instrument_parse_options.h"
 
 /*******************************************************************\
 
@@ -22,6 +22,6 @@ Function: main
 
 int main(int argc, const char **argv)
 {
-  goto_instrument_parseoptionst parseoptions(argc, argv);
-  return parseoptions.main();
+  goto_instrument_parse_optionst parse_options(argc, argv);
+  return parse_options.main();
 }

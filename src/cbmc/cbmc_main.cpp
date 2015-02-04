@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#include "cbmc_parseoptions.h"
+#include "cbmc_parse_options.h"
 
 /*******************************************************************\
 
@@ -48,9 +48,9 @@ int wmain(int argc, const wchar_t **argv_wide)
 int main(int argc, const char **argv)
 {
 #endif
-  cbmc_parseoptionst parseoptions(argc, argv);
+  cbmc_parse_optionst parse_options(argc, argv);
 
-  int res=parseoptions.main();
+  int res=parse_options.main();
 
   #ifdef IREP_HASH_STATS
   std::cout << "IREP_HASH_CNT=" << irep_hash_cnt << std::endl;

@@ -46,7 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include "goto_instrument_parseoptions.h"
+#include "goto_instrument_parse_options.h"
 #include "document_properties.h"
 #include "uninitialized.h"
 #include "full_slicer.h"
@@ -75,7 +75,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::eval_verbosity
+Function: goto_instrument_parse_optionst::eval_verbosity
 
   Inputs:
 
@@ -85,7 +85,7 @@ Function: goto_instrument_parseoptionst::eval_verbosity
 
 \*******************************************************************/
 
-void goto_instrument_parseoptionst::eval_verbosity()
+void goto_instrument_parse_optionst::eval_verbosity()
 {
   unsigned int v=8;
   
@@ -100,7 +100,7 @@ void goto_instrument_parseoptionst::eval_verbosity()
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::doit
+Function: goto_instrument_parse_optionst::doit
 
   Inputs:
 
@@ -110,7 +110,7 @@ Function: goto_instrument_parseoptionst::doit
 
 \*******************************************************************/
 
-int goto_instrument_parseoptionst::doit()
+int goto_instrument_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
@@ -502,7 +502,7 @@ int goto_instrument_parseoptionst::doit()
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::get_goto_program
+Function: goto_instrument_parse_optionst::get_goto_program
 
   Inputs:
 
@@ -512,7 +512,7 @@ Function: goto_instrument_parseoptionst::get_goto_program
 
 \*******************************************************************/
   
-void goto_instrument_parseoptionst::get_goto_program(
+void goto_instrument_parse_optionst::get_goto_program(
   goto_functionst &goto_functions)
 {
   status() << "Reading GOTO program from `" << cmdline.args[0] << "'" << eom;
@@ -527,7 +527,7 @@ void goto_instrument_parseoptionst::get_goto_program(
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::instrument_goto_program
+Function: goto_instrument_parse_optionst::instrument_goto_program
 
   Inputs:
 
@@ -537,7 +537,7 @@ Function: goto_instrument_parseoptionst::instrument_goto_program
 
 \*******************************************************************/
   
-void goto_instrument_parseoptionst::instrument_goto_program(
+void goto_instrument_parse_optionst::instrument_goto_program(
   goto_functionst &goto_functions)
 {
   optionst options;
@@ -941,7 +941,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::help
+Function: goto_instrument_parse_optionst::help
 
   Inputs:
 
@@ -951,7 +951,7 @@ Function: goto_instrument_parseoptionst::help
 
 \*******************************************************************/
 
-void goto_instrument_parseoptionst::help()
+void goto_instrument_parse_optionst::help()
 {
   std::cout <<
     "\n"

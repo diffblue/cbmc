@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_CBMC_PARSEOPTIONS_H
 
 #include <util/ui_message.h>
-#include <util/parseoptions.h>
+#include <util/parse_options.h>
 
 #include <langapi/language_ui.h>
 
@@ -54,8 +54,8 @@ class optionst;
   "(graphml-cex):" \
   "(decide)" // legacy, and will eventually disappear
 
-class cbmc_parseoptionst:
-  public parseoptions_baset,
+class cbmc_parse_optionst:
+  public parse_options_baset,
   public xml_interfacet,
   public language_uit
 {
@@ -63,8 +63,8 @@ public:
   virtual int doit();
   virtual void help();
 
-  cbmc_parseoptionst(int argc, const char **argv);
-  cbmc_parseoptionst(
+  cbmc_parse_optionst(int argc, const char **argv);
+  cbmc_parse_optionst(
     int argc,
     const char **argv,
     const std::string &extra_options);

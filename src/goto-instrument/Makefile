@@ -1,4 +1,4 @@
-SRC = goto_instrument_parseoptions.cpp rw_set.cpp \
+SRC = goto_instrument_parse_options.cpp rw_set.cpp \
       document_properties.cpp goto_instrument_languages.cpp \
       uninitialized.cpp full_slicer.cpp k_induction.cpp \
       object_id.cpp show_locations.cpp points_to.cpp \

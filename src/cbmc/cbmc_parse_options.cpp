@@ -42,14 +42,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-#include "cbmc_parseoptions.h"
+#include "cbmc_parse_options.h"
 #include "bmc.h"
 #include "version.h"
 #include "xml_interface.h"
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::cbmc_parseoptionst
+Function: cbmc_parse_optionst::cbmc_parse_optionst
 
   Inputs:
 
@@ -59,8 +59,8 @@ Function: cbmc_parseoptionst::cbmc_parseoptionst
 
 \*******************************************************************/
 
-cbmc_parseoptionst::cbmc_parseoptionst(int argc, const char **argv):
-  parseoptions_baset(CBMC_OPTIONS, argc, argv),
+cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
+  parse_options_baset(CBMC_OPTIONS, argc, argv),
   xml_interfacet(cmdline),
   language_uit("CBMC " CBMC_VERSION, cmdline)
 {
@@ -68,7 +68,7 @@ cbmc_parseoptionst::cbmc_parseoptionst(int argc, const char **argv):
   
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::cbmc_parseoptionst
+Function: cbmc_parse_optionst::cbmc_parse_optionst
 
   Inputs:
 
@@ -78,11 +78,11 @@ Function: cbmc_parseoptionst::cbmc_parseoptionst
 
 \*******************************************************************/
 
-::cbmc_parseoptionst::cbmc_parseoptionst(
+::cbmc_parse_optionst::cbmc_parse_optionst(
   int argc,
   const char **argv,
   const std::string &extra_options):
-  parseoptions_baset(CBMC_OPTIONS+extra_options, argc, argv),
+  parse_options_baset(CBMC_OPTIONS+extra_options, argc, argv),
   xml_interfacet(cmdline),
   language_uit("CBMC " CBMC_VERSION, cmdline)
 {
@@ -90,7 +90,7 @@ Function: cbmc_parseoptionst::cbmc_parseoptionst
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::eval_verbosity
+Function: cbmc_parse_optionst::eval_verbosity
 
   Inputs:
 
@@ -100,7 +100,7 @@ Function: cbmc_parseoptionst::eval_verbosity
 
 \*******************************************************************/
 
-void cbmc_parseoptionst::eval_verbosity()
+void cbmc_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
   unsigned int v=messaget::M_STATISTICS;
@@ -116,7 +116,7 @@ void cbmc_parseoptionst::eval_verbosity()
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::get_command_line_options
+Function: cbmc_parse_optionst::get_command_line_options
 
   Inputs:
 
@@ -126,7 +126,7 @@ Function: cbmc_parseoptionst::get_command_line_options
 
 \*******************************************************************/
 
-void cbmc_parseoptionst::get_command_line_options(optionst &options)
+void cbmc_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
   {
@@ -397,7 +397,7 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::doit
+Function: cbmc_parse_optionst::doit
 
   Inputs:
 
@@ -407,7 +407,7 @@ Function: cbmc_parseoptionst::doit
 
 \*******************************************************************/
 
-int cbmc_parseoptionst::doit()
+int cbmc_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
@@ -480,7 +480,7 @@ int cbmc_parseoptionst::doit()
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::set_properties
+Function: cbmc_parse_optionst::set_properties
 
   Inputs:
 
@@ -490,7 +490,7 @@ Function: cbmc_parseoptionst::set_properties
 
 \*******************************************************************/
 
-bool cbmc_parseoptionst::set_properties(goto_functionst &goto_functions)
+bool cbmc_parse_optionst::set_properties(goto_functionst &goto_functions)
 {
   try
   {
@@ -523,7 +523,7 @@ bool cbmc_parseoptionst::set_properties(goto_functionst &goto_functions)
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::get_goto_program
+Function: cbmc_parse_optionst::get_goto_program
 
   Inputs:
 
@@ -533,7 +533,7 @@ Function: cbmc_parseoptionst::get_goto_program
 
 \*******************************************************************/
   
-bool cbmc_parseoptionst::get_goto_program(
+bool cbmc_parse_optionst::get_goto_program(
   const optionst &options,
   bmct &bmc, // for get_modules
   goto_functionst &goto_functions)
@@ -676,7 +676,7 @@ bool cbmc_parseoptionst::get_goto_program(
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::preprocessing
+Function: cbmc_parse_optionst::preprocessing
 
   Inputs:
 
@@ -686,7 +686,7 @@ Function: cbmc_parseoptionst::preprocessing
 
 \*******************************************************************/
   
-void cbmc_parseoptionst::preprocessing()
+void cbmc_parse_optionst::preprocessing()
 {
   try
   {
@@ -744,7 +744,7 @@ void cbmc_parseoptionst::preprocessing()
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::process_goto_program
+Function: cbmc_parse_optionst::process_goto_program
 
   Inputs:
 
@@ -754,7 +754,7 @@ Function: cbmc_parseoptionst::process_goto_program
 
 \*******************************************************************/
   
-bool cbmc_parseoptionst::process_goto_program(
+bool cbmc_parse_optionst::process_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
 {
@@ -858,7 +858,7 @@ bool cbmc_parseoptionst::process_goto_program(
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::do_bmc
+Function: cbmc_parse_optionst::do_bmc
 
   Inputs:
 
@@ -868,7 +868,7 @@ Function: cbmc_parseoptionst::do_bmc
 
 \*******************************************************************/
 
-int cbmc_parseoptionst::do_bmc(
+int cbmc_parse_optionst::do_bmc(
   bmct &bmc,
   const goto_functionst &goto_functions)
 {
@@ -889,7 +889,7 @@ int cbmc_parseoptionst::do_bmc(
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::help
+Function: cbmc_parse_optionst::help
 
   Inputs:
 
@@ -899,7 +899,7 @@ Function: cbmc_parseoptionst::help
 
 \*******************************************************************/
 
-void cbmc_parseoptionst::help()
+void cbmc_parse_optionst::help()
 {
   std::cout <<
     "\n"
