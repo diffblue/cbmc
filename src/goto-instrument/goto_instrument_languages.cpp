@@ -11,11 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
 
-#include "goto_instrument_parseoptions.h"
+#include "goto_instrument_parse_options.h"
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::register_languages
+Function: goto_instrument_parse_optionst::register_languages
 
   Inputs:
 
@@ -25,7 +25,7 @@ Function: goto_instrument_parseoptionst::register_languages
 
 \*******************************************************************/
 
-void goto_instrument_parseoptionst::register_languages()
+void goto_instrument_parse_optionst::register_languages()
 {
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);

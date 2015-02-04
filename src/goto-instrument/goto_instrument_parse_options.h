@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_INSTRUMENT_PARSEOPTIONS_H
 
 #include <util/ui_message.h>
-#include <util/parseoptions.h>
+#include <util/parse_options.h>
 
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
@@ -59,16 +59,16 @@ Author: Daniel Kroening, kroening@kroening.com
   "(list-symbols)(list-undefined-functions)" \
   "(z3)"
 
-class goto_instrument_parseoptionst:
-  public parseoptions_baset,
+class goto_instrument_parse_optionst:
+  public parse_options_baset,
   public language_uit
 {
 public:
   virtual int doit();
   virtual void help();
 
-  goto_instrument_parseoptionst(int argc, const char **argv):
-    parseoptions_baset(GOTO_INSTRUMENT_OPTIONS, argc, argv),
+  goto_instrument_parse_optionst(int argc, const char **argv):
+    parse_options_baset(GOTO_INSTRUMENT_OPTIONS, argc, argv),
     language_uit("goto-instrument", cmdline)
   {
   }

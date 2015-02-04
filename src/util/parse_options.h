@@ -6,18 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef DBOX_PARSEOPTIONS_H
-
-#define DBOX_PARSEOPTIONS_H
+#ifndef CPROVER_PARSE_OPTIONS_H
+#define CPROVER_PARSE_OPTIONS_H
 
 #include <string>
 
 #include "cmdline.h"
 
-class parseoptions_baset
+class parse_options_baset
 {
 public:
-  parseoptions_baset(
+  parse_options_baset(
     const std::string &optstring, int argc, const char **argv);
 
   cmdlinet cmdline;
@@ -28,7 +27,7 @@ public:
   virtual int doit()=0;
   
   virtual int main();
-  virtual ~parseoptions_baset() { }
+  virtual ~parse_options_baset() { }
   
 private:
   bool parse_result;
