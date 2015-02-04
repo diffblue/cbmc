@@ -38,11 +38,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <path-symex/locs.h>
 
 #include "path_search.h"
-#include "symex_parseoptions.h"
+#include "symex_parse_options.h"
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::symex_parseoptionst
+Function: symex_parse_optionst::symex_parse_optionst
 
   Inputs:
 
@@ -52,15 +52,15 @@ Function: symex_parseoptionst::symex_parseoptionst
 
 \*******************************************************************/
 
-symex_parseoptionst::symex_parseoptionst(int argc, const char **argv):
-  parseoptions_baset(SYMEX_OPTIONS, argc, argv),
+symex_parse_optionst::symex_parse_optionst(int argc, const char **argv):
+  parse_options_baset(SYMEX_OPTIONS, argc, argv),
   language_uit("Symex " CBMC_VERSION, cmdline)
 {
 }
   
 /*******************************************************************\
 
-Function: symex_parseoptionst::eval_verbosity
+Function: symex_parse_optionst::eval_verbosity
 
   Inputs:
 
@@ -70,7 +70,7 @@ Function: symex_parseoptionst::eval_verbosity
 
 \*******************************************************************/
 
-void symex_parseoptionst::eval_verbosity()
+void symex_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
   int v=messaget::M_STATISTICS;
@@ -89,7 +89,7 @@ void symex_parseoptionst::eval_verbosity()
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::get_command_line_options
+Function: symex_parse_optionst::get_command_line_options
 
   Inputs:
 
@@ -99,7 +99,7 @@ Function: symex_parseoptionst::get_command_line_options
 
 \*******************************************************************/
 
-void symex_parseoptionst::get_command_line_options(optionst &options)
+void symex_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
   {
@@ -180,7 +180,7 @@ void symex_parseoptionst::get_command_line_options(optionst &options)
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::doit
+Function: symex_parse_optionst::doit
 
   Inputs:
 
@@ -190,7 +190,7 @@ Function: symex_parseoptionst::doit
 
 \*******************************************************************/
 
-int symex_parseoptionst::doit()
+int symex_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
@@ -301,7 +301,7 @@ int symex_parseoptionst::doit()
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::set_properties
+Function: symex_parse_optionst::set_properties
 
   Inputs:
 
@@ -311,7 +311,7 @@ Function: symex_parseoptionst::set_properties
 
 \*******************************************************************/
 
-bool symex_parseoptionst::set_properties(goto_functionst &goto_functions)
+bool symex_parse_optionst::set_properties(goto_functionst &goto_functions)
 {
   try
   {
@@ -341,7 +341,7 @@ bool symex_parseoptionst::set_properties(goto_functionst &goto_functions)
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::get_goto_program
+Function: symex_parse_optionst::get_goto_program
 
   Inputs:
 
@@ -351,7 +351,7 @@ Function: symex_parseoptionst::get_goto_program
 
 \*******************************************************************/
   
-bool symex_parseoptionst::get_goto_program(
+bool symex_parse_optionst::get_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
 {
@@ -496,7 +496,7 @@ bool symex_parseoptionst::get_goto_program(
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::process_goto_program
+Function: symex_parse_optionst::process_goto_program
 
   Inputs:
 
@@ -506,7 +506,7 @@ Function: symex_parseoptionst::process_goto_program
 
 \*******************************************************************/
   
-bool symex_parseoptionst::process_goto_program(
+bool symex_parse_optionst::process_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
 {
@@ -577,7 +577,7 @@ bool symex_parseoptionst::process_goto_program(
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::report_properties
+Function: symex_parse_optionst::report_properties
 
   Inputs:
 
@@ -587,7 +587,7 @@ Function: symex_parseoptionst::report_properties
 
 \*******************************************************************/
 
-void symex_parseoptionst::report_properties(
+void symex_parse_optionst::report_properties(
   const path_searcht::property_mapt &property_map)
 {
   for(path_searcht::property_mapt::const_iterator
@@ -652,7 +652,7 @@ void symex_parseoptionst::report_properties(
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::report_success
+Function: symex_parse_optionst::report_success
 
   Inputs:
 
@@ -662,7 +662,7 @@ Function: symex_parseoptionst::report_success
 
 \*******************************************************************/
 
-void symex_parseoptionst::report_success()
+void symex_parse_optionst::report_success()
 {
   result() << "VERIFICATION SUCCESSFUL" << eom;
 
@@ -687,7 +687,7 @@ void symex_parseoptionst::report_success()
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::show_counterexample
+Function: symex_parse_optionst::show_counterexample
 
   Inputs:
 
@@ -697,7 +697,7 @@ Function: symex_parseoptionst::show_counterexample
 
 \*******************************************************************/
 
-void symex_parseoptionst::show_counterexample(
+void symex_parse_optionst::show_counterexample(
   const goto_tracet &error_trace)
 {
   const namespacet ns(symbol_table);
@@ -724,7 +724,7 @@ void symex_parseoptionst::show_counterexample(
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::report_failure
+Function: symex_parse_optionst::report_failure
 
   Inputs:
 
@@ -734,7 +734,7 @@ Function: symex_parseoptionst::report_failure
 
 \*******************************************************************/
 
-void symex_parseoptionst::report_failure()
+void symex_parse_optionst::report_failure()
 {
   result() << "VERIFICATION FAILED" << eom;
 
@@ -759,7 +759,7 @@ void symex_parseoptionst::report_failure()
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::help
+Function: symex_parse_optionst::help
 
   Inputs:
 
@@ -769,7 +769,7 @@ Function: symex_parseoptionst::help
 
 \*******************************************************************/
 
-void symex_parseoptionst::help()
+void symex_parse_optionst::help()
 {
   std::cout <<
     "\n"
