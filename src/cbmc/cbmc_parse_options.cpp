@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
+#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -467,6 +468,18 @@ int cbmc_parse_optionst::doit()
      cmdline.isset("show-properties")) // use this one
   {
     const namespacet ns(symbol_table);
+    show_properties(ns, get_ui(), goto_functions);
+    return 0;
+  }
+
+  if(cmdline.isset("show-reachable-properties")) // may replace --show-properties
+  {
+    const namespacet ns(symbol_table);
+    
+    // Entry point will have been set before and function pointers removed
+    status() << "Removing Unused Functions" << eom;
+    remove_unused_functions(goto_functions, ui_message_handler);
+    
     show_properties(ns, get_ui(), goto_functions);
     return 0;
   }
