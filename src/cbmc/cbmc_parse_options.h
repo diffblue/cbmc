@@ -40,7 +40,7 @@ class optionst;
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-value-sets)(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
-  "(show-claims)(claim):(show-properties)(property):" \
+  "(show-claims)(claim):(show-properties)(show-reachable-properties)(property):" \
   "(all-claims)(all-properties)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
