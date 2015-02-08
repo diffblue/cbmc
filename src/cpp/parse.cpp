@@ -4832,13 +4832,13 @@ Function:
   : logical.and.expr
   | logical.or.expr LogOrOp logical.and.expr                left-to-right
 */
-bool Parser::rLogicalOrExpr(exprt &exp, bool temp_args)
+bool Parser::rLogicalOrExpr(exprt &exp, bool template_args)
 {
   #ifdef DEBUG
   std::cout << "Parser::rLogicalOrExpr 0\n";
   #endif
 
-  if(!rLogicalAndExpr(exp, temp_args))
+  if(!rLogicalAndExpr(exp, template_args))
     return false;
 
   #ifdef DEBUG
@@ -4851,7 +4851,7 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool temp_args)
     lex.get_token(tk);
 
     exprt right;
-    if(!rLogicalAndExpr(right, temp_args))
+    if(!rLogicalAndExpr(right, template_args))
       return false;
 
     exprt left;
@@ -4882,13 +4882,13 @@ Function:
   : inclusive.or.expr
   | logical.and.expr LogAndOp inclusive.or.expr
 */
-bool Parser::rLogicalAndExpr(exprt &exp, bool temp_args)
+bool Parser::rLogicalAndExpr(exprt &exp, bool template_args)
 {
   #ifdef DEBUG
   std::cout << "Parser::rLogicalAndExpr 1\n";
   #endif
 
-  if(!rInclusiveOrExpr(exp, temp_args))
+  if(!rInclusiveOrExpr(exp, template_args))
     return false;
 
   #ifdef DEBUG
@@ -4901,7 +4901,7 @@ bool Parser::rLogicalAndExpr(exprt &exp, bool temp_args)
     lex.get_token(tk);
 
     exprt right;
-    if(!rInclusiveOrExpr(right, temp_args))
+    if(!rInclusiveOrExpr(right, template_args))
       return false;
 
     exprt left;
@@ -4932,13 +4932,13 @@ Function:
   : exclusive.or.expr
   | inclusive.or.expr '|' exclusive.or.expr
 */
-bool Parser::rInclusiveOrExpr(exprt &exp, bool temp_args)
+bool Parser::rInclusiveOrExpr(exprt &exp, bool template_args)
 {
   #ifdef DEBUG
   std::cout << "Parser::rInclusiveOrExpr 0\n";
   #endif
 
-  if(!rExclusiveOrExpr(exp, temp_args))
+  if(!rExclusiveOrExpr(exp, template_args))
     return false;
 
   #ifdef DEBUG
@@ -4951,7 +4951,7 @@ bool Parser::rInclusiveOrExpr(exprt &exp, bool temp_args)
     lex.get_token(tk);
 
     exprt right;
-    if(!rExclusiveOrExpr(right, temp_args))
+    if(!rExclusiveOrExpr(right, template_args))
       return false;
 
     exprt left;
@@ -4982,13 +4982,13 @@ Function:
   : and.expr
   | exclusive.or.expr '^' and.expr
 */
-bool Parser::rExclusiveOrExpr(exprt &exp, bool temp_args)
+bool Parser::rExclusiveOrExpr(exprt &exp, bool template_args)
 {
   #ifdef DEBUG
   std::cout << "Parser::rExclusiveOrExpr 0\n";
   #endif
 
-  if(!rAndExpr(exp, temp_args))
+  if(!rAndExpr(exp, template_args))
     return false;
 
   #ifdef DEBUG
@@ -5001,7 +5001,7 @@ bool Parser::rExclusiveOrExpr(exprt &exp, bool temp_args)
     lex.get_token(tk);
 
     exprt right;
-    if(!rAndExpr(right, temp_args))
+    if(!rAndExpr(right, template_args))
       return false;
 
     exprt left;
@@ -5032,13 +5032,13 @@ Function:
   : equality.expr
   | and.expr '&' equality.expr
 */
-bool Parser::rAndExpr(exprt &exp, bool temp_args)
+bool Parser::rAndExpr(exprt &exp, bool template_args)
 {
   #ifdef DEBUG
   std::cout << "Parser::rAndExpr 0\n";
   #endif
 
-  if(!rEqualityExpr(exp, temp_args))
+  if(!rEqualityExpr(exp, template_args))
     return false;
 
   #ifdef DEBUG
@@ -5051,7 +5051,7 @@ bool Parser::rAndExpr(exprt &exp, bool temp_args)
     lex.get_token(tk);
 
     exprt right;
-    if(!rEqualityExpr(right, temp_args))
+    if(!rEqualityExpr(right, template_args))
       return false;
 
     exprt left;
@@ -5082,13 +5082,13 @@ Function:
   : relational.expr
   | equality.expr EqualOp relational.expr
 */
-bool Parser::rEqualityExpr(exprt &exp, bool temp_args)
+bool Parser::rEqualityExpr(exprt &exp, bool template_args)
 {
   #ifdef DEBUG
   std::cout << "Parser::rEqualityExpr 0\n";
   #endif
 
-  if(!rRelationalExpr(exp, temp_args))
+  if(!rRelationalExpr(exp, template_args))
     return false;
 
   #ifdef DEBUG
@@ -5102,7 +5102,7 @@ bool Parser::rEqualityExpr(exprt &exp, bool temp_args)
     lex.get_token(tk);
 
     exprt right;
-    if(!rRelationalExpr(right, temp_args))
+    if(!rRelationalExpr(right, template_args))
       return false;
 
     exprt left;
@@ -5133,7 +5133,7 @@ Function:
   : shift.expr
   | relational.expr (RelOp | '<' | '>') shift.expr
 */
-bool Parser::rRelationalExpr(exprt &exp, bool temp_args)
+bool Parser::rRelationalExpr(exprt &exp, bool template_args)
 {
   #ifdef DEBUG
   std::cout << "Parser::rRelationalExpr 0\n";
@@ -5149,7 +5149,7 @@ bool Parser::rRelationalExpr(exprt &exp, bool temp_args)
   int t;
 
   while(t=lex.LookAhead(0),
-        (t==TOK_LE || t==TOK_GE || t=='<' || (t=='>' && !temp_args)))
+        (t==TOK_LE || t==TOK_GE || t=='<' || (t=='>' && !template_args)))
   {
     cpp_tokent tk;
     lex.get_token(tk);
