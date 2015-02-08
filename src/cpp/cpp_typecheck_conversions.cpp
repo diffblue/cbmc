@@ -2066,7 +2066,7 @@ bool cpp_typecheckt::reinterpret_typecast(
 
     if(e.id()==ID_code)
     {
-      if(standard_conversion_function_to_pointer(e,tmp))
+      if(standard_conversion_function_to_pointer(e, tmp))
          e.swap(tmp);
       else
         return false;
@@ -2074,7 +2074,7 @@ bool cpp_typecheckt::reinterpret_typecast(
 
     if(e.type().id()==ID_array)
     {
-      if(standard_conversion_array_to_pointer(e,tmp))
+      if(standard_conversion_array_to_pointer(e, tmp))
         e.swap(tmp);
       else
         return false;
@@ -2082,7 +2082,7 @@ bool cpp_typecheckt::reinterpret_typecast(
 
     if(e.get_bool(ID_C_lvalue))
     {
-      if(standard_conversion_lvalue_to_rvalue(e,tmp))
+      if(standard_conversion_lvalue_to_rvalue(e, tmp))
         e.swap(tmp);
       else
         return false;
@@ -2124,15 +2124,9 @@ bool cpp_typecheckt::reinterpret_typecast(
      type.id()==ID_pointer &&
      !is_reference(type))
   {
-    if(e.type().subtype().id()==ID_code
-       && type.subtype().id() != ID_code )
-      return false;
-    else if (e.type().subtype().id() != ID_code
-       && type.subtype().id()==ID_code )
-      return false;
-
-    // this is more generous than the standard
-    new_expr = expr;
+    // pointer to pointer: we ok it all.
+    // This is more generous than the standard.
+    new_expr=expr;
     new_expr.make_typecast(type);
     return true;
   }
