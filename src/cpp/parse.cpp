@@ -22,20 +22,29 @@
 class new_scopet
 {
 public:
-  typedef enum { MEMBER, FUNCTION, VARIABLE, TAG,
-                 NAMESPACE, TEMPLATE, BLOCK } kindt;
+  new_scopet():kind(NONE), anon_count(0), parent(NULL)
+  {
+  }
+
+  typedef enum { NONE, MEMBER, FUNCTION, VARIABLE, TAG,
+                 NAMESPACE, CLASS_TEMPLATE, MEMBER_TEMPLATE,
+                 FUNCTION_TEMPLATE, BLOCK } kindt;
   kindt kind;
+  irep_idt id;
   
   static const char *kind2string(kindt kind)
   {
     switch(kind)
     {
+    case NONE: return "?";
     case MEMBER: return "MEMBER";
     case FUNCTION: return "FUNCTION";
     case VARIABLE: return "VARIABLE";
     case TAG: return "TAG";
     case NAMESPACE: return "NAMESPACE";
-    case TEMPLATE: return "TEMPLATE";
+    case CLASS_TEMPLATE: return "CLASS_TEMPLATE";
+    case MEMBER_TEMPLATE: return "MEMBER_TEMPLATE";
+    case FUNCTION_TEMPLATE: return "FUNCTION_TEMPLATE";
     case BLOCK: return "BLOCK";
     default: return "";
     }
@@ -44,11 +53,27 @@ public:
   typedef std::map<irep_idt, new_scopet> id_mapt;
   id_mapt id_map;
   
-  void print(std::ostream &out) const
+  unsigned anon_count;
+  
+  new_scopet *parent;
+  
+  inline void print(std::ostream &out) const
   {
     print_rec(out, 0);
   }
- 
+  
+  irep_idt get_anon_id()
+  {
+    ++anon_count;
+    return "#anon"+i2string(anon_count);
+  }
+  
+  std::string full_name() const
+  {
+    return (parent==NULL?"":(parent->full_name()+"::"))+
+           id2string(id);
+  }
+  
 protected:
   void print_rec(std::ostream &, unsigned indent) const;
 };
@@ -90,7 +115,7 @@ void new_scopet::print_rec(std::ostream &out, unsigned indent) const
       it!=id_map.end();
       it++)
   {
-    out << std::string(' ', indent)
+    out << std::string(indent, ' ')
         << it->first << ": "
         << kind2string(it->second.kind)
         << "\n";
@@ -115,8 +140,10 @@ protected:
   cpp_token_buffert &lex;
   cpp_parsert &parser;
   
+  // scopes
   new_scopet root_scope;
   new_scopet *current_scope;
+  void make_sub_scope(const irept &name, new_scopet::kindt);
 
   enum DeclKind { kDeclarator, kArgDeclarator, kCastDeclarator };
   enum TemplateDeclKind { tdk_unknown, tdk_decl, tdk_instantiation,
@@ -281,6 +308,37 @@ protected:
 
   unsigned int max_errors;
 };
+
+/*******************************************************************\
+
+Function: Parser::make_sub_scope
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void Parser::make_sub_scope(const irept &cpp_name, new_scopet::kindt kind)
+{
+  irep_idt id;
+
+  if(cpp_name.get_sub().size()==1 &&
+     cpp_name.get_sub().front().id()==ID_name)
+    id=cpp_name.get_sub().front().get(ID_identifier);
+  else
+    id=current_scope->get_anon_id();
+
+  new_scopet &s=current_scope->id_map[id];
+  
+  s.kind=kind;
+  s.id=id;
+  s.parent=current_scope;
+  
+  current_scope=&s;
+}
 
 /*******************************************************************\
 
@@ -728,7 +786,7 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
   irep_idt name;
 
   if(lex.LookAhead(0)=='{')
-    name="";
+    name=""; // an anonymous namespace
   else
   {
     if(lex.get_token(tk2)==TOK_IDENTIFIER)
@@ -950,23 +1008,6 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   case tdk_instantiation:
     // Repackage the decl
     decl=body;
-    assert(0);
-    // assumes that decl has the form: [nil [class ...] ;]
-    #if 0
-    if(Ptree::Length(decl)!=3)
-      return false;
-
-    if(Ptree::First(decl).is_not_nil())
-      return false;
-
-    if(Ptree::Second(decl)->What()!=ntClassSpec)
-      return false;
-
-    if(!Ptree::Eq(Ptree::Third(decl), ';'))
-      return false;
-    #endif
-
-    //decl=new PtreeTemplateInstantiation(Ptree::Second(decl));
     break;
 
   case tdk_specialization:
@@ -4340,6 +4381,9 @@ bool Parser::rClassSpec(typet &spec)
   #ifdef DEBUG
   std::cout << "Parser::rClassSpec 6\n";
   #endif
+
+  save_scopet saved_scope(current_scope);
+  make_sub_scope(spec.find(ID_tag), new_scopet::TAG);
 
   exprt body;
 
@@ -8468,6 +8512,10 @@ Function: Parser::operator()
 
 \*******************************************************************/
 
+#if 0
+#include <iostream>
+#endif
+
 bool Parser::operator()()
 {
   number_of_errors=0;
@@ -8480,6 +8528,10 @@ bool Parser::operator()()
     parser.parse_tree.items.push_back(item);
     item.clear();
   }
+  
+  #if 0
+  root_scope.print(std::cout);
+  #endif
 
   return number_of_errors!=0;
 }
