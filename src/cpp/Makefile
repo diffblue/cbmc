@@ -30,7 +30,7 @@ include ../common
 
 CLEANFILES = cpp$(LIBEXT)
 
-all: cpp$(LIBEXT) cpp_parser_test$(EXEEXT)
+all: cpp$(LIBEXT) cpp_parser_test$(EXEEXT) cpp_scanner_test$(EXEEXT)
 
 ###############################################################################
 
@@ -41,3 +41,9 @@ cpp_parser_test$(EXEEX): cpp_parser_test$(OBJEXT) $(OBJ) ../util/util$(LIBEXT) \
 	../ansi-c/ansi-c$(LIBEXT) ../big-int/big-int$(LIBEXT) ../linking/linking$(LIBEXT) \
 	../langapi/langapi$(LIBEXT)
 	$(LINKBIN)
+
+cpp_scanner_test$(EXEEX): cpp_scanner_test$(OBJEXT) $(OBJ) ../util/util$(LIBEXT) \
+	../ansi-c/ansi-c$(LIBEXT) ../big-int/big-int$(LIBEXT) ../linking/linking$(LIBEXT) \
+	../langapi/langapi$(LIBEXT)
+	$(LINKBIN)
+
