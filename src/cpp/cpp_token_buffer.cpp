@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <cassert>
 
 #include <ansi-c/ansi_c_y.tab.h>
+#include <ansi-c/ansi_c_parser.h>
 
 #include "cpp_token_buffer.h"
 
@@ -124,12 +125,8 @@ Function: cpp_token_buffert::read_token
 
 \*******************************************************************/
 
-int yycpplex();
 int yyansi_clex();
-
 extern char *yyansi_ctext;
-
-#include <ansi-c/ansi_c_parser.h>
 
 void cpp_token_buffert::read_token()
 {
@@ -138,9 +135,6 @@ void cpp_token_buffert::read_token()
 
   int kind;
   
-  #if 0
-  kind=yycpplex();
-  #else
   ansi_c_parser.stack.clear();
   kind=yyansi_clex();
   tokens.back().text=yyansi_ctext;
@@ -150,7 +144,6 @@ void cpp_token_buffert::read_token()
     tokens.back().line_no=ansi_c_parser.get_line_no();
     tokens.back().filename=ansi_c_parser.get_file();
   }  
-  #endif
 
   //std::cout << "TOKEN: " << kind << " " << tokens.back().text << std::endl;
 
