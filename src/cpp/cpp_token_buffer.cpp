@@ -39,7 +39,7 @@ int cpp_token_buffert::LookAhead(unsigned offset)
 
 /*******************************************************************\
 
-Function: cpp_token_buffert::GetToken
+Function: cpp_token_buffert::get_token
 
   Inputs:
 
@@ -49,7 +49,7 @@ Function: cpp_token_buffert::GetToken
 
 \*******************************************************************/
 
-int cpp_token_buffert::GetToken(cpp_tokent &token)
+int cpp_token_buffert::get_token(cpp_tokent &token)
 {
   assert(current_pos<=token_vector.size());
 
@@ -64,7 +64,7 @@ int cpp_token_buffert::GetToken(cpp_tokent &token)
 
 /*******************************************************************\
 
-Function: cpp_token_buffert::GetToken
+Function: cpp_token_buffert::get_token
 
   Inputs:
 
@@ -74,7 +74,7 @@ Function: cpp_token_buffert::GetToken
 
 \*******************************************************************/
 
-int cpp_token_buffert::GetToken()
+int cpp_token_buffert::get_token()
 {
   assert(current_pos<=token_vector.size());
 
