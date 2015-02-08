@@ -21,8 +21,8 @@ public:
   typedef unsigned int post;
  
   int LookAhead(unsigned offset);
-  int GetToken(cpp_tokent &token);
-  int GetToken();
+  int get_token(cpp_tokent &token);
+  int get_token();
   int LookAhead(unsigned offset, cpp_tokent &token);
 
   post Save();
