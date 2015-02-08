@@ -755,6 +755,12 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                      return make_identifier();
                  }
 
+"__null"         { if(PARSER.mode==ansi_c_parsert::GCC)
+                     return cpp98_keyword(TOK_NULLPTR); // GNU extension
+                   else
+                     return make_identifier();
+                 }
+
 "__char32_t"     { if(PARSER.mode==ansi_c_parsert::GCC)
                      return cpp98_keyword(TOK_CHAR32_T); // GNU extension
                    else
