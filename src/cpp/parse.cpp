@@ -8420,7 +8420,7 @@ Function:
 
 \*******************************************************************/
 
-bool Parser::MaybeTypeNameOrClassTemplate(cpp_tokent&)
+bool Parser::MaybeTypeNameOrClassTemplate(cpp_tokent &)
 {
   return true;
 }
@@ -8471,7 +8471,10 @@ bool Parser::operator()()
   cpp_itemt item;
 
   while(rProgram(item))
+  {
     parser.parse_tree.items.push_back(item);
+    item.clear();
+  }
 
   return number_of_errors!=0;
 }
