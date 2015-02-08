@@ -26,26 +26,58 @@ public:
   {
   }
 
-  typedef enum { NONE, MEMBER, FUNCTION, VARIABLE, TAG,
+  typedef enum { NONE,
+                 TEMPLATE, MEMBER, FUNCTION, VARIABLE,
+                 TYPEDEF, TAG,
                  NAMESPACE, CLASS_TEMPLATE, MEMBER_TEMPLATE,
-                 FUNCTION_TEMPLATE, BLOCK } kindt;
+                 FUNCTION_TEMPLATE, BLOCK,
+                 NON_TYPE_TEMPLATE_PARAMETER,
+                 TYPE_TEMPLATE_PARAMETER,
+                 TEMPLATE_TEMPLATE_PARAMETER } kindt;
   kindt kind;
   irep_idt id;
+  
+  bool is_type() const
+  {
+    return kind==TYPEDEF ||
+           kind==TYPE_TEMPLATE_PARAMETER ||
+           kind==TAG ||
+           kind==CLASS_TEMPLATE;
+  }
+  
+  bool is_template() const
+  {
+    return kind==FUNCTION_TEMPLATE ||
+           kind==CLASS_TEMPLATE ||
+           kind==MEMBER_TEMPLATE;
+  }
+  
+  bool is_named_scope() const
+  {
+    return kind==NAMESPACE ||
+           kind==TAG ||
+           kind==TYPE_TEMPLATE_PARAMETER;
+  }
   
   static const char *kind2string(kindt kind)
   {
     switch(kind)
     {
     case NONE: return "?";
+    case TEMPLATE: return "TEMPLATE";
     case MEMBER: return "MEMBER";
     case FUNCTION: return "FUNCTION";
     case VARIABLE: return "VARIABLE";
+    case TYPEDEF: return "TYPEDEF";
     case TAG: return "TAG";
     case NAMESPACE: return "NAMESPACE";
     case CLASS_TEMPLATE: return "CLASS_TEMPLATE";
     case MEMBER_TEMPLATE: return "MEMBER_TEMPLATE";
     case FUNCTION_TEMPLATE: return "FUNCTION_TEMPLATE";
     case BLOCK: return "BLOCK";
+    case NON_TYPE_TEMPLATE_PARAMETER: return "NON_TYPE_TEMPLATE_PARAMETER";
+    case TYPE_TEMPLATE_PARAMETER: return "TYPE_TEMPLATE_PARAMETER";
+    case TEMPLATE_TEMPLATE_PARAMETER: return "TEMPLATE_TEMPLATE_PARAMETER";
     default: return "";
     }
   }
@@ -143,7 +175,10 @@ protected:
   // scopes
   new_scopet root_scope;
   new_scopet *current_scope;
+  new_scopet &add_id(const irept &name, new_scopet::kindt);
+  new_scopet &add_id(const irep_idt &, new_scopet::kindt);
   void make_sub_scope(const irept &name, new_scopet::kindt);
+  void make_sub_scope(const irep_idt &, new_scopet::kindt);
 
   enum DeclKind { kDeclarator, kArgDeclarator, kCastDeclarator };
   enum TemplateDeclKind { tdk_unknown, tdk_decl, tdk_instantiation,
@@ -311,6 +346,54 @@ protected:
 
 /*******************************************************************\
 
+Function: Parser::add_id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+new_scopet &Parser::add_id(const irept &cpp_name, new_scopet::kindt kind)
+{
+  irep_idt id;
+
+  if(cpp_name.get_sub().size()==1 &&
+     cpp_name.get_sub().front().id()==ID_name)
+    id=cpp_name.get_sub().front().get(ID_identifier);
+  else
+    id=current_scope->get_anon_id();
+
+  return add_id(id, kind);
+}
+
+/*******************************************************************\
+
+Function: Parser::add_id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+new_scopet &Parser::add_id(const irep_idt &id, new_scopet::kindt kind)
+{
+  new_scopet &s=current_scope->id_map[id];
+  
+  s.kind=kind;
+  s.id=id;
+  s.parent=current_scope;
+
+  return s;
+}
+
+/*******************************************************************\
+
 Function: Parser::make_sub_scope
 
   Inputs:
@@ -323,20 +406,25 @@ Function: Parser::make_sub_scope
 
 void Parser::make_sub_scope(const irept &cpp_name, new_scopet::kindt kind)
 {
-  irep_idt id;
+  new_scopet &s=add_id(cpp_name, kind);
+  current_scope=&s;
+}
 
-  if(cpp_name.get_sub().size()==1 &&
-     cpp_name.get_sub().front().id()==ID_name)
-    id=cpp_name.get_sub().front().get(ID_identifier);
-  else
-    id=current_scope->get_anon_id();
+/*******************************************************************\
 
-  new_scopet &s=current_scope->id_map[id];
-  
-  s.kind=kind;
-  s.id=id;
-  s.parent=current_scope;
-  
+Function: Parser::make_sub_scope
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void Parser::make_sub_scope(const irep_idt &id, new_scopet::kindt kind)
+{
+  new_scopet &s=add_id(id, kind);
   current_scope=&s;
 }
 
@@ -981,7 +1069,10 @@ Function:
 bool Parser::rTemplateDecl(cpp_declarationt &decl)
 {
   TemplateDeclKind kind=tdk_unknown;
-
+  
+  make_sub_scope("#template", new_scopet::TEMPLATE);
+  current_scope->id_map.clear();
+  
   typet template_type;
   if(!rTemplateDecl2(template_type, kind))
     return false;
@@ -1186,6 +1277,8 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       set_location(name, tk2);
       cpp_name.get_sub().push_back(name);
       declarator.name().swap(cpp_name);
+      
+      add_id(declarator.name(), new_scopet::TYPE_TEMPLATE_PARAMETER);
     }
 
     if(lex.LookAhead(0)=='=')
@@ -1245,6 +1338,8 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     if(!rDeclarator(declarator, kArgDeclarator, false, true))
       return false;
+
+    add_id(declarator.name(), new_scopet::NON_TYPE_TEMPLATE_PARAMETER);
 
     exprt &value=declarator.value();
 
@@ -2639,13 +2734,19 @@ bool Parser::rDeclaratorWithInit(
   {
     // This is an anonymous bit field.
     cpp_tokent tk;
-    lex.get_token(tk);
+    lex.get_token(tk); // get :
 
     exprt e;
     if(!rExpression(e))
       return false;
 
-    //dw=Ptree::List(new Leaf(tk), e);
+    typet bit_field_type(ID_c_bit_field);
+    bit_field_type.set(ID_size, e);
+    bit_field_type.subtype().make_nil();
+    set_location(bit_field_type, tk);
+    
+    //merge_types(bit_field_type, declarator.type());
+
     return true;
   }
   else
