@@ -1675,6 +1675,112 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       expr.swap(result);
       return;
     }
+    else if(identifier=="__atomic_load_n")
+    {
+    }
+    else if(identifier=="__atomic_load")
+    {
+    }
+    else if(identifier=="__atomic_store_n")
+    {
+    }
+    else if(identifier=="__atomic_store")
+    {
+    }
+    else if(identifier=="__atomic_exchange_n")
+    {
+    }
+    else if(identifier=="__atomic_exchange")
+    {
+    }
+    else if(identifier=="__atomic_compare_exchange_n")
+    {
+    }
+    else if(identifier=="__atomic_compare_exchange")
+    {
+    }
+    else if(identifier=="__atomic_add_fetch" ||
+            identifier=="__atomic_sub_fetch" ||
+            identifier=="__atomic_and_fetch" ||
+            identifier=="__atomic_xor_fetch" ||
+            identifier=="__atomic_or_fetch" ||
+            identifier=="__atomic_nand_fetch")
+    {
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw "__atomic_*_fetch primitives take three arguments";
+      }
+      
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw "__atomic_*_fetch primitives take pointer as first argument";
+      }
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.make_ellipsis();
+      t.return_type()=ptr_arg.type().subtype();
+      result.type()=t;
+      expr.swap(result);
+      return;
+    }
+    else if(identifier=="__atomic_fetch_add" ||
+            identifier=="__atomic_fetch_sub" ||
+            identifier=="__atomic_fetch_and" ||
+            identifier=="__atomic_fetch_xor" ||
+            identifier=="__atomic_fetch_or" ||
+            identifier=="__atomic_fetch_nand")
+    {
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw "__atomic_fetch_* primitives take three arguments";
+      }
+      
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw "__atomic_fetch_* primitives take pointer as first argument";
+      }
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.make_ellipsis();
+      t.return_type()=ptr_arg.type().subtype();
+      result.type()=t;
+      expr.swap(result);
+      return;
+    }
+    else if(identifier=="__atomic_test_and_set")
+    {
+    }
+    else if(identifier=="__atomic_clear")
+    {
+    }
+    else if(identifier=="__atomic_thread_fence")
+    {
+    }
+    else if(identifier=="__atomic_signal_fence")
+    {
+    }
+    else if(identifier=="__atomic_always_lock_free")
+    {
+    }
+    else if(identifier=="__atomic_is_lock_free")
+    {
+    }
   }
 
   for(unsigned i=0; i<expr.get_sub().size(); i++)
