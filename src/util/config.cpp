@@ -647,7 +647,7 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
   else
   {
     set_ILP32();
-    long_double_width=8*8;
+    long_double_width=16*8;
   }
 
   arch=ARCH_SPARC;
