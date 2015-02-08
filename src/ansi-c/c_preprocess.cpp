@@ -617,7 +617,6 @@ bool c_preprocess_gcc_clang(
   
   command +=" -E -undef -D__CPROVER__";
 
-  command+=" -D__null=0";
   command+=" -D__WORDSIZE="+i2string(config.ansi_c.pointer_width);
   
   command+=" -D__DBL_MIN_EXP__=\"(-1021)\"";
@@ -940,7 +939,6 @@ bool c_preprocess_arm(
     
   if(config.ansi_c.os!=configt::ansi_ct::OS_WIN)
   {
-    command+=" -D__null=0";
     command+=" -D__WORDSIZE="+i2string(config.ansi_c.pointer_width);
 
     if(config.ansi_c.int_width==16)
