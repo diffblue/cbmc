@@ -26,6 +26,21 @@ public:
                  NAMESPACE, TEMPLATE, BLOCK } kindt;
   kindt kind;
   
+  static const char *kind2string(kindt kind)
+  {
+    switch(kind)
+    {
+    case MEMBER: return "MEMBER";
+    case FUNCTION: return "FUNCTION";
+    case VARIABLE: return "VARIABLE";
+    case TAG: return "TAG";
+    case NAMESPACE: return "NAMESPACE";
+    case TEMPLATE: return "TEMPLATE";
+    case BLOCK: return "BLOCK";
+    default: return "";
+    }
+  }
+  
   typedef std::map<irep_idt, new_scopet> id_mapt;
   id_mapt id_map;
   
@@ -75,20 +90,10 @@ void new_scopet::print_rec(std::ostream &out, unsigned indent) const
       it!=id_map.end();
       it++)
   {
-    out << std::string(' ', indent) << it->first << ": ";
-
-    switch(it->second.kind)
-    {
-    case MEMBER: out << "MEMBER"; break;
-    case FUNCTION: out << "FUNCTION"; break;
-    case VARIABLE: out << "VARIABLE"; break;
-    case TAG: out << "TAG"; break;
-    case NAMESPACE: out << "NAMESPACE"; break;
-    case TEMPLATE: out << "TEMPLATE"; break;
-    case BLOCK: out << "BLOCK"; break;
-    }
-
-    out << "\n";
+    out << std::string(' ', indent)
+        << it->first << ": "
+        << kind2string(it->second.kind)
+        << "\n";
     it->second.print_rec(out, indent+2);
   }
 }
