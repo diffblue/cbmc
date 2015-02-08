@@ -27,7 +27,7 @@ public:
     last_line.clear();
   }
   
-  inline parsert() { clear(); }
+  inline parsert():in(NULL) { clear(); }
   virtual ~parsert() { }
 
   // The following are for the benefit of the scanner
