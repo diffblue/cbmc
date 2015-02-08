@@ -202,3 +202,6 @@ typedef long long __gcc_v4di __attribute__ ((__vector_size__ (32)));
 typedef long long __gcc_v8di __attribute__ ((__vector_size__ (64)));
 typedef unsigned long long __gcc_di;
 
+enum __gcc_atomic_memmodels {
+  __ATOMIC_RELAXED, __ATOMIC_CONSUME, __ATOMIC_ACQUIRE, __ATOMIC_RELEASE, __ATOMIC_ACQ_REL, __ATOMIC_SEQ_CST
+};
