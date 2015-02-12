@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/unicode.h>
+
 #include "goto_instrument_parse_options.h"
 
 /*******************************************************************\
