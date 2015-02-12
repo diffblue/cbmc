@@ -14,7 +14,7 @@ $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 .PHONY: languages
 .PHONY: clean
 
-cpp.dir: ansi-c.dir
+cpp.dir: ansi-c.dir linking.dir
 
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir java_bytecode.dir
