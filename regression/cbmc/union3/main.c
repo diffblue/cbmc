@@ -2,14 +2,17 @@
 
 int my_func(int stat_loc)
 {
+  #ifdef __GNUC__
   // This is a 'temporary union', yet another gcc extension.
   // Visual Studio won't do it.
   return ((union { __typeof__(stat_loc) __in; int __i; })
     { .__in =(stat_loc) }).__i;
+  #endif
 }
 
 int main(void)
 {
+  #ifdef __GNUC__
   int x;
   assert(my_func(x)==x);
   
@@ -28,4 +31,5 @@ int main(void)
   union_object=(union my_U)some_float;
   
   assert(union_object.f==1.5f);
+  #endif
 } 
