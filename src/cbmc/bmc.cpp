@@ -50,6 +50,7 @@ Function: bmct::do_unwind_module
 void bmct::do_unwind_module(
   decision_proceduret &decision_procedure)
 {
+  // this is a hook for hw-cbmc
 }
 
 /*******************************************************************\
@@ -133,15 +134,22 @@ Function: bmct::do_conversion
 
 void bmct::do_conversion(prop_convt &prop_conv)
 {
-  // convert HDL
+  // convert HDL (hook for hw-cbmc)
   do_unwind_module(prop_conv);
+  
+  status() << "converting SSA" << eom;
 
   // convert SSA
   equation.convert(prop_conv);
 
   // the 'extra constraints'
-  forall_expr_list(it, bmc_constraints)
-    prop_conv.set_to_true(*it);
+  if(!bmc_constraints.empty())
+  {
+    status() << "converting constraints" << eom;
+    
+    forall_expr_list(it, bmc_constraints)
+      prop_conv.set_to_true(*it);
+  }
 }
 
 /*******************************************************************\
