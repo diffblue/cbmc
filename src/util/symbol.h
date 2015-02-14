@@ -61,9 +61,6 @@ public:
     return pretty_name==""?name:pretty_name;
   }
   
-  typedef std::list<irep_idt> hierarchyt;
-  hierarchyt hierarchy;
-  
   // global use
   bool is_type, is_macro, is_exported,
        is_input, is_output, is_state_var, is_property;
