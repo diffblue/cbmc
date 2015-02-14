@@ -27,9 +27,9 @@ Function: symbolt::show
    
 void symbolt::show(std::ostream &out) const
 {
-  out << "  " << name << std::endl;
-  out << "    type:  " << type.pretty(4) << std::endl
-      << "    value: " << value.pretty(4) << std::endl;
+  out << "  " << name << '\n';
+  out << "    type:  " << type.pretty(4) << '\n'
+      << "    value: " << value.pretty(4) << '\n';
 
   out << "  flags:";
   if(is_lvalue)          out << " lvalue";
@@ -49,18 +49,10 @@ void symbolt::show(std::ostream &out) const
   if(base_name!="")      out << " base_name=" << base_name;
   if(module!="")         out << " module=" << module;
   if(pretty_name!="")    out << " pretty_name=" << pretty_name;
-  out << std::endl;
-  out << "  location: " << location << std::endl;
+  out << '\n';
+  out << "  location: " << location << '\n';
 
-  out << "  hierarchy:";
-
-  for(std::list<irep_idt>::const_iterator it=hierarchy.begin();
-      it!=hierarchy.end();
-      it++)
-    out << " " << *it;
-
-  out << std::endl;  
-  out << std::endl;  
+  out << '\n';  
 }
 
 /*******************************************************************\
