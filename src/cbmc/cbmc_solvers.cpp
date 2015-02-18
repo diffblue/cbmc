@@ -46,9 +46,9 @@ smt1_dect::solvert bmct::get_smt1_solver_type() const
     s = smt1_dect::BOOLECTOR;
   else if(options.get_bool_option("mathsat"))
     s = smt1_dect::MATHSAT;
-  else if(options.get_bool_option("cv3"))
+  else if(options.get_bool_option("cvc3"))
     s = smt1_dect::CVC3;
-  else if(options.get_bool_option("cv4"))
+  else if(options.get_bool_option("cvc4"))
     s = smt1_dect::CVC4;
   else if(options.get_bool_option("opensmt"))
     s = smt1_dect::OPENSMT;
@@ -84,9 +84,9 @@ smt2_dect::solvert bmct::get_smt2_solver_type() const
     s = smt2_dect::BOOLECTOR;
   else if(options.get_bool_option("mathsat"))
     s = smt2_dect::MATHSAT;
-  else if(options.get_bool_option("cv3"))
+  else if(options.get_bool_option("cvc3"))
     s = smt2_dect::CVC3;
-  else if(options.get_bool_option("cv4"))
+  else if(options.get_bool_option("cvc4"))
     s = smt2_dect::CVC4;
   else if(options.get_bool_option("opensmt"))
     s = smt2_dect::OPENSMT;
