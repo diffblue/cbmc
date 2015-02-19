@@ -6,6 +6,8 @@ int main (void) {
   float f;
   float g;
 
+  #ifdef FE_UPWARD
+  #ifdef FE_DOWNWARD
   __CPROVER_assume(!isnan(f));
   __CPROVER_assume(!isnan(g));
 
@@ -21,6 +23,8 @@ int main (void) {
     float h = f + g;
     assert(h >= f);
   }
+  #endif
+  #endif
 
   return 1;
 }
