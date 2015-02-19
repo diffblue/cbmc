@@ -2906,6 +2906,13 @@ unary_identifier_declarator:
           $$=$2;
           do_pointer($1, $2);
         }
+        | '^' identifier_declarator
+        {
+          // This is an Apple extension to C/C++/Objective C.
+          // http://en.wikipedia.org/wiki/Blocks_(C_language_extension)
+          $$=$2;
+          do_pointer($1, $2);
+        }
         | '*' attribute_type_qualifier_list identifier_declarator
         {
           // the type_qualifier_list is for the pointer,
