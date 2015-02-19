@@ -1,3 +1,5 @@
+#include <assert.h>
+
 struct file_ops {
   int (*open)(int);
 };
