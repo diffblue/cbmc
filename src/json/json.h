@@ -118,6 +118,14 @@ public:
     return jsont(J_NUMBER, value);
   }
   
+  void clear()
+  {
+    value.clear();
+    kind=J_NULL;
+    object.clear();
+    array.clear();
+  }
+  
 protected:
   void output_rec(std::ostream &, unsigned indent) const;
   static void escape_string(const std::string &, std::ostream &);
