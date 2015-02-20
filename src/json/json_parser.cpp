@@ -32,7 +32,7 @@ bool parse_json(
   std::istream &in,
   const std::string &filename,
   message_handlert &message_handler,
-  irept &dest)
+  jsont &dest)
 {
   json_parser.clear();
   json_parser.set_file(filename);
@@ -67,7 +67,7 @@ Function: parse_json
 bool parse_json(
   const std::string &filename,
   message_handlert &message_handler,
-  irept &dest)
+  jsont &dest)
 {
   std::ifstream in(filename.c_str());
   

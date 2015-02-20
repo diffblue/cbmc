@@ -22,12 +22,12 @@ int main()
   
   console_message_handlert message_handler;
   
-  irept irep;
+  jsont json;
   
-  result=parse_json(std::cin, "", message_handler, irep);
+  result=parse_json(std::cin, "", message_handler, json);
 
   std::cout << "return value: " << result << "\n\n";
-  std::cout << irep.pretty() << "\n";  
+  std::cout << json << "\n";  
 }
 
 

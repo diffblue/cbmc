@@ -135,3 +135,24 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
   case J_NULL: out << "null"; break;
   }
 }
+
+/*******************************************************************\
+
+Function: jsont::swap
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void jsont::swap(jsont &other)
+{
+  std::swap(other.kind, kind);
+  other.array.swap(array);
+  other.object.swap(object);
+  other.value.swap(value);
+}
+

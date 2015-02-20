@@ -8,7 +8,7 @@
 int yyjsonlex();
 extern char *yyjsontext;
 
-static irep_idt convert_TOK_STRING()
+static std::string convert_TOK_STRING()
 {
   assert(yyjsontext[0]=='"');
   std::size_t len=strlen(yyjsontext);
@@ -41,14 +41,12 @@ static irep_idt convert_TOK_STRING()
       result+=*p;
   }
   
-  // hash here
-  return irep_idt(result);
+  return result;
 }
 
-static irep_idt convert_TOK_NUMBER()
+static std::string convert_TOK_NUMBER()
 {
-  // hash here
-  return irep_idt(yyjsontext);
+  return yyjsontext;
 }
 
 int yyjsonerror(const std::string &error)
@@ -70,8 +68,8 @@ int yyjsonerror(const std::string &error)
 document: value
         ;
 
-object  : '{' { json_parser.push(irept()); } '}'
-        | '{' { json_parser.push(irept()); } key_value_sequence '}'
+object  : '{' { json_parser.push(jsont::json_object()); } '}'
+        | '{' { json_parser.push(jsont::json_object()); } key_value_sequence '}'
         ;
 
 key_value_sequence:
@@ -84,20 +82,20 @@ key_value_sequence:
 key_value_pair:
           TOK_STRING
         {
-          // we abuse the id to temporarily store the key
-          json_parser.top().id(convert_TOK_STRING());
+          // we abuse the 'value' to temporarily store the key
+          json_parser.top().value=convert_TOK_STRING();
         }
           ':' value
         {
-          irept tmp;
+          jsont tmp;
           json_parser.pop(tmp);
-          json_parser.top().add(json_parser.top().id()).swap(tmp);
-          json_parser.top().id(irep_idt()); // delete again
+          json_parser.top().object[json_parser.top().value].swap(tmp);
+          json_parser.top().value.clear(); // end abuse
         }
         ;
 
-array   : '[' { json_parser.push(irept()); } ']'
-        | '[' { json_parser.push(irept()); } array_value_sequence ']'
+array   : '[' { json_parser.push(jsont::json_array()); } ']'
+        | '[' { json_parser.push(jsont::json_array()); } array_value_sequence ']'
         ;
 
 array_value_sequence:
@@ -108,23 +106,23 @@ array_value_sequence:
 array_value:
           value
         {
-          irept tmp;
+          jsont tmp;
           json_parser.pop(tmp);
-          json_parser.top().get_sub().push_back(tmp);
+          json_parser.top().array.push_back(tmp);
         }
         ;
 
 value   : TOK_STRING
-        { json_parser.push(irept(convert_TOK_STRING())); }
+        { json_parser.push(jsont::json_string(convert_TOK_STRING())); }
         | TOK_NUMBER
-        { json_parser.push(irept(convert_TOK_NUMBER())); }
+        { json_parser.push(jsont::json_number(convert_TOK_NUMBER())); }
         | object
         | array
         | TOK_TRUE
-        { json_parser.push(irept(ID_true)); }
+        { json_parser.push(jsont::json_true()); }
         | TOK_FALSE
-        { json_parser.push(irept(ID_false)); }
+        { json_parser.push(jsont::json_false()); }
         | TOK_NULL
-        { json_parser.push(irept(ID_null)); }
+        { json_parser.push(jsont::json_null()); }
         ;
 
