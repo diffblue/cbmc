@@ -14,22 +14,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/parser.h>
 
+#include "json.h"
+
 int yyjsonparse();
 
 class json_parsert:public parsert
 {
 public:
-  typedef std::stack<irept, std::vector<irept> > stackt;
+  typedef std::stack<jsont, std::vector<jsont> > stackt;
   stackt stack;
   
-  inline irept &top() { return stack.top(); }
+  inline jsont &top() { return stack.top(); }
   
-  inline void push(const irept &x)
+  inline void push(const jsont &x)
   {
     stack.push(x);
   }
 
-  inline void pop(irept &dest)
+  inline void pop(jsont &dest)
   {
     assert(!stack.empty());
     dest.swap(stack.top());
@@ -51,11 +53,11 @@ bool parse_json(
   std::istream &in,
   const std::string &filename,
   message_handlert &message_handler,
-  irept &dest);
+  jsont &dest);
 
 bool parse_json(
   const std::string &filename,
   message_handlert &message_handler,
-  irept &dest);
+  jsont &dest);
 
 #endif
