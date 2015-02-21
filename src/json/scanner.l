@@ -9,6 +9,9 @@
 %option noyywrap
 
 %{
+#define PARSER json_parser
+
+#include "json_parser.h"
 #include "json_y.tab.h"
 %}
 
