@@ -102,8 +102,11 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
       
       for(unsigned i=0; i<((indent+1)*2); i++)
         out << ' ';
-      
-      out << o_it->first << ": ";
+
+      out << '"';
+      escape_string(o_it->first, out);
+      out << '"';
+      out << ": ";
       o_it->second.output_rec(out, indent+1);
     }
     if(!object.empty())
