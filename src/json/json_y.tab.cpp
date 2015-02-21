@@ -101,11 +101,12 @@
 
 int yyjsonlex();
 extern char *yyjsontext;
+extern std::size_t yyjsonleng;
 
 static std::string convert_TOK_STRING()
 {
   assert(yyjsontext[0]=='"');
-  std::size_t len=strlen(yyjsontext);
+  std::size_t len=yyjsonleng;
   assert(len>=2);
   assert(yyjsontext[len-1]=='"');
   std::string result;
@@ -182,7 +183,7 @@ typedef int YYSTYPE;
 
 
 /* Line 216 of yacc.c.  */
-#line 186 "json_y.tab.cpp"
+#line 187 "json_y.tab.cpp"
 
 #ifdef short
 # undef short
@@ -472,9 +473,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    68,    68,    71,    71,    72,    72,    76,    77,    84,
-      83,    97,    97,    98,    98,   102,   103,   107,   115,   117,
-     119,   120,   121,   123,   125
+       0,    69,    69,    72,    72,    73,    73,    77,    78,    85,
+      84,    98,    98,    99,    99,   103,   104,   108,   116,   118,
+     120,   121,   122,   124,   126
 };
 #endif
 
@@ -1396,23 +1397,23 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 71 "parser.y"
-    { json_parser.push(jsont::json_object()); }
-    break;
-
-  case 5:
 #line 72 "parser.y"
     { json_parser.push(jsont::json_object()); }
     break;
 
+  case 5:
+#line 73 "parser.y"
+    { json_parser.push(jsont::json_object()); }
+    break;
+
   case 8:
-#line 78 "parser.y"
+#line 79 "parser.y"
     {
         }
     break;
 
   case 9:
-#line 84 "parser.y"
+#line 85 "parser.y"
     {
           // we abuse the 'value' to temporarily store the key
           json_parser.top().value=convert_TOK_STRING();
@@ -1420,7 +1421,7 @@ yyreduce:
     break;
 
   case 10:
-#line 89 "parser.y"
+#line 90 "parser.y"
     {
           jsont tmp;
           json_parser.pop(tmp);
@@ -1430,17 +1431,17 @@ yyreduce:
     break;
 
   case 11:
-#line 97 "parser.y"
-    { json_parser.push(jsont::json_array()); }
-    break;
-
-  case 13:
 #line 98 "parser.y"
     { json_parser.push(jsont::json_array()); }
     break;
 
+  case 13:
+#line 99 "parser.y"
+    { json_parser.push(jsont::json_array()); }
+    break;
+
   case 17:
-#line 108 "parser.y"
+#line 109 "parser.y"
     {
           jsont tmp;
           json_parser.pop(tmp);
@@ -1449,33 +1450,33 @@ yyreduce:
     break;
 
   case 18:
-#line 116 "parser.y"
+#line 117 "parser.y"
     { json_parser.push(jsont::json_string(convert_TOK_STRING())); }
     break;
 
   case 19:
-#line 118 "parser.y"
+#line 119 "parser.y"
     { json_parser.push(jsont::json_number(convert_TOK_NUMBER())); }
     break;
 
   case 22:
-#line 122 "parser.y"
+#line 123 "parser.y"
     { json_parser.push(jsont::json_true()); }
     break;
 
   case 23:
-#line 124 "parser.y"
+#line 125 "parser.y"
     { json_parser.push(jsont::json_false()); }
     break;
 
   case 24:
-#line 126 "parser.y"
+#line 127 "parser.y"
     { json_parser.push(jsont::json_null()); }
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1479 "json_y.tab.cpp"
+#line 1480 "json_y.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

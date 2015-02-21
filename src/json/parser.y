@@ -7,11 +7,12 @@
 
 int yyjsonlex();
 extern char *yyjsontext;
+extern std::size_t yyjsonleng;
 
 static std::string convert_TOK_STRING()
 {
   assert(yyjsontext[0]=='"');
-  std::size_t len=strlen(yyjsontext);
+  std::size_t len=yyjsonleng;
   assert(len>=2);
   assert(yyjsontext[len-1]=='"');
   std::string result;
