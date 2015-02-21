@@ -593,6 +593,7 @@ msc_based
 alias
 auto_object
 ssa_object
+ptr_object
 C_c_sizeof_type #c_sizeof_type
 array_update
 struct_update
