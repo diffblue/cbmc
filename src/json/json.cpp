@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "json.h"
 
+const jsont jsont::null_json_object(jsont::J_NULL);
+
 /*******************************************************************\
 
 Function: jsont::escape_string
