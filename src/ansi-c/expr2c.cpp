@@ -4547,6 +4547,9 @@ std::string expr2ct::convert(
   else if(src.id()==ID_comma)
     return convert_comma(src, precedence=1);
 
+  else if(src.id()==ID_ptr_object)
+    return "PTR_OBJECT("+id2string(src.get(ID_identifier))+")";
+
   else if(src.id()==ID_cond)
     return convert_cond(src, precedence);
 
