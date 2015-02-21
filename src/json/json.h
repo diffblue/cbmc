@@ -56,15 +56,15 @@ public:
     return kind==J_NULL;
   }
 
-  jsont():kind(J_NULL)
+  inline jsont():kind(J_NULL)
   {
   }
 
-  explicit jsont(kindt _kind):kind(_kind)
+  inline explicit jsont(kindt _kind):kind(_kind)
   {
   }
 
-  jsont(kindt _kind, const std::string &_value):kind(_kind), value(_value)
+  inline jsont(kindt _kind, const std::string &_value):kind(_kind), value(_value)
   {
   }
 
@@ -73,6 +73,20 @@ public:
   
   typedef std::map<std::string, jsont> objectt;
   objectt object;
+  
+  inline jsont &operator[](const std::string &key)
+  {
+    return object[key];
+  }
+
+  inline const jsont &operator[](const std::string &key) const
+  {
+    objectt::const_iterator it=object.find(key);
+    if(it==object.end())
+      return null_json_object;
+    else
+      return it->second;
+  }
 
   std::string value;
 
@@ -83,37 +97,37 @@ public:
   
   void swap(jsont &other);
   
-  static jsont json_true()
+  inline static jsont json_true()
   {
     return jsont(J_TRUE);
   }
   
-  static jsont json_false()
+  inline static jsont json_false()
   {
     return jsont(J_FALSE);
   }
   
-  static jsont json_null()
+  inline static jsont json_null()
   {
-    return jsont(J_NULL);
+    return null_json_object;
   }
   
-  static jsont json_array()
+  inline static jsont json_array()
   {
     return jsont(J_ARRAY);
   }
   
-  static jsont json_object()
+  inline static jsont json_object()
   {
     return jsont(J_OBJECT);
   }
   
-  static jsont json_string(const std::string &value)
+  inline static jsont json_string(const std::string &value)
   {
     return jsont(J_STRING, value);
   }
   
-  static jsont json_number(const std::string &value)
+  inline static jsont json_number(const std::string &value)
   {
     return jsont(J_NUMBER, value);
   }
@@ -129,6 +143,8 @@ public:
 protected:
   void output_rec(std::ostream &, unsigned indent) const;
   static void escape_string(const std::string &, std::ostream &);
+
+  static const jsont null_json_object;
 };
 
 static inline std::ostream & operator << (std::ostream &out, const jsont &src)
