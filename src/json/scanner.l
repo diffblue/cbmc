@@ -18,7 +18,7 @@ char	[^\"]|\\\"
 
 number	{int}|{int}{frac}|{int}{exp}|{int}{frac}{exp}
 int	{digit}|{digit19}{digits}|-{digit}|-{digit19}{digits}
-frac	.{digits}
+frac	"."{digits}
 exp	e{digits}
 digits	{digit}+
 digit   [0-9]
