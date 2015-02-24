@@ -350,7 +350,7 @@ extern inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
 class predicate_exprt:public exprt
 {
 public:
-  inline predicate_exprt():exprt("", typet(ID_bool))
+  inline predicate_exprt():exprt(irep_idt(), typet(ID_bool))
   {
   }
 
@@ -375,26 +375,118 @@ public:
   }
 };
 
-/*! \brief A generic base class for relations, i.e., binary predicates
+/*! \brief A generic base class for expressions that are predicates,
+           i.e., boolean-typed, and that take exactly one argument.
 */
-class binary_relation_exprt:public predicate_exprt
+class unary_predicate_exprt:public unary_exprt
 {
 public:
-  inline binary_relation_exprt()
+  inline unary_predicate_exprt():unary_exprt(irep_idt(), typet(ID_bool))
+  {
+  }
+
+  explicit inline unary_predicate_exprt(const irep_idt &_id):
+    unary_exprt(_id, typet(ID_bool))
+  {
+  }
+
+  inline unary_predicate_exprt(
+    const irep_idt &_id,
+    const exprt &_op):unary_exprt(_id, _op, typet(ID_bool))
+  {
+  }
+
+protected:
+  using exprt::op1; // hide
+  using exprt::op2; // hide
+};
+
+/*! \brief A generic base class for binary expressions
+*/
+class binary_exprt:public exprt
+{
+public:
+  inline binary_exprt()
   {
     operands().resize(2);
   }
 
-  inline explicit binary_relation_exprt(const irep_idt &id):predicate_exprt(id)
+  inline explicit binary_exprt(const irep_idt &_id):exprt(_id)
   {
     operands().resize(2);
+  }
+
+  inline binary_exprt(
+    const irep_idt &_id,
+    const typet &_type):exprt(_id, _type)
+  {
+    operands().resize(2);
+  }
+
+  inline binary_exprt(
+    const exprt &_lhs,
+    const irep_idt &_id,
+    const exprt &_rhs):
+    exprt(_id, _lhs.type())
+  {
+    copy_to_operands(_lhs, _rhs);
+  }
+
+  inline binary_exprt(
+    const exprt &_lhs,
+    const irep_idt &_id,
+    const exprt &_rhs,
+    const typet &_type):
+    exprt(_id, _type)
+  {
+    copy_to_operands(_lhs, _rhs);
+  }
+  
+protected:
+  using exprt::op2; // hide
+};
+
+/*! \brief A generic base class for expressions that are predicates,
+           i.e., boolean-typed, and that take exactly two arguments.
+*/
+class binary_predicate_exprt:public binary_exprt
+{
+public:
+  inline binary_predicate_exprt():binary_exprt(irep_idt(), typet(ID_bool))
+  {
+  }
+
+  explicit inline binary_predicate_exprt(const irep_idt &_id):
+    binary_exprt(_id, typet(ID_bool))
+  {
+  }
+
+  inline binary_predicate_exprt(
+    const exprt &_op0,
+    const irep_idt &_id,
+    const exprt &_op1):binary_exprt(_op0, _id, _op1, typet(ID_bool))
+  {
+  }
+};
+
+/*! \brief A generic base class for relations, i.e., binary predicates
+*/
+class binary_relation_exprt:public binary_predicate_exprt
+{
+public:
+  inline binary_relation_exprt()
+  {
+  }
+
+  inline explicit binary_relation_exprt(const irep_idt &id):binary_predicate_exprt(id)
+  {
   }
 
   inline binary_relation_exprt(
     const exprt &_lhs,
     const irep_idt &_id,
     const exprt &_rhs):
-    predicate_exprt(_id, _lhs, _rhs)
+    binary_predicate_exprt(_lhs, _id, _rhs)
   {
   }
 
@@ -443,48 +535,6 @@ extern inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
   assert(expr.operands().size()==2);
   return static_cast<binary_relation_exprt &>(expr);
 }
-
-/*! \brief A generic base class for binary expressions
-*/
-class binary_exprt:public exprt
-{
-public:
-  inline binary_exprt()
-  {
-    operands().resize(2);
-  }
-
-  inline explicit binary_exprt(const irep_idt &_id):exprt(_id)
-  {
-    operands().resize(2);
-  }
-
-  inline binary_exprt(
-    const irep_idt &_id,
-    const typet &_type):exprt(_id, _type)
-  {
-    operands().resize(2);
-  }
-
-  inline binary_exprt(
-    const exprt &_lhs,
-    const irep_idt &_id,
-    const exprt &_rhs):
-    exprt(_id, _lhs.type())
-  {
-    copy_to_operands(_lhs, _rhs);
-  }
-
-  inline binary_exprt(
-    const exprt &_lhs,
-    const irep_idt &_id,
-    const exprt &_rhs,
-    const typet &_type):
-    exprt(_id, _type)
-  {
-    copy_to_operands(_lhs, _rhs);
-  }
-};
 
 /*! \brief The plus expression
 */
@@ -1938,17 +1988,16 @@ public:
 
 /*! \brief Extracts a single bit of a bit-vector operand
 */
-class extractbit_exprt:public predicate_exprt
+class extractbit_exprt:public binary_predicate_exprt
 {
 public:
-  inline extractbit_exprt():predicate_exprt(ID_extractbit)
+  inline extractbit_exprt():binary_predicate_exprt(ID_extractbit)
   {
-    operands().resize(2);
   }
 
   inline extractbit_exprt(
     const exprt &_src,
-    const exprt &_index):predicate_exprt(ID_extractbit, _src, _index)
+    const exprt &_index):binary_predicate_exprt(_src, ID_extractbit, _index)
   {
   }
 
@@ -2718,7 +2767,7 @@ public:
 */
 inline const member_exprt &to_member_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_member);
+  assert(expr.id()==ID_member && expr.operands().size()==1);
   return static_cast<const member_exprt &>(expr);
 }
 
@@ -2727,25 +2776,169 @@ inline const member_exprt &to_member_expr(const exprt &expr)
 */
 inline member_exprt &to_member_expr(exprt &expr)
 {
-  assert(expr.id()==ID_member);
+  assert(expr.id()==ID_member && expr.operands().size()==1);
   return static_cast<member_exprt &>(expr);
 }
 
 /*! \brief Evaluates to true if the operand is NaN
 */
-class isnan_exprt:public predicate_exprt
+class isnan_exprt:public unary_predicate_exprt
 {
 public:
   inline explicit isnan_exprt(const exprt &op):
-    predicate_exprt(ID_isnan, op)
+    unary_predicate_exprt(ID_isnan, op)
   {
   }
 
-  inline isnan_exprt():predicate_exprt(ID_isnan)
+  inline isnan_exprt():unary_predicate_exprt(ID_isnan)
   {
-    operands().resize(1);
   }
 };
+
+/*! \brief Cast a generic exprt to a \ref isnan_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * isnan_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref isnan_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const isnan_exprt &to_isnan_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_isnan && expr.operands().size()==1);
+  return static_cast<const isnan_exprt &>(expr);
+}
+
+/*! \copydoc to_isnan_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline isnan_exprt &to_isnan_expr(exprt &expr)
+{
+  assert(expr.id()==ID_isnan && expr.operands().size()==1);
+  return static_cast<isnan_exprt &>(expr);
+}
+
+/*! \brief Evaluates to true if the operand is infinite
+*/
+class isinf_exprt:public unary_predicate_exprt
+{
+public:
+  inline explicit isinf_exprt(const exprt &op):
+    unary_predicate_exprt(ID_isinf, op)
+  {
+  }
+
+  inline isinf_exprt():unary_predicate_exprt(ID_isinf)
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref isinf_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * isinf_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref isinf_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const isinf_exprt &to_isinf_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_isinf && expr.operands().size()==1);
+  return static_cast<const isinf_exprt &>(expr);
+}
+
+/*! \copydoc to_isinf_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline isinf_exprt &to_isinf_expr(exprt &expr)
+{
+  assert(expr.id()==ID_isinf && expr.operands().size()==1);
+  return static_cast<isinf_exprt &>(expr);
+}
+
+/*! \brief Evaluates to true if the operand is finite
+*/
+class isfinite_exprt:public unary_predicate_exprt
+{
+public:
+  inline explicit isfinite_exprt(const exprt &op):
+    unary_predicate_exprt(ID_isfinite, op)
+  {
+  }
+
+  inline isfinite_exprt():unary_predicate_exprt(ID_isfinite)
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref isfinite_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * isfinite_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref isfinite_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const isfinite_exprt &to_isfinite_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_isfinite && expr.operands().size()==1);
+  return static_cast<const isfinite_exprt &>(expr);
+}
+
+/*! \copydoc to_isfinite_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline isfinite_exprt &to_isfinite_expr(exprt &expr)
+{
+  assert(expr.id()==ID_isfinite && expr.operands().size()==1);
+  return static_cast<isfinite_exprt &>(expr);
+}
+
+/*! \brief Evaluates to true if the operand is a normal number
+*/
+class isnormal_exprt:public unary_predicate_exprt
+{
+public:
+  inline explicit isnormal_exprt(const exprt &op):
+    unary_predicate_exprt(ID_isnormal, op)
+  {
+  }
+
+  inline isnormal_exprt():unary_predicate_exprt(ID_isnormal)
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref isnormal_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * isnormal_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref isnormal_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const isnormal_exprt &to_isnormal_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_isnormal && expr.operands().size()==1);
+  return static_cast<const isnormal_exprt &>(expr);
+}
+
+/*! \copydoc to_isnormal_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline isnormal_exprt &to_isnormal_expr(exprt &expr)
+{
+  assert(expr.id()==ID_isnormal && expr.operands().size()==1);
+  return static_cast<isnormal_exprt &>(expr);
+}
 
 /*! \brief IEEE-floating-point equality
 */
@@ -2825,6 +3018,78 @@ extern inline ieee_float_notequal_exprt &to_ieee_float_notequal_expr(exprt &expr
 {
   assert(expr.id()==ID_ieee_float_notequal && expr.operands().size()==2);
   return static_cast<ieee_float_notequal_exprt &>(expr);
+}
+
+/*! \brief IEEE-floating-point disequality
+*/
+class ieee_float_op_exprt:public exprt
+{
+public:
+  inline ieee_float_op_exprt()
+  {
+    operands().resize(3);
+  }
+
+  inline ieee_float_op_exprt(const exprt &_lhs, const irep_idt &_id, const exprt &_rhs, const exprt &_rm):
+    exprt(_id)
+  {
+    copy_to_operands(_lhs, _rhs, _rm);
+  }
+  
+  inline exprt &lhs()
+  {
+    return op0();
+  }
+
+  inline const exprt &lhs() const
+  {
+    return op0();
+  }
+
+  inline exprt &rhs()
+  {
+    return op1();
+  }
+
+  inline const exprt &rhs() const
+  {
+    return op1();
+  }
+
+  inline exprt &rounding_mode()
+  {
+    return op2();
+  }  
+
+  inline const exprt &rounding_mode() const
+  {
+    return op2();
+  }  
+};
+
+/*! \brief Cast a generic exprt to an \ref ieee_float_op_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * ieee_float_op_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref ieee_float_op_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const ieee_float_op_exprt &to_ieee_float_op_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==3);
+  return static_cast<const ieee_float_op_exprt &>(expr);
+}
+
+/*! \copydoc to_ieee_float_op_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
+{
+  assert(expr.operands().size()==3);
+  return static_cast<ieee_float_op_exprt &>(expr);
 }
 
 /*! \brief An expression denoting a type
