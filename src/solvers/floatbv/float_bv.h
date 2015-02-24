@@ -73,9 +73,9 @@ protected:
     return constant_exprt(i2string(u), typet(ID_integer));
   }
   
-  exprt exponent_all_ones(const exprt &, const ieee_float_spect &spec);
-  exprt exponent_all_zeros(const exprt &, const ieee_float_spect &spec);
-  exprt fraction_all_zeros(const exprt &, const ieee_float_spect &spec);
+  exprt exponent_all_ones(const exprt &, const ieee_float_spect &);
+  exprt exponent_all_zeros(const exprt &, const ieee_float_spect &);
+  exprt fraction_all_zeros(const exprt &, const ieee_float_spect &);
 
   struct rounding_mode_bitst
   {
@@ -94,8 +94,8 @@ protected:
   void normalization_shift(exprt &fraction, exprt &exponent);
   void denormalization_shift(exprt &fraction, exprt &exponent);
 
-  exprt add_bias(const exprt &exponent);
-  exprt sub_bias(const exprt &exponent);
+  exprt add_bias(const exprt &exponent, const ieee_float_spect &);
+  exprt sub_bias(const exprt &exponent, const ieee_float_spect &);
 
   exprt limit_distance(const exprt &dist, mp_integer limit);
 
@@ -125,11 +125,11 @@ protected:
   {
   };
 
-  biased_floatt bias(const unbiased_floatt &);
+  biased_floatt bias(const unbiased_floatt &, const ieee_float_spect &);
 
   // this takes unpacked format, and returns packed
   virtual exprt rounder(const unbiased_floatt &);
-  exprt pack(const biased_floatt &);
+  exprt pack(const biased_floatt &, const ieee_float_spect &);
   unbiased_floatt unpack(const exprt &, const ieee_float_spect &);
 
   void round_fraction(unbiased_floatt &result);
