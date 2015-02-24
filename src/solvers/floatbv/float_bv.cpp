@@ -892,22 +892,25 @@ exprt float_bvt::div(
   const unbiased_floatt unpacked1=unpack(src1, spec);
   const unbiased_floatt unpacked2=unpack(src2, spec);
   
-  #if 0
-  unsigned div_width=unpacked1.fraction.size()*2+1;
+  unsigned fraction_width=
+    to_unsignedbv_type(unpacked1.fraction.type()).get_width();
+  unsigned div_width=fraction_width*2+1;
 
   // pad fraction1 with zeros
-  exprt fraction1=unpacked1.fraction;
-  fraction1.reserve(div_width);
-  while(fraction1.size()<div_width)
-    fraction1.insert(fraction1.begin(), const_literal(false));
+  exprt fraction1=
+    concatenation_exprt(
+      unpacked1.fraction,
+      from_integer(0, unsignedbv_typet(div_width-fraction_width)),
+      unsignedbv_typet(div_width));
 
-  // zero-extend fraction2
+  // zero-extend fraction2 to match faction1
   const exprt fraction2=
-    bv_utils.zero_extension(unpacked2.fraction, div_width);
+    typecast_exprt(unpacked2.fraction, fraction1.type());
 
   // divide fractions
   unbiased_floatt result;
   exprt rem;
+  #if 0
   bv_utils.unsigned_divider(fraction1, fraction2, result.fraction, rem);
   
   // is there a remainder?
@@ -924,15 +927,16 @@ exprt float_bvt::div(
   const exprt exponent2=bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size()+1);
 
   // subtract exponents
-  exprt added_exponent=bv_utils.sub(exponent1, exponent2);
+  exprt added_exponent=minus_exprt(exponent1, exponent2);
 
   // adjust, as we have thown in extra fraction bits
-  result.exponent=bv_utils.add(
+  result.exponent=plus_exprt(
     added_exponent,
-    bv_utils.build_constant(spec.f, added_exponent.size()));
+    from_integer(spec.f, added_exponent.type()));
+  #endif
 
   // new sign
-  result.sign=prop.lxor(unpacked1.sign, unpacked2.sign);
+  result.sign=notequal_exprt(unpacked1.sign, unpacked2.sign);
 
   // Infinity? This happens when
   // 1) dividing a non-nan/non-zero by zero, or
@@ -957,11 +961,10 @@ exprt float_bvt::div(
   exprt force_zero=
     and_exprt(not_exprt(unpacked1.NaN), unpacked2.infinity);
   
-  result.fraction=bv_utils.select(force_zero,
-    bv_utils.zeros(result.fraction.size()), result.fraction);
+  result.fraction=if_exprt(force_zero,
+    gen_zero(result.fraction.type()), result.fraction);
 
-  return rounder(result);
-  #endif
+  return rounder(result, spec);
 }
 
 /*******************************************************************\
@@ -1161,16 +1164,21 @@ Function: float_bvt::normalization_shift
 
 \*******************************************************************/
 
-void float_bvt::normalization_shift(exprt &fraction, exprt &exponent)
+void float_bvt::normalization_shift(
+  exprt &fraction,
+  exprt &exponent)
 {
-  #if 0
   // n-log-n alignment shifter.
   // The worst-case shift is the number of fraction
   // bits minus one, in case the faction is one exactly.
-  assert(!fraction.empty());  
-  unsigned depth=integer2unsigned(address_bits(fraction.size()-1));
+  unsigned fraction_bits=to_unsignedbv_type(fraction.type()).get_width();
+  unsigned exponent_bits=to_signedbv_type(exponent.type()).get_width();
+  assert(fraction_bits!=0);  
   
-  if(exponent.size()<depth)
+  unsigned depth=integer2unsigned(address_bits(fraction_bits-1));
+  
+  #if 0
+  if(exponent_bits<depth)
     exponent=bv_utils.sign_extension(exponent, depth);
   
   exprt exponent_delta=bv_utils.zeros(exponent.size());
@@ -1214,11 +1222,14 @@ Function: float_bvt::denormalization_shift
 
 \*******************************************************************/
 
-void float_bvt::denormalization_shift(exprt &fraction, exprt &exponent)
+void float_bvt::denormalization_shift(
+  exprt &fraction,
+  exprt &exponent,
+  const ieee_float_spect &spec)
 {
-  #if 0
   mp_integer bias=spec.bias();
 
+  #if 0
   // Is the exponent strictly less than -bias+1, i.e., exponent<-bias+1?
   // This is transformed to distance=(-bias+1)-exponent
   // i.e., distance>0
@@ -1258,7 +1269,7 @@ void float_bvt::denormalization_shift(exprt &fraction, exprt &exponent)
 
   exprt denormalisedFraction = fraction;
 
-  exprt sticky_bit = const_literal(false);
+  exprt sticky_bit = false_exprt();
   denormalisedFraction = 
     sticky_right_shift(fraction, bv_utilst::LRIGHT, distance, sticky_bit);
   denormalisedFraction[0] = or_exprt(denormalisedFraction[0], sticky_bit);
@@ -1323,7 +1334,7 @@ exprt float_bvt::rounder(
 
   // align it!
   normalization_shift(aligned_fraction, aligned_exponent);
-  denormalization_shift(aligned_fraction, aligned_exponent);
+  denormalization_shift(aligned_fraction, aligned_exponent, spec);
 
   unbiased_floatt result;
   result.fraction=aligned_fraction;
