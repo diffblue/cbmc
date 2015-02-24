@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_FLOAT_BV_H
 #define CPROVER_FLOAT_BV_H
 
+#include <util/i2string.h>
+#include <util/ieee_float.h>
 #include <util/std_expr.h>
 
 class float_bvt
@@ -27,134 +29,39 @@ public:
     return convert(src);
   }
   
-protected:
   exprt convert(const exprt &);
   exprt convert_abs(const abs_exprt &);
   exprt convert_unary_minus(const unary_minus_exprt &);
   exprt convert_ieee_float_equal(const ieee_float_equal_exprt &);
-  //exprt convert_ieee_float_notequal(const ieee_float_notequal_exprt &);
-
-#if 0
-  // extraction
-  bvt get_exponent(const bvt &src); // still biased
-  bvt get_fraction(const bvt &src); // without hidden bit
-  literalt is_normal(const bvt &src);
-  literalt is_zero(const bvt &src); // this returns true on both 0 and -0
-  literalt is_infinity(const bvt &src);
-  literalt is_plus_inf(const bvt &src);
-  literalt is_minus_inf(const bvt &src);
-  literalt is_NaN(const bvt &src);
-
-  // add/sub
-  virtual bvt add_sub(const bvt &src1, const bvt &src2, bool subtract);
-  bvt add(const bvt &src1, const bvt &src2) { return add_sub(src1, src2, false); }
-  bvt sub(const bvt &src1, const bvt &src2) { return add_sub(src1, src2, true); }
-
-  // mul/div
-  virtual bvt mul(const bvt &src1, const bvt &src2);
-  virtual bvt div(const bvt &src1, const bvt &src2);
-
-  bvt abs(const bvt &src);
-  bvt inverse(const bvt &src);
-  bvt negate(const bvt &src);
-
-  // conversion
-  bvt from_unsigned_integer(const bvt &src);
-  bvt from_signed_integer(const bvt &src);
-  bvt to_integer(const bvt &src, unsigned int_width, bool is_signed);
-  bvt to_signed_integer(const bvt &src, unsigned int_width);
-  bvt to_unsigned_integer(const bvt &src, unsigned int_width);
-  bvt conversion(const bvt &src, const ieee_float_spect &dest_spec);
-
-  // relations
-  typedef enum { LT, LE, EQ, GT, GE } relt;
-  literalt relation(const bvt &src1, relt rel, const bvt &src2);
-
-  // constants
-  ieee_floatt get(const bvt &src) const;
-
-  // helpers
-  literalt exponent_all_ones(const bvt &src);
-  literalt exponent_all_zeros(const bvt &src);
-  literalt fraction_all_zeros(const bvt &src);
-    
-  // debugging hooks
-  bvt debug1(const bvt &op0, const bvt &op1);
-  bvt debug2(const bvt &op0, const bvt &op1);
+  exprt convert_ieee_float_notequal(const ieee_float_notequal_exprt &);
+  exprt convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
+  exprt convert_floatbv_plus(const ieee_float_op_exprt &expr);
+  exprt convert_floatbv_minus(const ieee_float_op_exprt &expr);
+  exprt convert_floatbv_mult(const ieee_float_op_exprt &expr);
+  exprt convert_floatbv_div(const ieee_float_op_exprt &expr);
+  exprt convert_isnan(const isnan_exprt &expr) { return is_NaN(expr.op(), get_spec(expr.op())); }
+  exprt convert_isfinite(const isfinite_exprt &);
+  exprt convert_isinf(const isinf_exprt &);
+  exprt convert_isnormal(const isnormal_exprt &);
+  exprt convert_floatbv_rel(const binary_relation_exprt &);
 
 protected:
-  propt &prop;
-  bv_utilst bv_utils;
-
-  // unpacked
-  virtual void normalization_shift(bvt &fraction, bvt &exponent);
-  void denormalization_shift(bvt &fraction, bvt &exponent);
-
-  bvt add_bias(const bvt &exponent);
-  bvt sub_bias(const bvt &exponent);
-
-  bvt limit_distance(const bvt &dist, mp_integer limit);
-
-  struct unpacked_floatt
-  {
-    literalt sign;
-    literalt infinity;
-    literalt zero;
-    literalt NaN;
-    bvt fraction;
-    bvt exponent;
-
-    unpacked_floatt():
-      sign(const_literal(false)),
-      infinity(const_literal(false)),
-      zero(const_literal(false)),
-      NaN(const_literal(false))
-    {
-    }
-  };
-
-  // this has a biased exponent
-  // and an _implicit_ hidden bit
-  struct biased_floatt:public unpacked_floatt
-  {
-  };
-
-  // the hidden bit is explicit,
-  // and the exponent is not biased
-  struct unbiased_floatt:public unpacked_floatt
-  {
-  };
-
-  biased_floatt bias(const unbiased_floatt &src);
-
-  // this takes unpacked format, and returns packed
-  virtual bvt rounder(const unbiased_floatt &src);
-  bvt pack(const biased_floatt &src);
-  unbiased_floatt unpack(const bvt &src);
-
-  void round_fraction(unbiased_floatt &result);
-  void round_exponent(unbiased_floatt &result);
+  // helpers
+  exprt exponent_all_ones(const exprt &, const ieee_float_spect &spec);
+  exprt exponent_all_zeros(const exprt &, const ieee_float_spect &spec);
+  exprt fraction_all_zeros(const exprt &, const ieee_float_spect &spec);
   
-  // rounding decision for fraction
-  literalt fraction_rounding_decision(
-    const unsigned dest_bits,
-    const literalt sign,
-    const bvt &fraction);
+  exprt is_equal(const exprt &, const exprt &, const ieee_float_spect &);
+  exprt is_zero(const exprt &, const ieee_float_spect &);
+  exprt is_NaN(const exprt &, const ieee_float_spect &);
 
-  // helpers for adder
+  ieee_float_spect get_spec(const exprt &);
+  
+  inline constant_exprt uint_const(unsigned u)
+  {
+    return constant_exprt(i2string(u), typet(ID_integer));
+  }
 
-  // computes src1.exponent-src2.exponent with extension
-  bvt subtract_exponents(
-    const unbiased_floatt &src1,
-    const unbiased_floatt &src2);
-
-  // computes the "sticky-bit"
-  bvt sticky_right_shift(
-    const bvt &op,
-    const bv_utilst::shiftt shift_type,
-    const bvt &dist,
-    literalt &sticky);
-#endif
 };
 
 #endif
