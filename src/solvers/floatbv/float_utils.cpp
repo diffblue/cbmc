@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
-#include <util/threeval.h>
 
 #include "float_utils.h"
 
