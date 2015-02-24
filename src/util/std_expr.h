@@ -401,6 +401,21 @@ protected:
   using exprt::op2; // hide
 };
 
+/*! \brief sign of an expression
+*/
+class sign_exprt:public unary_predicate_exprt
+{
+public:
+  inline sign_exprt()
+  {
+  }
+
+  inline explicit sign_exprt(const exprt &_op):
+    unary_predicate_exprt(ID_sign, _op)
+  {
+  }
+};
+
 /*! \brief A generic base class for binary expressions
 */
 class binary_exprt:public exprt
