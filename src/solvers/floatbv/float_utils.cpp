@@ -678,25 +678,6 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
 
 /*******************************************************************\
 
-Function: float_utilst::inverse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bvt float_utilst::inverse(const bvt &src)
-{
-  bvt one;
-  assert(0);
-  return bvt(); // not reached
-}
-
-/*******************************************************************\
-
 Function: float_utilst::negate
 
   Inputs:
