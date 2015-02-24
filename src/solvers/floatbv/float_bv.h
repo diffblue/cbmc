@@ -92,7 +92,7 @@ protected:
 
   // unpacked
   void normalization_shift(exprt &fraction, exprt &exponent);
-  void denormalization_shift(exprt &fraction, exprt &exponent);
+  void denormalization_shift(exprt &fraction, exprt &exponent, const ieee_float_spect &);
 
   exprt add_bias(const exprt &exponent, const ieee_float_spect &);
   exprt sub_bias(const exprt &exponent, const ieee_float_spect &);
