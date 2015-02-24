@@ -128,7 +128,7 @@ protected:
   biased_floatt bias(const unbiased_floatt &, const ieee_float_spect &);
 
   // this takes unpacked format, and returns packed
-  virtual exprt rounder(const unbiased_floatt &);
+  virtual exprt rounder(const unbiased_floatt &, const ieee_float_spect &);
   exprt pack(const biased_floatt &, const ieee_float_spect &);
   unbiased_floatt unpack(const exprt &, const ieee_float_spect &);
 
