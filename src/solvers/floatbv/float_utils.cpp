@@ -278,7 +278,7 @@ bvt float_utilst::conversion(
     // normalise it!
     if(dest_spec.e > spec.e)
     {
-      normalization_shift(result.fraction,result.exponent);	
+      normalization_shift(result.fraction,result.exponent);
     }
 
     // the flags get copied
@@ -459,15 +459,15 @@ bvt float_utilst::add_sub(
   #if 1
   literalt zero_sign=
     prop.lselect(rounding_mode_bits.round_to_minus_inf,
-		 prop.lor(unpacked1.sign, unpacked2.sign),
-		 prop.land(unpacked1.sign, unpacked2.sign));
+                 prop.lor(unpacked1.sign, unpacked2.sign),
+                 prop.land(unpacked1.sign, unpacked2.sign));
 
   result.sign=prop.lselect( 
     result.infinity,
     infinity_sign,
     prop.lselect(result.zero,
-		 zero_sign,
-		 add_sub_sign));
+                 zero_sign,
+                 add_sub_sign));
   #else
   result.sign=prop.lselect(
     result.infinity,
@@ -1184,7 +1184,7 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
     // Add zeros at the LSB end for the guard bit to shift into
     fraction=
       bv_utils.concatenate(bv_utils.zeros((spec.f + 3) - fraction.size()),
-			   fraction);
+                           fraction);
   }
 
   bvt denormalisedFraction = fraction;
@@ -1429,7 +1429,7 @@ void float_utilst::round_fraction(unbiased_floatt &result)
     // the exponent has to be incremented.
     result.exponent=
       bv_utils.incrementer(result.exponent, 
-			   prop.lor(overflow, subnormal_to_normal));
+                           prop.lor(overflow, subnormal_to_normal));
 
     // post normalization of the fraction
     // In the case of overflow, set the MSB to 1
@@ -1506,12 +1506,12 @@ void float_utilst::round_exponent(unbiased_floatt &result)
 
     result.fraction=
       bv_utils.select(set_to_max,
-		      bv_utils.inverted(bv_utils.zeros(result.fraction.size())),
-		      result.fraction);
+                      bv_utils.inverted(bv_utils.zeros(result.fraction.size())),
+                      result.fraction);
 
     result.infinity=prop.lor(result.infinity, 
-			     prop.land(exponent_too_large,
-				       overflow_to_inf));
+                             prop.land(exponent_too_large,
+                                       overflow_to_inf));
 #else
     result.infinity=prop.lor(result.infinity, exponent_too_large);
 #endif
@@ -1745,10 +1745,10 @@ bvt float_utilst::sticky_right_shift(
 
       bvt lost_bits;
 
-      if (d <= result.size())
-	lost_bits=bv_utils.extract(result, 0, d-1);
+      if(d <= result.size())
+        lost_bits=bv_utils.extract(result, 0, d-1);
       else
-	lost_bits=result;
+        lost_bits=result;
 
       sticky=prop.lor(
           prop.land(dist[stage],prop.lor(lost_bits)),
