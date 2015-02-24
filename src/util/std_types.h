@@ -986,6 +986,7 @@ public:
   mp_integer smallest() const;
   mp_integer largest() const;
   constant_exprt smallest_expr() const;
+  constant_exprt zero_expr() const;
   constant_exprt largest_expr() const;
 };
 
@@ -1031,6 +1032,7 @@ public:
   mp_integer smallest() const;
   mp_integer largest() const;
   constant_exprt smallest_expr() const;
+  constant_exprt zero_expr() const;
   constant_exprt largest_expr() const;
 };
 
