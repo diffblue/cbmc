@@ -69,7 +69,7 @@ public:
   {
   }
   
-  void set_rounding_mode(const bvt &src);
+  void set_rounding_mode(const bvt &);
 
   virtual ~float_utilst()
   {
@@ -77,7 +77,7 @@ public:
 
   ieee_float_spect spec;
 
-  bvt build_constant(const ieee_floatt &src);
+  bvt build_constant(const ieee_floatt &);
 
   static inline literalt sign_bit(const bvt &src)
   {
@@ -86,14 +86,14 @@ public:
   }
 
   // extraction
-  bvt get_exponent(const bvt &src); // still biased
-  bvt get_fraction(const bvt &src); // without hidden bit
-  literalt is_normal(const bvt &src);
-  literalt is_zero(const bvt &src); // this returns true on both 0 and -0
-  literalt is_infinity(const bvt &src);
-  literalt is_plus_inf(const bvt &src);
-  literalt is_minus_inf(const bvt &src);
-  literalt is_NaN(const bvt &src);
+  bvt get_exponent(const bvt &); // still biased
+  bvt get_fraction(const bvt &); // without hidden bit
+  literalt is_normal(const bvt &);
+  literalt is_zero(const bvt &); // this returns true on both 0 and -0
+  literalt is_infinity(const bvt &);
+  literalt is_plus_inf(const bvt &);
+  literalt is_minus_inf(const bvt &);
+  literalt is_NaN(const bvt &);
 
   // add/sub
   virtual bvt add_sub(const bvt &src1, const bvt &src2, bool subtract);
@@ -104,13 +104,13 @@ public:
   virtual bvt mul(const bvt &src1, const bvt &src2);
   virtual bvt div(const bvt &src1, const bvt &src2);
 
-  bvt abs(const bvt &src);
-  bvt inverse(const bvt &src);
-  bvt negate(const bvt &src);
+  bvt abs(const bvt &);
+  bvt inverse(const bvt &);
+  bvt negate(const bvt &);
 
   // conversion
-  bvt from_unsigned_integer(const bvt &src);
-  bvt from_signed_integer(const bvt &src);
+  bvt from_unsigned_integer(const bvt &);
+  bvt from_signed_integer(const bvt &);
   bvt to_integer(const bvt &src, unsigned int_width, bool is_signed);
   bvt to_signed_integer(const bvt &src, unsigned int_width);
   bvt to_unsigned_integer(const bvt &src, unsigned int_width);
@@ -121,12 +121,12 @@ public:
   literalt relation(const bvt &src1, relt rel, const bvt &src2);
 
   // constants
-  ieee_floatt get(const bvt &src) const;
+  ieee_floatt get(const bvt &) const;
 
   // helpers
-  literalt exponent_all_ones(const bvt &src);
-  literalt exponent_all_zeros(const bvt &src);
-  literalt fraction_all_zeros(const bvt &src);
+  literalt exponent_all_ones(const bvt &);
+  literalt exponent_all_zeros(const bvt &);
+  literalt fraction_all_zeros(const bvt &);
     
   // debugging hooks
   bvt debug1(const bvt &op0, const bvt &op1);
@@ -175,12 +175,12 @@ protected:
   {
   };
 
-  biased_floatt bias(const unbiased_floatt &src);
+  biased_floatt bias(const unbiased_floatt &);
 
   // this takes unpacked format, and returns packed
-  virtual bvt rounder(const unbiased_floatt &src);
-  bvt pack(const biased_floatt &src);
-  unbiased_floatt unpack(const bvt &src);
+  virtual bvt rounder(const unbiased_floatt &);
+  bvt pack(const biased_floatt &);
+  unbiased_floatt unpack(const bvt &);
 
   void round_fraction(unbiased_floatt &result);
   void round_exponent(unbiased_floatt &result);
