@@ -105,7 +105,6 @@ public:
   virtual bvt div(const bvt &src1, const bvt &src2);
 
   bvt abs(const bvt &);
-  bvt inverse(const bvt &);
   bvt negate(const bvt &);
 
   // conversion
