@@ -1676,9 +1676,10 @@ Function: float_bvt::bias
 
 \*******************************************************************/
 
-float_bvt::biased_floatt float_bvt::bias(const unbiased_floatt &src)
+float_bvt::biased_floatt float_bvt::bias(
+  const unbiased_floatt &src,
+  const ieee_float_spect &spec)
 {
-  #if 0
   biased_floatt result;
 
   result.sign=src.sign;
@@ -1686,25 +1687,26 @@ float_bvt::biased_floatt float_bvt::bias(const unbiased_floatt &src)
   result.infinity=src.infinity;
 
   // we need to bias the new exponent
-  result.exponent=add_bias(src.exponent);
+  result.exponent=add_bias(src.exponent, spec);
 
   // strip off hidden bit
-  assert(src.fraction.size()==spec.f+1);
+  assert(to_unsignedbv_type(src.fraction.type()).get_width()==spec.f+1);
 
-  exprt hidden_bit=src.fraction[src.fraction.size()-1];
+  exprt hidden_bit=extractbit_exprt(src.fraction, uint_const(spec.f));
   exprt denormal=not_exprt(hidden_bit);
 
-  result.fraction=src.fraction;
-  result.fraction.resize(spec.f);
+  result.fraction=
+    extractbits_exprt(
+      src.fraction, uint_const(spec.f-1), uint_const(0),
+      unsignedbv_typet(spec.f));
 
   // make exponent zero if its denormal
   // (includes zero)
-  for(unsigned i=0; i<result.exponent.size(); i++)
-    result.exponent[i]=
-      and_exprt(result.exponent[i], not_exprt(denormal));
+  result.exponent=
+    if_exprt(denormal, from_integer(0, result.exponent.type()),
+             result.exponent);
 
   return result;
-  #endif
 }
 
 /*******************************************************************\
@@ -1719,15 +1721,14 @@ Function: float_bvt::add_bias
 
 \*******************************************************************/
 
-exprt float_bvt::add_bias(const exprt &src)
+exprt float_bvt::add_bias(
+  const exprt &src,
+  const ieee_float_spect &spec)
 {
-  #if 0
-  assert(src.size()==spec.e);
-
-  return bv_utils.add(
-    src,
-    bv_utils.build_constant(spec.bias(), spec.e));
-  #endif
+  typet t=unsignedbv_typet(spec.e);
+  return plus_exprt(
+    typecast_exprt(src, t),
+    from_integer(spec.bias(), t));
 }
 
 /*******************************************************************\
@@ -1742,15 +1743,14 @@ Function: float_bvt::sub_bias
 
 \*******************************************************************/
 
-exprt float_bvt::sub_bias(const exprt &src)
+exprt float_bvt::sub_bias(
+  const exprt &src,
+  const ieee_float_spect &spec)
 {
-  #if 0
-  assert(src.size()==spec.e);
-
-  return bv_utils.sub(
-    src,
-    bv_utils.build_constant(spec.bias(), spec.e));
-  #endif
+  typet t=signedbv_typet(spec.e);
+  return minus_exprt(
+    typecast_exprt(src, t),
+    from_integer(spec.bias(), t));
 }
 
 /*******************************************************************\
@@ -1769,33 +1769,33 @@ float_bvt::unbiased_floatt float_bvt::unpack(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  #if 0
-  assert(src.size()==spec.width());
-
   unbiased_floatt result;
 
-  result.sign=sign_bit(src);
+  result.sign=sign_bit(src, spec);
 
-  result.fraction=get_fraction(src);
-  result.fraction.push_back(is_normal(src)); // add hidden bit
+  result.fraction=get_fraction(src, spec);
 
-  result.exponent=get_exponent(src);
-  assert(result.exponent.size()==spec.e);
+  // add hidden bit
+  exprt hidden_bit=isnormal(src, spec);
+  result.fraction=
+    concatenation_exprt(hidden_bit, result.fraction,
+      unsignedbv_typet(spec.f+1));
+
+  result.exponent=get_exponent(src, spec);
 
   // unbias the exponent
-  exprt denormal=bv_utils.is_zero(result.exponent);
+  exprt denormal=exponent_all_zeros(src, spec);
 
   result.exponent=
-    bv_utils.select(denormal,
-      bv_utils.build_constant(-spec.bias()+1, spec.e),
-      sub_bias(result.exponent));
+    if_exprt(denormal,
+      from_integer(-spec.bias()+1, signedbv_typet(spec.e)),
+      sub_bias(result.exponent, spec));
 
-  result.infinity=is_infinity(src);
-  result.zero=is_zero(src);
-  result.NaN=is_NaN(src);
+  result.infinity=isinf(src, spec);
+  result.zero=is_zero(src, spec);
+  result.NaN=isnan(src, spec);
 
   return result;
-  #endif
 }
 
 /*******************************************************************\
@@ -1810,37 +1810,39 @@ Function: float_bvt::pack
 
 \*******************************************************************/
 
-exprt float_bvt::pack(const biased_floatt &src)
+exprt float_bvt::pack(
+  const biased_floatt &src,
+  const ieee_float_spect &spec)
 {
-  #if 0
-  assert(src.fraction.size()==spec.f);
-  assert(src.exponent.size()==spec.e);
+  assert(to_unsignedbv_type(src.fraction.type()).get_width()==spec.f);
+  assert(to_signedbv_type(src.exponent.type()).get_width()==spec.e);
 
-  exprt result;
-  result.resize(spec.width());
+  // do sign -- we make this 'false' for NaN
+  exprt sign_bit=
+    if_exprt(src.NaN, false_exprt(), src.sign);
 
-  // do sign
-  // we make this 'false' for NaN
-  result[result.size()-1]=
-    if_exprt(src.NaN, const_literal(false), src.sign);
+  // the fraction is zero in case of infinity,
+  // and one in case of NaN
+  exprt fraction=
+    if_exprt(src.NaN, from_integer(1, src.fraction.type()),
+    if_exprt(src.infinity, from_integer(0, src.fraction.type()),
+    src.fraction));
 
   exprt infinity_or_NaN=
     or_exprt(src.NaN, src.infinity);
 
-  // just copy fraction
-  for(unsigned i=0; i<spec.f; i++)
-    result[i]=and_exprt(src.fraction[i], not_exprt(infinity_or_NaN));
-
-  result[0]=or_exprt(result[0], src.NaN);
-
   // do exponent
-  for(unsigned i=0; i<spec.e; i++)
-    result[i+spec.f]=or_exprt(
-      src.exponent[i],
-      infinity_or_NaN);
+  exprt exponent=
+    if_exprt(infinity_or_NaN, from_integer(-1, src.exponent.type()),
+             src.exponent);
 
-  return result;
-  #endif
+  // stitch all three together
+  return concatenation_exprt(
+    sign_bit,
+      concatenation_exprt(
+      exponent, fraction,
+      unsignedbv_typet(spec.e+spec.f)),
+    spec.to_type());
 }
 
 /*******************************************************************\
