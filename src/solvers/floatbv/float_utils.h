@@ -147,12 +147,8 @@ protected:
 
   struct unpacked_floatt
   {
-    literalt sign;
-    literalt infinity;
-    literalt zero;
-    literalt NaN;
-    bvt fraction;
-    bvt exponent;
+    literalt sign, infinity, zero, NaN;
+    bvt fraction, exponent;
 
     unpacked_floatt():
       sign(const_literal(false)),
