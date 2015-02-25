@@ -462,26 +462,25 @@ exprt float_bvt::to_integer(
     exprt distance=minus_exprt(offset, unpacked.exponent);
     exprt shift_result=lshr_exprt(unpacked.fraction, distance);
 
-  #if 0
     // if the exponent is negative, we have zero anyways
     exprt result=shift_result;
-    exprt exponent_sign=unpacked.exponent[unpacked.exponent.size()-1];
+    exprt exponent_sign=sign_exprt(unpacked.exponent);
 
-    for(unsigned i=0; i<result.size(); i++)
-      result[i]=and_exprt(result[i],
-                          not_exprt(exponent_sign));
+    result=
+      if_exprt(exponent_sign, gen_zero(result.type()), result);
 
     // chop out the right number of bits from the result
     typet result_type=
-      is_signed?signedbv_typet(dest_width):
-                unsignedbv_typet(dest_width);
+      is_signed?static_cast<typet>(signedbv_typet(dest_width)):
+                static_cast<typet>(unsignedbv_typet(dest_width));
     
     result=typecast_exprt(result, result_type);
 
     // if signed, apply sign.
     if(is_signed)
     {
-      result=bv_utils.cond_negate(result, unpacked.sign);
+      result=if_exprt(
+        unpacked.sign, unary_minus_exprt(result), result);
     }
     else
     {
@@ -490,7 +489,6 @@ exprt float_bvt::to_integer(
     }
 
     return result;
-  #endif
   }
   else
     assert(0);
