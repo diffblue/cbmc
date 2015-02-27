@@ -139,11 +139,12 @@ protected:
   void convert_minus(const minus_exprt &expr);
   void convert_div(const div_exprt &expr);
   void convert_mult(const mult_exprt &expr);
-  void convert_rounding_mode(const exprt &expr);
-  void convert_floatbv_plus(const exprt &expr);
-  void convert_floatbv_minus(const exprt &expr);
-  void convert_floatbv_div(const exprt &expr);
-  void convert_floatbv_mult(const exprt &expr);
+  void convert_rounding_mode_FPA(const exprt &expr);
+  void convert_rounding_mode_bvfp(const exprt &expr);
+  void convert_floatbv_plus(const ieee_float_op_exprt &expr);
+  void convert_floatbv_minus(const ieee_float_op_exprt &expr);
+  void convert_floatbv_div(const ieee_float_op_exprt &expr);
+  void convert_floatbv_mult(const ieee_float_op_exprt &expr);
   void convert_mod(const mod_exprt &expr);
   void convert_index(const index_exprt &expr);
   void convert_member(const member_exprt &expr);
@@ -153,10 +154,8 @@ protected:
   
   std::string convert_identifier(const irep_idt &identifier);
   
-  // helpers for floating-point numbers
-  void is_nan(const floatbv_typet &, const char *);
-  void is_zero(const floatbv_typet &, const char *);
-  void is_equal(const floatbv_typet &, const char *, const char *);
+  // introduces a let-expression for operands
+  exprt convert_operands(const exprt &);
   
   // auxiliary methods
   void find_symbols(const exprt &expr);
@@ -168,6 +167,9 @@ protected:
   exprt parse_union(const irept &s, const union_typet &type);
   exprt parse_array(const irept &s, const array_typet &type);
   exprt parse_rec(const irept &s, const typet &type);
+  
+  // we use this to build a bit-vector encoding of the FPA theory
+  std::string bvfp_suffix(const floatbv_typet &);
   
   // flattens any non-bitvector type into a bitvector,
   // e.g., booleans, vectors, structs, arrays, ...
