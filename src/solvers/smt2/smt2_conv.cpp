@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/flatten_byte_operators.h>
 #include <solvers/flattening/c_bit_field_replacement_type.h>
+#include <solvers/floatbv/float_bv.h>
 
 #include "smt2_conv.h"
 
@@ -127,8 +128,6 @@ void smt2_convt::write_header()
   // set-logic should come after setting options
   if(emit_set_logic)
     out << "(set-logic " << logic << ")" << "\n";
-
-
 }
 
 /*******************************************************************\
@@ -965,6 +964,23 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
 
 /*******************************************************************\
 
+Function: smt2_convt::bvfp_suffix
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string smt2_convt::bvfp_suffix(const floatbv_typet &type)
+{
+  return i2string(type.get_width())+"_"+i2string(type.get_f());
+}
+
+/*******************************************************************\
+
 Function: smt2_convt::convert_expr
 
   Inputs:
@@ -977,6 +993,7 @@ Function: smt2_convt::convert_expr
 
 void smt2_convt::convert_expr(const exprt &expr)
 {
+  // huge monster case split over expression id
   if(expr.id()==ID_symbol)
   {
     irep_idt id=to_symbol_expr(expr).get_identifier();
@@ -1101,19 +1118,19 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else if(expr.type().id()==ID_floatbv)
     {
+      // this has no rounding mode
       if(use_FPA_theory)
       {
-        out << "(fp.neg "; // no rounding
+        out << "(fp.neg ";
         convert_expr(expr.op0());
         out << ")";
       }
       else
       {
-        // All that's needed is to flip the most-significant bit.
-        out << "(bvxor ";
+        out << "(bvfp.neg" << bvfp_suffix(to_floatbv_type(expr.type()))
+            << " ";
         convert_expr(expr.op0());
-        std::size_t width=boolbv_width(expr.op0().type());
-        out << " (_ bv" << power(2, width-1) << " " << width << "))";
+        out << ")";
       }
     }
     else if(expr.type().id()==ID_vector)
@@ -1168,17 +1185,24 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_sign)
   {
     assert(expr.operands().size() == 1);
+    
+    const typet &op_type=expr.op0().type();
 
-    if (expr.op0().type().id()==ID_floatbv)
+    if(op_type.id()==ID_floatbv)
     {
       if(use_FPA_theory)
       {
 	out << "(fp.isNegative ";
-	convert_expr(expr.op0());
-	out << ")";
+        convert_expr(expr.op0());
+        out << ")";
       }
       else
-	FPCONVTODO("sign for floatbv");
+      {
+        out << "(bvfp.isNegative" << bvfp_suffix(to_floatbv_type(op_type))
+            << " ";
+        convert_expr(expr.op0());
+        out << ")";
+      }
     } 
     else
       UNEXPECTEDCASE("sign applied to type " + expr.type().id_string());
@@ -1264,9 +1288,9 @@ void smt2_convt::convert_expr(const exprt &expr)
     if(expr.id()==ID_ieee_float_notequal)
       out << "(not ";
       
+    // The FPA theory properly treats NaN and negative zero.
     if(use_FPA_theory)
     {
-      // The FPA theory properly treats NaN and negative zero.
       out << "(fp.eq ";
       convert_expr(expr.op0());
       out << " ";
@@ -1275,17 +1299,12 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else
     {
-      const typet &op_type=expr.op0().type();
-      assert(op_type.id()==ID_floatbv);
-      const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
-
-      out << "(let ((?feqop0 ";
+      out << "(bvfp.eq" << bvfp_suffix(to_floatbv_type(expr.op0().type()))
+          << " ";
       convert_expr(expr.op0());
-      out << ")) (let ((?feqop1 ";
+      out << " ";
       convert_expr(expr.op1());
-      out << ")) ";
-      is_equal(floatbv_type, "?feqop0", "?feqop1");
-      out << "))"; // and, let, let
+      out << ")";
     }
 
     if(expr.id()==ID_ieee_float_notequal)
@@ -1304,7 +1323,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_floatbv_plus)
   {
-    convert_floatbv_plus(expr);
+    convert_floatbv_plus(to_ieee_float_op_expr(expr));
   }
   else if(expr.id()==ID_minus)
   {
@@ -1312,7 +1331,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_floatbv_minus)
   {
-    convert_floatbv_minus(expr);
+    convert_floatbv_minus(to_ieee_float_op_expr(expr));
   }
   else if(expr.id()==ID_div)
   {
@@ -1320,7 +1339,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_floatbv_div)
   {
-    convert_floatbv_div(expr);
+    convert_floatbv_div(to_ieee_float_op_expr(expr));
   }
   else if(expr.id()==ID_mod)
   {
@@ -1332,7 +1351,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_floatbv_mult)
   {
-    convert_floatbv_mult(expr);
+    convert_floatbv_mult(to_ieee_float_op_expr(expr));
   }
   else if(expr.id()==ID_address_of)
   {
@@ -1635,8 +1654,6 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else if(type.id()==ID_floatbv)
     {
-      const floatbv_typet &floatbv_type=to_floatbv_type(type);
-
       if(use_FPA_theory)
       {
 	out << "(fp.abs ";
@@ -1645,13 +1662,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        // bit-level encoding
-        std::size_t result_width=floatbv_type.get_width();
-        out << "(bvand ";
+        out << "(bvfp.abs" << bvfp_suffix(to_floatbv_type(type))
+            << " ";
         convert_expr(expr.op0());
-        out << " (_ bv"
-            << (power(2, result_width-1)-1)
-            << " " << result_width << "))";
+        out << ")";
       }
     }
     else
@@ -1667,12 +1681,19 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << "false";
     else if(op_type.id()==ID_floatbv)
     {
-      const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
-      out << "(let ((?isnanop ";
-      convert_expr(expr.op0());
-      out << ")) ";
-      is_nan(floatbv_type, "?isnanop");
-      out << ")";
+      if(use_FPA_theory)
+      {
+        out << "(fp.isNaN ";
+        convert_expr(expr.op0());
+        out << ")";
+      }
+      else
+      {
+        out << "(bvfp.isNan" << bvfp_suffix(to_floatbv_type(op_type))
+            << " ";
+        convert_expr(expr.op0());
+        out << ")";
+      }
     }
     else
       UNEXPECTEDCASE("isnan with unsupported operand type");
@@ -1704,7 +1725,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        FPCONVTODO("isfinite for floatbv");
+	out << "(bvfp.isFinite" << bvfp_suffix(to_floatbv_type(op_type))
+	    << " ";
+        convert_expr(expr.op0());
+	out << ")";
       }
     }
     else
@@ -1729,7 +1753,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        FPCONVTODO("isinf for floatbv");
+	out << "(bvfp.isInfinite" << bvfp_suffix(to_floatbv_type(expr.type()))
+	    << " ";
+        convert_expr(expr.op0());
+        out << ")";
       }
     }
     else
@@ -1746,7 +1773,6 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << "true";
     else if(op_type.id()==ID_floatbv)
     {
-      //const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
       if(use_FPA_theory)
       {
         out << "(fp.isNormal ";
@@ -1755,7 +1781,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        FPCONVTODO("isNormal for floatbv");
+        out << "(bvfp.isNormal" << bvfp_suffix(to_floatbv_type(expr.type()))
+            << " ";
+        convert_expr(expr.op0());
+        out << ")";
       }
     }
     else
@@ -1907,114 +1936,6 @@ void smt2_convt::convert_expr(const exprt &expr)
 
 /*******************************************************************\
 
-Function: smt2_convt::is_nan
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void smt2_convt::is_nan(
-  const floatbv_typet &floatbv_type, 
-  const char *op)
-{
-  if(use_FPA_theory)
-  {
-    out << "(fp.isNaN " << op << ")";
-  }
-  else
-  {
-    // The exponent is all ones, and the fraction is not zero.
-    std::size_t width=floatbv_type.get_width(),
-              e=floatbv_type.get_e(),
-              f=floatbv_type.get_f();
-    out << "(and"
-           " (= (bvnot (_ bv0 " << e << ")) "
-           "((_ extract " << width-2 << " " << f << ") " << op << "))"
-           " (not (= (_ bv0 " << f << ") "
-           "((_ extract " << f-1 << " " << 0 << ") " << op << ")))"
-           ")"; // and
-  }
-}
-
-/*******************************************************************\
-
-Function: smt2_convt::is_equal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void smt2_convt::is_equal(
-  const floatbv_typet &floatbv_type, 
-  const char *op0, const char *op1)
-{
-  if(use_FPA_theory)
-  {
-    // The FPA theory properly treats NaN and negative zero.
-    out << "(fp.eq " << op0 << " " << op1 << ")";
-  }
-  else
-  {
-    // NaN is always different from anything else.
-    out << "(and";
-    
-    out << " (not ";
-    is_nan(floatbv_type, op0);
-    out << ")";
-
-    out << " (not ";
-    is_nan(floatbv_type, op1);
-    out << ")";
-    
-    out << " (or (= " << op0 << " " << op1 << ") (and ";
-    is_zero(floatbv_type, op0);
-    out << " ";
-    is_zero(floatbv_type, op1);
-    out << "))"; // and, or
-    
-    out << ")"; // and
-  }
-}
-
-/*******************************************************************\
-
-Function: smt2_convt::is_zero
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void smt2_convt::is_zero(
-  const floatbv_typet &floatbv_type, 
-  const char *op)
-{
-  if(use_FPA_theory)
-  {
-    out << "(fp.isZero " << op << ")";
-  }
-  else
-  {
-    // Everything but the sign bit has to be zero
-    std::size_t width=floatbv_type.get_width();
-    out << "(= (_ bv0 " << width-1 << ") "
-           "((_ extract " << width-2 << " " << 0 << ") " << op << "))";
-  }
-}
-
-/*******************************************************************\
-
 Function: smt2_convt::convert_typecast
 
   Inputs:
@@ -2061,7 +1982,12 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 	out << "))";
       }
       else
-       FPCONVTODO("floatbv -> bool");
+      {
+	out << "(not (fp.isZero" << bvfp_suffix(to_floatbv_type(expr.type()))
+	    << " ";
+	convert_expr(src);
+	out << "))";
+      }
     }
     else
     {
@@ -2211,13 +2137,32 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       {
         if(dest_type.id()==ID_bv)
         {
-          // this is _NOT_ a semantic conversion, but bit-wise
+          // This is _NOT_ a semantic conversion, but bit-wise,
+          // and straight-forward if the width matches.
           convert_expr(src);
         }
-        else
+	else if (dest_type.id()==ID_signedbv)
         {
-          FPCONVTODO("floatbv -> int");
+          out << "(bvfp.to_sbv"
+              << bvfp_suffix(to_floatbv_type(expr.type()))
+              << "_" << to_width << " ";
+	  out << "roundTowardZero ";
+          convert_expr(src);
+          out << ")";
         }
+	else if (dest_type.id()==ID_unsignedbv)
+        {
+          out << "(bvfp.to_ubv"
+              <<  bvfp_suffix(to_floatbv_type(expr.type()))
+              << "_" << to_width << " ";
+	  out << "roundTowardZero ";
+          convert_expr(src);
+          out << ")";
+        }
+        else
+	{
+	  UNEXPECTEDCASE("TODO typecast "+src_type.id_string()+" -> "+dest_type.id_string());
+	}
       }
     }
     else if(src_type.id()==ID_bool) // from boolean to int
@@ -2571,13 +2516,20 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       {
         out << "((_ to_fp " << dst.get_e() << " "
             << dst.get_f() + 1 << ") ";
-	convert_rounding_mode(expr.op1());
+	convert_rounding_mode_FPA(expr.op1());
 	out << " ";
         convert_expr(src);
         out << ")";
       }
       else
-        FPCONVTODO("typecast9 ") +src_type.id_string()+" -> "+dest_type.id_string();
+      {
+        out << "(bvfp.to_fp" << bvfp_suffix(to_floatbv_type(src.type()))
+            << "_to_" << dst.get_e() << " " << dst.get_f() + 1 << " ";
+	convert_rounding_mode_FPA(expr.op1());
+	out << " ";
+        convert_expr(src);
+        out << ")";
+      }
     }
     else if(src_type.id()==ID_unsignedbv)
     {
@@ -2602,13 +2554,23 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       {
         out << "((_ to_fp_unsigned " << dst.get_e() << " "
             << dst.get_f() + 1 << ") ";
-	convert_rounding_mode(expr.op1());
+	convert_rounding_mode_FPA(expr.op1());
 	out << " ";
         convert_expr(src);
         out << ")";
       }
       else
-        FPCONVTODO("typecast10 " +src_type.id_string()+" -> "+dest_type.id_string());
+      {
+        out << "(bvfp.to_fp_unsigned"
+            <<  to_unsignedbv_type(src_type).get_width()
+            << "_to_"
+            <<  bvfp_suffix(dst)
+            << " ";
+	convert_rounding_mode_FPA(expr.op1());
+	out << " ";
+        convert_expr(src);
+        out << ")";
+      }
     }
     else if(src_type.id()==ID_signedbv)
     {
@@ -2620,13 +2582,23 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       {
         out << "((_ to_fp " << dst.get_e() << " "
             << dst.get_f() + 1 << ") ";
-	convert_rounding_mode(expr.op1());
+	convert_rounding_mode_FPA(expr.op1());
 	out << " ";
         convert_expr(src);
         out << ")";
       }
       else
-        FPCONVTODO("typecast10 " +src_type.id_string()+" -> "+dest_type.id_string());
+      {
+        out << "(bvfp.to_fp_signed"
+            <<  to_unsignedbv_type(src_type).get_width()
+            << "_to_"
+            <<  bvfp_suffix(dst)
+            << " ";
+	convert_rounding_mode_FPA(expr.op1());
+	out << " ";
+        convert_expr(src);
+        out << ")";
+      }
     }
     else
       UNEXPECTEDCASE("TODO typecast11 "+src_type.id_string()+" -> "+dest_type.id_string());
@@ -2892,8 +2864,8 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       // produce corresponding bit-vector
       ieee_float_spect spec(floatbv_type);
 
-      std::string v_str=id2string(expr.get(ID_value));
-      mp_integer v=binary2integer(v_str, false);
+      mp_integer v=binary2integer(
+        id2string(expr.get_value()), false);
 
       out << "(_ bv" << v << " " << spec.width() << ")";
     }
@@ -3108,13 +3080,15 @@ void smt2_convt::convert_relation(const exprt &expr)
     else
     {
       if(expr.id()==ID_le)
-        out << "bvsle";
+        out << "bvfp.leq";
       else if(expr.id()==ID_lt)
-        out << "bvslt";
+        out << "bvfp.lt";
       else if(expr.id()==ID_ge)
-        out << "bvsge";
+        out << "bvfp.geq";
       else if(expr.id()==ID_gt)
-        out << "bvsgt";
+        out << "bvfp.gt";
+
+      out << bvfp_suffix(to_floatbv_type(op_type)) << " ";
 
       out << " ";
       convert_expr(expr.op0());
@@ -3263,10 +3237,9 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
   }
 }
 
-
 /*******************************************************************\
 
-Function: smt2_convt::convert_floatbv_plus
+Function: smt2_convt::convert_rounding_mode_FPA
 
   Inputs: The expression representing the rounding mode.
 
@@ -3277,7 +3250,7 @@ Function: smt2_convt::convert_floatbv_plus
 
 \*******************************************************************/
 
-void smt2_convt::convert_rounding_mode(const exprt &expr)
+void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
 {
   assert(use_FPA_theory);
 
@@ -3290,26 +3263,26 @@ void smt2_convt::convert_rounding_mode(const exprt &expr)
    * the macros from fenv.h to avoid portability problems.
    */
 
-  if (expr.id() == ID_constant)
+  if(expr.id()==ID_constant)
   {
-    const constant_exprt cexpr(to_constant_expr(expr));
+    const constant_exprt &cexpr=to_constant_expr(expr);
 
     mp_integer value=binary2integer(id2string(cexpr.get_value()), false);
 
-    if (value == 0)
+    if(value==0)
       out << "roundNearestTiesToEven";
-    else if (value == 1)
+    else if(value==1)
       out << "roundTowardNegative";
-    else if (value == 2)
+    else if(value==2)
       out << "roundTowardPositive";
-    else if (value == 3)
+    else if(value==3)
       out << "roundTowardZero";
     else
-      INVALIDEXPR("Unknown constant rounding mode with value " + id2string(cexpr.get_value()));
+      INVALIDEXPR("Unknown constant rounding mode with value "+id2string(cexpr.get_value()));
   }
   else
   {
-    std::size_t width = to_bitvector_type(expr.type()).get_width();
+    std::size_t width=to_bitvector_type(expr.type()).get_width();
 
     // Need to make the choice above part of the model
     out << "(ite (= (_ bv0 " << width << ") ";
@@ -3324,13 +3297,32 @@ void smt2_convt::convert_rounding_mode(const exprt &expr)
     convert_expr(expr);
     out << ") roundTowardPositive ";
 
-    // TODO : add some kind of error checking here
+    // TODO: add some kind of error checking here
     out << "roundTowardZero";
 
     out << ")))";
   }
 }
 
+/*******************************************************************\
+
+Function: smt2_convt::convert_rounding_mode_bvfp
+
+  Inputs: The expression representing the rounding mode.
+
+ Outputs: SMT-LIB output to out.
+
+ Purpose: Converting a constant or symbolic rounding mode for
+          use of the bvfp models.
+          Only called when use_FPA_theory is not enabled
+
+\*******************************************************************/
+
+void smt2_convt::convert_rounding_mode_bvfp(const exprt &expr)
+{
+  assert(!use_FPA_theory);
+  convert_expr(typecast_exprt(expr, unsignedbv_typet(32)));
+}
 
 /*******************************************************************\
 
@@ -3344,7 +3336,7 @@ Function: smt2_convt::convert_floatbv_plus
 
 \*******************************************************************/
 
-void smt2_convt::convert_floatbv_plus(const exprt &expr)
+void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
 {
   const typet &type=expr.type();
 
@@ -3358,7 +3350,7 @@ void smt2_convt::convert_floatbv_plus(const exprt &expr)
     if(type.id()==ID_floatbv)
     {
       out << "(fp.add ";
-      convert_rounding_mode(expr.op2());
+      convert_rounding_mode_FPA(expr.op2());
       out << " ";
       convert_expr(expr.op0());
       out << " ";
@@ -3496,7 +3488,7 @@ Function: smt2_convt::convert_floatbv_minus
 
 \*******************************************************************/
 
-void smt2_convt::convert_floatbv_minus(const exprt &expr)
+void smt2_convt::convert_floatbv_minus(const ieee_float_op_exprt &expr)
 {
   assert(expr.operands().size()==3);
   assert(expr.type().id()==ID_floatbv);
@@ -3504,7 +3496,7 @@ void smt2_convt::convert_floatbv_minus(const exprt &expr)
   if(use_FPA_theory)
   {
     out << "(fp.sub ";
-    convert_rounding_mode(expr.op2());
+    convert_rounding_mode_FPA(expr.op2());
     out << " ";
     convert_expr(expr.op0());
     out << " ";
@@ -3587,7 +3579,7 @@ Function: smt2_convt::convert_floatbv_div
 
 \*******************************************************************/
 
-void smt2_convt::convert_floatbv_div(const exprt &expr)
+void smt2_convt::convert_floatbv_div(const ieee_float_op_exprt &expr)
 {
   assert(expr.operands().size()==3);
   assert(expr.type().id()==ID_floatbv);
@@ -3595,7 +3587,7 @@ void smt2_convt::convert_floatbv_div(const exprt &expr)
   if(use_FPA_theory)
   {
     out << "(fp.div ";
-    convert_rounding_mode(expr.op2());
+    convert_rounding_mode_FPA(expr.op2());
     out << " ";
     convert_expr(expr.op0());
     out << " ";
@@ -3705,7 +3697,7 @@ Function: smt2_convt::convert_floatbv_mult
 
 \*******************************************************************/
 
-void smt2_convt::convert_floatbv_mult(const exprt &expr)
+void smt2_convt::convert_floatbv_mult(const ieee_float_op_exprt &expr)
 {
   assert(expr.operands().size()==3);
   assert(expr.type().id()==ID_floatbv);
@@ -3713,7 +3705,7 @@ void smt2_convt::convert_floatbv_mult(const exprt &expr)
   if(use_FPA_theory)
   {
     out << "(fp.mul ";
-    convert_rounding_mode(expr.op2());
+    convert_rounding_mode_FPA(expr.op2());
     out << " ";
     convert_expr(expr.op0());
     out << " ";
@@ -3722,7 +3714,7 @@ void smt2_convt::convert_floatbv_mult(const exprt &expr)
   }
   else
   {
-    FPCONVTODO("* for floatbv");
+    convert(float_bv(convert_operands(expr)));
   }
 }
 
