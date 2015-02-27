@@ -44,9 +44,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // General todos
 #define TODO(S) throw "TODO: " S
 
-// Needs expression level floating-point to bit-vector conversion
-#define FPCONVTODO(S) throw "TODO: floating-point to bit-vector conversion (try --fpa): " S
-
 /*******************************************************************\
 
 Function: smt2_convt::print_assignment
@@ -2525,7 +2522,7 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       {
         out << "(bvfp.to_fp" << bvfp_suffix(to_floatbv_type(src.type()))
             << "_to_" << dst.get_e() << " " << dst.get_f() + 1 << " ";
-	convert_rounding_mode_FPA(expr.op1());
+	convert_rounding_mode_bvfp(expr.op1());
 	out << " ";
         convert_expr(src);
         out << ")";
@@ -2566,7 +2563,7 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
             << "_to_"
             <<  bvfp_suffix(dst)
             << " ";
-	convert_rounding_mode_FPA(expr.op1());
+	convert_rounding_mode_bvfp(expr.op1());
 	out << " ";
         convert_expr(src);
         out << ")";
@@ -2594,7 +2591,7 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
             << "_to_"
             <<  bvfp_suffix(dst)
             << " ";
-	convert_rounding_mode_FPA(expr.op1());
+	convert_rounding_mode_bvfp(expr.op1());
 	out << " ";
         convert_expr(src);
         out << ")";
@@ -3370,7 +3367,26 @@ void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
   }
   else
   {
-    FPCONVTODO("+ for floatbv");
+    if(type.id()==ID_floatbv)
+    {
+      out << "(bvfp.add ";
+      convert_rounding_mode_bvfp(expr.op2());
+      out << " ";
+      convert_expr(expr.op0());
+      out << " ";
+      convert_expr(expr.op1());
+      out << ")";
+    }
+    else if(type.id()==ID_complex)
+    {
+      TODO("+ for floatbv complex");
+    }
+    else if(type.id()==ID_vector)
+    {
+      TODO("+ for floatbv vector");
+    }
+    else
+      UNEXPECTEDCASE("unsupported type for +: "+type.id_string());
   }
 }
 
@@ -3505,7 +3521,13 @@ void smt2_convt::convert_floatbv_minus(const ieee_float_op_exprt &expr)
   }
   else
   {
-    FPCONVTODO("binary - for floatbv");
+    out << "(bvfp.sub ";
+    convert_rounding_mode_bvfp(expr.op2());
+    out << " ";
+    convert_expr(expr.op0());
+    out << " ";
+    convert_expr(expr.op1());
+    out << ")";
   }
 }
 
@@ -3596,7 +3618,13 @@ void smt2_convt::convert_floatbv_div(const ieee_float_op_exprt &expr)
   }
   else
   {
-    FPCONVTODO("/ for floatbv");
+    out << "(bvfp.div ";
+    convert_rounding_mode_bvfp(expr.op2());
+    out << " ";
+    convert_expr(expr.op0());
+    out << " ";
+    convert_expr(expr.op1());
+    out << ")";
   }
 }
 
@@ -3714,7 +3742,13 @@ void smt2_convt::convert_floatbv_mult(const ieee_float_op_exprt &expr)
   }
   else
   {
-    convert(float_bv(convert_operands(expr)));
+    out << "(bvfp.mul ";
+    convert_rounding_mode_bvfp(expr.op2());
+    out << " ";
+    convert_expr(expr.op0());
+    out << " ";
+    convert_expr(expr.op1());
+    out << ")";
   }
 }
 
@@ -4538,8 +4572,10 @@ Function: smt2_convt::find_symbols
 
 void smt2_convt::find_symbols(const exprt &expr)
 {
+  // recursive call on type
   find_symbols(expr.type());
 
+  // recursive call on operands
   forall_operands(it, expr)
     find_symbols(*it);
 
@@ -4664,6 +4700,26 @@ void smt2_convt::find_symbols(const exprt &expr)
         object_sizes[expr]=id;
       }
     }
+  }
+  else if(expr.id()==ID_plus &&
+          expr.type().id()==ID_floatbv)
+  {
+    #if 0  
+    irep_idt function=
+      "fpbv."+bvfp_suffix(to_floatbv_type(expr.type()));
+    
+    if(bvfp_set.find(function)==bvfp_set.end())
+    {
+      bvfp_set.insert(function);
+      out << "; this is a model for floating-point addition\n";
+      out << "(declare-fun " << function << " ("
+      out << "(rm )";
+      convert_type(unsignedbv_typet());
+      out << ") ";
+      convert_type(expr.type());
+      out << ")" << "\n";
+    }
+    #endif
   }
 
 }
