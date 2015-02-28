@@ -825,27 +825,28 @@ exprt float_bvt::mul(
   const unbiased_floatt unpacked2=unpack(src2, spec);
 
   // zero-extend the fractions
-  #if 0
-  const exprt fraction1=bv_utils.zero_extension(unpacked1.fraction, unpacked1.fraction.size()*2);
-  const exprt fraction2=bv_utils.zero_extension(unpacked2.fraction, unpacked2.fraction.size()*2);
+  typet new_fraction_type=unsignedbv_typet(spec.f*2);
+  const exprt fraction1=typecast_exprt(unpacked1.fraction, new_fraction_type);
+  const exprt fraction2=typecast_exprt(unpacked2.fraction, new_fraction_type);
 
-  // multiply fractions
+  // multiply the fractions
   unbiased_floatt result;
-  result.fraction=bv_utils.unsigned_multiplier(fraction1, fraction2);
+  result.fraction=mult_exprt(fraction1, fraction2);
 
   // extend exponents to account for overflow
   // add two bits, as we do extra arithmetic on it later
-  const exprt exponent1=bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size()+2);
-  const exprt exponent2=bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size()+2);
+  typet new_exponent_type=signedbv_typet(spec.e+2);
+  const exprt exponent1=typecast_exprt(unpacked1.exponent, new_exponent_type);
+  const exprt exponent2=typecast_exprt(unpacked2.exponent, new_exponent_type);
 
   exprt added_exponent=plus_exprt(exponent1, exponent2);
 
-  // adjust, we are thowing in an extra fraction bit
-  // it has been extended above
-  result.exponent=bv_utils.inc(added_exponent);
+  // Adjust exponent; we are thowing in an extra fraction bit,
+  // it has been extended above.
+  result.exponent=plus_exprt(added_exponent, gen_one(new_exponent_type));
 
   // new sign
-  result.sign=xor_exprt(unpacked1.sign, unpacked2.sign);
+  result.sign=notequal_exprt(unpacked1.sign, unpacked2.sign);
 
   // infinity?
   result.infinity=or_exprt(unpacked1.infinity, unpacked2.infinity);
@@ -854,18 +855,17 @@ exprt float_bvt::mul(
   {
     exprt NaN_cond(ID_or, bool_typet());
 
-    NaN_cond.copy_to_operands(is_NaN(src1));
-    NaN_cond.copy_to_operands(is_NaN(src2));
+    NaN_cond.copy_to_operands(isnan(src1, spec));
+    NaN_cond.copy_to_operands(isnan(src2, spec));
 
     // infinity * 0 is NaN!
-    NaN_cond.copy_to_operands(and_exprt(is_zero(src1), unpacked2.infinity));
-    NaN_cond.copy_to_operands(and_exprt(is_zero(src2), unpacked1.infinity));
+    NaN_cond.copy_to_operands(and_exprt(unpacked1.zero, unpacked2.infinity));
+    NaN_cond.copy_to_operands(and_exprt(unpacked2.zero, unpacked1.infinity));
 
-    result.NaN=or_exprt(NaN_cond);
+    result.NaN=NaN_cond;
   }
 
-  return rounder(result);
-  #endif
+  return rounder(result, spec);
 }
 
 /*******************************************************************\
@@ -1084,6 +1084,25 @@ exprt float_bvt::isinf(
   return and_exprt(
     exponent_all_ones(src, spec),
     fraction_all_zeros(src, spec));
+}
+
+/*******************************************************************\
+
+Function: float_bvt::isfinite
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt float_bvt::isfinite(
+  const exprt &src,
+  const ieee_float_spect &spec)
+{
+  return not_exprt(or_exprt(isinf(src, spec), isnan(src, spec)));
 }
 
 /*******************************************************************\
