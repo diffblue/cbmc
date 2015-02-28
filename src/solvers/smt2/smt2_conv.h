@@ -140,7 +140,6 @@ protected:
   void convert_div(const div_exprt &expr);
   void convert_mult(const mult_exprt &expr);
   void convert_rounding_mode_FPA(const exprt &expr);
-  void convert_rounding_mode_bvfp(const exprt &expr);
   void convert_floatbv_plus(const ieee_float_op_exprt &expr);
   void convert_floatbv_minus(const ieee_float_op_exprt &expr);
   void convert_floatbv_div(const ieee_float_op_exprt &expr);
@@ -169,7 +168,17 @@ protected:
   exprt parse_rec(const irept &s, const typet &type);
   
   // we use this to build a bit-vector encoding of the FPA theory
-  std::string bvfp_suffix(const floatbv_typet &);
+  void convert_floatbv(const exprt &expr);
+  std::string floatbv_suffix(const floatbv_typet &);
+  std::set<irep_idt> bvfp_set; // already converted
+  
+  class smt2_symbolt:public exprt
+  {
+  public:
+    smt2_symbolt(const irep_idt &_identifier, const typet &_type):
+      exprt(ID_smt2_symbol, _type)
+    { set(ID_identifier, _identifier); }
+  };
   
   // flattens any non-bitvector type into a bitvector,
   // e.g., booleans, vectors, structs, arrays, ...
