@@ -912,7 +912,7 @@ exprt float_bvt::div(
   bv_utils.unsigned_divider(fraction1, fraction2, result.fraction, rem);
   
   // is there a remainder?
-  exprt have_remainder=bv_utils.is_not_zero(rem);
+  exprt have_remainder=notequal_exprt(rem, gen_zero(rem.type());
   
   // we throw this into the result, as one additional bit,
   // to get the right rounding decision
@@ -1194,15 +1194,15 @@ void float_bvt::normalization_shift(
   
   unsigned depth=integer2unsigned(address_bits(fraction_bits-1));
   
-  #if 0
   if(exponent_bits<depth)
-    exponent=bv_utils.sign_extension(exponent, depth);
+    exponent=typecast_exprt(exponent, signedbv_typet(depth));
   
-  exprt exponent_delta=bv_utils.zeros(exponent.size());
+  exprt exponent_delta=gen_zero(exponent.type());
   
   for(int d=depth-1; d>=0; d--)
   {
     unsigned distance=(1<<d);
+    #if 0
     assert(fraction.size()>distance);
     
     // check if first 'distance'-many bits are zeros
@@ -1220,10 +1220,10 @@ void float_bvt::normalization_shift(
     // add corresponding weight to exponent
     assert(d<(signed)exponent_delta.size());
     exponent_delta[d]=prefix_is_zero;
+    #endif
   }  
     
-  exponent=bv_utils.sub(exponent, exponent_delta);
-  #endif
+  exponent=minus_exprt(exponent, exponent_delta);
 }
 
 /*******************************************************************\
@@ -1276,7 +1276,7 @@ void float_bvt::denormalization_shift(
 #if 1
   // Care must be taken to not loose information required for the
   // guard and sticky bits.  +3 is for the hidden, guard and sticky bits.
-  if (fraction.size() < (spec.f + 3)) 
+  if(fraction.size() < (spec.f + 3)) 
   { 
     // Add zeros at the LSB end for the guard bit to shift into
     fraction=
@@ -1292,22 +1292,22 @@ void float_bvt::denormalization_shift(
   denormalisedFraction[0] = or_exprt(denormalisedFraction[0], sticky_bit);
 
   fraction=
-    bv_utils.select(
+    if_exprt(
       denormal,
       denormalisedFraction,
       fraction);
 
 #else
   fraction=
-    bv_utils.select(
+    if_exprt(
       denormal,
-      bv_utils.shift(fraction, bv_utilst::LRIGHT, distance),
+      lshr_exprt(fraction, distance),
       fraction);
 #endif
 
   exponent=
-    bv_utils.select(denormal,
-      bv_utils.build_constant(-bias, exponent.size()),
+    if_exprt(denormal,
+      from_integer(-bias, exponent.type()),
       exponent);
   #endif
 }
@@ -1360,8 +1360,8 @@ exprt float_bvt::rounder(
   result.NaN=src.NaN;
   result.infinity=src.infinity;
 
-  round_fraction(result);
-  round_exponent(result);
+  round_fraction(result, spec);
+  round_exponent(result, spec);
 
   return pack(bias(result, spec), spec);
 }
@@ -1392,7 +1392,7 @@ exprt float_bvt::fraction_rounding_decision(
   // more than two extra bits are superflus, and are
   // turned into a sticky bit
 
-  exprt sticky_bit=const_literal(false);
+  exprt sticky_bit=false_exprt();
 
   if(extra_bits>=2)
   {
@@ -1426,7 +1426,7 @@ exprt float_bvt::fraction_rounding_decision(
 
   // round to zero
   exprt round_to_zero=
-    const_literal(false);
+    false_exprt();
 
   // now select appropriate one
   return if_exprt(rounding_mode_bits.round_to_even, round_to_even,
@@ -1449,11 +1449,13 @@ Function: float_bvt::round_fraction
 
 \*******************************************************************/
 
-void float_bvt::round_fraction(unbiased_floatt &result)
+void float_bvt::round_fraction(
+  unbiased_floatt &result,
+  const ieee_float_spect &spec)
 {
-  #if 0
   unsigned fraction_size=spec.f+1;
 
+  #if 0
   // do we need to enlarge the fraction?
   if(result.fraction.size()<fraction_size)
   {
@@ -1556,7 +1558,9 @@ Function: float_bvt::round_exponent
 
 \*******************************************************************/
 
-void float_bvt::round_exponent(unbiased_floatt &result)
+void float_bvt::round_exponent(
+  unbiased_floatt &result,
+  const ieee_float_spect &spec)
 {
   #if 0
   // do we need to enlarge the exponent?
@@ -1823,11 +1827,11 @@ exprt float_bvt::sticky_right_shift(
   const exprt &dist,
   exprt &sticky)
 {
-  #if 0
   // only right shifts
   assert(shift_type==bv_utilst::LRIGHT ||
          shift_type==bv_utilst::ARIGHT);
 
+  #if 0
   unsigned d=1, width=op.size();
   exprt result=op;
   sticky=false_exprt();

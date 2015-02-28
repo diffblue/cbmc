@@ -579,8 +579,8 @@ bvt float_utilst::mul(const bvt &src1, const bvt &src2)
     NaN_cond.push_back(is_NaN(src2));
 
     // infinity * 0 is NaN!
-    NaN_cond.push_back(prop.land(is_zero(src1), unpacked2.infinity));
-    NaN_cond.push_back(prop.land(is_zero(src2), unpacked1.infinity));
+    NaN_cond.push_back(prop.land(unpacked1.zero, unpacked2.infinity));
+    NaN_cond.push_back(prop.land(unpacked2.zero, unpacked1.infinity));
 
     result.NaN=prop.lor(NaN_cond);
   }
