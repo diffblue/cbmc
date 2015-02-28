@@ -132,8 +132,8 @@ protected:
   exprt pack(const biased_floatt &, const ieee_float_spect &);
   unbiased_floatt unpack(const exprt &, const ieee_float_spect &);
 
-  void round_fraction(unbiased_floatt &result);
-  void round_exponent(unbiased_floatt &result);
+  void round_fraction(unbiased_floatt &result, const ieee_float_spect &);
+  void round_exponent(unbiased_floatt &result, const ieee_float_spect &);
   
   // rounding decision for fraction
   exprt fraction_rounding_decision(
