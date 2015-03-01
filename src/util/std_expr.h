@@ -3410,6 +3410,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref let_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * let_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref let_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const let_exprt &to_let_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_let && expr.operands().size()==3);
+  return static_cast<const let_exprt &>(expr);
+}
+
+/*! \copydoc to_let_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline let_exprt &to_let_expr(exprt &expr)
+{
+  assert(expr.id()==ID_let && expr.operands().size()==3);
+  return static_cast<let_exprt &>(expr);
+}
+
 /*! \brief A forall expression
 */
 class forall_exprt:public exprt
