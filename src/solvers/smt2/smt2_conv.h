@@ -169,7 +169,8 @@ protected:
   
   // we use this to build a bit-vector encoding of the FPA theory
   void convert_floatbv(const exprt &expr);
-  std::string floatbv_suffix(const floatbv_typet &);
+  static std::string type2id(const typet &);
+  static std::string floatbv_suffix(const exprt &);
   std::set<irep_idt> bvfp_set; // already converted
   
   class smt2_symbolt:public exprt
@@ -181,7 +182,8 @@ protected:
   };
   
   // flattens any non-bitvector type into a bitvector,
-  // e.g., booleans, vectors, structs, arrays, ...
+  // e.g., booleans, vectors, structs, arrays but also
+  // floats when using the FPA theory.
   // unflatten() does the opposite.
   typedef enum { BEGIN, END } wheret;
   void flatten2bv(const exprt &);
