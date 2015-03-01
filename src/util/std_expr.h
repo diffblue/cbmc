@@ -2016,6 +2016,10 @@ public:
   {
   }
 
+  extractbit_exprt(
+    const exprt &_src,
+    const unsigned _index);
+
   exprt &src()
   {
     return op0();
@@ -2082,6 +2086,12 @@ public:
     copy_to_operands(_src, _lower, _upper);
   }
   
+  extractbits_exprt(
+    const exprt &_src,
+    const unsigned _upper,
+    const unsigned _lower,
+    const typet &_type);
+
   exprt &src()
   {
     return op0();
