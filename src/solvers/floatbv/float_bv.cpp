@@ -1198,7 +1198,7 @@ void float_bvt::normalization_shift(
   
   if(exponent_bits<depth)
     exponent=typecast_exprt(exponent, signedbv_typet(depth));
-  
+
   exprt exponent_delta=gen_zero(exponent.type());
   
   for(int d=depth-1; d>=0; d--)
@@ -1207,9 +1207,10 @@ void float_bvt::normalization_shift(
     assert(fraction_bits>distance);
     
     // check if first 'distance'-many bits are zeros
-    #if 0
-    const exprt prefix=bv_utils.extract_msb(fraction, distance);
-    exprt prefix_is_zero=equal_exprt(prefix, gen_zer(prefix.type()));
+    const exprt prefix=
+      extractbits_exprt(fraction, fraction_bits-1, fraction_bits-distance,
+                        unsignedbv_typet(distance));
+    exprt prefix_is_zero=equal_exprt(prefix, gen_zero(prefix.type()));
     
     // If so, shift the zeros out left by 'distance'.
     // Otherwise, leave as is.
@@ -1220,9 +1221,11 @@ void float_bvt::normalization_shift(
       if_exprt(prefix_is_zero, shifted, fraction);
       
     // add corresponding weight to exponent
-    assert(d<(signed)exponent_delta.size());
-    exponent_delta[d]=prefix_is_zero;
-    #endif
+    assert(d<(signed int)exponent_bits);
+
+    exponent_delta=
+      or_exprt(exponent_delta,
+        shl_exprt(typecast_exprt(prefix_is_zero, exponent_delta.type()), d));
   }  
     
   exponent=minus_exprt(exponent, exponent_delta);
@@ -1255,35 +1258,38 @@ void float_bvt::denormalization_shift(
   // i.e. the exponent of the smallest normal number and thus the 'base'
   // exponent for subnormal numbers.
   
-  assert(to_signedbv_type(exponent.type()).get_width()>=spec.e);
+  unsigned exponent_bits=to_signedbv_type(exponent.type()).get_width();
+  assert(exponent_bits>=spec.e);
 
-  #if 0
 #if 1
   // Need to sign extend to avoid overflow.  Note that this is a
   // relatively rare problem as the value needs to be close to the top
   // of the exponent range and then range must not have been
   // previously extended as add, multiply, etc. do.  This is primarily
   // to handle casting down from larger ranges.
-  exponent=bv_utils.sign_extension(exponent, exponent.size() + 1);
+  exponent=typecast_exprt(exponent, signedbv_typet(exponent_bits+1));
 #endif
 
-  exprt distance=sub_exprt(
+  exprt distance=minus_exprt(
     from_integer(-bias+1, exponent.type()), exponent);
 
   // use sign bit
   exprt denormal=and_exprt(
-    not_exprt(distance.back()),
+    not_exprt(sign_exprt(distance)),
     notequal_exprt(distance, gen_zero(distance.type())));
 
 #if 1
   // Care must be taken to not loose information required for the
   // guard and sticky bits.  +3 is for the hidden, guard and sticky bits.
-  if(fraction.size() < (spec.f + 3)) 
+  unsigned fraction_bits=to_unsignedbv_type(fraction.type()).get_width();
+  
+  if(fraction_bits < spec.f+3) 
   { 
     // Add zeros at the LSB end for the guard bit to shift into
     fraction=
-      concatenation_exprt(bv_utils.zeros((spec.f + 3) - fraction.size()),
-                          fraction);
+      concatenation_exprt(
+        fraction, unsignedbv_typet(spec.f + 3 - fraction_bits).zero_expr(),
+        unsignedbv_typet(spec.f+3));
   }
 
   exprt denormalisedFraction = fraction;
@@ -1291,7 +1297,10 @@ void float_bvt::denormalization_shift(
   exprt sticky_bit = false_exprt();
   denormalisedFraction = 
     sticky_right_shift(fraction, bv_utilst::LRIGHT, distance, sticky_bit);
-  denormalisedFraction[0] = or_exprt(denormalisedFraction[0], sticky_bit);
+
+  denormalisedFraction=
+    or_exprt(denormalisedFraction,
+      typecast_exprt(sticky_bit, denormalisedFraction.type()));
 
   fraction=
     if_exprt(
@@ -1311,7 +1320,6 @@ void float_bvt::denormalization_shift(
     if_exprt(denormal,
       from_integer(-bias, exponent.type()),
       exponent);
-  #endif
 }
 
 /*******************************************************************\
