@@ -1940,9 +1940,19 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     out << ")"; // mk-... or concat
   }
-  else if (expr.id()==ID_object_size)
+  else if(expr.id()==ID_object_size)
   {
     out << object_sizes[expr];
+  }
+  else if(expr.id()==ID_let)
+  {
+    const let_exprt &let_expr=to_let_expr(expr);
+    out << "(let ((";
+    convert_expr(let_expr.symbol());
+    out << ' ';
+    convert_expr(let_expr.value());
+    out << ")) ";
+    convert_expr(let_expr.where());
   }
   else
     UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is unsupported");
