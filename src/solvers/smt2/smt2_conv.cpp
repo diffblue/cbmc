@@ -979,6 +979,10 @@ std::string smt2_convt::type2id(const typet &type)
   {
     return "u"+i2string(to_unsignedbv_type(type).get_width());
   }
+  else if(type.id()==ID_c_bool)
+  {
+    return "u"+i2string(to_c_bool_type(type).get_width());
+  }
   else if(type.id()==ID_signedbv)
   {
     return "s"+i2string(to_unsignedbv_type(type).get_width());
@@ -986,6 +990,10 @@ std::string smt2_convt::type2id(const typet &type)
   else if(type.id()==ID_bool)
   {
     return "b";
+  }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    return type2id(type.subtype());
   }
   else
   {
@@ -2566,6 +2574,15 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       }
       else
         convert_floatbv(expr);
+    }
+    else if(src_type.id()==ID_c_enum_tag)
+    {
+      // enum to float
+
+      // We first convert to 'underlying type'
+      floatbv_typecast_exprt tmp=expr;
+      tmp.op()=typecast_exprt(src, src_type.subtype());
+      convert_floatbv_typecast(tmp);
     }
     else
       UNEXPECTEDCASE("TODO typecast11 "+src_type.id_string()+" -> "+dest_type.id_string());
@@ -4598,29 +4615,28 @@ void smt2_convt::find_symbols(const exprt &expr)
     }
   }
   else if(!use_FPA_theory &&
+          expr.operands().size()>=1 &&
           (expr.id()==ID_floatbv_plus ||
            expr.id()==ID_floatbv_minus ||
            expr.id()==ID_floatbv_mult ||
            expr.id()==ID_floatbv_div ||
-           expr.id()==ID_lt ||
-           expr.id()==ID_gt ||
-           expr.id()==ID_le ||
-           expr.id()==ID_ge ||
            expr.id()==ID_floatbv_typecast ||
            expr.id()==ID_ieee_float_equal ||
            expr.id()==ID_ieee_float_notequal ||
-           expr.id()==ID_isnan ||
-           expr.id()==ID_isnormal ||
-           expr.id()==ID_isfinite ||
-           expr.id()==ID_isinf ||
-           expr.id()==ID_sign ||
-           expr.id()==ID_unary_minus ||
-           expr.id()==ID_typecast ||
-           expr.id()==ID_abs) &&
-          expr.operands().size()>=1 &&
-          expr.op0().type().id()==ID_floatbv)
+           ((expr.id()==ID_lt ||
+             expr.id()==ID_gt ||
+             expr.id()==ID_le ||
+             expr.id()==ID_ge ||
+             expr.id()==ID_isnan ||
+             expr.id()==ID_isnormal ||
+             expr.id()==ID_isfinite ||
+             expr.id()==ID_isinf ||
+             expr.id()==ID_sign ||
+             expr.id()==ID_unary_minus ||
+             expr.id()==ID_typecast ||
+             expr.id()==ID_abs) &&
+             expr.op0().type().id()==ID_floatbv)))
   {
-    floatbv_typet op0_type=to_floatbv_type(expr.op0().type());
     irep_idt function=
       "|float_bv."+expr.id_string()+floatbv_suffix(expr)+"|";
       
