@@ -1859,7 +1859,7 @@ exprt float_bvt::sticky_right_shift(
   exprt result=op;
   sticky=false_exprt();
   
-  unsigned dist_width=to_unsignedbv_type(dist.type()).get_width();
+  unsigned dist_width=to_signedbv_type(dist.type()).get_width();
 
   for(unsigned stage=0; stage<dist_width; stage++)
   {
