@@ -1989,6 +1989,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     // this is comparison with zero
     if(src_type.id()==ID_signedbv ||
        src_type.id()==ID_unsignedbv ||
+       src_type.id()==ID_c_bool ||
        src_type.id()==ID_fixedbv ||
        src_type.id()==ID_pointer)
     {
@@ -2400,18 +2401,17 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     // converted to ID_floatbv_typecast during symbolic execution,
     // adding the rounding mode.  See
     // smt2_convt::convert_floatbv_typecast.
-    // The exception is bool to float.
+    // The exception is bool and c_bool to float.
 
-    if (src_type.id()==ID_bool)
+    if(src_type.id()==ID_bool)
     {
       constant_exprt val(dest_type);
 
       ieee_floatt a;
-      a.spec = to_floatbv_type(dest_type);
+      a.spec=to_floatbv_type(dest_type);
 
       mp_integer significand;
       mp_integer exponent;
-
 
       out << "(ite ";
       convert_expr(src);
@@ -2433,9 +2433,14 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       convert_constant(val);
       out << ")";
     }
+    else if(src_type.id()==ID_c_bool)
+    {
+      // turn into proper bool
+      exprt tmp=typecast_exprt(src, bool_typet());
+      convert_typecast(typecast_exprt(tmp, dest_type));
+    }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
-
   }
   else if(dest_type.id()==ID_c_bit_field)
   {
