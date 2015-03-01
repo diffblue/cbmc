@@ -1913,6 +1913,8 @@ public:
   {
   }
 
+  shift_exprt(const exprt &_src, const irep_idt &_id, const unsigned _distance);
+
   inline exprt &op()
   {
     return op0();
@@ -1971,6 +1973,10 @@ public:
   inline shl_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_shl, _distance)
   {
   }
+
+  shl_exprt(const exprt &_src, const unsigned _distance):shift_exprt(_src, ID_shl, _distance)
+  {
+  }
 };
 
 /*! \brief Arithmetic right shift
@@ -1985,6 +1991,10 @@ public:
   inline ashr_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_ashr, _distance)
   {
   }
+
+  inline ashr_exprt(const exprt &_src, const unsigned _distance):shift_exprt(_src, ID_ashr, _distance)
+  {
+  }
 };
 
 /*! \brief Logical right shift
@@ -1997,6 +2007,10 @@ public:
   }
 
   inline lshr_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_lshr, _distance)
+  {
+  }
+
+  inline lshr_exprt(const exprt &_src, const unsigned _distance):shift_exprt(_src, ID_lshr, _distance)
   {
   }
 };
@@ -3161,6 +3175,8 @@ public:
   }
 
   bool value_is_zero_string() const;
+  
+  static constant_exprt integer_constant(unsigned);
 };
 
 /*! \brief Cast a generic exprt to a \ref constant_exprt
