@@ -256,7 +256,8 @@ extractbits_exprt::extractbits_exprt(
   const exprt &_src,
   const unsigned _upper,
   const unsigned _lower,
-  const typet &_type)
+  const typet &_type):
+  exprt(ID_extractbits, _type)
 {
   assert(_upper>=_lower);
   operands().resize(3);
