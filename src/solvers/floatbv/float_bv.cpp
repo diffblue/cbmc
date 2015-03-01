@@ -663,7 +663,8 @@ exprt float_bvt::add_sub(
     if_exprt(src2_bigger, unpacked1.fraction, unpacked2.fraction);
 
   // compute distance
-  const exprt distance=abs_exprt(exponent_difference);
+  const exprt distance=
+    typecast_exprt(abs_exprt(exponent_difference), unsignedbv_typet(spec.e));
 
   // limit the distance: shifting more than f+3 bits is unnecessary
   const exprt limited_dist=limit_distance(distance, spec.f+3);
@@ -782,24 +783,24 @@ exprt float_bvt::limit_distance(
   mp_integer limit)
 {
   unsigned nb_bits=integer2unsigned(address_bits(limit));
+  unsigned dist_width=to_unsignedbv_type(dist.type()).get_width();
 
-  exprt upper_bits=dist;
-  #if 0
-  upper_bits.erase(upper_bits.begin(), upper_bits.begin()+nb_bits);
-  exprt or_upper_bits=prop.lor(upper_bits);
+  if(dist_width<=nb_bits)
+    return dist;
 
-  exprt lower_bits=dist;
-  lower_bits.resize(nb_bits);
+  exprt upper_bits=
+    extractbits_exprt(dist, dist_width-1, nb_bits,
+                      unsignedbv_typet(dist_width-nb_bits));
+  exprt upper_bits_zero=equal_exprt(upper_bits, gen_zero(upper_bits.type()));
 
-  exprt result;
-  result.resize(lower_bits.size());
+  exprt lower_bits=
+    extractbits_exprt(dist, nb_bits-1, 0,
+                      unsignedbv_typet(nb_bits));
 
-  // bitwise-or with or_upper_bits
-  for(unsigned int i=0; i<result.size(); i++)
-    result[i]=prop.lor(lower_bits[i], or_upper_bits);
-
-  return result;
-  #endif
+  return if_exprt(
+    upper_bits_zero,
+    lower_bits,
+    unsignedbv_typet(nb_bits).largest_expr());
 }
 
 /*******************************************************************\
@@ -1203,20 +1204,20 @@ void float_bvt::normalization_shift(
   for(int d=depth-1; d>=0; d--)
   {
     unsigned distance=(1<<d);
-    #if 0
-    assert(fraction.size()>distance);
+    assert(fraction_bits>distance);
     
     // check if first 'distance'-many bits are zeros
+    #if 0
     const exprt prefix=bv_utils.extract_msb(fraction, distance);
-    exprt prefix_is_zero=bv_utils.is_zero(prefix);
+    exprt prefix_is_zero=equal_exprt(prefix, gen_zer(prefix.type()));
     
     // If so, shift the zeros out left by 'distance'.
     // Otherwise, leave as is.
     const exprt shifted=
-      bv_utils.shift(fraction, bv_utilst::LEFT, distance);
+      shl_exprt(fraction, distance);
     
     fraction=
-      bv_utils.select(prefix_is_zero, shifted, fraction);
+      if_exprt(prefix_is_zero, shifted, fraction);
       
     // add corresponding weight to exponent
     assert(d<(signed)exponent_delta.size());
