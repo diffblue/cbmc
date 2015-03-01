@@ -185,6 +185,23 @@ void object_descriptor_exprt::build(
 
 /*******************************************************************\
 
+Function: constant_exprt::integer_constant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt constant_exprt::integer_constant(unsigned v)
+{
+  return constant_exprt(i2string(v), integer_typet());
+}
+
+/*******************************************************************\
+
 Function: extractbit_exprt::extractbit_exprt
 
   Inputs:
@@ -198,7 +215,8 @@ Function: extractbit_exprt::extractbit_exprt
 extractbit_exprt::extractbit_exprt(
   const exprt &_src,
   const unsigned _index):
-  binary_predicate_exprt(_src, ID_extractbit, constant_exprt(i2string(_index), integer_typet()))
+  binary_predicate_exprt(
+    _src, ID_extractbit, constant_exprt::integer_constant(_index))
 {
 }
 
@@ -223,7 +241,7 @@ extractbits_exprt::extractbits_exprt(
   assert(_upper>=_lower);
   operands().resize(3);
   src()=_src;
-  upper()=constant_exprt(i2string(_upper), integer_typet());
-  lower()=constant_exprt(i2string(_lower), integer_typet());
+  upper()=constant_exprt::integer_constant(_upper);
+  lower()=constant_exprt::integer_constant(_lower);
 }
 
