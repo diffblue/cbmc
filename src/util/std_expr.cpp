@@ -13,7 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "config.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
+#include "i2string.h"
 
+#include "std_types.h"
 #include "std_expr.h"
 
 /*******************************************************************\
@@ -179,5 +181,49 @@ void object_descriptor_exprt::build(
   build_object_descriptor_rec(ns, expr, *this);
 
   assert(root_object().type().id()!=ID_empty);
+}
+
+/*******************************************************************\
+
+Function: extractbit_exprt::extractbit_exprt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+extractbit_exprt::extractbit_exprt(
+  const exprt &_src,
+  const unsigned _index):
+  binary_predicate_exprt(_src, ID_extractbit, constant_exprt(i2string(_index), integer_typet()))
+{
+}
+
+/*******************************************************************\
+
+Function: extractbit_exprt::extractbits_exprt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+extractbits_exprt::extractbits_exprt(
+  const exprt &_src,
+  const unsigned _upper,
+  const unsigned _lower,
+  const typet &_type)
+{
+  assert(_upper>=_lower);
+  operands().resize(3);
+  src()=_src;
+  upper()=constant_exprt(i2string(_upper), integer_typet());
+  lower()=constant_exprt(i2string(_lower), integer_typet());
 }
 
