@@ -1953,6 +1953,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     convert_expr(let_expr.value());
     out << ")) ";
     convert_expr(let_expr.where());
+    out << ')'; // let
   }
   else
     UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is unsupported");
