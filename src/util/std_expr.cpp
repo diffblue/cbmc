@@ -202,6 +202,26 @@ constant_exprt constant_exprt::integer_constant(unsigned v)
 
 /*******************************************************************\
 
+Function: shift_exprt::shift_exprt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+shift_exprt::shift_exprt(
+  const exprt &_src,
+  const irep_idt &_id,
+  const unsigned _distance):
+  binary_exprt(_src, _id, constant_exprt::integer_constant(_distance))
+{
+}
+
+/*******************************************************************\
+
 Function: extractbit_exprt::extractbit_exprt
 
   Inputs:
