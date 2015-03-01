@@ -123,18 +123,19 @@ protected:
   biased_floatt bias(const unbiased_floatt &, const ieee_float_spect &);
 
   // this takes unpacked format, and returns packed
-  virtual exprt rounder(const unbiased_floatt &, const ieee_float_spect &);
+  virtual exprt rounder(const unbiased_floatt &, const exprt &rm, const ieee_float_spect &);
   exprt pack(const biased_floatt &, const ieee_float_spect &);
   unbiased_floatt unpack(const exprt &, const ieee_float_spect &);
 
-  void round_fraction(unbiased_floatt &result, const ieee_float_spect &);
-  void round_exponent(unbiased_floatt &result, const ieee_float_spect &);
+  void round_fraction(unbiased_floatt &result, const rounding_mode_bitst &, const ieee_float_spect &);
+  void round_exponent(unbiased_floatt &result, const rounding_mode_bitst &, const ieee_float_spect &);
   
   // rounding decision for fraction
   exprt fraction_rounding_decision(
     const unsigned dest_bits,
     const exprt sign,
-    const exprt &fraction);
+    const exprt &fraction,
+    const rounding_mode_bitst &);
 
   // helpers for adder
 
@@ -146,7 +147,6 @@ protected:
   // computes the "sticky-bit"
   exprt sticky_right_shift(
     const exprt &op,
-    const bv_utilst::shiftt shift_type,
     const exprt &dist,
     exprt &sticky);
 };
