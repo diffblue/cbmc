@@ -68,11 +68,6 @@ protected:
   exprt get_fraction(const exprt &, const ieee_float_spect &); // without hidden bit
   exprt sign_bit(const exprt &, const ieee_float_spect &);
 
-  inline constant_exprt uint_const(unsigned u)
-  {
-    return constant_exprt(i2string(u), typet(ID_integer));
-  }
-  
   exprt exponent_all_ones(const exprt &, const ieee_float_spect &);
   exprt exponent_all_zeros(const exprt &, const ieee_float_spect &);
   exprt fraction_all_zeros(const exprt &, const ieee_float_spect &);

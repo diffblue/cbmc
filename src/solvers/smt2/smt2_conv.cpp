@@ -958,6 +958,44 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
 
 /*******************************************************************\
 
+Function: smt2_convt::type2id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string smt2_convt::type2id(const typet &type)
+{
+  if(type.id()==ID_floatbv)
+  {
+    ieee_float_spect spec(to_floatbv_type(type));
+    return "f"+i2string(spec.width())+"_"+i2string(spec.f);
+  }
+  else if(type.id()==ID_unsignedbv)
+  {
+    return "u"+i2string(to_unsignedbv_type(type).get_width());
+  }
+  else if(type.id()==ID_signedbv)
+  {
+    return "s"+i2string(to_unsignedbv_type(type).get_width());
+  }
+  else if(type.id()==ID_bool)
+  {
+    return "b";
+  }
+  else
+  {
+    assert(false);
+    return "";
+  }
+}
+
+/*******************************************************************\
+
 Function: smt2_convt::floatbv_suffix
 
   Inputs:
@@ -968,9 +1006,10 @@ Function: smt2_convt::floatbv_suffix
 
 \*******************************************************************/
 
-std::string smt2_convt::floatbv_suffix(const floatbv_typet &type)
+std::string smt2_convt::floatbv_suffix(const exprt &expr)
 {
-  return "_"+i2string(type.get_width())+"_"+i2string(type.get_f());
+  assert(!expr.operands().empty());
+  return "_"+type2id(expr.op0().type())+"->"+type2id(expr.type());
 }
 
 /*******************************************************************\
@@ -987,19 +1026,20 @@ Function: smt2_convt::convert_floatbv
 
 void smt2_convt::convert_floatbv(const exprt &expr)
 {
+  assert(!use_FPA_theory);
   assert(!expr.operands().empty());
 
   out << "(|float_bv." << expr.id()
-      << floatbv_suffix(to_floatbv_type(expr.op0().type()))
+      << floatbv_suffix(expr)
       << '|';
 
   forall_operands(it, expr)
   {
     out << ' ';
-    convert(*it);
+    convert_expr(*it);
   }
   
-  out << ' ';
+  out << ')';
 }
 
 /*******************************************************************\
@@ -1029,6 +1069,12 @@ void smt2_convt::convert_expr(const exprt &expr)
     irep_idt id=expr.get(ID_identifier);
     assert(id!="");
     out << '|' << convert_identifier("nondet_"+id2string(id)) << '|';
+  }
+  else if(expr.id()==ID_smt2_symbol)
+  {
+    irep_idt id=expr.get(ID_identifier);
+    assert(id!=irep_idt());
+    out << id;
   }
   else if(expr.id()==ID_typecast)
   {
@@ -1512,77 +1558,64 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==2);
 
-    if(expr.op0().type().id()==ID_unsignedbv ||
-       expr.op0().type().id()==ID_signedbv ||
-       expr.op0().type().id()==ID_bv ||
-       expr.op0().type().id()==ID_fixedbv)
+    if(expr.op1().is_constant())
     {
-      if(expr.op1().is_constant())
-      {
-        mp_integer i;
-        if(to_integer(expr.op1(), i))
-          INVALIDEXPR("extractbit: to_integer failed");
+      mp_integer i;
+      if(to_integer(expr.op1(), i))
+        INVALIDEXPR("extractbit: to_integer failed");
 
-        out << "(= ((_ extract " << i << " " << i << ") ";
-        convert_expr(expr.op0());
-        out << ") bit1)";
-      }
-      else
-      {
-        out << "(= ((_ extract 0 0) ";
-        // the arguments of the shift need to have the same width
-        out << "(bvlshr ";
-        convert_expr(expr.op0());
-        typecast_exprt tmp(expr.op0().type());
-        tmp.op0()=expr.op1();
-        convert_expr(tmp);
-        out << ")) bin1)"; // bvlshr, extract, =
-      }
+      out << "(= ((_ extract " << i << " " << i << ") ";
+      flatten2bv(expr.op0());
+      out << ") bit1)";
     }
     else
-      UNEXPECTEDCASE("unsupported type for "+expr.id_string()+": "+expr.op0().type().id_string());
+    {
+      out << "(= ((_ extract 0 0) ";
+      // the arguments of the shift need to have the same width
+      out << "(bvlshr ";
+      flatten2bv(expr.op0());
+      typecast_exprt tmp(expr.op0().type());
+      tmp.op0()=expr.op1();
+      convert_expr(tmp);
+      out << ")) bin1)"; // bvlshr, extract, =
+    }
   }
   else if(expr.id()==ID_extractbits)
   {
     assert(expr.operands().size()==3);
-
-    if(expr.op0().type().id()==ID_unsignedbv ||
-       expr.op0().type().id()==ID_signedbv ||
-       expr.op0().type().id()==ID_bv ||
-       expr.op0().type().id()==ID_fixedbv ||
-       expr.op0().type().id()==ID_vector)
+    
+    if(expr.op1().is_constant() &&
+       expr.op2().is_constant())
     {
-      if(expr.op1().is_constant() &&
-         expr.op2().is_constant())
-      {
-        mp_integer op1_i, op2_i;
-        if(to_integer(expr.op1(), op1_i))
-          INVALIDEXPR("extractbits: to_integer failed");
+      mp_integer op1_i, op2_i;
+      if(to_integer(expr.op1(), op1_i))
+        INVALIDEXPR("extractbits: to_integer failed");
 
-        if(to_integer(expr.op2(), op2_i))
-          INVALIDEXPR("extractbits: to_integer failed");
+      if(to_integer(expr.op2(), op2_i))
+        INVALIDEXPR("extractbits: to_integer failed");
 
-        out << "((_ extract " << op1_i << " " << op2_i << ") ";
-        convert_expr(expr.op0());
-        out << ")";
-      }
-      else
-      {
-        #if 0
-        out << "(= ((_ extract 0 0) ";
-        // the arguments of the shift need to have the same width
-        out << "(bvlshr ";
-        convert_expr(expr.op0());
-        typecast_exprt tmp(expr.op0().type());
-        tmp.op0()=expr.op1();
-        convert_expr(tmp);
-        out << ")) bin1)"; // bvlshr, extract, =
-        #endif
-        TODO("smt2: extractbits with non-constant index");
-      }
+      if(op2_i>op1_i) std::swap(op1_i, op2_i);
+      
+      // now op1_i>=op2_i
+
+      out << "((_ extract " << op1_i << " " << op2_i << ") ";
+      flatten2bv(expr.op0());
+      out << ")";
     }
     else
-      UNEXPECTEDCASE("unsupported type for "+expr.id_string()+": "+expr.op0().type().id_string());
+    {
+      #if 0
+      out << "(= ((_ extract 0 0) ";
+      // the arguments of the shift need to have the same width
+      out << "(bvlshr ";
+      convert_expr(expr.op0());
+      typecast_exprt tmp(expr.op0().type());
+      tmp.op0()=expr.op1();
+      convert_expr(tmp);
+      out << ")) bin1)"; // bvlshr, extract, =
+      #endif
+      TODO("smt2: extractbits with non-constant index");
+    }
   }
   else if(expr.id()==ID_replication)
   {
@@ -2070,8 +2103,6 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else if(src_type.id()==ID_floatbv) // from floatbv to int
     {
-      //const floatbv_typet &floatbv_type=to_floatbv_type(src_type);
-
       /* ISO 9899:1999
        *  6.3.1.4 Real floating and integer
        *  1 When a finite value of real floating type is converted
@@ -2110,36 +2141,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 	}
       }
       else
-      {
-        if(dest_type.id()==ID_bv)
-        {
-          // This is _NOT_ a semantic conversion, but bit-wise,
-          // and straight-forward if the width matches.
-          convert_expr(src);
-        }
-	else if(dest_type.id()==ID_signedbv)
-        {
-          out << "(bvfp.to_sbv"
-              << floatbv_suffix(to_floatbv_type(expr.type()))
-              << "_" << to_width << " ";
-	  out << "roundTowardZero ";
-          convert_expr(src);
-          out << ")";
-        }
-	else if(dest_type.id()==ID_unsignedbv)
-        {
-          out << "(bvfp.to_ubv"
-              << floatbv_suffix(to_floatbv_type(expr.type()))
-              << "_" << to_width << " ";
-	  out << "roundTowardZero ";
-          convert_expr(src);
-          out << ")";
-        }
-        else
-	{
-	  UNEXPECTEDCASE("TODO typecast "+src_type.id_string()+" -> "+dest_type.id_string());
-	}
-      }
+        convert_floatbv(src);
     }
     else if(src_type.id()==ID_bool) // from boolean to int
     {
@@ -2498,14 +2500,7 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
         out << ")";
       }
       else
-      {
-        out << "(bvfp.to_fp" << floatbv_suffix(to_floatbv_type(src.type()))
-            << "_to_" << dst.get_e() << " " << dst.get_f() + 1 << " ";
-        convert_expr(src);
-	out << " ";
-	convert_expr(expr.op1()); // rounding mode
-        out << ")";
-      }
+        convert_floatbv(expr);
     }
     else if(src_type.id()==ID_unsignedbv)
     {
@@ -2536,17 +2531,7 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
         out << ")";
       }
       else
-      {
-        out << "(bvfp.to_fp_unsigned"
-            <<  to_unsignedbv_type(src_type).get_width()
-            << "_to_"
-            << floatbv_suffix(dst)
-            << " ";
-        convert_expr(src);
-	out << " ";
-	convert_expr(expr.op1());
-        out << ")";
-      }
+        convert_floatbv(expr);
     }
     else if(src_type.id()==ID_signedbv)
     {
@@ -2564,17 +2549,7 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
         out << ")";
       }
       else
-      {
-        out << "(bvfp.to_fp_signed"
-            <<  to_unsignedbv_type(src_type).get_width()
-            << "_to_"
-            << floatbv_suffix(dst)
-            << " ";
-        convert_expr(src);
-	out << " ";
-	convert_expr(expr.op1()); // rounding mode
-        out << ")";
-      }
+        convert_floatbv(expr);
     }
     else
       UNEXPECTEDCASE("TODO typecast11 "+src_type.id_string()+" -> "+dest_type.id_string());
@@ -4209,6 +4184,13 @@ void smt2_convt::flatten2bv(const exprt &expr)
     else
       convert_expr(expr);
   }
+  else if(type.id()==ID_floatbv)
+  {
+    if(use_FPA_theory)
+      INVALIDEXPR("need to flatten floatbv in FPA theory");
+    else
+      convert_expr(expr); // good as is
+  }
   else
     convert_expr(expr);
 }
@@ -4599,99 +4581,61 @@ void smt2_convt::find_symbols(const exprt &expr)
       }
     }
   }
-  else if(expr.id()==ID_floatbv_plus ||
-          expr.id()==ID_floatbv_minus ||
-          expr.id()==ID_floatbv_mult ||
-          expr.id()==ID_floatbv_div)
-  {
-    floatbv_typet type=to_floatbv_type(expr.type());
-    irep_idt function=
-      "|float_bv."+expr.id_string()+floatbv_suffix(type)+"|";
-      
-    if(bvfp_set.insert(function).second)
-    {
-      out << "; this is a model for " << expr.id() << "\n"
-          << "(define-fun " << function << " (";
-      out << "(op0 ";
-      convert_type(expr.op0().type());
-      out << ")";
-      out << "(op1 ";
-      convert_type(expr.op1().type());
-      out << ") ";
-      out << "(rm ";
-      convert_type(expr.op2().type());
-      out << ")) ";
-      convert_type(expr.type()); // return type
-      out << " ";
-      
-      ieee_float_op_exprt tmp=to_ieee_float_op_expr(expr);
-      tmp.op0()=smt2_symbolt("op0", type);
-      tmp.op1()=smt2_symbolt("op1", type);
-      tmp.rounding_mode()=smt2_symbolt("rm", unsignedbv_typet());
-      convert_expr(float_bv(tmp));
-
-      out << ")\n"; // define-fun
-    }
-  }
-  else if((expr.id()==ID_lt ||
+  else if(!use_FPA_theory &&
+          (expr.id()==ID_floatbv_plus ||
+           expr.id()==ID_floatbv_minus ||
+           expr.id()==ID_floatbv_mult ||
+           expr.id()==ID_floatbv_div ||
+           expr.id()==ID_lt ||
            expr.id()==ID_gt ||
            expr.id()==ID_le ||
-           expr.id()==ID_ge) &&
-          expr.operands().size()==2 &&
-          expr.op0().type().id()==ID_floatbv)
-  {
-    floatbv_typet type=to_floatbv_type(expr.op0().type());
-    irep_idt function=
-      "|float_bv."+expr.id_string()+floatbv_suffix(type)+"|";
-      
-    if(bvfp_set.insert(function).second)
-    {
-      out << "; this is a model for " << expr.id() << "\n"
-          << "(define-fun " << function << " (";
-      out << "(op0 ";
-      convert_type(expr.op0().type());
-      out << ")";
-      out << "(op1 ";
-      convert_type(expr.op1().type());
-      out << ")) ";
-      convert_type(expr.type()); // return type
-      out << " ";
-      
-      exprt tmp=expr;
-      tmp.op0()=smt2_symbolt("op0", type);
-      tmp.op1()=smt2_symbolt("op1", type);
-      convert_expr(float_bv(tmp));
-
-      out << ")\n"; // define-fun
-    }
-  }
-  else if((expr.id()==ID_isnan ||
+           expr.id()==ID_ge ||
+           expr.id()==ID_floatbv_typecast ||
+           expr.id()==ID_ieee_float_equal ||
+           expr.id()==ID_ieee_float_notequal ||
+           expr.id()==ID_isnan ||
            expr.id()==ID_isnormal ||
            expr.id()==ID_isfinite ||
            expr.id()==ID_isinf ||
            expr.id()==ID_sign ||
            expr.id()==ID_unary_minus ||
+           expr.id()==ID_typecast ||
            expr.id()==ID_abs) &&
-          expr.operands().size()==1 &&
+          expr.operands().size()>=1 &&
           expr.op0().type().id()==ID_floatbv)
   {
-    floatbv_typet type=to_floatbv_type(expr.op0().type());
+    floatbv_typet op0_type=to_floatbv_type(expr.op0().type());
     irep_idt function=
-      "|float_bv."+expr.id_string()+floatbv_suffix(type)+"|";
+      "|float_bv."+expr.id_string()+floatbv_suffix(expr)+"|";
       
     if(bvfp_set.insert(function).second)
     {
-      out << "; this is a model for " << expr.id() << "\n"
+      out << "; this is a model for " << expr.id()
+          << " : " << type2id(expr.op0().type())
+          << " -> " << type2id(expr.type()) << "\n"
           << "(define-fun " << function << " (";
-      out << "(op ";
-      convert_type(expr.op0().type());
-      out << ")) ";
-      convert_type(expr.type()); // return type
-      out << " ";
+
+      for(unsigned i=0; i<expr.operands().size(); i++)
+      {
+        if(i!=0) out << " ";
+        out << "(op" << i << ' ';
+        convert_type(expr.operands()[i].type());
+        out << ')';
+      }
       
-      exprt tmp=expr;
-      tmp.op0()=smt2_symbolt("op", type);
-      convert_expr(float_bv(tmp));
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ' ';
+      
+      exprt tmp1=expr;
+      for(unsigned i=0; i<tmp1.operands().size(); i++)
+        tmp1.operands()[i]=
+          smt2_symbolt("op"+i2string(i), tmp1.operands()[i].type());
+
+      exprt tmp2=float_bv(tmp1);
+      assert(!tmp2.is_nil());
+
+      convert_expr(tmp2);
 
       out << ")\n"; // define-fun
     }

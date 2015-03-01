@@ -317,7 +317,7 @@ exprt float_bvt::sign_bit(
   const exprt &op,
   const ieee_float_spect &spec)
 {
-  return extractbit_exprt(op, uint_const(spec.width()-1));
+  return extractbit_exprt(op, spec.width()-1);
 }
 
 /*******************************************************************\
@@ -783,8 +783,8 @@ exprt float_bvt::limit_distance(
 {
   unsigned nb_bits=integer2unsigned(address_bits(limit));
 
-  #if 0
   exprt upper_bits=dist;
+  #if 0
   upper_bits.erase(upper_bits.begin(), upper_bits.begin()+nb_bits);
   exprt or_upper_bits=prop.lor(upper_bits);
 
@@ -908,21 +908,23 @@ exprt float_bvt::div(
   // divide fractions
   unbiased_floatt result;
   exprt rem;
-  #if 0
-  bv_utils.unsigned_divider(fraction1, fraction2, result.fraction, rem);
+
+  // the below should be merged somehow
+  result.fraction=div_exprt(fraction1, fraction2);
+  rem=mod_exprt(fraction1, fraction2);
   
   // is there a remainder?
-  exprt have_remainder=notequal_exprt(rem, gen_zero(rem.type());
+  exprt have_remainder=notequal_exprt(rem, gen_zero(rem.type()));
   
-  // we throw this into the result, as one additional bit,
+  // we throw this into the result, as least-significand bit,
   // to get the right rounding decision
-  result.fraction.insert(
-    result.fraction.begin(), have_remainder);
+  result.fraction=
+    concatenation_exprt(result.fraction, have_remainder, unsignedbv_typet(div_width+1));
     
   // We will subtract the exponents;
   // to account for overflow, we add a bit.
-  const exprt exponent1=bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size()+1);
-  const exprt exponent2=bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size()+1);
+  const exprt exponent1=typecast_exprt(unpacked1.exponent, signedbv_typet(spec.e+1));
+  const exprt exponent2=typecast_exprt(unpacked2.exponent, signedbv_typet(spec.e+1));
 
   // subtract exponents
   exprt added_exponent=minus_exprt(exponent1, exponent2);
@@ -931,7 +933,6 @@ exprt float_bvt::div(
   result.exponent=plus_exprt(
     added_exponent,
     from_integer(spec.f, added_exponent.type()));
-  #endif
 
   // new sign
   result.sign=notequal_exprt(unpacked1.sign, unpacked2.sign);
@@ -1122,7 +1123,7 @@ exprt float_bvt::get_exponent(
   const ieee_float_spect &spec)
 {
   return extractbits_exprt(
-    src, uint_const(spec.f+spec.e-1), uint_const(spec.f),
+    src, spec.f+spec.e-1, spec.f,
     unsignedbv_typet(spec.e));
 }
 
@@ -1144,7 +1145,7 @@ exprt float_bvt::get_fraction(
   const ieee_float_spect &spec)
 {
   return extractbits_exprt(
-    src, uint_const(spec.f-1), uint_const(0),
+    src, spec.f-1, 0,
     unsignedbv_typet(spec.f));
 }
 
@@ -1246,7 +1247,6 @@ void float_bvt::denormalization_shift(
 {
   mp_integer bias=spec.bias();
 
-  #if 0
   // Is the exponent strictly less than -bias+1, i.e., exponent<-bias+1?
   // This is transformed to distance=(-bias+1)-exponent
   // i.e., distance>0
@@ -1254,24 +1254,25 @@ void float_bvt::denormalization_shift(
   // i.e. the exponent of the smallest normal number and thus the 'base'
   // exponent for subnormal numbers.
   
-  assert(exponent.size()>=spec.e);
+  assert(to_signedbv_type(exponent.type()).get_width()>=spec.e);
 
+  #if 0
 #if 1
   // Need to sign extend to avoid overflow.  Note that this is a
   // relatively rare problem as the value needs to be close to the top
   // of the exponent range and then range must not have been
   // previously extended as add, multiply, etc. do.  This is primarily
   // to handle casting down from larger ranges.
-  exponent = bv_utils.sign_extension(exponent, exponent.size() + 1);
+  exponent=bv_utils.sign_extension(exponent, exponent.size() + 1);
 #endif
 
-  exprt distance=bv_utils.sub(
-    bv_utils.build_constant(-bias+1, exponent.size()), exponent);
+  exprt distance=sub_exprt(
+    from_integer(-bias+1, exponent.type()), exponent);
 
   // use sign bit
   exprt denormal=and_exprt(
     not_exprt(distance.back()),
-    not_exprt(bv_utils.is_zero(distance)));
+    notequal_exprt(distance, gen_zero(distance.type())));
 
 #if 1
   // Care must be taken to not loose information required for the
@@ -1280,8 +1281,8 @@ void float_bvt::denormalization_shift(
   { 
     // Add zeros at the LSB end for the guard bit to shift into
     fraction=
-      bv_utils.concatenate(bv_utils.zeros((spec.f + 3) - fraction.size()),
-                           fraction);
+      concatenation_exprt(bv_utils.zeros((spec.f + 3) - fraction.size()),
+                          fraction);
   }
 
   exprt denormalisedFraction = fraction;
@@ -1383,11 +1384,13 @@ exprt float_bvt::fraction_rounding_decision(
   const exprt sign,
   const exprt &fraction)
 {
-  #if 0
-  assert(dest_bits<fraction.size());
+  unsigned fraction_bits=
+    to_unsignedbv_type(fraction.type()).get_width();
+
+  assert(dest_bits<fraction_bits);
 
   // we have too many fraction bits
-  unsigned extra_bits=fraction.size()-dest_bits;
+  unsigned extra_bits=fraction_bits-dest_bits;
 
   // more than two extra bits are superflus, and are
   // turned into a sticky bit
@@ -1398,16 +1401,18 @@ exprt float_bvt::fraction_rounding_decision(
   {
     // We keep most-significant bits, and thus the tail is made
     // of least-significant bits.
-    exprt tail=bv_utils.extract(fraction, 0, extra_bits-2);
-    sticky_bit=or_exprt(tail);
+    exprt tail=
+      extractbits_exprt(fraction, extra_bits-2, 0,
+                        unsignedbv_typet(extra_bits-2+1));
+    sticky_bit=notequal_exprt(tail, gen_zero(tail.type()));
   }
 
   // the rounding bit is the last extra bit
   assert(extra_bits>=1);
-  exprt rounding_bit=fraction[extra_bits-1];
+  exprt rounding_bit=extractbit_exprt(fraction, extra_bits-1);
 
   // we get one bit of the fraction for some rounding decisions
-  exprt rounding_least=fraction[extra_bits];
+  exprt rounding_least=extractbit_exprt(fraction, extra_bits);
 
   // round-to-nearest (ties to even)
   exprt round_to_even=
@@ -1428,6 +1433,7 @@ exprt float_bvt::fraction_rounding_decision(
   exprt round_to_zero=
     false_exprt();
 
+  #if 0
   // now select appropriate one
   return if_exprt(rounding_mode_bits.round_to_even, round_to_even,
          if_exprt(rounding_mode_bits.round_to_plus_inf, round_to_plus_inf,
@@ -1653,15 +1659,15 @@ float_bvt::biased_floatt float_bvt::bias(
   // we need to bias the new exponent
   result.exponent=add_bias(src.exponent, spec);
 
-  // strip off hidden bit
+  // strip off the hidden bit
   assert(to_unsignedbv_type(src.fraction.type()).get_width()==spec.f+1);
 
-  exprt hidden_bit=extractbit_exprt(src.fraction, uint_const(spec.f));
+  exprt hidden_bit=extractbit_exprt(src.fraction, spec.f);
   exprt denormal=not_exprt(hidden_bit);
 
   result.fraction=
     extractbits_exprt(
-      src.fraction, uint_const(spec.f-1), uint_const(0),
+      src.fraction, spec.f-1, 0,
       unsignedbv_typet(spec.f));
 
   // make exponent zero if its denormal
