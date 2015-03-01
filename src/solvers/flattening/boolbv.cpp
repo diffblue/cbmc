@@ -337,6 +337,11 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return convert_lambda(expr, bv);
   else if(expr.id()==ID_array_of)
     return convert_array_of(to_array_of_expr(expr), bv);
+  else if(expr.id()==ID_let)
+  {
+    //const let_exprt &let_expr=to_let_expr(expr);
+    throw "let is todo";
+  }
   else if(expr.id()==ID_function_application)
   {
     // make it free bits

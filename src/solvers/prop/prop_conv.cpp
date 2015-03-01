@@ -413,6 +413,11 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
         equal?prop.lequal(tmp1, tmp2):prop.lxor(tmp1, tmp2);
     }
   }
+  else if(expr.id()==ID_let)
+  {
+    //const let_exprt &let_expr=to_let_expr(expr);
+    throw "let is todo";
+  }
 
   return convert_rest(expr);
 }
