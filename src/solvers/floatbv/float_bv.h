@@ -108,14 +108,14 @@ protected:
     }
   };
 
-  // this has a biased exponent
-  // and an _implicit_ hidden bit
+  // This has a biased exponent (unsigned)
+  // and an _implicit_ hidden bit.
   struct biased_floatt:public unpacked_floatt
   {
   };
 
-  // the hidden bit is explicit,
-  // and the exponent is not biased
+  // The hidden bit is explicit,
+  // and the exponent is not biased (signed)
   struct unbiased_floatt:public unpacked_floatt
   {
   };
