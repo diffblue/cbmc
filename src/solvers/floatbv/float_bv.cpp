@@ -337,15 +337,16 @@ exprt float_bvt::from_signed_integer(
   const exprt &rm,
   const ieee_float_spect &spec)
 {
+  unsigned src_width=to_signedbv_type(src.type()).get_width();
+
   unbiased_floatt result;
 
   // we need to adjust for negative integers
   result.sign=sign_bit(src, spec);
 
-  result.fraction=abs_exprt(src);
+  result.fraction=
+    typecast_exprt(abs_exprt(src), unsignedbv_typet(src_width));
   
-  unsigned src_width=to_signedbv_type(src.type()).get_width();
-
   // build an exponent (unbiased) -- this is signed!
   result.exponent=
     from_integer(
@@ -1224,7 +1225,7 @@ void float_bvt::normalization_shift(
     assert(d<(signed int)exponent_bits);
 
     exponent_delta=
-      or_exprt(exponent_delta,
+      bitor_exprt(exponent_delta,
         shl_exprt(typecast_exprt(prefix_is_zero, exponent_delta.type()), d));
   }  
     
@@ -1299,7 +1300,7 @@ void float_bvt::denormalization_shift(
     sticky_right_shift(fraction, distance, sticky_bit);
 
   denormalisedFraction=
-    or_exprt(denormalisedFraction,
+    bitor_exprt(denormalisedFraction,
       typecast_exprt(sticky_bit, denormalisedFraction.type()));
 
   fraction=
@@ -1342,7 +1343,7 @@ exprt float_bvt::rounder(
   // incoming: some fraction (with explicit 1),
   //           some exponent without bias
   // outgoing: rounded, with right size, with hidden bit, bias
-
+  
   exprt aligned_fraction=src.fraction,
         aligned_exponent=src.exponent;
 
@@ -1564,7 +1565,7 @@ void float_bvt::round_fraction(
     // post normalization of the fraction
     // In the case of overflow, set the MSB to 1
     // The subnormal case will have (only) the MSB set to 1
-    result.fraction=or_exprt(
+    result.fraction=bitor_exprt(
       result.fraction,
       if_exprt(overflow,
                from_integer(1<<(fraction_size-1), result.fraction.type()),
@@ -1808,7 +1809,7 @@ exprt float_bvt::pack(
   const ieee_float_spect &spec)
 {
   assert(to_unsignedbv_type(src.fraction.type()).get_width()==spec.f);
-  assert(to_signedbv_type(src.exponent.type()).get_width()==spec.e);
+  assert(to_unsignedbv_type(src.exponent.type()).get_width()==spec.e);
 
   // do sign -- we make this 'false' for NaN
   exprt sign_bit=
