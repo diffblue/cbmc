@@ -985,7 +985,7 @@ std::string smt2_convt::type2id(const typet &type)
   }
   else if(type.id()==ID_signedbv)
   {
-    return "s"+i2string(to_unsignedbv_type(type).get_width());
+    return "s"+i2string(to_signedbv_type(type).get_width());
   }
   else if(type.id()==ID_bool)
   {
