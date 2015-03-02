@@ -397,7 +397,7 @@ bvt float_utilst::add_sub(
   literalt sticky_bit;
   const bvt fraction1_shifted=fraction1_padded;
   const bvt fraction2_shifted=sticky_right_shift(
-    fraction2_padded, bv_utilst::LRIGHT, limited_dist, sticky_bit);
+    fraction2_padded, limited_dist, sticky_bit);
 
   // sticky bit: or of the bits lost by the right-shift
   bvt fraction2_stickied=fraction2_shifted;
@@ -1172,7 +1172,7 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
 
   literalt sticky_bit = const_literal(false);
   denormalisedFraction = 
-    sticky_right_shift(fraction, bv_utilst::LRIGHT, distance, sticky_bit);
+    sticky_right_shift(fraction, distance, sticky_bit);
   denormalisedFraction[0] = prop.lor(denormalisedFraction[0], sticky_bit);
 
   fraction=
@@ -1706,15 +1706,10 @@ Function: float_utilst::sticky_right_shift
 
 bvt float_utilst::sticky_right_shift(
   const bvt &op,
-  const bv_utilst::shiftt shift_type,
   const bvt &dist,
   literalt &sticky)
 {
-  // only right shifts
-  assert(shift_type==bv_utilst::LRIGHT ||
-         shift_type==bv_utilst::ARIGHT);
-
-  unsigned d=1, width=op.size();
+  unsigned d=1;
   bvt result=op;
   sticky=const_literal(false);
 
@@ -1722,11 +1717,11 @@ bvt float_utilst::sticky_right_shift(
   {
     if(dist[stage]!=const_literal(false))
     {
-      bvt tmp=bv_utils.shift(result, shift_type, d);
+      bvt tmp=bv_utils.shift(result, bv_utilst::LRIGHT, d);
 
       bvt lost_bits;
 
-      if(d <= result.size())
+      if(d<=result.size())
         lost_bits=bv_utils.extract(result, 0, d-1);
       else
         lost_bits=result;
@@ -1735,8 +1730,7 @@ bvt float_utilst::sticky_right_shift(
           prop.land(dist[stage],prop.lor(lost_bits)),
           sticky);
 
-      for(unsigned i=0; i<width; i++)
-        result[i]=prop.lselect(dist[stage], tmp[i], result[i]);
+      result=bv_utils.select(dist[stage], tmp, result);
     }
 
     d=d<<1;

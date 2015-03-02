@@ -196,7 +196,6 @@ protected:
   // computes the "sticky-bit"
   bvt sticky_right_shift(
     const bvt &op,
-    const bv_utilst::shiftt shift_type,
     const bvt &dist,
     literalt &sticky);
 };
