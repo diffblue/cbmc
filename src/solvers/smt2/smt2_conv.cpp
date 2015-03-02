@@ -1270,7 +1270,15 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
         convert_floatbv(expr);
-    } 
+    }
+    else if(op_type.id()==ID_signedbv)
+    {
+      std::size_t op_width=to_signedbv_type(op_type).get_width();
+            
+      out << "(bvslt ";
+      convert_expr(expr.op0());
+      out << " (_ bv0 " << op_width << "))";
+    }
     else
       UNEXPECTEDCASE("sign applied to type " + expr.type().id_string());
   }
