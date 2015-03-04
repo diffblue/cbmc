@@ -1459,25 +1459,44 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       // SMT2 requires the shift distance to have the same width as
       // the value that is shifted -- odd!
-
-      std::size_t width_op0=boolbv_width(expr.op0().type());
-      std::size_t width_op1=boolbv_width(expr.op1().type());
-
-      if(width_op0==width_op1)
-        convert_expr(expr.op1());
-      else if(width_op0>width_op1)
+      
+      if(expr.op1().type().id()==ID_integer)
       {
-        out << "((_ zero_extend " << width_op0-width_op1 << ") ";
-        convert_expr(expr.op1());
-        out << ")"; // zero_extend
-      }
-      else // width_op0<width_op1
-      {
-        out << "((_ extract " << width_op0-1 << " 0) ";
-        convert_expr(expr.op1());
-        out << ")"; // extract
-      }
+        mp_integer i;
+        if(to_integer(expr.op1(), i))
+          UNEXPECTEDCASE("op1 on shift not a constant");
 
+        // shift distance must be bit vector
+        std::size_t width_op0=boolbv_width(expr.op0().type());
+        exprt tmp=from_integer(i, unsignedbv_typet(width_op0));
+        convert_expr(tmp);
+      }
+      else if(expr.op1().type().id()==ID_signedbv ||
+              expr.op1().type().id()==ID_unsignedbv ||
+              expr.op1().type().id()==ID_c_enum ||
+              expr.op1().type().id()==ID_c_bool)
+      {
+        std::size_t width_op0=boolbv_width(expr.op0().type());
+        std::size_t width_op1=boolbv_width(expr.op1().type());
+
+        if(width_op0==width_op1)
+          convert_expr(expr.op1());
+        else if(width_op0>width_op1)
+        {
+          out << "((_ zero_extend " << width_op0-width_op1 << ") ";
+          convert_expr(expr.op1());
+          out << ")"; // zero_extend
+        }
+        else // width_op0<width_op1
+        {
+          out << "((_ extract " << width_op0-1 << " 0) ";
+          convert_expr(expr.op1());
+          out << ")"; // extract
+        }
+      }
+      else
+        UNEXPECTEDCASE("unsupported op1 type for "+expr.id_string()+": "+type.id_string());
+      
       out << ")"; // bv*sh
     }
     else
