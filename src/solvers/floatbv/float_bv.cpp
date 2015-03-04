@@ -297,15 +297,15 @@ Function: float_bvt::rounding_mode_bitst::get
 
 void float_bvt::rounding_mode_bitst::get(const exprt &rm)
 {
-  exprt round_to_even=from_integer(ieee_floatt::ROUND_TO_EVEN, rm.type());
-  exprt round_to_plus_inf=from_integer(ieee_floatt::ROUND_TO_PLUS_INF, rm.type());
-  exprt round_to_minus_inf=from_integer(ieee_floatt::ROUND_TO_MINUS_INF, rm.type());
-  exprt round_to_zero=from_integer(ieee_floatt::ROUND_TO_ZERO, rm.type());
+  exprt round_to_even_const=from_integer(ieee_floatt::ROUND_TO_EVEN, rm.type());
+  exprt round_to_plus_inf_const=from_integer(ieee_floatt::ROUND_TO_PLUS_INF, rm.type());
+  exprt round_to_minus_inf_const=from_integer(ieee_floatt::ROUND_TO_MINUS_INF, rm.type());
+  exprt round_to_zero_const=from_integer(ieee_floatt::ROUND_TO_ZERO, rm.type());
 
-  round_to_even=equal_exprt(rm, round_to_even);
-  round_to_plus_inf=equal_exprt(rm, round_to_plus_inf);
-  round_to_minus_inf=equal_exprt(rm, round_to_minus_inf);
-  round_to_zero=equal_exprt(rm, round_to_zero);
+  round_to_even=equal_exprt(rm, round_to_even_const);
+  round_to_plus_inf=equal_exprt(rm, round_to_plus_inf_const);
+  round_to_minus_inf=equal_exprt(rm, round_to_minus_inf_const);
+  round_to_zero=equal_exprt(rm, round_to_zero_const);
 }
 
 /*******************************************************************\
@@ -384,7 +384,7 @@ exprt float_bvt::from_unsigned_integer(
 
   result.fraction=src;
 
-  unsigned src_width=to_signedbv_type(src.type()).get_width();
+  unsigned src_width=to_unsignedbv_type(src.type()).get_width();
 
   // build an exponent (unbiased) -- this is signed!
   result.exponent=
