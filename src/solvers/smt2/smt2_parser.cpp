@@ -177,7 +177,7 @@ void smt2_parsert::operator()()
       
     case '"': // string literal
       get_string_literal();
-      symbol();
+      string_literal();
       if(open_parentheses==0) return; // done
       break;
 

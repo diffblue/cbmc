@@ -37,7 +37,27 @@ protected:
     else
       out << ' ';
 
+    // possibly need to quote
     out << buffer;
+  }
+  
+  virtual void string_literal()
+  {
+    if(first)
+      first=false;
+    else
+      out << ' ';
+
+    out << '"';
+
+    for(unsigned i=0; i<buffer.size(); i++)
+    {
+      char ch=buffer[i];
+      if(ch=='"') out << '\\';
+      out << ch;
+    }
+
+    out << '"';
   }
   
   virtual void open_expression() // '('
@@ -52,6 +72,7 @@ protected:
   virtual void close_expression() // ')'
   {
     out << ')';
+    first=false;
   }
 };
 

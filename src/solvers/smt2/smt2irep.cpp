@@ -39,6 +39,11 @@ protected:
       stack.top().get_sub().push_back(irept(buffer));
   }
   
+  virtual void string_literal()
+  {
+    symbol(); // we don't distinguish
+  }
+  
   virtual void open_expression() // '('
   {
     // produce sub-irep
