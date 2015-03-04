@@ -462,44 +462,41 @@ exprt float_bvt::to_integer(
   
   rounding_mode_bitst rounding_mode_bits(rm);
 
-  // The following is the usual case in ANSI-C, and we optimize for that.
-  if(rounding_mode_bits.round_to_zero.is_true())
+  // Right now hard-wired to round-to-zero, which is
+  // the usual case in ANSI-C.
+
+  // if the exponent is positive, shift right
+  exprt offset=from_integer(spec.f, signedbv_typet(spec.e));
+  exprt distance=minus_exprt(offset, unpacked.exponent);
+  exprt shift_result=lshr_exprt(unpacked.fraction, distance);
+
+  // if the exponent is negative, we have zero anyways
+  exprt result=shift_result;
+  exprt exponent_sign=sign_exprt(unpacked.exponent);
+
+  result=
+    if_exprt(exponent_sign, gen_zero(result.type()), result);
+
+  // chop out the right number of bits from the result
+  typet result_type=
+    is_signed?static_cast<typet>(signedbv_typet(dest_width)):
+              static_cast<typet>(unsignedbv_typet(dest_width));
+  
+  result=typecast_exprt(result, result_type);
+
+  // if signed, apply sign.
+  if(is_signed)
   {
-    // if the exponent is positive, shift right
-    exprt offset=from_integer(spec.f, signedbv_typet(spec.e));
-    exprt distance=minus_exprt(offset, unpacked.exponent);
-    exprt shift_result=lshr_exprt(unpacked.fraction, distance);
-
-    // if the exponent is negative, we have zero anyways
-    exprt result=shift_result;
-    exprt exponent_sign=sign_exprt(unpacked.exponent);
-
-    result=
-      if_exprt(exponent_sign, gen_zero(result.type()), result);
-
-    // chop out the right number of bits from the result
-    typet result_type=
-      is_signed?static_cast<typet>(signedbv_typet(dest_width)):
-                static_cast<typet>(unsignedbv_typet(dest_width));
-    
-    result=typecast_exprt(result, result_type);
-
-    // if signed, apply sign.
-    if(is_signed)
-    {
-      result=if_exprt(
-        unpacked.sign, unary_minus_exprt(result), result);
-    }
-    else
-    {
-      // It's unclear what the behaviour for negative floats
-      // to integer shall be.
-    }
-
-    return result;
+    result=if_exprt(
+      unpacked.sign, unary_minus_exprt(result), result);
   }
   else
-    assert(0);
+  {
+    // It's unclear what the behaviour for negative floats
+    // to integer shall be.
+  }
+
+  return result;
 }
 
 /*******************************************************************\

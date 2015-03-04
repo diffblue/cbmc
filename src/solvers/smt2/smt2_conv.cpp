@@ -2125,45 +2125,33 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else if(src_type.id()==ID_floatbv) // from floatbv to int
     {
-      /* ISO 9899:1999
-       *  6.3.1.4 Real floating and integer
-       *  1 When a finite value of real floating type is converted
-       *  to an integer type other than _Bool, the fractional part
-       *  is discarded (i.e., the value is truncated toward zero).
-       */
-
-      if(use_FPA_theory)
+      if(dest_type.id()==ID_bv)
       {
-        if(dest_type.id()==ID_bv)
-        {
-          // this is _NOT_ a semantic conversion, but bit-wise
+        // this is _NOT_ a semantic conversion, but bit-wise
 
-	  // This conversion is non-trivial as it requires creating a 
-	  // new bit-vector variable and then asserting that it converts
-	  // to the required floating-point number.
+        if(use_FPA_theory)
+        {
+          // This conversion is non-trivial as it requires creating a 
+          // new bit-vector variable and then asserting that it converts
+          // to the required floating-point number.
           TODO("bit-wise floatbv to bv");
         }
-	else if (dest_type.id()==ID_signedbv)
-        {
-          out << "((_ fp.to_sbv " << to_width << ") ";
-	  out << "roundTowardZero ";
-          convert_expr(src);
-          out << ")";
-        }
-	else if (dest_type.id()==ID_unsignedbv)
-        {
-          out << "((_ fp.to_ubv " << to_width << ") ";
-	  out << "roundTowardZero ";
-          convert_expr(src);
-          out << ")";
-        }
         else
-	{
-	  UNEXPECTEDCASE("TODO typecast "+src_type.id_string()+" -> "+dest_type.id_string());
-	}
+        {
+          // straight-forward if width matches
+          convert_expr(src);
+        }
       }
-      else
-        convert_floatbv(src);
+      else if (dest_type.id()==ID_signedbv)
+      {
+        // this should be floatbv_typecast, not typecast
+        UNEXPECTEDCASE("typecast unexpected "+src_type.id_string()+" -> "+dest_type.id_string());
+      }
+      else if (dest_type.id()==ID_unsignedbv)
+      {
+        // this should be floatbv_typecast, not typecast
+        UNEXPECTEDCASE("typecast unexpected "+src_type.id_string()+" -> "+dest_type.id_string());
+      }
     }
     else if(src_type.id()==ID_bool) // from boolean to int
     {
@@ -2589,8 +2577,38 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
     else
       UNEXPECTEDCASE("TODO typecast11 "+src_type.id_string()+" -> "+dest_type.id_string());
   }
+  else if(dest_type.id()==ID_signedbv)
+  {
+    if(use_FPA_theory)
+    {
+      unsigned dest_width=to_signedbv_type(dest_type).get_width();
+      out << "((_ fp.to_sbv " << dest_width << ") ";
+      convert_rounding_mode_FPA(expr.op1());
+      out << " ";
+      convert_expr(src);
+      out << ")";
+    }
+    else
+      convert_floatbv(expr);
+  }
+  else if(dest_type.id()==ID_unsignedbv)
+  {
+    if(use_FPA_theory)
+    {
+      unsigned dest_width=to_unsignedbv_type(dest_type).get_width();
+      out << "((_ fp.to_ubv " << dest_width << ") ";
+      convert_rounding_mode_FPA(expr.op1());
+      out << " ";
+      convert_expr(src);
+      out << ")";
+    }
+    else
+      convert_floatbv(expr);
+  }
   else
+  {
     UNEXPECTEDCASE("TODO typecast12 "+src_type.id_string()+" -> "+dest_type.id_string());
+  }
 }
 
 /*******************************************************************\
