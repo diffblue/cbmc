@@ -169,9 +169,9 @@ bool boolbvt::type_conversion(
       switch(src_bvtype)
       {
       case IS_FLOAT: // float to float
-        float_utils.spec=to_floatbv_type(src_type);
-        dest=float_utils.conversion(src, to_floatbv_type(dest_type));
-        return false;
+        // we don't have a rounding mode here,
+        // which is why we refuse.
+        break;
 
       case IS_SIGNED: // signed to float
       case IS_C_ENUM:
@@ -317,15 +317,9 @@ bool boolbvt::type_conversion(
     switch(src_bvtype)
     {
     case IS_FLOAT: // float to integer
-      {
-        // note that float to int conversion in ANSI-C is hardwired
-        // to ROUND TO ZERO, also known as truncate.
-        float_utilst float_utils(prop);
-        float_utils.rounding_mode_bits.set(ieee_floatt::ROUND_TO_ZERO);
-        float_utils.spec=to_floatbv_type(src_type);
-        dest=float_utils.to_integer(src, dest_width, dest_bvtype!=IS_UNSIGNED);
-        return false;
-      }
+      // we don't have a rounding mode here,
+      // which is why we refuse.
+      break;
      
     case IS_FIXED: // fixed to integer
       {

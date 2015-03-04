@@ -67,6 +67,20 @@ void boolbvt::convert_floatbv_typecast(
     float_utils.spec=to_floatbv_type(dest_type);
     bv=float_utils.from_unsigned_integer(bv0);
   }
+  else if(src_type.id()==ID_floatbv &&
+          dest_type.id()==ID_signedbv)
+  {
+    unsigned dest_width=to_signedbv_type(dest_type).get_width();
+    float_utils.spec=to_floatbv_type(src_type);
+    bv=float_utils.to_signed_integer(bv0, dest_width);
+  }
+  else if(src_type.id()==ID_floatbv &&
+          dest_type.id()==ID_unsignedbv)
+  {
+    unsigned dest_width=to_unsignedbv_type(dest_type).get_width();
+    float_utils.spec=to_floatbv_type(src_type);
+    bv=float_utils.to_unsigned_integer(bv0, dest_width);
+  }
   else
     return conversion_failed(expr, bv);
 }
