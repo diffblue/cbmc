@@ -38,24 +38,27 @@ exprt float_bvt::convert(const exprt &expr)
     return not_exprt(is_equal(expr.op0(), expr.op1(), get_spec(expr.op0())));
   else if(expr.id()==ID_floatbv_typecast)
   {
-    if(expr.type().id()==ID_signedbv &&
-       expr.op0().type().id()==ID_floatbv)
+    const typet &src_type=expr.op0().type();
+    const typet &dest_type=expr.type();
+    
+    if(dest_type.id()==ID_signedbv &&
+       src_type.id()==ID_floatbv) // float -> signed
       return to_signed_integer(
-        expr.op0(), to_signedbv_type(expr.type()).get_width(), expr.op1(), get_spec(expr.op0()));
-    else if(expr.type().id()==ID_unsignedbv &&
-            expr.op0().type().id()==ID_floatbv)
+        expr.op0(), to_signedbv_type(dest_type).get_width(), expr.op1(), get_spec(expr.op0()));
+    else if(dest_type.id()==ID_unsignedbv &&
+            src_type.id()==ID_floatbv) // float -> unsigned
       return to_unsigned_integer(
-        expr.op0(), to_unsignedbv_type(expr.type()).get_width(), expr.op1(), get_spec(expr.op0()));
-    else if(expr.op0().type().id()==ID_signedbv &&
-            expr.type().id()==ID_floatbv)
+        expr.op0(), to_unsignedbv_type(dest_type).get_width(), expr.op1(), get_spec(expr.op0()));
+    else if(src_type.id()==ID_signedbv &&
+            dest_type.id()==ID_floatbv) // signed -> float
       return from_signed_integer(
         expr.op0(), expr.op1(), get_spec(expr));
-    else if(expr.op0().type().id()==ID_unsignedbv &&
-            expr.type().id()==ID_floatbv)
+    else if(src_type.id()==ID_unsignedbv &&
+            dest_type.id()==ID_floatbv) // unsigned -> float
       return from_unsigned_integer(
         expr.op0(), expr.op1(), get_spec(expr));
-    else if(expr.type().id()==ID_floatbv &&
-            expr.op0().type().id()==ID_floatbv)
+    else if(dest_type.id()==ID_floatbv &&
+            src_type.id()==ID_floatbv) // float -> float
       return conversion(expr.op0(), expr.op1(), get_spec(expr.op0()), get_spec(expr));
     else
       return nil_exprt();
