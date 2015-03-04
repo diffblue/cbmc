@@ -1576,7 +1576,7 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       out << "(= ((_ extract " << i << " " << i << ") ";
       flatten2bv(expr.op0());
-      out << ") bit1)";
+      out << ") (_ bv1 1))";
     }
     else
     {
@@ -1853,7 +1853,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << " ((_ zero_extend 1) ";
       convert_expr(expr.op1());
       out << ")))"; // zero_extend, bvsub/bvadd, extract
-      out << " bit1)"; // =
+      out << " (_ bv1 1))"; // =
     }
     else
       UNEXPECTEDCASE("overflow check on unknown type: "+op_type.id_string());
@@ -4278,7 +4278,7 @@ void smt2_convt::unflatten(
     if(where==BEGIN)
       out << "(= "; // produces a bool
     else
-      out << " bit1)";
+      out << " (_ bv1 1))";
   }
   else if(type.id()==ID_vector)
   {
