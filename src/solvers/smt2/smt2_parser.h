@@ -33,4 +33,3 @@ private:
   void get_string_literal();
 };
 
-void smt2_parser_test(std::istream &in, std::ostream &out);
