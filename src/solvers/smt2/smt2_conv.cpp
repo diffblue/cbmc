@@ -116,9 +116,7 @@ void smt2_convt::write_header()
 
   out << "(set-info :source \"" << notes << "\")" << "\n";
   
-  // boolector doesn't seem to like set-option at all
-  if(solver!=BOOLECTOR)
-    out << "(set-option :produce-models true)" << "\n";
+  out << "(set-option :produce-models true)" << "\n";
 
   // We use a broad mixture of logics, so on some solvers
   // its better not to declare here.
@@ -167,15 +165,11 @@ void smt2_convt::write_footer()
   out << "(check-sat)" << "\n";
   out << "\n";
   
-  // Boolector doesn't like get-value
-  if(solver!=BOOLECTOR)
-  {
-    for(smt2_identifierst::const_iterator
-        it=smt2_identifiers.begin();
-        it!=smt2_identifiers.end();
-        it++)
-      out << "(get-value (|" << *it << "|))" << "\n";
-  }
+  for(smt2_identifierst::const_iterator
+      it=smt2_identifiers.begin();
+      it!=smt2_identifiers.end();
+      it++)
+    out << "(get-value (|" << *it << "|))" << "\n";
 
   // pop the assumptions, if any
   if(!assumptions.empty())

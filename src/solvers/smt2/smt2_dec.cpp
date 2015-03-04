@@ -128,7 +128,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   case BOOLECTOR:
     command = "boolector --smt2 "
             + temp_out_filename
-            + " -m --output "
+            + " -m > "
             + temp_result_filename;
     break;
 
