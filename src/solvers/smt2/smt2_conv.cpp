@@ -904,7 +904,7 @@ void smt2_convt::convert_literal(const literalt l)
     if(l.sign())
       out << "(not ";
 
-    out << "B" << l.var_no();
+    out << "|B" << l.var_no() << "|";
   
     if(l.sign())
       out << ")";  
@@ -3015,11 +3015,10 @@ void smt2_convt::convert_relation(const exprt &expr)
 
   const typet &op_type=expr.op0().type();
 
-  out << "(";
-
   if(op_type.id()==ID_unsignedbv ||
      op_type.id()==ID_pointer)
   {
+    out << "(";
     if(expr.id()==ID_le)
       out << "bvule";
     else if(expr.id()==ID_lt)
@@ -3033,10 +3032,12 @@ void smt2_convt::convert_relation(const exprt &expr)
     convert_expr(expr.op0());
     out << " ";
     convert_expr(expr.op1());
+    out << ")";
   }
   else if(op_type.id()==ID_signedbv ||
           op_type.id()==ID_fixedbv)
   {
+    out << "(";
     if(expr.id()==ID_le)
       out << "bvsle";
     else if(expr.id()==ID_lt)
@@ -3050,11 +3051,13 @@ void smt2_convt::convert_relation(const exprt &expr)
     convert_expr(expr.op0());
     out << " ";
     convert_expr(expr.op1());
+    out << ")";
   }
   else if(op_type.id()==ID_floatbv)
   {
     if(use_FPA_theory)
     {
+      out << "(";
       if(expr.id()==ID_le)
         out << "fp.leq";
       else if(expr.id()==ID_lt)
@@ -3068,6 +3071,7 @@ void smt2_convt::convert_relation(const exprt &expr)
       convert_expr(expr.op0());
       out << " ";
       convert_expr(expr.op1());
+      out << ")";
     }
     else
       convert_floatbv(expr);
@@ -3075,17 +3079,18 @@ void smt2_convt::convert_relation(const exprt &expr)
   else if(op_type.id()==ID_rational || 
           op_type.id()==ID_integer)
   {
+    out << "(";
     out << expr.id();
 
     out << " ";
     convert_expr(expr.op0());
     out << " ";
     convert_expr(expr.op1());
+    out << ")";
   }
   else
     UNEXPECTEDCASE("unsupported type for "+expr.id_string()+": "+op_type.id_string());
 
-  out << ")";
 }
 
 /*******************************************************************\
