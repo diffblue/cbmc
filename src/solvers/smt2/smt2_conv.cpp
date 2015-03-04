@@ -1125,7 +1125,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     forall_operands(it, expr)
     {
       out << " ";
-      convert_expr(*it);
+      flatten2bv(*it);
     }
 
     out << ")";
