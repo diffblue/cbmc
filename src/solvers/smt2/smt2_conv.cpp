@@ -1576,7 +1576,7 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       out << "(= ((_ extract " << i << " " << i << ") ";
       flatten2bv(expr.op0());
-      out << ") (_ bv1 1))";
+      out << ") #b1)";
     }
     else
     {
@@ -1853,7 +1853,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << " ((_ zero_extend 1) ";
       convert_expr(expr.op1());
       out << ")))"; // zero_extend, bvsub/bvadd, extract
-      out << " (_ bv1 1))"; // =
+      out << " #b1)"; // =
     }
     else
       UNEXPECTEDCASE("overflow check on unknown type: "+op_type.id_string());
@@ -2115,7 +2115,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
       // number negative
       out << " (= ((_ extract " << (from_width-1) << " " << (from_width-1) << ") ?tcop) "
-             "(_ bv1 1))";
+             "#b1)";
       
       out << ")"; // and
 
@@ -4278,7 +4278,7 @@ void smt2_convt::unflatten(
     if(where==BEGIN)
       out << "(= "; // produces a bool
     else
-      out << " (_ bv1 1))";
+      out << " #b1)";
   }
   else if(type.id()==ID_vector)
   {
