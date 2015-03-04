@@ -23,6 +23,7 @@ protected:
   std::string buffer;
   
   // string literal, simple symbol, quoted symbol in buffer
+  virtual void string_literal() = 0;
   virtual void symbol() = 0;
   virtual void open_expression() = 0; // '('
   virtual void close_expression() = 0; // ')'
