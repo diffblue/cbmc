@@ -57,5 +57,9 @@ protected:
 
 int main()
 {
-  smt2_parser_testt(std::cin, std::cout)();
+  while(std::cin)
+  {
+    smt2_parser_testt(std::cin, std::cout)();
+    std::cout << '\n';
+  }
 }
