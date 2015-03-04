@@ -140,7 +140,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     break;
 
   case CVC4:
-    command = "cvc4 -L smt2 "
+    command = "cvc4 -L smt2 --bitblast=eager --bv-div-zero-const "
             + temp_out_filename
             + " > "
             + temp_result_filename;
@@ -253,6 +253,19 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       // ( (|__CPROVER_pipe_count#1| (_ bv0 32)) )
       
       values[s0.id()]=s1;
+    }
+    else if(parsed.id()=="" &&
+            parsed.get_sub().size()==2 &&
+            parsed.get_sub().front().id()=="error")
+    {
+      // We ignore errors after UNSAT because get-value after check-sat
+      // returns unsat will give an error.
+      if(res!=D_UNSATISFIABLE)
+      {
+        error() << "SMT2 solver returned error message:\n"
+                << "\t\"" << parsed.get_sub()[1].id() <<"\"" << eom;
+        return decision_proceduret::D_ERROR;
+      }
     }
   }
 
