@@ -309,49 +309,49 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("boolector"))
   {
     options.set_option("boolector", true), solver_set = true;
-    if (!version_set)
-      options.set_option("smt1", true), version_set = true;
+    if(!version_set)
+      options.set_option("smt2", true), version_set = true;
   }
 
   if(cmdline.isset("mathsat"))
   {
     options.set_option("mathsat", true), solver_set = true;
-    if (!version_set)
+    if(!version_set)
       options.set_option("smt2", true), version_set = true;
   }
 
   if(cmdline.isset("cvc3"))
   {
     options.set_option("cvc3", true), solver_set = true;
-    if (!version_set)
+    if(!version_set)
       options.set_option("smt1", true), version_set = true;
   }
 
   if(cmdline.isset("cvc4"))
   {
     options.set_option("cvc4", true), solver_set = true;
-    if (!version_set)
+    if(!version_set)
       options.set_option("smt2", true), version_set = true;
   }
 
   if(cmdline.isset("yices"))
   {
     options.set_option("yices", true), solver_set = true;
-    if (!version_set)
+    if(!version_set)
       options.set_option("smt2", true), version_set = true;
   }
 
   if(cmdline.isset("z3"))
   {
     options.set_option("z3", true), solver_set = true;
-    if (!version_set)
+    if(!version_set)
       options.set_option("smt2", true), version_set = true;
   }
 
   if(cmdline.isset("opensmt"))
   {
     options.set_option("opensmt", true), solver_set = true;
-    if (!version_set)
+    if(!version_set)
       options.set_option("smt1", true), version_set = true;
   }
 
