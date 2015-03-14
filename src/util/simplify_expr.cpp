@@ -5117,14 +5117,16 @@ Function: simplify_exprt::simplify_byte_update
 bool simplify_exprt::simplify_byte_update(exprt &expr)
 {
   if(expr.operands().size()!=3) return true;
+  
+  byte_update_exprt &bu_expr=to_byte_update_expr(expr);
 
   // byte_update(byte_update(root, offset, value), offset, value2) =>
   // byte_update(root, offset, value2)
-  if(expr.id()==expr.op0().id() &&
-     expr.op1()==expr.op0().op1() &&
-     base_type_eq(expr.op2().type(), expr.op0().op2().type(), ns))
+  if(bu_expr.id()==bu_expr.op().id() &&
+     bu_expr.offset()==bu_expr.op().op1() &&
+     base_type_eq(bu_expr.value().type(), bu_expr.op().op2().type(), ns))
   {
-    expr.op0()=expr.op0().op0();
+    bu_expr.op()=bu_expr.op().op0();
     return false;
   }
 
@@ -5136,14 +5138,15 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
    *             value)
    */
 
-  if(expr.id()!=ID_byte_update_little_endian) return true;
+  if(bu_expr.id()!=ID_byte_update_little_endian) return true;
 
-  exprt &root=expr.op0();
-  exprt &offset=expr.op1();
+  exprt &root=bu_expr.op();
+  exprt &offset=bu_expr.offset();
+  const exprt &value=bu_expr.value();
 
-  if(expr.op2().id()==ID_with) 
+  if(bu_expr.value().id()==ID_with) 
   {
-    exprt &with=expr.op2();
+    exprt &with=bu_expr.value();
 
     if(with.operands().size()!=3) return true;
 
@@ -5212,6 +5215,41 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
           simplify_byte_update(expr); // do this recursively
           return false;
         }
+      }
+    }
+  }
+  
+  // the following require a constant offset
+  mp_integer offset_int;
+  if(to_integer(offset, offset_int) || offset_int<0)
+    return true;
+  
+  const typet &op_type=ns.follow(root.type());
+  
+  // search for updates of members, and replace by 'with'
+  if(op_type.id()==ID_struct)
+  {
+    const struct_typet &struct_type=
+      to_struct_type(op_type);
+    const struct_typet::componentst &components=
+      struct_type.components();
+      
+    for(struct_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        ++it)
+    {
+      mp_integer m_offset=
+        member_offset(struct_type, it->get_name(), ns);
+        
+      if(offset_int==m_offset &&
+         base_type_eq(it->type(), value.type(), ns))
+      {
+        exprt member_name(ID_member_name);
+        member_name.set(ID_component_name, it->get_name());
+        expr=with_exprt(root, member_name, value);
+        simplify_node(expr);
+        return false;
       }
     }
   }
