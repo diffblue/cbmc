@@ -102,7 +102,7 @@ public:
     {
     }
     
-    entryt(const idt &_identifier, const std::string _suffix):
+    entryt(const idt &_identifier, const std::string &_suffix):
       identifier(_identifier),
       suffix(_suffix)
     {
