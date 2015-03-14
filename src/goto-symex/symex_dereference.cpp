@@ -289,11 +289,6 @@ void goto_symext::dereference_rec(
     // this may yield a new auto-object
     trigger_auto_object(expr, state);
   }
-  else if(expr.id()=="implicit_dereference")
-  {
-    // old stuff, should be gone
-    assert(false);
-  }
   else if(expr.id()==ID_index &&
           to_index_expr(expr).array().id()==ID_member &&
           to_array_type(ns.follow(to_index_expr(expr).array().type())).

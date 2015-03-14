@@ -4541,9 +4541,6 @@ std::string expr2ct::convert(
   else if(src.id()=="implicit_address_of")
     return convert_implicit_address_of(src, precedence);
 
-  else if(src.id()=="implicit_dereference")
-    return convert_function(src, "IMPLICIT_DEREFERENCE", precedence=16);
-
   else if(src.id()==ID_comma)
     return convert_comma(src, precedence=1);
 
