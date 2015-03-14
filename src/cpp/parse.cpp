@@ -774,7 +774,8 @@ bool Parser::isTypeSpecifier()
        || t==TOK_CHAR16_T || t==TOK_CHAR32_T
        || t==TOK_WCHAR_T || t==TOK_COMPLEX // new !!!
        || t==TOK_SIGNED || t==TOK_UNSIGNED || t==TOK_FLOAT || t==TOK_DOUBLE
-       || t==TOK_INT8 || t==TOK_INT16 || t==TOK_INT32 || t==TOK_INT64 || t==TOK_PTR32 || t==TOK_PTR64
+       || t==TOK_INT8 || t==TOK_INT16 || t==TOK_INT32 || t==TOK_INT64 || t==TOK_GCC_INT128
+       || t==TOK_PTR32 || t==TOK_PTR64
        || t==TOK_GCC_FLOAT128
        || t==TOK_VOID || t==TOK_BOOL || t==TOK_CPROVER_BOOL
        || t==TOK_CLASS || t==TOK_STRUCT || t==TOK_UNION || t==TOK_ENUM || t==TOK_INTERFACE
@@ -2319,6 +2320,7 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     case TOK_INT16: type_id=ID_int16; break;
     case TOK_INT32: type_id=ID_int32; break;
     case TOK_INT64: type_id=ID_int64; break;
+    case TOK_GCC_INT128: type_id=ID_gcc_int128; break;
     case TOK_GCC_FLOAT128: type_id=ID_gcc_float128; break;
     case TOK_BOOL: type_id=ID_bool; break;
     case TOK_CPROVER_BOOL: type_id=ID_proper_bool; break;
