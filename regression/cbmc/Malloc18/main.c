@@ -18,7 +18,7 @@ int main()
   if(ret!=0)
   {
     unsigned char r=ret[0];
-    __CPROVER_assert(r==0, "ret[0] is 10");
+    __CPROVER_assert(r==10, "ret[0] is 10");
   }
 
   return 0;
