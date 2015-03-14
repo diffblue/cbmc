@@ -1,13 +1,12 @@
 unsigned char* init()
 {
-  unsigned long size;
-  if (size!=1) return 0;
+  unsigned long buffer_size;
+  if(buffer_size!=1) return 0;
 
-  assert(sizeof(unsigned char)==1);
-  unsigned char* buffer=__CPROVER_malloc(size);
-  assert(buffer!=0);
+  unsigned char* buffer=__CPROVER_malloc(buffer_size);
+  __CPROVER_assert(buffer!=0, "malloc did not return NULL");
 
-  buffer[0]=0;
+  buffer[0]=10;
 
   return buffer;
 }
@@ -19,7 +18,7 @@ int main()
   if(ret!=0)
   {
     unsigned char r=ret[0];
-    assert(r==0);
+    __CPROVER_assert(r==0, "ret[0] is 10");
   }
 
   return 0;
