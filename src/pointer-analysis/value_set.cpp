@@ -969,7 +969,7 @@ void value_sett::get_value_set_rec(
     #endif
   }
 
-  #if 1
+  #if 0
   std::cout << "GET_VALUE_SET_REC RESULT:\n";
   for(object_map_dt::const_iterator
       it=dest.read().begin();
@@ -1461,7 +1461,7 @@ void value_sett::assign_rec(
   
   if(lhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=lhs.get(ID_identifier);
+    const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
     
     entryt &e=get_entry(entryt(identifier, suffix), lhs.type());
     
