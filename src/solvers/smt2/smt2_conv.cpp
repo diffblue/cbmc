@@ -158,7 +158,8 @@ void smt2_convt::write_footer()
   // fix up the object sizes
   for(defined_expressionst::iterator it = object_sizes.begin();
       it != object_sizes.end();
-      ++it) {
+      ++it)
+  {
     define_object_size(it->second, it->first);
   }
   
