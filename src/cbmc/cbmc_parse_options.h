@@ -38,7 +38,7 @@ class optionst;
   "(dimacs)(refine)(max-node-refinement):(aig)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
-  "(show-goto-functions)(show-value-sets)(show-loops)" \
+  "(show-goto-functions)(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
   "(show-claims)(claim):(show-properties)(show-reachable-properties)(property):" \
   "(all-claims)(all-properties)" \
