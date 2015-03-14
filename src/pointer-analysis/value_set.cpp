@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
 
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
@@ -21,8 +20,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/cprover_prefix.h>
 
-#include <langapi/language_util.h>
 #include <ansi-c/c_types.h>
+
+#ifdef DEBUG
+#include <langapi/language_util.h>
+#include <iostream>
+#endif
 
 #include "value_set.h"
 #include "add_failed_symbols.h"
@@ -1784,7 +1787,7 @@ void value_sett::apply_code(
   }
   else
   {
-    std::cerr << code.pretty() << std::endl;
+    //std::cerr << code.pretty() << std::endl;
     throw "value_sett: unexpected statement: "+id2string(statement);
   }
 }
