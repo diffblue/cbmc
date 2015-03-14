@@ -474,9 +474,8 @@ void value_sett::get_value_set_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr) << std::endl;
+  std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr) << "\n";
   std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << std::endl;
-  std::cout << std::endl;
   #endif
   
   const typet &expr_type=ns.follow(expr.type());
@@ -970,17 +969,17 @@ void value_sett::get_value_set_rec(
     #endif
   }
 
-  #if 0
-  std::cout << "GET_VALUE_SET_REC RESULT:";
+  #if 1
+  std::cout << "GET_VALUE_SET_REC RESULT:\n";
   for(object_map_dt::const_iterator
       it=dest.read().begin();
       it!=dest.read().end();
       it++)
   {
     const exprt &e=to_expr(it);
-    std::cout << " " << from_expr(ns, "", e);
+    std::cout << "  " << from_expr(ns, "", e) << "\n";
   }
-  std::cout << std::endl << std::endl;
+  std::cout << "\n";
   #endif
 }
 
