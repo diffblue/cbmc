@@ -49,6 +49,11 @@ bool value_sett::field_sensitive(
   const irep_idt &id,
   const typet &type)
 {
+  #if 1
+  // disabled for now; see, e.g., regression/cbmc/Malloc19
+  return false;
+  
+  #else
   // we always track fields on these
   if(has_prefix(id2string(id), "value_set::dynamic_object") ||
      id=="value_set::return_value" ||
@@ -57,6 +62,7 @@ bool value_sett::field_sensitive(
 
   // otherwise it has to be a struct
   return type.id()==ID_struct;
+  #endif
 }
 
 /*******************************************************************\
