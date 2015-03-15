@@ -68,14 +68,16 @@ protected:
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);
     
-  virtual bool decide(prop_convt &prop_conv);
+  virtual bool decide(
+    const goto_functionst &,
+    prop_convt &);
     
   // the solvers we have
-  virtual bool decide_default();
-  virtual bool decide_bv_refinement();
-  virtual bool decide_aig();
-  virtual bool decide_smt1();
-  virtual bool decide_smt2();
+  virtual bool decide_default(const goto_functionst &);
+  virtual bool decide_bv_refinement(const goto_functionst &);
+  virtual bool decide_aig(const goto_functionst &);
+  virtual bool decide_smt1(const goto_functionst &);
+  virtual bool decide_smt2(const goto_functionst &);
   smt1_dect::solvert get_smt1_solver_type() const;
   smt2_dect::solvert get_smt2_solver_type() const;
   virtual void smt1_convert(smt1_dect::solvert solver, std::ostream &out);
