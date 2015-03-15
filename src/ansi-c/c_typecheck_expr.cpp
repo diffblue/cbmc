@@ -2415,6 +2415,7 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier==CPROVER_PREFIX "abs" ||
           identifier==CPROVER_PREFIX "labs" ||
+          identifier==CPROVER_PREFIX "llabs" ||
           identifier==CPROVER_PREFIX "fabs" ||
           identifier==CPROVER_PREFIX "fabsf" ||
           identifier==CPROVER_PREFIX "fabsl")

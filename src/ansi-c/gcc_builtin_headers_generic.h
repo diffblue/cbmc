@@ -11,6 +11,7 @@ int __builtin_va_arg_pack_len();
 int __builtin_constant_p();
 int __builtin_abs(int);
 long int __builtin_labs(long);
+long long int __builtin_llabs(long long int);
 double __builtin_cos(double);
 float __builtin_cosf(float);
 double __builtin_fabs(double);
