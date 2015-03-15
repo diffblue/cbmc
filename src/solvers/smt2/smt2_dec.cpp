@@ -114,11 +114,17 @@ Function: smt2_dect::dec_solve
 
 decision_proceduret::resultt smt2_dect::dec_solve()
 {
-  // this closes the SMT2 file
-  write_footer();
-  temp_out.close();
+  // we write the problem into a file
+  smt2_temp_filet smt2_temp_file;
+  
+  // copy from string buffer into file
+  smt2_temp_file.temp_out << stringstream.str();
 
-  temp_result_filename=
+  // this finishes up and closes the SMT2 file
+  write_footer(smt2_temp_file.temp_out);
+  smt2_temp_file.temp_out.close();
+
+  smt2_temp_file.temp_result_filename=
     get_temporary_file("smt2_dec_result_", "");
 
   std::string command;
@@ -127,23 +133,23 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   {
   case BOOLECTOR:
     command = "boolector --smt2 "
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " -m > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
   case CVC3:
     command = "cvc3 +model -lang smtlib -output-lang smtlib "
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
   case CVC4:
     command = "cvc4 -L smt2 --bitblast=eager --bv-div-zero-const "
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
   case MATHSAT:
@@ -163,31 +169,31 @@ decision_proceduret::resultt smt2_dect::dec_solve()
               " -theory.fp.mode=1"
               " -theory.fp.bit_blast_mode=2"
               " -theory.arr.mode=1"
-              " < "+temp_out_filename
-            + " > "+temp_result_filename;
+              " < "+smt2_temp_file.temp_out_filename
+            + " > "+smt2_temp_file.temp_result_filename;
     break;
 
   case OPENSMT:
     command = "opensmt "
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
 
   case YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
     command = "yices-smt2 "  //  Calling for 2.2.1
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
   case Z3:
     command = "z3 -smt2 "
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
   default:
@@ -205,7 +211,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     return decision_proceduret::D_ERROR;
   }
 
-  std::ifstream in(temp_result_filename.c_str());
+  std::ifstream in(smt2_temp_file.temp_result_filename.c_str());
   
   return read_result(in);
 }
