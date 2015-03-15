@@ -31,7 +31,7 @@ public:
 
 protected:
   void get_minimization_list(
-    bv_cbmct &bv_cbmc,
+    prop_convt &prop_conv,
     const symex_target_equationt &equation,        
     minimization_listt &minimization_list);
 
@@ -40,7 +40,7 @@ protected:
     class prop_minimizet &prop_minimize);
 
   symex_target_equationt::SSA_stepst::const_iterator get_failed_property(
-    const bv_cbmct &bv_cbmc,
+    const prop_convt &prop_conv,
     const symex_target_equationt &equation);
 
   // the failed property
