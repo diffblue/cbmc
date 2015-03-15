@@ -80,11 +80,12 @@ long double __CPROVER_infl(void);
 //extern int __CPROVER_thread_local __CPROVER_rounding_mode;
 
 // absolute value
-int __CPROVER_abs(int x);
-long int __CPROVER_labs(long int x);
-double __CPROVER_fabs(double x);
-long double __CPROVER_fabsl(long double x);
-float __CPROVER_fabsf(float x);
+int __CPROVER_abs(int);
+long int __CPROVER_labs(long int);
+long long int __CPROVER_llabs(long long int);
+double __CPROVER_fabs(double);
+long double __CPROVER_fabsl(long double);
+float __CPROVER_fabsf(float);
 
 // arrays
 //__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);
