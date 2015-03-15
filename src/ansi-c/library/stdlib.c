@@ -10,6 +10,24 @@ inline int abs(int i) { return __CPROVER_abs(i); }
 
 inline long int labs(long int i) { return __CPROVER_labs(i); }
 
+/* FUNCTION: llabs */
+
+#undef llabs
+
+inline long long int llabs(long long int i) { return __CPROVER_llabs(i); }
+
+/* FUNCTION: __builtin_abs */
+
+inline int __builtin_abs(int i) { return __CPROVER_abs(i); }
+
+/* FUNCTION: __builtin_labs */
+
+inline long int __builtin_labs(long int i) { return __CPROVER_labs(i); }
+
+/* FUNCTION: __builtin_llabs */
+
+inline long long int __builtin_llabs(long long int i) { return __CPROVER_llabs(i); }
+
 /* FUNCTION: exit */
 
 #undef exit
