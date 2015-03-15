@@ -149,20 +149,20 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   case MATHSAT:
     // The options below were recommended by Alberto Griggio
     // on 10 July 2013
-    command = "mathsat -input=smt2 \
- -preprocessor.toplevel_propagation=true \
- -preprocessor.simplification=7 \
- -dpll.branching_random_frequency=0.01 \
- -dpll.branching_random_invalidate_phase_cache=true \
- -dpll.restart_strategy=3 \
- -dpll.glucose_var_activity=true \
- -dpll.glucose_learnt_minimization=true \
- -theory.bv.eager=true \
- -theory.bv.bit_blast_mode=1 \
- -theory.bv.delay_propagated_eqs=true \
- -theory.fp.mode=1 \
- -theory.fp.bit_blast_mode=2 \
- -theory.arr.mode=1"
+    command = "mathsat -input=smt2"
+              " -preprocessor.toplevel_propagation=true"
+              " -preprocessor.simplification=7"
+              " -dpll.branching_random_frequency=0.01"
+              " -dpll.branching_random_invalidate_phase_cache=true"
+              " -dpll.restart_strategy=3"
+              " -dpll.glucose_var_activity=true"
+              " -dpll.glucose_learnt_minimization=true"
+              " -theory.bv.eager=true"
+              " -theory.bv.bit_blast_mode=1"
+              " -theory.bv.delay_propagated_eqs=true"
+              " -theory.fp.mode=1"
+              " -theory.fp.bit_blast_mode=2"
+              " -theory.arr.mode=1"
               " < "+temp_out_filename
             + " > "+temp_result_filename;
     break;
