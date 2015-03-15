@@ -97,6 +97,7 @@ public:
 
   // overloading interfaces
   virtual literalt convert(const exprt &expr);
+  virtual void set_frozen(literalt a) { /* not needed */ }
   virtual void set_to(const exprt &expr, bool value);
   virtual exprt get(const exprt &expr) const;
   virtual std::string decision_procedure_text() const { return "SMT2"; }
