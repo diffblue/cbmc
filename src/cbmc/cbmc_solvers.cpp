@@ -189,7 +189,7 @@ Function: bmct::decide_default
 
 \*******************************************************************/
 
-bool bmct::decide_default()
+bool bmct::decide_default(const goto_functionst &goto_functions)
 {
   bool result=true;
   
@@ -212,7 +212,10 @@ bool bmct::decide_default()
     bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
   else if(options.get_option("arrays-uf")=="always")
     bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-    
+
+  if(options.get_bool_option("all-properties"))
+    return all_properties(goto_functions, bv_cbmc);
+
   switch(run_decision_procedure(bv_cbmc))
   {
   case decision_proceduret::D_UNSATISFIABLE:
@@ -248,10 +251,8 @@ Function: bmct::decide_aig
 
 \*******************************************************************/
 
-bool bmct::decide_aig()
+bool bmct::decide_aig(const goto_functionst &goto_functions)
 {
-  bool result=true;
-
   std::auto_ptr<propt> sub_solver;
 
   if(options.get_bool_option("sat-preprocessor"))
@@ -269,24 +270,8 @@ bool bmct::decide_aig()
     bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
   else if(options.get_option("arrays-uf")=="always")
     bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-    
-  switch(run_decision_procedure(bv_cbmc))
-  {
-  case decision_proceduret::D_UNSATISFIABLE:
-    result=false;
-    report_success();
-    break;
 
-  case decision_proceduret::D_SATISFIABLE:
-    error_trace(bv_cbmc);
-    report_failure();
-    break;
-
-  default:
-    error() << "decision procedure failed" << eom;
-  }
-
-  return result;
+  return decide(goto_functions, bv_cbmc);
 }
 
 /*******************************************************************\
@@ -301,7 +286,7 @@ Function: bmct::bv_refinement
 
 \*******************************************************************/
 
-bool bmct::decide_bv_refinement()
+bool bmct::decide_bv_refinement(const goto_functionst &goto_functions)
 {
   std::auto_ptr<propt> solver;
 
@@ -321,7 +306,7 @@ bool bmct::decide_bv_refinement()
     bv_refinement.max_node_refinement=
       options.get_unsigned_int_option("max-node-refinement");
   
-  return decide(bv_refinement);
+  return decide(goto_functions, bv_refinement);
 }
 
 /*******************************************************************\
@@ -336,7 +321,7 @@ Function: bmct::decide_smt1
 
 \*******************************************************************/
 
-bool bmct::decide_smt1()
+bool bmct::decide_smt1(const goto_functionst &goto_functions)
 {
   smt1_dect::solvert solver=get_smt1_solver_type();
   const std::string &filename=options.get_option("outfile");
@@ -350,7 +335,7 @@ bool bmct::decide_smt1()
       "QF_AUFBV",
       solver);
 
-    return decide(smt1_dec);
+    return decide(goto_functions, smt1_dec);
   }
   else if(filename=="-")
     smt1_convert(solver, std::cout);
@@ -410,7 +395,7 @@ Function: bmct::decide_smt2
 
 \*******************************************************************/
 
-bool bmct::decide_smt2()
+bool bmct::decide_smt2(const goto_functionst &goto_functions)
 {
   smt2_dect::solvert solver=get_smt2_solver_type();
   const std::string &filename=options.get_option("outfile");
@@ -427,7 +412,7 @@ bool bmct::decide_smt2()
     if(options.get_bool_option("fpa"))
       smt2_dec.use_FPA_theory=true;
 
-    return decide(smt2_dec);
+    return decide(goto_functions, smt2_dec);
   }
   else if(filename=="-")
     smt2_convert(solver, std::cout);

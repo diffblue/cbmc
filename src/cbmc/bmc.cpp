@@ -466,31 +466,16 @@ bool bmct::run(const goto_functionst &goto_functions)
       return false;
     }
 
-    if(options.get_bool_option("all-properties"))
-    {
-      satcheckt satcheck;
-      satcheck.set_message_handler(get_message_handler());
-      bv_cbmct bv_cbmc(ns, satcheck);
-      bv_cbmc.set_message_handler(get_message_handler());
-
-      if(options.get_option("arrays-uf")=="never")
-        bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-      else if(options.get_option("arrays-uf")=="always")
-        bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-
-      return all_properties(goto_functions, bv_cbmc);
-    }
-    
     if(options.get_bool_option("smt1"))
-      return decide_smt1();
+      return decide_smt1(goto_functions);
     else if(options.get_bool_option("smt2"))
-      return decide_smt2();
+      return decide_smt2(goto_functions);
     else if(options.get_bool_option("dimacs"))
       return write_dimacs();
     else if(options.get_bool_option("refine"))
-      return decide_bv_refinement();
+      return decide_bv_refinement(goto_functions);
     else if(options.get_bool_option("aig"))
-      return decide_aig();
+      return decide_aig(goto_functions);
     else
     {
       if(options.get_bool_option("program-only"))
@@ -499,7 +484,7 @@ bool bmct::run(const goto_functionst &goto_functions)
         return false;
       }
 
-      return decide_default();
+      return decide_default(goto_functions);
     }
   }
 
@@ -534,14 +519,15 @@ Function: bmct::decide
 
 \*******************************************************************/
 
-bool bmct::decide(prop_convt &prop_conv)
+bool bmct::decide(
+  const goto_functionst &goto_functions,
+  prop_convt &prop_conv)
 {
-  if(options.get_bool_option("beautify-pbs") ||
-     options.get_bool_option("beautify-greedy"))
-    throw "sorry, this solver does not support beautification";
-
   prop_conv.set_message_handler(get_message_handler());
   
+  if(options.get_bool_option("all-properties"))
+    return all_properties(goto_functions, prop_conv);
+
   bool result=true;
 
   switch(run_decision_procedure(prop_conv))
