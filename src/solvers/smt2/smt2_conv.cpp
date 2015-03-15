@@ -137,15 +137,14 @@ Function: smt2_convt::write_footer
 
 \*******************************************************************/
 
-void smt2_convt::write_footer()
+void smt2_convt::write_footer(std::ostream &out)
 {
   out << "\n";
   
-  // push the assumptions, if any
+  // add the assumptions, if any
   if(!assumptions.empty())
   {
     out << "; assumptions\n";
-    out << "(push 1)\n";
 
     forall_literals(it, assumptions)
     {
@@ -172,10 +171,6 @@ void smt2_convt::write_footer()
       it++)
     out << "(get-value (|" << *it << "|))" << "\n";
 
-  // pop the assumptions, if any
-  if(!assumptions.empty())
-    out << "(pop 1)\n";
-    
   out << "\n";
 
   out << "(exit)\n";
@@ -248,7 +243,7 @@ Function: smt2_convt::dec_solve
 
 decision_proceduret::resultt smt2_convt::dec_solve()
 {
-  write_footer();
+  write_footer(out);
   return decision_proceduret::D_ERROR;
 }
 

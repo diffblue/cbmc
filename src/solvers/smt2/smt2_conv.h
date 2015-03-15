@@ -113,7 +113,7 @@ protected:
   boolbv_widtht boolbv_width;
   
   void write_header();
-  void write_footer();
+  void write_footer(std::ostream &);
 
   // new stuff
   void convert_expr(const exprt &);
