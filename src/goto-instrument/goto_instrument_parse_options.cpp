@@ -1027,7 +1027,7 @@ void goto_instrument_parse_optionst::help()
     " --render-cluster-function    clusterises the dot by functions\n"
     "\n"
     "Slicing:\n"
-    " --reachability-slicer        slice away instructions that can't reach assertions\n"
+    " --reachability-slice         slice away instructions that can't reach assertions\n"
     " --full-slice                 slice away instructions that don't affect assertions\n"
     "\n"
     "Further transformations:\n"
