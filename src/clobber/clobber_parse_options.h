@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_CLOBBER_PARSEOPTIONS_H
 
 #include <util/ui_message.h>
-#include <util/parseoptions.h>
+#include <util/parse_options.h>
 
 #include <langapi/language_ui.h>
 
@@ -29,16 +29,16 @@ class optionst;
   "(show-locs)(show-vcc)(show-properties)(show-trace)" \
   "(property):"
 
-class clobber_parseoptionst:
-  public parseoptions_baset,
+class clobber_parse_optionst:
+  public parse_options_baset,
   public language_uit
 {
 public:
   virtual int doit();
   virtual void help();
 
-  clobber_parseoptionst(int argc, const char **argv);
-  clobber_parseoptionst(
+  clobber_parse_optionst(int argc, const char **argv);
+  clobber_parse_optionst(
     int argc,
     const char **argv,
     const std::string &extra_options);

@@ -1,4 +1,4 @@
-SRC = clobber_main.cpp clobber_parseoptions.cpp
+SRC = clobber_main.cpp clobber_parse_options.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../linking/linking$(LIBEXT) \
