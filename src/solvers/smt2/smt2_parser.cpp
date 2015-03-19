@@ -98,6 +98,10 @@ Function: smt2_parsert::get_string_literal
 
 void smt2_parsert::get_string_literal()
 {
+  // TODO: the SMT-LIB standard says that string literals
+  // only use the double-double quote for escaping.
+  // In particular, \ has no particular meaning.
+
   // any sequence of printable ASCII characters delimited by
   // double quotes (") and possibly containing the C-style escape
   // sequences \" and double-backslash
