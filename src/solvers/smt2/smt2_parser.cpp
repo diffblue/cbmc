@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: smt2_parsert::get_simple_symbol()
+Function: smt2_parsert::is_simple_symbol_character
 
   Inputs:
 
@@ -23,23 +23,43 @@ Function: smt2_parsert::get_simple_symbol()
 
 \*******************************************************************/
 
-void smt2_parsert::get_simple_symbol(char first)
+bool smt2_parsert::is_simple_symbol_character(char ch)
+{
+  // any non-empty sequence of letters, digits and the characters
+  // ~ ! @ $ % ^ & * _ - + = < > . ? /
+  // that does not start with a digit and is not a reserved word.
+
+  return isalnum(ch) || 
+     ch=='~' || ch=='!' || ch=='@' || ch=='$' || ch=='%' ||
+     ch=='^' || ch=='&' || ch=='*' || ch=='_' || ch=='-' ||
+     ch=='+' || ch=='=' || ch=='<' || ch=='>' || ch=='.' ||
+     ch=='?' || ch=='/';
+}
+
+/*******************************************************************\
+
+Function: smt2_parsert::get_simple_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_parsert::get_simple_symbol()
 {
   // any non-empty sequence of letters, digits and the characters
   // ~ ! @ $ % ^ & * _ - + = < > . ? /
   // that does not start with a digit and is not a reserved word.
 
   buffer.clear();
-  buffer+=first;
 
   char ch;
   while(in.get(ch))
   {
-    if(isalnum(ch) || 
-       ch=='~' || ch=='!' || ch=='@' || ch=='$' || ch=='%' ||
-       ch=='^' || ch=='&' || ch=='*' || ch=='_' || ch=='-' ||
-       ch=='+' || ch=='=' || ch=='<' || ch=='>' || ch=='.' ||
-       ch=='?' || ch=='/')
+    if(is_simple_symbol_character(ch))
     {
       buffer+=ch;
     }
@@ -98,25 +118,33 @@ Function: smt2_parsert::get_string_literal
 
 void smt2_parsert::get_string_literal()
 {
-  // TODO: the SMT-LIB standard says that string literals
-  // only use the double-double quote for escaping.
-  // In particular, \ has no particular meaning.
-
-  // any sequence of printable ASCII characters delimited by
-  // double quotes (") and possibly containing the C-style escape
-  // sequences \" and double-backslash
-
   buffer.clear();
   
   char ch;
   while(in.get(ch))
   {
-    if(ch=='"') return; // done 
-    if(ch=='\\') in.get(ch); // quote
+    if(ch=='"')
+    {
+      // quotes may be escaped by repeating
+      if(in.get(ch))
+      {
+        if(ch=='"')
+        {
+        }
+        else
+        {
+          in.unget();
+          return; // done 
+        }
+      }
+      else
+        return; // done
+    }
     buffer+=ch;
   }
 
   // Hmpf. Eof before end of string literal. This is an error.
+  error("EOF within string literal");
 }
 
 /*******************************************************************\
@@ -161,8 +189,11 @@ void smt2_parsert::operator()()
       
     case ')':
       // done with sub-expression
-      if(open_parentheses==0) // unexpected ')'. This is an error;
+      if(open_parentheses==0) // unexpected ')'. This is an error.
+      {
+        error("unexpected closing parenthesis");
         return;
+      }
       
       open_parentheses--;
 
@@ -184,11 +215,27 @@ void smt2_parsert::operator()()
       string_literal();
       if(open_parentheses==0) return; // done
       break;
+      
+    case ':': // keyword
+      get_simple_symbol();
+      keyword();
+      if(open_parentheses==0) return; // done
+      break;
 
     default: // likely a simple symbol
-      get_simple_symbol(ch);
-      symbol();
-      if(open_parentheses==0) return; // done
+      if(is_simple_symbol_character(ch))
+      {
+        in.unget();
+        get_simple_symbol();
+        symbol();
+        if(open_parentheses==0) return; // done
+      }
+      else
+      {
+        // illegal character, error
+        error("unexpected character");
+        return;
+      }
     }
   }
 
@@ -199,5 +246,6 @@ void smt2_parsert::operator()()
   else
   {
     // Eof before end of expression. Error!
+    error("EOF before end of expression");
   }
 }

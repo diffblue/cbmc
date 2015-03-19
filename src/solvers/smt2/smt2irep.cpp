@@ -63,6 +63,15 @@ protected:
     else
       stack.top().get_sub().push_back(tmp);
   }
+  
+  virtual void keyword()
+  {
+    // ignore
+  }
+  
+  virtual void error(const std::string &message)
+  {
+  }
 };
 
 irept smt2irep(std::istream &in)
