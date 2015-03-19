@@ -1,5 +1,7 @@
 // small unit test for parsing SMT 2 files
 
+#include <cstdlib>
+
 #include <iostream>
 
 #include "smt2_parser.h"
@@ -41,6 +43,16 @@ protected:
     out << buffer;
   }
   
+  virtual void keyword()
+  {
+    if(first)
+      first=false;
+    else
+      out << ' ';
+
+    out << ':' << buffer;
+  }
+  
   virtual void string_literal()
   {
     if(first)
@@ -53,7 +65,7 @@ protected:
     for(unsigned i=0; i<buffer.size(); i++)
     {
       char ch=buffer[i];
-      if(ch=='"') out << '\\';
+      if(ch=='"') out << '"';
       out << ch;
     }
 
@@ -73,6 +85,12 @@ protected:
   {
     out << ')';
     first=false;
+  }
+  
+  virtual void error(const std::string &message)
+  {
+    std::cerr << "error: " << message << '\n';
+    exit(0);
   }
 };
 
