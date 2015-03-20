@@ -72,6 +72,16 @@ protected:
     out << '"';
   }
   
+  virtual void numeral()
+  {
+    if(first)
+      first=false;
+    else
+      out << ' ';
+
+    out << buffer;
+  }
+  
   virtual void open_expression() // '('
   {
     if(!first)

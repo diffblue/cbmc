@@ -44,6 +44,11 @@ protected:
     symbol(); // we don't distinguish
   }
   
+  virtual void numeral()
+  {
+    symbol(); // we don't distinguish
+  }
+  
   virtual void open_expression() // '('
   {
     // produce sub-irep
