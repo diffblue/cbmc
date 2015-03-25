@@ -323,11 +323,11 @@ Function: float_bvt::sign_bit
 
 \*******************************************************************/
 
-exprt float_bvt::sign_bit(
-  const exprt &op,
-  const ieee_float_spect &spec)
+exprt float_bvt::sign_bit(const exprt &op)
 {
-  return extractbit_exprt(op, spec.width()-1);
+  const bitvector_typet &bv_type=to_bitvector_type(op.type());
+  unsigned width=bv_type.get_width();
+  return extractbit_exprt(op, width-1);
 }
 
 /*******************************************************************\
@@ -352,7 +352,7 @@ exprt float_bvt::from_signed_integer(
   unbiased_floatt result;
 
   // we need to adjust for negative integers
-  result.sign=sign_bit(src, spec);
+  result.sign=sign_bit(src);
 
   result.fraction=
     typecast_exprt(abs_exprt(src), unsignedbv_typet(src_width));
@@ -1017,7 +1017,7 @@ exprt float_bvt::relation(
     // signs different? trivial! Unless Zero.
 
     exprt signs_different=
-      notequal_exprt(sign_bit(src1, spec), sign_bit(src2, spec));
+      notequal_exprt(sign_bit(src1), sign_bit(src2));
 
     // as long as the signs match: compare like unsigned numbers
 
@@ -1031,11 +1031,11 @@ exprt float_bvt::relation(
     // if both are negative (and not the same), need to turn around!
     exprt less_than2=
         notequal_exprt(less_than1,
-                       and_exprt(sign_bit(src1, spec), sign_bit(src2, spec)));
+                       and_exprt(sign_bit(src1), sign_bit(src2)));
 
     exprt less_than3=
       if_exprt(signs_different,
-        sign_bit(src1, spec),
+        sign_bit(src1),
         less_than2);
 
     if(rel==LT)
@@ -1772,7 +1772,7 @@ float_bvt::unbiased_floatt float_bvt::unpack(
 {
   unbiased_floatt result;
 
-  result.sign=sign_bit(src, spec);
+  result.sign=sign_bit(src);
 
   result.fraction=get_fraction(src, spec);
 
