@@ -48,6 +48,7 @@ public:
     logic(_logic),
     solver(_solver),
     boolbv_width(_ns),
+    let_id_count(0),
     pointer_logic(_ns),
     no_boolean_variables(0)
   {
@@ -162,6 +163,49 @@ protected:
   void find_symbols(const typet &type);
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
+  // letification
+  typedef std::pair<unsigned, symbol_exprt> let_count_id;
+  typedef hash_map_cont<exprt, let_count_id, irep_hash> seen_expressionst;
+  unsigned let_id_count;
+  const static unsigned LET_COUNT = 2;
+
+  class let_visitort : public expr_visitort
+  {
+    const seen_expressionst &let_map;
+
+  public:
+    let_visitort(const seen_expressionst &map):let_map(map) { }
+    
+    void operator()(exprt &expr)
+    {
+      seen_expressionst::const_iterator it = let_map.find(expr);
+      if (it != let_map.end() &&
+	  it->second.first >= LET_COUNT)
+      {
+	symbol_exprt symb = it->second.second;
+	expr = symb;
+	return;
+      }
+    }
+  };
+  
+  exprt letify(exprt &expr);
+  exprt letify_rec(
+    exprt &expr,
+    std::vector<exprt>& let_order,
+    const seen_expressionst& map,
+    unsigned i);
+
+  void collect_bindings(
+    exprt &expr,
+    seen_expressionst &map,
+    std::vector<exprt> &let_order);
+
+  exprt substitute_let(
+    exprt &expr,
+    const seen_expressionst &map);
+
+  // Parsing solver responses  
   constant_exprt parse_literal(const irept &, const typet &type);
   exprt parse_struct(const irept &s, const struct_typet &type);
   exprt parse_union(const irept &s, const union_typet &type);
@@ -180,7 +224,18 @@ protected:
     smt2_symbolt(const irep_idt &_identifier, const typet &_type):
       exprt(ID_smt2_symbol, _type)
     { set(ID_identifier, _identifier); }
+      
+    inline const irep_idt &get_identifier() const
+    {
+      return get(ID_identifier);
+    }
   };
+
+  inline const smt2_symbolt &to_smt2_symbol(const exprt &expr)
+  {
+    assert(expr.id()==ID_smt2_symbol && !expr.has_operands());
+    return static_cast<const smt2_symbolt&>(expr);
+  }
   
   // flattens any non-bitvector type into a bitvector,
   // e.g., booleans, vectors, structs, arrays but also
