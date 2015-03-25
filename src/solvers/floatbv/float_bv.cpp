@@ -63,6 +63,10 @@ exprt float_bvt::convert(const exprt &expr)
     else
       return nil_exprt();
   }
+  else if(expr.id()==ID_typecast &&
+	  expr.type().id()==ID_bool &&
+	  expr.op0().type().id()==ID_floatbv)  // float -> bool
+    return not_exprt(is_zero(expr.op0(), get_spec(expr.op0())));
   else if(expr.id()==ID_floatbv_plus)
     return add_sub(false, expr.op0(), expr.op1(), expr.op2(), get_spec(expr));
   else if(expr.id()==ID_floatbv_minus)
@@ -87,8 +91,10 @@ exprt float_bvt::convert(const exprt &expr)
     return relation(expr.op0(), LE, expr.op1(), get_spec(expr.op0()));
   else if(expr.id()==ID_ge)
     return relation(expr.op0(), GE, expr.op1(), get_spec(expr.op0()));
-  else
-    return nil_exprt();
+  else if(expr.id()==ID_sign)
+    return sign_bit(expr.op0());
+
+  return nil_exprt();
 }
 
 /*******************************************************************\
@@ -549,9 +555,9 @@ exprt float_bvt::conversion(
     unsigned padding=dest_spec.f-src_spec.f;
     result.fraction=
       concatenation_exprt(
-        unpacked_src.fraction,
-        from_integer(0, unsignedbv_typet(padding)),
-        unsignedbv_typet(dest_spec.f));
+	unpacked_src.fraction,		  
+	from_integer(0, unsignedbv_typet(padding)),
+        unsignedbv_typet(dest_spec.f+1));
     
     // the exponent gets sign-extended
     assert(unpacked_src.exponent.type().id()==ID_signedbv);
@@ -679,8 +685,9 @@ exprt float_bvt::add_sub(
 
   // pad fractions with 3 zeros from below
   exprt three_zeros=from_integer(0, unsignedbv_typet(3));
-  const exprt fraction1_padded=concatenation_exprt(new_fraction1, three_zeros, unsignedbv_typet(spec.f+3));
-  const exprt fraction2_padded=concatenation_exprt(new_fraction2, three_zeros, unsignedbv_typet(spec.f+3));
+  // add 4 to spec.f because unpacked new_fraction has the hidden bit
+  const exprt fraction1_padded=concatenation_exprt(new_fraction1, three_zeros, unsignedbv_typet(spec.f+4));
+  const exprt fraction2_padded=concatenation_exprt(new_fraction2, three_zeros, unsignedbv_typet(spec.f+4));
 
   // shift new_fraction2
   exprt sticky_bit;
@@ -691,12 +698,14 @@ exprt float_bvt::add_sub(
   // sticky bit: 'or' of the bits lost by the right-shift
   exprt fraction2_stickied=
     bitor_exprt(fraction2_shifted,
-    concatenation_exprt(
-      from_integer(0, unsignedbv_typet(spec.f+2)), sticky_bit, fraction2_shifted.type()));
+		concatenation_exprt(
+				    from_integer(0, unsignedbv_typet(spec.f+3)),
+				    sticky_bit,
+				    fraction2_shifted.type()));
 
   // need to have two extra fraction bits for addition and rounding
-  const exprt fraction1_ext=typecast_exprt(fraction1_shifted, unsignedbv_typet(spec.f+3+2));
-  const exprt fraction2_ext=typecast_exprt(fraction2_stickied, unsignedbv_typet(spec.f+3+2));
+  const exprt fraction1_ext=typecast_exprt(fraction1_shifted, unsignedbv_typet(spec.f+4+2));
+  const exprt fraction2_ext=typecast_exprt(fraction2_stickied, unsignedbv_typet(spec.f+4+2));
 
   unbiased_floatt result;
 
@@ -710,8 +719,10 @@ exprt float_bvt::add_sub(
       plus_exprt(fraction1_ext, fraction2_ext));
 
   // sign of result
-  exprt fraction_sign=sign_exprt(result.fraction);
-  result.fraction=abs_exprt(result.fraction);
+  unsigned width = to_bitvector_type(result.fraction.type()).get_width();
+  exprt fraction_sign=sign_exprt(typecast_exprt(result.fraction, signedbv_typet(width)));
+  result.fraction=typecast_exprt(abs_exprt(typecast_exprt(result.fraction, signedbv_typet(width))),
+				unsignedbv_typet(width));
 
   result.exponent=bigger_exponent;
 
@@ -833,8 +844,8 @@ exprt float_bvt::mul(
   const unbiased_floatt unpacked1=unpack(src1, spec);
   const unbiased_floatt unpacked2=unpack(src2, spec);
 
-  // zero-extend the fractions
-  typet new_fraction_type=unsignedbv_typet(spec.f*2);
+  // zero-extend the fractions (unpacked fraction has the hidden bit)
+  typet new_fraction_type=unsignedbv_typet((spec.f+1)*2);
   const exprt fraction1=typecast_exprt(unpacked1.fraction, new_fraction_type);
   const exprt fraction2=typecast_exprt(unpacked2.fraction, new_fraction_type);
 
@@ -1866,8 +1877,8 @@ exprt float_bvt::sticky_right_shift(
   unsigned d=1, width=to_unsignedbv_type(op.type()).get_width();
   exprt result=op;
   sticky=false_exprt();
-  
-  unsigned dist_width=to_signedbv_type(dist.type()).get_width();
+
+  unsigned dist_width=to_bitvector_type(dist.type()).get_width();
 
   for(unsigned stage=0; stage<dist_width; stage++)
   {
