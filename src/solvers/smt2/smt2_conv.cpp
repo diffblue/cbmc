@@ -164,12 +164,15 @@ void smt2_convt::write_footer(std::ostream &out)
   
   out << "(check-sat)" << "\n";
   out << "\n";
-  
-  for(smt2_identifierst::const_iterator
-      it=smt2_identifiers.begin();
-      it!=smt2_identifiers.end();
-      it++)
-    out << "(get-value (|" << *it << "|))" << "\n";
+
+  if (solver!=BOOLECTOR)
+  {
+    for(smt2_identifierst::const_iterator
+        it=smt2_identifiers.begin();
+        it!=smt2_identifiers.end();
+        it++)
+      out << "(get-value (|" << *it << "|))" << "\n";
+  }
 
   out << "\n";
 
@@ -1025,6 +1028,21 @@ Function: smt2_convt::convert_floatbv
 void smt2_convt::convert_floatbv(const exprt &expr)
 {
   assert(!use_FPA_theory);
+
+  if(expr.id()==ID_symbol)
+  {
+    irep_idt id=to_symbol_expr(expr).get_identifier();
+    out << '|' << convert_identifier(id) << '|';
+    return;
+  }
+
+  if(expr.id()==ID_smt2_symbol)
+  {
+    irep_idt id=to_smt2_symbol(expr).get_identifier();
+    out << id;
+    return;
+  }
+
   assert(!expr.operands().empty());
 
   out << "(|float_bv." << expr.id()
@@ -1692,7 +1710,7 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     if(type.id()==ID_signedbv)
     {
-      std::size_t result_width=to_signedbv_type(type).get_width();
+      std::size_t result_width = to_signedbv_type(type).get_width();
             
       out << "(ite (bvslt ";
       convert_expr(expr.op0());
@@ -3043,7 +3061,8 @@ void smt2_convt::convert_relation(const exprt &expr)
   const typet &op_type=expr.op0().type();
 
   if(op_type.id()==ID_unsignedbv ||
-     op_type.id()==ID_pointer)
+     op_type.id()==ID_pointer ||
+     op_type.id()==ID_bv)
   {
     out << "(";
     if(expr.id()==ID_le)
@@ -4705,8 +4724,9 @@ void smt2_convt::find_symbols(const exprt &expr)
           smt2_symbolt("op"+i2string(i), tmp1.operands()[i].type());
 
       exprt tmp2=float_bv(tmp1);
-      assert(!tmp2.is_nil());
+      tmp2=letify(tmp2);
 
+      assert(!tmp2.is_nil());
       convert_expr(tmp2);
 
       out << ")\n"; // define-fun
@@ -5130,4 +5150,132 @@ void smt2_convt::find_symbols_rec(
        find_symbols_rec(ns.follow(type), recstack);
      }
    }
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::letify
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt smt2_convt::letify(exprt &expr)
+{
+  seen_expressionst map;
+  std::vector<exprt> let_order;
+
+  collect_bindings(expr, map, let_order);
+
+  return letify_rec(expr, let_order, map, 0);
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::letify_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt smt2_convt::letify_rec(
+  exprt &expr,
+  std::vector<exprt> &let_order,
+  const seen_expressionst &map,
+  unsigned i)
+{
+  if(i >= let_order.size())
+    return substitute_let(expr, map);
+
+  exprt current=let_order[i];
+  assert(map.find(current) != map.end());
+  
+  if (map.find(current)->second.first < LET_COUNT)
+    return letify_rec(expr, let_order, map, i+1);
+
+  let_exprt let;
+
+  let.symbol() = map.find(current)->second.second;
+  let.value() = substitute_let(current, map);
+  let.where() = letify_rec(expr, let_order, map, i+1);
+
+  return let;
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::collect_bindings
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::collect_bindings(
+  exprt &expr,
+  seen_expressionst &map,
+  std::vector<exprt> &let_order)
+{
+  seen_expressionst::iterator it = map.find(expr);
+
+  if(it!=map.end())
+  {
+    let_count_id &count_id = it->second;
+    ++(count_id.first);
+    return;
+  }
+
+  // do not letify things with no children
+  if(expr.operands().empty())
+    return;
+  
+  for (unsigned i = 0; i < expr.operands().size(); ++i)
+    collect_bindings(expr.operands()[i], map, let_order);
+
+  assert(map.find(expr) == map.end());
+
+  symbol_exprt let=
+    symbol_exprt("_let_"+i2string(++let_id_count), expr.type());
+
+  map.insert(std::make_pair(expr, std::make_pair(1, let)));
+
+  let_order.push_back(expr);
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::substitute_let
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt smt2_convt::substitute_let(
+  exprt &expr,
+  const seen_expressionst &map)
+{
+  if(expr.operands().empty())
+    return expr;
+
+  let_visitort lv(map);
+
+  Forall_operands(it, expr)
+    it->visit(lv);
+
+  return expr;
 }
