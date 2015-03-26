@@ -1035,9 +1035,11 @@ exprt float_bvt::relation(
     // this works due to the BIAS
     exprt less_than1=
       binary_relation_exprt(
-        typecast_exprt(src1, unsignedbv_typet(spec.width())),
+	typecast_exprt(typecast_exprt(src1, bv_typet(spec.width())),
+		                      unsignedbv_typet(spec.width())),
         ID_lt,
-        typecast_exprt(src2, unsignedbv_typet(spec.width())));
+        typecast_exprt(typecast_exprt(src2, bv_typet(spec.width())),
+		                      unsignedbv_typet(spec.width())));
 
     // if both are negative (and not the same), need to turn around!
     exprt less_than2=

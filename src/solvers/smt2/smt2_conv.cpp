@@ -2081,7 +2081,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     if(src_type.id()==ID_signedbv || // from signedbv
        src_type.id()==ID_unsignedbv || // from unsigedbv
        src_type.id()==ID_c_bool ||
-       src_type.id()==ID_c_enum)
+       src_type.id()==ID_c_enum ||
+       src_type.id()==ID_bv)
     {
       std::size_t from_width=boolbv_width(src_type);
 
