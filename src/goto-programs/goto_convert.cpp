@@ -2062,9 +2062,22 @@ void goto_convertt::generate_ifthenelse(
   {
     // The above conjunction deliberately excludes the instance
     // if(some) { label: assert(0); }
-    true_case.instructions.back().guard=not_exprt(guard);
+    true_case.instructions.back().guard=boolean_negate(guard);
     dest.destructive_append(true_case);
     true_case.instructions.clear();
+  }
+
+  // similarly, do guarded assertions directly
+  if(false_case.instructions.size()==1 &&
+     false_case.instructions.back().is_assert() &&
+     false_case.instructions.back().guard.is_false() &&
+     false_case.instructions.back().labels.empty())
+  {
+    // The above conjunction deliberately excludes the instance
+    // if(some) ... else { label: assert(0); }
+    false_case.instructions.back().guard=guard;
+    dest.destructive_append(false_case);
+    false_case.instructions.clear();
   }
 
   // Flip around if no 'true' case code.
