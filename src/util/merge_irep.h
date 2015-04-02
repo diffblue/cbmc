@@ -17,7 +17,8 @@ class merged_irept:public irept
 public:
   inline bool operator == (const merged_irept &other) const
   {
-    // we assume that both are in the same container
+    // We assume that both are in the same container,
+    // which isn't checked.
     return data==other.data;
   }
 
@@ -29,8 +30,13 @@ public:
   
   inline std::size_t hash() const { return (std::size_t)data; }
 
+  // copy constructor: will only copy from other merged_irepts
+  inline merged_irept(const merged_irept &_src):irept(_src)
+  {
+  }
+
 protected:
-  // can only be used by merged_irepst
+  // more general one can only be used by merged_irepst
   inline explicit merged_irept(const irept &src):irept(src)
   {
   }
