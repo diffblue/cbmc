@@ -33,6 +33,13 @@ int yymmerror(const std::string &error);
 %token TOK_BEGIN       "begin"
 %token TOK_END         "end"
 %token TOK_FLAG        "flag"
+%token TOK_SHOW        "show"
+%token TOK_UNSHOW      "unshow"
+%token TOK_PROCEDURE   "procedure"
+%token TOK_ENUM        "enum"
+%token TOK_CHECK       "check"
+%token TOK_FORALL      "forall"
+
 %token TOK_IDENTIFIER
 %token TOK_TAG_IDENTIFIER
 %token TOK_NUMBER

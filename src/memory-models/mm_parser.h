@@ -17,7 +17,7 @@ int yymmparse();
 class mm_parsert:public parsert
 {
 public:
-  codet parse_tree;
+  irept parse_tree;
 
   virtual bool parse()
   {
