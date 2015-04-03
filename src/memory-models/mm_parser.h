@@ -17,7 +17,8 @@ int yymmparse();
 class mm_parsert:public parsert
 {
 public:
-  irept parse_tree;
+  irep_idt model_name;
+  irept instruction;
 
   virtual bool parse()
   {
@@ -26,7 +27,8 @@ public:
 
   virtual void clear()
   {
-    parse_tree.clear();
+    model_name.clear();
+    instruction.clear();
   }
 };
 

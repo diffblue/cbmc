@@ -1,5 +1,5 @@
 SRC = mm_y.tab.cpp mm_lex.yy.cpp mmcc_main.cpp mm_parser.cpp \
-      mmcc_parse_options.cpp
+      mmcc_parse_options.cpp mm2cpp.cpp
 
 OBJ += ../big-int/big-int$(LIBEXT) \
       ../util/util$(LIBEXT)
