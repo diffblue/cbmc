@@ -8,6 +8,7 @@
 static int isatty(int) { return 0; }
 #endif
 
+#define YYSTYPE unsigned
 #define PARSER mm_parser
 
 #include "mm_parser.h"
