@@ -51,7 +51,6 @@ tagidentifier	("'"{letter}({letter}|{digit}|"_"|"."|"-")*)
 "procedure"     { loc(); return TOK_PROCEDURE; }
 "check"         { loc(); return TOK_CHECK; }
 "enum"          { loc(); return TOK_ENUM; }
-"with"          { loc(); return TOK_WITH; }
 "forall"        { loc(); return TOK_FORALL; }
 {identifier}	{ loc(); return TOK_IDENTIFIER; }
 {tagidentifier}	{ loc(); return TOK_TAG_IDENTIFIER; }
