@@ -43,6 +43,7 @@ int yymmerror(const std::string &error);
 %token TOK_IDENTIFIER
 %token TOK_TAG_IDENTIFIER
 %token TOK_NUMBER
+%token TOK_STRING
 
 %start grammar
 
@@ -53,7 +54,27 @@ int yymmerror(const std::string &error);
 %}
 %%
 
-grammar : instruction
+grammar : model_name instruction
+        {
+          PARSER.model_name=stack($1).id();
+          PARSER.instruction=stack($2);
+        }
+        ;
+
+model_name:
+          TOK_IDENTIFIER
+        {
+          $$=$1;
+          stack($$).id(yymmtext);
+        }
+        | TOK_STRING
+        {
+          $$=$1;
+          std::string s;
+          const char *p=yymmtext+1;
+          while(*p!=0 && *p!='"') s+=*p;
+          stack($$).id(s);
+        }
         ;
 
 expr    : TOK_NUMBER

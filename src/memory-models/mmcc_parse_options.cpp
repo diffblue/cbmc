@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cbmc/version.h>
 
 #include "mm_parser.h"
+#include "mm2cpp.h"
 #include "mmcc_parse_options.h"
 
 /*******************************************************************\
@@ -102,6 +103,8 @@ int mmcc_parse_optionst::convert(std::istream &in)
     std::cerr << "parse error, giving up\n";
     return 3;
   }
+  
+  mm2cpp(mm_parser.model_name, mm_parser.instruction);
   
   return 0;
 }

@@ -26,9 +26,12 @@ digit		[0-9]
 number		{digit}+
 identifier	({letter}({letter}|{digit}|"_"|"."|"-")*)
 tagidentifier	("'"{letter}({letter}|{digit}|"_"|"."|"-")*)
+string          ["][^"]["]
+comment         "(*"(.|\n)*"*)"
 
 %%
 
+{comment}       { /* ignore */ }
 "^-1"		{ loc(); return TOK_INVERSE; }
 "->"		{ loc(); return TOK_MAPS_TO; }
 "++"		{ loc(); return TOK_PLUSPLUS; }
@@ -55,6 +58,7 @@ tagidentifier	("'"{letter}({letter}|{digit}|"_"|"."|"-")*)
 {identifier}	{ loc(); return TOK_IDENTIFIER; }
 {tagidentifier}	{ loc(); return TOK_TAG_IDENTIFIER; }
 {number}	{ loc(); return TOK_NUMBER; }
+{string}        { loc(); return TOK_STRING; }
 
 {nl}		{ /* ignore */ }
 {ws}		{ /* ignore */ }
