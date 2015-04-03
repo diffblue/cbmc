@@ -139,7 +139,7 @@ const merged_irept &merged_irepst::merged(const irept &irep)
   if(result.second) // really new, record
     merged_irep_store.insert(merged_irept(new_irep));
   
-  return static_cast<const merged_irept &>(*result.first);
+  return static_cast<const merged_irept &>(static_cast<const irept &>(*result.first));
 }
 
 /*******************************************************************\
