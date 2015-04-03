@@ -104,7 +104,7 @@ int mmcc_parse_optionst::convert(std::istream &in)
     return 3;
   }
   
-  mm2cpp(mm_parser.model_name, mm_parser.instruction);
+  mm2cpp(mm_parser.model_name, mm_parser.instruction, std::cout);
   
   return 0;
 }
