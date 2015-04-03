@@ -25,6 +25,7 @@ public:
   mmcc_parse_optionst(int argc, const char **argv);
 
 protected:
+  int convert(std::istream &);
 };
 
 #endif
