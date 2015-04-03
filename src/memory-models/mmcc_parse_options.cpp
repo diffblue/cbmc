@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <fstream>
 
+#include <util/cout_message.h>
+
 #include <cbmc/version.h>
 
 #include "mm_parser.h"
@@ -90,7 +92,9 @@ Function: mmcc_parse_optionst::convert
 
 int mmcc_parse_optionst::convert(std::istream &in)
 {
-  mm_parsert mm_parser;
+  console_message_handlert message_handler;
+  
+  mm_parser.set_message_handler(message_handler);
   mm_parser.in=&in;
   
   if(mm_parser.parse())
