@@ -1,4 +1,4 @@
-SRC = 
+SRC = mm_y.tab.cpp mm_lex.yy.cpp
 
 INCLUDES= -I ..
 
