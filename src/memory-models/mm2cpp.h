@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void mm2cpp(
   const irep_idt &,
-  const irept &);
+  const irept &,
+  std::ostream &);
 
 #endif
