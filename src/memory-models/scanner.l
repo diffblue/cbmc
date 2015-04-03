@@ -25,6 +25,7 @@ letter          [a-z]|[A-Z]
 digit		[0-9]
 number		{digit}+
 identifier	({letter}({letter}|{digit}|"_"|"."|"-")*)
+tagidentifier	("'"{letter}({letter}|{digit}|"_"|"."|"-")*)
 
 %%
 
@@ -32,6 +33,7 @@ identifier	({letter}({letter}|{digit}|"_"|"."|"-")*)
 "->"		{ loc(); return TOK_MAPS_TO; }
 "++"		{ loc(); return TOK_PLUSPLUS; }
 "||"		{ loc(); return TOK_OROR; }
+"flag"          { loc(); return TOK_FLAG; }
 "let"		{ loc(); return TOK_LET; }
 "in"		{ loc(); return TOK_IN; }
 "match"		{ loc(); return TOK_MATCH; }
@@ -45,6 +47,7 @@ identifier	({letter}({letter}|{digit}|"_"|"."|"-")*)
 "begin"         { loc(); return TOK_BEGIN; }
 "end"           { loc(); return TOK_END; }
 {identifier}	{ loc(); return TOK_IDENTIFIER; }
+{tagidentifier}	{ loc(); return TOK_TAG_IDENTIFIER; }
 {number}	{ loc(); return TOK_NUMBER; }
 
 {nl}		{ /* ignore */ }
@@ -55,3 +58,10 @@ identifier	({letter}({letter}|{digit}|"_"|"."|"-")*)
 %%
 
 int yywrap() { return 1; }
+
+int yymmerror(const std::string &error)
+{
+  mm_parser.parse_error(error, yytext);
+  return 0;
+}
+

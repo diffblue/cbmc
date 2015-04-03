@@ -1,4 +1,8 @@
-SRC = mm_y.tab.cpp mm_lex.yy.cpp
+SRC = mm_y.tab.cpp mm_lex.yy.cpp mmcc_main.cpp mm_parser.cpp \
+      mmcc_parse_options.cpp
+
+OBJ += ../big-int/big-int$(LIBEXT) \
+      ../util/util$(LIBEXT)
 
 INCLUDES= -I ..
 
@@ -8,7 +12,7 @@ include ../common
 CLEANFILES = memory_models$(LIBEXT) \
   mm_y.tab.h mm_y.tab.cpp mm_lex.yy.cpp mm_y.tab.cpp.output mm_y.output
 
-all: memory_models$(LIBEXT)
+all: mmcc$(EXEEXT)
 
 ###############################################################################
 
@@ -32,6 +36,6 @@ generated_files: mm_y.tab.cpp mm_lex.yy.cpp mm_y.tab.h
 
 ###############################################################################
 
-memory_models$(LIBEXT): $(OBJ) 
-	$(LINKLIB)
+mmcc$(EXEEXT): $(OBJ) 
+	$(LINKBIN)
 
