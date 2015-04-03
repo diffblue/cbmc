@@ -24,14 +24,15 @@ ws		(" "|\t|\r|\n)
 letter          [a-z]|[A-Z]
 digit		[0-9]
 number		{digit}+
-identifier	({letter}({letter}|{digit}|"_"|"."|"-")*)
-tagidentifier	("'"{letter}({letter}|{digit}|"_"|"."|"-")*)
+identifier	{letter}({letter}|{digit}|"_"|"."|"-")*
+tagidentifier	"'"{letter}({letter}|{digit}|"_"|"."|"-")*
 string          ["][^"]["]
 comment         "(*"(.|\n)*"*)"
 
 %%
 
 {comment}       { /* ignore */ }
+{string}        { loc(); return TOK_STRING; }
 "^-1"		{ loc(); return TOK_INVERSE; }
 "->"		{ loc(); return TOK_MAPS_TO; }
 "++"		{ loc(); return TOK_PLUSPLUS; }
@@ -55,10 +56,10 @@ comment         "(*"(.|\n)*"*)"
 "check"         { loc(); return TOK_CHECK; }
 "enum"          { loc(); return TOK_ENUM; }
 "forall"        { loc(); return TOK_FORALL; }
+"as"            { loc(); return TOK_AS; }
 {identifier}	{ loc(); return TOK_IDENTIFIER; }
 {tagidentifier}	{ loc(); return TOK_TAG_IDENTIFIER; }
 {number}	{ loc(); return TOK_NUMBER; }
-{string}        { loc(); return TOK_STRING; }
 
 {nl}		{ /* ignore */ }
 {ws}		{ /* ignore */ }

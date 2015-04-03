@@ -39,6 +39,7 @@ int yymmerror(const std::string &error);
 %token TOK_ENUM        "enum"
 %token TOK_CHECK       "check"
 %token TOK_FORALL      "forall"
+%token TOK_AS          "as"
 
 %token TOK_IDENTIFIER
 %token TOK_TAG_IDENTIFIER
@@ -54,7 +55,7 @@ int yymmerror(const std::string &error);
 %}
 %%
 
-grammar : model_name instruction
+grammar : model_name instruction_list
         {
           PARSER.model_name=stack($1).id();
           PARSER.instruction=stack($2);
