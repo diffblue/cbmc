@@ -73,7 +73,7 @@ model_name:
           $$=$1;
           std::string s;
           const char *p=yymmtext+1;
-          while(*p!=0 && *p!='"') s+=*p;
+          while(*p!=0 && *p!='"') { s+=*p; p++; }
           stack($$).id(s);
         }
         ;

@@ -26,7 +26,7 @@ digit		[0-9]
 number		{digit}+
 identifier	{letter}({letter}|{digit}|"_"|"."|"-")*
 tagidentifier	"'"{letter}({letter}|{digit}|"_"|"."|"-")*
-string          ["][^"]["]
+string          ["][^"\n]*["]
 comment         "(*"(.|\n)*"*)"
 
 %%
