@@ -37,7 +37,6 @@ int yymmerror(const std::string &error);
 %token TOK_UNSHOW      "unshow"
 %token TOK_PROCEDURE   "procedure"
 %token TOK_ENUM        "enum"
-%token TOK_CHECK       "check"
 %token TOK_FORALL      "forall"
 %token TOK_AS          "as"
 
@@ -267,10 +266,6 @@ expr_list: /* nothing */
         ;
 
 pat     : identifier
-        {
-          newstack($$);
-          mto($$, $1);
-        }
         | '(' identifier_list ')'
         {
           $$=$2;
@@ -328,11 +323,12 @@ instruction:
         }
         | flag_opt check expr as_opt
         {
-          $$=$2;
+          newstack($$);
           stack($$).id(ID_code);
           stack($$).set(ID_statement, "check");
           mto($$, $2);
           mto($$, $3);
+          mto($$, $4);
         }
         | "procedure" identifier '(' identifier_list ')' '=' instruction_list "end"
         {

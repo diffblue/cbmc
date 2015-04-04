@@ -53,7 +53,6 @@ comment         "(*"(.|\n)*"*)"
 "show"          { loc(); return TOK_SHOW; }
 "unshow"        { loc(); return TOK_UNSHOW; }
 "procedure"     { loc(); return TOK_PROCEDURE; }
-"check"         { loc(); return TOK_CHECK; }
 "enum"          { loc(); return TOK_ENUM; }
 "forall"        { loc(); return TOK_FORALL; }
 "as"            { loc(); return TOK_AS; }
