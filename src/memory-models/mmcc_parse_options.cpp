@@ -54,26 +54,39 @@ int mmcc_parse_optionst::doit()
     return 0;
   }
   
-  if(cmdline.args.size()==1)
+  try
   {
-    std::ifstream in(cmdline.args[0].c_str());
-    
-    if(!in)
+    if(cmdline.args.size()==1)
     {
-      std::cerr << "failed to open `" << cmdline.args[0] << "'\n";
-      return 2;
-    }
+      std::ifstream in(cmdline.args[0].c_str());
+      
+      if(!in)
+      {
+        std::cerr << "failed to open `" << cmdline.args[0] << "'\n";
+        return 2;
+      }
 
-    return convert(in);    
+      return convert(in, cmdline.args[0]);
+    }
+    else if(cmdline.args.size()==0)
+    {
+      return convert(std::cin, "stdin");
+    }
+    else
+    {
+      usage_error();
+      return 1;
+    }
   }
-  else if(cmdline.args.size()==0)
+  catch(const char *error)
   {
-    return convert(std::cin);
+    std::cerr << error << '\n';
+    return 10;
   }
-  else
+  catch(const std::string error)
   {
-    usage_error();
-    return 1;
+    std::cerr << error << '\n';
+    return 10;
   }
   
   return 0;
@@ -91,12 +104,15 @@ Function: mmcc_parse_optionst::convert
 
 \*******************************************************************/
 
-int mmcc_parse_optionst::convert(std::istream &in)
+int mmcc_parse_optionst::convert(
+  std::istream &in,
+  const std::string &file)
 {
   console_message_handlert message_handler;
   
   mm_parser.set_message_handler(message_handler);
   mm_parser.in=&in;
+  mm_parser.set_file(file);
   
   if(mm_parser.parse())
   {
