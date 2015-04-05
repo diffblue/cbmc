@@ -174,14 +174,14 @@ void mm2cppt::operator()(const irept &instruction)
   out << "// Model: " << model_name << '\n';
   out << '\n';
   
-  out << "class memory_model_" << text2c(model_name) << '\n';
+  out << "class memory_model_" << text2c(model_name) << "t\n";
   out << "{\n";
   out << "public:\n";
   out << "  void operator()();\n";
   out << "};\n";
   out << '\n';
 
-  out << "void memory_model_" << text2c(model_name) << "::operator()()\n";
+  out << "void memory_model_" << text2c(model_name) << "t::operator()()\n";
   out << "{\n";
   instruction2cpp(to_code(static_cast<const exprt &>(instruction)), 0);
   out << "}\n";
