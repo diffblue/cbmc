@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include <util/std_code.h>
 
 #include "mm2cpp.h"
