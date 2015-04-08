@@ -52,7 +52,7 @@ int yymmerror(const std::string &error);
 %right ';'
 %left '\\'
 %right '&'
-%nonassoc '*' '+' INV
+%nonassoc '*' '+'
 %nonassoc "^-1"
 
 %start grammar
