@@ -45,6 +45,16 @@ int yymmerror(const std::string &error);
 %token TOK_NUMBER
 %token TOK_STRING
 
+%right ','
+%left prec_app
+%right '|'
+%right "++"
+%right SEMI
+%left DIFF
+%right INTER
+%nonassoc '*' '+' OPT "^-1" COMP
+%nonassoc HAT
+
 %start grammar
 
 %{
@@ -105,7 +115,7 @@ expr    : TOK_NUMBER
         | expr "^-1"
         {
           $$=$2;
-          stack($$).id("transitive_closure");
+          stack($$).id("inverse");
           mto($$, $1);
         }
         | expr '|' expr
@@ -143,7 +153,7 @@ expr    : TOK_NUMBER
           mto($$, $1);
           mto($$, $3);
         }
-        | expr expr
+        | expr expr %prec prec_app
         {
           newstack($$);
           stack($$).id(ID_function_call);
@@ -258,7 +268,7 @@ expr_list: /* nothing */
         {
           newstack($$);
         }
-        | expr_list expr
+        | expr_list ',' expr
         {
           $$=$1;
           mto($$, $1);
