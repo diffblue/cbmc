@@ -87,13 +87,37 @@ model_name:
         }
         ;
 
-expr    : TOK_NUMBER
+simple_expr: TOK_NUMBER
         {
           $$=$1;
           stack($$).id(ID_constant);
           stack($$).set(ID_value, yymmtext);
         }
         | identifier
+        | tag_identifier
+        | "begin" expr "end"
+        {
+          $$=$2;
+        }
+        | '{' expr_list '}'
+        {
+          $$=$1;
+          stack($$).id(ID_set);
+          mto($$, $2);
+        }
+        | '(' expr ')'
+        {
+          $$=$2;
+        }
+        | '(' expr_list ')'
+        {
+          $$=$1;
+          stack($$).id("tuple");
+          mto($$, $2);
+        }
+        ;
+
+expr:     simple_expr
         | expr '*'
         {
           $$=$2;
@@ -153,7 +177,7 @@ expr    : TOK_NUMBER
           mto($$, $1);
           mto($$, $3);
         }
-        | expr expr %prec prec_app
+        | identifier simple_expr %prec prec_app
         {
           newstack($$);
           stack($$).id(ID_function_call);
@@ -180,27 +204,6 @@ expr    : TOK_NUMBER
           stack($$).id(ID_let);
           mto($$, $3);
           mto($$, $5);
-        }
-        | '(' expr ')'
-        {
-          $$=$2;
-        }
-        | "begin" expr "end"
-        {
-          $$=$2;
-        }
-        | tag_identifier
-        | '{' expr_list '}'
-        {
-          $$=$1;
-          stack($$).id(ID_set);
-          mto($$, $2);
-        }
-        | '(' expr_list ')'
-        {
-          $$=$1;
-          stack($$).id("tuple");
-          mto($$, $2);
         }
         | "match" expr "with" tag_match_list "end"
         {
