@@ -46,6 +46,8 @@ int yymmerror(const std::string &error);
 %token TOK_STRING
 
 %right ','
+%left prec_let
+%left prec_fun
 %left prec_app
 %right '|'
 %right "++"
@@ -184,21 +186,21 @@ expr:     simple_expr
           mto($$, $1);
           mto($$, $2);
         }
-        | "fun" pat "->" expr  
+        | "fun" pat "->" expr %prec prec_fun
         {
           $$=$1;
           stack($$).id(ID_function);
           mto($$, $2);
           mto($$, $4);
         }
-        | "let" binding_list "in" expr  
+        | "let" binding_list "in" expr %prec prec_let
         {
           $$=$1;
           stack($$).id(ID_let);
           mto($$, $2);
           mto($$, $4);
         }
-        | "let" "rec" binding_list "in" expr  
+        | "let" "rec" binding_list "in" expr %prec prec_let
         {
           $$=$1;
           stack($$).id(ID_let);
