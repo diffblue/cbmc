@@ -49,11 +49,11 @@ int yymmerror(const std::string &error);
 %left prec_app
 %right '|'
 %right "++"
-%right SEMI
-%left DIFF
-%right INTER
-%nonassoc '*' '+' OPT "^-1" COMP
-%nonassoc HAT
+%right ';'
+%left '\\'
+%right '&'
+%nonassoc '*' '+' INV
+%nonassoc "^-1"
 
 %start grammar
 
@@ -286,7 +286,7 @@ identifier_list: /* nothing */
         {
           newstack($$);
         }
-        | identifier_list identifier
+        | identifier_list ',' identifier
         {
           $$=$1;
           mto($$, $2);
@@ -354,15 +354,6 @@ instruction:
           $$=$1;
           stack($$).id(ID_code);
           stack($$).set(ID_statement, "call");
-          mto($$, $2);
-          mto($$, $3);
-        }
-        | "show" expr as_opt
-        {
-          // Jade says never used
-          $$=$1;
-          stack($$).id(ID_code);
-          stack($$).set(ID_statement, "show");
           mto($$, $2);
           mto($$, $3);
         }
