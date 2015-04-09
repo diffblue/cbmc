@@ -23,6 +23,10 @@ STATIC_ASSERT(sizeof(enum E_DI __attribute__ ((__mode__ (__HI__))))==2);
 STATIC_ASSERT(sizeof(enum E_DI __attribute__ ((__mode__ (__SI__))))==4);
 STATIC_ASSERT(sizeof(enum E_DI __attribute__ ((__mode__ (__DI__))))==8);
 
+// gcc (but not clang) also allows mode attributes on _Complex
+// from fftw3.h -- this means TF on the underlying floats
+typedef _Complex float __attribute__ ((__mode__ (TC))) fftwq_complex;
+
 #endif
 
 int main()
