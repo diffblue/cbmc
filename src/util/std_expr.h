@@ -1365,7 +1365,7 @@ public:
 
     while(p->id()==ID_member || p->id()==ID_index)
     {
-      assert(p->operands().size()!=0);
+      assert(!p->operands().empty());
       p=&p->op0();
     }
     

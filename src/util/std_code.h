@@ -650,14 +650,14 @@ public:
 static inline const code_gotot &to_code_goto(const codet &code)
 {
   assert(code.get_statement()==ID_goto &&
-         code.operands().size()==0);
+         code.operands().empty());
   return static_cast<const code_gotot &>(code);
 }
 
 static inline code_gotot &to_code_goto(codet &code)
 {
   assert(code.get_statement()==ID_goto &&
-         code.operands().size()==0);
+         code.operands().empty());
   return static_cast<code_gotot &>(code);
 }
 

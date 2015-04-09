@@ -691,7 +691,7 @@ Function: float_utilst::negate
 bvt float_utilst::negate(const bvt &src)
 {
   bvt result=src;
-  assert(src.size()!=0);
+  assert(!src.empty());
   literalt &sign_bit=result[result.size()-1];
   sign_bit=prop.lnot(sign_bit);
   return result;
@@ -712,7 +712,7 @@ Function: float_utilst::abs
 bvt float_utilst::abs(const bvt &src)
 {
   bvt result=src;
-  assert(src.size()!=0);
+  assert(!src.empty());
   result[result.size()-1]=const_literal(false);
   return result;
 }
@@ -825,7 +825,7 @@ Function: float_utilst::is_zero
 
 literalt float_utilst::is_zero(const bvt &src)
 {
-  assert(src.size()!=0);
+  assert(!src.empty());
   bvt all_but_sign;
   all_but_sign=src;
   all_but_sign.resize(all_but_sign.size()-1);

@@ -182,7 +182,7 @@ void value_set_fivrnst::output_entry(
     
     if (vr != object_map.read().validity_ranges.end())
     {
-      if (vr->second.size()==0)
+      if (vr->second.empty())
         std::cout << "        Empty validity record" << std::endl;
       else
         for (object_map_dt::vrange_listt::const_iterator vit =

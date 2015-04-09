@@ -453,7 +453,7 @@ void goto_convertt::do_cpp_new(
   exprt tmp_symbol_expr;
 
   // is this a placement new?
-  if(rhs.operands().size()==0) // no, "regular" one
+  if(rhs.operands().empty()) // no, "regular" one
   {
     // call __new or __new_array
     exprt new_symbol=

@@ -90,7 +90,7 @@ void dott::write_dot_subgraph(
   const goto_programt::instructionst& instructions =
     goto_program.instructions;  
   
-  if(instructions.size()==0)
+  if(instructions.empty())
   {
     out << "Node_" << subgraphscount << "_0 " <<
       "[shape=Mrecord,fontsize=22,label=\"?\"];" << std::endl;
@@ -199,7 +199,7 @@ void dott::write_dot_subgraph(
 
       std::string tlabel="true";
       std::string flabel="false";
-      if(fres.size()==0 || tres.size()==0)
+      if(fres.empty() || tres.empty())
       {
         tlabel="";
         flabel="";

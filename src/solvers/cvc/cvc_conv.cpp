@@ -493,7 +493,7 @@ void cvc_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_or || expr.id()==ID_and || expr.id()==ID_xor ||
           expr.id()==ID_nor || expr.id()==ID_nand)
   {
-    if(op.size()==0)
+    if(op.empty())
       throw "operator `"+expr.id_string()+"' takes at least one operand";
     else if(op.size()==1)
       convert_expr(op[0]);
@@ -729,7 +729,7 @@ void cvc_convt::convert_expr(const exprt &expr)
     {
       out << "ARRAY (i: " << array_index_type() << "):";
       
-      assert(expr.operands().size()!=0);
+      assert(!expr.operands().empty());
       
       unsigned i=0;
       forall_operands(it, expr)

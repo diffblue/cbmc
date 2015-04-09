@@ -305,7 +305,7 @@ bool entry_point(
 
   if(symbol.name==standard_main)
   {
-    if(parameters.size()==0)
+    if(parameters.empty())
     {
       // ok
     }

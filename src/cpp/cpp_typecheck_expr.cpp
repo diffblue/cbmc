@@ -356,7 +356,7 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
   // We need to overload, "sizeof-expression" can be mis-parsed
   // as a type.
   
-  if(expr.operands().size()==0)
+  if(expr.operands().empty())
   {
     const typet &type=
       static_cast<const typet &>(expr.find(ID_type_arg));
@@ -878,7 +878,7 @@ void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
   expr.type()=empty_typet();
 
   assert(expr.operands().size()==1 ||
-         expr.operands().size()==0);
+         expr.operands().empty());
 
   if(expr.operands().size()==1)
   {
@@ -1018,7 +1018,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
 {
   // these can have 0 or 1 arguments
 
-  if(expr.operands().size()==0)
+  if(expr.operands().empty())
   {
     // Default value, e.g., int()
     typecheck_type(expr.type());
@@ -1946,7 +1946,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     // These aren't really function calls, but either conversions or
     // initializations.    
-    if(expr.arguments().size()==0)
+    if(expr.arguments().empty())
     {
       // create temporary object
       exprt tmp_object_expr(ID_side_effect, pod);
