@@ -63,7 +63,7 @@ sub test($$$$$) {
   $options =~ s/$ign//g if(defined($ign));
 
   my $output = $input;
-  $output =~ s/\.(c|i|cpp|ii|xml|class)$/.out/;
+  $output =~ s/\.(c|i|gb|cpp|ii|xml|class)$/.out/;
 
   if($output eq $input) {
     print("Error in test file -- $test\n");
