@@ -552,7 +552,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
 
       simplify_extractbits(prime);
 
-      if(prime.operands().size()==0)
+      if(prime.operands().empty())
         result.copy_to_operands(true_exprt());
       else if(prime.operands().size()==1)
         result.move_to_operands(prime.op0());
@@ -564,7 +564,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
 
     exprt final;
 
-    if(result.operands().size()==0)
+    if(result.operands().empty())
       final=false_exprt();
     else if(result.operands().size()==1)
       final=result.op0();

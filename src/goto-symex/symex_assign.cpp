@@ -46,7 +46,7 @@ void goto_symext::symex_assign(
     
     if(statement==ID_function_call)
     {
-      assert(side_effect_expr.operands().size()!=0);
+      assert(!side_effect_expr.operands().empty());
     
       if(side_effect_expr.op0().id()!=ID_symbol)
         throw "symex_assign: expected symbol as function";

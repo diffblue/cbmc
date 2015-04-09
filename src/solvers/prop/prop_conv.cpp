@@ -368,7 +368,7 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   else if(expr.id()==ID_or || expr.id()==ID_and || expr.id()==ID_xor ||
           expr.id()==ID_nor || expr.id()==ID_nand)
   {
-    if(op.size()==0)
+    if(op.empty())
       throw "operator `"+expr.id_string()+"' takes at least one operand";
 
     bvt bv;

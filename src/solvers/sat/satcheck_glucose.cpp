@@ -168,7 +168,7 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
   convert(bv, c);
 
   // Glucose can't do empty clauses
-  if(c.size()==0)
+  if(c.empty())
   {
     empty_clause_added=true;
     return;
@@ -229,7 +229,7 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
     {
       msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
       messaget::status() << msg << messaget::eom;
-      assert(solver->model.size()!=0);
+      assert(solver->!model.empty());
       status=SAT;
       return P_SATISFIABLE;
     }

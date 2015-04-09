@@ -46,7 +46,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
     
   const exprt::operandst &operands=expr.operands();
 
-  if(operands.size()==0)
+  if(operands.empty())
     throw "operator "+expr.id_string()+" takes at least one operand";
 
   const exprt &op0=expr.op0();

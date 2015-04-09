@@ -224,7 +224,7 @@ bvt bv_utilst::extension(
   assert(old_size!=0);
 
   literalt extend_with=
-    (rep==SIGNED && bv.size()!=0)?bv[old_size-1]:
+    (rep==SIGNED && !bv.empty())?bv[old_size-1]:
     const_literal(false);
 
   for(unsigned i=old_size; i<new_size; i++)
@@ -1085,7 +1085,7 @@ Function: bv_utilst::signed_multiplier
 
 bvt bv_utilst::signed_multiplier(const bvt &op0, const bvt &op1)
 {
-  if(op0.size()==0 || op1.size()==0) return bvt();
+  if(op0.empty() || op1.empty()) return bvt();
 
   literalt sign0=op0[op0.size()-1];
   literalt sign1=op1[op1.size()-1];
@@ -1180,7 +1180,7 @@ bvt bv_utilst::signed_multiplier_no_overflow(
   const bvt &op0,
   const bvt &op1)
 {
-  if(op0.size()==0 || op1.size()==0) return bvt();
+  if(op0.empty() || op1.empty()) return bvt();
 
   literalt sign0=op0[op0.size()-1];
   literalt sign1=op1[op1.size()-1];
@@ -1265,7 +1265,7 @@ void bv_utilst::signed_divider(
   bvt &res,
   bvt &rem)
 {
-  if(op0.size()==0 || op1.size()==0) return;
+  if(op0.empty() || op1.empty()) return;
 
   bvt _op0(op0), _op1(op1);
 

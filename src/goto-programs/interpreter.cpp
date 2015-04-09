@@ -235,7 +235,7 @@ void interpretert::execute_goto()
 {
   if(evaluate_boolean(PC->guard))
   {
-    if(PC->targets.size()==0)
+    if(PC->targets.empty())
       throw "taken goto without target";
     
     if(PC->targets.size()>=2)
@@ -308,7 +308,7 @@ void interpretert::execute_assign()
   std::vector<mp_integer> rhs;
   evaluate(code_assign.rhs(), rhs);
   
-  if(rhs.size()!=0)
+  if(!rhs.empty())
   {
     mp_integer address=evaluate_address(code_assign.lhs());  
     unsigned size=get_size(code_assign.lhs().type());

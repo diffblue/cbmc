@@ -551,7 +551,7 @@ bool cbmc_parse_optionst::get_goto_program(
   bmct &bmc, // for get_modules
   goto_functionst &goto_functions)
 {
-  if(cmdline.args.size()==0)
+  if(cmdline.args.empty())
   {
     error() << "Please provide a program to verify" << eom;
     return true;

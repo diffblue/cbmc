@@ -523,7 +523,7 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="goto" || statement=="goto_w")
     {
-      assert(op.empty() && results.size()==0);
+      assert(op.empty() && results.empty());
       irep_idt number=to_constant_expr(arg0).get_value();
       code_gotot code_goto(label(number));
       c=code_goto;

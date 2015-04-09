@@ -250,7 +250,7 @@ void qbf_squolem_coret::lcnf(const bvt &bv)
   if(process_clause(bv, new_bv))
     return;
 
-  if(new_bv.size()==0)
+  if(new_bv.empty())
   {
     early_decision=true;
     return;
@@ -414,7 +414,7 @@ const exprt qbf_squolem_coret::f_get(literalt l)
     WitnessStack *wsp = squolem->getModelFunction(Literal(l.dimacs()));
     exprt res;
 
-    if(wsp==NULL || wsp->size()==0)
+    if(wsp==NULL || wsp->empty())
     {
 //      res=exprt(ID_nondet_bool, typet(ID_bool));
       res=false_exprt(); // just set it to zero
@@ -466,7 +466,7 @@ const exprt qbf_squolem_coret::f_get_cnf(WitnessStack *wsp)
         clause.move_to_operands(subf);
     }
 
-    if(clause.operands().size()==0)
+    if(clause.operands().empty())
       clause=false_exprt();
     else if(clause.operands().size()==1)
     {
@@ -521,7 +521,7 @@ const exprt qbf_squolem_coret::f_get_dnf(WitnessStack *wsp)
       simplify_extractbits(cube);
     }
 
-    if(cube.operands().size()==0)
+    if(cube.operands().empty())
       cube=true_exprt();
     else if(cube.operands().size()==1)
     {

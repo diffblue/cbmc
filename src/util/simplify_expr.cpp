@@ -1696,7 +1696,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
     }
   }
 
-  if(operands.size()==0)
+  if(operands.empty())
   {
     expr=gen_zero(expr.type());
     return false;
@@ -2977,7 +2977,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
           expr.id()==ID_and ||
           expr.id()==ID_xor)
   {
-    if(operands.size()==0) return true;
+    if(operands.empty()) return true;
 
     bool result=true;
 
@@ -3061,7 +3061,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
         }
     }
 
-    if(operands.size()==0)
+    if(operands.empty())
     {
       if(expr.id()==ID_and || negate)
         expr=true_exprt();

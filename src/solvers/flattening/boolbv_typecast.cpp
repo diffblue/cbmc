@@ -554,7 +554,7 @@ literalt boolbvt::convert_typecast(const exprt &expr)
 
     const bvt &bv=convert_bv(expr.op0());
     
-    if(bv.size()!=0)
+    if(!bv.empty())
       return prop.lor(bv);
   }
   

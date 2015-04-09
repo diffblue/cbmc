@@ -1261,7 +1261,7 @@ void goto_convertt::case_guard(
     dest.move_to_operands(eq_expr);
   }
 
-  assert(dest.operands().size()!=0);
+  assert(!dest.operands().empty());
 
   if(dest.operands().size()==1)
   {
@@ -1420,7 +1420,7 @@ void goto_convertt::convert_return(
     throw "return without target";
   }
 
-  if(code.operands().size()!=0 &&
+  if(!code.operands().empty() &&
      code.operands().size()!=1)
   {
     err_location(code);
@@ -1762,7 +1762,7 @@ void goto_convertt::convert_end_thread(
   const codet &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=0)
+  if(!code.operands().empty())
   {
     err_location(code);
     throw "end_thread expects no operands";
@@ -1787,7 +1787,7 @@ void goto_convertt::convert_atomic_begin(
   const codet &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=0)
+  if(!code.operands().empty())
   {
     err_location(code);
     throw "atomic_begin expects no operands";
@@ -1812,7 +1812,7 @@ void goto_convertt::convert_atomic_end(
   const codet &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=0)
+  if(!code.operands().empty())
   {
     err_location(code);
     throw "atomic_end expects no operands";

@@ -602,7 +602,7 @@ void goto_convertt::remove_temporary_object(
   bool result_is_used)
 {
   if(expr.operands().size()!=1 &&
-     expr.operands().size()!=0)
+     !expr.operands().empty())
     throw "temporary_object takes 0 or 1 operands";
 
   symbolt &new_symbol=

@@ -65,7 +65,7 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
     throw "unexpected size mismatch on equality";
   }
 
-  if(bv0.size()==0)
+  if(bv0.empty())
   {
     // An empty bit-vector comparison. It's not clear
     // what this is meant to say.

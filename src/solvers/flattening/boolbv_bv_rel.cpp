@@ -41,7 +41,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
     bvtypet bvtype0=get_bvtype(op0.type());
     bvtypet bvtype1=get_bvtype(op1.type());
 
-    if(bv0.size()==bv1.size() && bv0.size()!=0 &&
+    if(bv0.size()==bv1.size() && !bv0.empty() &&
        bvtype0==bvtype1)
     {
       if(bvtype0==IS_FLOAT)

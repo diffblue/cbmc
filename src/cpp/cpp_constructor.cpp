@@ -157,7 +157,7 @@ codet cpp_typecheckt::cpp_constructor(
       add_implicit_dereference(*it);
     }
 
-    if(operands_tc.size()==0)
+    if(operands_tc.empty())
     {
       // a POD is NOT initialized
       new_code.make_nil();

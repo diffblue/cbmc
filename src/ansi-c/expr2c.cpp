@@ -1120,7 +1120,7 @@ std::string expr2ct::convert_nondet(
   const exprt &src,
   unsigned &precedence)
 {
-  if(src.operands().size()!=0)
+  if(!src.operands().empty())
     return convert_norep(src, precedence);
 
   return "NONDET("+convert(src.type())+")";
@@ -1624,7 +1624,7 @@ std::string expr2ct::convert_member_designator(const exprt &src)
 {
   unsigned precedence;
 
-  if(src.operands().size()!=0)
+  if(!src.operands().empty())
     return convert_norep(src, precedence);
     
   return "."+src.get_string(ID_component_name);
@@ -2994,7 +2994,7 @@ std::string expr2ct::convert_code_return(
   const codet &src,
   unsigned indent)
 {
-  if(src.operands().size()!=0 &&
+  if(!src.operands().empty() &&
      src.operands().size()!=1)
   {
     unsigned precedence;

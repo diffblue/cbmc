@@ -501,7 +501,7 @@ exprt smt2_convt::parse_struct(
 
   result.operands().resize(components.size(), nil_exprt());
   
-  if(components.size()==0)
+  if(components.empty())
     return result;
 
   if(use_datatypes)

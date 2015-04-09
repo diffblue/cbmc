@@ -44,7 +44,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
     {
       const bvt &bv=convert_bv(operands[0]);
       
-      if(bv.size()!=0)
+      if(!bv.empty())
       {
         bvt invalid_bv, null_bv;
         encode(pointer_logic.get_invalid_object(), invalid_bv);
@@ -396,7 +396,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
 
       bvt op=convert_bv(*it);
 
-      if(op.size()==0)
+      if(op.empty())
         throw "unexpected pointer arithmetic operand width";
       
       // we cut any extra bits off

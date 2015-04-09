@@ -545,7 +545,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 {
   // these need not be constant, due to array indices!
 
-  if(expr.operands().size()!=0)
+  if(!expr.operands().empty())
   {
     err_location(expr);
     throw "builtin_offsetof expects no operands";
@@ -982,7 +982,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
 {
   typet type;
 
-  if(expr.operands().size()==0)
+  if(expr.operands().empty())
   {
     type.swap(static_cast<typet &>(expr.add(ID_type_arg)));
     typecheck_type(type);

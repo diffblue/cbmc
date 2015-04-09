@@ -146,7 +146,7 @@ void qbf_squolemt::lcnf(const bvt &bv)
   if(process_clause(bv, new_bv))
     return;
 
-  if(new_bv.size()==0)
+  if(new_bv.empty())
   {
     early_decision=true;
     return;

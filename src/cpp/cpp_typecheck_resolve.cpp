@@ -929,7 +929,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
   }
   else if(base_name==ID_integer)
   {
-    if(arguments.size()!=0)
+    if(!arguments.empty())
     {
       cpp_typecheck.err_location(source_location);
       throw id2string(base_name)+" expects no template arguments";
@@ -1171,7 +1171,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
       primary_templates.insert(id);
   }
 
-  assert(primary_templates.size()!=0);
+  assert(!primary_templates.empty());
 
   if(primary_templates.size()>=2)
   {
