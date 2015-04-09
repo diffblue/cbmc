@@ -148,7 +148,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
 
       type=result;
     }
-    else if(underlying_type.id()==ID_c_enum_tag)
+    else if(underlying_type.id()==ID_c_enum_tag ||
+            underlying_type.id()==ID_complex)
     {
       // gcc allows this, but clang doesn't.
       // We ignore for now.
