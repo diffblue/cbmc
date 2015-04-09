@@ -146,7 +146,9 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     break;
 
   case CVC4:
-    command = "cvc4 -L smt2 --bitblast=eager --bv-div-zero-const "
+    // The flags --bitblast=eager --bv-div-zero-const help but only
+    // work for pure bit-vector formulas.
+    command = "cvc4 -L smt2 "
             + smt2_temp_file.temp_out_filename
             + " > "
             + smt2_temp_file.temp_result_filename;
