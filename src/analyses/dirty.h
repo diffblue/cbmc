@@ -17,7 +17,7 @@ Date: March 2013
 class dirtyt
 {
 public:
-  typedef std::set<irep_idt> id_sett;
+  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
   typedef goto_functionst::goto_functiont goto_functiont;
 
   explicit dirtyt(const goto_functiont &goto_function)
@@ -37,7 +37,7 @@ public:
     return operator()(expr.get_identifier());
   }
 
-  inline const id_sett get_dirty_ids() const
+  inline const id_sett& get_dirty_ids() const
   {
     return dirty;
   }
