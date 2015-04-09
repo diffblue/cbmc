@@ -1274,7 +1274,7 @@ void value_sett::assign(
       {
         if(!base_type_eq(rhs.type(), type, ns))
           throw "value_sett::assign type mismatch: "
-                "rhs.type():\n"+rhs.type().pretty()+
+                "rhs.type():\n"+rhs.type().pretty()+"\n"+
                 "type:\n"+type.pretty();
 
         rhs_member=make_member(rhs, name, ns);
@@ -1297,7 +1297,7 @@ void value_sett::assign(
     {
       if(!base_type_eq(rhs.type(), type, ns))
         throw "value_sett::assign type mismatch: "
-          "rhs.type():\n"+rhs.type().pretty()+
+          "rhs.type():\n"+rhs.type().pretty()+"\n"+
           "type:\n"+type.pretty();
         
       if(rhs.id()==ID_array_of)
