@@ -279,6 +279,9 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-reaching-definitions"))
     {
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
       const namespacet ns(symbol_table);
       reaching_definitions_analysist rd_analysis(ns);
       rd_analysis(goto_functions);
