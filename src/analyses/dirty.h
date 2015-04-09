@@ -25,6 +25,12 @@ public:
     build(goto_function);
   }
 
+  explicit dirtyt(const goto_functionst &goto_functions)
+  {
+    forall_goto_functions(it, goto_functions)
+      build(it->second);
+  }
+
   void output(std::ostream &out) const;
 
   inline bool operator()(const irep_idt &id) const
