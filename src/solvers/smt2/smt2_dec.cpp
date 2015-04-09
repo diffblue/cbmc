@@ -47,7 +47,7 @@ std::string smt2_dect::decision_procedure_text() const
     (solver==GENERIC?"Generic":
      solver==BOOLECTOR?"Boolector":
      solver==CVC3?"CVC3":
-     solver==CVC4?"CVC3":
+     solver==CVC4?"CVC4":
      solver==MATHSAT?"MathSAT":
      solver==OPENSMT?"OpenSMT":
      solver==YICES?"Yices":
