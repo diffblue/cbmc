@@ -636,7 +636,8 @@ void goto_instrument_parse_optionst::instrument_goto_program(
 
   // we add the library in some cases, as some analyses benefit
 
-  if(cmdline.isset("mm"))
+  if(cmdline.isset("add-library") ||
+     cmdline.isset("mm"))
   {
     status() << "Adding CPROVER library" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
@@ -1035,6 +1036,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Further transformations:\n"
     " --inline                     perform full inlining\n"
+    " --add-library                add models of C library functions\n"
     "\n"
     "Other options:\n"
     " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n"
