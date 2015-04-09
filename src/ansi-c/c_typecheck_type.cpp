@@ -1151,8 +1151,14 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     }
     else if(symbol.type.id()==ID_c_enum)
     {
-      err_location(type);
-      throw "redeclaration of enum tag";
+      // We might already have the same anonymous enum, and this is
+      // simply ok. Note that the C standard treats these as
+      // different types.
+      if(!base_name.empty())
+      {
+        err_location(type);
+        throw "redeclaration of enum tag";
+      }
     }
     else
     {
