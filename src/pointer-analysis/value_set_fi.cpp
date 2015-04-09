@@ -1175,7 +1175,7 @@ void value_set_fit::assign(
       {
         if(!base_type_eq(rhs.type(), type, ns))
           throw "value_set_fit::assign type mismatch: "
-                "rhs.type():\n"+rhs.type().pretty()+
+                "rhs.type():\n"+rhs.type().pretty()+"\n"+
                 "type:\n"+type.pretty();
       
         if(rhs.id()==ID_struct ||
@@ -1228,11 +1228,15 @@ void value_set_fit::assign(
     {
       assign(lhs_index, exprt(rhs.id(), type.subtype()), ns);
     }
+    else if(rhs.is_nil())
+    {
+      // do nothing
+    }
     else
     {
       if(!base_type_eq(rhs.type(), type, ns))
         throw "value_set_fit::assign type mismatch: "
-              "rhs.type():\n"+rhs.type().pretty()+
+              "rhs.type():\n"+rhs.type().pretty()+"\n"+
               "type:\n"+type.pretty();
         
       if(rhs.id()==ID_array_of)
