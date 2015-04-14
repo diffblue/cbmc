@@ -4175,6 +4175,15 @@ std::string expr2ct::convert(
     #endif
   }
 
+  else if(src.id()==ID_sign)
+  {
+    if(src.operands().size()==1 &&
+       src.op0().type().id()==ID_floatbv)
+      return convert_function(src, "signbit", precedence=16);
+    else
+      return convert_function(src, "SIGN", precedence=16);
+  }
+
   else if(src.id()==ID_invalid_pointer)
     return convert_function(src, "INVALID-POINTER", precedence=16);
 

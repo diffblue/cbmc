@@ -2258,7 +2258,8 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       expr.swap(call);
     }
   }
-  else if(expr.id()==ID_isnan)
+  else if(expr.id()==ID_isnan ||
+          expr.id()==ID_sign)
     system_headers.insert("math.h");
   else if(expr.id()==ID_constant)
   {
