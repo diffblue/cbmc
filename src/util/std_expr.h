@@ -2731,7 +2731,7 @@ extern inline array_update_exprt &to_array_update_expr(exprt &expr)
 }
 #endif
 
-/*! \brief Extract member of struct
+/*! \brief Extract member of struct or union
 */
 class member_exprt:public exprt
 {
@@ -2782,13 +2782,25 @@ public:
   {
     set(ID_component_number, component_number);
   }
-  
+
+  // will go away, use compound()  
   inline const exprt &struct_op() const
   {
     return op0();
   }
 
+  // will go away, use compound()  
   inline exprt &struct_op()
+  {
+    return op0();
+  }
+
+  inline const exprt &compound() const
+  {
+    return op0();
+  }
+
+  inline exprt &compound()
   {
     return op0();
   }
