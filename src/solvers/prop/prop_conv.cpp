@@ -651,7 +651,7 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
   {
     print(8, "Post-processing");
     post_process();
-    //post_processing_done=true; //TODO: not clear where it might break
+    post_processing_done=true; 
   }
 
   print(7, "Solving with "+prop.solver_text());

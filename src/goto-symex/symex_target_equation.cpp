@@ -1144,9 +1144,8 @@ void symex_target_equationt::SSA_stept::output(
   if(is_shared_read() || is_shared_write())
     out << from_expr(ns, "", ssa_lhs) << std::endl;
 
-  out << "Guard: " << from_expr(ns, "", guard) << std::endl;
-
 #if 0
+  out << "Guard: " << from_expr(ns, "", guard) << std::endl;
   out << "Ignore: " << ignore << std::endl;
   out << "Converted: " << converted << std::endl;
 #endif
