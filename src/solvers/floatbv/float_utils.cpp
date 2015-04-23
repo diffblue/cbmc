@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
-#include <util/threeval.h>
 
 #include "float_utils.h"
 
@@ -279,7 +278,7 @@ bvt float_utilst::conversion(
     // normalise it!
     if(dest_spec.e > spec.e)
     {
-      normalization_shift(result.fraction,result.exponent);	
+      normalization_shift(result.fraction,result.exponent);
     }
 
     // the flags get copied
@@ -398,7 +397,7 @@ bvt float_utilst::add_sub(
   literalt sticky_bit;
   const bvt fraction1_shifted=fraction1_padded;
   const bvt fraction2_shifted=sticky_right_shift(
-    fraction2_padded, bv_utilst::LRIGHT, limited_dist, sticky_bit);
+    fraction2_padded, limited_dist, sticky_bit);
 
   // sticky bit: or of the bits lost by the right-shift
   bvt fraction2_stickied=fraction2_shifted;
@@ -460,15 +459,15 @@ bvt float_utilst::add_sub(
   #if 1
   literalt zero_sign=
     prop.lselect(rounding_mode_bits.round_to_minus_inf,
-		 prop.lor(unpacked1.sign, unpacked2.sign),
-		 prop.land(unpacked1.sign, unpacked2.sign));
+                 prop.lor(unpacked1.sign, unpacked2.sign),
+                 prop.land(unpacked1.sign, unpacked2.sign));
 
   result.sign=prop.lselect( 
     result.infinity,
     infinity_sign,
     prop.lselect(result.zero,
-		 zero_sign,
-		 add_sub_sign));
+                 zero_sign,
+                 add_sub_sign));
   #else
   result.sign=prop.lselect(
     result.infinity,
@@ -580,8 +579,8 @@ bvt float_utilst::mul(const bvt &src1, const bvt &src2)
     NaN_cond.push_back(is_NaN(src2));
 
     // infinity * 0 is NaN!
-    NaN_cond.push_back(prop.land(is_zero(src1), unpacked2.infinity));
-    NaN_cond.push_back(prop.land(is_zero(src2), unpacked1.infinity));
+    NaN_cond.push_back(prop.land(unpacked1.zero, unpacked2.infinity));
+    NaN_cond.push_back(prop.land(unpacked2.zero, unpacked1.infinity));
 
     result.NaN=prop.lor(NaN_cond);
   }
@@ -679,25 +678,6 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
 
 /*******************************************************************\
 
-Function: float_utilst::inverse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bvt float_utilst::inverse(const bvt &src)
-{
-  bvt one;
-  assert(0);
-  return bvt(); // not reached
-}
-
-/*******************************************************************\
-
 Function: float_utilst::negate
 
   Inputs:
@@ -711,7 +691,7 @@ Function: float_utilst::negate
 bvt float_utilst::negate(const bvt &src)
 {
   bvt result=src;
-  assert(src.size()!=0);
+  assert(!src.empty());
   literalt &sign_bit=result[result.size()-1];
   sign_bit=prop.lnot(sign_bit);
   return result;
@@ -732,7 +712,7 @@ Function: float_utilst::abs
 bvt float_utilst::abs(const bvt &src)
 {
   bvt result=src;
-  assert(src.size()!=0);
+  assert(!src.empty());
   result[result.size()-1]=const_literal(false);
   return result;
 }
@@ -845,7 +825,7 @@ Function: float_utilst::is_zero
 
 literalt float_utilst::is_zero(const bvt &src)
 {
-  assert(src.size()!=0);
+  assert(!src.empty());
   bvt all_but_sign;
   all_but_sign=src;
   all_but_sign.resize(all_but_sign.size()-1);
@@ -1185,14 +1165,14 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
     // Add zeros at the LSB end for the guard bit to shift into
     fraction=
       bv_utils.concatenate(bv_utils.zeros((spec.f + 3) - fraction.size()),
-			   fraction);
+                           fraction);
   }
 
   bvt denormalisedFraction = fraction;
 
   literalt sticky_bit = const_literal(false);
   denormalisedFraction = 
-    sticky_right_shift(fraction, bv_utilst::LRIGHT, distance, sticky_bit);
+    sticky_right_shift(fraction, distance, sticky_bit);
   denormalisedFraction[0] = prop.lor(denormalisedFraction[0], sticky_bit);
 
   fraction=
@@ -1430,7 +1410,7 @@ void float_utilst::round_fraction(unbiased_floatt &result)
     // the exponent has to be incremented.
     result.exponent=
       bv_utils.incrementer(result.exponent, 
-			   prop.lor(overflow, subnormal_to_normal));
+                           prop.lor(overflow, subnormal_to_normal));
 
     // post normalization of the fraction
     // In the case of overflow, set the MSB to 1
@@ -1507,12 +1487,12 @@ void float_utilst::round_exponent(unbiased_floatt &result)
 
     result.fraction=
       bv_utils.select(set_to_max,
-		      bv_utils.inverted(bv_utils.zeros(result.fraction.size())),
-		      result.fraction);
+                      bv_utils.inverted(bv_utils.zeros(result.fraction.size())),
+                      result.fraction);
 
     result.infinity=prop.lor(result.infinity, 
-			     prop.land(exponent_too_large,
-				       overflow_to_inf));
+                             prop.land(exponent_too_large,
+                                       overflow_to_inf));
 #else
     result.infinity=prop.lor(result.infinity, exponent_too_large);
 #endif
@@ -1726,15 +1706,10 @@ Function: float_utilst::sticky_right_shift
 
 bvt float_utilst::sticky_right_shift(
   const bvt &op,
-  const bv_utilst::shiftt shift_type,
   const bvt &dist,
   literalt &sticky)
 {
-  // only right shifts
-  assert(shift_type==bv_utilst::LRIGHT ||
-         shift_type==bv_utilst::ARIGHT);
-
-  unsigned d=1, width=op.size();
+  unsigned d=1;
   bvt result=op;
   sticky=const_literal(false);
 
@@ -1742,21 +1717,20 @@ bvt float_utilst::sticky_right_shift(
   {
     if(dist[stage]!=const_literal(false))
     {
-      bvt tmp=bv_utils.shift(result, shift_type, d);
+      bvt tmp=bv_utils.shift(result, bv_utilst::LRIGHT, d);
 
       bvt lost_bits;
 
-      if (d <= result.size())
-	lost_bits=bv_utils.extract(result, 0, d-1);
+      if(d<=result.size())
+        lost_bits=bv_utils.extract(result, 0, d-1);
       else
-	lost_bits=result;
+        lost_bits=result;
 
       sticky=prop.lor(
           prop.land(dist[stage],prop.lor(lost_bits)),
           sticky);
 
-      for(unsigned i=0; i<width; i++)
-        result[i]=prop.lselect(dist[stage], tmp[i], result[i]);
+      result=bv_utils.select(dist[stage], tmp, result);
     }
 
     d=d<<1;

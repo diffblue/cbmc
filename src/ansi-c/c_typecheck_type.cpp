@@ -96,6 +96,9 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_custom_type(type);
   else if(type.id()==ID_gcc_attribute_mode)
   {
+    // get that mode
+    irep_idt mode=type.get(ID_size);
+    
     // A list of all modes ist at
     // http://www.delorie.com/gnu/docs/gcc/gccint_53.html
     typecheck_type(type.subtype());
@@ -106,9 +109,6 @@ void c_typecheck_baset::typecheck_type(typet &type)
        underlying_type.id()==ID_unsignedbv)
     {
       bool is_signed=underlying_type.id()==ID_signedbv;
-      
-      // get width
-      irep_idt mode=type.get(ID_size);
       
       typet result;
       
@@ -148,7 +148,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
 
       type=result;
     }
-    else if(underlying_type.id()==ID_c_enum_tag)
+    else if(underlying_type.id()==ID_c_enum_tag ||
+            underlying_type.id()==ID_complex)
     {
       // gcc allows this, but clang doesn't.
       // We ignore for now.
@@ -156,9 +157,6 @@ void c_typecheck_baset::typecheck_type(typet &type)
     }
     else if(underlying_type.id()==ID_floatbv)
     {
-      // get width
-      irep_idt mode=type.get(ID_size);
-      
       typet result;
       
       if(mode=="__SF__") // 32 bits
@@ -186,7 +184,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
     else
     {
       err_location(type);
-      str << "attribute mode applied to inappropriate type `"
+      str << "attribute mode `" << mode
+          << "' applied to inappropriate type `"
           << to_string(type) << "'";
       throw 0;
     }
@@ -908,12 +907,14 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
     }  
   }
 
-  // we may add some minimal padding inside structs (not unions)
-  // unless there is an attribute that says that the struct is
-  // 'packed'
+  // We may add some minimal padding inside and at
+  // the end of structs and
+  // as additional member for unions.
 
   if(symbol.type.id()==ID_struct)
     add_padding(to_struct_type(symbol.type), *this);
+  else if(symbol.type.id()==ID_union)
+    add_padding(to_union_type(symbol.type), *this);
 
   // Now remove zero-width bit-fields, these are just
   // for adjusting alignment.
@@ -1150,8 +1151,14 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     }
     else if(symbol.type.id()==ID_c_enum)
     {
-      err_location(type);
-      throw "redeclaration of enum tag";
+      // We might already have the same anonymous enum, and this is
+      // simply ok. Note that the C standard treats these as
+      // different types.
+      if(!base_name.empty())
+      {
+        err_location(type);
+        throw "redeclaration of enum tag";
+      }
     }
     else
     {

@@ -36,12 +36,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include "clobber_parseoptions.h"
+#include "clobber_parse_options.h"
 #include "clobber_instrumenter.h"
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::clobber_parseoptionst
+Function: clobber_parse_optionst::clobber_parse_optionst
 
   Inputs:
 
@@ -51,15 +51,15 @@ Function: clobber_parseoptionst::clobber_parseoptionst
 
 \*******************************************************************/
 
-clobber_parseoptionst::clobber_parseoptionst(int argc, const char **argv):
-  parseoptions_baset(CLOBBER_OPTIONS, argc, argv),
+clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
+  parse_options_baset(CLOBBER_OPTIONS, argc, argv),
   language_uit("CLOBBER " CBMC_VERSION, cmdline)
 {
 }
   
 /*******************************************************************\
 
-Function: clobber_parseoptionst::eval_verbosity
+Function: clobber_parse_optionst::eval_verbosity
 
   Inputs:
 
@@ -69,7 +69,7 @@ Function: clobber_parseoptionst::eval_verbosity
 
 \*******************************************************************/
 
-void clobber_parseoptionst::eval_verbosity()
+void clobber_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
   int v=messaget::M_STATISTICS;
@@ -88,7 +88,7 @@ void clobber_parseoptionst::eval_verbosity()
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::get_command_line_options
+Function: clobber_parse_optionst::get_command_line_options
 
   Inputs:
 
@@ -98,7 +98,7 @@ Function: clobber_parseoptionst::get_command_line_options
 
 \*******************************************************************/
 
-void clobber_parseoptionst::get_command_line_options(optionst &options)
+void clobber_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
   {
@@ -179,7 +179,7 @@ void clobber_parseoptionst::get_command_line_options(optionst &options)
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::doit
+Function: clobber_parse_optionst::doit
 
   Inputs:
 
@@ -189,7 +189,7 @@ Function: clobber_parseoptionst::doit
 
 \*******************************************************************/
 
-int clobber_parseoptionst::doit()
+int clobber_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
@@ -266,7 +266,7 @@ int clobber_parseoptionst::doit()
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::set_properties
+Function: clobber_parse_optionst::set_properties
 
   Inputs:
 
@@ -276,7 +276,7 @@ Function: clobber_parseoptionst::set_properties
 
 \*******************************************************************/
 
-bool clobber_parseoptionst::set_properties(goto_functionst &goto_functions)
+bool clobber_parse_optionst::set_properties(goto_functionst &goto_functions)
 {
   try
   {
@@ -306,7 +306,7 @@ bool clobber_parseoptionst::set_properties(goto_functionst &goto_functions)
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::get_goto_program
+Function: clobber_parse_optionst::get_goto_program
 
   Inputs:
 
@@ -316,7 +316,7 @@ Function: clobber_parseoptionst::get_goto_program
 
 \*******************************************************************/
   
-bool clobber_parseoptionst::get_goto_program(
+bool clobber_parse_optionst::get_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
 {
@@ -463,7 +463,7 @@ bool clobber_parseoptionst::get_goto_program(
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::process_goto_program
+Function: clobber_parse_optionst::process_goto_program
 
   Inputs:
 
@@ -473,7 +473,7 @@ Function: clobber_parseoptionst::process_goto_program
 
 \*******************************************************************/
   
-bool clobber_parseoptionst::process_goto_program(
+bool clobber_parse_optionst::process_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
 {
@@ -544,7 +544,7 @@ bool clobber_parseoptionst::process_goto_program(
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::report_properties
+Function: clobber_parse_optionst::report_properties
 
   Inputs:
 
@@ -555,7 +555,7 @@ Function: clobber_parseoptionst::report_properties
 \*******************************************************************/
 
 #if 0
-void clobber_parseoptionst::report_properties(
+void clobber_parse_optionst::report_properties(
   const path_searcht::property_mapt &property_map)
 {
   for(path_searcht::property_mapt::const_iterator
@@ -621,7 +621,7 @@ void clobber_parseoptionst::report_properties(
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::report_success
+Function: clobber_parse_optionst::report_success
 
   Inputs:
 
@@ -631,7 +631,7 @@ Function: clobber_parseoptionst::report_success
 
 \*******************************************************************/
 
-void clobber_parseoptionst::report_success()
+void clobber_parse_optionst::report_success()
 {
   result() << "VERIFICATION SUCCESSFUL" << eom;
 
@@ -656,7 +656,7 @@ void clobber_parseoptionst::report_success()
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::show_counterexample
+Function: clobber_parse_optionst::show_counterexample
 
   Inputs:
 
@@ -666,7 +666,7 @@ Function: clobber_parseoptionst::show_counterexample
 
 \*******************************************************************/
 
-void clobber_parseoptionst::show_counterexample(
+void clobber_parse_optionst::show_counterexample(
   const goto_tracet &error_trace)
 {
   const namespacet ns(symbol_table);
@@ -693,7 +693,7 @@ void clobber_parseoptionst::show_counterexample(
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::report_failure
+Function: clobber_parse_optionst::report_failure
 
   Inputs:
 
@@ -703,7 +703,7 @@ Function: clobber_parseoptionst::report_failure
 
 \*******************************************************************/
 
-void clobber_parseoptionst::report_failure()
+void clobber_parse_optionst::report_failure()
 {
   result() << "VERIFICATION FAILED" << eom;
 
@@ -728,7 +728,7 @@ void clobber_parseoptionst::report_failure()
 
 /*******************************************************************\
 
-Function: clobber_parseoptionst::help
+Function: clobber_parse_optionst::help
 
   Inputs:
 
@@ -738,7 +738,7 @@ Function: clobber_parseoptionst::help
 
 \*******************************************************************/
 
-void clobber_parseoptionst::help()
+void clobber_parse_optionst::help()
 {
   std::cout <<
     "\n"

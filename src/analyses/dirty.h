@@ -17,6 +17,7 @@ Date: March 2013
 class dirtyt
 {
 public:
+  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
   typedef goto_functionst::goto_functiont goto_functiont;
 
   explicit dirtyt(const goto_functiont &goto_function)
@@ -24,14 +25,14 @@ public:
     build(goto_function);
   }
 
+  explicit dirtyt(const goto_functionst &goto_functions)
+  {
+    forall_goto_functions(it, goto_functions)
+      build(it->second);
+  }
+
   void output(std::ostream &out) const;
 
-  // will go away, use below  
-  inline bool is_dirty(const irep_idt &id) const
-  {
-    return dirty.find(id)!=dirty.end();
-  }
-  
   inline bool operator()(const irep_idt &id) const
   {
     return dirty.find(id)!=dirty.end();
@@ -42,11 +43,15 @@ public:
     return operator()(expr.get_identifier());
   }
 
+  inline const id_sett& get_dirty_ids() const
+  {
+    return dirty;
+  }
+  
 protected:
   void build(const goto_functiont &goto_function);
 
   // variables whose address is taken
-  typedef std::set<irep_idt> id_sett;
   id_sett dirty;
   
   void find_dirty(const exprt &expr);

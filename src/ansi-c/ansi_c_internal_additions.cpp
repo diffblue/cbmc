@@ -170,6 +170,7 @@ void ansi_c_internal_additions(std::string &code)
     // absolute value
     "int __CPROVER_abs(int x);\n"
     "long int __CPROVER_labs(long int x);\n"
+    "long int __CPROVER_llabs(long long int x);\n"
     "double __CPROVER_fabs(double x);\n"
     "long double __CPROVER_fabsl(long double x);\n"
     "float __CPROVER_fabsf(float x);\n"

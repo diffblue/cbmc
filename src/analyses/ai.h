@@ -114,12 +114,20 @@ public:
     const goto_functionst &goto_functions,
     std::ostream &out) const;
 
-  void output(
+  inline void output(
     const namespacet &ns,
     const goto_programt &goto_program,
     std::ostream &out) const
   {
     output(ns, goto_program, "", out);
+  }
+
+  inline void output(
+    const namespacet &ns,
+    const goto_functionst::goto_functiont &goto_function,
+    std::ostream &out) const
+  {
+    output(ns, goto_function.body, "", out);
   }
 
 protected:

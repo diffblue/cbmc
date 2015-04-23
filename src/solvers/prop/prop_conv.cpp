@@ -373,7 +373,7 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   else if(expr.id()==ID_or || expr.id()==ID_and || expr.id()==ID_xor ||
           expr.id()==ID_nor || expr.id()==ID_nand)
   {
-    if(op.size()==0)
+    if(op.empty())
       throw "operator `"+expr.id_string()+"' takes at least one operand";
 
     bvt bv;
@@ -417,6 +417,11 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
       return
         equal?prop.lequal(tmp1, tmp2):prop.lxor(tmp1, tmp2);
     }
+  }
+  else if(expr.id()==ID_let)
+  {
+    //const let_exprt &let_expr=to_let_expr(expr);
+    throw "let is todo";
   }
 
   return convert_rest(expr);

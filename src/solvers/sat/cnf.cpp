@@ -265,7 +265,7 @@ Function: cnft::land
 
 literalt cnft::land(const bvt &bv)
 {
-  if(bv.size()==0) return const_literal(true);
+  if(bv.empty()) return const_literal(true);
   if(bv.size()==1) return bv[0];
   if(bv.size()==2) return land(bv[0], bv[1]);
 
@@ -316,7 +316,7 @@ Function: cnft::lor
 
 literalt cnft::lor(const bvt &bv)
 {
-  if(bv.size()==0) return const_literal(false);
+  if(bv.empty()) return const_literal(false);
   if(bv.size()==1) return bv[0];
   if(bv.size()==2) return lor(bv[0], bv[1]);
 
@@ -367,7 +367,7 @@ Function: cnft::lxor
 
 literalt cnft::lxor(const bvt &bv)
 {
-  if(bv.size()==0) return const_literal(false);
+  if(bv.empty()) return const_literal(false);
   if(bv.size()==1) return bv[0];
   if(bv.size()==2) return lxor(bv[0], bv[1]);
 

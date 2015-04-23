@@ -7,7 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
+#include <ostream>
 
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
@@ -21,8 +21,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/cprover_prefix.h>
 
-#include <langapi/language_util.h>
 #include <ansi-c/c_types.h>
+
+#ifdef DEBUG
+#include <langapi/language_util.h>
+#include <iostream>
+#endif
 
 #include "value_set.h"
 #include "add_failed_symbols.h"
@@ -46,6 +50,11 @@ bool value_sett::field_sensitive(
   const irep_idt &id,
   const typet &type)
 {
+  #if 1
+  // disabled for now; see, e.g., regression/cbmc/Malloc19
+  return false;
+  
+  #else
   // we always track fields on these
   if(has_prefix(id2string(id), "value_set::dynamic_object") ||
      id=="value_set::return_value" ||
@@ -54,6 +63,7 @@ bool value_sett::field_sensitive(
 
   // otherwise it has to be a struct
   return type.id()==ID_struct;
+  #endif
 }
 
 /*******************************************************************\
@@ -369,7 +379,7 @@ void value_sett::eval_pointer_offset(
       else
       {
         const exprt &object=object_numbering[it->first];
-        mp_integer ptr_offset=compute_pointer_offset(ns, object);
+        mp_integer ptr_offset=compute_pointer_offset(object, ns);
         exprt offset=from_integer(it->second.offset, index_type());
 
         if(ptr_offset<0 || offset.id()!=ID_constant)
@@ -471,9 +481,8 @@ void value_sett::get_value_set_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr) << std::endl;
+  std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr) << "\n";
   std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << std::endl;
-  std::cout << std::endl;
   #endif
   
   const typet &expr_type=ns.follow(expr.type());
@@ -706,7 +715,7 @@ void value_sett::get_value_set_rec(
         
       if(i_is_set)
       {
-        i*=pointer_offset_size(ns, ptr_operand.type().subtype());
+        i*=pointer_offset_size(ptr_operand.type().subtype(), ns);
 
         if(expr.id()==ID_minus) i.negate();
       }
@@ -968,16 +977,16 @@ void value_sett::get_value_set_rec(
   }
 
   #if 0
-  std::cout << "GET_VALUE_SET_REC RESULT:";
+  std::cout << "GET_VALUE_SET_REC RESULT:\n";
   for(object_map_dt::const_iterator
       it=dest.read().begin();
       it!=dest.read().end();
       it++)
   {
     const exprt &e=to_expr(it);
-    std::cout << " " << from_expr(ns, "", e);
+    std::cout << "  " << from_expr(ns, "", e) << "\n";
   }
-  std::cout << std::endl << std::endl;
+  std::cout << "\n";
   #endif
 }
 
@@ -1131,7 +1140,7 @@ void value_sett::get_reference_set_rec(
         }
         else if(!to_integer(offset, i) &&
                 o.offset_is_zero())
-          o.offset=i*pointer_offset_size(ns, array_type.subtype());
+          o.offset=i*pointer_offset_size(array_type.subtype(), ns);
         else
           o.offset_is_set=false;
           
@@ -1265,7 +1274,7 @@ void value_sett::assign(
       {
         if(!base_type_eq(rhs.type(), type, ns))
           throw "value_sett::assign type mismatch: "
-                "rhs.type():\n"+rhs.type().pretty()+
+                "rhs.type():\n"+rhs.type().pretty()+"\n"+
                 "type:\n"+type.pretty();
 
         rhs_member=make_member(rhs, name, ns);
@@ -1288,7 +1297,7 @@ void value_sett::assign(
     {
       if(!base_type_eq(rhs.type(), type, ns))
         throw "value_sett::assign type mismatch: "
-          "rhs.type():\n"+rhs.type().pretty()+
+          "rhs.type():\n"+rhs.type().pretty()+"\n"+
           "type:\n"+type.pretty();
         
       if(rhs.id()==ID_array_of)
@@ -1459,7 +1468,7 @@ void value_sett::assign_rec(
   
   if(lhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=lhs.get(ID_identifier);
+    const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
     
     entryt &e=get_entry(entryt(identifier, suffix), lhs.type());
     
@@ -1784,7 +1793,7 @@ void value_sett::apply_code(
   }
   else
   {
-    std::cerr << code.pretty() << std::endl;
+    //std::cerr << code.pretty() << std::endl;
     throw "value_sett: unexpected statement: "+id2string(statement);
   }
 }

@@ -356,7 +356,7 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
   // We need to overload, "sizeof-expression" can be mis-parsed
   // as a type.
   
-  if(expr.operands().size()==0)
+  if(expr.operands().empty())
   {
     const typet &type=
       static_cast<const typet &>(expr.find(ID_type_arg));
@@ -878,7 +878,7 @@ void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
   expr.type()=empty_typet();
 
   assert(expr.operands().size()==1 ||
-         expr.operands().size()==0);
+         expr.operands().empty());
 
   if(expr.operands().size()==1)
   {
@@ -1018,7 +1018,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
 {
   // these can have 0 or 1 arguments
 
-  if(expr.operands().size()==0)
+  if(expr.operands().empty())
   {
     // Default value, e.g., int()
     typecheck_type(expr.type());
@@ -1675,6 +1675,112 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       expr.swap(result);
       return;
     }
+    else if(identifier=="__atomic_load_n")
+    {
+    }
+    else if(identifier=="__atomic_load")
+    {
+    }
+    else if(identifier=="__atomic_store_n")
+    {
+    }
+    else if(identifier=="__atomic_store")
+    {
+    }
+    else if(identifier=="__atomic_exchange_n")
+    {
+    }
+    else if(identifier=="__atomic_exchange")
+    {
+    }
+    else if(identifier=="__atomic_compare_exchange_n")
+    {
+    }
+    else if(identifier=="__atomic_compare_exchange")
+    {
+    }
+    else if(identifier=="__atomic_add_fetch" ||
+            identifier=="__atomic_sub_fetch" ||
+            identifier=="__atomic_and_fetch" ||
+            identifier=="__atomic_xor_fetch" ||
+            identifier=="__atomic_or_fetch" ||
+            identifier=="__atomic_nand_fetch")
+    {
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw "__atomic_*_fetch primitives take three arguments";
+      }
+      
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw "__atomic_*_fetch primitives take pointer as first argument";
+      }
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.make_ellipsis();
+      t.return_type()=ptr_arg.type().subtype();
+      result.type()=t;
+      expr.swap(result);
+      return;
+    }
+    else if(identifier=="__atomic_fetch_add" ||
+            identifier=="__atomic_fetch_sub" ||
+            identifier=="__atomic_fetch_and" ||
+            identifier=="__atomic_fetch_xor" ||
+            identifier=="__atomic_fetch_or" ||
+            identifier=="__atomic_fetch_nand")
+    {
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw "__atomic_fetch_* primitives take three arguments";
+      }
+      
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw "__atomic_fetch_* primitives take pointer as first argument";
+      }
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.make_ellipsis();
+      t.return_type()=ptr_arg.type().subtype();
+      result.type()=t;
+      expr.swap(result);
+      return;
+    }
+    else if(identifier=="__atomic_test_and_set")
+    {
+    }
+    else if(identifier=="__atomic_clear")
+    {
+    }
+    else if(identifier=="__atomic_thread_fence")
+    {
+    }
+    else if(identifier=="__atomic_signal_fence")
+    {
+    }
+    else if(identifier=="__atomic_always_lock_free")
+    {
+    }
+    else if(identifier=="__atomic_is_lock_free")
+    {
+    }
   }
 
   for(unsigned i=0; i<expr.get_sub().size(); i++)
@@ -1840,7 +1946,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     // These aren't really function calls, but either conversions or
     // initializations.    
-    if(expr.arguments().size()==0)
+    if(expr.arguments().empty())
     {
       // create temporary object
       exprt tmp_object_expr(ID_side_effect, pod);

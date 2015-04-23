@@ -21,15 +21,20 @@ public:
   smt2_temp_filet();
   ~smt2_temp_filet();
 
-protected:  
   std::ofstream temp_out;
   std::string temp_out_filename, temp_result_filename;
+};
+
+class smt2_stringstreamt
+{
+protected:
+  std::stringstream stringstream;
 };
 
 /*! \brief Decision procedure interface for various SMT 2.x solvers
     \ingroup gr_smt2
 */
-class smt2_dect:protected smt2_temp_filet, public smt2_convt
+class smt2_dect:protected smt2_stringstreamt, public smt2_convt
 {
 public:
   smt2_dect(
@@ -38,8 +43,7 @@ public:
     const std::string &_notes,
     const std::string &_logic,
     solvert _solver):
-    smt2_temp_filet(),
-    smt2_convt(_ns, _benchmark, _notes, _logic, _solver, temp_out)
+    smt2_convt(_ns, _benchmark, _notes, _logic, _solver, stringstream)
   {
   }
 

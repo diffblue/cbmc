@@ -172,22 +172,28 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
         continue;
 
       const typet &sub_type=it->type();
+      
+      exprt tmp;
 
+      if(sub_type.id()==ID_c_bit_field)
       {
-        exprt tmp=sizeof_rec(sub_type);
+        unsigned width=to_c_bit_field_type(sub_type).get_width();
+        tmp=
+          from_integer(width/8, size_type());
+      }
+      else
+      {
+        tmp=sizeof_rec(sub_type);
 
         if(tmp.is_nil())
           return nil_exprt();
-          
-        if(max_size.is_nil())
-          max_size=tmp;
-        else
-          max_size=if_exprt(
-            binary_relation_exprt(max_size, ID_lt, tmp),
-            tmp, max_size);
-
-        simplify(max_size, ns);
       }
+
+      max_size=if_exprt(
+        binary_relation_exprt(max_size, ID_lt, tmp),
+        tmp, max_size);
+
+      simplify(max_size, ns);
     }
 
     dest=max_size;

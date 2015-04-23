@@ -126,7 +126,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   }
   else if(statement==ID_CPROVER_throw)
   {
-    assert(code.operands().size()==0);
+    assert(code.operands().empty());
   }
   else if(statement==ID_assume ||
           statement==ID_assert)
@@ -848,7 +848,7 @@ Function: c_typecheck_baset::typecheck_return
 
 void c_typecheck_baset::typecheck_return(codet &code)
 {
-  if(code.operands().size()==0)
+  if(code.operands().empty())
   {
     if(follow(return_type).id()!=ID_empty)
     {

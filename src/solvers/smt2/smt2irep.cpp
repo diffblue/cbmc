@@ -39,6 +39,16 @@ protected:
       stack.top().get_sub().push_back(irept(buffer));
   }
   
+  virtual void string_literal()
+  {
+    symbol(); // we don't distinguish
+  }
+  
+  virtual void numeral()
+  {
+    symbol(); // we don't distinguish
+  }
+  
   virtual void open_expression() // '('
   {
     // produce sub-irep
@@ -57,6 +67,15 @@ protected:
       result=tmp;
     else
       stack.top().get_sub().push_back(tmp);
+  }
+  
+  virtual void keyword()
+  {
+    // ignore
+  }
+  
+  virtual void error(const std::string &message)
+  {
   }
 };
 

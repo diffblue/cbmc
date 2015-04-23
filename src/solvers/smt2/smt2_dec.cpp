@@ -47,7 +47,7 @@ std::string smt2_dect::decision_procedure_text() const
     (solver==GENERIC?"Generic":
      solver==BOOLECTOR?"Boolector":
      solver==CVC3?"CVC3":
-     solver==CVC4?"CVC3":
+     solver==CVC4?"CVC4":
      solver==MATHSAT?"MathSAT":
      solver==OPENSMT?"OpenSMT":
      solver==YICES?"Yices":
@@ -114,11 +114,17 @@ Function: smt2_dect::dec_solve
 
 decision_proceduret::resultt smt2_dect::dec_solve()
 {
-  // this closes the SMT2 file
-  write_footer();
-  temp_out.close();
+  // we write the problem into a file
+  smt2_temp_filet smt2_temp_file;
+  
+  // copy from string buffer into file
+  smt2_temp_file.temp_out << stringstream.str();
 
-  temp_result_filename=
+  // this finishes up and closes the SMT2 file
+  write_footer(smt2_temp_file.temp_out);
+  smt2_temp_file.temp_out.close();
+
+  smt2_temp_file.temp_result_filename=
     get_temporary_file("smt2_dec_result_", "");
 
   std::string command;
@@ -127,67 +133,69 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   {
   case BOOLECTOR:
     command = "boolector --smt2 "
-            + temp_out_filename
-            + " -m --output "
-            + temp_result_filename;
+            + smt2_temp_file.temp_out_filename
+            + " -m > "
+            + smt2_temp_file.temp_result_filename;
     break;
 
   case CVC3:
     command = "cvc3 +model -lang smtlib -output-lang smtlib "
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
   case CVC4:
+    // The flags --bitblast=eager --bv-div-zero-const help but only
+    // work for pure bit-vector formulas.
     command = "cvc4 -L smt2 "
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
   case MATHSAT:
     // The options below were recommended by Alberto Griggio
     // on 10 July 2013
-    command = "mathsat -input=smt2 \
- -preprocessor.toplevel_propagation=true \
- -preprocessor.simplification=7 \
- -dpll.branching_random_frequency=0.01 \
- -dpll.branching_random_invalidate_phase_cache=true \
- -dpll.restart_strategy=3 \
- -dpll.glucose_var_activity=true \
- -dpll.glucose_learnt_minimization=true \
- -theory.bv.eager=true \
- -theory.bv.bit_blast_mode=1 \
- -theory.bv.delay_propagated_eqs=true \
- -theory.fp.mode=1 \
- -theory.fp.bit_blast_mode=2 \
- -theory.arr.mode=1"
-              " < "+temp_out_filename
-            + " > "+temp_result_filename;
+    command = "mathsat -input=smt2"
+              " -preprocessor.toplevel_propagation=true"
+              " -preprocessor.simplification=7"
+              " -dpll.branching_random_frequency=0.01"
+              " -dpll.branching_random_invalidate_phase_cache=true"
+              " -dpll.restart_strategy=3"
+              " -dpll.glucose_var_activity=true"
+              " -dpll.glucose_learnt_minimization=true"
+              " -theory.bv.eager=true"
+              " -theory.bv.bit_blast_mode=1"
+              " -theory.bv.delay_propagated_eqs=true"
+              " -theory.fp.mode=1"
+              " -theory.fp.bit_blast_mode=2"
+              " -theory.arr.mode=1"
+              " < "+smt2_temp_file.temp_out_filename
+            + " > "+smt2_temp_file.temp_result_filename;
     break;
 
   case OPENSMT:
     command = "opensmt "
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
 
   case YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
     command = "yices-smt2 "  //  Calling for 2.2.1
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
   case Z3:
     command = "z3 -smt2 "
-            + temp_out_filename
+            + smt2_temp_file.temp_out_filename
             + " > "
-            + temp_result_filename;
+            + smt2_temp_file.temp_result_filename;
     break;
 
   default:
@@ -205,7 +213,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     return decision_proceduret::D_ERROR;
   }
 
-  std::ifstream in(temp_result_filename.c_str());
+  std::ifstream in(smt2_temp_file.temp_result_filename.c_str());
   
   return read_result(in);
 }
@@ -253,6 +261,19 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       // ( (|__CPROVER_pipe_count#1| (_ bv0 32)) )
       
       values[s0.id()]=s1;
+    }
+    else if(parsed.id()=="" &&
+            parsed.get_sub().size()==2 &&
+            parsed.get_sub().front().id()=="error")
+    {
+      // We ignore errors after UNSAT because get-value after check-sat
+      // returns unsat will give an error.
+      if(res!=D_UNSATISFIABLE)
+      {
+        error() << "SMT2 solver returned error message:\n"
+                << "\t\"" << parsed.get_sub()[1].id() <<"\"" << eom;
+        return decision_proceduret::D_ERROR;
+      }
     }
   }
 

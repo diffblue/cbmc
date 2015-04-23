@@ -101,7 +101,7 @@ propt::resultt satcheck_zcoret::prop_solve()
     std::string msg=
       i2string(no_variables())+" variables, "+
       i2string(no_clauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   // get the core

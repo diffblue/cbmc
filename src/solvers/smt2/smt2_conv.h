@@ -48,6 +48,7 @@ public:
     logic(_logic),
     solver(_solver),
     boolbv_width(_ns),
+    let_id_count(0),
     pointer_logic(_ns),
     no_boolean_variables(0)
   {
@@ -97,6 +98,7 @@ public:
 
   // overloading interfaces
   virtual literalt convert(const exprt &expr);
+  virtual void set_frozen(literalt a) { /* not needed */ }
   virtual void set_to(const exprt &expr, bool value);
   virtual exprt get(const exprt &expr) const;
   virtual std::string decision_procedure_text() const { return "SMT2"; }
@@ -113,7 +115,7 @@ protected:
   boolbv_widtht boolbv_width;
   
   void write_header();
-  void write_footer();
+  void write_footer(std::ostream &);
 
   // new stuff
   void convert_expr(const exprt &);
@@ -139,10 +141,11 @@ protected:
   void convert_minus(const minus_exprt &expr);
   void convert_div(const div_exprt &expr);
   void convert_mult(const mult_exprt &expr);
-  void convert_floatbv_plus(const exprt &expr);
-  void convert_floatbv_minus(const exprt &expr);
-  void convert_floatbv_div(const exprt &expr);
-  void convert_floatbv_mult(const exprt &expr);
+  void convert_rounding_mode_FPA(const exprt &expr);
+  void convert_floatbv_plus(const ieee_float_op_exprt &expr);
+  void convert_floatbv_minus(const ieee_float_op_exprt &expr);
+  void convert_floatbv_div(const ieee_float_op_exprt &expr);
+  void convert_floatbv_mult(const ieee_float_op_exprt &expr);
   void convert_mod(const mod_exprt &expr);
   void convert_index(const index_exprt &expr);
   void convert_member(const member_exprt &expr);
@@ -152,24 +155,91 @@ protected:
   
   std::string convert_identifier(const irep_idt &identifier);
   
-  // helpers for floating-point numbers
-  void is_nan(const floatbv_typet &, const char *);
-  void is_zero(const floatbv_typet &, const char *);
-  void is_equal(const floatbv_typet &, const char *, const char *);
+  // introduces a let-expression for operands
+  exprt convert_operands(const exprt &);
   
   // auxiliary methods
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
+  // letification
+  typedef std::pair<unsigned, symbol_exprt> let_count_id;
+  typedef hash_map_cont<exprt, let_count_id, irep_hash> seen_expressionst;
+  unsigned let_id_count;
+  const static unsigned LET_COUNT = 2;
+
+  class let_visitort : public expr_visitort
+  {
+    const seen_expressionst &let_map;
+
+  public:
+    let_visitort(const seen_expressionst &map):let_map(map) { }
+    
+    void operator()(exprt &expr)
+    {
+      seen_expressionst::const_iterator it = let_map.find(expr);
+      if (it != let_map.end() &&
+	  it->second.first >= LET_COUNT)
+      {
+	symbol_exprt symb = it->second.second;
+	expr = symb;
+	return;
+      }
+    }
+  };
+  
+  exprt letify(exprt &expr);
+  exprt letify_rec(
+    exprt &expr,
+    std::vector<exprt>& let_order,
+    const seen_expressionst& map,
+    unsigned i);
+
+  void collect_bindings(
+    exprt &expr,
+    seen_expressionst &map,
+    std::vector<exprt> &let_order);
+
+  exprt substitute_let(
+    exprt &expr,
+    const seen_expressionst &map);
+
+  // Parsing solver responses  
   constant_exprt parse_literal(const irept &, const typet &type);
   exprt parse_struct(const irept &s, const struct_typet &type);
   exprt parse_union(const irept &s, const union_typet &type);
   exprt parse_array(const irept &s, const array_typet &type);
   exprt parse_rec(const irept &s, const typet &type);
   
+  // we use this to build a bit-vector encoding of the FPA theory
+  void convert_floatbv(const exprt &expr);
+  static std::string type2id(const typet &);
+  static std::string floatbv_suffix(const exprt &);
+  std::set<irep_idt> bvfp_set; // already converted
+  
+  class smt2_symbolt:public exprt
+  {
+  public:
+    smt2_symbolt(const irep_idt &_identifier, const typet &_type):
+      exprt(ID_smt2_symbol, _type)
+    { set(ID_identifier, _identifier); }
+      
+    inline const irep_idt &get_identifier() const
+    {
+      return get(ID_identifier);
+    }
+  };
+
+  inline const smt2_symbolt &to_smt2_symbol(const exprt &expr)
+  {
+    assert(expr.id()==ID_smt2_symbol && !expr.has_operands());
+    return static_cast<const smt2_symbolt&>(expr);
+  }
+  
   // flattens any non-bitvector type into a bitvector,
-  // e.g., booleans, vectors, structs, arrays, ...
+  // e.g., booleans, vectors, structs, arrays but also
+  // floats when using the FPA theory.
   // unflatten() does the opposite.
   typedef enum { BEGIN, END } wheret;
   void flatten2bv(const exprt &);

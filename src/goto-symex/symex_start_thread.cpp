@@ -28,6 +28,11 @@ void goto_symext::symex_start_thread(statet &state)
 {
   if(state.guard.is_false()) return;
 
+  // we don't allow spawning threads out of atomic sections
+  // this would require amendments to ordering constraints
+  if(state.atomic_section_id!=0)
+    throw "start_thread in atomic section detected";
+
   // record this
   target.spawn(state.guard.as_expr(), state.source);
 

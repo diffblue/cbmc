@@ -929,7 +929,7 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         
         mp_integer step_size, index;
         
-        step_size=pointer_offset_size(ns, expr.type());
+        step_size=pointer_offset_size(expr.type(), ns);
         
         if(!to_integer(expr.op1(), index) &&
            step_size!=-1)
@@ -967,7 +967,7 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         {
           const struct_typet &struct_type=to_struct_type(op_type);
           const irep_idt &member=to_member_expr(expr).get_component_name();
-          mp_integer offset=member_offset(ns, struct_type, member);
+          mp_integer offset=member_offset(struct_type, member, ns);
           if(offset!=-1)
           {
             unsignedbv_typet int_type(config.ansi_c.pointer_width);
@@ -1098,7 +1098,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   {
     if(ptr.operands().size()!=1) return true;
 
-    mp_integer offset=compute_pointer_offset(ns, ptr.op0());
+    mp_integer offset=compute_pointer_offset(ptr.op0(), ns);
 
     if(offset!=-1)
     {
@@ -1200,7 +1200,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     typet pointer_type=ptr_expr.front().type();
 
     mp_integer element_size=
-      pointer_offset_size(ns, pointer_type.subtype());
+      pointer_offset_size(pointer_type.subtype(), ns);
     
     if(element_size==0) return true;
     
@@ -1696,7 +1696,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
     }
   }
 
-  if(operands.size()==0)
+  if(operands.empty())
   {
     expr=gen_zero(expr.type());
     return false;
@@ -2977,7 +2977,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
           expr.id()==ID_and ||
           expr.id()==ID_xor)
   {
-    if(operands.size()==0) return true;
+    if(operands.empty()) return true;
 
     bool result=true;
 
@@ -3061,7 +3061,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
         }
     }
 
-    if(operands.size()==0)
+    if(operands.empty())
     {
       if(expr.id()==ID_and || negate)
         expr=true_exprt();
@@ -4256,7 +4256,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
       // This rewrites byte_extract(s, o, array_type)[i]
       // to byte_extract(s, o+offset, sub_type)
 
-      mp_integer sub_size=pointer_offset_size(ns, array_type.subtype());
+      mp_integer sub_size=pointer_offset_size(array_type.subtype(), ns);
       if(sub_size==-1) return true;
 
       // add offset to index
@@ -4794,7 +4794,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         return true;
 
       // add member offset to index
-      mp_integer offset_int=member_offset(ns, struct_type, component_name);
+      mp_integer offset_int=member_offset(struct_type, component_name, ns);
       if(offset_int==-1) return true;
  
       const exprt &struct_offset=op.op1();
@@ -4823,7 +4823,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
     
     // need to convert!
     mp_integer target_size=
-      pointer_offset_size(ns, expr.type());
+      pointer_offset_size(expr.type(), ns);
 
     if(target_size!=-1)
     {
@@ -4987,7 +4987,7 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     expr=be.op().op2();
     return false;
   }
-
+  
   // the following require a constant offset
   mp_integer offset;
   if(to_integer(be.offset(), offset) || offset<0)
@@ -5002,7 +5002,7 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     return false;
   }
 
-  const mp_integer el_size=pointer_offset_size(ns, be.type());
+  const mp_integer el_size=pointer_offset_size(be.type(), ns);
   // no proper simplification for be.type()==void
   // or types of unknown size
   if(be.type().id()==ID_empty ||
@@ -5011,55 +5011,59 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
 
   // rethink the remaining code to correctly handle big endian
   if(expr.id()!=ID_byte_extract_little_endian) return true;
-
-  exprt result=be.op();
-
-  // try proper array or string constant
-  for(const typet *op_type=&(ns.follow(be.op().type()));
-      op_type->id()==ID_array;
-      op_type=&(ns.follow(*op_type).subtype()))
+  
+  // get type of object
+  const typet &op_type=ns.follow(be.op().type());
+  
+  if(op_type.id()==ID_array)
   {
-    // no arrays of zero-sized objects
-    assert(el_size>0);
+    exprt result=be.op();
 
-    if(base_type_eq(be.type(), op_type->subtype(), ns))
+    // try proper array or string constant
+    for(const typet *op_type_ptr=&op_type;
+        op_type_ptr->id()==ID_array;
+        op_type_ptr=&(ns.follow(*op_type_ptr).subtype()))
     {
-      if(offset%el_size==0)
+      // no arrays of zero-sized objects
+      assert(el_size>0);
+
+      if(base_type_eq(be.type(), op_type_ptr->subtype(), ns))
       {
-        offset/=el_size;
+        if(offset%el_size==0)
+        {
+          offset/=el_size;
 
-        result=
-          index_exprt(
-            result,
-            from_integer(offset, be.offset().type()));
+          result=
+            index_exprt(
+              result,
+              from_integer(offset, be.offset().type()));
 
-        expr=result;
+          expr=result;
 
-        return false;
+          return false;
+        }
       }
-    }
-    else
-    {
-      mp_integer sub_size=pointer_offset_size(ns, op_type->subtype());
-
-      if(sub_size>0)
+      else
       {
-        mp_integer index=offset/sub_size;
-        offset%=sub_size;
+        mp_integer sub_size=pointer_offset_size(op_type_ptr->subtype(), ns);
 
-        result=
-          index_exprt(
-            result,
-            from_integer(index, be.offset().type()));
+        if(sub_size>0)
+        {
+          mp_integer index=offset/sub_size;
+          offset%=sub_size;
+
+          result=
+            index_exprt(
+              result,
+              from_integer(index, be.offset().type()));
+        }
       }
     }
   }
-
-  // wasn't an array, try struct member
-  if(ns.follow(result.type()).id()==ID_struct)
+  else if(op_type.id()==ID_struct)
   {
     const struct_typet &struct_type=
-      to_struct_type(ns.follow(result.type()));
+      to_struct_type(op_type);
     const struct_typet::componentst &components=
       struct_type.components();
 
@@ -5069,31 +5073,26 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
         ++it)
     {
       mp_integer m_offset=
-        member_offset(ns, struct_type, it->get_name());
+        member_offset(struct_type, it->get_name(), ns);
       mp_integer m_size=
-        pointer_offset_size(ns, it->type());
-
-      if(m_offset>=0 &&
-         m_size>=0 &&
-         offset>=m_offset &&
-         offset+el_size<=m_offset+m_size)
+        pointer_offset_size(it->type(), ns);
+        
+      if(offset==m_offset &&
+         el_size==m_size &&
+         base_type_eq(be.type(), it->type(), ns))
       {
-        result=member_exprt(result, it->get_name(), it->type());
-
-        if(offset==m_offset &&
-           el_size==m_size &&
-           base_type_eq(be.type(), result.type(), ns))
-        {
-          expr=result;
-        }
-        else
-        {
-          be.op()=result;
-          be.offset()=
-            from_integer(offset-m_offset, be.offset().type());
-        }
-
+        expr=member_exprt(be.op(), it->get_name(), it->type());
         simplify_rec(expr);
+        return false;
+      }
+      else if(m_offset>=0 &&
+              m_size>=0 &&
+              offset>=m_offset &&
+              offset+el_size<=m_offset+m_size)
+      {
+        be.op()=member_exprt(be.op(), it->get_name(), it->type());
+        be.offset()=
+          from_integer(offset-m_offset, be.offset().type());
 
         return false;
       }
@@ -5118,14 +5117,16 @@ Function: simplify_exprt::simplify_byte_update
 bool simplify_exprt::simplify_byte_update(exprt &expr)
 {
   if(expr.operands().size()!=3) return true;
+  
+  byte_update_exprt &bu_expr=to_byte_update_expr(expr);
 
   // byte_update(byte_update(root, offset, value), offset, value2) =>
   // byte_update(root, offset, value2)
-  if(expr.id()==expr.op0().id() &&
-     expr.op1()==expr.op0().op1() &&
-     base_type_eq(expr.op2().type(), expr.op0().op2().type(), ns))
+  if(bu_expr.id()==bu_expr.op().id() &&
+     bu_expr.offset()==bu_expr.op().op1() &&
+     base_type_eq(bu_expr.value().type(), bu_expr.op().op2().type(), ns))
   {
-    expr.op0()=expr.op0().op0();
+    bu_expr.op()=bu_expr.op().op0();
     return false;
   }
 
@@ -5137,14 +5138,15 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
    *             value)
    */
 
-  if(expr.id()!=ID_byte_update_little_endian) return true;
+  if(bu_expr.id()!=ID_byte_update_little_endian) return true;
 
-  exprt &root=expr.op0();
-  exprt &offset=expr.op1();
+  exprt &root=bu_expr.op();
+  exprt &offset=bu_expr.offset();
+  const exprt &value=bu_expr.value();
 
-  if(expr.op2().id()==ID_with) 
+  if(bu_expr.value().id()==ID_with) 
   {
-    exprt &with=expr.op2();
+    exprt &with=bu_expr.value();
 
     if(with.operands().size()!=3) return true;
 
@@ -5173,8 +5175,8 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
         else
         {
           // new offset = offset + component offset
-          mp_integer i = member_offset(ns, struct_type, 
-                                       component_name);
+          mp_integer i = member_offset(struct_type, 
+                                       component_name, ns);
           if(i != -1) 
           {
             exprt compo_offset = from_integer(i, offset.type());
@@ -5190,7 +5192,7 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
       }
       else if(tp.id()==ID_array)
       {
-        mp_integer i = pointer_offset_size(ns, tp.subtype());
+        mp_integer i = pointer_offset_size(tp.subtype(), ns);
         if(i != -1)
         {
           exprt& index = with.op1();
@@ -5216,6 +5218,41 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
       }
     }
   }
+  
+  // the following require a constant offset
+  mp_integer offset_int;
+  if(to_integer(offset, offset_int) || offset_int<0)
+    return true;
+  
+  const typet &op_type=ns.follow(root.type());
+  
+  // search for updates of members, and replace by 'with'
+  if(op_type.id()==ID_struct)
+  {
+    const struct_typet &struct_type=
+      to_struct_type(op_type);
+    const struct_typet::componentst &components=
+      struct_type.components();
+      
+    for(struct_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        ++it)
+    {
+      mp_integer m_offset=
+        member_offset(struct_type, it->get_name(), ns);
+        
+      if(offset_int==m_offset &&
+         base_type_eq(it->type(), value.type(), ns))
+      {
+        exprt member_name(ID_member_name);
+        member_name.set(ID_component_name, it->get_name());
+        expr=with_exprt(root, member_name, value);
+        simplify_node(expr);
+        return false;
+      }
+    }
+  }
 
   return true;
 }
@@ -5234,10 +5271,12 @@ Function: sort_and_join
 \*******************************************************************/
 
 // The entries
-//  { "+",      "floatbv"    },
-//  { "*",      "floatbv"    },
+//  { ID_plus,   ID_floatbv  },
+//  { ID_mult,   ID_floatbv  },
+//  { ID_plus,   ID_pointer  },
 // are deliberately missing, as FP-addition and multiplication
-// aren't associative
+// aren't associative. Addition to pointers isn't really
+// associative.
 
 struct saj_tablet
 {
@@ -5253,7 +5292,6 @@ struct saj_tablet
   { ID_plus,   ID_unsignedbv },
   { ID_plus,   ID_signedbv   },
   { ID_plus,   ID_fixedbv    },
-  { ID_plus,   ID_pointer    },
   { ID_mult,   ID_integer    },
   { ID_mult,   ID_natural    },
   { ID_mult,   ID_real       },

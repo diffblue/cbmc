@@ -13,7 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "config.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
+#include "i2string.h"
 
+#include "std_types.h"
 #include "std_expr.h"
 
 /*******************************************************************\
@@ -131,9 +133,8 @@ static void build_object_descriptor_rec(
       return;
 
     mp_integer offset=
-      member_offset(ns,
-                    to_struct_type(struct_type),
-                    member.get_component_name());
+      member_offset(to_struct_type(struct_type),
+                    member.get_component_name(), ns);
     assert(offset>=0);
 
     dest.offset()=
@@ -180,5 +181,88 @@ void object_descriptor_exprt::build(
   build_object_descriptor_rec(ns, expr, *this);
 
   assert(root_object().type().id()!=ID_empty);
+}
+
+/*******************************************************************\
+
+Function: constant_exprt::integer_constant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt constant_exprt::integer_constant(unsigned v)
+{
+  return constant_exprt(i2string(v), integer_typet());
+}
+
+/*******************************************************************\
+
+Function: shift_exprt::shift_exprt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+shift_exprt::shift_exprt(
+  const exprt &_src,
+  const irep_idt &_id,
+  const unsigned _distance):
+  binary_exprt(_src, _id, constant_exprt::integer_constant(_distance))
+{
+}
+
+/*******************************************************************\
+
+Function: extractbit_exprt::extractbit_exprt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+extractbit_exprt::extractbit_exprt(
+  const exprt &_src,
+  const unsigned _index):
+  binary_predicate_exprt(
+    _src, ID_extractbit, constant_exprt::integer_constant(_index))
+{
+}
+
+/*******************************************************************\
+
+Function: extractbit_exprt::extractbits_exprt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+extractbits_exprt::extractbits_exprt(
+  const exprt &_src,
+  const unsigned _upper,
+  const unsigned _lower,
+  const typet &_type):
+  exprt(ID_extractbits, _type)
+{
+  assert(_upper>=_lower);
+  operands().resize(3);
+  src()=_src;
+  upper()=constant_exprt::integer_constant(_upper);
+  lower()=constant_exprt::integer_constant(_lower);
 }
 

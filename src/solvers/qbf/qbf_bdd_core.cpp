@@ -194,7 +194,7 @@ propt::resultt qbf_bdd_coret::prop_solve()
       solver_text() + ": "+
       i2string(no_variables())+" variables, "+
       i2string(matrix->nodeCount())+" nodes";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   model_bdds.resize(no_variables()+1, NULL);
@@ -419,7 +419,7 @@ Function: qbf_bdd_coret::compress_certificate
 
 void qbf_bdd_coret::compress_certificate(void)
 {
-  status("Compressing Certificate");
+  status() << "Compressing Certificate" << eom;
 
   for(quantifierst::const_iterator it=quantifiers.begin();
       it!=quantifiers.end();
@@ -552,7 +552,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
 
       simplify_extractbits(prime);
 
-      if(prime.operands().size()==0)
+      if(prime.operands().empty())
         result.copy_to_operands(true_exprt());
       else if(prime.operands().size()==1)
         result.move_to_operands(prime.op0());
@@ -564,7 +564,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
 
     exprt final;
 
-    if(result.operands().size()==0)
+    if(result.operands().empty())
       final=false_exprt();
     else if(result.operands().size()==1)
       final=result.op0();

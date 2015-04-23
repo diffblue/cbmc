@@ -53,8 +53,8 @@ void rd_range_domaint::transform(
           lhs.id()==ID_complex_imag)
   {
     assert(lhs.type().id()==ID_complex);
-    mp_integer offset=compute_pointer_offset(ns, lhs.op0());
-    mp_integer sub_size=pointer_offset_size(ns, lhs.type().subtype());
+    mp_integer offset=compute_pointer_offset(lhs.op0(), ns);
+    mp_integer sub_size=pointer_offset_size(lhs.type().subtype(), ns);
 
     assign(
       ns,
@@ -65,7 +65,7 @@ void rd_range_domaint::transform(
   }
   else
   {
-    mp_integer size=pointer_offset_size(ns, lhs.type());
+    mp_integer size=pointer_offset_size(lhs.type(), ns);
 
     assign(ns, from, lhs, size);
   }
@@ -101,7 +101,7 @@ void rd_range_domaint::assign(
   else if(lhs.id()==ID_symbol ||
           lhs.id()==ID_index ||
           lhs.id()==ID_member)
-    assign(ns, from, lhs, compute_pointer_offset(ns, lhs), size);
+    assign(ns, from, lhs, compute_pointer_offset(lhs, ns), size);
   else
     throw "assignment to `"+lhs.id_string()+"' not handled";
 }
@@ -205,7 +205,7 @@ void rd_range_domaint::assign_byte_extract(
   const mp_integer &size)
 {
   assert(size==1);
-  mp_integer op_offset=compute_pointer_offset(ns, be.op());
+  mp_integer op_offset=compute_pointer_offset(be.op(), ns);
 
   mp_integer index;
   if(op_offset==-1 || to_integer(be.offset(), index))
@@ -261,7 +261,7 @@ void rd_range_domaint::assign(
     }
     else
     {
-      mp_integer full_size=pointer_offset_size(ns, symbol.type());
+      mp_integer full_size=pointer_offset_size(symbol.type(), ns);
       gen(from, identifier, 0, full_size);
     }
   }

@@ -48,7 +48,7 @@ exprt convert_character_literal(
     // L is wchar_t, u is char16_t, U is char32_t
     typet type=wchar_t_type();
     
-    if(value.size()==0)
+    if(value.empty())
       throw "empty wide character literal";
     else if(value.size()==1)
     {
@@ -82,7 +82,7 @@ exprt convert_character_literal(
     std::string value;
     unescape_string(std::string(src, 1, src.size()-2), value);
 
-    if(value.size()==0)
+    if(value.empty())
       throw "empty character literal";
     else if(value.size()==1)
     {

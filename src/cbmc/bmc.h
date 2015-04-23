@@ -86,9 +86,10 @@ protected:
     decision_proceduret &decision_procedure);
   void do_conversion(prop_convt &solver);
   
-  prop_convt *solver_factory();
-
   virtual void show_vcc();
+  virtual bool all_properties(
+    const goto_functionst &goto_functions,
+    prop_convt &solver);
   virtual void show_vcc(std::ostream &out);
   virtual void show_program();
   virtual void report_success();
@@ -102,32 +103,7 @@ protected:
     const goto_functionst &goto_functions,
     prop_convt &solver);
 
-  // all properties
-  struct goalt
-  {
-    exprt::operandst conjuncts;
-    std::string description;
-    bool covered; //goal reachable?
-
-    explicit goalt(const goto_programt::instructiont &instruction)
-    {
-      description=id2string(instruction.source_location.get_comment());
-      covered = false;
-    }
-  
-    goalt()
-    {
-    }
-  };
-
-  // Collect _all_ goals in `goal_map'.
-  // This maps claim IDs to 'goalt'
-  typedef std::map<irep_idt, goalt> goal_mapt;
-  goal_mapt goal_map;
- 
-  virtual bool all_properties(const goto_functionst &goto_functions, 
-			      prop_convt &solver);
-
+  friend class bmc_all_propertiest;
 };
 
 #endif

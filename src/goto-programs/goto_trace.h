@@ -155,6 +155,16 @@ public:
   {
     steps.push_back(step);
   }
+
+  // delete all steps after (not including) s  
+  void trim_after(stepst::iterator s)
+  {
+    assert(s!=steps.end());
+    s++;
+    for(;
+        s!=steps.end(); 
+        s=steps.erase(s));
+  }
 };
 
 void show_goto_trace(
@@ -162,7 +172,7 @@ void show_goto_trace(
   const namespacet &ns,
   const goto_tracet &goto_trace);
 
-void counterexample_value(
+void trace_value(
   std::ostream &out,
   const namespacet &ns,
   const symbol_exprt &lhs_object,

@@ -148,7 +148,7 @@ void ui_message_handlert::print(
     {
       std::string tmp_message(message);
 
-      if(tmp_message.size()!=0 && tmp_message[tmp_message.size()-1]=='\n')
+      if(!tmp_message.empty() && *tmp_message.rbegin()=='\n')
         tmp_message.resize(tmp_message.size()-1);
     
       const char *type=level_string(level);

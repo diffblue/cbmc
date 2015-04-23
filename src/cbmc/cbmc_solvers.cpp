@@ -28,6 +28,81 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "counterexample_beautification.h"
 #include "version.h"
 
+/*******************************************************************\
+
+Function: cbmc_solverst::get_smt1_solver_type
+
+  Inputs: None
+
+ Outputs: An smt1_dect::solvert giving the solver to use.
+
+ Purpose: Uses the options to pick an SMT 1.2 solver
+
+\*******************************************************************/
+
+smt1_dect::solvert cbmc_solverst::get_smt1_solver_type() const
+{
+  assert(options.get_bool_option("smt1"));
+
+  smt1_dect::solvert s = smt1_dect::GENERIC;
+  
+  if(options.get_bool_option("boolector"))
+    s = smt1_dect::BOOLECTOR;
+  else if(options.get_bool_option("mathsat"))
+    s = smt1_dect::MATHSAT;
+  else if(options.get_bool_option("cvc3"))
+    s = smt1_dect::CVC3;
+  else if(options.get_bool_option("cvc4"))
+    s = smt1_dect::CVC4;
+  else if(options.get_bool_option("opensmt"))
+    s = smt1_dect::OPENSMT;
+  else if(options.get_bool_option("yices"))
+    s = smt1_dect::YICES;
+  else if(options.get_bool_option("z3"))
+    s = smt1_dect::Z3;
+  else if(options.get_bool_option("generic"))
+    s = smt1_dect::GENERIC;
+
+  return s;
+}
+
+/*******************************************************************\
+
+Function: cbmc_solverst::get_smt2_solver_type
+
+  Inputs: None
+
+ Outputs: An smt2_dect::solvert giving the solver to use.
+
+ Purpose: Uses the options to pick an SMT 2.0 solver
+
+\*******************************************************************/
+
+smt2_dect::solvert cbmc_solverst::get_smt2_solver_type() const
+{
+  assert(options.get_bool_option("smt2"));
+
+  smt2_dect::solvert s = smt2_dect::GENERIC;
+  
+  if(options.get_bool_option("boolector"))
+    s = smt2_dect::BOOLECTOR;
+  else if(options.get_bool_option("mathsat"))
+    s = smt2_dect::MATHSAT;
+  else if(options.get_bool_option("cvc3"))
+    s = smt2_dect::CVC3;
+  else if(options.get_bool_option("cvc4"))
+    s = smt2_dect::CVC4;
+  else if(options.get_bool_option("opensmt"))
+    s = smt2_dect::OPENSMT;
+  else if(options.get_bool_option("yices"))
+    s = smt2_dect::YICES;
+  else if(options.get_bool_option("z3"))
+    s = smt2_dect::Z3;
+  else if(options.get_bool_option("generic"))
+    s = smt2_dect::GENERIC;
+
+  return s;
+}
 
 // Solvers with additional objects
 
@@ -308,111 +383,6 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
     smt2_conv->set_message_handler(get_message_handler());
     return new solvert(smt2_conv);
   }
-}
-
-/*******************************************************************\
-
-Function: cbmc_solverst::get_cvc
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-     
-cbmc_solverst::solvert* cbmc_solverst::get_cvc()
-{
-  return get_smt1(smt1_dect::CVC3);
-}
-    
-/*******************************************************************\
-
-Function: cbmc_solverst::get_boolector
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-      
-cbmc_solverst::solvert* cbmc_solverst::get_boolector()
-{
-  return get_smt1(smt1_dect::BOOLECTOR);
-}
-
-/*******************************************************************\
-
-Function: cbmc_solverst::get_mathsat
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-       
-cbmc_solverst::solvert* cbmc_solverst::get_mathsat()
-{
-  if(options.get_bool_option("smt2"))
-    return get_smt2(smt2_dect::MATHSAT);
-  else
-    return get_smt1(smt1_dect::MATHSAT);
-}
-      
-/*******************************************************************\
-
-Function: cbmc_solverst::get_opensmt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-	
-cbmc_solverst::solvert* cbmc_solverst::get_opensmt()
-{
-  return get_smt1(smt1_dect::OPENSMT);
-}
-
-/*******************************************************************\
-
-Function: cbmc_solverst::get_z3
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-	 
-cbmc_solverst::solvert* cbmc_solverst::get_z3()
-{
-  return get_smt2(smt2_dect::Z3);
-}
-	 
-/*******************************************************************\
-
-Function: cbmc_solverst::get_yices
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-	  
-cbmc_solverst::solvert* cbmc_solverst::get_yices()
-{
-  return get_smt1(smt1_dect::YICES);
 }
 	  
 /*******************************************************************\

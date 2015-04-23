@@ -22,21 +22,21 @@ class constant_exprt;
 // these return -1 on failure
 
 mp_integer member_offset(
-  const namespacet &ns,
   const struct_typet &type,
-  const irep_idt &member);
+  const irep_idt &member,
+  const namespacet &ns);
 
 mp_integer pointer_offset_size(
-  const namespacet &ns,
-  const typet &type);
+  const typet &type,
+  const namespacet &ns);
 
 mp_integer pointer_offset_bits(
-  const namespacet &ns,
-  const typet &type);
+  const typet &type,
+  const namespacet &ns);
 
 mp_integer compute_pointer_offset(
-  const namespacet &ns,
-  const exprt &expr);
+  const exprt &expr,
+  const namespacet &ns);
 
 // these return 'nil' on failure
 

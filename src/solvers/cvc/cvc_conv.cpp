@@ -289,9 +289,9 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
     const irep_idt &component_name=
       to_member_expr(expr).get_component_name();
       
-    mp_integer offset=member_offset(ns,
+    mp_integer offset=member_offset(
       to_struct_type(struct_op.type()),
-      component_name);
+      component_name, ns);
     
     typet index_type(ID_unsignedbv);
     index_type.set(ID_width, config.ansi_c.pointer_width);
@@ -493,7 +493,7 @@ void cvc_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_or || expr.id()==ID_and || expr.id()==ID_xor ||
           expr.id()==ID_nor || expr.id()==ID_nand)
   {
-    if(op.size()==0)
+    if(op.empty())
       throw "operator `"+expr.id_string()+"' takes at least one operand";
     else if(op.size()==1)
       convert_expr(op[0]);
@@ -729,7 +729,7 @@ void cvc_convt::convert_expr(const exprt &expr)
     {
       out << "ARRAY (i: " << array_index_type() << "):";
       
-      assert(expr.operands().size()!=0);
+      assert(!expr.operands().empty());
       
       unsigned i=0;
       forall_operands(it, expr)

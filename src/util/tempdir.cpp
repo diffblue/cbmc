@@ -12,6 +12,7 @@ Author: CM Wintersteiger
 #include <direct.h>
 #endif
 
+#include <cassert>
 #include <cstdlib>
 #include <cstring>
 
@@ -172,7 +173,8 @@ temp_working_dirt::temp_working_dirt(const std::string &name_template):
   temp_dirt(name_template)
 {
   old_working_directory=get_current_working_directory();
-  chdir(path.c_str());
+  if(chdir(path.c_str())!=0)
+    assert(false);
 }
 
 /*******************************************************************\
@@ -189,6 +191,7 @@ Function: temp_working_dirt::~temp_working_dirt
 
 temp_working_dirt::~temp_working_dirt()
 {
-  chdir(old_working_directory.c_str());
+  if(chdir(old_working_directory.c_str())!=0)
+    assert(false);
 }
 

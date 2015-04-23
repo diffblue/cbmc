@@ -229,7 +229,7 @@ exprt zero_initializert::zero_initializer_rec(
       // skip methods
       if(it->type().id()==ID_code) continue;
 
-      mp_integer bits=pointer_offset_bits(ns, it->type());
+      mp_integer bits=pointer_offset_bits(it->type(), ns);
       
       if(bits>component_size)
       {

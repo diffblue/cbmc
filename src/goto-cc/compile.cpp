@@ -103,7 +103,7 @@ bool compilet::doit()
 
   // Work through the given source files
 
-  if(source_files.size()==0 && object_files.size()==0)
+  if(source_files.empty() && object_files.empty())
   {
     error() << "no input files" << eom;
     return true;
@@ -759,7 +759,7 @@ bool compilet::read_object(
   seen_modes.erase(ID_cpp);
   seen_modes.erase(ID_C);
 
-  if(seen_modes.size()!=0)
+  if(!seen_modes.empty())
   {
     error() << "Multi-language linking not supported" << eom;
     return true;

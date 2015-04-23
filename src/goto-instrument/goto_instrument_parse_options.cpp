@@ -46,7 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include "goto_instrument_parseoptions.h"
+#include "goto_instrument_parse_options.h"
 #include "document_properties.h"
 #include "uninitialized.h"
 #include "full_slicer.h"
@@ -75,7 +75,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::eval_verbosity
+Function: goto_instrument_parse_optionst::eval_verbosity
 
   Inputs:
 
@@ -85,7 +85,7 @@ Function: goto_instrument_parseoptionst::eval_verbosity
 
 \*******************************************************************/
 
-void goto_instrument_parseoptionst::eval_verbosity()
+void goto_instrument_parse_optionst::eval_verbosity()
 {
   unsigned int v=8;
   
@@ -100,7 +100,7 @@ void goto_instrument_parseoptionst::eval_verbosity()
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::doit
+Function: goto_instrument_parse_optionst::doit
 
   Inputs:
 
@@ -110,7 +110,7 @@ Function: goto_instrument_parseoptionst::doit
 
 \*******************************************************************/
 
-int goto_instrument_parseoptionst::doit()
+int goto_instrument_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
@@ -279,6 +279,9 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("show-reaching-definitions"))
     {
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
       const namespacet ns(symbol_table);
       reaching_definitions_analysist rd_analysis(ns);
       rd_analysis(goto_functions);
@@ -502,7 +505,7 @@ int goto_instrument_parseoptionst::doit()
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::get_goto_program
+Function: goto_instrument_parse_optionst::get_goto_program
 
   Inputs:
 
@@ -512,7 +515,7 @@ Function: goto_instrument_parseoptionst::get_goto_program
 
 \*******************************************************************/
   
-void goto_instrument_parseoptionst::get_goto_program(
+void goto_instrument_parse_optionst::get_goto_program(
   goto_functionst &goto_functions)
 {
   status() << "Reading GOTO program from `" << cmdline.args[0] << "'" << eom;
@@ -527,7 +530,7 @@ void goto_instrument_parseoptionst::get_goto_program(
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::instrument_goto_program
+Function: goto_instrument_parse_optionst::instrument_goto_program
 
   Inputs:
 
@@ -537,7 +540,7 @@ Function: goto_instrument_parseoptionst::instrument_goto_program
 
 \*******************************************************************/
   
-void goto_instrument_parseoptionst::instrument_goto_program(
+void goto_instrument_parse_optionst::instrument_goto_program(
   goto_functionst &goto_functions)
 {
   optionst options;
@@ -633,7 +636,8 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   // we add the library in some cases, as some analyses benefit
 
-  if(cmdline.isset("mm"))
+  if(cmdline.isset("add-library") ||
+     cmdline.isset("mm"))
   {
     status() << "Adding CPROVER library" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
@@ -941,7 +945,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::help
+Function: goto_instrument_parse_optionst::help
 
   Inputs:
 
@@ -951,7 +955,7 @@ Function: goto_instrument_parseoptionst::help
 
 \*******************************************************************/
 
-void goto_instrument_parseoptionst::help()
+void goto_instrument_parse_optionst::help()
 {
   std::cout <<
     "\n"
@@ -1027,11 +1031,12 @@ void goto_instrument_parseoptionst::help()
     " --render-cluster-function    clusterises the dot by functions\n"
     "\n"
     "Slicing:\n"
-    " --reachability-slicer        slice away instructions that can't reach assertions\n"
+    " --reachability-slice         slice away instructions that can't reach assertions\n"
     " --full-slice                 slice away instructions that don't affect assertions\n"
     "\n"
     "Further transformations:\n"
     " --inline                     perform full inlining\n"
+    " --add-library                add models of C library functions\n"
     "\n"
     "Other options:\n"
     " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n"

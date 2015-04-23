@@ -6,7 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "goto_instrument_parseoptions.h"
+#include <util/unicode.h>
+
+#include "goto_instrument_parse_options.h"
 
 /*******************************************************************\
 
@@ -20,8 +22,14 @@ Function: main
 
 \*******************************************************************/
 
+#ifdef _MSC_VER
+int wmain(int argc, const wchar_t **argv_wide)
+{
+  const char **argv=narrow_argv(argc, argv_wide);
+#else
 int main(int argc, const char **argv)
 {
-  goto_instrument_parseoptionst parseoptions(argc, argv);
-  return parseoptions.main();
+#endif
+  goto_instrument_parse_optionst parse_options(argc, argv);
+  return parse_options.main();
 }

@@ -188,7 +188,7 @@ propt::resultt satcheck_booleforce_baset::prop_solve()
       break;    
     }
 
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   if(result==BOOLEFORCE_UNSATISFIABLE)

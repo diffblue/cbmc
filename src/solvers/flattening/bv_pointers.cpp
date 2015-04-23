@@ -44,7 +44,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
     {
       const bvt &bv=convert_bv(operands[0]);
       
-      if(bv.size()!=0)
+      if(!bv.empty())
       {
         bvt invalid_bv, null_bv;
         encode(pointer_logic.get_invalid_object(), invalid_bv);
@@ -193,7 +193,7 @@ bool bv_pointerst::convert_address_of_rec(
       
     // get size
     mp_integer size=
-      pointer_offset_size(ns, array_type.subtype());
+      pointer_offset_size(array_type.subtype(), ns);
     
     offset_arithmetic(bv, size, index);
     assert(bv.size()==bits);
@@ -211,9 +211,9 @@ bool bv_pointerst::convert_address_of_rec(
 
     if(struct_op_type.id()==ID_struct)
     {
-      mp_integer offset=member_offset(ns,
+      mp_integer offset=member_offset(
         to_struct_type(struct_op_type),
-        member_expr.get_component_name());
+        member_expr.get_component_name(), ns);
 
       // add offset
       offset_arithmetic(bv, offset);
@@ -371,7 +371,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
         count++;
         bv=convert_bv(*it);
         assert(bv.size()==bits);
-        size=pointer_offset_size(ns, it->type().subtype());
+        size=pointer_offset_size(it->type().subtype(), ns);
       }
     }
 
@@ -396,7 +396,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
 
       bvt op=convert_bv(*it);
 
-      if(op.size()==0)
+      if(op.empty())
         throw "unexpected pointer arithmetic operand width";
       
       // we cut any extra bits off
@@ -433,7 +433,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
     bv=convert_bv(expr.op0());
     
     mp_integer element_size=
-      pointer_offset_size(ns, expr.op0().type().subtype());
+      pointer_offset_size(expr.op0().type().subtype(), ns);
     
     offset_arithmetic(bv, element_size, neg_op1);
 
@@ -493,7 +493,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     bv=bv_utils.sub(op0, op1);
     
     mp_integer element_size=
-      pointer_offset_size(ns, expr.op0().type().subtype());
+      pointer_offset_size(expr.op0().type().subtype(), ns);
       
     if(element_size!=1)
     {

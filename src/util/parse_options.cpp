@@ -16,12 +16,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include "cmdline.h"
-#include "parseoptions.h"
+#include "parse_options.h"
 #include "signal_catcher.h"
 
 /*******************************************************************\
 
-Function: parseoptions_baset::parseoptions_baset
+Function: parse_options_baset::parse_options_baset
 
   Inputs:
 
@@ -31,7 +31,7 @@ Function: parseoptions_baset::parseoptions_baset
 
 \*******************************************************************/
 
-parseoptions_baset::parseoptions_baset(
+parse_options_baset::parse_options_baset(
   const std::string &_optstring, int argc, const char **argv)
 {
   std::string optstring=std::string("?h(help)")+_optstring;
@@ -40,7 +40,7 @@ parseoptions_baset::parseoptions_baset(
 
 /*******************************************************************\
 
-Function: parseoptions_baset::help
+Function: parse_options_baset::help
 
   Inputs:
 
@@ -50,13 +50,13 @@ Function: parseoptions_baset::help
 
 \*******************************************************************/
 
-void parseoptions_baset::help()
+void parse_options_baset::help()
 {
 }
 
 /*******************************************************************\
 
-Function: parseoptions_baset::usage_error
+Function: parse_options_baset::usage_error
 
   Inputs:
 
@@ -66,7 +66,7 @@ Function: parseoptions_baset::usage_error
 
 \*******************************************************************/
 
-void parseoptions_baset::usage_error()
+void parse_options_baset::usage_error()
 {
   std::cerr << "Usage error!\n\n";
   help();
@@ -74,7 +74,7 @@ void parseoptions_baset::usage_error()
 
 /*******************************************************************\
 
-Function: parseoptions_baset::main
+Function: parse_options_baset::main
 
   Inputs:
 
@@ -84,7 +84,7 @@ Function: parseoptions_baset::main
 
 \*******************************************************************/
 
-int parseoptions_baset::main()
+int parse_options_baset::main()
 {
   if(parse_result)
   {

@@ -224,8 +224,7 @@ void goto_program_dereferencet::dereference_rec(
     
     assert(expr.operands().size()==1);
     
-    if(expr.op0().id()==ID_dereference ||
-       expr.op0().id()=="implicit_dereference")
+    if(expr.op0().id()==ID_dereference)
     {
       assert(expr.op0().operands().size()==1);
 
@@ -253,11 +252,6 @@ void goto_program_dereferencet::dereference_rec(
       expr.op0(), guard, mode);
 
     expr.swap(tmp);
-  }
-  else if(expr.id()=="implicit_dereference")
-  {
-    // old stuff
-    assert(false);
   }
   else if(expr.id()==ID_index)
   {

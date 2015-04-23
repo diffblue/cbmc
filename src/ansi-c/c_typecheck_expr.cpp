@@ -457,13 +457,15 @@ Function: c_typecheck_baset::typecheck_expr_builtin_va_arg
 
 void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
 {
-  // this comes with a type, which will need to be fixed
-  // and checked
-  typet type=expr.type();
-  typecheck_type(type);
+  // The first parameter is the va_list, and the second
+  // is the type, which will need to be fixed and checked.
+  // The type is given by the parser as type of the expression.
+
+  typet arg_type=expr.type();
+  typecheck_type(arg_type);
   
   code_typet new_type;
-  new_type.return_type().swap(type);
+  new_type.return_type().swap(arg_type);
   new_type.parameters().resize(1);
   new_type.parameters()[0].type()=pointer_typet(empty_typet());
 
@@ -543,7 +545,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 {
   // these need not be constant, due to array indices!
 
-  if(expr.operands().size()!=0)
+  if(!expr.operands().empty())
   {
     err_location(expr);
     throw "builtin_offsetof expects no operands";
@@ -980,7 +982,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
 {
   typet type;
 
-  if(expr.operands().size()==0)
+  if(expr.operands().empty())
   {
     type.swap(static_cast<typet &>(expr.add(ID_type_arg)));
     typecheck_type(type);
@@ -1241,8 +1243,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // an integer/float of the same size
     if((expr_type.id()==ID_signedbv ||
         expr_type.id()==ID_unsignedbv) &&
-       pointer_offset_size(*this, expr_type)==
-       pointer_offset_size(*this, op_vector_type))
+       pointer_offset_size(expr_type, *this)==
+       pointer_offset_size(op_vector_type, *this))
     {
     }
     else
@@ -2413,6 +2415,7 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier==CPROVER_PREFIX "abs" ||
           identifier==CPROVER_PREFIX "labs" ||
+          identifier==CPROVER_PREFIX "llabs" ||
           identifier==CPROVER_PREFIX "fabs" ||
           identifier==CPROVER_PREFIX "fabsf" ||
           identifier==CPROVER_PREFIX "fabsl")

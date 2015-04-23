@@ -30,42 +30,44 @@ public:
 
   edgest in, out;
   
-  void add_in(unsigned n)
+  inline void add_in(unsigned n)
   {
     in.insert(std::pair<unsigned, edget>(n, edget()));
   }
   
-  void add_out(unsigned n)
+  inline void add_out(unsigned n)
   {
     out.insert(std::pair<unsigned, edget>(n, edget()));
   }
 
-  void erase_in(unsigned n)
+  inline void erase_in(unsigned n)
   {
     in.erase(n);
   }
   
-  void erase_out(unsigned n)
+  inline void erase_out(unsigned n)
   {
     out.erase(n);
   }
 };
 
+// a node type with an exta bit
 template<class E>
 class visited_nodet:public graph_nodet<E>
 {
-  public:
-    typedef typename graph_nodet<E>::edget edget;
-    typedef typename graph_nodet<E>::edgest edgest;
+public:
+  typedef typename graph_nodet<E>::edget edget;
+  typedef typename graph_nodet<E>::edgest edgest;
 
-    bool visited;
+  bool visited;
 
-    visited_nodet():
-      visited(false)
+  inline visited_nodet():visited(false)
   {
   }
 };
 
+// compute intersection of two edge sets,
+// in linear time
 template<class E>
 void intersection(
   const typename graph_nodet<E>::edgest &a,
@@ -90,8 +92,9 @@ void intersection(
       it_b++;
   }
 }
-  
-template<class N>
+
+// a generic graph class with a parametric node type  
+template<class N=graph_nodet<empty_edget> >
 class graph
 {
 public:
@@ -104,19 +107,19 @@ protected:
   nodest nodes;
   
 public:
-  unsigned add_node()
+  inline unsigned add_node()
   {
     unsigned no=nodes.size();
     nodes.push_back(nodet());
     return no;
   }
   
-  void swap(graph &other)
+  inline void swap(graph &other)
   {
     nodes.swap(other.nodes);
   }
 
-  bool has_edge(unsigned i, unsigned j) const
+  inline bool has_edge(unsigned i, unsigned j) const
   {
     return nodes[i].out.find(j)!=nodes[i].out.end();
   }
@@ -151,19 +154,19 @@ public:
     return nodes[n].out;
   }
   
-  void add_edge(unsigned a, unsigned b)
+  inline void add_edge(unsigned a, unsigned b)
   {
     nodes[a].add_out(b);
     nodes[b].add_in(a);
   }
   
-  void remove_edge(unsigned a, unsigned b)
+  inline void remove_edge(unsigned a, unsigned b)
   {
     nodes[a].erase_out(b);
     nodes[b].erase_in(a);
   }
   
-  edget &edge(unsigned a, unsigned b)
+  inline edget &edge(unsigned a, unsigned b)
   {
     return nodes[a].out[b];
   }
@@ -173,20 +176,20 @@ public:
   void remove_in_edges(unsigned n);
   void remove_out_edges(unsigned n);
   
-  void remove_edges(unsigned n)
+  inline void remove_edges(unsigned n)
   {
     remove_in_edges(n);
     remove_out_edges(n);
   }
   
-  void clear()
+  inline void clear()
   {
     nodes.clear();
   }
   
   typedef std::list<unsigned> patht;
   
-  void shortest_path(
+  inline void shortest_path(
     unsigned src,
     unsigned dest,
     patht &path) const
@@ -194,7 +197,7 @@ public:
     shortest_path(src, dest, path, false);
   }
 
-  void shortest_loop(
+  inline void shortest_loop(
     unsigned node,
     patht &path) const
   {

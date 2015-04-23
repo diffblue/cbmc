@@ -28,7 +28,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
   const code_typet::parameterst &parameters=
     to_code_type(main_symbol.type).parameters();
 
-  if(parameters.size()==0)
+  if(parameters.empty())
     return;
 
   if(parameters.size()!=2 &&

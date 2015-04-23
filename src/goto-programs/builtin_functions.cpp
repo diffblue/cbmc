@@ -453,7 +453,7 @@ void goto_convertt::do_cpp_new(
   exprt tmp_symbol_expr;
 
   // is this a placement new?
-  if(rhs.operands().size()==0) // no, "regular" one
+  if(rhs.operands().empty()) // no, "regular" one
   {
     // call __new or __new_array
     exprt new_symbol=
@@ -1426,10 +1426,14 @@ void goto_convertt::do_function_call_symbol(
       err_location(dest_expr);
       throw "va_end argument expected to be lvalue";
     }    
-    
-    goto_programt::targett t=dest.add_instruction(ASSIGN);
-    t->source_location=function.source_location();
-    t->code=code_assignt(dest_expr, gen_zero(dest_expr.type()));
+
+    // our __builtin_va_list is a pointer
+    if(ns.follow(dest_expr.type()).id()==ID_pointer)
+    {
+      goto_programt::targett t=dest.add_instruction(ASSIGN);
+      t->source_location=function.source_location();
+      t->code=code_assignt(dest_expr, gen_zero(dest_expr.type()));
+    }
   }
   else if(identifier=="__sync_fetch_and_add" ||
           identifier=="__sync_fetch_and_sub" ||

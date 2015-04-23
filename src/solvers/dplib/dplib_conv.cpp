@@ -551,7 +551,7 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
     {
       dplib_prop.out << "ARRAY (i: " << array_index_type() << "):";
       
-      assert(expr.operands().size()!=0);
+      assert(!expr.operands().empty());
       
       unsigned i=0;
       forall_operands(it, expr)

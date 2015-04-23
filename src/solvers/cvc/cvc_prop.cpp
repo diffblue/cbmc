@@ -258,7 +258,7 @@ Function: cvc_propt::lxor
 
 literalt cvc_propt::lxor(const bvt &bv)
 {
-  if(bv.size()==0) return const_literal(false);
+  if(bv.empty()) return const_literal(false);
   if(bv.size()==1) return bv[0];
   if(bv.size()==2) return lxor(bv[0], bv[1]);
 

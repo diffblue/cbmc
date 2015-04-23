@@ -1120,7 +1120,7 @@ std::string expr2ct::convert_nondet(
   const exprt &src,
   unsigned &precedence)
 {
-  if(src.operands().size()!=0)
+  if(!src.operands().empty())
     return convert_norep(src, precedence);
 
   return "NONDET("+convert(src.type())+")";
@@ -1624,7 +1624,7 @@ std::string expr2ct::convert_member_designator(const exprt &src)
 {
   unsigned precedence;
 
-  if(src.operands().size()!=0)
+  if(!src.operands().empty())
     return convert_norep(src, precedence);
     
   return "."+src.get_string(ID_component_name);
@@ -2994,7 +2994,7 @@ std::string expr2ct::convert_code_return(
   const codet &src,
   unsigned indent)
 {
-  if(src.operands().size()!=0 &&
+  if(!src.operands().empty() &&
      src.operands().size()!=1)
   {
     unsigned precedence;
@@ -4175,6 +4175,15 @@ std::string expr2ct::convert(
     #endif
   }
 
+  else if(src.id()==ID_sign)
+  {
+    if(src.operands().size()==1 &&
+       src.op0().type().id()==ID_floatbv)
+      return convert_function(src, "signbit", precedence=16);
+    else
+      return convert_function(src, "SIGN", precedence=16);
+  }
+
   else if(src.id()==ID_invalid_pointer)
     return convert_function(src, "INVALID-POINTER", precedence=16);
 
@@ -4377,8 +4386,6 @@ std::string expr2ct::convert(
       return convert_statement_expression(src, precedence=15);
     else if(statement==ID_gcc_builtin_va_arg_next)
       return convert_function(src, "gcc_builtin_va_arg_next", precedence=16);
-    else if(statement==ID_throw)
-      return convert_function(src, "throw", precedence=16);
     else
       return convert_norep(src, precedence);
   }
@@ -4543,11 +4550,11 @@ std::string expr2ct::convert(
   else if(src.id()=="implicit_address_of")
     return convert_implicit_address_of(src, precedence);
 
-  else if(src.id()=="implicit_dereference")
-    return convert_function(src, "IMPLICIT_DEREFERENCE", precedence=16);
-
   else if(src.id()==ID_comma)
     return convert_comma(src, precedence=1);
+
+  else if(src.id()==ID_ptr_object)
+    return "PTR_OBJECT("+id2string(src.get(ID_identifier))+")";
 
   else if(src.id()==ID_cond)
     return convert_cond(src, precedence);

@@ -29,7 +29,7 @@ void boolbvt::convert_concatenation(const exprt &expr, bvt &bv)
     
   const exprt::operandst &operands=expr.operands();
 
-  if(operands.size()==0)
+  if(operands.empty())
     throw "concatenation takes at least one operand";
 
   unsigned offset=width;

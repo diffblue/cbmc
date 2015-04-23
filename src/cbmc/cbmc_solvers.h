@@ -70,22 +70,12 @@ public:
   //returns a solvert object
   virtual std::auto_ptr<solvert> get_solver() {
     solvert* solver;
-    if(options.get_bool_option("boolector")) solver = get_boolector();
-    else if(options.get_bool_option("dimacs")) solver = get_dimacs();
-    else if(options.get_bool_option("mathsat")) solver = get_mathsat();
-    else if(options.get_bool_option("cvc")) solver = get_cvc();
-    else if(options.get_bool_option("opensmt")) solver = get_opensmt();
+    if(options.get_bool_option("dimacs")) solver = get_dimacs();
     else if(options.get_bool_option("refine")) solver = get_bv_refinement();
     else if(options.get_bool_option("smt1")) 
-	    // this is the 'default' smt1 solver
-      solver = get_smt1(smt1_dect::BOOLECTOR);
+      solver = get_smt1(get_smt1_solver_type());
     else if(options.get_bool_option("smt2"))
-	    // this is the 'default' smt2 solver
-      solver = get_smt2(smt2_dect::MATHSAT);
-    else if(options.get_bool_option("yices"))
-      solver = get_yices();
-    else if(options.get_bool_option("z3"))
-      solver = get_z3();
+      solver = get_smt2(get_smt2_solver_type());
     else solver = get_default();
     return std::auto_ptr<solvert>(solver); 
   }
@@ -107,13 +97,10 @@ protected:
   solvert* get_dimacs();
   solvert* get_bv_refinement();
   solvert* get_smt1(smt1_dect::solvert solver);
-  solvert* get_cvc();
-  solvert* get_yices();
   solvert* get_smt2(smt2_dect::solvert solver);
-  solvert* get_boolector();
-  solvert* get_mathsat();
-  solvert* get_opensmt();
-  solvert* get_z3(); 
+
+  smt1_dect::solvert get_smt1_solver_type() const;
+  smt2_dect::solvert get_smt2_solver_type() const;
 
   //consistency checks during solver creation
   void no_beautification();

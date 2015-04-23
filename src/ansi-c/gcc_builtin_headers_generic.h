@@ -11,6 +11,7 @@ int __builtin_va_arg_pack_len();
 int __builtin_constant_p();
 int __builtin_abs(int);
 long int __builtin_labs(long);
+long long int __builtin_llabs(long long int);
 double __builtin_cos(double);
 float __builtin_cosf(float);
 double __builtin_fabs(double);
@@ -202,3 +203,6 @@ typedef long long __gcc_v4di __attribute__ ((__vector_size__ (32)));
 typedef long long __gcc_v8di __attribute__ ((__vector_size__ (64)));
 typedef unsigned long long __gcc_di;
 
+enum __gcc_atomic_memmodels {
+  __ATOMIC_RELAXED, __ATOMIC_CONSUME, __ATOMIC_ACQUIRE, __ATOMIC_RELEASE, __ATOMIC_ACQ_REL, __ATOMIC_SEQ_CST
+};

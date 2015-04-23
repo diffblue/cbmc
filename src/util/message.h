@@ -87,7 +87,8 @@ public:
   // 10 + debug info
     
   enum message_levelt { 
-    M_ERROR=1, M_WARNING=2, M_RESULT=4, M_STATUS=6, M_STATISTICS=8, M_DEBUG=10
+    M_ERROR=1, M_WARNING=2, M_RESULT=4, M_STATUS=6,
+    M_STATISTICS=8, M_PROGRESS=9, M_DEBUG=10
   };
 
   virtual ~message_clientt();
@@ -137,24 +138,6 @@ public:
   virtual ~messaget() { }
   
   // old interface, will go away
-
-  #if 0
-  inline void print(const std::string &message)
-  { print(1, message); }
-
-  inline void status(const std::string &message)
-  { print(6, message); }
-  
-  inline void result(const std::string &message)
-  { print(4, message); }
-   
-  inline void warning(const std::string &message)
-  { print(2, message); }
-   
-  inline void debug(const std::string &message)
-  { print(9, message); }
-  #endif
-   
   inline void status(
     const std::string &message,
     const std::string &file)
@@ -164,14 +147,6 @@ public:
     print(6, message, -1, location);
   }
    
-  #if 0
-  inline void error(const std::string &message)
-  { print(1, message); }
-
-  inline void statistics(const std::string &message)
-  { print(8, message); }
-  #endif
-
   inline void error(
     const std::string &message,
     const std::string &file)
@@ -264,6 +239,12 @@ public:
   inline mstreamt &statistics()
   {
     mstream.message_level=M_STATISTICS;
+    return mstream;
+  }
+  
+  inline mstreamt &progress()
+  {
+    mstream.message_level=M_PROGRESS;
     return mstream;
   }
   

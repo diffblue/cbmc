@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/byte_operators.h>
+#include <util/endianness_map.h>
 
 #include "boolbv.h"
 #include "flatten_byte_operators.h"
@@ -35,7 +36,11 @@ bvt map_bv(const endianness_mapt &map, const bvt &src)
   result.resize(src.size(), const_literal(false));
   
   for(unsigned i=0; i<src.size(); i++)
-    result[i]=src[map.map_bit(i)];
+  {
+    size_t mapped_index=map.map_bit(i);
+    assert(mapped_index<src.size());
+    result[i]=src[mapped_index];
+  }
   
   return result;
 }
@@ -66,8 +71,24 @@ void boolbvt::convert_byte_extract(
     bv=convert_bv(tmp);
     return;
   }
-
+  
   unsigned width=boolbv_width(expr.type());
+  
+  // special treatment for bit-fields and big-endian:
+  // we need byte granularity
+  #if 0
+  if(expr.id()==ID_byte_extract_big_endian &&
+     expr.type().id()==ID_c_bit_field &&
+     (width%8)!=0)
+  {
+    byte_extract_exprt tmp=expr;
+    // round up
+    to_c_bit_field_type(tmp.type()).set_width(width+8-width%8);
+    convert_byte_extract(tmp, bv);
+    bv.resize(width); // chop down
+    return;
+  }
+  #endif
 
   if(width==0)
     return conversion_failed(expr, bv);    

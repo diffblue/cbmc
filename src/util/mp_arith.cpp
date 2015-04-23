@@ -193,7 +193,7 @@ Function: binary2integer
 
 const mp_integer binary2integer(const std::string &n, bool is_signed)
 {
-  if(n.size()==0 || n.find_first_not_of("01")!=std::string::npos)
+  if(n.empty() || n.find_first_not_of("01")!=std::string::npos)
     return 0;
 
   if(n.size()<=(sizeof(unsigned long)*8))

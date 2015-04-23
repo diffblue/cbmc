@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/endianness_map.h>
 
 #include "boolbv.h"
 
@@ -82,7 +83,15 @@ void boolbvt::convert_byte_update(
         std::size_t offset_i=integer2unsigned(offset);
         
         for(std::size_t i=0; i<update_width; i++)
-          bv[map_op.map_bit(offset_i+i)]=value_bv[map_value.map_bit(i)];
+        {
+          size_t index_op=map_op.map_bit(offset_i+i);
+          size_t index_value=map_value.map_bit(i);
+
+          assert(index_op<bv.size());
+          assert(index_value<value_bv.size());
+          
+          bv[index_op]=value_bv[index_value];
+        }
       }
     }
 

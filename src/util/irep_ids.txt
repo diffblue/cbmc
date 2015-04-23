@@ -210,6 +210,7 @@ output_register
 inout
 nondet
 NULL
+null
 nullptr
 c_enum
 enum
@@ -591,6 +592,8 @@ msc_underlying_type
 msc_based
 alias
 auto_object
+ssa_object
+ptr_object
 C_c_sizeof_type #c_sizeof_type
 array_update
 struct_update
@@ -649,3 +652,4 @@ L1
 L2
 already_typechecked
 C_va_arg_type #va_arg_type
+smt2_symbol

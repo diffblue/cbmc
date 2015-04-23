@@ -117,8 +117,8 @@ void goto_symext::clean_expr(
   statet &state,
   const bool write)
 {
-  replace_nondet(expr);
   rewrite_union(expr, ns);
+  replace_nondet(expr);
   dereference(expr, state, write);
   replace_array_equal(expr);
   adjust_float_expressions(expr, ns);

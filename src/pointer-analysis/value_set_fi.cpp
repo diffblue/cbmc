@@ -590,8 +590,7 @@ void value_set_fit::get_value_set_rec(
     
     return;
   }
-  else if(expr.id()==ID_dereference ||
-          expr.id()=="implicit_dereference")
+  else if(expr.id()==ID_dereference)
   {
     object_mapt reference_set;
     get_reference_set_sharing(expr, reference_set, ns);
@@ -945,8 +944,7 @@ void value_set_fit::get_reference_set_sharing_rec(
 
     return;
   }
-  else if(expr.id()==ID_dereference ||
-          expr.id()=="implicit_dereference")
+  else if(expr.id()==ID_dereference)
   {
     if(expr.operands().size()!=1)
       throw expr.id_string()+" expected to have one operand";
@@ -1177,7 +1175,7 @@ void value_set_fit::assign(
       {
         if(!base_type_eq(rhs.type(), type, ns))
           throw "value_set_fit::assign type mismatch: "
-                "rhs.type():\n"+rhs.type().pretty()+
+                "rhs.type():\n"+rhs.type().pretty()+"\n"+
                 "type:\n"+type.pretty();
       
         if(rhs.id()==ID_struct ||
@@ -1230,11 +1228,15 @@ void value_set_fit::assign(
     {
       assign(lhs_index, exprt(rhs.id(), type.subtype()), ns);
     }
+    else if(rhs.is_nil())
+    {
+      // do nothing
+    }
     else
     {
       if(!base_type_eq(rhs.type(), type, ns))
         throw "value_set_fit::assign type mismatch: "
-              "rhs.type():\n"+rhs.type().pretty()+
+              "rhs.type():\n"+rhs.type().pretty()+"\n"+
               "type:\n"+type.pretty();
         
       if(rhs.id()==ID_array_of)
@@ -1445,8 +1447,7 @@ void value_set_fit::assign_rec(
     if (make_union(get_entry(name, suffix).object_map, values_rhs))
       changed = true;
   }
-  else if(lhs.id()==ID_dereference ||
-          lhs.id()=="implicit_dereference")
+  else if(lhs.id()==ID_dereference)
   {
     if(lhs.operands().size()!=1)
       throw lhs.id_string()+" expected to have one operand";

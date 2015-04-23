@@ -32,7 +32,7 @@ void boolbvt::convert_mult(const exprt &expr, bvt &bv)
   bv.resize(width);
 
   const exprt::operandst &operands=expr.operands();
-  if(operands.size()==0)
+  if(operands.empty())
     throw "mult without operands";
 
   const exprt &op0=expr.op0();

@@ -168,7 +168,7 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
   convert(bv, c);
 
   // Glucose can't do empty clauses
-  if(c.size()==0)
+  if(c.empty())
   {
     empty_clause_added=true;
     return;
@@ -203,7 +203,7 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
     std::string msg=
       i2string(_no_variables)+" variables, "+
       i2string(solver->nClauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
   
   add_variables();
@@ -213,12 +213,12 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
   if(empty_clause_added)
   {
     msg="empty clause: negated claim is UNSATISFIABLE, i.e., holds";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom
   }
   else if(!solver->okay())
   {
     msg="SAT checker inconsistent: negated claim is UNSATISFIABLE, i.e., holds";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
   else
   {
@@ -228,15 +228,15 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
     if(solver->solve(solver_assumptions))
     {
       msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
-      messaget::status(msg);
-      assert(solver->model.size()!=0);
+      messaget::status() << msg << messaget::eom;
+      assert(solver->!model.empty());
       status=SAT;
       return P_SATISFIABLE;
     }
     else
     {
       msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
-      messaget::status(msg);
+      messaget::status() << msg << messaget::eom;
     }
   }
 

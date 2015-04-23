@@ -313,6 +313,23 @@ mp_integer signedbv_typet::largest() const
 
 /*******************************************************************\
 
+Function: signedbv_typet::zero_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt signedbv_typet::zero_expr() const
+{
+  return to_constant_expr(from_integer(0, *this));
+}
+
+/*******************************************************************\
+
 Function: signedbv_typet::smallest_expr
 
   Inputs:
@@ -377,6 +394,23 @@ Function: unsignedbv_typet::largest
 mp_integer unsignedbv_typet::largest() const
 {
   return power(2, get_width())-1;
+}
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::zero_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt unsignedbv_typet::zero_expr() const
+{
+  return to_constant_expr(from_integer(0, *this));
 }
 
 /*******************************************************************\
