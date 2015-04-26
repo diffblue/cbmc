@@ -222,6 +222,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
     return read_result_z3(in);
 
   case GENERIC:
+  default:
     error() << "Generic solver can't solve" << eom;
     return decision_proceduret::D_ERROR;
   }
