@@ -206,8 +206,8 @@ decision_proceduret::resultt smt1_dect::dec_solve()
     return read_result_cvc3(in);
 
   case CVC4:
-    assert(false);
-    break;
+    error() << "no support for CVC4 with SMT1, use SMT2 instead" << eom;
+    return decision_proceduret::D_ERROR;
 
   case MATHSAT:
     return read_result_mathsat(in);
