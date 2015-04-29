@@ -18,8 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
+#include <util/ieee_float.h>
 #include <util/i2string.h>
 #include <util/expr_util.h>
+
+#include <ansi-c/c_types.h>
 
 #include "java_types.h"
 #include "java_bytecode_convert.h"
@@ -50,7 +53,7 @@ struct bytecode_infot
 class patternt
 {
 public:
-  inline patternt(const char *_p):p(_p)
+  explicit inline patternt(const char *_p):p(_p)
   {
   }
 
@@ -329,6 +332,72 @@ const bytecode_infot &java_bytecode_convertt::get_bytecode_info(const irep_idt &
         id2string(statement)+"'";
 }
 
+namespace {
+
+irep_idt get_if_cmp_operator(const irep_idt &stmt)
+{
+  if(stmt == patternt("if_?cmplt")) return ID_lt;
+  if(stmt == patternt("if_?cmple")) return ID_le;
+  if(stmt == patternt("if_?cmpgt")) return ID_gt;
+  if(stmt == patternt("if_?cmpge")) return ID_ge;
+  if(stmt == patternt("if_?cmpeq")) return ID_equal;
+  if(stmt == patternt("if_?cmpne")) return ID_notequal;
+  assert(!"Unhandled java comparison instruction.");
+}
+
+constant_exprt as_number(const mp_integer &value, const typet &type)
+{
+  const unsigned int java_int_width(type.get_unsigned_int(ID_width));
+  const std::string significant_bits(integer2string(value, 2));
+  std::string binary_width(java_int_width - significant_bits.length(), '0');
+  return constant_exprt(binary_width += significant_bits, type);
+}
+
+constant_exprt as_int(const mp_integer &value)
+{
+  return as_number(value, java_int_type());
+}
+
+constant_exprt as_width(const size_t width)
+{
+  return as_int(width);
+}
+
+//constant_exprt java_integer_width() {
+//  return as_width(32u);
+//}
+
+const std::pair<typet, exprt> get_java_type(const irep_idt &type_id)
+{
+  if(ID_boolean == type_id)
+    return std::make_pair(java_boolean_type(), as_width(1));
+
+  if(ID_char == type_id)
+    return std::make_pair(java_char_type(), as_width(16));
+
+  if(ID_float == type_id)
+    return std::make_pair(java_float_type(), as_width(16));
+
+  if(ID_double == type_id)
+    return std::make_pair(java_float_type(), as_width(32));
+
+  if(ID_byte == type_id)
+    return std::make_pair(java_byte_type(), as_width(8));
+
+  if(ID_short == type_id)
+    return std::make_pair(java_short_type(), as_width(16));
+
+  if(ID_int == type_id)
+    return std::make_pair(java_int_type(), as_width(32));
+
+  if(ID_long == type_id)
+    return std::make_pair(java_long_type(), as_width(64));
+
+  throw "Unsupported primitive type array";
+}
+
+}
+
 /*******************************************************************\
 
 Function: java_bytecode_convertt::convert_instructions
@@ -494,21 +563,39 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement==patternt("?astore"))
     {
-      // store value into an array
-      assert(op.size()==3 && results.empty());
-      code_assignt code_assign;
-      code_assign.lhs()=index_exprt(op[0], op[1]);
-      code_assign.rhs()=op[2];
-      c=code_assign;
+      assert(op.size() == 3 && results.empty());
+      const dereference_exprt array(op[0], op[0].type().subtype());
+      const typet elem_type(java_type(statement[0]));
+      const array_typet array_type(elem_type, exprt());
+      const member_exprt data(array, "data", array_type);
+      const index_exprt element(data, op[1], elem_type);
+      c = code_assignt(element, op[2]);
     }
     else if(statement==patternt("?store"))
     {
       // store value into some local variable
       assert(op.size()==1 && results.empty());
-      code_assignt code_assign;
-      code_assign.lhs()=variable(arg0, statement[0]);
-      code_assign.rhs()=op[0];
-      c=code_assign;
+      symbol_exprt var(variable(arg0, statement[0]));
+      const bool is_array('a' == statement[0]);
+      if (is_array) {
+        var.type() = op[0].type();
+      }
+      c = code_assignt(var, op[0]);
+    }
+    else if(statement==patternt("?aload"))
+    {
+      assert(op.size() == 2 && results.size() == 1);
+      const dereference_exprt array(op[0], op[0].type().subtype());
+      const typet elem_type(java_type(statement[0]));
+      const array_typet array_type(elem_type, exprt());
+      const member_exprt data(array, "data", array_type);
+      const typecast_exprt index(op[1], signed_long_int_type());
+      const index_exprt element(data, index, elem_type);
+      if(elem_type.get_unsigned_int(ID_width) < 32u) {
+        results[0]=typecast_exprt(element, java_int_type());
+      } else {
+        results[0]=element;
+      }
     }
     else if(statement==patternt("?load"))
     {
@@ -535,8 +622,33 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement==patternt("?const"))
     {
-      assert(results.size()==1);
-      results[0]=from_integer(0, java_type(statement[0]));
+      assert(results.size() == 1);
+      const char type_char(statement[0]);
+      const bool is_double('d' == type_char);
+      const bool is_float('f' == type_char);
+      if (is_double || is_float)
+      {
+        const ieee_float_spect spec(
+            is_float ?
+                ieee_float_spect::single_precision() :
+                ieee_float_spect::double_precision());
+
+        ieee_floatt value(spec);
+        const typet &arg_type=arg0.type();
+
+        if(ID_integer == arg_type.id())
+          value.from_integer(arg0.get_int(ID_value));
+        else
+          value.from_expr(to_constant_expr(arg0));
+
+        results[0] = value.to_expr();
+      }
+      else
+      {
+        const unsigned int value=arg0.get_unsigned_int(ID_value);
+        const typet type=java_type(statement[0]);
+        results[0] = as_number(value, type);
+      }
     }
     else if(statement==patternt("?ipush"))
     {
@@ -548,7 +660,8 @@ codet java_bytecode_convertt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==2 && results.empty());
       code_ifthenelset code_branch;
-      code_branch.cond()=binary_relation_exprt(op[0], ID_equal, op[1]);
+      const irep_idt cmp_op(get_if_cmp_operator(statement));
+      code_branch.cond()=binary_relation_exprt(op[0], cmp_op, op[1]);
       code_branch.then_case()=code_gotot(label(number));
       c=code_branch;
     }
@@ -660,16 +773,16 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==2 && results.size()==1);
 
       // The integer result on the stack is:
-      //  0 if op[1] equals op[0]
-      // -1 if op[1] is less than op[0]
-      //  1 if op[1] is greater than op[0]
+      //  0 if op[0] equals op[1]
+      // -1 if op[0] is less than op[1]
+      //  1 if op[0] is greater than op[1]
       
       typet t=java_int_type();
 
       results[0]=
         if_exprt(binary_relation_exprt(op[0], ID_equal, op[1]), gen_zero(t),
-        if_exprt(binary_relation_exprt(op[0], ID_gt, op[1]), from_integer(-1, t),
-        from_integer(1, t)));
+        if_exprt(binary_relation_exprt(op[0], ID_gt, op[1]), from_integer(1, t),
+        from_integer(-1, t)));
     }
     else if(statement==patternt("?cmpg"))
     {
@@ -735,25 +848,25 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="newarray")
     {
-      // use temporary since the stack symbol might get duplicated
       assert(op.size()==1 && results.size()==1);
 
-      typet object_type=arg0.id()==ID_boolean?java_boolean_type():
-                        arg0.id()==ID_char?java_char_type():
-                        arg0.id()==ID_float?java_float_type():
-                        arg0.id()==ID_double?java_double_type():
-                        arg0.id()==ID_byte?java_byte_type():
-                        arg0.id()==ID_short?java_short_type():
-                        arg0.id()==ID_int?java_int_type():
-                        arg0.id()==ID_long?java_long_type():
-                        (assert(false), typet());
-      
-      reference_typet ref_type(object_type);
-      exprt tmp=tmp_variable(ref_type);
-      exprt new_expr=side_effect_exprt(ID_java_new_array, ref_type);
-      new_expr.operands().resize(2);
-      new_expr.op1()=op[0]; // number of elements
-      c=code_assignt(tmp, new_expr);
+      const std::pair<typet, exprt> element_type(get_java_type(arg0.id()));
+      struct_typet array_type;
+      struct_typet::componentt length;
+      length.set_name("length");
+      length.type() = java_int_type();
+      struct_typet::componentt data;
+      data.set_name("data");
+      data.type() = array_typet(element_type.first, op[0]);
+      array_type.components().push_back(length);
+      array_type.components().push_back(data);
+
+      const pointer_typet ref_type(array_type);
+      side_effect_exprt java_new_array(ID_java_new_array, ref_type);
+      java_new_array.operands().resize(1);
+      java_new_array.copy_to_operands(op[0]);
+      const exprt tmp(tmp_variable(ref_type));
+      c = code_assignt(tmp, java_new_array);
       results[0]=tmp;
     }
     else if(statement=="anewarray")
@@ -761,18 +874,21 @@ codet java_bytecode_convertt::convert_instructions(
       // use temporary since the stack symbol might get duplicated
       assert(op.size()==1 && results.size()==1);
 
-      reference_typet ref_type(arg0.type());
+      /*reference_typet ref_type(arg0.type());
       exprt tmp=tmp_variable(ref_type);
       exprt new_expr=side_effect_exprt(ID_java_new_array, ref_type);
       new_expr.operands().resize(2);
       new_expr.op1()=op[0]; // number of elements
       c=code_assignt(tmp, new_expr);
-      results[0]=tmp;
+      results[0]=tmp;*/
+      assert(!"TODO: Implement anewarray");
     }
     else if(statement=="arraylength")
     {
-      assert(op.size()==1 && results.size()==1);
-      results[0]=gen_zero(java_int_type());
+      assert(op.size() == 1 && results.size() == 1);
+      const dereference_exprt array(op[0]);
+      const member_exprt length(array, "length", java_int_type());
+      results[0]=length;
     }
     else if(statement=="tableswitch")
     {
