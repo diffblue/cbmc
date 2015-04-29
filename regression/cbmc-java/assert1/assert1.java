@@ -5,9 +5,12 @@ class assert1
     java.util.Random random = new java.util.Random(42);
     
     int i=random.nextInt();
-    
+
     if(i>=10)
-      assert i>=20 : "my super assertion"; // should hold
+      assert i>=10 : "my super assertion"; // should hold
+
+    if(i>=20)
+      assert i>=10 : "my super assertion"; // should hold
   }
 }
 
