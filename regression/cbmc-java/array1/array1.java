@@ -14,7 +14,8 @@ class array1
 
     what_not what_not_array[]=new what_not[size];
     
-    assert what_not_array.length == size;
+    //assert what_not_array.length == size;
+    assert int_array[7] == 7;
   }
 }
 
