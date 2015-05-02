@@ -386,14 +386,14 @@ Function: local_may_aliast::build
 
 void local_may_aliast::build(const goto_functiont &goto_function)
 {
-  if(cfg.locs.empty()) return;
+  if(cfg.nodes.empty()) return;
 
   work_queuet work_queue;
   work_queue.push(0);  
   
   unknown_object=objects.number(exprt(ID_unknown));
   
-  loc_infos.resize(cfg.locs.size());
+  loc_infos.resize(cfg.nodes.size());
   
   // feed in sufficiently bad defaults
   for(code_typet::parameterst::const_iterator
@@ -418,8 +418,8 @@ void local_may_aliast::build(const goto_functiont &goto_function)
   while(!work_queue.empty())
   {
     unsigned loc_nr=work_queue.top();
-    const local_cfgt::loct &loc=cfg.locs[loc_nr];
-    const goto_programt::instructiont &instruction=*loc.t;
+    const local_cfgt::nodet &node=cfg.nodes[loc_nr];
+    const goto_programt::instructiont &instruction=*node.t;
     work_queue.pop();
     
     const loc_infot &loc_info_src=loc_infos[loc_nr];
@@ -460,8 +460,8 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     }
 
     for(local_cfgt::successorst::const_iterator
-        it=loc.successors.begin();
-        it!=loc.successors.end();
+        it=node.successors.begin();
+        it!=node.successors.end();
         it++)
     {
       if(loc_infos[*it].merge(loc_info_dest))

@@ -24,20 +24,21 @@ Author: Daniel Kroening, kroening@kroening.com
 class local_cfgt
 {
 public:
-  typedef std::vector<unsigned> successorst;
+  typedef std::size_t node_nrt;
+  typedef std::vector<node_nrt> successorst;
 
-  class loct
+  class nodet
   {
   public:
     goto_programt::const_targett t;
     successorst successors;
   };
 
-  typedef std::map<goto_programt::const_targett, unsigned> loc_mapt;
+  typedef std::map<goto_programt::const_targett, node_nrt> loc_mapt;
   loc_mapt loc_map;
   
-  typedef std::vector<loct> locst;
-  locst locs;
+  typedef std::vector<nodet> nodest;
+  nodest nodes;
   
   inline explicit local_cfgt(const goto_programt &_goto_program)
   {
