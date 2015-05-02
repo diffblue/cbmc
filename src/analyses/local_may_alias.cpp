@@ -34,7 +34,7 @@ bool local_may_aliast::destt::merge(const destt &src)
 {
   bool result=false;
 
-  unsigned old_size=objects.size();
+  std::size_t old_size=objects.size();
   objects.insert(src.objects.begin(), src.objects.end());
 
   if(objects.size()!=old_size)
