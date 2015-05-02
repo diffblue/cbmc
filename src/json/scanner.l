@@ -9,6 +9,11 @@
 %option noyywrap
 
 %{
+#ifdef _WIN32
+#define YY_NO_UNISTD_H
+static int isatty(int) { return 0; }
+#endif
+
 #define PARSER json_parser
 
 #include "json_parser.h"
