@@ -417,7 +417,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
 
   while(!work_queue.empty())
   {
-    unsigned loc_nr=work_queue.top();
+    local_cfgt::node_nrt loc_nr=work_queue.top();
     const local_cfgt::nodet &node=cfg.nodes[loc_nr];
     const goto_programt::instructiont &instruction=*node.t;
     work_queue.pop();
