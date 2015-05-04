@@ -327,10 +327,12 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
     {
       int optnr;
 
-      if(argv[i][1]=='-')
-        optnr=getoptnr(argv[i]+2);
+      if(argv[i][1]!=0 && argv[i][2]==0)
+        optnr=getoptnr(argv[i][1]); // single-letter option
+      else if(argv[i][1]=='-')
+        optnr=getoptnr(argv[i]+2); // multi-letter option
       else
-        optnr=getoptnr(argv[i][1]);
+        optnr=getoptnr(argv[i]+1); // multi-letter option
    
       if(optnr<0) return true;
       options[optnr].isset=true;
