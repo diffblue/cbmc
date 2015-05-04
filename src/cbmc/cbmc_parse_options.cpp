@@ -459,9 +459,12 @@ int cbmc_parse_optionst::doit()
   goto_functionst goto_functions;
   bmct bmc(options, symbol_table, ui_message_handler);
 
-  if(get_goto_program(options, bmc, goto_functions))
-    return 6;
-    
+  int get_goto_program_ret=
+    get_goto_program(options, bmc, goto_functions);
+
+  if(get_goto_program_ret!=-1)
+    return get_goto_program_ret;
+
   label_properties(goto_functions);
 
   if(cmdline.isset("show-claims") || // will go away
@@ -546,7 +549,7 @@ Function: cbmc_parse_optionst::get_goto_program
 
 \*******************************************************************/
   
-bool cbmc_parse_optionst::get_goto_program(
+int cbmc_parse_optionst::get_goto_program(
   const optionst &options,
   bmct &bmc, // for get_modules
   goto_functionst &goto_functions)
@@ -554,7 +557,7 @@ bool cbmc_parse_optionst::get_goto_program(
   if(cmdline.args.empty())
   {
     error() << "Please provide a program to verify" << eom;
-    return true;
+    return 6;
   }
 
   try
@@ -566,14 +569,14 @@ bool cbmc_parse_optionst::get_goto_program(
 
       if(read_goto_binary(cmdline.args[0],
            symbol_table, goto_functions, get_message_handler()))
-        return true;
+        return 6;
         
       config.ansi_c.set_from_symbol_table(symbol_table);
 
       if(cmdline.isset("show-symbol-table"))
       {
         show_symbol_table();
-        return true;
+        return 0;
       }
       
       irep_idt entry_point=goto_functions.entry_point();
@@ -581,7 +584,7 @@ bool cbmc_parse_optionst::get_goto_program(
       if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
       {
         error() << "The goto binary has no entry point; please complete linking" << eom;
-        return true;
+        return 6;
       }
     }
     else if(cmdline.isset("show-parse-tree"))
@@ -589,7 +592,7 @@ bool cbmc_parse_optionst::get_goto_program(
       if(cmdline.args.size()!=1)
       {
         error() << "Please give one source file only" << eom;
-        return true;
+        return 6;
       }
       
       std::string filename=cmdline.args[0];
@@ -603,7 +606,7 @@ bool cbmc_parse_optionst::get_goto_program(
       if(!infile)
       {
         error() << "failed to open input file `" << filename << "'" << eom;
-        return true;
+        return 6;
       }
                               
       languaget *language=get_language_from_filename(filename);
@@ -611,7 +614,7 @@ bool cbmc_parse_optionst::get_goto_program(
       if(language==NULL)
       {
         error() << "failed to figure out type of file `" <<  filename << "'" << eom;
-        return true;
+        return 6;
       }
       
       language->set_message_handler(get_message_handler());
@@ -621,19 +624,19 @@ bool cbmc_parse_optionst::get_goto_program(
       if(language->parse(infile, filename))
       {
         error() << "PARSING ERROR" << eom;
-        return true;
+        return 6;
       }
       
       language->show_parse(std::cout);
-      return true;
+      return 0;
     }
     else
     {
-    
-      if(parse()) return true;
-      if(typecheck()) return true;
-      if(get_modules(bmc)) return true;    
-      if(final()) return true;
+      if(parse()) return 6;
+      if(typecheck()) return 6;
+      int get_modules_ret=get_modules(bmc);
+      if(get_modules_ret!=-1) return get_modules_ret;
+      if(final()) return 6;
 
       // we no longer need any parse trees or language files
       clear_parse();
@@ -641,7 +644,7 @@ bool cbmc_parse_optionst::get_goto_program(
       if(cmdline.isset("show-symbol-table"))
       {
         show_symbol_table();
-        return true;
+        return 0;
       }
 
       irep_idt entry_point=goto_functions.entry_point();
@@ -649,7 +652,7 @@ bool cbmc_parse_optionst::get_goto_program(
       if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
       {
         error() << "No entry point; please provide a main function" << eom;
-        return true;
+        return 6;
       }
 
       status() << "Generating GOTO Program" << eom;
@@ -658,33 +661,33 @@ bool cbmc_parse_optionst::get_goto_program(
     }
 
     if(process_goto_program(options, goto_functions))
-      return true;
+      return 6;
   }
 
   catch(const char *e)
   {
     error() << e << eom;
-    return true;
+    return 6;
   }
 
   catch(const std::string e)
   {
     error() << e << eom;
-    return true;
+    return 6;
   }
   
   catch(int)
   {
-    return true;
+    return 6;
   }
   
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return true;
+    return 6;
   }
   
-  return false;
+  return -1; // no error, continue
 }
 
 /*******************************************************************\
