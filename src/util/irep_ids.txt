@@ -572,7 +572,6 @@ verilog_module
 event_guard
 posedge
 negedge
-task_enable
 pointer_and_address_pair
 user_specified_predicate
 user_specified_parameter_predicates
