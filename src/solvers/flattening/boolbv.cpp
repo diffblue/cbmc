@@ -519,6 +519,9 @@ literalt boolbvt::convert_rest(const exprt &expr)
     return convert_typecast(expr);
   else if(expr.id()==ID_equal)
     return convert_equality(to_equal_expr(expr));
+  else if(expr.id()==ID_verilog_case_equality ||
+          expr.id()==ID_verilog_case_inequality)
+    return convert_verilog_case_equality(to_binary_relation_expr(expr));
   else if(expr.id()==ID_notequal)
   {
     if(expr.operands().size()!=2)

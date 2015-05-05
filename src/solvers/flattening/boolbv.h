@@ -119,6 +119,7 @@ protected:
   virtual literalt convert_extractbit(const extractbit_exprt &expr);
   virtual literalt convert_overflow(const exprt &expr);
   virtual literalt convert_equality(const equal_exprt &expr);
+  virtual literalt convert_verilog_case_equality(const binary_relation_exprt &expr);
   virtual literalt convert_ieee_float_rel(const exprt &expr);
   virtual literalt convert_quantifier(const exprt &expr);
 
