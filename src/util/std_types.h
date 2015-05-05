@@ -921,6 +921,7 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
          type.id()==ID_unsignedbv ||
          type.id()==ID_fixedbv ||
          type.id()==ID_floatbv ||
+         type.id()==ID_verilogbv ||
          type.id()==ID_bv ||
          type.id()==ID_pointer ||
          type.id()==ID_c_bit_field ||
