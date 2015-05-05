@@ -571,6 +571,8 @@ hierarchical_identifier
 named_port_connection
 verilog_primitive_module
 verilog_module
+verilog_case_equality
+verilog_case_inequality
 event_guard
 posedge
 negedge
