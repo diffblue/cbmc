@@ -1085,21 +1085,22 @@ void goto_checkt::bounds_check(
       }
       else
       {
-        exprt eff_offset=ode.offset();
+        exprt effective_offset=ode.offset();
 
         if(ode.root_object().id()==ID_dereference)
         {
           exprt p_offset=pointer_offset(
             to_dereference_expr(ode.root_object()).pointer());
-          assert(p_offset.type()==eff_offset.type());
+          assert(p_offset.type()==effective_offset.type());
 
-          eff_offset=minus_exprt(eff_offset, p_offset);
+          effective_offset=plus_exprt(p_offset, effective_offset);
         }
 
         exprt zero=gen_zero(ode.offset().type());
         assert(zero.is_not_nil());
 
-        binary_relation_exprt inequality(eff_offset, ID_ge, zero);
+        // the final offset must not be negative
+        binary_relation_exprt inequality(effective_offset, ID_ge, zero);
 
         add_guarded_claim(
           inequality,
@@ -1122,12 +1123,12 @@ void goto_checkt::bounds_check(
       typecast_exprt(dynamic_size(ns), object_size(pointer).type()),
       object_size(pointer));
 
-    plus_exprt eff_offset(ode.offset(), pointer_offset(pointer));
+    plus_exprt effective_offset(ode.offset(), pointer_offset(pointer));
 
-    assert(eff_offset.op0().type()==eff_offset.op1().type());
-    assert(eff_offset.type()==size.type());
+    assert(effective_offset.op0().type()==effective_offset.op1().type());
+    assert(effective_offset.type()==size.type());
 
-    binary_relation_exprt inequality(eff_offset, ID_lt, size);
+    binary_relation_exprt inequality(effective_offset, ID_lt, size);
 
     or_exprt precond(
       and_exprt(
