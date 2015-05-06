@@ -2174,7 +2174,7 @@ void goto_convertt::generate_conditional_branch(
   const source_locationt &source_location,
   goto_programt &dest)
 {
-  if(has_and_or(guard))
+  if(has_and_or(guard) && needs_cleaning(guard))
   {
     // if(guard) goto target;
     //   becomes
