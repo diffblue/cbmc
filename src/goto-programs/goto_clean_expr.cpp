@@ -99,7 +99,8 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
 
   if(expr.id()==ID_index)
   {
-    // Will usually clean index because of possible memory violation.
+    // Will usually clean index expressions because of possible
+    // memory violation in case of out-of-bounds indices.
     // We do an exception for "string-lit"[0], which is safe.
     if(to_index_expr(expr).array().id()==ID_string_constant &&
        to_index_expr(expr).index().is_zero())
