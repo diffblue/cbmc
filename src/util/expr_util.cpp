@@ -257,25 +257,6 @@ exprt gen_binary(
 
 /*******************************************************************\
 
-Function: symbol_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-symbol_exprt symbol_expr(const symbolt &symbol)
-{
-  symbol_exprt tmp(symbol.type);
-  tmp.set_identifier(symbol.name);
-  return tmp;
-}
-
-/*******************************************************************\
-
 Function: make_next_state
 
   Inputs:

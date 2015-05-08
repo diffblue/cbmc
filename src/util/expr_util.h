@@ -38,9 +38,6 @@ void gen_and_old(exprt &expr);
 void gen_or_old(exprt &expr);
 
 /*! \copydoc gen_zero(const typet &) */
-symbol_exprt symbol_expr(const symbolt &symbol);
-
-/*! \copydoc gen_zero(const typet &) */
 void make_next_state(exprt &);
 
 /*! \copydoc splits an expression with >=3 operands into nested binary expressions */

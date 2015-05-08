@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <ostream>
 
 #include "symbol.h"
@@ -45,6 +44,8 @@ void symbolt::show(std::ostream &out) const
   if(is_auxiliary)       out << " auxiliary";
   if(is_property)        out << " property";
   if(is_state_var)       out << " state_var";
+  if(is_exported)        out << " exported";
+  if(is_volatile)        out << " volatile";
   if(mode!="")           out << " mode=" << mode;
   if(base_name!="")      out << " base_name=" << base_name;
   if(module!="")         out << " module=" << module;

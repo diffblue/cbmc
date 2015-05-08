@@ -35,18 +35,14 @@ symbol_exprt goto_convertt::make_compound_literal(
 {
   const source_locationt source_location=expr.find_source_location();
   
-  symbolt new_symbol;
+  auxiliary_symbolt new_symbol;
   symbolt *symbol_ptr;
   
   do
   {
     new_symbol.base_name="literal$"+i2string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-    new_symbol.is_lvalue=true;
-    new_symbol.is_thread_local=true;
     new_symbol.is_static_lifetime=source_location.get_function().empty();
-    new_symbol.is_file_local=true;
-    new_symbol.is_auxiliary=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
     new_symbol.location=source_location;

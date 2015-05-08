@@ -2407,17 +2407,13 @@ symbolt &goto_convertt::new_tmp_symbol(
   goto_programt &dest,
   const source_locationt &source_location)
 {
-  symbolt new_symbol;
+  auxiliary_symbolt new_symbol;
   symbolt *symbol_ptr;
   
   do
   {
     new_symbol.base_name="tmp_"+suffix+"$"+i2string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-    new_symbol.is_lvalue=true;
-    new_symbol.is_thread_local=true;
-    new_symbol.is_file_local=true;
-    new_symbol.is_auxiliary=true;
     new_symbol.type=type;    
     new_symbol.location=source_location;
   } while(symbol_table.move(new_symbol, symbol_ptr));    
