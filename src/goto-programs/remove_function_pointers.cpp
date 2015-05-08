@@ -119,17 +119,13 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
 {
   static int temporary_counter;
 
-  symbolt new_symbol;
+  auxiliary_symbolt new_symbol;
   symbolt *symbol_ptr;
   
   do
   {
     new_symbol.base_name="tmp_return_val$"+i2string(++temporary_counter);
     new_symbol.name="remove_function_pointers::"+id2string(new_symbol.base_name);
-    new_symbol.is_lvalue=true;
-    new_symbol.is_thread_local=true;
-    new_symbol.is_file_local=true;
-    new_symbol.is_auxiliary=true;
   } while(symbol_table.move(new_symbol, symbol_ptr));    
   
   return *symbol_ptr;  

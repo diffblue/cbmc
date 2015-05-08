@@ -73,15 +73,9 @@ void remove_returnst::replace_returns(
     function_symbol.type=f_it->second.type;
 
     // add symbol to symbol_table
-    symbolt new_symbol;
-    new_symbol.is_lvalue=true;
-    new_symbol.is_state_var=true;
-    new_symbol.is_thread_local=true;
-    new_symbol.is_file_local=true;
+    auxiliary_symbolt new_symbol;
     new_symbol.is_static_lifetime=true;
-    new_symbol.is_auxiliary=true;
     new_symbol.module=function_symbol.module;
-    new_symbol.value.make_nil();
     new_symbol.base_name=id2string(function_symbol.base_name)+"#return_value";
     new_symbol.name=id2string(function_symbol.name)+"#return_value";
     new_symbol.mode=function_symbol.mode;

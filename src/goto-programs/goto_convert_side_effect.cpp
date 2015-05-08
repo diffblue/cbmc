@@ -383,14 +383,9 @@ void goto_convertt::remove_function_call(
     return;
   }
 
-  symbolt new_symbol;
+  auxiliary_symbolt new_symbol;
 
   new_symbol.base_name="return_value";
-  new_symbol.is_lvalue=true;
-  new_symbol.is_state_var=true;
-  new_symbol.is_file_local=true;
-  new_symbol.is_thread_local=true;
-  new_symbol.is_auxiliary=true;
   new_symbol.type=expr.type();
   new_symbol.location=expr.find_source_location();
 
@@ -486,14 +481,10 @@ void goto_convertt::remove_cpp_new(
 {
   codet call;
 
-  symbolt new_symbol;
+  auxiliary_symbolt new_symbol;
 
   new_symbol.base_name="new_ptr$"+i2string(++temporary_counter);
-  new_symbol.is_lvalue=true;
   new_symbol.type=expr.type();
-  new_symbol.is_file_local=true;
-  new_symbol.is_thread_local=true;
-  new_symbol.is_auxiliary=true;
   new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 
   new_name(new_symbol);
@@ -561,13 +552,9 @@ void goto_convertt::remove_malloc(
 
   if(result_is_used)
   {
-    symbolt new_symbol;
+    auxiliary_symbolt new_symbol;
 
     new_symbol.base_name="malloc_value$"+i2string(++temporary_counter);
-    new_symbol.is_lvalue=true;
-    new_symbol.is_file_local=true;
-    new_symbol.is_thread_local=true;
-    new_symbol.is_auxiliary=true;
     new_symbol.type=expr.type();
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 

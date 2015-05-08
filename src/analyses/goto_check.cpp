@@ -1546,7 +1546,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
           // need to mark the dead variable as dead
           goto_programt::targett t=new_code.add_instruction(ASSIGN);
           exprt address_of_expr=address_of_exprt(variable);
-          exprt lhs=symbol_expr(ns.lookup(CPROVER_PREFIX "dead_object"));
+          exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
           exprt rhs=if_exprt(
             side_effect_expr_nondett(bool_typet()), address_of_expr, lhs, lhs.type());
           t->source_location=i.source_location;

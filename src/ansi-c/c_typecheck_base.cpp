@@ -216,15 +216,12 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
       // We do this because we want a convenient way
       // of adjusting the size of the type later on.
 
-      symbolt new_symbol;
+      type_symbolt new_symbol(symbol.type);
       new_symbol.name=id2string(symbol.name)+"$type";
       new_symbol.base_name=id2string(symbol.base_name)+"$type"; 
       new_symbol.location=symbol.location;
       new_symbol.mode=symbol.mode;
       new_symbol.module=symbol.module;
-      new_symbol.type=symbol.type;
-      new_symbol.is_type=true;
-      new_symbol.is_macro=false;
     
       symbol.type=symbol_typet(new_symbol.name);
     
@@ -652,18 +649,11 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 
     p_it->set_identifier(identifier);
 
-    symbolt p_symbol;
+    parameter_symbolt p_symbol;
     
     p_symbol.type=p_it->type();
     p_symbol.name=identifier;
     p_symbol.base_name=base_name;
-    p_symbol.is_static_lifetime=false;
-    p_symbol.is_type=false;
-    p_symbol.is_lvalue=true;
-    p_symbol.is_state_var=true;
-    p_symbol.is_thread_local=true;
-    p_symbol.is_file_local=true;
-    p_symbol.is_parameter=true;
     p_symbol.location=p_it->source_location();
 
     symbolt *new_p_symbol;
