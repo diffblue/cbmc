@@ -116,6 +116,7 @@ protected:
   void trigger_auto_object(const exprt &expr, statet &state);
   void initialize_auto_object(const exprt &expr, statet &state);
   void process_array_expr(exprt &expr);
+  void process_array_expr_rec(exprt &expr, const typet &type) const;
   exprt make_auto_object(const typet &type);
 
   virtual void dereference(
