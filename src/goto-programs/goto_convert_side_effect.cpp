@@ -492,6 +492,8 @@ void goto_convertt::remove_cpp_new(
   new_symbol.is_lvalue=true;
   new_symbol.type=expr.type();
   new_symbol.is_file_local=true;
+  new_symbol.is_thread_local=true;
+  new_symbol.is_auxiliary=true;
   new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 
   new_name(new_symbol);
@@ -564,6 +566,8 @@ void goto_convertt::remove_malloc(
     new_symbol.base_name="malloc_value$"+i2string(++temporary_counter);
     new_symbol.is_lvalue=true;
     new_symbol.is_file_local=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_auxiliary=true;
     new_symbol.type=expr.type();
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 
