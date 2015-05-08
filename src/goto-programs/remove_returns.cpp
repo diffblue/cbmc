@@ -79,6 +79,7 @@ void remove_returnst::replace_returns(
     new_symbol.is_thread_local=true;
     new_symbol.is_file_local=true;
     new_symbol.is_static_lifetime=true;
+    new_symbol.is_auxiliary=true;
     new_symbol.module=function_symbol.module;
     new_symbol.value.make_nil();
     new_symbol.base_name=id2string(function_symbol.base_name)+"#return_value";

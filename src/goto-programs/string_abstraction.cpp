@@ -349,6 +349,7 @@ void string_abstractiont::add_argument(
   new_symbol.is_thread_local=true;
   new_symbol.is_lvalue=true;
   new_symbol.is_file_local=true;
+  new_symbol.is_auxiliary=true;
 
   symbol_table.move(new_symbol);
 }
@@ -597,6 +598,7 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   new_symbol.is_thread_local=true;
   new_symbol.is_lvalue=true;
   new_symbol.is_file_local=true;
+  new_symbol.is_auxiliary=true;
 
   symbol_exprt sym_expr=new_symbol.symbol_expr();
 
@@ -1389,6 +1391,7 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
   new_symbol.is_thread_local=true;
   new_symbol.is_lvalue=true;
   new_symbol.is_file_local=true;
+  new_symbol.is_auxiliary=true;
 
   symbol_table.move(new_symbol);
 
@@ -1467,6 +1470,7 @@ void string_abstractiont::build_new_symbol(const symbolt &symbol,
   new_symbol.is_thread_local=symbol.is_thread_local;
   new_symbol.is_lvalue=true;
   new_symbol.is_file_local=true;
+  new_symbol.is_auxiliary=true;
 
   symbol_table.move(new_symbol);
 
@@ -1513,6 +1517,7 @@ bool string_abstractiont::build_symbol_constant(const mp_integer &zero_length,
     new_symbol.is_thread_local=false;
     new_symbol.is_lvalue=true;
     new_symbol.is_file_local=false;
+    new_symbol.is_auxiliary=true;
 
     {
       struct_exprt value(string_struct);

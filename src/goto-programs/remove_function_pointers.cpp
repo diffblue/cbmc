@@ -129,6 +129,7 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
     new_symbol.is_lvalue=true;
     new_symbol.is_thread_local=true;
     new_symbol.is_file_local=true;
+    new_symbol.is_auxiliary=true;
   } while(symbol_table.move(new_symbol, symbol_ptr));    
   
   return *symbol_ptr;  
