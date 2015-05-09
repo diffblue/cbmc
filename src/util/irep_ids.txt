@@ -138,6 +138,7 @@ from
 to
 module
 module_instance
+macromodule
 primitive_module_instance
 module_items
 module_source
@@ -365,6 +366,7 @@ component
 pretty_name
 C_class #class
 C_interface #interface
+interface
 targets
 location
 labels
@@ -462,6 +464,10 @@ genvar
 realtime
 parameters
 specify
+pullup
+pulldown
+automatic
+rcmos
 cmos
 nmos
 pmos
@@ -562,7 +568,11 @@ struct_tag
 union_tag
 c_enum_tag
 enum_constant
+bit_select
+part_select
 generate_block
+generate_assign
+generate_skip
 generate_case
 generate_if
 generate_for
