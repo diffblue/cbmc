@@ -3,6 +3,7 @@
 
 #ifdef _MSC_VER
 #include <float.h>
+int isnanf(float);
 #else
 #include <fenv.h>
 #endif
