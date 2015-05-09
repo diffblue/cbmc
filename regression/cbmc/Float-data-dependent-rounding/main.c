@@ -12,8 +12,8 @@ int main (void) {
   float f;
   float g;
 
-  __CPROVER_assume(!isnan(f));
-  __CPROVER_assume(!isnan(g));
+  __CPROVER_assume(!isnanf(f));
+  __CPROVER_assume(!isnanf(g));
 
   if (f > g) {
     #ifdef _MSC_VER
