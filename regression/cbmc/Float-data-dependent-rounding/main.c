@@ -3,7 +3,7 @@
 
 #ifdef _MSC_VER
 #include <float.h>
-int isnanf(float);
+#define isnan(x) ((x)!=(x))
 #else
 #include <fenv.h>
 #endif
@@ -12,8 +12,8 @@ int main (void) {
   float f;
   float g;
 
-  __CPROVER_assume(!isnanf(f));
-  __CPROVER_assume(!isnanf(g));
+  __CPROVER_assume(!isnan(f));
+  __CPROVER_assume(!isnan(g));
 
   if (f > g) {
     #ifdef _MSC_VER
