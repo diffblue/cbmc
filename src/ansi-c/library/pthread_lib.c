@@ -5,11 +5,18 @@
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
+// on Windows, the mutexes are integers already
+typedef pthread_mutex_t mutex_t;
+#else
+typedef signed char mutex_t;
+#endif
+
 inline int pthread_mutex_init(
   pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
 {
   __CPROVER_HIDE:;
-  *((signed char *)mutex)=0;
+  *((mutex_t *)mutex)=0;
   if(mutexattr!=0) (void)*mutexattr;
   return 0;
 }
@@ -25,10 +32,10 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  __CPROVER_assert(*((signed char *)mutex)!=-1,
+  __CPROVER_assert(*((mutex_t *)mutex)!=-1,
     "mutex not initialised or destroyed");
-  __CPROVER_assume(!*((signed char *)mutex));
-  *((signed char *)mutex)=1;
+  __CPROVER_assume(!*((mutex_t *)mutex));
+  *((mutex_t *)mutex)=1;
   __CPROVER_atomic_end();
 
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
@@ -50,10 +57,10 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
   int return_value;
   __CPROVER_atomic_begin();
 
-  __CPROVER_assert(*((signed char *)mutex)!=-1,
+  __CPROVER_assert(*((mutex_t *)mutex)!=-1,
     "mutex not initialised or destroyed");
 
-  if(*((signed char *)mutex)==1)
+  if(*((mutex_t *)mutex)==1)
   {
     // failed
     return_value=1;
@@ -62,7 +69,7 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
   {
     // ok
     return_value=0;
-    *((signed char *)mutex)=1;
+    *((mutex_t *)mutex)=1;
   }
 
   __CPROVER_atomic_end();
@@ -87,9 +94,9 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
                     "WWcumul", "RRcumul", "RWcumul", "WRcumul");
   __CPROVER_atomic_begin();
-  __CPROVER_assert(*((signed char *)mutex)==1,
+  __CPROVER_assert(*((mutex_t *)mutex)==1,
     "must hold lock upon unlock");
-  *((signed char *)mutex)=0;
+  *((mutex_t *)mutex)=0;
   __CPROVER_atomic_end();
 
   return 0; // we never fail
@@ -105,9 +112,9 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
-  __CPROVER_assert(*((signed char *)mutex)==0,
+  __CPROVER_assert(*((mutex_t *)mutex)==0,
     "lock held upon destroy");
-  *((signed char *)mutex)=-1;
+  *((mutex_t *)mutex)=-1;
   return 0;
 }
 
