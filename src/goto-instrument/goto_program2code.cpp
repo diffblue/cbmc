@@ -1022,9 +1022,9 @@ bool goto_program2codet::remove_default(
           next_case!=goto_program.instructions.end();
           ++next_case)
       {
-        cfg_dominatorst::node_mapt::const_iterator i_entry=
-          dominators.node_map.find(next_case);
-        assert(i_entry!=dominators.node_map.end());
+        cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
+          dominators.cfg.entry_map.find(next_case);
+        assert(i_entry!=dominators.cfg.entry_map.end());
         const cfg_dominatorst::nodet &n=i_entry->second;
 
         if(!n.dominators.empty())
@@ -1357,9 +1357,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
       next!=goto_program.instructions.end();
       ++next)
   {
-    cfg_dominatorst::node_mapt::const_iterator i_entry=
-      dominators.node_map.find(next);
-    assert(i_entry!=dominators.node_map.end());
+    cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
+      dominators.cfg.entry_map.find(next);
+    assert(i_entry!=dominators.cfg.entry_map.end());
     const cfg_dominatorst::nodet &n=i_entry->second;
 
     if(!n.dominators.empty())
@@ -1399,9 +1399,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
       after_loop!=goto_program.instructions.end();
       ++after_loop)
   {
-    cfg_dominatorst::node_mapt::const_iterator i_entry=
-      dominators.node_map.find(after_loop);
-    assert(i_entry!=dominators.node_map.end());
+    cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
+      dominators.cfg.entry_map.find(after_loop);
+    assert(i_entry!=dominators.cfg.entry_map.end());
     const cfg_dominatorst::nodet &n=i_entry->second;
 
     if(!n.dominators.empty())
@@ -1441,8 +1441,8 @@ Purpose:
 \*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_goto_goto(
-    goto_programt::const_targett target,
-    codet &dest)
+  goto_programt::const_targett target,
+  codet &dest)
 {
   // filter out useless goto 1; 1: ...
   goto_programt::const_targett next=target;
@@ -1451,9 +1451,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
     return target;
 
   const cfg_dominatorst &dominators=loops.get_dominator_info();
-  cfg_dominatorst::node_mapt::const_iterator it_entry=
-    dominators.node_map.find(target);
-  assert(it_entry!=dominators.node_map.end());
+  cfg_dominatorst::cfgt::entry_mapt::const_iterator it_entry=
+    dominators.cfg.entry_map.find(target);
+  assert(it_entry!=dominators.cfg.entry_map.end());
   const cfg_dominatorst::nodet &n=it_entry->second;
 
   // skip dead goto L as the label might be skipped if it is dead
