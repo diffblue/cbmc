@@ -220,6 +220,14 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 {
   assert(target!=goto_program.instructions.end());
 
+  if(target->type!=ASSERT &&
+     !target->source_location.get_comment().empty())
+  {
+    dest.copy_to_operands(code_skipt());
+    dest.operands().back().add_source_location().set_comment(
+      target->source_location.get_comment());
+  }
+
   // try do-while first
   if(target->is_target() && !target->is_goto())
   {
@@ -1860,7 +1868,8 @@ void goto_program2codet::cleanup_code_block(
   {
     exprt::operandst::iterator it=operands.begin()+i;
     // remove skip
-    if(to_code(*it).get_statement()==ID_skip)
+    if(to_code(*it).get_statement()==ID_skip &&
+       it->source_location().get_comment().empty())
       operands.erase(it);
     // merge nested blocks, unless there are declarations in the inner block
     else if(to_code(*it).get_statement()==ID_block)
