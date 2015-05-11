@@ -962,10 +962,10 @@ bool goto_program2codet::set_block_end_points(
         case_end!=upper_bound;
         ++case_end)
     {
-      cfg_dominatorst::node_mapt::const_iterator i_entry=
-        dominators.node_map.find(case_end);
-      assert(i_entry!=dominators.node_map.end());
-      const cfg_dominatorst::nodet &n=i_entry->second;
+      cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
+        dominators.cfg.entry_map.find(case_end);
+      assert(i_entry!=dominators.cfg.entry_map.end());
+      const cfg_dominatorst::cfgt::entryt &n=i_entry->second;
 
       // ignore dead instructions for the following checks
       if(n.dominators.empty())
@@ -1088,9 +1088,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
 
   // always use convert_goto_if for dead code as the construction below relies
   // on effective dominator information 
-  cfg_dominatorst::node_mapt::const_iterator t_entry=
-    dominators.node_map.find(target);
-  assert(t_entry!=dominators.node_map.end());
+  cfg_dominatorst::cfgt::entry_mapt::const_iterator t_entry=
+    dominators.cfg.entry_map.find(target);
+  assert(t_entry!=dominators.cfg.entry_map.end());
   if(t_entry->second.dominators.empty())
     return convert_goto_if(target, upper_bound, dest);
 
@@ -1231,10 +1231,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     if(processed_locations.find(it->location_number)==
         processed_locations.end())
     {
-      cfg_dominatorst::node_mapt::const_iterator it_entry=
-        dominators.node_map.find(it);
-      assert(it_entry!=dominators.node_map.end());
-      const cfg_dominatorst::nodet &n=it_entry->second;
+      cfg_dominatorst::cfgt::entry_mapt::const_iterator it_entry=
+        dominators.cfg.entry_map.find(it);
+      assert(it_entry!=dominators.cfg.entry_map.end());
+      const cfg_dominatorst::cfgt::entryt &n=it_entry->second;
 
       if(!n.dominators.empty())
       {

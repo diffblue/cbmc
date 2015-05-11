@@ -52,6 +52,7 @@ public:
 
 protected:
   cfg_dominators_templatet<P, T> cfg_dominators;
+  typedef typename cfg_dominators_templatet<P, T>::cfgt::entryt nodet;
 
   void compute(P &program);
   void compute_natural_loop(T, T);  
@@ -106,8 +107,7 @@ void natural_loops_templatet<P, T>::compute(P &program)
       {
         if((*n_it)->location_number<=m_it->location_number)
         {
-          const typename cfg_dominators_templatet<P, T>::nodet &node=
-            cfg_dominators.node_map[m_it];
+          const nodet &node=cfg_dominators.cfg.entry_map[m_it];
           
 #ifdef DEBUG
           std::cout << "Computing loop for " 
@@ -157,15 +157,14 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
     T p=stack.top();
     stack.pop();
 
-    typename cfg_dominators_templatet<P, T>::nodet &node=
-      cfg_dominators.node_map[p];
+    const nodet &node=cfg_dominators.cfg.entry_map[p];
 
-    for(typename std::list<T>::const_iterator
+    for(typename nodet::entriest::const_iterator
           q_it=node.predecessors.begin();
         q_it!=node.predecessors.end();
         ++q_it)
     {
-      T q=*q_it;
+      T q=(*q_it)->PC;
       std::pair<typename natural_loopt::const_iterator, bool> result=
           loop.insert(q);
       if(result.second)
