@@ -25,7 +25,9 @@ class empty_cfg_nodet
 {
 };
 
-template<class T>
+template<class T,
+         typename P=const goto_programt,
+         typename I=goto_programt::const_targett>
 class cfg_baset
 {
 public:
@@ -36,7 +38,7 @@ public:
 
     // we have edges both ways
     entriest successors, predecessors;
-    goto_programt::const_targett PC;
+    I PC;
   };
   
   typedef entryt * iterator;
@@ -88,11 +90,11 @@ protected:
   void compute_edges(
     const goto_functionst &goto_functions,
     const goto_programt &goto_program,
-    goto_programt::const_targett PC);
+    I PC);
 
   void compute_edges(
     const goto_functionst &goto_functions,
-    const goto_programt &goto_program);
+    P &goto_program);
 
   void compute_edges(
     const goto_functionst &goto_functions);
@@ -108,8 +110,7 @@ public:
     compute_edges(goto_functions);
   }
 
-  void operator()(
-    const goto_programt &goto_program)
+  void operator()(P &goto_program)
   {
     goto_functionst goto_functions;
     compute_edges(goto_functions, goto_program);
@@ -125,15 +126,17 @@ public:
 
 \*******************************************************************/
 
-template<class T>
-class concurrent_cfg_baset:public virtual cfg_baset<T>
+template<class T,
+         typename P=const goto_programt,
+         typename I=goto_programt::const_targett>
+class concurrent_cfg_baset:public virtual cfg_baset<T, P, I>
 {
 protected:
   virtual void compute_edges_start_thread(
     const goto_programt &goto_program,
     const goto_programt::instructiont &instruction,
     goto_programt::const_targett next_PC,
-    typename cfg_baset<T>::entryt &entry);
+    typename cfg_baset<T, P, I>::entryt &entry);
 };
 
 /*******************************************************************\
@@ -144,8 +147,10 @@ protected:
 
 \*******************************************************************/
 
-template<class T>
-class procedure_local_cfg_baset:public virtual cfg_baset<T>
+template<class T,
+         typename P=const goto_programt,
+         typename I=goto_programt::const_targett>
+class procedure_local_cfg_baset:public virtual cfg_baset<T, P, I>
 {
 protected:
   virtual void compute_edges_function_call(
@@ -153,7 +158,7 @@ protected:
     const goto_programt &goto_program,
     const goto_programt::instructiont &instruction,
     goto_programt::const_targett next_PC,
-    typename cfg_baset<T>::entryt &entry);
+    typename cfg_baset<T, P, I>::entryt &entry);
 };
 
 /*******************************************************************\
@@ -164,10 +169,12 @@ protected:
 
 \*******************************************************************/
 
-template<class T>
+template<class T,
+         typename P=const goto_programt,
+         typename I=goto_programt::const_targett>
 class procedure_local_concurrent_cfg_baset:
-  public concurrent_cfg_baset<T>,
-  public procedure_local_cfg_baset<T>
+  public concurrent_cfg_baset<T, P, I>,
+  public procedure_local_cfg_baset<T, P, I>
 {
 };
 
@@ -183,8 +190,8 @@ Function: cfg_baset::compute_edges_goto
 
 \*******************************************************************/
 
-template<class T>
-void cfg_baset<T>::compute_edges_goto(
+template<class T, typename P, typename I>
+void cfg_baset<T, P, I>::compute_edges_goto(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
@@ -217,8 +224,8 @@ Function: cfg_baset::compute_edges_catch
 
 \*******************************************************************/
 
-template<class T>
-void cfg_baset<T>::compute_edges_catch(
+template<class T, typename P, typename I>
+void cfg_baset<T, P, I>::compute_edges_catch(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
@@ -253,8 +260,8 @@ Function: cfg_baset::compute_edges_throw
 
 \*******************************************************************/
 
-template<class T>
-void cfg_baset<T>::compute_edges_throw(
+template<class T, typename P, typename I>
+void cfg_baset<T, P, I>::compute_edges_throw(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
@@ -275,8 +282,8 @@ Function: cfg_baset::compute_edges_start_thread
 
 \*******************************************************************/
 
-template<class T>
-void cfg_baset<T>::compute_edges_start_thread(
+template<class T, typename P, typename I>
+void cfg_baset<T, P, I>::compute_edges_start_thread(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
@@ -298,14 +305,14 @@ Function: concurrent_cfg_baset::compute_edges_start_thread
 
 \*******************************************************************/
 
-template<class T>
-void concurrent_cfg_baset<T>::compute_edges_start_thread(
+template<class T, typename P, typename I>
+void concurrent_cfg_baset<T, P, I>::compute_edges_start_thread(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
-  typename cfg_baset<T>::entryt &entry)
+  typename cfg_baset<T, P, I>::entryt &entry)
 {
-  cfg_baset<T>::compute_edges_start_thread(
+  cfg_baset<T, P, I>::compute_edges_start_thread(
     goto_program,
     instruction,
     next_PC,
@@ -334,8 +341,8 @@ Function: cfg_baset::compute_edges_function_call
 
 \*******************************************************************/
 
-template<class T>
-void cfg_baset<T>::compute_edges_function_call(
+template<class T, typename P, typename I>
+void cfg_baset<T, P, I>::compute_edges_function_call(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
@@ -400,13 +407,13 @@ Function: procedure_local_cfg_baset::compute_edges_function_call
 
 \*******************************************************************/
 
-template<class T>
-void procedure_local_cfg_baset<T>::compute_edges_function_call(
+template<class T, typename P, typename I>
+void procedure_local_cfg_baset<T, P, I>::compute_edges_function_call(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
-  typename cfg_baset<T>::entryt &entry)
+  typename cfg_baset<T, P, I>::entryt &entry)
 {
   const exprt &function=
     to_code_function_call(instruction.code).function();
@@ -430,8 +437,8 @@ Function: cfg_baset::compute_edges_return
 
 \*******************************************************************/
 
-template<class T>
-void cfg_baset<T>::compute_edges_return(
+template<class T, typename P, typename I>
+void cfg_baset<T, P, I>::compute_edges_return(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
@@ -455,11 +462,11 @@ Function: cfg_baset::compute_edges
 
 \*******************************************************************/
 
-template<class T>
-void cfg_baset<T>::compute_edges(
+template<class T, typename P, typename I>
+void cfg_baset<T, P, I>::compute_edges(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program,
-  goto_programt::const_targett PC)
+  I PC)
 {
   const goto_programt::instructiont &instruction=*PC;
   entryt &entry=entry_map[PC];
@@ -501,8 +508,11 @@ void cfg_baset<T>::compute_edges(
   case END_FUNCTION:
     // no successor
     break;
-  case ASSIGN:
   case ASSUME:
+    // false guard -> no successor
+    if(instruction.guard.is_false())
+      break;
+  case ASSIGN:
   case ASSERT:
   case OTHER:
   case SKIP:
@@ -541,12 +551,14 @@ Function: cfg_baset::compute_edges
 
 \*******************************************************************/
 
-template<class T>
-void cfg_baset<T>::compute_edges(
+template<class T, typename P, typename I>
+void cfg_baset<T, P, I>::compute_edges(
   const goto_functionst &goto_functions,
-  const goto_programt &goto_program)
+  P &goto_program)
 {
-  forall_goto_program_instructions(it, goto_program)
+  for(I it=goto_program.instructions.begin();
+      it!=goto_program.instructions.end();
+      ++it)
     compute_edges(goto_functions, goto_program, it);
 }
 
@@ -562,8 +574,8 @@ Function: cfg_baset::compute_edges
 
 \*******************************************************************/
 
-template<class T>
-void cfg_baset<T>::compute_edges(
+template<class T, typename P, typename I>
+void cfg_baset<T, P, I>::compute_edges(
   const goto_functionst &goto_functions)
 {
   forall_goto_functions(it, goto_functions)
