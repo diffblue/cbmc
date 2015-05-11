@@ -21,6 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+class empty_cfg_nodet
+{
+};
+
 template<class T>
 class cfg_baset
 {
@@ -111,6 +115,60 @@ public:
     compute_edges(goto_functions, goto_program);
   }
 
+};
+
+/*******************************************************************\
+
+   Class: concurrent_cfg_baset
+
+ Purpose:
+
+\*******************************************************************/
+
+template<class T>
+class concurrent_cfg_baset:public virtual cfg_baset<T>
+{
+protected:
+  virtual void compute_edges_start_thread(
+    const goto_programt &goto_program,
+    const goto_programt::instructiont &instruction,
+    goto_programt::const_targett next_PC,
+    typename cfg_baset<T>::entryt &entry);
+};
+
+/*******************************************************************\
+
+   Class: procedure_local_cfg_baset
+
+ Purpose:
+
+\*******************************************************************/
+
+template<class T>
+class procedure_local_cfg_baset:public virtual cfg_baset<T>
+{
+protected:
+  virtual void compute_edges_function_call(
+    const goto_functionst &goto_functions,
+    const goto_programt &goto_program,
+    const goto_programt::instructiont &instruction,
+    goto_programt::const_targett next_PC,
+    typename cfg_baset<T>::entryt &entry);
+};
+
+/*******************************************************************\
+
+   Class: procedure_local_concurrent_cfg_baset
+
+ Purpose:
+
+\*******************************************************************/
+
+template<class T>
+class procedure_local_concurrent_cfg_baset:
+  public concurrent_cfg_baset<T>,
+  public procedure_local_cfg_baset<T>
+{
 };
 
 /*******************************************************************\
@@ -226,6 +284,32 @@ void cfg_baset<T>::compute_edges_start_thread(
 {
   if(next_PC!=goto_program.instructions.end())
     entry.successors.push_back(&entry_map[next_PC]);
+}
+
+/*******************************************************************\
+
+Function: concurrent_cfg_baset::compute_edges_start_thread
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+template<class T>
+void concurrent_cfg_baset<T>::compute_edges_start_thread(
+  const goto_programt &goto_program,
+  const goto_programt::instructiont &instruction,
+  goto_programt::const_targett next_PC,
+  typename cfg_baset<T>::entryt &entry)
+{
+  cfg_baset<T>::compute_edges_start_thread(
+    goto_program,
+    instruction,
+    next_PC,
+    entry);
 
   for(goto_programt::instructiont::targetst::const_iterator
       t_it=instruction.targets.begin();
@@ -234,7 +318,7 @@ void cfg_baset<T>::compute_edges_start_thread(
   {
     goto_programt::const_targett t=*t_it;
     if(t!=goto_program.instructions.end())
-      entry.successors.push_back(&entry_map[t]);
+      entry.successors.push_back(&(this->entry_map[t]));
   }
 }
 
@@ -302,6 +386,36 @@ void cfg_baset<T>::compute_edges_function_call(
   }
   else if(next_PC!=goto_program.instructions.end())
     entry.successors.push_back(&entry_map[next_PC]);
+}
+
+/*******************************************************************\
+
+Function: procedure_local_cfg_baset::compute_edges_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+template<class T>
+void procedure_local_cfg_baset<T>::compute_edges_function_call(
+  const goto_functionst &goto_functions,
+  const goto_programt &goto_program,
+  const goto_programt::instructiont &instruction,
+  goto_programt::const_targett next_PC,
+  typename cfg_baset<T>::entryt &entry)
+{
+  const exprt &function=
+    to_code_function_call(instruction.code).function();
+
+  if(function.id()!=ID_symbol)
+    return;
+
+  if(next_PC!=goto_program.instructions.end())
+    entry.successors.push_back(&(this->entry_map[next_PC]));
 }
 
 /*******************************************************************\
@@ -383,21 +497,25 @@ void cfg_baset<T>::compute_edges(
   case RETURN:
     compute_edges_return(goto_program, instruction, next_PC, entry);
     break;
+  case END_THREAD:
+  case END_FUNCTION:
+    // no successor
+    break;
   case ASSIGN:
   case ASSUME:
   case ASSERT:
   case OTHER:
   case SKIP:
-  case END_THREAD:
   case LOCATION:
-  case END_FUNCTION:
   case ATOMIC_BEGIN:
   case ATOMIC_END:
   case DECL:
   case DEAD:
-  case NO_INSTRUCTION_TYPE:
     if(next_PC!=goto_program.instructions.end())
       entry.successors.push_back(&entry_map[next_PC]);
+    break;
+  case NO_INSTRUCTION_TYPE:
+    assert(false);
     break;
   }
 
