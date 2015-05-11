@@ -122,7 +122,10 @@ INCLUDES= -I .. \
   $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
 	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
-CLEANFILES = solvers$(LIBEXT)
+CLEANFILES = solvers$(LIBEXT) \
+             smt2/smt2_parser_test$(EXEEXT) \
+             smt2/smt2_parser_test$(OBJEXT) \
+             smt2/smt2_parser_test.d \
 
 all: solvers$(LIBEXT) smt2/smt2_parser_test$(EXEEXT)
 

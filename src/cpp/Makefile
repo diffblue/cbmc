@@ -28,7 +28,10 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
-CLEANFILES = cpp$(LIBEXT)
+CLEANFILES = cpp$(LIBEXT) \
+             cpp_parser_test$(EXEEXT) cpp_scanner_test$(EXEEXT) \
+             cpp_parser_test$(OBJEXT) cpp_scanner_test$(OBJEXT) \
+             cpp_parser_test.d cpp_scanner_test.d
 
 all: cpp$(LIBEXT) cpp_parser_test$(EXEEXT) cpp_scanner_test$(EXEEXT)
 
