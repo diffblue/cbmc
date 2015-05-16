@@ -2231,11 +2231,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   typecheck_function_call_arguments(expr);
 
   assert(expr.operands().size()==2);
-  
+
   add_implicit_dereference(expr);
 
   // we will deal with some 'special' functions here
-  do_special_functions(expr);
+  exprt tmp=do_special_functions(expr);
+  if(tmp.is_not_nil())
+    expr.swap(tmp);
 }
 
 /*******************************************************************\
