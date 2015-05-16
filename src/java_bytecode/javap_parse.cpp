@@ -51,11 +51,15 @@ public:
   class parsing_errort
   { 
   public:
-    explicit inline parsing_errort(const char *_msg):msg(_msg)
+    inline parsing_errort(
+      const char *_msg,
+      const std::string &_line):
+      msg(_msg), line(_line)
     {
     }
     
     const char *msg;
+    std::string line;
   };
 
   virtual bool parse();
@@ -68,7 +72,7 @@ public:
  
 protected: 
   void rgrammar();
-  void rcompiled_from();
+  void rheader();
   void rclass();
   void rmembers(classt &dest_class);
   membert &rmember(classt &dest_class);
@@ -173,7 +177,8 @@ bool javap_parsert::parse()
   
   catch(const parsing_errort &p)
   {
-    error() << p.msg << eom;
+    error() << p.msg << '\n'
+            << "before '" << p.line << '\'' << eom;
     return true;
   }
   
@@ -240,7 +245,7 @@ Function: javap_parsert::rgrammar
 
 void javap_parsert::rgrammar()
 {
-  rcompiled_from();
+  rheader();
 
   while(!eof())
     rclass();
@@ -248,7 +253,7 @@ void javap_parsert::rgrammar()
 
 /*******************************************************************\
 
-Function: javap_parsert::rcompiled_from
+Function: javap_parsert::rheader
 
   Inputs:
 
@@ -258,14 +263,28 @@ Function: javap_parsert::rcompiled_from
 
 \*******************************************************************/
 
-void javap_parsert::rcompiled_from()
+void javap_parsert::rheader()
 {
   std::string line;
-  std::getline(*in, line);
-  std::string s="Compiled from \"";
-  if(std::string(line, 0, s.size())!=s)
-    throw parsing_errort("Expected 'Compiled from'");
-  source_location.set_file(std::string(line, s.size(), line.size()-s.size()-1));
+  
+  while(true)
+  {
+    if(!std::getline(*in, line))
+      throw parsing_errort("Failed to parse header", "");
+
+    std::string s;
+
+    if(has_prefix(line, s="Compiled from \""))
+    {
+      source_location.set_file(std::string(line, s.size(), line.size()-s.size()-1));
+      break;
+    }
+    else if(has_prefix(line, s="  Compiled from \""))
+    {
+      source_location.set_file(std::string(line, s.size(), line.size()-s.size()-1));
+      break;
+    }
+  }
 }
 
 /*******************************************************************\
@@ -688,7 +707,7 @@ void javap_parsert::rclass()
   tokenize(line);
 
   if(token()!=ID_class)
-    throw parsing_errort("expected 'class'");
+    throw parsing_errort("expected 'class'", line);
 
   classt &c=parse_tree.add_class();
   
