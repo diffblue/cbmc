@@ -473,6 +473,27 @@ void full_slicer(
 
 /*******************************************************************\
 
+Function: property_slicer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void property_slicer(
+  goto_functionst &goto_functions,
+  const namespacet &ns,
+  const std::list<std::string> &properties)
+{
+  properties_criteriont p(properties);
+  full_slicert()(goto_functions, ns, p);
+}
+
+/*******************************************************************\
+
 Function: slicing_criteriont::~slicing_criteriont
 
   Inputs:

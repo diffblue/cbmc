@@ -49,7 +49,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)" \
   "(inline)" \
-  "(show-claims)(show-properties)" \
+  "(show-claims)(show-properties)(property):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
   "(cav11)" \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
