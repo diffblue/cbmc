@@ -24,7 +24,7 @@ int main()
       if(pos!=std::string::npos) function=std::string(function, 0, pos);
 
       std::cout << "{ \"" << function << "\",\n";
-      std::cout << "  \"#line 1 \\\"<builtin-library>-" << function << "\\\"\\n\"\n";
+      std::cout << "  \"#line 1 \\\"<builtin-library-" << function << ">\\\"\\n\"\n";
     }
     else if(!first)
     {
