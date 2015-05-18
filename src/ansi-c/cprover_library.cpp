@@ -67,7 +67,7 @@ void add_cprover_library(
          old->second.value.is_nil())
       {
         count++;
-        library_text << e->model << std::endl;
+        library_text << e->model << '\n';
       }
     }
   }
