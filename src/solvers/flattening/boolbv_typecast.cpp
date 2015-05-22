@@ -399,7 +399,8 @@ bool boolbvt::type_conversion(
     
   case IS_VERILOGBV:
     if(src_bvtype==IS_UNSIGNED ||
-       src_bvtype==IS_C_BOOL)
+       src_bvtype==IS_C_BOOL ||
+       src_type.id()==ID_bool)
     {
       for(unsigned i=0, j=0; i<dest_width; i+=2, j++)
       {

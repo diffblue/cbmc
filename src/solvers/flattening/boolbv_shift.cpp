@@ -24,7 +24,7 @@ Function: boolbvt::convert_shift
 
 \*******************************************************************/
 
-void boolbvt::convert_shift(const exprt &expr, bvt &bv)
+void boolbvt::convert_shift(const binary_exprt &expr, bvt &bv)
 {
   const irep_idt &type_id=expr.type().id();
 
@@ -32,7 +32,8 @@ void boolbvt::convert_shift(const exprt &expr, bvt &bv)
      type_id!=ID_signedbv &&
      type_id!=ID_floatbv &&
      type_id!=ID_pointer &&
-     type_id!=ID_bv)
+     type_id!=ID_bv &&
+     type_id!=ID_verilogbv)
     return conversion_failed(expr, bv);
 
   unsigned width=boolbv_width(expr.type());
@@ -73,6 +74,9 @@ void boolbvt::convert_shift(const exprt &expr, bvt &bv)
       distance=0;
     else
       distance=integer2long(i);
+
+    if(type_id==ID_verilogbv)
+      distance*=2;
     
     bv=bv_utils.shift(op, shift, distance);
   }

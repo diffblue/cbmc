@@ -154,7 +154,7 @@ Function: bv_refinementt::convert_div
 
 \*******************************************************************/
 
-void bv_refinementt::convert_div(const exprt &expr, bvt &bv)
+void bv_refinementt::convert_div(const div_exprt &expr, bvt &bv)
 {
   // we catch any division
   // unless it's integer division by a constant
@@ -179,7 +179,7 @@ Function: bv_refinementt::convert_mod
 
 \*******************************************************************/
 
-void bv_refinementt::convert_mod(const exprt &expr, bvt &bv)
+void bv_refinementt::convert_mod(const mod_exprt &expr, bvt &bv)
 {
   // we catch any mod
   // unless it's integer + constant

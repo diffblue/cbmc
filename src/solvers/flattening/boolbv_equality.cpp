@@ -72,14 +72,7 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
     return prop.new_variable();
   }
 
-  if(expr.lhs().type().id()==ID_verilogbv)
-  {
-    // TODO
-  }
-  else
-    return bv_utils.equal(bv0, bv1);
-  
-  return SUB::convert_rest(expr);
+  return bv_utils.equal(bv0, bv1);
 }
 
 /*******************************************************************\
