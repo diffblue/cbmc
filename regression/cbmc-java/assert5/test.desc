@@ -1,6 +1,6 @@
 CORE
-virtual1.class
-A.class B.class --function virtual1.main --gcc
+assert5.class
+--function assert5.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
