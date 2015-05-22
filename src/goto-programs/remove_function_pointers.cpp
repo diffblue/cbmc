@@ -71,6 +71,19 @@ protected:
                        goto_programt &dest);
 
   symbolt &new_tmp_symbol();
+
+  void compute_address_taken_in_symbols(
+    std::set<irep_idt> &address_taken)
+  {
+    const symbol_tablet &symbol_table=ns.get_symbol_table();
+
+    const symbol_tablet::symbolst &s=symbol_table.symbols;
+
+    for(symbol_tablet::symbolst::const_iterator
+        it=s.begin(); it!=s.end(); ++it)
+      compute_address_taken_functions(it->second.value, address_taken);
+  }
+
 };
 
 /*******************************************************************\
@@ -93,6 +106,7 @@ remove_function_pointerst::remove_function_pointerst(
   symbol_table(_symbol_table),
   add_safety_assertion(_add_safety_assertion)
 {
+  compute_address_taken_in_symbols(address_taken);
   compute_address_taken_functions(goto_functions, address_taken);
 
   // build type map
