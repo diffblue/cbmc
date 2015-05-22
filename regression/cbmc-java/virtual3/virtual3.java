@@ -1,9 +1,9 @@
-class A
+interface A
 {
-  public void f(){}
+  public void f();
 };
 
-class B extends A
+class B implements A
 {
   public void f()
   {
@@ -11,11 +11,11 @@ class B extends A
   }
 };
 
-class virtual1
+class virtual3
 {
   public static void main(String[] args)
   {
-    A a=new A();
+    A a = new B();
     a.f();
   }
 }

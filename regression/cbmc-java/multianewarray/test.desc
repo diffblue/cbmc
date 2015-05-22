@@ -1,6 +1,6 @@
 CORE
-virtual1.class
-A.class B.class --function virtual1.main --gcc
+multinewarray.class
+A.class --function multinewarray.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

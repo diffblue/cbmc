@@ -1,6 +1,6 @@
 CORE
-virtual1.class
-A.class B.class --function virtual1.main --gcc
+store_load1.class
+--function store_load1.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

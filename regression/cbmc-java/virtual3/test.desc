@@ -1,0 +1,8 @@
+CORE
+virtual3.class
+A.class B.class --function virtual3.main --gcc
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

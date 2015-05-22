@@ -1,0 +1,8 @@
+CORE
+assert4.class
+--function assert4.main
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

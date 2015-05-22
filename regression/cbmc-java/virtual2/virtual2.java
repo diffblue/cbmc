@@ -11,11 +11,11 @@ class B extends A
   }
 };
 
-class virtual1
+class virtual2
 {
   public static void main(String[] args)
   {
-    A a=new A();
+    A a=new B();
     a.f();
   }
 }
