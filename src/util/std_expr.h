@@ -257,6 +257,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref unary_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * unary_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref unary_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const unary_exprt &to_unary_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==1);
+  return static_cast<const unary_exprt &>(expr);
+}
+
+/*! \copydoc to_unary_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline unary_exprt &to_unary_expr(exprt &expr)
+{
+  assert(expr.operands().size()==1);
+  return static_cast<unary_exprt &>(expr);
+}
+
 /*! \brief absolute value
 */
 class abs_exprt:public unary_exprt
@@ -2014,6 +2039,72 @@ public:
   {
   }
 };
+
+/*! \brief Bit-vector replication
+*/
+class replication_exprt:public binary_exprt
+{
+public:
+  inline replication_exprt():binary_exprt(ID_replication)
+  {
+  }
+
+  explicit inline replication_exprt(const typet &_type):binary_exprt(ID_replication, _type)
+  {
+  }
+
+  inline replication_exprt(const exprt &_times, const exprt &_src):
+    binary_exprt(_times, ID_replication, _src)
+  {
+  }
+
+  replication_exprt(const unsigned _times, const exprt &_src);
+
+  inline exprt &times()
+  {
+    return op0();
+  }
+
+  inline const exprt &times() const
+  {
+    return op0();
+  }
+
+  inline exprt &op()
+  {
+    return op1();
+  }
+
+  inline const exprt &op() const
+  {
+    return op1();
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref replication_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * replication_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref replication_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const replication_exprt &to_replication_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_replication && expr.operands().size()==2);
+  return static_cast<const replication_exprt &>(expr);
+}
+
+/*! \copydoc to_replication_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline replication_exprt &to_replication_expr(exprt &expr)
+{
+  assert(expr.id()==ID_replication && expr.operands().size()==2);
+  return static_cast<replication_exprt &>(expr);
+}
 
 /*! \brief Extracts a single bit of a bit-vector operand
 */
