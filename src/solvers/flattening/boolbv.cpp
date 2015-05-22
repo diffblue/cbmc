@@ -278,11 +278,11 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
           expr.id()=="no-overflow-mult")
     return convert_mult(expr, bv);
   else if(expr.id()==ID_div)
-    return convert_div(expr, bv);
+    return convert_div(to_div_expr(expr), bv);
   else if(expr.id()==ID_mod)
-    return convert_mod(expr, bv);
+    return convert_mod(to_mod_expr(expr), bv);
   else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr)
-    return convert_shift(expr, bv);
+    return convert_shift(to_shift_expr(expr), bv);
   else if(expr.id()==ID_floatbv_plus || expr.id()==ID_floatbv_minus ||
           expr.id()==ID_floatbv_mult || expr.id()==ID_floatbv_div)
     return convert_floatbv_op(expr, bv);
@@ -291,7 +291,7 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
   else if(expr.id()==ID_concatenation)
     return convert_concatenation(expr, bv);
   else if(expr.id()==ID_replication)
-    return convert_replication(expr, bv);
+    return convert_replication(to_replication_expr(expr), bv);
   else if(expr.id()==ID_extractbits)
     return convert_extractbits(to_extractbits_expr(expr), bv);
   else if(expr.id()==ID_bitnot || expr.id()==ID_bitand ||
@@ -299,7 +299,7 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return convert_bitwise(expr, bv);
   else if(expr.id()==ID_unary_minus ||
           expr.id()=="no-overflow-unary-minus")
-    return convert_unary_minus(expr, bv);
+    return convert_unary_minus(to_unary_expr(expr), bv);
   else if(expr.id()==ID_unary_plus)
   {
     assert(expr.operands().size()==1);

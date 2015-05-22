@@ -22,15 +22,12 @@ Function: boolbvt::convert_replication
 
 \*******************************************************************/
 
-void boolbvt::convert_replication(const exprt &expr, bvt &bv)
+void boolbvt::convert_replication(const replication_exprt &expr, bvt &bv)
 {
   unsigned width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
-
-  if(expr.operands().size()!=2)
-    throw "replication takes two operands";
 
   mp_integer times;
   if(to_integer(expr.op0(), times))

@@ -141,8 +141,8 @@ protected:
   virtual void convert_typecast(const typecast_exprt &expr, bvt &bv);
   virtual void convert_add_sub(const exprt &expr, bvt &bv);
   virtual void convert_mult(const exprt &expr, bvt &bv);
-  virtual void convert_div(const exprt &expr, bvt &bv);
-  virtual void convert_mod(const exprt &expr, bvt &bv);
+  virtual void convert_div(const div_exprt &expr, bvt &bv);
+  virtual void convert_mod(const mod_exprt &expr, bvt &bv);
   virtual void convert_floatbv_op(const exprt &expr, bvt &bv);
   virtual void convert_floatbv_typecast(const floatbv_typecast_exprt &expr, bvt &bv);
   virtual void convert_member(const member_exprt &expr, bvt &bv);
@@ -150,12 +150,12 @@ protected:
   virtual void convert_update(const exprt &expr, bvt &bv);
   virtual void convert_case(const exprt &expr, bvt &bv);
   virtual void convert_cond(const exprt &expr, bvt &bv);
-  virtual void convert_shift(const exprt &expr, bvt &bv);
+  virtual void convert_shift(const binary_exprt &expr, bvt &bv);
   virtual void convert_bitwise(const exprt &expr, bvt &bv);
-  virtual void convert_unary_minus(const exprt &expr, bvt &bv);
+  virtual void convert_unary_minus(const unary_exprt &expr, bvt &bv);
   virtual void convert_abs(const exprt &expr, bvt &bv);
   virtual void convert_concatenation(const exprt &expr, bvt &bv);
-  virtual void convert_replication(const exprt &expr, bvt &bv);
+  virtual void convert_replication(const replication_exprt &expr, bvt &bv);
   virtual void convert_bv_literals(const exprt &expr, bvt &bv);
   virtual void convert_constant(const constant_exprt &expr, bvt &bv);
   virtual void convert_extractbits(const extractbits_exprt &expr, bvt &bv);

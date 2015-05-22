@@ -90,8 +90,8 @@ protected:
   
   // we refine expensive arithmetic
   virtual void convert_mult(const exprt &expr, bvt &bv);
-  virtual void convert_div(const exprt &expr, bvt &bv);
-  virtual void convert_mod(const exprt &expr, bvt &bv);
+  virtual void convert_div(const div_exprt &expr, bvt &bv);
+  virtual void convert_mod(const mod_exprt &expr, bvt &bv);
   virtual void convert_floatbv_op(const exprt &expr, bvt &bv);
 
   // for collecting statistics
