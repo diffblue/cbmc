@@ -414,6 +414,24 @@ bool boolbvt::type_conversion(
 
       return false;
     }
+    else if(src_bvtype==IS_VERILOGBV)
+    {
+      // verilogbv to verilogbv
+      dest=src;
+
+      if(dest_width<src_width)
+        dest.resize(dest_width);
+      else
+      {
+        dest=src;
+        while(dest.size()<dest_width)
+        {
+          dest.push_back(const_literal(false));
+          dest.push_back(const_literal(false));
+        }
+      }
+      return false;
+    }
     break;
 
   case IS_BV:
