@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_sizeof.h>
 
-#include "java_bytecode_typecheck.h"
+#include "../java_bytecode/java_bytecode_typecheck.h"
 
 /*******************************************************************\
 
@@ -59,7 +59,7 @@ Function: java_bytecode_typecheckt::typecheck_expr_java_new
 void java_bytecode_typecheckt::typecheck_expr_java_new(side_effect_exprt &expr)
 { 
   if(expr.get_statement()==ID_java_new_array)
-    assert(expr.operands().size()==2);
+    assert(expr.operands().size()==4);
   else
     assert(expr.operands().size()==1);
 

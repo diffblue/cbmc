@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "../java_bytecode/java_bytecode_parse_tree.h"
 #include <ostream>
 
-#include "java_bytecode_parse_tree.h"
 
 /*******************************************************************\
 

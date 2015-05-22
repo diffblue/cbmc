@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/language.h>
 
-#include "java_bytecode_parse_tree.h"
+#include "../java_bytecode/java_bytecode_parse_tree.h"
 
 class java_bytecode_languaget:public languaget
 {

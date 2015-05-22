@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/prefix.h>
 
-#include "java_bytecode_typecheck.h"
+#include "../java_bytecode/java_bytecode_typecheck.h"
 
 /*******************************************************************\
 
@@ -42,6 +42,8 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
       new_symbol.name=identifier;
       new_symbol.is_type=true;
       new_symbol.type=class_typet();
+      new_symbol.type.set(ID_incomplete_class, true);
+      //new_symbol.type.id(ID_incomplete_struct);
       new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
       new_symbol.mode=ID_java;
       

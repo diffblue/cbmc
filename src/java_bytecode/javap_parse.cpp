@@ -207,7 +207,7 @@ void javap_parsert::tokenize(const std::string &str)
   {
     char ch=str[s];
 
-    if(isalnum(ch) || ch=='.' || ch=='_' || ch=='$')
+    if(isalnum(ch) || ch=='.' || ch=='_' || ch=='$' || ch=='-')
       t+=ch;
     else
     {
@@ -321,6 +321,15 @@ void javap_parsert::rconstant(const std::string &line)
   
   // the expressions are produced once all are read
 }
+
+namespace {
+const char INTERFACE_METHOD[] = "InterfaceMethod";
+const char METHOD[] = "Method";
+
+bool is_method(const irep_idt &kind) {
+  return kind == INTERFACE_METHOD || kind == METHOD;
+}
+}
   
 /*******************************************************************\
 
@@ -343,7 +352,7 @@ void javap_parsert::post_process_constants()
   {
     constantt &c=c_it->second;
 
-    if(c.kind=="Method" || c.kind=="Field")
+    if(is_method(c.kind) || c.kind=="Field")
     {
       // this is #class.#NameAndType
       assert(!c.value_string.empty());
@@ -358,7 +367,7 @@ void javap_parsert::post_process_constants()
       std::string member_string=constant(std::string(name_and_type, 0, type_pos-1));
 
       // for overloading
-      std::string member_suffix=(c.kind=="Method")?":"+type_string:"";
+      std::string member_suffix=is_method(c.kind)?":"+type_string:"";
       
       irep_idt identifier="java::"+slash_to_dot(class_string)+"."+member_string+member_suffix;
       typet type=java_type_from_string(type_string);
@@ -447,6 +456,17 @@ Function: javap_parsert::rcode
 
 \*******************************************************************/
 
+namespace {
+bool is_number_token(const irep_idt &t) {
+	const size_t length(t.size());
+	if(length == 0) {
+		return false;
+	}
+	const char first(t[0]);
+	return isdigit(first) || ('-' == first && isdigit(t[1]));
+}
+}
+
 void javap_parsert::rcode(membert &dest_member)
 {
   instructiont &instruction=dest_member.add_instruction();
@@ -471,7 +491,7 @@ void javap_parsert::rcode(membert &dest_member)
       t=token();
       instruction.args.push_back(constants[unsafe_string2unsigned(id2string(t))].value_expr);
     }
-    else if(t!="" && isdigit(t[0]))
+    else if(is_number_token(t))
       instruction.args.push_back(constant_exprt(t, integer_typet())); // some number
     else
       instruction.args.push_back(exprt(t)); // some string, e.g., primitive type
@@ -620,6 +640,7 @@ typet javap_parsert::rtype()
       array_typet tmp;
       tmp.subtype()=type;
       type=tmp;
+      // TODO: type = java_array_type(type);
     }
   }
   
@@ -675,6 +696,11 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
   }
   else
   {
+    if(lookahead()==ID_abstract)
+    {
+      token();
+      m.is_abstract = true;
+    }
     // eat (return) type
     rtype();
 
@@ -706,10 +732,19 @@ void javap_parsert::rclass()
   line=getline();
   tokenize(line);
 
-  if(token()!=ID_class)
+  bool is_abstract(false);
+  if(lookahead() == "abstract")
+  {
+    token();
+    is_abstract = true;
+  }
+
+  const irep_idt type(token());
+  if(ID_class != type && ID_interface != type)
     throw parsing_errort("expected 'class'", line);
 
   classt &c=parse_tree.add_class();
+  c.is_abstract = is_abstract || ID_interface == type;
   
   c.name=rname();
   
@@ -717,6 +752,13 @@ void javap_parsert::rclass()
   {
     token(); // read 'extends'
     c.extends=rname();
+  }
+  if(lookahead()=="implements")
+  {
+    do {
+      token();
+      c.implements.push_back(rname());
+    } while(lookahead()==",");
   }
 
   while(!eof())
@@ -778,7 +820,7 @@ bool javap_parse(
   std::string stripped_file_name=
     has_suffix(file, ".class")?std::string(file, 0, file.size()-6):file;
   
-  std::string command="javap";
+  std::string command="javap-1.6";
   
   command+=" -s -c -l -private -verbose \""+stripped_file_name+"\"";
   command+=" 2>\""+stderr_file+"\" >\""+stdout_file+"\"";  

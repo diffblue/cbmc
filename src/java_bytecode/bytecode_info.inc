@@ -58,7 +58,7 @@
 { "fconst_0",      0x0b, 0, 1, 'f' }, // → 0.0f; push 0.0f on the stack
 { "fconst_1",      0x0c, 0, 1, 'f' }, // → 1.0f; push 1.0f on the stack
 { "fconst_2",      0x0d, 0, 1, 'f' }, // → 2.0f; push 2.0f on the stack
-{ "fdiv",          0x6e, 1, 1, 'f' }, // value1, value2 → result; divide two floats
+{ "fdiv",          0x6e, 2, 1, 'f' }, // value1, value2 → result; divide two floats
 { "fload",         0x17, 0, 1, 'f' }, // → value; load a float value from a local variable #index
 { "fload_0",       0x22, 0, 1, 'f' }, // → value; load a float value from local variable 0
 { "fload_1",       0x23, 0, 1, 'f' }, // → value; load a float value from local variable 1
@@ -184,7 +184,7 @@
 { "lxor",          0x83, 2, 1, 'l' }, // value1, value2 → result; bitwise exclusive or of two longs
 { "monitorenter",  0xc2, 1, 0, ' ' }, // objectref →; enter monitor for object ("grab the lock" - start of synchronized() section)
 { "monitorexit",   0xc3, 1, 0, ' ' }, // objectref →; exit monitor for object ("release the lock" - end of synchronized() section)
-{ "multianewarray",0xc5, 0, 1, 'a' }, // count1, [count2,...] → arrayref; create a new array of dimensions dimensions with elements of type identified by class reference in constant pool index (indexbyte1 << 8 + indexbyte2); the sizes of each dimension is identified by count1, [count2, etc.]
+{ "multianewarray",0xc5, 1, 1, 'a' }, // count1, [count2,...] → arrayref; create a new array of dimensions dimensions with elements of type identified by class reference in constant pool index (indexbyte1 << 8 + indexbyte2); the sizes of each dimension is identified by count1, [count2, etc.]
 { "new",           0xbb, 0, 1, 'a' }, // → objectref; create new object of type identified by class reference in constant pool index (indexbyte1 << 8 + indexbyte2)
 { "newarray",      0xbc, 1, 1, 'a' }, // count → arrayref; create new array with count elements of primitive type identified by atype
 { "nop",           0x00, 0, 0, ' ' }, // [No change]; perform no operation
