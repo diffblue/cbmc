@@ -6,18 +6,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "../java_bytecode/java_bytecode_language.h"
 #include <util/symbol_table.h>
-
-#include <linking/linking.h>
 
 #include <ansi-c/expr2c.h>
 
-#include "java_bytecode_language.h"
-#include "java_bytecode_typecheck.h"
-#include "java_bytecode_convert.h"
-#include "java_entry_point.h"
-#include "javap_parse.h"
-#include "java_bytecode_internal_additions.h"
+#include "../java_bytecode/java_bytecode_convert.h"
+#include "../java_bytecode/java_bytecode_internal_additions.h"
+#include "../java_bytecode/java_bytecode_typecheck.h"
+#include "../java_bytecode/java_bytecode_load_class.h"
+#include "../java_bytecode/java_bytecode_vtable.h"
+#include "../java_bytecode/java_entry_point.h"
+#include "../java_bytecode/javap_parse.h"
 
 /*******************************************************************\
 
@@ -108,7 +108,7 @@ Function: java_bytecode_languaget::typecheck
  Purpose:
 
 \*******************************************************************/
-
+#include <iostream>
 bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
@@ -118,16 +118,22 @@ bool java_bytecode_languaget::typecheck(
   if(java_bytecode_convert(
        parse_tree, new_symbol_table, module, get_message_handler()))
     return true;
-  
+
   if(java_bytecode_typecheck(
        new_symbol_table, module, get_message_handler()))
     return true;
 
-  symbol_table.swap(new_symbol_table);
+//  symbol_table.swap(new_symbol_table);
 
-//  if(linking(new_symbol_table, symbol_table, message_handler))
-//    return true;
-    
+  if(java_bytecode_load_class(symbol_table, new_symbol_table, get_message_handler()))
+    return true;
+
+  /*if(linking(symbol_table, new_symbol_table, get_message_handler()))
+    return true;*/
+
+  if(java_bytecode_vtable(symbol_table, module))
+    return true;
+
   return false;
 }
 

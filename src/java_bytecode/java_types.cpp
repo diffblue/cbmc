@@ -195,20 +195,35 @@ Function: java_array_type
 
 \*******************************************************************/
 
-typet java_array_type(const typet &subtype)
+pointer_typet java_array_type(const typet &subtype)
 {
-  // array types are proper object types in Java,
-  // inheriting from java.lang.Object
-  
-  class_typet result;
-  
-  class_typet::componentt length;
+  struct_typet array_type;
+  struct_typet::componentt length;
   length.set_name("length");
-  length.type()=java_int_type(); // the length is 'int'
+  length.type() = java_int_type();
+  struct_typet::componentt data;
+  data.set_name("data");
+  data.type() = pointer_typet(empty_typet());
+  array_type.components().push_back(length);
+  array_type.components().push_back(data);
+  return pointer_typet(array_type);
+}
 
-  result.components().push_back(length);
-  
-  return result;
+/*******************************************************************\
+
+Function: is_reference_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool is_reference_type(const char t)
+{
+  return 'a' == t;
 }
 
 /*******************************************************************\
@@ -301,8 +316,8 @@ typet java_type_from_string(const std::string &src)
   case '[': // array type
     {
       if(src.size()<=2) return nil_typet();
-      typet subtype=java_type_from_string(src.substr(1, std::string::npos));
-      return java_reference_type(java_array_type(subtype));
+      const typet subtype(java_type_from_string(src.substr(1, std::string::npos)));
+      return java_array_type(subtype);
     }
     
   case 'F': return java_float_type();    
@@ -332,4 +347,3 @@ typet java_type_from_string(const std::string &src)
     return nil_typet();
   }
 }
-

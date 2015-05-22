@@ -39,7 +39,7 @@ public:
   public:
     std::string signature;
     irep_idt base_name, name;
-    bool is_method, is_static, is_native;
+    bool is_method, is_static, is_native, is_abstract;
 
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
@@ -52,7 +52,7 @@ public:
 
     void output(std::ostream &out) const;
     
-    inline membert():is_method(false), is_static(false), is_native(false)
+    inline membert():is_method(false), is_static(false), is_native(false), is_abstract(false)
     {
     }
   };
@@ -61,6 +61,9 @@ public:
   {
   public:
     irep_idt name, extends;
+    bool is_abstract;
+    typedef std::list<irep_idt> implementst;
+    implementst implements;
     
     typedef std::list<membert> memberst;
     memberst members;

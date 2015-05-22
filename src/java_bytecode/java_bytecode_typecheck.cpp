@@ -6,13 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "../java_bytecode/java_bytecode_typecheck.h"
 #include <util/std_types.h>
 #include <util/prefix.h>
 #include <util/config.h>
 
 #include <ansi-c/expr2c.h>
 
-#include "java_bytecode_typecheck.h"
 
 /*******************************************************************\
 
@@ -87,9 +87,17 @@ void java_bytecode_typecheckt::typecheck()
       s_it++)
   {
     typecheck_symbol(s_it->second);
-    dest_symbol_table.add(s_it->second);
+    if(dest_symbol_table.add(s_it->second))
+    {
+      symbolt &symbol(dest_symbol_table.lookup(s_it->second.name));
+      // TODO: Fully update incomplete symbol?
+      if(symbol.value.is_nil() && s_it->second.value.is_not_nil())
+      {
+        symbol.value = s_it->second.value;
+        symbol.type = s_it->second.type;
+      }
+    }
   }
-  
   // now swap dest and src
   src_symbol_table.swap(dest_symbol_table);
 }

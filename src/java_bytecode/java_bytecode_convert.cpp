@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include <numeric>
 #include <set>
 #include <stack>
 
@@ -26,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_types.h"
 #include "java_bytecode_convert.h"
+#include "java_bytecode_vtable.h"
 
 // http://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 
@@ -71,7 +73,7 @@ public:
     return pattern.p[what.size()]==0;
   }
 };
-  
+
 class java_bytecode_convertt:public messaget
 {
 public:
@@ -95,25 +97,34 @@ public:
 
 protected:
   symbol_tablet &symbol_table;
-  
+
   irep_idt current_method;
   unsigned number_of_parameters;
-  
+
   // JVM local variables
-  symbol_exprt variable(const exprt &arg, char type_char)
+  symbol_exprt &variable(std::map<irep_idt, symbol_exprt> &variables, const exprt &arg, char type_char)
   {
     irep_idt number=to_constant_expr(arg).get_value();
     std::string prefix=(unsafe_string2unsigned(id2string(number))<number_of_parameters)?"arg":"local";
     irep_idt base_name=prefix+id2string(number)+type_char;
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+    const std::map<irep_idt, symbol_exprt>::iterator variable(variables.find(identifier));
+    if(variables.end() != variable) {
+      symbol_exprt &cached(variable->second);
+      if(!is_reference_type(type_char))
+        cached.type() = java_type(type_char);
+      return cached;
+    }
     symbol_exprt result(identifier, java_type(type_char));
     result.set(ID_C_base_name, base_name);
-    return result;
+    std::pair<std::map<irep_idt, symbol_exprt>::iterator, bool> it(variables.insert(std::make_pair(identifier, result)));
+    assert(it.second);
+    return it.first->second;
   }
-  
+
   // temporary variables
   unsigned tmp_counter;
-  
+
   symbol_exprt tmp_variable(const typet &type)
   {
     irep_idt base_name="tmp"+i2string(tmp_counter++);
@@ -122,7 +133,7 @@ protected:
     result.set(ID_C_base_name, base_name);
     return result;
   }
-  
+
   // JVM program locations
   irep_idt label(const irep_idt &address)
   {
@@ -142,11 +153,11 @@ protected:
     operands.resize(n);
     for(unsigned i=0; i<n; i++)
       operands[i]=stack[stack.size()-n+i];
-    
+
     stack.resize(stack.size()-n);
     return operands;
   }
-  
+
   void push(const exprt::operandst &o)
   {
     stack.resize(stack.size()+o.size());
@@ -161,7 +172,7 @@ protected:
   void convert(symbolt &class_symbol, const membert &m);
   void convert(const instructiont &i);
   typet convert(const typet &type);
-  codet convert_instructions(const instructionst &);  
+  codet convert_instructions(const instructionst &);
 
   static const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 };
@@ -188,6 +199,19 @@ void java_bytecode_convertt::convert(
     convert(*it);
 }
 
+namespace {
+const char JAVA_NS[] = "java::";
+irept make_base(const irep_idt &base_name) {
+  irept base;
+  base.id(ID_base);
+  const symbol_typet type(JAVA_NS + id2string(base_name));
+  base.add(ID_type, type);
+  return base;
+}
+
+const char ID_interfaces[] = "interfaces";
+}
+
 /*******************************************************************\
 
 Function: java_bytecode_convertt::convert
@@ -204,22 +228,100 @@ void java_bytecode_convertt::convert(const classt &c)
 {
   class_typet class_type;
   class_type.set_tag(c.name);
-  
+  irept &b(class_type.add(ID_bases));
+  irept::subt &b_sub(b.get_sub());
+  if (!c.extends.empty())
+    b_sub.push_back(make_base(c.extends));
+  irept &impl(class_type.add(ID_interfaces));
+  irept::subt &impl_sub(impl.get_sub());
+  const std::list<irep_idt> &ifc(c.implements);
+  for(typeof(ifc.begin()) it(ifc.begin()); it != ifc.end(); ++it) {
+    std::cout << "<it>" << *it << "</it>" << std::endl;
+    const irept base(make_base(*it));
+    b_sub.push_back(base); // TODO: Useful?
+    impl_sub.push_back(base);
+  }
+
   // produce class symbol
   symbolt new_symbol;
   new_symbol.base_name=c.name;
+  class_type.set(ID_base_name, new_symbol.base_name);
   new_symbol.pretty_name=c.name;
-  new_symbol.name="java::"+id2string(c.name);
+  new_symbol.name=JAVA_NS + id2string(c.name);
+  class_type.set(ID_name, new_symbol.name);
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
-  
+  new_symbol.is_type = true;
+
   for(classt::memberst::const_iterator
       it=c.members.begin();
       it!=c.members.end();
       it++)
     convert(new_symbol, *it);
-  
-  symbol_table.add(new_symbol);
+
+  assert(!symbol_table.add(new_symbol));
+}
+
+namespace {
+char java_type(const typet &type)
+{
+  const irep_idt &id(type.id());
+  if (ID_signedbv == id) {
+    const unsigned int width(type.get_unsigned_int(ID_width));
+    if(java_int_type().get_unsigned_int(ID_width) == width)
+      return 'i';
+    else if(java_long_type().get_unsigned_int(ID_width) == width)
+      return 'l';
+    else if(java_short_type().get_unsigned_int(ID_width) == width)
+      return 's';
+    else if(java_byte_type().get_unsigned_int(ID_width) == width)
+      return 'b';
+  } else if(ID_unsignedbv == id) {
+    return 'c';
+  } else if(ID_floatbv == id) {
+    const unsigned int width(type.get_unsigned_int(ID_width));
+    if(java_float_type().get_unsigned_int(ID_width) == width)
+      return 'f';
+    else if(java_double_type().get_unsigned_int(ID_width) == width)
+      return 'd';
+  } else if(ID_bool == id) {
+    return 'z';
+  }
+  return 'a';
+}
+
+const size_t SLOTS_PER_INTEGER(1u);
+const size_t INTEGER_WIDTH(64u);
+size_t count_slots(const size_t value, const code_typet::parametert &param) {
+  const unsigned int width(param.type().get_unsigned_int(ID_width));
+  return value + SLOTS_PER_INTEGER + width / INTEGER_WIDTH;
+}
+
+size_t get_variable_slots(const code_typet::parametert &param) {
+  return count_slots(0, param);
+}
+
+size_t count_java_parameter_slots(const code_typet::parameterst &p) {
+  return std::accumulate(p.begin(), p.end(), 0, &count_slots);
+}
+
+bool is_contructor(const irep_idt &class_name, const class_typet::methodt &method) {
+  const std::string &name(id2string(class_name));
+  std::string needle("java::");
+  needle += name;
+  needle += ".";
+  needle += name;
+  needle += ":()V";
+  return id2string(method.get_name()).find(needle) != std::string::npos;
+}
+
+void cast_if_necessary(binary_relation_exprt &condition) {
+  exprt &lhs(condition.lhs());
+  exprt &rhs(condition.rhs());
+  const typet &lhs_type(lhs.type());
+  if(lhs_type == rhs.type()) return;
+  rhs = typecast_exprt(rhs, lhs_type);
+}
 }
 
 /*******************************************************************\
@@ -239,35 +341,38 @@ void java_bytecode_convertt::convert(
   const membert &m)
 {
   class_typet &class_type=to_class_type(class_symbol.type);
-  
+
   typet member_type=java_type_from_string(m.signature);
 
   if(member_type.id()==ID_code)
   {
-    irep_idt method_identifier=
-      id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
+    const irep_idt method_identifier(id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature);
 
     code_typet &code_type=to_code_type(member_type);
     code_typet::parameterst &parameters=code_type.parameters();
-    
+
     // do we need to add 'this'?
     if(!m.is_static)
     {
       code_typet::parametert this_p;
-      symbol_typet class_type(class_symbol.name);
+      //symbol_typet class_type(class_symbol.name);
+      // TODO: Actual type?
+      empty_typet class_type;
       this_p.set(ID_C_this, true);
-      this_p.type()=java_reference_type(class_type);
+      // TODO: java_reference_type
+      this_p.type()=pointer_typet(class_type);
       parameters.insert(parameters.begin(), this_p);
     }
-    
+
     // assign names to parameters
-    for(unsigned i=0; i<parameters.size(); i++)
+    for (size_t i(0), param_index(0);i < parameters.size(); ++i)
     {
-      irep_idt base_name="arg"+i2string(i);
-      irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name);
+      irep_idt base_name="arg"+i2string(param_index);
+      const typet &type(parameters[i].type());
+      irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_type(type);
       parameters[i].set_base_name(base_name);
       parameters[i].set_identifier(identifier);
-      
+
       // add to symbol table
       symbolt parameter_symbol;
       parameter_symbol.base_name=base_name;
@@ -277,15 +382,22 @@ void java_bytecode_convertt::convert(
       parameter_symbol.is_lvalue=true;
       parameter_symbol.is_state_var=true;
       symbol_table.add(parameter_symbol);
+      param_index+=get_variable_slots(parameters[i]);
     }
 
     class_type.methods().push_back(class_typet::methodt());
     class_typet::methodt &method=class_type.methods().back();
-    
+
     method.set_base_name(m.base_name);
     method.set_name(method_identifier);
+    const bool is_virtual(!m.is_static);
+    method.set(ID_abstract, m.is_abstract);
+    method.set(ID_is_virtual, is_virtual);
+    if(is_virtual) set_virtual_name(method);
+    if(is_contructor(class_symbol.base_name, method)) { method.set(ID_constructor, true); }
     method.type()=member_type;
-    
+
+
     // create method symbol
     symbolt method_symbol;
     method_symbol.mode=ID_java;
@@ -295,16 +407,18 @@ void java_bytecode_convertt::convert(
                               id2string(method.get_base_name())+"()";
     method_symbol.type=member_type;
     current_method=method_symbol.name;
-    number_of_parameters=parameters.size();
+    number_of_parameters=count_java_parameter_slots(parameters);
     tmp_counter=0;
     method_symbol.value=convert_instructions(m.instructions);
     symbol_table.add(method_symbol);
+
+    if (is_virtual) create_vtable_type_and_pointer(symbol_table, class_symbol);
   }
   else
   {
     class_type.components().push_back(class_typet::componentt());
     class_typet::componentt &component=class_type.components().back();
-    
+
     component.set_name(m.name);
     component.set_base_name(m.base_name);
     component.type()=member_type;
@@ -327,15 +441,13 @@ const bytecode_infot &java_bytecode_convertt::get_bytecode_info(const irep_idt &
 {
   for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
     if(statement==p->mnemonic) return *p;
-  
+
   throw std::string("failed to find bytecode mnemonic `")+
         id2string(statement)+"'";
 }
 
 namespace {
-
-irep_idt get_if_cmp_operator(const irep_idt &stmt)
-{
+irep_idt get_if_cmp_operator(const irep_idt &stmt) {
   if(stmt == patternt("if_?cmplt")) return ID_lt;
   if(stmt == patternt("if_?cmple")) return ID_le;
   if(stmt == patternt("if_?cmpgt")) return ID_gt;
@@ -345,57 +457,77 @@ irep_idt get_if_cmp_operator(const irep_idt &stmt)
   assert(!"Unhandled java comparison instruction.");
 }
 
-constant_exprt as_number(const mp_integer &value, const typet &type)
-{
+constant_exprt as_number(const mp_integer value, const typet &type) {
   const unsigned int java_int_width(type.get_unsigned_int(ID_width));
   const std::string significant_bits(integer2string(value, 2));
   std::string binary_width(java_int_width - significant_bits.length(), '0');
   return constant_exprt(binary_width += significant_bits, type);
 }
 
-constant_exprt as_int(const mp_integer &value)
-{
+constant_exprt as_int(const mp_integer value) {
   return as_number(value, java_int_type());
 }
 
-constant_exprt as_width(const size_t width)
-{
+constant_exprt as_width(const size_t width) {
   return as_int(width);
 }
 
-//constant_exprt java_integer_width() {
-//  return as_width(32u);
-//}
-
-const std::pair<typet, exprt> get_java_type(const irep_idt &type_id)
-{
-  if(ID_boolean == type_id)
-    return std::make_pair(java_boolean_type(), as_width(1));
-
-  if(ID_char == type_id)
-    return std::make_pair(java_char_type(), as_width(16));
-
-  if(ID_float == type_id)
-    return std::make_pair(java_float_type(), as_width(16));
-
-  if(ID_double == type_id)
-    return std::make_pair(java_float_type(), as_width(32));
-
-  if(ID_byte == type_id)
-    return std::make_pair(java_byte_type(), as_width(8));
-
-  if(ID_short == type_id)
-    return std::make_pair(java_short_type(), as_width(16));
-
-  if(ID_int == type_id)
-    return std::make_pair(java_int_type(), as_width(32));
-
-  if(ID_long == type_id)
-    return std::make_pair(java_long_type(), as_width(64));
-
-  throw "Unsupported primitive type array";
+constant_exprt java_integer_width() {
+  return as_width(32u);
 }
 
+const size_t JAVA_NS_LENGTH(6u);
+const typet get_java_type(const irept &type) {
+  const irep_idt &type_id(type.get(ID_identifier));
+  const irep_idt &id(type_id.empty() ? type.id() : type_id);
+  if(ID_boolean == id) {
+    return java_boolean_type();
+  }
+  if(ID_char == id) {
+    return java_char_type();
+  }
+  if(ID_float == id) {
+    return java_float_type();
+  }
+  if(ID_double == id) {
+    return java_double_type();
+  }
+  if(ID_byte == id) {
+    return java_byte_type();
+  }
+  if(ID_short == id) {
+    return java_short_type();
+  }
+  if(ID_int == id) {
+    return java_int_type();
+  }
+  if(ID_long == id) {
+    return java_long_type();
+  }
+  const std::string &type_name(id2string(type.find(ID_type).get(ID_identifier)));
+  const bool has_ns(std::string::npos != type_name.find(JAVA_NS));
+  const std::string name(has_ns ? type_name.substr(JAVA_NS_LENGTH, type_name.size() - JAVA_NS_LENGTH) : type_name);
+  const char first_char(name[0]);
+  if ('[' == first_char || '(' == first_char) {
+    return java_type_from_string(id2string(name));
+  }
+  return pointer_typet(static_cast<const typet &>(type.find(ID_type)));
+}
+
+const char METHOD_NAME_SEP('.');
+
+std::string to_field_name(const exprt &arg)
+{
+  const std::string &id(id2string(arg.get(ID_identifier)));
+  const std::string::size_type pos(id.find_last_of(METHOD_NAME_SEP) + 1);
+  return id.substr(pos);
+}
+
+member_exprt to_member(const exprt &obj, const exprt &field)
+{
+  const dereference_exprt lhs(obj, obj.type().subtype());
+  return member_exprt(lhs, to_field_name(field), field.type());
+}
 }
 
 /*******************************************************************\
@@ -414,9 +546,9 @@ codet java_bytecode_convertt::convert_instructions(
   const instructionst &instructions)
 {
   // first pass: get targets
-  
+
   std::set<irep_idt> targets;
-  
+
   for(instructionst::const_iterator
       i_it=instructions.begin();
       i_it!=instructions.end();
@@ -439,6 +571,7 @@ codet java_bytecode_convertt::convert_instructions(
     }
   }
 
+  std::map<irep_idt, symbol_exprt> loc_vars;
   code_blockt code;
 
   for(instructionst::const_iterator
@@ -447,13 +580,13 @@ codet java_bytecode_convertt::convert_instructions(
       i_it++)
   {
     codet c=code_skipt();
-  
+
     irep_idt statement=i_it->statement;
     exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
     exprt arg1=i_it->args.size()>=2?i_it->args[1]:nil_exprt();
-    
+
     const bytecode_infot &bytecode_info=get_bytecode_info(statement);
-    
+
     // deal with _idx suffixes
     if(statement.size()>=2 &&
        statement[statement.size()-2]=='_' &&
@@ -464,7 +597,7 @@ codet java_bytecode_convertt::convert_instructions(
         integer_typet());
       statement=std::string(id2string(statement), 0, statement.size()-2);
     }
-    
+
     exprt::operandst op=pop(bytecode_info.pop);
     exprt::operandst results;
     results.resize(bytecode_info.push, nil_exprt());
@@ -496,58 +629,41 @@ codet java_bytecode_convertt::convert_instructions(
             statement=="invokevirtual" ||
             statement=="invokestatic")
     {
-      bool use_this=statement!="invokestatic";
-      bool is_virtual=statement=="invokevirtual";
-    
-      code_function_callt call;
-      
-      code_typet code_type=to_code_type(arg0.type());
-      code_typet::parameterst &parameters=code_type.parameters();
+      const bool use_this(statement != "invokestatic");
+      const bool is_virtual(statement == "invokevirtual" || statement == "invokeinterface");
 
-      // check for 'this'
+      code_typet &code_type(to_code_type(arg0.type()));
+      code_typet::parameterst &parameters(code_type.parameters());
+
       if(use_this)
       {
-        // does the function have 'this'?
-        if(parameters.empty() ||
-           !parameters[0].get_bool(ID_C_this))
+        if(parameters.empty() || !parameters[0].get_bool(ID_C_this))
         {
-          // add 'this'
-          code_typet::parametert this_p;
-          this_p.type()=java_reference_type(typet());
+          // TODO: java_reference_type
+          const empty_typet empty;
+          const pointer_typet this_pointer(empty);
+          code_typet::parametert this_p(this_pointer);
           this_p.set(ID_C_this, true);
           parameters.insert(parameters.begin(), this_p);
         }
       }
-      
-      // arguments, these all come off the stack
-      call.arguments()=pop(parameters.size());
 
-      // return value, goes onto the stack
-      const typet &return_type=code_type.return_type();
-      if(return_type.id()!=ID_empty)
-      {
-        call.lhs()=tmp_variable(return_type);
+      code_function_callt call;
+      call.arguments() = pop(parameters.size());
+      const typet &return_type(code_type.return_type());
+      if (ID_empty != return_type.id()) {
+        call.lhs() = tmp_variable(return_type);
         results.resize(1);
-        results[0]=call.lhs();
+        results[0] = call.lhs();
       }
 
       if(is_virtual)
       {
-        /*
-        irep_idt identifier=arg0.get(ID_identifier);
-        member_exprt member_expr;
-        member_expr.set_component_name(identifier);
-        member_expr.type()=pointer_typet(arg0.type());
-        member_expr.struct_op()=call.arguments()[0]; // this
-        dereference_exprt deref_expr(member_expr, arg0.type());
-        call.function()=deref_expr;
-        */
-        call.function()=arg0;
-      }
-      else
-        call.function()=arg0;
-      
-      c=call;
+        const exprt &this_arg(call.arguments().front());
+        call.function() = make_vtable_function(arg0, this_arg);
+      } else
+        call.function() = arg0;
+      c = call;
     }
     else if(statement=="return")
     {
@@ -564,18 +680,27 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?astore"))
     {
       assert(op.size() == 3 && results.empty());
+      exprt &array_pointer(op[0]);
+      if(ID_pointer != array_pointer.type().id() || ID_struct != array_pointer.type().subtype().id())
+      {
+        const typet generic_array_type(java_array_type(empty_typet()));
+        array_pointer = typecast_exprt(array_pointer, generic_array_type);
+        array_pointer.type() = generic_array_type;
+      }
       const dereference_exprt array(op[0], op[0].type().subtype());
-      const typet elem_type(java_type(statement[0]));
-      const array_typet array_type(elem_type, exprt());
+      const char type_char(statement[0]);
+      const typet elem_type(java_type(type_char));
+      const empty_typet empty;
+      const pointer_typet array_type(empty);
       const member_exprt data(array, "data", array_type);
-      const index_exprt element(data, op[1], elem_type);
+      const dereference_exprt element(plus_exprt(data, op[1]), elem_type);
       c = code_assignt(element, op[2]);
     }
     else if(statement==patternt("?store"))
     {
       // store value into some local variable
       assert(op.size()==1 && results.empty());
-      symbol_exprt var(variable(arg0, statement[0]));
+      symbol_exprt &var(variable(loc_vars, arg0, statement[0]));
       const bool is_array('a' == statement[0]);
       if (is_array) {
         var.type() = op[0].type();
@@ -587,20 +712,23 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size() == 2 && results.size() == 1);
       const dereference_exprt array(op[0], op[0].type().subtype());
       const typet elem_type(java_type(statement[0]));
-      const array_typet array_type(elem_type, exprt());
+      const empty_typet empty;
+      const pointer_typet array_type(empty);
       const member_exprt data(array, "data", array_type);
+      const typecast_exprt pointer(data, pointer_typet(elem_type));
       const typecast_exprt index(op[1], signed_long_int_type());
-      const index_exprt element(data, index, elem_type);
-      if(elem_type.get_unsigned_int(ID_width) < 32u) {
+      const dereference_exprt element(plus_exprt(pointer, index), elem_type);
+      const irep_idt &elem_type_id(elem_type.id());
+      if((ID_signedbv == elem_type_id || ID_unsignedbv == elem_type_id) &&
+          elem_type.get_unsigned_int(ID_width) < 32u)
         results[0]=typecast_exprt(element, java_int_type());
-      } else {
+      else
         results[0]=element;
-      }
     }
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg0, statement[0]);
+      results[0]=variable(loc_vars, arg0, statement[0]);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -634,8 +762,7 @@ codet java_bytecode_convertt::convert_instructions(
                 ieee_float_spect::double_precision());
 
         ieee_floatt value(spec);
-        const typet &arg_type=arg0.type();
-
+        const typet &arg_type(arg0.type());
         if(ID_integer == arg_type.id())
           value.from_integer(arg0.get_int(ID_value));
         else
@@ -645,8 +772,8 @@ codet java_bytecode_convertt::convert_instructions(
       }
       else
       {
-        const unsigned int value=arg0.get_unsigned_int(ID_value);
-        const typet type=java_type(statement[0]);
+        const unsigned int value(arg0.get_unsigned_int(ID_value));
+        const typet type(java_type(statement[0]));
         results[0] = as_number(value, type);
       }
     }
@@ -661,7 +788,9 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==2 && results.empty());
       code_ifthenelset code_branch;
       const irep_idt cmp_op(get_if_cmp_operator(statement));
-      code_branch.cond()=binary_relation_exprt(op[0], cmp_op, op[1]);
+      binary_relation_exprt condition(op[0], cmp_op, op[1]);
+      cast_if_necessary(condition);
+      code_branch.cond()=condition;
       code_branch.then_case()=code_gotot(label(number));
       c=code_branch;
     }
@@ -675,7 +804,7 @@ codet java_bytecode_convertt::convert_instructions(
         statement=="ifgt"?ID_gt:
         statement=="ifle"?ID_le:
         (assert(false), "");
-    
+
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
@@ -688,24 +817,28 @@ codet java_bytecode_convertt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
-      code_branch.cond()=binary_relation_exprt(op[0], ID_notequal, gen_zero(java_int_type()));
+      const typecast_exprt lhs(op[0], pointer_typet());
+      const exprt rhs(gen_zero(lhs.type()));
+      code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
       code_branch.then_case()=code_gotot(label(number));
       c=code_branch;
     }
     else if(statement==patternt("ifnull"))
     {
-      irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
+      irep_idt number=to_constant_expr(arg0).get_value();
       code_ifthenelset code_branch;
-      code_branch.cond()=binary_relation_exprt(op[0], ID_equal, gen_zero(java_int_type()));
+      const typecast_exprt lhs(op[0], pointer_typet());
+      const exprt rhs(gen_zero(lhs.type()));
+      code_branch.cond()=binary_relation_exprt(lhs, ID_equal, rhs);
       code_branch.then_case()=code_gotot(label(number));
       c=code_branch;
     }
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0, 'i');
-      code_assign.rhs()=plus_exprt(variable(arg0, 'i'), typecast_exprt(arg1, java_int_type()));
+      code_assign.lhs()=variable(loc_vars, arg0, 'i');
+      code_assign.rhs()=plus_exprt(variable(loc_vars, arg0, 'i'), typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
     else if(statement==patternt("?xor"))
@@ -736,7 +869,13 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?ushr"))
     {
       assert(op.size()==2 && results.size()==1);
-      results[0]=lshr_exprt(op[0], op[1]);
+      const typet type(java_type(statement[0]));
+      const unsigned int width(type.get_unsigned_int(ID_width));
+      typet target(unsigned_long_int_type());
+      target.set(ID_width, width);
+      const typecast_exprt lhs(op[0], target);
+      const typecast_exprt rhs(op[1], target);
+      results[0]=lshr_exprt(lhs, rhs);
     }
     else if(statement==patternt("?add"))
     {
@@ -763,6 +902,30 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.size()==1);
       results[0]=unary_minus_exprt(op[0], op[0].type());
     }
+    else if(statement=="frem" || statement=="drem")
+    {
+      assert(op.size()==2 && results.size()==1);
+      std::string function("java::__CPROVER.__java_bytecode_");
+      const bool is_float(statement == "frem");
+      if(is_float) {
+        function += "frem:(FF)F";
+      } else {
+        function += "drem:(DD)D";
+      }
+      const typet type(is_float ? java_float_type() : java_double_type());
+      code_typet function_type;
+      function_type.return_type() = type;
+      const code_typet::parametert param(type);
+      function_type.parameters().push_back(param);
+      function_type.parameters().push_back(param);
+      code_function_callt call;
+      call.lhs() = tmp_variable(type);
+      call.function() = symbol_exprt(function, function_type);
+      call.arguments().push_back(op[0]);
+      call.arguments().push_back(op[1]);
+      results[0]=call.lhs();
+      c = call;
+    }
     else if(statement==patternt("?rem"))
     {
       assert(op.size()==2 && results.size()==1);
@@ -770,24 +933,35 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement==patternt("?cmp"))
     {
-      assert(op.size()==2 && results.size()==1);
+    assert(op.size() == 2 && results.size() == 1);
 
       // The integer result on the stack is:
       //  0 if op[0] equals op[1]
       // -1 if op[0] is less than op[1]
       //  1 if op[0] is greater than op[1]
-      
-      typet t=java_int_type();
 
+      const typet t(java_int_type());
       results[0]=
         if_exprt(binary_relation_exprt(op[0], ID_equal, op[1]), gen_zero(t),
         if_exprt(binary_relation_exprt(op[0], ID_gt, op[1]), from_integer(1, t),
         from_integer(-1, t)));
     }
-    else if(statement==patternt("?cmpg"))
+    else if(statement==patternt("?cmp?"))
     {
       assert(op.size()==2 && results.size()==1);
-      results[0]=binary_relation_exprt(op[0], ID_gt, op[1]);
+      const floatbv_typet type(to_floatbv_type(java_type(statement[0])));
+      const ieee_float_spect spec(type);
+      const ieee_floatt nan(ieee_floatt::NaN(spec));
+      const constant_exprt nan_expr(nan.to_expr());
+      const int nan_value(statement[4] == 'l' ? -1 : 1);
+      const typet result_type(java_int_type());
+      const exprt nan_result(from_integer(nan_value, result_type));
+      // (value1 == NaN || value2 == NaN) ? nan_value : value1  < value2 ? -1 : value2 < value1  1 ? 1 : 0;
+      // (value1 == NaN || value2 == NaN) ? nan_value : value1 == value2 ? 0  : value1 < value2 -1 ? 1 : 0;
+      results[0]=
+        if_exprt(or_exprt(ieee_float_equal_exprt(nan_expr, op[0]), ieee_float_equal_exprt(nan_expr, op[1])), nan_result,
+        if_exprt(ieee_float_equal_exprt(op[0], op[1]), gen_zero(result_type),
+        if_exprt(binary_relation_exprt(op[0], ID_lt, op[1]), from_integer(-1, result_type), from_integer(1, result_type))));
     }
     else if(statement==patternt("?cmpl"))
     {
@@ -817,12 +991,17 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="getfield")
     {
       assert(op.size()==1 && results.size()==1);
-      results[0]=member_exprt(dereference_exprt(op[0]), arg0.get(ID_component_name));
+      results[0]=to_member(op[0], arg0);
     }
     else if(statement=="getstatic")
     {
       assert(op.empty() && results.size()==1);
       results[0]=arg0;
+    }
+    else if(statement=="putfield")
+    {
+      assert(op.size()==2 && results.size()==0);
+      c = code_assignt(to_member(op[0], arg0), op[1]);
     }
     else if(statement=="putstatic")
     {
@@ -838,38 +1017,36 @@ codet java_bytecode_convertt::convert_instructions(
     {
       // use temporary since the stack symbol might get duplicated
       assert(op.empty() && results.size()==1);
-      reference_typet ref_type;
-      ref_type.subtype()=arg0.type();
-      exprt tmp=tmp_variable(ref_type);
-      exprt new_expr=side_effect_exprt(ID_java_new, ref_type);
+      const pointer_typet ref_type(arg0.type());
+      const exprt tmp(tmp_variable(ref_type));
+      exprt new_expr(side_effect_exprt(ID_java_new, ref_type));
       new_expr.operands().resize(1);
-      c=code_assignt(tmp, new_expr);
-      results[0]=tmp;
+      c = code_assignt(tmp, new_expr);
+      const typecast_exprt rhs(tmp, ref_type); // XXX: Necessary?
+      results[0]=rhs;
     }
-    else if(statement=="newarray")
+    else if(statement=="newarray" || statement=="anewarray" || statement=="multianewarray")
     {
       assert(op.size()==1 && results.size()==1);
+      exprt init_dim(from_integer(1, java_int_type()));
+      if(statement == "multianewarray")
+        init_dim = arg1;
 
-      const std::pair<typet, exprt> element_type(get_java_type(arg0.id()));
-      struct_typet array_type;
-      struct_typet::componentt length;
-      length.set_name("length");
-      length.type() = java_int_type();
-      struct_typet::componentt data;
-      data.set_name("data");
-      data.type() = array_typet(element_type.first, op[0]);
-      array_type.components().push_back(length);
-      array_type.components().push_back(data);
-
-      const pointer_typet ref_type(array_type);
+      typet element_type(get_java_type(arg0));
+      if(ID_bool == element_type.id())
+        element_type = java_byte_type();
+      const typet ref_type(java_array_type(element_type));
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.operands().resize(1);
       java_new_array.copy_to_operands(op[0]);
+      const constant_exprt element_type_carrier(element_type);
+      java_new_array.copy_to_operands(element_type_carrier);
+      java_new_array.copy_to_operands(init_dim);
       const exprt tmp(tmp_variable(ref_type));
       c = code_assignt(tmp, java_new_array);
       results[0]=tmp;
     }
-    else if(statement=="anewarray")
+    else if(statement=="anewarray" && false)
     {
       // use temporary since the stack symbol might get duplicated
       assert(op.size()==1 && results.size()==1);
@@ -919,7 +1096,7 @@ codet java_bytecode_convertt::convert_instructions(
         code.add(c);
     }
   }
-  
+
   return code;
 }
 
@@ -942,9 +1119,9 @@ typet java_bytecode_convertt::convert(const typet &type)
   else if(type.id()==ID_code)
   {
     code_typet code_type=to_code_type(type); // copy
-    
+
     code_type.return_type()=convert(code_type.return_type());
-    
+
     code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::iterator
@@ -954,7 +1131,7 @@ typet java_bytecode_convertt::convert(const typet &type)
     {
       it->type()=convert(it->type());
     }
-    
+
     return code_type;
   }
   else
@@ -986,9 +1163,9 @@ bool java_bytecode_convert(
     java_bytecode_convert(parse_tree);
     return false;
   }
-  
+
   catch(int)
-  {    
+  {
   }
 
   catch(const char *e)
