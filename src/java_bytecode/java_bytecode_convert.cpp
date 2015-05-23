@@ -437,7 +437,8 @@ Function: java_bytecode_convertt::get_bytecode_info
 
 \*******************************************************************/
 
-const bytecode_infot &java_bytecode_convertt::get_bytecode_info(const irep_idt &statement)
+const bytecode_infot &java_bytecode_convertt::get_bytecode_info(
+  const irep_idt &statement)
 {
   for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
     if(statement==p->mnemonic) return *p;
@@ -447,70 +448,82 @@ const bytecode_infot &java_bytecode_convertt::get_bytecode_info(const irep_idt &
 }
 
 namespace {
-irep_idt get_if_cmp_operator(const irep_idt &stmt) {
+
+irep_idt get_if_cmp_operator(const irep_idt &stmt)
+{
   if(stmt == patternt("if_?cmplt")) return ID_lt;
   if(stmt == patternt("if_?cmple")) return ID_le;
   if(stmt == patternt("if_?cmpgt")) return ID_gt;
   if(stmt == patternt("if_?cmpge")) return ID_ge;
   if(stmt == patternt("if_?cmpeq")) return ID_equal;
   if(stmt == patternt("if_?cmpne")) return ID_notequal;
-  assert(!"Unhandled java comparison instruction.");
+
+  throw "Unhandled java comparison instruction";
 }
 
-constant_exprt as_number(const mp_integer value, const typet &type) {
+constant_exprt as_number(const mp_integer value, const typet &type)
+{
   const unsigned int java_int_width(type.get_unsigned_int(ID_width));
   const std::string significant_bits(integer2string(value, 2));
   std::string binary_width(java_int_width - significant_bits.length(), '0');
   return constant_exprt(binary_width += significant_bits, type);
 }
 
-constant_exprt as_int(const mp_integer value) {
+#if 0
+constant_exprt as_int(const mp_integer value)
+{
   return as_number(value, java_int_type());
 }
 
-constant_exprt as_width(const size_t width) {
+constant_exprt as_width(const size_t width)
+{
   return as_int(width);
 }
 
-constant_exprt java_integer_width() {
+constant_exprt java_integer_width()
+{
   return as_width(32u);
 }
+#endif
 
 const size_t JAVA_NS_LENGTH(6u);
-const typet get_java_type(const irept &type) {
-  const irep_idt &type_id(type.get(ID_identifier));
-  const irep_idt &id(type_id.empty() ? type.id() : type_id);
-  if(ID_boolean == id) {
+
+const typet get_java_type(const irept &type)
+{
+  const irep_idt &type_id=type.get(ID_identifier);
+
+  const irep_idt &id=type_id.empty()?type.id():type_id;
+
+  if(ID_boolean == id)
     return java_boolean_type();
-  }
-  if(ID_char == id) {
+  else if(ID_char == id)
     return java_char_type();
-  }
-  if(ID_float == id) {
+  else if(ID_float == id)
     return java_float_type();
-  }
-  if(ID_double == id) {
+  else if(ID_double == id)
     return java_double_type();
-  }
-  if(ID_byte == id) {
+  else if(ID_byte == id)
     return java_byte_type();
-  }
-  if(ID_short == id) {
+  else if(ID_short == id)
     return java_short_type();
-  }
-  if(ID_int == id) {
+  else if(ID_int == id)
     return java_int_type();
-  }
-  if(ID_long == id) {
+  else if(ID_long == id)
     return java_long_type();
-  }
-  const std::string &type_name(id2string(type.find(ID_type).get(ID_identifier)));
-  const bool has_ns(std::string::npos != type_name.find(JAVA_NS));
-  const std::string name(has_ns ? type_name.substr(JAVA_NS_LENGTH, type_name.size() - JAVA_NS_LENGTH) : type_name);
-  const char first_char(name[0]);
-  if ('[' == first_char || '(' == first_char) {
+
+  const std::string &type_name=
+    id2string(type.find(ID_type).get(ID_identifier));
+
+  const bool has_ns=std::string::npos != type_name.find(JAVA_NS);
+  
+  const std::string name=
+    has_ns ? type_name.substr(JAVA_NS_LENGTH, type_name.size() - JAVA_NS_LENGTH) : type_name;
+  
+  const char first_char=name[0];
+  
+  if ('[' == first_char || '(' == first_char)
     return java_type_from_string(id2string(name));
-  }
+
   return pointer_typet(static_cast<const typet &>(type.find(ID_type)));
 }
 
