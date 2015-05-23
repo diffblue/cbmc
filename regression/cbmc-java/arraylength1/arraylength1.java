@@ -1,4 +1,4 @@
-class arraylength
+class arraylength1
 {
   public static void main(String[] args)
   {
