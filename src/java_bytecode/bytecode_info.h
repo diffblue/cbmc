@@ -11,11 +11,27 @@
 // z  boolean
 // a  reference
 
+// The 'format' is:
+// ' ' - just one byte
+// 'c' - a constant_pool index, one byte
+// 'C' - a constant_pool index, two bytes
+// 'b' - a byte, signed
+// 'o' - two byte branch offset
+// 'O' - four byte branch offset
+// 'v' - local variable index, one byte
+// 'V' - local variable index, one byte, plus one byte, signed
+// 'I' - two byte constant_pool index, plus two bytes
+// 'L' - lookupswitch
+// 'T' - tableswitch
+// 'm' - multianewarray
+// 't' - array subtype, one byte
+// 's' - a short, signed
+
 struct bytecode_infot
 {
   const char *mnemonic;
   unsigned char opcode;
-  unsigned char format;
+  char format;
   unsigned pop, push;
   char result_type;
 };
