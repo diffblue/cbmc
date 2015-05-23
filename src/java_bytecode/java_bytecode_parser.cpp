@@ -44,7 +44,7 @@ protected:
   {
   public:
     irep_idt mnemonic;
-    unsigned char format;
+    char format;
   };
   
   std::vector<bytecodet> bytecodes;
@@ -418,8 +418,6 @@ Function: java_bytecode_parsert::rbytecode
 
 \*******************************************************************/
 
-#include <iostream>
-
 void java_bytecode_parsert::rbytecode(
   u4 code_length,
   membert::instructionst &instructions)
@@ -440,14 +438,61 @@ void java_bytecode_parsert::rbytecode(
     instruction.statement=bytecodes[bytecode].mnemonic;
     instruction.address=address;
     
-    std::cout << "CODE: " << address << " " << instruction.statement << " "
-              << (int)bytecodes[bytecode].format << "\n";
-
     switch(bytecodes[bytecode].format)
     {
-    case 0: // no further bytes
+    case ' ': // no further bytes
       break;
 
+    case 'c': // a constant_pool index (one byte)
+      address+=1;
+      break;
+
+    case 'C': // a constant_pool index (two bytes)
+      address+=2;
+      break;
+      
+    case 'b': // a signed byte
+      address+=1;
+      break;
+
+    case 'o': // two byte branch offset
+      address+=2;
+      break;
+
+    case 'O': // four byte branch offset
+      address+=4;
+      break;
+
+    case 'v': // local variable index (one byte)
+      address+=1;
+      break;
+      
+    case 'V': // local variable index (one byte) plus one signed byte
+      address+=2;
+      break;
+      
+    case 'I': // two byte constant_pool index plus two bytes
+      address+=4;
+      break;
+      
+    case 'L': // lookupswitch
+      break;
+      
+    case 'T': // tableswitch
+      break;
+      
+    case 'm': // multianewarray
+      break;
+      
+    case 't': // array subtype, one byte
+      address+=1;
+      break;
+      
+    case 's': // a short, signed
+      address+=2;
+      break;
+
+    #if 0
     case 1: // one further byte
       {
         u1 arg=code[address];
@@ -469,6 +514,7 @@ void java_bytecode_parsert::rbytecode(
         address+=4;
       }
       break;
+    #endif
     
     default:;
     }
