@@ -6,18 +6,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "../java_bytecode/java_bytecode_language.h"
 #include <util/symbol_table.h>
 
 #include <ansi-c/expr2c.h>
 
-#include "../java_bytecode/java_bytecode_convert.h"
-#include "../java_bytecode/java_bytecode_internal_additions.h"
-#include "../java_bytecode/java_bytecode_typecheck.h"
-#include "../java_bytecode/java_bytecode_load_class.h"
-#include "../java_bytecode/java_bytecode_vtable.h"
-#include "../java_bytecode/java_entry_point.h"
-#include "../java_bytecode/javap_parse.h"
+#include "java_bytecode_language.h"
+#include "java_bytecode_convert.h"
+#include "java_bytecode_internal_additions.h"
+#include "java_bytecode_typecheck.h"
+#include "java_bytecode_load_class.h"
+#include "java_bytecode_vtable.h"
+#include "java_entry_point.h"
+#include "java_bytecode_parser.h"
+#include "javap_parse.h"
 
 /*******************************************************************\
 
@@ -94,7 +95,11 @@ bool java_bytecode_languaget::parse(
 {
   // store the path
   parse_path=path;
+  #if 1
   return javap_parse(path, parse_tree, get_message_handler());
+  #else
+  return java_bytecode_parse(path, parse_tree, get_message_handler());
+  #endif
 }
              
 /*******************************************************************\
@@ -108,7 +113,7 @@ Function: java_bytecode_languaget::typecheck
  Purpose:
 
 \*******************************************************************/
-#include <iostream>
+
 bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
