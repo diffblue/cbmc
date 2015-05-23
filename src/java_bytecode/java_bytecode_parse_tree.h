@@ -15,16 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_bytecode_parse_treet
 {
 public:
-  class itemt
-  {
-  public:
-    irep_idt name;
-    typet type;
-
-    typedef std::vector<codet> instructionst;
-    instructionst instructions;
-  };
-  
   class instructiont
   {
   public:
