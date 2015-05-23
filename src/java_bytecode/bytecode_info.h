@@ -15,6 +15,7 @@ struct bytecode_infot
 {
   const char *mnemonic;
   unsigned char opcode;
+  unsigned char format;
   unsigned pop, push;
   char result_type;
 };
