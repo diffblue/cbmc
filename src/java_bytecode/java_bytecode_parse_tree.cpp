@@ -119,12 +119,13 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
     out << "native ";
   
   out << name;
+  out << " : " << signature;
 
   if(is_method)
   {
-    out << "\n";
+    out << '\n';
 
-    out << "  {" << "\n";
+    out << "  {" << '\n';
 
     for(instructionst::const_iterator
         i_it=instructions.begin();
@@ -132,7 +133,7 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
         i_it++)
     {
       if(i_it->source_location.get_line()!=irep_idt())
-        out << "    // " << i_it->source_location << "\n";
+        out << "    // " << i_it->source_location << '\n';
 
       out << "    " << i_it->address << ": ";
       out << i_it->statement;
@@ -140,19 +141,19 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
       for(std::vector<exprt>::const_iterator
           a_it=i_it->args.begin(); a_it!=i_it->args.end(); a_it++)
       {
-        if(a_it!=i_it->args.begin()) out << ",";
-        out << " " << *a_it;
+        if(a_it!=i_it->args.begin()) out << ',';
+        out << ' ' << *a_it;
       }
 
-      out << "\n";
+      out << '\n';
     }
 
-    out << "  }" << "\n";
+    out << "  }" << '\n';
   }
   else
   {
-    out << ";";
+    out << ';';
   }
 
-  out << "\n";
+  out << '\n';
 }
