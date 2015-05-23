@@ -28,29 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_bytecode_convert.h"
 #include "java_bytecode_vtable.h"
-
-// http://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
-
-// The 'result_type' is one of the following:
-// i  integer
-// l  long
-// s  short
-// b  byte
-// c  character
-// f  float
-// d  double
-// z  boolean
-// a  reference
-
-struct bytecode_infot
-{
-  const char *mnemonic;
-  unsigned char opcode;
-  unsigned pop, push;
-  char result_type;
-} const bytecode_info[]= {
-#include "bytecode_info.inc"
-};
+#include "bytecode_info.h"
 
 class patternt
 {

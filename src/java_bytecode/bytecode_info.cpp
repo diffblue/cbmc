@@ -1,3 +1,20 @@
+// http://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
+
+// The 'result_type' is one of the following:
+// i  integer
+// l  long
+// s  short
+// b  byte
+// c  character
+// f  float
+// d  double
+// z  boolean
+// a  reference
+
+#include "bytecode_info.h"
+
+struct bytecode_infot const bytecode_info[]= {
+
 { "aaload",        0x32, 2, 1, ' ' }, // arrayref, index → value; load onto the stack a reference from an array
 { "aastore",       0x53, 3, 0, ' ' }, // arrayref, index, value →; store into a reference in an array
 { "aconst_null",   0x01, 0, 1, 'a' }, // → null; push a null reference onto the stack
@@ -203,3 +220,5 @@
 { "impdep1",       0xfe, 0, 0, ' ' }, // ; reserved for implementation-dependent operations within debuggers; should not appear in any class file
 { "impdep2",       0xff, 0, 0, ' ' }, // ; reserved for implementation-dependent operations within debuggers; should not appear in any class file
 { 0, 0 }  
+
+};
