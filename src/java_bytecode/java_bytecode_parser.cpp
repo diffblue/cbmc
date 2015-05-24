@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/i2string.h>
 #include <util/parser.h>
+#include <util/std_expr.h>
+#include <util/arith_tools.h>
 
 #include "java_bytecode_parser.h"
 #include "bytecode_info.h"
@@ -79,7 +81,7 @@ protected:
   void rmethod(classt &parsed_class);
   void rclass_attribute(classt &parsed_class);
   void rmember_attribute(membert &member);
-  void rbytecode(u4 code_length, membert::instructionst &);
+  void rbytecode(membert::instructionst &);
   
   u8 read_bytes(unsigned bytes) const
   {
@@ -418,20 +420,25 @@ Function: java_bytecode_parsert::rbytecode
 
 \*******************************************************************/
 
+#define T_BOOLEAN 4
+#define T_CHAR    5
+#define T_FLOAT   6
+#define T_DOUBLE  7
+#define T_BYTE    8
+#define T_SHORT   9
+#define T_INT    10
+#define T_LONG   11
+
 void java_bytecode_parsert::rbytecode(
-  u4 code_length,
   membert::instructionst &instructions)
 {
-  std::vector<u1> code;
-  code.resize(code_length);
+  u4 code_length=read_u4();
+  
+  unsigned address;
 
-  for(std::vector<u1>::iterator it=code.begin();
-      it!=code.end(); it++)
-    *it=read_u1();
-
-  for(unsigned address=0; address<code.size(); address++)
+  for(address=0; address<code_length; address++)
   {
-    u1 bytecode=code[address];
+    u1 bytecode=read_u1();
     
     instructions.push_back(instructiont());
     instructiont &instruction=instructions.back();
@@ -444,81 +451,161 @@ void java_bytecode_parsert::rbytecode(
       break;
 
     case 'c': // a constant_pool index (one byte)
+      {
+        u1 c=read_u1();
+        instruction.args.push_back(constant(c));
+        instruction.args.push_back(nil_exprt());
+      }
       address+=1;
       break;
 
     case 'C': // a constant_pool index (two bytes)
+      {
+        u2 c=read_u2();
+        instruction.args.push_back(constant(c));
+      }
       address+=2;
       break;
       
     case 'b': // a signed byte
+      {
+        signed char c=read_u1();
+        instruction.args.push_back(from_integer(c, integer_typet()));
+      }
       address+=1;
+      
       break;
 
     case 'o': // two byte branch offset
+      {
+        signed short offset=read_u2();
+        instruction.args.push_back(from_integer(address+offset, integer_typet()));
+      }
       address+=2;
       break;
 
     case 'O': // four byte branch offset
+      {
+        signed int offset=read_u4();
+        instruction.args.push_back(from_integer(address+offset, integer_typet()));
+      }
       address+=4;
       break;
 
     case 'v': // local variable index (one byte)
+      {
+        u1 v=read_u1();
+        instruction.args.push_back(from_integer(v, integer_typet()));
+      }
       address+=1;
       break;
       
     case 'V': // local variable index (one byte) plus one signed byte
+      {
+        u1 v=read_u1();
+        instruction.args.push_back(from_integer(v, integer_typet()));
+        signed char c=read_u1();
+        instruction.args.push_back(from_integer(c, integer_typet()));
+      }
       address+=2;
       break;
       
     case 'I': // two byte constant_pool index plus two bytes
+      {
+        u2 c=read_u2();
+        instruction.args.push_back(constant(c));
+        u1 b1=read_u1();
+        instruction.args.push_back(from_integer(b1, integer_typet()));
+        u1 b2=read_u1();
+        instruction.args.push_back(from_integer(b2, integer_typet()));
+      }
       address+=4;
       break;
       
     case 'L': // lookupswitch
+      {
+        // first a pad to 32-bit align
+        while((address&3)!=0) { read_u1(); address++; }
+        
+        // now default value
+        u4 default_value=read_u4();
+        
+        // number of pairs
+        u4 npairs=read_u4();
+        
+        for(unsigned i=0; i<npairs; i++)
+        {
+          u4 match=read_u4();
+          u4 offset=read_u4();
+        }
+      }
       break;
       
     case 'T': // tableswitch
+      {
+        // first a pad to 32-bit align
+        while((address&3)!=0) { read_u1(); address++; }
+        
+        // now default value
+        u4 default_value=read_u4();
+
+        // now low value
+        u4 low_value=read_u4();
+        
+        // now high value
+        u4 high_value=read_u4();
+
+        // there are high-low+1 offsets
+        for(unsigned i=low_value; i<=high_value; i++)
+        {
+          u4 offset=read_u4();
+        }
+      }
       break;
       
-    case 'm': // multianewarray
+    case 'm': // multianewarray: constant-pool index plus one unsigned byte
+      {
+        u2 c=read_u2();
+        instruction.args.push_back(constant(c));
+        u1 dimensions=read_u1();
+        instruction.args.push_back(from_integer(dimensions, integer_typet()));
+      }
       break;
       
     case 't': // array subtype, one byte
+      {
+        typet t;
+        switch(read_u1())
+        {
+        case T_BOOLEAN: t.id(ID_bool); break;
+        case T_CHAR: t.id(ID_char); break;
+        case T_FLOAT: t.id(ID_float); break;
+        case T_DOUBLE: t.id(ID_double); break;
+        case T_BYTE: t.id(ID_byte); break;
+        case T_SHORT: t.id(ID_short); break;
+        case T_INT: t.id(ID_int); break;
+        case T_LONG: t.id(ID_long); break;
+        default:;
+        }
+        instruction.args.push_back(type_exprt(t));
+      }
       address+=1;
       break;
       
-    case 's': // a short, signed
+    case 's': // a signed short
+      {
+        signed short s=read_u2();
+        instruction.args.push_back(from_integer(s, integer_typet()));
+      }
       address+=2;
       break;
 
-    #if 0
-    case 1: // one further byte
-      {
-        u1 arg=code[address];
-        address+=1;
-      }
-      break;
-    
-    case 2: // two further bytes
-      {
-        u2 arg=(code[address]<<8)|code[address+1];
-        address+=2;
-      }
-      break;
-    
-    case 4: // four further bytes
-      {
-        u4 arg=(code[address+0]<<24)|(code[address+1]<<16)|
-               (code[address+2]<<8) |code[address+3];
-        address+=4;
-      }
-      break;
-    #endif
-    
     default:;
     }
   }
+  
+  if(address!=code_length)
+    throw "bytecode length mismatch";
 }
 
 /*******************************************************************\
@@ -544,9 +631,8 @@ void java_bytecode_parsert::rmember_attribute(membert &member)
   {
     u2 max_stack=read_u2();
     u2 max_locals=read_u2();
-    u4 code_length=read_u4();
 
-    rbytecode(code_length, member.instructions);
+    rbytecode(member.instructions);
 
     u2 exception_table_length=read_u2();
 
