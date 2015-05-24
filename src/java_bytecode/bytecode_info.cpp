@@ -23,7 +23,7 @@ struct bytecode_infot const bytecode_info[]= {
 { "aload_1",        0x2b, ' ', 0, 1, 'a' }, // → objectref; load a reference onto the stack from local variable 1
 { "aload_2",        0x2c, ' ', 0, 1, 'a' }, // → objectref; load a reference onto the stack from local variable 2
 { "aload_3",        0x2d, ' ', 0, 1, 'a' }, // → objectref; load a reference onto the stack from local variable 3
-{ "anewarray",      0xbd, 'c', 1, 1, 'a' }, // count → arrayref; create a new array of references of length count and component type identified by the class reference index (indexbyte1 << 8 + indexbyte2) in the constant pool
+{ "anewarray",      0xbd, 'C', 1, 1, 'a' }, // count → arrayref; create a new array of references of length count and component type identified by the class reference index (indexbyte1 << 8 + indexbyte2) in the constant pool
 { "areturn",        0xb0, ' ', 1, 0, ' ' }, // objectref → [empty]; return a reference from a method
 { "arraylength",    0xbe, ' ', 1, 1, 'i' }, // arrayref → length; get the length of an array
 { "astore",         0x3a, 'v', 1, 0, ' ' }, // objectref →; store a reference into a local variable #index
