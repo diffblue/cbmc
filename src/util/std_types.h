@@ -346,9 +346,15 @@ public:
     return find(ID_bases).get_sub();
   }
   
+  inline irept::subt &bases()
+  {
+    return add(ID_bases).get_sub();
+  }
+  
   bool has_base(const irep_idt &id) const
   {
     const irept::subt &b=bases();
+
     forall_irep(it, b)
     {
       assert(it->id()==ID_base);
