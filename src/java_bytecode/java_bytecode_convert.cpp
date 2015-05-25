@@ -680,17 +680,20 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?aload"))
     {
       assert(op.size() == 2 && results.size() == 1);
+
       const dereference_exprt array(op[0], op[0].type().subtype());
-      const typet elem_type(java_type(statement[0]));
-      const empty_typet empty;
-      const pointer_typet array_type(empty);
-      const member_exprt data(array, "data", array_type);
-      const typecast_exprt pointer(data, pointer_typet(elem_type));
-      const typecast_exprt index(op[1], signed_long_int_type());
-      const dereference_exprt element(plus_exprt(pointer, index), elem_type);
-      const irep_idt &elem_type_id(elem_type.id());
-      if((ID_signedbv == elem_type_id || ID_unsignedbv == elem_type_id) &&
-          elem_type.get_unsigned_int(ID_width) < 32u)
+      const struct_typet &struct_type=to_struct_type(op[0].type().subtype());
+      assert(struct_type.components().size()==2);
+
+      const member_exprt data(
+        array, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+
+      typet element_type=data.type().subtype();
+      
+      const index_exprt element(data, op[1], element_type);
+
+      if((element_type.id()==ID_signedbv || element_type.id()==ID_unsignedbv) &&
+          element_type.get_unsigned_int(ID_width) < 32)
         results[0]=typecast_exprt(element, java_int_type());
       else
         results[0]=element;
