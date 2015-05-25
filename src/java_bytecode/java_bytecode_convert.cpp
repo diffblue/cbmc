@@ -37,8 +37,6 @@ public:
   {
   }
 
-  const char *p;
-
   // match with '?'  
   friend bool operator==(const irep_idt &what, const patternt &pattern)
   {
@@ -50,6 +48,9 @@ public:
 
     return pattern.p[what.size()]==0;
   }
+
+protected:
+  const char *p;
 };
 
 class java_bytecode_convertt:public messaget
@@ -80,23 +81,30 @@ protected:
   unsigned number_of_parameters;
 
   // JVM local variables
-  symbol_exprt &variable(std::map<irep_idt, symbol_exprt> &variables, const exprt &arg, char type_char)
+  symbol_exprt &variable(
+    std::map<irep_idt, symbol_exprt> &variables,
+    const exprt &arg,
+    char type_char)
   {
     irep_idt number=to_constant_expr(arg).get_value();
     std::string prefix=(unsafe_string2unsigned(id2string(number))<number_of_parameters)?"arg":"local";
     irep_idt base_name=prefix+id2string(number)+type_char;
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
     const std::map<irep_idt, symbol_exprt>::iterator variable(variables.find(identifier));
-    if(variables.end() != variable) {
+
+    if(variables.end() != variable)
+    {
       symbol_exprt &cached(variable->second);
       if(!is_reference_type(type_char))
         cached.type() = java_type(type_char);
       return cached;
     }
+
     symbol_exprt result(identifier, java_type(type_char));
     result.set(ID_C_base_name, base_name);
     std::pair<std::map<irep_idt, symbol_exprt>::iterator, bool> it(variables.insert(std::make_pair(identifier, result)));
     assert(it.second);
+
     return it.first->second;
   }
 
@@ -208,12 +216,14 @@ void java_bytecode_convertt::convert(const classt &c)
   class_type.set_tag(c.name);
   irept &b(class_type.add(ID_bases));
   irept::subt &b_sub(b.get_sub());
-  if (!c.extends.empty())
+  if(!c.extends.empty())
     b_sub.push_back(make_base(c.extends));
   irept &impl(class_type.add(ID_interfaces));
   irept::subt &impl_sub(impl.get_sub());
   const std::list<irep_idt> &ifc(c.implements);
-  for(typeof(ifc.begin()) it(ifc.begin()); it != ifc.end(); ++it) {
+
+  for(typeof(ifc.begin()) it(ifc.begin()); it != ifc.end(); ++it)
+  {
     std::cout << "<it>" << *it << "</it>" << std::endl;
     const irept base(make_base(*it));
     b_sub.push_back(base); // TODO: Useful?
@@ -1109,7 +1119,7 @@ typet java_bytecode_convertt::convert(const typet &type)
     return empty_typet();
   else if(type.id()==ID_code)
   {
-    code_typet code_type=to_code_type(type); // copy
+    code_typet code_type=to_code_type(type); // copy, will change
 
     code_type.return_type()=convert(code_type.return_type());
 
@@ -1147,7 +1157,8 @@ bool java_bytecode_convert(
   const std::string &module,
   message_handlert &message_handler)
 {
-  java_bytecode_convertt java_bytecode_convert(symbol_table, message_handler);
+  java_bytecode_convertt java_bytecode_convert(
+    symbol_table, message_handler);
 
   try
   {
