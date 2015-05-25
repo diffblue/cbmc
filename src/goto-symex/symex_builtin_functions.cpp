@@ -74,6 +74,12 @@ void goto_symext::symex_malloc(
   exprt size=code.op0();
   typet object_type=nil_typet();
   
+  // is the type given?
+  if(code.find("#type").is_not_nil())
+  {
+    object_type=static_cast<const typet &>(code.find("#type"));
+  }
+  else
   {
     exprt tmp_size=size;
     state.rename(tmp_size, ns); // to allow constant propagation
