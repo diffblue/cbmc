@@ -238,21 +238,22 @@ void java_bytecode_convertt::convert(const classt &c)
   symbolt new_symbol;
   new_symbol.base_name=c.name;
   new_symbol.pretty_name=c.name;
-  new_symbol.name=JAVA_NS + id2string(c.name);
+  new_symbol.name=JAVA_NS+id2string(c.name);
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
   new_symbol.is_type=true;
-
-  class_type.set(ID_name, new_symbol.name);
+  
+  symbolt *class_symbol;
+  
+  // add before we do members
+  if(symbol_table.move(new_symbol, class_symbol))
+    throw "failed to add class symbol";
 
   for(classt::memberst::const_iterator
       it=c.members.begin();
       it!=c.members.end();
       it++)
-    convert(new_symbol, *it);
-
-  if(symbol_table.add(new_symbol))
-    throw "failed to add class symbol";
+    convert(*class_symbol, *it);
 }
 
 namespace {
