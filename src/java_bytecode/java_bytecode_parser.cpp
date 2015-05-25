@@ -12,8 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/parser.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
+#include <util/ieee_float.h>
+
+#include <ansi-c/string_constant.h>
 
 #include "java_bytecode_parser.h"
+#include "java_types.h"
 #include "bytecode_info.h"
 
 #ifdef DEBUG
@@ -51,14 +55,29 @@ protected:
   
   std::vector<bytecodet> bytecodes;
   
-  typedef std::vector<exprt> constant_poolt;
+  struct pool_entryt
+  {
+    u1 tag;
+    u2 ref1, ref2;
+    std::string s;
+    u8 number;
+    exprt expr;
+    pool_entryt():tag(0), ref1(0), ref2(0), number(0) { }
+  };
+  
+  typedef std::vector<pool_entryt> constant_poolt;
   constant_poolt constant_pool;
   
-  exprt &constant(u2 index)
+  pool_entryt &pool_entry(u2 index)
   {
     if(index==0 || index>=constant_pool.size())
       throw "invalid constant pool index";
     return constant_pool[index];
+  }
+  
+  exprt &constant(u2 index)
+  {
+    return pool_entry(index).expr;
   }
   
   void get_bytecodes()
@@ -113,6 +132,15 @@ protected:
   u8 read_u8() const
   {
     return read_bytes(8);
+  }
+
+  // java/lang/Object -> java.lang.Object
+  static std::string slash_to_dot(const std::string &src)
+  {
+    std::string result=src;
+    for(std::string::iterator it=result.begin(); it!=result.end(); it++)
+      if(*it=='/') *it='.';
+    return result;
   }
 };
 
@@ -181,8 +209,6 @@ Function: java_bytecode_parsert::rClassFile
 #define ACC_STRICT       0x0800
 #define ACC_SYNTHETIC    0x1000
 
-#include <iostream>
-
 void java_bytecode_parsert::rClassFile()
 {
   u4 magic=read_u4();
@@ -203,10 +229,10 @@ void java_bytecode_parsert::rClassFile()
   u2 super_class=read_u2();
   
   parsed_class.name=
-    constant(constant(this_class).get_unsigned_int(ID_name)).id();
+    constant(this_class).get(ID_identifier);
 
   parsed_class.extends=
-    constant(constant(super_class).get_unsigned_int(ID_name)).id();
+    constant(super_class).get(ID_identifier);
 
   rinterfaces(parsed_class);
   rfields(parsed_class);
@@ -245,12 +271,11 @@ Function: java_bytecode_parsert::rconstant_pool
 #define CONSTANT_MethodType          16
 #define CONSTANT_InvokeDynamic       18
 
-#include <iostream>
-
 void java_bytecode_parsert::rconstant_pool()
 {
   u2 constant_pool_count=read_u2();
   if(constant_pool_count==0) throw "invalid constant_pool_count";
+  
   constant_pool.resize(constant_pool_count);
   
   for(constant_poolt::iterator
@@ -261,94 +286,181 @@ void java_bytecode_parsert::rconstant_pool()
     // the first entry isn't used
     if(it==constant_pool.begin()) continue;
     
-    u1 tag=read_u1();
-    switch(tag)
+    it->tag=read_u1();
+    
+    switch(it->tag)
     {
     case CONSTANT_Class:
-      it->id(ID_class);
-      it->set(ID_name, read_u2());
+      it->ref1=read_u2();
       break;
 
     case CONSTANT_Fieldref:
-      it->id("fieldref");
-      it->set(ID_class, read_u2());
-      it->set(ID_name, read_u2());
+    case CONSTANT_Methodref:
+    case CONSTANT_InterfaceMethodref:
+    case CONSTANT_NameAndType:
+    case CONSTANT_InvokeDynamic:
+      it->ref1=read_u2();
+      it->ref2=read_u2();
       break;
       
-    case CONSTANT_Methodref:
-      it->id("methodref");
-      it->set(ID_class, read_u2());
-      it->set(ID_name, read_u2());
-      break;
-
-    case CONSTANT_InterfaceMethodref:
-      it->id("interfacemethodref");
-      it->set(ID_class, read_u2());
-      it->set(ID_name, read_u2());
-      break;
-
     case CONSTANT_String:
-      it->id(ID_string);
-      it->set(ID_index, read_u2());
+    case CONSTANT_MethodType:
+      it->ref1=read_u2();
       break;
 
     case CONSTANT_Integer:
-      it->id(ID_int);
-      it->set(ID_value, read_u4());
-      break;
-
     case CONSTANT_Float:
-      it->id(ID_float);
-      it->set(ID_value, read_u4());
+      it->number=read_u4();
       break;
-      
+
     case CONSTANT_Long:
-      it->id(ID_long);
-      it->set(ID_value, read_u8());
-      break;
-
     case CONSTANT_Double:
-      it->id(ID_double);
-      it->set(ID_value, read_u8());
-      break;
-
-    case CONSTANT_NameAndType:
-      it->id("nameandtype");
-      it->set(ID_name, read_u2());
-      it->set(ID_type, read_u2());
+      it->number=read_u8();
+      // Eight-byte constants take up two entires
+      // in the constant_pool table, for annoying this programmer.
+      if(it==constant_pool.end()) throw "invalid double entry";
+      it++;
+      it->tag=0;
       break;
 
     case CONSTANT_Utf8:
       {
         u2 bytes=read_u2();
-        std::string s;
-        s.resize(bytes);
-        for(std::string::iterator s_it=s.begin(); s_it!=s.end(); s_it++)
+        it->s.resize(bytes);
+        for(std::string::iterator s_it=it->s.begin(); s_it!=it->s.end(); s_it++)
           *s_it=read_u1();
-        it->id(s);
       }
       break;
 
     case CONSTANT_MethodHandle:
-      it->id("methodhandle");
-      it->set("kind", read_u1());
-      it->set(ID_index, read_u2());
-      break;
-
-    case CONSTANT_MethodType:
-      it->id("methodtype");
-      it->set(ID_index, read_u2());
-      break;
-
-    case CONSTANT_InvokeDynamic:
-      it->id("invokedynamic");
-      it->set("bootstrap_method_attr", read_u2());
-      it->set("nameandtype", read_u2());
+      it->ref1=read_u1();
+      it->ref2=read_u2();
       break;
 
     default:
       throw std::string("unknown constant pool entry (")+
-            i2string(tag)+")";
+            i2string(it->tag)+")";
+    }
+  }
+
+  // we do a bit of post-processing after we have them all
+  for(constant_poolt::iterator
+      it=constant_pool.begin();
+      it!=constant_pool.end();
+      it++)
+  {
+    // the first entry isn't used
+    if(it==constant_pool.begin()) continue;
+    
+    switch(it->tag)
+    {
+    case CONSTANT_Class:
+      {
+        irep_idt identifier="java::"+slash_to_dot(pool_entry(it->ref1).s);
+        it->expr=type_exprt(symbol_typet(identifier));
+      }
+      break;
+
+    case CONSTANT_Fieldref:
+      {
+        const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
+        const pool_entryt &name_entry=pool_entry(nameandtype_entry.ref1);
+        const pool_entryt &type_entry=pool_entry(nameandtype_entry.ref2);
+        const pool_entryt &class_entry=pool_entry(it->ref1);
+        const pool_entryt &class_name_entry=pool_entry(class_entry.ref1);
+        typet type=java_type_from_string(id2string(type_entry.s));
+        
+        irep_idt identifier=
+          "java::"+slash_to_dot(class_name_entry.s)+
+          "."+name_entry.s;
+
+        symbol_exprt symbol_expr(identifier, type);
+        symbol_expr.set(ID_C_base_name, name_entry.s);
+
+        it->expr=symbol_expr;
+      }
+      break;
+      
+    case CONSTANT_Methodref:
+      {
+        const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
+        const pool_entryt &name_entry=pool_entry(nameandtype_entry.ref1);
+        const pool_entryt &type_entry=pool_entry(nameandtype_entry.ref2);
+        const pool_entryt &class_entry=pool_entry(it->ref1);
+        const pool_entryt &class_name_entry=pool_entry(class_entry.ref1);
+        typet type=java_type_from_string(id2string(type_entry.s));
+        
+        irep_idt identifier=
+          "java::"+slash_to_dot(class_name_entry.s)+
+          "."+name_entry.s+
+          ":"+type_entry.s;
+
+        symbol_exprt symbol_expr(identifier, type);
+        symbol_expr.set(ID_C_base_name, name_entry.s);
+
+        it->expr=symbol_expr;
+      }
+      break;
+
+    case CONSTANT_InterfaceMethodref:
+      {
+        it->expr.id("interfacemethodref");
+      }
+      break;
+
+    case CONSTANT_String:
+      it->expr=string_constantt(pool_entry(it->ref1).s);
+      break;
+
+    case CONSTANT_Integer:
+      it->expr=from_integer(it->number, java_int_type());
+      break;
+
+    case CONSTANT_Float:
+      {
+        ieee_floatt value(ieee_float_spect::single_precision());
+        value.unpack(it->number);
+        it->expr=value.to_expr();
+      }
+      break;
+      
+    case CONSTANT_Long:
+      it->expr=from_integer(it->number, java_long_type());
+      break;
+
+    case CONSTANT_Double:
+      {
+        ieee_floatt value(ieee_float_spect::double_precision());
+        value.unpack(it->number);
+        it->expr=value.to_expr();
+      }
+      break;
+
+    case CONSTANT_NameAndType:
+      {
+        it->expr.id("nameandtype");
+      }
+      break;
+
+    case CONSTANT_MethodHandle:
+      {
+        it->expr.id("methodhandle");
+      }
+      break;
+
+    case CONSTANT_MethodType:
+      {
+        it->expr.id("methodtype");
+      }
+      break;
+
+    case CONSTANT_InvokeDynamic:
+      {
+        it->expr.id("invokedynamic");
+      }
+      break;
+
+    default:;
     }
   }
 }
@@ -370,7 +482,7 @@ void java_bytecode_parsert::rinterfaces(classt &parsed_class)
   u2 interfaces_count=read_u2();
 
   for(unsigned i=0; i<interfaces_count; i++)
-    parsed_class.implements.push_back(constant(read_u2()).id());
+    parsed_class.implements.push_back(pool_entry(read_u2()).s);
 }
 
 /*******************************************************************\
@@ -400,8 +512,8 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
     u2 attributes_count=read_u2();
     
     member.is_method=false;
-    member.name=constant(name_index).id();
-    member.signature=id2string(constant(descriptor_index).id());
+    member.name=pool_entry(name_index).s;
+    member.signature=id2string(pool_entry(descriptor_index).s);
 
     for(unsigned j=0; j<attributes_count; j++)
       rmember_attribute(member);
@@ -451,19 +563,12 @@ void java_bytecode_parsert::rbytecode(
       break;
 
     case 'c': // a constant_pool index (one byte)
-      {
-        u1 c=read_u1();
-        instruction.args.push_back(constant(c));
-        instruction.args.push_back(nil_exprt());
-      }
+      instruction.args.push_back(constant(read_u1()));
       address+=1;
       break;
 
     case 'C': // a constant_pool index (two bytes)
-      {
-        u2 c=read_u2();
-        instruction.args.push_back(constant(c));
-      }
+      instruction.args.push_back(constant(read_u2()));
       address+=2;
       break;
       
@@ -625,7 +730,7 @@ void java_bytecode_parsert::rmember_attribute(membert &member)
   u2 attribute_name_index=read_u2();
   u4 attribute_length=read_u4();
   
-  irep_idt attribute_name=constant(attribute_name_index).id();
+  irep_idt attribute_name=pool_entry(attribute_name_index).s;
   
   if(attribute_name=="Code")
   {
@@ -726,8 +831,6 @@ Function: java_bytecode_parsert::rmethod
 #define ACC_ANNOTATION 0x2000
 #define ACC_ENUM       0x4000
 
-#include <iostream>
-
 void java_bytecode_parsert::rmethod(classt &parsed_class)
 {
   parsed_class.members.push_back(membert());
@@ -738,8 +841,8 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   u2 descriptor_index=read_u2();
   
   member.is_method=true;
-  member.name=constant(name_index).id();
-  member.signature=id2string(constant(descriptor_index).id());
+  member.name=pool_entry(name_index).s;
+  member.signature=id2string(pool_entry(descriptor_index).s);
   
   u2 attributes_count=read_u2();
 
