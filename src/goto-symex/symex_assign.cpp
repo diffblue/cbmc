@@ -168,7 +168,7 @@ void goto_symext::symex_assign_rec(
       throw "symex_assign_rec: unexpected assignment to union member";
     }
     else
-      assert(false);
+      throw "symex_assign_rec: unexpected assignment to member of `"+type.id_string()+"'";
   }
   else if(lhs.id()==ID_if)
     symex_assign_if(state, to_if_expr(lhs), full_lhs, rhs, guard, assignment_type);
