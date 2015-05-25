@@ -345,16 +345,12 @@ void java_bytecode_convertt::convert(
     code_typet &code_type=to_code_type(member_type);
     code_typet::parameterst &parameters=code_type.parameters();
 
-    // do we need to add 'this'?
+    // do we need to add 'this' as a parameter?
     if(!m.is_static)
     {
       code_typet::parametert this_p;
-      //symbol_typet class_type(class_symbol.name);
-      // TODO: Actual type?
-      empty_typet class_type;
+      this_p.type()=java_reference_type(symbol_typet(class_symbol.name));
       this_p.set(ID_C_this, true);
-      // TODO: java_reference_type
-      this_p.type()=pointer_typet(class_type);
       parameters.insert(parameters.begin(), this_p);
     }
 
@@ -363,19 +359,17 @@ void java_bytecode_convertt::convert(
         i < parameters.size(); ++i)
     {
       irep_idt base_name="arg"+i2string(param_index);
-      const typet &type(parameters[i].type());
+      const typet &type=parameters[i].type();
       irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_type(type);
       parameters[i].set_base_name(base_name);
       parameters[i].set_identifier(identifier);
 
       // add to symbol table
-      symbolt parameter_symbol;
+      parameter_symbolt parameter_symbol;
       parameter_symbol.base_name=base_name;
       parameter_symbol.mode=ID_java;
       parameter_symbol.name=identifier;
       parameter_symbol.type=parameters[i].type();
-      parameter_symbol.is_lvalue=true;
-      parameter_symbol.is_state_var=true;
       symbol_table.add(parameter_symbol);
       param_index+=get_variable_slots(parameters[i]);
     }
