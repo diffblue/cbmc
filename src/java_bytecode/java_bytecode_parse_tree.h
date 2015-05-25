@@ -29,7 +29,7 @@ public:
   public:
     std::string signature;
     irep_idt base_name, name;
-    bool is_method, is_static, is_native, is_abstract;
+    bool is_method, is_static, is_native, is_abstract, is_public;
 
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
@@ -42,7 +42,8 @@ public:
 
     void output(std::ostream &out) const;
     
-    inline membert():is_method(false), is_static(false), is_native(false), is_abstract(false)
+    inline membert():is_method(false), is_static(false), is_native(false), is_abstract(false),
+                     is_public(false)
     {
     }
   };
