@@ -1,17 +1,6 @@
 // http://docs.oracle.com/javase/specs/jvms/se8/html/
 // http://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 
-// The 'result_type' is one of the following:
-// i  integer
-// l  long
-// s  short
-// b  byte
-// c  character
-// f  float
-// d  double
-// z  boolean
-// a  reference
-
 #include "bytecode_info.h"
 
 struct bytecode_infot const bytecode_info[]= {
@@ -192,7 +181,7 @@ struct bytecode_infot const bytecode_info[]= {
 { "lreturn",        0xad, ' ', 1, 0, ' ' }, // value → [empty]; return a long value
 { "lshl",           0x79, ' ', 2, 1, 'l' }, // value1, value2 → result; bitwise shift left of a long value1 by value2 positions
 { "lshr",           0x7b, ' ', 2, 1, 'l' }, // value1, value2 → result; bitwise shift right of a long value1 by value2 positions
-{ "lstore",         0x37, 'c', 1, 0, ' ' }, // value →; store a long value in a local variable #index
+{ "lstore",         0x37, 'v', 1, 0, ' ' }, // value →; store a long value in a local variable #index
 { "lstore_0",       0x3f, ' ', 1, 0, ' ' }, // value →; store a long value in a local variable 0
 { "lstore_1",       0x40, ' ', 1, 0, ' ' }, // value →; store a long value in a local variable 1
 { "lstore_2",       0x41, ' ', 1, 0, ' ' }, // value →; store a long value in a local variable 2
