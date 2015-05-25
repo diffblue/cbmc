@@ -553,7 +553,7 @@ void goto_convertt::do_java_new(
   if(lhs.is_nil())
     throw "do_java_new without lhs is yet to be implemented";
 
-  //bool new_array=rhs.get(ID_statement)==ID_java_new_array;
+  bool new_array=rhs.get(ID_statement)==ID_java_new_array;
 
   assert(rhs.operands().empty());
 
@@ -574,6 +574,21 @@ void goto_convertt::do_java_new(
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(lhs, malloc_expr);
   t_n->source_location=rhs.find_location();
+  
+  // if it's an array, we need to set the length field
+  if(new_array)
+  {
+    assert(object_type.id()==ID_struct);
+    const struct_typet &struct_type=to_struct_type(object_type);
+    assert(struct_type.components().size()==2);
+    const array_typet &array_type=to_array_type(struct_type.components()[1].type());
+
+    dereference_exprt deref(lhs, object_type);
+    member_exprt length(deref, struct_type.components()[0].get_name());
+    goto_programt::targett t_s=dest.add_instruction(ASSIGN);
+    t_s->code=code_assignt(length, array_type.size());
+    t_s->source_location=rhs.find_location();
+  }
 
   // grab initializer
   goto_programt tmp_initializer;
