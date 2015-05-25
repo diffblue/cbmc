@@ -6,9 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "../java_bytecode/java_bytecode_parse_tree.h"
 #include <ostream>
 
+#include <langapi/language_util.h>
+
+#include "java_bytecode_parse_tree.h"
 
 /*******************************************************************\
 
@@ -142,7 +144,11 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
           a_it=i_it->args.begin(); a_it!=i_it->args.end(); a_it++)
       {
         if(a_it!=i_it->args.begin()) out << ',';
+        #if 1
+        out << ' ' << from_expr(*a_it);
+        #else
         out << ' ' << *a_it;
+        #endif
       }
 
       out << '\n';
