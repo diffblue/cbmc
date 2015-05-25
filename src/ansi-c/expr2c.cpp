@@ -827,12 +827,19 @@ std::string expr2ct::convert_with(
       const struct_union_typet &struct_union_type=
         to_struct_union_type(full_type);
 
-      const exprt comp_expr=
+      const struct_union_typet::componentt &comp_expr=
         struct_union_type.get_component(component_name);
         
       assert(comp_expr.is_not_nil());
+      
+      irep_idt display_component_name;
+      
+      if(comp_expr.get_pretty_name().empty())
+        display_component_name=component_name;
+      else
+        display_component_name=comp_expr.get_pretty_name();
         
-      op1="."+comp_expr.get_string(ID_pretty_name);
+      op1="."+id2string(display_component_name);
       p1=10;
     }
     else
