@@ -4586,6 +4586,9 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_sizeof)
     return convert_sizeof(src, precedence);
+    
+  else if(src.id()==ID_type)
+    return convert(src.type());
 
   // no C language expression for internal representation
   return convert_norep(src, precedence);
