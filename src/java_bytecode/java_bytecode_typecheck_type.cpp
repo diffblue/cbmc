@@ -29,11 +29,15 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
   {
     irep_idt identifier=to_symbol_type(type).get_identifier();
     
+    symbol_tablet::symbolst::const_iterator s_it1=
+      src_symbol_table.symbols.find(identifier);
+    
     // does it exist already in the destination symbol table?
-    symbol_tablet::symbolst::const_iterator s_it=
+    symbol_tablet::symbolst::const_iterator s_it2=
       dest_symbol_table.symbols.find(identifier);
     
-    if(s_it==dest_symbol_table.symbols.end())
+    if(s_it1==src_symbol_table.symbols.end() &&
+       s_it2==dest_symbol_table.symbols.end())
     {
       assert(has_prefix(id2string(identifier), "java::"));
     
@@ -49,8 +53,8 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
       
       dest_symbol_table.add(new_symbol);
       
-      s_it=dest_symbol_table.symbols.find(identifier);
-      assert(s_it!=dest_symbol_table.symbols.end());
+      s_it2=dest_symbol_table.symbols.find(identifier);
+      assert(s_it2!=dest_symbol_table.symbols.end());
     }
     else
     {
