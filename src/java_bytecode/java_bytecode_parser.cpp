@@ -34,8 +34,11 @@ public:
 
   virtual bool parse();
   
+  typedef java_bytecode_parse_treet::classest classest;
   typedef java_bytecode_parse_treet::classt classt;
+  typedef java_bytecode_parse_treet::classt::memberst memberst;
   typedef java_bytecode_parse_treet::membert membert;
+  typedef java_bytecode_parse_treet::membert::instructionst instructionst;
   typedef java_bytecode_parse_treet::instructiont instructiont;
   
   java_bytecode_parse_treet parse_tree;
@@ -59,7 +62,7 @@ protected:
   {
     u1 tag;
     u2 ref1, ref2;
-    std::string s;
+    irep_idt s;
     u8 number;
     exprt expr;
     pool_entryt():tag(0), ref1(0), ref2(0), number(0) { }
@@ -100,7 +103,17 @@ protected:
   void rmethod(classt &parsed_class);
   void rclass_attribute(classt &parsed_class);
   void rmember_attribute(membert &member);
+  void rcode_attribute(membert &member);
   void rbytecode(membert::instructionst &);
+  
+  void skip_bytes(unsigned bytes) const
+  {
+    for(unsigned i=0; i<bytes; i++)
+    {
+      if(!*in) throw "unexpected end of input file";
+      in->get();
+    }
+  }
   
   u8 read_bytes(unsigned bytes) const
   {
@@ -326,9 +339,11 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_Utf8:
       {
         u2 bytes=read_u2();
-        it->s.resize(bytes);
-        for(std::string::iterator s_it=it->s.begin(); s_it!=it->s.end(); s_it++)
+        std::string s;
+        s.resize(bytes);
+        for(std::string::iterator s_it=s.begin(); s_it!=s.end(); s_it++)
           *s_it=read_u1();
+        it->s=s; // hashes
       }
       break;
 
@@ -356,7 +371,7 @@ void java_bytecode_parsert::rconstant_pool()
     {
     case CONSTANT_Class:
       {
-        std::string class_name=slash_to_dot(pool_entry(it->ref1).s);
+        std::string class_name=slash_to_dot(id2string(pool_entry(it->ref1).s));
         irep_idt identifier="java::"+class_name;
         symbol_typet symbol_type(identifier);
         symbol_type.set(ID_C_base_name, class_name);
@@ -374,8 +389,8 @@ void java_bytecode_parsert::rconstant_pool()
         typet type=java_type_from_string(id2string(type_entry.s));
         
         irep_idt identifier=
-          "java::"+slash_to_dot(class_name_entry.s)+
-          "."+name_entry.s;
+          "java::"+slash_to_dot(id2string(class_name_entry.s))+
+          "."+id2string(name_entry.s);
 
         symbol_exprt symbol_expr(identifier, type);
         symbol_expr.set(ID_C_base_name, name_entry.s);
@@ -394,9 +409,9 @@ void java_bytecode_parsert::rconstant_pool()
         typet type=java_type_from_string(id2string(type_entry.s));
         
         irep_idt identifier=
-          "java::"+slash_to_dot(class_name_entry.s)+
-          "."+name_entry.s+
-          ":"+type_entry.s;
+          "java::"+slash_to_dot(id2string(class_name_entry.s))+
+          "."+id2string(name_entry.s)+
+          ":"+id2string(type_entry.s);
 
         symbol_exprt symbol_expr(identifier, type);
         symbol_expr.set(ID_C_base_name, name_entry.s);
@@ -755,18 +770,62 @@ void java_bytecode_parsert::rmember_attribute(membert &member)
     u2 attributes_count=read_u2();
 
     for(unsigned j=0; j<attributes_count; j++)
-      rmember_attribute(member);
+      rcode_attribute(member);
   }
   else
+    skip_bytes(attribute_length);
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rcode_attribute
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_parsert::rcode_attribute(membert &member)
+{
+  u2 attribute_name_index=read_u2();
+  u4 attribute_length=read_u4();
+  
+  irep_idt attribute_name=pool_entry(attribute_name_index).s;
+  
+  if(attribute_name=="LineNumberTable")
   {
-    // unknown
-    std::vector<u1> info;
-    info.resize(attribute_length);
-    for(std::vector<u1>::iterator it=info.begin();
-        it!=info.end();
+    // address -> instructiont
+    typedef std::map<unsigned, membert::instructionst::iterator> instruction_mapt;
+    instruction_mapt instruction_map;
+
+    for(membert::instructionst::iterator
+        it=member.instructions.begin(); 
+        it!=member.instructions.end();
         it++)
-      *it=read_u1();
+    {
+      instruction_map[it->address]=it;
+    }
+  
+    u2 line_number_table_length=read_u2();
+
+    for(unsigned i=0; i<line_number_table_length; i++)
+    {
+      u2 start_pc=read_u2();
+      u2 line_number=read_u2();
+
+      // annotate the bytecode program      
+      instruction_mapt::const_iterator it=
+        instruction_map.find(start_pc);
+      
+      if(it!=instruction_map.end())
+        it->second->source_location.set_line(line_number);
+    }
   }
+  else
+    skip_bytes(attribute_length);
 }
 
 /*******************************************************************\
@@ -785,12 +844,34 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
 {
   u2 attribute_name_index=read_u2();
   u4 attribute_length=read_u4();
-  std::vector<u1> info;
-  info.resize(attribute_length);
-  for(std::vector<u1>::iterator it=info.begin();
-      it!=info.end();
-      it++)
-    *it=read_u1();
+
+  irep_idt attribute_name=pool_entry(attribute_name_index).s;
+  
+  if(attribute_name=="SourceFile")
+  {
+    u2 sourcefile_index=read_u2();
+    irep_idt sourcefile_name=pool_entry(sourcefile_index).s;
+    
+    for(classest::iterator c_it=parse_tree.classes.begin();
+        c_it!=parse_tree.classes.end();
+        c_it++)
+    {
+      for(memberst::iterator m_it=c_it->members.begin();
+          m_it!=c_it->members.end();
+          m_it++)
+      {
+        for(instructionst::iterator i_it=m_it->instructions.begin();
+            i_it!=m_it->instructions.end();
+            i_it++)
+        {
+          if(!i_it->source_location.get_line().empty())
+            i_it->source_location.set_file(sourcefile_name);
+        }
+      }
+    }
+  }
+  else
+    skip_bytes(attribute_length);
 }
 
 /*******************************************************************\
