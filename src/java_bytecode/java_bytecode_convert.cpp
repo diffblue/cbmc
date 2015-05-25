@@ -659,7 +659,7 @@ codet java_bytecode_convertt::convert_instructions(
       exprt &array_pointer(op[0]);
       if(ID_pointer != array_pointer.type().id() || ID_struct != array_pointer.type().subtype().id())
       {
-        const typet generic_array_type(java_array_type(empty_typet()));
+        const typet generic_array_type(java_array_type(java_reference_type(empty_typet()), nil_exprt()));
         array_pointer = typecast_exprt(array_pointer, generic_array_type);
         array_pointer.type() = generic_array_type;
       }
@@ -1009,33 +1009,31 @@ codet java_bytecode_convertt::convert_instructions(
       
       if(statement=="newarray")
       {
-        irep_idt type=arg0.type().id();
+        irep_idt id=arg0.type().id();
 
-        if(type==ID_bool)
+        if(id==ID_bool)
           element_type=java_byte_type();
-        else if(type==ID_char)
+        else if(id==ID_char)
           element_type=java_char_type();
-        else if(type==ID_float)
+        else if(id==ID_float)
           element_type=java_float_type();
-        else if(type==ID_double)
+        else if(id==ID_double)
           element_type=java_double_type();
-        else if(type==ID_byte)
+        else if(id==ID_byte)
           element_type=java_byte_type();
-        else if(type==ID_short)
+        else if(id==ID_short)
           element_type=java_short_type();
-        else if(type==ID_int)
+        else if(id==ID_int)
           element_type=java_int_type();
-        else if(type==ID_long)
+        else if(id==ID_long)
           element_type=java_long_type();
       }
       else
-        element_type=java_type('a');
+        element_type=java_reference_type(empty_typet());
 
-      const typet ref_type=java_array_type(element_type);
+      const typet ref_type=java_array_type(element_type, op[0]);
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
-      java_new_array.operands().resize(1);
-      java_new_array.op0()=op[0];
 
       const exprt tmp=tmp_variable(ref_type);
       c=code_assignt(tmp, java_new_array);
@@ -1051,8 +1049,7 @@ codet java_bytecode_convertt::convert_instructions(
       
       assert(op.size()==dimension);
 
-      typet element_type=java_type('a');
-      const typet ref_type=java_array_type(element_type);
+      const typet ref_type=java_array_type(java_reference_type(empty_typet()), nil_exprt());
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.operands()=op;

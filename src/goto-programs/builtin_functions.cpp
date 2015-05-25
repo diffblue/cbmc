@@ -553,43 +553,22 @@ void goto_convertt::do_java_new(
   if(lhs.is_nil())
     throw "do_java_new without lhs is yet to be implemented";
 
-  bool new_array=rhs.get(ID_statement)==ID_java_new_array;
+  //bool new_array=rhs.get(ID_statement)==ID_java_new_array;
 
-  // the number of objects is the first argument for arrays
-  if(new_array)
-    assert(rhs.operands().size()==1);
-  else
-    assert(rhs.operands().empty());
+  assert(rhs.operands().empty());
 
   typet object_type=rhs.type().subtype();
 
   // build size expression
   exprt object_size=size_of_expr(object_type, ns);
+  
   if(object_size.is_nil())
     throw "do_java_new got nil object_size";
-
-  exprt size;
-
-  if(new_array)
-  {
-    exprt count=rhs.op0();
-
-    // might have side-effect
-    clean_expr(count, dest);
-
-    if(count.type()!=object_size.type())
-      count.make_typecast(object_size.type());
-
-    // multiply to get final size
-    size=mult_exprt(object_size, count);
-  }
-  else
-    size=object_size;
 
   // we produce a malloc side-effect, which stays
   side_effect_exprt malloc_expr(ID_malloc);
   
-  malloc_expr.copy_to_operands(size);
+  malloc_expr.copy_to_operands(object_size);
   malloc_expr.set("#type", object_type);
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
