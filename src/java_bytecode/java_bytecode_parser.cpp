@@ -388,14 +388,14 @@ void java_bytecode_parsert::rconstant_pool()
         const pool_entryt &class_name_entry=pool_entry(class_entry.ref1);
         typet type=java_type_from_string(id2string(type_entry.s));
         
-        irep_idt identifier=
-          "java::"+slash_to_dot(id2string(class_name_entry.s))+
-          "."+id2string(name_entry.s);
+        irep_idt class_identifier=
+          "java::"+slash_to_dot(id2string(class_name_entry.s));
 
-        symbol_exprt symbol_expr(identifier, type);
-        symbol_expr.set(ID_C_base_name, name_entry.s);
+        member_exprt member_expr(type);
+        member_expr.struct_op()=exprt("dummy", symbol_typet(class_identifier));
+        member_expr.set_component_name(name_entry.s);
 
-        it->expr=symbol_expr;
+        it->expr=member_expr;
       }
       break;
       
