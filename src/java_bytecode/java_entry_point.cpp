@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "../java_bytecode/java_entry_point.h"
 #include <algorithm>
 #include <set>
 
@@ -17,13 +16,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
-#include <linking/entry_point.h>
 
+#include <linking/entry_point.h>
 #include <goto-programs/goto_functions.h>
+
+#include "java_entry_point.h"
 
 //#include "zero_initializer.h"
 
 namespace {
+
 exprt gen_argument(const typet &type)
 {
   if(type.id()==ID_pointer)
@@ -41,33 +43,51 @@ exprt gen_argument(const typet &type)
 
 #define INITIALIZE CPROVER_PREFIX "initialize"
 
-void create_initialize(symbol_tablet &symbol_table) {
+void create_initialize(symbol_tablet &symbol_table)
+{
   symbolt initialize;
   initialize.name = INITIALIZE;
+
   code_typet type;
   type.return_type() = empty_typet();
+
   initialize.type = type;
   initialize.value = code_blockt();
+
   symbol_table.add(initialize);
 }
 
-const irep_idt &get_name(const std::pair<const irep_idt, symbolt> &symbol) { return symbol.first; }
+inline const irep_idt &get_name(
+  const std::pair<const irep_idt, symbolt> &symbol)
+{
+  return symbol.first;
+}
 
-class init_symbol_filtert {
+class init_symbol_filtert
+{
   symbol_tablet &symbol_table;
-  static bool should_filter(const symbolt &symbol) {
-    if (symbol.is_static_lifetime && symbol.value.is_nil())
+
+  static bool should_filter(const symbolt &symbol)
+  {
+    if(symbol.is_static_lifetime && symbol.value.is_nil())
       return true;
-    const exprt &value(symbol.value);
-    if(ID_struct != value.id())
+
+    const exprt &value=symbol.value;
+
+    if(ID_struct!=value.id())
       return false;
+
     return to_struct_expr(value).operands().empty();
   }
+
 public:
-  init_symbol_filtert(symbol_tablet &symbol_table) :
-      symbol_table(symbol_table) {
+  init_symbol_filtert(symbol_tablet &symbol_table):
+    symbol_table(symbol_table)
+  {
   }
-  void operator()(const irep_idt &symbol_name) {
+
+  void operator()(const irep_idt &symbol_name)
+  {
     if(should_filter(symbol_table.lookup(symbol_name)))
       symbol_table.remove(symbol_name);
   }
@@ -76,20 +96,27 @@ public:
 bool java_static_lifetime_init(
   symbol_tablet &symbol_table,
   const source_locationt &source_location,
-  message_handlert &message_handler) {
-  symbol_tablet copy(symbol_table);
+  message_handlert &message_handler)
+{
+  symbol_tablet copy=symbol_table;
   symbol_tablet::symbolst &symbols(copy.symbols);
+
   std::vector<irep_idt> names;
   std::transform(symbols.begin(), symbols.end(), std::back_inserter(names), get_name);
-  init_symbol_filtert filter(copy);
+  init_symbol_filtert filter=copy;
+
   std::for_each(names.begin(), names.end(), filter);
+
   if(static_lifetime_init(copy, source_location, message_handler))
     return true;
-  symbolt &lhs(symbol_table.lookup(INITIALIZE));
-  const symbolt &rhs(copy.lookup(INITIALIZE));
+
+  symbolt &lhs=symbol_table.lookup(INITIALIZE);
+  const symbolt &rhs=copy.lookup(INITIALIZE);
   lhs.value = rhs.value;
+
   return false;
 }
+
 }
 
 /*******************************************************************\
