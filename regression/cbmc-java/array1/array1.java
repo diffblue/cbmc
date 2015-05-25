@@ -1,7 +1,3 @@
-class what_not
-{
-};
-
 class array1
 {
   public static void main(String[] args)
