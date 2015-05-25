@@ -87,10 +87,13 @@ protected:
     char type_char)
   {
     irep_idt number=to_constant_expr(arg).get_value();
+    
     std::string prefix=(unsafe_string2unsigned(id2string(number))<number_of_parameters)?"arg":"local";
     irep_idt base_name=prefix+id2string(number)+type_char;
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
-    const std::map<irep_idt, symbol_exprt>::iterator variable(variables.find(identifier));
+
+    const std::map<irep_idt, symbol_exprt>::iterator variable=
+      variables.find(identifier);
 
     if(variables.end() != variable)
     {
@@ -558,7 +561,7 @@ codet java_bytecode_convertt::convert_instructions(
   const instructionst &instructions)
 {
   // first pass: get targets
-
+  
   std::set<irep_idt> targets;
 
   for(instructionst::const_iterator
