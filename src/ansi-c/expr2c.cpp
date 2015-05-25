@@ -1103,8 +1103,14 @@ std::string expr2ct::convert_malloc(
 
   std::string dest="MALLOC";
   dest+='(';
-  dest+=convert((const typet &)src.find("#type"));
-  dest+=", ";
+
+  if(src.type().id()==ID_pointer &&
+     src.type().subtype().id()!=ID_empty)
+  {
+    dest+=convert(src.type().subtype());
+    dest+=", ";
+  }
+  
   dest+=op0;
   dest+=')';
 

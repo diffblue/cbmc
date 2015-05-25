@@ -567,9 +567,8 @@ void goto_convertt::do_java_new(
 
   // we produce a malloc side-effect, which stays
   side_effect_exprt malloc_expr(ID_malloc);
-  
   malloc_expr.copy_to_operands(object_size);
-  malloc_expr.set("#type", object_type);
+  malloc_expr.type()=pointer_typet(object_type);
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(lhs, malloc_expr);
