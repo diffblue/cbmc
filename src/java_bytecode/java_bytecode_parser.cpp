@@ -391,11 +391,11 @@ void java_bytecode_parsert::rconstant_pool()
         irep_idt class_identifier=
           "java::"+slash_to_dot(id2string(class_name_entry.s));
 
-        member_exprt member_expr(type);
-        member_expr.struct_op()=exprt("dummy", symbol_typet(class_identifier));
-        member_expr.set_component_name(name_entry.s);
+        exprt fieldref("fieldref", type);
+        fieldref.set(ID_class, class_identifier);
+        fieldref.set(ID_component_name, name_entry.s);
 
-        it->expr=member_expr;
+        it->expr=fieldref;
       }
       break;
       
