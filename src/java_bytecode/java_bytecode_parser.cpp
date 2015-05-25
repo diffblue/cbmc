@@ -400,6 +400,7 @@ void java_bytecode_parsert::rconstant_pool()
       break;
       
     case CONSTANT_Methodref:
+    case CONSTANT_InterfaceMethodref:
       {
         const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
         const pool_entryt &name_entry=pool_entry(nameandtype_entry.ref1);
@@ -417,12 +418,6 @@ void java_bytecode_parsert::rconstant_pool()
         symbol_expr.set(ID_C_base_name, name_entry.s);
 
         it->expr=symbol_expr;
-      }
-      break;
-
-    case CONSTANT_InterfaceMethodref:
-      {
-        it->expr.id("interfacemethodref");
       }
       break;
 
