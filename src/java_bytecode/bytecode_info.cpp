@@ -168,7 +168,7 @@ struct bytecode_infot const bytecode_info[]= {
 { "ldc_w",          0x13, 'C', 0, 1, ' ' }, // → value; push a constant #index from a constant pool (String, int or float) onto the stack (wide index is constructed as indexbyte1 << 8 + indexbyte2)
 { "ldc2_w",         0x14, 'C', 0, 1, ' ' }, // → value; push a constant #index from a constant pool (double or long) onto the stack (wide index is constructed as indexbyte1 << 8 + indexbyte2)
 { "ldiv",           0x6d, ' ', 2, 1, 'l' }, // value1, value2 → result; divide two longs
-{ "lload",          0x16, 'c', 0, 1, 'l' }, // → value; load a long value from a local variable #index
+{ "lload",          0x16, 'v', 0, 1, 'l' }, // → value; load a long value from a local variable #index
 { "lload_0",        0x1e, ' ', 0, 1, 'l' }, // → value; load a long value from a local variable 0
 { "lload_1",        0x1f, ' ', 0, 1, 'l' }, // → value; load a long value from a local variable 1
 { "lload_2",        0x20, ' ', 0, 1, 'l' }, // → value; load a long value from a local variable 2
