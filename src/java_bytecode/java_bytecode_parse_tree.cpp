@@ -84,7 +84,9 @@ Function: java_bytecode_parse_treet::classt::output
 
 void java_bytecode_parse_treet::classt::output(std::ostream &out) const
 {
-  out << "class " << name << " {" << "\n";
+  out << "class " << name;
+  if(!extends.empty()) out << " extends " << extends;
+  out << " {" << '\n';
 
   for(memberst::const_iterator
       it=members.begin();
@@ -94,8 +96,8 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
     it->output(out);
   }
   
-  out << "}" << "\n";
-  out << "\n";
+  out << '}' << '\n';
+  out << '\n';
 }
 
 /*******************************************************************\
