@@ -488,47 +488,6 @@ constant_exprt java_integer_width()
 }
 #endif
 
-const size_t JAVA_NS_LENGTH(6u);
-
-const typet get_java_type(const irept &type)
-{
-  const irep_idt &type_id=type.get(ID_identifier);
-
-  const irep_idt &id=type_id.empty()?type.id():type_id;
-
-  if(ID_boolean == id)
-    return java_boolean_type();
-  else if(ID_char == id)
-    return java_char_type();
-  else if(ID_float == id)
-    return java_float_type();
-  else if(ID_double == id)
-    return java_double_type();
-  else if(ID_byte == id)
-    return java_byte_type();
-  else if(ID_short == id)
-    return java_short_type();
-  else if(ID_int == id)
-    return java_int_type();
-  else if(ID_long == id)
-    return java_long_type();
-
-  const std::string &type_name=
-    id2string(type.find(ID_type).get(ID_identifier));
-
-  const bool has_ns=std::string::npos != type_name.find(JAVA_NS);
-  
-  const std::string name=
-    has_ns ? type_name.substr(JAVA_NS_LENGTH, type_name.size() - JAVA_NS_LENGTH) : type_name;
-  
-  const char first_char=name[0];
-  
-  if ('[' == first_char || '(' == first_char)
-    return java_type_from_string(id2string(name));
-
-  return pointer_typet(static_cast<const typet &>(type.find(ID_type)));
-}
-
 const char METHOD_NAME_SEP('.');
 
 std::string to_field_name(const exprt &arg)
@@ -1035,47 +994,72 @@ codet java_bytecode_convertt::convert_instructions(
       // use temporary since the stack symbol might get duplicated
       assert(op.empty() && results.size()==1);
       const pointer_typet ref_type(arg0.type());
-      const exprt tmp(tmp_variable(ref_type));
-      exprt new_expr(side_effect_exprt(ID_java_new, ref_type));
-      new_expr.operands().resize(1);
-      c = code_assignt(tmp, new_expr);
-      const typecast_exprt rhs(tmp, ref_type); // XXX: Necessary?
-      results[0]=rhs;
-    }
-    else if(statement=="newarray" || statement=="anewarray" || statement=="multianewarray")
-    {
-      assert(op.size()==1 && results.size()==1);
-      exprt init_dim(from_integer(1, java_int_type()));
-      if(statement == "multianewarray")
-        init_dim = arg1;
-
-      typet element_type(get_java_type(arg0));
-      if(ID_bool == element_type.id())
-        element_type = java_byte_type();
-      const typet ref_type(java_array_type(element_type));
-      side_effect_exprt java_new_array(ID_java_new_array, ref_type);
-      java_new_array.operands().resize(1);
-      java_new_array.copy_to_operands(op[0]);
-      const constant_exprt element_type_carrier(element_type);
-      java_new_array.copy_to_operands(element_type_carrier);
-      java_new_array.copy_to_operands(init_dim);
-      const exprt tmp(tmp_variable(ref_type));
-      c = code_assignt(tmp, java_new_array);
+      exprt java_new_expr=side_effect_exprt(ID_java_new, ref_type);
+      const exprt tmp=tmp_variable(ref_type);
+      c=code_assignt(tmp, java_new_expr);
       results[0]=tmp;
     }
-    else if(statement=="anewarray" && false)
+    else if(statement=="newarray" ||
+            statement=="anewarray")
     {
-      // use temporary since the stack symbol might get duplicated
+      // the op is the array size
       assert(op.size()==1 && results.size()==1);
 
-      /*reference_typet ref_type(arg0.type());
-      exprt tmp=tmp_variable(ref_type);
-      exprt new_expr=side_effect_exprt(ID_java_new_array, ref_type);
-      new_expr.operands().resize(2);
-      new_expr.op1()=op[0]; // number of elements
-      c=code_assignt(tmp, new_expr);
-      results[0]=tmp;*/
-      assert(!"TODO: Implement anewarray");
+      typet element_type;
+      
+      if(statement=="newarray")
+      {
+        irep_idt type=arg0.type().id();
+
+        if(type==ID_bool)
+          element_type=java_byte_type();
+        else if(type==ID_char)
+          element_type=java_char_type();
+        else if(type==ID_float)
+          element_type=java_float_type();
+        else if(type==ID_double)
+          element_type=java_double_type();
+        else if(type==ID_byte)
+          element_type=java_byte_type();
+        else if(type==ID_short)
+          element_type=java_short_type();
+        else if(type==ID_int)
+          element_type=java_int_type();
+        else if(type==ID_long)
+          element_type=java_long_type();
+      }
+      else
+        element_type=java_type('a');
+
+      const typet ref_type=java_array_type(element_type);
+
+      side_effect_exprt java_new_array(ID_java_new_array, ref_type);
+      java_new_array.operands().resize(1);
+      java_new_array.op0()=op[0];
+
+      const exprt tmp=tmp_variable(ref_type);
+      c=code_assignt(tmp, java_new_array);
+      results[0]=tmp;
+    }
+    else if(statement=="multianewarray")
+    {
+      // the ops are the dimensions
+      assert(op.size()>=1 && results.size()==1);
+
+      irep_idt number=to_constant_expr(arg0).get_value();
+      unsigned dimension=safe_c_str2unsigned(number.c_str());
+      
+      assert(op.size()==dimension);
+
+      typet element_type=java_type('a');
+      const typet ref_type=java_array_type(element_type);
+
+      side_effect_exprt java_new_array(ID_java_new_array, ref_type);
+      java_new_array.operands()=op;
+
+      const exprt tmp=tmp_variable(ref_type);
+      c=code_assignt(tmp, java_new_array);
+      results[0]=tmp;
     }
     else if(statement=="arraylength")
     {
