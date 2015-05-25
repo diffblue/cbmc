@@ -792,6 +792,21 @@ void java_bytecode_parsert::rmember_attribute(membert &member)
 
     for(unsigned j=0; j<attributes_count; j++)
       rcode_attribute(member);
+      
+    irep_idt line_number;
+      
+    // add missing line numbers
+    for(membert::instructionst::iterator
+        it=member.instructions.begin(); 
+        it!=member.instructions.end();
+        it++)
+    {
+      if(!it->source_location.get_line().empty())
+        line_number=it->source_location.get_line();
+      else if(!line_number.empty())
+        it->source_location.set_line(line_number);
+    }
+    
   }
   else
     skip_bytes(attribute_length);
