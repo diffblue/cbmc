@@ -298,7 +298,8 @@ const char NAME_SEP = '.';
 
  \*******************************************************************/
 
-void set_virtual_name(class_typet::methodt &method) {
+void set_virtual_name(class_typet::methodt &method)
+{
   const std::string &name(id2string(method.get(ID_name)));
   const std::string::size_type vname_start(name.find_last_of(NAME_SEP) + 1);
   std::string virtual_name(name.substr(vname_start));
@@ -306,10 +307,14 @@ void set_virtual_name(class_typet::methodt &method) {
 }
 
 namespace {
-exprt get_ref(const exprt &this_obj, const symbol_typet &target_type) {
+
+exprt get_ref(
+  const exprt &this_obj,
+  const symbol_typet &target_type)
+{
   const typet &type(this_obj.type());
   const irep_idt &type_id(type.id());
-  if (ID_symbol == type_id)
+  if(ID_symbol == type_id)
     return get_ref(address_of_exprt(this_obj), target_type);
   assert(ID_pointer == type_id);
   assert(ID_symbol == type.subtype().id());
