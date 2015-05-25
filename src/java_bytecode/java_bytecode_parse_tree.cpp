@@ -147,7 +147,7 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
           a_it=i_it->args.begin(); a_it!=i_it->args.end(); a_it++)
       {
         if(a_it!=i_it->args.begin()) out << ',';
-        #if 1
+        #if 0
         out << ' ' << from_expr(*a_it);
         #else
         out << ' ' << *a_it;

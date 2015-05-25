@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/pointer_predicates.h>
+#include <util/pointer_offset_size.h>
 
 #include <ansi-c/c_types.h>
 
@@ -552,23 +553,26 @@ void goto_convertt::do_java_new(
   if(lhs.is_nil())
     throw "do_java_new without lhs is yet to be implemented";
 
-  // the object size is the first argument
   bool new_array=rhs.get(ID_statement)==ID_java_new_array;
 
+  // the number of objects is the first argument for arrays
   if(new_array)
-    assert(rhs.operands().size()==2);
-  else
     assert(rhs.operands().size()==1);
+  else
+    assert(rhs.operands().empty());
 
   typet object_type=rhs.type().subtype();
 
   // build size expression
-  exprt object_size=rhs.op0();
+  exprt object_size=size_of_expr(object_type, ns);
+  if(object_size.is_nil())
+    throw "do_java_new got nil object_size";
+
   exprt size;
 
   if(new_array)
   {
-    exprt count=rhs.op1();
+    exprt count=rhs.op0();
 
     // might have side-effect
     clean_expr(count, dest);

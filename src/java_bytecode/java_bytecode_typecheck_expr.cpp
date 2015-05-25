@@ -59,16 +59,12 @@ Function: java_bytecode_typecheckt::typecheck_expr_java_new
 void java_bytecode_typecheckt::typecheck_expr_java_new(side_effect_exprt &expr)
 { 
   if(expr.get_statement()==ID_java_new_array)
-    assert(expr.operands().size()==4);
+    assert(expr.operands().size()>=1);
   else
-    assert(expr.operands().size()==1);
+    assert(expr.operands().empty());
 
   typet &type=expr.type();
   typecheck_type(type);
-
-  // we need to compute the size of the object to be allocated
-  expr.op0()=c_sizeof(type.subtype(), ns);  
-  expr.op0().set(ID_C_c_sizeof_type, type.subtype());
 }
 
 /*******************************************************************\
