@@ -260,7 +260,8 @@ namespace {
 char java_type(const typet &type)
 {
   const irep_idt &id(type.id());
-  if (ID_signedbv == id) {
+  if (ID_signedbv == id)
+  {
     const unsigned int width(type.get_unsigned_int(ID_width));
     if(java_int_type().get_unsigned_int(ID_width) == width)
       return 'i';
@@ -270,36 +271,43 @@ char java_type(const typet &type)
       return 's';
     else if(java_byte_type().get_unsigned_int(ID_width) == width)
       return 'b';
-  } else if(ID_unsignedbv == id) {
+  }
+  else if(ID_unsignedbv == id)
     return 'c';
-  } else if(ID_floatbv == id) {
+  else if(ID_floatbv == id)
+  {
     const unsigned int width(type.get_unsigned_int(ID_width));
     if(java_float_type().get_unsigned_int(ID_width) == width)
       return 'f';
     else if(java_double_type().get_unsigned_int(ID_width) == width)
       return 'd';
-  } else if(ID_bool == id) {
-    return 'z';
   }
+  else if(ID_bool == id)
+    return 'z';
+
   return 'a';
 }
 
 const size_t SLOTS_PER_INTEGER(1u);
 const size_t INTEGER_WIDTH(64u);
-size_t count_slots(const size_t value, const code_typet::parametert &param) {
+size_t count_slots(const size_t value, const code_typet::parametert &param)
+{
   const unsigned int width(param.type().get_unsigned_int(ID_width));
   return value + SLOTS_PER_INTEGER + width / INTEGER_WIDTH;
 }
 
-size_t get_variable_slots(const code_typet::parametert &param) {
+size_t get_variable_slots(const code_typet::parametert &param)
+{
   return count_slots(0, param);
 }
 
-size_t count_java_parameter_slots(const code_typet::parameterst &p) {
+size_t count_java_parameter_slots(const code_typet::parameterst &p)
+{
   return std::accumulate(p.begin(), p.end(), 0, &count_slots);
 }
 
-bool is_contructor(const irep_idt &class_name, const class_typet::methodt &method) {
+bool is_contructor(const irep_idt &class_name, const class_typet::methodt &method)
+{
   const std::string &name(id2string(class_name));
   std::string needle("java::");
   needle += name;
@@ -309,7 +317,8 @@ bool is_contructor(const irep_idt &class_name, const class_typet::methodt &metho
   return id2string(method.get_name()).find(needle) != std::string::npos;
 }
 
-void cast_if_necessary(binary_relation_exprt &condition) {
+void cast_if_necessary(binary_relation_exprt &condition)
+{
   exprt &lhs(condition.lhs());
   exprt &rhs(condition.rhs());
   const typet &lhs_type(lhs.type());
@@ -629,7 +638,7 @@ codet java_bytecode_convertt::convert_instructions(
 
       if(is_virtual)
       {
-        const exprt &this_arg(call.arguments().front());
+        const exprt &this_arg=call.arguments().front();
         #if 0
         call.function() = make_vtable_function(arg0, this_arg);
         #else
@@ -1123,6 +1132,9 @@ codet java_bytecode_convertt::convert_instructions(
       c=codet(statement);
       c.operands()=op;
     }
+    
+    if(!i_it->source_location.get_line().empty())
+      c.add_source_location()=i_it->source_location;
 
     push(results);
 
