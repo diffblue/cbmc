@@ -618,8 +618,11 @@ codet java_bytecode_convertt::convert_instructions(
 
       code_function_callt call;
       call.arguments() = pop(parameters.size());
-      const typet &return_type(code_type.return_type());
-      if (ID_empty != return_type.id()) {
+
+      const typet &return_type=code_type.return_type();
+
+      if (ID_empty != return_type.id())
+      {
         call.lhs() = tmp_variable(return_type);
         results.resize(1);
         results[0] = call.lhs();
@@ -736,10 +739,12 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?const"))
     {
       assert(results.size() == 1);
-      const char type_char(statement[0]);
+
+      const char type_char=statement[0];
       const bool is_double('d' == type_char);
       const bool is_float('f' == type_char);
-      if (is_double || is_float)
+
+      if(is_double || is_float)
       {
         const ieee_float_spect spec(
             is_float ?
@@ -758,7 +763,7 @@ codet java_bytecode_convertt::convert_instructions(
       else
       {
         const unsigned int value(arg0.get_unsigned_int(ID_value));
-        const typet type(java_type(statement[0]));
+        const typet type=java_type(statement[0]);
         results[0] = as_number(value, type);
       }
     }
@@ -771,12 +776,15 @@ codet java_bytecode_convertt::convert_instructions(
     {
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==2 && results.empty());
+
       code_ifthenelset code_branch;
-      const irep_idt cmp_op(get_if_cmp_operator(statement));
+      const irep_idt cmp_op=get_if_cmp_operator(statement);
+      
       binary_relation_exprt condition(op[0], cmp_op, op[1]);
       cast_if_necessary(condition);
       code_branch.cond()=condition;
       code_branch.then_case()=code_gotot(label(number));
+      
       c=code_branch;
     }
     else if(statement==patternt("if??"))
@@ -855,11 +863,14 @@ codet java_bytecode_convertt::convert_instructions(
     {
       assert(op.size()==2 && results.size()==1);
       const typet type(java_type(statement[0]));
+
       const unsigned int width(type.get_unsigned_int(ID_width));
-      typet target(unsigned_long_int_type());
+      typet target=unsigned_long_int_type();
       target.set(ID_width, width);
+
       const typecast_exprt lhs(op[0], target);
       const typecast_exprt rhs(op[1], target);
+
       results[0]=lshr_exprt(lhs, rhs);
     }
     else if(statement==patternt("?add"))
@@ -890,24 +901,29 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="frem" || statement=="drem")
     {
       assert(op.size()==2 && results.size()==1);
+
       std::string function("java::__CPROVER.__java_bytecode_");
       const bool is_float(statement == "frem");
-      if(is_float) {
+
+      if(is_float)
         function += "frem:(FF)F";
-      } else {
+      else
         function += "drem:(DD)D";
-      }
+
       const typet type(is_float ? java_float_type() : java_double_type());
       code_typet function_type;
       function_type.return_type() = type;
+
       const code_typet::parametert param(type);
       function_type.parameters().push_back(param);
       function_type.parameters().push_back(param);
+
       code_function_callt call;
       call.lhs() = tmp_variable(type);
       call.function() = symbol_exprt(function, function_type);
       call.arguments().push_back(op[0]);
       call.arguments().push_back(op[1]);
+
       results[0]=call.lhs();
       c = call;
     }
@@ -918,14 +934,15 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement==patternt("?cmp"))
     {
-    assert(op.size() == 2 && results.size() == 1);
+      assert(op.size() == 2 && results.size() == 1);
 
       // The integer result on the stack is:
       //  0 if op[0] equals op[1]
       // -1 if op[0] is less than op[1]
       //  1 if op[0] is greater than op[1]
 
-      const typet t(java_int_type());
+      const typet t=java_int_type();
+
       results[0]=
         if_exprt(binary_relation_exprt(op[0], ID_equal, op[1]), gen_zero(t),
         if_exprt(binary_relation_exprt(op[0], ID_gt, op[1]), from_integer(1, t),
@@ -941,8 +958,10 @@ codet java_bytecode_convertt::convert_instructions(
       const int nan_value(statement[4] == 'l' ? -1 : 1);
       const typet result_type(java_int_type());
       const exprt nan_result(from_integer(nan_value, result_type));
+
       // (value1 == NaN || value2 == NaN) ? nan_value : value1  < value2 ? -1 : value2 < value1  1 ? 1 : 0;
       // (value1 == NaN || value2 == NaN) ? nan_value : value1 == value2 ? 0  : value1 < value2 -1 ? 1 : 0;
+
       results[0]=
         if_exprt(or_exprt(ieee_float_equal_exprt(nan_expr, op[0]), ieee_float_equal_exprt(nan_expr, op[1])), nan_result,
         if_exprt(ieee_float_equal_exprt(op[0], op[1]), gen_zero(result_type),
