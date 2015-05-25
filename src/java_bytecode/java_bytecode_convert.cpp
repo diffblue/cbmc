@@ -628,7 +628,11 @@ codet java_bytecode_convertt::convert_instructions(
       if(is_virtual)
       {
         const exprt &this_arg(call.arguments().front());
+        #if 0
         call.function() = make_vtable_function(arg0, this_arg);
+        #else
+        call.function() = arg0;
+        #endif
       }
       else
         call.function() = arg0;
