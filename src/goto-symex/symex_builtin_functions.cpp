@@ -75,9 +75,9 @@ void goto_symext::symex_malloc(
   typet object_type=nil_typet();
   
   // is the type given?
-  if(code.find("#type").is_not_nil())
+  if(code.type().id()==ID_pointer && code.type().subtype().id()!=ID_empty)
   {
-    object_type=static_cast<const typet &>(code.find("#type"));
+    object_type=code.type().subtype();
   }
   else
   {
