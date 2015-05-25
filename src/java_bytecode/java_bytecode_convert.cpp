@@ -1061,7 +1061,7 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="arraylength")
     {
       assert(op.size() == 1 && results.size() == 1);
-      const dereference_exprt array(op[0]);
+      const dereference_exprt array(op[0], op[0].type().subtype());
       const member_exprt length(array, "length", java_int_type());
       results[0]=length;
     }
