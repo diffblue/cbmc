@@ -649,40 +649,48 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement==patternt("?astore"))
     {
-      assert(op.size() == 3 && results.empty());
-      exprt &array_pointer(op[0]);
-      if(ID_pointer != array_pointer.type().id() || ID_struct != array_pointer.type().subtype().id())
-      {
-        const typet generic_array_type(java_array_type(java_reference_type(empty_typet()), nil_exprt()));
-        array_pointer = typecast_exprt(array_pointer, generic_array_type);
-        array_pointer.type() = generic_array_type;
-      }
-      const dereference_exprt array(op[0], op[0].type().subtype());
-      const char type_char(statement[0]);
-      const typet elem_type(java_type(type_char));
-      const empty_typet empty;
-      const pointer_typet array_type(empty);
-      const member_exprt data(array, "data", array_type);
-      const dereference_exprt element(plus_exprt(data, op[1]), elem_type);
-      c = code_assignt(element, op[2]);
+      assert(op.size()==3 && results.empty());
+      
+      exprt pointer=
+        typecast_exprt(op[0], java_array_type(java_type(statement[0]), nil_exprt()));
+
+      const dereference_exprt array(pointer, pointer.type().subtype());
+      assert(pointer.type().subtype().id()==ID_struct);
+      const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
+      assert(struct_type.components().size()==2);
+
+      const member_exprt data(
+        array, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+
+      typet element_type=data.type().subtype();
+
+      const index_exprt element(data, op[1], element_type);
+
+      c=code_assignt(element, op[2]);
     }
     else if(statement==patternt("?store"))
     {
       // store value into some local variable
       assert(op.size()==1 && results.empty());
-      symbol_exprt &var(variable(loc_vars, arg0, statement[0]));
+
+      symbol_exprt var=variable(loc_vars, arg0, statement[0]);
+
       const bool is_array('a' == statement[0]);
-      if (is_array) {
-        var.type() = op[0].type();
-      }
-      c = code_assignt(var, op[0]);
+      
+      if(is_array)
+        var.type()=op[0].type();
+
+      c=code_assignt(var, op[0]);
     }
     else if(statement==patternt("?aload"))
     {
       assert(op.size() == 2 && results.size() == 1);
 
-      const dereference_exprt array(op[0], op[0].type().subtype());
-      const struct_typet &struct_type=to_struct_type(op[0].type().subtype());
+      exprt pointer=
+        typecast_exprt(op[0], java_array_type(java_type(statement[0]), nil_exprt()));
+
+      const dereference_exprt array(pointer, pointer.type().subtype());
+      const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
       assert(struct_type.components().size()==2);
 
       const member_exprt data(
@@ -1058,8 +1066,18 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="arraylength")
     {
       assert(op.size() == 1 && results.size() == 1);
-      const dereference_exprt array(op[0], op[0].type().subtype());
-      const member_exprt length(array, "length", java_int_type());
+
+      exprt pointer=
+        typecast_exprt(op[0], java_array_type(java_type(statement[0]), nil_exprt()));
+
+      const dereference_exprt array(pointer, pointer.type().subtype());
+      assert(pointer.type().subtype().id()==ID_struct);
+      const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
+      assert(struct_type.components().size()==2);
+
+      const member_exprt length(
+        array, struct_type.components()[0].get_name(), struct_type.components()[0].type());
+
       results[0]=length;
     }
     else if(statement=="tableswitch")
