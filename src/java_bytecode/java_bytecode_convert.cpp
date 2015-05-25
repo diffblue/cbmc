@@ -483,18 +483,17 @@ constant_exprt java_integer_width()
 }
 #endif
 
-member_exprt to_member(const exprt &pointer, const exprt &field)
+member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 {
-  const member_exprt &member_expr=to_member_expr(field);
+  symbol_typet class_type(fieldref.get(ID_class));
 
   exprt pointer2=
-    typecast_exprt(pointer, pointer_typet(member_expr.struct_op().type()));
+    typecast_exprt(pointer, pointer_typet(class_type));
     
-  const dereference_exprt obj_deref(
-    pointer2, member_expr.struct_op().type());
+  const dereference_exprt obj_deref(pointer2, class_type);
 
   return member_exprt(
-    obj_deref, member_expr.get_component_name(), member_expr.type());
+    obj_deref, fieldref.get(ID_component_name), fieldref.type());
 }
 }
 
@@ -1000,7 +999,9 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="getstatic")
     {
       assert(op.empty() && results.size()==1);
-      results[0]=arg0;
+      symbol_exprt symbol_expr(arg0.type());
+      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+arg0.get_string(ID_component_name));
+      results[0]=symbol_expr;
     }
     else if(statement=="putfield")
     {
@@ -1010,7 +1011,9 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="putstatic")
     {
       assert(op.size()==1 && results.empty());
-      c=code_assignt(arg0, op[0]);
+      symbol_exprt symbol_expr(arg0.type());
+      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+arg0.get_string(ID_component_name));
+      c=code_assignt(symbol_expr, op[0]);
     }
     else if(statement==patternt("?2?")) // i2c etc.
     {
