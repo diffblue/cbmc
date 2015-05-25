@@ -482,19 +482,18 @@ constant_exprt java_integer_width()
 }
 #endif
 
-const char METHOD_NAME_SEP('.');
-
-std::string to_field_name(const exprt &arg)
+member_exprt to_member(const exprt &pointer, const exprt &field)
 {
-  const std::string &id(id2string(arg.get(ID_identifier)));
-  const std::string::size_type pos(id.find_last_of(METHOD_NAME_SEP) + 1);
-  return id.substr(pos);
-}
+  const member_exprt &member_expr=to_member_expr(field);
 
-member_exprt to_member(const exprt &obj, const exprt &field)
-{
-  const dereference_exprt lhs(obj, obj.type().subtype());
-  return member_exprt(lhs, to_field_name(field), field.type());
+  exprt pointer2=
+    typecast_exprt(pointer, pointer_typet(member_expr.struct_op().type()));
+    
+  const dereference_exprt obj_deref(
+    pointer2, member_expr.struct_op().type());
+
+  return member_exprt(
+    obj_deref, member_expr.get_component_name(), member_expr.type());
 }
 }
 
