@@ -227,12 +227,12 @@ void java_bytecode_parsert::rClassFile()
   u2 access_flags=read_u2();
   u2 this_class=read_u2();
   u2 super_class=read_u2();
-  
+
   parsed_class.name=
-    constant(this_class).get(ID_identifier);
+    constant(this_class).find(ID_type).get(ID_C_base_name);
 
   parsed_class.extends=
-    constant(super_class).get(ID_identifier);
+    constant(super_class).find(ID_type).get(ID_C_base_name);
 
   rinterfaces(parsed_class);
   rfields(parsed_class);
@@ -356,8 +356,11 @@ void java_bytecode_parsert::rconstant_pool()
     {
     case CONSTANT_Class:
       {
-        irep_idt identifier="java::"+slash_to_dot(pool_entry(it->ref1).s);
-        it->expr=type_exprt(symbol_typet(identifier));
+        std::string class_name=slash_to_dot(pool_entry(it->ref1).s);
+        irep_idt identifier="java::"+class_name;
+        symbol_typet symbol_type(identifier);
+        symbol_type.set(ID_C_base_name, class_name);
+        it->expr=type_exprt(symbol_type);
       }
       break;
 
@@ -850,6 +853,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   member.is_abstract=access_flags&ACC_ABSTRACT;
   member.is_public=access_flags&ACC_PUBLIC;
   member.name=pool_entry(name_index).s;
+  member.base_name=pool_entry(name_index).s;
   member.signature=id2string(pool_entry(descriptor_index).s);
 
   u2 attributes_count=read_u2();
