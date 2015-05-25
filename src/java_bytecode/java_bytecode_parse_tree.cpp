@@ -114,6 +114,9 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
 {
   out << "  ";
 
+  if(is_public)
+    out << "public ";
+  
   if(is_static)
     out << "static ";
   
