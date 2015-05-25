@@ -213,33 +213,34 @@ Function: java_bytecode_convertt::convert
 void java_bytecode_convertt::convert(const classt &c)
 {
   class_typet class_type;
-  class_type.set_tag(c.name);
-  irept &b(class_type.add(ID_bases));
-  irept::subt &b_sub(b.get_sub());
-  if(!c.extends.empty())
-    b_sub.push_back(make_base(c.extends));
-  irept &impl(class_type.add(ID_interfaces));
-  irept::subt &impl_sub(impl.get_sub());
-  const std::list<irep_idt> &ifc(c.implements);
 
-  for(typeof(ifc.begin()) it(ifc.begin()); it != ifc.end(); ++it)
+  class_type.set_tag(c.name);
+  class_type.set(ID_base_name, c.name);
+
+  if(!c.extends.empty())
+    class_type.bases().push_back(make_base(c.extends));
+
+  irept &impl=class_type.add(ID_interfaces);
+  const std::list<irep_idt> &ifc=c.implements;
+
+  for(std::list<irep_idt>::const_iterator it=ifc.begin();
+      it!=ifc.end(); ++it)
   {
-    std::cout << "<it>" << *it << "</it>" << std::endl;
-    const irept base(make_base(*it));
-    b_sub.push_back(base); // TODO: Useful?
-    impl_sub.push_back(base);
+    const irept base=make_base(*it);
+    class_type.bases().push_back(base); // TODO: Useful?
+    impl.get_sub().push_back(base);
   }
 
   // produce class symbol
   symbolt new_symbol;
   new_symbol.base_name=c.name;
-  class_type.set(ID_base_name, new_symbol.base_name);
   new_symbol.pretty_name=c.name;
   new_symbol.name=JAVA_NS + id2string(c.name);
-  class_type.set(ID_name, new_symbol.name);
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
-  new_symbol.is_type = true;
+  new_symbol.is_type=true;
+
+  class_type.set(ID_name, new_symbol.name);
 
   for(classt::memberst::const_iterator
       it=c.members.begin();
@@ -247,7 +248,8 @@ void java_bytecode_convertt::convert(const classt &c)
       it++)
     convert(new_symbol, *it);
 
-  assert(!symbol_table.add(new_symbol));
+  if(symbol_table.add(new_symbol))
+    throw "failed to add class symbol";
 }
 
 namespace {
@@ -334,7 +336,8 @@ void java_bytecode_convertt::convert(
 
   if(member_type.id()==ID_code)
   {
-    const irep_idt method_identifier(id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature);
+    const irep_idt method_identifier=
+      id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
 
     code_typet &code_type=to_code_type(member_type);
     code_typet::parameterst &parameters=code_type.parameters();
@@ -353,7 +356,8 @@ void java_bytecode_convertt::convert(
     }
 
     // assign names to parameters
-    for (size_t i(0), param_index(0);i < parameters.size(); ++i)
+    for(size_t i=0, param_index=0;
+        i < parameters.size(); ++i)
     {
       irep_idt base_name="arg"+i2string(param_index);
       const typet &type(parameters[i].type());
@@ -378,13 +382,19 @@ void java_bytecode_convertt::convert(
 
     method.set_base_name(m.base_name);
     method.set_name(method_identifier);
-    const bool is_virtual(!m.is_static);
+
+    const bool is_virtual=!m.is_static;
+
     method.set(ID_abstract, m.is_abstract);
     method.set(ID_is_virtual, is_virtual);
-    if(is_virtual) set_virtual_name(method);
-    if(is_contructor(class_symbol.base_name, method)) { method.set(ID_constructor, true); }
-    method.type()=member_type;
 
+    if(is_virtual)
+      set_virtual_name(method);
+
+    if(is_contructor(class_symbol.base_name, method))
+      method.set(ID_constructor, true);
+
+    method.type()=member_type;
 
     // create method symbol
     symbolt method_symbol;
@@ -400,7 +410,8 @@ void java_bytecode_convertt::convert(
     method_symbol.value=convert_instructions(m.instructions);
     symbol_table.add(method_symbol);
 
-    if (is_virtual) create_vtable_type_and_pointer(symbol_table, class_symbol);
+    if(is_virtual)
+      create_vtable_type_and_pointer(symbol_table, class_symbol);
   }
   else
   {
