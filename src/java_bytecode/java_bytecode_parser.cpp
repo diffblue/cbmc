@@ -563,12 +563,22 @@ void java_bytecode_parsert::rbytecode(
 
   for(address=0; address<code_length; address++)
   {
+    bool wide_instruction=false;
+    unsigned start_of_instruction=address;
+    
     u1 bytecode=read_u1();
+    
+    if(bytecode==0xc4) // wide
+    {
+      wide_instruction=true;
+      address++;
+      bytecode=read_u1();
+    }
     
     instructions.push_back(instructiont());
     instructiont &instruction=instructions.back();
     instruction.statement=bytecodes[bytecode].mnemonic;
-    instruction.address=address;
+    instruction.address=start_of_instruction;
     
     switch(bytecodes[bytecode].format)
     {
@@ -576,8 +586,16 @@ void java_bytecode_parsert::rbytecode(
       break;
 
     case 'c': // a constant_pool index (one byte)
-      instruction.args.push_back(constant(read_u1()));
-      address+=1;
+      if(wide_instruction)
+      {
+        instruction.args.push_back(constant(read_u2()));
+        address+=2;
+      }
+      else
+      {
+        instruction.args.push_back(constant(read_u1()));
+        address+=1;
+      }
       break;
 
     case 'C': // a constant_pool index (two bytes)
@@ -619,6 +637,14 @@ void java_bytecode_parsert::rbytecode(
       break;
       
     case 'V': // local variable index (one byte) plus one signed byte
+      if(wide_instruction)
+      {
+        u2 v=read_u2();
+        instruction.args.push_back(from_integer(v, integer_typet()));
+        signed short c=read_u2();
+        instruction.args.push_back(from_integer(c, integer_typet()));
+      }
+      else
       {
         u1 v=read_u1();
         instruction.args.push_back(from_integer(v, integer_typet()));
