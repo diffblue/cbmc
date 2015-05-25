@@ -643,8 +643,8 @@ codet java_bytecode_convertt::convert_instructions(
     {
       const bool use_this(statement != "invokestatic");
       const bool is_virtual(statement == "invokevirtual" || statement == "invokeinterface");
-
-      code_typet &code_type(to_code_type(arg0.type()));
+      
+      code_typet &code_type=to_code_type(arg0.type());
       code_typet::parameterst &parameters(code_type.parameters());
 
       if(use_this)
@@ -673,8 +673,10 @@ codet java_bytecode_convertt::convert_instructions(
       {
         const exprt &this_arg(call.arguments().front());
         call.function() = make_vtable_function(arg0, this_arg);
-      } else
+      }
+      else
         call.function() = arg0;
+
       c = call;
     }
     else if(statement=="return")
