@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/std_types.h>
+#include <util/std_expr.h>
 #include <util/ieee_float.h>
 
 #include "java_types.h"
@@ -195,17 +196,38 @@ Function: java_array_type
 
 \*******************************************************************/
 
-pointer_typet java_array_type(const typet &subtype)
+pointer_typet java_array_type(
+  const typet &subtype,
+  const exprt &size)
 {
   struct_typet array_type;
+  
+  if(subtype==java_char_type())
+    array_type.set_tag("java_char_array");
+  else if(subtype==java_float_type())
+    array_type.set_tag("java_float_array");
+  else if(subtype==java_double_type())
+    array_type.set_tag("java_double_array");
+  else if(subtype==java_byte_type())
+    array_type.set_tag("java_byte_array");
+  else if(subtype==java_short_type())
+    array_type.set_tag("java_short_array");
+  else if(subtype==java_int_type())
+    array_type.set_tag("java_int_array");
+  else if(subtype==java_long_type())
+    array_type.set_tag("java_long_array");
+
   struct_typet::componentt length;
   length.set_name("length");
-  length.type() = java_int_type();
+  length.type()=java_int_type();
+  
   struct_typet::componentt data;
   data.set_name("data");
-  data.type() = pointer_typet(empty_typet());
+  data.type()=array_typet(subtype, size);
+
   array_type.components().push_back(length);
   array_type.components().push_back(data);
+
   return pointer_typet(array_type);
 }
 
@@ -316,8 +338,8 @@ typet java_type_from_string(const std::string &src)
   case '[': // array type
     {
       if(src.size()<=2) return nil_typet();
-      const typet subtype(java_type_from_string(src.substr(1, std::string::npos)));
-      return java_array_type(subtype);
+      const typet subtype=java_type_from_string(src.substr(1, std::string::npos));
+      return java_array_type(subtype, nil_exprt());
     }
     
   case 'F': return java_float_type();    
