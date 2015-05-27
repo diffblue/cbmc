@@ -83,12 +83,24 @@ public:
                         bvt &res, bvt &rem);
 
   literalt equal(const bvt &op0, const bvt &op1);
+  
+  static inline literalt sign_bit(const bvt &op)
+  {
+    return op[op.size()-1];
+  }
 
   literalt is_zero(const bvt &op)
   { return prop.lnot(prop.lor(op)); }
 
   literalt is_not_zero(const bvt &op)
   { return prop.lor(op); }
+  
+  literalt is_int_min(const bvt &op)
+  {
+    bvt tmp=op;
+    tmp[tmp.size()-1]=!tmp[tmp.size()-1];
+    return is_zero(tmp);
+  }
 
   literalt is_one(const bvt &op);
 
