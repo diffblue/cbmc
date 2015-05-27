@@ -564,12 +564,25 @@ literalt bv_utilst::overflow_add(
     // an overflow occurs if the signs of the two operands are the same
     // and the sign of the sum is the opposite
 
+    #if 0
     literalt old_sign=op0[op0.size()-1];
     literalt sign_the_same=prop.lequal(op0[op0.size()-1], op1[op1.size()-1]);
 
     literalt carry_out;
     bvt result=add(op0, op1);
     return prop.land(sign_the_same, prop.lxor(result[result.size()-1], old_sign));
+    
+    #else
+
+    // Overflow happens if a_{n−1} XOR b_{n−1} XOR c_n
+    // is true.
+    
+    return prop.lxor(prop.lxor(
+      op0.back(),
+      op1.back()),
+      carry_out(op0, op1, const_literal(false)));
+      
+    #endif
   }
   else if(rep==UNSIGNED)
   {
@@ -595,10 +608,17 @@ Function: bv_utilst::overflow_sub
 literalt bv_utilst::overflow_sub(
   const bvt &op0, const bvt &op1, representationt rep)
 {
-  // this needs to be fixed!!
   if(rep==SIGNED)
   {
-    return overflow_add(op0, negate(op1), SIGNED);
+    //return overflow_add(op0, negate(op1), SIGNED);
+
+    // Overflow happens if a_{n−1} XOR \neg b_{n−1} XOR c_n
+    // is true.
+    
+    return prop.lxor(prop.lxor(
+      op0.back(),
+      !op1.back()),
+      carry_out(op0, inverted(op1), const_literal(true)));
   }
   else if(rep==UNSIGNED)
   {
