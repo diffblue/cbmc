@@ -80,6 +80,9 @@ public:
   void swap(java_bytecode_parse_treet &other);
   void clear();
   void output(std::ostream &out) const;
+
+  typedef std::vector<irep_idt> class_refst;
+  class_refst class_refs;
 };
 
 #endif

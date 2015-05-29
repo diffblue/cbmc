@@ -11,13 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-#include <util/message.h>
-
-#include "java_bytecode_parse_tree.h"
-
 bool java_bytecode_parse(
   const std::string &file,
-  java_bytecode_parse_treet &,
-  message_handlert &);
+  class java_bytecode_parse_treet &,
+  class message_handlert &);
 
 #endif

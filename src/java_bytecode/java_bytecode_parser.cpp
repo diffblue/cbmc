@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/string_constant.h>
 
 #include "java_bytecode_parser.h"
+#include "java_bytecode_parse_tree.h"
 #include "java_types.h"
 #include "bytecode_info.h"
 
@@ -33,7 +34,7 @@ public:
   }
 
   virtual bool parse();
-  
+
   typedef java_bytecode_parse_treet::classest classest;
   typedef java_bytecode_parse_treet::classt classt;
   typedef java_bytecode_parse_treet::classt::memberst memberst;
@@ -42,21 +43,11 @@ public:
   typedef java_bytecode_parse_treet::instructiont instructiont;
   
   java_bytecode_parse_treet parse_tree;
- 
-protected: 
+
   typedef unsigned char u1;
   typedef unsigned short u2;
   typedef unsigned int u4;
   typedef unsigned long long u8;
-  
-  class bytecodet
-  {
-  public:
-    irep_idt mnemonic;
-    char format;
-  };
-  
-  std::vector<bytecodet> bytecodes;
   
   struct pool_entryt
   {
@@ -70,6 +61,16 @@ protected:
   
   typedef std::vector<pool_entryt> constant_poolt;
   constant_poolt constant_pool;
+ 
+protected: 
+  class bytecodet
+  {
+  public:
+    irep_idt mnemonic;
+    char format;
+  };
+  
+  std::vector<bytecodet> bytecodes;
   
   pool_entryt &pool_entry(u2 index)
   {
@@ -157,6 +158,21 @@ protected:
   }
 };
 
+#define CONSTANT_Class                7
+#define CONSTANT_Fieldref             9
+#define CONSTANT_Methodref           10
+#define CONSTANT_InterfaceMethodref  11
+#define CONSTANT_String               8
+#define CONSTANT_Integer              3
+#define CONSTANT_Float                4
+#define CONSTANT_Long                 5
+#define CONSTANT_Double               6
+#define CONSTANT_NameAndType         12
+#define CONSTANT_Utf8                 1
+#define CONSTANT_MethodHandle        15
+#define CONSTANT_MethodType          16
+#define CONSTANT_InvokeDynamic       18
+
 /*******************************************************************\
 
 Function: java_bytecode_parsert::parse
@@ -242,12 +258,13 @@ void java_bytecode_parsert::rClassFile()
   u2 super_class=read_u2();
 
   parsed_class.name=
-    constant(this_class).find(ID_type).get(ID_C_base_name);
+    constant(this_class).type().get(ID_C_base_name);
 
   parsed_class.extends=
-    constant(super_class).find(ID_type).get(ID_C_base_name);
+    constant(super_class).type().get(ID_C_base_name);
 
   rinterfaces(parsed_class);
+  
   rfields(parsed_class);
   rmethods(parsed_class);
   
@@ -255,6 +272,17 @@ void java_bytecode_parsert::rClassFile()
 
   for(unsigned j=0; j<attributes_count; j++)
     rclass_attribute(parsed_class);
+
+  // get the class references for the benefit of a dependency
+  // analysis.
+  for(constant_poolt::iterator
+      it=constant_pool.begin();
+      it!=constant_pool.end();
+      it++)
+  {
+    if(it->tag==CONSTANT_Class)
+      parse_tree.class_refs.push_back(it->expr.get(ID_C_base_name));
+  }
 }
 
 /*******************************************************************\
@@ -268,21 +296,6 @@ Function: java_bytecode_parsert::rconstant_pool
  Purpose:
 
 \*******************************************************************/
-
-#define CONSTANT_Class                7
-#define CONSTANT_Fieldref             9
-#define CONSTANT_Methodref           10
-#define CONSTANT_InterfaceMethodref  11
-#define CONSTANT_String               8
-#define CONSTANT_Integer              3
-#define CONSTANT_Float                4
-#define CONSTANT_Long                 5
-#define CONSTANT_Double               6
-#define CONSTANT_NameAndType         12
-#define CONSTANT_Utf8                 1
-#define CONSTANT_MethodHandle        15
-#define CONSTANT_MethodType          16
-#define CONSTANT_InvokeDynamic       18
 
 void java_bytecode_parsert::rconstant_pool()
 {
