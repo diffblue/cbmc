@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_vtable.h"
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
-#include "javap_parse.h"
 
 /*******************************************************************\
 
@@ -95,11 +94,7 @@ bool java_bytecode_languaget::parse(
 {
   // store the path
   parse_path=path;
-  #if 0
-  return javap_parse(path, parse_tree, get_message_handler());
-  #else
   return java_bytecode_parse(path, parse_tree, get_message_handler());
-  #endif
 }
              
 /*******************************************************************\
