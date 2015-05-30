@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/prefix.h>
 
-#include "../java_bytecode/java_bytecode_typecheck.h"
+#include "java_bytecode_typecheck.h"
 
 /*******************************************************************\
 
