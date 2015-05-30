@@ -65,6 +65,7 @@ public:
 protected:
   java_bytecode_parse_treet parse_tree;
   std::string parse_path;
+  irep_idt main_class;
 };
  
 languaget *new_java_bytecode_language();

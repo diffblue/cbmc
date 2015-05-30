@@ -27,6 +27,11 @@ Function: java_bytecode_parse_treet::swap
 void java_bytecode_parse_treet::classt::swap(
   classt &other)
 {
+  other.name.swap(name);
+  other.extends.swap(extends);
+  std::swap(other.is_abstract, is_abstract);
+  other.implements.swap(implements);
+  other.members.swap(members);
 }
 
 /*******************************************************************\
