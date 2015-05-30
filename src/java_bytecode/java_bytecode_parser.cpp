@@ -35,7 +35,6 @@ public:
 
   virtual bool parse();
 
-  typedef java_bytecode_parse_treet::classest classest;
   typedef java_bytecode_parse_treet::classt classt;
   typedef java_bytecode_parse_treet::classt::memberst memberst;
   typedef java_bytecode_parse_treet::membert membert;
@@ -250,8 +249,7 @@ void java_bytecode_parsert::rClassFile()
   
   rconstant_pool();
 
-  parse_tree.classes.push_back(classt());
-  classt &parsed_class=parse_tree.classes.back();
+  classt &parsed_class=parse_tree.parsed_class;
 
   u2 access_flags=read_u2();
   u2 this_class=read_u2();
@@ -901,21 +899,16 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
     u2 sourcefile_index=read_u2();
     irep_idt sourcefile_name=pool_entry(sourcefile_index).s;
     
-    for(classest::iterator c_it=parse_tree.classes.begin();
-        c_it!=parse_tree.classes.end();
-        c_it++)
+    for(memberst::iterator m_it=parsed_class.members.begin();
+        m_it!=parsed_class.members.end();
+        m_it++)
     {
-      for(memberst::iterator m_it=c_it->members.begin();
-          m_it!=c_it->members.end();
-          m_it++)
+      for(instructionst::iterator i_it=m_it->instructions.begin();
+          i_it!=m_it->instructions.end();
+          i_it++)
       {
-        for(instructionst::iterator i_it=m_it->instructions.begin();
-            i_it!=m_it->instructions.end();
-            i_it++)
-        {
-          if(!i_it->source_location.get_line().empty())
-            i_it->source_location.set_file(sourcefile_name);
-        }
+        if(!i_it->source_location.get_line().empty())
+          i_it->source_location.set_file(sourcefile_name);
       }
     }
   }
