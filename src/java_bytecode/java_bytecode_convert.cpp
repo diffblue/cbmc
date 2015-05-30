@@ -224,7 +224,7 @@ void java_bytecode_convertt::convert(const classt &c)
   
   // add before we do members
   if(symbol_table.move(new_symbol, class_symbol))
-    throw "failed to add class symbol";
+    throw "failed to add class symbol "+id2string(new_symbol.name);
 
   for(classt::memberst::const_iterator
       it=c.members.begin();
