@@ -1,6 +1,6 @@
 CORE
 if_icmp1.class
---function if_icmp1.main
+
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
