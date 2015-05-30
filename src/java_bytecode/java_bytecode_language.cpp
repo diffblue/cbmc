@@ -130,6 +130,9 @@ bool java_bytecode_languaget::typecheck(
       c_it!=java_class_loader.class_map.end();
       c_it++)
   {
+    if(c_it->second.parsed_class.name.empty())
+      continue;
+    debug() << "Converting class " << c_it->first << eom;
     if(java_bytecode_convert(
          c_it->second, symbol_table, get_message_handler()))
       return true;
