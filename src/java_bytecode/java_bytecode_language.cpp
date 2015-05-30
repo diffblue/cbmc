@@ -118,9 +118,10 @@ bool java_bytecode_languaget::typecheck(
   const std::string &module)
 {
   main_class=parse_tree.parsed_class.name;
-
+  
   // first get dependencies
   java_class_loadert java_class_loader;
+  java_class_loader.set_message_handler(get_message_handler());
   
   java_class_loader(parse_tree);
 

@@ -38,6 +38,8 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
     // do we have the class already?
     if(class_map.find(c)!=class_map.end())
       continue; // got it already
+
+    debug() << "Reading class " << c << eom;
       
     java_bytecode_parse_treet &parse_tree=class_map[c];
 
@@ -74,13 +76,15 @@ void java_class_loadert::operator()(java_bytecode_parse_treet &parse_tree)
 {
   // move into our class_map
   java_bytecode_parse_treet &p=class_map[parse_tree.parsed_class.name];
-  
-  p.swap(parse_tree);
 
+  p.swap(parse_tree);
+  
   // get any dependencies
   for(java_bytecode_parse_treet::class_refst::const_iterator
       it=p.class_refs.begin();
       it!=p.class_refs.end();
       it++)
+  {
     (*this)(*it);
+  }
 }
