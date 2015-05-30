@@ -66,20 +66,22 @@ public:
     }
 
     void output(std::ostream &out) const;
+    
+    void swap(classt &other);
   };
   
-  typedef std::list<classt> classest;
-  classest classes;
+  classt parsed_class;
   
-  inline classt &add_class()
+  void swap(java_bytecode_parse_treet &other)
   {
-    classes.push_back(classt());
-    return classes.back();
+    other.parsed_class.swap(parsed_class);
+    other.class_refs.swap(class_refs);
   }
 
-  void swap(java_bytecode_parse_treet &other);
-  void clear();
-  void output(std::ostream &out) const;
+  inline void output(std::ostream &out) const
+  {
+    parsed_class.output(out);
+  }
 
   typedef std::vector<irep_idt> class_refst;
   class_refst class_refs;
