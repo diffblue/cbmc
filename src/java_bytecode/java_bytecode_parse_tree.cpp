@@ -24,50 +24,9 @@ Function: java_bytecode_parse_treet::swap
 
 \*******************************************************************/
 
-void java_bytecode_parse_treet::swap(
-  java_bytecode_parse_treet &java_bytecode_parse_tree)
+void java_bytecode_parse_treet::classt::swap(
+  classt &other)
 {
-  java_bytecode_parse_tree.classes.swap(classes);
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::clear
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void java_bytecode_parse_treet::clear()
-{
-  classes.clear();
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void java_bytecode_parse_treet::output(std::ostream &out) const
-{
-  for(classest::const_iterator
-      it=classes.begin();
-      it!=classes.end();
-      it++)
-  {
-    it->output(out);
-  }
 }
 
 /*******************************************************************\
