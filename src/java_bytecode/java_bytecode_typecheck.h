@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool java_bytecode_typecheck(
   symbol_tablet &symbol_table,
-  const std::string &module,
   message_handlert &message_handler);
 
 bool java_bytecode_typecheck(
@@ -33,13 +32,11 @@ class java_bytecode_typecheckt:
 public:
   java_bytecode_typecheckt(
     symbol_tablet &_symbol_table,
-    const std::string &_module,
     message_handlert &_message_handler):
     typecheckt(_message_handler),
     namespacet(_symbol_table),
     src_symbol_table(_symbol_table),
     ns(dest_symbol_table),
-    module(_module),
     mode(ID_java)
   {
   }
@@ -53,7 +50,6 @@ protected:
   symbol_tablet &src_symbol_table;
   symbol_tablet dest_symbol_table;
   const namespacet ns;
-  const irep_idt module;
   const irep_idt mode;
 
   void typecheck_symbol(symbolt &symbol);

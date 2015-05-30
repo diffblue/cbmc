@@ -583,7 +583,8 @@ codet java_bytecode_convertt::convert_instructions(
             statement=="invokestatic")
     {
       const bool use_this(statement != "invokestatic");
-      const bool is_virtual(statement == "invokevirtual" || statement == "invokeinterface");
+      const bool is_virtual(
+        statement == "invokevirtual" || statement == "invokeinterface");
       
       code_typet &code_type=to_code_type(arg0.type());
       code_typet::parameterst &parameters(code_type.parameters());
@@ -593,8 +594,8 @@ codet java_bytecode_convertt::convert_instructions(
         if(parameters.empty() || !parameters[0].get_bool(ID_C_this))
         {
           // TODO: java_reference_type
-          const empty_typet empty;
-          const pointer_typet this_pointer(empty);
+          empty_typet empty_type;
+          const pointer_typet this_pointer(empty_type);
           code_typet::parametert this_p(this_pointer);
           this_p.set(ID_C_this, true);
           parameters.insert(parameters.begin(), this_p);
@@ -602,11 +603,12 @@ codet java_bytecode_convertt::convert_instructions(
       }
 
       code_function_callt call;
+      call.add_source_location()=i_it->source_location;
       call.arguments() = pop(parameters.size());
 
       const typet &return_type=code_type.return_type();
 
-      if (ID_empty != return_type.id())
+      if(ID_empty != return_type.id())
       {
         call.lhs() = tmp_variable(return_type);
         results.resize(1);
@@ -615,8 +617,8 @@ codet java_bytecode_convertt::convert_instructions(
 
       if(is_virtual)
       {
-        const exprt &this_arg=call.arguments().front();
         #if 0
+        const exprt &this_arg=call.arguments().front();
         call.function() = make_vtable_function(arg0, this_arg);
         #else
         call.function() = arg0;
@@ -625,6 +627,7 @@ codet java_bytecode_convertt::convert_instructions(
       else
         call.function() = arg0;
 
+      call.function().add_source_location()=i_it->source_location;
       c = call;
     }
     else if(statement=="return")
@@ -1181,7 +1184,6 @@ Function: java_bytecode_convert
 bool java_bytecode_convert(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
-  const std::string &module,
   message_handlert &message_handler)
 {
   java_bytecode_convertt java_bytecode_convert(

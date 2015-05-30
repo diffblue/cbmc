@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_vtable.h"
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
+#include "java_class_loader.h"
 
 /*******************************************************************\
 
@@ -94,7 +95,10 @@ bool java_bytecode_languaget::parse(
 {
   // store the path
   parse_path=path;
-  return java_bytecode_parse(path, parse_tree, get_message_handler());
+  if(java_bytecode_parse(path, parse_tree, get_message_handler()))
+    return true;
+
+  return false;
 }
              
 /*******************************************************************\
@@ -113,25 +117,27 @@ bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  symbol_tablet new_symbol_table;
+  main_class=parse_tree.parsed_class.name;
 
-  if(java_bytecode_convert(
-       parse_tree, new_symbol_table, module, get_message_handler()))
-    return true;
+  // first get dependencies
+  java_class_loadert java_class_loader;
+  
+  java_class_loader(parse_tree);
 
+  // now convert all
+  for(java_class_loadert::class_mapt::const_iterator
+      c_it=java_class_loader.class_map.begin();
+      c_it!=java_class_loader.class_map.end();
+      c_it++)
+  {
+    if(java_bytecode_convert(
+         c_it->second, symbol_table, get_message_handler()))
+      return true;
+  }
+
+  // now typecheck
   if(java_bytecode_typecheck(
-       new_symbol_table, module, get_message_handler()))
-    return true;
-
-//  symbol_table.swap(new_symbol_table);
-
-  if(java_bytecode_load_class(symbol_table, new_symbol_table, get_message_handler()))
-    return true;
-
-  /*if(linking(symbol_table, new_symbol_table, get_message_handler()))
-    return true;*/
-
-  if(java_bytecode_vtable(symbol_table, module))
+       symbol_table, get_message_handler()))
     return true;
 
   return false;
@@ -156,7 +162,8 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
   */
   java_internal_additions(symbol_table);
 
-  if(java_entry_point(symbol_table, get_message_handler())) return true;
+  if(java_entry_point(symbol_table, main_class, get_message_handler()))
+    return true;
   
   return false;
 }

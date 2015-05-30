@@ -133,6 +133,7 @@ Function: java_entry_point
 
 bool java_entry_point(
   symbol_tablet &symbol_table,
+  const irep_idt &main_class,
   message_handlert &message_handler)
 {
   // check if the entry point is already there
@@ -140,12 +141,18 @@ bool java_entry_point(
      symbol_table.symbols.end())
     return false; // silently ignore
 
-  // are we given anything?
+  std::string entry_method;
 
-  if(config.main=="")
-    return false; // no, give up silently
+  // are we given a function?
+  if(config.main.empty())
+  {
+    // use main class
+    entry_method=id2string(main_class)+".main";
+  }
+  else
+    entry_method=id2string(config.main);
 
-  std::string prefix="java::"+id2string(config.main)+":";
+  std::string prefix="java::"+entry_method+":";
 
   // look it up
   std::set<irep_idt> matches;

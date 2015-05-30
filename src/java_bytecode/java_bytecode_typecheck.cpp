@@ -116,11 +116,10 @@ Function: java_bytecode_typecheck
 
 bool java_bytecode_typecheck(
   symbol_tablet &symbol_table,
-  const std::string &module,
   message_handlert &message_handler)
 {
   java_bytecode_typecheckt java_bytecode_typecheck(
-    symbol_table, module, message_handler);
+    symbol_table, message_handler);
   return java_bytecode_typecheck.typecheck_main();
 }
 

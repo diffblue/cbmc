@@ -23,7 +23,8 @@ Function:
 
 \*******************************************************************/
 
-void java_class_loadert::operator()(const irep_idt &class_name)
+java_bytecode_parse_treet &java_class_loadert::operator()(
+  const irep_idt &class_name)
 {
   std::stack<irep_idt> queue;
 
@@ -52,7 +53,9 @@ void java_class_loadert::operator()(const irep_idt &class_name)
         it!=parse_tree.class_refs.end();
         it++)
       queue.push(*it);
-  }  
+  }
+  
+  return class_map[class_name];
 }
 
 /*******************************************************************\
