@@ -66,7 +66,7 @@ public:
 
   void operator()(const java_bytecode_parse_treet &parse_tree)
   {
-    convert(parse_tree);
+    convert(parse_tree.parsed_class);
   }
 
   typedef java_bytecode_parse_treet::classt classt;
@@ -156,7 +156,6 @@ protected:
   }
 
   // conversion
-  void convert(const java_bytecode_parse_treet &parse_tree);
   void convert(const classt &c);
   void convert(symbolt &class_symbol, const membert &m);
   void convert(const instructiont &i);
@@ -165,28 +164,6 @@ protected:
 
   static const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 };
-
-/*******************************************************************\
-
-Function: java_bytecode_convertt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void java_bytecode_convertt::convert(
-  const java_bytecode_parse_treet &parse_tree)
-{
-  for(java_bytecode_parse_treet::classest::const_iterator
-      it=parse_tree.classes.begin();
-      it!=parse_tree.classes.end();
-      it++)
-    convert(*it);
-}
 
 namespace {
 const char JAVA_NS[] = "java::";

@@ -17,6 +17,7 @@ class java_class_loadert:public messaget
 {
 public:
   void operator()(const irep_idt &);
+  void operator()(java_bytecode_parse_treet &);
   
   // maps class names to the parse trees
   typedef std::map<irep_idt, java_bytecode_parse_treet> class_mapt;
