@@ -45,7 +45,7 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
 
     // parse the class file
     java_bytecode_parse(
-      id2string(c),
+      id2string(c)+".class",
       parse_tree,
       get_message_handler());
 
