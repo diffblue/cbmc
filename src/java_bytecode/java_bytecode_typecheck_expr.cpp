@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_sizeof.h>
 
-#include "../java_bytecode/java_bytecode_typecheck.h"
+#include "java_bytecode_typecheck.h"
 
 /*******************************************************************\
 

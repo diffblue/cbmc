@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/expr2c.h>
 #endif
 
-#include "../java_bytecode/java_bytecode_typecheck.h"
+#include "java_bytecode_typecheck.h"
 
 /*******************************************************************\
 
