@@ -28,7 +28,7 @@ Function: java_bytecode_typecheckt::to_string
 
 std::string java_bytecode_typecheckt::to_string(const exprt &expr)
 { 
-  return expr2c(expr, *this);
+  return expr2c(expr, ns);
 }
 
 /*******************************************************************\
@@ -45,12 +45,12 @@ Function: java_bytecode_typecheckt::to_string
 
 std::string java_bytecode_typecheckt::to_string(const typet &type)
 { 
-  return type2c(type, *this);
+  return type2c(type, ns);
 }
 
 /*******************************************************************\
 
-Function: java_bytecode_typecheckt::typecheck_symbol
+Function: java_bytecode_typecheckt::typecheck_non_type_symbol
 
   Inputs:
 
@@ -60,10 +60,14 @@ Function: java_bytecode_typecheckt::typecheck_symbol
 
 \*******************************************************************/
 
-void java_bytecode_typecheckt::typecheck_symbol(symbolt &symbol)
+void java_bytecode_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
 {
+  assert(!symbol.is_type);
+  debug("X1");
   typecheck_type(symbol.type);
+  debug("X2");
   typecheck_expr(symbol.value);
+  debug("X3");
 }
 
 /*******************************************************************\
@@ -80,26 +84,51 @@ Function: java_bytecode_typecheckt::typecheck
 
 void java_bytecode_typecheckt::typecheck()
 {
-  // we add symbols, so the iterators won't be stable
+  // This is complicated by the fact that hash_map iterators
+  // get invalidated when inserting!
+  // The references stay valid, luckily.
+  
+  std::vector<irep_idt> symbols;
+  symbols.reserve(symbol_table.symbols.size());
+  
   for(symbol_tablet::symbolst::iterator
-      s_it=src_symbol_table.symbols.begin();
-      s_it!=src_symbol_table.symbols.end();
+      s_it=symbol_table.symbols.begin();
+      s_it!=symbol_table.symbols.end();
+      s_it++)
+    symbols.push_back(s_it->first);
+  
+  // We first check all type symbols,
+  // recursively doing base classes first.
+  for(std::vector<irep_idt>::const_iterator
+      s_it=symbols.begin();
+      s_it!=symbols.end();
       s_it++)
   {
-    typecheck_symbol(s_it->second);
-    if(dest_symbol_table.add(s_it->second))
-    {
-      symbolt &symbol(dest_symbol_table.lookup(s_it->second.name));
-      // TODO: Fully update incomplete symbol?
-      if(symbol.value.is_nil() && s_it->second.value.is_not_nil())
-      {
-        symbol.value = s_it->second.value;
-        symbol.type = s_it->second.type;
-      }
-    }
+    symbolt &symbol=symbol_table.symbols[*s_it];
+    
+    if(!symbol.is_type)
+      continue;
+  
+    // already done?
+    if(!already_typechecked.insert(*s_it).second)
+      continue;
+  
+    typecheck_type_symbol(symbol);
   }
-  // now swap dest and src
-  src_symbol_table.swap(dest_symbol_table);
+
+  // We now check all non-type symbols
+  for(std::vector<irep_idt>::const_iterator
+      s_it=symbols.begin();
+      s_it!=symbols.end();
+      s_it++)
+  {
+    symbolt &symbol=symbol_table.symbols[*s_it];
+    
+    if(symbol.is_type)
+      continue;
+
+    typecheck_non_type_symbol(symbol);
+  }
 }
 
 /*******************************************************************\
