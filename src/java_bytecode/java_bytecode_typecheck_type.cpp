@@ -29,16 +29,18 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
   {
     irep_idt identifier=to_symbol_type(type).get_identifier();
     
-    symbol_tablet::symbolst::const_iterator s_it1=
-      src_symbol_table.symbols.find(identifier);
+    symbol_tablet::symbolst::const_iterator s_it=
+      symbol_table.symbols.find(identifier);
     
-    // does it exist already in the destination symbol table?
-    symbol_tablet::symbolst::const_iterator s_it2=
-      dest_symbol_table.symbols.find(identifier);
-    
-    if(s_it1==src_symbol_table.symbols.end() &&
-       s_it2==dest_symbol_table.symbols.end())
+    // does it exist already in the symbol table?
+    if(s_it!=symbol_table.symbols.end())
     {
+      // yes, got it
+      assert(s_it->second.is_type);
+    }
+    else
+    {
+      // No, not there. Must be class we failed to load.
       assert(has_prefix(id2string(identifier), "java::"));
     
       // no, create the symbol
@@ -47,25 +49,21 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
       new_symbol.is_type=true;
       new_symbol.type=class_typet();
       new_symbol.type.set(ID_incomplete_class, true);
-      //new_symbol.type.id(ID_incomplete_struct);
       new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
       new_symbol.mode=ID_java;
       
-      dest_symbol_table.add(new_symbol);
-      
-      s_it2=dest_symbol_table.symbols.find(identifier);
-      assert(s_it2!=dest_symbol_table.symbols.end());
-    }
-    else
-    {
-      // yes!
+      if(symbol_table.add(new_symbol))
+        throw "failed to add an incomplete class symbol";
     }
   }
   else if(type.id()==ID_pointer)
+  {
     typecheck_type(type.subtype());
+  }
   else if(type.id()==ID_array)
   {
     typecheck_type(type.subtype());
+    typecheck_expr(to_array_type(type).size());
   }
   else if(type.id()==ID_code)
   {
@@ -76,4 +74,23 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
         it=parameters.begin(); it!=parameters.end(); it++)
       typecheck_type(it->type());
   }
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_type_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_typecheckt::typecheck_type_symbol(symbolt &symbol)
+{
+  assert(symbol.is_type);
+  
+  typecheck_type(symbol.type);
 }
