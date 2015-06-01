@@ -678,6 +678,24 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
 
 /*******************************************************************\
 
+Function: float_utilst::rem
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bvt float_utilst::rem(const bvt &src1, const bvt &src2)
+{
+  // stub: do src1-(src1/src2)*src2
+  return sub(src1, mul(div(src1, src2), src2));
+}
+
+/*******************************************************************\
+
 Function: float_utilst::negate
 
   Inputs:

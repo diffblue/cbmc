@@ -22,6 +22,10 @@ Function: boolbvt::convert_mod
 
 void boolbvt::convert_mod(const mod_exprt &expr, bvt &bv)
 {
+  if(expr.type().id()==ID_floatbv)
+  {
+  }
+
   if(expr.type().id()!=ID_unsignedbv &&
      expr.type().id()!=ID_signedbv)
     return conversion_failed(expr, bv);

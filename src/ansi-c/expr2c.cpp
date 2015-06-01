@@ -4169,6 +4169,9 @@ std::string expr2ct::convert(
   else if(src.id()==ID_floatbv_div)
     return convert_function(src, "FLOAT/", precedence=16);
 
+  else if(src.id()==ID_floatbv_rem)
+    return convert_function(src, "FLOAT%", precedence=16);
+
   else if(src.id()==ID_floatbv_typecast)
   {
     #if 1

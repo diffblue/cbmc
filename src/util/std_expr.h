@@ -794,6 +794,48 @@ extern inline mod_exprt &to_mod_expr(exprt &expr)
   return static_cast<mod_exprt &>(expr);
 }
 
+/*! \brief remainder of division
+*/
+class rem_exprt:public binary_exprt
+{
+public:
+  inline rem_exprt():binary_exprt(ID_rem)
+  {
+  }
+
+  inline rem_exprt(
+    const exprt &_lhs,
+    const exprt &_rhs):
+    binary_exprt(_lhs, ID_rem, _rhs)
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref rem_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * rem_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref rem_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const rem_exprt &to_rem_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_rem && expr.operands().size()==2);
+  return static_cast<const rem_exprt &>(expr);
+}
+
+/*! \copydoc to_rem_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline rem_exprt &to_rem_expr(exprt &expr)
+{
+  assert(expr.id()==ID_rem && expr.operands().size()==2);
+  return static_cast<rem_exprt &>(expr);
+}
+
 /*! \brief exponentiation
  */
 class power_exprt:public binary_exprt

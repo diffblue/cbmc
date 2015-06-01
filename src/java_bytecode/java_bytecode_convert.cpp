@@ -912,39 +912,13 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.size()==1);
       results[0]=unary_minus_exprt(op[0], op[0].type());
     }
-    else if(statement=="frem" || statement=="drem")
-    {
-      assert(op.size()==2 && results.size()==1);
-
-      std::string function("java::__CPROVER.__java_bytecode_");
-      const bool is_float(statement == "frem");
-
-      if(is_float)
-        function += "frem:(FF)F";
-      else
-        function += "drem:(DD)D";
-
-      const typet type(is_float ? java_float_type() : java_double_type());
-      code_typet function_type;
-      function_type.return_type() = type;
-
-      const code_typet::parametert param(type);
-      function_type.parameters().push_back(param);
-      function_type.parameters().push_back(param);
-
-      code_function_callt call;
-      call.lhs() = tmp_variable(type);
-      call.function() = symbol_exprt(function, function_type);
-      call.arguments().push_back(op[0]);
-      call.arguments().push_back(op[1]);
-
-      results[0]=call.lhs();
-      c = call;
-    }
     else if(statement==patternt("?rem"))
     {
       assert(op.size()==2 && results.size()==1);
-      results[0]=mod_exprt(op[0], op[1]);
+      if(statement=="frem" || statement=="drem")
+        results[0]=rem_exprt(op[0], op[1]);
+      else
+        results[0]=mod_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?cmp"))
     {
