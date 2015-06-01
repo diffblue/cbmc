@@ -36,9 +36,11 @@ public:
   virtual bool parse();
 
   typedef java_bytecode_parse_treet::classt classt;
-  typedef java_bytecode_parse_treet::classt::memberst memberst;
-  typedef java_bytecode_parse_treet::membert membert;
-  typedef java_bytecode_parse_treet::membert::instructionst instructionst;
+  typedef java_bytecode_parse_treet::classt::fieldst fieldst;
+  typedef java_bytecode_parse_treet::classt::methodst methodst;
+  typedef java_bytecode_parse_treet::methodt methodt;
+  typedef java_bytecode_parse_treet::fieldt fieldt;
+  typedef java_bytecode_parse_treet::methodt::instructionst instructionst;
   typedef java_bytecode_parse_treet::instructiont instructiont;
   
   java_bytecode_parse_treet parse_tree;
@@ -102,9 +104,9 @@ protected:
   void rmethods(classt &parsed_class);
   void rmethod(classt &parsed_class);
   void rclass_attribute(classt &parsed_class);
-  void rmember_attribute(membert &member);
-  void rcode_attribute(membert &member);
-  void rbytecode(membert::instructionst &);
+  void rmethod_attribute(methodt &method);
+  void rcode_attribute(methodt &method);
+  void rbytecode(methodt::instructionst &);
   
   void skip_bytes(unsigned bytes) const
   {
@@ -527,20 +529,22 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
 
   for(unsigned i=0; i<fields_count; i++)
   {
-    parsed_class.members.push_back(membert());
-    membert &member=parsed_class.members.back();
+    fieldt &field=parsed_class.add_field();
     
     u2 access_flags=read_u2();
     u2 name_index=read_u2();
     u2 descriptor_index=read_u2();
     u2 attributes_count=read_u2();
     
-    member.is_method=false;
-    member.name=pool_entry(name_index).s;
-    member.signature=id2string(pool_entry(descriptor_index).s);
+    field.name=pool_entry(name_index).s;
+    field.signature=id2string(pool_entry(descriptor_index).s);
 
     for(unsigned j=0; j<attributes_count; j++)
-      rmember_attribute(member);
+    {
+      u2 attribute_name_index=read_u2();
+      u4 attribute_length=read_u4();
+      skip_bytes(attribute_length);
+    }
   }
 }
 
@@ -566,7 +570,7 @@ Function: java_bytecode_parsert::rbytecode
 #define T_LONG   11
 
 void java_bytecode_parsert::rbytecode(
-  membert::instructionst &instructions)
+  methodt::instructionst &instructions)
 {
   u4 code_length=read_u4();
   
@@ -765,7 +769,7 @@ void java_bytecode_parsert::rbytecode(
 
 /*******************************************************************\
 
-Function: java_bytecode_parsert::rmember_attribute
+Function: java_bytecode_parsert::rmethod_attribute
 
   Inputs:
 
@@ -775,7 +779,7 @@ Function: java_bytecode_parsert::rmember_attribute
 
 \*******************************************************************/
 
-void java_bytecode_parsert::rmember_attribute(membert &member)
+void java_bytecode_parsert::rmethod_attribute(methodt &method)
 {
   u2 attribute_name_index=read_u2();
   u4 attribute_length=read_u4();
@@ -787,7 +791,7 @@ void java_bytecode_parsert::rmember_attribute(membert &member)
     u2 max_stack=read_u2();
     u2 max_locals=read_u2();
 
-    rbytecode(member.instructions);
+    rbytecode(method.instructions);
 
     u2 exception_table_length=read_u2();
 
@@ -802,14 +806,14 @@ void java_bytecode_parsert::rmember_attribute(membert &member)
     u2 attributes_count=read_u2();
 
     for(unsigned j=0; j<attributes_count; j++)
-      rcode_attribute(member);
+      rcode_attribute(method);
       
     irep_idt line_number;
       
     // add missing line numbers
-    for(membert::instructionst::iterator
-        it=member.instructions.begin(); 
-        it!=member.instructions.end();
+    for(methodt::instructionst::iterator
+        it=method.instructions.begin(); 
+        it!=method.instructions.end();
         it++)
     {
       if(!it->source_location.get_line().empty())
@@ -835,7 +839,7 @@ Function: java_bytecode_parsert::rcode_attribute
 
 \*******************************************************************/
 
-void java_bytecode_parsert::rcode_attribute(membert &member)
+void java_bytecode_parsert::rcode_attribute(methodt &method)
 {
   u2 attribute_name_index=read_u2();
   u4 attribute_length=read_u4();
@@ -845,12 +849,12 @@ void java_bytecode_parsert::rcode_attribute(membert &member)
   if(attribute_name=="LineNumberTable")
   {
     // address -> instructiont
-    typedef std::map<unsigned, membert::instructionst::iterator> instruction_mapt;
+    typedef std::map<unsigned, methodt::instructionst::iterator> instruction_mapt;
     instruction_mapt instruction_map;
 
-    for(membert::instructionst::iterator
-        it=member.instructions.begin(); 
-        it!=member.instructions.end();
+    for(methodt::instructionst::iterator
+        it=method.instructions.begin(); 
+        it!=method.instructions.end();
         it++)
     {
       instruction_map[it->address]=it;
@@ -899,8 +903,8 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
     u2 sourcefile_index=read_u2();
     irep_idt sourcefile_name=pool_entry(sourcefile_index).s;
     
-    for(memberst::iterator m_it=parsed_class.members.begin();
-        m_it!=parsed_class.members.end();
+    for(methodst::iterator m_it=parsed_class.methods.begin();
+        m_it!=parsed_class.methods.end();
         m_it++)
     {
       for(instructionst::iterator i_it=m_it->instructions.begin();
@@ -964,25 +968,23 @@ Function: java_bytecode_parsert::rmethod
 
 void java_bytecode_parsert::rmethod(classt &parsed_class)
 {
-  parsed_class.members.push_back(membert());
-  membert &member=parsed_class.members.back();
+  methodt &method=parsed_class.add_method();
 
   u2 access_flags=read_u2();
   u2 name_index=read_u2();
   u2 descriptor_index=read_u2();
   
-  member.is_method=true;
-  member.is_static=access_flags&ACC_STATIC;
-  member.is_abstract=access_flags&ACC_ABSTRACT;
-  member.is_public=access_flags&ACC_PUBLIC;
-  member.name=pool_entry(name_index).s;
-  member.base_name=pool_entry(name_index).s;
-  member.signature=id2string(pool_entry(descriptor_index).s);
+  method.is_static=access_flags&ACC_STATIC;
+  method.is_abstract=access_flags&ACC_ABSTRACT;
+  method.is_public=access_flags&ACC_PUBLIC;
+  method.name=pool_entry(name_index).s;
+  method.base_name=pool_entry(name_index).s;
+  method.signature=id2string(pool_entry(descriptor_index).s);
 
   u2 attributes_count=read_u2();
 
   for(unsigned j=0; j<attributes_count; j++)
-    rmember_attribute(member);
+    rmethod_attribute(method);
 }
 
 /*******************************************************************\

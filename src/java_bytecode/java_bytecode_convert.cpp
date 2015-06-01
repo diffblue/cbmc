@@ -70,9 +70,10 @@ public:
   }
 
   typedef java_bytecode_parse_treet::classt classt;
-  typedef java_bytecode_parse_treet::membert membert;
+  typedef java_bytecode_parse_treet::methodt methodt;
+  typedef java_bytecode_parse_treet::fieldt fieldt;
   typedef java_bytecode_parse_treet::instructiont instructiont;
-  typedef membert::instructionst instructionst;
+  typedef methodt::instructionst instructionst;
 
 protected:
   symbol_tablet &symbol_table;
@@ -157,7 +158,8 @@ protected:
 
   // conversion
   void convert(const classt &c);
-  void convert(symbolt &class_symbol, const membert &m);
+  void convert(symbolt &class_symbol, const fieldt &f);
+  void convert(symbolt &class_symbol, const methodt &m);
   void convert(const instructiont &i);
   typet convert(const typet &type);
   codet convert_instructions(const instructionst &);
@@ -226,9 +228,15 @@ void java_bytecode_convertt::convert(const classt &c)
   if(symbol_table.move(new_symbol, class_symbol))
     throw "failed to add class symbol "+id2string(new_symbol.name);
 
-  for(classt::memberst::const_iterator
-      it=c.members.begin();
-      it!=c.members.end();
+  for(classt::fieldst::const_iterator
+      it=c.fields.begin();
+      it!=c.fields.end();
+      it++)
+    convert(*class_symbol, *it);
+
+  for(classt::methodst::const_iterator
+      it=c.methods.begin();
+      it!=c.methods.end();
       it++)
     convert(*class_symbol, *it);
 }
@@ -318,94 +326,112 @@ Function: java_bytecode_convertt::convert
 
 void java_bytecode_convertt::convert(
   symbolt &class_symbol,
-  const membert &m)
+  const methodt &m)
 {
   class_typet &class_type=to_class_type(class_symbol.type);
 
   typet member_type=java_type_from_string(m.signature);
 
-  if(member_type.id()==ID_code)
+  assert(member_type.id()==ID_code);
+
+  const irep_idt method_identifier=
+    id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
+
+  code_typet &code_type=to_code_type(member_type);
+  code_typet::parameterst &parameters=code_type.parameters();
+
+  // do we need to add 'this' as a parameter?
+  if(!m.is_static)
   {
-    const irep_idt method_identifier=
-      id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
-
-    code_typet &code_type=to_code_type(member_type);
-    code_typet::parameterst &parameters=code_type.parameters();
-
-    // do we need to add 'this' as a parameter?
-    if(!m.is_static)
-    {
-      code_typet::parametert this_p;
-      this_p.type()=java_reference_type(symbol_typet(class_symbol.name));
-      this_p.set(ID_C_this, true);
-      parameters.insert(parameters.begin(), this_p);
-    }
-
-    // assign names to parameters
-    for(size_t i=0, param_index=0;
-        i < parameters.size(); ++i)
-    {
-      irep_idt base_name="arg"+i2string(param_index);
-      const typet &type=parameters[i].type();
-      irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_type(type);
-      parameters[i].set_base_name(base_name);
-      parameters[i].set_identifier(identifier);
-
-      // add to symbol table
-      parameter_symbolt parameter_symbol;
-      parameter_symbol.base_name=base_name;
-      parameter_symbol.mode=ID_java;
-      parameter_symbol.name=identifier;
-      parameter_symbol.type=parameters[i].type();
-      symbol_table.add(parameter_symbol);
-      param_index+=get_variable_slots(parameters[i]);
-    }
-
-    class_type.methods().push_back(class_typet::methodt());
-    class_typet::methodt &method=class_type.methods().back();
-
-    method.set_base_name(m.base_name);
-    method.set_name(method_identifier);
-
-    const bool is_virtual=!m.is_static;
-
-    method.set(ID_abstract, m.is_abstract);
-    method.set(ID_is_virtual, is_virtual);
-
-    if(is_virtual)
-      set_virtual_name(method);
-
-    if(is_contructor(class_symbol.base_name, method))
-      method.set(ID_constructor, true);
-
-    method.type()=member_type;
-
-    // create method symbol
-    symbolt method_symbol;
-    method_symbol.mode=ID_java;
-    method_symbol.name=method.get_name();
-    method_symbol.base_name=method.get_base_name();
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(method.get_base_name())+"()";
-    method_symbol.type=member_type;
-    current_method=method_symbol.name;
-    number_of_parameters=count_java_parameter_slots(parameters);
-    tmp_counter=0;
-    method_symbol.value=convert_instructions(m.instructions);
-    symbol_table.add(method_symbol);
-
-    if(is_virtual)
-      create_vtable_type_and_pointer(symbol_table, class_symbol);
+    code_typet::parametert this_p;
+    this_p.type()=java_reference_type(symbol_typet(class_symbol.name));
+    this_p.set(ID_C_this, true);
+    parameters.insert(parameters.begin(), this_p);
   }
-  else
+
+  // assign names to parameters
+  for(size_t i=0, param_index=0;
+      i < parameters.size(); ++i)
   {
-    class_type.components().push_back(class_typet::componentt());
-    class_typet::componentt &component=class_type.components().back();
+    irep_idt base_name="arg"+i2string(param_index);
+    const typet &type=parameters[i].type();
+    irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_type(type);
+    parameters[i].set_base_name(base_name);
+    parameters[i].set_identifier(identifier);
 
-    component.set_name(m.name);
-    component.set_base_name(m.base_name);
-    component.type()=member_type;
+    // add to symbol table
+    parameter_symbolt parameter_symbol;
+    parameter_symbol.base_name=base_name;
+    parameter_symbol.mode=ID_java;
+    parameter_symbol.name=identifier;
+    parameter_symbol.type=parameters[i].type();
+    symbol_table.add(parameter_symbol);
+    param_index+=get_variable_slots(parameters[i]);
   }
+
+  class_type.methods().push_back(class_typet::methodt());
+  class_typet::methodt &method=class_type.methods().back();
+
+  method.set_base_name(m.base_name);
+  method.set_name(method_identifier);
+
+  const bool is_virtual=!m.is_static;
+
+  method.set(ID_abstract, m.is_abstract);
+  method.set(ID_is_virtual, is_virtual);
+
+  if(is_virtual)
+    set_virtual_name(method);
+
+  if(is_contructor(class_symbol.base_name, method))
+    method.set(ID_constructor, true);
+
+  method.type()=member_type;
+
+  // create method symbol
+  symbolt method_symbol;
+  method_symbol.mode=ID_java;
+  method_symbol.name=method.get_name();
+  method_symbol.base_name=method.get_base_name();
+  method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
+                            id2string(method.get_base_name())+"()";
+  method_symbol.type=member_type;
+  current_method=method_symbol.name;
+  number_of_parameters=count_java_parameter_slots(parameters);
+  tmp_counter=0;
+  method_symbol.value=convert_instructions(m.instructions);
+  symbol_table.add(method_symbol);
+
+  if(is_virtual)
+    create_vtable_type_and_pointer(symbol_table, class_symbol);
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_convertt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_convertt::convert(
+  symbolt &class_symbol,
+  const fieldt &f)
+{
+  class_typet &class_type=to_class_type(class_symbol.type);
+
+  typet member_type=java_type_from_string(f.signature);
+
+  class_type.components().push_back(class_typet::componentt());
+  class_typet::componentt &component=class_type.components().back();
+
+  component.set_name(f.name);
+  component.set_base_name(f.name);
+  component.type()=member_type;
 }
 
 /*******************************************************************\

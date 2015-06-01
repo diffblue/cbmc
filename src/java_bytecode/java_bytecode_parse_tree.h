@@ -28,8 +28,21 @@ public:
   {
   public:
     std::string signature;
-    irep_idt base_name, name;
-    bool is_method, is_static, is_native, is_abstract, is_public;
+    irep_idt name;
+    bool is_public, is_static;
+    
+    virtual void output(std::ostream &out) const = 0;
+    
+    inline membert():is_public(false), is_static(false)
+    {
+    }
+  };
+  
+  class methodt:public membert
+  {
+  public:
+    irep_idt base_name;
+    bool is_native, is_abstract;
 
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
@@ -40,12 +53,17 @@ public:
       return instructions.back();
     }
 
-    void output(std::ostream &out) const;
+    virtual void output(std::ostream &out) const;
     
-    inline membert():is_method(false), is_static(false), is_native(false), is_abstract(false),
-                     is_public(false)
+    inline methodt():is_native(false), is_abstract(false)
     {
     }
+  };
+  
+  class fieldt:public membert
+  {
+  public:
+    virtual void output(std::ostream &out) const;
   };
   
   class classt
@@ -56,13 +74,21 @@ public:
     typedef std::list<irep_idt> implementst;
     implementst implements;
     
-    typedef std::list<membert> memberst;
-    memberst members;
+    typedef std::list<fieldt> fieldst;
+    typedef std::list<methodt> methodst;
+    fieldst fields;
+    methodst methods;
     
-    inline membert &add_member()
+    inline fieldt &add_field()
     {
-      members.push_back(membert());
-      return members.back();
+      fields.push_back(fieldt());
+      return fields.back();
+    }
+
+    inline methodt &add_method()
+    {
+      methods.push_back(methodt());
+      return methods.back();
     }
 
     void output(std::ostream &out) const;
