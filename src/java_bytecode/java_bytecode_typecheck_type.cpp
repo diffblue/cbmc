@@ -42,13 +42,18 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
     {
       // No, not there. Must be class we failed to load.
       assert(has_prefix(id2string(identifier), "java::"));
+      
+      class_typet dummy_type;
+      dummy_type.set(ID_incomplete_class, true);
+      dummy_type.components().push_back(class_typet::componentt());
+      dummy_type.components().back().type()=bool_typet();
+      dummy_type.components().back().set_name("dummy");
     
       // no, create the symbol
       symbolt new_symbol;
       new_symbol.name=identifier;
       new_symbol.is_type=true;
-      new_symbol.type=class_typet();
-      new_symbol.type.set(ID_incomplete_class, true);
+      new_symbol.type=dummy_type;
       new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
       new_symbol.mode=ID_java;
       
