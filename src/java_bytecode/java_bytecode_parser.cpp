@@ -281,7 +281,7 @@ void java_bytecode_parsert::rClassFile()
       it++)
   {
     if(it->tag==CONSTANT_Class)
-      parse_tree.class_refs.push_back(it->expr.type().get(ID_C_base_name));
+      parse_tree.class_refs.insert(it->expr.type().get(ID_C_base_name));
   }
 }
 

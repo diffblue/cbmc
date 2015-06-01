@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_PARSE_TREE_H
 #define CPROVER_JAVA_BYTECODE_PARSE_TREE_H
 
+#include <set>
+
 #include <util/std_code.h>
 #include <util/std_types.h>
 
@@ -106,7 +108,7 @@ public:
 
   void output(std::ostream &out) const;
 
-  typedef std::vector<irep_idt> class_refst;
+  typedef std::set<irep_idt> class_refst;
   class_refst class_refs;
 };
 
