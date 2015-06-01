@@ -1107,6 +1107,11 @@ codet java_bytecode_convertt::convert_instructions(
       c=codet(statement);
       c.copy_to_operands(op[0]);
     }
+    else if(statement=="pop" || statement=="pop2")
+    {
+      // these are skips
+      c=code_skipt();
+    }
     else
     {
       c=codet(statement);
