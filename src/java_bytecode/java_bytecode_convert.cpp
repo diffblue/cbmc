@@ -375,7 +375,7 @@ void java_bytecode_convertt::convert(
   method.set_base_name(m.base_name);
   method.set_name(method_identifier);
 
-  const bool is_virtual=!m.is_static;
+  const bool is_virtual=!m.is_static && !m.is_final;
 
   method.set(ID_abstract, m.is_abstract);
   method.set(ID_is_virtual, is_virtual);
