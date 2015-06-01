@@ -564,15 +564,6 @@ void goto_convertt::do_java_new(
 
   typet object_type=rhs.type().subtype();
   
-  if(new_array)
-  {
-    // stuff the size into object_type
-    struct_typet &struct_type=to_struct_type(object_type);
-    assert(struct_type.components().size()==2);
-    assert(struct_type.components()[1].type().id()==ID_pointer);
-    //to_array_type(struct_type.components()[1].type()).size()=rhs.op0();
-  }
-
   // build size expression
   exprt object_size=size_of_expr(object_type, ns);
   
@@ -588,28 +579,34 @@ void goto_convertt::do_java_new(
   t_n->code=code_assignt(lhs, malloc_expr);
   t_n->source_location=rhs.find_location();
   
-  // if it's an array, we need to set the length field
   if(new_array)
   {
     assert(object_type.id()==ID_struct);
     const struct_typet &struct_type=to_struct_type(object_type);
     assert(struct_type.components().size()==2);
-    //const array_typet &array_type=to_array_type(struct_type.components()[1].type());
 
+    // if it's an array, we need to set the length field
     dereference_exprt deref(lhs, object_type);
-    member_exprt length(deref, struct_type.components()[0].get_name());
+    member_exprt length(deref, struct_type.components()[0].get_name(), struct_type.components()[0].type());
     goto_programt::targett t_s=dest.add_instruction(ASSIGN);
     t_s->code=code_assignt(length, rhs.op0());
     t_s->source_location=rhs.find_location();
     
+    // we also need to allocate space for the data
+    member_exprt data(deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+    side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
+    data_cpp_new_expr.set(ID_size, rhs.op0());
+    goto_programt::targett t_p=dest.add_instruction(ASSIGN);
+    t_p->code=code_assignt(data, data_cpp_new_expr);
+    t_p->source_location=rhs.find_location();
+    
     // zero-initialize the data
-    #if 0
-    member_exprt data(deref, struct_type.components()[1].get_name());
-    goto_programt::targett t_d=dest.add_instruction(ASSIGN);
-    exprt zero_element=gen_zero(array_type.subtype());
-    t_d->code=code_assignt(data, array_of_exprt(zero_element, array_type));
+    exprt zero_element=gen_zero(data.type().subtype());
+    codet array_set(ID_array_set);
+    array_set.copy_to_operands(data, zero_element);
+    goto_programt::targett t_d=dest.add_instruction(OTHER);
+    t_d->code=array_set;
     t_d->source_location=rhs.find_location();
-    #endif
   }
   else
   {
