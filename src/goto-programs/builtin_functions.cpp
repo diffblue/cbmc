@@ -587,6 +587,17 @@ void goto_convertt::do_java_new(
     goto_programt::targett t_s=dest.add_instruction(ASSIGN);
     t_s->code=code_assignt(length, array_type.size());
     t_s->source_location=rhs.find_location();
+    
+    // zero-initialize the data
+    member_exprt data(deref, struct_type.components()[1].get_name());
+    goto_programt::targett t_d=dest.add_instruction(ASSIGN);
+    exprt zero_element=gen_zero(array_type.subtype());
+    t_d->code=code_assignt(data, array_of_exprt(zero_element, array_type));
+    t_d->source_location=rhs.find_location();
+  }
+  else
+  {
+    // call constructor for object
   }
 
   // grab initializer
