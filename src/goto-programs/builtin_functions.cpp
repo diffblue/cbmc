@@ -23,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/pointer_offset_size.h>
 
+#include <linking/zero_initializer.h>
+
 #include <ansi-c/c_types.h>
 
 #include "goto_convert_class.h"
@@ -597,7 +599,12 @@ void goto_convertt::do_java_new(
   }
   else
   {
-    // call constructor for object
+    // zero-initialize the object
+    dereference_exprt deref(lhs, object_type);
+    exprt zero_object=zero_initializer(object_type, rhs.find_location(), ns, get_message_handler());
+    goto_programt::targett t_i=dest.add_instruction(ASSIGN);
+    t_i->code=code_assignt(deref, zero_object);
+    t_i->source_location=rhs.find_location();
   }
 
   // grab initializer
