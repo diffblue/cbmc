@@ -1044,7 +1044,8 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   u2 access_flags=read_u2();
   u2 name_index=read_u2();
   u2 descriptor_index=read_u2();
-  
+
+  method.is_final=access_flags&ACC_FINAL;  
   method.is_static=access_flags&ACC_STATIC;
   method.is_abstract=access_flags&ACC_ABSTRACT;
   method.is_public=access_flags&ACC_PUBLIC;

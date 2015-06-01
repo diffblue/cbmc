@@ -44,7 +44,7 @@ public:
   {
   public:
     irep_idt base_name;
-    bool is_native, is_abstract;
+    bool is_native, is_abstract, is_final;
 
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
@@ -57,7 +57,7 @@ public:
 
     virtual void output(std::ostream &out) const;
     
-    inline methodt():is_native(false), is_abstract(false)
+    inline methodt():is_native(false), is_abstract(false), is_final(false)
     {
     }
   };

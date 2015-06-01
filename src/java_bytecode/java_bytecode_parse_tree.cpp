@@ -124,6 +124,9 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   if(is_static)
     out << "static ";
   
+  if(is_final)
+    out << "final ";
+  
   if(is_native)
     out << "native ";
   
