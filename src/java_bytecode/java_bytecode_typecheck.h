@@ -54,6 +54,7 @@ protected:
   void typecheck_type(typet &type);
   void typecheck_expr_symbol(symbol_exprt &expr);
   void typecheck_expr_java_new(side_effect_exprt &expr);
+  void typecheck_expr_java_new_array(side_effect_exprt &expr);
 
   // overload to use language-specific syntax
   virtual std::string to_string(const exprt &expr);

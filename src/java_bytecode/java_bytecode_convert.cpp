@@ -673,7 +673,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==3 && results.empty());
       
       exprt pointer=
-        typecast_exprt(op[0], java_array_type(java_type(statement[0]), nil_exprt()));
+        typecast_exprt(op[0], java_array_type(java_type(statement[0])));
 
       const dereference_exprt array(pointer, pointer.type().subtype());
       assert(pointer.type().subtype().id()==ID_struct);
@@ -708,7 +708,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size() == 2 && results.size() == 1);
 
       exprt pointer=
-        typecast_exprt(op[0], java_array_type(java_type(statement[0]), nil_exprt()));
+        typecast_exprt(op[0], java_array_type(java_type(statement[0])));
 
       const dereference_exprt array(pointer, pointer.type().subtype());
       const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
@@ -1051,9 +1051,10 @@ codet java_bytecode_convertt::convert_instructions(
       else
         element_type=java_reference_type(empty_typet());
 
-      const typet ref_type=java_array_type(element_type, op[0]);
+      const typet ref_type=java_array_type(element_type);
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
+      java_new_array.copy_to_operands(op[0]);
 
       const exprt tmp=tmp_variable(ref_type);
       c=code_assignt(tmp, java_new_array);
@@ -1069,7 +1070,7 @@ codet java_bytecode_convertt::convert_instructions(
       
       assert(op.size()==dimension);
 
-      const typet ref_type=java_array_type(java_reference_type(empty_typet()), nil_exprt());
+      const typet ref_type=java_array_type(java_reference_type(empty_typet()));
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.operands()=op;
@@ -1083,7 +1084,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size() == 1 && results.size() == 1);
 
       exprt pointer=
-        typecast_exprt(op[0], java_array_type(java_type(statement[0]), nil_exprt()));
+        typecast_exprt(op[0], java_array_type(java_type(statement[0])));
 
       const dereference_exprt array(pointer, pointer.type().subtype());
       assert(pointer.type().subtype().id()==ID_struct);

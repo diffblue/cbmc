@@ -41,8 +41,10 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
   else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=to_side_effect_expr(expr).get_statement();
-    if(statement==ID_java_new || statement==ID_java_new_array)
+    if(statement==ID_java_new)
       typecheck_expr_java_new(to_side_effect_expr(expr));
+    else if(statement==ID_java_new_array)
+      typecheck_expr_java_new_array(to_side_effect_expr(expr));
   }
 }
 
@@ -61,6 +63,25 @@ Function: java_bytecode_typecheckt::typecheck_expr_java_new
 void java_bytecode_typecheckt::typecheck_expr_java_new(side_effect_exprt &expr)
 { 
   assert(expr.operands().empty());
+  typet &type=expr.type();
+  typecheck_type(type);
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_expr_java_new_array
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_typecheckt::typecheck_expr_java_new_array(side_effect_exprt &expr)
+{ 
+  assert(expr.operands().size()==1);
   typet &type=expr.type();
   typecheck_type(type);
 }

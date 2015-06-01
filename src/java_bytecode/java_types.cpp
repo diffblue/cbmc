@@ -196,9 +196,7 @@ Function: java_array_type
 
 \*******************************************************************/
 
-pointer_typet java_array_type(
-  const typet &subtype,
-  const exprt &size)
+pointer_typet java_array_type(const typet &subtype)
 {
   struct_typet array_type;
   
@@ -223,7 +221,7 @@ pointer_typet java_array_type(
   
   struct_typet::componentt data;
   data.set_name("data");
-  data.type()=array_typet(subtype, size);
+  data.type()=array_typet(subtype, nil_exprt());
 
   array_type.components().push_back(length);
   array_type.components().push_back(data);
@@ -339,7 +337,7 @@ typet java_type_from_string(const std::string &src)
     {
       if(src.size()<=2) return nil_typet();
       const typet subtype=java_type_from_string(src.substr(1, std::string::npos));
-      return java_array_type(subtype, nil_exprt());
+      return java_array_type(subtype);
     }
     
   case 'F': return java_float_type();    
