@@ -7,7 +7,8 @@ class putstatic_getstatic1
 {
   public static void main(String[] args)
   {
+    assert A.i == 0;
     A.i = 999;
-    assert 999 == A.i;
+    assert A.i == 999;
   }
 }
