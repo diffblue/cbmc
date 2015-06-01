@@ -569,8 +569,8 @@ void goto_convertt::do_java_new(
     // stuff the size into object_type
     struct_typet &struct_type=to_struct_type(object_type);
     assert(struct_type.components().size()==2);
-    assert(struct_type.components()[1].type().id()==ID_array);
-    to_array_type(struct_type.components()[1].type()).size()=rhs.op0();
+    assert(struct_type.components()[1].type().id()==ID_pointer);
+    //to_array_type(struct_type.components()[1].type()).size()=rhs.op0();
   }
 
   // build size expression
@@ -594,20 +594,22 @@ void goto_convertt::do_java_new(
     assert(object_type.id()==ID_struct);
     const struct_typet &struct_type=to_struct_type(object_type);
     assert(struct_type.components().size()==2);
-    const array_typet &array_type=to_array_type(struct_type.components()[1].type());
+    //const array_typet &array_type=to_array_type(struct_type.components()[1].type());
 
     dereference_exprt deref(lhs, object_type);
     member_exprt length(deref, struct_type.components()[0].get_name());
     goto_programt::targett t_s=dest.add_instruction(ASSIGN);
-    t_s->code=code_assignt(length, array_type.size());
+    t_s->code=code_assignt(length, rhs.op0());
     t_s->source_location=rhs.find_location();
     
     // zero-initialize the data
+    #if 0
     member_exprt data(deref, struct_type.components()[1].get_name());
     goto_programt::targett t_d=dest.add_instruction(ASSIGN);
     exprt zero_element=gen_zero(array_type.subtype());
     t_d->code=code_assignt(data, array_of_exprt(zero_element, array_type));
     t_d->source_location=rhs.find_location();
+    #endif
   }
   else
   {
