@@ -46,15 +46,27 @@ exprt gen_argument(const typet &type)
 void create_initialize(symbol_tablet &symbol_table)
 {
   symbolt initialize;
-  initialize.name = INITIALIZE;
+  initialize.name=INITIALIZE;
+  initialize.base_name=INITIALIZE;
+  initialize.mode=ID_java;
 
   code_typet type;
-  type.return_type() = empty_typet();
+  type.return_type()=empty_typet();
+  initialize.type=type;
+  
+  code_blockt init_code;
+  
+  namespacet ns(symbol_table);
+  
+  symbol_exprt rounding_mode=
+    ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
 
-  initialize.type = type;
-  initialize.value = code_blockt();
-
-  symbol_table.add(initialize);
+  init_code.add(code_assignt(rounding_mode, gen_zero(rounding_mode.type())));
+  
+  initialize.value=init_code;
+  
+  if(symbol_table.add(initialize))
+    throw "failed to add "+std::string(INITIALIZE);
 }
 
 inline const irep_idt &get_name(
@@ -110,9 +122,9 @@ bool java_static_lifetime_init(
   if(static_lifetime_init(copy, source_location, message_handler))
     return true;
 
-  symbolt &lhs=symbol_table.lookup(INITIALIZE);
-  const symbolt &rhs=copy.lookup(INITIALIZE);
-  lhs.value = rhs.value;
+  //symbolt &lhs=symbol_table.lookup(INITIALIZE);
+  //const symbolt &rhs=copy.lookup(INITIALIZE);
+  //lhs.value = rhs.value;
 
   return false;
 }
@@ -246,6 +258,7 @@ bool java_entry_point(
   new_symbol.name=goto_functionst::entry_point();
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
+  new_symbol.mode=ID_java;
 
   if(symbol_table.move(new_symbol))
   {

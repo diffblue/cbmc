@@ -47,7 +47,8 @@ void adjust_float_expressions(
     rounding_mode.add_source_location()=expr.source_location();
   
     if(expr.id()==ID_plus || expr.id()==ID_minus ||
-       expr.id()==ID_mult || expr.id()==ID_div)
+       expr.id()==ID_mult || expr.id()==ID_div ||
+       expr.id()==ID_rem)
     {
       // make sure we have binary expressions
       if(expr.operands().size()>2)
@@ -59,7 +60,9 @@ void adjust_float_expressions(
       expr.id(expr.id()==ID_plus?ID_floatbv_plus:
               expr.id()==ID_minus?ID_floatbv_minus:
               expr.id()==ID_mult?ID_floatbv_mult:
-                                 ID_floatbv_div);
+              expr.id()==ID_div?ID_floatbv_div:
+              expr.id()==ID_rem?ID_floatbv_rem:
+                                irep_idt());
 
       expr.operands().resize(3);
       expr.op2()=rounding_mode;

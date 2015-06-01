@@ -100,9 +100,10 @@ public:
   bvt add(const bvt &src1, const bvt &src2) { return add_sub(src1, src2, false); }
   bvt sub(const bvt &src1, const bvt &src2) { return add_sub(src1, src2, true); }
 
-  // mul/div
+  // mul/div/rem
   virtual bvt mul(const bvt &src1, const bvt &src2);
   virtual bvt div(const bvt &src1, const bvt &src2);
+  virtual bvt rem(const bvt &src1, const bvt &src2);
 
   bvt abs(const bvt &);
   bvt negate(const bvt &);

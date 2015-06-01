@@ -284,7 +284,8 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
   else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr)
     return convert_shift(to_shift_expr(expr), bv);
   else if(expr.id()==ID_floatbv_plus || expr.id()==ID_floatbv_minus ||
-          expr.id()==ID_floatbv_mult || expr.id()==ID_floatbv_div)
+          expr.id()==ID_floatbv_mult || expr.id()==ID_floatbv_div ||
+          expr.id()==ID_floatbv_rem)
     return convert_floatbv_op(expr, bv);
   else if(expr.id()==ID_floatbv_typecast)
     return convert_floatbv_typecast(to_floatbv_typecast_expr(expr), bv);
