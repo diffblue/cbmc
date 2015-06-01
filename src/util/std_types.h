@@ -155,6 +155,16 @@ public:
   class componentt:public exprt
   {
   public:
+    inline componentt()
+    {
+    }
+  
+    inline componentt(const irep_idt &_name, const typet &_type)
+    {
+      set_name(_name);
+      type()=_type;
+    }
+  
     inline const irep_idt &get_name() const
     {
       return get(ID_name);
