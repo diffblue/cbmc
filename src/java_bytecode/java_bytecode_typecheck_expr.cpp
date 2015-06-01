@@ -108,6 +108,7 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
   
   if(s_it==symbol_table.symbols.end())
   {
+    #if 1
     assert(has_prefix(id2string(identifier), "java::"));
   
     // no, create the symbol
@@ -130,6 +131,12 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
     
     if(symbol_table.add(new_symbol))
       throw "failed to add expression symbol to symbol table";
+    #else
+    str << "failed to find expression symbol `"
+        << identifier << "' in symbol table";
+    throw 0;
+    
+    #endif
   }
   else
   {

@@ -608,6 +608,8 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
     u2 attributes_count=read_u2();
     
     field.name=pool_entry(name_index).s;
+    field.is_static=access_flags&ACC_STATIC;
+    field.is_final=access_flags&ACC_FINAL;
     field.signature=id2string(pool_entry(descriptor_index).s);
 
     for(unsigned j=0; j<attributes_count; j++)
