@@ -22,9 +22,7 @@ typet java_double_type();
 typet java_boolean_type();
 typet java_reference_type(const typet &subtype);
 
-pointer_typet java_array_type(
-  const typet &subtype,
-  const exprt &size);
+pointer_typet java_array_type(const typet &subtype);
 
 bool is_reference_type(char t);
 

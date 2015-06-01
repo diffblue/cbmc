@@ -557,9 +557,21 @@ void goto_convertt::do_java_new(
 
   bool new_array=rhs.get(ID_statement)==ID_java_new_array;
 
-  assert(rhs.operands().empty());
+  if(new_array)
+    assert(rhs.operands().size()==1);
+  else
+    assert(rhs.operands().empty());
 
   typet object_type=rhs.type().subtype();
+  
+  if(new_array)
+  {
+    // stuff the size into object_type
+    struct_typet &struct_type=to_struct_type(object_type);
+    assert(struct_type.components().size()==2);
+    assert(struct_type.components()[1].type().id()==ID_array);
+    to_array_type(struct_type.components()[1].type()).size()=rhs.op0();
+  }
 
   // build size expression
   exprt object_size=size_of_expr(object_type, ns);
