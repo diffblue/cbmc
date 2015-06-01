@@ -47,6 +47,32 @@ Function: java_bytecode_parse_treet::classt::output
 
 \*******************************************************************/
 
+void java_bytecode_parse_treet::output(std::ostream &out) const
+{
+  parsed_class.output(out);
+
+  out << "Class references:\n";
+  for(class_refst::const_iterator it=class_refs.begin();
+      it!=class_refs.end();
+      it++)
+  {
+    out << "  " << *it << '\n';
+  }
+    
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parse_treet::classt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parse_treet::classt::output(std::ostream &out) const
 {
   out << "class " << name;
@@ -73,6 +99,7 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
   
   out << '}' << '\n';
   out << '\n';
+  
 }
 
 /*******************************************************************\
