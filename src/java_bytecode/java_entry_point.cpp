@@ -24,24 +24,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#include "zero_initializer.h"
 
-namespace {
-
-exprt gen_argument(const typet &type)
-{
-  if(type.id()==ID_pointer)
-  {
-    /*
-    side_effect_exprt result(ID_java_new);
-    result.operands().resize(1);
-    return result;
-    */
-    return side_effect_expr_nondett(type);
-  }
-  else
-    return side_effect_expr_nondett(type);
-}
-
 #define INITIALIZE CPROVER_PREFIX "initialize"
+
+/*******************************************************************\
+
+Function: create_initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+namespace {
 
 void create_initialize(symbol_tablet &symbol_table)
 {
@@ -69,66 +66,62 @@ void create_initialize(symbol_tablet &symbol_table)
     throw "failed to add "+std::string(INITIALIZE);
 }
 
-inline const irep_idt &get_name(
-  const std::pair<const irep_idt, symbolt> &symbol)
+exprt gen_argument(const typet &type)
 {
-  return symbol.first;
+  if(type.id()==ID_pointer)
+  {
+    /*
+    side_effect_exprt result(ID_java_new);
+    result.operands().resize(1);
+    return result;
+    */
+    return side_effect_expr_nondett(type);
+  }
+  else
+    return side_effect_expr_nondett(type);
 }
 
-class init_symbol_filtert
-{
-  symbol_tablet &symbol_table;
+}
 
-  static bool should_filter(const symbolt &symbol)
-  {
-    if(symbol.is_static_lifetime && symbol.value.is_nil())
-      return true;
+/*******************************************************************\
 
-    const exprt &value=symbol.value;
+Function: java_static_lifetime_init
 
-    if(ID_struct!=value.id())
-      return false;
+  Inputs:
 
-    return to_struct_expr(value).operands().empty();
-  }
+ Outputs:
 
-public:
-  init_symbol_filtert(symbol_tablet &symbol_table):
-    symbol_table(symbol_table)
-  {
-  }
+ Purpose:
 
-  void operator()(const irep_idt &symbol_name)
-  {
-    if(should_filter(symbol_table.lookup(symbol_name)))
-      symbol_table.remove(symbol_name);
-  }
-};
+\*******************************************************************/
 
 bool java_static_lifetime_init(
   symbol_tablet &symbol_table,
   const source_locationt &source_location,
   message_handlert &message_handler)
 {
-  symbol_tablet copy=symbol_table;
-  symbol_tablet::symbolst &symbols(copy.symbols);
+  symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
+  code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
+  
+  // we need to run all the <clinit> methods
 
-  std::vector<irep_idt> names;
-  std::transform(symbols.begin(), symbols.end(), std::back_inserter(names), get_name);
-  init_symbol_filtert filter=copy;
-
-  std::for_each(names.begin(), names.end(), filter);
-
-  if(static_lifetime_init(copy, source_location, message_handler))
-    return true;
-
-  //symbolt &lhs=symbol_table.lookup(INITIALIZE);
-  //const symbolt &rhs=copy.lookup(INITIALIZE);
-  //lhs.value = rhs.value;
-
+  for(symbol_tablet::symbolst::const_iterator
+      it=symbol_table.symbols.begin();
+      it!=symbol_table.symbols.end();
+      it++)
+  {
+    if(it->second.base_name=="<clinit>" &&
+       it->second.type.id()==ID_code &&
+       it->second.mode==ID_java)
+    {
+      code_function_callt function_call;
+      function_call.lhs()=nil_exprt();
+      function_call.function()=it->second.symbol_expr();
+      code_block.add(function_call);
+    }
+  }
+  
   return false;
-}
-
 }
 
 /*******************************************************************\
