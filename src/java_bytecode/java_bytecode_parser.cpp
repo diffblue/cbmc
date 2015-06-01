@@ -300,7 +300,12 @@ void java_bytecode_parsert::get_class_refs()
       it++)
   {
     if(it->tag==CONSTANT_Class)
-      parse_tree.class_refs.insert(it->expr.type().get(ID_C_base_name));
+    {
+      if(it->expr.type().id()==ID_symbol)
+        parse_tree.class_refs.insert(it->expr.type().get(ID_C_base_name));
+      else if(it->expr.type().id()==ID_array)
+        parse_tree.class_refs.insert(it->expr.type().subtype().get(ID_C_base_name));
+    }
   }
   
   std::set<irep_idt> signatures;
@@ -331,11 +336,11 @@ void java_bytecode_parsert::get_class_refs()
         std::string dest;
         while(s_it!=s.end() && *s_it!=';')
         {
-          dest+=*s_it=='/'?'.':*s_it;
+          dest+=*s_it;
           s_it++;
         }
         
-        parse_tree.class_refs.insert(dest);
+        parse_tree.class_refs.insert(slash_to_dot(dest));
       }
     }
   }
@@ -440,11 +445,21 @@ void java_bytecode_parsert::rconstant_pool()
     {
     case CONSTANT_Class:
       {
-        std::string class_name=slash_to_dot(id2string(pool_entry(it->ref1).s));
-        irep_idt identifier="java::"+class_name;
-        symbol_typet symbol_type(identifier);
-        symbol_type.set(ID_C_base_name, class_name);
-        it->expr=type_exprt(symbol_type);
+        const std::string &s=id2string(pool_entry(it->ref1).s);
+      
+        if(!s.empty() &&
+           s[0]=='[')
+        {
+          it->expr=type_exprt(java_type_from_string(s));
+        }
+        else
+        {
+          std::string class_name=slash_to_dot(s);
+          irep_idt identifier="java::"+class_name;
+          symbol_typet symbol_type(identifier);
+          symbol_type.set(ID_C_base_name, class_name);
+          it->expr=type_exprt(symbol_type);
+        }
       }
       break;
 
