@@ -198,6 +198,9 @@ Function: java_array_type
 
 pointer_typet java_array_type(const typet &subtype)
 {
+  // This is a pointer to a struct containing the length
+  // plus a pointer to the data.
+
   struct_typet array_type;
   
   if(subtype==java_char_type())
@@ -215,13 +218,8 @@ pointer_typet java_array_type(const typet &subtype)
   else if(subtype==java_long_type())
     array_type.set_tag("java_long_array");
 
-  struct_typet::componentt length;
-  length.set_name("length");
-  length.type()=java_int_type();
-  
-  struct_typet::componentt data;
-  data.set_name("data");
-  data.type()=array_typet(subtype, nil_exprt());
+  struct_typet::componentt length("length", java_int_type());
+  struct_typet::componentt data("data", pointer_typet(subtype));
 
   array_type.components().push_back(length);
   array_type.components().push_back(data);
