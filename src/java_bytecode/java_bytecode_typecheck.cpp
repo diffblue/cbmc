@@ -63,11 +63,8 @@ Function: java_bytecode_typecheckt::typecheck_non_type_symbol
 void java_bytecode_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
 {
   assert(!symbol.is_type);
-  debug("X1");
   typecheck_type(symbol.type);
-  debug("X2");
   typecheck_expr(symbol.value);
-  debug("X3");
 }
 
 /*******************************************************************\
