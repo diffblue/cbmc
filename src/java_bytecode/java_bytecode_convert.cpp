@@ -675,17 +675,17 @@ codet java_bytecode_convertt::convert_instructions(
       exprt pointer=
         typecast_exprt(op[0], java_array_type(java_type(statement[0])));
 
-      const dereference_exprt array(pointer, pointer.type().subtype());
+      const dereference_exprt deref(pointer, pointer.type().subtype());
       assert(pointer.type().subtype().id()==ID_struct);
       const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
       assert(struct_type.components().size()==2);
 
-      const member_exprt data(
-        array, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+      const member_exprt data_ptr(
+        deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
 
-      typet element_type=data.type().subtype();
-
-      const index_exprt element(data, op[1], element_type);
+      plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
+      typet element_type=data_ptr.type().subtype();
+      const dereference_exprt element(data_plus_offset, element_type);
 
       c=code_assignt(element, op[2]);
     }
@@ -710,16 +710,16 @@ codet java_bytecode_convertt::convert_instructions(
       exprt pointer=
         typecast_exprt(op[0], java_array_type(java_type(statement[0])));
 
-      const dereference_exprt array(pointer, pointer.type().subtype());
+      const dereference_exprt deref(pointer, pointer.type().subtype());
       const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
       assert(struct_type.components().size()==2);
 
-      const member_exprt data(
-        array, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+      const member_exprt data_ptr(
+        deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
 
-      typet element_type=data.type().subtype();
-      
-      const index_exprt element(data, op[1], element_type);
+      plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
+      typet element_type=data_ptr.type().subtype();
+      const dereference_exprt element(data_plus_offset, element_type);
 
       if((element_type.id()==ID_signedbv || element_type.id()==ID_unsignedbv) &&
           element_type.get_unsigned_int(ID_width) < 32)
