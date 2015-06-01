@@ -107,6 +107,7 @@ protected:
   void rmethod_attribute(methodt &method);
   void rcode_attribute(methodt &method);
   void rbytecode(methodt::instructionst &);
+  void get_class_refs();
   
   void skip_bytes(unsigned bytes) const
   {
@@ -273,8 +274,26 @@ void java_bytecode_parsert::rClassFile()
   for(unsigned j=0; j<attributes_count; j++)
     rclass_attribute(parsed_class);
 
-  // get the class references for the benefit of a dependency
+  get_class_refs();
+}
+  
+/*******************************************************************\
+
+Function: java_bytecode_parsert::get_class_refs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_parsert::get_class_refs()
+{
+  // Get the class references for the benefit of a dependency
   // analysis.
+
   for(constant_poolt::iterator
       it=constant_pool.begin();
       it!=constant_pool.end();
@@ -282,6 +301,43 @@ void java_bytecode_parsert::rClassFile()
   {
     if(it->tag==CONSTANT_Class)
       parse_tree.class_refs.insert(it->expr.type().get(ID_C_base_name));
+  }
+  
+  std::set<irep_idt> signatures;
+
+  for(methodst::const_iterator m_it=parse_tree.parsed_class.methods.begin();
+      m_it!=parse_tree.parsed_class.methods.end();
+      m_it++)
+    signatures.insert(m_it->signature);
+
+  for(fieldst::const_iterator m_it=parse_tree.parsed_class.fields.begin();
+      m_it!=parse_tree.parsed_class.fields.end();
+      m_it++)
+    signatures.insert(m_it->signature);
+
+  for(std::set<irep_idt>::const_iterator
+      it=signatures.begin();
+      it!=signatures.end();
+      it++)
+  {
+    // we scan for L<name>;
+    const std::string &s=id2string(*it);
+    for(std::string::const_iterator s_it=s.begin();
+        s_it!=s.end(); s_it++)
+    {
+      if(*s_it=='L')
+      {
+        s_it++;
+        std::string dest;
+        while(s_it!=s.end() && *s_it!=';')
+        {
+          dest+=*s_it=='/'?'.':*s_it;
+          s_it++;
+        }
+        
+        parse_tree.class_refs.insert(dest);
+      }
+    }
   }
 }
 
