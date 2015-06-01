@@ -458,7 +458,7 @@ void goto_symext::symex_cpp_new(
              "dynamic_"+count_string+"_value";
   symbol.name="symex_dynamic::"+id2string(symbol.base_name);
   symbol.is_lvalue=true;
-  symbol.mode="cpp";
+  symbol.mode=ID_cpp;
   
   if(do_array)
   {
