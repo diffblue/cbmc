@@ -103,7 +103,26 @@ bool java_static_lifetime_init(
   symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
   
-  // we need to run all the <clinit> methods
+  // we need to zero out all static variables
+  
+  for(symbol_tablet::symbolst::const_iterator
+      it=symbol_table.symbols.begin();
+      it!=symbol_table.symbols.end();
+      it++)
+  {
+    if(it->second.type.id()!=ID_code &&
+       it->second.is_lvalue &&
+       it->second.is_state_var &&
+       it->second.is_static_lifetime &&
+       it->second.value.is_not_nil() &&
+       it->second.mode==ID_java)
+    {
+      code_assignt assignment(it->second.symbol_expr(), it->second.value);
+      code_block.add(assignment);
+    }
+  }
+  
+  // we now need to run all the <clinit> methods
 
   for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();

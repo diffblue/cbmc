@@ -432,6 +432,27 @@ void java_bytecode_convertt::convert(
   component.set_name(f.name);
   component.set_base_name(f.name);
   component.type()=member_type;
+
+  // is this static?
+  if(f.is_static)
+  {
+    // create the symbol
+    symbolt new_symbol;
+
+    new_symbol.is_static_lifetime=true;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_state_var=true;
+    new_symbol.name="java::"+id2string(class_symbol.name)+"."+id2string(f.name);
+    new_symbol.base_name=f.name;
+    new_symbol.type=member_type;
+    new_symbol.pretty_name=id2string(class_symbol.name)+"."+id2string(f.name);
+    new_symbol.mode=ID_java;
+    new_symbol.is_type=false;  
+    new_symbol.value=gen_zero(member_type);
+
+    if(symbol_table.add(new_symbol))
+      throw "failed to add static field symbol";
+  }
 }
 
 /*******************************************************************\
