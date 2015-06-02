@@ -121,6 +121,12 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   if(is_public)
     out << "public ";
   
+  if(is_protected)
+    out << "protected ";
+  
+  if(is_private)
+    out << "private ";
+  
   if(is_static)
     out << "static ";
   
@@ -129,6 +135,9 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   
   if(is_native)
     out << "native ";
+  
+  if(is_synchronized)
+    out << "synchronized ";
   
   out << name;
   out << " : " << signature;

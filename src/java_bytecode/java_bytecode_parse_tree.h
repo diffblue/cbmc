@@ -31,11 +31,13 @@ public:
   public:
     std::string signature;
     irep_idt name;
-    bool is_public, is_static, is_final;
+    bool is_public, is_protected, is_private, is_static, is_final;
     
     virtual void output(std::ostream &out) const = 0;
     
-    inline membert():is_public(false), is_static(false), is_final(false)
+    inline membert():
+      is_public(false), is_protected(false), is_private(false),
+      is_static(false), is_final(false)
     {
     }
   };
@@ -44,7 +46,7 @@ public:
   {
   public:
     irep_idt base_name;
-    bool is_native, is_abstract;
+    bool is_native, is_abstract, is_synchronized;
 
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
@@ -57,7 +59,7 @@ public:
 
     virtual void output(std::ostream &out) const;
     
-    inline methodt():is_native(false), is_abstract(false)
+    inline methodt():is_native(false), is_abstract(false), is_synchronized(false)
     {
     }
   };
