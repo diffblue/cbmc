@@ -79,7 +79,7 @@ protected:
   virtual void get_command_line_options(optionst &options);
   virtual int do_bmc(bmct &bmc, const goto_functionst &goto_functions);
 
-  virtual bool get_goto_program(
+  virtual int get_goto_program(
     const optionst &options,
     bmct &bmc,
     goto_functionst &goto_functions);
@@ -96,9 +96,9 @@ protected:
   bool options_inclusive(const char *opt1, const char *opt2);
 
   // get any additional stuff before finalizing
-  virtual bool get_modules(bmct &bmc)
+  virtual int get_modules(bmct &bmc)
   {
-    return false;
+    return -1; // continue
   }
   
   void preprocessing();

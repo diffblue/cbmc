@@ -56,10 +56,17 @@ void full_slicert::fixedpoint()
         p_it!=e->predecessors.end();
         p_it++)
     {
+      object_id_sett::size_type old_size = (*p_it)->required_objects.size();
+
       (*p_it)->required_objects.insert(
         required_objects.begin(), required_objects.end());
 
-      queue.push(*p_it);
+      object_id_sett::size_type new_size = (*p_it)->required_objects.size();
+
+      assert(new_size >= old_size);
+
+      if (new_size > old_size)
+	queue.push(*p_it);
     }
   }
 }

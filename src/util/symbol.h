@@ -77,12 +77,17 @@ public:
   
   void clear()
   {
+    type.make_nil();
     value.make_nil();
     location.make_nil();
-    is_lvalue=is_thread_local=is_static_lifetime=is_file_local=is_extern=
-    is_type=is_macro=is_exported=is_parameter=is_auxiliary=
-    is_volatile=is_input=is_output=is_state_var=is_property=false;
+
     name=module=base_name=mode=pretty_name=irep_idt();
+
+    is_type=is_macro=is_exported=
+    is_input=is_output=is_state_var=is_property=
+    is_static_lifetime=is_thread_local=
+    is_lvalue=is_file_local=is_extern=is_volatile=
+    is_parameter=is_auxiliary=false;
   }
      
   void swap(symbolt &b);
@@ -125,5 +130,57 @@ typedef std::list<const symbolt *> symbolptr_listt;
 #define Forall_symbolptr_list(it, list) \
   for(symbolptr_listt::iterator it=(list).begin(); \
       it!=(list).end(); ++it)
+
+/*! \brief Symbol table entry describing a data type
+    \ingroup gr_symbol_table
+
+    This is a symbol generated as part of type checking.
+*/
+class type_symbolt:public symbolt
+{
+public:
+  type_symbolt(const typet &_type)
+  {
+    type=_type;
+    is_type=true;
+  }
+};
+
+/*! \brief Internally generated symbol table entry
+    \ingroup gr_symbol_table
+
+    This is a symbol generated as part of translation to or
+    modification of the intermediate representation.
+*/
+class auxiliary_symbolt:public symbolt
+{
+public:
+  auxiliary_symbolt()
+  {
+    is_lvalue=true;
+    is_state_var=true;
+    is_thread_local=true;
+    is_file_local=true;
+    is_auxiliary=true;
+  }
+};
+
+/*! \brief Symbol table entry of function parameter
+    \ingroup gr_symbol_table
+
+    This is a symbol generated as part of type checking.
+*/
+class parameter_symbolt:public symbolt
+{
+public:
+  parameter_symbolt()
+  {
+    is_lvalue=true;
+    is_state_var=true;
+    is_thread_local=true;
+    is_file_local=true;
+    is_parameter=true;
+  }
+};
 
 #endif

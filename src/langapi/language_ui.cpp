@@ -327,8 +327,11 @@ void language_uit::show_symbol_table_plain(std::ostream &out, bool brief)
     if(symbol.is_output)          out << " output";
     if(symbol.is_macro)           out << " macro";
     if(symbol.is_parameter)       out << " parameter";
+    if(symbol.is_auxiliary)       out << " auxiliary";
     if(symbol.is_property)        out << " property";
     if(symbol.is_state_var)       out << " state_var";
+    if(symbol.is_exported)        out << " exported";
+    if(symbol.is_volatile)        out << " volatile";
 
     out << std::endl;
     out << "Location....: " << symbol.location << std::endl;

@@ -35,18 +35,14 @@ symbol_exprt goto_convertt::make_compound_literal(
 {
   const source_locationt source_location=expr.find_source_location();
   
-  symbolt new_symbol;
+  auxiliary_symbolt new_symbol;
   symbolt *symbol_ptr;
   
   do
   {
     new_symbol.base_name="literal$"+i2string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-    new_symbol.is_lvalue=true;
-    new_symbol.is_thread_local=true;
     new_symbol.is_static_lifetime=source_location.get_function().empty();
-    new_symbol.is_file_local=true;
-    new_symbol.is_auxiliary=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
     new_symbol.location=source_location;
@@ -99,7 +95,8 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
 
   if(expr.id()==ID_index)
   {
-    // Will usually clean index because of possible memory violation.
+    // Will usually clean index expressions because of possible
+    // memory violation in case of out-of-bounds indices.
     // We do an exception for "string-lit"[0], which is safe.
     if(to_index_expr(expr).array().id()==ID_string_constant &&
        to_index_expr(expr).index().is_zero())

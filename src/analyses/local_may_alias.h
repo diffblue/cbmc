@@ -57,7 +57,7 @@ public:
 protected:
   void build(const goto_functiont &goto_function);
 
-  typedef std::stack<unsigned> work_queuet;
+  typedef std::stack<local_cfgt::node_nrt> work_queuet;
 
   // the following may eventually get merged  
   mutable numbering<irep_idt> pointers;
