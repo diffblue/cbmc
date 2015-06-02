@@ -432,8 +432,15 @@ void java_bytecode_convertt::convert(
   component.set_name(f.name);
   component.set_base_name(f.name);
   component.type()=member_type;
+  
+  if(f.is_private)
+    component.set_access(ID_private);
+  else if(f.is_protected)
+    component.set_access(ID_protected);
+  else if(f.is_public)
+    component.set_access(ID_public);
 
-  // is this static?
+  // is this a static field?
   if(f.is_static)
   {
     // create the symbol
@@ -442,10 +449,10 @@ void java_bytecode_convertt::convert(
     new_symbol.is_static_lifetime=true;
     new_symbol.is_lvalue=true;
     new_symbol.is_state_var=true;
-    new_symbol.name="java::"+id2string(class_symbol.name)+"."+id2string(f.name);
+    new_symbol.name=id2string(class_symbol.name)+"."+id2string(f.name);
     new_symbol.base_name=f.name;
     new_symbol.type=member_type;
-    new_symbol.pretty_name=id2string(class_symbol.name)+"."+id2string(f.name);
+    new_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+id2string(f.name);
     new_symbol.mode=ID_java;
     new_symbol.is_type=false;  
     new_symbol.value=gen_zero(member_type);

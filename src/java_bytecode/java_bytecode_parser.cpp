@@ -1051,6 +1051,10 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   method.is_static=access_flags&ACC_STATIC;
   method.is_abstract=access_flags&ACC_ABSTRACT;
   method.is_public=access_flags&ACC_PUBLIC;
+  method.is_protected=access_flags&ACC_PROTECTED;
+  method.is_private=access_flags&ACC_PRIVATE;
+  method.is_synchronized=access_flags&ACC_SYNCHRONIZED;
+  method.is_native=access_flags&ACC_NATIVE;
   method.name=pool_entry(name_index).s;
   method.base_name=pool_entry(name_index).s;
   method.signature=id2string(pool_entry(descriptor_index).s);
