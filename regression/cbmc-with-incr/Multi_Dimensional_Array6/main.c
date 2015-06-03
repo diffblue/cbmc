@@ -22,7 +22,7 @@ int main()
 
   for(j=0;j<N_COL;j++)
     for(k=0;k<N_LIN;k++)
-      __CPROVER_assert(matriz[j][k]<=maior, "");
+      assert(matriz[j][k]<=maior);
 
-  __CPROVER_assert(matriz[0][0]<maior, "");
+  assert(matriz[0][0]<maior);
 }

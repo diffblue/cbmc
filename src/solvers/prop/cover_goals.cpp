@@ -91,8 +91,9 @@ void cover_goalst::constraint()
 
 #if 0
   std::cout << "cover_goals.assertion_clause = ";
-  forall_literals(it, bv) 
-    std::cout << *it << ", ";
+  for(exprt::operandst::iterator it = disjuncts.begin();
+      it != disjuncts.end(); ++it) 
+    std::cout << to_literal_expr(*it).get_literal() << ", ";
   std::cout << std::endl;
 #endif
 

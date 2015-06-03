@@ -188,9 +188,15 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("unwindset", cmdline.get_value("unwindset"));
 
   if(cmdline.isset("incremental"))
+  {
+    options.set_option("refine-arrays", true);
     options.set_option("incremental", true);
+  }
   if(cmdline.isset("incremental-check"))
+  {
+    options.set_option("refine-arrays", true);
     options.set_option("incremental-check", cmdline.get_value("incremental-check"));
+  }
   if(cmdline.isset("earliest-loop-exit"))
     options.set_option("earliest-loop-exit", true);
   if(cmdline.isset("magic-numbers"))
@@ -298,7 +304,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("dimacs", true);
 
   if(cmdline.isset("refine"))
-    options.set_option("refine", true);
+  {
+    options.set_option("refine-arrays", true);
+    options.set_option("refine-arithmetic", true);
+  }
 
   if(cmdline.isset("max-node-refinement"))
     options.set_option("max-node-refinement", cmdline.get_value("max-node-refinement"));

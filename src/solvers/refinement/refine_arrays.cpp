@@ -7,8 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/std_expr.h>
+#include <iostream>
 
 #include "bv_refinement.h"
+#include <solvers/sat/satcheck.h>
 
 /*******************************************************************\
 
@@ -24,10 +26,15 @@ Function: bv_refinementt::post_process_arrays
 
 void bv_refinementt::post_process_arrays()
 {
+  collect_indices();
+  // at this point all indices should in the index set
+  
   // just build the data structure
-  build_index_map();
+  update_index_map();
 
   // we don't actually add any constraints
+  lazy_arrays = do_array_refinement;
+  add_array_constraints();
 }
 
 /*******************************************************************\
@@ -44,8 +51,67 @@ Function: bv_refinementt::arrays_overapproximated
 
 void bv_refinementt::arrays_overapproximated()
 {
-  // build index_map with values
-  index_mapt value_index_map;
+  if(!lazy_arrays) return;
+  
+  unsigned nb_active = 0;
+
+  std::list<lazy_constraintt>::iterator it = lazy_array_constraints.begin();
+  while(it != lazy_array_constraints.end())
+  {
+    satcheck_minisat_no_simplifiert sat_check;
+    bv_pointerst solver(ns,sat_check);
+
+    exprt current = (*it).lazy;
+
+    // some minor simplifications
+    // check if they are worth having
+    if (current.id() == ID_implies)
+    {
+      implies_exprt imp = to_implies_expr(current);
+      assert (imp.operands().size() == 2);
+      exprt implies_simplified = get(imp.op0());
+      if (implies_simplified == false_exprt()){
+	      ++it;
+	      continue;
+      }
+    }
+
+    if (current.id() == ID_or)
+    {
+      or_exprt orexp = to_or_expr(current);
+      assert (orexp.operands().size() == 2);
+      exprt o1 = get(orexp.op0());
+      exprt o2 = get(orexp.op1());
+      if (o1 == true_exprt() || o2 == true_exprt())
+      {
+	      ++it;
+	      continue;
+      }
+    }
+
+    exprt simplified = get(current);
+    solver << simplified;
+
+    switch(sat_check.prop_solve())
+    {
+      case decision_proceduret::D_SATISFIABLE:
+        ++it;
+	      break; 
+      case decision_proceduret::D_UNSATISFIABLE:
+        prop.l_set_to_true(convert(current));
+        nb_active++;
+        lazy_array_constraints.erase(it++);
+	      break;
+      default:
+	assert(false);
+    }
+
+  }
+
+  std::cout << "BV-Refinement: " << nb_active << " array expressions become active" << std::endl;
+  std::cout << "BV-Refinement: " << lazy_array_constraints.size() << " inactive array expressions" << std::endl;
+  if (nb_active > 0)
+    progress = true;
 
   #if 0
   // iterate over *roots*

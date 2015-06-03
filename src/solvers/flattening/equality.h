@@ -29,6 +29,7 @@ public:
   {
     add_equality_constraints();
     prop_conv_solvert::post_process();
+    typemap.clear(); // if called incrementally, don't do it twice
   }
 
 protected:

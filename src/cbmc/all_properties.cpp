@@ -128,6 +128,9 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
         symex_target_equationt::SSA_stepst::iterator next=*c_it;
         next++; // include the assertion
         build_goto_trace(bmc.equation, next, solver, bmc.ns, g.goto_trace);
+#if 0
+        show_goto_trace(std::cout, bmc.ns, g.goto_trace);
+#endif
         break;
       }
     }
@@ -189,6 +192,9 @@ bool bmc_all_propertiest::operator()()
         goal_map[property_id].description=it->comment;
       }
       
+      //need to convert again as the context of the expression 
+      //  may have changed
+      it->cond_literal = solver.convert(it->cond_expr);
       goal_map[property_id].instances.push_back(it);
     }
   }
@@ -217,6 +223,7 @@ bool bmc_all_propertiest::operator()()
 
   status() << "Running " << solver.decision_procedure_text() << eom;
 
+  solver.set_assumptions(bmc.equation.activate_assertions);
   cover_goals();  
 
   // output runtime
