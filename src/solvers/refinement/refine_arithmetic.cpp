@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/bv_arithmetic.h>
 #include <util/ieee_float.h>
 #include <util/expr_util.h>
+#include <util/arith_tools.h>
 
 #include <langapi/language_util.h>
 
@@ -20,8 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // Parameters
 #define MAX_INTEGER_UNDERAPPROX 3
 #define MAX_FLOAT_UNDERAPPROX 10
-
-#define RM ieee_floatt::ROUND_TO_EVEN
 
 //#define DEBUG
 
@@ -81,6 +80,9 @@ Function: bv_refinementt::convert_floatbv_op
 
 void bv_refinementt::convert_floatbv_op(const exprt &expr, bvt &bv)
 {
+  if(!do_arithmetic_refinement)
+    return SUB::convert_floatbv_op(expr, bv);
+  
   if(ns.follow(expr.type()).id()!=ID_floatbv ||
      expr.operands().size()!=3)
     return SUB::convert_floatbv_op(expr, bv);
@@ -102,6 +104,9 @@ Function: bv_refinementt::convert_mult
 
 void bv_refinementt::convert_mult(const exprt &expr, bvt &bv)
 {
+  if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
+    return SUB::convert_mult(expr, bv);
+  
   // we catch any multiplication
   // unless it involves a constant
 
@@ -156,6 +161,9 @@ Function: bv_refinementt::convert_div
 
 void bv_refinementt::convert_div(const exprt &expr, bvt &bv)
 {
+  if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
+    return SUB::convert_div(expr, bv);
+
   // we catch any division
   // unless it's integer division by a constant
   
@@ -181,6 +189,9 @@ Function: bv_refinementt::convert_mod
 
 void bv_refinementt::convert_mod(const exprt &expr, bvt &bv)
 {
+  if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
+    return SUB::convert_mod(expr, bv);
+
   // we catch any mod
   // unless it's integer + constant
 
@@ -255,17 +266,24 @@ void bv_refinementt::check_SAT(approximationt &a)
     assert(a.expr.operands().size()==3);
 
     if(a.over_state==MAX_STATE) return;
-  
+
     ieee_float_spect spec(to_floatbv_type(type));
     ieee_floatt o0(spec), o1(spec);
 
     o0.unpack(a.op0_value);
     o1.unpack(a.op1_value);
     
+    // get actual rounding mode
+    mp_integer rounding_mode_int;
+    exprt rounding_mode_expr = get(a.expr.op2());
+    to_integer(rounding_mode_expr, rounding_mode_int);
+    ieee_floatt::rounding_modet rounding_mode = 
+      (ieee_floatt::rounding_modet)integer2long(rounding_mode_int);
+
     ieee_floatt result=o0;
-    o0.rounding_mode=RM;
-    o1.rounding_mode=RM;
-    result.rounding_mode=RM;
+    o0.rounding_mode=rounding_mode;
+    o1.rounding_mode=rounding_mode;
+    result.rounding_mode=rounding_mode;
 
     if(a.expr.id()==ID_floatbv_plus)
       result+=o1;
@@ -304,7 +322,7 @@ void bv_refinementt::check_SAT(approximationt &a)
       bvt r;
       float_utilst float_utils(prop);
       float_utils.spec=spec;
-      float_utils.rounding_mode_bits.set(RM);
+      float_utils.rounding_mode_bits.set(rounding_mode);
       
       literalt op0_equal=
         bv_utils.equal(a.op0_bv, float_utils.build_constant(o0));
@@ -331,7 +349,7 @@ void bv_refinementt::check_SAT(approximationt &a)
       bvt r;
       float_utilst float_utils(prop);
       float_utils.spec=spec;
-      float_utils.rounding_mode_bits.set(RM);
+      float_utils.rounding_mode_bits.set(rounding_mode);
 
       bvt op0=a.op0_bv, op1=a.op1_bv, res=a.result_bv;
 
@@ -412,8 +430,15 @@ void bv_refinementt::check_SAT(approximationt &a)
     else
       assert(0);
   }
-  else
+  else if(type.id()==ID_fixedbv)
+  {
+    //TODO: not implemented
     assert(0);
+  }
+  else
+  {
+    assert(0);
+  }
 
   status() << "Found spurious `" << a.as_string()
            << "' (state " << a.over_state << ")" << eom;
