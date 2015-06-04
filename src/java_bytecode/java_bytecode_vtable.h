@@ -9,11 +9,8 @@ bool java_bytecode_vtable(class symbol_tablet &symbol_table,
 void create_vtable_type_and_pointer(symbol_tablet &symbol_table,
     class symbolt &class_symbol);
 
-// TODO: Remove
-exprt make_vtable_tropenkopf(const exprt &function, const exprt &this_obj);
-exprt make_vtable_tropenkopf2(const exprt &function, const exprt &this_obj);
-#include <util/std_code.h>
-code_assignt make_vtable_assignment(const symbol_tablet &symbol_table, const exprt &func);
+code_assignt make_vtable_assignment(const symbol_tablet &symbol_table,
+    const exprt &func);
 
 exprt make_vtable_function(const exprt &function, const exprt &this_obj);
 

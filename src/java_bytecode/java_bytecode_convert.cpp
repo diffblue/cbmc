@@ -218,6 +218,7 @@ void java_bytecode_convertt::convert(const classt &c)
   new_symbol.base_name=c.name;
   new_symbol.pretty_name=c.name;
   new_symbol.name=JAVA_NS+id2string(c.name);
+  class_type.set(ID_name, new_symbol.name);
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
   new_symbol.is_type=true;
@@ -291,15 +292,11 @@ size_t count_java_parameter_slots(const code_typet::parameterst &p)
   return std::accumulate(p.begin(), p.end(), 0, &count_slots);
 }
 
-bool is_contructor(const irep_idt &class_name, const class_typet::methodt &method)
+bool is_contructor(const class_typet::methodt &method)
 {
-  const std::string &name(id2string(class_name));
-  std::string needle("java::");
-  needle += name;
-  needle += ".";
-  needle += name;
-  needle += ":()V";
-  return id2string(method.get_name()).find(needle) != std::string::npos;
+  const std::string &name(id2string(method.get_name()));
+  const std::string::size_type &npos(std::string::npos);
+  return npos != name.find("<init>") || npos != name.find("<clinit>");
 }
 
 void cast_if_necessary(binary_relation_exprt &condition)
@@ -344,7 +341,9 @@ void java_bytecode_convertt::convert(
   if(!m.is_static)
   {
     code_typet::parametert this_p;
-    this_p.type()=java_reference_type(symbol_typet(class_symbol.name));
+    const empty_typet empty;
+    const pointer_typet object_ref_type(empty);
+    this_p.type()=object_ref_type;
     this_p.set(ID_C_this, true);
     parameters.insert(parameters.begin(), this_p);
   }
@@ -383,7 +382,7 @@ void java_bytecode_convertt::convert(
   if(is_virtual)
     set_virtual_name(method);
 
-  if(is_contructor(class_symbol.base_name, method))
+  if(is_contructor(method))
     method.set(ID_constructor, true);
 
   method.type()=member_type;
@@ -647,10 +646,9 @@ codet java_bytecode_convertt::convert_instructions(
       {
         if(parameters.empty() || !parameters[0].get_bool(ID_C_this))
         {
-          // TODO: java_reference_type
-          empty_typet empty_type;
-          const pointer_typet this_pointer(empty_type);
-          code_typet::parametert this_p(this_pointer);
+          const empty_typet empty;
+          pointer_typet object_ref_type(empty);
+          code_typet::parametert this_p(object_ref_type);
           this_p.set(ID_C_this, true);
           parameters.insert(parameters.begin(), this_p);
         }
@@ -671,12 +669,8 @@ codet java_bytecode_convertt::convert_instructions(
 
       if(is_virtual)
       {
-        #if 0
         const exprt &this_arg=call.arguments().front();
         call.function() = make_vtable_function(arg0, this_arg);
-        #else
-        call.function() = arg0;
-        #endif
       }
       else
         call.function() = arg0;
