@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/vtable.h>
 
-#include <iostream>
-
 namespace {
 bool is_virtual(const class_typet::methodt &method) {
   return method.get_bool(ID_is_virtual)

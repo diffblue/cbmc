@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef DEBUG
 #include <iostream>
 #endif
-#include <iostream>
+
 class java_bytecode_parsert:public parsert
 {
 public:
