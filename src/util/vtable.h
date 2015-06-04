@@ -1,7 +1,7 @@
 #ifndef CPROVER_VTABLE_H_
 #define CPROVER_VTABLE_H_
 
-class vtable_namest {
+class vtnamest {
 public:
   static const char VT_PTR[];
 

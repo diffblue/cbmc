@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef DEBUG
 #include <iostream>
 #endif
-
+#include <iostream>
 class java_bytecode_parsert:public parsert
 {
 public:
@@ -1082,7 +1082,7 @@ bool java_bytecode_parse(
   java_bytecode_parse_treet &parse_tree,
   message_handlert &message_handler)
 {
-  std::ifstream in(file.c_str());
+  std::ifstream in(file.c_str(), std::ios::binary);
 
   if(!in)
   {
