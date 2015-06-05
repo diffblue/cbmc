@@ -23,6 +23,7 @@ typet java_boolean_type();
 typet java_reference_type(const typet &subtype);
 
 pointer_typet java_array_type(const typet &subtype);
+pointer_typet java_array_type(const char subtype);
 
 bool is_reference_type(char t);
 
@@ -36,7 +37,7 @@ bool is_reference_type(char t);
 // z  boolean
 // a  reference
 
-typet java_type(char t);
+typet java_type_from_char(char t);
 typet java_type_from_string(const std::string &);
 
 #endif

@@ -103,11 +103,11 @@ protected:
     {
       symbol_exprt &cached(variable->second);
       if(!is_reference_type(type_char))
-        cached.type() = java_type(type_char);
+        cached.type() = java_type_from_char(type_char);
       return cached;
     }
 
-    symbol_exprt result(identifier, java_type(type_char));
+    symbol_exprt result(identifier, java_type_from_char(type_char));
     result.set(ID_C_base_name, base_name);
     std::pair<std::map<irep_idt, symbol_exprt>::iterator, bool> it(variables.insert(std::make_pair(identifier, result)));
     assert(it.second);
@@ -741,7 +741,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==3 && results.empty());
       
       exprt pointer=
-        typecast_exprt(op[0], java_array_type(java_type(statement[0])));
+        typecast_exprt(op[0], java_array_type(statement[0]));
 
       const dereference_exprt deref(pointer, pointer.type().subtype());
       assert(pointer.type().subtype().id()==ID_struct);
@@ -776,7 +776,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size() == 2 && results.size() == 1);
 
       exprt pointer=
-        typecast_exprt(op[0], java_array_type(java_type(statement[0])));
+        typecast_exprt(op[0], java_array_type(statement[0]));
 
       const dereference_exprt deref(pointer, pointer.type().subtype());
       const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
@@ -845,7 +845,7 @@ codet java_bytecode_convertt::convert_instructions(
       else
       {
         const unsigned int value(arg0.get_unsigned_int(ID_value));
-        const typet type=java_type(statement[0]);
+        const typet type=java_type_from_char(statement[0]);
         results[0] = as_number(value, type);
       }
     }
@@ -944,7 +944,7 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?ushr"))
     {
       assert(op.size()==2 && results.size()==1);
-      const typet type(java_type(statement[0]));
+      const typet type(java_type_from_char(statement[0]));
 
       const unsigned int width(type.get_unsigned_int(ID_width));
       typet target=unsigned_long_int_type();
@@ -1007,7 +1007,7 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?cmp?"))
     {
       assert(op.size()==2 && results.size()==1);
-      const floatbv_typet type(to_floatbv_type(java_type(statement[0])));
+      const floatbv_typet type(to_floatbv_type(java_type_from_char(statement[0])));
       const ieee_float_spect spec(type);
       const ieee_floatt nan(ieee_floatt::NaN(spec));
       const constant_exprt nan_expr(nan.to_expr());
@@ -1075,7 +1075,7 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?2?")) // i2c etc.
     {
       assert(op.size()==1 && results.size()==1);
-      results[0]=typecast_exprt(op[0], java_type(statement[2]));
+      results[0]=typecast_exprt(op[0], java_type_from_char(statement[2]));
     }
     else if(statement=="new")
     {
@@ -1152,7 +1152,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size() == 1 && results.size() == 1);
 
       exprt pointer=
-        typecast_exprt(op[0], java_array_type(java_type(statement[0])));
+        typecast_exprt(op[0], java_array_type(statement[0]));
 
       const dereference_exprt array(pointer, pointer.type().subtype());
       assert(pointer.type().subtype().id()==ID_struct);
