@@ -677,12 +677,13 @@ void goto_convertt::do_java_new(
   else
   {
     // zero-initialize the object
+    const source_locationt &location=rhs.find_location();
     dereference_exprt deref(lhs, object_type);
     exprt zero_object=zero_initializer(object_type, rhs.find_location(), ns, get_message_handler());
     goto_programt::targett t_i=dest.add_instruction(ASSIGN);
     t_i->code=code_assignt(deref, zero_object);
-    const source_locationt &location(rhs.find_location());
     t_i->source_location=location;
+
     assign_vtpointers(dest, ns, lhs, to_symbol_type(object_type), location);
   }
 
