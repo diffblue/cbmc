@@ -289,36 +289,6 @@ void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
 }
 
 namespace {
-char java_type(const typet &type)
-{
-  const irep_idt &id(type.id());
-  if (ID_signedbv == id)
-  {
-    const unsigned int width(type.get_unsigned_int(ID_width));
-    if(java_int_type().get_unsigned_int(ID_width) == width)
-      return 'i';
-    else if(java_long_type().get_unsigned_int(ID_width) == width)
-      return 'l';
-    else if(java_short_type().get_unsigned_int(ID_width) == width)
-      return 's';
-    else if(java_byte_type().get_unsigned_int(ID_width) == width)
-      return 'b';
-  }
-  else if(ID_unsignedbv == id)
-    return 'c';
-  else if(ID_floatbv == id)
-  {
-    const unsigned int width(type.get_unsigned_int(ID_width));
-    if(java_float_type().get_unsigned_int(ID_width) == width)
-      return 'f';
-    else if(java_double_type().get_unsigned_int(ID_width) == width)
-      return 'd';
-  }
-  else if(ID_bool == id)
-    return 'z';
-
-  return 'a';
-}
 
 const size_t SLOTS_PER_INTEGER(1u);
 const size_t INTEGER_WIDTH(64u);
@@ -400,7 +370,7 @@ void java_bytecode_convertt::convert(
   {
     irep_idt base_name="arg"+i2string(param_index);
     const typet &type=parameters[i].type();
-    irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_type(type);
+    irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_char_from_type(type);
     parameters[i].set_base_name(base_name);
     parameters[i].set_identifier(identifier);
 
