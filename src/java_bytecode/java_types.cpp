@@ -229,6 +229,49 @@ pointer_typet java_array_type(const typet &subtype)
 
 /*******************************************************************\
 
+Function: java_array_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+pointer_typet java_array_type(const char subtype)
+{
+  // This is a pointer to a struct containing the length
+  // plus a pointer to the data.
+
+  struct_typet array_type;
+  
+  if(subtype=='c')
+    array_type.set_tag("java_char_array");
+  else if(subtype=='f')
+    array_type.set_tag("java_float_array");
+  else if(subtype=='d')
+    array_type.set_tag("java_double_array");
+  else if(subtype=='b')
+    array_type.set_tag("java_byte_array");
+  else if(subtype=='s')
+    array_type.set_tag("java_short_array");
+  else if(subtype=='i')
+    array_type.set_tag("java_int_array");
+  else if(subtype=='l')
+    array_type.set_tag("java_long_array");
+
+  struct_typet::componentt length("length", java_int_type());
+  struct_typet::componentt data("data", pointer_typet(java_type_from_char(subtype)));
+
+  array_type.components().push_back(length);
+  array_type.components().push_back(data);
+
+  return pointer_typet(array_type);
+}
+
+/*******************************************************************\
+
 Function: is_reference_type
 
   Inputs:
@@ -246,7 +289,7 @@ bool is_reference_type(const char t)
 
 /*******************************************************************\
 
-Function: java_type
+Function: java_type_from_char
 
   Inputs:
 
@@ -256,7 +299,7 @@ Function: java_type
 
 \*******************************************************************/
 
-typet java_type(char t)
+typet java_type_from_char(char t)
 {
   switch(t)
   {
