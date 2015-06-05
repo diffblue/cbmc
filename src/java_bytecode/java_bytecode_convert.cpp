@@ -66,7 +66,10 @@ public:
 
   void operator()(const java_bytecode_parse_treet &parse_tree)
   {
-    convert(parse_tree.parsed_class);
+    if(parse_tree.loading_successful)
+      convert(parse_tree.parsed_class);
+    else
+      generate_class_stub(parse_tree.parsed_class.name);
   }
 
   typedef java_bytecode_parse_treet::classt classt;
@@ -165,6 +168,8 @@ protected:
   codet convert_instructions(const instructionst &);
 
   static const bytecode_infot &get_bytecode_info(const irep_idt &statement);
+  
+  void generate_class_stub(const irep_idt &class_name);
 };
 
 namespace {
@@ -240,6 +245,47 @@ void java_bytecode_convertt::convert(const classt &c)
       it!=c.methods.end();
       it++)
     convert(*class_symbol, *it);
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_convertt::generate_class_stub
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
+{
+  class_typet class_type;
+
+  class_type.set_tag(class_name);
+  class_type.set(ID_base_name, class_name);
+
+  class_type.set(ID_incomplete_class, true);
+  class_type.components().push_back(class_typet::componentt());
+  class_type.components().back().type()=bool_typet();
+  class_type.components().back().set_name("dummy");
+
+  // produce class symbol
+  symbolt new_symbol;
+  new_symbol.base_name=class_name;
+  new_symbol.pretty_name=class_name;
+  new_symbol.name=JAVA_NS+id2string(class_name);
+  class_type.set(ID_name, new_symbol.name);
+  new_symbol.type=class_type;
+  new_symbol.mode=ID_java;
+  new_symbol.is_type=true;
+  
+  symbolt *class_symbol;
+  
+  // add before we do members
+  if(symbol_table.move(new_symbol, class_symbol))
+    throw "failed to add stub class symbol "+id2string(new_symbol.name);
 }
 
 namespace {

@@ -106,12 +106,19 @@ public:
   {
     other.parsed_class.swap(parsed_class);
     other.class_refs.swap(class_refs);
+    std::swap(loading_successful, other.loading_successful);
   }
 
   void output(std::ostream &out) const;
 
   typedef std::set<irep_idt> class_refst;
   class_refst class_refs;
+  
+  bool loading_successful;
+  
+  inline java_bytecode_parse_treet():loading_successful(false)
+  {
+  }
 };
 
 #endif

@@ -242,6 +242,8 @@ Function: java_bytecode_parsert::rClassFile
 
 void java_bytecode_parsert::rClassFile()
 {
+  parse_tree.loading_successful=false;
+
   u4 magic=read_u4();
   u2 minor_version=read_u2(), major_version=read_u2();
   
@@ -275,6 +277,8 @@ void java_bytecode_parsert::rClassFile()
     rclass_attribute(parsed_class);
 
   get_class_refs();
+
+  parse_tree.loading_successful=true;
 }
   
 /*******************************************************************\

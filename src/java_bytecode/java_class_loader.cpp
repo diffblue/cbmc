@@ -48,13 +48,18 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
       id2string(c)+".class",
       parse_tree,
       get_message_handler());
-
-    // add any dependencies to queue
-    for(java_bytecode_parse_treet::class_refst::const_iterator
-        it=parse_tree.class_refs.begin();
-        it!=parse_tree.class_refs.end();
-        it++)
-      queue.push(*it);
+      
+    if(parse_tree.loading_successful)
+    {
+      // add any dependencies to queue
+      for(java_bytecode_parse_treet::class_refst::const_iterator
+          it=parse_tree.class_refs.begin();
+          it!=parse_tree.class_refs.end();
+          it++)
+        queue.push(*it);
+    }
+    else
+      parse_tree.parsed_class.name=c;
   }
   
   return class_map[class_name];
