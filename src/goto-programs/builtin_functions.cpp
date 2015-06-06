@@ -647,32 +647,46 @@ void goto_convertt::do_java_new(
   
   if(new_array)
   {
-    assert(object_type.id()==ID_struct);
-    const struct_typet &struct_type=to_struct_type(object_type);
-    assert(struct_type.components().size()==2);
+    // multi-dimensional?
+    
+    if(rhs.operands().size()==1)
+    {
+      assert(object_type.id()==ID_struct);
+      const struct_typet &struct_type=to_struct_type(object_type);
+      assert(struct_type.components().size()==2);
 
-    // if it's an array, we need to set the length field
-    dereference_exprt deref(lhs, object_type);
-    member_exprt length(deref, struct_type.components()[0].get_name(), struct_type.components()[0].type());
-    goto_programt::targett t_s=dest.add_instruction(ASSIGN);
-    t_s->code=code_assignt(length, rhs.op0());
-    t_s->source_location=rhs.find_location();
-    
-    // we also need to allocate space for the data
-    member_exprt data(deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
-    side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
-    data_cpp_new_expr.set(ID_size, rhs.op0());
-    goto_programt::targett t_p=dest.add_instruction(ASSIGN);
-    t_p->code=code_assignt(data, data_cpp_new_expr);
-    t_p->source_location=rhs.find_location();
-    
-    // zero-initialize the data
-    exprt zero_element=gen_zero(data.type().subtype());
-    codet array_set(ID_array_set);
-    array_set.copy_to_operands(data, zero_element);
-    goto_programt::targett t_d=dest.add_instruction(OTHER);
-    t_d->code=array_set;
-    t_d->source_location=rhs.find_location();
+      // if it's an array, we need to set the length field
+      dereference_exprt deref(lhs, object_type);
+      member_exprt length(deref, struct_type.components()[0].get_name(), struct_type.components()[0].type());
+      goto_programt::targett t_s=dest.add_instruction(ASSIGN);
+      t_s->code=code_assignt(length, rhs.op0());
+      t_s->source_location=rhs.find_location();
+      
+      // we also need to allocate space for the data
+      member_exprt data(deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+      side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
+      data_cpp_new_expr.set(ID_size, rhs.op0());
+      goto_programt::targett t_p=dest.add_instruction(ASSIGN);
+      t_p->code=code_assignt(data, data_cpp_new_expr);
+      t_p->source_location=rhs.find_location();
+      
+      // zero-initialize the data
+      exprt zero_element=gen_zero(data.type().subtype());
+      codet array_set(ID_array_set);
+      array_set.copy_to_operands(data, zero_element);
+      goto_programt::targett t_d=dest.add_instruction(OTHER);
+      t_d->code=array_set;
+      t_d->source_location=rhs.find_location();
+    }
+    else
+    {
+      assert(rhs.operands().size()>=2);
+
+      side_effect_exprt tmp_java_new_array=rhs;
+      goto_programt tmp;
+
+      // recursive call
+    }
   }
   else
   {
