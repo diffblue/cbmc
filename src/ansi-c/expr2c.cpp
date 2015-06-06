@@ -378,7 +378,7 @@ std::string expr2ct::convert_rec(
         it++)
     {
       dest+=' ';
-      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_base_name()));
+      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_name()));
       dest+=';';
     }
     
@@ -414,7 +414,7 @@ std::string expr2ct::convert_rec(
         it++)
     {
       dest+=' ';
-      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_base_name()));
+      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_name()));
       dest+=';';
     }
     
