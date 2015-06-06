@@ -620,13 +620,10 @@ void goto_convertt::do_java_new(
 {
   if(lhs.is_nil())
     throw "do_java_new without lhs is yet to be implemented";
+    
+  source_locationt location=rhs.source_location();
 
-  bool new_array=rhs.get(ID_statement)==ID_java_new_array;
-
-  if(new_array)
-    assert(rhs.operands().size()>=1); // one per dimension
-  else
-    assert(rhs.operands().empty());
+  assert(rhs.operands().empty());
 
   typet object_type=rhs.type().subtype();
   
@@ -643,69 +640,121 @@ void goto_convertt::do_java_new(
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(lhs, malloc_expr);
-  t_n->source_location=rhs.find_location();
+  t_n->source_location=location;
   
-  if(new_array)
-  {
-    // multi-dimensional?
+  // zero-initialize the object
+  dereference_exprt deref(lhs, object_type);
+  exprt zero_object=zero_initializer(object_type, location, ns, get_message_handler());
+  goto_programt::targett t_i=dest.add_instruction(ASSIGN);
+  t_i->code=code_assignt(deref, zero_object);
+  t_i->source_location=location;
+
+  assign_vtpointers(dest, ns, lhs, to_symbol_type(object_type), location);
+}
+
+/*******************************************************************\
+
+Function: goto_convertt::do_java_new_array
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::do_java_new_array(
+  const exprt &lhs,
+  const side_effect_exprt &rhs,
+  goto_programt &dest)
+{
+  if(lhs.is_nil())
+    throw "do_java_new without lhs is yet to be implemented";
     
-    if(rhs.operands().size()==1)
-    {
-      assert(object_type.id()==ID_struct);
-      const struct_typet &struct_type=to_struct_type(object_type);
-      assert(struct_type.components().size()==2);
+  source_locationt location=rhs.source_location();
 
-      // if it's an array, we need to set the length field
-      dereference_exprt deref(lhs, object_type);
-      member_exprt length(deref, struct_type.components()[0].get_name(), struct_type.components()[0].type());
-      goto_programt::targett t_s=dest.add_instruction(ASSIGN);
-      t_s->code=code_assignt(length, rhs.op0());
-      t_s->source_location=rhs.find_location();
-      
-      // we also need to allocate space for the data
-      member_exprt data(deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
-      side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
-      data_cpp_new_expr.set(ID_size, rhs.op0());
-      goto_programt::targett t_p=dest.add_instruction(ASSIGN);
-      t_p->code=code_assignt(data, data_cpp_new_expr);
-      t_p->source_location=rhs.find_location();
-      
-      // zero-initialize the data
-      exprt zero_element=gen_zero(data.type().subtype());
-      codet array_set(ID_array_set);
-      array_set.copy_to_operands(data, zero_element);
-      goto_programt::targett t_d=dest.add_instruction(OTHER);
-      t_d->code=array_set;
-      t_d->source_location=rhs.find_location();
-    }
-    else
-    {
-      assert(rhs.operands().size()>=2);
+  assert(rhs.operands().size()>=1); // one per dimension
 
-      side_effect_exprt tmp_java_new_array=rhs;
-      goto_programt tmp;
+  typet object_type=rhs.type().subtype();
+  
+  // build size expression
+  exprt object_size=size_of_expr(object_type, ns);
+  
+  if(object_size.is_nil())
+    throw "do_java_new got nil object_size";
 
-      // recursive call
-    }
-  }
-  else
+  // we produce a malloc side-effect, which stays
+  side_effect_exprt malloc_expr(ID_malloc);
+  malloc_expr.copy_to_operands(object_size);
+  malloc_expr.type()=pointer_typet(object_type);
+
+  goto_programt::targett t_n=dest.add_instruction(ASSIGN);
+  t_n->code=code_assignt(lhs, malloc_expr);
+  t_n->source_location=location;
+  
+  // multi-dimensional?
+  
+  assert(object_type.id()==ID_struct);
+  const struct_typet &struct_type=to_struct_type(object_type);
+  assert(struct_type.components().size()==2);
+
+  // if it's an array, we need to set the length field
+  dereference_exprt deref(lhs, object_type);
+  member_exprt length(deref, struct_type.components()[0].get_name(), struct_type.components()[0].type());
+  goto_programt::targett t_s=dest.add_instruction(ASSIGN);
+  t_s->code=code_assignt(length, rhs.op0());
+  t_s->source_location=location;
+  
+  // we also need to allocate space for the data
+  member_exprt data(deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+  side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
+  data_cpp_new_expr.set(ID_size, rhs.op0());
+  goto_programt::targett t_p=dest.add_instruction(ASSIGN);
+  t_p->code=code_assignt(data, data_cpp_new_expr);
+  t_p->source_location=location;
+  
+  // zero-initialize the data
+  exprt zero_element=gen_zero(data.type().subtype());
+  codet array_set(ID_array_set);
+  array_set.copy_to_operands(data, zero_element);
+  goto_programt::targett t_d=dest.add_instruction(OTHER);
+  t_d->code=array_set;
+  t_d->source_location=location;
+
+  if(rhs.operands().size()>=2)
   {
-    // zero-initialize the object
-    const source_locationt &location=rhs.find_location();
-    dereference_exprt deref(lhs, object_type);
-    exprt zero_object=zero_initializer(object_type, rhs.find_location(), ns, get_message_handler());
-    goto_programt::targett t_i=dest.add_instruction(ASSIGN);
-    t_i->code=code_assignt(deref, zero_object);
-    t_i->source_location=location;
+    // produce
+    // for(int i=0; i<size; i++) tmp[i]=java_new(dim-1);
+    // This will be converted recursively.
+    
+    goto_programt tmp;
 
-    assign_vtpointers(dest, ns, lhs, to_symbol_type(object_type), location);
+    symbol_exprt tmp_i=
+      new_tmp_symbol(index_type(), "index", tmp, location).symbol_expr();
+
+    code_fort for_loop;
+    
+    side_effect_exprt sub_java_new=rhs;
+    sub_java_new.operands().erase(sub_java_new.operands().begin());
+    sub_java_new.type()=data.type().subtype();
+    
+    side_effect_exprt inc(ID_assign);
+    inc.operands().resize(2);
+    inc.op0()=tmp_i;
+    inc.op1()=plus_exprt(tmp_i, gen_one(tmp_i.type()));
+    
+    dereference_exprt deref_expr(plus_exprt(data, tmp_i), data.type().subtype());
+    
+    for_loop.init()=code_assignt(tmp_i, gen_zero(tmp_i.type()));
+    for_loop.cond()=binary_relation_exprt(tmp_i, ID_lt, rhs.op0());
+    for_loop.iter()=inc;
+    for_loop.body()=code_skipt();
+    for_loop.body()=code_assignt(deref_expr, sub_java_new);
+
+    convert(for_loop, tmp);
+    dest.destructive_append(tmp);
   }
-
-  // grab initializer
-  goto_programt tmp_initializer;
-  cpp_new_initializer(lhs, rhs, tmp_initializer);
-
-  dest.destructive_append(tmp_initializer);
 }
 
 /*******************************************************************\
