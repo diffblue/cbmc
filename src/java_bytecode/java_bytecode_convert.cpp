@@ -1053,6 +1053,10 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.empty() && results.size()==1);
       const pointer_typet ref_type(arg0.type());
       exprt java_new_expr=side_effect_exprt(ID_java_new, ref_type);
+
+      if(!i_it->source_location.get_line().empty())
+        java_new_expr.add_source_location()=i_it->source_location;
+
       const exprt tmp=tmp_variable(ref_type);
       c=code_assignt(tmp, java_new_expr);
       results[0]=tmp;
@@ -1094,6 +1098,9 @@ codet java_bytecode_convertt::convert_instructions(
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.copy_to_operands(op[0]);
 
+      if(!i_it->source_location.get_line().empty())
+        java_new_array.add_source_location()=i_it->source_location;
+
       const exprt tmp=tmp_variable(ref_type);
       c=code_assignt(tmp, java_new_array);
       results[0]=tmp;
@@ -1112,6 +1119,9 @@ codet java_bytecode_convertt::convert_instructions(
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.operands()=op;
+
+      if(!i_it->source_location.get_line().empty())
+        java_new_array.add_source_location()=i_it->source_location;
 
       const exprt tmp=tmp_variable(ref_type);
       c=code_assignt(tmp, java_new_array);
