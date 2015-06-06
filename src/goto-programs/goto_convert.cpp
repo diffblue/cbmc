@@ -761,13 +761,20 @@ void goto_convertt::convert_assign(
     do_cpp_new(lhs, to_side_effect_expr(rhs), dest);
   }
   else if(rhs.id()==ID_side_effect &&
-          (rhs.get(ID_statement)==ID_java_new ||
-           rhs.get(ID_statement)==ID_java_new_array))
+          rhs.get(ID_statement)==ID_java_new)
   {
     Forall_operands(it, rhs)
       clean_expr(*it, dest);
 
     do_java_new(lhs, to_side_effect_expr(rhs), dest);
+  }
+  else if(rhs.id()==ID_side_effect &&
+          rhs.get(ID_statement)==ID_java_new_array)
+  {
+    Forall_operands(it, rhs)
+      clean_expr(*it, dest);
+
+    do_java_new_array(lhs, to_side_effect_expr(rhs), dest);
   }
   else if(rhs.id()==ID_side_effect &&
           rhs.get(ID_statement)==ID_malloc)
