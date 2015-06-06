@@ -191,7 +191,7 @@ struct bytecode_infot const bytecode_info[]= {
 { "lxor",           0x83, ' ', 2, 1, 'l' }, // value1, value2 → result; bitwise exclusive or of two longs
 { "monitorenter",   0xc2, ' ', 1, 0, ' ' }, // objectref →; enter monitor for object ("grab the lock" - start of synchronized() section)
 { "monitorexit",    0xc3, ' ', 1, 0, ' ' }, // objectref →; exit monitor for object ("release the lock" - end of synchronized() section)
-{ "multianewarray", 0xc5, 'm', 1, 1, 'a' }, // count1, [count2,...] → arrayref; create a new array of dimensions dimensions with elements of type identified by class reference in constant pool index (indexbyte1 << 8 + indexbyte2); the sizes of each dimension is identified by count1, [count2, etc.]
+{ "multianewarray", 0xc5, 'm', 0, 1, 'a' }, // count1, [count2,...] → arrayref; create a new array of dimensions dimensions with elements of type identified by class reference in constant pool index (indexbyte1 << 8 + indexbyte2); the sizes of each dimension is identified by count1, [count2, etc.]
 { "new",            0xbb, 'C', 0, 1, 'a' }, // → objectref; create new object of type identified by class reference in constant pool index (indexbyte1 << 8 + indexbyte2)
 { "newarray",       0xbc, 't', 1, 1, 'a' }, // count → arrayref; create new array with count elements of primitive type identified by atype
 { "nop",            0x00, ' ', 0, 0, ' ' }, // [No change]; perform no operation

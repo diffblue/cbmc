@@ -1089,7 +1089,7 @@ codet java_bytecode_convertt::convert_instructions(
       else
         element_type=java_reference_type(empty_typet());
 
-      const typet ref_type=java_array_type(element_type);
+      const typet ref_type=java_array_type(element_type, 1);
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.copy_to_operands(op[0]);
@@ -1100,15 +1100,15 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="multianewarray")
     {
-      // the ops are the dimensions
-      assert(op.size()>=1 && results.size()==1);
-
-      irep_idt number=to_constant_expr(arg0).get_value();
+      // The first argument is the type, the second argument is the dimension.
+      // The size of each dimension is on the stack.
+      irep_idt number=to_constant_expr(arg1).get_value();
       unsigned dimension=safe_c_str2unsigned(number.c_str());
-      
-      assert(op.size()==dimension);
 
-      const typet ref_type=java_array_type(java_reference_type(empty_typet()));
+      op=pop(dimension);
+      assert(results.size()==1);
+
+      const typet ref_type=java_array_type(arg0.type(), dimension);
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.operands()=op;
@@ -1119,7 +1119,7 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="arraylength")
     {
-      assert(op.size() == 1 && results.size() == 1);
+      assert(op.size()==1 && results.size()==1);
 
       exprt pointer=
         typecast_exprt(op[0], java_array_type(statement[0]));
