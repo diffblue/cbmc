@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 
-#include <ansi-c/expr2c.h>
-
 #include "java_bytecode_language.h"
 #include "java_bytecode_convert.h"
 #include "java_bytecode_internal_additions.h"
@@ -19,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
+
+#include "expr2java.h"
 
 /*******************************************************************\
 
@@ -226,7 +226,7 @@ bool java_bytecode_languaget::from_expr(
   std::string &code,
   const namespacet &ns)
 {
-  code=expr2c(expr, ns);
+  code=expr2java(expr, ns);
   return false;
 }
 
@@ -247,7 +247,7 @@ bool java_bytecode_languaget::from_type(
   std::string &code,
   const namespacet &ns)
 {
-  code=type2c(type, ns);
+  code=type2java(type, ns);
   return false;
 }
 
