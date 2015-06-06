@@ -1661,7 +1661,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       if(ptr_arg.type().id()!=ID_pointer)
       {
         err_location(source_location);
-        throw "__sync_* primitives take pointer as first argument";
+        throw "__sync_* primitives take a pointer as first argument";
       }
 
       symbol_exprt result;
@@ -1677,27 +1677,232 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
     }
     else if(identifier=="__atomic_load_n")
     {
-    }
-    else if(identifier=="__atomic_load")
-    {
+      // These are polymorphic
+      // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+      // type __atomic_load_n(type *ptr, int memorder)
+
+      if(fargs.operands.size()!=2)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects two arguments";
+      }
+
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=ptr_arg.type().subtype();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
     else if(identifier=="__atomic_store_n")
     {
-    }
-    else if(identifier=="__atomic_store")
-    {
+      // These are polymorphic
+      // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+      // void __atomic_store_n(type *ptr, type val, int memorder)
+
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects three arguments";
+      }
+
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type().subtype()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=empty_typet();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
     else if(identifier=="__atomic_exchange_n")
     {
+      // These are polymorphic
+      // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+      // type __atomic_exchange_n(type *ptr, type val, int memorder)
+
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects three arguments";
+      }
+
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type().subtype()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=ptr_arg.type().subtype();
+      result.type()=t;
+      expr.swap(result);
+      return;
+    }
+    else if(identifier=="__atomic_load" ||
+            identifier=="__atomic_store")
+    {
+      // void __atomic_load(type *ptr, type *ret, int memorder)
+      // void __atomic_store(type *ptr, type *val, int memorder)
+
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects three arguments";
+      }
+
+      if(fargs.operands[0].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      if(fargs.operands[1].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as second argument";
+      }
+      
+      const exprt &ptr_arg=fargs.operands.front();
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=empty_typet();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
     else if(identifier=="__atomic_exchange")
     {
+      // void __atomic_exchange(type *ptr, type *val, type *ret, int memorder)
+
+      if(fargs.operands.size()!=4)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects four arguments";
+      }
+
+      if(fargs.operands[0].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      if(fargs.operands[1].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as second argument";
+      }
+      
+      if(fargs.operands[2].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as third argument";
+      }
+      
+      const exprt &ptr_arg=fargs.operands.front();
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=empty_typet();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
-    else if(identifier=="__atomic_compare_exchange_n")
+    else if(identifier=="__atomic_compare_exchange_n" ||
+            identifier=="__atomic_compare_exchange")
     {
-    }
-    else if(identifier=="__atomic_compare_exchange")
-    {
+      // bool __atomic_compare_exchange_n(type *ptr, type *expected, type desired, bool weak, int success_memorder, int failure_memorder)
+      // bool __atomic_compare_exchange(type *ptr, type *expected, type *desired, bool weak, int success_memorder, int failure_memorder)
+
+      if(fargs.operands.size()!=6)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects six arguments";
+      }
+
+      if(fargs.operands[0].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      if(fargs.operands[1].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as second argument";
+      }
+
+      if(identifier=="__atomic_compare_exchange" &&
+         fargs.operands[2].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as third argument";
+      }
+
+      const exprt &ptr_arg=fargs.operands.front();
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      
+      if(identifier=="__atomic_compare_exchange")
+        t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      else
+        t.parameters().push_back(code_typet::parametert(ptr_arg.type().subtype()));
+      
+      t.parameters().push_back(code_typet::parametert(c_bool_type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=c_bool_type();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
     else if(identifier=="__atomic_add_fetch" ||
             identifier=="__atomic_sub_fetch" ||
