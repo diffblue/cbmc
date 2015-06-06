@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ansi-c/expr2c_class.h>
 
+#include "java_types.h"
 #include "expr2java.h"
 
 class expr2javat:public expr2ct
@@ -179,187 +180,22 @@ std::string expr2javat::convert_rec(
   const std::string q=
     new_qualifiers.as_string();
 
-  if(is_reference(src))
-  {
-    return q+convert(src.subtype())+" &"+d;
-  }
-  else if(is_rvalue_reference(src))
-  {
-    return q+convert(src.subtype())+" &&"+d;
-  }
-  else if(src.get(ID_C_c_type)!=irep_idt())
-  {
-    const irep_idt c_type=src.get(ID_C_c_type);
-
-    if(c_type==ID_signed_char)
-      return q+"signed char"+d;
-    else if(c_type==ID_unsigned_char)
-      return q+"unsigned char"+d;
-    else if(c_type==ID_char)
-      return q+"char"+d;
-    else if(c_type==ID_signed_short_int)
-      return q+"short"+d;
-    else if(c_type==ID_unsigned_short_int)
-      return q+"unsigned short"+d;
-    else if(c_type==ID_signed_int)
-      return q+"int"+d;
-    else if(c_type==ID_unsigned_int)
-      return q+"unsigned"+d;
-    else if(c_type==ID_signed_long_int)
-      return q+"long"+d;
-    else if(c_type==ID_unsigned_long_int)
-      return q+"unsigned long"+d;
-    else if(c_type==ID_signed_long_long_int)
-      return q+"long long"+d;
-    else if(c_type==ID_unsigned_long_long_int)
-      return q+"unsigned long long"+d;
-    else if(c_type==ID_wchar_t)
-      return q+"wchar_t"+d;
-    else if(c_type==ID_float)
-      return q+"float"+d;
-    else if(c_type==ID_double)
-      return q+"double"+d;
-    else if(c_type==ID_long_double)
-      return q+"long double"+d;
-    else if(c_type==ID_bool)
-      return q+"bool"+d;
-    else
-      return expr2ct::convert_rec(src, qualifiers, declarator);
-  }
-  else if(src.id()==ID_symbol)
-  {
-    const irep_idt &identifier=
-      to_symbol_type(src).get_identifier();
-
-    const symbolt &symbol=ns.lookup(identifier);
-
-    if(symbol.type.id()==ID_struct ||
-       symbol.type.id()==ID_incomplete_struct)
-    {
-      std::string dest=q;
-      
-      if(symbol.type.get_bool(ID_C_class))
-        dest+="class";
-      else if(symbol.type.get_bool(ID_C_interface))
-        dest+="__interface"; // MS-specific
-      else
-        dest+="struct";
-
-      if(symbol.pretty_name!=irep_idt())
-        dest+=" "+id2string(symbol.pretty_name);
-
-      dest+=d;
-
-      return dest;
-    }
-    else if(symbol.type.id()==ID_c_enum)
-    {
-      std::string dest=q;
-
-      dest+="enum";
-
-      if(symbol.pretty_name!=irep_idt())
-        dest+=" "+id2string(symbol.pretty_name);
-
-      dest+=d;
-
-      return dest;
-    }
-    else
-      return expr2ct::convert_rec(src, qualifiers, declarator);
-  }
-  else if(src.id()==ID_struct ||
-          src.id()==ID_incomplete_struct)
-  {
-    std::string dest=q;
-
-    if(src.get_bool(ID_C_class))
-      dest+="class";
-    else if(src.get_bool(ID_C_interface))
-      dest+="__interface"; // MS-specific
-    else
-      dest+="struct";
-
-    dest+=d;
-
-    return dest;
-  }
-  else if(src.id()==ID_constructor)
-  {
-    return "constructor ";
-  }
-  else if(src.id()==ID_destructor)
-  {
-    return "destructor ";
-  }
-  else if(src.id()=="java-template-type")
-  {
-    return "typename";
-  }
-  else if(src.id()==ID_template)
-  {
-    std::string dest="template<";
-
-    const irept::subt &arguments=src.find(ID_arguments).get_sub();
-
-    forall_irep(it, arguments)
-    {
-      if(it!=arguments.begin()) dest+=", ";
-
-      const exprt &argument=(const exprt &)*it;
-
-      if(argument.id()==ID_symbol)
-      {
-        dest+=convert(argument.type())+" ";
-        dest+=convert(argument);
-      }
-      else if(argument.id()==ID_type)
-        dest+=convert(argument.type());
-      else
-        dest+=argument.to_string();
-    }
-
-    dest+="> "+convert(src.subtype());
-    return dest;
-  }
-  else if(src.id()==ID_pointer &&
-          src.find("to-member").is_not_nil())
-  {
-    typet tmp=src;
-    typet member;
-    member.swap(tmp.add("to-member"));
-
-    std::string dest = "(" + convert_rec(member, c_qualifierst(), "") + ":: *)";
-
-    if(src.subtype().id()==ID_code)
-    {
-      const code_typet& code_type = to_code_type(src.subtype());
-      const typet& return_type = code_type.return_type();
-      dest = convert_rec(return_type, c_qualifierst(), "") +" " + dest;
-
-      const code_typet::parameterst &args = code_type.parameters();
-      dest += "(";
-
-      for(code_typet::parameterst::const_iterator it=args.begin();
-          it!=args.end();
-          ++it)
-      {
-        if(it!=args.begin()) dest+=", ";
-        dest+=convert_rec(it->type(), c_qualifierst(), "");
-      }
-
-      dest += ")";
-      dest+=d;
-    }
-    else
-      dest=convert_rec(src.subtype(), c_qualifierst(), "")+" "+dest+d;
-
-    return dest;
-  }
-  else if(src.id()==ID_verilogbv)
-    return "sc_lv["+id2string(src.get(ID_width))+"]"+d;
-  else if(src.id()==ID_unassigned)
-    return "?";
+  if(src==java_int_type())
+    return q+"int"+d;
+  else if(src==java_long_type())
+    return q+"long"+d;
+  else if(src==java_short_type())
+    return q+"short"+d;
+  else if(src==java_byte_type())
+    return q+"byte"+d;
+  else if(src==java_char_type())
+    return q+"char"+d;
+  else if(src==java_float_type())
+    return q+"float"+d;
+  else if(src==java_double_type())
+    return q+"double"+d;
+  else if(src==java_boolean_type())
+    return q+"bool"+d;
   else if(src.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(src);
@@ -395,10 +231,6 @@ std::string expr2javat::convert_rec(
     dest+=" -> "+convert(return_type);
 
     return dest;
-  }
-  else if(src.id()==ID_nullptr)
-  {
-    return "std::nullptr_t";
   }
   else
     return expr2ct::convert_rec(src, qualifiers, declarator);

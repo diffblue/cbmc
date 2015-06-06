@@ -229,7 +229,7 @@ std::string expr2ct::convert_rec(
   
   std::string d=
     declarator==""?declarator:" "+declarator;
-  
+
   if(src.id()==ID_bool)
   {
     return q+"_Bool"+d;
@@ -362,8 +362,33 @@ std::string expr2ct::convert_rec(
              "__CPROVER_bitvector["+integer2string(width)+"]"+d;
     }
   }
-  else if(src.id()==ID_struct ||
-          src.id()==ID_incomplete_struct)
+  else if(src.id()==ID_struct)
+  {
+    const struct_typet &struct_type=to_struct_type(src);
+  
+    std::string dest=q+"struct";
+
+    const irep_idt &tag=struct_type.get_tag();
+    if(tag!="") dest+=" "+id2string(tag);
+    dest+=" {";
+    
+    for(struct_typet::componentst::const_iterator
+        it=struct_type.components().begin();
+        it!=struct_type.components().end();
+        it++)
+    {
+      dest+=' ';
+      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_base_name()));
+      dest+=';';
+    }
+    
+    dest+=" }";
+    
+    dest+=d;
+    
+    return dest;
+  }
+  else if(src.id()==ID_incomplete_struct)
   {
     std::string dest=q+"struct";
 
@@ -373,24 +398,39 @@ std::string expr2ct::convert_rec(
     
     return dest;
   }
-  else if(src.id()==ID_union ||
-          src.id()==ID_incomplete_union)
+  else if(src.id()==ID_union)
+  {
+    const union_typet &union_type=to_union_type(src);
+  
+    std::string dest=q+"union";
+
+    const irep_idt &tag=union_type.get_tag();
+    if(tag!="") dest+=" "+id2string(tag);
+    dest+=" {";
+    
+    for(union_typet::componentst::const_iterator
+        it=union_type.components().begin();
+        it!=union_type.components().end();
+        it++)
+    {
+      dest+=' ';
+      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_base_name()));
+      dest+=';';
+    }
+    
+    dest+=" }";
+    
+    dest+=d;
+    
+    return dest;
+  }
+  else if(src.id()==ID_incomplete_union)
   {
     std::string dest=q+"union";
 
     const std::string &tag=src.get_string(ID_tag);
     if(tag!="") dest+=" "+tag;
     dest+=d;
-
-    /*
-    const irept &components=type.find(ID_components);
-
-    forall_irep(it, components.get_sub())
-    {
-      typet &subtype=(typet &)it->find(ID_type);
-      base_type(subtype, ns);
-    }
-    */
 
     return dest;
   }
@@ -504,14 +544,32 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_symbol)
   {
-    return convert_rec(ns.follow(src), new_qualifiers, declarator);
+    const typet &followed=ns.follow(src);
+    
+    if(followed.id()==ID_struct)
+    {
+      std::string dest=q+"struct";
+      const irep_idt &tag=to_struct_type(followed).get_tag();
+      if(tag!="") dest+=" "+id2string(tag);
+      dest+=d;
+    }
+    else if(followed.id()==ID_union)
+    {
+      std::string dest=q+"struct";
+      const irep_idt &tag=to_union_type(followed).get_tag();
+      if(tag!="") dest+=" "+id2string(tag);
+      dest+=d;
+    }
+    else
+      return convert_rec(followed, new_qualifiers, declarator);
   }
   else if(src.id()==ID_struct_tag)
   {
-    const typet &struct_type=to_struct_tag_type(src);
+    const struct_tag_typet &struct_tag_type=
+      to_struct_tag_type(src);
 
     std::string dest=q+"struct";
-    const std::string &tag=struct_type.get_string(ID_tag);
+    const std::string &tag=ns.follow_tag(struct_tag_type).get_string(ID_tag);
     if(tag!="") dest+=" "+tag;
     dest+=d;
 
@@ -519,10 +577,11 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_union_tag)
   {
-    const typet &union_type=to_union_tag_type(src);
+    const union_tag_typet &union_tag_type=
+      to_union_tag_type(src);
 
-    std::string dest=q+"struct";
-    const std::string &tag=union_type.get_string(ID_tag);
+    std::string dest=q+"union";
+    const std::string &tag=ns.follow_tag(union_tag_type).get_string(ID_tag);
     if(tag!="") dest+=" "+tag;
     dest+=d;
 
