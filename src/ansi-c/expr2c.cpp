@@ -500,25 +500,25 @@ std::string expr2ct::convert_rec(
   {
     c_qualifierst sub_qualifiers;
     sub_qualifiers.read(src.subtype());
-    const typet &subtype=ns.follow(src.subtype());
+    const typet &subtype_followed=ns.follow(src.subtype());
   
     // The star gets attached to the declarator.
     std::string new_declarator="*";
 
     if(q!="" &&
-       (!declarator.empty() || src.subtype().id()==ID_pointer))
+       (!declarator.empty() || subtype_followed.id()==ID_pointer))
       new_declarator+=" "+q;
     
     new_declarator+=declarator;
 
     // Depending on precedences, we may add parentheses.
-    if(subtype.id()==ID_code ||
+    if(subtype_followed.id()==ID_code ||
         (sizeof_nesting==0 &&
-         (subtype.id()==ID_array ||
-          subtype.id()==ID_incomplete_array)))
+         (subtype_followed.id()==ID_array ||
+          subtype_followed.id()==ID_incomplete_array)))
       new_declarator="("+new_declarator+")";
-    
-    return convert_rec(subtype, sub_qualifiers, new_declarator);
+      
+    return convert_rec(src.subtype(), sub_qualifiers, new_declarator);
   }
   else if(src.id()==ID_array)
   {
@@ -552,6 +552,7 @@ std::string expr2ct::convert_rec(
       const irep_idt &tag=to_struct_type(followed).get_tag();
       if(tag!="") dest+=" "+id2string(tag);
       dest+=d;
+      return dest;
     }
     else if(followed.id()==ID_union)
     {
@@ -559,6 +560,7 @@ std::string expr2ct::convert_rec(
       const irep_idt &tag=to_union_type(followed).get_tag();
       if(tag!="") dest+=" "+id2string(tag);
       dest+=d;
+      return dest;
     }
     else
       return convert_rec(followed, new_qualifiers, declarator);
