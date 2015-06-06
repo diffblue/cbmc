@@ -144,9 +144,6 @@ bool java_bytecode_languaget::typecheck(
        symbol_table, get_message_handler()))
     return true;
 
-  if(java_bytecode_vtable(symbol_table, module))
-    return true;
-
   return false;
 }
 

@@ -71,10 +71,10 @@ public:
 
   void create_vtable_symbol(symbolt &result, const class_typet &class_type)
   {
-    const std::string &class_name(id2string(class_type.get(ID_name)));
-    const std::string &base_class_name(id2string(class_type.get(ID_base_name)));
+    const std::string &class_name=id2string(class_type.get(ID_name));
+    const std::string &base_class_name=id2string(class_type.get(ID_base_name));
     const symbolt &type_symbol(get_vt_type_symbol(class_type));
-    const std::string &type_base_name(id2string(type_symbol.base_name));
+    const std::string &type_base_name=id2string(type_symbol.base_name);
     result.name = vtnamest::get_table(class_name);
     result.base_name = vtnamest::get_table_base(base_class_name);
     result.pretty_name = result.base_name;
@@ -107,11 +107,13 @@ public:
     class_typet &vtable_type(to_class_type(vtable_type_symbol.type));
     const irep_idt &ifc_name(ifc_method->get_name());
     if (has_component(vtable_type, ifc_name)) return;
+
     struct_typet::componentt entry_component;
     entry_component.set_name(ifc_name);
     entry_component.set_base_name(ifc_method->get_base_name());
     entry_component.type() = pointer_typet(implementation.type());
     vtable_type.components().push_back(entry_component);
+
     const irep_idt &impl_name(implementation.get_name());
     const symbol_exprt impl_symbol(impl_name, implementation.type());
     const address_of_exprt impl_ref(impl_symbol);
@@ -248,25 +250,25 @@ void create_vtable_type(const irep_idt &vt_name, symbol_tablet &symbol_table,
 const char ID_isvtptr[] = "is_vtptr";
 const char NS_SEP[] = "::";
 
-void add_vtable_pointer_member(const irep_idt &vt_name, symbolt &class_symbol) {
+void add_vtable_pointer_member(
+  const irep_idt &vt_name,
+  symbolt &class_symbol)
+{
   struct_typet::componentt comp;
-  comp.type() = pointer_typet(symbol_typet(vt_name));
-  const std::string &name(id2string(class_symbol.name));
-  comp.set_name(vtnamest::get_pointer(name));
-  comp.set(ID_base_name, comp.get_name());
-  const std::string &base_name(id2string(class_symbol.base_name));
-  comp.set(ID_pretty_name, base_name + vtnamest::VT_PTR);
+
+  comp.type()=pointer_typet(symbol_typet(vt_name));
+  comp.set_name("@vtable_pointer");
   comp.set(ID_isvtptr, true);
-  comp.set(ID_access, ID_public);
-  struct_typet &class_type(to_struct_type(class_symbol.type));
-  struct_typet::componentst &components(class_type.components());
-  components.push_back(comp);
+
+  struct_typet &class_type=to_struct_type(class_symbol.type);
+  class_type.components().push_back(comp);
 }
+
 }
 
 /*******************************************************************
 
- Function: create_vtable_type_and_pointer
+ Function: create_vtable_symbol
 
  Inputs:
 
@@ -276,17 +278,35 @@ void add_vtable_pointer_member(const irep_idt &vt_name, symbolt &class_symbol) {
 
 \*******************************************************************/
 
-void create_vtable_type_and_pointer(
+void create_vtable_symbol(
   symbol_tablet &symbol_table,
-  symbolt &class_symbol)
+  const symbolt &class_symbol)
 {
-  const irep_idt vttype=vtnamest::get_type(id2string(class_symbol.name));
+  const irep_idt vttype=
+    vtnamest::get_type(id2string(class_symbol.name));
   
-  if (!symbol_table.has_symbol(vttype))
-  {
+  if(!symbol_table.has_symbol(vttype))
     create_vtable_type(vttype, symbol_table, class_symbol);
-    add_vtable_pointer_member(vttype, class_symbol);
-  }
+}
+
+/*******************************************************************
+
+ Function: create_vtable_pointer
+
+ Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void create_vtable_pointer(symbolt &class_symbol)
+{
+  const irep_idt vttype=
+    vtnamest::get_type(id2string(class_symbol.name));
+  
+  add_vtable_pointer_member(vttype, class_symbol);
 }
 
 namespace {
@@ -371,8 +391,7 @@ exprt make_vtable_function(
   const symbol_typet target_type(class_id);
   const exprt this_ref(get_ref(this_obj, target_type));
   const typet ref_type(this_ref.type());
-  const std::string memb_name(vtnamest::get_pointer(class_id));
-  const member_exprt vtable_member(this_ref, memb_name, vtable_pointer_type);
+  const member_exprt vtable_member(this_ref, "@vtable_pointer", vtable_pointer_type);
   const dereference_exprt vtable(vtable_member, vtable_type); // TODO: cast?
   const pointer_typet func_ptr_type(func.type());
   const member_exprt func_ptr(vtable, func_name, func_ptr_type);

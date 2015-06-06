@@ -11,13 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 
-bool java_bytecode_vtable(
-  class symbol_tablet &symbol_table,
-  const std::string &module);
-
-void create_vtable_type_and_pointer(
-  symbol_tablet &symbol_table,
+void create_vtable_pointer(
   class symbolt &class_symbol);
+
+void create_vtable_symbol(
+  symbol_tablet &symbol_table,
+  const class symbolt &class_symbol);
 
 code_assignt make_vtable_assignment(
   const symbol_tablet &symbol_table,

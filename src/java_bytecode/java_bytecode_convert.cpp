@@ -172,19 +172,6 @@ protected:
   void generate_class_stub(const irep_idt &class_name);
 };
 
-namespace {
-const char JAVA_NS[] = "java::";
-irept make_base(const irep_idt &base_name) {
-  irept base;
-  base.id(ID_base);
-  const symbol_typet type(JAVA_NS + id2string(base_name));
-  base.add(ID_type, type);
-  return base;
-}
-
-const char ID_interfaces[] = "interfaces";
-}
-
 /*******************************************************************\
 
 Function: java_bytecode_convertt::convert
@@ -205,8 +192,16 @@ void java_bytecode_convertt::convert(const classt &c)
   class_type.set(ID_base_name, c.name);
 
   if(!c.extends.empty())
-    class_type.bases().push_back(make_base(c.extends));
+  {
+    symbol_typet base("java::"+id2string(c.extends));
+    class_type.add_base(base);
+    class_typet::componentt base_class_field;
+    base_class_field.type()=base;
+    base_class_field.set_name("@"+id2string(c.extends));
+    class_type.components().push_back(base_class_field);
+  }
 
+  #if 0
   irept &impl=class_type.add(ID_interfaces);
   const std::list<irep_idt> &ifc=c.implements;
 
@@ -217,12 +212,13 @@ void java_bytecode_convertt::convert(const classt &c)
     class_type.bases().push_back(base); // TODO: Useful?
     impl.get_sub().push_back(base);
   }
+  #endif
 
   // produce class symbol
   symbolt new_symbol;
   new_symbol.base_name=c.name;
   new_symbol.pretty_name=c.name;
-  new_symbol.name=JAVA_NS+id2string(c.name);
+  new_symbol.name="java::"+id2string(c.name);
   class_type.set(ID_name, new_symbol.name);
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
@@ -234,6 +230,7 @@ void java_bytecode_convertt::convert(const classt &c)
   if(symbol_table.move(new_symbol, class_symbol))
     throw "failed to add class symbol "+id2string(new_symbol.name);
 
+  // now do members  
   for(classt::fieldst::const_iterator
       it=c.fields.begin();
       it!=c.fields.end();
@@ -245,6 +242,13 @@ void java_bytecode_convertt::convert(const classt &c)
       it!=c.methods.end();
       it++)
     convert(*class_symbol, *it);
+
+  // create the virtual table
+  create_vtable_symbol(symbol_table, *class_symbol);
+
+  // is this a root class?
+  if(c.extends.empty())
+    create_vtable_pointer(*class_symbol);
 }
 
 /*******************************************************************\
@@ -267,15 +271,12 @@ void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
   class_type.set(ID_base_name, class_name);
 
   class_type.set(ID_incomplete_class, true);
-  class_type.components().push_back(class_typet::componentt());
-  class_type.components().back().type()=bool_typet();
-  class_type.components().back().set_name("dummy");
 
   // produce class symbol
   symbolt new_symbol;
   new_symbol.base_name=class_name;
   new_symbol.pretty_name=class_name;
-  new_symbol.name=JAVA_NS+id2string(class_name);
+  new_symbol.name="java::"+id2string(class_name);
   class_type.set(ID_name, new_symbol.name);
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
@@ -283,9 +284,14 @@ void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
   
   symbolt *class_symbol;
   
-  // add before we do members
   if(symbol_table.move(new_symbol, class_symbol))
     throw "failed to add stub class symbol "+id2string(new_symbol.name);
+
+  // create the virtual table
+  create_vtable_symbol(symbol_table, *class_symbol);
+
+  // create vtable pointer
+  create_vtable_pointer(*class_symbol);
 }
 
 namespace {
@@ -416,9 +422,6 @@ void java_bytecode_convertt::convert(
   tmp_counter=0;
   method_symbol.value=convert_instructions(m.instructions);
   symbol_table.add(method_symbol);
-
-  if(is_virtual)
-    create_vtable_type_and_pointer(symbol_table, class_symbol);
 }
 
 /*******************************************************************\
