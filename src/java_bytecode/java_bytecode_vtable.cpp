@@ -217,8 +217,9 @@ public:
 
 \*******************************************************************/
 
-bool java_bytecode_vtable(symbol_tablet &symbol_table,
-    const std::string &module)
+bool java_bytecode_vtable(
+  symbol_tablet &symbol_table,
+  const std::string &module)
 {
   const symbol_tablet::symbolst &symbols(symbol_table.symbols);
   java_bytecode_vtable_factoryt factory(symbol_table, module);
@@ -264,6 +265,7 @@ void add_vtable_pointer_member(const irep_idt &vt_name, symbolt &class_symbol) {
 }
 
 /*******************************************************************
+
  Function: create_vtable_type_and_pointer
 
  Inputs:
@@ -272,12 +274,16 @@ void add_vtable_pointer_member(const irep_idt &vt_name, symbolt &class_symbol) {
 
  Purpose:
 
- \*******************************************************************/
+\*******************************************************************/
 
-void create_vtable_type_and_pointer(symbol_tablet &symbol_table,
-    symbolt &class_symbol) {
-  const irep_idt vttype(vtnamest::get_type(id2string(class_symbol.name)));
-  if (!symbol_table.has_symbol(vttype)) {
+void create_vtable_type_and_pointer(
+  symbol_tablet &symbol_table,
+  symbolt &class_symbol)
+{
+  const irep_idt vttype=vtnamest::get_type(id2string(class_symbol.name));
+  
+  if (!symbol_table.has_symbol(vttype))
+  {
     create_vtable_type(vttype, symbol_table, class_symbol);
     add_vtable_pointer_member(vttype, class_symbol);
   }
@@ -288,6 +294,7 @@ const char NAME_SEP = '.';
 }
 
 /*******************************************************************
+
  Function: get_virtual_name
 
  Inputs:
@@ -296,7 +303,7 @@ const char NAME_SEP = '.';
 
  Purpose:
 
- \*******************************************************************/
+\*******************************************************************/
 
 void set_virtual_name(class_typet::methodt &method)
 {
@@ -336,6 +343,7 @@ std::string get_full_class_name(const std::string &name) {
 }
 
 /*******************************************************************
+
  Function: make_vtable_function
 
  Inputs:
@@ -344,9 +352,11 @@ std::string get_full_class_name(const std::string &name) {
 
  Purpose:
 
- \*******************************************************************/
+\*******************************************************************/
 
-exprt make_vtable_function(const exprt &func, const exprt &this_obj)
+exprt make_vtable_function(
+  const exprt &func,
+  const exprt &this_obj)
 {
   const irep_idt &func_name(func.get(ID_identifier));
   const std::string class_id(get_full_class_name(id2string(func_name)));
