@@ -765,14 +765,17 @@ void java_bytecode_parsert::rbytecode(
         
         // now default value
         u4 default_value=read_u4();
+        address+=4;
         
         // number of pairs
         u4 npairs=read_u4();
+        address+=4;
         
         for(unsigned i=0; i<npairs; i++)
         {
           u4 match=read_u4();
           u4 offset=read_u4();
+          address+=8;
         }
       }
       break;
@@ -784,27 +787,32 @@ void java_bytecode_parsert::rbytecode(
         
         // now default value
         u4 default_value=read_u4();
+        address+=4;
 
         // now low value
         u4 low_value=read_u4();
+        address+=4;
         
         // now high value
         u4 high_value=read_u4();
+        address+=4;
 
         // there are high-low+1 offsets
         for(unsigned i=low_value; i<=high_value; i++)
         {
           u4 offset=read_u4();
+          address+=4;
         }
       }
       break;
       
     case 'm': // multianewarray: constant-pool index plus one unsigned byte
       {
-        u2 c=read_u2();
+        u2 c=read_u2(); // constant-pool index
         instruction.args.push_back(constant(c));
-        u1 dimensions=read_u1();
+        u1 dimensions=read_u1(); // number of dimensions
         instruction.args.push_back(from_integer(dimensions, integer_typet()));
+        address+=3;
       }
       break;
       
@@ -862,7 +870,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
   u4 attribute_length=read_u4();
   
   irep_idt attribute_name=pool_entry(attribute_name_index).s;
-  
+
   if(attribute_name=="Code")
   {
     u2 max_stack=read_u2();
