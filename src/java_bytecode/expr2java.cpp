@@ -36,8 +36,6 @@ protected:
   virtual std::string convert(const exprt &src, unsigned &precedence);
   virtual std::string convert_java_this(const exprt &src, unsigned precedence);
   virtual std::string convert_java_new(const exprt &src, unsigned precedence);
-  virtual std::string convert_extractbit(const exprt &src, unsigned precedence);
-  virtual std::string convert_extractbits(const exprt &src, unsigned precedence);
   virtual std::string convert_code_java_delete(const exprt &src, unsigned precedence);
   virtual std::string convert_struct(const exprt &src, unsigned &precedence);
   virtual std::string convert_code(const codet &src, unsigned indent);
@@ -511,10 +509,6 @@ std::string expr2javat::convert(
 {
   if(src.id()=="java-this")
     return convert_java_this(src, precedence=15);
-  if(src.id()==ID_extractbit)
-    return convert_extractbit(src, precedence=15);
-  else if(src.id()==ID_extractbits)
-    return convert_extractbits(src, precedence=15);
   else if(src.id()==ID_side_effect &&
           (src.get(ID_statement)==ID_java_new ||
            src.get(ID_statement)==ID_java_new_array))
@@ -557,48 +551,6 @@ std::string expr2javat::convert_code(
     return convert_java_new(src,indent);
 
   return expr2ct::convert_code(src, indent);
-}
-
-
-/*******************************************************************\
-
-Function: expr2javat::extractbit
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string expr2javat::convert_extractbit(
-  const exprt &src,
-  unsigned precedence)
-{
-  assert(src.operands().size() == 2);
-  return convert(src.op0()) + "[" + convert(src.op1()) + "]";
-}
-
-/*******************************************************************\
-
-Function: expr2javat::extractbit
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string expr2javat::convert_extractbits(
-  const exprt &src,
-  unsigned precedence)
-{
-  assert(src.operands().size() == 3);
-  return convert(src.op0()) + ".range(" + convert(src.op1()) + ","
-         + convert(src.op2()) + ")";
 }
 
 /*******************************************************************\
