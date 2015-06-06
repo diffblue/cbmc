@@ -370,7 +370,7 @@ std::string expr2ct::convert_rec(
     const std::string &tag=src.get_string(ID_tag);
     if(tag!="") dest+=" "+tag;
     dest+=d;
-
+    
     return dest;
   }
   else if(src.id()==ID_union ||
@@ -505,6 +505,28 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_symbol)
   {
     return convert_rec(ns.follow(src), new_qualifiers, declarator);
+  }
+  else if(src.id()==ID_struct_tag)
+  {
+    const typet &struct_type=to_struct_tag_type(src);
+
+    std::string dest=q+"struct";
+    const std::string &tag=struct_type.get_string(ID_tag);
+    if(tag!="") dest+=" "+tag;
+    dest+=d;
+
+    return dest;
+  }
+  else if(src.id()==ID_union_tag)
+  {
+    const typet &union_type=to_union_tag_type(src);
+
+    std::string dest=q+"struct";
+    const std::string &tag=union_type.get_string(ID_tag);
+    if(tag!="") dest+=" "+tag;
+    dest+=d;
+
+    return dest;
   }
   else if(src.id()==ID_code)
   {
