@@ -343,7 +343,7 @@ public:
 
   inline bool is_class() const
   {
-    return get_bool(ID_C_class);    
+    return get_bool(ID_C_class);
   }
   
   inline irep_idt default_access() const
@@ -359,6 +359,11 @@ public:
   inline irept::subt &bases()
   {
     return add(ID_bases).get_sub();
+  }
+  
+  inline void add_base(const typet &base)
+  {
+    bases().push_back(exprt(ID_base, base));
   }
   
   bool has_base(const irep_idt &id) const
