@@ -196,30 +196,44 @@ Function: java_array_type
 
 \*******************************************************************/
 
-pointer_typet java_array_type(const typet &subtype)
+pointer_typet java_array_type(const typet &subtype, unsigned dimension)
 {
+  assert(dimension!=0);
+
+  // Multi-dimensional arrays in Java are arrays of arrays
+  typet final_subtype;
+  
+  struct_typet array_type;
+  
+  if(dimension==1)
+  {
+    final_subtype=subtype;
+  
+    if(subtype==java_char_type())
+      array_type.set_tag("java_char_array");
+    else if(subtype==java_float_type())
+      array_type.set_tag("java_float_array");
+    else if(subtype==java_double_type())
+      array_type.set_tag("java_double_array");
+    else if(subtype==java_byte_type())
+      array_type.set_tag("java_byte_array");
+    else if(subtype==java_short_type())
+      array_type.set_tag("java_short_array");
+    else if(subtype==java_int_type())
+      array_type.set_tag("java_int_array");
+    else if(subtype==java_long_type())
+      array_type.set_tag("java_long_array");
+  }
+  else
+  {
+    final_subtype=java_array_type(subtype, dimension-1);
+  }
+
   // This is a pointer to a struct containing the length
   // plus a pointer to the data.
 
-  struct_typet array_type;
-  
-  if(subtype==java_char_type())
-    array_type.set_tag("java_char_array");
-  else if(subtype==java_float_type())
-    array_type.set_tag("java_float_array");
-  else if(subtype==java_double_type())
-    array_type.set_tag("java_double_array");
-  else if(subtype==java_byte_type())
-    array_type.set_tag("java_byte_array");
-  else if(subtype==java_short_type())
-    array_type.set_tag("java_short_array");
-  else if(subtype==java_int_type())
-    array_type.set_tag("java_int_array");
-  else if(subtype==java_long_type())
-    array_type.set_tag("java_long_array");
-
   struct_typet::componentt length("length", java_int_type());
-  struct_typet::componentt data("data", pointer_typet(subtype));
+  struct_typet::componentt data("data", pointer_typet(final_subtype));
 
   array_type.components().push_back(length);
   array_type.components().push_back(data);
@@ -378,7 +392,7 @@ typet java_type_from_string(const std::string &src)
     {
       if(src.size()<=2) return nil_typet();
       const typet subtype=java_type_from_string(src.substr(1, std::string::npos));
-      return java_array_type(subtype);
+      return java_array_type(subtype, 1);
     }
     
   case 'F': return java_float_type();    

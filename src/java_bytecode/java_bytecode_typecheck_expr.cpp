@@ -81,7 +81,7 @@ Function: java_bytecode_typecheckt::typecheck_expr_java_new_array
 
 void java_bytecode_typecheckt::typecheck_expr_java_new_array(side_effect_exprt &expr)
 { 
-  assert(expr.operands().size()==1);
+  assert(expr.operands().size()>=1); // one per dimension
   typet &type=expr.type();
   typecheck_type(type);
 }

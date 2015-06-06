@@ -624,7 +624,7 @@ void goto_convertt::do_java_new(
   bool new_array=rhs.get(ID_statement)==ID_java_new_array;
 
   if(new_array)
-    assert(rhs.operands().size()==1);
+    assert(rhs.operands().size()>=1); // one per dimension
   else
     assert(rhs.operands().empty());
 
