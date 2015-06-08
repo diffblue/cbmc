@@ -5,11 +5,14 @@
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_mutex_t_defined
+#define __CPROVER_mutex_t_defined
 #if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
 // on Windows, the mutexes are integers already
 typedef pthread_mutex_t __CPROVER_mutex_t;
 #else
 typedef signed char __CPROVER_mutex_t;
+#endif
 #endif
 
 inline int pthread_mutex_init(
@@ -26,6 +29,16 @@ inline int pthread_mutex_init(
 #ifndef __CPROVER_PTHREAD_H_INCLUDED
 #include <pthread.h>
 #define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_mutex_t_defined
+#define __CPROVER_mutex_t_defined
+#if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
+// on Windows, the mutexes are integers already
+typedef pthread_mutex_t __CPROVER_mutex_t;
+#else
+typedef signed char __CPROVER_mutex_t;
+#endif
 #endif
 
 inline int pthread_mutex_lock(pthread_mutex_t *mutex)
@@ -49,6 +62,16 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 #ifndef __CPROVER_PTHREAD_H_INCLUDED
 #include <pthread.h>
 #define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_mutex_t_defined
+#define __CPROVER_mutex_t_defined
+#if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
+// on Windows, the mutexes are integers already
+typedef pthread_mutex_t __CPROVER_mutex_t;
+#else
+typedef signed char __CPROVER_mutex_t;
+#endif
 #endif
 
 inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
@@ -87,6 +110,16 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_mutex_t_defined
+#define __CPROVER_mutex_t_defined
+#if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
+// on Windows, the mutexes are integers already
+typedef pthread_mutex_t __CPROVER_mutex_t;
+#else
+typedef signed char __CPROVER_mutex_t;
+#endif
+#endif
+
 inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
@@ -107,6 +140,16 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 #ifndef __CPROVER_PTHREAD_H_INCLUDED
 #include <pthread.h>
 #define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_mutex_t_defined
+#define __CPROVER_mutex_t_defined
+#if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
+// on Windows, the mutexes are integers already
+typedef pthread_mutex_t __CPROVER_mutex_t;
+#else
+typedef signed char __CPROVER_mutex_t;
+#endif
 #endif
 
 inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
