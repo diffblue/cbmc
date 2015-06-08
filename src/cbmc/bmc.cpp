@@ -685,4 +685,11 @@ void bmct::setup_unwind()
     symex.prop_conv.set_all_frozen();
     equation.is_incremental = true;
   }
+  //freeze for refinement
+  if(options.get_bool_option("refine-arrays"))
+  {
+    //TODO: make more selective
+    symex.prop_conv.set_all_frozen();
+  }
 }
+
