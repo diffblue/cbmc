@@ -4,7 +4,7 @@
 namespace {
 const char VT_NS[] = "virtual_table::";
 const char VT_SEP = '@';
-const char ID_virtual_name[] = "virtual_name";
+//const char ID_virtual_name[] = "virtual_name";
 const char NS_SEP[] = "::";
 }
 
