@@ -690,6 +690,15 @@ Function: float_utilst::rem
 
 bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 {
+  /* The semantics of floating-point remainder implemented as below
+     is the sensible one.  Unfortunately this is not the one required
+     by IEEE-754 or fmod / remainder.  Martin has discussed the
+     'correct' semantics with Christoph and Alberto at length as
+     well as talking to various hardware designers and we still
+     hasn't found a good way to implement them in a solver.
+     We have some approaches that are correct but they really
+     don't scale. */
+
   // stub: do src1-(src1/src2)*src2
   return sub(src1, mul(div(src1, src2), src2));
 }
