@@ -398,7 +398,7 @@ void dump_ct::convert_compound(
 {
   const irep_idt &name=type.get(ID_tag);
 
-  if(!converted.insert(name).second)
+  if(!converted_compound.insert(name).second)
     return;
 
   const irept &bases = type.find(ID_bases);
@@ -564,7 +564,7 @@ void dump_ct::convert_compound_enum(
   const irep_idt &name=tag.get(ID_C_base_name);
 
   if(tag.is_nil() ||
-     !converted.insert(name).second)
+     !converted_enum.insert(name).second)
     return;
 
   os << type_to_string(type);
@@ -891,7 +891,7 @@ void dump_ct::convert_global_variable(
 {
   const irep_idt &func=symbol.location.get_function();
   if((func.empty() || symbol.is_extern || symbol.value.is_not_nil()) &&
-      !converted.insert(symbol.name).second)
+      !converted_global.insert(symbol.name).second)
     return;
 
   code_declt d(symbol.symbol_expr());
@@ -996,11 +996,13 @@ void dump_ct::convert_function_declaration(
       local_static_decls,
       type_decls);
 
-    convertedt converted_bak(converted);
+    convertedt converted_c_bak(converted_compound);
+    convertedt converted_e_bak(converted_enum);
     insert_local_type_decls(
       b,
       type_decls);
-    converted.swap(converted_bak);
+    converted_enum.swap(converted_e_bak);
+    converted_compound.swap(converted_c_bak);
 
     os_body << "// " << symbol.name << std::endl;
     os_body << "// " << symbol.location << std::endl;
