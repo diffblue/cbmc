@@ -22,11 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define MAX_INTEGER_UNDERAPPROX 3
 #define MAX_FLOAT_UNDERAPPROX 10
 
-//#define DEBUG
-
-#ifdef DEBUG
-#include <iostream>
-#endif
 
 /*******************************************************************\
 
@@ -303,19 +298,19 @@ void bv_refinementt::check_SAT(approximationt &a)
     ieee_floatt rr(spec);
     rr.unpack(a.result_value);
     
-    std::cout << "S1: " << o0 << " " << a.expr.id() << " " << o1
-              << " != " << rr << std::endl;
-    std::cout << "S2: " << integer2binary(a.op0_value, spec.width())
+    debug() << "S1: " << o0 << " " << a.expr.id() << " " << o1
+              << " != " << rr << eom;
+    debug() << "S2: " << integer2binary(a.op0_value, spec.width())
                         << " " << a.expr.id() << " " <<
                            integer2binary(a.op1_value, spec.width())
-              << "!=" << integer2binary(a.result_value, spec.width()) << std::endl;
-    std::cout << "S3: " << integer2binary(a.op0_value, spec.width())
+              << "!=" << integer2binary(a.result_value, spec.width()) << eom;
+    debug() << "S3: " << integer2binary(a.op0_value, spec.width())
                         << " " << a.expr.id() << " " <<
                            integer2binary(a.op1_value, spec.width())
-              << "==" << integer2binary(result.pack(), spec.width()) << std::endl;
+              << "==" << integer2binary(result.pack(), spec.width()) << eom;
     #endif
   
-    //if(a.over_state==1) { std::cout << "DISAGREEMENT!\n"; exit(1); }
+    //if(a.over_state==1) { debug() << "DISAGREEMENT!\n"; exit(1); }
     
     if(a.over_state<max_node_refinement)
     {

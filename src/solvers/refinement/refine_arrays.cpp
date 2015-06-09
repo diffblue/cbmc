@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/std_expr.h>
-#include <iostream>
 
 #include "bv_refinement.h"
 #include <solvers/sat/satcheck.h>
@@ -108,8 +107,10 @@ void bv_refinementt::arrays_overapproximated()
 
   }
 
-  std::cout << "BV-Refinement: " << nb_active << " array expressions become active" << std::endl;
-  std::cout << "BV-Refinement: " << lazy_array_constraints.size() << " inactive array expressions" << std::endl;
+  debug() << "BV-Refinement: " << nb_active 
+	  << " array expressions become active" << eom;
+  debug() << "BV-Refinement: " << lazy_array_constraints.size() 
+	  << " inactive array expressions" << eom;
   if (nb_active > 0)
     progress = true;
 
