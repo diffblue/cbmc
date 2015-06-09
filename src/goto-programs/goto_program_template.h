@@ -752,4 +752,12 @@ inline bool order_const_target(
   return &_i1<&_i2;
 }
 
+template <class codeT, class guardT>
+struct const_target_hash_templatet
+{
+  inline std::size_t operator()(
+    const typename goto_program_templatet<codeT, guardT>::const_targett t) const
+  { return t->location_number; }
+};
+
 #endif
