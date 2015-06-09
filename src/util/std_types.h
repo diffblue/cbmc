@@ -73,6 +73,16 @@ public:
   }
 };
 
+/*! \brief Natural numbers (which include zero)
+*/
+class natural_typet:public typet
+{
+public:
+  inline natural_typet():typet(ID_natural)
+  {
+  }
+};
+
 /*! \brief Unbounded, signed rational numbers
 */
 class rational_typet:public typet
