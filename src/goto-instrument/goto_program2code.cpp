@@ -1795,6 +1795,10 @@ void goto_program2codet::cleanup_code(
         }
       }
     }
+
+    while(call.lhs().is_not_nil() &&
+          call.lhs().id()==ID_typecast)
+      call.lhs()=to_typecast_expr(call.lhs()).op();
   }
 
   if(code.has_operands())
