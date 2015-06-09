@@ -377,6 +377,22 @@ bool boolbvt::type_conversion(
         return false;
       }
       
+    case IS_VERILOGBV: // verilogbv to signed/unsigned/enum
+      {
+        for(unsigned i=0; i<dest_width; i++)
+        {
+          unsigned src_index=i*2; // we take every second bit
+
+          if(src_index<src_width)
+            dest.push_back(src[src_index]);
+          else // always zero-extend
+            dest.push_back(const_literal(false));
+        }
+
+        return false;
+      }
+      break;
+      
     default:
       if(src_type.id()==ID_bool)
       {
