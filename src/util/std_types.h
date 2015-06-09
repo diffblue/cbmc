@@ -1010,9 +1010,8 @@ public:
   {
   }
 
-  inline explicit unsignedbv_typet(unsigned width):bitvector_typet(ID_unsignedbv)
+  inline explicit unsignedbv_typet(unsigned width):bitvector_typet(ID_unsignedbv, width)
   {
-    set_width(width);
   }
   
   mp_integer smallest() const;
@@ -1056,9 +1055,8 @@ public:
   {
   }
 
-  inline explicit signedbv_typet(unsigned width):bitvector_typet(ID_signedbv)
+  inline explicit signedbv_typet(unsigned width):bitvector_typet(ID_signedbv, width)
   {
-    set_width(width);
   }
 
   mp_integer smallest() const;
