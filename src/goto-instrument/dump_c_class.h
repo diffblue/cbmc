@@ -44,7 +44,7 @@ protected:
   languaget *language;
 
   typedef hash_set_cont<irep_idt, irep_id_hash> convertedt;
-  convertedt converted;
+  convertedt converted_compound, converted_global, converted_enum;
 
   std::set<std::string> system_headers;
 
