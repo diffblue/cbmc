@@ -756,12 +756,17 @@ void value_set_fit::get_value_set_rec(
     insert(dest, address_of_exprt(expr), 0);
     return;
   }
-  else if(expr.id()==ID_with ||          
-          expr.id()==ID_array_of ||
-          expr.id()==ID_array)
+  else if(expr.id()==ID_with)
   {
     // these are supposed to be done by assign()
     throw "unexpected value in get_value_set: "+expr.id_string();
+  }
+  else if(expr.id()==ID_array_of ||
+          expr.id()==ID_array)
+  {
+    // an array constructur, possibly containing addresses
+    forall_operands(it, expr)
+      get_value_set_rec(*it, dest, suffix, original_type, ns, recursion_set);
   }
   else if(expr.id()==ID_dynamic_object)
   {
