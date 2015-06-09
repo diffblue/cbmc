@@ -130,7 +130,7 @@ exprt value_set_dereferencet::dereference(
     false_guard.add(not_exprt(if_expr.cond()));
     
     exprt true_case=dereference(if_expr.true_case(), true_guard, mode);
-    exprt false_case=dereference(if_expr.true_case(), false_guard, mode);
+    exprt false_case=dereference(if_expr.false_case(), false_guard, mode);
     
     return if_exprt(if_expr.cond(), true_case, false_case);
   }
