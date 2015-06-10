@@ -332,6 +332,53 @@ typet java_type_from_char(char t)
 
 /*******************************************************************\
 
+Function: java_bytecode_promotion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Java does not support byte/short return types.
+          These are always promoted.
+
+\*******************************************************************/
+
+typet java_bytecode_promotion(const typet &type)
+{
+  if(type==java_boolean_type() ||
+     type==java_char_type() ||
+     type==java_byte_type() ||
+     type==java_short_type())
+    return java_int_type();
+
+  return type;
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_promotion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Java does not support byte/short return types.
+          These are always promoted.
+
+\*******************************************************************/
+
+exprt java_bytecode_promotion(const exprt &expr)
+{
+  typet new_type=java_bytecode_promotion(expr.type());
+
+  if(new_type==expr.type())
+    return expr;
+  else
+    return typecast_exprt(expr, new_type);
+}
+
+/*******************************************************************\
+
 Function: java_type_from_string
 
   Inputs:
@@ -353,10 +400,14 @@ typet java_type_from_string(const std::string &src)
     {
       std::size_t e_pos=src.rfind(')');
       if(e_pos==std::string::npos) return nil_typet();
+
       code_typet result;
+
+      // return types are promoted
       result.return_type()=
-        java_type_from_string(std::string(src, e_pos+1, std::string::npos));
-        
+        java_bytecode_promotion(
+          java_type_from_string(std::string(src, e_pos+1, std::string::npos)));
+
       for(std::size_t i=1; i<src.size() && src[i]!=')'; i++)
       {
         code_typet::parametert param;
@@ -399,6 +450,7 @@ typet java_type_from_string(const std::string &src)
   case 'D': return java_double_type();
   case 'I': return java_int_type();
   case 'C': return java_char_type();
+  case 'S': return java_short_type();
   case 'Z': return java_boolean_type();
   case 'V': return java_void_type();  
   case 'J': return java_long_type();  
