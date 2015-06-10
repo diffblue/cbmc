@@ -10,7 +10,7 @@ Author:
 #define CPROVER_GOTO_FENCE_INSERTER_PARSEOPTIONS_H
 
 #include <util/ui_message.h>
-#include <util/parseoptions.h>
+#include <util/parse_options.h>
 
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
@@ -24,16 +24,16 @@ Author:
   "(cav11)(version)(const-function-pointer-propagation)(print-graph)" \
   "(volatile)(all-shared)(pensieve)(naive)(all-shared-aeg)(async)(userdef)" 
 
-class goto_fence_inserter_parseoptionst:
-  public parseoptions_baset,
+class goto_fence_inserter_parse_optionst:
+  public parse_options_baset,
   public language_uit
 {
 public:
   virtual int doit();
   virtual void help();
 
-  goto_fence_inserter_parseoptionst(int argc, const char **argv):
-    parseoptions_baset(GOTO_FENCE_INSERTER_OPTIONS, argc, argv),
+  goto_fence_inserter_parse_optionst(int argc, const char **argv):
+    parse_options_baset(GOTO_FENCE_INSERTER_OPTIONS, argc, argv),
     language_uit("goto-instrument", cmdline)
   {
   }

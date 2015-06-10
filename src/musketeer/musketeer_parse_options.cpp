@@ -39,7 +39,7 @@ Author:
 
 #include "propagate_const_function_pointers.h"
 #include "version.h"
-#include "musketeer_parseoptions.h"
+#include "musketeer_parse_options.h"
 #include "fencer.h"
 #include "fence_shared.h"
 #include "pensieve.h"
@@ -48,7 +48,7 @@ Author:
 
 /*******************************************************************\
 
-Function: goto_fence_inserter_parseoptionst::set_verbosity
+Function: goto_fence_inserter_parse_optionst::set_verbosity
 
   Inputs:
 
@@ -58,7 +58,7 @@ Function: goto_fence_inserter_parseoptionst::set_verbosity
 
 \*******************************************************************/
 
-void goto_fence_inserter_parseoptionst::set_verbosity()
+void goto_fence_inserter_parse_optionst::set_verbosity()
 {
   unsigned int v=8; // default
   
@@ -73,7 +73,7 @@ void goto_fence_inserter_parseoptionst::set_verbosity()
 
 /*******************************************************************\
 
-Function: goto_fence_inserter_parseoptionst::doit
+Function: goto_fence_inserter_parse_optionst::doit
 
   Inputs:
 
@@ -83,7 +83,7 @@ Function: goto_fence_inserter_parseoptionst::doit
 
 \*******************************************************************/
 
-int goto_fence_inserter_parseoptionst::doit()
+int goto_fence_inserter_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
@@ -151,7 +151,7 @@ int goto_fence_inserter_parseoptionst::doit()
 
 /*******************************************************************\
 
-Function: goto_fence_inserter_parseoptionst::get_goto_program
+Function: goto_fence_inserter_parse_optionst::get_goto_program
 
   Inputs:
 
@@ -161,7 +161,7 @@ Function: goto_fence_inserter_parseoptionst::get_goto_program
 
 \*******************************************************************/
   
-void goto_fence_inserter_parseoptionst::get_goto_program(
+void goto_fence_inserter_parse_optionst::get_goto_program(
   goto_functionst &goto_functions)
 {
   status() << "Reading GOTO program from " << cmdline.args[0] << eom;
@@ -175,7 +175,7 @@ void goto_fence_inserter_parseoptionst::get_goto_program(
 
 /*******************************************************************\
 
-Function: goto_fence_inserter_parseoptionst::instrument_goto_program
+Function: goto_fence_inserter_parse_optionst::instrument_goto_program
 
   Inputs:
 
@@ -185,7 +185,7 @@ Function: goto_fence_inserter_parseoptionst::instrument_goto_program
 
 \*******************************************************************/
   
-void goto_fence_inserter_parseoptionst::instrument_goto_program(
+void goto_fence_inserter_parse_optionst::instrument_goto_program(
   goto_functionst &goto_functions)
 {
   optionst options;
@@ -433,7 +433,7 @@ void goto_fence_inserter_parseoptionst::instrument_goto_program(
 
 /*******************************************************************\
 
-Function: goto_fence_inserter_parseoptionst::help
+Function: goto_fence_inserter_parse_optionst::help
 
   Inputs:
 
@@ -443,7 +443,7 @@ Function: goto_fence_inserter_parseoptionst::help
 
 \*******************************************************************/
 
-void goto_fence_inserter_parseoptionst::help()
+void goto_fence_inserter_parse_optionst::help()
 {
   std::cout <<
     "\n"
