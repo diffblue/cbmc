@@ -612,8 +612,8 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
     u2 attributes_count=read_u2();
     
     field.name=pool_entry(name_index).s;
-    field.is_static=access_flags&ACC_STATIC;
-    field.is_final=access_flags&ACC_FINAL;
+    field.is_static=(access_flags&ACC_STATIC)!=0;
+    field.is_final=(access_flags&ACC_FINAL)!=0;
     field.signature=id2string(pool_entry(descriptor_index).s);
 
     for(unsigned j=0; j<attributes_count; j++)
@@ -1059,14 +1059,14 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   u2 name_index=read_u2();
   u2 descriptor_index=read_u2();
 
-  method.is_final=access_flags&ACC_FINAL;  
-  method.is_static=access_flags&ACC_STATIC;
-  method.is_abstract=access_flags&ACC_ABSTRACT;
-  method.is_public=access_flags&ACC_PUBLIC;
-  method.is_protected=access_flags&ACC_PROTECTED;
-  method.is_private=access_flags&ACC_PRIVATE;
-  method.is_synchronized=access_flags&ACC_SYNCHRONIZED;
-  method.is_native=access_flags&ACC_NATIVE;
+  method.is_final=(access_flags&ACC_FINAL)!=0;
+  method.is_static=(access_flags&ACC_STATIC)!=0;
+  method.is_abstract=(access_flags&ACC_ABSTRACT)!=0;
+  method.is_public=(access_flags&ACC_PUBLIC)!=0;
+  method.is_protected=(access_flags&ACC_PROTECTED)!=0;
+  method.is_private=(access_flags&ACC_PRIVATE)!=0;
+  method.is_synchronized=(access_flags&ACC_SYNCHRONIZED)!=0;
+  method.is_native=(access_flags&ACC_NATIVE)!=0;
   method.name=pool_entry(name_index).s;
   method.base_name=pool_entry(name_index).s;
   method.signature=id2string(pool_entry(descriptor_index).s);
