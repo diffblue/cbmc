@@ -164,7 +164,7 @@ Function: java_boolean_type
 
 typet java_boolean_type()
 {
-  return bool_typet();
+  return c_bool_typet(8);
 }
 
 /*******************************************************************\
