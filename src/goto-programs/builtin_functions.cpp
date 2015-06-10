@@ -574,20 +574,22 @@ void assign_vtpointer(goto_programt &dest, const namespacet &ns,
   }
 }
 
-bool is_type_missing(const namespacet &ns, const symbol_typet &type) {
+bool is_type_missing(const namespacet &ns, const symbol_typet &type)
+{
   return !ns.get_symbol_table().has_symbol(type.get_identifier());
 }
 
 void assign_vtpointers(goto_programt &dest, const namespacet &ns,
     const exprt &lhs, const symbol_typet &class_type,
-    const source_locationt &location) {
+    const source_locationt &location)
+{
   if (is_type_missing(ns, class_type)) return;
   const irep_idt &class_name(class_type.get_identifier());
   const irep_idt vtname(vtnamest::get_table(id2string(class_name)));
   if (ns.get_symbol_table().has_symbol(vtname)) {
     const class_typet &full_class_type(to_class_type(ns.follow(class_type)));
     const irept::subt &bases(full_class_type.bases());
-    for (typeof(bases.begin()) it(bases.begin()); it != bases.end(); ++it) {
+    for (irept::subt::const_iterator it=bases.begin(); it != bases.end(); ++it) {
       const typet &type(static_cast<const typet &>(it->find(ID_type)));
       const symbol_typet &parent_type(to_symbol_type(type));
       if (is_type_missing(ns, parent_type)) continue;
