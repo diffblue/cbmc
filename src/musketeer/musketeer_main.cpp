@@ -6,7 +6,7 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-#include "musketeer_parseoptions.h"
+#include "musketeer_parse_options.h"
 
 /*******************************************************************\
 
@@ -22,6 +22,6 @@ Function: main
 
 int main(int argc, const char **argv)
 {
-  goto_fence_inserter_parseoptionst parseoptions(argc, argv);
-  return parseoptions.main();
+  goto_fence_inserter_parse_optionst parse_options(argc, argv);
+  return parse_options.main();
 }

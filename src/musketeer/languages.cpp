@@ -10,11 +10,11 @@ Author:
 
 #include <ansi-c/ansi_c_language.h>
 
-#include "musketeer_parseoptions.h"
+#include "musketeer_parse_options.h"
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::register_languages
+Function: goto_instrument_parse_optionst::register_languages
 
   Inputs:
 
@@ -24,7 +24,7 @@ Function: goto_instrument_parseoptionst::register_languages
 
 \*******************************************************************/
 
-void goto_fence_inserter_parseoptionst::register_languages()
+void goto_fence_inserter_parse_optionst::register_languages()
 {
   register_language(new_ansi_c_language);
 }
