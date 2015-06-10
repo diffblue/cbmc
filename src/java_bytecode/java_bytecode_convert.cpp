@@ -165,7 +165,9 @@ protected:
   void convert(symbolt &class_symbol, const methodt &m);
   void convert(const instructiont &i);
   typet convert(const typet &type);
-  codet convert_instructions(const instructionst &);
+
+  codet convert_instructions(
+    const instructionst &, const code_typet &);
 
   static const bytecode_infot &get_bytecode_info(const irep_idt &statement);
   
@@ -420,7 +422,7 @@ void java_bytecode_convertt::convert(
   current_method=method_symbol.name;
   number_of_parameters=count_java_parameter_slots(parameters);
   tmp_counter=0;
-  method_symbol.value=convert_instructions(m.instructions);
+  method_symbol.value=convert_instructions(m.instructions, code_type);
   symbol_table.add(method_symbol);
 }
 
@@ -524,23 +526,6 @@ constant_exprt as_number(const mp_integer value, const typet &type)
   return constant_exprt(binary_width += significant_bits, type);
 }
 
-#if 0
-constant_exprt as_int(const mp_integer value)
-{
-  return as_number(value, java_int_type());
-}
-
-constant_exprt as_width(const size_t width)
-{
-  return as_int(width);
-}
-
-constant_exprt java_integer_width()
-{
-  return as_width(32u);
-}
-#endif
-
 member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 {
   symbol_typet class_type(fieldref.get(ID_class));
@@ -568,7 +553,8 @@ Function: java_bytecode_convertt::convert_instructions
 \*******************************************************************/
 
 codet java_bytecode_convertt::convert_instructions(
-  const instructionst &instructions)
+  const instructionst &instructions,
+  const code_typet &method_type)
 {
   // first pass: get targets
   
@@ -688,8 +674,12 @@ codet java_bytecode_convertt::convert_instructions(
 
       if(is_virtual)
       {
+#if 0
         const exprt &this_arg=call.arguments().front();
         call.function() = make_vtable_function(arg0, this_arg);
+#else
+        call.function() = arg0;
+#endif
       }
       else
         call.function() = arg0;
@@ -700,14 +690,14 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="return")
     {
       assert(op.empty() && results.empty());
-      code_returnt code_return;
-      c=code_return;
+      c=code_returnt();
     }
     else if(statement==patternt("?return"))
     {
       assert(op.size()==1 && results.empty());
-      code_returnt code_return(op[0]);
-      c=code_return;
+      // return values are promoted
+      exprt retval=java_bytecode_promotion(op[0]);
+      c=code_returnt(retval);
     }
     else if(statement==patternt("?astore"))
     {
@@ -760,13 +750,9 @@ codet java_bytecode_convertt::convert_instructions(
 
       plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
       typet element_type=data_ptr.type().subtype();
-      const dereference_exprt element(data_plus_offset, element_type);
+      dereference_exprt element(data_plus_offset, element_type);
 
-      if((element_type.id()==ID_signedbv || element_type.id()==ID_unsignedbv) &&
-          element_type.get_unsigned_int(ID_width) < 32)
-        results[0]=typecast_exprt(element, java_int_type());
-      else
-        results[0]=element;
+      results[0]=java_bytecode_promotion(element);
     }
     else if(statement==patternt("?load"))
     {

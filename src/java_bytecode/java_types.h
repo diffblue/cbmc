@@ -41,4 +41,7 @@ typet java_type_from_char(char t);
 typet java_type_from_string(const std::string &);
 char java_char_from_type(const typet &type);
 
+typet java_bytecode_promotion(const typet &);
+exprt java_bytecode_promotion(const exprt &);
+
 #endif
