@@ -143,22 +143,29 @@ public:
     return std::find_if(methods.begin(), methods.end(), pred) != methods.end();
   }
 
-  void extract_types(std::vector<class_typet> &result, const irept::subt &types,
-      const class_typet::methodt &method) {
-    for (typeof(types.begin()) it(types.begin()); it != types.end(); ++it) {
+  void extract_types(
+    std::vector<class_typet> &result,
+    const irept::subt &types,
+    const class_typet::methodt &method)
+  {
+    for(irept::subt::const_iterator it=types.begin();
+        it != types.end(); ++it)
+    {
       if (!has_method(*it, method)) continue;
       result.push_back(get_class_type(*it));
     }
   }
 
-  void create_base_vtable_entries(struct_exprt &vtable_value,
-      const class_typet &class_type, const class_typet::methodt &method)
+  void create_base_vtable_entries(
+    struct_exprt &vtable_value,
+    const class_typet &class_type,
+    const class_typet::methodt &method)
   {
     if (!is_virtual(method)) return;
     std::vector<class_typet> bases;
     extract_types(bases, class_type.bases(), method);
     //extract_types(bases, class_type.find(ID_interfaces).get_sub(), method);
-    for (typeof(bases.begin()) b(bases.begin()); b != bases.end(); ++b)
+    for(std::vector<class_typet>::const_iterator b=bases.begin(); b != bases.end(); ++b)
       add_vtable_entry(vtable_value, *b, class_type, method);
   }
 
@@ -196,9 +203,9 @@ public:
     create_vtable_symbol(vtable_symbol, class_type);
     const class_typet::methodst &methods(class_type.methods());
     struct_exprt vtable_value;
-    for (typeof(methods.begin()) m(methods.begin()); m != methods.end(); ++m)
+    for (class_typet::methodst::const_iterator m=methods.begin(); m != methods.end(); ++m)
       create_base_vtable_entries(vtable_value, class_type, *m);
-    for (typeof(methods.begin()) m(methods.begin()); m != methods.end(); ++m)
+    for (class_typet::methodst::const_iterator m=methods.begin(); m != methods.end(); ++m)
       create_vtable_entry(vtable_value, class_type, *m);
     set_vtable_value(vtable_symbol, class_type, vtable_value);
     assert(!symbol_table.add(vtable_symbol));
