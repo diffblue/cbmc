@@ -101,6 +101,7 @@ simple_expr:
           stack($$).id(ID_constant);
           stack($$).set(ID_value, yymmtext);
         }
+        | identifier
         | tag_identifier
         | "begin" expr "end"
         {
@@ -130,7 +131,6 @@ simple_expr:
         ;
 
 expr:     simple_expr
-        | identifier
         | expr '*'
         {
           $$=$2;
