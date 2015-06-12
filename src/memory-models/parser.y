@@ -58,7 +58,7 @@ int yymmerror(const std::string &error);
 %right ';'
 %left '\\'
 %right '&'
-%nonassoc '+' '?'
+%nonassoc '~' '+' '?'
 %nonassoc "^-1"
 
 %start grammar
@@ -153,6 +153,12 @@ expr:     simple_expr
         {
           $$=$2;
           stack($$).id("reflexive_closure");
+          mto($$, $1);
+        }
+        | '~' expr
+        {
+          $$=$1;
+          stack($$).id("complement");
           mto($$, $1);
         }
         | expr "^-1"
