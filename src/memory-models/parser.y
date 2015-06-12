@@ -398,12 +398,13 @@ instruction:
           mto($$, $2);
           mto($$, $3);
         }
-        | "show" expr_list
+        | "show" expr_list as_opt
         {
           $$=$1;
           stack($$).id(ID_code);
           stack($$).set(ID_statement, "show");
           mto($$, $2);
+          mto($$, $3);
         }
         | "unshow" expr_list
         {
