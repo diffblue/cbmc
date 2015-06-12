@@ -102,7 +102,7 @@ simple_expr: TOK_NUMBER
         {
           $$=$2;
         }
-        | '{' expr_list '}'
+        | '{' expr_list_opt '}'
         {
           $$=$1;
           stack($$).id(ID_set);
@@ -112,7 +112,7 @@ simple_expr: TOK_NUMBER
         {
           $$=$2;
         }
-        | '(' expr_list ')'
+        | '(' expr_list_opt ')'
         {
           $$=$1;
           stack($$).id("tuple");
@@ -270,15 +270,20 @@ binding_list:
         }
         ;
 
-expr_list: /* nothing */
-        {
-          newstack($$);
-        }
+expr_list:
+          expr
         | expr_list ',' expr
         {
           $$=$1;
           mto($$, $1);
         }
+        ;
+
+expr_list_opt: /* nothing */
+        {
+          newstack($$);
+        }
+        | expr_list
         ;
 
 pat     : identifier
