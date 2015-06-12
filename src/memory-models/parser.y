@@ -40,6 +40,7 @@ int yymmerror(const std::string &error);
 %token TOK_FORALL      "forall"
 %token TOK_AS          "as"
 %token TOK_CALL        "call"
+%token TOK_INCLUDE     "include"
 
 %token TOK_IDENTIFIER
 %token TOK_TAG_IDENTIFIER
@@ -414,6 +415,10 @@ instruction:
           stack($$).set(ID_statement, ID_enum);
           mto($$, $2);
           mto($$, $4);
+        }
+        | "include" TOK_STRING
+        {
+          $$=$1;
         }
         ;
 
