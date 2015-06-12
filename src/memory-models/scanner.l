@@ -27,11 +27,13 @@ number		{digit}+
 identifier	{letter}({letter}|{digit}|"_"|"."|"-")*
 tagidentifier	"'"{letter}({letter}|{digit}|"_"|"."|"-")*
 string          ["][^"\n]*["]
-comment         "(*"(.|\n)*"*)"
+pascalcomment   "(*"(.|\n)*"*)"
+cppcomment      "//".*\n
 
 %%
 
-{comment}       { /* ignore */ }
+{pascalcomment} { /* ignore */ }
+{cppcomment}    { /* ignore */ }
 {string}        { loc(); return TOK_STRING; }
 "^-1"		{ loc(); return TOK_INVERSE; }
 "->"		{ loc(); return TOK_MAPS_TO; }
