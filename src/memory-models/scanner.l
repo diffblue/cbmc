@@ -42,6 +42,7 @@ cppcomment      "//".*\n
 "flag"          { loc(); return TOK_FLAG; }
 "let"		{ loc(); return TOK_LET; }
 "in"		{ loc(); return TOK_IN; }
+"do"		{ loc(); return TOK_DO; }
 "match"		{ loc(); return TOK_MATCH; }
 "with"		{ loc(); return TOK_WITH; }
 "from"		{ loc(); return TOK_FROM; }
