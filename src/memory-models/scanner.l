@@ -49,6 +49,7 @@ comment         "(*"(.|\n)*"*)"
 "fun"		{ loc(); return TOK_FUN; }
 "rec"           { loc(); return TOK_REC; }
 "begin"         { loc(); return TOK_BEGIN; }
+"call"          { loc(); return TOK_CALL; }
 "end"           { loc(); return TOK_END; }
 "show"          { loc(); return TOK_SHOW; }
 "unshow"        { loc(); return TOK_UNSHOW; }
