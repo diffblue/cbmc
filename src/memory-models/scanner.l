@@ -60,6 +60,7 @@ cppcomment      "//".*\n
 "enum"          { loc(); return TOK_ENUM; }
 "forall"        { loc(); return TOK_FORALL; }
 "as"            { loc(); return TOK_AS; }
+"and"           { loc(); return TOK_AND; }
 {identifier}	{ loc(); return TOK_IDENTIFIER; }
 {tagidentifier}	{ loc(); return TOK_TAG_IDENTIFIER; }
 {number}	{ loc(); return TOK_NUMBER; }
