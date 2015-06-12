@@ -36,10 +36,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+#include <cegis/bmc_verification_oracle.h>
+#include <cegis/cegis.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/goto_check.h>
+#include <cegis/ga_learning_algorithm.h>
 
 #include <langapi/mode.h>
 
@@ -489,6 +492,13 @@ int cbmc_parse_optionst::doit()
 
   if(set_properties(goto_functions))
     return 7;
+
+  if(cmdline.isset("cegis"))
+  {
+    ga_learning_algorithmt learning_algorithm;
+    bmc_verification_oraclet verification_oracle(bmc, goto_functions);
+    return run_cegis(learning_algorithm, verification_oracle, result());
+  }
 
   // do actual BMC
   return do_bmc(bmc, goto_functions);
