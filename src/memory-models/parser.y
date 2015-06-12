@@ -22,6 +22,7 @@ int yymmerror(const std::string &error);
 %token TOK_PLUSPLUS    "++"
 %token TOK_OROR        "||"
 %token TOK_LET         "let"
+%token TOK_AND         "and"
 %token TOK_IN          "in"
 %token TOK_MATCH       "match"
 %token TOK_WITH        "with"
