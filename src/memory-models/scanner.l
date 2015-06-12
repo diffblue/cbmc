@@ -19,13 +19,13 @@ static int isatty(int) { return 0; }
 
 %}
 
-nl		(\r\n|\r|\n)
-ws		(" "|\t|\r|\n)
+nl              (\r\n|\r|\n)
+ws              (" "|\t|\r|\n)
 letter          [a-z]|[A-Z]
-digit		[0-9]
-number		{digit}+
-identifier	{letter}({letter}|{digit}|"_"|"."|"-")*
-tagidentifier	"'"{letter}({letter}|{digit}|"_"|"."|"-")*
+digit           [0-9]
+number          {digit}+
+identifier      {letter}({letter}|{digit}|"_"|"."|"-")*
+tagidentifier   "'"{letter}({letter}|{digit}|"_"|"."|"-")*
 string          ["][^"\n]*["]
 pascalcomment   "(*"(.|\n)*"*)"
 cppcomment      "//".*\n
@@ -35,22 +35,22 @@ cppcomment      "//".*\n
 {pascalcomment} { /* ignore */ }
 {cppcomment}    { /* ignore */ }
 {string}        { loc(); return TOK_STRING; }
-"^-1"		{ loc(); return TOK_INVERSE; }
-"->"		{ loc(); return TOK_MAPS_TO; }
-"++"		{ loc(); return TOK_PLUSPLUS; }
-"||"		{ loc(); return TOK_OROR; }
+"^-1"           { loc(); return TOK_INVERSE; }
+"->"            { loc(); return TOK_MAPS_TO; }
+"++"            { loc(); return TOK_PLUSPLUS; }
+"||"            { loc(); return TOK_OROR; }
 "flag"          { loc(); return TOK_FLAG; }
-"let"		{ loc(); return TOK_LET; }
-"in"		{ loc(); return TOK_IN; }
-"do"		{ loc(); return TOK_DO; }
-"match"		{ loc(); return TOK_MATCH; }
-"with"		{ loc(); return TOK_WITH; }
-"from"		{ loc(); return TOK_FROM; }
+"let"           { loc(); return TOK_LET; }
+"in"            { loc(); return TOK_IN; }
+"do"            { loc(); return TOK_DO; }
+"match"         { loc(); return TOK_MATCH; }
+"with"          { loc(); return TOK_WITH; }
+"from"          { loc(); return TOK_FROM; }
 "acyclic"       { loc(); return TOK_ACYCLIC; }
 "irreflexive"   { loc(); return TOK_IRRELFEXIVE; }
 "empty"         { loc(); return TOK_EMPTY; }
-"include"	{ loc(); return TOK_INCLUDE; }
-"fun"		{ loc(); return TOK_FUN; }
+"include"       { loc(); return TOK_INCLUDE; }
+"fun"           { loc(); return TOK_FUN; }
 "rec"           { loc(); return TOK_REC; }
 "begin"         { loc(); return TOK_BEGIN; }
 "call"          { loc(); return TOK_CALL; }
@@ -62,14 +62,14 @@ cppcomment      "//".*\n
 "forall"        { loc(); return TOK_FORALL; }
 "as"            { loc(); return TOK_AS; }
 "and"           { loc(); return TOK_AND; }
-{identifier}	{ loc(); return TOK_IDENTIFIER; }
-{tagidentifier}	{ loc(); return TOK_TAG_IDENTIFIER; }
-{number}	{ loc(); return TOK_NUMBER; }
+{identifier}    { loc(); return TOK_IDENTIFIER; }
+{tagidentifier} { loc(); return TOK_TAG_IDENTIFIER; }
+{number}        { loc(); return TOK_NUMBER; }
 
-{nl}		{ /* ignore */ }
-{ws}		{ /* ignore */ }
-.		{ loc(); return yytext[0]; }
-<<EOF>>		{ yyterminate(); /* done! */ }
+{nl}            { /* ignore */ }
+{ws}            { /* ignore */ }
+.               { loc(); return yytext[0]; }
+<<EOF>>         { yyterminate(); /* done! */ }
 
 %%
 
