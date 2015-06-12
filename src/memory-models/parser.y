@@ -25,6 +25,7 @@ int yymmerror(const std::string &error);
 %token TOK_IN          "in"
 %token TOK_MATCH       "match"
 %token TOK_WITH        "with"
+%token TOK_FROM        "from"
 %token TOK_ACYCLIC     "acyclic"
 %token TOK_IRRELFEXIVE "irreflexive"
 %token TOK_EMPTY       "empty"

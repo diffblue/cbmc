@@ -42,6 +42,7 @@ comment         "(*"(.|\n)*"*)"
 "in"		{ loc(); return TOK_IN; }
 "match"		{ loc(); return TOK_MATCH; }
 "with"		{ loc(); return TOK_WITH; }
+"from"		{ loc(); return TOK_FROM; }
 "acyclic"       { loc(); return TOK_ACYCLIC; }
 "irreflexive"   { loc(); return TOK_IRRELFEXIVE; }
 "empty"         { loc(); return TOK_EMPTY; }
