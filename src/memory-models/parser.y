@@ -120,6 +120,11 @@ simple_expr: TOK_NUMBER
           stack($$).id("tuple");
           mto($$, $2);
         }
+        | '_'
+        {
+          $$=$1;
+          stack($$).id("universe");
+        }
         ;
 
 expr:     simple_expr
@@ -241,13 +246,6 @@ flag_opt: /* nothing */
 tag_match: expr "->" expr
         {
           $$=$2;
-          mto($$, $1);
-          mto($$, $3);
-        }
-        | '_' "->" expr
-        {
-          $$=$2;
-          stack($1).id(ID_default);
           mto($$, $1);
           mto($$, $3);
         }
