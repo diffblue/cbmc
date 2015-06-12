@@ -347,6 +347,14 @@ pat_bind: identifier '=' expr
           mto($$, $3);
           mto($$, $6);
         }
+        | identifier identifier '=' expr
+        {
+          $$=$3;
+          stack($$).id("funbinding");
+          mto($$, $1);
+          mto($$, $2);
+          mto($$, $4);
+        }
         ;
 
 instruction:
