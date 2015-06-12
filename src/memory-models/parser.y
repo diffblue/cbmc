@@ -92,7 +92,8 @@ model_name:
         }
         ;
 
-simple_expr: TOK_NUMBER
+simple_expr: 
+          TOK_NUMBER
         {
           $$=$1;
           stack($$).id(ID_constant);
@@ -208,14 +209,14 @@ expr:     simple_expr
           mto($$, $2);
           mto($$, $4);
         }
-        | "let" binding_list "in" expr %prec prec_let
+        | "let" pat_bind_list "in" expr %prec prec_let
         {
           $$=$1;
           stack($$).id(ID_let);
           mto($$, $2);
           mto($$, $4);
         }
-        | "let" "rec" binding_list "in" expr %prec prec_let
+        | "let" "rec" pat_bind_list "in" expr %prec prec_let
         {
           $$=$1;
           stack($$).id(ID_let);
@@ -264,13 +265,13 @@ tag_match_list:
         }
         ;
 
-binding_list:
-          binding
+pat_bind_list:
+          pat_bind
         {
           newstack($$);
           mto($$, $1);
         }
-        | binding_list "and" binding
+        | pat_bind_list "and" pat_bind
         {
           $$=$1;
           mto($$, $3);
@@ -324,20 +325,14 @@ identifier_list_opt: /* nothing */
         | identifier_list
         ;
 
-binding : valbinding
-        | funbinding  
-        ;
- 
-valbinding: pat '=' expr  
+pat_bind: identifier '=' expr
         {
           $$=$2;
           stack($$).id("valbinding");
           mto($$, $1);
           mto($$, $3);
         }
-        ;
- 
-funbinding: identifier pat '=' expr  
+        | '(' identifier_list_opt ')' '=' expr
         {
           $$=$3;
           stack($$).id("funbinding");
@@ -348,14 +343,14 @@ funbinding: identifier pat '=' expr
         ;
 
 instruction:
-          "let" binding_list
+          "let" pat_bind_list
         {
           $$=$1;
           stack($$).id(ID_code);
           stack($$).set(ID_statement, ID_let);
           mto($$, $2);
         }
-        | "let" "rec" binding_list
+        | "let" "rec" pat_bind_list
         {
           $$=$1;
           stack($$).id(ID_code);
