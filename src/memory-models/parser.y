@@ -398,14 +398,14 @@ instruction:
           mto($$, $2);
           mto($$, $3);
         }
-        | "show" identifier_list
+        | "show" expr_list
         {
           $$=$1;
           stack($$).id(ID_code);
           stack($$).set(ID_statement, "show");
           mto($$, $2);
         }
-        | "unshow" identifier_list
+        | "unshow" expr_list
         {
           $$=$1;
           stack($$).id(ID_code);
