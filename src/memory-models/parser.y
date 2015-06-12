@@ -333,13 +333,13 @@ pat_bind: identifier '=' expr
           mto($$, $1);
           mto($$, $3);
         }
-        | '(' identifier_list_opt ')' '=' expr
+        | identifier '(' identifier_list_opt ')' '=' expr
         {
-          $$=$3;
+          $$=$2;
           stack($$).id("funbinding");
           mto($$, $1);
-          mto($$, $2);
           mto($$, $3);
+          mto($$, $6);
         }
         ;
 
