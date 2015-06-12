@@ -232,13 +232,17 @@ expr:     simple_expr
           mto($$, $3);
           mto($$, $5);
         }
-        | "match" expr "with" tag_match_list "end"
+        | "match" expr "with" alt_opt tag_match_list "end"
         {
           $$=$1;
           stack($$).id("match");
           mto($$, $2);
-          mto($$, $4);
+          mto($$, $5);
         }
+        ;
+
+alt_opt : /* nothing */
+        | "||";
         ;
 
 flag_opt: /* nothing */
