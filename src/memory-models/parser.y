@@ -281,6 +281,10 @@ binding_list:
 
 expr_list:
           expr
+        {
+          newstack($$);
+          mto($$, $1);
+        }
         | expr_list ',' expr
         {
           $$=$1;
@@ -296,21 +300,30 @@ expr_list_opt: /* nothing */
         ;
 
 pat     : identifier
-        | '(' identifier_list ')'
+        | '(' identifier_list_opt ')'
         {
           $$=$2;
         }
         ;
 
-identifier_list: /* nothing */
+identifier_list:
+          identifier
         {
           newstack($$);
+          mto($$, $1);
         }
         | identifier_list ',' identifier
         {
           $$=$1;
           mto($$, $2);
         }
+        ;
+
+identifier_list_opt: /* nothing */
+        {
+          newstack($$);
+        }
+        | identifier_list
         ;
 
 binding : valbinding
@@ -360,7 +373,7 @@ instruction:
           mto($$, $3);
           mto($$, $4);
         }
-        | "procedure" identifier '(' identifier_list ')' '=' instruction_list "end"
+        | "procedure" identifier '(' identifier_list_opt ')' '=' instruction_list "end"
         {
           $$=$1;
           stack($$).id(ID_code);
