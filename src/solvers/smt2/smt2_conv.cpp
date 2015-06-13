@@ -121,7 +121,7 @@ void smt2_convt::write_header()
   // We use a broad mixture of logics, so on some solvers
   // its better not to declare here.
   // set-logic should come after setting options
-  if(emit_set_logic)
+  if(emit_set_logic && !logic.empty())
     out << "(set-logic " << logic << ")" << "\n";
 }
 
