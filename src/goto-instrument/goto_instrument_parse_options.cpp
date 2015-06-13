@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/string2int.h>
+#include <util/unicode.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -72,6 +73,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "call_sequences.h"
 #include "accelerate/accelerate.h"
 #include "count_eloc.h"
+#include "horn_encoding.h"
 
 /*******************************************************************\
 
@@ -461,6 +463,34 @@ int goto_instrument_parse_optionst::doit()
       accelerate_functions(goto_functions, symbol_table, cmdline.isset("z3"));
       remove_skip(goto_functions);
       goto_functions.update();
+    }
+    
+    if(cmdline.isset("horn-encoding"))
+    {
+      status() << "Horn-clause encoding" << eom;
+      namespacet ns(symbol_table);
+      
+      if(cmdline.args.size()==2)
+      {
+        #ifdef _WIN32
+        std::ofstream out(widen(cmdline.args[1]).c_str());
+        #else
+        std::ofstream out(cmdline.args[1].c_str());
+        #endif
+        
+        if(!out)
+        {
+          error() << "Failed to open output file "
+                  << cmdline.args[1] << eom;
+          return 1;
+        }
+        
+        horn_encoding(goto_functions, ns, out);
+      }
+      else
+        horn_encoding(goto_functions, ns, std::cout);
+        
+      return 0;
     }
     
     // write new binary?
