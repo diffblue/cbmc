@@ -44,22 +44,26 @@ int yymmerror(const std::string &error);
 %token TOK_AS          "as"
 %token TOK_CALL        "call"
 %token TOK_INCLUDE     "include"
+%token TOK_SET_INTERSECTION "∩"
+%token TOK_SET_UNION   "∪"
+%token TOK_CROSS_PRODUCT "⨯"
+%token TOK_EMPTY_SET   "∅"
 
 %token TOK_IDENTIFIER
 %token TOK_TAG_IDENTIFIER
 %token TOK_NUMBER
 %token TOK_STRING
 
-%left '*'
+%left '*' "⨯"
 %right ','
 %left prec_let
 %left prec_fun
 %left prec_app
-%right '|'
+%right '|' "∪"
 %right "++"
 %right ';'
 %left '\\'
-%right '&'
+%right '&' "∩"
 %nonassoc '~' '+' '?'
 %nonassoc "^-1"
 
@@ -176,6 +180,13 @@ expr:     simple_expr
           mto($$, $1);
           mto($$, $3);
         }
+        | expr "∪" expr
+        {
+          $$=$2;
+          stack($$).id("union");
+          mto($$, $1);
+          mto($$, $3);
+        }
         | expr ';' expr
         {
           $$=$2;
@@ -191,6 +202,13 @@ expr:     simple_expr
           mto($$, $3);
         }
         | expr '&' expr
+        {
+          $$=$2;
+          stack($$).id("intersection");
+          mto($$, $1);
+          mto($$, $3);
+        }
+        | expr "∩" expr
         {
           $$=$2;
           stack($$).id("intersection");
