@@ -472,7 +472,7 @@ int goto_instrument_parse_optionst::doit()
       
       if(cmdline.args.size()==2)
       {
-        #ifdef _WIN32
+        #ifdef _MSC_VER
         std::ofstream out(widen(cmdline.args[1]).c_str());
         #else
         std::ofstream out(cmdline.args[1].c_str());
