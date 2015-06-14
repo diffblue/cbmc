@@ -7,7 +7,7 @@
 
 
 #if defined linux || defined __linux__		\
- || defined sun					\
+ || defined __sun				\
  || defined UWIN				\
  || defined osf1                                \
  || defined __MACH__                            \
