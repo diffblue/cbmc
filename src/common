@@ -33,11 +33,11 @@ endif
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
-  CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.6
+  CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.6 -std=c++11
   LINKFLAGS += -mmacosx-version-min=10.6
   LINKNATIVE += -mmacosx-version-min=10.6
 else
-  CP_CXXFLAGS = -MMD -MP
+  CP_CXXFLAGS = -MMD -MP -std=c++11
 endif
   #LINKFLAGS = -static
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
