@@ -1,6 +1,6 @@
 diff -rupN minisat-2.2.0/core/Solver.cc minisat-2.2.0.patched/core/Solver.cc
 --- minisat-2.2.0/core/Solver.cc	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/core/Solver.cc	2014-08-09 20:55:51.000000000 +0100
++++ minisat-2.2.0.patched/core/Solver.cc	2015-05-22 19:06:39.000000000 +0100
 @@ -209,7 +209,7 @@ void Solver::cancelUntil(int level) {
          for (int c = trail.size()-1; c >= trail_lim[level]; c--){
              Var      x  = var(trail[c]);
@@ -21,7 +21,7 @@ diff -rupN minisat-2.2.0/core/Solver.cc minisat-2.2.0.patched/core/Solver.cc
                  cancelUntil(0);
 diff -rupN minisat-2.2.0/core/SolverTypes.h minisat-2.2.0.patched/core/SolverTypes.h
 --- minisat-2.2.0/core/SolverTypes.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/core/SolverTypes.h	2014-03-29 11:57:49.000000000 +0000
++++ minisat-2.2.0.patched/core/SolverTypes.h	2015-05-22 19:06:39.000000000 +0100
 @@ -47,7 +47,7 @@ struct Lit {
      int     x;
  
@@ -42,7 +42,7 @@ diff -rupN minisat-2.2.0/core/SolverTypes.h minisat-2.2.0.patched/core/SolverTyp
  inline  bool sign      (Lit p)              { return p.x & 1; }
 diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
 --- minisat-2.2.0/mtl/IntTypes.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/mtl/IntTypes.h	2014-08-09 20:55:51.000000000 +0100
++++ minisat-2.2.0.patched/mtl/IntTypes.h	2015-05-22 19:06:39.000000000 +0100
 @@ -31,7 +31,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #else
  
@@ -55,7 +55,7 @@ diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
  
 diff -rupN minisat-2.2.0/mtl/Vec.h minisat-2.2.0.patched/mtl/Vec.h
 --- minisat-2.2.0/mtl/Vec.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/mtl/Vec.h	2014-08-09 20:55:51.000000000 +0100
++++ minisat-2.2.0.patched/mtl/Vec.h	2015-05-22 19:06:39.000000000 +0100
 @@ -96,7 +96,7 @@ template<class T>
  void vec<T>::capacity(int min_cap) {
      if (cap >= min_cap) return;
@@ -67,26 +67,17 @@ diff -rupN minisat-2.2.0/mtl/Vec.h minisat-2.2.0.patched/mtl/Vec.h
  
 diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolver.cc
 --- minisat-2.2.0/simp/SimpSolver.cc	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/simp/SimpSolver.cc	2014-08-09 20:55:51.000000000 +0100
-@@ -130,13 +130,16 @@ lbool SimpSolver::solve_(bool do_simp, b
++++ minisat-2.2.0.patched/simp/SimpSolver.cc	2015-06-14 22:37:51.000000000 +0100
+@@ -130,8 +130,6 @@ lbool SimpSolver::solve_(bool do_simp, b
      return result;
  }
  
 -
-+#include <iostream>
- 
+-
  bool SimpSolver::addClause_(vec<Lit>& ps)
  {
  #ifndef NDEBUG
-     for (int i = 0; i < ps.size(); i++)
-+    {
-+        if(isEliminated(var(ps[i]))) std::cout << "E: " << var(ps[i]) << "\n";
-         assert(!isEliminated(var(ps[i])));
-+    }
- #endif
- 
-     int nclauses = clauses.size();
-@@ -227,10 +230,12 @@ bool SimpSolver::merge(const Clause& _ps
+@@ -227,10 +225,12 @@ bool SimpSolver::merge(const Clause& _ps
          if (var(qs[i]) != v){
              for (int j = 0; j < ps.size(); j++)
                  if (var(ps[j]) == var(qs[i]))
@@ -99,7 +90,7 @@ diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolve
              out_clause.push(qs[i]);
          }
          next:;
-@@ -261,10 +266,12 @@ bool SimpSolver::merge(const Clause& _ps
+@@ -261,10 +261,12 @@ bool SimpSolver::merge(const Clause& _ps
          if (var(__qs[i]) != v){
              for (int j = 0; j < ps.size(); j++)
                  if (var(__ps[j]) == var(__qs[i]))
@@ -114,7 +105,7 @@ diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolve
          next:;
 diff -rupN minisat-2.2.0/utils/Options.h minisat-2.2.0.patched/utils/Options.h
 --- minisat-2.2.0/utils/Options.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/utils/Options.h	2014-08-09 20:55:51.000000000 +0100
++++ minisat-2.2.0.patched/utils/Options.h	2015-06-14 22:33:24.000000000 +0100
 @@ -60,7 +60,7 @@ class Option
      struct OptionLt {
          bool operator()(const Option* x, const Option* y) {
@@ -124,9 +115,28 @@ diff -rupN minisat-2.2.0/utils/Options.h minisat-2.2.0.patched/utils/Options.h
          }
      };
  
+@@ -282,15 +282,15 @@ class Int64Option : public Option
+         if (range.begin == INT64_MIN)
+             fprintf(stderr, "imin");
+         else
+-            fprintf(stderr, "%4"PRIi64, range.begin);
++            fprintf(stderr, "%4" PRIi64, range.begin);
+ 
+         fprintf(stderr, " .. ");
+         if (range.end == INT64_MAX)
+             fprintf(stderr, "imax");
+         else
+-            fprintf(stderr, "%4"PRIi64, range.end);
++            fprintf(stderr, "%4" PRIi64, range.end);
+ 
+-        fprintf(stderr, "] (default: %"PRIi64")\n", value);
++        fprintf(stderr, "] (default: %" PRIi64 ")\n", value);
+         if (verbose){
+             fprintf(stderr, "\n        %s\n", description);
+             fprintf(stderr, "\n");
 diff -rupN minisat-2.2.0/utils/ParseUtils.h minisat-2.2.0.patched/utils/ParseUtils.h
 --- minisat-2.2.0/utils/ParseUtils.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/utils/ParseUtils.h	2014-08-09 20:55:51.000000000 +0100
++++ minisat-2.2.0.patched/utils/ParseUtils.h	2015-05-22 19:06:39.000000000 +0100
 @@ -24,7 +24,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #include <stdlib.h>
  #include <stdio.h>
