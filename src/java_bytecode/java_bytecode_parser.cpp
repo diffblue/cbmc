@@ -245,7 +245,8 @@ void java_bytecode_parsert::rClassFile()
   parse_tree.loading_successful=false;
 
   u4 magic=read_u4();
-  u2 minor_version=read_u2(), major_version=read_u2();
+  u2 __attribute__((unused)) minor_version=read_u2();
+  u2 major_version=read_u2();
   
   if(magic!=0xCAFEBABE) throw "wrong magic";
 
@@ -256,7 +257,7 @@ void java_bytecode_parsert::rClassFile()
 
   classt &parsed_class=parse_tree.parsed_class;
 
-  u2 access_flags=read_u2();
+  u2 __attribute__((unused)) access_flags=read_u2();
   u2 this_class=read_u2();
   u2 super_class=read_u2();
 
@@ -618,7 +619,7 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
 
     for(unsigned j=0; j<attributes_count; j++)
     {
-      u2 attribute_name_index=read_u2();
+      u2 __attribute__((unused)) attribute_name_index=read_u2();
       u4 attribute_length=read_u4();
       skip_bytes(attribute_length);
     }
@@ -764,7 +765,7 @@ void java_bytecode_parsert::rbytecode(
         while((address&3)!=0) { read_u1(); address++; }
         
         // now default value
-        u4 default_value=read_u4();
+        u4 __attribute__((unused)) default_value=read_u4();
         address+=4;
         
         // number of pairs
@@ -773,8 +774,8 @@ void java_bytecode_parsert::rbytecode(
         
         for(unsigned i=0; i<npairs; i++)
         {
-          u4 match=read_u4();
-          u4 offset=read_u4();
+          u4 __attribute__((unused)) match=read_u4();
+          u4 __attribute__((unused)) offset=read_u4();
           address+=8;
         }
       }
@@ -786,7 +787,7 @@ void java_bytecode_parsert::rbytecode(
         while((address&3)!=0) { read_u1(); address++; }
         
         // now default value
-        u4 default_value=read_u4();
+        u4 __attribute__((unused)) default_value=read_u4();
         address+=4;
 
         // now low value
@@ -800,7 +801,7 @@ void java_bytecode_parsert::rbytecode(
         // there are high-low+1 offsets
         for(unsigned i=low_value; i<=high_value; i++)
         {
-          u4 offset=read_u4();
+          u4 __attribute__((unused)) offset=read_u4();
           address+=4;
         }
       }
@@ -873,8 +874,8 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
 
   if(attribute_name=="Code")
   {
-    u2 max_stack=read_u2();
-    u2 max_locals=read_u2();
+    u2 __attribute__((unused)) max_stack=read_u2();
+    u2 __attribute__((unused)) max_locals=read_u2();
 
     rbytecode(method.instructions);
 
@@ -882,10 +883,10 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
 
     for(unsigned e=0; e<exception_table_length; e++)
     {
-      u2 start_pc=read_u2();
-      u2 end_pc=read_u2();
-      u2 handler_pc=read_u2();
-      u2 catch_type=read_u2();
+      u2 __attribute__((unused)) start_pc=read_u2();
+      u2 __attribute__((unused)) end_pc=read_u2();
+      u2 __attribute__((unused)) handler_pc=read_u2();
+      u2 __attribute__((unused)) catch_type=read_u2();
     }
 
     u2 attributes_count=read_u2();
