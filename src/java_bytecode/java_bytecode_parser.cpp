@@ -240,6 +240,10 @@ Function: java_bytecode_parsert::rClassFile
 #define ACC_STRICT       0x0800
 #define ACC_SYNTHETIC    0x1000
 
+#ifdef _MSC_VER
+#define __attribute__()
+#endif
+
 void java_bytecode_parsert::rClassFile()
 {
   parse_tree.loading_successful=false;
