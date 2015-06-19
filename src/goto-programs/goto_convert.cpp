@@ -25,6 +25,29 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: is_empty
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static bool is_empty(const goto_programt &goto_program)
+{
+  forall_goto_program_instructions(it, goto_program)
+    if(!it->is_skip() ||
+       !it->labels.empty() ||
+       !it->code.is_nil())
+      return false;
+
+  return true;
+}
+
+/*******************************************************************\
+
 Function: goto_convertt::finish_gotos
 
   Inputs:
@@ -527,6 +550,7 @@ void goto_convertt::convert(
   {
     dest.add_instruction(SKIP);
     dest.instructions.back().code.make_nil();
+    dest.instructions.back().source_location=code.source_location();
   }
 }
 
@@ -1042,12 +1066,16 @@ void goto_convertt::convert_for(
   // do the z label
   goto_programt tmp_z;
   goto_programt::targett z=tmp_z.add_instruction(SKIP);
+  z->source_location=code.source_location();
 
   // do the x label
   goto_programt tmp_x;
   
   if(code.op2().is_nil())
+  {
     tmp_x.add_instruction(SKIP);
+    tmp_x.instructions.back().source_location=code.source_location();
+  }
   else
   {
     exprt tmp_B=code.iter();
@@ -1055,7 +1083,10 @@ void goto_convertt::convert_for(
     clean_expr(tmp_B, tmp_x, false);
 
     if(tmp_x.instructions.empty())
+    {
       tmp_x.add_instruction(SKIP);
+      tmp_x.instructions.back().source_location=code.source_location();
+    }
   }
   
   // optimize the v label
@@ -1128,6 +1159,7 @@ void goto_convertt::convert_while(
   goto_programt tmp_z;
   goto_programt::targett z=tmp_z.add_instruction();
   z->make_skip();
+  z->source_location=source_location;
 
   goto_programt tmp_branch;
   generate_conditional_branch(boolean_negate(cond), z, source_location, tmp_branch);
@@ -1209,6 +1241,7 @@ void goto_convertt::convert_dowhile(
   goto_programt tmp_z;
   goto_programt::targett z=tmp_z.add_instruction();
   z->make_skip();
+  z->source_location=code.source_location();
 
   // do the x label
   goto_programt::targett x;
@@ -1327,6 +1360,7 @@ void goto_convertt::convert_switch(
   goto_programt tmp_z;
   goto_programt::targett z=tmp_z.add_instruction();
   z->make_skip();
+  z->source_location=code.source_location();
 
   // set the new targets -- continue stays as is
   targets.set_break(z);
@@ -1750,6 +1784,7 @@ void goto_convertt::convert_start_thread(
     start_thread->targets.push_back(tmp.instructions.begin());
     dest.destructive_append(tmp);
     goto_instruction->targets.push_back(dest.add_instruction(SKIP));
+    dest.instructions.back().source_location=code.source_location();
   }
 }
 
@@ -2043,13 +2078,15 @@ void goto_convertt::generate_ifthenelse(
   const source_locationt &source_location,
   goto_programt &dest)
 {
-  if(true_case.instructions.empty() &&
-     false_case.instructions.empty())
+  if(is_empty(true_case) &&
+     is_empty(false_case))
     return;
 
   // do guarded gotos directly
-  if(false_case.instructions.empty() &&
-     true_case.instructions.size()==1 &&
+  if(is_empty(false_case) &&
+     // true_case.instructions.size()==1 optimised
+     !true_case.instructions.empty() &&
+     ++true_case.instructions.begin()==true_case.instructions.end() &&
      true_case.instructions.back().is_goto() &&
      true_case.instructions.back().guard.is_true() &&
      true_case.instructions.back().labels.empty())
@@ -2088,11 +2125,11 @@ void goto_convertt::generate_ifthenelse(
   }
 
   // Flip around if no 'true' case code.
-  if(true_case.instructions.empty())
+  if(is_empty(true_case))
     return generate_ifthenelse(
       boolean_negate(guard), false_case, true_case, source_location, dest);
 
-  bool has_else=!false_case.instructions.empty();
+  bool has_else=!is_empty(false_case);
 
   //    if(c) P;
   //--------------------
@@ -2116,6 +2153,7 @@ void goto_convertt::generate_ifthenelse(
   goto_programt tmp_z;
   goto_programt::targett z=tmp_z.add_instruction();
   z->make_skip();
+  z->source_location=source_location;
 
   // y: Q;
   goto_programt tmp_y;
@@ -2137,8 +2175,8 @@ void goto_convertt::generate_ifthenelse(
 
   // x: goto z;
   x->make_goto(z);
-  if(!tmp_w.instructions.empty())
-    x->source_location=tmp_w.instructions.back().source_location;
+  assert(!tmp_w.instructions.empty());
+  x->source_location=tmp_w.instructions.back().source_location;
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
@@ -2191,6 +2229,7 @@ void goto_convertt::generate_conditional_branch(
     goto_programt tmp;
     goto_programt::targett target_false=tmp.add_instruction();
     target_false->make_skip();
+    target_false->source_location=source_location;
     
     generate_conditional_branch(
       guard, target_true, target_false, source_location, dest);
