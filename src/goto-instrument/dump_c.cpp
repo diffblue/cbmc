@@ -567,20 +567,34 @@ void dump_ct::convert_compound_enum(
      !converted_enum.insert(name).second)
     return;
 
-  os << type_to_string(type);
-
-  if(type.get_bool(ID_C_packed))
-    os << " __attribute__ ((__packed__))";
-
-  os << ";\n\n";
-
-  const c_enum_typet::memberst &members=
-    to_c_enum_type(type).members();
-  for(c_enum_typet::memberst::const_iterator
+  c_enum_typet enum_type=to_c_enum_type(type);
+  c_enum_typet::memberst &members=
+    (c_enum_typet::memberst &)(enum_type.add(ID_body).get_sub());
+  for(c_enum_typet::memberst::iterator
       it=members.begin();
       it!=members.end();
       ++it)
-    declared_enum_constants.insert(it->get_base_name());
+  {
+    const irep_idt bn=it->get_base_name();
+
+    if(declared_enum_constants.find(bn)!=
+       declared_enum_constants.end() ||
+       copied_symbol_table.has_symbol(bn))
+    {
+      std::string new_bn=id2string(name)+"$$"+id2string(bn);
+      it->set_base_name(new_bn);
+    }
+
+    declared_enum_constants.insert(
+      std::make_pair(bn, it->get_base_name()));
+  }
+
+  os << type_to_string(enum_type);
+
+  if(enum_type.get_bool(ID_C_packed))
+    os << " __attribute__ ((__packed__))";
+
+  os << ";\n\n";
 }
 
 /*******************************************************************\
@@ -1347,11 +1361,18 @@ void dump_ct::cleanup_expr(exprt &expr)
   {
     const irep_idt &cformat=expr.get(ID_C_cformat);
 
-    if(!cformat.empty() &&
-       declared_enum_constants.find(cformat)==
-       declared_enum_constants.end() &&
-       !std::isdigit(id2string(cformat)[0]))
-      expr.remove(ID_C_cformat);
+    if(!cformat.empty())
+    {
+      declared_enum_constants_mapt::const_iterator entry=
+        declared_enum_constants.find(cformat);
+
+      if(entry!=declared_enum_constants.end() &&
+         entry->first!=entry->second)
+        expr.set(ID_C_cformat, entry->second);
+      else if(entry==declared_enum_constants.end() &&
+              !std::isdigit(id2string(cformat)[0]))
+        expr.remove(ID_C_cformat);
+    }
   }
 }
 
