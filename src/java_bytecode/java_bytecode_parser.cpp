@@ -132,17 +132,17 @@ protected:
 
   u1 read_u1() const
   {
-    return read_bytes(1);
+    return (u1)read_bytes(1);
   }
   
   inline u2 read_u2() const
   {
-    return read_bytes(2);
+    return (u2)read_bytes(2);
   }
   
   u4 read_u4() const
   {
-    return read_bytes(4);
+    return (u4)read_bytes(4);
   }
   
   u8 read_u8() const
