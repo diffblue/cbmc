@@ -1255,20 +1255,27 @@ void dump_ct::cleanup_expr(exprt &expr)
     }
     expr.type().swap(type);
   }
-  else if(expr.id()==ID_union &&
-          (expr.type().get_bool(ID_C_transparent_union) ||
-           ns.follow(expr.type()).get_bool(ID_C_transparent_union)))
+  else if(expr.id()==ID_union)
   {
     union_exprt &u=to_union_expr(expr);
+    const union_typet &u_type_f=to_union_type(ns.follow(u.type()));
 
+    if(!u.type().get_bool(ID_C_transparent_union) &&
+       !u_type_f.get_bool(ID_C_transparent_union))
+    {
+      if(u_type_f.get_component(u.get_component_name()).get_is_padding())
+        // we just use an empty struct to fake an empty union
+        expr=struct_exprt(struct_typet());
+    }
     // add a typecast for NULL
-    if(u.op().id()==ID_constant &&
-       u.op().type().id()==ID_pointer &&
-       u.op().type().subtype().id()==ID_empty &&
-       (u.op().is_zero() || to_constant_expr(u.op()).get_value()==ID_NULL))
+    else if(u.op().id()==ID_constant &&
+            u.op().type().id()==ID_pointer &&
+            u.op().type().subtype().id()==ID_empty &&
+            (u.op().is_zero() ||
+             to_constant_expr(u.op()).get_value()==ID_NULL))
     {
       const struct_union_typet::componentt &comp=
-        to_union_type(ns.follow(u.type())).get_component(u.get_component_name());
+        u_type_f.get_component(u.get_component_name());
       const typet &u_op_type=comp.type();
       assert(u_op_type.id()==ID_pointer);
 
