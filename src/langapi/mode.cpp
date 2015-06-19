@@ -43,7 +43,7 @@ Function: register_language
 void register_language(language_factoryt factory)
 {
   languages.push_back(language_entryt());
-  std::auto_ptr<languaget> l(factory());
+  std::unique_ptr<languaget> l(factory());
   languages.back().factory=factory;
   languages.back().extensions=l->extensions();
   languages.back().mode=l->id();

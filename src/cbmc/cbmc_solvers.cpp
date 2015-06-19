@@ -158,10 +158,10 @@ prop_convt *bmct::solver_factory()
     if(options.get_bool_option("sat-preprocessor") &&
        !options.get_bool_option("beautify"))
     {
-      solver=std::auto_ptr<propt>(new satcheckt);
+      solver=std::unique_ptr<propt>(new satcheckt);
     }
     else
-      solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
+      solver=std::unique_ptr<propt>(new satcheck_minisat_no_simplifiert);
 
     solver->set_message_handler(get_message_handler());
       
@@ -193,16 +193,16 @@ bool bmct::decide_default(const goto_functionst &goto_functions)
 {
   bool result=true;
   
-  std::auto_ptr<propt> solver;
+  std::unique_ptr<propt> solver;
 
   // SAT preprocessor won't work with beautification.
   if(options.get_bool_option("sat-preprocessor") &&
      !options.get_bool_option("beautify"))
   {
-    solver=std::auto_ptr<propt>(new satcheckt);
+    solver=std::unique_ptr<propt>(new satcheckt);
   }
   else
-    solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
+    solver=std::unique_ptr<propt>(new satcheck_minisat_no_simplifiert);
 
   solver->set_message_handler(get_message_handler());
     
@@ -253,12 +253,12 @@ Function: bmct::decide_aig
 
 bool bmct::decide_aig(const goto_functionst &goto_functions)
 {
-  std::auto_ptr<propt> sub_solver;
+  std::unique_ptr<propt> sub_solver;
 
   if(options.get_bool_option("sat-preprocessor"))
-    sub_solver=std::auto_ptr<propt>(new satcheckt);
+    sub_solver=std::unique_ptr<propt>(new satcheckt);
   else
-    sub_solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
+    sub_solver=std::unique_ptr<propt>(new satcheck_minisat_no_simplifiert);
 
   aig_prop_solvert solver(*sub_solver);
 
@@ -288,13 +288,13 @@ Function: bmct::bv_refinement
 
 bool bmct::decide_bv_refinement(const goto_functionst &goto_functions)
 {
-  std::auto_ptr<propt> solver;
+  std::unique_ptr<propt> solver;
 
   // We offer the option to disable the SAT preprocessor
   if(options.get_bool_option("sat-preprocessor"))
-    solver=std::auto_ptr<propt>(new satcheckt);
+    solver=std::unique_ptr<propt>(new satcheckt);
   else
-    solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
+    solver=std::unique_ptr<propt>(new satcheck_minisat_no_simplifiert);
   
   solver->set_message_handler(get_message_handler());
 

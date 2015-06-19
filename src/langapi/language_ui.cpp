@@ -293,7 +293,7 @@ void language_uit::show_symbol_table_plain(std::ostream &out, bool brief)
       if(ptr==NULL) throw "symbol "+id2string(symbol.name)+" has unknown mode";
     }
 
-    std::auto_ptr<languaget> p(ptr);
+    std::unique_ptr<languaget> p(ptr);
     std::string type_str, value_str;
     
     if(symbol.type.is_not_nil())

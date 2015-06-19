@@ -742,7 +742,7 @@ void cbmc_parse_optionst::preprocessing()
     
     ptr->set_message_handler(get_message_handler());
 
-    std::auto_ptr<languaget> language(ptr);
+    std::unique_ptr<languaget> language(ptr);
   
     if(language->preprocess(infile, filename, std::cout))
       error() << "PREPROCESSING ERROR" << eom;
