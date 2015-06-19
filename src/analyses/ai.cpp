@@ -237,7 +237,7 @@ bool ai_baset::visit(
     if(to_l==goto_program.instructions.end())
       continue;
 
-    std::auto_ptr<statet> tmp_state(
+    std::unique_ptr<statet> tmp_state(
       make_temporary_state(current));
   
     statet &new_values=*tmp_state;
@@ -308,7 +308,7 @@ bool ai_baset::do_function_call(
     locationt l_begin=goto_function.body.instructions.begin();
     
     // do the edge from the call site to the beginning of the function
-    std::auto_ptr<statet> state(make_temporary_state(get_state(l_call)));
+    std::unique_ptr<statet> state(make_temporary_state(get_state(l_call)));
 
     state->transform(l_call, l_begin, *this, ns);
     
@@ -329,7 +329,7 @@ bool ai_baset::do_function_call(
     locationt l_next=l_call;
     l_next++;
 
-    std::auto_ptr<statet> state(make_temporary_state(get_state(l_end)));
+    std::unique_ptr<statet> state(make_temporary_state(get_state(l_end)));
 
     state->transform(l_end, l_next, *this, ns);
 

@@ -334,13 +334,14 @@ Function: bmct::run
 bool bmct::run(const goto_functionst &goto_functions)
 {
   const std::string mm=options.get_option("mm");
-  std::auto_ptr<memory_model_baset> memory_model(0);
+  std::unique_ptr<memory_model_baset> memory_model;
+  
   if(mm.empty() || mm=="sc")
-    memory_model.reset(new memory_model_sct(ns));
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_sct(ns));
   else if(mm=="tso")
-    memory_model.reset(new memory_model_tsot(ns));
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_tsot(ns));
   else if(mm=="pso")
-    memory_model.reset(new memory_model_psot(ns));
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_psot(ns));
   else
   {
     error() << "Invalid memory model " << mm
