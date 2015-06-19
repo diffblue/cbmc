@@ -2224,7 +2224,9 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   else if(expr.id()==ID_array ||
           expr.id()==ID_vector)
   {
-    if(no_typecast) return;
+    if(no_typecast ||
+       expr.get_bool(ID_C_string_constant))
+      return;
 
     const typet &t=expr.type();
 
