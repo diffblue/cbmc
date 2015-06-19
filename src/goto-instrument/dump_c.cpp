@@ -1012,9 +1012,14 @@ void dump_ct::convert_function_declaration(
 
     convertedt converted_c_bak(converted_compound);
     convertedt converted_e_bak(converted_enum);
+
+    declared_enum_constants_mapt
+      enum_constants_bak(declared_enum_constants);
+
     insert_local_type_decls(
       b,
       type_decls);
+
     converted_enum.swap(converted_e_bak);
     converted_compound.swap(converted_c_bak);
 
@@ -1023,6 +1028,8 @@ void dump_ct::convert_function_declaration(
     os_body << make_decl(symbol.name, symbol.type) << std::endl;
     os_body << expr_to_string(b);
     os_body << std::endl << std::endl;
+
+    declared_enum_constants.swap(enum_constants_bak);
   }
 
   if(symbol.name!=goto_functionst::entry_point() &&
