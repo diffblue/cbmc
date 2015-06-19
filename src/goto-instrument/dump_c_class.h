@@ -52,7 +52,9 @@ protected:
     system_library_mapt;
   system_library_mapt system_library_map;
 
-  hash_set_cont<irep_idt, irep_id_hash> declared_enum_constants;
+  typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash>
+    declared_enum_constants_mapt;
+  declared_enum_constants_mapt declared_enum_constants;
 
   void init_system_library_map();
 
