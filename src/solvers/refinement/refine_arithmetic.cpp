@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/bv_arithmetic.h>
 #include <util/ieee_float.h>
 #include <util/expr_util.h>
+#include <util/arith_tools.h>
 
 #include <langapi/language_util.h>
 
@@ -20,8 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // Parameters
 #define MAX_INTEGER_UNDERAPPROX 3
 #define MAX_FLOAT_UNDERAPPROX 10
-
-#define RM ieee_floatt::ROUND_TO_EVEN
 
 //#define DEBUG
 
@@ -262,10 +261,17 @@ void bv_refinementt::check_SAT(approximationt &a)
     o0.unpack(a.op0_value);
     o1.unpack(a.op1_value);
     
+    // get actual rounding mode
+    mp_integer rounding_mode_int;
+    exprt rounding_mode_expr = get(a.expr.op2());
+    to_integer(rounding_mode_expr, rounding_mode_int);
+    ieee_floatt::rounding_modet rounding_mode = 
+      (ieee_floatt::rounding_modet)integer2long(rounding_mode_int);
+
     ieee_floatt result=o0;
-    o0.rounding_mode=RM;
-    o1.rounding_mode=RM;
-    result.rounding_mode=RM;
+    o0.rounding_mode=rounding_mode;
+    o1.rounding_mode=rounding_mode;
+    result.rounding_mode=rounding_mode;
 
     if(a.expr.id()==ID_floatbv_plus)
       result+=o1;
@@ -304,7 +310,7 @@ void bv_refinementt::check_SAT(approximationt &a)
       bvt r;
       float_utilst float_utils(prop);
       float_utils.spec=spec;
-      float_utils.rounding_mode_bits.set(RM);
+      float_utils.rounding_mode_bits.set(rounding_mode);
       
       literalt op0_equal=
         bv_utils.equal(a.op0_bv, float_utils.build_constant(o0));
@@ -331,7 +337,7 @@ void bv_refinementt::check_SAT(approximationt &a)
       bvt r;
       float_utilst float_utils(prop);
       float_utils.spec=spec;
-      float_utils.rounding_mode_bits.set(RM);
+      float_utils.rounding_mode_bits.set(rounding_mode);
 
       bvt op0=a.op0_bv, op1=a.op1_bv, res=a.result_bv;
 
