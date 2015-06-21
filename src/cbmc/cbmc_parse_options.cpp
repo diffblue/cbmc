@@ -36,13 +36,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+
 #include <cegis/bmc_verification_oracle.h>
 #include <cegis/cegis.h>
+#include <cegis/ga_learning_algorithm.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/goto_check.h>
-#include <cegis/ga_learning_algorithm.h>
 
 #include <langapi/mode.h>
 
