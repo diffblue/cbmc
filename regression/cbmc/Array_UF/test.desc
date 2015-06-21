@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
- --arrays-uf-always
+--arrays-uf-always
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

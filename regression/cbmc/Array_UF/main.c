@@ -9,5 +9,5 @@ int main()
   for(unsigned i = 0;i<10;i++) {
     a[i] = b[i];
   }
-  assert(a[y]==a[z]);
+  __CPROVER_assert(a[y]==a[z], "a[y]==a[z]");
 }
