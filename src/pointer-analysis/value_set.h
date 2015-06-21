@@ -28,7 +28,8 @@ public:
 
   static bool field_sensitive(
     const irep_idt &id,
-    const typet &type);
+    const typet &type,
+    const namespacet &);
 
   unsigned location_number;
   static object_numberingt object_numbering;
@@ -136,7 +137,9 @@ public:
     values.clear();
   }
   
-  entryt &get_entry(const entryt &e, const typet &type);
+  entryt &get_entry(
+    const entryt &e, const typet &type,
+    const namespacet &);
   
   void output(
     const namespacet &ns,
