@@ -22,7 +22,7 @@ Function: boolbvt::convert_div
 
 \*******************************************************************/
 
-void boolbvt::convert_div(const exprt &expr, bvt &bv)
+void boolbvt::convert_div(const div_exprt &expr, bvt &bv)
 {
   if(expr.type().id()!=ID_unsignedbv &&
      expr.type().id()!=ID_signedbv &&

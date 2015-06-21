@@ -154,7 +154,7 @@ Function: bv_refinementt::convert_div
 
 \*******************************************************************/
 
-void bv_refinementt::convert_div(const exprt &expr, bvt &bv)
+void bv_refinementt::convert_div(const div_exprt &expr, bvt &bv)
 {
   if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
     return SUB::convert_div(expr, bv);
@@ -182,7 +182,7 @@ Function: bv_refinementt::convert_mod
 
 \*******************************************************************/
 
-void bv_refinementt::convert_mod(const exprt &expr, bvt &bv)
+void bv_refinementt::convert_mod(const mod_exprt &expr, bvt &bv)
 {
   if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
     return SUB::convert_mod(expr, bv);

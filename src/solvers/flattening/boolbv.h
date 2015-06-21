@@ -141,8 +141,8 @@ protected:
   virtual void convert_typecast(const typecast_exprt &expr, bvt &bv);
   virtual void convert_add_sub(const exprt &expr, bvt &bv);
   virtual void convert_mult(const exprt &expr, bvt &bv);
-  virtual void convert_div(const exprt &expr, bvt &bv);
-  virtual void convert_mod(const exprt &expr, bvt &bv);
+  virtual void convert_div(const div_exprt &expr, bvt &bv);
+  virtual void convert_mod(const mod_exprt &expr, bvt &bv);
   virtual void convert_floatbv_op(const exprt &expr, bvt &bv);
   virtual void convert_floatbv_typecast(const floatbv_typecast_exprt &expr, bvt &bv);
   virtual void convert_member(const member_exprt &expr, bvt &bv);
