@@ -128,6 +128,12 @@ simple_expr:
           stack($$).id("tuple");
           mto($$, $2);
         }
+        | '(' ')'
+        {
+          // only used for procedure calls
+          $$=$1;
+          stack($$).id("empty_tuple");
+        }
         | '_'
         {
           $$=$1;
