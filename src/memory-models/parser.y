@@ -122,7 +122,7 @@ simple_expr:
         {
           $$=$2;
         }
-        | '(' expr_list_opt ')'
+        | '(' tuple ')'
         {
           $$=$1;
           stack($$).id("tuple");
@@ -150,6 +150,8 @@ expr:     simple_expr
         }
         | expr '*' simple_expr
         {
+          // The simple_expr in the rule above is to avoid a conflict
+          // between a*b and a*, say followed by LET
           $$=$2;
           stack($$).id("cartesian_product");
           mto($$, $1);
@@ -157,6 +159,8 @@ expr:     simple_expr
         }
         | expr "⨯" simple_expr
         {
+          // The simple_expr in the rule above could be expr,
+          // as there is no ambiguity with the reflexive transitive closure.
           $$=$2;
           stack($$).id("cartesian_product");
           mto($$, $1);
@@ -323,6 +327,19 @@ simple_expr_sequence:
           mto($$, $1);
         }
         | simple_expr_sequence simple_expr
+        {
+          $$=$1;
+          mto($$, $1);
+        }
+        ;
+
+tuple:
+          expr ',' expr
+        {
+          newstack($$);
+          mto($$, $1);
+        }
+        | tuple ',' expr
         {
           $$=$1;
           mto($$, $1);
