@@ -24,8 +24,8 @@ ws              (" "|\t|\r|\n)
 letter          [a-z]|[A-Z]
 digit           [0-9]
 number          {digit}+
-identifier      {letter}({letter}|{digit}|"_"|"."|"-")*
-tagidentifier   "'"{letter}({letter}|{digit}|"_"|"."|"-")*
+identifier      {letter}({letter}|{digit}|"_"|"."|"-"|"'")*
+tagidentifier   "'"{letter}({letter}|{digit}|"_"|"."|"-"|"'")*
 string          ["][^"\n]*["]
 pascalcomment   "(*"(.|\n)*"*)"
 cppcomment      "//".*\n
