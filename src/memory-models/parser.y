@@ -222,7 +222,7 @@ expr:     simple_expr
           mto($$, $1);
           mto($$, $3);
         }
-        | identifier simple_expr %prec prec_app
+        | identifier simple_expr_sequence %prec prec_app
         {
           newstack($$);
           stack($$).id(ID_function_call);
@@ -306,6 +306,19 @@ pat_bind_list:
         {
           $$=$1;
           mto($$, $3);
+        }
+        ;
+
+simple_expr_sequence:
+          expr
+        {
+          newstack($$);
+          mto($$, $1);
+        }
+        | simple_expr_sequence expr
+        {
+          $$=$1;
+          mto($$, $1);
         }
         ;
 
