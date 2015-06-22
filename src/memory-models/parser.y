@@ -148,14 +148,14 @@ expr:     simple_expr
           stack($$).id("transitive_closure");
           mto($$, $1);
         }
-        | expr '*' expr
+        | expr '*' simple_expr
         {
           $$=$2;
           stack($$).id("cartesian_product");
           mto($$, $1);
           mto($$, $3);
         }
-        | expr "⨯" expr
+        | expr "⨯" simple_expr
         {
           $$=$2;
           stack($$).id("cartesian_product");
