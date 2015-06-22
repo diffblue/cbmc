@@ -19,6 +19,9 @@ static int isatty(int) { return 0; }
 
 %}
 
+%x GRAMMAR
+%s COMMENT
+
 nl              (\r\n|\r|\n)
 ws              (" "|\t|\r|\n)
 letter          [a-z]|[A-Z]
@@ -27,12 +30,14 @@ number          {digit}+
 identifier      {letter}({letter}|{digit}|"_"|"."|"-"|"'")*
 tagidentifier   "'"{letter}({letter}|{digit}|"_"|"."|"-"|"'")*
 string          ["][^"\n]*["]
-pascalcomment   "(*"(.|\n)*"*)"
 cppcomment      "//".*\n
 
 %%
 
-{pascalcomment} { /* ignore */ }
+<INITIAL>.|\n   { BEGIN(GRAMMAR); yyless(0); }
+
+<GRAMMAR>{
+"(*"            { BEGIN(COMMENT); }
 {cppcomment}    { /* ignore */ }
 {string}        { loc(); return TOK_STRING; }
 "^-1"           { loc(); return TOK_INVERSE; }
@@ -74,6 +79,12 @@ cppcomment      "//".*\n
 {ws}            { /* ignore */ }
 .               { loc(); return yytext[0]; }
 <<EOF>>         { yyterminate(); /* done! */ }
+}
+
+<COMMENT>{
+"*)"            { BEGIN(GRAMMAR); }
+\n|.            { /* ignore */ }
+}
 
 %%
 
