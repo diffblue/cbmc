@@ -155,6 +155,13 @@ expr:     simple_expr
           mto($$, $1);
           mto($$, $3);
         }
+        | expr "⨯" expr
+        {
+          $$=$2;
+          stack($$).id("cartesian_product");
+          mto($$, $1);
+          mto($$, $3);
+        }
         | expr '?'
         {
           $$=$2;
