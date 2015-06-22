@@ -81,9 +81,67 @@ void mm2cppt::check_acyclic(const exprt &expr, unsigned indent)
     let_valuest::const_iterator v_it=let_values.find(identifier);
     if(v_it!=let_values.end())
       check_acyclic(v_it->second, indent);
+    else if(identifier=="po")
+    {
+    }
+    else if(identifier=="rf")
+    {
+    }
+    else if(identifier=="co")
+    {
+    }
+    else if(identifier=="loc")
+    {
+    }
+    else if(identifier=="int")
+    {
+    }
+    else if(identifier=="ext")
+    {
+    }
+    else if(identifier=="id")
+    {
+    }
+    else if(identifier=="R")
+    {
+    }
+    else if(identifier=="W")
+    {
+    }
+    else if(identifier=="F")
+    {
+    }
+    else if(identifier=="B")
+    {
+    }
+    else if(identifier=="RMW")
+    {
+    }
+    else if(identifier=="rmw")
+    {
+    }
+    else if(identifier=="IW")
+    {
+    }
+    else if(identifier=="FW")
+    {
+    }
+    else if(identifier=="M")
+    {
+    }
+    else if(identifier=="addr")
+    {
+    }
+    else if(identifier=="data")
+    {
+    }
+    else if(identifier=="ctrl")
+    {
+    }
     else
     {
-      throw "unknown identifier `"+id2string(identifier)+"'";
+      throw expr.source_location().as_string()+
+            ": unknown identifier `"+id2string(identifier)+"'";
     }
   }
   else if(expr.id()==ID_union)
