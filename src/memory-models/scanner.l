@@ -17,6 +17,8 @@ static int isatty(int) { return 0; }
 #define loc() \
   { newstack(yymmlval); PARSER.set_source_location(stack(yymmlval)); }
 
+unsigned comment_nesting;
+
 %}
 
 %x GRAMMAR
@@ -37,7 +39,7 @@ cppcomment      "//".*\n
 <INITIAL>.|\n   { BEGIN(GRAMMAR); yyless(0); }
 
 <GRAMMAR>{
-"(*"            { BEGIN(COMMENT); }
+"(*"            { comment_nesting=1; BEGIN(COMMENT); }
 {cppcomment}    { /* ignore */ }
 {string}        { loc(); return TOK_STRING; }
 "^-1"           { loc(); return TOK_INVERSE; }
@@ -82,7 +84,9 @@ cppcomment      "//".*\n
 }
 
 <COMMENT>{
-"*)"            { BEGIN(GRAMMAR); }
+"*)"            { comment_nesting--;
+                  if(comment_nesting==0) BEGIN(GRAMMAR); }
+"(*"            { comment_nesting++; }
 \n|.            { /* ignore */ }
 }
 
