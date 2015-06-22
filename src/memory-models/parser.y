@@ -310,12 +310,12 @@ pat_bind_list:
         ;
 
 simple_expr_sequence:
-          expr
+          simple_expr
         {
           newstack($$);
           mto($$, $1);
         }
-        | simple_expr_sequence expr
+        | simple_expr_sequence simple_expr
         {
           $$=$1;
           mto($$, $1);
