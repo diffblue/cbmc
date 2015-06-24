@@ -141,24 +141,28 @@ bool boolbvt::type_conversion(
         return false;
       }
     }
-    else if(src_bvtype==IS_RANGE)
+    else if(src_bvtype==IS_RANGE) // range to range
     {
       mp_integer src_from=to_range_type(src_type).get_from();
       mp_integer dest_from=to_range_type(dest_type).get_from();
 
       if(dest_from==src_from)
       {
-        // do zero extension
-        dest.resize(dest_width);
-        for(unsigned i=0; i<dest.size(); i++)
-          dest[i]=(i<src.size()?src[i]:const_literal(false));
-
+        // do zero extension, if needed
+        dest=bv_utils.zero_extension(src, dest_width);
         return false;
       }
       else
       {
-        // need to do arithmetic
+        // need to do arithmetic: add src_from-dest_from
+        mp_integer offset=src_from-dest_from;
+        dest=
+          bv_utils.add(
+            bv_utils.zero_extension(src, dest_width),
+            bv_utils.build_constant(offset, dest_width));
       }
+
+      return false;
     }
     break;
     
