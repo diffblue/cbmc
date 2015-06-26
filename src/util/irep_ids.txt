@@ -7,7 +7,8 @@ c_bool
 proper_bool
 signedbv
 unsignedbv
-verilogbv
+verilog_signedbv
+verilog_unsignedbv
 floatbv
 fixedbv
 C_source_location #source_location

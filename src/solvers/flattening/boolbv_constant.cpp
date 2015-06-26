@@ -91,7 +91,8 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
 
     return;
   }
-  else if(expr_type.id()==ID_verilogbv)
+  else if(expr_type.id()==ID_verilog_signedbv ||
+          expr_type.id()==ID_verilog_unsignedbv)
   {
     const std::string &binary=id2string(expr.get_value());
 

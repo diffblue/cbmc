@@ -358,7 +358,8 @@ std::string expr2cppt::convert_rec(
 
     return dest;
   }
-  else if(src.id()==ID_verilogbv)
+  else if(src.id()==ID_verilog_signedbv ||
+          src.id()==ID_verilog_unsignedbv)
     return "sc_lv["+id2string(src.get(ID_width))+"]"+d;
   else if(src.id()==ID_unassigned)
     return "?";
@@ -522,7 +523,9 @@ std::string expr2cppt::convert(
   else if(src.id()==ID_side_effect &&
           src.get(ID_statement)==ID_throw)
     return convert_function(src, "throw", precedence=16);
-  else if(src.is_constant() && src.type().id() == ID_verilogbv)
+  else if(src.is_constant() && src.type().id() == ID_verilog_signedbv)
+    return "'" + id2string(src.get(ID_value)) + "'";
+  else if(src.is_constant() && src.type().id() == ID_verilog_unsignedbv)
     return "'" + id2string(src.get(ID_value)) + "'";
   else if(src.is_constant() && to_constant_expr(src).get_value()==ID_nullptr)
     return "nullptr";
