@@ -33,7 +33,8 @@ void boolbvt::convert_shift(const binary_exprt &expr, bvt &bv)
      type_id!=ID_floatbv &&
      type_id!=ID_pointer &&
      type_id!=ID_bv &&
-     type_id!=ID_verilogbv)
+     type_id!=ID_verilog_signedbv &&
+     type_id!=ID_verilog_unsignedbv)
     return conversion_failed(expr, bv);
 
   unsigned width=boolbv_width(expr.type());
@@ -75,7 +76,8 @@ void boolbvt::convert_shift(const binary_exprt &expr, bvt &bv)
     else
       distance=integer2long(i);
 
-    if(type_id==ID_verilogbv)
+    if(type_id==ID_verilog_signedbv ||
+       type_id==ID_verilog_unsignedbv)
       distance*=2;
     
     bv=bv_utils.shift(op, shift, distance);

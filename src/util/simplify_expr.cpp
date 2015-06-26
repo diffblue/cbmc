@@ -2228,7 +2228,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
         i++;
     }
   }
-  else if(expr.type().id()==ID_verilogbv)
+  else if(expr.type().id()==ID_verilog_unsignedbv)
   {
     // search for neighboring constants to merge
     size_t i=0;
@@ -2240,15 +2240,15 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
     
       if(opi.is_constant() &&
          opn.is_constant() &&
-         (opi.type().id()==ID_verilogbv || is_bitvector_type(opi.type())) &&
-         (opn.type().id()==ID_verilogbv || is_bitvector_type(opn.type())))
+         (opi.type().id()==ID_verilog_unsignedbv || is_bitvector_type(opi.type())) &&
+         (opn.type().id()==ID_verilog_unsignedbv || is_bitvector_type(opn.type())))
       {
         // merge!
         const std::string new_value=
           opi.get_string(ID_value)+opn.get_string(ID_value);
         opi.set(ID_value, new_value);
         opi.type().set(ID_width, new_value.size());
-        opi.type().id(ID_verilogbv);
+        opi.type().id(ID_verilog_unsignedbv);
         // erase opn
         expr.operands().erase(expr.operands().begin()+i+1);
         result=true;

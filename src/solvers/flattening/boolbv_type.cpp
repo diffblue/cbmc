@@ -38,8 +38,10 @@ bvtypet get_bvtype(const typet &type)
     return IS_FIXED;
   else if(type.id()==ID_bv)
     return IS_BV;
-  else if(type.id()==ID_verilogbv)
-    return IS_VERILOGBV;
+  else if(type.id()==ID_verilog_signedbv)
+    return IS_VERILOG_SIGNED;
+  else if(type.id()==ID_verilog_unsignedbv)
+    return IS_VERILOG_UNSIGNED;
   else if(type.id()==ID_range)
     return IS_RANGE;
   else if(type.id()==ID_c_bit_field)

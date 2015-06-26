@@ -381,7 +381,7 @@ bool boolbvt::type_conversion(
         return false;
       }
       
-    case IS_VERILOGBV: // verilogbv to signed/unsigned/enum
+    case IS_VERILOG_UNSIGNED: // verilog_unsignedbv to signed/unsigned/enum
       {
         for(unsigned i=0; i<dest_width; i++)
         {
@@ -391,6 +391,22 @@ bool boolbvt::type_conversion(
             dest.push_back(src[src_index]);
           else // always zero-extend
             dest.push_back(const_literal(false));
+        }
+
+        return false;
+      }
+      break;
+      
+    case IS_VERILOG_SIGNED: // verilog_signedbv to signed/unsigned/enum
+      {
+        for(unsigned i=0; i<dest_width; i++)
+        {
+          unsigned src_index=i*2; // we take every second bit
+
+          if(src_index<src_width)
+            dest.push_back(src[src_index]);
+          else // always sign-extend
+            dest.push_back(src.back());
         }
 
         return false;
@@ -417,7 +433,7 @@ bool boolbvt::type_conversion(
     }
     break;
     
-  case IS_VERILOGBV:
+  case IS_VERILOG_UNSIGNED:
     if(src_bvtype==IS_UNSIGNED ||
        src_bvtype==IS_C_BOOL ||
        src_type.id()==ID_bool)
@@ -434,9 +450,23 @@ bool boolbvt::type_conversion(
 
       return false;
     }
-    else if(src_bvtype==IS_VERILOGBV)
+    else if(src_bvtype==IS_SIGNED)
     {
-      // verilogbv to verilogbv
+      for(unsigned i=0, j=0; i<dest_width; i+=2, j++)
+      {
+        if(j<src_width)
+          dest.push_back(src[j]);
+        else
+          dest.push_back(src.back());
+
+        dest.push_back(const_literal(false));
+      }
+
+      return false;
+    }
+    else if(src_bvtype==IS_VERILOG_UNSIGNED)
+    {
+      // verilog_unsignedbv to verilog_unsignedbv
       dest=src;
 
       if(dest_width<src_width)

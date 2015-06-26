@@ -52,7 +52,8 @@ exprt gen_zero(const typet &type)
   }
   else if(type_id==ID_unsignedbv ||
           type_id==ID_signedbv ||
-          type_id==ID_verilogbv ||
+          type_id==ID_verilog_signedbv ||
+          type_id==ID_verilog_unsignedbv ||
           type_id==ID_floatbv ||
           type_id==ID_fixedbv ||
           type_id==ID_c_bit_field ||

@@ -96,7 +96,8 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         return literal;
         #endif
       }
-      else if(bvtype0==IS_VERILOGBV &&
+      else if((bvtype0==IS_VERILOG_SIGNED ||
+               bvtype0==IS_VERILOG_UNSIGNED) &&
               op0.type()==op1.type())
       {
         // extract number bits

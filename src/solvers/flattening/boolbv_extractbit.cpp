@@ -50,7 +50,8 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       return bv0[integer2long(o)];
   }
 
-  if(operands[0].type().id()==ID_verilogbv)
+  if(operands[0].type().id()==ID_verilog_signedbv ||
+     operands[0].type().id()==ID_verilog_unsignedbv)
   {
     // TODO
     assert(false);
