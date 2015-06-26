@@ -29,7 +29,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
   const irep_idt &rel=expr.id();
-
+  
   if(operands.size()==2)
   {
     const exprt &op0=expr.op0();
@@ -95,6 +95,37 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
           }          
         }
  
+        return literal;
+      }
+      else if(bvtype0==IS_VERILOGBV &&
+              op0.type()==op1.type())
+      {
+        // extract number bits
+        bvt extract0, extract1;
+        
+        extract0.resize(bv0.size()/2);
+        extract1.resize(bv1.size()/2);
+        
+        for(unsigned i=0; i<extract0.size(); i++)
+          extract0[i]=bv0[i*2];
+        
+        for(unsigned i=0; i<extract1.size(); i++)
+          extract1[i]=bv1[i*2];
+          
+        bv_utilst::representationt rep=bv_utilst::UNSIGNED;
+
+        // now compare
+        literalt literal;
+        bool or_equal=(rel==ID_le || rel==ID_ge);
+
+        if(rel==ID_le || rel==ID_lt)
+          literal=bv_utils.lt_or_le(or_equal, extract0, extract1, rep);
+        else if(rel==ID_ge || rel==ID_gt)
+          literal=bv_utils.lt_or_le(or_equal, extract1, extract0, rep);
+                                              // swapped
+        else
+          return SUB::convert_rest(expr);
+        
         return literal;
       }
     }
