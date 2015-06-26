@@ -47,15 +47,11 @@ void boolbvt::convert_bitwise(const exprt &expr, bvt &bv)
     return;
   }
   else if(expr.id()==ID_bitand || expr.id()==ID_bitor ||
-          expr.id()==ID_bitxor || expr.id()==ID_bitxnor)
+          expr.id()==ID_bitxor || 
+          expr.id()==ID_bitnand || expr.id()==ID_bitnor ||
+          expr.id()==ID_bitxnor)
   {
     bv.resize(width);
-    
-    literalt neutral=
-      const_literal(expr.id()==ID_bitand || expr.id()==ID_bitxnor);
-
-    for(unsigned i=0; i<width; i++)
-      bv[i]=neutral;
     
     forall_operands(it, expr)
     {
@@ -63,19 +59,28 @@ void boolbvt::convert_bitwise(const exprt &expr, bvt &bv)
 
       if(op.size()!=width)
         throw "convert_bitwise: unexpected operand width";
-
-      for(unsigned i=0; i<width; i++)
+        
+      if(it==expr.operands().begin())
+        bv=op;
+      else
       {
-        if(expr.id()==ID_bitand)
-          bv[i]=prop.land(bv[i], op[i]);
-        else if(expr.id()==ID_bitor)
-          bv[i]=prop.lor(bv[i], op[i]);
-        else if(expr.id()==ID_bitxor)
-          bv[i]=prop.lxor(bv[i], op[i]);
-        else if(expr.id()==ID_bitxnor)
-          bv[i]=prop.lequal(bv[i], op[i]);
-        else
-          throw "unexpected operand";
+        for(unsigned i=0; i<width; i++)
+        {
+          if(expr.id()==ID_bitand)
+            bv[i]=prop.land(bv[i], op[i]);
+          else if(expr.id()==ID_bitor)
+            bv[i]=prop.lor(bv[i], op[i]);
+          else if(expr.id()==ID_bitxor)
+            bv[i]=prop.lxor(bv[i], op[i]);
+          else if(expr.id()==ID_bitnand)
+            bv[i]=prop.lnand(bv[i], op[i]);
+          else if(expr.id()==ID_bitnor)
+            bv[i]=prop.lnor(bv[i], op[i]);
+          else if(expr.id()==ID_bitxnor)
+            bv[i]=prop.lequal(bv[i], op[i]);
+          else
+            throw "unexpected operand";
+        }
       }
     }    
 

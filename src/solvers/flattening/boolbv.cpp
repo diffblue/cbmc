@@ -296,7 +296,9 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
   else if(expr.id()==ID_extractbits)
     return convert_extractbits(to_extractbits_expr(expr), bv);
   else if(expr.id()==ID_bitnot || expr.id()==ID_bitand ||
-          expr.id()==ID_bitor || expr.id()==ID_bitxor)
+          expr.id()==ID_bitor || expr.id()==ID_bitxor ||
+          expr.id()==ID_bitxnor || expr.id()==ID_bitnor ||
+          expr.id()==ID_bitnand)
     return convert_bitwise(expr, bv);
   else if(expr.id()==ID_unary_minus ||
           expr.id()=="no-overflow-unary-minus")
