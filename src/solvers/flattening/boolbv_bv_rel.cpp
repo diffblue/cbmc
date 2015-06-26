@@ -67,19 +67,17 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
                bvtype0==IS_FIXED)
       {
         literalt literal;
-        bool or_equal=(rel==ID_le || rel==ID_ge);
 
         bv_utilst::representationt rep=
           ((bvtype0==IS_SIGNED) || (bvtype0==IS_FIXED))?bv_utilst::SIGNED:
                                                         bv_utilst::UNSIGNED;
 
-        if(rel==ID_le || rel==ID_lt)
-          literal=bv_utils.lt_or_le(or_equal, bv0, bv1, rep);
-        else if(rel==ID_ge || rel==ID_gt)
-          literal=bv_utils.lt_or_le(or_equal, bv1, bv0, rep);
-                                              // swapped
-        else
-          return SUB::convert_rest(expr);
+        #if 1
+
+        return bv_utils.rel(bv0, expr.id(), bv1, rep);
+        
+        #else
+        literalt literal=bv_utils.rel(bv0, expr.id(), bv1, rep);
 
         if(prop.has_set_to())
         {
@@ -96,6 +94,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         }
  
         return literal;
+        #endif
       }
       else if(bvtype0==IS_VERILOGBV &&
               op0.type()==op1.type())
@@ -115,18 +114,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         bv_utilst::representationt rep=bv_utilst::UNSIGNED;
 
         // now compare
-        literalt literal;
-        bool or_equal=(rel==ID_le || rel==ID_ge);
-
-        if(rel==ID_le || rel==ID_lt)
-          literal=bv_utils.lt_or_le(or_equal, extract0, extract1, rep);
-        else if(rel==ID_ge || rel==ID_gt)
-          literal=bv_utils.lt_or_le(or_equal, extract1, extract0, rep);
-                                              // swapped
-        else
-          return SUB::convert_rest(expr);
-        
-        return literal;
+        return bv_utils.rel(extract0, expr.id(), extract1, rep);
       }
     }
   }

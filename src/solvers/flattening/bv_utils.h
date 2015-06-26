@@ -112,6 +112,10 @@ public:
                     const bvt &bv1,
                     representationt rep);
 
+  // id is one of ID_lt, le, gt, ge, equal, notequal
+  literalt rel(const bvt &bv0, irep_idt id, const bvt &bv1,
+               representationt rep);
+
   literalt unsigned_less_than(const bvt &bv0, const bvt &bv1);
   literalt signed_less_than(const bvt &bv0, const bvt &bv1);
 

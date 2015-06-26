@@ -1520,7 +1520,6 @@ literalt bv_utilst::lt_or_le(
     prop.l_set_to_true(compareBelow[start]);
   }
 
-
   // Determine the output
   //  \forall i .  cb[i] & -a[i] &  b[i] =>  result
   //  \forall i .  cb[i] &  a[i] & -b[i] => -result
@@ -1625,6 +1624,40 @@ literalt bv_utilst::signed_less_than(
   const bvt &bv1)
 {
   return lt_or_le(false, bv0, bv1, SIGNED);
+}
+
+/*******************************************************************\
+
+Function: bv_utilst::rel
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+literalt bv_utilst::rel(
+  const bvt &bv0,
+  irep_idt id,
+  const bvt &bv1,
+  representationt rep)
+{
+  if(id==ID_equal)
+    return equal(bv0, bv1);
+  else if(id==ID_notequal)
+    return !equal(bv0, bv1);
+  else if(id==ID_le)
+    return lt_or_le(true, bv0, bv1, rep);
+  else if(id==ID_lt)
+    return lt_or_le(false, bv0, bv1, rep);
+  else if(id==ID_ge)
+    return lt_or_le(true, bv1, bv0, rep); // swapped
+  else if(id==ID_gt)
+    return lt_or_le(false, bv1, bv0, rep); // swapped
+  else
+    assert(false);
 }
 
 /*******************************************************************\
