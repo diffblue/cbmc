@@ -47,12 +47,15 @@ void boolbvt::convert_bitwise(const exprt &expr, bvt &bv)
     return;
   }
   else if(expr.id()==ID_bitand || expr.id()==ID_bitor ||
-          expr.id()==ID_bitxor)
+          expr.id()==ID_bitxor || expr.id()==ID_bitxnor)
   {
     bv.resize(width);
+    
+    literalt neutral=
+      const_literal(expr.id()==ID_bitand || expr.id()==ID_bitxnor);
 
     for(unsigned i=0; i<width; i++)
-      bv[i]=const_literal(expr.id()==ID_bitand);
+      bv[i]=neutral;
     
     forall_operands(it, expr)
     {
@@ -69,6 +72,8 @@ void boolbvt::convert_bitwise(const exprt &expr, bvt &bv)
           bv[i]=prop.lor(bv[i], op[i]);
         else if(expr.id()==ID_bitxor)
           bv[i]=prop.lxor(bv[i], op[i]);
+        else if(expr.id()==ID_bitxnor)
+          bv[i]=prop.lequal(bv[i], op[i]);
         else
           throw "unexpected operand";
       }
