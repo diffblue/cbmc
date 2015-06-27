@@ -161,6 +161,9 @@ public:
   // put a and b together, where a comes first (lower indices)
   bvt concatenate(const bvt &a, const bvt &b) const;
 
+  literalt verilog_bv_has_x_or_z(const bvt &);
+  bvt verilog_bv_normal_bits(const bvt &);
+
 protected:
   propt &prop;
 

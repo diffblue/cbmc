@@ -1706,3 +1706,57 @@ void bv_utilst::cond_implies_equal(
     prop.lcnf(!cond, !a[i],  b[i]);
   }
 }
+
+/*******************************************************************\
+
+Function: bv_utilst::verilog_bv_has_x_or_z
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+literalt bv_utilst::verilog_bv_has_x_or_z(const bvt &src)
+{
+  bvt odd_bits;
+  odd_bits.reserve(src.size()/2);
+
+  // check every odd bit
+  for(unsigned i=0; i<src.size(); i++)
+  {
+    if(i%2!=0)
+      odd_bits.push_back(src[i]);
+  }
+  
+  return prop.lor(odd_bits);
+}
+
+/*******************************************************************\
+
+Function: bv_utilst::verilog_bv_normal_bits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bvt bv_utilst::verilog_bv_normal_bits(const bvt &src)
+{
+  bvt even_bits;
+  even_bits.reserve(src.size()/2);
+
+  // get every even bit
+  for(unsigned i=0; i<src.size(); i++)
+  {
+    if(i%2==0)
+      even_bits.push_back(src[i]);
+  }
+  
+  return even_bits;
+}
