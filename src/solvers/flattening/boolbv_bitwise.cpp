@@ -36,13 +36,10 @@ void boolbvt::convert_bitwise(const exprt &expr, bvt &bv)
     
     const bvt &op_bv=convert_bv(op0);
 
-    bv.resize(width);
-    
     if(op_bv.size()!=width)
       throw "convert_bitwise: unexpected operand width";
 
-    for(unsigned i=0; i<width; i++)
-      bv[i]=prop.lnot(op_bv[i]);
+    bv=bv_utils.inverted(op_bv);
 
     return;
   }
