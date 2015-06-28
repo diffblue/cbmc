@@ -101,7 +101,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   LINKFLAGS = -static -std=c++11
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) -o $@ $^ -static
+  LINKNATIVE = $(HOSTCXX) -std=c++11 -o $@ $^ -static
 ifeq ($(origin CC),default)
   #CC = gcc
   CC = i686-pc-mingw32-gcc
