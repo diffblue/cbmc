@@ -98,7 +98,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
   CP_CXXFLAGS = -MMD -MP
-  LINKFLAGS = -static
+  LINKFLAGS = -static -std=c++11
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^ -static
