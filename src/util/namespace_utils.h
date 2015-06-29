@@ -6,12 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+// THIS FILE IS DEPRECATED
+
 #ifndef CPROVER_NAMESPACE_UTILS_H
 #define CPROVER_NAMESPACE_UTILS_H
 
 #include "namespace.h"
 #include "base_type.h"
 #include "type_eq.h"
+#include "std_expr.h"
 
 // second: true <=> not found
 
@@ -27,6 +30,14 @@ class namespace_utils_baset
     const symbolt *symbol;
     if(lookup(name, symbol))
       throw "identifier "+id2string(name)+" not found";
+    return *symbol;
+  }
+   
+  const symbolt &lookup(const symbol_exprt &symbol_expr) const
+  {
+    const symbolt *symbol;
+    if(lookup(symbol_expr.get_identifier(), symbol))
+      throw "identifier "+id2string(symbol_expr.get_identifier())+" not found";
     return *symbol;
   }
    
