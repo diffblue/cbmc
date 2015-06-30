@@ -52,7 +52,7 @@ public:
 
 protected:
   cfg_dominators_templatet<P, T> cfg_dominators;
-  typedef typename cfg_dominators_templatet<P, T>::cfgt::entryt nodet;
+  typedef typename cfg_dominators_templatet<P, T>::cfgt::nodet nodet;
 
   void compute(P &program);
   void compute_natural_loop(T, T);  
@@ -107,7 +107,8 @@ void natural_loops_templatet<P, T>::compute(P &program)
       {
         if((*n_it)->location_number<=m_it->location_number)
         {
-          const nodet &node=cfg_dominators.cfg.entry_map[m_it];
+          const nodet &node=
+            cfg_dominators.cfg[cfg_dominators.cfg.entry_map[m_it]];
           
 #ifdef DEBUG
           std::cout << "Computing loop for " 
@@ -157,14 +158,15 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
     T p=stack.top();
     stack.pop();
 
-    const nodet &node=cfg_dominators.cfg.entry_map[p];
+    const nodet &node=
+      cfg_dominators.cfg[cfg_dominators.cfg.entry_map[p]];
 
-    for(typename nodet::entriest::const_iterator
-          q_it=node.predecessors.begin();
-        q_it!=node.predecessors.end();
+    for(typename nodet::edgest::const_iterator
+          q_it=node.in.begin();
+        q_it!=node.in.end();
         ++q_it)
     {
-      T q=(*q_it)->PC;
+      T q=cfg_dominators.cfg[q_it->first].PC;
       std::pair<typename natural_loopt::const_iterator, bool> result=
           loop.insert(q);
       if(result.second)

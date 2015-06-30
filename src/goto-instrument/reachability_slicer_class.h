@@ -46,7 +46,7 @@ protected:
   typedef cfg_baset<slicer_entryt> cfgt;
   cfgt cfg;
 
-  typedef std::stack<cfgt::iterator> queuet;
+  typedef std::stack<cfgt::entryt> queuet;
 
   void fixedpoint_assertions(const is_threadedt &is_threaded);
 

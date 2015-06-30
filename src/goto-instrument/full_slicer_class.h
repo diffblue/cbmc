@@ -46,11 +46,11 @@ protected:
   typedef cfg_baset<cfg_nodet> cfgt;
   cfgt cfg;
 
-  typedef std::stack<cfgt::iterator> queuet;
+  typedef std::stack<cfgt::entryt> queuet;
 
   void fixedpoint();
   void slice(goto_functionst &goto_functions);
-  object_id_sett transform(cfgt::iterator);
+  object_id_sett transform(cfgt::nodet&);
 };
 
 #endif
