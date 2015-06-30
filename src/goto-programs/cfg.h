@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_PROGRAMS_CFG_H
 
 #include <util/std_expr.h>
+#include <util/graph.h>
 
 #include "goto_functions.h"
 
@@ -25,28 +26,44 @@ class empty_cfg_nodet
 {
 };
 
+// these are the CFG nodes
+template<class T, typename I>
+struct cfg_base_nodet:public graph_nodet<empty_edget>, public T
+{
+  typedef typename graph_nodet<empty_edget>::edget edget;
+  typedef typename graph_nodet<empty_edget>::edgest edgest;
+
+  I PC;
+};
+
 template<class T,
          typename P=const goto_programt,
          typename I=goto_programt::const_targett>
-class cfg_baset
+class cfg_baset:public graph< cfg_base_nodet<T,I> >
 {
 public:
-  // these are the CFG nodes
-  struct entryt: public T
+  typedef unsigned entryt;
+
+  struct entry_mapt:
+    public std::map<goto_programt::const_targett, entryt>
   {
-    typedef std::list<struct entryt *> entriest;
+    graph< cfg_base_nodet<T,I> > & container;
 
-    // we have edges both ways
-    entriest successors, predecessors;
-    I PC;
+    explicit entry_mapt(graph< cfg_base_nodet<T,I> > & _container):
+      container(_container)
+    {
+    }
+
+    entryt& operator[](const goto_programt::const_targett &t)
+    {
+      std::pair<iterator,bool> e=insert(std::make_pair(t, 0));
+
+      if(e.second)
+        e.first->second=container.add_node();
+
+      return e.first->second;
+    }
   };
-  
-  typedef entryt * iterator;
-  typedef const entryt * const_iterator;
-
-  typedef std::list<iterator> entriest;
-  
-  typedef std::map<goto_programt::const_targett, entryt> entry_mapt;
   entry_mapt entry_map;
 
 protected:
@@ -100,6 +117,10 @@ protected:
     const goto_functionst &goto_functions);
 
 public:
+  cfg_baset():entry_map(*this)
+  {
+  }
+
   virtual ~cfg_baset()
   {
   }
@@ -199,7 +220,7 @@ void cfg_baset<T, P, I>::compute_edges_goto(
 {
   if(next_PC!=goto_program.instructions.end() &&
      !instruction.guard.is_true())
-    entry.successors.push_back(&entry_map[next_PC]);
+    this->add_edge(entry, entry_map[next_PC]);
 
   for(goto_programt::instructiont::targetst::const_iterator
       t_it=instruction.targets.begin();
@@ -208,7 +229,7 @@ void cfg_baset<T, P, I>::compute_edges_goto(
   {
     goto_programt::const_targett t=*t_it;
     if(t!=goto_program.instructions.end())
-      entry.successors.push_back(&entry_map[t]);
+      this->add_edge(entry, entry_map[t]);
   }
 }
 
@@ -232,7 +253,7 @@ void cfg_baset<T, P, I>::compute_edges_catch(
   entryt &entry)
 {
   if(next_PC!=goto_program.instructions.end())
-    entry.successors.push_back(&entry_map[next_PC]);
+    this->add_edge(entry, entry_map[next_PC]);
 
   // Not ideal, but preserves targets
   // Ideally, the throw statements should have those as successors
@@ -244,7 +265,7 @@ void cfg_baset<T, P, I>::compute_edges_catch(
   {
     goto_programt::const_targett t=*t_it;
     if(t!=goto_program.instructions.end())
-      entry.successors.push_back(&entry_map[t]);
+      this->add_edge(entry, entry_map[t]);
   }
 }
 
@@ -290,7 +311,7 @@ void cfg_baset<T, P, I>::compute_edges_start_thread(
   entryt &entry)
 {
   if(next_PC!=goto_program.instructions.end())
-    entry.successors.push_back(&entry_map[next_PC]);
+    this->add_edge(entry, entry_map[next_PC]);
 }
 
 /*******************************************************************\
@@ -325,7 +346,7 @@ void concurrent_cfg_baset<T, P, I>::compute_edges_start_thread(
   {
     goto_programt::const_targett t=*t_it;
     if(t!=goto_program.instructions.end())
-      entry.successors.push_back(&(this->entry_map[t]));
+      this->add_edge(entry, this->entry_map[t]);
   }
 }
 
@@ -376,23 +397,20 @@ void cfg_baset<T, P, I>::compute_edges_function_call(
     if(i_it!=e_it)
     {
       // nonempty function
-      entry.successors.push_back(&entry_map[i_it]);
+      this->add_edge(entry, entry_map[i_it]);
 
       // add the last instruction as predecessor of the return location
       if(next_PC!=goto_program.instructions.end())
-      {
-        entry_map[last_it].successors.push_back(&entry_map[next_PC]);
-        entry_map[next_PC].predecessors.push_back(&entry_map[last_it]);
-      }
+        this->add_edge(entry_map[last_it], entry_map[next_PC]);
     }
     else if(next_PC!=goto_program.instructions.end())
     {
       // empty function
-      entry.successors.push_back(&entry_map[next_PC]);
+      this->add_edge(entry, entry_map[next_PC]);
     }        
   }
   else if(next_PC!=goto_program.instructions.end())
-    entry.successors.push_back(&entry_map[next_PC]);
+    this->add_edge(entry, entry_map[next_PC]);
 }
 
 /*******************************************************************\
@@ -422,7 +440,7 @@ void procedure_local_cfg_baset<T, P, I>::compute_edges_function_call(
     return;
 
   if(next_PC!=goto_program.instructions.end())
-    entry.successors.push_back(&(this->entry_map[next_PC]));
+    this->add_edge(entry, this->entry_map[next_PC]);
 }
 
 /*******************************************************************\
@@ -447,7 +465,7 @@ void cfg_baset<T, P, I>::compute_edges_return(
   // the successor of return is the last instruction of the function,
   // normally END_FUNCTION
   if(next_PC!=goto_program.instructions.end())
-    entry.successors.push_back(&entry_map[--(goto_program.instructions.end())]);
+    this->add_edge(entry, entry_map[--(goto_program.instructions.end())]);
 }
 
 /*******************************************************************\
@@ -469,8 +487,8 @@ void cfg_baset<T, P, I>::compute_edges(
   I PC)
 {
   const goto_programt::instructiont &instruction=*PC;
-  entryt &entry=entry_map[PC];
-  entry.PC=PC;
+  entryt entry=entry_map[PC];
+  (*this)[entry].PC=PC;
   goto_programt::const_targett next_PC(PC);
   next_PC++;
 
@@ -522,20 +540,11 @@ void cfg_baset<T, P, I>::compute_edges(
   case DECL:
   case DEAD:
     if(next_PC!=goto_program.instructions.end())
-      entry.successors.push_back(&entry_map[next_PC]);
+      this->add_edge(entry, entry_map[next_PC]);
     break;
   case NO_INSTRUCTION_TYPE:
     assert(false);
     break;
-  }
-
-  // now do backward edges
-  for(typename entriest::const_iterator
-      s_it=entry.successors.begin();
-      s_it!=entry.successors.end();
-      s_it++)
-  {
-    (*s_it)->predecessors.push_back(&entry);
   }
 }
 

@@ -105,7 +105,7 @@ void cfg_dominators_templatet<P, T>::initialise(P &program)
   for(typename cfgt::entry_mapt::const_iterator
       e_it=cfg.entry_map.begin();
       e_it!=cfg.entry_map.end(); ++e_it)
-    top.insert(e_it->second.PC);
+    top.insert(cfg[e_it->second].PC);
 }
 
 /*******************************************************************\
@@ -126,14 +126,14 @@ void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
   std::list<T> worklist;
 
   entry_node = program.instructions.begin();
-  typename cfgt::entryt &n=cfg.entry_map[entry_node];
+  typename cfgt::nodet &n=cfg[cfg.entry_map[entry_node]];
   n.dominators.insert(entry_node);
 
-  for(typename cfgt::entriest::const_iterator 
-      s_it=n.successors.begin();
-      s_it!=n.successors.end();
+  for(typename cfgt::edgest::const_iterator 
+      s_it=n.out.begin();
+      s_it!=n.out.end();
       ++s_it)
-    worklist.push_back((*s_it)->PC);
+    worklist.push_back(cfg[s_it->first].PC);
 
   while(!worklist.empty())
   {
@@ -142,26 +142,26 @@ void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
     worklist.pop_front();
 
     bool changed=false;
-    typename cfgt::entryt &node=cfg.entry_map[current];
+    typename cfgt::nodet &node=cfg[cfg.entry_map[current]];
     if(node.dominators.empty())
-      for(typename cfgt::entriest::const_iterator 
-          p_it=node.predecessors.begin();
-          !changed && p_it!=node.predecessors.end();
+      for(typename cfgt::edgest::const_iterator 
+          p_it=node.in.begin();
+          !changed && p_it!=node.in.end();
           ++p_it)
-        if(!cfg.entry_map[(*p_it)->PC].dominators.empty())
+        if(!cfg[p_it->first].dominators.empty())
         {
-          node.dominators=cfg.entry_map[(*p_it)->PC].dominators;
+          node.dominators=cfg[p_it->first].dominators;
           node.dominators.insert(current);
           changed=true;
         }
 
     // compute intersection of predecessors
-    for(typename cfgt::entriest::const_iterator 
-          p_it=node.predecessors.begin();
-        p_it!=node.predecessors.end();
+    for(typename cfgt::edgest::const_iterator 
+          p_it=node.in.begin();
+        p_it!=node.in.end();
         ++p_it)
     {   
-      const target_sett &other=cfg.entry_map[(*p_it)->PC].dominators;
+      const target_sett &other=cfg[p_it->first].dominators;
       if(other.empty())
         continue;
 
@@ -191,12 +191,12 @@ void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
 
     if(changed) // fixed point for node reached?
     {
-      for(typename cfgt::entriest::const_iterator 
-            s_it=node.successors.begin();
-          s_it!=node.successors.end();
+      for(typename cfgt::edgest::const_iterator 
+            s_it=node.out.begin();
+          s_it!=node.out.end();
           ++s_it)
       {
-        worklist.push_back((*s_it)->PC);
+        worklist.push_back(cfg[s_it->first].PC);
       }
     }
   }

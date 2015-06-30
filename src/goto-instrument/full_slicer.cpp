@@ -33,40 +33,45 @@ void full_slicert::fixedpoint()
       e_it=cfg.entry_map.begin();
       e_it!=cfg.entry_map.end();
       e_it++)
+  {
+    cfgt::nodet &node=cfg[e_it->second];
+
     if(e_it->first->is_assert())
     {
-      get_objects(e_it->first->guard, e_it->second.required_objects);
-      e_it->second.node_required=true;
-      queue.push(&e_it->second);
+      get_objects(e_it->first->guard, node.required_objects);
+      node.node_required=true;
+      queue.push(e_it->second);
     }
     else if(e_it->first->is_end_function())
-      e_it->second.node_required=true; // always retained
+      node.node_required=true; // always retained
+  }
 
   // process queue until empty
   while(!queue.empty())
   {
-    cfgt::iterator e=queue.top();
+    cfgt::entryt e=queue.top();
+    cfgt::nodet &node=cfg[e];
     queue.pop();
     
     // look at required_objects
-    object_id_sett required_objects=transform(e);
+    object_id_sett required_objects=transform(node);
 
-    for(cfgt::entriest::const_iterator
-        p_it=e->predecessors.begin();
-        p_it!=e->predecessors.end();
+    for(cfgt::edgest::const_iterator
+        p_it=node.in.begin();
+        p_it!=node.in.end();
         p_it++)
     {
-      object_id_sett::size_type old_size = (*p_it)->required_objects.size();
+      object_id_sett::size_type old_size = cfg[p_it->first].required_objects.size();
 
-      (*p_it)->required_objects.insert(
+      cfg[p_it->first].required_objects.insert(
         required_objects.begin(), required_objects.end());
 
-      object_id_sett::size_type new_size = (*p_it)->required_objects.size();
+      object_id_sett::size_type new_size = cfg[p_it->first].required_objects.size();
 
       assert(new_size >= old_size);
 
       if (new_size > old_size)
-	queue.push(*p_it);
+        queue.push(p_it->first);
     }
   }
 }
@@ -100,7 +105,7 @@ void full_slicert::slice(goto_functionst &goto_functions)
       Forall_goto_program_instructions(i_it, f_it->second.body)
       {
         const cfgt::entryt &e=cfg.entry_map[i_it];
-        if(!e.node_required)
+        if(!cfg[e].node_required)
           i_it->make_skip();
       }
     }
@@ -122,12 +127,12 @@ Function: full_slicert::transform
 
 \*******************************************************************/
 
-object_id_sett full_slicert::transform(cfgt::iterator e)
+object_id_sett full_slicert::transform(cfgt::nodet& e)
 {
-  const object_id_sett &old_set=e->required_objects;
-  object_id_sett new_set=e->required_objects; // copy!
+  const object_id_sett &old_set=e.required_objects;
+  object_id_sett new_set=e.required_objects; // copy!
   
-  const goto_programt::instructiont &instruction=*(e->PC);
+  const goto_programt::instructiont &instruction=*(e.PC);
 
   switch(instruction.type)
   {
@@ -147,7 +152,7 @@ object_id_sett full_slicert::transform(cfgt::iterator e)
 
       if(found)
       {
-        e->node_required=true;
+        e.node_required=true;
         new_set.insert(w.begin(), w.end());
       }
     }    
@@ -169,7 +174,7 @@ object_id_sett full_slicert::transform(cfgt::iterator e)
 
       if(found)
       {
-        e->node_required=true;
+        e.node_required=true;
         new_set.insert(w.begin(), w.end());
       }
     }
@@ -206,7 +211,7 @@ object_id_sett full_slicert::transform(cfgt::iterator e)
 
       if(found)
       {
-        e->node_required=true;
+        e.node_required=true;
         // add what it reads
         get_objects_r(code_assign, new_set);
       }
@@ -218,7 +223,7 @@ object_id_sett full_slicert::transform(cfgt::iterator e)
       object_idt object_id(to_symbol_expr(instruction.code.op0()));
       if(old_set.find(object_id)!=old_set.end())
       {
-        e->node_required=true;
+        e.node_required=true;
         new_set.erase(object_id);
       }
     }
@@ -246,7 +251,7 @@ object_id_sett full_slicert::transform(cfgt::iterator e)
         if(old_set.find(lhs_id)!=old_set.end())
         {
           new_set.erase(lhs_id);
-          e->node_required=true;
+          e.node_required=true;
           get_objects(code_function_call.arguments()[i], new_set);
         }
       }

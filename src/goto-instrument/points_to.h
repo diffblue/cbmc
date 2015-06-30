@@ -64,7 +64,7 @@ protected:
   value_mapt value_map;
   
   void fixedpoint();
-  bool transform(cfgt::iterator);
+  bool transform(const cfgt::nodet&);
   
   const object_id_sett empty_set;
 };

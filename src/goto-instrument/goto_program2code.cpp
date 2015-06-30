@@ -965,7 +965,8 @@ bool goto_program2codet::set_block_end_points(
       cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
         dominators.cfg.entry_map.find(case_end);
       assert(i_entry!=dominators.cfg.entry_map.end());
-      const cfg_dominatorst::cfgt::entryt &n=i_entry->second;
+      const cfg_dominatorst::cfgt::nodet &n=
+        dominators.cfg[i_entry->second];
 
       // ignore dead instructions for the following checks
       if(n.dominators.empty())
@@ -1025,7 +1026,8 @@ bool goto_program2codet::remove_default(
         cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
           dominators.cfg.entry_map.find(next_case);
         assert(i_entry!=dominators.cfg.entry_map.end());
-        const cfg_dominatorst::nodet &n=i_entry->second;
+        const cfg_dominatorst::cfgt::nodet &n=
+          dominators.cfg[i_entry->second];
 
         if(!n.dominators.empty())
           break;
@@ -1091,7 +1093,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   cfg_dominatorst::cfgt::entry_mapt::const_iterator t_entry=
     dominators.cfg.entry_map.find(target);
   assert(t_entry!=dominators.cfg.entry_map.end());
-  if(t_entry->second.dominators.empty())
+  if(dominators.cfg[t_entry->second].dominators.empty())
     return convert_goto_if(target, upper_bound, dest);
 
   // maybe, let's try some more
@@ -1234,7 +1236,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       cfg_dominatorst::cfgt::entry_mapt::const_iterator it_entry=
         dominators.cfg.entry_map.find(it);
       assert(it_entry!=dominators.cfg.entry_map.end());
-      const cfg_dominatorst::cfgt::entryt &n=it_entry->second;
+      const cfg_dominatorst::cfgt::nodet &n=
+        dominators.cfg[it_entry->second];
 
       if(!n.dominators.empty())
       {
@@ -1360,7 +1363,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
       dominators.cfg.entry_map.find(next);
     assert(i_entry!=dominators.cfg.entry_map.end());
-    const cfg_dominatorst::nodet &n=i_entry->second;
+    const cfg_dominatorst::cfgt::nodet &n=
+      dominators.cfg[i_entry->second];
 
     if(!n.dominators.empty())
       break;
@@ -1402,7 +1406,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
       dominators.cfg.entry_map.find(after_loop);
     assert(i_entry!=dominators.cfg.entry_map.end());
-    const cfg_dominatorst::nodet &n=i_entry->second;
+    const cfg_dominatorst::cfgt::nodet &n=
+      dominators.cfg[i_entry->second];
 
     if(!n.dominators.empty())
       break;
@@ -1454,7 +1459,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
   cfg_dominatorst::cfgt::entry_mapt::const_iterator it_entry=
     dominators.cfg.entry_map.find(target);
   assert(it_entry!=dominators.cfg.entry_map.end());
-  const cfg_dominatorst::nodet &n=it_entry->second;
+  const cfg_dominatorst::cfgt::nodet &n=
+    dominators.cfg[it_entry->second];
 
   // skip dead goto L as the label might be skipped if it is dead
   // as well and at the end of a case block

@@ -40,23 +40,24 @@ void reachability_slicert::fixedpoint_assertions(
       e_it++)
     if(e_it->first->is_assert() ||
        is_threaded(e_it->first))
-      queue.push(&e_it->second);
+      queue.push(e_it->second);
 
   while(!queue.empty())
   {
-    cfgt::iterator e=queue.top();
+    cfgt::entryt e=queue.top();
+    cfgt::nodet &node=cfg[e];
     queue.pop();
 
-    if(e->reaches_assertion) continue;
+    if(node.reaches_assertion) continue;
 
-    e->reaches_assertion=true;
+    node.reaches_assertion=true;
     
-    for(cfgt::entriest::const_iterator
-        p_it=e->predecessors.begin();
-        p_it!=e->predecessors.end();
+    for(cfgt::edgest::const_iterator
+        p_it=node.in.begin();
+        p_it!=node.in.end();
         p_it++)
     {
-      queue.push(*p_it);
+      queue.push(p_it->first);
     }
   }
 }
@@ -83,7 +84,7 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
     {
       Forall_goto_program_instructions(i_it, f_it->second.body)
       {
-        const cfgt::entryt &e=cfg.entry_map[i_it];
+        const cfgt::nodet &e=cfg[cfg.entry_map[i_it]];
         if(!e.reaches_assertion &&
            !i_it->is_end_function())
           i_it->make_goto(i_it);
