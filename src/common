@@ -96,8 +96,8 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   EXEEXT = .exe
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
-  CP_CFLAGS = -MMD -MP -std=c++11
-  CP_CXXFLAGS = -MMD -MP
+  CP_CFLAGS = -MMD -MP
+  CP_CXXFLAGS = -MMD -MP -std=c++11
   LINKFLAGS = -static -std=c++11
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
