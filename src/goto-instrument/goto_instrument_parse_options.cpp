@@ -44,7 +44,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/interval_analysis.h>
 #include <analyses/interval_domain.h>
 #include <analyses/reaching_definitions.h>
-#include <analyses/dependence_graph.h>
+//#include <analyses/dependence_graph.h>
 
 #include <cbmc/version.h>
 
@@ -282,6 +282,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-reaching-definitions"))
     {
+      #if 0
       status() << "Function Pointer Removal" << eom;
       remove_function_pointers(symbol_table, goto_functions, false);
 
@@ -300,6 +301,7 @@ int goto_instrument_parse_optionst::doit()
           rd_analysis.output(ns, f_it->second.body, std::cout);
         }
       }
+      #endif
 
       return 0;
     }
@@ -309,6 +311,7 @@ int goto_instrument_parse_optionst::doit()
       status() << "Function Pointer Removal" << eom;
       remove_function_pointers(symbol_table, goto_functions, false);
 
+      #if 0
       const namespacet ns(symbol_table);
       dependence_grapht dependence_graph(ns);
       dependence_graph(goto_functions, ns);
@@ -326,6 +329,7 @@ int goto_instrument_parse_optionst::doit()
       }
 
       dependence_graph.output_dot(std::cout);
+      #endif
 
       return 0;
     }
