@@ -11,6 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-void full_slicer(goto_functionst &goto_functions);
+void full_slicer(goto_functionst &, const namespacet &);
 
 #endif

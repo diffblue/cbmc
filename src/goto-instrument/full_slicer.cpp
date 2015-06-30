@@ -271,7 +271,9 @@ Function: slicer
 
 \*******************************************************************/
 
-void full_slicer(goto_functionst &goto_functions)
+void full_slicer(
+  goto_functionst &goto_functions,
+  const namespacet &ns)
 {
   full_slicert()(goto_functions);
 }
