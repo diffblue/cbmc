@@ -56,6 +56,13 @@ public:
       instructions.push_back(instructiont());
       return instructions.back();
     }
+    
+    class exceptiont
+    {
+    };
+    
+    typedef std::vector<exceptiont> exception_tablet;
+    exception_tablet exception_table;
 
     virtual void output(std::ostream &out) const;
     
