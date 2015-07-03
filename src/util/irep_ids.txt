@@ -465,6 +465,7 @@ decl_type
 genvar
 realtime
 parameters
+parameter_assignments
 specify
 pullup
 pulldown
@@ -672,3 +673,5 @@ C_va_arg_type #va_arg_type
 smt2_symbol
 overlapped_implication
 non_overlapped_implication
+Verilog
+verilog_realtime
