@@ -43,7 +43,7 @@ void c_typecheck_baset::implicit_typecast(
         << to_string(src_type) << "' to `"
         << to_string(dest_type) << "': "
         << *it;
-    error();
+    error_msg();
   }
   
   if(!c_typecast.errors.empty())
@@ -60,7 +60,7 @@ void c_typecheck_baset::implicit_typecast(
         << "' to `"
         << to_string(dest_type)
         << "': " << *it;
-    warning();
+    warning_msg();
   }
 }
 

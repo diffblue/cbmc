@@ -178,8 +178,8 @@ void goto_inlinet::replace_return(
         if(it->code.operands().size()!=1)
         {
           err_location(it->code);
-          str << "return expects one operand!" << std::endl;
-          warning();
+          str << "return expects one operand!";
+          warning_msg();
 	  continue;
         }
       
@@ -324,7 +324,8 @@ void goto_inlinet::expand_function_call(
     // it's really recursive, and we need full inlining.
     // Uh. Buh. Give up.
     err_location(function);
-    warning("recursion is ignored");
+    str << "recursion is ignored";
+    warning_msg();
     target->make_skip();
     
     target++;
@@ -419,7 +420,7 @@ void goto_inlinet::expand_function_call(
       err_location(function);
       str << "no body for function `" << identifier
           << "'";
-      warning();
+      warning_msg();
     }
 
     goto_programt tmp;
@@ -633,17 +634,19 @@ void goto_inline(
 
   catch(int)
   {
-    goto_inline.error();
+    goto_inline.error_msg();
   }
 
   catch(const char *e)
   {
-    goto_inline.error(e);
+    goto_inline.str << e;
+    goto_inline.error_msg();
   }
 
   catch(const std::string &e)
   {
-    goto_inline.error(e);
+    goto_inline.str << e;
+    goto_inline.error_msg();
   }
   
   if(goto_inline.get_error_found())
@@ -718,17 +721,19 @@ void goto_partial_inline(
 
   catch(int)
   {
-    goto_inline.error();
+    goto_inline.error_msg();
   }
 
   catch(const char *e)
   {
-    goto_inline.error(e);
+    goto_inline.str << e;
+    goto_inline.error_msg();
   }
 
   catch(const std::string &e)
   {
-    goto_inline.error(e);
+    goto_inline.str << e;
+    goto_inline.error_msg();
   }
 
   if(goto_inline.get_error_found())

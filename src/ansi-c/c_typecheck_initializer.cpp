@@ -878,7 +878,8 @@ exprt c_typecheck_baset::do_initializer_list(
       if(value.operands().size()>1)
       {
         err_location(value);
-        warning("ignoring excess initializers");
+        str << "ignoring excess initializers";
+        warning_msg();
       }
 
       return do_initializer_rec(value.op0(), type, force_constant);

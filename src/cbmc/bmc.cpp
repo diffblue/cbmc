@@ -376,7 +376,8 @@ bool bmct::run(const goto_functionst &goto_functions)
   {
     message_streamt message_stream(get_message_handler());
     message_stream.err_location(symex.last_source_location);
-    message_stream.error(error_str);
+    message_stream.str << error_str;
+    message_stream.error_msg();
     return true;
   }
 
@@ -384,7 +385,8 @@ bool bmct::run(const goto_functionst &goto_functions)
   {
     message_streamt message_stream(get_message_handler());
     message_stream.err_location(symex.last_source_location);
-    message_stream.error(error_str);
+    message_stream.str << error_str;
+    message_stream.error_msg();
     return true;
   }
 

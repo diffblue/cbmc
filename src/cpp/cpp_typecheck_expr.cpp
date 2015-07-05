@@ -1148,7 +1148,8 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
   if(cpp_scopes.current_scope().class_identifier.empty())
   {
     err_location(expr);
-    error("`this' is not allowed here");
+    str << "`this' is not allowed here";
+    error_msg();
     throw 0;
   }
 

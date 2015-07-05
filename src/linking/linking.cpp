@@ -226,7 +226,7 @@ void linkingt::link_warning(
       << " " << new_symbol.location << std::endl
       << type_to_string_verbose(ns, new_symbol);
 
-  warning();
+  warning_msg();
 }
 
 /*******************************************************************\
@@ -495,7 +495,7 @@ void linkingt::duplicate_code_symbol(
       str << "warning: function `" << old_symbol.name << "' in module `" << 
         new_symbol.module << "' is shadowed by a definition in module `" << 
         old_symbol.module << "'";
-      warning();
+      warning_msg();
     }
     else
       link_error(
