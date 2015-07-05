@@ -13,12 +13,13 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 #include <list>
 #include <map>
 #include <iosfwd>
+#include <cassert>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_program.h>
 #include <goto-programs/cfg.h>
 
-template<class P, class T>
+template <class P, class T, bool post_dom>
 class cfg_dominators_templatet
 {
 public:
@@ -56,10 +57,10 @@ Function: operator <<
 
 \*******************************************************************/
 
-template <class P, class T>
+template <class P, class T, bool post_dom>
 std::ostream &operator << (
   std::ostream &out,
-  const cfg_dominators_templatet<P, T> &cfg_dominators)
+  const cfg_dominators_templatet<P, T, post_dom> &cfg_dominators)
 {
   cfg_dominators.output(out);
   return out;
@@ -77,8 +78,8 @@ Function: operator ()
 
 \*******************************************************************/
 
-template<class P, class T>
-void cfg_dominators_templatet<P, T>::operator()(P &program)
+template <class P, class T, bool post_dom>
+void cfg_dominators_templatet<P, T, post_dom>::operator()(P &program)
 {
   initialise(program);
   fixedpoint(program);
@@ -96,8 +97,8 @@ Function: cfg_dominators_templatet::initialise
 
 \*******************************************************************/
 
-template<class P, class T>
-void cfg_dominators_templatet<P, T>::initialise(P &program)
+template <class P, class T, bool post_dom>
+void cfg_dominators_templatet<P, T, post_dom>::initialise(P &program)
 {
   cfg(program);
 
@@ -120,18 +121,24 @@ Function: cfg_dominators_templatet::fixedpoint
 
 \*******************************************************************/
 
-template<class P, class T>
-void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
+template <class P, class T, bool post_dom>
+void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 {
   std::list<T> worklist;
 
-  entry_node = program.instructions.begin();
+  if(program.instructions.empty())
+    return;
+
+  if(post_dom)
+    entry_node = --program.instructions.end();
+  else
+    entry_node = program.instructions.begin();
   typename cfgt::nodet &n=cfg[cfg.entry_map[entry_node]];
   n.dominators.insert(entry_node);
 
   for(typename cfgt::edgest::const_iterator 
-      s_it=n.out.begin();
-      s_it!=n.out.end();
+      s_it=(post_dom?n.in:n.out).begin();
+      s_it!=(post_dom?n.in:n.out).end();
       ++s_it)
     worklist.push_back(cfg[s_it->first].PC);
 
@@ -145,8 +152,8 @@ void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
     typename cfgt::nodet &node=cfg[cfg.entry_map[current]];
     if(node.dominators.empty())
       for(typename cfgt::edgest::const_iterator 
-          p_it=node.in.begin();
-          !changed && p_it!=node.in.end();
+          p_it=(post_dom?node.out:node.in).begin();
+          !changed && p_it!=(post_dom?node.out:node.in).end();
           ++p_it)
         if(!cfg[p_it->first].dominators.empty())
         {
@@ -157,8 +164,8 @@ void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
 
     // compute intersection of predecessors
     for(typename cfgt::edgest::const_iterator 
-          p_it=node.in.begin();
-        p_it!=node.in.end();
+          p_it=(post_dom?node.out:node.in).begin();
+        p_it!=(post_dom?node.out:node.in).end();
         ++p_it)
     {   
       const target_sett &other=cfg[p_it->first].dominators;
@@ -192,8 +199,8 @@ void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
     if(changed) // fixed point for node reached?
     {
       for(typename cfgt::edgest::const_iterator 
-            s_it=node.out.begin();
-          s_it!=node.out.end();
+            s_it=(post_dom?node.in:node.out).begin();
+          s_it!=(post_dom?node.in:node.out).end();
           ++s_it)
       {
         worklist.push_back(cfg[s_it->first].PC);
@@ -214,8 +221,8 @@ Function: cfg_dominators_templatet::output
 
 \*******************************************************************/
 
-template <class P, class T>
-void cfg_dominators_templatet<P, T>::output(std::ostream &out) const
+template <class P, class T, bool post_dom>
+void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
 {
   for(typename cfgt::entry_mapt::const_iterator
       it=cfg.entry_map.begin();
@@ -223,7 +230,10 @@ void cfg_dominators_templatet<P, T>::output(std::ostream &out) const
   {
     unsigned n=it->first->location_number;
     
-    out << n << " dominated by ";
+    if(post_dom)
+      out << n << " post-dominated by ";
+    else
+      out << n << " dominated by ";
     for(typename target_sett::const_iterator d_it=it->second.dominators.begin();
         d_it!=it->second.dominators.end();)
     {
@@ -235,7 +245,10 @@ void cfg_dominators_templatet<P, T>::output(std::ostream &out) const
   }
 }
 
-typedef cfg_dominators_templatet<const goto_programt, goto_programt::const_targett>
+typedef cfg_dominators_templatet<const goto_programt, goto_programt::const_targett, false>
         cfg_dominatorst;
+
+typedef cfg_dominators_templatet<const goto_programt, goto_programt::const_targett, true>
+        cfg_post_dominatorst;
 
 #endif

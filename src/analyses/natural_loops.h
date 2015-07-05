@@ -36,7 +36,7 @@ public:
 
   void output(std::ostream &) const;
   
-  inline const cfg_dominators_templatet<P, T>& get_dominator_info() const
+  inline const cfg_dominators_templatet<P, T, false>& get_dominator_info() const
   {
     return cfg_dominators;
   }
@@ -51,8 +51,8 @@ public:
   }
 
 protected:
-  cfg_dominators_templatet<P, T> cfg_dominators;
-  typedef typename cfg_dominators_templatet<P, T>::cfgt::nodet nodet;
+  cfg_dominators_templatet<P, T, false> cfg_dominators;
+  typedef typename cfg_dominators_templatet<P, T, false>::cfgt::nodet nodet;
 
   void compute(P &program);
   void compute_natural_loop(T, T);  
