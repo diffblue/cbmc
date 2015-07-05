@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/expr_util.h>
-#include <util/message_stream.h>
+#include <util/message.h>
 #include <util/arith_tools.h>
 #include <util/i2string.h>
 #include <util/type_eq.h>
@@ -51,8 +51,8 @@ bool string_abstractiont::build_wrap(const exprt &object, exprt &dest, bool writ
       !(dest.type().id()==ID_array && a_t.id()==ID_pointer &&
        type_eq(dest.type().subtype(), a_t.subtype(), ns)))
   {
-    std::string msg="warning: inconsistent abstract type for "+object.pretty();
-    warning(msg);
+    warning() << "warning: inconsistent abstract type for "
+              << object.pretty() << eom;
     return true;
   }
 
@@ -139,7 +139,7 @@ Function: string_abstractiont::string_abstractiont
 string_abstractiont::string_abstractiont(
   symbol_tablet &_symbol_table,
   message_handlert &_message_handler):
-  message_streamt(_message_handler),
+  messaget(_message_handler),
   arg_suffix("#strarg"),
   sym_suffix("#str$fcn"),
   symbol_table(_symbol_table),
@@ -759,8 +759,8 @@ void string_abstractiont::abstract_function_call(
 
     if(it1==arguments.end())
     {
-      err_location(target->source_location);
-      throw "function call: not enough arguments";
+      error() << "function call: not enough arguments" << eom;
+      throw 0;
     }
 
     str_args.push_back(exprt());

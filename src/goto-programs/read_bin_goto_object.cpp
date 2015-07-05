@@ -9,7 +9,7 @@ Date: June 2006
 \*******************************************************************/
 
 #include <util/namespace.h>
-#include <util/message_stream.h>
+#include <util/message.h>
 #include <util/symbol_table.h>
 #include <util/irep_serialization.h>
 
@@ -171,7 +171,7 @@ bool read_bin_goto_object(
   goto_functionst &functions,
   message_handlert &message_handler)
 { 
-  message_streamt message_stream(message_handler);
+  messaget message(message_handler);
 
   {
     char hdr[4];
@@ -191,18 +191,16 @@ bool read_bin_goto_object(
       else if(hdr[0]==0x7f && hdr[1]=='E' && hdr[2]=='L' && hdr[3]=='F')
       {
         if(filename!="")
-          message_stream.str << 
-            "Sorry, but I can't read ELF binary `" << filename << "'";
+          message.error() << 
+            "Sorry, but I can't read ELF binary `" << filename << "'" << messaget::eom;
         else
-          message_stream.str << "Sorry, but I can't read ELF binaries";
-  
-        message_stream.error();
+          message.error() << "Sorry, but I can't read ELF binaries" << messaget::eom;
+
         return true;
       }
       else
       {
-        message_stream.str << "`" << filename << "' is not a goto-binary";
-        message_stream.error();
+        message.error() << "`" << filename << "' is not a goto-binary" << messaget::eom;
         return true;
       } 
     }
@@ -218,9 +216,9 @@ bool read_bin_goto_object(
     switch(version)
     {
     case 1:
-      message_stream.warning(
+      message.error() <<
           "The input was compiled with an old version of "
-          "goto-cc; please recompile");
+          "goto-cc; please recompile" << messaget::eom;
       return true;
 
     case 2:
@@ -231,9 +229,9 @@ bool read_bin_goto_object(
       break;
 
     default:
-      message_stream.warning(
+      message.error() <<
           "The input was compiled with an unsupported version of "
-          "goto-cc; please recompile");
+          "goto-cc; please recompile" << messaget::eom;
       return true;
     }
   } 
