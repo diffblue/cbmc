@@ -1422,7 +1422,7 @@ void c_typecheck_baset::typecheck_expr_rel(
     return;
   }
 
-  expr.type()=typet(ID_bool);
+  expr.type()=bool_typet();
 
   if(expr.id()==ID_equal || expr.id()==ID_notequal)
   {
@@ -2923,7 +2923,7 @@ void c_typecheck_baset::typecheck_expr_unary_boolean(exprt &expr)
   // We do 'bool' anyway to get more compact formulae. Eventually,
   // this should be achieved by means of simplification, and not
   // in the frontend.
-  expr.type()=typet(ID_bool);
+  expr.type()=bool_typet();
 }
 
 /*******************************************************************\
@@ -3308,7 +3308,7 @@ void c_typecheck_baset::typecheck_expr_binary_boolean(exprt &expr)
   // We do 'bool' anyway to get more compact formulae. Eventually,
   // this should be achieved by means of simplification, and not
   // in the frontend.
-  expr.type()=typet(ID_bool);
+  expr.type()=bool_typet();
 }
 
 /*******************************************************************\
