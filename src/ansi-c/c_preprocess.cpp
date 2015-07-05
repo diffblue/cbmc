@@ -396,7 +396,8 @@ bool c_preprocess_visual_studio(
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
     unlink(command_file_name.c_str());
-    message_stream.error("CL Preprocessing failed (fopen failed)");
+    message_stream.str << "CL Preprocessing failed (fopen failed)";
+    message_stream.error_msg();
     return true;
   }
 
@@ -423,7 +424,8 @@ bool c_preprocess_visual_studio(
   if(result!=0)
   {
     message_stream.error_parse(1);
-    message_stream.error("CL Preprocessing failed");
+    message_stream.str << "CL Preprocessing failed";
+    message_stream.error_msg();
     return true;
   }
   else
@@ -555,7 +557,8 @@ bool c_preprocess_codewarrior(
   {
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
-    message_stream.error("Preprocessing failed (fopen failed)");
+    message_stream.str << "Preprocessing failed (fopen failed)";
+    message_stream.error_msg();
     return true;
   }
 
@@ -572,7 +575,8 @@ bool c_preprocess_codewarrior(
   if(result!=0)
   {
     message_stream.error_parse(1);
-    message_stream.error("Preprocessing failed");
+    message_stream.str << "Preprocessing failed";
+    message_stream.error_msg();
     return true;
   }
   else
@@ -883,7 +887,8 @@ bool c_preprocess_gcc_clang(
   if(result!=0)
   {
     message_stream.error_parse(1);
-    message_stream.error("GCC preprocessing failed");
+    message_stream.str << "GCC preprocessing failed";
+    message_stream.error_msg();
     return true;
   }
   else
@@ -992,7 +997,8 @@ bool c_preprocess_arm(
   {
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
-    message_stream.error("ARMCC preprocessing failed (fopen failed)");
+    message_stream.str << "ARMCC preprocessing failed (fopen failed)";
+    mesaage_stream.error_msg();
     return true;
   }
   #else
@@ -1012,7 +1018,8 @@ bool c_preprocess_arm(
   else
   {
     unlink(stderr_file.c_str());
-    message_stream.error("ARMCC preprocessing failed (popen failed)");
+    message_stream.str << "ARMCC preprocessing failed (popen failed)";
+    message_stream.error_msg();
     return true;
   }
   #endif
@@ -1030,7 +1037,8 @@ bool c_preprocess_arm(
   if(result!=0)
   {
     message_stream.error_parse(1);
-    message_stream.error("ARMCC preprocessing failed");
+    message_stream.str << "ARMCC preprocessing failed";
+    message_stream.error_msg();
     return true;
   }
   else
@@ -1065,7 +1073,8 @@ bool c_preprocess_none(
   if(!infile)
   {
     message_streamt message_stream(message_handler);
-    message_stream.error("failed to open `"+file+"'");
+    message_stream.str << "failed to open `" << file << "'";
+    message_stream.error_msg();
     return true;
   }
   

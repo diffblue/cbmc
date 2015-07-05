@@ -194,17 +194,19 @@ bool cpp_typecheck(
 
   catch(int)
   {
-    cpp_typecheck.error();
+    cpp_typecheck.error_msg();
   }
 
   catch(const char *e)
   {
-    cpp_typecheck.error(e);
+    cpp_typecheck.str << e;
+    cpp_typecheck.error_msg();
   }
 
   catch(const std::string &e)
   {
-    cpp_typecheck.error(e);
+    cpp_typecheck.str << e;
+    cpp_typecheck.error_msg();
   }
 
   return cpp_typecheck.get_error_found();

@@ -198,7 +198,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
      type.id()!=ID_array)
   {
     err_location(type);
-    error("only a pointer can be 'restrict'");
+    str << "only a pointer can be 'restrict'";
+    error_msg();
     throw 0;
   }
   
@@ -235,7 +236,8 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
   if(size_int<1 || size_int>1024)
   {
     err_location(size_expr);
-    error("bit vector width invalid");
+    str << "bit vector width invalid";
+    error_msg();
     throw 0;
   }
   
@@ -271,7 +273,8 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     if(f_int<0 || f_int>size_int)
     {
       err_location(source_location);
-      error("fixedbv fraction width invalid");
+      str << "fixedbv fraction width invalid";
+      error_msg();
       throw 0;
     }
     
@@ -301,7 +304,8 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     if(f_int<1 || f_int+1>=size_int)
     {
       err_location(source_location);
-      error("floatbv fraction width invalid");
+      str << "floatbv fraction width invalid";
+      error_msg();
       throw 0;
     }
     
@@ -768,7 +772,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       {
         err_location(type);
         str << "redefinition of body of `" << s_it->second.pretty_name << "'";
-        error();
+        error_msg();
         throw 0;
       }
     }

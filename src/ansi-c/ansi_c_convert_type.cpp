@@ -256,14 +256,16 @@ void ansi_c_convert_typet::write(typet &type)
        gcc_float128_cnt || gcc_int128_cnt || bv_cnt)
     {
       err_location(source_location);
-      error("illegal type modifier for defined type");
+      str << "illegal type modifier for defined type";
+      error_msg();
       throw 0;
     }
 
     if(other.size()!=1)
     {
       err_location(source_location);
-      error("illegal combination of defined types");
+      str << "illegal combination of defined types";
+      error_msg();
       throw 0;
     }
 
@@ -277,14 +279,16 @@ void ansi_c_convert_typet::write(typet &type)
        short_cnt || char_cnt)
     {
       err_location(source_location);
-      error("cannot combine integer type with float");
+      str << "cannot combine integer type with float";
+      error_msg();
       throw 0;
     }
 
     if(long_cnt || double_cnt || float_cnt)
     {
       err_location(source_location);
-      error("conflicting type modifiers");
+      str << "conflicting type modifiers";
+      error_msg();
       throw 0;
     }
 
@@ -299,14 +303,16 @@ void ansi_c_convert_typet::write(typet &type)
        short_cnt || char_cnt)
     {
       err_location(source_location);
-      error("cannot combine integer type with float");
+      str << "cannot combine integer type with float";
+      error_msg();
       throw 0;
     }
 
     if(double_cnt && float_cnt)
     {
       err_location(source_location);
-      error("conflicting type modifiers");
+      str << "conflicting type modifiers";
+      error_msg();
       throw 0;
     }
 
@@ -324,14 +330,16 @@ void ansi_c_convert_typet::write(typet &type)
       else
       {
         err_location(source_location);
-        error("conflicting type modifiers");
+        str << "conflicting type modifiers";
+        error_msg();
         throw 0;
       }
     }
     else
     {
       err_location(source_location);
-      error("illegal type modifier for float");
+      str << "illegal type modifier for float";
+      error_msg();
       throw 0;
     }
   }
@@ -343,7 +351,8 @@ void ansi_c_convert_typet::write(typet &type)
        char_cnt || long_cnt)
     {
       err_location(source_location);
-      error("illegal type modifier for C boolean type");
+      str << "illegal type modifier for C boolean type";
+      error_msg();
       throw 0;
     }
 
@@ -357,7 +366,8 @@ void ansi_c_convert_typet::write(typet &type)
        char_cnt || long_cnt)
     {
       err_location(source_location);
-      error("illegal type modifier for proper boolean type");
+      str << "illegal type modifier for proper boolean type";
+      error_msg();
       throw 0;
     }
 
@@ -375,14 +385,16 @@ void ansi_c_convert_typet::write(typet &type)
        gcc_float128_cnt || bv_cnt || proper_bool_cnt)
     {
       err_location(source_location);
-      error("illegal type modifier for char type");
+      str << "illegal type modifier for char type";
+      error_msg();
       throw 0;
     }
 
     if(signed_cnt && unsigned_cnt)
     {
       err_location(source_location);
-      error("conflicting type modifiers");
+      str << "conflicting type modifiers";
+      error_msg();
       throw 0;
     }
     else if(unsigned_cnt)
@@ -401,7 +413,8 @@ void ansi_c_convert_typet::write(typet &type)
     if(signed_cnt && unsigned_cnt)
     {
       err_location(source_location);
-      error("conflicting type modifiers");
+      str << "conflicting type modifiers";
+      error_msg();
       throw 0;
     }
     else if(unsigned_cnt)
@@ -414,7 +427,8 @@ void ansi_c_convert_typet::write(typet &type)
       if(long_cnt || char_cnt || short_cnt || gcc_int128_cnt || bv_cnt)
       {
         err_location(source_location);
-        error("conflicting type modifiers");
+        str << "conflicting type modifiers";
+        error_msg();
         throw 0;
       }
       
@@ -459,7 +473,8 @@ void ansi_c_convert_typet::write(typet &type)
       if(long_cnt || char_cnt)
       {
         err_location(source_location);
-        error("conflicting type modifiers");
+        str << "conflicting type modifiers";
+        error_msg();
         throw 0;
       }
 
@@ -480,7 +495,8 @@ void ansi_c_convert_typet::write(typet &type)
     else
     {
       err_location(source_location);
-      error("illegal type modifier for integer type");
+      str << "illegal type modifier for integer type";
+      error_msg();
       throw 0;
     }
   }

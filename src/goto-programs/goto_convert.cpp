@@ -81,7 +81,7 @@ void goto_convertt::finish_gotos()
         {
           err_location(i.code);
           str << "goto label `" << it->id_string() << "' not found";
-          error();
+          error_msg();
           throw 0;
         }
           
@@ -99,7 +99,7 @@ void goto_convertt::finish_gotos()
       {
         err_location(i.code);
         str << "goto label `" << goto_label << "' not found";
-        error();
+        error_msg();
         throw 0;
       }
 
@@ -115,7 +115,7 @@ void goto_convertt::finish_gotos()
       {
         err_location(i.code);
         str << "goto label `" << goto_label << "' not found";
-        error();
+        error_msg();
         throw 0;
       }
 
@@ -524,7 +524,7 @@ void goto_convertt::convert(
       err_location(code.op0());
       str << "static assertion "
           << get_string_constant(code.op1());
-      error();
+      error_msg();
       throw 0;
     }
     else if(assertion.is_true())
@@ -1882,7 +1882,8 @@ void goto_convertt::convert_bp_enforce(
   if(code.operands().size()!=2)
   {
     err_location(code);
-    error("bp_enfroce expects two arguments");
+    str << "bp_enfroce expects two arguments";
+    error_msg();
     throw 0;
   }
     
@@ -2392,7 +2393,7 @@ const irep_idt goto_convertt::get_string_constant(
   err_location(expr);
   str << "expected string constant, but got: "
       << expr.pretty();
-  error();
+  error_msg();
 
   throw 0;
 }
@@ -2573,17 +2574,19 @@ void goto_convert(
   
   catch(int)
   {
-    goto_convert.error();
+    goto_convert.error_msg();
   }
 
   catch(const char *e)
   {
-    goto_convert.error(e);
+    goto_convert.str << e;
+    goto_convert.error_msg();
   }
 
   catch(const std::string &e)
   {
-    goto_convert.error(e);
+    goto_convert.str << e;
+    goto_convert.error_msg();
   }
 
   if(goto_convert.get_error_found())

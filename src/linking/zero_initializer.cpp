@@ -97,7 +97,8 @@ exprt zero_initializert::zero_initializer_rec(
   else if(type_id==ID_code)
   {
     err_location(source_location);
-    error("cannot zero-initialize code-type");
+    str << "cannot zero-initialize code-type";
+    error_msg();
     throw 0;
   }
   else if(type_id==ID_array)
@@ -132,14 +133,15 @@ exprt zero_initializert::zero_initializer_rec(
         err_location(source_location);
         str << "failed to zero-initialize array of non-fixed size `"
             << to_string(array_type.size()) << "'";
-        error();
+        error_msg();
         throw 0;
       }
         
       if(array_size<0)
       {
         err_location(source_location);
-        error("failed to zero-initialize array of with negative size");
+        str << "failed to zero-initialize array of with negative size";
+        error_msg();
         throw 0;
       }
 
@@ -162,14 +164,15 @@ exprt zero_initializert::zero_initializer_rec(
       err_location(source_location);
       str << "failed to zero-initialize vector of non-fixed size `"
           << to_string(vector_type.size()) << "'";
-      error();
+      error_msg();
       throw 0;
     }
       
     if(vector_size<0)
     {
       err_location(source_location);
-      error("failed to zero-initialize vector of with negative size");
+      str << "failed to zero-initialize vector of with negative size";
+      error_msg();
       throw 0;
     }
 
@@ -269,7 +272,7 @@ exprt zero_initializert::zero_initializer_rec(
     err_location(source_location);
     str << "failed to zero-initialize `" << to_string(type)
         << "'";
-    error();
+    error_msg();
     throw 0;
   }
 }

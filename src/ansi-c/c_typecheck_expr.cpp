@@ -1567,7 +1567,8 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
   if(expr.operands().size()!=1)
   {
     err_location(expr);
-    error("ptrmember operator expects one operand");
+    str << "ptrmember operator expects one operand";
+    error_msg();
     throw 0;
   }
 
@@ -1614,7 +1615,8 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   if(expr.operands().size()!=1)
   {
     err_location(expr);
-    error("member operator expects one operand");
+    str << "member operator expects one operand";
+    error_msg();
     throw 0;
   }
 
@@ -1825,7 +1827,8 @@ void c_typecheck_baset::typecheck_side_effect_gcc_conditional_expression(
   if(operands.size()!=2)
   {
     err_location(expr);
-    error("gcc conditional_expr expects two operands");
+    str << "gcc conditional_expr expects two operands";
+    error_msg();
     throw 0;
   }
 
@@ -1862,7 +1865,8 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   if(expr.operands().size()!=1)
   {
     err_location(expr);
-    error("unary operator & expects one operand");
+    str << "unary operator & expects one operand";
+    error_msg();
     throw 0;
   }
 
@@ -1871,7 +1875,8 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   if(op.type().id()==ID_c_bit_field)
   {
     err_location(expr);
-    error("cannot take address of a bit field");
+    str << "cannot take address of a bit field";
+    error_msg();
     throw 0;
   }
   
@@ -2173,7 +2178,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
       err_location(f_op);
       str << "function `" << identifier << "' is not declared";
-      warning();
+      warning_msg();
     }
   }
 
@@ -2803,7 +2808,8 @@ void c_typecheck_baset::typecheck_function_call_arguments(
          op.type().id()!=ID_bool)
       {
         err_location(expr);
-        warning("assignment where Boolean argument is expected");
+        str << "assignment where Boolean argument is expected";
+        warning_msg();
       }
 
       implicit_typecast(op, op_type);

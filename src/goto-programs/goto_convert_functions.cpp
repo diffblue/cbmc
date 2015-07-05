@@ -358,17 +358,19 @@ void goto_convert(
 
   catch(int)
   {
-    goto_convert_functions.error();
+    goto_convert_functions.error_msg();
   }
 
   catch(const char *e)
   {
-    goto_convert_functions.error(e);
+    goto_convert_functions.str << e;
+    goto_convert_functions.error_msg();
   }
 
   catch(const std::string &e)
   {
-    goto_convert_functions.error(e);
+    goto_convert_functions.str << e;
+    goto_convert_functions.error_msg();
   }
 
   if(goto_convert_functions.get_error_found())
@@ -403,17 +405,19 @@ void goto_convert(
 
   catch(int)
   {
-    goto_convert_functions.error();
+    goto_convert_functions.error_msg();
   }
 
   catch(const char *e)
   {
-    goto_convert_functions.error(e);
+    goto_convert_functions.str << e;
+    goto_convert_functions.error_msg(e);
   }
 
   catch(const std::string &e)
   {
-    goto_convert_functions.error(e);
+    goto_convert_functions.str << e;
+    goto_convert_functions.error_msg(e);
   }
 
   if(goto_convert_functions.get_error_found())
