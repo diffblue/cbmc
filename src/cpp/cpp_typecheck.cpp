@@ -243,6 +243,8 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   disable_access_control = true;
 
+  // The below is already done by __CPROVER_initialize
+  #if 0
   // fill in any missing zero initializers
   // for static initialization
   Forall_symbols(s_it, symbol_table.symbols)
@@ -275,7 +277,6 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       symbol.value=::zero_initializer(symbol.type, symbol.location, *this, get_message_handler());
     else
     {
-      // The below is already done by __CPROVER_initialize
       #if 0
       // _always_ zero initialize,
       // even if there is already an initializer.
@@ -287,6 +288,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       #endif
     }
   }
+  #endif
 
   for(dynamic_initializationst::const_iterator
       d_it=dynamic_initializations.begin();
@@ -316,9 +318,8 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
       init_block.move_to_operands(code);
 
-      // Make it nil because we do not want
-      // global_init to try to initialize the
-      // object
+      // Make it nil to get zero initialization by
+      // __CPROVER_initialize
       symbol.value.make_nil();
     }
     else
