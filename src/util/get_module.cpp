@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include "get_module.h"
-#include "message_stream.h"
+#include "message.h"
 #include "symbol_table.h"
 
 /*******************************************************************\
