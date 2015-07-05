@@ -119,19 +119,19 @@ public:
   // constructors, destructor
   
   inline messaget():
-    mstream(M_DEBUG, &message_handler)
+    mstream(M_DEBUG, *this)
   {
   }
   
   inline messaget(const messaget &other):
     message_clientt(other),
-    mstream(M_DEBUG, &message_handler)
+    mstream(M_DEBUG, *this)
   {
   }
    
   inline explicit messaget(message_handlert &_message_handler):
     message_clientt(_message_handler),
-    mstream(M_DEBUG, &message_handler)
+    mstream(M_DEBUG, *this)
   {
   }
    
@@ -171,14 +171,14 @@ public:
   public:
     inline mstreamt(
       unsigned _message_level,
-      message_handlert **_message_handler):
+      messaget &_message):
       message_level(_message_level),
-      message_handler(_message_handler)
+      message(_message)
     {
     }
 
     unsigned message_level;
-    message_handlert **message_handler;
+    messaget &message;
 
     template <class T>
     inline mstreamt &operator << (const T &x)
@@ -198,8 +198,7 @@ public:
   // the printing of the message
   static inline mstreamt &eom(mstreamt &m)
   {
-    if((*m.message_handler)!=NULL)
-      (*m.message_handler)->print(m.message_level, m.str());
+    m.message.print(m.message_level, m.str());
     m.clear(); // clears error bits
     m.str(std::string()); // clears the string
     return m;
