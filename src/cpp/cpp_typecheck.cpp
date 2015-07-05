@@ -275,6 +275,8 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       symbol.value=::zero_initializer(symbol.type, symbol.location, *this, get_message_handler());
     else
     {
+      // The below is already done by __CPROVER_initialize
+      #if 0
       // _always_ zero initialize,
       // even if there is already an initializer.
       zero_initializer(
@@ -282,6 +284,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
         symbol.type,
         symbol.location,
         init_block.operands());
+      #endif
     }
   }
 
