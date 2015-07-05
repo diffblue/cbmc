@@ -243,53 +243,6 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   disable_access_control = true;
 
-  // The below is already done by __CPROVER_initialize
-  #if 0
-  // fill in any missing zero initializers
-  // for static initialization
-  Forall_symbols(s_it, symbol_table.symbols)
-  {
-    symbolt &symbol=s_it->second;
-
-    if(!symbol.is_static_lifetime)
-      continue;
-      
-    if(symbol.mode!=ID_cpp)
-      continue;
-      
-    // magic value
-    if(symbol.name=="__CPROVER::constant_infinity_uint")
-      continue;
-
-    // it has a non-code initializer already?
-    if(symbol.value.is_not_nil() &&
-       symbol.value.id()!=ID_code)
-      continue;
-      
-    // it's a declaration only
-    if(symbol.is_extern)
-      continue;
-
-    if(!symbol.is_lvalue)
-      continue;
-
-    if(cpp_is_pod(symbol.type))
-      symbol.value=::zero_initializer(symbol.type, symbol.location, *this, get_message_handler());
-    else
-    {
-      #if 0
-      // _always_ zero initialize,
-      // even if there is already an initializer.
-      zero_initializer(
-        cpp_symbol_expr(symbol),
-        symbol.type,
-        symbol.location,
-        init_block.operands());
-      #endif
-    }
-  }
-  #endif
-
   for(dynamic_initializationst::const_iterator
       d_it=dynamic_initializations.begin();
       d_it!=dynamic_initializations.end();
@@ -313,10 +266,10 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     // initializer given?
     if(symbol.value.is_not_nil())
     {
-      code_assignt code(symbol_expr, symbol.value);
-      code.add_source_location()=symbol.location;
-
-      init_block.move_to_operands(code);
+      // This will be a constructor call,
+      // which we execute.
+      assert(symbol.value.id()==ID_code);
+      init_block.copy_to_operands(symbol.value);
 
       // Make it nil to get zero initialization by
       // __CPROVER_initialize
