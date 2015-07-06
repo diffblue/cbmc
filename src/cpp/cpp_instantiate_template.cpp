@@ -224,7 +224,7 @@ void cpp_typecheckt::elaborate_class_template(
   
   const symbolt &symbol=lookup(type);
 
-  // Make a copy, as instantiate will destry the symbol type!  
+  // Make a copy, as instantiate will destroy the symbol type!  
   const typet t_type=symbol.type;
   
   if(t_type.id()==ID_incomplete_struct &&
