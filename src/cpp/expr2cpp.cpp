@@ -566,10 +566,9 @@ std::string expr2cppt::convert_code(
   return expr2ct::convert_code(src, indent);
 }
 
-
 /*******************************************************************\
 
-Function: expr2cppt::extractbit
+Function: expr2cppt::convert_extractbit
 
   Inputs:
 
@@ -589,7 +588,7 @@ std::string expr2cppt::convert_extractbit(
 
 /*******************************************************************\
 
-Function: expr2cppt::extractbit
+Function: expr2cppt::convert_extractbits
 
   Inputs:
 

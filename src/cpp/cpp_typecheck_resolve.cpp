@@ -1758,7 +1758,7 @@ exprt cpp_typecheck_resolvet::resolve(
       cpp_typecheck.err_location(source_location);
       cpp_typecheck.str
         << "found no match for symbol `" << base_name
-        << "', candidates are:" << std::endl;
+        << "', candidates are:\n";
       show_identifiers(base_name, identifiers, cpp_typecheck.str);
     }
     else
@@ -1766,7 +1766,7 @@ exprt cpp_typecheck_resolvet::resolve(
       cpp_typecheck.err_location(source_location);
       cpp_typecheck.str
         << "symbol `" << base_name
-        << "' does not uniquely resolve:" << std::endl;
+        << "' does not uniquely resolve:\n";
       show_identifiers(base_name, new_identifiers, cpp_typecheck.str);
       
       #if 0
