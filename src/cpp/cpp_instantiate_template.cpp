@@ -164,7 +164,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   irep_idt identifier=
     id2string(template_scope->prefix)+
     id2string(suffix)+
-    "tag."+id2string(template_symbol.base_name);
+    "tag-"+id2string(template_symbol.base_name);
   
   // already there?
   symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(identifier);

@@ -127,7 +127,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     tag_scope(base_name, has_body, tag_only_declaration);
 
   const irep_idt symbol_name=
-    dest_scope.prefix+"tag."+id2string(base_name);
+    dest_scope.prefix+"tag-"+id2string(base_name);
 
   // check if we have it
   
