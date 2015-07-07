@@ -192,9 +192,12 @@ void cpp_typecheckt::typecheck_compound_type(
     }
   }
 
+  // The identifier 'tag-X' matches what the C front-end does!
+  // The hypen is deliberate to avoid collisions with other
+  // identifiers.
   const irep_idt symbol_name=
     dest_scope->prefix+
-    "tag."+id2string(base_name);
+    "tag-"+id2string(base_name);
 
   // check if we have it already
 
