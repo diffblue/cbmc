@@ -1353,7 +1353,7 @@ Purpose:
 \*******************************************************************/
 
 void cpp_typecheckt::typecheck_member_function(
-  const irep_idt &compound_symbol,
+  const irep_idt &compound_identifier,
   struct_typet::componentt &component,
   irept &initializers,
   const typet &method_qualifier,
@@ -1374,7 +1374,7 @@ void cpp_typecheckt::typecheck_member_function(
   else
   {
     adjust_method_type(
-      compound_symbol,
+      compound_identifier,
       type,
       method_qualifier);
   }
@@ -1388,7 +1388,9 @@ void cpp_typecheckt::typecheck_member_function(
     function_identifier(component.type());
 
   const irep_idt identifier=
-    id2string(component.get_name())+id2string(f_id);
+    id2string(compound_identifier)+"::"+
+    id2string(component.get_base_name())+
+    id2string(f_id);
 
   component.set_name(identifier);
 
@@ -1416,7 +1418,7 @@ void cpp_typecheckt::typecheck_member_function(
   if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
-    str << "failed to insert new symbol: "
+    str << "failed to insert new method symbol: "
         << symbol.name << "\n";
 
     str << "name of previous symbol: "
