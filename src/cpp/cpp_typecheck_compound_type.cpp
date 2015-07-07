@@ -1417,7 +1417,7 @@ void cpp_typecheckt::typecheck_member_function(
   {
     err_location(symbol.location);
     str << "failed to insert new symbol: "
-        << symbol.name.c_str() << "\n";
+        << symbol.name << "\n";
 
     str << "name of previous symbol: "
         << new_symbol->name << "\n";
