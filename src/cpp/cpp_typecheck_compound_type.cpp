@@ -1391,22 +1391,18 @@ void cpp_typecheckt::typecheck_member_function(
     function_identifier(component.type());
 
   const irep_idt identifier=
-    id2string(compound_identifier)+"::"+
+    cpp_scopes.current_scope().prefix+
     id2string(component.get_base_name())+
     id2string(f_id);
 
   component.set_name(identifier);
-
-  component.set("prefix",
-                cpp_scopes.current_scope().prefix+
-                component.get_string(ID_base_name)+
-                id2string(f_id)+"::");
+  component.set("prefix", id2string(identifier)+"::");
 
   if(value.is_not_nil())
     type.set(ID_C_inlined, true);
 
   symbol.name=identifier;
-  symbol.base_name=component.get(ID_base_name);
+  symbol.base_name=component.get_base_name();
   symbol.value.swap(value);
   symbol.mode=ID_cpp;
   symbol.module=module;
