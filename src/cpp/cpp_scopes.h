@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_scopest
 {
 public:
-  cpp_scopest()
+  inline cpp_scopest()
   {
     current_scope_ptr=&root_scope;
   }
@@ -28,25 +28,26 @@ public:
   typedef std::set<cpp_scopet *> scope_sett;
   typedef std::set<cpp_idt *> id_sett;
 
-  cpp_scopet &current_scope()
+  inline cpp_scopet &current_scope()
   {
     return *current_scope_ptr;
   }
 
-  cpp_scopet &new_scope(const irep_idt &new_scope_name)
+  cpp_scopet &new_scope(
+    const irep_idt &new_scope_name,
+    cpp_idt::id_classt id_class)
   {
     assert(!new_scope_name.empty());
     cpp_scopet &n=current_scope_ptr->new_scope(new_scope_name);
+    n.id_class=id_class;
     id_map[n.identifier]=&n;
     current_scope_ptr=&n;
     return n;
   }
 
-  cpp_scopet &new_namespace(const irep_idt &new_scope_name)
+  inline cpp_scopet &new_namespace(const irep_idt &new_scope_name)
   {
-    cpp_scopet &n=new_scope(new_scope_name);
-    n.id_class=cpp_idt::NAMESPACE;
-    return n;
+    return new_scope(new_scope_name, cpp_idt::NAMESPACE);
   }
 
   cpp_scopet &new_block_scope();

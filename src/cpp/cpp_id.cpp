@@ -84,6 +84,9 @@ void cpp_idt::print_fields(std::ostream &out, unsigned indent) const
   out << "  prefix=" << prefix << std::endl;
 
   for(unsigned i=0; i<indent; i++) out << ' ';
+  out << "  suffix=" << suffix << std::endl;
+
+  for(unsigned i=0; i<indent; i++) out << ' ';
   out << "  base_name=" << base_name << std::endl;
 
   for(unsigned i=0; i<indent; i++) out << ' ';

@@ -27,9 +27,7 @@ Function: cpp_scopest::new_block_scope
 cpp_scopet &cpp_scopest::new_block_scope()
 {
   unsigned prefix=++current_scope().compound_counter;
-  cpp_scopet &n=new_scope(i2string(prefix));
-  n.id_class=cpp_idt::BLOCK_SCOPE;
-  return n;
+  return new_scope(i2string(prefix), cpp_idt::BLOCK_SCOPE);
 }
 
 /*******************************************************************\
