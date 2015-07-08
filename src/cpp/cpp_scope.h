@@ -55,6 +55,11 @@ public:
            id_class==NAMESPACE;
   }
 
+  inline bool is_template_scope() const
+  {
+    return id_class==TEMPLATE_SCOPE;
+  }
+
   cpp_scopet &get_parent() const
   {
     return static_cast<cpp_scopet &>(cpp_idt::get_parent());
@@ -82,8 +87,7 @@ public:
     using_scopes.push_back(&other);
   }
 
-  class cpp_scopet &new_scope(
-    const irep_idt &new_scope_name);
+  class cpp_scopet &new_scope(const irep_idt &new_scope_name);
 };
 
 class cpp_root_scopet:public cpp_scopet

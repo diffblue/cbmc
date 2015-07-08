@@ -163,8 +163,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   
   irep_idt identifier=
     id2string(template_scope->prefix)+
-    id2string(suffix)+
-    "tag-"+id2string(template_symbol.base_name);
+    "tag-"+id2string(template_symbol.base_name)+
+    id2string(suffix);
   
   // already there?
   symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(identifier);
@@ -317,7 +317,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   if(template_scope==NULL)
   {
     err_location(source_location);
-    str << "identifier: " << template_symbol.name << std::endl;
+    str << "identifier: " << template_symbol.name << '\n';
     throw "template instantiation error: scope not found";
   }
   
@@ -391,16 +391,17 @@ const symbolt &cpp_typecheckt::instantiate_template(
   else
   {
     // set up a scope as subscope of the template scope
-    std::string prefix=template_scope->get_parent().prefix+suffix;
     cpp_scopet &sub_scope=
       cpp_scopes.current_scope().new_scope(subscope_name);
-    sub_scope.prefix=prefix;
+    sub_scope.id_class=cpp_idt::TEMPLATE_SCOPE;
+    sub_scope.prefix=template_scope->get_parent().prefix;
+    sub_scope.suffix=suffix;
     sub_scope.add_using_scope(template_scope->get_parent());
     cpp_scopes.go_to(sub_scope);
     cpp_scopes.id_map.insert(
       cpp_scopest::id_mapt::value_type(subscope_name, &sub_scope));
   }
-
+  
   // store the information that the template has
   // been instantiated using these arguments
   {

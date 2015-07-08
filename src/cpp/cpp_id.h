@@ -59,7 +59,7 @@ public:
   {
     return id_class==TYPEDEF;
   }
-
+  
   irep_idt identifier, base_name;
 
   // if it is a member or method, what class is it in?
@@ -67,7 +67,7 @@ public:
   exprt this_expr;
 
   // scope data
-  std::string prefix;
+  std::string prefix, suffix;
   unsigned compound_counter;
   
   cpp_idt &insert(const irep_idt &_base_name)

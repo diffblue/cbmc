@@ -191,14 +191,15 @@ void cpp_typecheckt::typecheck_compound_type(
       dest_scope=&cpp_typecheck_resolve.resolve_scope(cpp_name, base_name, t_args);
     }
   }
-
+  
   // The identifier 'tag-X' matches what the C front-end does!
   // The hypen is deliberate to avoid collisions with other
   // identifiers.
   const irep_idt symbol_name=
     dest_scope->prefix+
-    "tag-"+id2string(base_name);
-
+    "tag-"+id2string(base_name)+
+    dest_scope->suffix;
+    
   // check if we have it already
 
   symbol_tablet::symbolst::iterator previous_symbol=
@@ -207,7 +208,7 @@ void cpp_typecheckt::typecheck_compound_type(
   if(previous_symbol!=symbol_table.symbols.end())
   {
     // we do!
-
+    
     symbolt &symbol=previous_symbol->second;
 
     if(has_body)
@@ -247,8 +248,11 @@ void cpp_typecheckt::typecheck_compound_type(
     symbol.type.swap(type);
     symbol.is_type=true;
     symbol.is_macro=false;
-    symbol.pretty_name=cpp_scopes.current_scope().prefix+id2string(symbol.base_name);
-    symbol.type.set(ID_tag, symbol.pretty_name);
+    symbol.pretty_name=
+      cpp_scopes.current_scope().prefix+
+      id2string(symbol.base_name)+
+      cpp_scopes.current_scope().suffix;
+    symbol.type.set(ID_tag, cpp_scopes.current_scope().prefix+id2string(symbol.base_name));
 
     // move early, must be visible before doing body
     symbolt *new_symbol;
@@ -262,10 +266,11 @@ void cpp_typecheckt::typecheck_compound_type(
     id.id_class=cpp_idt::CLASS;
     id.is_scope=true;
     id.prefix=cpp_scopes.current_scope().prefix+
-              id2string(new_symbol->base_name)+"::";
+              id2string(new_symbol->base_name)+
+              cpp_scopes.current_scope().suffix+"::";
     id.class_identifier=new_symbol->name;
     id.id_class=cpp_idt::CLASS;
-
+    
     if(has_body)
       typecheck_compound_body(*new_symbol);
     else
