@@ -34,8 +34,6 @@ public:
   }
 };
 
-const char ID_interfaces[] = "interfaces";
-
 class is_name_equalt {
   const irep_idt &name;
 public:
@@ -74,7 +72,6 @@ public:
     const std::string &class_name=id2string(class_type.get(ID_name));
     const std::string &base_class_name=id2string(class_type.get(ID_base_name));
     const symbolt &type_symbol(get_vt_type_symbol(class_type));
-    const std::string &type_base_name=id2string(type_symbol.base_name);
     result.name = vtnamest::get_table(class_name);
     result.base_name = vtnamest::get_table_base(base_class_name);
     result.pretty_name = result.base_name;
@@ -255,7 +252,6 @@ void create_vtable_type(const irep_idt &vt_name, symbol_tablet &symbol_table,
 }
 
 const char ID_isvtptr[] = "is_vtptr";
-const char NS_SEP[] = "::";
 
 void add_vtable_pointer_member(
   const irep_idt &vt_name,
