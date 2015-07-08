@@ -167,7 +167,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
     id2string(suffix);
   
   // already there?
-  symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(identifier);
+  symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table.symbols.find(identifier);
   if(s_it!=symbol_table.symbols.end())
     return s_it->second;
 
@@ -198,7 +199,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   id.id_class=cpp_idt::CLASS;
   id.is_scope=true;
   id.prefix=template_scope->prefix+
-            id2string(s_ptr->base_name)+"::";
+            id2string(s_ptr->base_name)+
+            id2string(suffix)+"::";
   id.class_identifier=s_ptr->name;
   id.id_class=cpp_idt::CLASS;
   
@@ -253,6 +255,8 @@ Function: cpp_typecheckt::instantiate_template
 
 \*******************************************************************/
 
+#define MAX_DEPTH 50
+
 const symbolt &cpp_typecheckt::instantiate_template(
   const source_locationt &source_location,
   const symbolt &template_symbol,
@@ -260,10 +264,12 @@ const symbolt &cpp_typecheckt::instantiate_template(
   const cpp_template_args_tct &full_template_args,
   const typet &specialization)
 {
-  if(instantiation_stack.size()==50)
+  if(instantiation_stack.size()==MAX_DEPTH)
   {
     err_location(source_location);
-    throw "reached maximum template recursion depth";
+    str << "reached maximum template recursion depth ("
+        << MAX_DEPTH << ")";
+    throw 0;
   }
   
   instantiation_levelt i_level(instantiation_stack);
