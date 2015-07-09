@@ -998,7 +998,7 @@ bool c_preprocess_arm(
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
     message_stream.str << "ARMCC preprocessing failed (fopen failed)";
-    mesaage_stream.error_msg();
+    message_stream.error_msg();
     return true;
   }
   #else
