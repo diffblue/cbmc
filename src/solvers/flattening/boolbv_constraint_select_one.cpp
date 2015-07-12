@@ -24,11 +24,11 @@ void boolbvt::convert_constraint_select_one(const exprt &expr, bvt &bv)
 {
   const exprt::operandst &operands=expr.operands();
 
-  if(expr.id()!="constraint_select_one")
+  if(expr.id()!=ID_constraint_select_one)
     throw "expected constraint_select_one expression";
 
-  if(operands.size()<2)
-    throw "constraint_select_one takes at least two operands";
+  if(operands.empty())
+    throw "constraint_select_one takes at one operand";
 
   if(expr.type()!=expr.op0().type())
     throw "constraint_select_one expects matching types";
@@ -62,7 +62,7 @@ void boolbvt::convert_constraint_select_one(const exprt &expr, bvt &bv)
       b.push_back(prop.land(equal_bv));
     }
 
-    prop.l_set_to_true(prop.lor(b));
+    prop.lcnf(b);
   }
   else
   {
