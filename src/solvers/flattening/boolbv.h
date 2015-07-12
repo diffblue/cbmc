@@ -116,6 +116,7 @@ protected:
   virtual literalt convert_bv_rel(const exprt &expr);
   virtual literalt convert_typecast(const exprt &expr);
   virtual literalt convert_reduction(const exprt &expr);
+  virtual literalt convert_onehot(const unary_exprt &expr);
   virtual literalt convert_extractbit(const extractbit_exprt &expr);
   virtual literalt convert_overflow(const exprt &expr);
   virtual literalt convert_equality(const equal_exprt &expr);
