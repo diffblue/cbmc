@@ -609,6 +609,8 @@ literalt boolbvt::convert_rest(const exprt &expr)
           expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
           expr.id()==ID_reduction_xor || expr.id()==ID_reduction_xnor)
     return convert_reduction(expr);
+  else if(expr.id()==ID_onehot || expr.id()==ID_onehot0)
+    return convert_onehot(to_unary_expr(expr));
   else if(has_prefix(expr.id_string(), "overflow-"))
     return convert_overflow(expr);
   else if(expr.id()==ID_isnan)
