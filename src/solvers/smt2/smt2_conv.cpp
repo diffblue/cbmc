@@ -1998,6 +1998,10 @@ void smt2_convt::convert_expr(const exprt &expr)
     convert_expr(let_expr.where());
     out << ')'; // let
   }
+  else if(expr.id()==ID_constraint_select_one)
+  {
+    UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is not yet supported");
+  }
   else
     UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is unsupported");
 }
@@ -4594,7 +4598,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ")" << "\n";
 
       // use a quantifier instead of the lambda
-      #if 0 // not really working in any sover yet!
+      #if 0 // not really working in any solver yet!
       out << "(assert (forall ((i ";
       convert_type(array_index_type());
       out << ")) (= (select " << id << " i) ";
