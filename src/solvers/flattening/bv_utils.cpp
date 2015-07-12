@@ -250,90 +250,92 @@ Function: bv_utilst::full_adder
 #define OPTIMAL_FULL_ADDER
 
 literalt bv_utilst::full_adder(
-  const literalt a, const literalt b,
-  const literalt carry_in, literalt &carry_out)
+  const literalt a,
+  const literalt b,
+  const literalt carry_in,
+  literalt &carry_out)
 {
-#ifdef OPTIMAL_FULL_ADDER
-  literalt x;
-  literalt y;
-  int constantProp = -1;
+  #ifdef OPTIMAL_FULL_ADDER
+  if(prop.has_set_to())
+  {
+    literalt x;
+    literalt y;
+    int constantProp = -1;
 
-  if (a.is_constant())
-  {
-    x = b;
-    y = carry_in;
-    constantProp = (a.is_true()) ? 1 : 0;    
-  }
-  else if (b.is_constant())
-  {
-    x = a;
-    y = carry_in;
-    constantProp = (b.is_true()) ? 1 : 0;    
-  }
-  else if (carry_in.is_constant())
-  {
-    x = a;
-    y = b;
-    constantProp = (carry_in.is_true()) ? 1 : 0;
-  }
+    if(a.is_constant())
+    {
+      x = b;
+      y = carry_in;
+      constantProp = (a.is_true()) ? 1 : 0;    
+    }
+    else if (b.is_constant())
+    {
+      x = a;
+      y = carry_in;
+      constantProp = (b.is_true()) ? 1 : 0;    
+    }
+    else if (carry_in.is_constant())
+    {
+      x = a;
+      y = b;
+      constantProp = (carry_in.is_true()) ? 1 : 0;
+    }
 
-  literalt sum;
+    literalt sum;
 
-  // Rely on prop.l* to do further constant propagation
-  if (constantProp == 1)
-  {
-    // At least one input bit is 1
-    carry_out = prop.lor(x, y);
-    sum = prop.lequal(x, y);    
-  }
-  else if (constantProp == 0)
-  {
-    // At least one input bit is 0
-    carry_out = prop.land(x,y);
-    sum = prop.lxor(x,y);    
+    // Rely on prop.l* to do further constant propagation
+    if(constantProp == 1)
+    {
+      // At least one input bit is 1
+      carry_out = prop.lor(x, y);
+      sum = prop.lequal(x, y);    
+    }
+    else if(constantProp == 0)
+    {
+      // At least one input bit is 0
+      carry_out = prop.land(x,y);
+      sum = prop.lxor(x,y);    
+    }
+    else
+    {
+      carry_out = prop.new_variable();
+      sum = prop.new_variable();
+      
+      // Any two inputs 1 will set the carry_out to 1
+      prop.lcnf(!a,        !b, carry_out);
+      prop.lcnf(!a, !carry_in, carry_out);
+      prop.lcnf(!b, !carry_in, carry_out);
+      
+      // Any two inputs 0 will set the carry_out to 0
+      prop.lcnf(a,        b, !carry_out);
+      prop.lcnf(a, carry_in, !carry_out);
+      prop.lcnf(b, carry_in, !carry_out);
+      
+      // If both carry out and sum are 1 then all inputs are 1
+      prop.lcnf(       a, !sum, !carry_out);
+      prop.lcnf(       b, !sum, !carry_out);
+      prop.lcnf(carry_in, !sum, !carry_out);
+      
+      // If both carry out and sum are 0 then all inputs are 0
+      prop.lcnf(       !a, sum, carry_out);
+      prop.lcnf(       !b, sum, carry_out);
+      prop.lcnf(!carry_in, sum, carry_out);
+      
+      // If all of the inputs are 1 or all are 0 it sets the sum
+      prop.lcnf(!a, !b, !carry_in,  sum);
+      prop.lcnf( a,  b,  carry_in, !sum);
+    }
+
+    return sum;
   }
   else
+  #endif // OPTIMAL_FULL_ADDER
   {
-    carry_out = prop.new_variable();
-    sum = prop.new_variable();
-    
-    // Any two inputs 1 will set the carry_out to 1
-    prop.lcnf(!a,        !b, carry_out);
-    prop.lcnf(!a, !carry_in, carry_out);
-    prop.lcnf(!b, !carry_in, carry_out);
-    
-    // Any two inputs 0 will set the carry_out to 0
-    prop.lcnf(a,        b, !carry_out);
-    prop.lcnf(a, carry_in, !carry_out);
-    prop.lcnf(b, carry_in, !carry_out);
-    
-    // If both carry out and sum are 1 then all inputs are 1
-    prop.lcnf(       a, !sum, !carry_out);
-    prop.lcnf(       b, !sum, !carry_out);
-    prop.lcnf(carry_in, !sum, !carry_out);
-    
-    // If both carry out and sum are 0 then all inputs are 0
-    prop.lcnf(       !a, sum, carry_out);
-    prop.lcnf(       !b, sum, carry_out);
-    prop.lcnf(!carry_in, sum, carry_out);
-    
-    // If all of the inputs are 1 or all are 0 it sets the sum
-    prop.lcnf(!a, !b, !carry_in,  sum);
-    prop.lcnf( a,  b,  carry_in, !sum);
-  }
-
-  return sum;
-
-#else
-
+    // trivial encoding
     carry_out=carry(a, b, carry_in);
-
-    return prop.lxor(
-           prop.lxor(a, b), carry_in);
-#endif
-
+    return prop.lxor(prop.lxor(a, b), carry_in);
+  }
 }
-
 
 /*******************************************************************\
 
@@ -355,63 +357,67 @@ Function: bv_utilst::carry
 literalt bv_utilst::carry(literalt a, literalt b, literalt c)
 {
   #ifdef COMPACT_CARRY
-  // propagation possible?
-  unsigned const_count=
-    a.is_constant() + b.is_constant() + c.is_constant();
-  
-  // propagation is possible if two or three inputs are constant
-  if(const_count>=2)
-    return prop.lor(prop.lor(
-        prop.land(a, b),
-        prop.land(a, c)),
-        prop.land(b, c));
-        
-  // it's also possible if two of a,b,c are the same
-  if(a==b)
-    return a;
-  else if(a==c)
-    return a;
-  else if(b==c)
-    return b;
-        
-  // the below yields fewer clauses and variables,
-  // but doesn't propagate anything at all
+  if(prop.has_set_to())
+  {
+    // propagation possible?
+    unsigned const_count=
+      a.is_constant() + b.is_constant() + c.is_constant();
+    
+    // propagation is possible if two or three inputs are constant
+    if(const_count>=2)
+      return prop.lor(prop.lor(
+          prop.land(a, b),
+          prop.land(a, c)),
+          prop.land(b, c));
+          
+    // it's also possible if two of a,b,c are the same
+    if(a==b)
+      return a;
+    else if(a==c)
+      return a;
+    else if(b==c)
+      return b;
+          
+    // the below yields fewer clauses and variables,
+    // but doesn't propagate anything at all
 
-  bvt clause;
+    bvt clause;
 
-  literalt x=prop.new_variable();
+    literalt x=prop.new_variable();
 
-  /*
-  carry_correct: LEMMA
-    (    a OR     b OR          NOT x) AND
-    (    a OR NOT b OR     c OR NOT x) AND
-    (    a OR NOT b OR NOT c OR     x) AND
-    (NOT a OR     b OR     c OR NOT x) AND
-    (NOT a OR     b OR NOT c OR     x) AND
-    (NOT a OR NOT b OR              x)
-    IFF
-    (x=((a AND b) OR (a AND c) OR (b AND c)));
-  */
+    /*
+    carry_correct: LEMMA
+      (    a OR     b OR          NOT x) AND
+      (    a OR NOT b OR     c OR NOT x) AND
+      (    a OR NOT b OR NOT c OR     x) AND
+      (NOT a OR     b OR     c OR NOT x) AND
+      (NOT a OR     b OR NOT c OR     x) AND
+      (NOT a OR NOT b OR              x)
+      IFF
+      (x=((a AND b) OR (a AND c) OR (b AND c)));
+    */
 
-  prop.lcnf( a,  b,     !x);
-  prop.lcnf( a, !b,  c, !x);
-  prop.lcnf( a, !b, !c,  x);
-  prop.lcnf(!a,  b,  c, !x);
-  prop.lcnf(!a,  b, !c,  x);
-  prop.lcnf(!a, !b,      x);
+    prop.lcnf( a,  b,     !x);
+    prop.lcnf( a, !b,  c, !x);
+    prop.lcnf( a, !b, !c,  x);
+    prop.lcnf(!a,  b,  c, !x);
+    prop.lcnf(!a,  b, !c,  x);
+    prop.lcnf(!a, !b,      x);
 
-  return x;
+    return x;
+  }
+  else
+  #endif // COMPACT_CARRY
+  {
+    // trivial encoding
+    bvt tmp;
 
-  #else
+    tmp.push_back(prop.land(a, b));
+    tmp.push_back(prop.land(a, c));
+    tmp.push_back(prop.land(b, c));
 
-  bvt tmp;
-
-  tmp.push_back(prop.land(a, b));
-  tmp.push_back(prop.land(a, c));
-  tmp.push_back(prop.land(b, c));
-
-  return prop.lor(tmp);
-  #endif
+    return prop.lor(tmp);
+  }
 }
 
 /*******************************************************************\
