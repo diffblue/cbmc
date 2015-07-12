@@ -32,34 +32,24 @@ void boolbvt::convert_constraint_select_one(const exprt &expr, bvt &bv)
 
   if(expr.type()!=expr.op0().type())
     throw "constraint_select_one expects matching types";
-    
+ 
   if(prop.has_set_to())
   {
-    std::vector<bvt> op_bv;
-    op_bv.reserve(expr.operands().size());
-
-    forall_operands(it, expr)
-      op_bv.push_back(convert_bv(*it));
-
-    bv=op_bv[0];
-
-    // add constraints
-
-    bvt equal_bv;
-    equal_bv.resize(bv.size());
+    unsigned width=boolbv_width(expr.type());
+    bv=prop.new_variables(width);
 
     bvt b;
-    b.reserve(op_bv.size()-1);
+    b.reserve(expr.operands().size());
 
-    for(unsigned i=1; i<op_bv.size(); i++)
+    // add constraints
+    forall_operands(it, expr)
     {
-      if(op_bv[i].size()!=bv.size())
+      bvt it_bv=convert_bv(*it);
+
+      if(it_bv.size()!=bv.size())
         throw "constraint_select_one expects matching width";
 
-      for(unsigned j=0; j<bv.size(); j++)
-        equal_bv[j]=prop.lequal(bv[j], op_bv[i][j]);
-
-      b.push_back(prop.land(equal_bv));
+      b.push_back(bv_utils.equal(bv, it_bv));
     }
 
     prop.lcnf(b);
