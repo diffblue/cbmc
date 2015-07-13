@@ -106,12 +106,13 @@ protected:
   virtual void error_trace(
     const prop_convt &prop_conv);
   
-  void cover(
+  bool cover(
     const goto_functionst &goto_functions,
     prop_convt &solver,
     const std::string &criterion);
 
   friend class bmc_all_propertiest;
+  friend class bmc_covert;
 };
 
 #endif

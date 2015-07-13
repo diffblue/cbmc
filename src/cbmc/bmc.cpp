@@ -458,8 +458,7 @@ bool bmct::run(const goto_functionst &goto_functions)
         bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
         
       std::string criterion=options.get_option("cover");
-      cover(goto_functions, bv_cbmc, criterion);
-      return false;
+      return cover(goto_functions, bv_cbmc, criterion);
     }
 
     // any properties to check at all?
