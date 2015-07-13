@@ -54,7 +54,8 @@ public:
         block_map[it]=block_count;
         
         next_is_target=
-          it->is_goto() || it->is_return() || it->is_function_call();
+          it->is_goto() || it->is_return() ||
+          it->is_function_call() || it->is_assume();
       }
     }
     
