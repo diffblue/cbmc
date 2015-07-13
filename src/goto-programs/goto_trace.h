@@ -36,6 +36,7 @@ public:
   bool is_assignment() const      { return type==ASSIGNMENT; }
   bool is_assume() const          { return type==ASSUME; }
   bool is_assert() const          { return type==ASSERT; }
+  bool is_goto() const            { return type==GOTO; }
   bool is_constraint() const      { return type==CONSTRAINT; }
   bool is_function_call() const   { return type==FUNCTION_CALL; }
   bool is_function_return() const { return type==FUNCTION_RETURN; }
@@ -51,7 +52,7 @@ public:
   bool is_atomic_begin() const    { return type==ATOMIC_BEGIN; }
   bool is_atomic_end() const      { return type==ATOMIC_END; }
 
-  typedef enum { NONE, ASSIGNMENT, ASSUME, ASSERT,
+  typedef enum { NONE, ASSIGNMENT, ASSUME, ASSERT, GOTO,
                  LOCATION, INPUT, OUTPUT, DECL, DEAD,
                  FUNCTION_CALL, FUNCTION_RETURN,
                  CONSTRAINT,
@@ -71,12 +72,9 @@ public:
   // this transition done by given thread number
   unsigned thread_nr;
   
-  // for assume, assert
+  // for assume, assert, goto
   bool cond_value;
   exprt cond_expr;
-  
-  // for goto
-  bool goto_taken;
   
   // for assert
   std::string comment;

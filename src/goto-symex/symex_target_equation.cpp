@@ -561,6 +561,34 @@ void symex_target_equationt::assertion(
 
 /*******************************************************************\
 
+Function: symex_target_equationt::goto_instruction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: record a goto instruction
+
+\*******************************************************************/
+
+void symex_target_equationt::goto_instruction(
+  const exprt &guard,
+  const exprt &cond,
+  const sourcet &source)
+{
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  
+  SSA_step.guard=guard;
+  SSA_step.cond_expr=cond;
+  SSA_step.type=goto_trace_stept::GOTO;
+  SSA_step.source=source;
+
+  merge_ireps(SSA_step);
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::constraint
 
   Inputs: 
@@ -609,6 +637,7 @@ void symex_target_equationt::convert(
   convert_decls(prop_conv);
   convert_assumptions(prop_conv);
   convert_assertions(prop_conv);
+  convert_goto_instructions(prop_conv);
   convert_io(prop_conv);
   convert_constraints(prop_conv);
 }
@@ -707,6 +736,34 @@ void symex_target_equationt::convert_assumptions(
       it!=SSA_steps.end(); it++)
   {
     if(it->is_assume())
+    {
+      if(it->ignore)
+        it->cond_literal=const_literal(true);
+      else
+        it->cond_literal=prop_conv.convert(it->cond_expr);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::convert_goto_instructions
+
+  Inputs: converter
+
+ Outputs: -
+
+ Purpose: converts goto instructions
+
+\*******************************************************************/
+
+void symex_target_equationt::convert_goto_instructions(
+  prop_convt &prop_conv)
+{
+  for(SSA_stepst::iterator it=SSA_steps.begin();
+      it!=SSA_steps.end(); it++)
+  {
+    if(it->is_goto())
     {
       if(it->ignore)
         it->cond_literal=const_literal(true);

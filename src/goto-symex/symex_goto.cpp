@@ -51,7 +51,7 @@ void goto_symext::symex_goto(statet &state)
     return; // nothing to do
   }
   
-  target.location(state.guard.as_expr(), state.source);
+  target.goto_instruction(state.guard.as_expr(), new_guard, state.source);
     
   assert(!instruction.targets.empty());
   
