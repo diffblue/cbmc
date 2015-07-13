@@ -21,107 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bmc.h"
 #include "bv_cbmc.h"
 
-#if 0
-void bmct::cover(
-  const goto_functionst &goto_functions,
-  prop_convt &solver,
-  const std::string &criterion)
-{
-  // convert
-
-  equation.convert_guards(solver);
-  equation.convert_assignments(solver);
-  equation.convert_decls(solver);
-  equation.convert_assumptions(solver);
-
-  // collect _all_ goals in `goal_map'
-  typedef std::map<goto_programt::const_targett, exprt::operandst> goal_mapt;
-  goal_mapt goal_map;
-  
-  forall_goto_functions(f_it, goto_functions)
-    forall_goto_program_instructions(i_it, f_it->second.body)
-      if(i_it->is_assert())
-        goal_map[i_it]=exprt::operandst();
-
-  // get the conditions for these goals from formula
-
-  exprt assumption=true_exprt();
-
-  for(symex_target_equationt::SSA_stepst::iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
-      it++)
-  {
-    if(it->is_assert())
-    {
-      // We just want reachability, i.e., the guard of the instruction,
-      // not the assertion itself. The guard has been converted above.
-      exprt goal=and_exprt(assumption, literal_exprt(it->guard_literal));
-
-      goal_map[it->source.pc].push_back(goal);
-    }
-    else if(it->is_assume())
-    {
-      // Assumptions have been converted above.
-      assumption=
-        and_exprt(assumption, literal_exprt(it->cond_literal));
-    }
-  }
-  
-  // try to cover those
-  cover_goalst cover_goals(solver);
-  cover_goals.set_message_handler(get_message_handler());
-
-  for(goal_mapt::const_iterator
-      it=goal_map.begin();
-      it!=goal_map.end();
-      it++)
-  {
-    // the following is FALSE if the bv is empty
-    literalt condition=solver.convert(disjunction(it->second));
-    cover_goals.add(condition);
-  }
-
-  status() << "Total number of coverage goals: " << cover_goals.size() << eom;
-
-  cover_goals();
-
-  // report
-  std::list<cover_goalst::goalt>::const_iterator g_it=
-    cover_goals.goals.begin();
-      
-  for(goal_mapt::const_iterator
-      it=goal_map.begin();
-      it!=goal_map.end();
-      it++, g_it++)
-  {
-    if(ui==ui_message_handlert::XML_UI)
-    {
-      xmlt xml_result("result");
-      
-      // use this one
-      xml_result.set_attribute("name", id2string(it->first->source_location.get_property_id()));
-
-      xml_result.set_attribute("status",
-        g_it->covered?"COVERED":"NOT_COVERED");
-      
-      std::cout << xml_result << "\n";
-    }
-    else
-    {
-      if(!g_it->covered)
-        warning() << "!! failed to cover " << it->first->source_location;
-    }
-  }
-
-  status() << eom;
-
-  status() << "** Covered " << cover_goals.number_covered()
-           << " of " << cover_goals.size() << " in "
-           << cover_goals.iterations() << " iterations" << eom;
-}
-#endif
-
 /*******************************************************************\
 
    Class: bmc_covert
@@ -139,6 +38,35 @@ class bmc_covert:
   public messaget
 {
 public:
+  class basic_blockst
+  {
+  public:
+    explicit basic_blockst(const goto_programt &_goto_program)
+    {
+      bool next_is_target=true;
+      unsigned block_count=0;
+
+      forall_goto_program_instructions(it, _goto_program)
+      {
+        if(next_is_target || it->is_target())
+          block_count++;
+          
+        block_map[it]=block_count;
+        
+        next_is_target=
+          it->is_goto() || it->is_return() || it->is_function_call();
+      }
+    }
+    
+    typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
+    block_mapt block_map;
+    
+    inline unsigned operator[](goto_programt::const_targett t)
+    {
+      return block_map[t];
+    }
+  };
+
   bmc_covert(
     const goto_functionst &_goto_functions,
     prop_convt &_solver,
@@ -298,50 +226,53 @@ bool bmc_covert::operator()(const criteriont criterion)
   // stop the time
   absolute_timet sat_start=current_time();
   
-  bmc.do_conversion(solver);  
+  bmc.do_conversion(solver);
+  
+  std::map<goto_programt::const_targett, irep_idt> location_map;
   
   // Collect _all_ goals in `goal_map'.
   // This maps property IDs to 'goalt'
   forall_goto_functions(f_it, goto_functions)
   {
+    basic_blockst basic_blocks(f_it->second.body);
+  
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(i_it->function==ID__start ||
          i_it->function=="__CPROVER_initialize")
         continue;
         
-      if(i_it->is_assert() ||
-         i_it->is_assign() ||
-         i_it->is_goto() ||
-         i_it->is_end_function() ||
-         i_it->is_decl() ||
-         i_it->is_target())
-      {        
-        switch(criterion)
-        {
-        case C_ASSERTION:
-          if(i_it->is_assert())
-            goal_map[id(i_it)]=
-              goalt(id2string(i_it->source_location.get_comment()));
-          break;
-          
-        case C_LOCATION:
+      switch(criterion)
+      {
+      case C_ASSERTION:
+        if(i_it->is_assert())
           goal_map[id(i_it)]=
-            goalt("function "+id2string(f_it->first)+" location "+i2string(i_it->location_number));
-          break;
+            goalt(id2string(i_it->source_location.get_comment()));
+        break;
         
-        case C_BRANCH:
-          if(i_it->is_goto() && !i_it->guard.is_true())
-          {
-            goal_map[id(i_it, "TK")]=
-              goalt("function "+id2string(f_it->first)+" location "+i2string(i_it->location_number)+" branch taken");
-            goal_map[id(i_it, "NT")]=
-              goalt("function "+id2string(f_it->first)+" location "+i2string(i_it->location_number)+" branch not taken");
-          }
-          break;
-        
-        default:;
+      case C_LOCATION:
+        {
+          std::string b=i2string(basic_blocks[i_it]);
+          std::string id=id2string(f_it->first)+"#"+b;
+          location_map[i_it]=id;
+          if(goal_map[id].description=="" &&
+             i_it->source_location.get_file()!="")
+            goal_map[id]=goalt("block "+i_it->source_location.as_string());
         }
+        break;
+      
+      case C_BRANCH:
+        if(i_it->is_goto() && !i_it->guard.is_true())
+        {
+          std::string b=i2string(basic_blocks[i_it]);
+          goal_map[id(i_it, "TK")]=
+            goalt("function "+id2string(f_it->first)+" block "+b+" branch taken");
+          goal_map[id(i_it, "NT")]=
+            goalt("function "+id2string(f_it->first)+" block "+b+" branch not taken");
+        }
+        break;
+      
+      default:;
       }
     }
   }
@@ -365,7 +296,10 @@ bool bmc_covert::operator()(const criteriont criterion)
       break;
       
     case C_LOCATION:
-      goal_map[id(it->source.pc)].add_instance(it, it->guard_literal);
+      {
+        irep_idt id=location_map[it->source.pc];
+        goal_map[id].add_instance(it, it->guard_literal);
+      }
       break;
     
     case C_BRANCH:
@@ -428,7 +362,8 @@ bool bmc_covert::operator()(const criteriont criterion)
     if(bmc.ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
-      xml_result.set_attribute("property", id2string(it->first));
+      xml_result.set_attribute("goal", id2string(it->first));
+      xml_result.set_attribute("description", it->second.description);
       xml_result.set_attribute("status", it->second.satisfied?"SATISFIED":"FAILED");
 
       if(it->second.satisfied)
