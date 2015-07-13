@@ -445,7 +445,7 @@ bool bmct::run(const goto_functionst &goto_functions)
       return false;
     }
     
-    if(options.get_bool_option("cover-assertions"))
+    if(options.get_option("cover")!="")
     {
       satcheckt satcheck;
       satcheck.set_message_handler(get_message_handler());
@@ -456,8 +456,9 @@ bool bmct::run(const goto_functionst &goto_functions)
         bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
       else if(options.get_option("arrays-uf")=="always")
         bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-    
-      cover_assertions(goto_functions, bv_cbmc);
+        
+      std::string criterion=options.get_option("cover");
+      cover(goto_functions, bv_cbmc, criterion);
       return false;
     }
 

@@ -106,10 +106,10 @@ protected:
   virtual void error_trace(
     const prop_convt &prop_conv);
   
-  // vacuity checks
-  void cover_assertions(
+  void cover(
     const goto_functionst &goto_functions,
-    prop_convt &solver);
+    prop_convt &solver,
+    const std::string &criterion);
 
   friend class bmc_all_propertiest;
 };
