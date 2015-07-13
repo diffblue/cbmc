@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: bmct::cover_assertions
+Function: bmct::cover
 
   Inputs:
 
@@ -29,9 +29,10 @@ Function: bmct::cover_assertions
 
 \*******************************************************************/
 
-void bmct::cover_assertions(
+void bmct::cover(
   const goto_functionst &goto_functions,
-  prop_convt &solver)
+  prop_convt &solver,
+  const std::string &criterion)
 {
   // convert
 

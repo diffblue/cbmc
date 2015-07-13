@@ -145,8 +145,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("show-vcc"))
     options.set_option("show-vcc", true);
 
-  if(cmdline.isset("cover-assertions"))
-    options.set_option("cover-assertions", true);
+  if(cmdline.isset("cover"))
+    options.set_option("cover", cmdline.get_value("cover"));
 
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
@@ -248,7 +248,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("error-label", cmdline.get_values("error-label"));
 
   // generate unwinding assertions
-  if(cmdline.isset("cover-assertions"))
+  if(cmdline.isset("cover"))
     options.set_option("unwinding-assertions", false);
   else
     options.set_option("unwinding-assertions",
@@ -836,10 +836,11 @@ bool cbmc_parse_optionst::process_goto_program(
     // add loop ids
     goto_functions.compute_loop_numbers();
     
-    // if we aim to cover, replace
+    // if we aim to cover assertions, replace
     // all assertions by false to prevent simplification
     
-    if(cmdline.isset("cover-assertions"))
+    if(cmdline.isset("cover") &&
+       cmdline.get_value("cover")=="assertions")
       make_assertions_false(goto_functions);
 
     // show it?
@@ -990,7 +991,7 @@ void cbmc_parse_optionst::help()
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
-    " --cover-assertions           check which assertions are reachable\n"
+    " --cover CC                   create test-suite with coverage criterion CC\n"
     " --mm MM                      memory consistency model for concurrent programs\n"
     "\n"
     "BMC options:\n"
