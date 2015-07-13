@@ -148,6 +148,12 @@ public:
     const std::string &msg,
     const sourcet &source)=0;
 
+  // record a goto
+  virtual void goto_instruction(
+    const exprt &guard,
+    const exprt &cond,
+    const sourcet &source)=0;
+
   // record a constraint
   virtual void constraint(
     const exprt &cond,
