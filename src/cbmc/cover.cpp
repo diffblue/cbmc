@@ -185,6 +185,9 @@ void bmc_covert::goal_covered(const cover_goalst::goalt &)
       g_it++)
   {
     goalt &g=g_it->second;
+    
+    // covered already?
+    if(g.satisifed) continue;
   
     // check whether satisfied
     for(goalt::instancest::const_iterator

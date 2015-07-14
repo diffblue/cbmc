@@ -113,6 +113,9 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
       g_it++)
   {
     goalt &g=g_it->second;
+    
+    // failed already?
+    if(g.failed) continue;
   
     // check whether failed
     for(goalt::instancest::const_iterator
