@@ -122,6 +122,10 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
     get_symbols(SSA_step.cond_expr);
     break;
 
+  case goto_trace_stept::GOTO:
+    get_symbols(SSA_step.cond_expr);
+    break;
+
   case goto_trace_stept::LOCATION:
     // ignore
     break;
