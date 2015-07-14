@@ -1,4 +1,5 @@
 #include <cassert>
+#include <map>
 
 #include <util/expr.h>
 #include <util/std_code.h>
