@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <stack>
+#include <map>
 
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"

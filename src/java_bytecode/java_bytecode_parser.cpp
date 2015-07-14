@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <fstream>
+#include <map>
 
 #include <util/i2string.h>
 #include <util/parser.h>
