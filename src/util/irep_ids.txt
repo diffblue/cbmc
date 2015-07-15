@@ -581,6 +581,7 @@ generate_case
 generate_if
 generate_for
 delay
+cycle_delay
 hierarchical_identifier
 named_port_connection
 named_block
