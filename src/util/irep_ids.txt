@@ -582,6 +582,7 @@ generate_if
 generate_for
 delay
 cycle_delay
+cycle_delay_and
 hierarchical_identifier
 named_port_connection
 named_block
