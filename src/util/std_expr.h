@@ -486,6 +486,31 @@ protected:
   using exprt::op2; // hide
 };
 
+/*! \brief Cast a generic exprt to a \ref binary_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * binary_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref binary_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const binary_exprt &to_binary_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<const binary_exprt &>(expr);
+}
+
+/*! \copydoc to_binary_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline binary_exprt &to_binary_expr(exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<binary_exprt &>(expr);
+}
+
 /*! \brief A generic base class for expressions that are predicates,
            i.e., boolean-typed, and that take exactly two arguments.
 */
