@@ -447,6 +447,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(new_decl.type().id()==ID_struct)
   {
+    // a class template
     convert_non_template_declaration(new_decl);
 
     // also instantiate all the template methods
