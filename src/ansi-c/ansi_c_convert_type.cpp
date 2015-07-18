@@ -215,7 +215,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       // these are symbols
       const irep_idt &id=it->get(ID_identifier);
 
-      if(id=="thread")
+      if(id==ID_thread)
         c_storage_spec.is_thread_local=true;
       else if(id=="align")
       {
