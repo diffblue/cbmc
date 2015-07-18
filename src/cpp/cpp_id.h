@@ -61,7 +61,7 @@ public:
   }
   
   irep_idt identifier, base_name;
-
+  
   // if it is a member or method, what class is it in?
   irep_idt class_identifier;
   exprt this_expr;
@@ -70,29 +70,6 @@ public:
   std::string prefix, suffix;
   unsigned compound_counter;
   
-  cpp_idt &insert(const irep_idt &_base_name)
-  {
-    cpp_id_mapt::iterator it=
-      sub.insert(std::pair<irep_idt, cpp_idt>
-        (_base_name, cpp_idt()));
-
-    it->second.base_name=_base_name;
-    it->second.set_parent(*this);
-
-    return it->second;
-  }
-
-  cpp_idt &insert(const cpp_idt &cpp_id)
-  {
-    cpp_id_mapt::iterator it=
-      sub.insert(std::pair<irep_idt, cpp_idt>
-        (cpp_id.base_name, cpp_id));
-
-    it->second.set_parent(*this);
-
-    return it->second;
-  }
-
   inline cpp_idt &get_parent() const
   {
     assert(parent!=NULL);
@@ -118,7 +95,6 @@ public:
 protected:
   cpp_id_mapt sub;
 
-private:
   // These are used for base classes and 'using' clauses.
   typedef std::vector<cpp_idt *> scope_listt;
   scope_listt using_scopes, secondary_scopes;
