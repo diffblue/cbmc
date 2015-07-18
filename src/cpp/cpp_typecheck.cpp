@@ -340,7 +340,7 @@ void cpp_typecheckt::do_not_typechecked()
       {
         assert(symbol.type.id()==ID_code);
 
-        if(symbol.base_name =="operator=")
+        if(symbol.base_name=="operator=")
         {
           cpp_declaratort declarator;
           declarator.add_source_location() = symbol.location;
@@ -350,7 +350,7 @@ void cpp_typecheckt::do_not_typechecked()
           convert_function(symbol);
           cont=true;
         }
-        else if(symbol.value.operands().size() == 1)
+        else if(symbol.value.operands().size()==1)
         {
           exprt tmp = symbol.value.operands()[0];
           symbol.value.swap(tmp);
