@@ -169,7 +169,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
     cppname.get_sub().push_back(name);
 
     exprt member(ID_ptrmember);
-    member.set("component_cpp_name", cppname);
+    member.set(ID_component_cpp_name, cppname);
     member.operands().push_back(exprt("cpp-this"));
     member.add_source_location() = source_location;
 
