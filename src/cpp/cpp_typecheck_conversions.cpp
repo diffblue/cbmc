@@ -1244,7 +1244,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         cpp_func_name.get_sub().push_back(func_name);
 
         exprt member_func(ID_member);
-        member_func.add("component_cpp_name") = cpp_func_name;
+        member_func.add(ID_component_cpp_name) = cpp_func_name;
         exprt ac("already_typechecked");
         ac.copy_to_operands(expr);
         member_func.copy_to_operands(ac);
@@ -1516,7 +1516,7 @@ bool cpp_typecheckt::reference_binding(
         cpp_func_name.get_sub().push_back(func_name);
 
         exprt member_func(ID_member);
-        member_func.add("component_cpp_name") = cpp_func_name;
+        member_func.add(ID_component_cpp_name) = cpp_func_name;
         exprt ac("already_typechecked");
         ac.copy_to_operands(expr);
         member_func.copy_to_operands(ac);
