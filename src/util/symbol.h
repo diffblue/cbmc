@@ -58,7 +58,7 @@ public:
   
   const irep_idt &display_name() const
   {
-    return pretty_name==""?name:pretty_name;
+    return pretty_name.empty()?name:pretty_name;
   }
   
   // global use
