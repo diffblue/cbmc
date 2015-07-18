@@ -107,10 +107,10 @@ static void copy_member(
 
   exprt &op1 = code.op0().op1();
 
-  op1.add("component_cpp_name").id(ID_cpp_name);
-  op1.add("component_cpp_name").get_sub().push_back(irept(ID_name));
-  op1.add("component_cpp_name").get_sub().back().set(ID_identifier, member_base_name);
-  op1.add("component_cpp_name").get_sub().back().set(ID_C_source_location, source_location);
+  op1.add(ID_component_cpp_name).id(ID_cpp_name);
+  op1.add(ID_component_cpp_name).get_sub().push_back(irept(ID_name));
+  op1.add(ID_component_cpp_name).get_sub().back().set(ID_identifier, member_base_name);
+  op1.add(ID_component_cpp_name).get_sub().back().set(ID_C_source_location, source_location);
 
   op1.operands().push_back(exprt(ID_cpp_name));
   op1.op0().get_sub().push_back(irept(ID_name));
@@ -165,10 +165,10 @@ static void copy_array(
 
   exprt& op1 = code.op0().op1();
   op1.operands().push_back(exprt(ID_member));
-  op1.op0().add("component_cpp_name").id(ID_cpp_name);
-  op1.op0().add("component_cpp_name").get_sub().push_back(irept(ID_name));
-  op1.op0().add("component_cpp_name").get_sub().back().set(ID_identifier, member_base_name);
-  op1.op0().add("component_cpp_name").get_sub().back().set(ID_C_source_location, source_location);
+  op1.op0().add(ID_component_cpp_name).id(ID_cpp_name);
+  op1.op0().add(ID_component_cpp_name).get_sub().push_back(irept(ID_name));
+  op1.op0().add(ID_component_cpp_name).get_sub().back().set(ID_identifier, member_base_name);
+  op1.op0().add(ID_component_cpp_name).get_sub().back().set(ID_C_source_location, source_location);
 
   op1.op0().operands().push_back(exprt(ID_cpp_name));
   op1.op0().op0().get_sub().push_back(irept(ID_name));
@@ -382,7 +382,7 @@ void cpp_typecheckt::default_cpctor(
     mem_init.add_source_location() = source_location;
 
     exprt memberexpr(ID_member);
-    memberexpr.set("component_cpp_name", cppname);
+    memberexpr.set(ID_component_cpp_name, cppname);
     memberexpr.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
     memberexpr.add_source_location() = source_location;
 

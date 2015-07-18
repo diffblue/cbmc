@@ -6466,7 +6466,7 @@ bool Parser::rPostfixExpr(exprt &exp)
         set_location(exp, op);
       }
 
-      exp.add("component_cpp_name").swap(e);
+      exp.add(ID_component_cpp_name).swap(e);
 
       break;
 

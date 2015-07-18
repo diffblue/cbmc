@@ -136,7 +136,7 @@ codet cpp_typecheckt::cpp_destructor(
     exprt member_expr(ID_member);
     member_expr.copy_to_operands(object);
     member_expr.op0().type().set(ID_C_constant, false);
-    member_expr.add("component_cpp_name").swap(cpp_name);
+    member_expr.add(ID_component_cpp_name).swap(cpp_name);
     member_expr.add_source_location()=source_location;
 
     side_effect_expr_function_callt function_call;
