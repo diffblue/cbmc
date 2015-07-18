@@ -150,7 +150,7 @@ void ansi_c_parsert::add_declarator(
     ansi_c_declaration.set_is_global(true);
 
   // abstract?
-  if(base_name!="")
+  if(!base_name.empty())
   {
     c_storage_spect c_storage_spec(ansi_c_declaration.type());
     bool is_typedef=c_storage_spec.is_typedef;

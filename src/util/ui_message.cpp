@@ -208,7 +208,8 @@ void ui_message_handlert::xml_ui_msg(
   xmlt result;
   result.name="message";
 
-  if(location.is_not_nil() && location.get_file()!="")
+  if(location.is_not_nil() &&
+     !location.get_file().empty())
     result.new_element(xml(location));
 
   result.new_element("text").data=msg1;

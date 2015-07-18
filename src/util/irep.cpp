@@ -1014,7 +1014,7 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
 
   std::string result;
 
-  if(id()!="")
+  if(!id().empty())
   {
     result+=id_string();
     indent+=2;
