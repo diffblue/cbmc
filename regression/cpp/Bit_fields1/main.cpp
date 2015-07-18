@@ -28,10 +28,10 @@ template<> class trait<unsigned> { public: enum { t=1 }; };
 template<> class trait<signed> { public: enum { t=2 }; };
 template<> class trait<some_enum_type> { public: enum { t=3 }; };
 
-static_assert(trait<decltype(X.a)>::t==1, "X.a");
-static_assert(trait<decltype(X.c)>::t==2, "X.c");
-static_assert(trait<decltype(X.x)>::t==2, "X.x");
-static_assert(trait<decltype(X.enum_field1)>::t==3, "X.enum_field1");
+static_assert(trait<decltype(X.a)>::t==1, "X.a is unsigned");
+static_assert(trait<decltype(X.c)>::t==2, "X.c is signed");
+static_assert(trait<decltype(X.x)>::t==2, "X.x is signed");
+static_assert(trait<decltype(X.enum_field1)>::t==3, "X.enum_field1 is an enum");
 
 int main()
 {
