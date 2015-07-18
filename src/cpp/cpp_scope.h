@@ -42,6 +42,29 @@ public:
     cpp_idt::id_classt id_class,
     id_sett &id_set);
 
+  cpp_idt &insert(const irep_idt &_base_name)
+  {
+    cpp_id_mapt::iterator it=
+      sub.insert(std::pair<irep_idt, cpp_idt>
+        (_base_name, cpp_idt()));
+
+    it->second.base_name=_base_name;
+    it->second.set_parent(*this);
+
+    return it->second;
+  }
+
+  cpp_idt &insert(const cpp_idt &cpp_id)
+  {
+    cpp_id_mapt::iterator it=
+      sub.insert(std::pair<irep_idt, cpp_idt>
+        (cpp_id.base_name, cpp_id));
+
+    it->second.set_parent(*this);
+
+    return it->second;
+  }
+
   bool contains(const irep_idt &base_name);
 
   bool is_root_scope() const
