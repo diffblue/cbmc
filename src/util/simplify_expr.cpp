@@ -2941,7 +2941,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     simplify_node(expr);
     return false;
   }
-  else if(expr.id()=="<=>")
+  else if(expr.id()==ID_iff)
   {
     if(operands.size()!=2 ||
        operands.front().type().id()!=ID_bool ||
