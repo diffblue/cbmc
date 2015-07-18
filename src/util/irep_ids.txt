@@ -582,8 +582,11 @@ generate_case
 generate_if
 generate_for
 delay
-cycle_delay
-cycle_delay_and
+verilog_cycle_delay
+sva_cycle_delay
+sva_sequence_throughout
+sva_sequence_concatenation
+sva_sequence_first_match
 hierarchical_identifier
 named_port_connection
 named_block
