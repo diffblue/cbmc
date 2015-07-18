@@ -125,6 +125,7 @@ C_incomplete #incomplete
 identifier
 name
 cpp_name
+component_cpp_name
 C_id_class #id_class
 declaration
 declaration_list
@@ -680,3 +681,12 @@ Verilog
 verilog_realtime
 onehot
 onehot0
+verilog_star_event
+verilog_attribute
+time
+fork
+disable
+wait
+deassign
+force
+release
