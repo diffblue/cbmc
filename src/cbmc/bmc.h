@@ -56,6 +56,7 @@ public:
   
   void set_ui(language_uit::uit _ui) { ui=_ui; }
 
+  // the safety_checkert interface
   virtual resultt operator()(
     const goto_functionst &goto_functions);
 
