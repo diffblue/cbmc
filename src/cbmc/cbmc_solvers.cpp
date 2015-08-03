@@ -188,10 +188,9 @@ Function: bmct::decide_default
 
 \*******************************************************************/
 
-bool bmct::decide_default(const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::decide_default(
+  const goto_functionst &goto_functions)
 {
-  bool result=true;
-  
   std::unique_ptr<propt> solver;
 
   // SAT preprocessor won't work with beautification.
@@ -218,9 +217,8 @@ bool bmct::decide_default(const goto_functionst &goto_functions)
   switch(run_decision_procedure(bv_cbmc))
   {
   case decision_proceduret::D_UNSATISFIABLE:
-    result=false;
     report_success();
-    break;
+    return SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
     if(options.get_bool_option("beautify"))
@@ -229,13 +227,12 @@ bool bmct::decide_default(const goto_functionst &goto_functions)
 
     error_trace(bv_cbmc);
     report_failure();
-    break;
+    return UNSAFE;
 
   default:
     error() << "decision procedure failed" << eom;
+    return ERROR;
   }
-
-  return result;
 }
 
 /*******************************************************************\
@@ -250,7 +247,7 @@ Function: bmct::decide_aig
 
 \*******************************************************************/
 
-bool bmct::decide_aig(const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::decide_aig(const goto_functionst &goto_functions)
 {
   std::unique_ptr<propt> sub_solver;
 
@@ -285,7 +282,7 @@ Function: bmct::bv_refinement
 
 \*******************************************************************/
 
-bool bmct::decide_bv_refinement(const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::decide_bv_refinement(const goto_functionst &goto_functions)
 {
   std::unique_ptr<propt> solver;
 
@@ -320,7 +317,7 @@ Function: bmct::decide_smt1
 
 \*******************************************************************/
 
-bool bmct::decide_smt1(const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::decide_smt1(const goto_functionst &goto_functions)
 {
   smt1_dect::solvert solver=get_smt1_solver_type();
   const std::string &filename=options.get_option("outfile");
@@ -344,13 +341,13 @@ bool bmct::decide_smt1(const goto_functionst &goto_functions)
     if(!out)
     {
       std::cerr << "failed to open " << filename << std::endl;
-      return false;
+      return ERROR;
     }
     
     smt1_convert(solver, out);
   }
   
-  return false;
+  return SAFE; // to indicate non-error
 }
 
 /*******************************************************************\
@@ -394,7 +391,7 @@ Function: bmct::decide_smt2
 
 \*******************************************************************/
 
-bool bmct::decide_smt2(const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::decide_smt2(const goto_functionst &goto_functions)
 {
   smt2_dect::solvert solver=get_smt2_solver_type();
   const std::string &filename=options.get_option("outfile");
@@ -421,13 +418,13 @@ bool bmct::decide_smt2(const goto_functionst &goto_functions)
     if(!out)
     {
       std::cerr << "failed to open " << filename << std::endl;
-      return false;
+      return ERROR;
     }
     
     smt2_convert(solver, out);
   }
   
-  return false;
+  return SAFE; // to indicate non-error
 }
 
 /*******************************************************************\

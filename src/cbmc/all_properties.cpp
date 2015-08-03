@@ -46,7 +46,7 @@ public:
   {
   }
 
-  bool operator()();
+  safety_checkert::resultt operator()();
 
   virtual void goal_covered(const cover_goalst::goalt &);
 
@@ -149,7 +149,7 @@ Function: bmc_all_propertiest::operator()
 
 \*******************************************************************/
 
-bool bmc_all_propertiest::operator()()
+safety_checkert::resultt bmc_all_propertiest::operator()()
 {
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
@@ -258,7 +258,8 @@ bool bmc_all_propertiest::operator()()
            << " of " << cover_goals.size() << " failed ("
            << cover_goals.iterations() << " iterations)" << eom;
   
-  return false;
+  return (cover_goals.number_covered()==0)?
+    safety_checkert::SAFE:safety_checkert::UNSAFE;
 }
 
 /*******************************************************************\
@@ -273,7 +274,7 @@ Function: bmct::all_properties
 
 \*******************************************************************/
 
-bool bmct::all_properties(
+safety_checkert::resultt bmct::all_properties(
   const goto_functionst &goto_functions,
   prop_convt &solver)
 {

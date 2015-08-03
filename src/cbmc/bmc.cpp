@@ -331,7 +331,8 @@ Function: bmct::run
 
 \*******************************************************************/
 
-bool bmct::run(const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::run(
+  const goto_functionst &goto_functions)
 {
   const std::string mm=options.get_option("mm");
   std::unique_ptr<memory_model_baset> memory_model;
@@ -346,7 +347,7 @@ bool bmct::run(const goto_functionst &goto_functions)
   {
     error() << "Invalid memory model " << mm
             << " -- use one of sc, tso, pso" << eom;
-    return true;
+    return safety_checkert::ERROR;
   }
 
   symex.set_message_handler(get_message_handler());
@@ -378,7 +379,7 @@ bool bmct::run(const goto_functionst &goto_functions)
     message_stream.err_location(symex.last_source_location);
     message_stream.str << error_str;
     message_stream.error_msg();
-    return true;
+    return safety_checkert::ERROR;
   }
 
   catch(const char *error_str)
@@ -387,13 +388,13 @@ bool bmct::run(const goto_functionst &goto_functions)
     message_stream.err_location(symex.last_source_location);
     message_stream.str << error_str;
     message_stream.error_msg();
-    return true;
+    return safety_checkert::ERROR;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return true;
+    return safety_checkert::ERROR;
   }
 
   statistics() << "size of program expression: "
@@ -442,7 +443,7 @@ bool bmct::run(const goto_functionst &goto_functions)
     if(options.get_bool_option("show-vcc"))
     {
       show_vcc();
-      return false;
+      return safety_checkert::SAFE; // to indicate non-error
     }
     
     if(options.get_option("cover")!="")
@@ -458,7 +459,8 @@ bool bmct::run(const goto_functionst &goto_functions)
         bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
         
       std::string criterion=options.get_option("cover");
-      return cover(goto_functions, bv_cbmc, criterion);
+      return cover(goto_functions, bv_cbmc, criterion)?
+        safety_checkert::ERROR:safety_checkert::SAFE;
     }
 
     // any properties to check at all?
@@ -466,7 +468,7 @@ bool bmct::run(const goto_functionst &goto_functions)
        symex.remaining_vccs==0)
     {
       report_success();
-      return false;
+      return safety_checkert::SAFE;
     }
 
     if(options.get_bool_option("smt1"))
@@ -474,7 +476,7 @@ bool bmct::run(const goto_functionst &goto_functions)
     else if(options.get_bool_option("smt2"))
       return decide_smt2(goto_functions);
     else if(options.get_bool_option("dimacs"))
-      return write_dimacs();
+      return write_dimacs()?ERROR:SAFE;
     else if(options.get_bool_option("refine"))
       return decide_bv_refinement(goto_functions);
     else if(options.get_bool_option("aig"))
@@ -484,7 +486,7 @@ bool bmct::run(const goto_functionst &goto_functions)
       if(options.get_bool_option("program-only"))
       {
         show_program();
-        return false;
+        return safety_checkert::SAFE;
       }
 
       return decide_default(goto_functions);
@@ -494,19 +496,19 @@ bool bmct::run(const goto_functionst &goto_functions)
   catch(std::string &error_str)
   {
     error() << error_str << eom;
-    return true;
+    return safety_checkert::ERROR;
   }
 
   catch(const char *error_str)
   {
     error() << error_str << eom;
-    return true;
+    return safety_checkert::ERROR;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return true;
+    return safety_checkert::ERROR;
   }
 }
 
@@ -522,7 +524,7 @@ Function: bmct::decide
 
 \*******************************************************************/
 
-bool bmct::decide(
+safety_checkert::resultt bmct::decide(
   const goto_functionst &goto_functions,
   prop_convt &prop_conv)
 {
@@ -531,25 +533,21 @@ bool bmct::decide(
   if(options.get_bool_option("all-properties"))
     return all_properties(goto_functions, prop_conv);
 
-  bool result=true;
-
   switch(run_decision_procedure(prop_conv))
   {
   case decision_proceduret::D_UNSATISFIABLE:
-    result=false;
     report_success();
-    break;
+    return SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
     error_trace(prop_conv);
     report_failure();
-    break;
+    return UNSAFE;
 
   default:
     error() << "decision procedure failed" << eom;
+    return ERROR;
   }
-
-  return result;
 }
 
 /*******************************************************************\
@@ -604,28 +602,4 @@ void bmct::setup_unwind()
 
   if(options.get_option("unwind")!="")
     symex.set_unwind_limit(options.get_unsigned_int_option("unwind"));
-}
-
-/*******************************************************************\
-
-Function: bmct::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-safety_checkert::resultt bmct::operator()(
-  const goto_functionst &goto_functions)
-{
-  if(!run(goto_functions))
-    return safety_checkert::SAFE;
-
-  if(safety_checkert::error_trace.steps.empty())
-    return safety_checkert::ERROR;
-
-  return safety_checkert::UNSAFE;
 }
