@@ -110,7 +110,7 @@ public:
     return get_bool(ID_hide);
   }
   
-  static const source_locationt &nil()
+  inline static const source_locationt &nil()
   {
     return static_cast<const source_locationt &>(get_nil_irep());
   }
