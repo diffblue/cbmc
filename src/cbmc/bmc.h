@@ -23,17 +23,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 #include <langapi/language_ui.h>
 #include <goto-symex/symex_target_equation.h>
+#include <goto-programs/safety_checker.h>
 
 #include "symex_bmc.h"
 
-class bmct:public messaget
+class bmct:public safety_checkert
 {
 public:
   bmct(
     const optionst &_options,
     const symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
-    messaget(_message_handler),
+    safety_checkert(ns, _message_handler),
     options(_options),
     ns(_symbol_table, new_symbol_table),
     equation(ns),
@@ -54,7 +55,10 @@ public:
   friend class counterexample_beautification_greedyt;
   
   void set_ui(language_uit::uit _ui) { ui=_ui; }
-  
+
+  virtual resultt operator()(
+    const goto_functionst &goto_functions);
+
 protected:
   const optionst &options;  
   symbol_tablet new_symbol_table;
