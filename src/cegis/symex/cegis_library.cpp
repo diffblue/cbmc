@@ -7,10 +7,13 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/ui_message.h>
+
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_convert.h>
+
 #include <ansi-c/c_types.h>
 #include <ansi-c/cprover_library.h>
+
 #include <cegis/options/literals.h>
 
 namespace {

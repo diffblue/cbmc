@@ -7,8 +7,11 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <algorithm>
+
 #include <util/bv_arithmetic.h>
+
 #include <goto-programs/goto_trace.h>
+
 #include <cegis/options/literals.h>
 #include <cegis/util/goto_program_adapter.h>
 #include <cegis/symex/candidate_factory.h>
