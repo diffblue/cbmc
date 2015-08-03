@@ -44,7 +44,7 @@ public:
     symex.constant_propagation=options.get_bool_option("propagation");
   }
  
-  virtual bool run(const goto_functionst &goto_functions);
+  virtual resultt run(const goto_functionst &goto_functions);
   virtual ~bmct() { }
 
   // additional stuff   
@@ -58,7 +58,10 @@ public:
 
   // the safety_checkert interface
   virtual resultt operator()(
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions)
+  {
+    return run(goto_functions);
+  }
 
 protected:
   const optionst &options;  
@@ -73,16 +76,16 @@ protected:
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);
     
-  virtual bool decide(
+  virtual resultt decide(
     const goto_functionst &,
     prop_convt &);
     
   // the solvers we have
-  virtual bool decide_default(const goto_functionst &);
-  virtual bool decide_bv_refinement(const goto_functionst &);
-  virtual bool decide_aig(const goto_functionst &);
-  virtual bool decide_smt1(const goto_functionst &);
-  virtual bool decide_smt2(const goto_functionst &);
+  virtual resultt decide_default(const goto_functionst &);
+  virtual resultt decide_bv_refinement(const goto_functionst &);
+  virtual resultt decide_aig(const goto_functionst &);
+  virtual resultt decide_smt1(const goto_functionst &);
+  virtual resultt decide_smt2(const goto_functionst &);
   smt1_dect::solvert get_smt1_solver_type() const;
   smt2_dect::solvert get_smt2_solver_type() const;
   virtual void smt1_convert(smt1_dect::solvert solver, std::ostream &out);
@@ -100,7 +103,7 @@ protected:
   prop_convt *solver_factory();
 
   virtual void show_vcc();
-  virtual bool all_properties(
+  virtual resultt all_properties(
     const goto_functionst &goto_functions,
     prop_convt &solver);
   virtual void show_vcc(std::ostream &out);
