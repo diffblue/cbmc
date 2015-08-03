@@ -37,9 +37,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 
-#include <cegis/bmc_verification_oracle.h>
-#include <cegis/cegis.h>
-#include <cegis/ga_learning_algorithm.h>
+#include <cegis/bmc/bmc_verification_oracle.h>
+#include <cegis/symex/symex_learn.h>
+#include <cegis/facade/cegis.h>
+#include <cegis/options/cegis_options.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -496,8 +497,11 @@ int cbmc_parse_optionst::doit()
 
   if(cmdline.isset("cegis"))
   {
-    ga_learning_algorithmt learning_algorithm;
-    bmc_verification_oraclet verification_oracle(bmc, goto_functions);
+    if (cmdline.isset("function"))
+      options.set_option("function", cmdline.get_value("function"));
+    const cegis_optionst cegis_options(cmdline, options);
+    symex_learnt learning_algorithm(cegis_options, symbol_table, goto_functions, ui_message_handler);
+    bmc_verification_oraclet verification_oracle(options, symbol_table, goto_functions, ui_message_handler);
     return run_cegis(learning_algorithm, verification_oracle, result());
   }
 

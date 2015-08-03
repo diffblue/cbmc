@@ -1,5 +1,5 @@
 /*******************************************************************
- Module:  JAVA Bytecode Language Conversion
+ Module:  Counterexample-Guided Inductive Synthesis
 
  Authors: Daniel Kroening, kroening@kroening.com
  Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
@@ -8,8 +8,6 @@
 
 #ifndef CPROVER_CEGIS_H
 #define CPROVER_CEGIS_H
-
-#include <iosfwd>
 
 /**
  * @brief CEGIS common template algorithm.
@@ -24,8 +22,8 @@
  * @tparam learnt CEGIS learning algorithm type (e.g. GA).
  * @tparam oraclet CEGIS verification oracle type (e.g BMC).
  */
-template<class learnt, class oraclet>
-int run_cegis(learnt &learn, oraclet &oracle, std::ostream &os)
+template<class learnt, class oraclet, class mstreamt>
+int run_cegis(learnt &learn, oraclet &oracle, mstreamt &os)
 {
   do
   {

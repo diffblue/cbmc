@@ -69,7 +69,7 @@ void bmct::error_trace(const prop_convt &prop_conv)
 {
   status() << "Building error trace" << eom;
 
-  goto_tracet goto_trace;
+  goto_tracet &goto_trace=safety_checkert::error_trace;
   build_goto_trace(equation, prop_conv, ns, goto_trace);
   
   #if 0
@@ -604,4 +604,14 @@ void bmct::setup_unwind()
 
   if(options.get_option("unwind")!="")
     symex.set_unwind_limit(options.get_unsigned_int_option("unwind"));
+}
+
+safety_checkert::resultt bmct::operator ()(const goto_functionst &goto_functions)
+{
+  show_vcc(std::cout);
+  if (!run(goto_functions))
+    return safety_checkert::SAFE;
+  if (safety_checkert::error_trace.steps.empty())
+    return safety_checkert::ERROR;
+  return safety_checkert::UNSAFE;
 }
