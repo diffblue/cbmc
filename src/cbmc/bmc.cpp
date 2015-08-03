@@ -606,12 +606,28 @@ void bmct::setup_unwind()
     symex.set_unwind_limit(options.get_unsigned_int_option("unwind"));
 }
 
-safety_checkert::resultt bmct::operator ()(const goto_functionst &goto_functions)
+/*******************************************************************\
+
+Function: bmct::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+safety_checkert::resultt bmct::operator()(
+  const goto_functionst &goto_functions)
 {
   show_vcc(std::cout);
-  if (!run(goto_functions))
+
+  if(!run(goto_functions))
     return safety_checkert::SAFE;
-  if (safety_checkert::error_trace.steps.empty())
+
+  if(safety_checkert::error_trace.steps.empty())
     return safety_checkert::ERROR;
+
   return safety_checkert::UNSAFE;
 }
