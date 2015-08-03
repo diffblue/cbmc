@@ -1,6 +1,15 @@
-#include <cegis/options/literals.h>
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <goto-programs/goto_functions.h>
+
 #include <cegis/util/goto_program_adapter.h>
+#include <cegis/options/literals.h>
 
 goto_program_adaptert::goto_program_adaptert(symbol_tablet &symbol_table,
     goto_programt &goto_program) :

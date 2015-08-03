@@ -1,5 +1,15 @@
+/*******************************************************************\
+
+Module: Bounded Model Checking for ANSI-C + HDL
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <algorithm>
+
 #include <goto-programs/goto_functions.h>
+
 #include <cegis/options/cegis_options.h>
 #include <cegis/util/source_location_factory.h>
 #include <cegis/util/goto_program_adapter.h>

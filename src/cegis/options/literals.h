@@ -1,10 +1,11 @@
 /*******************************************************************
- Module:  Counterexample-Guided Inductive Synthesis
 
- Authors: Daniel Kroening, kroening@kroening.com
- Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+Module: Counterexample-Guided Inductive Synthesis
 
- \*******************************************************************/
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+
+\*******************************************************************/
 
 #ifndef CEGIS_LITERALS_H_
 #define CEGIS_LITERALS_H_

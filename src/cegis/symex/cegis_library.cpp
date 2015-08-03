@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <util/ui_message.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_convert.h>

@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #ifndef CEGIS_GOTO_PROGRAM_ADAPTER_H_
 #define CEGIS_GOTO_PROGRAM_ADAPTER_H_
 

@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <util/cmdline.h>
 #include <util/options.h>
 #include <util/mp_arith.h>
