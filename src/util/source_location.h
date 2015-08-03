@@ -112,7 +112,7 @@ public:
 };
 
 // will go away
-typedef source_locationt locationt;
+//typedef source_locationt locationt;
 
 std::ostream &operator <<(std::ostream &, const source_locationt &);
 
