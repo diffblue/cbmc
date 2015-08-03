@@ -14,6 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class source_locationt:public irept
 {
 public:
+  source_locationt()
+  {
+  }
+
   std::string as_string() const;
   
   inline const irep_idt &get_file() const
