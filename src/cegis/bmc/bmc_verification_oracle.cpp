@@ -7,9 +7,12 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <algorithm>
+
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_convert.h>
+
 #include <cbmc/bmc.h>
+
 #include <cegis/bmc/bmc_verification_oracle.h>
 
 bmc_verification_oraclet::bmc_verification_oraclet(const optionst &options,

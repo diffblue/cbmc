@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cmdline.h>
 #include <util/options.h>
 #include <util/mp_arith.h>
+
 #include <cegis/options/cegis_options.h>
 
 cegis_optionst::cegis_optionst(const cmdlinet &cmdline, const optionst &options) :
