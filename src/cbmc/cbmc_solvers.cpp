@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <solvers/sat/satcheck.h>
-#include <solvers/sat/satcheck_minisat2.h>
 
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
@@ -161,7 +160,7 @@ prop_convt *bmct::solver_factory()
       solver=std::unique_ptr<propt>(new satcheckt);
     }
     else
-      solver=std::unique_ptr<propt>(new satcheck_minisat_no_simplifiert);
+      solver=std::unique_ptr<propt>(new satcheck_no_simplifiert);
 
     solver->set_message_handler(get_message_handler());
       
@@ -202,7 +201,7 @@ bool bmct::decide_default(const goto_functionst &goto_functions)
     solver=std::unique_ptr<propt>(new satcheckt);
   }
   else
-    solver=std::unique_ptr<propt>(new satcheck_minisat_no_simplifiert);
+    solver=std::unique_ptr<propt>(new satcheck_no_simplifiert);
 
   solver->set_message_handler(get_message_handler());
     
@@ -258,7 +257,7 @@ bool bmct::decide_aig(const goto_functionst &goto_functions)
   if(options.get_bool_option("sat-preprocessor"))
     sub_solver=std::unique_ptr<propt>(new satcheckt);
   else
-    sub_solver=std::unique_ptr<propt>(new satcheck_minisat_no_simplifiert);
+    sub_solver=std::unique_ptr<propt>(new satcheck_no_simplifiert);
 
   aig_prop_solvert solver(*sub_solver);
 
@@ -294,7 +293,7 @@ bool bmct::decide_bv_refinement(const goto_functionst &goto_functions)
   if(options.get_bool_option("sat-preprocessor"))
     solver=std::unique_ptr<propt>(new satcheckt);
   else
-    solver=std::unique_ptr<propt>(new satcheck_minisat_no_simplifiert);
+    solver=std::unique_ptr<propt>(new satcheck_no_simplifiert);
   
   solver->set_message_handler(get_message_handler());
 

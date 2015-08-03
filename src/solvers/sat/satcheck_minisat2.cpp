@@ -226,10 +226,10 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
   }
   else
   {
-    Minisat::vec<Minisat::Lit> MiniSat_assumptions;
-    convert(assumptions, MiniSat_assumptions);
+    Minisat::vec<Minisat::Lit> solver_assumptions;
+    convert(assumptions, solver_assumptions);
 
-    if(solver->solve(MiniSat_assumptions))
+    if(solver->solve(solver_assumptions))
     {
       messaget::status() << 
         "SAT checker: negated claim is SATISFIABLE, i.e., does not hold" << eom;

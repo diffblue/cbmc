@@ -43,6 +43,7 @@ typedef satcheck_minisat1t satcheckt;
 #include "satcheck_minisat2.h"
 
 typedef satcheck_minisat_simplifiert satcheckt;
+typedef satcheck_minisat_no_simplifiert satcheck_no_simplifiert;
 
 #elif defined SATCHECK_PRECOSAT
 
@@ -67,6 +68,7 @@ typedef satcheck_lingelingt satcheckt;
 #include "satcheck_glucose.h"
 
 typedef satcheck_glucose_simplifiert satcheckt;
+typedef satcheck_glucose_no_simplifiert satcheck_no_simplifiert;
 
 #endif
 

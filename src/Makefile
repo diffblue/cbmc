@@ -61,3 +61,12 @@ minisat2-download:
 	@mv minisat-2.2.0 ../minisat-2.2.0
 	@(cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
 	@rm minisat2_2.2.0.orig.tar.gz
+
+glucose-download:
+	@echo "Downloading glucose-syrup"
+	@lwp-download http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
+	@tar xfz glucose-syrup.tgz
+	@rm -Rf ../glucose-syrup
+	@mv glucose-syrup ../
+	@rm glucose-syrup.tgz
+
