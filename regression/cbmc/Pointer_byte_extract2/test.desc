@@ -1,7 +1,7 @@
 CORE
 main.c
 --all-properties --little-endian
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.2\] .*: FAILED$
 ^\*\* 1 of 2 failed (2 iterations)$
