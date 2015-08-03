@@ -16,7 +16,7 @@ BUILD_ENV = AUTO
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
 MINISAT2 = ../../minisat-2.2.0
-#GLUCOSE = ../../glucose2.2
+#GLUCOSE = ../../glucose-syrup
 #SMVSAT =
 
 # Signing identity for MacOS Gatekeeper
