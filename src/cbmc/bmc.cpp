@@ -621,8 +621,6 @@ Function: bmct::operator()
 safety_checkert::resultt bmct::operator()(
   const goto_functionst &goto_functions)
 {
-  show_vcc(std::cout);
-
   if(!run(goto_functions))
     return safety_checkert::SAFE;
 
