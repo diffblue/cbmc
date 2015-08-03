@@ -1,0 +1,11 @@
+#line 2 "main.ii"
+template<typename T> struct member_fkt_ptr { };
+
+// the two below are different
+//template<typename R, typename A> struct member_fkt_ptr<R (A::*)()> { };
+template<typename R, typename A> struct member_fkt_ptr<R (A::*)() const> { };
+
+int main()
+{
+  __CPROVER::dump_scopes;
+}

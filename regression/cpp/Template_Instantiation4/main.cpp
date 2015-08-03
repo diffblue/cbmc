@@ -1,5 +1,5 @@
 template<int I>
-class X{
+class X {
 public:
   X()
   {
@@ -18,4 +18,11 @@ X<1> x;
 int main()
 {
   //x.some_func();
+}
+
+// also works with function templates
+template<typename T>
+void some_function_template()
+{
+  T::MORE_NONSENSE();
 }
