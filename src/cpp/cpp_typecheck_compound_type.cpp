@@ -1432,9 +1432,14 @@ void cpp_typecheckt::typecheck_member_function(
 
     throw 0;
   }
-
-  // remember for later typechecking of body
-  add_function_body(new_symbol);
+  
+  // Is this in a class template?
+  // If so, we defer typechecking until used.
+  if(cpp_scopes.current_scope().get_parent().is_template_scope())
+  {
+  }
+  else // remember for later typechecking of body
+    add_function_body(new_symbol);
 }
 
 /*******************************************************************\
