@@ -1,10 +1,22 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <algorithm>
+
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/std_types.h>
 #include <util/arith_tools.h>
+
 #include <ansi-c/c_types.h>
+
 #include <goto-programs/goto_functions.h>
+
 #include <cegis/options/cegis_options.h>
 #include <cegis/options/literals.h>
 #include <cegis/util/source_location_factory.h>

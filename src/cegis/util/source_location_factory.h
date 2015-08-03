@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #ifndef CEGIS_SOURCE_LOCATION_FACTORY_H_
 #define CEGIS_SOURCE_LOCATION_FACTORY_H_
 

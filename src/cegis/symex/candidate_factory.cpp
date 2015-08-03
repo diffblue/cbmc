@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <algorithm>
 #include <util/bv_arithmetic.h>
 #include <goto-programs/goto_trace.h>
@@ -44,7 +52,7 @@ bool is_operand(const exprt &expr, const size_t index)
   const exprt &array=element.array();
   if (ID_symbol != array.id()) return false;
   if (VARS != id2string(to_symbol_expr(array).get_identifier())) return false;
-  const exprt &element_index=element.index();
+  //const exprt &element_index=element.index();
   const mp_integer::llong_t var_index=from_index(element.index());
   return var_index >= 0 && static_cast<size_t>(var_index) == index;
 }

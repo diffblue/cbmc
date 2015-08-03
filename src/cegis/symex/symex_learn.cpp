@@ -1,11 +1,24 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <sstream>
 #include <algorithm>
+
 #include <util/options.h>
 #include <util/arith_tools.h>
+
 #include <ansi-c/c_types.h>
 #include <ansi-c/cprover_library.h>
+
 #include <goto-programs/goto_convert.h>
+
 #include <cbmc/bmc.h>
+
 #include <cegis/options/literals.h>
 #include <cegis/options/cegis_options.h>
 #include <cegis/util/source_location_factory.h>

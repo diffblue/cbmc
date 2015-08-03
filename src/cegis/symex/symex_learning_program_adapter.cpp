@@ -1,4 +1,13 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <algorithm>
+
 #include <cegis/options/cegis_options.h>
 #include <cegis/util/source_location_factory.h>
 #include <cegis/util/goto_program_adapter.h>
