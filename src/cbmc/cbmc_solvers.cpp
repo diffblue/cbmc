@@ -161,7 +161,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
     )
   {
     // simplifier won't work with beautification
-    propt* prop = new satcheck_minisat_no_simplifiert();
+    propt* prop = new satcheck_no_simplifiert();
     prop->set_message_handler(get_message_handler());
     
     bv_cbmct* bv_cbmc = new bv_cbmct(ns, *prop);
@@ -240,7 +240,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
     prop=new satcheckt();
   }
   else
-    prop=new satcheck_minisat_no_simplifiert();
+    prop=new satcheck_no_simplifiert();
   
   prop->set_message_handler(get_message_handler());
 
