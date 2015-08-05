@@ -25,7 +25,7 @@ Function: boolbvt::convert_unary_minus
 
 \*******************************************************************/
 
-void boolbvt::convert_unary_minus(const exprt &expr, bvt &bv)
+void boolbvt::convert_unary_minus(const unary_exprt &expr, bvt &bv)
 {
   const typet &type=ns.follow(expr.type());
 

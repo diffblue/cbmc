@@ -139,7 +139,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   {
     // these appear to have type "struct _GUID"
     // and they are lvalues!
-    expr.type()=symbol_typet("tag._GUID");
+    expr.type()=symbol_typet("tag-_GUID");
     follow(expr.type());
     expr.set(ID_C_lvalue, true);
   }
@@ -630,7 +630,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
     {
       exprt member(ID_member);
-      member.add("component_cpp_name")= cpp_name;
+      member.add(ID_component_cpp_name)= cpp_name;
 
       exprt tmp("already_typechecked");
       tmp.copy_to_operands(expr.op0());
@@ -721,7 +721,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           // Found! We turn op(a, b, ...) into a.op(b, ...)
           {
             exprt member(ID_member);
-            member.add("component_cpp_name")=cpp_name;
+            member.add(ID_component_cpp_name)=cpp_name;
 
             exprt tmp("already_typechecked");
             tmp.copy_to_operands(expr.op0());
@@ -1148,7 +1148,8 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
   if(cpp_scopes.current_scope().class_identifier.empty())
   {
     err_location(expr);
-    error("`this' is not allowed here");
+    str << "`this' is not allowed here";
+    error_msg();
     throw 0;
   }
 
@@ -1279,8 +1280,8 @@ void cpp_typecheckt::typecheck_expr_member(
   // explicit calls without knowing if a destructor is defined for the type. 
   // An explicit call to a destructor where none is defined has no effect.
   
-  if(expr.find("component_cpp_name").is_not_nil() &&
-     to_cpp_name(expr.find("component_cpp_name")).is_destructor() &&
+  if(expr.find(ID_component_cpp_name).is_not_nil() &&
+     to_cpp_name(expr.find(ID_component_cpp_name)).is_destructor() &&
      follow(op0.type()).id()!=ID_struct)
   {
     exprt tmp("cpp_dummy_destructor");
@@ -1318,10 +1319,10 @@ void cpp_typecheckt::typecheck_expr_member(
     
   irep_idt struct_identifier=type.get(ID_name);
 
-  if(expr.find("component_cpp_name").is_not_nil())
+  if(expr.find(ID_component_cpp_name).is_not_nil())
   {
     cpp_namet component_cpp_name=
-      to_cpp_name(expr.find("component_cpp_name"));
+      to_cpp_name(expr.find(ID_component_cpp_name));
 
     // go to the scope of the struct/union
     cpp_save_scopet save_scope(cpp_scopes);
@@ -1390,7 +1391,7 @@ void cpp_typecheckt::typecheck_expr_member(
 
     const irep_idt component_name=symbol_expr.get(ID_component_name);
 
-    expr.remove("component_cpp_name");
+    expr.remove(ID_component_cpp_name);
     expr.set(ID_component_name, component_name);
   }
 
@@ -1661,7 +1662,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       if(ptr_arg.type().id()!=ID_pointer)
       {
         err_location(source_location);
-        throw "__sync_* primitives take pointer as first argument";
+        throw "__sync_* primitives take a pointer as first argument";
       }
 
       symbol_exprt result;
@@ -1677,27 +1678,232 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
     }
     else if(identifier=="__atomic_load_n")
     {
-    }
-    else if(identifier=="__atomic_load")
-    {
+      // These are polymorphic
+      // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+      // type __atomic_load_n(type *ptr, int memorder)
+
+      if(fargs.operands.size()!=2)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects two arguments";
+      }
+
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=ptr_arg.type().subtype();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
     else if(identifier=="__atomic_store_n")
     {
-    }
-    else if(identifier=="__atomic_store")
-    {
+      // These are polymorphic
+      // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+      // void __atomic_store_n(type *ptr, type val, int memorder)
+
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects three arguments";
+      }
+
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type().subtype()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=empty_typet();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
     else if(identifier=="__atomic_exchange_n")
     {
+      // These are polymorphic
+      // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+      // type __atomic_exchange_n(type *ptr, type val, int memorder)
+
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects three arguments";
+      }
+
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type().subtype()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=ptr_arg.type().subtype();
+      result.type()=t;
+      expr.swap(result);
+      return;
+    }
+    else if(identifier=="__atomic_load" ||
+            identifier=="__atomic_store")
+    {
+      // void __atomic_load(type *ptr, type *ret, int memorder)
+      // void __atomic_store(type *ptr, type *val, int memorder)
+
+      if(fargs.operands.size()!=3)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects three arguments";
+      }
+
+      if(fargs.operands[0].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      if(fargs.operands[1].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as second argument";
+      }
+      
+      const exprt &ptr_arg=fargs.operands.front();
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=empty_typet();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
     else if(identifier=="__atomic_exchange")
     {
+      // void __atomic_exchange(type *ptr, type *val, type *ret, int memorder)
+
+      if(fargs.operands.size()!=4)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects four arguments";
+      }
+
+      if(fargs.operands[0].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      if(fargs.operands[1].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as second argument";
+      }
+      
+      if(fargs.operands[2].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as third argument";
+      }
+      
+      const exprt &ptr_arg=fargs.operands.front();
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=empty_typet();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
-    else if(identifier=="__atomic_compare_exchange_n")
+    else if(identifier=="__atomic_compare_exchange_n" ||
+            identifier=="__atomic_compare_exchange")
     {
-    }
-    else if(identifier=="__atomic_compare_exchange")
-    {
+      // bool __atomic_compare_exchange_n(type *ptr, type *expected, type desired, bool weak, int success_memorder, int failure_memorder)
+      // bool __atomic_compare_exchange(type *ptr, type *expected, type *desired, bool weak, int success_memorder, int failure_memorder)
+
+      if(fargs.operands.size()!=6)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" expects six arguments";
+      }
+
+      if(fargs.operands[0].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as first argument";
+      }
+      
+      if(fargs.operands[1].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as second argument";
+      }
+
+      if(identifier=="__atomic_compare_exchange" &&
+         fargs.operands[2].type().id()!=ID_pointer)
+      {
+        err_location(source_location);
+        throw id2string(identifier)+" takes a pointer as third argument";
+      }
+
+      const exprt &ptr_arg=fargs.operands.front();
+
+      symbol_exprt result;
+      result.add_source_location()=source_location;
+      result.set_identifier(identifier);
+      code_typet t;
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      
+      if(identifier=="__atomic_compare_exchange")
+        t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      else
+        t.parameters().push_back(code_typet::parametert(ptr_arg.type().subtype()));
+      
+      t.parameters().push_back(code_typet::parametert(c_bool_type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.parameters().push_back(code_typet::parametert(signed_int_type()));
+      t.return_type()=c_bool_type();
+      result.type()=t;
+      expr.swap(result);
+      return;
     }
     else if(identifier=="__atomic_add_fetch" ||
             identifier=="__atomic_sub_fetch" ||
@@ -1849,7 +2055,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
           ptrmem.operands().push_back(
             cpp_scopes.current_scope().this_expr);
 
-          ptrmem.add("component_cpp_name") = expr;
+          ptrmem.add(ID_component_cpp_name) = expr;
 
           ptrmem.add_source_location()=source_location;
           typecheck_expr_ptrmember(ptrmem, fargs);
@@ -1917,10 +2123,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   if(expr.function().id()==ID_member ||
      expr.function().id()==ID_ptrmember)
   {
-    if(expr.function().get("component_cpp_name")==ID_cpp_name)
+    if(expr.function().get(ID_component_cpp_name)==ID_cpp_name)
     {
       const cpp_namet &cpp_name=
-        to_cpp_name(expr.function().find("component_cpp_name"));
+        to_cpp_name(expr.function().find(ID_component_cpp_name));
       is_qualified=cpp_name.is_qualified();
     }
   }
@@ -2116,7 +2322,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     cppname.get_sub().push_back(name);
 
     exprt member(ID_member);
-    member.add("component_cpp_name") = cppname;
+    member.add(ID_component_cpp_name) = cppname;
 
     member.move_to_operands(op0);
 
@@ -2231,11 +2437,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   typecheck_function_call_arguments(expr);
 
   assert(expr.operands().size()==2);
-  
+
   add_implicit_dereference(expr);
 
   // we will deal with some 'special' functions here
-  do_special_functions(expr);
+  exprt tmp=do_special_functions(expr);
+  if(tmp.is_not_nil())
+    expr.swap(tmp);
 }
 
 /*******************************************************************\
@@ -2401,7 +2609,7 @@ void cpp_typecheckt::typecheck_method_application(
   }
 
   if(symbol.value.id()=="cpp_not_typechecked" &&
-      !symbol.value.get_bool("is_used"))
+     !symbol.value.get_bool("is_used"))
   {
     symbol_table.symbols[symbol.name].value.set("is_used", true);
   }
@@ -2488,7 +2696,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   already_typechecked.move_to_operands(expr.op0());
 
   exprt member(ID_member);
-  member.set("component_cpp_name", cpp_name);
+  member.set(ID_component_cpp_name, cpp_name);
   member.move_to_operands(already_typechecked);
 
   side_effect_expr_function_callt new_expr;
@@ -2570,7 +2778,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   already_typechecked.move_to_operands(expr.op0());
 
   exprt member(ID_member);
-  member.set("component_cpp_name", cpp_name);
+  member.set(ID_component_cpp_name, cpp_name);
   member.move_to_operands(already_typechecked);
 
   side_effect_expr_function_callt new_expr;

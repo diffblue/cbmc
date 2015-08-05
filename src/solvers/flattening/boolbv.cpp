@@ -284,24 +284,27 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
   else if(expr.id()==ID_mod)
     return convert_mod(to_mod_expr(expr), bv);
   else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr)
-    return convert_shift(expr, bv);
+    return convert_shift(to_shift_expr(expr), bv);
   else if(expr.id()==ID_floatbv_plus || expr.id()==ID_floatbv_minus ||
-          expr.id()==ID_floatbv_mult || expr.id()==ID_floatbv_div)
+          expr.id()==ID_floatbv_mult || expr.id()==ID_floatbv_div ||
+          expr.id()==ID_floatbv_rem)
     return convert_floatbv_op(expr, bv);
   else if(expr.id()==ID_floatbv_typecast)
     return convert_floatbv_typecast(to_floatbv_typecast_expr(expr), bv);
   else if(expr.id()==ID_concatenation)
     return convert_concatenation(expr, bv);
   else if(expr.id()==ID_replication)
-    return convert_replication(expr, bv);
+    return convert_replication(to_replication_expr(expr), bv);
   else if(expr.id()==ID_extractbits)
     return convert_extractbits(to_extractbits_expr(expr), bv);
   else if(expr.id()==ID_bitnot || expr.id()==ID_bitand ||
-          expr.id()==ID_bitor || expr.id()==ID_bitxor)
+          expr.id()==ID_bitor || expr.id()==ID_bitxor ||
+          expr.id()==ID_bitxnor || expr.id()==ID_bitnor ||
+          expr.id()==ID_bitnand)
     return convert_bitwise(expr, bv);
   else if(expr.id()==ID_unary_minus ||
           expr.id()=="no-overflow-unary-minus")
-    return convert_unary_minus(expr, bv);
+    return convert_unary_minus(to_unary_expr(expr), bv);
   else if(expr.id()==ID_unary_plus)
   {
     assert(expr.operands().size()==1);
@@ -608,6 +611,8 @@ literalt boolbvt::convert_rest(const exprt &expr)
           expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
           expr.id()==ID_reduction_xor || expr.id()==ID_reduction_xnor)
     return convert_reduction(expr);
+  else if(expr.id()==ID_onehot || expr.id()==ID_onehot0)
+    return convert_onehot(to_unary_expr(expr));
   else if(has_prefix(expr.id_string(), "overflow-"))
     return convert_overflow(expr);
   else if(expr.id()==ID_isnan)

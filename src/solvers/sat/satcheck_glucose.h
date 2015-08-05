@@ -26,7 +26,7 @@ template<typename T>
 class satcheck_glucose_baset:public cnf_solvert
 {
 public:
-  satcheck_glucose_baset();
+  explicit satcheck_glucose_baset(T *);
   virtual ~satcheck_glucose_baset();
   
   virtual resultt prop_solve();
@@ -35,8 +35,11 @@ public:
   virtual void lcnf(const bvt &bv);
   virtual void set_assignment(literalt a, bool value);
 
-  // extra MiniSat/Glucose feature: solve with assumptions
+  // extra MiniSat feature: solve with assumptions
   virtual void set_assumptions(const bvt &_assumptions);
+  
+  // extra MiniSat feature: default branching decision
+  void set_polarity(literalt a, bool value);
 
   virtual bool is_in_conflict(literalt a) const;
   virtual bool has_set_assumptions() const { return true; }
@@ -47,7 +50,6 @@ protected:
   
   void add_variables();
   bvt assumptions;
-  bool empty_clause_added;
 };
 
 class satcheck_glucose_no_simplifiert:

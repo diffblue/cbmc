@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define MAX_INTEGER_UNDERAPPROX 3
 #define MAX_FLOAT_UNDERAPPROX 10
 
-
 /*******************************************************************\
 
 Function: bv_refinementt::approximationt::add_over_assumption

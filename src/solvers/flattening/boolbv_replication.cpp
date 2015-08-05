@@ -22,25 +22,22 @@ Function: boolbvt::convert_replication
 
 \*******************************************************************/
 
-void boolbvt::convert_replication(const exprt &expr, bvt &bv)
+void boolbvt::convert_replication(const replication_exprt &expr, bvt &bv)
 {
   unsigned width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
 
-  if(expr.operands().size()!=2)
-    throw "replication takes two operands";
-
   mp_integer times;
   if(to_integer(expr.op0(), times))
     throw "replication takes constant as first parameter";
-  const unsigned u_times=integer2unsigned(times);
 
-  const bvt &op=convert_bv(expr.op1());
-
-  unsigned offset=0;
   bv.resize(width);
+
+  const unsigned u_times=integer2unsigned(times);
+  const bvt &op=convert_bv(expr.op1());
+  unsigned offset=0;
 
   for(unsigned i=0; i<u_times; i++)
   {

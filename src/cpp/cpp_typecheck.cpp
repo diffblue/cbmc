@@ -194,17 +194,19 @@ bool cpp_typecheck(
 
   catch(int)
   {
-    cpp_typecheck.error();
+    cpp_typecheck.error_msg();
   }
 
   catch(const char *e)
   {
-    cpp_typecheck.error(e);
+    cpp_typecheck.str << e;
+    cpp_typecheck.error_msg();
   }
 
   catch(const std::string &e)
   {
-    cpp_typecheck.error(e);
+    cpp_typecheck.str << e;
+    cpp_typecheck.error_msg();
   }
 
   return cpp_typecheck.get_error_found();
@@ -241,48 +243,6 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   disable_access_control = true;
 
-  // fill in any missing zero initializers
-  // for static initialization
-  Forall_symbols(s_it, symbol_table.symbols)
-  {
-    symbolt &symbol=s_it->second;
-
-    if(!symbol.is_static_lifetime)
-      continue;
-      
-    if(symbol.mode!=ID_cpp)
-      continue;
-      
-    // magic value
-    if(symbol.name=="__CPROVER::constant_infinity_uint")
-      continue;
-
-    // it has a non-code initializer already?
-    if(symbol.value.is_not_nil() &&
-       symbol.value.id()!=ID_code)
-      continue;
-      
-    // it's a declaration only
-    if(symbol.is_extern)
-      continue;
-
-    if(!symbol.is_lvalue)
-      continue;
-
-    if(cpp_is_pod(symbol.type))
-      symbol.value=::zero_initializer(symbol.type, symbol.location, *this, get_message_handler());
-    else
-    {
-      // _always_ zero initialize,
-      // even if there is already an initializer.
-      zero_initializer(
-        cpp_symbol_expr(symbol),
-        symbol.type,
-        symbol.location,
-        init_block.operands());
-    }
-  }
-
   for(dynamic_initializationst::const_iterator
       d_it=dynamic_initializations.begin();
       d_it!=dynamic_initializations.end();
@@ -306,14 +266,13 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     // initializer given?
     if(symbol.value.is_not_nil())
     {
-      code_assignt code(symbol_expr, symbol.value);
-      code.add_source_location()=symbol.location;
+      // This will be a constructor call,
+      // which we execute.
+      assert(symbol.value.id()==ID_code);
+      init_block.copy_to_operands(symbol.value);
 
-      init_block.move_to_operands(code);
-
-      // Make it nil because we do not want
-      // global_init to try to initialize the
-      // object
+      // Make it nil to get zero initialization by
+      // __CPROVER_initialize
       symbol.value.make_nil();
     }
     else
@@ -381,7 +340,7 @@ void cpp_typecheckt::do_not_typechecked()
       {
         assert(symbol.type.id()==ID_code);
 
-        if(symbol.base_name =="operator=")
+        if(symbol.base_name=="operator=")
         {
           cpp_declaratort declarator;
           declarator.add_source_location() = symbol.location;
@@ -391,7 +350,7 @@ void cpp_typecheckt::do_not_typechecked()
           convert_function(symbol);
           cont=true;
         }
-        else if(symbol.value.operands().size() == 1)
+        else if(symbol.value.operands().size()==1)
         {
           exprt tmp = symbol.value.operands()[0];
           symbol.value.swap(tmp);

@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::convert_argument
+Function: cpp_typecheckt::convert_parameter
 
   Inputs:
 
@@ -29,7 +29,7 @@ Function: cpp_typecheckt::convert_argument
 
 \*******************************************************************/
 
-void cpp_typecheckt::convert_argument(
+void cpp_typecheckt::convert_parameter(
   const irep_idt &mode,
   code_typet::parametert &parameter)
 {
@@ -64,7 +64,7 @@ void cpp_typecheckt::convert_argument(
   if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
-    str << "cpp_typecheckt::convert_argument: symbol_table.move("
+    str << "cpp_typecheckt::convert_parameter: symbol_table.move("
         << symbol.name << ") failed";
     throw 0;
   }
@@ -75,7 +75,7 @@ void cpp_typecheckt::convert_argument(
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::convert_arguments
+Function: cpp_typecheckt::convert_parameters
 
   Inputs:
 
@@ -85,7 +85,7 @@ Function: cpp_typecheckt::convert_arguments
 
 \*******************************************************************/
 
-void cpp_typecheckt::convert_arguments(
+void cpp_typecheckt::convert_parameters(
   const irep_idt &mode,
   code_typet &function_type)
 {
@@ -96,7 +96,7 @@ void cpp_typecheckt::convert_arguments(
       it=parameters.begin();
       it!=parameters.end();
       it++)
-    convert_argument(mode, *it);
+    convert_parameter(mode, *it);
 }
 
 /*******************************************************************\
@@ -139,7 +139,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   function_scope.prefix+=id2string(symbol.name)+"::";
 
   // genuine function definition -- do the parameter declarations
-  convert_arguments(symbol.mode, function_type);
+  convert_parameters(symbol.mode, function_type);
 
   // create "this" if it's a non-static method
   if(function_scope.is_method &&

@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <solvers/sat/satcheck.h>
-#include <solvers/sat/satcheck_minisat2.h>
 
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/smt1/smt1_dec.h>

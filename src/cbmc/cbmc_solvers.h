@@ -68,7 +68,7 @@ public:
   };
 
   //returns a solvert object
-  virtual std::auto_ptr<solvert> get_solver() {
+  virtual std::unique_ptr<solvert> get_solver() {
     solvert* solver;
     if(options.get_bool_option("dimacs")) solver = get_dimacs();
     else if(options.get_bool_option("refine-arrays") ||
@@ -79,7 +79,7 @@ public:
     else if(options.get_bool_option("smt2"))
       solver = get_smt2(get_smt2_solver_type());
     else solver = get_default();
-    return std::auto_ptr<solvert>(solver); 
+    return std::unique_ptr<solvert>(solver); 
   }
 
   virtual ~cbmc_solverst() { 

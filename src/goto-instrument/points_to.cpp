@@ -35,7 +35,7 @@ void points_tot::fixedpoint()
         e_it!=cfg.entry_map.end();
         e_it++)
     {
-      if(transform(&e_it->second))
+      if(transform(cfg[e_it->second]))
         added=true;
     }
   }
@@ -87,10 +87,10 @@ Function: points_tot::transform
 
 \*******************************************************************/
 
-bool points_tot::transform(cfgt::iterator e)
+bool points_tot::transform(const cfgt::nodet &e)
 {
   bool result=false;
-  const goto_programt::instructiont &instruction=*(e->PC);
+  const goto_programt::instructiont &instruction=*(e.PC);
 
   switch(instruction.type)
   {

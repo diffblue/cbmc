@@ -136,6 +136,8 @@ void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
       bv=float_utils.mul(bv0, bv1);
     else if(expr.id()==ID_floatbv_div)
       bv=float_utils.div(bv0, bv1);
+    else if(expr.id()==ID_floatbv_rem)
+      bv=float_utils.rem(bv0, bv1);
     else
       assert(false);
   }

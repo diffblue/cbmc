@@ -29,17 +29,19 @@ bool typecheckt::typecheck_main()
 
   catch(int)
   {
-    error();
+    error_msg();
   }
 
   catch(const char *e)
   {
-    error(e);
+    str << e;
+    error_msg();
   }
 
   catch(const std::string &e)
   {
-    error(e);
+    str << e;
+    error_msg();
   }
 
   return error_found;

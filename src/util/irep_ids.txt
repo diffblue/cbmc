@@ -7,7 +7,8 @@ c_bool
 proper_bool
 signedbv
 unsignedbv
-verilogbv
+verilog_signedbv
+verilog_unsignedbv
 floatbv
 fixedbv
 C_source_location #source_location
@@ -124,6 +125,7 @@ C_incomplete #incomplete
 identifier
 name
 cpp_name
+component_cpp_name
 C_id_class #id_class
 declaration
 declaration_list
@@ -233,6 +235,7 @@ array_equal
 array_set
 array_copy
 mod
+rem
 shr
 ashr
 lshr
@@ -463,6 +466,8 @@ decl_type
 genvar
 realtime
 parameters
+parameter_assignments
+named_parameter_assignment
 specify
 pullup
 pulldown
@@ -577,8 +582,14 @@ generate_case
 generate_if
 generate_for
 delay
+verilog_cycle_delay
+sva_cycle_delay
+sva_sequence_throughout
+sva_sequence_concatenation
+sva_sequence_first_match
 hierarchical_identifier
 named_port_connection
+named_block
 verilog_primitive_module
 verilog_module
 verilog_case_equality
@@ -644,6 +655,7 @@ floatbv_plus
 floatbv_minus
 floatbv_mult
 floatbv_div
+floatbv_rem
 floatbv_sin
 floatbv_cos
 floatbv_typecast
@@ -666,3 +678,18 @@ L2
 already_typechecked
 C_va_arg_type #va_arg_type
 smt2_symbol
+overlapped_implication
+non_overlapped_implication
+Verilog
+verilog_realtime
+onehot
+onehot0
+verilog_star_event
+verilog_attribute
+time
+fork
+disable
+wait
+deassign
+force
+release

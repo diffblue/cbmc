@@ -24,12 +24,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 #include <langapi/language_ui.h>
 #include <goto-symex/symex_target_equation.h>
+#include <goto-programs/safety_checker.h>
 
 #include "symex_bmc.h"
 #include "bv_cbmc.h"
 
-
-class bmct:public messaget
+class bmct:public safety_checkert
 {
 public:
   bmct(
@@ -37,7 +37,7 @@ public:
     const symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     prop_convt& _prop_conv):
-    messaget(_message_handler),
+    safety_checkert(ns, _message_handler),
     options(_options),
     ns(_symbol_table, new_symbol_table),
     equation(ns),
@@ -47,7 +47,7 @@ public:
     symex.constant_propagation=options.get_bool_option("propagation");
   }
  
-  virtual bool run(const goto_functionst &goto_functions);
+  virtual resultt run(const goto_functionst &goto_functions);
   virtual ~bmct() { }
 
   // additional stuff   
@@ -61,7 +61,14 @@ public:
     ui=_ui; 
     symex.set_ui(ui);
   }
-  
+
+  // the safety_checkert interface
+  virtual resultt operator()(
+    const goto_functionst &goto_functions)
+  {
+    return run(goto_functions);
+  }
+
 protected:
   const optionst &options;  
   symbol_tablet new_symbol_table;
@@ -75,9 +82,9 @@ protected:
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);
     
-  virtual bool decide(prop_convt &prop_conv, bool show_report=true);
-    
-  virtual bool write_dimacs(prop_convt &prop_conv);
+  virtual safety_checkert::resultt decide(prop_convt &prop_conv, 
+					  bool show_report=true);
+  virtual safety_checkert::resultt write_dimacs(prop_convt &prop_conv);
   
   // unwinding
   virtual void setup_unwind();
@@ -87,7 +94,7 @@ protected:
   void do_conversion(prop_convt &solver);
   
   virtual void show_vcc();
-  virtual bool all_properties(
+  virtual resultt all_properties(
     const goto_functionst &goto_functions,
     prop_convt &solver);
   virtual void show_vcc(std::ostream &out);
@@ -98,12 +105,13 @@ protected:
   virtual void error_trace(
     const prop_convt &prop_conv);
   
-  // vacuity checks
-  void cover_assertions(
+  bool cover(
     const goto_functionst &goto_functions,
-    prop_convt &solver);
+    prop_convt &solver,
+    const std::string &criterion);
 
   friend class bmc_all_propertiest;
+  friend class bmc_covert;
 };
 
 #endif

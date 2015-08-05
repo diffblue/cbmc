@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 bool java_bytecode_convert(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
-  const std::string &module,
   message_handlert &message_handler);
 
 #endif

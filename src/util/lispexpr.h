@@ -6,11 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+// THIS HEADER IS DEPRECATED AND WILL GO AWAY
+
 #ifndef CPROVER_LISPEXPR_H
 #define CPROVER_LISPEXPR_H
 
 #if defined(_WIN32) && !defined(__MINGW32__)
-#include <cstring>
+#include <string.h>
 #define strcasecmp _strcmpi
 #else
 #include <strings.h>

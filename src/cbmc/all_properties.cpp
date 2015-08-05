@@ -46,7 +46,7 @@ public:
   {
   }
 
-  bool operator()();
+  safety_checkert::resultt operator()();
 
   virtual void goal_covered(const cover_goalst::goalt &);
 
@@ -113,6 +113,9 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
       g_it++)
   {
     goalt &g=g_it->second;
+    
+    // failed already?
+    if(g.failed) continue;
   
     // check whether failed
     for(goalt::instancest::const_iterator
@@ -149,7 +152,7 @@ Function: bmc_all_propertiest::operator()
 
 \*******************************************************************/
 
-bool bmc_all_propertiest::operator()()
+safety_checkert::resultt bmc_all_propertiest::operator()()
 {
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
@@ -168,9 +171,6 @@ bool bmc_all_propertiest::operator()()
         goal_map[i_it->source_location.get_property_id()]=goalt(*i_it);
 
   // get the conditions for these goals from formula
-  
-  unsigned property_counter=0;
-
   // collect all 'instances' of the properties
   for(symex_target_equationt::SSA_stepst::iterator
       it=bmc.equation.SSA_steps.begin();
@@ -184,13 +184,15 @@ bool bmc_all_propertiest::operator()()
 
       if(it->source.pc->is_assert())
         property_id=it->source.pc->source_location.get_property_id();
-      else
+      else if(it->source.pc->is_goto())
       {
-        // need new property ID, say for an unwinding assertion
-        property_counter++;
-        property_id=i2string(property_counter);
+        // this is likely an unwinding assertion
+        property_id=id2string(it->source.pc->source_location.get_function())+".unwind."+
+                    i2string(it->source.pc->loop_number);
         goal_map[property_id].description=it->comment;
       }
+      else
+        continue;
       
       //need to convert again as the context of the expression 
       //  may have changed
@@ -241,14 +243,11 @@ bool bmc_all_propertiest::operator()()
     status() << "** Results:" << eom;
   }
   
-  bool res = true;
-
   for(goal_mapt::iterator
       it=goal_map.begin();
       it!=goal_map.end();
       it++)
   {
-    if(!it->second.failed) res = false;
     if(bmc.ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
@@ -274,7 +273,8 @@ bool bmc_all_propertiest::operator()()
            << " of " << cover_goals.size() << " failed ("
            << cover_goals.iterations() << " iterations)" << eom;
 
-  return res;
+  return (cover_goals.number_covered()==0)?
+    safety_checkert::SAFE:safety_checkert::UNSAFE;
 }
 
 /*******************************************************************\
@@ -289,7 +289,7 @@ Function: bmct::all_properties
 
 \*******************************************************************/
 
-bool bmct::all_properties(
+safety_checkert::resultt bmct::all_properties(
   const goto_functionst &goto_functions,
   prop_convt &solver)
 {

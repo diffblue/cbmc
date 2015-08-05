@@ -73,6 +73,16 @@ public:
   }
 };
 
+/*! \brief Natural numbers (which include zero)
+*/
+class natural_typet:public typet
+{
+public:
+  inline natural_typet():typet(ID_natural)
+  {
+  }
+};
+
 /*! \brief Unbounded, signed rational numbers
 */
 class rational_typet:public typet
@@ -155,6 +165,16 @@ public:
   class componentt:public exprt
   {
   public:
+    inline componentt()
+    {
+    }
+  
+    inline componentt(const irep_idt &_name, const typet &_type)
+    {
+      set_name(_name);
+      type()=_type;
+    }
+  
     inline const irep_idt &get_name() const
     {
       return get(ID_name);
@@ -333,7 +353,7 @@ public:
 
   inline bool is_class() const
   {
-    return get_bool(ID_C_class);    
+    return get_bool(ID_C_class);
   }
   
   inline irep_idt default_access() const
@@ -346,9 +366,20 @@ public:
     return find(ID_bases).get_sub();
   }
   
+  inline irept::subt &bases()
+  {
+    return add(ID_bases).get_sub();
+  }
+  
+  inline void add_base(const typet &base)
+  {
+    bases().push_back(exprt(ID_base, base));
+  }
+  
   bool has_base(const irep_idt &id) const
   {
     const irept::subt &b=bases();
+
     forall_irep(it, b)
     {
       assert(it->id()==ID_base);
@@ -921,7 +952,8 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
          type.id()==ID_unsignedbv ||
          type.id()==ID_fixedbv ||
          type.id()==ID_floatbv ||
-         type.id()==ID_verilogbv ||
+         type.id()==ID_verilog_signedbv ||
+         type.id()==ID_verilog_unsignedbv ||
          type.id()==ID_bv ||
          type.id()==ID_pointer ||
          type.id()==ID_c_bit_field ||
@@ -979,9 +1011,8 @@ public:
   {
   }
 
-  inline explicit unsignedbv_typet(unsigned width):bitvector_typet(ID_unsignedbv)
+  inline explicit unsignedbv_typet(unsigned width):bitvector_typet(ID_unsignedbv, width)
   {
-    set_width(width);
   }
   
   mp_integer smallest() const;
@@ -1025,9 +1056,8 @@ public:
   {
   }
 
-  inline explicit signedbv_typet(unsigned width):bitvector_typet(ID_signedbv)
+  inline explicit signedbv_typet(unsigned width):bitvector_typet(ID_signedbv, width)
   {
-    set_width(width);
   }
 
   mp_integer smallest() const;

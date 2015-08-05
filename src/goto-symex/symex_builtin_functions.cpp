@@ -74,6 +74,12 @@ void goto_symext::symex_malloc(
   exprt size=code.op0();
   typet object_type=nil_typet();
   
+  // is the type given?
+  if(code.type().id()==ID_pointer && code.type().subtype().id()!=ID_empty)
+  {
+    object_type=code.type().subtype();
+  }
+  else
   {
     exprt tmp_size=size;
     state.rename(tmp_size, ns); // to allow constant propagation
@@ -452,7 +458,7 @@ void goto_symext::symex_cpp_new(
              "dynamic_"+count_string+"_value";
   symbol.name="symex_dynamic::"+id2string(symbol.base_name);
   symbol.is_lvalue=true;
-  symbol.mode="cpp";
+  symbol.mode=ID_cpp;
   
   if(do_array)
   {

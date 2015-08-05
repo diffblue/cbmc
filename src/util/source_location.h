@@ -14,6 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class source_locationt:public irept
 {
 public:
+  source_locationt()
+  {
+  }
+
   std::string as_string() const;
   
   inline const irep_idt &get_file() const
@@ -105,10 +109,15 @@ public:
   {
     return get_bool(ID_hide);
   }
+  
+  inline static const source_locationt &nil()
+  {
+    return static_cast<const source_locationt &>(get_nil_irep());
+  }
 };
 
 // will go away
-typedef source_locationt locationt;
+//typedef source_locationt locationt;
 
 std::ostream &operator <<(std::ostream &, const source_locationt &);
 

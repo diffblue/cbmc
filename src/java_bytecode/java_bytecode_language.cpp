@@ -8,16 +8,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 
-#include <linking/linking.h>
-
-#include <ansi-c/expr2c.h>
-
 #include "java_bytecode_language.h"
-#include "java_bytecode_typecheck.h"
 #include "java_bytecode_convert.h"
-#include "java_entry_point.h"
-#include "javap_parse.h"
 #include "java_bytecode_internal_additions.h"
+#include "java_bytecode_typecheck.h"
+#include "java_bytecode_load_class.h"
+#include "java_bytecode_vtable.h"
+#include "java_entry_point.h"
+#include "java_bytecode_parser.h"
+#include "java_class_loader.h"
+
+#include "expr2java.h"
 
 /*******************************************************************\
 
@@ -94,7 +95,10 @@ bool java_bytecode_languaget::parse(
 {
   // store the path
   parse_path=path;
-  return javap_parse(path, parse_tree, get_message_handler());
+  if(java_bytecode_parse(path, parse_tree, get_message_handler()))
+    return true;
+
+  return false;
 }
              
 /*******************************************************************\
@@ -113,21 +117,33 @@ bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  symbol_tablet new_symbol_table;
-
-  if(java_bytecode_convert(
-       parse_tree, new_symbol_table, module, get_message_handler()))
-    return true;
+  main_class=parse_tree.parsed_class.name;
   
+  // first get dependencies
+  java_class_loadert java_class_loader;
+  java_class_loader.set_message_handler(get_message_handler());
+  
+  java_class_loader(parse_tree);
+
+  // now convert all
+  for(java_class_loadert::class_mapt::const_iterator
+      c_it=java_class_loader.class_map.begin();
+      c_it!=java_class_loader.class_map.end();
+      c_it++)
+  {
+    if(c_it->second.parsed_class.name.empty())
+      continue;
+    debug() << "Converting class " << c_it->first << eom;
+    if(java_bytecode_convert(
+         c_it->second, symbol_table, get_message_handler()))
+      return true;
+  }
+
+  // now typecheck
   if(java_bytecode_typecheck(
-       new_symbol_table, module, get_message_handler()))
+       symbol_table, get_message_handler()))
     return true;
 
-  symbol_table.swap(new_symbol_table);
-
-//  if(linking(new_symbol_table, symbol_table, message_handler))
-//    return true;
-    
   return false;
 }
 
@@ -150,7 +166,8 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
   */
   java_internal_additions(symbol_table);
 
-  if(java_entry_point(symbol_table, get_message_handler())) return true;
+  if(java_entry_point(symbol_table, main_class, get_message_handler()))
+    return true;
   
   return false;
 }
@@ -206,7 +223,7 @@ bool java_bytecode_languaget::from_expr(
   std::string &code,
   const namespacet &ns)
 {
-  code=expr2c(expr, ns);
+  code=expr2java(expr, ns);
   return false;
 }
 
@@ -227,7 +244,7 @@ bool java_bytecode_languaget::from_type(
   std::string &code,
   const namespacet &ns)
 {
-  code=type2c(type, ns);
+  code=type2java(type, ns);
   return false;
 }
 

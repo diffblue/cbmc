@@ -95,15 +95,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       const bvt &bv0=convert_bv(operands[0]);
       const bvt &bv1=convert_bv(operands[1]);
 
-      const irep_idt rel=expr.id();
-
-      if(rel==ID_le || rel==ID_lt)
-        return bv_utils.lt_or_le(rel==ID_le, bv0, bv1, bv_utilst::UNSIGNED);
-
-      if(rel==ID_ge || rel==ID_gt)
-        return bv_utils.lt_or_le(rel==ID_ge, bv1, bv0, bv_utilst::UNSIGNED);
-                                            // swapped
-      assert(false);
+      return bv_utils.rel(bv0, expr.id(), bv1, bv_utilst::UNSIGNED);
     }
   }
 
@@ -441,7 +433,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
   }
   else if(expr.id()==ID_lshr || 
           expr.id()==ID_shl)
-    return SUB::convert_shift(expr, bv);
+    return SUB::convert_shift(to_shift_expr(expr), bv);
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
           expr.id()==ID_bitnot)

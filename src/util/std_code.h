@@ -1008,12 +1008,12 @@ code_expressiont &to_code_expression(codet &code);
 const code_expressiont &to_code_expression(const codet &code);
 
 /*! \brief An expression containing a side effect
-    \remark The ID will eventually change to ID_side_effect
 */
 class side_effect_exprt:public exprt
 {
 public:
-  inline explicit side_effect_exprt(const irep_idt &statement):exprt(ID_side_effect)
+  inline explicit side_effect_exprt(const irep_idt &statement):
+    exprt(ID_side_effect)
   {
     set_statement(statement);
   }

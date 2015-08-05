@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_utilst
 {
 public:
-  bv_utilst(propt &_prop):prop(_prop) { }
+  inline bv_utilst(propt &_prop):prop(_prop) { }
 
   typedef enum { SIGNED, UNSIGNED } representationt;
 
@@ -83,12 +83,24 @@ public:
                         bvt &res, bvt &rem);
 
   literalt equal(const bvt &op0, const bvt &op1);
+  
+  static inline literalt sign_bit(const bvt &op)
+  {
+    return op[op.size()-1];
+  }
 
   literalt is_zero(const bvt &op)
   { return prop.lnot(prop.lor(op)); }
 
   literalt is_not_zero(const bvt &op)
   { return prop.lor(op); }
+  
+  literalt is_int_min(const bvt &op)
+  {
+    bvt tmp=op;
+    tmp[tmp.size()-1]=!tmp[tmp.size()-1];
+    return is_zero(tmp);
+  }
 
   literalt is_one(const bvt &op);
 
@@ -99,6 +111,10 @@ public:
                     const bvt &bv0,
                     const bvt &bv1,
                     representationt rep);
+
+  // id is one of ID_lt, le, gt, ge, equal, notequal
+  literalt rel(const bvt &bv0, irep_idt id, const bvt &bv1,
+               representationt rep);
 
   literalt unsigned_less_than(const bvt &bv0, const bvt &bv1);
   literalt signed_less_than(const bvt &bv0, const bvt &bv1);
@@ -144,6 +160,9 @@ public:
 
   // put a and b together, where a comes first (lower indices)
   bvt concatenate(const bvt &a, const bvt &b) const;
+
+  literalt verilog_bv_has_x_or_z(const bvt &);
+  bvt verilog_bv_normal_bits(const bvt &);
 
 protected:
   propt &prop;

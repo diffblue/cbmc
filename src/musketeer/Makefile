@@ -1,5 +1,5 @@
 SRC = languages.cpp fencer.cpp fence_inserter.cpp musketeer_main.cpp \
-      musketeer_parseoptions.cpp fence_assert.cpp fence_user_def.cpp \
+      musketeer_parse_options.cpp fence_assert.cpp fence_user_def.cpp \
       fence_shared.cpp pensieve.cpp propagate_const_function_pointers.cpp \
       graph_visitor.cpp cycles_visitor.cpp
 

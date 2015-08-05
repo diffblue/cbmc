@@ -143,7 +143,8 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     entry.total_width=to_bv_type(type).get_width();
     assert(entry.total_width!=0);
   }
-  else if(type_id==ID_verilogbv)
+  else if(type_id==ID_verilog_signedbv ||
+          type_id==ID_verilog_unsignedbv)
   {
     // we encode with two bits
     entry.total_width=type.get_unsigned_int(ID_width)*2;

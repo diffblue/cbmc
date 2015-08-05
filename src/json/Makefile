@@ -7,7 +7,7 @@ include ../common
 
 CLEANFILES=json$(LIBEXT) json_y.tab.h json_y.tab.cpp json_lex.yy.cpp \
            json_y.tab.cpp.output json_y.output \
-           json_test$(EXEEXT) json_test$(OBJEXT)
+           json_test$(EXEEXT) json_test$(OBJEXT) json_test.d
 
 all: json$(LIBEXT) json_test$(EXEEXT)
 

@@ -141,24 +141,28 @@ bool boolbvt::type_conversion(
         return false;
       }
     }
-    else if(src_bvtype==IS_RANGE)
+    else if(src_bvtype==IS_RANGE) // range to range
     {
       mp_integer src_from=to_range_type(src_type).get_from();
       mp_integer dest_from=to_range_type(dest_type).get_from();
 
       if(dest_from==src_from)
       {
-        // do zero extension
-        dest.resize(dest_width);
-        for(unsigned i=0; i<dest.size(); i++)
-          dest[i]=(i<src.size()?src[i]:const_literal(false));
-
+        // do zero extension, if needed
+        dest=bv_utils.zero_extension(src, dest_width);
         return false;
       }
       else
       {
-        // need to do arithmetic
+        // need to do arithmetic: add src_from-dest_from
+        mp_integer offset=src_from-dest_from;
+        dest=
+          bv_utils.add(
+            bv_utils.zero_extension(src, dest_width),
+            bv_utils.build_constant(offset, dest_width));
       }
+
+      return false;
     }
     break;
     
@@ -377,6 +381,38 @@ bool boolbvt::type_conversion(
         return false;
       }
       
+    case IS_VERILOG_UNSIGNED: // verilog_unsignedbv to signed/unsigned/enum
+      {
+        for(unsigned i=0; i<dest_width; i++)
+        {
+          unsigned src_index=i*2; // we take every second bit
+
+          if(src_index<src_width)
+            dest.push_back(src[src_index]);
+          else // always zero-extend
+            dest.push_back(const_literal(false));
+        }
+
+        return false;
+      }
+      break;
+      
+    case IS_VERILOG_SIGNED: // verilog_signedbv to signed/unsigned/enum
+      {
+        for(unsigned i=0; i<dest_width; i++)
+        {
+          unsigned src_index=i*2; // we take every second bit
+
+          if(src_index<src_width)
+            dest.push_back(src[src_index]);
+          else // always sign-extend
+            dest.push_back(src.back());
+        }
+
+        return false;
+      }
+      break;
+      
     default:
       if(src_type.id()==ID_bool)
       {
@@ -397,9 +433,10 @@ bool boolbvt::type_conversion(
     }
     break;
     
-  case IS_VERILOGBV:
+  case IS_VERILOG_UNSIGNED:
     if(src_bvtype==IS_UNSIGNED ||
-       src_bvtype==IS_C_BOOL)
+       src_bvtype==IS_C_BOOL ||
+       src_type.id()==ID_bool)
     {
       for(unsigned i=0, j=0; i<dest_width; i+=2, j++)
       {
@@ -411,6 +448,38 @@ bool boolbvt::type_conversion(
         dest.push_back(const_literal(false));
       }
 
+      return false;
+    }
+    else if(src_bvtype==IS_SIGNED)
+    {
+      for(unsigned i=0, j=0; i<dest_width; i+=2, j++)
+      {
+        if(j<src_width)
+          dest.push_back(src[j]);
+        else
+          dest.push_back(src.back());
+
+        dest.push_back(const_literal(false));
+      }
+
+      return false;
+    }
+    else if(src_bvtype==IS_VERILOG_UNSIGNED)
+    {
+      // verilog_unsignedbv to verilog_unsignedbv
+      dest=src;
+
+      if(dest_width<src_width)
+        dest.resize(dest_width);
+      else
+      {
+        dest=src;
+        while(dest.size()<dest_width)
+        {
+          dest.push_back(const_literal(false));
+          dest.push_back(const_literal(false));
+        }
+      }
       return false;
     }
     break;

@@ -331,8 +331,11 @@ exprt dereferencet::dereference_typecast(
     // into *(type *)(A+offset), and then let some other layer
     // worry about it.
 
-    exprt integer=
-      plus_exprt(offset, typecast_exprt(op, offset.type()));
+    exprt integer=op;
+
+    if(!offset.is_zero())
+      integer=
+        plus_exprt(offset, typecast_exprt(op, offset.type()));
 
     exprt new_typecast=
       typecast_exprt(integer, pointer_typet(type));

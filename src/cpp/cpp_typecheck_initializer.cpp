@@ -304,7 +304,7 @@ void cpp_typecheckt::zero_initializer(
 
       exprt member(ID_member);
       member.copy_to_operands(object);
-      member.set("component_cpp_name", cpp_name);
+      member.set(ID_component_cpp_name, cpp_name);
       zero_initializer(member, comp.type(), source_location, ops);
     }
   }

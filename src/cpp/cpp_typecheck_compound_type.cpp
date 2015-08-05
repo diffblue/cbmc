@@ -191,11 +191,15 @@ void cpp_typecheckt::typecheck_compound_type(
       dest_scope=&cpp_typecheck_resolve.resolve_scope(cpp_name, base_name, t_args);
     }
   }
-
+  
+  // The identifier 'tag-X' matches what the C front-end does!
+  // The hypen is deliberate to avoid collisions with other
+  // identifiers.
   const irep_idt symbol_name=
     dest_scope->prefix+
-    "tag."+id2string(base_name);
-
+    "tag-"+id2string(base_name)+
+    dest_scope->suffix;
+    
   // check if we have it already
 
   symbol_tablet::symbolst::iterator previous_symbol=
@@ -204,7 +208,7 @@ void cpp_typecheckt::typecheck_compound_type(
   if(previous_symbol!=symbol_table.symbols.end())
   {
     // we do!
-
+    
     symbolt &symbol=previous_symbol->second;
 
     if(has_body)
@@ -244,8 +248,11 @@ void cpp_typecheckt::typecheck_compound_type(
     symbol.type.swap(type);
     symbol.is_type=true;
     symbol.is_macro=false;
-    symbol.pretty_name=cpp_scopes.current_scope().prefix+id2string(symbol.base_name);
-    symbol.type.set(ID_tag, symbol.pretty_name);
+    symbol.pretty_name=
+      cpp_scopes.current_scope().prefix+
+      id2string(symbol.base_name)+
+      cpp_scopes.current_scope().suffix;
+    symbol.type.set(ID_tag, cpp_scopes.current_scope().prefix+id2string(symbol.base_name));
 
     // move early, must be visible before doing body
     symbolt *new_symbol;
@@ -259,10 +266,11 @@ void cpp_typecheckt::typecheck_compound_type(
     id.id_class=cpp_idt::CLASS;
     id.is_scope=true;
     id.prefix=cpp_scopes.current_scope().prefix+
-              id2string(new_symbol->base_name)+"::";
+              id2string(new_symbol->base_name)+
+              cpp_scopes.current_scope().suffix+"::";
     id.class_identifier=new_symbol->name;
     id.id_class=cpp_idt::CLASS;
-
+    
     if(has_body)
       typecheck_compound_body(*new_symbol);
     else
@@ -1353,7 +1361,7 @@ Purpose:
 \*******************************************************************/
 
 void cpp_typecheckt::typecheck_member_function(
-  const irep_idt &compound_symbol,
+  const irep_idt &compound_identifier,
   struct_typet::componentt &component,
   irept &initializers,
   const typet &method_qualifier,
@@ -1374,7 +1382,7 @@ void cpp_typecheckt::typecheck_member_function(
   else
   {
     adjust_method_type(
-      compound_symbol,
+      compound_identifier,
       type,
       method_qualifier);
   }
@@ -1388,20 +1396,18 @@ void cpp_typecheckt::typecheck_member_function(
     function_identifier(component.type());
 
   const irep_idt identifier=
-    id2string(component.get_name())+id2string(f_id);
+    cpp_scopes.current_scope().prefix+
+    id2string(component.get_base_name())+
+    id2string(f_id);
 
   component.set_name(identifier);
-
-  component.set("prefix",
-                cpp_scopes.current_scope().prefix+
-                component.get_string(ID_base_name)+
-                id2string(f_id)+"::");
+  component.set("prefix", id2string(identifier)+"::");
 
   if(value.is_not_nil())
     type.set(ID_C_inlined, true);
 
   symbol.name=identifier;
-  symbol.base_name=component.get(ID_base_name);
+  symbol.base_name=component.get_base_name();
   symbol.value.swap(value);
   symbol.mode=ID_cpp;
   symbol.module=module;
@@ -1416,8 +1422,8 @@ void cpp_typecheckt::typecheck_member_function(
   if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
-    str << "failed to insert new symbol: "
-        << symbol.name.c_str() << "\n";
+    str << "failed to insert new method symbol: "
+        << symbol.name << "\n";
 
     str << "name of previous symbol: "
         << new_symbol->name << "\n";
@@ -1426,9 +1432,14 @@ void cpp_typecheckt::typecheck_member_function(
 
     throw 0;
   }
-
-  // remember for later typechecking of body
-  add_function_body(new_symbol);
+  
+  // Is this in a class template?
+  // If so, we defer typechecking until used.
+  if(cpp_scopes.current_scope().get_parent().is_template_scope())
+  {
+  }
+  else // remember for later typechecking of body
+    add_function_body(new_symbol);
 }
 
 /*******************************************************************\

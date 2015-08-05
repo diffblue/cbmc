@@ -446,7 +446,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
           err_location(new_symbol.location);
           str << "function body `" << new_symbol.display_name()
               << "' defined twice";
-          error();
+          error_msg();
           throw 0;
         }
       }
@@ -577,7 +577,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
           err_location(new_symbol.value);
           str << "symbol `" << new_symbol.display_name()
               << "' already has an initial value";
-          warning();
+          warning_msg();
         }
       }
     }

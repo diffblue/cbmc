@@ -377,7 +377,7 @@ bool static_analysis_baset::visit(
     if(to_l==goto_program.instructions.end())
       continue;
 
-    std::auto_ptr<statet> tmp_state(
+    std::unique_ptr<statet> tmp_state(
       make_temporary_state(current));
   
     statet &new_values=*tmp_state;
@@ -545,7 +545,7 @@ void static_analysis_baset::do_function_call_rec(
     if(function.operands().size()!=3)
       throw "if takes three arguments";
     
-    std::auto_ptr<statet> n2(make_temporary_state(new_state));
+    std::unique_ptr<statet> n2(make_temporary_state(new_state));
     
     do_function_call_rec(
       l_call, l_return,
@@ -569,7 +569,7 @@ void static_analysis_baset::do_function_call_rec(
     std::list<exprt> values;
     get_reference_set(l_call, function, values);
 
-    std::auto_ptr<statet> state_from(make_temporary_state(new_state));
+    std::unique_ptr<statet> state_from(make_temporary_state(new_state));
 
     // now call all of these
     for(std::list<exprt>::const_iterator it=values.begin();
@@ -579,7 +579,7 @@ void static_analysis_baset::do_function_call_rec(
       if(it->id()==ID_object_descriptor)
       {
         const object_descriptor_exprt &o=to_object_descriptor_expr(*it);
-        std::auto_ptr<statet> n2(make_temporary_state(new_state));    
+        std::unique_ptr<statet> n2(make_temporary_state(new_state));    
         do_function_call_rec(l_call, l_return, o.object(), arguments, *n2, goto_functions);
         merge(new_state, *n2, l_return);
       }

@@ -34,9 +34,6 @@ void boolbvt::convert_div(const div_exprt &expr, bvt &bv)
   if(width==0)
     return conversion_failed(expr, bv);
 
-  if(expr.operands().size()!=2)
-    throw "division takes two operands";
-
   if(expr.op0().type().id()!=expr.type().id() ||
      expr.op1().type().id()!=expr.type().id())
     return conversion_failed(expr, bv);

@@ -33,11 +33,11 @@ endif
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
-  CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.6
-  LINKFLAGS += -mmacosx-version-min=10.6
-  LINKNATIVE += -mmacosx-version-min=10.6
+  CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.7 -std=c++11 -stdlib=libc++ -D STL_HASH_STD
+  LINKFLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
+  LINKNATIVE += -mmacosx-version-min=10.7 -stdlib=libc++
 else
-  CP_CXXFLAGS = -MMD -MP
+  CP_CXXFLAGS = -MMD -MP -std=c++11
 endif
   #LINKFLAGS = -static
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
@@ -97,11 +97,11 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
-  CP_CXXFLAGS = -MMD -MP
-  LINKFLAGS = -static
+  CP_CXXFLAGS = -MMD -MP -std=c++11 -U__STRICT_ANSI__
+  LINKFLAGS = -static -std=c++11
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) -o $@ $^ -static
+  LINKNATIVE = $(HOSTCXX) -std=c++11 -o $@ $^ -static
 ifeq ($(origin CC),default)
   #CC = gcc
   CC = i686-pc-mingw32-gcc

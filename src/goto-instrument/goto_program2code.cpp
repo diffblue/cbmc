@@ -220,6 +220,14 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 {
   assert(target!=goto_program.instructions.end());
 
+  if(target->type!=ASSERT &&
+     !target->source_location.get_comment().empty())
+  {
+    dest.copy_to_operands(code_skipt());
+    dest.operands().back().add_source_location().set_comment(
+      target->source_location.get_comment());
+  }
+
   // try do-while first
   if(target->is_target() && !target->is_goto())
   {
@@ -954,10 +962,11 @@ bool goto_program2codet::set_block_end_points(
         case_end!=upper_bound;
         ++case_end)
     {
-      cfg_dominatorst::node_mapt::const_iterator i_entry=
-        dominators.node_map.find(case_end);
-      assert(i_entry!=dominators.node_map.end());
-      const cfg_dominatorst::nodet &n=i_entry->second;
+      cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
+        dominators.cfg.entry_map.find(case_end);
+      assert(i_entry!=dominators.cfg.entry_map.end());
+      const cfg_dominatorst::cfgt::nodet &n=
+        dominators.cfg[i_entry->second];
 
       // ignore dead instructions for the following checks
       if(n.dominators.empty())
@@ -1014,10 +1023,11 @@ bool goto_program2codet::remove_default(
           next_case!=goto_program.instructions.end();
           ++next_case)
       {
-        cfg_dominatorst::node_mapt::const_iterator i_entry=
-          dominators.node_map.find(next_case);
-        assert(i_entry!=dominators.node_map.end());
-        const cfg_dominatorst::nodet &n=i_entry->second;
+        cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
+          dominators.cfg.entry_map.find(next_case);
+        assert(i_entry!=dominators.cfg.entry_map.end());
+        const cfg_dominatorst::cfgt::nodet &n=
+          dominators.cfg[i_entry->second];
 
         if(!n.dominators.empty())
           break;
@@ -1080,10 +1090,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
 
   // always use convert_goto_if for dead code as the construction below relies
   // on effective dominator information 
-  cfg_dominatorst::node_mapt::const_iterator t_entry=
-    dominators.node_map.find(target);
-  assert(t_entry!=dominators.node_map.end());
-  if(t_entry->second.dominators.empty())
+  cfg_dominatorst::cfgt::entry_mapt::const_iterator t_entry=
+    dominators.cfg.entry_map.find(target);
+  assert(t_entry!=dominators.cfg.entry_map.end());
+  if(dominators.cfg[t_entry->second].dominators.empty())
     return convert_goto_if(target, upper_bound, dest);
 
   // maybe, let's try some more
@@ -1223,10 +1233,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     if(processed_locations.find(it->location_number)==
         processed_locations.end())
     {
-      cfg_dominatorst::node_mapt::const_iterator it_entry=
-        dominators.node_map.find(it);
-      assert(it_entry!=dominators.node_map.end());
-      const cfg_dominatorst::nodet &n=it_entry->second;
+      cfg_dominatorst::cfgt::entry_mapt::const_iterator it_entry=
+        dominators.cfg.entry_map.find(it);
+      assert(it_entry!=dominators.cfg.entry_map.end());
+      const cfg_dominatorst::cfgt::nodet &n=
+        dominators.cfg[it_entry->second];
 
       if(!n.dominators.empty())
       {
@@ -1349,10 +1360,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
       next!=goto_program.instructions.end();
       ++next)
   {
-    cfg_dominatorst::node_mapt::const_iterator i_entry=
-      dominators.node_map.find(next);
-    assert(i_entry!=dominators.node_map.end());
-    const cfg_dominatorst::nodet &n=i_entry->second;
+    cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
+      dominators.cfg.entry_map.find(next);
+    assert(i_entry!=dominators.cfg.entry_map.end());
+    const cfg_dominatorst::cfgt::nodet &n=
+      dominators.cfg[i_entry->second];
 
     if(!n.dominators.empty())
       break;
@@ -1391,10 +1403,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
       after_loop!=goto_program.instructions.end();
       ++after_loop)
   {
-    cfg_dominatorst::node_mapt::const_iterator i_entry=
-      dominators.node_map.find(after_loop);
-    assert(i_entry!=dominators.node_map.end());
-    const cfg_dominatorst::nodet &n=i_entry->second;
+    cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
+      dominators.cfg.entry_map.find(after_loop);
+    assert(i_entry!=dominators.cfg.entry_map.end());
+    const cfg_dominatorst::cfgt::nodet &n=
+      dominators.cfg[i_entry->second];
 
     if(!n.dominators.empty())
       break;
@@ -1433,8 +1446,8 @@ Purpose:
 \*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_goto_goto(
-    goto_programt::const_targett target,
-    codet &dest)
+  goto_programt::const_targett target,
+  codet &dest)
 {
   // filter out useless goto 1; 1: ...
   goto_programt::const_targett next=target;
@@ -1443,10 +1456,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
     return target;
 
   const cfg_dominatorst &dominators=loops.get_dominator_info();
-  cfg_dominatorst::node_mapt::const_iterator it_entry=
-    dominators.node_map.find(target);
-  assert(it_entry!=dominators.node_map.end());
-  const cfg_dominatorst::nodet &n=it_entry->second;
+  cfg_dominatorst::cfgt::entry_mapt::const_iterator it_entry=
+    dominators.cfg.entry_map.find(target);
+  assert(it_entry!=dominators.cfg.entry_map.end());
+  const cfg_dominatorst::cfgt::nodet &n=
+    dominators.cfg[it_entry->second];
 
   // skip dead goto L as the label might be skipped if it is dead
   // as well and at the end of a case block
@@ -1787,6 +1801,10 @@ void goto_program2codet::cleanup_code(
         }
       }
     }
+
+    while(call.lhs().is_not_nil() &&
+          call.lhs().id()==ID_typecast)
+      call.lhs()=to_typecast_expr(call.lhs()).op();
   }
 
   if(code.has_operands())
@@ -1837,6 +1855,43 @@ void goto_program2codet::cleanup_code(
 
 /*******************************************************************\
 
+Function: has_break_continue
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+static bool has_break_continue(const codet &code)
+{
+  const irep_idt &statement=code.get_statement();
+
+  if(statement==ID_break ||
+     statement==ID_continue)
+    return true;
+  else if(statement==ID_while ||
+          statement==ID_dowhile ||
+          statement==ID_for)
+    return false;
+  else if(code.has_operands())
+  {
+    const exprt::operandst &operands=code.operands();
+    forall_expr(it, operands)
+    {
+      if(it->id()==ID_code &&
+         has_break_continue(to_code(*it)))
+        return true;
+    }
+  }
+
+  return false;
+}
+
+/*******************************************************************\
+
 Function: goto_program2codet::cleanup_code_block
 
 Inputs:
@@ -1860,7 +1915,8 @@ void goto_program2codet::cleanup_code_block(
   {
     exprt::operandst::iterator it=operands.begin()+i;
     // remove skip
-    if(to_code(*it).get_statement()==ID_skip)
+    if(to_code(*it).get_statement()==ID_skip &&
+       it->source_location().get_comment().empty())
       operands.erase(it);
     // merge nested blocks, unless there are declarations in the inner block
     else if(to_code(*it).get_statement()==ID_block)
@@ -1875,7 +1931,7 @@ void goto_program2codet::cleanup_code_block(
 
       // nested blocks with declarations become do { } while(false)
       // to ensure the inner block is never lost
-      if(has_decl)
+      if(!has_break_continue(to_code(*it)) && has_decl)
       {
         code_dowhilet d;
         d.cond()=false_exprt();
@@ -2174,7 +2230,9 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   else if(expr.id()==ID_array ||
           expr.id()==ID_vector)
   {
-    if(no_typecast) return;
+    if(no_typecast ||
+       expr.get_bool(ID_C_string_constant))
+      return;
 
     const typet &t=expr.type();
 

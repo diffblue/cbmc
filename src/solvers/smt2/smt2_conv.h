@@ -106,6 +106,11 @@ public:
   virtual tvt l_get(literalt l) const;
   virtual void set_assumptions(const bvt &bv) { assumptions=bv; }
 
+  // new stuff
+  void convert_expr(const exprt &);
+  void convert_type(const typet &);
+  void convert_literal(const literalt);
+
 protected:
   std::ostream &out;
   std::string benchmark, notes, logic;
@@ -116,11 +121,6 @@ protected:
   
   void write_header();
   void write_footer(std::ostream &);
-
-  // new stuff
-  void convert_expr(const exprt &);
-  void convert_type(const typet &);
-  void convert_literal(const literalt);
 
   // tweaks for arrays  
   bool use_array_theory(const exprt &);

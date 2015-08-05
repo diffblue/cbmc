@@ -947,7 +947,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
     dest=exprt(ID_constant, typet(ID_empty));
     cpp_typecheck.str << "Scopes in location " << source_location << std::endl;
     cpp_typecheck.cpp_scopes.get_root_scope().print(cpp_typecheck.str);
-    cpp_typecheck.warning();
+    cpp_typecheck.warning_msg();
   }
   else if(base_name=="current_scope")
   {
@@ -955,7 +955,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
     cpp_typecheck.str << "Scope in location " << source_location 
                       << ": " 
                       << original_scope->prefix;
-    cpp_typecheck.warning();
+    cpp_typecheck.warning_msg();
   }
   else if(base_name=="size_t")
   {
@@ -1758,7 +1758,7 @@ exprt cpp_typecheck_resolvet::resolve(
       cpp_typecheck.err_location(source_location);
       cpp_typecheck.str
         << "found no match for symbol `" << base_name
-        << "', candidates are:" << std::endl;
+        << "', candidates are:\n";
       show_identifiers(base_name, identifiers, cpp_typecheck.str);
     }
     else
@@ -1766,7 +1766,7 @@ exprt cpp_typecheck_resolvet::resolve(
       cpp_typecheck.err_location(source_location);
       cpp_typecheck.str
         << "symbol `" << base_name
-        << "' does not uniquely resolve:" << std::endl;
+        << "' does not uniquely resolve:\n";
       show_identifiers(base_name, new_identifiers, cpp_typecheck.str);
       
       #if 0

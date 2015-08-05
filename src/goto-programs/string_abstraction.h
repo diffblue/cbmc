@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 
 #include <util/symbol_table.h>
-#include <util/message_stream.h>
+#include <util/message.h>
 #include <util/config.h>
 #include <util/std_expr.h>
 
@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-class string_abstractiont:public message_streamt
+class string_abstractiont:public messaget
 {
 public:
   string_abstractiont(

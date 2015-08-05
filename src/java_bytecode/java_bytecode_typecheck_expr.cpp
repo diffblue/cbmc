@@ -35,12 +35,16 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     typecheck_expr(*it);
 
   if(expr.id()==ID_symbol)
+  {
     typecheck_expr_symbol(to_symbol_expr(expr));
+  }
   else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=to_side_effect_expr(expr).get_statement();
-    if(statement==ID_java_new || statement==ID_java_new_array)
+    if(statement==ID_java_new)
       typecheck_expr_java_new(to_side_effect_expr(expr));
+    else if(statement==ID_java_new_array)
+      typecheck_expr_java_new_array(to_side_effect_expr(expr));
   }
 }
 
@@ -58,17 +62,28 @@ Function: java_bytecode_typecheckt::typecheck_expr_java_new
 
 void java_bytecode_typecheckt::typecheck_expr_java_new(side_effect_exprt &expr)
 { 
-  if(expr.get_statement()==ID_java_new_array)
-    assert(expr.operands().size()==2);
-  else
-    assert(expr.operands().size()==1);
-
+  assert(expr.operands().empty());
   typet &type=expr.type();
   typecheck_type(type);
+}
 
-  // we need to compute the size of the object to be allocated
-  expr.op0()=c_sizeof(type.subtype(), ns);  
-  expr.op0().set(ID_C_c_sizeof_type, type.subtype());
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_expr_java_new_array
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_typecheckt::typecheck_expr_java_new_array(side_effect_exprt &expr)
+{ 
+  assert(expr.operands().size()>=1); // one per dimension
+  typet &type=expr.type();
+  typecheck_type(type);
 }
 
 /*******************************************************************\
@@ -86,13 +101,14 @@ Function: java_bytecode_typecheckt::typecheck_expr_symbol
 void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
 { 
   irep_idt identifier=expr.get_identifier();
-  
+
   // does it exist already in the destination symbol table?
   symbol_tablet::symbolst::const_iterator s_it=
-    dest_symbol_table.symbols.find(identifier);
+    symbol_table.symbols.find(identifier);
   
-  if(s_it==dest_symbol_table.symbols.end())
+  if(s_it==symbol_table.symbols.end())
   {
+    #if 1
     assert(has_prefix(id2string(identifier), "java::"));
   
     // no, create the symbol
@@ -102,19 +118,34 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
     new_symbol.base_name=expr.get(ID_C_base_name);
     new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
     new_symbol.mode=ID_java;
+    new_symbol.is_type=false;
     
-    dest_symbol_table.add(new_symbol);
+    if(new_symbol.type.id()==ID_code)
+    {
+      new_symbol.is_lvalue=false;
+    }
+    else
+    {
+      new_symbol.is_lvalue=true;
+    }
     
-    s_it=dest_symbol_table.symbols.find(identifier);
-    assert(s_it!=dest_symbol_table.symbols.end());
+    if(symbol_table.add(new_symbol))
+      throw "failed to add expression symbol to symbol table";
+    #else
+    str << "failed to find expression symbol `"
+        << identifier << "' in symbol table";
+    throw 0;
+    
+    #endif
   }
   else
   {
     // yes!
-  }
-  
-  const symbolt &symbol=s_it->second;
+    assert(!s_it->second.is_type);
 
-  // type the expression
-  expr.type()=symbol.type;
+    const symbolt &symbol=s_it->second;
+
+    // type the expression
+    expr.type()=symbol.type;
+  }
 }

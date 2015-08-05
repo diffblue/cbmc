@@ -37,6 +37,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 
+#include <cegis/bmc/bmc_verification_oracle.h>
+#include <cegis/symex/symex_learn.h>
+#include <cegis/facade/cegis.h>
+#include <cegis/options/cegis_options.h>
+
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/goto_check.h>
@@ -146,8 +151,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("show-vcc"))
     options.set_option("show-vcc", true);
 
-  if(cmdline.isset("cover-assertions"))
-    options.set_option("cover-assertions", true);
+  if(cmdline.isset("cover"))
+    options.set_option("cover", cmdline.get_value("cover"));
 
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
@@ -273,7 +278,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("error-label", cmdline.get_values("error-label"));
 
   // generate unwinding assertions
-  if(cmdline.isset("cover-assertions"))
+  if(cmdline.isset("cover"))
     options.set_option("unwinding-assertions", false);
   else
     options.set_option("unwinding-assertions",
@@ -536,7 +541,7 @@ int cbmc_parse_optionst::doit()
   //get solver
   cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
   cbmc_solvers.set_ui(get_ui());
-  std::auto_ptr<cbmc_solverst::solvert> cbmc_solver = cbmc_solvers.get_solver();
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = cbmc_solvers.get_solver();
   prop_convt& prop_conv = cbmc_solver->prop_conv();
 
   bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
@@ -579,6 +584,16 @@ int cbmc_parse_optionst::doit()
 
   if(set_properties(goto_functions))
     return 7;
+
+  if(cmdline.isset("cegis"))
+  {
+    if (cmdline.isset("function"))
+      options.set_option("function", cmdline.get_value("function"));
+    const cegis_optionst cegis_options(cmdline, options);
+    symex_learnt learning_algorithm(cegis_options, symbol_table, goto_functions, ui_message_handler);
+    bmc_verification_oraclet verification_oracle(options, symbol_table, goto_functions, ui_message_handler);
+    return run_cegis(learning_algorithm, verification_oracle, result());
+  }
 
   // do actual BMC
   return do_bmc(bmc, goto_functions);
@@ -822,7 +837,7 @@ void cbmc_parse_optionst::preprocessing()
     
     ptr->set_message_handler(get_message_handler());
 
-    std::auto_ptr<languaget> language(ptr);
+    std::unique_ptr<languaget> language(ptr);
   
     if(language->preprocess(infile, filename, std::cout))
       error() << "PREPROCESSING ERROR" << eom;
@@ -915,10 +930,11 @@ bool cbmc_parse_optionst::process_goto_program(
     // add loop ids
     goto_functions.compute_loop_numbers();
     
-    // if we aim to cover, replace
+    // if we aim to cover assertions, replace
     // all assertions by false to prevent simplification
     
-    if(cmdline.isset("cover-assertions"))
+    if(cmdline.isset("cover") &&
+       cmdline.get_value("cover")=="assertions")
       make_assertions_false(goto_functions);
 
     // show it?
@@ -1069,7 +1085,7 @@ void cbmc_parse_optionst::help()
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
-    " --cover-assertions           check which assertions are reachable\n"
+    " --cover CC                   create test-suite with coverage criterion CC\n"
     " --mm MM                      memory consistency model for concurrent programs\n"
     "\n"
     "BMC options:\n"

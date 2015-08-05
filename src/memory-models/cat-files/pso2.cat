@@ -1,0 +1,9 @@
+"PSO"
+
+let fr = rf^-1;co
+let com = rf | co | fr
+acyclic po-loc | com as sc-per-location
+
+let ppo = po \ (W*R | W*W)
+acyclic ppo | rfe | co | fr as pso
+

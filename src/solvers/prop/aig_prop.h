@@ -78,7 +78,11 @@ public:
 
   virtual bool has_set_to() const { return true; }
  
-  virtual void lcnf(const bvt &clause);
+  virtual void lcnf(const bvt &clause)
+  {
+    l_set_to_true(lor(clause));
+  }
+  
   virtual void l_set_to(literalt a, bool value)
   {
     constraints.push_back(a^!value);

@@ -22,9 +22,12 @@ int yymmerror(const std::string &error);
 %token TOK_PLUSPLUS    "++"
 %token TOK_OROR        "||"
 %token TOK_LET         "let"
+%token TOK_AND         "and"
 %token TOK_IN          "in"
+%token TOK_DO          "do"
 %token TOK_MATCH       "match"
 %token TOK_WITH        "with"
+%token TOK_FROM        "from"
 %token TOK_ACYCLIC     "acyclic"
 %token TOK_IRRELFEXIVE "irreflexive"
 %token TOK_EMPTY       "empty"
@@ -39,22 +42,29 @@ int yymmerror(const std::string &error);
 %token TOK_ENUM        "enum"
 %token TOK_FORALL      "forall"
 %token TOK_AS          "as"
+%token TOK_CALL        "call"
+%token TOK_INCLUDE     "include"
+%token TOK_SET_INTERSECTION "∩"
+%token TOK_SET_UNION   "∪"
+%token TOK_CROSS_PRODUCT "⨯"
+%token TOK_EMPTY_SET   "∅"
 
 %token TOK_IDENTIFIER
 %token TOK_TAG_IDENTIFIER
 %token TOK_NUMBER
 %token TOK_STRING
 
+%left '*' "⨯"
 %right ','
 %left prec_let
 %left prec_fun
 %left prec_app
-%right '|'
+%right '|' "∪"
 %right "++"
 %right ';'
 %left '\\'
-%right '&'
-%nonassoc '*' '+' '?'
+%right '&' "∩"
+%nonassoc '~' '+' '?'
 %nonassoc "^-1"
 
 %start grammar
@@ -89,7 +99,8 @@ model_name:
         }
         ;
 
-simple_expr: TOK_NUMBER
+simple_expr: 
+          TOK_NUMBER
         {
           $$=$1;
           stack($$).id(ID_constant);
@@ -101,7 +112,7 @@ simple_expr: TOK_NUMBER
         {
           $$=$2;
         }
-        | '{' expr_list '}'
+        | '{' expr_list_opt '}'
         {
           $$=$1;
           stack($$).id(ID_set);
@@ -111,11 +122,22 @@ simple_expr: TOK_NUMBER
         {
           $$=$2;
         }
-        | '(' expr_list ')'
+        | '(' tuple ')'
         {
           $$=$1;
           stack($$).id("tuple");
           mto($$, $2);
+        }
+        | '(' ')'
+        {
+          // only used for procedure calls
+          $$=$1;
+          stack($$).id("empty_tuple");
+        }
+        | '_'
+        {
+          $$=$1;
+          stack($$).id("universe");
         }
         ;
 
@@ -132,10 +154,34 @@ expr:     simple_expr
           stack($$).id("transitive_closure");
           mto($$, $1);
         }
+        | expr '*' simple_expr
+        {
+          // The simple_expr in the rule above is to avoid a conflict
+          // between a*b and a*, say followed by LET
+          $$=$2;
+          stack($$).id("cartesian_product");
+          mto($$, $1);
+          mto($$, $3);
+        }
+        | expr "⨯" simple_expr
+        {
+          // The simple_expr in the rule above could be expr,
+          // as there is no ambiguity with the reflexive transitive closure.
+          $$=$2;
+          stack($$).id("cartesian_product");
+          mto($$, $1);
+          mto($$, $3);
+        }
         | expr '?'
         {
           $$=$2;
-          stack($$).id("question_mark");
+          stack($$).id("reflexive_closure");
+          mto($$, $1);
+        }
+        | '~' expr
+        {
+          $$=$1;
+          stack($$).id("complement");
           mto($$, $1);
         }
         | expr "^-1"
@@ -145,6 +191,13 @@ expr:     simple_expr
           mto($$, $1);
         }
         | expr '|' expr
+        {
+          $$=$2;
+          stack($$).id("union");
+          mto($$, $1);
+          mto($$, $3);
+        }
+        | expr "∪" expr
         {
           $$=$2;
           stack($$).id("union");
@@ -172,6 +225,13 @@ expr:     simple_expr
           mto($$, $1);
           mto($$, $3);
         }
+        | expr "∩" expr
+        {
+          $$=$2;
+          stack($$).id("intersection");
+          mto($$, $1);
+          mto($$, $3);
+        }
         | expr "++" expr
         {
           $$=$2;
@@ -179,7 +239,7 @@ expr:     simple_expr
           mto($$, $1);
           mto($$, $3);
         }
-        | identifier simple_expr %prec prec_app
+        | identifier simple_expr_sequence %prec prec_app
         {
           newstack($$);
           stack($$).id(ID_function_call);
@@ -193,27 +253,31 @@ expr:     simple_expr
           mto($$, $2);
           mto($$, $4);
         }
-        | "let" binding_list "in" expr %prec prec_let
+        | "let" pat_bind_list "in" expr %prec prec_let
         {
           $$=$1;
           stack($$).id(ID_let);
           mto($$, $2);
           mto($$, $4);
         }
-        | "let" "rec" binding_list "in" expr %prec prec_let
+        | "let" "rec" pat_bind_list "in" expr %prec prec_let
         {
           $$=$1;
           stack($$).id(ID_let);
           mto($$, $3);
           mto($$, $5);
         }
-        | "match" expr "with" tag_match_list "end"
+        | "match" expr "with" alt_opt tag_match_list "end"
         {
           $$=$1;
           stack($$).id("match");
           mto($$, $2);
-          mto($$, $4);
+          mto($$, $5);
         }
+        ;
+
+alt_opt : /* nothing */
+        | "||";
         ;
 
 flag_opt: /* nothing */
@@ -234,13 +298,6 @@ tag_match: expr "->" expr
           mto($$, $1);
           mto($$, $3);
         }
-        | '_' "->" expr
-        {
-          $$=$2;
-          stack($1).id(ID_default);
-          mto($$, $1);
-          mto($$, $3);
-        }
         ;
 
 tag_match_list:
@@ -256,22 +313,50 @@ tag_match_list:
         }
         ;
 
-binding_list:
-          binding
+pat_bind_list:
+          pat_bind
         {
           newstack($$);
           mto($$, $1);
         }
-        | binding_list "and" binding
+        | pat_bind_list "and" pat_bind
         {
           $$=$1;
           mto($$, $3);
         }
         ;
 
-expr_list: /* nothing */
+simple_expr_sequence:
+          simple_expr
         {
           newstack($$);
+          mto($$, $1);
+        }
+        | simple_expr_sequence simple_expr
+        {
+          $$=$1;
+          mto($$, $1);
+        }
+        ;
+
+tuple:
+          expr ',' expr
+        {
+          newstack($$);
+          mto($$, $1);
+        }
+        | tuple ',' expr
+        {
+          $$=$1;
+          mto($$, $1);
+        }
+        ;
+
+expr_list:
+          expr
+        {
+          newstack($$);
+          mto($$, $1);
         }
         | expr_list ',' expr
         {
@@ -280,16 +365,25 @@ expr_list: /* nothing */
         }
         ;
 
+expr_list_opt: /* nothing */
+        {
+          newstack($$);
+        }
+        | expr_list
+        ;
+
 pat     : identifier
-        | '(' identifier_list ')'
+        | '(' identifier_list_opt ')'
         {
           $$=$2;
         }
         ;
 
-identifier_list: /* nothing */
+identifier_list:
+          identifier
         {
           newstack($$);
+          mto($$, $1);
         }
         | identifier_list ',' identifier
         {
@@ -298,38 +392,47 @@ identifier_list: /* nothing */
         }
         ;
 
-binding : valbinding
-        | funbinding  
+identifier_list_opt: /* nothing */
+        {
+          newstack($$);
+        }
+        | identifier_list
         ;
- 
-valbinding: pat '=' expr  
+
+pat_bind: identifier '=' expr
         {
           $$=$2;
           stack($$).id("valbinding");
           mto($$, $1);
           mto($$, $3);
         }
-        ;
- 
-funbinding: identifier pat '=' expr  
+        | identifier '(' identifier_list_opt ')' '=' expr
+        {
+          $$=$2;
+          stack($$).id("funbinding");
+          mto($$, $1);
+          mto($$, $3);
+          mto($$, $6);
+        }
+        | identifier identifier '=' expr
         {
           $$=$3;
           stack($$).id("funbinding");
           mto($$, $1);
           mto($$, $2);
-          mto($$, $3);
+          mto($$, $4);
         }
         ;
 
 instruction:
-          "let" binding_list
+          "let" pat_bind_list
         {
           $$=$1;
           stack($$).id(ID_code);
           stack($$).set(ID_statement, ID_let);
           mto($$, $2);
         }
-        | "let" "rec" binding_list
+        | "let" "rec" pat_bind_list
         {
           $$=$1;
           stack($$).id(ID_code);
@@ -345,7 +448,7 @@ instruction:
           mto($$, $3);
           mto($$, $4);
         }
-        | "procedure" identifier '(' identifier_list ')' '=' instruction_list "end"
+        | "procedure" identifier '(' identifier_list_opt ')' '=' instruction_list "end"
         {
           $$=$1;
           stack($$).id(ID_code);
@@ -362,14 +465,15 @@ instruction:
           mto($$, $2);
           mto($$, $3);
         }
-        | "show" identifier_list
+        | "show" expr_list as_opt
         {
           $$=$1;
           stack($$).id(ID_code);
           stack($$).set(ID_statement, "show");
           mto($$, $2);
+          mto($$, $3);
         }
-        | "unshow" identifier_list
+        | "unshow" expr_list
         {
           $$=$1;
           stack($$).id(ID_code);
@@ -400,6 +504,10 @@ instruction:
           stack($$).set(ID_statement, ID_enum);
           mto($$, $2);
           mto($$, $4);
+        }
+        | "include" TOK_STRING
+        {
+          $$=$1;
         }
         ;
 

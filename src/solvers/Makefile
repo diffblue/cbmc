@@ -113,6 +113,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       flattening/boolbv_complex.cpp flattening/boolbv_floatbv_op.cpp \
       flattening/boolbv_union.cpp flattening/flatten_byte_operators.cpp \
       flattening/boolbv_update.cpp flattening/c_bit_field_replacement_type.cpp \
+      flattening/boolbv_onehot.cpp \
       floatbv/float_utils.cpp floatbv/float_bv.cpp \
       refinement/bv_refinement_loop.cpp refinement/refine_arithmetic.cpp \
       refinement/refine_arrays.cpp
@@ -122,7 +123,10 @@ INCLUDES= -I .. \
   $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
 	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
-CLEANFILES = solvers$(LIBEXT)
+CLEANFILES = solvers$(LIBEXT) \
+             smt2/smt2_parser_test$(EXEEXT) \
+             smt2/smt2_parser_test$(OBJEXT) \
+             smt2/smt2_parser_test.d \
 
 all: solvers$(LIBEXT) smt2/smt2_parser_test$(EXEEXT)
 

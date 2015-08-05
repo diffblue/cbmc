@@ -42,6 +42,29 @@ public:
     cpp_idt::id_classt id_class,
     id_sett &id_set);
 
+  cpp_idt &insert(const irep_idt &_base_name)
+  {
+    cpp_id_mapt::iterator it=
+      sub.insert(std::pair<irep_idt, cpp_idt>
+        (_base_name, cpp_idt()));
+
+    it->second.base_name=_base_name;
+    it->second.set_parent(*this);
+
+    return it->second;
+  }
+
+  cpp_idt &insert(const cpp_idt &cpp_id)
+  {
+    cpp_id_mapt::iterator it=
+      sub.insert(std::pair<irep_idt, cpp_idt>
+        (cpp_id.base_name, cpp_id));
+
+    it->second.set_parent(*this);
+
+    return it->second;
+  }
+
   bool contains(const irep_idt &base_name);
 
   bool is_root_scope() const
@@ -53,6 +76,11 @@ public:
   {
     return id_class==ROOT_SCOPE ||
            id_class==NAMESPACE;
+  }
+
+  inline bool is_template_scope() const
+  {
+    return id_class==TEMPLATE_SCOPE;
   }
 
   cpp_scopet &get_parent() const
@@ -82,8 +110,7 @@ public:
     using_scopes.push_back(&other);
   }
 
-  class cpp_scopet &new_scope(
-    const irep_idt &new_scope_name);
+  class cpp_scopet &new_scope(const irep_idt &new_scope_name);
 };
 
 class cpp_root_scopet:public cpp_scopet

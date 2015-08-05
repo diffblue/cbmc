@@ -46,9 +46,9 @@ Function: to_rational
 
 bool to_rational(const exprt &expr, rationalt &rational_value)
 {
-  if(expr.id()!="constant") return true;
+  if(expr.id()!=ID_constant) return true;
 
-  const std::string &value=expr.get_string("value");
+  const std::string &value=expr.get_string(ID_value);
 
   std::string no1, no2;
   char mode=0;

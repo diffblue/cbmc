@@ -9,22 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_PARSE_TREE_H
 #define CPROVER_JAVA_BYTECODE_PARSE_TREE_H
 
+#include <set>
+
 #include <util/std_code.h>
 #include <util/std_types.h>
 
 class java_bytecode_parse_treet
 {
 public:
-  class itemt
-  {
-  public:
-    irep_idt name;
-    typet type;
-
-    typedef std::vector<codet> instructionst;
-    instructionst instructions;
-  };
-  
   class instructiont
   {
   public:
@@ -38,8 +30,23 @@ public:
   {
   public:
     std::string signature;
-    irep_idt base_name, name;
-    bool is_method, is_static, is_native;
+    irep_idt name;
+    bool is_public, is_protected, is_private, is_static, is_final;
+    
+    virtual void output(std::ostream &out) const = 0;
+    
+    inline membert():
+      is_public(false), is_protected(false), is_private(false),
+      is_static(false), is_final(false)
+    {
+    }
+  };
+  
+  class methodt:public membert
+  {
+  public:
+    irep_idt base_name;
+    bool is_native, is_abstract, is_synchronized;
 
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
@@ -49,43 +56,76 @@ public:
       instructions.push_back(instructiont());
       return instructions.back();
     }
-
-    void output(std::ostream &out) const;
     
-    inline membert():is_method(false), is_static(false), is_native(false)
+    class exceptiont
+    {
+    };
+    
+    typedef std::vector<exceptiont> exception_tablet;
+    exception_tablet exception_table;
+
+    virtual void output(std::ostream &out) const;
+    
+    inline methodt():is_native(false), is_abstract(false), is_synchronized(false)
     {
     }
+  };
+  
+  class fieldt:public membert
+  {
+  public:
+    virtual void output(std::ostream &out) const;
   };
   
   class classt
   {
   public:
     irep_idt name, extends;
+    bool is_abstract;
+    typedef std::list<irep_idt> implementst;
+    implementst implements;
     
-    typedef std::list<membert> memberst;
-    memberst members;
+    typedef std::list<fieldt> fieldst;
+    typedef std::list<methodt> methodst;
+    fieldst fields;
+    methodst methods;
     
-    inline membert &add_member()
+    inline fieldt &add_field()
     {
-      members.push_back(membert());
-      return members.back();
+      fields.push_back(fieldt());
+      return fields.back();
+    }
+
+    inline methodt &add_method()
+    {
+      methods.push_back(methodt());
+      return methods.back();
     }
 
     void output(std::ostream &out) const;
+    
+    void swap(classt &other);
   };
   
-  typedef std::list<classt> classest;
-  classest classes;
+  classt parsed_class;
   
-  inline classt &add_class()
+  void swap(java_bytecode_parse_treet &other)
   {
-    classes.push_back(classt());
-    return classes.back();
+    other.parsed_class.swap(parsed_class);
+    other.class_refs.swap(class_refs);
+    std::swap(loading_successful, other.loading_successful);
   }
 
-  void swap(java_bytecode_parse_treet &other);
-  void clear();
   void output(std::ostream &out) const;
+
+  typedef std::set<irep_idt> class_refst;
+  class_refst class_refs;
+  
+  bool loading_successful;
+  
+  inline java_bytecode_parse_treet():loading_successful(false)
+  {
+  }
 };
 
 #endif

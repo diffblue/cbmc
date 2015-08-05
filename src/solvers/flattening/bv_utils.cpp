@@ -250,90 +250,92 @@ Function: bv_utilst::full_adder
 #define OPTIMAL_FULL_ADDER
 
 literalt bv_utilst::full_adder(
-  const literalt a, const literalt b,
-  const literalt carry_in, literalt &carry_out)
+  const literalt a,
+  const literalt b,
+  const literalt carry_in,
+  literalt &carry_out)
 {
-#ifdef OPTIMAL_FULL_ADDER
-  literalt x;
-  literalt y;
-  int constantProp = -1;
+  #ifdef OPTIMAL_FULL_ADDER
+  if(prop.has_set_to())
+  {
+    literalt x;
+    literalt y;
+    int constantProp = -1;
 
-  if (a.is_constant())
-  {
-    x = b;
-    y = carry_in;
-    constantProp = (a.is_true()) ? 1 : 0;    
-  }
-  else if (b.is_constant())
-  {
-    x = a;
-    y = carry_in;
-    constantProp = (b.is_true()) ? 1 : 0;    
-  }
-  else if (carry_in.is_constant())
-  {
-    x = a;
-    y = b;
-    constantProp = (carry_in.is_true()) ? 1 : 0;
-  }
+    if(a.is_constant())
+    {
+      x = b;
+      y = carry_in;
+      constantProp = (a.is_true()) ? 1 : 0;    
+    }
+    else if (b.is_constant())
+    {
+      x = a;
+      y = carry_in;
+      constantProp = (b.is_true()) ? 1 : 0;    
+    }
+    else if (carry_in.is_constant())
+    {
+      x = a;
+      y = b;
+      constantProp = (carry_in.is_true()) ? 1 : 0;
+    }
 
-  literalt sum;
+    literalt sum;
 
-  // Rely on prop.l* to do further constant propagation
-  if (constantProp == 1)
-  {
-    // At least one input bit is 1
-    carry_out = prop.lor(x, y);
-    sum = prop.lequal(x, y);    
-  }
-  else if (constantProp == 0)
-  {
-    // At least one input bit is 0
-    carry_out = prop.land(x,y);
-    sum = prop.lxor(x,y);    
+    // Rely on prop.l* to do further constant propagation
+    if(constantProp == 1)
+    {
+      // At least one input bit is 1
+      carry_out = prop.lor(x, y);
+      sum = prop.lequal(x, y);    
+    }
+    else if(constantProp == 0)
+    {
+      // At least one input bit is 0
+      carry_out = prop.land(x,y);
+      sum = prop.lxor(x,y);    
+    }
+    else
+    {
+      carry_out = prop.new_variable();
+      sum = prop.new_variable();
+      
+      // Any two inputs 1 will set the carry_out to 1
+      prop.lcnf(!a,        !b, carry_out);
+      prop.lcnf(!a, !carry_in, carry_out);
+      prop.lcnf(!b, !carry_in, carry_out);
+      
+      // Any two inputs 0 will set the carry_out to 0
+      prop.lcnf(a,        b, !carry_out);
+      prop.lcnf(a, carry_in, !carry_out);
+      prop.lcnf(b, carry_in, !carry_out);
+      
+      // If both carry out and sum are 1 then all inputs are 1
+      prop.lcnf(       a, !sum, !carry_out);
+      prop.lcnf(       b, !sum, !carry_out);
+      prop.lcnf(carry_in, !sum, !carry_out);
+      
+      // If both carry out and sum are 0 then all inputs are 0
+      prop.lcnf(       !a, sum, carry_out);
+      prop.lcnf(       !b, sum, carry_out);
+      prop.lcnf(!carry_in, sum, carry_out);
+      
+      // If all of the inputs are 1 or all are 0 it sets the sum
+      prop.lcnf(!a, !b, !carry_in,  sum);
+      prop.lcnf( a,  b,  carry_in, !sum);
+    }
+
+    return sum;
   }
   else
+  #endif // OPTIMAL_FULL_ADDER
   {
-    carry_out = prop.new_variable();
-    sum = prop.new_variable();
-    
-    // Any two inputs 1 will set the carry_out to 1
-    prop.lcnf(!a,        !b, carry_out);
-    prop.lcnf(!a, !carry_in, carry_out);
-    prop.lcnf(!b, !carry_in, carry_out);
-    
-    // Any two inputs 0 will set the carry_out to 0
-    prop.lcnf(a,        b, !carry_out);
-    prop.lcnf(a, carry_in, !carry_out);
-    prop.lcnf(b, carry_in, !carry_out);
-    
-    // If both carry out and sum are 1 then all inputs are 1
-    prop.lcnf(       a, !sum, !carry_out);
-    prop.lcnf(       b, !sum, !carry_out);
-    prop.lcnf(carry_in, !sum, !carry_out);
-    
-    // If both carry out and sum are 0 then all inputs are 0
-    prop.lcnf(       !a, sum, carry_out);
-    prop.lcnf(       !b, sum, carry_out);
-    prop.lcnf(!carry_in, sum, carry_out);
-    
-    // If all of the inputs are 1 or all are 0 it sets the sum
-    prop.lcnf(!a, !b, !carry_in,  sum);
-    prop.lcnf( a,  b,  carry_in, !sum);
-  }
-
-  return sum;
-
-#else
-
+    // trivial encoding
     carry_out=carry(a, b, carry_in);
-
-    return prop.lxor(
-           prop.lxor(a, b), carry_in);
-#endif
-
+    return prop.lxor(prop.lxor(a, b), carry_in);
+  }
 }
-
 
 /*******************************************************************\
 
@@ -355,63 +357,67 @@ Function: bv_utilst::carry
 literalt bv_utilst::carry(literalt a, literalt b, literalt c)
 {
   #ifdef COMPACT_CARRY
-  // propagation possible?
-  unsigned const_count=
-    a.is_constant() + b.is_constant() + c.is_constant();
-  
-  // propagation is possible if two or three inputs are constant
-  if(const_count>=2)
-    return prop.lor(prop.lor(
-        prop.land(a, b),
-        prop.land(a, c)),
-        prop.land(b, c));
-        
-  // it's also possible if two of a,b,c are the same
-  if(a==b)
-    return a;
-  else if(a==c)
-    return a;
-  else if(b==c)
-    return b;
-        
-  // the below yields fewer clauses and variables,
-  // but doesn't propagate anything at all
+  if(prop.has_set_to())
+  {
+    // propagation possible?
+    unsigned const_count=
+      a.is_constant() + b.is_constant() + c.is_constant();
+    
+    // propagation is possible if two or three inputs are constant
+    if(const_count>=2)
+      return prop.lor(prop.lor(
+          prop.land(a, b),
+          prop.land(a, c)),
+          prop.land(b, c));
+          
+    // it's also possible if two of a,b,c are the same
+    if(a==b)
+      return a;
+    else if(a==c)
+      return a;
+    else if(b==c)
+      return b;
+          
+    // the below yields fewer clauses and variables,
+    // but doesn't propagate anything at all
 
-  bvt clause;
+    bvt clause;
 
-  literalt x=prop.new_variable();
+    literalt x=prop.new_variable();
 
-  /*
-  carry_correct: LEMMA
-    (    a OR     b OR          NOT x) AND
-    (    a OR NOT b OR     c OR NOT x) AND
-    (    a OR NOT b OR NOT c OR     x) AND
-    (NOT a OR     b OR     c OR NOT x) AND
-    (NOT a OR     b OR NOT c OR     x) AND
-    (NOT a OR NOT b OR              x)
-    IFF
-    (x=((a AND b) OR (a AND c) OR (b AND c)));
-  */
+    /*
+    carry_correct: LEMMA
+      (    a OR     b OR          NOT x) AND
+      (    a OR NOT b OR     c OR NOT x) AND
+      (    a OR NOT b OR NOT c OR     x) AND
+      (NOT a OR     b OR     c OR NOT x) AND
+      (NOT a OR     b OR NOT c OR     x) AND
+      (NOT a OR NOT b OR              x)
+      IFF
+      (x=((a AND b) OR (a AND c) OR (b AND c)));
+    */
 
-  prop.lcnf( a,  b,     !x);
-  prop.lcnf( a, !b,  c, !x);
-  prop.lcnf( a, !b, !c,  x);
-  prop.lcnf(!a,  b,  c, !x);
-  prop.lcnf(!a,  b, !c,  x);
-  prop.lcnf(!a, !b,      x);
+    prop.lcnf( a,  b,     !x);
+    prop.lcnf( a, !b,  c, !x);
+    prop.lcnf( a, !b, !c,  x);
+    prop.lcnf(!a,  b,  c, !x);
+    prop.lcnf(!a,  b, !c,  x);
+    prop.lcnf(!a, !b,      x);
 
-  return x;
+    return x;
+  }
+  else
+  #endif // COMPACT_CARRY
+  {
+    // trivial encoding
+    bvt tmp;
 
-  #else
+    tmp.push_back(prop.land(a, b));
+    tmp.push_back(prop.land(a, c));
+    tmp.push_back(prop.land(b, c));
 
-  bvt tmp;
-
-  tmp.push_back(prop.land(a, b));
-  tmp.push_back(prop.land(a, c));
-  tmp.push_back(prop.land(b, c));
-
-  return prop.lor(tmp);
-  #endif
+    return prop.lor(tmp);
+  }
 }
 
 /*******************************************************************\
@@ -561,13 +567,12 @@ literalt bv_utilst::overflow_add(
 {
   if(rep==SIGNED)
   {
-    // an overflow occurs if the signs of the two operands are the same
-    // and the sign of the sum is the opposite
+    // An overflow occurs if the signs of the two operands are the same
+    // and the sign of the sum is the opposite.
 
     literalt old_sign=op0[op0.size()-1];
     literalt sign_the_same=prop.lequal(op0[op0.size()-1], op1[op1.size()-1]);
 
-    literalt carry_out;
     bvt result=add(op0, op1);
     return prop.land(sign_the_same, prop.lxor(result[result.size()-1], old_sign));
   }
@@ -595,10 +600,16 @@ Function: bv_utilst::overflow_sub
 literalt bv_utilst::overflow_sub(
   const bvt &op0, const bvt &op1, representationt rep)
 {
-  // this needs to be fixed!!
   if(rep==SIGNED)
   {
-    return overflow_add(op0, negate(op1), SIGNED);
+    // We special-case INT_MIN-INT_MIN, which is zero,
+    // and thus not an overflow.
+    literalt op0_int_min=is_int_min(op0);
+    literalt op1_int_min=is_int_min(op1);
+    
+    return 
+      prop.land(prop.lor(!op0_int_min, !op1_int_min),
+      overflow_add(op0, negate(op1), SIGNED));
   }
   else if(rep==UNSIGNED)
   {
@@ -1515,7 +1526,6 @@ literalt bv_utilst::lt_or_le(
     prop.l_set_to_true(compareBelow[start]);
   }
 
-
   // Determine the output
   //  \forall i .  cb[i] & -a[i] &  b[i] =>  result
   //  \forall i .  cb[i] &  a[i] & -b[i] => -result
@@ -1624,6 +1634,40 @@ literalt bv_utilst::signed_less_than(
 
 /*******************************************************************\
 
+Function: bv_utilst::rel
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+literalt bv_utilst::rel(
+  const bvt &bv0,
+  irep_idt id,
+  const bvt &bv1,
+  representationt rep)
+{
+  if(id==ID_equal)
+    return equal(bv0, bv1);
+  else if(id==ID_notequal)
+    return !equal(bv0, bv1);
+  else if(id==ID_le)
+    return lt_or_le(true, bv0, bv1, rep);
+  else if(id==ID_lt)
+    return lt_or_le(false, bv0, bv1, rep);
+  else if(id==ID_ge)
+    return lt_or_le(true, bv1, bv0, rep); // swapped
+  else if(id==ID_gt)
+    return lt_or_le(false, bv1, bv0, rep); // swapped
+  else
+    assert(false);
+}
+
+/*******************************************************************\
+
 Function: bv_utilst::is_constant
 
   Inputs:
@@ -1667,4 +1711,58 @@ void bv_utilst::cond_implies_equal(
     prop.lcnf(!cond,  a[i], !b[i]);
     prop.lcnf(!cond, !a[i],  b[i]);
   }
+}
+
+/*******************************************************************\
+
+Function: bv_utilst::verilog_bv_has_x_or_z
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+literalt bv_utilst::verilog_bv_has_x_or_z(const bvt &src)
+{
+  bvt odd_bits;
+  odd_bits.reserve(src.size()/2);
+
+  // check every odd bit
+  for(unsigned i=0; i<src.size(); i++)
+  {
+    if(i%2!=0)
+      odd_bits.push_back(src[i]);
+  }
+  
+  return prop.lor(odd_bits);
+}
+
+/*******************************************************************\
+
+Function: bv_utilst::verilog_bv_normal_bits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bvt bv_utilst::verilog_bv_normal_bits(const bvt &src)
+{
+  bvt even_bits;
+  even_bits.reserve(src.size()/2);
+
+  // get every even bit
+  for(unsigned i=0; i<src.size(); i++)
+  {
+    if(i%2==0)
+      even_bits.push_back(src[i]);
+  }
+  
+  return even_bits;
 }

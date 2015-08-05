@@ -48,7 +48,8 @@ Function: value_sett::field_sensitive
 
 bool value_sett::field_sensitive(
   const irep_idt &id,
-  const typet &type)
+  const typet &type,
+  const namespacet &ns)
 {
   // we always track fields on these
   if(has_prefix(id2string(id), "value_set::dynamic_object") ||
@@ -57,7 +58,7 @@ bool value_sett::field_sensitive(
     return true;
 
   // otherwise it has to be a struct
-  return type.id()==ID_struct;
+  return ns.follow(type).id()==ID_struct;
 }
 
 /*******************************************************************\
@@ -74,11 +75,12 @@ Function: value_sett::insert
 
 value_sett::entryt &value_sett::get_entry(
   const entryt &e,
-  const typet &type)
+  const typet &type,
+  const namespacet &ns)
 {
   irep_idt index;
 
-  if(field_sensitive(e.identifier, type))
+  if(field_sensitive(e.identifier, type, ns))
     index=id2string(e.identifier)+e.suffix;
   else
     index=e.identifier;
@@ -1464,7 +1466,7 @@ void value_sett::assign_rec(
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
     
-    entryt &e=get_entry(entryt(identifier, suffix), lhs.type());
+    entryt &e=get_entry(entryt(identifier, suffix), lhs.type(), ns);
     
     if(add_to_sets)
       make_union(e.object_map, values_rhs);
@@ -1480,7 +1482,7 @@ void value_sett::assign_rec(
       "value_set::dynamic_object"+
       dynamic_object.instance().get_string(ID_value);
       
-    entryt &e=get_entry(entryt(name, suffix), lhs.type());
+    entryt &e=get_entry(entryt(name, suffix), lhs.type(), ns);
 
     make_union(e.object_map, values_rhs);
   }

@@ -26,9 +26,6 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
 
 /* FUNCTION: __new_array */
 
-#undef malloc
-void *malloc(__CPROVER_size_t malloc_size);
-
 inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
 {
   // The constructor call is done by the front-end.

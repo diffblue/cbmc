@@ -6,18 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JAVAP_PARSE_H
-#define CPROVER_JAVAP_PARSE_H
+#ifndef CPROVER_JAVA_BYTECODE_PARSE_H
+#define CPROVER_JAVA_BYTECODE_PARSE_H
 
 #include <string>
 
-#include <util/message.h>
-
-#include "java_bytecode_parse_tree.h"
-
-bool javap_parse(
+bool java_bytecode_parse(
   const std::string &file,
-  java_bytecode_parse_treet &,
-  message_handlert &);
+  class java_bytecode_parse_treet &,
+  class message_handlert &);
 
 #endif

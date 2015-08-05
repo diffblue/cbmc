@@ -398,7 +398,7 @@ void dump_ct::convert_compound(
 {
   const irep_idt &name=type.get(ID_tag);
 
-  if(!converted.insert(name).second)
+  if(!converted_compound.insert(name).second)
     return;
 
   const irept &bases = type.find(ID_bases);
@@ -564,23 +564,37 @@ void dump_ct::convert_compound_enum(
   const irep_idt &name=tag.get(ID_C_base_name);
 
   if(tag.is_nil() ||
-     !converted.insert(name).second)
+     !converted_enum.insert(name).second)
     return;
 
-  os << type_to_string(type);
-
-  if(type.get_bool(ID_C_packed))
-    os << " __attribute__ ((__packed__))";
-
-  os << ";\n\n";
-
-  const c_enum_typet::memberst &members=
-    to_c_enum_type(type).members();
-  for(c_enum_typet::memberst::const_iterator
+  c_enum_typet enum_type=to_c_enum_type(type);
+  c_enum_typet::memberst &members=
+    (c_enum_typet::memberst &)(enum_type.add(ID_body).get_sub());
+  for(c_enum_typet::memberst::iterator
       it=members.begin();
       it!=members.end();
       ++it)
-    declared_enum_constants.insert(it->get_base_name());
+  {
+    const irep_idt bn=it->get_base_name();
+
+    if(declared_enum_constants.find(bn)!=
+       declared_enum_constants.end() ||
+       copied_symbol_table.has_symbol(bn))
+    {
+      std::string new_bn=id2string(name)+"$$"+id2string(bn);
+      it->set_base_name(new_bn);
+    }
+
+    declared_enum_constants.insert(
+      std::make_pair(bn, it->get_base_name()));
+  }
+
+  os << type_to_string(enum_type);
+
+  if(enum_type.get_bool(ID_C_packed))
+    os << " __attribute__ ((__packed__))";
+
+  os << ";\n\n";
 }
 
 /*******************************************************************\
@@ -891,7 +905,7 @@ void dump_ct::convert_global_variable(
 {
   const irep_idt &func=symbol.location.get_function();
   if((func.empty() || symbol.is_extern || symbol.value.is_not_nil()) &&
-      !converted.insert(symbol.name).second)
+      !converted_global.insert(symbol.name).second)
     return;
 
   code_declt d(symbol.symbol_expr());
@@ -996,17 +1010,26 @@ void dump_ct::convert_function_declaration(
       local_static_decls,
       type_decls);
 
-    convertedt converted_bak(converted);
+    convertedt converted_c_bak(converted_compound);
+    convertedt converted_e_bak(converted_enum);
+
+    declared_enum_constants_mapt
+      enum_constants_bak(declared_enum_constants);
+
     insert_local_type_decls(
       b,
       type_decls);
-    converted.swap(converted_bak);
+
+    converted_enum.swap(converted_e_bak);
+    converted_compound.swap(converted_c_bak);
 
     os_body << "// " << symbol.name << std::endl;
     os_body << "// " << symbol.location << std::endl;
     os_body << make_decl(symbol.name, symbol.type) << std::endl;
     os_body << expr_to_string(b);
     os_body << std::endl << std::endl;
+
+    declared_enum_constants.swap(enum_constants_bak);
   }
 
   if(symbol.name!=goto_functionst::entry_point() &&
@@ -1253,20 +1276,27 @@ void dump_ct::cleanup_expr(exprt &expr)
     }
     expr.type().swap(type);
   }
-  else if(expr.id()==ID_union &&
-          (expr.type().get_bool(ID_C_transparent_union) ||
-           ns.follow(expr.type()).get_bool(ID_C_transparent_union)))
+  else if(expr.id()==ID_union)
   {
     union_exprt &u=to_union_expr(expr);
+    const union_typet &u_type_f=to_union_type(ns.follow(u.type()));
 
+    if(!u.type().get_bool(ID_C_transparent_union) &&
+       !u_type_f.get_bool(ID_C_transparent_union))
+    {
+      if(u_type_f.get_component(u.get_component_name()).get_is_padding())
+        // we just use an empty struct to fake an empty union
+        expr=struct_exprt(struct_typet());
+    }
     // add a typecast for NULL
-    if(u.op().id()==ID_constant &&
-       u.op().type().id()==ID_pointer &&
-       u.op().type().subtype().id()==ID_empty &&
-       (u.op().is_zero() || to_constant_expr(u.op()).get_value()==ID_NULL))
+    else if(u.op().id()==ID_constant &&
+            u.op().type().id()==ID_pointer &&
+            u.op().type().subtype().id()==ID_empty &&
+            (u.op().is_zero() ||
+             to_constant_expr(u.op()).get_value()==ID_NULL))
     {
       const struct_union_typet::componentt &comp=
-        to_union_type(ns.follow(u.type())).get_component(u.get_component_name());
+        u_type_f.get_component(u.get_component_name());
       const typet &u_op_type=comp.type();
       assert(u_op_type.id()==ID_pointer);
 
@@ -1338,11 +1368,18 @@ void dump_ct::cleanup_expr(exprt &expr)
   {
     const irep_idt &cformat=expr.get(ID_C_cformat);
 
-    if(!cformat.empty() &&
-       declared_enum_constants.find(cformat)==
-       declared_enum_constants.end() &&
-       !std::isdigit(id2string(cformat)[0]))
-      expr.remove(ID_C_cformat);
+    if(!cformat.empty())
+    {
+      declared_enum_constants_mapt::const_iterator entry=
+        declared_enum_constants.find(cformat);
+
+      if(entry!=declared_enum_constants.end() &&
+         entry->first!=entry->second)
+        expr.set(ID_C_cformat, entry->second);
+      else if(entry==declared_enum_constants.end() &&
+              !std::isdigit(id2string(cformat)[0]))
+        expr.remove(ID_C_cformat);
+    }
   }
 }
 

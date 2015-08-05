@@ -233,11 +233,11 @@ protected:
   std::string template_suffix(
     const cpp_template_args_tct &template_args);
 
-  void convert_arguments(
+  void convert_parameters(
     const irep_idt &mode,
     code_typet &function_type);
 
-  void convert_argument(
+  void convert_parameter(
     const irep_idt &mode,
     code_typet::parametert &parameter);
 
@@ -401,14 +401,14 @@ protected:
   static bool has_volatile(const typet &type);
 
   void typecheck_member_function(
-    const irep_idt &compound_symbol,
-    struct_typet::componentt  &component,
+    const irep_idt &compound_identifier,
+    struct_typet::componentt &component,
     irept &initializers,
     const typet &method_qualifier,
     exprt &value);
 
   void adjust_method_type(
-    const irep_idt &compound_symbol,
+    const irep_idt &compound_identifier,
     typet &method_type,
     const typet &method_qualifier);
 

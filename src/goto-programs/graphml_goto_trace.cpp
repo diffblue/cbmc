@@ -217,9 +217,11 @@ void convert(
       if(next->type==goto_trace_stept::ASSIGNMENT &&
          it->full_lhs==next->full_lhs)
         continue;
+      // fall through
     case goto_trace_stept::ASSIGNMENT:
     case goto_trace_stept::ASSERT:
     case goto_trace_stept::LOCATION:
+    case goto_trace_stept::GOTO:
     case goto_trace_stept::FUNCTION_CALL:
       if(it->type!=goto_trace_stept::LOCATION ||
          from!=to)
@@ -250,7 +252,7 @@ void convert(
           code_assignt assign(it->lhs_object, it->lhs_object_value);
           val.data=convert_assign_rec(ns, identifier, assign);
         }
-        else if(it->type==goto_trace_stept::LOCATION &&
+        else if(it->type==goto_trace_stept::GOTO &&
                 it->pc->is_goto())
         {
           xmlt &val=edge.new_element("data");
@@ -258,7 +260,7 @@ void convert(
           const std::string cond=from_expr(ns, "", it->cond_expr);
           const std::string neg_cond=
             from_expr(ns, "", not_exprt(it->cond_expr));
-          val.data="["+(it->goto_taken ? cond : neg_cond)+"]";
+          val.data="["+(it->cond_value ? cond : neg_cond)+"]";
 
           xmlt edge2("edge");
           edge2.set_attribute("source", graphml[from].node_name);
@@ -274,7 +276,7 @@ void convert(
 
           xmlt &val2=edge2.new_element("data");
           val2.set_attribute("key", "sourcecode");
-          val2.data="["+(it->goto_taken ? neg_cond : cond)+"]";
+          val2.data="["+(it->cond_value ? neg_cond : cond)+"]";
 
           graphml[sink].in[from].xml_node=edge2;
           graphml[from].out[sink].xml_node=edge2;

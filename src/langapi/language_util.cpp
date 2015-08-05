@@ -32,18 +32,18 @@ std::string from_expr(
   const irep_idt &identifier,
   const exprt &expr)
 {
-  std::auto_ptr<languaget> p;
+  std::unique_ptr<languaget> p;
 
   if(identifier=="")
-    p=std::auto_ptr<languaget>(get_default_language());
+    p=std::unique_ptr<languaget>(get_default_language());
   else
   {
     const symbolt *symbol;
     
     if(ns.lookup(identifier, symbol))
-      p=std::auto_ptr<languaget>(get_default_language());
+      p=std::unique_ptr<languaget>(get_default_language());
     else if(symbol->mode=="")
-      p=std::auto_ptr<languaget>(get_default_language());
+      p=std::unique_ptr<languaget>(get_default_language());
     else
     {
       languaget *ptr=get_language_from_mode(symbol->mode);
@@ -52,7 +52,7 @@ std::string from_expr(
         throw "symbol `"+id2string(symbol->name)+
               "' has unknown mode '"+id2string(symbol->mode)+"'";
 
-      p=std::auto_ptr<languaget>(ptr);
+      p=std::unique_ptr<languaget>(ptr);
     }
   }
 
@@ -79,18 +79,18 @@ std::string from_type(
   const irep_idt &identifier,
   const typet &type)
 {
-  std::auto_ptr<languaget> p;
+  std::unique_ptr<languaget> p;
 
   if(identifier=="")
-    p=std::auto_ptr<languaget>(get_default_language());
+    p=std::unique_ptr<languaget>(get_default_language());
   else
   {
     const symbolt *symbol;
     
     if(ns.lookup(identifier, symbol))
-      p=std::auto_ptr<languaget>(get_default_language());
+      p=std::unique_ptr<languaget>(get_default_language());
     else if(symbol->mode=="")
-      p=std::auto_ptr<languaget>(get_default_language());
+      p=std::unique_ptr<languaget>(get_default_language());
     else
     {
       languaget *ptr=get_language_from_mode(symbol->mode);
@@ -99,7 +99,7 @@ std::string from_type(
         throw "symbol `"+id2string(symbol->name)+
               "' has unknown mode '"+id2string(symbol->mode)+"'";
 
-      p=std::auto_ptr<languaget>(ptr);
+      p=std::unique_ptr<languaget>(ptr);
     }
   }
 

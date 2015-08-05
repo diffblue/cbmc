@@ -78,7 +78,7 @@ void bmct::error_trace(const prop_convt &prop_conv)
 
   status() << "Building error trace" << eom;
 
-  goto_tracet goto_trace;
+  goto_tracet &goto_trace=safety_checkert::error_trace;
   build_goto_trace(equation, prop_conv, ns, goto_trace);
   
   #if 0
@@ -343,21 +343,23 @@ Function: bmct::run
 
 \*******************************************************************/
 
-bool bmct::run(const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::run(
+  const goto_functionst &goto_functions)
 {
   const std::string mm=options.get_option("mm");
-  std::auto_ptr<memory_model_baset> memory_model(0);
+  std::unique_ptr<memory_model_baset> memory_model;
+  
   if(mm.empty() || mm=="sc")
-    memory_model.reset(new memory_model_sct(ns));
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_sct(ns));
   else if(mm=="tso")
-    memory_model.reset(new memory_model_tsot(ns));
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_tsot(ns));
   else if(mm=="pso")
-    memory_model.reset(new memory_model_psot(ns));
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_psot(ns));
   else
   {
     error() << "Invalid memory model " << mm
             << " -- use one of sc, tso, pso" << eom;
-    return true;
+    return safety_checkert::ERROR;
   }
 
   symex.set_message_handler(get_message_handler());
@@ -372,7 +374,7 @@ bool bmct::run(const goto_functionst &goto_functions)
     // get unwinding info
     setup_unwind();
 
-    bool verification_result = false; //true = "FAILED"
+    safety_checkert::resultt verification_result = safety_checkert::SAFE;
 
     irep_idt entry_point=goto_functions.entry_point();
     goto_functionst::function_mapt::const_iterator it=
@@ -444,7 +446,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 	if(options.get_bool_option("program-only"))
 	{
 	  show_program();
-	  return false;
+	  return safety_checkert::SAFE;
 	}
 
 	{
@@ -456,15 +458,25 @@ bool bmct::run(const goto_functionst &goto_functions)
 	if(options.get_bool_option("show-vcc"))
 	{
 	  show_vcc();
-	  if(!symex.is_incremental) return false;
+	  if(!symex.is_incremental) 
+            return safety_checkert::SAFE; // to indicate non-error
 	}
   
-	if(options.get_bool_option("cover-assertions"))
+	if(options.get_option("cover")!="")
 	{
-          if(options.get_option("incremental-check")!="")
-                throw "incremental vacuity checks not supported";
-	  cover_assertions(goto_functions,symex.prop_conv);
-	  return false;
+	  satcheckt satcheck;
+	  satcheck.set_message_handler(get_message_handler());
+	  bv_cbmct bv_cbmc(ns, satcheck);
+	  bv_cbmc.set_message_handler(get_message_handler());
+
+	  if(options.get_option("arrays-uf")=="never")
+	    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
+	  else if(options.get_option("arrays-uf")=="always")
+	    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
+        
+	  std::string criterion=options.get_option("cover");
+	  return cover(goto_functions, bv_cbmc, criterion)?
+	    safety_checkert::ERROR:safety_checkert::SAFE;
 	}
 
 	if(symex.remaining_vccs==0)
@@ -483,14 +495,14 @@ bool bmct::run(const goto_functionst &goto_functions)
 	    } 
             continue;
 	  }
-          else return false;  //nothing to check, exit
+          else return safety_checkert::SAFE;  //nothing to check, exit
 	}
 
         //call decision procedure
 	if(options.get_bool_option("all-properties")) 
         {
 	  if(all_properties(goto_functions,symex.prop_conv)) 
-            return true; //all properties FAILED, exit
+            return safety_checkert::UNSAFE; //all properties FAILED, exit
 	}
         else 
         {
@@ -516,12 +528,12 @@ bool bmct::run(const goto_functionst &goto_functions)
       catch(std::string &error_str)
       {
         error() << error_str << eom;
-        return true;
+        return safety_checkert::ERROR;
       }
       catch(const char *error_str)
       {
         error() << error_str << eom;
-        return true;
+        return safety_checkert::ERROR;
       }
 
     } //while
@@ -531,17 +543,17 @@ bool bmct::run(const goto_functionst &goto_functions)
   catch(std::string &error_str)
   {
     error() << error_str << eom;
-    return true;
+    return safety_checkert::ERROR;
   }
   catch(const char *error_str)
   {
     error() << error_str << eom;
-    return true;
+    return safety_checkert::ERROR;
   }
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return true;
+    return safety_checkert::ERROR;
   }
 }
 
@@ -557,7 +569,7 @@ Function: bmct::decide
 
 \*******************************************************************/
 
-bool bmct::decide(prop_convt &prop_conv, bool show_report)
+safety_checkert::resultt bmct::decide(prop_convt &prop_conv, bool show_report)
 {
   prop_conv.set_message_handler(get_message_handler());
  
@@ -566,14 +578,11 @@ bool bmct::decide(prop_convt &prop_conv, bool show_report)
     return write_dimacs(prop_conv);
   }
 
-  bool result=true;
-
   switch(run_decision_procedure(prop_conv))
   {
   case decision_proceduret::D_UNSATISFIABLE:
-    result=false;
     report_success();
-    break;
+    return safety_checkert::SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
     if(options.get_bool_option("beautify")) {
@@ -583,13 +592,12 @@ bool bmct::decide(prop_convt &prop_conv, bool show_report)
     }
     if(show_report) error_trace(prop_conv);
     report_failure();
-    break;
+    return safety_checkert::UNSAFE;
 
   default:
     error() << "decision procedure failed" << eom;
+    return safety_checkert::ERROR;
   }
-
-  return result;
 }
 
 /*******************************************************************\
@@ -604,9 +612,10 @@ Function: bmct::write_dimacs
 
 \*******************************************************************/
 
-bool bmct::write_dimacs(prop_convt& prop_conv) {
+safety_checkert::resultt bmct::write_dimacs(prop_convt& prop_conv) {
   return dynamic_cast<dimacst&>(prop_conv).write_dimacs(
-    options.get_option("outfile"));
+    options.get_option("outfile")) ? 
+    safety_checkert::ERROR : safety_checkert::SAFE;
 }
 
 /*******************************************************************\

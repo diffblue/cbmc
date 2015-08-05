@@ -264,23 +264,6 @@ literalt aig_prop_baset::lselect(literalt a, literalt b, literalt c)
 
 /*******************************************************************\
 
-Function: aig_prop_constraintt::lcnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void aig_prop_constraintt::lcnf(const bvt &clause)
-{
-  l_set_to_true(lor(clause));
-}
-  
-/*******************************************************************\
-
 Function: aig_prop_baset::set_equal
 
   Inputs:
@@ -473,32 +456,35 @@ void aig_prop_solvert::usage_count(std::vector<unsigned> &p_usage_count, std::ve
   unsigned usedThreeTimes = 0;
   unsigned usedMore = 0;
 
-  for (unsigned n=0; n<aig.nodes.size(); n++) {
-    switch (p_usage_count[n] + n_usage_count[n]) {
-    case 0 : ++unused; break;
-    case 1 :
-      if (p_usage_count[n] == 1) {
+  for (unsigned n=0; n<aig.nodes.size(); n++)
+  {
+    switch (p_usage_count[n] + n_usage_count[n])
+    {
+    case 0: ++unused; break;
+    case 1:
+      if(p_usage_count[n] == 1)
 	++usedOncePositive;
-      } else {
+      else 
 	++usedOnceNegative;
-      }
       break;
 
     case 2 :
-      if (p_usage_count[n] >= 2) {
+      if (p_usage_count[n] >= 2)
+      {
 	++usedTwicePositive;
-
-      } else if (n_usage_count[n] >= 2) {
+      } 
+      else if (n_usage_count[n] >= 2)
+      {
 	++usedTwiceNegative;
-
-      } else {
+      }
+      else
+      {
 	assert(p_usage_count[n] == 1 && n_usage_count[n] == 1);
 	++usedTwiceMixed;
-
       }
       break;
-    case 3 : ++usedThreeTimes; break;
-    default : ++usedMore; break;
+    case 3: ++usedThreeTimes; break;
+    default: ++usedMore; break;
     }
   }
 
@@ -515,7 +501,6 @@ void aig_prop_solvert::usage_count(std::vector<unsigned> &p_usage_count, std::ve
 	       << eom;
   #endif
 }
-
 
 /*******************************************************************\
 
@@ -536,9 +521,8 @@ void aig_prop_solvert::convert_node(
   std::vector<unsigned> &p_usage_count,
   std::vector<unsigned> &n_usage_count)
 {
-
-  if (p_usage_count[n] > 0 || n_usage_count[n] > 0) {
-    
+  if (p_usage_count[n] > 0 || n_usage_count[n] > 0)
+  {
     literalt o=literalt(n, false);
     bvt body(2);
     body[0]=node.a;
@@ -548,7 +532,8 @@ void aig_prop_solvert::convert_node(
     // Inline positive literals
     // This should remove the overhead introduced by land and lor for bvt
     
-    for (bvt::size_type i = 0; i < body.size(); i++) {
+    for (bvt::size_type i = 0; i < body.size(); i++)
+    {
       literalt l = body[i];
       
       if (!l.sign() &&                      // Used positively...
@@ -569,8 +554,6 @@ void aig_prop_solvert::convert_node(
     // TODO : Likewise could find things that are constrained, esp the output
     // and backwards constant propagate.  Again may not be worth it.
 
-
-
     // lxor and lselect et al. are difficult to express in AIGs.
     // Doing so introduces quite a bit of overhead.
     // This should recognise the AIGs they produce and
@@ -585,8 +568,8 @@ void aig_prop_solvert::convert_node(
     // but will still be recognised because the negation is
     // recorded where it is used
     
-    if (body.size() == 2 && body[0].sign() && body[1].sign()) {
-
+    if(body.size() == 2 && body[0].sign() && body[1].sign())
+    {
       const aigt::nodet &left = aig.nodes[body[0].var_no()];
       const aigt::nodet &right = aig.nodes[body[1].var_no()];
       
@@ -640,7 +623,8 @@ void aig_prop_solvert::convert_node(
 
     // Likewise, carry has an improved encoding which is generated
     // by the CNF encoding
-    if (body.size() == 3 && body[0].sign() && body[1].sign() && body[2].sign()) {
+    if (body.size() == 3 && body[0].sign() && body[1].sign() && body[2].sign())
+    {
       const aigt::nodet &left = aig.nodes[body[0].var_no()];
       const aigt::nodet &mid = aig.nodes[body[1].var_no()];
       const aigt::nodet &right = aig.nodes[body[2].var_no()];
@@ -713,32 +697,30 @@ void aig_prop_solvert::convert_node(
     // They don't handle cases where the construction is partially constant
     // folded.  Also the usage constraints are sufficient for improvement
     // but reductions may still be possible with looser restrictions.
-
-
 #endif
 
     if(n_pos)
+    {
+      bvt lits(2);
+      lits[1]=neg(o);
+      
+      forall_literals(it, body)
       {
-	bvt lits(2);
-	lits[1]=neg(o);
-	
-	forall_literals(it, body)
-	{
-	  lits[0]=pos(*it);
-	  solver.lcnf(lits);
-	}
+        lits[0]=pos(*it);
+        solver.lcnf(lits);
       }
+    }
     
     if(n_neg)
-      {
-	bvt lits;
-	
-	forall_literals(it, body)
-	  lits.push_back(neg(*it));
+    {
+      bvt lits;
+      
+      forall_literals(it, body)
+        lits.push_back(neg(*it));
 
-	lits.push_back(pos(o));
-	solver.lcnf(lits);
-      }
+      lits.push_back(pos(o));
+      solver.lcnf(lits);
+    }
 
   }
 }

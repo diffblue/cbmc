@@ -6,14 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#if 0
-#include <util/std_types.h>
-#include <util/prefix.h>
-#include <util/config.h>
-
-#include <ansi-c/expr2c.h>
-#endif
-
 #include "java_bytecode_typecheck.h"
 
 /*******************************************************************\

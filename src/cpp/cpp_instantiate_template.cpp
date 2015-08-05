@@ -163,20 +163,24 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   
   irep_idt identifier=
     id2string(template_scope->prefix)+
-    id2string(suffix)+
-    "tag."+id2string(template_symbol.base_name);
+    "tag-"+id2string(template_symbol.base_name)+
+    id2string(suffix);
   
   // already there?
-  symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(identifier);
+  symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table.symbols.find(identifier);
   if(s_it!=symbol_table.symbols.end())
     return s_it->second;
 
-  // create as incomplete_struct, but mark as
-  // "template_class_instance", to be elaborated later
+  // Create as incomplete_struct, but mark as
+  // "template_class_instance", to be elaborated later.
   symbolt new_symbol;
   new_symbol.name=identifier;
+  new_symbol.pretty_name=template_symbol.pretty_name;
   new_symbol.location=template_symbol.location;
   new_symbol.type=typet(ID_incomplete_struct);
+  new_symbol.type.set(ID_tag, template_symbol.type.find(ID_tag));
+  if(template_symbol.type.get_bool(ID_C_class)) new_symbol.type.set(ID_C_class, true);
   new_symbol.type.set(ID_template_class_instance, true);
   new_symbol.type.add_source_location()=template_symbol.location;
   new_symbol.type.set("specialization_template_args", specialization_template_args);
@@ -195,7 +199,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   id.id_class=cpp_idt::CLASS;
   id.is_scope=true;
   id.prefix=template_scope->prefix+
-            id2string(s_ptr->base_name)+"::";
+            id2string(s_ptr->base_name)+
+            id2string(suffix)+"::";
   id.class_identifier=s_ptr->name;
   id.id_class=cpp_idt::CLASS;
   
@@ -221,7 +226,7 @@ void cpp_typecheckt::elaborate_class_template(
   
   const symbolt &symbol=lookup(type);
 
-  // Make a copy, as instantiate will destry the symbol type!  
+  // Make a copy, as instantiate will destroy the symbol type!  
   const typet t_type=symbol.type;
   
   if(t_type.id()==ID_incomplete_struct &&
@@ -250,6 +255,8 @@ Function: cpp_typecheckt::instantiate_template
 
 \*******************************************************************/
 
+#define MAX_DEPTH 50
+
 const symbolt &cpp_typecheckt::instantiate_template(
   const source_locationt &source_location,
   const symbolt &template_symbol,
@@ -257,10 +264,12 @@ const symbolt &cpp_typecheckt::instantiate_template(
   const cpp_template_args_tct &full_template_args,
   const typet &specialization)
 {
-  if(instantiation_stack.size()==50)
+  if(instantiation_stack.size()==MAX_DEPTH)
   {
     err_location(source_location);
-    throw "reached maximum template recursion depth";
+    str << "reached maximum template recursion depth ("
+        << MAX_DEPTH << ")";
+    throw 0;
   }
   
   instantiation_levelt i_level(instantiation_stack);
@@ -314,7 +323,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   if(template_scope==NULL)
   {
     err_location(source_location);
-    str << "identifier: " << template_symbol.name << std::endl;
+    str << "identifier: " << template_symbol.name << '\n';
     throw "template instantiation error: scope not found";
   }
   
@@ -388,16 +397,17 @@ const symbolt &cpp_typecheckt::instantiate_template(
   else
   {
     // set up a scope as subscope of the template scope
-    std::string prefix=template_scope->get_parent().prefix+suffix;
     cpp_scopet &sub_scope=
       cpp_scopes.current_scope().new_scope(subscope_name);
-    sub_scope.prefix=prefix;
+    sub_scope.id_class=cpp_idt::TEMPLATE_SCOPE;
+    sub_scope.prefix=template_scope->get_parent().prefix;
+    sub_scope.suffix=suffix;
     sub_scope.add_using_scope(template_scope->get_parent());
     cpp_scopes.go_to(sub_scope);
     cpp_scopes.id_map.insert(
       cpp_scopest::id_mapt::value_type(subscope_name, &sub_scope));
   }
-
+  
   // store the information that the template has
   // been instantiated using these arguments
   {
@@ -437,6 +447,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(new_decl.type().id()==ID_struct)
   {
+    // a class template
     convert_non_template_declaration(new_decl);
 
     // also instantiate all the template methods
@@ -492,7 +503,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     if(new_decl.member_spec().is_virtual())
     {
       err_location(new_decl);
-      str <<  "invalid use of `virtual' in template declaration";
+      str << "invalid use of `virtual' in template declaration";
       throw 0;
     }
 

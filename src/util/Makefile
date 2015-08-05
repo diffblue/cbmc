@@ -4,7 +4,7 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       mp_arith.cpp namespace.cpp parse_options.cpp rename.cpp \
       replace_expr.cpp threeval.cpp typecheck.cpp graph.cpp \
       type.cpp cnf_simplify.cpp pointer_predicates.cpp merge_irep.cpp \
-      bitvector.cpp parser.cpp replace_symbol.cpp actuals.cpp \
+      bitvector.cpp parser.cpp replace_symbol.cpp \
       get_module.cpp string_hash.cpp string_container.cpp identifier.cpp \
       rational.cpp options.cpp c_misc.cpp simplify_expr.cpp dstring.cpp \
       find_symbols.cpp rational_tools.cpp ui_message.cpp simplify_utils.cpp \
@@ -17,7 +17,8 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       ieee_float.cpp signal_catcher.cpp pointer_offset_size.cpp \
       bv_arithmetic.cpp tempdir.cpp tempfile.cpp timer.cpp unicode.cpp \
       irep_ids.cpp byte_operators.cpp string2int.cpp file_util.cpp \
-      memory_info.cpp pipe_stream.cpp irep_hash.cpp endianness_map.cpp 
+      memory_info.cpp pipe_stream.cpp irep_hash.cpp endianness_map.cpp \
+      vtable.cpp 
 
 INCLUDES= -I ..
 

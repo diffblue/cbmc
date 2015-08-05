@@ -1,7 +1,7 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
        assembler analyses java_bytecode aa-path-symex path-symex musketeer \
-       json
+       json cegis
 
 all: cbmc.dir goto-cc.dir goto-instrument.dir path-symex.dir json.dir xmlrepair.dir
 
@@ -9,7 +9,7 @@ all: cbmc.dir goto-cc.dir goto-instrument.dir path-symex.dir json.dir xmlrepair.
 
 util.dir: big-int.dir
 
-# everything depends on util
+# everything but big-int depends on util
 $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 
 .PHONY: languages
@@ -26,7 +26,8 @@ goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
 musketeer.dir: goto-instrument.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
-          pointer-analysis.dir goto-programs.dir linking.dir
+          pointer-analysis.dir goto-programs.dir linking.dir \
+          cegis.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 
@@ -62,3 +63,12 @@ minisat2-download:
 	@mv minisat-2.2.0 ../minisat-2.2.0
 	@(cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
 	@rm minisat2_2.2.0.orig.tar.gz
+
+glucose-download:
+	@echo "Downloading glucose-syrup"
+	@lwp-download http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
+	@tar xfz glucose-syrup.tgz
+	@rm -Rf ../glucose-syrup
+	@mv glucose-syrup ../
+	@rm glucose-syrup.tgz
+

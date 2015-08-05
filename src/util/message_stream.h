@@ -38,48 +38,48 @@ public:
   void err_location(const irept &irep) { saved_error_location=static_cast<const source_locationt &>(irep.find(ID_C_source_location)); }
   void err_location(const source_locationt &_location) { saved_error_location=_location; }
 
-  void error(const std::string &message)
+  void error_msg(const std::string &message)
   {
     send_msg(1, message);
   }
 
-  void warning(const std::string &message)
+  void warning_msg(const std::string &message)
   {
     send_msg(2, message);
   }
 
-  void statistics(const std::string &message)
+  void statistics_msg(const std::string &message)
   {
     send_msg(8, message);
   }
   
-  void debug(const std::string &message)
+  void debug_msg(const std::string &message)
   {
     send_msg(9, message);
   }
   
-  void error()
+  void error_msg()
   {
     send_msg(1, str.str());
     clear_err();
     sequence_number++;
   }
 
-  void warning()
+  void warning_msg()
   {
     send_msg(2, str.str());
     clear_err();
     sequence_number++;
   }
   
-  void status()
+  void status_msg()
   {
     send_msg(6, str.str());
     clear_err();
     sequence_number++;
   }
   
-  void statistics()
+  void statistics_msg()
   {
     send_msg(8, str.str());
     clear_err();
