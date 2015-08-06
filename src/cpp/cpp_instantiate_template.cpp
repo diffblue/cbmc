@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 \*******************************************************************/
 
 #include <util/arith_tools.h>
-#include <util/simplify_expr_class.h>
 #include <util/simplify_expr.h>
 
 #include <ansi-c/c_types.h>
