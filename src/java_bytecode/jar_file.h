@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 #include <vector>
+#include <map>
 
 bool get_jar_index(
   const std::string &jar_file,
@@ -20,5 +21,9 @@ bool get_jar_entry(
   const std::string &jar_file,
   std::size_t index,
   std::vector<char> &);
+
+bool get_jar_manifest(
+  const std::string &jar_file,
+  std::map<std::string, std::string> &);
 
 #endif
