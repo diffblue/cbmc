@@ -1098,6 +1098,34 @@ Function: java_bytecode_parse
 \*******************************************************************/
 
 bool java_bytecode_parse(
+  std::istream &istream,
+  java_bytecode_parse_treet &parse_tree,
+  message_handlert &message_handler)
+{
+  java_bytecode_parsert java_bytecode_parser;
+  java_bytecode_parser.in=&istream;
+  java_bytecode_parser.set_message_handler(message_handler);
+  
+  bool parser_result=java_bytecode_parser.parse();
+
+  parse_tree.swap(java_bytecode_parser.parse_tree);
+
+  return parser_result;
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool java_bytecode_parse(
   const std::string &file,
   java_bytecode_parse_treet &parse_tree,
   message_handlert &message_handler)
@@ -1111,14 +1139,6 @@ bool java_bytecode_parse(
                     << file << '\'' << messaget::eom;
     return true;
   }
-
-  java_bytecode_parsert java_bytecode_parser;
-  java_bytecode_parser.in=&in;
-  java_bytecode_parser.set_message_handler(message_handler);
   
-  bool parser_result=java_bytecode_parser.parse();
-
-  parse_tree.swap(java_bytecode_parser.parse_tree);
-
-  return parser_result;
+  return java_bytecode_parse(in, parse_tree, message_handler);
 }
