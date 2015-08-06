@@ -18,7 +18,7 @@ bool java_bytecode_parse(
   class message_handlert &);
 
 bool java_bytecode_parse(
-  const std::istream &,
+  std::istream &,
   class java_bytecode_parse_treet &,
   class message_handlert &);
 
