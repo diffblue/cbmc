@@ -351,19 +351,21 @@ Function: value_sett::eval_pointer_offset
 
 \*******************************************************************/
 
-void value_sett::eval_pointer_offset(
+bool value_sett::eval_pointer_offset(
   exprt &expr,
   const namespacet &ns) const
 {
+  bool mod=false;
+
   if(expr.id()==ID_pointer_offset)
   {
     assert(expr.operands().size()==1);
 
     object_mapt reference_set;
-    get_value_set(expr.op0(), reference_set, ns);
+    get_value_set(expr.op0(), reference_set, ns, true);
 
     exprt new_expr;
-    new_expr.make_nil();
+    mp_integer previous_offset=0;
 
     const object_map_dt &object_map=reference_set.read();
     for(object_map_dt::const_iterator
@@ -371,35 +373,35 @@ void value_sett::eval_pointer_offset(
         it!=object_map.end();
         it++)
       if(!it->second.offset_is_set)
-        return;
+        return false;
       else
       {
         const exprt &object=object_numbering[it->first];
         mp_integer ptr_offset=compute_pointer_offset(object, ns);
-        exprt offset=from_integer(it->second.offset, index_type());
 
-        if(ptr_offset<0 || offset.id()!=ID_constant)
-          return;
+        if(ptr_offset<0)
+          return false;
 
-        plus_exprt offset_sum(
-          offset,
-          from_integer(ptr_offset, index_type()));
-        simplify(offset_sum, ns);
+        ptr_offset+=it->second.offset;
 
-        if(new_expr.is_not_nil() && offset_sum!=new_expr)
-          return;
+        if(mod && ptr_offset!=previous_offset)
+          return false;
 
-        new_expr=offset_sum;
+        new_expr=from_integer(ptr_offset, index_type());
+        previous_offset=ptr_offset;
+        mod=true;
       }
 
-    if(new_expr.is_not_nil())
+    if(mod)
       expr.swap(new_expr);
   }
   else
   {
     Forall_operands(it, expr)
-      eval_pointer_offset(*it, ns);
+      mod=eval_pointer_offset(*it, ns) || mod;
   }
+
+  return mod;
 }
 
 /*******************************************************************\
@@ -547,7 +549,7 @@ void value_sett::get_value_set_rec(
 
       // not found? try without suffix
       if(v_it==values.end())
-        v_it=values.find(expr.get_string(ID_identifier));
+        v_it=values.find(expr.get(ID_identifier));
         
       if(v_it!=values.end())
         make_union(dest, v_it->second.object_map);
@@ -915,11 +917,12 @@ void value_sett::get_value_set_rec(
     bool found=false;
 
     exprt op1=expr.op1();
-    eval_pointer_offset(op1, ns);
-    simplify(op1, ns);
+    if(eval_pointer_offset(op1, ns))
+      simplify(op1, ns);
 
+    mp_integer op1_offset;
     const typet &op0_type=ns.follow(expr.op0().type());
-    if(op1.id()==ID_constant && op0_type.id()==ID_struct)
+    if(!to_integer(op1, op1_offset) && op0_type.id()==ID_struct)
     {
       const struct_typet &struct_type=to_struct_type(op0_type);
 
@@ -930,22 +933,16 @@ void value_sett::get_value_set_rec(
       {
         const irep_idt &name=c_it->get_name();
 
-        exprt offset=member_offset_expr(struct_type, name, ns);
-        if(offset.is_nil())
-          continue;
+        mp_integer comp_offset=member_offset(struct_type, name, ns);
 
-        equal_exprt eq(offset, op1);
-        simplify(eq, ns);
-
-        if(!eq.is_true())
+        if(comp_offset>op1_offset)
+          break;
+        else if(comp_offset!=op1_offset)
           continue;
 
         found=true;
 
-        member_exprt member(c_it->type());
-        member.set_component_name(name);
-        member.struct_op()=expr.op0();
-
+        member_exprt member(expr.op0(), name, c_it->type());
         get_value_set_rec(member, dest, suffix, original_type, ns);
       }
     }
