@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <sstream>
 
 #include "jar_file.h"
 
@@ -35,7 +36,7 @@ bool get_jar_entry(
 {
   #ifdef HAVE_LIBZIP
   int zip_error;
-
+  
   struct zip *zip=
     zip_open(jar_file.c_str(), 0, &zip_error);
     
@@ -51,15 +52,16 @@ bool get_jar_entry(
     return true; // error
   }
 
-  std::vector<char> data;
+  std::vector<char> buffer;
+  buffer.resize(ZIP_READ_SIZE);
+  
   while(true)
   {
-    dest.resize(dest.size()+ZIP_READ_SIZE);
     int bytes_read=
-      zip_fread(zip_file, dest.data()-ZIP_READ_SIZE, ZIP_READ_SIZE);
-    if(bytes_read<0) break;
+      zip_fread(zip_file, buffer.data(), ZIP_READ_SIZE);
     assert(bytes_read<=ZIP_READ_SIZE);
-    dest.resize(dest.size()-ZIP_READ_SIZE+bytes_read);
+    if(bytes_read<=0) break;
+    dest.insert(dest.end(), buffer.begin(), buffer.begin()+bytes_read);
   }
 
   zip_fclose(zip_file);    
@@ -110,3 +112,66 @@ bool get_jar_index(
   #endif
 }
 
+/*******************************************************************\
+
+Function: get_jar_manifest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#define ZIP_READ_SIZE 10000
+
+bool get_jar_manifest(
+  const std::string &jar_file,
+  std::map<std::string, std::string> &manifest)
+{
+  std::vector<std::string> entries;
+  if(get_jar_index(jar_file, entries))
+    return true;
+    
+  std::size_t index=0;
+  bool found=false;
+    
+  for(std::vector<std::string>::const_iterator
+      e_it=entries.begin(); e_it!=entries.end(); e_it++)
+  {
+    if(*e_it=="META-INF/MANIFEST.MF")
+    {
+      index=e_it-entries.begin();
+      found=true;
+      break;
+    }
+  }
+
+  if(!found) return true;  
+  
+  std::vector<char> dest; 
+  if(get_jar_entry(jar_file, index, dest))
+    return true;
+
+  std::istringstream in(dest.data());
+
+  std::string line;
+  while(std::getline(in, line))
+  {
+    std::size_t pos=line.find(':');
+    if(pos==std::string::npos) continue;
+    std::string key=line.substr(0, pos);
+    
+    // skip spaces
+    pos++;
+    while(pos<line.size() && line[pos]==' ') pos++;
+
+    std::string value=line.substr(pos, std::string::npos);
+    
+    // store
+    manifest[key]=value;
+  }
+  
+  return false;
+}
