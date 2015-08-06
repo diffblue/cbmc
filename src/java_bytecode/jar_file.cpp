@@ -169,6 +169,10 @@ bool get_jar_manifest(
 
     std::string value=line.substr(pos, std::string::npos);
     
+    // trim off \r
+    if(!value.empty() && *value.rbegin()=='\r')
+      value.resize(value.size()-1);
+    
     // store
     manifest[key]=value;
   }
