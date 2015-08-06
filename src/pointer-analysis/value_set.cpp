@@ -420,7 +420,7 @@ void value_sett::get_value_set(
   const namespacet &ns) const
 {
   object_mapt object_map;
-  get_value_set(expr, object_map, ns);
+  get_value_set(expr, object_map, ns, false);
   
   for(object_map_dt::const_iterator
       it=object_map.read().begin();
@@ -449,10 +449,11 @@ Function: value_sett::get_value_set
 void value_sett::get_value_set(
   const exprt &expr,
   object_mapt &dest,
-  const namespacet &ns) const
+  const namespacet &ns,
+  bool is_simplified) const
 {
   exprt tmp(expr);
-  simplify(tmp, ns);
+  if(!is_simplified) simplify(tmp, ns);
 
   get_value_set_rec(tmp, dest, "", tmp.type(), ns);
 }
@@ -1227,6 +1228,7 @@ void value_sett::assign(
   const exprt &lhs,
   const exprt &rhs,
   const namespacet &ns,
+  bool is_simplified,
   bool add_to_sets)
 {
   #if 0
@@ -1275,7 +1277,7 @@ void value_sett::assign(
 
         rhs_member=make_member(rhs, name, ns);
       
-        assign(lhs_member, rhs_member, ns, add_to_sets);
+        assign(lhs_member, rhs_member, ns, is_simplified, add_to_sets);
       }
     }
   }
@@ -1287,7 +1289,7 @@ void value_sett::assign(
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
     {
-      assign(lhs_index, exprt(rhs.id(), type.subtype()), ns, add_to_sets);
+      assign(lhs_index, exprt(rhs.id(), type.subtype()), ns, is_simplified, add_to_sets);
     }
     else
     {
@@ -1299,14 +1301,14 @@ void value_sett::assign(
       if(rhs.id()==ID_array_of)
       {
         assert(rhs.operands().size()==1);
-        assign(lhs_index, rhs.op0(), ns, add_to_sets);
+        assign(lhs_index, rhs.op0(), ns, is_simplified, add_to_sets);
       }
       else if(rhs.id()==ID_array ||
               rhs.id()==ID_constant)
       {
         forall_operands(o_it, rhs)
         {
-          assign(lhs_index, *o_it, ns, add_to_sets);
+          assign(lhs_index, *o_it, ns, is_simplified, add_to_sets);
           add_to_sets=true;
         }
       }
@@ -1317,14 +1319,14 @@ void value_sett::assign(
         exprt op0_index(ID_index, type.subtype());
         op0_index.copy_to_operands(rhs.op0(), exprt(ID_unknown, index_type()));
 
-        assign(lhs_index, op0_index, ns, add_to_sets);
-        assign(lhs_index, rhs.op2(), ns, true);
+        assign(lhs_index, op0_index, ns, is_simplified, add_to_sets);
+        assign(lhs_index, rhs.op2(), ns, is_simplified, true);
       }
       else
       {
         exprt rhs_index(ID_index, type.subtype());
         rhs_index.copy_to_operands(rhs, exprt(ID_unknown, index_type()));
-        assign(lhs_index, rhs_index, ns, true);
+        assign(lhs_index, rhs_index, ns, is_simplified, true);
       }
     }
   }
@@ -1332,7 +1334,7 @@ void value_sett::assign(
   {
     // basic type
     object_mapt values_rhs;
-    get_value_set(rhs, values_rhs, ns);
+    get_value_set(rhs, values_rhs, ns, is_simplified);
     
     assign_rec(lhs, values_rhs, "", ns, add_to_sets);
   }
@@ -1360,7 +1362,7 @@ void value_sett::do_free(
 
   // find out what it points to    
   object_mapt value_set;
-  get_value_set(op, value_set, ns);
+  get_value_set(op, value_set, ns, false);
   
   const object_map_dt &object_map=value_set.read();
   
@@ -1605,7 +1607,7 @@ void value_sett::do_function_call(
   {
     const std::string identifier="value_set::dummy_arg_"+i2string(i);
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
-    assign(dummy_lhs, arguments[i], ns, false);
+    assign(dummy_lhs, arguments[i], ns, false, false);
   }
 
   // now assign to 'actual actuals'
@@ -1624,7 +1626,7 @@ void value_sett::do_function_call(
       symbol_exprt("value_set::dummy_arg_"+i2string(i), it->type());
     
     exprt actual_lhs=symbol_exprt(identifier, it->type());
-    assign(actual_lhs, v_expr, ns, true);
+    assign(actual_lhs, v_expr, ns, true, true);
     i++;
   }
 
@@ -1651,7 +1653,7 @@ void value_sett::do_end_function(
 
   symbol_exprt rhs("value_set::return_value", lhs.type());
 
-  assign(lhs, rhs, ns);
+  assign(lhs, rhs, ns, false, false);
 }
 
 /*******************************************************************\
@@ -1688,7 +1690,7 @@ void value_sett::apply_code(
     if(code.operands().size()!=2)
       throw "assignment expected to have two operands";
 
-    assign(code.op0(), code.op1(), ns);
+    assign(code.op0(), code.op1(), ns, false, false);
   }
   else if(statement==ID_decl)
   {
@@ -1714,10 +1716,10 @@ void value_sett::apply_code(
         address_of_exprt address_of_expr;
         address_of_expr.object()=failed;
         address_of_expr.type()=lhs.type();
-        assign(lhs, address_of_expr, ns);
+        assign(lhs, address_of_expr, ns, false, false);
       }
       else
-        assign(lhs, exprt(ID_invalid), ns);
+        assign(lhs, exprt(ID_invalid), ns, false, false);
     }
   }
   else if(statement=="specc_notify" ||
@@ -1765,7 +1767,7 @@ void value_sett::apply_code(
     if(code.operands().size()==1)
     {
       symbol_exprt lhs("value_set::return_value", code.op0().type());
-      assign(lhs, code.op0(), ns);
+      assign(lhs, code.op0(), ns, false, false);
     }
   }
   else if(statement==ID_array_set)
@@ -1835,7 +1837,7 @@ void value_sett::guard(
     address_of_exprt address_of(dynamic_object);
     address_of.type()=expr.op0().type();
 
-    assign(expr.op0(), address_of, ns);
+    assign(expr.op0(), address_of, ns, false, false);
   }
 }
 
