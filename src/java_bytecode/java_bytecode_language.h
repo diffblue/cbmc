@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/language.h>
 
-#include "java_bytecode_parse_tree.h"
+#include "java_class_loader.h"
 
 class java_bytecode_languaget:public languaget
 {
@@ -63,9 +63,8 @@ public:
   virtual void modules_provided(std::set<std::string> &modules);  
   
 protected:
-  java_bytecode_parse_treet parse_tree;
-  std::string parse_path;
   irep_idt main_class;
+  java_class_loadert java_class_loader;
 };
  
 languaget *new_java_bytecode_language();
