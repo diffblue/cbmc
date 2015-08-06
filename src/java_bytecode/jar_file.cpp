@@ -124,8 +124,6 @@ Function: get_jar_manifest
 
 \*******************************************************************/
 
-#define ZIP_READ_SIZE 10000
-
 bool get_jar_manifest(
   const std::string &jar_file,
   std::map<std::string, std::string> &manifest)
