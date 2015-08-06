@@ -189,7 +189,7 @@ public:
     value_setst::valuest &dest,
     const namespacet &ns) const;
 
-  void eval_pointer_offset(
+  bool eval_pointer_offset(
     exprt &expr,
     const namespacet &ns) const;
 
