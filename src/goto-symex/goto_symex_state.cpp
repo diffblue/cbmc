@@ -289,6 +289,7 @@ void goto_symex_statet::assignment(
   symbol_exprt &lhs, // L0/L1
   const exprt &rhs,  // L2
   const namespacet &ns,
+  bool rhs_is_simplified,
   bool record_value)
 {
   assert(lhs.id()==ID_symbol);
@@ -332,7 +333,7 @@ void goto_symex_statet::assignment(
     symbol_exprt l1_lhs(l1_identifier, lhs.type());
     level2.get_original_name(l1_lhs.type());
 
-    value_set.assign(l1_lhs, l1_rhs, ns, is_shared);  
+    value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
   }
   
   #if 0
@@ -594,7 +595,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
 
     const bool record_events_bak=record_events;
     record_events=false;
-    assignment(expr, tmp, ns, true);
+    assignment(expr, tmp, ns, true, true);
     record_events=record_events_bak;
 
     symbol_exprt lhs=ns.lookup(orig_identifier).symbol_expr();

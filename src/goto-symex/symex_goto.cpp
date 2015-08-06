@@ -139,7 +139,7 @@ void goto_symext::symex_goto(statet &state)
       
       symbol_exprt new_lhs=guard_symbol_expr;
       state.rename(new_lhs, ns, goto_symex_statet::L1);
-      state.assignment(new_lhs, new_rhs, ns, false);
+      state.assignment(new_lhs, new_rhs, ns, true, false);
       
       guardt guard;
 
@@ -379,7 +379,7 @@ void goto_symext::phi_function(
     symbol_exprt new_lhs=symbol_exprt(l1_identifier, type);
     const bool record_events=dest_state.record_events;
     dest_state.record_events=false;
-    dest_state.assignment(new_lhs, rhs, ns, true);
+    dest_state.assignment(new_lhs, rhs, ns, true, true);
     dest_state.record_events=record_events;
     
     target.assignment(

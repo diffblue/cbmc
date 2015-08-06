@@ -226,6 +226,7 @@ public:
     symbol_exprt &lhs, // L0/L1
     const exprt &rhs,  // L2
     const namespacet &ns,
+    bool rhs_is_simplified,
     bool record_value);
 
   // what to propagate

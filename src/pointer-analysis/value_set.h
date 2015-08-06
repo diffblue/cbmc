@@ -171,7 +171,8 @@ public:
     const exprt &lhs,
     const exprt &rhs,
     const namespacet &ns,
-    bool add_to_sets=false);
+    bool is_simplified,
+    bool add_to_sets);
 
   void do_function_call(
     const irep_idt &function,
@@ -203,7 +204,8 @@ protected:
   void get_value_set(
     const exprt &expr,
     object_mapt &dest,
-    const namespacet &ns) const;
+    const namespacet &ns,
+    bool is_simplified) const;
 
   void get_reference_set(
     const exprt &expr,
