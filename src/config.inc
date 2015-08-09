@@ -22,8 +22,8 @@ endif
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
-MINISAT2 = ../../minisat-2.2.1
-#GLUCOSE = ../../glucose-syrup
+#MINISAT2 = ../../minisat-2.2.1
+GLUCOSE = ../../glucose-syrup
 #SMVSAT =
 
 # Signing identity for MacOS Gatekeeper
