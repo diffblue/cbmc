@@ -803,6 +803,28 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset('I'))
     ansi_c.include_paths=cmdline.get_values('I');
 
+  if(cmdline.isset("classpath"))
+  {
+    // Specifying -classpath or -cp overrides any setting of the
+    // CLASSPATH environment variable.
+    set_classpath(cmdline.get_value("classpath"));
+  }
+  else if(cmdline.isset("cp"))
+  {
+    // Specifying -classpath or -cp overrides any setting of the
+    // CLASSPATH environment variable.
+    set_classpath(cmdline.get_value("cp"));
+  }
+  else
+  {
+    // environment variable set?
+    const char *CLASSPATH=getenv("CLASSPATH");
+    if(CLASSPATH!=NULL)
+      set_classpath(CLASSPATH);
+    else
+      set_classpath("."); // default
+  }
+
   if(cmdline.isset("include"))
     ansi_c.include_files=cmdline.get_values("include");
 
@@ -1245,6 +1267,35 @@ irep_idt configt::this_architecture()
   #endif
 
   return this_arch;  
+}
+
+/*******************************************************************\
+
+Function: configt::set_classpath
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::set_classpath(const std::string &cp)
+{
+  std::string current;
+  for(std::size_t pos=0; pos<cp.size(); pos++)
+  {
+    // these are separated by colons
+    if(cp[pos]==':')
+    {
+      if(!current.empty()) java.class_path.push_back(current);
+    }
+    else
+      current+=cp[pos];
+  }
+  
+  if(!current.empty()) java.class_path.push_back(current);
 }
 
 /*******************************************************************\
