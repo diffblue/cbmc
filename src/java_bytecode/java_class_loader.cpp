@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 
 #include <util/suffix.h>
+#include <util/config.h>
 
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
@@ -112,13 +113,28 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
     return parse_tree;
   }
   
-  // See if we can find a class file
-  if(!java_bytecode_parse(
-       id2string(class_name)+".class",
-       parse_tree,
-       get_message_handler()))
-    return parse_tree;
+  // See if we can find a class file in class path
   
+  for(std::list<std::string>::const_iterator
+      cp_it=config.java.class_path.begin();
+      cp_it!=config.java.class_path.end();
+      cp_it++)
+  {
+    std::string full_path;
+    
+    #ifdef _WIN32
+    full_path=*cp_it+'\\'+id2string(class_name)+".class";
+    #else
+    full_path=*cp_it+'/'+id2string(class_name)+".class";
+    #endif
+  
+    if(!java_bytecode_parse(
+         full_path,
+         parse_tree,
+         get_message_handler()))
+      return parse_tree;
+  }
+    
   // not found
   warning() << "failed to load class `" << class_name << '\'' << eom;
   parse_tree.parsed_class.name=class_name;
