@@ -520,6 +520,8 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_symbol)
   {
+    irep_idt identifier=to_symbol_expr(expr).get_identifier();
+    
     // is it a pointer, integer, array or struct?
     if(expr_type.id()==ID_pointer ||
        expr_type.id()==ID_signedbv ||
@@ -530,7 +532,7 @@ void value_sett::get_value_set_rec(
     {
       // look it up
       valuest::const_iterator v_it=
-        values.find(expr.get_string(ID_identifier)+suffix);
+        values.find(id2string(identifier)+suffix);
 
       // try first component name as suffix if not yet found
       if(v_it==values.end() &&
@@ -544,12 +546,12 @@ void value_sett::get_value_set_rec(
           struct_union_type.components().front().get_string(ID_name);
 
         v_it=values.find(
-            expr.get_string(ID_identifier)+"."+first_component_name+suffix);
+            id2string(identifier)+"."+first_component_name+suffix);
       }
 
       // not found? try without suffix
       if(v_it==values.end())
-        v_it=values.find(expr.get(ID_identifier));
+        v_it=values.find(identifier);
         
       if(v_it!=values.end())
         make_union(dest, v_it->second.object_map);
@@ -946,6 +948,21 @@ void value_sett::get_value_set_rec(
         get_value_set_rec(member, dest, suffix, original_type, ns);
       }
     }
+    
+    if(op0_type.id()==ID_union)
+    {
+      const union_typet &union_type=to_union_type(op0_type);
+
+      // just collect them all
+      for(union_typet::componentst::const_iterator
+          c_it=union_type.components().begin();
+          c_it!=union_type.components().end(); c_it++)
+      {
+        const irep_idt &name=c_it->get_name();
+        member_exprt member(expr.op0(), name, c_it->type());
+        get_value_set_rec(member, dest, suffix, original_type, ns);
+      }
+    }
 
     if(!found)
       // we just pass through
@@ -1241,7 +1258,7 @@ void value_sett::assign(
   {
     const struct_union_typet &struct_union_type=
       to_struct_union_type(type);
-    
+      
     for(struct_union_typet::componentst::const_iterator
         c_it=struct_union_type.components().begin();
         c_it!=struct_union_type.components().end();
@@ -1669,8 +1686,8 @@ void value_sett::apply_code(
   const codet &code,
   const namespacet &ns)
 {
-  const irep_idt &statement=code.get(ID_statement);
-
+  const irep_idt &statement=code.get_statement();
+  
   if(statement==ID_block)
   {
     forall_operands(it, code)
