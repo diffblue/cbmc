@@ -9,4 +9,10 @@ int main()
   
   // this should also not overflow
   b=a-INT_MIN;
+  
+  int x, y, z;
+
+  x = INT_MIN+1;
+  y = INT_MIN;
+  z = x-y; // neither
 }
