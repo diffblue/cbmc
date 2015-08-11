@@ -602,14 +602,13 @@ literalt bv_utilst::overflow_sub(
 {
   if(rep==SIGNED)
   {
-    // We special-case INT_MIN-INT_MIN, which is zero,
-    // and thus not an overflow.
-    literalt op0_int_min=is_int_min(op0);
-    literalt op1_int_min=is_int_min(op1);
+    // We special-case x-INT_MIN, which is >=0,
+    // always representable, and thus not an overflow.
+    literalt op1_is_int_min=is_int_min(op1);
     
     return 
-      prop.land(prop.lor(!op0_int_min, !op1_int_min),
-      overflow_add(op0, negate(op1), SIGNED));
+      prop.land(!op1_is_int_min,
+                overflow_add(op0, negate(op1), SIGNED));
   }
   else if(rep==UNSIGNED)
   {
