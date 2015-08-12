@@ -602,13 +602,16 @@ literalt bv_utilst::overflow_sub(
 {
   if(rep==SIGNED)
   {
-    // We special-case x-INT_MIN, which is >=0,
-    // always representable, and thus not an overflow.
+    // We special-case x-INT_MIN, which is >=0 if
+    // x is negative, always representable, and
+    // thus not an overflow.
     literalt op1_is_int_min=is_int_min(op1);
+    literalt op0_is_negative=op0[op0.size()-1];
     
     return 
-      prop.land(!op1_is_int_min,
-                overflow_add(op0, negate(op1), SIGNED));
+      prop.lselect(op1_is_int_min,
+        !op0_is_negative,
+        overflow_add(op0, negate(op1), SIGNED));
   }
   else if(rep==UNSIGNED)
   {
