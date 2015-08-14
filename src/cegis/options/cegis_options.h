@@ -74,7 +74,52 @@ public:
    *
    * @return
    */
+  std::string skolem_function_name() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  bool has_skolem_function() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  std::string ranking_function_name() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  bool has_ranking_function() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
   size_t max_prog_size() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  size_t total_target_functions() const;
 
   /**
    * @brief

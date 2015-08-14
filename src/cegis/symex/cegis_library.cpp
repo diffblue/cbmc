@@ -44,7 +44,7 @@ void add_synthesis_placeholder(symbol_tablet &symbol_table)
 }
 
 void add_cegis_library(symbol_tablet &symbol_table,
-    goto_functionst &goto_functions, ui_message_handlert &msg)
+    goto_functionst &goto_functions, message_handlert &msg)
 {
   std::set<irep_idt> synthesis_library;
   synthesis_library.insert(EXECUTE);

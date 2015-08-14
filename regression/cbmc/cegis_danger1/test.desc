@@ -1,0 +1,9 @@
+CORE
+main.c
+--gcc --unwind 2 --no-unwinding-assertions --cegis --function main --cegis-max-prog-size 1 --cegis-targets __CPROVER_synthesis_danger_invariant
+^EXIT=0$
+^SIGNAL=0$
+^ *__CPROVER_synthesis_tmp_0 *= *3.*;$
+^.*__CPROVER_synthesis_writeonly_danger_invariant *= *[(]signed int[)][(]__CPROVER_synthesis_const_x *<= *__CPROVER_synthesis_tmp_0[)];$
+--
+^warning: ignoring

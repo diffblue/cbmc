@@ -33,7 +33,7 @@ class optionst;
   "(no-assertions)(no-assumptions)" \
   "(xml-ui)(xml-interface)(vcd):" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
-  "(cegis)(cegis-root):(cegis-targets):(cegis-max-prog-size):" \
+  "(cegis)(cegis-root):(cegis-targets):(cegis-max-prog-size):(cegis-skolem):(cegis-ranking):" \
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
   "(floatbv)(fixedbv)" \

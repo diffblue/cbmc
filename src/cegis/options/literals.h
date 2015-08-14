@@ -51,7 +51,49 @@ Author: Daniel Kroening, kroening@kroening.com
  *
  * @details
  */
-#define CPROVER_SYNTHESIS_VARIABLE_PREFIX "__CPROVER_synthesis_arg_"
+#define CPROVER_SYNTHESIS_ARG_PREFIX "__CPROVER_synthesis_arg_"
+
+/**
+ * @brief
+ *
+ * @details
+ */
+#define CPROVER_SYNTHESIS_PRIVATE_ARG_PREFIX "__CPROVER_synthesis_private_arg_"
+
+/**
+ * @brief
+ *
+ * @details
+ */
+#define CPROVER_SYNTHESIS_CONST_PREFIX "__CPROVER_synthesis_const_"
+
+/**
+ * @brief
+ *
+ * @details
+ */
+#define CPROVER_SYNTHESIS_TMPVAR_PREFIX "__CPROVER_synthesis_tmp_"
+
+/**
+ * @brief
+ *
+ * @details
+ */
+#define CPROVER_SYNTHESIS_WRITEONLY_PREFIX "__CPROVER_synthesis_writeonly_"
+
+/**
+ * @brief
+ *
+ * @details
+ */
+#define CPROVER_SYNTHESIS_SKOLEM_PREFIX "__CPROVER_synthesis_skolem_"
+
+/**
+ * @brief
+ *
+ * @details
+ */
+#define CPROVER_SYNTHESIS_RANKING_PREFIX "__CPROVER_synthesis_ranking_"
 
 /**
  * @brief
@@ -66,5 +108,13 @@ Author: Daniel Kroening, kroening@kroening.com
  * @details
  */
 #define SYNTHESIS_EXECUTE "__CPROVER_synthesis_execute"
+
+/**
+ * @brief Source location of generated constants.
+ *
+ * @details Used as source location for generated variables and their initialisation.
+ * Function doesn't actually exist.
+ */
+#define SYNTHESIS_INIT "__CPROVER_synthesis_initialize"
 
 #endif /* CEGIS_LITERALS_H_ */

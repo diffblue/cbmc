@@ -50,8 +50,10 @@ void limit_prog_size(const cegis_optionst &options, goto_programt &body,
   const unsigned int max_prog_size=options.max_prog_size();
   const constant_exprt rhs=from_integer(max_prog_size, unsigned_int_type());
   const goto_programt::targett assume_prog_size=body.add_instruction(ASSUME);
-  const binary_predicate_exprt cond(prog_size_symbol, ID_le, rhs);
-  assume_prog_size->guard=cond;
+  const binary_predicate_exprt upper_bound(prog_size_symbol, ID_le, rhs);
+  const constant_exprt one(from_integer(1, prog_size_symbol.type()));
+  const binary_predicate_exprt lower_bound(one, ID_le, prog_size_symbol);
+  assume_prog_size->guard=and_exprt(lower_bound, upper_bound);
   assume_prog_size->source_location=loc;
 }
 
@@ -62,10 +64,13 @@ symbol_typet get_instr_type()
 
 const char SIZE_PARAM[]="__CPROVER_synthesis_execute_prog_size";
 const char PROG_PARAM[]="__CPROVER_synthesis_execute_prog";
+const char IS_SKOLEM_PARAM[]="__CPROVER_synthesis_execute_is_skolem";
+const char IS_RANKING_PARAM[]="__CPROVER_synthesis_execute_is_ranking";
 
-void add_function_body(const symbol_tablet &st, goto_functionst &gf,
+void add_body(const symbol_tablet &st, goto_functionst &gf,
     const std::string &fn, const code_declt &szdecl,
-    const code_declt &prog_decl, source_location_factoryt &lfactory)
+    const code_declt &prog_decl, source_location_factoryt &lfactory,
+    const bool is_skolem, const bool is_ranking)
 {
   goto_functionst::function_mapt &fm=gf.function_map;
   const goto_functionst::function_mapt::iterator entry=fm.find(fn);
@@ -85,6 +90,16 @@ void add_function_body(const symbol_tablet &st, goto_functionst &gf,
    const index_exprt first(prog, first_index);
    const address_of_exprt prog_ref(first);
    call.arguments().push_back(prog_ref);*/
+  const constant_exprt yes=from_integer(1, signed_int_type());
+  const constant_exprt no=from_integer(0, signed_int_type());
+  const goto_programt::targett assign_skolem=body.add_instruction(ASSIGN);
+  const symbol_exprt skolem_lhs(st.lookup(IS_SKOLEM_PARAM).symbol_expr());
+  assign_skolem->code=code_assignt(skolem_lhs, is_skolem ? yes : no);
+  assign_skolem->source_location=lfactory(fn);
+  const goto_programt::targett assign_ranking=body.add_instruction(ASSIGN);
+  const symbol_exprt ranking_lhs(st.lookup(IS_RANKING_PARAM).symbol_expr());
+  assign_ranking->code=code_assignt(ranking_lhs, is_ranking ? yes : no);
+  assign_ranking->source_location=lfactory(fn);
   const symbol_exprt size_param(st.lookup(SIZE_PARAM).symbol_expr());
   const goto_programt::targett assign_size=body.add_instruction(ASSIGN);
   assign_size->code=code_assignt(size_param, prog_size);
@@ -109,12 +124,12 @@ class create_target_programt
   const cegis_optionst &options;
   symbol_tablet &st;
   goto_functionst &gf;
-  source_location_factoryt &lfactory;
+  source_location_factoryt &loc_fac;
 public:
   create_target_programt(const cegis_optionst &options,
       symbol_tablet &symbol_table, goto_functionst &goto_functions,
       source_location_factoryt &lfactory) :
-      options(options), st(symbol_table), gf(goto_functions), lfactory(lfactory)
+      options(options), st(symbol_table), gf(goto_functions), loc_fac(lfactory)
   {
   }
 
@@ -124,21 +139,27 @@ public:
 
   void operator()(const std::string &function_name) const
   {
+    create(function_name, false, false);
+  }
+
+  void create(const std::string &func, const bool is_skolem,
+      const bool is_ranking) const
+  {
     const std::string synthesis_entry(options.entry_function_name());
     goto_programt &body=get_program_body(gf, synthesis_entry);
     const goto_program_adaptert adapter(st, body);
-    const std::string prog_size(concat(SYNTHESIS_PROG_SIZE, function_name));
+    const std::string prog_size(concat(SYNTHESIS_PROG_SIZE, func));
     const std::string entry_name=options.entry_function_name();
-    const source_locationt size_loc(lfactory(entry_name));
+    const source_locationt size_loc(loc_fac(entry_name));
     const typet sztype(unsigned_int_type());
     code_declt &szdecl=adapter.append_decl(prog_size, sztype, size_loc);
     const exprt &size=szdecl.symbol();
-    limit_prog_size(options, body, size, lfactory(entry_name));
-    const std::string prog(concat(SYNTHESIS_PROG, function_name));
+    limit_prog_size(options, body, size, loc_fac(entry_name));
+    const std::string prog(concat(SYNTHESIS_PROG, func));
     const array_typet prog_type(get_instr_type(), size);
-    const source_locationt prog_loc(lfactory(entry_name));
+    const source_locationt prog_loc(loc_fac(entry_name));
     code_declt &prog_decl=adapter.append_decl(prog, prog_type, prog_loc);
-    add_function_body(st, gf, function_name, szdecl, prog_decl, lfactory);
+    add_body(st, gf, func, szdecl, prog_decl, loc_fac, is_skolem, is_ranking);
   }
 };
 }
@@ -148,6 +169,10 @@ void target_program_factoryt::operator ()() const
   const std::list<std::string> functions=options.target_function_names();
   const create_target_programt create_prog(options, symbol_table, gf, lfactory);
   std::for_each(functions.begin(), functions.end(), create_prog);
+  if (options.has_skolem_function())
+    create_prog.create(options.skolem_function_name(), true, false);
+  if (options.has_ranking_function())
+    create_prog.create(options.ranking_function_name(), false, true);
 }
 
 void add_target_programs(class symbol_tablet &symbol_table,

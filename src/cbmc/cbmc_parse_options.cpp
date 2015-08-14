@@ -501,7 +501,7 @@ int cbmc_parse_optionst::doit()
       options.set_option("function", cmdline.get_value("function"));
     const cegis_optionst cegis_options(cmdline, options);
     symex_learnt learning_algorithm(cegis_options, symbol_table, goto_functions, ui_message_handler);
-    bmc_verification_oraclet verification_oracle(options, symbol_table, goto_functions, ui_message_handler);
+    bmc_verification_oraclet verification_oracle(options, symbol_table, goto_functions);
     return run_cegis(learning_algorithm, verification_oracle, result());
   }
 

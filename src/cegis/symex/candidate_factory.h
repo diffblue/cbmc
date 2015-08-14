@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CEGIS_CANDIDATE_FACTORY_H_
 #define CEGIS_CANDIDATE_FACTORY_H_
 
-#include <goto-programs/goto_program.h>
+#include <cegis/value/goto_candidate.h>
 
 /**
  * @brief Transforms a CBMC counterexample from a SYMEX learner.
@@ -30,7 +30,7 @@ public:
    * corresponding assignments) for which the previous solution violates the
    * safety property.
    */
-  typedef std::map<const irep_idt, goto_programt::instructionst> candidatet;
+  typedef goto_candidatet candidatet;
 private:
   candidatet &result;
   const class goto_functionst &gf;
