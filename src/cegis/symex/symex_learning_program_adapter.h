@@ -33,7 +33,7 @@ private:
   symbol_tablet symbol_table;
   goto_functionst gf;
   const class cegis_optionst &options;
-  class ui_message_handlert &msg;
+  class message_handlert &msg;
   const std::deque<counterexamplet> &counterexamples;
 public:
   /**
@@ -49,7 +49,7 @@ public:
    */
   symex_learning_program_adaptert(const symbol_tablet &symbol_table,
       const goto_functionst &goto_functions, const cegis_optionst &options,
-      ui_message_handlert &msg,
+      message_handlert &msg,
       const std::deque<counterexamplet> &counterexamples);
 
   /**

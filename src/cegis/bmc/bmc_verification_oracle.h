@@ -10,8 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CEGIS_BMC_VERIFICATION_ORACLE_H_
 #define CEGIS_BMC_VERIFICATION_ORACLE_H_
 
-#include <util/options.h>
-#include <goto-programs/goto_program.h>
+#include <cegis/value/goto_candidate.h>
 
 /**
  * @brief BMC-based CEGIS verification oracle.
@@ -31,10 +30,9 @@ public:
   typedef std::map<const irep_idt, exprt> counterexamplet;
 private:
   bool is_failure;
-  const optionst &options;
+  const class optionst &options;
   const symbol_tablet &symbol_table;
   const class goto_functionst &goto_functions;
-  ui_message_handlert &ui_message_handler;
   counterexamplet current_counterexample;
 public:
   /**
@@ -43,7 +41,7 @@ public:
    * @details Solutions are provided as a set of GOTO function bodies
    * (goto_programt::instructionst) for function names.
    */
-  typedef std::map<const irep_idt, goto_programt::instructionst> candidatet;
+  typedef goto_candidatet candidatet;
 
   /**
    * @brief Creates a BMC-based CEGIS verification oracle.
@@ -54,11 +52,9 @@ public:
    * @param options All existing CBMC options.
    * @param symbol_table The symbol table of the input problem.
    * @param goto_functions The GOTO functions of the input problem.
-   * @param ui_message_handler The message handler to log to.
    */
   bmc_verification_oraclet(const optionst &options,
-      const symbol_tablet &symbol_table, const goto_functionst &goto_functions,
-      ui_message_handlert &ui_message_handler);
+      const symbol_tablet &symbol_table, const goto_functionst &goto_functions);
 
   /**
    * @brief Default destructor.

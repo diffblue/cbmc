@@ -37,7 +37,7 @@ void create_symex_learning_variables(symbol_tablet &symbol_table,
  */
 class variables_factoryt
 {
-  symbol_tablet &symbol_table;
+  symbol_tablet &st;
   goto_functionst &gf;
   const cegis_optionst &options;
   source_location_factoryt &loc_fac;

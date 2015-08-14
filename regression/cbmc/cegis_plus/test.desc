@@ -1,9 +1,8 @@
 CORE
 main.c
---unwind 2 --no-unwinding-assertions --cegis --function main --cegis-max-prog-size 1
+--gcc --unwind 2 --no-unwinding-assertions --cegis --function main --cegis-max-prog-size 1
 ^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
-^.*result = __CPROVER_synthesis_arg_x [+] __CPROVER_synthesis_arg_y;$
+^.*result *= *__CPROVER_synthesis_arg_x *[+] *__CPROVER_synthesis_arg_y;$
 --
 ^warning: ignoring

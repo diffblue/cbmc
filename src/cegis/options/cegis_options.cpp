@@ -51,6 +51,26 @@ std::list<std::string> cegis_optionst::target_function_names() const
   return std::list<std::string>(1, "__CPROVER_synthesis_learn");
 }
 
+std::string cegis_optionst::skolem_function_name() const
+{
+  return get_option(cmdline, options, "cegis-skolem", "");
+}
+
+bool cegis_optionst::has_skolem_function() const
+{
+  return !skolem_function_name().empty();
+}
+
+std::string cegis_optionst::ranking_function_name() const
+{
+  return get_option(cmdline, options, "cegis-ranking", "");
+}
+
+bool cegis_optionst::has_ranking_function() const
+{
+  return !ranking_function_name().empty();
+}
+
 size_t cegis_optionst::max_prog_size() const
 {
   const char option[]="cegis-max-prog-size";
@@ -59,6 +79,14 @@ size_t cegis_optionst::max_prog_size() const
   const size_t value=options.get_unsigned_int_option(option);
   if (value) return value;
   return 10;
+}
+
+size_t cegis_optionst::total_target_functions() const
+{
+  size_t result=target_function_names().size();
+  if (has_skolem_function()) ++result;
+  if (has_ranking_function()) ++result;
+  return result;
 }
 
 const optionst &cegis_optionst::get_options() const

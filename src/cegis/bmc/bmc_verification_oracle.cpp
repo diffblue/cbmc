@@ -13,13 +13,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/bmc.h>
 
+#include <cegis/options/literals.h>
+#include <cegis/util/symbol_table_adapter.h>
+#include <cegis/util/source_location_factory.h>
 #include <cegis/bmc/bmc_verification_oracle.h>
 
 bmc_verification_oraclet::bmc_verification_oraclet(const optionst &options,
-    const symbol_tablet &symbol_table, const goto_functionst &goto_functions,
-    ui_message_handlert &ui_message_handler) :
+    const symbol_tablet &symbol_table, const goto_functionst &goto_functions) :
     is_failure(false), options(options), symbol_table(symbol_table), goto_functions(
-        goto_functions), ui_message_handler(ui_message_handler)
+        goto_functions)
 {
 }
 
@@ -46,7 +48,7 @@ public:
 
 class insert_bodyt
 {
-  typedef bmc_verification_oraclet::candidatet::value_type body_typet;
+  typedef bmc_verification_oraclet::candidatet::bodiest::value_type body_typet;
   goto_functionst &goto_functions;
 public:
   insert_bodyt(goto_functionst &goto_functions) :
@@ -67,13 +69,20 @@ public:
   }
 };
 
-const char INPUT_PREFIX[]="__CPROVER_synthesis_arg";
+bool is_part_of_counterexample(const std::string &name)
+{
+  return std::string::npos != name.find(CPROVER_SYNTHESIS_ARG_PREFIX)
+      || std::string::npos != name.find(CPROVER_SYNTHESIS_PRIVATE_ARG_PREFIX);
+}
+
 class build_counterexamplet
 {
   bmc_verification_oraclet::counterexamplet &input_values;
+  const bmc_verification_oraclet::candidatet::constantst &constants;
 public:
-  build_counterexamplet(bmc_verification_oraclet::counterexamplet &ce) :
-      input_values(ce)
+  build_counterexamplet(bmc_verification_oraclet::counterexamplet &ce,
+      const bmc_verification_oraclet::candidatet::constantst &constants) :
+      input_values(ce), constants(constants)
   {
   }
 
@@ -82,9 +91,27 @@ public:
     if (!step.is_assignment()) return;
     if (step.pc->source_location.get_file().empty()) return;
     const irep_idt &symbol_id(step.lhs_object.get_identifier());
-    // TODO: Handle global variables
-    if (id2string(symbol_id).find(INPUT_PREFIX) == std::string::npos) return;
+    const std::string &name=id2string(symbol_id);
+    if (!is_part_of_counterexample(name)) return;
     input_values[symbol_id]=step.full_lhs_value;
+  }
+};
+
+class constant_inserter
+{
+  symbol_table_adaptert st_adapter;
+  goto_functionst &gf;
+  source_location_factoryt lfactory;
+public:
+  constant_inserter(symbol_tablet &st, goto_functionst &gf) :
+      st_adapter(st), gf(gf)
+  {
+  }
+  void operator()(const std::pair<const irep_idt, exprt> &constant)
+  {
+    const source_locationt loc(lfactory(SYNTHESIS_INIT));
+    const exprt &value=constant.second;
+    st_adapter.add_global_constant(constant.first, value, gf, loc);
   }
 };
 }
@@ -92,11 +119,17 @@ public:
 void bmc_verification_oraclet::verify(const candidatet &candidate)
 {
   current_counterexample.clear();
+  symbol_tablet symbol_table(this->symbol_table);
   goto_functionst goto_functions;
   goto_functions.copy_from(this->goto_functions);
+  const constant_inserter add_constant(symbol_table, goto_functions);
+  const candidatet::constantst &constants=candidate.constants;
+  std::for_each(constants.begin(), constants.end(), add_constant);
+  const candidatet::bodiest &bodies=candidate.bodies;
   const insert_bodyt insert_body(goto_functions);
-  std::for_each(candidate.begin(), candidate.end(), insert_body);
-  bmct bmc(options, symbol_table, ui_message_handler);
+  std::for_each(bodies.begin(), bodies.end(), insert_body);
+  null_message_handlert null_message_handler;
+  bmct bmc(options, symbol_table, null_message_handler);
   const safety_checkert::resultt bmc_result=bmc(goto_functions);
   switch (bmc_result)
   {
@@ -106,7 +139,7 @@ void bmc_verification_oraclet::verify(const candidatet &candidate)
     return;
   default:
     const goto_tracet::stepst &trace=bmc.safety_checkert::error_trace.steps;
-    const build_counterexamplet build_ce(current_counterexample);
+    const build_counterexamplet build_ce(current_counterexample, constants);
     std::for_each(trace.begin(), trace.end(), build_ce);
   }
 }
