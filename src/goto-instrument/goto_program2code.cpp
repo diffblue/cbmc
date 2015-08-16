@@ -1855,43 +1855,6 @@ void goto_program2codet::cleanup_code(
 
 /*******************************************************************\
 
-Function: has_break_continue
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
-static bool has_break_continue(const codet &code)
-{
-  const irep_idt &statement=code.get_statement();
-
-  if(statement==ID_break ||
-     statement==ID_continue)
-    return true;
-  else if(statement==ID_while ||
-          statement==ID_dowhile ||
-          statement==ID_for)
-    return false;
-  else if(code.has_operands())
-  {
-    const exprt::operandst &operands=code.operands();
-    forall_expr(it, operands)
-    {
-      if(it->id()==ID_code &&
-         has_break_continue(to_code(*it)))
-        return true;
-    }
-  }
-
-  return false;
-}
-
-/*******************************************************************\
-
 Function: goto_program2codet::cleanup_code_block
 
 Inputs:
@@ -1929,26 +1892,15 @@ void goto_program2codet::cleanup_code_block(
           break;
         }
 
-      // nested blocks with declarations become do { } while(false)
-      // to ensure the inner block is never lost
-      if(!has_break_continue(to_code(*it)) && has_decl)
-      {
-        code_dowhilet d;
-        d.cond()=false_exprt();
-        cleanup_expr(d.cond(), false);
-        d.body().swap(*it);
-
-        it->swap(d);
-
-        ++i;
-      }
-      else
+      if(!has_decl)
       {
         operands.insert(operands.begin()+i+1,
             it->operands().begin(), it->operands().end());
         operands.erase(operands.begin()+i);
         // no ++i
       }
+      else
+        ++i;
     }
     else
       ++i;
