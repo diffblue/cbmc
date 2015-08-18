@@ -1,6 +1,30 @@
-diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
---- minisat-2.2.0/mtl/IntTypes.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/mtl/IntTypes.h	2015-05-22 19:06:39.000000000 +0100
+diff -rupN glucose-syrup/core/Solver.cc glucose-syrup-patched/core/Solver.cc
+--- glucose-syrup/core/Solver.cc	2015-08-18 20:02:43.000000000 +0100
++++ glucose-syrup-patched/core/Solver.cc	2015-08-18 19:58:28.000000000 +0100
+@@ -931,7 +931,6 @@ void Solver::uncheckedEnqueue(Lit p, CRe
+ CRef Solver::propagate() {
+     CRef confl = CRef_Undef;
+     int num_props = 0;
+-    int previousqhead = qhead;
+     watches.cleanAll();
+     watchesBin.cleanAll();
+     unaryWatches.cleanAll();
+diff -rupN glucose-syrup/core/SolverTypes.h glucose-syrup-patched/core/SolverTypes.h
+--- glucose-syrup/core/SolverTypes.h	2015-08-18 19:59:51.000000000 +0100
++++ glucose-syrup-patched/core/SolverTypes.h	2015-08-18 20:05:42.000000000 +0100
+@@ -53,7 +53,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
+ 
+ #include <assert.h>
+ #include <stdint.h>
++#ifndef _MSC_VER
+ #include <pthread.h>
++#endif
+ 
+ #include "mtl/IntTypes.h"
+ #include "mtl/Alg.h"
+diff -rupN glucose-syrup/mtl/IntTypes.h glucose-syrup-patched/mtl/IntTypes.h
+--- glucose-syrup/mtl/IntTypes.h	2015-08-18 20:02:43.000000000 +0100
++++ glucose-syrup-patched/mtl/IntTypes.h	2015-08-18 19:58:28.000000000 +0100
 @@ -31,7 +31,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #else
  
@@ -11,9 +35,9 @@ diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
  
  #endif
  
-diff -rupN minisat-2.2.0/utils/ParseUtils.h minisat-2.2.0.patched/utils/ParseUtils.h
---- minisat-2.2.0/utils/ParseUtils.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/utils/ParseUtils.h	2015-05-22 19:06:39.000000000 +0100
+diff -rupN glucose-syrup/utils/ParseUtils.h glucose-syrup-patched/utils/ParseUtils.h
+--- glucose-syrup/utils/ParseUtils.h	2015-08-18 20:02:43.000000000 +0100
++++ glucose-syrup-patched/utils/ParseUtils.h	2015-08-18 19:58:28.000000000 +0100
 @@ -25,7 +25,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #include <stdio.h>
  #include <math.h>
@@ -45,14 +69,19 @@ diff -rupN minisat-2.2.0/utils/ParseUtils.h minisat-2.2.0.patched/utils/ParseUti
  
      int  operator *  () const { return (pos >= size) ? EOF : buf[pos]; }
      void operator ++ ()       { pos++; assureLookahead(); }
-diff -urN glucose-syrup/core/Solver.cc glucose-syrup.patched/core/Solver.cc
---- glucose-syrup/core/Solver.cc	2014-10-03 10:10:21.000000000 +0100
-+++ glucose-syrup.patched/core/Solver.cc	2015-08-09 20:38:10.000000000 +0100
-@@ -931,7 +931,6 @@
- CRef Solver::propagate() {
-     CRef confl = CRef_Undef;
-     int num_props = 0;
--    int previousqhead = qhead;
-     watches.cleanAll();
-     watchesBin.cleanAll();
-     unaryWatches.cleanAll();
+diff -rupN glucose-syrup/utils/System.h glucose-syrup-patched/utils/System.h
+--- glucose-syrup/utils/System.h	2015-08-18 19:59:51.000000000 +0100
++++ glucose-syrup-patched/utils/System.h	2015-08-18 20:04:57.000000000 +0100
+@@ -60,8 +60,11 @@ static inline double Glucose::cpuTime(vo
+ 
+ // Laurent: I know that this will not compile directly under Windows... sorry for that
+ static inline double Glucose::realTime() {
++#ifndef _WIN32
+     struct timeval tv;
+     gettimeofday(&tv, NULL);
+-    return (double)tv.tv_sec + (double) tv.tv_usec / 1000000; }
++    return (double)tv.tv_sec + (double) tv.tv_usec / 1000000;
++#endif
++}
+ 
+ #endif
