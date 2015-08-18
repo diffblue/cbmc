@@ -556,7 +556,7 @@ std::string expr2ct::convert_rec(
     }
     else if(followed.id()==ID_union)
     {
-      std::string dest=q+"struct";
+      std::string dest=q+"union";
       const irep_idt &tag=to_union_type(followed).get_tag();
       if(tag!="") dest+=" "+id2string(tag);
       dest+=d;
