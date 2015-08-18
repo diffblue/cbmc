@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cstdlib>
+
 #include "namespace.h"
 #include "config.h"
 #include "symbol_table.h"
