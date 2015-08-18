@@ -634,10 +634,10 @@ std::string expr2ct::convert_rec(
 
     c_qualifierst ret_qualifiers;
     ret_qualifiers.read(code_type.return_type());
-    const typet &return_type=ns.follow(code_type.return_type());
+    const typet &return_type=code_type.return_type();
 
     // return type may be a function pointer or array
-    const typet *non_ptr_type=&return_type;
+    const typet *non_ptr_type=&ns.follow(return_type);
     while(non_ptr_type->id()==ID_pointer)
       non_ptr_type=&(ns.follow(non_ptr_type->subtype()));
 
@@ -738,7 +738,7 @@ std::string expr2ct::convert_typecast(
      from_type.id()==ID_c_bool)
     return convert(src.op(), precedence);
 
-  std::string dest="("+convert(to_type)+")";
+  std::string dest="("+convert(src.type())+")";
 
   unsigned p;
   std::string tmp=convert(src.op(), p);

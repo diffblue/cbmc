@@ -87,10 +87,12 @@ protected:
       std::ostream &os_body);
   void convert_compound(
       const typet &type,
+      const typet &unresolved,
       bool recursive,
       std::ostream &os);
   void convert_compound(
       const struct_union_typet &type,
+      const typet &unresolved,
       bool recursive,
       std::ostream &os);
   void convert_compound_enum(

@@ -2300,7 +2300,12 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     if(ns.follow(expr.type()).id()==ID_c_bit_field)
       expr=to_typecast_expr(expr).op();
     else
+    {
       add_local_types(expr.type());
+
+      assert(expr.type().id()!=ID_union &&
+             expr.type().id()!=ID_struct);
+    }
   }
   else if(expr.id()==ID_symbol)
   {
