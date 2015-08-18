@@ -177,25 +177,23 @@ void dump_ct::operator()(std::ostream &os)
       ++it)
   {
     const symbolt &symbol=ns.lookup(*it);
+    const irep_idt &type_id=symbol.type.id();
 
     if(symbol.is_type &&
        symbol.location.get_function().empty() &&
-       (symbol.type.id()==ID_struct ||
-        symbol.type.id()==ID_incomplete_struct ||
-        symbol.type.id()==ID_union ||
-        symbol.type.id()==ID_incomplete_union))
+       (type_id==ID_struct ||
+        type_id==ID_incomplete_struct ||
+        type_id==ID_union ||
+        type_id==ID_incomplete_union ||
+        type_id==ID_c_enum))
     {
       os << "// " << symbol.name << std::endl;
       os << "// " << symbol.location << std::endl;
-      os << type_to_string(symbol.type) << ";\n\n";
-    }
-    else if(symbol.is_type &&
-            symbol.location.get_function().empty() &&
-            symbol.type.id()==ID_c_enum)
-    {
-      os << "// " << symbol.name << std::endl;
-      os << "// " << symbol.location << std::endl;
-      convert_compound_enum(symbol.type, os);
+
+      if(type_id==ID_c_enum)
+        convert_compound_enum(symbol.type, os);
+      else
+        os << type_to_string(symbol_typet(symbol.name)) << ";\n\n";
     }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
       convert_global_variable(
@@ -316,7 +314,7 @@ void dump_ct::convert_compound_declaration(
   if(symbol.type.id()==ID_struct ||
      symbol.type.id()==ID_union ||
      symbol.type.id()==ID_c_enum)
-    convert_compound(symbol.type, true, os_body);
+    convert_compound(symbol.type, symbol_typet(symbol.name), true, os_body);
 }
 
 /*******************************************************************\
@@ -333,6 +331,7 @@ Purpose:
 
 void dump_ct::convert_compound(
   const typet &type,
+  const typet &unresolved,
   bool recursive,
   std::ostream &os)
 {
@@ -343,7 +342,7 @@ void dump_ct::convert_compound(
     assert(symbol.is_type);
 
     if(!ignore(symbol))
-      convert_compound(symbol.type, recursive, os);
+      convert_compound(symbol.type, unresolved, recursive, os);
   }
   else if(type.id()==ID_c_enum_tag)
   {
@@ -352,13 +351,13 @@ void dump_ct::convert_compound(
     assert(symbol.is_type);
 
     if(!ignore(symbol))
-      convert_compound(symbol.type, recursive, os);
+      convert_compound(symbol.type, unresolved, recursive, os);
   }
   else if(type.id()==ID_array || type.id()==ID_pointer)
   {
     if(!recursive) return;
 
-    convert_compound(type.subtype(), recursive, os);
+    convert_compound(type.subtype(), type.subtype(), recursive, os);
 
     // sizeof may contain a type symbol that has to be declared first
     if(type.id()==ID_array)
@@ -370,11 +369,14 @@ void dump_ct::convert_compound(
           it=syms.begin();
           it!=syms.end();
           ++it)
-        convert_compound(symbol_typet(*it), recursive, os);
+      {
+        symbol_typet s_type(*it);
+        convert_compound(s_type, s_type, recursive, os);
+      }
     }
   }
   else if(type.id()==ID_struct || type.id()==ID_union)
-    convert_compound(to_struct_union_type(type), recursive, os);
+    convert_compound(to_struct_union_type(type), unresolved, recursive, os);
   else if(type.id()==ID_c_enum)
     convert_compound_enum(type, os);
 }
@@ -393,6 +395,7 @@ Purpose:
 
 void dump_ct::convert_compound(
   const struct_union_typet &type,
+  const typet &unresolved,
   bool recursive,
   std::ostream &os)
 {
@@ -448,7 +451,7 @@ void dump_ct::convert_compound(
       it++)
   {
     const struct_typet::componentt &comp=*it;
-    typet comp_type=ns.follow(comp.type());
+    const typet &comp_type=ns.follow(comp.type());
 
     if(comp_type.id()==ID_code ||
        comp.get_bool(ID_from_base) ||
@@ -456,7 +459,7 @@ void dump_ct::convert_compound(
       continue;
 
     if(recursive && comp_type.id()!=ID_pointer)
-      convert_compound(comp.type(), recursive, os);
+      convert_compound(comp.type(), comp.type(), recursive, os);
 
     irep_idt comp_name=comp.get_name();
 
@@ -466,7 +469,7 @@ void dump_ct::convert_compound(
     // component names such as "main" would collide with other objects in the
     // namespace
     std::string fake_unique_name="NO/SUCH/NS::"+id2string(comp_name);
-    std::string s=make_decl(fake_unique_name, comp_type);
+    std::string s=make_decl(fake_unique_name, comp.type());
     assert(s.find("NO/SUCH/NS")==std::string::npos);
 
     if(comp_type.id()==ID_c_bit_field &&
@@ -510,7 +513,7 @@ void dump_ct::convert_compound(
     struct_body << ";" << std::endl;
   }
 
-  os << type_to_string(type);
+  os << type_to_string(unresolved);
   if(!base_decls.str().empty())
   {
     assert(language->id()=="cpp");
@@ -1205,7 +1208,7 @@ void dump_ct::insert_local_type_decls(
     // a comment block ...
     std::ostringstream os_body;
     os_body << *it << " */\n";
-    convert_compound(type, false, os_body);
+    convert_compound(type, symbol_typet(*it), false, os_body);
     os_body << "/*";
 
     code_skipt skip;
@@ -1399,6 +1402,19 @@ void dump_ct::cleanup_type(typet &type)
 {
   Forall_subtypes(it, type)
     cleanup_type(*it);
+
+  if(type.id()==ID_code)
+  {
+    code_typet &code_type=to_code_type(type);
+
+    cleanup_type(code_type.return_type());
+
+    for(code_typet::parameterst::iterator
+        it=code_type.parameters().begin();
+        it!=code_type.parameters().end();
+        ++it)
+      cleanup_type(it->type());
+  }
 
   if(type.id()==ID_array)
     cleanup_expr(to_array_type(type).size());
