@@ -68,5 +68,6 @@ glucose-download:
 	@tar xfz glucose-syrup.tgz
 	@rm -Rf ../glucose-syrup
 	@mv glucose-syrup ../
+	@(cd ../glucose-syrup; patch -p1 < ../scripts/glucose-syrup-patch)
 	@rm glucose-syrup.tgz
 
