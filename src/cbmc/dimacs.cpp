@@ -9,10 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 
+#include "dimacs.h"
 #include <solvers/sat/dimacs_cnf.h>
-
-#include "bmc.h"
-#include "bv_cbmc.h"
 
 /*******************************************************************\
 
@@ -26,10 +24,8 @@ Function: bmct::write_dimacs
 
 \*******************************************************************/
 
-bool bmct::write_dimacs()
-{
-  const std::string &filename=options.get_option("outfile");
-  
+bool dimacst::write_dimacs(const std::string &filename)
+{ 
   if(filename.empty() || filename=="-")
     return write_dimacs(std::cout);
 
@@ -45,7 +41,7 @@ bool bmct::write_dimacs()
 
 /*******************************************************************\
 
-Function: bmct::write_dimacs
+Function: dimacst::write_dimacs
 
   Inputs:
 
@@ -55,23 +51,16 @@ Function: bmct::write_dimacs
 
 \*******************************************************************/
 
-bool bmct::write_dimacs(std::ostream &out)
+bool dimacst::write_dimacs(std::ostream &out)
 {
-  dimacs_cnft dimacs_cnf;
-  dimacs_cnf.set_message_handler(get_message_handler());
+  dec_solve();
 
-  bv_cbmct bv_cbmc(ns, dimacs_cnf);
-
-  do_conversion(bv_cbmc);
-
-  bv_cbmc.dec_solve();
-
-  dimacs_cnf.write_dimacs_cnf(out);
+  dynamic_cast<dimacs_cnft&>(prop).write_dimacs_cnf(out);
 
   // we dump the mapping variable<->literals
   for(bv_cbmct::symbolst::const_iterator
-      s_it=bv_cbmc.get_symbols().begin();
-      s_it!=bv_cbmc.get_symbols().end();
+      s_it=get_symbols().begin();
+      s_it!=get_symbols().end();
       s_it++)
   {
     if(s_it->second.is_constant())
@@ -83,7 +72,7 @@ bool bmct::write_dimacs(std::ostream &out)
   }
 
   // dump mapping for selected bit-vectors
-  const boolbv_mapt &boolbv_map=bv_cbmc.get_map();
+  const boolbv_mapt &boolbv_map=get_map();
 
   for(boolbv_mapt::mappingt::const_iterator
       m_it=boolbv_map.mapping.begin();
