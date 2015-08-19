@@ -7,10 +7,12 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <algorithm>
+#include <memory>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_convert.h>
 
+#include <cbmc/cbmc_solvers.h>
 #include <cbmc/bmc.h>
 
 #include <cegis/options/literals.h>
@@ -128,8 +130,15 @@ void bmc_verification_oraclet::verify(const candidatet &candidate)
   const candidatet::bodiest &bodies=candidate.bodies;
   const insert_bodyt insert_body(goto_functions);
   std::for_each(bodies.begin(), bodies.end(), insert_body);
+
+  //get solver
   null_message_handlert null_message_handler;
-  bmct bmc(options, symbol_table, null_message_handler);
+  cbmc_solverst cbmc_solvers(options, symbol_table, null_message_handler);
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = 
+    cbmc_solvers.get_solver();
+  prop_convt& prop_conv = cbmc_solver->prop_conv();
+  bmct bmc(options, symbol_table, null_message_handler, prop_conv);
+
   const safety_checkert::resultt bmc_result=bmc(goto_functions);
   switch (bmc_result)
   {

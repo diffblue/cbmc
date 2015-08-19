@@ -48,6 +48,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
+#include "cbmc_solvers.h"
 #include "cbmc_parse_options.h"
 #include "bmc.h"
 #include "version.h"
@@ -462,7 +463,15 @@ int cbmc_parse_optionst::doit()
   }
 
   goto_functionst goto_functions;
-  bmct bmc(options, symbol_table, ui_message_handler);
+
+  //get solver
+  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
+  cbmc_solvers.set_ui(get_ui());
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = 
+    cbmc_solvers.get_solver();
+  prop_convt& prop_conv = cbmc_solver->prop_conv();
+
+  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
 
   int get_goto_program_ret=
     get_goto_program(options, bmc, goto_functions);

@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Symbolic Execution of ANSI-C
+Module: Writing DIMACS Files
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -9,12 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 
-#include "dimacs.h"
 #include <solvers/sat/dimacs_cnf.h>
+
+#include "cbmc_dimacs.h"
 
 /*******************************************************************\
 
-Function: bmct::write_dimacs
+Function: cbmc_dimacst::write_dimacs
 
   Inputs:
 
@@ -24,7 +25,7 @@ Function: bmct::write_dimacs
 
 \*******************************************************************/
 
-bool dimacst::write_dimacs(const std::string &filename)
+bool cbmc_dimacst::write_dimacs(const std::string &filename)
 { 
   if(filename.empty() || filename=="-")
     return write_dimacs(std::cout);
@@ -41,7 +42,7 @@ bool dimacst::write_dimacs(const std::string &filename)
 
 /*******************************************************************\
 
-Function: dimacst::write_dimacs
+Function: cbmc_dimacst::write_dimacs
 
   Inputs:
 
@@ -51,7 +52,7 @@ Function: dimacst::write_dimacs
 
 \*******************************************************************/
 
-bool dimacst::write_dimacs(std::ostream &out)
+bool cbmc_dimacst::write_dimacs(std::ostream &out)
 {
   dec_solve();
 
