@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module:
+Module: Writing DIMACS Files
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -11,17 +11,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_cbmc.h"
 
-class dimacst:public bv_cbmct
+class cbmc_dimacst:public bv_cbmct
 {
 public:
-  dimacst(
+  cbmc_dimacst(
     const namespacet &_ns,
     propt &_prop):bv_cbmct(_ns, _prop) { }
-  virtual ~dimacst() { }
+  virtual ~cbmc_dimacst() { }
 
   bool write_dimacs(const std::string &filename);
   bool write_dimacs(std::ostream &out);
-
 };
 
 #endif

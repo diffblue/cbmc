@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_convert.h>
 
+#include <cbmc/cbmc_solvers.h>
 #include <cbmc/bmc.h>
 
 #include <cegis/options/literals.h>
@@ -65,7 +66,14 @@ bool symex_learnt::learn(const counterexamplet &counterexample)
   const symbol_tablet &new_st=program_adapter.get_adapted_symbol_table();
   optionst learn_options(options.get_options());
   learn_options.set_option("unwinding-assertions", false);
-  bmct bmc(learn_options, new_st, null_message_handler);
+
+  //get solver
+  cbmc_solverst cbmc_solvers(learn_options, symbol_table, null_message_handler);
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = 
+    cbmc_solvers.get_solver();
+  prop_convt& prop_conv = cbmc_solver->prop_conv();
+  bmct bmc(learn_options, new_st, null_message_handler, prop_conv);
+
   const safety_checkert::resultt bmc_result=bmc(new_gf);
   if (safety_checkert::UNSAFE != bmc_result) return false;
   const goto_tracet &trace=bmc.safety_checkert::error_trace;

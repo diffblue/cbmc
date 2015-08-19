@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_pso.h>
 
 #include "bmc.h"
+#include "cbmc_dimacs.h"
 #include "bv_cbmc.h"
 
 /*******************************************************************\
@@ -448,18 +449,8 @@ safety_checkert::resultt bmct::run(
     
     if(options.get_option("cover")!="")
     {
-      satcheckt satcheck;
-      satcheck.set_message_handler(get_message_handler());
-      bv_cbmct bv_cbmc(ns, satcheck);
-      bv_cbmc.set_message_handler(get_message_handler());
-
-      if(options.get_option("arrays-uf")=="never")
-        bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-      else if(options.get_option("arrays-uf")=="always")
-        bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-        
       std::string criterion=options.get_option("cover");
-      return cover(goto_functions, bv_cbmc, criterion)?
+      return cover(goto_functions, prop_conv, criterion)?
         safety_checkert::ERROR:safety_checkert::SAFE;
     }
 
@@ -471,26 +462,13 @@ safety_checkert::resultt bmct::run(
       return safety_checkert::SAFE;
     }
 
-    if(options.get_bool_option("smt1"))
-      return decide_smt1(goto_functions);
-    else if(options.get_bool_option("smt2"))
-      return decide_smt2(goto_functions);
-    else if(options.get_bool_option("dimacs"))
-      return write_dimacs()?ERROR:SAFE;
-    else if(options.get_bool_option("refine"))
-      return decide_bv_refinement(goto_functions);
-    else if(options.get_bool_option("aig"))
-      return decide_aig(goto_functions);
-    else
+    if(options.get_bool_option("program-only"))
     {
-      if(options.get_bool_option("program-only"))
-      {
-        show_program();
-        return safety_checkert::SAFE;
-      }
-
-      return decide_default(goto_functions);
+      show_program();
+      return safety_checkert::SAFE;
     }
+
+    return decide(goto_functions, prop_conv);
   }
 
   catch(std::string &error_str)
@@ -602,4 +580,23 @@ void bmct::setup_unwind()
 
   if(options.get_option("unwind")!="")
     symex.set_unwind_limit(options.get_unsigned_int_option("unwind"));
+}
+
+/*******************************************************************\
+
+Function: bmct::write_dimacs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+safety_checkert::resultt bmct::write_dimacs(prop_convt& prop_conv) 
+{
+  return dynamic_cast<cbmc_dimacst&>(prop_conv).write_dimacs(
+    options.get_option("outfile")) ? 
+    safety_checkert::ERROR : safety_checkert::SAFE;
 }

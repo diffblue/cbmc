@@ -33,12 +33,14 @@ public:
   bmct(
     const optionst &_options,
     const symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
+    message_handlert &_message_handler,
+    prop_convt& _prop_conv):
     safety_checkert(ns, _message_handler),
     options(_options),
     ns(_symbol_table, new_symbol_table),
     equation(ns),
     symex(ns, new_symbol_table, equation),
+    prop_conv(_prop_conv),
     ui(ui_message_handlert::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
@@ -69,7 +71,8 @@ protected:
   namespacet ns;
   symex_target_equationt equation;
   symex_bmct symex;
- 
+  prop_convt& prop_conv;
+
   // use gui format
   language_uit::uit ui;
   
@@ -81,17 +84,16 @@ protected:
     prop_convt &);
     
   // the solvers we have
-  virtual resultt decide_default(const goto_functionst &);
-  virtual resultt decide_bv_refinement(const goto_functionst &);
-  virtual resultt decide_aig(const goto_functionst &);
-  virtual resultt decide_smt1(const goto_functionst &);
-  virtual resultt decide_smt2(const goto_functionst &);
+  //virtual resultt decide_default(const goto_functionst &);
+  //virtual resultt decide_bv_refinement(const goto_functionst &);
+  //virtual resultt decide_aig(const goto_functionst &);
+  //virtual resultt decide_smt1(const goto_functionst &);
+  //virtual resultt decide_smt2(const goto_functionst &);
   smt1_dect::solvert get_smt1_solver_type() const;
   smt2_dect::solvert get_smt2_solver_type() const;
-  virtual void smt1_convert(smt1_dect::solvert solver, std::ostream &out);
-  virtual void smt2_convert(smt2_dect::solvert solver, std::ostream &out);
-  virtual bool write_dimacs();
-  virtual bool write_dimacs(std::ostream &out);
+  //virtual void smt1_convert(smt1_dect::solvert solver, std::ostream &out);
+  //virtual void smt2_convert(smt2_dect::solvert solver, std::ostream &out);
+  virtual safety_checkert::resultt write_dimacs(prop_convt& prop_conv);
   
   // unwinding
   virtual void setup_unwind();
@@ -100,8 +102,6 @@ protected:
     decision_proceduret &decision_procedure);
   void do_conversion(prop_convt &solver);
   
-  prop_convt *solver_factory();
-
   virtual void show_vcc();
   virtual resultt all_properties(
     const goto_functionst &goto_functions,
