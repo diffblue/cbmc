@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <solvers/sat/satcheck.h>
-#include <solvers/sat/satcheck_minisat2.h>
 
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
@@ -157,11 +156,11 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
   if(options.get_bool_option("beautify") || 
      options.get_bool_option("all-claims") ||
      options.get_bool_option("cover-assertions") ||
-     !options.get_bool_option("sat-preprocessor") //no Minisat simplifier
+     !options.get_bool_option("sat-preprocessor") //no simplifier
     )
   {
     // simplifier won't work with beautification
-    propt* prop = new satcheck_minisat_no_simplifiert();
+    propt* prop = new satcheck_no_simplifiert();
     prop->set_message_handler(get_message_handler());
     
     bv_cbmct* bv_cbmc = new bv_cbmct(ns, *prop);
@@ -239,7 +238,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
     prop=new satcheckt();
   }
   else
-    prop=new satcheck_minisat_no_simplifiert();
+    prop=new satcheck_no_simplifiert();
   
   prop->set_message_handler(get_message_handler());
 
@@ -250,10 +249,12 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
   if(options.get_option("max-node-refinement")!="")
     bv_refinement->max_node_refinement = 
       options.get_unsigned_int_option("max-node-refinement");
-  //bv_refinement->do_array_refinement = 
-  //  options.get_bool_option("refine-arrays");
-  //bv_refinement->do_arithmetic_refinement = 
-  //  options.get_bool_option("refine-arithmetic");
+#if 0 //TODO: enable this for array refinement
+  bv_refinement->do_array_refinement = 
+    options.get_bool_option("refine-arrays");
+  bv_refinement->do_arithmetic_refinement = 
+    options.get_bool_option("refine-arithmetic");
+#endif
   return new cbmc_solver_with_propt(bv_refinement,prop);
 }
 
