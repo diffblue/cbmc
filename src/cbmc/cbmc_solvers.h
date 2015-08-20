@@ -72,8 +72,7 @@ public:
   virtual std::unique_ptr<solvert> get_solver() {
     solvert* solver;
     if(options.get_bool_option("dimacs")) solver = get_dimacs();
-    else if(options.get_bool_option("refine-arrays") ||
-            options.get_bool_option("refine-arithmetic")) 
+    else if(options.get_bool_option("refine")) 
       solver = get_bv_refinement();
     else if(options.get_bool_option("smt1")) 
       solver = get_smt1(get_smt1_solver_type());
