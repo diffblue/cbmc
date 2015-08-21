@@ -86,7 +86,7 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
 
   {
     std::pair<elementst::iterator, bool> result=
-      elements.insert(std::pair<exprt, unsigned>(e2, elements.size()));
+      elements.insert(elementst::value_type(e2, elements.size()));
 
     u.second=result.first->second;
 
@@ -102,7 +102,8 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
     if(result==equalities.end())
     {
       l=prop.new_variable();
-      equalities.insert(std::pair<std::pair<unsigned, unsigned>, literalt>(u, l));
+      if(freeze_all && !l.is_constant()) prop.set_frozen(l);
+      equalities.insert(equalitiest::value_type(u, l));
     }
     else
       l=result->second;
@@ -185,3 +186,4 @@ void equalityt::add_equality_constraints(const typestructt &typestruct)
     prop.set_equal(bv_utils.equal(bv1, bv2), it->second);
   }
 }
+

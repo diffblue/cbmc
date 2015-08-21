@@ -249,12 +249,12 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
   if(options.get_option("max-node-refinement")!="")
     bv_refinement->max_node_refinement = 
       options.get_unsigned_int_option("max-node-refinement");
-#if 0 //TODO: enable this for array refinement
+
   bv_refinement->do_array_refinement = 
     options.get_bool_option("refine-arrays");
   bv_refinement->do_arithmetic_refinement = 
     options.get_bool_option("refine-arithmetic");
-#endif
+
   return new cbmc_solver_with_propt(bv_refinement,prop);
 }
 

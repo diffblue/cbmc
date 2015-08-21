@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cstdlib>
 #include <map>
+#include <iostream>
 
 #include <util/std_expr.h>
 #include <util/symbol.h>
@@ -258,9 +259,12 @@ literalt prop_conv_solvert::convert(const exprt &expr)
 {
   if(!use_cache || 
      expr.id()==ID_symbol ||
-     expr.id()==ID_constant)
-    return convert_bool(expr);
-
+     expr.id()==ID_constant) 
+  {
+    literalt literal=convert_bool(expr);
+    if(freeze_all && !literal.is_constant()) prop.set_frozen(literal);
+    return literal;
+  }
   // check cache first
 
   std::pair<cachet::iterator, bool> result=
@@ -274,6 +278,7 @@ literalt prop_conv_solvert::convert(const exprt &expr)
   // insert into cache
 
   result.first->second=literal;
+  if(freeze_all && !literal.is_constant()) prop.set_frozen(literal);
 
   #if 0
   std::cout << literal << "=" << expr << std::endl;
@@ -646,7 +651,7 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
   {
     print(8, "Post-processing");
     post_process();
-    post_processing_done=true;
+    post_processing_done=true; 
   }
 
   print(7, "Solving with "+prop.solver_text());
@@ -720,4 +725,3 @@ void prop_conv_solvert::print_assignment(std::ostream &out) const
       it++)
     out << it->first << " = " << prop.l_get(it->second) << "\n";
 }
-

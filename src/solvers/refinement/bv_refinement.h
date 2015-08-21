@@ -30,6 +30,9 @@ public:
 
   // maximal number of times we refine a formula node
   unsigned max_node_refinement;
+  // enable/disable refinements
+  bool do_array_refinement;
+  bool do_arithmetic_refinement;
   
   using bv_pointerst::is_in_conflict;
 
@@ -87,6 +90,7 @@ protected:
   // we refine the theory of arrays
   virtual void post_process_arrays();
   void arrays_overapproximated();
+  void freeze_lazy_constraints();
   
   // we refine expensive arithmetic
   virtual void convert_mult(const exprt &expr, bvt &bv);
