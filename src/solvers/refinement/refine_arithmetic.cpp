@@ -22,12 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define MAX_INTEGER_UNDERAPPROX 3
 #define MAX_FLOAT_UNDERAPPROX 10
 
-//#define DEBUG
-
-#ifdef DEBUG
-#include <iostream>
-#endif
-
 /*******************************************************************\
 
 Function: bv_refinementt::approximationt::add_over_assumption
@@ -80,6 +74,9 @@ Function: bv_refinementt::convert_floatbv_op
 
 void bv_refinementt::convert_floatbv_op(const exprt &expr, bvt &bv)
 {
+  if(!do_arithmetic_refinement)
+    return SUB::convert_floatbv_op(expr, bv);
+  
   if(ns.follow(expr.type()).id()!=ID_floatbv ||
      expr.operands().size()!=3)
     return SUB::convert_floatbv_op(expr, bv);
@@ -101,6 +98,9 @@ Function: bv_refinementt::convert_mult
 
 void bv_refinementt::convert_mult(const exprt &expr, bvt &bv)
 {
+  if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
+    return SUB::convert_mult(expr, bv);
+  
   // we catch any multiplication
   // unless it involves a constant
 
@@ -155,6 +155,9 @@ Function: bv_refinementt::convert_div
 
 void bv_refinementt::convert_div(const div_exprt &expr, bvt &bv)
 {
+  if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
+    return SUB::convert_div(expr, bv);
+
   // we catch any division
   // unless it's integer division by a constant
   
@@ -180,6 +183,9 @@ Function: bv_refinementt::convert_mod
 
 void bv_refinementt::convert_mod(const mod_exprt &expr, bvt &bv)
 {
+  if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
+    return SUB::convert_mod(expr, bv);
+
   // we catch any mod
   // unless it's integer + constant
 
@@ -254,7 +260,7 @@ void bv_refinementt::check_SAT(approximationt &a)
     assert(a.expr.operands().size()==3);
 
     if(a.over_state==MAX_STATE) return;
-  
+
     ieee_float_spect spec(to_floatbv_type(type));
     ieee_floatt o0(spec), o1(spec);
 
@@ -291,19 +297,19 @@ void bv_refinementt::check_SAT(approximationt &a)
     ieee_floatt rr(spec);
     rr.unpack(a.result_value);
     
-    std::cout << "S1: " << o0 << " " << a.expr.id() << " " << o1
-              << " != " << rr << std::endl;
-    std::cout << "S2: " << integer2binary(a.op0_value, spec.width())
+    debug() << "S1: " << o0 << " " << a.expr.id() << " " << o1
+              << " != " << rr << eom;
+    debug() << "S2: " << integer2binary(a.op0_value, spec.width())
                         << " " << a.expr.id() << " " <<
                            integer2binary(a.op1_value, spec.width())
-              << "!=" << integer2binary(a.result_value, spec.width()) << std::endl;
-    std::cout << "S3: " << integer2binary(a.op0_value, spec.width())
+              << "!=" << integer2binary(a.result_value, spec.width()) << eom;
+    debug() << "S3: " << integer2binary(a.op0_value, spec.width())
                         << " " << a.expr.id() << " " <<
                            integer2binary(a.op1_value, spec.width())
-              << "==" << integer2binary(result.pack(), spec.width()) << std::endl;
+              << "==" << integer2binary(result.pack(), spec.width()) << eom;
     #endif
   
-    //if(a.over_state==1) { std::cout << "DISAGREEMENT!\n"; exit(1); }
+    //if(a.over_state==1) { debug() << "DISAGREEMENT!\n"; exit(1); }
     
     if(a.over_state<max_node_refinement)
     {
@@ -418,8 +424,15 @@ void bv_refinementt::check_SAT(approximationt &a)
     else
       assert(0);
   }
-  else
+  else if(type.id()==ID_fixedbv)
+  {
+    //TODO: not implemented
     assert(0);
+  }
+  else
+  {
+    assert(0);
+  }
 
   status() << "Found spurious `" << a.as_string()
            << "' (state " << a.over_state << ")" << eom;

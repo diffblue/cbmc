@@ -6,9 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifdef DEBUG
+#include <iostream>
+#include <langapi/language_util.h>
+#endif
+
 #include <util/std_expr.h>
+#include <util/find_symbols.h>
 
 #include "bv_refinement.h"
+#include <solvers/sat/satcheck.h>
 
 /*******************************************************************\
 
@@ -18,16 +25,22 @@ Function: bv_refinementt::post_process_arrays
 
  Outputs:
 
- Purpose:
+ Purpose: generate array constraints
 
 \*******************************************************************/
 
 void bv_refinementt::post_process_arrays()
 {
+  collect_indices();
+  // at this point all indices should in the index set
+  
   // just build the data structure
-  build_index_map();
+  update_index_map();
 
   // we don't actually add any constraints
+  lazy_arrays = do_array_refinement;
+  add_array_constraints();
+  freeze_lazy_constraints();
 }
 
 /*******************************************************************\
@@ -38,44 +51,108 @@ Function: bv_refinementt::arrays_overapproximated
 
  Outputs:
 
- Purpose:
+ Purpose: check whether counterexample is spurious
 
 \*******************************************************************/
 
 void bv_refinementt::arrays_overapproximated()
 {
-  // build index_map with values
-  index_mapt value_index_map;
+  if(!do_array_refinement) return;
+  
+  unsigned nb_active = 0;
 
-  #if 0
-  // iterate over *roots*
-  for(unsigned i=0; i<arrays.size(); i++)
+  std::list<lazy_constraintt>::iterator it = lazy_array_constraints.begin();
+  while(it != lazy_array_constraints.end())
   {
-    if(!arrays.is_root_number(i)) continue;
+    satcheck_no_simplifiert sat_check;
+    bv_pointerst solver(ns,sat_check);
+    solver.unbounded_array=bv_pointerst::U_ALL;
 
-    unsigned root_number=arrays.find_number(i);
-    assert(root_number!=i);
+    exprt current = (*it).lazy;
 
-    index_sett &root_index_set=index_map[root_number];
-    index_sett &index_set=index_map[i];
+    // some minor simplifications
+    // check if they are worth having
+    if (current.id() == ID_implies)
+    {
+      implies_exprt imp = to_implies_expr(current);
+      assert (imp.operands().size() == 2);
+      exprt implies_simplified = get(imp.op0());
+      if (implies_simplified == false_exprt())
+      {
+	++it;
+	continue;
+      }
+    }
 
-    root_index_set.insert(index_set.begin(), index_set.end());
-  }  
+    if (current.id() == ID_or)
+    {
+      or_exprt orexp = to_or_expr(current);
+      assert (orexp.operands().size() == 2);
+      exprt o1 = get(orexp.op0());
+      exprt o2 = get(orexp.op1());
+      if (o1 == true_exprt() || o2 == true_exprt())
+      {
+	++it;
+	continue;
+      }
+    }
 
-  // check constraints for if, with, array_of
-  for(unsigned i=0; i<arrays.size(); i++)
-    add_array_constraints(
-      index_map[arrays.find_number(i)],
-      arrays[i]);
+    exprt simplified = get(current);
+    solver << simplified;
 
-  // check constraints for equalities
-  for(array_equalitiest::const_iterator it=
-      array_equalities.begin();
-      it!=array_equalities.end();
-      it++)
-    add_array_constraints(
-      index_map[arrays.find_number(it->f1)],
-      *it);
-  #endif
+    switch(sat_check.prop_solve())
+    {
+    case decision_proceduret::D_SATISFIABLE:
+      ++it;
+      break; 
+    case decision_proceduret::D_UNSATISFIABLE:
+      prop.l_set_to_true(convert(current));
+      nb_active++;
+      lazy_array_constraints.erase(it++);
+      break;
+    default:
+      assert(false);
+    }
+
+  }
+
+  debug() << "BV-Refinement: " << nb_active 
+	  << " array expressions become active" << eom;
+  debug() << "BV-Refinement: " << lazy_array_constraints.size() 
+	  << " inactive array expressions" << eom;
+  if (nb_active > 0)
+    progress = true;
 }
 
+
+/*******************************************************************\
+
+Function: bv_refinementt::freeze_lazy_constraints
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: freeze symbols for incremental solving
+
+\*******************************************************************/
+
+void bv_refinementt::freeze_lazy_constraints()
+{
+  if(!lazy_arrays) return;
+
+  for(std::list<lazy_constraintt>::iterator 
+	l_it = lazy_array_constraints.begin();
+      l_it != lazy_array_constraints.end(); ++l_it)
+  {
+    std::set<symbol_exprt> symbols;
+    find_symbols(l_it->lazy,symbols);
+    for(std::set<symbol_exprt>::const_iterator it = symbols.begin();
+	it != symbols.end(); ++it)
+    {
+      bvt bv = convert_bv(l_it->lazy);
+      forall_literals(b_it, bv) 
+	if(!b_it->is_constant()) prop.set_frozen(*b_it);
+    }
+  }
+}

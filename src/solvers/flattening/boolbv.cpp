@@ -153,14 +153,16 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
   // even though we are inserting more elements recursively.
 
   convert_bitvector(expr, cache_result.first->second);
-  
+
   // check
-  forall_literals(it, cache_result.first->second)
+  forall_literals(it, cache_result.first->second) {
+    if(freeze_all && !it->is_constant()) prop.set_frozen(*it);
     if(it->var_no()==literalt::unused_var_no())
     {
       std::cout << "unused_var_no: " << expr.pretty() << std::endl;
       assert(false);
     }
+  }
 
   return cache_result.first->second;
 }
@@ -715,6 +717,8 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
       to_symbol_expr(expr.lhs()).get_identifier();
 
     map.set_literals(identifier, type, bv1);
+
+    if(freeze_all) set_frozen(bv1);
 
     return false;
   }

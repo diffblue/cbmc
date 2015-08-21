@@ -28,7 +28,9 @@ Function: bv_refinementt::bv_refinementt
 bv_refinementt::bv_refinementt(
   const namespacet &_ns, propt &_prop):
   bv_pointerst(_ns, _prop),
-  max_node_refinement(5)
+  max_node_refinement(5),
+  do_array_refinement(true),
+  do_arithmetic_refinement(true)
 {
   // check features we need
   assert(prop.has_set_assumptions());
@@ -137,7 +139,7 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
 {
   // this puts the underapproximations into effect
   bvt assumptions = parent_assumptions;
-  
+
   for(approximationst::const_iterator
       a_it=approximations.begin();
       a_it!=approximations.end();

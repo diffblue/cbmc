@@ -280,8 +280,24 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("dimacs"))
     options.set_option("dimacs", true);
 
-  if(cmdline.isset("refine"))
+  if(cmdline.isset("refine-arrays"))
+  {
     options.set_option("refine", true);
+    options.set_option("refine-arrays", true);
+  }
+
+  if(cmdline.isset("refine-arithmetic"))
+  {
+    options.set_option("refine", true);
+    options.set_option("refine-arithmetic", true);
+  }
+
+  if(cmdline.isset("refine"))
+  {
+    options.set_option("refine", true);
+    options.set_option("refine-arrays", true);
+    options.set_option("refine-arithmetic", true);
+  }
 
   if(cmdline.isset("max-node-refinement"))
     options.set_option("max-node-refinement", cmdline.get_value("max-node-refinement"));
