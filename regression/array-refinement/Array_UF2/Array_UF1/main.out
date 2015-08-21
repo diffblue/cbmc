@@ -1,0 +1,34 @@
+CBMC version 5.1 64-bit x86_64 linux
+Parsing main.c
+Converting
+Type-checking main
+Generating GOTO Program
+Adding CPROVER library
+Function Pointer Removal
+Partial Inlining
+Generic Property Instrumentation
+Starting Bounded Model Checking
+Unwinding loop main.0 iteration 1 file main.c line 9 function main thread 0
+Unwinding loop main.0 iteration 2 file main.c line 9 function main thread 0
+Unwinding loop main.0 iteration 3 file main.c line 9 function main thread 0
+Unwinding loop main.0 iteration 4 file main.c line 9 function main thread 0
+Unwinding loop main.0 iteration 5 file main.c line 9 function main thread 0
+Unwinding loop main.0 iteration 6 file main.c line 9 function main thread 0
+Unwinding loop main.0 iteration 7 file main.c line 9 function main thread 0
+Unwinding loop main.0 iteration 8 file main.c line 9 function main thread 0
+Unwinding loop main.0 iteration 9 file main.c line 9 function main thread 0
+Unwinding loop main.0 iteration 10 file main.c line 9 function main thread 0
+size of program expression: 72 steps
+simple slicing removed 4 assignments
+Generated 1 VCC(s), 1 remaining after simplification
+Passing problem to propositional reduction
+converting SSA
+Running propositional reduction
+Post-processing
+Solving with MiniSAT 2.2.0 with simplifier
+2347 variables, 7195 clauses
+SAT checker: negated claim is UNSATISFIABLE, i.e., holds
+Runtime decision procedure: 0.016s
+VERIFICATION SUCCESSFUL
+EXIT=0
+SIGNAL=0
