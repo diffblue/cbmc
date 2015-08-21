@@ -32,8 +32,8 @@ Author: Daniel Kroening, kroening@kroening.com
 symex_learnt::symex_learnt(const cegis_optionst &options,
     const symbol_tablet &symbol_table, const goto_functionst &goto_functions,
     message_handlert &msg) :
-    options(options), symbol_table(symbol_table), goto_functions(
-        goto_functions), msg(msg)
+    messaget(msg), options(options), symbol_table(symbol_table),
+    goto_functions(goto_functions)
 {
 }
 

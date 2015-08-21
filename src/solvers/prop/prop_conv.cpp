@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cstdlib>
 #include <map>
-#include <iostream>
 
 #include <util/std_expr.h>
 #include <util/symbol.h>
@@ -262,7 +261,6 @@ literalt prop_conv_solvert::convert(const exprt &expr)
      expr.id()==ID_constant) 
   {
     literalt literal=convert_bool(expr);
-    if(freeze_all && !literal.is_constant()) prop.set_frozen(literal);
     return literal;
   }
   // check cache first
@@ -278,7 +276,6 @@ literalt prop_conv_solvert::convert(const exprt &expr)
   // insert into cache
 
   result.first->second=literal;
-  if(freeze_all && !literal.is_constant()) prop.set_frozen(literal);
 
   #if 0
   std::cout << literal << "=" << expr << std::endl;
