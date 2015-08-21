@@ -39,8 +39,8 @@ arrayst::arrayst(
   const namespacet &_ns,
   propt &_prop):equalityt(_ns, _prop)
 {
-  lazy_arrays = false; 		// will be set to true when --refine is used
-  incremental_cache = false;	// for incremental solving
+  lazy_arrays = false;        // will be set to true when --refine is used
+  incremental_cache = false;  // for incremental solving
 }
 
 /*******************************************************************\
@@ -141,11 +141,11 @@ void arrayst::collect_indices(const exprt &expr)
     if(array_op_type.id()==ID_array)
     {
       const array_typet &array_type=
-	to_array_type(array_op_type);
+        to_array_type(array_op_type);
 
       if(is_unbounded_array(array_type))
       {
-	record_array_index(e);
+        record_array_index(e);
       }
     }
   }
@@ -308,8 +308,8 @@ void arrayst::add_array_constraint(const lazy_constraintt &lazy, bool refine)
     {
       if (expr_map.find(lazy.lazy) == expr_map.end()) 
       {
-	lazy_array_constraints.push_back(lazy);
-	expr_map[lazy.lazy] = true;
+        lazy_array_constraints.push_back(lazy);
+        expr_map[lazy.lazy] = true;
       }
     }
     else
@@ -361,11 +361,10 @@ void arrayst::add_array_constraints()
           it!=array_equalities.end();
           it++)
       {
-
-    	add_array_constraints(
+        add_array_constraints(
           index_map[arrays.find_number(it->f1)],
           *it);
-	
+
         // update_index_map should not be necessary here
       }
     
@@ -429,7 +428,7 @@ void arrayst::add_array_Ackermann_constraints()
           equal_exprt values_equal(index_expr1, index_expr2);
 
           lazy_constraintt lazy(ARRAY_ACKERMANN, 
-				implies_exprt(indices_equal, values_equal));
+                                implies_exprt(indices_equal, values_equal));
           add_array_constraint(lazy, true); //added lazily
         }
   }
@@ -479,9 +478,9 @@ void arrayst::update_index_map()
         i2=i1->second.begin();
         i2!=i1->second.end();
         i2++)    std::cout << "Index set (" << i1->first << " = "
-		           << arrays.find_number(i1->first) << " = "
-			   << from_expr(ns,"",arrays[arrays.find_number(i1->first)]) << "): "
-			   << from_expr(ns,"",*i2) << std::endl;
+                           << arrays.find_number(i1->first) << " = "
+                           << from_expr(ns,"",arrays[arrays.find_number(i1->first)]) << "): "
+                           << from_expr(ns,"",*i2) << std::endl;
    std::cout << "-----" << std::endl;
 #endif
 
@@ -856,7 +855,7 @@ void arrayst::add_array_constraints_if(
 
     // add implication
     lazy_constraintt lazy(ARRAY_IF, implies_exprt(expr.cond(), 
-			      equal_exprt(index_expr1, index_expr2)));
+                              equal_exprt(index_expr1, index_expr2)));
     add_array_constraint(lazy, false); //added immediately
   }
 
@@ -881,7 +880,7 @@ void arrayst::add_array_constraints_if(
 
     // add implication
     lazy_constraintt lazy(ARRAY_IF, or_exprt(expr.cond(), 
-			      equal_exprt(index_expr1, index_expr2)));
+                              equal_exprt(index_expr1, index_expr2)));
     add_array_constraint(lazy, false); //added immediately
   }
 }

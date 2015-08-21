@@ -79,6 +79,7 @@ protected:
       lazy = _lazy;
     }
   };
+
   bool lazy_arrays;
   bool incremental_cache;
   std::list<lazy_constraintt> lazy_array_constraints;
@@ -100,7 +101,6 @@ protected:
   void collect_arrays(const exprt &a);
   void collect_indices();
   void collect_indices(const exprt &a);
-
   
   virtual bool is_unbounded_array(const typet &type) const { assert(false); }
     // (maybe this function should be partially moved here from boolbv)

@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
  *
  * @details Implements a CEGIS learning algorithm using CBMC symbolic exeuction.
  */
-class symex_learnt
+class symex_learnt:public messaget
 {
 public:
   /**
@@ -42,9 +42,9 @@ private:
   const class cegis_optionst &options;
   const symbol_tablet &symbol_table;
   const goto_functionst &goto_functions;
-  message_handlert &msg;
   std::deque<counterexamplet> counterexamples;
   candidatet candidate;
+
 public:
   /**
    * @brief Creates a symbolic execution CEGIS learner.

@@ -155,8 +155,8 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
   convert_bitvector(expr, cache_result.first->second);
 
   // check
-  forall_literals(it, cache_result.first->second) {
-    if(freeze_all && !it->is_constant()) prop.set_frozen(*it);
+  forall_literals(it, cache_result.first->second)
+  {
     if(it->var_no()==literalt::unused_var_no())
     {
       std::cout << "unused_var_no: " << expr.pretty() << std::endl;
@@ -494,7 +494,10 @@ void boolbvt::convert_symbol(const exprt &expr, bvt &bv)
 
     forall_literals(it, bv)
       if(it->var_no()>=prop.no_variables() &&
-        !it->is_constant()) { std::cout << identifier << std::endl; abort(); }
+        !it->is_constant())
+      {
+        std::cout << identifier << std::endl; abort();
+      }
   }
 }
    
@@ -717,8 +720,6 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
       to_symbol_expr(expr.lhs()).get_identifier();
 
     map.set_literals(identifier, type, bv1);
-
-    if(freeze_all) set_frozen(bv1);
 
     return false;
   }
