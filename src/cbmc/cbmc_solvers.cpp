@@ -213,7 +213,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_dimacs()
   dimacs_cnft* prop = new dimacs_cnft();
   prop->set_message_handler(get_message_handler());
 
-  return new cbmc_solver_with_propt(new cbmc_dimacst(ns, *prop),prop);
+  return new cbmc_solver_with_propt(new cbmc_dimacst(ns, *prop), prop);
 }
 
 /*******************************************************************\

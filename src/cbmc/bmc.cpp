@@ -594,7 +594,7 @@ Function: bmct::write_dimacs
 
 \*******************************************************************/
 
-safety_checkert::resultt bmct::write_dimacs(prop_convt& prop_conv) 
+safety_checkert::resultt bmct::write_dimacs(prop_convt &prop_conv) 
 {
   return dynamic_cast<cbmc_dimacst&>(prop_conv).write_dimacs(
     options.get_option("outfile")) ? 
