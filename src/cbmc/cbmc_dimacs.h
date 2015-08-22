@@ -16,11 +16,22 @@ class cbmc_dimacst:public bv_cbmct
 public:
   cbmc_dimacst(
     const namespacet &_ns,
-    propt &_prop):bv_cbmct(_ns, _prop) { }
-  virtual ~cbmc_dimacst() { }
+    propt &_prop,
+    const std::string &_filename):
+    bv_cbmct(_ns, _prop),
+    filename(_filename)
+  {
+  }
 
+  virtual ~cbmc_dimacst()
+  {
+    write_dimacs(filename);
+  }
+
+protected:
+  std::string filename;
   bool write_dimacs(const std::string &filename);
-  bool write_dimacs(std::ostream &out);
+  bool write_dimacs(std::ostream &);
 };
 
 #endif

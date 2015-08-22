@@ -508,12 +508,6 @@ safety_checkert::resultt bmct::decide(
 {
   prop_conv.set_message_handler(get_message_handler());
 
-  if(options.get_bool_option("dimacs"))
-  {
-    do_conversion(prop_conv);
-    return write_dimacs(prop_conv);
-  }
-            
   if(options.get_bool_option("all-properties"))
     return all_properties(goto_functions, prop_conv);
 
@@ -529,7 +523,12 @@ safety_checkert::resultt bmct::decide(
     return UNSAFE;
 
   default:
+    if(options.get_bool_option("dimacs") ||
+       options.get_option("outfile")!="")
+      return ERROR;
+      
     error() << "decision procedure failed" << eom;
+
     return ERROR;
   }
 }
@@ -586,23 +585,4 @@ void bmct::setup_unwind()
 
   if(options.get_option("unwind")!="")
     symex.set_unwind_limit(options.get_unsigned_int_option("unwind"));
-}
-
-/*******************************************************************\
-
-Function: bmct::write_dimacs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-safety_checkert::resultt bmct::write_dimacs(prop_convt &prop_conv) 
-{
-  return dynamic_cast<cbmc_dimacst&>(prop_conv).write_dimacs(
-    options.get_option("outfile")) ? 
-    safety_checkert::ERROR : safety_checkert::SAFE;
 }

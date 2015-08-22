@@ -156,6 +156,9 @@ public:
 
   ~cbmc_solver_with_aigpropt()
   {
+    // delete prop before the AIG
+    delete prop;
+    prop=NULL;
     delete aig;
   }
 
@@ -185,6 +188,9 @@ public:
 
   ~cbmc_solver_with_filet()
   {
+    // delete the prop before the file
+    delete prop_conv_ptr;
+    prop_conv_ptr=NULL;
     delete out;
   }
 
@@ -211,7 +217,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
   if(options.get_bool_option("beautify") || 
      options.get_bool_option("all-claims") ||
      options.get_bool_option("cover-assertions") ||
-     !options.get_bool_option("sat-preprocessor") //no simplifier
+     !options.get_bool_option("sat-preprocessor") // no simplifier
     )
   {
     // simplifier won't work with beautification
@@ -227,7 +233,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
    
     solver = new cbmc_solver_with_propt(bv_cbmc,prop);
   }
-  else //with simplifier
+  else // with simplifier
   {
   #if 1
     propt* prop = new satcheckt();
@@ -267,8 +273,10 @@ cbmc_solverst::solvert* cbmc_solverst::get_dimacs()
 {
   dimacs_cnft *prop=new dimacs_cnft();
   prop->set_message_handler(get_message_handler());
-
-  return new cbmc_solver_with_propt(new cbmc_dimacst(ns, *prop), prop);
+  
+  std::string filename=options.get_option("outfile");
+  
+  return new cbmc_solver_with_propt(new cbmc_dimacst(ns, *prop, filename), prop);
 }
 
 /*******************************************************************\
