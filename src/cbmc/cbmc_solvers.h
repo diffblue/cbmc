@@ -48,41 +48,53 @@ public:
   }
 
   //The solver class (that takes care of allocated objects)
-  class solvert {
-    public:
-      solvert(prop_convt* _prop_conv) {
-        assert(_prop_conv!=NULL);
-        prop_conv_ptr = _prop_conv;
-      }
-      ~solvert() {
-        assert(prop_conv_ptr!=NULL);
-        delete prop_conv_ptr;
-      }
+  class solvert
+  {
+  public:
+    solvert(prop_convt* _prop_conv)
+    {
+      assert(_prop_conv!=NULL);
+      prop_conv_ptr = _prop_conv;
+    }
 
-      //use this to get the prop_conv
-      prop_convt& prop_conv() const { 
-        assert(prop_conv_ptr!=NULL);
-        return *prop_conv_ptr;
-      }
-    protected:
-      prop_convt* prop_conv_ptr;
+    ~solvert()
+    {
+      assert(prop_conv_ptr!=NULL);
+      delete prop_conv_ptr;
+    }
+
+    //use this to get the prop_conv
+    prop_convt& prop_conv() const
+    { 
+      assert(prop_conv_ptr!=NULL);
+      return *prop_conv_ptr;
+    }
+
+  protected:
+    prop_convt* prop_conv_ptr;
   };
 
   //returns a solvert object
-  virtual std::unique_ptr<solvert> get_solver() {
-    solvert* solver;
-    if(options.get_bool_option("dimacs")) solver = get_dimacs();
+  virtual std::unique_ptr<solvert> get_solver()
+  {
+    solvert *solver;
+
+    if(options.get_bool_option("dimacs"))
+      solver = get_dimacs();
     else if(options.get_bool_option("refine")) 
       solver = get_bv_refinement();
     else if(options.get_bool_option("smt1")) 
       solver = get_smt1(get_smt1_solver_type());
     else if(options.get_bool_option("smt2"))
       solver = get_smt2(get_smt2_solver_type());
-    else solver = get_default();
+    else
+      solver = get_default();
+
     return std::unique_ptr<solvert>(solver); 
   }
 
-  virtual ~cbmc_solverst() { 
+  virtual ~cbmc_solverst()
+  { 
   }
 
   void set_ui(language_uit::uit _ui) { ui=_ui; }
