@@ -83,18 +83,6 @@ protected:
     const goto_functionst &,
     prop_convt &);
     
-  // the solvers we have
-  //virtual resultt decide_default(const goto_functionst &);
-  //virtual resultt decide_bv_refinement(const goto_functionst &);
-  //virtual resultt decide_aig(const goto_functionst &);
-  //virtual resultt decide_smt1(const goto_functionst &);
-  //virtual resultt decide_smt2(const goto_functionst &);
-  smt1_dect::solvert get_smt1_solver_type() const;
-  smt2_dect::solvert get_smt2_solver_type() const;
-  //virtual void smt1_convert(smt1_dect::solvert solver, std::ostream &out);
-  //virtual void smt2_convert(smt2_dect::solvert solver, std::ostream &out);
-  virtual safety_checkert::resultt write_dimacs(prop_convt& prop_conv);
-  
   // unwinding
   virtual void setup_unwind();
 

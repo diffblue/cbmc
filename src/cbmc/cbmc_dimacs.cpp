@@ -31,6 +31,7 @@ bool cbmc_dimacst::write_dimacs(const std::string &filename)
     return write_dimacs(std::cout);
 
   std::ofstream out(filename.c_str());
+
   if(!out)
   {
     error() << "failed to open " << filename << eom;
@@ -54,8 +55,6 @@ Function: cbmc_dimacst::write_dimacs
 
 bool cbmc_dimacst::write_dimacs(std::ostream &out)
 {
-  dec_solve();
-
   dynamic_cast<dimacs_cnft&>(prop).write_dimacs_cnf(out);
 
   // we dump the mapping variable<->literals

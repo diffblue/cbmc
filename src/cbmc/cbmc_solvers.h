@@ -28,9 +28,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_cbmc.h"
 
-
 /*******************************************************************\
+
 Solver factory
+
 \*******************************************************************/
  
 class cbmc_solverst:public messaget
