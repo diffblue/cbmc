@@ -8,20 +8,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <memory>
 #include <iostream>
+#include <fstream>
+
+#include <util/unicode.h>
 
 #include <solvers/sat/satcheck.h>
-
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
-
 #include <solvers/prop/aig_prop.h>
 #include <solvers/sat/dimacs_cnf.h>
 
-
 #include "cbmc_solvers.h"
-
 #include "bv_cbmc.h"
 #include "cbmc_dimacs.h"
 #include "counterexample_beautification.h"
@@ -307,6 +306,9 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
   
   if(filename=="")
   {
+    if(solver==smt1_dect::GENERIC)
+      throw "please use --outfile";
+
     smt1_dect* smt1_dec = new smt1_dect(
       ns,
       "cbmc",
@@ -332,7 +334,12 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
   }
   else
   {
+    #ifdef _WIN32
+    std::ofstream out(widen(filename).c_str());
+    #else
     std::ofstream out(filename.c_str());
+    #endif
+    
     if(!out)
       throw "failed to open "+filename;
 
@@ -371,6 +378,9 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
   
   if(filename=="")
   {
+    if(solver==smt2_dect::GENERIC)
+      throw "please use --outfile";
+  
     smt2_dect* smt2_dec = new smt2_dect(
       ns,
       "cbmc",
@@ -402,7 +412,11 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
   }
   else
   {
+    #ifdef _WIN32
+    std::ofstream out(widen(filename).c_str());
+    #else
     std::ofstream out(filename.c_str());
+    #endif
 
     if(!out)
       throw "failed to open "+filename;
