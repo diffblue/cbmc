@@ -507,7 +507,13 @@ safety_checkert::resultt bmct::decide(
   prop_convt &prop_conv)
 {
   prop_conv.set_message_handler(get_message_handler());
-  
+
+  if(options.get_bool_option("dimacs"))
+  {
+    do_conversion(prop_conv);
+    return write_dimacs(prop_conv);
+  }
+            
   if(options.get_bool_option("all-properties"))
     return all_properties(goto_functions, prop_conv);
 
