@@ -215,10 +215,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
   solvert *solver;
   
   if(options.get_bool_option("beautify") || 
-     options.get_bool_option("all-claims") ||
-     options.get_bool_option("cover-assertions") ||
-     !options.get_bool_option("sat-preprocessor") // no simplifier
-    )
+     !options.get_bool_option("sat-preprocessor")) // no simplifier
   {
     // simplifier won't work with beautification
     propt* prop = new satcheck_no_simplifiert();
@@ -412,7 +409,6 @@ Function: cbmc_solverst::get_smt2
 cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
 {
   no_beautification();
-  no_incremental_check();
 
   const std::string &filename=options.get_option("outfile");
   
@@ -492,8 +488,7 @@ Function: cbmc_solverst::no_beautification
 
 void cbmc_solverst::no_beautification()
 {
-  if(options.get_bool_option("beautify-pbs") ||
-     options.get_bool_option("beautify-greedy"))
+  if(options.get_bool_option("beautify"))
     throw "sorry, this solver does not support beautification";
 }
 
