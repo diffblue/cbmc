@@ -271,6 +271,9 @@ Function: cbmc_solverst::get_dimacs
  
 cbmc_solverst::solvert* cbmc_solverst::get_dimacs()
 {
+  no_beautification();
+  no_incremental_check();
+
   dimacs_cnft *prop=new dimacs_cnft();
   prop->set_message_handler(get_message_handler());
   
@@ -508,7 +511,7 @@ Function: cbmc_solverst::no_incremental_check
 
 void cbmc_solverst::no_incremental_check()
 {
-  if(options.get_bool_option("all-claims") ||
+  if(options.get_bool_option("all-properties") ||
      options.get_bool_option("cover-assertions") ||
      options.get_option("incremental-check")!="")
     throw "sorry, this solver does not support incremental solving";
