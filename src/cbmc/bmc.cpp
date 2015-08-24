@@ -33,8 +33,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_pso.h>
 
 #include "bmc.h"
-#include "cbmc_dimacs.h"
-#include "bv_cbmc.h"
 
 /*******************************************************************\
 
