@@ -71,7 +71,7 @@ protected:
   namespacet ns;
   symex_target_equationt equation;
   symex_bmct symex;
-  prop_convt& prop_conv;
+  prop_convt &prop_conv;
 
   // use gui format
   language_uit::uit ui;

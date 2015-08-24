@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_tso.h>
 #include <goto-symex/memory_model_pso.h>
 
+#include "counterexample_beautification.h"
 #include "bmc.h"
 
 /*******************************************************************\
@@ -516,6 +517,10 @@ safety_checkert::resultt bmct::decide(
     return SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
+    if(options.get_bool_option("beautify"))
+      counterexample_beautificationt()(
+        dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
+  
     error_trace(prop_conv);
     report_failure();
     return UNSAFE;
