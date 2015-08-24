@@ -480,12 +480,24 @@ int cbmc_parse_optionst::doit()
 
   goto_functionst goto_functions;
 
-  //get solver
+  // get solver
   cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
   cbmc_solvers.set_ui(get_ui());
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = 
-    cbmc_solvers.get_solver();
-  prop_convt& prop_conv = cbmc_solver->prop_conv();
+
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
+  
+  try
+  {
+    cbmc_solver=cbmc_solvers.get_solver();
+  }
+  
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
+    return 1;
+  }
+
+  prop_convt &prop_conv=cbmc_solver->prop_conv();
 
   bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
 
