@@ -102,7 +102,7 @@ protected:
   void collect_indices();
   void collect_indices(const exprt &a);
   
-  virtual bool is_unbounded_array(const typet &type) const { assert(false); }
+  virtual bool is_unbounded_array(const typet &type) const=0;
     // (maybe this function should be partially moved here from boolbv)
 };
 
