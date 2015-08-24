@@ -228,7 +228,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
     else if(options.get_option("arrays-uf")=="always")
       bv_cbmc->unbounded_array=bv_cbmct::U_ALL;
    
-    solver = new cbmc_solver_with_propt(bv_cbmc,prop);
+    solver = new cbmc_solver_with_propt(bv_cbmc, prop);
   }
   else // with simplifier
   {
@@ -236,13 +236,13 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
     propt* prop = new satcheckt();
     prop->set_message_handler(get_message_handler());
     bv_cbmct* bv_cbmc = new bv_cbmct(ns, *prop);
-    solver = new cbmc_solver_with_propt(bv_cbmc,prop);
+    solver = new cbmc_solver_with_propt(bv_cbmc, prop);
   #else
     aigt* aig = new aigt();
     propt* prop = new aig_propt(*aig);
     prop->set_message_handler(get_message_handler());
     bv_cbmct* bv_cbmc = new bv_cbmct(ns, *prop);
-    solver = new cbmc_solver_with_aigpropt(bv_cbmc,prop,aig);
+    solver = new cbmc_solver_with_aigpropt(bv_cbmc, prop, aig);
   #endif
 
     if(options.get_option("arrays-uf")=="never")
@@ -319,7 +319,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
   bv_refinement->do_arithmetic_refinement = 
     options.get_bool_option("refine-arithmetic");
 
-  return new cbmc_solver_with_propt(bv_refinement,prop);
+  return new cbmc_solver_with_propt(bv_refinement, prop);
 }
 
 /*******************************************************************\
