@@ -29,4 +29,9 @@ std::string from_type(
 
 std::string from_type(const typet &type);
 
+exprt to_expr(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const std::string &src);
+
 #endif
