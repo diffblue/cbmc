@@ -47,8 +47,7 @@ Function: bmct::do_unwind_module
 
 \*******************************************************************/
 
-void bmct::do_unwind_module(
-  decision_proceduret &decision_procedure)
+void bmct::do_unwind_module()
 {
   // this is a hook for hw-cbmc
 }
@@ -132,10 +131,10 @@ Function: bmct::do_conversion
 
 \*******************************************************************/
 
-void bmct::do_conversion(prop_convt &prop_conv)
+void bmct::do_conversion()
 {
   // convert HDL (hook for hw-cbmc)
-  do_unwind_module(prop_conv);
+  do_unwind_module();
   
   status() << "converting SSA" << eom;
 
@@ -175,7 +174,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   // stop the time
   absolute_timet sat_start=current_time();
   
-  do_conversion(prop_conv);  
+  do_conversion();
 
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
@@ -449,7 +448,7 @@ safety_checkert::resultt bmct::run(
     if(options.get_option("cover")!="")
     {
       std::string criterion=options.get_option("cover");
-      return cover(goto_functions, prop_conv, criterion)?
+      return cover(goto_functions, criterion)?
         safety_checkert::ERROR:safety_checkert::SAFE;
     }
 
