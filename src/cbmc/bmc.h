@@ -99,8 +99,7 @@ protected:
   virtual void report_success();
   virtual void report_failure();
 
-  virtual void error_trace(
-    const prop_convt &prop_conv);
+  virtual void error_trace();
   
   bool cover(
     const goto_functionst &goto_functions,

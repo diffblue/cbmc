@@ -65,7 +65,7 @@ Function: bmct::error_trace
 
 \*******************************************************************/
 
-void bmct::error_trace(const prop_convt &prop_conv)
+void bmct::error_trace()
 {
   status() << "Building error trace" << eom;
 
@@ -521,7 +521,7 @@ safety_checkert::resultt bmct::decide(
       counterexample_beautificationt()(
         dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
   
-    error_trace(prop_conv);
+    error_trace();
     report_failure();
     return UNSAFE;
 
