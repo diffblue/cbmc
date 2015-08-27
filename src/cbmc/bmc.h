@@ -85,10 +85,8 @@ protected:
     
   // unwinding
   virtual void setup_unwind();
-
-  virtual void do_unwind_module(
-    decision_proceduret &decision_procedure);
-  void do_conversion(prop_convt &solver);
+  virtual void do_unwind_module();
+  void do_conversion();
   
   virtual void show_vcc();
   virtual resultt all_properties(
@@ -103,7 +101,6 @@ protected:
   
   bool cover(
     const goto_functionst &goto_functions,
-    prop_convt &solver,
     const std::string &criterion);
 
   friend class bmc_all_propertiest;

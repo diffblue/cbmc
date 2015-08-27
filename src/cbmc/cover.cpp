@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/time_stopping.h>
 #include <util/xml.h>
 
-#include <solvers/sat/satcheck.h>
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
 
@@ -70,9 +69,8 @@ public:
 
   bmc_covert(
     const goto_functionst &_goto_functions,
-    prop_convt &_solver,
     bmct &_bmc):
-    goto_functions(_goto_functions), solver(_solver), bmc(_bmc)
+    goto_functions(_goto_functions), solver(_bmc.prop_conv), bmc(_bmc)
   {
   }
   
@@ -230,7 +228,7 @@ bool bmc_covert::operator()(const criteriont criterion)
   // stop the time
   absolute_timet sat_start=current_time();
   
-  bmc.do_conversion(solver);
+  bmc.do_conversion();
   
   std::map<goto_programt::const_targett, irep_idt> location_map;
   
@@ -406,7 +404,6 @@ Function: bmct::cover
 
 bool bmct::cover(
   const goto_functionst &goto_functions,
-  prop_convt &solver,
   const std::string &criterion)
 {
   bmc_covert::criteriont c;
@@ -432,7 +429,7 @@ bool bmct::cover(
     return true;
   }
 
-  bmc_covert bmc_cover(goto_functions, solver, *this);
+  bmc_covert bmc_cover(goto_functions, *this);
   bmc_cover.set_message_handler(get_message_handler());
   return bmc_cover(c);
 }
