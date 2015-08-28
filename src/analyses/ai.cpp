@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/expr_util.h>
 
+#include "is_threaded.h"
+
 #include "ai.h"
 
 /*******************************************************************\
@@ -460,7 +462,7 @@ bool ai_baset::do_function_call_rec(
 
 /*******************************************************************\
 
-Function: ai_baset::fixedpoint
+Function: ai_baset::sequential_fixedpoint
 
   Inputs:
 
@@ -470,7 +472,7 @@ Function: ai_baset::fixedpoint
 
 \*******************************************************************/
 
-void ai_baset::fixedpoint(
+void ai_baset::sequential_fixedpoint(
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
@@ -482,3 +484,83 @@ void ai_baset::fixedpoint(
       it++)
     fixedpoint(it->second.body, goto_functions, ns);
 }
+
+/*******************************************************************\
+
+Function: ai_baset::concurrent_fixedpoint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ai_baset::concurrent_fixedpoint(
+  const goto_functionst &goto_functions,
+  const namespacet &ns)
+{
+  sequential_fixedpoint(goto_functions, ns);
+
+  is_threadedt is_threaded(goto_functions);
+
+  // construct an initial shared state collecting the results of all
+  // functions
+  goto_programt tmp;
+  tmp.add_instruction();
+  goto_programt::const_targett sh_target=tmp.instructions.begin();
+  statet &shared_state=get_state(sh_target);
+
+  typedef std::list<std::pair<goto_programt const*,
+                              goto_programt::const_targett> > thread_wlt;
+  thread_wlt thread_wl;
+
+  forall_goto_functions(it, goto_functions)
+    forall_goto_program_instructions(t_it, it->second.body)
+    {
+      if(is_threaded(t_it))
+      {
+        thread_wl.push_back(std::make_pair(&(it->second.body), t_it));
+
+        goto_programt::const_targett l_end=
+          it->second.body.instructions.end();
+        --l_end;
+
+        merge_shared(shared_state, l_end, sh_target, ns);
+      }
+    }
+
+  // now feed in the shared state into all concurrently executing
+  // functions, and iterate until the shared state stabilizes
+  bool new_shared=true;
+  while(new_shared)
+  {
+    new_shared=false;
+
+    for(thread_wlt::const_iterator it=thread_wl.begin();
+        it!=thread_wl.end();
+        ++it)
+    {
+      working_sett working_set;
+      put_in_working_set(working_set, it->second);
+
+      statet &begin_state=get_state(it->second);
+      merge(begin_state, sh_target, it->second);
+
+      while(!working_set.empty())
+      {
+        goto_programt::const_targett l=get_next(working_set);
+
+        visit(l, working_set, *(it->first), goto_functions, ns);
+
+        // the underlying domain must make sure that the final state
+        // carries all possible values; otherwise we would need to
+        // merge over each and every state
+        if(l->is_end_function())
+          new_shared|=merge_shared(shared_state, l, sh_target, ns);
+      }
+    }
+  }
+}
+

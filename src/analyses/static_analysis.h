@@ -185,11 +185,12 @@ protected:
     const goto_programt &goto_program,
     const goto_functionst &goto_functions);
     
-  bool fixedpoint(
-    goto_functionst::function_mapt::const_iterator it,
+  virtual void fixedpoint(
+    const goto_functionst &goto_functions)=0;
+
+  void sequential_fixedpoint(
     const goto_functionst &goto_functions);
-    
-  void fixedpoint(
+  void concurrent_fixedpoint(
     const goto_functionst &goto_functions);
 
   // true = found s.th. new
@@ -206,6 +207,8 @@ protected:
   }
   
   virtual bool merge(statet &a, const statet &b, locationt to)=0;
+  // for concurrent fixedpoint
+  virtual bool merge_shared(statet &a, const statet &b, locationt to)=0;
   
   typedef std::set<irep_idt> functions_donet;
   functions_donet functions_done;
@@ -330,9 +333,51 @@ protected:
     state_map[l].get_reference_set(ns, expr, dest);
   }
 
+  virtual void fixedpoint(const goto_functionst &goto_functions)
+  {
+    sequential_fixedpoint(goto_functions);
+  }
+
 private:  
   // to enforce that T is derived from domain_baset
   void dummy(const T &s) { const statet &x=dummy1(s); (void)x; }
+
+  // not implemented in sequential analyses
+  virtual bool merge_shared(
+    statet &a,
+    const statet &b,
+    goto_programt::const_targett to)
+  {
+    throw "not implemented";
+  }
+};
+
+template<typename T>
+class concurrency_aware_static_analysist:public static_analysist<T>
+{
+public:
+  // constructor
+  explicit concurrency_aware_static_analysist(const namespacet &_ns):
+    static_analysist<T>(_ns)
+  {
+  }
+
+  virtual bool merge_shared(
+    static_analysis_baset::statet &a,
+    const static_analysis_baset::statet &b,
+    goto_programt::const_targett to)
+  {
+    return static_cast<T &>(a).merge_shared(
+      this->ns,
+      static_cast<const T &>(b),
+      to);
+  }
+
+protected:
+  virtual void fixedpoint(const goto_functionst &goto_functions)
+  {
+    this->concurrent_fixedpoint(goto_functions);
+  }
 };
 
 #endif

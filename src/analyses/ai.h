@@ -161,7 +161,14 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
     
-  void fixedpoint(
+  virtual void fixedpoint(
+    const goto_functionst &goto_functions,
+    const namespacet &ns)=0;
+
+  void sequential_fixedpoint(
+    const goto_functionst &goto_functions,
+    const namespacet &ns);
+  void concurrent_fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
@@ -197,6 +204,12 @@ protected:
   // abstract methods
     
   virtual bool merge(const statet &src, locationt from, locationt to)=0;
+  // for concurrent fixedpoint
+  virtual bool merge_shared(
+    const statet &src,
+    locationt from,
+    locationt to,
+    const namespacet &ns)=0;
   virtual statet &get_state(locationt l)=0;
   virtual const statet &find_state(locationt l) const=0;
   virtual statet* make_temporary_state(const statet &s)=0;
@@ -263,9 +276,56 @@ protected:
     return new domainT(static_cast<const domainT &>(s));
   }
 
+  virtual void fixedpoint(
+    const goto_functionst &goto_functions,
+    const namespacet &ns)
+  {
+    sequential_fixedpoint(goto_functions, ns);
+  }
+
 private:  
   // to enforce that domainT is derived from ai_domain_baset
   void dummy(const domainT &s) { const statet &x=s; (void)x; }
+
+  // not implemented in sequential analyses
+  virtual bool merge_shared(
+    const statet &src,
+    goto_programt::const_targett from,
+    goto_programt::const_targett to,
+    const namespacet &ns)
+  {
+    throw "not implemented";
+  }
+};
+
+template<typename domainT>
+class concurrency_aware_ait:public ait<domainT>
+{
+public:
+  typedef typename ait<domainT>::statet statet;
+
+  // constructor
+  concurrency_aware_ait():ait<domainT>()
+  {
+  }
+
+  virtual bool merge_shared(
+    const statet &src,
+    goto_programt::const_targett from,
+    goto_programt::const_targett to,
+    const namespacet &ns)
+  {
+    statet &dest=this->get_state(to);
+    return static_cast<domainT &>(dest).merge_shared(static_cast<const domainT &>(src), from, to, ns);
+  }
+
+protected:
+  virtual void fixedpoint(
+    const goto_functionst &goto_functions,
+    const namespacet &ns)
+  {
+    this->concurrent_fixedpoint(goto_functions, ns);
+  }
 };
 
 #endif

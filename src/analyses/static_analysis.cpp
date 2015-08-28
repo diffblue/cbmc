@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/expr_util.h>
 
+#include "is_threaded.h"
+
 #include "static_analysis.h"
 
 /*******************************************************************\
@@ -613,7 +615,7 @@ void static_analysis_baset::do_function_call_rec(
 
 /*******************************************************************\
 
-Function: static_analysis_baset::fixedpoint
+Function: static_analysis_baset::sequential_fixedpoint
 
   Inputs:
 
@@ -623,25 +625,19 @@ Function: static_analysis_baset::fixedpoint
 
 \*******************************************************************/
 
-void static_analysis_baset::fixedpoint(
+void static_analysis_baset::sequential_fixedpoint(
   const goto_functionst &goto_functions)
 {
   // do each function at least once
 
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
-    if(functions_done.find(it->first)==
-       functions_done.end())
-    {
-      fixedpoint(it, goto_functions);
-    }
+  forall_goto_functions(it, goto_functions)
+    if(functions_done.insert(it->first).second)
+      fixedpoint(it->second.body, goto_functions);
 }
 
 /*******************************************************************\
 
-Function: static_analysis_baset::fixedpoint
+Function: static_analysis_baset::concurrent_fixedpoint
 
   Inputs:
 
@@ -651,10 +647,74 @@ Function: static_analysis_baset::fixedpoint
 
 \*******************************************************************/
 
-bool static_analysis_baset::fixedpoint(
-  const goto_functionst::function_mapt::const_iterator it,
+void static_analysis_baset::concurrent_fixedpoint(
   const goto_functionst &goto_functions)
 {
-  functions_done.insert(it->first);
-  return fixedpoint(it->second.body, goto_functions);
+  sequential_fixedpoint(goto_functions);
+
+  is_threadedt is_threaded(goto_functions);
+
+  // construct an initial shared state collecting the results of all
+  // functions
+  goto_programt tmp;
+  tmp.add_instruction();
+  goto_programt::const_targett sh_target=tmp.instructions.begin();
+  generate_state(sh_target);
+  statet &shared_state=get_state(sh_target);
+
+  typedef std::list<std::pair<goto_programt const*,
+                              goto_programt::const_targett> > thread_wlt;
+  thread_wlt thread_wl;
+
+  forall_goto_functions(it, goto_functions)
+    forall_goto_program_instructions(t_it, it->second.body)
+    {
+      if(is_threaded(t_it))
+      {
+        thread_wl.push_back(std::make_pair(&(it->second.body), t_it));
+
+        goto_programt::const_targett l_end=
+          it->second.body.instructions.end();
+        --l_end;
+
+        const statet &end_state=get_state(l_end);
+        merge_shared(shared_state, end_state, sh_target);
+      }
+    }
+
+  // new feed in the shared state into all concurrently executing
+  // functions, and iterate until the shared state stabilizes
+  bool new_shared=true;
+  while(new_shared)
+  {
+    new_shared=false;
+
+    for(thread_wlt::const_iterator it=thread_wl.begin();
+        it!=thread_wl.end();
+        ++it)
+    {
+      working_sett working_set;
+      put_in_working_set(working_set, it->second);
+
+      statet &begin_state=get_state(it->second);
+      merge(begin_state, shared_state, it->second);
+
+      while(!working_set.empty())
+      {
+        goto_programt::const_targett l=get_next(working_set);
+
+        visit(l, working_set, *(it->first), goto_functions);
+
+        // the underlying domain must make sure that the final state
+        // carries all possible values; otherwise we would need to
+        // merge over each and every state
+        if(l->is_end_function())
+        {
+          statet &end_state=get_state(l);
+          new_shared|=merge_shared(shared_state, end_state, sh_target);
+        }
+      }
+    }
+  }
 }
+
