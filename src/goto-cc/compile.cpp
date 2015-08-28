@@ -21,6 +21,7 @@ Date: June 2006
 #include <util/file_util.h>
 #include <util/unicode.h>
 #include <util/irep_serialization.h>
+#include <util/suffix.h>
 
 #include <ansi-c/ansi_c_language.h>
 
@@ -177,7 +178,9 @@ bool compilet::add_input_file(const std::string &file_name)
      ext=="c++" ||
      ext=="C" ||
      ext=="i" ||
-     ext=="ii")
+     ext=="ii" ||
+     ext=="class" ||
+     ext=="jar")
   {
     source_files.push_back(file_name);
   }
@@ -715,6 +718,11 @@ bool compilet::parse_source(const std::string &file_name)
   if(typecheck()) // we just want to typecheck this one file here
     return true;
     
+  if((has_suffix(file_name, ".class") ||
+      has_suffix(file_name, ".jar")) &&
+     final())
+    return true;
+
   // so we remove it from the list afterwards
   language_files.filemap.erase(file_name);
   return false;
