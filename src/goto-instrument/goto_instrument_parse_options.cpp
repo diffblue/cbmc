@@ -44,7 +44,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/interval_analysis.h>
 #include <analyses/interval_domain.h>
 #include <analyses/reaching_definitions.h>
-//#include <analyses/dependence_graph.h>
+#include <analyses/dependence_graph.h>
 
 #include <cbmc/version.h>
 
@@ -330,6 +330,32 @@ int goto_instrument_parse_optionst::doit()
 
       dependence_graph.output_dot(std::cout);
       #endif
+
+      return 0;
+    }
+
+    if(cmdline.isset("show-dependence-graph"))
+    {
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      const namespacet ns(symbol_table);
+      dependence_grapht dependence_graph(ns);
+      dependence_graph(goto_functions, ns);
+
+      forall_goto_functions(f_it, goto_functions)
+      {
+        if(f_it->second.body_available)
+        {
+          std::cout << "////" << std::endl;
+          std::cout << "//// Function: " << f_it->first << std::endl;
+          std::cout << "////" << std::endl;
+          std::cout << std::endl;
+          dependence_graph.output(ns, f_it->second.body, std::cout);
+        }
+      }
+
+      dependence_graph.output_dot(std::cout);
 
       return 0;
     }
