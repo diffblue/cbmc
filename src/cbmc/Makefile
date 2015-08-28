@@ -9,6 +9,9 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
       ../pointer-analysis/value_set$(OBJEXT) \
+      ../pointer-analysis/value_set_analysis_fi$(OBJEXT) \
+      ../pointer-analysis/value_set_domain_fi$(OBJEXT) \
+      ../pointer-analysis/value_set_fi$(OBJEXT) \
       ../pointer-analysis/value_set_dereference$(OBJEXT) \
       ../pointer-analysis/dereference_callback$(OBJEXT) \
       ../pointer-analysis/add_failed_symbols$(OBJEXT) \
