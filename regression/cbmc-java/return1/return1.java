@@ -12,12 +12,19 @@ class return1
     return b;
   }
 
+  public static long long_value()
+  {
+    long l = 0x10000ffffl;
+    return l;
+  }
+
   public static void main(String[] args)
   {
     short s = short_value();
     if(s == 1)
       if(bool_value())
-        assert false;
+        if(long_value()==0x10000ffffl)
+          assert false;
   }
 }
 
