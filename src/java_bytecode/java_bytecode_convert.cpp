@@ -1137,13 +1137,13 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="tableswitch")
     {
-      assert(op.size()==1 && results.size()==1);
+      assert(op.size()==1 && results.size()==0);
       c=codet(statement);
       c.copy_to_operands(op[0]);
     }
     else if(statement=="lookupswitch")
     {
-      assert(op.size()==1 && results.size()==1);
+      assert(op.size()==1 && results.size()==0);
       c=codet(statement);
       c.copy_to_operands(op[0]);
     }
