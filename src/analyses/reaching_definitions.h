@@ -9,114 +9,244 @@ Date: February 2013
 
 \*******************************************************************/
 
-#include "static_analysis.h"
-#include "local_may_alias.h"
+#ifndef CPROVER_REACHING_DEFINITIONS_H
+#define CPROVER_REACHING_DEFINITIONS_H
 
-class if_exprt;
-class byte_extract_exprt;
-class dereference_exprt;
+#include "ai.h"
+#include "goto_rw.h"
 
-class rd_range_domaint:public domain_baset
+class value_setst;
+class is_threadedt;
+class dirtyt;
+class reaching_definitions_analysist;
+
+// requirement: V has a member "identifier" of type irep_idt
+template<typename V>
+class sparse_bitvector_analysist
 {
 public:
-  rd_range_domaint():
-    local_may_alias(0)
+  inline const V& get(const std::size_t value_index) const
   {
+    assert(value_index<values.size());
+    return values[value_index]->first;
   }
 
-  virtual void transform(
-      const namespacet &ns,
-      locationt from,
-      locationt to);
-
-  virtual void output(
-      const namespacet &ns,
-      std::ostream &out) const;
-
-  // returns true iff there is s.th. new
-  bool merge(const rd_range_domaint &other, locationt to);
-
-  void set_may_alias(local_may_aliast *a)
+  inline std::size_t add(const V& value)
   {
-    local_may_alias=a;
+    inner_mapt &m=value_map[value.identifier];
+
+    std::pair<typename inner_mapt::iterator, bool> entry=
+      m.insert(std::make_pair(value, values.size()));
+
+    if(entry.second)
+      values.push_back(entry.first);
+
+    return entry.first->second;
   }
 
 protected:
-  // each element x represents a range [x.first, x.second.first)
-  typedef std::multimap<mp_integer, std::pair<mp_integer, locationt> >
-    rangest;
-  typedef hash_map_cont<irep_idt, rangest, irep_id_hash> valuest;
+  typedef typename std::map<V, std::size_t> inner_mapt;
+  std::vector<typename inner_mapt::const_iterator> values;
+  hash_map_cont<irep_idt, inner_mapt, irep_id_hash> value_map;
+};
+
+struct reaching_definitiont
+{
+  irep_idt identifier;
+  ai_domain_baset::locationt definition_at;
+  range_spect bit_begin;
+  range_spect bit_end;
+};
+
+inline bool operator<(
+  const reaching_definitiont &a,
+  const reaching_definitiont &b)
+{
+  if(a.definition_at<b.definition_at) return true;
+  if(b.definition_at<a.definition_at) return false;
+
+  if(a.bit_begin<b.bit_begin) return true;
+  if(b.bit_begin<a.bit_begin) return false;
+
+  if(a.bit_end<b.bit_end) return true;
+  if(b.bit_end<a.bit_end) return false;
+
+  // we do not expect comparison of unrelated definitions
+  // as this operator< is only used in sparse_bitvector_analysist
+  assert(a.identifier==b.identifier);
+
+  return false;
+}
+
+class rd_range_domaint:public ai_domain_baset
+{
+public:
+  rd_range_domaint():
+    ai_domain_baset(),
+    bv_container(0)
+  {
+  }
+
+  inline void set_bitvector_container(
+    sparse_bitvector_analysist<reaching_definitiont> &_bv_container)
+  {
+    bv_container=&_bv_container;
+  }
+
+  virtual void transform(
+      locationt from,
+      locationt to,
+      ai_baset &ai,
+      const namespacet &ns);
+
+  virtual void output(
+      std::ostream &out,
+      const ai_baset &ai,
+      const namespacet &ns) const
+  {
+    output(out);
+  }
+
+  // returns true iff there is s.th. new
+  bool merge(
+    const rd_range_domaint &other,
+    locationt from,
+    locationt to);
+  bool merge_shared(
+    const rd_range_domaint &other,
+    locationt from,
+    locationt to,
+    const namespacet &ns);
+
+  // each element x represents a range of bits [x.first, x.second)
+  typedef std::multimap<range_spect, range_spect> rangest;
+  typedef std::map<locationt, rangest> ranges_at_loct;
+
+  const ranges_at_loct& get(const irep_idt &identifier) const;
+  inline const void clear_cache(const irep_idt &identifier) const
+  {
+    export_cache[identifier].clear();
+  }
+
+protected:
+  sparse_bitvector_analysist<reaching_definitiont> *bv_container;
+
+  typedef std::set<std::size_t> values_innert;
+  #ifdef USE_DSTRING
+  typedef std::map<irep_idt, values_innert> valuest;
+  #else
+  typedef hash_map_cont<irep_idt, values_innert, irep_id_hash> valuest;
+  #endif
   valuest values;
 
-  local_may_aliast * local_may_alias;
+  #ifdef USE_DSTRING
+  typedef std::map<irep_idt, ranges_at_loct> export_cachet;
+  #else
+  typedef hash_map_cont<irep_idt, ranges_at_loct, irep_id_hash>
+    export_cachet;
+  #endif
+  mutable export_cachet export_cache;
 
-  void assign(
-    const namespacet &ns,
-    locationt from,
-    const exprt &lhs,
-    const mp_integer &size);
-  void assign_if(
-    const namespacet &ns,
-    locationt from,
-    const if_exprt &if_expr,
-    const mp_integer &size);
-  void assign_dereference(
-    const namespacet &ns,
-    locationt from,
-    const dereference_exprt &deref,
-    const mp_integer &size);
-  void assign_byte_extract(
-    const namespacet &ns,
-    locationt from,
-    const byte_extract_exprt &be,
-    const mp_integer &size);
+  void populate_cache(const irep_idt &identifier) const;
 
-  void assign(
+  void transform_dead(
+    const namespacet &ns,
+    locationt from);
+  void transform_start_thread(
+    const namespacet &ns,
+    reaching_definitions_analysist &rd);
+  void transform_function_call(
     const namespacet &ns,
     locationt from,
-    const exprt &lhs,
-    const mp_integer &range_start,
-    const mp_integer &size);
+    locationt to,
+    reaching_definitions_analysist &rd);
+  void transform_end_function(
+    const namespacet &ns,
+    locationt from,
+    locationt to,
+    reaching_definitions_analysist &rd);
+  void transform_assign(
+    const namespacet &ns,
+    locationt from,
+    locationt to,
+    reaching_definitions_analysist &rd);
 
   void kill(
-    locationt from,
     const irep_idt &identifier,
-    const mp_integer &range_start,
-    const mp_integer &size);
+    const range_spect &range_start,
+    const range_spect &range_end);
   void kill_inf(
-    locationt from,
     const irep_idt &identifier,
-    const mp_integer &range_start);
+    const range_spect &range_start);
   bool gen(
     locationt from,
     const irep_idt &identifier,
-    const mp_integer &range_start,
-    const mp_integer &size);
+    const range_spect &range_start,
+    const range_spect &range_end);
+
+  void output(std::ostream &out) const;
+
+  bool merge_inner(
+    values_innert &dest,
+    const values_innert &other);
 };
 
 class reaching_definitions_analysist :
-  public static_analysist<rd_range_domaint>
+  public concurrency_aware_ait<rd_range_domaint>,
+  public sparse_bitvector_analysist<reaching_definitiont>
 {
 public:
   // constructor
   explicit reaching_definitions_analysist(const namespacet &_ns):
-    static_analysist<rd_range_domaint>(_ns)
+    concurrency_aware_ait<rd_range_domaint>(),
+    ns(_ns),
+    value_sets(0),
+    is_threaded(0),
+    is_dirty(0)
   {
   }
 
-  virtual void initialize(
-    const goto_programt &goto_program)
-  {
-    throw "reaching definitions uses local_may_aliast, cannot be used on goto_programt";
-  }
+  virtual ~reaching_definitions_analysist();
 
   virtual void initialize(
     const goto_functionst &goto_functions);
 
-protected:
-  typedef hash_map_cont<irep_idt, local_may_aliast, irep_id_hash> may_aliasest;
-  may_aliasest local_may_aliases;
+  virtual statet &get_state(goto_programt::const_targett l)
+  {
+    statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
 
-  virtual void generate_state(locationt l);
+    rd_range_domaint *rd_state=dynamic_cast<rd_range_domaint*>(&s);
+    assert(rd_state!=0);
+
+    rd_state->set_bitvector_container(*this);
+
+    return s;
+  }
+
+  value_setst &get_value_sets() const
+  {
+    assert(value_sets);
+    return *value_sets;
+  }
+
+  const is_threadedt &get_is_threaded() const
+  {
+    assert(is_threaded);
+    return *is_threaded;
+  }
+
+  const dirtyt &get_is_dirty() const
+  {
+    assert(is_dirty);
+    return *is_dirty;
+  }
+
+protected:
+  const namespacet &ns;
+  value_setst * value_sets;
+  is_threadedt * is_threaded;
+  dirtyt * is_dirty;
 };
+
+#endif
 
