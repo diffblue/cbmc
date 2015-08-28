@@ -23,7 +23,8 @@ public:
     source_locationt source_location;
     unsigned address;
     irep_idt statement;
-    std::vector<exprt> args;
+    typedef std::vector<exprt> argst;
+    argst args;
   };
   
   class membert
