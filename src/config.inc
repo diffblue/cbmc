@@ -18,7 +18,8 @@ BUILD_ENV = AUTO
 MINISAT2 = ../../minisat-2.2.0
 #GLUCOSE = ../../glucose-syrup
 #SMVSAT =
-#LIBZIP = /opt/local/lib/libzip
+#LIBZIPLIB = /opt/local/lib/libzip
+#LIBZIPINC = /opt/local/lib/libzip
 
 # Signing identity for MacOS Gatekeeper
 
