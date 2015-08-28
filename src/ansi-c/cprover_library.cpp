@@ -76,10 +76,11 @@ void add_cprover_library(
   {
     std::istringstream in(library_text.str());
     
-    // switch mode temporarily to GCC flavour
-    
+    // switch mode temporarily from gcc C++ to gcc C flavour
     configt::ansi_ct::flavourt old_mode=config.ansi_c.mode;
-    config.ansi_c.mode=configt::ansi_ct::MODE_GCC_C;
+    
+    if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC_CPP)
+      config.ansi_c.mode=configt::ansi_ct::MODE_GCC_C;
     
     ansi_c_languaget ansi_c_language;
     ansi_c_language.set_message_handler(message_handler);
