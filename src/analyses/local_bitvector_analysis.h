@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-   Class: local_may_aliast
+   Class: local_bitvector_analysist
    
  Purpose:
 
