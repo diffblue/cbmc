@@ -172,13 +172,10 @@ protected:
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
     const namespacet &ns);
-    
-  static locationt successor(locationt l)
-  {
-    l++;
-    return l;
-  }
   
+  typedef std::set<irep_idt> functions_donet;
+  functions_donet functions_done;
+
   typedef std::set<irep_idt> recursion_sett;
   recursion_sett recursion_set;
     
