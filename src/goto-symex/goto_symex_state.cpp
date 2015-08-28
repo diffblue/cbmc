@@ -581,7 +581,11 @@ bool goto_symex_statet::l2_thread_read_encoding(
       read_guard|=*it;
     }
 
-    if_exprt tmp(or_exprt(no_write.op(), read_guard.as_expr()), ssa_l1, ssa_l1);
+    exprt cond=read_guard.as_expr();
+    if(!no_write.op().is_false())
+      cond=or_exprt(no_write.op(), cond);
+
+    if_exprt tmp(cond, ssa_l1, ssa_l1);
     level2(to_symbol_expr(tmp.true_case()));
 
     if(a_s_read.second.empty())
@@ -592,6 +596,12 @@ bool goto_symex_statet::l2_thread_read_encoding(
 
     to_symbol_expr(tmp.false_case()).set_identifier(
       level2.name(l1_identifier, a_s_read.first));
+
+    if(cond.is_false())
+    {
+      exprt t=tmp.false_case();
+      t.swap(tmp);
+    }
 
     const bool record_events_bak=record_events;
     record_events=false;
