@@ -8,6 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/find_symbols.h>
 #include <util/cprover_prefix.h>
+#ifdef DEBUG_FULL_SLICERT
+#include <util/i2string.h>
+#endif
 
 #include <goto-programs/remove_skip.h>
 
@@ -404,6 +407,23 @@ void full_slicert::operator()(
         if(!i_it->is_end_function() && // always retained
            !cfg[e].node_required)
           i_it->make_skip();
+#ifdef DEBUG_FULL_SLICERT
+        else
+        {
+          std::string c="ins:"+i2string(i_it->location_number);
+          c+=" req by:";
+          for(std::set<unsigned>::const_iterator
+              req_it=cfg[e].required_by.begin();
+              req_it!=cfg[e].required_by.end();
+              ++req_it)
+          {
+            if(req_it!=cfg[e].required_by.begin()) c+=",";
+            c+=i2string(*req_it);
+          }
+          i_it->source_location.set_column(c);  // for show-goto-functions
+          i_it->source_location.set_comment(c); // for dump-c
+        }
+#endif
       }
     }
 
