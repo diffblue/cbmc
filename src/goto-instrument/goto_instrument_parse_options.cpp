@@ -39,6 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/natural_loops.h>
 #include <analyses/local_may_alias.h>
 #include <analyses/local_bitvector_analysis.h>
+#include <analyses/custom_bitvector_analysis.h>
 #include <analyses/goto_check.h>
 #include <analyses/call_graph.h>
 #include <analyses/interval_analysis.h>
@@ -198,6 +199,25 @@ int goto_instrument_parse_optionst::doit()
         local_bitvector_analysis.output(std::cout, it->second, ns);
         std::cout << std::endl;
       }
+
+      return 0;
+    }
+
+    if(cmdline.isset("show-custom-bitvector-analysis"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+    
+      remove_returns(symbol_table, goto_functions);
+
+      custom_bitvector_analysist custom_bitvector_analysis;
+      custom_bitvector_analysis(goto_functions, ns);
+      custom_bitvector_analysis.output(ns, goto_functions, std::cout);
 
       return 0;
     }
