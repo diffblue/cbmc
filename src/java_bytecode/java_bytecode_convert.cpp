@@ -200,6 +200,8 @@ void java_bytecode_convertt::convert(const classt &c)
     class_typet::componentt base_class_field;
     base_class_field.type()=base;
     base_class_field.set_name("@"+id2string(c.extends));
+    base_class_field.set_base_name("@"+id2string(c.extends));
+    base_class_field.set_pretty_name("@"+id2string(c.extends));
     class_type.components().push_back(base_class_field);
   }
 
