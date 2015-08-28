@@ -31,7 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_set.h"
 #include "add_failed_symbols.h"
 
-const value_sett::object_map_dt value_sett::object_map_dt::empty;
+const value_sett::object_map_dt value_sett::object_map_dt::blank;
 object_numberingt value_sett::object_numbering;
    
 /*******************************************************************\

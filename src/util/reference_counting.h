@@ -62,7 +62,7 @@ public:
   
   inline const T &read() const
   {
-    if(d==NULL) return T::empty;
+    if(d==NULL) return T::blank;
     return *d;
   }
 

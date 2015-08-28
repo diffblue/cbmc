@@ -23,7 +23,7 @@ struct ref_expr_set_dt
   typedef hash_set_cont<exprt, irep_hash> expr_sett;
   expr_sett expr_set;
   
-  const static ref_expr_set_dt empty;
+  const static ref_expr_set_dt blank;
 };
 
 class ref_expr_sett:public reference_counting<ref_expr_set_dt>
