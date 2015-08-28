@@ -41,7 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(function-enter):(function-exit):(branch):" \
   "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)" \
   "(show-goto-functions)(show-value-sets)(show-local-may-alias)" \
-  "(show-local-bitvector-analysis)" \
+  "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \
   "(show-struct-alignment)(interval-analysis)(show-intervals)" \
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)" \
