@@ -260,6 +260,9 @@ bool ai_baset::visit(
     }
     else
     {
+      // initialize state, if necessary
+      get_state(to_l);
+
       new_values.transform(l, to_l, *this, ns);
     
       if(merge(new_values, l, to_l))
@@ -295,25 +298,48 @@ bool ai_baset::do_function_call(
   const exprt::operandst &arguments,
   const namespacet &ns)
 {
+  // initialize state, if necessary
+  get_state(l_return);
+
   const goto_functionst::goto_functiont &goto_function=
     f_it->second;
 
   if(!goto_function.body_available)
-    return false; // do nothing, no change
+  {
+    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
+    tmp_state->transform(l_call, l_return, *this, ns);
+
+    return merge(*tmp_state, l_call, l_return);
+  }
     
   assert(!goto_function.body.instructions.empty());
   
   {
     // get the state at the beginning of the function
     locationt l_begin=goto_function.body.instructions.begin();
+    // initialize state, if necessary
+    get_state(l_begin);
     
     // do the edge from the call site to the beginning of the function
-    std::unique_ptr<statet> state(make_temporary_state(get_state(l_call)));
+    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
+    tmp_state->transform(l_call, l_begin, *this, ns);
 
-    state->transform(l_call, l_begin, *this, ns);
-    
+    bool new_data=false;
+
     // merge the new stuff
-    if(merge(*state, l_call, l_begin))
+    if(merge(*tmp_state, l_call, l_begin))
+      new_data=true;
+
+    // do each function at least once
+    if(functions_done.find(f_it->first)==
+       functions_done.end())
+    {
+      new_data=true;
+      functions_done.insert(f_it->first);
+    }
+
+    // do we need to do the fixedpoint of the body?
+    if(new_data)
     {
       // also do the fixedpoint of the body via a recursive call
       fixedpoint(goto_function.body, goto_functions, ns);
@@ -326,15 +352,13 @@ bool ai_baset::do_function_call(
     assert(l_end->is_end_function());
 
     // do edge from end of function to instruction after call
-    locationt l_next=l_call;
-    l_next++;
+    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_end)));
+    tmp_state->transform(l_end, l_return, *this, ns);
 
-    std::unique_ptr<statet> state(make_temporary_state(get_state(l_end)));
-
-    state->transform(l_end, l_next, *this, ns);
-
-    // Propagate those -- not exceedingly precise, this is.
-    return merge(*state, l_end, l_next);
+    // Propagate those -- not exceedingly precise, this is,
+    // as still it contains all the state from the
+    // call site
+    return merge(*tmp_state, l_end, l_return);
   }
 }    
 

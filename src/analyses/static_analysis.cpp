@@ -444,14 +444,15 @@ void static_analysis_baset::do_function_call(
     locationt l_begin=goto_function.body.instructions.begin();
     
     // do the edge from the call site to the beginning of the function
-    new_state.transform(ns, l_call, l_begin);  
+    std::unique_ptr<statet> tmp_state(make_temporary_state(new_state));
+    tmp_state->transform(ns, l_call, l_begin);  
     
     statet &begin_state=get_state(l_begin);
 
     bool new_data=false;
 
     // merge the new stuff
-    if(merge(begin_state, new_state, l_begin))
+    if(merge(begin_state, *tmp_state, l_begin))
       new_data=true;
 
     // do each function at least once
@@ -479,14 +480,19 @@ void static_analysis_baset::do_function_call(
     statet &end_of_function=get_state(l_end);
 
     // do edge from end of function to instruction after call
-    locationt l_next=l_call;
-    l_next++;
-    end_of_function.transform(ns, l_end, l_next);
+    std::unique_ptr<statet> tmp_state(
+      make_temporary_state(end_of_function));
+    tmp_state->transform(ns, l_end, l_return);
 
     // propagate those -- not exceedingly precise, this is,
     // as still it contains all the state from the
     // call site
-    merge(new_state, end_of_function, l_end);
+    merge(new_state, *tmp_state, l_return);
+  }
+
+  {
+    // effect on current procedure (if any)
+    new_state.transform(ns, l_call, l_return);
   }
 }    
 
@@ -585,7 +591,8 @@ void static_analysis_baset::do_function_call_rec(
       }
     }
   }
-  else if(function.id()=="NULL-object")
+  else if(function.id()=="NULL-object" ||
+          function.id()==ID_integer_address)
   {
     // ignore, can't be a function
   }
