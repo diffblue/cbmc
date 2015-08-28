@@ -33,6 +33,13 @@ ifneq ($(wildcard ../cpp/Makefile),)
   CP_CXXFLAGS += -D HAVE_CPP
 endif
 
+ifneq ($(wildcard ../java_bytecode/Makefile),)
+  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
+  ifneq ($(LIBZIP),)
+    LIBS += -L $(LIBZIP) -lzip
+  endif
+endif
+
 ###############################################################################
 
 goto-cc$(EXEEXT): $(OBJ)

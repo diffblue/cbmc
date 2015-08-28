@@ -229,10 +229,10 @@ bool java_entry_point(
   // build call to initialization function
   {
     symbol_tablet::symbolst::iterator init_it=
-      symbol_table.symbols.find("__CPROVER_initialize");
+      symbol_table.symbols.find(INITIALIZE);
 
     if(init_it==symbol_table.symbols.end())
-      throw "failed to find __CPROVER_initialize symbol";
+      throw "failed to find " INITIALIZE " symbol";
 
     code_function_callt call_init;
     call_init.lhs().make_nil();

@@ -1147,6 +1147,11 @@ Function: configt::ansi_ct::set_from_symbol_table
 
 void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
 {
+  // maybe not compiled from C/C++
+  if(symbol_table.symbols.find(CPROVER_PREFIX "architecture_" "int_width")==
+     symbol_table.symbols.end())
+    return;
+
   namespacet ns(symbol_table);
 
   int_width=from_ns(ns, "int_width");
