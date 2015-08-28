@@ -36,7 +36,7 @@ endif
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   ifneq ($(LIBZIPLIB),)
-    LIBS += -L $(LIBZIPLIB) -lzip
+    LIBS += -L $(LIBZIPLIB) -lzip -lz
   endif
 endif
 
