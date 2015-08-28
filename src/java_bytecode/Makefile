@@ -13,8 +13,8 @@ include ../common
 
 CLEANFILES = java_bytecode$(LIBEXT)
 
-ifneq ($(LIBZIP),)
-  INCLUDES += -I $(LIBZIP)/include
+ifneq ($(LIBZIPINC),)
+  INCLUDES += -I $(LIBZIPINC)/include
   CP_CXXFLAGS += -DHAVE_LIBZIP
 endif
 
