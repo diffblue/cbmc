@@ -576,11 +576,18 @@ codet java_bytecode_convertt::convert_instructions(
       assert(!i_it->args.empty());
       targets.insert(label(to_constant_expr(i_it->args[0]).get_value()));
     }
-    else if(i_it->statement=="tableswitch")
+    else if(i_it->statement=="tableswitch" ||
+            i_it->statement=="lookupswitch")
     {
-    }
-    else if(i_it->statement=="lookupswitch")
-    {
+      bool is_label=true;
+      for(instructiont::argst::const_iterator
+          a_it=i_it->args.begin();
+          a_it!=i_it->args.end();
+          a_it++, is_label=!is_label)
+      {
+        if(is_label)
+          targets.insert(label(to_constant_expr(*a_it).get_value()));
+      }
     }
   }
 
@@ -1135,17 +1142,44 @@ codet java_bytecode_convertt::convert_instructions(
 
       results[0]=length;
     }
-    else if(statement=="tableswitch")
+    else if(statement=="tableswitch" ||
+            statement=="lookupswitch")
     {
       assert(op.size()==1 && results.size()==0);
-      c=codet(statement);
-      c.copy_to_operands(op[0]);
-    }
-    else if(statement=="lookupswitch")
-    {
-      assert(op.size()==1 && results.size()==0);
-      c=codet(statement);
-      c.copy_to_operands(op[0]);
+
+      // we turn into switch-case
+      code_switcht code_switch;
+      code_switch.value()=op[0];
+      code_blockt code_block;
+
+      bool is_label=true;
+      for(instructiont::argst::const_iterator
+          a_it=i_it->args.begin();
+          a_it!=i_it->args.end();
+          a_it++, is_label=!is_label)
+      {
+        if(is_label)
+        {
+          code_switch_caset code_case;
+
+          irep_idt number=to_constant_expr(*a_it).get_value();
+          code_case.code()=code_gotot(label(number));
+        
+          if(a_it==i_it->args.begin())
+            code_case.set_default();
+          else
+          {
+            instructiont::argst::const_iterator prev=a_it;
+            prev--;
+            code_case.case_op()=typecast_exprt(*prev, op[0].type());
+          }
+          
+          code_block.add(code_case);
+        }
+      }
+      
+      code_switch.body()=code_block;
+      c=code_switch;
     }
     else if(statement=="pop" || statement=="pop2")
     {
