@@ -18,7 +18,7 @@ int main()
   pthread_create(&th2, 0, foo, 0);
   pthread_join(th1, 0);
   pthread_join(th2, 0);
-  assert(i==1);
-  assert(i==2);
+  assert(i==1); // should fail, as there are two threads
+  assert(i==2); // should pass
 }
 
