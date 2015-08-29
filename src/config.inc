@@ -5,6 +5,8 @@ BUILD_ENV = AUTO
 #CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 #CXXFLAGS = -std=c++11
 
+LINKFLAGS = -static
+
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk 
 
@@ -18,8 +20,8 @@ BUILD_ENV = AUTO
 MINISAT2 = ../../minisat-2.2.0
 #GLUCOSE = ../../glucose-syrup
 #SMVSAT =
-#LIBZIPLIB = /opt/local/lib/libzip
-#LIBZIPINC = /opt/local/lib/libzip
+#LIBZIPLIB = /usr/lib/x86_64-linux-gnu
+#LIBZIPINC = /usr/lib
 
 # Signing identity for MacOS Gatekeeper
 
