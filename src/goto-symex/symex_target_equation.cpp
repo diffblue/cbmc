@@ -1013,8 +1013,8 @@ void symex_target_equationt::SSA_stept::output(
 
   switch(type)
   {
-  case goto_trace_stept::ASSERT: out << "ASSERT" << std::endl; break;
-  case goto_trace_stept::ASSUME: out << "ASSUME" << std::endl; break;
+  case goto_trace_stept::ASSERT: out << "ASSERT " << from_expr(ns, "", cond_expr) << std::endl; break;
+  case goto_trace_stept::ASSUME: out << "ASSUME " << from_expr(ns, "", cond_expr) << std::endl; break;
   case goto_trace_stept::LOCATION: out << "LOCATION" << std::endl; break;
   case goto_trace_stept::INPUT: out << "INPUT" << std::endl; break;
   case goto_trace_stept::OUTPUT: out << "OUTPUT" << std::endl; break;
@@ -1050,6 +1050,7 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::ATOMIC_END: out << "AUTOMIC_END" << std::endl; break;
   case goto_trace_stept::SPAWN: out << "SPAWN" << std::endl; break;
   case goto_trace_stept::MEMORY_BARRIER: out << "MEMORY_BARRIER" << std::endl; break;
+  case goto_trace_stept::GOTO: out << "IF " << from_expr(ns, "", cond_expr) << " GOTO" << std::endl; break;
 
   default: assert(false);
   }
