@@ -42,6 +42,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cegis/facade/cegis.h>
 #include <cegis/options/cegis_options.h>
 
+#include <goto-instrument/full_slicer.h>
+
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/goto_check.h>
@@ -847,6 +849,13 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
 
+    // full slice?
+    if(cmdline.isset("full-slice"))
+    {
+      status() << "Performing a full slice" << eom;
+      full_slicer(goto_functions, ns);
+    }
+  
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
