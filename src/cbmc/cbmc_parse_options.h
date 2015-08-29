@@ -22,7 +22,7 @@ class optionst;
 
 #define CBMC_OPTIONS \
   "(program-only)(function):(preprocess)(slice-by-trace):" \
-  "(no-simplify)(unwind):(unwindset):(slice-formula)" \
+  "(no-simplify)(unwind):(unwindset):(slice-formula)(full-slice)" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
   "D:I:" \
