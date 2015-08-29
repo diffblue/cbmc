@@ -426,10 +426,13 @@ safety_checkert::resultt bmct::run(
       }
       else
       {
-        simple_slice(equation);
-        statistics() << "simple slicing removed "
-                     << equation.count_ignored_SSA_steps()
-                     << " assignments" << eom;
+        if(options.get_option("cover")=="")
+        {
+          simple_slice(equation);
+          statistics() << "simple slicing removed "
+                       << equation.count_ignored_SSA_steps()
+                       << " assignments" << eom;
+        }
       }
     }
 
