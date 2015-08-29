@@ -194,8 +194,13 @@ bool java_entry_point(
   if(matches.empty())
   {
     messaget message(message_handler);
-    message.error() << "main method `" << config.main
-                    << "' not in symbol table" << messaget::eom;
+
+    if(config.main.empty())
+      message.error() << "main method not in symbol table" << messaget::eom;
+    else
+      message.error() << "main method `" << config.main
+                      << "' not in symbol table" << messaget::eom;
+      
     return true; // give up with error, no main
   }
 
