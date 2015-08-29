@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/numbering.h>
 
 #include "ai.h"
+#include "local_may_alias.h"
 
 /*******************************************************************\
 
@@ -60,6 +61,9 @@ protected:
   friend class custom_bitvector_domaint;
 
   numbering<irep_idt> bits;
+  
+  typedef std::map<irep_idt, local_may_aliast> local_may_alias_mapt;
+  local_may_alias_mapt local_may_alias_map;
 };
 
 #endif
