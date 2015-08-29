@@ -507,7 +507,7 @@ Function: cbmc_solverst::no_incremental_check
 void cbmc_solverst::no_incremental_check()
 {
   if(options.get_bool_option("all-properties") ||
-     options.get_bool_option("cover-assertions") ||
+     options.get_option("cover")!="" ||
      options.get_option("incremental-check")!="")
     throw "sorry, this solver does not support incremental solving";
 }
