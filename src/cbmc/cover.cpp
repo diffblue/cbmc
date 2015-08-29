@@ -408,17 +408,17 @@ bool bmct::cover(
 {
   bmc_covert::criteriont c;
   
-  if(criterion=="assertion")
+  if(criterion=="assertion" || criterion=="assertions")
     c=bmc_covert::C_ASSERTION;
-  else if(criterion=="path")
+  else if(criterion=="path" || criterion=="paths")
     c=bmc_covert::C_PATH;
-  else if(criterion=="branch")
+  else if(criterion=="branch" || criterion=="branches")
     c=bmc_covert::C_BRANCH;
-  else if(criterion=="location")
+  else if(criterion=="location" || criterion=="locations")
     c=bmc_covert::C_LOCATION;
-  else if(criterion=="assertions")
+  else if(criterion=="decision" || criterion=="decisions")
     c=bmc_covert::C_DECISION;
-  else if(criterion=="assertions")
+  else if(criterion=="condition" || criterion=="conditions")
     c=bmc_covert::C_CONDITION;
   else if(criterion=="mcdc")
     c=bmc_covert::C_MCDC;
