@@ -149,6 +149,9 @@ int goto_instrument_parse_optionst::doit()
       status() << "Partial Inlining" << eom;
       goto_partial_inline(goto_functions, ns, ui_message_handler);
     
+      // recalculate numbers, etc.
+      goto_functions.update();
+
       status() << "Pointer Analysis" << eom;
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_functions);
@@ -167,12 +170,15 @@ int goto_instrument_parse_optionst::doit()
       status() << "Partial Inlining" << eom;
       goto_partial_inline(goto_functions, ns, ui_message_handler);
     
+      // recalculate numbers, etc.
+      goto_functions.update();
+
       forall_goto_functions(it, goto_functions)
       {
-        local_may_aliast local_may_alias(it->second);
         std::cout << ">>>>" << std::endl;
         std::cout << ">>>> " << it->first << std::endl;
         std::cout << ">>>>" << std::endl;
+        local_may_aliast local_may_alias(it->second);
         local_may_alias.output(std::cout, it->second, ns);
         std::cout << std::endl;
       }
@@ -190,6 +196,9 @@ int goto_instrument_parse_optionst::doit()
       status() << "Partial Inlining" << eom;
       goto_partial_inline(goto_functions, ns, ui_message_handler);
     
+      // recalculate numbers, etc.
+      goto_functions.update();
+
       forall_goto_functions(it, goto_functions)
       {
         local_bitvector_analysist local_bitvector_analysis(it->second);
@@ -215,9 +224,34 @@ int goto_instrument_parse_optionst::doit()
     
       remove_returns(symbol_table, goto_functions);
 
+      // recalculate numbers, etc.
+      goto_functions.update();
+
       custom_bitvector_analysist custom_bitvector_analysis;
       custom_bitvector_analysis(goto_functions, ns);
       custom_bitvector_analysis.output(ns, goto_functions, std::cout);
+
+      return 0;
+    }
+
+    if(cmdline.isset("custom-bitvector-analysis"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+    
+      remove_returns(symbol_table, goto_functions);
+
+      // recalculate numbers, etc.
+      goto_functions.update();
+
+      custom_bitvector_analysist custom_bitvector_analysis;
+      custom_bitvector_analysis(goto_functions, ns);
+      custom_bitvector_analysis.check(ns, goto_functions, std::cout);
 
       return 0;
     }
@@ -231,7 +265,10 @@ int goto_instrument_parse_optionst::doit()
 
       status() << "Partial Inlining" << eom;
       goto_partial_inline(goto_functions, ns, ui_message_handler);
-    
+
+      // recalculate numbers, etc.
+      goto_functions.update();
+
       status() << "Pointer Analysis" << eom;
       points_tot points_to;
       points_to(goto_functions);
@@ -249,6 +286,9 @@ int goto_instrument_parse_optionst::doit()
       status() << "Partial Inlining" << eom;
       goto_partial_inline(goto_functions, ns, ui_message_handler);
     
+      // recalculate numbers, etc.
+      goto_functions.update();
+
       status() << "Interval Analysis" << eom;
       static_analysist<interval_domaint> interval_analysis(ns);
       interval_analysis(goto_functions);
@@ -281,6 +321,9 @@ int goto_instrument_parse_optionst::doit()
 
         status() << "Partial Inlining" << eom;
         goto_partial_inline(goto_functions, ns, ui_message_handler);
+
+        // recalculate numbers, etc.
+        goto_functions.update();
       }
     
       status() << "Pointer Analysis" << eom;
@@ -302,7 +345,6 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-reaching-definitions"))
     {
-      #if 0
       status() << "Function Pointer Removal" << eom;
       remove_function_pointers(symbol_table, goto_functions, false);
 
@@ -321,35 +363,6 @@ int goto_instrument_parse_optionst::doit()
           rd_analysis.output(ns, f_it->second.body, std::cout);
         }
       }
-      #endif
-
-      return 0;
-    }
-
-    if(cmdline.isset("show-dependence-graph"))
-    {
-      status() << "Function Pointer Removal" << eom;
-      remove_function_pointers(symbol_table, goto_functions, false);
-
-      #if 0
-      const namespacet ns(symbol_table);
-      dependence_grapht dependence_graph(ns);
-      dependence_graph(goto_functions, ns);
-
-      forall_goto_functions(f_it, goto_functions)
-      {
-        if(f_it->second.body_available)
-        {
-          std::cout << "////" << std::endl;
-          std::cout << "//// Function: " << f_it->first << std::endl;
-          std::cout << "////" << std::endl;
-          std::cout << std::endl;
-          dependence_graph.output(ns, f_it->second.body, std::cout);
-        }
-      }
-
-      dependence_graph.output_dot(std::cout);
-      #endif
 
       return 0;
     }
@@ -1060,6 +1073,9 @@ void goto_instrument_parse_optionst::instrument_goto_program(
   
   // label the assertions
   label_properties(goto_functions);
+
+  // recalculate numbers, etc.
+  goto_functions.update();
 }
 
 /*******************************************************************\
