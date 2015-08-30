@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+class custom_bitvector_analysist;
+
 class custom_bitvector_domaint:public ai_domain_baset
 {
 public:
@@ -41,29 +43,56 @@ public:
     locationt from,
     locationt to);
 
-  void assign_lhs(const exprt &, const exprt &);
-
   typedef unsigned long long bit_vectort;
+  
+  struct vectorst
+  {
+    bit_vectort may, must;
+    inline vectorst():may(0), must(0) { }
 
-  typedef std::map<irep_idt, bit_vectort> bitst;
+    inline bool merge(const vectorst &other)
+    {
+      bit_vectort old_may=may, old_must=must;
+      may|=other.may;
+      must&=other.must;
+      return may!=old_may || must!=old_must;
+    }
+    
+    bool is_blank() const { return may==0 && must==0; }
+  };
+
+  void assign_lhs(const exprt &, const vectorst &);
+  void get_rhs(const exprt &, vectorst &dest);
+
+  typedef std::map<irep_idt, vectorst> bitst;
   bitst bits;
 
 protected:  
-  unsigned get_bit_nr(ai_baset &, const exprt &);
-  void set_bit(const exprt &, unsigned bit_nr, bool);
+  typedef enum { SET_MUST, CLEAR_MUST } modet;
+
+  void set_bit(const exprt &, unsigned bit_nr, modet);
 };
 
 class custom_bitvector_analysist:public ait<custom_bitvector_domaint> 
 {
 public:
+  void instrument(goto_functionst &);
+  void check(const namespacet &, const goto_functionst &, std::ostream &);
+  exprt eval(const exprt &src, locationt loc);
+
+  unsigned get_bit_nr(const exprt &);
 
 protected:
+  virtual void initialize(const goto_functionst &_goto_functions)
+  {
+    local_may_alias_factory(_goto_functions);
+  }
+
   friend class custom_bitvector_domaint;
 
   numbering<irep_idt> bits;
   
-  typedef std::map<irep_idt, local_may_aliast> local_may_alias_mapt;
-  local_may_alias_mapt local_may_alias_map;
+  local_may_alias_factoryt local_may_alias_factory;
 };
 
 #endif
