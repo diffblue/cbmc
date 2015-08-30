@@ -557,9 +557,15 @@ void goto_convertt::remove_malloc(
     new_symbol.base_name="malloc_value$"+i2string(++temporary_counter);
     new_symbol.type=expr.type();
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
+    new_symbol.location=expr.source_location();
 
     new_name(new_symbol);
     tmp_symbols.push_back(new_symbol.name);
+
+    code_declt decl;
+    decl.symbol()=new_symbol.symbol_expr();
+    decl.add_source_location()=new_symbol.location;
+    convert_decl(decl, dest);
 
     call=code_assignt(new_symbol.symbol_expr(), expr);
     call.add_source_location()=expr.source_location();
