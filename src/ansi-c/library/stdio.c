@@ -52,7 +52,11 @@ inline FILE *fopen(const char *filename, const char *mode)
   __CPROVER_assert(__CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
   #endif
 
+  _Bool fopen_error;
+  if(fopen_error) return NULL;
+  
   FILE *f=malloc(sizeof(FILE));
+  __CPROVER_set_must(f, "open");
 
   return f;
 }
@@ -67,6 +71,9 @@ inline FILE *fopen(const char *filename, const char *mode)
 inline int fclose(FILE *stream)
 {
   __CPROVER_HIDE:;
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fclose file must be open");
+  __CPROVER_clear_must(stream, "open");
   int return_value;
   free(stream);
   return return_value;
@@ -113,6 +120,10 @@ inline char *fgets(char *str, int size, FILE *stream)
 
   (void)size;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fgets file must be open");
+
   #ifdef __CPROVER_STRING_ABSTRACTION
   int resulting_size;
   __CPROVER_assert(__CPROVER_buffer_size(str)>=size, "buffer-overflow in fgets");
@@ -148,6 +159,9 @@ inline size_t fread(
 
   (void)*stream;
 
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fread file must be open");
+
   for(i=0; i<bytes; i++)
   {
     char nondet_char;
@@ -167,8 +181,13 @@ inline size_t fread(
 inline int feof(FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "feof file must be open");
+
   return return_value;
 }
 
@@ -182,8 +201,13 @@ inline int feof(FILE *stream)
 inline int ferror(FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
   (void)*stream;
+  
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "feof file must be open");
+  
   return return_value;
 }
 
@@ -197,8 +221,13 @@ inline int ferror(FILE *stream)
 inline int fileno(FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fileno file must be open");
+
   return return_value;
 }
 
@@ -212,12 +241,17 @@ inline int fileno(FILE *stream)
 inline int fputs(const char *s, FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(s), "fputs zero-termination of 1st argument");
   #endif
   (void)*s;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fputs file must be open");
+
   return return_value;
 }
 
@@ -231,8 +265,13 @@ inline int fputs(const char *s, FILE *stream)
 inline int fflush(FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fflush file must be open");
+
   return return_value;
 }
 
@@ -246,8 +285,13 @@ inline int fflush(FILE *stream)
 inline int fpurge(FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fpurge file must be open");
+
   return return_value;
 }
 
@@ -265,6 +309,10 @@ inline int fgetc(FILE *stream)
   (void)*stream;
   // it's a byte or EOF (-1)
   __CPROVER_assume(return_value>=-1 && return_value<=255);
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fgetc file must be open");
+
   return return_value;
 }
 
@@ -280,6 +328,10 @@ inline int getc(FILE *stream)
   __CPROVER_HIDE:;
   int return_value;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "getc file must be open");
+
   // it's a byte or EOF
   __CPROVER_assume(return_value>=-1 && return_value<=255);
   return return_value;
@@ -313,6 +365,10 @@ inline int getw(FILE *stream)
   __CPROVER_HIDE:;
   int return_value;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "getw file must be open");
+
   // it's any int, no restriction
   return return_value;
 }
@@ -331,6 +387,10 @@ inline int fseek(FILE *stream, long offset, int whence)
   (void)*stream;
   (void)offset;
   (void)whence;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fseek file must be open");
+
   return return_value;
 }
 
@@ -346,6 +406,10 @@ inline long ftell(FILE *stream)
   __CPROVER_HIDE:;
   int return_value;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "ftell file must be open");
+
   return return_value;
 }
 
@@ -360,6 +424,9 @@ void rewind(FILE *stream)
 {
   __CPROVER_HIDE:
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "rewind file must be open");
 }
 
 /* FUNCTION: fwrite */
@@ -379,6 +446,10 @@ size_t fwrite(
   (void)*(char*)ptr;
   (void)size;
   (void)*stream;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fwrite file must be open");
+
   size_t nwrite;
   __CPROVER_assume(nwrite<=nitems);
   return nwrite;
@@ -492,6 +563,10 @@ inline int vfscanf(FILE *restrict stream, const char *restrict format, va_list a
   (void)*stream;
   (void)*format;
   (void)arg;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "vfscanf file must be open");
+
   return result;
 }
 
@@ -576,6 +651,10 @@ inline int vfprintf(FILE *stream, const char *restrict format, va_list arg)
   (void)*stream;
   (void)*format;
   (void)arg;
+
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "vfprintf file must be open");
+
   return result;
 }
 
