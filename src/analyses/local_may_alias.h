@@ -10,6 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_LOCAL_MAY_ALIAS_H
 
 #include <stack>
+#include <memory>
+
+#include <util/union_find.h>
 
 #include "locals.h"
 #include "dirty.h"
@@ -59,37 +62,15 @@ protected:
 
   typedef std::stack<local_cfgt::node_nrt> work_queuet;
 
-  // the following may eventually get merged  
-  mutable numbering<irep_idt> pointers;
   mutable numbering<exprt> objects;
   
-  // The following struct describes what a pointer
-  // may point to
-  struct destt
-  {
-  public:
-    inline destt()
-    {
-    }
-  
-    std::set<unsigned> objects;
-    
-    bool merge(const destt &);
-
-    inline void clear()
-    { 
-      objects.clear();
-    }
-  };
-  
-  // pointers -> destt
-  typedef std::map<unsigned, destt> points_tot;
+  typedef unsigned_union_find alias_sett;
 
   // the information tracked per program location  
   class loc_infot
   {
   public:
-    points_tot points_to;
+    alias_sett aliases;
     
     bool merge(const loc_infot &src);
   };
@@ -103,15 +84,65 @@ protected:
     const loc_infot &loc_info_src,
     loc_infot &loc_info_dest);
     
+  typedef std::set<unsigned> object_sett; 
+   
   void get_rec(
-    destt &dest,
+    object_sett &dest,
     const exprt &rhs,
     const loc_infot &loc_info_src) const;
     
   bool is_tracked(const irep_idt &identifier) const;
   
   unsigned unknown_object;
-  std::set<exprt> empty_set;
+};
+
+class local_may_alias_factoryt
+{
+public:
+  inline local_may_alias_factoryt():goto_functions(NULL)
+  {
+  }
+  
+  inline void operator()(const goto_functionst &_goto_functions)
+  {
+    goto_functions=&_goto_functions;
+
+    forall_goto_functions(f_it, _goto_functions)
+      forall_goto_program_instructions(i_it, f_it->second.body)
+        target_map[i_it]=f_it->first;
+  }
+  
+  local_may_aliast & operator()(const irep_idt &fkt)
+  {
+    assert(goto_functions!=NULL);
+    fkt_mapt::iterator f_it=fkt_map.find(fkt);
+    if(f_it!=fkt_map.end()) return *f_it->second;
+    goto_functionst::function_mapt::const_iterator f_it2=
+      goto_functions->function_map.find(fkt);
+    assert(f_it2!=goto_functions->function_map.end());
+    return *(fkt_map[fkt]=std::unique_ptr<local_may_aliast>(
+              new local_may_aliast(f_it2->second)));
+  }
+  
+  local_may_aliast & operator()(goto_programt::const_targett t)
+  {
+    target_mapt::const_iterator t_it=
+      target_map.find(t);
+    assert(t_it!=target_map.end());
+    return operator()(t_it->second);
+  }
+  
+  std::set<exprt> get(
+    const goto_programt::const_targett t,
+    const exprt &src) const;
+
+protected:
+  const goto_functionst *goto_functions;  
+  typedef std::map<irep_idt, std::unique_ptr<local_may_aliast> > fkt_mapt;
+  fkt_mapt fkt_map;
+
+  typedef std::map<goto_programt::const_targett, irep_idt > target_mapt;
+  target_mapt target_map;
 };
 
 #endif

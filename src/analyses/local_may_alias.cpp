@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <iterator>
-#include <algorithm>
+//#include <iterator>
+//#include <algorithm>
 
 #include <util/std_expr.h>
 #include <util/std_code.h>
@@ -20,76 +20,33 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: local_may_aliast::destt::merge
-
-  Inputs:
-
- Outputs:
-
- Purpose: 
-
-\*******************************************************************/
-
-bool local_may_aliast::destt::merge(const destt &src)
-{
-  bool result=false;
-
-  std::size_t old_size=objects.size();
-  objects.insert(src.objects.begin(), src.objects.end());
-
-  if(objects.size()!=old_size)
-    result=true;
-
-  return result;
-}
-
-/*******************************************************************\
-
 Function: local_may_aliast::loc_infot::merge
 
   Inputs:
 
- Outputs:
+ Outputs: return 'true' iff changed
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
 bool local_may_aliast::loc_infot::merge(const loc_infot &src)
 {
-  bool result=false;
+  bool changed=false;
   
-  points_tot::iterator dest_it=points_to.begin();
-
-  for(points_tot::const_iterator
-      src_it=src.points_to.begin();
-      src_it!=src.points_to.end();
-      ) // no it++
+  // do union; this should be amortized linear
+  for(std::size_t i=0; i<src.aliases.size(); i++)
   {
-    if(dest_it==points_to.end() || 
-       src_it->first<dest_it->first)
-    {
-      points_to.insert(dest_it, *src_it);
-      result=true;
-      src_it++;
-      continue;
-    }
-    else if(dest_it->first<src_it->first)
-    {
-      dest_it++;
-      continue;
-    }
-    
-    assert(dest_it->first==src_it->first);
-    
-    if(dest_it->second.merge(src_it->second))
-      result=true;
+    std::size_t root=src.aliases.find(i);
 
-    dest_it++;
-    src_it++;
+    if(!aliases.same_set(i, root))
+    {
+      aliases.make_union(i, root);
+      changed=true;
+    }
   }
   
-  return result;
+  return changed;
 }
 
 /*******************************************************************\
@@ -109,14 +66,14 @@ bool local_may_aliast::is_tracked(const irep_idt &identifier) const
 {
   localst::locals_mapt::const_iterator it=locals.locals_map.find(identifier);
   if(it==locals.locals_map.end()) return false;
-  if(it->second.id()!=ID_pointer) return false;
+  if(it->second.type().id()!=ID_pointer) return false;
   if(dirty(identifier)) return false;
   return true;
 }
 
 /*******************************************************************\
 
-Function: local_may_aliast::assign
+Function: local_may_aliast::assign_lhs
 
   Inputs:
 
@@ -138,10 +95,22 @@ void local_may_aliast::assign_lhs(
 
     if(is_tracked(identifier))
     {
-      unsigned dest_pointer=pointers.number(identifier);
-      destt &dest_set=loc_info_dest.points_to[dest_pointer];
-      dest_set.clear();
-      get_rec(dest_set, rhs, loc_info_src);
+      unsigned dest_pointer=objects.number(lhs);
+
+      // isolate the lhs pointer
+      loc_info_dest.aliases.isolate(dest_pointer);
+      
+      object_sett rhs_set;
+      get_rec(rhs_set, rhs, loc_info_src);
+      
+      // make these all aliases
+      for(object_sett::const_iterator
+          p_it=rhs_set.begin();
+          p_it!=rhs_set.end();
+          p_it++)
+      {
+        loc_info_dest.aliases.make_union(dest_pointer, *p_it);
+      }
     }
   }
   else if(lhs.id()==ID_dereference)
@@ -188,18 +157,18 @@ std::set<exprt> local_may_aliast::get(
   
   const loc_infot &loc_info_src=loc_infos[loc_it->second];
   
-  destt result_tmp;
+  object_sett result_tmp;
   get_rec(result_tmp, rhs, loc_info_src);
 
   std::set<exprt> result;
 
-  for(std::set<unsigned>::const_iterator
-      it=result_tmp.objects.begin();
-      it!=result_tmp.objects.end();
+  for(object_sett::const_iterator
+      it=result_tmp.begin();
+      it!=result_tmp.end();
       it++)
   {
     result.insert(objects[*it]);
-  }  
+  }
   
   return result;
 }
@@ -226,19 +195,19 @@ bool local_may_aliast::aliases(
   
   const loc_infot &loc_info_src=loc_infos[loc_it->second];
   
-  destt tmp1, tmp2;
+  object_sett tmp1, tmp2;
   get_rec(tmp1, src1, loc_info_src);
   get_rec(tmp2, src2, loc_info_src);
 
-  if(tmp1.objects.find(unknown_object)!=tmp1.objects.end() ||
-     tmp2.objects.find(unknown_object)!=tmp2.objects.end())
+  if(tmp1.find(unknown_object)!=tmp1.end() ||
+     tmp2.find(unknown_object)!=tmp2.end())
     return true;
 
   std::list<unsigned> result;
   
   std::set_intersection(
-    tmp1.objects.begin(), tmp1.objects.end(),
-    tmp2.objects.begin(), tmp2.objects.end(),
+    tmp1.begin(), tmp1.end(),
+    tmp2.begin(), tmp2.end(),
     std::back_inserter(result));
   
   return !result.empty();
@@ -257,32 +226,38 @@ Function: local_may_aliast::get_rec
 \*******************************************************************/
 
 void local_may_aliast::get_rec(
-  destt &dest,
+  object_sett &dest,
   const exprt &rhs,
   const loc_infot &loc_info_src) const
 {
   if(rhs.id()==ID_constant)
   {
     if(rhs.is_zero())
-      dest.objects.insert(objects.number(exprt(ID_null_object)));
+      dest.insert(objects.number(exprt(ID_null_object)));
     else
-      dest.objects.insert(objects.number(exprt(ID_integer_address_object)));
+      dest.insert(objects.number(exprt(ID_integer_address_object)));
   }
   else if(rhs.id()==ID_symbol)
   {
     const irep_idt &identifier=to_symbol_expr(rhs).get_identifier();
+
     if(is_tracked(identifier))
     {
-      unsigned src_pointer=pointers.number(identifier);
-      points_tot::const_iterator src_it=loc_info_src.points_to.find(src_pointer);
-      if(src_it!=loc_info_src.points_to.end())
-      {
-        const std::set<unsigned> &src=src_it->second.objects;
-        dest.objects.insert(src.begin(), src.end());
-      }
+      unsigned src_pointer=objects.number(rhs);
+      
+      dest.insert(src_pointer);
+      
+      for(std::size_t i=0; i<loc_info_src.aliases.size(); i++)
+        if(loc_info_src.aliases.same_set(src_pointer, i))
+          dest.insert(i);
     }
     else
-      dest.objects.insert(unknown_object);
+      dest.insert(unknown_object);
+  }
+  else if(rhs.id()==ID_if)
+  {
+    get_rec(dest, to_if_expr(rhs).false_case(), loc_info_src);
+    get_rec(dest, to_if_expr(rhs).true_case(), loc_info_src);
   }
   else if(rhs.id()==ID_address_of)
   {
@@ -290,23 +265,31 @@ void local_may_aliast::get_rec(
     
     if(object.id()==ID_symbol)
     {
-      unsigned object_nr=objects.number(object);
-      dest.objects.insert(object_nr);
+      unsigned object_nr=objects.number(rhs);
+      dest.insert(object_nr);
     }
     else if(object.id()==ID_index)
     {
       const index_exprt &index_expr=to_index_expr(object);
       if(index_expr.array().id()==ID_symbol)
       {
-        index_exprt tmp=index_expr;
-        tmp.index()=gen_zero(index_type());
-        dest.objects.insert(objects.number(tmp));
+        index_exprt tmp1=index_expr;
+        tmp1.index()=gen_zero(index_type());
+        address_of_exprt tmp2(tmp1);
+        dest.insert(objects.number(tmp2));
+      }
+      else if(index_expr.array().id()==ID_string_constant)
+      {
+        index_exprt tmp1=index_expr;
+        tmp1.index()=gen_zero(index_type());
+        address_of_exprt tmp2(tmp1);
+        dest.insert(objects.number(tmp2));
       }
       else
-        dest.objects.insert(unknown_object);
+        dest.insert(unknown_object);
     }
     else
-      dest.objects.insert(unknown_object);
+      dest.insert(unknown_object);
   }
   else if(rhs.id()==ID_typecast)
   {
@@ -330,10 +313,10 @@ void local_may_aliast::get_rec(
         get_rec(dest, rhs.op1(), loc_info_src);
       }
       else
-        dest.objects.insert(unknown_object);
+        dest.insert(unknown_object);
     }
     else
-      dest.objects.insert(unknown_object);
+      dest.insert(unknown_object);
   }
   else if(rhs.id()==ID_minus)
   {
@@ -342,19 +325,19 @@ void local_may_aliast::get_rec(
       get_rec(dest, rhs.op0(), loc_info_src);
     }
     else
-      dest.objects.insert(unknown_object);
+      dest.insert(unknown_object);
   }
   else if(rhs.id()==ID_member)
   {
-    dest.objects.insert(unknown_object);
+    dest.insert(unknown_object);
   }
   else if(rhs.id()==ID_index)
   {
-    dest.objects.insert(unknown_object);
+    dest.insert(unknown_object);
   }
   else if(rhs.id()==ID_dereference)
   {
-    dest.objects.insert(unknown_object);
+    dest.insert(unknown_object);
   }
   else if(rhs.id()==ID_side_effect)
   {
@@ -363,13 +346,13 @@ void local_may_aliast::get_rec(
 
     if(statement==ID_malloc)
     {
-      dest.objects.insert(objects.number(exprt(ID_dynamic_object)));
+      dest.insert(objects.number(exprt(ID_dynamic_object)));
     }
     else
-      dest.objects.insert(unknown_object);
+      dest.insert(unknown_object);
   }
   else
-    dest.objects.insert(unknown_object);
+    dest.insert(unknown_object);
 }
  
 /*******************************************************************\
@@ -389,12 +372,16 @@ void local_may_aliast::build(const goto_functiont &goto_function)
   if(cfg.nodes.empty()) return;
 
   work_queuet work_queue;
-  work_queue.push(0);  
+
+  // put all nodes into work queue  
+  for(local_cfgt::node_nrt n=0; n<cfg.nodes.size(); n++)
+    work_queue.push(n);  
   
   unknown_object=objects.number(exprt(ID_unknown));
   
   loc_infos.resize(cfg.nodes.size());
   
+  #if 0
   // feed in sufficiently bad defaults
   for(code_typet::parameterst::const_iterator
       it=goto_function.type.parameters().begin();
@@ -403,17 +390,20 @@ void local_may_aliast::build(const goto_functiont &goto_function)
   {
     const irep_idt &identifier=it->get_identifier();
     if(is_tracked(identifier))
-      loc_infos[0].points_to[pointers.number(identifier)].objects.insert(unknown_object);
+      loc_infos[0].points_to[objects.number(identifier)].objects.insert(unknown_object);
   }
+  #endif
 
+  #if 0
   for(localst::locals_mapt::const_iterator
       l_it=locals.locals_map.begin();
       l_it!=locals.locals_map.end();
       l_it++)
   {
     if(is_tracked(l_it->first))
-      loc_infos[0].points_to[pointers.number(l_it->first)].objects.insert(unknown_object);
+      loc_infos[0].aliases.make_union(objects.number(l_it->second), unknown_object);
   }
+  #endif
 
   while(!work_queue.empty())
   {
@@ -494,26 +484,23 @@ void local_may_aliast::output(
     out << "**** " << i_it->source_location << "\n";
 
     const loc_infot &loc_info=loc_infos[l];
-
-    for(points_tot::const_iterator
-        p_it=loc_info.points_to.begin();
-        p_it!=loc_info.points_to.end();
-        p_it++)
+    
+    for(std::size_t i=0; i<loc_info.aliases.size(); i++)
     {
-      out << "  " << pointers[p_it->first] << " = { ";
-
-      for(std::set<unsigned>::const_iterator
-          s_it=p_it->second.objects.begin();
-          s_it!=p_it->second.objects.end();
-          s_it++)
+      if(loc_info.aliases.count(i)!=1 &&
+         loc_info.aliases.find(i)==i) // root?
       {
-        if(s_it!=p_it->second.objects.begin()) out << ", ";
-        out << from_expr(ns, "", objects[*s_it]);
-      }
+        out << '{';
+        for(std::size_t j=0; j<loc_info.aliases.size(); j++)
+          if(loc_info.aliases.find(j)==i)
+          {
+            assert(j<objects.size());
+            out << ' ' << from_expr(ns, "", objects[j]);
+          }
         
-      out << " }";
-      
-      out << "\n";
+        out << " }";
+        out << "\n";
+      }
     }
 
     out << "\n";
