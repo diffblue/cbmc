@@ -76,7 +76,7 @@ void ai_baset::output(
 
     find_state(i_it).output(out, *this, ns);
     out << "\n";
-    #if 0
+    #if 1
     goto_program.output_instruction(ns, identifier, out, i_it);
     out << "\n";
     #endif
