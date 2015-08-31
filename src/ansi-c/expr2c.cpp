@@ -4320,6 +4320,9 @@ std::string expr2ct::convert(
   else if(src.id()==ID_pointer_object)
     return convert_function(src, "POINTER_OBJECT", precedence=16);
 
+  else if(src.id()=="get_must")
+    return convert_function(src, "__CPROVER_get_must", precedence=16);
+
   else if(src.id()=="object_value")
     return convert_function(src, "OBJECT_VALUE", precedence=16);
 
