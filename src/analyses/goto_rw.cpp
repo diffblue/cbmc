@@ -821,11 +821,11 @@ void rw_range_set_value_sett::get_objects_dereference(
     range_start,
     size);
 
-  exprt tmp=deref;
-  dereference(target, tmp, ns, value_sets);
+  exprt object=deref;
+  dereference(target, object, ns, value_sets);
 
   range_spect new_size=
-    to_range_spect(pointer_offset_bits(tmp.type(), ns));
+    to_range_spect(pointer_offset_bits(object.type(), ns));
 
   if(range_start==-1 || new_size<=range_start)
     new_size=-1;
@@ -835,7 +835,8 @@ void rw_range_set_value_sett::get_objects_dereference(
     new_size=std::min(size, new_size);
   }
 
-  get_objects_rec(mode, tmp, range_start, new_size);
+  if(object.is_not_nil() && object!=deref)
+    get_objects_rec(mode, object, range_start, new_size);
 }
 
 /*******************************************************************\
