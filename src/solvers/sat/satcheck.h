@@ -13,8 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#define SATCHECK_ZCHAFF
 //#define SATCHECK_MINISAT1
-#define SATCHECK_MINISAT2
-//#define SATCHECK_GLUCOSE
+//#define SATCHECK_MINISAT2
+#define SATCHECK_GLUCOSE
 //#define SATCHECK_BOOLEFORCE
 //#define SATCHECK_PRECOSAT
 //#define SATCHECK_PICOSAT
