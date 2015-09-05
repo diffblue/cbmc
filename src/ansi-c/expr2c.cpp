@@ -556,7 +556,7 @@ std::string expr2ct::convert_rec(
     }
     else if(followed.id()==ID_union)
     {
-      std::string dest=q+"struct";
+      std::string dest=q+"union";
       const irep_idt &tag=to_union_type(followed).get_tag();
       if(tag!="") dest+=" "+id2string(tag);
       dest+=d;
@@ -634,10 +634,10 @@ std::string expr2ct::convert_rec(
 
     c_qualifierst ret_qualifiers;
     ret_qualifiers.read(code_type.return_type());
-    const typet &return_type=ns.follow(code_type.return_type());
+    const typet &return_type=code_type.return_type();
 
     // return type may be a function pointer or array
-    const typet *non_ptr_type=&return_type;
+    const typet *non_ptr_type=&ns.follow(return_type);
     while(non_ptr_type->id()==ID_pointer)
       non_ptr_type=&(ns.follow(non_ptr_type->subtype()));
 
@@ -738,7 +738,7 @@ std::string expr2ct::convert_typecast(
      from_type.id()==ID_c_bool)
     return convert(src.op(), precedence);
 
-  std::string dest="("+convert(to_type)+")";
+  std::string dest="("+convert(src.type())+")";
 
   unsigned p;
   std::string tmp=convert(src.op(), p);
@@ -4319,6 +4319,9 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_pointer_object)
     return convert_function(src, "POINTER_OBJECT", precedence=16);
+
+  else if(src.id()=="get_must")
+    return convert_function(src, "__CPROVER_get_must", precedence=16);
 
   else if(src.id()=="object_value")
     return convert_function(src, "OBJECT_VALUE", precedence=16);

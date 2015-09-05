@@ -55,7 +55,6 @@ bool is_operand(const exprt &expr, const size_t index)
   const exprt &array=element.array();
   if (ID_symbol != array.id()) return false;
   if (VARS != id2string(to_symbol_expr(array).get_identifier())) return false;
-  //const exprt &element_index=element.index();
   const mp_integer::llong_t var_index=from_index(element.index());
   return var_index >= 0 && static_cast<size_t>(var_index) == index;
 }
@@ -171,10 +170,17 @@ class handle_stept
   exprt::operandst variables;
   const goto_functionst &gf;
 
+  bool handle_const_assignment(const std::string &name, const exprt &value)
+  {
+    return result.constants.insert(std::make_pair(name, value)).second;
+  }
+
   bool handle_variables_assignment(const goto_trace_stept &step)
   {
     if (goto_trace_stept::ASSIGNMENT != step.type) return false;
     const std::string &lhs=id2string(step.lhs_object.get_identifier());
+    if (std::string::npos != lhs.find(CPROVER_SYNTHESIS_TMPVAR_PREFIX))
+      return handle_const_assignment(lhs, step.full_lhs_value);
     if (std::string::npos == lhs.find(VARS)) return false;
     const constant_exprt &value=to_constant_expr(step.full_lhs_value);
     const address_of_exprt &ptr=to_address_of_expr(value.op0());
@@ -197,10 +203,11 @@ public:
     if (SYNTHESIS_PROG != lhs.substr(0, SYNTHESIS_PROG_PREFIX_LEN)) return;
     if (is_size(lhs)) return;
     const std::string function_name=lhs.substr(SYNTHESIS_PROG_PREFIX_LEN);
-    assert(result.end() == result.find(function_name));
+    candidate_factoryt::candidatet::bodiest &bodies=result.bodies;
+    assert(bodies.end() == bodies.find(function_name));
     const array_exprt &value=to_array_expr(step.full_lhs_value);
     const array_exprt::operandst &instrs=value.operands();
-    goto_programt::instructionst &body=result[function_name];
+    goto_programt::instructionst &body=bodies[function_name];
     const instruction_convertert convert_to_instr(gf, variables, body);
     std::for_each(instrs.begin(), instrs.end(), convert_to_instr);
   }
@@ -212,5 +219,5 @@ bool candidate_factoryt::operator ()() const
   const goto_tracet::stepst &steps=goto_trace.steps;
   const handle_stept handle_step(result, gf);
   std::for_each(steps.begin(), steps.end(), handle_step);
-  return !result.empty();
+  return !result.bodies.empty();
 }

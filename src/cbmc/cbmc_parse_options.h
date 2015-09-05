@@ -22,22 +22,23 @@ class optionst;
 
 #define CBMC_OPTIONS \
   "(program-only)(function):(preprocess)(slice-by-trace):" \
-  "(no-simplify)(unwind):(unwindset):(slice-formula)" \
+  "(no-simplify)(unwind):(unwindset):(slice-formula)(full-slice)" \
   "(unwind-max):(unwind-min):" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
   "D:I:" \
+  "(classpath):" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
   "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)(nan-check)" \
   "(no-assertions)(no-assumptions)" \
   "(xml-ui)(xml-interface)(vcd):" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
-  "(cegis)(cegis-root):(cegis-targets):(cegis-max-prog-size):" \
+  "(cegis)(cegis-root):(cegis-targets):(cegis-max-prog-size):(cegis-skolem):(cegis-ranking):" \
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
   "(floatbv)(fixedbv)" \
-  "(dimacs)(refine)(max-node-refinement)(refine-arrays)(refine-arithmetic):(aig)" \
+  "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)(aig)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-loops)" \
@@ -49,7 +50,7 @@ class optionst;
   "(incremental-check):(incremental)(earliest-loop-exit)" \
   "(ignore-assertions-before-unwind-min)(stop-when-unsat)" \
   "(magic-numbers)" \
-  "(cover-assertions)(cover):" \
+  "(cover):" \
   "(mm):" \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \
   "(ppc-macos)(unsigned-char)" \

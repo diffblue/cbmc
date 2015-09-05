@@ -20,6 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
  * @param msg
  */
 void add_cegis_library(class symbol_tablet &symbol_table,
-    class goto_functionst &goto_functions, class ui_message_handlert &msg);
+    class goto_functionst &goto_functions, class message_handlert &msg);
 
 #endif /* CEGIS_CEGIS_LIBRARY_H_ */

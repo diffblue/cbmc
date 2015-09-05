@@ -42,15 +42,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cegis/facade/cegis.h>
 #include <cegis/options/cegis_options.h>
 
+#include <goto-instrument/full_slicer.h>
+
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/goto_check.h>
 
 #include <langapi/mode.h>
-
-#include <solvers/prop/prop_conv.h>
-#include <solvers/sat/satcheck.h>
-#include <solvers/sat/satcheck_minisat2.h>
 
 #include "cbmc_solvers.h"
 #include "cbmc_parse_options.h"
@@ -553,14 +551,6 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("test-preprocessor"))
     return test_c_preprocessor(ui_message_handler)?8:0;
   
-  //get solver
-  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
-  cbmc_solvers.set_ui(get_ui());
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = cbmc_solvers.get_solver();
-  prop_convt& prop_conv = cbmc_solver->prop_conv();
-
-  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
-  
   if(cmdline.isset("preprocess"))
   {
     preprocessing();
@@ -568,6 +558,27 @@ int cbmc_parse_optionst::doit()
   }
 
   goto_functionst goto_functions;
+
+  // get solver
+  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
+  cbmc_solvers.set_ui(get_ui());
+
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
+  
+  try
+  {
+    cbmc_solver=cbmc_solvers.get_solver();
+  }
+  
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
+    return 1;
+  }
+
+  prop_convt &prop_conv=cbmc_solver->prop_conv();
+
+  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
 
   int get_goto_program_ret=
     get_goto_program(options, bmc, goto_functions);
@@ -606,7 +617,7 @@ int cbmc_parse_optionst::doit()
       options.set_option("function", cmdline.get_value("function"));
     const cegis_optionst cegis_options(cmdline, options);
     symex_learnt learning_algorithm(cegis_options, symbol_table, goto_functions, ui_message_handler);
-    bmc_verification_oraclet verification_oracle(options, symbol_table, goto_functions, ui_message_handler);
+    bmc_verification_oraclet verification_oracle(options, symbol_table, goto_functions);
     return run_cegis(learning_algorithm, verification_oracle, result());
   }
 
@@ -915,6 +926,13 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
 
+    // full slice?
+    if(cmdline.isset("full-slice"))
+    {
+      status() << "Performing a full slice" << eom;
+      full_slicer(goto_functions, ns);
+    }
+  
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);

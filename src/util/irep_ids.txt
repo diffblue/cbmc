@@ -575,6 +575,8 @@ c_enum_tag
 enum_constant
 bit_select
 part_select
+indexed_part_select_plus
+indexed_part_select_minus
 generate_block
 generate_assign
 generate_skip

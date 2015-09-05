@@ -19,11 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 namespace {
 const char EXECUTE[]="__CPROVER_synthesis_execute";
 
-symbol_typet get_instr_type()
-{
-  return symbol_typet(SYNTHESIS_INSTR_TYPE_SYMBOL_NAME);
-}
-
 void add_synthesis_placeholder(symbol_tablet &symbol_table)
 {
   if (symbol_table.has_symbol(EXECUTE)) return;
@@ -44,7 +39,7 @@ void add_synthesis_placeholder(symbol_tablet &symbol_table)
 }
 
 void add_cegis_library(symbol_tablet &symbol_table,
-    goto_functionst &goto_functions, ui_message_handlert &msg)
+    goto_functionst &goto_functions, message_handlert &msg)
 {
   std::set<irep_idt> synthesis_library;
   synthesis_library.insert(EXECUTE);

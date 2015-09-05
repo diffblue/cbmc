@@ -289,6 +289,7 @@ void goto_symex_statet::assignment(
   symbol_exprt &lhs, // L0/L1
   const exprt &rhs,  // L2
   const namespacet &ns,
+  bool rhs_is_simplified,
   bool record_value)
 {
   assert(lhs.id()==ID_symbol);
@@ -332,7 +333,7 @@ void goto_symex_statet::assignment(
     symbol_exprt l1_lhs(l1_identifier, lhs.type());
     level2.get_original_name(l1_lhs.type());
 
-    value_set.assign(l1_lhs, l1_rhs, ns, is_shared);  
+    value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
   }
   
   #if 0
@@ -580,7 +581,11 @@ bool goto_symex_statet::l2_thread_read_encoding(
       read_guard|=*it;
     }
 
-    if_exprt tmp(or_exprt(no_write.op(), read_guard.as_expr()), ssa_l1, ssa_l1);
+    exprt cond=read_guard.as_expr();
+    if(!no_write.op().is_false())
+      cond=or_exprt(no_write.op(), cond);
+
+    if_exprt tmp(cond, ssa_l1, ssa_l1);
     level2(to_symbol_expr(tmp.true_case()));
 
     if(a_s_read.second.empty())
@@ -592,9 +597,15 @@ bool goto_symex_statet::l2_thread_read_encoding(
     to_symbol_expr(tmp.false_case()).set_identifier(
       level2.name(l1_identifier, a_s_read.first));
 
+    if(cond.is_false())
+    {
+      exprt t=tmp.false_case();
+      t.swap(tmp);
+    }
+
     const bool record_events_bak=record_events;
     record_events=false;
-    assignment(expr, tmp, ns, true);
+    assignment(expr, tmp, ns, true, true);
     record_events=record_events_bak;
 
     symbol_exprt lhs=ns.lookup(orig_identifier).symbol_expr();

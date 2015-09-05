@@ -117,11 +117,18 @@ public:
   {
     std::list<std::string> include_paths;
   } verilog;
+  
+  struct javat
+  {
+    std::list<std::string> class_path;
+  } java;
 
   // this is the function to start executing
   std::string main;
   
   bool set(const cmdlinet &cmdline);
+  
+  void set_classpath(const std::string &cp);
   
   static irep_idt this_architecture();
   static irep_idt this_operating_system();

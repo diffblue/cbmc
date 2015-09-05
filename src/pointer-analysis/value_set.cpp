@@ -31,7 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_set.h"
 #include "add_failed_symbols.h"
 
-const value_sett::object_map_dt value_sett::object_map_dt::empty;
+const value_sett::object_map_dt value_sett::object_map_dt::blank;
 object_numberingt value_sett::object_numbering;
    
 /*******************************************************************\
@@ -351,19 +351,21 @@ Function: value_sett::eval_pointer_offset
 
 \*******************************************************************/
 
-void value_sett::eval_pointer_offset(
+bool value_sett::eval_pointer_offset(
   exprt &expr,
   const namespacet &ns) const
 {
+  bool mod=false;
+
   if(expr.id()==ID_pointer_offset)
   {
     assert(expr.operands().size()==1);
 
     object_mapt reference_set;
-    get_value_set(expr.op0(), reference_set, ns);
+    get_value_set(expr.op0(), reference_set, ns, true);
 
     exprt new_expr;
-    new_expr.make_nil();
+    mp_integer previous_offset=0;
 
     const object_map_dt &object_map=reference_set.read();
     for(object_map_dt::const_iterator
@@ -371,35 +373,35 @@ void value_sett::eval_pointer_offset(
         it!=object_map.end();
         it++)
       if(!it->second.offset_is_set)
-        return;
+        return false;
       else
       {
         const exprt &object=object_numbering[it->first];
         mp_integer ptr_offset=compute_pointer_offset(object, ns);
-        exprt offset=from_integer(it->second.offset, index_type());
 
-        if(ptr_offset<0 || offset.id()!=ID_constant)
-          return;
+        if(ptr_offset<0)
+          return false;
 
-        plus_exprt offset_sum(
-          offset,
-          from_integer(ptr_offset, index_type()));
-        simplify(offset_sum, ns);
+        ptr_offset+=it->second.offset;
 
-        if(new_expr.is_not_nil() && offset_sum!=new_expr)
-          return;
+        if(mod && ptr_offset!=previous_offset)
+          return false;
 
-        new_expr=offset_sum;
+        new_expr=from_integer(ptr_offset, index_type());
+        previous_offset=ptr_offset;
+        mod=true;
       }
 
-    if(new_expr.is_not_nil())
+    if(mod)
       expr.swap(new_expr);
   }
   else
   {
     Forall_operands(it, expr)
-      eval_pointer_offset(*it, ns);
+      mod=eval_pointer_offset(*it, ns) || mod;
   }
+
+  return mod;
 }
 
 /*******************************************************************\
@@ -420,7 +422,7 @@ void value_sett::get_value_set(
   const namespacet &ns) const
 {
   object_mapt object_map;
-  get_value_set(expr, object_map, ns);
+  get_value_set(expr, object_map, ns, false);
   
   for(object_map_dt::const_iterator
       it=object_map.read().begin();
@@ -449,10 +451,11 @@ Function: value_sett::get_value_set
 void value_sett::get_value_set(
   const exprt &expr,
   object_mapt &dest,
-  const namespacet &ns) const
+  const namespacet &ns,
+  bool is_simplified) const
 {
   exprt tmp(expr);
-  simplify(tmp, ns);
+  if(!is_simplified) simplify(tmp, ns);
 
   get_value_set_rec(tmp, dest, "", tmp.type(), ns);
 }
@@ -517,6 +520,8 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_symbol)
   {
+    irep_idt identifier=to_symbol_expr(expr).get_identifier();
+    
     // is it a pointer, integer, array or struct?
     if(expr_type.id()==ID_pointer ||
        expr_type.id()==ID_signedbv ||
@@ -527,7 +532,7 @@ void value_sett::get_value_set_rec(
     {
       // look it up
       valuest::const_iterator v_it=
-        values.find(expr.get_string(ID_identifier)+suffix);
+        values.find(id2string(identifier)+suffix);
 
       // try first component name as suffix if not yet found
       if(v_it==values.end() &&
@@ -541,12 +546,12 @@ void value_sett::get_value_set_rec(
           struct_union_type.components().front().get_string(ID_name);
 
         v_it=values.find(
-            expr.get_string(ID_identifier)+"."+first_component_name+suffix);
+            id2string(identifier)+"."+first_component_name+suffix);
       }
 
       // not found? try without suffix
       if(v_it==values.end())
-        v_it=values.find(expr.get_string(ID_identifier));
+        v_it=values.find(identifier);
         
       if(v_it!=values.end())
         make_union(dest, v_it->second.object_map);
@@ -914,11 +919,12 @@ void value_sett::get_value_set_rec(
     bool found=false;
 
     exprt op1=expr.op1();
-    eval_pointer_offset(op1, ns);
-    simplify(op1, ns);
+    if(eval_pointer_offset(op1, ns))
+      simplify(op1, ns);
 
+    mp_integer op1_offset;
     const typet &op0_type=ns.follow(expr.op0().type());
-    if(op1.id()==ID_constant && op0_type.id()==ID_struct)
+    if(!to_integer(op1, op1_offset) && op0_type.id()==ID_struct)
     {
       const struct_typet &struct_type=to_struct_type(op0_type);
 
@@ -929,22 +935,31 @@ void value_sett::get_value_set_rec(
       {
         const irep_idt &name=c_it->get_name();
 
-        exprt offset=member_offset_expr(struct_type, name, ns);
-        if(offset.is_nil())
-          continue;
+        mp_integer comp_offset=member_offset(struct_type, name, ns);
 
-        equal_exprt eq(offset, op1);
-        simplify(eq, ns);
-
-        if(!eq.is_true())
+        if(comp_offset>op1_offset)
+          break;
+        else if(comp_offset!=op1_offset)
           continue;
 
         found=true;
 
-        member_exprt member(c_it->type());
-        member.set_component_name(name);
-        member.struct_op()=expr.op0();
+        member_exprt member(expr.op0(), name, c_it->type());
+        get_value_set_rec(member, dest, suffix, original_type, ns);
+      }
+    }
+    
+    if(op0_type.id()==ID_union)
+    {
+      const union_typet &union_type=to_union_type(op0_type);
 
+      // just collect them all
+      for(union_typet::componentst::const_iterator
+          c_it=union_type.components().begin();
+          c_it!=union_type.components().end(); c_it++)
+      {
+        const irep_idt &name=c_it->get_name();
+        member_exprt member(expr.op0(), name, c_it->type());
         get_value_set_rec(member, dest, suffix, original_type, ns);
       }
     }
@@ -1227,6 +1242,7 @@ void value_sett::assign(
   const exprt &lhs,
   const exprt &rhs,
   const namespacet &ns,
+  bool is_simplified,
   bool add_to_sets)
 {
   #if 0
@@ -1242,7 +1258,7 @@ void value_sett::assign(
   {
     const struct_union_typet &struct_union_type=
       to_struct_union_type(type);
-    
+      
     for(struct_union_typet::componentst::const_iterator
         c_it=struct_union_type.components().begin();
         c_it!=struct_union_type.components().end();
@@ -1275,7 +1291,7 @@ void value_sett::assign(
 
         rhs_member=make_member(rhs, name, ns);
       
-        assign(lhs_member, rhs_member, ns, add_to_sets);
+        assign(lhs_member, rhs_member, ns, is_simplified, add_to_sets);
       }
     }
   }
@@ -1287,7 +1303,7 @@ void value_sett::assign(
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
     {
-      assign(lhs_index, exprt(rhs.id(), type.subtype()), ns, add_to_sets);
+      assign(lhs_index, exprt(rhs.id(), type.subtype()), ns, is_simplified, add_to_sets);
     }
     else
     {
@@ -1299,14 +1315,14 @@ void value_sett::assign(
       if(rhs.id()==ID_array_of)
       {
         assert(rhs.operands().size()==1);
-        assign(lhs_index, rhs.op0(), ns, add_to_sets);
+        assign(lhs_index, rhs.op0(), ns, is_simplified, add_to_sets);
       }
       else if(rhs.id()==ID_array ||
               rhs.id()==ID_constant)
       {
         forall_operands(o_it, rhs)
         {
-          assign(lhs_index, *o_it, ns, add_to_sets);
+          assign(lhs_index, *o_it, ns, is_simplified, add_to_sets);
           add_to_sets=true;
         }
       }
@@ -1317,14 +1333,14 @@ void value_sett::assign(
         exprt op0_index(ID_index, type.subtype());
         op0_index.copy_to_operands(rhs.op0(), exprt(ID_unknown, index_type()));
 
-        assign(lhs_index, op0_index, ns, add_to_sets);
-        assign(lhs_index, rhs.op2(), ns, true);
+        assign(lhs_index, op0_index, ns, is_simplified, add_to_sets);
+        assign(lhs_index, rhs.op2(), ns, is_simplified, true);
       }
       else
       {
         exprt rhs_index(ID_index, type.subtype());
         rhs_index.copy_to_operands(rhs, exprt(ID_unknown, index_type()));
-        assign(lhs_index, rhs_index, ns, true);
+        assign(lhs_index, rhs_index, ns, is_simplified, true);
       }
     }
   }
@@ -1332,7 +1348,7 @@ void value_sett::assign(
   {
     // basic type
     object_mapt values_rhs;
-    get_value_set(rhs, values_rhs, ns);
+    get_value_set(rhs, values_rhs, ns, is_simplified);
     
     assign_rec(lhs, values_rhs, "", ns, add_to_sets);
   }
@@ -1360,7 +1376,7 @@ void value_sett::do_free(
 
   // find out what it points to    
   object_mapt value_set;
-  get_value_set(op, value_set, ns);
+  get_value_set(op, value_set, ns, false);
   
   const object_map_dt &object_map=value_set.read();
   
@@ -1605,7 +1621,7 @@ void value_sett::do_function_call(
   {
     const std::string identifier="value_set::dummy_arg_"+i2string(i);
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
-    assign(dummy_lhs, arguments[i], ns, false);
+    assign(dummy_lhs, arguments[i], ns, false, false);
   }
 
   // now assign to 'actual actuals'
@@ -1624,7 +1640,7 @@ void value_sett::do_function_call(
       symbol_exprt("value_set::dummy_arg_"+i2string(i), it->type());
     
     exprt actual_lhs=symbol_exprt(identifier, it->type());
-    assign(actual_lhs, v_expr, ns, true);
+    assign(actual_lhs, v_expr, ns, true, true);
     i++;
   }
 
@@ -1651,7 +1667,7 @@ void value_sett::do_end_function(
 
   symbol_exprt rhs("value_set::return_value", lhs.type());
 
-  assign(lhs, rhs, ns);
+  assign(lhs, rhs, ns, false, false);
 }
 
 /*******************************************************************\
@@ -1670,8 +1686,8 @@ void value_sett::apply_code(
   const codet &code,
   const namespacet &ns)
 {
-  const irep_idt &statement=code.get(ID_statement);
-
+  const irep_idt &statement=code.get_statement();
+  
   if(statement==ID_block)
   {
     forall_operands(it, code)
@@ -1688,7 +1704,7 @@ void value_sett::apply_code(
     if(code.operands().size()!=2)
       throw "assignment expected to have two operands";
 
-    assign(code.op0(), code.op1(), ns);
+    assign(code.op0(), code.op1(), ns, false, false);
   }
   else if(statement==ID_decl)
   {
@@ -1714,10 +1730,10 @@ void value_sett::apply_code(
         address_of_exprt address_of_expr;
         address_of_expr.object()=failed;
         address_of_expr.type()=lhs.type();
-        assign(lhs, address_of_expr, ns);
+        assign(lhs, address_of_expr, ns, false, false);
       }
       else
-        assign(lhs, exprt(ID_invalid), ns);
+        assign(lhs, exprt(ID_invalid), ns, false, false);
     }
   }
   else if(statement=="specc_notify" ||
@@ -1765,7 +1781,7 @@ void value_sett::apply_code(
     if(code.operands().size()==1)
     {
       symbol_exprt lhs("value_set::return_value", code.op0().type());
-      assign(lhs, code.op0(), ns);
+      assign(lhs, code.op0(), ns, false, false);
     }
   }
   else if(statement==ID_array_set)
@@ -1835,7 +1851,7 @@ void value_sett::guard(
     address_of_exprt address_of(dynamic_object);
     address_of.type()=expr.op0().type();
 
-    assign(expr.op0(), address_of, ns);
+    assign(expr.op0(), address_of, ns, false, false);
   }
 }
 

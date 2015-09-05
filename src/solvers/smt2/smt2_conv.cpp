@@ -247,6 +247,7 @@ Function: smt2_convt::dec_solve
 decision_proceduret::resultt smt2_convt::dec_solve()
 {
   write_footer(out);
+  out.flush();
   return decision_proceduret::D_ERROR;
 }
 

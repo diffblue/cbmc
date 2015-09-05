@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/expr_util.h>
 
+#include "is_threaded.h"
+
 #include "ai.h"
 
 /*******************************************************************\
@@ -74,7 +76,7 @@ void ai_baset::output(
 
     find_state(i_it).output(out, *this, ns);
     out << "\n";
-    #if 0
+    #if 1
     goto_program.output_instruction(ns, identifier, out, i_it);
     out << "\n";
     #endif
@@ -260,6 +262,9 @@ bool ai_baset::visit(
     }
     else
     {
+      // initialize state, if necessary
+      get_state(to_l);
+
       new_values.transform(l, to_l, *this, ns);
     
       if(merge(new_values, l, to_l))
@@ -295,25 +300,48 @@ bool ai_baset::do_function_call(
   const exprt::operandst &arguments,
   const namespacet &ns)
 {
+  // initialize state, if necessary
+  get_state(l_return);
+
   const goto_functionst::goto_functiont &goto_function=
     f_it->second;
 
   if(!goto_function.body_available)
-    return false; // do nothing, no change
+  {
+    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
+    tmp_state->transform(l_call, l_return, *this, ns);
+
+    return merge(*tmp_state, l_call, l_return);
+  }
     
   assert(!goto_function.body.instructions.empty());
   
   {
     // get the state at the beginning of the function
     locationt l_begin=goto_function.body.instructions.begin();
+    // initialize state, if necessary
+    get_state(l_begin);
     
     // do the edge from the call site to the beginning of the function
-    std::unique_ptr<statet> state(make_temporary_state(get_state(l_call)));
+    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
+    tmp_state->transform(l_call, l_begin, *this, ns);
 
-    state->transform(l_call, l_begin, *this, ns);
-    
+    bool new_data=false;
+
     // merge the new stuff
-    if(merge(*state, l_call, l_begin))
+    if(merge(*tmp_state, l_call, l_begin))
+      new_data=true;
+
+    // do each function at least once
+    if(functions_done.find(f_it->first)==
+       functions_done.end())
+    {
+      new_data=true;
+      functions_done.insert(f_it->first);
+    }
+
+    // do we need to do the fixedpoint of the body?
+    if(new_data)
     {
       // also do the fixedpoint of the body via a recursive call
       fixedpoint(goto_function.body, goto_functions, ns);
@@ -326,15 +354,13 @@ bool ai_baset::do_function_call(
     assert(l_end->is_end_function());
 
     // do edge from end of function to instruction after call
-    locationt l_next=l_call;
-    l_next++;
+    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_end)));
+    tmp_state->transform(l_end, l_return, *this, ns);
 
-    std::unique_ptr<statet> state(make_temporary_state(get_state(l_end)));
-
-    state->transform(l_end, l_next, *this, ns);
-
-    // Propagate those -- not exceedingly precise, this is.
-    return merge(*state, l_end, l_next);
+    // Propagate those -- not exceedingly precise, this is,
+    // as still it contains all the state from the
+    // call site
+    return merge(*tmp_state, l_end, l_return);
   }
 }    
 
@@ -436,7 +462,7 @@ bool ai_baset::do_function_call_rec(
 
 /*******************************************************************\
 
-Function: ai_baset::fixedpoint
+Function: ai_baset::sequential_fixedpoint
 
   Inputs:
 
@@ -446,7 +472,7 @@ Function: ai_baset::fixedpoint
 
 \*******************************************************************/
 
-void ai_baset::fixedpoint(
+void ai_baset::sequential_fixedpoint(
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
@@ -458,3 +484,83 @@ void ai_baset::fixedpoint(
       it++)
     fixedpoint(it->second.body, goto_functions, ns);
 }
+
+/*******************************************************************\
+
+Function: ai_baset::concurrent_fixedpoint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ai_baset::concurrent_fixedpoint(
+  const goto_functionst &goto_functions,
+  const namespacet &ns)
+{
+  sequential_fixedpoint(goto_functions, ns);
+
+  is_threadedt is_threaded(goto_functions);
+
+  // construct an initial shared state collecting the results of all
+  // functions
+  goto_programt tmp;
+  tmp.add_instruction();
+  goto_programt::const_targett sh_target=tmp.instructions.begin();
+  statet &shared_state=get_state(sh_target);
+
+  typedef std::list<std::pair<goto_programt const*,
+                              goto_programt::const_targett> > thread_wlt;
+  thread_wlt thread_wl;
+
+  forall_goto_functions(it, goto_functions)
+    forall_goto_program_instructions(t_it, it->second.body)
+    {
+      if(is_threaded(t_it))
+      {
+        thread_wl.push_back(std::make_pair(&(it->second.body), t_it));
+
+        goto_programt::const_targett l_end=
+          it->second.body.instructions.end();
+        --l_end;
+
+        merge_shared(shared_state, l_end, sh_target, ns);
+      }
+    }
+
+  // now feed in the shared state into all concurrently executing
+  // functions, and iterate until the shared state stabilizes
+  bool new_shared=true;
+  while(new_shared)
+  {
+    new_shared=false;
+
+    for(thread_wlt::const_iterator it=thread_wl.begin();
+        it!=thread_wl.end();
+        ++it)
+    {
+      working_sett working_set;
+      put_in_working_set(working_set, it->second);
+
+      statet &begin_state=get_state(it->second);
+      merge(begin_state, sh_target, it->second);
+
+      while(!working_set.empty())
+      {
+        goto_programt::const_targett l=get_next(working_set);
+
+        visit(l, working_set, *(it->first), goto_functions, ns);
+
+        // the underlying domain must make sure that the final state
+        // carries all possible values; otherwise we would need to
+        // merge over each and every state
+        if(l->is_end_function())
+          new_shared|=merge_shared(shared_state, l, sh_target, ns);
+      }
+    }
+  }
+}
+

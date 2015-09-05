@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/string2int.h>
 #include <util/i2string.h>
-#include <util/string2int.h>
+#include <util/string2int.h> 
 #include <util/location.h>
 #include <util/time_stopping.h>
 #include <util/message_stream.h>
@@ -36,12 +36,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_tso.h>
 #include <goto-symex/memory_model_pso.h>
 
-#include <solvers/sat/satcheck_minisat2.h>
-
-#include "bmc.h"
-#include "bv_cbmc.h"
-#include "dimacs.h"
 #include "counterexample_beautification.h"
+#include "bmc.h"
+#include "dimacs.h"
 
 /*******************************************************************\
 
@@ -55,8 +52,7 @@ Function: bmct::do_unwind_module
 
 \*******************************************************************/
 
-void bmct::do_unwind_module(
-  decision_proceduret &decision_procedure)
+void bmct::do_unwind_module()
 {
 }
 
@@ -72,7 +68,7 @@ Function: bmct::error_trace
 
 \*******************************************************************/
 
-void bmct::error_trace(const prop_convt &prop_conv)
+void bmct::error_trace()
 {
   if(options.get_bool_option("stop-when-unsat")) return; 
 
@@ -141,10 +137,10 @@ Function: bmct::do_conversion
 
 \*******************************************************************/
 
-void bmct::do_conversion(prop_convt &prop_conv)
+void bmct::do_conversion()
 {
   // convert HDL
-  do_unwind_module(prop_conv);
+  do_unwind_module();
 
   // convert SSA
   equation.convert(prop_conv);
@@ -182,7 +178,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   statistics() << "converted: " <<  equation.count_converted_SSA_steps() << eom;
 #endif
   
-  do_conversion(prop_conv);  
+  do_conversion();
 
 #if 0
   statistics() << "ignored: " <<  equation.count_ignored_SSA_steps() << eom;
@@ -412,6 +408,14 @@ safety_checkert::resultt bmct::run(
 
       try
       {
+        if(options.get_option("cover")=="")
+        {
+          simple_slice(equation);
+          statistics() << "simple slicing removed "
+                       << equation.count_ignored_SSA_steps()
+                       << " assignments" << eom;
+        }
+
         if(options.get_option("slice-by-trace")!="")
         {
           symex_slice_by_tracet symex_slice_by_trace(ns);
@@ -458,24 +462,13 @@ safety_checkert::resultt bmct::run(
 	if(options.get_bool_option("show-vcc"))
 	{
 	  show_vcc();
-	  if(!symex.is_incremental) 
-            return safety_checkert::SAFE; // to indicate non-error
+	  return safety_checkert::SAFE; // to indicate non-error
 	}
-  
+    
 	if(options.get_option("cover")!="")
 	{
-	  satcheckt satcheck;
-	  satcheck.set_message_handler(get_message_handler());
-	  bv_cbmct bv_cbmc(ns, satcheck);
-	  bv_cbmc.set_message_handler(get_message_handler());
-
-	  if(options.get_option("arrays-uf")=="never")
-	    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-	  else if(options.get_option("arrays-uf")=="always")
-	    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-        
 	  std::string criterion=options.get_option("cover");
-	  return cover(goto_functions, bv_cbmc, criterion)?
+	  return cover(goto_functions, criterion)?
 	    safety_checkert::ERROR:safety_checkert::SAFE;
 	}
 
@@ -488,7 +481,7 @@ safety_checkert::resultt bmct::run(
             //at this point all other assertions have been checked
 	    if(symex.add_loop_check())
 	    {
-              bool result = !decide(symex.prop_conv,false);
+              bool result = !decide(goto_functions,symex.prop_conv,false);
               if(options.get_bool_option("earliest-loop-exit"))
                 result = !result;
               symex.update_loop_info(result);
@@ -508,7 +501,7 @@ safety_checkert::resultt bmct::run(
         {
          if(symex.remaining_vccs>0)
 	  {
-             verification_result = decide(symex.prop_conv);
+             verification_result = decide(goto_functions,symex.prop_conv);
             if(options.get_bool_option("stop-when-unsat") ? 
                !verification_result : //verification succeeds, exit
                verification_result)  //bug found, exit
@@ -520,17 +513,13 @@ safety_checkert::resultt bmct::run(
             //at this point all other assertions have been checked
             if(symex.add_loop_check())
 	    {
-              symex.update_loop_info(!decide(symex.prop_conv,false));
+              symex.update_loop_info(
+		!decide(goto_functions,symex.prop_conv,false));
 	    }
 	  }
 	}
       }
       catch(std::string &error_str)
-      {
-        error() << error_str << eom;
-        return safety_checkert::ERROR;
-      }
-      catch(const char *error_str)
       {
         error() << error_str << eom;
         return safety_checkert::ERROR;
@@ -569,14 +558,14 @@ Function: bmct::decide
 
 \*******************************************************************/
 
-safety_checkert::resultt bmct::decide(prop_convt &prop_conv, bool show_report)
+safety_checkert::resultt bmct::decide(
+  const goto_functionst &goto_functions,
+  prop_convt &prop_conv, bool show_report)
 {
   prop_conv.set_message_handler(get_message_handler());
- 
-  if(options.get_bool_option("dimacs")) {
-    do_conversion(prop_conv);
-    return write_dimacs(prop_conv);
-  }
+
+  if(options.get_bool_option("all-properties"))
+    return all_properties(goto_functions, prop_conv);
 
   switch(run_decision_procedure(prop_conv))
   {
@@ -585,37 +574,22 @@ safety_checkert::resultt bmct::decide(prop_convt &prop_conv, bool show_report)
     return safety_checkert::SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
-    if(options.get_bool_option("beautify")) {
-      bv_cbmct& bv_cbmc = dynamic_cast<bv_cbmct&>(prop_conv);
+    if(options.get_bool_option("beautify"))
       counterexample_beautificationt()(
-        bv_cbmc, equation, ns);
-    }
-    if(show_report) error_trace(prop_conv);
+        dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
+  
+    if(show_report) error_trace();
     report_failure();
     return safety_checkert::UNSAFE;
 
   default:
+    if(options.get_bool_option("dimacs") ||
+       options.get_option("outfile")!="")
+      return ERROR;
+      
     error() << "decision procedure failed" << eom;
     return safety_checkert::ERROR;
   }
-}
-
-/*******************************************************************\
-
-Function: bmct::write_dimacs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-safety_checkert::resultt bmct::write_dimacs(prop_convt& prop_conv) {
-  return dynamic_cast<dimacst&>(prop_conv).write_dimacs(
-    options.get_option("outfile")) ? 
-    safety_checkert::ERROR : safety_checkert::SAFE;
 }
 
 /*******************************************************************\

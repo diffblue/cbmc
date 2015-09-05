@@ -39,8 +39,8 @@ arrayst::arrayst(
   const namespacet &_ns,
   propt &_prop):equalityt(_ns, _prop)
 {
-  lazy_arrays = false; 		// will be set to true when --refine is used
-  incremental_cache = true;	// used for the 2ls tool
+  lazy_arrays = false;        // will be set to true when --refine is used
+  incremental_cache = false;  // for incremental solving
 }
 
 /*******************************************************************\
@@ -141,11 +141,11 @@ void arrayst::collect_indices(const exprt &expr)
     if(array_op_type.id()==ID_array)
     {
       const array_typet &array_type=
-	to_array_type(array_op_type);
+        to_array_type(array_op_type);
 
       if(is_unbounded_array(array_type))
       {
-	record_array_index(e);
+        record_array_index(e);
       }
     }
   }
@@ -190,7 +190,7 @@ void arrayst::collect_arrays(const exprt &a)
     index_expr.index()=a.op1();
     record_array_index(index_expr);
   }
-  else if(a.id()==ID_update)
+  else if(a.id()==ID_update) //TODO: is this obsolete?
   {
     if(a.operands().size()!=3)
       throw "update expected to have three operands";
@@ -205,14 +205,14 @@ void arrayst::collect_arrays(const exprt &a)
     arrays.make_union(a, a.op0());
     collect_arrays(a.op0());
     
+#if 0
     // make sure this shows as an application
-    #if 0
     index_exprt index_expr;
     index_expr.type()=array_type.subtype();
     index_expr.array()=a.op0();
     index_expr.index()=a.op1();
     record_array_index(index_expr);
-    #endif
+#endif
   }
   else if(a.id()==ID_if)
   {
@@ -289,35 +289,32 @@ void arrayst::collect_arrays(const exprt &a)
 
 Function: arrayst::add_array_constraint
 
-  Inputs:
+  Inputs: 
 
  Outputs:
 
- Purpose: Lazily adding array constraints for the refinement loop.
+ Purpose: adds array constraints 
+          (refine=true...lazily for the refinement loop)
 
 \*******************************************************************/
 
 
 void arrayst::add_array_constraint(const lazy_constraintt &lazy, bool refine)
 {
-  if (lazy_arrays)
+  if (lazy_arrays && refine)
   {
     // lazily add the constraint
     if (incremental_cache)
     {
-      if (expr_map.find(lazy.lazy) == expr_map.end()) {
-	if (!refine) prop.l_set_to_true(convert(lazy.lazy));
-	else
-	{
-	  lazy_array_constraints.push_back(lazy);
-	  expr_map[lazy.lazy] = true;
-	}
+      if (expr_map.find(lazy.lazy) == expr_map.end()) 
+      {
+        lazy_array_constraints.push_back(lazy);
+        expr_map[lazy.lazy] = true;
       }
     }
     else
     {
-      if (!refine) prop.l_set_to_true(convert(lazy.lazy));
-      else lazy_array_constraints.push_back(lazy);
+      lazy_array_constraints.push_back(lazy);
     }
   }
   else
@@ -359,18 +356,17 @@ void arrayst::add_array_constraints()
   }
 
   // add constraints for equalities
-      for(array_equalitiest::const_iterator it=
-          array_equalities.begin();
-          it!=array_equalities.end();
-          it++)
-      {
+  for(array_equalitiest::const_iterator it=
+	array_equalities.begin();
+      it!=array_equalities.end();
+      it++)
+  {
+    add_array_constraints(
+      index_map[arrays.find_number(it->f1)],
+      *it);
 
-    	add_array_constraints(
-          index_map[arrays.find_number(it->f1)],
-          *it);
-	
-        // update_index_map should not be necessary here
-      }
+    // update_index_map should not be necessary here
+  }
     
   // add the Ackermann constraints
   add_array_Ackermann_constraints();
@@ -429,12 +425,11 @@ void arrayst::add_array_Ackermann_constraints()
           index_exprt index_expr2=index_expr1;
           index_expr2.index()=*i2;
 
-          
           equal_exprt values_equal(index_expr1, index_expr2);
-          convert(values_equal);
 
-          lazy_constraintt lazy(ARRAY_ACKERMANN, implies_exprt(indices_equal, values_equal));
-          add_array_constraint(lazy);
+          lazy_constraintt lazy(ARRAY_ACKERMANN, 
+                                implies_exprt(indices_equal, values_equal));
+          add_array_constraint(lazy, true); //added lazily
         }
   }
 }
@@ -473,7 +468,8 @@ void arrayst::update_index_map()
     root_index_set.insert(index_set.begin(), index_set.end());
   }
 
-#if 0
+#ifdef DEBUG
+  //print index sets
   for(index_mapt::const_iterator
         i1=index_map.begin();
         i1!=index_map.end();
@@ -482,12 +478,11 @@ void arrayst::update_index_map()
         i2=i1->second.begin();
         i2!=i1->second.end();
         i2++)    std::cout << "Index set (" << i1->first << " = "
-		           << arrays.find_number(i1->first) << " = "
-			   << from_expr(ns,"",arrays[arrays.find_number(i1->first)]) << "): "
-			   << from_expr(ns,"",*i2) << std::endl;
+                           << arrays.find_number(i1->first) << " = "
+                           << from_expr(ns,"",arrays[arrays.find_number(i1->first)]) << "): "
+                           << from_expr(ns,"",*i2) << std::endl;
    std::cout << "-----" << std::endl;
 #endif
-
 }
 
 /*******************************************************************\
@@ -603,8 +598,9 @@ void arrayst::add_array_constraints(
       assert(index_expr1.type()==index_expr2.type());
 
       // add constraint
-      lazy_constraintt lazy(ARRAY_TYPECAST, equal_exprt(index_expr1, index_expr2));
-      add_array_constraint(lazy, false);
+      lazy_constraintt lazy(ARRAY_TYPECAST, 
+        equal_exprt(index_expr1, index_expr2));
+      add_array_constraint(lazy, false); //added immediately
     }
   }
   else if(expr.id()==ID_index)
@@ -649,7 +645,7 @@ void arrayst::add_array_constraints_with(
     }
 
      lazy_constraintt lazy(ARRAY_WIDTH, equal_exprt(index_expr, value));
-     add_array_constraint(lazy,false);
+     add_array_constraint(lazy,false); //added immediately
   }
 
   // use other array index applications for "else" case
@@ -683,8 +679,9 @@ void arrayst::add_array_constraints_with(
 
         equal_exprt equality_expr(index_expr1, index_expr2);
         
-        lazy_constraintt lazy(ARRAY_WIDTH, or_exprt(equality_expr,equal_exprt(index,other_index)));
-        add_array_constraint(lazy,false);
+        lazy_constraintt lazy(ARRAY_WIDTH, or_exprt(equality_expr,
+                                  equal_exprt(index,other_index)));
+        add_array_constraint(lazy,false); //added immediately
     }
   }
 }
@@ -708,7 +705,7 @@ void arrayst::add_array_constraints_update(
   // we got x=UPDATE(y, [i], v)
   // add constaint x[i]=v
 
-  #if 0
+#if 0
   const exprt &index=expr.where();
   const exprt &value=expr.new_value();
 
@@ -773,7 +770,7 @@ void arrayst::add_array_constraints_update(
       }
     }
   }
-  #endif
+#endif
 }
 
 /*******************************************************************\
@@ -810,7 +807,7 @@ void arrayst::add_array_constraints_array_of(
 
     // add constraint
     lazy_constraintt lazy(ARRAY_OF, equal_exprt(index_expr, expr.op0()));
-    add_array_constraint(lazy, false);
+    add_array_constraint(lazy, false); //added immediately
   }
 }
 
@@ -856,8 +853,9 @@ void arrayst::add_array_constraints_if(
     assert(index_expr1.type()==index_expr2.type());
 
     // add implication
-    lazy_constraintt lazy(ARRAY_IF, implies_exprt(expr.cond(), equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, false);
+    lazy_constraintt lazy(ARRAY_IF, implies_exprt(expr.cond(), 
+                              equal_exprt(index_expr1, index_expr2)));
+    add_array_constraint(lazy, false); //added immediately
   }
 
   // now the false case
@@ -880,7 +878,10 @@ void arrayst::add_array_constraints_if(
     assert(index_expr1.type()==index_expr2.type());
 
     // add implication
-    lazy_constraintt lazy(ARRAY_IF, or_exprt(expr.cond(), equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, false);
+    lazy_constraintt lazy(ARRAY_IF, or_exprt(expr.cond(), 
+                              equal_exprt(index_expr1, index_expr2)));
+    add_array_constraint(lazy, false); //added immediately
   }
 }
+
+

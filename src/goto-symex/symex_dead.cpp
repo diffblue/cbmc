@@ -78,6 +78,6 @@ void goto_symext::symex_dead(statet &state)
     l1_lhs.type()=code.op0().type();
     l1_lhs.set_identifier(l1_identifier);
     state.rename(rhs, ns, goto_symex_statet::L1);
-    state.value_set.assign(l1_lhs, rhs, ns);
+    state.value_set.assign(l1_lhs, rhs, ns, true, false);
   }
 }

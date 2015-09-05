@@ -2268,6 +2268,20 @@ exprt c_typecheck_baset::do_special_functions(
 
     return same_object_expr;
   }
+  else if(identifier==CPROVER_PREFIX "get_must")
+  {
+    if(expr.arguments().size()!=2)
+    {
+      err_location(f_op);
+      throw "get_must_flag expects two operands";
+    }
+
+    exprt get_must_flag_expr=
+      binary_predicate_exprt(expr.arguments()[0], "get_must", expr.arguments()[1]);
+    get_must_flag_expr.add_source_location()=source_location;
+
+    return get_must_flag_expr;
+  }
   else if(identifier==CPROVER_PREFIX "invalid_pointer")
   {
     if(expr.arguments().size()!=1)

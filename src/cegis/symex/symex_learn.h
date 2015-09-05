@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
  *
  * @details Implements a CEGIS learning algorithm using CBMC symbolic exeuction.
  */
-class symex_learnt
+class symex_learnt:public messaget
 {
 public:
   /**
@@ -37,14 +37,14 @@ public:
    * @details Solutions are provided as a set of GOTO function bodies
    * (goto_programt::instructionst) for function names.
    */
-  typedef std::map<const irep_idt, goto_programt::instructionst> candidatet;
+  typedef goto_candidatet candidatet;
 private:
   const class cegis_optionst &options;
   const symbol_tablet &symbol_table;
   const goto_functionst &goto_functions;
-  ui_message_handlert &ui_message_handler;
   std::deque<counterexamplet> counterexamples;
   candidatet candidate;
+
 public:
   /**
    * @brief Creates a symbolic execution CEGIS learner.
@@ -58,11 +58,10 @@ public:
    * @param options All existing CBMC options.
    * @param symbol_table The symbol table of the input problem.
    * @param goto_functions The GOTO functions of the input problem.
-   * @param ui_message_handler The message handler to log to.
+   * @param msg The message handler to log to.
    */
-  symex_learnt(const cegis_optionst &options,
-      const symbol_tablet &symbol_table, const goto_functionst &goto_functions,
-      ui_message_handlert &ui_message_handler);
+  symex_learnt(const cegis_optionst &options, const symbol_tablet &symbol_table,
+      const goto_functionst &goto_functions, message_handlert &msg);
 
   /**
    * @brief Default destructor.

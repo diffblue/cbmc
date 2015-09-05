@@ -149,7 +149,7 @@ bool goto_symext::symex_goto(statet &state)
       
       symbol_exprt new_lhs=guard_symbol_expr;
       state.rename(new_lhs, ns, goto_symex_statet::L1);
-      state.assignment(new_lhs, new_rhs, ns, false);
+      state.assignment(new_lhs, new_rhs, ns, true, false);
       
       guardt guard;
 
@@ -267,15 +267,9 @@ void goto_symext::merge_gotos(statet &state)
   {
     statet::goto_statet &goto_state=*list_it;
 
-    // fix up atomic section
-    if(state.guard.is_false())
-      state.atomic_section_id=goto_state.atomic_section_id;
-    else
-    {
-      if(!goto_state.guard.is_false() &&
-         state.atomic_section_id!=goto_state.atomic_section_id)
-        throw "unmatched atomic section detected";
-    }
+    // check atomic section
+    if(state.atomic_section_id!=goto_state.atomic_section_id)
+      throw "Atomic sections differ across branches";
     
     // do SSA phi functions
     phi_function(goto_state, state);
@@ -415,7 +409,7 @@ void goto_symext::phi_function(
     symbol_exprt new_lhs=symbol_exprt(l1_identifier, type);
     const bool record_events=dest_state.record_events;
     dest_state.record_events=false;
-    dest_state.assignment(new_lhs, rhs, ns, true);
+    dest_state.assignment(new_lhs, rhs, ns, true, true);
     dest_state.record_events=record_events;
     
     target.assignment(

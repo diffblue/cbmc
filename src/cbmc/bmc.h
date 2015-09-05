@@ -42,6 +42,7 @@ public:
     ns(_symbol_table, new_symbol_table),
     equation(ns),
     symex(ns, new_symbol_table, equation,_prop_conv),
+    prop_conv(_prop_conv),
     ui(ui_message_handlert::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
@@ -75,23 +76,23 @@ protected:
   namespacet ns;
   symex_target_equationt equation;
   symex_bmct symex;
- 
+  prop_convt &prop_conv;
+
   // use gui format
   language_uit::uit ui;
   
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);
     
-  virtual safety_checkert::resultt decide(prop_convt &prop_conv, 
-					  bool show_report=true);
-  virtual safety_checkert::resultt write_dimacs(prop_convt &prop_conv);
-  
+  virtual resultt decide(
+    const goto_functionst &,
+    prop_convt &, 
+    bool show_report=true);
+    
   // unwinding
   virtual void setup_unwind();
-
-  virtual void do_unwind_module(
-    decision_proceduret &decision_procedure);
-  void do_conversion(prop_convt &solver);
+  virtual void do_unwind_module();
+  void do_conversion();
   
   virtual void show_vcc();
   virtual resultt all_properties(
@@ -102,12 +103,10 @@ protected:
   virtual void report_success();
   virtual void report_failure();
 
-  virtual void error_trace(
-    const prop_convt &prop_conv);
+  virtual void error_trace();
   
   bool cover(
     const goto_functionst &goto_functions,
-    prop_convt &solver,
     const std::string &criterion);
 
   friend class bmc_all_propertiest;

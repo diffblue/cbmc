@@ -768,11 +768,14 @@ void java_bytecode_parsert::rbytecode(
       
     case 'L': // lookupswitch
       {
+        unsigned base_offset=address;
+      
         // first a pad to 32-bit align
-        while((address&3)!=0) { read_u1(); address++; }
+        while(((address+1)&3)!=0) { read_u1(); address++; }
         
         // now default value
-        u4 UNUSED default_value=read_u4();
+        u4 default_value=read_u4();
+        instruction.args.push_back(from_integer(base_offset+default_value, integer_typet()));
         address+=4;
         
         // number of pairs
@@ -781,8 +784,10 @@ void java_bytecode_parsert::rbytecode(
         
         for(unsigned i=0; i<npairs; i++)
         {
-          u4 UNUSED match=read_u4();
-          u4 UNUSED offset=read_u4();
+          u4 match=read_u4();
+          u4 offset=read_u4();
+          instruction.args.push_back(from_integer(match, integer_typet()));
+          instruction.args.push_back(from_integer(base_offset+offset, integer_typet()));
           address+=8;
         }
       }
@@ -790,13 +795,16 @@ void java_bytecode_parsert::rbytecode(
       
     case 'T': // tableswitch
       {
+        unsigned base_offset=address;
+      
         // first a pad to 32-bit align
-        while((address&3)!=0) { read_u1(); address++; }
+        while(((address+1)&3)!=0) { read_u1(); address++; }
         
         // now default value
-        u4 UNUSED default_value=read_u4();
+        u4 default_value=read_u4();
+        instruction.args.push_back(from_integer(base_offset+default_value, integer_typet()));
         address+=4;
-
+        
         // now low value
         u4 low_value=read_u4();
         address+=4;
@@ -808,7 +816,9 @@ void java_bytecode_parsert::rbytecode(
         // there are high-low+1 offsets
         for(unsigned i=low_value; i<=high_value; i++)
         {
-          u4 UNUSED offset=read_u4();
+          u4 offset=read_u4();
+          instruction.args.push_back(from_integer(i, integer_typet()));
+          instruction.args.push_back(from_integer(base_offset+offset, integer_typet()));
           address+=4;
         }
       }
@@ -1098,6 +1108,34 @@ Function: java_bytecode_parse
 \*******************************************************************/
 
 bool java_bytecode_parse(
+  std::istream &istream,
+  java_bytecode_parse_treet &parse_tree,
+  message_handlert &message_handler)
+{
+  java_bytecode_parsert java_bytecode_parser;
+  java_bytecode_parser.in=&istream;
+  java_bytecode_parser.set_message_handler(message_handler);
+  
+  bool parser_result=java_bytecode_parser.parse();
+
+  parse_tree.swap(java_bytecode_parser.parse_tree);
+
+  return parser_result;
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool java_bytecode_parse(
   const std::string &file,
   java_bytecode_parse_treet &parse_tree,
   message_handlert &message_handler)
@@ -1111,14 +1149,6 @@ bool java_bytecode_parse(
                     << file << '\'' << messaget::eom;
     return true;
   }
-
-  java_bytecode_parsert java_bytecode_parser;
-  java_bytecode_parser.in=&in;
-  java_bytecode_parser.set_message_handler(message_handler);
   
-  bool parser_result=java_bytecode_parser.parse();
-
-  parse_tree.swap(java_bytecode_parser.parse_tree);
-
-  return parser_result;
+  return java_bytecode_parse(in, parse_tree, message_handler);
 }

@@ -90,6 +90,7 @@ protected:
   // we refine the theory of arrays
   virtual void post_process_arrays();
   void arrays_overapproximated();
+  void freeze_lazy_constraints();
   
   // we refine expensive arithmetic
   virtual void convert_mult(const exprt &expr, bvt &bv);

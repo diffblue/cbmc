@@ -10,6 +10,7 @@ Author: CM Wintersteiger
 
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
+#include <java_bytecode/java_bytecode_language.h>
 
 #ifdef HAVE_SPECC
 #include <specc/specc_language.h>
@@ -33,6 +34,7 @@ void goto_cc_modet::register_languages()
 {
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);
+  register_language(new_java_bytecode_language);
 
   #ifdef HAVE_SPECC
   register_language(new_specc_language);

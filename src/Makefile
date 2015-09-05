@@ -27,7 +27,7 @@ musketeer.dir: goto-instrument.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir \
-          cegis.dir
+          cegis.dir goto-instrument.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 
@@ -70,5 +70,6 @@ glucose-download:
 	@tar xfz glucose-syrup.tgz
 	@rm -Rf ../glucose-syrup
 	@mv glucose-syrup ../
+	@(cd ../glucose-syrup; patch -p1 < ../scripts/glucose-syrup-patch)
 	@rm glucose-syrup.tgz
 

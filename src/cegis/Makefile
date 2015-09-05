@@ -3,7 +3,7 @@ SRC = bmc/bmc_verification_oracle.cpp symex/symex_learn.cpp \
       symex/symex_learning_program_adapter.cpp symex/cegis_library.cpp \
       symex/target_program_factory.cpp symex/test_case_factory.cpp \
       util/goto_program_adapter.cpp util/source_location_factory.cpp \
-      options/cegis_options.cpp
+      util/symbol_table_adapter.cpp options/cegis_options.cpp
 
 INCLUDES= -I ..
 

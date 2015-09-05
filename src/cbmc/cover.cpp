@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/time_stopping.h>
 #include <util/xml.h>
 
-#include <solvers/sat/satcheck.h>
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
 
@@ -70,9 +69,8 @@ public:
 
   bmc_covert(
     const goto_functionst &_goto_functions,
-    prop_convt &_solver,
     bmct &_bmc):
-    goto_functions(_goto_functions), solver(_solver), bmc(_bmc)
+    goto_functions(_goto_functions), solver(_bmc.prop_conv), bmc(_bmc)
   {
   }
   
@@ -163,6 +161,8 @@ protected:
   const goto_functionst &goto_functions;
   prop_convt &solver;
   bmct &bmc;
+
+  void collect_conditions(const exprt &src, std::set<exprt> &dest);
 };
 
 /*******************************************************************\
@@ -211,6 +211,35 @@ void bmc_covert::goal_covered(const cover_goalst::goalt &)
 
 /*******************************************************************\
 
+Function: bmc_covert::collect_conditions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void bmc_covert::collect_conditions(const exprt &src, std::set<exprt> &dest)
+{
+  if(src.id()==ID_and || src.id()==ID_or ||
+     src.id()==ID_not || src.id()==ID_implies)
+  {
+    forall_operands(it, src)
+      collect_conditions(*it, dest);
+  }
+  else if(src.is_true())
+  {
+  }
+  else
+  {
+    dest.insert(src); 
+  }
+}
+
+/*******************************************************************\
+
 Function: bmc_covert::operator()
 
   Inputs:
@@ -229,8 +258,18 @@ bool bmc_covert::operator()(const criteriont criterion)
 
   // stop the time
   absolute_timet sat_start=current_time();
+
+  // we don't want the assertions to become constraints
+  for(symex_target_equationt::SSA_stepst::iterator
+      it=bmc.equation.SSA_steps.begin();
+      it!=bmc.equation.SSA_steps.end();
+      it++)
+    if(it->type==goto_trace_stept::ASSERT)
+      it->type=goto_trace_stept::LOCATION;
   
-  bmc.do_conversion(solver);
+  bmc.do_conversion();
+  
+  //bmc.equation.output(std::cout);
   
   std::map<goto_programt::const_targett, irep_idt> location_map;
   
@@ -275,6 +314,24 @@ bool bmc_covert::operator()(const criteriont criterion)
             goalt("function "+id2string(f_it->first)+" block "+b+" branch not taken");
         }
         break;
+        
+      case C_CONDITION:
+        if(i_it->is_goto())
+        {
+          std::set<exprt> conditions;
+
+          collect_conditions(i_it->guard, conditions);
+          unsigned i=0;
+
+          for(std::set<exprt>::const_iterator it=conditions.begin();
+              it!=conditions.end();
+              it++, i++)
+          {
+            goal_map[id(i_it, "C"+i2string(i))]=
+              goalt("condition "+from_expr(bmc.ns, "", *it));
+          }
+        }
+        break;
       
       default:;
       }
@@ -295,8 +352,8 @@ bool bmc_covert::operator()(const criteriont criterion)
     switch(criterion)
     {
     case C_ASSERTION:
-      if(it->is_assert() && it->source.pc->is_assert())
-        goal_map[id(it->source.pc)].add_instance(it, it->cond_literal);
+      if(it->source.pc->is_assert())
+        goal_map[id(it->source.pc)].add_instance(it, it->guard_literal);
       break;
       
     case C_LOCATION:
@@ -406,22 +463,21 @@ Function: bmct::cover
 
 bool bmct::cover(
   const goto_functionst &goto_functions,
-  prop_convt &solver,
   const std::string &criterion)
 {
   bmc_covert::criteriont c;
   
-  if(criterion=="assertion")
+  if(criterion=="assertion" || criterion=="assertions")
     c=bmc_covert::C_ASSERTION;
-  else if(criterion=="path")
+  else if(criterion=="path" || criterion=="paths")
     c=bmc_covert::C_PATH;
-  else if(criterion=="branch")
+  else if(criterion=="branch" || criterion=="branches")
     c=bmc_covert::C_BRANCH;
-  else if(criterion=="location")
+  else if(criterion=="location" || criterion=="locations")
     c=bmc_covert::C_LOCATION;
-  else if(criterion=="assertions")
+  else if(criterion=="decision" || criterion=="decisions")
     c=bmc_covert::C_DECISION;
-  else if(criterion=="assertions")
+  else if(criterion=="condition" || criterion=="conditions")
     c=bmc_covert::C_CONDITION;
   else if(criterion=="mcdc")
     c=bmc_covert::C_MCDC;
@@ -432,7 +488,7 @@ bool bmct::cover(
     return true;
   }
 
-  bmc_covert bmc_cover(goto_functions, solver, *this);
+  bmc_covert bmc_cover(goto_functions, *this);
   bmc_cover.set_message_handler(get_message_handler());
   return bmc_cover(c);
 }

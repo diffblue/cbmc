@@ -161,7 +161,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   // stop the time
   absolute_timet sat_start=current_time();
   
-  bmc.do_conversion(solver);  
+  bmc.do_conversion();  
   
   // Collect _all_ goals in `goal_map'.
   // This maps claim IDs to 'goalt'

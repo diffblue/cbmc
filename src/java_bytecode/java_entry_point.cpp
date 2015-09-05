@@ -194,8 +194,13 @@ bool java_entry_point(
   if(matches.empty())
   {
     messaget message(message_handler);
-    message.error() << "main method `" << config.main
-                    << "' not in symbol table" << messaget::eom;
+
+    if(config.main.empty())
+      message.error() << "main method not in symbol table" << messaget::eom;
+    else
+      message.error() << "main method `" << config.main
+                      << "' not in symbol table" << messaget::eom;
+      
     return true; // give up with error, no main
   }
 
@@ -229,10 +234,10 @@ bool java_entry_point(
   // build call to initialization function
   {
     symbol_tablet::symbolst::iterator init_it=
-      symbol_table.symbols.find("__CPROVER_initialize");
+      symbol_table.symbols.find(INITIALIZE);
 
     if(init_it==symbol_table.symbols.end())
-      throw "failed to find __CPROVER_initialize symbol";
+      throw "failed to find " INITIALIZE " symbol";
 
     code_function_callt call_init;
     call_init.lhs().make_nil();

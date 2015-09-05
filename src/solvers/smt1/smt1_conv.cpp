@@ -86,6 +86,7 @@ Function: smt1_convt::dec_solve
 decision_proceduret::resultt smt1_convt::dec_solve()
 {
   write_footer();
+  out.flush();
   return decision_proceduret::D_ERROR;
 }
 

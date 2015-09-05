@@ -261,6 +261,8 @@ void add_vtable_pointer_member(
 
   comp.type()=pointer_typet(symbol_typet(vt_name));
   comp.set_name("@vtable_pointer");
+  comp.set_base_name("@vtable_pointer");
+  comp.set_pretty_name("@vtable_pointer");
   comp.set(ID_isvtptr, true);
 
   struct_typet &class_type=to_struct_type(class_symbol.type);

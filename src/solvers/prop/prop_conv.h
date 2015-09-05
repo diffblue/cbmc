@@ -72,7 +72,7 @@ public:
     use_cache(true),
     equality_propagation(true),
     freeze_all(false),
-      post_processing_done(false),
+    post_processing_done(false),
     prop(_prop) { }
 
   virtual ~prop_conv_solvert() { }

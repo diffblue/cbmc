@@ -172,7 +172,7 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
   {
     ssize_t nread;
     size_t i;
-    __CPROVER_assume((size_t)nread<=nbyte);
+    __CPROVER_assume(0<=nread && (size_t)nread<=nbyte);
 
     for(i=0; i<nbyte; i++)
     {

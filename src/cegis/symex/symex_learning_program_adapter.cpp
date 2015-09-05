@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 symex_learning_program_adaptert::symex_learning_program_adaptert(
     const symbol_tablet &symbol_table, const goto_functionst &goto_functions,
-    const cegis_optionst &options, ui_message_handlert &msg,
+    const cegis_optionst &options, message_handlert &msg,
     const std::deque<counterexamplet> &counterexamples) :
     symbol_table(symbol_table), options(options), msg(msg), counterexamples(
         counterexamples)

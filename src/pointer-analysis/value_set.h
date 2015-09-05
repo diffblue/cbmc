@@ -59,7 +59,7 @@ public:
   {
   public:
     object_map_dt() {}
-    const static object_map_dt empty;
+    const static object_map_dt blank;
   };
   
   exprt to_expr(object_map_dt::const_iterator it) const;
@@ -171,7 +171,8 @@ public:
     const exprt &lhs,
     const exprt &rhs,
     const namespacet &ns,
-    bool add_to_sets=false);
+    bool is_simplified,
+    bool add_to_sets);
 
   void do_function_call(
     const irep_idt &function,
@@ -188,7 +189,7 @@ public:
     value_setst::valuest &dest,
     const namespacet &ns) const;
 
-  void eval_pointer_offset(
+  bool eval_pointer_offset(
     exprt &expr,
     const namespacet &ns) const;
 
@@ -203,7 +204,8 @@ protected:
   void get_value_set(
     const exprt &expr,
     object_mapt &dest,
-    const namespacet &ns) const;
+    const namespacet &ns,
+    bool is_simplified) const;
 
   void get_reference_set(
     const exprt &expr,

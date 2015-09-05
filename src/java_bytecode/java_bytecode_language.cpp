@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/symbol_table.h>
+#include <util/suffix.h>
 
 #include "java_bytecode_language.h"
 #include "java_bytecode_convert.h"
@@ -17,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
+#include "jar_file.h"
 
 #include "expr2java.h"
 
@@ -36,6 +38,7 @@ std::set<std::string> java_bytecode_languaget::extensions() const
 {
   std::set<std::string> s;
   s.insert("class");
+  s.insert("jar");
   return s;
 }
 
@@ -93,11 +96,35 @@ bool java_bytecode_languaget::parse(
   std::istream &instream,
   const std::string &path)
 {
-  // store the path
-  parse_path=path;
-  if(java_bytecode_parse(path, parse_tree, get_message_handler()))
-    return true;
+  java_class_loader.set_message_handler(get_message_handler());
 
+  // look at extension
+  if(has_suffix(path, ".class"))
+  {
+    java_class_loader.add_class_file(path);
+    main_class=java_class_loadert::file_to_class_name(path);
+  }
+  else if(has_suffix(path, ".jar"))
+  {
+    java_class_loader.add_jar_file(path);
+
+    // need to get entry point class from the manifest in the jar file
+    std::map<std::string, std::string> manifest;
+    get_jar_manifest(path, manifest);
+    
+    main_class=manifest["Main-Class"];
+    if(main_class=="")
+    {
+      error() << "JAR has no Main-Class" << eom;
+      return true;
+    }
+    
+    status() << "Java main class: " << main_class << eom;
+  }
+  else
+    assert(false);
+
+  java_class_loader(main_class);
   return false;
 }
              
@@ -117,14 +144,6 @@ bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  main_class=parse_tree.parsed_class.name;
-  
-  // first get dependencies
-  java_class_loadert java_class_loader;
-  java_class_loader.set_message_handler(get_message_handler());
-  
-  java_class_loader(parse_tree);
-
   // now convert all
   for(java_class_loadert::class_mapt::const_iterator
       c_it=java_class_loader.class_map.begin();
@@ -133,7 +152,9 @@ bool java_bytecode_languaget::typecheck(
   {
     if(c_it->second.parsed_class.name.empty())
       continue;
+
     debug() << "Converting class " << c_it->first << eom;
+
     if(java_bytecode_convert(
          c_it->second, symbol_table, get_message_handler()))
       return true;
@@ -186,7 +207,7 @@ Function: java_bytecode_languaget::show_parse
   
 void java_bytecode_languaget::show_parse(std::ostream &out)
 {
-  parse_tree.output(out);
+  java_class_loader(main_class).output(out);
 }
 
 /*******************************************************************\
