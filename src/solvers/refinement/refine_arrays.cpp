@@ -35,7 +35,7 @@ void bv_refinementt::post_process_arrays()
   // at this point all indices should in the index set
   
   // just build the data structure
-  update_index_map();
+  update_index_map(true);
 
   // we don't actually add any constraints
   lazy_arrays = do_array_refinement;
