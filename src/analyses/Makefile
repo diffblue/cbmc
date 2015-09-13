@@ -4,7 +4,7 @@ SRC = natural_loops.cpp is_threaded.cpp dirty.cpp interval_analysis.cpp \
       locals.cpp goto_check.cpp call_graph.cpp interval_domain.cpp \
       goto_rw.cpp reaching_definitions.cpp ai.cpp local_cfg.cpp \
       local_bitvector_analysis.cpp dependence_graph.cpp \
-      custom_bitvector_analysis.cpp
+      custom_bitvector_analysis.cpp escape_analysis.cpp
 
 INCLUDES= -I ..
 
