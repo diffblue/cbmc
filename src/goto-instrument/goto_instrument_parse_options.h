@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)" \
   "(show-goto-functions)(show-value-sets)(show-local-may-alias)" \
   "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \
+  "(show-escape-analysis)(escape-analysis)" \
   "(custom-bitvector-analysis)" \
   "(show-struct-alignment)(interval-analysis)(show-intervals)" \
   "(show-uninitialized)(show-locations)" \
@@ -71,20 +72,30 @@ public:
 
   goto_instrument_parse_optionst(int argc, const char **argv):
     parse_options_baset(GOTO_INSTRUMENT_OPTIONS, argc, argv),
-    language_uit("goto-instrument", cmdline)
+    language_uit("goto-instrument", cmdline),
+    function_pointer_removal_done(false),
+    partial_inlining_done(false),
+    remove_returns_done(false)
   {
   }
   
 protected:
   virtual void register_languages();
 
-  void get_goto_program(
-    goto_functionst &goto_functions);
-
-  void instrument_goto_program(
-    goto_functionst &goto_functions);
+  void get_goto_program();
+  void instrument_goto_program();
     
   void eval_verbosity();
+  
+  void do_function_pointer_removal();
+  void do_partial_inlining();
+  void do_remove_returns();
+  
+  bool function_pointer_removal_done;
+  bool partial_inlining_done;
+  bool remove_returns_done;
+  
+  goto_functionst goto_functions;
 };
 
 #endif
