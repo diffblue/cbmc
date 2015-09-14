@@ -344,6 +344,29 @@ void custom_bitvector_analysist::instrument(goto_functionst &)
 
 /*******************************************************************\
 
+Function: custom_bitvector_analysist::has_get_must
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+bool custom_bitvector_analysist::has_get_must(const exprt &src)
+{
+  if(src.id()=="get_must")
+    return true;
+  
+  forall_operands(it, src)
+    if(has_get_must(*it)) return true;
+
+  return false;
+}
+
+/*******************************************************************\
+
 Function: custom_bitvector_analysist::eval
 
   Inputs:
@@ -413,6 +436,7 @@ void custom_bitvector_analysist::check(
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
+      if(!has_get_must(i_it->guard)) continue;
       out << i_it->source_location;
       if(!i_it->source_location.get_comment().empty())
         out << ", " << i_it->source_location.get_comment();
