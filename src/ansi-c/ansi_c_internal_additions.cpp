@@ -107,6 +107,7 @@ void ansi_c_internal_additions(std::string &code)
     "__CPROVER_bool __CPROVER_get_flag(const void *, const char *);\n"
     "void __CPROVER_set_must(const void *, const char *);\n"
     "void __CPROVER_clear_must(const void *, const char *);\n"
+    "void __CPROVER_cleanup(const void *, const void *);\n"
     "__CPROVER_bool __CPROVER_get_must(const void *, const char *);\n"
 
     "const unsigned __CPROVER_constant_infinity_uint;\n"
