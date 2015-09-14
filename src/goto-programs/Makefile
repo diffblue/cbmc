@@ -11,7 +11,7 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       format_strings.cpp loop_ids.cpp pointer_arithmetic.cpp \
       goto_program_template.cpp write_goto_binary.cpp remove_unreachable.cpp \
       remove_unused_functions.cpp remove_vector.cpp \
-      wp.cpp goto_clean_expr.cpp safety_checker.cpp \
+      wp.cpp goto_clean_expr.cpp safety_checker.cpp parameter_assignments.cpp \
       compute_called_functions.cpp link_to_library.cpp \
       remove_returns.cpp osx_fat_reader.cpp remove_complex.cpp \
       goto_trace.cpp xml_goto_trace.cpp vcd_goto_trace.cpp graphml_goto_trace.cpp
