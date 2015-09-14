@@ -42,14 +42,22 @@ public:
     const escape_domaint &b,
     locationt from,
     locationt to);
+    
+  void make_bottom()
+  {
+    cleanup_map.clear();
+  }
+  
+  void make_top()
+  {
+    cleanup_map.clear();
+  }
 
   typedef std::set<irep_idt> cleanupt;
   typedef std::map<irep_idt, cleanupt > cleanup_mapt;
   cleanup_mapt cleanup_map;
 
 protected:  
-  typedef enum { SET_MUST, CLEAR_MUST } modet;
-
   void assign_lhs(const exprt &, const std::set<irep_idt> &);
   void get_rhs(const exprt &, std::set<irep_idt> &);
   void set_cleanup(const exprt &, const irep_idt &);
