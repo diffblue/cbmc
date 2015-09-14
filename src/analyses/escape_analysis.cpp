@@ -280,16 +280,6 @@ bool escape_domaint::merge(
     if(a_cleanup.size()!=old_size) changed=true;
   }
 
-  for(cleanup_mapt::const_iterator a_it=cleanup_map.begin();
-      a_it!=cleanup_map.end();
-      )
-  {
-    if(a_it->second.empty())
-      a_it=cleanup_map.erase(a_it);
-    else
-      a_it++;
-  }
-  
   return changed;
 }
 
