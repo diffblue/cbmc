@@ -79,6 +79,7 @@ public:
   void instrument(goto_functionst &);
   void check(const namespacet &, const goto_functionst &, std::ostream &);
   exprt eval(const exprt &src, locationt loc);
+  static bool has_get_must(const exprt &);
 
   unsigned get_bit_nr(const exprt &);
 
