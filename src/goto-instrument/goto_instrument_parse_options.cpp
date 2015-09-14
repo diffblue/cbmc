@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_asm.h>
+#include <goto-programs/remove_unused_functions.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -207,6 +208,8 @@ int goto_instrument_parse_optionst::doit()
       do_partial_inlining();
       do_remove_returns();
 
+      remove_unused_functions(goto_functions, get_message_handler());
+    
       // recalculate numbers, etc.
       goto_functions.update();
 
@@ -224,6 +227,8 @@ int goto_instrument_parse_optionst::doit()
       do_partial_inlining();
       do_remove_returns();
 
+      remove_unused_functions(goto_functions, get_message_handler());
+    
       // recalculate numbers, etc.
       goto_functions.update();
 
@@ -242,6 +247,8 @@ int goto_instrument_parse_optionst::doit()
       do_partial_inlining();
       do_remove_returns();
 
+      remove_unused_functions(goto_functions, get_message_handler());
+    
       // recalculate numbers, etc.
       goto_functions.update();
 
@@ -258,6 +265,8 @@ int goto_instrument_parse_optionst::doit()
       do_partial_inlining();
       do_remove_returns();
 
+      remove_unused_functions(goto_functions, get_message_handler());
+    
       // recalculate numbers, etc.
       goto_functions.update();
 
