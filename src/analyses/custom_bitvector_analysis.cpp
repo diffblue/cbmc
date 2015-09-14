@@ -33,16 +33,16 @@ void custom_bitvector_domaint::set_bit(
   {
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
     
-    vectorst &vectors=bits[identifier];
+    bit_vectort &bit_vector=must_bits[identifier];
 
     if(mode==SET_MUST)
     {    
-      vectors.must|=(1l<<bit_nr);
+      bit_vector|=(1l<<bit_nr);
     }
     else if(mode==CLEAR_MUST)
     {
-      vectors.must|=(1l<<bit_nr);
-      vectors.must^=(1l<<bit_nr);
+      bit_vector|=(1l<<bit_nr);
+      bit_vector^=(1l<<bit_nr);
     }
   }
 }
@@ -66,7 +66,8 @@ void custom_bitvector_domaint::assign_lhs(
   if(lhs.id()==ID_symbol)
   {
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
-    bits[identifier]=vectors;
+    must_bits[identifier]=vectors.must_bits;
+    may_bits[identifier]=vectors.may_bits;
   }
 }
 
@@ -89,7 +90,8 @@ void custom_bitvector_domaint::get_rhs(
   if(lhs.id()==ID_symbol)
   {
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
-    vectors=bits[identifier];
+    vectors.may_bits=may_bits[identifier];
+    vectors.must_bits=must_bits[identifier];
   }
 }
 
@@ -239,42 +241,46 @@ void custom_bitvector_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
+  if(is_bottom)
+    out << "BOTTOM\n";
+
   const custom_bitvector_analysist &cba=
     static_cast<const custom_bitvector_analysist &>(ai);
-
-  for(bitst::const_iterator it=bits.begin();
-      it!=bits.end();
+    
+  for(bitst::const_iterator it=may_bits.begin();
+      it!=may_bits.end();
       it++)
   {
-    {
-      out << it->first << " MAY: ";
-      bit_vectort b=it->second.may;
+    out << it->first << " MAY: ";
+    bit_vectort b=it->second;
+    
+    for(unsigned i=0; b!=0; i++, b>>=1)
+      if(b&1)
+      {
+        assert(i<cba.bits.size());
+        out << ' '
+            << cba.bits[i];
+      }
 
-      for(unsigned i=0; b!=0; i++, b>>=1)
-        if(b&1)
-        {
-          assert(i<cba.bits.size());
-          out << ' '
-              << cba.bits[i];
-        }
+    out << '\n';
+  }
 
-      out << '\n';
-    }
+  for(bitst::const_iterator it=must_bits.begin();
+      it!=must_bits.end();
+      it++)
+  {
+    out << it->first << " MUST: ";
+    bit_vectort b=it->second;
 
-    {
-      out << it->first << " MUST: ";
-      bit_vectort b=it->second.must;
+    for(unsigned i=0; b!=0; i++, b>>=1)
+      if(b&1)
+      {
+        assert(i<cba.bits.size());
+        out << ' '
+            << cba.bits[i];
+      }
 
-      for(unsigned i=0; b!=0; i++, b>>=1)
-        if(b&1)
-        {
-          assert(i<cba.bits.size());
-          out << ' '
-              << cba.bits[i];
-        }
-
-      out << '\n';
-    }
+    out << '\n';
   }
 }
 
@@ -295,32 +301,67 @@ bool custom_bitvector_domaint::merge(
   locationt from,
   locationt to)
 {
+  if(b.is_bottom)
+    return false; // no change
+
+  if(is_bottom)
+  {
+    *this=b;
+    return true; // change
+  }
+
   bool changed=false;
 
-  for(bitst::const_iterator b_it=b.bits.begin();
-      b_it!=b.bits.end();
+  // first do MAY
+  for(bitst::const_iterator b_it=b.may_bits.begin();
+      b_it!=b.may_bits.end();
       b_it++)
   {
-    bitst::iterator a_it=bits.find(b_it->first);
-    if(a_it!=bits.end())
+    bit_vectort &a_bits=may_bits[b_it->first];
+    bit_vectort old=a_bits;
+    a_bits|=b_it->second;
+    if(old!=a_bits) changed=true;
+  }
+
+  // now do MUST
+  for(bitst::iterator a_it=must_bits.begin();
+      a_it!=must_bits.end();
+      a_it++)
+  {
+    bitst::const_iterator b_it=
+      b.must_bits.find(a_it->first);
+
+    if(b_it==b.must_bits.end())
     {
-      if(a_it->second.merge(b_it->second))
-        changed=true;
+      a_it->second=0;
+      changed=true;
     }
     else
     {
-      bits[b_it->first]=b_it->second;
-      changed=true;
+      bit_vectort old=a_it->second;
+      a_it->second&=b_it->second;
+      if(old!=a_it->second) changed=true;
     }
   }
   
-  // erase all blank ones
-  for(bitst::const_iterator a_it=bits.begin();
-      a_it!=bits.end();
+  // erase blank ones
+  for(bitst::iterator a_it=may_bits.begin();
+      a_it!=may_bits.end();
       )
   {
-    if(a_it->second.is_blank())
-      a_it=bits.erase(a_it);
+    if(a_it->second==0)
+      a_it=may_bits.erase(a_it);
+    else
+      a_it++;
+  }
+  
+  // erase blank ones
+  for(bitst::iterator a_it=must_bits.begin();
+      a_it!=must_bits.end();
+      )
+  {
+    if(a_it->second==0)
+      a_it=must_bits.erase(a_it);
     else
       a_it++;
   }
@@ -394,7 +435,7 @@ exprt custom_bitvector_analysist::eval(
       custom_bitvector_domaint::vectorst v;
       operator[](loc).get_rhs(object, v);
 
-      bool value=v.must&(1l<<bit_nr);
+      bool value=v.must_bits&(1l<<bit_nr);
       
       if(value)
         return true_exprt();
