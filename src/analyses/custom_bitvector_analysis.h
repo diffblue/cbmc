@@ -38,34 +38,46 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const;
 
+  virtual void make_bottom()
+  {
+    may_bits.clear();
+    must_bits.clear();
+    is_bottom=true;
+  }
+
+  virtual void make_top()
+  {
+    may_bits.clear();
+    must_bits.clear();
+    is_bottom=false;
+  }
+
   bool merge(
     const custom_bitvector_domaint &b,
     locationt from,
     locationt to);
 
   typedef unsigned long long bit_vectort;
+  typedef std::map<irep_idt, bit_vectort> bitst;
   
   struct vectorst
   {
-    bit_vectort may, must;
-    inline vectorst():may(0), must(0) { }
-
-    inline bool merge(const vectorst &other)
+    bit_vectort may_bits, must_bits;
+    vectorst():may_bits(0), must_bits(0)
     {
-      bit_vectort old_may=may, old_must=must;
-      may|=other.may;
-      must&=other.must;
-      return may!=old_may || must!=old_must;
     }
-    
-    bool is_blank() const { return may==0 && must==0; }
   };
-
+  
+  bitst may_bits, must_bits;
+  
   void assign_lhs(const exprt &, const vectorst &);
   void get_rhs(const exprt &, vectorst &dest);
 
-  typedef std::map<irep_idt, vectorst> bitst;
-  bitst bits;
+  bool is_bottom;
+  
+  custom_bitvector_domaint():is_bottom(true)
+  {
+  }
 
 protected:  
   typedef enum { SET_MUST, CLEAR_MUST } modet;
