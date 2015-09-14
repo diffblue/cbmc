@@ -55,6 +55,16 @@ public:
   {
   }
   
+  // no states
+  virtual void make_bottom()
+  {
+  }
+
+  // all states
+  virtual void make_top()
+  {
+  }
+  
   // also add
   //
   //   bool merge(const T &b, locationt from, locationt to);

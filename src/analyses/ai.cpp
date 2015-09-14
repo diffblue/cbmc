@@ -114,8 +114,10 @@ Function: ai_baset::initialize
 
 void ai_baset::initialize(const goto_programt &goto_program)
 {
+  // we mark everything as unreachable as starting point
+
   forall_goto_program_instructions(i_it, goto_program)
-    get_state(i_it);
+    get_state(i_it).make_bottom();
 }
 
 /*******************************************************************\
@@ -182,6 +184,10 @@ bool ai_baset::fixedpoint(
 {
   if(goto_program.instructions.empty())
     return false;
+    
+  // The first instruction of 'goto_program' is the entry point,
+  // and we make that 'top'.
+  get_state(goto_program.instructions.begin()).make_top();
   
   working_sett working_set;
 
