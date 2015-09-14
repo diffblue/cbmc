@@ -39,7 +39,7 @@ void custom_bitvector_domaint::set_bit(
     {    
       vectors.must|=(1l<<bit_nr);
     }
-    else // CLEAR_MUST
+    else if(mode==CLEAR_MUST)
     {
       vectors.must|=(1l<<bit_nr);
       vectors.must^=(1l<<bit_nr);
@@ -198,7 +198,7 @@ void custom_bitvector_domaint::transform(
           {
             unsigned bit_nr=
               cba.get_bit_nr(code_function_call.arguments()[1]);
-
+              
             modet mode=(identifier=="__CPROVER_set_must")?SET_MUST:CLEAR_MUST;
             
             exprt lhs=code_function_call.arguments()[0];
@@ -250,7 +250,7 @@ void custom_bitvector_domaint::output(
       out << it->first << " MAY: ";
       bit_vectort b=it->second.may;
 
-      for(unsigned i=0; b!=0; i++, b<<=1)
+      for(unsigned i=0; b!=0; i++, b>>=1)
         if(b&1)
         {
           assert(i<cba.bits.size());
@@ -265,7 +265,7 @@ void custom_bitvector_domaint::output(
       out << it->first << " MUST: ";
       bit_vectort b=it->second.must;
 
-      for(unsigned i=0; b!=0; i++, b<<=1)
+      for(unsigned i=0; b!=0; i++, b>>=1)
         if(b&1)
         {
           assert(i<cba.bits.size());
