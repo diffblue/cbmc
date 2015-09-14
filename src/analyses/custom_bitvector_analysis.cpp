@@ -156,6 +156,8 @@ void custom_bitvector_domaint::transform(
       // may alias other stuff
       std::set<exprt> lhs_set=
         cba.local_may_alias_factory(from).get(from, code_assign.lhs());
+        
+      lhs_set.insert(code_assign.lhs());
 
       for(std::set<exprt>::const_iterator
           l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)

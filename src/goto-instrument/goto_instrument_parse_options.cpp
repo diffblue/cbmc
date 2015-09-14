@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/parameter_assignments.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -183,6 +184,7 @@ int goto_instrument_parse_optionst::doit()
     {
       do_function_pointer_removal();
       do_partial_inlining();
+      parameter_assignments(symbol_table, goto_functions);
     
       // recalculate numbers, etc.
       goto_functions.update();
@@ -207,7 +209,8 @@ int goto_instrument_parse_optionst::doit()
       do_function_pointer_removal();
       do_partial_inlining();
       do_remove_returns();
-
+      parameter_assignments(symbol_table, goto_functions);
+      
       remove_unused_functions(goto_functions, get_message_handler());
     
       // recalculate numbers, etc.
@@ -226,6 +229,7 @@ int goto_instrument_parse_optionst::doit()
       do_function_pointer_removal();
       do_partial_inlining();
       do_remove_returns();
+      parameter_assignments(symbol_table, goto_functions);
 
       remove_unused_functions(goto_functions, get_message_handler());
     
@@ -246,6 +250,7 @@ int goto_instrument_parse_optionst::doit()
       do_function_pointer_removal();
       do_partial_inlining();
       do_remove_returns();
+      parameter_assignments(symbol_table, goto_functions);
 
       remove_unused_functions(goto_functions, get_message_handler());
     
@@ -264,6 +269,7 @@ int goto_instrument_parse_optionst::doit()
       do_function_pointer_removal();
       do_partial_inlining();
       do_remove_returns();
+      parameter_assignments(symbol_table, goto_functions);
 
       remove_unused_functions(goto_functions, get_message_handler());
     
