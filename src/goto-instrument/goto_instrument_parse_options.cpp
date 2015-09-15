@@ -204,6 +204,23 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("escape-analysis"))
+    {
+      do_function_pointer_removal();
+      do_partial_inlining();
+      do_remove_returns();
+      parameter_assignments(symbol_table, goto_functions);
+
+      // recalculate numbers, etc.
+      goto_functions.update();
+
+      namespacet ns(symbol_table);
+
+      escape_analysist escape_analysis;
+      escape_analysis(goto_functions, ns);
+      escape_analysis.instrument(goto_functions, ns);
+    }
+
     if(cmdline.isset("show-custom-bitvector-analysis"))
     {
       do_function_pointer_removal();
@@ -231,8 +248,6 @@ int goto_instrument_parse_optionst::doit()
       do_remove_returns();
       parameter_assignments(symbol_table, goto_functions);
 
-      remove_unused_functions(goto_functions, get_message_handler());
-    
       // recalculate numbers, etc.
       goto_functions.update();
 
@@ -243,25 +258,6 @@ int goto_instrument_parse_optionst::doit()
       escape_analysis.output(ns, goto_functions, std::cout);
 
       return 0;
-    }
-
-    if(cmdline.isset("escape-analysis"))
-    {
-      do_function_pointer_removal();
-      do_partial_inlining();
-      do_remove_returns();
-      parameter_assignments(symbol_table, goto_functions);
-
-      remove_unused_functions(goto_functions, get_message_handler());
-    
-      // recalculate numbers, etc.
-      goto_functions.update();
-
-      namespacet ns(symbol_table);
-
-      escape_analysist escape_analysis;
-      escape_analysis(goto_functions, ns);
-      escape_analysis.instrument(goto_functions, ns);
     }
 
     if(cmdline.isset("custom-bitvector-analysis"))
