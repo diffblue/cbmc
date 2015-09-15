@@ -501,6 +501,6 @@ void custom_bitvector_analysist::check(
     out << '\n';
   }
   
-  out << '\n';
-  out << pass << " pass, " << fail << " fail, " << unknown << " unknown\n";
+  out << "SUMMARY: " << pass << " pass, " << fail << " fail, "
+      << unknown << " unknown\n";
 }
