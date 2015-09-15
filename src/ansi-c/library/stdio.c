@@ -42,7 +42,7 @@ inline int puts(const char *s)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
-inline fclose_cleanup(void *stream)
+inline void fclose_cleanup(void *stream)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(__CPROVER_get_must(stream, "closed"),
