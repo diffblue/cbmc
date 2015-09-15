@@ -158,6 +158,8 @@ void escape_domaint::transform(
       // may alias other stuff
       std::set<exprt> lhs_set=
         ea.local_may_alias_factory(from).get(from, code_assign.lhs());
+        
+      lhs_set.insert(code_assign.lhs());
 
       for(std::set<exprt>::const_iterator
           l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
@@ -197,12 +199,14 @@ void escape_domaint::transform(
             
             irep_idt cleanup_function=
               get_function(code_function_call.arguments()[1]);
-
+              
             if(!cleanup_function.empty())
             {
               // may alias other stuff
               std::set<exprt> lhs_set=
                 ea.local_may_alias_factory(from).get(from, lhs);
+                
+              lhs_set.insert(lhs);
 
               for(std::set<exprt>::const_iterator
                   l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
@@ -279,7 +283,19 @@ bool escape_domaint::merge(
     a_cleanup.insert(b_cleanup.begin(), b_cleanup.end());
     if(a_cleanup.size()!=old_size) changed=true;
   }
-
+  
+  // kill empty ones
+  
+  for(cleanup_mapt::iterator a_it=cleanup_map.begin();
+      a_it!=cleanup_map.end();
+      ) // no a_it++
+  {
+    if(a_it->second.empty())
+      a_it=cleanup_map.erase(a_it);
+    else
+      a_it++;
+  }
+  
   return changed;
 }
 
@@ -302,7 +318,7 @@ void escape_analysist::check_lhs(
 {
   if(lhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(lhs).get_identifier();
+    const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
     
     // does it have a cleanup function?
     const escape_domaint::cleanup_mapt &cleanup_map=
@@ -310,14 +326,23 @@ void escape_analysist::check_lhs(
       
     const escape_domaint::cleanup_mapt::const_iterator m_it=
       cleanup_map.find(identifier);
-    
+
     if(m_it!=cleanup_map.end())
     {
       std::set<exprt> lhs_set=
         local_may_alias_factory(location).get(location, lhs);
 
-      // more than one?
-      if(lhs_set.size()<=1)
+      lhs_set.insert(lhs);
+      
+      unsigned count=0;
+      
+      for(std::set<exprt>::const_iterator l_it=lhs_set.begin();
+          l_it!=lhs_set.end(); l_it++)
+        if(l_it->id()==ID_symbol)
+          count+=1;
+
+      // More than one? Then we are still ok.
+      if(count<=1)
       {
         cleanup_functions.insert(m_it->second.begin(), m_it->second.end());
       }
@@ -344,6 +369,8 @@ void escape_analysist::insert_cleanup(
   const std::set<irep_idt> &cleanup_functions,
   const namespacet &ns)
 {
+  source_locationt source_location=location->source_location;
+  
   for(std::set<irep_idt>::const_iterator c_it=cleanup_functions.begin();
       c_it!=cleanup_functions.end();
       c_it++)
@@ -353,6 +380,7 @@ void escape_analysist::insert_cleanup(
     code.lhs().make_nil();
     code.function()=ns.lookup(*c_it).symbol_expr();
     location->make_function_call(code);
+    location->source_location=source_location;
   }
 }
 
@@ -377,7 +405,7 @@ void escape_analysist::instrument(
     Forall_goto_program_instructions(i_it, f_it->second.body)
     {
       const goto_programt::instructiont &instruction=*i_it;
-      
+
       switch(instruction.type)
       {
       case ASSIGN:
@@ -388,6 +416,8 @@ void escape_analysist::instrument(
           std::set<exprt> lhs_set=
             local_may_alias_factory(i_it).get(i_it, code_assign.lhs());
 
+          lhs_set.insert(code_assign.lhs());
+
           for(std::set<exprt>::const_iterator
               l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
           {
@@ -395,6 +425,9 @@ void escape_analysist::instrument(
             check_lhs(i_it, *l_it, cleanup_functions);
 
             insert_cleanup(f_it->second, i_it, *l_it, cleanup_functions, ns);
+
+            for(unsigned i=0; i<cleanup_functions.size(); i++)
+              i_it++;
           }
         }
         break;
@@ -404,8 +437,11 @@ void escape_analysist::instrument(
           const code_deadt &code_dead=to_code_dead(instruction.code);
           std::set<irep_idt> cleanup_functions;
           check_lhs(i_it, code_dead.symbol(), cleanup_functions);
-
+          
           insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions, ns);
+          
+          for(unsigned i=0; i<cleanup_functions.size(); i++)
+            i_it++;
         }
         break;
 
