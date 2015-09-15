@@ -59,10 +59,11 @@ inline FILE *fopen(const char *filename, const char *mode)
   __CPROVER_assert(__CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
   #endif
 
+  FILE *f;
+
   _Bool fopen_error;
-  if(fopen_error) return NULL;
-  
-  FILE *f=malloc(sizeof(FILE));
+  f=fopen_error?NULL:malloc(sizeof(FILE));
+
   __CPROVER_set_must(f, "open");
   __CPROVER_cleanup(f, fclose_cleanup);
 
