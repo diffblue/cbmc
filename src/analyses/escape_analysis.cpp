@@ -375,10 +375,22 @@ void escape_analysist::insert_cleanup(
       c_it!=cleanup_functions.end();
       c_it++)
   {
+    symbol_exprt function=ns.lookup(*c_it).symbol_expr();
+    const code_typet &function_type=to_code_type(function.type());
+  
     goto_function.body.insert_before_swap(location);
     code_function_callt code;
     code.lhs().make_nil();
-    code.function()=ns.lookup(*c_it).symbol_expr();
+    code.function()=function;
+
+    if(function_type.parameters().size()==1)
+    {
+      typet param_type=function_type.parameters().front().type();
+      exprt arg=lhs;
+      if(arg.type()!=param_type) arg.make_typecast(param_type);
+      code.arguments().push_back(arg);
+    }
+    
     location->make_function_call(code);
     location->source_location=source_location;
   }
