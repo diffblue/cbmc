@@ -472,6 +472,8 @@ void custom_bitvector_analysist::check(
   const goto_functionst &goto_functions,
   std::ostream &out)
 {
+  unsigned pass=0, fail=0, unknown=0;
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
@@ -488,7 +490,17 @@ void custom_bitvector_analysist::check(
       exprt result2=simplify_expr(result, ns);
       out << from_expr(ns, f_it->first, result2);
       out << '\n';
+      
+      if(result2.is_true())
+        pass++;
+      else if(result2.is_false())
+        fail++;
+      else
+        unknown++;
     }
     out << '\n';
   }
+  
+  out << '\n';
+  out << pass << " pass, " << fail << " fail, " << unknown << " unknown\n";
 }
