@@ -560,15 +560,51 @@ codet java_bytecode_convertt::convert_instructions(
   const instructionst &instructions,
   const code_typet &method_type)
 {
-  // first pass: get targets
+  // Run a worklist algorithm, assuming that the bytecode has not
+  // been tampered with. See "Leroy, X. (2003). Java bytecode
+  // verification: algorithms and formalizations. Journal of Automated
+  // Reasoning, 30(3-4), 235-269." for a more complete treatment.
+
+  // first pass: get targets and map addresses to instructions
   
-  std::set<irep_idt> targets;
+  struct converted_instructiont
+  {
+    converted_instructiont(
+      const instructionst::const_iterator &it,
+      const codet &_code):source(it), code(_code), done(false)
+    {
+    }
+
+    instructionst::const_iterator source;
+    std::list<unsigned> successors;
+    codet code;
+    bool done;
+  };
+  typedef std::map<unsigned, converted_instructiont> address_mapt;
+  address_mapt address_map;
+  std::set<unsigned> targets;
 
   for(instructionst::const_iterator
       i_it=instructions.begin();
       i_it!=instructions.end();
       i_it++)
   {
+    std::pair<address_mapt::iterator, bool> a_entry=
+      address_map.insert(std::make_pair(
+          i_it->address,
+          converted_instructiont(i_it, code_skipt())));
+    assert(a_entry.second);
+    // addresses are strictly increasing, hence we must have inserted
+    // a new maximal key
+    assert(a_entry.first==--address_map.end());
+
+    if(i_it->statement!="goto")
+    {
+      instructionst::const_iterator next=i_it;
+      if(++next!=instructions.end())
+        a_entry.first->second.successors.push_back(next->address);
+    }
+
     if(i_it->statement=="goto" ||
        i_it->statement==patternt("if_?cmp??") ||
        i_it->statement==patternt("if??") ||
@@ -576,7 +612,10 @@ codet java_bytecode_convertt::convert_instructions(
        i_it->statement=="ifnull")
     {
       assert(!i_it->args.empty());
-      targets.insert(label(to_constant_expr(i_it->args[0]).get_value()));
+      const unsigned target=safe_string2unsigned(
+        id2string(to_constant_expr(i_it->args[0]).get_value()));
+      targets.insert(target);
+      a_entry.first->second.successors.push_back(target);
     }
     else if(i_it->statement=="tableswitch" ||
             i_it->statement=="lookupswitch")
@@ -588,20 +627,35 @@ codet java_bytecode_convertt::convert_instructions(
           a_it++, is_label=!is_label)
       {
         if(is_label)
-          targets.insert(label(to_constant_expr(*a_it).get_value()));
+        {
+          const unsigned target=safe_string2unsigned(
+            id2string(to_constant_expr(*a_it).get_value()));
+          targets.insert(target);
+          a_entry.first->second.successors.push_back(target);
+        }
       }
     }
   }
 
   std::map<irep_idt, symbol_exprt> loc_vars;
-  code_blockt code;
 
-  for(instructionst::const_iterator
-      i_it=instructions.begin();
-      i_it!=instructions.end();
-      i_it++)
+  std::set<unsigned> working_set;
+  if(!instructions.empty())
+    working_set.insert(instructions.front().address);
+
+  while(!working_set.empty())
   {
-    codet c=code_skipt();
+    std::set<unsigned>::iterator cur=working_set.begin();
+    address_mapt::iterator a_it=address_map.find(*cur);
+    assert(a_it!=address_map.end());
+    working_set.erase(cur);
+
+    if(a_it->second.done) continue;
+    working_set.insert(a_it->second.successors.begin(),
+                       a_it->second.successors.end());
+
+    instructionst::const_iterator i_it=a_it->second.source;
+    codet &c=a_it->second.code;
 
     irep_idt statement=i_it->statement;
     exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
@@ -1199,14 +1253,25 @@ codet java_bytecode_convertt::convert_instructions(
 
     push(results);
 
-    {
-      irep_idt l=label(i2string(i_it->address));
+    a_it->second.done=true;
+  }
 
-      if(targets.find(l)!=targets.end())
-        code.add(code_labelt(l, c));
-      else if(c.get_statement()!=ID_skip)
-        code.add(c);
-    }
+  // TODO: add exception handlers from exception table
+  code_blockt code;
+
+  for(address_mapt::const_iterator it=
+      address_map.begin();
+      it!=address_map.end();
+      ++it)
+  {
+    const unsigned address=it->first;
+    assert(it->first==it->second.source->address);
+    const codet &c=it->second.code;
+
+    if(targets.find(address)!=targets.end())
+      code.add(code_labelt(label(i2string(address)), c));
+    else if(c.get_statement()!=ID_skip)
+      code.add(c);
   }
 
   return code;
