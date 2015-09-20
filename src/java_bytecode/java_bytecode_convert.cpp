@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_vtable.h"
 #include "bytecode_info.h"
 
+namespace {
 class patternt
 {
 public:
@@ -92,7 +93,7 @@ protected:
   {
     irep_idt number=to_constant_expr(arg).get_value();
     
-    std::string prefix=(unsafe_string2unsigned(id2string(number))<number_of_parameters)?"arg":"local";
+    std::string prefix=(safe_string2unsigned(id2string(number))<number_of_parameters)?"arg":"local";
     irep_idt base_name=prefix+id2string(number)+type_char;
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
 
@@ -173,6 +174,7 @@ protected:
   
   void generate_class_stub(const irep_idt &class_name);
 };
+}
 
 /*******************************************************************\
 
