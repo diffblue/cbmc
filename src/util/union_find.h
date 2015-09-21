@@ -136,11 +136,28 @@ public:
     return is_union;
   }
   
+  // true == already in same set
+  bool make_union(typename numbering<T>::const_iterator it_a,
+                  typename numbering<T>::const_iterator it_b)
+  {
+    size_type na=it_a-numbering<T>::begin(), nb=it_b-numbering<T>::begin();
+    bool is_union=find_number(na)==find_number(nb);
+    uuf.make_union(na, nb);
+    return is_union;
+  }
+  
   // are 'a' and 'b' in the same set?
   inline bool same_set(const T &a, const T &b)
   {
     size_type na=number(a), nb=number(b);
     return uuf.same_set(na, nb);
+  }
+
+  // are 'a' and 'b' in the same set?
+  inline bool same_set(typename numbering<T>::const_iterator it_a,
+                       typename numbering<T>::const_iterator it_b) const
+  {
+    return uuf.same_set(it_a-numbering<T>::begin(), it_b-numbering<T>::begin());
   }
 
   inline const T &find(const T &a)
@@ -166,6 +183,11 @@ public:
   inline bool is_root(const T &a)
   {
     return is_root(number(a));
+  }
+
+  inline bool is_root(typename numbering<T>::const_iterator it) const
+  {
+    return uuf.is_root(it-numbering<T>::begin());
   }
 
   inline size_type number(const T &a)
