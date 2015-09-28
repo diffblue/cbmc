@@ -598,7 +598,9 @@ codet java_bytecode_convertt::convert_instructions(
     // a new maximal key
     assert(a_entry.first==--address_map.end());
 
-    if(i_it->statement!="goto")
+    if(i_it->statement!="goto" &&
+       i_it->statement!="return" &&
+       !(i_it->statement==patternt("?return")))
     {
       instructionst::const_iterator next=i_it;
       if(++next!=instructions.end())
