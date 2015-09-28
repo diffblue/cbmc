@@ -1243,6 +1243,14 @@ codet java_bytecode_convertt::convert_instructions(
     {
       // these are skips
       c=code_skipt();
+
+      // pop2 removes two single-word items from the stack (e.g. two
+      // integers, or an integer and an object reference) or one
+      // two-word item (i.e. a double or a long).
+      // http://cs.au.dk/~mis/dOvs/jvmspec/ref-pop2.html
+      if(statement=="pop2" &&
+         op[0].type().get_unsigned_int(ID_width)==32)
+        pop(1);
     }
     else
     {
