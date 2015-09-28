@@ -157,6 +157,7 @@ void escape_domaint::transform(
       get_rhs(code_assign.rhs(), cleanup_functions);
 
       // may alias other stuff
+      #if 0
       std::set<exprt> lhs_set=
         ea.local_may_alias_factory(from).get(from, code_assign.lhs());
         
@@ -167,6 +168,7 @@ void escape_domaint::transform(
       {
         assign_lhs(*l_it, cleanup_functions);
       }
+      #endif
     }
     break;
 
@@ -204,6 +206,7 @@ void escape_domaint::transform(
             if(!cleanup_function.empty())
             {
               // may alias other stuff
+              #if 0
               std::set<exprt> lhs_set=
                 ea.local_may_alias_factory(from).get(from, lhs);
                 
@@ -214,6 +217,7 @@ void escape_domaint::transform(
               {
                 set_cleanup(*l_it, cleanup_function);
               }
+              #endif
             }
           }
         }
@@ -253,6 +257,17 @@ void escape_domaint::output(
         c_it++)
       out << ' ' << *c_it;
     out << '\n';
+    
+    out << "  Aliases:";
+    for(cleanup_mapt::const_iterator it2=cleanup_map.begin();
+        it2!=cleanup_map.end();
+        it2++)
+    {
+      if(it->first==it2->first) continue;
+      if(aliases.same_set(it->first, it2->first))
+        out << ' ' << it2->first;
+      out << '\n';
+    }
   }
 }
 
@@ -298,6 +313,27 @@ bool escape_domaint::merge(
       a_it++;
   }
   
+  // do union
+  for(aliasest::const_iterator it=aliases.begin();
+      it!=aliases.end(); it++)
+  {
+    irep_idt b_root=b.aliases.find(it);
+    
+    if(!aliases.same_set(*it, b_root))
+    {
+      aliases.make_union(*it, b_root);
+      changed=true;
+    }
+  }
+  
+  // isolate non-tracked ones
+  for(aliasest::const_iterator it=aliases.begin();
+      it!=aliases.end(); it++)
+  {
+    if(cleanup_map.find(*it)==cleanup_map.end())
+      aliases.isolate(it);
+  }
+  
   return changed;
 }
 
@@ -331,6 +367,7 @@ void escape_analysist::check_lhs(
 
     if(m_it!=cleanup_map.end())
     {
+      #if 0
       std::set<exprt> lhs_set=
         local_may_alias_factory(location).get(location, lhs);
 
@@ -350,6 +387,7 @@ void escape_analysist::check_lhs(
           m_it->second.cleanup_functions.begin(),
           m_it->second.cleanup_functions.end());
       }
+      #endif
     }
   }
 }
@@ -429,6 +467,7 @@ void escape_analysist::instrument(
           const code_assignt &code_assign=to_code_assign(instruction.code);
           
           // may alias other stuff
+          #if 0
           std::set<exprt> lhs_set=
             local_may_alias_factory(i_it).get(i_it, code_assign.lhs());
 
@@ -445,6 +484,7 @@ void escape_analysist::instrument(
             for(unsigned i=0; i<cleanup_functions.size(); i++)
               i_it++;
           }
+          #endif
         }
         break;
 
