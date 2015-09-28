@@ -173,7 +173,7 @@ public:
     return find(number(a));
   }
   
-  inline const T &find_number(typename numbering<T>::const_iterator it) const
+  inline size_type find_number(typename numbering<T>::const_iterator it) const
   {
     return find_number(it-numbering<T>::begin());
   }
