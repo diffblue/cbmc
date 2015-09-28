@@ -578,6 +578,7 @@ codet java_bytecode_convertt::convert_instructions(
     instructionst::const_iterator source;
     std::list<unsigned> successors;
     codet code;
+    stackt stack;
     bool done;
   };
   typedef std::map<unsigned, converted_instructiont> address_mapt;
@@ -657,6 +658,8 @@ codet java_bytecode_convertt::convert_instructions(
                        a_it->second.successors.end());
 
     instructionst::const_iterator i_it=a_it->second.source;
+    stack.swap(a_it->second.stack);
+    a_it->second.stack.clear();
     codet &c=a_it->second.code;
 
     irep_idt statement=i_it->statement;
@@ -1319,6 +1322,16 @@ codet java_bytecode_convertt::convert_instructions(
     push(results);
 
     a_it->second.done=true;
+    for(std::list<unsigned>::iterator
+        it=a_it->second.successors.begin();
+        it!=a_it->second.successors.end();
+        ++it)
+    {
+      address_mapt::iterator a_it2=address_map.find(*it);
+      assert(a_it2!=address_map.end());
+
+      a_it2->second.stack=stack;
+    }
   }
 
   // TODO: add exception handlers from exception table
