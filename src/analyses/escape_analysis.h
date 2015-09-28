@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ESCAPE_ANALYSIS_H
 
 #include <util/numbering.h>
+#include <util/union_find.h>
 
 #include "ai.h"
-#include "local_may_alias.h"
 
 /*******************************************************************\
 
@@ -54,6 +54,9 @@ public:
     cleanup_map.clear();
   }
   
+  typedef union_find<irep_idt> aliasest;
+  aliasest aliases;
+  
   struct cleanupt
   {
     std::set<irep_idt> cleanup_functions;
@@ -79,15 +82,12 @@ public:
 protected:
   virtual void initialize(const goto_functionst &_goto_functions)
   {
-    local_may_alias_factory(_goto_functions);
   }
 
   friend class escape_domaint;
 
   numbering<irep_idt> bits;
   
-  local_may_alias_factoryt local_may_alias_factory;
-
   void check_lhs(locationt, const exprt &, std::set<irep_idt> &);
 
   void insert_cleanup(
