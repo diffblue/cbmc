@@ -1066,6 +1066,61 @@ codet java_bytecode_convertt::convert_instructions(
       results[1]=op[0];
       results[2]=op[1];
     }
+    else if(statement=="dup_x2")
+    {
+      assert(op.size()==3 && results.size()==4);
+      results[0]=op[2];
+      results[1]=op[0];
+      results[2]=op[1];
+      results[3]=op[2];
+    }
+    // dup2* behaviour depends on the size of the operands on the
+    // stack
+    else if(statement=="dup2")
+    {
+      assert(!stack.empty() && results.empty());
+
+      if(stack.back().type().get_unsigned_int(ID_width)==32)
+        op=pop(2);
+      else
+        op=pop(1);
+
+      results.insert(results.end(), op.begin(), op.end());
+      results.insert(results.end(), op.begin(), op.end());
+    }
+    else if(statement=="dup2_x1")
+    {
+      assert(!stack.empty() && results.empty());
+
+      if(stack.back().type().get_unsigned_int(ID_width)==32)
+        op=pop(3);
+      else
+        op=pop(2);
+
+      results.insert(results.end(), op.begin()+1, op.end());
+      results.insert(results.end(), op.begin(), op.end());
+    }
+    else if(statement=="dup2_x2")
+    {
+      assert(!stack.empty() && results.empty());
+
+      if(stack.back().type().get_unsigned_int(ID_width)==32)
+        op=pop(2);
+      else
+        op=pop(1);
+
+      assert(!stack.empty());
+      exprt::operandst op2;
+
+      if(stack.back().type().get_unsigned_int(ID_width)==32)
+        op2=pop(2);
+      else
+        op2=pop(1);
+
+      results.insert(results.end(), op.begin(), op.end());
+      results.insert(results.end(), op2.begin(), op2.end());
+      results.insert(results.end(), op.begin(), op.end());
+    }
     else if(statement=="dconst")
     {
       assert(op.empty() && results.size()==1);
