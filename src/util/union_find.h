@@ -168,6 +168,11 @@ public:
     return uuf.same_set(it_a-numbering<T>::begin(), it_b-numbering<T>::begin());
   }
 
+  inline const T &find(typename numbering<T>::const_iterator it) const
+  {
+    return find(it-numbering<T>::begin());
+  }
+  
   inline const T &find(const T &a)
   {
     return find(number(a));
