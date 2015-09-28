@@ -149,8 +149,16 @@ public:
   // are 'a' and 'b' in the same set?
   inline bool same_set(const T &a, const T &b) const
   {
-    size_type na=number(a), nb=number(b);
-    return uuf.same_set(na, nb);
+    typename subt::number_type na, nb;
+    bool have_na=!subt::get_number(a, na),
+         have_nb=!subt::get_number(b, nb);
+    
+    if(have_na && have_nb)
+      return uuf.same_set(na, nb);
+    else if(!have_na && !have_nb)
+      return a==b;
+    else
+      return false;
   }
 
   // are 'a' and 'b' in the same set?
@@ -180,9 +188,14 @@ public:
     return uuf.is_root(a);
   }
 
-  inline bool is_root(const T &a)
+  inline bool is_root(const T &a) const
   {
-    return is_root(number(a));
+    typename subt::number_type na;
+
+    if(subt::get_number(a, na))
+      return true; // not found, it's a root
+    else
+      return uuf.is_root(na);
   }
 
   inline bool is_root(typename numbering<T>::const_iterator it) const
