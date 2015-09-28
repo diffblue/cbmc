@@ -231,6 +231,16 @@ public:
     uuf.clear();
   }  
 
+  void isolate(typename numbering<T>::const_iterator it)
+  {
+    uuf.isolate(it-numbering<T>::begin());
+  }
+
+  void isolate(const T &a)
+  {
+    uuf.isolate(number(a));
+  }
+
 protected:
   unsigned_union_find uuf;
   typedef numbering<T> subt;
