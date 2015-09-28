@@ -1,6 +1,7 @@
 /*******************************************************************\
 
-Module: Field-insensitive, location-sensitive escape analysis
+Module: Field-insensitive, location-sensitive, over-approximative
+        escape analysis
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -52,8 +53,12 @@ public:
   {
     cleanup_map.clear();
   }
-
-  typedef std::set<irep_idt> cleanupt;
+  
+  struct cleanupt
+  {
+    std::set<irep_idt> cleanup_functions;
+  };
+  
   typedef std::map<irep_idt, cleanupt > cleanup_mapt;
   cleanup_mapt cleanup_map;
 

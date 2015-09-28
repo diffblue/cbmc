@@ -58,7 +58,7 @@ void escape_domaint::set_cleanup(
   if(lhs.id()==ID_symbol)
   {
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
-    cleanup_map[identifier].insert(function);
+    cleanup_map[identifier].cleanup_functions.insert(function);
   }
 }
 
@@ -81,7 +81,7 @@ void escape_domaint::assign_lhs(
   if(lhs.id()==ID_symbol)
   {
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
-    cleanup_map[identifier]=cleanup_functions;
+    cleanup_map[identifier].cleanup_functions=cleanup_functions;
   }
 }
 
@@ -109,7 +109,8 @@ void escape_domaint::get_rhs(
       cleanup_map.find(identifier);
     
     if(m_it!=cleanup_map.end())
-      cleanup_functions.insert(m_it->second.begin(), m_it->second.end());
+      cleanup_functions.insert(m_it->second.cleanup_functions.begin(),
+                               m_it->second.cleanup_functions.end());
   }
   else if(rhs.id()==ID_if)
   {
@@ -246,8 +247,9 @@ void escape_domaint::output(
       it++)
   {
     out << it->first << ':';
-    for(std::set<irep_idt>::const_iterator c_it=it->second.begin();
-        c_it!=it->second.end();
+    for(std::set<irep_idt>::const_iterator
+        c_it=it->second.cleanup_functions.begin();
+        c_it!=it->second.cleanup_functions.end();
         c_it++)
       out << ' ' << *c_it;
     out << '\n';
@@ -277,8 +279,8 @@ bool escape_domaint::merge(
       b_it!=b.cleanup_map.end();
       b_it++)
   {
-    const std::set<irep_idt> &b_cleanup=b_it->second;
-    std::set<irep_idt> &a_cleanup=cleanup_map[b_it->first];
+    const std::set<irep_idt> &b_cleanup=b_it->second.cleanup_functions;
+    std::set<irep_idt> &a_cleanup=cleanup_map[b_it->first].cleanup_functions;
     unsigned old_size=a_cleanup.size();
     a_cleanup.insert(b_cleanup.begin(), b_cleanup.end());
     if(a_cleanup.size()!=old_size) changed=true;
@@ -290,7 +292,7 @@ bool escape_domaint::merge(
       a_it!=cleanup_map.end();
       ) // no a_it++
   {
-    if(a_it->second.empty())
+    if(a_it->second.cleanup_functions.empty())
       a_it=cleanup_map.erase(a_it);
     else
       a_it++;
@@ -344,7 +346,9 @@ void escape_analysist::check_lhs(
       // More than one? Then we are still ok.
       if(count<=1)
       {
-        cleanup_functions.insert(m_it->second.begin(), m_it->second.end());
+        cleanup_functions.insert(
+          m_it->second.cleanup_functions.begin(),
+          m_it->second.cleanup_functions.end());
       }
     }
   }
