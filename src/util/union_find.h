@@ -147,7 +147,7 @@ public:
   }
   
   // are 'a' and 'b' in the same set?
-  inline bool same_set(const T &a, const T &b)
+  inline bool same_set(const T &a, const T &b) const
   {
     size_type na=number(a), nb=number(b);
     return uuf.same_set(na, nb);
