@@ -170,12 +170,12 @@ public:
 
   inline const T &find(typename numbering<T>::const_iterator it) const
   {
-    return find(it-numbering<T>::begin());
+    return numbering<T>::operator[](find_number(it-numbering<T>::begin()));
   }
   
   inline const T &find(const T &a)
   {
-    return find(number(a));
+    return numbering<T>::operator[](find_number(number(a)));
   }
   
   inline size_type find_number(typename numbering<T>::const_iterator it) const
