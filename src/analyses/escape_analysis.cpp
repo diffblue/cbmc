@@ -487,13 +487,15 @@ void escape_analysist::instrument(
     Forall_goto_program_instructions(i_it, f_it->second.body)
     {
       const goto_programt::instructiont &instruction=*i_it;
+      
+      get_state(i_it);
 
       switch(instruction.type)
       {
       case ASSIGN:
         {
           const code_assignt &code_assign=to_code_assign(instruction.code);
-          
+
           std::set<irep_idt> cleanup_functions;
           operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
           insert_cleanup(f_it->second, i_it, code_assign.lhs(), cleanup_functions, ns);
