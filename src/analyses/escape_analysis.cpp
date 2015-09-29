@@ -299,8 +299,8 @@ void escape_domaint::output(
       if(it->first==it2->first) continue;
       if(aliases.same_set(it->first, it2->first))
         out << ' ' << it2->first;
-      out << '\n';
     }
+    out << '\n';
   }
 }
 
