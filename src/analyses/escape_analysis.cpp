@@ -148,11 +148,12 @@ void escape_domaint::get_rhs_aliases(
   if(rhs.id()==ID_symbol)
   {
     irep_idt identifier=to_symbol_expr(rhs).get_identifier();
+    alias_set.insert(identifier);
     
     for(aliasest::const_iterator it=aliases.begin();
         it!=aliases.end();
         it++)
-      if(*it!=identifier && aliases.same_set(*it, identifier))
+      if(aliases.same_set(*it, identifier))
         alias_set.insert(identifier);
   }
   else if(rhs.id()==ID_if)
