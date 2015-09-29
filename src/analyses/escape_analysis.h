@@ -66,10 +66,14 @@ public:
   cleanup_mapt cleanup_map;
 
 protected:  
-  void assign_lhs(const exprt &, const std::set<irep_idt> &);
-  void get_rhs(const exprt &, std::set<irep_idt> &);
-  void set_cleanup(const exprt &, const irep_idt &);
+  void assign_lhs_cleanup(const exprt &, const std::set<irep_idt> &);
+  void get_rhs_cleanup(const exprt &, std::set<irep_idt> &);
+  void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);
+  void get_rhs_aliases(const exprt &, std::set<irep_idt> &);
   irep_idt get_function(const exprt &);
+  void check_lhs(const exprt &, std::set<irep_idt> &);
+  
+  friend class escape_analysist;
 };
 
 class escape_analysist:public ait<escape_domaint> 
@@ -88,8 +92,6 @@ protected:
 
   numbering<irep_idt> bits;
   
-  void check_lhs(locationt, const exprt &, std::set<irep_idt> &);
-
   void insert_cleanup(
     goto_functionst::goto_functiont &,
     goto_programt::targett,

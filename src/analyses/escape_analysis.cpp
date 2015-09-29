@@ -41,7 +41,7 @@ irep_idt escape_domaint::get_function(const exprt &lhs)
 
 /*******************************************************************\
 
-Function: escape_domaint::set_cleanup
+Function: escape_domaint::assign_lhs_cleanup
 
   Inputs:
 
@@ -51,30 +51,7 @@ Function: escape_domaint::set_cleanup
 
 \*******************************************************************/
 
-void escape_domaint::set_cleanup(
-  const exprt &lhs,
-  const irep_idt &function)
-{
-  if(lhs.id()==ID_symbol)
-  {
-    irep_idt identifier=to_symbol_expr(lhs).get_identifier();
-    cleanup_map[identifier].cleanup_functions.insert(function);
-  }
-}
-
-/*******************************************************************\
-
-Function: escape_domaint::assign_lhs
-
-  Inputs:
-
- Outputs:
-
- Purpose: 
-
-\*******************************************************************/
-
-void escape_domaint::assign_lhs(
+void escape_domaint::assign_lhs_cleanup(
   const exprt &lhs,
   const std::set<irep_idt> &cleanup_functions)
 {
@@ -87,7 +64,7 @@ void escape_domaint::assign_lhs(
 
 /*******************************************************************\
 
-Function: escape_domaint::get_rhs
+Function: escape_domaint::assign_lhs_aliases
 
   Inputs:
 
@@ -97,7 +74,36 @@ Function: escape_domaint::get_rhs
 
 \*******************************************************************/
 
-void escape_domaint::get_rhs(
+void escape_domaint::assign_lhs_aliases(
+  const exprt &lhs,
+  const std::set<irep_idt> &alias_set)
+{
+  if(lhs.id()==ID_symbol)
+  {
+    irep_idt identifier=to_symbol_expr(lhs).get_identifier();
+    aliases.isolate(identifier);
+    for(std::set<irep_idt>::const_iterator it=alias_set.begin();
+        it!=alias_set.end();
+        it++)
+    {
+      aliases.make_union(identifier, *it);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: escape_domaint::get_rhs_cleanup
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+void escape_domaint::get_rhs_cleanup(
   const exprt &rhs,
   std::set<irep_idt> &cleanup_functions)
 {
@@ -114,12 +120,49 @@ void escape_domaint::get_rhs(
   }
   else if(rhs.id()==ID_if)
   {
-    get_rhs(to_if_expr(rhs).true_case(), cleanup_functions);
-    get_rhs(to_if_expr(rhs).false_case(), cleanup_functions);
+    get_rhs_cleanup(to_if_expr(rhs).true_case(), cleanup_functions);
+    get_rhs_cleanup(to_if_expr(rhs).false_case(), cleanup_functions);
   }
   else if(rhs.id()==ID_typecast)
   {
-    get_rhs(to_typecast_expr(rhs).op(), cleanup_functions);
+    get_rhs_cleanup(to_typecast_expr(rhs).op(), cleanup_functions);
+  }
+}
+
+/*******************************************************************\
+
+Function: escape_domaint::get_rhs_aliases
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+void escape_domaint::get_rhs_aliases(
+  const exprt &rhs,
+  std::set<irep_idt> &alias_set)
+{
+  if(rhs.id()==ID_symbol)
+  {
+    irep_idt identifier=to_symbol_expr(rhs).get_identifier();
+    
+    for(aliasest::const_iterator it=aliases.begin();
+        it!=aliases.end();
+        it++)
+      if(*it!=identifier && aliases.same_set(*it, identifier))
+        alias_set.insert(identifier);
+  }
+  else if(rhs.id()==ID_if)
+  {
+    get_rhs_aliases(to_if_expr(rhs).true_case(), alias_set);
+    get_rhs_aliases(to_if_expr(rhs).false_case(), alias_set);
+  }
+  else if(rhs.id()==ID_typecast)
+  {
+    get_rhs_aliases(to_typecast_expr(rhs).op(), alias_set);
   }
 }
 
@@ -142,8 +185,8 @@ void escape_domaint::transform(
   const namespacet &ns)
 {
   // upcast of ai
-  escape_analysist &ea=
-    static_cast<escape_analysist &>(ai);
+  //escape_analysist &ea=
+  //  static_cast<escape_analysist &>(ai);
 
   const goto_programt::instructiont &instruction=*from;
 
@@ -154,35 +197,28 @@ void escape_domaint::transform(
       const code_assignt &code_assign=to_code_assign(instruction.code);
       
       std::set<irep_idt> cleanup_functions;
-      get_rhs(code_assign.rhs(), cleanup_functions);
+      get_rhs_cleanup(code_assign.rhs(), cleanup_functions);
+      assign_lhs_cleanup(code_assign.lhs(), cleanup_functions);
 
-      // may alias other stuff
-      #if 0
-      std::set<exprt> lhs_set=
-        ea.local_may_alias_factory(from).get(from, code_assign.lhs());
-        
-      lhs_set.insert(code_assign.lhs());
-
-      for(std::set<exprt>::const_iterator
-          l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
-      {
-        assign_lhs(*l_it, cleanup_functions);
-      }
-      #endif
+      std::set<irep_idt> aliases;
+      get_rhs_aliases(code_assign.rhs(), aliases);
+      assign_lhs_aliases(code_assign.lhs(), aliases);
     }
     break;
 
   case DECL:
     {
       const code_declt &code_decl=to_code_decl(instruction.code);
-      assign_lhs(code_decl.symbol(), std::set<irep_idt>());
+      aliases.isolate(code_decl.get_identifier());
+      assign_lhs_cleanup(code_decl.symbol(), std::set<irep_idt>());
     }
     break;
 
   case DEAD:
     {
       const code_deadt &code_dead=to_code_dead(instruction.code);
-      assign_lhs(code_dead.symbol(), std::set<irep_idt>());
+      aliases.isolate(code_dead.get_identifier());
+      assign_lhs_cleanup(code_dead.symbol(), std::set<irep_idt>());
     }
     break;
 
@@ -206,18 +242,14 @@ void escape_domaint::transform(
             if(!cleanup_function.empty())
             {
               // may alias other stuff
-              #if 0
-              std::set<exprt> lhs_set=
-                ea.local_may_alias_factory(from).get(from, lhs);
-                
-              lhs_set.insert(lhs);
+              std::set<irep_idt> lhs_set;
+              get_rhs_aliases(lhs, lhs_set);
 
-              for(std::set<exprt>::const_iterator
+              for(std::set<irep_idt>::const_iterator
                   l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
               {
-                set_cleanup(*l_it, cleanup_function);
+                cleanup_map[*l_it].cleanup_functions.insert(cleanup_function);
               }
-              #endif
             }
           }
         }
@@ -339,7 +371,7 @@ bool escape_domaint::merge(
 
 /*******************************************************************\
 
-Function: escape_analysist::check_lhs
+Function: escape_domaint::check_lhs
 
   Inputs:
 
@@ -349,8 +381,7 @@ Function: escape_analysist::check_lhs
 
 \*******************************************************************/
 
-void escape_analysist::check_lhs(
-  locationt location,
+void escape_domaint::check_lhs(
   const exprt &lhs,
   std::set<irep_idt> &cleanup_functions)  
 {
@@ -359,35 +390,31 @@ void escape_analysist::check_lhs(
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
     
     // does it have a cleanup function?
-    const escape_domaint::cleanup_mapt &cleanup_map=
-      operator[](location).cleanup_map;
-      
     const escape_domaint::cleanup_mapt::const_iterator m_it=
       cleanup_map.find(identifier);
 
     if(m_it!=cleanup_map.end())
     {
-      #if 0
-      std::set<exprt> lhs_set=
-        local_may_alias_factory(location).get(location, lhs);
+      // count the aliases
 
-      lhs_set.insert(lhs);
-      
       unsigned count=0;
       
-      for(std::set<exprt>::const_iterator l_it=lhs_set.begin();
-          l_it!=lhs_set.end(); l_it++)
-        if(l_it->id()==ID_symbol)
+      for(aliasest::const_iterator
+          a_it=aliases.begin();
+          a_it!=aliases.end();
+          a_it++)
+      {
+        if(*a_it!=identifier && aliases.same_set(*a_it, identifier))
           count+=1;
+      }
 
-      // More than one? Then we are still ok.
-      if(count<=1)
+      // There is an alias? Then we are still ok.
+      if(count==0)
       {
         cleanup_functions.insert(
           m_it->second.cleanup_functions.begin(),
           m_it->second.cleanup_functions.end());
       }
-      #endif
     }
   }
 }
@@ -466,34 +493,18 @@ void escape_analysist::instrument(
         {
           const code_assignt &code_assign=to_code_assign(instruction.code);
           
-          // may alias other stuff
-          #if 0
-          std::set<exprt> lhs_set=
-            local_may_alias_factory(i_it).get(i_it, code_assign.lhs());
-
-          lhs_set.insert(code_assign.lhs());
-
-          for(std::set<exprt>::const_iterator
-              l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
-          {
-            std::set<irep_idt> cleanup_functions;
-            check_lhs(i_it, *l_it, cleanup_functions);
-
-            insert_cleanup(f_it->second, i_it, *l_it, cleanup_functions, ns);
-
-            for(unsigned i=0; i<cleanup_functions.size(); i++)
-              i_it++;
-          }
-          #endif
+          std::set<irep_idt> cleanup_functions;
+          operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
+          insert_cleanup(f_it->second, i_it, code_assign.lhs(), cleanup_functions, ns);
         }
         break;
 
       case DEAD:
         {
           const code_deadt &code_dead=to_code_dead(instruction.code);
+
           std::set<irep_idt> cleanup_functions;
-          check_lhs(i_it, code_dead.symbol(), cleanup_functions);
-          
+          operator[](i_it).check_lhs(code_dead.symbol(), cleanup_functions);          
           insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions, ns);
           
           for(unsigned i=0; i<cleanup_functions.size(); i++)
