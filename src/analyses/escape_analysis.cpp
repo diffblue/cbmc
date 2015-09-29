@@ -347,8 +347,8 @@ bool escape_domaint::merge(
   }
   
   // do union
-  for(aliasest::const_iterator it=aliases.begin();
-      it!=aliases.end(); it++)
+  for(aliasest::const_iterator it=b.aliases.begin();
+      it!=b.aliases.end(); it++)
   {
     irep_idt b_root=b.aliases.find(it);
     
@@ -358,7 +358,7 @@ bool escape_domaint::merge(
       changed=true;
     }
   }
-  
+
   // isolate non-tracked ones
   for(aliasest::const_iterator it=aliases.begin();
       it!=aliases.end(); it++)
