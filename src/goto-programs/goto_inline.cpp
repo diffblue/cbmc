@@ -151,6 +151,56 @@ void goto_inlinet::parameter_assignments(
 
 /*******************************************************************\
 
+Function: goto_inlinet::parameter_destruction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_inlinet::parameter_destruction(
+  const source_locationt &source_location,
+  const irep_idt &function_name,
+  const code_typet &code_type,
+  goto_programt &dest)
+{
+  const code_typet::parameterst &parameter_types=
+    code_type.parameters();
+  
+  // iterates over the types of the parameters
+  for(code_typet::parameterst::const_iterator
+      it=parameter_types.begin();
+      it!=parameter_types.end();
+      it++)
+  {
+    const code_typet::parametert &parameter=*it;
+
+    const irep_idt &identifier=parameter.get_identifier();
+
+    if(identifier==irep_idt())
+    {
+      err_location(source_location);
+      throw "no identifier for function parameter";
+    }
+
+    {
+      const symbolt &symbol=ns.lookup(identifier);
+
+      goto_programt::targett dead=dest.add_instruction();
+      dead->make_dead();
+      dead->code=code_deadt(symbol.symbol_expr());
+      dead->code.add_source_location()=source_location;
+      dead->source_location=source_location;
+      dead->function=function_name; 
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: goto_inlinet::replace_return
 
   Inputs:
@@ -380,6 +430,7 @@ void goto_inlinet::expand_function_call(
     goto_programt tmp;
     parameter_assignments(target->source_location, identifier, f.type, arguments, tmp);
     tmp.destructive_append(tmp2);
+    parameter_destruction(target->source_location, identifier, f.type, tmp);
 
     if(f.is_hidden())
     {

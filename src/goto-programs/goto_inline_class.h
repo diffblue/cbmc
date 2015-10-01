@@ -70,6 +70,12 @@ protected:
     const exprt::operandst &arguments,
     goto_programt &dest);
 
+  void parameter_destruction(
+    const source_locationt &source_location,
+    const irep_idt &function_name,
+    const code_typet &code_type,
+    goto_programt &dest);
+
   typedef hash_set_cont<irep_idt, irep_id_hash> recursion_sett;
   recursion_sett recursion_set;
   
