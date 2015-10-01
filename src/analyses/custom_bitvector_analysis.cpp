@@ -84,14 +84,23 @@ Function: custom_bitvector_domaint::get_rhs
 \*******************************************************************/
 
 void custom_bitvector_domaint::get_rhs(
-  const exprt &lhs,
+  const exprt &rhs,
   vectorst &vectors)
 {
-  if(lhs.id()==ID_symbol)
+  if(rhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(lhs).get_identifier();
+    irep_idt identifier=to_symbol_expr(rhs).get_identifier();
     vectors.may_bits=may_bits[identifier];
     vectors.must_bits=must_bits[identifier];
+  }
+  else if(rhs.id()==ID_typecast)
+  {
+    get_rhs(to_typecast_expr(rhs).op(), vectors);
+  }
+  else if(rhs.id()==ID_if)
+  {
+    get_rhs(to_if_expr(rhs).true_case(), vectors);
+    get_rhs(to_if_expr(rhs).false_case(), vectors);
   }
 }
 
@@ -269,7 +278,7 @@ void custom_bitvector_domaint::output(
       it!=must_bits.end();
       it++)
   {
-    out << it->first << " MUST: ";
+    out << it->first << " MUST:";
     bit_vectort b=it->second;
 
     for(unsigned i=0; b!=0; i++, b>>=1)
