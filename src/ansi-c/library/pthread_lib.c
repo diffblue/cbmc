@@ -15,12 +15,18 @@ typedef signed char __CPROVER_mutex_t;
 #endif
 #endif
 
+inline pthread_mutex_cleanup(void *p)
+{
+  __CPROVER_assert(__CPROVER_get_must("mutext_destroyed"));
+}
+
 inline int pthread_mutex_init(
   pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
 {
   __CPROVER_HIDE:;
   *((__CPROVER_mutex_t *)mutex)=0;
   if(mutexattr!=0) (void)*mutexattr;
+  __CPROVER_cleanup(*mutex, pthread_mutex_cleanup);
   return 0;
 }
 
@@ -158,6 +164,7 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==0,
     "lock held upon destroy");
   *((__CPROVER_mutex_t *)mutex)=-1;
+  __CPROVER_set_must(*mutex, "mutex_destroyed");
   return 0;
 }
 
