@@ -535,10 +535,9 @@ void escape_analysist::instrument(
   Forall_goto_functions(f_it, goto_functions)
   {
     Forall_goto_program_instructions(i_it, f_it->second.body)
+    {
       get_state(i_it);
 
-    Forall_goto_program_instructions(i_it, f_it->second.body)
-    {
       const goto_programt::instructiont &instruction=*i_it;
       
       switch(instruction.type)
