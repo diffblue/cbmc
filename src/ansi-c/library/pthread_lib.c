@@ -226,7 +226,7 @@ inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
   __CPROVER_assert(*((signed char *)lock)==0,
     "rwlock held upon destroy");
   *((signed char *)lock)=-1;
-  __CPROVER_set_must(mutex, "rwlock_destroyed");
+  __CPROVER_set_must(lock, "rwlock_destroyed");
   return 0;
 }
 
@@ -249,7 +249,7 @@ inline int pthread_rwlock_init(pthread_rwlock_t *lock,
   __CPROVER_HIDE:;
   (*(signed char *)lock)=0;
   if(attr!=0) (void)*attr;
-  __CPROVER_cleanup(mutex, pthread_rwlock_cleanup);
+  __CPROVER_cleanup(lock, pthread_rwlock_cleanup);
   return 0;
 }
 
