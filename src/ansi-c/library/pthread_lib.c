@@ -15,8 +15,9 @@ typedef signed char __CPROVER_mutex_t;
 #endif
 #endif
 
-inline pthread_mutex_cleanup(void *p)
+inline void pthread_mutex_cleanup(void *p)
 {
+  __CPROVER_HIDE:
   __CPROVER_assert(__CPROVER_get_must(p, "mutext_destroyed"), "mutex must be destroyed");
 }
 
