@@ -83,6 +83,7 @@ protected:
   typedef enum { SET_MUST, CLEAR_MUST } modet;
 
   void set_bit(const exprt &, unsigned bit_nr, modet);
+  void set_bit(const irep_idt &, unsigned bit_nr, modet);
 };
 
 class custom_bitvector_analysist:public ait<custom_bitvector_domaint> 

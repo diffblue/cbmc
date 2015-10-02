@@ -486,6 +486,7 @@ void escape_analysist::insert_cleanup(
   goto_programt::targett location,
   const exprt &lhs,
   const std::set<irep_idt> &cleanup_functions,
+  bool is_object,
   const namespacet &ns)
 {
   source_locationt source_location=location->source_location;
@@ -507,6 +508,7 @@ void escape_analysist::insert_cleanup(
     {
       typet param_type=function_type.parameters().front().type();
       exprt arg=lhs;
+      if(is_object) arg=address_of_exprt(arg);
       if(arg.type()!=param_type) arg.make_typecast(param_type);
       code.arguments().push_back(arg);
     }
@@ -548,7 +550,7 @@ void escape_analysist::instrument(
 
           std::set<irep_idt> cleanup_functions;
           operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
-          insert_cleanup(f_it->second, i_it, code_assign.lhs(), cleanup_functions, ns);
+          insert_cleanup(f_it->second, i_it, code_assign.lhs(), cleanup_functions, false, ns);
         }
         break;
 
@@ -556,7 +558,7 @@ void escape_analysist::instrument(
         {
           const code_deadt &code_dead=to_code_dead(instruction.code);
 
-          std::set<irep_idt> cleanup_functions;
+          std::set<irep_idt> cleanup_functions1;
           
           escape_domaint &d=operator[](i_it);
 
@@ -566,16 +568,22 @@ void escape_analysist::instrument(
           // does it have a cleanup function for the object?
           if(m_it!=d.cleanup_map.end())
           {
-            cleanup_functions.insert(
+            cleanup_functions1.insert(
               m_it->second.cleanup_functions.begin(),
               m_it->second.cleanup_functions.end());
           }
 
-          d.check_lhs(code_dead.symbol(), cleanup_functions);          
-
-          insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions, ns);
+          std::set<irep_idt> cleanup_functions2;
           
-          for(unsigned i=0; i<cleanup_functions.size(); i++)
+          d.check_lhs(code_dead.symbol(), cleanup_functions2);
+
+          insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions1, true, ns);
+          insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions2, false, ns);
+          
+          for(unsigned i=0; i<cleanup_functions1.size(); i++)
+            i_it++;
+
+          for(unsigned i=0; i<cleanup_functions2.size(); i++)
             i_it++;
         }
         break;

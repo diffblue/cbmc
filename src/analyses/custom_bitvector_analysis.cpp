@@ -26,6 +26,36 @@ Function: custom_bitvector_domaint::set_bit
 \*******************************************************************/
 
 void custom_bitvector_domaint::set_bit(
+  const irep_idt &identifier,
+  unsigned bit_nr,
+  modet mode)
+{
+  bit_vectort &bit_vector=must_bits[identifier];
+
+  if(mode==SET_MUST)
+  {    
+    bit_vector|=(1l<<bit_nr);
+  }
+  else if(mode==CLEAR_MUST)
+  {
+    bit_vector|=(1l<<bit_nr);
+    bit_vector^=(1l<<bit_nr);
+  }
+}
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::set_bit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+void custom_bitvector_domaint::set_bit(
   const exprt &lhs,
   unsigned bit_nr,
   modet mode)
@@ -33,17 +63,15 @@ void custom_bitvector_domaint::set_bit(
   if(lhs.id()==ID_symbol)
   {
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
-    
-    bit_vectort &bit_vector=must_bits[identifier];
-
-    if(mode==SET_MUST)
-    {    
-      bit_vector|=(1l<<bit_nr);
-    }
-    else if(mode==CLEAR_MUST)
+    set_bit(identifier, bit_nr, mode);
+  }
+  else if(lhs.id()==ID_address_of)
+  {
+    const exprt &op=to_address_of_expr(lhs).object();
+    if(op.id()==ID_symbol)
     {
-      bit_vector|=(1l<<bit_nr);
-      bit_vector^=(1l<<bit_nr);
+      irep_idt identifier="&"+id2string(to_symbol_expr(op).get_identifier());
+      set_bit(identifier, bit_nr, mode);
     }
   }
 }
@@ -90,7 +118,7 @@ void custom_bitvector_domaint::get_rhs(
 {
   if(rhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(rhs).get_identifier();
+    const irep_idt identifier=to_symbol_expr(rhs).get_identifier();
     vectors.may_bits=may_bits[identifier];
     vectors.must_bits=must_bits[identifier];
   }
@@ -102,6 +130,16 @@ void custom_bitvector_domaint::get_rhs(
   {
     get_rhs(to_if_expr(rhs).true_case(), vectors);
     get_rhs(to_if_expr(rhs).false_case(), vectors);
+  }
+  else if(rhs.id()==ID_address_of)
+  {
+    const exprt &op=to_address_of_expr(rhs).object();
+    if(op.id()==ID_symbol)
+    {
+      const irep_idt identifier="&"+id2string(to_symbol_expr(op).get_identifier());
+      vectors.may_bits=may_bits[identifier];
+      vectors.must_bits=must_bits[identifier];
+    }
   }
 }
 
@@ -218,7 +256,7 @@ void custom_bitvector_domaint::transform(
             // may alias other stuff
             std::set<exprt> lhs_set=
               cba.local_may_alias_factory(from).get(from, lhs);
-
+              
             for(std::set<exprt>::const_iterator
                 l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
             {

@@ -98,6 +98,7 @@ protected:
     goto_programt::targett,
     const exprt &,
     const std::set<irep_idt> &,
+    bool is_object,
     const namespacet &);
 };
 
