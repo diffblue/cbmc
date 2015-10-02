@@ -70,6 +70,7 @@ protected:
   void get_rhs_cleanup(const exprt &, std::set<irep_idt> &);
   void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);
   void get_rhs_aliases(const exprt &, std::set<irep_idt> &);
+  void get_rhs_aliases_address_of(const exprt &, std::set<irep_idt> &);
   irep_idt get_function(const exprt &);
   void check_lhs(const exprt &, std::set<irep_idt> &);
   

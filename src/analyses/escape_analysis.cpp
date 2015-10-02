@@ -81,7 +81,9 @@ void escape_domaint::assign_lhs_aliases(
   if(lhs.id()==ID_symbol)
   {
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
+
     aliases.isolate(identifier);
+
     for(std::set<irep_idt>::const_iterator it=alias_set.begin();
         it!=alias_set.end();
         it++)
@@ -165,6 +167,41 @@ void escape_domaint::get_rhs_aliases(
   {
     get_rhs_aliases(to_typecast_expr(rhs).op(), alias_set);
   }
+  else if(rhs.id()==ID_address_of)
+  {
+    get_rhs_aliases_address_of(to_address_of_expr(rhs).op0(), alias_set);
+  }
+}
+
+/*******************************************************************\
+
+Function: escape_domaint::get_rhs_aliases_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+void escape_domaint::get_rhs_aliases_address_of(
+  const exprt &rhs,
+  std::set<irep_idt> &alias_set)
+{
+  if(rhs.id()==ID_symbol)
+  {
+    irep_idt identifier=to_symbol_expr(rhs).get_identifier();
+    alias_set.insert("&"+id2string(identifier));
+  }
+  else if(rhs.id()==ID_if)
+  {
+    get_rhs_aliases_address_of(to_if_expr(rhs).true_case(), alias_set);
+    get_rhs_aliases_address_of(to_if_expr(rhs).false_case(), alias_set);
+  }
+  else if(rhs.id()==ID_dereference)
+  {
+  }
 }
 
 /*******************************************************************\
@@ -203,6 +240,8 @@ void escape_domaint::transform(
 
       std::set<irep_idt> aliases;
       get_rhs_aliases(code_assign.rhs(), aliases);
+      std::cout << "RHS: " << code_assign.rhs() << "\n";
+      std::cout << "ALI: " << aliases.size() << "\n";
       assign_lhs_aliases(code_assign.lhs(), aliases);
     }
     break;
@@ -290,17 +329,27 @@ void escape_domaint::output(
         c_it++)
       out << ' ' << *c_it;
     out << '\n';
-    
-    out << "  Aliases:";
-    for(cleanup_mapt::const_iterator it2=cleanup_map.begin();
-        it2!=cleanup_map.end();
-        it2++)
+  }
+  
+  for(aliasest::const_iterator a_it1=aliases.begin();
+      a_it1!=aliases.end();
+      a_it1++)
+  {
+    bool first=true;
+  
+    for(aliasest::const_iterator a_it2=aliases.begin();
+        a_it2!=aliases.end();
+        a_it2++)
     {
-      if(it->first==it2->first) continue;
-      if(aliases.same_set(it->first, it2->first))
-        out << ' ' << it2->first;
+      if(aliases.is_root(a_it1) && a_it1!=a_it2 &&
+         aliases.same_set(a_it1, a_it2))
+      {
+        if(first) { out << "Aliases: " << *a_it1; first=false; }
+        out << ' ' << *a_it2;
+      }
     }
-    out << '\n';
+
+    if(!first) out << '\n';
   }
 }
 
@@ -360,12 +409,14 @@ bool escape_domaint::merge(
   }
 
   // isolate non-tracked ones
+  #if 0
   for(aliasest::const_iterator it=aliases.begin();
       it!=aliases.end(); it++)
   {
     if(cleanup_map.find(*it)==cleanup_map.end())
       aliases.isolate(it);
   }
+  #endif
   
   return changed;
 }
