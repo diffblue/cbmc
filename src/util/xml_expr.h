@@ -9,10 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_XML_EXPR_H
 #define CPROVER_XML_EXPR_H
 
+#include "xml.h"
+
 class source_locationt;
 class typet;
 class exprt;
-class xmlt;
 class namespacet;
 
 xmlt xml(
