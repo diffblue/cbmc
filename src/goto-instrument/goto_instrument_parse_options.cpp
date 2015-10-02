@@ -263,11 +263,6 @@ int goto_instrument_parse_optionst::doit()
       escape_analysist escape_analysis;
       escape_analysis(goto_functions, ns);
 
-      escape_analysis.instrument(goto_functions, ns);
-
-      // recalculate numbers, etc.
-      goto_functions.update();
-
       escape_analysis.output(ns, goto_functions, std::cout);
 
       return 0;
