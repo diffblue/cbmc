@@ -89,7 +89,7 @@ class custom_bitvector_analysist:public ait<custom_bitvector_domaint>
 {
 public:
   void instrument(goto_functionst &);
-  void check(const namespacet &, const goto_functionst &, std::ostream &);
+  void check(const namespacet &, const goto_functionst &, bool xml, std::ostream &);
   exprt eval(const exprt &src, locationt loc);
   static bool has_get_must(const exprt &);
 
