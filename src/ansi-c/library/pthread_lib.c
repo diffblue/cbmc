@@ -18,7 +18,7 @@ typedef signed char __CPROVER_mutex_t;
 inline void pthread_mutex_cleanup(void *p)
 {
   __CPROVER_HIDE:
-  __CPROVER_assert(__CPROVER_get_must(p, "mutext_destroyed"), "mutex must be destroyed");
+  __CPROVER_assert(__CPROVER_get_must(p, "mutex_destroyed"), "mutex must be destroyed");
 }
 
 inline int pthread_mutex_init(
@@ -224,8 +224,9 @@ inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(*((signed char *)lock)==0,
-    "lock held upon destroy");
+    "rwlock held upon destroy");
   *((signed char *)lock)=-1;
+  __CPROVER_set_must(mutex, "rwlock_destroyed");
   return 0;
 }
 
@@ -236,12 +237,19 @@ inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+inline void pthread_rwlock_cleanup(void *p)
+{
+  __CPROVER_HIDE:
+  __CPROVER_assert(__CPROVER_get_must(p, "rwlock_destroyed"), "rwlock must be destroyed");
+}
+
 inline int pthread_rwlock_init(pthread_rwlock_t *lock, 
   const pthread_rwlockattr_t *attr)
 {
   __CPROVER_HIDE:;
   (*(signed char *)lock)=0;
   if(attr!=0) (void)*attr;
+  __CPROVER_cleanup(mutex, pthread_rwlock_cleanup);
   return 0;
 }
 
