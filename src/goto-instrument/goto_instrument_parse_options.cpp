@@ -39,6 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/show_value_sets.h>
 
 #include <analyses/natural_loops.h>
+#include <analyses/global_may_alias.h>
 #include <analyses/local_may_alias.h>
 #include <analyses/local_bitvector_analysis.h>
 #include <analyses/custom_bitvector_analysis.h>
@@ -176,6 +177,24 @@ int goto_instrument_parse_optionst::doit()
         local_may_alias.output(std::cout, it->second, ns);
         std::cout << std::endl;
       }
+
+      return 0;
+    }
+
+    if(cmdline.isset("show-global-may-alias"))
+    {
+      do_function_pointer_removal();
+      do_partial_inlining();
+      do_remove_returns();
+      parameter_assignments(symbol_table, goto_functions);
+
+      // recalculate numbers, etc.
+      goto_functions.update();
+      
+      namespacet ns(symbol_table);
+      global_may_alias_analysist global_may_alias_analysis;
+      global_may_alias_analysis(goto_functions, ns);
+      global_may_alias_analysis.output(ns, goto_functions, std::cout);
 
       return 0;
     }

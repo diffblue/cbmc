@@ -40,7 +40,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(stack-depth):(nondet-static)" \
   "(function-enter):(function-exit):(branch):" \
   "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)" \
-  "(show-goto-functions)(show-value-sets)(show-local-may-alias)" \
+  "(show-goto-functions)(show-value-sets)" \
+  "(show-local-may-alias)(show-global-may-alias)" \
   "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \
   "(show-escape-analysis)(escape-analysis)" \
   "(custom-bitvector-analysis)" \
