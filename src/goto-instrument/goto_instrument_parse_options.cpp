@@ -284,7 +284,7 @@ int goto_instrument_parse_optionst::doit()
 
       custom_bitvector_analysist custom_bitvector_analysis;
       custom_bitvector_analysis(goto_functions, ns);
-      custom_bitvector_analysis.check(ns, goto_functions, std::cout);
+      custom_bitvector_analysis.check(ns, goto_functions, cmdline.isset("xml-ui"), std::cout);
 
       return 0;
     }

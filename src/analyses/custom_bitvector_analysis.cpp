@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/xml_expr.h>
 #include <util/simplify_expr.h>
 
 #include "custom_bitvector_analysis.h"
@@ -479,6 +480,7 @@ Function: custom_bitvector_analysist::check
 void custom_bitvector_analysist::check(
   const namespacet &ns,
   const goto_functionst &goto_functions,
+  bool use_xml,
   std::ostream &out)
 {
   unsigned pass=0, fail=0, unknown=0;
@@ -486,20 +488,44 @@ void custom_bitvector_analysist::check(
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
-    out << "******** Function " << f_it->first << '\n';
+
+    if(!use_xml)
+      out << "******** Function " << f_it->first << '\n';
+
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
       if(!has_get_must(i_it->guard)) continue;
-      out << i_it->source_location;
-      if(!i_it->source_location.get_comment().empty())
-        out << ", " << i_it->source_location.get_comment();
-      out << ": ";
+
       exprt result=eval(i_it->guard, i_it);
       exprt result2=simplify_expr(result, ns);
-      out << from_expr(ns, f_it->first, result2);
-      out << '\n';
-      
+
+      if(use_xml)
+      {
+        out << "<result status=\"";
+        if(result2.is_true())
+          out << "SUCCESS";
+        else if(result2.is_false())
+          out << "FAILURE";
+        else 
+          out << "UNKNOWN";
+        out << "\">\n";
+        out << xml(i_it->source_location);
+        out << "<description>"
+            << i_it->source_location.get_comment()
+            << "</description>\n";
+        out << "</result>\n\n";
+      }
+      else
+      {
+        out << i_it->source_location;
+        if(!i_it->source_location.get_comment().empty())
+          out << ", " << i_it->source_location.get_comment();
+        out << ": ";
+        out << from_expr(ns, f_it->first, result2);
+        out << '\n';
+      }
+
       if(result2.is_true())
         pass++;
       else if(result2.is_false())
@@ -507,9 +533,12 @@ void custom_bitvector_analysist::check(
       else
         unknown++;
     }
-    out << '\n';
+
+    if(!use_xml)
+      out << '\n';
   }
   
-  out << "SUMMARY: " << pass << " pass, " << fail << " fail, "
-      << unknown << " unknown\n";
+  if(!use_xml)
+    out << "SUMMARY: " << pass << " pass, " << fail << " fail, "
+        << unknown << " unknown\n";
 }
