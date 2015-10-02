@@ -439,7 +439,7 @@ void escape_domaint::check_lhs(
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
     
-    // does it have a cleanup function?
+    // pointer with aleanup function?
     const escape_domaint::cleanup_mapt::const_iterator m_it=
       cleanup_map.find(identifier);
 
@@ -501,6 +501,7 @@ void escape_analysist::insert_cleanup(
     code_function_callt code;
     code.lhs().make_nil();
     code.function()=function;
+    code.function().add_source_location()=source_location;
 
     if(function_type.parameters().size()==1)
     {
@@ -534,11 +535,12 @@ void escape_analysist::instrument(
   Forall_goto_functions(f_it, goto_functions)
   {
     Forall_goto_program_instructions(i_it, f_it->second.body)
+      get_state(i_it);
+
+    Forall_goto_program_instructions(i_it, f_it->second.body)
     {
       const goto_programt::instructiont &instruction=*i_it;
       
-      get_state(i_it);
-
       switch(instruction.type)
       {
       case ASSIGN:
@@ -556,7 +558,22 @@ void escape_analysist::instrument(
           const code_deadt &code_dead=to_code_dead(instruction.code);
 
           std::set<irep_idt> cleanup_functions;
-          operator[](i_it).check_lhs(code_dead.symbol(), cleanup_functions);          
+          
+          escape_domaint &d=operator[](i_it);
+
+          const escape_domaint::cleanup_mapt::const_iterator m_it=
+            d.cleanup_map.find("&"+id2string(code_dead.get_identifier()));
+            
+          // does it have a cleanup function for the object?
+          if(m_it!=d.cleanup_map.end())
+          {
+            cleanup_functions.insert(
+              m_it->second.cleanup_functions.begin(),
+              m_it->second.cleanup_functions.end());
+          }
+
+          d.check_lhs(code_dead.symbol(), cleanup_functions);          
+
           insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions, ns);
           
           for(unsigned i=0; i<cleanup_functions.size(); i++)
@@ -567,5 +584,8 @@ void escape_analysist::instrument(
       default:;
       }
     }
+
+    Forall_goto_program_instructions(i_it, f_it->second.body)
+      get_state(i_it);
   }
 }
