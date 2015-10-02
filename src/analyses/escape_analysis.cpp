@@ -156,7 +156,7 @@ void escape_domaint::get_rhs_aliases(
         it!=aliases.end();
         it++)
       if(aliases.same_set(*it, identifier))
-        alias_set.insert(identifier);
+        alias_set.insert(*it);
   }
   else if(rhs.id()==ID_if)
   {
@@ -240,8 +240,6 @@ void escape_domaint::transform(
 
       std::set<irep_idt> aliases;
       get_rhs_aliases(code_assign.rhs(), aliases);
-      std::cout << "RHS: " << code_assign.rhs() << "\n";
-      std::cout << "ALI: " << aliases.size() << "\n";
       assign_lhs_aliases(code_assign.lhs(), aliases);
     }
     break;
@@ -275,16 +273,16 @@ void escape_domaint::transform(
           if(code_function_call.arguments().size()==2)
           {
             exprt lhs=code_function_call.arguments()[0];
-            
+
             irep_idt cleanup_function=
               get_function(code_function_call.arguments()[1]);
-              
+
             if(!cleanup_function.empty())
             {
               // may alias other stuff
               std::set<irep_idt> lhs_set;
               get_rhs_aliases(lhs, lhs_set);
-
+              
               for(std::set<irep_idt>::const_iterator
                   l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
               {
