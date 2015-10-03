@@ -478,11 +478,6 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   {
     // the successors are non-obvious
   }
-  else if(i.is_return())
-  {
-    // the successor is the end_function at the end of the function
-    successors.push_back(--instructions.end());
-  }
   else if(i.is_assume())
   {
     if(!i.guard.is_false() && next!=instructions.end())
@@ -533,11 +528,6 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   else if(i.is_end_thread())
   {
     // no successors
-  }
-  else if(i.is_return())
-  {
-    // the successor is the end_function at the end
-    successors.push_back(--instructions.end());
   }
   else if(i.is_assume())
   {
