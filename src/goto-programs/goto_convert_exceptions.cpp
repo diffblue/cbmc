@@ -377,16 +377,15 @@ Function: goto_convertt::unwind_destructor_stack
 
 void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
-  std::size_t stack_size,
-  goto_programt &dest,
-  bool do_dead)
+  std::size_t final_stack_size,
+  goto_programt &dest)
 {
   // There might be exceptions happening in the exception
   // handler. We thus pop off the stack, and then later
   // one restore the original stack.
   destructor_stackt old_stack=targets.destructor_stack;
 
-  while(targets.destructor_stack.size()>stack_size)
+  while(targets.destructor_stack.size()>final_stack_size)
   {
     codet d_code=targets.destructor_stack.back();
     d_code.add_source_location()=source_location;
@@ -394,8 +393,7 @@ void goto_convertt::unwind_destructor_stack(
     // pop now to avoid doing this again
     targets.destructor_stack.pop_back();
  
-    if(do_dead || d_code.get_statement()!=ID_dead)
-      convert(d_code, dest);
+    convert(d_code, dest);
   }
 
   // Now restore old stack.

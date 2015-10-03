@@ -43,9 +43,7 @@ Inputs:
 
 Outputs:
 
-Purpose: turns 'return x' into an assignment to fkt#return_value,
-         unless the function returns void,
-         and a 'goto the_end_of_the_function'.
+Purpose: turns 'return x' into an assignment to fkt#return_value
 
 \*******************************************************************/
 
@@ -72,7 +70,7 @@ void remove_returnst::replace_returns(
     f_it->second.type.return_type()=empty_typet();
     function_symbol.type=f_it->second.type;
 
-    // add symbol to symbol_table
+    // add return_value symbol to symbol_table
     auxiliary_symbolt new_symbol;
     new_symbol.is_static_lifetime=true;
     new_symbol.module=function_symbol.module;
@@ -89,11 +87,6 @@ void remove_returnst::replace_returns(
   if(goto_program.empty())
     return;
 
-  goto_programt::targett end_function=
-    --goto_program.instructions.end();
-
-  assert(end_function->is_end_function());
-
   if(has_return_value)
   {
     Forall_goto_program_instructions(i_it, goto_program)
@@ -102,38 +95,17 @@ void remove_returnst::replace_returns(
       {
         assert(i_it->code.operands().size()==1);
 
-        // replace "return x;" by "fkt#return_value=x; goto end_function;"
+        // replace "return x;" by "fkt#return_value=x;"
         symbol_exprt lhs_expr;
         lhs_expr.set_identifier(id2string(function_id)+"#return_value");
         lhs_expr.type()=return_type;
 
         code_assignt assignment(lhs_expr, i_it->code.op0());
 
-        // now turn the `return' into `goto'
-        i_it->make_goto(end_function);
-  
-        goto_programt::instructiont tmp_i;
-        tmp_i.make_assignment();
-        tmp_i.code=assignment;
-        tmp_i.source_location=i_it->source_location;
-        tmp_i.function=i_it->function;
-
-        // inserts the assignment
-        goto_program.insert_before_swap(i_it, tmp_i);
-
-        // i_it is now the assignment, advance to the `goto'
-        i_it++;
+        // now turn the `return' into `assignment'
+        i_it->type=ASSIGN;
+        i_it->code=assignment;
       }
-    }
-  }
-  else
-  {
-    // simply replace all the returns by gotos
-
-    Forall_goto_program_instructions(i_it, goto_program)
-    {
-      if(i_it->is_return())
-        i_it->make_goto(end_function);
     }
   }
 }

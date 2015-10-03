@@ -222,8 +222,7 @@ protected:
   void unwind_destructor_stack(
     const source_locationt &,
     std::size_t stack_size,
-    goto_programt &dest,
-    bool do_dead=true);
+    goto_programt &dest);
 
   //
   // gotos
@@ -253,7 +252,7 @@ protected:
     casest cases;
     cases_mapt cases_map;
 
-    goto_programt::targett break_target, continue_target,
+    goto_programt::targett return_target, break_target, continue_target,
       default_target, throw_target, leave_target;
     
     std::size_t break_stack_size, continue_stack_size, throw_stack_size,
@@ -288,6 +287,12 @@ protected:
     {
       default_set=true;
       default_target=_default_target;
+    }
+
+    void set_return(goto_programt::targett _return_target)
+    {
+      return_set=true;
+      return_target=_return_target;
     }
 
     void set_throw(goto_programt::targett _throw_target)
