@@ -691,7 +691,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     compound_symbol.type=type;
     compound_symbol.location=type.source_location();
 
-    typecheck_compound_body(compound_symbol);
+    typecheck_compound_body(to_struct_union_type(compound_symbol.type));
 
     std::string typestr=type2name(compound_symbol.type);
     compound_symbol.base_name="#anon-"+typestr;
@@ -730,25 +730,23 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       compound_symbol.location=type.source_location();
       compound_symbol.pretty_name=id2string(type.id())+" "+id2string(base_name);
 
+      typet new_type=compound_symbol.type;
+
+      if(compound_symbol.type.id()==ID_struct)
+        compound_symbol.type.id(ID_incomplete_struct);
+      else if(compound_symbol.type.id()==ID_union)
+        compound_symbol.type.id(ID_incomplete_union);
+      else
+        assert(false);
+
+      symbolt *new_symbol;
+      move_symbol(compound_symbol, new_symbol);
+
       if(have_body)
       {
-        // add before doing the body (may be recursive)      
-        symbolt *new_symbol;
-        move_symbol(compound_symbol, new_symbol);
+        typecheck_compound_body(to_struct_union_type(new_type));
 
-        typecheck_compound_body(*new_symbol);
-      }
-      else
-      {
-        if(compound_symbol.type.id()==ID_struct)
-          compound_symbol.type.id(ID_incomplete_struct);
-        else if(compound_symbol.type.id()==ID_union)
-          compound_symbol.type.id(ID_incomplete_union);
-        else
-          assert(false);
-
-        symbolt *new_symbol;
-        move_symbol(compound_symbol, new_symbol);
+        new_symbol->type.swap(new_type);
       }
     }
     else
@@ -764,8 +762,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
           type.remove(ID_tag);
           type.set(ID_tag, base_name);
 
-          s_it->second.type=type;
-          typecheck_compound_body(s_it->second);
+          typecheck_compound_body(type);
+          s_it->second.type.swap(type);
         }
       }
       else if(have_body)
@@ -797,10 +795,10 @@ Function: c_typecheck_baset::typecheck_compound_type
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
+void c_typecheck_baset::typecheck_compound_body(
+  struct_union_typet &type)
 {
-  struct_union_typet::componentst &components=
-    to_struct_union_type(symbol.type).components();
+  struct_union_typet::componentst &components=type.components();
 
   struct_union_typet::componentst old_components;
   old_components.swap(components);
@@ -846,6 +844,14 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
 
         typecheck_type(new_component.type());
 
+        if(!is_complete_type(new_component.type()) &&
+           (new_component.type().id()!=ID_array ||
+            !to_array_type(new_component.type()).is_incomplete()))
+        {
+          err_location(new_component.source_location());
+          throw "incomplete type not permitted here";
+        }
+
         components.push_back(new_component);
       }
     }
@@ -885,17 +891,17 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
   // We allow an incomplete (C99) array as _last_ member!
   // Zero-length is allowed everywhere.
 
-  if(symbol.type.id()==ID_struct)
+  if(type.id()==ID_struct)
   {
     for(struct_union_typet::componentst::iterator
         it=components.begin();
         it!=components.end();
         it++)
     {
-      typet &type=it->type();
+      typet &c_type=it->type();
     
-      if(type.id()==ID_array &&
-         to_array_type(type).is_incomplete())
+      if(c_type.id()==ID_array &&
+         to_array_type(c_type).is_incomplete())
       {
         // needs to be last member
         if(it!=--components.end())
@@ -905,8 +911,8 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
         }
         
         // make it zero-length
-        type.id(ID_array);
-        type.set(ID_size, gen_zero(index_type()));
+        c_type.id(ID_array);
+        c_type.set(ID_size, gen_zero(index_type()));
       }
     }  
   }
@@ -915,10 +921,10 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
   // the end of structs and
   // as additional member for unions.
 
-  if(symbol.type.id()==ID_struct)
-    add_padding(to_struct_type(symbol.type), *this);
-  else if(symbol.type.id()==ID_union)
-    add_padding(to_union_type(symbol.type), *this);
+  if(type.id()==ID_struct)
+    add_padding(to_struct_type(type), *this);
+  else if(type.id()==ID_union)
+    add_padding(to_union_type(type), *this);
 
   // Now remove zero-width bit-fields, these are just
   // for adjusting alignment.
