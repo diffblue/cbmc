@@ -98,12 +98,6 @@ protected:
     goto_programt::const_targett next_PC,
     entryt &entry);
 
-  virtual void compute_edges_return(
-    const goto_programt &goto_program,
-    const goto_programt::instructiont &instruction,
-    goto_programt::const_targett next_PC,
-    entryt &entry);
-
   void compute_edges(
     const goto_functionst &goto_functions,
     const goto_programt &goto_program,
@@ -445,31 +439,6 @@ void procedure_local_cfg_baset<T, P, I>::compute_edges_function_call(
 
 /*******************************************************************\
 
-Function: cfg_baset::compute_edges_return
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-template<class T, typename P, typename I>
-void cfg_baset<T, P, I>::compute_edges_return(
-  const goto_programt &goto_program,
-  const goto_programt::instructiont &instruction,
-  goto_programt::const_targett next_PC,
-  entryt &entry)
-{
-  // the successor of return is the last instruction of the function,
-  // normally END_FUNCTION
-  if(next_PC!=goto_program.instructions.end())
-    this->add_edge(entry, entry_map[--(goto_program.instructions.end())]);
-}
-
-/*******************************************************************\
-
 Function: cfg_baset::compute_edges
 
   Inputs:
@@ -498,12 +467,15 @@ void cfg_baset<T, P, I>::compute_edges(
   case GOTO:
     compute_edges_goto(goto_program, instruction, next_PC, entry);
     break;
+
   case CATCH:
     compute_edges_catch(goto_program, instruction, next_PC, entry);
     break;
+
   case THROW:
     compute_edges_throw(goto_program, instruction, next_PC, entry);
     break;
+
   case START_THREAD:
     compute_edges_start_thread(
       goto_program,
@@ -511,6 +483,7 @@ void cfg_baset<T, P, I>::compute_edges(
       next_PC,
       entry);
     break;
+
   case FUNCTION_CALL:
     compute_edges_function_call(
       goto_functions,
@@ -519,20 +492,21 @@ void cfg_baset<T, P, I>::compute_edges(
       next_PC,
       entry);
     break;
-  case RETURN:
-    compute_edges_return(goto_program, instruction, next_PC, entry);
-    break;
+
   case END_THREAD:
   case END_FUNCTION:
     // no successor
     break;
+
   case ASSUME:
     // false guard -> no successor
     if(instruction.guard.is_false())
       break;
+
   case ASSIGN:
   case ASSERT:
   case OTHER:
+  case RETURN:
   case SKIP:
   case LOCATION:
   case ATOMIC_BEGIN:
@@ -542,6 +516,7 @@ void cfg_baset<T, P, I>::compute_edges(
     if(next_PC!=goto_program.instructions.end())
       this->add_edge(entry, entry_map[next_PC]);
     break;
+
   case NO_INSTRUCTION_TYPE:
     assert(false);
     break;
