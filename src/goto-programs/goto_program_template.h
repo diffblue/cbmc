@@ -32,7 +32,7 @@ typedef enum { NO_INSTRUCTION_TYPE=0,
                END_FUNCTION=9,  // exit point of a function
                ATOMIC_BEGIN=10, // marks a block without interleavings
                ATOMIC_END=11,   // end of a block without interleavings
-               RETURN=12,       // return from a function
+               RETURN=12,       // set function return value (no control-flow change)
                ASSIGN=13,       // assignment lhs:=rhs
                DECL=14,         // declare a local variable
                DEAD=15,         // marks the end-of-live of a local variable

@@ -245,8 +245,14 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   else
     end_location.make_nil();
 
+  goto_programt tmp_end_function;
+  goto_programt::targett end_function=tmp_end_function.add_instruction();
+  end_function->type=END_FUNCTION;
+  end_function->source_location=end_location;
+  end_function->code.set(ID_identifier, identifier);
+
   targets=targetst();
-  targets.return_set=true;
+  targets.set_return(end_function);
   targets.has_return_value=
     f.type.return_type().id()!=ID_empty &&
     f.type.return_type().id()!=ID_constructor &&
@@ -290,10 +296,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   }
 
   // add "end of function"
-  goto_programt::targett t=f.body.add_instruction();
-  t->type=END_FUNCTION;
-  t->source_location=end_location;
-  t->code.set(ID_identifier, identifier);
+  f.body.destructive_append(tmp_end_function);
 
   // do function tags
   Forall_goto_program_instructions(i_it, f.body)

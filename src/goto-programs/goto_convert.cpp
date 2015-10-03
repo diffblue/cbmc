@@ -1491,6 +1491,12 @@ void goto_convertt::convert_return(
       err_location(new_code);
       throw "function must return value";
     }
+
+    // Now add a return node to set the return value.
+    goto_programt::targett t=dest.add_instruction();
+    t->make_return();
+    t->code=new_code;
+    t->source_location=new_code.source_location();
   }
   else
   {
@@ -1502,15 +1508,12 @@ void goto_convertt::convert_return(
     }
   }
   
-  // Need to process entire destructor stack.
-  // We ignore 'dead' here, as we may need
-  // these for the return value.
-  unwind_destructor_stack(code.source_location(), 0, dest, false);
+  // Need to process _entire_ destructor stack.
+  unwind_destructor_stack(code.source_location(), 0, dest);
   
-  // now add return
+  // add goto to end-of-function
   goto_programt::targett t=dest.add_instruction();
-  t->make_return();
-  t->code=new_code;
+  t->make_goto(targets.return_target, true_exprt());
   t->source_location=new_code.source_location();
 }
 
