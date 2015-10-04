@@ -18,17 +18,17 @@ Date: June 2006
 
 /*******************************************************************\
  
-Function: read_goto_object_v2
+Function: read_goto_object_v3
  
   Inputs: input stream, symbol_table, functions
  
  Outputs: true on error, false otherwise
  
- Purpose: read goto binary format v2
+ Purpose: read goto binary format v3
  
 \*******************************************************************/
 
-bool read_bin_goto_object_v2(
+bool read_bin_goto_object_v3(
   std::istream &in,
   const std::string &filename,
   symbol_tablet &symbol_table,
@@ -216,13 +216,14 @@ bool read_bin_goto_object(
     switch(version)
     {
     case 1:
+    case 2:
       message.error() <<
           "The input was compiled with an old version of "
           "goto-cc; please recompile" << messaget::eom;
       return true;
 
-    case 2:
-      return read_bin_goto_object_v2(in, filename, 
+    case 3:
+      return read_bin_goto_object_v3(in, filename, 
                                      symbol_table, functions, 
                                      message_handler,
                                      irepconverter);
