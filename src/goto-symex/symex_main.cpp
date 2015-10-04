@@ -316,7 +316,7 @@ void goto_symext::symex_step(
     
   case RETURN:
     if(!state.guard.is_false())
-      symex_return(state);
+      return_assignment(state);
 
     state.source.pc++;
     break;

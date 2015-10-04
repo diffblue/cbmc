@@ -83,10 +83,6 @@ void local_cfgt::build(const goto_programt &goto_program)
       }
       break;
       
-    case RETURN:
-      node.successors.push_back(nodes.size()-1);
-      break;
-      
     case THROW:
     case END_FUNCTION:
     case END_THREAD:

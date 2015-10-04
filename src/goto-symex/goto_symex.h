@@ -85,7 +85,6 @@ public:
     statet &state);
 
   // these bypass the target maps
-  virtual void symex_step_return(statet &state);
   virtual void symex_step_goto(statet &state, bool taken);
   
   // statistics
@@ -155,7 +154,6 @@ protected:
   virtual void symex_atomic_end(statet &state);  
   virtual void symex_decl(statet &state);
   virtual void symex_dead(statet &state);
-  virtual void symex_return(statet &state);
 
   virtual void symex_other(
     const goto_functionst &goto_functions,
