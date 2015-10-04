@@ -12,6 +12,7 @@
 
 namespace
 {
+#if 0
 const char PROGRAM_ARG_NAME[]="__CPROVER_danger_execute::program";
 const char PROGRAM_ARG_BASE_NAME[]="program";
 const char SIZE_ARG_NAME[]="__CPROVER_danger_execute::size";
@@ -83,6 +84,7 @@ void set_init_values(danger_programt &prog)
   pos=init_array(st, body, DANGER_OPS, --pos);
   pos=init_array(st, body, DANGER_RESULT_OPS, pos);
 }
+#endif
 }
 
 void add_danger_library(danger_programt &prog, message_handlert &msg,

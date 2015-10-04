@@ -8,7 +8,7 @@
 
 namespace
 {
-const char NONDET_PREFIX[]="DANGER_CONSTANT_NONDET_";
+//const char NONDET_PREFIX[]="DANGER_CONSTANT_NONDET_";
 }
 
 size_t default_constant_strategy(danger_programt &program,
