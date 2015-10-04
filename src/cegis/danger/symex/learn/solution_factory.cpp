@@ -26,6 +26,7 @@ const size_t get_const_value(const exprt &expr)
 }
 
 typedef std::map<size_t, const irep_idt> danger_variable_namest;
+
 void reverse(danger_variable_namest &names, const danger_variable_idst &o)
 {
   for (danger_variable_idst::const_iterator it=o.begin(); it != o.end(); ++it)
@@ -210,6 +211,7 @@ void create_danger_solution(danger_goto_solutiont &result,
     const danger_programt &prog, const goto_tracet &trace,
     const danger_variable_idst &ids, const size_t max_size)
 {
+  typedef std::map<size_t, const irep_idt> danger_variable_namest;
   danger_variable_namest names;
   reverse(names, ids);
   instruction_sett instr_set;
