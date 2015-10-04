@@ -1,13 +1,10 @@
 CORE
 main.c
---gcc --unwind 2 --no-unwinding-assertions --cegis --function main --cegis-max-prog-size 1 --cegis-targets __CPROVER_synthesis_danger_invariant --cegis-skolem __CPROVER_synthesis_skolem
+--gcc --danger
 ^EXIT=0$
 ^SIGNAL=0$
-^ *__CPROVER_synthesis_tmp_0 *= *-2;$
-^ *__CPROVER_synthesis_tmp_1 *= *1;$
-^ *__CPROVER_synthesis_danger_invariant: *$
-^.*__CPROVER_synthesis_writeonly_danger_invariant *= *__CPROVER_synthesis_const_x *[+] *__CPROVER_synthesis_tmp_0;$
-^ *__CPROVER_synthesis_skolem: *$
-^.*__CPROVER_synthesis_skolem_condition *= *[(]signed *int[)][(]__CPROVER_synthesis_tmp_1 *<= *__CPROVER_synthesis_const_x[)];$
+^.*__CPROVER_danger_D0_x *= *[(]unsigned *int[)]x *- *DANGER_CONSTANT_2u;$
+^.*__CPROVER_danger_R0_x_0 *= *DANGER_CONSTANT_3u *- *[(]unsigned *int[)]x;$
+^.*__CPROVER_danger_S0_x_0 *= *[(]unsigned *int[)]x *<< *[(]unsigned *int[)]x;$
 --
 ^warning: ignoring

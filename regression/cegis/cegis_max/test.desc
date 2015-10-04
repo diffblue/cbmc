@@ -1,8 +1,0 @@
-CORE
-main.c
---gcc --unwind 2 --no-unwinding-assertions --cegis --function main --cegis-max-prog-size 1
-^EXIT=0$
-^SIGNAL=0$
-^.*result *= *[(]signed int[)][(]__CPROVER_synthesis_arg_y *< *__CPROVER_synthesis_arg_x[)];$
---
-^warning: ignoring
