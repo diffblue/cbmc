@@ -1511,10 +1511,11 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     else if(i.is_return())
     {
       if(i.code.operands().size()==1)
+      {
         check(i.code.op0());
-        
-      // this has no successor
-      assertions.clear();
+        // the return value invalidate any assertion
+        invalidate(i.code.op0());
+      }
     }
     else if(i.is_throw())
     {

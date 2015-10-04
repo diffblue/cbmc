@@ -373,8 +373,7 @@ void full_slicert::operator()(
     else if(implicit(e_it->first))
       add_to_queue(queue, e_it->second, e_it->first);
     else if((e_it->first->is_goto() && e_it->first->guard.is_true()) ||
-            e_it->first->is_throw() ||
-            e_it->first->is_return())
+            e_it->first->is_throw())
       jumps.push_back(e_it->second);
     else if(e_it->first->is_decl())
     {

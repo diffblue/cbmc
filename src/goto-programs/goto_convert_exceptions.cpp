@@ -275,22 +275,12 @@ void goto_convertt::convert_CPROVER_throw(
   else // otherwise, we do a return
   {
     // need to process destructor stack
-    for(destructor_stackt::const_reverse_iterator
-        d_it=targets.destructor_stack.rbegin();
-        d_it!=
-        (destructor_stackt::const_reverse_iterator)targets.destructor_stack.rend();
-        // The type cast for rend() above is a work-around for broken g++ 3.4.4,
-        // and will enventually go away.
-        d_it++)
-    {
-      codet d_code=*d_it;
-      d_code.add_source_location()=code.source_location();
-      convert(d_code, dest);
-    }
+    unwind_destructor_stack(code.source_location(), 0, dest);
 
-    goto_programt::targett t=dest.add_instruction(RETURN);
+    // add goto
+    goto_programt::targett t=dest.add_instruction();
+    t->make_goto(targets.return_target);
     t->source_location=code.source_location();
-    t->code=code_returnt();
   }
 }
 
