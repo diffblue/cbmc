@@ -848,7 +848,7 @@ void c_typecheck_baset::typecheck_compound_body(
            (new_component.type().id()!=ID_array ||
             !to_array_type(new_component.type()).is_incomplete()))
         {
-          err_location(new_component.source_location());
+          err_location(new_component.type().source_location());
           throw "incomplete type not permitted here";
         }
 
