@@ -132,11 +132,12 @@ void remove_returnst::do_function_calls(
     {
       code_function_callt &function_call=to_code_function_call(i_it->code);
 
-      // replace "lhs=f(...)" by "f(...); lhs=f#return_value;"
       code_typet old_type=to_code_type(function_call.function().type());
 
+      // Do we return anything?
       if(old_type.return_type()!=empty_typet())
       {
+        // replace "lhs=f(...)" by "f(...); lhs=f#return_value; DEAD f#return_value;"
         assert(function_call.function().id()==ID_symbol);
 
         const irep_idt function_id=
@@ -171,14 +172,23 @@ void remove_returnst::do_function_calls(
             rhs=nondet_value;
           }
 
-          goto_programt::targett t=goto_program.insert_after(i_it);
-          t->make_assignment();
-          t->source_location=i_it->source_location;
-          t->code=code_assignt(function_call.lhs(), rhs);
-          t->function=i_it->function;
+          goto_programt::targett t_a=goto_program.insert_after(i_it);
+          t_a->make_assignment();
+          t_a->source_location=i_it->source_location;
+          t_a->code=code_assignt(function_call.lhs(), rhs);
+          t_a->function=i_it->function;
 
           // fry the previous assignment
           function_call.lhs().make_nil();
+
+          if(f_it->second.body_available)
+          {
+            goto_programt::targett t_d=goto_program.insert_after(t_a);
+            t_d->make_dead();
+            t_d->source_location=i_it->source_location;
+            t_d->code=code_deadt(rhs);
+            t_d->function=i_it->function;
+          }
         }
       }
     }
