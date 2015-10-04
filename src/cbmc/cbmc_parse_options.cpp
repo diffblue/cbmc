@@ -37,10 +37,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 
-#include <cegis/bmc/bmc_verification_oracle.h>
-#include <cegis/symex/symex_learn.h>
+#include <cegis/symex/cegis_symex_verify.h>
+#include <cegis/symex/cegis_symex_learn.h>
+#include <cegis/danger/constant/default_constant_strategy.h>
+#include <cegis/danger/preprocess/danger_preprocessing.h>
+#include <cegis/danger/symex/verify/danger_verify_config.h>
+#include <cegis/danger/symex/learn/danger_learn_config.h>
 #include <cegis/facade/cegis.h>
-#include <cegis/options/cegis_options.h>
 
 #include <goto-instrument/full_slicer.h>
 
@@ -534,14 +537,20 @@ int cbmc_parse_optionst::doit()
   if(set_properties(goto_functions))
     return 7;
 
-  if(cmdline.isset("cegis"))
+  if(cmdline.isset("danger"))
   {
-    if (cmdline.isset("function"))
-      options.set_option("function", cmdline.get_value("function"));
-    const cegis_optionst cegis_options(cmdline, options);
-    symex_learnt learning_algorithm(cegis_options, symbol_table, goto_functions, ui_message_handler);
-    bmc_verification_oraclet verification_oracle(options, symbol_table, goto_functions);
-    return run_cegis(learning_algorithm, verification_oracle, result());
+    size_t max_prog_size=100u;
+    if (cmdline.isset("danger-max-size"))
+      max_prog_size=string2integer(cmdline.get_value("function")).to_ulong();
+
+    const constant_strategyt strategy=default_constant_strategy;
+    danger_preprocessingt preproc(symbol_table, goto_functions, strategy);
+    const danger_programt &prog=preproc.get_danger_program();
+    danger_verify_configt verify_config(prog);
+    cegis_symex_verifyt<danger_verify_configt> verify(options, verify_config);
+    danger_learn_configt learn_config(prog);
+    cegis_symex_learnt<danger_learn_configt> learn(options, learn_config);
+    return run_cegis(learn, verify, preproc, max_prog_size, result());
   }
 
   // do actual BMC
