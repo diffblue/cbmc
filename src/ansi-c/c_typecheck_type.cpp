@@ -891,7 +891,8 @@ void c_typecheck_baset::typecheck_compound_body(
   // We allow an incomplete (C99) array as _last_ member!
   // Zero-length is allowed everywhere.
 
-  if(type.id()==ID_struct)
+  if(type.id()==ID_struct ||
+     type.id()==ID_union)
   {
     for(struct_union_typet::componentst::iterator
         it=components.begin();
@@ -904,7 +905,7 @@ void c_typecheck_baset::typecheck_compound_body(
          to_array_type(c_type).is_incomplete())
       {
         // needs to be last member
-        if(it!=--components.end())
+        if(type.id()==ID_struct && it!=--components.end())
         {
           err_location(*it);
           throw "flexible struct member must be last member";
