@@ -41,7 +41,7 @@ const goto_functionst &danger_learn_configt::get_goto_functions() const
   return program.gf;
 }
 
-void danger_learn_configt::danger_learn_configt::convert(candidatet &candidate,
+void danger_learn_configt::convert(candidatet &candidate,
     const class goto_tracet &trace, const size_t max_solution_size)
 {
   candidate.danger_programs.clear();
