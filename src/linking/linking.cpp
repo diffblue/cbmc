@@ -618,12 +618,12 @@ void linkingt::duplicate_object_symbol(
         err_location(new_symbol.value);
         str << "error: conflicting initializers for variable \""
             << old_symbol.name
-            << "\"" << std::endl;
+            << "\"" << '\n';
         str << "old value in module " << old_symbol.module
-            << " " << old_symbol.value.find_location() << std::endl
-            << expr_to_string(ns, old_symbol.name, tmp_old) << std::endl;
+            << " " << old_symbol.value.find_source_location() << '\n'
+            << expr_to_string(ns, old_symbol.name, tmp_old) << '\n';
         str << "new value in module " << new_symbol.module
-            << " " << new_symbol.value.find_location() << std::endl
+            << " " << new_symbol.value.find_source_location() << '\n'
             << expr_to_string(ns, new_symbol.name, tmp_new);
         throw 0;
       }

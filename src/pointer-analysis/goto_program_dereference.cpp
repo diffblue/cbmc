@@ -246,7 +246,7 @@ void goto_program_dereferencet::dereference_rec(
     if(expr.operands().size()!=1)
       throw "dereference expects one operand";
 
-    dereference_location=expr.find_location();
+    dereference_location=expr.find_source_location();
     
     exprt tmp=dereference.dereference(
       expr.op0(), guard, mode);
@@ -262,7 +262,7 @@ void goto_program_dereferencet::dereference_rec(
 
     if(expr.op0().type().id()==ID_pointer)
     {
-      dereference_location=expr.find_location();
+      dereference_location=expr.find_source_location();
 
       exprt tmp1(ID_plus, expr.op0().type());
       tmp1.operands().swap(expr.operands());

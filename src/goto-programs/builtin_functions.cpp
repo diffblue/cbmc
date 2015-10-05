@@ -527,7 +527,7 @@ void goto_convertt::do_cpp_new(
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(
     lhs, typecast_exprt(tmp_symbol_expr, lhs.type()));
-  t_n->source_location=rhs.find_location();
+  t_n->source_location=rhs.find_source_location();
     
   // grab initializer
   goto_programt tmp_initializer;

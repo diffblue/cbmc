@@ -594,7 +594,7 @@ void goto_checkt::integer_overflow_check(
       not_exprt(overflow),
       "arithmetic overflow on "+kind+" "+expr.id_string(),
       "overflow",
-      expr.find_location(),
+      expr.find_source_location(),
       expr,
       guard);
   }
