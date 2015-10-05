@@ -117,3 +117,8 @@ extern const int __CPROVER_pipe_offset;
 extern unsigned __CPROVER_pipe_count;
 #endif
 
+__CPROVER_bool __CPROVER_get_flag(const void *, const char *);
+void __CPROVER_set_must(const void *, const char *);
+void __CPROVER_clear_must(const void *, const char *);
+void __CPROVER_cleanup(const void *, const void *);
+__CPROVER_bool __CPROVER_get_must(const void *, const char *);
