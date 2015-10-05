@@ -904,7 +904,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     {
       parameter=exprt(ID_type, typet(ID_symbol));
       parameter.type().set(ID_identifier, identifier);
-      parameter.type().add_source_location()=declaration.find_location();
+      parameter.type().add_source_location()=declaration.find_source_location();
     }
     else
     {
