@@ -1,7 +1,8 @@
 What architecture?
 ------------------
 
-CPROVER compiles in the following environments:
+CPROVER now needs a C++11 compliant compiler and works in the following
+environments:
 
 - Linux
 
@@ -14,7 +15,7 @@ CPROVER compiles in the following environments:
 - Cygwin
   (We recommend the i686-pc-mingw32-g++ cross compiler, version 4.7 or above.)
 
-- Microsoft's Visual Studio 2010, 2012 or 2013 (older versions won't work)
+- Microsoft's Visual Studio 2012 or 2013 (older versions won't work)
 
 The rest of this document is split up into three parts: compilation on
 Linux, MacOS, Windows.  Please read the section appropriate for your
@@ -166,7 +167,7 @@ Follow these instructions:
    BUILD_ENV = MinGW
 
 3B) To compile with Visual Studio, make sure you have at least Visual
-   Studio 10, and adjust the second line of config.inc to say
+   Studio 2012, and adjust the second line of config.inc to say
 
    BUILD_ENV = MSVC
 
