@@ -127,7 +127,7 @@ void assign_ce_values(danger_programt &prog, const counterexamplet &ce)
   std::for_each(ce.begin(), ce.end(), assign_value);
 }
 
-const char CONSTRAINTS[]=DANGER_PREFIX "constraints";
+//const char CONSTRAINTS[]=DANGER_PREFIX "constraints";
 
 void create_constraints(danger_programt &prog)
 {
