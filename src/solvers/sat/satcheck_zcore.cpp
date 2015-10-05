@@ -97,9 +97,10 @@ Function: satcheck_zcoret::prop_solve
 
 propt::resultt satcheck_zcoret::prop_solve()
 {
+  // We start counting at 1, thus there is one variable fewer.
   {
     std::string msg=
-      i2string(no_variables())+" variables, "+
+      i2string(no_variables()-1)+" variables, "+
       i2string(no_clauses())+" clauses";
     messaget::status() << msg << messaget::eom;
   }

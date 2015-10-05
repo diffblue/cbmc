@@ -213,7 +213,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 
   {
     messaget::status() <<
-      _no_variables << " variables, " <<
+      (no_variables()-1) << " variables, " <<
       solver->nClauses() << " clauses" << eom;
   }
   

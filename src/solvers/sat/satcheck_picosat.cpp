@@ -118,7 +118,7 @@ propt::resultt satcheck_picosatt::prop_solve()
 
   {
     std::string msg=
-      i2string(_no_variables)+" variables, "+
+      i2string(_no_variables-1)+" variables, "+
       i2string(picosat_added_original_clauses(picosat))+" clauses";
     messaget::status() << msg << messaget::eom;
   }
