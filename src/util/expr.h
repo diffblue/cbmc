@@ -130,16 +130,23 @@ public:
   
   friend bool operator<(const exprt &X, const exprt &Y);
   
+  #if 0
   // will go away
-  inline const source_locationt &find_location() const { return find_source_location(); }
+  inline const source_locationt &find_location() const
+  {
+    return find_source_location();
+  }
+  #endif
 
   const source_locationt &find_source_location() const;
 
+  #if 0
   // will go away
   inline const source_locationt &location() const
   {
     return static_cast<const source_locationt &>(find(ID_C_source_location));
   }
+  #endif
 
   inline const source_locationt &source_location() const
   {
