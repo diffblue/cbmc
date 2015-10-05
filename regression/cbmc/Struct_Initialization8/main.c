@@ -8,6 +8,8 @@ struct S
 
 struct S s={ .z=1, .a={ 2, 3, 4 } };
 struct S t={ 1, { 2, 3, 4 } };
+
+// old style (gcc)
 struct S u={ z: 1, a: { 2, 3, 4 } };
 
 int main()
