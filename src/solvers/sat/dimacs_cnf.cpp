@@ -74,7 +74,8 @@ Function: dimacs_cnft::write_problem_line
 
 void dimacs_cnft::write_problem_line(std::ostream &out)
 {
-  out << "p cnf " << no_variables() << " " 
+  // We start counting at 1, thus there is one variable fewer.
+  out << "p cnf " << (no_variables()-1) << " " 
       << clauses.size() << "\n";
 }
 

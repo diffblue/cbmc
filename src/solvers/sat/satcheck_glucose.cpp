@@ -211,9 +211,10 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
 {
   assert(status!=ERROR);
 
+  // We start counting at 1, thus there is one variable fewer.
   {
     messaget::status() <<
-      _no_variables << " variables, " <<
+      (no_variables()-1) << " variables, " <<
       solver->nClauses() << " clauses" << eom;
   }
   

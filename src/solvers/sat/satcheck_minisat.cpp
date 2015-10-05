@@ -241,7 +241,7 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
 
   {
     messaget::status() <<
-      _no_variables << " variables, " <<
+      (_no_variables-1) << " variables, " <<
       solver->nClauses() << " clauses" << messaget::eom;
   }
   

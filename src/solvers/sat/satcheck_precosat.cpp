@@ -114,9 +114,10 @@ propt::resultt satcheck_precosatt::prop_solve()
 {
   assert(status!=ERROR);
 
+  // We start counting at 1, thus there is one variable fewer.
   {
     std::string msg=
-      i2string(_no_variables)+" variables, "+
+      i2string(no_variables()-1)+" variables, "+
       i2string(solver->getAddedOrigClauses())+" clauses";
     messaget::status() << msg << messaget::eom;
   }
