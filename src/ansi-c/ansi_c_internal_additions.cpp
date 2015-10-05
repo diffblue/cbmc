@@ -104,6 +104,7 @@ void ansi_c_internal_additions(std::string &code)
     "__CPROVER_bool __CPROVER_is_zero_string(const void *);\n"
     "__CPROVER_size_t __CPROVER_zero_string_length(const void *);\n"
     "__CPROVER_size_t __CPROVER_buffer_size(const void *);\n"
+
     "__CPROVER_bool __CPROVER_get_flag(const void *, const char *);\n"
     "void __CPROVER_set_must(const void *, const char *);\n"
     "void __CPROVER_clear_must(const void *, const char *);\n"
