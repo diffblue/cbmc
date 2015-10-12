@@ -2,7 +2,7 @@
 BUILD_ENV = AUTO
 
 # Variables you may want to override
-CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
+#CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 #CXXFLAGS = -std=c++11
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
@@ -15,8 +15,8 @@ CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parenthese
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
-#MINISAT2 = ../../minisat-2.2.0
-GLUCOSE = ../../glucose-syrup
+MINISAT2 = ../../minisat-2.2.0
+#GLUCOSE = ../../glucose-syrup
 #SMVSAT =
 #LIBZIPLIB = /opt/local/lib/libzip
 #LIBZIPINC = /opt/local/lib/libzip
