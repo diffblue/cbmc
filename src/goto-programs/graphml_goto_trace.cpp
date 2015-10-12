@@ -8,6 +8,10 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+#if 0
+#include <iostream>
+#endif
+
 #include <util/config.h>
 #include <util/i2string.h>
 #include <util/arith_tools.h>
@@ -193,6 +197,18 @@ void convert(
 
     step_to_node[it->step_nr]=entry.first->second;
   }
+#if 0
+  for(goto_tracet::stepst::const_iterator
+      it=goto_trace.steps.begin();
+      it!=goto_trace.steps.end();
+      it++)
+  {
+    std::cout << "pc " << it->pc->location_number
+	      << " ->step " << it->step_nr
+	      << " ->node " << step_to_node[it->step_nr] 
+	      << " (" << pc_to_node[it->pc->location_number] << ")" << std::endl;    
+  }
+#endif
 
   // build edges
   for(goto_tracet::stepst::const_iterator
