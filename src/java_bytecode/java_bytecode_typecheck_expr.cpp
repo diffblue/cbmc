@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/prefix.h>
 
-#include <ansi-c/c_sizeof.h>
-
 #include "java_bytecode_typecheck.h"
 
 /*******************************************************************\
@@ -35,9 +33,7 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     typecheck_expr(*it);
 
   if(expr.id()==ID_symbol)
-  {
     typecheck_expr_symbol(to_symbol_expr(expr));
-  }
   else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=to_side_effect_expr(expr).get_statement();
@@ -46,6 +42,8 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     else if(statement==ID_java_new_array)
       typecheck_expr_java_new_array(to_side_effect_expr(expr));
   }
+  else if(expr.id()==ID_member)
+    typecheck_expr_member(to_member_expr(expr));
 }
 
 /*******************************************************************\
@@ -147,5 +145,52 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
 
     // type the expression
     expr.type()=symbol.type;
+  }
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_expr_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
+{
+  // the member might be in a parent class
+  const irep_idt component_name=expr.get_component_name();
+
+  assert(expr.struct_op().type().id()==ID_symbol);
+  
+  while(1)
+  {
+    const symbolt &class_symbol=ns.lookup(
+      to_symbol_type(expr.struct_op().type()));
+      
+    const struct_typet &struct_type=to_struct_type(class_symbol.type);
+
+    if(struct_type.has_component(component_name))
+      return; // done
+
+    // look at parent
+    const struct_typet::componentst &components=struct_type.components();
+    
+    if(components.empty())
+    {
+      err_location(expr);
+      throw "failed to find field in class hierarchy";
+    }
+    
+    const struct_typet::componentt &c=components.front();
+    
+    member_exprt m(expr.struct_op(), c.get_name(), c.type());
+    m.add_source_location()=expr.source_location();
+    
+    expr.struct_op()=m;
   }
 }
