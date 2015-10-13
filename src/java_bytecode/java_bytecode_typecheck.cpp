@@ -81,11 +81,19 @@ Function: java_bytecode_typecheckt::typecheck
 
 void java_bytecode_typecheckt::typecheck()
 {
+  // The hash table iterators are not stable,
+  // and we might add new symbols.
+  
+  std::vector<irep_idt> identifiers;
+  identifiers.reserve(symbol_table.symbols.size());
+  forall_symbols(s_it, symbol_table.symbols)
+    identifiers.push_back(s_it->first);
+    
   // We first check all type symbols,
   // recursively doing base classes first.
-  Forall_symbols(s_it, symbol_table.symbols)
+  for(const irep_idt &id : identifiers)
   {
-    symbolt &symbol=s_it->second;
+    symbolt &symbol=symbol_table.symbols[id];
     
     if(!symbol.is_type)
       continue;
@@ -94,9 +102,9 @@ void java_bytecode_typecheckt::typecheck()
   }
 
   // We now check all non-type symbols
-  Forall_symbols(s_it, symbol_table.symbols)
+  for(const irep_idt &id : identifiers)
   {
-    symbolt &symbol=s_it->second;
+    symbolt &symbol=symbol_table.symbols[id];
     
     if(symbol.is_type)
       continue;
