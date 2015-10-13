@@ -272,10 +272,12 @@ Function: language_uit::show_symbol_table_plain
 
 \*******************************************************************/
 
-void language_uit::show_symbol_table_plain(std::ostream &out, bool brief)
+void language_uit::show_symbol_table_plain(
+  std::ostream &out,
+  bool brief)
 {
   if(!brief)
-    out << std::endl << "Symbols:" << std::endl << std::endl;
+    out << '\n' << "Symbols:" << '\n' << std::endl;
   
   const namespacet ns(symbol_table);
 
@@ -308,13 +310,13 @@ void language_uit::show_symbol_table_plain(std::ostream &out, bool brief)
       continue;
     }
 
-    out << "Symbol......: " << symbol.name << std::endl;
-    out << "Pretty name.: " << symbol.pretty_name << std::endl;
-    out << "Module......: " << symbol.module << std::endl;
-    out << "Base name...: " << symbol.base_name << std::endl;
-    out << "Mode........: " << symbol.mode << std::endl;
-    out << "Type........: " << type_str << std::endl;
-    out << "Value.......: " << value_str << std::endl;
+    out << "Symbol......: " << symbol.name << '\n' << std::flush;
+    out << "Pretty name.: " << symbol.pretty_name << '\n';
+    out << "Module......: " << symbol.module << '\n';
+    out << "Base name...: " << symbol.base_name << '\n';
+    out << "Mode........: " << symbol.mode << '\n';
+    out << "Type........: " << type_str << '\n';
+    out << "Value.......: " << value_str << '\n';
     out << "Flags.......:";
 
     if(symbol.is_lvalue)          out << " lvalue";
@@ -333,9 +335,9 @@ void language_uit::show_symbol_table_plain(std::ostream &out, bool brief)
     if(symbol.is_exported)        out << " exported";
     if(symbol.is_volatile)        out << " volatile";
 
-    out << std::endl;
-    out << "Location....: " << symbol.location << std::endl;
+    out << '\n';
+    out << "Location....: " << symbol.location << '\n';
     
-    out << std::endl;
+    out << '\n' << std::flush;
   }
 }
