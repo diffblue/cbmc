@@ -326,6 +326,7 @@ void goto_inlinet::expand_function_call(
     err_location(function);
     str << "recursion is ignored";
     warning_msg();
+    recursion_detected = true;
     target->make_skip();
     
     target++;
@@ -607,13 +608,13 @@ Function: goto_inline
 
   Inputs:
 
- Outputs:
+ Outputs: true, if a recursion was detected
 
- Purpose:
+ Purpose: 
 
 \*******************************************************************/
 
-void goto_inline(
+bool goto_inline(
   goto_functionst &goto_functions,
   const namespacet &ns,
   message_handlert &message_handler)
@@ -627,7 +628,7 @@ void goto_inline(
       goto_functions.function_map.find(goto_functionst::entry_point());
       
     if(it==goto_functions.function_map.end())
-      return;
+      return false;
     
     goto_inline.goto_inline(it->second.body);
   }
@@ -662,6 +663,8 @@ void goto_inline(
       it->second.body_available=false;
       it->second.body.clear();
     }
+
+  return goto_inline.recursion_detected;
 }
 
 /*******************************************************************\
@@ -670,18 +673,18 @@ Function: goto_inline
 
   Inputs:
 
- Outputs:
+ Outputs: true, if a recursion was detected
 
  Purpose:
 
 \*******************************************************************/
 
-void goto_inline(
+bool goto_inline(
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   const namespacet ns(goto_model.symbol_table);
-  goto_inline(goto_model.goto_functions, ns, message_handler);
+  return goto_inline(goto_model.goto_functions, ns, message_handler);
 }
 
 /*******************************************************************\
@@ -690,13 +693,13 @@ Function: goto_partial_inline
 
   Inputs:
 
- Outputs:
+ Outputs: true, if a recursion was detected
 
  Purpose:
 
 \*******************************************************************/
 
-void goto_partial_inline(
+bool goto_partial_inline(
   goto_functionst &goto_functions,
   const namespacet &ns,
   message_handlert &message_handler,
@@ -738,6 +741,8 @@ void goto_partial_inline(
 
   if(goto_inline.get_error_found())
     throw 0;
+
+  return goto_inline.recursion_detected;
 }
 
 /*******************************************************************\
@@ -746,17 +751,17 @@ Function: goto_partial_inline
 
   Inputs:
 
- Outputs:
+ Outputs: true, if a recursion was detected
 
  Purpose:
 
 \*******************************************************************/
 
-void goto_partial_inline(
+bool goto_partial_inline(
   goto_modelt &goto_model,
   message_handlert &message_handler,
   unsigned _smallfunc_limit)
 {
   const namespacet ns(goto_model.symbol_table);
-  goto_partial_inline(goto_model.goto_functions, ns, message_handler, _smallfunc_limit);
+  return goto_partial_inline(goto_model.goto_functions, ns, message_handler, _smallfunc_limit);
 }

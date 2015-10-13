@@ -22,6 +22,7 @@ public:
     message_handlert &_message_handler):
     message_streamt(_message_handler),
     smallfunc_limit(0),
+    recursion_detected(false),
     goto_functions(_goto_functions),
     ns(_ns)
   {
@@ -44,6 +45,7 @@ public:
     goto_programt::targett &target);
 
   unsigned smallfunc_limit; 
+  bool recursion_detected;
 
 protected:
   goto_functionst &goto_functions;
