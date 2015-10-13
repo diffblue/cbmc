@@ -81,45 +81,22 @@ Function: java_bytecode_typecheckt::typecheck
 
 void java_bytecode_typecheckt::typecheck()
 {
-  // This is complicated by the fact that hash_map iterators
-  // get invalidated when inserting!
-  // The references stay valid, luckily.
-  
-  std::vector<irep_idt> symbols;
-  symbols.reserve(symbol_table.symbols.size());
-  
-  for(symbol_tablet::symbolst::iterator
-      s_it=symbol_table.symbols.begin();
-      s_it!=symbol_table.symbols.end();
-      s_it++)
-    symbols.push_back(s_it->first);
-  
   // We first check all type symbols,
   // recursively doing base classes first.
-  for(std::vector<irep_idt>::const_iterator
-      s_it=symbols.begin();
-      s_it!=symbols.end();
-      s_it++)
+  Forall_symbols(s_it, symbol_table.symbols)
   {
-    symbolt &symbol=symbol_table.symbols[*s_it];
+    symbolt &symbol=s_it->second;
     
     if(!symbol.is_type)
-      continue;
-  
-    // already done?
-    if(!already_typechecked.insert(*s_it).second)
       continue;
   
     typecheck_type_symbol(symbol);
   }
 
   // We now check all non-type symbols
-  for(std::vector<irep_idt>::const_iterator
-      s_it=symbols.begin();
-      s_it!=symbols.end();
-      s_it++)
+  Forall_symbols(s_it, symbol_table.symbols)
   {
-    symbolt &symbol=symbol_table.symbols[*s_it];
+    symbolt &symbol=s_it->second;
     
     if(symbol.is_type)
       continue;
