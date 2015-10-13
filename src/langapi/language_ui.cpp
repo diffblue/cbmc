@@ -278,12 +278,18 @@ void language_uit::show_symbol_table_plain(
 {
   if(!brief)
     out << '\n' << "Symbols:" << '\n' << std::endl;
+    
+  // we want to sort alphabetically
+  std::set<std::string> symbols;
+
+  forall_symbols(it, symbol_table.symbols)
+    symbols.insert(id2string(it->first));
   
   const namespacet ns(symbol_table);
 
-  forall_symbols(it, symbol_table.symbols)
+  for(const std::string &id : symbols)
   {
-    const symbolt &symbol=it->second;
+    const symbolt &symbol=ns.lookup(id);
     
     languaget *ptr;
     
