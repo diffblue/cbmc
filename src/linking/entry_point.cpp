@@ -87,13 +87,21 @@ bool static_lifetime_init(
   
   // do assignments based on "value"
 
-  Forall_symbols(it, symbol_table.symbols)
-  {
-    const irep_idt &identifier=it->first;
-  
-    if(!it->second.is_static_lifetime) continue;
+  // sort alphabetically for reproducible results
+  std::set<std::string> symbols;
 
-    if(it->second.is_type) continue;
+  forall_symbols(it, symbol_table.symbols)
+    symbols.insert(id2string(it->first));
+
+  for(const std::string &id : symbols)
+  {
+    const symbolt &symbol=ns.lookup(id);
+
+    const irep_idt &identifier=symbol.name;
+  
+    if(!symbol.is_static_lifetime) continue;
+
+    if(symbol.is_type) continue;
 
     // special values
     if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
@@ -108,10 +116,10 @@ bool static_lifetime_init(
       continue;
       
     // just for linking
-    if(has_prefix(id2string(identifier), CPROVER_PREFIX "architecture_"))
+    if(has_prefix(id, CPROVER_PREFIX "architecture_"))
       continue;
   
-    const typet &type=ns.follow(it->second.type);
+    const typet &type=ns.follow(symbol.type);
       
     // check type
     if(type.id()==ID_code ||
@@ -121,8 +129,8 @@ bool static_lifetime_init(
     // We won't try to initialize any symbols that have 
     // remained incomplete.
 
-    if(it->second.value.is_nil() &&
-       it->second.is_extern)
+    if(symbol.value.is_nil() &&
+       symbol.is_extern)
       // Compilers would usually complain about these
       // symbols being undefined.
       continue;
@@ -132,6 +140,10 @@ bool static_lifetime_init(
     {
       // C standard 6.9.2, paragraph 5
       // adjust the type to an array of size 1
+      symbol_tablet::symbolst::iterator it=
+        symbol_table.symbols.find(identifier);
+      assert(it!=symbol_table.symbols.end());
+
       it->second.type=type;
       it->second.type.set(ID_size, gen_one(size_type()));
     }
@@ -140,18 +152,18 @@ bool static_lifetime_init(
        type.id()==ID_incomplete_union)
       continue; // do not initialize
       
-    if(it->second.value.id()==ID_nondet)
+    if(symbol.value.id()==ID_nondet)
       continue; // do not initialize
 
     exprt rhs;
       
-    if(it->second.value.is_nil())
+    if(symbol.value.is_nil())
     {
     
       try
       {
         namespacet ns(symbol_table);
-        rhs=zero_initializer(it->second.type, it->second.location, ns, message_handler);
+        rhs=zero_initializer(symbol.type, symbol.location, ns, message_handler);
         assert(rhs.is_not_nil());
       }
       
@@ -161,25 +173,25 @@ bool static_lifetime_init(
       }
     }
     else
-      rhs=it->second.value;
+      rhs=symbol.value;
     
-    symbol_exprt symbol(it->second.name, it->second.type);
- 
-    code_assignt code(symbol, rhs);
-    code.add_source_location()=it->second.location;
+    code_assignt code(symbol.symbol_expr(), rhs);
+    code.add_source_location()=symbol.location;
 
     dest.move_to_operands(code);
   }
 
   // call designated "initialization" functions
 
-  forall_symbols(it, symbol_table.symbols)
+  for(const std::string &id : symbols)
   {
-    if(it->second.type.get_bool("initialization") &&
-       it->second.type.id()==ID_code)
+    const symbolt &symbol=ns.lookup(id);
+
+    if(symbol.type.get_bool("initialization") &&
+       symbol.type.id()==ID_code)
     {
       code_function_callt function_call;      
-      function_call.function()=it->second.symbol_expr();
+      function_call.function()=symbol.symbol_expr();
       function_call.add_source_location()=source_location;
       dest.move_to_operands(function_call);
     }
