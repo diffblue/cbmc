@@ -1,6 +1,6 @@
 diff -rupN glucose-syrup/core/Solver.cc glucose-syrup-patched/core/Solver.cc
---- glucose-syrup/core/Solver.cc	2015-08-18 20:02:43.000000000 +0100
-+++ glucose-syrup-patched/core/Solver.cc	2015-08-18 19:58:28.000000000 +0100
+--- glucose-syrup/core/Solver.cc	2014-10-03 10:10:21.000000000 +0100
++++ glucose-syrup-patched/core/Solver.cc	2015-10-16 12:16:50.000000000 +0100
 @@ -931,7 +931,6 @@ void Solver::uncheckedEnqueue(Lit p, CRe
  CRef Solver::propagate() {
      CRef confl = CRef_Undef;
@@ -9,9 +9,19 @@ diff -rupN glucose-syrup/core/Solver.cc glucose-syrup-patched/core/Solver.cc
      watches.cleanAll();
      watchesBin.cleanAll();
      unaryWatches.cleanAll();
+@@ -1405,7 +1404,9 @@ lbool Solver::search(int nof_conflicts) 
+                 decisions++;
+                 next = pickBranchLit();
+                 if (next == lit_Undef) {
++#if 0
+                     printf("c last restart ## conflicts  :  %d %d \n", conflictC, decisionLevel());
++#endif
+                     // Model found:
+                     return l_True;
+                 }
 diff -rupN glucose-syrup/core/SolverTypes.h glucose-syrup-patched/core/SolverTypes.h
---- glucose-syrup/core/SolverTypes.h	2015-08-18 19:59:51.000000000 +0100
-+++ glucose-syrup-patched/core/SolverTypes.h	2015-08-18 20:05:42.000000000 +0100
+--- glucose-syrup/core/SolverTypes.h	2014-10-03 10:10:22.000000000 +0100
++++ glucose-syrup-patched/core/SolverTypes.h	2015-10-16 12:14:25.000000000 +0100
 @@ -53,7 +53,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  
  #include <assert.h>
@@ -23,8 +33,8 @@ diff -rupN glucose-syrup/core/SolverTypes.h glucose-syrup-patched/core/SolverTyp
  #include "mtl/IntTypes.h"
  #include "mtl/Alg.h"
 diff -rupN glucose-syrup/mtl/IntTypes.h glucose-syrup-patched/mtl/IntTypes.h
---- glucose-syrup/mtl/IntTypes.h	2015-08-18 20:02:43.000000000 +0100
-+++ glucose-syrup-patched/mtl/IntTypes.h	2015-08-18 19:58:28.000000000 +0100
+--- glucose-syrup/mtl/IntTypes.h	2014-10-03 10:10:22.000000000 +0100
++++ glucose-syrup-patched/mtl/IntTypes.h	2015-10-16 12:14:25.000000000 +0100
 @@ -31,7 +31,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #else
  
@@ -35,9 +45,25 @@ diff -rupN glucose-syrup/mtl/IntTypes.h glucose-syrup-patched/mtl/IntTypes.h
  
  #endif
  
+diff -rupN glucose-syrup/simp/SimpSolver.cc glucose-syrup-patched/simp/SimpSolver.cc
+--- glucose-syrup/simp/SimpSolver.cc	2014-10-03 10:10:22.000000000 +0100
++++ glucose-syrup-patched/simp/SimpSolver.cc	2015-10-16 12:17:24.000000000 +0100
+@@ -760,10 +760,11 @@ bool SimpSolver::eliminate(bool turn_off
+         checkGarbage();
+     }
+ 
++#if 0
+     if (verbosity >= 0 && elimclauses.size() > 0)
+         printf("c |  Eliminated clauses:     %10.2f Mb                                                                |\n", 
+                double(elimclauses.size() * sizeof(uint32_t)) / (1024*1024));
+-
++#endif
+                
+     return ok;
+ 
 diff -rupN glucose-syrup/utils/ParseUtils.h glucose-syrup-patched/utils/ParseUtils.h
---- glucose-syrup/utils/ParseUtils.h	2015-08-18 20:02:43.000000000 +0100
-+++ glucose-syrup-patched/utils/ParseUtils.h	2015-08-18 19:58:28.000000000 +0100
+--- glucose-syrup/utils/ParseUtils.h	2014-10-03 10:10:22.000000000 +0100
++++ glucose-syrup-patched/utils/ParseUtils.h	2015-10-16 12:14:25.000000000 +0100
 @@ -25,7 +25,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #include <stdio.h>
  #include <math.h>
@@ -70,8 +96,8 @@ diff -rupN glucose-syrup/utils/ParseUtils.h glucose-syrup-patched/utils/ParseUti
      int  operator *  () const { return (pos >= size) ? EOF : buf[pos]; }
      void operator ++ ()       { pos++; assureLookahead(); }
 diff -rupN glucose-syrup/utils/System.h glucose-syrup-patched/utils/System.h
---- glucose-syrup/utils/System.h	2015-08-18 19:59:51.000000000 +0100
-+++ glucose-syrup-patched/utils/System.h	2015-08-18 20:04:57.000000000 +0100
+--- glucose-syrup/utils/System.h	2014-10-03 10:10:22.000000000 +0100
++++ glucose-syrup-patched/utils/System.h	2015-10-16 12:14:25.000000000 +0100
 @@ -60,8 +60,11 @@ static inline double Glucose::cpuTime(vo
  
  // Laurent: I know that this will not compile directly under Windows... sorry for that
