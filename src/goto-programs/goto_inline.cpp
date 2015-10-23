@@ -95,21 +95,21 @@ void goto_inlinet::parameter_assignments(
       // subject to some exceptions
       if(!base_type_eq(par_type, actual.type(), ns))
       {
-        const typet &f_argtype = ns.follow(par_type);
+        const typet &f_partype = ns.follow(par_type);
         const typet &f_acttype = ns.follow(actual.type());
         
         // we are willing to do some conversion
-        if((f_argtype.id()==ID_pointer &&
+        if((f_partype.id()==ID_pointer &&
             f_acttype.id()==ID_pointer) ||
-           (f_argtype.id()==ID_array &&
-            f_acttype.id()==ID_pointer &&
-            f_argtype.subtype()==f_acttype.subtype()))
+           (f_partype.id()==ID_pointer &&
+            f_acttype.id()==ID_array &&
+            f_partype.subtype()==f_acttype.subtype()))
         {
           actual.make_typecast(par_type);
         }
-        else if((f_argtype.id()==ID_signedbv ||
-                 f_argtype.id()==ID_unsignedbv ||
-                 f_argtype.id()==ID_bool) &&
+        else if((f_partype.id()==ID_signedbv ||
+                 f_partype.id()==ID_unsignedbv ||
+                 f_partype.id()==ID_bool) &&
                 (f_acttype.id()==ID_signedbv ||
                  f_acttype.id()==ID_unsignedbv ||
                  f_acttype.id()==ID_bool))  
@@ -122,7 +122,8 @@ void goto_inlinet::parameter_assignments(
 
           str << "function call: argument `" << identifier
               << "' type mismatch: argument is `"
-              << from_type(ns, identifier, it1->type())
+              // << from_type(ns, identifier, actual.type())
+              << actual.type().pretty()
               << "', parameter is `"
               << from_type(ns, identifier, par_type)
               << "'";
