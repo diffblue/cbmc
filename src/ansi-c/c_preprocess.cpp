@@ -725,7 +725,7 @@ bool c_preprocess_gcc_clang(
   // The width of wchar_t depends on the OS!
   {
     command+=" -D__WCHAR_MAX__="+type_max(wchar_t_type());
-
+    
     std::string sig=config.ansi_c.wchar_t_is_unsigned?"unsigned":"signed";
     
     if(config.ansi_c.wchar_t_width==config.ansi_c.short_int_width)
@@ -734,6 +734,8 @@ bool c_preprocess_gcc_clang(
       command+=" -D__WCHAR_TYPE__=\""+sig+" int\"";
     else if(config.ansi_c.wchar_t_width==config.ansi_c.long_int_width)
       command+=" -D__WCHAR_TYPE__=\""+sig+" long int\"";
+    else if(config.ansi_c.wchar_t_width==config.ansi_c.char_width)
+      command+=" -D__WCHAR_TYPE__=\""+sig+" char\"";
     else
       assert(false);
   }
