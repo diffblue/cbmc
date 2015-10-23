@@ -61,7 +61,7 @@ void goto_inlinet::parameter_assignments(
     const code_typet::parametert &parameter=*it2;
 
     // this is the type the n-th argument should be
-    const typet &arg_type=ns.follow(parameter.type());
+    const typet &par_type=ns.follow(parameter.type());
 
     const irep_idt &identifier=parameter.get_identifier();
 
@@ -89,13 +89,13 @@ void goto_inlinet::parameter_assignments(
     else
     {
       // this is the actual parameter
-      exprt actual(*it1);
+      exprt actual=*it1;
 
-      // it should be the same exact type,
+      // it should be the same exact type as the parameter,
       // subject to some exceptions
-      if(!base_type_eq(arg_type, actual.type(), ns))
+      if(!base_type_eq(par_type, actual.type(), ns))
       {
-        const typet &f_argtype = ns.follow(arg_type);
+        const typet &f_argtype = ns.follow(par_type);
         const typet &f_acttype = ns.follow(actual.type());
         
         // we are willing to do some conversion
@@ -105,7 +105,7 @@ void goto_inlinet::parameter_assignments(
             f_acttype.id()==ID_pointer &&
             f_argtype.subtype()==f_acttype.subtype()))
         {
-          actual.make_typecast(arg_type);
+          actual.make_typecast(par_type);
         }
         else if((f_argtype.id()==ID_signedbv ||
                  f_argtype.id()==ID_unsignedbv ||
@@ -114,24 +114,24 @@ void goto_inlinet::parameter_assignments(
                  f_acttype.id()==ID_unsignedbv ||
                  f_acttype.id()==ID_bool))  
         {
-          actual.make_typecast(arg_type);
+          actual.make_typecast(par_type);
         }
         else
         {
           err_location(*it1);
 
           str << "function call: argument `" << identifier
-              << "' type mismatch: got `"
+              << "' type mismatch: argument is `"
               << from_type(ns, identifier, it1->type())
-              << "', expected `"
-              << from_type(ns, identifier, arg_type)
+              << "', parameter is `"
+              << from_type(ns, identifier, par_type)
               << "'";
           throw 0;
         }
       }
 
       // adds an assignment of the actual parameter to the formal parameter
-      code_assignt assignment(symbol_exprt(identifier, arg_type), actual);
+      code_assignt assignment(symbol_exprt(identifier, par_type), actual);
       assignment.add_source_location()=source_location;
 
       dest.add_instruction(ASSIGN);
