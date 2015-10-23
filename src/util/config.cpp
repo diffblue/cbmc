@@ -1174,8 +1174,7 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
 
   alignment=from_ns(ns, "alignment");
 
-  //memory_operand_size=from_ns(ns, "memory_operand_size");
-  memory_operand_size=int_width/8;
+  memory_operand_size=from_ns(ns, "memory_operand_size");
 
   endianness=(endiannesst)from_ns(ns, "endianness");
 
