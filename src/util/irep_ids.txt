@@ -11,6 +11,7 @@ verilog_signedbv
 verilog_unsignedbv
 floatbv
 fixedbv
+x86_extended
 C_source_location #source_location
 C_end_location #end_location
 C_is_padding #is_padding
