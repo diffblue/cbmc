@@ -24,6 +24,10 @@ public:
   // respectively
   unsigned f, e;
   
+  // x86 has an extended precision format with an explicit
+  // integer bit.
+  bool x86_extended;
+  
   mp_integer bias() const;
   
   ieee_float_spect(const floatbv_typet &type)
@@ -33,7 +37,7 @@ public:
   
   void from_type(const floatbv_typet &type);
 
-  ieee_float_spect():f(0), e(0)
+  ieee_float_spect():f(0), e(0), x86_extended(false)
   {
   }
 
@@ -43,8 +47,9 @@ public:
 
   inline unsigned width() const
   {
-    // add one for the sign bit
-    return f+e+1;
+    // Add one for the sign bit.
+    // Add one if x86 explicit integer bit is used.
+    return f+e+1+(x86_extended?1:0);
   }  
 
   mp_integer max_exponent() const;
@@ -71,12 +76,30 @@ public:
     return ieee_float_spect(112, 15);
   }  
   
-  inline friend bool operator == (const ieee_float_spect &a, const ieee_float_spect &b)
+  inline static ieee_float_spect x86_80()
   {
-    return a.f==b.f && a.e==b.e;
+    // Intel, not IEEE
+    ieee_float_spect result(63, 15);
+    result.x86_extended=true;
+    return result;
+  }  
+  
+  inline static ieee_float_spect x86_96()
+  {
+    // Intel, not IEEE
+    ieee_float_spect result(63, 15);
+    result.x86_extended=true;
+    return result;
+  }  
+  
+  inline friend bool operator == (
+    const ieee_float_spect &a, const ieee_float_spect &b)
+  {
+    return a.f==b.f && a.e==b.e && a.x86_extended==b.x86_extended;
   }
 
-  inline friend bool operator != (const ieee_float_spect &a, const ieee_float_spect &b)
+  inline friend bool operator != (
+    const ieee_float_spect &a, const ieee_float_spect &b)
   {
     return !(a==b);
   }
