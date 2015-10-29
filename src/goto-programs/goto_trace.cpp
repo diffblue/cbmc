@@ -81,6 +81,9 @@ void goto_trace_stept::output(
   if(type==ASSERT || type==ASSUME || type==GOTO)
     out << " (" << cond_value << ")";
 
+  if(hidden)
+    out << " hidden";
+
   out << "\n";
 
   if(!pc->source_location.is_nil())
