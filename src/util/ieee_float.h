@@ -41,7 +41,7 @@ public:
   {
   }
 
-  ieee_float_spect(unsigned _f, unsigned _e):f(_f), e(_e)
+  ieee_float_spect(unsigned _f, unsigned _e):f(_f), e(_e), x86_extended(false)
   {
   }
 
