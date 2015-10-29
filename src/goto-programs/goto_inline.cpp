@@ -443,13 +443,23 @@ void goto_inlinet::expand_function_call(
         new_source_location.set_hide();
       
         Forall_goto_program_instructions(it, tmp)
+        {
           if(it->function==identifier)
           {
-            replace_location(it->source_location, new_source_location);
-            replace_location(it->guard, new_source_location);
-            replace_location(it->code, new_source_location);
+            // don't hide assignment to lhs
+            if(it->is_assign() && to_code_assign(it->code).lhs()==lhs)
+            {
+            }
+            else
+            {
+              replace_location(it->source_location, new_source_location);
+              replace_location(it->guard, new_source_location);
+              replace_location(it->code, new_source_location);
+            }
+
             it->function=target->function;
           }
+        }
       }
     }
 
