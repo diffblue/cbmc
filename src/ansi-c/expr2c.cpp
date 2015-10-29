@@ -2195,10 +2195,31 @@ std::string expr2ct::convert_constant(
       else
         dest="FALSE";
     }
+    else if(type==char_type() && type!=signed_int_type() && type!=unsigned_int_type())
+    {
+      if(int_value=='\n')
+        dest+="\\n";
+      else if(int_value=='\r')
+        dest+="\\r";
+      else if(int_value=='\t')
+        dest+="\\t";
+      else if(int_value=='\'')
+        dest+="'\\''";
+      else if(int_value=='\\')
+        dest+="'\\'";
+      else if(int_value>=' ' && int_value<126)
+      {
+        dest+='\'';
+        dest+=char(integer2long(int_value));
+        dest+='\'';
+      }
+      else
+        dest=integer2string(int_value);
+    }
     else
     {
       dest=integer2string(int_value);
-
+      
       if(c_type==ID_unsigned_int)
         dest+='u';
       else if(c_type==ID_unsigned_long_int)
