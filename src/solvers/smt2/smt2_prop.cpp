@@ -535,7 +535,7 @@ tvt smt2_propt::l_get(literalt literal) const
   if(literal.is_false()) return tvt(false);
 
   unsigned v=literal.var_no();
-  if(v>=assignment.size()) return tvt(tvt::TV_UNKNOWN);
+  if(v>=assignment.size()) return tvt(tvt::tv_enumt::TV_UNKNOWN);
   tvt r=assignment[v];
   return literal.sign()?!r:r;
 }

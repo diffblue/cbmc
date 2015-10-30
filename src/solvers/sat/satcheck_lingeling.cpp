@@ -41,7 +41,7 @@ tvt satcheck_lingelingt::l_get(literalt a) const
   tvt result;
 
   if(a.var_no()>lglmaxvar(solver))
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
   const int val=lglderef(solver, a.dimacs());
   if(val>0)
@@ -49,7 +49,7 @@ tvt satcheck_lingelingt::l_get(literalt a) const
   else if(val<0)
     result=tvt(false);
   else
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
   return result;
 }

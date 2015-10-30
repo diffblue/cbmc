@@ -97,7 +97,7 @@ tvt satcheck_smvsatt::l_get(literalt a) const
   {
    case 0: result=tvt(false); break;
    case 1: result=tvt(true); break;
-   default: result=tvt(tvt::TV_UNKNOWN); break;
+   default: result=tvt(tvt::tv_enumt::TV_UNKNOWN); break;
   }
 
   if(a.sign()) result=!result;

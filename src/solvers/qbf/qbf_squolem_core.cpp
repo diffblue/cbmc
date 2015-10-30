@@ -120,16 +120,16 @@ Function: qbf_squolem_coret::l_get
 tvt qbf_squolem_coret::l_get(literalt a) const
 {
   if(a.is_true())
-    return tvt(tvt::TV_TRUE);
+    return tvt(tvt::tv_enumt::TV_TRUE);
   else if(a.is_false())
-    return tvt(tvt::TV_FALSE);
+    return tvt(tvt::tv_enumt::TV_FALSE);
   else if(squolem->modelIsTrue(a.var_no()))
-    return tvt(tvt::TV_TRUE);
+    return tvt(tvt::tv_enumt::TV_TRUE);
   else if(squolem->modelIsFalse(a.var_no()) ||
           squolem->modelIsDontCare(a.var_no()))
-    return tvt(tvt::TV_FALSE);
+    return tvt(tvt::tv_enumt::TV_FALSE);
   else
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt(tvt::tv_enumt::TV_UNKNOWN);
 }
 
 /*******************************************************************\

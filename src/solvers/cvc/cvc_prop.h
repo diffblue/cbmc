@@ -53,7 +53,7 @@ public:
   virtual tvt l_get(literalt literal) const
   {
     unsigned v=literal.var_no();
-    if(v>=assignment.size()) return tvt(tvt::TV_UNKNOWN);
+    if(v>=assignment.size()) return tvt(tvt::tv_enumt::TV_UNKNOWN);
     tvt r=assignment[v];
     return literal.sign()?!r:r;
   }
@@ -71,7 +71,7 @@ public:
   void reset_assignment()
   {
     assignment.clear();
-    assignment.resize(no_variables(), tvt(tvt::TV_UNKNOWN));
+    assignment.resize(no_variables(), tvt(tvt::tv_enumt::TV_UNKNOWN));
   }
 
 protected:
