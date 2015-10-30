@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class tvt
 {
 public:
-  enum class tv_enumt { TV_FALSE, TV_UNKNOWN, TV_TRUE };
+  enum class tv_enumt : unsigned char { TV_FALSE, TV_UNKNOWN, TV_TRUE };
 
   inline bool is_true() const { return value==tv_enumt::TV_TRUE; }
   inline bool is_false() const { return value==tv_enumt::TV_FALSE; }
