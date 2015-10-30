@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
-#include <util/bitvector.h>
 #include <util/config.h>
 #include <util/std_types.h>
 #include <util/expr_util.h>
