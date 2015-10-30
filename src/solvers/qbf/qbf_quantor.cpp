@@ -59,7 +59,7 @@ Function: qbf_quantort::l_get
 tvt qbf_quantort::l_get(literalt a) const
 {
   assert(false);
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }
 
 /*******************************************************************\

@@ -4521,7 +4521,7 @@ tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
      b.get(ID_value)==ID_NULL)
     return tvt(false);
 
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }
 
 /*******************************************************************\
@@ -4556,7 +4556,7 @@ tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
       return objects_equal_address_of(a.op0(), b.op0());
   }
 
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }
 
 /*******************************************************************\

@@ -55,7 +55,7 @@ public:
 
   virtual tvt l_get(literalt) const
   {
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt::unknown();
   }
   
   virtual size_t no_clauses() const

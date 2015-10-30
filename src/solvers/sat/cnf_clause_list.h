@@ -30,7 +30,7 @@ public:
    
   virtual tvt l_get(literalt literal) const
   {
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt::unknown();
   }
 
   virtual resultt prop_solve() { return P_ERROR; }
@@ -94,7 +94,7 @@ public:
     unsigned v=literal.var_no();
 
     if(v==0 || v>=assignment.size())
-      return tvt(tvt::TV_UNKNOWN);
+      return tvt::unknown();
 
     tvt r=assignment[v];
     return literal.sign()?!r:r;

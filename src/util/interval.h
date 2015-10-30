@@ -108,7 +108,7 @@ tvt operator <= (const interval<T> &a, const interval<T> &b)
 {
   if(a.upper_set && b.lower_set && a.upper<=b.lower) return tvt(true);
   if(a.lower_set && b.upper_set && a.lower>b.upper) return tvt(false);
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }
 
 template<class T>
