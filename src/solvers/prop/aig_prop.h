@@ -54,7 +54,7 @@ public:
   { return "conversion into and-inverter graph"; }
 
   virtual tvt l_get(literalt a) const
-  { assert(0); return tvt(tvt::TV_UNKNOWN); }
+  { assert(0); return tvt::unknown(); }
   
   virtual resultt prop_solve()
   { assert(0); return P_ERROR; }

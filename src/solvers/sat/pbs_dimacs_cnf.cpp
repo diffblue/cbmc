@@ -298,5 +298,5 @@ tvt pbs_dimacs_cnft::l_get(literalt a) const
     }
 
   //std::cout << "ERROR" << "\n";
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }

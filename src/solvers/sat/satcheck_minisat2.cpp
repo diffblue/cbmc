@@ -68,7 +68,7 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
   tvt result;
 
   if(a.var_no()>=(unsigned)solver->model.size())
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt::unknown();
 
   using Minisat::lbool;
 
@@ -77,7 +77,7 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
   else if(solver->model[a.var_no()]==l_False)
     result=tvt(false);
   else
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt::unknown();
   
   if(a.sign()) result=!result;
 

@@ -18,16 +18,16 @@ Author: Daniel Kroening, kroening@kroening.com
 class tvt
 {
 public:
-  typedef enum { TV_FALSE, TV_UNKNOWN, TV_TRUE } tv_enumt;
+  enum class tv_enumt { TV_FALSE, TV_UNKNOWN, TV_TRUE };
 
-  inline bool is_true() const { return value==TV_TRUE; }
-  inline bool is_false() const { return value==TV_FALSE; }
-  inline bool is_unknown() const { return value==TV_UNKNOWN; }
-  inline bool is_known() const { return value==TV_TRUE || value==TV_FALSE; }
+  inline bool is_true() const { return value==tv_enumt::TV_TRUE; }
+  inline bool is_false() const { return value==tv_enumt::TV_FALSE; }
+  inline bool is_unknown() const { return value==tv_enumt::TV_UNKNOWN; }
+  inline bool is_known() const { return value==tv_enumt::TV_TRUE || value==tv_enumt::TV_FALSE; }
 
   static inline tvt unknown()
   {
-    return tvt(TV_UNKNOWN);
+    return tvt(tv_enumt::TV_UNKNOWN);
   }
 
   const char *to_string() const;
@@ -41,7 +41,7 @@ public:
   {
   }
   
-  inline explicit tvt(bool b):value(b?TV_TRUE:TV_FALSE)
+  inline explicit tvt(bool b):value(b?tv_enumt::TV_TRUE:tv_enumt::TV_FALSE)
   {
   }
 
@@ -61,23 +61,23 @@ public:
 
   inline friend tvt operator &&(const tvt a, const tvt b)
   {
-    if(a.value==TV_FALSE || b.value==TV_FALSE) return tvt(TV_FALSE);
-    if(a.value==TV_TRUE  && b.value==TV_TRUE)  return tvt(TV_TRUE);
-    return tvt(TV_UNKNOWN);
+    if(a.value==tv_enumt::TV_FALSE || b.value==tv_enumt::TV_FALSE) return tvt(tv_enumt::TV_FALSE);
+    if(a.value==tv_enumt::TV_TRUE  && b.value==tv_enumt::TV_TRUE)  return tvt(tv_enumt::TV_TRUE);
+    return tvt(tv_enumt::TV_UNKNOWN);
   }
 
   inline friend tvt operator ||(const tvt a, const tvt b)
   {
-    if(a.value==TV_TRUE  || b.value==TV_TRUE)  return tvt(TV_TRUE);
-    if(a.value==TV_FALSE && b.value==TV_FALSE) return tvt(TV_FALSE);
-    return tvt(TV_UNKNOWN);
+    if(a.value==tv_enumt::TV_TRUE  || b.value==tv_enumt::TV_TRUE)  return tvt(tv_enumt::TV_TRUE);
+    if(a.value==tv_enumt::TV_FALSE && b.value==tv_enumt::TV_FALSE) return tvt(tv_enumt::TV_FALSE);
+    return tvt(tv_enumt::TV_UNKNOWN);
   }
 
   inline friend tvt operator !(const tvt a)
   {
-    if(a.value==TV_UNKNOWN) return tvt(TV_UNKNOWN);
-    if(a.value==TV_TRUE) return tvt(TV_FALSE);
-    return tvt(TV_TRUE);
+    if(a.value==tv_enumt::TV_UNKNOWN) return tvt(tv_enumt::TV_UNKNOWN);
+    if(a.value==tv_enumt::TV_TRUE) return tvt(tv_enumt::TV_FALSE);
+    return tvt(tv_enumt::TV_TRUE);
   }
 
 protected:

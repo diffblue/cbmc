@@ -686,9 +686,9 @@ exprt prop_conv_solvert::get(const exprt &expr) const
   {
     switch(value.get_value())
     {
-     case tvt::TV_TRUE:  return true_exprt();
-     case tvt::TV_FALSE: return false_exprt();
-     case tvt::TV_UNKNOWN: return false_exprt(); // default
+     case tvt::tv_enumt::TV_TRUE:  return true_exprt();
+     case tvt::tv_enumt::TV_FALSE: return false_exprt();
+     case tvt::tv_enumt::TV_UNKNOWN: return false_exprt(); // default
     }
   }
   

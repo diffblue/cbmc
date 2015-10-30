@@ -108,8 +108,8 @@ exprt boolbvt::bv_get_rec(
     {
       switch(prop.l_get(bv[offset]).get_value())
       {
-      case tvt::TV_FALSE: return false_exprt();
-      case tvt::TV_TRUE:  return true_exprt();
+      case tvt::tv_enumt::TV_FALSE: return false_exprt();
+      case tvt::tv_enumt::TV_TRUE:  return true_exprt();
       default: return false_exprt(); // default
       }
     }
@@ -240,9 +240,9 @@ exprt boolbvt::bv_get_rec(
     else
       switch(prop.l_get(bv[bit_nr]).get_value())
       {
-       case tvt::TV_FALSE: ch='0'; break;
-       case tvt::TV_TRUE:  ch='1'; break;
-       case tvt::TV_UNKNOWN: ch='0'; break;
+       case tvt::tv_enumt::TV_FALSE: ch='0'; break;
+       case tvt::tv_enumt::TV_TRUE:  ch='1'; break;
+       case tvt::tv_enumt::TV_UNKNOWN: ch='0'; break;
        default: assert(false);
       }
 
@@ -477,9 +477,9 @@ mp_integer boolbvt::get_value(
     assert(bit_nr<bv.size());
     switch(prop.l_get(bv[bit_nr]).get_value())
     {
-     case tvt::TV_FALSE:   break;
-     case tvt::TV_TRUE:    value+=weight; break;
-     case tvt::TV_UNKNOWN: break;
+     case tvt::tv_enumt::TV_FALSE:   break;
+     case tvt::tv_enumt::TV_TRUE:    value+=weight; break;
+     case tvt::tv_enumt::TV_UNKNOWN: break;
      default: assert(false);
     }
 
