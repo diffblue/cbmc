@@ -781,7 +781,7 @@ bool configt::set(const cmdlinet &cmdline)
   
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=false; // ealier than C99
-  ansi_c.cpp11=false;
+  ansi_c.standard=ansi_ct::standardt::STD99;
   ansi_c.use_fixed_for_float=false;
   ansi_c.endianness=ansi_ct::NO_ENDIANNESS;
   ansi_c.os=ansi_ct::NO_OS;

@@ -235,18 +235,27 @@ bool gcc_modet::doit()
   if(cmdline.isset("std"))
   {
     std::string std_string=cmdline.get_value("std");
+    
+    if(std_string=="gnu89" || std_string=="c89")
+      config.ansi_c.standard=configt::ansi_ct::standardt::STD89;
 
     if(std_string=="gnu99" || std_string=="c99" || std_string=="iso9899:1999" ||
-       std_string=="gnu9x" || std_string=="c9x" || std_string=="iso9899:199x" ||
-       std_string=="gnu11" || std_string=="c11" ||
+       std_string=="gnu9x" || std_string=="c9x" || std_string=="iso9899:199x")
+      config.ansi_c.standard=configt::ansi_ct::standardt::STD99;
+
+    if(std_string=="gnu11" || std_string=="c11" ||
        std_string=="gnu1x" || std_string=="c1x")
-      config.ansi_c.for_has_scope=true;
+      config.ansi_c.standard=configt::ansi_ct::standardt::STD11;
 
     if(std_string=="c++11" || std_string=="c++1x" ||
        std_string=="gnu++11" || std_string=="gnu++1x" || 
        std_string=="c++1y" ||
        std_string=="gnu++1y")
-      config.ansi_c.cpp11=true;
+      config.ansi_c.standard=configt::ansi_ct::standardt::STD11;
+
+    if(config.ansi_c.standard==configt::ansi_ct::standardt::STD99 ||
+       config.ansi_c.standard==configt::ansi_ct::standardt::STD11)
+      config.ansi_c.for_has_scope=true;
   }
 
   // gcc's default is 32 bits for wchar_t

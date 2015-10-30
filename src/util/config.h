@@ -43,7 +43,7 @@ public:
     bool use_fixed_for_float;
     bool for_has_scope;
     bool single_precision_constant;
-    bool cpp11;
+    enum class standardt { STD89, STD99, STD11 } standard;
     
     ieee_floatt::rounding_modet rounding_mode;
 
