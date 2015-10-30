@@ -488,7 +488,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // We need to use byte_extract.
       // Won't do this without a committment to an endianness.
 
-      if(config.ansi_c.endianness==configt::ansi_ct::NO_ENDIANNESS)
+      if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::NO_ENDIANNESS)
       {
       }
       else
@@ -913,7 +913,7 @@ bool value_set_dereferencet::memory_model_bytes(
     return false;
 
   // We won't do this without a committment to an endianness.
-  if(config.ansi_c.endianness==configt::ansi_ct::NO_ENDIANNESS)
+  if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::NO_ENDIANNESS)
     return false; 
 
   // But everything else we will try!

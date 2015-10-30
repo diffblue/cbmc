@@ -125,9 +125,9 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __CPROVER::array_set(const void dest[], ...);" << std::endl;
             
   // GCC stuff, but also for ARM
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC_C ||
-     config.ansi_c.mode==configt::ansi_ct::MODE_GCC_CPP ||
-     config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_C ||
+     config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_CPP ||
+     config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_ARM_C_CPP)
   {
     out << "extern \"C\" {" << std::endl;
     out << c2cpp(gcc_builtin_headers_generic);
@@ -136,7 +136,7 @@ void cpp_internal_additions(std::ostream &out)
   }
   
   // extensions for Visual C/C++
-  if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
+  if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN)
     out << "extern \"C\" int __noop(...);\n";
 
   // string symbols to identify the architecture we have compiled for
@@ -148,7 +148,7 @@ void cpp_internal_additions(std::ostream &out)
   out << "}" << std::endl;
   
   // Microsoft stuff
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP)
   {
     // type_info infrastructure -- the standard wants this to be in the
     // std:: namespace, but MS has it in the root namespace

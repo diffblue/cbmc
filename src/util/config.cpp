@@ -249,29 +249,29 @@ Function: configt::ansi_ct::set_arch_spec_i386
 void configt::ansi_ct::set_arch_spec_i386()
 {
   set_ILP32();
-  arch=ARCH_I386;
-  endianness=IS_LITTLE_ENDIAN;
+  arch=archt::ARCH_I386;
+  endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("i386");
     defines.push_back("__i386");
     defines.push_back("__i386__");
-    if(os==OS_MACOS)
+    if(os==ost::OS_MACOS)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_IX86");
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -291,34 +291,34 @@ Function: configt::ansi_ct::set_arch_spec_x86_64
 void configt::ansi_ct::set_arch_spec_x86_64()
 {
   set_LP64();
-  arch=ARCH_X86_64;
-  endianness=IS_LITTLE_ENDIAN;
+  arch=archt::ARCH_X86_64;
+  endianness=endiannesst::IS_LITTLE_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=false;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("__LP64__");
     defines.push_back("__x86_64");
     defines.push_back("__x86_64__");
     defines.push_back("_LP64");
     defines.push_back("__amd64__");
     defines.push_back("__amd64");
-    if(os==OS_MACOS)
+    if(os==ost::OS_MACOS)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_X64");
     defines.push_back("_M_AMD64");
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -342,12 +342,12 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
   else // ppc64 or ppc64le
     set_LP64();
 
-  arch=ARCH_POWER;
+  arch=archt::ARCH_POWER;
 
   if(subarch=="ppc64le")
-    endianness=IS_LITTLE_ENDIAN;
+    endianness=endiannesst::IS_LITTLE_ENDIAN;
   else
-    endianness=IS_BIG_ENDIAN;
+    endianness=endiannesst::IS_BIG_ENDIAN;
 
   long_double_width=16*8;
   char_is_unsigned=true;
@@ -355,14 +355,14 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("__powerpc");
     defines.push_back("__powerpc__");
     defines.push_back("__POWERPC__");
     defines.push_back("__ppc__");
 
-    if(os==OS_MACOS)
+    if(os==ost::OS_MACOS)
       defines.push_back("__BIG_ENDIAN__");
 
     if(subarch!="powerpc")
@@ -384,16 +384,16 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
     }
     break;
 
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_PPC");
     break;
 
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
 
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -423,15 +423,15 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
     long_double_width=8*8;
   }
 
-  arch=ARCH_ARM;
-  endianness=IS_LITTLE_ENDIAN;
+  arch=archt::ARCH_ARM;
+  endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=true;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     if(subarch=="arm64")
       defines.push_back("__aarch64__");
     else
@@ -439,14 +439,14 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
     if(subarch=="armhf")
       defines.push_back("__ARM_PCS_VFP");
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_ARM");
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -466,26 +466,26 @@ Function: configt::ansi_ct::set_arch_spec_alpha
 void configt::ansi_ct::set_arch_spec_alpha()
 {
   set_LP64();
-  arch=ARCH_ALPHA;
-  endianness=IS_LITTLE_ENDIAN;
+  arch=archt::ARCH_ALPHA;
+  endianness=endiannesst::IS_LITTLE_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=false;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("__alpha__");
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_ALPHA");
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -504,7 +504,7 @@ Function: configt::ansi_ct::set_arch_spec_mips
 
 void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
 {
-  arch=ARCH_MIPS;
+  arch=archt::ARCH_MIPS;
 
   if(subarch=="mipsel" ||
      subarch=="mips" ||
@@ -523,29 +523,29 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
   if(subarch=="mipsel" ||
      subarch=="mipsn32el" ||
      subarch=="mips64el")
-    endianness=IS_LITTLE_ENDIAN;
+    endianness=endiannesst::IS_LITTLE_ENDIAN;
   else
-    endianness=IS_BIG_ENDIAN;
+    endianness=endiannesst::IS_BIG_ENDIAN;
 
   char_is_unsigned=false;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("__mips__");
     defines.push_back("mips");
     defines.push_back("_MIPS_SZPTR="+i2string(config.ansi_c.pointer_width));
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -565,26 +565,26 @@ Function: configt::ansi_ct::set_arch_spec_s390
 void configt::ansi_ct::set_arch_spec_s390()
 {
   set_ILP32();
-  arch=ARCH_S390;
-  endianness=IS_BIG_ENDIAN;
+  arch=archt::ARCH_S390;
+  endianness=endiannesst::IS_BIG_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=true;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("__s390__");
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -604,25 +604,25 @@ Function: configt::ansi_ct::set_arch_spec_s390x
 void configt::ansi_ct::set_arch_spec_s390x()
 {
   set_LP64();
-  arch=ARCH_S390X;
-  endianness=IS_BIG_ENDIAN;
+  arch=archt::ARCH_S390X;
+  endianness=endiannesst::IS_BIG_ENDIAN;
   char_is_unsigned=true;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("__s390x__");
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -652,27 +652,27 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
     long_double_width=16*8;
   }
 
-  arch=ARCH_SPARC;
-  endianness=IS_BIG_ENDIAN;
+  arch=archt::ARCH_SPARC;
+  endianness=endiannesst::IS_BIG_ENDIAN;
   char_is_unsigned=false;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("__sparc__");
     if(subarch=="sparc64")
       defines.push_back("__arch64__");
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -692,28 +692,28 @@ Function: configt::ansi_ct::set_arch_spec_ia64
 void configt::ansi_ct::set_arch_spec_ia64()
 {
   set_LP64();
-  arch=ARCH_IA64;
+  arch=archt::ARCH_IA64;
   long_double_width=16*8;
-  endianness=IS_LITTLE_ENDIAN;
+  endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("__ia64__");
     defines.push_back("_IA64");
     defines.push_back("__IA64__");
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_IA64");
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -736,29 +736,29 @@ void configt::ansi_ct::set_arch_spec_x32()
   // 32-bit long int and 32-bit pointers.
   set_ILP32();
   long_double_width=16*8; // different from i386
-  arch=ARCH_X32;
-  endianness=IS_LITTLE_ENDIAN;
+  arch=archt::ARCH_X32;
+  endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
   NULL_is_zero=true;
 
   switch(mode)
   {
-  case MODE_GCC_C:
-  case MODE_GCC_CPP:
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
     defines.push_back("__ILP32__");
     defines.push_back("__x86_64");
     defines.push_back("__x86_64__");
     defines.push_back("__amd64__");
     defines.push_back("__amd64");
     break;
-  case MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR_C_CPP:
-  case MODE_ARM_C_CPP:
-  case MODE_ANSI_C_CPP:
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
     break;
-  case NO_MODE:
+  case flavourt::NO_MODE:
     assert(false);
   }
 }
@@ -783,10 +783,10 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.for_has_scope=false; // ealier than C99
   ansi_c.standard=ansi_ct::standardt::STD99;
   ansi_c.use_fixed_for_float=false;
-  ansi_c.endianness=ansi_ct::NO_ENDIANNESS;
-  ansi_c.os=ansi_ct::NO_OS;
-  ansi_c.arch=ansi_ct::NO_ARCH;
-  ansi_c.lib=configt::ansi_ct::LIB_NONE;
+  ansi_c.endianness=ansi_ct::endiannesst::NO_ENDIANNESS;
+  ansi_c.os=ansi_ct::ost::NO_OS;
+  ansi_c.arch=ansi_ct::archt::NO_ARCH;
+  ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
   ansi_c.NULL_is_zero=(size_t)((void*)0)==0;
   
   // Default is ROUND_TO_EVEN, justified by C99:
@@ -876,15 +876,15 @@ bool configt::set(const cmdlinet &cmdline)
   {
     // Cygwin uses GCC throughout, use i386-linux
     // MinGW needs --win32 --gcc
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.os=configt::ansi_ct::OS_WIN;
+    ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::ost::OS_WIN;
 
     if(cmdline.isset("gcc"))
     {
       // There are gcc versions that target Windows (MinGW for example),
       // and we support that.
-      ansi_c.preprocessor=ansi_ct::PP_GCC;
-      ansi_c.mode=ansi_ct::MODE_GCC_C;
+      ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+      ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
 
       // enable Cygwin
       #ifdef _WIN32
@@ -899,53 +899,53 @@ bool configt::set(const cmdlinet &cmdline)
       // but we recognize the Visual Studio language,
       // which is somewhat inconsistent.
       #ifdef _WIN32
-      ansi_c.preprocessor=ansi_ct::PP_VISUAL_STUDIO;
-      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
+      ansi_c.preprocessor=ansi_ct::preprocessort::PP_VISUAL_STUDIO;
+      ansi_c.mode=ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
       #elif __FreeBSD__
-      ansi_c.preprocessor=ansi_ct::PP_CLANG;
-      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
+      ansi_c.preprocessor=ansi_ct::preprocessort::PP_CLANG;
+      ansi_c.mode=ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
       #else
-      ansi_c.preprocessor=ansi_ct::PP_GCC;
-      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
+      ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+      ansi_c.mode=ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
       #endif
     }
   }
   else if(os=="macos")
   {
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.os=configt::ansi_ct::OS_MACOS;
-    ansi_c.mode=ansi_ct::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::PP_GCC;
+    ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::ost::OS_MACOS;
+    ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
+    ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
   }
   else if(os=="linux" || os=="solaris")
   {
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.os=configt::ansi_ct::OS_LINUX;
-    ansi_c.mode=ansi_ct::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::PP_GCC;
+    ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
+    ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
+    ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
   }
   else if(os=="freebsd")
   {
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.os=configt::ansi_ct::OS_LINUX;
-    ansi_c.mode=ansi_ct::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::PP_CLANG;
+    ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
+    ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
+    ansi_c.preprocessor=ansi_ct::preprocessort::PP_CLANG;
   }
   else
   {
     // give up, but use reasonable defaults
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.os=configt::ansi_ct::OS_LINUX;
-    ansi_c.mode=ansi_ct::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::PP_GCC;
+    ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
+    ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
+    ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
   }
   
   if(arch=="none")
   {
     // the architecture for people who can't commit
-    ansi_c.arch=configt::ansi_ct::NO_ARCH;
-    ansi_c.endianness=configt::ansi_ct::NO_ENDIANNESS;
-    ansi_c.lib=configt::ansi_ct::LIB_NONE;
+    ansi_c.arch=configt::ansi_ct::archt::NO_ARCH;
+    ansi_c.endianness=configt::ansi_ct::endiannesst::NO_ENDIANNESS;
+    ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
     ansi_c.NULL_is_zero=false;
 
     if(sizeof(long int)==8)
@@ -1066,13 +1066,13 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.string_abstraction=false;  
   
   if(cmdline.isset("no-library"))
-    ansi_c.lib=configt::ansi_ct::LIB_NONE;
+    ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
   
   if(cmdline.isset("little-endian"))
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
 
   if(cmdline.isset("big-endian"))
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::endiannesst::IS_BIG_ENDIAN;
 
   if(cmdline.isset("little-endian") &&
      cmdline.isset("big-endian"))

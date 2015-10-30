@@ -67,15 +67,15 @@ public:
     // instruction (in bytes)
     unsigned memory_operand_size;
     
-    typedef enum { NO_ENDIANNESS, IS_LITTLE_ENDIAN, IS_BIG_ENDIAN } endiannesst;
+    enum class endiannesst { NO_ENDIANNESS, IS_LITTLE_ENDIAN, IS_BIG_ENDIAN };
     endiannesst endianness;
 
-    typedef enum { NO_OS, OS_LINUX, OS_MACOS, OS_WIN } ost;
+    enum class ost { NO_OS, OS_LINUX, OS_MACOS, OS_WIN };
     ost os;
 
-    typedef enum { NO_ARCH, ARCH_I386, ARCH_X86_64, ARCH_POWER, ARCH_ARM,
-                   ARCH_ALPHA, ARCH_MIPS, ARCH_S390, ARCH_S390X, ARCH_SPARC,
-                   ARCH_IA64, ARCH_X32 } archt;
+    enum class archt { NO_ARCH, ARCH_I386, ARCH_X86_64, ARCH_POWER, ARCH_ARM,
+                       ARCH_ALPHA, ARCH_MIPS, ARCH_S390, ARCH_S390X, ARCH_SPARC,
+                       ARCH_IA64, ARCH_X32 };
     archt arch;
 
     // architecture-specific integer value of null pointer constant
@@ -93,13 +93,13 @@ public:
     void set_arch_spec_ia64();
     void set_arch_spec_x32();
     
-    typedef enum { NO_MODE, MODE_ANSI_C_CPP, MODE_GCC_C, MODE_GCC_CPP,
-                   MODE_VISUAL_STUDIO_C_CPP,
-                   MODE_CODEWARRIOR_C_CPP, MODE_ARM_C_CPP } flavourt;
+    enum class flavourt { NO_MODE, MODE_ANSI_C_CPP, MODE_GCC_C, MODE_GCC_CPP,
+                          MODE_VISUAL_STUDIO_C_CPP,
+                          MODE_CODEWARRIOR_C_CPP, MODE_ARM_C_CPP };
     flavourt mode; // the syntax of source files
 
-    typedef enum { NO_PP, PP_GCC, PP_CLANG, PP_VISUAL_STUDIO,
-                   PP_CODEWARRIOR, PP_ARM } preprocessort;
+    enum class preprocessort { NO_PP, PP_GCC, PP_CLANG, PP_VISUAL_STUDIO,
+                               PP_CODEWARRIOR, PP_ARM };
     preprocessort preprocessor; // the preprocessor to use
 
     std::list<std::string> defines;
@@ -108,8 +108,9 @@ public:
     std::list<std::string> include_paths;
     std::list<std::string> include_files;
 
-    typedef enum { LIB_NONE, LIB_FULL } libt;
+    enum class libt { LIB_NONE, LIB_FULL };
     libt lib;
+
     bool string_abstraction;
   } ansi_c;
   
