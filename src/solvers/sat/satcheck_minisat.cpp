@@ -141,7 +141,7 @@ tvt satcheck_minisat1_baset::l_get(literalt a) const
   else if(solver->model[a.var_no()]==l_False)
     result=tvt(false);
   else
-    result=tvt(tvt::TV_UNKNOWN);
+    result=tvt(tvt::tv_enumt::TV_UNKNOWN);
   
   if(a.sign()) result=!result;
 
