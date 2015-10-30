@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#if 0
 #include "string2int.h"
 #include "type.h"
 #include "bitvector.h"
@@ -52,3 +53,4 @@ unsigned bv_width(const typet &type)
 }
 
 
+#endif

@@ -1,9 +1,9 @@
 class typet;
 
-typedef enum { BV_UNKNOWN, BV_NONE, BV_SIGNED, BV_UNSIGNED } bv_semt;
+//typedef enum { BV_UNKNOWN, BV_NONE, BV_SIGNED, BV_UNSIGNED } bv_semt;
 
-bv_semt bv_sem(const typet &type);
+//bv_semt bv_sem(const typet &type);
 
 // depreciated, and will disappear
-unsigned bv_width(const typet &type);
+//unsigned bv_width(const typet &type);
 

@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "replace_expr.h"
 #include "std_types.h"
-#include "bitvector.h"
 #include "simplify_utils.h"
 #include "expr_util.h"
 #include "std_expr.h"
@@ -531,9 +530,6 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   const exprt &operand=expr.op0();
   const irep_idt &op_type_id=op_type.id();
 
-  unsigned expr_width=bv_width(expr_type);
-  unsigned op_width=bv_width(operand.type());
-  
   if(operand.is_constant())
   {
     const irep_idt &value=to_constant_expr(operand).get_value();
@@ -791,7 +787,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     if(operand.operands().size()==1 &&
        op_type_id==expr_type_id &&
        (expr_type_id==ID_unsignedbv || expr_type_id==ID_signedbv) &&
-       expr_width<=op_width)
+       to_bitvector_type(expr_type).get_width()<=
+         to_bitvector_type(operand.type()).get_width())
     {
       exprt tmp;
       tmp.swap(expr.op0().op0());
