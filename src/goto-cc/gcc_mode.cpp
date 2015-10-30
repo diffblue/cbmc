@@ -162,9 +162,9 @@ bool gcc_modet::doit()
     
   // ARM-specific
   if(cmdline.isset("mbig-endian") || cmdline.isset("mbig"))
-    config.ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    config.ansi_c.endianness=configt::ansi_ct::endiannesst::IS_BIG_ENDIAN;
   else if(cmdline.isset("little-endian") || cmdline.isset("mlittle"))
-    config.ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    config.ansi_c.endianness=configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
     
   // -fshort-wchar makes wchar_t "short unsigned int"
   if(cmdline.isset("fshort-wchar"))
@@ -221,11 +221,11 @@ bool gcc_modet::doit()
      cmdline.isset("winx64"))
   {
     // We may wish to reconsider the below.
-    config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
+    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
     debug() << "Enabling Visual Studio syntax" << eom;
   }
   else
-    config.ansi_c.mode=configt::ansi_ct::MODE_GCC_C;
+    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
 
   if(compiler.mode==compilet::ASSEMBLE_ONLY)
     compiler.object_file_extension="s";

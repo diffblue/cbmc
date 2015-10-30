@@ -210,8 +210,8 @@ void ansi_c_internal_additions(std::string &code)
     "\n";
     
   // GCC junk stuff, also for ARM
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC_C ||
-     config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_C ||
+     config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_ARM_C_CPP)
   {
     code+=gcc_builtin_headers_generic;
     code+=clang_builtin_headers;
@@ -221,26 +221,26 @@ void ansi_c_internal_additions(std::string &code)
 
     switch(config.ansi_c.arch)
     {
-    case configt::ansi_ct::ARCH_I386:
-    case configt::ansi_ct::ARCH_X86_64:
-    case configt::ansi_ct::ARCH_X32:
+    case configt::ansi_ct::archt::ARCH_I386:
+    case configt::ansi_ct::archt::ARCH_X86_64:
+    case configt::ansi_ct::archt::ARCH_X32:
       code+=gcc_builtin_headers_ia32;
       code+=gcc_builtin_headers_ia32_2;
       break;
       
-    case configt::ansi_ct::ARCH_ARM:
+    case configt::ansi_ct::archt::ARCH_ARM:
       code+=gcc_builtin_headers_arm;
       break;
 
-    case configt::ansi_ct::ARCH_ALPHA:
+    case configt::ansi_ct::archt::ARCH_ALPHA:
       code+=gcc_builtin_headers_alpha;
       break;
      
-    case configt::ansi_ct::ARCH_MIPS:
+    case configt::ansi_ct::archt::ARCH_MIPS:
       code+=gcc_builtin_headers_mips;
       break;
      
-    case configt::ansi_ct::ARCH_POWER:
+    case configt::ansi_ct::archt::ARCH_POWER:
       code+=gcc_builtin_headers_power;
       break;
      
@@ -257,16 +257,16 @@ void ansi_c_internal_additions(std::string &code)
   }
 
   // this is Visual C/C++ only
-  if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
+  if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN)
     code+="int __noop();\n"
           "int __assume(int);\n";
     
   // ARM stuff
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_ARM_C_CPP)
     code+=arm_builtin_headers;
     
   // CW stuff
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_CODEWARRIOR_C_CPP)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_CODEWARRIOR_C_CPP)
     code+=cw_builtin_headers;
     
   // Architecture strings
@@ -310,6 +310,6 @@ void ansi_c_architecture_strings(std::string &code)
   code+=architecture_string(config.ansi_c.use_fixed_for_float, "fixed_for_float");
   code+=architecture_string(config.ansi_c.alignment, "alignment");
   code+=architecture_string(config.ansi_c.memory_operand_size, "memory_operand_size");
-  code+=architecture_string(config.ansi_c.endianness, "endianness");
+  code+=architecture_string(int(config.ansi_c.endianness), "endianness");
   code+=architecture_string(config.ansi_c.NULL_is_zero, "NULL_is_zero");
 }

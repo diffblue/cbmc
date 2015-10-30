@@ -272,22 +272,22 @@ bool c_preprocess(
 {
   switch(config.ansi_c.preprocessor)
   {
-  case configt::ansi_ct::PP_CODEWARRIOR:
+  case configt::ansi_ct::preprocessort::PP_CODEWARRIOR:
     return c_preprocess_codewarrior(path, outstream, message_handler);
   
-  case configt::ansi_ct::PP_GCC:
+  case configt::ansi_ct::preprocessort::PP_GCC:
     return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
   
-  case configt::ansi_ct::PP_CLANG:
+  case configt::ansi_ct::preprocessort::PP_CLANG:
     return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
   
-  case configt::ansi_ct::PP_VISUAL_STUDIO:
+  case configt::ansi_ct::preprocessort::PP_VISUAL_STUDIO:
     return c_preprocess_visual_studio(path, outstream, message_handler);
   
-  case configt::ansi_ct::PP_ARM:
+  case configt::ansi_ct::preprocessort::PP_ARM:
     return c_preprocess_arm(path, outstream, message_handler);
   
-  case configt::ansi_ct::NO_PP:
+  case configt::ansi_ct::preprocessort::NO_PP:
     return c_preprocess_none(path, outstream, message_handler);
   }
 
@@ -614,7 +614,7 @@ bool c_preprocess_gcc_clang(
 
   std::string command;
   
-  if(preprocessor==configt::ansi_ct::PP_CLANG)
+  if(preprocessor==configt::ansi_ct::preprocessort::PP_CLANG)
     command="clang";
   else
     command="gcc";
@@ -745,32 +745,32 @@ bool c_preprocess_gcc_clang(
 
   switch(config.ansi_c.os)
   {
-  case configt::ansi_ct::OS_LINUX:
+  case configt::ansi_ct::ost::OS_LINUX:
     command+=" -Dlinux -D__linux -D__linux__ -D__gnu_linux__";
     command+=" -Dunix -D__unix -D__unix__";
     command+=" -D__USE_UNIX98";
     break;
 
-  case configt::ansi_ct::OS_MACOS:
+  case configt::ansi_ct::ost::OS_MACOS:
     command+=" -D__APPLE__ -D__MACH__";
     // needs to be __APPLE_CPP__ for C++
     command+=" -D__APPLE_CC__";
     break;
 
-  case configt::ansi_ct::OS_WIN:
+  case configt::ansi_ct::ost::OS_WIN:
     command+=" -D _WIN32";
 
-    if(config.ansi_c.mode!=configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP)
+    if(config.ansi_c.mode!=configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP)
       command+=" -D _M_IX86=Blend";
 
-    if(config.ansi_c.arch==configt::ansi_ct::ARCH_X86_64)
+    if(config.ansi_c.arch==configt::ansi_ct::archt::ARCH_X86_64)
       command+=" -D _WIN64"; // yes, both _WIN32 and _WIN64 get defined
 
     if(config.ansi_c.char_is_unsigned)
       command+=" -D _CHAR_UNSIGNED"; // This is Visual Studio
     break;
 
-  case configt::ansi_ct::NO_OS:
+  case configt::ansi_ct::ost::NO_OS:
     command+=" -nostdinc"; // make sure we don't mess with the system library
     break;
     
@@ -826,8 +826,8 @@ bool c_preprocess_gcc_clang(
   // the following forces the mode
   switch(config.ansi_c.mode)
   {
-  case configt::ansi_ct::MODE_GCC_C: command+=" -x c"; break;
-  case configt::ansi_ct::MODE_GCC_CPP: command+=" -x c++"; break;
+  case configt::ansi_ct::flavourt::MODE_GCC_C: command+=" -x c"; break;
+  case configt::ansi_ct::flavourt::MODE_GCC_CPP: command+=" -x c++"; break;
   default:;
   }
 
@@ -957,7 +957,7 @@ bool c_preprocess_arm(
 //  if(config.ansi_c.char_is_unsigned)
 //    command+=" -D__CHAR_UNSIGNED__";
     
-  if(config.ansi_c.os!=configt::ansi_ct::OS_WIN)
+  if(config.ansi_c.os!=configt::ansi_ct::ost::OS_WIN)
   {
     command+=" -D__WORDSIZE="+i2string(config.ansi_c.pointer_width);
 
@@ -1093,7 +1093,7 @@ bool c_preprocess_none(
     return true;
   }
   
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_CODEWARRIOR_C_CPP)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_CODEWARRIOR_C_CPP)
   {
     // special treatment for "/* #line"
     postprocess_codewarrior(infile, outstream);
