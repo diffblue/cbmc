@@ -1,4 +1,6 @@
-class typet;
+// This file is deprecated, and will disappear.
+
+//class typet;
 
 //typedef enum { BV_UNKNOWN, BV_NONE, BV_SIGNED, BV_UNSIGNED } bv_semt;
 
