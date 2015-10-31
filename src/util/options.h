@@ -30,6 +30,11 @@ public:
   void set_option(const std::string &option, const unsigned value);
   void set_option(const std::string &option, const std::string &value);
 
+  void set_option(const std::string &option, const char *value)
+  {
+    set_option(option, std::string(value));
+  }
+
   inline void set_option(const std::string &option, const value_listt &values)
   {
     option_map[option]=values;
