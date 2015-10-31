@@ -88,12 +88,6 @@ public:
 
   void copy_to_subtypes(const typet &type);
 
-  // will go away
-  inline const source_locationt &location() const
-  {
-    return (const source_locationt &)find(ID_C_source_location);
-  }
-
   inline const source_locationt &source_location() const
   {
     return (const source_locationt &)find(ID_C_source_location);
