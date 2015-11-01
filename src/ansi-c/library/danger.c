@@ -29,7 +29,7 @@ void __CPROVER_danger_execute(struct __CPROVER_danger_instructiont *program,
     __CPROVER_assume(op0_id < max_op_index && op1_id < max_op_index && op2_id < max_op_index
         && (op0_id >= __CPROVER_danger_number_of_consts || op1_id >= __CPROVER_danger_number_of_consts  || op2_id >= __CPROVER_danger_number_of_consts)
         && (opcode > 5u || op0_id <= op1_id) && (opcode < 21u || !op1_id)
-        && (opcode == 9u || opcode >= 15u && opcode <= 18 || !op2_id)
+        && (opcode == 9u || (opcode >= 15u && opcode <= 18) || !op2_id)
         && (opcode != 9u || op0_id != op2_id || op1_id < op2_id));
     const unsigned int * const op0_ptr=__CPROVER_danger_OPS[op0_id];
     const unsigned int * const op1_ptr=__CPROVER_danger_OPS[op1_id];
@@ -37,7 +37,7 @@ void __CPROVER_danger_execute(struct __CPROVER_danger_instructiont *program,
     __CPROVER_assume(op0_ptr && op1_ptr && op2_ptr);  // No null pointers in op array
     const unsigned int op0=*op0_ptr;
     const unsigned int op1=*op1_ptr;
-    __CPROVER_assume(opcode != 19 && opcode != 20 || op1); // Avoid div by 0.
+    __CPROVER_assume((opcode != 19 && opcode != 20) || op1); // Avoid div by 0.
     const unsigned int op2=*op2_ptr;
 #define sop0 ((int) op0)
 #define sop1 ((int) op1)
