@@ -273,25 +273,14 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
     a_begin.source_location=f.body.instructions.front().source_location;
     f.body.insert_before_swap(f.body.instructions.begin(), a_begin);
 
-    bool last_is_return=false;
+    goto_programt::targett a_end=f.body.add_instruction();
+    a_end->make_atomic_end();
+    a_end->source_location=end_location;
+
     Forall_goto_program_instructions(i_it, f.body)
     {
-      last_is_return=i_it->is_return();
-      if(last_is_return)
-      {
-        goto_programt::instructiont a_end;
-        a_end.make_atomic_end();
-        a_end.source_location=i_it->source_location;
-        f.body.insert_before_swap(i_it, a_end);
-        ++i_it;
-      }
-    }
-
-    if(!last_is_return)
-    {
-      goto_programt::targett t=f.body.add_instruction();
-      t->make_atomic_end();
-      t->source_location=end_location;
+      if(i_it->is_goto() && i_it->get_target()->is_end_function())
+        i_it->set_target(a_end);
     }
   }
 
