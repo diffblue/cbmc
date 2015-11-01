@@ -110,6 +110,13 @@ public:
       return targets.front();
     }
 
+    // for the usual case of a single target
+    inline void set_target(targett t)
+    {
+      targets.clear();
+      targets.push_back(t);
+    }
+
     //! goto target labels    
     typedef std::list<irep_idt> labelst;
     labelst labels;
