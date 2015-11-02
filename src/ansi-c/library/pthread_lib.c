@@ -18,7 +18,9 @@ typedef signed char __CPROVER_mutex_t;
 inline void pthread_mutex_cleanup(void *p)
 {
   __CPROVER_HIDE:
-  __CPROVER_assert(__CPROVER_get_must(p, "mutex_destroyed"), "mutex must be destroyed");
+  __CPROVER_assert(
+    __CPROVER_get_must(p, "mutex_destroyed"),
+    "mutex must be destroyed");
 }
 
 inline int pthread_mutex_init(
@@ -28,6 +30,7 @@ inline int pthread_mutex_init(
   *((__CPROVER_mutex_t *)mutex)=0;
   if(mutexattr!=0) (void)*mutexattr;
   __CPROVER_cleanup(mutex, pthread_mutex_cleanup);
+  __CPROVER_set_must(mutex, "mutex-init");
   return 0;
 }
 
@@ -52,6 +55,10 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
+  __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
+                   "mutex must be initialized");
+  __CPROVER_set_must(mutex, "mutex-locked");
+  __CPROVER_set_may(mutex, "mutex-locked");
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)!=-1,
     "mutex not initialised or destroyed");
   __CPROVER_assume(!*((__CPROVER_mutex_t *)mutex));
@@ -86,6 +93,9 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
   __CPROVER_HIDE:;
   int return_value;
   __CPROVER_atomic_begin();
+
+  __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
+                   "mutex must be initialized");
 
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)!=-1,
     "mutex not initialised or destroyed");
@@ -130,6 +140,12 @@ typedef signed char __CPROVER_mutex_t;
 inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
+
+  __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-locked"),
+                   "mutex must be locked");
+
+  __CPROVER_clear_may(mutex, "mutex-locked");
+
   // the fence must be before the unlock
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
                     "WWcumul", "RRcumul", "RWcumul", "WRcumul");
@@ -162,6 +178,13 @@ typedef signed char __CPROVER_mutex_t;
 inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
+
+  __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
+                   "mutex must be initialized");
+
+  __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-locked"),
+                   "mutex must not be locked");
+
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==0,
     "lock held upon destroy");
   *((__CPROVER_mutex_t *)mutex)=-1;
@@ -240,7 +263,8 @@ inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 inline void pthread_rwlock_cleanup(void *p)
 {
   __CPROVER_HIDE:
-  __CPROVER_assert(__CPROVER_get_must(p, "rwlock_destroyed"), "rwlock must be destroyed");
+  __CPROVER_assert(__CPROVER_get_must(p, "rwlock_destroyed"),
+                   "rwlock must be destroyed");
 }
 
 inline int pthread_rwlock_init(pthread_rwlock_t *lock, 
