@@ -2272,14 +2272,28 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=2)
     {
       err_location(f_op);
-      throw "get_must_flag expects two operands";
+      throw "get_must expects two operands";
     }
 
-    exprt get_must_flag_expr=
+    exprt get_must_expr=
       binary_predicate_exprt(expr.arguments()[0], "get_must", expr.arguments()[1]);
-    get_must_flag_expr.add_source_location()=source_location;
+    get_must_expr.add_source_location()=source_location;
 
-    return get_must_flag_expr;
+    return get_must_expr;
+  }
+  else if(identifier==CPROVER_PREFIX "get_may")
+  {
+    if(expr.arguments().size()!=2)
+    {
+      err_location(f_op);
+      throw "get_may expects two operands";
+    }
+
+    exprt get_may_expr=
+      binary_predicate_exprt(expr.arguments()[0], "get_may", expr.arguments()[1]);
+    get_may_expr.add_source_location()=source_location;
+
+    return get_may_expr;
   }
   else if(identifier==CPROVER_PREFIX "invalid_pointer")
   {

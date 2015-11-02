@@ -4344,6 +4344,9 @@ std::string expr2ct::convert(
   else if(src.id()=="get_must")
     return convert_function(src, "__CPROVER_get_must", precedence=16);
 
+  else if(src.id()=="get_may")
+    return convert_function(src, "__CPROVER_get_may", precedence=16);
+
   else if(src.id()=="object_value")
     return convert_function(src, "OBJECT_VALUE", precedence=16);
 
