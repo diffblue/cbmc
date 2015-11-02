@@ -80,7 +80,7 @@ public:
   }
 
 protected:  
-  typedef enum { SET_MUST, CLEAR_MUST } modet;
+  typedef enum { SET_MUST, CLEAR_MUST, SET_MAY, CLEAR_MAY } modet;
 
   void set_bit(const exprt &, unsigned bit_nr, modet);
   void set_bit(const irep_idt &, unsigned bit_nr, modet);
@@ -92,7 +92,7 @@ public:
   void instrument(goto_functionst &);
   void check(const namespacet &, const goto_functionst &, bool xml, std::ostream &);
   exprt eval(const exprt &src, locationt loc);
-  static bool has_get_must(const exprt &);
+  static bool has_get_must_or_may(const exprt &);
 
   unsigned get_bit_nr(const exprt &);
 

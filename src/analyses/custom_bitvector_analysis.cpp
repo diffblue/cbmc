@@ -30,16 +30,37 @@ void custom_bitvector_domaint::set_bit(
   unsigned bit_nr,
   modet mode)
 {
-  bit_vectort &bit_vector=must_bits[identifier];
-
-  if(mode==SET_MUST)
-  {    
-    bit_vector|=(1l<<bit_nr);
-  }
-  else if(mode==CLEAR_MUST)
+  switch(mode)
   {
-    bit_vector|=(1l<<bit_nr);
-    bit_vector^=(1l<<bit_nr);
+  case SET_MUST:
+    {
+      bit_vectort &bit_vector=must_bits[identifier];
+      bit_vector|=(1l<<bit_nr);
+    }
+    break;
+  
+  case CLEAR_MUST:
+    {
+      bit_vectort &bit_vector=must_bits[identifier];
+      bit_vector|=(1l<<bit_nr);
+      bit_vector^=(1l<<bit_nr);
+    }
+    break;
+  
+  case SET_MAY:
+    {
+      bit_vectort &bit_vector=may_bits[identifier];
+      bit_vector|=(1l<<bit_nr);
+    }
+    break;
+  
+  case CLEAR_MAY:
+    {
+      bit_vectort &bit_vector=may_bits[identifier];
+      bit_vector|=(1l<<bit_nr);
+      bit_vector^=(1l<<bit_nr);
+    }
+    break;
   }
 }
 
@@ -242,14 +263,27 @@ void custom_bitvector_domaint::transform(
       {
         const irep_idt &identifier=to_symbol_expr(function).get_identifier();
         if(identifier=="__CPROVER_set_must" ||
-           identifier=="__CPROVER_clear_must")
+           identifier=="__CPROVER_clear_must" ||
+           identifier=="__CPROVER_set_may" ||
+           identifier=="__CPROVER_clear_may")
         {
           if(code_function_call.arguments().size()==2)
           {
             unsigned bit_nr=
               cba.get_bit_nr(code_function_call.arguments()[1]);
               
-            modet mode=(identifier=="__CPROVER_set_must")?SET_MUST:CLEAR_MUST;
+            modet mode;
+            
+            if(identifier=="__CPROVER_set_must")
+              mode=SET_MUST;
+            else if(identifier=="__CPROVER_clear_must")
+              mode=CLEAR_MUST;
+            else if(identifier=="__CPROVER_set_may")
+              mode=SET_MAY;
+            else if(identifier=="__CPROVER_clear_may")
+              mode=CLEAR_MAY;
+            else
+              assert(false);
             
             exprt lhs=code_function_call.arguments()[0];
             
@@ -435,7 +469,7 @@ void custom_bitvector_analysist::instrument(goto_functionst &)
 
 /*******************************************************************\
 
-Function: custom_bitvector_analysist::has_get_must
+Function: custom_bitvector_analysist::has_get_must_or_may
 
   Inputs:
 
@@ -445,13 +479,14 @@ Function: custom_bitvector_analysist::has_get_must
 
 \*******************************************************************/
 
-bool custom_bitvector_analysist::has_get_must(const exprt &src)
+bool custom_bitvector_analysist::has_get_must_or_may(const exprt &src)
 {
-  if(src.id()=="get_must")
+  if(src.id()=="get_must" ||
+     src.id()=="get_may")
     return true;
   
   forall_operands(it, src)
-    if(has_get_must(*it)) return true;
+    if(has_get_must_or_may(*it)) return true;
 
   return false;
 }
@@ -472,7 +507,7 @@ exprt custom_bitvector_analysist::eval(
   const exprt &src,
   locationt loc)
 {
-  if(src.id()=="get_must")
+  if(src.id()=="get_must" || src.id()=="get_may")
   {
     if(src.operands().size()==2)
     {
@@ -483,7 +518,12 @@ exprt custom_bitvector_analysist::eval(
       custom_bitvector_domaint::vectorst v;
       operator[](loc).get_rhs(object, v);
 
-      bool value=v.must_bits&(1l<<bit_nr);
+      bool value=false;
+      
+      if(src.id()=="get_must")
+        value=v.must_bits&(1l<<bit_nr);
+      else if(src.id()=="get_may")
+        value=v.may_bits&(1l<<bit_nr);
       
       if(value)
         return true_exprt();
@@ -533,7 +573,7 @@ void custom_bitvector_analysist::check(
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
-      if(!has_get_must(i_it->guard)) continue;
+      if(!has_get_must_or_may(i_it->guard)) continue;
 
       exprt result=eval(i_it->guard, i_it);
       exprt result2=simplify_expr(result, ns);
