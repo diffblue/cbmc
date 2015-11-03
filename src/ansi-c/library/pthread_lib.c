@@ -602,6 +602,7 @@ inline int pthread_barrier_init(
 {
   __CPROVER_HIDE:;
   __CPROVER_set_must(barrier, "barrier-init");
+  __CPROVER_clear_may(barrier, "barrier-destroyed");
 }       
 
 /* FUNCTION: pthread_barrier_destroy */
