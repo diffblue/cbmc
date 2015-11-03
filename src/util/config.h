@@ -45,6 +45,10 @@ public:
     bool single_precision_constant;
     enum class standardt { STD89, STD99, STD11 } standard;
     
+    void set_std89() { standard=standardt::STD89; for_has_scope=false; }
+    void set_std99() { standard=standardt::STD99; for_has_scope=true; }
+    void set_std11() { standard=standardt::STD11; for_has_scope=true; }
+    
     ieee_floatt::rounding_modet rounding_mode;
 
     void set_16();

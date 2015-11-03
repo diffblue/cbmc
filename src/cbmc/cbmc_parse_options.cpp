@@ -158,6 +158,15 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
 
+  if(cmdline.isset("std89"))
+    config.ansi_c.set_std89();
+
+  if(cmdline.isset("std99"))
+    config.ansi_c.set_std99();
+
+  if(cmdline.isset("std11"))
+    config.ansi_c.set_std11();
+
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
   else
