@@ -256,7 +256,9 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   
   status() << "** " << cover_goals.number_covered()
            << " of " << cover_goals.size() << " failed ("
-           << cover_goals.iterations() << " iterations)" << eom;
+           << cover_goals.iterations() << " iteration"
+           << (cover_goals.iterations()==1?"":"s")
+           << ")" << eom;
   
   return (cover_goals.number_covered()==0)?
     safety_checkert::SAFE:safety_checkert::UNSAFE;
