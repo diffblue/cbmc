@@ -46,6 +46,7 @@ inline int pthread_mutex_init(
   if(mutexattr!=0) (void)*mutexattr;
   __CPROVER_cleanup(mutex, pthread_mutex_cleanup);
   __CPROVER_set_must(mutex, "mutex-init");
+  __CPROVER_clear_may(mutex, "mutex-destroyed");
   return 0;
 }
 
