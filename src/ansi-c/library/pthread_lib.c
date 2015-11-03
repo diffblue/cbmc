@@ -596,7 +596,7 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int pthread_barrier_init(
+inline int pthread_barrier_init(
   pthread_barrier_t *restrict barrier,
   const pthread_barrierattr_t *restrict attr, unsigned count)
 {
@@ -611,7 +611,7 @@ int pthread_barrier_init(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int pthread_barrier_destroy(pthread_barrier_t *barrier)
+inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(__CPROVER_get_must(barrier, "barrier-init"),
@@ -628,7 +628,7 @@ int pthread_barrier_destroy(pthread_barrier_t *barrier)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int pthread_barrier_wait(pthread_barrier_t *barrier)
+inline int pthread_barrier_wait(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(__CPROVER_get_must(barrier, "barrier-init"),
