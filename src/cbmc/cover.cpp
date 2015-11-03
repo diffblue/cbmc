@@ -444,7 +444,9 @@ bool bmc_covert::operator()(const criteriont criterion)
   
   status() << "** " << cover_goals.number_covered()
            << " of " << cover_goals.size() << " covered ("
-           << cover_goals.iterations() << " iterations)" << eom;
+           << cover_goals.iterations() << " iteration"
+           << (cover_goals.iterations()==1?"":"s")
+           << ")" << eom;
   
   return false;
 }
