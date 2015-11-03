@@ -589,3 +589,50 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
 }
 #endif
 
+/* FUNCTION: pthread_barrier_init */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+int pthread_barrier_init(
+  pthread_barrier_t *restrict barrier,
+  const pthread_barrierattr_t *restrict attr, unsigned count)
+{
+  __CPROVER_HIDE:;
+  __CPROVER_set_must(barrier, "barrier-init");
+}       
+
+/* FUNCTION: pthread_barrier_destroy */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+int pthread_barrier_destroy(pthread_barrier_t *barrier)
+{
+  __CPROVER_HIDE:;
+  __CPROVER_assert(__CPROVER_get_must(barrier, "barrier-init"),
+                   "pthread barrier must be initialized");
+  __CPROVER_assert(!__CPROVER_get_may(barrier, "barrier-destroyed"),
+                   "pthread barrier must not be destroyed");
+  __CPROVER_set_may(barrier, "barrier-destroyed");
+}
+
+/* FUNCTION: pthread_barrier_wait */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+int pthread_barrier_wait(pthread_barrier_t *barrier)
+{
+  __CPROVER_HIDE:;
+  __CPROVER_assert(__CPROVER_get_must(barrier, "barrier-init"),
+                   "pthread barrier must be initialized");
+  __CPROVER_assert(!__CPROVER_get_may(barrier, "barrier-destroyed"),
+                   "pthread barrier must not be destroyed");
+}
