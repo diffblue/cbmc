@@ -2,7 +2,7 @@
 
 #include <semaphore.h>
 
-inline int sem_init(sem_t *sem, inline int pshared, unsigned inline int value)
+inline int sem_init(sem_t *sem, int pshared, unsigned int value)
 {
   __CPROVER_HIDE:;
   __CPROVER_set_must(sem, "sem-init");
@@ -65,7 +65,7 @@ inline int sem_post(sem_t * sem)
 
 #include <semaphore.h>
 
-inline int sem_post_multiple(sem_t * sem, inline int number)
+inline int sem_post_multiple(sem_t *sem, int number)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
@@ -78,7 +78,7 @@ inline int sem_post_multiple(sem_t * sem, inline int number)
 
 #include <semaphore.h>
 
-inline int sem_getvalue(sem_t * sem, inline int * sval)
+inline int sem_getvalue(sem_t *sem, int *sval)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
@@ -91,7 +91,7 @@ inline int sem_getvalue(sem_t * sem, inline int * sval)
 
 #include <semaphore.h>
 
-inline int sem_destroy(sem_t * sem)
+inline int sem_destroy(sem_t *sem)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
