@@ -1,3 +1,18 @@
+/* FUNCTION: pthread_cancel */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+inline int pthread_cancel(pthread_t thread)
+{
+  __CPROVER_HIDE:;
+
+  __CPROVER_assert(__CPROVER_get_must(thread, "pthread-id"),
+                   "cancel must be given valid thread ID");
+}
+
 /* FUNCTION: pthread_mutex_init */
 
 #ifndef __CPROVER_PTHREAD_H_INCLUDED
@@ -426,6 +441,8 @@ int pthread_create(
   __CPROVER_atomic_begin();
   this_thread_id=++__CPROVER_next_thread_id;
   __CPROVER_atomic_end();
+  
+  __CPROVER_set_must(thread, "pthread-id");
 
   if(thread)
   {
