@@ -19,7 +19,7 @@ inline void pthread_mutex_cleanup(void *p)
 {
   __CPROVER_HIDE:
   __CPROVER_assert(
-    __CPROVER_get_must(p, "mutex_destroyed"),
+    __CPROVER_get_must(p, "mutex-destroyed"),
     "mutex must be destroyed");
 }
 
@@ -55,13 +55,24 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
+
   __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
                    "mutex must be initialized");
+
+  __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-destroyed"),
+                   "mutex must not be destroyed");
+
+  __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-locked"),
+                   "attempt to lock non-recurisive locked mutex");
+
   __CPROVER_set_must(mutex, "mutex-locked");
   __CPROVER_set_may(mutex, "mutex-locked");
+
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)!=-1,
     "mutex not initialised or destroyed");
+
   __CPROVER_assume(!*((__CPROVER_mutex_t *)mutex));
+
   *((__CPROVER_mutex_t *)mutex)=1;
   __CPROVER_atomic_end();
 
@@ -141,8 +152,14 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
 
+  __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
+                   "mutex must be initialized");
+
   __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-locked"),
                    "mutex must be locked");
+
+  __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-destroyed"),
+                   "mutex must not be destroyed");
 
   __CPROVER_clear_may(mutex, "mutex-locked");
 
@@ -185,10 +202,16 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
   __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-locked"),
                    "mutex must not be locked");
 
+  __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-destroyed"),
+                   "mutex must not be destroyed");
+
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==0,
     "lock held upon destroy");
   *((__CPROVER_mutex_t *)mutex)=-1;
-  __CPROVER_set_must(mutex, "mutex_destroyed");
+
+  __CPROVER_set_must(mutex, "mutex-destroyed");
+  __CPROVER_set_may(mutex, "mutex-destroyed");
+
   return 0;
 }
 
