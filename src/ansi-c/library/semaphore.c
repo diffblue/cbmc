@@ -6,8 +6,6 @@ inline int sem_init(sem_t *sem, inline int pshared, unsigned inline int value)
 {
   __CPROVER_HIDE:;
   __CPROVER_set_must(sem, "sem-init");
-  __CPROVER_assert(!__CPROVER_get_may(sem, "sem-destroyed"),
-                   "semaphore must not be destroyed");
 }
 
 /* FUNCTION: sem_wait */
