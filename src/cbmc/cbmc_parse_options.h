@@ -25,7 +25,7 @@ class optionst;
   "(no-simplify)(unwind):(unwindset):(slice-formula)(full-slice)" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
-  "D:I:" \
+  "D:I:(std):" \
   "(classpath):" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
