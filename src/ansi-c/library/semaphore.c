@@ -6,6 +6,7 @@ inline int sem_init(sem_t *sem, inline int pshared, unsigned inline int value)
 {
   __CPROVER_HIDE:;
   __CPROVER_set_must(sem, "sem-init");
+  __CPROVER_clear_may(sem, "sem-destroyed");
 }
 
 /* FUNCTION: sem_wait */
