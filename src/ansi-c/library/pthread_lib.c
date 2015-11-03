@@ -10,7 +10,7 @@ inline int pthread_cancel(pthread_t thread)
   __CPROVER_HIDE:;
 
   __CPROVER_assert(__CPROVER_get_must(thread, "pthread-id"),
-                   "cancel must be given valid thread ID");
+                   "must be given valid thread ID");
 }
 
 /* FUNCTION: pthread_mutex_init */
@@ -267,10 +267,15 @@ extern unsigned long __CPROVER_next_thread_id;
 inline int pthread_join(pthread_t thread, void **value_ptr)
 {
   __CPROVER_HIDE:;
+
+  __CPROVER_assert(__CPROVER_get_must(thread, "pthread-id"),
+                   "must be given valid thread ID");
+
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
   if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
   if(value_ptr!=0) (void)**(char**)value_ptr;
   __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread]);
+
   return 0;
 }
 
