@@ -348,20 +348,23 @@ void goto_inlinet::expand_function_call(
   goto_programt &dest,
   goto_programt::targett &target,
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   const exprt &constrain,
   bool full)
 {
   // look it up
-  if(function.id()!=ID_symbol)
-  {
-    err_location(function);
-    throw "function_call expects symbol as function operand, "
-          "but got `"+function.id_string()+"'";
-  }
+  const irep_idt identifier=function.get_identifier();
   
-  const irep_idt identifier=function.get(ID_identifier);
+  #if 0
+  // we ignore certain calls
+  if(identifier=="__CPROVER_cleanup" ||
+     identifier=="__CPROVER_set_must" ||
+     identifier=="__CPROVER_set_may" ||
+     identifier=="__CPROVER_clear_must" ||
+     identifier=="__CPROVER_clear_may")
+    return; // ignore
+  #endif
   
   // see if we are already expanding it
   if(recursion_set.find(identifier)!=recursion_set.end())
@@ -395,8 +398,7 @@ void goto_inlinet::expand_function_call(
     }
 
     err_location(function);
-    str << "failed to find function `" << identifier
-        << "'";
+    str << "failed to find function `" << identifier << "'";
     throw 0;
   }
   
@@ -480,8 +482,7 @@ void goto_inlinet::expand_function_call(
     if(no_body_set.insert(identifier).second)
     {
       err_location(function);
-      str << "no body for function `" << identifier
-          << "'";
+      str << "no body for function `" << identifier << "'";
       warning_msg();
     }
 
@@ -631,7 +632,8 @@ bool goto_inlinet::inline_instruction(
     if(call.function().id()==ID_symbol)
     {
       expand_function_call(
-        dest, it, call.lhs(), call.function(), call.arguments(),
+        dest, it, call.lhs(), to_symbol_expr(call.function()),
+        call.arguments(),
         static_cast<const exprt &>(get_nil_irep()), full);
 
       return true;
@@ -648,7 +650,7 @@ bool goto_inlinet::inline_instruction(
       expand_function_call(
         dest, it,
         it->code.op0().op0(), // lhs
-        it->code.op0().op1().op0(), // function
+        to_symbol_expr(it->code.op0().op1().op0()), // function
         it->code.op0().op1().op1().operands(), // arguments
         it->code.op1(), // constraint
         full);
