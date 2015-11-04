@@ -85,6 +85,48 @@ void ai_baset::output(
 
 /*******************************************************************\
 
+Function: ai_baset::entry_state
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ai_baset::entry_state(const goto_functionst &goto_functions)
+{
+  // find the 'entry function'
+  
+  goto_functionst::function_mapt::const_iterator
+    f_it=goto_functions.function_map.find(goto_functions.entry_point());
+    
+  if(f_it!=goto_functions.function_map.end())
+    entry_state(f_it->second.body);
+}
+
+/*******************************************************************\
+
+Function: ai_baset::entry_state
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ai_baset::entry_state(const goto_programt &goto_program)
+{
+  // The first instruction of 'goto_program' is the entry point,
+  // and we make that 'top'.
+  get_state(goto_program.instructions.begin()).make_top();  
+}
+
+/*******************************************************************\
+
 Function: ai_baset::initialize
 
   Inputs:
@@ -182,13 +224,6 @@ bool ai_baset::fixedpoint(
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
-  if(goto_program.instructions.empty())
-    return false;
-    
-  // The first instruction of 'goto_program' is the entry point,
-  // and we make that 'top'.
-  get_state(goto_program.instructions.begin()).make_top();
-  
   working_sett working_set;
 
   // We will put all locations at least once into the working set.
@@ -338,20 +373,9 @@ bool ai_baset::do_function_call(
     if(merge(*tmp_state, l_call, l_begin))
       new_data=true;
 
-    // do each function at least once
-    if(functions_done.find(f_it->first)==
-       functions_done.end())
-    {
-      new_data=true;
-      functions_done.insert(f_it->first);
-    }
-
-    // do we need to do the fixedpoint of the body?
+    // do we need to do/re-do the fixedpoint of the body?
     if(new_data)
-    {
-      // also do the fixedpoint of the body via a recursive call
       fixedpoint(goto_function.body, goto_functions, ns);
-    }
   }
 
   {
@@ -423,7 +447,7 @@ bool ai_baset::do_function_call_rec(
   else if(function.id()==ID_if)
   {
     if(function.operands().size()!=3)
-      throw "if takes three arguments";
+      throw "if has three operands";
     
     bool new_data1=
       do_function_call_rec(
