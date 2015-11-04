@@ -1780,7 +1780,7 @@ Function: simplify_exprt::simplify_floatbv_typecast
 bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 {
   // These casts usually reduce precision, and thus, usually round.
-
+  
   assert(expr.operands().size()==2);
         
   const typet &dest_type=ns.follow(expr.type());
@@ -1793,9 +1793,6 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
     return false;
   }
   
-  if(dest_type.id()!=ID_floatbv)
-    return true;
-    
   exprt op0=expr.op0();
   exprt op1=expr.op1(); // rounding mode
   
@@ -1837,11 +1834,26 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
     {
       if(src_type.id()==ID_floatbv)
       {
-        ieee_floatt result(to_constant_expr(op0));
-        result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
-        result.change_spec(to_floatbv_type(dest_type));
-        expr=result.to_expr();
-        return false;
+        if(dest_type.id()==ID_floatbv) // float to float
+        {
+          ieee_floatt result(to_constant_expr(op0));
+          result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+          result.change_spec(to_floatbv_type(dest_type));
+          expr=result.to_expr();
+          return false;
+        }
+        else if(dest_type.id()==ID_signedbv ||
+                dest_type.id()==ID_unsignedbv)
+        {
+          if(rounding_mode==ieee_floatt::ROUND_TO_ZERO)
+          {
+            ieee_floatt result(to_constant_expr(op0));
+            result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+            mp_integer value=result.to_integer();
+            expr=from_integer(value, dest_type);
+            return false;
+          }
+        }
       }
       else if(src_type.id()==ID_signedbv ||
               src_type.id()==ID_unsignedbv)
@@ -1849,12 +1861,15 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         mp_integer value;
         if(!to_integer(op0, value))
         {
-          ieee_floatt result;
-          result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
-          result.spec=to_floatbv_type(dest_type);
-          result.from_integer(value);
-          expr=result.to_expr();
-          return false;
+          if(dest_type.id()==ID_floatbv) // int to float
+          {
+            ieee_floatt result;
+            result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+            result.spec=to_floatbv_type(dest_type);
+            result.from_integer(value);
+            expr=result.to_expr();
+            return false;
+          }
         }
       }
     }
