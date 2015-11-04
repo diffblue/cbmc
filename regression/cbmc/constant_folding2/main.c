@@ -7,12 +7,12 @@ typedef struct _pair
 int main (void)
 {
   pair p;
-  p.x = 0.0;
-  p.y = (int)0.0f;
+  p.x = 0;
+  p.y = 0;
   
   int array[2];
   array[0] = 0;
-  array[1] = (int)0.0f;
+  array[1] = 0;
   
   int i=0;
   
