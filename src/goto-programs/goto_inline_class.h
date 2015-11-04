@@ -53,7 +53,7 @@ protected:
     goto_programt &dest,
     goto_programt::targett &target,
     const exprt &lhs,
-    const exprt &function,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     const exprt &constrain,
     bool recursive);
