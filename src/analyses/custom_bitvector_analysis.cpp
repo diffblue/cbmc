@@ -116,8 +116,18 @@ void custom_bitvector_domaint::assign_lhs(
   if(lhs.id()==ID_symbol)
   {
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
-    must_bits[identifier]=vectors.must_bits;
-    may_bits[identifier]=vectors.may_bits;
+
+    // we erase blank ones to avoid noise
+
+    if(vectors.must_bits==0)
+      must_bits.erase(identifier);
+    else
+      must_bits[identifier]=vectors.must_bits;
+    
+    if(vectors.may_bits==0)
+      may_bits.erase(identifier);
+    else
+      may_bits[identifier]=vectors.may_bits;
   }
 }
 
@@ -290,6 +300,8 @@ void custom_bitvector_domaint::transform(
             // may alias other stuff
             std::set<exprt> lhs_set=
               cba.local_may_alias_factory(from).get(from, lhs);
+
+            lhs_set.insert(lhs);
               
             for(std::set<exprt>::const_iterator
                 l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
@@ -447,7 +459,7 @@ bool custom_bitvector_domaint::merge(
     else
       a_it++;
   }
-  
+
   return changed;
 }
 
