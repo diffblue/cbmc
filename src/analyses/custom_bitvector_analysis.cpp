@@ -44,6 +44,7 @@ void custom_bitvector_domaint::set_bit(
       bit_vectort &bit_vector=must_bits[identifier];
       bit_vector|=(1l<<bit_nr);
       bit_vector^=(1l<<bit_nr);
+      if(bit_vector==0) must_bits.erase(identifier);
     }
     break;
   
@@ -59,6 +60,7 @@ void custom_bitvector_domaint::set_bit(
       bit_vectort &bit_vector=may_bits[identifier];
       bit_vector|=(1l<<bit_nr);
       bit_vector^=(1l<<bit_nr);
+      if(bit_vector==0) may_bits.erase(identifier);
     }
     break;
   }
@@ -143,24 +145,50 @@ Function: custom_bitvector_domaint::get_rhs
 
 \*******************************************************************/
 
-void custom_bitvector_domaint::get_rhs(
-  const exprt &rhs,
-  vectorst &vectors)
+custom_bitvector_domaint::vectorst
+  custom_bitvector_domaint::get_rhs(const irep_idt &identifier)
+{
+  vectorst vectors;
+
+  bitst::const_iterator may_it=may_bits.find(identifier);
+  if(may_it!=may_bits.end()) vectors.may_bits=may_it->second;
+  
+  bitst::const_iterator must_it=must_bits.find(identifier);
+  if(must_it!=must_bits.end()) vectors.must_bits=must_it->second;
+  
+  return vectors;
+}
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::get_rhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+custom_bitvector_domaint::vectorst
+  custom_bitvector_domaint::get_rhs(const exprt &rhs)
 {
   if(rhs.id()==ID_symbol)
   {
     const irep_idt identifier=to_symbol_expr(rhs).get_identifier();
-    vectors.may_bits=may_bits[identifier];
-    vectors.must_bits=must_bits[identifier];
+    return get_rhs(identifier);
   }
   else if(rhs.id()==ID_typecast)
   {
-    get_rhs(to_typecast_expr(rhs).op(), vectors);
+    return get_rhs(to_typecast_expr(rhs).op());
   }
   else if(rhs.id()==ID_if)
   {
-    get_rhs(to_if_expr(rhs).true_case(), vectors);
-    get_rhs(to_if_expr(rhs).false_case(), vectors);
+    // need to merge both
+    vectorst v_true=get_rhs(to_if_expr(rhs).true_case());
+    vectorst v_false=get_rhs(to_if_expr(rhs).false_case());
+    return merge(v_true, v_false);
   }
   else if(rhs.id()==ID_address_of)
   {
@@ -168,10 +196,11 @@ void custom_bitvector_domaint::get_rhs(
     if(op.id()==ID_symbol)
     {
       const irep_idt identifier="&"+id2string(to_symbol_expr(op).get_identifier());
-      vectors.may_bits=may_bits[identifier];
-      vectors.must_bits=must_bits[identifier];
+      return get_rhs(identifier);
     }
   }
+  
+  return vectorst();
 }
 
 /*******************************************************************\
@@ -243,8 +272,7 @@ void custom_bitvector_domaint::transform(
       for(std::set<exprt>::const_iterator
           l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
       {
-        vectorst rhs_vectors;
-        get_rhs(code_assign.rhs(), rhs_vectors);
+        vectorst rhs_vectors=get_rhs(code_assign.rhs());
         assign_lhs(*l_it, rhs_vectors);
       }
     }
@@ -527,8 +555,8 @@ exprt custom_bitvector_analysist::eval(
 
       exprt object=src.op0();
       
-      custom_bitvector_domaint::vectorst v;
-      operator[](loc).get_rhs(object, v);
+      custom_bitvector_domaint::vectorst v=
+        operator[](loc).get_rhs(object);
 
       bool value=false;
       
