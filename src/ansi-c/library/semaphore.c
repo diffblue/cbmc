@@ -5,11 +5,12 @@
 inline int sem_init(sem_t *sem, int pshared, unsigned int value)
 {
   __CPROVER_HIDE:;
-  pshared;
-  value;
-  sem;
+  (void)pshared;
+  (void)value;
+  (void)sem;
   __CPROVER_set_must(sem, "sem-init");
   __CPROVER_clear_may(sem, "sem-destroyed");
+  return 0;
 }
 
 /* FUNCTION: sem_wait */
@@ -19,11 +20,12 @@ inline int sem_init(sem_t *sem, int pshared, unsigned int value)
 inline int sem_wait(sem_t *sem)
 {
   __CPROVER_HIDE:;
-  sem;
+  (void)sem;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
                    "semaphore must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(sem, "sem-destroyed"),
                    "semaphore must not be destroyed");
+  return 0;
 }
 
 /* FUNCTION: sem_timedwait */
@@ -33,12 +35,13 @@ inline int sem_wait(sem_t *sem)
 inline int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 {
   __CPROVER_HIDE:;
-  sem;
-  abstime;
+  (void)sem;
+  (void)abstime;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
                    "semaphore must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(sem, "sem-destroyed"),
                    "semaphore must not be destroyed");
+  return 0;
 }
 
 /* FUNCTION: sem_trywait */
@@ -48,11 +51,12 @@ inline int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 inline int sem_trywait(sem_t *sem)
 {
   __CPROVER_HIDE:;
-  sem;
+  (void)sem;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
                    "semaphore must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(sem, "sem-destroyed"),
                    "semaphore must not be destroyed");
+  return 0;
 }
 
 /* FUNCTION: sem_post */
@@ -62,11 +66,12 @@ inline int sem_trywait(sem_t *sem)
 inline int sem_post(sem_t *sem)
 {
   __CPROVER_HIDE:;
-  sem;
+  (void)sem;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
                    "semaphore must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(sem, "sem-destroyed"),
                    "semaphore must not be destroyed");
+  return 0;
 }
 
 /* FUNCTION: sem_post_multiple */
@@ -76,12 +81,13 @@ inline int sem_post(sem_t *sem)
 inline int sem_post_multiple(sem_t *sem, int number)
 {
   __CPROVER_HIDE:;
-  sem;
-  number;
+  (void)sem;
+  (void)number;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
                    "semaphore must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(sem, "sem-destroyed"),
                    "semaphore must not be destroyed");
+  return 0;
 }
 
 /* FUNCTION: sem_getvalue */
@@ -91,12 +97,13 @@ inline int sem_post_multiple(sem_t *sem, int number)
 inline int sem_getvalue(sem_t *sem, int *sval)
 {
   __CPROVER_HIDE:;
-  sem;
-  sval;
+  (void)sem;
+  (void)sval;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
                    "semaphore must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(sem, "sem-destroyed"),
                    "semaphore must not be destroyed");
+  return 0;
 }
 
 /* FUNCTION: sem_destroy */
@@ -106,10 +113,11 @@ inline int sem_getvalue(sem_t *sem, int *sval)
 inline int sem_destroy(sem_t *sem)
 {
   __CPROVER_HIDE:;
-  sem;
+  (void)sem;
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
                    "semaphore must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(sem, "sem-destroyed"),
                    "semaphore must not be destroyed");
   __CPROVER_set_may(sem, "sem-destroyed");
+  return 0;
 }
