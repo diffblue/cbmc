@@ -36,11 +36,9 @@ public:
   
   // how function calls are treated:
   // a) there is an edge from each call site to the function head
-  // b) there is an edge from each return to the last instruction (END_FUNCTION)
-  //    of each function
-  // c) there is an edge from the last instruction of the function
-  //    to the instruction following the call site
-  //    (for setting the LHS)
+  // b) there is an edge from the last instruction (END_FUNCTION) of the function
+  //    to the instruction _following_ the call site
+  //    (this also needs to set the LHS, if applicable)
 
   virtual void transform(
     locationt from,
