@@ -75,6 +75,10 @@ library_check: library/*.c
 		        -D__CPROVER_danger_max_solution_size=1 \
 		        -D__CPROVER_danger_number_of_vars=1 \
 		        -D__CPROVER_danger_number_of_consts=1 \
+		        -D__CPROVER_set_may(x, y)=0 \
+		        -D__CPROVER_set_must(x, y)=0 \
+		        -D__CPROVER_get_may(x, y)=0 \
+		        -D__CPROVER_get_must(x, y)=0 \
 			-D__CPROVER_thread_local=__thread -DLIBRARY_CHECK -o __libcheck.i __libcheck.c ; \
 		$(CC) -S -Wall -Werror -pedantic -Wextra -std=gnu99 __libcheck.i -o __libcheck.s \
 			-Wno-unused-label -Wno-uninitialized ; \
