@@ -68,10 +68,19 @@ public:
     }
   };
   
+  vectorst merge(const vectorst &a, const vectorst &b)
+  {
+    vectorst result;
+    result.may_bits=a.may_bits|b.may_bits;
+    result.must_bits=a.must_bits&b.must_bits;
+    return result;
+  }
+  
   bitst may_bits, must_bits;
   
   void assign_lhs(const exprt &, const vectorst &);
-  void get_rhs(const exprt &, vectorst &dest);
+  vectorst get_rhs(const exprt &);
+  vectorst get_rhs(const irep_idt &);
 
   bool is_bottom;
   
