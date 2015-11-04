@@ -8,9 +8,11 @@
 inline int pthread_cancel(pthread_t thread)
 {
   __CPROVER_HIDE:;
-
-  __CPROVER_assert(__CPROVER_get_must(thread, "pthread-id"),
+  __CPROVER_assert(__CPROVER_get_must((void *)thread, "pthread-id"),
                    "must be given valid thread ID");
+
+  int result;
+  return result;
 }
 
 /* FUNCTION: pthread_mutex_init */
@@ -269,7 +271,7 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
 {
   __CPROVER_HIDE:;
 
-  __CPROVER_assert(__CPROVER_get_must(thread, "pthread-id"),
+  __CPROVER_assert(__CPROVER_get_must((void *)thread, "pthread-id"),
                    "must be given valid thread ID");
 
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
@@ -624,8 +626,12 @@ inline int pthread_barrier_init(
   const pthread_barrierattr_t *restrict attr, unsigned count)
 {
   __CPROVER_HIDE:;
+  (void)attr;
+  (void)count;
   __CPROVER_set_must(barrier, "barrier-init");
   __CPROVER_clear_may(barrier, "barrier-destroyed");
+  int result;
+  return result;
 }       
 
 /* FUNCTION: pthread_barrier_destroy */
@@ -643,6 +649,8 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
   __CPROVER_assert(!__CPROVER_get_may(barrier, "barrier-destroyed"),
                    "pthread barrier must not be destroyed");
   __CPROVER_set_may(barrier, "barrier-destroyed");
+  int result;
+  return result;
 }
 
 /* FUNCTION: pthread_barrier_wait */
@@ -659,4 +667,6 @@ inline int pthread_barrier_wait(pthread_barrier_t *barrier)
                    "pthread barrier must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(barrier, "barrier-destroyed"),
                    "pthread barrier must not be destroyed");
+  int result;
+  return result;
 }
