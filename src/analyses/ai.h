@@ -93,6 +93,7 @@ public:
   {
     goto_functionst goto_functions;
     initialize(goto_program);
+    entry_state(goto_program);
     fixedpoint(goto_program, goto_functions, ns);
   }
     
@@ -101,6 +102,7 @@ public:
     const namespacet &ns)
   {
     initialize(goto_functions);
+    entry_state(goto_functions);
     fixedpoint(goto_functions, ns);
   }
 
@@ -110,6 +112,7 @@ public:
   {
     goto_functionst goto_functions;
     initialize(goto_function);
+    entry_state(goto_function.body);
     fixedpoint(goto_function.body, goto_functions, ns);
   }
 
@@ -143,6 +146,9 @@ protected:
   virtual void initialize(const goto_programt &);
   virtual void initialize(const goto_functionst::goto_functiont &);
   virtual void initialize(const goto_functionst &);
+
+  void entry_state(const goto_programt &);
+  void entry_state(const goto_functionst &);
 
   virtual void output(
     const namespacet &ns,
@@ -188,9 +194,6 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
   
-  typedef std::set<irep_idt> functions_donet;
-  functions_donet functions_done;
-
   typedef std::set<irep_idt> recursion_sett;
   recursion_sett recursion_set;
     
