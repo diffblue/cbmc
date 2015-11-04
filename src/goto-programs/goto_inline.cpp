@@ -356,15 +356,16 @@ void goto_inlinet::expand_function_call(
   // look it up
   const irep_idt identifier=function.get_identifier();
   
-  #if 0
   // we ignore certain calls
   if(identifier=="__CPROVER_cleanup" ||
      identifier=="__CPROVER_set_must" ||
      identifier=="__CPROVER_set_may" ||
      identifier=="__CPROVER_clear_must" ||
      identifier=="__CPROVER_clear_may")
+  {
+    target++;
     return; // ignore
-  #endif
+  }
   
   // see if we are already expanding it
   if(recursion_set.find(identifier)!=recursion_set.end())
