@@ -325,16 +325,33 @@ void custom_bitvector_domaint::transform(
             
             exprt lhs=code_function_call.arguments()[0];
             
-            // may alias other stuff
-            std::set<exprt> lhs_set=
-              cba.local_may_alias_factory(from).get(from, lhs);
-
-            lhs_set.insert(lhs);
-              
-            for(std::set<exprt>::const_iterator
-                l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
+            if(lhs.is_constant() &&
+               to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
             {
-              set_bit(*l_it, bit_nr, mode);
+              if(mode==CLEAR_MAY)
+                for(bitst::const_iterator b_it=may_bits.begin();
+                    b_it!=may_bits.end();
+                    b_it++)
+                  set_bit(b_it->first, bit_nr, mode);
+              else if(mode==CLEAR_MUST)
+                for(bitst::const_iterator b_it=must_bits.begin();
+                    b_it!=must_bits.end();
+                    b_it++)
+                  set_bit(b_it->first, bit_nr, mode);
+            }
+            else
+            {
+              // may alias other stuff
+              std::set<exprt> lhs_set=
+                cba.local_may_alias_factory(from).get(from, lhs);
+
+              lhs_set.insert(lhs);
+               
+              for(std::set<exprt>::const_iterator
+                  l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
+              {
+                set_bit(*l_it, bit_nr, mode);
+              }
             }
           }
         }

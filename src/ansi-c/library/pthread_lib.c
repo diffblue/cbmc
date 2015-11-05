@@ -271,8 +271,8 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
 {
   __CPROVER_HIDE:;
 
-  __CPROVER_assert(__CPROVER_get_must((void *)thread, "pthread-id"),
-                   "must be given valid thread ID");
+  //__CPROVER_assert(__CPROVER_get_must(&thread, "pthread-id"),
+  //                 "must be given valid thread ID");
 
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
   if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
@@ -431,6 +431,10 @@ void __actual_thread_spawn(
   unsigned long id)
 {
   __CPROVER_HIDE:;
+  
+  // Clear all locked mutexes; locking must happen in same thread.
+  __CPROVER_clear_must(0, "mutex-locked");
+  
   __CPROVER_ASYNC_1: __CPROVER_thread_id=id,
                        start_routine(arg),
                        __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
