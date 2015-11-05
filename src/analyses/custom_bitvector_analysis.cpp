@@ -623,6 +623,9 @@ void custom_bitvector_analysist::check(
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
+    
+    if(f_it->first=="__actual_thread_spawn")
+      continue;
 
     if(!use_xml)
       out << "******** Function " << f_it->first << '\n';

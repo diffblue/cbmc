@@ -21,7 +21,8 @@ SRC = goto_instrument_parse_options.cpp rw_set.cpp \
       wmm/cycle_collection.cpp wmm/goto2graph.cpp wmm/weak_memory.cpp \
       wmm/data_dp.cpp wmm/instrumenter_strategies.cpp \
       wmm/event_graph.cpp wmm/pair_collection.cpp \
-      goto_instrument_main.cpp horn_encoding.cpp
+      goto_instrument_main.cpp horn_encoding.cpp \
+      thread_exit_instrumentation.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \

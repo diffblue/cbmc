@@ -80,6 +80,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "accelerate/accelerate.h"
 #include "count_eloc.h"
 #include "horn_encoding.h"
+#include "thread_exit_instrumentation.h"
 
 /*******************************************************************\
 
@@ -255,10 +256,12 @@ int goto_instrument_parse_optionst::doit()
       parameter_assignments(symbol_table, goto_functions);
       
       remove_unused_functions(goto_functions, get_message_handler());
-    
+      
+      thread_exit_instrumentation(goto_functions);
+
       // recalculate numbers, etc.
       goto_functions.update();
-
+      
       namespacet ns(symbol_table);
       custom_bitvector_analysist custom_bitvector_analysis;
       custom_bitvector_analysis(goto_functions, ns);
@@ -296,6 +299,8 @@ int goto_instrument_parse_optionst::doit()
 
       remove_unused_functions(goto_functions, get_message_handler());
     
+      thread_exit_instrumentation(goto_functions);
+
       // recalculate numbers, etc.
       goto_functions.update();
 
