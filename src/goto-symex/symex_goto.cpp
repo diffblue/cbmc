@@ -42,6 +42,9 @@ void goto_symext::symex_goto(statet &state)
   if(new_guard.is_false() ||
      state.guard.is_false())
   {
+    if(!state.guard.is_false())
+      target.location(state.guard.as_expr(), state.source);
+
     // reset unwinding counter
     if(instruction.is_backwards_goto())
       frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count=0;
