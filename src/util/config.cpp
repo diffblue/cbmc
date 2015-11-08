@@ -781,7 +781,14 @@ bool configt::set(const cmdlinet &cmdline)
   
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=false; // ealier than C99
+  
+  #if defined(__FreeBSD__) || defined(__APPLE__)
+  // By default, Clang builds C code in GNU C11
+  ansi_c.standard=ansi_ct::standardt::STD11;
+  #else
   ansi_c.standard=ansi_ct::standardt::STD99;
+  #endif
+  
   ansi_c.use_fixed_for_float=false;
   ansi_c.endianness=ansi_ct::endiannesst::NO_ENDIANNESS;
   ansi_c.os=ansi_ct::ost::NO_OS;
