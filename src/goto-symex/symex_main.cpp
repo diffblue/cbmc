@@ -268,7 +268,8 @@ void goto_symext::symex_step(
   switch(instruction.type)
   {
   case SKIP:
-    // really ignore
+    if(!state.guard.is_false())
+      target.location(state.guard.as_expr(), state.source);
     state.source.pc++;
     break;
 

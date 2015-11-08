@@ -59,25 +59,13 @@ Function: build_graph_rec
 static bool build_graph_rec(
   const xmlt &xml,
   std::map<std::string, unsigned> &name_to_node,
-  std::set<std::string> &sinks,
+  std::map<std::string, std::map<std::string, std::string> > &defaults,
   graphmlt &dest,
   std::string &entrynode)
 {
   if(xml.name=="node")
   {
     const std::string node_name=xml.get_attribute("id");
-
-    for(xmlt::elementst::const_iterator
-        e_it=xml.elements.begin();
-        e_it!=xml.elements.end();
-        e_it++)
-      if(e_it->get_attribute("key")=="sink" &&
-         e_it->data=="true")
-      {
-        assert(name_to_node.find(node_name)==name_to_node.end());
-        sinks.insert(node_name);
-        return false;
-      }
 
     const unsigned n=add_node(node_name, name_to_node, dest);
 
@@ -90,45 +78,81 @@ static bool build_graph_rec(
         e_it=xml.elements.begin();
         e_it!=xml.elements.end();
         e_it++)
+    {
+      assert(e_it->name=="data");
+
       if(e_it->get_attribute("key")=="violation" &&
          e_it->data=="true")
         node.is_violation=e_it->data=="true";
       else if(e_it->get_attribute("key")=="threadNumber")
         node.thread_nr=safe_string2unsigned(e_it->data);
+      else if(e_it->get_attribute("key")=="entry" &&
+              e_it->data=="true")
+        entrynode=node_name;
+    }
   }
   else if(xml.name=="edge")
   {
     const std::string source=xml.get_attribute("source");
     const std::string target=xml.get_attribute("target");
 
-    assert(sinks.find(source)==sinks.end());
-    if(sinks.find(target)!=sinks.end())
-      return false;
-
     const unsigned s=add_node(source, name_to_node, dest);
     const unsigned t=add_node(target, name_to_node, dest);
 
     // add edge and annotate
-    dest[s].out[t].xml_node=xml;
-    dest[t].in[s].xml_node=xml;
+    xmlt xml_w_defaults=xml;
+
+    std::map<std::string, std::string> &edge_defaults=defaults["edge"];
+    for(std::map<std::string, std::string>::const_iterator
+        it=edge_defaults.begin();
+        it!=edge_defaults.end();
+        ++it)
+    {
+      bool found=false;
+      for(xmlt::elementst::const_iterator
+          e_it=xml.elements.begin();
+          e_it!=xml.elements.end() && !found;
+          ++e_it)
+        found=e_it->get_attribute("key")==it->first;
+
+      if(!found)
+      {
+        xmlt &d=xml_w_defaults.new_element("data");
+        d.set_attribute("key", it->first);
+        d.data=it->second;
+      }
+    }
+
+    dest[s].out[t].xml_node=xml_w_defaults;
+    dest[t].in[s].xml_node=xml_w_defaults;
   }
   else if(xml.name=="graphml" ||
-          xml.name=="graph" ||
-          xml.name=="data")
+          xml.name=="graph")
   {
     for(xmlt::elementst::const_iterator
         e_it=xml.elements.begin();
         e_it!=xml.elements.end();
         e_it++)
       // recursive call
-      if(build_graph_rec(*e_it, name_to_node, sinks, dest, entrynode))
+      if(build_graph_rec(
+          *e_it,
+          name_to_node,
+          defaults,
+          dest,
+          entrynode))
         return true;
-
-    if(xml.name=="data" &&
-       xml.get_attribute("key")=="entrynode")
-      entrynode=xml.data;
   }
   else if(xml.name=="key")
+  {
+    for(xmlt::elementst::const_iterator
+        e_it=xml.elements.begin();
+        e_it!=xml.elements.end();
+        ++e_it)
+      if(e_it->name=="default")
+        defaults[xml.get_attribute("for")][xml.get_attribute("id")]=
+          e_it->data;
+  }
+  else if(xml.name=="data")
   {
     // ignored
   }
@@ -161,11 +185,16 @@ static bool build_graph(
   assert(dest.size()==0);
 
   std::map<std::string, unsigned> name_to_node;
-  std::set<std::string> sinks;
+  std::map<std::string, std::map<std::string, std::string> > defaults;
   std::string entrynode;
 
   const bool err=
-    build_graph_rec(xml, name_to_node, sinks, dest, entrynode);
+    build_graph_rec(
+      xml,
+      name_to_node,
+      defaults,
+      dest,
+      entrynode);
 
   for(unsigned i=0; !err && i<dest.size(); ++i)
   {
@@ -277,44 +306,22 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("id", "sourcecodelang");
   }
 
-  // <key attr.name="tokenSet" attr.type="string" for="edge" id="tokens"/>
+  // <key attr.name="control" attr.type="string" for="edge" id="control"/>
   {
     xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "tokenSet");
+    key.set_attribute("attr.name", "control");
     key.set_attribute("attr.type", "string");
     key.set_attribute("for", "edge");
-    key.set_attribute("id", "tokens");
+    key.set_attribute("id", "control");
   }
 
-  // <key attr.name="originTokenSet" attr.type="string" for="edge" id="origintokens"/>
+  // <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
   {
     xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "originTokenSet");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "origintokens");
-  }
-
-  // <key attr.name="negativeCase" attr.type="string" for="edge" id="negated">
-  //     <default>false</default>
-  // </key>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "negativeCase");
-    key.set_attribute("attr.type", "boolean");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "negated");
-
-    key.new_element("default").data="false";
-  }
-
-  // <key attr.name="lineNumberInOrigin" attr.type="int" for="edge" id="originline"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "lineNumberInOrigin");
+    key.set_attribute("attr.name", "startline");
     key.set_attribute("attr.type", "int");
     key.set_attribute("for", "edge");
-    key.set_attribute("id", "originline");
+    key.set_attribute("id", "startline");
   }
 
   // <key attr.name="originFileName" attr.type="string" for="edge" id="originfile">
@@ -327,7 +334,7 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("for", "edge");
     key.set_attribute("id", "originfile");
 
-    key.new_element("default").data="\"<command-line>\"";
+    key.new_element("default").data="<command-line>";
   }
 
   // <key attr.name="nodeType" attr.type="string" for="node" id="nodetype">

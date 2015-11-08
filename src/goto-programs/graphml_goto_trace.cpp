@@ -155,8 +155,6 @@ void convert(
   graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
 
-  // prepare all nodes
-  std::map<unsigned, unsigned> pc_to_node;
   // step numbers start at 1
   std::vector<unsigned> step_to_node(goto_trace.steps.size()+1, 0);
 
@@ -168,6 +166,8 @@ void convert(
     const source_locationt &source_location=it->pc->source_location;
 
     if(it->hidden ||
+       it->is_location() ||
+       (it->is_goto() && it->pc->guard.is_true()) ||
        source_location.is_nil() ||
        source_location.get_file().empty() ||
        source_location.get_file()=="<built-in-additions>" ||
@@ -178,34 +178,52 @@ void convert(
       continue;
     }
 
-    std::pair<std::map<unsigned, unsigned>::iterator, bool> entry=
-      pc_to_node.insert(std::make_pair(it->pc->location_number, 0));
-    if(entry.second)
+    // skip declarations followed by an immediate assignment
+    goto_tracet::stepst::const_iterator next=it;
+    ++next;
+    if(next!=goto_trace.steps.end() &&
+       next->type==goto_trace_stept::ASSIGNMENT &&
+       it->full_lhs==next->full_lhs &&
+       it->pc->source_location==next->pc->source_location)
     {
-      entry.first->second=graphml.add_node();
-      graphml[entry.first->second].node_name=i2string(entry.first->first);
-      graphml[entry.first->second].file=source_location.get_file();
-      graphml[entry.first->second].line=source_location.get_line();
-      graphml[entry.first->second].thread_nr=it->thread_nr;
-      graphml[entry.first->second].is_violation=
-        it->type==goto_trace_stept::ASSERT && !it->cond_value;
+      step_to_node[it->step_nr]=sink;
+
+      continue;
     }
 
-    step_to_node[it->step_nr]=entry.first->second;
+    const unsigned node=graphml.add_node();
+    graphml[node].node_name=
+      i2string(it->pc->location_number)+"."+i2string(it->step_nr);
+    graphml[node].file=source_location.get_file();
+    graphml[node].line=source_location.get_line();
+    graphml[node].thread_nr=it->thread_nr;
+    graphml[node].is_violation=
+      it->type==goto_trace_stept::ASSERT && !it->cond_value;
+
+    step_to_node[it->step_nr]=node;
   }
 
   // build edges
   for(goto_tracet::stepst::const_iterator
       it=goto_trace.steps.begin();
       it!=goto_trace.steps.end();
-      it++)
+      ) // no ++it
   {
     const unsigned from=step_to_node[it->step_nr];
 
-    if(from==sink) continue;
+    if(from==sink)
+    {
+      ++it;
+      continue;
+    }
 
     goto_tracet::stepst::const_iterator next=it;
-    for(++next; next!=goto_trace.steps.end() && next->hidden; ++next) ;
+    for(++next;
+        next!=goto_trace.steps.end() &&
+        (step_to_node[next->step_nr]==sink ||
+         it->pc==next->pc);
+        ++next)
+      ;
     const unsigned to=
       next==goto_trace.steps.end()?
       sink:step_to_node[next->step_nr];
@@ -213,18 +231,11 @@ void convert(
     switch(it->type)
     {
     case goto_trace_stept::DECL:
-      // skip declarations followed by an immediate assignment
-      if(next->type==goto_trace_stept::ASSIGNMENT &&
-         it->full_lhs==next->full_lhs)
-        continue;
-      // fall through
     case goto_trace_stept::ASSIGNMENT:
     case goto_trace_stept::ASSERT:
-    case goto_trace_stept::LOCATION:
     case goto_trace_stept::GOTO:
     case goto_trace_stept::FUNCTION_CALL:
-      if(it->type!=goto_trace_stept::LOCATION ||
-         from!=to)
+    case goto_trace_stept::FUNCTION_RETURN:
       {
         xmlt edge("edge");
         edge.set_attribute("source", graphml[from].node_name);
@@ -233,10 +244,10 @@ void convert(
         {
           xmlt &data_f=edge.new_element("data");
           data_f.set_attribute("key", "originfile");
-          data_f.data='"'+id2string(graphml[from].file)+'"';
+          data_f.data=id2string(graphml[from].file);
 
           xmlt &data_l=edge.new_element("data");
-          data_l.set_attribute("key", "originline");
+          data_l.set_attribute("key", "startline");
           data_l.data=id2string(graphml[from].line);
         }
 
@@ -251,6 +262,10 @@ void convert(
           val.set_attribute("key", "assumption");
           code_assignt assign(it->lhs_object, it->lhs_object_value);
           val.data=convert_assign_rec(ns, identifier, assign);
+
+          xmlt &val_s=edge.new_element("data");
+          val_s.set_attribute("key", "assumption.scope");
+          val_s.data=id2string(it->pc->source_location.get_function());
         }
         else if(it->type==goto_trace_stept::GOTO &&
                 it->pc->is_goto())
@@ -268,10 +283,10 @@ void convert(
 
           xmlt &data_f2=edge2.new_element("data");
           data_f2.set_attribute("key", "originfile");
-          data_f2.data='"'+id2string(graphml[from].file)+'"';
+          data_f2.data=id2string(graphml[from].file);
 
           xmlt &data_l2=edge2.new_element("data");
-          data_l2.set_attribute("key", "originline");
+          data_l2.set_attribute("key", "startline");
           data_l2.data=id2string(graphml[from].line);
 
           xmlt &val2=edge2.new_element("data");
@@ -287,7 +302,7 @@ void convert(
       }
       break;
 
-    case goto_trace_stept::FUNCTION_RETURN:
+    case goto_trace_stept::LOCATION:
     case goto_trace_stept::ASSUME:
     case goto_trace_stept::INPUT:
     case goto_trace_stept::OUTPUT:
@@ -302,5 +317,7 @@ void convert(
     case goto_trace_stept::NONE:
         ; /* ignore */
     }
+
+    it=next;
   }
 }
