@@ -536,9 +536,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
       new_symbol.type=size.type();
       new_symbol.type.set(ID_C_constant, true);
-      new_symbol.is_file_local=true;
       new_symbol.is_type=false;
-      new_symbol.is_thread_local=true;
       new_symbol.is_static_lifetime=false;
       new_symbol.value.make_nil();
       new_symbol.location=source_location;
