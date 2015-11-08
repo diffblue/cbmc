@@ -441,6 +441,18 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     data.data="C";
   }
 
+#if 0
+  //TODO: This must come from the property file, unfortunately
+  // <data key="specification">CHECK( init(main()), LTL(G ! call(__VERIFIER_error())) )</data>
+  {
+    xmlt &data=graph.new_element("data");
+    data.set_attribute("key", "specification");
+    data.data="CHECK( init(main()), LTL(G ! call(__VERIFIER_error())) )";
+  }
+//<data key="memorymodel">precise</data>
+//<data key="architecture">32bit</data>
+#endif
+
   bool entry_done=false;
   for(unsigned i=0; i<src.size(); ++i)
   {

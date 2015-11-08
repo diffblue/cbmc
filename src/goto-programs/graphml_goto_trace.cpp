@@ -166,7 +166,7 @@ void convert(
     const source_locationt &source_location=it->pc->source_location;
 
     if(it->hidden ||
-       it->is_location() ||
+       (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
        (it->is_goto() && it->pc->guard.is_true()) ||
        source_location.is_nil() ||
        source_location.get_file().empty() ||
@@ -230,12 +230,9 @@ void convert(
 
     switch(it->type)
     {
-    case goto_trace_stept::DECL:
     case goto_trace_stept::ASSIGNMENT:
     case goto_trace_stept::ASSERT:
     case goto_trace_stept::GOTO:
-    case goto_trace_stept::FUNCTION_CALL:
-    case goto_trace_stept::FUNCTION_RETURN:
       {
         xmlt edge("edge");
         edge.set_attribute("source", graphml[from].node_name);
@@ -277,6 +274,7 @@ void convert(
             from_expr(ns, "", not_exprt(it->cond_expr));
           val.data="["+(it->cond_value ? cond : neg_cond)+"]";
 
+          #if 0
           xmlt edge2("edge");
           edge2.set_attribute("source", graphml[from].node_name);
           edge2.set_attribute("target", graphml[sink].node_name);
@@ -295,6 +293,7 @@ void convert(
 
           graphml[sink].in[from].xml_node=edge2;
           graphml[from].out[sink].xml_node=edge2;
+          #endif
         }
 
         graphml[to].in[from].xml_node=edge;
@@ -302,6 +301,9 @@ void convert(
       }
       break;
 
+    case goto_trace_stept::DECL:
+    case goto_trace_stept::FUNCTION_CALL:
+    case goto_trace_stept::FUNCTION_RETURN:
     case goto_trace_stept::LOCATION:
     case goto_trace_stept::ASSUME:
     case goto_trace_stept::INPUT:
