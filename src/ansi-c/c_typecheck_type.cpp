@@ -530,7 +530,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       while(symbol_table.symbols.find(temp_identifier)!=symbol_table.symbols.end());
 
       // add the symbol to symbol table
-      symbolt new_symbol;
+      auxiliary_symbolt new_symbol;
       new_symbol.name=temp_identifier;
       new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
       new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
