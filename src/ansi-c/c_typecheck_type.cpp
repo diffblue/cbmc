@@ -530,15 +530,13 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       while(symbol_table.symbols.find(temp_identifier)!=symbol_table.symbols.end());
 
       // add the symbol to symbol table
-      symbolt new_symbol;
+      auxiliary_symbolt new_symbol;
       new_symbol.name=temp_identifier;
       new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
       new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
       new_symbol.type=size.type();
       new_symbol.type.set(ID_C_constant, true);
-      new_symbol.is_file_local=true;
       new_symbol.is_type=false;
-      new_symbol.is_thread_local=true;
       new_symbol.is_static_lifetime=false;
       new_symbol.value.make_nil();
       new_symbol.location=source_location;
