@@ -145,6 +145,9 @@ void k_inductiont::process_loop(
 {
   assert(!loop.empty());
 
+  // save the loop guard
+  const exprt loop_guard=loop_head->guard;
+
   // compute the loop exit
   goto_programt::targett loop_exit=
     get_loop_exit(loop);
@@ -156,7 +159,7 @@ void k_inductiont::process_loop(
 
     // assume the loop condition has become false
     goto_programt::instructiont assume(ASSUME);
-    assume.guard=loop_head->guard;
+    assume.guard=loop_guard;
     goto_function.body.insert_before_swap(loop_exit, assume);
   }
 
@@ -175,38 +178,29 @@ void k_inductiont::process_loop(
     // unwind to get k+1 copies
     std::vector<goto_programt::targett> iteration_points;
     unwind(goto_function.body, loop_head, loop_exit, k+1, iteration_points);
-
+    
+    // we can remove everything up to the first assertion
+    for(goto_programt::targett t=loop_head; t!=loop_exit; t++)
+    {
+      if(t->is_assert()) break;
+      t->make_skip();
+    }
+    
     // now turn any assertions in iterations 0..k-1 into assumptions
     assert(iteration_points.size()==k+1);
 
     assert(k>=1);
     goto_programt::targett end=iteration_points[k-1];
-    std::size_t it_p_count=0;
-    bool after_it_p=true;
+
     for(goto_programt::targett t=loop_head; t!=end; t++)
     {
       assert(t!=goto_function.body.instructions.end());
       if(t->is_assert()) t->type=ASSUME;
-
-      if(t==iteration_points[it_p_count])
-      {
-        after_it_p=true;
-        ++it_p_count;
-      }
-      else if(t->is_goto() && after_it_p)
-      {
-        assert(t==loop_head ||
-               not_exprt(t->guard)==loop_head->guard);
-        t->type=ASSUME;
-        t->targets.clear();
-        t->guard=not_exprt(t->guard);
-        after_it_p=false;
-      }
     }
 
     // assume the loop condition has become false
     goto_programt::instructiont assume(ASSUME);
-    assume.guard=to_not_expr(loop_head->guard).op();
+    assume.guard=loop_guard;
     goto_function.body.insert_before_swap(loop_exit, assume);
 
     // Now havoc at the loop head. Use insert_swap to
