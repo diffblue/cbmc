@@ -17,10 +17,10 @@ $goto_cc -o $name.o $name.c
 
 $goto_instrument --k-induction $k --base-case $name.o $name.base.o
 $cbmc $name.base.o
-if [ $? == 0 ] ; then echo "## Base case passes" ; fi
+if [ $? == 0 ] ; then echo "## Base case passes" ; else echo "## Base case fails" ; fi
 
 $goto_instrument --k-induction $k --step-case $name.o $name.step.o
 $cbmc $name.step.o
-if [ $? == 0 ] ; then echo "## Step case passes" ; fi
+if [ $? == 0 ] ; then echo "## Step case passes" ; else echo "## Step case fails" ; fi
 
 
