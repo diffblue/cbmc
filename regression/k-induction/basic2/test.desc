@@ -1,0 +1,9 @@
+CORE
+main.c
+2
+^EXIT=0$
+^SIGNAL=0$
+^## Base case passes$
+^## Step case passes$
+--
+^warning: ignoring
