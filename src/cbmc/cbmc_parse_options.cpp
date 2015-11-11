@@ -1035,6 +1035,13 @@ void cbmc_parse_optionst::help()
                                    << configt::this_architecture() << ")\n"
     " --os                         set operating system (default: "
                                    << configt::this_operating_system() << ")\n"
+    " --std89/99/11                set language standard (default: "
+                                   << (configt::ansi_ct::default_standard()==
+                                       configt::ansi_ct::standardt::STD89?"89":
+                                       configt::ansi_ct::default_standard()==
+                                       configt::ansi_ct::standardt::STD99?"99":
+                                       configt::ansi_ct::default_standard()==
+                                       configt::ansi_ct::standardt::STD11?"11":"") << ")\n"
     #ifdef _WIN32
     " --gcc                        use GCC as preprocessor\n"
     #endif
