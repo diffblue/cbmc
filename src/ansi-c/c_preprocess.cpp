@@ -707,6 +707,9 @@ bool c_preprocess_gcc_clang(
   command+=" -D__DEC128_MANT_DIG__=34";
   command+=" -D__LDBL_MIN_10_EXP__=\"(-4931)\"";
 
+  if(preprocessor==configt::ansi_ct::preprocessort::PP_CLANG)
+    command+=" -D_Noreturn=__attribute__((__noreturn__))";
+
   if(config.ansi_c.int_width==16)
     command+=GCC_DEFINES_16;
   else if(config.ansi_c.int_width==32)
