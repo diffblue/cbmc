@@ -78,7 +78,8 @@ void goto_convert_functionst::goto_convert()
   forall_symbols(it, symbol_table.symbols)
   {
     if(!it->second.is_type &&
-       it->second.type.id()==ID_code)
+       it->second.type.id()==ID_code &&
+       (it->second.mode==ID_C || it->second.mode==ID_cpp))
       symbol_list.push_back(it->first);
   }
   
