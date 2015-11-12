@@ -43,13 +43,12 @@ public:
     bool use_fixed_for_float;
     bool for_has_scope;
     bool single_precision_constant;
-    enum class standardt { STD89, STD99, STD11 } standard;
+    enum class c_standardt { C89, C99, C11 } c_standard;
+    static c_standardt default_c_standard();
     
-    static standardt default_standard();
-    
-    void set_std89() { standard=standardt::STD89; for_has_scope=false; }
-    void set_std99() { standard=standardt::STD99; for_has_scope=true; }
-    void set_std11() { standard=standardt::STD11; for_has_scope=true; }
+    void set_c89() { c_standard=c_standardt::C89; for_has_scope=false; }
+    void set_c99() { c_standard=c_standardt::C99; for_has_scope=true; }
+    void set_c11() { c_standard=c_standardt::C11; for_has_scope=true; }
     
     ieee_floatt::rounding_modet rounding_mode;
 
@@ -119,6 +118,17 @@ public:
 
     bool string_abstraction;
   } ansi_c;
+  
+  struct cppt
+  {
+    enum class cpp_standardt { CPP98, CPP03, CPP11 } cpp_standard;
+    static cpp_standardt default_cpp_standard();
+
+    void set_cpp98() { cpp_standard=cpp_standardt::CPP98; }
+    void set_cpp03() { cpp_standard=cpp_standardt::CPP03; }
+    void set_cpp11() { cpp_standard=cpp_standardt::CPP11; }
+    
+  } cpp;
   
   struct verilogt
   {
