@@ -3494,6 +3494,7 @@ std::string expr2ct::convert_code(
   unsigned indent)
 {
   static bool comment_done=false;
+
   if(!comment_done && !src.source_location().get_comment().empty())
   {
     comment_done=true;
@@ -3504,7 +3505,7 @@ std::string expr2ct::convert_code(
     return dest;
   }
 
-  const irep_idt &statement=src.get(ID_statement);
+  const irep_idt &statement=src.get_statement();
 
   if(statement==ID_expression)
     return convert_code_expression(src, indent);
