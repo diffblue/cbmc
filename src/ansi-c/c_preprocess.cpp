@@ -782,16 +782,16 @@ bool c_preprocess_gcc_clang(
   }
   
   // Standard Defines, ANSI9899 6.10.8
-  switch(config.ansi_c.standard)
+  switch(config.ansi_c.c_standard)
   {
-  case configt::ansi_ct::standardt::STD89:
+  case configt::ansi_ct::c_standardt::C89:
     break; // __STDC_VERSION__ is not defined
 
-  case configt::ansi_ct::standardt::STD99:
+  case configt::ansi_ct::c_standardt::C99:
     command += " -D __STDC_VERSION__=199901L";
     break;
 
-  case configt::ansi_ct::standardt::STD11:
+  case configt::ansi_ct::c_standardt::C11:
     command += " -D __STDC_VERSION__=201112L";
     break;
   }
