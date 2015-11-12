@@ -351,6 +351,10 @@ void local_may_aliast::get_rec(
     else
       dest.insert(unknown_object);
   }
+  else if(rhs.is_nil())
+  {
+    // this means 'empty'
+  }
   else
     dest.insert(unknown_object);
 }
