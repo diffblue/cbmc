@@ -68,7 +68,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   get_may.op0()=constant_exprt(ID_NULL, pointer_typet(empty_typet()));
   get_may.op1()=address_of_exprt(mutex_locked_string);
   
-  end->make_assertion(get_may);
+  end->make_assertion(not_exprt(get_may));
 
   end->source_location=source_location;
   end->source_location.set_comment("mutexes must not be locked on thread exit");

@@ -572,20 +572,43 @@ exprt custom_bitvector_analysist::eval(
 
       exprt object=src.op0();
       
-      custom_bitvector_domaint::vectorst v=
-        operator[](loc).get_rhs(object);
+      if(object.is_constant() &&
+         to_constant_expr(object).get_value()==ID_NULL) // NULL means all
+      {
+        const custom_bitvector_domaint &d=operator[](loc);
 
-      bool value=false;
-      
-      if(src.id()=="get_must")
-        value=v.must_bits&(1l<<bit_nr);
-      else if(src.id()=="get_may")
-        value=v.may_bits&(1l<<bit_nr);
-      
-      if(value)
-        return true_exprt();
+        if(src.id()=="get_may")
+        {
+          for(custom_bitvector_domaint::bitst::const_iterator
+              b_it=d.may_bits.begin();
+              b_it!=d.may_bits.end();
+              b_it++)
+          {
+            if(b_it->second&(1l<<bit_nr)) return true_exprt();
+          }
+          
+          return false_exprt();
+        }
+        else
+          return src;
+      }
       else
-        return false_exprt();
+      {
+        custom_bitvector_domaint::vectorst v=
+          operator[](loc).get_rhs(object);
+
+        bool value=false;
+
+        if(src.id()=="get_must")
+          value=v.must_bits&(1l<<bit_nr);
+        else if(src.id()=="get_may")
+          value=v.may_bits&(1l<<bit_nr);
+
+        if(value)
+          return true_exprt();
+        else
+          return false_exprt();
+      }
     }
     else
       return src;
