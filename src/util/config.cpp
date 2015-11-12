@@ -765,7 +765,7 @@ void configt::ansi_ct::set_arch_spec_x32()
 
 /*******************************************************************\
 
-Function: configt::ansi_ct::default_standard
+Function: configt::ansi_ct::default_c_standard
 
   Inputs:
 
@@ -775,17 +775,34 @@ Function: configt::ansi_ct::default_standard
 
 \*******************************************************************/
 
-configt::ansi_ct::standardt configt::ansi_ct::default_standard()
+configt::ansi_ct::c_standardt configt::ansi_ct::default_c_standard()
 {
   #if defined(__APPLE__)
   // By default, clang on the Mac builds C code in GNU C11
-  return standardt::STD11;
+  return c_standardt::C11;
   #elif defined(__FreeBSD__)
   // By default, clang on FreeBSD builds C code in GNU C99
-  return standardt::STD99;
+  return c_standardt::C99;
   #else
-  return standardt::STD99;
+  return c_standardt::C99;
   #endif
+}
+  
+/*******************************************************************\
+
+Function: configt::ansi_ct::default_cpp_standard
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+configt::cppt::cpp_standardt configt::cppt::default_cpp_standard()
+{
+  return cpp_standardt::CPP98;
 }
   
 /*******************************************************************\
@@ -804,9 +821,11 @@ bool configt::set(const cmdlinet &cmdline)
 {
   // defaults -- we match the architecture we have ourselves
   
+  cpp.cpp_standard=cppt::default_cpp_standard();
+  
   ansi_c.single_precision_constant=false;
-  ansi_c.for_has_scope=false; // ealier than C99
-  ansi_c.standard=ansi_ct::default_standard();
+  ansi_c.for_has_scope=true; // C99 or later
+  ansi_c.c_standard=ansi_ct::default_c_standard();
   ansi_c.use_fixed_for_float=false;
   ansi_c.endianness=ansi_ct::endiannesst::NO_ENDIANNESS;
   ansi_c.os=ansi_ct::ost::NO_OS;

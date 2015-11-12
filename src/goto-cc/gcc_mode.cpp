@@ -237,21 +237,21 @@ bool gcc_modet::doit()
     std::string std_string=cmdline.get_value("std");
     
     if(std_string=="gnu89" || std_string=="c89")
-      config.ansi_c.set_std89();
+      config.ansi_c.set_c89();
 
     if(std_string=="gnu99" || std_string=="c99" || std_string=="iso9899:1999" ||
        std_string=="gnu9x" || std_string=="c9x" || std_string=="iso9899:199x")
-      config.ansi_c.set_std99();
+      config.ansi_c.set_c99();
 
     if(std_string=="gnu11" || std_string=="c11" ||
        std_string=="gnu1x" || std_string=="c1x")
-      config.ansi_c.set_std11();
+      config.ansi_c.set_c11();
 
     if(std_string=="c++11" || std_string=="c++1x" ||
        std_string=="gnu++11" || std_string=="gnu++1x" || 
        std_string=="c++1y" ||
        std_string=="gnu++1y")
-      config.ansi_c.set_std11();
+      config.cpp.set_cpp11();
   }
 
   // gcc's default is 32 bits for wchar_t

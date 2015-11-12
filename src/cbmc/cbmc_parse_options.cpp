@@ -158,14 +158,23 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
 
-  if(cmdline.isset("std89"))
-    config.ansi_c.set_std89();
+  if(cmdline.isset("c89"))
+    config.ansi_c.set_c89();
 
-  if(cmdline.isset("std99"))
-    config.ansi_c.set_std99();
+  if(cmdline.isset("c99"))
+    config.ansi_c.set_c99();
 
-  if(cmdline.isset("std11"))
-    config.ansi_c.set_std11();
+  if(cmdline.isset("c11"))
+    config.ansi_c.set_c11();
+
+  if(cmdline.isset("cpp98"))
+    config.cpp.set_cpp98();
+
+  if(cmdline.isset("cpp03"))
+    config.cpp.set_cpp03();
+
+  if(cmdline.isset("cpp11"))
+    config.cpp.set_cpp11();
 
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
@@ -1035,13 +1044,20 @@ void cbmc_parse_optionst::help()
                                    << configt::this_architecture() << ")\n"
     " --os                         set operating system (default: "
                                    << configt::this_operating_system() << ")\n"
-    " --std89/99/11                set language standard (default: "
-                                   << (configt::ansi_ct::default_standard()==
-                                       configt::ansi_ct::standardt::STD89?"89":
-                                       configt::ansi_ct::default_standard()==
-                                       configt::ansi_ct::standardt::STD99?"99":
-                                       configt::ansi_ct::default_standard()==
-                                       configt::ansi_ct::standardt::STD11?"11":"") << ")\n"
+    " --c89/99/11                  set C language standard (default: "
+                                   << (configt::ansi_ct::default_c_standard()==
+                                       configt::ansi_ct::c_standardt::C89?"c89":
+                                       configt::ansi_ct::default_c_standard()==
+                                       configt::ansi_ct::c_standardt::C99?"c99":
+                                       configt::ansi_ct::default_c_standard()==
+                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n"
+    " --cpp98/03/11                set C++ language standard (default: "
+                                   << (configt::cppt::default_cpp_standard()==
+                                       configt::cppt::cpp_standardt::CPP98?"cpp98":
+                                       configt::cppt::default_cpp_standard()==
+                                       configt::cppt::cpp_standardt::CPP03?"cpp03":
+                                       configt::cppt::default_cpp_standard()==
+                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n"
     #ifdef _WIN32
     " --gcc                        use GCC as preprocessor\n"
     #endif
