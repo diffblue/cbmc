@@ -97,6 +97,8 @@ bool read_bin_goto_object_v3(
     typedef std::map<unsigned, goto_programt::targett> rev_target_mapt;
     rev_target_mapt rev_target_map;
     
+    bool hidden=false;
+    
     std::size_t ins_count = irepconverter.read_gb_word(in); // # of instructions
     for(std::size_t i=0; i<ins_count; i++)
     {
@@ -123,8 +125,15 @@ bool read_bin_goto_object_v3(
         target_map[itarget].push_back(irepconverter.read_gb_word(in));
         
       std::size_t l_count = irepconverter.read_gb_word(in); // # of labels
+
       for(std::size_t i=0; i<l_count; i++)
-        instruction.labels.push_back(irepconverter.read_string_ref(in));
+      {
+        irep_idt label=irepconverter.read_string_ref(in);
+        instruction.labels.push_back(label);
+        if(label=="__CPROVER_HIDE") hidden=true;
+        // The above info is normally in the type of the goto_functiont object,
+        // which should likely be stored in the binary.
+      }
     }
     
     // Resolve targets
@@ -147,6 +156,8 @@ bool read_bin_goto_object_v3(
     
     f.body.update();
     f.body_available=f.body.instructions.size()>0;    
+    
+    if(hidden) f.make_hidden();
   }
   
   return false;
