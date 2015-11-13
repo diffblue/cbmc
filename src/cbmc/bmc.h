@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 #include <map>
-#include <exception>
 
 #include <util/hash_cont.h>
 #include <util/options.h>
@@ -27,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/safety_checker.h>
 
 #include "symex_bmc.h"
-#include "bv_cbmc.h"
 
 class bmct:public safety_checkert
 {
@@ -41,9 +39,10 @@ public:
     options(_options),
     ns(_symbol_table, new_symbol_table),
     equation(ns),
-    symex(ns, new_symbol_table, equation,_prop_conv),
+    symex_ptr(new symex_bmct(ns, new_symbol_table, equation)),
     prop_conv(_prop_conv),
-    ui(ui_message_handlert::PLAIN)
+    ui(ui_message_handlert::PLAIN),
+    symex(*symex_ptr)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
   }
@@ -58,10 +57,7 @@ public:
   friend class hw_cbmc_satt;
   friend class counterexample_beautification_greedyt;
   
-  void set_ui(language_uit::uit _ui) { 
-    ui=_ui; 
-    symex.set_ui(ui);
-  }
+  void set_ui(language_uit::uit _ui) { ui=_ui; }
 
   // the safety_checkert interface
   virtual resultt operator()(
@@ -71,11 +67,29 @@ public:
   }
 
 protected:
+  bmct(
+    const optionst &_options,
+    const symbol_tablet &_symbol_table,
+    message_handlert &_message_handler,
+    prop_convt& _prop_conv,
+    symex_bmct *_symex_ptr):
+    safety_checkert(ns, _message_handler),
+    options(_options),
+    ns(_symbol_table, new_symbol_table),
+    equation(ns),
+    symex_ptr(_symex_ptr),
+    prop_conv(_prop_conv),
+    ui(ui_message_handlert::PLAIN),
+    symex(dynamic_cast<symex_bmct &>(*symex_ptr))
+  {
+    symex.constant_propagation=options.get_bool_option("propagation");
+  }
+
   const optionst &options;  
   symbol_tablet new_symbol_table;
   namespacet ns;
   symex_target_equationt equation;
-  symex_bmct symex;
+  symex_bmct *symex_ptr;
   prop_convt &prop_conv;
 
   // use gui format
@@ -86,8 +100,7 @@ protected:
     
   virtual resultt decide(
     const goto_functionst &,
-    prop_convt &, 
-    bool show_report=true);
+    prop_convt &);
     
   // unwinding
   virtual void setup_unwind();
@@ -111,6 +124,9 @@ protected:
 
   friend class bmc_all_propertiest;
   friend class bmc_covert;
+
+private:
+  symex_bmct &symex;
 };
 
 #endif

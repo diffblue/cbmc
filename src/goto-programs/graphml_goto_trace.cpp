@@ -253,7 +253,6 @@ void convert(
            it->lhs_object_value.is_not_nil() &&
            it->full_lhs.is_not_nil())
         {
-#if 0
           irep_idt identifier=it->lhs_object.get_identifier();
 
           xmlt &val=edge.new_element("data");
@@ -264,7 +263,6 @@ void convert(
           xmlt &val_s=edge.new_element("data");
           val_s.set_attribute("key", "assumption.scope");
           val_s.data=id2string(it->pc->source_location.get_function());
-#endif
         }
         else if(it->type==goto_trace_stept::GOTO &&
                 it->pc->is_goto())

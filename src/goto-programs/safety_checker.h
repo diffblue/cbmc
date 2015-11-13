@@ -26,7 +26,7 @@ public:
     const namespacet &_ns,
     message_handlert &_message_handler);
 
-  typedef enum { SAFE, UNSAFE, ERROR } resultt;
+  typedef enum { SAFE, UNSAFE, UNKNOWN, ERROR } resultt;
 
   // check whether all assertions in goto_functions are safe
   // if UNSAFE, then a trace is returned

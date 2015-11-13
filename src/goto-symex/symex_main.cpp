@@ -158,6 +158,10 @@ bool goto_symext::operator()(
 {
   assert(!goto_program.instructions.empty());
 
+  //We count only new assertions.
+  total_vccs = 0;
+  remaining_vccs = 0;
+
   if(state.symex_target==NULL) {
     state.source=symex_targett::sourcet(goto_program);
     assert(!state.threads.empty());

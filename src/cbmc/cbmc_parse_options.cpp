@@ -53,6 +53,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cbmc_solvers.h"
 #include "cbmc_parse_options.h"
 #include "bmc.h"
+#include "bmc_incremental_one_loop.h"
+#include "bmc_incremental.h"
 #include "version.h"
 #include "xml_interface.h"
 
@@ -578,10 +580,21 @@ int cbmc_parse_optionst::doit()
 
   prop_convt &prop_conv=cbmc_solver->prop_conv();
 
-  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
+  std::unique_ptr<bmct> bmc;
+  if(options.get_option("incremental-check")!="")
+    bmc = std::unique_ptr<bmct>(
+      new bmc_incremental_one_loopt(options, symbol_table, ui_message_handler, 
+				    prop_conv, goto_functions));
+  else if(options.get_bool_option("incremental"))
+    bmc = std::unique_ptr<bmct>(
+      new bmc_incrementalt(options, symbol_table, ui_message_handler, 
+			   prop_conv, goto_functions));
+  else
+    bmc = std::unique_ptr<bmct>(
+      new bmct(options, symbol_table, ui_message_handler, prop_conv));
 
   int get_goto_program_ret=
-    get_goto_program(options, bmc, goto_functions);
+    get_goto_program(options, *bmc, goto_functions);
 
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
@@ -622,7 +635,7 @@ int cbmc_parse_optionst::doit()
   }
 
   // do actual BMC
-  return do_bmc(bmc, goto_functions);
+  return do_bmc(*bmc, goto_functions);
 }
 
 /*******************************************************************\
