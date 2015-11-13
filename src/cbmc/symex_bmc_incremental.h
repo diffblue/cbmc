@@ -12,7 +12,7 @@ Author: Peter Schrammel, Daniel Kroening, kroening@kroening.com
 #include "symex_bmc.h"
  
 class symex_bmc_incrementalt : public symex_bmct
- {
+{
  public:
   symex_bmc_incrementalt(
     const namespacet &_ns,

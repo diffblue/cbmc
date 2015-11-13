@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 #include <iostream>
-#include <memory>
 
 #include <util/string2int.h>
 #include <util/i2string.h>
@@ -166,7 +165,7 @@ Function: bmct::run_decision_procedure
 \*******************************************************************/
 
 decision_proceduret::resultt
-bmct::run_decision_procedure(prop_convt &prop_conv)
+  bmct::run_decision_procedure(prop_convt &prop_conv)
 {
   status() << "Passing problem to " 
            << prop_conv.decision_procedure_text() << eom;
@@ -264,6 +263,97 @@ void bmct::report_failure()
 
 /*******************************************************************\
 
+Function: bmct::slice
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void bmct::slice()
+{
+  if(options.get_option("slice-by-trace")!="")
+  {
+    symex_slice_by_tracet symex_slice_by_trace(ns);
+ 
+    symex_slice_by_trace.slice_by_trace
+      (options.get_option("slice-by-trace"), equation);
+  }
+ 
+  if(equation.has_threads())
+  {
+    // we should build a thread-aware SSA slicer
+    statistics() << "no slicing due to threads" << eom;
+  }
+  else
+  {
+    if(options.get_bool_option("slice-formula"))
+    {
+      ::slice(equation);
+      statistics() << "slicing removed "
+		   << equation.count_ignored_SSA_steps()
+		   << " assignments" << eom;
+    }
+    else
+    {
+      if(options.get_option("cover")=="")
+      {
+	simple_slice(equation);
+	statistics() << "simple slicing removed "
+		     << equation.count_ignored_SSA_steps()
+		     << " assignments" << eom;
+      }
+    }
+  }
+ 
+  {
+    statistics() << "Generated " << symex.total_vccs
+		 << " VCC(s), " << symex.remaining_vccs
+		 << " remaining after simplification" << eom;
+  }
+}
+
+/*******************************************************************\
+
+Function: bmct::show
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+safety_checkert::resultt bmct::show(const goto_functionst &goto_functions)
+{
+  if(options.get_bool_option("show-vcc"))
+  {
+    show_vcc();
+    return safety_checkert::SAFE; // to indicate non-error
+  }
+     
+  if(options.get_option("cover")!="")
+  {
+    std::string criterion=options.get_option("cover");
+    return cover(goto_functions, criterion)?
+      safety_checkert::ERROR:safety_checkert::SAFE;
+  }
+
+  if(options.get_bool_option("program-only"))
+  {
+    show_program();
+    return safety_checkert::SAFE;
+  }
+
+  return safety_checkert::UNKNOWN;
+}
+
+/*******************************************************************\
+
 Function: bmct::show_program
 
   Inputs:
@@ -322,22 +412,19 @@ void bmct::show_program()
 
 /*******************************************************************\
 
-Function: bmct::run
+Function: bmct::initialize
 
   Inputs:
 
  Outputs:
 
- Purpose:
+ Purpose: initialize BMC
 
 \*******************************************************************/
 
-safety_checkert::resultt bmct::run(
-  const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::initialize()
 {
   const std::string mm=options.get_option("mm");
-  std::unique_ptr<memory_model_baset> memory_model;
-  
   if(mm.empty() || mm=="sc")
     memory_model=std::unique_ptr<memory_model_baset>(new memory_model_sct(ns));
   else if(mm=="tso")
@@ -345,135 +432,79 @@ safety_checkert::resultt bmct::run(
   else if(mm=="pso")
     memory_model=std::unique_ptr<memory_model_baset>(new memory_model_psot(ns));
   else
-  {
+   {
     error() << "Invalid memory model " << mm
             << " -- use one of sc, tso, pso" << eom;
     return safety_checkert::ERROR;
-  }
-
+   }
   symex.set_message_handler(get_message_handler());
   symex.options=options;
-
+ 
   status() << "Starting Bounded Model Checking" << eom;
-
+ 
   symex.last_source_location.make_nil();
-
+ 
+  // get unwinding info
+  setup_unwind();
+ 
+  return safety_checkert::UNKNOWN;
+ }
+ 
+ /*******************************************************************\
+ 
+Function: bmct::step
+ 
+  Inputs: 
+ 
+ Outputs: 
+ 
+ Purpose: do BMC
+ 
+ \*******************************************************************/
+ 
+safety_checkert::resultt bmct::step(const goto_functionst &goto_functions)
+{
   try
   {
-    // get unwinding info
-    setup_unwind();
-
     // perform symbolic execution
     symex(goto_functions);
-
+ 
     // add a partial ordering, if required    
     if(equation.has_threads())
     {
       memory_model->set_message_handler(get_message_handler());
       (*memory_model)(equation);
     }
-  }
+ 
+    statistics() << "size of program expression: "
+		 << equation.SSA_steps.size()
+		 << " steps" << eom;
 
-  catch(const std::string &error_str)
-  {
-    message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_source_location);
-    message_stream.str << error_str;
-    message_stream.error_msg();
-    return safety_checkert::ERROR;
-  }
-
-  catch(const char *error_str)
-  {
-    message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_source_location);
-    message_stream.str << error_str;
-    message_stream.error_msg();
-    return safety_checkert::ERROR;
-  }
-
-  catch(std::bad_alloc)
-  {
-    error() << "Out of memory" << eom;
-    return safety_checkert::ERROR;
-  }
-
-  statistics() << "size of program expression: "
-               << equation.SSA_steps.size()
-               << " steps" << eom;
-
-  try
-  {
-    if(options.get_option("slice-by-trace")!="")
+    // perform slicing
+    slice(); 
+ 
+    // do diverse other options
     {
-      symex_slice_by_tracet symex_slice_by_trace(ns);
-
-      symex_slice_by_trace.slice_by_trace
-	(options.get_option("slice-by-trace"), equation);
+      resultt result = show(goto_functions);
+      if(result != safety_checkert::UNKNOWN)
+        return result;
     }
-
-    if(equation.has_threads())
-    {
-      // we should build a thread-aware SSA slicer
-      statistics() << "no slicing due to threads" << eom;
-    }
-    else
-    {
-      if(options.get_bool_option("slice-formula"))
-      {
-        slice(equation);
-        statistics() << "slicing removed "
-                     << equation.count_ignored_SSA_steps()
-                     << " assignments" << eom;
-      }
-      else
-      {
-        if(options.get_option("cover")=="")
-        {
-          simple_slice(equation);
-          statistics() << "simple slicing removed "
-                       << equation.count_ignored_SSA_steps()
-                       << " assignments" << eom;
-        }
-      }
-    }
-
-    {
-      statistics() << "Generated " << symex.total_vccs
-                   << " VCC(s), " << symex.remaining_vccs
-                   << " remaining after simplification" << eom;
-    }
-
-    if(options.get_bool_option("show-vcc"))
-    {
-      show_vcc();
-      return safety_checkert::SAFE; // to indicate non-error
-    }
-    
-    if(options.get_option("cover")!="")
-    {
-      std::string criterion=options.get_option("cover");
-      return cover(goto_functions, criterion)?
-        safety_checkert::ERROR:safety_checkert::SAFE;
-    }
-
+ 
     // any properties to check at all?
-    if(!options.get_bool_option("program-only") &&
-       symex.remaining_vccs==0)
+    if(symex.remaining_vccs==0)
     {
       report_success();
       return safety_checkert::SAFE;
     }
+    
+    //do all properties
+    if(options.get_bool_option("all-properties"))
+      return all_properties(goto_functions, prop_conv);
 
-    if(options.get_bool_option("program-only"))
-    {
-      show_program();
-      return safety_checkert::SAFE;
-    }
-
+    //do "normal" BMC
     return decide(goto_functions, prop_conv);
   }
-
+ 
   catch(std::string &error_str)
   {
     error() << error_str << eom;
@@ -491,6 +522,30 @@ safety_checkert::resultt bmct::run(
     error() << "Out of memory" << eom;
     return safety_checkert::ERROR;
   }
+
+  assert(false);
+}
+
+/*******************************************************************\
+
+Function: bmc_incrementalt::run
+ 
+  Inputs: 
+
+ Outputs: 
+
+ Purpose: initialize and do BMC
+
+\*******************************************************************/
+
+safety_checkert::resultt bmct::run(
+  const goto_functionst &goto_functions)
+{
+  safety_checkert::resultt result = initialize();
+  if(result != safety_checkert::UNKNOWN)
+    return result;
+
+  return step(goto_functions);
 }
 
 /*******************************************************************\
@@ -507,36 +562,39 @@ Function: bmct::decide
 
 safety_checkert::resultt bmct::decide(
   const goto_functionst &goto_functions,
-  prop_convt &prop_conv)
+  prop_convt &prop_conv, 
+  bool show_report)
 {
   prop_conv.set_message_handler(get_message_handler());
-
-  if(options.get_bool_option("all-properties"))
-    return all_properties(goto_functions, prop_conv);
-
+ 
   switch(run_decision_procedure(prop_conv))
   {
   case decision_proceduret::D_UNSATISFIABLE:
-    report_success();
-    return SAFE;
+    if(show_report)
+      report_success();
+ 
+    return safety_checkert::SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
-    if(options.get_bool_option("beautify"))
-      counterexample_beautificationt()(
-        dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
-  
-    error_trace();
-    report_failure();
-    return UNSAFE;
+    if(show_report)
+    {
+      if(options.get_bool_option("beautify"))
+        counterexample_beautificationt()(
+          dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
+   
+      error_trace();
+      report_failure();
+    }
+    return safety_checkert::UNSAFE;
 
   default:
     if(options.get_bool_option("dimacs") ||
        options.get_option("outfile")!="")
-      return ERROR;
+      return safety_checkert::ERROR;
       
     error() << "decision procedure failed" << eom;
 
-    return ERROR;
+    return safety_checkert::ERROR;
   }
 }
 

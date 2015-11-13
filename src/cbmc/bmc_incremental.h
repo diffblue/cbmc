@@ -38,31 +38,25 @@ class bmc_incrementalt:public bmct
     goto_functions(_goto_functions),
     symex(dynamic_cast<symex_bmc_incrementalt &>(*symex_ptr))  
   { }
-  
-  virtual resultt initialize();
-  virtual resultt step();
-  virtual resultt run();
-  virtual resultt run(const goto_functionst &goto_functions) 
-  { return run(); }
   virtual ~bmc_incrementalt() { }
+  
+  // make public
+  virtual resultt run() { return run(goto_functions); }
+  virtual resultt initialize() { return bmct::initialize(); }
+  virtual resultt step() { return step(goto_functions); }
   
  protected:
   const goto_functionst &goto_functions;
-  std::unique_ptr<memory_model_baset> memory_model;
-  goto_symext::statet symex_state; //TODO: move this into symex_bmc
- 
-  virtual resultt decide(
-     const goto_functionst &goto_functions,
-     prop_convt &prop_conv) 
-  { return decide(goto_functions, prop_conv,true); } 
- 
-  virtual resultt decide(
-     const goto_functionst &goto_functions,
-     prop_convt &, 
-     bool show_report);
 
-   // unwinding
-   virtual void setup_unwind();
+  //ENHANCE: move this into symex_bmc
+  goto_symext::statet symex_state; 
+ 
+  // overload
+  virtual resultt run(const goto_functionst &goto_functions);
+  virtual resultt step(const goto_functionst &goto_functions);
+
+  // unwinding
+  virtual void setup_unwind();
  private:
   symex_bmc_incrementalt &symex;
 };

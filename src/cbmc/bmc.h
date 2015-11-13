@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 #include <map>
+#include <memory>
 
 #include <util/hash_cont.h>
 #include <util/options.h>
@@ -24,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_ui.h>
 #include <goto-symex/symex_target_equation.h>
 #include <goto-programs/safety_checker.h>
+#include <goto-symex/memory_model.h>
 
 #include "symex_bmc.h"
 
@@ -34,7 +36,8 @@ public:
     const optionst &_options,
     const symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
-    prop_convt& _prop_conv):
+    prop_convt& _prop_conv)
+  :
     safety_checkert(ns, _message_handler),
     options(_options),
     ns(_symbol_table, new_symbol_table),
@@ -47,7 +50,6 @@ public:
     symex.constant_propagation=options.get_bool_option("propagation");
   }
  
-  virtual resultt run(const goto_functionst &goto_functions);
   virtual ~bmct() { }
 
   // additional stuff   
@@ -60,6 +62,8 @@ public:
   void set_ui(language_uit::uit _ui) { ui=_ui; }
 
   // the safety_checkert interface
+  // ENHANCE: it would be reasonable to pass the goto_functions 
+  //   parameter to the constructor
   virtual resultt operator()(
     const goto_functionst &goto_functions)
   {
@@ -91,22 +95,36 @@ protected:
   symex_target_equationt equation;
   symex_bmct *symex_ptr;
   prop_convt &prop_conv;
+  std::unique_ptr<memory_model_baset> memory_model;
 
   // use gui format
   language_uit::uit ui;
   
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);
-    
+
+  // ENHANCE: goto_functions and prop_conv could be omitted    
   virtual resultt decide(
     const goto_functionst &,
-    prop_convt &);
+    prop_convt &,
+    bool show_report=true);
     
   // unwinding
   virtual void setup_unwind();
   virtual void do_unwind_module();
   void do_conversion();
   
+  // run
+  virtual resultt run(const goto_functionst &goto_functions);
+
+  // decomposed run
+  virtual resultt initialize();
+  virtual resultt step(const goto_functionst &goto_functions);
+
+  // functions used in run
+  virtual void slice();
+  virtual resultt show(const goto_functionst &goto_functions);
+
   virtual void show_vcc();
   virtual resultt all_properties(
     const goto_functionst &goto_functions,
