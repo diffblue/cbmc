@@ -255,20 +255,14 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_floatbv)
   {
-    // annotated?
-    
-    irep_idt c_type=src.get(ID_C_c_type);
-    const std::string c_type_str=c_type_as_string(c_type);
-
-    if(!c_type_str.empty())
-      return q+c_type_str+d;
-
-    mp_integer width=string2integer(src.get_string(ID_width));
+    unsigned width=to_floatbv_type(src).get_width();
 
     if(width==config.ansi_c.single_width)
       return q+"float"+d;
     else if(width==config.ansi_c.double_width)
       return q+"double"+d;
+    else if(width==config.ansi_c.long_double_width)
+      return q+"long double"+d;
     else
     {
       std::string swidth=src.get_string(ID_width);
@@ -278,22 +272,24 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_fixedbv)
   {
-    // annotated?
-    
-    irep_idt c_type=src.get(ID_C_c_type);
-    const std::string c_type_str=c_type_as_string(c_type);
+    unsigned width=to_fixedbv_type(src).get_width();
 
-    if(!c_type_str.empty())
-      return q+c_type_str+d;
-
-    mp_integer width=string2integer(src.get_string(ID_width));
-
-    if(width==config.ansi_c.single_width)
-      return q+"float"+d;
-    else if(width==config.ansi_c.double_width)
-      return q+"double"+d;
+    if(config.ansi_c.use_fixed_for_float)
+    {
+      if(width==config.ansi_c.single_width)
+        return q+"float"+d;
+      else if(width==config.ansi_c.double_width)
+        return q+"double"+d;
+      else if(width==config.ansi_c.long_double_width)
+        return q+"long double"+d;
+      else
+        assert(false);
+    }
     else
-      assert(false);
+    {
+      unsigned fraction_bits=to_fixedbv_type(src).get_fraction_bits();
+      return q+"__CPROVER_fixedbv["+i2string(width)+"]["+i2string(fraction_bits)+"]";
+    }
   }
   else if(src.id()==ID_c_bit_field)
   {
@@ -304,7 +300,6 @@ std::string expr2ct::convert_rec(
           src.id()==ID_unsignedbv)
   {
     // annotated?
-    
     irep_idt c_type=src.get(ID_C_c_type);
     const std::string c_type_str=c_type_as_string(c_type);
 
