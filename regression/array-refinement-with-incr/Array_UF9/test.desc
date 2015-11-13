@@ -1,6 +1,6 @@
 CORE
 main.c
---arrays-uf-always --no-propagation --refine-arrays --unwind 2
+--arrays-uf-always --no-propagation --unwind-max 21
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
