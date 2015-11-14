@@ -610,9 +610,9 @@ exprt bv_pointerst::bv_get_rec(
     else
       switch(prop.l_get(bv[bit_nr]).get_value())
       {
-       case tvt::TV_FALSE: ch='0'; break;
-       case tvt::TV_TRUE:  ch='1'; break;
-       case tvt::TV_UNKNOWN: ch='0'; break;
+       case tvt::tv_enumt::TV_FALSE: ch='0'; break;
+       case tvt::tv_enumt::TV_TRUE:  ch='1'; break;
+       case tvt::tv_enumt::TV_UNKNOWN: ch='0'; break;
        default: assert(false);
       }
       

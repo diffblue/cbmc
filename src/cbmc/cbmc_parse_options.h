@@ -26,7 +26,7 @@ class optionst;
   "(unwind-max):(unwind-min):" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
-  "D:I:" \
+  "D:I:(std89)(std99)(std11)" \
   "(classpath):" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
@@ -35,6 +35,7 @@ class optionst;
   "(xml-ui)(xml-interface)(vcd):" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
   "(cegis)(cegis-root):(cegis-targets):(cegis-max-prog-size):(cegis-skolem):(cegis-ranking):" \
+  "(danger)(danger-max-size):" \
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
   "(floatbv)(fixedbv)" \

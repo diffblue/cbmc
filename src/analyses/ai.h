@@ -36,11 +36,9 @@ public:
   
   // how function calls are treated:
   // a) there is an edge from each call site to the function head
-  // b) there is an edge from each return to the last instruction (END_FUNCTION)
-  //    of each function
-  // c) there is an edge from the last instruction of the function
-  //    to the instruction following the call site
-  //    (for setting the LHS)
+  // b) there is an edge from the last instruction (END_FUNCTION) of the function
+  //    to the instruction _following_ the call site
+  //    (this also needs to set the LHS, if applicable)
 
   virtual void transform(
     locationt from,
@@ -52,6 +50,16 @@ public:
     std::ostream &out,
     const ai_baset &ai,
     const namespacet &ns) const
+  {
+  }
+  
+  // no states
+  virtual void make_bottom()
+  {
+  }
+
+  // all states
+  virtual void make_top()
   {
   }
   
@@ -85,6 +93,7 @@ public:
   {
     goto_functionst goto_functions;
     initialize(goto_program);
+    entry_state(goto_program);
     fixedpoint(goto_program, goto_functions, ns);
   }
     
@@ -93,6 +102,7 @@ public:
     const namespacet &ns)
   {
     initialize(goto_functions);
+    entry_state(goto_functions);
     fixedpoint(goto_functions, ns);
   }
 
@@ -102,6 +112,7 @@ public:
   {
     goto_functionst goto_functions;
     initialize(goto_function);
+    entry_state(goto_function.body);
     fixedpoint(goto_function.body, goto_functions, ns);
   }
 
@@ -135,6 +146,9 @@ protected:
   virtual void initialize(const goto_programt &);
   virtual void initialize(const goto_functionst::goto_functiont &);
   virtual void initialize(const goto_functionst &);
+
+  void entry_state(const goto_programt &);
+  void entry_state(const goto_functionst &);
 
   virtual void output(
     const namespacet &ns,
@@ -180,9 +194,6 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
   
-  typedef std::set<irep_idt> functions_donet;
-  functions_donet functions_done;
-
   typedef std::set<irep_idt> recursion_sett;
   recursion_sett recursion_set;
     

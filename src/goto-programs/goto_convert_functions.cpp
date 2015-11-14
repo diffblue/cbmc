@@ -78,7 +78,8 @@ void goto_convert_functionst::goto_convert()
   forall_symbols(it, symbol_table.symbols)
   {
     if(!it->second.is_type &&
-       it->second.type.id()==ID_code)
+       it->second.type.id()==ID_code &&
+       (it->second.mode==ID_C || it->second.mode==ID_cpp))
       symbol_list.push_back(it->first);
   }
   
@@ -245,8 +246,14 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   else
     end_location.make_nil();
 
+  goto_programt tmp_end_function;
+  goto_programt::targett end_function=tmp_end_function.add_instruction();
+  end_function->type=END_FUNCTION;
+  end_function->source_location=end_location;
+  end_function->code.set(ID_identifier, identifier);
+
   targets=targetst();
-  targets.return_set=true;
+  targets.set_return(end_function);
   targets.has_return_value=
     f.type.return_type().id()!=ID_empty &&
     f.type.return_type().id()!=ID_constructor &&
@@ -267,33 +274,19 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
     a_begin.source_location=f.body.instructions.front().source_location;
     f.body.insert_before_swap(f.body.instructions.begin(), a_begin);
 
-    bool last_is_return=false;
+    goto_programt::targett a_end=f.body.add_instruction();
+    a_end->make_atomic_end();
+    a_end->source_location=end_location;
+
     Forall_goto_program_instructions(i_it, f.body)
     {
-      last_is_return=i_it->is_return();
-      if(last_is_return)
-      {
-        goto_programt::instructiont a_end;
-        a_end.make_atomic_end();
-        a_end.source_location=i_it->source_location;
-        f.body.insert_before_swap(i_it, a_end);
-        ++i_it;
-      }
-    }
-
-    if(!last_is_return)
-    {
-      goto_programt::targett t=f.body.add_instruction();
-      t->make_atomic_end();
-      t->source_location=end_location;
+      if(i_it->is_goto() && i_it->get_target()->is_end_function())
+        i_it->set_target(a_end);
     }
   }
 
   // add "end of function"
-  goto_programt::targett t=f.body.add_instruction();
-  t->type=END_FUNCTION;
-  t->source_location=end_location;
-  t->code.set(ID_identifier, identifier);
+  f.body.destructive_append(tmp_end_function);
 
   // do function tags
   Forall_goto_program_instructions(i_it, f.body)

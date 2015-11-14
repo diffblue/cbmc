@@ -100,7 +100,7 @@ tvt satcheck_booleforce_baset::l_get(literalt a) const
   else if(r<0)
     result=tvt(false);
   else
-    result=tvt(tvt::TV_UNKNOWN);
+    result=tvt(tvt::tv_enumt::TV_UNKNOWN);
 
   if(a.sign()) result=!result;
 

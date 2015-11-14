@@ -61,7 +61,7 @@ void goto_inlinet::parameter_assignments(
     const code_typet::parametert &parameter=*it2;
 
     // this is the type the n-th argument should be
-    const typet &arg_type=ns.follow(parameter.type());
+    const typet &par_type=ns.follow(parameter.type());
 
     const irep_idt &identifier=parameter.get_identifier();
 
@@ -89,49 +89,50 @@ void goto_inlinet::parameter_assignments(
     else
     {
       // this is the actual parameter
-      exprt actual(*it1);
+      exprt actual=*it1;
 
-      // it should be the same exact type,
+      // it should be the same exact type as the parameter,
       // subject to some exceptions
-      if(!base_type_eq(arg_type, actual.type(), ns))
+      if(!base_type_eq(par_type, actual.type(), ns))
       {
-        const typet &f_argtype = ns.follow(arg_type);
+        const typet &f_partype = ns.follow(par_type);
         const typet &f_acttype = ns.follow(actual.type());
         
         // we are willing to do some conversion
-        if((f_argtype.id()==ID_pointer &&
+        if((f_partype.id()==ID_pointer &&
             f_acttype.id()==ID_pointer) ||
-           (f_argtype.id()==ID_array &&
-            f_acttype.id()==ID_pointer &&
-            f_argtype.subtype()==f_acttype.subtype()))
+           (f_partype.id()==ID_pointer &&
+            f_acttype.id()==ID_array &&
+            f_partype.subtype()==f_acttype.subtype()))
         {
-          actual.make_typecast(arg_type);
+          actual.make_typecast(par_type);
         }
-        else if((f_argtype.id()==ID_signedbv ||
-                 f_argtype.id()==ID_unsignedbv ||
-                 f_argtype.id()==ID_bool) &&
+        else if((f_partype.id()==ID_signedbv ||
+                 f_partype.id()==ID_unsignedbv ||
+                 f_partype.id()==ID_bool) &&
                 (f_acttype.id()==ID_signedbv ||
                  f_acttype.id()==ID_unsignedbv ||
                  f_acttype.id()==ID_bool))  
         {
-          actual.make_typecast(arg_type);
+          actual.make_typecast(par_type);
         }
         else
         {
           err_location(*it1);
 
           str << "function call: argument `" << identifier
-              << "' type mismatch: got `"
-              << from_type(ns, identifier, it1->type())
-              << "', expected `"
-              << from_type(ns, identifier, arg_type)
+              << "' type mismatch: argument is `"
+              // << from_type(ns, identifier, actual.type())
+              << actual.type().pretty()
+              << "', parameter is `"
+              << from_type(ns, identifier, par_type)
               << "'";
           throw 0;
         }
       }
 
       // adds an assignment of the actual parameter to the formal parameter
-      code_assignt assignment(symbol_exprt(identifier, arg_type), actual);
+      code_assignt assignment(symbol_exprt(identifier, par_type), actual);
       assignment.add_source_location()=source_location;
 
       dest.add_instruction(ASSIGN);
@@ -146,6 +147,56 @@ void goto_inlinet::parameter_assignments(
   if(it1!=arguments.end())
   {
     // too many arguments -- we just ignore that, no harm done
+  }
+}
+
+/*******************************************************************\
+
+Function: goto_inlinet::parameter_destruction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_inlinet::parameter_destruction(
+  const source_locationt &source_location,
+  const irep_idt &function_name,
+  const code_typet &code_type,
+  goto_programt &dest)
+{
+  const code_typet::parameterst &parameter_types=
+    code_type.parameters();
+  
+  // iterates over the types of the parameters
+  for(code_typet::parameterst::const_iterator
+      it=parameter_types.begin();
+      it!=parameter_types.end();
+      it++)
+  {
+    const code_typet::parametert &parameter=*it;
+
+    const irep_idt &identifier=parameter.get_identifier();
+
+    if(identifier==irep_idt())
+    {
+      err_location(source_location);
+      throw "no identifier for function parameter";
+    }
+
+    {
+      const symbolt &symbol=ns.lookup(identifier);
+
+      goto_programt::targett dead=dest.add_instruction();
+      dead->make_dead();
+      dead->code=code_deadt(symbol.symbol_expr());
+      dead->code.add_source_location()=source_location;
+      dead->source_location=source_location;
+      dead->function=function_name; 
+    }
   }
 }
 
@@ -297,20 +348,24 @@ void goto_inlinet::expand_function_call(
   goto_programt &dest,
   goto_programt::targett &target,
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   const exprt &constrain,
   bool full)
 {
   // look it up
-  if(function.id()!=ID_symbol)
-  {
-    err_location(function);
-    throw "function_call expects symbol as function operand, "
-          "but got `"+function.id_string()+"'";
-  }
+  const irep_idt identifier=function.get_identifier();
   
-  const irep_idt identifier=function.get(ID_identifier);
+  // we ignore certain calls
+  if(identifier=="__CPROVER_cleanup" ||
+     identifier=="__CPROVER_set_must" ||
+     identifier=="__CPROVER_set_may" ||
+     identifier=="__CPROVER_clear_must" ||
+     identifier=="__CPROVER_clear_may")
+  {
+    target++;
+    return; // ignore
+  }
   
   // see if we are already expanding it
   if(recursion_set.find(identifier)!=recursion_set.end())
@@ -345,8 +400,7 @@ void goto_inlinet::expand_function_call(
     }
 
     err_location(function);
-    str << "failed to find function `" << identifier
-        << "'";
+    str << "failed to find function `" << identifier << "'";
     throw 0;
   }
   
@@ -381,6 +435,7 @@ void goto_inlinet::expand_function_call(
     goto_programt tmp;
     parameter_assignments(target->source_location, identifier, f.type, arguments, tmp);
     tmp.destructive_append(tmp2);
+    parameter_destruction(target->source_location, identifier, f.type, tmp);
 
     if(f.is_hidden())
     {
@@ -392,13 +447,23 @@ void goto_inlinet::expand_function_call(
         new_source_location.set_hide();
       
         Forall_goto_program_instructions(it, tmp)
+        {
           if(it->function==identifier)
           {
-            replace_location(it->source_location, new_source_location);
-            replace_location(it->guard, new_source_location);
-            replace_location(it->code, new_source_location);
+            // don't hide assignment to lhs
+            if(it->is_assign() && to_code_assign(it->code).lhs()==lhs)
+            {
+            }
+            else
+            {
+              replace_location(it->source_location, new_source_location);
+              replace_location(it->guard, new_source_location);
+              replace_location(it->code, new_source_location);
+            }
+
             it->function=target->function;
           }
+        }
       }
     }
 
@@ -419,8 +484,7 @@ void goto_inlinet::expand_function_call(
     if(no_body_set.insert(identifier).second)
     {
       err_location(function);
-      str << "no body for function `" << identifier
-          << "'";
+      str << "no body for function `" << identifier << "'";
       warning_msg();
     }
 
@@ -570,7 +634,8 @@ bool goto_inlinet::inline_instruction(
     if(call.function().id()==ID_symbol)
     {
       expand_function_call(
-        dest, it, call.lhs(), call.function(), call.arguments(),
+        dest, it, call.lhs(), to_symbol_expr(call.function()),
+        call.arguments(),
         static_cast<const exprt &>(get_nil_irep()), full);
 
       return true;
@@ -587,7 +652,7 @@ bool goto_inlinet::inline_instruction(
       expand_function_call(
         dest, it,
         it->code.op0().op0(), // lhs
-        it->code.op0().op1().op0(), // function
+        to_symbol_expr(it->code.op0().op1().op0()), // function
         it->code.op0().op1().op1().operands(), // arguments
         it->code.op1(), // constraint
         full);

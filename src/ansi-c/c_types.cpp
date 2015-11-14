@@ -506,9 +506,18 @@ typet long_double_type()
       result=ieee_float_spect::quadruple_precision().to_type();
     else if(config.ansi_c.long_double_width==64)
       result=ieee_float_spect::double_precision().to_type();
+    else if(config.ansi_c.long_double_width==80)
+    {
+      // x86 extended precision has 80 bits in total, and
+      // deviating from IEEE, does not use a hidden bit.
+      // We use the closest we have got, but the below isn't accurate.
+      result=ieee_float_spect(63, 15).to_type();
+    }
     else if(config.ansi_c.long_double_width==96)
+    {
       result=ieee_float_spect(80, 15).to_type();
-      // not quite right. Intel's extended precision isn't IEEE.
+      // not quite right. The extra bits beyond 80 are usually padded.
+    }
     else
       assert(false);
   }

@@ -41,7 +41,7 @@ tvt satcheck_picosatt::l_get(literalt a) const
   tvt result;
 
   if((int)a.var_no()>picosat_variables(picosat))
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
   const int val=picosat_deref(picosat, a.dimacs());
   if(val>0)
@@ -49,7 +49,7 @@ tvt satcheck_picosatt::l_get(literalt a) const
   else if(val<0)
     result=tvt(false);
   else
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
   return result;
 }
@@ -118,7 +118,7 @@ propt::resultt satcheck_picosatt::prop_solve()
 
   {
     std::string msg=
-      i2string(_no_variables)+" variables, "+
+      i2string(_no_variables-1)+" variables, "+
       i2string(picosat_added_original_clauses(picosat))+" clauses";
     messaget::status() << msg << messaget::eom;
   }

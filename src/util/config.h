@@ -43,7 +43,12 @@ public:
     bool use_fixed_for_float;
     bool for_has_scope;
     bool single_precision_constant;
-    bool cpp11;
+    enum class c_standardt { C89, C99, C11 } c_standard;
+    static c_standardt default_c_standard();
+    
+    void set_c89() { c_standard=c_standardt::C89; for_has_scope=false; }
+    void set_c99() { c_standard=c_standardt::C99; for_has_scope=true; }
+    void set_c11() { c_standard=c_standardt::C11; for_has_scope=true; }
     
     ieee_floatt::rounding_modet rounding_mode;
 
@@ -67,15 +72,15 @@ public:
     // instruction (in bytes)
     unsigned memory_operand_size;
     
-    typedef enum { NO_ENDIANNESS, IS_LITTLE_ENDIAN, IS_BIG_ENDIAN } endiannesst;
+    enum class endiannesst { NO_ENDIANNESS, IS_LITTLE_ENDIAN, IS_BIG_ENDIAN };
     endiannesst endianness;
 
-    typedef enum { NO_OS, OS_LINUX, OS_MACOS, OS_WIN } ost;
+    enum class ost { NO_OS, OS_LINUX, OS_MACOS, OS_WIN };
     ost os;
 
-    typedef enum { NO_ARCH, ARCH_I386, ARCH_X86_64, ARCH_POWER, ARCH_ARM,
-                   ARCH_ALPHA, ARCH_MIPS, ARCH_S390, ARCH_S390X, ARCH_SPARC,
-                   ARCH_IA64, ARCH_X32 } archt;
+    enum class archt { NO_ARCH, ARCH_I386, ARCH_X86_64, ARCH_POWER, ARCH_ARM,
+                       ARCH_ALPHA, ARCH_MIPS, ARCH_S390, ARCH_S390X, ARCH_SPARC,
+                       ARCH_IA64, ARCH_X32 };
     archt arch;
 
     // architecture-specific integer value of null pointer constant
@@ -93,13 +98,13 @@ public:
     void set_arch_spec_ia64();
     void set_arch_spec_x32();
     
-    typedef enum { NO_MODE, MODE_ANSI_C_CPP, MODE_GCC_C, MODE_GCC_CPP,
-                   MODE_VISUAL_STUDIO_C_CPP,
-                   MODE_CODEWARRIOR_C_CPP, MODE_ARM_C_CPP } flavourt;
+    enum class flavourt { NO_MODE, MODE_ANSI_C_CPP, MODE_GCC_C, MODE_GCC_CPP,
+                          MODE_VISUAL_STUDIO_C_CPP,
+                          MODE_CODEWARRIOR_C_CPP, MODE_ARM_C_CPP };
     flavourt mode; // the syntax of source files
 
-    typedef enum { NO_PP, PP_GCC, PP_CLANG, PP_VISUAL_STUDIO,
-                   PP_CODEWARRIOR, PP_ARM } preprocessort;
+    enum class preprocessort { NO_PP, PP_GCC, PP_CLANG, PP_VISUAL_STUDIO,
+                               PP_CODEWARRIOR, PP_ARM };
     preprocessort preprocessor; // the preprocessor to use
 
     std::list<std::string> defines;
@@ -108,10 +113,22 @@ public:
     std::list<std::string> include_paths;
     std::list<std::string> include_files;
 
-    typedef enum { LIB_NONE, LIB_FULL } libt;
+    enum class libt { LIB_NONE, LIB_FULL };
     libt lib;
+
     bool string_abstraction;
   } ansi_c;
+  
+  struct cppt
+  {
+    enum class cpp_standardt { CPP98, CPP03, CPP11 } cpp_standard;
+    static cpp_standardt default_cpp_standard();
+
+    void set_cpp98() { cpp_standard=cpp_standardt::CPP98; }
+    void set_cpp03() { cpp_standard=cpp_standardt::CPP03; }
+    void set_cpp11() { cpp_standard=cpp_standardt::CPP11; }
+    
+  } cpp;
   
   struct verilogt
   {

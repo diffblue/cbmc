@@ -63,7 +63,7 @@ Function: satcheck_zcoret::l_get
 tvt satcheck_zcoret::l_get(literalt a) const
 {
   assert(false);
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt(tvt::tv_enumt::TV_UNKNOWN);
 }
 
 /*******************************************************************\
@@ -97,9 +97,10 @@ Function: satcheck_zcoret::prop_solve
 
 propt::resultt satcheck_zcoret::prop_solve()
 {
+  // We start counting at 1, thus there is one variable fewer.
   {
     std::string msg=
-      i2string(no_variables())+" variables, "+
+      i2string(no_variables()-1)+" variables, "+
       i2string(no_clauses())+" clauses";
     messaget::status() << msg << messaget::eom;
   }

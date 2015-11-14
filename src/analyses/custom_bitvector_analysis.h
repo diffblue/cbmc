@@ -38,47 +38,70 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const;
 
+  virtual void make_bottom()
+  {
+    may_bits.clear();
+    must_bits.clear();
+    is_bottom=true;
+  }
+
+  virtual void make_top()
+  {
+    may_bits.clear();
+    must_bits.clear();
+    is_bottom=false;
+  }
+
   bool merge(
     const custom_bitvector_domaint &b,
     locationt from,
     locationt to);
 
   typedef unsigned long long bit_vectort;
+  typedef std::map<irep_idt, bit_vectort> bitst;
   
   struct vectorst
   {
-    bit_vectort may, must;
-    inline vectorst():may(0), must(0) { }
-
-    inline bool merge(const vectorst &other)
+    bit_vectort may_bits, must_bits;
+    vectorst():may_bits(0), must_bits(0)
     {
-      bit_vectort old_may=may, old_must=must;
-      may|=other.may;
-      must&=other.must;
-      return may!=old_may || must!=old_must;
     }
-    
-    bool is_blank() const { return may==0 && must==0; }
   };
-
+  
+  vectorst merge(const vectorst &a, const vectorst &b)
+  {
+    vectorst result;
+    result.may_bits=a.may_bits|b.may_bits;
+    result.must_bits=a.must_bits&b.must_bits;
+    return result;
+  }
+  
+  bitst may_bits, must_bits;
+  
   void assign_lhs(const exprt &, const vectorst &);
-  void get_rhs(const exprt &, vectorst &dest);
+  vectorst get_rhs(const exprt &);
+  vectorst get_rhs(const irep_idt &);
 
-  typedef std::map<irep_idt, vectorst> bitst;
-  bitst bits;
+  bool is_bottom;
+  
+  custom_bitvector_domaint():is_bottom(true)
+  {
+  }
 
 protected:  
-  typedef enum { SET_MUST, CLEAR_MUST } modet;
+  typedef enum { SET_MUST, CLEAR_MUST, SET_MAY, CLEAR_MAY } modet;
 
   void set_bit(const exprt &, unsigned bit_nr, modet);
+  void set_bit(const irep_idt &, unsigned bit_nr, modet);
 };
 
 class custom_bitvector_analysist:public ait<custom_bitvector_domaint> 
 {
 public:
   void instrument(goto_functionst &);
-  void check(const namespacet &, const goto_functionst &, std::ostream &);
+  void check(const namespacet &, const goto_functionst &, bool xml, std::ostream &);
   exprt eval(const exprt &src, locationt loc);
+  static bool has_get_must_or_may(const exprt &);
 
   unsigned get_bit_nr(const exprt &);
 

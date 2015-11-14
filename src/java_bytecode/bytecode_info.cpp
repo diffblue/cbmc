@@ -54,9 +54,9 @@ struct bytecode_infot const bytecode_info[]= {
 { "dup",            0x59, ' ', 1, 2, ' ' }, // value → value, value; duplicate the value on top of the stack
 { "dup_x1",         0x5a, ' ', 2, 3, ' ' }, // value2, value1 → value1, value2, value1; insert a copy of the top value into the stack two values from the top. value1 and value2 must not be of the type double or long.
 { "dup_x2",         0x5b, ' ', 3, 4, ' ' }, // value3, value2, value1 → value1, value3, value2, value1; insert a copy of the top value into the stack two (if value2 is double or long it takes up the entry of value3, too) or three values (if value2 is neither double nor long) from the top
-{ "dup2",           0x5c, ' ', 2, 4, ' ' }, // {value2, value1} → {value2, value; value2, value1} }, // duplicate top two stack words
-{ "dup2_x1",        0x5d, ' ', 3, 5, ' ' }, // value3, {value2, value1} → {value2, value; value3, {value2, value1} }, // duplicate two words and insert beneath third word (see explanation above)
-{ "dup2_x2",        0x5e, ' ', 4, 6, ' ' }, // {value4, value; value2, value1} → {value2, value1}, {value4, value3}, {value2, value1} }, // duplicate two words and insert beneath fourth word
+{ "dup2",           0x5c, ' ', 0, 0, ' ' }, // {value2, value1} → {value2, value; value2, value1} }, // duplicate top two stack words
+{ "dup2_x1",        0x5d, ' ', 0, 0, ' ' }, // value3, {value2, value1} → {value2, value; value3, {value2, value1} }, // duplicate two words and insert beneath third word (see explanation above)
+{ "dup2_x2",        0x5e, ' ', 0, 0, ' ' }, // {value4, value; value2, value1} → {value2, value1}, {value4, value3}, {value2, value1} }, // duplicate two words and insert beneath fourth word
 { "fadd",           0x62, ' ', 2, 1, 'f' }, // value1, value2 → result; add two floats
 { "faload",         0x30, ' ', 2, 1, 'f' }, // arrayref, index → value; load a float from an array
 { "fastore",        0x51, ' ', 3, 0, ' ' }, // arrayref, index, value →; store a float in an array
@@ -196,7 +196,7 @@ struct bytecode_infot const bytecode_info[]= {
 { "newarray",       0xbc, 't', 1, 1, 'a' }, // count → arrayref; create new array with count elements of primitive type identified by atype
 { "nop",            0x00, ' ', 0, 0, ' ' }, // [No change]; perform no operation
 { "pop",            0x57, ' ', 1, 0, ' ' }, // value →; discard the top value on the stack
-{ "pop2",           0x58, ' ', 2, 0, ' ' }, // {value2, value1} →; discard the top two values on the stack (or one value, if it is a double or long)
+{ "pop2",           0x58, ' ', 1, 0, ' ' }, // {value2, value1} →; discard the top two values on the stack (or one value, if it is a double or long)
 { "putfield",       0xb5, 'C', 2, 0, ' ' }, // objectref, value →; set field to value in an object objectref, where the field is identified by a field reference index in constant pool (indexbyte1 << 8 + indexbyte2)
 { "putstatic",      0xb3, 'C', 1, 0, ' ' }, // value →; set static field to value in a class, where the field is identified by a field reference index in constant pool (indexbyte1 << 8 + indexbyte2)
 { "ret",            0xa9, 'v', 0, 0, ' ' }, // [No change]; continue execution from address taken from a local variable #index (the asymmetry with jsr is intentional)

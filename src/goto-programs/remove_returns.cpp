@@ -43,9 +43,7 @@ Inputs:
 
 Outputs:
 
-Purpose: turns 'return x' into an assignment to fkt#return_value,
-         unless the function returns void,
-         and a 'goto the_end_of_the_function'.
+Purpose: turns 'return x' into an assignment to fkt#return_value
 
 \*******************************************************************/
 
@@ -72,7 +70,7 @@ void remove_returnst::replace_returns(
     f_it->second.type.return_type()=empty_typet();
     function_symbol.type=f_it->second.type;
 
-    // add symbol to symbol_table
+    // add return_value symbol to symbol_table
     auxiliary_symbolt new_symbol;
     new_symbol.is_static_lifetime=true;
     new_symbol.module=function_symbol.module;
@@ -89,11 +87,6 @@ void remove_returnst::replace_returns(
   if(goto_program.empty())
     return;
 
-  goto_programt::targett end_function=
-    --goto_program.instructions.end();
-
-  assert(end_function->is_end_function());
-
   if(has_return_value)
   {
     Forall_goto_program_instructions(i_it, goto_program)
@@ -102,38 +95,17 @@ void remove_returnst::replace_returns(
       {
         assert(i_it->code.operands().size()==1);
 
-        // replace "return x;" by "fkt#return_value=x; goto end_function;"
+        // replace "return x;" by "fkt#return_value=x;"
         symbol_exprt lhs_expr;
         lhs_expr.set_identifier(id2string(function_id)+"#return_value");
         lhs_expr.type()=return_type;
 
         code_assignt assignment(lhs_expr, i_it->code.op0());
 
-        // now turn the `return' into `goto'
-        i_it->make_goto(end_function);
-  
-        goto_programt::instructiont tmp_i;
-        tmp_i.make_assignment();
-        tmp_i.code=assignment;
-        tmp_i.source_location=i_it->source_location;
-        tmp_i.function=i_it->function;
-
-        // inserts the assignment
-        goto_program.insert_before_swap(i_it, tmp_i);
-
-        // i_it is now the assignment, advance to the `goto'
-        i_it++;
+        // now turn the `return' into `assignment'
+        i_it->type=ASSIGN;
+        i_it->code=assignment;
       }
-    }
-  }
-  else
-  {
-    // simply replace all the returns by gotos
-
-    Forall_goto_program_instructions(i_it, goto_program)
-    {
-      if(i_it->is_return())
-        i_it->make_goto(end_function);
     }
   }
 }
@@ -160,11 +132,12 @@ void remove_returnst::do_function_calls(
     {
       code_function_callt &function_call=to_code_function_call(i_it->code);
 
-      // replace "lhs=f(...)" by "f(...); lhs=f#return_value;"
       code_typet old_type=to_code_type(function_call.function().type());
 
+      // Do we return anything?
       if(old_type.return_type()!=empty_typet())
       {
+        // replace "lhs=f(...)" by "f(...); lhs=f#return_value; DEAD f#return_value;"
         assert(function_call.function().id()==ID_symbol);
 
         const irep_idt function_id=
@@ -199,14 +172,23 @@ void remove_returnst::do_function_calls(
             rhs=nondet_value;
           }
 
-          goto_programt::targett t=goto_program.insert_after(i_it);
-          t->make_assignment();
-          t->source_location=i_it->source_location;
-          t->code=code_assignt(function_call.lhs(), rhs);
-          t->function=i_it->function;
+          goto_programt::targett t_a=goto_program.insert_after(i_it);
+          t_a->make_assignment();
+          t_a->source_location=i_it->source_location;
+          t_a->code=code_assignt(function_call.lhs(), rhs);
+          t_a->function=i_it->function;
 
           // fry the previous assignment
           function_call.lhs().make_nil();
+
+          if(f_it->second.body_available)
+          {
+            goto_programt::targett t_d=goto_program.insert_after(t_a);
+            t_d->make_dead();
+            t_d->source_location=i_it->source_location;
+            t_d->code=code_deadt(rhs);
+            t_d->function=i_it->function;
+          }
         }
       }
     }

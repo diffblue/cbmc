@@ -219,8 +219,9 @@ propt::resultt pbs_dimacs_cnft::prop_solve()
   file.close();
   pbfile.close();
 
+  // We start counting at 1, thus there is one variable fewer.
   messaget::status() << 
-    no_variables() << " variables, " <<
+    (no_variables()-1) << " variables, " <<
     clauses.size() << " clauses" << eom;
 
   bool result=pbs_solve();
@@ -297,5 +298,5 @@ tvt pbs_dimacs_cnft::l_get(literalt a) const
     }
 
   //std::cout << "ERROR" << "\n";
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }

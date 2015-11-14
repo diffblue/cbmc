@@ -37,10 +37,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 
-#include <cegis/bmc/bmc_verification_oracle.h>
-#include <cegis/symex/symex_learn.h>
+#include <cegis/symex/cegis_symex_verify.h>
+#include <cegis/symex/cegis_symex_learn.h>
+#include <cegis/danger/constant/default_constant_strategy.h>
+#include <cegis/danger/preprocess/danger_preprocessing.h>
+#include <cegis/danger/symex/verify/danger_verify_config.h>
+#include <cegis/danger/symex/learn/danger_learn_config.h>
 #include <cegis/facade/cegis.h>
-#include <cegis/options/cegis_options.h>
 
 #include <goto-instrument/full_slicer.h>
 
@@ -156,6 +159,24 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
+
+  if(cmdline.isset("c89"))
+    config.ansi_c.set_c89();
+
+  if(cmdline.isset("c99"))
+    config.ansi_c.set_c99();
+
+  if(cmdline.isset("c11"))
+    config.ansi_c.set_c11();
+
+  if(cmdline.isset("cpp98"))
+    config.cpp.set_cpp98();
+
+  if(cmdline.isset("cpp03"))
+    config.cpp.set_cpp03();
+
+  if(cmdline.isset("cpp11"))
+    config.cpp.set_cpp11();
 
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
@@ -624,14 +645,20 @@ int cbmc_parse_optionst::doit()
   if(set_properties(goto_functions))
     return 7;
 
-  if(cmdline.isset("cegis"))
+  if(cmdline.isset("danger"))
   {
-    if (cmdline.isset("function"))
-      options.set_option("function", cmdline.get_value("function"));
-    const cegis_optionst cegis_options(cmdline, options);
-    symex_learnt learning_algorithm(cegis_options, symbol_table, goto_functions, ui_message_handler);
-    bmc_verification_oraclet verification_oracle(options, symbol_table, goto_functions);
-    return run_cegis(learning_algorithm, verification_oracle, result());
+    size_t max_prog_size=100u;
+    if (cmdline.isset("danger-max-size"))
+      max_prog_size=string2integer(cmdline.get_value("function")).to_ulong();
+
+    const constant_strategyt strategy=default_constant_strategy;
+    danger_preprocessingt preproc(symbol_table, goto_functions, strategy);
+    const danger_programt &prog=preproc.get_danger_program();
+    danger_verify_configt verify_config(prog);
+    cegis_symex_verifyt<danger_verify_configt> verify(options, verify_config);
+    danger_learn_configt learn_config(prog);
+    cegis_symex_learnt<danger_learn_configt> learn(options, learn_config);
+    return run_cegis(learn, verify, preproc, max_prog_size, result());
   }
 
   // do actual BMC
@@ -1088,6 +1115,10 @@ void cbmc_parse_optionst::help()
     " cbmc [-?] [-h] [--help]      show help\n"
     " cbmc file.c ...              source file names\n"
     "\n"
+    "Analysis options:\n"
+    " --all-properties             check and report status of all properties\n"
+    " --show-properties            show the properties, but don't run analysis\n"
+    "\n"
     "Frontend options:\n"
     " -I path                      set include path (C/C++)\n"
     " -D macro                     define preprocessor macro (C/C++)\n"
@@ -1098,14 +1129,25 @@ void cbmc_parse_optionst::help()
     " --little-endian              allow little-endian word-byte conversions\n"
     " --big-endian                 allow big-endian word-byte conversions\n"
     " --unsigned-char              make \"char\" unsigned by default\n"
-    " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show symbol table\n"
-    " --show-goto-functions        show goto program\n"
     " --mm model                   set memory model (default: sc)\n"
     " --arch                       set architecture (default: "
                                    << configt::this_architecture() << ")\n"
     " --os                         set operating system (default: "
                                    << configt::this_operating_system() << ")\n"
+    " --c89/99/11                  set C language standard (default: "
+                                   << (configt::ansi_ct::default_c_standard()==
+                                       configt::ansi_ct::c_standardt::C89?"c89":
+                                       configt::ansi_ct::default_c_standard()==
+                                       configt::ansi_ct::c_standardt::C99?"c99":
+                                       configt::ansi_ct::default_c_standard()==
+                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n"
+    " --cpp98/03/11                set C++ language standard (default: "
+                                   << (configt::cppt::default_cpp_standard()==
+                                       configt::cppt::cpp_standardt::CPP98?"cpp98":
+                                       configt::cppt::default_cpp_standard()==
+                                       configt::cppt::cpp_standardt::CPP03?"cpp03":
+                                       configt::cppt::default_cpp_standard()==
+                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n"
     #ifdef _WIN32
     " --gcc                        use GCC as preprocessor\n"
     #endif
@@ -1116,6 +1158,11 @@ void cbmc_parse_optionst::help()
     " --round-to-minus-inf         IEEE floating point rounding mode\n"
     " --round-to-zero              IEEE floating point rounding mode\n"
     "\n"
+    "Program representations:\n"
+    " --show-parse-tree            show parse tree\n"
+    " --show-symbol-table          show symbol table\n"
+    " --show-goto-functions        show goto program\n"
+    "\n"
     "Program instrumentation options:\n"
     " --bounds-check               enable array bounds checks\n"
     " --div-by-zero-check          enable division by zero checks\n"
@@ -1125,9 +1172,6 @@ void cbmc_parse_optionst::help()
     " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
     " --float-overflow-check       check floating-point for +/-Inf\n"
     " --nan-check                  check floating-point for NaN\n"
-    " --all-properties             report status of all properties\n"
-    " --show-properties            show the properties\n"
-    " --show-loops                 show the loops in the program\n"
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
@@ -1138,6 +1182,7 @@ void cbmc_parse_optionst::help()
     " --function name              set main function name\n"
     " --property id                only check one specific property\n"
     " --program-only               only show program expression\n"
+    " --show-loops                 show the loops in the program\n"
     " --depth nr                   limit search depth\n"
     " --unwind nr                  unwind nr times\n"
     " --unwindset L:B,...          unwind loop L with a bound of B\n"

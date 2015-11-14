@@ -16,7 +16,6 @@ Author: Vincent Nimal
 #include <util/i2string.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
-#include <util/location.h>
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/message.h>
@@ -65,9 +64,9 @@ protected:
     {
       std::ostringstream s;
 
-      if(it->location().as_string().empty()) continue;
+      if(it->source_location().as_string().empty()) continue;
 
-      OUTPUT(s, "fence", it->location().get_file(), it->location().get_line(),
+      OUTPUT(s, "fence", it->source_location().get_file(), it->source_location().get_line(),
         ns.lookup(it->get_identifier()).base_name, "Write");
       non_redundant_display.insert(s.str());
     }
@@ -78,9 +77,9 @@ protected:
     {
       std::ostringstream s;
 
-      if(it->location().as_string().empty()) continue;
+      if(it->source_location().as_string().empty()) continue;
 
-      OUTPUT(s, "fence", it->location().get_file(), it->location().get_line(),
+      OUTPUT(s, "fence", it->source_location().get_file(), it->source_location().get_line(),
         ns.lookup(it->get_identifier()).base_name, "Read");
       non_redundant_display.insert(s.str());
     }
@@ -381,7 +380,7 @@ void fence_all_sharedt::compute()
             message.debug() << "debug: " 
               << id2string(r_it->second.object) << " shared: "
               << var.is_shared() << " loc: " 
-              << r_it->second.symbol_expr.location() << messaget::eom;
+              << r_it->second.symbol_expr.source_location() << messaget::eom;
             if(var.is_shared()) 
             {
               /* this variable has perhaps been discovered after dereferencing
@@ -490,7 +489,7 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
         message.debug() << "debug: " 
           << id2string(w_it->second.object) << " shared: "
           << var.is_shared() << " loc: " 
-          << w_it->second.symbol_expr.location() << messaget::eom;
+          << w_it->second.symbol_expr.source_location() << messaget::eom;
         if(var.is_shared()) 
         {
           /* this variable has perhaps been discovered after dereferencing

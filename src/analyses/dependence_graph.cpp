@@ -202,13 +202,6 @@ void dep_graph_domaint::data_dependencies(
   // data dependencies using def-use pairs
   data_deps.clear();
 
-  // END_FUNCTION depends on the return statements if there is a
-  // return value
-  if(from->is_return() &&
-     to_code_return(from->code).has_return_value() &&
-     to->is_end_function())
-    data_deps.insert(from);
-
   // TODO use (future) reaching-definitions-dereferencing rw_set
   value_setst &value_sets=
     dep_graph.reaching_definitions().get_value_sets();

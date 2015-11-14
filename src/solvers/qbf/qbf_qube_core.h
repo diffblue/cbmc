@@ -43,7 +43,7 @@ public:
     }
 
 
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt::unknown();
   }
 
   virtual modeltypet m_get(literalt a) const;

@@ -38,7 +38,7 @@ void add_cprover_library(
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  if(config.ansi_c.lib==configt::ansi_ct::LIB_NONE)
+  if(config.ansi_c.lib==configt::ansi_ct::libt::LIB_NONE)
     return;
 
   std::ostringstream library_text;
@@ -79,8 +79,8 @@ void add_cprover_library(
     // switch mode temporarily from gcc C++ to gcc C flavour
     configt::ansi_ct::flavourt old_mode=config.ansi_c.mode;
     
-    if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC_CPP)
-      config.ansi_c.mode=configt::ansi_ct::MODE_GCC_C;
+    if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_CPP)
+      config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
     
     ansi_c_languaget ansi_c_language;
     ansi_c_language.set_message_handler(message_handler);

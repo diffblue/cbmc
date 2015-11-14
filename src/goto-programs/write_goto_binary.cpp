@@ -16,7 +16,7 @@ Author: CM Wintersteiger
 
 /*******************************************************************\
 
-Function: goto_programt::write_goto_binary_v2
+Function: goto_programt::write_goto_binary_v3
 
   Inputs:
 
@@ -26,7 +26,7 @@ Function: goto_programt::write_goto_binary_v2
 
 \*******************************************************************/
 
-bool write_goto_binary_v2(
+bool write_goto_binary_v3(
   std::ostream &out,
   const symbol_tablet &lsymbol_table,
   const goto_functionst &functions,
@@ -38,7 +38,7 @@ bool write_goto_binary_v2(
 
   forall_symbols(it, lsymbol_table.symbols)
   {
-    // In version 2, symbols are not converted to ireps,
+    // Since version 2, symbols are not converted to ireps,
     // instead they are saved in a custom binary format
     
     const symbolt &sym = it->second;        
@@ -92,7 +92,7 @@ bool write_goto_binary_v2(
   {
     if(it->second.body_available)
     {      
-      // In version 2, goto functions are not converted to ireps,
+      // Since version 2, goto functions are not converted to ireps,
       // instead they are saved in a custom binary format      
       
       write_gb_string(out, id2string(it->first)); // name      
@@ -166,7 +166,10 @@ bool write_goto_binary(
     throw "version 1 no longer supported";
 
   case 2:
-    return write_goto_binary_v2(
+    throw "version 2 no longer supported";
+    
+  case 3:
+    return write_goto_binary_v3(
       out, lsymbol_table, functions,
       irepconverter);
 

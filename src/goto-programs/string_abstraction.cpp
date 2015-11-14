@@ -293,15 +293,6 @@ void string_abstractiont::add_str_arguments(
     current_args.insert(identifier);
   }
 
-  const typet &abstract_ret_type=build_abstraction_type(
-      to_code_type(fct.type).return_type());
-  if(!abstract_ret_type.is_nil())
-  {
-    add_argument(str_args, fct_symbol, abstract_ret_type,
-      "$return_value_str_abst"+arg_suffix,
-      abstract_ret_val_name(fct_symbol));
-  }
-
   parameters.insert(parameters.end(), str_args.begin(), str_args.end());
   code_typet::parameterst &symb_parameters=
     to_code_type(fct_symbol.type).parameters();
@@ -662,7 +653,8 @@ goto_programt::targett string_abstractiont::abstract(
     break;
 
   case RETURN:
-    it=abstract_return(dest, it);
+    // use remove_returns
+    assert(false);
     break;
 
   case END_FUNCTION:
@@ -786,111 +778,7 @@ void string_abstractiont::abstract_function_call(
       str_args.back()=address_of_exprt(str_args.back());
   }
 
-  const typet &abstract_ret_type=build_abstraction_type(
-      to_code_type(fct_symbol.type).return_type());
-  if(!abstract_ret_type.is_nil())
-  {
-    const exprt &lhs = call.lhs();
-    exprt new_lhs;
-
-    if(lhs.is_nil() ||
-        build_wrap(lhs, new_lhs, false))
-      str_args.push_back(null_pointer_exprt(
-            is_ptr_argument(abstract_ret_type)?
-            to_pointer_type(abstract_ret_type):
-            pointer_typet(abstract_ret_type)));
-    else
-    {
-      assert(type_eq(new_lhs.type(),
-            abstract_ret_type, ns));
-
-      if(is_ptr_argument(abstract_ret_type))
-        str_args.push_back(new_lhs);
-      else
-        str_args.push_back(address_of_exprt(new_lhs));
-    }
-  }
-
   arguments.insert(arguments.end(), str_args.begin(), str_args.end());
-}
-
-/*******************************************************************\
-
-Function: string_abstractiont::abstract_return
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-goto_programt::targett string_abstractiont::abstract_return(
-  goto_programt &dest,
-  goto_programt::targett target)
-{
-  code_returnt &ret=to_code_return(target->code);
-
-  if(!ret.has_return_value())
-    return target;
-
-  exprt &retval=ret.return_value();
-
-  replace_string_macros(retval, false, target->source_location);
-
-  const symbolt &fct_symbol=ns.lookup(target->function);
-  const typet &abstract_ret_type=build_abstraction_type(
-      to_code_type(fct_symbol.type).return_type());
-  if(abstract_ret_type.is_nil())
-    return target;
-
-  irep_idt identifier=abstract_ret_val_name(fct_symbol);
-  const symbolt &str_symbol=ns.lookup(identifier);
-  symbol_exprt sym_expr=str_symbol.symbol_expr();
-
-  goto_programt::instructiont is_null;
-  is_null.function=target->function;
-  is_null.source_location=target->source_location;
-  dest.insert_before_swap(target, is_null);
-  goto_programt::targett next=target;
-  ++next;
-  target->make_goto(next, equal_exprt(sym_expr,
-        null_pointer_exprt(to_pointer_type(sym_expr.type()))));
-
-  exprt new_retval;
-  // may fail if returning a constant like NULL
-  if(build_wrap(retval, new_retval, false))
-    new_retval=build_unknown(abstract_ret_type, false);
-
-  if(is_ptr_argument(abstract_ret_type))
-    return value_assignments(dest, next, sym_expr, new_retval);
-  else
-  {
-    exprt lhs_deref=dereference_exprt(sym_expr,
-        sym_expr.type().subtype());
-
-    return value_assignments(dest, next, lhs_deref, new_retval);
-  }
-}
-
-/*******************************************************************\
-
-Function: string_abstractiont::abstract_ret_val_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-irep_idt string_abstractiont::abstract_ret_val_name(const symbolt &fct)
-{
-  return id2string(fct.module)+
-         "::"+id2string(fct.base_name)+
-         "::$return_value_str_abst"+arg_suffix;
 }
 
 /*******************************************************************\

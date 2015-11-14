@@ -90,8 +90,6 @@ protected:
 
   void abstract_function_call(goto_programt &dest, goto_programt::targett it);
 
-  goto_programt::targett abstract_return(goto_programt &dest, goto_programt::targett it);
-
   goto_programt::targett value_assignments(goto_programt &dest,
       goto_programt::targett it,
       const exprt& lhs, const exprt& rhs);
@@ -133,7 +131,6 @@ protected:
       const irep_idt &identifier, const typet &type);
 
   exprt member(const exprt &a, whatt what);
-  irep_idt abstract_ret_val_name(const symbolt &fct);
 
   typet string_struct;
   goto_programt initialization;

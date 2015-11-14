@@ -255,20 +255,14 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_floatbv)
   {
-    // annotated?
-    
-    irep_idt c_type=src.get(ID_C_c_type);
-    const std::string c_type_str=c_type_as_string(c_type);
-
-    if(!c_type_str.empty())
-      return q+c_type_str+d;
-
-    mp_integer width=string2integer(src.get_string(ID_width));
+    unsigned width=to_floatbv_type(src).get_width();
 
     if(width==config.ansi_c.single_width)
       return q+"float"+d;
     else if(width==config.ansi_c.double_width)
       return q+"double"+d;
+    else if(width==config.ansi_c.long_double_width)
+      return q+"long double"+d;
     else
     {
       std::string swidth=src.get_string(ID_width);
@@ -278,22 +272,24 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_fixedbv)
   {
-    // annotated?
-    
-    irep_idt c_type=src.get(ID_C_c_type);
-    const std::string c_type_str=c_type_as_string(c_type);
+    unsigned width=to_fixedbv_type(src).get_width();
 
-    if(!c_type_str.empty())
-      return q+c_type_str+d;
-
-    mp_integer width=string2integer(src.get_string(ID_width));
-
-    if(width==config.ansi_c.single_width)
-      return q+"float"+d;
-    else if(width==config.ansi_c.double_width)
-      return q+"double"+d;
+    if(config.ansi_c.use_fixed_for_float)
+    {
+      if(width==config.ansi_c.single_width)
+        return q+"float"+d;
+      else if(width==config.ansi_c.double_width)
+        return q+"double"+d;
+      else if(width==config.ansi_c.long_double_width)
+        return q+"long double"+d;
+      else
+        assert(false);
+    }
     else
-      assert(false);
+    {
+      unsigned fraction_bits=to_fixedbv_type(src).get_fraction_bits();
+      return q+"__CPROVER_fixedbv["+i2string(width)+"]["+i2string(fraction_bits)+"]";
+    }
   }
   else if(src.id()==ID_c_bit_field)
   {
@@ -304,7 +300,6 @@ std::string expr2ct::convert_rec(
           src.id()==ID_unsignedbv)
   {
     // annotated?
-    
     irep_idt c_type=src.get(ID_C_c_type);
     const std::string c_type_str=c_type_as_string(c_type);
 
@@ -2195,10 +2190,31 @@ std::string expr2ct::convert_constant(
       else
         dest="FALSE";
     }
+    else if(type==char_type() && type!=signed_int_type() && type!=unsigned_int_type())
+    {
+      if(int_value=='\n')
+        dest+="\\n";
+      else if(int_value=='\r')
+        dest+="\\r";
+      else if(int_value=='\t')
+        dest+="\\t";
+      else if(int_value=='\'')
+        dest+="'\\''";
+      else if(int_value=='\\')
+        dest+="'\\'";
+      else if(int_value>=' ' && int_value<126)
+      {
+        dest+='\'';
+        dest+=char(integer2long(int_value));
+        dest+='\'';
+      }
+      else
+        dest=integer2string(int_value);
+    }
     else
     {
       dest=integer2string(int_value);
-
+      
       if(c_type==ID_unsigned_int)
         dest+='u';
       else if(c_type==ID_unsigned_long_int)
@@ -3473,6 +3489,7 @@ std::string expr2ct::convert_code(
   unsigned indent)
 {
   static bool comment_done=false;
+
   if(!comment_done && !src.source_location().get_comment().empty())
   {
     comment_done=true;
@@ -3483,7 +3500,7 @@ std::string expr2ct::convert_code(
     return dest;
   }
 
-  const irep_idt &statement=src.get(ID_statement);
+  const irep_idt &statement=src.get_statement();
 
   if(statement==ID_expression)
     return convert_code_expression(src, indent);
@@ -4322,6 +4339,9 @@ std::string expr2ct::convert(
 
   else if(src.id()=="get_must")
     return convert_function(src, "__CPROVER_get_must", precedence=16);
+
+  else if(src.id()=="get_may")
+    return convert_function(src, "__CPROVER_get_may", precedence=16);
 
   else if(src.id()=="object_value")
     return convert_function(src, "OBJECT_VALUE", precedence=16);

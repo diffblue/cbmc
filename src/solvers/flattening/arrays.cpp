@@ -55,8 +55,6 @@ Function: arrayst::record_array_index
 
 \*******************************************************************/
 
-
-
 void arrayst::record_array_index(const index_exprt &index)
 {
   // we are not allowed to put the index directly in the
@@ -917,7 +915,6 @@ void arrayst::add_array_constraints_if(
   }
 
   // now the false case
-
   for(index_sett::const_iterator
       it=index_set.begin();
       it!=index_set.end();
@@ -945,5 +942,3 @@ void arrayst::add_array_constraints_if(
 #endif
   }
 }
-
-

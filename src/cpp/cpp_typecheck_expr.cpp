@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/i2string.h>
 #include <util/std_types.h>
 #include <util/arith_tools.h>
-#include <util/bitvector.h>
 #include <util/std_expr.h>
 #include <util/config.h>
 #include <util/simplify_expr.h>

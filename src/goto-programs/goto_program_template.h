@@ -32,7 +32,7 @@ typedef enum { NO_INSTRUCTION_TYPE=0,
                END_FUNCTION=9,  // exit point of a function
                ATOMIC_BEGIN=10, // marks a block without interleavings
                ATOMIC_END=11,   // end of a block without interleavings
-               RETURN=12,       // return from a function
+               RETURN=12,       // set function return value (no control-flow change)
                ASSIGN=13,       // assignment lhs:=rhs
                DECL=14,         // declare a local variable
                DEAD=15,         // marks the end-of-live of a local variable
@@ -108,6 +108,13 @@ public:
     {
       assert(targets.size()==1);
       return targets.front();
+    }
+
+    // for the usual case of a single target
+    inline void set_target(targett t)
+    {
+      targets.clear();
+      targets.push_back(t);
     }
 
     //! goto target labels    
@@ -478,11 +485,6 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   {
     // the successors are non-obvious
   }
-  else if(i.is_return())
-  {
-    // the successor is the end_function at the end of the function
-    successors.push_back(--instructions.end());
-  }
   else if(i.is_assume())
   {
     if(!i.guard.is_false() && next!=instructions.end())
@@ -533,11 +535,6 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   else if(i.is_end_thread())
   {
     // no successors
-  }
-  else if(i.is_return())
-  {
-    // the successor is the end_function at the end
-    successors.push_back(--instructions.end());
   }
   else if(i.is_assume())
   {

@@ -60,7 +60,7 @@ public:
   virtual void reset_assignment()
   {
     assignment.clear();
-    assignment.resize(no_variables(), tvt(tvt::TV_UNKNOWN));
+    assignment.resize(no_variables(), tvt(tvt::tv_enumt::TV_UNKNOWN));
   }
 
   friend class smt1_convt;

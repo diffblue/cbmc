@@ -596,9 +596,9 @@ tvt qbf_bdd_certificatet::l_get(literalt a) const
   const BDD &model=*model_bdds[a.var_no()];
 
   if(model==bdd_manager->bddZero())
-    return tvt(a.sign()?tvt::TV_TRUE:tvt::TV_FALSE);
+    return tvt(a.sign()?tvt::tv_enumt::TV_TRUE:tvt::tv_enumt::TV_FALSE);
   else if(model==bdd_manager->bddOne())
-    return tvt(a.sign()?tvt::TV_FALSE:tvt::TV_TRUE);
+    return tvt(a.sign()?tvt::tv_enumt::TV_FALSE:tvt::tv_enumt::TV_TRUE);
   else
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt(tvt::tv_enumt::TV_UNKNOWN);
 }

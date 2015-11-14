@@ -144,7 +144,7 @@ bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  // now convert all
+  // first convert all
   for(java_class_loadert::class_mapt::const_iterator
       c_it=java_class_loader.class_map.begin();
       c_it!=java_class_loader.class_map.end();
@@ -160,7 +160,7 @@ bool java_bytecode_languaget::typecheck(
       return true;
   }
 
-  // now typecheck
+  // now typecheck all
   if(java_bytecode_typecheck(
        symbol_table, get_message_handler()))
     return true;

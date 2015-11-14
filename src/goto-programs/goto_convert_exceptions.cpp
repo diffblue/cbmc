@@ -275,22 +275,12 @@ void goto_convertt::convert_CPROVER_throw(
   else // otherwise, we do a return
   {
     // need to process destructor stack
-    for(destructor_stackt::const_reverse_iterator
-        d_it=targets.destructor_stack.rbegin();
-        d_it!=
-        (destructor_stackt::const_reverse_iterator)targets.destructor_stack.rend();
-        // The type cast for rend() above is a work-around for broken g++ 3.4.4,
-        // and will enventually go away.
-        d_it++)
-    {
-      codet d_code=*d_it;
-      d_code.add_source_location()=code.source_location();
-      convert(d_code, dest);
-    }
+    unwind_destructor_stack(code.source_location(), 0, dest);
 
-    goto_programt::targett t=dest.add_instruction(RETURN);
+    // add goto
+    goto_programt::targett t=dest.add_instruction();
+    t->make_goto(targets.return_target);
     t->source_location=code.source_location();
-    t->code=code_returnt();
   }
 }
 
@@ -377,16 +367,15 @@ Function: goto_convertt::unwind_destructor_stack
 
 void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
-  std::size_t stack_size,
-  goto_programt &dest,
-  bool do_dead)
+  std::size_t final_stack_size,
+  goto_programt &dest)
 {
   // There might be exceptions happening in the exception
   // handler. We thus pop off the stack, and then later
   // one restore the original stack.
   destructor_stackt old_stack=targets.destructor_stack;
 
-  while(targets.destructor_stack.size()>stack_size)
+  while(targets.destructor_stack.size()>final_stack_size)
   {
     codet d_code=targets.destructor_stack.back();
     d_code.add_source_location()=source_location;
@@ -394,8 +383,7 @@ void goto_convertt::unwind_destructor_stack(
     // pop now to avoid doing this again
     targets.destructor_stack.pop_back();
  
-    if(do_dead || d_code.get_statement()!=ID_dead)
-      convert(d_code, dest);
+    convert(d_code, dest);
   }
 
   // Now restore old stack.

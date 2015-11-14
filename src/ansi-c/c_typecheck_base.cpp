@@ -299,13 +299,13 @@ void c_typecheck_baset::typecheck_redefinition_type(
         throw 0;
       }
     }
-    else if(config.ansi_c.os==configt::ansi_ct::OS_WIN &&
+    else if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN &&
             final_new.id()==ID_c_enum && final_old.id()==ID_c_enum)              
     {        
       // under Windows, ignore this silently;
       // MSC doesn't think this is a problem, but GCC complains.
     }
-    else if(config.ansi_c.os==configt::ansi_ct::OS_WIN &&
+    else if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN &&
             final_new.id()==ID_pointer && final_old.id()==ID_pointer &&
             follow(final_new.subtype()).id()==ID_c_enum &&
             follow(final_old.subtype()).id()==ID_c_enum)
@@ -419,8 +419,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         // definition is marked as "extern inline"
         
         if(old_symbol.type.get_bool(ID_C_inlined) &&
-           (config.ansi_c.mode==configt::ansi_ct::MODE_GCC_C ||
-            config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP))
+           (config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_C ||
+            config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_ARM_C_CPP))
         {
           // overwrite "extern inline" properties
           old_symbol.is_extern=new_symbol.is_extern;

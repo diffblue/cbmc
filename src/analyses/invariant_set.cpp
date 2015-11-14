@@ -433,7 +433,7 @@ tvt invariant_sett::is_eq(std::pair<unsigned, unsigned> p) const
   if(has_ne(p) || has_ne(s))
     return tvt(false);
 
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }
   
 /*******************************************************************\
@@ -463,7 +463,7 @@ tvt invariant_sett::is_le(std::pair<unsigned, unsigned> p) const
     if(has_ne(s) || has_ne(p))
       return tvt(false);
     
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }
 
 /*******************************************************************\
@@ -857,7 +857,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
   {
     forall_operands(it, expr)
       if(implies_rec(*it)!=tvt(true))
-        return tvt(tvt::TV_UNKNOWN);
+        return tvt::unknown();
       
     return tvt(true);
   }
@@ -879,7 +879,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
     bool ob0=get_object(expr.op0(), p.first);
     bool ob1=get_object(expr.op1(), p.second);
     
-    if(ob0 || ob1) return tvt(tvt::TV_UNKNOWN);
+    if(ob0 || ob1) return tvt::unknown();
     
     tvt r;
     
@@ -913,7 +913,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
       assert(false);
   }
 
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }
 
 /*******************************************************************\

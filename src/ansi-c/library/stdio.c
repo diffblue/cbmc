@@ -42,6 +42,13 @@ inline int puts(const char *s)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
+inline void fclose_cleanup(void *stream)
+{
+  __CPROVER_HIDE:;
+  __CPROVER_assert(__CPROVER_get_must(stream, "closed"),
+                   "resource leak: fopen file not closed");
+}
+
 inline FILE *fopen(const char *filename, const char *mode)
 {
   __CPROVER_HIDE:;
@@ -52,11 +59,13 @@ inline FILE *fopen(const char *filename, const char *mode)
   __CPROVER_assert(__CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
   #endif
 
+  FILE *f;
+
   _Bool fopen_error;
-  if(fopen_error) return NULL;
-  
-  FILE *f=malloc(sizeof(FILE));
+  f=fopen_error?NULL:malloc(sizeof(FILE));
+
   __CPROVER_set_must(f, "open");
+  __CPROVER_cleanup(f, fclose_cleanup);
 
   return f;
 }
@@ -74,6 +83,7 @@ inline int fclose(FILE *stream)
   __CPROVER_assert(__CPROVER_get_must(stream, "open"),
                    "fclose file must be open");
   __CPROVER_clear_must(stream, "open");
+  __CPROVER_set_must(stream, "closed");
   int return_value;
   free(stream);
   return return_value;

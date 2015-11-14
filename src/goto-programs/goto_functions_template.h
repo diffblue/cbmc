@@ -166,12 +166,13 @@ void goto_functions_templatet<bodyT>::output(
   {
     if(it->second.body_available)
     {
-      out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
-      out << std::endl;
+      out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
       
       const symbolt &symbol=ns.lookup(it->first);
-      out << symbol.display_name() << " /* " << symbol.name << " */" << std::endl;
+      out << symbol.display_name() << " /* " << symbol.name << " */\n";
       it->second.body.output(ns, symbol.name, out);
+      
+      out << std::flush;
     }
   }
 }

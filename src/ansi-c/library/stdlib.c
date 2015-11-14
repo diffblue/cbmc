@@ -295,6 +295,11 @@ inline long atol(const char *nptr)
 
 #undef getenv
 
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#include <limits.h>
+#define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
 inline char *getenv(const char *name)
 {
   __CPROVER_HIDE:;
@@ -311,7 +316,11 @@ inline char *getenv(const char *name)
   char *buffer;
   __CPROVER_size_t buf_size;
 
-  __CPROVER_assume(buf_size>=1);
+  // It's reasonable to assume this won't exceed the signed
+  // range in practice, but in principle, this could exceed
+  // the range.
+
+  __CPROVER_assume(1<=buf_size && buf_size<=SSIZE_MAX);
   buffer=(char *)__CPROVER_malloc(buf_size);
   buffer[buf_size-1]=0;
 

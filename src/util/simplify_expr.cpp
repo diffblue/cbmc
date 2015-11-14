@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "replace_expr.h"
 #include "std_types.h"
-#include "bitvector.h"
 #include "simplify_utils.h"
 #include "expr_util.h"
 #include "std_expr.h"
@@ -531,9 +530,6 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   const exprt &operand=expr.op0();
   const irep_idt &op_type_id=op_type.id();
 
-  unsigned expr_width=bv_width(expr_type);
-  unsigned op_width=bv_width(operand.type());
-  
   if(operand.is_constant())
   {
     const irep_idt &value=to_constant_expr(operand).get_value();
@@ -791,7 +787,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     if(operand.operands().size()==1 &&
        op_type_id==expr_type_id &&
        (expr_type_id==ID_unsignedbv || expr_type_id==ID_signedbv) &&
-       expr_width<=op_width)
+       to_bitvector_type(expr_type).get_width()<=
+         to_bitvector_type(operand.type()).get_width())
     {
       exprt tmp;
       tmp.swap(expr.op0().op0());
@@ -1783,7 +1780,7 @@ Function: simplify_exprt::simplify_floatbv_typecast
 bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 {
   // These casts usually reduce precision, and thus, usually round.
-
+  
   assert(expr.operands().size()==2);
         
   const typet &dest_type=ns.follow(expr.type());
@@ -1796,9 +1793,6 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
     return false;
   }
   
-  if(dest_type.id()!=ID_floatbv)
-    return true;
-    
   exprt op0=expr.op0();
   exprt op1=expr.op1(); // rounding mode
   
@@ -1840,11 +1834,26 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
     {
       if(src_type.id()==ID_floatbv)
       {
-        ieee_floatt result(to_constant_expr(op0));
-        result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
-        result.change_spec(to_floatbv_type(dest_type));
-        expr=result.to_expr();
-        return false;
+        if(dest_type.id()==ID_floatbv) // float to float
+        {
+          ieee_floatt result(to_constant_expr(op0));
+          result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+          result.change_spec(to_floatbv_type(dest_type));
+          expr=result.to_expr();
+          return false;
+        }
+        else if(dest_type.id()==ID_signedbv ||
+                dest_type.id()==ID_unsignedbv)
+        {
+          if(rounding_mode==ieee_floatt::ROUND_TO_ZERO)
+          {
+            ieee_floatt result(to_constant_expr(op0));
+            result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+            mp_integer value=result.to_integer();
+            expr=from_integer(value, dest_type);
+            return false;
+          }
+        }
       }
       else if(src_type.id()==ID_signedbv ||
               src_type.id()==ID_unsignedbv)
@@ -1852,12 +1861,15 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         mp_integer value;
         if(!to_integer(op0, value))
         {
-          ieee_floatt result;
-          result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
-          result.spec=to_floatbv_type(dest_type);
-          result.from_integer(value);
-          expr=result.to_expr();
-          return false;
+          if(dest_type.id()==ID_floatbv) // int to float
+          {
+            ieee_floatt result;
+            result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+            result.spec=to_floatbv_type(dest_type);
+            result.from_integer(value);
+            expr=result.to_expr();
+            return false;
+          }
         }
       }
     }
@@ -4521,7 +4533,7 @@ tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
      b.get(ID_value)==ID_NULL)
     return tvt(false);
 
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }
 
 /*******************************************************************\
@@ -4556,7 +4568,7 @@ tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
       return objects_equal_address_of(a.op0(), b.op0());
   }
 
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt::unknown();
 }
 
 /*******************************************************************\
