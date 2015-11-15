@@ -658,6 +658,8 @@ void custom_bitvector_analysist::check(
       if(!i_it->is_assert()) continue;
       if(!has_get_must_or_may(i_it->guard)) continue;
 
+      if(operator[](i_it).is_bottom) continue;
+
       exprt result=eval(i_it->guard, i_it);
       exprt result2=simplify_expr(result, ns);
 
