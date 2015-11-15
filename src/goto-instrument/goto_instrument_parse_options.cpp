@@ -257,7 +257,8 @@ int goto_instrument_parse_optionst::doit()
       
       remove_unused_functions(goto_functions, get_message_handler());
       
-      thread_exit_instrumentation(goto_functions);
+      if(!cmdline.isset("inline"))
+        thread_exit_instrumentation(goto_functions);
 
       // recalculate numbers, etc.
       goto_functions.update();
@@ -299,7 +300,8 @@ int goto_instrument_parse_optionst::doit()
 
       remove_unused_functions(goto_functions, get_message_handler());
     
-      thread_exit_instrumentation(goto_functions);
+      if(!cmdline.isset("inline"))
+        thread_exit_instrumentation(goto_functions);
 
       // recalculate numbers, etc.
       goto_functions.update();
@@ -887,6 +889,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     status() << "Function Pointer Removal" << eom;
     remove_function_pointers(
       symbol_table, goto_functions, cmdline.isset("pointer-check"));
+
+    if(cmdline.isset("show-custom-bitvector-analysis") ||
+       cmdline.isset("custom-bitvector-analysis"))
+    {
+      do_remove_returns();
+      thread_exit_instrumentation(goto_functions);
+    }
 
     status() << "Performing full inlining" << eom;
     goto_inline(goto_functions, ns, ui_message_handler);
