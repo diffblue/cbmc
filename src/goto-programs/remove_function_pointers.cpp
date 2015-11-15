@@ -390,6 +390,9 @@ void remove_function_pointerst::remove_function_pointer(
     // type-compatible?
     if(!is_type_compatible(return_value_used, call_type, f_it->second))
       continue;
+
+    if(f_it->first=="pthread_mutex_cleanup")
+      continue;
     
     symbol_exprt expr;
     expr.type()=f_it->second;
