@@ -44,7 +44,7 @@ xmlt xml(const source_locationt &location)
     result.set_attribute("line", id2string(location.get_line()));
 
   if(!location.get_column().empty())
-    result.set_attribute("column", id2string(location.get_line()));
+    result.set_attribute("column", id2string(location.get_column()));
 
   if(!location.get_function().empty())
     result.set_attribute("function", id2string(location.get_function()));
