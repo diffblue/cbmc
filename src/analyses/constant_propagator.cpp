@@ -18,7 +18,7 @@ Author: Peter Schrammel
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::assign_rec
+Function: constant_propagator_domaint::assign_rec
 
   Inputs:
 
@@ -28,7 +28,7 @@ Function: const_propagator_domaint::assign_rec
 
 \*******************************************************************/
 
-void const_propagator_domaint::assign_rec(
+void constant_propagator_domaint::assign_rec(
   valuest &values,
   const exprt &lhs, const exprt &rhs,
   const namespacet &ns)
@@ -58,7 +58,7 @@ void const_propagator_domaint::assign_rec(
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::transform
+Function: constant_propagator_domaint::transform
 
   Inputs:
 
@@ -68,7 +68,7 @@ Function: const_propagator_domaint::transform
 
 \*******************************************************************/
 
-void const_propagator_domaint::transform(
+void constant_propagator_domaint::transform(
   locationt from,
   locationt to,
   ai_baset &ai,
@@ -121,7 +121,7 @@ void const_propagator_domaint::transform(
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::assign
+Function: constant_propagator_domaint::assign
 
   Inputs:
 
@@ -131,7 +131,7 @@ Function: const_propagator_domaint::assign
 
 \*******************************************************************/
 
-void const_propagator_domaint::assign(
+void constant_propagator_domaint::assign(
   valuest &dest,
   const exprt &lhs,
   exprt rhs,
@@ -161,7 +161,7 @@ void const_propagator_domaint::assign(
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::valuest::maps_to_top
+Function: constant_propagator_domaint::valuest::maps_to_top
 
   Inputs:
 
@@ -171,7 +171,7 @@ Function: const_propagator_domaint::valuest::maps_to_top
 
 \*******************************************************************/
 
-bool const_propagator_domaint::valuest::maps_to_top(const exprt &expr) const
+bool constant_propagator_domaint::valuest::maps_to_top(const exprt &expr) const
 {
   if(expr.id()==ID_side_effect && 
      to_side_effect_expr(expr).get_statement()==ID_nondet) 
@@ -190,7 +190,7 @@ bool const_propagator_domaint::valuest::maps_to_top(const exprt &expr) const
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::valuest::set_to_top
+Function: constant_propagator_domaint::valuest::set_to_top
 
   Inputs:
 
@@ -200,7 +200,7 @@ Function: const_propagator_domaint::valuest::set_to_top
 
 \*******************************************************************/
 
-bool const_propagator_domaint::valuest::set_to_top(const irep_idt &id)
+bool constant_propagator_domaint::valuest::set_to_top(const irep_idt &id)
 {
   bool result = false;
   replace_symbolt::expr_mapt::iterator r_it =
@@ -218,12 +218,12 @@ bool const_propagator_domaint::valuest::set_to_top(const irep_idt &id)
   return result;
 }
 
-bool const_propagator_domaint::valuest::set_to_top(const exprt &expr)
+bool constant_propagator_domaint::valuest::set_to_top(const exprt &expr)
 {
   return set_to_top(to_symbol_expr(expr).get_identifier());
 }
 
-void const_propagator_domaint::valuest::set_all_to_top()
+void constant_propagator_domaint::valuest::set_all_to_top()
 {
   for(replace_symbolt::expr_mapt::iterator it =
         replace_const.expr_map.begin();
@@ -235,7 +235,7 @@ void const_propagator_domaint::valuest::set_all_to_top()
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::valuest::add
+Function: constant_propagator_domaint::valuest::add
 
   Inputs:
 
@@ -245,7 +245,7 @@ Function: const_propagator_domaint::valuest::add
 
 \*******************************************************************/
 
-void const_propagator_domaint::valuest::set_to(const irep_idt &lhs_id,
+void constant_propagator_domaint::valuest::set_to(const irep_idt &lhs_id,
 					    const exprt &rhs_val)
 {
   replace_const.expr_map[lhs_id] = rhs_val;
@@ -253,7 +253,7 @@ void const_propagator_domaint::valuest::set_to(const irep_idt &lhs_id,
   if(it!=top_ids.end()) top_ids.erase(it);
 }
 
-void const_propagator_domaint::valuest::set_to(const exprt &lhs,
+void constant_propagator_domaint::valuest::set_to(const exprt &lhs,
 					    const exprt &rhs_val)
 {
   const irep_idt &lhs_id = to_symbol_expr(lhs).get_identifier();
@@ -262,7 +262,7 @@ void const_propagator_domaint::valuest::set_to(const exprt &lhs,
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::valuest::output
+Function: constant_propagator_domaint::valuest::output
 
   Inputs:
 
@@ -272,7 +272,7 @@ Function: const_propagator_domaint::valuest::output
 
 \*******************************************************************/
 
-void const_propagator_domaint::valuest::output(
+void constant_propagator_domaint::valuest::output(
   std::ostream &out,
   const namespacet &ns) const
 {
@@ -293,7 +293,7 @@ void const_propagator_domaint::valuest::output(
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::output
+Function: constant_propagator_domaint::output
 
   Inputs:
 
@@ -303,7 +303,7 @@ Function: const_propagator_domaint::output
 
 \*******************************************************************/
 
-void const_propagator_domaint::output(
+void constant_propagator_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
   const namespacet &ns) const
@@ -313,7 +313,7 @@ void const_propagator_domaint::output(
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::valuest::merge
+Function: constant_propagator_domaint::valuest::merge
 
   Inputs:
 
@@ -323,7 +323,7 @@ Function: const_propagator_domaint::valuest::merge
 
 \*******************************************************************/
 
-bool const_propagator_domaint::valuest::merge(const valuest &src)
+bool constant_propagator_domaint::valuest::merge(const valuest &src)
 {
   bool changed = false;
   for(replace_symbolt::expr_mapt::const_iterator 
@@ -358,7 +358,7 @@ bool const_propagator_domaint::valuest::merge(const valuest &src)
 
 /*******************************************************************\
 
-Function: const_propagator_domaint::merge
+Function: constant_propagator_domaint::merge
 
   Inputs:
 
@@ -368,8 +368,8 @@ Function: const_propagator_domaint::merge
 
 \*******************************************************************/
 
-bool const_propagator_domaint::merge(
-  const const_propagator_domaint &other,
+bool constant_propagator_domaint::merge(
+  const constant_propagator_domaint &other,
   locationt from,
   locationt to)
 {
@@ -378,7 +378,7 @@ bool const_propagator_domaint::merge(
 
 /*******************************************************************\
 
-Function: const_propagator_ait::replace
+Function: constant_propagator_ait::replace
 
   Inputs:
 
@@ -388,7 +388,7 @@ Function: const_propagator_ait::replace
 
 \*******************************************************************/
 
-void const_propagator_ait::replace(
+void constant_propagator_ait::replace(
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns)
 {
@@ -426,7 +426,7 @@ void const_propagator_ait::replace(
 
 /*******************************************************************\
 
-Function: const_propagator_ait::replace_types_rec
+Function: constant_propagator_ait::replace_types_rec
 
   Inputs:
 
@@ -436,7 +436,7 @@ Function: const_propagator_ait::replace_types_rec
 
 \*******************************************************************/
 
-void const_propagator_ait::replace_types_rec(
+void constant_propagator_ait::replace_types_rec(
   const replace_symbolt &replace_const, 
   exprt &expr)
 {
