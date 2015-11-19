@@ -8,6 +8,10 @@ Author: Peter Schrammel
 
 //#define DEBUG
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <util/find_symbols.h>
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
@@ -72,10 +76,10 @@ void constant_propagator_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-#ifdef DEBUG
+  #ifdef DEBUG
   std::cout << from->location_number << " --> "
-            << to->location_number << std::endl;
-#endif
+            << to->location_number << '\n';
+  #endif
   
   if(from->is_decl())
   {
@@ -109,12 +113,31 @@ void constant_propagator_domaint::transform(
   }
   else if(from->is_function_call())
   {
-    values.set_all_to_top();
+    const exprt &function=to_code_function_call(from->code).function();
+    
+    if(function.id()==ID_symbol)
+    {
+      const irep_idt &identifier=to_symbol_expr(function).get_identifier();
+
+      if(identifier=="__CPROVER_set_must" ||
+         identifier=="__CPROVER_get_must" ||
+         identifier=="__CPROVER_set_may" ||
+         identifier=="__CPROVER_get_may" ||
+         identifier=="__CPROVER_cleanup" ||
+         identifier=="__CPROVER_clear_may" ||
+         identifier=="__CPROVER_clear_must")
+      {
+      }
+      else
+        values.set_all_to_top();
+    }
+    else
+      values.set_all_to_top();
   }
 
-#ifdef DEBUG
-  output(std::cout,ai,ns);
-#endif
+  #ifdef DEBUG
+  output(std::cout, ai, ns);
+  #endif
 }
 
 /*******************************************************************\
@@ -514,6 +537,9 @@ void constant_propagator_ait::replace(
     }
     else if(it->is_function_call())
     {
+      s_it->second.values.replace_const(to_code_function_call(it->code).function());
+      simplify_expr(to_code_function_call(it->code).function(), ns);
+    
       exprt::operandst &args = 
         to_code_function_call(it->code).arguments();
 
