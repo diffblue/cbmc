@@ -45,7 +45,7 @@ bool replace_symbol_extt::replace(exprt &dest) const
     if(object.id()==ID_symbol)
     {
       expr_mapt::const_iterator it=
-      expr_map.find(object.get(ID_identifier));
+        expr_map.find(object.get(ID_identifier));
 
       if(it!=expr_map.end())
 	return false;
