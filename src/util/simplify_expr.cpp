@@ -1296,14 +1296,14 @@ bool simplify_exprt::simplify_mult(exprt &expr)
 
       if(found)
       {
-	// update the constant factor
-	if(!constant->mul(*it)) do_erase=true;
+        // update the constant factor
+        if(!constant->mul(*it)) do_erase=true;
       }
       else
       {
-	// set it as the constant factor if this is the first
-	constant=it;
-	found=true;
+        // set it as the constant factor if this is the first
+        constant=it;
+        found=true;
       }
     }
 
@@ -2368,7 +2368,7 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
     }
   }
   else if(expr.op0().type().id()==ID_integer ||
-	  expr.op0().type().id()==ID_natural)
+          expr.op0().type().id()==ID_natural)
   {
     if(expr.id()==ID_lshr)
     {
@@ -2432,74 +2432,74 @@ bool simplify_exprt::simplify_if_implies(
   if(truth && cond.id()==ID_lt && expr.id()==ID_lt)
   {
     if(cond.op0() == expr.op0() &&
-	cond.op1().is_constant() &&
-	expr.op1().is_constant() &&
-	cond.op1().type() == expr.op1().type())
+        cond.op1().is_constant() &&
+        expr.op1().is_constant() &&
+        cond.op1().type() == expr.op1().type())
     {
       const irep_idt &type_id = cond.op1().type().id();
       if(type_id==ID_integer || type_id==ID_natural)
       {
-	if(string2integer(cond.op1().get_string(ID_value)) >=
-	  string2integer(expr.op1().get_string(ID_value)))
+        if(string2integer(cond.op1().get_string(ID_value)) >=
+          string2integer(expr.op1().get_string(ID_value)))
         {
-	  new_truth = true;
-	  return false;
+          new_truth = true;
+          return false;
         }
       }
       else if(type_id==ID_unsignedbv)
       {
-	const mp_integer i1, i2;
-	if(binary2integer(cond.op1().get_string(ID_value), false) >=
+        const mp_integer i1, i2;
+        if(binary2integer(cond.op1().get_string(ID_value), false) >=
            binary2integer(expr.op1().get_string(ID_value), false))
         {
-	  new_truth = true;
-	  return false;
+          new_truth = true;
+          return false;
         }
       }
       else if(type_id==ID_signedbv)
       {
-	const mp_integer i1, i2;
-	if(binary2integer(cond.op1().get_string(ID_value), true) >=
+        const mp_integer i1, i2;
+        if(binary2integer(cond.op1().get_string(ID_value), true) >=
            binary2integer(expr.op1().get_string(ID_value), true))
         {
-	  new_truth = true;
-	  return false;
+          new_truth = true;
+          return false;
         }
       }
     }
     if(cond.op1() == expr.op1() &&
-	cond.op0().is_constant() &&
-	expr.op0().is_constant() &&
-	cond.op0().type() == expr.op0().type())
+        cond.op0().is_constant() &&
+        expr.op0().is_constant() &&
+        cond.op0().type() == expr.op0().type())
     {
       const irep_idt &type_id = cond.op1().type().id();
       if(type_id==ID_integer || type_id==ID_natural)
       {
-	if(string2integer(cond.op1().get_string(ID_value)) <=
+        if(string2integer(cond.op1().get_string(ID_value)) <=
            string2integer(expr.op1().get_string(ID_value)))
         {
-	  new_truth = true;
-	  return false;
+          new_truth = true;
+          return false;
         }
       }
       else if(type_id==ID_unsignedbv)
       {
-	const mp_integer i1, i2;
-	if(binary2integer(cond.op1().get_string(ID_value), false) <=
+        const mp_integer i1, i2;
+        if(binary2integer(cond.op1().get_string(ID_value), false) <=
            binary2integer(expr.op1().get_string(ID_value), false))
         {
-	  new_truth = true;
-	  return false;
+          new_truth = true;
+          return false;
         }
       }
       else if(type_id==ID_signedbv)
       {
-	const mp_integer i1, i2;
-	if(binary2integer(cond.op1().get_string(ID_value), true) <=
+        const mp_integer i1, i2;
+        if(binary2integer(cond.op1().get_string(ID_value), true) <=
            binary2integer(expr.op1().get_string(ID_value), true))
         {
-	  new_truth = true;
-	  return false;
+          new_truth = true;
+          return false;
         }
       }
     }
@@ -2533,13 +2533,13 @@ bool simplify_exprt::simplify_if_recursive(
     {
       if(new_truth)
       {
-	expr=true_exprt();
-	return false;
+        expr=true_exprt();
+        return false;
       }
       else
       {
-	expr=false_exprt();
-	return false;
+        expr=false_exprt();
+        return false;
       }
     }
   }
@@ -2685,15 +2685,15 @@ bool simplify_exprt::simplify_if_cond(exprt &expr)
     {
       if(expr.has_operands())
       {
-	exprt::operandst &operands = expr.operands();
-	for(exprt::operandst::iterator it1 = operands.begin();
-	    it1 != operands.end(); it1++)
+        exprt::operandst &operands = expr.operands();
+        for(exprt::operandst::iterator it1 = operands.begin();
+            it1 != operands.end(); it1++)
         {
-	  for(exprt::operandst::iterator it2 = operands.begin();
-	      it2 != operands.end(); it2++)
+          for(exprt::operandst::iterator it2 = operands.begin();
+              it2 != operands.end(); it2++)
           {
-	    if(it1 != it2)
-	      tmp = simplify_if_recursive(*it1, *it2, true) && tmp;
+            if(it1 != it2)
+              tmp = simplify_if_recursive(*it1, *it2, true) && tmp;
           }
         }
       }

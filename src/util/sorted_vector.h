@@ -13,11 +13,11 @@
  * fitness for a particular purpose.  This software is provided "AS IS", and
  * you, its user, assume the entire risk as to its quality and accuracy.
  *
- * Created:			November 19th, 2002
- * Last modified:	November 27th, 2002 
-						(changed namespace from std to codeproject;
-						uses template member functions for MSCVER>=1300)
-								
+ * Created:                        November 19th, 2002
+ * Last modified:        November 27th, 2002 
+                                                (changed namespace from std to codeproject;
+                                                uses template member functions for MSCVER>=1300)
+                                                                
  */
 
 #ifndef SORTED_VECTOR_
@@ -61,23 +61,23 @@ public:
   typedef std::pair<const_iterator, const_iterator> Paircc_;
 
   typedef std::pair<iterator, bool> Pairib_;
-	explicit sorted_vector(const Pr& pred = Pr(),const A& al = A())
+        explicit sorted_vector(const Pr& pred = Pr(),const A& al = A())
     :key_compare_(pred),vec_(al){}
 
 #if (_MSC_VER >= 1300)
-	template<class It>
-	sorted_vector(It first, It beyond, 
-					const Pr& pred = Pr(),const A& al = A())
-		:key_compare_(pred),vec_(first,beyond,al)
+        template<class It>
+        sorted_vector(It first, It beyond, 
+                                        const Pr& pred = Pr(),const A& al = A())
+                :key_compare_(pred),vec_(first,beyond,al)
         {stable_sort();}
 #else
     sorted_vector(const_iterator first, const_iterator beyond, 
-					const Pr& pred = Pr(),const A& al = A())
+                                        const Pr& pred = Pr(),const A& al = A())
         :key_compare_(pred),vec_(first,beyond,al)
         {stable_sort();}
 #endif
-	sorted_vector(const Myt_& x)
-		: key_compare_(x.key_compare_),vec_(x.vec_)
+        sorted_vector(const Myt_& x)
+                : key_compare_(x.key_compare_),vec_(x.vec_)
         {}
     ~sorted_vector()                {}
     Myt_& operator=(const Myt_& x) {vec_.operator=(x.vec_);
@@ -85,44 +85,44 @@ public:
                                      return *this;}
     Myt_& operator=(const Cont& x){vec_.operator=(x);
                                     sort();return *this;}
-		
-	void				reserve(size_type n)	{vec_.reserve(n);}
-	iterator			begin()					{return vec_.begin(); }
-	const_iterator		begin() const			{return vec_.begin(); }
-    iterator			end()					{return vec_.end();}
-    const_iterator		end() const				{return vec_.end();}
-    reverse_iterator	rbegin()				{return vec_.rbegin();}
+                
+        void                                reserve(size_type n)        {vec_.reserve(n);}
+        iterator                        begin()                                        {return vec_.begin(); }
+        const_iterator                begin() const                        {return vec_.begin(); }
+    iterator                        end()                                        {return vec_.end();}
+    const_iterator                end() const                                {return vec_.end();}
+    reverse_iterator        rbegin()                                {return vec_.rbegin();}
     const_reverse_iterator rbegin() const   
-												{return vec_.rbegin();}
+                                                                                                {return vec_.rbegin();}
 
-    reverse_iterator rend()						{return vec_.rend();}
+    reverse_iterator rend()                                                {return vec_.rend();}
     const_reverse_iterator rend() const     
-												{return vec_.rend();}
+                                                                                                {return vec_.rend();}
 
 
-    size_type size() const						{return vec_.size();}
-    size_type max_size() const					{return vec_.max_size();}
-    bool empty() const							{return vec_.empty();}
-    A get_allocator() const						{return vec_.get_allocator();}
-    const_reference at(size_type p) const		{return vec_.at(p);}
-    reference at(size_type p)					{return vec_.at(p);}
-	const_reference operator[](size_type p) const
-												{return vec_.operator[](p);}
-		
-	reference operator[](size_type p)			{return vec_.operator[](p);}
-    reference front()							{return vec_.front();}
-	const_reference front() const				{return vec_.front();}
-    reference back()							{return vec_.back();}
-    const_reference back() const				{return vec_.back();}
-    void pop_back()								{vec_.pop_back();}
+    size_type size() const                                                {return vec_.size();}
+    size_type max_size() const                                        {return vec_.max_size();}
+    bool empty() const                                                        {return vec_.empty();}
+    A get_allocator() const                                                {return vec_.get_allocator();}
+    const_reference at(size_type p) const                {return vec_.at(p);}
+    reference at(size_type p)                                        {return vec_.at(p);}
+        const_reference operator[](size_type p) const
+                                                                                                {return vec_.operator[](p);}
+                
+        reference operator[](size_type p)                        {return vec_.operator[](p);}
+    reference front()                                                        {return vec_.front();}
+        const_reference front() const                                {return vec_.front();}
+    reference back()                                                        {return vec_.back();}
+    const_reference back() const                                {return vec_.back();}
+    void pop_back()                                                                {vec_.pop_back();}
 
-    void assign(const_iterator first, const_iterator beyond)					
-												{vec_.assign(first,beyond);}
-	void assign(size_type n, const K& x = K())
-												{vec_.assign(n,x);}
+    void assign(const_iterator first, const_iterator beyond)                                        
+                                                                                                {vec_.assign(first,beyond);}
+        void assign(size_type n, const K& x = K())
+                                                                                                {vec_.assign(n,x);}
 /*insert members*/
    Pairib_ insert(const value_type& x)
-		{
+                {
             if(bNoDuplicates){
                 iterator p= lower_bound(x);
                 if(p==end()||key_compare_(x,*p)){
@@ -147,8 +147,8 @@ public:
                        }
                     }
                }else{
-                   if(	KeyCompare_Leq_(*it,x)
-					   &&((it+1)==end()||KeyCompare_Geq_(*(it+1),x))){
+                   if(        KeyCompare_Leq_(*it,x)
+                                           &&((it+1)==end()||KeyCompare_Geq_(*(it+1),x))){
                        return InsertImpl_(it+1,x);
                    }
                }
@@ -157,7 +157,7 @@ public:
         }
 #if (_MSC_VER >= 1300)
   template<class It>
-	void insert(It first, It beyond)
+        void insert(It first, It beyond)
     {
         size_type n= std::distance(first,beyond);
         reserve(size()+n);
@@ -176,7 +176,7 @@ public:
         }
 #endif
     iterator erase(iterator p)          {return vec_.erase(p);}
-	iterator erase(iterator first, iterator beyond)
+        iterator erase(iterator first, iterator beyond)
                                         {return vec_.erase(first,beyond);}
     size_type erase(const K& key)     
         {
@@ -186,44 +186,44 @@ public:
             return n;
         }
     void clear()                        {return vec_.clear();}
-		
+                
     bool Eq_(const Myt_& x) const      
-		{return (size() == x.size()
-		&& std::equal(begin(), end(), x.begin())); }
-	bool Lt_(const Myt_& x) const
+                {return (size() == x.size()
+                && std::equal(begin(), end(), x.begin())); }
+        bool Lt_(const Myt_& x) const
         {return (std::lexicographical_compare(begin(), end(),
-										x.begin(), x.end()));}
-	void swap(Myt_& x)
+                                                                                x.begin(), x.end()));}
+        void swap(Myt_& x)
         {vec_.swap(x.vec_);std::swap(key_compare_,x.key_compare_);}
         
-	friend void swap(Myt_& x, Myt_& Y_)
-		{x.swap(Y_); }
+        friend void swap(Myt_& x, Myt_& Y_)
+                {x.swap(Y_); }
 
-	key_compare key_comp() const			{return key_compare_; }
-    value_compare value_comp() const		{return (key_comp()); }
-	iterator find(const K& k)
-		{	iterator p = lower_bound(k);
-			return (p==end()||key_compare_(k, *p))? end():p;
-		}
-	const_iterator find(const K& k) const
-		{const_iterator p = lower_bound(k);
+        key_compare key_comp() const                        {return key_compare_; }
+    value_compare value_comp() const                {return (key_comp()); }
+        iterator find(const K& k)
+                {        iterator p = lower_bound(k);
+                        return (p==end()||key_compare_(k, *p))? end():p;
+                }
+        const_iterator find(const K& k) const
+                {const_iterator p = lower_bound(k);
         return (p==end()||key_compare_(k,*p))?end():p;}
-	size_type count(const K& k) const
-		{Paircc_ Ans_ = equal_range(k);
+        size_type count(const K& k) const
+                {Paircc_ Ans_ = equal_range(k);
         size_type n = std::distance(Ans_.first, Ans_.second);
         return (n); }
-	iterator lower_bound(const K& k)
+        iterator lower_bound(const K& k)
         {return std::lower_bound(begin(), end(), k, key_compare_); }
-	const_iterator lower_bound(const K& k) const
+        const_iterator lower_bound(const K& k) const
         {return std::lower_bound(begin(), end(), k, key_compare_); }
-	iterator upper_bound(const K& k)
-		{return std::upper_bound(begin(), end(), k, key_compare_); }
-	const_iterator upper_bound(const K& k) const
-		{return std::upper_bound(begin(), end(), k, key_compare_); }
-	Pairii_ equal_range(const K& k)
+        iterator upper_bound(const K& k)
+                {return std::upper_bound(begin(), end(), k, key_compare_); }
+        const_iterator upper_bound(const K& k) const
+                {return std::upper_bound(begin(), end(), k, key_compare_); }
+        Pairii_ equal_range(const K& k)
         {return std::equal_range(begin(), end(), k, key_compare_); }
-	Paircc_ equal_range(const K& k) const
-		{return std::equal_range(begin(), end(), k, key_compare_); }
+        Paircc_ equal_range(const K& k) const
+                {return std::equal_range(begin(), end(), k, key_compare_); }
 
 /*functions for use with direct std::vector-access*/
     Cont& get_container()
@@ -273,29 +273,29 @@ protected:
 
 
 template<class K,bool bNoDuplicates,class Pr, class A> inline
-	bool operator==(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
-		            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
-	{return x.Eq_(Y_); }
+        bool operator==(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
+                            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
+        {return x.Eq_(Y_); }
 template<class K,bool bNoDuplicates,class Pr, class A> inline
-	bool operator!=(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
-		            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
-	{return !(x == Y_); }
+        bool operator!=(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
+                            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
+        {return !(x == Y_); }
 template<class K,bool bNoDuplicates,class Pr, class A> inline
-	bool operator<(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
-		            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
-	{return x.Lt_(Y_);}
+        bool operator<(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
+                            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
+        {return x.Lt_(Y_);}
 template<class K,bool bNoDuplicates,class Pr,class A> inline
-	bool operator>(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
-		            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
-	{return Y_ < x; }
+        bool operator>(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
+                            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
+        {return Y_ < x; }
 template<class K,bool bNoDuplicates,class Pr, class A> inline
-	bool operator<=(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
-		            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
-	{return !(Y_ < x); }
+        bool operator<=(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
+                            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
+        {return !(Y_ < x); }
 template<class K, bool bNoDuplicates,class Pr,class A> inline
-	bool operator>=(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
-		            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
-	{return (!(x < Y_)); }
+        bool operator>=(const sorted_vector<K, bNoDuplicates,Pr,A>& x,
+                            const sorted_vector<K, bNoDuplicates,Pr,A>& Y_)
+        {return (!(x < Y_)); }
 
 //#pragma warning(pop)
 //#pragma pack(pop)
