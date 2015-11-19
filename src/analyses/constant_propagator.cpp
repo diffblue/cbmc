@@ -300,7 +300,7 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
       ++it)
   {
     if(src.replace_const.expr_map.find(it->first) ==
-       replace_const.expr_map.end())
+       src.replace_const.expr_map.end())
     {
 	changed = set_to_top(it->first);
 	assert(changed);
@@ -350,19 +350,6 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
   
   bool changed = false;
 
-  for(replace_symbolt::expr_mapt::const_iterator 
-      it=replace_const.expr_map.begin();
-      it!=replace_const.expr_map.end();
-      ++it)
-  {
-    if(src.replace_const.expr_map.find(it->first) ==
-       replace_const.expr_map.end())
-    {
-	set_to(it->first, it->second);
-	assert(changed);
-    }
-  }
-    
   for(replace_symbolt::expr_mapt::const_iterator 
       it=src.replace_const.expr_map.begin();
       it!=src.replace_const.expr_map.end();
