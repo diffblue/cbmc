@@ -411,12 +411,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     {
       if(options.get_bool_option("smt1"))
       {
-	options.set_option("boolector", true), solver_set = true;
+        options.set_option("boolector", true), solver_set = true;
       }
       else
       {
-	assert(options.get_bool_option("smt2"));
-	options.set_option("mathsat", true), solver_set = true;
+        assert(options.get_bool_option("smt2"));
+        options.set_option("mathsat", true), solver_set = true;
       }
     }
   }

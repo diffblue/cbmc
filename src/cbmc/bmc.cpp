@@ -407,7 +407,7 @@ safety_checkert::resultt bmct::run(
       symex_slice_by_tracet symex_slice_by_trace(ns);
 
       symex_slice_by_trace.slice_by_trace
-	(options.get_option("slice-by-trace"), equation);
+        (options.get_option("slice-by-trace"), equation);
     }
 
     if(equation.has_threads())
