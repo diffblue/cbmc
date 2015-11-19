@@ -37,7 +37,7 @@ void install_signal_catcher()
   #else
   // declare act to deal with action on signal set
   static struct sigaction act;
-	
+
   act.sa_handler=signal_catcher;
   act.sa_flags=0;
   sigfillset(&(act.sa_mask));

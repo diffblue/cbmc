@@ -254,9 +254,9 @@ mp_integer power(const mp_integer &base,
     {
     case 2:
       {
-	mp_integer result;
-	result.setPower2(exponent.to_ulong());
-	return result;
+        mp_integer result;
+        result.setPower2(exponent.to_ulong());
+        return result;
       }
     case 1: return 1;
     case 0: return 0;
