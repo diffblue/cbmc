@@ -35,7 +35,7 @@ void constant_propagator_domaint::assign_rec(
 
 #ifdef DEBUG
   std::cout << "assign: " << from_expr(ns, "", lhs)
-	    << " := " << from_type(ns, "", rhs_type) << std::endl;
+            << " := " << from_type(ns, "", rhs_type) << std::endl;
 #endif
 
   if(lhs.id()==ID_symbol && rhs_type.id()!=ID_array
@@ -74,7 +74,7 @@ void constant_propagator_domaint::transform(
 {
 #ifdef DEBUG
   std::cout << from->location_number << " --> "
-	    << to->location_number << std::endl;
+            << to->location_number << std::endl;
 #endif
   
   if(from->is_decl())
@@ -137,21 +137,21 @@ void constant_propagator_domaint::assign(
 {
 #ifdef DEBUG
   std::cout << "assign:     " << from_expr(ns, "", lhs)
-	    << " := " << from_expr(ns, "", rhs) << std::endl;
+            << " := " << from_expr(ns, "", rhs) << std::endl;
 #endif
 
   values.replace_const(rhs);
 
 #ifdef DEBUG
   std::cout << "replaced:   " << from_expr(ns, "", lhs)
-	    << " := " << from_expr(ns, "", rhs) << std::endl;
+            << " := " << from_expr(ns, "", rhs) << std::endl;
 #endif
 
   rhs = simplify_expr(rhs, ns);
 
 #ifdef DEBUG
   std::cout << "simplified: " << from_expr(ns, "", lhs)
-	    << " := " << from_expr(ns, "", rhs) << std::endl;
+            << " := " << from_expr(ns, "", rhs) << std::endl;
 #endif
 
   dest.set_to(lhs, rhs);
@@ -350,7 +350,7 @@ void constant_propagator_domaint::valuest::output(
   out << "const map:\n";
 
   for(replace_symbolt::expr_mapt::const_iterator 
-	it=replace_const.expr_map.begin();
+        it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
       ++it)
     out << ' ' << it->first << "=" <<
@@ -359,7 +359,7 @@ void constant_propagator_domaint::valuest::output(
   out << "top ids:\n";
 
   for(std::set<irep_idt>::const_iterator 
-	it=top_ids.begin();
+        it=top_ids.begin();
       it!=top_ids.end();
       ++it)
     out << ' ' << *it << '\n';
@@ -414,7 +414,7 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
       if(c_it->second != it->second)
       {
         set_to_top(it->first);
-	changed = true;
+        changed = true;
       }
     }
     else if(top_ids.find(it->first)==top_ids.end())
@@ -515,13 +515,13 @@ void constant_propagator_ait::replace(
     else if(it->is_function_call())
     {
       exprt::operandst &args = 
-	to_code_function_call(it->code).arguments();
+        to_code_function_call(it->code).arguments();
 
       for(exprt::operandst::iterator o_it = args.begin();
-	  o_it != args.end(); ++o_it)
+          o_it != args.end(); ++o_it)
       {
         s_it->second.values.replace_const(*o_it);
-	*o_it = simplify_expr(*o_it, ns);
+        *o_it = simplify_expr(*o_it, ns);
       }
     }
   }
