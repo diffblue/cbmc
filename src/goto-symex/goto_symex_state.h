@@ -148,7 +148,7 @@ public:
   enum levelt { L0=0, L1=1, L2=2 };
 
   // performs renaming _up to_ the given level
-  void rename(exprt &expr, const namespacet &ns, levelt level=L2);
+  bool rename(exprt &expr, const namespacet &ns, levelt level=L2);
   void rename(
     typet &type,
     const irep_idt &l1_identifier,
@@ -170,7 +170,7 @@ public:
   void get_original_name(exprt &expr) const;
   void get_original_name(typet &type) const;
 protected:
-  void rename_address(exprt &expr, const namespacet &ns, levelt level);
+  bool rename_address(exprt &expr, const namespacet &ns, levelt level);
 
   void set_ssa_indices(ssa_exprt &expr, const namespacet &ns, levelt level=L2);
   // only required for value_set.assign

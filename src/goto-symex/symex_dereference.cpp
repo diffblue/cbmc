@@ -23,44 +23,48 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 #include "symex_dereference_state.h"
 
-void goto_symext::dereference_rec_address_of(
+bool goto_symext::dereference_rec_address_of(
   exprt &expr,
   statet &state,
   guardt &guard)
 {
+  bool result=false;
+
   // Could be member, could be if, could be index.
 
   if(expr.id()==ID_member)
-    dereference_rec_address_of(
+    result=dereference_rec_address_of(
       to_member_expr(expr).struct_op(), state, guard);
   else if(expr.id()==ID_if)
   {
     // the condition is not an address
-    dereference_rec(
+    result=dereference_rec(
       to_if_expr(expr).cond(), state, guard, false);
 
     // add to guard?
-    dereference_rec_address_of(
-      to_if_expr(expr).true_case(), state, guard);
-    dereference_rec_address_of(
-      to_if_expr(expr).false_case(), state, guard);
+    result=dereference_rec_address_of(
+      to_if_expr(expr).true_case(), state, guard) || result;
+    result=dereference_rec_address_of(
+      to_if_expr(expr).false_case(), state, guard) || result;
   }
   else if(expr.id()==ID_index)
   {
     // the index is not an address
-    dereference_rec(
+    result=dereference_rec(
       to_index_expr(expr).index(), state, guard, false);
 
     // the array _is_ an address
-    dereference_rec_address_of(
-      to_index_expr(expr).array(), state, guard);
+    result=dereference_rec_address_of(
+      to_index_expr(expr).array(), state, guard) || result;
   }
   else
   {
     // give up and dereference
 
-    dereference_rec(expr, state, guard, false);
+    result=dereference_rec(expr, state, guard, false);
   }
+
+  return result;
 }
 
 bool goto_symext::is_index_member_symbol_if(const exprt &expr)
@@ -226,12 +230,14 @@ exprt goto_symext::address_arithmetic(
   return result;
 }
 
-void goto_symext::dereference_rec(
+bool goto_symext::dereference_rec(
   exprt &expr,
   statet &state,
   guardt &guard,
   const bool write)
 {
+  bool result=false;
+
   if(expr.id()==ID_dereference)
   {
     if(expr.operands().size()!=1)
@@ -267,6 +273,8 @@ void goto_symext::dereference_rec(
 
     // this may yield a new auto-object
     trigger_auto_object(expr, state);
+
+    result=true;
   }
   else if(expr.id()==ID_index &&
           to_index_expr(expr).array().id()==ID_member &&
@@ -291,6 +299,8 @@ void goto_symext::dereference_rec(
     dereference_rec(tmp, state, guard, write);
 
     expr.swap(tmp);
+
+    result=true;
   }
   else if(expr.id()==ID_index &&
           to_index_expr(expr).array().type().id()==ID_pointer)
@@ -307,6 +317,8 @@ void goto_symext::dereference_rec(
     const typet &expr_type=ns.follow(expr.type());
     expr=address_arithmetic(object, state, guard,
                             expr_type.subtype().id()==ID_array);
+
+    result=true;
   }
   else if(expr.id()==ID_typecast)
   {
@@ -327,17 +339,24 @@ void goto_symext::dereference_rec(
             from_integer(0, index_type())));
 
       dereference_rec(expr, state, guard, write);
+
+      result=true;
     }
     else
     {
-      dereference_rec(tc_op, state, guard, write);
+      result=dereference_rec(tc_op, state, guard, write) || result;
     }
   }
   else
   {
     Forall_operands(it, expr)
-      dereference_rec(*it, state, guard, write);
+      result=dereference_rec(*it, state, guard, write) || result;
   }
+
+  if(result)
+    expr.remove(ID_C_expr_simplified);
+
+  return result;
 }
 
 void goto_symext::dereference(

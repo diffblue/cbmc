@@ -131,13 +131,13 @@ protected:
     statet &state,
     const bool write);
 
-  void dereference_rec(
+  bool dereference_rec(
     exprt &expr,
     statet &state,
     guardt &guard,
     const bool write);
 
-  void dereference_rec_address_of(
+  bool dereference_rec_address_of(
     exprt &expr,
     statet &state,
     guardt &guard);

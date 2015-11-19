@@ -22,6 +22,9 @@ bool replace_expr(const exprt &what, const exprt &by, exprt &dest)
   Forall_operands(it, dest)
     result=replace_expr(what, by, *it) && result;
 
+  if(!result)
+    dest.remove(ID_C_expr_simplified);
+
   return result;
 }
 
@@ -41,6 +44,9 @@ bool replace_expr(const replace_mapt &what, exprt &dest)
 
   Forall_operands(it, dest)
     result=replace_expr(what, *it) && result;
+
+  if(!result)
+    dest.remove(ID_C_expr_simplified);
 
   return result;
 }
