@@ -50,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/interval_domain.h>
 #include <analyses/reaching_definitions.h>
 #include <analyses/dependence_graph.h>
+#include <analyses/constant_propagator.h>
 
 #include <cbmc/version.h>
 
@@ -903,6 +904,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     status() << "Performing full inlining" << eom;
     goto_inline(goto_functions, ns, ui_message_handler);
+  }
+
+  if(cmdline.isset("constant-propagator"))
+  {
+    do_function_pointer_removal();
+
+    namespacet ns(symbol_table);
+
+    status() << "Propagating Constants" << eom;
+
+    constant_propagator_ait constant_propagator_ai(goto_functions, ns);
   }
 
   // add generic checks, if needed
