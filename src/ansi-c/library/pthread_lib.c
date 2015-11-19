@@ -452,28 +452,7 @@ extern __CPROVER_bool __CPROVER_threads_exited[];
 extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
 extern unsigned long __CPROVER_next_thread_id;
 
-// using separate function avoid unnecessary copies of local variables
-// from functions invoking pthread_create, don't inline!
-void __actual_thread_spawn(
-  void * (*start_routine)(void *),
-  void *arg,
-  unsigned long id)
-{
-  __CPROVER_HIDE:;
-  
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
-  // Clear all locked mutexes; locking must happen in same thread.
-  __CPROVER_clear_must(0, "mutex-locked");
-  #endif
-  
-  __CPROVER_ASYNC_1: __CPROVER_thread_id=id,
-                       start_routine(arg),
-                       __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
-                                       "WWcumul", "RRcumul", "RWcumul", "WRcumul"),
-                       __CPROVER_threads_exited[id]=1;
-}
-
-int pthread_create(
+inline int pthread_create(
   pthread_t *thread,
   const pthread_attr_t *attr,
   void * (*start_routine)(void *),
@@ -500,7 +479,18 @@ int pthread_create(
   }
 
   if(attr) (void)*attr;
-  __actual_thread_spawn(start_routine, arg, this_thread_id);
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
+  // Clear all locked mutexes; locking must happen in same thread.
+  __CPROVER_clear_must(0, "mutex-locked");
+  #endif
+  
+  __CPROVER_ASYNC_1:
+    __CPROVER_thread_id=this_thread_id,
+    start_routine(arg),
+    __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                    "WWcumul", "RRcumul", "RWcumul", "WRcumul"),
+    __CPROVER_threads_exited[this_thread_id]=1;
 
   return 0;
 }
