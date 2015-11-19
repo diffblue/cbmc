@@ -6,7 +6,7 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -195,7 +195,7 @@ Function: constant_propagator_domaint::valuest::set_to_top
 
  Outputs:
 
- Purpose:
+ Purpose: Do not call this when iterating over replace_const.expr_map!
 
 \*******************************************************************/
 
@@ -297,14 +297,16 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
   for(replace_symbolt::expr_mapt::const_iterator 
       it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
-      ++it)
+      )
   {
     if(src.replace_const.expr_map.find(it->first) ==
        src.replace_const.expr_map.end())
     {
-	changed = set_to_top(it->first);
-	assert(changed);
+      //cannot use set_to_top here
+      replace_const.expr_map.erase(it++);
+      changed = true;
     }
+    else ++it;
   }
 
   for(replace_symbolt::expr_mapt::const_iterator 
@@ -327,6 +329,10 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     // is not in "this", ignore
     else { }
   }
+
+#ifdef DEBUG
+  std::cout << "merged: " << changed << '\n';
+#endif
 
   return changed;
 }
