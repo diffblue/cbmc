@@ -41,8 +41,8 @@ public:
     bool empty() const
     {
       return replace_const.expr_map.empty() && 
-	replace_const.type_map.empty() &&
-	top_ids.empty();
+        replace_const.type_map.empty() &&
+        top_ids.empty();
     }
 
     void set_to(const exprt &lhs, const exprt &rhs_val);
@@ -65,8 +65,8 @@ protected:
     const namespacet &ns) const;
 
   void assign_rec(valuest &values,
-		  const exprt &lhs, const exprt &rhs,
-		  const namespacet &ns);
+                  const exprt &lhs, const exprt &rhs,
+                  const namespacet &ns);
 };
 
 class constant_propagator_ait:public ait<constant_propagator_domaint>
