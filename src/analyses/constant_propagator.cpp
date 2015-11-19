@@ -389,6 +389,26 @@ Function: constant_propagator_ait::replace
 \*******************************************************************/
 
 void constant_propagator_ait::replace(
+  goto_functionst &goto_functions,
+  const namespacet &ns)
+{
+  Forall_goto_functions(f_it, goto_functions)
+    replace(f_it->second, ns);
+}
+
+/*******************************************************************\
+
+Function: constant_propagator_ait::replace
+
+  Inputs:
+
+ Outputs: 
+
+ Purpose:
+
+\*******************************************************************/
+
+void constant_propagator_ait::replace(
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns)
 {
