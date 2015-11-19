@@ -888,6 +888,18 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   namespacet ns(symbol_table);
 
+  if(cmdline.isset("show-custom-bitvector-analysis") ||
+     cmdline.isset("custom-bitvector-analysis"))
+  {
+    partial_inlining_done=true;
+    status() << "Partial Inlining" << eom;
+    const namespacet ns(symbol_table);
+    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    status() << "Propagating Constants" << eom;
+    constant_propagator_ait constant_propagator_ai(goto_functions, ns);
+    remove_skip(goto_functions);
+  }
+
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
@@ -915,6 +927,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     status() << "Propagating Constants" << eom;
 
     constant_propagator_ait constant_propagator_ai(goto_functions, ns);
+    
+    remove_skip(goto_functions);
   }
 
   // add generic checks, if needed
