@@ -42,7 +42,7 @@ void constant_propagator_domaint::assign_rec(
                          && rhs_type.id()!=ID_struct
                          && rhs_type.id()!=ID_union)
   {
-    if(!values.maps_to_top(rhs))
+    if(values.is_constant(rhs))
       assign(values, lhs, rhs, ns);
     else
       values.set_to_top(lhs);
@@ -159,7 +159,7 @@ void constant_propagator_domaint::assign(
 
 /*******************************************************************\
 
-Function: constant_propagator_domaint::valuest::maps_to_top
+Function: constant_propagator_domaint::valuest::is_constant
 
   Inputs:
 
@@ -169,24 +169,52 @@ Function: constant_propagator_domaint::valuest::maps_to_top
 
 \*******************************************************************/
 
-bool constant_propagator_domaint::valuest::maps_to_top(const exprt &expr) const
+bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
 {
   if(expr.id()==ID_side_effect && 
      to_side_effect_expr(expr).get_statement()==ID_nondet) 
-    return true;
+    return false;
 
   if(expr.id()==ID_symbol)
     if(replace_const.expr_map.find(to_symbol_expr(expr).get_identifier()) ==
        replace_const.expr_map.end())
-      return true;
+      return false;
+
+  if(expr.id()==ID_address_of)
+    return is_constant_address_of(to_address_of_expr(expr).object());
 
   forall_operands(it, expr)
-  {
-    if(maps_to_top(*it))
-      return true;
-  }
+    if(!is_constant(*it))
+      return false;
 
-  return false;
+  return true;
+}
+
+/*******************************************************************\
+
+Function: constant_propagator_domaint::valuest::is_constant_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool constant_propagator_domaint::valuest::is_constant_address_of(const exprt &expr) const
+{
+  if(expr.id()==ID_index)
+    return is_constant_address_of(to_index_expr(expr).array()) &&
+           is_constant(to_index_expr(expr).index());
+  
+  if(expr.id()==ID_member)
+    return is_constant_address_of(to_member_expr(expr).struct_op());
+  
+  if(expr.id()==ID_dereference)
+    return is_constant(to_dereference_expr(expr).pointer());
+  
+  return true;
 }
 
 /*******************************************************************\

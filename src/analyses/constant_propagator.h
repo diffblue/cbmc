@@ -48,7 +48,8 @@ public:
     void set_to(const exprt &lhs, const exprt &rhs_val);
     void set_to(const irep_idt &lhs_id, const exprt &rhs_val);
     
-    bool maps_to_top(const exprt &expr) const;
+    bool is_constant(const exprt &expr) const;
+    bool is_constant_address_of(const exprt &expr) const;
     bool set_to_top(const exprt &expr);
     bool set_to_top(const irep_idt &id);
     void set_all_to_top();
