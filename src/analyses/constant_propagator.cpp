@@ -97,23 +97,17 @@ void constant_propagator_domaint::transform(
     const exprt &rhs = assignment.rhs();
     assign_rec(values, lhs, rhs, ns);
   }
+  else if(from->is_assume())
+  {
+    two_way_propagate_rec(from->guard, ns);
+  }
   else if(from->is_goto())
   {
     exprt g; 
     if(from->get_target()==to) g  = simplify_expr(from->guard,ns);
     else g  = simplify_expr(not_exprt(from->guard),ns);
-    
-    if(g.id()==ID_equal)
-    {
-      const exprt &lhs = g.op0(); 
-      const exprt &rhs = g.op1();
 
-      // two-way propagation 
-      valuest copy_values = values;
-      assign_rec(copy_values, lhs, rhs, ns);
-      assign_rec(values, rhs, lhs, ns);
-      values.meet(copy_values);
-    }
+    two_way_propagate_rec(g, ns);
   }
   else if(from->is_dead())
   {
@@ -130,6 +124,59 @@ void constant_propagator_domaint::transform(
   std::cout << "after:\n";
   output(std::cout,ai,ns);
 #endif
+}
+
+
+/*******************************************************************\
+
+Function: constant_propagator_domaint::two_way_propagate_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: handles equalities and conjunctions containing equalities
+
+\*******************************************************************/
+
+bool constant_propagator_domaint::two_way_propagate_rec(
+  const exprt &expr,
+  const namespacet &ns)
+{
+#ifdef DEBUG
+  std::cout << "two_way_propagate_rec: " << from_expr(ns,"",expr) << '\n';
+#endif
+  bool change = false;
+  
+  if(expr.id()==ID_and)
+  {
+    // need a fixed point here to get the most out of it
+    do
+    {
+      change = false;
+      
+      forall_operands(it, expr)
+	if(two_way_propagate_rec(*it, ns))
+	  change = true;
+    }
+    while(change);
+  }
+  else if(expr.id()==ID_equal)
+  {
+    const exprt &lhs = expr.op0(); 
+    const exprt &rhs = expr.op1();
+
+    // two-way propagation 
+    valuest copy_values = values;
+    assign_rec(copy_values, lhs, rhs, ns);
+    assign_rec(values, rhs, lhs, ns);
+    change = values.meet(copy_values);
+  }
+
+#ifdef DEBUG
+  std::cout << "two_way_propagate_rec: " << change << '\n';
+#endif
+  return change;
 }
 
 /*******************************************************************\

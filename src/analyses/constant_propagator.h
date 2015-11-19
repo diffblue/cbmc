@@ -81,6 +81,9 @@ protected:
   void assign_rec(valuest &values,
 		  const exprt &lhs, const exprt &rhs,
 		  const namespacet &ns);
+
+  bool two_way_propagate_rec(const exprt &expr,
+			     const namespacet &ns);
 };
 
 class constant_propagator_ait:public ait<constant_propagator_domaint>
