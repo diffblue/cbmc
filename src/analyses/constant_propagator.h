@@ -23,36 +23,51 @@ public:
   struct valuest
   {
   public:
+    explicit valuest() : is_bottom(true) {}
+    
     // maps variables to constants
     replace_symbol_extt replace_const;
-    std::set<irep_idt> top_ids;
+    bool is_bottom;
     
     void output(std::ostream &, const namespacet &) const;
     
     bool merge(const valuest &src);
+    bool meet(const valuest &src);
     
-    inline void clear()
+    inline void set_to_bottom()
     {
       replace_const.expr_map.clear();
       replace_const.type_map.clear();
-      top_ids.clear();
+      is_bottom = true;
     }
     
-    bool empty() const
+    inline void set_to(const irep_idt &lhs_id, const exprt &rhs_val)
     {
-      return replace_const.expr_map.empty() && 
-        replace_const.type_map.empty() &&
-        top_ids.empty();
+      replace_const.expr_map[lhs_id] = rhs_val;
+      is_bottom = false;
     }
 
-    void set_to(const exprt &lhs, const exprt &rhs_val);
-    void set_to(const irep_idt &lhs_id, const exprt &rhs_val);
-    
+    inline void set_to(const exprt &lhs, const exprt &rhs_val)
+    {
+      const irep_idt &lhs_id = to_symbol_expr(lhs).get_identifier();
+      set_to(lhs_id, rhs_val);
+    }
+
     bool is_constant(const exprt &expr) const;
     bool is_constant_address_of(const exprt &expr) const;
-    bool set_to_top(const exprt &expr);
     bool set_to_top(const irep_idt &id);
-    void set_all_to_top();
+
+    inline bool set_to_top(const exprt &expr)
+    {
+      return set_to_top(to_symbol_expr(expr).get_identifier());
+    }
+    
+    inline void set_to_top()
+    {
+      replace_const.expr_map.clear();
+      replace_const.type_map.clear();
+      is_bottom = false;
+    }
   };
 
   valuest values;
@@ -67,6 +82,9 @@ protected:
   void assign_rec(valuest &values,
                   const exprt &lhs, const exprt &rhs,
                   const namespacet &ns);
+
+  bool two_way_propagate_rec(const exprt &expr,
+			     const namespacet &ns);
 };
 
 class constant_propagator_ait:public ait<constant_propagator_domaint>
