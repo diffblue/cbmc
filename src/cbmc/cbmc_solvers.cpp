@@ -473,7 +473,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
     return new cbmc_solver_with_filet(smt2_conv, out);
   }
 }
-	  
+
 /*******************************************************************\
 
 Function: cbmc_solverst::no_beautification
