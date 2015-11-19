@@ -8,8 +8,6 @@ Author: Peter Schrammel
 
 //#define DEBUG
 
-#include <iostream>
-
 #include <util/find_symbols.h>
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
@@ -88,7 +86,7 @@ void constant_propagator_domaint::transform(
     const code_assignt &assignment=to_code_assign(from->code);
     const exprt &lhs = assignment.lhs();
     const exprt &rhs = assignment.rhs();
-    assign_rec(values,lhs,rhs,ns);
+    assign_rec(values, lhs, rhs, ns);
   }
   else if(from->is_goto())
   {
@@ -97,10 +95,10 @@ void constant_propagator_domaint::transform(
       const exprt &lhs = from->guard.op0(); 
       const exprt &rhs = from->guard.op1();
 
-      //two-way propagation 
+      // two-way propagation 
       valuest copy_values = values;
-      assign_rec(copy_values,lhs,rhs,ns);
-      assign_rec(values,rhs,lhs,ns);
+      assign_rec(copy_values, lhs, rhs, ns);
+      assign_rec(values, rhs, lhs, ns);
       values.merge(copy_values);
     }
   }
@@ -182,7 +180,7 @@ bool constant_propagator_domaint::valuest::maps_to_top(const exprt &expr) const
        replace_const.expr_map.end())
       return true;
 
-  forall_operands(it,expr)
+  forall_operands(it, expr)
   {
     if(maps_to_top(*it))
       return true;
@@ -490,6 +488,7 @@ void constant_propagator_ait::replace(
     {
       exprt::operandst &args = 
 	to_code_function_call(it->code).arguments();
+
       for(exprt::operandst::iterator o_it = args.begin();
 	  o_it != args.end(); ++o_it)
       {
@@ -517,7 +516,8 @@ void constant_propagator_ait::replace_types_rec(
   exprt &expr)
 {
   replace_const(expr.type());
-  Forall_operands(it,expr)
-    replace_types_rec(replace_const,*it);
+
+  Forall_operands(it, expr)
+    replace_types_rec(replace_const, *it);
 }
 
