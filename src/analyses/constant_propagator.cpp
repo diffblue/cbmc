@@ -80,6 +80,11 @@ void constant_propagator_domaint::transform(
   std::cout << from->location_number << " --> "
             << to->location_number << '\n';
   #endif
+
+#ifdef DEBUG
+  std::cout << "before:\n";
+  output(std::cout,ai,ns);
+#endif
   
   if(from->is_decl())
   {
@@ -92,19 +97,17 @@ void constant_propagator_domaint::transform(
     const exprt &rhs = assignment.rhs();
     assign_rec(values, lhs, rhs, ns);
   }
+  else if(from->is_assume())
+  {
+    two_way_propagate_rec(from->guard, ns);
+  }
   else if(from->is_goto())
   {
-    if(from->guard.id()==ID_equal && from->get_target()==to)
-    {
-      const exprt &lhs = from->guard.op0(); 
-      const exprt &rhs = from->guard.op1();
+    exprt g; 
+    if(from->get_target()==to) g = simplify_expr(from->guard,ns);
+    else g = simplify_expr(not_exprt(from->guard),ns);
 
-      // two-way propagation 
-      valuest copy_values = values;
-      assign_rec(copy_values, lhs, rhs, ns);
-      assign_rec(values, rhs, lhs, ns);
-      values.merge(copy_values);
-    }
+    two_way_propagate_rec(g, ns);
   }
   else if(from->is_dead())
   {
@@ -129,15 +132,69 @@ void constant_propagator_domaint::transform(
       {
       }
       else
-        values.set_all_to_top();
+        values.set_to_top();
     }
     else
-      values.set_all_to_top();
+      values.set_to_top();
   }
 
-  #ifdef DEBUG
-  output(std::cout, ai, ns);
-  #endif
+#ifdef DEBUG
+  std::cout << "after:\n";
+  output(std::cout,ai,ns);
+#endif
+}
+
+
+/*******************************************************************\
+
+Function: constant_propagator_domaint::two_way_propagate_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: handles equalities and conjunctions containing equalities
+
+\*******************************************************************/
+
+bool constant_propagator_domaint::two_way_propagate_rec(
+  const exprt &expr,
+  const namespacet &ns)
+{
+#ifdef DEBUG
+  std::cout << "two_way_propagate_rec: " << from_expr(ns,"",expr) << '\n';
+#endif
+  bool change = false;
+  
+  if(expr.id()==ID_and)
+  {
+    // need a fixed point here to get the most out of it
+    do
+    {
+      change = false;
+      
+      forall_operands(it, expr)
+	if(two_way_propagate_rec(*it, ns))
+	  change = true;
+    }
+    while(change);
+  }
+  else if(expr.id()==ID_equal)
+  {
+    const exprt &lhs = expr.op0(); 
+    const exprt &rhs = expr.op1();
+
+    // two-way propagation 
+    valuest copy_values = values;
+    assign_rec(copy_values, lhs, rhs, ns);
+    assign_rec(values, rhs, lhs, ns);
+    change = values.meet(copy_values);
+  }
+
+#ifdef DEBUG
+  std::cout << "two_way_propagate_rec: " << change << '\n';
+#endif
+  return change;
 }
 
 /*******************************************************************\
@@ -158,25 +215,8 @@ void constant_propagator_domaint::assign(
   exprt rhs,
   const namespacet &ns) const
 {
-#ifdef DEBUG
-  std::cout << "assign:     " << from_expr(ns, "", lhs)
-            << " := " << from_expr(ns, "", rhs) << std::endl;
-#endif
-
   values.replace_const(rhs);
-
-#ifdef DEBUG
-  std::cout << "replaced:   " << from_expr(ns, "", lhs)
-            << " := " << from_expr(ns, "", rhs) << std::endl;
-#endif
-
   rhs = simplify_expr(rhs, ns);
-
-#ifdef DEBUG
-  std::cout << "simplified: " << from_expr(ns, "", lhs)
-            << " := " << from_expr(ns, "", rhs) << std::endl;
-#endif
-
   dest.set_to(lhs, rhs);
 }
 
@@ -248,7 +288,7 @@ Function: constant_propagator_domaint::valuest::set_to_top
 
  Outputs:
 
- Purpose:
+ Purpose: Do not call this when iterating over replace_const.expr_map!
 
 \*******************************************************************/
 
@@ -261,97 +301,12 @@ bool constant_propagator_domaint::valuest::set_to_top(const irep_idt &id)
 
   if(r_it != replace_const.expr_map.end())
   {
+    assert(!is_bottom);
     replace_const.expr_map.erase(r_it);
     result = true;
   }
 
-  if(top_ids.find(id)==top_ids.end())
-  {
-    top_ids.insert(id);
-    result = true;
-  }
-
   return result;
-}
-
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::set_to_top
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool constant_propagator_domaint::valuest::set_to_top(const exprt &expr)
-{
-  return set_to_top(to_symbol_expr(expr).get_identifier());
-}
-
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::set_all_to_top
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void constant_propagator_domaint::valuest::set_all_to_top()
-{
-  for(replace_symbolt::expr_mapt::iterator it =
-        replace_const.expr_map.begin();
-      it != replace_const.expr_map.end(); ++it)
-    top_ids.insert(it->first);
-
-  replace_const.expr_map.clear();
-}
-
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::set_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void constant_propagator_domaint::valuest::set_to(
-  const irep_idt &lhs_id,
-  const exprt &rhs_val)
-{
-  replace_const.expr_map[lhs_id] = rhs_val;
-  std::set<irep_idt>::iterator it = top_ids.find(lhs_id);
-  if(it!=top_ids.end()) top_ids.erase(it);
-}
-
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::set_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void constant_propagator_domaint::valuest::set_to(
-  const exprt &lhs,
-  const exprt &rhs_val)
-{
-  const irep_idt &lhs_id = to_symbol_expr(lhs).get_identifier();
-  set_to(lhs_id, rhs_val);
 }
 
 /*******************************************************************\
@@ -372,20 +327,15 @@ void constant_propagator_domaint::valuest::output(
 {
   out << "const map:\n";
 
+  if(is_bottom)
+    out << "  bottom\n";
+
   for(replace_symbolt::expr_mapt::const_iterator 
-        it=replace_const.expr_map.begin();
+	it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
       ++it)
     out << ' ' << it->first << "=" <<
       from_expr(ns, "", it->second) << '\n';
-
-  out << "top ids:\n";
-
-  for(std::set<irep_idt>::const_iterator 
-        it=top_ids.begin();
-      it!=top_ids.end();
-      ++it)
-    out << ' ' << *it << '\n';
 }
 
 /*******************************************************************\
@@ -416,12 +366,87 @@ Function: constant_propagator_domaint::valuest::merge
 
  Outputs: Return true if "this" has changed.
 
- Purpose:
+ Purpose: join
 
 \*******************************************************************/
 
 bool constant_propagator_domaint::valuest::merge(const valuest &src)
 {
+  //nothing to do 
+  if(src.is_bottom)
+    return false;
+
+  //just copy
+  if(is_bottom)
+  {
+    replace_const = src.replace_const;
+    is_bottom = src.is_bottom;
+    return true;
+  }
+  
+  bool changed = false;
+
+  //set everything to top that is not in src
+  for(replace_symbolt::expr_mapt::const_iterator 
+        it=replace_const.expr_map.begin();
+      it!=replace_const.expr_map.end();
+      )
+  {
+    if(src.replace_const.expr_map.find(it->first) ==
+       src.replace_const.expr_map.end())
+    {
+      //cannot use set_to_top here
+      replace_const.expr_map.erase(it++);
+      changed = true;
+    }
+    else ++it;
+  }
+
+  for(replace_symbolt::expr_mapt::const_iterator 
+      it=src.replace_const.expr_map.begin();
+      it!=src.replace_const.expr_map.end();
+      ++it)
+  {      
+    replace_symbolt::expr_mapt::iterator 
+      c_it = replace_const.expr_map.find(it->first);
+
+    if(c_it != replace_const.expr_map.end())
+    {
+      // values are different, set to top
+      if(c_it->second != it->second)
+      {
+	changed = set_to_top(it->first);
+	assert(changed);
+      }
+    }
+    // is not in "this", ignore
+    else { }
+  }
+
+#ifdef DEBUG
+  std::cout << "merged: " << changed << '\n';
+#endif
+
+  return changed;
+}
+
+/*******************************************************************\
+
+Function: constant_propagator_domaint::valuest::meet
+
+  Inputs:
+
+ Outputs: Return true if "this" has changed.
+
+ Purpose: meet
+
+\*******************************************************************/
+
+bool constant_propagator_domaint::valuest::meet(const valuest &src)
+{
+  if(src.is_bottom || is_bottom)
+    return false;
+  
   bool changed = false;
 
   for(replace_symbolt::expr_mapt::const_iterator 
@@ -436,23 +461,16 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     {
       if(c_it->second != it->second)
       {
-        set_to_top(it->first);
+        set_to_bottom();
         changed = true;
+	break;
       }
     }
-    else if(top_ids.find(it->first)==top_ids.end())
+    else
     {
       set_to(it->first, it->second);
       changed = true;
     }
-  }
-
-  for(std::set<irep_idt>::const_iterator
-      it=src.top_ids.begin();
-      it!=src.top_ids.end(); ++it)
-  {
-    bool c = set_to_top(*it);
-    changed = changed || c;
   }
 
   return changed;
