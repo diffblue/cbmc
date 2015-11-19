@@ -6,20 +6,19 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-#ifndef CPROVER_CONST_PROPAGATOR_H
-#define CPROVER_CONST_PROPAGATOR_H
+#ifndef CPROVER_CONSTANT_PROPAGATOR_H
+#define CPROVER_CONSTANT_PROPAGATOR_H
 
-#include <iostream>
+#include "ai.h"
 
-#include <analyses/ai.h>
 #include "replace_symbol_ext.h"
 
-class const_propagator_domaint:public ai_domain_baset
+class constant_propagator_domaint:public ai_domain_baset
 {
 public:
   virtual void transform(locationt, locationt, ai_baset &, const namespacet &);
   virtual void output(std::ostream &, const ai_baset &, const namespacet &) const;
-  bool merge(const const_propagator_domaint &, locationt, locationt);
+  bool merge(const constant_propagator_domaint &, locationt, locationt);
 
   struct valuest
   {
@@ -69,10 +68,10 @@ protected:
 		  const namespacet &ns);
 };
 
-class const_propagator_ait:public ait<const_propagator_domaint>
+class constant_propagator_ait:public ait<constant_propagator_domaint>
 {
 public:
-  const_propagator_ait(
+  constant_propagator_ait(
     goto_functionst::goto_functiont &goto_function,
     const namespacet &ns)
   {
@@ -81,7 +80,7 @@ public:
   }
 
 protected:
-  friend class const_propagator_domaint;
+  friend class constant_propagator_domaint;
 
 void replace(
   goto_functionst::goto_functiont &goto_function,
