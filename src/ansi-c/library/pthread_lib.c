@@ -8,8 +8,11 @@
 inline int pthread_cancel(pthread_t thread)
 {
   __CPROVER_HIDE:;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must((void *)thread, "pthread-id"),
                    "must be given valid thread ID");
+  #endif
 
   int result;
   return result;
@@ -32,13 +35,15 @@ typedef signed char __CPROVER_mutex_t;
 #endif
 #endif
 
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
 inline void pthread_mutex_cleanup(void *p)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   __CPROVER_assert(
     __CPROVER_get_must(p, "mutex-destroyed"),
     "mutex must be destroyed");
 }
+#endif
 
 inline int pthread_mutex_init(
   pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
@@ -46,9 +51,13 @@ inline int pthread_mutex_init(
   __CPROVER_HIDE:;
   *((__CPROVER_mutex_t *)mutex)=0;
   if(mutexattr!=0) (void)*mutexattr;
+  
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_cleanup(mutex, pthread_mutex_cleanup);
   __CPROVER_set_must(mutex, "mutex-init");
   __CPROVER_clear_may(mutex, "mutex-destroyed");
+  #endif
+
   return 0;
 }
 
@@ -74,6 +83,7 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
 
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
                    "mutex must be initialized");
 
@@ -88,6 +98,7 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)!=-1,
     "mutex not initialised or destroyed");
+  #endif
 
   __CPROVER_assume(!*((__CPROVER_mutex_t *)mutex));
 
@@ -123,11 +134,13 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
   int return_value;
   __CPROVER_atomic_begin();
 
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
                    "mutex must be initialized");
 
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)!=-1,
     "mutex not initialised or destroyed");
+  #endif
 
   if(*((__CPROVER_mutex_t *)mutex)==1)
   {
@@ -170,6 +183,7 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
 
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
                    "mutex must be initialized");
 
@@ -180,6 +194,7 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
                    "mutex must not be destroyed");
 
   __CPROVER_clear_may(mutex, "mutex-locked");
+  #endif
 
   // the fence must be before the unlock
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
@@ -214,6 +229,7 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
 
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
                    "mutex must be initialized");
 
@@ -223,12 +239,13 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
   __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-destroyed"),
                    "mutex must not be destroyed");
 
+  __CPROVER_set_must(mutex, "mutex-destroyed");
+  __CPROVER_set_may(mutex, "mutex-destroyed");
+  #endif
+
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==0,
     "lock held upon destroy");
   *((__CPROVER_mutex_t *)mutex)=-1;
-
-  __CPROVER_set_must(mutex, "mutex-destroyed");
-  __CPROVER_set_may(mutex, "mutex-destroyed");
 
   return 0;
 }
@@ -271,8 +288,10 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
 {
   __CPROVER_HIDE:;
 
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   //__CPROVER_assert(__CPROVER_get_must(&thread, "pthread-id"),
   //                 "must be given valid thread ID");
+  #endif
 
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
   if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
@@ -295,7 +314,11 @@ inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
   __CPROVER_assert(*((signed char *)lock)==0,
     "rwlock held upon destroy");
   *((signed char *)lock)=-1;
+  
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS   
   __CPROVER_set_must(lock, "rwlock_destroyed");
+  #endif
+
   return 0;
 }
 
@@ -306,12 +329,14 @@ inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS  
 inline void pthread_rwlock_cleanup(void *p)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   __CPROVER_assert(__CPROVER_get_must(p, "rwlock_destroyed"),
                    "rwlock must be destroyed");
 }
+#endif
 
 inline int pthread_rwlock_init(pthread_rwlock_t *lock, 
   const pthread_rwlockattr_t *attr)
@@ -319,7 +344,11 @@ inline int pthread_rwlock_init(pthread_rwlock_t *lock,
   __CPROVER_HIDE:;
   (*(signed char *)lock)=0;
   if(attr!=0) (void)*attr;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
   __CPROVER_cleanup(lock, pthread_rwlock_cleanup);
+  #endif
+
   return 0;
 }
 
@@ -432,8 +461,10 @@ void __actual_thread_spawn(
 {
   __CPROVER_HIDE:;
   
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
   // Clear all locked mutexes; locking must happen in same thread.
   __CPROVER_clear_must(0, "mutex-locked");
+  #endif
   
   __CPROVER_ASYNC_1: __CPROVER_thread_id=id,
                        start_routine(arg),
@@ -454,7 +485,9 @@ int pthread_create(
   this_thread_id=++__CPROVER_next_thread_id;
   __CPROVER_atomic_end();
   
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(thread, "pthread-id");
+  #endif
 
   if(thread)
   {
@@ -632,8 +665,12 @@ inline int pthread_barrier_init(
   __CPROVER_HIDE:;
   (void)attr;
   (void)count;
+  
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(barrier, "barrier-init");
   __CPROVER_clear_may(barrier, "barrier-destroyed");
+  #endif
+  
   int result;
   return result;
 }       
@@ -648,11 +685,15 @@ inline int pthread_barrier_init(
 inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
+  
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(barrier, "barrier-init"),
                    "pthread barrier must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(barrier, "barrier-destroyed"),
                    "pthread barrier must not be destroyed");
   __CPROVER_set_may(barrier, "barrier-destroyed");
+  #endif
+
   int result;
   return result;
 }
@@ -667,10 +708,14 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 inline int pthread_barrier_wait(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
+  
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(barrier, "barrier-init"),
                    "pthread barrier must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(barrier, "barrier-destroyed"),
                    "pthread barrier must not be destroyed");
+  #endif
+
   int result;
   return result;
 }
