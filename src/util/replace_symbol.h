@@ -50,6 +50,12 @@ public:
   {
     replace(dest);
   }
+  
+  inline void clear()
+  {
+    expr_map.clear();
+    type_map.clear();
+  }
 
   replace_symbolt();
   virtual ~replace_symbolt();
