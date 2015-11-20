@@ -1761,6 +1761,22 @@ bool simplify_exprt::simplify_minus(exprt &expr)
     expr.swap(tmp);
     return false;
   }
+  else if(is_number(expr.type()) &&
+          operands[0].type().id()==ID_pointer &&
+          operands[1].type().id()==ID_pointer)
+  {
+    // pointer arithmetic: rewrite "p-p" to "0"
+    
+    if(operands[0]==operands[1])
+    {
+      exprt zero=gen_zero(expr.type());
+      if(zero.is_not_nil())
+      {
+        expr=zero;
+        return false;
+      }
+    }
+  }
 
   return true;
 }
