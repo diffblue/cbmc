@@ -2193,11 +2193,11 @@ std::string expr2ct::convert_constant(
     else if(type==char_type() && type!=signed_int_type() && type!=unsigned_int_type())
     {
       if(int_value=='\n')
-        dest+="\\n";
+        dest+="'\\n'";
       else if(int_value=='\r')
-        dest+="\\r";
+        dest+="'\\r'";
       else if(int_value=='\t')
-        dest+="\\t";
+        dest+="'\\t'";
       else if(int_value=='\'')
         dest+="'\\''";
       else if(int_value=='\\')
