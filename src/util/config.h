@@ -80,7 +80,7 @@ public:
 
     enum class archt { NO_ARCH, ARCH_I386, ARCH_X86_64, ARCH_POWER, ARCH_ARM,
                        ARCH_ALPHA, ARCH_MIPS, ARCH_S390, ARCH_S390X, ARCH_SPARC,
-                       ARCH_IA64, ARCH_X32 };
+                       ARCH_IA64, ARCH_X32, ARCH_V850 };
     archt arch;
 
     // architecture-specific integer value of null pointer constant
@@ -97,6 +97,7 @@ public:
     void set_arch_spec_sparc(const irep_idt &subarch);
     void set_arch_spec_ia64();
     void set_arch_spec_x32();
+    void set_arch_spec_v850();
     
     enum class flavourt { NO_MODE, MODE_ANSI_C_CPP, MODE_GCC_C, MODE_GCC_CPP,
                           MODE_VISUAL_STUDIO_C_CPP,

@@ -763,6 +763,42 @@ void configt::ansi_ct::set_arch_spec_x32()
   }
 }
 
+/*******************************************************************	\
+
+Function: configt::ansi_ct::set_arch_spec_v850
+
+  Inputs: None
+
+ Outputs: None
+
+ Purpose: Sets up the widths of variables for the Renesas V850
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_v850()
+{
+  // The Renesas V850 is a 32-bit microprocessor used in
+  // many automotive applications.  This spec is written from the
+  // architecture manual rather than having access to a running
+  // system.  Thus some assumptions have been made.
+  
+  set_ILP32();
+
+  // Technically, the V850's don't have floating-point at all.
+  // However, the RH850, aimed at automotive has both 32-bit and
+  // 64-bit IEEE-754 float.
+  double_width=8*8;
+  long_double_width=8*8;
+  arch=archt::ARCH_V850;
+  endianness=endiannesst::IS_LITTLE_ENDIAN;
+
+  // Without information about the compiler and RTOS, these are guesses
+  char_is_unsigned=false;
+  NULL_is_zero=true;
+
+  // No preprocessor definitions due to lack of information
+}
+
 /*******************************************************************\
 
 Function: configt::ansi_ct::default_c_standard
@@ -916,6 +952,16 @@ bool configt::set(const cmdlinet &cmdline)
     os="macos";
   }
 
+  if(cmdline.isset("arch"))
+  {
+    arch=cmdline.get_value("arch");
+  }
+  if(cmdline.isset("os"))
+  {
+    os=cmdline.get_value("os");
+  }
+  
+  
   if(os=="windows")
   {
     // Cygwin uses GCC throughout, use i386-linux
@@ -1026,6 +1072,8 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.set_arch_spec_s390();
   else if(arch=="x32")
     ansi_c.set_arch_spec_x32();
+  else if(arch=="v850")
+    ansi_c.set_arch_spec_v850();
   else if(arch=="x86_64")
     ansi_c.set_arch_spec_x86_64();
   else if(arch=="i386")
