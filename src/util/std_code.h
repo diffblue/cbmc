@@ -209,18 +209,6 @@ public:
     return op0();
   }
 
-  #if 0  
-  inline exprt &initializer()
-  {
-    return op1();
-  }
-
-  inline const exprt &initializer() const
-  {
-    return op1();
-  }
-  #endif
-  
   const irep_idt &get_identifier() const;
 
   friend inline const code_declt &to_code_decl(const codet &code)
