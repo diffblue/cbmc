@@ -47,9 +47,9 @@ void constant_propagator_domaint::assign_rec(
                          && rhs_type.id()!=ID_union)
   {
     if(values.is_constant(rhs))
-      assign(values, lhs, rhs, ns);
+      assign(values, to_symbol_expr(lhs), rhs, ns);
     else
-      values.set_to_top(lhs);
+      values.set_to_top(to_symbol_expr(lhs));
   }
 #if 0
   else //TODO: could make field or array element-sensitive
@@ -88,7 +88,9 @@ void constant_propagator_domaint::transform(
   
   if(from->is_decl())
   {
-    values.set_to_top(to_code_decl(from->code).symbol());
+    const code_declt &code_decl=to_code_decl(from->code);
+    const symbol_exprt &symbol=to_symbol_expr(code_decl.symbol());
+    values.set_to_top(symbol);
   }
   else if(from->is_assign())
   {
@@ -112,7 +114,7 @@ void constant_propagator_domaint::transform(
   else if(from->is_dead())
   {
     const code_deadt &code_dead=to_code_dead(from->code);
-    values.set_to_top(code_dead.symbol());
+    values.set_to_top(to_symbol_expr(code_dead.symbol()));
   }
   else if(from->is_function_call())
   {
@@ -211,7 +213,7 @@ Function: constant_propagator_domaint::assign
 
 void constant_propagator_domaint::assign(
   valuest &dest,
-  const exprt &lhs,
+  const symbol_exprt &lhs,
   exprt rhs,
   const namespacet &ns) const
 {

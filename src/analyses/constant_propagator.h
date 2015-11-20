@@ -23,7 +23,7 @@ public:
   struct valuest
   {
   public:
-    explicit valuest() : is_bottom(true) {}
+    valuest():is_bottom(true) { }
     
     // maps variables to constants
     replace_symbol_extt replace_const;
@@ -36,8 +36,7 @@ public:
     
     inline void set_to_bottom()
     {
-      replace_const.expr_map.clear();
-      replace_const.type_map.clear();
+      replace_const.clear();
       is_bottom = true;
     }
     
@@ -47,25 +46,23 @@ public:
       is_bottom = false;
     }
 
-    inline void set_to(const exprt &lhs, const exprt &rhs_val)
+    inline void set_to(const symbol_exprt &lhs, const exprt &rhs_val)
     {
-      const irep_idt &lhs_id = to_symbol_expr(lhs).get_identifier();
-      set_to(lhs_id, rhs_val);
+      set_to(lhs.get_identifier(), rhs_val);
     }
 
     bool is_constant(const exprt &expr) const;
     bool is_constant_address_of(const exprt &expr) const;
     bool set_to_top(const irep_idt &id);
 
-    inline bool set_to_top(const exprt &expr)
+    inline bool set_to_top(const symbol_exprt &expr)
     {
-      return set_to_top(to_symbol_expr(expr).get_identifier());
+      return set_to_top(expr.get_identifier());
     }
     
     inline void set_to_top()
     {
-      replace_const.expr_map.clear();
-      replace_const.type_map.clear();
+      replace_const.clear();
       is_bottom = false;
     }
   };
@@ -75,7 +72,7 @@ public:
 protected:
   void assign(
     valuest &dest,
-    const exprt &lhs,
+    const symbol_exprt &lhs,
     exprt rhs,
     const namespacet &ns) const;
 
