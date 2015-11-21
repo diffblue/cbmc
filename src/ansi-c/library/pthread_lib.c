@@ -9,6 +9,7 @@ inline int pthread_cancel(pthread_t thread)
 {
   __CPROVER_HIDE:;
 
+  (void)thread;
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must((void *)thread, "pthread-id"),
                    "must be given valid thread ID");
@@ -653,6 +654,7 @@ inline int pthread_barrier_init(
   const pthread_barrierattr_t *restrict attr, unsigned count)
 {
   __CPROVER_HIDE:;
+  (void)barrier;
   (void)attr;
   (void)count;
   
@@ -676,6 +678,8 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
   
+  (void)barrier;
+  
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(barrier, "barrier-init"),
                    "pthread barrier must be initialized");
@@ -698,6 +702,8 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 inline int pthread_barrier_wait(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
+  
+  (void)barrier;
   
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(barrier, "barrier-init"),
