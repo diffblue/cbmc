@@ -3642,10 +3642,11 @@ bool Parser::rMemberInit(exprt &init)
   init.add(ID_member).swap(name);
   
   cpp_tokent tk1, tk2;
-  if(lex.get_token(tk1)!='(') return false;
+  lex.get_token(tk1);
   set_location(init, tk1);
 
-  if(lex.LookAhead(0)=='{')
+  if(tk1.kind=='{' ||
+     (tk1.kind=='(' && lex.LookAhead(0)=='{'))
   {
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rMemberInit 3\n";
@@ -3655,9 +3656,17 @@ bool Parser::rMemberInit(exprt &init)
       return false;
 
     init.operands().push_back(exp);
+
+    // read closing parenthesis
+    lex.get_token(tk2);
+    if(tk2.kind!='}' && tk2.kind!=')')
+      return false;
   }
   else
   {
+    if(tk1.kind!='(')
+      return false;
+
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rMemberInit 4\n";
     #endif
@@ -3668,11 +3677,12 @@ bool Parser::rMemberInit(exprt &init)
       return false;
 
     init.operands().swap(args.operands());
+
+    // read closing parenthesis
+    if(lex.get_token(tk2)!=')')
+      return false;
   }
 
-  // read closing parenthesis
-  if(lex.get_token(tk2)!=')')
-    return false;
   if(lex.LookAhead(0)==TOK_ELLIPSIS)
   {
     lex.get_token();
