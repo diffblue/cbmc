@@ -7832,7 +7832,7 @@ bool Parser::moreVarName()
   if(lex.LookAhead(0)==TOK_SCOPE)
   {
     int t=lex.LookAhead(1);
-    if(t==TOK_IDENTIFIER || t=='~' || t==TOK_OPERATOR)
+    if(t==TOK_IDENTIFIER || t=='~' || t==TOK_OPERATOR || t==TOK_TEMPLATE)
       return true;
   }
 
