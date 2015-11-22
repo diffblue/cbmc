@@ -148,7 +148,6 @@ void cpp_token_buffert::read_token()
   //std::cout << "TOKEN: " << kind << " " << tokens.back().text << std::endl;
 
   tokens.back().kind=kind;
-  tokens.back().pos=token_vector.size()-1;
 
   //std::cout << "II: " << token_vector.back()->kind << std::endl;
   //std::cout << "I2: " << token_vector.size() << std::endl;
@@ -186,4 +185,47 @@ Function: cpp_token_buffert::Restore
 void cpp_token_buffert::Restore(post pos)
 {
   current_pos=pos;
+}
+
+/*******************************************************************\
+
+Function: cpp_token_buffert::Replace
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cpp_token_buffert::Replace(const cpp_tokent &token)
+{
+  assert(current_pos<=token_vector.size());
+
+  if(token_vector.size()==current_pos) read_token();
+
+  *token_vector[current_pos]=token;
+}
+
+/*******************************************************************\
+
+Function: cpp_token_buffert::Replace
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cpp_token_buffert::Insert(const cpp_tokent &token)
+{
+  assert(current_pos<=token_vector.size());
+
+  tokens.push_back(token);
+
+  token_vector.insert(token_vector.begin()+current_pos,
+                      --tokens.end());
 }
