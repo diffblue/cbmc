@@ -1391,6 +1391,8 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
   if((t0==TOK_CLASS || t0==TOK_TYPENAME))
   {
+    cpp_token_buffert::post pos=lex.Save();
+
     cpp_tokent tk1;
     lex.get_token(tk1);
 
@@ -1452,8 +1454,19 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       declarator.value()=exprt(ID_type);
       declarator.value().type().swap(default_type);
     }
+
+    if(lex.LookAhead(0)==',' ||
+       lex.LookAhead(0)=='>')
+      return true;
+
+    lex.Restore(pos);
   }
-  else if(t0==TOK_TEMPLATE)
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTempArgDeclaration 1\n";
+  #endif
+
+  if(t0==TOK_TEMPLATE)
   {
     TemplateDeclKind kind;
 
