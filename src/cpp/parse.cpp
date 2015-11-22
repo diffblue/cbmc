@@ -1376,7 +1376,8 @@ Function:
 /*
   temp.arg.declaration
   : CLASS [Identifier] {'=' type.name}
-  | type.specifier arg.declarator {'=' additive.expr}
+  | CLASS Ellipsis [Identifier]
+  | type.specifier arg.declarator {'=' conditional.expr}
   | template.decl2 CLASS Identifier {'=' type.name}
 */
 bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
@@ -1407,6 +1408,16 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     declarator.type().make_nil();
     set_location(declarator, tk1);
 
+    bool has_ellipsis=false;
+
+    if(lex.LookAhead(0)==TOK_ELLIPSIS)
+    {
+      cpp_tokent tk2;
+      lex.get_token(tk2);
+
+      has_ellipsis=true;
+    }
+
     if(lex.LookAhead(0) == TOK_IDENTIFIER)
     {
       cpp_namet cpp_name;
@@ -1420,10 +1431,18 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       declarator.name().swap(cpp_name);
       
       add_id(declarator.name(), new_scopet::TYPE_TEMPLATE_PARAMETER);
+
+      if(has_ellipsis)
+      {
+        // TODO
+      }
     }
 
     if(lex.LookAhead(0)=='=')
     {
+      if(has_ellipsis)
+        return false;
+
       typet default_type;
 
       lex.get_token(tk1);
@@ -1478,6 +1497,20 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     if(!rTypeSpecifier(declaration.type(), true))
       return false;
 
+    #ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "Parser::rTempArgDeclaration 3\n";
+    #endif
+
+    bool has_ellipsis=false;
+
+    if(lex.LookAhead(0)==TOK_ELLIPSIS)
+    {
+      cpp_tokent tk2;
+      lex.get_token(tk2);
+
+      has_ellipsis=true;
+    }
+
     declaration.declarators().resize(1);
     cpp_declaratort &declarator=declaration.declarators().front();
 
@@ -1490,10 +1523,18 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     add_id(declarator.name(), new_scopet::NON_TYPE_TEMPLATE_PARAMETER);
 
+    if(has_ellipsis)
+    {
+      // TODO
+    }
+
     exprt &value=declarator.value();
 
     if(lex.LookAhead(0)=='=')
     {
+      if(has_ellipsis)
+        return false;
+
       cpp_tokent tk;
 
       lex.get_token(tk);
@@ -3619,6 +3660,12 @@ bool Parser::rMemberInit(exprt &init)
   // read closing parenthesis
   if(lex.get_token(tk2)!=')')
     return false;
+  if(lex.LookAhead(0)==TOK_ELLIPSIS)
+  {
+    lex.get_token();
+
+    // TODO
+  }
 
   return true;
 }
@@ -4138,7 +4185,9 @@ bool Parser::rTemplateArgs(irept &template_args)
 
     // try type name first
     if(rTypeNameOrFunctionType(a) &&
-        (lex.LookAhead(0) == '>' || lex.LookAhead(0) == ','))
+       ((lex.LookAhead(0) == '>' || lex.LookAhead(0) == ',') ||
+        (lex.LookAhead(0)==TOK_ELLIPSIS && lex.LookAhead(1) == '>'))
+        )
     {
       #ifdef DEBUG
       std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4\n";
@@ -4160,6 +4209,12 @@ bool Parser::rTemplateArgs(irept &template_args)
       lex.Restore(pos);
       rTypeNameOrFunctionType(a);
 
+      if(lex.LookAhead(0)==TOK_ELLIPSIS)
+      {
+        lex.get_token(tk1);
+
+        // TODO
+      }
       #ifdef DEBUG
       std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.2\n";
       #endif
@@ -4176,6 +4231,13 @@ bool Parser::rTemplateArgs(irept &template_args)
 
       if(!rConditionalExpr(exp, true))
         return false;
+
+      if(lex.LookAhead(0)==TOK_ELLIPSIS)
+      {
+        lex.get_token(tk1);
+
+        // TODO
+      }
     }
 
     #ifdef DEBUG
@@ -4316,6 +4378,11 @@ bool Parser::rArgDeclList(irept &arglist)
       t=lex.LookAhead(0);
       if(t==',')
         lex.get_token(tk);
+      else if(t==TOK_ELLIPSIS)
+      {
+        lex.get_token(tk);
+        // TODO
+      }
       else if(t!=')' && t!=TOK_ELLIPSIS)
         return false;
     }
@@ -4513,7 +4580,17 @@ bool Parser::rFunctionArguments(exprt &args)
 
     args.move_to_operands(exp);
 
-    if(lex.LookAhead(0)!=',')
+    if(lex.LookAhead(0)==TOK_ELLIPSIS &&
+       (lex.LookAhead(1)==')' || lex.LookAhead(1)==','))
+    {
+      lex.get_token(tk);
+      // TODO
+
+      if(lex.LookAhead(0)==')')
+        return true;
+      lex.get_token();
+    }
+    else if(lex.LookAhead(0)!=',')
       return true;
     else
       lex.get_token(tk);
@@ -4861,6 +4938,13 @@ bool Parser::rBaseSpecifiers(irept &bases)
 
     if(!rName(base.add(ID_name)))
       return false;
+
+    if(lex.LookAhead(0)==TOK_ELLIPSIS)
+    {
+      lex.get_token();
+
+      // TODO
+    }
 
     bases.get_sub().push_back(irept());
     bases.get_sub().back().swap(base);
@@ -6422,6 +6506,7 @@ Function:
   sizeof.expr
   : SIZEOF unary.expr
   | SIZEOF '(' type.name ')'
+  | SIZEOF Ellipsis '(' Identifier ')'
 */
 
 bool Parser::rSizeofExpr(exprt &exp)
@@ -6454,6 +6539,26 @@ bool Parser::rSizeofExpr(exprt &exp)
       }
 
     lex.Restore(pos);
+  }
+  else if(lex.LookAhead(0)==TOK_ELLIPSIS)
+  {
+    typet tname;
+    cpp_tokent ell, op, cp;
+
+    lex.get_token(ell);
+
+    lex.get_token(op);
+
+    if(rTypeName(tname))
+      if(lex.get_token(cp)==')')
+      {
+        exp=exprt(ID_sizeof);
+        exp.add(ID_type_arg).swap(tname);
+        set_location(exp, tk);
+        return true;
+      }
+
+    return false;
   }
 
   exprt unary;
@@ -6855,6 +6960,12 @@ bool Parser::rAllocateInitializer(exprt &init)
       return false;
 
     init.move_to_operands(exp);
+
+    if(lex.LookAhead(0)==TOK_ELLIPSIS)
+    {
+      lex.get_token();
+      // TODO
+    }
 
     if(lex.LookAhead(0)==',')
       lex.get_token();
