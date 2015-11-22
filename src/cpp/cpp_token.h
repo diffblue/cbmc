@@ -21,7 +21,6 @@ public:
   std::string text;
   unsigned line_no;
   irep_idt filename;
-  unsigned pos;
   
   void clear()
   {
@@ -30,7 +29,6 @@ public:
     text="";
     line_no=0;
     filename="";
-    pos=0;
   }
   
   void swap(cpp_tokent &token)
@@ -40,7 +38,6 @@ public:
     text.swap(token.text);
     std::swap(line_no, token.line_no);
     filename.swap(token.filename);
-    std::swap(pos, token.pos);    
   }
 };
 

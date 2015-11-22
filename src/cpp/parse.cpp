@@ -4208,8 +4208,11 @@ bool Parser::rTemplateArgs(irept &template_args)
 
     // try type name first
     if(rTypeNameOrFunctionType(a) &&
-       ((lex.LookAhead(0) == '>' || lex.LookAhead(0) == ',') ||
-        (lex.LookAhead(0)==TOK_ELLIPSIS && lex.LookAhead(1) == '>'))
+       ((lex.LookAhead(0) == '>' || lex.LookAhead(0) == ',' ||
+         lex.LookAhead(0)==TOK_SHIFTRIGHT) ||
+        (lex.LookAhead(0)==TOK_ELLIPSIS &&
+         (lex.LookAhead(1) == '>' ||
+          lex.LookAhead(1)==TOK_SHIFTRIGHT)))
         )
     {
       #ifdef DEBUG
@@ -4270,6 +4273,7 @@ bool Parser::rTemplateArgs(irept &template_args)
     template_args.get_sub().push_back(irept(irep_idt()));
     template_args.get_sub().back().swap(exp);
 
+    pos=lex.Save();
     cpp_tokent tk2;
     switch(lex.get_token(tk2))
     {
@@ -4280,13 +4284,14 @@ bool Parser::rTemplateArgs(irept &template_args)
       break;
 
     case TOK_SHIFTRIGHT: // turn >> into > >
-      // the newer C++ standards frown on this!
-
-      // turn >> into > > // TODO
-      //lex.GetOnlyClosingBracket(tk2);
-      //temp_args=Ptree::List(new Leaf(tk1), args,
-      //                      new Leaf(tk2.ptr, 1));
-      return false;
+      lex.Restore(pos);
+      tk2.kind='>';
+      tk2.text='>';
+      lex.Replace(tk2);
+      lex.Insert(tk2);
+      assert(lex.LookAhead(0)=='>');
+      assert(lex.LookAhead(1)=='>');
+      return true;
 
     default:
       return false;
@@ -7902,6 +7907,8 @@ bool Parser::maybeTemplateArgs()
       }
       else if(u=='\0' || u==';' || u=='}')
         return false;
+      else if(u==TOK_SHIFTRIGHT && n>=2)
+        n-=2;
 
       #ifdef DEBUG
       std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 4\n";
