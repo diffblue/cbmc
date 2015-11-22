@@ -698,9 +698,17 @@ void goto_convertt::convert_decl(
     convert_assign(assign, dest);
   }
 
-  // do destructor
+  // now create a 'dead' instruction -- will be added after the
+  // destructor created below as unwind_destructor_stack pops off the
+  // top of the destructor stack
   const symbol_exprt symbol_expr(symbol.name, symbol.type);
 
+  {
+    code_deadt code_dead(symbol_expr);
+    targets.destructor_stack.push_back(code_dead);
+  }
+
+  // do destructor
   code_function_callt destructor=get_destructor(ns, symbol.type);
 
   if(destructor.is_not_nil())
@@ -712,12 +720,6 @@ void goto_convertt::convert_decl(
     destructor.arguments().push_back(this_expr);
 
     targets.destructor_stack.push_back(destructor);
-  }
-    
-  // now create a 'dead' instruction
-  {
-    code_deadt code_dead(symbol_expr);
-    targets.destructor_stack.push_back(code_dead);
   }
 }
 

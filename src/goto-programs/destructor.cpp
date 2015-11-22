@@ -33,15 +33,9 @@ code_function_callt get_destructor(
   }
   else if(type.id()==ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(type);
+    const exprt &methods=static_cast<const exprt&>(type.find(ID_methods));
 
-    const struct_typet::componentst &components=
-      struct_type.components();
-
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    forall_operands(it, methods)
     {
       if(it->type().id()==ID_code)
       {

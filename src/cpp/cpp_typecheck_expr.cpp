@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_expr.h>
 #include <util/config.h>
 #include <util/simplify_expr.h>
+#include <util/base_type.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/c_qualifiers.h>
@@ -2386,6 +2387,33 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       tmp_object_expr.set(ID_C_access, member.get(ID_C_access));
     }
 
+    // the constructor is being used, so make sure the destructor
+    // will be available
+    {
+      // find name of destructor
+      const struct_typet::componentst &components=
+        to_struct_type(follow(tmp_object_expr.type())).components();
+
+      for(struct_typet::componentst::const_iterator
+          it=components.begin();
+          it!=components.end();
+          it++)
+      {
+        const typet &type=it->type();
+
+        if(!it->get_bool(ID_from_base) &&
+           type.id()==ID_code &&
+           type.find(ID_return_type).id()==ID_destructor)
+        {
+          symbol_tablet::symbolst::iterator s_it=
+            symbol_table.symbols.find(it->get(ID_name));
+          assert(s_it!=symbol_table.symbols.end());
+          add_function_body(&(s_it->second));
+          break;
+        }
+      }
+    }
+
     expr.function().swap(member);
     
     typecheck_method_application(expr);
@@ -2548,6 +2576,10 @@ void cpp_typecheckt::typecheck_expr_side_effect(
   {
     typecheck_expr_throw(expr);
   }
+  else if(statement==ID_temporary_object)
+  {
+    // TODO
+  }
   else
     c_typecheck_baset::typecheck_expr_side_effect(expr);
 }
@@ -2597,9 +2629,15 @@ void cpp_typecheckt::typecheck_method_application(
     
     if(expr.arguments().size()==func_type.parameters().size())
     {
-      implicit_typecast(expr.arguments().front(), this_type);
-      assert(is_reference(expr.arguments().front().type()));
-      expr.arguments().front().type().remove(ID_C_reference);
+      // this might be set up for base-class initialisation
+      if(!base_type_eq(expr.arguments().front().type(),
+                      func_type.parameters().front().type(),
+                      *this))
+      {
+        implicit_typecast(expr.arguments().front(), this_type);
+        assert(is_reference(expr.arguments().front().type()));
+        expr.arguments().front().type().remove(ID_C_reference);
+      }
     }
     else
     {
