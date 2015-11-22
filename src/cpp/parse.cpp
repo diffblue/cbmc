@@ -236,6 +236,7 @@ protected:
   bool optMemberSpec(cpp_member_spect &);
   bool optStorageSpec(cpp_storage_spect &);
   bool optCvQualify(typet &);
+  bool optAlignas(typet &);
   bool rAttribute();
   bool optAttribute(cpp_declarationt &);
   bool optIntegralTypeOrClassSpec(typet &);
@@ -2364,6 +2365,59 @@ bool Parser::optCvQualify(typet &cv)
     else
       break;
   }
+
+  return true;
+}
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+/*
+  dcl.align
+  : ALIGNAS unary.expr
+  | ALIGNAS '(' type.name ')'
+*/
+bool Parser::optAlignas(typet &cv)
+{
+  if(lex.LookAhead(0)!=TOK_ALIGNAS)
+    return true;
+
+  cpp_tokent tk;
+  lex.get_token(tk);
+
+  if(lex.LookAhead(0)!='(')
+    return false;
+
+  typet tname;
+  cpp_tokent op, cp;
+
+  cpp_token_buffert::post pos=lex.Save();
+  lex.get_token(op);
+
+  if(rTypeName(tname))
+    if(lex.get_token(cp)==')')
+    {
+      // TODO
+      return true;
+    }
+
+  lex.Restore(pos);
+
+  exprt unary;
+
+  if(!rUnaryExpr(unary))
+    return false;
+
+  // TODO
 
   return true;
 }
@@ -4683,6 +4737,8 @@ bool Parser::rClassSpec(typet &spec)
   }
   else
   {
+    if(!optAlignas(spec))
+      return false;
     irept name;
 
     if(!rName(name))
