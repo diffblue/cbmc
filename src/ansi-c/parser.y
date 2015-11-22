@@ -164,6 +164,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_CATCH "__CPROVER_catch"
 %token TOK_CPROVER_TRY "__CPROVER_try"
 %token TOK_CPROVER_FINALLY "__CPROVER_finally"
+%token TOK_CPROVER_ID  "__CPROVER_ID"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_TRUE        "TRUE"
@@ -244,7 +245,16 @@ grammar:
 /*** Token with values **************************************************/
 
 identifier:
-        TOK_IDENTIFIER
+          TOK_IDENTIFIER
+        | TOK_CPROVER_ID TOK_STRING
+        {
+          $$=$1;
+          stack($$).id(ID_symbol);
+          irep_idt value=stack($2).get(ID_value);
+          stack($$).set(ID_C_base_name, value);
+          stack($$).set(ID_identifier, value);
+          stack($$).set(ID_C_id_class, ANSI_C_SYMBOL);
+        }
         ;
 
 typedef_name:
