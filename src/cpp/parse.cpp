@@ -289,6 +289,7 @@ protected:
   bool rPmExpr(exprt &);
   bool rCastExpr(exprt &);
   bool rTypeName(typet &);
+  bool rTypeNameOrFunctionType(typet &);
   bool rUnaryExpr(exprt &);
   bool rThrowExpr(exprt &);
   bool rNoexceptExpr(exprt &);
@@ -686,7 +687,7 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
 
   declaration.type()=typet(ID_typedef);
 
-  if(!rTypeSpecifier(type_name, false))
+  if(!rTypeNameOrFunctionType(type_name))
     return false;
 
   #ifdef DEBUG
@@ -769,7 +770,7 @@ bool Parser::rTypedefUsing(cpp_declarationt &declaration)
   if(lex.get_token(tk)!='=')
     return false;
 
-  if(!rTypeSpecifier(type_name, false))
+  if(!rTypeNameOrFunctionType(type_name))
     return false;
 
   merge_types(type_name, declaration.type());
@@ -4136,7 +4137,7 @@ bool Parser::rTemplateArgs(irept &template_args)
     typet a;
 
     // try type name first
-    if(rTypeName(a) &&
+    if(rTypeNameOrFunctionType(a) &&
         (lex.LookAhead(0) == '>' || lex.LookAhead(0) == ','))
     {
       #ifdef DEBUG
@@ -4157,7 +4158,11 @@ bool Parser::rTemplateArgs(irept &template_args)
       std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.1\n";
       #endif
       lex.Restore(pos);
-      rTypeName(a);
+      rTypeNameOrFunctionType(a);
+
+      #ifdef DEBUG
+      std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.2\n";
+      #endif
     }
     else
     {
@@ -5974,6 +5979,183 @@ bool Parser::rTypeName(typet &tname)
 
   // make type_name subtype of arg
   make_subtype(type_name, tname);
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeName 2\n";
+  #endif
+
+  return true;
+}
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+/*
+  type.name
+  | type.specifier { '(' type.specifier ( ',' type.specifier )*
+      { {,} Ellipsis } ')' } {cv.qualify} {(ptr.operator)*}
+*/
+bool Parser::rTypeNameOrFunctionType(typet &tname)
+{
+  #ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 0\n";
+  #endif
+
+  cpp_token_buffert::post pos=lex.Save();
+
+  if(rTypeName(tname) && lex.LookAhead(0)!='(')
+  {
+    if(!optPtrOperator(tname))
+      return false;
+    return true;
+  }
+
+  lex.Restore(pos);
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 1.0\n";
+  #endif
+
+  code_typet type;
+
+  if(!rCastOperatorName(type.return_type()))
+    return false;
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 1\n";
+  #endif
+
+  if(lex.LookAhead(0)!='(')
+  {
+    tname.swap(type.return_type());
+
+    if(!optPtrOperator(tname))
+      return false;
+
+    return true;
+  }
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 2\n";
+  #endif
+
+  cpp_tokent op, cp;
+  lex.get_token(op);
+
+  // TODO -- cruel hack for Clang's type_traits:
+  // struct __member_pointer_traits_imp<_Rp (_Class::*)(_Param..., ...), true, false>
+  if(lex.LookAhead(0)==TOK_IDENTIFIER &&
+     lex.LookAhead(1)==TOK_SCOPE &&
+     lex.LookAhead(2)=='*' &&
+     lex.LookAhead(3)==')' &&
+     lex.LookAhead(4)=='(')
+  {
+    lex.get_token();
+    lex.get_token();
+    lex.get_token();
+    lex.get_token();
+    lex.get_token();
+  }
+  else if(lex.LookAhead(0)==TOK_IDENTIFIER &&
+          lex.LookAhead(1)==')' &&
+          lex.LookAhead(2)=='(')
+  {
+    lex.get_token(op);
+    type.set(ID_identifier, op.data.get(ID_C_base_name));
+    lex.get_token();
+    lex.get_token();
+  }
+  else if(lex.LookAhead(0)=='*' &&
+          lex.LookAhead(1)==TOK_IDENTIFIER &&
+          lex.LookAhead(2)==')' &&
+          lex.LookAhead(3)=='(')
+  {
+    lex.get_token(op);
+    lex.get_token(op);
+    type.set(ID_identifier, op.data.get(ID_C_base_name));
+    lex.get_token();
+    lex.get_token();
+  }
+
+  for(;;)
+  {
+    typet parameter_type;
+
+    int t=lex.LookAhead(0);
+    if(t==')')
+    {
+      break;
+    }
+    else if(t==TOK_ELLIPSIS)
+    {
+      cpp_tokent tk;
+      lex.get_token(tk);
+      type.make_ellipsis();
+      break;
+    }
+    else if(rTypeName(parameter_type))
+    {
+      cpp_tokent tk;
+
+      type.parameters().push_back(
+        code_typet::parametert(parameter_type));
+      t=lex.LookAhead(0);
+      if(t==TOK_ELLIPSIS)
+      {
+        lex.get_token(tk);
+        // TODO -- this is actually ambiguous as it could refer to a
+        // template parameter pack or declare a variadic function
+        t=lex.LookAhead(0);
+      }
+
+      // optional parameter name
+      if(t==TOK_IDENTIFIER)
+      {
+        lex.get_token(tk);
+
+        t=lex.LookAhead(0);
+      }
+
+      if(t==',')
+        lex.get_token(tk);
+      else if(t!=')' && t!=TOK_ELLIPSIS)
+        return false;
+    }
+    else
+      return false;
+  }
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 3\n";
+  #endif
+
+  lex.get_token(cp);
+
+  typet cv_q;
+
+  if(!optCvQualify(cv_q))
+    return false;
+
+  merge_types(cv_q, type.return_type());
+
+  if(!optPtrOperator(type.return_type()))
+    return false;
+
+  tname.swap(type);
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 4\n";
+  #endif
 
   return true;
 }
