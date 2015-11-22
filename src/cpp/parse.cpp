@@ -7598,8 +7598,22 @@ bool Parser::rPrimaryExpr(exprt &exp)
       if(!optIntegralTypeOrClassSpec(type))
         return false;
 
-      if(type.is_not_nil())
+      #ifdef DEBUG
+      std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 14\n";
+      #endif
+
+      if(type.is_not_nil() && lex.LookAhead(0)==TOK_SCOPE)
       {
+        lex.get_token(tk);
+        lex.get_token(tk);
+
+        // TODO
+      }
+      else if(type.is_not_nil())
+      {
+        #ifdef DEBUG
+        std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 15\n";
+        #endif
         if(lex.get_token(tk)!='(')
           return false;
 
