@@ -143,6 +143,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     follow(expr.type());
     expr.set(ID_C_lvalue, true);
   }
+  else if(expr.id()==ID_noexcept)
+  {
+    // TODO
+    expr=false_exprt();
+  }
   else
     c_typecheck_baset::typecheck_expr_main(expr);
 }
