@@ -2578,6 +2578,7 @@ void cpp_typecheckt::typecheck_method_application(
   member_expr.swap(expr.function());
 
   const symbolt &symbol=lookup(member_expr.get(ID_component_name));
+  add_function_body(&(symbol_table.symbols.find(symbol.name)->second));
 
   // build new function expression
   exprt new_function(cpp_symbol_expr(symbol));
