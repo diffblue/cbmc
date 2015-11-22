@@ -311,9 +311,13 @@ bool bmc_covert::operator()(const criteriont criterion)
           if(i_it->is_end_function() &&
              goal_map[id].description=="" &&
              i_it->source_location.get_file()!="")
+          {
             goal_map[id]=goalt(
               "block "+i_it->source_location.as_string(),
               i_it->source_location);
+            abort();
+            status() << "BBB: " <<  i_it->source_location.as_string() << eom;
+          }
         }
         break;
       
@@ -398,6 +402,8 @@ bool bmc_covert::operator()(const criteriont criterion)
     default:;
     }
   }
+  
+  status() << "Aiming to cover " << goal_map.size() << " goals" << eom;
   
   cover_goalst cover_goals(solver);
   
