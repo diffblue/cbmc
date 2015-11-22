@@ -305,7 +305,7 @@ protected:
   bool rPrimaryExpr(exprt &);
   bool rVarName(exprt &);
   bool rVarNameCore(exprt &);
-  bool isTemplateArgs();
+  bool maybeTemplateArgs();
 
   bool rFunctionBody(cpp_declaratort &);
   bool rCompoundStatement(codet &);
@@ -7593,15 +7593,20 @@ bool Parser::rVarNameCore(exprt &name)
       set_location(components.back(), tk);
 
       // may be followed by template arguments
-      if(isTemplateArgs())
+      if(maybeTemplateArgs())
       {
+        cpp_token_buffert::post pos=lex.Save();
+
         #ifdef DEBUG
         std::cout << std::string(__indent, ' ') << "Parser::rVarNameCore 4\n";
         #endif
 
         irept args;
         if(!rTemplateArgs(args))
-          return false;
+        {
+          lex.Restore(pos);
+          return true;
+        }
 
         components.push_back(irept(ID_template_args));
         components.back().add(ID_arguments).swap(args);
@@ -7700,29 +7705,42 @@ Function:
 
   template.args must be followed by '(' or '::'
 */
-bool Parser::isTemplateArgs()
+bool Parser::maybeTemplateArgs()
 {
   int i=0;
   int t=lex.LookAhead(i++);
 
   #ifdef DEBUG
-  std::cout << "Parser::isTemplateArgs 0\n";
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 0\n";
   #endif
 
   if(t=='<')
   {
+#if 1
+    for(;;)
+    {
+      int u=lex.LookAhead(i++);
+      if(u=='\0' || u==';' || u=='}')
+        return false;
+      else if((u=='>' || u==TOK_SHIFTRIGHT) &&
+              (lex.LookAhead(i)==TOK_SCOPE || lex.LookAhead(i)=='(' ||
+               lex.LookAhead(i)==')'))
+        return true;
+    }
+#else
     int n=1;
 
     while(n>0)
     {
       #ifdef DEBUG
-      std::cout << std::string(__indent, ' ') << "Parser::isTemplateArgs 1\n";
+      std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 1\n";
       #endif
 
       int u=lex.LookAhead(i++);
 
       #ifdef DEBUG
-      std::cout << std::string(__indent, ' ') << "Parser::isTemplateArgs 2\n";
+      std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 2\n";
       #endif
 
       if(u=='<')
@@ -7737,7 +7755,7 @@ bool Parser::isTemplateArgs()
           int v=lex.LookAhead(i++);
 
           #ifdef DEBUG
-          std::cout << std::string(__indent, ' ') << "Parser::isTemplateArgs 3\n";
+          std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 3\n";
           #endif
 
           if(v=='(')
@@ -7752,25 +7770,26 @@ bool Parser::isTemplateArgs()
         return false;
 
       #ifdef DEBUG
-      std::cout << std::string(__indent, ' ') << "Parser::isTemplateArgs 4\n";
+      std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 4\n";
       #endif
     }
 
     #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::isTemplateArgs 5\n";
+    std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 5\n";
     #endif
 
     t=lex.LookAhead(i);
 
     #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::isTemplateArgs 6\n";
+    std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 6\n";
     #endif
 
     return t==TOK_SCOPE || t=='(';
+#endif
   }
 
   #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::isTemplateArgs 7\n";
+  std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 7\n";
   #endif
 
   return false;
