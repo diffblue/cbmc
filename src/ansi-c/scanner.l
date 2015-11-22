@@ -637,6 +637,7 @@ mutable             { return cpp98_keyword(TOK_MUTABLE); }
 namespace           { return cpp98_keyword(TOK_NAMESPACE); }
 new                 { return cpp98_keyword(TOK_NEW); }
 noexcept            { return cpp11_keyword(TOK_NOEXCEPT); } // C++11
+noreturn            { return cpp11_keyword(TOK_NORETURN); } // C++11
 not                 { return cpp98_keyword('!'); }
 not_eq              { return cpp98_keyword(TOK_NE); }
 nullptr             { return cpp11_keyword(TOK_NULLPTR); } // C++11

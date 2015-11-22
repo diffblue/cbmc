@@ -220,6 +220,7 @@ protected:
   bool optStorageSpec(cpp_storage_spect &);
   bool optCvQualify(typet &);
   bool rAttribute();
+  bool optAttribute(cpp_declarationt &);
   bool optIntegralTypeOrClassSpec(typet &);
   bool rConstructorDecl(cpp_declaratort &, typet &, typet &trailing_return_type);
   bool optThrowDecl(irept &);
@@ -1444,6 +1445,9 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
   std::cout << "Parser::rDeclaration 0.1  token: " << lex.LookAhead(0) << std::endl;
   #endif
 
+  if(!optAttribute(declaration))
+    return false;
+
   cpp_member_spect member_spec;
   if(!optMemberSpec(member_spec))
     return false;
@@ -2246,6 +2250,50 @@ bool Parser::rAttribute()
 
   default:
     return false;
+  }
+
+  return true;
+}
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool Parser::optAttribute(cpp_declarationt &declaration)
+{
+  if(lex.LookAhead(0)!='[' ||
+     lex.LookAhead(1)!='[')
+    return true;
+
+  lex.get_token();
+  lex.get_token();
+
+  for(;;)
+  {
+    cpp_tokent tk;
+    lex.get_token(tk);
+
+    switch(tk.kind)
+    {
+    case ']':
+      lex.get_token();
+      return true;
+
+    case TOK_NORETURN:
+      // TODO
+      break;
+
+    default:
+      return false;
+    }
   }
 
   return true;
