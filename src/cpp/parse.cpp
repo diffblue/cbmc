@@ -209,6 +209,7 @@ protected:
   bool rDefinition(cpp_itemt &);
   bool rNullDeclaration(cpp_declarationt &);
   bool rTypedef(cpp_declarationt &);
+  bool rTypedefUsing(cpp_declarationt &);
   bool rTypedefStatement(codet &);
   bool rTypeSpecifier(typet &, bool);
   bool isTypeSpecifier();
@@ -614,6 +615,10 @@ bool Parser::rDefinition(cpp_itemt &item)
     return rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_INLINE && lex.LookAhead(1)==TOK_NAMESPACE)
     return rNamespaceSpec(item.make_namespace_spec());
+  else if(t==TOK_USING &&
+          lex.LookAhead(1)==TOK_IDENTIFIER &&
+          lex.LookAhead(2)=='=')
+    return rTypedefUsing(item.make_declaration());
   else if(t==TOK_USING)
     return rUsing(item.make_using());
   else if(t==TOK_STATIC_ASSERT)
@@ -683,20 +688,98 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
   if(!rTypeSpecifier(type_name, false))
     return false;
 
-  merge_types(type_name, declaration.type());
-
   #ifdef DEBUG
-  std::cout << "Parser::rTypedef 2\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rTypedef 2\n";
   #endif
 
-  if(!rDeclarators(declaration.declarators(), true))
-    return false;
+  if(type_name.id()==ID_code)
+  {
+    cpp_declaratort name;
+    name.name()=cpp_namet(type_name.get(ID_identifier));
+    type_name.remove(ID_identifier);
+    name.type().make_nil();
+
+    merge_types(type_name, declaration.type());
+
+    declaration.declarators().push_back(name);
+  }
+  else
+  {
+    merge_types(type_name, declaration.type());
+
+    if(!rDeclarators(declaration.declarators(), true))
+      return false;
+  }
 
   if(lex.get_token(tk)!=';')
     return false;
 
   #ifdef DEBUG
-  std::cout << "Parser::rTypedef 3\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rTypedef 3\n";
+  #endif
+
+  return true;
+}
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+/*
+  USING Identifier '=' type.specifier ';'
+*/
+bool Parser::rTypedefUsing(cpp_declarationt &declaration)
+{
+  cpp_tokent tk;
+  typet type_name;
+
+  if(lex.get_token(tk)!=TOK_USING)
+    return false;
+
+  #ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rTypedefUsing 1\n";
+  #endif
+
+  declaration=cpp_declarationt();
+  set_location(declaration, tk);
+
+  declaration.type()=typet(ID_typedef);
+
+  if(lex.get_token(tk)!=TOK_IDENTIFIER)
+    return false;
+
+  cpp_declaratort name;
+  name.name()=cpp_namet(tk.data.get(ID_C_base_name));
+  name.type().make_nil();
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTypedefUsing 2\n";
+  #endif
+
+  if(lex.get_token(tk)!='=')
+    return false;
+
+  if(!rTypeSpecifier(type_name, false))
+    return false;
+
+  merge_types(type_name, declaration.type());
+
+  declaration.declarators().push_back(name);
+
+  if(lex.get_token(tk)!=';')
+    return false;
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTypedefUsing 3\n";
   #endif
 
   return true;
@@ -1124,7 +1207,12 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     return false;
 
   cpp_declarationt body;
-  if(!rDeclaration(body))
+  if(lex.LookAhead(0)==TOK_USING)
+  {
+    if(!rTypedefUsing(body))
+      return false;
+  }
+  else if(!rDeclaration(body))
     return false;
 
   // Repackage the decl and body depending upon what kind of template
@@ -4852,6 +4940,10 @@ bool Parser::rClassMember(cpp_itemt &member)
     return rTypedef(member.make_declaration());
   else if(t==TOK_TEMPLATE)
     return rTemplateDecl(member.make_declaration());
+  else if(t==TOK_USING &&
+          lex.LookAhead(1)==TOK_IDENTIFIER &&
+          lex.LookAhead(2)=='=')
+    return rTypedefUsing(member.make_declaration());
   else if(t==TOK_USING)
     return rUsing(member.make_using());
   else if(t==TOK_STATIC_ASSERT)
@@ -7813,6 +7905,14 @@ bool Parser::rStatement(codet &statement)
     
   case TOK_USING:
     {
+      if(lex.LookAhead(1)==TOK_IDENTIFIER &&
+         lex.LookAhead(2)=='=')
+      {
+        statement=codet(ID_decl);
+        statement.operands().resize(1);
+        return rTypedefUsing((cpp_declarationt &)statement.op0());
+      }
+
       cpp_usingt cpp_using;
 
       if(!rUsing(cpp_using))
