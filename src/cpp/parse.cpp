@@ -4669,7 +4669,8 @@ bool Parser::rEnumSpec(typet &spec)
     //is_enum_class=true;
   }
 
-  if(lex.LookAhead(0)!='{')
+  if(lex.LookAhead(0)!='{' &&
+     lex.LookAhead(0)!=':')
   {
     // Visual Studio allows full names for the tag,
     // not just an identifier
@@ -4679,14 +4680,22 @@ bool Parser::rEnumSpec(typet &spec)
       return false;
 
     spec.add(ID_tag).swap(name);
-    
-    // C++11 enums have an optional underlying type
-    if(lex.LookAhead(0)==':')
-    {
-      lex.get_token(tk); // read the colon
-      if(!rTypeName(spec.subtype())) return false;
-    }
   }
+    
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rEnumSpec 2\n";
+  #endif
+
+  // C++11 enums have an optional underlying type
+  if(lex.LookAhead(0)==':')
+  {
+    lex.get_token(tk); // read the colon
+    if(!rTypeName(spec.subtype())) return false;
+  }
+
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rEnumSpec 3\n";
+  #endif
 
   if(lex.LookAhead(0)!='{')
     return true; // ok, no body
