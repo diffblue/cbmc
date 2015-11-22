@@ -411,6 +411,8 @@ bool bmc_covert::operator()(const criteriont criterion)
     literalt l=solver.convert(it->second.as_expr());
     cover_goals.add(l);
   }
+  
+  assert(cover_goals.size()==goal_map.size());
 
   status() << "Running " << solver.decision_procedure_text() << eom;
 
@@ -431,12 +433,16 @@ bool bmc_covert::operator()(const criteriont criterion)
     status() << "** " << as_string(criterion) << " coverage results:" << eom;
   }
   
+  unsigned goals_covered=0;
+  
   for(goal_mapt::const_iterator
       it=goal_map.begin();
       it!=goal_map.end();
       it++)
   {
     const goalt &goal=it->second;
+    
+    if(goal.satisfied) goals_covered++;
   
     if(bmc.ui==ui_message_handlert::XML_UI)
     {
@@ -444,7 +450,7 @@ bool bmc_covert::operator()(const criteriont criterion)
       xml_result.set_attribute("goal", id2string(it->first));
       xml_result.set_attribute("description", goal.description);
       xml_result.set_attribute("status", goal.satisfied?"SATISFIED":"FAILED");
-
+      
       if(goal.source_location.is_not_nil())
         xml_result.new_element()=xml(goal.source_location);
 
@@ -455,16 +461,17 @@ bool bmc_covert::operator()(const criteriont criterion)
     }
     else
     {
-      status() << "[" << it->first << "] "
-               << goal.description << ": " << (goal.satisfied?"SATISFIED":"FAILED")
+      status() << "[" << it->first << "]";
+      if(!goal.description.empty()) status() << ' ' << goal.description;
+      status() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
                << eom;
     }
   }
 
   status() << eom;
   
-  status() << "** " << cover_goals.number_covered()
-           << " of " << cover_goals.size() << " covered ("
+  status() << "** " << goals_covered
+           << " of " << goal_map.size() << " covered ("
            << cover_goals.iterations() << " iteration"
            << (cover_goals.iterations()==1?"":"s")
            << ")" << eom;
