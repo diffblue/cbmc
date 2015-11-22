@@ -201,6 +201,7 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %x GCC_ATTRIBUTE5
 %x GCC_ASM
 %x GCC_ASM_PAREN
+%x CPROVER_ID
 
 %{
 void ansi_c_scanner_init()
@@ -1065,6 +1066,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 "__CPROVER_catch"        { loc(); return TOK_CPROVER_CATCH; }
 "__CPROVER_try"          { loc(); return TOK_CPROVER_TRY; }
 "__CPROVER_finally"      { loc(); return TOK_CPROVER_FINALLY; }
+"__CPROVER_ID"           { loc(); return TOK_CPROVER_ID; }
 
 "\x22\x00" |
 "\\forall"      { /* Non-standard, obviously. Found in ACSL syntax. */
