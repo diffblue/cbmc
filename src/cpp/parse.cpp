@@ -272,6 +272,7 @@ protected:
   bool rTypeName(typet &);
   bool rUnaryExpr(exprt &);
   bool rThrowExpr(exprt &);
+  bool rNoexceptExpr(exprt &);
   bool rSizeofExpr(exprt &);
   bool rTypeidExpr(exprt &);
   bool rAlignofExpr(exprt &);
@@ -2614,7 +2615,8 @@ Function:
 
 /*
   throw.decl : THROW '(' (name {','})* {name} ')'
-             : THROW '(' '...' ')'
+             | THROW '(' '...' ')'
+             | NOEXCEPT
 */
 bool Parser::optThrowDecl(irept &throw_decl)
 {
@@ -2664,6 +2666,15 @@ bool Parser::optThrowDecl(irept &throw_decl)
       return false;
 
     //p=Ptree::Snoc(p, new Leaf(tk));
+  }
+  else if(lex.LookAhead(0)==TOK_NOEXCEPT)
+  {
+    exprt expr;
+
+    if(!rNoexceptExpr(expr))
+      return false;
+
+    // TODO
   }
 
   throw_decl=p;
@@ -5682,6 +5693,7 @@ Function:
   | sizeof.expr
   | allocate.expr
   | throw.expression
+  | noexcept.expr
 */
 
 bool Parser::rUnaryExpr(exprt &exp)
@@ -5762,6 +5774,8 @@ bool Parser::rUnaryExpr(exprt &exp)
     return rAlignofExpr(exp);
   else if(t==TOK_THROW)
     return rThrowExpr(exp);
+  else if(t==TOK_NOEXCEPT)
+    return rNoexceptExpr(exp);
   else if(t==TOK_REAL || t==TOK_IMAG)
   {
     // a GCC extension for complex floating-point arithmetic
@@ -6002,6 +6016,56 @@ bool Parser::rAlignofExpr(exprt &exp)
   exp.add(ID_type_arg).swap(tname);
   set_location(exp, tk);
   return true;
+}
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+/*
+  noexcept.expr
+  : NOEXCEPT '(' expression ')'
+*/
+bool Parser::rNoexceptExpr(exprt &exp)
+{
+  cpp_tokent tk;
+
+  #ifdef DEBUG
+  std::cout << "Parser::rNoexceptExpr 0\n";
+  #endif
+
+  if(lex.get_token(tk)!=TOK_NOEXCEPT)
+    return false;
+
+  if(lex.LookAhead(0)=='(')
+  {
+    exprt subexp;
+    cpp_tokent op, cp;
+
+    lex.get_token(op);
+
+    if(rExpression(subexp))
+      if(lex.get_token(cp)==')')
+      {
+        // TODO
+        exp=exprt(ID_noexcept);
+        exp.move_to_operands(subexp);
+        set_location(exp, tk);
+        return true;
+      }
+  }
+  else
+    return true;
+
+  return false;
 }
 
 bool Parser::isAllocateExpr(int t)
