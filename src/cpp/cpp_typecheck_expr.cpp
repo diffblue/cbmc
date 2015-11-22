@@ -856,7 +856,11 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     }
   }
 
+  // the C front end does not know about references
+  const bool is_ref=is_reference(expr.type());
   c_typecheck_baset::typecheck_expr_address_of(expr);
+  if(is_ref)
+    expr.type()=reference_typet(expr.type().subtype());
 }
 
 /*******************************************************************\

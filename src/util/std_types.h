@@ -1288,6 +1288,7 @@ public:
 
   inline explicit reference_typet(const typet &_subtype):pointer_typet(_subtype)
   {
+    set(ID_C_reference, true);
   }
 };
 
