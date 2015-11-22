@@ -414,10 +414,9 @@ protected:
     std::size_t leave_stack_size;
   };
   
-  void case_guard(
+  exprt case_guard(
     const exprt &value,
-    const caset &case_op,
-    exprt &dest);
+    const caset &case_op);
 
   // if(cond) { true_case } else { false_case }
   void generate_ifthenelse(
