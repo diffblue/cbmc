@@ -581,6 +581,7 @@ codet java_bytecode_convertt::convert_instructions(
     stackt stack;
     bool done;
   };
+  
   typedef std::map<unsigned, converted_instructiont> address_mapt;
   address_mapt address_map;
   std::set<unsigned> targets;
@@ -615,9 +616,11 @@ codet java_bytecode_convertt::convert_instructions(
        i_it->statement=="ifnull")
     {
       assert(!i_it->args.empty());
+
       const unsigned target=safe_string2unsigned(
         id2string(to_constant_expr(i_it->args[0]).get_value()));
       targets.insert(target);
+
       a_entry.first->second.successors.push_back(target);
     }
     else if(i_it->statement=="tableswitch" ||
@@ -892,9 +895,12 @@ codet java_bytecode_convertt::convert_instructions(
       const irep_idt cmp_op=get_if_cmp_operator(statement);
       
       binary_relation_exprt condition(op[0], cmp_op, op[1]);
+
       cast_if_necessary(condition);
       code_branch.cond()=condition;
       code_branch.then_case()=code_gotot(label(number));
+      code_branch.then_case().add_source_location()=i_it->source_location;
+      code_branch.add_source_location()=i_it->source_location;
       
       c=code_branch;
     }
@@ -911,9 +917,14 @@ codet java_bytecode_convertt::convert_instructions(
 
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
+
       code_ifthenelset code_branch;
       code_branch.cond()=binary_relation_exprt(op[0], id, gen_zero(op[0].type()));
+      code_branch.cond().add_source_location()=i_it->source_location;
       code_branch.then_case()=code_gotot(label(number));
+      code_branch.then_case().add_source_location()=i_it->source_location;
+      code_branch.add_source_location()=i_it->source_location;
+
       c=code_branch;
     }
     else if(statement==patternt("ifnonnull"))
@@ -925,6 +936,9 @@ codet java_bytecode_convertt::convert_instructions(
       const exprt rhs(gen_zero(lhs.type()));
       code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
       code_branch.then_case()=code_gotot(label(number));
+      code_branch.then_case().add_source_location()=i_it->source_location;
+      code_branch.add_source_location()=i_it->source_location;
+
       c=code_branch;
     }
     else if(statement==patternt("ifnull"))
@@ -936,6 +950,9 @@ codet java_bytecode_convertt::convert_instructions(
       const exprt rhs(gen_zero(lhs.type()));
       code_branch.cond()=binary_relation_exprt(lhs, ID_equal, rhs);
       code_branch.then_case()=code_gotot(label(number));
+      code_branch.then_case().add_source_location()=i_it->source_location;
+      code_branch.add_source_location()=i_it->source_location;
+
       c=code_branch;
     }
     else if(statement=="iinc")
@@ -1265,8 +1282,10 @@ codet java_bytecode_convertt::convert_instructions(
 
       // we turn into switch-case
       code_switcht code_switch;
+      code_switch.add_source_location()=i_it->source_location;
       code_switch.value()=op[0];
       code_blockt code_block;
+      code_block.add_source_location()=i_it->source_location;
 
       bool is_label=true;
       for(instructiont::argst::const_iterator
@@ -1277,9 +1296,11 @@ codet java_bytecode_convertt::convert_instructions(
         if(is_label)
         {
           code_switch_caset code_case;
+          code_case.add_source_location()=i_it->source_location;
 
           irep_idt number=to_constant_expr(*a_it).get_value();
           code_case.code()=code_gotot(label(number));
+          code_case.code().add_source_location()=i_it->source_location;
         
           if(a_it==i_it->args.begin())
             code_case.set_default();
@@ -1288,6 +1309,7 @@ codet java_bytecode_convertt::convert_instructions(
             instructiont::argst::const_iterator prev=a_it;
             prev--;
             code_case.case_op()=typecast_exprt(*prev, op[0].type());
+            code_case.case_op().add_source_location()=i_it->source_location;
           }
           
           code_block.add(code_case);
