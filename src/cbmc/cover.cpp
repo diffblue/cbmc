@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/time_stopping.h>
 #include <util/xml.h>
+#include <util/xml_expr.h>
 
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
@@ -118,29 +119,36 @@ public:
     }
     
     std::string description;
+    source_locationt source_location;
     
     // if satisified, we compute a goto_trace
     bool satisfied;
     goto_tracet goto_trace;
     
-    explicit goalt(const std::string &_description):
+    goalt(
+      const std::string &_description,
+      const source_locationt &_source_location):
       description(_description),
+      source_location(_source_location),
       satisfied(false)
     {
     }
     
-    goalt():satisfied(false)
+    goalt():source_location(source_locationt::nil()),
+            satisfied(false)
     {
     }
     
     exprt as_expr() const
     {
       std::vector<exprt> tmp;
+
       for(instancest::const_iterator
           it=instances.begin();
           it!=instances.end();
           it++)
         tmp.push_back(literal_exprt(it->condition));
+
       return conjunction(tmp);
     }
   };
@@ -290,7 +298,9 @@ bool bmc_covert::operator()(const criteriont criterion)
       case C_ASSERTION:
         if(i_it->is_assert())
           goal_map[id(i_it)]=
-            goalt(id2string(i_it->source_location.get_comment()));
+            goalt(
+              id2string(i_it->source_location.get_comment()),
+              i_it->source_location);
         break;
         
       case C_LOCATION:
@@ -300,7 +310,9 @@ bool bmc_covert::operator()(const criteriont criterion)
           location_map[i_it]=id;
           if(goal_map[id].description=="" &&
              i_it->source_location.get_file()!="")
-            goal_map[id]=goalt("block "+i_it->source_location.as_string());
+            goal_map[id]=goalt(
+              "block "+i_it->source_location.as_string(),
+              i_it->source_location);
         }
         break;
       
@@ -309,9 +321,11 @@ bool bmc_covert::operator()(const criteriont criterion)
         {
           std::string b=i2string(basic_blocks[i_it]);
           goal_map[id(i_it, "TK")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch taken");
+            goalt("function "+id2string(f_it->first)+" block "+b+" branch taken",
+                  i_it->source_location);
           goal_map[id(i_it, "NT")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch not taken");
+            goalt("function "+id2string(f_it->first)+" block "+b+" branch not taken",
+                  i_it->source_location);
         }
         break;
         
@@ -328,7 +342,8 @@ bool bmc_covert::operator()(const criteriont criterion)
               it++, i++)
           {
             goal_map[id(i_it, "C"+i2string(i))]=
-              goalt("condition "+from_expr(bmc.ns, "", *it));
+              goalt("condition "+from_expr(bmc.ns, "", *it),
+                    i_it->source_location);
           }
         }
         break;
@@ -420,22 +435,27 @@ bool bmc_covert::operator()(const criteriont criterion)
       it!=goal_map.end();
       it++)
   {
+    const goalt &goal=it->second;
+  
     if(bmc.ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
       xml_result.set_attribute("goal", id2string(it->first));
-      xml_result.set_attribute("description", it->second.description);
-      xml_result.set_attribute("status", it->second.satisfied?"SATISFIED":"FAILED");
+      xml_result.set_attribute("description", goal.description);
+      xml_result.set_attribute("status", goal.satisfied?"SATISFIED":"FAILED");
 
-      if(it->second.satisfied)
-        convert(bmc.ns, it->second.goto_trace, xml_result.new_element());
+      if(goal.source_location.is_not_nil())
+        xml_result.new_element()=xml(goal.source_location);
+
+      if(goal.satisfied)
+        convert(bmc.ns, goal.goto_trace, xml_result.new_element());
 
       std::cout << xml_result << "\n";
     }
     else
     {
       status() << "[" << it->first << "] "
-               << it->second.description << ": " << (it->second.satisfied?"SATISFIED":"FAILED")
+               << goal.description << ": " << (goal.satisfied?"SATISFIED":"FAILED")
                << eom;
     }
   }
