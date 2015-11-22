@@ -336,7 +336,7 @@ protected:
   bool rMSC_leaveStatement(codet &);
   bool rMSCAsmStatement(codet &);
   bool rMSC_if_existsStatement(codet &);
-  bool rMSCTypePredicate(exprt &);
+  bool rTypePredicate(exprt &);
   bool rMSCuuidof(exprt &);
   bool rMSC_if_existsExpr(exprt &);
 
@@ -912,7 +912,7 @@ bool Parser::isTypeSpecifier()
        || t==TOK_TYPENAME
        || t==TOK_TYPEOF
        || t==TOK_DECLTYPE
-       || t==TOK_MSC_UNDERLYING_TYPE
+       || t==TOK_UNDERLYING_TYPE
      )
     return true;
 
@@ -2744,7 +2744,7 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 
     return true;
   }
-  else if(t==TOK_MSC_UNDERLYING_TYPE)
+  else if(t==TOK_UNDERLYING_TYPE)
   {
     // A Visual Studio extension that returns the underlying
     // type of an enum.
@@ -7388,7 +7388,7 @@ Function:
   __is_... (t)
 */
 
-bool Parser::rMSCTypePredicate(exprt &expr)
+bool Parser::rTypePredicate(exprt &expr)
 {
   cpp_tokent tk;
 
@@ -7401,14 +7401,14 @@ bool Parser::rMSCTypePredicate(exprt &expr)
   
   switch(tk.kind)
   {
-  case TOK_MSC_UNARY_TYPE_PREDICATE:
+  case TOK_UNARY_TYPE_PREDICATE:
     if(lex.get_token(tk)!='(') return false;
     if(!rTypeName(tname1)) return false;
     if(lex.get_token(tk)!=')') return false;
     expr.add(ID_type_arg).swap(tname1);
     break;
   
-  case TOK_MSC_BINARY_TYPE_PREDICATE:
+  case TOK_BINARY_TYPE_PREDICATE:
     if(lex.get_token(tk)!='(') return false;
     if(!rTypeName(tname1)) return false;
     if(lex.get_token(tk)!=',') return false;
@@ -7566,9 +7566,12 @@ bool Parser::rPrimaryExpr(exprt &exp)
   case TOK_TYPEID:
     return rTypeidExpr(exp);
     
-  case TOK_MSC_UNARY_TYPE_PREDICATE:
-  case TOK_MSC_BINARY_TYPE_PREDICATE:
-    return rMSCTypePredicate(exp);
+  case TOK_UNARY_TYPE_PREDICATE:
+  case TOK_BINARY_TYPE_PREDICATE:
+    #ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 10\n";
+    #endif
+    return rTypePredicate(exp);
 
   case TOK_MSC_UUIDOF:
     #ifdef DEBUG

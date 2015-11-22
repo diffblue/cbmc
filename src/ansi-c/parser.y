@@ -215,12 +215,12 @@ extern char *yyansi_ctext;
 %token TOK_SCOPE       "::"
 %token TOK_DOTPM       ".*"
 %token TOK_ARROWPM     "->*"
-%token TOK_MSC_UNARY_TYPE_PREDICATE
-%token TOK_MSC_BINARY_TYPE_PREDICATE
+%token TOK_UNARY_TYPE_PREDICATE
+%token TOK_BINARY_TYPE_PREDICATE
 %token TOK_MSC_UUIDOF  "__uuidof"
 %token TOK_MSC_IF_EXISTS "__if_exists"
 %token TOK_MSC_IF_NOT_EXISTS "__if_not_exists"
-%token TOK_MSC_UNDERLYING_TYPE "__underlying_type"
+%token TOK_UNDERLYING_TYPE "__underlying_type"
 
 /*** priority, associativity, etc. definitions **************************/
 
