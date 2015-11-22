@@ -747,28 +747,6 @@ std::string expr2ct::convert_typecast(
 
 /*******************************************************************\
 
-Function: expr2ct::convert_implicit_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string expr2ct::convert_implicit_address_of(
-  const exprt &src,
-  unsigned &precedence)
-{
-  if(src.operands().size()!=1)
-    return convert_norep(src, precedence);
-
-  return convert(src.op0(), precedence);
-}
-
-/*******************************************************************\
-
 Function: expr2ct::convert_trinary
 
   Inputs:
@@ -4668,9 +4646,6 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_typecast)
     return convert_typecast(to_typecast_expr(src), precedence=14);
-
-  else if(src.id()=="implicit_address_of")
-    return convert_implicit_address_of(src, precedence);
 
   else if(src.id()==ID_comma)
     return convert_comma(src, precedence=1);

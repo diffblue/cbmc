@@ -2222,8 +2222,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     }
 
     // do implicit dereference
-    if((expr.function().id()=="implicit_address_of" ||
-        expr.function().id()==ID_address_of) &&
+    if(expr.function().id()==ID_address_of &&
       expr.function().operands().size()==1)
     {
       exprt tmp;

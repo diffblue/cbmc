@@ -57,9 +57,6 @@ protected:
   std::string convert_pointer_difference(const exprt &src,
     unsigned &precedence);
 
-  std::string convert_implicit_address_of(
-    const exprt &src, unsigned &precedence);
-
   std::string convert_binary(
     const exprt &src, const std::string &symbol,
     unsigned precedence, bool full_parentheses);
