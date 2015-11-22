@@ -286,7 +286,7 @@ bool bmc_covert::operator()(const criteriont criterion)
   forall_goto_functions(f_it, goto_functions)
   {
     basic_blockst basic_blocks(f_it->second.body);
-  
+    
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(i_it->function==ID__start ||
@@ -308,15 +308,12 @@ bool bmc_covert::operator()(const criteriont criterion)
           std::string b=i2string(basic_blocks[i_it]);
           std::string id=id2string(f_it->first)+"#"+b;
           location_map[i_it]=id;
-          if(i_it->is_end_function() &&
-             goal_map[id].description=="" &&
+          if(goal_map[id].description=="" &&
              i_it->source_location.get_file()!="")
           {
             goal_map[id]=goalt(
               "block "+i_it->source_location.as_string(),
               i_it->source_location);
-            abort();
-            status() << "BBB: " <<  i_it->source_location.as_string() << eom;
           }
         }
         break;
