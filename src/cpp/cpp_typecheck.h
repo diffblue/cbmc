@@ -245,10 +245,6 @@ protected:
   // Misc
   //
 
-  void find_constructor(
-    const typet &dest_type,
-    exprt &symbol_expr);
-
   void default_ctor(
     const source_locationt &source_location,
     const irep_idt &base_name,
