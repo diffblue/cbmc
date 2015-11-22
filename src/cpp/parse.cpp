@@ -274,8 +274,8 @@ protected:
 
   bool rCommaExpression(exprt &);
 
-  bool rExpression(exprt &);
-  bool rConditionalExpr(exprt &);
+  bool rExpression(exprt &, bool);
+  bool rConditionalExpr(exprt &, bool);
   bool rLogicalOrExpr(exprt &, bool);
   bool rLogicalAndExpr(exprt &, bool);
   bool rInclusiveOrExpr(exprt &, bool);
@@ -283,7 +283,7 @@ protected:
   bool rAndExpr(exprt &, bool);
   bool rEqualityExpr(exprt &, bool);
   bool rRelationalExpr(exprt &, bool);
-  bool rShiftExpr(exprt &);
+  bool rShiftExpr(exprt &, bool);
   bool rAdditiveExpr(exprt &);
   bool rMultiplyExpr(exprt &);
   bool rPmExpr(exprt &);
@@ -1101,13 +1101,13 @@ bool Parser::rStaticAssert(cpp_static_assertt &cpp_static_assert)
   if(lex.get_token(tk)!='(')
     return false;
 
-  if(!rExpression(cpp_static_assert.cond()))
+  if(!rExpression(cpp_static_assert.cond(), false))
     return false;
 
   if(lex.get_token(tk)!=',')
     return false;
 
-  if(!rExpression(cpp_static_assert.description()))
+  if(!rExpression(cpp_static_assert.description(), false))
     return false;
 
   if(lex.get_token(tk)!=')')
@@ -1496,7 +1496,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       cpp_tokent tk;
 
       lex.get_token(tk);
-      if(!rAdditiveExpr(value))
+      if(!rConditionalExpr(value, true))
         return false;
     }
     else
@@ -1729,7 +1729,7 @@ bool Parser::rSimpleDeclaration(cpp_declarationt &declaration)
   cpp_tokent eqs;
   lex.get_token(eqs);
 
-  if(!rExpression(declarator.value()))
+  if(!rExpression(declarator.value(), false))
     return false;
     
   declaration.declarators().push_back(declarator);
@@ -1801,7 +1801,7 @@ bool Parser::rIntegralDeclaration(
     {
       exprt width;
 
-      if(!rExpression(width))
+      if(!rExpression(width, false))
         return false;
 
       if(lex.get_token(tk)!=';')
@@ -3003,7 +3003,7 @@ bool Parser::rDeclaratorWithInit(
     lex.get_token(tk); // get :
 
     exprt e;
-    if(!rExpression(e))
+    if(!rExpression(e, false))
       return false;
 
     typet bit_field_type(ID_c_bit_field);
@@ -3071,7 +3071,7 @@ bool Parser::rDeclaratorWithInit(
       lex.get_token(tk); // get :
 
       exprt e;
-      if(!rExpression(e))
+      if(!rExpression(e, false))
         return false;
         
       typet bit_field_type(ID_c_bit_field);
@@ -4151,7 +4151,7 @@ bool Parser::rTemplateArgs(irept &template_args)
       // but could also be an expr
       lex.Restore(pos);
       exprt tmp;
-      if(rLogicalOrExpr(tmp, true))
+      if(rConditionalExpr(tmp, true))
         exp.id("ambiguous");
       #ifdef DEBUG
       std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.1\n";
@@ -4168,7 +4168,8 @@ bool Parser::rTemplateArgs(irept &template_args)
 
       lex.Restore(pos);
 
-      if(!rLogicalOrExpr(exp, true))
+
+      if(!rConditionalExpr(exp, true))
         return false;
     }
 
@@ -4398,7 +4399,7 @@ Function:
 bool Parser::rInitializeExpr(exprt &expr)
 {  
   if(lex.LookAhead(0)!='{')
-    return rExpression(expr);
+    return rExpression(expr, false);
 
   // we want { initialize_expr, ... }
 
@@ -4502,7 +4503,7 @@ bool Parser::rFunctionArguments(exprt &args)
 
   for(;;)
   {
-    if(!rExpression(exp))
+    if(!rExpression(exp, false))
       return false;
 
     args.move_to_operands(exp);
@@ -4644,7 +4645,7 @@ bool Parser::rEnumBody(irept &body)
 
       exprt exp;
 
-      if(!rExpression(exp))
+      if(!rExpression(exp, false))
       {
         if(!SyntaxError())
           return false;        // too many errors
@@ -5071,7 +5072,7 @@ bool Parser::rCommaExpression(exprt &exp)
   std::cout << std::string(__indent, ' ') << "Parser::rCommaExpression 0\n";
   #endif
 
-  if(!rExpression(exp))
+  if(!rExpression(exp, false))
     return false;
 
   #ifdef DEBUG
@@ -5085,7 +5086,7 @@ bool Parser::rCommaExpression(exprt &exp)
     lex.get_token(tk);
 
     exprt right;
-    if(!rExpression(right))
+    if(!rExpression(right, false))
       return false;
 
     exprt left;
@@ -5119,7 +5120,7 @@ Function:
   expression
   : conditional.expr {(AssignOp | '=') expression}        right-to-left
 */
-bool Parser::rExpression(exprt &exp)
+bool Parser::rExpression(exprt &exp, bool template_args)
 {
   cpp_tokent tk;
 
@@ -5128,7 +5129,7 @@ bool Parser::rExpression(exprt &exp)
   std::cout << std::string(__indent, ' ') << "Parser::rExpression 0\n";
   #endif
 
-  if(!rConditionalExpr(exp))
+  if(!rConditionalExpr(exp, template_args))
     return false;
 
   #ifdef DEBUG
@@ -5150,7 +5151,7 @@ bool Parser::rExpression(exprt &exp)
     #endif
 
     exprt right;
-    if(!rExpression(right))
+    if(!rExpression(right, template_args))
       return false;
 
     #ifdef DEBUG
@@ -5212,14 +5213,14 @@ Function:
   conditional.expr
   : logical.or.expr {'?' comma.expression ':' conditional.expr}  right-to-left
 */
-bool Parser::rConditionalExpr(exprt &exp)
+bool Parser::rConditionalExpr(exprt &exp, bool template_args)
 {
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rConditionalExpr 0\n";
   #endif
 
-  if(!rLogicalOrExpr(exp, false))
+  if(!rLogicalOrExpr(exp, template_args))
     return false;
 
   #ifdef DEBUG
@@ -5242,7 +5243,7 @@ bool Parser::rConditionalExpr(exprt &exp)
     if(lex.get_token(tk2)!=':')
       return false;
 
-    if(!rExpression(otherwise))
+    if(!rExpression(otherwise, template_args))
       return false;
 
     exprt cond;
@@ -5587,7 +5588,7 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
   std::cout << std::string(__indent, ' ') << "Parser::rRelationalExpr 0\n";
   #endif
 
-  if(!rShiftExpr(exp))
+  if(!rShiftExpr(exp, template_args))
     return false;
 
   #ifdef DEBUG
@@ -5603,7 +5604,7 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
     lex.get_token(tk);
 
     exprt right;
-    if(!rShiftExpr(right))
+    if(!rShiftExpr(right, template_args))
       return false;
 
     exprt left;
@@ -5644,7 +5645,7 @@ Function:
   : additive.expr
   | shift.expr ShiftOp additive.expr
 */
-bool Parser::rShiftExpr(exprt &exp)
+bool Parser::rShiftExpr(exprt &exp, bool template_args)
 {
   #ifdef DEBUG
   indenter _i;
@@ -5659,7 +5660,7 @@ bool Parser::rShiftExpr(exprt &exp)
   #endif
 
   while(lex.LookAhead(0)==TOK_SHIFTLEFT ||
-        lex.LookAhead(0)==TOK_SHIFTRIGHT)
+        (lex.LookAhead(0)==TOK_SHIFTRIGHT && !template_args))
   {
     cpp_tokent tk;
     lex.get_token(tk);
@@ -6143,7 +6144,7 @@ bool Parser::rThrowExpr(exprt &exp)
   {
     exprt e;
   
-    if(!rExpression(e))
+    if(!rExpression(e, false))
       return false;
 
     exp.move_to_operands(e);
@@ -6204,7 +6205,7 @@ bool Parser::rTypeidExpr(exprt &exp)
     lex.Restore(pos);
     lex.get_token(op);
 
-    if(rExpression(subexp))
+    if(rExpression(subexp, false))
       if(lex.get_token(cp)==')')
       {
         // exp=new PtreeTypeidExpr(new Leaf(tk),
@@ -6360,7 +6361,7 @@ bool Parser::rNoexceptExpr(exprt &exp)
 
     lex.get_token(op);
 
-    if(rExpression(subexp))
+    if(rExpression(subexp, false))
       if(lex.get_token(cp)==')')
       {
         // TODO
@@ -7863,7 +7864,7 @@ bool Parser::rStatement(codet &statement)
       lex.get_token(tk1);
 
       exprt case_expr;
-      if(!rExpression(case_expr))
+      if(!rExpression(case_expr, false))
         return false;
       
       if(lex.LookAhead(0)==TOK_ELLIPSIS)
@@ -7873,7 +7874,7 @@ bool Parser::rStatement(codet &statement)
         lex.get_token(tk2);
         
         exprt range_end;
-        if(!rExpression(range_end))
+        if(!rExpression(range_end, false))
           return false;
 
         statement=codet(ID_gcc_switch_case_range);
