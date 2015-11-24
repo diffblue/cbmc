@@ -6,3 +6,6 @@ typedef void (*func4)(int, ...); // same, how mean!
 typedef void func5(int);
 typedef void (func5)(int); // same
 
+int main()
+{
+}
