@@ -14,7 +14,7 @@
 #include "cpp_member_spec.h"
 #include "cpp_enum_type.h"
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -6222,54 +6222,48 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
 
   for(;;)
   {
-    typet parameter_type;
-
+    // function type parameters
+  
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 5\n";
     #endif
 
     int t=lex.LookAhead(0);
     if(t==')')
-    {
       break;
-    }
     else if(t==TOK_ELLIPSIS)
     {
       cpp_tokent tk;
       lex.get_token(tk);
       type.make_ellipsis();
-      break;
-    }
-    else if(rTypeName(parameter_type))
-    {
-      cpp_tokent tk;
-
-      type.parameters().push_back(
-        code_typet::parametert(parameter_type));
-      t=lex.LookAhead(0);
-      if(t==TOK_ELLIPSIS)
-      {
-        lex.get_token(tk);
-        // TODO -- this is actually ambiguous as it could refer to a
-        // template parameter pack or declare a variadic function
-        t=lex.LookAhead(0);
-      }
-
-      // optional parameter name
-      if(t==TOK_IDENTIFIER)
-      {
-        lex.get_token(tk);
-
-        t=lex.LookAhead(0);
-      }
-
-      if(t==',')
-        lex.get_token(tk);
-      else if(t!=')' && t!=TOK_ELLIPSIS)
-        return false;
     }
     else
-      return false;
+    {    
+      cpp_declarationt parameter_declaration;
+      if(!rArgDeclaration(parameter_declaration))
+        return false;
+
+      code_typet::parametert parameter;
+      parameter.swap(parameter_declaration);
+      type.parameters().push_back(parameter);
+      
+      t=lex.LookAhead(0);
+      if(t==',')
+      {
+        cpp_tokent tk;
+        lex.get_token(tk);
+      }
+      else if(t==TOK_ELLIPSIS)
+      {
+        // TODO -- this is actually ambiguous as it could refer to a
+        // template parameter pack or declare a variadic function
+        cpp_tokent tk;
+        lex.get_token(tk);
+        type.make_ellipsis();
+      }
+      else if(t==')')
+        break;
+    }
   }
 
   #ifdef DEBUG
@@ -6279,26 +6273,24 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   cpp_tokent cp;
   lex.get_token(cp);
 
-  typet cv_q;
-
-  if(!optCvQualify(cv_q))
+  // not sure where this one belongs
+  if(!optCvQualify(type))
     return false;
-
-  merge_types(cv_q, type.return_type());
 
   #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 7\n";
   #endif
 
-  if(!optPtrOperator(type.return_type()))
+  // not sure where this one belongs
+  if(!optPtrOperator(type))
     return false;
-
+    
   tname.swap(type);
 
   #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 8\n";
   #endif
-
+  
   return true;
 }
 
