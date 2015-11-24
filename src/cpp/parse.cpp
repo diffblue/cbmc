@@ -4360,16 +4360,12 @@ bool Parser::rArgDeclList(irept &arglist)
 
     int t=lex.LookAhead(0);
     if(t==')')
-    {
-      arglist.swap(list);
       break;
-    }
     else if(t==TOK_ELLIPSIS)
     {
       cpp_tokent tk;
       lex.get_token(tk);
-      arglist.swap(list);
-      arglist.get_sub().push_back(irept(ID_ellipsis));
+      list.get_sub().push_back(irept(ID_ellipsis));
       break;
     }
     else if(rArgDeclaration(declaration))
@@ -4384,7 +4380,7 @@ bool Parser::rArgDeclList(irept &arglist)
       else if(t==TOK_ELLIPSIS)
       {
         lex.get_token(tk);
-        // TODO
+        list.get_sub().push_back(irept(ID_ellipsis));
       }
       else if(t!=')' && t!=TOK_ELLIPSIS)
         return false;
@@ -4395,6 +4391,8 @@ bool Parser::rArgDeclList(irept &arglist)
       return false;
     }
   }
+
+  arglist.swap(list);
 
   return true;
 }
