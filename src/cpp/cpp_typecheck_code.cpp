@@ -437,7 +437,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     
   typet &type=declaration.type();
     
-  bool is_typedef=convert_typedef(type);
+  bool is_typedef=declaration.is_typedef();
 
   typecheck_type(type);
   assert(type.is_not_nil());

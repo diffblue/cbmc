@@ -505,8 +505,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
       str << "invalid use of `virtual' in template declaration";
       throw 0;
     }
-
-    if(convert_typedef(new_decl.type()))
+    
+    if(new_decl.is_typedef())
     {
       err_location(new_decl);
       str << "template declaration for typedef";

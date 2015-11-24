@@ -1076,8 +1076,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       if(declaration.type().id()==irep_idt()) // empty?
         continue;
 
-      bool is_typedef=
-        convert_typedef(declaration.type());
+      bool is_typedef=declaration.is_typedef();
 
       // is it tag-only?
       if(declaration.type().id()==ID_struct ||
@@ -1232,7 +1231,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         // full member-initialization list
         bool is_static=declaration.storage_spec().is_static();    // Shall be false
         bool is_mutable=declaration.storage_spec().is_mutable();  // Shall be false
-        bool is_typedef=convert_typedef(declaration.type());      // Shall be false
+        bool is_typedef=declaration.is_typedef();                 // Shall be false
         
         typecheck_compound_declarator(
           symbol,

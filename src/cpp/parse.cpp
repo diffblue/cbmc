@@ -688,47 +688,14 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
 
   declaration=cpp_declarationt();
   set_location(declaration, tk);
+  declaration.set_is_typedef();
 
-  declaration.type()=typet(ID_typedef);
-
-  typet type_name;
-  if(!rTypeNameOrFunctionType(type_name))
+  if(!rTypeSpecifier(declaration.type(), true))
     return false;
 
-  #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rTypedef 2\n";
-  #endif
-
-  if(type_name.id()==ID_code)
-  {
-    #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::rTypedef 3\n";
-    #endif
-
-    cpp_declaratort name;
-    name.name()=cpp_namet(type_name.get(ID_identifier));
-    type_name.remove(ID_identifier);
-    name.type().make_nil();
-
-    merge_types(type_name, declaration.type());
-
-    declaration.declarators().push_back(name);
-  }
-  else
-  {
-    merge_types(type_name, declaration.type());
-
-    if(!rDeclarators(declaration.declarators(), true))
-      return false;
-  }
-
-  if(lex.get_token(tk)!=';')
+  if(!rDeclarators(declaration.declarators(), true))
     return false;
-
-  #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rTypedef 4\n";
-  #endif
-
+    
   return true;
 }
 
