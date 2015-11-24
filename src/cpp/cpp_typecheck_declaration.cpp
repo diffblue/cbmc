@@ -14,31 +14,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::convert_typedef
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool cpp_typecheckt::convert_typedef(typet &type)
-{
-  if(type.id()==ID_merged_type &&
-     type.subtypes().size()>=2 &&
-     type.subtypes()[0].id()==ID_typedef)
-  {
-    type.subtypes().erase(type.subtypes().begin());
-    return true;
-  }
-
-  return false;
-}
-
-/*******************************************************************\
-
 Function: cpp_typecheckt::convert_anonymous_union
 
   Inputs:
@@ -175,7 +150,7 @@ void cpp_typecheckt::convert_non_template_declaration(
 
   // we first check if this is a typedef
   typet &declaration_type=declaration.type();
-  bool is_typedef=convert_typedef(declaration_type);
+  bool is_typedef=declaration.is_typedef();
 
   declaration.name_anon_struct_union();
   typecheck_type(declaration_type);

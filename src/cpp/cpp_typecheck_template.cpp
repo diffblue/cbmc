@@ -1131,7 +1131,7 @@ void cpp_typecheckt::convert_template_declaration(
     throw 0;
   }
 
-  if(convert_typedef(declaration.type()))
+  if(declaration.is_typedef())
   {
     err_location(declaration);
     str << "template declaration for typedef";

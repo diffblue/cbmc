@@ -350,7 +350,6 @@ protected:
 
   // types
 
-  bool convert_typedef(typet &type);
   void typecheck_type(typet &type);
 
   cpp_scopet &typecheck_template_parameters(
