@@ -14,7 +14,7 @@
 #include "cpp_member_spec.h"
 #include "cpp_enum_type.h"
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -602,6 +602,11 @@ Function:
 bool Parser::rDefinition(cpp_itemt &item)
 {
   int t=lex.LookAhead(0);
+
+  #ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rDefinition 1 " << t << "\n";
+  #endif
 
   if(t==';')
     return rNullDeclaration(item.make_declaration());
@@ -6140,6 +6145,10 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
 
   if(rTypeName(tname) && lex.LookAhead(0)!='(')
   {
+    #ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 1\n";
+    #endif
+
     if(!optPtrOperator(tname))
       return false;
     return true;
@@ -6148,7 +6157,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   lex.Restore(pos);
 
   #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 1.0\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 2\n";
   #endif
 
   code_typet type;
@@ -6157,7 +6166,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
     return false;
 
   #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 1\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 3\n";
   #endif
 
   if(lex.LookAhead(0)!='(')
@@ -6171,7 +6180,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   }
 
   #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 2\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 4\n";
   #endif
 
   cpp_tokent op, cp;
@@ -6215,6 +6224,10 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   for(;;)
   {
     typet parameter_type;
+
+    #ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 5\n";
+    #endif
 
     int t=lex.LookAhead(0);
     if(t==')')
@@ -6261,7 +6274,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   }
 
   #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 3\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 6\n";
   #endif
 
   lex.get_token(cp);
@@ -6273,13 +6286,17 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
 
   merge_types(cv_q, type.return_type());
 
+  #ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 7\n";
+  #endif
+
   if(!optPtrOperator(type.return_type()))
     return false;
 
   tname.swap(type);
 
   #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 4\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 8\n";
   #endif
 
   return true;
