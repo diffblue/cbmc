@@ -2590,9 +2590,6 @@ Function:
 */
 bool Parser::optIntegralTypeOrClassSpec(typet &p)
 {
-  bool is_integral;
-  int t;
-
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::optIntegralTypeOrClassSpec 0\n";
@@ -2605,8 +2602,10 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     lex.get_token(tk);
   }
 
-  is_integral=false;
+  bool is_integral=false;
   p.make_nil();
+
+  int t;
 
   for(;;)
   {
@@ -6183,7 +6182,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 4\n";
   #endif
 
-  cpp_tokent op, cp;
+  cpp_tokent op;
   lex.get_token(op);
 
   // TODO -- cruel hack for Clang's type_traits:
@@ -6277,6 +6276,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   std::cout << std::string(__indent, ' ') << "Parser::rTypeNameOrFunctionType 6\n";
   #endif
 
+  cpp_tokent cp;
   lex.get_token(cp);
 
   typet cv_q;
