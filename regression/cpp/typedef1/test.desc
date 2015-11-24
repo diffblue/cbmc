@@ -1,6 +1,6 @@
 CORE
 main.cpp
-
+-std=c++11
 ^EXIT=64$
 ^SIGNAL=0$
 ^CONVERSION ERROR$
