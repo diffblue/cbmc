@@ -1,8 +1,6 @@
-typedef unsigned int T;
+typedef unsigned *something, *TP;
 
-typedef T *something, *TP;
-
-void func(unsigned int *)
+void func(unsigned *)
 {
 }
 
