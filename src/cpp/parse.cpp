@@ -672,7 +672,6 @@ Function:
 bool Parser::rTypedef(cpp_declarationt &declaration)
 {
   cpp_tokent tk;
-  typet type_name;
 
   if(lex.get_token(tk)!=TOK_TYPEDEF)
     return false;
@@ -687,6 +686,7 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
 
   declaration.type()=typet(ID_typedef);
 
+  typet type_name;
   if(!rTypeNameOrFunctionType(type_name))
     return false;
 
@@ -696,6 +696,10 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
 
   if(type_name.id()==ID_code)
   {
+    #ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "Parser::rTypedef 3\n";
+    #endif
+
     cpp_declaratort name;
     name.name()=cpp_namet(type_name.get(ID_identifier));
     type_name.remove(ID_identifier);
@@ -717,7 +721,7 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
     return false;
 
   #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rTypedef 3\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rTypedef 4\n";
   #endif
 
   return true;
