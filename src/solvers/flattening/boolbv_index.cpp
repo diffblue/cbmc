@@ -7,11 +7,11 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
 
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
+#include <util/i2string.h>
 
 #include "boolbv.h"
 
@@ -79,11 +79,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
     // Must have a finite size
     mp_integer array_size;
     if(to_integer(array_type.size(), array_size))
-    {
-      std::cout << to_array_type(array.type()).size().pretty() << std::endl;
       throw "failed to convert array size";
-    }
-
     
     // see if the index address is constant
     // many of these are compacted by simplify_expr
@@ -123,15 +119,15 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
     if (is_uniform && prop.has_set_to())
     {
       static int uniform_array_counter;  // Temporary hack
-      char buffer [64];
-      snprintf(buffer, 64,
-	       "__CPROVER_internal_uniform_array_%d",
-	       uniform_array_counter++);
-      symbol_exprt result(buffer, expr.type());
+
+      std::string identifier=
+        "__CPROVER_internal_uniform_array_"+
+        i2string(uniform_array_counter++);
+
+      symbol_exprt result(identifier, expr.type());
       bv = convert_bv(result);
       
       equal_exprt value_equality(result, array.op0());
-
       
       binary_relation_exprt lower_bound(from_integer(0, index.type()), ID_le, index);
       binary_relation_exprt upper_bound(index, ID_lt, from_integer(array_size, index.type()));
