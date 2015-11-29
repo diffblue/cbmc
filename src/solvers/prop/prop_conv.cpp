@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cstdlib>
 #include <map>
-#include <iostream>
 
 #include <util/std_expr.h>
 #include <util/symbol.h>
