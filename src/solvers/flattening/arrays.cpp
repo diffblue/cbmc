@@ -55,8 +55,6 @@ Function: arrayst::record_array_index
 
 \*******************************************************************/
 
-
-
 void arrayst::record_array_index(const index_exprt &index)
 {
   // we are not allowed to put the index directly in the
@@ -359,17 +357,17 @@ void arrayst::add_array_constraints()
   }
 
   // add constraints for equalities
-      for(array_equalitiest::const_iterator it=
-          array_equalities.begin();
-          it!=array_equalities.end();
-          it++)
-      {
-        add_array_constraints(
-          index_map[arrays.find_number(it->f1)],
-          *it);
+  for(array_equalitiest::const_iterator it=
+	array_equalities.begin();
+      it!=array_equalities.end();
+      it++)
+  {
+    add_array_constraints(
+      index_map[arrays.find_number(it->f1)],
+      *it);
 
-        // update_index_map should not be necessary here
-      }
+    // update_index_map should not be necessary here
+  }
     
   // add the Ackermann constraints
   add_array_Ackermann_constraints();
@@ -517,7 +515,6 @@ void arrayst::update_index_map(bool update_all)
                            << from_expr(ns,"",*i2) << std::endl;
    std::cout << "-----" << std::endl;
 #endif
-
 }
 
 /*******************************************************************\
@@ -918,7 +915,6 @@ void arrayst::add_array_constraints_if(
   }
 
   // now the false case
-
   for(index_sett::const_iterator
       it=index_set.begin();
       it!=index_set.end();
@@ -946,5 +942,3 @@ void arrayst::add_array_constraints_if(
 #endif
   }
 }
-
-
