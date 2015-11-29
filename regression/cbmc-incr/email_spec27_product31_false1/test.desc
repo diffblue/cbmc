@@ -1,0 +1,8 @@
+CORE
+main.c
+--error-label ERROR --unwind-max 3
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

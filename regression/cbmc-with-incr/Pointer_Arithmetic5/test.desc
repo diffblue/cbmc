@@ -1,0 +1,8 @@
+CORE
+main.c
+--pointer-check --bounds-check --function f
+^SIGNAL=0$
+^Counterexample:$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
