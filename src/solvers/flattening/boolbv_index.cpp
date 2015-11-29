@@ -159,11 +159,12 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
 
       // Symbol for output
       static int actual_array_counter;  // Temporary hack
-      char buffer [64];
-      snprintf(buffer, 64,
-	       "__CPROVER_internal_actual_array_%d",
-	       actual_array_counter++);
-      symbol_exprt result(buffer, expr.type());
+      
+      std::string identifier=
+        "__CPROVER_internal_actual_array_"+
+        i2string(actual_array_counter++);
+
+      symbol_exprt result(identifier, expr.type());
       bv = convert_bv(result);
       
       // add implications
