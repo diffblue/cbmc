@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_predicates.h"
 #include "prefix.h"
 #include "byte_operators.h"
+#include "bv_arithmetic.h"
 
 //#define DEBUGX
 
@@ -1478,28 +1479,6 @@ bool simplify_exprt::simplify_div(exprt &expr)
       }
     }
   }
-  else if(expr_type.id()==ID_floatbv)
-  {
-    // division by one?
-    if(expr.op1().is_constant() &&
-       expr.op1().is_one())
-    {
-      exprt tmp;
-      tmp.swap(expr.op0());
-      expr.swap(tmp);
-      return false;
-    }
-
-    if(expr.op0().is_constant() &&
-       expr.op1().is_constant())
-    {
-      ieee_floatt f0(to_constant_expr(expr.op0()));
-      ieee_floatt f1(to_constant_expr(expr.op1()));
-      f0/=f1;
-      expr=f0.to_expr();
-      return false;
-    }
-  }
 
   return true;
 }
@@ -1970,6 +1949,16 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
     }
   }
 
+  // division by one? Exact for all rounding modes.
+  if (expr.id()==ID_floatbv_div &&
+      op1.is_constant() && op1.is_one())
+  { 
+    exprt tmp;
+    tmp.swap(op0);
+    expr.swap(tmp);
+    return false;
+  }
+  
   return true;
 }
 
@@ -3853,6 +3842,71 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     }
   }
 
+  #define NORMALISE_CONSTANT_TESTS
+  #ifdef NORMALISE_CONSTANT_TESTS
+  // Normalise to >= and = to improve caching and term sharing
+  if (expr.op0().type().id()==ID_unsignedbv ||
+      expr.op0().type().id()==ID_signedbv)
+  {
+    bv_spect spec(expr.op0().type());
+    mp_integer max(spec.max_value());
+    
+    if(expr.id()==ID_notequal)
+    {
+      expr.id(ID_equal);
+      simplify_inequality_constant(expr);
+      expr.make_not();
+      simplify_node(expr);
+      return false;
+    }
+    else if(expr.id()==ID_gt)
+    {
+      mp_integer i;
+      if(to_integer(expr.op1(), i))
+	throw "Bit-vector constant unexpectedly non-integer";
+      
+      if (i == max)
+      {
+	expr=false_exprt();
+	return false;
+      }
+
+      expr.id(ID_ge);
+      ++i;
+      expr.op1()=from_integer(i, expr.op1().type());
+      simplify_inequality_constant(expr);
+      return false;
+    }
+    else if(expr.id()==ID_lt)
+    {
+      expr.id(ID_ge);
+      simplify_inequality_constant(expr);
+      expr.make_not();
+      simplify_node(expr);
+      return false;
+    }
+    else if(expr.id()==ID_le)
+    {
+      mp_integer i;
+      if(to_integer(expr.op1(), i))
+	throw "Bit-vector constant unexpectedly non-integer";
+
+      if (i == max)
+      {
+	expr=true_exprt();
+	return false;
+      }
+
+      expr.id(ID_ge);
+      ++i;
+      expr.op1()=from_integer(i, expr.op1().type());
+      simplify_inequality_constant(expr);
+      expr.make_not();
+      simplify_node(expr);
+      return false;
+    }
+  }
+#endif
   return true;
 }
 
