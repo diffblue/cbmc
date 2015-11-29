@@ -50,6 +50,7 @@ public:
   virtual void set_frozen(const bvt &);
   virtual void set_assumptions(const bvt &_assumptions);
   virtual bool has_set_assumptions() const { return false; }
+  virtual void set_all_frozen() {}
 
   // returns true if an assumption is in the final conflict
   virtual bool is_in_conflict(literalt l) const;  
@@ -70,7 +71,8 @@ public:
     prop_convt(_ns),
     use_cache(true),
     equality_propagation(true),
-      post_processing_done(false),
+    freeze_all(false),
+    post_processing_done(false),
     prop(_prop) { }
 
   virtual ~prop_conv_solvert() { }
@@ -89,6 +91,7 @@ public:
   virtual void set_frozen(literalt a) { prop.set_frozen(a); }
   virtual void set_assumptions(const bvt &_assumptions) { prop.set_assumptions(_assumptions); }
   virtual bool has_set_assumptions() const { return prop.has_set_assumptions(); }
+  virtual void set_all_frozen() { freeze_all = true; }
   virtual literalt convert(const exprt &expr);
   virtual bool is_in_conflict(literalt l) const { return prop.is_in_conflict(l); }
   virtual bool has_is_in_conflict() const { return prop.has_is_in_conflict(); }
@@ -98,6 +101,7 @@ public:
   
   bool use_cache;
   bool equality_propagation;
+  bool freeze_all; // freezing variables (for incremental solving)
   
   virtual void clear_cache() { cache.clear();}
 

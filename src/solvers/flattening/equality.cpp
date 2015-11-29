@@ -102,6 +102,7 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
     if(result==equalities.end())
     {
       l=prop.new_variable();
+      if(freeze_all && !l.is_constant()) prop.set_frozen(l);
       equalities.insert(equalitiest::value_type(u, l));
     }
     else
