@@ -11,7 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "aig_prop.h"
 
+// Tries to compact AIGs corresponding to xor and equality
+// Needed to match the performance of the native CNF back-end.
 #define USE_AIG_COMPACT
+
+// Use the Plaisted-Greenbaum encoding, again, needed to match the
+// native CNF back-end.
 #define USE_PG
 
 /*******************************************************************\
