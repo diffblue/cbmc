@@ -591,6 +591,17 @@ sva_cycle_delay
 sva_sequence_throughout
 sva_sequence_concatenation
 sva_sequence_first_match
+sva_always
+sva_nexttime
+sva_s_nexttime
+sva_eventually
+sva_s_eventually
+sva_until
+sva_s_until
+sva_until_with
+sva_s_until_with
+sva_overlapped_implication
+sva_non_overlapped_implication
 hierarchical_identifier
 named_port_connection
 named_block
@@ -682,8 +693,6 @@ L2
 already_typechecked
 C_va_arg_type #va_arg_type
 smt2_symbol
-overlapped_implication
-non_overlapped_implication
 Verilog
 verilog_realtime
 onehot
