@@ -24,6 +24,7 @@ public:
   }
 
   virtual bool has_set_to() const { return false; }
+  virtual bool cnf_handled_well() const { return false; }
  
   virtual literalt land(literalt a, literalt b);
   virtual literalt lor(literalt a, literalt b);
