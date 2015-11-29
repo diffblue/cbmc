@@ -246,7 +246,8 @@ Function: bv_utilst::full_adder
 
 \*******************************************************************/
 
-// The optimal encoding is the default
+// The optimal encoding is the default as it gives a reduction in space
+// and small performance gains
 #define OPTIMAL_FULL_ADDER
 
 literalt bv_utilst::full_adder(
@@ -256,7 +257,7 @@ literalt bv_utilst::full_adder(
   literalt &carry_out)
 {
   #ifdef OPTIMAL_FULL_ADDER
-  if(prop.has_set_to())
+  if(prop.has_set_to() && prop.cnf_handled_well())
   {
     literalt x;
     literalt y;
@@ -349,15 +350,13 @@ Function: bv_utilst::carry
 
 \*******************************************************************/
 
-// Compact carry is the default when not using AIGs
-#ifndef USE_AIG
+// Daniel's carry optimisation
 #define COMPACT_CARRY
-#endif
 
 literalt bv_utilst::carry(literalt a, literalt b, literalt c)
 {
   #ifdef COMPACT_CARRY
-  if(prop.has_set_to())
+  if(prop.has_set_to() && prop.cnf_handled_well())
   {
     // propagation possible?
     unsigned const_count=
@@ -1426,15 +1425,171 @@ void bv_utilst::unsigned_divider(
     prop.limplies(is_not_zero, lt_or_le(true, res, op0, UNSIGNED)));
 }
 
+
+#ifdef COMPACT_EQUAL_CONST
+// TODO : use for lt_or_le as well
+
+/*******************************************************************\
+
+Function: bv_utilst::equal_const_rec
+
+  Inputs: A bit-vector of a variable that is to be registered.
+
+ Outputs: None.
+
+ Purpose: The equal_const optimisation will be used on this bit-vector.
+
+\*******************************************************************/
+
+void bv_utilst::equal_const_register(const bvt &var)
+{
+  assert(!is_constant(var));
+  equal_const_registered.insert(var);
+  return;
+}
+
+
+/*******************************************************************\
+
+Function: bv_utilst::equal_const_rec
+
+  Inputs: Bit-vectors for a variable and a const to compare, note that
+  to avoid significant amounts of copying these are mutable and consumed.
+
+ Outputs: The literal that is true if and only if all the bits in var
+ and const are equal.
+
+ Purpose: The obvious recursive comparison, the interesting thing is
+ that it is cached so the literals are shared between constants.
+
+\*******************************************************************/
+
+literalt bv_utilst::equal_const_rec(bvt &var, bvt &constant)
+{
+  unsigned size = var.size();
+  
+  assert(size != 0);
+  assert(size == constant.size());
+  assert(is_constant(constant));
+  
+  if (size == 1)
+  {
+    literalt comp = prop.lequal(var[size - 1], constant[size - 1]);    
+    var.pop_back();
+    constant.pop_back();
+    return comp;
+  }
+  else
+  {
+    var_constant_pairt index(var, constant);
+    
+    equal_const_cachet::iterator entry = equal_const_cache.find(index);
+    
+    if (entry != equal_const_cache.end())
+    {
+      return entry->second;
+    }
+    else
+    {
+      literalt comp = prop.lequal(var[size - 1], constant[size - 1]);    
+      var.pop_back();
+      constant.pop_back();
+      
+      literalt rec = equal_const_rec(var, constant);
+      literalt compare = prop.land(rec, comp);
+
+      equal_const_cache.insert(std::pair<var_constant_pairt, literalt>(index, compare));
+      
+      return compare;
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: bv_utilst::equal_const
+
+  Inputs: Bit-vectors for a variable and a const to compare.
+
+ Outputs: The literal that is true if and only if they are equal.
+
+ Purpose: An experimental encoding, aimed primarily at variable
+ position access to constant arrays.  These generate a lot of
+ comparisons of the form var = small_const .  It will introduce some
+ additional literals and for variables that have only a few
+ comparisons with constants this may result in a net increase in
+ formula size.  It is hoped that a 'sufficently advanced preprocessor'
+ will remove these.
+
+\*******************************************************************/
+
+
+literalt bv_utilst::equal_const(const bvt &var, const bvt &constant)
+{
+  unsigned size = constant.size();
+
+  assert(var.size() == size);
+  assert(!is_constant(var));
+  assert( is_constant(constant));
+  assert(size >= 2);
+
+  // These get modified : be careful!
+  bvt var_upper;
+  bvt var_lower;
+  bvt constant_upper;
+  bvt constant_lower;
+  
+  /* Split the constant based on a change in parity
+   * This is based on the observation that most constants are small,
+   * so combinations of the lower bits are heavily used but the upper
+   * bits are almost always either all 0 or all 1.
+   */
+  literalt top_bit = constant[size - 1];
+
+  unsigned split = size - 1;
+  var_upper.push_back(var[size - 1]);
+  constant_upper.push_back(constant[size - 1]);
+  
+  for (split = size - 2; split != 0; --split)
+  {
+    if (constant[split] != top_bit)
+    {
+      break;
+    }
+    else
+    {
+      var_upper.push_back(var[split]);
+      constant_upper.push_back(constant[split]);
+    }
+  }
+
+  for (unsigned i = 0; i <= split; ++i)
+  {
+    var_lower.push_back(var[i]);
+    constant_lower.push_back(constant[i]);
+  }
+
+  // Check we have split the array correctly
+  assert(var_upper.size() + var_lower.size() == size);
+  assert(constant_upper.size() + constant_lower.size() == size);
+  
+  literalt top_comparison = equal_const_rec(var_upper, constant_upper);
+  literalt bottom_comparison = equal_const_rec(var_lower, constant_lower);
+
+  return prop.land(top_comparison, bottom_comparison);
+}
+
+#endif
+
 /*******************************************************************\
 
 Function: bv_utilst::equal
 
-  Inputs:
+  Inputs: Bit-vectors for the two things to compare.
 
- Outputs:
+ Outputs: The literal that is true if and only if they are equal.
 
- Purpose:
+ Purpose: Bit-blasting ID_equal and use in other encodings.
 
 \*******************************************************************/
 
@@ -1442,6 +1597,17 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
 {
   assert(op0.size()==op1.size());
 
+  #ifdef COMPACT_EQUAL_CONST
+  // simplify_expr should put the constant on the right
+  // but bit-level simplification may result in the other cases
+  if (is_constant(op0) && !is_constant(op1) && op0.size() > 2 &&
+      equal_const_registered.find(op1) != equal_const_registered.end())
+    return equal_const(op1, op0);
+  else if (!is_constant(op0) && is_constant(op1) && op0.size() > 2 &&
+      equal_const_registered.find(op0) != equal_const_registered.end())
+    return equal_const(op0, op1);   
+  #endif
+    
   bvt equal_bv;
   equal_bv.resize(op0.size());
 
@@ -1464,16 +1630,17 @@ Function: bv_utilst::lt_or_le
 
 \*******************************************************************/
 
-#ifndef USE_AIG
 
 /* Some clauses are not needed for correctness but they remove
    models (effectively setting "don't care" bits) and so may be worth
    including.*/
 //#define INCLUDE_REDUNDANT_CLAUSES
 
-//#define NEW_ENCODING
+// Saves space but slows the solver
+// There is a variant that uses the xor as an auxiliary that should improve both
+//#define COMPACT_LT_OR_LE
 
-#endif
+
 
 literalt bv_utilst::lt_or_le(
   bool or_equal,
@@ -1486,109 +1653,110 @@ literalt bv_utilst::lt_or_le(
   literalt top0=bv0[bv0.size()-1],
     top1=bv1[bv1.size()-1];
   
-#ifdef NEW_ENCODING
-
-  bvt compareBelow;   // 1 if a compare is needed below this bit
-  literalt result;
-  size_t start;
-  size_t i;
-
-  compareBelow.resize(bv0.size());
-  Forall_literals(it, compareBelow) { (*it) = prop.new_variable(); }
-  result = prop.new_variable();
-
-  if (rep==SIGNED)
+#ifdef COMPACT_LT_OR_LE
+  if (prop.has_set_to() && prop.cnf_handled_well())
   {
-    assert(bv0.size() >= 2);
-    start = compareBelow.size() - 2;
-
-    literalt firstComp=compareBelow[start];
-
-    // When comparing signs we are comparing the top bit
+    bvt compareBelow;   // 1 if a compare is needed below this bit
+    literalt result;
+    size_t start;
+    size_t i;
+    
+    compareBelow.resize(bv0.size());
+    Forall_literals(it, compareBelow) { (*it) = prop.new_variable(); }
+    result = prop.new_variable();
+    
+    if (rep==SIGNED)
+      {
+	assert(bv0.size() >= 2);
+	start = compareBelow.size() - 2;
+	
+	literalt firstComp=compareBelow[start];
+	
+	// When comparing signs we are comparing the top bit
 #ifdef INCLUDE_REDUNDANT_CLAUSES
-    prop.l_set_to_true(compareBelow[start + 1])
+	prop.l_set_to_true(compareBelow[start + 1])
 #endif    
-
-    // Four cases...
-    prop.lcnf( top0,  top1, firstComp);  // + +   compare needed
-    prop.lcnf( top0, !top1,   !result);  // + -   result false and no compare needed
-    prop.lcnf(!top0,  top1,    result);  // - +   result true and no compare needed
-    prop.lcnf(!top0, !top1, firstComp);  // - -   negated compare needed
-
+	  
+	  // Four cases...
+	  prop.lcnf( top0,  top1, firstComp);  // + +   compare needed
+	prop.lcnf( top0, !top1,   !result);  // + -   result false and no compare needed
+	prop.lcnf(!top0,  top1,    result);  // - +   result true and no compare needed
+	prop.lcnf(!top0, !top1, firstComp);  // - -   negated compare needed
+	
 #ifdef INCLUDE_REDUNDANT_CLAUSES
-    prop.lcnf( top0, !top1, !firstComp);
-    prop.lcnf(!top0,  top1, !firstComp);
+	prop.lcnf( top0, !top1, !firstComp);
+	prop.lcnf(!top0,  top1, !firstComp);
+#endif
+	
+    }
+    else
+    {
+      // Unsigned is much easier
+      start = compareBelow.size() - 1;
+      prop.l_set_to_true(compareBelow[start]);
+    }
+
+    // Determine the output
+    //  \forall i .  cb[i] & -a[i] &  b[i] =>  result
+    //  \forall i .  cb[i] &  a[i] & -b[i] => -result
+    i = start;
+    do
+    {
+      prop.lcnf(!compareBelow[i],  bv0[i], !bv1[i],  result);
+      prop.lcnf(!compareBelow[i], !bv0[i],  bv1[i], !result);
+    }
+    while (i-- != 0);
+
+    // Chain the comparison bit
+    //  \forall i != 0 . cb[i] &  a[i] &  b[i] => cb[i-1]
+    //  \forall i != 0 . cb[i] & -a[i] & -b[i] => cb[i-1]
+    for (i = start; i > 0; i--)
+    {
+      prop.lcnf(!compareBelow[i], !bv0[i], !bv1[i], compareBelow[i-1]);
+      prop.lcnf(!compareBelow[i],  bv0[i],  bv1[i], compareBelow[i-1]);
+    }
+    
+    
+#ifdef INCLUDE_REDUNDANT_CLAUSES
+    // Optional zeroing of the comparison bit when not needed
+    //  \forall i != 0 . -c[i] => -c[i-1]
+    //  \forall i != 0 .  c[i] & -a[i] &  b[i] => -c[i-1]
+    //  \forall i != 0 .  c[i] &  a[i] & -b[i] => -c[i-1]
+    for (i = start; i > 0; i--)
+    {
+      prop.lcnf( compareBelow[i],                   !compareBelow[i-1]);
+      prop.lcnf(!compareBelow[i],  bv0[i], !bv1[i], !compareBelow[i-1]);
+      prop.lcnf(!compareBelow[i], !bv0[i],  bv1[i], !compareBelow[i-1]);
+    }
 #endif
 
+
+    // The 'base case' of the induction is the case when they are equal
+    prop.lcnf(!compareBelow[0], !bv0[0], !bv1[0], (or_equal) ? result : !result);
+    prop.lcnf(!compareBelow[0],  bv0[0],  bv1[0], (or_equal) ? result : !result);
+    
+    return result;
   }
   else
-  {
-    // Unsigned is much easier
-    start = compareBelow.size() - 1;
-    prop.l_set_to_true(compareBelow[start]);
-  }
-
-  // Determine the output
-  //  \forall i .  cb[i] & -a[i] &  b[i] =>  result
-  //  \forall i .  cb[i] &  a[i] & -b[i] => -result
-  i = start;
-  do
-  {
-    prop.lcnf(!compareBelow[i],  bv0[i], !bv1[i],  result);
-    prop.lcnf(!compareBelow[i], !bv0[i],  bv1[i], !result);
-  }
-  while (i-- != 0);
-
-  // Chain the comparison bit
-  //  \forall i != 0 . cb[i] &  a[i] &  b[i] => cb[i-1]
-  //  \forall i != 0 . cb[i] & -a[i] & -b[i] => cb[i-1]
-  for (i = start; i > 0; i--)
-  {
-    prop.lcnf(!compareBelow[i], !bv0[i], !bv1[i], compareBelow[i-1]);
-    prop.lcnf(!compareBelow[i],  bv0[i],  bv1[i], compareBelow[i-1]);
-  }
-
-
-#ifdef INCLUDE_REDUNDANT_CLAUSES
-// Optional zeroing of the comparison bit when not needed
-//  \forall i != 0 . -c[i] => -c[i-1]
-//  \forall i != 0 .  c[i] & -a[i] &  b[i] => -c[i-1]
-//  \forall i != 0 .  c[i] &  a[i] & -b[i] => -c[i-1]
-  for (i = start; i > 0; i--)
-  {
-    prop.lcnf( compareBelow[i],                   !compareBelow[i-1]);
-    prop.lcnf(!compareBelow[i],  bv0[i], !bv1[i], !compareBelow[i-1]);
-    prop.lcnf(!compareBelow[i], !bv0[i],  bv1[i], !compareBelow[i-1]);
-  }
 #endif
+  {
+    literalt carry=
+      carry_out(bv0, inverted(bv1), const_literal(true));
+    
+    literalt result;
+    
+    if(rep==SIGNED)
+      result=prop.lxor(prop.lequal(top0, top1), carry);
+    else if(rep==UNSIGNED)
+      result=!carry;
+    else
+      assert(false);
 
-
-  // The 'base case' of the induction is the case when they are equal
-  prop.lcnf(!compareBelow[0], !bv0[0], !bv1[0], (or_equal) ? result : !result);
-  prop.lcnf(!compareBelow[0],  bv0[0],  bv1[0], (or_equal) ? result : !result);
-
-  return result;
-
-#else
-
-  literalt carry=
-    carry_out(bv0, inverted(bv1), const_literal(true));
-
-  literalt result;
-
-  if(rep==SIGNED)
-    result=prop.lxor(prop.lequal(top0, top1), carry);
-  else if(rep==UNSIGNED)
-    result=!carry;
-  else
-    assert(false);
-
-  if(or_equal)
-    result=prop.lor(result, equal(bv0, bv1));
-
-  return result;
-
-#endif
+    if(or_equal)
+      result=prop.lor(result, equal(bv0, bv1));
+    
+    return result;
+  }
 }
 
 /*******************************************************************\
@@ -1607,7 +1775,7 @@ literalt bv_utilst::unsigned_less_than(
   const bvt &op0,
   const bvt &op1)
 {
-#ifdef NEW_ENCODING
+#ifdef COMPACT_LT_OR_LE
   return lt_or_le(false, op0, op1, UNSIGNED);
 #else
   // A <= B  iff  there is an overflow on A-B
@@ -1708,11 +1876,20 @@ void bv_utilst::cond_implies_equal(
 {
   assert(a.size()==b.size());
 
-  for(unsigned i=0; i<a.size(); i++)
+  if (prop.cnf_handled_well())
   {
-    prop.lcnf(!cond,  a[i], !b[i]);
-    prop.lcnf(!cond, !a[i],  b[i]);
+    for(unsigned i=0; i<a.size(); i++)
+    {
+      prop.lcnf(!cond,  a[i], !b[i]);
+      prop.lcnf(!cond, !a[i],  b[i]);
+    }
   }
+  else
+  {
+    prop.limplies(cond, equal(a,b));
+  }
+
+  return;
 }
 
 /*******************************************************************\
