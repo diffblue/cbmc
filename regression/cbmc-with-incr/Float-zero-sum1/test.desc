@@ -1,0 +1,8 @@
+KNOWNBUG
+main.c
+--floatbv --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
