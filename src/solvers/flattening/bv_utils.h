@@ -9,9 +9,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BV_UTILS_H
 #define CPROVER_BV_UTILS_H
 
+#include <map>
+#include <set>
+
 #include <util/mp_arith.h>
 
 #include <solvers/prop/prop.h>
+
+// Shares variables between var == const tests for registered variables.
+// Gives ~15% memory savings on some programs using constant arrays
+// but seems to give a run-time penalty.
+//#define COMPACT_EQUAL_CONST
+
 
 class bv_utilst
 {
@@ -82,6 +91,20 @@ public:
   void unsigned_divider(const bvt &op0, const bvt &op1,
                         bvt &res, bvt &rem);
 
+  #ifdef COMPACT_EQUAL_CONST
+  typedef std::set<bvt> equal_const_registeredt;
+  equal_const_registeredt equal_const_registered;
+  void equal_const_register(const bvt &var);
+  
+  typedef std::pair<bvt, bvt> var_constant_pairt;
+  typedef std::map<var_constant_pairt, literalt> equal_const_cachet;
+  equal_const_cachet equal_const_cache;
+  
+  literalt equal_const_rec (bvt &var, bvt &constant);
+  literalt equal_const(const bvt &var, const bvt &constant);
+  #endif
+
+  
   literalt equal(const bvt &op0, const bvt &op1);
   
   static inline literalt sign_bit(const bvt &op)
