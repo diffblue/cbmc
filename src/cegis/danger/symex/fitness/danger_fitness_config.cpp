@@ -40,7 +40,7 @@ void fix_quantifiers(const danger_programt &org_prog, danger_programt &new_prog,
   --org_off;
   goto_programt::targett new_off=new_prog.loops.front().meta_variables.Dx;
   --new_off;
-  typename goto_programt::targett::difference_type diff;
+  goto_programt::targett::difference_type diff;
   for (goto_programt::targett &q : quantifiers)
   {
     diff=std::distance(org_off, static_cast<goto_programt::const_targett>(q));
