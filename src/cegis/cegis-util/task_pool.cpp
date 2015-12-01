@@ -29,6 +29,7 @@ task_poolt::~task_poolt()
 
 namespace
 {
+#ifndef _WIN32
 void execute_and_remove(task_poolt::handlerst &handlers, const pid_t pid,
     const int status)
 {
@@ -39,6 +40,7 @@ void execute_and_remove(task_poolt::handlerst &handlers, const pid_t pid,
     handlers.erase(it);
   }
 }
+#endif
 
 void cleanup(task_poolt::task_idst &task_ids, task_poolt::handlerst &handlers)
 {
