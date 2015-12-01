@@ -7,7 +7,6 @@ make cbmc-mac-signed
 
 (cd ../goto-cc; make goto-cc-mac-signed)
 (cd ../goto-instrument; make goto-instrument-mac-signed)
-(cd ~/progr/hw-cbmc/trunk/src/hw-cbmc; make hw-cbmc-mac-signed)
 
 VERSION=`./cbmc --version`
 VERSION_FILE=`echo $VERSION | sed "y/./-/"`
@@ -22,7 +21,7 @@ mkdir /tmp/cbmc-dist/package-root/usr/bin
 mkdir /tmp/cbmc-dist/resources
 mkdir /tmp/cbmc-dist/resources/en.lproj
 
-cp ~/progr/hw-cbmc/trunk/src/hw-cbmc/hw-cbmc ../cbmc/cbmc ../goto-cc/goto-cc \
+cp ../cbmc/cbmc ../goto-cc/goto-cc \
   ../goto-instrument/goto-instrument /tmp/cbmc-dist/package-root/usr/bin
 cp ../../LICENSE /tmp/cbmc-dist/resources/License.txt
 
