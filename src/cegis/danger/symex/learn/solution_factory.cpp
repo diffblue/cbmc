@@ -29,7 +29,6 @@ const program_individualt::instructiont::opt get_const_value(const exprt &expr)
 }
 #endif
 
-typedef std::map<size_t, const irep_idt> danger_variable_namest;
 void reverse(danger_variable_namest &names, const danger_variable_idst &o)
 {
   for (danger_variable_idst::const_iterator it=o.begin(); it != o.end(); ++it)

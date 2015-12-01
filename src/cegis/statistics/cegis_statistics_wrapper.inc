@@ -1,10 +1,10 @@
-typedef std::chrono::high_resolution_clock clockt;
+typedef std::chrono::high_resolution_clock my_clockt;
 
 template<class learnt, class verifyt, class mstreamt>
 cegis_statistics_wrappert<learnt, verifyt, mstreamt>::cegis_statistics_wrappert(
     learnt &learner, verifyt &verifier, mstreamt &os) :
     learner(learner), verifier(verifier), os(os), num_ces(0), learner_time(0), verifier_time(
-        0), start_time(clockt::now())
+        0), start_time(my_clockt::now())
 {
 }
 
@@ -27,7 +27,7 @@ const typename cegis_statistics_wrappert<learnt, verifyt, mstreamt>::candidatet 
   return learner.next_candidate();
 }
 
-typedef clockt::time_point time_pointt;
+typedef my_clockt::time_point time_pointt;
 
 template<class learnt, class verifyt, class mstreamt>
 template<class itert>
@@ -35,9 +35,9 @@ bool cegis_statistics_wrappert<learnt, verifyt, mstreamt>::learn(itert first,
     const itert &last)
 {
   num_ces+=std::distance(first, last);
-  time_pointt before=clockt::now();
+  time_pointt before=my_clockt::now();
   const bool result=learner.learn(first, last);
-  time_pointt after=clockt::now();
+  time_pointt after=my_clockt::now();
   learner_time+=std::chrono::duration_cast < millisecondst > (after - before);
   return result;
 }
@@ -52,7 +52,7 @@ void cegis_statistics_wrappert<learnt, verifyt, mstreamt>::show_candidate(
       << messaget::endl;
   os << "  <verifying_time>" << verifier_time.count() << "</verifying_time>"
       << messaget::endl;
-  const time_pointt now=clockt::now();
+  const time_pointt now=my_clockt::now();
   const millisecondst full_time(
       std::chrono::duration_cast < millisecondst > (now - start_time));
   os << "  <full_time>" << full_time.count() << "</full_time>"
@@ -67,9 +67,9 @@ template<class learnt, class verifyt, class mstreamt>
 void cegis_statistics_wrappert<learnt, verifyt, mstreamt>::verify(
     const candidatet &candidate)
 {
-  time_pointt before=clockt::now();
+  time_pointt before=my_clockt::now();
   verifier.verify(candidate);
-  time_pointt after=clockt::now();
+  time_pointt after=my_clockt::now();
   verifier_time+=std::chrono::duration_cast < millisecondst > (after - before);
 }
 
