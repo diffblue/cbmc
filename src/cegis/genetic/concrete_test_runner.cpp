@@ -102,6 +102,7 @@ public:
     return WEXITSTATUS(result);
 #else
     NOT_SUPPORTED();
+    return 0;
 #endif
   }
 
