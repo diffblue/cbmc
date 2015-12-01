@@ -3,6 +3,7 @@
 #include <util/arith_tools.h>
 #include <util/bv_arithmetic.h>
 #include <util/namespace_utils.h>
+#include <util/constant_width.h>
 
 #include <cegis/danger/options/danger_program.h>
 #include <cegis/danger/util/danger_program_helper.h>
@@ -49,8 +50,9 @@ public:
     const bv_arithmetict bv(constant);
     const mp_integer::ullong_t value=bv.to_integer().to_ulong();
     constants.insert(from_integer(value, type));
-    constants.insert(from_integer(value + 1, type));
-    constants.insert(from_integer(value - 1, type));
+    // XXX: Add constant +/- 1?
+    //constants.insert(from_integer(value + 1, type));
+    //constants.insert(from_integer(value - 1, type));
   }
 
   void operator()(const goto_programt::instructiont &instr)
@@ -72,34 +74,30 @@ public:
     prog.assertion.visit(op);
   }
 };
-
-class add_constantt
-{
-  danger_programt &program;
-public:
-  add_constantt(danger_programt &program) :
-      program(program)
-  {
-  }
-
-  void operator()(const constant_exprt &expr) const
-  {
-    add_danger_constant(program, expr);
-    // XXX: Add negation of every constant?
-    // if (!expr.is_zero()) add_danger_constant(program, unary_minus_exprt(expr));
-  }
-};
 }
 
-size_t literals_constant_strategy(danger_programt &program,
-    const size_t max_length)
+std::vector<constant_exprt> collect_literal_constants(
+    const danger_programt &program)
 {
   const compare_constantt compare(program);
   constant_sett constants(compare);
   const constant_expr_visitort visitor(program, constants);
   const danger_programt::program_ranget &range=program.danger_range;
   std::for_each(range.begin, range.end, visitor);
-  const add_constantt add_constant(program);
-  std::for_each(constants.begin(), constants.end(), add_constant);
-  return constants.size();
+  return std::vector<constant_exprt>(constants.begin(), constants.end());
+}
+
+size_t literals_constant_strategy(danger_programt &program,
+    const size_t max_length)
+{
+  const std::vector<constant_exprt> lit(collect_literal_constants(program));
+  size_t max_word_width=0u;
+  for (const constant_exprt &expr : lit)
+  {
+    add_danger_constant(program, expr);
+    // XXX: Add negation of every constant?
+    // if (!expr.is_zero()) add_danger_constant(program, unary_minus_exprt(expr));
+    max_word_width=std::max(max_word_width, get_min_word_width(expr));
+  }
+  return max_word_width;
 }

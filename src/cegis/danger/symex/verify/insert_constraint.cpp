@@ -1,7 +1,7 @@
-#include <iterator>
 #include <algorithm>
 
 #include <util/cprover_prefix.h>
+#include <util/expr_util.h>
 
 #include <cegis/danger/constraint/danger_constraint_factory.h>
 #include <cegis/danger/options/danger_program.h>
@@ -11,10 +11,13 @@
 
 namespace
 {
+#define DANGER_CONSTANT_PREFIX "DANGER_CONSTANT_"
+
 bool is_meta(const irep_idt &id, const typet &type)
 {
   if (ID_code == type.id()) return true;
   const std::string &name=id2string(id);
+  if (std::string::npos != name.find(DANGER_CONSTANT_PREFIX)) return true;
   if (std::string::npos != name.find("#return_value")) return true;
   return std::string::npos != name.find(CPROVER_PREFIX);
 }
@@ -138,4 +141,31 @@ void get_danger_constraint_vars(constraint_varst &vars,
   danger_symbol_set smb(&compare_symbol);
   collect_counterexample_variables(smb, program);
   std::copy(smb.begin(), smb.end(), std::back_inserter(vars));
+}
+
+void danger_limit_ce(const goto_programt::targetst &quantifiers,
+    danger_programt &program, size_t width)
+{
+  const symbol_tablet &st=program.st;
+  goto_programt &body=get_danger_body(program.gf);
+  for (const goto_programt::targett &quantifier : quantifiers)
+  {
+    const irep_idt &var=get_affected_variable(*quantifier);
+    const goto_programt::targett assume=body.insert_after(quantifier);
+    assume->type=goto_program_instruction_typet::ASSUME;
+    assume->source_location=default_danger_source_location();
+    const symbol_exprt expr=st.lookup(var).symbol_expr();
+    const typet &type=expr.type();
+    constant_exprt pattern=to_constant_expr(gen_zero(type));
+    std::string value=id2string(pattern.get_value());
+    const size_t value_sz=value.size();
+    assert(width <= value.size());
+    for (size_t i=0; i < value_sz - width; ++i)
+      value[i]='1';
+    pattern.set_value(value);
+    const bitand_exprt bitand_expr(expr, pattern);
+    const exprt zero(gen_zero(type));
+    const equal_exprt condition(bitand_expr, zero);
+    assume->guard=condition;
+  }
 }

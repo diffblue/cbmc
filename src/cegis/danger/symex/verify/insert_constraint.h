@@ -37,4 +37,16 @@ typedef std::deque<symbol_exprt> constraint_varst;
 void get_danger_constraint_vars(constraint_varst &vars,
     const danger_programt &program);
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param quantifiers
+ * @param program
+ * @param width
+ */
+void danger_limit_ce(const goto_programt::targetst &quantifiers,
+    danger_programt &program, size_t width);
+
 #endif /* CEGIS_DANGER_INSERT_CONSTRAINT_H_ */

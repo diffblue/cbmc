@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CEGIS_DANGER_DEFAULT_CONSTANT_STRATEGY_H_
 #define CEGIS_DANGER_DEFAULT_CONSTANT_STRATEGY_H_
 
-#include <cstddef>
-
 /**
  * @brief
  *

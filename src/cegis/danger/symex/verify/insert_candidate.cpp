@@ -84,6 +84,7 @@ public:
   void operator()(const goto_programt::const_targett &target)
   {
     copy_instr(pos=body.insert_after(pos), target);
+    pos->guard.visit(visitor);
     pos->code.visit(visitor);
   }
 };

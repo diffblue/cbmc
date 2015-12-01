@@ -26,7 +26,7 @@ typedef class danger_goto_solutiont candidatet;
  * @param program
  * @param candidate
  */
-void danger_insert_candidate(danger_programt &program,
+void danger_insert_candidate(class danger_programt &program,
     const candidatet &candidate);
 
 #endif /* CEGIS_DANGER_INSERT_CANDIDATE_H_ */

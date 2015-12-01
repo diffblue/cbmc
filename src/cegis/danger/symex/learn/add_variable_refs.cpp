@@ -53,7 +53,7 @@ goto_programt::targett set_ops_reference(const symbol_tablet &st,
 
 null_pointer_exprt get_null()
 {
-  void_typet void_type;
+  const void_typet void_type;
   const pointer_typet void_pointer_type(void_type);
   return null_pointer_exprt(void_pointer_type);
 }
@@ -102,16 +102,22 @@ void link_user_program_variables(danger_programt &prog,
       to_instrument.erase(id->first);
       break;
     case goto_program_instruction_typet::DEAD:
-      set_ops_reference(st, body, pred(it), get_null(), id->second);
+      //set_ops_reference(st, body, pred(it), get_null(), id->second);
+      // XXX: pred(it) would be cleaner, but this avoids inconsistencies when jumping to DEAD.
+      set_ops_reference(st, body, it, get_null(), id->second);
       break;
     default:
       break;
     }
   }
-  goto_programt::targett pos=pred(prog.danger_range.begin);
+  const goto_programt::targett range_begin(prog.danger_range.begin);
+  goto_programt::targett pos=pred(range_begin);
   danger_variable_idst::const_iterator it;
   for (it=to_instrument.begin(); it != to_instrument.end(); ++it)
+  {
     pos=set_ops_reference(st, body, pos, it->first, it->second);
+    if (it == to_instrument.begin()) move_labels(body, range_begin, pos);
+  }
 }
 
 goto_programt::targett set_rops_reference(const symbol_tablet &st,
@@ -125,10 +131,13 @@ goto_programt::targett link_temps(const symbol_tablet &st, goto_programt &body,
     goto_programt::targett pos, const size_t num_temps,
     const size_t num_user_vars)
 {
+  goto_programt::targett previous_successor(pos);
+  ++previous_successor;
   for (size_t i=0; i < num_temps; ++i)
   {
     const std::string name=get_danger_meta_name(get_tmp(i));
     pos=set_rops_reference(st, body, pos, name, i);
+    if (i == 0) move_labels(body, previous_successor, pos);
     pos=set_ops_reference(st, body, pos, name, i + num_user_vars);
   }
   return pos;

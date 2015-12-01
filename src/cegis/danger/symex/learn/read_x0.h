@@ -22,4 +22,16 @@
 void danger_read_x0(class danger_goto_solutiont &result,
     const class danger_programt &prog, const class goto_tracet &trace);
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param ind
+ * @param prog
+ * @param trace
+ */
+void danger_read_x0(class program_individualt &ind, const danger_programt &prog,
+    const goto_tracet &trace);
+
 #endif /* CEGIS_DANGER_READ_X0_H_ */

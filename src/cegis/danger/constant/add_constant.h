@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CEGIS_DANGER_ADD_CONSTANT_H_
 #define CEGIS_DANGER_ADD_CONSTANT_H_
 
+#include <string>
+
 /**
  * @brief
  *

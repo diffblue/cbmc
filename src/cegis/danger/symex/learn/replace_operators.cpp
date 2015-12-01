@@ -6,10 +6,10 @@
 
 namespace
 {
-const char ROP[]="__CPROVER_danger_execute::1::1::result";
-const char OP0[]="__CPROVER_danger_execute::1::1::op0";
-const char OP1[]="__CPROVER_danger_execute::1::1::op1";
-const char OP2[]="__CPROVER_danger_execute::1::1::op2";
+const char ROP[]="__CPROVER_danger_execute::1::1::1::result";
+const char OP0[]="__CPROVER_danger_execute::1::1::1::op0";
+const char OP1[]="__CPROVER_danger_execute::1::1::1::op1";
+const char OP2[]="__CPROVER_danger_execute::1::1::1::op2";
 class replace_ops_visitort: public expr_visitort
 {
 private:
@@ -50,7 +50,7 @@ public:
     const danger_variable_namest &names=is_res ? rnames : this->names;
     const size_t op=is_res ? instr_idx : is_op0 ? op0 : is_op1 ? op1 : op2;
     const danger_variable_namest::const_iterator name=names.find(op);
-    if (names.end() == name) return;
+    assert(names.end() != name);
     const symbol_exprt symbol(st.lookup(name->second).symbol_expr());
     const typet danger_type(danger_meta_type());
     if (type_eq(danger_type, symbol.type(), ns)) expr=symbol;

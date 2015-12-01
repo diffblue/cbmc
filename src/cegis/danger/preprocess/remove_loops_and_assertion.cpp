@@ -18,7 +18,7 @@ bool handle_assertion_removal(danger_programt &program,
   --end;
   goto_programt::targett &last_loop_end=program.loops.back().body.end;
   const bool is_last_loop_end=last_loop_end == target;
-  instrs.erase(target);
+  erase_target(instrs, target);
   ++end;
   if (is_last_loop_end) last_loop_end=end;
   return true;
@@ -39,7 +39,7 @@ void handle_loop_removal(danger_programt &program,
     else loop.guard=simplify_expr(not_exprt(guard), ns);
     loop.body.begin=goto_target;
     ++loop.body.begin;
-    instrs.erase(goto_target);
+    erase_target(instrs, goto_target);
   } else
   {
     loop.guard=simplify_expr(instr.guard, ns);
@@ -48,7 +48,7 @@ void handle_loop_removal(danger_programt &program,
   assert(!loop.guard.id().empty());
   loop.body.end=target;
   --loop.body.end;
-  instrs.erase(target--);
+  erase_target(instrs, target--);
   ++loop.body.end;
   program.loops.push_back(loop);
 }

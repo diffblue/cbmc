@@ -17,6 +17,19 @@ Author: Daniel Kroening, kroening@kroening.com
  *
  * @details
  *
+ * @param st
+ * @param num_vars
+ * @param num_consts
+ * @param max_solution_size
+ */
+std::string get_danger_library_text(size_t num_vars, size_t num_consts,
+    size_t max_solution_size);
+
+/**
+ * @brief
+ *
+ * @details
+ *
  * @param prog
  * @param msg
  * @param num_vars
