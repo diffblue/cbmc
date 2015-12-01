@@ -63,6 +63,7 @@ void add_danger_constant(danger_programt &program, const exprt &value)
 
 namespace
 {
+#if 0
 void add_danger_constant(danger_programt &prog, const std::string &name,
     const exprt &value, typet type)
 {
@@ -75,6 +76,7 @@ void add_danger_constant(danger_programt &prog, const std::string &name,
   if (!is_empty(value))
     pos=danger_assign_user_variable(st, prog.gf, pos, name, value);
 }
+#endif
 }
 
 void add_danger_constant(danger_programt &prog, const std::string &name,

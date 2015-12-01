@@ -43,6 +43,7 @@ void force_all_guards_violated(exprt::operandst &op, const size_t num_loops)
   }
 }
 
+#if 0
 void get_all_exits(exprt::operandst &op, const size_t num_loops)
 {
   for (size_t i=0; i < num_loops; ++i)
@@ -50,6 +51,7 @@ void get_all_exits(exprt::operandst &op, const size_t num_loops)
     op.push_back(danger_component_as_bool(get_Gx(i)));
   }
 }
+#endif
 }
 
 void force_assertion_satisfaction(goto_functionst &gf, const size_t num_loops)
