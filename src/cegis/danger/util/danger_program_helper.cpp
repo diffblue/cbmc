@@ -2,6 +2,8 @@
 
 #include <goto-programs/goto_functions.h>
 
+#include <cegis/wordsize/restrict_bv_size.h>
+#include <cegis/danger/options/danger_program.h>
 #include <cegis/danger/meta/literals.h>
 #include <cegis/danger/util/danger_program_helper.h>
 
@@ -42,7 +44,41 @@ const irep_idt &get_affected_variable(const goto_programt::instructiont &instr)
   }
 }
 
-bool is_nondet(const goto_programt::targett &target)
+class id_searcht: public const_expr_visitort
+{
+  const irep_idt &id;
+  bool found;
+public:
+  id_searcht(const irep_idt &id) :
+      id(id), found(false)
+  {
+  }
+
+  virtual ~id_searcht()
+  {
+  }
+
+  virtual void operator()(const exprt &expr)
+  {
+    if (ID_symbol != expr.id()) return;
+    if (id == to_symbol_expr(expr).get_identifier()) found=true;
+  }
+
+  bool is_found()
+  {
+    return found;
+  }
+};
+
+bool contains(const exprt &rhs, const irep_idt &id)
+{
+  id_searcht search(id);
+  rhs.visit(search);
+  return search.is_found();
+}
+
+bool is_nondet(const goto_programt::targett &target,
+    const goto_programt::targett &end)
 {
   const goto_programt::instructiont &instr=*target;
   switch (instr.type)
@@ -50,9 +86,12 @@ bool is_nondet(const goto_programt::targett &target)
   case goto_program_instruction_typet::DECL:
   {
     goto_programt::targett next=target;
-    const goto_programt::instructiont next_instr=*++next;
+    if (++next == end) return true;
+    const goto_programt::instructiont next_instr=*next;
     if (goto_program_instruction_typet::ASSIGN != next_instr.type) return true;
-    return get_affected_variable(instr) != get_affected_variable(next_instr);
+    const irep_idt id(get_affected_variable(instr));
+    if (id != get_affected_variable(next_instr)) return true;
+    return contains(to_code_assign(next_instr.code).rhs(), id);
   }
   case goto_program_instruction_typet::ASSIGN:
   {
@@ -68,11 +107,14 @@ bool is_nondet(const goto_programt::targett &target)
 namespace
 {
 const char NS_SEP[]="::";
+const char NONDET_CONSTANT_PREFIX[]="DANGER_CONSTANT_NONDET_";
 }
 bool is_global_const(const irep_idt &name, const typet &type)
 {
   if (!type.get_bool(ID_C_constant)) return false;
-  return std::string::npos == id2string(name).find(NS_SEP);
+  const std::string &n=id2string(name);
+  if (std::string::npos != n.find(NONDET_CONSTANT_PREFIX)) return true;
+  return std::string::npos == n.find(NS_SEP);
 }
 
 namespace
@@ -96,4 +138,46 @@ goto_programt::targett fix_target_by_offset(
   const size_t distance=std::distance(original_offset, target);
   std::advance(new_offset, distance);
   return new_offset;
+}
+
+void erase_target(goto_programt::instructionst &body,
+    const goto_programt::targett &target)
+{
+  goto_programt::targett succ=target;
+  assert(++succ != body.end());
+  for (goto_programt::instructiont &instr : body)
+  {
+    for (goto_programt::targett &t : instr.targets)
+      if (target == t) t=succ;
+  }
+  body.erase(target);
+}
+
+void erase_target(goto_programt &body, const goto_programt::targett &target)
+{
+  erase_target(body.instructions, target);
+}
+
+void restrict_bv_size(danger_programt &prog, const size_t width_in_bits)
+{
+  restrict_bv_size(prog.st, prog.gf, width_in_bits);
+  for (danger_programt::loopt &loop : prog.loops)
+    restrict_bv_size(loop.guard, width_in_bits);
+  restrict_bv_size(prog.assertion, width_in_bits);
+}
+
+goto_programt::targett insert_before_preserve_labels(goto_programt &body,
+    const goto_programt::targett &target)
+{
+  const goto_programt::targett result=body.insert_before(target);
+  move_labels(body, target, result);
+  return result;
+}
+
+void move_labels(goto_programt &body, const goto_programt::targett &from,
+    const goto_programt::targett &to)
+{
+  for (goto_programt::instructiont &instr : body.instructions)
+    for (goto_programt::targett &target : instr.targets)
+      if (from == target) target=to;
 }

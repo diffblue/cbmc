@@ -23,6 +23,7 @@ template<class verify_configurationt>
 void cegis_symex_verifyt<verify_configurationt>::verify(
     const candidatet &candidate)
 {
+  is_failure=true;
   current_counterexamples.clear();
   config.process(candidate);
   const symbol_tablet &st=config.get_symbol_table();

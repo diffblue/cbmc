@@ -1,10 +1,13 @@
 #include <algorithm>
 
+#include <util/arith_tools.h>
 #include <util/bv_arithmetic.h>
 
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/goto_functions.h>
 
+#include <cegis/value/program_individual_serialisation.h>
+#include <cegis/instructions/instruction_set_factory.h>
 #include <cegis/danger/meta/literals.h>
 #include <cegis/danger/meta/meta_variable_names.h>
 #include <cegis/danger/instrument/meta_variables.h>
@@ -12,21 +15,19 @@
 #include <cegis/danger/options/danger_program.h>
 #include <cegis/danger/util/copy_instructions.h>
 #include <cegis/danger/util/danger_program_helper.h>
-#include <cegis/danger/symex/learn/instruction_set_factory.h>
 #include <cegis/danger/symex/learn/replace_operators.h>
 #include <cegis/danger/symex/learn/solution_factory.h>
 #include <cegis/danger/symex/learn/read_x0.h>
 
 namespace
 {
-const size_t get_const_value(const exprt &expr)
+const program_individualt::instructiont::opt get_const_value(const exprt &expr)
 {
   const bv_arithmetict bv(expr);
-  return bv.to_integer().to_ulong();
+  return static_cast<program_individualt::instructiont::opt>(bv.to_integer().to_ulong());
 }
 
 typedef std::map<size_t, const irep_idt> danger_variable_namest;
-
 void reverse(danger_variable_namest &names, const danger_variable_idst &o)
 {
   for (danger_variable_idst::const_iterator it=o.begin(); it != o.end(); ++it)
@@ -63,6 +64,7 @@ goto_programt::instructionst &get_prog(
   }
 }
 
+// TODO: Replace construct by name prefixes for programs
 class read_instrt
 {
   danger_goto_solutiont::danger_programst &progs;
@@ -70,7 +72,7 @@ class read_instrt
   const danger_variable_namest &names;
   danger_variable_namest rnames;
   const instruction_sett &instrset;
-  const size_t max_size;
+  size_t prog_size;
   size_t loop_index;
   size_t insidx;
   prog_typet prog_type;
@@ -83,7 +85,7 @@ class read_instrt
     {
     case INV:
     {
-      const size_t idx=create_temps(rnames, max_size - 1);
+      const size_t idx=create_temps(rnames, prog_size - 1);
       const std::string result(get_danger_meta_name(get_Rx(loop_index, 0))); // XXX: Lexicographical ranking?
       rnames.insert(std::make_pair(idx, result));
       prog_type=RNK;
@@ -93,8 +95,8 @@ class read_instrt
     {
       const danger_programt::loopt &loop=danger_prog.loops[loop_index];
       const size_t num_skolem=loop.skolem_choices.size();
-      const size_t num_temps=create_temps(rnames, max_size - num_skolem);
-      for (size_t i=num_temps; i < max_size; ++i)
+      const size_t num_temps=create_temps(rnames, prog_size - num_skolem);
+      for (size_t i=num_temps; i < prog_size; ++i)
       {
         const size_t sk=i - num_temps;
         const std::string name(get_danger_meta_name(get_Sx(loop_index, sk)));
@@ -106,7 +108,7 @@ class read_instrt
     }
     case SKO:
     {
-      const size_t idx=create_temps(rnames, max_size - 1);
+      const size_t idx=create_temps(rnames, prog_size - 1);
       const std::string result_name(get_danger_meta_name(get_Dx(loop_index)));
       rnames.insert(std::make_pair(idx, result_name));
       prog_type=INV;
@@ -117,17 +119,24 @@ class read_instrt
 public:
   read_instrt(danger_goto_solutiont::danger_programst &progs,
       const danger_programt &danger_prog, const danger_variable_namest &names,
-      const instruction_sett &instrset, const size_t max_size) :
-      progs(progs), danger_prog(danger_prog), names(names), instrset(instrset), max_size(
-          max_size), loop_index(0u), insidx(0u), prog_type(SKO)
+      const instruction_sett &instrset, const size_t prog_size) :
+      progs(progs), danger_prog(danger_prog), names(names), instrset(instrset), prog_size(
+          prog_size), loop_index(0u), insidx(0u), prog_type(SKO)
   {
     switch_prog();
   }
 
-  void operator()(const exprt &prog_arary_member)
+  read_instrt(danger_goto_solutiont::danger_programst &progs,
+      const danger_programt &danger_prog, const danger_variable_namest &names,
+      const instruction_sett &instrset) :
+      progs(progs), danger_prog(danger_prog), names(names), instrset(instrset), prog_size(
+          0u), loop_index(0u), insidx(0u), prog_type(SKO)
   {
-    const struct_exprt &instr_rep=to_struct_expr(prog_arary_member);
-    const size_t opcode=get_const_value(instr_rep.op0());
+  }
+
+  void operator()(const program_individualt::instructiont &instruction)
+  {
+    const program_individualt::instructiont::opcodet opcode=instruction.opcode;
     const instruction_sett::const_iterator instr_entry=instrset.find(opcode);
     assert(instrset.end() != instr_entry);
     goto_programt::instructionst &prog=get_prog(progs, prog_type, insidx);
@@ -143,30 +152,27 @@ public:
     }
     copy_instr.finalize();
     std::advance(first, -instr.size());
-    const size_t op0=get_const_value(instr_rep.op1());
-    const size_t op1=get_const_value(instr_rep.op2());
-    const size_t op2=get_const_value(instr_rep.op3());
+    const program_individualt::instructiont::opst &ops=instruction.ops;
+    const size_t empty_op=0u;
+    const size_t op0=!ops.empty() ? ops.front() : empty_op;
+    const size_t op1=ops.size() >= 2 ? ops.at(1) : empty_op;
+    const size_t op2=ops.size() >= 3 ? ops.at(2) : empty_op;
     const symbol_tablet &st=danger_prog.st;
     replace_ops_in_instr(st, first, last, names, rnames, op0, op1, op2, insidx);
-    if (++insidx % max_size == 0)
-    {
-      danger_make_presentable(prog);
-      switch_prog();
-    }
+    if (++insidx % prog_size == 0) danger_make_presentable(prog);
   }
-};
 
-class read_instrt_reft
-{
-  read_instrt &ref;
-public:
-  read_instrt_reft(read_instrt &ref) :
-      ref(ref)
-  {
-  }
   void operator()(const exprt &prog_arary_member)
   {
-    ref(prog_arary_member);
+    const struct_exprt &instr_rep=to_struct_expr(prog_arary_member);
+    operator()(to_program_individual_instruction(instr_rep));
+    if (insidx % prog_size == 0) switch_prog();
+  }
+
+  void set_prog_size(const size_t prog_size)
+  {
+    this->prog_size=prog_size;
+    switch_prog();
   }
 };
 
@@ -183,17 +189,9 @@ public:
 
   void operator()(const goto_trace_stept &step)
   {
-    if (goto_trace_stept::DECL != step.type) return;
-    const exprt &value=step.full_lhs_value;
-    if (ID_array != value.id()) return;
-    const typet &type=value.type().subtype();
-    if (ID_struct != type.id()) return;
-    const std::string &tname=id2string(to_struct_type(type).get_tag());
-    const char * const danger_tag=&DANGER_INSTRUCTION_TYPE_NAME[4];
-    if (std::string::npos == tname.find(danger_tag)) return;
-    const exprt::operandst &instructions=value.operands();
-    read_instrt_reft read_instr(this->read_instr);
-    std::for_each(instructions.begin(), instructions.end(), read_instr);
+    if (!is_program_indivdual_decl(step)) return;
+    for (const exprt &prog_array_member : step.full_lhs_value.operands())
+      read_instr(prog_array_member);
   }
 };
 
@@ -205,13 +203,22 @@ void extract_programs(danger_goto_solutiont::danger_programst &progs,
   const extract_programt extract(progs, prog, names, instrset, max_size);
   std::for_each(trace.steps.begin(), trace.steps.end(), extract);
 }
+
+void extract_instruction_set(instruction_sett &instr_set,
+    const goto_functionst &gf)
+{
+  typedef goto_functionst::function_mapt function_mapt;
+  const function_mapt &function_map=gf.function_map;
+  const function_mapt::const_iterator it=function_map.find(DANGER_EXECUTE);
+  assert(function_map.end() != it);
+  extract_instruction_set(instr_set, it->second.body);
+}
 }
 
 void create_danger_solution(danger_goto_solutiont &result,
     const danger_programt &prog, const goto_tracet &trace,
     const danger_variable_idst &ids, const size_t max_size)
 {
-  typedef std::map<size_t, const irep_idt> danger_variable_namest;
   danger_variable_namest names;
   reverse(names, ids);
   instruction_sett instr_set;
@@ -219,4 +226,37 @@ void create_danger_solution(danger_goto_solutiont &result,
   danger_goto_solutiont::danger_programst &progs=result.danger_programs;
   extract_programs(progs, prog, trace, names, instr_set, max_size);
   danger_read_x0(result, prog, trace);
+}
+
+void create_danger_solution(danger_goto_solutiont &result,
+    const danger_programt &prog, const program_individualt &ind,
+    const instruction_sett &instr_set, const danger_variable_idst &ids)
+{
+  danger_variable_namest names;
+  reverse(names, ids);
+  danger_goto_solutiont::danger_programst &progs=result.danger_programs;
+  progs.clear();
+  typedef program_individualt individualt;
+  const individualt::programst &ind_progs=ind.programs;
+  read_instrt extract(progs, prog, names, instr_set);
+  for (const individualt::programt &program : ind_progs)
+  {
+    extract.set_prog_size(program.size());
+    for (const individualt::instructiont &instr : program)
+      extract(instr);
+  }
+  danger_goto_solutiont::nondet_choicest &nondet=result.x0_choices;
+  nondet.clear();
+  const typet type=danger_meta_type(); // XXX: Currently single data type.
+  for (const individualt::x0t::value_type &x0 : ind.x0)
+    nondet.push_back(from_integer(x0, type));
+}
+
+void create_danger_solution(danger_goto_solutiont &result,
+    const danger_programt &prog, const program_individualt &ind,
+    const danger_variable_idst &ids)
+{
+  instruction_sett instr_set;
+  extract_instruction_set(instr_set, prog.gf);
+  create_danger_solution(result, prog, ind, instr_set, ids);
 }

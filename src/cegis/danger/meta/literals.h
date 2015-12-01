@@ -13,6 +13,7 @@
 #define DANGER_PREFIX "__CPROVER_danger_"
 #define DANGER_MODULE "<builtin-library-danger>"
 
+#define DANGER_X0_PLACEHOLDER_PREFIX "__CPROVER_danger_x0_"
 #define DANGER_EXECUTE "__CPROVER_danger_execute"
 #define DANGER_INSTRUCTION_TYPE_NAME "tag-__CPROVER_danger_instructiont"
 #define DANGER_OPS "__CPROVER_danger_OPS"

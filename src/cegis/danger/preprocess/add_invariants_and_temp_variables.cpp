@@ -7,18 +7,27 @@
 
 namespace
 {
+bool need_temp_variables(const size_t max_program_length)
+{
+  return max_program_length >= 2u;
+}
+
 void create_tmp_variables(danger_programt &program,
     const size_t max_program_length)
 {
+  if (!need_temp_variables(max_program_length)) return;
   symbol_tablet &st=program.st;
   goto_functionst &gf=program.gf;
+  goto_programt &body=get_danger_body(gf);
   goto_programt::targett insert_after=program.danger_range.begin;
   --insert_after;
+  const goto_programt::targett first(insert_after);
   const typet type(danger_meta_type());
   for (size_t i=0; i < max_program_length - 1; ++i)
   {
     const std::string base_name(get_tmp(i));
     insert_after=declare_danger_variable(st, gf, insert_after, base_name, type);
+    if (i == 0) move_labels(body, program.danger_range.begin, insert_after);
   }
 }
 
@@ -31,6 +40,7 @@ void createDx0(danger_programt &prog)
   goto_programt::targett &meta=prog.Dx0;
   goto_programt::targett pos=first.body.begin;
   meta=declare_danger_variable(prog.st, prog.gf, --pos, get_Dx0(), type);
+  move_labels(get_danger_body(prog.gf), first.body.begin, meta);
 }
 
 class create_skolem_meta_variablest
@@ -81,6 +91,8 @@ public:
     goto_programt::targett pos=loop.body.begin;
     const std::string inv(get_Dx(loop_id));
     meta.Dx=declare_danger_variable(st, gf, --pos, inv, type);
+    goto_programt &body=get_danger_body(gf);
+    move_labels(body, loop.body.begin, meta.Dx);
     const std::string guard(get_Gx(loop_id));
     meta.Gx=declare_danger_variable(st, gf, meta.Dx, guard, type);
     pos=assign_danger_variable(st, gf, meta.Gx, guard, loop.guard);
@@ -96,6 +108,7 @@ public:
     pos=loop.body.end;
     const std::string x_prime(get_Dx_prime(loop_id));
     meta.Dx_prime=declare_danger_variable(st, gf, --pos, x_prime, type);
+    move_labels(body, loop.body.end, meta.Dx_prime);
     pos=meta.Dx_prime;
     for (size_t i=0; i < ranking_count; ++i)
     {

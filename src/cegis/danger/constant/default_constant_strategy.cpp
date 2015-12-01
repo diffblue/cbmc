@@ -18,12 +18,13 @@ size_t default_constant_strategy(danger_programt &program,
   const bv_spect spec(type);
   add_danger_constant(program, from_integer(spec.max_value().to_ulong(), type));
   add_danger_constant(program, from_integer(0u, type));
-  return 2u + literals_constant_strategy(program, max_length);
+  return std::max(size_t(1u), literals_constant_strategy(program, max_length));
+  //return 2u + literals_constant_strategy(program, max_length);
   /*for (size_t i=0; i < max_length; ++i)
-  {
-    const side_effect_expr_nondett value(type);
-    std::string name(NONDET_PREFIX);
-    add_danger_constant(program, name+=integer2string(i), value);
-  }
-  return 2u + max_length + literals_constant_strategy(program, max_length);*/
+   {
+   const side_effect_expr_nondett value(type);
+   std::string name(NONDET_PREFIX);
+   add_danger_constant(program, name+=integer2string(i), value);
+   }
+   return 2u + max_length + literals_constant_strategy(program, max_length);*/
 }

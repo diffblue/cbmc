@@ -24,6 +24,8 @@ class danger_verify_configt
   const danger_programt &original_program;
   danger_programt program;
   goto_programt::targetst quantifiers;
+  bool limit_ce;
+  size_t max_ce_width;
 public:
   /**
    * @brief Counterexample type for this CEGIS component.
@@ -73,7 +75,7 @@ public:
    *
    * @return
    */
-  const symbol_tablet &get_symbol_table();
+  const symbol_tablet &get_symbol_table() const;
 
   /**
    * @brief
@@ -82,7 +84,16 @@ public:
    *
    * @return
    */
-  const goto_functionst &get_goto_functions();
+  const goto_functionst &get_goto_functions() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  goto_functionst &get_goto_functions();
 
   /**
    * @brief
@@ -94,6 +105,33 @@ public:
    */
   void convert(counterexamplest &counterexamples,
       const class goto_tracet &trace);
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  size_t get_number_of_loops() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  exprt::operandst get_loop_guards() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param size
+   */
+  void set_max_ce_width(size_t size);
 };
 
 #endif /* CEGIS_DANGER_VERIFY_CONFIG_H_ */

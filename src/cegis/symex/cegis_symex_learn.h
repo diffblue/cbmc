@@ -1,11 +1,11 @@
 /*******************************************************************
 
-Module: Counterexample-Guided Inductive Synthesis
+ Module: Counterexample-Guided Inductive Synthesis
 
-Author: Daniel Kroening, kroening@kroening.com
-        Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+ Author: Daniel Kroening, kroening@kroening.com
+ Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
 
-\*******************************************************************/
+ \*******************************************************************/
 
 #ifndef CEGIS_DANGER_CEGIS_SYMEX_LEARN_H_
 #define CEGIS_DANGER_CEGIS_SYMEX_LEARN_H_
@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
  *
  * @details
  */
-template<class learn_configurationt>
+template<class preproct, class learn_configurationt>
 class cegis_symex_learnt
 {
 public:
@@ -24,10 +24,16 @@ public:
   typedef typename learn_configurationt::counterexamplest counterexamplest;
 private:
   const class optionst &options;
+  preproct &preproc;
   learn_configurationt &config;
+  size_t word_width;
+  size_t current_solution_size;
   size_t max_solution_size;
   candidatet current_candidate;
   counterexamplest counterexamples;
+
+  safety_checkert::resultt run_bmc(message_handlert &msg, const optionst &opt);
+  bool learn_at_current_size();
 public:
   /**
    * @brief
@@ -35,9 +41,11 @@ public:
    * @details
    *
    * @param options
+   * @param preproc
    * @param config
    */
-  cegis_symex_learnt(const optionst &options, learn_configurationt &config);
+  cegis_symex_learnt(const optionst &options, preproct &preproc,
+      learn_configurationt &config);
 
   /**
    * @brief
@@ -47,6 +55,16 @@ public:
   ~cegis_symex_learnt();
 
   /**
+   * @brief
+   *
+   * @details
+   *
+   * @param seed
+   */
+  template<class seedt>
+  void seed(seedt &seed);
+
+  /**
    * @brief Provides the next candidate.
    *
    * @details Provides the last candidate generated using learn.
@@ -54,20 +72,6 @@ public:
    * @return The next candidate.
    */
   const candidatet &next_candidate() const;
-
-  /**
-   * @brief Generates a candidate solution.
-   *
-   * @details Generates a new candidate based on previously received counterexamples.
-   * This operation is useful when the set of counterexamples remains the same and only
-   * the maximum solution size has changed.
-   *
-   * @param max_solution_size The new maximum solution size.
-   *
-   * @return <code>true</code> if learning was successful, <code>false</code>
-   * if no new candidate could be generated.
-   */
-  bool learn(size_t max_solution_size);
 
   /**
    * @brief Generates a candidate solution.
@@ -86,6 +90,17 @@ public:
   bool learn(itert first, const itert &last);
 
   /**
+   * @brief Adds explicit counterexamples.
+   *
+   * @details Adds counterexamples to the learner without starting a new learn round.
+   *
+   * @param first The first iterator of the counterexample set.
+   * @param last The last iterator of the counterexample set.
+   */
+  template<class itert>
+  void add_counterexamples(itert first, const itert &last);
+
+  /**
    * @brief Displays the last candidate.
    *
    * @details Prints the last candidate generated using learn.
@@ -93,6 +108,16 @@ public:
    * @param os The stream to output the candidate.
    */
   void show_candidate(messaget::mstreamt &os) const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param min
+   * @param max
+   */
+  void set_solution_size_range(size_t min, size_t max);
 };
 
 #include "cegis_symex_learn.inc"
