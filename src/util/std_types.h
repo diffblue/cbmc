@@ -962,6 +962,22 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
   return static_cast<const bitvector_typet &>(type);
 }
 
+inline bitvector_typet &to_bitvector_type(typet &type)
+{
+  assert(type.id()==ID_signedbv ||
+         type.id()==ID_unsignedbv ||
+         type.id()==ID_fixedbv ||
+         type.id()==ID_floatbv ||
+         type.id()==ID_verilog_signedbv ||
+         type.id()==ID_verilog_unsignedbv ||
+         type.id()==ID_bv ||
+         type.id()==ID_pointer ||
+         type.id()==ID_c_bit_field ||
+         type.id()==ID_c_bool);
+
+  return static_cast<bitvector_typet &>(type);
+}
+
 /*! \brief fixed-width bit-vector without numerical interpretation
 */
 class bv_typet:public bitvector_typet
