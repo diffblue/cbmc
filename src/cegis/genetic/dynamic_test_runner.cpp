@@ -156,11 +156,14 @@ void dynamic_test_runnert::run_test(individualt &ind, const counterexamplet &ce,
     args.push_back(static_cast<unsigned int>(x0));
 
   const int argc=args.size();
-  unsigned int argv[argc];
+
+  std::vector<unsigned int> argv;
+  argv.resize(argc);
+
   for (int i=0; i < argc; ++i)
     argv[i]=args[i];
 
-  on_complete(EXIT_SUCCESS == fitness_tester(argv));
+  on_complete(EXIT_SUCCESS == fitness_tester(argv.data()));
 }
 
 void dynamic_test_runnert::join()
