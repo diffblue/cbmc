@@ -61,6 +61,7 @@ void cleanup(task_poolt::task_idst &task_ids, task_poolt::handlerst &handlers)
 #endif
 }
 
+#ifndef _WIN32
 bool erase_if_managed(task_poolt::task_idst &ids, const task_poolt::task_idt id)
 {
   const task_poolt::task_idst::iterator task_id=ids.find(id);
@@ -68,6 +69,7 @@ bool erase_if_managed(task_poolt::task_idst &ids, const task_poolt::task_idt id)
   ids.erase(task_id);
   return true;
 }
+#endif
 }
 
 #define FORK_ERROR "Fork system call failed."
