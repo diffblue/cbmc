@@ -95,6 +95,7 @@ task_poolt::task_idt task_poolt::schedule(const taskt &task)
   }
 #else
   NOT_SUPPORTED();
+  return 0;
 #endif
 }
 
