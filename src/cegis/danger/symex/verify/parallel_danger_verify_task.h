@@ -10,7 +10,7 @@
 #ifndef CEGIS_PARALLEL_DANGER_VERIFY_TASK_H_
 #define CEGIS_PARALLEL_DANGER_VERIFY_TASK_H_
 
-#include <util/irep_pipe.h>
+#include <cegis/cegis-util/irep_pipe.h>
 #include <cegis/danger/symex/verify/danger_verify_config.h>
 
 #ifdef _WIN32

@@ -1,14 +1,17 @@
 #ifndef _WIN32
+#include <signal.h>
 #include <sys/signal.h>
 #include <sys/wait.h>
 #endif
+
 #include <algorithm>
 #include <cstdlib>
 #include <iterator>
 #include <sstream>
 
 #include <util/irep.h>
-#include <util/task_pool.h>
+
+#include "task_pool.h"
 
 task_poolt::task_poolt()
 {

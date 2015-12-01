@@ -1,7 +1,8 @@
 #include <util/arith_tools.h>
 #include <util/bv_arithmetic.h>
-#include <util/constant_width.h>
 #include <util/mp_arith.h>
+
+#include <cegis/cegis-util/constant_width.h>
 
 #include <cegis/danger/options/danger_program.h>
 #include <cegis/danger/instrument/meta_variables.h>
@@ -11,12 +12,14 @@
 
 namespace
 {
+#if 0
 const char NONDET_CONSTANT_PREFIX[]="DANGER_CONSTANT_NONDET_";
 std::string get_ndt_name(size_t index)
 {
   std::string name(NONDET_CONSTANT_PREFIX);
   return name+=integer2string(index);
 }
+#endif
 
 const char CONSTANT_PREFIX[]="DANGER_CONSTANT_";
 std::string get_name(size_t index)

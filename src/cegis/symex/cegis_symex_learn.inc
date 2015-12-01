@@ -1,9 +1,9 @@
-#include <util/constant_width.h>
-
 #include <goto-programs/safety_checker.h>
 
 #include <cbmc/cbmc_solvers.h>
 #include <cbmc/bmc.h>
+
+#include <cegis/cegis-util/constant_width.h>
 
 #define CONSTANT_WIDTH_OPTION "max-constant-width"
 #define CEGIS_DEFAULT_MIN_WORD_WIDTH 4u
