@@ -1,6 +1,10 @@
 #include <cstdlib>
 #include <fstream>
 
+#ifndef _WIN32
+#include <sys/wait.h>
+#endif
+
 #include <util/bv_arithmetic.h>
 #include <util/mp_arith.h>
 
