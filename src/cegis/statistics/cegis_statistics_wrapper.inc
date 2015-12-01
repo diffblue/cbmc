@@ -27,7 +27,7 @@ const typename cegis_statistics_wrappert<learnt, verifyt, mstreamt>::candidatet 
   return learner.next_candidate();
 }
 
-typedef my_clockt::time_point time_pointt;
+typedef my_clockt::time_point my_time_pointt;
 
 template<class learnt, class verifyt, class mstreamt>
 template<class itert>
@@ -35,9 +35,9 @@ bool cegis_statistics_wrappert<learnt, verifyt, mstreamt>::learn(itert first,
     const itert &last)
 {
   num_ces+=std::distance(first, last);
-  time_pointt before=my_clockt::now();
+  my_time_pointt before=my_clockt::now();
   const bool result=learner.learn(first, last);
-  time_pointt after=my_clockt::now();
+  my_time_pointt after=my_clockt::now();
   learner_time+=std::chrono::duration_cast < millisecondst > (after - before);
   return result;
 }
@@ -52,7 +52,7 @@ void cegis_statistics_wrappert<learnt, verifyt, mstreamt>::show_candidate(
       << messaget::endl;
   os << "  <verifying_time>" << verifier_time.count() << "</verifying_time>"
       << messaget::endl;
-  const time_pointt now=my_clockt::now();
+  const my_time_pointt now=my_clockt::now();
   const millisecondst full_time(
       std::chrono::duration_cast < millisecondst > (now - start_time));
   os << "  <full_time>" << full_time.count() << "</full_time>"
@@ -67,9 +67,9 @@ template<class learnt, class verifyt, class mstreamt>
 void cegis_statistics_wrappert<learnt, verifyt, mstreamt>::verify(
     const candidatet &candidate)
 {
-  time_pointt before=my_clockt::now();
+  my_time_pointt before=my_clockt::now();
   verifier.verify(candidate);
-  time_pointt after=my_clockt::now();
+  my_time_pointt after=my_clockt::now();
   verifier_time+=std::chrono::duration_cast < millisecondst > (after - before);
 }
 
