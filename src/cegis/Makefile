@@ -22,6 +22,7 @@ SRC = danger/util/danger_program_helper.cpp danger/util/copy_instructions.cpp \
       genetic/instruction_set_info_factory.cpp genetic/random_mutate.cpp genetic/random_cross.cpp \
       genetic/random_individual.cpp genetic/genetic_constant_strategy.cpp instructions/instruction_set_factory.cpp \
       genetic/concrete_test_runner.cpp genetic/dynamic_test_runner.cpp \
+      util/task_pool.cpp util/constant_width util/irep_pipe.cpp \
       ../goto-instrument/dump_c.cpp ../goto-instrument/goto_program2code.cpp
 
 INCLUDES= -I ..
