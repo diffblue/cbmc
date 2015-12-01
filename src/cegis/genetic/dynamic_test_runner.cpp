@@ -1,5 +1,6 @@
+//#include <dlfcn.h>
+
 #include <cstdlib>
-#include <dlfcn.h>
 #include <fstream>
 
 #include <util/bv_arithmetic.h>
@@ -27,7 +28,9 @@ dynamic_test_runnert::~dynamic_test_runnert()
 {
   if (fitness_tester)
   {
+    #if 0
     dlclose(handle);
+    #endif
   }
 }
 
@@ -99,6 +102,7 @@ void prepare_library(dynamic_test_runnert::lib_handlet &handle,
   compile_command+=library;
   const int result=system(compile_command.c_str());
   if (result) throw std::runtime_error(COMPLING_FAILED);
+  #if 0
   handle=dlopen(library.c_str(), RTLD_NOW);
   if (!handle)
   {
@@ -112,6 +116,7 @@ void prepare_library(dynamic_test_runnert::lib_handlet &handle,
     perror(error);
     throw std::runtime_error(LOAD_FUNC_FAILED);
   }
+  #endif
 }
 }
 
