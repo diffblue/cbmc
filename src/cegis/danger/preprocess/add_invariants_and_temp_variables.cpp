@@ -21,7 +21,7 @@ void create_tmp_variables(danger_programt &program,
   goto_programt &body=get_danger_body(gf);
   goto_programt::targett insert_after=program.danger_range.begin;
   --insert_after;
-  const goto_programt::targett first(insert_after);
+  //const goto_programt::targett first(insert_after);
   const typet type(danger_meta_type());
   for (size_t i=0; i < max_program_length - 1; ++i)
   {
