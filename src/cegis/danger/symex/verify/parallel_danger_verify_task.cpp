@@ -248,9 +248,9 @@ default:
 success=run_bmc<danger_config_rankingt>(new_ces, options, config, candidate);
 break;
 }
-#ifndef _WIN32
 irept package;
 to_irep(package, success, new_ces);
+#ifndef _WIN32
 pipe.close_read();
 pipe.send(package);
 pipe.close_write();
@@ -260,12 +260,12 @@ pipe.close_write();
 void parallel_danger_verify_taskt::read_counterexamples(bool &success,
 counterexamplest &counterexamples)
 {
-#ifndef _WIN32
 irept package;
+#ifndef _WIN32
 pipe.receive(package);
 pipe.close_read();
-from_irep(this->success, new_ces, package);
 #endif
+from_irep(this->success, new_ces, package);
 std::copy(new_ces.begin(), new_ces.end(),
   std::inserter(counterexamples, counterexamples.end()));
 success=this->success;
