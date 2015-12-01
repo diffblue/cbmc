@@ -67,6 +67,10 @@ public:
 class transform_to_info
 {
 public:
+  transform_to_info()
+  {
+  }
+
   instruction_set_infot::value_type operator()(
       const instruction_sett::value_type &instr) const
   {
