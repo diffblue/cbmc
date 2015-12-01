@@ -17,8 +17,9 @@
  *
  * @details
  */
-struct danger_goto_solutiont
+class danger_goto_solutiont
 {
+public:
   /**
    * @brief
    *

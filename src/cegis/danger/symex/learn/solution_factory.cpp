@@ -21,11 +21,13 @@
 
 namespace
 {
+#if 0
 const program_individualt::instructiont::opt get_const_value(const exprt &expr)
 {
   const bv_arithmetict bv(expr);
   return static_cast<program_individualt::instructiont::opt>(bv.to_integer().to_ulong());
 }
+#endif
 
 typedef std::map<size_t, const irep_idt> danger_variable_namest;
 void reverse(danger_variable_namest &names, const danger_variable_idst &o)

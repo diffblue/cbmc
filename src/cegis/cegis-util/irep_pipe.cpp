@@ -7,7 +7,7 @@
 
 #include <xmllang/xml_parser.h>
 #include <util/xml_irep.h>
-#include <util/irep_pipe.h>
+#include <cegis/cegis-util/irep_pipe.h>
 
 namespace
 {

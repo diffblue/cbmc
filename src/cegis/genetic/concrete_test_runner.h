@@ -13,8 +13,9 @@
 #include <functional>
 
 #include <util/expr.h>
-#include <util/task_pool.h>
 #include <util/tempfile.h>
+
+#include <cegis/cegis-util/task_pool.h>
 
 #include <cegis/value/program_individual.h>
 

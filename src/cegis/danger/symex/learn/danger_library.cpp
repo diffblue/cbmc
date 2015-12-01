@@ -107,8 +107,10 @@ std::string get_danger_library_text(const size_t num_vars,
   std::set<irep_idt> functions;
   functions.insert(DANGER_EXECUTE);
   std::string text;
+  #if 0
   get_cprover_library_text(text, functions, st,
       get_prefix(num_vars, num_consts, max_solution_size));
+  #endif
   return text;
 }
 
@@ -122,7 +124,9 @@ void add_danger_library(danger_programt &prog, message_handlert &msg,
   std::set<irep_idt> functions;
   functions.insert(DANGER_EXECUTE);
   const std::string prefix(get_prefix(num_vars, num_consts, max_solution_size));
+  #if 0
   add_cprover_library(functions, st, msg, prefix);
+  #endif
   goto_convert(DANGER_EXECUTE, st, goto_functions, msg);
   set_loop_id(goto_functions);
   set_init_values(prog);

@@ -13,7 +13,8 @@
 #include <functional>
 
 #include <util/irep.h>
-#include <util/task_pool.h>
+
+#include <cegis/cegis-util/task_pool.h>
 
 /**
  * @brief

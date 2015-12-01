@@ -3,7 +3,8 @@
 #include <util/arith_tools.h>
 #include <util/bv_arithmetic.h>
 #include <util/namespace_utils.h>
-#include <util/constant_width.h>
+
+#include <cegis/cegis-util/constant_width.h>
 
 #include <cegis/danger/options/danger_program.h>
 #include <cegis/danger/util/danger_program_helper.h>

@@ -1,5 +1,6 @@
 #include <util/std_expr.h>
-#include <util/constant_width.h>
+
+#include "constant_width.h"
 
 // TODO: Consider min word width to be size of character.
 #define MIN_WORD_WIDTH 2u
