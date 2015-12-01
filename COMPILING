@@ -15,7 +15,7 @@ environments:
 - Cygwin
   (We recommend the i686-pc-mingw32-g++ cross compiler, version 4.7 or above.)
 
-- Microsoft's Visual Studio 2012 or 2013 (older versions won't work)
+- Microsoft's Visual Studio 2012, 2013 or 2015 (older versions won't work)
 
 The rest of this document is split up into three parts: compilation on
 Linux, MacOS, Windows.  Please read the section appropriate for your
