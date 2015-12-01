@@ -2,6 +2,8 @@
 #include <signal.h>
 #include <sys/signal.h>
 #include <sys/wait.h>
+#else
+typedef unsigned int pid_t;
 #endif
 
 #include <algorithm>
