@@ -109,6 +109,7 @@ public:
 
   // main recursion
   bool simplify_node(exprt &expr);
+  bool simplify_node_preorder(exprt &expr);
   bool simplify_rec(exprt &expr);
 
   virtual bool simplify(exprt &expr)
