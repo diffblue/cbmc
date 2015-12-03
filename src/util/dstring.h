@@ -13,12 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_container.h"
 
-//#define CONSTDSTRING
-
 class dstring
 {
 public:
-  #ifdef CONSTDSTRING
+  #if __cplusplus > 199711L
   // this is safe for static objects
   constexpr dstring():no(0)
   {
