@@ -332,24 +332,6 @@ literalt cvc_propt::lor(literalt a, literalt b)
 
 /*******************************************************************\
 
-Function: cvc_propt::lnot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-literalt cvc_propt::lnot(literalt a)
-{
-  a.invert();
-  return a;
-}
-
-/*******************************************************************\
-
 Function: cvc_propt::lxor
 
   Inputs:
@@ -364,8 +346,8 @@ literalt cvc_propt::lxor(literalt a, literalt b)
 {
   if(a==const_literal(false)) return b;
   if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return lnot(b);
-  if(b==const_literal(true)) return lnot(a);
+  if(a==const_literal(true)) return !b;
+  if(b==const_literal(true)) return !a;
 
   out << "%% lxor" << std::endl;
 
@@ -391,7 +373,7 @@ Function: cvc_propt::lnand
 
 literalt cvc_propt::lnand(literalt a, literalt b)
 {
-  return lnot(land(a, b));
+  return !land(a, b);
 }
 
 /*******************************************************************\
@@ -408,7 +390,7 @@ Function: cvc_propt::lnor
 
 literalt cvc_propt::lnor(literalt a, literalt b)
 {
-  return lnot(lor(a, b));
+  return !lor(a, b);
 }
 
 /*******************************************************************\
@@ -425,7 +407,7 @@ Function: cvc_propt::lequal
 
 literalt cvc_propt::lequal(literalt a, literalt b)
 {
-  return lnot(lxor(a, b));
+  return !lxor(a, b);
 }
 
 /*******************************************************************\
@@ -442,7 +424,7 @@ Function: cvc_propt::limplies
 
 literalt cvc_propt::limplies(literalt a, literalt b)
 {
-  return lor(lnot(a), b);
+  return lor(!a, b);
 }
 
 /*******************************************************************\
@@ -543,7 +525,7 @@ void cvc_propt::lcnf(const bvt &bv)
     if(s.insert(*it).second)
       new_bv.push_back(*it);
 
-    if(s.find(lnot(*it))!=s.end())
+    if(s.find(!*it)!=s.end())
       return; // clause satisfied
 
     assert(it->var_no()<_no_variables);

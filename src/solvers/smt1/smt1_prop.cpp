@@ -232,24 +232,6 @@ literalt smt1_propt::lor(literalt a, literalt b)
 
 /*******************************************************************\
 
-Function: smt1_propt::lnot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-literalt smt1_propt::lnot(literalt a)
-{
-  a.invert();
-  return a;
-}
-
-/*******************************************************************\
-
 Function: smt1_propt::lxor
 
   Inputs:
@@ -264,8 +246,8 @@ literalt smt1_propt::lxor(literalt a, literalt b)
 {
   if(a==const_literal(false)) return b;
   if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return lnot(b);
-  if(b==const_literal(true)) return lnot(a);
+  if(a==const_literal(true)) return !b;
+  if(b==const_literal(true)) return !a;
 
   out << "\n";
 
@@ -294,7 +276,7 @@ Function: smt1_propt::lnand
 
 literalt smt1_propt::lnand(literalt a, literalt b)
 {
-  return lnot(land(a, b));
+  return !land(a, b);
 }
 
 /*******************************************************************\
@@ -311,7 +293,7 @@ Function: smt1_propt::lnor
 
 literalt smt1_propt::lnor(literalt a, literalt b)
 {
-  return lnot(lor(a, b));
+  return !lor(a, b);
 }
 
 /*******************************************************************\
@@ -328,7 +310,7 @@ Function: smt1_propt::lequal
 
 literalt smt1_propt::lequal(literalt a, literalt b)
 {
-  return lnot(lxor(a, b));
+  return !lxor(a, b);
 }
 
 /*******************************************************************\
@@ -345,7 +327,7 @@ Function: smt1_propt::limplies
 
 literalt smt1_propt::limplies(literalt a, literalt b)
 {
-  return lor(lnot(a), b);
+  return lor(!a, b);
 }
 
 /*******************************************************************\
@@ -368,8 +350,8 @@ literalt smt1_propt::lselect(literalt a, literalt b, literalt c)
 
   if(a==const_literal(false)) return b;
   if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return lnot(b);
-  if(b==const_literal(true)) return lnot(a);
+  if(a==const_literal(true)) return !b;
+  if(b==const_literal(true)) return !a;
 
   out << "\n";
 

@@ -312,24 +312,6 @@ literalt dplib_propt::lor(literalt a, literalt b)
 
 /*******************************************************************\
 
-Function: dplib_propt::lnot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-literalt dplib_propt::lnot(literalt a)
-{
-  a.invert();
-  return a;
-}
-
-/*******************************************************************\
-
 Function: dplib_propt::lxor
 
   Inputs:
@@ -344,8 +326,8 @@ literalt dplib_propt::lxor(literalt a, literalt b)
 {
   if(a==const_literal(false)) return b;
   if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return lnot(b);
-  if(b==const_literal(true)) return lnot(a);
+  if(a==const_literal(true)) return !b;
+  if(b==const_literal(true)) return !a;
 
   literalt o=def_dplib_literal();
   out << "!(" << dplib_literal(a) << " <-> " << dplib_literal(b)
@@ -368,7 +350,7 @@ Function: dplib_propt::lnand
 
 literalt dplib_propt::lnand(literalt a, literalt b)
 {
-  return lnot(land(a, b));
+  return !land(a, b);
 }
 
 /*******************************************************************\
@@ -385,7 +367,7 @@ Function: dplib_propt::lnor
 
 literalt dplib_propt::lnor(literalt a, literalt b)
 {
-  return lnot(lor(a, b));
+  return !lor(a, b);
 }
 
 /*******************************************************************\
@@ -402,7 +384,7 @@ Function: dplib_propt::lequal
 
 literalt dplib_propt::lequal(literalt a, literalt b)
 {
-  return lnot(lxor(a, b));
+  return !lxor(a, b);
 }
 
 /*******************************************************************\
@@ -419,7 +401,7 @@ Function: dplib_propt::limplies
 
 literalt dplib_propt::limplies(literalt a, literalt b)
 {
-  return lor(lnot(a), b);
+  return lor(!a, b);
 }
 
 /*******************************************************************\
@@ -520,7 +502,7 @@ void dplib_propt::lcnf(const bvt &bv)
     if(s.insert(*it).second)
       new_bv.push_back(*it);
 
-    if(s.find(lnot(*it))!=s.end())
+    if(s.find(!*it)!=s.end())
       return; // clause satisfied
 
     assert(it->var_no()<=_no_variables);

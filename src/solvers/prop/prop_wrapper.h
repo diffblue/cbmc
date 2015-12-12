@@ -33,9 +33,6 @@ class prop_wrappert:public virtual propt
   virtual literalt lor(const bvt &bv)
   { return p.lor(bv); }
 
-  virtual literalt lnot(literalt a)
-  { return p.lnot(a); }
-
   virtual literalt lxor(literalt a, literalt b)
   { return p.lxor(a, b); }
 

@@ -89,7 +89,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
             if(or_equal)
               prop.l_set_to_true(prop.limplies(equal_lit, literal));
             else
-              prop.l_set_to_true(prop.limplies(equal_lit, prop.lnot(literal)));
+              prop.l_set_to_true(prop.limplies(equal_lit, !literal));
           }          
         }
  

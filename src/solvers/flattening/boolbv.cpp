@@ -536,9 +536,8 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.operands().size()!=2)
       throw "notequal expects two operands";
     
-    return prop.lnot(
-      convert_equality(
-        equal_exprt(expr.op0(), expr.op1())));
+    return !convert_equality(
+        equal_exprt(expr.op0(), expr.op1()));
   }
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
@@ -647,8 +646,8 @@ literalt boolbvt::convert_rest(const exprt &expr)
       float_utilst float_utils(prop);
       float_utils.spec=to_floatbv_type(expr.op0().type());
       return prop.land(
-        prop.lnot(float_utils.is_infinity(bv)),
-        prop.lnot(float_utils.is_NaN(bv)));
+        !float_utils.is_infinity(bv),
+        !float_utils.is_NaN(bv));
     }
     else if(expr.op0().type().id()==ID_fixedbv)
       return const_literal(true);

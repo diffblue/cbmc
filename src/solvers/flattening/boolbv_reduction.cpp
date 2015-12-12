@@ -51,7 +51,7 @@ static literalt do_reduction_op(
   if(id==ID_reduction_nor ||
      id==ID_reduction_nand ||
      id==ID_reduction_xnor)
-    l=prop.lnot(l);
+    l=!l;
   
   return l; 
 }
