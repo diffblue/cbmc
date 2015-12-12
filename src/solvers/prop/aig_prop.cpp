@@ -133,23 +133,6 @@ literalt aig_prop_baset::lor(literalt a, literalt b)
 
 /*******************************************************************\
 
-Function: aig_prop_baset::lnot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-literalt aig_prop_baset::lnot(literalt a)
-{
-  return neg(a);
-}
-
-/*******************************************************************\
-
 Function: aig_prop_baset::lxor
 
   Inputs:

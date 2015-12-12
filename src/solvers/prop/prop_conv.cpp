@@ -385,11 +385,11 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
       if(expr.id()==ID_or)
         return prop.lor(bv);
       else if(expr.id()==ID_nor)
-        return prop.lnot(prop.lor(bv));
+        return !prop.lor(bv);
       else if(expr.id()==ID_and)
         return prop.land(bv);
       else if(expr.id()==ID_nand)
-        return prop.lnot(prop.land(bv));
+        return !prop.land(bv);
       else if(expr.id()==ID_xor) 
         return prop.lxor(bv);
     }
@@ -399,7 +399,7 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
     if(op.size()!=1)
       throw "not takes one operand";
 
-    return prop.lnot(convert(op[0]));
+    return !convert(op[0]);
   }
   else if(expr.id()==ID_equal || expr.id()==ID_notequal)
   {

@@ -72,8 +72,7 @@ void boolbvt::convert_case(const exprt &expr, bvt &bv)
       }
 
       compare_literal=bv_utils.equal(compare_bv, op);
-      compare_literal=prop.land(prop.lnot(previous_compare),
-                           compare_literal);
+      compare_literal=prop.land(!previous_compare, compare_literal);
 
       previous_compare=prop.lor(previous_compare, compare_literal);
 

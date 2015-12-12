@@ -29,7 +29,6 @@ public:
   virtual literalt lor(literalt a, literalt b)=0;
   virtual literalt land(const bvt &bv)=0;
   virtual literalt lor(const bvt &bv)=0;
-  virtual literalt lnot(literalt a)=0;
   virtual literalt lxor(literalt a, literalt b)=0;
   virtual literalt lxor(const bvt &bv)=0;
   virtual literalt lnand(literalt a, literalt b)=0;

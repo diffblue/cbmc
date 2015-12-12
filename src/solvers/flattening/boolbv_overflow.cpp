@@ -104,8 +104,8 @@ literalt boolbvt::convert_overflow(const exprt &expr)
 
       // these need to be either all 1's or all 0's
       literalt all_one=prop.land(bv_overflow);
-      literalt all_zero=prop.lnot(prop.lor(bv_overflow));
-      return prop.lnot(prop.lor(all_one, all_zero));
+      literalt all_zero=!prop.lor(bv_overflow);
+      return !prop.lor(all_one, all_zero);
     }
   }
   else if(expr.id()==ID_overflow_unary_minus)

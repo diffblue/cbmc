@@ -54,7 +54,7 @@ void boolbvt::convert_cond(const exprt &expr, bvt &bv)
       if(condition)
       {
         cond_literal=convert(*it);
-        cond_literal=prop.land(prop.lnot(previous_cond), cond_literal);
+        cond_literal=prop.land(!previous_cond, cond_literal);
 
         previous_cond=prop.lor(previous_cond, cond_literal);
       }

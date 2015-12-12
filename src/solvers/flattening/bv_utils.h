@@ -113,7 +113,7 @@ public:
   }
 
   literalt is_zero(const bvt &op)
-  { return prop.lnot(prop.lor(op)); }
+  { return !prop.lor(op); }
 
   literalt is_not_zero(const bvt &op)
   { return prop.lor(op); }
