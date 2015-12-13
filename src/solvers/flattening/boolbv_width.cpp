@@ -213,10 +213,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_code)
   {
   }
-  else if(type_id==ID_enum)
+  else if(type_id==ID_enumeration)
   {
     // get number of necessary bits
-    std::size_t size=to_enum_type(type).elements().size();
+    std::size_t size=to_enumeration_type(type).elements().size();
     entry.total_width=integer2unsigned(address_bits(size));
     assert(entry.total_width!=0);
   }

@@ -558,10 +558,10 @@ extern inline union_tag_typet &to_union_tag_type(typet &type)
 /*! \brief A generic enumeration type (not to be confused with C enums)
 */
 
-class enum_typet:public typet
+class enumeration_typet:public typet
 {
 public:
-  inline enum_typet():typet(ID_enum)
+  inline enumeration_typet():typet(ID_enumeration)
   {
   }
   
@@ -576,29 +576,29 @@ public:
   }
 };
 
-/*! \brief Cast a generic typet to a \ref enum_typet
+/*! \brief Cast a generic typet to a \ref enumeration_typet
  *
  * This is an unchecked conversion. \a type must be known to be \ref
- * enum_typet.
+ * enumeration_typet.
  *
  * \param type Source type
- * \return Object of type \ref enum_typet
+ * \return Object of type \ref enumeration_typet
  *
  * \ingroup gr_std_types
 */
-extern inline const enum_typet &to_enum_type(const typet &type)
+extern inline const enumeration_typet &to_enumeration_type(const typet &type)
 {
-  assert(type.id()==ID_enum);
-  return static_cast<const enum_typet &>(type);
+  assert(type.id()==ID_enumeration);
+  return static_cast<const enumeration_typet &>(type);
 }
 
-/*! \copydoc to_enum_type(const typet &)
+/*! \copydoc to_enumeration_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline enum_typet &to_enum_type(typet &type)
+extern inline enumeration_typet &to_enumeration_type(typet &type)
 {
-  assert(type.id()==ID_enum);
-  return static_cast<enum_typet &>(type);
+  assert(type.id()==ID_enumeration);
+  return static_cast<enumeration_typet &>(type);
 }
 
 /*! \brief The type of C enums
