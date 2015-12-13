@@ -216,8 +216,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_enum)
   {
     // get number of necessary bits
-
-    std::size_t size=type.find(ID_elements).get_sub().size();
+    std::size_t size=to_enum_type(type).elements().size();
     entry.total_width=integer2unsigned(address_bits(size));
     assert(entry.total_width!=0);
   }
