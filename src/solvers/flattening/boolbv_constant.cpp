@@ -91,6 +91,19 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
 
     return;
   }
+  else if(expr_type.id()==ID_enum)
+  {
+    const irept::subt &elements=to_enum_type(expr_type).elements();
+    const irep_idt &value=expr.get_value();
+
+    unsigned i;
+    for(i=0; i<elements.size(); i++)
+      if(elements[i].id()==value)
+      {
+        bv=bv_utils.build_constant(i, width);
+        return;
+      }
+  }
   else if(expr_type.id()==ID_verilog_signedbv ||
           expr_type.id()==ID_verilog_unsignedbv)
   {
