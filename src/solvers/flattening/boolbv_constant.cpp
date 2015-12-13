@@ -91,9 +91,9 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
 
     return;
   }
-  else if(expr_type.id()==ID_enum)
+  else if(expr_type.id()==ID_enumeration)
   {
-    const irept::subt &elements=to_enum_type(expr_type).elements();
+    const irept::subt &elements=to_enumeration_type(expr_type).elements();
     const irep_idt &value=expr.get_value();
 
     unsigned i;
