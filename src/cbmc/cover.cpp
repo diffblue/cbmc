@@ -397,8 +397,8 @@ bool bmc_covert::operator()(const criteriont criterion)
          it->source.pc->is_goto() &&
          !it->source.pc->guard.is_true())
       {
-        and_exprt c_true_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(it->cond_literal));
-        and_exprt c_false_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(!it->cond_literal));
+        and_exprt c_true_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(!it->cond_literal));
+        and_exprt c_false_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(it->cond_literal));
         literalt c_true=solver.convert(c_true_expr);
         literalt c_false=solver.convert(c_false_expr);
 
