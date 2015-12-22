@@ -322,11 +322,11 @@ bool bmc_covert::operator()(const criteriont criterion)
         if(i_it->is_goto() && !i_it->guard.is_true())
         {
           std::string b=i2string(basic_blocks[i_it]);
-          goal_map[id(i_it, "TK")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch taken",
+          goal_map[id(i_it, "TRUE")]=
+            goalt("function "+id2string(f_it->first)+" block "+b+" branch true",
                   i_it->source_location);
-          goal_map[id(i_it, "NT")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch not taken",
+          goal_map[id(i_it, "FALSE")]=
+            goalt("function "+id2string(f_it->first)+" block "+b+" branch false",
                   i_it->source_location);
         }
         break;
@@ -354,6 +354,9 @@ bool bmc_covert::operator()(const criteriont criterion)
       }
     }
   }
+  
+  // collects assumptions
+  and_exprt::operandst assumptions;
 
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals
@@ -362,21 +365,30 @@ bool bmc_covert::operator()(const criteriont criterion)
       it!=bmc.equation.SSA_steps.end();
       it++)
   {
+    if(it->is_assume())
+      assumptions.push_back(literal_exprt(it->cond_literal));
+  
     if(it->source.pc->function==ID__start ||
        it->source.pc->function=="__CPROVER_initialize")
       continue;
-
+      
     switch(criterion)
     {
     case C_ASSERTION:
       if(it->source.pc->is_assert())
-        goal_map[id(it->source.pc)].add_instance(it, it->guard_literal);
+      {
+        and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
+        literalt c=solver.convert(c_expr);
+        goal_map[id(it->source.pc)].add_instance(it, c);
+      }
       break;
       
     case C_LOCATION:
       {
+        and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
+        literalt c=solver.convert(c_expr);
         irep_idt id=location_map[it->source.pc];
-        goal_map[id].add_instance(it, it->guard_literal);
+        goal_map[id].add_instance(it, c);
       }
       break;
     
@@ -385,14 +397,16 @@ bool bmc_covert::operator()(const criteriont criterion)
          it->source.pc->is_goto() &&
          !it->source.pc->guard.is_true())
       {
+        and_exprt c_true_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(it->cond_literal));
+        and_exprt c_false_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(!it->cond_literal));
+        literalt c_true=solver.convert(c_true_expr);
+        literalt c_false=solver.convert(c_false_expr);
+
         // a branch can have three states:
         // 1) taken 2) not taken 3) not executed!
-        literalt bt=it->cond_literal;
-        literalt bnt=solver.convert(and_exprt(
-          literal_exprt(it->guard_literal), literal_exprt(!it->cond_literal)));
 
-        goal_map[id(it->source.pc, "TK")].add_instance(it, bt);
-        goal_map[id(it->source.pc, "NT")].add_instance(it, bnt);
+        goal_map[id(it->source.pc, "TRUE")].add_instance(it, c_true);
+        goal_map[id(it->source.pc, "FALSE")].add_instance(it, c_false);
       }
       break;
       
