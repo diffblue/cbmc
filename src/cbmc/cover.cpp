@@ -396,6 +396,8 @@ bool bmc_covert::operator()(const criteriont criterion)
       break;
       
     case C_LOCATION:
+      if(it->assignment_type!=symex_targett::PHI &&
+         it->assignment_type!=symex_targett::GUARD)
       {
         and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
         literalt c=solver.convert(c_expr);
