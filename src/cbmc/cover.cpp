@@ -66,6 +66,17 @@ public:
     {
       return block_map[t];
     }
+    
+    void output(std::ostream &out)
+    {
+      for(block_mapt::const_iterator
+          b_it=block_map.begin();
+          b_it!=block_map.end();
+          b_it++)
+        out << b_it->first->source_location
+            << " -> " << b_it->second
+            << '\n';
+    }
   };
 
   bmc_covert(
@@ -207,6 +218,7 @@ void bmc_covert::goal_covered(const cover_goalst::goalt &)
       
       if(solver.l_get(cond).is_true())
       {
+        status() << "Covered " << g.description << messaget::eom;
         g.satisfied=true;
         symex_target_equationt::SSA_stepst::iterator next=c_it->step;
         next++; // include the instruction itself
