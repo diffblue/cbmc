@@ -375,18 +375,18 @@ extern inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
 class predicate_exprt:public exprt
 {
 public:
-  inline predicate_exprt():exprt(irep_idt(), typet(ID_bool))
+  inline predicate_exprt():exprt(irep_idt(), bool_typet())
   {
   }
 
   explicit inline predicate_exprt(const irep_idt &_id):
-    exprt(_id, typet(ID_bool))
+    exprt(_id, bool_typet())
   {
   }
 
   inline predicate_exprt(
     const irep_idt &_id,
-    const exprt &_op):exprt(_id, typet(ID_bool))
+    const exprt &_op):exprt(_id, bool_typet())
   {
     copy_to_operands(_op);
   }
@@ -394,7 +394,7 @@ public:
   inline predicate_exprt(
     const irep_idt &_id,
     const exprt &_op0,
-    const exprt &_op1):exprt(_id, typet(ID_bool))
+    const exprt &_op1):exprt(_id, bool_typet())
   {
     copy_to_operands(_op0, _op1);
   }
@@ -406,18 +406,18 @@ public:
 class unary_predicate_exprt:public unary_exprt
 {
 public:
-  inline unary_predicate_exprt():unary_exprt(irep_idt(), typet(ID_bool))
+  inline unary_predicate_exprt():unary_exprt(irep_idt(), bool_typet())
   {
   }
 
   explicit inline unary_predicate_exprt(const irep_idt &_id):
-    unary_exprt(_id, typet(ID_bool))
+    unary_exprt(_id, bool_typet())
   {
   }
 
   inline unary_predicate_exprt(
     const irep_idt &_id,
-    const exprt &_op):unary_exprt(_id, _op, typet(ID_bool))
+    const exprt &_op):unary_exprt(_id, _op, bool_typet())
   {
   }
 
@@ -517,19 +517,19 @@ extern inline binary_exprt &to_binary_expr(exprt &expr)
 class binary_predicate_exprt:public binary_exprt
 {
 public:
-  inline binary_predicate_exprt():binary_exprt(irep_idt(), typet(ID_bool))
+  inline binary_predicate_exprt():binary_exprt(irep_idt(), bool_typet())
   {
   }
 
   explicit inline binary_predicate_exprt(const irep_idt &_id):
-    binary_exprt(_id, typet(ID_bool))
+    binary_exprt(_id, bool_typet())
   {
   }
 
   inline binary_predicate_exprt(
     const exprt &_op0,
     const irep_idt &_id,
-    const exprt &_op1):binary_exprt(_op0, _id, _op1, typet(ID_bool))
+    const exprt &_op1):binary_exprt(_op0, _id, _op1, bool_typet())
   {
   }
 };
@@ -1694,17 +1694,17 @@ public:
   {
   }
 
-  inline and_exprt(const exprt &op0, const exprt &op1):exprt(ID_and, typet(ID_bool))
+  inline and_exprt(const exprt &op0, const exprt &op1):exprt(ID_and, bool_typet())
   {
     copy_to_operands(op0, op1);
   }
 
-  inline and_exprt(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_and, typet(ID_bool))
+  inline and_exprt(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_and, bool_typet())
   {
     copy_to_operands(op0, op1, op2);
   }
 
-  inline and_exprt(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_and, typet(ID_bool))
+  inline and_exprt(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_and, bool_typet())
   {
     exprt::operandst &op=operands();
     op.resize(4);
@@ -1792,7 +1792,7 @@ extern inline implies_exprt &to_implies_expr(exprt &expr)
 class or_exprt:public exprt
 {
 public:
-  inline or_exprt():exprt(ID_or, typet(ID_bool))
+  inline or_exprt():exprt(ID_or, bool_typet())
   {
   }
 
@@ -1801,12 +1801,12 @@ public:
     copy_to_operands(op0, op1);
   }
 
-  inline or_exprt(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_or, typet(ID_bool))
+  inline or_exprt(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_or, bool_typet())
   {
     copy_to_operands(op0, op1, op2);
   }
 
-  inline or_exprt(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_or, typet(ID_bool))
+  inline or_exprt(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_or, bool_typet())
   {
     exprt::operandst &op=operands();
     op.resize(4);
