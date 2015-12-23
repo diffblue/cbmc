@@ -145,13 +145,14 @@ the second loop.
 </p>
 
 <p class="justified">
-What if the number of unwindings specified is too small? In this case,
-bugs that require paths that are deeper may be missed. In order to address
-this problem, CBMC by default inserts checks that the given unwinding
-bound is actually sufficiently large. These checks are called <i>unwinding
-assertions</i>. Continuing the generic example above, this unwinding
-assertion for a bound of 5 corresponds to checking the following
-loop-free program:
+What if the number of unwindings specified is too small? In this case, bugs
+that require paths that are deeper may be missed.  In order to address this
+problem, CBMC can optionally insert checks that the given unwinding bound is
+actually sufficiently large.  These checks are called <i>unwinding
+assertions</i>, and are enabled with the option
+<code>--unwinding-assertions</code>.  Continuing the generic example above,
+this unwinding assertion for a bound of 5 corresponds to checking the
+following loop-free program:
 </p>
 
 <hr>
@@ -182,13 +183,8 @@ The unwinding assertions can be verified just like any other generated
 assertion.  If all of them are proven to hold, the given loop bounds are
 sufficient for the program.  This establishes a <a
 href="http://en.wikipedia.org/wiki/Worst-case_execution_time"><i>high-level
-worst-case execution time</i></a> (WCET).  In order to disable the
-generation of unwinding assertions, run CBMC with the parameter
+worst-case execution time</i></a> (WCET). 
 </p>
-
-<code>
-&nbsp;&nbsp;--no-unwinding-assertions
-</code>
 
 <p class="justified">
 In some cases, it is desirable to cut off very deep loops in favor
