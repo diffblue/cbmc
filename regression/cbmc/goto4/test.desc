@@ -1,8 +1,9 @@
 CORE
 main.c
---unwind 1
+--unwind 1 --unwinding-assertions
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
+^  unwinding assertion loop 0$
 --
 ^warning: ignoring
