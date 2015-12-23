@@ -135,7 +135,7 @@ In order to set the entry point to the <code>sum</code> function, run
 You will note that CBMC unwinds the <code>for</code> loop in the program.
 As CBMC performs Bounded Model Checking, all loops have to have a finite
 upper run-time bound in order to guarantee that all bugs are found.  CBMC
-actually checks that enough unwinding is performed.  As an example, consider
+can optionally check that enough unwinding is performed.  As an example, consider
 the program <a href="binsearch.c">binsearch.c</a>:</p>
 
 <hr>
@@ -165,15 +165,17 @@ a run time bound for this loop.  The unwinding bound has to be given as a
 command line argument:</p>
 
 <code>
-&nbsp;&nbsp;cbmc binsearch.c --function binsearch --unwind 6 --bounds-check
+&nbsp;&nbsp;cbmc binsearch.c --function binsearch --unwind 6 --bounds-check --unwinding-assertions
 </code>
 
 <p class="justified">
-CBMC not only verifies the array bounds (note that this actually depends
-on the result of the right shift), but also checks that enough unwinding is
-done, i.e., it proves a run-time bound. For any lower unwinding bound, there
-are traces that require more loop iterations. Thus, CBMC will produce an
-appropriate counterexample.</p>
+CBMC verifies that verifies the array accesses are within the bounds; note
+that this actually depends on the result of the right shift.  In addition,
+as CBMC is given the option <code>--unwinding-assertions</code>, it also
+checks that enough unwinding is done, i.e., it proves a run-time bound.  For
+any lower unwinding bound, there are traces that require more loop
+iterations.  Thus, CBMC will produce an appropriate counterexample.
+</p>
 
 <h3>Unbounded Loops</h3>
 
@@ -239,15 +241,11 @@ the number of program steps to be processed.</li>
 </ol>
 
 <p class="justified">
-CBMC can assert whether the arugment to <code>--unwind</code> is large enough to
-cover all program paths. If the argument is too small, CBMC will detect
-that not enough unwinding is done and aborts with an unwinding assertion
-violation. In order to disable this test, run CBMC with the parameter
+Given the option <code>--unwinding-assertions</code>, CBMC checks whether
+the arugment to <code>--unwind</code> is large enough to cover all program
+paths. If the argument is too small, CBMC will detect that not enough
+unwinding is done and aborts with an unwinding assertion violation.
 </p>
-
-<code>
-&nbsp;&nbsp;--no-unwinding-assertions
-</code>
 
 <p class="justified">
 Reconsider the example. For a loop unwinding bound of one, no bug is found.

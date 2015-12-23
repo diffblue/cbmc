@@ -271,7 +271,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("unwinding-assertions", false);
   else
     options.set_option("unwinding-assertions",
-      !cmdline.isset("no-unwinding-assertions"));
+      cmdline.isset("unwinding-assertions"));
 
   // generate unwinding assumptions otherwise
   options.set_option("partial-loops",
@@ -1117,7 +1117,7 @@ void cbmc_parse_optionst::help()
     "                              (use --show-loops to get the loop IDs)\n"
     " --show-vcc                   show the verification conditions\n"
     " --slice-formula              remove assignments unrelated to property\n"
-    " --no-unwinding-assertions    do not generate unwinding assertions\n"
+    " --unwinding-assertions       generate unwinding assertions\n"
     " --partial-loops              permit paths with partial loops\n"
     " --no-pretty-names            do not simplify identifiers\n"
     " --graphml-cex filename       write the counterexample in GraphML format to filename\n"
