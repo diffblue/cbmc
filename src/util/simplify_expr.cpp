@@ -3432,6 +3432,33 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   if(!base_type_eq(tmp0.type(), tmp1.type(), ns))
     return true;
     
+  // if rhs is ID_if (and lhs is not), swap operands for == and !=
+  if((expr.id()==ID_equal || expr.id()==ID_notequal) &&
+     tmp0.id()!=ID_if &&
+     tmp1.id()==ID_if)
+  {
+    expr.op0().swap(expr.op1());
+    return simplify_inequality(expr);
+  }
+
+  if(tmp0.id()==ID_if && tmp0.operands().size()==3)
+  {
+    const if_exprt &if_expr=to_if_expr(tmp0);
+
+    exprt tmp_op1=expr;
+    tmp_op1.op0()=if_expr.true_case();
+    simplify_inequality(tmp_op1);
+    exprt tmp_op2=expr;
+    tmp_op2.op0()=if_expr.false_case();
+    simplify_inequality(tmp_op2);
+
+    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
+
+    simplify_if(expr);
+
+    return false;
+  }
+
   // see if we are comparing pointers that are address_of
   if((tmp0.id()==ID_address_of ||
         (tmp0.id()==ID_typecast && tmp0.op0().id()==ID_address_of)) &&
@@ -3822,6 +3849,24 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
 {
   // the constant is always on the RHS
   assert(expr.op1().is_constant());
+
+  if(expr.op0().id()==ID_if && expr.op0().operands().size()==3)
+  {
+    const if_exprt &if_expr=to_if_expr(expr.op0());
+
+    exprt tmp_op1=expr;
+    tmp_op1.op0()=if_expr.true_case();
+    simplify_inequality_constant(tmp_op1);
+    exprt tmp_op2=expr;
+    tmp_op2.op0()=if_expr.false_case();
+    simplify_inequality_constant(tmp_op2);
+
+    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
+
+    simplify_if(expr);
+
+    return false;
+  }
 
   // do we deal with pointers?
   if(expr.op1().type().id()==ID_pointer)
@@ -4250,9 +4295,6 @@ bool simplify_exprt::simplify_with(exprt &expr)
           
         if(i<0 || i>=expr.op0().operands().size())
           break;
-          
-        if(!expr.op2().is_constant())
-          break;
 
         expr.op0().operands()[integer2long(i)].swap(expr.op2());
 
@@ -4543,6 +4585,21 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
       return false;
     }
+  }
+  else if(array.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(array);
+    exprt cond=if_expr.cond();
+
+    index_exprt idx_false=to_index_expr(expr);
+    idx_false.array()=if_expr.false_case();
+
+    to_index_expr(expr).array()=if_expr.true_case();
+
+    expr=if_exprt(cond, expr, idx_false, expr.type());
+    simplify_rec(expr);
+
+    return false;
   }
 
   return result;
@@ -5156,6 +5213,21 @@ bool simplify_exprt::simplify_member(exprt &expr)
         }
       }
     }
+  }
+  else if(op.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(op);
+    exprt cond=if_expr.cond();
+
+    member_exprt member_false=to_member_expr(expr);
+    member_false.compound()=if_expr.false_case();
+
+    to_member_expr(expr).compound()=if_expr.true_case();
+
+    expr=if_exprt(cond, expr, member_false, expr.type());
+    simplify_rec(expr);
+
+    return false;
   }
 
   return true;
