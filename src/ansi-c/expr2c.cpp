@@ -4278,6 +4278,14 @@ std::string expr2ct::convert(
       return convert_function(src, "SIGN", precedence=16);
   }
 
+  else if(src.id()==ID_popcount)
+  {
+    if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP)
+      return convert_function(src, "__popcnt", precedence=16);
+    else
+      return convert_function(src, "__builtin_popcount", precedence=16);
+  }
+
   else if(src.id()==ID_invalid_pointer)
     return convert_function(src, "INVALID-POINTER", precedence=16);
 
