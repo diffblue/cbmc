@@ -1334,3 +1334,51 @@ bool simplify_exprt::simplify_unary_minus(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_bitnot
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_bitnot(exprt &expr)
+{
+  if(!expr.has_operands()) return true;
+
+  exprt::operandst &operands=expr.operands();
+
+  if(operands.size()!=1) return true;
+
+  exprt &op=operands.front();
+
+  if(expr.type().id()==ID_bv ||
+     expr.type().id()==ID_unsignedbv ||
+     expr.type().id()==ID_signedbv)
+  {
+    if(op.type()==expr.type())
+    {
+      if(op.id()==ID_constant)
+      {
+        std::string value=op.get_string(ID_value);
+
+        for(std::string::iterator it=value.begin();
+            it!=value.end();
+            ++it)
+          *it=(*it=='0')?'1':'0';
+
+        exprt tmp(ID_constant, op.type());
+        tmp.set(ID_value, value);
+        expr.swap(tmp);
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+

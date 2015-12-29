@@ -192,3 +192,73 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_not
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_not(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+
+  exprt &op=expr.op0();
+
+  if(expr.type().id()!=ID_bool ||
+     op.type().id()!=ID_bool) return true;
+     
+  if(op.id()==ID_not) // (not not a) == a
+  {
+    if(op.operands().size()==1)
+    {
+      exprt tmp;
+      tmp.swap(op.op0());
+      expr.swap(tmp);
+      return false;
+    }
+  }
+  else if(op.is_false())
+  {
+    expr=true_exprt();
+    return false;
+  }
+  else if(op.is_true())
+  {
+    expr=false_exprt();
+    return false;
+  }
+  else if(op.id()==ID_and ||
+          op.id()==ID_or)
+  {
+    exprt tmp;
+    tmp.swap(op);
+    expr.swap(tmp);
+
+    Forall_operands(it, expr)
+    {
+      it->make_not();
+      simplify_node(*it);
+    }
+    
+    expr.id(expr.id()==ID_and?ID_or:ID_and);
+
+    return false;
+  }
+  else if(op.id()==ID_notequal) // !(a!=b) <-> a==b
+  {
+    exprt tmp;
+    tmp.swap(op);
+    expr.swap(tmp);
+    expr.id(ID_equal);
+    return false;
+  }
+  
+  return true;
+}
+
