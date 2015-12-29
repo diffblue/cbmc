@@ -5,8 +5,11 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       replace_expr.cpp threeval.cpp typecheck.cpp graph.cpp \
       type.cpp cnf_simplify.cpp pointer_predicates.cpp merge_irep.cpp \
       parser.cpp replace_symbol.cpp \
+      simplify_expr.cpp simplify_expr_floatbv.cpp simplify_expr_int.cpp \
+      simplify_expr_array.cpp simplify_expr_struct.cpp \
+      simplify_expr_boolean.cpp simplify_expr_pointer.cpp \
       get_module.cpp string_hash.cpp string_container.cpp identifier.cpp \
-      rational.cpp options.cpp c_misc.cpp simplify_expr.cpp dstring.cpp \
+      rational.cpp options.cpp c_misc.cpp dstring.cpp \
       find_symbols.cpp rational_tools.cpp ui_message.cpp simplify_utils.cpp \
       time_stopping.cpp symbol.cpp irep_hash_container.cpp cout_message.cpp \
       type_eq.cpp guard.cpp array_name.cpp message_stream.cpp \
