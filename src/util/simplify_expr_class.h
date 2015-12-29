@@ -107,6 +107,7 @@ public:
   bool simplify_inequality_constant(exprt &expr);
   bool simplify_inequality_not_constant(exprt &expr);
   bool simplify_inequality_address_of(exprt &expr);
+  bool simplify_inequality_pointer_object(exprt &expr);
 
   // main recursion
   bool simplify_node(exprt &expr);
