@@ -5404,51 +5404,74 @@ Function: sort_and_join
 struct saj_tablet
 {
   const irep_idt id;
-  const irep_idt type_id;
+  const irep_idt type_ids[10];
 } const saj_table[]=
 {
-  { ID_plus,   ID_integer    },
-  { ID_plus,   ID_natural    },
-  { ID_plus,   ID_real       },
-  { ID_plus,   ID_complex    },
-  { ID_plus,   ID_rational   },
-  { ID_plus,   ID_unsignedbv },
-  { ID_plus,   ID_signedbv   },
-  { ID_plus,   ID_fixedbv    },
-  { ID_mult,   ID_integer    },
-  { ID_mult,   ID_natural    },
-  { ID_mult,   ID_real       },
-  { ID_mult,   ID_complex    },
-  { ID_mult,   ID_rational   },
-  { ID_mult,   ID_unsignedbv },
-  { ID_mult,   ID_signedbv   },
-  { ID_mult,   ID_fixedbv    },
-  { ID_and,    ID_bool       },
-  { ID_or,     ID_bool       },
-  { ID_xor,    ID_bool       },
-  { ID_bitand, ID_unsignedbv },
-  { ID_bitand, ID_signedbv   },
-  { ID_bitand, ID_floatbv    },
-  { ID_bitand, ID_fixedbv    },
-  { ID_bitor,  ID_unsignedbv },
-  { ID_bitor,  ID_signedbv   },
-  { ID_bitor,  ID_floatbv    },
-  { ID_bitor,  ID_fixedbv    },
-  { ID_bitxor, ID_unsignedbv },
-  { ID_bitxor, ID_signedbv   },
-  { ID_bitxor, ID_floatbv    },
-  { ID_bitxor, ID_fixedbv    },
-  { irep_idt(), irep_idt()   }
+  { ID_plus,  {ID_integer    ,
+               ID_natural    ,
+               ID_real       ,
+               ID_complex    ,
+               ID_rational   ,
+               ID_unsignedbv ,
+               ID_signedbv   ,
+               ID_fixedbv    ,
+               irep_idt()  }},
+  { ID_mult,  {ID_integer    ,
+               ID_natural    ,
+               ID_real       ,
+               ID_complex    ,
+               ID_rational   ,
+               ID_unsignedbv ,
+               ID_signedbv   ,
+               ID_fixedbv    ,
+               irep_idt()  }},
+  { ID_and,   {ID_bool       ,
+               irep_idt()  }},
+  { ID_or,    {ID_bool       ,
+               irep_idt()  }},
+  { ID_xor,   {ID_bool       ,
+               irep_idt()  }},
+  { ID_bitand,{ID_unsignedbv ,
+               ID_signedbv   ,
+               ID_floatbv    ,
+               ID_fixedbv    ,
+               irep_idt()  }},
+  { ID_bitor, {ID_unsignedbv ,
+               ID_signedbv   ,
+               ID_floatbv    ,
+               ID_fixedbv    ,
+               irep_idt()  }},
+  { ID_bitxor,{ID_unsignedbv ,
+               ID_signedbv   ,
+               ID_floatbv    ,
+               ID_fixedbv    ,
+               irep_idt()  }},
+  { irep_idt(),{ irep_idt() }}
 };
 
-bool sort_and_join(const irep_idt &id, const irep_idt &type_id)
+static bool sort_and_join(
+  const struct saj_tablet &saj_entry,
+  const irep_idt &type_id)
 {
-  for(unsigned i=0; saj_table[i].id!=irep_idt(); i++)
-    if(id==saj_table[i].id &&
-       type_id==saj_table[i].type_id)
+  for(unsigned i=0; saj_entry.type_ids[i]!=irep_idt(); i++)
+    if(type_id==saj_entry.type_ids[i])
       return true;
 
   return false;
+}
+
+static const struct saj_tablet &sort_and_join(
+  const irep_idt &id,
+  const irep_idt &type_id)
+{
+  unsigned i=0;
+
+  for( ; saj_table[i].id!=irep_idt(); i++)
+    if(id==saj_table[i].id &&
+       sort_and_join(saj_table[i], type_id))
+      return saj_table[i];
+
+  return saj_table[i];
 }
 
 /*******************************************************************\
@@ -5469,40 +5492,41 @@ bool simplify_exprt::sort_and_join(exprt &expr)
 
   if(!expr.has_operands()) return true;
 
-  if(!::sort_and_join(expr.id(), expr.type().id()))
+  const struct saj_tablet &saj_entry=
+    ::sort_and_join(expr.id(), expr.type().id());
+  if(saj_entry.id==irep_idt())
     return true;
 
   // check operand types
 
   forall_operands(it, expr)
-    if(!::sort_and_join(expr.id(), it->type().id()))
+    if(!::sort_and_join(saj_entry, it->type().id()))
       return true;
 
   // join expressions
 
-  for(size_t i=0; i<expr.operands().size();)
+  exprt::operandst new_ops;
+  new_ops.reserve(expr.operands().size());
+
+  forall_operands(it, expr)
   {
-    if(expr.operands()[i].id()==expr.id())
+    if(it->id()==expr.id())
     {
-      size_t no_joined=expr.operands()[i].operands().size();
+      new_ops.reserve(new_ops.capacity()+it->operands().size()-1);
 
-      expr.operands().insert(expr.operands().begin()+i+1,
-        expr.operands()[i].operands().begin(), 
-        expr.operands()[i].operands().end());
-
-      expr.operands().erase(expr.operands().begin()+i);
-
-      i+=no_joined;
+      forall_operands(it2, *it)
+        new_ops.push_back(*it2);
 
       result=false;
     }
     else
-      i++;
+      new_ops.push_back(*it);
   }
 
   // sort it
 
-  result=sort_operands(expr.operands()) && result;
+  result=sort_operands(new_ops) && result;
+  expr.operands().swap(new_ops);
 
   return result;
 }
