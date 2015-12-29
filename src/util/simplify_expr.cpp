@@ -471,10 +471,13 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   // eliminate typecasts from NULL
   if(expr_type.id()==ID_pointer &&
      expr.op0().is_constant() &&
-     to_constant_expr(expr.op0()).get_value()==ID_NULL)
+     (to_constant_expr(expr.op0()).get_value()==ID_NULL ||
+      (expr.op0().is_zero() && config.ansi_c.NULL_is_zero)))
   {
     exprt tmp=expr.op0();
     tmp.type()=expr.type();
+    to_constant_expr(tmp).set_value(ID_NULL);
+    tmp.remove(ID_C_cformat);
     expr.swap(tmp);
     return false;
   }
@@ -505,6 +508,35 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     simplify_typecast(expr.op0()); // rec. call
     simplify_typecast(expr); // rec. call
     return false;
+  }
+
+  // mildly more elaborate version of the above:
+  // (int)((T*)0 + int) -> (int)(sizeof(T)*(size_t)int) if NULL is zero
+  if(config.ansi_c.NULL_is_zero &&
+     (expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
+     expr.op0().id()==ID_plus &&
+     expr.op0().operands().size()==2 &&
+     expr.op0().op0().id()==ID_typecast &&
+     expr.op0().op0().operands().size()==1 &&
+     expr.op0().op0().op0().is_zero() &&
+     op_type.id()==ID_pointer)
+  {
+    unsignedbv_typet size_type(config.ansi_c.pointer_width);
+
+    mp_integer sub_size=pointer_offset_size(op_type.subtype(), ns);
+    if(sub_size!=-1)
+    {
+      // void*
+      if(sub_size==0 || sub_size==1)
+        expr.op0()=typecast_exprt(expr.op0().op1(), size_type);
+      else
+        expr.op0()=mult_exprt(from_integer(sub_size, size_type),
+                              typecast_exprt(expr.op0().op1(), size_type));
+
+      simplify_rec(expr.op0());
+      simplify_typecast(expr); // rec. call
+      return false;
+    }
   }
   
   // Push a numerical typecast into various integer operations, i.e.,
@@ -1132,6 +1164,24 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
   exprt &ptr=expr.op0();
 
+  if(ptr.id()==ID_if && ptr.operands().size()==3)
+  {
+    const if_exprt &if_expr=to_if_expr(ptr);
+
+    exprt tmp_op1=expr;
+    tmp_op1.op0()=if_expr.true_case();
+    simplify_pointer_offset(tmp_op1);
+    exprt tmp_op2=expr;
+    tmp_op2.op0()=if_expr.false_case();
+    simplify_pointer_offset(tmp_op2);
+
+    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
+
+    simplify_if(expr);
+
+    return false;
+  }
+
   if(ptr.type().id()!=ID_pointer) return true;
   
   if(ptr.id()==ID_address_of)
@@ -1272,6 +1322,15 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
     simplify_node(expr);
     
+    return false;
+  }
+  else if(ptr.id()==ID_constant &&
+          ptr.get(ID_value)==ID_NULL)
+  {
+    expr=gen_zero(expr.type());
+
+    simplify_node(expr);
+
     return false;
   }
 
@@ -1635,6 +1694,27 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   }
   else
   {
+    // ((T*)p+a)+b -> (T*)p+(a+b)
+    if(expr.type().id()==ID_pointer &&
+       expr.operands().size()==2 &&
+       expr.op0().id()==ID_plus &&
+       expr.op0().operands().size()==2)
+    {
+      exprt op0=expr.op0();
+
+      if(expr.op0().op1().id()==ID_plus)
+        op0.op1().copy_to_operands(expr.op1());
+      else
+        op0.op1()=plus_exprt(op0.op1(), expr.op1());
+
+      expr.swap(op0);
+
+      simplify_plus(expr.op1());
+      simplify_plus(expr);
+
+      return false;
+    }
+
     // count the constants
     size_t count=0;
     forall_operands(it, expr)
@@ -3283,6 +3363,50 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
 
 /*******************************************************************\
 
+Function: simplify_exprt::simplify_inequality_pointer_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
+{
+  assert(expr.type().id()==ID_bool);
+  assert(expr.operands().size()==2);
+  assert(expr.id()==ID_equal || expr.id()==ID_notequal);
+
+  forall_operands(it, expr)
+  {
+    assert(it->id()==ID_pointer_object);
+    assert(it->operands().size()==1);
+    const exprt &op=it->op0();
+
+    if(op.id()==ID_address_of)
+    {
+      if(op.operands().size()!=1 ||
+         (op.op0().id()!=ID_symbol &&
+          op.op0().id()!=ID_dynamic_object &&
+          op.op0().id()!=ID_string_constant))
+        return true;
+    }
+    else if(op.id()!=ID_constant ||
+            op.get(ID_value)!=ID_NULL)
+      return true;
+  }
+
+  bool equal=expr.op0().op0()==expr.op1().op0();
+
+  expr.make_bool(expr.id()==ID_equal?equal:!equal);
+
+  return false;
+}
+
+/*******************************************************************\
+
 Function: simplify_exprt::simplify_inequality
 
   Inputs:
@@ -3315,6 +3439,11 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
        (tmp1.id()==ID_typecast && tmp1.op0().id()==ID_address_of)) &&
       (expr.id()==ID_equal || expr.id()==ID_notequal))
     return simplify_inequality_address_of(expr);
+
+  if(tmp0.id()==ID_pointer_object &&
+     tmp1.id()==ID_pointer_object &&
+     (expr.id()==ID_equal || expr.id()==ID_notequal))
+    return simplify_inequality_pointer_object(expr);
 
   // first see if we compare to a constant
   
@@ -3717,8 +3846,26 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
          expr.op0().operands().size()==1)
       {
         if(expr.op0().op0().id()==ID_symbol ||
+           expr.op0().op0().id()==ID_dynamic_object ||
            expr.op0().op0().id()==ID_member ||
-           expr.op0().op0().id()==ID_index)
+           expr.op0().op0().id()==ID_index ||
+           expr.op0().op0().id()==ID_string_constant)
+        {
+          expr=false_exprt();
+          return false;
+        }
+      }
+      else if(expr.op0().id()==ID_typecast &&
+              expr.op0().operands().size()==1 &&
+              expr.op0().type().id()==ID_pointer &&
+              expr.op0().op0().id()==ID_address_of &&
+              expr.op0().op0().operands().size()==1)
+      {
+        if(expr.op0().op0().op0().id()==ID_symbol ||
+           expr.op0().op0().op0().id()==ID_dynamic_object ||
+           expr.op0().op0().op0().id()==ID_member ||
+           expr.op0().op0().op0().id()==ID_index ||
+           expr.op0().op0().op0().id()==ID_string_constant)
         {
           expr=false_exprt();
           return false;
@@ -4449,24 +4596,30 @@ bool simplify_exprt::simplify_object(exprt &expr)
     {
       // cast from integer to pointer
 
-      // We do a bit of special treatment for (TYPE *)(a+(int)&o),
-      // which is re-written to '&o'.
+      // We do a bit of special treatment for (TYPE *)(a+(int)&o) and
+      // (TYPE *)(a+(int)((T*)&o+x)), which are re-written to '&o'.
 
       exprt tmp=expr.op0();
       if(tmp.id()==ID_plus && tmp.operands().size()==2)
       {
-        if(tmp.op0().id()==ID_typecast &&
-           tmp.op0().operands().size()==1 &&
-           tmp.op0().op0().id()==ID_address_of)
+        exprt cand=tmp.op0().id()==ID_typecast?tmp.op0():tmp.op1();
+
+        if(cand.id()==ID_typecast &&
+           cand.operands().size()==1 &&
+           cand.op0().id()==ID_address_of)
         {
-          expr=tmp.op0().op0();
+          expr=cand.op0();
           return false;
         }
-        else if(tmp.op1().id()==ID_typecast &&
-                tmp.op1().operands().size()==1 &&
-                tmp.op1().op0().id()==ID_address_of)
+        else if(cand.id()==ID_typecast &&
+                cand.operands().size()==1 &&
+                cand.op0().id()==ID_plus &&
+                cand.op0().operands().size()==2 &&
+                cand.op0().op0().id()==ID_typecast &&
+                cand.op0().op0().operands().size()==1 &&
+                cand.op0().op0().op0().id()==ID_address_of)
         {
-          expr=tmp.op1().op0();
+          expr=cand.op0().op0().op0();
           return false;
         }
       }
@@ -4516,7 +4669,25 @@ bool simplify_exprt::simplify_pointer_object(exprt &expr)
   
   exprt &op=expr.op0();
   
-  return simplify_object(op);
+  bool result=simplify_object(op);
+
+  if(op.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(op);
+    exprt cond=if_expr.cond();
+
+    exprt p_o_false=expr;
+    p_o_false.op0()=if_expr.false_case();
+
+    expr.op0()=if_expr.true_case();
+
+    expr=if_exprt(cond, expr, p_o_false, expr.type());
+    simplify_rec(expr);
+
+    return false;
+  }
+
+  return result;
 }
 
 /*******************************************************************\
@@ -4536,6 +4707,24 @@ bool simplify_exprt::simplify_dynamic_object(exprt &expr)
   if(expr.operands().size()!=1) return true;
   
   exprt &op=expr.op0();
+
+  if(op.id()==ID_if && op.operands().size()==3)
+  {
+    const if_exprt &if_expr=to_if_expr(op);
+
+    exprt tmp_op1=expr;
+    tmp_op1.op0()=if_expr.true_case();
+    simplify_dynamic_object(tmp_op1);
+    exprt tmp_op2=expr;
+    tmp_op2.op0()=if_expr.false_case();
+    simplify_dynamic_object(tmp_op2);
+
+    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
+
+    simplify_if(expr);
+
+    return false;
+  }
   
   bool result=true;
   
