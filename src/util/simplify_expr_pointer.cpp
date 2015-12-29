@@ -16,6 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "config.h"
 #include "expr_util.h"
+#include "threeval.h"
+#include "prefix.h"
+#include "pointer_predicates.h"
 
 /*******************************************************************\
 
@@ -424,5 +427,404 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   }
 
   return true;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_inequality_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
+{
+  assert(expr.type().id()==ID_bool);
+  assert(expr.operands().size()==2);
+  assert(expr.id()==ID_equal || expr.id()==ID_notequal);
+
+  exprt tmp0=expr.op0();
+  if(tmp0.id()==ID_typecast)
+    tmp0=expr.op0().op0();
+  if(tmp0.op0().id()==ID_index &&
+     to_index_expr(tmp0.op0()).index().is_zero())
+    tmp0=address_of_exprt(to_index_expr(tmp0.op0()).array());
+  exprt tmp1=expr.op1();
+  if(tmp1.id()==ID_typecast)
+    tmp1=expr.op1().op0();
+  if(tmp1.op0().id()==ID_index &&
+     to_index_expr(tmp1.op0()).index().is_zero())
+    tmp1=address_of_exprt(to_index_expr(tmp1.op0()).array());
+  assert(tmp0.id()==ID_address_of);
+  assert(tmp1.id()==ID_address_of);
+
+  if(tmp0.operands().size()!=1) return true;
+  if(tmp1.operands().size()!=1) return true;
+  
+  if(tmp0.op0().id()==ID_symbol &&
+     tmp1.op0().id()==ID_symbol)
+  {
+    bool equal=
+       tmp0.op0().get(ID_identifier)==
+       tmp1.op0().get(ID_identifier);
+       
+    expr.make_bool(expr.id()==ID_equal?equal:!equal);
+    
+    return false;
+  }
+  
+  return true;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_inequality_pointer_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
+{
+  assert(expr.type().id()==ID_bool);
+  assert(expr.operands().size()==2);
+  assert(expr.id()==ID_equal || expr.id()==ID_notequal);
+
+  forall_operands(it, expr)
+  {
+    assert(it->id()==ID_pointer_object);
+    assert(it->operands().size()==1);
+    const exprt &op=it->op0();
+
+    if(op.id()==ID_address_of)
+    {
+      if(op.operands().size()!=1 ||
+         (op.op0().id()!=ID_symbol &&
+          op.op0().id()!=ID_dynamic_object &&
+          op.op0().id()!=ID_string_constant))
+        return true;
+    }
+    else if(op.id()!=ID_constant ||
+            op.get(ID_value)!=ID_NULL)
+      return true;
+  }
+
+  bool equal=expr.op0().op0()==expr.op1().op0();
+
+  expr.make_bool(expr.id()==ID_equal?equal:!equal);
+
+  return false;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_pointer_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_pointer_object(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+  
+  exprt &op=expr.op0();
+  
+  bool result=simplify_object(op);
+
+  if(op.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(op);
+    exprt cond=if_expr.cond();
+
+    exprt p_o_false=expr;
+    p_o_false.op0()=if_expr.false_case();
+
+    expr.op0()=if_expr.true_case();
+
+    expr=if_exprt(cond, expr, p_o_false, expr.type());
+    simplify_rec(expr);
+
+    return false;
+  }
+
+  return result;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_dynamic_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_dynamic_object(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+  
+  exprt &op=expr.op0();
+
+  if(op.id()==ID_if && op.operands().size()==3)
+  {
+    const if_exprt &if_expr=to_if_expr(op);
+
+    exprt tmp_op1=expr;
+    tmp_op1.op0()=if_expr.true_case();
+    simplify_dynamic_object(tmp_op1);
+    exprt tmp_op2=expr;
+    tmp_op2.op0()=if_expr.false_case();
+    simplify_dynamic_object(tmp_op2);
+
+    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
+
+    simplify_if(expr);
+
+    return false;
+  }
+  
+  bool result=true;
+  
+  if(!simplify_object(op)) result=false;
+
+  // NULL is not dynamic
+  if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
+  {
+    expr=false_exprt();
+    return false;
+  }  
+
+  // &something depends on the something
+  if(op.id()==ID_address_of && op.operands().size()==1)
+  {
+    if(op.op0().id()==ID_symbol)
+    {
+      const irep_idt identifier=to_symbol_expr(op.op0()).get_identifier();
+
+      // this is for the benefit of symex
+      expr.make_bool(has_prefix(id2string(identifier), "symex_dynamic::"));
+      return false;
+    }
+    else if(op.op0().id()==ID_string_constant)
+    {
+      expr=false_exprt();
+      return false;
+    }
+    else if(op.op0().id()==ID_array)
+    {
+      expr=false_exprt();
+      return false;
+    }
+  }
+  
+  return result;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_invalid_pointer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_invalid_pointer(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+  
+  exprt &op=expr.op0();
+  
+  bool result=true;
+  
+  if(!simplify_object(op)) result=false;
+
+  // NULL is not invalid
+  if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
+  {
+    expr=false_exprt();
+    return false;
+  }  
+  
+  // &anything is not invalid
+  if(op.id()==ID_address_of)
+  {
+    expr=false_exprt();
+    return false;
+  }  
+  
+  return result;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::objects_equal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
+{
+  if(a==b) return tvt(true);
+
+  if(a.id()==ID_address_of && b.id()==ID_address_of &&
+     a.operands().size()==1 && b.operands().size()==1)
+    return objects_equal_address_of(a.op0(), b.op0());
+
+  if(a.id()==ID_constant && b.id()==ID_constant &&
+     a.get(ID_value)==ID_NULL && b.get(ID_value)==ID_NULL)
+    return tvt(true);
+
+  if(a.id()==ID_constant && b.id()==ID_address_of &&
+     a.get(ID_value)==ID_NULL)
+    return tvt(false);
+
+  if(b.id()==ID_constant && a.id()==ID_address_of &&
+     b.get(ID_value)==ID_NULL)
+    return tvt(false);
+
+  return tvt::unknown();
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::objects_equal_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
+{
+  if(a==b) return tvt(true);
+
+  if(a.id()==ID_symbol && b.id()==ID_symbol)
+  {
+    if(a.get(ID_identifier)==b.get(ID_identifier))
+      return tvt(true);
+  }
+  else if(a.id()==ID_index && b.id()==ID_index)
+  {
+    if(a.operands().size()==2 && b.operands().size()==2)
+      return objects_equal_address_of(a.op0(), b.op0());
+  }
+  else if(a.id()==ID_member && b.id()==ID_member)
+  {
+    if(a.operands().size()==1 && b.operands().size()==1)
+      return objects_equal_address_of(a.op0(), b.op0());
+  }
+
+  return tvt::unknown();
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_object_size
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_object_size(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+  
+  exprt &op=expr.op0();
+  
+  bool result=true;
+  
+  if(!simplify_object(op)) result=false;
+  
+  if(op.id()==ID_address_of && op.operands().size()==1)
+  {
+    if(op.op0().id()==ID_symbol)
+    {
+      // just get the type
+      const typet &type=ns.follow(op.op0().type());
+
+      exprt size=size_of_expr(type, ns);
+
+      if(size.is_not_nil())
+      {
+        typet type=expr.type();
+
+        if(size.type()!=type)
+        {
+          size.make_typecast(type);
+          simplify_node(size);
+        }
+
+        expr=size;
+        return false;
+      }
+    }
+    else if(op.op0().id()==ID_string_constant)
+    {
+      typet type=expr.type();
+      expr=from_integer(op.op0().get(ID_value).size()+1, type);
+      return false;
+    }
+  }
+  
+  return result;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_good_pointer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_good_pointer(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+  
+  // we expand the definition
+  exprt def=good_pointer_def(expr.op0(), ns);
+
+  // recursive call
+  simplify_node(def);  
+  
+  expr.swap(def);
+
+  return false;
 }
 
