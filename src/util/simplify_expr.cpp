@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "prefix.h"
 #include "byte_operators.h"
 #include "bv_arithmetic.h"
+#include "endianness_map.h"
 
 //#define DEBUGX
 
@@ -4951,15 +4952,13 @@ bool simplify_exprt::simplify_member(exprt &expr)
     if(target_size!=-1)
     {
       mp_integer target_bits=target_size*8;
-      std::string bits=expr2bits(op);
+      std::string bits=expr2bits(op, true);
       
-      // TODO: we effectively do little-endian here
-
       if(mp_integer(bits.size())>=target_bits)
       {
         std::string bits_cut=std::string(bits, 0, integer2long(target_bits));
       
-        exprt tmp=bits2expr(bits_cut, expr.type());
+        exprt tmp=bits2expr(bits_cut, expr.type(), true);
 
         if(tmp.is_not_nil())
         {
@@ -4987,8 +4986,10 @@ Function: simplify_exprt::bits2expr
 
 exprt simplify_exprt::bits2expr(
   const std::string &bits,
-  const typet &_type)
+  const typet &_type,
+  bool little_endian)
 {
+  // bits start at lowest memory address
   const typet &type=ns.follow(_type);
 
   if(type.id()==ID_unsignedbv ||
@@ -4998,7 +4999,16 @@ exprt simplify_exprt::bits2expr(
   {
     unsigned width=to_bitvector_type(type).get_width();
     if(bits.size()==width)
-      return constant_exprt(bits, type);
+    {
+      endianness_mapt map(type, little_endian, ns);
+
+      std::string tmp=bits;
+      for(std::string::size_type i=0; i<bits.size(); ++i)
+        tmp[i]=bits[map.map_bit(i)];
+
+      std::reverse(tmp.begin(), tmp.end());
+      return constant_exprt(tmp, type);
+    }
   }
   else if(type.id()==ID_c_enum)
   {
@@ -5010,7 +5020,8 @@ exprt simplify_exprt::bits2expr(
     return
       bits2expr(
         bits,
-        ns.follow_tag(to_c_enum_tag_type(type)));
+        ns.follow_tag(to_c_enum_tag_type(type)),
+        little_endian);
   else if(type.id()==ID_union)
   {
     // need to find full-size member
@@ -5039,8 +5050,11 @@ Function: simplify_exprt::expr2bits
 
 \*******************************************************************/
 
-std::string simplify_exprt::expr2bits(const exprt &expr)
+std::string simplify_exprt::expr2bits(
+  const exprt &expr,
+  bool little_endian)
 {
+  // extract bits from lowest to highest memory address
   const typet &type=ns.follow(expr.type());
 
   if(expr.id()==ID_constant)
@@ -5052,25 +5066,42 @@ std::string simplify_exprt::expr2bits(const exprt &expr)
        type.id()==ID_floatbv ||
        type.id()==ID_fixedbv)
     {
-      return id2string(to_constant_expr(expr).get_value());
+      std::string nat=id2string(to_constant_expr(expr).get_value());
+      std::reverse(nat.begin(), nat.end());
+
+      endianness_mapt map(type, little_endian, ns);
+
+      std::string result=nat;
+      for(std::string::size_type i=0; i<nat.size(); ++i)
+        result[map.map_bit(i)]=nat[i];
+
+      return result;
     }
   }
   else if(expr.id()==ID_union)
   {
-    return expr2bits(to_union_expr(expr).op());
+    return expr2bits(to_union_expr(expr).op(), little_endian);
   }
   else if(expr.id()==ID_struct)
   {
     std::string result;
     forall_operands(it, expr)
-      result+=expr2bits(*it);
+    {
+      std::string tmp=expr2bits(*it, little_endian);
+      if(tmp.empty()) return tmp; // failed
+      result+=tmp;
+    }
     return result;
   }
   else if(expr.id()==ID_array)
   {
     std::string result;
     forall_operands(it, expr)
-      result+=expr2bits(*it);
+    {
+      std::string tmp=expr2bits(*it, little_endian);
+      if(tmp.empty()) return tmp; // failed
+      result+=tmp;
+    }
     return result;
   }
   
