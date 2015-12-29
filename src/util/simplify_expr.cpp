@@ -330,6 +330,47 @@ bool simplify_exprt::simplify_sign(exprt &expr)
 
 /*******************************************************************\
 
+Function: simplify_exprt::simplify_popcount
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_popcount(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+ 
+  if(expr.op0().is_constant())
+  {
+    const typet &type=ns.follow(expr.op0().type());
+    
+    if(type.id()==ID_signedbv ||
+       type.id()==ID_unsignedbv)
+    {
+      mp_integer value;
+      if(!to_integer(expr.op0(), value))
+      {
+        unsigned result;
+        
+        for(result=0; value!=0; value=value>>1)
+          if(value.is_odd()) result++;
+        
+        expr=from_integer(result, expr.type());
+        
+        return false;
+      }
+    }
+  }
+  
+  return true; 
+}
+
+/*******************************************************************\
+
 Function: simplify_exprt::simplify_typecast
 
   Inputs:
@@ -5805,6 +5846,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_abs(expr) && result;
   else if(expr.id()==ID_sign)
     result=simplify_sign(expr) && result;
+  else if(expr.id()==ID_popcount)
+    result=simplify_popcount(expr) && result;
   #else
   
   unsigned no=expr.id().get_no();
