@@ -96,27 +96,27 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
     #ifdef UNIFORM_ARRAY_HACK
     bool is_uniform = false;
 
-    if (array.id()==ID_array_of)
+    if(array.id()==ID_array_of)
     {
       is_uniform = true;
     }
-    else if (array.id()==ID_constant || array.id()==ID_array)
+    else if(array.id()==ID_constant || array.id()==ID_array)
     {
       bool found_exception = false;
       forall_expr(it, array.operands())
       {
-	if (*it != array.op0())
-	{
-	  found_exception = true;
-	  break;
-	}
+        if(*it != array.op0())
+        {
+          found_exception = true;
+          break;
+        }
       }
 
-      if (!found_exception)
-	is_uniform = true;
+      if(!found_exception)
+        is_uniform = true;
     }
 
-    if (is_uniform && prop.has_set_to())
+    if(is_uniform && prop.has_set_to())
     {
       static int uniform_array_counter;  // Temporary hack
 
@@ -132,9 +132,9 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
       binary_relation_exprt lower_bound(from_integer(0, index.type()), ID_le, index);
       binary_relation_exprt upper_bound(index, ID_lt, from_integer(array_size, index.type()));
 
-      if (lower_bound.lhs().is_nil() ||
-	  upper_bound.rhs().is_nil())
-	throw "number conversion failed (2)";
+      if(lower_bound.lhs().is_nil() ||
+         upper_bound.rhs().is_nil())
+        throw "number conversion failed (2)";
 
       and_exprt range_condition(lower_bound, upper_bound);
       implies_exprt implication(range_condition, value_equality);
@@ -150,8 +150,8 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
     #ifdef ACTUAL_ARRAY_HACK
     // More useful when updates to concrete locations in
     // actual arrays are compacted by simplify_expr
-    if ((array.id()==ID_constant || array.id()==ID_array) &&
-	prop.has_set_to())
+    if((array.id()==ID_constant || array.id()==ID_array) &&
+       prop.has_set_to())
     {
       #ifdef CONSTANT_ARRAY_HACK
       // TODO : Compile the whole array into a single relation
@@ -189,13 +189,13 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
         if(index_equality.rhs().is_nil())
           throw "number conversion failed (1)";
 
-	assert(it != array.operands().end());
-	
-	value_equality.rhs()=*it++;
+        assert(it != array.operands().end());
+        
+        value_equality.rhs()=*it++;
 
-	// Cache comparisons and equalities
-	prop.l_set_to_true(convert(implies_exprt(index_equality,
-						 value_equality)));
+        // Cache comparisons and equalities
+        prop.l_set_to_true(convert(implies_exprt(index_equality,
+                                                 value_equality)));
       }
       
       return;
@@ -324,7 +324,7 @@ void boolbvt::convert_index(
 
   // Expression simplification should remove these cases
   assert(array.id() != ID_array_of &&
-	 array.id() != ID_array);
+         array.id() != ID_array);
   // If not there are large improvements possible as above
 
   // TODO : If the underlying array can use one of the
