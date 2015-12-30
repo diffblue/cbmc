@@ -1317,6 +1317,7 @@ void goto_instrument_parse_optionst::help()
     " --full-slice                 slice away instructions that don't affect assertions\n"
     "\n"
     "Further transformations:\n"
+    " --constant-propagator        propagate constants and simplify expressions\n"
     " --inline                     perform full inlining\n"
     " --add-library                add models of C library functions\n"
     "\n"
