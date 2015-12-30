@@ -1825,7 +1825,7 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
               from_integer(offset, be.offset().type()));
 
           expr=result;
-
+          simplify_rec(expr);
           return false;
         }
       }
