@@ -2533,28 +2533,15 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier=="__builtin_popcount" ||
           identifier=="__builtin_popcountl" ||
-          identifier=="__builtin_popcountll")
-  {
-    if(expr.arguments().size()!=1)
-    {
-      err_location(f_op);
-      throw "__builtin_popcount expects one operand";
-    }
-
-    exprt popcount_expr(ID_popcount, expr.type());
-    popcount_expr.operands()=expr.arguments();
-    popcount_expr.add_source_location()=source_location;
-
-    return popcount_expr;
-  }
-  else if(identifier=="__popcnt16" ||
+          identifier=="__builtin_popcountll" ||
+          identifier=="__popcnt16" ||
           identifier=="__popcnt" ||
           identifier=="__popcnt64")
   {
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "__popcnt expects one operand";
+      throw id2string(identifier)+" expects one operand";
     }
 
     exprt popcount_expr(ID_popcount, expr.type());
