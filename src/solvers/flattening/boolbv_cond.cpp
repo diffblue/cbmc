@@ -33,10 +33,6 @@ void boolbvt::convert_cond(const exprt &expr, bvt &bv)
 
   bv.resize(width);
 
-  // make it free variables
-  Forall_literals(it, bv)
-    *it=prop.new_variable();
-
   if(operands.size()<2)
     throw "cond takes at least two operands";
 
@@ -48,6 +44,10 @@ void boolbvt::convert_cond(const exprt &expr, bvt &bv)
     bool condition=true;
     literalt previous_cond=const_literal(false);
     literalt cond_literal=const_literal(false);
+
+    // make it free variables
+    Forall_literals(it, bv)
+      *it=prop.new_variable();
 
     forall_operands(it, expr)
     {
