@@ -223,25 +223,40 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
   if(!solver->okay())
   {
     messaget::status() <<
-      "SAT checker inconsistent: negated claim is UNSATISFIABLE, i.e., holds" << eom;
+      "SAT checker inconsistent: instance is UNSATISFIABLE" << eom;
   }
   else
   {
-    Glucose::vec<Glucose::Lit> solver_assumptions;
-    convert(assumptions, solver_assumptions);
+    // if assumptions contains false, we need this to be UNSAT
+    bool has_false=false;
+    
+    forall_literals(it, assumptions)
+      if(it->is_false())
+        has_false=true;
 
-    if(solver->solve(solver_assumptions))
+    if(has_false)
     {
-      messaget::status() << 
-        "SAT checker: negated claim is SATISFIABLE, i.e., does not hold" << eom;
-      assert(solver->model.size()!=0);
-      status=SAT;
-      return P_SATISFIABLE;
+      messaget::status() <<
+        "got FALSE as assumption: instance is UNSATISFIABLE" << eom;
     }
     else
     {
-      messaget::status() <<
-        "SAT checker: negated claim is UNSATISFIABLE, i.e., holds" << eom;
+      Glucose::vec<Glucose::Lit> solver_assumptions;
+      convert(assumptions, solver_assumptions);
+
+      if(solver->solve(solver_assumptions))
+      {
+        messaget::status() << 
+          "SAT checker: instance is SATISFIABLE" << eom;
+        assert(solver->model.size()!=0);
+        status=SAT;
+        return P_SATISFIABLE;
+      }
+      else
+      {
+        messaget::status() <<
+          "SAT checker: instance is UNSATISFIABLE" << eom;
+      }
     }
   }
 

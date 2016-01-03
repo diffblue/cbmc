@@ -130,7 +130,7 @@ propt::resultt satcheck_lingelingt::prop_solve()
   const int res=lglsat(solver);
   if(res==10)
   {
-    msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
+    msg="SAT checker: instance is SATISFIABLE";
     messaget::status() << msg << messaget::eom;
     status=SAT;
     return P_SATISFIABLE;
@@ -138,7 +138,7 @@ propt::resultt satcheck_lingelingt::prop_solve()
   else
   {
     assert(res==20);
-    msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+    msg="SAT checker: instance is UNSATISFIABLE";
     messaget::status() << msg << messaget::eom;
   }
 

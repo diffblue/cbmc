@@ -253,11 +253,11 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
 
   if(empty_clause_added)
   {
-    msg="empty clause: negated claim is UNSATISFIABLE, i.e., holds";
+    msg="empty clause: instance is UNSATISFIABLE";
   }
   else if(!solver->okay())
   {
-    msg="SAT checker inconsistent: negated claim is UNSATISFIABLE, i.e., holds";
+    msg="SAT checker inconsistent: instance is UNSATISFIABLE";
   }
   else
   {
@@ -266,13 +266,13 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
 
     if(solver->solve(MiniSat_assumptions))
     {
-      msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
+      msg="SAT checker: instance is SATISFIABLE";
       messaget::status() << msg << messaget::eom;
       status=SAT;
       return P_SATISFIABLE;
     }
     else
-      msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+      msg="SAT checker: instance is UNSATISFIABLE";
   }
 
   messaget::status() << msg << messaget::eom;
