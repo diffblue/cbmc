@@ -232,8 +232,8 @@ Function: satcheck_lingelingt::set_frozen
 
 void satcheck_lingelingt::set_frozen(literalt a)
 {
-  assert(!a.is_constant());
-  lglfreeze(solver, a.dimacs());
+  if(!a.is_constant())
+    lglfreeze(solver, a.dimacs());
 }
 
 /*******************************************************************\
