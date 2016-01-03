@@ -164,11 +164,11 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
     switch(result)
     {
      case UNSATISFIABLE:
-      msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+      msg="SAT checker: instance is UNSATISFIABLE";
       break;
 
      case SATISFIABLE:
-      msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
+      msg="SAT checker: instance is SATISFIABLE";
       break;
 
      case UNDETERMINED:

@@ -176,11 +176,11 @@ propt::resultt satcheck_booleforce_baset::prop_solve()
     switch(result)
     {
     case BOOLEFORCE_UNSATISFIABLE:
-      msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+      msg="SAT checker: instance is UNSATISFIABLE";
       break;
 
     case BOOLEFORCE_SATISFIABLE:
-      msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
+      msg="SAT checker: instance is SATISFIABLE";
       break;
 
     default:

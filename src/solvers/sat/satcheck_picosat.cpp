@@ -131,7 +131,7 @@ propt::resultt satcheck_picosatt::prop_solve()
   const int res=picosat_sat(picosat, -1);
   if(res==PICOSAT_SATISFIABLE)
   {
-    msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
+    msg="SAT checker: instance is SATISFIABLE";
     messaget::status() << msg << messaget::eom;
     status=SAT;
     return P_SATISFIABLE;
@@ -139,7 +139,7 @@ propt::resultt satcheck_picosatt::prop_solve()
   else
   {
     assert(res==PICOSAT_UNSATISFIABLE);
-    msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+    msg="SAT checker: instance is UNSATISFIABLE";
     messaget::status() << msg << messaget::eom;
   }
 

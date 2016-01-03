@@ -176,11 +176,11 @@ propt::resultt satcheck_smvsatt::prop_solve()
     switch(result)
     {
     case 0:
-      msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+      msg="SAT checker: instance is UNSATISFIABLE";
       break;
 
     case 1:
-      msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
+      msg="SAT checker: instance is SATISFIABLE";
       break;
 
     default:
