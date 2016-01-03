@@ -428,9 +428,11 @@ Function: satcheck_minisat_simplifiert::set_frozen
 
 void satcheck_minisat_simplifiert::set_frozen(literalt a)
 {
-  assert(!a.is_constant());
-  add_variables();
-  solver->setFrozen(a.var_no(), true);
+  if(!a.is_constant())
+  {
+    add_variables();
+    solver->setFrozen(a.var_no(), true);
+  }
 }
 
 /*******************************************************************\
