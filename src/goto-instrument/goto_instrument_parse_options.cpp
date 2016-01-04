@@ -81,7 +81,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "accelerate/accelerate.h"
 #include "count_eloc.h"
 #include "horn_encoding.h"
-#include "thread_exit_instrumentation.h"
+#include "thread_instrumentation.h"
 
 /*******************************************************************\
 
@@ -259,7 +259,10 @@ int goto_instrument_parse_optionst::doit()
       remove_unused_functions(goto_functions, get_message_handler());
       
       if(!cmdline.isset("inline"))
+      {
         thread_exit_instrumentation(goto_functions);
+        mutex_init_instrumentation(symbol_table, goto_functions);
+      }
 
       // recalculate numbers, etc.
       goto_functions.update();
@@ -302,7 +305,10 @@ int goto_instrument_parse_optionst::doit()
       remove_unused_functions(goto_functions, get_message_handler());
     
       if(!cmdline.isset("inline"))
+      {
         thread_exit_instrumentation(goto_functions);
+        mutex_init_instrumentation(symbol_table, goto_functions);
+      }
 
       // recalculate numbers, etc.
       goto_functions.update();
@@ -916,6 +922,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     {
       do_remove_returns();
       thread_exit_instrumentation(goto_functions);
+      mutex_init_instrumentation(symbol_table, goto_functions);
     }
 
     status() << "Performing full inlining" << eom;
