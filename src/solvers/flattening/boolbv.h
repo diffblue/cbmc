@@ -115,7 +115,7 @@ protected:
   
   virtual literalt convert_bv_rel(const exprt &expr);
   virtual literalt convert_typecast(const exprt &expr);
-  virtual literalt convert_reduction(const exprt &expr);
+  virtual literalt convert_reduction(const unary_exprt &expr);
   virtual literalt convert_onehot(const unary_exprt &expr);
   virtual literalt convert_extractbit(const extractbit_exprt &expr);
   virtual literalt convert_overflow(const exprt &expr);
@@ -161,6 +161,8 @@ protected:
   virtual void convert_constant(const constant_exprt &expr, bvt &bv);
   virtual void convert_extractbits(const extractbits_exprt &expr, bvt &bv);
   virtual void convert_symbol(const exprt &expr, bvt &bv);
+  virtual void convert_reduction(const unary_exprt &expr, bvt &bv);
+  virtual void convert_not(const not_exprt &expr, bvt &bv);
 
   virtual void make_bv_expr(const typet &type, const bvt &bv, exprt &dest);
   virtual void make_free_bv_expr(const typet &type, exprt &dest);

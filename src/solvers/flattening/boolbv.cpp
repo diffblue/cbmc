@@ -358,6 +358,12 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     
     return;
   }
+  else if(expr.id()==ID_reduction_or  || expr.id()==ID_reduction_and  ||
+          expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
+          expr.id()==ID_reduction_xor || expr.id()==ID_reduction_xnor)
+    return convert_reduction(to_unary_expr(expr), bv);
+  else if(expr.id()==ID_not)
+    return convert_not(to_not_expr(expr), bv);
   else if(expr.id()==ID_float_debug1 ||
           expr.id()==ID_float_debug2)
   {
@@ -613,7 +619,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
   else if(expr.id()==ID_reduction_or  || expr.id()==ID_reduction_and  ||
           expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
           expr.id()==ID_reduction_xor || expr.id()==ID_reduction_xnor)
-    return convert_reduction(expr);
+    return convert_reduction(to_unary_expr(expr));
   else if(expr.id()==ID_onehot || expr.id()==ID_onehot0)
     return convert_onehot(to_unary_expr(expr));
   else if(has_prefix(expr.id_string(), "overflow-"))
