@@ -531,7 +531,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
   const exprt::operandst &operands=expr.operands();
 
   if(expr.id()==ID_typecast)
-    return convert_typecast(expr);
+    return convert_typecast(to_typecast_expr(expr));
   else if(expr.id()==ID_equal)
     return convert_equality(to_equal_expr(expr));
   else if(expr.id()==ID_verilog_case_equality ||
