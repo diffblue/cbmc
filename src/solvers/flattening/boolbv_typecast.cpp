@@ -608,24 +608,23 @@ Function: boolbvt::convert_typecast
 
 literalt boolbvt::convert_typecast(const typecast_exprt &expr)
 {
-  if(expr.operands().size()==1)
-  {
-    if(expr.op0().type().id()==ID_range)
-    {
-      mp_integer from=string2integer(expr.op0().type().get_string(ID_from));
-      mp_integer to=string2integer(expr.op0().type().get_string(ID_to));
-
-      if(from==1 && to==1)
-        return const_literal(true);
-      else if(from==0 && to==0)
-        return const_literal(false);
-    }
-
-    const bvt &bv=convert_bv(expr.op0());
-    
-    if(!bv.empty())
-      return prop.lor(bv);
-  }
+  assert(expr.operands().size()==1);
   
+  if(expr.op0().type().id()==ID_range)
+  {
+    mp_integer from=string2integer(expr.op0().type().get_string(ID_from));
+    mp_integer to=string2integer(expr.op0().type().get_string(ID_to));
+
+    if(from==1 && to==1)
+      return const_literal(true);
+    else if(from==0 && to==0)
+      return const_literal(false);
+  }
+
+  const bvt &bv=convert_bv(expr.op0());
+  
+  if(!bv.empty())
+    return prop.lor(bv);
+
   return SUB::convert_rest(expr);
 }
