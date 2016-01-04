@@ -2334,20 +2334,22 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   exprt tmp=expr;
   bool result=true;
 
+  if(!tmp.get_bool(ID_C_expr_simplified))
+  {
   result=simplify_node_preorder(tmp);
 
   if(!simplify_node(tmp))
     result=false;
 
-  #if 1
   replace_mapt::const_iterator it=local_replace_map.find(tmp);
   if(it!=local_replace_map.end())
   {
     tmp=it->second;
     result=false;
   }
-  #else
-  if(!local_replace_map.empty() &&
+  }
+  #if 0
+  else if(!local_replace_map.empty() &&
      !replace_expr(local_replace_map, tmp))
   {
     simplify_rec(tmp);
@@ -2357,6 +2359,7 @@ bool simplify_exprt::simplify_rec(exprt &expr)
 
   if(!result)
   {
+    tmp.set(ID_C_expr_simplified, true);
     expr.swap(tmp);
 
     #ifdef USE_CACHE
