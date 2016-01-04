@@ -3,7 +3,9 @@
 #include <sys/signal.h>
 #include <sys/wait.h>
 #else
+#ifndef __MINGW32__
 typedef unsigned int pid_t;
+#endif
 #endif
 
 #include <algorithm>
