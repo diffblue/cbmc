@@ -364,6 +364,8 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return convert_reduction(to_unary_expr(expr), bv);
   else if(expr.id()==ID_not)
     return convert_not(to_not_expr(expr), bv);
+  else if(expr.id()==ID_power)
+    return convert_power(to_binary_expr(expr), bv);
   else if(expr.id()==ID_float_debug1 ||
           expr.id()==ID_float_debug2)
   {
