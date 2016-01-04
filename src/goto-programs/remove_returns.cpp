@@ -24,6 +24,9 @@ public:
   void operator()(
     goto_functionst &goto_functions);
 
+  void restore(
+    goto_functionst &goto_functions);
+
 protected:
   symbol_tablet &symbol_table;
 
@@ -31,6 +34,13 @@ protected:
     goto_functionst::function_mapt::iterator f_it);
 
   void do_function_calls(
+    goto_functionst &goto_functions,
+    goto_programt &goto_program);
+
+  void restore_returns(
+    goto_functionst::function_mapt::iterator f_it);
+
+  void undo_function_calls(
     goto_functionst &goto_functions,
     goto_programt &goto_program);
 };
@@ -252,5 +262,196 @@ void remove_returns(goto_modelt &goto_model)
 {
   remove_returnst rr(goto_model.symbol_table);
   rr(goto_model.goto_functions);
+}
+
+/*******************************************************************\
+
+Function: remove_returnst::restore_returns
+
+Inputs:
+
+Outputs:
+
+Purpose: turns 'return x' into an assignment to fkt#return_value
+
+\*******************************************************************/
+
+void remove_returnst::restore_returns(
+  goto_functionst::function_mapt::iterator f_it)
+{
+  const irep_idt function_id=f_it->first;
+
+  // do we have X#return_value?
+  std::string rv_name=id2string(function_id)+"#return_value";
+
+  symbol_tablet::symbolst::iterator rv_it=
+    symbol_table.symbols.find(rv_name);
+
+  if(rv_it==symbol_table.symbols.end())
+    return;
+
+  // look up the function symbol
+  symbol_tablet::symbolst::iterator s_it=
+    symbol_table.symbols.find(function_id);
+
+  assert(s_it!=symbol_table.symbols.end());
+  symbolt &function_symbol=s_it->second;
+
+  // restore the return type
+  f_it->second.type.return_type()=rv_it->second.type;
+  function_symbol.type=f_it->second.type;
+
+  // remove the return_value symbol from the symbol_table
+  irep_idt rv_name_id=rv_it->second.name;
+  symbol_table.symbols.erase(rv_it);
+
+  goto_programt &goto_program=f_it->second.body;
+
+  Forall_goto_program_instructions(i_it, goto_program)
+  {
+    if(i_it->is_assign())
+    {
+      code_assignt &assign=to_code_assign(i_it->code);
+      if(assign.lhs().id()!=ID_symbol ||
+         to_symbol_expr(assign.lhs()).get_identifier()!=rv_name_id)
+        continue;
+
+      // replace "fkt#return_value=x;" by "return x;"
+      code_returnt return_code(assign.rhs());
+
+      // now turn the `return' into `assignment'
+      i_it->type=RETURN;
+      i_it->code=return_code;
+
+      // remove the subsequent goto (and possibly dead)
+      goto_programt::instructionst::iterator next=i_it;
+      ++next;
+      assert(next!=goto_program.instructions.end());
+
+      if(next->is_dead())
+      {
+        assert(to_code_dead(next->code).symbol()==
+               return_code.return_value());
+        next=goto_program.instructions.erase(next);
+        assert(next!=goto_program.instructions.end());
+      }
+
+      assert(next->is_goto());
+      // i_it remains valid
+      goto_program.instructions.erase(next);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_returnst::undo_function_calls
+
+Inputs:
+
+Outputs:
+
+Purpose: turns f(...); lhs=f#return_value; into x=f(...)
+
+\*******************************************************************/
+
+void remove_returnst::undo_function_calls(
+  goto_functionst &goto_functions,
+  goto_programt &goto_program)
+{
+  namespacet ns(symbol_table);
+
+  Forall_goto_program_instructions(i_it, goto_program)
+  {
+    if(i_it->is_function_call())
+    {
+      code_function_callt &function_call=to_code_function_call(i_it->code);
+
+      assert(function_call.function().id()==ID_symbol);
+
+      const irep_idt function_id=
+        to_symbol_expr(function_call.function()).get_identifier();
+
+      const symbolt &function_symbol=ns.lookup(function_id);
+
+      // fix the type
+      to_code_type(function_call.function().type()).return_type()=
+        to_code_type(function_symbol.type).return_type();
+
+      // find "f(...); lhs=f#return_value; DEAD f#return_value;"
+      // and revert to "lhs=f(...);"
+      // nondet assignments when the body of f isn't available are
+      // not reverted
+      goto_programt::instructionst::iterator next=i_it;
+      ++next;
+      assert(next!=goto_program.instructions.end());
+
+      if(!next->is_assign())
+        continue;
+
+      const code_assignt &assign=to_code_assign(next->code);
+
+      if(assign.rhs().id()!=ID_symbol)
+        continue;
+
+      irep_idt rv_name=id2string(function_id)+"#return_value";
+      const symbol_exprt &rhs=to_symbol_expr(assign.rhs());
+      if(rhs.get_identifier()!=rv_name)
+        continue;
+
+      // restore the previous assignment
+      function_call.lhs()=assign.lhs();
+
+      // remove the assignment and subsequent dead
+      // i_it remains valid
+      next=goto_program.instructions.erase(next);
+      assert(next!=goto_program.instructions.end());
+      assert(next->is_dead());
+      // i_it remains valid
+      goto_program.instructions.erase(next);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_returnst::restore()
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void remove_returnst::restore(goto_functionst &goto_functions)
+{
+  // restore all types first
+  Forall_goto_functions(it, goto_functions)
+    restore_returns(it);
+
+  Forall_goto_functions(it, goto_functions)
+    undo_function_calls(goto_functions, it->second.body);
+}
+
+/*******************************************************************\
+
+Function: restore_returns
+
+Inputs:
+
+Outputs:
+
+Purpose: restores return statements
+
+\*******************************************************************/
+
+void restore_returns(
+  symbol_tablet &symbol_table,
+  goto_functionst &goto_functions)
+{
+  remove_returnst rr(symbol_table);
+  rr.restore(goto_functions);
 }
 

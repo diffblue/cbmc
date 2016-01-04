@@ -534,6 +534,10 @@ int goto_instrument_parse_optionst::doit()
       const bool is_cpp=cmdline.isset("dump-cpp");
       const bool h=cmdline.isset("use-system-headers");
       namespacet ns(symbol_table);
+
+      // restore RETURN instructions in case remove_returns had been
+      // applied
+      restore_returns(symbol_table, goto_functions);
       
       if(cmdline.args.size()==2)
       {

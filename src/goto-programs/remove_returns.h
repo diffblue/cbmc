@@ -21,4 +21,7 @@ void remove_returns(symbol_tablet &, goto_functionst &);
 
 void remove_returns(goto_modelt &);
 
+// reverse the above operations
+void restore_returns(symbol_tablet &, goto_functionst &);
+
 #endif
