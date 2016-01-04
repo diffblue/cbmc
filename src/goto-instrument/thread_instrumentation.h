@@ -13,4 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void thread_exit_instrumentation(goto_functionst &);
 
+void mutex_init_instrumentation(const symbol_tablet &, goto_functionst &);
+
 #endif

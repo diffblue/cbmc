@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/string_constant.h>
 
-#include "thread_exit_instrumentation.h"
+#include "thread_instrumentation.h"
 
 /*******************************************************************\
 
@@ -115,4 +115,91 @@ void thread_exit_instrumentation(goto_functionst &goto_functions)
   {
     thread_exit_instrumentation(goto_functions.function_map[fkt].body);
   }
+}
+
+/*******************************************************************\
+
+Function: mutex_init_instrumentation
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void mutex_init_instrumentation(
+  const symbol_tablet &symbol_table,
+  goto_programt &goto_program,
+  typet lock_type)
+{
+  symbol_tablet::symbolst::const_iterator f_it=
+    symbol_table.symbols.find("__CPROVER_set_must");
+
+  if(f_it==symbol_table.symbols.end())
+    return;
+
+  Forall_goto_program_instructions(it, goto_program)
+  {
+    if(it->is_assign())
+    {
+      const code_assignt &code_assign=
+       to_code_assign(it->code);
+       
+      if(code_assign.lhs().type()==lock_type)
+      {
+        goto_programt::targett t=goto_program.insert_after(it);
+
+        code_function_callt call;
+        
+        call.function()=f_it->second.symbol_expr();
+        call.arguments().resize(2);
+        call.arguments()[0]=address_of_exprt(code_assign.lhs());
+        call.arguments()[1]=address_of_exprt(string_constantt("mutex-init"));
+        
+        t->make_function_call(call);
+        t->source_location=it->source_location;
+      }
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: mutex_init_instrumentation
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void mutex_init_instrumentation(
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions)
+{
+  // get pthread_mutex_lock
+  
+  symbol_tablet::symbolst::const_iterator f_it=
+    symbol_table.symbols.find("pthread_mutex_lock");
+
+  if(f_it==symbol_table.symbols.end())
+    return;
+
+  // get type of lock argument
+  code_typet code_type=to_code_type(to_code_type(f_it->second.type));
+  if(code_type.parameters().size()!=1)
+    return;
+  
+  typet lock_type=code_type.parameters()[0].type();
+  
+  if(lock_type.id()!=ID_pointer)
+    return;
+
+  Forall_goto_functions(f_it, goto_functions)
+    mutex_init_instrumentation(
+      symbol_table, f_it->second.body, lock_type.subtype());
 }
