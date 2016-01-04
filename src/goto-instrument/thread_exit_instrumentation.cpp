@@ -22,6 +22,7 @@ Function: has_start_thread
 
 \*******************************************************************/
 
+namespace {
 bool has_start_thread(const goto_programt &goto_program)
 {
   for(const auto &instruction : goto_program.instructions)
@@ -29,6 +30,7 @@ bool has_start_thread(const goto_programt &goto_program)
       return true;
 
   return false;
+}
 }
 
 /*******************************************************************\
