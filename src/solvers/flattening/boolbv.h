@@ -114,7 +114,7 @@ protected:
     const typet &dest_type, bvt &dest);
   
   virtual literalt convert_bv_rel(const exprt &expr);
-  virtual literalt convert_typecast(const exprt &expr);
+  virtual literalt convert_typecast(const typecast_exprt &expr);
   virtual literalt convert_reduction(const unary_exprt &expr);
   virtual literalt convert_onehot(const unary_exprt &expr);
   virtual literalt convert_extractbit(const extractbit_exprt &expr);

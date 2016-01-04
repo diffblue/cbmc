@@ -606,7 +606,7 @@ Function: boolbvt::convert_typecast
 
 \*******************************************************************/
 
-literalt boolbvt::convert_typecast(const exprt &expr)
+literalt boolbvt::convert_typecast(const typecast_exprt &expr)
 {
   if(expr.operands().size()==1)
   {
