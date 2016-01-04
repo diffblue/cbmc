@@ -163,6 +163,7 @@ protected:
   virtual void convert_symbol(const exprt &expr, bvt &bv);
   virtual void convert_reduction(const unary_exprt &expr, bvt &bv);
   virtual void convert_not(const not_exprt &expr, bvt &bv);
+  virtual void convert_power(const binary_exprt &expr, bvt &bv);
 
   virtual void make_bv_expr(const typet &type, const bvt &bv, exprt &dest);
   virtual void make_free_bv_expr(const typet &type, exprt &dest);
