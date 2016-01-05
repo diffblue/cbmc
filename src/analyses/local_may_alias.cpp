@@ -267,6 +267,10 @@ void local_may_aliast::get_rec(
     {
       unsigned object_nr=objects.number(rhs);
       dest.insert(object_nr);
+
+      for(std::size_t i=0; i<loc_info_src.aliases.size(); i++)
+        if(loc_info_src.aliases.same_set(object_nr, i))
+          dest.insert(i);
     }
     else if(object.id()==ID_index)
     {
@@ -276,14 +280,24 @@ void local_may_aliast::get_rec(
         index_exprt tmp1=index_expr;
         tmp1.index()=gen_zero(index_type());
         address_of_exprt tmp2(tmp1);
-        dest.insert(objects.number(tmp2));
+        unsigned object_nr=objects.number(tmp2);
+        dest.insert(object_nr);
+
+        for(std::size_t i=0; i<loc_info_src.aliases.size(); i++)
+          if(loc_info_src.aliases.same_set(object_nr, i))
+            dest.insert(i);
       }
       else if(index_expr.array().id()==ID_string_constant)
       {
         index_exprt tmp1=index_expr;
         tmp1.index()=gen_zero(index_type());
         address_of_exprt tmp2(tmp1);
-        dest.insert(objects.number(tmp2));
+        unsigned object_nr=objects.number(tmp2);
+        dest.insert(object_nr);
+
+        for(std::size_t i=0; i<loc_info_src.aliases.size(); i++)
+          if(loc_info_src.aliases.same_set(object_nr, i))
+            dest.insert(i);
       }
       else
         dest.insert(unknown_object);
