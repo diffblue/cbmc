@@ -97,6 +97,10 @@ void custom_bitvector_domaint::set_bit(
       set_bit(identifier, bit_nr, mode);
     }
   }
+  else if(lhs.id()==ID_typecast)
+  {
+    set_bit(to_typecast_expr(lhs).op(), bit_nr, mode);
+  }
 }
 
 /*******************************************************************\
@@ -344,7 +348,7 @@ void custom_bitvector_domaint::transform(
               // may alias other stuff
               std::set<exprt> lhs_set=
                 cba.local_may_alias_factory(from).get(from, lhs);
-
+                
               lhs_set.insert(lhs);
                
               for(std::set<exprt>::const_iterator
