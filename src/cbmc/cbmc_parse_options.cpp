@@ -276,6 +276,13 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // generate unwinding assumptions otherwise
   options.set_option("partial-loops",
    cmdline.isset("partial-loops"));
+   
+  if(options.get_bool_option("partial-loops") &&
+     options.get_bool_option("unwinding-assertions"))
+  {
+    error() << "--partial-loops and --unwinding-assertions must not be given together" << eom;
+    exit(1);
+  }
 
   // remove unused equations
   options.set_option("slice-formula",
