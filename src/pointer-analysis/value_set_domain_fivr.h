@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef VALUE_SET_DOMAIN_INCR_H_
 #define VALUE_SET_DOMAIN_INCR_H_
 
-#include <goto-programs/flow_insensitive_analysis.h>
+#include <analyses/flow_insensitive_analysis.h>
 
 #include "value_set_fivr.h"
 
