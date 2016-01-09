@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_FIVR_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_FIVR_H
 
-#include <goto-programs/flow_insensitive_analysis.h>
+#include <analyses/flow_insensitive_analysis.h>
 
 #include "value_set_domain_fivr.h"
 #include "value_sets.h"
