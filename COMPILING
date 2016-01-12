@@ -111,12 +111,13 @@ COMPILATION ON MACOS X
 Follow these instructions:
 
 0) You need a C/C++ compiler, Flex and Bison, and GNU make. To this
-   end, install the XCode command-line utilities (installing XCode is
-   not enough). These are available at
+   end, first install the XCode from the App-store and then type
 
-   https://developer.apple.com/downloads/
+   xcode-select --install
 
-1) In a terminal window, get the CBMC source via
+   in a terminal window.
+
+1) Then get the CBMC source via
 
    svn co http://www.cprover.org/svn/cbmc/trunk cbmc-trunk
 
