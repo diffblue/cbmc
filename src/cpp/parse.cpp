@@ -2781,7 +2781,7 @@ bool Parser::rConstructorDecl(
   
   trailing_return_type.make_nil();
 
-  constructor=cpp_declaratort(typet("function_type"));
+  constructor=cpp_declaratort(typet(ID_function_type));
   constructor.type().subtype().make_nil();
   constructor.name().swap(type_name);
 
@@ -3096,7 +3096,7 @@ bool Parser::rDeclaratorWithInit(
       // Possibly a C++11 list initializer;
       // or a function body.
 
-      if(declarator.type().id()!="function_type")
+      if(declarator.type().id()!=ID_function_type)
       {
         if(!rInitializeExpr(declarator.value()))
           return false;
@@ -3308,7 +3308,7 @@ bool Parser::rDeclarator(
 
       if(is_args)
       {
-        typet function_type("function_type");
+        typet function_type(ID_function_type);
         function_type.subtype().swap(d_outer);
         function_type.add(ID_parameters).swap(args);
 

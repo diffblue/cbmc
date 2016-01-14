@@ -725,7 +725,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   cpp_save_scopet saved_scope(cpp_scopes);
   
   if(declaration.declarators().size()!=1 ||
-     declaration.declarators().front().type().id()!="function_type")
+     declaration.declarators().front().type().id()!=ID_function_type)
   {
     err_location(declaration.type());
     str << "expected function template specialization";

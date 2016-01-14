@@ -203,7 +203,7 @@ void cpp_typecheckt::default_ctor(
   cpp_declaratort decl;
   decl.name().id(ID_cpp_name);
   decl.name().move_to_sub(name);
-  decl.type()=typet("function_type");
+  decl.type()=typet(ID_function_type);
   decl.type().subtype().make_nil();
   decl.add_source_location() = source_location;
 
@@ -439,7 +439,7 @@ void cpp_typecheckt::default_assignop(
   declarator_name.get_sub().push_back(irept(ID_operator));
   declarator_name.get_sub().push_back(irept("="));
 
-  declarator_type.id("function_type");
+  declarator_type.id(ID_function_type);
   declarator_type.subtype()=reference_typet();
   declarator_type.subtype().add("#qualifier").make_nil();
   declarator_type.subtype().subtype().make_nil();

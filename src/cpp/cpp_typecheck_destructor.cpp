@@ -63,7 +63,7 @@ void cpp_typecheckt::default_dtor(
   cpp_declaratort decl;
   decl.name().id(ID_cpp_name);
   decl.name().move_to_sub(name);
-  decl.type().id("function_type");
+  decl.type().id(ID_function_type);
   decl.type().subtype().make_nil();
 
   decl.value().id(ID_code);

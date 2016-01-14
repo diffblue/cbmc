@@ -2124,7 +2124,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     cpp_declaration.declarators().front();
     
   // and that needs to have function type  
-  if(function_declarator.type().id()!="function_type")
+  if(function_declarator.type().id()!=ID_function_type)
   {
     cpp_typecheck.err_location(source_location);
     throw "expected function type for function template";
