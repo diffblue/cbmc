@@ -6881,10 +6881,15 @@ bool Parser::rAllocateType(
     atype.swap(tname);
   }
 
-  if(lex.LookAhead(0)=='(' ||
-     lex.LookAhead(0)=='{')
+  if(lex.LookAhead(0)=='(')
   {
     if(!rAllocateInitializer(initializer))
+      return false;
+  }
+  else if(lex.LookAhead(0)=='{')
+  {
+    // this is a C++11 extension
+    if(!rInitializeExpr(initializer))
       return false;
   }
 
@@ -6953,13 +6958,9 @@ Function:
 /*
   allocate.initializer
   : '(' {initialize.expr (',' initialize.expr)* } ')'
-  | initialize.expr
 */
 bool Parser::rAllocateInitializer(exprt &init)
 {
-  if(lex.LookAhead(0)=='{')
-    return rInitializeExpr(init);
-
   if(lex.get_token()!='(')
     return false;
 
