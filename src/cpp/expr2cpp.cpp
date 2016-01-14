@@ -409,6 +409,11 @@ std::string expr2cppt::convert_rec(
   {
     return "std::nullptr_t";
   }
+  else if(src.id()==ID_initializer_list)
+  {
+    // only really used in error messages
+    return "{ ... }";
+  }
   else
     return expr2ct::convert_rec(src, qualifiers, declarator);
 }

@@ -148,6 +148,10 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     // TODO
     expr=false_exprt();
   }
+  else if(expr.id()==ID_initializer_list)
+  {
+    expr.type().id(ID_initializer_list);
+  }
   else
     c_typecheck_baset::typecheck_expr_main(expr);
 }
