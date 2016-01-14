@@ -3090,9 +3090,17 @@ bool Parser::rDeclaratorWithInit(
         if(!rInitializeExpr(declarator.value()))
           return false;
       }
+    }
+    else if(t=='{')
+    {
+      // Possibly a C++11 list initializer;
+      // or a function body.
 
-      dw.swap(declarator);
-      return true;
+      if(declarator.type().id()!="function_type")
+      {
+        if(!rInitializeExpr(declarator.value()))
+          return false;
+      }
     }
     else if(t==':')
     {
@@ -3110,15 +3118,10 @@ bool Parser::rDeclaratorWithInit(
       set_location(bit_field_type, tk);
       
       merge_types(bit_field_type, declarator.type());
-        
-      dw.swap(declarator);
-      return true;
     }
-    else
-    {
-      dw.swap(declarator);
-      return true;
-    }
+
+    dw.swap(declarator);
+    return true;
   }
 }
 
