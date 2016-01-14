@@ -148,7 +148,7 @@ void cpp_convert_typet::read_rec(const typet &type)
     constexpr_cnt++;
   else if(type.id()==ID_extern)
     extern_cnt++;
-  else if(type.id()=="function_type")
+  else if(type.id()==ID_function_type)
   {
     read_function_type(type);
   }
