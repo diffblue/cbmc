@@ -7541,19 +7541,25 @@ bool Parser::rPrimaryExpr(exprt &exp)
     #endif
     return true;
 
+  case '{': // C++11 initialisation expression
+    #ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 10\n";
+    #endif
+    return rInitializeExpr(exp);
+
   case TOK_TYPEID:
     return rTypeidExpr(exp);
     
   case TOK_UNARY_TYPE_PREDICATE:
   case TOK_BINARY_TYPE_PREDICATE:
     #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 10\n";
+    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 11\n";
     #endif
     return rTypePredicate(exp);
 
   case TOK_MSC_UUIDOF:
     #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 11\n";
+    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 12\n";
     #endif
     return rMSCuuidof(exp);
 
@@ -7562,13 +7568,13 @@ bool Parser::rPrimaryExpr(exprt &exp)
   case TOK_MSC_IF_EXISTS:
   case TOK_MSC_IF_NOT_EXISTS:
     #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 12\n";
+    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 13\n";
     #endif
     return rMSC_if_existsExpr(exp);
 
   default:
     #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 13\n";
+    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 14\n";
     #endif
     {
       typet type;
@@ -7577,7 +7583,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
         return false;
 
       #ifdef DEBUG
-      std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 14\n";
+      std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 15\n";
       #endif
 
       if(type.is_not_nil() && lex.LookAhead(0)==TOK_SCOPE)
@@ -7590,7 +7596,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
       else if(type.is_not_nil())
       {
         #ifdef DEBUG
-        std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 15\n";
+        std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 16\n";
         #endif
         if(lex.get_token(tk)!='(')
           return false;
@@ -7623,7 +7629,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
       }
     }
     #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 16\n";
+    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 17\n";
     #endif
 
     return true;
