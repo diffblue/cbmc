@@ -2806,7 +2806,7 @@ bool Parser::rConstructorDecl(
   std::cout << std::string(__indent, ' ') << "Parser::rConstructorDecl 2\n";
   #endif
 
-  typet &cv=(typet &)constructor.add(ID_method_qualifier);
+  typet &cv=static_cast<typet &>(constructor.add(ID_method_qualifier));
   cv.make_nil();
   optCvQualify(cv);
 
