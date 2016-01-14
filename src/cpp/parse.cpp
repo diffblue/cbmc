@@ -4485,8 +4485,6 @@ bool Parser::rInitializeExpr(exprt &expr)
   exprt e;
 
   expr.id(ID_initializer_list);
-  expr.type().id(ID_array);
-  expr.type().set(ID_size, ID_nil);
   set_location(expr, tk);
 
   int t=lex.LookAhead(0);
@@ -7433,6 +7431,7 @@ Function:
   | var.name
   | '(' comma.expression ')'
   | integral.or.class.spec '(' function.arguments ')'
+  | integral.or.class.spec initializer
   | typeid.expr
   | true
   | false
@@ -7605,20 +7604,37 @@ bool Parser::rPrimaryExpr(exprt &exp)
         #ifdef DEBUG
         std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 16\n";
         #endif
-        if(lex.get_token(tk)!='(')
+        if(lex.LookAhead(0)=='{')
+        {
+          lex.LookAhead(0, tk);
+          
+          exprt exp2;
+          if(!rInitializeExpr(exp2))
+            return false;
+
+          exp=exprt("explicit-constructor-call");
+          exp.type().swap(type);
+          exp.move_to_operands(exp2);
+          set_location(exp, tk);
+        }
+        else if(lex.LookAhead(0)=='(')
+        {
+          lex.get_token(tk);
+
+          exprt exp2;
+          if(!rFunctionArguments(exp2))
+            return false;
+
+          if(lex.get_token(tk2)!=')')
+            return false;
+
+          exp=exprt("explicit-constructor-call");
+          exp.type().swap(type);
+          exp.operands().swap(exp2.operands());
+          set_location(exp, tk);
+        }
+        else
           return false;
-
-        exprt exp2;
-        if(!rFunctionArguments(exp2))
-            return false;
-
-        if(lex.get_token(tk2)!=')')
-            return false;
-
-        exp=exprt("explicit-constructor-call");
-        exp.type().swap(type);
-        exp.operands().swap(exp2.operands());
-        set_location(exp, tk);
       }
       else
       {
