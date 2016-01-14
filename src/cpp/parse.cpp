@@ -6881,7 +6881,8 @@ bool Parser::rAllocateType(
     atype.swap(tname);
   }
 
-  if(lex.LookAhead(0)=='(')
+  if(lex.LookAhead(0)=='(' ||
+     lex.LookAhead(0)=='{')
   {
     if(!rAllocateInitializer(initializer))
       return false;
@@ -6952,13 +6953,15 @@ Function:
 /*
   allocate.initializer
   : '(' {initialize.expr (',' initialize.expr)* } ')'
+  | initialize.expr
 */
 bool Parser::rAllocateInitializer(exprt &init)
 {
-  {
-    if(lex.get_token()!='(')
-      return false;
-  }
+  if(lex.LookAhead(0)=='{')
+    return rInitializeExpr(init);
+
+  if(lex.get_token()!='(')
+    return false;
 
   init.clear();
 
