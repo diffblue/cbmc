@@ -224,31 +224,7 @@ int goto_instrument_parse_optionst::doit()
 
       return 0;
     }
-
-    if(cmdline.isset("escape-analysis"))
-    {
-      do_function_pointer_removal();
-      do_partial_inlining();
-      do_remove_returns();
-      parameter_assignments(symbol_table, goto_functions);
-
-      namespacet ns(symbol_table);
-
-      // recalculate numbers, etc.
-      goto_functions.update();
-
-      status() << "Escape Analysis" << eom;
-      escape_analysist escape_analysis;
-      escape_analysis(goto_functions, ns);
-      escape_analysis.instrument(goto_functions, ns);
-
-      // inline added functions, they are often small
-      goto_partial_inline(goto_functions, ns, ui_message_handler);
-
-      // recalculate numbers, etc.
-      goto_functions.update();
-    }
-
+    
     if(cmdline.isset("show-custom-bitvector-analysis"))
     {
       do_function_pointer_removal();
@@ -910,6 +886,30 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     remove_skip(goto_functions);
   }
 
+  if(cmdline.isset("escape-analysis"))
+  {
+    do_function_pointer_removal();
+    do_partial_inlining();
+    do_remove_returns();
+    parameter_assignments(symbol_table, goto_functions);
+
+    namespacet ns(symbol_table);
+
+    // recalculate numbers, etc.
+    goto_functions.update();
+
+    status() << "Escape Analysis" << eom;
+    escape_analysist escape_analysis;
+    escape_analysis(goto_functions, ns);
+    escape_analysis.instrument(goto_functions, ns);
+
+    // inline added functions, they are often small
+    goto_partial_inline(goto_functions, ns, ui_message_handler);
+
+    // recalculate numbers, etc.
+    goto_functions.update();
+  }
+    
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
