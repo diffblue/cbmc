@@ -81,7 +81,7 @@ protected:
                   const namespacet &ns);
 
   bool two_way_propagate_rec(const exprt &expr,
-			     const namespacet &ns);
+                             const namespacet &ns);
 };
 
 class constant_propagator_ait:public ait<constant_propagator_domaint>

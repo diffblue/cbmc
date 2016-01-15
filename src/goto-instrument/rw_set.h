@@ -68,7 +68,7 @@ public:
   }
   
   inline bool empty() const
-  {	
+  {
     return r_entries.empty() && w_entries.empty();
   }
   
