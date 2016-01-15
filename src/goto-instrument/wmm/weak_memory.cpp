@@ -59,7 +59,7 @@ void introduce_temporaries(
 #ifdef LOCAL_MAY
   local_may_aliast local_may(goto_function);
 #endif
-	
+
   Forall_goto_program_instructions(i_it, goto_program)
   {
     goto_programt::instructiont &instruction=*i_it;

@@ -176,8 +176,8 @@ bool constant_propagator_domaint::two_way_propagate_rec(
       change = false;
       
       forall_operands(it, expr)
-	if(two_way_propagate_rec(*it, ns))
-	  change = true;
+        if(two_way_propagate_rec(*it, ns))
+          change = true;
     }
     while(change);
   }
@@ -333,7 +333,7 @@ void constant_propagator_domaint::valuest::output(
     out << "  bottom\n";
 
   for(replace_symbolt::expr_mapt::const_iterator 
-	it=replace_const.expr_map.begin();
+        it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
       ++it)
     out << ' ' << it->first << "=" <<
@@ -417,8 +417,8 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
       // values are different, set to top
       if(c_it->second != it->second)
       {
-	changed = set_to_top(it->first);
-	assert(changed);
+        changed = set_to_top(it->first);
+        assert(changed);
       }
     }
     // is not in "this", ignore
@@ -465,7 +465,7 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
       {
         set_to_bottom();
         changed = true;
-	break;
+        break;
       }
     }
     else

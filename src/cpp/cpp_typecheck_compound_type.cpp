@@ -750,9 +750,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
     if(symbol_table.move(static_symbol, new_symbol))
     {
       err_location(cpp_name.source_location());
-	str << "redeclaration of static member `" 
-	    << static_symbol.base_name
-	    << "'";
+        str << "redeclaration of static member `" 
+            << static_symbol.base_name
+            << "'";
       throw 0;
     }
 

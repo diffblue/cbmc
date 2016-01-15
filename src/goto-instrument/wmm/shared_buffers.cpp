@@ -1180,7 +1180,7 @@ void shared_bufferst::affected_by_delay(
               <<" reads from "<<id2string(r_it->second.object)
               <<messaget::eom;
             if(is_buffered_in_general(ns, r_it->second.symbol_expr,true)) 
-	      //shouldn't it be true? false => overapprox
+              //shouldn't it be true? false => overapprox
               affected_by_delay_set.insert(w_it->second.object);
           }
     }

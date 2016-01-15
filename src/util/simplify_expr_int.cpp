@@ -2077,12 +2077,12 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     {
       mp_integer i;
       if(to_integer(expr.op1(), i))
-	throw "Bit-vector constant unexpectedly non-integer";
+        throw "Bit-vector constant unexpectedly non-integer";
       
       if (i == max)
       {
-	expr=false_exprt();
-	return false;
+        expr=false_exprt();
+        return false;
       }
 
       expr.id(ID_ge);
@@ -2103,12 +2103,12 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     {
       mp_integer i;
       if(to_integer(expr.op1(), i))
-	throw "Bit-vector constant unexpectedly non-integer";
+        throw "Bit-vector constant unexpectedly non-integer";
 
       if (i == max)
       {
-	expr=true_exprt();
-	return false;
+        expr=true_exprt();
+        return false;
       }
 
       expr.id(ID_ge);

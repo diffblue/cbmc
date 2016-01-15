@@ -65,8 +65,8 @@ exprt float_bvt::convert(const exprt &expr)
       return nil_exprt();
   }
   else if(expr.id()==ID_typecast &&
-	  expr.type().id()==ID_bool &&
-	  expr.op0().type().id()==ID_floatbv)  // float -> bool
+          expr.type().id()==ID_bool &&
+          expr.op0().type().id()==ID_floatbv)  // float -> bool
     return not_exprt(is_zero(expr.op0(), get_spec(expr.op0())));
   else if(expr.id()==ID_floatbv_plus)
     return add_sub(false, expr.op0(), expr.op1(), expr.op2(), get_spec(expr));
@@ -556,8 +556,8 @@ exprt float_bvt::conversion(
     unsigned padding=dest_spec.f-src_spec.f;
     result.fraction=
       concatenation_exprt(
-	unpacked_src.fraction,		  
-	from_integer(0, unsignedbv_typet(padding)),
+        unpacked_src.fraction,                  
+        from_integer(0, unsignedbv_typet(padding)),
         unsignedbv_typet(dest_spec.f+1));
     
     // the exponent gets sign-extended
@@ -699,10 +699,10 @@ exprt float_bvt::add_sub(
   // sticky bit: 'or' of the bits lost by the right-shift
   exprt fraction2_stickied=
     bitor_exprt(fraction2_shifted,
-		concatenation_exprt(
-				    from_integer(0, unsignedbv_typet(spec.f+3)),
-				    sticky_bit,
-				    fraction2_shifted.type()));
+                concatenation_exprt(
+                                    from_integer(0, unsignedbv_typet(spec.f+3)),
+                                    sticky_bit,
+                                    fraction2_shifted.type()));
 
   // need to have two extra fraction bits for addition and rounding
   const exprt fraction1_ext=typecast_exprt(fraction1_shifted, unsignedbv_typet(spec.f+4+2));
@@ -723,7 +723,7 @@ exprt float_bvt::add_sub(
   unsigned width = to_bitvector_type(result.fraction.type()).get_width();
   exprt fraction_sign=sign_exprt(typecast_exprt(result.fraction, signedbv_typet(width)));
   result.fraction=typecast_exprt(abs_exprt(typecast_exprt(result.fraction, signedbv_typet(width))),
-				unsignedbv_typet(width));
+                                unsignedbv_typet(width));
 
   result.exponent=bigger_exponent;
 
@@ -1036,11 +1036,11 @@ exprt float_bvt::relation(
     // this works due to the BIAS
     exprt less_than1=
       binary_relation_exprt(
-	typecast_exprt(typecast_exprt(src1, bv_typet(spec.width())),
-		                      unsignedbv_typet(spec.width())),
+        typecast_exprt(typecast_exprt(src1, bv_typet(spec.width())),
+                                      unsignedbv_typet(spec.width())),
         ID_lt,
         typecast_exprt(typecast_exprt(src2, bv_typet(spec.width())),
-		                      unsignedbv_typet(spec.width())));
+                                      unsignedbv_typet(spec.width())));
 
     // if both are negative (and not the same), need to turn around!
     exprt less_than2=

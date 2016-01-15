@@ -273,11 +273,12 @@ void fence_volatilet::compute()
           if(has_prefix(id2string(r_it->second.object), CPROVER_PREFIX))
             continue;
 
-          try {
+          try
+          {
             message.debug() << "debug: " 
               << id2string(r_it->second.object) << messaget::eom;
             const symbolt& var=ns.lookup(r_it->second.object);
- 	    #if 0
+            #if 0
             if(var.is_volatile && !var.is_thread_local)
             #endif
             if(is_volatile(var.type))
@@ -286,7 +287,9 @@ void fence_volatilet::compute()
                 << id2string(r_it->second.object) << messaget::eom; 
               fenced_edges.reads.push_front(r_it->second.symbol_expr); 
             }
-          } catch (std::string s) { 
+          }
+          catch (std::string s)
+          { 
             message.warning() << "failed to find" << s 
               << messaget::eom; 
             continue; 

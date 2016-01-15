@@ -48,7 +48,7 @@ bool replace_symbol_extt::replace(exprt &dest) const
         expr_map.find(object.get(ID_identifier));
 
       if(it!=expr_map.end())
-	return false;
+        return false;
     }
   }
   else if(dest.id()==ID_symbol)

@@ -454,21 +454,21 @@ void value_set_fivrnst::get_value_set_rec(
     // (if it exists)
     irep_idt ident = expr.get_string(ID_identifier)+suffix;
 
-		if(has_prefix(id2string(ident), alloc_adapter_prefix))
-		{
-			insert_from(dest, expr, 0);
-			return;
-		}
-		else
-		{
-			valuest::const_iterator v_it=values.find(ident);
-			
-			if(v_it!=values.end())
-			{
-			  copy_objects(dest, v_it->second.object_map);
-	      return;
-	    }
-		}
+    if(has_prefix(id2string(ident), alloc_adapter_prefix))
+    {
+      insert_from(dest, expr, 0);
+      return;
+    }
+    else
+    {
+      valuest::const_iterator v_it=values.find(ident);
+            
+      if(v_it!=values.end())
+      {
+        copy_objects(dest, v_it->second.object_map);
+        return;
+      }
+    }
   }
   else if(expr.id()==ID_if)
   {

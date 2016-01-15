@@ -931,7 +931,7 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
       
       for(unsigned bit=0; bit<a.size(); bit++)
       {
-	// \todo reformulate using full_adder
+        // \todo reformulate using full_adder
         s[bit]=prop.lxor(a[bit], prop.lxor(b[bit], c[bit]));
         t[bit]=(bit==0)?const_literal(false):
                carry(a[bit-1], b[bit-1], c[bit-1]);
@@ -1665,29 +1665,29 @@ literalt bv_utilst::lt_or_le(
     Forall_literals(it, compareBelow) { (*it) = prop.new_variable(); }
     result = prop.new_variable();
     
-    if (rep==SIGNED)
-      {
-	assert(bv0.size() >= 2);
-	start = compareBelow.size() - 2;
-	
-	literalt firstComp=compareBelow[start];
-	
-	// When comparing signs we are comparing the top bit
+    if(rep==SIGNED)
+    {
+      assert(bv0.size() >= 2);
+      start = compareBelow.size() - 2;
+        
+      literalt firstComp=compareBelow[start];
+        
+      // When comparing signs we are comparing the top bit
 #ifdef INCLUDE_REDUNDANT_CLAUSES
-	prop.l_set_to_true(compareBelow[start + 1])
+      prop.l_set_to_true(compareBelow[start + 1])
 #endif    
-	  
-	  // Four cases...
-	  prop.lcnf( top0,  top1, firstComp);  // + +   compare needed
-	prop.lcnf( top0, !top1,   !result);  // + -   result false and no compare needed
-	prop.lcnf(!top0,  top1,    result);  // - +   result true and no compare needed
-	prop.lcnf(!top0, !top1, firstComp);  // - -   negated compare needed
-	
+          
+      // Four cases...
+      prop.lcnf( top0,  top1, firstComp);  // + +   compare needed
+      prop.lcnf( top0, !top1,   !result);  // + -   result false and no compare needed
+      prop.lcnf(!top0,  top1,    result);  // - +   result true and no compare needed
+      prop.lcnf(!top0, !top1, firstComp);  // - -   negated compare needed
+        
 #ifdef INCLUDE_REDUNDANT_CLAUSES
-	prop.lcnf( top0, !top1, !firstComp);
-	prop.lcnf(!top0,  top1, !firstComp);
+      prop.lcnf( top0, !top1, !firstComp);
+      prop.lcnf(!top0,  top1, !firstComp);
 #endif
-	
+
     }
     else
     {
@@ -1729,7 +1729,6 @@ literalt bv_utilst::lt_or_le(
       prop.lcnf(!compareBelow[i], !bv0[i],  bv1[i], !compareBelow[i-1]);
     }
 #endif
-
 
     // The 'base case' of the induction is the case when they are equal
     prop.lcnf(!compareBelow[0], !bv0[0], !bv1[0], (or_equal) ? result : !result);

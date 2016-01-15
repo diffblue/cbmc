@@ -288,8 +288,8 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       expr.op2().swap(e2);
     }
     else if(expr.op1().type().id()==ID_array &&
-	    expr.op2().type().id()==ID_array &&
-	    expr.op1().type().subtype() == expr.op2().type().subtype())
+            expr.op2().type().id()==ID_array &&
+            expr.op1().type().subtype() == expr.op2().type().subtype())
     {
       // array-to-pointer conversion
       
@@ -316,8 +316,8 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       err_location(expr);
       str << "error: types are incompatible.\n"
           << "I got `" << type2cpp(expr.op1().type(), *this)
-	  << "' and `" << type2cpp(expr.op2().type(), *this)
-	  << "'.";
+          << "' and `" << type2cpp(expr.op2().type(), *this)
+          << "'.";
       throw 0;
     }
   }

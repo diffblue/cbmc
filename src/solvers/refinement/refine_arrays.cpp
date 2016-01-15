@@ -79,8 +79,8 @@ void bv_refinementt::arrays_overapproximated()
       exprt implies_simplified = get(imp.op0());
       if (implies_simplified == false_exprt())
       {
-	++it;
-	continue;
+        ++it;
+        continue;
       }
     }
 
@@ -92,8 +92,8 @@ void bv_refinementt::arrays_overapproximated()
       exprt o2 = get(orexp.op1());
       if (o1 == true_exprt() || o2 == true_exprt())
       {
-	++it;
-	continue;
+        ++it;
+        continue;
       }
     }
 
@@ -117,9 +117,9 @@ void bv_refinementt::arrays_overapproximated()
   }
 
   debug() << "BV-Refinement: " << nb_active 
-	  << " array expressions become active" << eom;
+          << " array expressions become active" << eom;
   debug() << "BV-Refinement: " << lazy_array_constraints.size() 
-	  << " inactive array expressions" << eom;
+          << " inactive array expressions" << eom;
   if (nb_active > 0)
     progress = true;
 }
@@ -142,17 +142,17 @@ void bv_refinementt::freeze_lazy_constraints()
   if(!lazy_arrays) return;
 
   for(std::list<lazy_constraintt>::iterator 
-	l_it = lazy_array_constraints.begin();
+        l_it = lazy_array_constraints.begin();
       l_it != lazy_array_constraints.end(); ++l_it)
   {
     std::set<symbol_exprt> symbols;
     find_symbols(l_it->lazy,symbols);
     for(std::set<symbol_exprt>::const_iterator it = symbols.begin();
-	it != symbols.end(); ++it)
+        it != symbols.end(); ++it)
     {
       bvt bv = convert_bv(l_it->lazy);
       forall_literals(b_it, bv) 
-	if(!b_it->is_constant()) prop.set_frozen(*b_it);
+        if(!b_it->is_constant()) prop.set_frozen(*b_it);
     }
   }
 }
