@@ -405,9 +405,9 @@ void aig_prop_solvert::usage_count(std::vector<unsigned> &p_usage_count, std::ve
     if (!((*c_it).is_constant())) {
 
       if ((*c_it).sign()) {
-	++n_usage_count[(*c_it).var_no()];
+        ++n_usage_count[(*c_it).var_no()];
       } else {
-	++p_usage_count[(*c_it).var_no()];
+        ++p_usage_count[(*c_it).var_no()];
       }
 
     }
@@ -418,15 +418,15 @@ void aig_prop_solvert::usage_count(std::vector<unsigned> &p_usage_count, std::ve
 
     if (node.is_and()) {
       if (node.a.sign()) {
-	++n_usage_count[node.a.var_no()];
+        ++n_usage_count[node.a.var_no()];
       } else {
-	++p_usage_count[node.a.var_no()];
+        ++p_usage_count[node.a.var_no()];
       }
 
       if (node.b.sign()) {
-	++n_usage_count[node.b.var_no()];
+        ++n_usage_count[node.b.var_no()];
       } else {
-	++p_usage_count[node.b.var_no()];
+        ++p_usage_count[node.b.var_no()];
       }
 
     }
@@ -451,24 +451,24 @@ void aig_prop_solvert::usage_count(std::vector<unsigned> &p_usage_count, std::ve
     case 0: ++unused; break;
     case 1:
       if(p_usage_count[n] == 1)
-	++usedOncePositive;
+        ++usedOncePositive;
       else 
-	++usedOnceNegative;
+        ++usedOnceNegative;
       break;
 
     case 2 :
       if (p_usage_count[n] >= 2)
       {
-	++usedTwicePositive;
+        ++usedTwicePositive;
       } 
       else if (n_usage_count[n] >= 2)
       {
-	++usedTwiceNegative;
+        ++usedTwiceNegative;
       }
       else
       {
-	assert(p_usage_count[n] == 1 && n_usage_count[n] == 1);
-	++usedTwiceMixed;
+        assert(p_usage_count[n] == 1 && n_usage_count[n] == 1);
+        ++usedTwiceMixed;
       }
       break;
     case 3: ++usedThreeTimes; break;
@@ -477,16 +477,16 @@ void aig_prop_solvert::usage_count(std::vector<unsigned> &p_usage_count, std::ve
   }
 
   statistics() << "Unused: " << unused << " "
-	       << "Used once: " << usedOncePositive + usedOnceNegative
-	       << " (P: " << usedOncePositive
+               << "Used once: " << usedOncePositive + usedOnceNegative
+               << " (P: " << usedOncePositive
                << ", N: " << usedOnceNegative << ") "
-	       << "Used twice: " << usedTwicePositive + usedTwiceNegative + usedTwiceMixed
+               << "Used twice: " << usedTwicePositive + usedTwiceNegative + usedTwiceMixed
                << " (P: " << usedTwicePositive
                << ", N: " << usedTwiceNegative
                << ", M: " << usedTwiceMixed << ") "
-	       << "Used three times: " << usedThreeTimes << " "
-	       << "Used more: " << usedMore
-	       << eom;
+               << "Used three times: " << usedThreeTimes << " "
+               << "Used more: " << usedMore
+               << eom;
   #endif
 }
 
@@ -525,15 +525,15 @@ void aig_prop_solvert::convert_node(
       literalt l = body[i];
       
       if (!l.sign() &&                      // Used positively...
-	  aig.nodes[l.var_no()].is_and() && // ... is a gate ...
-	  p_usage_count[l.var_no()] == 1 && // ... only used here.
-	  n_usage_count[l.var_no()] == 0) {
-	
-	const aigt::nodet &rep = aig.nodes[l.var_no()];
-	body[i] = rep.a;
-	body.push_back(rep.b);
-	--i;                         // Repeat the process
-	--p_usage_count[l.var_no()]; // Supress generation of inlined node
+          aig.nodes[l.var_no()].is_and() && // ... is a gate ...
+          p_usage_count[l.var_no()] == 1 && // ... only used here.
+          n_usage_count[l.var_no()] == 0) {
+        
+        const aigt::nodet &rep = aig.nodes[l.var_no()];
+        body[i] = rep.a;
+        body.push_back(rep.b);
+        --i;                         // Repeat the process
+        --p_usage_count[l.var_no()]; // Supress generation of inlined node
       }
     }
 
@@ -563,48 +563,48 @@ void aig_prop_solvert::convert_node(
       
       if(left.is_and() && right.is_and())
       {
-	if(left.a == neg(right.a))
-	{
-	  if (p_usage_count[body[0].var_no()] == 0 &&
-	      n_usage_count[body[0].var_no()] == 1 &&
-	      p_usage_count[body[1].var_no()] == 0 &&
-	      n_usage_count[body[1].var_no()] == 1)
+        if(left.a == neg(right.a))
+        {
+          if (p_usage_count[body[0].var_no()] == 0 &&
+              n_usage_count[body[0].var_no()] == 1 &&
+              p_usage_count[body[1].var_no()] == 0 &&
+              n_usage_count[body[1].var_no()] == 1)
           {
-	    bvt lits(3);
+            bvt lits(3);
 
-	    if (n_neg)
-	    {
-	      lits[0] = left.a;
-	      lits[1] = right.b;
-	      lits[2] = o;
-	      solver.lcnf(lits);
-	      
-	      lits[0] = neg(left.a);
-	      lits[1] = left.b;
-	      lits[2] = o;
-	      solver.lcnf(lits);
-	    }
+            if (n_neg)
+            {
+              lits[0] = left.a;
+              lits[1] = right.b;
+              lits[2] = o;
+              solver.lcnf(lits);
+              
+              lits[0] = neg(left.a);
+              lits[1] = left.b;
+              lits[2] = o;
+              solver.lcnf(lits);
+            }
 
-	    if (n_pos)
-	    {
-	      lits[0] = left.a;
-	      lits[1] = neg(right.b);
-	      lits[2] = neg(o);
-	      solver.lcnf(lits);
-	      
-	      lits[0] = neg(left.a);
-	      lits[1] = neg(left.b);
-	      lits[2] = neg(o);
-	      solver.lcnf(lits);
-	    }
+            if (n_pos)
+            {
+              lits[0] = left.a;
+              lits[1] = neg(right.b);
+              lits[2] = neg(o);
+              solver.lcnf(lits);
+              
+              lits[0] = neg(left.a);
+              lits[1] = neg(left.b);
+              lits[2] = neg(o);
+              solver.lcnf(lits);
+            }
 
-	    // Supress generation
-	    --n_usage_count[body[0].var_no()];
-	    --n_usage_count[body[1].var_no()];
-	    
-	    return;
-	  }
-	}
+            // Supress generation
+            --n_usage_count[body[0].var_no()];
+            --n_usage_count[body[1].var_no()];
+            
+            return;
+          }
+        }
       }      
     }
 
@@ -618,66 +618,66 @@ void aig_prop_solvert::convert_node(
       const aigt::nodet &right = aig.nodes[body[2].var_no()];
 
       if (left.is_and() && mid.is_and() && right.is_and()) {
-	if (p_usage_count[body[0].var_no()] == 0 &&
-	    n_usage_count[body[0].var_no()] == 1 &&
-	    p_usage_count[body[1].var_no()] == 0 &&
-	    n_usage_count[body[1].var_no()] == 1 &&
-	    p_usage_count[body[2].var_no()] == 0 &&
-	    n_usage_count[body[2].var_no()] == 1) {
+        if (p_usage_count[body[0].var_no()] == 0 &&
+            n_usage_count[body[0].var_no()] == 1 &&
+            p_usage_count[body[1].var_no()] == 0 &&
+            n_usage_count[body[1].var_no()] == 1 &&
+            p_usage_count[body[2].var_no()] == 0 &&
+            n_usage_count[body[2].var_no()] == 1) {
 
-	  literalt a = left.a;
-	  literalt b = left.b;
-	  literalt c = mid.a;
+          literalt a = left.a;
+          literalt b = left.b;
+          literalt c = mid.a;
 
-	  if (a == right.b && b == mid.b && c == right.a) {
+          if (a == right.b && b == mid.b && c == right.a) {
 
-	    // A (negative) carry -- 1 if at most one input is 1
-	    bvt lits(3);
+            // A (negative) carry -- 1 if at most one input is 1
+            bvt lits(3);
 
-	    if (n_neg)
-	    {
-	      lits[0] = a;
-	      lits[1] = b;
-	      lits[2] = o;
-	      solver.lcnf(lits);
+            if (n_neg)
+            {
+              lits[0] = a;
+              lits[1] = b;
+              lits[2] = o;
+              solver.lcnf(lits);
 
-	      lits[0] = a;
-	      lits[1] = c;
-	      lits[2] = o;
-	      solver.lcnf(lits);
-	      
-	      lits[0] = b;
-	      lits[1] = c;
-	      lits[2] = o;
-	      solver.lcnf(lits);
-	    }
+              lits[0] = a;
+              lits[1] = c;
+              lits[2] = o;
+              solver.lcnf(lits);
+              
+              lits[0] = b;
+              lits[1] = c;
+              lits[2] = o;
+              solver.lcnf(lits);
+            }
 
-	    if (n_pos)
-	    {
-	      lits[0] = neg(a);
-	      lits[1] = neg(b);
-	      lits[2] = neg(o);
-	      solver.lcnf(lits);
+            if (n_pos)
+            {
+              lits[0] = neg(a);
+              lits[1] = neg(b);
+              lits[2] = neg(o);
+              solver.lcnf(lits);
 
-	      lits[0] = neg(a);
-	      lits[1] = neg(c);
-	      lits[2] = neg(o);
-	      solver.lcnf(lits);
-	      
-	      lits[0] = neg(b);
-	      lits[1] = neg(c);
-	      lits[2] = neg(o);
-	      solver.lcnf(lits);
-	    }
+              lits[0] = neg(a);
+              lits[1] = neg(c);
+              lits[2] = neg(o);
+              solver.lcnf(lits);
+              
+              lits[0] = neg(b);
+              lits[1] = neg(c);
+              lits[2] = neg(o);
+              solver.lcnf(lits);
+            }
 
-	    // Supress generation
-	    --n_usage_count[body[0].var_no()];
-	    --n_usage_count[body[1].var_no()];
-	    --n_usage_count[body[2].var_no()];
-	    
-	    return;
-	  }
-	}
+            // Supress generation
+            --n_usage_count[body[0].var_no()];
+            --n_usage_count[body[1].var_no()];
+            --n_usage_count[body[2].var_no()];
+            
+            return;
+          }
+        }
       }
     }
 
@@ -757,9 +757,9 @@ void aig_prop_solvert::convert_aig()
     if(aig.nodes[n].is_and())
       {
 #ifdef USE_PG
-	convert_node(n, aig.nodes[n], n_pos[n], n_neg[n], p_usage_count, n_usage_count);
+        convert_node(n, aig.nodes[n], n_pos[n], n_neg[n], p_usage_count, n_usage_count);
 #else
-	convert_node(n, aig.nodes[n], true, true, p_usage_count, n_usage_count);
+        convert_node(n, aig.nodes[n], true, true, p_usage_count, n_usage_count);
 #endif
       }
   }

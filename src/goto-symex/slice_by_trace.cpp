@@ -35,7 +35,7 @@ Function: slice_by_trace
 \*******************************************************************/
 
 void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
-					   symex_target_equationt &equation)
+                                           symex_target_equationt &equation)
 {
   std::cout << "Slicing by trace..." << std::endl;
 
@@ -69,7 +69,7 @@ void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
     trace_condition = exprt(ID_and, typet(ID_bool));
     trace_condition.operands().reserve(trace_conditions.size());
     for (std::vector<exprt>::iterator i = trace_conditions.begin();
-	 i != trace_conditions.end(); i++) {
+         i != trace_conditions.end(); i++) {
       trace_condition.move_to_operands(*i);
     }
   }
@@ -79,7 +79,7 @@ void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
   std::set<exprt> implications = implied_guards(trace_condition);
     
   for(std::set<exprt>::iterator i = sliced_guards.begin(); i !=
-	sliced_guards.end(); i++)
+        sliced_guards.end(); i++)
   {
     exprt g_copy (*i);
 
@@ -247,7 +247,7 @@ void symex_slice_by_tracet::parse_events(std::string read_line) {
     std::string event = read_line.substr(vidx, vnext - vidx);
     eis.insert(event);
     if ((!alphabet.empty()) && ((alphabet.count(event) != 0) != 
-				alphabet_parity))
+                                alphabet_parity))
       throw ("Trace uses symbol not in alphabet: " + event);
     if(vnext == std::string::npos) break;
     vidx = vnext;
@@ -286,9 +286,9 @@ void symex_slice_by_tracet::compute_ts_back(
       
       if (!alphabet.empty())
       {
-	bool present = (alphabet.count(event) != 0);
-	if (alphabet_parity != present)
-	  continue;
+        bool present = (alphabet.count(event) != 0);
+        if (alphabet_parity != present)
+          continue;
       }
       
       exprt guard = i->guard;
@@ -306,88 +306,88 @@ void symex_slice_by_tracet::compute_ts_back(
       std::vector<exprt> merge;
       
       for(size_t j = 0; j < t.size(); j++) {
-	if ((t[j].is_true()) || (t[j].is_false())) {
-	  merge.push_back(t[j]);
-	} else {
-	  exprt merge_sym =exprt(ID_symbol, typet(ID_bool));
-	  merge_sym.set(ID_identifier, id2string(merge_identifier)+"#"+
-			i2string(merge_count++));
-	  exprt t_copy (t[j]);
-	  merge_map_back.push_back(t_copy);
-	  std::set<exprt> empty_impls;
-	  merge_impl_cache_back.push_back
-	    (std::pair<bool,std::set<exprt> >(false, empty_impls));
-	  merge.push_back(merge_sym);
-	}
+        if ((t[j].is_true()) || (t[j].is_false())) {
+          merge.push_back(t[j]);
+        } else {
+          exprt merge_sym =exprt(ID_symbol, typet(ID_bool));
+          merge_sym.set(ID_identifier, id2string(merge_identifier)+"#"+
+                        i2string(merge_count++));
+          exprt t_copy (t[j]);
+          merge_map_back.push_back(t_copy);
+          std::set<exprt> empty_impls;
+          merge_impl_cache_back.push_back
+            (std::pair<bool,std::set<exprt> >(false, empty_impls));
+          merge.push_back(merge_sym);
+        }
       }
 
       for(size_t j = 0; j < t.size(); j++) {
-	exprt u_lhs = exprt(ID_and, typet(ID_bool));
-	if ((j < sigma.size()) && (matches(sigma[j],event))) {
-	  u_lhs.operands().reserve(2);
-	  u_lhs.copy_to_operands(guard);
-	  if (!sigma_vals[j].empty()) {
-	    std::list<exprt> eq_conds;
-	    std::list<exprt>::iterator pvi = i->io_args.begin();
-	    for (std::vector<irep_idt>::iterator k = sigma_vals[j].begin();
-		 k != sigma_vals[j].end(); k++) {
-	      
-	      exprt equal_cond=exprt(ID_equal, bool_typet());
-	      equal_cond.operands().reserve(2);
-	      equal_cond.copy_to_operands(*pvi);
-	      // Should eventually change to handle non-bv types!
-	      exprt constant_value=from_integer(unsafe_string2int(id2string(*k)), (*pvi).type());
-	      equal_cond.move_to_operands(constant_value);
-	      eq_conds.push_back(equal_cond);
-	      pvi++;
-	    }
-	    exprt val_merge = exprt(ID_and, typet(ID_bool));
-	    val_merge.operands().reserve(eq_conds.size()+1);
-	    val_merge.copy_to_operands(merge[j+1]);
-	    for (std::list<exprt>::iterator k = eq_conds.begin(); 
-		 k!= eq_conds.end(); k++) {
-	      val_merge.copy_to_operands(*k);
-	    }
-	    u_lhs.move_to_operands(val_merge);
-	  } else {
-	    u_lhs.copy_to_operands(merge[j+1]);
-	  }
+        exprt u_lhs = exprt(ID_and, typet(ID_bool));
+        if ((j < sigma.size()) && (matches(sigma[j],event))) {
+          u_lhs.operands().reserve(2);
+          u_lhs.copy_to_operands(guard);
+          if (!sigma_vals[j].empty()) {
+            std::list<exprt> eq_conds;
+            std::list<exprt>::iterator pvi = i->io_args.begin();
+            for (std::vector<irep_idt>::iterator k = sigma_vals[j].begin();
+                 k != sigma_vals[j].end(); k++) {
+              
+              exprt equal_cond=exprt(ID_equal, bool_typet());
+              equal_cond.operands().reserve(2);
+              equal_cond.copy_to_operands(*pvi);
+              // Should eventually change to handle non-bv types!
+              exprt constant_value=from_integer(unsafe_string2int(id2string(*k)), (*pvi).type());
+              equal_cond.move_to_operands(constant_value);
+              eq_conds.push_back(equal_cond);
+              pvi++;
+            }
+            exprt val_merge = exprt(ID_and, typet(ID_bool));
+            val_merge.operands().reserve(eq_conds.size()+1);
+            val_merge.copy_to_operands(merge[j+1]);
+            for (std::list<exprt>::iterator k = eq_conds.begin(); 
+                 k!= eq_conds.end(); k++) {
+              val_merge.copy_to_operands(*k);
+            }
+            u_lhs.move_to_operands(val_merge);
+          } else {
+            u_lhs.copy_to_operands(merge[j+1]);
+          }
 
-	  simplify(u_lhs, ns);
-	  
-	  if ((!u_lhs.is_false()) && implies_false(u_lhs))
-	    u_lhs=false_exprt();
-	  if (!u_lhs.is_false())
-	    slice_this = false;
-	} else {
-	  u_lhs=false_exprt();
-	}
-	exprt u_rhs = exprt (ID_and, typet(ID_bool));
-	if ((semantics != ":suffix") || (j != 0)) {
-	  u_rhs.operands().reserve(2);
-	  u_rhs.copy_to_operands(guard);
-	  u_rhs.copy_to_operands(merge[j]);
-	  u_rhs.op0().make_not();
-	} else {
-	  u_rhs.swap(merge[j]);
-	}
-	exprt u_j = exprt (ID_or, typet(ID_bool));
-	u_j.operands().reserve(2);
-	u_j.copy_to_operands(u_lhs);
-	u_j.copy_to_operands(u_rhs);
+          simplify(u_lhs, ns);
+          
+          if ((!u_lhs.is_false()) && implies_false(u_lhs))
+            u_lhs=false_exprt();
+          if (!u_lhs.is_false())
+            slice_this = false;
+        } else {
+          u_lhs=false_exprt();
+        }
+        exprt u_rhs = exprt (ID_and, typet(ID_bool));
+        if ((semantics != ":suffix") || (j != 0)) {
+          u_rhs.operands().reserve(2);
+          u_rhs.copy_to_operands(guard);
+          u_rhs.copy_to_operands(merge[j]);
+          u_rhs.op0().make_not();
+        } else {
+          u_rhs.swap(merge[j]);
+        }
+        exprt u_j = exprt (ID_or, typet(ID_bool));
+        u_j.operands().reserve(2);
+        u_j.copy_to_operands(u_lhs);
+        u_j.copy_to_operands(u_rhs);
 
-	simplify(u_j, ns);
+        simplify(u_j, ns);
 
-	t[j] = u_j;
+        t[j] = u_j;
       }
       
       if (semantics == ":prefix")
-	t[t.size()-1]=true_exprt();
+        t[t.size()-1]=true_exprt();
       
       if (slice_this) {
-	exprt guard_copy(guard);
-	
-	sliced_guards.insert(guard_copy);
+        exprt guard_copy(guard);
+        
+        sliced_guards.insert(guard_copy);
       }
     }
   }
@@ -460,35 +460,35 @@ void symex_slice_by_tracet::slice_SSA_steps(
       simplify(guard, ns);
       
       if (implications.count(guard) != 0) {
-	it->cond_expr=true_exprt();
-	it->ssa_rhs=true_exprt();
-	it->guard=false_exprt();
-	sliced_SSA_steps++;
-	if (it->is_output() || it->is_location())
-	  trace_loc_sliced++;
-	sliced_SSA_step = true;
+        it->cond_expr=true_exprt();
+        it->ssa_rhs=true_exprt();
+        it->guard=false_exprt();
+        sliced_SSA_steps++;
+        if (it->is_output() || it->is_location())
+          trace_loc_sliced++;
+        sliced_SSA_step = true;
       }
     }
     else if(guard.id()==ID_and)
     {
       Forall_operands(git,guard)
       {
-	exprt neg_expr=*git;
-	neg_expr.make_not();
-	simplify(neg_expr, ns);
-	
-	if (implications.count(neg_expr) != 0) {
-	  it->cond_expr=true_exprt();
-	  it->ssa_rhs=true_exprt();
-	  it->guard=false_exprt();
-	  sliced_SSA_steps++;
-	  if (it->is_output() || it->is_location())
-	    trace_loc_sliced++;
-	  sliced_SSA_step = true;
-	  break; // Sliced, so no need to consider the rest
-	}
+        exprt neg_expr=*git;
+        neg_expr.make_not();
+        simplify(neg_expr, ns);
+        
+        if (implications.count(neg_expr) != 0) {
+          it->cond_expr=true_exprt();
+          it->ssa_rhs=true_exprt();
+          it->guard=false_exprt();
+          sliced_SSA_steps++;
+          if (it->is_output() || it->is_location())
+            trace_loc_sliced++;
+          sliced_SSA_step = true;
+          break; // Sliced, so no need to consider the rest
+        }
       } else if (guard.id() == ID_or) {
-	std::cout << "Guarded by an OR." << std::endl;
+        std::cout << "Guarded by an OR." << std::endl;
       }
     }
 
@@ -496,41 +496,41 @@ void symex_slice_by_tracet::slice_SSA_steps(
     {
       if(it->ssa_rhs.id()==ID_if)
       {
-	conds_seen++;
-	exprt cond_copy (it->ssa_rhs.op0());
-	simplify(cond_copy, ns);
-	
-	if (implications.count(cond_copy) != 0) {
-	  sliced_conds++;
-	  exprt t_copy1 (it->ssa_rhs.op1());
-	  exprt t_copy2 (it->ssa_rhs.op1());
-	  it->ssa_rhs = t_copy1;
-	  it->cond_expr.op1().swap(t_copy2);
-	}
-	else
-	{
-	  cond_copy.make_not();
-	  simplify(cond_copy, ns);
-	  if (implications.count(cond_copy) != 0) {
-	    sliced_conds++;
-	    exprt f_copy1 (it->ssa_rhs.op2());
-	    exprt f_copy2 (it->ssa_rhs.op2());
-	    it->ssa_rhs = f_copy1;
-	    it->cond_expr.op1().swap(f_copy2);
-	  }
-	}
+        conds_seen++;
+        exprt cond_copy (it->ssa_rhs.op0());
+        simplify(cond_copy, ns);
+        
+        if (implications.count(cond_copy) != 0) {
+          sliced_conds++;
+          exprt t_copy1 (it->ssa_rhs.op1());
+          exprt t_copy2 (it->ssa_rhs.op1());
+          it->ssa_rhs = t_copy1;
+          it->cond_expr.op1().swap(t_copy2);
+        }
+        else
+        {
+          cond_copy.make_not();
+          simplify(cond_copy, ns);
+          if (implications.count(cond_copy) != 0) {
+            sliced_conds++;
+            exprt f_copy1 (it->ssa_rhs.op2());
+            exprt f_copy2 (it->ssa_rhs.op2());
+            it->ssa_rhs = f_copy1;
+            it->cond_expr.op1().swap(f_copy2);
+          }
+        }
       }
     }
   }
 
   std::cout << "Trace slicing effectively removed " 
-	    << (sliced_SSA_steps + sliced_conds) << " out of "
-	    << equation.SSA_steps.size() << " SSA_steps." << std::endl;
+            << (sliced_SSA_steps + sliced_conds) << " out of "
+            << equation.SSA_steps.size() << " SSA_steps." << std::endl;
   std::cout << "  (" 
-    	    << ((sliced_SSA_steps + sliced_conds) - trace_loc_sliced) 
-	    << " out of " 
-	    << (equation.SSA_steps.size() - trace_SSA_steps - location_SSA_steps)
-	    << " non-trace, non-location SSA_steps)" << std::endl;
+                << ((sliced_SSA_steps + sliced_conds) - trace_loc_sliced) 
+            << " out of " 
+            << (equation.SSA_steps.size() - trace_SSA_steps - location_SSA_steps)
+            << " non-trace, non-location SSA_steps)" << std::endl;
 }
 
 /*******************************************************************\
@@ -626,14 +626,14 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
       int i = unsafe_c_str2int(merge_loc+1);
       if (merge_impl_cache_back[i].first)
       {
-	return merge_impl_cache_back[i].second;
+        return merge_impl_cache_back[i].second;
       }
       else
       {
-	merge_impl_cache_back[i].first = true;
-	exprt merge_copy (merge_map_back[i]);
-	merge_impl_cache_back[i].second = implied_guards(merge_copy);
-	return merge_impl_cache_back[i].second;
+        merge_impl_cache_back[i].first = true;
+        exprt merge_copy (merge_map_back[i]);
+        merge_impl_cache_back[i].second = implied_guards(merge_copy);
+        return merge_impl_cache_back[i].second;
       }
     }
   } else if (e.id() == ID_not) { // Definitely a guard
@@ -645,8 +645,8 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
     Forall_operands(it,e) {
       std::set<exprt> r = implied_guards(*it);
       for (std::set<exprt>::iterator i = r.begin();
-	   i != r.end(); i++) {
-	s.insert(*i);
+           i != r.end(); i++) {
+        s.insert(*i);
       }
     }
     return s;
@@ -656,17 +656,17 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
       rs.push_back(implied_guards(*it));
     }
     for (std::set<exprt>::iterator i = rs.front().begin();
-	 i != rs.front().end();) {
+         i != rs.front().end();) {
       for (std::vector<std::set<exprt> >::iterator j = rs.begin();
-	 j != rs.end(); j++) {
-	if (j == rs.begin())
-	  j++;
-	std::set<exprt>::iterator k = i;
-	i++;
-	if (j->count(*k) == 0) {
-	  rs.front().erase(k);
-	  break;
-	}
+         j != rs.end(); j++) {
+        if (j == rs.begin())
+          j++;
+        std::set<exprt>::iterator k = i;
+        i++;
+        if (j->count(*k) == 0) {
+          rs.front().erase(k);
+          break;
+        }
       }
     }
     s = rs.front();

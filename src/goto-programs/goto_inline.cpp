@@ -231,7 +231,7 @@ void goto_inlinet::replace_return(
           err_location(it->code);
           str << "return expects one operand!";
           warning_msg();
-	  continue;
+          continue;
         }
       
         goto_programt tmp;
