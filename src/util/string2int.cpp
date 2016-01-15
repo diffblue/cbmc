@@ -43,8 +43,18 @@ inline T str2number(const char *str, int base, bool safe)
     assert(0 == errno);
     errno=errno_bak;
     assert(endptr!=str);
-    assert(val <= std::numeric_limits<T>::max());
-    assert(val >= std::numeric_limits<T>::min());
+    if(std::numeric_limits<T>::min()==0)
+    {
+      // unsigned
+      assert(val >= 0);
+      assert((T)val <= std::numeric_limits<T>::max());
+    }
+    else
+    {
+      // signed
+      assert(val <= (long long)std::numeric_limits<T>::max());
+      assert(val >= (long long)std::numeric_limits<T>::min());
+    }
   }
   
   return (T)val;
