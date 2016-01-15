@@ -180,11 +180,11 @@ protected:
     {
       seen_expressionst::const_iterator it = let_map.find(expr);
       if (it != let_map.end() &&
-	  it->second.first >= LET_COUNT)
+          it->second.first >= LET_COUNT)
       {
-	symbol_exprt symb = it->second.second;
-	expr = symb;
-	return;
+        symbol_exprt symb = it->second.second;
+        expr = symb;
+        return;
       }
     }
   };

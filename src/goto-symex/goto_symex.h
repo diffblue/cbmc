@@ -77,7 +77,7 @@ public:
   virtual void operator()(
     statet &state,
     const goto_functionst &goto_functions,
-    const goto_programt &goto_program);	   
+    const goto_programt &goto_program);
 
   /** execute just one step */
   virtual void symex_step(

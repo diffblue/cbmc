@@ -21,7 +21,7 @@ void convert(
 void convert(
   const xmlt&,
   goto_programt&);
-	
+
 goto_programt::targett find_instruction(
   const xmlt &, 
   goto_programt::instructionst &, 
