@@ -1380,19 +1380,19 @@ void shared_bufferst::cfg_visitort::weak_memory(
                 vars.flush_delayed, false_exprt());
             }
 
-            // ATOMIC_END
-            i_it=goto_program.insert_before(i_it);
-            i_it->make_atomic_end();
-            i_it->source_location=source_location;
-            i_it++;
-       
-            i_it--; // the for loop already counts us up
-          }
-          catch (...)
-          {
-            shared_buffers.message.warning() << "Identifier not found" 
-              << messaget::eom;
-          }
+          // ATOMIC_END
+          i_it=goto_program.insert_before(i_it);
+          i_it->make_atomic_end();
+          i_it->source_location=source_location;
+          i_it++;
+     
+          i_it--; // the for loop already counts us up
+        }
+        catch (...)
+        {
+          shared_buffers.message.warning() << "Identifier not found" 
+            << messaget::eom;
+        }
     }
     else if(is_fence(instruction, ns) || (instruction.is_other() 
        && instruction.code.get_statement()==ID_fence
