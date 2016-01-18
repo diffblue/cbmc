@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-
 #include <fstream>
 
 #include "json_parser.h"

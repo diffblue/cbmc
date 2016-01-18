@@ -8,12 +8,12 @@
 #include "bigint.hh"
 #include "allocainc.h"
 
-#include <ctype.h>
-#include <limits.h>
-#include <string.h>
+#include <cctype>
+#include <climits>
+#include <cstring>
 
 // How to report errors.
-#include <stdio.h>
+#include <cstdio>
 #define error(x) fprintf (stderr, "%s\n", x)
 
 

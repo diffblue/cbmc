@@ -1,5 +1,5 @@
 %{
-#include <string.h>
+#include <cstring>
 
 #include "xml_parser.h"
 
