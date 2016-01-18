@@ -20,7 +20,7 @@ Author:
 #include <sys/wait.h>
 #include <signal.h>
 #include <unistd.h>
-#include <string.h>
+#include <cstring>
 #endif
 
 #define READ_BUFFER_SIZE 1024
