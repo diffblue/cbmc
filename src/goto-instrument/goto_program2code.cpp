@@ -260,7 +260,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return convert_assign(target, upper_bound, dest);
 
     case RETURN:
-      return convert_return(target, dest);
+      return convert_return(target, upper_bound, dest);
 
     case DECL:
       return convert_decl(target, upper_bound, dest);
@@ -554,17 +554,30 @@ Purpose:
 
 goto_programt::const_targett goto_program2codet::convert_return(
     goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
     codet &dest)
 {
   code_returnt ret=to_code_return(target->code);
 
-  // catch the specific case where the original code was missing a return
-  if(ret.has_return_value() &&
-     ret.return_value().id()==ID_side_effect &&
-     to_side_effect_expr(ret.return_value()).get_statement()==ID_nondet)
-    return target;
+  // add return instruction unless original code was missing a return
+  if(!ret.has_return_value() ||
+     ret.return_value().id()!=ID_side_effect ||
+     to_side_effect_expr(ret.return_value()).get_statement()!=ID_nondet)
+    dest.copy_to_operands(ret);
 
-  dest.copy_to_operands(ret);
+  // all v3 (or later) goto programs have an explicit GOTO after return
+  goto_programt::const_targett next=target;
+  ++next;
+  assert(next!=goto_program.instructions.end());
+
+  // skip goto (and possibly dead), unless crossing the current boundary
+  while(next!=upper_bound && next->is_dead() && !next->is_target())
+    ++next;
+
+  if(next!=upper_bound &&
+     next->is_goto() &&
+     !next->is_target())
+    target=next;
 
   return target;
 }

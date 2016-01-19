@@ -131,6 +131,7 @@ protected:
 
   goto_programt::const_targett convert_return(
       goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
       codet &dest);
 
   goto_programt::const_targett convert_decl(
