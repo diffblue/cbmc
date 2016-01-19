@@ -324,7 +324,7 @@ Function: null_pointer
 exprt null_pointer(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
-  return equal_exprt(pointer, null_pointer);
+  return same_object(pointer, null_pointer);
 }
 
 /*******************************************************************\
