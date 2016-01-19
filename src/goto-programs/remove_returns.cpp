@@ -37,7 +37,7 @@ protected:
     goto_functionst &goto_functions,
     goto_programt &goto_program);
 
-  void restore_returns(
+  bool restore_returns(
     goto_functionst::function_mapt::iterator f_it);
 
   void undo_function_calls(
@@ -276,7 +276,7 @@ Purpose: turns 'return x' into an assignment to fkt#return_value
 
 \*******************************************************************/
 
-void remove_returnst::restore_returns(
+bool remove_returnst::restore_returns(
   goto_functionst::function_mapt::iterator f_it)
 {
   const irep_idt function_id=f_it->first;
@@ -288,7 +288,7 @@ void remove_returnst::restore_returns(
     symbol_table.symbols.find(rv_name);
 
   if(rv_it==symbol_table.symbols.end())
-    return;
+    return true;
 
   // look up the function symbol
   symbol_tablet::symbolst::iterator s_it=
@@ -341,6 +341,8 @@ void remove_returnst::restore_returns(
       goto_program.instructions.erase(next);
     }
   }
+
+  return false;
 }
 
 /*******************************************************************\
@@ -367,7 +369,9 @@ void remove_returnst::undo_function_calls(
     {
       code_function_callt &function_call=to_code_function_call(i_it->code);
 
-      assert(function_call.function().id()==ID_symbol);
+      // ignore function pointers
+      if(function_call.function().id()!=ID_symbol)
+        continue;
 
       const irep_idt function_id=
         to_symbol_expr(function_call.function()).get_identifier();
@@ -428,11 +432,15 @@ Purpose:
 void remove_returnst::restore(goto_functionst &goto_functions)
 {
   // restore all types first
+  bool unmodified=true;
   Forall_goto_functions(it, goto_functions)
-    restore_returns(it);
+    unmodified=restore_returns(it) && unmodified;
 
-  Forall_goto_functions(it, goto_functions)
-    undo_function_calls(goto_functions, it->second.body);
+  if(!unmodified)
+  {
+    Forall_goto_functions(it, goto_functions)
+      undo_function_calls(goto_functions, it->second.body);
+  }
 }
 
 /*******************************************************************\
