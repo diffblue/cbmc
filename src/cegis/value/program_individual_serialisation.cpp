@@ -114,29 +114,26 @@ void serialise(irept &sdu, const program_individualt &individual)
 
 void deserialise(program_individualt &individual, const irept &sdu)
 {
-  const irept::named_subt &named_sub=sdu.get_named_sub();
-  typedef irept::named_subt::const_iterator const_iterator;
-  const const_iterator programs=named_sub.find(PROGRAMS);
-  assert(named_sub.end() != programs);
-  for (const irept &program : programs->second.get_sub())
+  const irept &programs=sdu.find(PROGRAMS);
+  assert(programs.is_not_nil());
+  for (const irept &program : programs.get_sub())
   {
     program_individualt::programt prog;
     for (const irept &instruction : program.get_sub())
     {
       program_individualt::instructiont instr;
       instr.opcode=instruction.get_long_long(OPCODE);
-      const irept::named_subt &named_sub=instruction.get_named_sub();
-      const const_iterator ops=named_sub.find(OPS);
-      assert(named_sub.end() != ops);
-      for (const irept &op : ops->second.get_sub())
+      const irept &ops=instruction.find(OPS);
+      assert(ops.is_not_nil());
+      for (const irept &op : ops.get_sub())
         instr.ops.push_back(get_value(op));
       prog.push_back(instr);
     }
     individual.programs.push_back(prog);
   }
-  const irept::named_subt::const_iterator x0=named_sub.find(X0);
-  assert(named_sub.end() != x0);
-  for (const irept &value : x0->second.get_sub())
+  const irept &x0=sdu.find(X0);
+  assert(x0.is_not_nil());
+  for (const irept &value : x0.get_sub())
     individual.x0.push_back(get_value(value));
   individual.fitness=sdu.get_long_long(FITNESS);
 }
