@@ -41,6 +41,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-instrument/full_slicer.h>
 
+#include <linking/entry_point.h>
+
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/goto_check.h>
@@ -668,36 +670,12 @@ int cbmc_parse_optionst::get_goto_program(
 
   try
   {
-    if(cmdline.args.size()==1 &&
-       is_goto_binary(cmdline.args[0]))
+    if(cmdline.isset("show-parse-tree"))
     {
-      status() << "Reading GOTO program from file" << eom;
-
-      if(read_goto_binary(cmdline.args[0],
-           symbol_table, goto_functions, get_message_handler()))
-        return 6;
-        
-      config.ansi_c.set_from_symbol_table(symbol_table);
-
-      if(cmdline.isset("show-symbol-table"))
+      if(cmdline.args.size()!=1 ||
+         is_goto_binary(cmdline.args[0]))
       {
-        show_symbol_table();
-        return 0;
-      }
-      
-      irep_idt entry_point=goto_functions.entry_point();
-      
-      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
-      {
-        error() << "The goto binary has no entry point; please complete linking" << eom;
-        return 6;
-      }
-    }
-    else if(cmdline.isset("show-parse-tree"))
-    {
-      if(cmdline.args.size()!=1)
-      {
-        error() << "Please give one source file only" << eom;
+        error() << "Please give exactly one source file" << eom;
         return 6;
       }
       
@@ -736,35 +714,63 @@ int cbmc_parse_optionst::get_goto_program(
       language->show_parse(std::cout);
       return 0;
     }
-    else
+
+    cmdlinet::argst binaries;
+    binaries.reserve(cmdline.args.size());
+
+    for(cmdlinet::argst::iterator
+        it=cmdline.args.begin();
+        it!=cmdline.args.end();
+        ) // no ++it
+    {
+      if(is_goto_binary(*it))
+      {
+        binaries.push_back(*it);
+        it=cmdline.args.erase(it);
+        continue;
+      }
+
+      ++it;
+    }
+
+    if(!cmdline.args.empty())
     {
       if(parse()) return 6;
       if(typecheck()) return 6;
       int get_modules_ret=get_modules(bmc);
       if(get_modules_ret!=-1) return get_modules_ret;
-      if(final()) return 6;
+      if(binaries.empty() && final()) return 6;
 
       // we no longer need any parse trees or language files
       clear_parse();
-
-      if(cmdline.isset("show-symbol-table"))
-      {
-        show_symbol_table();
-        return 0;
-      }
-
-      irep_idt entry_point=goto_functions.entry_point();
-      
-      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
-      {
-        error() << "No entry point; please provide a main function" << eom;
-        return 6;
-      }
-
-      status() << "Generating GOTO Program" << eom;
-
-      goto_convert(symbol_table, goto_functions, ui_message_handler);
     }
+
+    for(cmdlinet::argst::const_iterator
+        it=binaries.begin();
+        it!=binaries.end();
+        ++it)
+    {
+      status() << "Reading GOTO program from file " << eom;
+
+      if(read_object_and_link(*it, symbol_table, goto_functions, *this))
+        return 6;
+    }
+
+    if(!binaries.empty())
+      config.ansi_c.set_from_symbol_table(symbol_table);
+
+    if(cmdline.isset("show-symbol-table"))
+    {
+      show_symbol_table();
+      return 0;
+    }
+
+    if(entry_point(symbol_table, "main", get_message_handler()))
+      return 6;
+
+    status() << "Generating GOTO Program" << eom;
+
+    goto_convert(symbol_table, goto_functions, ui_message_handler);
 
     if(process_goto_program(options, goto_functions))
       return 6;
