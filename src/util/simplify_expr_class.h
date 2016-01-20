@@ -102,7 +102,6 @@ public:
   bool eliminate_common_addends(exprt &op0, exprt &op1);
   static tvt objects_equal(const exprt &a, const exprt &b);
   static tvt objects_equal_address_of(const exprt &a, const exprt &b);
-  bool sort_and_join(exprt &expr);
   bool simplify_address_of_arg(exprt &expr);
   bool simplify_inequality_constant(exprt &expr);
   bool simplify_inequality_not_constant(exprt &expr);
@@ -140,7 +139,5 @@ protected:
   
   void setup_jump_table();
 };
-
-bool sort_and_join(const std::string &id, const std::string &type_id);
 
 #endif

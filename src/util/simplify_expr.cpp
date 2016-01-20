@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "byte_operators.h"
 #include "bv_arithmetic.h"
 #include "endianness_map.h"
+#include "simplify_utils.h"
 
 //#define DEBUGX
 
