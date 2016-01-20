@@ -237,7 +237,7 @@ void goto_symext::symex_assign_symbol(
   exprt ssa_rhs=rhs;
   
   // put assignment guard into the rhs
-  if(!guard.empty())
+  if(!guard.is_true())
   {
     if_exprt tmp_ssa_rhs;
     tmp_ssa_rhs.type()=ssa_rhs.type();
@@ -489,7 +489,7 @@ void goto_symext::symex_assign_if(
 {
   // we have (c?a:b)=e;
 
-  unsigned old_guard_size=guard.size();
+  guardt old_guard=guard;
   
   exprt renamed_guard=lhs.cond();
   state.rename(renamed_guard, ns);
@@ -499,14 +499,14 @@ void goto_symext::symex_assign_if(
   {
     guard.add(renamed_guard);
     symex_assign_rec(state, lhs.true_case(), full_lhs, rhs, guard, assignment_type);
-    guard.resize(old_guard_size);
+    guard.swap(old_guard);
   }
    
   if(!renamed_guard.is_true())
   { 
     guard.add(not_exprt(renamed_guard));
     symex_assign_rec(state, lhs.false_case(), full_lhs, rhs, guard, assignment_type);
-    guard.resize(old_guard_size);
+    guard.swap(old_guard);
   }
 }
 
