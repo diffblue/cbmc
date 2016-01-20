@@ -11,6 +11,7 @@
 #define CEGIS_GENETIC_DYNAMIC_TEST_RUNNER_H_
 
 #include <functional>
+#include <map>
 
 #include <util/expr.h>
 #include <util/tempfile.h>
