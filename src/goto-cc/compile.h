@@ -59,7 +59,6 @@ public:
   bool link();
 
   bool parse_source(const std::string &);
-  bool read_object(const std::string &, goto_functionst &);
 
   bool write_object_file( const std::string &, const symbol_tablet &, 
                           goto_functionst &);
@@ -72,17 +71,6 @@ protected:
   unsigned function_body_count(const goto_functionst &);
   
   void add_compiler_specific_defines(class configt &config) const;
-
-  bool link_functions(
-    symbol_tablet &dest_symbol_table,
-    goto_functionst &dest_functions,
-    symbol_tablet &src_symbol_table,
-    goto_functionst &src_functions,
-    const rename_symbolt &replace_symbol);
-  
-  void rename_symbols_in_function(
-    goto_functionst::goto_functiont &,
-    const rename_symbolt &) const;
 
   void convert_symbols(goto_functionst &dest);
 };

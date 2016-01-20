@@ -29,4 +29,12 @@ bool read_goto_binary(
   
 bool is_goto_binary(const std::string &filename);
 
+class language_uit;
+
+bool read_object_and_link(
+  const std::string &file_name,
+  symbol_tablet &symbol_table,
+  goto_functionst &functions,
+  language_uit &language_ui);
+
 #endif

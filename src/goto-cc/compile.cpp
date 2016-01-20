@@ -404,7 +404,8 @@ bool compilet::link()
     std::string file_name=object_files.front();
     object_files.pop_front();
 
-    if(read_object(file_name, compiled_functions))
+    if(read_object_and_link(file_name, symbol_table,
+                            compiled_functions, *this))
       return true;
   }
 
@@ -730,66 +731,6 @@ bool compilet::parse_source(const std::string &file_name)
 
 /*******************************************************************\
 
-Function: compilet::read_object
-
-  Inputs: a file_name
-
- Outputs: true on error, false otherwise
-
- Purpose: reads an object file
-
-\*******************************************************************/
-
-bool compilet::read_object(
-  const std::string &file_name,
-  goto_functionst &functions)
-{
-  print(8, "Reading: " + file_name);
-
-  // we read into a temporary symbol_table
-  symbol_tablet temp_symbol_table;
-  goto_functionst temp_functions;
-
-  if(read_goto_binary(file_name, temp_symbol_table, temp_functions, *message_handler))
-    return true;
-  
-  std::set<irep_idt> seen_modes;
-
-  for(symbol_tablet::symbolst::const_iterator
-      it=temp_symbol_table.symbols.begin();
-      it!=temp_symbol_table.symbols.end();
-      it++)
-  {
-    if(it->second.mode!="")
-      seen_modes.insert(it->second.mode);
-  }
-  
-  seen_modes.erase(ID_cpp);
-  seen_modes.erase(ID_C);
-
-  if(!seen_modes.empty())
-  {
-    error() << "Multi-language linking not supported" << eom;
-    return true;
-  }
-
-  // hardwired to C-style linking
-
-  linkingt linking(symbol_table, temp_symbol_table, ui_message_handler);
-  
-  if(linking.typecheck_main())
-    return true;
-    
-  if(link_functions(symbol_table, functions,
-                    temp_symbol_table, temp_functions,
-                    linking.rename_symbol))
-    return true;
-
-  return false;
-}
-
-/*******************************************************************\
-
 Function: compilet::compilet
 
   Inputs: none
@@ -856,114 +797,6 @@ unsigned compilet::function_body_count(const goto_functionst &functions)
       fbs++;
 
   return fbs;
-}
-
-/*******************************************************************\
-
-Function: compilet::link_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool compilet::link_functions(
-  symbol_tablet &dest_symbol_table,
-  goto_functionst &dest_functions,
-  symbol_tablet &src_symbol_table,
-  goto_functionst &src_functions,
-  const rename_symbolt &rename_symbol)
-{
-  // merge functions
-  Forall_goto_functions(src_it, src_functions)
-  {
-    // the function might have been renamed    
-    rename_symbolt::expr_mapt::const_iterator e_it=
-      rename_symbol.expr_map.find(src_it->first);
-
-    irep_idt final_id=src_it->first;
-
-    if(e_it!=rename_symbol.expr_map.end())
-      final_id=e_it->second;
-  
-    // already there?
-    goto_functionst::function_mapt::iterator dest_f_it=
-      dest_functions.function_map.find(final_id);
-
-    if(dest_f_it==dest_functions.function_map.end()) // not there yet
-    {
-      rename_symbols_in_function(src_it->second, rename_symbol);
-
-      goto_functionst::goto_functiont &in_dest_symbol_table=
-        dest_functions.function_map[final_id];
-
-      in_dest_symbol_table.body.swap(src_it->second.body);
-      in_dest_symbol_table.body_available=src_it->second.body_available;
-      in_dest_symbol_table.type=src_it->second.type;
-    }
-    else // collision!
-    {
-      goto_functionst::goto_functiont &in_dest_symbol_table=
-        dest_functions.function_map[final_id];
-
-      goto_functionst::goto_functiont &src_func=src_it->second;
-
-      if(in_dest_symbol_table.body.instructions.empty())
-      {
-        // the one with body wins!
-        rename_symbols_in_function(src_func, rename_symbol);
-        
-        in_dest_symbol_table.body.swap(src_func.body);
-        in_dest_symbol_table.body_available=src_func.body_available;
-        in_dest_symbol_table.type=src_func.type;
-      }
-      else if(src_func.body.instructions.empty())
-      {
-        // just keep the old one in dest
-      }
-      else if(in_dest_symbol_table.type.get_bool(ID_C_inlined))
-      {
-        // ok, we silently ignore
-      }
-      else
-      {
-        // the linking code will have ensured that types match
-        rename_symbol(src_func.type);
-        assert(base_type_eq(in_dest_symbol_table.type, src_func.type, ns));
-      }
-    }
-  }
-
-  return false;
-}
-
-/*******************************************************************\
-
-Function: compilet::rename_symbols_in_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void compilet::rename_symbols_in_function(
-  goto_functionst::goto_functiont &function,
-  const rename_symbolt &rename_symbol) const
-{
-  goto_programt &program=function.body;
-  rename_symbol(function.type);
-
-  Forall_goto_program_instructions(iit, program)
-  {
-    rename_symbol(iit->code);
-    rename_symbol(iit->guard);
-  }
 }
 
 /*******************************************************************\
