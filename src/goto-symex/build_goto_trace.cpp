@@ -235,8 +235,9 @@ void build_goto_trace(
     goto_trace_step.identifier=SSA_step.identifier;
 
     goto_trace_step.assignment_type=
-      (SSA_step.assignment_type==symex_targett::VISIBLE_ACTUAL_PARAMETER ||
-       SSA_step.assignment_type==symex_targett::HIDDEN_ACTUAL_PARAMETER)?
+      (it->is_assignment()&&
+       (SSA_step.assignment_type==symex_targett::VISIBLE_ACTUAL_PARAMETER ||
+        SSA_step.assignment_type==symex_targett::HIDDEN_ACTUAL_PARAMETER))?
       goto_trace_stept::ACTUAL_PARAMETER:
       goto_trace_stept::STATE;
     
