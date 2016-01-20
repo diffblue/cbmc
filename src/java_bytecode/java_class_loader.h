@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_CLASS_LOADER_H
 #define CPROVER_JAVA_CLASS_LOADER_H
 
+#include <map>
+
 #include <util/message.h>
 
 #include "java_bytecode_parse_tree.h"
