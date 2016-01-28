@@ -104,8 +104,8 @@ void constant_propagator_domaint::transform(
   else if(from->is_goto())
   {
     exprt g; 
-    if(from->get_target()==to) g  = simplify_expr(from->guard,ns);
-    else g  = simplify_expr(not_exprt(from->guard),ns);
+    if(from->get_target()==to) g = simplify_expr(from->guard,ns);
+    else g = simplify_expr(not_exprt(from->guard),ns);
 
     two_way_propagate_rec(g, ns);
   }
