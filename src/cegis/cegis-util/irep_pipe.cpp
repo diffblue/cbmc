@@ -1,5 +1,6 @@
 #include <exception>
 #include <sstream>
+#include <stdexcept>
 
 #ifndef _WIN32
 #include <unistd.h>
