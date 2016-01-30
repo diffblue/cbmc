@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <fstream>
+#include <stdexcept>
 
 #include <util/bv_arithmetic.h>
 #include <util/substitute.h>
