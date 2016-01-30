@@ -12,6 +12,7 @@ typedef unsigned int pid_t;
 #include <cstdlib>
 #include <iterator>
 #include <sstream>
+#include <stdexcept>
 
 #include <util/irep.h>
 
