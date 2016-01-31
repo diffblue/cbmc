@@ -484,6 +484,7 @@ inline int pthread_create(
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
   // Clear all locked mutexes; locking must happen in same thread.
   __CPROVER_clear_must(0, "mutex-locked");
+  __CPROVER_clear_may(0, "mutex-locked");
   #endif
   
   __CPROVER_ASYNC_1:
@@ -520,7 +521,7 @@ inline int pthread_cond_init(
 #endif
 
 inline int pthread_cond_signal(
-    pthread_cond_t *cond)
+  pthread_cond_t *cond)
 { __CPROVER_HIDE:
   __CPROVER_atomic_begin();
   (*((unsigned *)cond))++;
@@ -555,13 +556,25 @@ inline int pthread_cond_wait(
     pthread_cond_t *cond,
     pthread_mutex_t *mutex)
 { __CPROVER_HIDE:
-  pthread_mutex_unlock(mutex);
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
+                   "mutex must be initialized");
+
+  __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-locked"),
+                   "mutex must be locked");
+
+  __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-destroyed"),
+                   "mutex must not be destroyed");
+
+  __CPROVER_clear_may(mutex, "mutex-locked");
+  #endif
+
   __CPROVER_atomic_begin();
   __CPROVER_assume(*((unsigned *)cond));
   (*((unsigned *)cond))--;
   __CPROVER_atomic_end();
-  // we get the mutex from the signaling thread
-  pthread_mutex_lock(mutex);
+
   return 0; // we never fail
 }
 
