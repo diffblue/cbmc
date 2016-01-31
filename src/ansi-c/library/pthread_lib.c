@@ -560,6 +560,7 @@ inline int pthread_cond_wait(
   __CPROVER_assume(*((unsigned *)cond));
   (*((unsigned *)cond))--;
   __CPROVER_atomic_end();
+  // we get the mutex from the signaling thread
   pthread_mutex_lock(mutex);
   return 0; // we never fail
 }
