@@ -1,3 +1,24 @@
+/* FUNCTION: pthread_mutexattr_settype */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+inline int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
+{
+  __CPROVER_HIDE:;
+
+  (void)attr;
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  if(type==PTHREAD_MUTEX_RECURSIVE)
+    __CPROVER_set_must(attr, "mutexattr-recursive");
+  #endif
+
+  int result;
+  return result;
+}
+
 /* FUNCTION: pthread_cancel */
 
 #ifndef __CPROVER_PTHREAD_H_INCLUDED
@@ -57,6 +78,8 @@ inline int pthread_mutex_init(
   __CPROVER_cleanup(mutex, pthread_mutex_cleanup);
   __CPROVER_set_must(mutex, "mutex-init");
   __CPROVER_clear_may(mutex, "mutex-destroyed");
+  if(__CPROVER_get_must(mutexattr, "mutexattr-recursive"))
+    __CPROVER_set_must(mutex, "mutex-recursive");
   #endif
 
   return 0;
@@ -91,7 +114,8 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
   __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-destroyed"),
                    "mutex must not be destroyed");
 
-  __CPROVER_assert(!__CPROVER_get_may(mutex, "mutex-locked"),
+  __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-recursive") ||
+                   !__CPROVER_get_may(mutex, "mutex-locked"),
                    "attempt to lock non-recurisive locked mutex");
 
   __CPROVER_set_must(mutex, "mutex-locked");
