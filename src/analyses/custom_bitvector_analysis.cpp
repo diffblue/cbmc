@@ -362,6 +362,21 @@ void custom_bitvector_domaint::transform(
       }
     }
     break;
+    
+  case GOTO:
+    if(has_get_must_or_may(instruction.guard))
+    {
+      exprt guard=instruction.guard;
+    
+      if(to!=from->get_target()) guard.make_not();
+
+      exprt result=eval(guard, cba);
+      exprt result2=simplify_expr(result, ns);
+
+      if(result2.is_false())
+        make_bottom();
+    }
+    break;
 
   default:;
   }
@@ -514,22 +529,6 @@ bool custom_bitvector_domaint::merge(
 
 /*******************************************************************\
 
-Function: custom_bitvector_analysist::instrument
-
-  Inputs:
-
- Outputs:
-
- Purpose: 
-
-\*******************************************************************/
-
-void custom_bitvector_analysist::instrument(goto_functionst &)
-{
-}
-
-/*******************************************************************\
-
 Function: custom_bitvector_domaint::has_get_must_or_may
 
   Inputs:
@@ -624,6 +623,22 @@ exprt custom_bitvector_domaint::eval(
   
     return tmp;
   }
+}
+
+/*******************************************************************\
+
+Function: custom_bitvector_analysist::instrument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+void custom_bitvector_analysist::instrument(goto_functionst &)
+{
 }
 
 /*******************************************************************\
