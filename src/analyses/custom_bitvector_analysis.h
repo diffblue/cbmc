@@ -68,7 +68,7 @@ public:
     }
   };
   
-  vectorst merge(const vectorst &a, const vectorst &b)
+  static vectorst merge(const vectorst &a, const vectorst &b)
   {
     vectorst result;
     result.may_bits=a.may_bits|b.may_bits;
@@ -79,14 +79,19 @@ public:
   bitst may_bits, must_bits;
   
   void assign_lhs(const exprt &, const vectorst &);
-  vectorst get_rhs(const exprt &);
-  vectorst get_rhs(const irep_idt &);
+  vectorst get_rhs(const exprt &) const;
+  vectorst get_rhs(const irep_idt &) const;
 
   bool is_bottom;
   
   custom_bitvector_domaint():is_bottom(true)
   {
   }
+
+  static bool has_get_must_or_may(const exprt &);
+  exprt eval(
+    const exprt &src,
+    custom_bitvector_analysist &) const;
 
 protected:  
   typedef enum { SET_MUST, CLEAR_MUST, SET_MAY, CLEAR_MAY } modet;
@@ -100,8 +105,11 @@ class custom_bitvector_analysist:public ait<custom_bitvector_domaint>
 public:
   void instrument(goto_functionst &);
   void check(const namespacet &, const goto_functionst &, bool xml, std::ostream &);
-  exprt eval(const exprt &src, locationt loc);
-  static bool has_get_must_or_may(const exprt &);
+
+  exprt eval(const exprt &src, locationt loc)
+  {
+    return operator[](loc).eval(src, *this);
+  }
 
   unsigned get_bit_nr(const exprt &);
 

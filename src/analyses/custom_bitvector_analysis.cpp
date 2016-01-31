@@ -150,7 +150,7 @@ Function: custom_bitvector_domaint::get_rhs
 \*******************************************************************/
 
 custom_bitvector_domaint::vectorst
-  custom_bitvector_domaint::get_rhs(const irep_idt &identifier)
+  custom_bitvector_domaint::get_rhs(const irep_idt &identifier) const
 {
   vectorst vectors;
 
@@ -176,7 +176,7 @@ Function: custom_bitvector_domaint::get_rhs
 \*******************************************************************/
 
 custom_bitvector_domaint::vectorst
-  custom_bitvector_domaint::get_rhs(const exprt &rhs)
+  custom_bitvector_domaint::get_rhs(const exprt &rhs) const
 {
   if(rhs.id()==ID_symbol)
   {
@@ -530,7 +530,7 @@ void custom_bitvector_analysist::instrument(goto_functionst &)
 
 /*******************************************************************\
 
-Function: custom_bitvector_analysist::has_get_must_or_may
+Function: custom_bitvector_domaint::has_get_must_or_may
 
   Inputs:
 
@@ -540,7 +540,7 @@ Function: custom_bitvector_analysist::has_get_must_or_may
 
 \*******************************************************************/
 
-bool custom_bitvector_analysist::has_get_must_or_may(const exprt &src)
+bool custom_bitvector_domaint::has_get_must_or_may(const exprt &src)
 {
   if(src.id()=="get_must" ||
      src.id()=="get_may")
@@ -554,7 +554,7 @@ bool custom_bitvector_analysist::has_get_must_or_may(const exprt &src)
 
 /*******************************************************************\
 
-Function: custom_bitvector_analysist::eval
+Function: custom_bitvector_domaint::eval
 
   Inputs:
 
@@ -564,28 +564,27 @@ Function: custom_bitvector_analysist::eval
 
 \*******************************************************************/
 
-exprt custom_bitvector_analysist::eval(
+exprt custom_bitvector_domaint::eval(
   const exprt &src,
-  locationt loc)
+  custom_bitvector_analysist &custom_bitvector_analysis) const
 {
   if(src.id()=="get_must" || src.id()=="get_may")
   {
     if(src.operands().size()==2)
     {
-      unsigned bit_nr=get_bit_nr(src.op1());
+      unsigned bit_nr=
+        custom_bitvector_analysis.get_bit_nr(src.op1());
 
       exprt object=src.op0();
       
       if(object.is_constant() &&
          to_constant_expr(object).get_value()==ID_NULL) // NULL means all
       {
-        const custom_bitvector_domaint &d=operator[](loc);
-
         if(src.id()=="get_may")
         {
           for(custom_bitvector_domaint::bitst::const_iterator
-              b_it=d.may_bits.begin();
-              b_it!=d.may_bits.end();
+              b_it=may_bits.begin();
+              b_it!=may_bits.end();
               b_it++)
           {
             if(b_it->second&(1l<<bit_nr)) return true_exprt();
@@ -599,7 +598,7 @@ exprt custom_bitvector_analysist::eval(
       else
       {
         custom_bitvector_domaint::vectorst v=
-          operator[](loc).get_rhs(object);
+          get_rhs(object);
 
         bool value=false;
 
@@ -621,7 +620,7 @@ exprt custom_bitvector_analysist::eval(
   {
     exprt tmp=src;
     Forall_operands(it, tmp)
-      *it=eval(*it, loc);
+      *it=eval(*it, custom_bitvector_analysis);
   
     return tmp;
   }
@@ -660,7 +659,8 @@ void custom_bitvector_analysist::check(
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
-      if(!has_get_must_or_may(i_it->guard)) continue;
+      if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
+        continue;
 
       if(operator[](i_it).is_bottom) continue;
 
