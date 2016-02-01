@@ -93,7 +93,7 @@ void custom_bitvector_domaint::set_bit(
     const exprt &op=to_address_of_expr(lhs).object();
     if(op.id()==ID_symbol)
     {
-      irep_idt identifier="&"+id2string(to_symbol_expr(op).get_identifier());
+      irep_idt identifier='&'+id2string(to_symbol_expr(op).get_identifier());
       set_bit(identifier, bit_nr, mode);
     }
   }
@@ -122,6 +122,9 @@ void custom_bitvector_domaint::assign_lhs(
   if(lhs.id()==ID_symbol)
   {
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
+    
+    if(lhs.type().id()!=ID_pointer)
+      identifier='&'+id2string(identifier);
 
     // we erase blank ones to avoid noise
 
@@ -181,7 +184,11 @@ custom_bitvector_domaint::vectorst
   if(rhs.id()==ID_symbol)
   {
     const irep_idt identifier=to_symbol_expr(rhs).get_identifier();
-    return get_rhs(identifier);
+    
+    if(rhs.type().id()==ID_pointer)
+      return get_rhs(identifier);
+    else
+      return get_rhs('&'+id2string(identifier));
   }
   else if(rhs.id()==ID_typecast)
   {
@@ -199,7 +206,7 @@ custom_bitvector_domaint::vectorst
     const exprt &op=to_address_of_expr(rhs).object();
     if(op.id()==ID_symbol)
     {
-      const irep_idt identifier="&"+id2string(to_symbol_expr(op).get_identifier());
+      const irep_idt identifier='&'+id2string(to_symbol_expr(op).get_identifier());
       return get_rhs(identifier);
     }
   }
