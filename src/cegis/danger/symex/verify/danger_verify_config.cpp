@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iterator>
 
 #include <cegis/wordsize/restrict_bv_size.h>
 #include <cegis/danger/symex/verify/insert_constraint.h>
