@@ -13,6 +13,8 @@ inline int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   if(type==PTHREAD_MUTEX_RECURSIVE)
     __CPROVER_set_must(attr, "mutexattr-recursive");
+  #else
+  (void)type;
   #endif
 
   int result;

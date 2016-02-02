@@ -36,11 +36,12 @@ echo "Building cbmc-${VERSION_FILE}.pkg (${BITS} bits)"
 #  --target 10.5 \
 #  --id org.cprover.cbmc
 
-pkgbuild --root /tmp/cbmc-dist/package-root/ \
-  /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg \
+pkgbuild \
+  --root /tmp/cbmc-dist/package-root/ \
   --identifier org.cprover.cbmc \
   --version $VERSION \
-  
+  --verbose \
+  /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg  
 
 #echo Copying.
 #scp /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg \
