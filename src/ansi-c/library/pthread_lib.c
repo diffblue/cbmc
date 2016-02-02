@@ -581,6 +581,8 @@ inline int pthread_cond_wait(
     pthread_mutex_t *mutex)
 { __CPROVER_HIDE:
 
+  (void)*mutex;
+
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
                    "mutex must be initialized");
