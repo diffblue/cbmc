@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iterator>
 
 #include <cegis/danger/util/danger_program_helper.h>
 #include <cegis/danger/options/danger_program.h>

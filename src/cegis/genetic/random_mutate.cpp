@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <cegis/genetic/random_individual.h>
 #include <cegis/genetic/random_mutate.h>
 
