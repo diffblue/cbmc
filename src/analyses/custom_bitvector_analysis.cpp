@@ -273,17 +273,18 @@ void custom_bitvector_domaint::transform(
   case ASSIGN:
     {
       const code_assignt &code_assign=to_code_assign(instruction.code);
-      
+
       // may alias other stuff
       std::set<exprt> lhs_set=
         cba.local_may_alias_factory(from).get(from, code_assign.lhs());
         
       lhs_set.insert(code_assign.lhs());
+      
+      vectorst rhs_vectors=get_rhs(code_assign.rhs());
 
       for(std::set<exprt>::const_iterator
           l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
       {
-        vectorst rhs_vectors=get_rhs(code_assign.rhs());
         assign_lhs(*l_it, rhs_vectors);
       }
     }
