@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <util/arith_tools.h>
 #include <util/bv_arithmetic.h>
 
