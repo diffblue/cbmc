@@ -1744,33 +1744,31 @@ Function: simplify_exprt::simplify_byte_extract
 
 \*******************************************************************/
 
-bool simplify_exprt::simplify_byte_extract(exprt &expr)
+bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
 {
-  byte_extract_exprt &be=to_byte_extract_expr(expr);
-
   // lift up any ID_if on the object
-  if(be.op().id()==ID_if)
+  if(expr.op().id()==ID_if)
   {
     if_exprt if_expr=lift_if(expr, 0);
-    simplify_byte_extract(if_expr.true_case());
-    simplify_byte_extract(if_expr.false_case());
+    simplify_byte_extract(to_byte_extract_expr(if_expr.true_case()));
+    simplify_byte_extract(to_byte_extract_expr(if_expr.false_case()));
     simplify_if(if_expr);
-    expr=if_expr;
+    expr.swap(if_expr);
     return false;
   }
 
-  const mp_integer el_size=pointer_offset_bits(be.type(), ns);
+  const mp_integer el_size=pointer_offset_bits(expr.type(), ns);
 
   // byte_extract(byte_extract(root, offset1), offset2) =>
   // byte_extract(root, offset1+offset2)
-  if(be.op().id()==be.id())
+  if(expr.op().id()==expr.id())
   {
-    be.offset()=plus_exprt(
-      to_byte_extract_expr(be.op()).offset(),
-      be.offset());
-    simplify_plus(be.offset());
+    expr.offset()=plus_exprt(
+      to_byte_extract_expr(expr.op()).offset(),
+      expr.offset());
+    simplify_plus(expr.offset());
 
-    be.op()=to_byte_extract_expr(be.op()).op();
+    expr.op()=to_byte_extract_expr(expr.op()).op();
     simplify_byte_extract(expr);
 
     return false;
@@ -1778,22 +1776,24 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
 
   // byte_extract(byte_update(root, offset, value), offset) =>
   // value
-  if(((be.id()==ID_byte_extract_big_endian &&
-       be.op().id()==ID_byte_update_big_endian) ||
-      (be.id()==ID_byte_extract_little_endian &&
-       be.op().id()==ID_byte_update_little_endian)) &&
-     be.offset()==be.op().op1())
+  if(((expr.id()==ID_byte_extract_big_endian &&
+       expr.op().id()==ID_byte_update_big_endian) ||
+      (expr.id()==ID_byte_extract_little_endian &&
+       expr.op().id()==ID_byte_update_little_endian)) &&
+     expr.offset()==expr.op().op1())
   {
-    if(base_type_eq(be.type(), be.op().op2().type(), ns))
+    if(base_type_eq(expr.type(), expr.op().op2().type(), ns))
     {
-      expr=be.op().op2();
+      exprt tmp=expr.op().op2();
+      expr.swap(tmp);
+
       return false;
     }
     else if(el_size>=0 &&
-            el_size<=pointer_offset_bits(be.op().op2().type(), ns))
+            el_size<=pointer_offset_bits(expr.op().op2().type(), ns))
     {
-      be.op()=be.op().op2();
-      be.offset()=gen_zero(be.offset().type());
+      expr.op()=expr.op().op2();
+      expr.offset()=gen_zero(expr.offset().type());
 
       simplify_byte_extract(expr);
 
@@ -1803,33 +1803,34 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
 
   // the following require a constant offset
   mp_integer offset;
-  if(to_integer(be.offset(), offset) || offset<0)
+  if(to_integer(expr.offset(), offset) || offset<0)
     return true;
 
   // byte extract of full object is object
   // don't do any of the following if endianness doesn't match, as
   // bytes need to be swapped
   if(offset==0 &&
-     base_type_eq(expr.type(), be.op().type(), ns) &&
+     base_type_eq(expr.type(), expr.op().type(), ns) &&
      byte_extract_id()!=expr.id())
   {
-    expr=be.op();
+    exprt tmp=expr.op();
+    expr.swap(tmp);
 
     return false;
   }
 
-  // no proper simplification for be.type()==void
+  // no proper simplification for expr.type()==void
   // or types of unknown size
-  if(be.type().id()==ID_empty ||
+  if(expr.type().id()==ID_empty ||
      el_size<0)
     return true;
   assert(el_size>0);
 
-  if(be.op().id()==ID_array_of &&
-     be.op().op0().id()==ID_constant)
+  if(expr.op().id()==ID_array_of &&
+     expr.op().op0().id()==ID_constant)
   {
     std::string const_bits=
-      expr2bits(be.op().op0(),
+      expr2bits(expr.op().op0(),
                 byte_extract_id()==ID_byte_extract_little_endian);
 
     // double the string until we have sufficiently many bits
@@ -1845,8 +1846,8 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     exprt tmp=
       bits2expr(
         el_bits,
-        be.type(),
-        be.id()==ID_byte_extract_little_endian);
+        expr.type(),
+        expr.id()==ID_byte_extract_little_endian);
 
     if(tmp.is_not_nil())
     {
@@ -1856,20 +1857,20 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
   }
 
   // in some cases we even handle non-const array_of
-  if(be.op().id()==ID_array_of &&
+  if(expr.op().id()==ID_array_of &&
      (offset*8)%el_size==0 &&
-     el_size<=pointer_offset_bits(be.op().op0().type(), ns))
+     el_size<=pointer_offset_bits(expr.op().op0().type(), ns))
   {
-    be.op()=index_exprt(be.op(), be.offset());
-    be.offset()=from_integer(0, be.offset().type());
-    simplify_rec(be);
+    expr.op()=index_exprt(expr.op(), expr.offset());
+    expr.offset()=from_integer(0, expr.offset().type());
+    simplify_rec(expr);
 
     return false;
   }
 
   // extract bits of a constant
   std::string bits=
-    expr2bits(be.op(), expr.id()==ID_byte_extract_little_endian);
+    expr2bits(expr.op(), expr.id()==ID_byte_extract_little_endian);
   // exact match of length only - otherwise we might lose bits of
   // flexible array members at the end of a struct
   if(mp_integer(bits.size())==el_size+offset*8)
@@ -1882,12 +1883,12 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
 
     exprt tmp=
       bits2expr(bits_cut,
-                be.type(),
+                expr.type(),
                 expr.id()==ID_byte_extract_little_endian);
 
     if(tmp.is_not_nil())
     {
-      expr=tmp;
+      expr.swap(tmp);
 
       return false;
     }
@@ -1897,11 +1898,11 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
   if(expr.id()!=ID_byte_extract_little_endian) return true;
 
   // get type of object
-  const typet &op_type=ns.follow(be.op().type());
+  const typet &op_type=ns.follow(expr.op().type());
 
   if(op_type.id()==ID_array)
   {
-    exprt result=be.op();
+    exprt result=expr.op();
 
     // try proper array or string constant
     for(const typet *op_type_ptr=&op_type;
@@ -1914,7 +1915,7 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
       assert(el_size%8==0);
       mp_integer el_bytes=el_size/8;
 
-      if(base_type_eq(be.type(), op_type_ptr->subtype(), ns))
+      if(base_type_eq(expr.type(), op_type_ptr->subtype(), ns))
       {
         if(offset%el_bytes==0)
         {
@@ -1923,9 +1924,9 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
           result=
             index_exprt(
               result,
-              from_integer(offset, be.offset().type()));
+              from_integer(offset, expr.offset().type()));
 
-          expr=result;
+          expr.swap(result);
           simplify_rec(expr);
           return false;
         }
@@ -1942,7 +1943,7 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
           result=
             index_exprt(
               result,
-              from_integer(index, be.offset().type()));
+              from_integer(index, expr.offset().type()));
         }
       }
     }
@@ -1967,21 +1968,24 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
 
       if(offset*8==m_offset_bits &&
          el_size==m_size &&
-         base_type_eq(be.type(), it->type(), ns))
+         base_type_eq(expr.type(), it->type(), ns))
       {
-        expr=member_exprt(be.op(), it->get_name(), it->type());
-        simplify_rec(expr);
+        member_exprt member(expr.op(), it->get_name(), it->type());
+        simplify_member(member);
+        expr.swap(member);
+
         return false;
       }
-      else if(m_offset_bits>=0 &&
-              offset*8>=m_offset_bits &&
+      else if(offset*8>=m_offset_bits &&
               offset*8+el_size<=m_offset_bits+m_size &&
               m_offset_bits%8==0)
       {
-        be.op()=member_exprt(be.op(), it->get_name(), it->type());
-        be.offset()=
-          from_integer(offset-m_offset_bits/8, be.offset().type());
-        simplify_rec(be.offset());
+        expr.op()=member_exprt(expr.op(), it->get_name(), it->type());
+        simplify_member(expr.op());
+        expr.offset()=
+          from_integer(offset-m_offset_bits/8, expr.offset().type());
+        simplify_rec(expr.offset());
+
         return false;
       }
 
@@ -2380,7 +2384,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_byte_update(to_byte_update_expr(expr)) && result;
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
-    result=simplify_byte_extract(expr) && result;
+    result=simplify_byte_extract(to_byte_extract_expr(expr)) && result;
   else if(expr.id()==ID_pointer_object)
     result=simplify_pointer_object(expr) && result;
   else if(expr.id()==ID_dynamic_object)
