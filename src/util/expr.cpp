@@ -477,7 +477,8 @@ bool exprt::is_zero() const
     }
     else if(type_id==ID_pointer)
     {
-      return constant.value_is_zero_string();
+      return constant.value_is_zero_string() ||
+             constant.get_value()==ID_NULL;
     }
   }
 
