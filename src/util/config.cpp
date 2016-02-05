@@ -1191,7 +1191,7 @@ bool configt::set(const cmdlinet &cmdline)
 
 /*******************************************************************\
 
-Function: from_ns
+Function: configt::ansi_ct::os_to_string
 
   Inputs:
 
@@ -1201,7 +1201,162 @@ Function: from_ns
 
 \*******************************************************************/
 
-static unsigned from_ns(
+std::string configt::ansi_ct::os_to_string(ost os)
+{
+  switch(os)
+  {
+  case ost::OS_LINUX: return "os";
+  case ost::OS_MACOS: return "macos";
+  case ost::OS_WIN: return "win";
+  default: return "none";
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::os_to_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+configt::ansi_ct::ost configt::ansi_ct::string_to_os(const std::string &os)
+{
+  if(os=="linux")
+    return ost::OS_LINUX;
+  else if(os=="macos")
+    return ost::OS_MACOS;
+  else if(os=="win")
+    return ost::OS_WIN;
+  else
+    return ost::NO_OS;
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::arch_to_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string configt::ansi_ct::arch_to_string(archt arch)
+{
+  switch(arch)
+  {
+  case archt::ARCH_I386:   return "i386";    
+  case archt::ARCH_X86_64: return "x86_64";    
+  case archt::ARCH_POWER:  return "power";    
+  case archt::ARCH_ARM:    return "arm";    
+  case archt::ARCH_ALPHA:  return "alpha";    
+  case archt::ARCH_MIPS:   return "mips";    
+  case archt::ARCH_S390:   return "s390";    
+  case archt::ARCH_S390X:  return "s390x";    
+  case archt::ARCH_SPARC:  return "sparc";    
+  case archt::ARCH_IA64:   return "ia64";    
+  case archt::ARCH_X32:    return "x32";    
+  case archt::ARCH_V850:   return "v850";    
+  default: return "none";
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::string_to_arch
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+configt::ansi_ct::archt configt::ansi_ct::string_to_arch(const std::string &arch)
+{
+  if(arch=="i386")
+    return archt::ARCH_I386;
+  else if(arch=="x86_64")
+    return archt::ARCH_X86_64;
+  else if(arch=="power")
+    return archt::ARCH_POWER;
+  else if(arch=="arm")
+    return archt::ARCH_ARM;
+  else if(arch=="alpha")
+    return archt::ARCH_ALPHA;
+  else if(arch=="mips")
+    return archt::ARCH_MIPS;
+  else if(arch=="s390")
+    return archt::ARCH_S390;
+  else if(arch=="s390x")
+    return archt::ARCH_S390X;
+  else if(arch=="sparc")
+    return archt::ARCH_SPARC;
+  else if(arch=="ia64")
+    return archt::ARCH_IA64;
+  else if(arch=="x32")
+    return archt::ARCH_X32;
+  else if(arch=="v850")
+    return archt::ARCH_V850;
+  else
+    return archt::NO_ARCH;
+}
+
+/*******************************************************************\
+
+Function: string_from_ns
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static irep_idt string_from_ns(
+  const namespacet &ns,
+  const std::string &what)
+{
+  const irep_idt id=CPROVER_PREFIX "architecture_"+what;
+  const symbolt *symbol;
+
+  if(ns.lookup(id, symbol))
+    throw "failed to find "+id2string(id);
+    
+  const exprt &tmp=symbol->value;
+    
+  if(tmp.id()!=ID_address_of ||
+     tmp.operands().size()!=1 ||
+     tmp.op0().id()!=ID_index ||
+     tmp.op0().operands().size()!=2 ||
+     tmp.op0().op0().id()!=ID_string_constant)
+    throw "symbol table configuration entry `"+id2string(id)+"' is not a string constant";
+
+  return tmp.op0().op0().get(ID_value);
+}
+
+/*******************************************************************\
+
+Function: unsigned_from_ns
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static unsigned unsigned_from_ns(
   const namespacet &ns,
   const std::string &what)
 {
@@ -1246,31 +1401,33 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
 
   namespacet ns(symbol_table);
 
-  int_width=from_ns(ns, "int_width");
-  long_int_width=from_ns(ns, "long_int_width");
+  int_width=unsigned_from_ns(ns, "int_width");
+  long_int_width=unsigned_from_ns(ns, "long_int_width");
   bool_width=1*8;
-  char_width=from_ns(ns, "char_width");
-  short_int_width=from_ns(ns, "short_int_width");
-  long_long_int_width=from_ns(ns, "long_long_int_width");
-  pointer_width=from_ns(ns, "pointer_width");
-  single_width=from_ns(ns, "single_width");
-  double_width=from_ns(ns, "double_width");
-  long_double_width=from_ns(ns, "long_double_width");
-  wchar_t_width=from_ns(ns, "wchar_t_width");
+  char_width=unsigned_from_ns(ns, "char_width");
+  short_int_width=unsigned_from_ns(ns, "short_int_width");
+  long_long_int_width=unsigned_from_ns(ns, "long_long_int_width");
+  pointer_width=unsigned_from_ns(ns, "pointer_width");
+  single_width=unsigned_from_ns(ns, "single_width");
+  double_width=unsigned_from_ns(ns, "double_width");
+  long_double_width=unsigned_from_ns(ns, "long_double_width");
+  wchar_t_width=unsigned_from_ns(ns, "wchar_t_width");
 
-  char_is_unsigned=from_ns(ns, "char_is_unsigned")!=0;
-  wchar_t_is_unsigned=from_ns(ns, "wchar_t_is_unsigned")!=0;
-  use_fixed_for_float=from_ns(ns, "fixed_for_float")!=0;
+  char_is_unsigned=unsigned_from_ns(ns, "char_is_unsigned")!=0;
+  wchar_t_is_unsigned=unsigned_from_ns(ns, "wchar_t_is_unsigned")!=0;
+  use_fixed_for_float=unsigned_from_ns(ns, "fixed_for_float")!=0;
   // for_has_scope, single_precision_constant, rounding_mode not
   // stored in namespace
 
-  alignment=from_ns(ns, "alignment");
+  alignment=unsigned_from_ns(ns, "alignment");
 
-  memory_operand_size=from_ns(ns, "memory_operand_size");
+  memory_operand_size=unsigned_from_ns(ns, "memory_operand_size");
 
-  endianness=(endiannesst)from_ns(ns, "endianness");
+  endianness=(endiannesst)unsigned_from_ns(ns, "endianness");
 
-  // os, arch not stored in namespace
+  arch=string_to_arch(id2string(string_from_ns(ns, "architecture")));
+
+  os=string_to_os(id2string(string_from_ns(ns, "os")));
 
   //NULL_is_zero=from_ns("NULL_is_zero");
   NULL_is_zero=true;

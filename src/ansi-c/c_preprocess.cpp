@@ -725,6 +725,17 @@ bool c_preprocess_gcc_clang(
       command+=GCC_DEFINES_32;
   }
   
+  switch(config.ansi_c.arch)
+  {
+  case configt::ansi_ct::archt::ARCH_I386:
+    command+=" -D __i386__"; break;
+  
+  case configt::ansi_ct::archt::ARCH_X86_64:
+    command+=" -D __x86_64__"; break;
+  
+  default:;
+  }
+  
   // The width of wchar_t depends on the OS!
   {
     command+=" -D__WCHAR_MAX__="+type_max(wchar_t_type());
