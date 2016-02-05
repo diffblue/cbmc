@@ -2004,25 +2004,21 @@ Function: simplify_exprt::simplify_byte_update
 
 \*******************************************************************/
 
-bool simplify_exprt::simplify_byte_update(exprt &expr)
+bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
 {
-  if(expr.operands().size()!=3) return true;
-  
-  byte_update_exprt &bu_expr=to_byte_update_expr(expr);
-
   // byte_update(byte_update(root, offset, value), offset, value2) =>
   // byte_update(root, offset, value2)
-  if(bu_expr.id()==bu_expr.op().id() &&
-     bu_expr.offset()==bu_expr.op().op1() &&
-     base_type_eq(bu_expr.value().type(), bu_expr.op().op2().type(), ns))
+  if(expr.id()==expr.op().id() &&
+     expr.offset()==expr.op().op1() &&
+     base_type_eq(expr.value().type(), expr.op().op2().type(), ns))
   {
-    bu_expr.op()=bu_expr.op().op0();
+    expr.op()=expr.op().op0();
     return false;
   }
 
-  exprt &root=bu_expr.op();
-  exprt &offset=bu_expr.offset();
-  const exprt &value=bu_expr.value();
+  const exprt &root=expr.op();
+  const exprt &offset=expr.offset();
+  const exprt &value=expr.value();
   const mp_integer val_size=pointer_offset_bits(value.type(), ns);
   const mp_integer root_size=pointer_offset_bits(root.type(), ns);
 
@@ -2032,13 +2028,14 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
      root_size>0 &&
      val_size>=root_size)
   {
-    expr=byte_extract_exprt(
-      bu_expr.id()==ID_byte_update_little_endian ?
+    byte_extract_exprt be(
+      expr.id()==ID_byte_update_little_endian ?
         ID_byte_extract_little_endian :
         ID_byte_extract_big_endian,
-      value, offset, bu_expr.type());
+      value, offset, expr.type());
 
-    simplify_byte_extract(expr);
+    simplify_byte_extract(be);
+    expr.swap(be);
 
     return false;
   }
@@ -2051,30 +2048,27 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
    *             value)
    */
 
-  if(bu_expr.id()!=ID_byte_update_little_endian) return true;
+  if(expr.id()!=ID_byte_update_little_endian) return true;
 
-  if(bu_expr.value().id()==ID_with) 
+  if(value.id()==ID_with)
   {
-    exprt &with=bu_expr.value();
+    const with_exprt &with=to_with_expr(value);
 
-    if(with.operands().size()!=3) return true;
-
-    if(with.op0().id()==ID_byte_extract_little_endian)
+    if(with.old().id()==ID_byte_extract_little_endian)
     {
-      exprt &extract=with.op0();
+      const byte_extract_exprt &extract=to_byte_extract_expr(with.old());
 
       /* the simplification can be used only if 
          root and offset of update and extract
          are the same */
-      if(extract.operands().size() != 2) return true;
-      if(!(root == extract.op0())) return true;
-      if(!(offset == extract.op1())) return true;
+      if(!(root==extract.op())) return true;
+      if(!(offset==extract.offset())) return true;
 
-      const typet& tp = ns.follow(with.type());
+      const typet& tp=ns.follow(with.type());
       if(tp.id()==ID_struct) 
       {
         const struct_typet &struct_type=to_struct_type(tp);
-        const irep_idt &component_name=with.op1().get(ID_component_name);
+        const irep_idt &component_name=with.where().get(ID_component_name);
         
         // is this a bit field?
         if(struct_type.get_component(component_name).type().id()==ID_c_bit_field)
@@ -2104,7 +2098,7 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
         mp_integer i = pointer_offset_size(tp.subtype(), ns);
         if(i != -1)
         {
-          exprt& index = with.op1();
+          const exprt& index=with.where();
           mult_exprt index_offset(index, from_integer(i, index.type()));
           simplify_node (index_offset);
 
@@ -2139,14 +2133,21 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
   if(val_size<=0)
     return true;
   
-  // search for updates of members, and replace by 'with'
+  // Are we updating (parts of) a struct? Do individual member updates
+  // instead, unless there are non-byte-sized bit fields
   if(op_type.id()==ID_struct)
   {
+    exprt result_expr;
+    result_expr.make_nil();
+
+    mp_integer update_size=
+      pointer_offset_size(value.type(), ns);
+
     const struct_typet &struct_type=
       to_struct_type(op_type);
     const struct_typet::componentst &components=
       struct_type.components();
-      
+
     for(struct_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
@@ -2154,16 +2155,72 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
     {
       mp_integer m_offset=
         member_offset(struct_type, it->get_name(), ns);
-        
-      if(offset_int==m_offset &&
-         base_type_eq(it->type(), value.type(), ns))
+      mp_integer m_size_bits=pointer_offset_bits(it->type(), ns);
+      mp_integer m_size_bytes=m_size_bits/8;
+
+      // can we determine the current offset, and is it a byte-sized
+      // member?
+      if(m_offset<0 ||
+         m_size_bits<=0 ||
+         m_size_bits%8!=0)
       {
-        exprt member_name(ID_member_name);
-        member_name.set(ID_component_name, it->get_name());
-        expr=with_exprt(root, member_name, value);
-        simplify_node(expr);
-        return false;
+        result_expr.make_nil();
+        break;
       }
+      // is that member part of the update?
+      else if(m_offset+m_size_bytes<=offset_int)
+        continue;
+      // are we done updating?
+      else if(update_size>0 &&
+              m_offset>=offset_int+update_size)
+        break;
+
+      if(result_expr.is_nil())
+        result_expr=expr.op();
+
+      exprt member_name(ID_member_name);
+      member_name.set(ID_component_name, it->get_name());
+      result_expr=with_exprt(result_expr, member_name, nil_exprt());
+
+      // are we updating on member boundaries?
+      if(m_offset<offset_int ||
+         (m_offset==offset_int &&
+          update_size>0 &&
+          m_size_bytes>update_size))
+      {
+        byte_update_exprt v(
+          ID_byte_update_little_endian,
+          member_exprt(root, it->get_name(), it->type()),
+          from_integer(offset_int-m_offset, offset.type()),
+          value);
+
+        to_with_expr(result_expr).new_value().swap(v);
+      }
+      else if(update_size>0 &&
+              m_offset+m_size_bytes>offset_int+update_size)
+      {
+        // we don't handle this for the moment
+        result_expr.make_nil();
+        break;
+      }
+      else
+      {
+        byte_extract_exprt v(
+          ID_byte_extract_little_endian,
+          value,
+          from_integer(m_offset-offset_int, offset.type()),
+          it->type());
+
+        to_with_expr(result_expr).new_value().swap(v);
+      }
+    }
+
+    if(result_expr.is_not_nil())
+    {
+      simplify_rec(result_expr);
+      expr.swap(result_expr);
+
+      return false;
     }
   }
 
@@ -2198,7 +2255,7 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
                       from_integer(bytes_req, offset.type())));
 
         *it=byte_update_exprt(
-          bu_expr.id(),
+          expr.id(),
           *it,
           from_integer(offset_int+val_offset-m_offset_bits/8, offset.type()),
           new_val);
@@ -2320,7 +2377,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_member(expr) && result;
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
-    result=simplify_byte_update(expr) && result;
+    result=simplify_byte_update(to_byte_update_expr(expr)) && result;
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
     result=simplify_byte_extract(expr) && result;
