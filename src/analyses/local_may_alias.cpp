@@ -51,28 +51,6 @@ bool local_may_aliast::loc_infot::merge(const loc_infot &src)
 
 /*******************************************************************\
 
-Function: local_may_aliast::is_tracked
-
-  Inputs:
-
- Outputs: return 'true' iff we track the object with given
-          identifier
-
- Purpose:
-
-\*******************************************************************/
-
-bool local_may_aliast::is_tracked(const irep_idt &identifier) const
-{
-  localst::locals_mapt::const_iterator it=locals.locals_map.find(identifier);
-  if(it==locals.locals_map.end()) return false;
-  if(it->second.type().id()!=ID_pointer) return false;
-  if(dirty(identifier)) return false;
-  return true;
-}
-
-/*******************************************************************\
-
 Function: local_may_aliast::assign_lhs
 
   Inputs:
@@ -91,9 +69,7 @@ void local_may_aliast::assign_lhs(
 {
   if(lhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
-
-    if(is_tracked(identifier))
+    if(lhs.type().id()==ID_pointer)
     {
       unsigned dest_pointer=objects.number(lhs);
 
@@ -115,6 +91,26 @@ void local_may_aliast::assign_lhs(
   }
   else if(lhs.id()==ID_dereference)
   {
+    // this might invalidate all pointers that are
+    // a) local and dirty
+    // b) global
+    if(lhs.type().id()==ID_pointer)
+    {
+      for(std::size_t i=0; i<objects.size(); i++)
+      {
+        if(objects[i].id()==ID_symbol)
+        {
+          const irep_idt &identifier=to_symbol_expr(objects[i]).get_identifier();
+
+          if(dirty(identifier) || !locals.is_local(identifier))
+          {
+            loc_info_dest.aliases.isolate(i);
+            loc_info_dest.aliases.make_union(i, unknown_object);
+          }
+             
+        }
+      }
+    }
   }
   else if(lhs.id()==ID_index)
   {
@@ -239,9 +235,7 @@ void local_may_aliast::get_rec(
   }
   else if(rhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=to_symbol_expr(rhs).get_identifier();
-
-    if(is_tracked(identifier))
+    if(rhs.type().id()==ID_pointer)
     {
       unsigned src_pointer=objects.number(rhs);
       
@@ -461,6 +455,24 @@ void local_may_aliast::build(const goto_functiont &goto_function)
         const code_function_callt &code_function_call=to_code_function_call(instruction.code);
         if(code_function_call.lhs().is_not_nil())
           assign_lhs(code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
+
+        // this might invalidate all pointers that are
+        // a) local and dirty
+        // b) global
+        for(std::size_t i=0; i<objects.size(); i++)
+        {
+          if(objects[i].id()==ID_symbol)
+          {
+            const irep_idt &identifier=to_symbol_expr(objects[i]).get_identifier();
+
+            if(dirty(identifier) || !locals.is_local(identifier))
+            {
+              loc_info_dest.aliases.isolate(i);
+              loc_info_dest.aliases.make_union(i, unknown_object);
+            }
+               
+          }
+        }
       }
       break;
 
