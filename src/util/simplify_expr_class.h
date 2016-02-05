@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "type.h"
 #include "mp_arith.h"
 
+class byte_update_exprt;
 class exprt;
 class index_exprt;
 class member_exprt;
@@ -79,7 +80,7 @@ public:
   bool simplify_update(exprt &expr);
   bool simplify_index(exprt &expr);
   bool simplify_member(exprt &expr);
-  bool simplify_byte_update(exprt &expr);
+  bool simplify_byte_update(byte_update_exprt &expr);
   bool simplify_byte_extract(exprt &expr);
   bool simplify_pointer_object(exprt &expr);
   bool simplify_object_size(exprt &expr);
