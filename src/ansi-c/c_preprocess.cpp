@@ -728,10 +728,10 @@ bool c_preprocess_gcc_clang(
   switch(config.ansi_c.arch)
   {
   case configt::ansi_ct::archt::ARCH_I386:
-    command+=" -D __i386__"; break;
+    command+=" -D__i386__"; break;
   
   case configt::ansi_ct::archt::ARCH_X86_64:
-    command+=" -D __x86_64__"; break;
+    command+=" -D__x86_64__"; break;
   
   default:;
   }
