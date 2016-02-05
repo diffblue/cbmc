@@ -78,10 +78,16 @@ public:
     enum class ost { NO_OS, OS_LINUX, OS_MACOS, OS_WIN };
     ost os;
 
+    static std::string os_to_string(ost);
+    static ost string_to_os(const std::string &);
+
     enum class archt { NO_ARCH, ARCH_I386, ARCH_X86_64, ARCH_POWER, ARCH_ARM,
                        ARCH_ALPHA, ARCH_MIPS, ARCH_S390, ARCH_S390X, ARCH_SPARC,
                        ARCH_IA64, ARCH_X32, ARCH_V850 };
     archt arch;
+    
+    static std::string arch_to_string(archt);
+    static archt string_to_arch(const std::string &);
 
     // architecture-specific integer value of null pointer constant
     bool NULL_is_zero;
