@@ -1336,7 +1336,7 @@ void configt::set_from_symbol_table(
   namespacet ns(symbol_table);
   
   // first set architecture to get some defaults
-  set_arch(string_from_ns(ns, "architecture"));
+  set_arch(string_from_ns(ns, "arch"));
   
   // clear defines
   ansi_c.defines.clear();
