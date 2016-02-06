@@ -339,7 +339,7 @@ void ansi_c_architecture_strings(std::string &code)
   code+=architecture_string(config.ansi_c.alignment, "alignment");
   code+=architecture_string(config.ansi_c.memory_operand_size, "memory_operand_size");
   code+=architecture_string(int(config.ansi_c.endianness), "endianness");
-  code+=architecture_string(config.ansi_c.arch, "architecture");
+  code+=architecture_string(id2string(config.ansi_c.arch), "arch");
   code+=architecture_string(configt::ansi_ct::os_to_string(config.ansi_c.os), "os");
   code+=architecture_string(config.ansi_c.NULL_is_zero, "NULL_is_zero");
 }
