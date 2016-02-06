@@ -1297,12 +1297,13 @@ public:
   {
   }
 
+  // this one will go away; use the one with width
   inline explicit pointer_typet(const typet &_subtype):
     bitvector_typet(ID_pointer, _subtype)
   {
   }
 
-  inline explicit pointer_typet(const typet &_subtype, unsigned width):
+  inline pointer_typet(const typet &_subtype, unsigned width):
     bitvector_typet(ID_pointer, _subtype, width)
   {
   }
@@ -1348,13 +1349,14 @@ public:
     set(ID_C_reference, true);
   }
 
+  // this one will go away; use the one with width
   inline explicit reference_typet(const typet &_subtype):
     pointer_typet(_subtype)
   {
     set(ID_C_reference, true);
   }
 
-  inline explicit reference_typet(const typet &_subtype, unsigned _width):
+  inline reference_typet(const typet &_subtype, unsigned _width):
     pointer_typet(_subtype, _width)
   {
     set(ID_C_reference, true);
