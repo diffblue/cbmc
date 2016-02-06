@@ -1335,12 +1335,12 @@ void configt::set_from_symbol_table(
 
   namespacet ns(symbol_table);
   
-  // first set architecture to get some defaults
-  set_arch(string_from_ns(ns, "arch"));
-  
   // clear defines
   ansi_c.defines.clear();
 
+  // first set architecture to get some defaults
+  set_arch(string_from_ns(ns, "arch"));
+  
   ansi_c.int_width=unsigned_from_ns(ns, "int_width");
   ansi_c.long_int_width=unsigned_from_ns(ns, "long_int_width");
   ansi_c.bool_width=1*8;
