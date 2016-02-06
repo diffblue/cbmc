@@ -751,7 +751,7 @@ void goto_instrument_parse_optionst::get_goto_program()
     throw 0;
 
   config.set(cmdline);
-  config.ansi_c.set_from_symbol_table(symbol_table);
+  config.set_from_symbol_table(symbol_table);
 }
 
 /*******************************************************************\

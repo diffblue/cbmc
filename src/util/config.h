@@ -63,8 +63,6 @@ public:
     void set_ILP32(); // int=32, long=32, pointer=32
     void set_LP32();  // int=16, long=32, pointer=32
 
-    void set_from_symbol_table(const symbol_tablet &symbol_table);
-    
     // minimum alignment (in structs) measured in bytes
     unsigned alignment;
 
@@ -81,13 +79,7 @@ public:
     static std::string os_to_string(ost);
     static ost string_to_os(const std::string &);
 
-    enum class archt { NO_ARCH, ARCH_I386, ARCH_X86_64, ARCH_POWER, ARCH_ARM,
-                       ARCH_ALPHA, ARCH_MIPS, ARCH_S390, ARCH_S390X, ARCH_SPARC,
-                       ARCH_IA64, ARCH_X32, ARCH_V850 };
-    archt arch;
-    
-    static std::string arch_to_string(archt);
-    static archt string_to_arch(const std::string &);
+    irep_idt arch;
 
     // architecture-specific integer value of null pointer constant
     bool NULL_is_zero;
@@ -150,6 +142,10 @@ public:
 
   // this is the function to start executing
   std::string main;
+  
+  void set_arch(const irep_idt &);
+
+  void set_from_symbol_table(const symbol_tablet &);
   
   bool set(const cmdlinet &cmdline);
   
