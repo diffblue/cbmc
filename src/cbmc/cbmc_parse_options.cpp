@@ -757,7 +757,7 @@ int cbmc_parse_optionst::get_goto_program(
     }
 
     if(!binaries.empty())
-      config.ansi_c.set_from_symbol_table(symbol_table);
+      config.set_from_symbol_table(symbol_table);
 
     if(cmdline.isset("show-symbol-table"))
     {
