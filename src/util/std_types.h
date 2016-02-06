@@ -1348,7 +1348,14 @@ public:
     set(ID_C_reference, true);
   }
 
-  inline explicit reference_typet(const typet &_subtype):pointer_typet(_subtype)
+  inline explicit reference_typet(const typet &_subtype):
+    pointer_typet(_subtype)
+  {
+    set(ID_C_reference, true);
+  }
+
+  inline explicit reference_typet(const typet &_subtype, unsigned _width):
+    pointer_typet(_subtype, _width)
   {
     set(ID_C_reference, true);
   }
