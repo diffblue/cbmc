@@ -1212,7 +1212,7 @@ std::string configt::ansi_ct::os_to_string(ost os)
 {
   switch(os)
   {
-  case ost::OS_LINUX: return "os";
+  case ost::OS_LINUX: return "linux";
   case ost::OS_MACOS: return "macos";
   case ost::OS_WIN: return "win";
   default: return "none";
@@ -1221,7 +1221,7 @@ std::string configt::ansi_ct::os_to_string(ost os)
 
 /*******************************************************************\
 
-Function: configt::ansi_ct::os_to_string
+Function: configt::ansi_ct::string_to_os
 
   Inputs:
 
