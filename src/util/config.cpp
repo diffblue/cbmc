@@ -844,6 +844,8 @@ Function: configt::set_arch
 
 void configt::set_arch(const irep_idt &arch)
 {
+  ansi_c.arch=arch;
+
   if(arch=="none")
   {
     // the architecture for people who can't commit
