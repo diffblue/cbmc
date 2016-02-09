@@ -1267,9 +1267,6 @@ static irep_idt string_from_ns(
     
   const exprt &tmp=symbol->value;
   
-  if(tmp.id()==ID_string_constant)
-    return tmp.get(ID_value);
-    
   if(tmp.id()!=ID_address_of ||
      tmp.operands().size()!=1 ||
      tmp.op0().id()!=ID_index ||
@@ -1344,7 +1341,11 @@ void configt::set_from_symbol_table(
   ansi_c.defines.clear();
 
   // first set architecture to get some defaults
-  set_arch(string_from_ns(ns, "arch"));
+  if(symbol_table.symbols.find(CPROVER_PREFIX "architecture_" "arch")==
+     symbol_table.symbols.end())
+    set_arch(id2string(this_architecture()));
+  else
+    set_arch(string_from_ns(ns, "arch"));
   
   ansi_c.int_width=unsigned_from_ns(ns, "int_width");
   ansi_c.long_int_width=unsigned_from_ns(ns, "long_int_width");
@@ -1370,7 +1371,11 @@ void configt::set_from_symbol_table(
 
   ansi_c.endianness=(ansi_ct::endiannesst)unsigned_from_ns(ns, "endianness");
 
-  ansi_c.os=ansi_ct::string_to_os(id2string(string_from_ns(ns, "os")));
+  if(symbol_table.symbols.find(CPROVER_PREFIX "architecture_" "os")==
+     symbol_table.symbols.end())
+    ansi_c.os=ansi_ct::string_to_os(id2string(this_operating_system()));
+  else
+    ansi_c.os=ansi_ct::string_to_os(id2string(string_from_ns(ns, "os")));
 
   //NULL_is_zero=from_ns("NULL_is_zero");
   ansi_c.NULL_is_zero=true;
