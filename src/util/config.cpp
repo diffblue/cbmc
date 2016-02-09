@@ -1266,13 +1266,18 @@ static irep_idt string_from_ns(
     throw "failed to find "+id2string(id);
     
   const exprt &tmp=symbol->value;
+  
+  if(tmp.id()==ID_string_constant)
+    return tmp.get(ID_value);
     
   if(tmp.id()!=ID_address_of ||
      tmp.operands().size()!=1 ||
      tmp.op0().id()!=ID_index ||
      tmp.op0().operands().size()!=2 ||
      tmp.op0().op0().id()!=ID_string_constant)
+  {
     throw "symbol table configuration entry `"+id2string(id)+"' is not a string constant";
+  }
 
   return tmp.op0().op0().get(ID_value);
 }
