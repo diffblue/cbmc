@@ -60,10 +60,10 @@ public:
 
   virtual void lcnf(const bvt &bv)=0;
   virtual bool has_set_to() const { return true; }
+
   // Some solvers (notably aig) prefer encodings that avoid raw CNF
   // They overload this to return false and thus avoid some optimisations
   virtual bool cnf_handled_well() const { return true; }
-
   
   // assumptions
   virtual void set_assumptions(const bvt &_assumptions) { }
