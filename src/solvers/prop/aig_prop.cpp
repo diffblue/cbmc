@@ -327,13 +327,16 @@ Function: aig_prop_solvert::compute_phase
 
 \*******************************************************************/
 
-void aig_prop_solvert::compute_phase(std::vector<bool> &n_pos, std::vector<bool> &n_neg) {
+void aig_prop_solvert::compute_phase(
+  std::vector<bool> &n_pos,
+  std::vector<bool> &n_neg)
+{
   std::stack<literalt> queue;
 
   // Get phases of constraints
-  for(constraintst::const_iterator
-      c_it=constraints.begin();
-      c_it!=constraints.end();
+  for(aig_plus_constraintst::constraintst::const_iterator
+      c_it=aig.constraints.begin();
+      c_it!=aig.constraints.end();
       c_it++)
     queue.push(*c_it);
 
@@ -396,14 +399,17 @@ Function: aig_prop_solvert::usage_count
 
 \*******************************************************************/
 
-void aig_prop_solvert::usage_count(std::vector<unsigned> &p_usage_count, std::vector<unsigned> &n_usage_count) {
-
-  for (constraintst::const_iterator
-      c_it=constraints.begin();
-      c_it!=constraints.end();
-       c_it++) {
-    if (!((*c_it).is_constant())) {
-
+void aig_prop_solvert::usage_count(
+  std::vector<unsigned> &p_usage_count,
+  std::vector<unsigned> &n_usage_count)
+{
+  for(aig_plus_constraintst::constraintst::const_iterator
+      c_it=aig.constraints.begin();
+      c_it!=aig.constraints.end();
+      c_it++)
+  {
+    if (!((*c_it).is_constant()))
+    {
       if ((*c_it).sign()) {
         ++n_usage_count[(*c_it).var_no()];
       } else {
@@ -413,7 +419,8 @@ void aig_prop_solvert::usage_count(std::vector<unsigned> &p_usage_count, std::ve
     }
   }
 
-  for (unsigned n=0; n<aig.nodes.size(); n++) {
+  for (unsigned n=0; n<aig.nodes.size(); n++)
+  {
     const aigt::nodet &node=aig.nodes[n];
 
     if (node.is_and()) {
@@ -767,9 +774,9 @@ void aig_prop_solvert::convert_aig()
 
   
   // 3. Do constraints
-  for(constraintst::const_iterator
-      c_it=constraints.begin();
-      c_it!=constraints.end();
+  for(aig_plus_constraintst::constraintst::const_iterator
+      c_it=aig.constraints.begin();
+      c_it!=aig.constraints.end();
       c_it++)
   {
     solver.l_set_to(*c_it, true);

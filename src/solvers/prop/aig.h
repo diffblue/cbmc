@@ -137,4 +137,17 @@ protected:
 
 std::ostream &operator << (std::ostream &, const aigt &);
 
+class aig_plus_constraintst:public aigt
+{
+public:
+  typedef std::vector<literalt> constraintst;
+  constraintst constraints;
+  
+  inline void clear()
+  {
+    aigt::clear();
+    constraints.clear();
+  }
+};
+
 #endif
