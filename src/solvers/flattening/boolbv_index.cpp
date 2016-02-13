@@ -322,12 +322,7 @@ void boolbvt::convert_index(
 
   bv.resize(width);
 
-  // Expression simplification should remove these cases
-  assert(array.id() != ID_array_of &&
-         array.id() != ID_array);
-  // If not there are large improvements possible as above
-
-  // TODO : If the underlying array can use one of the
+  // TODO: If the underlying array can use one of the
   // improvements given above then it may be better to use
   // the array theory for short chains of updates and then
   // the improved array handling rather than full flattening.
