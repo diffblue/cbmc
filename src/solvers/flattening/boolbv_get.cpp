@@ -144,6 +144,14 @@ exprt boolbvt::bv_get_rec(
         return dest;
       }
     }
+    else if(type.id()==ID_struct_tag)
+    {
+      return bv_get_rec(bv, unknown, offset, ns.follow_tag(to_struct_tag_type(type)));
+    }
+    else if(type.id()==ID_union_tag)
+    {
+      return bv_get_rec(bv, unknown, offset, ns.follow_tag(to_union_tag_type(type)));
+    }
     else if(type.id()==ID_struct)
     {
       const struct_typet &struct_type=to_struct_type(type);
