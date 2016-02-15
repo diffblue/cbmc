@@ -41,6 +41,8 @@ public:
   inline const BDD &high() const;
   inline unsigned node_number() const;
   inline void clear();
+  
+  bool is_initialized() const { return node!=0; }
 
   // internal  
   explicit inline BDD(class node *_node);

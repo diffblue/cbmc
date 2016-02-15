@@ -191,7 +191,7 @@ protected:
 
 BDD apply::APP(const BDD &x, const BDD &y)
 {
-  assert(x.node!=NULL && y.node!=NULL);
+  assert(x.is_initialized() && y.is_initialized());
   assert(x.node->mgr==y.node->mgr);
 
   // dynamic programming
@@ -374,7 +374,7 @@ BDD restrictt::RES(const BDD &u)
 {
   // replace 'var' in 'u' by constant 'value'
 
-  assert(u.node!=NULL);
+  assert(u.is_initialized());
   mgr *mgr=u.node->mgr;
   
   BDD t;
