@@ -345,7 +345,7 @@ Function: c_typecastt::get_c_type
 \*******************************************************************/
 
 c_typecastt::c_typet c_typecastt::get_c_type(
-  const typet &type)
+  const typet &type) const
 {
   unsigned width=type.get_int(ID_width);
 
@@ -495,10 +495,54 @@ Function: c_typecastt::implicit_typecast_arithmetic
 
 \*******************************************************************/
 
+c_typecastt::c_typet c_typecastt::minimum_promotion(
+  const typet &type) const
+{
+  c_typet c_type=get_c_type(type);
+
+  // 6.3.1.1, par 2
+
+  // "If an int can represent all values of the original type, the
+  // value is converted to an int; otherwise, it is converted to
+  // an unsigned int."
+
+  c_typet max_type=std::max(c_type, INT); // minimum promotion
+
+  // The second case can arise if we promote any unsigned type
+  // that is as large as unsigned int.
+
+  if(config.ansi_c.short_int_width==config.ansi_c.int_width &&
+     max_type==USHORT)
+    max_type=UINT;
+  else if(config.ansi_c.char_width==config.ansi_c.int_width &&
+          max_type==UCHAR)
+    max_type=UINT;
+  else
+    max_type=std::max(max_type, INT);
+
+  if(max_type==UINT &&
+     type.id()==ID_c_bit_field &&
+     to_c_bit_field_type(type).get_width()<config.ansi_c.int_width)
+    max_type=INT;
+
+  return max_type;
+}
+
+/*******************************************************************\
+
+Function: c_typecastt::implicit_typecast_arithmetic
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void c_typecastt::implicit_typecast_arithmetic(exprt &expr)
 {
-  c_typet c_type=get_c_type(expr.type());
-  c_type=std::max(c_type, INT); // minimum promotion
+  c_typet c_type=minimum_promotion(expr.type());
   implicit_typecast_arithmetic(expr, c_type);
 }
 
@@ -681,26 +725,10 @@ void c_typecastt::implicit_typecast_arithmetic(
   const typet &type1=ns.follow(expr1.type());
   const typet &type2=ns.follow(expr2.type());
 
-  c_typet c_type1=get_c_type(type1),
-          c_type2=get_c_type(type2);
+  c_typet c_type1=minimum_promotion(type1),
+          c_type2=minimum_promotion(type2);
 
   c_typet max_type=std::max(c_type1, c_type2);
-
-  // "If an int can represent all values of the original type, the
-  // value is converted to an int; otherwise, it is converted to
-  // an unsigned int."
-  
-  // The second case can arise if we promote any unsigned type
-  // that is as large as unsigned int.
-
-  if(config.ansi_c.short_int_width==config.ansi_c.int_width &&
-     max_type==USHORT)
-    max_type=UINT;
-  else if(config.ansi_c.char_width==config.ansi_c.int_width &&
-          max_type==UCHAR)
-    max_type=UINT;
-  else
-    max_type=std::max(max_type, INT);
 
   if(max_type==LARGE_SIGNED_INT || max_type==LARGE_UNSIGNED_INT)
   {
