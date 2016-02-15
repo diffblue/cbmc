@@ -443,6 +443,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("graphml-cex"))
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
 
+  if(cmdline.isset("json-cex"))
+    options.set_option("json-cex", cmdline.get_value("json-cex"));
+
   if(cmdline.isset("danger"))
   {
     unsigned int min_prog_size=1u;

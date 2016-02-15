@@ -92,9 +92,9 @@ public:
       return it->second;
   }
   
-  inline jsont &push_back()
+  inline jsont &push_back(const jsont &json)
   {
-    array.push_back(jsont());
+    array.push_back(json);
     return array.back();
   }
 
