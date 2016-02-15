@@ -4,7 +4,7 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       mp_arith.cpp namespace.cpp parse_options.cpp rename.cpp \
       replace_expr.cpp threeval.cpp typecheck.cpp graph.cpp \
       type.cpp cnf_simplify.cpp pointer_predicates.cpp merge_irep.cpp \
-      parser.cpp replace_symbol.cpp \
+      parser.cpp replace_symbol.cpp json.cpp \
       simplify_expr.cpp simplify_expr_floatbv.cpp simplify_expr_int.cpp \
       simplify_expr_array.cpp simplify_expr_struct.cpp \
       simplify_expr_boolean.cpp simplify_expr_pointer.cpp \
