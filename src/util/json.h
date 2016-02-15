@@ -67,6 +67,10 @@ public:
   inline jsont(kindt _kind, const std::string &_value):kind(_kind), value(_value)
   {
   }
+  
+  inline explicit jsont(const std::string &s):kind(J_STRING), value(s)
+  {
+  }
 
   typedef std::vector<jsont> arrayt;
   arrayt array;
@@ -87,6 +91,12 @@ public:
     else
       return it->second;
   }
+  
+  inline jsont &push_back()
+  {
+    array.push_back(jsont());
+    return array.back();
+  }
 
   std::string value;
 
@@ -106,6 +116,11 @@ public:
   {
     return jsont(J_FALSE);
   }
+  
+  inline static jsont json_boolean(bool value)
+  {
+    return jsont(value?J_TRUE:J_FALSE);
+  }  
   
   inline static jsont json_null()
   {
