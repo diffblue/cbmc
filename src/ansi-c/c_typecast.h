@@ -78,7 +78,7 @@ protected:
                  COMPLEX,
                  VOIDPTR, PTR, OTHER };
 
-  c_typet get_c_type(const typet &type);
+  c_typet get_c_type(const typet &type) const;
 
   void implicit_typecast_arithmetic(
     exprt &expr,
@@ -94,6 +94,8 @@ protected:
     const typet &dest_type);
 
   void do_typecast(exprt &dest, const typet &type);
+
+  c_typet minimum_promotion(const typet &type) const;
 };
 
 #endif
