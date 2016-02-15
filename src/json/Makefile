@@ -1,4 +1,4 @@
-SRC = json.cpp json_parser.cpp json_y.tab.cpp json_lex.yy.cpp
+SRC = json_parser.cpp json_y.tab.cpp json_lex.yy.cpp
 
 INCLUDES= -I ..
 
