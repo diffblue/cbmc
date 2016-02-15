@@ -182,6 +182,7 @@ void convert(
 
         const symbolt &symbol=ns.lookup(it->identifier);
         jsont &json_function=json_call_return["function"];
+        json_function=jsont::json_object();
         json_function["display_name"]=jsont(id2string(symbol.display_name()));
         json_function["identifier"]=jsont(id2string(it->identifier));
         json_function["source_location"]=json(symbol.location);
