@@ -73,12 +73,13 @@ Function: endianness_mapt::build_little_endian
 void endianness_mapt::build_little_endian(const typet &src)
 {
   mp_integer s=pointer_offset_bits(src, ns); // error is -1
+  if(s<=0) return;
   
-  while(s>0)
-  {
-    map.push_back(map.size());
-    --s;
-  }
+  std::size_t new_size=map.size()+integer2long(s);
+  map.reserve(new_size);
+
+  for(std::size_t i=map.size(); i<new_size; ++i)
+    map.push_back(i);
 }
 
 /*******************************************************************\
@@ -150,10 +151,12 @@ void endianness_mapt::build_big_endian(const typet &src)
     // everything else (unions in particular)
     // is treated like a byte-array
     mp_integer s=pointer_offset_bits(src, ns); // error is -1
-    while(s>0)
-    {
-      map.push_back(map.size());
-      --s;
-    }
+    if(s<=0) return;
+
+    std::size_t new_size=map.size()+integer2long(s);
+    map.reserve(new_size);
+
+    for(std::size_t i=map.size(); i<new_size; ++i)
+      map.push_back(i);
   }
 }
