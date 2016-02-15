@@ -5,18 +5,18 @@
 namespace miniBDD
 {
 
-BDD::BDD():node(NULL)
+BDD::BDD():node(0)
 {
 }
 
 BDD::BDD(const BDD &x):node(x.node)
 {
-  if(node!=NULL) node->add_reference();
+  if(is_initialized()) node->add_reference();
 }
 
 BDD::BDD(class node *_node):node(_node)
 {
-  if(node!=NULL) node->add_reference();
+  if(is_initialized()) node->add_reference();
 }
 
 BDD &BDD::operator=(const BDD &x)
@@ -26,7 +26,7 @@ BDD &BDD::operator=(const BDD &x)
 
   node=x.node;
 
-  if(node!=NULL) node->add_reference();
+  if(is_initialized()) node->add_reference();
 
   return *this;
 }
@@ -38,51 +38,51 @@ BDD::~BDD()
 
 bool BDD::is_constant() const
 {
-  assert(node!=NULL);
+  assert(is_initialized());
   return node->node_number<=1;
 }
 
 bool BDD::is_true() const
 {
-  assert(node!=NULL);
+  assert(is_initialized());
   return node->node_number==1;
 }
 
 bool BDD::is_false() const
 {
-  assert(node!=NULL);
+  assert(is_initialized());
   return node->node_number==0;
 }
 
 unsigned BDD::var() const
 {
-  assert(node!=NULL);
+  assert(is_initialized());
   return node->var;
 }
 
 unsigned BDD::node_number() const
 {
-  assert(node!=NULL);
+  assert(is_initialized());
   return node->node_number;
 }
 
 const BDD &BDD::low() const
 {
-  assert(node!=NULL);
+  assert(is_initialized());
   assert(node->node_number>=2);
   return node->low;
 }
 
 const BDD &BDD::high() const
 {
-  assert(node!=NULL);
+  assert(is_initialized());
   assert(node->node_number>=2);
   return node->high;
 }
 
 void BDD::clear()
 {
-  if(node!=NULL)
+  if(is_initialized())
   {
     node->remove_reference();
     node=NULL;
