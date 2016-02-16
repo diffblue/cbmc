@@ -59,17 +59,6 @@ public:
 
   typedef unsigned long long bit_vectort;
   
-  inline void set_bit(bit_vectort &dest, unsigned bit_nr)
-  {
-    dest|=(1l<<bit_nr);
-  }
-  
-  inline void clear_bit(bit_vectort &dest, unsigned bit_nr)
-  {
-    dest|=(1l<<bit_nr);
-    dest^=(1l<<bit_nr);
-  }  
-  
   typedef std::map<irep_idt, bit_vectort> bitst;
   
   struct vectorst
@@ -110,6 +99,19 @@ protected:
 
   void set_bit(const exprt &, unsigned bit_nr, modet);
   void set_bit(const irep_idt &, unsigned bit_nr, modet);
+
+  inline void set_bit(bit_vectort &dest, unsigned bit_nr)
+  {
+    dest|=(1l<<bit_nr);
+  }
+  
+  inline void clear_bit(bit_vectort &dest, unsigned bit_nr)
+  {
+    dest|=(1l<<bit_nr);
+    dest^=(1l<<bit_nr);
+  }  
+  
+  void erase_blank_vectors(bitst &);  
 };
 
 class custom_bitvector_analysist:public ait<custom_bitvector_domaint> 

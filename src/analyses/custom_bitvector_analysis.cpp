@@ -325,15 +325,25 @@ void custom_bitvector_domaint::transform(
                to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
             {
               if(mode==CLEAR_MAY)
+              {
                 for(bitst::iterator b_it=may_bits.begin();
                     b_it!=may_bits.end();
                     b_it++)
                   clear_bit(b_it->second, bit_nr);
+
+                // erase blank ones
+                erase_blank_vectors(may_bits);
+              }
               else if(mode==CLEAR_MUST)
+              {
                 for(bitst::iterator b_it=must_bits.begin();
                     b_it!=must_bits.end();
                     b_it++)
                   clear_bit(b_it->second, bit_nr);
+
+                // erase blank ones
+                erase_blank_vectors(must_bits);
+              }
             }
             else
             {
@@ -495,28 +505,35 @@ bool custom_bitvector_domaint::merge(
   }
   
   // erase blank ones
-  for(bitst::iterator a_it=may_bits.begin();
-      a_it!=may_bits.end();
-      )
-  {
-    if(a_it->second==0)
-      a_it=may_bits.erase(a_it);
-    else
-      a_it++;
-  }
-  
-  // erase blank ones
-  for(bitst::iterator a_it=must_bits.begin();
-      a_it!=must_bits.end();
-      )
-  {
-    if(a_it->second==0)
-      a_it=must_bits.erase(a_it);
-    else
-      a_it++;
-  }
+  erase_blank_vectors(may_bits);
+  erase_blank_vectors(must_bits);
 
   return changed;
+}
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::erase_blank_vectors
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: erase blank bitvectors
+
+\*******************************************************************/
+
+void custom_bitvector_domaint::erase_blank_vectors(bitst &bits)
+{
+  for(bitst::iterator a_it=bits.begin();
+      a_it!=bits.end();
+      )
+  {
+    if(a_it->second==0)
+      a_it=bits.erase(a_it);
+    else
+      a_it++;
+  }
 }
 
 /*******************************************************************\
