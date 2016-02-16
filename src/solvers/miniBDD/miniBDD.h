@@ -1,11 +1,23 @@
-// A minimalistic BDD library, following Bryant's original paper
-// and Henrik Reif Andersen's lecture notes
-//
-// Written by Daniel Kroening on the 28th of September 2009
+/*******************************************************************\
 
-#ifndef miniBDD_H
-#define miniBDD_H
+Module: A minimalistic BDD library, following Bryant's original paper
+        and Andersen's lecture notes
 
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
+#ifndef CPROVER_MINIBDD_H
+#define CPROVER_MINIBDD_H
+
+/*! \file solvers/miniBDD/miniBDD.h
+ * \brief Small BDD implementation
+ *
+ * \author Daniel Kroening <kroening@kroening.com>
+ * \date   Mon Sep 28 00:00:00 BST 2009
+*/
+
+#include <cassert>
 #include <list>
 #include <vector>
 #include <map>
