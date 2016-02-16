@@ -146,6 +146,20 @@ void endianness_mapt::build_big_endian(const typet &src)
       }
     }
   }
+  else if(src.id()==ID_vector)
+  {
+    const vector_typet &vector_type=to_vector_type(src);
+
+    mp_integer s;
+    if(to_integer(vector_type.size(), s))
+      assert(false);
+
+    while(s>0)
+    {
+      build_big_endian(vector_type.subtype());
+      --s;
+    }
+  }
   else
   {
     // everything else (unions in particular)
