@@ -363,7 +363,7 @@ void dump_ct::convert_compound(
     if(type.id()==ID_array)
     {
       find_symbols_sett syms;
-      find_type_symbols(to_array_type(type).size(), syms);
+      find_non_pointer_type_symbols(to_array_type(type).size(), syms);
 
       for(find_symbols_sett::const_iterator
           it=syms.begin();
@@ -458,7 +458,11 @@ void dump_ct::convert_compound(
        comp.get_is_padding())
       continue;
 
-    if(recursive && comp_type.id()!=ID_pointer)
+    const typet *non_array_type=&ns.follow(comp_type);
+    while(non_array_type->id()==ID_array)
+      non_array_type=&(ns.follow(non_array_type->subtype()));
+
+    if(recursive && non_array_type->id()!=ID_pointer)
       convert_compound(comp.type(), comp.type(), recursive, os);
 
     irep_idt comp_name=comp.get_name();
