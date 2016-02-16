@@ -124,7 +124,7 @@ void stack_depth(
   const exprt depth_expr(from_integer(depth, sym.type()));
 
   Forall_goto_functions(f_it, goto_functions)
-    if(f_it->second.body_available &&
+    if(f_it->second.body_available() &&
         f_it->first!=CPROVER_PREFIX "initialize" &&
         f_it->first!=goto_functionst::entry_point())
       stack_depth(f_it->second.body, sym, depth, depth_expr);

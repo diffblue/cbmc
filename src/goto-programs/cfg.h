@@ -377,7 +377,7 @@ void cfg_baset<T, P, I>::compute_edges_function_call(
     goto_functions.function_map.find(identifier);
 
   if(f_it!=goto_functions.function_map.end() &&
-     f_it->second.body_available)
+     f_it->second.body_available())
   {
     // get the first instruction
     goto_programt::const_targett i_it=
@@ -563,7 +563,7 @@ void cfg_baset<T, P, I>::compute_edges(
   const goto_functionst &goto_functions)
 {
   forall_goto_functions(it, goto_functions)
-    if(it->second.body_available)
+    if(it->second.body_available())
       compute_edges(goto_functions, it->second.body);
 }
 

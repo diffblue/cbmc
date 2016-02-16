@@ -793,7 +793,7 @@ unsigned compilet::function_body_count(const goto_functionst &functions)
       functions.function_map.begin();
       it != functions.function_map.end();
       it++)
-    if(it->second.body_available)
+    if(it->second.body_available())
       fbs++;
 
   return fbs;

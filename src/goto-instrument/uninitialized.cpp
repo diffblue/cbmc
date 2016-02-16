@@ -267,7 +267,7 @@ void show_uninitialized(
 
   forall_goto_functions(f_it, goto_functions)
   {
-    if(f_it->second.body_available)
+    if(f_it->second.body_available())
     {
       out << "////" << std::endl;
       out << "//// Function: " << f_it->first << std::endl;

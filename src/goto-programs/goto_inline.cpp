@@ -408,7 +408,7 @@ void goto_inlinet::expand_function_call(
   // see if we need to inline this  
   if(!full)
   {
-    if(!f.body_available ||
+    if(!f.body_available() ||
        (!f.is_inlined() && f.body.instructions.size() > smallfunc_limit))
     {
       target++;
@@ -416,7 +416,7 @@ void goto_inlinet::expand_function_call(
     }
   }
 
-  if(f.body_available)
+  if(f.body_available())
   {
     recursion_set.insert(identifier);
 
@@ -723,10 +723,7 @@ void goto_inline(
       it!=goto_functions.function_map.end();
       it++)
     if(it->first!=goto_functionst::entry_point())
-    {
-      it->second.body_available=false;
       it->second.body.clear();
-    }
 }
 
 /*******************************************************************\
@@ -780,7 +777,7 @@ void goto_partial_inline(
         it=goto_functions.function_map.begin();
         it!=goto_functions.function_map.end();
         it++)
-      if(it->second.body_available)
+      if(it->second.body_available())
         goto_inline.goto_inline_rec(it, false);
   }
 

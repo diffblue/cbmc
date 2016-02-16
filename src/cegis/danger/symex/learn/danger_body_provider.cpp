@@ -27,6 +27,6 @@ const goto_programt &danger_body_providert::operator ()()
   const goto_functionst::function_mapt::const_iterator it=function_map.find(id);
   assert(function_map.end() != it);
   const goto_function_templatet<goto_programt> &f=it->second;
-  assert(f.body_available);
+  assert(f.body_available());
   return f.body;
 }

@@ -39,7 +39,7 @@ void ai_baset::output(
       f_it!=goto_functions.function_map.end();
       f_it++)
   {
-    if(f_it->second.body_available)
+    if(f_it->second.body_available())
     {
       out << "////\n";
       out << "//// Function: " << f_it->first << "\n";
@@ -347,7 +347,7 @@ bool ai_baset::do_function_call(
   const goto_functionst::goto_functiont &goto_function=
     f_it->second;
 
-  if(!goto_function.body_available)
+  if(!goto_function.body_available())
   {
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
     tmp_state->transform(l_call, l_return, *this, ns);

@@ -398,7 +398,7 @@ void full_slicert::operator()(
   // by skips
 
   Forall_goto_functions(f_it, goto_functions)
-    if(f_it->second.body_available)
+    if(f_it->second.body_available())
     {
       Forall_goto_program_instructions(i_it, f_it->second.body)
       {

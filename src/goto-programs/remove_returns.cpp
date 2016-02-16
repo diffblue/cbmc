@@ -167,7 +167,7 @@ void remove_returnst::do_function_calls(
         {
           exprt rhs;
           
-          if(f_it->second.body_available)
+          if(f_it->second.body_available())
           {
             symbol_exprt return_value;
             return_value.type()=function_call.lhs().type();
@@ -191,7 +191,7 @@ void remove_returnst::do_function_calls(
           // fry the previous assignment
           function_call.lhs().make_nil();
 
-          if(f_it->second.body_available)
+          if(f_it->second.body_available())
           {
             goto_programt::targett t_d=goto_program.insert_after(t_a);
             t_d->make_dead();

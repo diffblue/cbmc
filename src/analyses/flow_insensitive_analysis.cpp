@@ -342,7 +342,7 @@ bool flow_insensitive_analysis_baset::do_function_call(
 {
   const goto_functionst::goto_functiont &goto_function=f_it->second;
 
-  if(!goto_function.body_available)
+  if(!goto_function.body_available())
   {
     const code_function_callt &code = 
       to_code_function_call(to_code(l_call->code));

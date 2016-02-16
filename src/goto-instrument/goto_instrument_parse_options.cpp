@@ -386,7 +386,7 @@ int goto_instrument_parse_optionst::doit()
 
       forall_goto_functions(f_it, goto_functions)
       {
-        if(f_it->second.body_available)
+        if(f_it->second.body_available())
         {
           std::cout << "////" << std::endl;
           std::cout << "//// Function: " << f_it->first << std::endl;
@@ -409,7 +409,7 @@ int goto_instrument_parse_optionst::doit()
 
       forall_goto_functions(f_it, goto_functions)
       {
-        if(f_it->second.body_available)
+        if(f_it->second.body_available())
         {
           std::cout << "////" << std::endl;
           std::cout << "//// Function: " << f_it->first << std::endl;
@@ -494,7 +494,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("list-undefined-functions"))
     {
       Forall_goto_functions(it, goto_functions)
-        if(!it->second.body_available)
+        if(!it->second.body_available())
           std::cout << it->first << std::endl;
       return 0;
     }
