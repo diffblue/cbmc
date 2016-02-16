@@ -288,6 +288,9 @@ void bmct::show_program()
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end(); it++)
   {
+    std::cout << "// " << it->source.pc->location_number << " ";
+    std::cout << it->source.pc->source_location.as_string() << "\n";
+
     if(it->is_assignment())
     {
       std::string string_value;
@@ -308,6 +311,47 @@ void bmct::show_program()
       std::string string_value;
       languages.from_expr(it->cond_expr, string_value);
       std::cout << "(" << count << ") ASSERT("
+                << string_value <<") " << "\n";
+
+      if(!it->guard.is_true())
+      {
+        languages.from_expr(it->guard, string_value);
+        std::cout << std::string(i2string(count).size()+3, ' ');
+        std::cout << "guard: " << string_value << "\n";
+      }
+
+      count++;
+    }  
+    else if(it->is_assume())
+    {
+      std::string string_value;
+      languages.from_expr(it->cond_expr, string_value);
+      std::cout << "(" << count << ") ASSUME("
+                << string_value <<") " << "\n";
+
+      if(!it->guard.is_true())
+      {
+        languages.from_expr(it->guard, string_value);
+        std::cout << std::string(i2string(count).size()+3, ' ');
+        std::cout << "guard: " << string_value << "\n";
+      }
+
+      count++;
+    }  
+    else if(it->is_constraint())
+    {
+      std::string string_value;
+      languages.from_expr(it->cond_expr, string_value);
+      std::cout << "(" << count << ") CONSTRAINT("
+                << string_value <<") " << "\n";
+
+      count++;
+    }  
+    else if(it->is_shared_read() || it->is_shared_write())
+    {
+      std::string string_value;
+      languages.from_expr(it->ssa_lhs, string_value);
+      std::cout << "(" << count << ") SHARED_" << (it->is_shared_write()?"WRITE":"READ") << "("
                 << string_value <<") " << "\n";
 
       if(!it->guard.is_true())
