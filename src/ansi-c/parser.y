@@ -1008,6 +1008,21 @@ type_qualifier:
         | TOK_PTR32                 { $$=$1; set($$, ID_ptr32); }
         | TOK_PTR64                 { $$=$1; set($$, ID_ptr64); }
         | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); mto($$, $3); }
+        | alignas_specifier
+        ;
+
+alignas_specifier:
+          TOK_ALIGNAS '(' comma_expression ')'
+        { $$ = $1;
+          stack($$).id(ID_aligned);
+          stack($$).set(ID_size, stack($3));
+        }
+        | TOK_ALIGNAS '(' type_name ')'
+        { $$ = $1;
+          stack($$).id(ID_aligned);
+          stack($3).set(ID_type_arg, stack($3));
+          stack($$).set(ID_size, stack($3));
+        }
         ;
 
 attribute_or_type_qualifier:
