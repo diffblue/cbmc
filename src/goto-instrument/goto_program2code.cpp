@@ -617,13 +617,25 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   if(next!=upper_bound &&
      move_to_dest &&
      !next->is_target() &&
-     next->is_assign())
+     (next->is_assign() || next->is_function_call()))
   {
-    const code_assignt &a=to_code_assign(next->code);
-    if(a.lhs()==symbol &&
-       va_list_expr.find(a.lhs())==va_list_expr.end())
+    exprt lhs=next->is_assign() ?
+      to_code_assign(next->code).lhs() :
+      to_code_function_call(next->code).lhs();
+    if(lhs==symbol &&
+       va_list_expr.find(lhs)==va_list_expr.end())
     {
-      d.copy_to_operands(a.rhs());
+      if(next->is_assign())
+        d.copy_to_operands(to_code_assign(next->code).rhs());
+      else
+      {
+        // could hack this by just erasing the first operand
+        const code_function_callt &f=to_code_function_call(next->code);
+        side_effect_expr_function_callt call;
+        call.function()=f.function();
+        call.arguments()=f.arguments();
+        d.copy_to_operands(call);
+      }
 
       ++target;
       convert_labels(target, dest);
@@ -1778,8 +1790,19 @@ void goto_program2codet::cleanup_code(
     if(va_list_expr.find(code.op0())!=va_list_expr.end())
       code.op0().type().id(ID_gcc_builtin_va_list);
 
-    Forall_operands(it, code)
-      cleanup_expr(*it, true);
+    if(code.operands().size()==2 &&
+       code.op1().id()==ID_side_effect &&
+       to_side_effect_expr(code.op1()).get_statement()==ID_function_call)
+    {
+      side_effect_expr_function_callt &call=
+        to_side_effect_expr_function_call(code.op1());
+      cleanup_function_call(call.function(), call.arguments());
+
+      cleanup_expr(code.op1(), false);
+    }
+    else
+      Forall_operands(it, code)
+        cleanup_expr(*it, true);
 
     if(code.op0().type().id()==ID_array)
       cleanup_expr(to_array_type(code.op0().type()).size(), true);
@@ -1788,32 +1811,11 @@ void goto_program2codet::cleanup_code(
 
     return;
   }
-  else if(code.get_statement()==ID_function_call &&
-          to_code_function_call(code).function().id()==ID_symbol)
+  else if(code.get_statement()==ID_function_call)
   {
     code_function_callt &call=to_code_function_call(code);
-    const symbol_exprt &fn=to_symbol_expr(call.function());
-    code_function_callt::argumentst &arguments=call.arguments();
 
-    // don't edit function calls we might have introduced
-    const symbolt *s;
-    if(!ns.lookup(fn.get_identifier(), s))
-    {
-      const symbolt &fn_sym=ns.lookup(fn.get_identifier());
-      const code_typet &code_type=to_code_type(fn_sym.type);
-      const code_typet::parameterst &parameters=code_type.parameters();
-
-      if(parameters.size()==arguments.size())
-      {
-        code_typet::parameterst::const_iterator it=parameters.begin();
-        Forall_expr(it2, arguments)
-        {
-          if(ns.follow(it2->type()).id()==ID_union)
-            it2->type()=it->type();
-          ++it;
-        }
-      }
-    }
+    cleanup_function_call(call.function(), call.arguments());
 
     while(call.lhs().is_not_nil() &&
           call.lhs().id()==ID_typecast)
@@ -1863,6 +1865,48 @@ void goto_program2codet::cleanup_code(
     else if(do_while.cond().is_false() &&
             do_while.body().get_statement()!=ID_block)
       code=do_while.body();
+  }
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::cleanup_function_call
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::cleanup_function_call(
+  const exprt &function,
+  code_function_callt::argumentst &arguments)
+{
+  if(function.id()!=ID_symbol)
+    return;
+
+  const symbol_exprt &fn=to_symbol_expr(function);
+
+  // don't edit function calls we might have introduced
+  const symbolt *s;
+  if(!ns.lookup(fn.get_identifier(), s))
+  {
+    const symbolt &fn_sym=ns.lookup(fn.get_identifier());
+    const code_typet &code_type=to_code_type(fn_sym.type);
+    const code_typet::parameterst &parameters=code_type.parameters();
+
+    if(parameters.size()==arguments.size())
+    {
+      code_typet::parameterst::const_iterator it=parameters.begin();
+      Forall_expr(it2, arguments)
+      {
+        if(ns.follow(it2->type()).id()==ID_union)
+          it2->type()=it->type();
+        ++it;
+      }
+    }
   }
 }
 
@@ -2277,10 +2321,9 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       symbol_exprt symbol_expr(symbol.name, symbol.type);
       symbol_expr.add_source_location()=expr.source_location();
       
-      side_effect_exprt call(ID_function_call);
+      side_effect_expr_function_callt call;
       call.add_source_location()=expr.source_location();
-      call.operands().resize(2);
-      call.op0()=symbol_expr;
+      call.function()=symbol_expr;
       call.type()=expr.type();
       
       expr.swap(call);
