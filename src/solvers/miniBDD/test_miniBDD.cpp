@@ -50,6 +50,39 @@ void test3()
   //mgr.DumpTable(std::cout);
 }
 
+#if 0
+#include <langapi/language_util.h>
+#include <langapi/mode.h>
+#include <ansi-c/ansi_c_language.h>
+
+// link against
+// ../langapi/langapi$(LIBEXT) ../ansi-c/ansi-c$(LIBEXT) ../linking/linking$(LIBEXT)
+
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
+#include <util/namespace.h>
+
+void test4()
+{
+  register_language(new_ansi_c_language);
+
+  symbol_exprt a("a", bool_typet());
+  symbol_exprt b("b", bool_typet());
+
+  or_exprt o(and_exprt(a, b), not_exprt(a));
+
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  std::cout << from_expr(ns, "", o) << std::endl;
+
+  bdd_exprt t(ns);
+  t.from_expr(o);
+
+  std::cout << from_expr(ns, "", t.as_expr()) << std::endl;
+}
+#endif
+
 int main()
 {
   test3();
