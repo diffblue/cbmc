@@ -1021,7 +1021,6 @@ alignas_specifier:
         { $$ = $1;
           stack($$).id(ID_aligned);
           stack($3).set(ID_type_arg, stack($3));
-          stack($$).set(ID_size, stack($3));
         }
         ;
 
