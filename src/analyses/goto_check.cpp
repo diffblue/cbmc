@@ -88,17 +88,9 @@ protected:
   
   void invalidate(const exprt &lhs);
   
-  static bool has_dereference(const exprt &src)
+  inline static bool has_dereference(const exprt &src)
   {
-    if(src.id()==ID_dereference)
-      return true;
-    else
-    {
-      forall_operands(it, src)
-        if(has_dereference(*it)) return true;
-
-      return false;
-    }
+    return has_subexpr(src, ID_dereference);
   }
 
   bool enable_bounds_check;

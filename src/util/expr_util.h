@@ -52,3 +52,6 @@ exprt is_not_zero(const exprt &, const namespacet &ns);
 /*! negate a Boolean expression, possibly removing a not_exprt,
     and swapping false and true */
 exprt boolean_negate(const exprt &);
+
+/*! returns true if the expression has a subexpresion with given ID */
+bool has_subexpr(const exprt &, const irep_idt &);

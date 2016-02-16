@@ -60,20 +60,7 @@ Function: value_set_dereferencet::has_dereference
 
 bool value_set_dereferencet::has_dereference(const exprt &expr)
 {
-  forall_operands(it, expr)
-    if(has_dereference(*it))
-      return true;
-
-  if(expr.id()==ID_dereference)
-    return true;
-
-  // we no longer do this one
-  if(expr.id()==ID_index &&
-     expr.operands().size()==2 &&
-     expr.op0().type().id()==ID_pointer)
-    assert(false);  
-
-  return false;
+  return has_subexpr(expr, ID_dereference);
 }
 
 /*******************************************************************\
