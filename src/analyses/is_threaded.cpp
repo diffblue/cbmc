@@ -8,32 +8,51 @@ Date: October 2012
 
 \*******************************************************************/
 
-#include "static_analysis.h"
+#include "ai.h"
 #include "is_threaded.h"
 
-class is_threaded_domaint:public domain_baset
+class is_threaded_domaint:public ai_domain_baset
 {
+  bool has_spawn;
 public:
   bool is_threaded;
   
-  inline is_threaded_domaint():is_threaded(false)
+  inline is_threaded_domaint():has_spawn(false), is_threaded(false)
   {
   }
 
-  inline bool merge(const is_threaded_domaint &other, locationt to)
-  {
-    bool old=is_threaded;
-    is_threaded=is_threaded || other.is_threaded;
-    return old!=is_threaded;
-  }
-  
-  void transform(
-    const namespacet &ns,
+  inline bool merge(
+    const is_threaded_domaint &src,
     locationt from,
     locationt to)
   {
-    if(from->is_start_thread())
+    bool old_h_s=has_spawn;
+    if(src.has_spawn &&
+       (from->is_end_function() ||
+        from->function==to->function))
+      has_spawn=true;
+
+    bool old_i_t=is_threaded;
+    if(has_spawn ||
+       (src.is_threaded &&
+       !from->is_end_function()))
       is_threaded=true;
+
+    return old_i_t!=is_threaded || old_h_s!=has_spawn;
+  }
+  
+  void transform(
+    locationt from,
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns)
+  {
+    if(from->is_start_thread() ||
+       to->is_end_thread())
+    {
+      has_spawn=true;
+      is_threaded=true;
+    }
   }
 };
 
@@ -55,9 +74,9 @@ void is_threadedt::compute(const goto_functionst &goto_functions)
   symbol_tablet symbol_table;
   const namespacet ns(symbol_table);
 
-  static_analysist<is_threaded_domaint> is_threaded_analysis(ns);
+  ait<is_threaded_domaint> is_threaded_analysis;
   
-  is_threaded_analysis(goto_functions);
+  is_threaded_analysis(goto_functions, ns);
   
   for(goto_functionst::function_mapt::const_iterator
       f_it=goto_functions.function_map.begin();
