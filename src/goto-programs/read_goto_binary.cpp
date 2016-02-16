@@ -311,7 +311,6 @@ static bool link_functions(
         dest_functions.function_map[final_id];
 
       in_dest_symbol_table.body.swap(src_it->second.body);
-      in_dest_symbol_table.body_available=src_it->second.body_available;
       in_dest_symbol_table.type=src_it->second.type;
     }
     else // collision!
@@ -327,7 +326,6 @@ static bool link_functions(
         rename_symbols_in_function(src_func, rename_symbol);
 
         in_dest_symbol_table.body.swap(src_func.body);
-        in_dest_symbol_table.body_available=src_func.body_available;
         in_dest_symbol_table.type=src_func.type;
       }
       else if(src_func.body.instructions.empty())

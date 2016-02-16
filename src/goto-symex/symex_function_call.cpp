@@ -317,7 +317,7 @@ void goto_symext::symex_function_call_code(
   // record the call
   target.function_call(state.guard.as_expr(), identifier, state.source);
 
-  if(!goto_function.body_available)
+  if(!goto_function.body_available())
   {
     no_body(identifier);
     

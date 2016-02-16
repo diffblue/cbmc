@@ -206,7 +206,7 @@ void dump_ct::operator()(std::ostream &os)
         goto_functions.function_map.find(symbol.name);
 
       if(func_entry!=goto_functions.function_map.end() &&
-         func_entry->second.body_available &&
+         func_entry->second.body_available() &&
          (symbol.name==ID_main ||
           (!config.main.empty() && symbol.name==config.main)))
         skip_function_main=true;
@@ -992,7 +992,7 @@ void dump_ct::convert_function_declaration(
   goto_functionst::function_mapt::const_iterator func_entry=
     goto_functions.function_map.find(symbol.name);
   if(func_entry!=goto_functions.function_map.end() &&
-     func_entry->second.body_available)
+     func_entry->second.body_available())
   {
     code_blockt b;
     std::list<irep_idt> type_decls, local_static;

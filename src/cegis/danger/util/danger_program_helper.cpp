@@ -14,7 +14,7 @@ goto_programt &get_danger_body(goto_functionst &gf)
   const goto_functionst::function_mapt::iterator it=function_map.find(id);
   assert(function_map.end() != it && "Danger program function missing.");
   goto_function_templatet<goto_programt> &f=it->second;
-  assert(f.body_available && "Danger program function body missing.");
+  assert(f.body_available() && "Danger program function body missing.");
   return f.body;
 }
 
@@ -25,7 +25,7 @@ const goto_programt &get_danger_body(const goto_functionst &gf)
   const goto_functionst::function_mapt::const_iterator it=function_map.find(id);
   assert(function_map.end() != it && "Danger program function missing.");
   const goto_function_templatet<goto_programt> &f=it->second;
-  assert(f.body_available && "Danger program function body missing.");
+  assert(f.body_available() && "Danger program function body missing.");
   return f.body;
 }
 

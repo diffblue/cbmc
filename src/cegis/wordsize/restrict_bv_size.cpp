@@ -15,7 +15,7 @@ void restrict_bv_size(symbol_tablet &st, goto_functionst &gf,
   {
     goto_functionst::function_mapt::value_type::second_type &func=entry.second;
     restrict_bv_size(func.type, width_in_bits);
-    if (!func.body_available) continue;
+    if (!func.body_available()) continue;
     goto_programt::instructionst &body=func.body.instructions;
     for (goto_programt::instructiont &instr : body)
     {

@@ -305,7 +305,7 @@ void dott::output(std::ostream &out)
       it!=goto_functions.function_map.end();
       it++)
   {
-    if(it->second.body_available)
+    if(it->second.body_available())
       write_dot_subgraph(out, id2string(it->first), it->second.body);
   }
 

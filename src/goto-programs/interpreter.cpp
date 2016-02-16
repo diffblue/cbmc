@@ -41,7 +41,7 @@ void interpretert::operator()()
   
   const goto_functionst::goto_functiont &goto_function=main_it->second;
   
-  if(!goto_function.body_available)
+  if(!goto_function.body_available())
     throw "main has no body";
 
   PC=goto_function.body.instructions.begin();
@@ -439,7 +439,7 @@ void interpretert::execute_function_call()
 
   // do the call
       
-  if(f_it->second.body_available)
+  if(f_it->second.body_available())
   {
     call_stack.push(stack_framet());
     stack_framet &frame=call_stack.top();

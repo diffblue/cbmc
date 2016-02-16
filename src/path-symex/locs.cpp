@@ -54,7 +54,7 @@ void locst::build(const goto_functionst &goto_functions)
     function_entryt &function_entry=function_map[f_it->first];
     function_entry.type=goto_function.type;
 
-    if(goto_function.body_available)
+    if(goto_function.body_available())
     {
       const loc_reft entry_loc=end();
       function_entry.first_loc=entry_loc;
