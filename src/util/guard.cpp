@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 #include "std_expr.h"
+#include "simplify_utils.h"
 #include "guard.h"
 
 /*******************************************************************\
@@ -138,17 +139,23 @@ guardt &operator -= (guardt &g1, const guardt &g2)
   if(g1.id()!=ID_and || g2.id()!=ID_and)
     return g1;
 
-  exprt::operandst &op1=g1.operands();
-  const exprt::operandst &op2=g2.operands();
+  sort_and_join(g1);
+  guardt g2_sorted=g2;
+  sort_and_join(g2_sorted);
 
-  exprt::operandst::const_iterator it2=op2.begin();
-  
-  while(!op1.empty() &&
-        it2!=op2.end() &&
-        op1.front()==*it2)
+  exprt::operandst &op1=g1.operands();
+  const exprt::operandst &op2=g2_sorted.operands();
+
+  exprt::operandst::iterator it1=op1.begin();
+  for(exprt::operandst::const_iterator
+      it2=op2.begin();
+      it2!=op2.end();
+      ++it2)
   {
-    op1.erase(op1.begin());
-    it2++;
+    while(it1!=op1.end() && *it1<*it2)
+      ++it1;
+    if(it1!=op1.end() && *it1==*it2)
+      it1=op1.erase(it1);
   }
 
   g1=conjunction(op1);
@@ -183,33 +190,43 @@ guardt &operator |= (guardt &g1, const guardt &g2)
     else
       g1=or_exprt(g1, g2);
 
+    // TODO: make simplify more capable and apply here
+
     return g1;
   }
 
   // find common prefix  
+  sort_and_join(g1);
+  guardt g2_sorted=g2;
+  sort_and_join(g2_sorted);
+
   exprt::operandst &op1=g1.operands();
-  const exprt::operandst &op2=g2.operands();
+  const exprt::operandst &op2=g2_sorted.operands();
+
+  exprt::operandst n_op1, n_op2;
+  n_op1.reserve(op1.size());
+  n_op2.reserve(op2.size());
 
   exprt::operandst::iterator it1=op1.begin();
-  exprt::operandst::const_iterator it2=op2.begin();
-  
-  while(it1!=op1.end())
+  for(exprt::operandst::const_iterator
+      it2=op2.begin();
+      it2!=op2.end();
+      ++it2)
   {
-    if(it2==op2.end())
-      break;
-      
-    if(*it1!=*it2)
-      break;
-
-    it1++;
-    it2++;
+    while(it1!=op1.end() && *it1<*it2)
+    {
+      n_op1.push_back(*it1);
+      it1=op1.erase(it1);
+    }
+    if(it1!=op1.end() && *it1==*it2)
+      ++it1;
+    else
+      n_op2.push_back(*it2);
   }
   
-  if(it2==op2.end()) return g1;
+  if(n_op2.empty()) return g1;
 
   // end of common prefix
-  exprt::operandst n_op1(it1, op1.end());
-  exprt::operandst n_op2(it2, op2.end());
   exprt and_expr1=conjunction(n_op1);
   exprt and_expr2=conjunction(n_op2);
   
@@ -225,6 +242,7 @@ guardt &operator |= (guardt &g1, const guardt &g2)
     {
     }
     else
+      // TODO: make simplify more capable and apply here
       g1.add(or_exprt(and_expr1, and_expr2));
   }
   
