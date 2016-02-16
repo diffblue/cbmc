@@ -414,3 +414,27 @@ exprt boolean_negate(const exprt &src)
   else
     return not_exprt(src);
 }
+
+/*******************************************************************\
+
+Function: has_subexpr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool has_subexpr(const exprt &src, const irep_idt &id)
+{
+  if(src.id()==id) return true;
+  
+  forall_operands(it, src)
+    if(has_subexpr(*it, id))
+      return true;
+
+  return false;      
+}
+
