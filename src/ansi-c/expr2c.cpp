@@ -3271,7 +3271,7 @@ std::string expr2ct::convert_code_decl(
   dest+=convert_rec(src.op0().type(), c_qualifierst(), declarator);
 
   if(src.operands().size()==2)
-    dest+=" = "+convert(src.op1());
+    dest+="="+convert(src.op1());
 
   dest+=';';
 
