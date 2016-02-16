@@ -61,7 +61,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(interpreter)(show-reaching-definitions)(count-eloc)" \
   "(list-symbols)(list-undefined-functions)" \
   "(z3)(add-library)(show-dependence-graph)" \
-  "(horn)"
+  "(horn)(skip-loops):"
 
 class goto_instrument_parse_optionst:
   public parse_options_baset,
