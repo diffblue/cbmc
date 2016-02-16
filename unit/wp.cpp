@@ -10,8 +10,8 @@
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/expr2c.h>
 
-#include "goto_convert_functions.h"
-#include "wp.h"
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/wp.h>
 
 int main(int argc, const char **argv)
 {

@@ -21,17 +21,7 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
-LIBS = ../ansi-c/ansi-c$(LIBEXT) \
-       ../cpp/cpp$(LIBEXT) \
-       ../linking/linking$(LIBEXT) \
-       ../util/util$(LIBEXT) \
-       ../big-int/big-int$(LIBEXT) \
-       ../pointer-analysis/pointer-analysis$(LIBEXT) \
-       ../langapi/langapi$(LIBEXT) \
-       ../assembler/assembler$(LIBEXT) \
-       ../analyses/analyses$(LIBEXT)
-
-CLEANFILES = goto-programs$(LIBEXT) test_wp$(EXEEXT) osx_fat_reader_test$(EXEEXT)
+CLEANFILES = goto-programs$(LIBEXT)
 
 all: goto-programs$(LIBEXT)
 
@@ -39,10 +29,3 @@ all: goto-programs$(LIBEXT)
 
 goto-programs$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-
-test_wp$(EXEEXT): test_wp$(OBJEXT) goto-programs$(LIBEXT)
-	$(LINKBIN)
-
-osx_fat_reader_test$(EXEEXT): osx_fat_reader_test$(OBJEXT) goto-programs$(LIBEXT)
-	$(LINKBIN)
-

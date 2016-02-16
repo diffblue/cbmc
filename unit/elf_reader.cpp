@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "elf_reader.h"
+#include <goto-programs/elf_reader.h>
 
 int main(int argc, char **argv)
 {

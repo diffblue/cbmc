@@ -25,17 +25,14 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
 
 INCLUDES= -I ..
 
-LIBS = ../big-int/bigint$(OBJEXT) ../big-int/bigint-func$(OBJEXT)
-
 include ../config.inc
 include ../common
 
 CLEANFILES = util$(LIBEXT) \
              irep_ids.h irep_ids.inc \
-             ieee_float_test$(EXEEXT) ieee_float_test$(OBJEXT) ieee_float_test.d \
              irep_ids_convert$(EXEEXT) irep_ids_convert$(OBJEXT) irep_ids_convert.d
 
-all: util$(LIBEXT) ieee_float_test$(EXEEXT)
+all: util$(LIBEXT)
 
 ###############################################################################
 
@@ -58,8 +55,3 @@ $(OBJ): irep_ids.h
 
 util$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-
-ieee_float_test$(OBJEXT): irep_ids.h  
-
-ieee_float_test$(EXEEXT): ieee_float_test$(OBJEXT) util$(LIBEXT)
-	$(LINKBIN)

@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "smt2_parser.h"
+#include <solvers/smt2/smt2_parser.h>
 
 /*******************************************************************\
 

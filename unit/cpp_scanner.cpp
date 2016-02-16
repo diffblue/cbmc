@@ -4,8 +4,8 @@
 #include <util/config.h>
 #include <ansi-c/ansi_c_parser.h>
 
-#include "cpp_parser.h"
-#include "cpp_token_buffer.h"
+#include <cpp/cpp_parser.h>
+#include <cpp/cpp_token_buffer.h>
 
 /*******************************************************************\
 
@@ -39,5 +39,7 @@ int main(int argc, const char *argv[])
   
   while(cpp_parser.token_buffer.get_token(tk))
     std::cout << tk.text << '\n';
+
+  return 0;
 }
 

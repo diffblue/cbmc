@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "osx_fat_reader.h"
+#include <goto-programs/osx_fat_reader.h>
 
 int main(int argc, char **argv)
 {
