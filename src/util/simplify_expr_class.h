@@ -9,6 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SIMPLIFY_EXPR_CLASS_H
 #define CPROVER_SIMPLIFY_EXPR_CLASS_H
 
+// #define DEBUG_ON_DEMAND
+#ifdef DEBUG_ON_DEMAND
+#include <sys/stat.h>
+#endif
+
 #include <map>
 #include <set>
 
@@ -31,8 +36,15 @@ public:
   explicit simplify_exprt(const namespacet &_ns):
     do_simplify_if(true),
     ns(_ns)
+#ifdef DEBUG_ON_DEMAND
+    ,debug_on(false)
+#endif
   {
     setup_jump_table();
+#ifdef DEBUG_ON_DEMAND
+    struct stat f;
+    debug_on=stat("SIMP_DEBUG", &f)==0;
+#endif
   }
 
   virtual ~simplify_exprt()
@@ -113,10 +125,7 @@ public:
   bool simplify_node_preorder(exprt &expr);
   bool simplify_rec(exprt &expr);
 
-  virtual bool simplify(exprt &expr)
-  {
-    return simplify_rec(expr);
-  }
+  virtual bool simplify(exprt &expr);
   
   typedef std::set<mp_integer> value_listt;
   bool get_values(const exprt &expr, value_listt &value_list);
@@ -136,6 +145,9 @@ public:
   
 protected:
   const namespacet &ns;
+#ifdef DEBUG_ON_DEMAND
+  bool debug_on;
+#endif
   
   void setup_jump_table();
 };

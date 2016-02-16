@@ -2228,7 +2228,11 @@ bool simplify_exprt::simplify_node(exprt &expr)
   #endif
 
   #ifdef DEBUGX
-  if(!result)
+  if(!result
+     #ifdef DEBUG_ON_DEMAND
+     && debug_on
+     #endif
+     )
   {
     std::cout << "===== " << from_expr(ns, "", old)
               << "\n ---> " << from_expr(ns, "", expr)
@@ -2292,6 +2296,32 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   }
 
   return result;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify(exprt &expr)
+{
+#ifdef DEBUG_ON_DEMAND
+  if(debug_on)
+    std::cout << "TO-SIMP " << from_expr(ns, "", expr) << "\n";
+#endif
+  bool res=simplify_rec(expr);
+#ifdef DEBUG_ON_DEMAND
+  if(debug_on)
+    std::cout << "FULLSIMP " << from_expr(ns, "", expr) << "\n";
+#endif
+  return res;
 }
 
 /*******************************************************************\
