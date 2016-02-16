@@ -106,6 +106,17 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
       simplify_index(new_index_expr); // recursive call
 
+      if(equality_expr.is_true())
+      {
+        expr=with_expr.op2();
+        return false;
+      }
+      else if(equality_expr.is_false())
+      {
+        expr.swap(new_index_expr);
+        return false;
+      }
+
       exprt if_expr(ID_if, expr.type());
       if_expr.reserve_operands(3);
       if_expr.move_to_operands(equality_expr);
