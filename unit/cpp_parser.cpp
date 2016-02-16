@@ -2,7 +2,7 @@
 
 #include <util/config.h>
 
-#include "cpp_parser.h"
+#include <cpp/cpp_parser.h>
 
 /*******************************************************************\
 
@@ -26,5 +26,7 @@ int main(int argc, const char *argv[])
   cpp_parser.in=&in;
   
   cpp_parser.parse();
+
+  return 0;
 }
 

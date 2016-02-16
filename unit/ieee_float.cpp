@@ -11,7 +11,7 @@
 #define nextafterf(a, b) (throw "no nextafterf", 0);
 #endif
 
-#include "ieee_float.h"
+#include <util/ieee_float.h>
 
 #define PINF (std::numeric_limits<float>::infinity())
 #define NINF (-std::numeric_limits<float>::infinity())
@@ -294,7 +294,7 @@ int main()
   srand(time(0));
   check_minmax();
 
-  for(unsigned i=0; i<100000000; i++)
+  for(unsigned i=0; i<100000; i++)
   {
     if(i%10000==0) std::cout << "*********** " << i << std::endl;
     check_arithmetic(i);

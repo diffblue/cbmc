@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "miniBDD.h"
+#include <solvers/miniBDD/miniBDD.h>
 
 using namespace miniBDD;
 
@@ -50,17 +50,15 @@ void test3()
   //mgr.DumpTable(std::cout);
 }
 
-#if 0
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
 #include <ansi-c/ansi_c_language.h>
 
-// link against
-// ../langapi/langapi$(LIBEXT) ../ansi-c/ansi-c$(LIBEXT) ../linking/linking$(LIBEXT)
-
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 #include <util/namespace.h>
+
+#include <solvers/prop/bdd_expr.h>
 
 void test4()
 {
@@ -81,7 +79,6 @@ void test4()
 
   std::cout << from_expr(ns, "", t.as_expr()) << std::endl;
 }
-#endif
 
 int main()
 {
