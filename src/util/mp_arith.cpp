@@ -202,23 +202,24 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
 
     unsigned long mask=1;
     mask=mask << (n.size()-1);
-    mp_integer result=(n[0]=='1') ? mask : 0;
-    if(is_signed) result.negate();
+    mp_integer top_bit=(n[0]=='1') ? mask : 0;
+    if(is_signed) top_bit.negate();
     mask>>=1;
+    unsigned long other_bits=0;
 
     for(std::string::const_iterator it=++n.begin();
         it!=n.end();
         ++it)
     {
       if(*it=='1')
-        result+=mask;
+        other_bits+=mask;
       else if(*it!='0')
         return 0;
 
       mask>>=1;
     }
 
-    return result;
+    return top_bit+other_bits;
   }
 
   #if 0
