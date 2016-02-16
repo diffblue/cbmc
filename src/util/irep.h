@@ -81,6 +81,9 @@ extern inline const std::string &name2string(const irep_namet &n)
 #include <iostream>
 #endif
 
+class irept;
+const irept &get_nil_irep();
+
 /*! \brief Base class for tree-like data structures with sharing
 */
 class irept
@@ -173,7 +176,6 @@ public:
   inline ~irept()
   {
     remove_ref(data);
-    data=NULL;
   }
   
   #else
@@ -235,9 +237,9 @@ public:
 
   int compare(const irept &i) const;
   
-  void clear();
+  inline void clear() { *this=irept(); }
 
-  inline void make_nil() { clear(); id(ID_nil); }
+  inline void make_nil() { *this=get_nil_irep(); }
   
   inline subt &get_sub() { return write().sub; } // DANGEROUS
   inline const subt &get_sub() const { return read().sub; }
@@ -348,8 +350,6 @@ public:
     return *data;
   }
   
-  void recursive_detach();
-  
   #else
   dt data;
 
@@ -386,7 +386,5 @@ struct irep_full_eq
     return full_eq(i1, i2);
   }
 };
-
-const irept &get_nil_irep();
 
 #endif
