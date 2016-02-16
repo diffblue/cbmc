@@ -2180,6 +2180,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       cleanup_expr(*it, no_typecast);
   }
 
+  // try to get rid of type casts, revealing (char)97 -> 'a'
+  if(expr.id()==ID_typecast &&
+     to_typecast_expr(expr).op().is_constant())
+    simplify(expr, ns);
+
   if(expr.id()==ID_union ||
      expr.id()==ID_struct)
   {

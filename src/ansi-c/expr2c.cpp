@@ -2179,7 +2179,7 @@ std::string expr2ct::convert_constant(
       else if(int_value=='\'')
         dest+="'\\''";
       else if(int_value=='\\')
-        dest+="'\\'";
+        dest+="'\\\\'";
       else if(int_value>=' ' && int_value<126)
       {
         dest+='\'';
