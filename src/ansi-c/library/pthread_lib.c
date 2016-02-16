@@ -506,15 +506,14 @@ inline int pthread_create(
   }
 
   if(attr) (void)*attr;
-
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
-  // Clear all locked mutexes; locking must happen in same thread.
-  __CPROVER_clear_must(0, "mutex-locked");
-  __CPROVER_clear_may(0, "mutex-locked");
-  #endif
   
   __CPROVER_ASYNC_1:
     __CPROVER_thread_id=this_thread_id,
+    #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
+    // Clear all locked mutexes; locking must happen in same thread.
+    __CPROVER_clear_must(0, "mutex-locked"),
+    __CPROVER_clear_may(0, "mutex-locked"),
+    #endif
     start_routine(arg),
     __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
                     "WWcumul", "RRcumul", "RWcumul", "WRcumul"),
