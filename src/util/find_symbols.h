@@ -50,6 +50,14 @@ void find_type_symbols(
   const exprt &src,
   find_symbols_sett &dest);
 
+void find_non_pointer_type_symbols(
+  const typet &src,
+  find_symbols_sett &dest);
+
+void find_non_pointer_type_symbols(
+  const exprt &src,
+  find_symbols_sett &dest);
+
 void find_type_and_expr_symbols(
   const typet &src,
   find_symbols_sett &dest);

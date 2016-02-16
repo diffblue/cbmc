@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "find_symbols.h"
 
-typedef enum { F_TYPE, F_EXPR, F_BOTH } kindt;
+typedef enum { F_TYPE, F_TYPE_NON_PTR, F_EXPR, F_BOTH } kindt;
 
 /*******************************************************************\
 
@@ -211,11 +211,15 @@ Function: find_symbols
 
 void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
 {
-  if(src.has_subtype())
-    find_symbols(kind, src.subtype(), dest);
+  if(kind!=F_TYPE_NON_PTR ||
+     src.id()!=ID_pointer)
+  {
+    if(src.has_subtype())
+      find_symbols(kind, src.subtype(), dest);
 
-  forall_subtypes(it, src)
-    find_symbols(kind, *it, dest);
+    forall_subtypes(it, src)
+      find_symbols(kind, *it, dest);
+  }
     
   if(src.id()==ID_struct ||
      src.id()==ID_union)
@@ -300,6 +304,44 @@ Function: find_type_symbols
 void find_type_symbols(const typet &src, find_symbols_sett &dest)
 {
   find_symbols(F_TYPE, src, dest);
+}
+
+/*******************************************************************\
+
+Function: find_non_pointer_type_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void find_non_pointer_type_symbols(
+  const exprt &src,
+  find_symbols_sett &dest)
+{
+  find_symbols(F_TYPE_NON_PTR, src, dest);
+}
+
+/*******************************************************************\
+
+Function: find_non_pointer_type_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void find_non_pointer_type_symbols(
+  const typet &src,
+  find_symbols_sett &dest)
+{
+  find_symbols(F_TYPE_NON_PTR, src, dest);
 }
 
 /*******************************************************************\
