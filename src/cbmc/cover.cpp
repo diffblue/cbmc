@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/time_stopping.h>
 #include <util/xml.h>
+#include <util/xml_expr.h>
 
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
@@ -65,6 +66,17 @@ public:
     {
       return block_map[t];
     }
+    
+    void output(std::ostream &out)
+    {
+      for(block_mapt::const_iterator
+          b_it=block_map.begin();
+          b_it!=block_map.end();
+          b_it++)
+        out << b_it->first->source_location
+            << " -> " << b_it->second
+            << '\n';
+    }
   };
 
   bmc_covert(
@@ -118,29 +130,36 @@ public:
     }
     
     std::string description;
+    source_locationt source_location;
     
     // if satisified, we compute a goto_trace
     bool satisfied;
     goto_tracet goto_trace;
     
-    explicit goalt(const std::string &_description):
+    goalt(
+      const std::string &_description,
+      const source_locationt &_source_location):
       description(_description),
+      source_location(_source_location),
       satisfied(false)
     {
     }
     
-    goalt():satisfied(false)
+    goalt():source_location(source_locationt::nil()),
+            satisfied(false)
     {
     }
     
     exprt as_expr() const
     {
       std::vector<exprt> tmp;
+
       for(instancest::const_iterator
           it=instances.begin();
           it!=instances.end();
           it++)
         tmp.push_back(literal_exprt(it->condition));
+
       return conjunction(tmp);
     }
   };
@@ -199,6 +218,7 @@ void bmc_covert::goal_covered(const cover_goalst::goalt &)
       
       if(solver.l_get(cond).is_true())
       {
+        status() << "Covered " << g.description << messaget::eom;
         g.satisfied=true;
         symex_target_equationt::SSA_stepst::iterator next=c_it->step;
         next++; // include the instruction itself
@@ -278,7 +298,7 @@ bool bmc_covert::operator()(const criteriont criterion)
   forall_goto_functions(f_it, goto_functions)
   {
     basic_blockst basic_blocks(f_it->second.body);
-  
+    
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(i_it->function==ID__start ||
@@ -290,7 +310,9 @@ bool bmc_covert::operator()(const criteriont criterion)
       case C_ASSERTION:
         if(i_it->is_assert())
           goal_map[id(i_it)]=
-            goalt(id2string(i_it->source_location.get_comment()));
+            goalt(
+              id2string(i_it->source_location.get_comment()),
+              i_it->source_location);
         break;
         
       case C_LOCATION:
@@ -300,7 +322,11 @@ bool bmc_covert::operator()(const criteriont criterion)
           location_map[i_it]=id;
           if(goal_map[id].description=="" &&
              i_it->source_location.get_file()!="")
-            goal_map[id]=goalt("block "+i_it->source_location.as_string());
+          {
+            goal_map[id]=goalt(
+              "block "+i_it->source_location.as_string(),
+              i_it->source_location);
+          }
         }
         break;
       
@@ -308,10 +334,12 @@ bool bmc_covert::operator()(const criteriont criterion)
         if(i_it->is_goto() && !i_it->guard.is_true())
         {
           std::string b=i2string(basic_blocks[i_it]);
-          goal_map[id(i_it, "TK")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch taken");
-          goal_map[id(i_it, "NT")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch not taken");
+          goal_map[id(i_it, "TRUE")]=
+            goalt("function "+id2string(f_it->first)+" block "+b+" branch true",
+                  i_it->source_location);
+          goal_map[id(i_it, "FALSE")]=
+            goalt("function "+id2string(f_it->first)+" block "+b+" branch false",
+                  i_it->source_location);
         }
         break;
         
@@ -328,7 +356,8 @@ bool bmc_covert::operator()(const criteriont criterion)
               it++, i++)
           {
             goal_map[id(i_it, "C"+i2string(i))]=
-              goalt("condition "+from_expr(bmc.ns, "", *it));
+              goalt("condition "+from_expr(bmc.ns, "", *it),
+                    i_it->source_location);
           }
         }
         break;
@@ -337,6 +366,9 @@ bool bmc_covert::operator()(const criteriont criterion)
       }
     }
   }
+  
+  // collects assumptions
+  and_exprt::operandst assumptions;
 
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals
@@ -345,21 +377,32 @@ bool bmc_covert::operator()(const criteriont criterion)
       it!=bmc.equation.SSA_steps.end();
       it++)
   {
+    if(it->is_assume())
+      assumptions.push_back(literal_exprt(it->cond_literal));
+  
     if(it->source.pc->function==ID__start ||
        it->source.pc->function=="__CPROVER_initialize")
       continue;
-
+      
     switch(criterion)
     {
     case C_ASSERTION:
       if(it->source.pc->is_assert())
-        goal_map[id(it->source.pc)].add_instance(it, it->guard_literal);
+      {
+        and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
+        literalt c=solver.convert(c_expr);
+        goal_map[id(it->source.pc)].add_instance(it, c);
+      }
       break;
       
     case C_LOCATION:
+      if(it->assignment_type!=symex_targett::PHI &&
+         it->assignment_type!=symex_targett::GUARD)
       {
+        and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
+        literalt c=solver.convert(c_expr);
         irep_idt id=location_map[it->source.pc];
-        goal_map[id].add_instance(it, it->guard_literal);
+        goal_map[id].add_instance(it, c);
       }
       break;
     
@@ -368,20 +411,24 @@ bool bmc_covert::operator()(const criteriont criterion)
          it->source.pc->is_goto() &&
          !it->source.pc->guard.is_true())
       {
+        and_exprt c_true_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(!it->cond_literal));
+        and_exprt c_false_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(it->cond_literal));
+        literalt c_true=solver.convert(c_true_expr);
+        literalt c_false=solver.convert(c_false_expr);
+
         // a branch can have three states:
         // 1) taken 2) not taken 3) not executed!
-        literalt bt=it->cond_literal;
-        literalt bnt=solver.convert(and_exprt(
-          literal_exprt(it->guard_literal), literal_exprt(!it->cond_literal)));
 
-        goal_map[id(it->source.pc, "TK")].add_instance(it, bt);
-        goal_map[id(it->source.pc, "NT")].add_instance(it, bnt);
+        goal_map[id(it->source.pc, "TRUE")].add_instance(it, c_true);
+        goal_map[id(it->source.pc, "FALSE")].add_instance(it, c_false);
       }
       break;
       
     default:;
     }
   }
+  
+  status() << "Aiming to cover " << goal_map.size() << " goals" << eom;
   
   cover_goalst cover_goals(solver);
   
@@ -395,6 +442,8 @@ bool bmc_covert::operator()(const criteriont criterion)
     literalt l=solver.convert(it->second.as_expr());
     cover_goals.add(l);
   }
+  
+  assert(cover_goals.size()==goal_map.size());
 
   status() << "Running " << solver.decision_procedure_text() << eom;
 
@@ -415,35 +464,45 @@ bool bmc_covert::operator()(const criteriont criterion)
     status() << "** " << as_string(criterion) << " coverage results:" << eom;
   }
   
+  unsigned goals_covered=0;
+  
   for(goal_mapt::const_iterator
       it=goal_map.begin();
       it!=goal_map.end();
       it++)
   {
+    const goalt &goal=it->second;
+    
+    if(goal.satisfied) goals_covered++;
+  
     if(bmc.ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
       xml_result.set_attribute("goal", id2string(it->first));
-      xml_result.set_attribute("description", it->second.description);
-      xml_result.set_attribute("status", it->second.satisfied?"SATISFIED":"FAILED");
+      xml_result.set_attribute("description", goal.description);
+      xml_result.set_attribute("status", goal.satisfied?"SATISFIED":"FAILED");
+      
+      if(goal.source_location.is_not_nil())
+        xml_result.new_element()=xml(goal.source_location);
 
-      if(it->second.satisfied)
-        convert(bmc.ns, it->second.goto_trace, xml_result.new_element());
+      if(goal.satisfied)
+        convert(bmc.ns, goal.goto_trace, xml_result.new_element());
 
       std::cout << xml_result << "\n";
     }
     else
     {
-      status() << "[" << it->first << "] "
-               << it->second.description << ": " << (it->second.satisfied?"SATISFIED":"FAILED")
+      status() << "[" << it->first << "]";
+      if(!goal.description.empty()) status() << ' ' << goal.description;
+      status() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
                << eom;
     }
   }
 
   status() << eom;
   
-  status() << "** " << cover_goals.number_covered()
-           << " of " << cover_goals.size() << " covered ("
+  status() << "** " << goals_covered
+           << " of " << goal_map.size() << " covered ("
            << cover_goals.iterations() << " iteration"
            << (cover_goals.iterations()==1?"":"s")
            << ")" << eom;

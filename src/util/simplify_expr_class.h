@@ -90,6 +90,7 @@ public:
   bool simplify_isnormal(exprt &expr);
   bool simplify_abs(exprt &expr);
   bool simplify_sign(exprt &expr);
+  bool simplify_popcount(exprt &expr);
 
   // auxiliary
   bool simplify_if_implies(exprt &expr, const exprt &cond, bool truth, bool &new_truth);
@@ -101,14 +102,15 @@ public:
   bool eliminate_common_addends(exprt &op0, exprt &op1);
   static tvt objects_equal(const exprt &a, const exprt &b);
   static tvt objects_equal_address_of(const exprt &a, const exprt &b);
-  bool sort_and_join(exprt &expr);
   bool simplify_address_of_arg(exprt &expr);
   bool simplify_inequality_constant(exprt &expr);
   bool simplify_inequality_not_constant(exprt &expr);
   bool simplify_inequality_address_of(exprt &expr);
+  bool simplify_inequality_pointer_object(exprt &expr);
 
   // main recursion
   bool simplify_node(exprt &expr);
+  bool simplify_node_preorder(exprt &expr);
   bool simplify_rec(exprt &expr);
 
   virtual bool simplify(exprt &expr)
@@ -129,15 +131,13 @@ public:
   typedef bool (simplify_exprt::*jump_table_entryt)(exprt &);
   
   // bit-level conversions
-  exprt bits2expr(const std::string &bits, const typet &type);
-  std::string expr2bits(const exprt &expr);
+  exprt bits2expr(const std::string &bits, const typet &type, bool little_endian);
+  std::string expr2bits(const exprt &expr, bool little_endian);
   
 protected:
   const namespacet &ns;
   
   void setup_jump_table();
 };
-
-bool sort_and_join(const std::string &id, const std::string &type_id);
 
 #endif

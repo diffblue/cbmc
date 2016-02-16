@@ -105,6 +105,7 @@ bool goto_symext::symex_goto(statet &state)
   }
   
   goto_programt::const_targett new_state_pc, state_pc;
+  symex_targett::sourcet original_source=state.source;
   
   if(forward)
   {
@@ -160,7 +161,7 @@ bool goto_symext::symex_goto(statet &state)
         guard.as_expr(),
         new_lhs, guard_symbol_expr, new_lhs, guard_symbol_expr,
         new_rhs,
-        state.source,
+        original_source,
         symex_targett::GUARD);
       
       guard_expr=guard_symbol_expr;

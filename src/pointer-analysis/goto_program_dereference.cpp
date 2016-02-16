@@ -150,7 +150,7 @@ void goto_program_dereferencet::dereference_rec(
       throw expr.id_string()+" must be Boolean, but got "+
             expr.pretty();
 
-    std::size_t old_guards=guard.size();
+    guardt old_guard=guard;
 
     for(unsigned i=0; i<expr.operands().size(); i++)
     {
@@ -173,7 +173,7 @@ void goto_program_dereferencet::dereference_rec(
         guard.add(op);
     }
 
-    guard.resize(old_guards);
+    guard.swap(old_guard);
 
     return;
   }
@@ -197,20 +197,20 @@ void goto_program_dereferencet::dereference_rec(
 
     if(o1)
     {
-      std::size_t old_guard=guard.size();
+      guardt old_guard=guard;
       guard.add(expr.op0());
       dereference_rec(expr.op1(), guard, mode);
-      guard.resize(old_guard);
+      guard.swap(old_guard);
     }
 
     if(o2)
     {
-      std::size_t old_guard=guard.size();
+      guardt old_guard=guard;
       exprt tmp(expr.op0());
       tmp.make_not();
       guard.add(tmp);
       dereference_rec(expr.op2(), guard, mode);
-      guard.resize(old_guard);
+      guard.swap(old_guard);
     }
 
     return;

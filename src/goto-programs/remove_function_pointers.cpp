@@ -371,6 +371,15 @@ void remove_function_pointerst::remove_function_pointer(
 
   const exprt &pointer=function.op0();
   
+  // Is this simple?
+  if(pointer.id()==ID_address_of &&
+     to_address_of_expr(pointer).object().id()==ID_symbol)
+  {
+    to_code_function_call(target->code).function()=
+      to_address_of_expr(pointer).object();
+    return;
+  }
+  
   typedef std::list<exprt> functionst;
   functionst functions;
   
@@ -389,6 +398,9 @@ void remove_function_pointerst::remove_function_pointer(
 
     // type-compatible?
     if(!is_type_compatible(return_value_used, call_type, f_it->second))
+      continue;
+
+    if(f_it->first=="pthread_mutex_cleanup")
       continue;
     
     symbol_exprt expr;

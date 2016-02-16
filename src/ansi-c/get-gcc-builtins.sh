@@ -31,6 +31,9 @@ svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/cilkplus.def > /dev/null
 echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/sanitizer.def
 svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/sanitizer.def > /dev/null
 
+echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/chkp-builtins.def
+svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/chkp-builtins.def > /dev/null
+
 cat > gcc-builtins.h <<EOF
 #include <inttypes.h>
 #include <complex.h>

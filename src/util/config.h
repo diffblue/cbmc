@@ -63,8 +63,6 @@ public:
     void set_ILP32(); // int=32, long=32, pointer=32
     void set_LP32();  // int=16, long=32, pointer=32
 
-    void set_from_symbol_table(const symbol_tablet &symbol_table);
-    
     // minimum alignment (in structs) measured in bytes
     unsigned alignment;
 
@@ -78,10 +76,10 @@ public:
     enum class ost { NO_OS, OS_LINUX, OS_MACOS, OS_WIN };
     ost os;
 
-    enum class archt { NO_ARCH, ARCH_I386, ARCH_X86_64, ARCH_POWER, ARCH_ARM,
-                       ARCH_ALPHA, ARCH_MIPS, ARCH_S390, ARCH_S390X, ARCH_SPARC,
-                       ARCH_IA64, ARCH_X32 };
-    archt arch;
+    static std::string os_to_string(ost);
+    static ost string_to_os(const std::string &);
+
+    irep_idt arch;
 
     // architecture-specific integer value of null pointer constant
     bool NULL_is_zero;
@@ -97,6 +95,7 @@ public:
     void set_arch_spec_sparc(const irep_idt &subarch);
     void set_arch_spec_ia64();
     void set_arch_spec_x32();
+    void set_arch_spec_v850();
     
     enum class flavourt { NO_MODE, MODE_ANSI_C_CPP, MODE_GCC_C, MODE_GCC_CPP,
                           MODE_VISUAL_STUDIO_C_CPP,
@@ -121,12 +120,13 @@ public:
   
   struct cppt
   {
-    enum class cpp_standardt { CPP98, CPP03, CPP11 } cpp_standard;
+    enum class cpp_standardt { CPP98, CPP03, CPP11, CPP14 } cpp_standard;
     static cpp_standardt default_cpp_standard();
 
     void set_cpp98() { cpp_standard=cpp_standardt::CPP98; }
     void set_cpp03() { cpp_standard=cpp_standardt::CPP03; }
     void set_cpp11() { cpp_standard=cpp_standardt::CPP11; }
+    void set_cpp14() { cpp_standard=cpp_standardt::CPP14; }
     
   } cpp;
   
@@ -142,6 +142,10 @@ public:
 
   // this is the function to start executing
   std::string main;
+  
+  void set_arch(const irep_idt &);
+
+  void set_from_symbol_table(const symbol_tablet &);
   
   bool set(const cmdlinet &cmdline);
   

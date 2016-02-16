@@ -8,10 +8,10 @@ echo $VERSION_FILE
 mkdir /tmp/cbmc-dist
 cd /tmp/cbmc-dist
 svn export http://www.cprover.org/svn/cbmc/releases/cbmc-${VERSION} cbmc-src
-tar cfz cbmc-${VERSION}.tgz cbmc-src/
+tar cfz cbmc-${VERSION}-src.tgz cbmc-src/
 
 echo Copying.
-scp cbmc-${VERSION}.tgz \
+scp cbmc-${VERSION}-src.tgz \
   kroening@dkr-srv.cs.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
 
 cd /tmp

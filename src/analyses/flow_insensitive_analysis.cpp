@@ -342,9 +342,9 @@ bool flow_insensitive_analysis_baset::do_function_call(
 {
   const goto_functionst::goto_functiont &goto_function=f_it->second;
 
-	if(!goto_function.body_available)
-	{
-	  const code_function_callt &code = 
+  if(!goto_function.body_available)
+  {
+    const code_function_callt &code = 
       to_code_function_call(to_code(l_call->code));
     
     goto_programt temp;
@@ -369,8 +369,8 @@ bool flow_insensitive_analysis_baset::do_function_call(
     new_data = state.transform(ns, t, l_next) || new_data;
     
     return new_data;
-	}
-	
+  }
+        
   assert(!goto_function.body.instructions.empty());
 
   bool new_data=false;

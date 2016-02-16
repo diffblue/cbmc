@@ -8,8 +8,9 @@ namespace
 void store_skolem_choices_for_loop(danger_programt::loopt &loop)
 {
   const danger_programt::program_ranget &range=loop.body;
-  for (goto_programt::targett it=range.begin; it != range.end; ++it)
-    if (is_nondet(it)) loop.skolem_choices.push_back(it);
+  const goto_programt::targett &end=range.end;
+  for (goto_programt::targett it=range.begin; it != end; ++it)
+    if (is_nondet(it, end)) loop.skolem_choices.push_back(it);
 }
 }
 
@@ -25,7 +26,7 @@ void store_x0_choices_for_range(danger_programt &program,
     const goto_programt::targett &begin, const goto_programt::targett &end)
 {
   for (goto_programt::targett it=begin; it != end; ++it)
-    if (is_nondet(it)) program.x0_choices.push_back(it);
+    if (is_nondet(it, end)) program.x0_choices.push_back(it);
 }
 }
 

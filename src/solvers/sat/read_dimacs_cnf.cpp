@@ -63,7 +63,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
         std::cout << "line" << line << std::endl;
         #endif
         if(!decision.compare(std::string("c")))
-        //	      if(!strcasecmp(decision.c_str(),"c"))
+        //              if(!strcasecmp(decision.c_str(),"c"))
         {
           #ifdef VERBOSE
           std::cout << "c " << std::endl;
@@ -72,7 +72,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
         }
 
         if(!decision.compare(std::string("p")))
-        //	      if(!strcasecmp(decision.c_str(),"p"))
+        //              if(!strcasecmp(decision.c_str(),"p"))
         {
           #ifdef VERBOSE
           std::cout << "p " << std::endl;

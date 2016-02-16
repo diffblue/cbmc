@@ -27,6 +27,8 @@ public:
 
   post Save();
   void Restore(post pos);
+  void Replace(const cpp_tokent &token);
+  void Insert(const cpp_tokent &token);
   
   void clear()
   {

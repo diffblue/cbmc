@@ -66,7 +66,7 @@ void goto_convertt::finish_gotos()
   {
     goto_programt::instructiont &i=**it;
     
-    if(i.code.get(ID_statement)=="non-deterministic-goto")
+    if(i.code.get_statement()=="non-deterministic-goto")
     {
       const irept &destinations=i.code.find("destinations");
 
@@ -105,7 +105,7 @@ void goto_convertt::finish_gotos()
 
       i.targets.push_back(l_it->second);
     }
-    else if(i.code.get(ID_statement)==ID_goto)
+    else if(i.code.get_statement()==ID_goto)
     {
       const irep_idt &goto_label=i.code.get(ID_destination);
 
@@ -698,9 +698,17 @@ void goto_convertt::convert_decl(
     convert_assign(assign, dest);
   }
 
-  // do destructor
+  // now create a 'dead' instruction -- will be added after the
+  // destructor created below as unwind_destructor_stack pops off the
+  // top of the destructor stack
   const symbol_exprt symbol_expr(symbol.name, symbol.type);
 
+  {
+    code_deadt code_dead(symbol_expr);
+    targets.destructor_stack.push_back(code_dead);
+  }
+
+  // do destructor
   code_function_callt destructor=get_destructor(ns, symbol.type);
 
   if(destructor.is_not_nil())
@@ -712,12 +720,6 @@ void goto_convertt::convert_decl(
     destructor.arguments().push_back(this_expr);
 
     targets.destructor_stack.push_back(destructor);
-  }
-    
-  // now create a 'dead' instruction
-  {
-    code_deadt code_dead(symbol_expr);
-    targets.destructor_stack.push_back(code_dead);
   }
 }
 
@@ -1285,12 +1287,11 @@ Function: goto_convertt::case_guard
 
 \*******************************************************************/
 
-void goto_convertt::case_guard(
+exprt goto_convertt::case_guard(
   const exprt &value,
-  const exprt::operandst &case_op,
-  exprt &dest)
+  const exprt::operandst &case_op)
 {
-  dest=exprt(ID_or, typet(ID_bool));
+  exprt dest=exprt(ID_or, bool_typet());
   dest.reserve_operands(case_op.size());
 
   forall_expr(it, case_op)
@@ -1309,6 +1310,8 @@ void goto_convertt::case_guard(
     tmp.swap(dest.op0());
     dest.swap(tmp);
   }
+  
+  return dest;
 }
 
 /*******************************************************************\
@@ -1384,8 +1387,7 @@ void goto_convertt::convert_switch(
   
     assert(!case_ops.empty());    
   
-    exprt guard_expr;
-    case_guard(argument, case_ops, guard_expr);
+    exprt guard_expr=case_guard(argument, case_ops);
 
     goto_programt::targett x=tmp_cases.add_instruction();
     x->make_goto(it->first);

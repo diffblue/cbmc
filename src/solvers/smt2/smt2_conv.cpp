@@ -1273,7 +1273,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(use_FPA_theory)
       {
-	out << "(fp.isNegative ";
+        out << "(fp.isNegative ";
         convert_expr(expr.op0());
         out << ")";
       }
@@ -1739,7 +1739,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(use_FPA_theory)
       {
-	out << "(fp.abs ";
+        out << "(fp.abs ";
         convert_expr(expr.op0());
         out << ")";
       }
@@ -1784,17 +1784,17 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(use_FPA_theory)
       {
-	out << "(and ";
+        out << "(and ";
 
-	out << "(not (fp.isNaN ";
+        out << "(not (fp.isNaN ";
         convert_expr(expr.op0());
         out << "))";
 
-	out << "(not (fp.isInf ";
+        out << "(not (fp.isInf ";
         convert_expr(expr.op0());
         out << "))";
 
-	out << ")";
+        out << ")";
       }
       else
         convert_floatbv(expr);
@@ -1815,7 +1815,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(use_FPA_theory)
       {
-	out << "(fp.isInfinite ";
+        out << "(fp.isInfinite ";
         convert_expr(expr.op0());
         out << ")";
       }
@@ -2051,9 +2051,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     {
       if(use_FPA_theory)
       {
-	out << "(not (fp.isZero ";
-	convert_expr(src);
-	out << "))";
+        out << "(not (fp.isZero ";
+        convert_expr(src);
+        out << "))";
       }
       else
         convert_floatbv(expr);
@@ -2547,8 +2547,8 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       {
         out << "((_ to_fp " << dst.get_e() << " "
             << dst.get_f() + 1 << ") ";
-	convert_rounding_mode_FPA(expr.op1());
-	out << " ";
+        convert_rounding_mode_FPA(expr.op1());
+        out << " ";
         convert_expr(src);
         out << ")";
       }
@@ -2578,8 +2578,8 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       {
         out << "((_ to_fp_unsigned " << dst.get_e() << " "
             << dst.get_f() + 1 << ") ";
-	convert_rounding_mode_FPA(expr.op1());
-	out << " ";
+        convert_rounding_mode_FPA(expr.op1());
+        out << " ";
         convert_expr(src);
         out << ")";
       }
@@ -2596,8 +2596,8 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       {
         out << "((_ to_fp " << dst.get_e() << " "
             << dst.get_f() + 1 << ") ";
-	convert_rounding_mode_FPA(expr.op1());
-	out << " ";
+        convert_rounding_mode_FPA(expr.op1());
+        out << " ";
         convert_expr(src);
         out << ")";
       }
@@ -2862,9 +2862,9 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     if(use_FPA_theory)
     {
       /* CBMC stores floating point literals in the most
-	 computationally useful form; biased exponents and
-	 significands including the hidden bit.  Thus some encoding
-	 is needed to get to IEEE-754 style representations. */
+         computationally useful form; biased exponents and
+         significands including the hidden bit.  Thus some encoding
+         is needed to get to IEEE-754 style representations. */
 
       ieee_floatt v=ieee_floatt(expr);
       size_t e = floatbv_type.get_e();
@@ -2880,23 +2880,23 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
 
       if(v.is_NaN())
       {
-	out << "(_ NaN " << e << " " << f << ")";
+        out << "(_ NaN " << e << " " << f << ")";
       }
       else if(v.is_infinity())
       {
-	if (v.get_sign())
-	  out << "(_ -oo " << e << " " << f << ")";
-	else
-	  out << "(_ +oo " << e << " " << f << ")";
+        if (v.get_sign())
+          out << "(_ -oo " << e << " " << f << ")";
+        else
+          out << "(_ +oo " << e << " " << f << ")";
       }
       else
       {
-	// Zero, normal or subnormal
+        // Zero, normal or subnormal
 
-	mp_integer binary = v.pack();
-	std::string binaryString(integer2binary(v.pack(), v.spec.width()));
+        mp_integer binary = v.pack();
+        std::string binaryString(integer2binary(v.pack(), v.spec.width()));
 
-	out << "(fp "
+        out << "(fp "
             << "#b" << binaryString.substr(0, 1) << " "
             << "#b" << binaryString.substr(1, e) << " "
             << "#b" << binaryString.substr(1+e, f-1) << ")";
@@ -4351,7 +4351,7 @@ void smt2_convt::unflatten(
         for(mp_integer i=0; i!=size; ++i, offset+=subtype_width)
         {
           out << " ";
-	  unflatten(BEGIN, vector_type.subtype(), nesting+1);
+          unflatten(BEGIN, vector_type.subtype(), nesting+1);
           out << "((_ extract " << offset+subtype_width-1 << " "
               << offset << ") ?ufop" << nesting << ")";
           unflatten(END, vector_type.subtype(), nesting+1);

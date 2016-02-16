@@ -370,7 +370,13 @@ std::string expr2cppt::convert_rec(
     // C doesn't really have syntax for function types,
     // so we use C++11 trailing return types!
   
-    std::string dest="auto ";
+    std::string dest="auto";
+    
+    // qualifiers, declarator?
+    if(d.empty())
+      dest+=' ';
+    else
+      dest+=d;
 
     dest+='(';
     const code_typet::parameterst &parameters=code_type.parameters();
@@ -402,6 +408,11 @@ std::string expr2cppt::convert_rec(
   else if(src.id()==ID_nullptr)
   {
     return "std::nullptr_t";
+  }
+  else if(src.id()==ID_initializer_list)
+  {
+    // only really used in error messages
+    return "{ ... }";
   }
   else
     return expr2ct::convert_rec(src, qualifiers, declarator);

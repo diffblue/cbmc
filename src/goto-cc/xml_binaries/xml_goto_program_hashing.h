@@ -33,7 +33,7 @@ class xml_goto_program_convertt {
                     const std::string &);
 };
 
-	
+
 
 
 #endif /*XML_GOTO_PROGRAM_H_*/

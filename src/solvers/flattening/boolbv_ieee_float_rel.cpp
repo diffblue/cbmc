@@ -50,7 +50,7 @@ literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
       if(rel==ID_ieee_float_equal)
         return float_utils.relation(bv0, float_utilst::EQ, bv1);
       else if(rel==ID_ieee_float_notequal)
-        return prop.lnot(float_utils.relation(bv0, float_utilst::EQ, bv1));
+        return !float_utils.relation(bv0, float_utilst::EQ, bv1);
       else
         return SUB::convert_rest(expr);
     }

@@ -91,8 +91,6 @@ protected:
     const exprt &rhs,
     const loc_infot &loc_info_src) const;
     
-  bool is_tracked(const irep_idt &identifier) const;
-  
   unsigned unknown_object;
 };
 

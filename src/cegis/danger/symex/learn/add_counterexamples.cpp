@@ -59,8 +59,14 @@ void declare_x_arrays(symbol_tablet &st, goto_functionst &gf,
   }
 }
 
-const char X_LABEL[]=DANGER_PREFIX"x_loop";
 const char X_INDEX[]=DANGER_PREFIX"x_index";
+symbol_exprt get_index(const symbol_tablet &st)
+{
+  const std::string index_name(get_danger_meta_name(X_INDEX));
+  return st.lookup(index_name).symbol_expr();
+}
+
+const char X_LABEL[]=DANGER_PREFIX"x_loop";
 goto_programt::targett add_ce_loop(danger_programt &prog, const size_t ces_size)
 {
   symbol_tablet &st=prog.st;
@@ -73,20 +79,22 @@ goto_programt::targett add_ce_loop(danger_programt &prog, const size_t ces_size)
   goto_programt::targett loop_head=pos;
   (++loop_head)->labels.push_back(X_LABEL);
   goto_programt &body=get_danger_body(gf);
-  pos=body.insert_before(prog.danger_range.end);
+  pos=insert_before_preserve_labels(body, prog.danger_range.end);
+  //pos=body.insert_before(prog.danger_range.end);
   pos->type=goto_program_instruction_typet::ASSIGN;
   pos->source_location=default_danger_source_location();
-  const std::string index_name(get_danger_meta_name(X_INDEX));
-  const symbol_exprt index(st.lookup(index_name).symbol_expr());
+  const symbol_exprt index(get_index(st));
   const constant_exprt one(from_integer(1, size_type));
   const code_assignt inc(index, plus_exprt(index, one));
   pos->code=inc;
   pos=body.insert_after(pos);
   pos->type=goto_program_instruction_typet::GOTO;
   pos->source_location=default_danger_source_location();
+  pos->function=goto_functionst::entry_point();
   pos->targets.push_back(loop_head);
   pos->loop_number=0u;
-  const constant_exprt num_ces(from_integer(ces_size, size_type));
+  //const constant_exprt num_ces(from_integer(ces_size, size_type));
+  const constant_exprt num_ces(from_integer(ces_size + 1, size_type));
   const binary_relation_exprt cond(index, ID_lt, num_ces);
   pos->guard=cond;
   return pos;
@@ -97,14 +105,29 @@ class assign_ce_valuet
   const symbol_tablet &st;
   goto_functionst &gf;
   goto_programt::targett pos;
+  goto_programt::targett goto_pos;
 public:
-  assign_ce_valuet(danger_programt &prog) :
+  void add_x0_case(const size_t ces_size)
+  {
+    const typet size_type(unsigned_int_type());
+    const constant_exprt num_ces(from_integer(ces_size, size_type));
+    const symbol_exprt index(get_index(st));
+    const equal_exprt cond(index, num_ces);
+    pos->guard=cond;
+    goto_pos=pos;
+  }
+
+  assign_ce_valuet(danger_programt &prog, const size_t ces_size) :
       st(prog.st), gf(prog.gf)
   {
     const danger_programt::loopst &loops=prog.loops;
     assert(!loops.empty());
     pos=loops.begin()->meta_variables.Dx;
     ++pos;
+    pos=get_danger_body(gf).insert_after(pos);
+    pos->type=goto_program_instruction_typet::GOTO;
+    pos->source_location=default_danger_source_location();
+    add_x0_case(ces_size);
   }
 
   void operator()(const std::pair<const irep_idt, exprt> &assignment)
@@ -113,18 +136,22 @@ public:
     base_name+=id2string(assignment.first);
     const std::string array_name(get_danger_meta_name(base_name));
     const symbol_exprt array(st.lookup(array_name).symbol_expr());
-    const std::string index_name(get_danger_meta_name(X_INDEX));
-    const symbol_exprt index(st.lookup(index_name).symbol_expr());
-    const index_exprt rhs(array, index);
+    const index_exprt rhs(array, get_index(st));
     const symbol_exprt lhs(st.lookup(assignment.first).symbol_expr());
     pos=danger_assign(st, gf, pos, lhs, rhs);
   }
+
+  void finalize_x0_case()
+  {
+    goto_pos->targets.push_back(++pos);
+  }
 };
 
-void assign_ce_values(danger_programt &prog, const counterexamplet &ce)
+void assign_ce_values(danger_programt &prog, const counterexamplet &ce,
+    const size_t num_ces)
 {
-  const assign_ce_valuet assign_value(prog);
-  std::for_each(ce.begin(), ce.end(), assign_value);
+  const assign_ce_valuet assign_value(prog, num_ces);
+  std::for_each(ce.begin(), ce.end(), assign_value).finalize_x0_case();
 }
 
 //const char CONSTRAINTS[]=DANGER_PREFIX "constraints";
@@ -165,7 +192,7 @@ void danger_add_learned_counterexamples(danger_programt &prog,
   goto_programt::targett pos=prog.danger_range.begin;
   declare_x_arrays(st, gf, --pos, vals);
   const goto_programt::targett loop_end=add_ce_loop(prog, ces.size());
-  assign_ce_values(prog, prototype);
+  assign_ce_values(prog, prototype, ces_count);
   create_constraints(prog);
   add_final_assertion(prog, loop_end);
 }

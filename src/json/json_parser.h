@@ -13,8 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/parser.h>
-
-#include "json.h"
+#include <util/json.h>
 
 int yyjsonparse();
 

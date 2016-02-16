@@ -37,15 +37,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 
-#include <cegis/symex/cegis_symex_verify.h>
-#include <cegis/symex/cegis_symex_learn.h>
-#include <cegis/danger/constant/default_constant_strategy.h>
-#include <cegis/danger/preprocess/danger_preprocessing.h>
-#include <cegis/danger/symex/verify/danger_verify_config.h>
-#include <cegis/danger/symex/learn/danger_learn_config.h>
-#include <cegis/facade/cegis.h>
+#include <cegis/danger/facade/danger_runner.h>
 
 #include <goto-instrument/full_slicer.h>
+
+#include <linking/entry_point.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -305,11 +301,18 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("unwinding-assertions", false);
   else
     options.set_option("unwinding-assertions",
-      !cmdline.isset("no-unwinding-assertions"));
+      cmdline.isset("unwinding-assertions"));
 
   // generate unwinding assumptions otherwise
   options.set_option("partial-loops",
    cmdline.isset("partial-loops"));
+   
+  if(options.get_bool_option("partial-loops") &&
+     options.get_bool_option("unwinding-assertions"))
+  {
+    error() << "--partial-loops and --unwinding-assertions must not be given together" << eom;
+    exit(1);
+  }
 
   // remove unused equations
   options.set_option("slice-formula",
@@ -439,12 +442,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     {
       if(options.get_bool_option("smt1"))
       {
-	options.set_option("boolector", true), solver_set = true;
+        options.set_option("boolector", true), solver_set = true;
       }
       else
       {
-	assert(options.get_bool_option("smt2"));
-	options.set_option("mathsat", true), solver_set = true;
+        assert(options.get_bool_option("smt2"));
+        options.set_option("mathsat", true), solver_set = true;
       }
     }
   }
@@ -467,6 +470,46 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("graphml-cex"))
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
+
+  if(cmdline.isset("json-cex"))
+    options.set_option("json-cex", cmdline.get_value("json-cex"));
+
+  if(cmdline.isset("danger"))
+  {
+    unsigned int min_prog_size=1u;
+    if (cmdline.isset("cegis-min-size"))
+      min_prog_size=string2integer(cmdline.get_value("cegis-min-size")).to_ulong();
+    options.set_option("cegis-min-size", min_prog_size);
+    unsigned int max_prog_size=5u;
+    if (cmdline.isset("cegis-max-size"))
+      max_prog_size=string2integer(cmdline.get_value("cegis-max-size")).to_ulong();
+    options.set_option("cegis-max-size", max_prog_size);
+    options.set_option("cegis-parallel-verify", cmdline.isset("cegis-parallel-verify"));
+    options.set_option("cegis-limit-wordsize", cmdline.isset("cegis-limit-wordsize"));
+    options.set_option("cegis-match-select", !cmdline.isset("cegis-tournament-select"));
+    options.set_option("cegis-statistics", cmdline.isset("cegis-statistics"));
+    options.set_option("cegis-genetic", cmdline.isset("cegis-genetic"));
+    unsigned int genetic_rounds=10u;
+    if (cmdline.isset("cegis-genetic-rounds"))
+      genetic_rounds=string2integer(cmdline.get_value("cegis-genetic-rounds")).to_ulong();
+    options.set_option("cegis-genetic-rounds", genetic_rounds);
+    unsigned int seed=747864937u;
+    if (cmdline.isset("cegis-seed"))
+      seed=string2integer(cmdline.get_value("cegis-seed")).to_ulong();
+    options.set_option("cegis-seed", seed);
+    unsigned int pop_size=2000u;
+    if (cmdline.isset("cegis-genetic-popsize"))
+      pop_size=string2integer(cmdline.get_value("cegis-genetic-popsize")).to_ulong();
+    options.set_option("cegis-genetic-popsize", pop_size);
+    unsigned int mutation_rate=1u;
+    if (cmdline.isset("cegis-genetic-mutation-rate"))
+      mutation_rate=string2integer(cmdline.get_value("cegis-genetic-mutation-rate")).to_ulong();
+    options.set_option("cegis-genetic-mutation-rate", mutation_rate);
+    unsigned int replace_rate=15u;
+    if (cmdline.isset("cegis-genetic-replace-rate"))
+      replace_rate=string2integer(cmdline.get_value("cegis-genetic-replace-rate")).to_ulong();
+    options.set_option("cegis-genetic-replace-rate", replace_rate);
+  }
 }
 
 /*******************************************************************\
@@ -646,20 +689,7 @@ int cbmc_parse_optionst::doit()
     return 7;
 
   if(cmdline.isset("danger"))
-  {
-    size_t max_prog_size=100u;
-    if (cmdline.isset("danger-max-size"))
-      max_prog_size=string2integer(cmdline.get_value("function")).to_ulong();
-
-    const constant_strategyt strategy=default_constant_strategy;
-    danger_preprocessingt preproc(symbol_table, goto_functions, strategy);
-    const danger_programt &prog=preproc.get_danger_program();
-    danger_verify_configt verify_config(prog);
-    cegis_symex_verifyt<danger_verify_configt> verify(options, verify_config);
-    danger_learn_configt learn_config(prog);
-    cegis_symex_learnt<danger_learn_configt> learn(options, learn_config);
-    return run_cegis(learn, verify, preproc, max_prog_size, result());
-  }
+    return run_danger(options, result(), symbol_table, goto_functions);
 
   // do actual BMC
   return do_bmc(*bmc, goto_functions);
@@ -733,36 +763,12 @@ int cbmc_parse_optionst::get_goto_program(
 
   try
   {
-    if(cmdline.args.size()==1 &&
-       is_goto_binary(cmdline.args[0]))
+    if(cmdline.isset("show-parse-tree"))
     {
-      status() << "Reading GOTO program from file" << eom;
-
-      if(read_goto_binary(cmdline.args[0],
-           symbol_table, goto_functions, get_message_handler()))
-        return 6;
-        
-      config.ansi_c.set_from_symbol_table(symbol_table);
-
-      if(cmdline.isset("show-symbol-table"))
+      if(cmdline.args.size()!=1 ||
+         is_goto_binary(cmdline.args[0]))
       {
-        show_symbol_table();
-        return 0;
-      }
-      
-      irep_idt entry_point=goto_functions.entry_point();
-      
-      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
-      {
-        error() << "The goto binary has no entry point; please complete linking" << eom;
-        return 6;
-      }
-    }
-    else if(cmdline.isset("show-parse-tree"))
-    {
-      if(cmdline.args.size()!=1)
-      {
-        error() << "Please give one source file only" << eom;
+        error() << "Please give exactly one source file" << eom;
         return 6;
       }
       
@@ -801,35 +807,63 @@ int cbmc_parse_optionst::get_goto_program(
       language->show_parse(std::cout);
       return 0;
     }
-    else
+
+    cmdlinet::argst binaries;
+    binaries.reserve(cmdline.args.size());
+
+    for(cmdlinet::argst::iterator
+        it=cmdline.args.begin();
+        it!=cmdline.args.end();
+        ) // no ++it
+    {
+      if(is_goto_binary(*it))
+      {
+        binaries.push_back(*it);
+        it=cmdline.args.erase(it);
+        continue;
+      }
+
+      ++it;
+    }
+
+    if(!cmdline.args.empty())
     {
       if(parse()) return 6;
       if(typecheck()) return 6;
       int get_modules_ret=get_modules(bmc);
       if(get_modules_ret!=-1) return get_modules_ret;
-      if(final()) return 6;
+      if(binaries.empty() && final()) return 6;
 
       // we no longer need any parse trees or language files
       clear_parse();
-
-      if(cmdline.isset("show-symbol-table"))
-      {
-        show_symbol_table();
-        return 0;
-      }
-
-      irep_idt entry_point=goto_functions.entry_point();
-      
-      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
-      {
-        error() << "No entry point; please provide a main function" << eom;
-        return 6;
-      }
-
-      status() << "Generating GOTO Program" << eom;
-
-      goto_convert(symbol_table, goto_functions, ui_message_handler);
     }
+
+    for(cmdlinet::argst::const_iterator
+        it=binaries.begin();
+        it!=binaries.end();
+        ++it)
+    {
+      status() << "Reading GOTO program from file " << eom;
+
+      if(read_object_and_link(*it, symbol_table, goto_functions, *this))
+        return 6;
+    }
+
+    if(!binaries.empty())
+      config.set_from_symbol_table(symbol_table);
+
+    if(cmdline.isset("show-symbol-table"))
+    {
+      show_symbol_table();
+      return 0;
+    }
+
+    if(entry_point(symbol_table, "main", get_message_handler()))
+      return 6;
+
+    status() << "Generating GOTO Program" << eom;
+
+    goto_convert(symbol_table, goto_functions, ui_message_handler);
 
     if(process_goto_program(options, goto_functions))
       return 6;
@@ -954,7 +988,8 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_asm(symbol_table, goto_functions);
 
     // add the library
-    status() << "Adding CPROVER library" << eom;
+    status() << "Adding CPROVER library (" 
+             << config.ansi_c.arch << ")" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
 
     if(cmdline.isset("string-abstraction"))
@@ -1153,10 +1188,10 @@ void cbmc_parse_optionst::help()
     #endif
     " --no-arch                    don't set up an architecture\n"
     " --no-library                 disable built-in abstract C library\n"
-    " --round-to-nearest           IEEE floating point rounding mode (default)\n"
-    " --round-to-plus-inf          IEEE floating point rounding mode\n"
-    " --round-to-minus-inf         IEEE floating point rounding mode\n"
-    " --round-to-zero              IEEE floating point rounding mode\n"
+    " --round-to-nearest           rounding towards nearest even (default)\n"
+    " --round-to-plus-inf          rounding towards plus infinity\n"
+    " --round-to-minus-inf         rounding towards minus infinity\n"
+    " --round-to-zero              rounding towards zero\n"
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
@@ -1196,7 +1231,7 @@ void cbmc_parse_optionst::help()
     " --stop-when-unsat            for step case in k-induction checks\n"
     " --show-vcc                   show the verification conditions\n"
     " --slice-formula              remove assignments unrelated to property\n"
-    " --no-unwinding-assertions    do not generate unwinding assertions\n"
+    " --unwinding-assertions       generate unwinding assertions\n"
     " --partial-loops              permit paths with partial loops\n"
     " --no-pretty-names            do not simplify identifiers\n"
     " --graphml-cex filename       write the counterexample in GraphML format to filename\n"
@@ -1204,15 +1239,13 @@ void cbmc_parse_optionst::help()
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n"
-    " --smt1                       output subgoals in SMT1 syntax (experimental)\n"
-    " --smt2                       output subgoals in SMT2 syntax (experimental)\n"
-    " --boolector                  use Boolector (experimental)\n"
-    " --mathsat                    use MathSAT (experimental)\n"
-    " --cvc3                       use CVC3 (experimental)\n"
-    " --cvc4                       use CVC4 (experimental)\n"
-    " --yices                      use Yices (experimental)\n"
-    " --z3                         use Z3 (experimental)\n"
-    " --opensmt                    use OpenSMT (experimental)\n"
+    " --smt1                       output subgoals in SMT1 syntax (obsolete)\n"
+    " --smt2                       output subgoals in SMT2 syntax\n"
+    " --boolector                  use Boolector\n"
+    " --mathsat                    use MathSAT\n"
+    " --cvc4                       use CVC4\n"
+    " --yices                      use Yices\n"
+    " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
     " --refine-arrays              use refinement procedure for arrays (experimental)\n"
     " --refine-arithmetic          use refinement procedure for arithmetic (experimental)\n"

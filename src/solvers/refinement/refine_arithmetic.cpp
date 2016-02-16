@@ -487,10 +487,10 @@ void bv_refinementt::check_UNSAT(approximationt &a)
       // but keep the fraction zero
 
       for(unsigned i=0; i<fraction0.size(); i++)
-        a.add_under_assumption(prop.lnot(fraction0[i]));
+        a.add_under_assumption(!fraction0[i]);
 
       for(unsigned i=0; i<fraction1.size(); i++)
-        a.add_under_assumption(prop.lnot(fraction1[i]));
+        a.add_under_assumption(!fraction1[i]);
     }
     else
     {
@@ -508,12 +508,10 @@ void bv_refinementt::check_UNSAT(approximationt &a)
 
         #if 0
         for(unsigned i=x; i<fraction0.size(); i++)
-          a.add_under_assumption(prop.lnot(
-            fraction0[fraction0.size()-i-1]));
+          a.add_under_assumption(!fraction0[fraction0.size()-i-1]);
 
         for(unsigned i=x; i<fraction1.size(); i++)
-          a.add_under_assumption(prop.lnot(
-            fraction1[fraction1.size()-i-1]));
+          a.add_under_assumption(!fraction1[fraction1.size()-i-1]);
         #endif
       }
     }
@@ -532,10 +530,10 @@ void bv_refinementt::check_UNSAT(approximationt &a)
       a.under_assumptions.reserve(a.op0_bv.size()+a.op1_bv.size());
 
       for(unsigned i=x; i<a.op0_bv.size(); i++)
-        a.add_under_assumption(prop.lnot(a.op0_bv[i]));
+        a.add_under_assumption(!a.op0_bv[i]);
 
       for(unsigned i=x; i<a.op1_bv.size(); i++)
-        a.add_under_assumption(prop.lnot(a.op1_bv[i]));
+        a.add_under_assumption(!a.op1_bv[i]);
     }
   }
 
@@ -585,10 +583,10 @@ void bv_refinementt::initialize(approximationt &a)
   // initially, we force the operands to be all zero
 
   for(unsigned i=0; i<a.op0_bv.size(); i++)
-    a.add_under_assumption(prop.lnot(a.op0_bv[i]));
+    a.add_under_assumption(!a.op0_bv[i]);
 
   for(unsigned i=0; i<a.op1_bv.size(); i++)
-    a.add_under_assumption(prop.lnot(a.op1_bv[i]));
+    a.add_under_assumption(!a.op1_bv[i]);
 }
 
 /*******************************************************************\

@@ -766,7 +766,7 @@ bool c_preprocess_gcc_clang(
     if(config.ansi_c.mode!=configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP)
       command+=" -D _M_IX86=Blend";
 
-    if(config.ansi_c.arch==configt::ansi_ct::archt::ARCH_X86_64)
+    if(config.ansi_c.arch=="x86_64")
       command+=" -D _WIN64"; // yes, both _WIN32 and _WIN64 get defined
 
     if(config.ansi_c.char_is_unsigned)

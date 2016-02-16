@@ -747,28 +747,6 @@ std::string expr2ct::convert_typecast(
 
 /*******************************************************************\
 
-Function: expr2ct::convert_implicit_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string expr2ct::convert_implicit_address_of(
-  const exprt &src,
-  unsigned &precedence)
-{
-  if(src.operands().size()!=1)
-    return convert_norep(src, precedence);
-
-  return convert(src.op0(), precedence);
-}
-
-/*******************************************************************\
-
 Function: expr2ct::convert_trinary
 
   Inputs:
@@ -2193,11 +2171,11 @@ std::string expr2ct::convert_constant(
     else if(type==char_type() && type!=signed_int_type() && type!=unsigned_int_type())
     {
       if(int_value=='\n')
-        dest+="\\n";
+        dest+="'\\n'";
       else if(int_value=='\r')
-        dest+="\\r";
+        dest+="'\\r'";
       else if(int_value=='\t')
-        dest+="\\t";
+        dest+="'\\t'";
       else if(int_value=='\'')
         dest+="'\\''";
       else if(int_value=='\\')
@@ -4300,6 +4278,14 @@ std::string expr2ct::convert(
       return convert_function(src, "SIGN", precedence=16);
   }
 
+  else if(src.id()==ID_popcount)
+  {
+    if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP)
+      return convert_function(src, "__popcnt", precedence=16);
+    else
+      return convert_function(src, "__builtin_popcount", precedence=16);
+  }
+
   else if(src.id()==ID_invalid_pointer)
     return convert_function(src, "INVALID-POINTER", precedence=16);
 
@@ -4322,6 +4308,7 @@ std::string expr2ct::convert(
     return "NULL-object";
 
   else if(src.id()==ID_integer_address ||
+          src.id()==ID_integer_address_object ||
           src.id()==ID_stack_object ||
           src.id()==ID_static_object)
   {
@@ -4668,9 +4655,6 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_typecast)
     return convert_typecast(to_typecast_expr(src), precedence=14);
-
-  else if(src.id()=="implicit_address_of")
-    return convert_implicit_address_of(src, precedence);
 
   else if(src.id()==ID_comma)
     return convert_comma(src, precedence=1);

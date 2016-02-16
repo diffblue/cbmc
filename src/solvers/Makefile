@@ -83,7 +83,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       prop/prop.cpp prop/prop_conv.cpp prop/prop_conv_store.cpp \
       prop/cover_goals.cpp prop/literal.cpp \
       prop/aig.cpp prop/aig_prop.cpp prop/minimize.cpp \
-      prop/prop_assignment.cpp \
+      prop/prop_assignment.cpp prop/bdd_expr.cpp \
       cvc/cvc_conv.cpp cvc/cvc_dec.cpp \
       smt1/smt1_dec.cpp smt1/smt1_conv.cpp \
       smt2/smt2_dec.cpp smt2/smt2_conv.cpp smt2/smt2_parser.cpp smt2/smt2irep.cpp \
@@ -113,10 +113,12 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       flattening/boolbv_complex.cpp flattening/boolbv_floatbv_op.cpp \
       flattening/boolbv_union.cpp flattening/flatten_byte_operators.cpp \
       flattening/boolbv_update.cpp flattening/c_bit_field_replacement_type.cpp \
-      flattening/boolbv_onehot.cpp \
+      flattening/boolbv_onehot.cpp flattening/boolbv_not.cpp \
+      flattening/boolbv_power.cpp \
       floatbv/float_utils.cpp floatbv/float_bv.cpp \
       refinement/bv_refinement_loop.cpp refinement/refine_arithmetic.cpp \
-      refinement/refine_arrays.cpp
+      refinement/refine_arrays.cpp \
+      miniBDD/miniBDD.cpp
 
 INCLUDES= -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \

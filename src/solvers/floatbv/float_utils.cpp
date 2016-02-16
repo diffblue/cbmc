@@ -165,8 +165,7 @@ bvt float_utilst::to_integer(
     literalt exponent_sign=unpacked.exponent[unpacked.exponent.size()-1];
 
     for(unsigned i=0; i<result.size(); i++)
-      result[i]=prop.land(result[i],
-                          prop.lnot(exponent_sign));
+      result[i]=prop.land(result[i], !exponent_sign);
 
     // chop out the right number of bits from the result
     if(result.size()>dest_width)
@@ -315,8 +314,8 @@ Function: float_utilst::is_normal
 literalt float_utilst::is_normal(const bvt &src)
 {
   return prop.land(
-           prop.lnot(exponent_all_zeros(src)),
-           prop.lnot(exponent_all_ones(src)));
+           !exponent_all_zeros(src),
+           !exponent_all_ones(src));
 }
 
 /*******************************************************************\
@@ -367,7 +366,7 @@ bvt float_utilst::add_sub(
 
   // subtract?
   if(subtract)
-    unpacked2.sign=prop.lnot(unpacked2.sign);
+    unpacked2.sign=!unpacked2.sign;
 
   // figure out which operand has the bigger exponent
   const bvt exponent_difference=subtract_exponents(unpacked1, unpacked2);
@@ -433,7 +432,7 @@ bvt float_utilst::add_sub(
 
   // infinity?
   result.infinity=prop.land(
-      prop.lnot(result.NaN),
+      !result.NaN,
       prop.lor(unpacked1.infinity, unpacked2.infinity));
 
   // zero?
@@ -444,8 +443,8 @@ bvt float_utilst::add_sub(
   //     thus we can perform this test now
   //  3. The rules for sign are different for zero
   result.zero = prop.land(
-      prop.lnot(prop.lor(result.infinity, result.NaN)),
-      prop.lnot(prop.lor(result.fraction)));
+      !prop.lor(result.infinity, result.NaN),
+      !prop.lor(result.fraction));
 
 
   // sign
@@ -653,12 +652,12 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   // In particular, inf/0=inf.
   result.infinity=
     prop.lor(
-      prop.land(prop.lnot(unpacked1.zero),
-      prop.land(prop.lnot(unpacked1.NaN),
+      prop.land(!unpacked1.zero,
+      prop.land(!unpacked1.NaN,
                 unpacked2.zero)),
       prop.land(unpacked1.infinity,
-      prop.land(prop.lnot(unpacked2.NaN),
-                prop.lnot(unpacked2.zero))));
+      prop.land(!unpacked2.NaN,
+                !unpacked2.zero)));
 
   // NaN?
   result.NaN=prop.lor(unpacked1.NaN,
@@ -668,7 +667,7 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
 
   // Division by infinity produces zero, unless we have NaN
   literalt force_zero=
-    prop.land(prop.lnot(unpacked1.NaN), unpacked2.infinity);
+    prop.land(!unpacked1.NaN, unpacked2.infinity);
   
   result.fraction=bv_utils.select(force_zero,
     bv_utils.zeros(result.fraction.size()), result.fraction);
@@ -720,7 +719,7 @@ bvt float_utilst::negate(const bvt &src)
   bvt result=src;
   assert(!src.empty());
   literalt &sign_bit=result[result.size()-1];
-  sign_bit=prop.lnot(sign_bit);
+  sign_bit=!sign_bit;
   return result;
 }
 
@@ -805,9 +804,9 @@ literalt float_utilst::relation(
     {
       bvt and_bv;
       and_bv.push_back(less_than3);
-      and_bv.push_back(prop.lnot(bitwise_equal)); // for the case of two negative numbers
-      and_bv.push_back(prop.lnot(both_zero));
-      and_bv.push_back(prop.lnot(NaN));
+      and_bv.push_back(!bitwise_equal); // for the case of two negative numbers
+      and_bv.push_back(!both_zero);
+      and_bv.push_back(!NaN);
 
       return prop.land(and_bv);
     }
@@ -818,7 +817,7 @@ literalt float_utilst::relation(
       or_bv.push_back(both_zero);
       or_bv.push_back(bitwise_equal);
 
-      return prop.land(prop.lor(or_bv), prop.lnot(NaN));
+      return prop.land(prop.lor(or_bv), !NaN);
     }
     else
       assert(false);
@@ -829,7 +828,7 @@ literalt float_utilst::relation(
 
     return prop.land(
       prop.lor(bitwise_equal, both_zero),
-      prop.lnot(NaN));
+      !NaN);
   }
   else
     assert(0);
@@ -874,7 +873,7 @@ Function: float_utilst::is_plus_inf
 literalt float_utilst::is_plus_inf(const bvt &src)
 {
   bvt and_bv;
-  and_bv.push_back(prop.lnot(sign_bit(src)));
+  and_bv.push_back(!sign_bit(src));
   and_bv.push_back(exponent_all_ones(src));
   and_bv.push_back(fraction_all_zeros(src));
   return prop.land(and_bv);
@@ -970,7 +969,7 @@ Function: float_utilst::is_NaN
 literalt float_utilst::is_NaN(const bvt &src)
 {
   return prop.land(exponent_all_ones(src),
-                   prop.lnot(fraction_all_zeros(src)));
+                   !fraction_all_zeros(src));
 }
 
 /*******************************************************************\
@@ -1073,7 +1072,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
     // the bits above need to be zero
     for(unsigned j=0; j<i; j++)
       equal.push_back(
-        prop.lnot(fraction[fraction.size()-1-j]));
+        !fraction[fraction.size()-1-j]);
 
     // this one needs to be one
     equal.push_back(fraction[fraction.size()-1-i]);
@@ -1181,8 +1180,8 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
 
   // use sign bit
   literalt denormal=prop.land(
-    prop.lnot(distance.back()),
-    prop.lnot(bv_utils.is_zero(distance)));
+    !distance.back(),
+    !bv_utils.is_zero(distance));
 
 #if 1
   // Care must be taken to not loose information required for the
@@ -1323,7 +1322,7 @@ literalt float_utilst::fraction_rounding_decision(
   
   // round up
   literalt round_to_plus_inf=
-    prop.land(prop.lnot(sign),
+    prop.land(!sign,
               prop.lor(rounding_bit, sticky_bit));
 
   // round down
@@ -1487,9 +1486,8 @@ void float_utilst::round_exponent(unbiased_floatt &result)
 
     literalt exponent_too_large=
       prop.land(
-        prop.lnot(
-          bv_utils.signed_less_than(old_exponent, max_exponent)),
-        prop.lnot(bv_utils.is_zero(result.fraction)));
+        !bv_utils.signed_less_than(old_exponent, max_exponent),
+        !bv_utils.is_zero(result.fraction));
 
 #if 1
     // Directed rounding modes round overflow to the maximum normal
@@ -1497,12 +1495,12 @@ void float_utilst::round_exponent(unbiased_floatt &result)
     literalt overflow_to_inf=
       prop.lor(rounding_mode_bits.round_to_even,
       prop.lor(prop.land(rounding_mode_bits.round_to_plus_inf,
-                         prop.lnot(result.sign)),
+                         !result.sign),
                prop.land(rounding_mode_bits.round_to_minus_inf,
                          result.sign)));
 
     literalt set_to_max=
-      prop.land(exponent_too_large, prop.lnot(overflow_to_inf));
+      prop.land(exponent_too_large, !overflow_to_inf);
 
 
     bvt largest_normal_exponent=
@@ -1553,7 +1551,7 @@ float_utilst::biased_floatt float_utilst::bias(const unbiased_floatt &src)
   assert(src.fraction.size()==spec.f+1);
 
   literalt hidden_bit=src.fraction[src.fraction.size()-1];
-  literalt denormal=prop.lnot(hidden_bit);
+  literalt denormal=!hidden_bit;
 
   result.fraction=src.fraction;
   result.fraction.resize(spec.f);
@@ -1562,7 +1560,7 @@ float_utilst::biased_floatt float_utilst::bias(const unbiased_floatt &src)
   // (includes zero)
   for(unsigned i=0; i<result.exponent.size(); i++)
     result.exponent[i]=
-      prop.land(result.exponent[i], prop.lnot(denormal));
+      prop.land(result.exponent[i], !denormal);
 
   return result;
 }
@@ -1680,7 +1678,7 @@ bvt float_utilst::pack(const biased_floatt &src)
 
   // just copy fraction
   for(unsigned i=0; i<spec.f; i++)
-    result[i]=prop.land(src.fraction[i], prop.lnot(infinity_or_NaN));
+    result[i]=prop.land(src.fraction[i], !infinity_or_NaN);
 
   result[0]=prop.lor(result[0], src.NaN);
 

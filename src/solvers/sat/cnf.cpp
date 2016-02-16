@@ -231,7 +231,7 @@ Function: cnft::gate_equal
 
 void cnft::gate_equal(literalt a, literalt b, literalt o)
 {
-  gate_xor(a, b, lnot(o));
+  gate_xor(a, b, !o);
 }
   
 /*******************************************************************\
@@ -248,7 +248,7 @@ Function: cnft::gate_implies
 
 void cnft::gate_implies(literalt a, literalt b, literalt o)
 {
-  gate_or(lnot(a), b, o);
+  gate_or(!a, b, o);
 }
 
 /*******************************************************************\
@@ -431,24 +431,6 @@ literalt cnft::lor(literalt a, literalt b)
 
 /*******************************************************************\
 
-Function: cnft::lnot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-literalt cnft::lnot(literalt a)
-{
-  a.invert();
-  return a;
-}
-
-/*******************************************************************\
-
 Function: cnft::lxor
 
   Inputs:
@@ -463,10 +445,10 @@ literalt cnft::lxor(literalt a, literalt b)
 {
   if(a.is_false()) return b;
   if(b.is_false()) return a;
-  if(a.is_true()) return lnot(b);
-  if(b.is_true()) return lnot(a);
+  if(a.is_true()) return !b;
+  if(b.is_true()) return !a;
   if(a==b) return const_literal(false);
-  if(a==lnot(b)) return const_literal(true);
+  if(a==!b) return const_literal(true);
 
   literalt o=new_variable();
   gate_xor(a, b, o);
@@ -487,7 +469,7 @@ Function: cnft::lnand
 
 literalt cnft::lnand(literalt a, literalt b)
 {
-  return lnot(land(a, b));
+  return !land(a, b);
 }
 
 /*******************************************************************\
@@ -504,7 +486,7 @@ Function: cnft::lnor
 
 literalt cnft::lnor(literalt a, literalt b)
 {
-  return lnot(lor(a, b));
+  return !lor(a, b);
 }
 
 /*******************************************************************\
@@ -521,7 +503,7 @@ Function: cnft::lequal
 
 literalt cnft::lequal(literalt a, literalt b)
 {
-  return lnot(lxor(a, b));
+  return !lxor(a, b);
 }
 
 /*******************************************************************\
@@ -538,7 +520,7 @@ Function: cnft::limplies
 
 literalt cnft::limplies(literalt a, literalt b)
 {
-  return lor(lnot(a), b);
+  return lor(!a, b);
 }
 
 /*******************************************************************\
@@ -719,7 +701,7 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
       // prevent duplicate literals
       if(l==previous)
         it=dest.erase(it);
-      else if(previous==lnot(l))
+      else if(previous==!l)
         return true; // clause satisfied trivially
       else
       {

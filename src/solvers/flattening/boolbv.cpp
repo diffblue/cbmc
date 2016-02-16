@@ -358,6 +358,14 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     
     return;
   }
+  else if(expr.id()==ID_reduction_or  || expr.id()==ID_reduction_and  ||
+          expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
+          expr.id()==ID_reduction_xor || expr.id()==ID_reduction_xnor)
+    return convert_reduction(to_unary_expr(expr), bv);
+  else if(expr.id()==ID_not)
+    return convert_not(to_not_expr(expr), bv);
+  else if(expr.id()==ID_power)
+    return convert_power(to_binary_expr(expr), bv);
   else if(expr.id()==ID_float_debug1 ||
           expr.id()==ID_float_debug2)
   {
@@ -525,7 +533,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
   const exprt::operandst &operands=expr.operands();
 
   if(expr.id()==ID_typecast)
-    return convert_typecast(expr);
+    return convert_typecast(to_typecast_expr(expr));
   else if(expr.id()==ID_equal)
     return convert_equality(to_equal_expr(expr));
   else if(expr.id()==ID_verilog_case_equality ||
@@ -536,9 +544,8 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.operands().size()!=2)
       throw "notequal expects two operands";
     
-    return prop.lnot(
-      convert_equality(
-        equal_exprt(expr.op0(), expr.op1())));
+    return !convert_equality(
+        equal_exprt(expr.op0(), expr.op1()));
   }
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
@@ -614,7 +621,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
   else if(expr.id()==ID_reduction_or  || expr.id()==ID_reduction_and  ||
           expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
           expr.id()==ID_reduction_xor || expr.id()==ID_reduction_xnor)
-    return convert_reduction(expr);
+    return convert_reduction(to_unary_expr(expr));
   else if(expr.id()==ID_onehot || expr.id()==ID_onehot0)
     return convert_onehot(to_unary_expr(expr));
   else if(has_prefix(expr.id_string(), "overflow-"))
@@ -647,8 +654,8 @@ literalt boolbvt::convert_rest(const exprt &expr)
       float_utilst float_utils(prop);
       float_utils.spec=to_floatbv_type(expr.op0().type());
       return prop.land(
-        prop.lnot(float_utils.is_infinity(bv)),
-        prop.lnot(float_utils.is_NaN(bv)));
+        !float_utils.is_infinity(bv),
+        !float_utils.is_NaN(bv));
     }
     else if(expr.op0().type().id()==ID_fixedbv)
       return const_literal(true);

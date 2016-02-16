@@ -164,6 +164,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_CATCH "__CPROVER_catch"
 %token TOK_CPROVER_TRY "__CPROVER_try"
 %token TOK_CPROVER_FINALLY "__CPROVER_finally"
+%token TOK_CPROVER_ID  "__CPROVER_ID"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_TRUE        "TRUE"
@@ -215,12 +216,12 @@ extern char *yyansi_ctext;
 %token TOK_SCOPE       "::"
 %token TOK_DOTPM       ".*"
 %token TOK_ARROWPM     "->*"
-%token TOK_MSC_UNARY_TYPE_PREDICATE
-%token TOK_MSC_BINARY_TYPE_PREDICATE
+%token TOK_UNARY_TYPE_PREDICATE
+%token TOK_BINARY_TYPE_PREDICATE
 %token TOK_MSC_UUIDOF  "__uuidof"
 %token TOK_MSC_IF_EXISTS "__if_exists"
 %token TOK_MSC_IF_NOT_EXISTS "__if_not_exists"
-%token TOK_MSC_UNDERLYING_TYPE "__underlying_type"
+%token TOK_UNDERLYING_TYPE "__underlying_type"
 
 /*** priority, associativity, etc. definitions **************************/
 
@@ -244,7 +245,16 @@ grammar:
 /*** Token with values **************************************************/
 
 identifier:
-        TOK_IDENTIFIER
+          TOK_IDENTIFIER
+        | TOK_CPROVER_ID TOK_STRING
+        {
+          $$=$1;
+          stack($$).id(ID_symbol);
+          irep_idt value=stack($2).get(ID_value);
+          stack($$).set(ID_C_base_name, value);
+          stack($$).set(ID_identifier, value);
+          stack($$).set(ID_C_id_class, ANSI_C_SYMBOL);
+        }
         ;
 
 typedef_name:

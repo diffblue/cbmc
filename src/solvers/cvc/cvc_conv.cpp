@@ -1107,7 +1107,6 @@ void cvc_convt::convert_expr(const exprt &expr)
       assert(false);
   }
   else if(expr.id()==ID_address_of ||
-          expr.id()=="implicit_address_of" ||
           expr.id()=="reference_to")
   {
     assert(expr.operands().size()==1);

@@ -1293,7 +1293,7 @@ void goto_checkt::check_rec(
       throw "`"+expr.id_string()+"' must be Boolean, but got "+
             expr.pretty();
 
-    unsigned old_guards=guard.size();
+    guardt old_guard=guard;
 
     for(unsigned i=0; i<expr.operands().size(); i++)
     {
@@ -1311,7 +1311,7 @@ void goto_checkt::check_rec(
         guard.add(op);
     }
 
-    guard.resize(old_guards);
+    guard.swap(old_guard);
 
     return;
   }
@@ -1331,17 +1331,17 @@ void goto_checkt::check_rec(
     check_rec(expr.op0(), guard, false);
 
     {
-      unsigned old_guard=guard.size();
+      guardt old_guard=guard;
       guard.add(expr.op0());
       check_rec(expr.op1(), guard, false);
-      guard.resize(old_guard);
+      guard.swap(old_guard);
     }
 
     {
-      unsigned old_guard=guard.size();
+      guardt old_guard=guard;
       guard.add(not_exprt(expr.op0()));
       check_rec(expr.op2(), guard, false);
-      guard.resize(old_guard);
+      guard.swap(old_guard);
     }
 
     return;

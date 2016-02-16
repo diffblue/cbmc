@@ -200,8 +200,6 @@ void cpp_typecheckt::zero_initializer(
 
   if(final_type.id()==ID_struct)
   {
-    std::list<codet> lst;
-
     forall_irep(cit, final_type.find(ID_components).get_sub())
     {
       const exprt &component=static_cast<const exprt &>(*cit);
@@ -223,43 +221,27 @@ void cpp_typecheckt::zero_initializer(
       zero_initializer(member, component.type(), source_location, ops);
     }
   }
-  else if(final_type.id()==ID_array)
+  else if(final_type.id()==ID_array &&
+          !cpp_is_pod(final_type.subtype()))
   {
-    if(cpp_is_pod(final_type.subtype()))
+    const array_typet &array_type=to_array_type(type);
+    const exprt &size_expr=array_type.size();
+
+    if(size_expr.id()==ID_infinity)
+      return; // don't initialize
+
+    mp_integer size;
+
+    bool to_int=to_integer(size_expr, size);
+    assert(!to_int);
+    assert(size>=0);
+
+    exprt::operandst empty_operands;
+    for(mp_integer i=0; i<size; ++i)
     {
-      exprt value=
-        ::zero_initializer(final_type, source_location, *this, get_message_handler());
-
-      exprt obj=object;
-      typecheck_expr(obj);
-
-      code_assignt assign;
-      assign.lhs()=obj;
-      assign.rhs()=value;
-      assign.add_source_location()=source_location;
-      ops.push_back(assign);
-    }
-    else
-    {
-      const array_typet &array_type=to_array_type(type);
-      const exprt &size_expr=array_type.size();
-
-      if(size_expr.id()==ID_infinity)
-        return; // don't initialize
-
-      mp_integer size;
-
-      bool to_int=to_integer(size_expr, size);
-      assert(!to_int);
-      assert(size>=0);
-
-      exprt::operandst empty_operands;
-      for(mp_integer i=0; i<size; ++i)
-      {
-        exprt index(ID_index);
-        index.copy_to_operands(object, from_integer(i, index_type()));
-        zero_initializer(index, array_type.subtype(), source_location, ops);
-      }
+      exprt index(ID_index);
+      index.copy_to_operands(object, from_integer(i, index_type()));
+      zero_initializer(index, array_type.subtype(), source_location, ops);
     }
   }
   else if(final_type.id()==ID_union)
@@ -338,11 +320,12 @@ void cpp_typecheckt::zero_initializer(
   }
   else
   {
-    assert(gen_zero(final_type).is_not_nil());
+    exprt value=
+      ::zero_initializer(final_type, source_location, *this, get_message_handler());
 
     code_assignt assign;
     assign.lhs()=object;
-    assign.rhs()=gen_zero(final_type);
+    assign.rhs()=value;
     assign.add_source_location()=source_location;
 
     typecheck_expr(assign.op0());

@@ -555,6 +555,52 @@ extern inline union_tag_typet &to_union_tag_type(typet &type)
   return static_cast<union_tag_typet &>(type);
 }
 
+/*! \brief A generic enumeration type (not to be confused with C enums)
+*/
+
+class enumeration_typet:public typet
+{
+public:
+  inline enumeration_typet():typet(ID_enumeration)
+  {
+  }
+  
+  const irept::subt &elements() const
+  {
+    return find(ID_elements).get_sub();
+  }
+
+  irept::subt &elements()
+  {
+    return add(ID_elements).get_sub();
+  }
+};
+
+/*! \brief Cast a generic typet to a \ref enumeration_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * enumeration_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref enumeration_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const enumeration_typet &to_enumeration_type(const typet &type)
+{
+  assert(type.id()==ID_enumeration);
+  return static_cast<const enumeration_typet &>(type);
+}
+
+/*! \copydoc to_enumeration_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline enumeration_typet &to_enumeration_type(typet &type)
+{
+  assert(type.id()==ID_enumeration);
+  return static_cast<enumeration_typet &>(type);
+}
+
 /*! \brief The type of C enums
 */
 
@@ -962,6 +1008,22 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
   return static_cast<const bitvector_typet &>(type);
 }
 
+inline bitvector_typet &to_bitvector_type(typet &type)
+{
+  assert(type.id()==ID_signedbv ||
+         type.id()==ID_unsignedbv ||
+         type.id()==ID_fixedbv ||
+         type.id()==ID_floatbv ||
+         type.id()==ID_verilog_signedbv ||
+         type.id()==ID_verilog_unsignedbv ||
+         type.id()==ID_bv ||
+         type.id()==ID_pointer ||
+         type.id()==ID_c_bit_field ||
+         type.id()==ID_c_bool);
+
+  return static_cast<bitvector_typet &>(type);
+}
+
 /*! \brief fixed-width bit-vector without numerical interpretation
 */
 class bv_typet:public bitvector_typet
@@ -1235,12 +1297,13 @@ public:
   {
   }
 
+  // this one will go away; use the one with width
   inline explicit pointer_typet(const typet &_subtype):
     bitvector_typet(ID_pointer, _subtype)
   {
   }
 
-  inline explicit pointer_typet(const typet &_subtype, unsigned width):
+  inline pointer_typet(const typet &_subtype, unsigned width):
     bitvector_typet(ID_pointer, _subtype, width)
   {
   }
@@ -1286,8 +1349,17 @@ public:
     set(ID_C_reference, true);
   }
 
-  inline explicit reference_typet(const typet &_subtype):pointer_typet(_subtype)
+  // this one will go away; use the one with width
+  inline explicit reference_typet(const typet &_subtype):
+    pointer_typet(_subtype)
   {
+    set(ID_C_reference, true);
+  }
+
+  inline reference_typet(const typet &_subtype, unsigned _width):
+    pointer_typet(_subtype, _width)
+  {
+    set(ID_C_reference, true);
   }
 };
 

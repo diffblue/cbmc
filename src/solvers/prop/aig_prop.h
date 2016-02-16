@@ -24,13 +24,13 @@ public:
   }
 
   virtual bool has_set_to() const { return false; }
+  virtual bool cnf_handled_well() const { return false; }
  
   virtual literalt land(literalt a, literalt b);
   virtual literalt lor(literalt a, literalt b);
   virtual literalt land(const bvt &bv);
   virtual literalt lor(const bvt &bv);
   virtual void lcnf(const bvt &clause) { assert(false); }
-  virtual literalt lnot(literalt a);
   virtual literalt lxor(literalt a, literalt b);
   virtual literalt lxor(const bvt &bv);
   virtual literalt lnand(literalt a, literalt b);
@@ -66,16 +66,13 @@ protected:
 class aig_prop_constraintt:public aig_prop_baset
 {
 public:
-  inline aig_prop_constraintt():aig_prop_baset(aig)
+  inline explicit aig_prop_constraintt(aig_plus_constraintst &_dest):
+    aig_prop_baset(_dest),
+    dest(_dest)
   {
-    // Todo: Note that aig may not be constructed before
-    // it is passed to aig_prop_baset.  Proceed with caution.
   }
 
-  aigt aig;
-  typedef std::vector<literalt> constraintst;
-  constraintst constraints;
-
+  aig_plus_constraintst &dest;
   virtual bool has_set_to() const { return true; }
  
   virtual void lcnf(const bvt &clause)
@@ -85,7 +82,7 @@ public:
   
   virtual void l_set_to(literalt a, bool value)
   {
-    constraints.push_back(a^!value);
+    dest.constraints.push_back(a^!value);
   }
 };
 
@@ -93,9 +90,12 @@ class aig_prop_solvert:public aig_prop_constraintt
 {
 public:
   explicit inline aig_prop_solvert(propt &_solver):
+    aig_prop_constraintt(aig),
     solver(_solver)
   {
   }
+  
+  aig_plus_constraintst aig;
 
   virtual const std::string solver_text()
   { return "conversion into and-inverter graph followed by "+

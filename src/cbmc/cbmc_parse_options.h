@@ -34,7 +34,9 @@ class optionst;
   "(no-assertions)(no-assumptions)" \
   "(xml-ui)(xml-interface)(vcd):" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
-  "(cegis)(cegis-root):(cegis-targets):(cegis-max-prog-size):(cegis-skolem):(cegis-ranking):" \
+  "(cegis)(cegis-seed):(cegis-root):(cegis-targets):(cegis-min-prog-size):(cegis-max-prog-size):(cegis-skolem):(cegis-ranking):" \
+  "(cegis-max-size):(cegis-statistics)(cegis-genetic)(cegis-genetic-rounds):(cegis-genetic-popsize):(cegis-tournament-select)" \
+  "(cegis-genetic-mutation-rate):(cegis-genetic-replace-rate):(cegis-limit-wordsize)(cegis-parallel-verify)(danger)" \
   "(danger)(danger-max-size):" \
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
@@ -58,7 +60,7 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(graphml-cex):" \
+  "(graphml-cex):(json-cex):" \
   "(decide)" // legacy, and will eventually disappear
 
 class cbmc_parse_optionst:

@@ -35,6 +35,8 @@ codet cpp_typecheckt::cpp_constructor(
 
   typecheck_expr(object_tc);
 
+  elaborate_class_template(object_tc.type());
+
   typet tmp_type(object_tc.type());
   follow_symbol(tmp_type);
 

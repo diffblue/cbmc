@@ -127,7 +127,7 @@ propt::resultt satcheck_precosatt::prop_solve()
   const int res=solver->solve();
   if(res==1)
   {
-    msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
+    msg="SAT checker: instance is SATISFIABLE";
     messaget::status() << msg << messaget::eom;
     status=SAT;
     return P_SATISFIABLE;
@@ -135,7 +135,7 @@ propt::resultt satcheck_precosatt::prop_solve()
   else
   {
     assert(res==-1);
-    msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+    msg="SAT checker: instance is UNSATISFIABLE";
     messaget::status() << msg << messaget::eom;
   }
 

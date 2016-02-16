@@ -203,7 +203,7 @@ void cpp_typecheckt::default_ctor(
   cpp_declaratort decl;
   decl.name().id(ID_cpp_name);
   decl.name().move_to_sub(name);
-  decl.type()=typet("function_type");
+  decl.type()=typet(ID_function_type);
   decl.type().subtype().make_nil();
   decl.add_source_location() = source_location;
 
@@ -277,9 +277,9 @@ void cpp_typecheckt::default_cpctor(
   cpp_declarationt parameter_decl;
   parameter_decl.set(ID_type, ID_merged_type);
   typet::subtypest &sub = parameter_decl.type().subtypes();
-  sub.push_back((const typet &)(cppcomp));
+  sub.push_back(static_cast<const typet &>(static_cast<const irept &>(cppcomp)));
   irept constnd(ID_const);
-  sub.push_back((const typet &)(constnd));
+  sub.push_back(static_cast<const typet &>(constnd));
   parameter_decl.move_to_operands(parameter_tor);
   parameter_decl.add_source_location() = source_location;
 
@@ -290,7 +290,7 @@ void cpp_typecheckt::default_cpctor(
   irept &initializers = decl0.add(ID_member_initializers);
   initializers.id(ID_member_initializers);
 
-  cpp_declaratort &declarator = (cpp_declaratort &) cpctor.op0();
+  cpp_declaratort &declarator = static_cast<cpp_declaratort &>(cpctor.op0());
   exprt &block = declarator.value();
 
   // First, we need to call the parent copy constructors
@@ -439,7 +439,7 @@ void cpp_typecheckt::default_assignop(
   declarator_name.get_sub().push_back(irept(ID_operator));
   declarator_name.get_sub().push_back(irept("="));
 
-  declarator_type.id("function_type");
+  declarator_type.id(ID_function_type);
   declarator_type.subtype()=reference_typet();
   declarator_type.subtype().add("#qualifier").make_nil();
   declarator_type.subtype().subtype().make_nil();

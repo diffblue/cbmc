@@ -8,8 +8,8 @@ Date: June 2011
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_SYMEX_VCD_GOTO_TRACE_H
-#define CPROVER_GOTO_SYMEX_VCD_GOTO_TRACE_H
+#ifndef CPROVER_GOTO_PROGRAMS_VCD_GOTO_TRACE_H
+#define CPROVER_GOTO_PROGRAMS_VCD_GOTO_TRACE_H
 
 #include <iosfwd>
 

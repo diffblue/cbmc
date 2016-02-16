@@ -154,11 +154,20 @@ bool gcc_modet::doit()
   
   // get configuration
   config.set(cmdline);
-  
-  if(cmdline.isset("m32") || cmdline.isset("mx32"))
-    config.ansi_c.set_32();
+
+  // Intel-specific  
+  if(cmdline.isset("m16"))
+    config.ansi_c.set_16();
+  else if(cmdline.isset("m32") || cmdline.isset("mx32"))
+  {
+    config.ansi_c.arch="i386";
+    config.ansi_c.set_arch_spec_i386();
+  }
   else if(cmdline.isset("m64"))
-    config.ansi_c.set_64();
+  {
+    config.ansi_c.arch="x86_64";
+    config.ansi_c.set_arch_spec_x86_64();
+  }
     
   // ARM-specific
   if(cmdline.isset("mbig-endian") || cmdline.isset("mbig"))
@@ -252,6 +261,9 @@ bool gcc_modet::doit()
        std_string=="c++1y" ||
        std_string=="gnu++1y")
       config.cpp.set_cpp11();
+
+    if(std_string=="gnu++14" || std_string=="c++14")
+      config.cpp.set_cpp14();
   }
 
   // gcc's default is 32 bits for wchar_t

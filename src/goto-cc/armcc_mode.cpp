@@ -60,7 +60,7 @@ bool armcc_modet::doit()
   config.set(cmdline);
 
   config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_ARM_C_CPP;
-  config.ansi_c.arch=configt::ansi_ct::archt::ARCH_ARM;
+  config.ansi_c.arch="arm";
   
   // determine actions to be taken
   

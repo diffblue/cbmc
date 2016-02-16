@@ -249,7 +249,6 @@ Function: configt::ansi_ct::set_arch_spec_i386
 void configt::ansi_ct::set_arch_spec_i386()
 {
   set_ILP32();
-  arch=archt::ARCH_I386;
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
   NULL_is_zero=true;
@@ -264,13 +263,16 @@ void configt::ansi_ct::set_arch_spec_i386()
     if(os==ost::OS_MACOS)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
+
   case flavourt::MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_IX86");
     break;
+
   case flavourt::MODE_CODEWARRIOR_C_CPP:
   case flavourt::MODE_ARM_C_CPP:
   case flavourt::MODE_ANSI_C_CPP:
     break;
+
   case flavourt::NO_MODE:
     assert(false);
   }
@@ -291,7 +293,6 @@ Function: configt::ansi_ct::set_arch_spec_x86_64
 void configt::ansi_ct::set_arch_spec_x86_64()
 {
   set_LP64();
-  arch=archt::ARCH_X86_64;
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=false;
@@ -341,8 +342,6 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
     set_ILP32();
   else // ppc64 or ppc64le
     set_LP64();
-
-  arch=archt::ARCH_POWER;
 
   if(subarch=="ppc64le")
     endianness=endiannesst::IS_LITTLE_ENDIAN;
@@ -423,7 +422,6 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
     long_double_width=8*8;
   }
 
-  arch=archt::ARCH_ARM;
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=true;
   NULL_is_zero=true;
@@ -466,7 +464,6 @@ Function: configt::ansi_ct::set_arch_spec_alpha
 void configt::ansi_ct::set_arch_spec_alpha()
 {
   set_LP64();
-  arch=archt::ARCH_ALPHA;
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=false;
@@ -504,8 +501,6 @@ Function: configt::ansi_ct::set_arch_spec_mips
 
 void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
 {
-  arch=archt::ARCH_MIPS;
-
   if(subarch=="mipsel" ||
      subarch=="mips" ||
      subarch=="mipsn32el" ||
@@ -565,7 +560,6 @@ Function: configt::ansi_ct::set_arch_spec_s390
 void configt::ansi_ct::set_arch_spec_s390()
 {
   set_ILP32();
-  arch=archt::ARCH_S390;
   endianness=endiannesst::IS_BIG_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=true;
@@ -604,7 +598,6 @@ Function: configt::ansi_ct::set_arch_spec_s390x
 void configt::ansi_ct::set_arch_spec_s390x()
 {
   set_LP64();
-  arch=archt::ARCH_S390X;
   endianness=endiannesst::IS_BIG_ENDIAN;
   char_is_unsigned=true;
   NULL_is_zero=true;
@@ -652,7 +645,6 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
     long_double_width=16*8;
   }
 
-  arch=archt::ARCH_SPARC;
   endianness=endiannesst::IS_BIG_ENDIAN;
   char_is_unsigned=false;
   NULL_is_zero=true;
@@ -692,7 +684,6 @@ Function: configt::ansi_ct::set_arch_spec_ia64
 void configt::ansi_ct::set_arch_spec_ia64()
 {
   set_LP64();
-  arch=archt::ARCH_IA64;
   long_double_width=16*8;
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
@@ -736,7 +727,6 @@ void configt::ansi_ct::set_arch_spec_x32()
   // 32-bit long int and 32-bit pointers.
   set_ILP32();
   long_double_width=16*8; // different from i386
-  arch=archt::ARCH_X32;
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
   NULL_is_zero=true;
@@ -761,6 +751,41 @@ void configt::ansi_ct::set_arch_spec_x32()
   case flavourt::NO_MODE:
     assert(false);
   }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_v850
+
+  Inputs: None
+
+ Outputs: None
+
+ Purpose: Sets up the widths of variables for the Renesas V850
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_v850()
+{
+  // The Renesas V850 is a 32-bit microprocessor used in
+  // many automotive applications.  This spec is written from the
+  // architecture manual rather than having access to a running
+  // system.  Thus some assumptions have been made.
+  
+  set_ILP32();
+
+  // Technically, the V850's don't have floating-point at all.
+  // However, the RH850, aimed at automotive has both 32-bit and
+  // 64-bit IEEE-754 float.
+  double_width=8*8;
+  long_double_width=8*8;
+  endianness=endiannesst::IS_LITTLE_ENDIAN;
+
+  // Without information about the compiler and RTOS, these are guesses
+  char_is_unsigned=false;
+  NULL_is_zero=true;
+
+  // No preprocessor definitions due to lack of information
 }
 
 /*******************************************************************\
@@ -804,6 +829,78 @@ configt::cppt::cpp_standardt configt::cppt::default_cpp_standard()
 {
   return cpp_standardt::CPP98;
 }
+
+/*******************************************************************\
+
+Function: configt::set_arch
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::set_arch(const irep_idt &arch)
+{
+  ansi_c.arch=arch;
+
+  if(arch=="none")
+  {
+    // the architecture for people who can't commit
+    ansi_c.endianness=configt::ansi_ct::endiannesst::NO_ENDIANNESS;
+    ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
+    ansi_c.NULL_is_zero=false;
+
+    if(sizeof(long int)==8)
+      ansi_c.set_64();
+    else
+      ansi_c.set_32();
+  }
+  else if(arch=="alpha")
+    ansi_c.set_arch_spec_alpha();
+  else if(arch=="arm64" ||
+          arch=="armel" ||
+          arch=="armhf" ||
+          arch=="arm")
+    ansi_c.set_arch_spec_arm(arch);
+  else if(arch=="mips64el" ||
+          arch=="mipsn32el" ||
+          arch=="mipsel" ||
+          arch=="mips64" ||
+          arch=="mipsn32" ||
+          arch=="mips")
+    ansi_c.set_arch_spec_mips(arch);
+  else if(arch=="powerpc" ||
+          arch=="ppc64" ||
+          arch=="ppc64le")
+    ansi_c.set_arch_spec_power(arch);
+  else if(arch=="sparc" ||
+          arch=="sparc64")
+    ansi_c.set_arch_spec_sparc(arch);
+  else if(arch=="ia64")
+    ansi_c.set_arch_spec_ia64();
+  else if(arch=="s390x")
+    ansi_c.set_arch_spec_s390x();
+  else if(arch=="s390")
+    ansi_c.set_arch_spec_s390();
+  else if(arch=="x32")
+    ansi_c.set_arch_spec_x32();
+  else if(arch=="v850")
+    ansi_c.set_arch_spec_v850();
+  else if(arch=="x86_64")
+    ansi_c.set_arch_spec_x86_64();
+  else if(arch=="i386")
+    ansi_c.set_arch_spec_i386();
+  else
+  {
+    // We run on something new and unknown.
+    // We verify for i386 instead.
+    ansi_c.set_arch_spec_i386();
+    ansi_c.arch="i386";
+  }
+}
   
 /*******************************************************************\
 
@@ -829,7 +926,7 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.use_fixed_for_float=false;
   ansi_c.endianness=ansi_ct::endiannesst::NO_ENDIANNESS;
   ansi_c.os=ansi_ct::ost::NO_OS;
-  ansi_c.arch=ansi_ct::archt::NO_ARCH;
+  ansi_c.arch="none";
   ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
   ansi_c.NULL_is_zero=(size_t)((void*)0)==0;
   
@@ -916,6 +1013,16 @@ bool configt::set(const cmdlinet &cmdline)
     os="macos";
   }
 
+  if(cmdline.isset("arch"))
+  {
+    arch=cmdline.get_value("arch");
+  }
+
+  if(cmdline.isset("os"))
+  {
+    os=cmdline.get_value("os");
+  }
+    
   if(os=="windows")
   {
     // Cygwin uses GCC throughout, use i386-linux
@@ -983,60 +1090,8 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
     ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
   }
-  
-  if(arch=="none")
-  {
-    // the architecture for people who can't commit
-    ansi_c.arch=configt::ansi_ct::archt::NO_ARCH;
-    ansi_c.endianness=configt::ansi_ct::endiannesst::NO_ENDIANNESS;
-    ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
-    ansi_c.NULL_is_zero=false;
 
-    if(sizeof(long int)==8)
-      ansi_c.set_64();
-    else
-      ansi_c.set_32();
-  }
-  else if(arch=="alpha")
-    ansi_c.set_arch_spec_alpha();
-  else if(arch=="arm64" ||
-          arch=="armel" ||
-          arch=="armhf" ||
-          arch=="arm")
-    ansi_c.set_arch_spec_arm(arch);
-  else if(arch=="mips64el" ||
-          arch=="mipsn32el" ||
-          arch=="mipsel" ||
-          arch=="mips64" ||
-          arch=="mipsn32" ||
-          arch=="mips")
-    ansi_c.set_arch_spec_mips(arch);
-  else if(arch=="powerpc" ||
-          arch=="ppc64" ||
-          arch=="ppc64le")
-    ansi_c.set_arch_spec_power(arch);
-  else if(arch=="sparc" ||
-          arch=="sparc64")
-    ansi_c.set_arch_spec_sparc(arch);
-  else if(arch=="ia64")
-    ansi_c.set_arch_spec_ia64();
-  else if(arch=="s390x")
-    ansi_c.set_arch_spec_s390x();
-  else if(arch=="s390")
-    ansi_c.set_arch_spec_s390();
-  else if(arch=="x32")
-    ansi_c.set_arch_spec_x32();
-  else if(arch=="x86_64")
-    ansi_c.set_arch_spec_x86_64();
-  else if(arch=="i386")
-    ansi_c.set_arch_spec_i386();
-  else
-  {
-    // We run on something new and unknown.
-    // We verify for i386 instead.
-    ansi_c.set_arch_spec_i386();
-    arch="i386";
-  }
+  set_arch(arch);
 
   if(os=="windows")
   {
@@ -1143,7 +1198,7 @@ bool configt::set(const cmdlinet &cmdline)
 
 /*******************************************************************\
 
-Function: from_ns
+Function: configt::ansi_ct::os_to_string
 
   Inputs:
 
@@ -1153,7 +1208,90 @@ Function: from_ns
 
 \*******************************************************************/
 
-static unsigned from_ns(
+std::string configt::ansi_ct::os_to_string(ost os)
+{
+  switch(os)
+  {
+  case ost::OS_LINUX: return "linux";
+  case ost::OS_MACOS: return "macos";
+  case ost::OS_WIN: return "win";
+  default: return "none";
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::string_to_os
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+configt::ansi_ct::ost configt::ansi_ct::string_to_os(const std::string &os)
+{
+  if(os=="linux")
+    return ost::OS_LINUX;
+  else if(os=="macos")
+    return ost::OS_MACOS;
+  else if(os=="win")
+    return ost::OS_WIN;
+  else
+    return ost::NO_OS;
+}
+
+/*******************************************************************\
+
+Function: string_from_ns
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static irep_idt string_from_ns(
+  const namespacet &ns,
+  const std::string &what)
+{
+  const irep_idt id=CPROVER_PREFIX "architecture_"+what;
+  const symbolt *symbol;
+
+  if(ns.lookup(id, symbol))
+    throw "failed to find "+id2string(id);
+    
+  const exprt &tmp=symbol->value;
+  
+  if(tmp.id()!=ID_address_of ||
+     tmp.operands().size()!=1 ||
+     tmp.op0().id()!=ID_index ||
+     tmp.op0().operands().size()!=2 ||
+     tmp.op0().op0().id()!=ID_string_constant)
+  {
+    throw "symbol table configuration entry `"+id2string(id)+"' is not a string constant";
+  }
+
+  return tmp.op0().op0().get(ID_value);
+}
+
+/*******************************************************************\
+
+Function: unsigned_from_ns
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static unsigned unsigned_from_ns(
   const namespacet &ns,
   const std::string &what)
 {
@@ -1179,7 +1317,7 @@ static unsigned from_ns(
 
 /*******************************************************************\
 
-Function: configt::ansi_ct::set_from_symbol_table
+Function: configt::set_from_symbol_table
 
   Inputs:
 
@@ -1189,7 +1327,8 @@ Function: configt::ansi_ct::set_from_symbol_table
 
 \*******************************************************************/
 
-void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
+void configt::set_from_symbol_table(
+  const symbol_tablet &symbol_table)
 {
   // maybe not compiled from C/C++
   if(symbol_table.symbols.find(CPROVER_PREFIX "architecture_" "int_width")==
@@ -1197,35 +1336,49 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
     return;
 
   namespacet ns(symbol_table);
+  
+  // clear defines
+  ansi_c.defines.clear();
 
-  int_width=from_ns(ns, "int_width");
-  long_int_width=from_ns(ns, "long_int_width");
-  bool_width=1*8;
-  char_width=from_ns(ns, "char_width");
-  short_int_width=from_ns(ns, "short_int_width");
-  long_long_int_width=from_ns(ns, "long_long_int_width");
-  pointer_width=from_ns(ns, "pointer_width");
-  single_width=from_ns(ns, "single_width");
-  double_width=from_ns(ns, "double_width");
-  long_double_width=from_ns(ns, "long_double_width");
-  wchar_t_width=from_ns(ns, "wchar_t_width");
+  // first set architecture to get some defaults
+  if(symbol_table.symbols.find(CPROVER_PREFIX "architecture_" "arch")==
+     symbol_table.symbols.end())
+    set_arch(id2string(this_architecture()));
+  else
+    set_arch(string_from_ns(ns, "arch"));
+  
+  ansi_c.int_width=unsigned_from_ns(ns, "int_width");
+  ansi_c.long_int_width=unsigned_from_ns(ns, "long_int_width");
+  ansi_c.bool_width=1*8;
+  ansi_c.char_width=unsigned_from_ns(ns, "char_width");
+  ansi_c.short_int_width=unsigned_from_ns(ns, "short_int_width");
+  ansi_c.long_long_int_width=unsigned_from_ns(ns, "long_long_int_width");
+  ansi_c.pointer_width=unsigned_from_ns(ns, "pointer_width");
+  ansi_c.single_width=unsigned_from_ns(ns, "single_width");
+  ansi_c.double_width=unsigned_from_ns(ns, "double_width");
+  ansi_c.long_double_width=unsigned_from_ns(ns, "long_double_width");
+  ansi_c.wchar_t_width=unsigned_from_ns(ns, "wchar_t_width");
 
-  char_is_unsigned=from_ns(ns, "char_is_unsigned")!=0;
-  wchar_t_is_unsigned=from_ns(ns, "wchar_t_is_unsigned")!=0;
-  use_fixed_for_float=from_ns(ns, "fixed_for_float")!=0;
+  ansi_c.char_is_unsigned=unsigned_from_ns(ns, "char_is_unsigned")!=0;
+  ansi_c.wchar_t_is_unsigned=unsigned_from_ns(ns, "wchar_t_is_unsigned")!=0;
+  ansi_c.use_fixed_for_float=unsigned_from_ns(ns, "fixed_for_float")!=0;
   // for_has_scope, single_precision_constant, rounding_mode not
   // stored in namespace
 
-  alignment=from_ns(ns, "alignment");
+  ansi_c.alignment=unsigned_from_ns(ns, "alignment");
 
-  memory_operand_size=from_ns(ns, "memory_operand_size");
+  ansi_c.memory_operand_size=unsigned_from_ns(ns, "memory_operand_size");
 
-  endianness=(endiannesst)from_ns(ns, "endianness");
+  ansi_c.endianness=(ansi_ct::endiannesst)unsigned_from_ns(ns, "endianness");
 
-  // os, arch not stored in namespace
+  if(symbol_table.symbols.find(CPROVER_PREFIX "architecture_" "os")==
+     symbol_table.symbols.end())
+    ansi_c.os=ansi_ct::string_to_os(id2string(this_operating_system()));
+  else
+    ansi_c.os=ansi_ct::string_to_os(id2string(string_from_ns(ns, "os")));
 
   //NULL_is_zero=from_ns("NULL_is_zero");
-  NULL_is_zero=true;
+  ansi_c.NULL_is_zero=true;
 
   // mode, preprocessor (and all preprocessor command line options),
   // lib, string_abstraction not stored in namespace

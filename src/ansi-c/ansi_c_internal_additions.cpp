@@ -71,6 +71,25 @@ Function: architecture_string
 
 \*******************************************************************/
 
+static std::string architecture_string(const std::string &value, const char *s)
+{
+  return std::string("const char *__CPROVER_architecture_")+
+         std::string(s)+
+         "=\""+value+"\";\n";
+}
+
+/*******************************************************************\
+
+Function: architecture_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static std::string architecture_string(int value, const char *s)
 {
   return std::string("const int __CPROVER_architecture_")+
@@ -222,32 +241,38 @@ void ansi_c_internal_additions(std::string &code)
     // there are many more, e.g., look at
     // https://developer.apple.com/library/mac/#documentation/developertools/gcc-4.0.1/gcc/Target-Builtins.html
 
-    switch(config.ansi_c.arch)
+    if(config.ansi_c.arch=="i386" ||
+       config.ansi_c.arch=="x86_64" ||
+       config.ansi_c.arch=="x32")
     {
-    case configt::ansi_ct::archt::ARCH_I386:
-    case configt::ansi_ct::archt::ARCH_X86_64:
-    case configt::ansi_ct::archt::ARCH_X32:
       code+=gcc_builtin_headers_ia32;
       code+=gcc_builtin_headers_ia32_2;
-      break;
-      
-    case configt::ansi_ct::archt::ARCH_ARM:
+    }
+    else if(config.ansi_c.arch=="arm64" ||
+            config.ansi_c.arch=="armel" ||
+            config.ansi_c.arch=="armhf" ||
+            config.ansi_c.arch=="arm")
+    {
       code+=gcc_builtin_headers_arm;
-      break;
-
-    case configt::ansi_ct::archt::ARCH_ALPHA:
+    }
+    else if(config.ansi_c.arch=="alpha")
+    {
       code+=gcc_builtin_headers_alpha;
-      break;
-     
-    case configt::ansi_ct::archt::ARCH_MIPS:
+    }
+    else if(config.ansi_c.arch=="mips64el" ||
+            config.ansi_c.arch=="mipsn32el" ||
+            config.ansi_c.arch=="mipsel" ||
+            config.ansi_c.arch=="mips64" ||
+            config.ansi_c.arch=="mipsn32" ||
+            config.ansi_c.arch=="mips")
+    {
       code+=gcc_builtin_headers_mips;
-      break;
-     
-    case configt::ansi_ct::archt::ARCH_POWER:
+    }
+    else if(config.ansi_c.arch=="powerpc" ||
+            config.ansi_c.arch=="ppc64" ||
+            config.ansi_c.arch=="ppc64le")
+    {
       code+=gcc_builtin_headers_power;
-      break;
-     
-    default:;
     }
 
     // On 64-bit systems, gcc has typedefs
@@ -314,5 +339,7 @@ void ansi_c_architecture_strings(std::string &code)
   code+=architecture_string(config.ansi_c.alignment, "alignment");
   code+=architecture_string(config.ansi_c.memory_operand_size, "memory_operand_size");
   code+=architecture_string(int(config.ansi_c.endianness), "endianness");
+  code+=architecture_string(id2string(config.ansi_c.arch), "arch");
+  code+=architecture_string(configt::ansi_ct::os_to_string(config.ansi_c.os), "os");
   code+=architecture_string(config.ansi_c.NULL_is_zero, "NULL_is_zero");
 }

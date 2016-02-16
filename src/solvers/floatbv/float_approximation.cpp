@@ -53,7 +53,7 @@ void float_approximationt::normalization_shift(bvt &fraction, bvt &exponent)
     // the bits above need to be zero
     for(unsigned j=0; j<i; j++)
       equal.push_back(
-        prop.lnot(fraction[fraction.size()-1-j]));
+        !fraction[fraction.size()-1-j]);
 
     // this one needs to be one
     equal.push_back(fraction[fraction.size()-1-i]);

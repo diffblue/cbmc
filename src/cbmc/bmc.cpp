@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/json_goto_trace.h>
 #include <goto-programs/graphml_goto_trace.h>
 
 #include <goto-symex/build_goto_trace.h>
@@ -72,19 +73,6 @@ void bmct::error_trace()
   goto_tracet &goto_trace=safety_checkert::error_trace;
   build_goto_trace(equation, prop_conv, ns, goto_trace);
   
-  #if 0
-  if(options.get_option("vcd")!="")
-  {
-    if(options.get_option("vcd")=="-")
-      output_vcd(ns, goto_trace, std::cout);
-    else
-    {
-      std::ofstream out(options.get_option("vcd").c_str());
-      output_vcd(ns, goto_trace, out);
-    }
-  }
-  #endif
-  
   switch(ui)
   {
   case ui_message_handlert::PLAIN:
@@ -118,6 +106,22 @@ void bmct::error_trace()
       write_graphml(cex_graph, out);
     }
   }
+
+  if(options.get_option("json-cex")!="")
+  {
+    jsont json_trace;
+    convert(ns, goto_trace, json_trace);
+  
+    if(options.get_option("json-cex")=="-")
+    {
+      std::cout << json_trace;
+    }
+    else
+    {
+      std::ofstream out(options.get_option("json-cex").c_str());
+      out << json_trace << '\n';
+    }
+  }  
 }
 
 /*******************************************************************\

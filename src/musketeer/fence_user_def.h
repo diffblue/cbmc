@@ -40,7 +40,7 @@ public:
   }
 
   fence_user_def_insertert(instrumentert &instr, memory_modelt _model)
-    :fence_insertert(instr, model) {
+    :fence_insertert(instr, _model) {
   }  
 };
 

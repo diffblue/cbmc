@@ -824,7 +824,7 @@ void bv_pointerst::do_postponed(
       literalt l1=bv_utils.equal(bv, saved_bv);
       literalt l2=postponed.bv.front();
       
-      if(!is_dynamic) l2=prop.lnot(l2);
+      if(!is_dynamic) l2=!l2;
       
       prop.l_set_to(prop.limplies(l1, l2), true);
     }

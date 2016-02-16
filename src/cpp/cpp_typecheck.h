@@ -245,10 +245,6 @@ protected:
   // Misc
   //
 
-  void find_constructor(
-    const typet &dest_type,
-    exprt &symbol_expr);
-
   void default_ctor(
     const source_locationt &source_location,
     const irep_idt &base_name,
@@ -354,7 +350,6 @@ protected:
 
   // types
 
-  bool convert_typedef(typet &type);
   void typecheck_type(typet &type);
 
   cpp_scopet &typecheck_template_parameters(

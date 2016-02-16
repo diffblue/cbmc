@@ -50,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/interval_domain.h>
 #include <analyses/reaching_definitions.h>
 #include <analyses/dependence_graph.h>
+#include <analyses/constant_propagator.h>
 
 #include <cbmc/version.h>
 
@@ -80,7 +81,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "accelerate/accelerate.h"
 #include "count_eloc.h"
 #include "horn_encoding.h"
-#include "thread_exit_instrumentation.h"
+#include "thread_instrumentation.h"
 
 /*******************************************************************\
 
@@ -223,31 +224,7 @@ int goto_instrument_parse_optionst::doit()
 
       return 0;
     }
-
-    if(cmdline.isset("escape-analysis"))
-    {
-      do_function_pointer_removal();
-      do_partial_inlining();
-      do_remove_returns();
-      parameter_assignments(symbol_table, goto_functions);
-
-      namespacet ns(symbol_table);
-
-      // recalculate numbers, etc.
-      goto_functions.update();
-
-      status() << "Escape Analysis" << eom;
-      escape_analysist escape_analysis;
-      escape_analysis(goto_functions, ns);
-      escape_analysis.instrument(goto_functions, ns);
-
-      // inline added functions, they are often small
-      goto_partial_inline(goto_functions, ns, ui_message_handler);
-
-      // recalculate numbers, etc.
-      goto_functions.update();
-    }
-
+    
     if(cmdline.isset("show-custom-bitvector-analysis"))
     {
       do_function_pointer_removal();
@@ -257,7 +234,11 @@ int goto_instrument_parse_optionst::doit()
       
       remove_unused_functions(goto_functions, get_message_handler());
       
-      thread_exit_instrumentation(goto_functions);
+      if(!cmdline.isset("inline"))
+      {
+        thread_exit_instrumentation(goto_functions);
+        mutex_init_instrumentation(symbol_table, goto_functions);
+      }
 
       // recalculate numbers, etc.
       goto_functions.update();
@@ -299,7 +280,11 @@ int goto_instrument_parse_optionst::doit()
 
       remove_unused_functions(goto_functions, get_message_handler());
     
-      thread_exit_instrumentation(goto_functions);
+      if(!cmdline.isset("inline"))
+      {
+        thread_exit_instrumentation(goto_functions);
+        mutex_init_instrumentation(symbol_table, goto_functions);
+      }
 
       // recalculate numbers, etc.
       goto_functions.update();
@@ -531,6 +516,10 @@ int goto_instrument_parse_optionst::doit()
       const bool is_cpp=cmdline.isset("dump-cpp");
       const bool h=cmdline.isset("use-system-headers");
       namespacet ns(symbol_table);
+
+      // restore RETURN instructions in case remove_returns had been
+      // applied
+      restore_returns(symbol_table, goto_functions);
       
       if(cmdline.args.size()==2)
       {
@@ -762,7 +751,7 @@ void goto_instrument_parse_optionst::get_goto_program()
     throw 0;
 
   config.set(cmdline);
-  config.ansi_c.set_from_symbol_table(symbol_table);
+  config.set_from_symbol_table(symbol_table);
 }
 
 /*******************************************************************\
@@ -875,12 +864,52 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("add-library") ||
      cmdline.isset("mm"))
   {
+    if(cmdline.isset("show-custom-bitvector-analysis") ||
+       cmdline.isset("custom-bitvector-analysis"))
+      config.ansi_c.defines.push_back("__CPROVER_CUSTOM_BITVECTOR_ANALYSIS");
+  
     status() << "Adding CPROVER library" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
   }
 
   namespacet ns(symbol_table);
 
+  if(cmdline.isset("show-custom-bitvector-analysis") ||
+     cmdline.isset("custom-bitvector-analysis"))
+  {
+    partial_inlining_done=true;
+    status() << "Partial Inlining" << eom;
+    const namespacet ns(symbol_table);
+    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    status() << "Propagating Constants" << eom;
+    constant_propagator_ait constant_propagator_ai(goto_functions, ns);
+    remove_skip(goto_functions);
+  }
+
+  if(cmdline.isset("escape-analysis"))
+  {
+    do_function_pointer_removal();
+    do_partial_inlining();
+    do_remove_returns();
+    parameter_assignments(symbol_table, goto_functions);
+
+    namespacet ns(symbol_table);
+
+    // recalculate numbers, etc.
+    goto_functions.update();
+
+    status() << "Escape Analysis" << eom;
+    escape_analysist escape_analysis;
+    escape_analysis(goto_functions, ns);
+    escape_analysis.instrument(goto_functions, ns);
+
+    // inline added functions, they are often small
+    goto_partial_inline(goto_functions, ns, ui_message_handler);
+
+    // recalculate numbers, etc.
+    goto_functions.update();
+  }
+    
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
@@ -888,8 +917,29 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     remove_function_pointers(
       symbol_table, goto_functions, cmdline.isset("pointer-check"));
 
+    if(cmdline.isset("show-custom-bitvector-analysis") ||
+       cmdline.isset("custom-bitvector-analysis"))
+    {
+      do_remove_returns();
+      thread_exit_instrumentation(goto_functions);
+      mutex_init_instrumentation(symbol_table, goto_functions);
+    }
+
     status() << "Performing full inlining" << eom;
     goto_inline(goto_functions, ns, ui_message_handler);
+  }
+
+  if(cmdline.isset("constant-propagator"))
+  {
+    do_function_pointer_removal();
+
+    namespacet ns(symbol_table);
+
+    status() << "Propagating Constants" << eom;
+
+    constant_propagator_ait constant_propagator_ai(goto_functions, ns);
+    
+    remove_skip(goto_functions);
   }
 
   // add generic checks, if needed
@@ -1278,6 +1328,7 @@ void goto_instrument_parse_optionst::help()
     " --full-slice                 slice away instructions that don't affect assertions\n"
     "\n"
     "Further transformations:\n"
+    " --constant-propagator        propagate constants and simplify expressions\n"
     " --inline                     perform full inlining\n"
     " --add-library                add models of C library functions\n"
     "\n"

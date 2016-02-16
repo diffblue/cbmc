@@ -350,7 +350,7 @@ Function: slice
 \*******************************************************************/
 
 void slice(symex_target_equationt &equation, 
-	   const expr_listt &expressions)
+           const expr_listt &expressions)
 {
   symex_slicet symex_slice;
   symex_slice.slice(equation, expressions);

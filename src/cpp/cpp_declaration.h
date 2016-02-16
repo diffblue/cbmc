@@ -117,13 +117,14 @@ public:
     return get("specialization_of");
   }
   
+  void set_is_typedef()
+  {
+    set(ID_is_typedef, true);
+  }
+  
   bool is_typedef() const
   {
-    const typet &t=type();
-  
-    return t.id()==ID_merged_type &&
-           t.subtypes().size()>=2 &&
-           t.subtypes()[0].id()==ID_typedef;
+    return get_bool(ID_is_typedef);
   }
 
   void output(std::ostream &out) const;

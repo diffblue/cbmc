@@ -58,7 +58,7 @@ int all_paths_enumeratort::backtrack(patht &path) {
   goto_programt::targetst succs;
   goto_program.get_successors(parent.loc, succs);
 
-  int ret = 0;
+  unsigned int ret = 0;
 
   for (goto_programt::targetst::iterator it = succs.begin();
        it != succs.end();
@@ -70,7 +70,8 @@ int all_paths_enumeratort::backtrack(patht &path) {
     ret++;
   }
 
-  if ((ret + 1) < succs.size()) {
+  if ((ret + 1) < succs.size())
+  {
     // We can take the next branch here...
 
 #ifdef DEBUG
