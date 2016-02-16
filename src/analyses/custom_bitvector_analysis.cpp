@@ -33,35 +33,19 @@ void custom_bitvector_domaint::set_bit(
   switch(mode)
   {
   case SET_MUST:
-    {
-      bit_vectort &bit_vector=must_bits[identifier];
-      bit_vector|=(1l<<bit_nr);
-    }
+    set_bit(must_bits[identifier], bit_nr);
     break;
   
   case CLEAR_MUST:
-    {
-      bit_vectort &bit_vector=must_bits[identifier];
-      bit_vector|=(1l<<bit_nr);
-      bit_vector^=(1l<<bit_nr);
-      if(bit_vector==0) must_bits.erase(identifier);
-    }
+    clear_bit(must_bits[identifier], bit_nr);
     break;
   
   case SET_MAY:
-    {
-      bit_vectort &bit_vector=may_bits[identifier];
-      bit_vector|=(1l<<bit_nr);
-    }
+    set_bit(may_bits[identifier], bit_nr);
     break;
   
   case CLEAR_MAY:
-    {
-      bit_vectort &bit_vector=may_bits[identifier];
-      bit_vector|=(1l<<bit_nr);
-      bit_vector^=(1l<<bit_nr);
-      if(bit_vector==0) may_bits.erase(identifier);
-    }
+    clear_bit(may_bits[identifier], bit_nr);
     break;
   }
 }
@@ -341,15 +325,15 @@ void custom_bitvector_domaint::transform(
                to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
             {
               if(mode==CLEAR_MAY)
-                for(bitst::const_iterator b_it=may_bits.begin();
+                for(bitst::iterator b_it=may_bits.begin();
                     b_it!=may_bits.end();
                     b_it++)
-                  set_bit(b_it->first, bit_nr, mode);
+                  clear_bit(b_it->second, bit_nr);
               else if(mode==CLEAR_MUST)
-                for(bitst::const_iterator b_it=must_bits.begin();
+                for(bitst::iterator b_it=must_bits.begin();
                     b_it!=must_bits.end();
                     b_it++)
-                  set_bit(b_it->first, bit_nr, mode);
+                  clear_bit(b_it->second, bit_nr);
             }
             else
             {

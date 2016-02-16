@@ -58,6 +58,18 @@ public:
     locationt to);
 
   typedef unsigned long long bit_vectort;
+  
+  inline void set_bit(bit_vectort &dest, unsigned bit_nr)
+  {
+    dest|=(1l<<bit_nr);
+  }
+  
+  inline void clear_bit(bit_vectort &dest, unsigned bit_nr)
+  {
+    dest|=(1l<<bit_nr);
+    dest^=(1l<<bit_nr);
+  }  
+  
   typedef std::map<irep_idt, bit_vectort> bitst;
   
   struct vectorst
