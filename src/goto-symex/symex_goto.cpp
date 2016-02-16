@@ -329,6 +329,14 @@ void goto_symext::phi_function(
     if(dest_state.atomic_section_id==0 &&
        dest_state.threads.size()>=2 && symbol.is_shared())
       continue; // no phi nodes for shared stuff
+
+    // don't merge (thread-)locals across different threads, which
+    // may have been introduced by symex_start_thread (and will
+    // only later be removed from level2.current_names by pop_frame
+    // once the thread is executed)
+    if(!it->get_level_0().empty() &&
+       it->get_level_0()!=i2string(dest_state.source.thread_nr))
+      continue;
     
     // get type (may need renaming)      
     typet type=symbol.type;
