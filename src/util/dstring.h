@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class dstring
 {
 public:
-  #if __cplusplus > 199711L
   // this is safe for static objects
   constexpr dstring():no(0)
   {
@@ -31,18 +30,6 @@ public:
   // This conversion allows the use of dstrings
   // in switch ... case statements.  
   constexpr operator int() const { return no; }
-  #else
-  // this is safe for static objects
-  inline dstring():no(0)
-  {
-  }
-
-  // this is safe for static objects
-  // the 2nd argument is to avoid accidental conversions
-  inline dstring(unsigned _no, unsigned):no(_no)
-  {
-  }
-  #endif
 
   // this one is not safe for static objects
   inline dstring(const char *s):no(string_container[s])
