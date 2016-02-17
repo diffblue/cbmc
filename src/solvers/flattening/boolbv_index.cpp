@@ -339,6 +339,12 @@ void boolbvt::convert_index(
      offset+width<=mp_integer(tmp.size()))
   {
     // in bounds
+
+    // Expression simplification should remove these cases
+    assert(array.id()!=ID_array_of &&
+           array.id()!=ID_array);
+    // If not there are large improvements possible as above
+
     for(unsigned i=0; i<width; i++)
       bv[i]=tmp[integer2long(offset+i)];
   }
