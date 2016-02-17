@@ -11,3 +11,4 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/type.h>
 
 std::string type2name(const typet &type);
+std::string type2name(const typet &type, const namespacet &ns);

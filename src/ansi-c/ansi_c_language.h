@@ -52,6 +52,11 @@ public:
     std::string &code,
     const namespacet &ns);
 
+  virtual bool type_to_name(
+    const typet &type,
+    std::string &name,
+    const namespacet &ns);
+
   virtual bool to_expr(
     const std::string &code,
     const std::string &module,

@@ -61,6 +61,11 @@ public:
     std::string &code,
     const namespacet &ns);
 
+  virtual bool type_to_name(
+    const typet &type,
+    std::string &name,
+    const namespacet &ns);
+
   // conversion from string into expression
   virtual bool to_expr(
     const std::string &code,
