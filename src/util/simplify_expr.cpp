@@ -1643,30 +1643,25 @@ exprt simplify_exprt::bits2expr(
   // bits start at lowest memory address
   const typet &type=ns.follow(_type);
 
+  if(pointer_offset_bits(type, ns)!=bits.size())
+    return nil_exprt();
+
   if(type.id()==ID_unsignedbv ||
      type.id()==ID_signedbv ||
      type.id()==ID_floatbv ||
      type.id()==ID_fixedbv)
   {
-    unsigned width=to_bitvector_type(type).get_width();
-    if(bits.size()==width)
-    {
-      endianness_mapt map(type, little_endian, ns);
+    endianness_mapt map(type, little_endian, ns);
 
-      std::string tmp=bits;
-      for(std::string::size_type i=0; i<bits.size(); ++i)
-        tmp[i]=bits[map.map_bit(i)];
+    std::string tmp=bits;
+    for(std::string::size_type i=0; i<bits.size(); ++i)
+      tmp[i]=bits[map.map_bit(i)];
 
-      std::reverse(tmp.begin(), tmp.end());
-      return constant_exprt(tmp, type);
-    }
+    std::reverse(tmp.begin(), tmp.end());
+    return constant_exprt(tmp, type);
   }
   else if(type.id()==ID_c_enum)
-  {
-    unsigned width=to_bitvector_type(type.subtype()).get_width();
-    if(bits.size()==width)
-      return constant_exprt(bits, type);
-  }
+    return constant_exprt(bits, type);
   else if(type.id()==ID_c_enum_tag)
     return
       bits2expr(
@@ -1675,15 +1670,82 @@ exprt simplify_exprt::bits2expr(
         little_endian);
   else if(type.id()==ID_union)
   {
-    // need to find full-size member
+    // find a suitable member
+    const union_typet &union_type=to_union_type(type);
+    const union_typet::componentst &components=
+      union_type.components();
+
+    for(union_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        ++it)
+    {
+      exprt val=bits2expr(bits, it->type(), little_endian);
+      if(val.is_nil())
+        continue;
+
+      return union_exprt(it->get_name(), val, type);
+    }
   }
   else if(type.id()==ID_struct)
   {
-    // need to split up; this exposes endianness
+    const struct_typet &struct_type=to_struct_type(type);
+    const struct_typet::componentst &components=
+      struct_type.components();
+
+    exprt result=struct_exprt(type);
+    result.reserve_operands(components.size());
+
+    mp_integer m_offset_bits=0;
+    for(struct_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        ++it)
+    {
+      mp_integer m_size=pointer_offset_bits(it->type(), ns);
+      assert(m_size>=0);
+
+      std::string comp_bits=
+        std::string(
+          bits,
+          integer2long(m_offset_bits),
+          integer2long(m_size));
+      exprt comp=bits2expr(comp_bits, it->type(), little_endian);
+      if(comp.is_nil())
+        return nil_exprt();
+      result.move_to_operands(comp);
+
+      m_offset_bits+=m_size;
+    }
+
+    return result;
   }
   else if(type.id()==ID_array)
   {
-    // need to split up; this exposes endianness
+    const array_typet &array_type=to_array_type(type);
+
+    mp_integer size;
+    if(to_integer(array_type.size(), size))
+      assert(false);
+    std::size_t n_el=integer2long(size);
+
+    std::size_t el_size=
+      integer2long(pointer_offset_bits(type.subtype(), ns));
+    assert(el_size>0);
+
+    exprt result=array_exprt(array_type);
+    result.reserve_operands(n_el);
+
+    for(std::size_t i=0; i<n_el; ++i)
+    {
+      std::string el_bits=std::string(bits, i*el_size, el_size);
+      exprt el=bits2expr(el_bits, type.subtype(), little_endian);
+      if(el.is_nil())
+        return nil_exprt();
+      result.move_to_operands(el);
+    }
+
+    return result;
   }
   
   return nil_exprt();
