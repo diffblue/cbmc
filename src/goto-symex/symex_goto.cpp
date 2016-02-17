@@ -332,11 +332,9 @@ void goto_symext::phi_function(
     // may have been introduced by symex_start_thread (and will
     // only later be removed from level2.current_names by pop_frame
     // once the thread is executed)
-    #if 0
     if(!it->get_level_0().empty() &&
        it->get_level_0()!=i2string(dest_state.source.thread_nr))
       continue;
-    #endif
     
     exprt goto_state_rhs=*it, dest_state_rhs=*it;
 
