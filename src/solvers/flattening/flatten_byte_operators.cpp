@@ -50,9 +50,9 @@ exprt flatten_byte_extract(
   mp_integer size_bits=pointer_offset_bits(src.type(), ns);
   if(size_bits<0)
     throw "byte_extract flatting with non-constant size: "+src.pretty();
-  unsigned width_bits=integer2unsigned(size_bits);
+  std::size_t width_bits=integer2unsigned(size_bits);
 
-  unsigned width_bytes=width_bits/8+(width_bits%8==0?0:1);
+  std::size_t width_bytes=width_bits/8+(width_bits%8==0?0:1);
   
   const typet &t=src.op0().type();
   
@@ -70,10 +70,10 @@ exprt flatten_byte_extract(
       exprt::operandst op;
       op.resize(width_bytes);
       
-      for(unsigned i=0; i<width_bytes; i++)
+      for(std::size_t i=0; i<width_bytes; i++)
       {
         // the most significant byte comes first in the concatenation!
-        unsigned offset_i=
+        std::size_t offset_i=
           little_endian?(width_bytes-i-1):i;
         
         plus_exprt offset(from_integer(offset_i, src.op1().type()), src.op1());
@@ -150,7 +150,7 @@ exprt flatten_byte_extract(
       throw "byte_extract flatting of non-constant source size: "+src.pretty();
 
     // cast to generic bit-vector
-    unsigned op0_width=integer2unsigned(op0_bits);
+    std::size_t op0_width=integer2unsigned(op0_bits);
     typecast_exprt src_op0_tc(src.op0(), bv_typet(op0_width));
     lshr_exprt left_shift(src_op0_tc, times_eight);
 
@@ -283,7 +283,7 @@ exprt flatten_byte_update(
           t.id()==ID_floatbv)
   {
     // do a shift, mask and OR
-    unsigned width=to_bitvector_type(t).get_width();
+    std::size_t width=to_bitvector_type(t).get_width();
     
     if(element_size*8>width)
       throw "flatten_byte_update to update element that is too large";

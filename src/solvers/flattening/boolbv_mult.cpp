@@ -24,7 +24,7 @@ Function: boolbvt::convert_mult
 
 void boolbvt::convert_mult(const exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -49,7 +49,7 @@ void boolbvt::convert_mult(const exprt &expr, bvt &bv)
     if(bv.size()!=width)
       throw "convert_mult: unexpected operand width";
 
-    unsigned fraction_bits=
+    std::size_t fraction_bits=
       to_fixedbv_type(expr.type()).get_fraction_bits();
              
     // do a sign extension by fraction_bits bits

@@ -48,12 +48,12 @@ exprt boolbvt::get(const exprt &expr) const
         
       std::vector<bool> unknown;
       bvt bv;
-      unsigned width=map_entry.width;
+      std::size_t width=map_entry.width;
 
       bv.resize(width);
       unknown.resize(width);
 
-      for(unsigned bit_nr=0; bit_nr<width; bit_nr++)
+      for(std::size_t bit_nr=0; bit_nr<width; bit_nr++)
       {
         assert(bit_nr<map_entry.literal_map.size());
 
@@ -91,13 +91,13 @@ Function: boolbvt::bv_get_rec
 exprt boolbvt::bv_get_rec(
   const bvt &bv,
   const std::vector<bool> &unknown,
-  unsigned offset,
+  std::size_t offset,
   const typet &type) const
 {
   if(type.id()==ID_symbol)
     return bv_get_rec(bv, unknown, offset, ns.follow(type));
 
-  unsigned width=boolbv_width(type);
+  std::size_t width=boolbv_width(type);
   
   assert(bv.size()==unknown.size());
   assert(bv.size()>=offset+width);
@@ -124,14 +124,14 @@ exprt boolbvt::bv_get_rec(
     if(type.id()==ID_array)
     {
       const typet &subtype=type.subtype();
-      unsigned sub_width=boolbv_width(subtype);
+      std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0)
       {
         exprt::operandst op;
         op.reserve(width/sub_width);
 
-        for(unsigned new_offset=0;
+        for(std::size_t new_offset=0;
             new_offset<width;
             new_offset+=sub_width)
         {
@@ -156,7 +156,7 @@ exprt boolbvt::bv_get_rec(
     {
       const struct_typet &struct_type=to_struct_type(type);
       const struct_typet::componentst &components=struct_type.components();
-      unsigned new_offset=0;
+      std::size_t new_offset=0;
       exprt::operandst op;
       op.reserve(components.size());
 
@@ -168,7 +168,7 @@ exprt boolbvt::bv_get_rec(
         const typet &subtype=ns.follow(it->type());
         op.push_back(nil_exprt());
 
-        unsigned sub_width=boolbv_width(subtype);
+        std::size_t sub_width=boolbv_width(subtype);
 
         if(sub_width!=0)
         {
@@ -189,7 +189,7 @@ exprt boolbvt::bv_get_rec(
       assert(!components.empty());
 
       // Any idea that's better than just returning the first component?      
-      unsigned component_nr=0;      
+      std::size_t component_nr=0;      
 
       union_exprt value(union_type);
 
@@ -205,15 +205,15 @@ exprt boolbvt::bv_get_rec(
     else if(type.id()==ID_vector)
     {
       const typet &subtype=ns.follow(type.subtype());
-      unsigned sub_width=boolbv_width(subtype);
+      std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0 && width%sub_width==0)
       {
-        unsigned size=width/sub_width;
+        std::size_t size=width/sub_width;
         exprt value(ID_vector, type);
         value.operands().resize(size);
 
-        for(unsigned i=0; i<size; i++)
+        for(std::size_t i=0; i<size; i++)
           value.operands()[i]=
             bv_get_rec(bv, unknown, i*sub_width, subtype);
             
@@ -223,7 +223,7 @@ exprt boolbvt::bv_get_rec(
     else if(type.id()==ID_complex)
     {
       const typet &subtype=ns.follow(type.subtype());
-      unsigned sub_width=boolbv_width(subtype);
+      std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0 && width==sub_width*2)
       {
@@ -240,7 +240,7 @@ exprt boolbvt::bv_get_rec(
 
   std::string value;
 
-  for(unsigned bit_nr=offset; bit_nr<offset+width; bit_nr++)
+  for(std::size_t bit_nr=offset; bit_nr<offset+width; bit_nr++)
   {
     char ch;
     if(unknown[bit_nr])
@@ -372,7 +372,7 @@ exprt boolbvt::bv_get_unbounded_array(
   valuest values;
 
   {
-    unsigned number;
+    std::size_t number;
 
     symbol_exprt array_expr;
     array_expr.type()=type;
@@ -440,12 +440,12 @@ exprt boolbvt::bv_get_unbounded_array(
     result=exprt(ID_array, type);
     result.type().set(ID_size, size);
 
-    unsigned long size_int=integer2long(size_mpint);
+    std::size_t size_int=integer2long(size_mpint);
 
     // allocate operands
     result.operands().resize(size_int);
 
-    for(unsigned i=0; i<size_int; i++)
+    for(std::size_t i=0; i<size_int; i++)
       result.operands()[i]=exprt(ID_unknown);
 
     // search uninterpreted functions

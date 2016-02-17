@@ -42,7 +42,7 @@ void bv_minimizet::add_objective(
     // convert it
     bvt bv=boolbv.convert_bv(objective);
   
-    for(unsigned i=0; i<bv.size(); i++)
+    for(std::size_t i=0; i<bv.size(); i++)
     {
       literalt lit=bv[i];
   

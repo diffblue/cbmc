@@ -37,7 +37,7 @@ void boolbvt::convert_update(const exprt &expr, bvt &bv)
   if(ops.size()!=3)
     throw "update takes at three operands";
 
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
     return conversion_failed(expr, bv);
@@ -66,9 +66,9 @@ Function: boolbvt::convert_update_rec
 
 void boolbvt::convert_update_rec(
   const exprt::operandst &designators,
-  unsigned d,
+  std::size_t d,
   const typet &type,
-  unsigned offset,
+  std::size_t offset,
   const exprt &new_value,
   bvt &bv)
 {
@@ -80,13 +80,13 @@ void boolbvt::convert_update_rec(
   {
     // done
     bvt new_value_bv=convert_bv(new_value);
-    unsigned new_value_width=boolbv_width(type);
+    std::size_t new_value_width=boolbv_width(type);
     
     if(new_value_width!=new_value_bv.size())
       throw "convert_update_rec: unexpected new_value size";
 
     // update
-    for(unsigned i=0; i<new_value_width; i++)
+    for(std::size_t i=0; i<new_value_width; i++)
     {
       assert(offset+i<bv.size());
       bv[offset+i]=new_value_bv[i];
@@ -111,7 +111,7 @@ void boolbvt::convert_update_rec(
     
     const typet &subtype=ns.follow(array_type.subtype());
 
-    unsigned element_size=boolbv_width(subtype);
+    std::size_t element_size=boolbv_width(subtype);
 
     // iterate over array
     mp_integer size;
@@ -120,9 +120,9 @@ void boolbvt::convert_update_rec(
       
     bvt tmp_bv=bv;
     
-    for(unsigned i=0; i!=integer2long(size); ++i)
+    for(std::size_t i=0; i!=integer2long(size); ++i)
     {
-      unsigned new_offset=offset+i*element_size;
+      std::size_t new_offset=offset+i*element_size;
       
       convert_update_rec(
         designators, d+1, subtype, new_offset, new_value, tmp_bv);
@@ -130,9 +130,9 @@ void boolbvt::convert_update_rec(
       bvt const_bv=bv_utils.build_constant(i, index_bv.size());
       literalt equal=bv_utils.equal(const_bv, index_bv);
 
-      for(unsigned j=0; j<element_size; j++)
+      for(std::size_t j=0; j<element_size; j++)
       {
-        unsigned idx=new_offset+j;
+        std::size_t idx=new_offset+j;
         assert(idx<bv.size());
         bv[idx]=prop.lselect(equal, tmp_bv[idx], bv[idx]);
       }
@@ -147,7 +147,7 @@ void boolbvt::convert_update_rec(
       const struct_typet &struct_type=
         to_struct_type(type);
 
-      unsigned struct_offset=0;
+      std::size_t struct_offset=0;
       
       struct_typet::componentt component;
       component.make_nil();
@@ -161,7 +161,7 @@ void boolbvt::convert_update_rec(
           it++)
       {
         const typet &subtype=it->type();
-        unsigned sub_width=boolbv_width(subtype);
+        std::size_t sub_width=boolbv_width(subtype);
 
         if(it->get_name()==component_name)
         {
@@ -177,7 +177,7 @@ void boolbvt::convert_update_rec(
 
       const typet &new_type=ns.follow(component.type());
 
-      unsigned new_offset=offset+struct_offset;
+      std::size_t new_offset=offset+struct_offset;
 
       // recursive call
       convert_update_rec(

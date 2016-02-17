@@ -30,7 +30,7 @@ bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)
   bvt result;
   result.resize(width);
   assert(n_str.size()==width);
-  for(unsigned i=0; i<width; i++)
+  for(std::size_t i=0; i<width; i++)
     result[i]=const_literal(n_str[width-i-1]=='1');
   return result;
 }
@@ -71,7 +71,7 @@ Function: bv_utilst::set_equal
 void bv_utilst::set_equal(const bvt &a, const bvt &b)
 {
   assert(a.size()==b.size());
-  for(unsigned i=0; i<a.size(); i++)
+  for(std::size_t i=0; i<a.size(); i++)
     prop.set_equal(a[i], b[i]);
 }
 
@@ -87,7 +87,7 @@ Function: bv_utilst::extract
 
 \*******************************************************************/
 
-bvt bv_utilst::extract(const bvt &a, unsigned first, unsigned last)
+bvt bv_utilst::extract(const bvt &a, std::size_t first, std::size_t last)
 {
   // preconditions
   assert(first<a.size());
@@ -114,7 +114,7 @@ Function: bv_utilst::extract_msb
 
 \*******************************************************************/
 
-bvt bv_utilst::extract_msb(const bvt &a, unsigned n)
+bvt bv_utilst::extract_msb(const bvt &a, std::size_t n)
 {
   // preconditions
   assert(n<=a.size());
@@ -138,7 +138,7 @@ Function: bv_utilst::extract_lsb
 
 \*******************************************************************/
 
-bvt bv_utilst::extract_lsb(const bvt &a, unsigned n)
+bvt bv_utilst::extract_lsb(const bvt &a, std::size_t n)
 {
   // preconditions
   assert(n<=a.size());
@@ -166,10 +166,10 @@ bvt bv_utilst::concatenate(const bvt &a, const bvt &b) const
 
   result.resize(a.size()+b.size());
 
-  for(unsigned i=0; i<a.size(); i++)
+  for(std::size_t i=0; i<a.size(); i++)
     result[i]=a[i];
 
-  for(unsigned i=0; i<b.size(); i++)
+  for(std::size_t i=0; i<b.size(); i++)
     result[i+a.size()]=b[i];
 
   return result;
@@ -194,7 +194,7 @@ bvt bv_utilst::select(literalt s, const bvt &a, const bvt &b)
   bvt result;
 
   result.resize(a.size());
-  for(unsigned i=0; i<result.size(); i++)
+  for(std::size_t i=0; i<result.size(); i++)
     result[i]=prop.lselect(s, a[i], b[i]);
 
   return result;
@@ -214,10 +214,10 @@ Function: bv_utilst::extension
 
 bvt bv_utilst::extension(
   const bvt &bv,
-  unsigned new_size,
+  std::size_t new_size,
   representationt rep)
 {
-  unsigned old_size=bv.size();
+  std::size_t old_size=bv.size();
   bvt result=bv;
   result.resize(new_size);
   
@@ -227,7 +227,7 @@ bvt bv_utilst::extension(
     (rep==SIGNED && !bv.empty())?bv[old_size-1]:
     const_literal(false);
 
-  for(unsigned i=old_size; i<new_size; i++)
+  for(std::size_t i=old_size; i<new_size; i++)
     result[i]=extend_with;
 
   return result;
@@ -441,7 +441,7 @@ void bv_utilst::adder(
 
   carry_out=carry_in;
 
-  for(unsigned i=0; i<sum.size(); i++)
+  for(std::size_t i=0; i<sum.size(); i++)
   {
     sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
   }
@@ -468,7 +468,7 @@ literalt bv_utilst::carry_out(
 
   literalt carry_out=carry_in;
 
-  for(unsigned i=0; i<op0.size(); i++)
+  for(std::size_t i=0; i<op0.size(); i++)
     carry_out=carry(op0[i], op1[i], carry_out);
 
   return carry_out;
@@ -701,16 +701,16 @@ Function: bv_utilst::shift
 
 bvt bv_utilst::shift(const bvt &op, const shiftt s, const bvt &dist)
 {
-  unsigned d=1, width=op.size();
+  std::size_t d=1, width=op.size();
   bvt result=op;
 
-  for(unsigned stage=0; stage<dist.size(); stage++)
+  for(std::size_t stage=0; stage<dist.size(); stage++)
   {
     if(dist[stage]!=const_literal(false))
     {
       bvt tmp=shift(result, s, d);
 
-      for(unsigned i=0; i<width; i++)
+      for(std::size_t i=0; i<width; i++)
         result[i]=prop.lselect(dist[stage], tmp[i], result[i]);
     }
 
@@ -732,12 +732,12 @@ Function: bv_utilst::shift
 
 \*******************************************************************/
 
-bvt bv_utilst::shift(const bvt &src, const shiftt s, unsigned dist)
+bvt bv_utilst::shift(const bvt &src, const shiftt s, std::size_t dist)
 {
   bvt result;
   result.resize(src.size());
 
-  for(unsigned i=0; i<src.size(); i++)
+  for(std::size_t i=0; i<src.size(); i++)
   {
     literalt l;
 
@@ -916,10 +916,10 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
   else
   {
     std::vector<bvt> new_pps;
-    unsigned no_full_adders=pps.size()/3;
+    std::size_t no_full_adders=pps.size()/3;
 
     // add groups of three partial products using CSA
-    for(unsigned i=0; i<no_full_adders; i++)
+    for(std::size_t i=0; i<no_full_adders; i++)
     {
       const bvt &a=pps[i*3+0], 
                 &b=pps[i*3+1],
@@ -929,7 +929,7 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
 
       bvt s(a.size()), t(a.size());
       
-      for(unsigned bit=0; bit<a.size(); bit++)
+      for(std::size_t bit=0; bit<a.size(); bit++)
       {
         // \todo reformulate using full_adder
         s[bit]=prop.lxor(a[bit], prop.lxor(b[bit], c[bit]));
@@ -942,7 +942,7 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
     }
     
     // pass onwards up to two remaining partial products
-    for(unsigned i=no_full_adders*3; i<pps.size(); i++)
+    for(std::size_t i=no_full_adders*3; i<pps.size(); i++)
       new_pps.push_back(pps[i]);
 
     assert(new_pps.size()<pps.size());    
@@ -973,20 +973,20 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   bvt product;
   product.resize(op0.size());
 
-  for(unsigned i=0; i<product.size(); i++)
+  for(std::size_t i=0; i<product.size(); i++)
     product[i]=const_literal(false);
 
-  for(unsigned sum=0; sum<op0.size(); sum++)
+  for(std::size_t sum=0; sum<op0.size(); sum++)
     if(op0[sum]!=const_literal(false))
     {
       bvt tmpop;
 
       tmpop.reserve(op0.size());
 
-      for(unsigned idx=0; idx<sum; idx++)
+      for(std::size_t idx=0; idx<sum; idx++)
         tmpop.push_back(const_literal(false));
 
-      for(unsigned idx=sum; idx<op0.size(); idx++)
+      for(std::size_t idx=sum; idx<op0.size(); idx++)
         tmpop.push_back(prop.land(op1[idx-sum], op0[sum]));
 
       product=add(product, tmpop);
@@ -1007,7 +1007,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   std::vector<bvt> pps;
   pps.reserve(op0.size());
 
-  for(unsigned bit=0; bit<op0.size(); bit++)
+  for(std::size_t bit=0; bit<op0.size(); bit++)
     if(op0[bit]!=const_literal(false))
     {
       bvt pp;
@@ -1015,10 +1015,10 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
       pp.reserve(op0.size());
 
       // zeros according to weight
-      for(unsigned idx=0; idx<bit; idx++)
+      for(std::size_t idx=0; idx<bit; idx++)
         pp.push_back(const_literal(false));
 
-      for(unsigned idx=bit; idx<op0.size(); idx++)
+      for(std::size_t idx=bit; idx<op0.size(); idx++)
         pp.push_back(prop.land(op1[idx-bit], op0[bit]));
 
       pps.push_back(pp);
@@ -1058,25 +1058,25 @@ bvt bv_utilst::unsigned_multiplier_no_overflow(
   bvt product;
   product.resize(_op0.size());
 
-  for(unsigned i=0; i<product.size(); i++)
+  for(std::size_t i=0; i<product.size(); i++)
     product[i]=const_literal(false);
 
-  for(unsigned sum=0; sum<op0.size(); sum++)
+  for(std::size_t sum=0; sum<op0.size(); sum++)
     if(op0[sum]!=const_literal(false))
     {
       bvt tmpop;
 
       tmpop.reserve(product.size());
 
-      for(unsigned idx=0; idx<sum; idx++)
+      for(std::size_t idx=0; idx<sum; idx++)
         tmpop.push_back(const_literal(false));
 
-      for(unsigned idx=sum; idx<product.size(); idx++)
+      for(std::size_t idx=sum; idx<product.size(); idx++)
         tmpop.push_back(prop.land(op1[idx-sum], op0[sum]));
 
       adder_no_overflow(product, tmpop);
 
-      for(unsigned idx=op1.size()-sum; idx<op1.size(); idx++)
+      for(std::size_t idx=op1.size()-sum; idx<op1.size(); idx++)
         prop.l_set_to_false(prop.land(op1[idx], op0[sum]));
     }
 
@@ -1131,7 +1131,7 @@ bvt bv_utilst::cond_negate(const bvt &bv, const literalt cond)
   bvt result;
   result.resize(bv.size());
 
-  for(unsigned i=0; i<bv.size(); i++)
+  for(std::size_t i=0; i<bv.size(); i++)
     result[i]=prop.lselect(cond, neg_bv[i], bv[i]);
 
   return result;
@@ -1286,10 +1286,10 @@ void bv_utilst::signed_divider(
 
   bvt neg_0=negate(_op0), neg_1=negate(_op1);
 
-  for(unsigned i=0; i<_op0.size(); i++)
+  for(std::size_t i=0; i<_op0.size(); i++)
     _op0[i]=(prop.lselect(sign_0, neg_0[i], _op0[i]));
 
-  for(unsigned i=0; i<_op1.size(); i++)
+  for(std::size_t i=0; i<_op1.size(); i++)
     _op1[i]=(prop.lselect(sign_1, neg_1[i], _op1[i]));
 
   unsigned_divider(_op0, _op1, res, rem);
@@ -1298,10 +1298,10 @@ void bv_utilst::signed_divider(
 
   literalt result_sign=prop.lxor(sign_0, sign_1);
 
-  for(unsigned i=0; i<res.size(); i++)
+  for(std::size_t i=0; i<res.size(); i++)
     res[i]=prop.lselect(result_sign, neg_res[i], res[i]);
 
-  for(unsigned i=0; i<res.size(); i++)
+  for(std::size_t i=0; i<res.size(); i++)
     rem[i]=prop.lselect(sign_0, neg_rem[i], rem[i]);
 }
 
@@ -1352,14 +1352,14 @@ void bv_utilst::unsigned_divider(
   bvt &res,
   bvt &rem)
 {
-  unsigned width=op0.size();
+  std::size_t width=op0.size();
   
   // check if we divide by a power of two
   #if 0
   {
-    unsigned one_count=0, non_const_count=0, one_pos=0;
+    std::size_t one_count=0, non_const_count=0, one_pos=0;
     
-    for(unsigned i=0; i<op1.size(); i++)
+    for(std::size_t i=0; i<op1.size(); i++)
     {
       literalt l=op1[i];
       if(l.is_true())
@@ -1378,7 +1378,7 @@ void bv_utilst::unsigned_divider(
 
       // remainder is just a mask
       rem=op0;
-      for(unsigned i=one_pos; i<rem.size(); i++)
+      for(std::size_t i=one_pos; i<rem.size(); i++)
         rem[i]=const_literal(false);
       return;
     }
@@ -1393,7 +1393,7 @@ void bv_utilst::unsigned_divider(
 
   res.resize(width);
   rem.resize(width);
-  for(unsigned i=0; i<width; i++)
+  for(std::size_t i=0; i<width; i++)
   {
     res[i]=prop.new_variable();
     rem[i]=prop.new_variable();
@@ -1466,7 +1466,7 @@ Function: bv_utilst::equal_const_rec
 
 literalt bv_utilst::equal_const_rec(bvt &var, bvt &constant)
 {
-  unsigned size = var.size();
+  std::size_t size = var.size();
   
   assert(size != 0);
   assert(size == constant.size());
@@ -1523,10 +1523,9 @@ Function: bv_utilst::equal_const
 
 \*******************************************************************/
 
-
 literalt bv_utilst::equal_const(const bvt &var, const bvt &constant)
 {
-  unsigned size = constant.size();
+  std::size_t size = constant.size();
 
   assert(var.size() == size);
   assert(!is_constant(var));
@@ -1546,11 +1545,11 @@ literalt bv_utilst::equal_const(const bvt &var, const bvt &constant)
    */
   literalt top_bit = constant[size - 1];
 
-  unsigned split = size - 1;
+  std::size_t split = size - 1;
   var_upper.push_back(var[size - 1]);
   constant_upper.push_back(constant[size - 1]);
   
-  for (split = size - 2; split != 0; --split)
+  for(split = size - 2; split != 0; --split)
   {
     if (constant[split] != top_bit)
     {
@@ -1563,7 +1562,7 @@ literalt bv_utilst::equal_const(const bvt &var, const bvt &constant)
     }
   }
 
-  for (unsigned i = 0; i <= split; ++i)
+  for(std::size_t i = 0; i <= split; ++i)
   {
     var_lower.push_back(var[i]);
     constant_lower.push_back(constant[i]);
@@ -1611,7 +1610,7 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
   bvt equal_bv;
   equal_bv.resize(op0.size());
 
-  for(unsigned i=0; i<op0.size(); i++)
+  for(std::size_t i=0; i<op0.size(); i++)
     equal_bv[i]=prop.lequal(op0[i], op1[i]);
 
   return prop.land(equal_bv);
@@ -1877,7 +1876,7 @@ void bv_utilst::cond_implies_equal(
 
   if (prop.cnf_handled_well())
   {
-    for(unsigned i=0; i<a.size(); i++)
+    for(std::size_t i=0; i<a.size(); i++)
     {
       prop.lcnf(!cond,  a[i], !b[i]);
       prop.lcnf(!cond, !a[i],  b[i]);
@@ -1909,7 +1908,7 @@ literalt bv_utilst::verilog_bv_has_x_or_z(const bvt &src)
   odd_bits.reserve(src.size()/2);
 
   // check every odd bit
-  for(unsigned i=0; i<src.size(); i++)
+  for(std::size_t i=0; i<src.size(); i++)
   {
     if(i%2!=0)
       odd_bits.push_back(src[i]);
@@ -1936,7 +1935,7 @@ bvt bv_utilst::verilog_bv_normal_bits(const bvt &src)
   even_bits.reserve(src.size()/2);
 
   // get every even bit
-  for(unsigned i=0; i<src.size(); i++)
+  for(std::size_t i=0; i<src.size(); i++)
   {
     if(i%2==0)
       even_bits.push_back(src[i]);

@@ -42,7 +42,7 @@ literalt boolbvt::convert_reduction(const unary_exprt &expr)
 
   literalt l=op_bv[0];
 
-  for(unsigned i=1; i<op_bv.size(); i++)
+  for(std::size_t i=1; i<op_bv.size(); i++)
   {
     switch(op)
     {
@@ -105,7 +105,7 @@ void boolbvt::convert_reduction(const unary_exprt &expr, bvt &bv)
       
       literalt l0=op_bv[0], l1=op_bv[1];
 
-      for(unsigned i=2; i<op_bv.size(); i+=2)
+      for(std::size_t i=2; i<op_bv.size(); i+=2)
       {
         switch(op)
         {

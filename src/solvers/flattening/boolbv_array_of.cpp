@@ -33,7 +33,7 @@ void boolbvt::convert_array_of(const array_of_exprt &expr, bvt &bv)
   if(is_unbounded_array(array_type))
     return conversion_failed(expr, bv);
 
-  unsigned width=boolbv_width(array_type);
+  std::size_t width=boolbv_width(array_type);
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -52,11 +52,11 @@ void boolbvt::convert_array_of(const array_of_exprt &expr, bvt &bv)
   if(size*tmp.size()!=width)
     throw "convert_array_of: unexpected operand width";
     
-  unsigned offset=0;
+  std::size_t offset=0;
 
   for(mp_integer i=0; i<size; i=i+1)
   {
-    for(unsigned j=0; j<tmp.size(); j++, offset++)
+    for(std::size_t j=0; j<tmp.size(); j++, offset++)
       bv[offset]=tmp[j];
   }
   

@@ -37,7 +37,7 @@ void boolbvt::convert_shift(const binary_exprt &expr, bvt &bv)
      type_id!=ID_verilog_unsignedbv)
     return conversion_failed(expr, bv);
 
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -69,7 +69,7 @@ void boolbvt::convert_shift(const binary_exprt &expr, bvt &bv)
     if(to_integer(expr.op1(), i))
       throw "convert_shift: failed to convert constant";
     
-    unsigned distance;
+    std::size_t distance;
     
     if(i<0 || i>std::numeric_limits<signed>::max())
       distance=0;

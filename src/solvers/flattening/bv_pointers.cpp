@@ -592,7 +592,7 @@ Function: bv_pointerst::bv_get_rec
 exprt bv_pointerst::bv_get_rec(
   const bvt &bv,
   const std::vector<bool> &unknown,
-  unsigned offset,
+  std::size_t offset,
   const typet &type) const
 {
   if(!is_ptr(type))

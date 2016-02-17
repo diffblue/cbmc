@@ -30,7 +30,7 @@ void boolbvt::convert_mod(const mod_exprt &expr, bvt &bv)
      expr.type().id()!=ID_signedbv)
     return conversion_failed(expr, bv);
 
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);

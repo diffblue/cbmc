@@ -45,7 +45,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
     const array_typet &array_type=
       to_array_type(array_op_type);
 
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
     
     if(width==0)
       return conversion_failed(expr, bv);
@@ -59,7 +59,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
       // free variables
 
       bv.resize(width);
-      for(unsigned i=0; i<width; i++)
+      for(std::size_t i=0; i<width; i++)
         bv[i]=prop.new_variable();
 
       record_array_index(expr);
@@ -224,7 +224,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
       // free variables
 
       bv.resize(width);
-      for(unsigned i=0; i<width; i++)
+      for(std::size_t i=0; i<width; i++)
         bv[i]=prop.new_variable();
 
       // add implications
@@ -248,7 +248,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
 
         mp_integer offset=i*width;
 
-        for(unsigned j=0; j<width; j++)
+        for(std::size_t j=0; j<width; j++)
           equal_bv[j]=prop.lequal(bv[j],
                              array_bv[integer2long(offset+j)]);
 
@@ -279,7 +279,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
 
         mp_integer offset=i*width;
 
-        for(unsigned j=0; j<width; j++)
+        for(std::size_t j=0; j<width; j++)
         {
           literalt l=array_bv[integer2long(offset+j)];
 
@@ -315,7 +315,7 @@ void boolbvt::convert_index(
   const array_typet &array_type=
     to_array_type(ns.follow(array.type()));
 
-  unsigned width=boolbv_width(array_type.subtype());
+  std::size_t width=boolbv_width(array_type.subtype());
 
   if(width==0)
     return conversion_failed(array, bv);
@@ -345,13 +345,13 @@ void boolbvt::convert_index(
            array.id()!=ID_array);
     // If not there are large improvements possible as above
 
-    for(unsigned i=0; i<width; i++)
+    for(std::size_t i=0; i<width; i++)
       bv[i]=tmp[integer2long(offset+i)];
   }
   else
   {
     // out of bounds
-    for(unsigned i=0; i<width; i++)
+    for(std::size_t i=0; i<width; i++)
       bv[i]=prop.new_variable();
   }
 }

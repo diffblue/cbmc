@@ -70,14 +70,14 @@ void boolbvt::convert_floatbv_typecast(
   else if(src_type.id()==ID_floatbv &&
           dest_type.id()==ID_signedbv)
   {
-    unsigned dest_width=to_signedbv_type(dest_type).get_width();
+    std::size_t dest_width=to_signedbv_type(dest_type).get_width();
     float_utils.spec=to_floatbv_type(src_type);
     bv=float_utils.to_signed_integer(bv0, dest_width);
   }
   else if(src_type.id()==ID_floatbv &&
           dest_type.id()==ID_unsignedbv)
   {
-    unsigned dest_width=to_unsignedbv_type(dest_type).get_width();
+    std::size_t dest_width=to_unsignedbv_type(dest_type).get_width();
     float_utils.spec=to_floatbv_type(src_type);
     bv=float_utils.to_unsigned_integer(bv0, dest_width);
   }
@@ -149,16 +149,16 @@ void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
     {
       float_utils.spec=to_floatbv_type(subtype);
 
-      unsigned width=boolbv_width(type);
-      unsigned sub_width=boolbv_width(subtype);
+      std::size_t width=boolbv_width(type);
+      std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width==0 || width%sub_width!=0)
         throw "convert_floatbv_op: unexpected vector operand width";
 
-      unsigned size=width/sub_width;
+      std::size_t size=width/sub_width;
       bv.resize(width);
 
-      for(unsigned i=0; i<size; i++)
+      for(std::size_t i=0; i<size; i++)
       {
         bvt tmp_bv0, tmp_bv1, tmp_bv;
         

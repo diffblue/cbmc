@@ -46,7 +46,7 @@ Function: boolbvt::literal
 
 bool boolbvt::literal(
   const exprt &expr,
-  const unsigned bit,
+  const std::size_t bit,
   literalt &dest) const
 {
   if(expr.type().id()==ID_bool)
@@ -78,7 +78,7 @@ bool boolbvt::literal(
     {
       const index_exprt &index_expr=to_index_expr(expr);
 
-      unsigned element_width=boolbv_width(index_expr.type());
+      std::size_t element_width=boolbv_width(index_expr.type());
       
       if(element_width==0)
         throw "literal expects a bit-vector type";
@@ -87,7 +87,7 @@ bool boolbvt::literal(
       if(to_integer(index_expr.index(), index))
         throw "literal expects constant index";
 
-      unsigned offset=integer2unsigned(index*element_width);
+      std::size_t offset=integer2unsigned(index*element_width);
 
       return literal(index_expr.array(), bit+offset, dest);
     }
@@ -99,7 +99,7 @@ bool boolbvt::literal(
         to_struct_type(expr.type()).components();
       const irep_idt &component_name=member_expr.get_component_name();
 
-      unsigned offset=0;
+      std::size_t offset=0;
 
       for(struct_typet::componentst::const_iterator
           it=components.begin();
@@ -111,7 +111,7 @@ bool boolbvt::literal(
         if(it->get_name()==component_name)
           return literal(expr.op0(), bit+offset, dest);
 
-        unsigned element_width=boolbv_width(subtype);
+        std::size_t element_width=boolbv_width(subtype);
 
         if(element_width==0)
           throw "literal expects a bit-vector type";
@@ -185,11 +185,11 @@ void boolbvt::conversion_failed(const exprt &expr, bvt &bv)
   ignoring(expr);
 
   // try to make it free bits
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
 
   bv.resize(width);
 
-  for(unsigned i=0; i<width; i++)
+  for(std::size_t i=0; i<width; i++)
     bv[i]=prop.new_variable();
 }
 
@@ -230,7 +230,7 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return convert_update(expr, bv);
   else if(expr.id()==ID_width)
   {
-    unsigned result_width=boolbv_width(expr.type());
+    std::size_t result_width=boolbv_width(expr.type());
 
     if(result_width==0)
       return conversion_failed(expr, bv);
@@ -238,7 +238,7 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     if(expr.operands().size()!=1)
       return conversion_failed(expr, bv);
 
-    unsigned op_width=boolbv_width(expr.op0().type());
+    std::size_t op_width=boolbv_width(expr.op0().type());
 
     if(op_width==0)
       return conversion_failed(expr, bv);
@@ -250,7 +250,7 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     {
       std::string binary=integer2binary(op_width/8, result_width);
 
-      for(unsigned i=0; i<result_width; i++)
+      for(std::size_t i=0; i<result_width; i++)
       {
         bool bit=(binary[binary.size()-i-1]=='1');
         bv[i]=const_literal(bit);
@@ -398,7 +398,7 @@ Function: boolbvt::convert_lambda
 
 void boolbvt::convert_lambda(const exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
     return conversion_failed(expr, bv);
@@ -428,12 +428,12 @@ void boolbvt::convert_lambda(const exprt &expr, bvt &bv)
 
     const bvt &tmp=convert_bv(expr_op1);
 
-    unsigned offset=integer2unsigned(i*tmp.size());
+    std::size_t offset=integer2unsigned(i*tmp.size());
 
     if(size*tmp.size()!=width)
       throw "convert_lambda: unexpected operand width";
 
-    for(unsigned j=0; j<tmp.size(); j++)
+    for(std::size_t j=0; j<tmp.size(); j++)
       bv[offset+j]=tmp[j];
   }
 }
@@ -452,7 +452,7 @@ Function: boolbvt::convert_bv_literals
 
 void boolbvt::convert_bv_literals(const exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -464,7 +464,7 @@ void boolbvt::convert_bv_literals(const exprt &expr, bvt &bv)
   if(bv_sub.size()!=width)
     throw "bv_literals with wrong size";
 
-  for(unsigned i=0; i<width; i++)
+  for(std::size_t i=0; i<width; i++)
     bv[i].set(unsafe_string2int(id2string(bv_sub[i].id())));
 }
 
@@ -483,7 +483,7 @@ Function: boolbvt::convert_symbol
 void boolbvt::convert_symbol(const exprt &expr, bvt &bv)
 {
   const typet &type=expr.type();
-  unsigned width=boolbv_width(type);
+  std::size_t width=boolbv_width(type);
 
   bv.resize(width);
   
@@ -788,7 +788,7 @@ void boolbvt::make_bv_expr(const typet &type, const bvt &bv, exprt &dest)
 
   bv_sub.resize(bv.size());
 
-  for(unsigned i=0; i<bv.size(); i++)
+  for(std::size_t i=0; i<bv.size(); i++)
     bv_sub[i].id(i2string(bv[i].get()));
 }
 
@@ -806,7 +806,7 @@ Function: boolbvt::make_bv_expr
 
 void boolbvt::make_free_bv_expr(const typet &type, exprt &dest)
 {
-  unsigned width=boolbv_width(type);
+  std::size_t width=boolbv_width(type);
 
   if(width==0)
     throw "failed to get width of "+type.to_string();
@@ -894,10 +894,10 @@ void boolbvt::build_offset_map(const struct_typet &src, offset_mapt &dest)
     src.components();
 
   dest.resize(components.size());
-  unsigned offset=0;
-  for(unsigned i=0; i<components.size(); i++)
+  std::size_t offset=0;
+  for(std::size_t i=0; i<components.size(); i++)
   {
-    unsigned comp_width=boolbv_width(components[i].type());
+    std::size_t comp_width=boolbv_width(components[i].type());
     dest[i]=offset;
     offset+=comp_width;
   }

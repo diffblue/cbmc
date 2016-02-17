@@ -42,7 +42,7 @@ protected:
   virtual exprt bv_get_rec(
     const bvt &bv,
     const std::vector<bool> &unknown,
-    unsigned offset,
+    std::size_t offset,
     const typet &type) const;
 
   bool convert_address_of_rec(

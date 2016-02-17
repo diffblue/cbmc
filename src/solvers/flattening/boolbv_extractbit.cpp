@@ -58,8 +58,8 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
   }
   else
   {
-    unsigned width_op0=boolbv_width(operands[0].type());
-    unsigned width_op1=boolbv_width(operands[1].type());
+    std::size_t width_op0=boolbv_width(operands[0].type());
+    std::size_t width_op1=boolbv_width(operands[1].type());
 
     if(width_op0==0 || width_op1==0)
       return SUB::convert_rest(expr);
@@ -82,7 +82,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       literalt l=prop.new_variable();
 
       // add implications
-      for(unsigned i=0; i<bv0.size(); i++)
+      for(std::size_t i=0; i<bv0.size(); i++)
       {
         equality.rhs()=from_integer(i, index_type);
         literalt equal=prop.lequal(l, bv0[i]);
@@ -95,7 +95,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     {
       literalt l=prop.new_variable();
 
-      for(unsigned i=0; i<bv0.size(); i++)
+      for(std::size_t i=0; i<bv0.size(); i++)
       {
         equality.rhs()=from_integer(i, index_type);
         l=prop.lselect(convert(equality), bv0[i], l);

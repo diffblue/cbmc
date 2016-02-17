@@ -24,7 +24,7 @@ Function: boolbvt::convert_replication
 
 void boolbvt::convert_replication(const replication_exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -35,16 +35,16 @@ void boolbvt::convert_replication(const replication_exprt &expr, bvt &bv)
 
   bv.resize(width);
 
-  const unsigned u_times=integer2unsigned(times);
+  const std::size_t u_times=integer2unsigned(times);
   const bvt &op=convert_bv(expr.op1());
-  unsigned offset=0;
+  std::size_t offset=0;
 
-  for(unsigned i=0; i<u_times; i++)
+  for(std::size_t i=0; i<u_times; i++)
   {
     if(op.size()+offset>width)
       throw "replication operand width too big";
 
-    for(unsigned i=0; i<op.size(); i++)
+    for(std::size_t i=0; i<op.size(); i++)
       bv[i+offset]=op[i];
 
     offset+=op.size();

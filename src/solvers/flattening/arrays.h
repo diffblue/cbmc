@@ -63,7 +63,7 @@ protected:
   typedef std::set<exprt> index_sett;
   // references to values in this container need to be stable as
   // elements are added while references are held
-  typedef std::map<unsigned, index_sett> index_mapt;
+  typedef std::map<std::size_t, index_sett> index_mapt;
   index_mapt index_map;
   
   // adds array constraints lazily
@@ -98,8 +98,8 @@ protected:
   void add_array_constraints_array_of(const index_sett &index_set, const array_of_exprt &exprt);
 
   void update_index_map(bool update_all);
-  void update_index_map(unsigned i);
-  std::set<unsigned> update_indices;
+  void update_index_map(std::size_t i);
+  std::set<std::size_t> update_indices;
   void collect_arrays(const exprt &a);
   void collect_indices();
   void collect_indices(const exprt &a);

@@ -25,7 +25,7 @@ Function: boolbvt::convert_extractbits
 
 void boolbvt::convert_extractbits(const extractbits_exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -66,10 +66,10 @@ void boolbvt::convert_extractbits(const extractbits_exprt &expr, bvt &bv)
           i2string(unsigned(integer2long(o1-o2+1)))+" but got "+
           i2string(width)+"): "+expr.to_string();
 
-  unsigned offset=integer2unsigned(o2);
+  std::size_t offset=integer2unsigned(o2);
 
   bv.resize(width);
 
-  for(unsigned i=0; i<width; i++)
+  for(std::size_t i=0; i<width; i++)
     bv[i]=bv0[offset+i];
 }
