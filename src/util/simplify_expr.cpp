@@ -2062,17 +2062,39 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
 
   switch(expr.id())
   {
-    case ID_address_of:
-      // the argument of this expression needs special treatment
-      break;
+  case ID_address_of:
+    // the argument of this expression needs special treatment
+    break;
+    
+  case ID_if:
+    // we first want to look at the condition
+    {
+      if_exprt &if_expr=to_if_expr(expr);
+      if(!simplify_rec(if_expr.cond())) result=false;
 
-    default:
-      if(expr.has_operands())
+      // 1 ? a : b -> a  and  0 ? a : b -> b
+      if(if_expr.cond().is_constant())
       {
-        Forall_operands(it, expr)
-          if(!simplify_rec(*it)) // recursive call
-            result=false;
+        expr=if_expr.cond().is_true()?
+          if_expr.true_case():if_expr.false_case();
+        simplify_rec(expr);
+        result=false;
       }
+      else
+      {
+        if(!simplify_rec(if_expr.true_case())) result=false; 
+        if(!simplify_rec(if_expr.false_case())) result=false; 
+      }
+    }
+    break;
+
+  default:
+    if(expr.has_operands())
+    {
+      Forall_operands(it, expr)
+        if(!simplify_rec(*it)) // recursive call
+          result=false;
+    }
   }
 
   return result;
