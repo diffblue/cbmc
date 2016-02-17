@@ -1840,8 +1840,7 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
   // lift up any ID_if on the object
   if(be.op().id()==ID_if)
   {
-    if_exprt &if_expr=to_if_expr(be.op());
-    lift_if(expr, if_expr);
+    expr=lift_if(expr, 0);
     return false;
   }
 
