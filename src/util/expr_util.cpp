@@ -450,20 +450,22 @@ Function: lift_if
 
 \*******************************************************************/
 
-void lift_if(exprt &dest, if_exprt &if_expr)
+if_exprt lift_if(const exprt &src, unsigned operand_number)
 {
+  assert(operand_number < src.operands().size());
+  assert(src.operands()[operand_number].id()==ID_if);
+
+  const if_exprt if_expr=to_if_expr(src.operands()[operand_number]);
   const exprt true_case=if_expr.true_case();
   const exprt false_case=if_expr.false_case();
 
   if_exprt result;
   result.cond()=if_expr.cond();
-  result.type()=dest.type();
+  result.type()=src.type();
+  result.true_case()=src;
+  result.true_case().operands()[operand_number]=true_case;
+  result.false_case()=src;
+  result.false_case().operands()[operand_number]=false_case;
   
-  static_cast<exprt &>(if_expr)=true_case;
-  result.true_case()=dest;
-
-  static_cast<exprt &>(if_expr)=false_case;
-  result.false_case()=dest;
-  
-  dest=result;
+  return result;
 }
