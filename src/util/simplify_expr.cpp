@@ -2060,7 +2060,6 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
 {
   bool result=true;
 
-  #if __cplusplus > 199711L
   switch(expr.id())
   {
     case ID_address_of:
@@ -2075,17 +2074,6 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
             result=false;
       }
   }
-  #else
-  if(expr.id()==ID_address_of)
-  {
-  }
-  else if(expr.has_operands())
-  {
-    Forall_operands(it, expr)
-      if(!simplify_rec(*it)) // recursive call
-        result=false;
-  }
-  #endif
 
   return result;
 }
