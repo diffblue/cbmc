@@ -133,12 +133,10 @@ void goto_symext::symex_malloc(
 
       new_symbol_table.add(size_symbol);
 
-      guardt guard;
-      symex_assign_rec(
-        state, size_symbol.symbol_expr(), nil_exprt(), size, guard,
-        symex_targett::HIDDEN);
+      code_assignt assignment(size_symbol.symbol_expr(), size);
+      size=assignment.lhs();
 
-      size=size_symbol.symbol_expr();
+      symex_assign_rec(state, assignment);
     }
   }
   
@@ -173,10 +171,7 @@ void goto_symext::symex_malloc(
   if(rhs.type()!=lhs.type())
     rhs.make_typecast(lhs.type());
 
-  state.rename(rhs, ns);
-  
-  guardt guard;
-  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
+  symex_assign_rec(state, code_assignt(lhs, rhs));
 }
 
 /*******************************************************************\
@@ -198,8 +193,9 @@ irep_idt get_symbol(const exprt &src)
   else if(src.id()==ID_address_of)
   {
     exprt op=to_address_of_expr(src).object();
-    if(op.id()==ID_symbol)
-      return to_symbol_expr(op).get_identifier();
+    if(op.id()==ID_symbol &&
+       op.get_bool(ID_C_SSA_symbol))
+      return to_ssa_expr(op).get_object_name();
     else
       return irep_idt();
   }
@@ -226,8 +222,6 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
   
   if(id!=irep_idt())
   {
-    id=state.get_original_name(id);
-
     // strip last name off id to get function name
     std::size_t pos=id2string(id).rfind("::");
     if(pos!=std::string::npos)
@@ -252,8 +246,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
     }
   }
 
-  guardt guard;
-  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, symex_targett::STATE);
+  symex_assign_rec(state, code_assignt(lhs, rhs));
 }
 
 /*******************************************************************\
@@ -488,10 +481,7 @@ void goto_symext::symex_cpp_new(
   else
     rhs.copy_to_operands(symbol.symbol_expr());
   
-  state.rename(rhs, ns);
-
-  guardt guard;
-  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, symex_targett::STATE);
+  symex_assign_rec(state, code_assignt(lhs, rhs));
 }
 
 /*******************************************************************\

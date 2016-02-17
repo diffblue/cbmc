@@ -65,7 +65,9 @@ protected:
   // produces an address ID for an event
   inline irep_idt address(event_it event) const
   {
-    return event->original_lhs_object.get_identifier();
+    ssa_exprt tmp=event->ssa_lhs;
+    tmp.remove_level_2();
+    return tmp.get_identifier();
   }
 
   // produce a clock symbol for some event

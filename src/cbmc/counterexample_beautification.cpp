@@ -45,7 +45,7 @@ void counterexample_beautificationt::get_minimization_list(
     {
       if(!prop_conv.l_get(it->guard_literal).is_false())
       {
-        const typet &type=it->original_lhs_object.type();
+        const typet &type=it->ssa_lhs.type();
       
         if(type!=bool_typet())
         {

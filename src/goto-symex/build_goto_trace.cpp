@@ -226,7 +226,10 @@ void build_goto_trace(
     goto_trace_step.thread_nr=SSA_step.source.thread_nr;
     goto_trace_step.pc=SSA_step.source.pc;
     goto_trace_step.comment=SSA_step.comment;
-    goto_trace_step.lhs_object=SSA_step.original_lhs_object;
+    if(SSA_step.ssa_lhs.is_not_nil())
+      goto_trace_step.lhs_object=ssa_exprt(SSA_step.ssa_lhs.get_original_expr());
+    else
+      goto_trace_step.lhs_object.make_nil();
     goto_trace_step.type=SSA_step.type;
     goto_trace_step.hidden=SSA_step.hidden;
     goto_trace_step.format_string=SSA_step.format_string;

@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/guard.h>
 #include <util/std_expr.h>
 #include <util/i2string.h>
+#include <util/ssa_expr.h>
 
 #include <pointer-analysis/value_set.h>
 #include <goto-programs/goto_functions.h>
@@ -45,97 +46,39 @@ public:
   
   struct renaming_levelt
   {
-  public:
-    virtual irep_idt current_name(const irep_idt &identifier) const=0;
-    virtual irep_idt name(const irep_idt &identifier, unsigned count) const=0;
     virtual ~renaming_levelt() { }
 
-    typedef std::map<irep_idt, unsigned> current_namest;
+    typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned> > current_namest;
     current_namest current_names;
     
-    void remove(const irep_idt &identifier) { current_names.erase(identifier); }
-    const irep_idt &get_original_name(const irep_idt &identifier) const;
-    void get_original_name(exprt &expr) const;
-    void get_original_name(typet &type) const;
-    void print(std::ostream &out) const;
-    unsigned current_count(const irep_idt &identifier) const;
-    
-    irep_idt operator()(const irep_idt &identifier)
+    unsigned current_count(const irep_idt &identifier) const
     {
-      // see if it's already renamed
-      if(is_renamed(identifier)) return identifier;
-
-      // record
-      irep_idt i=current_name(identifier);
-      original_identifiers[i]=identifier;
-      return i;
+      current_namest::const_iterator it=
+        current_names.find(identifier);
+      return it==current_names.end()?0:it->second.second;
     }
 
-    inline void operator()(symbol_exprt &expr)
+    void increase_counter(const irep_idt &identifier)
     {
-      expr.set_identifier(operator()(expr.get_identifier()));
-    }
-    
-    irep_idt rename_identifier(const irep_idt &identifier, unsigned count)
-    {
-      current_names[identifier]=count;
-      irep_idt new_name=name(identifier, count);
-      original_identifiers[new_name]=identifier;
-      return new_name;
-    }
-    
-    irep_idt increase_counter(const irep_idt &identifier)
-    {
-      return rename_identifier(identifier, current_names[identifier]+1);
-    }
-    
-    inline bool is_renamed(const irep_idt &identifier) const
-    {
-      return original_identifiers.find(identifier)!=original_identifiers.end();
-    }
-    
-    void restore_from(const current_namest &other)
-    {
-      for(current_namest::const_iterator
-          it=other.begin();
-          it!=other.end();
-          it++)
-      {
-        // could be done faster exploing ordering
-        current_names[it->first]=it->second;
-      }
+      assert(current_names.find(identifier)!=current_names.end());
+      ++current_names[identifier].second;
     }
 
-    void get_variables(std::set<irep_idt> &vars) const
+    void get_variables(hash_set_cont<ssa_exprt, irep_hash> &vars) const
     {
       for(current_namest::const_iterator it=current_names.begin();
           it!=current_names.end();
           it++)
-        vars.insert(it->first);
+        vars.insert(it->second.first);
     }
-
-  protected:
-    original_identifierst original_identifiers;
   };
   
   // level 0 -- threads!
   // renaming built for one particular interleaving
   struct level0t:public renaming_levelt
   {
-  public:
-    virtual irep_idt name(const irep_idt &identifier, unsigned thread_nr) const
-    {
-      return id2string(identifier)+"!"+i2string(thread_nr);
-    }
-
-    virtual irep_idt current_name(const irep_idt &identifier) const
-    { // never called
-      assert(false);
-      return irep_idt();
-    }
-
-    irep_idt operator()(
-      const irep_idt &identifier,
+    void operator()(
+      ssa_exprt &ssa_expr,
       const namespacet &ns,
       unsigned thread_nr);
 
@@ -148,26 +91,27 @@ public:
   
   struct level1t:public renaming_levelt
   {
-  public:
-    virtual irep_idt name(const irep_idt &identifier, unsigned frame) const
-    {
-      return id2string(identifier)+"@"+i2string(frame);
-    }
-    
-    virtual irep_idt current_name(const irep_idt &identifier) const
-    {
-      // see if it's already renamed
-      if(is_renamed(identifier))
-        return identifier;
+    void operator()(ssa_exprt &ssa_expr);
 
-      // rename only if needed
-      const current_namest::const_iterator it=
-        current_names.find(identifier);
-    
-      if(it==current_names.end())
-        return identifier;
-      else
-        return name(identifier, it->second);
+    void restore_from(const current_namest &other)
+    {
+      current_namest::iterator it=current_names.begin();
+      for(current_namest::const_iterator
+          ito=other.begin();
+          ito!=other.end();
+          ++ito)
+      {
+        while(it!=current_names.end() && it->first<ito->first)
+          ++it;
+        if(it==current_names.end() || ito->first<it->first)
+          current_names.insert(it, *ito);
+        else if(it!=current_names.end())
+        {
+          assert(it->first==ito->first);
+          it->second=ito->second;
+          ++it;
+        }
+      }
     }
 
     level1t() { }
@@ -178,22 +122,6 @@ public:
 
   struct level2t:public renaming_levelt
   {
-  public:
-    virtual irep_idt name(const irep_idt &identifier, unsigned count) const
-    {
-      return id2string(identifier)+"#"+i2string(count);
-    }
-
-    virtual irep_idt current_name(const irep_idt &identifier) const
-    {
-      // see if it's already renamed
-      if(is_renamed(identifier))
-        return identifier;
-
-      // _always_ rename
-      return name(identifier, current_count(identifier));
-    }
-    
     level2t() { }
     virtual ~level2t() { }
   } level2;
@@ -216,14 +144,15 @@ public:
   typedef enum { L0=0, L1=1, L2=2 } levelt;
 
   // performs renaming _up to_ the given level
-  irep_idt rename_identifier(const irep_idt &identifier, const namespacet &ns, levelt level=L2);
   void rename(exprt &expr, const namespacet &ns, levelt level=L2);
-  void rename(typet &type, const namespacet &ns, levelt level=L2);
-  
-  void rename_address(exprt &expr, const namespacet &ns, levelt level);
+  void rename(
+    typet &type,
+    const irep_idt &l1_identifier,
+    const namespacet &ns,
+    levelt level=L2);
   
   void assignment(
-    symbol_exprt &lhs, // L0/L1
+    ssa_exprt &lhs, // L0/L1
     const exprt &rhs,  // L2
     const namespacet &ns,
     bool rhs_is_simplified,
@@ -234,10 +163,20 @@ public:
   bool constant_propagation_reference(const exprt &expr) const;
 
   // undoes all levels of renaming
-  const irep_idt &get_original_name(const irep_idt &identifier) const;
   void get_original_name(exprt &expr) const;
   void get_original_name(typet &type) const;
+protected:
+  void rename_address(exprt &expr, const namespacet &ns, levelt level);
+
+  void set_ssa_indices(ssa_exprt &expr, const namespacet &ns, levelt level=L2);
+  // only required for value_set.assign
+  void get_l1_name(exprt &expr) const;
+
+  // this maps L1 names to (L2) types
+  typedef hash_map_cont<irep_idt, typet, irep_id_hash> l1_typest;
+  l1_typest l1_types;
   
+public:
   // uses level 1 names, and is used to
   // do dereferencing
   value_sett value_set;
@@ -263,25 +202,20 @@ public:
     }
 
     // the below replicate levelt2 member functions
-    void level2_get_variables(std::set<irep_idt> &vars) const
+    void level2_get_variables(hash_set_cont<ssa_exprt, irep_hash> &vars) const
     {
       for(level2t::current_namest::const_iterator
           it=level2_current_names.begin();
           it!=level2_current_names.end();
           it++)
-        vars.insert(it->first);
+        vars.insert(it->second.first);
     }
 
     unsigned level2_current_count(const irep_idt &identifier) const
     {
       level2t::current_namest::const_iterator it=
         level2_current_names.find(identifier);
-      return it==level2_current_names.end()?0:it->second;
-    }
-
-    irep_idt level2_current_name(const irep_idt &identifier) const
-    {
-      return id2string(identifier)+"#"+i2string(level2_current_count(identifier));
+      return it==level2_current_names.end()?0:it->second.second;
     }
   };
 
@@ -305,8 +239,8 @@ public:
 
     renaming_levelt::current_namest old_level1;
     
-    typedef std::set<irep_idt> local_variablest;
-    local_variablest local_variables;
+    typedef std::set<irep_idt> local_objectst;
+    local_objectst local_objects;
     
     framet():
       return_value(nil_exprt()),
@@ -368,9 +302,9 @@ public:
   // threads
   unsigned atomic_section_id;
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
-  typedef hash_map_cont<symbol_exprt, a_s_r_entryt, irep_hash> read_in_atomic_sectiont;
+  typedef hash_map_cont<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_sectiont;
   typedef std::list<guardt> a_s_w_entryt;
-  typedef hash_map_cont<symbol_exprt, a_s_w_entryt, irep_hash> written_in_atomic_sectiont;
+  typedef hash_map_cont<ssa_exprt, a_s_w_entryt, irep_hash> written_in_atomic_sectiont;
   read_in_atomic_sectiont read_in_atomic_section;
   written_in_atomic_sectiont written_in_atomic_section;
   
@@ -392,8 +326,8 @@ public:
   typedef std::vector<threadt> threadst;
   threadst threads;
   
-  bool l2_thread_read_encoding(symbol_exprt &expr, const namespacet &ns);
-  bool l2_thread_write_encoding(const symbol_exprt &expr, const namespacet &ns);
+  bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);
+  bool l2_thread_write_encoding(const ssa_exprt &expr, const namespacet &ns);
 
   void switch_to_thread(unsigned t);
   bool record_events;

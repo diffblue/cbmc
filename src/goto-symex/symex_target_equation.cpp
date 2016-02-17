@@ -67,8 +67,7 @@ Function: symex_target_equationt::shared_read
 
 void symex_target_equationt::shared_read(
   const exprt &guard,
-  const symbol_exprt &ssa_object,
-  const symbol_exprt &original_object,
+  const ssa_exprt &ssa_object,
   unsigned atomic_section_id,
   const sourcet &source)
 {
@@ -77,7 +76,6 @@ void symex_target_equationt::shared_read(
   
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
-  SSA_step.original_lhs_object=original_object;
   SSA_step.type=goto_trace_stept::SHARED_READ;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
@@ -99,8 +97,7 @@ Function: symex_target_equationt::shared_write
 
 void symex_target_equationt::shared_write(
   const exprt &guard,
-  const symbol_exprt &ssa_object,
-  const symbol_exprt &original_object,
+  const ssa_exprt &ssa_object,
   unsigned atomic_section_id,
   const sourcet &source)
 {
@@ -109,7 +106,6 @@ void symex_target_equationt::shared_write(
   
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
-  SSA_step.original_lhs_object=original_object;
   SSA_step.type=goto_trace_stept::SHARED_WRITE;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
@@ -235,8 +231,7 @@ Function: symex_target_equationt::assignment
 
 void symex_target_equationt::assignment(
   const exprt &guard,
-  const symbol_exprt &ssa_lhs,
-  const symbol_exprt &original_lhs_object,
+  const ssa_exprt &ssa_lhs,
   const exprt &ssa_full_lhs,
   const exprt &original_full_lhs,
   const exprt &ssa_rhs,
@@ -250,7 +245,6 @@ void symex_target_equationt::assignment(
   
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_lhs;
-  SSA_step.original_lhs_object=original_lhs_object;
   SSA_step.ssa_full_lhs=ssa_full_lhs;
   SSA_step.original_full_lhs=original_full_lhs;
   SSA_step.ssa_rhs=ssa_rhs;
@@ -279,8 +273,7 @@ Function: symex_target_equationt::decl
 
 void symex_target_equationt::decl(
   const exprt &guard,
-  const symbol_exprt &ssa_lhs,
-  const symbol_exprt &original_lhs_object,
+  const ssa_exprt &ssa_lhs,
   const sourcet &source,
   assignment_typet assignment_type)
 {
@@ -292,8 +285,7 @@ void symex_target_equationt::decl(
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.ssa_full_lhs=ssa_lhs;
-  SSA_step.original_lhs_object=original_lhs_object;
-  SSA_step.original_full_lhs=original_lhs_object;
+  SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
   SSA_step.type=goto_trace_stept::DECL;
   SSA_step.source=source;
   SSA_step.hidden=(assignment_type!=STATE);
@@ -319,8 +311,7 @@ Function: symex_target_equationt::dead
 
 void symex_target_equationt::dead(
   const exprt &guard,
-  const symbol_exprt &ssa_lhs,
-  const symbol_exprt &original_lhs_object,
+  const ssa_exprt &ssa_lhs,
   const sourcet &source)
 {
   // we currently don't record these
@@ -946,7 +937,6 @@ void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
   merge_irep(SSA_step.guard);
 
   merge_irep(SSA_step.ssa_lhs);
-  merge_irep(SSA_step.original_lhs_object);
   merge_irep(SSA_step.ssa_full_lhs);
   merge_irep(SSA_step.original_full_lhs);
   merge_irep(SSA_step.ssa_rhs);

@@ -309,9 +309,8 @@ void symex_slice_by_tracet::compute_ts_back(
         if ((t[j].is_true()) || (t[j].is_false())) {
           merge.push_back(t[j]);
         } else {
-          exprt merge_sym =exprt(ID_symbol, typet(ID_bool));
-          merge_sym.set(ID_identifier, id2string(merge_identifier)+"#"+
-                        i2string(merge_count++));
+          ssa_exprt merge_sym(merge_symbol);
+          merge_sym.set_level_2(merge_count++);
           exprt t_copy (t[j]);
           merge_map_back.push_back(t_copy);
           std::set<exprt> empty_impls;
@@ -571,8 +570,8 @@ void symex_slice_by_tracet::assign_merges(
   size_t merge_count = (merge_map_back.size()) - 1;
   for (std::vector<exprt>::reverse_iterator i = merge_map_back.rbegin();
        i != merge_map_back.rend(); i++) {
-    symbol_exprt merge_sym(typet(ID_bool));
-    merge_sym.set_identifier(id2string(merge_identifier)+"#"+i2string(merge_count));
+    ssa_exprt merge_sym(merge_symbol);
+    merge_sym.set_level_2(merge_count);
     merge_count--;
     guardt t_guard;
     t_guard.make_true();
@@ -585,7 +584,6 @@ void symex_slice_by_tracet::assign_merges(
     
     SSA_step.guard=t_guard.as_expr();
     SSA_step.ssa_lhs=merge_sym;
-    SSA_step.original_lhs_object=merge_symbol;
     SSA_step.ssa_rhs.swap(merge_copy);
     SSA_step.assignment_type=symex_targett::HIDDEN;
     

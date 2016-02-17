@@ -34,24 +34,21 @@ public:
   // read event
   virtual void shared_read(
     const exprt &guard,
-    const symbol_exprt &ssa_object,
-    const symbol_exprt &original_object,
+    const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
     const sourcet &source);
 
   // write event
   virtual void shared_write(
     const exprt &guard,
-    const symbol_exprt &ssa_object,
-    const symbol_exprt &original_object,
+    const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
     const sourcet &source);
 
   // assignment to a variable - lhs must be symbol
   virtual void assignment(
     const exprt &guard,
-    const symbol_exprt &ssa_lhs,
-    const symbol_exprt &original_lhs,
+    const ssa_exprt &ssa_lhs,
     const exprt &ssa_full_lhs,
     const exprt &original_full_lhs,
     const exprt &ssa_rhs,
@@ -61,16 +58,14 @@ public:
   // declare fresh variable - lhs must be symbol
   virtual void decl(
     const exprt &guard,
-    const symbol_exprt &ssa_lhs,
-    const symbol_exprt &original_lhs_object,
+    const ssa_exprt &ssa_lhs,
     const sourcet &source,
     assignment_typet assignment_type);
 
   // note the death of a variable - lhs must be symbol
   virtual void dead(
     const exprt &guard,
-    const symbol_exprt &ssa_lhs,
-    const symbol_exprt &original_lhs_object,
+    const ssa_exprt &ssa_lhs,
     const sourcet &source);
 
   // record a function call
@@ -199,7 +194,7 @@ public:
     literalt guard_literal;
 
     // for ASSIGNMENT and DECL
-    symbol_exprt ssa_lhs, original_lhs_object;
+    ssa_exprt ssa_lhs;
     exprt ssa_full_lhs, original_full_lhs;
     exprt ssa_rhs;
     assignment_typet assignment_type;
@@ -228,8 +223,7 @@ public:
       type(goto_trace_stept::NONE),
       hidden(false),
       guard(static_cast<const exprt &>(get_nil_irep())),
-      ssa_lhs(static_cast<const symbol_exprt &>(get_nil_irep())),
-      original_lhs_object(static_cast<const symbol_exprt &>(get_nil_irep())),
+      ssa_lhs(static_cast<const ssa_exprt &>(get_nil_irep())),
       ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       ssa_rhs(static_cast<const exprt &>(get_nil_irep())),

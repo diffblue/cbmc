@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 
 #include "goto_symex.h"
-#include "renaming_ns.h"
 #include "symex_dereference_state.h"
 
 /*******************************************************************\
@@ -227,8 +226,28 @@ exprt goto_symext::address_arithmetic(
     if(ns.follow(result.type()).id()==ID_array && !keep_array)
       result=index_exprt(result, gen_zero(index_type()));
 
-    // TODO: consider pointer offset for ID_SSA_symbol
-    result=address_of_exprt(result);
+    // handle field-sensitive SSA symbol
+    mp_integer offset=0;
+    if(expr.id()==ID_symbol &&
+       expr.get_bool(ID_C_SSA_symbol))
+    {
+      offset=compute_pointer_offset(expr, ns);
+      assert(offset>=0);
+    }
+
+    if(offset>0)
+    {
+      byte_extract_exprt be(byte_extract_id());
+      be.type()=expr.type();
+      be.op()=to_ssa_expr(expr).get_l1_object();
+      be.offset()=from_integer(offset, index_type());
+
+      result=address_arithmetic(be, state, guard, keep_array);
+
+      do_simplify(result);
+    }
+    else
+      result=address_of_exprt(result);
   }
   else
     throw "goto_symext::address_arithmetic does not handle "+expr.id_string();
@@ -271,10 +290,9 @@ void goto_symext::dereference_rec(
 
     // we need to set up some elaborate call-backs
     symex_dereference_statet symex_dereference_state(*this, state);
-    renaming_nst renaming_ns(ns, state);
 
     value_set_dereferencet dereference(
-      renaming_ns,
+      ns,
       new_symbol_table,
       options,
       symex_dereference_state);      
@@ -386,4 +404,7 @@ void goto_symext::dereference(
   // start the recursion!
   guardt guard;  
   dereference_rec(expr, state, guard, write);
+  // dereferencing may introduce new symbol_exprt
+  // (like __CPROVER_memory)
+  state.rename(expr, ns, goto_symex_statet::L1);
 }

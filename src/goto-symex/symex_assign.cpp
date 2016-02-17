@@ -19,6 +19,30 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: goto_symext::symex_assign_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_symext::symex_assign_rec(
+  statet &state,
+  const code_assignt &code)
+{
+  code_assignt deref_code=code;
+
+  clean_expr(deref_code.lhs(), state, true);
+  clean_expr(deref_code.rhs(), state, false);
+
+  symex_assign(state, deref_code);
+}
+
+/*******************************************************************\
+
 Function: goto_symext::symex_assign
 
   Inputs:
@@ -153,8 +177,9 @@ void goto_symext::symex_assign_rec(
   guardt &guard,
   assignment_typet assignment_type)
 {
-  if(lhs.id()==ID_symbol)
-    symex_assign_symbol(state, to_symbol_expr(lhs), full_lhs, rhs, guard, assignment_type);
+  if(lhs.id()==ID_symbol &&
+     lhs.get_bool(ID_C_SSA_symbol))
+    symex_assign_symbol(state, to_ssa_expr(lhs), full_lhs, rhs, guard, assignment_type);
   else if(lhs.id()==ID_index)
     symex_assign_array(state, to_index_expr(lhs), full_lhs, rhs, guard, assignment_type);
   else if(lhs.id()==ID_member)
@@ -228,7 +253,7 @@ Function: goto_symext::symex_assign_symbol
 
 void goto_symext::symex_assign_symbol(
   statet &state,
-  const symbol_exprt &lhs,
+  const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const exprt &rhs,
   guardt &guard,
@@ -247,17 +272,10 @@ void goto_symext::symex_assign_symbol(
     tmp_ssa_rhs.swap(ssa_rhs);
   }
   
-  symbol_exprt original_lhs=lhs;
-  state.get_original_name(original_lhs);
-
-  const symbolt &symbol=ns.lookup(original_lhs);
-  if(symbol.is_auxiliary) assignment_type=symex_targett::HIDDEN;
-  
   state.rename(ssa_rhs, ns);
   do_simplify(ssa_rhs);
   
-  symbol_exprt ssa_lhs=lhs;
-  state.rename(ssa_lhs, ns, goto_symex_statet::L1);
+  ssa_exprt ssa_lhs=lhs;
   state.assignment(ssa_lhs, ssa_rhs, ns, options.get_bool_option("simplify"), constant_propagation);
   
   exprt ssa_full_lhs=full_lhs;
@@ -271,10 +289,13 @@ void goto_symext::symex_assign_symbol(
   tmp_guard.append(guard);
   
   // do the assignment
+  const symbolt &symbol=ns.lookup(ssa_lhs.get_original_expr());
+  if(symbol.is_auxiliary) assignment_type=symex_targett::HIDDEN;
+  
   target.assignment(
     tmp_guard.as_expr(),
-    ssa_lhs, original_lhs,
-    ssa_full_lhs, add_to_lhs(full_lhs, original_lhs),
+    ssa_lhs,
+    ssa_full_lhs, add_to_lhs(full_lhs, ssa_lhs.get_original_expr()),
     ssa_rhs, 
     state.source,
     assignment_type);

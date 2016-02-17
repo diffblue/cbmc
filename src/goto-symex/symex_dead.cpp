@@ -43,19 +43,9 @@ void goto_symext::symex_dead(statet &state)
   // We increase the L2 renaming to make these non-deterministic.
   // We also prevent propagation of old values.
   
-  const irep_idt &identifier=
-    to_symbol_expr(code.op0()).get_identifier();
-    
-  const irep_idt l1_identifier=
-    state.rename_identifier(identifier, ns, goto_symex_statet::L1);
-    
-  // prevent propagation
-  state.propagation.remove(l1_identifier);
+  ssa_exprt ssa(to_symbol_expr(code.op0()));
+  state.rename(ssa, ns, goto_symex_statet::L1);
 
-  // L2 renaming
-  unsigned new_count=state.level2.current_count(l1_identifier)+1;
-  state.level2.rename_identifier(l1_identifier, new_count);
-    
   // in case of pointers, put something into the value set
   if(ns.follow(code.op0().type()).id()==ID_pointer)
   {
@@ -74,10 +64,18 @@ void goto_symext::symex_dead(statet &state)
     else
       rhs=exprt(ID_invalid);
     
-    symbol_exprt l1_lhs;
-    l1_lhs.type()=code.op0().type();
-    l1_lhs.set_identifier(l1_identifier);
     state.rename(rhs, ns, goto_symex_statet::L1);
-    state.value_set.assign(l1_lhs, rhs, ns, true, false);
+    state.value_set.assign(ssa, rhs, ns, true, false);
   }
+
+  ssa_exprt ssa_lhs=to_ssa_expr(ssa);
+  const irep_idt &l1_identifier=ssa_lhs.get_identifier();
+
+  // prevent propagation
+  state.propagation.remove(l1_identifier);
+
+  // L2 renaming
+  if(state.level2.current_names.find(l1_identifier)!=
+     state.level2.current_names.end())
+    state.level2.increase_counter(l1_identifier);
 }

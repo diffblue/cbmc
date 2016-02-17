@@ -21,7 +21,7 @@ Date: July 2005
 #include <iosfwd>
 #include <vector>
 
-#include <util/std_expr.h>
+#include <util/ssa_expr.h>
 
 #include <goto-programs/goto_program.h>
 
@@ -80,7 +80,7 @@ public:
   std::string comment;
 
   // the object being assigned
-  symbol_exprt lhs_object;
+  ssa_exprt lhs_object;
   
   // the full, original lhs expression
   exprt full_lhs;
@@ -173,7 +173,7 @@ void show_goto_trace(
 void trace_value(
   std::ostream &out,
   const namespacet &ns,
-  const symbol_exprt &lhs_object,
+  const ssa_exprt &lhs_object,
   const exprt &full_lhs,
   const exprt &value);
 

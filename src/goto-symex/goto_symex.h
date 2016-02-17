@@ -153,6 +153,7 @@ protected:
   virtual void symex_atomic_begin(statet &state);
   virtual void symex_atomic_end(statet &state);  
   virtual void symex_decl(statet &state);
+  virtual void symex_decl(statet &state, const symbol_exprt &expr);
   virtual void symex_dead(statet &state);
 
   virtual void symex_other(
@@ -239,12 +240,13 @@ protected:
   virtual void do_simplify(exprt &expr);
   
   //virtual void symex_block(statet &state, const codet &code);
+  void symex_assign_rec(statet &state, const code_assignt &code);
   virtual void symex_assign(statet &state, const code_assignt &code);
 
   typedef symex_targett::assignment_typet assignment_typet;
   
   void symex_assign_rec(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
-  void symex_assign_symbol(statet &state, const symbol_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_symbol(statet &state, const ssa_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
   void symex_assign_typecast(statet &state, const typecast_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
   void symex_assign_array(statet &state, const index_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
   void symex_assign_struct_member(statet &state, const member_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);

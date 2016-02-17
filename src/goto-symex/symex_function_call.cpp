@@ -136,15 +136,7 @@ void goto_symext::parameter_assignments(
         }
       }
       
-      guardt guard;
-      state.rename(lhs, ns, goto_symex_statet::L1);
-      
-      symex_targett::assignment_typet assignment_type=
-        goto_function.is_hidden()?
-        symex_targett::HIDDEN_ACTUAL_PARAMETER:
-        symex_targett::VISIBLE_ACTUAL_PARAMETER;
-        
-      symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, assignment_type);
+      symex_assign_rec(state, code_assignt(lhs, rhs));
     }
 
     it1++;
@@ -173,15 +165,7 @@ void goto_symext::parameter_assignments(
       
       symbol_exprt lhs=symbol_exprt(id, it1->type());
 
-      guardt guard;
-      state.rename(lhs, ns, goto_symex_statet::L1);
-
-      symex_targett::assignment_typet assignment_type=
-        goto_function.is_hidden()?
-        symex_targett::HIDDEN_ACTUAL_PARAMETER:
-        symex_targett::VISIBLE_ACTUAL_PARAMETER;
-        
-      symex_assign_symbol(state, lhs, nil_exprt(), *it1, guard, assignment_type);
+      symex_assign_rec(state, code_assignt(lhs, *it1));
     }
   }
   else if(it1!=arguments.end())
@@ -328,9 +312,8 @@ void goto_symext::symex_function_call_code(
     {
       side_effect_expr_nondett rhs(call.lhs().type());
       rhs.add_source_location()=call.source_location();
-      state.rename(rhs, ns, goto_symex_statet::L1);
       code_assignt code(call.lhs(), rhs);
-      symex_assign(state, to_code_assign(code)); /* TODO: clean_expr? */
+      symex_assign_rec(state, code);
     }
 
     state.source.pc++;
@@ -400,11 +383,23 @@ void goto_symext::pop_frame(statet &state)
     state.level1.restore_from(frame.old_level1);
   
     // clear function-locals from L2 renaming
-    for(statet::framet::local_variablest::const_iterator
-        it=frame.local_variables.begin();
-        it!=frame.local_variables.end();
-        it++)
-      state.level2.remove(*it);
+    for(goto_symex_statet::renaming_levelt::current_namest::iterator
+        c_it=state.level2.current_names.begin();
+        c_it!=state.level2.current_names.end();
+       ) // no ++c_it
+    {
+      const irep_idt l1_o_id=c_it->second.first.get_l1_object_identifier();
+      // could use iteration over local_objects as l1_o_id is prefix
+      if(frame.local_objects.find(l1_o_id)==frame.local_objects.end())
+      {
+        ++c_it;
+        continue;
+      }
+      goto_symex_statet::renaming_levelt::current_namest::iterator
+        cur=c_it;
+      ++c_it;
+      state.level2.current_names.erase(cur);
+    }
   }
   
   state.pop_frame();
@@ -467,7 +462,9 @@ void goto_symext::locality(
       it++)
   {
     // get L0 name
-    irep_idt l0_name=state.rename_identifier(*it, ns, goto_symex_statet::L0);
+    ssa_exprt ssa(ns.lookup(*it).symbol_expr());
+    state.rename(ssa, ns, goto_symex_statet::L0);
+    const irep_idt l0_name=ssa.get_identifier();
 
     // save old L1 name for popping the frame
     statet::level1t::current_namest::const_iterator c_it=
@@ -480,19 +477,23 @@ void goto_symext::locality(
     // identifiers may be shared among functions
     // (e.g., due to inlining or other code restructuring)
     
-    irep_idt l1_name;
+    state.level1.current_names[l0_name]=
+      std::make_pair(ssa, frame_nr);
+    state.rename(ssa, ns, goto_symex_statet::L1);
+
+    irep_idt l1_name=ssa.get_identifier();
     unsigned offset=0;
     
-    do
+    while(state.l1_history.find(l1_name)!=state.l1_history.end())
     {
-      state.level1.rename_identifier(l0_name, frame_nr+offset);
-      l1_name=state.level1(l0_name);
-      offset++;
+      state.level1.increase_counter(l0_name);
+      ssa.set_level_1(frame_nr+offset);
+      l1_name=ssa.get_identifier();
+      ++offset;
     }
-    while(state.l1_history.find(l1_name)!=state.l1_history.end());
     
     // now unique -- store
-    frame.local_variables.insert(l1_name);
+    frame.local_objects.insert(l1_name);
     state.l1_history.insert(l1_name);
   }
 }
@@ -522,8 +523,6 @@ void goto_symext::return_assignment(statet &state)
   if(code.operands().size()==1)
   {
     exprt value=code.op0();
-
-    clean_expr(value, state, false);
   
     if(frame.return_value.is_not_nil())
     {
@@ -536,7 +535,7 @@ void goto_symext::return_assignment(statet &state)
               "assignment.lhs().type():\n"+assignment.lhs().type().pretty()+"\n"+
               "assignment.rhs().type():\n"+assignment.rhs().type().pretty();
 
-      symex_assign(state, assignment);
+      symex_assign_rec(state, assignment);
     }
   }
   else
