@@ -1757,20 +1757,11 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
 {
   byte_extract_exprt &be=to_byte_extract_expr(expr);
 
-  // pull out any ID_if on the object
+  // lift up any ID_if on the object
   if(be.op().id()==ID_if)
   {
-    const if_exprt &if_expr=to_if_expr(be.op());
-    exprt cond=if_expr.cond();
-
-    byte_extract_exprt be_false=be;
-    be_false.op()=if_expr.false_case();
-
-    be.op()=if_expr.true_case();
-
-    expr=if_exprt(cond, be, be_false, be.type());
-    simplify_rec(expr);
-
+    if_exprt &if_expr=to_if_expr(be.op());
+    lift_if(expr, if_expr);
     return false;
   }
 
