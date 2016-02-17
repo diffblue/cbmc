@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr.h"
 #include "namespace.h"
 #include "symbol.h"
+#include "ssa_expr.h"
 
 #include "pointer_offset_size.h"
 
@@ -499,7 +500,13 @@ mp_integer compute_pointer_offset(
   const namespacet &ns)
 {
   if(expr.id()==ID_symbol)
-    return 0;
+  {
+    if(is_ssa_expr(expr))
+      return compute_pointer_offset(
+        to_ssa_expr(expr).get_original_expr(), ns);
+    else
+      return 0;
+  }
   else if(expr.id()==ID_index)
   {
     assert(expr.operands().size()==2);

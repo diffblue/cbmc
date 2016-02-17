@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/pointer_predicates.h>
 #include <util/byte_operators.h>
+#include <util/ssa_expr.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/c_typecast.h>
@@ -651,6 +652,8 @@ void value_set_dereferencet::valid_check(
   else if(symbol_expr.id()==ID_symbol)
   {
     const irep_idt identifier=
+      is_ssa_expr(symbol_expr)?
+      to_ssa_expr(symbol_expr).get_object_name():
       to_symbol_expr(symbol_expr).get_identifier();
     
     const symbolt &symbol=ns.lookup(identifier);

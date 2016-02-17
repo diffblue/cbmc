@@ -44,13 +44,34 @@ public:
     return to_symbol_expr(ode.root_object()).get_identifier();
   }
 
+  inline const ssa_exprt get_l1_object() const
+  {
+    object_descriptor_exprt ode;
+    ode.object()=get_original_expr();
+
+    ssa_exprt root(ode.root_object());
+    root.set(ID_L0, get(ID_L0));
+    root.set(ID_L1, get(ID_L1));
+    root.update_identifier();
+
+    return root;
+  }
+
   inline const irep_idt get_l1_object_identifier() const
   {
-    return build_identifier(
-             get_original_expr(),
-             get_level_0(),
-             get_level_1(),
-             irep_idt()); // intentionally blank
+    #if 0
+    return get_l1_object().get_identifier();
+    #else
+    // the above is the clean version, this is the fast one, making
+    // use of internal knowledge about identifier names
+    std::string l1_o_id=id2string(get_identifier());
+    std::string::size_type fs_suffix=l1_o_id.find_first_of(".[#");
+
+    if(fs_suffix!=std::string::npos)
+      l1_o_id.resize(fs_suffix);
+
+    return l1_o_id;
+    #endif
   }
 
   inline const irep_idt get_original_name() const
