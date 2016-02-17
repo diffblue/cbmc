@@ -481,6 +481,35 @@ public:
   }  
 };
 
+/*! \brief Cast a generic typet to a \ref tag_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * tag_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref tag_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const tag_typet &to_tag_type(const typet &type)
+{
+  assert(type.id()==ID_c_enum_tag ||
+         type.id()==ID_struct_tag ||
+         type.id()==ID_union_tag);
+  return static_cast<const tag_typet &>(type);
+}
+
+/*! \copydoc to_tag_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline tag_typet &to_tag_type(typet &type)
+{
+  assert(type.id()==ID_c_enum_tag ||
+         type.id()==ID_struct_tag ||
+         type.id()==ID_union_tag);
+  return static_cast<tag_typet &>(type);
+}
+
 /*! \brief A struct tag type
 */
 
