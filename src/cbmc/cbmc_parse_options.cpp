@@ -1015,7 +1015,7 @@ int cbmc_parse_optionst::do_bmc(
   bmc.set_ui(get_ui());
 
   // do actual BMC
-  bool result=bmc.run(goto_functions);
+  bool result=(bmc.run(goto_functions)==safety_checkert::SAFE);
 
   // let's log some more statistics
   debug() << "Memory consumption:" << messaget::endl;
@@ -1024,7 +1024,7 @@ int cbmc_parse_optionst::do_bmc(
 
   // We return '0' if the property holds,
   // and '10' if it is violated.
-  return result?10:0;
+  return result?0:10;
 }
 
 /*******************************************************************\
