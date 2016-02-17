@@ -2082,6 +2082,29 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
     return false;
   }
 
+  exprt &root=bu_expr.op();
+  exprt &offset=bu_expr.offset();
+  const exprt &value=bu_expr.value();
+  const mp_integer val_size=pointer_offset_bits(value.type(), ns);
+  const mp_integer root_size=pointer_offset_bits(root.type(), ns);
+
+  // byte update of full object is byte_extract(new value)
+  if(offset.is_zero() &&
+     val_size>0 &&
+     root_size>0 &&
+     val_size>=root_size)
+  {
+    expr=byte_extract_exprt(
+      bu_expr.id()==ID_byte_update_little_endian ?
+        ID_byte_extract_little_endian :
+        ID_byte_extract_big_endian,
+      value, offset, bu_expr.type());
+
+    simplify_byte_extract(expr);
+
+    return false;
+  }
+
   /*
    * byte_update(root, offset, 
    *             extract(root, offset) WITH component:=value)
@@ -2091,10 +2114,6 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
    */
 
   if(bu_expr.id()!=ID_byte_update_little_endian) return true;
-
-  exprt &root=bu_expr.op();
-  exprt &offset=bu_expr.offset();
-  const exprt &value=bu_expr.value();
 
   if(bu_expr.value().id()==ID_with) 
   {
@@ -2177,6 +2196,10 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
     return true;
   
   const typet &op_type=ns.follow(root.type());
+
+  // size must be known
+  if(val_size<=0)
+    return true;
   
   // search for updates of members, and replace by 'with'
   if(op_type.id()==ID_struct)
@@ -2204,6 +2227,55 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
         return false;
       }
     }
+  }
+
+  // replace elements of array or struct expressions, possibly using
+  // byte_extract
+  if(root.id()==ID_array)
+  {
+    mp_integer el_size=pointer_offset_bits(op_type.subtype(), ns);
+    if(el_size<=0 || el_size%8!=0 || val_size%8!=0)
+      return true;
+
+    exprt result=root;
+
+    mp_integer m_offset_bits=0, val_offset=0;
+    Forall_operands(it, result)
+    {
+      if(offset_int*8+val_size<=m_offset_bits)
+        break;
+
+      if(offset_int*8<m_offset_bits+el_size)
+      {
+        mp_integer bytes_req=(m_offset_bits+el_size)/8-offset_int;
+        bytes_req-=val_offset;
+        if(val_offset+bytes_req>val_size/8)
+          bytes_req=val_size/8-val_offset;
+
+        byte_extract_exprt new_val(
+          byte_extract_id(),
+          value,
+          from_integer(val_offset, offset.type()),
+          array_typet(unsignedbv_typet(8),
+                      from_integer(bytes_req, offset.type())));
+
+        *it=byte_update_exprt(
+          bu_expr.id(),
+          *it,
+          from_integer(offset_int+val_offset-m_offset_bits/8, offset.type()),
+          new_val);
+
+        simplify_rec(*it);
+
+        val_offset+=bytes_req;
+      }
+
+      m_offset_bits+=el_size;
+    }
+
+    expr.swap(result);
+
+    return false;
   }
 
   return true;
