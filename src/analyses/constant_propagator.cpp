@@ -189,7 +189,8 @@ bool constant_propagator_domaint::two_way_propagate_rec(
     // two-way propagation 
     valuest copy_values = values;
     assign_rec(copy_values, lhs, rhs, ns);
-    assign_rec(values, rhs, lhs, ns);
+    if(!values.is_constant(rhs) || values.is_constant(lhs))
+      assign_rec(values, rhs, lhs, ns);
     change = values.meet(copy_values);
   }
 
