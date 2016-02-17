@@ -27,9 +27,11 @@ public:
   {
   }
 
+  #if 0
   // This conversion allows the use of dstrings
   // in switch ... case statements.  
   constexpr operator int() const { return no; }
+  #endif
 
   // this one is not safe for static objects
   inline dstring(const char *s):no(string_container[s])

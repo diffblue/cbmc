@@ -1890,19 +1890,17 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     }
   }
 
-  // don't do any of the following if endianness doesn't match, as
-  // bytes need to be swapped
-  if(byte_extract_id()!=expr.id())
-    return true;
-  
   // the following require a constant offset
   mp_integer offset;
   if(to_integer(be.offset(), offset) || offset<0)
     return true;
 
   // byte extract of full object is object
+  // don't do any of the following if endianness doesn't match, as
+  // bytes need to be swapped
   if(offset==0 &&
-     base_type_eq(expr.type(), be.op().type(), ns))
+     base_type_eq(expr.type(), be.op().type(), ns) &&
+     byte_extract_id()!=expr.id())
   {
     expr=be.op();
 
@@ -1914,9 +1912,40 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
   if(be.type().id()==ID_empty ||
      el_size<0)
     return true;
+  assert(el_size>0);
 
   if(be.op().id()==ID_array_of &&
-     el_size>0 &&
+     be.op().op0().id()==ID_constant)
+  {
+    std::string const_bits=
+      expr2bits(be.op().op0(),
+                byte_extract_id()==ID_byte_extract_little_endian);
+
+    // double the string until we have sufficiently many bits
+    while(const_bits.size()<integer2long(offset*8+el_size))
+      const_bits+=const_bits;
+
+    std::string el_bits=
+      std::string(
+        const_bits,
+        integer2long(offset*8),
+        integer2long(el_size));
+
+    exprt tmp=
+      bits2expr(
+        el_bits,
+        be.type(),
+        be.id()==ID_byte_extract_little_endian);
+
+    if(tmp.is_not_nil())
+    {
+      expr.swap(tmp);
+      return false;
+    }
+  }
+
+  // in some cases we even handle non-const array_of
+  if(be.op().id()==ID_array_of &&
      (offset*8)%el_size==0 &&
      el_size<=pointer_offset_bits(be.op().op0().type(), ns))
   {
@@ -1927,44 +1956,42 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     return false;
   }
 
-  // rethink the remaining code to correctly handle big endian
-  if(expr.id()!=ID_byte_extract_little_endian) return true;
-  
-  // get type of object
-  const typet &op_type=ns.follow(be.op().type());
-
-  exprt result=be.op();
-
-  // extract bits of a union member
-  if(result.id()==ID_union)
+  // extract bits of a constant
+  std::string bits=
+    expr2bits(be.op(), expr.id()==ID_byte_extract_little_endian);
+  // exact match of length only - otherwise we might lose bits of
+  // flexible array members at the end of a struct
+  if(mp_integer(bits.size())==el_size+offset*8)
   {
-    std::string bits=
-      expr2bits(result, expr.id()==ID_byte_extract_little_endian);
+    std::string bits_cut=
+      std::string(
+        bits,
+        integer2long(offset*8),
+        integer2long(el_size));
 
-    if(mp_integer(bits.size())>=el_size+offset*8)
+    exprt tmp=
+      bits2expr(bits_cut,
+                be.type(),
+                expr.id()==ID_byte_extract_little_endian);
+
+    if(tmp.is_not_nil())
     {
-      std::string bits_cut=
-        std::string(
-          bits,
-          integer2long(offset*8),
-          integer2long(el_size));
+      expr=tmp;
 
-      exprt tmp=
-        bits2expr(bits_cut,
-                  be.type(),
-                  expr.id()==ID_byte_extract_little_endian);
-
-      if(tmp.is_not_nil())
-      {
-        expr=tmp;
-
-        return false;
-      }
+      return false;
     }
   }
 
+  // rethink the remaining code to correctly handle big endian
+  if(expr.id()!=ID_byte_extract_little_endian) return true;
+
+  // get type of object
+  const typet &op_type=ns.follow(be.op().type());
+
   if(op_type.id()==ID_array)
   {
+    exprt result=be.op();
+
     // try proper array or string constant
     for(const typet *op_type_ptr=&op_type;
         op_type_ptr->id()==ID_array;
@@ -2296,36 +2323,35 @@ Function: simplify_exprt::simplify_node_preorder
 bool simplify_exprt::simplify_node_preorder(exprt &expr)
 {
   bool result=true;
+  
+  // The ifs below could one day be replaced by a switch()
 
-  switch(expr.id())
+  if(expr.id()==ID_address_of)
   {
-  case ID_address_of:
     // the argument of this expression needs special treatment
-    break;
-    
-  case ID_if:
+  }
+  else if(expr.id()==ID_if)
+  {
     // we first want to look at the condition
+    if_exprt &if_expr=to_if_expr(expr);
+    if(!simplify_rec(if_expr.cond())) result=false;
+
+    // 1 ? a : b -> a  and  0 ? a : b -> b
+    if(if_expr.cond().is_constant())
     {
-      if_exprt &if_expr=to_if_expr(expr);
-      if(!simplify_rec(if_expr.cond())) result=false;
-
-      // 1 ? a : b -> a  and  0 ? a : b -> b
-      if(if_expr.cond().is_constant())
-      {
-        expr=if_expr.cond().is_true()?
-          if_expr.true_case():if_expr.false_case();
-        simplify_rec(expr);
-        result=false;
-      }
-      else
-      {
-        if(!simplify_rec(if_expr.true_case())) result=false; 
-        if(!simplify_rec(if_expr.false_case())) result=false; 
-      }
+      expr=if_expr.cond().is_true()?
+        if_expr.true_case():if_expr.false_case();
+      simplify_rec(expr);
+      result=false;
     }
-    break;
-
-  default:
+    else
+    {
+      if(!simplify_rec(if_expr.true_case())) result=false; 
+      if(!simplify_rec(if_expr.false_case())) result=false; 
+    }
+  }
+  else
+  {
     if(expr.has_operands())
     {
       Forall_operands(it, expr)
