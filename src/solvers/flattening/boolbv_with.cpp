@@ -11,7 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
-#include <util/byte_operators.h>
+#include <util/endianness_map.h>
+#include <util/config.h>
 
 #include "boolbv.h"
 
@@ -34,19 +35,6 @@ void boolbvt::convert_with(const exprt &expr, bvt &bv)
 
   if((expr.operands().size()%2)!=1)
     throw "with takes an odd number of operands";
-
-  if(expr.op0().type().id()==ID_union)
-  {
-    assert(expr.operands().size()==3);
-
-    bv=convert_bv(
-      byte_update_exprt(byte_update_id(),
-                        expr.op0(),
-                        gen_zero(integer_typet()),
-                        expr.op2()));
-
-    return;
-  }
 
   bv=convert_bv(expr.op0());
 
@@ -309,16 +297,26 @@ void boolbvt::convert_with_union(
   bvt &next_bv)
 {
   next_bv=prev_bv;
-  
-  // Should use byte_update_exprt, see above,
-  // as the below doesn't work on big endian.
 
   const bvt &op2_bv=convert_bv(op2);
 
   if(next_bv.size()<op2_bv.size())
     throw "convert_with_union: unexpected operand op2 width";
 
-  for(unsigned i=0; i<op2_bv.size(); i++)
-    next_bv[i]=op2_bv[i];
+  if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN)
+  {
+    for(std::size_t i=0; i<op2_bv.size(); i++)
+      next_bv[i]=op2_bv[i];
+  }
+  else
+  {
+    assert(config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_BIG_ENDIAN);
+
+    endianness_mapt map_u(type, false, ns);
+    endianness_mapt map_op2(op2.type(), false, ns);
+
+    for(std::size_t i=0; i<op2_bv.size(); i++)
+      next_bv[map_u.map_bit(i)]=op2_bv[map_op2.map_bit(i)];
+  }
 }
 
