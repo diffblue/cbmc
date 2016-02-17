@@ -9,8 +9,87 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/i2string.h>
 #include <util/std_types.h>
 #include <util/arith_tools.h>
+#include <util/namespace.h>
+#include <util/symbol.h>
+#include <util/symbol_table.h>
 
 #include "type2name.h"
+
+typedef hash_map_cont<irep_idt, std::pair<size_t, bool>, irep_id_hash>
+  symbol_numbert;
+
+static std::string type2name(
+  const typet &type,
+  const namespacet &ns,
+  symbol_numbert &symbol_number);
+
+/*******************************************************************\
+
+Function: type2name_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static std::string type2name_symbol(
+  const typet &type,
+  const namespacet &ns,
+  symbol_numbert &symbol_number)
+{
+  const irep_idt &identifier=type.get(ID_identifier);
+
+  const symbolt *symbol;
+
+  if(ns.lookup(identifier, symbol))
+    return "SYM#"+id2string(identifier)+"#";
+
+  assert(symbol && symbol->is_type);
+
+  if(symbol->type.id()!=ID_struct &&
+     symbol->type.id()!=ID_union)
+    return type2name(symbol->type, ns, symbol_number);
+
+  std::string result;
+
+  // assign each symbol a number when seen for the first time
+  std::pair<symbol_numbert::iterator, bool> entry=
+    symbol_number.insert(std::make_pair(
+        identifier,
+        std::make_pair(symbol_number.size(), true)));
+
+  // new entry, add definition
+  if(entry.second)
+  {
+    result="SYM#"+i2string(entry.first->second.first);
+    result+="={";
+    result+=type2name(symbol->type, ns, symbol_number);
+    result+='}';
+
+    entry.first->second.second=false;
+  }
+#if 0
+  // in recursion, print the shorthand only
+  else if(entry.first->second.second)
+    result="SYM#"+i2string(entry.first->second.first);
+  // entering recursion
+  else
+  {
+    entry.first->second.second=true;
+    result=type2name(symbol->type, ns, symbol_number);
+    entry.first->second.second=false;
+  }
+#else
+  // shorthand only as structs/unions are always symbols
+  else
+    result="SYM#"+i2string(entry.first->second.first);
+#endif
+
+  return result;
+}
 
 /*******************************************************************\
 
@@ -24,7 +103,11 @@ Function: type2name
 
 \*******************************************************************/
 
-std::string type2name(const typet &type)
+static bool parent_is_sym_check=false;
+static std::string type2name(
+  const typet &type,
+  const namespacet &ns,
+  symbol_numbert &symbol_number)
 {
   std::string result;
   
@@ -37,6 +120,14 @@ std::string type2name(const typet &type)
 
   if(type.get_bool(ID_C_volatile))
     result+='v';
+
+  if(type.get_bool(ID_C_transparent_union))
+    result+='t';
+
+  // this isn't really a qualifier, but the linker needs to
+  // distinguish these - should likely be fixed in the linker instead
+  if(!type.source_location().get_function().empty())
+    result+='l';
 
   if(type.id()==irep_idt())
     throw "Empty type encountered.";
@@ -69,7 +160,7 @@ std::string type2name(const typet &type)
   {
     const code_typet &t=to_code_type(type);
     const code_typet::parameterst parameters=t.parameters();
-    result+="P(";
+    result+=type2name(t.return_type(), ns, symbol_number)+"(";
 
     for(code_typet::parameterst::const_iterator
         it=parameters.begin();
@@ -77,7 +168,7 @@ std::string type2name(const typet &type)
         it++)
     {      
       if(it!=parameters.begin()) result+='|';
-      result+=type2name(it->type());
+      result+=type2name(it->type(), ns, symbol_number);
     }
 
     if(t.has_ellipsis())
@@ -87,7 +178,7 @@ std::string type2name(const typet &type)
     }
 
     result+=")->";
-    result+=type2name(t.return_type());
+    result+=type2name(t.return_type(), ns, symbol_number);
   }
   else if(type.id()==ID_array)
   {
@@ -95,16 +186,24 @@ std::string type2name(const typet &type)
     mp_integer size;
     if(to_integer(t.size(), size))
       result+="ARR?";
+    else if(t.size().id()==ID_symbol)
+      result+="ARR"+t.size().get_string(ID_identifier);
     else
       result+="ARR"+integer2string(size);
   }
-  else if(type.id()==ID_symbol)
+  else if(type.id()==ID_symbol ||
+          type.id()==ID_c_enum_tag ||
+          type.id()==ID_struct_tag ||
+          type.id()==ID_union_tag)
   {
-    result+="SYM#"+type.get_string(ID_identifier)+"#";
+    parent_is_sym_check=true;
+    result+=type2name_symbol(type, ns, symbol_number);
   }
   else if(type.id()==ID_struct || 
           type.id()==ID_union)
   {
+    assert(parent_is_sym_check);
+    parent_is_sym_check=false;
     if(type.id()==ID_struct) result+="ST";
     if(type.id()==ID_union) result+="UN";
     const struct_union_typet &t=to_struct_union_type(type);
@@ -116,8 +215,8 @@ std::string type2name(const typet &type)
         it++)
     {            
       if(it!=components.begin()) result+='|';
-      result+=type2name(it->type());
-      result+="'"+it->get_string(ID_name)+"'|";
+      result+=type2name(it->type(), ns, symbol_number);
+      result+="'"+it->get_string(ID_name)+"'";
     }
     result+=']';
   }
@@ -125,10 +224,22 @@ std::string type2name(const typet &type)
     result +="ST?";
   else if(type.id()==ID_incomplete_union)
     result +="UN?";
-  else if(type.id()==ID_c_enum_tag)
-    result +="EN"+to_c_enum_tag_type(type).get_string(ID_identifier)+"#";
   else if(type.id()==ID_c_enum)
-    result +="EN"+type.get_string(ID_width);
+  {
+    result +="EN";
+    const c_enum_typet &t=to_c_enum_type(type);
+    const c_enum_typet::memberst &members=t.members();
+    result+='[';
+    for(c_enum_typet::memberst::const_iterator
+        it=members.begin();
+        it!=members.end();
+        ++it)
+    {
+      if(it!=members.begin()) result+='|';
+      result+=id2string(it->get_value());
+      result+="'"+id2string(it->get_identifier())+"'";
+    }
+  }
   else if(type.id()==ID_incomplete_c_enum)
     result +="EN?";
   else if(type.id()==ID_c_bit_field)
@@ -143,7 +254,7 @@ std::string type2name(const typet &type)
   if(type.has_subtype())
   {
     result+='{';
-    result+=type2name(type.subtype());    
+    result+=type2name(type.subtype(), ns, symbol_number);
     result+='}';
   }
 
@@ -152,13 +263,49 @@ std::string type2name(const typet &type)
     result+='$';
     forall_subtypes(it, type)
     {      
-      result+=type2name(*it);
-      result+="|";      
+      result+=type2name(*it, ns, symbol_number);
+      result+='|';
     }
-    result.resize(result.size()-1);
-    result+='$';
+    result[result.size()-1]='$';
   }
   
   return result;
+}
+
+/*******************************************************************\
+
+Function: type2name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string type2name(const typet &type, const namespacet &ns)
+{
+  parent_is_sym_check=true;
+  symbol_numbert symbol_number;
+  return type2name(type, ns, symbol_number);
+}
+
+/*******************************************************************\
+
+Function: type2name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string type2name(const typet &type)
+{
+  symbol_tablet symbol_table;
+  return type2name(type, namespacet(symbol_table));
 }
 
