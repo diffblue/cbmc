@@ -811,6 +811,24 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
   const exprt &pointer=to_dereference_expr(expr).pointer();
 
   if(pointer.type().id()!=ID_pointer) return true;
+
+  if(pointer.id()==ID_if && pointer.operands().size()==3)
+  {
+    const if_exprt &if_expr=to_if_expr(pointer);
+
+    exprt tmp_op1=expr;
+    tmp_op1.op0()=if_expr.true_case();
+    simplify_dereference(tmp_op1);
+    exprt tmp_op2=expr;
+    tmp_op2.op0()=if_expr.false_case();
+    simplify_dereference(tmp_op2);
+
+    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
+
+    simplify_if(expr);
+
+    return false;
+  }
   
   if(pointer.id()==ID_address_of)
   {
