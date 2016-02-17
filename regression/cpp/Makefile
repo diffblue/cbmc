@@ -1,13 +1,13 @@
 default: tests.log
 
 test:
-	if ! ../test.pl -c ../../../src/goto-cc/goto-cc ; then \
+	@if ! ../test.pl -c ../../../src/goto-cc/goto-cc ; then \
 		../failed-tests-printer.pl ; \
 		exit 1 ; \
 	fi
 
 tests.log: ../test.pl
-	if ! ../test.pl -c ../../../src/goto-cc/goto-cc ; then \
+	@if ! ../test.pl -c ../../../src/goto-cc/goto-cc ; then \
 		../failed-tests-printer.pl ; \
 		exit 1 ; \
 	fi
