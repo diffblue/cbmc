@@ -43,6 +43,9 @@ std::string c_qualifierst::as_string() const
     
   if(is_ptr64)
     qualifiers+="__ptr64 ";
+
+  if(is_noreturn)
+    qualifiers+="_Noreturn ";
     
   return qualifiers;
 }
@@ -81,6 +84,9 @@ void c_qualifierst::read(const typet &src)
 
   if(src.get_bool(ID_C_transparent_union))
     is_transparent_union=true;
+
+  if(src.get_bool(ID_C_noreturn))
+    is_noreturn=true;
 }
 
 /*******************************************************************\
@@ -131,6 +137,11 @@ void c_qualifierst::write(typet &dest) const
     dest.set(ID_C_transparent_union, true);
   else
     dest.remove(ID_C_transparent_union);
+
+  if(is_noreturn)
+    dest.set(ID_C_noreturn, true);
+  else
+    dest.remove(ID_C_noreturn);
 }
 
 /*******************************************************************\
@@ -153,6 +164,7 @@ void c_qualifierst::clear(typet &dest)
   dest.remove(ID_C_ptr32);
   dest.remove(ID_C_ptr64);
   dest.remove(ID_C_transparent_union);
+  dest.remove(ID_C_noreturn);
 }
 
 /*******************************************************************\
