@@ -19,7 +19,7 @@ template <typename T>
 class numbering:public std::vector<T>
 {
 public:
-  typedef unsigned int number_type;
+  typedef std::size_t number_type;
 
   number_type number(const T &a)
   {
