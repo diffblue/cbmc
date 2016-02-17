@@ -1834,11 +1834,39 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
   
   // get type of object
   const typet &op_type=ns.follow(be.op().type());
-  
+
+  exprt result=be.op();
+
+  // extract bits of a union member
+  if(result.id()==ID_union)
+  {
+    std::string bits=
+      expr2bits(result, expr.id()==ID_byte_extract_little_endian);
+
+    if(mp_integer(bits.size())>=el_size+offset*8)
+    {
+      std::string bits_cut=
+        std::string(
+          bits,
+          integer2long(offset*8),
+          integer2long(el_size));
+
+      exprt tmp=
+        bits2expr(bits_cut,
+                  be.type(),
+                  expr.id()==ID_byte_extract_little_endian);
+
+      if(tmp.is_not_nil())
+      {
+        expr=tmp;
+
+        return false;
+      }
+    }
+  }
+
   if(op_type.id()==ID_array)
   {
-    exprt result=be.op();
-
     // try proper array or string constant
     for(const typet *op_type_ptr=&op_type;
         op_type_ptr->id()==ID_array;
