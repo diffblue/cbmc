@@ -1765,17 +1765,31 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     return false;
   }
 
+  const mp_integer el_size=pointer_offset_bits(be.type(), ns);
+
   // byte_extract(byte_update(root, offset, value), offset) =>
   // value
   if(((be.id()==ID_byte_extract_big_endian &&
        be.op().id()==ID_byte_update_big_endian) ||
       (be.id()==ID_byte_extract_little_endian &&
        be.op().id()==ID_byte_update_little_endian)) &&
-     be.offset()==be.op().op1() &&
-     base_type_eq(be.type(), be.op().op2().type(), ns))
+     be.offset()==be.op().op1())
   {
-    expr=be.op().op2();
-    return false;
+    if(base_type_eq(be.type(), be.op().op2().type(), ns))
+    {
+      expr=be.op().op2();
+      return false;
+    }
+    else if(el_size>=0 &&
+            el_size<=pointer_offset_bits(be.op().op2().type(), ns))
+    {
+      be.op()=be.op().op2();
+      be.offset()=gen_zero(be.offset().type());
+
+      simplify_byte_extract(expr);
+
+      return false;
+    }
   }
 
   // don't do any of the following if endianness doesn't match, as
@@ -1797,7 +1811,6 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     return false;
   }
 
-  const mp_integer el_size=pointer_offset_size(be.type(), ns);
   // no proper simplification for be.type()==void
   // or types of unknown size
   if(be.type().id()==ID_empty ||
