@@ -438,3 +438,32 @@ bool has_subexpr(const exprt &src, const irep_idt &id)
   return false;      
 }
 
+/*******************************************************************\
+
+Function: lift_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void lift_if(exprt &dest, if_exprt &if_expr)
+{
+  const exprt true_case=if_expr.true_case();
+  const exprt false_case=if_expr.false_case();
+
+  if_exprt result;
+  result.cond()=if_expr.cond();
+  result.type()=dest.type();
+  
+  static_cast<exprt &>(if_expr)=true_case;
+  result.true_case()=dest;
+
+  static_cast<exprt &>(if_expr)=false_case;
+  result.false_case()=dest;
+  
+  dest=result;
+}
