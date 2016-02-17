@@ -64,6 +64,34 @@ std::string linkingt::type_to_string(
 
 /*******************************************************************\
 
+Function: follow_tags_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static const typet &follow_tags_symbols(
+  const namespacet &ns,
+  const typet &type)
+{
+  if(type.id()==ID_symbol)
+    return ns.follow(type);
+  else if(type.id()==ID_c_enum_tag)
+    return ns.follow_tag(to_c_enum_tag_type(type));
+  else if(type.id()==ID_struct_tag)
+    return ns.follow_tag(to_struct_tag_type(type));
+  else if(type.id()==ID_union_tag)
+    return ns.follow_tag(to_union_tag_type(type));
+  else
+    return type;
+}
+
+/*******************************************************************\
+
 Function: linkingt::type_to_string_verbose
 
   Inputs:
@@ -79,7 +107,7 @@ std::string linkingt::type_to_string_verbose(
   const symbolt &symbol,
   const typet &type) const
 { 
-  const typet &followed=ns.follow(type);
+  const typet &followed=follow_tags_symbols(ns, type);
 
   if(followed.id()==ID_struct || followed.id()==ID_union)
   {
@@ -154,8 +182,8 @@ void linkingt::detailed_conflict_report_rec(
 
   std::string msg;
 
-  const typet &t1=ns.follow(type1);
-  const typet &t2=ns.follow(type2);
+  const typet &t1=follow_tags_symbols(ns, type1);
+  const typet &t2=follow_tags_symbols(ns, type2);
 
   if(t1.id()!=t2.id())
     msg="type classes differ";
@@ -230,6 +258,49 @@ void linkingt::detailed_conflict_report_rec(
           break;
         }
       }
+  }
+  else if(t1.id()==ID_c_enum)
+  {
+    const c_enum_typet::memberst &members1=
+      to_c_enum_type(t1).members();
+
+    const c_enum_typet::memberst &members2=
+      to_c_enum_type(t2).members();
+
+    if(t1.subtype()!=t2.subtype())
+    {
+      msg="enum value types are different (";
+      msg+=type_to_string(ns, old_symbol.name, t1.subtype())+'/';
+      msg+=type_to_string(ns, new_symbol.name, t2.subtype())+')';
+    }
+    else if(members1.size()!=members2.size())
+    {
+      msg="number of enum members is different (";
+      msg+=i2string(members1.size())+'/';
+      msg+=i2string(members2.size())+')';
+    }
+    else
+      for(std::size_t i=0; i<members1.size(); ++i)
+      {
+        if(members1[i].get_base_name()!=members2[i].get_base_name())
+        {
+          msg="names of member "+i2string(i)+" differ (";
+          msg+=id2string(members1[i].get_base_name())+'/';
+          msg+=id2string(members2[i].get_base_name())+')';
+          break;
+        }
+        else if(members1[i].get_value()!=members2[i].get_value())
+        {
+          msg="values of member "+i2string(i)+" differ (";
+          msg+=id2string(members1[i].get_value())+'/';
+          msg+=id2string(members2[i].get_value())+')';
+          break;
+        }
+      }
+
+    msg+="\nenum declarations at\n";
+    msg+=t1.source_location().as_string()+" and\n";
+    msg+=t1.source_location().as_string();
   }
   else if(t1.id()==ID_code)
   {
@@ -736,10 +807,12 @@ void linkingt::duplicate_object_symbol(
     }
     else
     {
-      // provide additional diagnostic output for struct/union/array
+      // provide additional diagnostic output for
+      // struct/union/array/enum
       if(old_type.id()==ID_struct ||
          old_type.id()==ID_union ||
-         old_type.id()==ID_array)
+         old_type.id()==ID_array ||
+         old_type.id()==ID_c_enum_tag)
         detailed_conflict_report(
           old_symbol,
           new_symbol,
