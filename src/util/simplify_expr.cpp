@@ -1874,12 +1874,15 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     {
       // no arrays of zero-sized objects
       assert(el_size>0);
+      // no arrays of non-byte sized objects
+      assert(el_size%8==0);
+      mp_integer el_bytes=el_size/8;
 
       if(base_type_eq(be.type(), op_type_ptr->subtype(), ns))
       {
-        if(offset%el_size==0)
+        if(offset%el_bytes==0)
         {
-          offset/=el_size;
+          offset/=el_bytes;
 
           result=
             index_exprt(
@@ -1915,17 +1918,18 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     const struct_typet::componentst &components=
       struct_type.components();
 
+    mp_integer m_offset_bits=0;
     for(struct_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
         ++it)
     {
-      mp_integer m_offset=
-        member_offset(struct_type, it->get_name(), ns);
       mp_integer m_size=
-        pointer_offset_size(it->type(), ns);
-        
-      if(offset==m_offset &&
+        pointer_offset_bits(it->type(), ns);
+      if(m_size<=0)
+        break;
+
+      if(offset*8==m_offset_bits &&
          el_size==m_size &&
          base_type_eq(be.type(), it->type(), ns))
       {
@@ -1933,17 +1937,19 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
         simplify_rec(expr);
         return false;
       }
-      else if(m_offset>=0 &&
-              m_size>=0 &&
-              offset>=m_offset &&
-              offset+el_size<=m_offset+m_size)
+      else if(m_offset_bits>=0 &&
+              offset*8>=m_offset_bits &&
+              offset*8+el_size<=m_offset_bits+m_size &&
+              m_offset_bits%8==0)
       {
         be.op()=member_exprt(be.op(), it->get_name(), it->type());
         be.offset()=
-          from_integer(offset-m_offset, be.offset().type());
-
+          from_integer(offset-m_offset_bits/8, be.offset().type());
+        simplify_rec(be.offset());
         return false;
       }
+
+      m_offset_bits+=m_size;
     }
   }
 
