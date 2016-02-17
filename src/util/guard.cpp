@@ -223,6 +223,11 @@ guardt &operator |= (guardt &g1, const guardt &g2)
     else
       n_op2.push_back(*it2);
   }
+  while(it1!=op1.end())
+  {
+    n_op1.push_back(*it1);
+    it1=op1.erase(it1);
+  }
   
   if(n_op2.empty()) return g1;
 
@@ -230,7 +235,6 @@ guardt &operator |= (guardt &g1, const guardt &g2)
   exprt and_expr1=conjunction(n_op1);
   exprt and_expr2=conjunction(n_op2);
   
-  op1.erase(it1, op1.end());
   g1=conjunction(op1);
   
   exprt tmp(and_expr2);
