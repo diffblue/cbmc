@@ -1840,7 +1840,11 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
   // lift up any ID_if on the object
   if(be.op().id()==ID_if)
   {
-    expr=lift_if(expr, 0);
+    if_exprt if_expr=lift_if(expr, 0);
+    simplify_byte_extract(if_expr.true_case());
+    simplify_byte_extract(if_expr.false_case());
+    simplify_if(if_expr);
+    expr=if_expr;
     return false;
   }
 
