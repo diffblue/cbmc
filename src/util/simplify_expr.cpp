@@ -1850,6 +1850,21 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
 
   const mp_integer el_size=pointer_offset_bits(be.type(), ns);
 
+  // byte_extract(byte_extract(root, offset1), offset2) =>
+  // byte_extract(root, offset1+offset2)
+  if(be.op().id()==be.id())
+  {
+    be.offset()=plus_exprt(
+      to_byte_extract_expr(be.op()).offset(),
+      be.offset());
+    simplify_plus(be.offset());
+
+    be.op()=to_byte_extract_expr(be.op()).op();
+    simplify_byte_extract(expr);
+
+    return false;
+  }
+
   // byte_extract(byte_update(root, offset, value), offset) =>
   // value
   if(((be.id()==ID_byte_extract_big_endian &&
