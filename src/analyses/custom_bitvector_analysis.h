@@ -100,16 +100,21 @@ protected:
   void set_bit(const exprt &, unsigned bit_nr, modet);
   void set_bit(const irep_idt &, unsigned bit_nr, modet);
 
-  inline void set_bit(bit_vectort &dest, unsigned bit_nr)
+  static inline void set_bit(bit_vectort &dest, unsigned bit_nr)
   {
-    dest|=(1l<<bit_nr);
+    dest|=(1ll<<bit_nr);
   }
   
-  inline void clear_bit(bit_vectort &dest, unsigned bit_nr)
+  static inline void clear_bit(bit_vectort &dest, unsigned bit_nr)
   {
-    dest|=(1l<<bit_nr);
-    dest^=(1l<<bit_nr);
+    dest|=(1ll<<bit_nr);
+    dest^=(1ll<<bit_nr);
   }  
+  
+  static inline bool get_bit(const bit_vectort src, unsigned bit_nr)
+  {
+    return (src&(1ll<<bit_nr))!=0;
+  }
   
   void erase_blank_vectors(bitst &);  
 };

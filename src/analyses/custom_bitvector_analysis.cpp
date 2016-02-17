@@ -595,7 +595,7 @@ exprt custom_bitvector_domaint::eval(
               b_it!=may_bits.end();
               b_it++)
           {
-            if(b_it->second&(1l<<bit_nr)) return true_exprt();
+            if(get_bit(b_it->second, bit_nr)) return true_exprt();
           }
           
           return false_exprt();
@@ -611,9 +611,9 @@ exprt custom_bitvector_domaint::eval(
         bool value=false;
 
         if(src.id()=="get_must")
-          value=v.must_bits&(1l<<bit_nr);
+          value=get_bit(v.must_bits, bit_nr);
         else if(src.id()=="get_may")
-          value=v.may_bits&(1l<<bit_nr);
+          value=get_bit(v.may_bits, bit_nr);
 
         if(value)
           return true_exprt();
