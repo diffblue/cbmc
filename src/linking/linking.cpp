@@ -129,7 +129,7 @@ std::string linkingt::type_to_string_verbose(
 
 /*******************************************************************\
 
-Function: linkingt::link_error
+Function: linkingt::detailed_conflict_report
 
   Inputs:
 
@@ -139,36 +139,191 @@ Function: linkingt::link_error
 
 \*******************************************************************/
 
-void linkingt::show_struct_diff(
-  const struct_typet &old_type, const struct_typet &new_type)
+void linkingt::detailed_conflict_report_rec(
+  const symbolt &old_symbol,
+  const symbolt &new_symbol,
+  const typet &type1,
+  const typet &type2,
+  unsigned depth,
+  exprt &conflict_path)
 {
-  if(old_type.components().size()!=new_type.components().size())
-    str << "number of members is different";
-  else
+  #ifdef DEBUG
+  str << "<BEGIN DEPTH " << depth << ">";
+  debug();
+  #endif
+
+  std::string msg;
+
+  const typet &t1=ns.follow(type1);
+  const typet &t2=ns.follow(type2);
+
+  if(t1.id()!=t2.id())
+    msg="type classes differ";
+  else if(t1.id()==ID_pointer ||
+          t1.id()==ID_array)
   {
-    for(unsigned i=0; i<old_type.components().size(); i++)
+    if(depth>0 &&
+       !base_type_eq(t1.subtype(), t2.subtype(), ns))
     {
-      if(old_type.components()[i].get_name()!=new_type.components()[i].get_name())
-      {
-        str << "name of member differs: "
-            << old_type.components()[i].get_name() << " vs. "
-            << new_type.components()[i].get_name();
-        break;
-      }
-      
-      if(!base_type_eq(old_type.components()[i].type(), new_type.components()[i].type(), ns))
-      {
-        str << "type of member "
-            << old_type.components()[i].get_name() << " differs: "
-            << type_to_string(ns, "", old_type.components()[i].type()) << " vs. "
-            << type_to_string(ns, "", new_type.components()[i].type());
-        str << "\n" << old_type.components()[i].type().pretty() << "\n";
-        str << "\n" << new_type.components()[i].type().pretty() << "\n";
-        break;
-      }
+      conflict_path=dereference_exprt(conflict_path);
+
+      detailed_conflict_report_rec(
+        old_symbol,
+        new_symbol,
+        t1.subtype(),
+        t2.subtype(),
+        depth-1,
+        conflict_path);
     }
+    else if(t1.id()==ID_pointer)
+      msg="pointer types differ";
+    else
+      msg="array types differ";
   }
+  else if(t1.id()==ID_struct ||
+          t1.id()==ID_union)
+  {
+    const struct_union_typet::componentst &components1=
+      to_struct_union_type(t1).components();
+
+    const struct_union_typet::componentst &components2=
+      to_struct_union_type(t2).components();
+
+    if(components1.size()!=components2.size())
+    {
+      msg="number of members is different (";
+      msg+=i2string(components1.size())+'/';
+      msg+=i2string(components2.size())+')';
+    }
+    else
+      for(std::size_t i=0; i<components1.size(); ++i)
+      {
+        const typet &subtype1=components1[i].type();
+        const typet &subtype2=components2[i].type();
+
+        if(components1[i].get_name()!=components2[i].get_name())
+        {
+          msg="names of member "+i2string(i)+" differ (";
+          msg+=id2string(components1[i].get_name())+'/';
+          msg+=id2string(components2[i].get_name())+')';
+          break;
+        }
+        else if(!base_type_eq(subtype1, subtype2, ns))
+        {
+          conflict_path.type()=t1;
+          conflict_path=
+            member_exprt(conflict_path, components1[i].get_name());
+
+          if(depth>0)
+            detailed_conflict_report_rec(
+              old_symbol,
+              new_symbol,
+              subtype1,
+              subtype2,
+              depth-1,
+              conflict_path);
+          else
+            msg="type of member "+
+                id2string(components1[i].get_name())+
+                " differs";
+
+          break;
+        }
+      }
+  }
+  else if(t1.id()==ID_code)
+  {
+    const code_typet::parameterst &parameters1=
+      to_code_type(t1).parameters();
+
+    const code_typet::parameterst &parameters2=
+      to_code_type(t2).parameters();
+
+    const typet &return_type1=to_code_type(t1).return_type();
+    const typet &return_type2=to_code_type(t2).return_type();
+
+    if(parameters1.size()!=parameters2.size())
+    {
+      msg="parameter counts differ (";
+      msg+=i2string(parameters1.size())+'/';
+      msg+=i2string(parameters2.size())+')';
+    }
+    else if(!base_type_eq(return_type1, return_type2, ns))
+    {
+      conflict_path=
+        index_exprt(conflict_path,
+                    constant_exprt(i2string(-1), integer_typet()));
+
+      if(depth>0)
+        detailed_conflict_report_rec(
+          old_symbol,
+          new_symbol,
+          return_type1,
+          return_type2,
+          depth-1,
+          conflict_path);
+      else
+        msg="return types differ";
+    }
+    else
+      for(std::size_t i=0; i<parameters1.size(); i++)
+      {
+        const typet &subtype1=parameters1[i].type();
+        const typet &subtype2=parameters2[i].type();
+
+        if(!base_type_eq(subtype1, subtype2, ns))
+        {
+          conflict_path=
+            index_exprt(conflict_path,
+                        constant_exprt(i2string(i), integer_typet()));
+
+          if(depth>0)
+            detailed_conflict_report_rec(
+              old_symbol,
+              new_symbol,
+              subtype1,
+              subtype2,
+              depth-1,
+              conflict_path);
+          else
+            msg="parameter types differ";
+
+          break;
+        }
+      }
+  }
+  else
+    msg="conflict on POD";
+
+  if(!msg.empty())
+  {
+    str << std::endl;
+    str << "reason for conflict at "
+        << expr_to_string(ns, "", conflict_path)
+        << ": " << msg << std::endl;
+
+    str << std::endl;
+    str << type_to_string_verbose(ns, old_symbol, t1) << std::endl;
+    str << type_to_string_verbose(ns, new_symbol, t2) << std::endl;
+  }
+
+  #ifdef DEBUG
+  str << "<END DEPTH " << depth << ">";
+  debug();
+  #endif
 }
+
+/*******************************************************************\
+
+Function: linkingt::link_error
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void linkingt::link_error(
     const symbolt &old_symbol,
@@ -187,15 +342,6 @@ void linkingt::link_error(
       << "' " << new_symbol.location << "\n"
       << type_to_string_verbose(ns, new_symbol);
 
-  if(ns.follow(old_symbol.type).id()==ID_struct &&
-     ns.follow(new_symbol.type).id()==ID_struct)
-  {
-    str << "\n";
-    str << "Difference between struct types:\n";
-    show_struct_diff(to_struct_type(ns.follow(old_symbol.type)), 
-                     to_struct_type(ns.follow(new_symbol.type)));
-  }
-  
   throw 0;
 }
 
@@ -224,7 +370,7 @@ void linkingt::link_warning(
       << type_to_string_verbose(ns, old_symbol) << std::endl;
   str << "new definition in module " << new_symbol.module
       << " " << new_symbol.location << std::endl
-      << type_to_string_verbose(ns, new_symbol);
+      << type_to_string_verbose(ns, new_symbol) << std::endl;
 
   warning_msg();
 }
@@ -457,10 +603,18 @@ void linkingt::duplicate_code_symbol(
       }
 
       if(!conflicts.empty())
+      {
+        detailed_conflict_report(
+          old_symbol,
+          new_symbol,
+          conflicts.front().first,
+          conflicts.front().second);
+
         link_error(
           old_symbol,
           new_symbol,
           "conflicting function declarations");
+      }
       else
       {
         // warns about the first inconsistency
@@ -494,7 +648,7 @@ void linkingt::duplicate_code_symbol(
       // keep the one in old_symbol -- libraries come last!
       str << "warning: function `" << old_symbol.name << "' in module `" << 
         new_symbol.module << "' is shadowed by a definition in module `" << 
-        old_symbol.module << "'";
+        old_symbol.module << "'" << std::endl;
       warning_msg();
     }
     else
@@ -582,6 +736,16 @@ void linkingt::duplicate_object_symbol(
     }
     else
     {
+      // provide additional diagnostic output for struct/union/array
+      if(old_type.id()==ID_struct ||
+         old_type.id()==ID_union ||
+         old_type.id()==ID_array)
+        detailed_conflict_report(
+          old_symbol,
+          new_symbol,
+          old_symbol.type,
+          new_symbol.type);
+
       link_error(
         old_symbol,
         new_symbol,
@@ -748,6 +912,12 @@ void linkingt::duplicate_type_symbol(
       return;
     }
   }
+
+  detailed_conflict_report(
+    old_symbol,
+    new_symbol,
+    old_symbol.type,
+    new_symbol.type);
 
   link_error(
     old_symbol,
