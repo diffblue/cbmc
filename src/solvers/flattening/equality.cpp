@@ -150,12 +150,12 @@ Function: equalityt::add_equality_constraints
 
 void equalityt::add_equality_constraints(const typestructt &typestruct)
 {
-  unsigned no_elements=typestruct.elements.size();
-  unsigned bits=0;
+  std::size_t no_elements=typestruct.elements.size();
+  std::size_t bits=0;
 
   // get number of necessary bits
 
-  for(unsigned i=no_elements; i!=0; bits++)
+  for(std::size_t i=no_elements; i!=0; bits++)
     i=(i>>1);
 
   // generate bit vectors
@@ -164,10 +164,10 @@ void equalityt::add_equality_constraints(const typestructt &typestruct)
 
   eq_bvs.resize(no_elements);
 
-  for(unsigned i=0; i<no_elements; i++)
+  for(std::size_t i=0; i<no_elements; i++)
   {
     eq_bvs[i].resize(bits);
-    for(unsigned j=0; j<bits; j++)
+    for(std::size_t j=0; j<bits; j++)
       eq_bvs[i][j]=prop.new_variable();
   }
 

@@ -48,7 +48,7 @@ void boolbvt::convert_member(const member_exprt &expr, bvt &bv)
     const struct_typet::componentst &components=
       to_struct_type(struct_op_type).components();
 
-    unsigned offset=0;
+    std::size_t offset=0;
 
     for(struct_typet::componentst::const_iterator
         it=components.begin();
@@ -56,7 +56,7 @@ void boolbvt::convert_member(const member_exprt &expr, bvt &bv)
         it++)
     {
       const typet &subtype=it->type();
-      unsigned sub_width=boolbv_width(subtype);
+      std::size_t sub_width=boolbv_width(subtype);
 
       if(it->get_name()==component_name)
       {
@@ -74,7 +74,7 @@ void boolbvt::convert_member(const member_exprt &expr, bvt &bv)
         bv.resize(sub_width);
         assert(offset+sub_width<=struct_bv.size());
 
-        for(unsigned i=0; i<sub_width; i++)
+        for(std::size_t i=0; i<sub_width; i++)
           bv[i]=struct_bv[offset+i];
 
         return;

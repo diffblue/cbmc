@@ -267,7 +267,7 @@ const boolbv_widtht::membert &boolbv_widtht::get_member(
   const struct_typet &type,
   const irep_idt &member) const
 {
-  unsigned component_number=type.component_number(member);
+  std::size_t component_number=type.component_number(member);
 
   return get_entry(type).members[component_number];
 }

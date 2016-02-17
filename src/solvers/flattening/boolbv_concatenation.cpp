@@ -22,7 +22,7 @@ Function: boolbvt::convert_concatenation
 
 void boolbvt::convert_concatenation(const exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -32,7 +32,7 @@ void boolbvt::convert_concatenation(const exprt &expr, bvt &bv)
   if(operands.empty())
     throw "concatenation takes at least one operand";
 
-  unsigned offset=width;
+  std::size_t offset=width;
   bv.resize(width);
 
   forall_expr(it, operands)
@@ -44,7 +44,7 @@ void boolbvt::convert_concatenation(const exprt &expr, bvt &bv)
 
     offset-=op.size();
 
-    for(unsigned i=0; i<op.size(); i++)
+    for(std::size_t i=0; i<op.size(); i++)
       bv[offset+i]=op[i];
   }    
 

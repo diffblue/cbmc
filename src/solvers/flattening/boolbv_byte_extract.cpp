@@ -35,7 +35,7 @@ bvt map_bv(const endianness_mapt &map, const bvt &src)
   bvt result;
   result.resize(src.size(), const_literal(false));
   
-  for(unsigned i=0; i<src.size(); i++)
+  for(std::size_t i=0; i<src.size(); i++)
   {
     size_t mapped_index=map.map_bit(i);
     assert(mapped_index<src.size());
@@ -72,7 +72,7 @@ void boolbvt::convert_byte_extract(
     return;
   }
   
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   // special treatment for bit-fields and big-endian:
   // we need byte granularity
@@ -125,9 +125,9 @@ void boolbvt::convert_byte_extract(
 
     mp_integer offset=index*byte_width;
     
-    unsigned offset_i=integer2unsigned(offset);
+    std::size_t offset_i=integer2unsigned(offset);
 
-    for(unsigned i=0; i<width; i++)
+    for(std::size_t i=0; i<width; i++)
       // out of bounds?
       if(offset<0 || offset_i+i>=op_bv.size())
         bv[i]=prop.new_variable();
@@ -136,12 +136,12 @@ void boolbvt::convert_byte_extract(
   }
   else
   {
-    unsigned bytes=op_bv.size()/byte_width;
+    std::size_t bytes=op_bv.size()/byte_width;
     
     if(prop.has_set_to())
     {
       // free variables
-      for(unsigned i=0; i<width; i++)
+      for(std::size_t i=0; i<width; i++)
         bv[i]=prop.new_variable();
 
       // add implications
@@ -154,13 +154,13 @@ void boolbvt::convert_byte_extract(
       bvt equal_bv;
       equal_bv.resize(width);
 
-      for(unsigned i=0; i<bytes; i++)
+      for(std::size_t i=0; i<bytes; i++)
       {
         equality.rhs()=from_integer(i, constant_type);
 
-        unsigned offset=i*byte_width;
+        std::size_t offset=i*byte_width;
 
-        for(unsigned j=0; j<width; j++)
+        for(std::size_t j=0; j<width; j++)
           if(offset+j<op_bv.size())
             equal_bv[j]=prop.lequal(bv[j], op_bv[offset+j]);
           else
@@ -177,15 +177,15 @@ void boolbvt::convert_byte_extract(
 
       typet constant_type(offset.type()); // type of index operand
       
-      for(unsigned i=0; i<bytes; i++)
+      for(std::size_t i=0; i<bytes; i++)
       {
         equality.rhs()=from_integer(i, constant_type);
           
         literalt e=convert(equality);
 
-        unsigned offset=i*byte_width;
+        std::size_t offset=i*byte_width;
 
-        for(unsigned j=0; j<width; j++)
+        for(std::size_t j=0; j<width; j++)
         {
           literalt l;
           

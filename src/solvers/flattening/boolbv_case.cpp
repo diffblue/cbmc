@@ -26,7 +26,7 @@ void boolbvt::convert_case(const exprt &expr, bvt &bv)
 {
   const std::vector<exprt> &operands=expr.operands();
 
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
     return conversion_failed(expr, bv);

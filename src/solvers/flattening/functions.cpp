@@ -79,7 +79,7 @@ exprt functionst::arguments_equal(const exprt::operandst &o1,
   and_exprt::operandst &conjuncts=and_expr.operands();
   conjuncts.resize(o1.size());
   
-  for(unsigned i=0; i<o1.size(); i++)
+  for(std::size_t i=0; i<o1.size(); i++)
   {
     exprt lhs=o1[i];
     exprt rhs=o2[i];

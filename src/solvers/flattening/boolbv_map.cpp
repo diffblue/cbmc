@@ -37,7 +37,7 @@ std::string boolbv_mapt::map_entryt::get_value(const propt &prop) const
   
   result.reserve(literal_map.size());
 
-  for(unsigned i=0; i<literal_map.size(); i++)
+  for(std::size_t i=0; i<literal_map.size(); i++)
   {
     char ch='*';
 
@@ -133,7 +133,7 @@ Function: boolbv_mapt::get_literals
 void boolbv_mapt::get_literals(
   const irep_idt &identifier,
   const typet &type,
-  const unsigned width,
+  const std::size_t width,
   bvt &literals)
 {
   map_entryt &map_entry=get_map_entry(identifier, type);
@@ -144,7 +144,7 @@ void boolbv_mapt::get_literals(
   Forall_literals(it, literals)
   {
     literalt &l=*it;
-    const unsigned bit=it-literals.begin();
+    const std::size_t bit=it-literals.begin();
 
     assert(bit<map_entry.literal_map.size());
     map_bitt &mb=map_entry.literal_map[bit];
@@ -189,7 +189,7 @@ void boolbv_mapt::set_literals(
   forall_literals(it, literals)
   {
     const literalt &literal=*it;
-    const unsigned bit=it-literals.begin();
+    const std::size_t bit=it-literals.begin();
 
     assert(literal.is_constant() ||
            literal.var_no()<prop.no_variables());

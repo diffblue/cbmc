@@ -39,7 +39,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
      type.id()!=ID_vector)
     return conversion_failed(expr, bv);
 
-  unsigned width=boolbv_width(type);
+  std::size_t width=boolbv_width(type);
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -96,20 +96,20 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
     {
       const typet &subtype=ns.follow(type.subtype());
     
-      unsigned sub_width=boolbv_width(subtype);
+      std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width==0 || width%sub_width!=0)
         throw "convert_add_sub: unexpected vector operand width";
 
-      unsigned size=width/sub_width;
+      std::size_t size=width/sub_width;
       bv.resize(width);
 
-      for(unsigned i=0; i<size; i++)
+      for(std::size_t i=0; i<size; i++)
       {
         bvt tmp_op;
         tmp_op.resize(sub_width);
 
-        for(unsigned j=0; j<tmp_op.size(); j++)
+        for(std::size_t j=0; j<tmp_op.size(); j++)
         {
           assert(i*sub_width+j<op.size());
           tmp_op[j]=op[i*sub_width+j];
@@ -118,7 +118,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
         bvt tmp_result;
         tmp_result.resize(sub_width);
 
-        for(unsigned j=0; j<tmp_result.size(); j++)
+        for(std::size_t j=0; j<tmp_result.size(); j++)
         {
           assert(i*sub_width+j<bv.size());
           tmp_result[j]=bv[i*sub_width+j];
@@ -136,7 +136,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
       
         assert(tmp_result.size()==sub_width);
         
-        for(unsigned j=0; j<tmp_result.size(); j++)
+        for(std::size_t j=0; j<tmp_result.size(); j++)
         {
           assert(i*sub_width+j<bv.size());
           bv[i*sub_width+j]=tmp_result[j];
