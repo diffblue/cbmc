@@ -32,6 +32,11 @@ public:
     update_identifier();
   }
 
+  inline void update_type()
+  {
+    static_cast<exprt &>(add(ID_expression)).type()=type();
+  }
+
   inline const exprt &get_original_expr() const
   {
     return static_cast<const exprt &>(find(ID_expression));

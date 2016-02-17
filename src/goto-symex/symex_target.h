@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_program.h>
 
+class ssa_exprt;
 class symbol_exprt;
 
 class symex_targett
@@ -57,24 +58,21 @@ public:
   // read event
   virtual void shared_read(
     const exprt &guard,
-    const symbol_exprt &ssa_rhs,
-    const symbol_exprt &original_rhs,
+    const ssa_exprt &ssa_rhs,
     unsigned atomic_section_id,
     const sourcet &source)=0;
 
   // write event
   virtual void shared_write(
     const exprt &guard,
-    const symbol_exprt &ssa_rhs,
-    const symbol_exprt &original_rhs,
+    const ssa_exprt &ssa_rhs,
     unsigned atomic_section_id,
     const sourcet &source)=0;
 
   // write event - lhs must be symbol
   virtual void assignment(
     const exprt &guard,
-    const symbol_exprt &ssa_lhs,
-    const symbol_exprt &original_lhs_object,
+    const ssa_exprt &ssa_lhs,
     const exprt &ssa_full_lhs,
     const exprt &original_full_lhs,
     const exprt &ssa_rhs,
@@ -84,16 +82,14 @@ public:
   // declare fresh variable - lhs must be symbol
   virtual void decl(
     const exprt &guard,
-    const symbol_exprt &ssa_lhs,
-    const symbol_exprt &original_lhs_object,
+    const ssa_exprt &ssa_lhs,
     const sourcet &source,
     assignment_typet assignment_type)=0;
 
   // note the death of a variable - lhs must be symbol
   virtual void dead(
     const exprt &guard,
-    const symbol_exprt &ssa_lhs,
-    const symbol_exprt &original_lhs_object,
+    const ssa_exprt &ssa_lhs,
     const sourcet &source)=0;
 
   // record a function call

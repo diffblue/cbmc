@@ -101,10 +101,13 @@ void goto_symext::symex_other(
     clean_code.op0()=d0;
     clean_code.op1()=d1;
     
-    clean_expr(clean_code, state, false);
+    clean_expr(clean_code.op0(), state, true);
+    clean_expr(clean_code.op1(), state, false);
     
     process_array_expr(clean_code.op0());
+    clean_expr(clean_code.op0(), state, true);
     process_array_expr(clean_code.op1());
+    clean_expr(clean_code.op1(), state, false);
     
 
     if(!base_type_eq(clean_code.op0().type(),
@@ -136,9 +139,11 @@ void goto_symext::symex_other(
     
     clean_code.op0()=d0;
 
-    clean_expr(clean_code, state, false);
+    clean_expr(clean_code.op0(), state, true);
+    clean_expr(clean_code.op1(), state, false);
     
     process_array_expr(clean_code.op0());
+    clean_expr(clean_code.op0(), state, true);
     
     const typet &op0_type=ns.follow(clean_code.op0().type());
     

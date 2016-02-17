@@ -175,8 +175,7 @@ void postconditiont::weaken(exprt &dest)
   // we are lazy:
   // if lhs is mentioned in dest, we use "true".
   
-  const irep_idt &lhs_identifier=
-    s.get_original_name(SSA_step.ssa_lhs.get_identifier());
+  const irep_idt &lhs_identifier=SSA_step.ssa_lhs.get_object_name();
 
   if(is_used(dest, lhs_identifier))
     dest=true_exprt();
@@ -198,8 +197,7 @@ Function: postconditiont::strengthen
 
 void postconditiont::strengthen(exprt &dest)
 {
-  const irep_idt &lhs_identifier=
-    s.get_original_name(SSA_step.ssa_lhs.get_identifier());
+  const irep_idt &lhs_identifier=SSA_step.ssa_lhs.get_object_name();
 
   if(!is_used(SSA_step.ssa_rhs, lhs_identifier))
   {
@@ -240,9 +238,14 @@ bool postconditiont::is_used(
     assert(expr.operands().size()==1);
     return is_used_address_of(expr.op0(), identifier);
   }
+  else if(expr.id()==ID_symbol &&
+          expr.get_bool(ID_C_SSA_symbol))
+  {
+    return to_ssa_expr(expr).get_object_name()==identifier;
+  }
   else if(expr.id()==ID_symbol)
   {
-    return s.get_original_name(expr.get(ID_identifier))==identifier;
+    return expr.get(ID_identifier)==identifier;
   }
   else if(expr.id()==ID_dereference)
   {

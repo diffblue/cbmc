@@ -52,7 +52,7 @@ void goto_symext::symex_start_thread(statet &state)
   new_thread.pc=thread_target;
   new_thread.guard=state.guard;
   new_thread.call_stack.push_back(state.top());
-  new_thread.call_stack.back().local_variables.clear();
+  new_thread.call_stack.back().local_objects.clear();
   new_thread.call_stack.back().goto_state_map.clear();
   #if 0
   new_thread.abstract_events=&(target.new_thread(cur_thread.abstract_events));
@@ -61,29 +61,36 @@ void goto_symext::symex_start_thread(statet &state)
   // create a copy of the local variables for the new thread
   statet::framet &frame=state.top();
 
-  for(std::set<irep_idt>::const_iterator
-      it=frame.local_variables.begin();
-      it!=frame.local_variables.end();
-      it++)
+  for(goto_symex_statet::renaming_levelt::current_namest::const_iterator
+      c_it=state.level2.current_names.begin();
+      c_it!=state.level2.current_names.end();
+      ++c_it)
   {
-    // get original name
-    irep_idt original_name=state.get_original_name(*it);
-  
-    // get L0 name for current thread
-    irep_idt l0_name=state.level0.rename_identifier(original_name, t);
-    
-    // setup L1 name
-    state.level1.rename_identifier(l0_name, 0);
-    irep_idt l1_name=state.level1.current_name(l0_name);
-    state.l1_history.insert(l1_name);
+    const irep_idt l1_o_id=c_it->second.first.get_l1_object_identifier();
+    // could use iteration over local_objects as l1_o_id is prefix
+    if(frame.local_objects.find(l1_o_id)==frame.local_objects.end())
+      continue;
 
-    // make sure the L2 name with current index exists for future renaming
-    state.level2(l1_name);
-    
+    // get original name
+    ssa_exprt lhs(c_it->second.first.get_original_expr());
+
+    // get L0 name for current thread
+    lhs.set_level_0(t);
+
+    // setup L1 name
+    if(!state.level1.current_names.insert(
+        std::make_pair(lhs.get_l1_object_identifier(),
+                       std::make_pair(lhs, 0))).second)
+      assert(false);
+    state.rename(lhs, ns, goto_symex_statet::L1);
+    const irep_idt l1_name=lhs.get_l1_object_identifier();
+    // store it
+    state.l1_history.insert(l1_name);
+    new_thread.call_stack.back().local_objects.insert(l1_name);
+
     // make copy
-    typet type=ns.lookup(original_name).type;
-    symbol_exprt lhs(l1_name, type);
-    symbol_exprt rhs(*it, type);
+    ssa_exprt rhs=c_it->second.first;
+    state.rename(rhs, ns);
 
     guardt guard;
     symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
@@ -102,13 +109,10 @@ void goto_symext::symex_start_thread(statet &state)
       continue;
 
     // get original name
-    irep_idt original_name=symbol.name;
+    ssa_exprt lhs(symbol.symbol_expr());
 
     // get L0 name for current thread
-    irep_idt l0_name=state.level0.rename_identifier(original_name, t);
-
-    symbol_exprt lhs=symbol.symbol_expr();
-    lhs.set_identifier(l0_name);
+    lhs.set_level_0(t);
 
     exprt rhs=symbol.value;
     if(rhs.is_nil())

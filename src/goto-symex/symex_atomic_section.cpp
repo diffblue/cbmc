@@ -66,9 +66,8 @@ void goto_symext::symex_atomic_end(statet &state)
       r_it!=state.read_in_atomic_section.end();
       ++r_it)
   {
-    symbol_exprt r=r_it->first;
-    r.set_identifier(
-      state.level2.name(r.get_identifier(), r_it->second.first));
+    ssa_exprt r=r_it->first;
+    r.set_level_2(r_it->second.first);
 
     // guard is the disjunction over reads
     assert(!r_it->second.second.empty());
@@ -81,12 +80,9 @@ void goto_symext::symex_atomic_end(statet &state)
     exprt read_guard_expr=read_guard.as_expr();
     do_simplify(read_guard_expr);
 
-    symbol_exprt original_symbol=r_it->first;
-    state.get_original_name(original_symbol);
     target.shared_read(
       read_guard_expr,
       r,
-      original_symbol,
       atomic_section_id,
       state.source);
   }
@@ -96,8 +92,8 @@ void goto_symext::symex_atomic_end(statet &state)
       w_it!=state.written_in_atomic_section.end();
       ++w_it)
   {
-    symbol_exprt w=w_it->first;
-    state.level2(w);
+    ssa_exprt w=w_it->first;
+    w.set_level_2(state.level2.current_count(w.get_identifier()));
 
     // guard is the disjunction over writes
     assert(!w_it->second.empty());
@@ -110,12 +106,9 @@ void goto_symext::symex_atomic_end(statet &state)
     exprt write_guard_expr=write_guard.as_expr();
     do_simplify(write_guard_expr);
 
-    symbol_exprt original_symbol=w_it->first;
-    state.get_original_name(original_symbol);
     target.shared_write(
       write_guard_expr,
       w,
-      original_symbol,
       atomic_section_id,
       state.source);
   }
