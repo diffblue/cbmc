@@ -2224,6 +2224,13 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       cleanup_expr(*it, no_typecast);
   }
 
+  // work around transparent union argument 
+  if(expr.id()==ID_union &&
+     ns.follow(expr.type()).id()!=ID_union)
+  {
+    expr=to_union_expr(expr).op();
+  }
+
   // try to get rid of type casts, revealing (char)97 -> 'a'
   if(expr.id()==ID_typecast &&
      to_typecast_expr(expr).op().is_constant())
