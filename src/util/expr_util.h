@@ -19,6 +19,7 @@ class exprt;
 class symbol_exprt;
 class update_exprt;
 class with_exprt;
+class if_exprt;
 class symbolt;
 class typet;
 class namespacet;
@@ -55,3 +56,7 @@ exprt boolean_negate(const exprt &);
 
 /*! returns true if the expression has a subexpresion with given ID */
 bool has_subexpr(const exprt &, const irep_idt &);
+
+/*! lift up an if_exprt */
+void lift_if(exprt &, if_exprt &);
+
