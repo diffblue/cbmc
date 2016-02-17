@@ -1817,6 +1817,18 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
      el_size<0)
     return true;
 
+  if(be.op().id()==ID_array_of &&
+     el_size>0 &&
+     (offset*8)%el_size==0 &&
+     el_size<=pointer_offset_bits(be.op().op0().type(), ns))
+  {
+    be.op()=index_exprt(be.op(), be.offset());
+    be.offset()=from_integer(0, be.offset().type());
+    simplify_rec(be);
+
+    return false;
+  }
+
   // rethink the remaining code to correctly handle big endian
   if(expr.id()!=ID_byte_extract_little_endian) return true;
   
