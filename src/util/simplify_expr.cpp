@@ -1757,10 +1757,22 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
 {
   byte_extract_exprt &be=to_byte_extract_expr(expr);
 
-  // don't do any of the following if endianness doesn't match, as
-  // bytes need to be swapped
-  if(byte_extract_id()!=expr.id())
-    return true;
+  // pull out any ID_if on the object
+  if(be.op().id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(be.op());
+    exprt cond=if_expr.cond();
+
+    byte_extract_exprt be_false=be;
+    be_false.op()=if_expr.false_case();
+
+    be.op()=if_expr.true_case();
+
+    expr=if_exprt(cond, be, be_false, be.type());
+    simplify_rec(expr);
+
+    return false;
+  }
 
   // byte_extract(byte_update(root, offset, value), offset) =>
   // value
@@ -1774,6 +1786,11 @@ bool simplify_exprt::simplify_byte_extract(exprt &expr)
     expr=be.op().op2();
     return false;
   }
+
+  // don't do any of the following if endianness doesn't match, as
+  // bytes need to be swapped
+  if(byte_extract_id()!=expr.id())
+    return true;
   
   // the following require a constant offset
   mp_integer offset;
