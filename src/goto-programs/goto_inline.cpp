@@ -224,6 +224,7 @@ void goto_inlinet::replace_return(
   {
     if(it->is_return())
     {
+      #if 1
       if(lhs.is_not_nil())
       {
         if(it->code.operands().size()!=1)
@@ -275,6 +276,47 @@ void goto_inlinet::replace_return(
       }
 
       it->make_goto(--dest.instructions.end());
+      #else
+      if(lhs.is_not_nil())
+      {
+        if(it->code.operands().size()!=1)
+        {
+          err_location(it->code);
+          str << "return expects one operand!";
+          warning_msg();
+          continue;
+        }
+      
+        code_assignt code_assign(lhs, it->code.op0());
+
+        // this may happen if the declared return type at the call site
+        // differs from the defined return type
+        if(code_assign.lhs().type()!=
+           code_assign.rhs().type())
+          code_assign.rhs().make_typecast(code_assign.lhs().type());
+
+        if(constrain.is_not_nil() && !constrain.is_true())
+        {
+          codet constrain(ID_bp_constrain);
+          constrain.reserve_operands(2);
+          constrain.move_to_operands(code_assign);
+          constrain.copy_to_operands(constrain);
+          it->code=constrain;
+        }
+        else
+          it->code=code_assign;
+
+        it++;
+      }
+      else if(!it->code.operands().empty())
+      {
+        codet expression(ID_expression);
+        expression.move_to_operands(it->code.op0());
+        it->code=expression;
+        it->type=OTHER;
+        it++;
+      }
+      #endif
     }
   }
 }
