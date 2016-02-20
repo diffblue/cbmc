@@ -67,95 +67,6 @@ simplify_expr_cachet simplify_expr_cache;
 
 /*******************************************************************\
 
-Function: simplify_exprt::setup_jump_table
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-// ugly global object
-
-std::vector<simplify_exprt::jump_table_entryt> simplify_jump_table;
-
-#define ENTRY(id, member) \
-  if(simplify_jump_table.size()<=(id).get_no()) \
-    simplify_jump_table.resize((id).get_no()+1, 0); \
-  simplify_jump_table[(id).get_no()]=&simplify_exprt::member;
-
-void simplify_exprt::setup_jump_table()
-{
-  // done already?
-  if(!simplify_jump_table.empty()) return;
-
-  ENTRY(ID_typecast, simplify_typecast);
-  ENTRY(ID_extractbit, simplify_extractbit);
-  ENTRY(ID_extractbits, simplify_extractbits);
-  ENTRY(ID_concatenation, simplify_concatenation);
-  ENTRY(ID_mult, simplify_mult);
-  ENTRY(ID_div, simplify_div);
-  ENTRY(ID_mod, simplify_mod);
-  ENTRY(ID_plus, simplify_plus);
-  ENTRY(ID_minus, simplify_minus);
-  ENTRY(ID_floatbv_plus, simplify_floatbv_op);
-  ENTRY(ID_floatbv_minus, simplify_floatbv_op);
-  ENTRY(ID_floatbv_mult, simplify_floatbv_op);
-  ENTRY(ID_floatbv_div, simplify_floatbv_op);
-  ENTRY(ID_floatbv_typecast, simplify_floatbv_typecast);
-  ENTRY(ID_ashr, simplify_shifts);
-  ENTRY(ID_lshr, simplify_shifts);
-  ENTRY(ID_shl, simplify_shifts);
-  ENTRY(ID_bitnot, simplify_bitwise);
-  ENTRY(ID_bitand, simplify_bitwise);
-  ENTRY(ID_bitor, simplify_bitwise);
-  ENTRY(ID_bitxor, simplify_bitwise);
-  ENTRY(ID_if, simplify_if);
-  ENTRY(ID_bitnot, simplify_bitnot);
-  ENTRY(ID_not, simplify_not);
-  ENTRY(ID_implies, simplify_boolean);
-  ENTRY(ID_iff, simplify_boolean);
-  ENTRY(ID_or, simplify_boolean);
-  ENTRY(ID_xor, simplify_boolean);
-  ENTRY(ID_and, simplify_boolean);
-  ENTRY(ID_equal, simplify_inequality);
-  ENTRY(ID_notequal, simplify_inequality);
-  ENTRY(ID_gt, simplify_inequality);
-  ENTRY(ID_lt, simplify_inequality);
-  ENTRY(ID_ge, simplify_inequality);
-  ENTRY(ID_le, simplify_inequality);
-  ENTRY(ID_ieee_float_equal, simplify_ieee_float_relation);
-  ENTRY(ID_ieee_float_notequal, simplify_ieee_float_relation);
-  ENTRY(ID_lambda, simplify_lambda);
-  ENTRY(ID_with, simplify_with);
-  ENTRY(ID_update, simplify_update);
-  ENTRY(ID_index, simplify_index);
-  ENTRY(ID_member, simplify_member);
-  ENTRY(ID_byte_update_little_endian, simplify_byte_update);
-  ENTRY(ID_byte_update_big_endian, simplify_byte_update);
-  ENTRY(ID_byte_extract_little_endian, simplify_byte_extract);
-  ENTRY(ID_byte_extract_big_endian, simplify_byte_extract);
-  ENTRY(ID_pointer_object, simplify_pointer_object);
-  ENTRY(ID_object_size, simplify_object_size);
-  ENTRY(ID_dynamic_object, simplify_dynamic_object);
-  ENTRY(ID_invalid_pointer, simplify_invalid_pointer);
-  ENTRY(ID_good_pointer, simplify_good_pointer);
-  ENTRY(ID_unary_minus, simplify_unary_minus);
-  ENTRY(ID_unary_plus, simplify_unary_plus);
-  ENTRY(ID_dereference, simplify_dereference);
-  ENTRY(ID_address_of, simplify_address_of);
-  ENTRY(ID_pointer_offset, simplify_pointer_offset);
-  ENTRY(ID_isinf, simplify_isinf);
-  ENTRY(ID_isnan, simplify_isnan);
-  ENTRY(ID_isnormal, simplify_isnormal);
-  ENTRY(ID_abs, simplify_abs);
-  ENTRY(ID_sign, simplify_sign);
-}
-
-/*******************************************************************\
-
 Function: simplify_exprt::simplify_abs
 
   Inputs:
@@ -2389,7 +2300,6 @@ bool simplify_exprt::simplify_node(exprt &expr)
 
   result=sort_and_join(expr) && result;
 
-  #if 1 // use jump table?
   if(expr.id()==ID_typecast)
     result=simplify_typecast(expr) && result;
   else if(expr.id()==ID_equal || expr.id()==ID_notequal ||
@@ -2487,18 +2397,6 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_sign(expr) && result;
   else if(expr.id()==ID_popcount)
     result=simplify_popcount(expr) && result;
-  #else
-  
-  unsigned no=expr.id().get_no();
-  
-  if(no<simplify_jump_table.size())
-  {
-    jump_table_entryt entry=simplify_jump_table[no];
-    if(entry!=NULL)
-      result=(this->*entry)(expr) && result;
-  }
-  
-  #endif
 
   #ifdef DEBUGX
   if(!result

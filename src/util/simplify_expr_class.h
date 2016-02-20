@@ -40,7 +40,6 @@ public:
     ,debug_on(false)
 #endif
   {
-    setup_jump_table();
 #ifdef DEBUG_ON_DEMAND
     struct stat f;
     debug_on=stat("SIMP_DEBUG", &f)==0;
@@ -55,8 +54,6 @@ public:
 
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
-
-  // jump table entries
 
   bool simplify_typecast(exprt &expr);
   bool simplify_extractbit(exprt &expr);
@@ -137,8 +134,6 @@ public:
            type.id()==ID_bv;
   }
   
-  typedef bool (simplify_exprt::*jump_table_entryt)(exprt &);
-  
   // bit-level conversions
   exprt bits2expr(const std::string &bits, const typet &type, bool little_endian);
   std::string expr2bits(const exprt &expr, bool little_endian);
@@ -148,8 +143,6 @@ protected:
 #ifdef DEBUG_ON_DEMAND
   bool debug_on;
 #endif
-  
-  void setup_jump_table();
 };
 
 #endif
