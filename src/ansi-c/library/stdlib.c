@@ -99,7 +99,7 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc;
-  __CPROVER_malloc_object=record_malloc?maclloc_res:__CPROVER_malloc_object;
+  __CPROVER_malloc_object=record_malloc?malloc_res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
   
