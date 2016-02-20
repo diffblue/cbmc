@@ -61,17 +61,17 @@ inline FILE *fopen(const char *filename, const char *mode)
   __CPROVER_assert(__CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
   #endif
 
-  FILE *f;
+  FILE *fopen_result;
 
   _Bool fopen_error;
-  f=fopen_error?NULL:malloc(sizeof(FILE));
+  fopen_result=fopen_error?NULL:malloc(sizeof(FILE));
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-  __CPROVER_set_must(f, "open");
-  __CPROVER_cleanup(f, fclose_cleanup);
+  __CPROVER_set_must(fopen_result, "open");
+  __CPROVER_cleanup(fopen_result, fclose_cleanup);
   #endif
 
-  return f;
+  return fopen_result;
 }
 
 /* FUNCTION: fclose */
