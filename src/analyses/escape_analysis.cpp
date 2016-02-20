@@ -332,6 +332,9 @@ void escape_domaint::transform(
       }
     }
     break;
+  
+  case END_FUNCTION:
+    break;
 
   default:;
   }
