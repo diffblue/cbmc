@@ -91,23 +91,23 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   // realistically, malloc may return NULL,
   // and __CPROVER_malloc doesn't, but no one cares
   __CPROVER_HIDE:;
-  void *res;
-  res=__CPROVER_malloc(malloc_size);
+  void *malloc_res;
+  malloc_res=__CPROVER_malloc(malloc_size);
 
   // make sure it's not recorded as deallocated
-  __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
+  __CPROVER_deallocated=(malloc_res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
   
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc;
-  __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
+  __CPROVER_malloc_object=record_malloc?maclloc_res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
   
   // detect memory leaks
   __CPROVER_bool record_may_leak;
-  __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
+  __CPROVER_memory_leak=record_may_leak?malloc_res:__CPROVER_memory_leak;
 
-  return res;
+  return malloc_res;
 }
 
 /* FUNCTION: __builtin_alloca */
