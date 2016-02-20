@@ -75,6 +75,8 @@ protected:
   void check_lhs(const exprt &, std::set<irep_idt> &);
   
   friend class escape_analysist;
+  
+  bool is_tracked(const symbol_exprt &);
 };
 
 class escape_analysist:public ait<escape_domaint> 
