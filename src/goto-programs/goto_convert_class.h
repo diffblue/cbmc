@@ -64,7 +64,7 @@ protected:
     const exprt &expr,
     goto_programt &dest);
   
-  typedef std::list<irep_idt> tmp_symbolst;
+  typedef std::list<symbol_exprt> tmp_symbolst;
   tmp_symbolst tmp_symbols;
 
   //
@@ -86,7 +86,9 @@ protected:
   void make_temp_symbol(
     exprt &expr,
     const std::string &suffix,
-    goto_programt &dest);
+    goto_programt &);
+    
+  void kill_tmp_symbols(std::size_t, goto_programt &);
 
   void rewrite_boolean(exprt &dest);
 
