@@ -210,57 +210,67 @@ template<typename T>
 propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 {
   assert(status!=ERROR);
-
+  
   {
     messaget::status() <<
       (no_variables()-1) << " variables, " <<
       solver->nClauses() << " clauses" << eom;
   }
   
-  add_variables();
-  
-  if(!solver->okay())
+  try
   {
-    messaget::status() <<
-      "SAT checker inconsistent: instance is UNSATISFIABLE" << eom;
-  }
-  else
-  {
-    // if assumptions contains false, we need this to be UNSAT
-    bool has_false=false;
+    add_variables();
     
-    forall_literals(it, assumptions)
-      if(it->is_false())
-        has_false=true;
-
-    if(has_false)
+    if(!solver->okay())
     {
       messaget::status() <<
-        "got FALSE as assumption: instance is UNSATISFIABLE" << eom;
+        "SAT checker inconsistent: instance is UNSATISFIABLE" << eom;
     }
     else
     {
-      Minisat::vec<Minisat::Lit> solver_assumptions;
-      convert(assumptions, solver_assumptions);
+      // if assumptions contains false, we need this to be UNSAT
+      bool has_false=false;
       
-      if(solver->solve(solver_assumptions))
+      forall_literals(it, assumptions)
+        if(it->is_false())
+          has_false=true;
+
+      if(has_false)
       {
-        messaget::status() << 
-          "SAT checker: instance is SATISFIABLE" << eom;
-        assert(solver->model.size()!=0);
-        status=SAT;
-        return P_SATISFIABLE;
+        messaget::status() <<
+          "got FALSE as assumption: instance is UNSATISFIABLE" << eom;
       }
       else
       {
-        messaget::status() <<
-          "SAT checker: instance is UNSATISFIABLE" << eom;
+        Minisat::vec<Minisat::Lit> solver_assumptions;
+        convert(assumptions, solver_assumptions);
+        
+        if(solver->solve(solver_assumptions))
+        {
+          messaget::status() << 
+            "SAT checker: instance is SATISFIABLE" << eom;
+          assert(solver->model.size()!=0);
+          status=SAT;
+          return P_SATISFIABLE;
+        }
+        else
+        {
+          messaget::status() <<
+            "SAT checker: instance is UNSATISFIABLE" << eom;
+        }
       }
     }
-  }
 
-  status=UNSAT;
-  return P_UNSATISFIABLE;
+    status=UNSAT;
+    return P_UNSATISFIABLE;
+  }
+  catch(Minisat::OutOfMemoryException)
+  {
+    messaget::error() <<
+      "SAT checker ran out of memory" << eom;
+    status=ERROR;
+    return P_ERROR;
+  }
 }
 
 /*******************************************************************\
