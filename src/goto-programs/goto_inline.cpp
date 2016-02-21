@@ -224,7 +224,7 @@ void goto_inlinet::replace_return(
   {
     if(it->is_return())
     {
-      #if 1
+      #if 0
       if(lhs.is_not_nil())
       {
         if(it->code.operands().size()!=1)
@@ -283,6 +283,7 @@ void goto_inlinet::replace_return(
         {
           err_location(it->code);
           str << "return expects one operand!";
+          str << '\n' << it->code.pretty();
           warning_msg();
           continue;
         }
@@ -302,9 +303,13 @@ void goto_inlinet::replace_return(
           constrain.move_to_operands(code_assign);
           constrain.copy_to_operands(constrain);
           it->code=constrain;
+          it->type=OTHER;
         }
         else
+        {
           it->code=code_assign;
+          it->type=ASSIGN;
+        }
 
         it++;
       }
