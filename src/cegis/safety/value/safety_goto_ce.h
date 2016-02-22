@@ -17,8 +17,9 @@
  *
  * @details
  */
-struct safety_goto_cet
+class safety_goto_cet
 {
+public:
   typedef std::map<const irep_idt, exprt> assignmentst;
   typedef std::vector<assignmentst> assignments_per_loopt;
 
