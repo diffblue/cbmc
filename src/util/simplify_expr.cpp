@@ -272,7 +272,7 @@ bool simplify_exprt::simplify_popcount(exprt &expr)
       mp_integer value;
       if(!to_integer(expr.op0(), value))
       {
-        unsigned result;
+        std::size_t result;
         
         for(result=0; value!=0; value=value>>1)
           if(value.is_odd()) result++;
@@ -1400,7 +1400,7 @@ bool simplify_exprt::simplify_with(exprt &expr)
            has_component(component_name))
           return result;
 
-        unsigned number=to_struct_type(op0_type).
+        std::size_t number=to_struct_type(op0_type).
            component_number(component_name);
 
         expr.op0().operands()[number].swap(expr.op2());
@@ -1502,7 +1502,7 @@ bool simplify_exprt::simplify_update(exprt &expr)
          has_component(component_name))
         return true;
 
-      unsigned number=to_struct_type(value_ptr_type).
+      std::size_t number=to_struct_type(value_ptr_type).
         component_number(component_name);
         
       assert(number<value_ptr->operands().size());
