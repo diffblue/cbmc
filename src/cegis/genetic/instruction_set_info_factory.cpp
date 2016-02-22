@@ -1,5 +1,6 @@
 #include <cstring>
 #include <algorithm>
+#include <iterator>
 
 #include <cegis/instructions/instruction_set_factory.h>
 #include <cegis/genetic/instruction_set_info_factory.h>
