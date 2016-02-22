@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iterator>
 
 #include <cegis/invariant/options/target_copy_helper.h>
 
