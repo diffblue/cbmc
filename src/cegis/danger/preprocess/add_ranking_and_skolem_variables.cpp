@@ -75,19 +75,6 @@ public:
     ++loop_id;
   }
 };
-
-#if 0
-void createAx(invariant_programt &program)
-{
-  symbol_tablet &st=program.st;
-  goto_functionst &gf=program.gf;
-  goto_programt::targett pos=program.get_loops().back()->body.begin;
-  const std::string base_name(get_Ax());
-  const typet type(invariant_meta_type());
-  program.Ax=declare_invariant_variable(st, gf, --pos, get_Ax(), type);
-  assign_invariant_variable(st, gf, program.Ax, base_name, program.assertion);
-}
-#endif
 }
 
 void add_ranking_and_skolem_variables(danger_programt &program,
