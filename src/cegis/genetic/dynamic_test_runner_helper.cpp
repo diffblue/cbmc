@@ -1,4 +1,6 @@
+#ifndef _WIN32
 #include <dlfcn.h> // TODO: Windows MinGW/VS equivalent?
+#endif
 
 #include <cassert>
 #include <cstdlib>
@@ -16,9 +18,11 @@ void close_fitness_tester_library(fitness_lib_handlet &handle,
 {
   if (fitness_tester && handle)
   {
+    #ifndef _WIN32
     dlclose(handle);
     handle=0;
     fitness_tester=0;
+    #endif
   }
 }
 
@@ -104,6 +108,8 @@ void prepare_fitness_tester_library(fitness_lib_handlet &handle,
   compile_command+=library_file_path;
   const int result=system(compile_command.c_str());
   if (result) throw std::runtime_error(COMPLING_FAILED);
+  
+  #ifndef _WIN32
   handle=dlopen(library_file_path.c_str(), RTLD_NOW);
   if (!handle)
   {
@@ -117,6 +123,7 @@ void prepare_fitness_tester_library(fitness_lib_handlet &handle,
     perror(error);
     throw std::runtime_error(LOAD_FUNC_FAILED);
   }
+  #endif
 }
 
 void serialise(std::deque<unsigned int> &stream,
