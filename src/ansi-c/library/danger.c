@@ -1,3 +1,16 @@
+#ifndef __CPROVER_cegis_number_of_vars
+#define __CPROVER_cegis_number_of_vars 2
+#endif
+#ifndef __CPROVER_cegis_number_of_consts
+#define __CPROVER_cegis_number_of_consts 1
+#endif
+#ifndef __CPROVER_cegis_number_of_ops
+#define __CPROVER_cegis_number_of_ops 3
+#endif 
+#ifndef __CPROVER_cegis_max_solution_size
+#define __CPROVER_cegis_max_solution_size 1
+#endif
+
 /* FUNCTION: __CPROVER_danger_execute */
 
 const void *__CPROVER_cegis_OPS[__CPROVER_cegis_number_of_ops];
