@@ -988,24 +988,24 @@ public:
   {
   }
 
-  inline bitvector_typet(const irep_idt &_id, const typet &_subtype, unsigned width):
+  inline bitvector_typet(const irep_idt &_id, const typet &_subtype, std::size_t width):
     type_with_subtypet(_id, _subtype)
   {
     set_width(width);
   }
 
-  inline bitvector_typet(const irep_idt &_id, unsigned width):
+  inline bitvector_typet(const irep_idt &_id, std::size_t width):
     type_with_subtypet(_id)
   {
     set_width(width);
   }
 
-  inline unsigned get_width() const
+  inline std::size_t get_width() const
   {
     return get_unsigned_int(ID_width);
   }
 
-  inline void set_width(unsigned width)
+  inline void set_width(std::size_t width)
   {
     set(ID_width, width);
   }
@@ -1062,7 +1062,7 @@ public:
   {
   }
 
-  inline explicit bv_typet(unsigned width):bitvector_typet(ID_bv)
+  inline explicit bv_typet(std::size_t width):bitvector_typet(ID_bv)
   {
     set_width(width);
   }
@@ -1102,7 +1102,7 @@ public:
   {
   }
 
-  inline explicit unsignedbv_typet(unsigned width):bitvector_typet(ID_unsignedbv, width)
+  inline explicit unsignedbv_typet(std::size_t width):bitvector_typet(ID_unsignedbv, width)
   {
   }
   
@@ -1147,7 +1147,7 @@ public:
   {
   }
 
-  inline explicit signedbv_typet(unsigned width):bitvector_typet(ID_signedbv, width)
+  inline explicit signedbv_typet(std::size_t width):bitvector_typet(ID_signedbv, width)
   {
   }
 
@@ -1273,7 +1273,7 @@ public:
   {
   }
 
-  inline explicit c_bit_field_typet(const typet &subtype, unsigned width):
+  inline explicit c_bit_field_typet(const typet &subtype, std::size_t width):
     bitvector_typet(ID_c_bit_field, subtype, width)
   {
   }
@@ -1332,7 +1332,7 @@ public:
   {
   }
 
-  inline pointer_typet(const typet &_subtype, unsigned width):
+  inline pointer_typet(const typet &_subtype, std::size_t width):
     bitvector_typet(ID_pointer, _subtype, width)
   {
   }
@@ -1408,7 +1408,7 @@ public:
   {
   }
 
-  explicit inline c_bool_typet(unsigned width):
+  explicit inline c_bool_typet(std::size_t width):
     bitvector_typet(ID_c_bool, width)
   {
   }
