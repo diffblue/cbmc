@@ -112,10 +112,8 @@ std::string get_invariant_library_text(const size_t num_vars,
   add_placeholder(st, func_name);
   std::set<irep_idt> functions;
   functions.insert(func_name);
-  std::string text;
-  //get_cprover_library_text(text, functions, st,
-  //    get_prefix(num_vars, num_consts, max_solution_size));
-  return text;
+  std::string text(get_prefix(num_vars, num_consts, max_solution_size));
+  return text+=get_cprover_library_text(functions, st);
 }
 
 void add_invariant_library(invariant_programt &prog, message_handlert &msg,
@@ -127,8 +125,10 @@ void add_invariant_library(invariant_programt &prog, message_handlert &msg,
   add_placeholder(st, func_name);
   std::set<irep_idt> functions;
   functions.insert(func_name);
-  const std::string prefix(get_prefix(num_vars, num_consts, max_solution_size));
-  //add_cprover_library(functions, st, msg, prefix);
+  const std::string library_src(
+      get_invariant_library_text(num_vars, num_consts, max_solution_size,
+          func_name));
+  add_library(library_src, st, msg);
   goto_convert(func_name, st, goto_functions, msg);
   set_loop_id(goto_functions, func_name);
   set_init_values(prog);

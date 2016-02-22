@@ -152,12 +152,12 @@ bool handle_ce(std::string &source, bool &initialised, const std::string &line)
     source+="  " CEGIS_PREFIX "ce_value_init();\n";
     initialised=true;
   }
-  const std::string::size_type name_end=line.find(" = { ");
+  const std::string::size_type name_end=line.find("={ ");
   source+="\n";
   std::string prefix=line.substr(0, name_end);
   fix_cprover_names(prefix);
   source+=prefix;
-  source+=" = { " CEGIS_PREFIX "ce_value() };\n";
+  source+="={ " CEGIS_PREFIX "ce_value() };\n";
   return true;
 }
 
@@ -183,18 +183,18 @@ bool handle_ce_loop(const std::string &line, std::stringstream &ss)
 bool handle_internals(const std::string &line)
 {
   if (contains(line, "ARRAY_OF(")) return true;
-  return "    __CPROVER_malloc_size = 0u;" == line
-      || "    __CPROVER_dead_object = NULL;" == line
-      || "    __CPROVER_deallocated = NULL;" == line
-      || "    __CPROVER_malloc_is_new_array = 0 != 0;" == line
-      || "    __CPROVER_malloc_object = NULL;" == line
-      || "    __CPROVER_malloc_size = 0ul;" == line
-      || "    __CPROVER_memory_leak = NULL;" == line
-      || "    __CPROVER_next_thread_id = (unsigned long int)0;" == line
-      || "    __CPROVER_pipe_count = (unsigned int)0;" == line
-      || "    __CPROVER_rounding_mode = 0;" == line
-      || "    __CPROVER_thread_id = (unsigned long int)0;" == line
-      || "    __CPROVER_threads_exited = ARRAY_OF((_Bool)0);" == line
+  return contains(line, "__CPROVER_malloc_size =")
+      || contains(line, "__CPROVER_dead_object =")
+      || contains(line, "__CPROVER_deallocated =")
+      || contains(line, "__CPROVER_malloc_is_new_array =")
+      || contains(line, "__CPROVER_malloc_object =")
+      || contains(line, "__CPROVER_malloc_size =")
+      || contains(line, "__CPROVER_memory_leak =")
+      || contains(line, "__CPROVER_next_thread_id =")
+      || contains(line, "__CPROVER_pipe_count =")
+      || contains(line, "__CPROVER_rounding_mode =")
+      || contains(line, "__CPROVER_thread_id =")
+      || contains(line, "__CPROVER_threads_exited =")
       || "  assert((_Bool)0);" == line || "void assert(void);" == line
       || "static signed int assert#return_value;" == line;
 }

@@ -178,7 +178,6 @@ int run_danger(optionst &options, mstreamt &result, const symbol_tablet &st,
       is_gen ? genetic_constant_strategy : default_constant_strategy;
   danger_preprocessingt preproc(options, st, gf, str);
   const danger_programt &prog=preproc.get_danger_program();
-  std::cerr << "<loops_size>" << prog.get_loops().size() << "</loops_size>" << std::endl;
   genetic_preprocessingt<danger_preprocessingt> gen_preproc(options, preproc);
   return run_genetic_and_symex(result, options, prog, gen_preproc);
 }
