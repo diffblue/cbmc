@@ -116,7 +116,7 @@ Function: integer2binary
 
 \*******************************************************************/
 
-const std::string integer2binary(const mp_integer &n, unsigned width)
+const std::string integer2binary(const mp_integer &n, std::size_t width)
 {
   mp_integer a(n);
 
@@ -130,7 +130,7 @@ const std::string integer2binary(const mp_integer &n, unsigned width)
     a=a-1;
   }
 
-  unsigned len = a.digits(2) + 2;
+  std::size_t len = a.digits(2) + 2;
   char *buffer=(char *)malloc(len);
   char *s = a.as_string(buffer, len, 2);
 
@@ -148,7 +148,7 @@ const std::string integer2binary(const mp_integer &n, unsigned width)
     result=result.substr(result.size()-width, width);
 
   if(neg)
-    for(unsigned i=0; i<result.size(); i++)
+    for(std::size_t i=0; i<result.size(); i++)
       result[i]=(result[i]=='0')?'1':'0';
 
   return result;
