@@ -15,7 +15,7 @@
 #include <cegis/value/program_individual.h>
 
 typedef std::map<size_t, goto_programt::instructionst> instruction_sett;
-typedef std::map<const irep_idt, size_t> danger_variable_idst;
+typedef std::map<const irep_idt, size_t> invariant_variable_idst;
 
 /**
  * @brief
@@ -32,7 +32,7 @@ typedef std::map<const irep_idt, size_t> danger_variable_idst;
  */
 void create_danger_solution(class danger_goto_solutiont &result,
     const class danger_programt &prog, const class goto_tracet &trace,
-    const danger_variable_idst &ids, const size_t max_solution_size);
+    const invariant_variable_idst &ids, const size_t max_solution_size);
 
 /**
  * @brief
@@ -47,7 +47,7 @@ void create_danger_solution(class danger_goto_solutiont &result,
  */
 void create_danger_solution(danger_goto_solutiont &result,
     const danger_programt &prog, const program_individualt &ind,
-    const instruction_sett &instr, const danger_variable_idst &ids);
+    const instruction_sett &instr, const invariant_variable_idst &ids);
 
 /**
  * @brief
@@ -61,6 +61,6 @@ void create_danger_solution(danger_goto_solutiont &result,
  */
 void create_danger_solution(danger_goto_solutiont &result,
     const danger_programt &prog, const program_individualt &ind,
-    const danger_variable_idst &ids);
+    const invariant_variable_idst &ids);
 
 #endif /* CEGIS_DANGER_SOLUTION_FACTORY_H_ */

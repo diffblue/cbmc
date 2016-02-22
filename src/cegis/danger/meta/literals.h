@@ -11,14 +11,7 @@
 #define CEGIS_DANGER_LITERALS_H_
 
 #define DANGER_PREFIX "__CPROVER_danger_"
-#define DANGER_MODULE "<builtin-library-danger>"
-
-#define DANGER_X0_PLACEHOLDER_PREFIX "__CPROVER_danger_x0_"
-#define DANGER_EXECUTE "__CPROVER_danger_execute"
-#define DANGER_INSTRUCTION_TYPE_NAME "tag-__CPROVER_danger_instructiont"
-#define DANGER_OPS "__CPROVER_danger_OPS"
-#define DANGER_RESULT_OPS "__CPROVER_danger_RESULT_OPS"
-#define DANGER_TMP_PREFIX DANGER_PREFIX"tmp_"
-#define PRIME_SUFFIX "_prime"
+#define DANGER_EXECUTE DANGER_PREFIX "execute"
+#define DANGER_X0_PLACEHOLDER_PREFIX DANGER_PREFIX "x0_"
 
 #endif /* CEGIS_DANGER_LITERALS_H_ */

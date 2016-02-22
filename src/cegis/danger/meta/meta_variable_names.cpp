@@ -1,12 +1,8 @@
 #include <util/mp_arith.h>
 
+#include <cegis/invariant/meta/literals.h>
 #include <cegis/danger/meta/literals.h>
 #include <cegis/danger/meta/meta_variable_names.h>
-
-std::string get_Ax()
-{
-  return DANGER_PREFIX"A_x";
-}
 
 namespace
 {
@@ -43,17 +39,7 @@ std::string get_Dx(const size_t loop_id)
 
 namespace
 {
-const char GUARD_PREFIX[]=DANGER_PREFIX"G";
-}
-
-std::string get_Gx(const size_t loop_id)
-{
-  return build_var_name(GUARD_PREFIX, loop_id, STATE_BEFORE_LOOP);
-}
-
-namespace
-{
-const char STATE_AFTER_LOOP[]="x" PRIME_SUFFIX;
+const char STATE_AFTER_LOOP[]="x" CEGIS_PRIME_SUFFIX;
 }
 
 std::string get_Dx_prime(const size_t loop_id)
@@ -95,10 +81,4 @@ const char SKOLEM_PREFIX[]=DANGER_PREFIX"S";
 std::string get_Sx(const size_t loop_id, const size_t result_id)
 {
   return build_var_name(SKOLEM_PREFIX, loop_id, STATE_BEFORE_LOOP, result_id);
-}
-
-std::string get_tmp(const size_t id)
-{
-  std::string result(DANGER_TMP_PREFIX);
-  return result+=integer2string(id);
 }

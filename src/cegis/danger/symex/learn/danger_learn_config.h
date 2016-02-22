@@ -30,11 +30,11 @@ public:
    *
    * @details
    */
-  typedef std::map<const irep_idt, size_t> danger_variable_idst;
+  typedef std::map<const irep_idt, size_t> invariant_variable_idst;
 private:
   const danger_programt &original_program;
   danger_programt program;
-  danger_variable_idst var_ids;
+  invariant_variable_idst var_ids;
   size_t num_consts;
 public:
   /**
@@ -79,6 +79,16 @@ public:
    */
   void process(const counterexamplest &counterexamples,
       size_t max_solution_size);
+
+  /**
+   * @brief Process the goto program using template data.
+   *
+   * @details Creates template counterexamples and processes the goto
+   * program with them. This is useful for GA source code generation.
+   *
+   * @param max_solution_size
+   */
+  void process(size_t max_solution_size);
 
   /**
    * @brief
@@ -145,7 +155,7 @@ public:
    *
    * @return
    */
-  const danger_variable_idst &get_vars() const;
+  const invariant_variable_idst &get_vars() const;
 
   /**
    * @brief

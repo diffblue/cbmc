@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <functional>
 
-#include <cegis/danger/value/danger_goto_solution.h>
-
 /**
  * @brief
  *

@@ -3,37 +3,35 @@
 #include <cbmc/cbmc_solvers.h>
 #include <cbmc/bmc.h>
 
-template<class test_runnert>
-lazy_fitnesst<test_runnert>::lazy_fitnesst(test_runnert &test_runner) :
+template<class test_runnert, class cet>
+lazy_fitnesst<test_runnert, cet>::lazy_fitnesst(test_runnert &test_runner) :
     test_runner(test_runner)
 {
 }
 
-template<class test_runnert>
-lazy_fitnesst<test_runnert>::~lazy_fitnesst()
+template<class test_runnert, class cet>
+lazy_fitnesst<test_runnert, cet>::~lazy_fitnesst()
 {
 }
 
-template<class test_runnert>
+template<class test_runnert, class cet>
 template<class seedt>
-void lazy_fitnesst<test_runnert>::seed(seedt &seeder)
+void lazy_fitnesst<test_runnert, cet>::seed(seedt &seeder)
 {
   seeder(counterexamples);
 }
 
-template<class test_runnert>
-void lazy_fitnesst<test_runnert>::add_test_case(const counterexamplet &ce)
+template<class test_runnert, class cet>
+void lazy_fitnesst<test_runnert, cet>::add_test_case(const counterexamplet &ce)
 {
-  const counterexamplest::const_iterator end=counterexamples.end();
-  // XXX: This should never occur
-  //if (end == std::find(counterexamples.begin(), counterexamples.end(), ce))
-  assert(end == std::find(counterexamples.begin(), counterexamples.end(), ce));
+  const typename counterexamplest::iterator end=counterexamples.end();
+  assert(end == std::find(counterexamples.begin(), end, ce));
   counterexamples.push_back(ce);
 }
 
-template<class test_runnert>
-typename lazy_fitnesst<test_runnert>::populationt::iterator lazy_fitnesst<
-    test_runnert>::find_candidate(populationt &pop)
+template<class test_runnert, class cet>
+typename lazy_fitnesst<test_runnert, cet>::populationt::iterator lazy_fitnesst<
+    test_runnert, cet>::find_candidate(populationt &pop)
 {
   const size_t ces=get_target_fitness();
   for (populationt::iterator it=pop.begin(); it != pop.end(); ++it)
@@ -41,6 +39,8 @@ typename lazy_fitnesst<test_runnert>::populationt::iterator lazy_fitnesst<
   return pop.end();
 }
 
+namespace
+{
 size_t get_bounty(const size_t index)
 {
   /*size_t bounty=1u;
@@ -49,8 +49,6 @@ size_t get_bounty(const size_t index)
   return 1u;
 }
 
-namespace
-{
 bool &new_test_result(std::list<bool> &test_case_data)
 {
   test_case_data.push_back(false);
@@ -76,9 +74,9 @@ public:
 };
 }
 
-template<class test_runnert>
-typename lazy_fitnesst<test_runnert>::populationt::iterator lazy_fitnesst<
-    test_runnert>::init(populationt &pop)
+template<class test_runnert, class cet>
+typename lazy_fitnesst<test_runnert, cet>::populationt::iterator lazy_fitnesst<
+    test_runnert, cet>::init(populationt &pop)
 {
   const counterexamplest &ces=counterexamples;
   const size_t ce_count=ces.size();
@@ -99,8 +97,8 @@ typename lazy_fitnesst<test_runnert>::populationt::iterator lazy_fitnesst<
   return find_candidate(pop);
 }
 
-template<class test_runnert>
-void lazy_fitnesst<test_runnert>::set_fitness(individualt &individual)
+template<class test_runnert, class cet>
+void lazy_fitnesst<test_runnert, cet>::set_fitness(individualt &individual)
 {
   individual.fitness=0u;
   std::list<bool> &ind_test_data=test_case_data[&individual];
@@ -112,9 +110,9 @@ void lazy_fitnesst<test_runnert>::set_fitness(individualt &individual)
   test_runner.join();
 }
 
-template<class test_runnert>
-typename lazy_fitnesst<test_runnert>::individualt::fitnesst lazy_fitnesst<
-    test_runnert>::get_target_fitness() const
+template<class test_runnert, class cet>
+typename lazy_fitnesst<test_runnert, cet>::individualt::fitnesst lazy_fitnesst<
+    test_runnert, cet>::get_target_fitness() const
 {
   size_t fitness=0;
   const size_t end=counterexamples.size();
@@ -123,8 +121,8 @@ typename lazy_fitnesst<test_runnert>::individualt::fitnesst lazy_fitnesst<
   return fitness;
 }
 
-template<class test_runnert>
-const test_case_datat &lazy_fitnesst<test_runnert>::get_test_case_data() const
+template<class test_runnert, class cet>
+const test_case_datat &lazy_fitnesst<test_runnert, cet>::get_test_case_data() const
 {
   return test_case_data;
 }

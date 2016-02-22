@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <iterator>
 
 #ifndef _WIN32
 #include <cstdlib>

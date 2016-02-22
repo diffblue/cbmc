@@ -1,5 +1,3 @@
-#include <iterator>
-
 #include <goto-programs/safety_checker.h>
 
 #include <cbmc/cbmc_solvers.h>

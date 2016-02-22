@@ -10,8 +10,8 @@
 #ifndef CEGIS_DANGER_PREPROCESSING_H_
 #define CEGIS_DANGER_PREPROCESSING_H_
 
+#include <cegis/invariant/constant/constant_strategy.h>
 #include <cegis/danger/options/danger_program.h>
-#include <cegis/danger/constant/constant_strategy.h>
 
 /**
  * @brief

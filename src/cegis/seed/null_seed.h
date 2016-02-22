@@ -24,24 +24,14 @@ public:
    * @brief
    *
    * @details
-   */
-  null_seedt();
-
-  /**
-   * @brief
-   *
-   * @details
-   */
-  ~null_seedt();
-
-  /**
-   * @brief
-   *
-   * @details
    *
    * @param ces
+   * @tparam ces
    */
-  void operator()(danger_verify_configt::counterexamplest &ces) const;
+  template<class cest>
+  void operator()(cest &ces) const;
 };
+
+#include "null_seed.inc"
 
 #endif /* CEGIS_NULL_SEED_H_ */
