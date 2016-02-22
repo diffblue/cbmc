@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <fstream>
+#include <stdexcept>
 
 #ifndef _WIN32
 #include <sys/wait.h>
