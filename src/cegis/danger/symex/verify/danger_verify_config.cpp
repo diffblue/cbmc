@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iterator>
 
 #include <cegis/wordsize/restrict_bv_size.h>
 #include <cegis/invariant/symex/verify/extract_counterexample.h>
