@@ -2508,7 +2508,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
 
   if(parameters.size()>expr.arguments().size())
   {
-    unsigned i=expr.arguments().size();
+    std::size_t i=expr.arguments().size();
 
     for(; i<parameters.size(); i++)
     {
@@ -2520,7 +2520,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
     }
   }
 
-  for(unsigned i=0; i<parameters.size(); i++)
+  for(std::size_t i=0; i<parameters.size(); i++)
   {
     if(parameters[i].get_bool("#call_by_value"))
     {
