@@ -98,24 +98,42 @@ void add_cprover_library(
   std::string library_text;
 
   library_text=get_cprover_library_text(functions, symbol_table);
-
-  if(!library_text.empty())
-  {
-    std::istringstream in(library_text);
-
-    // switch mode temporarily from gcc C++ to gcc C flavour
-    configt::ansi_ct::flavourt old_mode=config.ansi_c.mode;
-    
-    if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_CPP)
-      config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
-    
-    ansi_c_languaget ansi_c_language;
-    ansi_c_language.set_message_handler(message_handler);
-    ansi_c_language.parse(in, "");
-    
-    ansi_c_language.typecheck(symbol_table, "<built-in-library>");
-
-    config.ansi_c.mode=old_mode;
-  }
+  
+  add_library(library_text, symbol_table, message_handler);
 }
 
+/*******************************************************************\
+
+Function: add_library
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void add_library(
+  const std::string &src,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
+{
+  if(!src.empty()) return;
+
+  std::istringstream in(src);
+
+  // switch mode temporarily from gcc C++ to gcc C flavour
+  configt::ansi_ct::flavourt old_mode=config.ansi_c.mode;
+  
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_CPP)
+    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
+  
+  ansi_c_languaget ansi_c_language;
+  ansi_c_language.set_message_handler(message_handler);
+  ansi_c_language.parse(in, "");
+  
+  ansi_c_language.typecheck(symbol_table, "<built-in-library>");
+
+  config.ansi_c.mode=old_mode;
+}
