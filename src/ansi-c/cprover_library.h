@@ -14,6 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/message.h>
 
+std::string get_cprover_library_text(
+  const std::set<irep_idt> &functions,
+  const symbol_tablet &symbol_table);
+
 void add_cprover_library(
   const std::set<irep_idt> &functions,
   symbol_tablet &symbol_table,
