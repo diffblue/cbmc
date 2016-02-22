@@ -76,6 +76,7 @@ public:
   }
 };
 
+#if 0
 void createAx(invariant_programt &program)
 {
   symbol_tablet &st=program.st;
@@ -86,6 +87,7 @@ void createAx(invariant_programt &program)
   program.Ax=declare_invariant_variable(st, gf, --pos, get_Ax(), type);
   assign_invariant_variable(st, gf, program.Ax, base_name, program.assertion);
 }
+#endif
 }
 
 void add_ranking_and_skolem_variables(danger_programt &program,
