@@ -256,7 +256,7 @@ public:
   const componentt &get_component(
     const irep_idt &component_name) const;
 
-  unsigned component_number(const irep_idt &component_name) const;
+  std::size_t component_number(const irep_idt &component_name) const;
   typet component_type(const irep_idt &component_name) const;
   
   irep_idt get_tag() const { return get(ID_tag); }
@@ -1192,14 +1192,14 @@ public:
   {
   }
 
-  inline unsigned get_fraction_bits() const
+  inline std::size_t get_fraction_bits() const
   {
     return get_width()-get_integer_bits();
   }
 
-  unsigned get_integer_bits() const;
+  std::size_t get_integer_bits() const;
 
-  inline void set_integer_bits(unsigned b)
+  inline void set_integer_bits(std::size_t b)
   {
     set(ID_integer_bits, b);
   }
@@ -1232,15 +1232,15 @@ public:
   {
   }
 
-  inline unsigned get_e() const
+  inline std::size_t get_e() const
   {
     // subtract one for sign bit
     return get_width()-get_f()-1;
   }
 
-  unsigned get_f() const;
+  std::size_t get_f() const;
 
-  inline void set_f(unsigned b)
+  inline void set_f(std::size_t b)
   {
     set(ID_f, b);
   }
@@ -1385,7 +1385,7 @@ public:
     set(ID_C_reference, true);
   }
 
-  inline reference_typet(const typet &_subtype, unsigned _width):
+  inline reference_typet(const typet &_subtype, std::size_t _width):
     pointer_typet(_subtype, _width)
   {
     set(ID_C_reference, true);
