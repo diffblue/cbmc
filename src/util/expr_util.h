@@ -58,5 +58,5 @@ exprt boolean_negate(const exprt &);
 bool has_subexpr(const exprt &, const irep_idt &);
 
 /*! lift up an if_exprt one level */
-if_exprt lift_if(const exprt &, unsigned operand_number);
+if_exprt lift_if(const exprt &, std::size_t operand_number);
 
