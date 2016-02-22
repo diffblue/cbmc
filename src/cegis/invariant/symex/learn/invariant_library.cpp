@@ -128,7 +128,7 @@ void add_invariant_library(invariant_programt &prog, message_handlert &msg,
   std::set<irep_idt> functions;
   functions.insert(func_name);
   const std::string prefix(get_prefix(num_vars, num_consts, max_solution_size));
-  add_cprover_library(functions, st, msg, prefix);
+  //add_cprover_library(functions, st, msg, prefix);
   goto_convert(func_name, st, goto_functions, msg);
   set_loop_id(goto_functions, func_name);
   set_init_values(prog);
