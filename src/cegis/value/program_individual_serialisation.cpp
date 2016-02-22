@@ -18,7 +18,7 @@ bool is_program_indivdual_decl(const goto_trace_stept &step)
   const typet &type=value.type().subtype();
   if (ID_struct != type.id()) return false;
   const std::string &tname=id2string(to_struct_type(type).get_tag());
-  const char * const danger_tag=&CEGIS_INSTRUCTION_TYPE_NAME[4];
+  const char * const danger_tag=CEGIS_INSTRUCTION_TYPE_NAME+4;
   return std::string::npos != tname.find(danger_tag);
 }
 
