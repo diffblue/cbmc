@@ -86,7 +86,7 @@ Function: string_constantt:to_array_expr
 array_exprt string_constantt::to_array_expr() const
 {
   const std::string &str=get_string(ID_value);
-  unsigned string_size=str.size()+1; // we add the zero
+  std::size_t string_size=str.size()+1; // we add the zero
   const typet &char_type=type().subtype();
   bool char_is_unsigned=char_type.id()==ID_unsignedbv;
 
@@ -100,7 +100,7 @@ array_exprt string_constantt::to_array_expr() const
   dest.operands().resize(string_size);
 
   exprt::operandst::iterator it=dest.operands().begin();
-  for(unsigned i=0; i<string_size; i++, it++)
+  for(std::size_t i=0; i<string_size; i++, it++)
   {
     // Are we at the end? Do implicit zero.
     int ch=i==string_size-1?0:str[i];
