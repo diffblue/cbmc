@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iterator>
 
 #include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/safety/options/safety_program.h>
