@@ -113,8 +113,8 @@ std::string get_invariant_library_text(const size_t num_vars,
   std::set<irep_idt> functions;
   functions.insert(func_name);
   std::string text;
-  get_cprover_library_text(text, functions, st,
-      get_prefix(num_vars, num_consts, max_solution_size));
+  //get_cprover_library_text(text, functions, st,
+  //    get_prefix(num_vars, num_consts, max_solution_size));
   return text;
 }
 
