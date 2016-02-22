@@ -19,15 +19,6 @@
  *
  * @return
  */
-std::string get_Ax();
-
-/**
- * @brief
- *
- * @details
- *
- * @return
- */
 std::string get_Dx0();
 
 /**
@@ -51,17 +42,6 @@ std::string get_Dx(const size_t loop_id);
  * @return
  */
 std::string get_Dx_prime(const size_t loop_id);
-
-/**
- * @brief
- *
- * @details
- *
- * @param loop_id
- *
- * @return
- */
-std::string get_Gx(const size_t loop_id);
 
 /**
  * @brief
@@ -98,16 +78,5 @@ std::string get_Rx_prime(const size_t loop_id, const size_t result_id);
  * @return
  */
 std::string get_Sx(const size_t loop_id, const size_t result_id);
-
-/**
- * @brief
- *
- * @details
- *
- * @param id
- *
- * @return
- */
-std::string get_tmp(const size_t id);
 
 #endif /* CEGIS_DANGER_META_VARIABLE_NAMES_H_ */

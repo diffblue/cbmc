@@ -2,19 +2,20 @@
 #include <util/bv_arithmetic.h>
 
 #include <cegis/danger/meta/meta_variable_names.h>
-#include <cegis/danger/instrument/meta_variables.h>
+#include <cegis/invariant/meta/meta_variable_names.h>
+#include <cegis/invariant/instrument/meta_variables.h>
 
 namespace
 {
 symbol_exprt as_var(const std::string &base_name)
 {
-  const std::string name=get_danger_meta_name(base_name);
-  return symbol_exprt(name, danger_meta_type());
+  const std::string name=get_invariant_meta_name(base_name);
+  return symbol_exprt(name, invariant_meta_type());
 }
 
 constant_exprt get_min_value()
 {
-  const typet type(danger_meta_type());
+  const typet type(invariant_meta_type());
   const bv_spect spec(type);
   return from_integer(spec.min_value(), type);
 }
@@ -22,7 +23,7 @@ constant_exprt get_min_value()
 
 notequal_exprt danger_component_as_bool(const std::string &base_name)
 {
-  const constant_exprt rhs(from_integer(0u, danger_meta_type()));
+  const constant_exprt rhs(from_integer(0u, invariant_meta_type()));
   return notequal_exprt(as_var(base_name), rhs);
 }
 

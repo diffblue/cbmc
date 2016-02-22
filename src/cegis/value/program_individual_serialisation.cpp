@@ -2,7 +2,7 @@
 
 #include <goto-programs/goto_trace.h>
 
-#include <cegis/danger/meta/literals.h>
+#include <cegis/invariant/meta/literals.h>
 #include <cegis/danger/options/danger_program.h>
 #include <cegis/danger/symex/learn/add_variable_refs.h>
 #include <cegis/danger/symex/learn/read_x0.h>
@@ -18,7 +18,7 @@ bool is_program_indivdual_decl(const goto_trace_stept &step)
   const typet &type=value.type().subtype();
   if (ID_struct != type.id()) return false;
   const std::string &tname=id2string(to_struct_type(type).get_tag());
-  const char * const danger_tag=DANGER_INSTRUCTION_TYPE_NAME+4;
+  const char * const danger_tag=&CEGIS_INSTRUCTION_TYPE_NAME[4];
   return std::string::npos != tname.find(danger_tag);
 }
 
@@ -42,7 +42,7 @@ program_individualt::instructiont to_program_individual_instruction(
   return result;
 }
 
-program_individualt to_program_individual(const danger_programt &prog,
+program_individualt to_program_individual(const invariant_programt &prog,
     const goto_tracet &trace)
 {
   program_individualt individual;
@@ -58,6 +58,14 @@ program_individualt to_program_individual(const danger_programt &prog,
       }
       individual.programs.push_back(prog);
     }
+  return individual;
+}
+
+program_individualt to_program_individual(const danger_programt &prog,
+    const goto_tracet &trace)
+{
+  const invariant_programt &inv_prog=prog;
+  program_individualt individual(to_program_individual(inv_prog, trace));
   danger_read_x0(individual, prog, trace);
   return individual;
 }
@@ -114,26 +122,29 @@ void serialise(irept &sdu, const program_individualt &individual)
 
 void deserialise(program_individualt &individual, const irept &sdu)
 {
-  const irept &programs=sdu.find(PROGRAMS);
-  assert(programs.is_not_nil());
-  for (const irept &program : programs.get_sub())
+  const irept::named_subt &named_sub=sdu.get_named_sub();
+  typedef irept::named_subt::const_iterator const_iterator;
+  const const_iterator programs=named_sub.find(PROGRAMS);
+  assert(named_sub.end() != programs);
+  for (const irept &program : programs->second.get_sub())
   {
     program_individualt::programt prog;
     for (const irept &instruction : program.get_sub())
     {
       program_individualt::instructiont instr;
       instr.opcode=instruction.get_long_long(OPCODE);
-      const irept &ops=instruction.find(OPS);
-      assert(ops.is_not_nil());
-      for (const irept &op : ops.get_sub())
+      const irept::named_subt &named_sub=instruction.get_named_sub();
+      const const_iterator ops=named_sub.find(OPS);
+      assert(named_sub.end() != ops);
+      for (const irept &op : ops->second.get_sub())
         instr.ops.push_back(get_value(op));
       prog.push_back(instr);
     }
     individual.programs.push_back(prog);
   }
-  const irept &x0=sdu.find(X0);
-  assert(x0.is_not_nil());
-  for (const irept &value : x0.get_sub())
+  const irept::named_subt::const_iterator x0=named_sub.find(X0);
+  assert(named_sub.end() != x0);
+  for (const irept &value : x0->second.get_sub())
     individual.x0.push_back(get_value(value));
   individual.fitness=sdu.get_long_long(FITNESS);
 }
@@ -153,8 +164,8 @@ void individual_to_danger_solution_deserialisert::operator ()(
 {
   program_individualt ind;
   deserialise(ind, sdu);
-  danger_variable_idst ids;
-  get_danger_variable_ids(prog.st, ids);
+  invariant_variable_idst ids;
+  get_invariant_variable_ids(prog.st, ids);
   const instruction_sett &instrs=info_fac.get_instructions();
   create_danger_solution(result, prog, ind, instrs, ids);
 }

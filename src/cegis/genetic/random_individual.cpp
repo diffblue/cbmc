@@ -4,21 +4,14 @@
 #include <util/bv_arithmetic.h>
 #include <util/std_types.h>
 
+#include <cegis/genetic/genetic_settings.h>
 #include <cegis/genetic/random_individual.h>
 
-random_individualt::random_individualt(unsigned int seed, const typet &type,
+random_individualt::random_individualt(const typet &type,
     const instruction_set_info_factoryt &info_factory,
-    const std::function<size_t(size_t)> &min_prog_sz,
-    const std::function<size_t(size_t)> &max_prog_sz,
-    const std::function<size_t(void)> &num_progs,
-    const std::function<size_t(void)> &num_vars,
-    const std::function<size_t(void)> &num_consts,
-    const std::function<size_t(void)> &num_x0) :
-    type(type), info_factory(info_factory), min_prog_sz(min_prog_sz), max_prog_sz(
-        max_prog_sz), num_progs(num_progs), num_vars(num_vars), num_consts(
-        num_consts), num_x0(num_x0)
+    genetic_settingst &settings) :
+    type(type), info_factory(info_factory), settings(settings)
 {
-  srand(seed);
 }
 
 random_individualt::~random_individualt()
@@ -27,9 +20,9 @@ random_individualt::~random_individualt()
 
 size_t random_individualt::prog_size(const size_t index) const
 {
-  const size_t max=max_prog_sz(index);
+  const size_t max=settings.max_prog_sz(index);
   if (max == 0u) return 0u;
-  const size_t min=min_prog_sz(index);
+  const size_t min=settings.min_prog_sz(index);
   if (min >= max) return min;
   const size_t diff=max - min;
   return min + rand() % (diff + 1);
@@ -44,7 +37,7 @@ program_individualt::instructiont::opcodet random_individualt::opcode()
 program_individualt::instructiont::opt random_individualt::op(
     const size_t instr_index) const
 {
-  return rand() % (num_vars() + instr_index);
+  return rand() % (settings.num_vars() + instr_index);
 }
 
 void random_individualt::havoc(program_individualt::instructiont &instr,
@@ -99,14 +92,14 @@ program_individualt::x0t::value_type random_individualt::constant() const
 void random_individualt::havoc(program_individualt &ind)
 {
   program_individualt::programst &progs=ind.programs;
-  progs.resize(num_progs());
+  progs.resize(settings.num_progs());
   for (size_t i=0u; i < progs.size(); ++i)
     havoc(progs[i], i);
   post_process(ind);
-  const size_t number_of_x0=num_x0();
+  const size_t number_of_x0=settings.num_x0();
   program_individualt::x0t &ind_x0=ind.x0;
   ind_x0.resize(number_of_x0);
-  const size_t number_of_constants=num_consts();
+  const size_t number_of_constants=settings.num_consts();
   for (size_t i=0; i < number_of_constants; ++i)
     ind_x0[i]=constant();
   for (size_t i=number_of_constants; i < number_of_x0; ++i)
@@ -120,17 +113,17 @@ unsigned int random_individualt::rand() const
 
 size_t random_individualt::get_num_vars() const
 {
-  return num_vars();
+  return settings.num_vars();
 }
 
 size_t random_individualt::get_max_prog_size(const size_t prog_index) const
 {
-  return max_prog_sz(prog_index);
+  return settings.max_prog_sz(prog_index);
 }
 
 size_t random_individualt::get_min_prog_size(const size_t prog_index) const
 {
-  return min_prog_sz(prog_index);
+  return settings.min_prog_sz(prog_index);
 }
 
 namespace

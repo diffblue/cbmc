@@ -46,7 +46,7 @@ void encoded_danger_learn_configt::show_candidate(messaget::mstreamt &os,
     const candidatet &candidate)
 {
   const danger_programt &prog=danger_learn_config.get_danger_program();
-  const danger_learn_configt::danger_variable_idst &vars=
+  const danger_learn_configt::invariant_variable_idst &vars=
       danger_learn_config.get_vars();
   danger_goto_solutiont converted;
   create_danger_solution(converted, prog, candidate, vars);

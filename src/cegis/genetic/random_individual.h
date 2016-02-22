@@ -24,36 +24,20 @@ class random_individualt
 {
   const typet type;
   instruction_set_info_factoryt info_factory;
-  const std::function<size_t(size_t)> min_prog_sz;
-  const std::function<size_t(size_t)> max_prog_sz;
-  const std::function<size_t(void)> num_progs;
-  const std::function<size_t(void)> num_vars;
-  const std::function<size_t(void)> num_consts;
-  const std::function<size_t(void)> num_x0;
+  class genetic_settingst &settings;
 public:
   /**
    * @brief
    *
    * @details
    *
-   * @param seed
    * @param type
    * @param instruction_set_info_factory
-   * @param min_prog_sz
-   * @param max_prog_sz
-   * @param num_progs
-   * @param num_vars
-   * @param num_consts
-   * @param num_x0
+   * @param settings
    */
-  random_individualt(unsigned int seed, const typet &type,
+  random_individualt(const typet &type,
       const instruction_set_info_factoryt &info_factory,
-      const std::function<size_t(size_t)> &min_prog_sz,
-      const std::function<size_t(size_t)> &max_prog_sz,
-      const std::function<size_t(void)> &get_num_progs,
-      const std::function<size_t(void)> &num_vars,
-      const std::function<size_t(void)> &num_consts,
-      const std::function<size_t(void)> &num_x0);
+      genetic_settingst &settings);
 
   /**
    * @brief

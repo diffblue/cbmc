@@ -5,11 +5,11 @@
 #include <goto-programs/goto_trace.h>
 
 #include <cegis/value/program_individual.h>
+#include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/danger/value/danger_goto_solution.h>
 #include <cegis/danger/options/danger_program.h>
-#include <cegis/danger/util/danger_program_helper.h>
 #include <cegis/danger/meta/literals.h>
-#include <cegis/danger/instrument/meta_variables.h>
+#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/danger/symex/learn/read_x0.h>
 
 namespace
@@ -22,7 +22,7 @@ bool is_placeholder_of(const goto_programt::targett &x0,
     return false;
   std::string placeholder_base(DANGER_X0_PLACEHOLDER_PREFIX);
   placeholder_base+=id2string(get_affected_variable(*x0));
-  const std::string placeholder_name(get_danger_meta_name(placeholder_base));
+  const std::string placeholder_name(get_invariant_meta_name(placeholder_base));
   return placeholder_name == id2string(get_affected_variable(placeholder_instr));
 }
 

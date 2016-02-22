@@ -1,10 +1,9 @@
 #include <algorithm>
-#include <iterator>
 
 #include <util/expr_util.h>
 
-#include <cegis/danger/util/danger_program_helper.h>
-#include <cegis/danger/symex/verify/insert_constraint.h>
+#include <cegis/invariant/util/invariant_constraint_variables.h>
+#include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/seed/literals_seed.h>
 
 danger_literals_seedt::danger_literals_seedt(const danger_programt &prog) :
@@ -152,7 +151,7 @@ public:
     keyst newKey;
     newKey.insert(id);
     const init_pool_keyst add(newKey, id);
-    const goto_programt &body=get_danger_body(prog.gf);
+    const goto_programt &body=get_entry_body(prog.gf);
     const goto_programt::instructionst &instrs=body.instructions;
     std::for_each(instrs.begin(), instrs.end(), add);
     it=pool.insert(std::make_pair(newKey, valuest())).first;
@@ -240,7 +239,7 @@ public:
   {
     const create_pool_keyst create_keys(prog, pool);
     std::for_each(vars.begin(), vars.end(), create_keys);
-    const goto_programt &body=get_danger_body(prog.gf);
+    const goto_programt &body=get_entry_body(prog.gf);
     const goto_programt::instructionst &instr=body.instructions;
     const scrape_literalst scrape(pool);
     std::for_each(instr.begin(), instr.end(), scrape);
@@ -292,7 +291,7 @@ void danger_literals_seedt::operator()(
 {
   if (seeded) return;
   constraint_varst vars;
-  get_danger_constraint_vars(vars, prog);
+  get_invariant_constraint_vars(vars, prog);
   const value_poolt pool(prog, vars);
   pool.seed(counterexamples);
   seeded=true;

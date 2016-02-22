@@ -1,6 +1,5 @@
 #include <cstdlib>
 #include <fstream>
-#include <stdexcept>
 
 #ifndef _WIN32
 #include <sys/wait.h>
@@ -9,6 +8,7 @@
 #include <util/bv_arithmetic.h>
 #include <util/mp_arith.h>
 
+#include <cegis/invariant/meta/literals.h>
 #include <cegis/genetic/concrete_test_runner.h>
 
 #define EXECUTABLE_PREFIX "test_runner"
@@ -33,20 +33,20 @@ void implement_deserialise(std::string &source)
 {
   source+=
       "#include <stdlib.h>\n\n"
-          "#define __CPROVER_cegis_next_arg() atol(argv[__CPROVER_cegis_deserialise_index++])\n"
-          "#define __CPROVER_cegis_deserialise_init() unsigned int __CPROVER_cegis_deserialise_index=1u+__CPROVER_cegis_first_prog_offset\n"
-          "#define __CPROVER_cegis_declare_prog(var_name, sz) const size_t sz=__CPROVER_cegis_next_arg(); \\\n"
-          "  struct __CPROVER_danger_instructiont var_name[sz]; \\\n"
-          "for (unsigned int i=0; i < sizeof(var_name) / sizeof(struct __CPROVER_danger_instructiont); ++i) \\\n"
+          "#define " CEGIS_PREFIX "next_arg() atol(argv[__CPROVER_cegis_deserialise_index++])\n"
+          "#define " CEGIS_PREFIX "deserialise_init() unsigned int __CPROVER_cegis_deserialise_index=1u+__CPROVER_cegis_first_prog_offset\n"
+          "#define " CEGIS_PREFIX "declare_prog(var_name, sz) const size_t sz=__CPROVER_cegis_next_arg(); \\\n"
+          "  struct " CEGIS_PREFIX "instructiont var_name[sz]; \\\n"
+          "for (unsigned int i=0; i < sizeof(var_name) / sizeof(struct " CEGIS_PREFIX "instructiont); ++i) \\\n"
           "{ \\\n"
-          "  var_name[i].opcode=__CPROVER_cegis_next_arg(); \\\n"
-          "  var_name[i].op0=__CPROVER_cegis_next_arg(); \\\n"
-          "  var_name[i].op1=__CPROVER_cegis_next_arg(); \\\n"
-          "  var_name[i].op2=__CPROVER_cegis_next_arg(); \\\n"
+          "  var_name[i].opcode=" CEGIS_PREFIX "next_arg(); \\\n"
+          "  var_name[i].op0=" CEGIS_PREFIX "next_arg(); \\\n"
+          "  var_name[i].op1=" CEGIS_PREFIX "next_arg(); \\\n"
+          "  var_name[i].op2=" CEGIS_PREFIX "next_arg(); \\\n"
           "}\n"
-          "#define __CPROVER_cegis_deserialise_x0(var_name) var_name=__CPROVER_cegis_next_arg()\n"
-          "#define __CPROVER_cegis_ce_value_init() unsigned int __CPROVER_cegis_ce_index=1u\n"
-          "#define __CPROVER_cegis_ce_value() atol(argv[__CPROVER_cegis_ce_index++])\n";
+          "#define " CEGIS_PREFIX "deserialise_x0(var_name) var_name=" CEGIS_PREFIX "next_arg()\n"
+          "#define " CEGIS_PREFIX "ce_value_init() unsigned int " CEGIS_PREFIX "ce_index=1u\n"
+          "#define " CEGIS_PREFIX "ce_value() atol(argv[" CEGIS_PREFIX "ce_index++])\n";
 
 }
 
@@ -56,7 +56,7 @@ void write_file(const char * const path, const std::string &content)
   ofs << content;
 }
 
-#define COMPILE_COMMAND "gcc -std=c99 -g0 -O3 "
+#define COMPILE_COMMAND "gcc -std=c99 -g0 -O2 "
 #define ARTIFACT_SEPARATOR " -o "
 #define COMPLING_FAILED "Compiling test runner failed."
 

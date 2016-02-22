@@ -1,9 +1,9 @@
 #include <algorithm>
 
+#include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/danger/options/danger_program.h>
-#include <cegis/danger/util/danger_program_helper.h>
 #include <cegis/danger/meta/literals.h>
-#include <cegis/danger/instrument/meta_variables.h>
+#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/danger/symex/learn/add_x0_placeholders.h>
 
 namespace
@@ -36,15 +36,14 @@ public:
   void operator()(const goto_programt::targett &target) const
   {
     const irep_idt &x0_name=get_affected_variable(*target);
-    std::string
-    base_name(DANGER_X0_PLACEHOLDER_PREFIX);
+    std::string base_name(DANGER_X0_PLACEHOLDER_PREFIX);
     base_name+=id2string(x0_name);
-    goto_programt::targett pos=prog.danger_range.begin;
+    goto_programt::targett pos=prog.invariant_range.begin;
     const typet &type=get_type(target);
-    declare_danger_variable(st, gf, --pos, base_name, type);
-    const std::string full_name(get_danger_meta_name (base_name));
+    declare_invariant_variable(st, gf, --pos, base_name, type);
+    const std::string full_name(get_invariant_meta_name(base_name));
     const symbol_exprt placeholder(full_name, type);
-    danger_assign_user_variable(st, gf, target, x0_name, placeholder);
+    invariant_assign_user_variable(st, gf, target, x0_name, placeholder);
   }
 };
 }

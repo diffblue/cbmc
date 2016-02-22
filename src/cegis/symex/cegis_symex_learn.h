@@ -10,6 +10,8 @@
 #ifndef CEGIS_DANGER_CEGIS_SYMEX_LEARN_H_
 #define CEGIS_DANGER_CEGIS_SYMEX_LEARN_H_
 
+#include <goto-programs/safety_checker.h>
+
 /**
  * @brief
  *

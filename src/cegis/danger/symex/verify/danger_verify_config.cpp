@@ -1,10 +1,10 @@
 #include <algorithm>
-#include <iterator>
 
 #include <cegis/wordsize/restrict_bv_size.h>
-#include <cegis/danger/symex/verify/insert_constraint.h>
+#include <cegis/invariant/symex/verify/extract_counterexample.h>
+#include <cegis/invariant/symex/verify/insert_constraint.h>
+#include <cegis/danger/constraint/danger_constraint_factory.h>
 #include <cegis/danger/symex/verify/insert_candidate.h>
-#include <cegis/danger/symex/verify/extract_counterexample.h>
 #include <cegis/danger/symex/verify/danger_verify_config.h>
 
 danger_verify_configt::danger_verify_configt(const danger_programt &program) :
@@ -20,7 +20,7 @@ void danger_verify_configt::process(const candidatet &candidate)
 {
   program=original_program;
   quantifiers.clear();
-  danger_insert_constraint(quantifiers, program);
+  invariant_insert_constraint(quantifiers, program, create_danger_constraint);
   danger_insert_candidate(program, candidate);
   goto_functionst &gf=program.gf;
   if (limit_ce) restrict_bv_size(program.st, gf, max_ce_width);
@@ -46,7 +46,7 @@ void danger_verify_configt::convert(counterexamplest &counterexamples,
     const goto_tracet &trace)
 {
   counterexamples.push_back(counterexamplet());
-  danger_extract_counterexample(counterexamples.back(), trace, quantifiers);
+  invariant_extract_counterexample(counterexamples.back(), trace, quantifiers);
 }
 
 size_t danger_verify_configt::get_number_of_loops() const

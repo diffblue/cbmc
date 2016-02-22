@@ -4,9 +4,11 @@
 
 #include <goto-programs/goto_inline.h>
 
-#include <cegis/danger/preprocess/remove_loops_and_assertion.h>
+#include <cegis/invariant/preprocess/remove_loops_and_assertion.h>
+#include <cegis/invariant/preprocess/add_invariants_and_temp_variables.h>
+#include <cegis/danger/meta/meta_variable_names.h>
+#include <cegis/danger/preprocess/add_ranking_and_skolem_variables.h>
 #include <cegis/danger/preprocess/store_nondet_choices.h>
-#include <cegis/danger/preprocess/add_invariants_and_temp_variables.h>
 #include <cegis/danger/preprocess/danger_preprocessing.h>
 
 danger_preprocessingt::danger_preprocessingt(optionst &options,
@@ -42,8 +44,9 @@ void danger_preprocessingt::operator ()()
   null_message_handlert null_msg;
   goto_functionst &gf=original_program.gf;
   goto_inline(gf, ns, null_msg);
-  danger_remove_loops_and_assertion(original_program);
+  invariant_remove_loops_and_assertion(original_program);
   store_skolem_choices(original_program);
+  store_x0_choices(original_program);
   gf.update();
   current_program=original_program;
 }
@@ -53,8 +56,9 @@ void danger_preprocessingt::operator ()(const size_t max_length)
   current_program=original_program;
   const unsigned int max_width=constant_strategy(current_program, max_length);
   options.set_option("max-constant-width", max_width);
-  store_x0_choices(current_program);
-  add_danger_invariants_and_temp_variables(current_program, max_length);
+  create_tmp_variables(current_program, max_length);
+  add_invariant_variables(current_program, get_Dx0(), get_Dx, get_Dx_prime);
+  add_ranking_and_skolem_variables(current_program, max_length);
 }
 
 const danger_programt &danger_preprocessingt::get_danger_program() const

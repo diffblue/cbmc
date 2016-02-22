@@ -1,7 +1,7 @@
 #include <algorithm>
 
+#include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/danger/options/danger_program.h>
-#include <cegis/danger/util/danger_program_helper.h>
 #include <cegis/danger/value/danger_goto_solution.h>
 #include <cegis/danger/options/danger_program_printer.h>
 
@@ -15,7 +15,7 @@ class danger_program_printert
   size_t func_count;
 public:
   danger_program_printert(const danger_programt &prog, messaget::mstreamt &os) :
-      ns(prog.st), body_printer(get_danger_body(prog.gf)), os(os), func_count(0)
+      ns(prog.st), body_printer(get_entry_body(prog.gf)), os(os), func_count(0)
   {
   }
 
