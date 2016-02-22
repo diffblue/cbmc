@@ -253,7 +253,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
 
   if(expr.type().id()==ID_signedbv)
   {
-    unsigned width=to_signedbv_type(expr.type()).get_width();
+    std::size_t width=to_signedbv_type(expr.type()).get_width();
     if(width >= config.ansi_c.int_width)
       return false;
     new_expr = expr;
@@ -263,7 +263,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
 
   if(expr.type().id()==ID_unsignedbv)
   {
-    unsigned width=to_unsignedbv_type(expr.type()).get_width();
+    std::size_t width=to_unsignedbv_type(expr.type()).get_width();
     if(width >= config.ansi_c.int_width)
       return false;
     new_expr = expr;
@@ -311,7 +311,7 @@ bool cpp_typecheckt::standard_conversion_floating_point_promotion(
   if(expr.type()!=float_type())
     return false;
 
-  unsigned width=to_floatbv_type(expr.type()).get_width();
+  std::size_t width=to_floatbv_type(expr.type()).get_width();
 
   if(width!=config.ansi_c.single_width)
     return false;
