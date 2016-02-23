@@ -372,7 +372,7 @@ bool symex_parse_optionst::get_goto_program(
            symbol_table, goto_functions, get_message_handler()))
         return true;
         
-      config.ansi_c.set_from_symbol_table(symbol_table);
+      config.set_from_symbol_table(symbol_table);
 
       if(cmdline.isset("show-symbol-table"))
       {
