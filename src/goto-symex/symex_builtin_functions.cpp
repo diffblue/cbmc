@@ -234,6 +234,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
 
   exprt tmp=code.op0();
   state.rename(tmp, ns); // to allow constant propagation
+  do_simplify(tmp);
   irep_idt id=get_symbol(tmp);
 
   exprt rhs=gen_zero(lhs.type());
@@ -346,6 +347,7 @@ void goto_symext::symex_printf(
 
   exprt tmp_rhs=rhs;
   state.rename(tmp_rhs, ns);
+  do_simplify(tmp_rhs);
 
   const exprt::operandst &operands=tmp_rhs.operands();
   std::list<exprt> args;
@@ -391,6 +393,7 @@ void goto_symext::symex_input(
   {
     args.push_back(code.operands()[i]);
     state.rename(args.back(), ns);
+    do_simplify(args.back());
   }
 
   const irep_idt input_id=get_string_argument(id_arg, ns);
@@ -427,6 +430,7 @@ void goto_symext::symex_output(
   {
     args.push_back(code.operands()[i]);
     state.rename(args.back(), ns);
+    do_simplify(args.back());
   }
 
   const irep_idt output_id=get_string_argument(id_arg, ns);
