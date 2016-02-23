@@ -28,8 +28,6 @@ string_constantt::string_constantt():
   exprt(ID_string_constant)
 {
   set_value(irep_idt());
-  type()=array_typet();
-  type().subtype()=char_type();
 }
 
 /*******************************************************************\
@@ -48,8 +46,6 @@ string_constantt::string_constantt(const irep_idt &_value):
   exprt(ID_string_constant)
 {
   set_value(_value);
-  type()=array_typet();
-  type().subtype()=char_type();
 }
 
 /*******************************************************************\
@@ -67,7 +63,7 @@ Function: string_constantt::set_value
 void string_constantt::set_value(const irep_idt &value)
 {
   exprt size_expr=from_integer(value.size()+1, index_type());
-  type().add(ID_size).swap(size_expr);
+  type()=array_typet(char_type(), size_expr);
   set(ID_value, value);
 }
 
@@ -93,9 +89,7 @@ array_exprt string_constantt::to_array_expr() const
   exprt size=from_integer(string_size, index_type());
 
   array_exprt dest;
-  dest.type()=array_typet();
-  dest.type().subtype()=char_type;
-  dest.type().set(ID_size, size);
+  dest.type()=array_typet(char_type, size);
 
   dest.operands().resize(string_size);
 
