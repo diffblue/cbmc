@@ -165,14 +165,11 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
   // the member might be in a parent class
   const irep_idt component_name=expr.get_component_name();
 
-  assert(expr.struct_op().type().id()==ID_symbol);
-  
   while(1)
   {
-    const symbolt &class_symbol=ns.lookup(
-      to_symbol_type(expr.struct_op().type()));
-      
-    const struct_typet &struct_type=to_struct_type(class_symbol.type);
+    // TODO handle vtables
+    const struct_typet &struct_type=
+      to_struct_type(ns.follow(expr.struct_op().type()));
 
     if(struct_type.has_component(component_name))
       return; // done
