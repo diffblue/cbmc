@@ -51,6 +51,8 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
     code_ifthenelset &code_ifthenelse=to_code_ifthenelse(code);
     typecheck_expr(code_ifthenelse.cond());
     typecheck_code(code_ifthenelse.then_case());
+    if(code_ifthenelse.else_case().is_not_nil())
+      typecheck_code(code_ifthenelse.else_case());
   }
   else if(statement==ID_return)
   {
