@@ -923,6 +923,22 @@ declaring_list:
           $$=$4;
           to_ansi_c_declaration(stack($$)).add_initializer(stack($5));
         }
+        | TOK_GCC_AUTO_TYPE declarator
+          post_declarator_attributes_opt '=' initializer
+        {
+          // handled as typeof(initializer)
+          stack($1).id(ID_typeof);
+          stack($1).copy_to_operands(stack($5));
+
+          $2=merge($3, $2);
+
+          // the symbol has to be visible during initialization
+          init($$, ID_declaration);
+          stack($$).type().swap(stack($1));
+          PARSER.add_declarator(stack($$), stack($2));
+          // add the initializer
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($5));
+        }
         | declaring_list ',' declarator
           post_declarator_attributes_opt
           {
