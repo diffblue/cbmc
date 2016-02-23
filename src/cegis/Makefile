@@ -34,19 +34,49 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       genetic/random_individual.cpp genetic/genetic_constant_strategy.cpp instructions/instruction_set_factory.cpp \
       genetic/concrete_test_runner.cpp genetic/dynamic_test_runner_helper.cpp genetic/genetic_settings.cpp \
       cegis-util/task_pool.cpp cegis-util/constant_width.cpp cegis-util/irep_pipe.cpp \
-      ../goto-instrument/dump_c.cpp ../goto-instrument/goto_program2code.cpp
+      runner/cegis_parse_options.cpp runner/cegis_main.cpp \
+      ../goto-instrument/dump_c.cpp ../goto-instrument/goto_program2code.cpp \
+      ../cbmc/cbmc_parse_options.cpp ../cbmc/bmc.cpp ../cbmc/cbmc_solvers.cpp ../cbmc/symex_bmc.cpp \
+      ../cbmc/xml_interface.cpp ../cbmc/cover.cpp ../cbmc/bv_cbmc.cpp ../cbmc/counterexample_beautification.cpp \
+      ../cbmc/cbmc_languages.cpp ../cbmc/show_vcc.cpp ../cbmc/cbmc_dimacs.cpp ../cbmc/all_properties.cpp
+
+OBJ += ../ansi-c/ansi-c$(LIBEXT) \
+      ../cpp/cpp$(LIBEXT) \
+      ../java_bytecode/java_bytecode$(LIBEXT) \
+      ../linking/linking$(LIBEXT) \
+      ../big-int/big-int$(LIBEXT) \
+      ../goto-programs/goto-programs$(LIBEXT) \
+      ../goto-symex/goto-symex$(LIBEXT) \
+      ../pointer-analysis/value_set$(OBJEXT) \
+      ../pointer-analysis/value_set_analysis_fi$(OBJEXT) \
+      ../pointer-analysis/value_set_domain_fi$(OBJEXT) \
+      ../pointer-analysis/value_set_fi$(OBJEXT) \
+      ../pointer-analysis/value_set_dereference$(OBJEXT) \
+      ../pointer-analysis/dereference_callback$(OBJEXT) \
+      ../pointer-analysis/add_failed_symbols$(OBJEXT) \
+      ../pointer-analysis/rewrite_index$(OBJEXT) \
+      ../pointer-analysis/goto_program_dereference$(OBJEXT) \
+      ../goto-instrument/full_slicer$(OBJEXT) \
+      ../analyses/analyses$(LIBEXT) \
+      ../langapi/langapi$(LIBEXT) \
+      ../xmllang/xmllang$(LIBEXT) \
+      ../assembler/assembler$(LIBEXT) \
+      ../solvers/solvers$(LIBEXT) \
+      ../util/util$(LIBEXT)
 
 INCLUDES= -I ..
+
+LIBS = $(DLFCN_LINKFLAGS)
 
 include ../config.inc
 include ../common
 
-CLEANFILES = cegis$(LIBEXT)
+CLEANFILES = cegis$(EXEEXT)
 
-all: cegis$(LIBEXT)
+all: cegis$(EXEEXT)
 
 ###############################################################################
 
-cegis$(LIBEXT): $(OBJ)
-	$(LINKLIB)
+cegis$(EXEEXT): $(OBJ)
+	$(LINKBIN)
 

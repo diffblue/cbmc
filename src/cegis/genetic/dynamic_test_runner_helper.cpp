@@ -123,6 +123,8 @@ void prepare_fitness_tester_library(fitness_lib_handlet &handle,
     perror(error);
     throw std::runtime_error(LOAD_FUNC_FAILED);
   }
+  #else
+  assert(!"Dynamic library loading currently not supported on Windows.");
   #endif
 }
 
