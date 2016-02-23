@@ -962,7 +962,7 @@ Function: smt2_convt::type2id
 
 \*******************************************************************/
 
-std::string smt2_convt::type2id(const typet &type)
+std::string smt2_convt::type2id(const typet &type) const
 {
   if(type.id()==ID_floatbv)
   {
@@ -987,7 +987,7 @@ std::string smt2_convt::type2id(const typet &type)
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    return type2id(type.subtype());
+    return type2id(ns.follow_tag(to_c_enum_tag_type(type)).subtype());
   }
   else
   {
@@ -1008,7 +1008,7 @@ Function: smt2_convt::floatbv_suffix
 
 \*******************************************************************/
 
-std::string smt2_convt::floatbv_suffix(const exprt &expr)
+std::string smt2_convt::floatbv_suffix(const exprt &expr) const
 {
   assert(!expr.operands().empty());
   return "_"+type2id(expr.op0().type())+"->"+type2id(expr.type());
@@ -2613,7 +2613,8 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
       // We first convert to 'underlying type'
       floatbv_typecast_exprt tmp=expr;
-      tmp.op()=typecast_exprt(src, src_type.subtype());
+      tmp.op()=typecast_exprt(src,
+                              ns.follow_tag(to_c_enum_tag_type(src_type)).subtype());
       convert_floatbv_typecast(tmp);
     }
     else

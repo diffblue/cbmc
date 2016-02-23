@@ -153,7 +153,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
     {
       // gcc allows this, but clang doesn't.
       // We ignore for now.
-      type=type.subtype();
+      if(underlying_type.id()==ID_c_enum_tag)
+        type=follow_tag(to_c_enum_tag_type(underlying_type)).subtype();
+      else
+        type=type.subtype();
     }
     else if(underlying_type.id()==ID_floatbv)
     {
@@ -1092,11 +1095,6 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       bits=config.ansi_c.int_width;
   }
   
-  // We use a subtype to store signed and width
-
-  type.subtype().id(is_signed?ID_signedbv:ID_unsignedbv);
-  type.subtype().set(ID_width, bits);
-  
   // tag?
   if(type.find(ID_tag).is_nil())
   {
@@ -1143,6 +1141,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       it++)
     body.push_back(*it);
 
+  // We use a subtype to store signed and width
+  enum_tag_symbol.type.subtype().id(is_signed?ID_signedbv:ID_unsignedbv);
+  enum_tag_symbol.type.subtype().set(ID_width, bits);
+
   // is it in the symbol table already?
   symbol_tablet::symbolst::iterator s_it=
     symbol_table.symbols.find(identifier);
@@ -1182,8 +1184,6 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   }
 
   // We produce a c_enum_tag as the resulting type.
-  // This retains the subtype; we may want to have
-  // that differ from the subtype of the c_enum type.
   type.id(ID_c_enum_tag);
   type.remove(ID_tag);
   type.set(ID_identifier, identifier);
@@ -1226,13 +1226,8 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     // Yes.
     const symbolt &symbol=s_it->second;
     
-    if(symbol.type.id()==ID_c_enum ||
-       symbol.type.id()==ID_incomplete_c_enum)
-    {
-      // copy subtype into tag
-      type.subtype()=symbol.type.subtype();
-    }
-    else
+    if(symbol.type.id()!=ID_c_enum &&
+       symbol.type.id()!=ID_incomplete_c_enum)
     {
       err_location(source_location);
       throw "use of tag that does not match previous declaration";
@@ -1256,8 +1251,6 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     
     symbolt *new_symbol;
     move_symbol(enum_tag_symbol, new_symbol);
-    
-    type.subtype()=new_type.subtype();
   }
   
   // Clean up resulting type
