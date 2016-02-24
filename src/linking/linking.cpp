@@ -177,7 +177,7 @@ void linkingt::detailed_conflict_report_rec(
 {
   #ifdef DEBUG
   str << "<BEGIN DEPTH " << depth << ">";
-  debug();
+  debug_msg();
   #endif
 
   std::string msg;
@@ -380,7 +380,7 @@ void linkingt::detailed_conflict_report_rec(
 
   #ifdef DEBUG
   str << "<END DEPTH " << depth << ">";
-  debug();
+  debug_msg();
   #endif
 }
 
@@ -1113,8 +1113,8 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
       {
         queue.push(*d_it);
         #ifdef DEBUG
-        str << "LINKING: needs to be renamed (dependency): " << s_it->first;
-        debug();
+        str << "LINKING: needs to be renamed (dependency): " << *d_it;
+        debug_msg();
         #endif
       }
   }
@@ -1147,7 +1147,7 @@ void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
     #ifdef DEBUG
     str << "LINKING: renaming " << *it << " to "
         << new_identifier;
-    debug();
+    debug_msg();
     #endif
 
     if(new_symbol.is_type)
@@ -1255,7 +1255,7 @@ void linkingt::typecheck()
       needs_to_be_renamed.insert(s_it->first);
       #ifdef DEBUG
       str << "LINKING: needs to be renamed: " << s_it->first;
-      debug();
+      debug_msg();
       #endif
     }
   }
