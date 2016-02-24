@@ -1134,6 +1134,8 @@ Function: linkingt::rename_symbols
 
 void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
 {
+  namespacet src_ns(src_symbol_table);
+
   for(id_sett::const_iterator
       it=needs_to_be_renamed.begin();
       it!=needs_to_be_renamed.end();
@@ -1141,7 +1143,13 @@ void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
   {
     symbolt &new_symbol=src_symbol_table.symbols[*it];
 
-    irep_idt new_identifier=rename(*it);
+    irep_idt new_identifier;
+
+    if(new_symbol.is_type)
+      new_identifier=type_to_name(src_ns, *it, new_symbol.type);
+    else
+      new_identifier=rename(*it);
+
     new_symbol.name=new_identifier;
     
     #ifdef DEBUG
