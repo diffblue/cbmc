@@ -527,7 +527,7 @@ bool simplify_exprt::simplify_minus(exprt &expr)
     simplify_unary_minus(tmp2);
 
     plus_exprt tmp(operands[0], tmp2);
-    simplify_plus(tmp);
+    simplify_node(tmp);
 
     expr.swap(tmp);
     return false;
