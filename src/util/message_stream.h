@@ -86,6 +86,13 @@ public:
     sequence_number++;
   }
   
+  void debug_msg()
+  {
+    send_msg(9, str.str());
+    clear_err();
+    sequence_number++;
+  }
+
   std::ostringstream str;
   
   bool get_error_found() const
