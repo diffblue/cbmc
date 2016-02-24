@@ -1953,7 +1953,7 @@ type_name:
 initializer_opt:
         /* nothing */
         {
-          newstack($$);
+          init($$);
           stack($$).make_nil();
         }
         | '=' initializer
