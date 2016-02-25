@@ -160,6 +160,10 @@ bool java_bytecode_languaget::typecheck(
       return true;
   }
 
+  // Construct vtable symbols before typecheck
+  if (java_bytecode_vtable(symbol_table, module))
+    return true;
+
   // now typecheck all
   if(java_bytecode_typecheck(
        symbol_table, get_message_handler()))
