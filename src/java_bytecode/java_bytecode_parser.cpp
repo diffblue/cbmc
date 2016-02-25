@@ -591,7 +591,7 @@ void java_bytecode_parsert::rinterfaces(classt &parsed_class)
   u2 interfaces_count=read_u2();
 
   for(unsigned i=0; i<interfaces_count; i++)
-    parsed_class.implements.push_back(pool_entry(read_u2()).s);
+    parsed_class.implements.push_back(constant(read_u2()).type().get(ID_C_base_name));
 }
 
 /*******************************************************************\
