@@ -1,7 +1,7 @@
 interface A
 {
   public void f();
-};
+}
 
 class B implements A
 {
@@ -9,14 +9,20 @@ class B implements A
   {
     assert false;
   }
-};
+}
+
+class C implements A
+{
+  public void f(){}
+}
 
 class virtual3
 {
   public static void main(String[] args)
   {
-    A a = new B();
-    a.f();
+    A b = new B();
+    A c = new C();
+    b.f();
   }
 }
 

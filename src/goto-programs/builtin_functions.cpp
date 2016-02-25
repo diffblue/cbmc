@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/pointer_offset_size.h>
 #include <util/vtable.h>
+#include <util/namespace_utils.h>
 
 #include <linking/zero_initializer.h>
 
@@ -545,61 +546,33 @@ symbol_exprt get_vt(const irep_idt &class_name) {
   return symbol_exprt(vt_name, vttype);
 }
 
-const dereference_exprt cast_if_necessary(const exprt &lhs,
-    const irep_idt &ptr_class, const irep_idt &vt_class) {
-  const symbol_typet class_type(vt_class);
-  if (ptr_class == vt_class) return dereference_exprt(lhs, class_type);
-  const symbol_typet target_type(ptr_class);
-  const typecast_exprt cast(lhs, pointer_typet(target_type));
-  return dereference_exprt(cast, target_type);
-}
-
-void assign_vtpointer(goto_programt &dest, const namespacet &ns,
-    const exprt &lhs, const irep_idt &ptr_class, const irep_idt &vt_class,
-    const source_locationt &location) {
-  const symbol_exprt ptr_vt(get_vt(ptr_class));
-  const symbol_exprt vt(get_vt(vt_class));
-  const dereference_exprt lhs_ref(cast_if_necessary(lhs, ptr_class, vt_class));
-  const std::string memb_name(vtnamest::get_pointer(id2string(ptr_class)));
-  const pointer_typet ptr_vt_type(ptr_vt.type());
-  const member_exprt vtmember(lhs_ref, memb_name, ptr_vt_type);
-  const address_of_exprt vtable_ptr(vt);
-  const goto_programt::targett instr(dest.add_instruction(ASSIGN));
-  instr->source_location = location;
-  if (ptr_class == vt_class) {
-    instr->code = code_assignt(vtmember, vtable_ptr);
-  } else {
-    const typecast_exprt cast(vtable_ptr, ptr_vt_type);
-    instr->code = code_assignt(vtmember, cast);
-  }
-}
-
 bool is_type_missing(const namespacet &ns, const symbol_typet &type)
 {
   return !ns.get_symbol_table().has_symbol(type.get_identifier());
 }
 
-void assign_vtpointers(goto_programt &dest, const namespacet &ns,
-    const exprt &lhs, const symbol_typet &class_type,
-    const source_locationt &location)
+exprt &get_vt_pointer_member(struct_exprt &expr)
+{
+  // We assume the first member is vt_pointer or super class object.
+  assert(expr.has_operands());
+  exprt &op0=expr.op0();
+  if (ID_struct != op0.id()) return op0;
+  return get_vt_pointer_member(to_struct_expr(op0));
+}
+
+void set_vt_pointer(struct_exprt &expr, const namespacet &ns,
+    const symbol_typet &class_type)
 {
   if (is_type_missing(ns, class_type)) return;
   const irep_idt &class_name(class_type.get_identifier());
-  const irep_idt vtname(vtnamest::get_table(id2string(class_name)));
-  if (ns.get_symbol_table().has_symbol(vtname)) {
-    const class_typet &full_class_type(to_class_type(ns.follow(class_type)));
-    const irept::subt &bases(full_class_type.bases());
-    for (irept::subt::const_iterator it=bases.begin(); it != bases.end(); ++it) {
-      const typet &type(static_cast<const typet &>(it->find(ID_type)));
-      const symbol_typet &parent_type(to_symbol_type(type));
-      if (is_type_missing(ns, parent_type)) continue;
-      const irep_idt &parent_name(parent_type.get_identifier());
-      const irep_idt parent_vtname(vtnamest::get_table(id2string(parent_name)));
-      if(!ns.get_symbol_table().has_symbol(parent_vtname)) continue;
-      assign_vtpointer(dest, ns, lhs, parent_name, class_name, location);
-    }
-    assign_vtpointer(dest, ns, lhs, class_name, class_name, location);
-  }
+  const symbol_exprt vt(get_vt(class_name));
+  exprt &vt_pointer_member=get_vt_pointer_member(expr);
+  const typet &member_type=vt_pointer_member.type();
+  const address_of_exprt vt_pointer(vt);
+  if (type_eq(member_type, vt_pointer.type(), ns))
+    vt_pointer_member=vt_pointer;
+  else
+    vt_pointer_member=typecast_exprt(vt_pointer, member_type);
 }
 }
 
@@ -647,11 +620,10 @@ void goto_convertt::do_java_new(
   // zero-initialize the object
   dereference_exprt deref(lhs, object_type);
   exprt zero_object=zero_initializer(object_type, location, ns, get_message_handler());
+  set_vt_pointer(to_struct_expr(zero_object), ns, to_symbol_type(object_type));
   goto_programt::targett t_i=dest.add_instruction(ASSIGN);
   t_i->code=code_assignt(deref, zero_object);
   t_i->source_location=location;
-
-  assign_vtpointers(dest, ns, lhs, to_symbol_type(object_type), location);
 }
 
 /*******************************************************************\

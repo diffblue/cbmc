@@ -20,8 +20,9 @@ class virtual4
 {
   public static void main(String[] args)
   {
-    A a = new C();
-    a.f();
+    A b = new B();
+    A c = new C();
+    c.f();
   }
 }
 
