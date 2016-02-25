@@ -7,6 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <unordered_set>
+#include <unordered_map>
 
 #include "base_type.h"
 #include "rational.h"
@@ -395,6 +397,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
     return true;
 
   bool result=true;
+  bool recurse_needed = false;
 
   exprt::operandst &operands=expr.operands();
 
@@ -511,6 +514,137 @@ bool simplify_exprt::simplify_plus(exprt &expr)
       }
     }
 
+
+    // Distributivity refactoring
+    typedef std::unordered_set<exprt, irep_hash> occurence_sett;
+    typedef std::unordered_map<exprt, occurence_sett, irep_hash> factorst;
+    typedef std::unordered_map<exprt, unsigned, irep_hash> occurence_countt;
+
+    // Build a map of the possible multiplicative factors
+    factorst fac;  // factors -> terms in sum they appear in
+    occurence_countt counts; // factors -> number of terms they appear in,
+                             // x + x gives 2 not 1
+    forall_expr(it, operands)
+    {
+      if(it->id()==ID_mult)
+      {
+        occurence_sett unique_factors; // x*x only adds 1 to x's count
+        forall_operands(jt, *it)
+        {
+          fac[*jt].insert(*it);
+          unique_factors.insert(*jt);
+        }
+
+        for(auto ui : unique_factors)
+          ++counts[ui];
+      }
+      else
+      {
+        // Needed for x*y + x -> x*(y + 1)
+        // and x + x + x + x -> x * 4
+        fac[*it].insert(*it);
+        ++counts[*it];
+      }
+    }
+
+    // heuristic : factor out the most common multiplicand ...
+    assert(!counts.empty());
+    occurence_countt::const_iterator max_occ = counts.begin();
+    for(occurence_countt::const_iterator i = counts.begin();
+        i != counts.end();
+        ++i)
+    {
+      if(i->second > max_occ->second &&
+          !i->first.is_constant())
+        max_occ = i;
+    }
+
+    factorst::iterator fold = fac.find(max_occ->first);
+    assert(fold != fac.end());
+
+    // ... if it appear at least twice
+    if(max_occ->second >= 2 && !max_occ->first.is_constant())
+    {
+      // std::cout << "Distributivity activated for "
+      //           << expr.pretty() << std::endl;
+      // std::cout << "Folding " << fold->first.pretty() << std::endl;
+
+      // Factor the terms containing fold
+      exprt::operandst factored;
+      factored.reserve(max_occ->second);
+
+      Forall_expr(it, operands)
+      {
+        if(fold->second.find(*it) != fold->second.end())
+        {
+          // Need to remove one instance of the folded term
+          // and add to the factored list
+          exprt tmp(*it);
+          *it = from_integer(0, it->type());
+
+          if(tmp == fold->first)
+          {
+            // Special case if the two expr is to be factored
+            factored.push_back(from_integer(1, it->type()));
+          }
+          else
+          {
+            assert(tmp.id() == ID_mult);
+
+            bool found = false;
+
+            Forall_operands(jt, tmp)
+            {
+              if(*jt == fold->first)
+              {
+                found = true;
+                *jt = from_integer(1, jt->type());
+                // Erase doesn't catch the unit case
+                break;
+              }
+            }
+            assert(found);
+
+            factored.push_back(tmp);
+          }
+        }
+      }
+
+      // Build the factored multiplication term
+      assert(factored.size() >= 2);
+
+      plus_exprt bracket(factored[0], factored[1]);
+
+      exprt::operandst::const_iterator it = factored.begin();
+      ++it; ++it;
+      while(it != factored.end())
+      {
+        bracket.operands().push_back(*it);
+        ++it;
+      }
+      // std::cout << "bracket" << std::endl
+      //           << bracket.pretty() << std::endl;
+
+
+      Forall_operands(jt, bracket)
+        simplify_node(*jt);  // To remove the '* 1' nodes
+      simplify_node(bracket);
+
+      mult_exprt completed(fold->first, bracket);
+      simplify_node(completed);
+
+      operands.push_back(completed);
+
+
+      // std::cout << "refactored expr" << std::endl
+      //           << expr.pretty() << std::endl;
+
+      // Simplify the new term to iterate the distributivity
+      recurse_needed = true;
+      result = false; // We have definitely changed things
+    }
+
+
     // delete zeros
     // (can't do for floats, as the result of 0.0 + (-0.0)
     // need not be -0.0 in std rounding)
@@ -540,6 +674,12 @@ bool simplify_exprt::simplify_plus(exprt &expr)
     exprt tmp(operands.front());
     expr.swap(tmp);
     return false;
+  }
+
+  if(recurse_needed)
+  {
+    // Do this late as otherwise it may destroy the operands reference
+    simplify_node(expr);
   }
 
   return result;
