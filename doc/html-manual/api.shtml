@@ -193,6 +193,12 @@ The function <b>__CPROVER_array_set</b> initializes the array <b>dest</b> with
 the given value.
 </p>
 
+<h4>Uninterpreted Functions</h4>
+
+<p class="justified">
+Uninterpreted functions are documented <a href="modeling-nondet.shtml">here</a>.
+</p>
+
 <h3>Predefined Types and Symbols</h3>
 
 <h4>__CPROVER_bitvector</h4>
@@ -303,6 +309,12 @@ This array models the contents of integer-addressed memory.
 <h4>__CPROVER::fixedbv<N> (C++ only)</h4>
 
 <p class="justified">This type is the equivalent of <b>__CPROVER_fixedbv[N,m]</b> in the C++ front-end.
+</p>
+
+<h3>Concurrency</h3>
+
+<p class="justified">
+Asynchronous threads are created by preceding an instruction with a label with the prefix <b>__CPROVER_ASYNC_</b>.
 </p>
 
 <!--#include virtual="footer.inc" -->
