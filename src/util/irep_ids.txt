@@ -715,3 +715,6 @@ noreturn
 C_noreturn #noreturn
 process
 signal
+C_spec_loop_invariant #spec_loop_invariant
+C_spec_requires #spec_requires
+C_spec_ensures #spec_ensures
