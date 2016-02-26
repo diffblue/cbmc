@@ -174,7 +174,7 @@ These functions return the absolute value of the given
 argument.
 </p>
 
-<h4>__CPROVER_array_equal, __CPROVER_array_copy, __CPROVER_array_copy</h4>
+<h4>__CPROVER_array_equal, __CPROVER_array_copy, __CPROVER_array_set</h4>
 
 <hr>
 <code>
