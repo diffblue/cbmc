@@ -83,6 +83,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "horn_encoding.h"
 #include "thread_instrumentation.h"
 #include "skip_loops.h"
+#include "code_contracts.h"
 
 /*******************************************************************\
 
@@ -922,6 +923,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_functions.update();
   }
     
+  // verify and set invariants and pre/post-condition pairs
+  if(cmdline.isset("apply-code-contracts"))
+  {
+    status() << "Applying Code Contracts" << eom;
+    code_contracts(symbol_table, goto_functions);
+  }
+
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
