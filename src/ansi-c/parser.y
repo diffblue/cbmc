@@ -165,6 +165,9 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_TRY "__CPROVER_try"
 %token TOK_CPROVER_FINALLY "__CPROVER_finally"
 %token TOK_CPROVER_ID  "__CPROVER_ID"
+%token TOK_CPROVER_LOOP_INVARIANT  "__CPROVER_loop_invariant"
+%token TOK_CPROVER_REQUIRES  "__CPROVER_requires"
+%token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_TRUE        "TRUE"
@@ -440,6 +443,27 @@ quantifier_expression:
           mto($$, $4);
           PARSER.pop_scope();
         }
+        ;
+
+loop_invariant_opt:
+        /* nothing */
+        { init($$); stack($$).make_nil(); }
+        | TOK_CPROVER_LOOP_INVARIANT '(' conditional_expression ')'
+        { $$=$3; }
+        ;
+
+requires_opt:
+        /* nothing */
+        { init($$); stack($$).make_nil(); }
+        | TOK_CPROVER_REQUIRES '(' conditional_expression ')'
+        { $$=$3; }
+        ;
+
+ensures_opt:
+        /* nothing */
+        { init($$); stack($$).make_nil(); }
+        | TOK_CPROVER_ENSURES '(' conditional_expression ')'
+        { $$=$3; }
         ;
 
 statement_expression: '(' compound_statement ')'
@@ -2241,21 +2265,29 @@ declaration_or_expression_statement:
         ;
 
 iteration_statement:
-        TOK_WHILE '(' comma_expression_opt ')' statement
+        TOK_WHILE '(' comma_expression_opt ')'
+          loop_invariant_opt statement
         {
           $$=$1;
           statement($$, ID_while);
           stack($$).operands().reserve(2);
           mto($$, $3);
-          mto($$, $5);
+          mto($$, $6);
+
+          if(stack($5).is_not_nil())
+            stack($$).add(ID_C_spec_loop_invariant).swap(stack($5));
         }
-        | TOK_DO statement TOK_WHILE '(' comma_expression ')' ';'
+        | TOK_DO statement TOK_WHILE '(' comma_expression ')'
+          loop_invariant_opt ';'
         {
           $$=$1;
           statement($$, ID_dowhile);
           stack($$).operands().reserve(2);
           mto($$, $5);
           mto($$, $2);
+
+          if(stack($7).is_not_nil())
+            stack($$).add(ID_C_spec_loop_invariant).swap(stack($7));
         }
         | TOK_FOR
           {
@@ -2269,6 +2301,7 @@ iteration_statement:
           '(' declaration_or_expression_statement
               comma_expression_opt ';'
               comma_expression_opt ')'
+              loop_invariant_opt
           statement
         {
           $$=$1;
@@ -2277,7 +2310,10 @@ iteration_statement:
           mto($$, $4);
           mto($$, $5);
           mto($$, $7);
-          mto($$, $9);
+          mto($$, $10);
+
+          if(stack($9).is_not_nil())
+            stack($$).add(ID_C_spec_loop_invariant).swap(stack($9));
 
           if(PARSER.for_has_scope)
             PARSER.pop_scope(); // remove the C99 for-scope
@@ -2665,8 +2701,14 @@ asm_definition:
 
 function_definition:
           function_head
+          requires_opt
+          ensures_opt
           function_body
         {
+          if(stack($2).is_not_nil())
+            stack($1).add(ID_C_spec_requires).swap(stack($2));
+          if(stack($3).is_not_nil())
+            stack($1).add(ID_C_spec_ensures).swap(stack($3));
           // The head is a declaration with one declarator,
           // and the body becomes the 'value'.
           $$=$1;
@@ -2674,7 +2716,7 @@ function_definition:
             to_ansi_c_declaration(stack($$));
             
           assert(ansi_c_declaration.declarators().size()==1);
-          ansi_c_declaration.add_initializer(stack($2));
+          ansi_c_declaration.add_initializer(stack($4));
           
           // Kill the scope that 'function_head' creates.
           PARSER.pop_scope();

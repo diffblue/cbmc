@@ -1067,6 +1067,9 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 "__CPROVER_try"          { loc(); return TOK_CPROVER_TRY; }
 "__CPROVER_finally"      { loc(); return TOK_CPROVER_FINALLY; }
 "__CPROVER_ID"           { loc(); return TOK_CPROVER_ID; }
+"__CPROVER_loop_invariant" { loc(); return TOK_CPROVER_LOOP_INVARIANT; }
+"__CPROVER_requires"     { loc(); return TOK_CPROVER_REQUIRES; }
+"__CPROVER_ensures"      { loc(); return TOK_CPROVER_ENSURES; }
 
 "\x22\x00" |
 "\\forall"      { /* Non-standard, obviously. Found in ACSL syntax. */

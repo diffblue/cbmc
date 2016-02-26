@@ -586,6 +586,8 @@ void c_typecheck_baset::typecheck_for(codet &code)
     code.swap(code_block);
     typecheck_code(code); // recursive call
   }
+
+  typecheck_spec_expr(code, ID_C_spec_loop_invariant);
 }
 
 /*******************************************************************\
@@ -956,6 +958,8 @@ void c_typecheck_baset::typecheck_while(code_whilet &code)
   // restore flags
   break_is_allowed=old_break_is_allowed;
   continue_is_allowed=old_continue_is_allowed;
+
+  typecheck_spec_expr(code, ID_C_spec_loop_invariant);
 }
 
 /*******************************************************************\
@@ -997,4 +1001,33 @@ void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
   // restore flags
   break_is_allowed=old_break_is_allowed;
   continue_is_allowed=old_continue_is_allowed;
+
+  typecheck_spec_expr(code, ID_C_spec_loop_invariant);
 }
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_spec_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_spec_expr(
+  codet &code,
+  const irep_idt &spec)
+{
+  if(code.find(spec).is_not_nil())
+  {
+    exprt &constraint=
+      static_cast<exprt&>(code.add(spec));
+
+    typecheck_expr(constraint);
+    implicit_typecast_bool(constraint);
+  }
+}
+
