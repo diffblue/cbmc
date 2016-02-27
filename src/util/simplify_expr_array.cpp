@@ -117,12 +117,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
         return false;
       }
 
-      exprt if_expr(ID_if, expr.type());
-      if_expr.reserve_operands(3);
-      if_expr.move_to_operands(equality_expr);
-      if_expr.copy_to_operands(with_expr.op2());
-      if_expr.move_to_operands(new_index_expr);
-
+      if_exprt if_expr(equality_expr, with_expr.op2(), new_index_expr);
       simplify_if(if_expr);
 
       expr.swap(if_expr);
