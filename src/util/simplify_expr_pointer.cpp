@@ -258,18 +258,11 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
   if(ptr.id()==ID_if && ptr.operands().size()==3)
   {
-    const if_exprt &if_expr=to_if_expr(ptr);
-
-    exprt tmp_op1=expr;
-    tmp_op1.op0()=if_expr.true_case();
-    simplify_pointer_offset(tmp_op1);
-    exprt tmp_op2=expr;
-    tmp_op2.op0()=if_expr.false_case();
-    simplify_pointer_offset(tmp_op2);
-
-    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
-
-    simplify_if(expr);
+    if_exprt if_expr=lift_if(expr, 0);
+    simplify_pointer_offset(if_expr.true_case());
+    simplify_pointer_offset(if_expr.false_case());
+    simplify_if(if_expr);
+    expr.swap(if_expr);
 
     return false;
   }
@@ -583,18 +576,11 @@ bool simplify_exprt::simplify_dynamic_object(exprt &expr)
 
   if(op.id()==ID_if && op.operands().size()==3)
   {
-    const if_exprt &if_expr=to_if_expr(op);
-
-    exprt tmp_op1=expr;
-    tmp_op1.op0()=if_expr.true_case();
-    simplify_dynamic_object(tmp_op1);
-    exprt tmp_op2=expr;
-    tmp_op2.op0()=if_expr.false_case();
-    simplify_dynamic_object(tmp_op2);
-
-    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
-
-    simplify_if(expr);
+    if_exprt if_expr=lift_if(expr, 0);
+    simplify_dynamic_object(if_expr.true_case());
+    simplify_dynamic_object(if_expr.false_case());
+    simplify_if(if_expr);
+    expr.swap(if_expr);
 
     return false;
   }

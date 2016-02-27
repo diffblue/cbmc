@@ -452,7 +452,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     simplify_typecast(tmp_op1);
     simplify_typecast(tmp_op2);
     expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, expr_type);
-    simplify_if(expr);
+    simplify_if(to_if_expr(expr));
     return false;
   }
   #endif
@@ -764,7 +764,7 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
 
     expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
 
-    simplify_if(expr);
+    simplify_if(to_if_expr(expr));
 
     return false;
   }
@@ -2396,7 +2396,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
           expr.id()==ID_ge    || expr.id()==ID_le)
     result=simplify_inequality(expr) && result;
   else if(expr.id()==ID_if)
-    result=simplify_if(expr) && result;
+    result=simplify_if(to_if_expr(expr)) && result;
   else if(expr.id()==ID_lambda)
     result=simplify_lambda(expr) && result;
   else if(expr.id()==ID_with)

@@ -1271,18 +1271,11 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
 
   if(tmp0.id()==ID_if && tmp0.operands().size()==3)
   {
-    const if_exprt &if_expr=to_if_expr(tmp0);
-
-    exprt tmp_op1=expr;
-    tmp_op1.op0()=if_expr.true_case();
-    simplify_inequality(tmp_op1);
-    exprt tmp_op2=expr;
-    tmp_op2.op0()=if_expr.false_case();
-    simplify_inequality(tmp_op2);
-
-    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
-
-    simplify_if(expr);
+    if_exprt if_expr=lift_if(expr, 0);
+    simplify_inequality(if_expr.true_case());
+    simplify_inequality(if_expr.false_case());
+    simplify_if(if_expr);
+    expr.swap(if_expr);
 
     return false;
   }
@@ -1680,18 +1673,11 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
 
   if(expr.op0().id()==ID_if && expr.op0().operands().size()==3)
   {
-    const if_exprt &if_expr=to_if_expr(expr.op0());
-
-    exprt tmp_op1=expr;
-    tmp_op1.op0()=if_expr.true_case();
-    simplify_inequality_constant(tmp_op1);
-    exprt tmp_op2=expr;
-    tmp_op2.op0()=if_expr.false_case();
-    simplify_inequality_constant(tmp_op2);
-
-    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
-
-    simplify_if(expr);
+    if_exprt if_expr=lift_if(expr, 0);
+    simplify_inequality_constant(if_expr.true_case());
+    simplify_inequality_constant(if_expr.false_case());
+    simplify_if(if_expr);
+    expr.swap(if_expr);
 
     return false;
   }
