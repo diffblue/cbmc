@@ -19,10 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "type.h"
 #include "mp_arith.h"
+#include "replace_expr.h"
 
 class byte_extract_exprt;
 class byte_update_exprt;
 class exprt;
+class if_exprt;
 class index_exprt;
 class member_exprt;
 class namespacet;
@@ -70,7 +72,8 @@ public:
   bool simplify_floatbv_typecast(exprt &expr);
   bool simplify_shifts(exprt &expr);
   bool simplify_bitwise(exprt &expr);
-  bool simplify_if(exprt &expr);
+  bool simplify_if_preorder(if_exprt &expr);
+  bool simplify_if(if_exprt &expr);
   bool simplify_bitnot(exprt &expr);
   bool simplify_not(exprt &expr);
   bool simplify_boolean(exprt &expr);
@@ -145,6 +148,7 @@ protected:
 #ifdef DEBUG_ON_DEMAND
   bool debug_on;
 #endif
+  replace_mapt local_replace_map;
 };
 
 #endif
