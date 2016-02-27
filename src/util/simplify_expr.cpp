@@ -1106,7 +1106,7 @@ bool simplify_exprt::simplify_if_cond(exprt &expr)
 
 /*******************************************************************\
 
-Function: simplify_exprt::simplify_if
+Function: simplify_exprt::simplify_if_preorder
 
   Inputs:
 
@@ -1116,24 +1116,23 @@ Function: simplify_exprt::simplify_if
 
 \*******************************************************************/
 
-bool simplify_exprt::simplify_if(exprt &expr)
+bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
 {
-  exprt::operandst &operands=expr.operands();
-  if(operands.size()!=3) return true;
+  exprt &cond=expr.cond();
+  exprt &truevalue=expr.true_case();
+  exprt &falsevalue=expr.false_case();
 
-  exprt &cond=operands[0];
-  exprt &truevalue=operands[1];
-  exprt &falsevalue=operands[2];
+  // we first want to look at the condition
+  bool result=simplify_rec(cond);
 
-  if(truevalue==falsevalue)
+  // 1 ? a : b -> a  and  0 ? a : b -> b
+  if(cond.is_constant())
   {
-    exprt tmp;
-    tmp.swap(truevalue);
+    exprt tmp=cond.is_true()?truevalue:falsevalue;
+    simplify_rec(tmp);
     expr.swap(tmp);
     return false;
   }
-
-  bool result=true;
 
   if(do_simplify_if)
   {
@@ -1146,6 +1145,84 @@ bool simplify_exprt::simplify_if(exprt &expr)
       result=false;
     }
 
+    #if 0
+    replace_mapt map_before(local_replace_map);
+
+    // a ? b : c  --> a ? b[a/true] : c
+    if(cond.id()==ID_and)
+    {
+      forall_operands(it, cond)
+      {
+        if(it->id()==ID_not)
+          local_replace_map.insert(
+            std::make_pair(it->op0(), false_exprt()));
+        else
+          local_replace_map.insert(
+            std::make_pair(*it, true_exprt()));
+      }
+    }
+    else
+      local_replace_map.insert(std::make_pair(cond, true_exprt()));
+
+    result=simplify_rec(truevalue) && result;
+
+    local_replace_map=map_before;
+
+    // a ? b : c  --> a ? b : c[a/false]
+    if(cond.id()==ID_or)
+    {
+      forall_operands(it, cond)
+      {
+        if(it->id()==ID_not)
+          local_replace_map.insert(
+            std::make_pair(it->op0(), true_exprt()));
+        else
+          local_replace_map.insert(
+            std::make_pair(*it, false_exprt()));
+      }
+    }
+    else
+      local_replace_map.insert(std::make_pair(cond, false_exprt()));
+
+    result=simplify_rec(falsevalue) && result;
+
+    local_replace_map.swap(map_before);
+    #else
+    result=simplify_rec(truevalue) && result;
+    result=simplify_rec(falsevalue) && result;
+    #endif
+  }
+  else
+  {
+    result=simplify_rec(truevalue) && result;
+    result=simplify_rec(falsevalue) && result;
+  }
+
+  return result;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_if(if_exprt &expr)
+{
+  exprt &cond=expr.cond();
+  exprt &truevalue=expr.true_case();
+  exprt &falsevalue=expr.false_case();
+
+  bool result=true;
+
+  if(do_simplify_if)
+  {
     #if 0
     result = simplify_if_cond(cond) && result;
     result = simplify_if_branch(truevalue, falsevalue, cond) && result;
@@ -1210,23 +1287,9 @@ bool simplify_exprt::simplify_if(exprt &expr)
         return false;
       }
     }
-
-    #if 0
-    // a ? b : c  --> a ? b[a/true] : c
-    exprt tmp_true=truevalue;
-    replace_expr(cond, true_exprt(), tmp_true);
-    if(tmp_true!=truevalue)
-    { truevalue=tmp_true; simplify_rec(truevalue); result=false; }
-
-    // a ? b : c  --> a ? b : c[a/false]
-    exprt tmp_false=falsevalue;
-    replace_expr(cond, false_exprt(), tmp_false);
-    if(tmp_false!=falsevalue)
-    { falsevalue=tmp_false; simplify_rec(falsevalue); result=false; }
-    #endif
   }
 
-  if(cond.is_true())
+  if(truevalue==falsevalue)
   {
     exprt tmp;
     tmp.swap(truevalue);
@@ -1234,11 +1297,24 @@ bool simplify_exprt::simplify_if(exprt &expr)
     return false;
   }
 
-  if(cond.is_false())
+  if(((truevalue.id()==ID_struct && falsevalue.id()==ID_struct) ||
+      (truevalue.id()==ID_array && falsevalue.id()==ID_array)) &&
+     truevalue.operands().size()==falsevalue.operands().size())
   {
-    exprt tmp;
-    tmp.swap(falsevalue);
-    expr.swap(tmp);
+    exprt cond_copy=cond;
+    exprt falsevalue_copy=falsevalue;
+    expr.swap(truevalue);
+
+    exprt::operandst::const_iterator f_it=
+      falsevalue_copy.operands().begin();
+    Forall_operands(it, expr)
+    {
+      if_exprt if_expr(cond_copy, *it, *f_it);
+      it->swap(if_expr);
+      simplify_if(to_if_expr(*it));
+      ++f_it;
+    }
+
     return false;
   }
 
@@ -2331,25 +2407,7 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
     // the argument of this expression needs special treatment
   }
   else if(expr.id()==ID_if)
-  {
-    // we first want to look at the condition
-    if_exprt &if_expr=to_if_expr(expr);
-    if(!simplify_rec(if_expr.cond())) result=false;
-
-    // 1 ? a : b -> a  and  0 ? a : b -> b
-    if(if_expr.cond().is_constant())
-    {
-      expr=if_expr.cond().is_true()?
-        if_expr.true_case():if_expr.false_case();
-      simplify_rec(expr);
-      result=false;
-    }
-    else
-    {
-      if(!simplify_rec(if_expr.true_case())) result=false; 
-      if(!simplify_rec(if_expr.false_case())) result=false; 
-    }
-  }
+    result=simplify_if_preorder(to_if_expr(expr));
   else
   {
     if(expr.has_operands())
@@ -2544,6 +2602,22 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   result=simplify_node_preorder(tmp);
 
   if(!simplify_node(tmp)) result=false;
+
+  #if 1
+  replace_mapt::const_iterator it=local_replace_map.find(tmp);
+  if(it!=local_replace_map.end())
+  {
+    tmp=it->second;
+    result=false;
+  }
+  #else
+  if(!local_replace_map.empty() &&
+     !replace_expr(local_replace_map, tmp))
+  {
+    simplify_rec(tmp);
+    result=false;
+  }
+  #endif
 
   if(!result)
   {
