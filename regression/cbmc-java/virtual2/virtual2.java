@@ -15,8 +15,9 @@ class virtual2
 {
   public static void main(String[] args)
   {
-    A a=new B();
-    a.f();
+    A a=new A();
+    A b=new B();
+    b.f();
   }
 }
 
