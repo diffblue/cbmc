@@ -253,7 +253,9 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   {
     if(rhs.operands().size()>=3)
     {
-      return get_rec(make_binary(rhs), loc_info_src);
+      assert(rhs.op0().type().id()==ID_pointer);
+      return get_rec(rhs.op0(), loc_info_src) |
+             flagst::mk_uses_offset();
     }
     else if(rhs.operands().size()==2)
     {
