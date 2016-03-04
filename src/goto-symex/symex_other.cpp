@@ -94,15 +94,21 @@ void goto_symext::symex_other(
     // we need to add dereferencing for both operands
     dereference_exprt d0, d1;
     d0.op0()=code.op0();
-    d0.type()=code.op0().type().subtype();
+    d0.type()=empty_typet();
     d1.op0()=code.op1();
-    d1.type()=code.op1().type().subtype();
+    d1.type()=empty_typet();
 
     clean_code.op0()=d0;
     clean_code.op1()=d1;
 
     clean_expr(clean_code.op0(), state, true);
+    if(clean_code.op0().id()==byte_extract_id() &&
+       clean_code.op0().type().id()==ID_empty)
+      clean_code.op0()=clean_code.op0().op0();
     clean_expr(clean_code.op1(), state, false);
+    if(clean_code.op1().id()==byte_extract_id() &&
+       clean_code.op1().type().id()==ID_empty)
+      clean_code.op1()=clean_code.op1().op0();
 
     process_array_expr(clean_code.op0());
     clean_expr(clean_code.op0(), state, true);
@@ -135,11 +141,14 @@ void goto_symext::symex_other(
     // we need to add dereferencing for the first operand
     dereference_exprt d0;
     d0.op0()=code.op0();
-    d0.type()=code.op0().type().subtype();
+    d0.type()=empty_typet();
 
     clean_code.op0()=d0;
 
     clean_expr(clean_code.op0(), state, true);
+    if(clean_code.op0().id()==byte_extract_id() &&
+       clean_code.op0().type().id()==ID_empty)
+      clean_code.op0()=clean_code.op0().op0();
     clean_expr(clean_code.op1(), state, false);
 
     process_array_expr(clean_code.op0());
