@@ -1676,7 +1676,11 @@ exprt simplify_exprt::bits2expr(
     return constant_exprt(tmp, type);
   }
   else if(type.id()==ID_c_enum)
-    return constant_exprt(bits, type);
+  {
+    exprt val=bits2expr(bits, type.subtype(), little_endian);
+    val.type()=type;
+    return val;
+  }
   else if(type.id()==ID_c_enum_tag)
     return
       bits2expr(
@@ -1925,10 +1929,8 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
 
   // no proper simplification for expr.type()==void
   // or types of unknown size
-  if(expr.type().id()==ID_empty ||
-     el_size<0)
+  if(el_size<=0)
     return true;
-  assert(el_size>0);
 
   if(expr.op().id()==ID_array_of &&
      expr.op().op0().id()==ID_constant)
