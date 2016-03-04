@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "dereference.h"
 
 #ifdef DEBUG
+static int deref_depth=0;
 #include <iostream>
 #include <langapi/language_util.h>
 #endif
@@ -22,28 +23,101 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
+#include <util/namespace.h>
+#include <util/cprover_prefix.h>
+#include <util/symbol.h>
+#include <util/config.h>
 
 #include <util/c_types.h>
 
+// #define USE_NULL_OBJECT
+
+/// Build byte_extract_* for the given root object and offset
+static exprt build_byte_extract(
+  const namespacet &ns,
+  const exprt &object,
+  const exprt &offset,
+  const typet &type)
+{
+  if(object.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(object);
+
+    exprt true_case=
+      build_byte_extract(ns, if_expr.true_case(), offset, type);
+
+    exprt false_case=
+      build_byte_extract(ns, if_expr.false_case(), offset, type);
+
+    return if_exprt(if_expr.cond(), true_case, false_case);
+  }
+
+  object_descriptor_exprt ode;
+  ode.offset()=offset;
+  ode.build(object, ns);
+
+  byte_extract_exprt be(byte_extract_id());
+  be.type()=type;
+  be.op()=ode.root_object();
+  CHECK_RETURN(be.op().is_not_nil());
+  be.offset()=ode.offset();
+
+  return simplify_expr(be, ns);
+}
+
+/// Test whether type is char*, void*, or an integer type
+static bool is_generic_pointer_type(
+  const namespacet &ns,
+  const typet &type)
+{
+  return
+    base_type_eq(type, pointer_type(empty_typet()), ns) ||
+    base_type_eq(type, pointer_type(char_type()), ns) ||
+    type.id()==ID_signedbv || type.id()==ID_unsignedbv;
+}
+
+/// Returns true, iff some operand has pointer type
+static bool has_pointer(const exprt &expr, const namespacet &ns)
+{
+  if(ns.follow(expr.type()).id()==ID_pointer)
+    return true;
+
+  forall_operands(it, expr)
+    if(has_pointer(*it, ns))
+      return true;
+
+  return false;
+}
+
 /// \par parameters: expression, to be dereferenced
 /// \return returns object after dereferencing
-exprt dereferencet::operator()(const exprt &pointer)
+exprt dereferencet::operator()(
+  const exprt &pointer,
+  exprt &invalid_cond)
 {
   if(pointer.type().id()!=ID_pointer)
     throw "dereference expected pointer type, but got "+
           pointer.type().pretty();
 
   // type of the object
-  const typet &type=pointer.type().subtype();
+  const typet &type=ns.follow(pointer.type()).subtype();
+
+  // we don't deal with { array }[index], { struct }.member - let
+  // simplify worry about these
+  const exprt simp_pointer=simplify_expr(pointer, ns);
 
   #ifdef DEBUG
-  std::cout << "DEREF: " << from_expr(ns, "", pointer) << '\n';
+  std::cout << "DEREF: " << from_expr(ns, "", simp_pointer) << '\n';
   #endif
 
+  // recursively push down the dereferencing operator
+
+  invalid_cond=false_exprt();
   return dereference_rec(
-    pointer,
+    simp_pointer,
     from_integer(0, index_type()), // offset
-    type);
+    type,
+    invalid_cond);
 }
 
 exprt dereferencet::read_object(
@@ -147,79 +221,192 @@ exprt dereferencet::read_object(
   }
 
   // give up and use byte_extract
-  return binary_exprt(object, byte_extract_id(), simplified_offset, dest_type);
+  return build_byte_extract(ns, object, simplified_offset, dest_type);
 }
 
+/// Compute *expr
 exprt dereferencet::dereference_rec(
   const exprt &address,
   const exprt &offset,
-  const typet &type)
+  const typet &type,
+  exprt &invalid_cond)
 {
+#ifdef DEBUG
+  std::cerr << std::string(2*deref_depth, ' ') << deref_depth
+            << ": deref_rec: " << from_expr(ns, "", address) << '\n';
+  ++deref_depth;
+#endif
+
+  const typet &expr_type=ns.follow(address.type());
+  exprt result=nil_exprt();
+
+  // the base case: we arrived at &object
   if(address.id()==ID_address_of)
   {
     const address_of_exprt &address_of_expr=to_address_of_expr(address);
 
     const exprt &object=address_of_expr.object();
 
-    return read_object(object, offset, type);
+    if(object.id()==ID_if)
+    {
+      const if_exprt &if_expr=to_if_expr(object);
+
+      if_exprt new_if(
+        if_expr.cond(),
+        address_of_exprt(if_expr.true_case()),
+        address_of_exprt(if_expr.false_case()));
+
+      result=dereference_rec(new_if, offset, type, invalid_cond);
+    }
+    else
+      result=read_object(object, offset, type);
   }
+  // *((T) x)
   else if(address.id()==ID_typecast)
   {
     const typecast_exprt &typecast_expr=to_typecast_expr(address);
 
-    return dereference_typecast(typecast_expr, offset, type);
+    result=dereference_typecast(
+      typecast_expr,
+      offset,
+      type,
+      invalid_cond);
   }
+  // *(p + c)
   else if(address.id()==ID_plus)
   {
     // pointer arithmetic
     if(address.operands().size()<2)
       throw "plus with less than two operands";
 
-    return dereference_plus(address, offset, type);
+    PRECONDITION(
+      expr_type.id()==ID_pointer ||
+      is_generic_pointer_type(ns, expr_type));
+    result=dereference_plus(address, offset, type, invalid_cond);
   }
+  // *(c ? x : y)
   else if(address.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(address);
 
-    return dereference_if(if_expr, offset, type);
+    result=dereference_if(if_expr, offset, type, invalid_cond);
   }
-  else if(address.id()==ID_constant)
+#if 0
+  // consider handling further cases, such as bitmasks
+  else if(address.id()==ID_bitand)
   {
-    const typet result_type=ns.follow(address.type()).subtype();
+    // just ignores the (negative) offset induced by bitand
+    // TODO: more precision
+    forall_operands(it, address)
+      if(has_pointer(*it, ns))
+      {
+        result=dereference_rec(*it, offset, type, invalid_cond);
+        break;
+      }
+  }
+#endif
+  // NULL pointer dereference
+  else if((address.is_constant() &&
+           to_constant_expr(address).get_value()==ID_NULL) ||
+          (config.ansi_c.NULL_is_zero &&
+           (expr_type.id()==ID_unsignedbv ||
+            expr_type.id()==ID_signedbv) &&
+           simplify_expr(address, ns).is_zero()))
+  {
+#ifdef USE_NULL_OBJECT
+      result=exprt("NULL-object", type);
+#else
+      invalid_cond.make_true();
+#endif
+  }
+  // *c for some integer expression
+  else if(expr_type.id()==ID_unsignedbv ||
+          expr_type.id()==ID_signedbv)
+  {
+    exprt symbol_expr=ns.lookup(CPROVER_PREFIX "memory").symbol_expr();
 
-    // pointer-typed constant
-    if(to_constant_expr(address).get_value()==ID_NULL) // NULL
-    {
-      // we turn this into (type *)0
-      exprt zero=from_integer(0, index_type());
-      return dereference_rec(
-        typecast_exprt(zero, address.type()), offset, type);
-    }
-    else
-      throw "dereferencet: unexpected pointer constant "+address.pretty();
+    byte_extract_exprt be(byte_extract_id());
+    be.type()=type;
+    be.op()=symbol_expr;
+    be.offset()=address;
+    if(!base_type_eq(be.offset().type(), index_type(), ns))
+      be.offset().make_typecast(index_type());
+
+    result=be;
   }
   else
-  {
-    throw "failed to dereference `"+address.id_string()+"'";
-  }
+    // anything else is definitively invalid
+    invalid_cond.make_true();
+
+#ifdef DEBUG
+  --deref_depth;
+  std::cerr << std::string(2*deref_depth, ' ') << deref_depth << ": deref_rec "
+    << address.id() << " result cand: "
+    << "{g=" << from_expr(ns, "", not_exprt(invalid_cond)) << "} "
+    << from_expr(ns, "", result) << '\n';
+#endif
+
+  return result;
 }
 
+/// Compute *(c ? x : y) via c ? *x : *y
 exprt dereferencet::dereference_if(
   const if_exprt &expr,
   const exprt &offset,
-  const typet &type)
+  const typet &type,
+  exprt &invalid_cond)
 {
   // push down the if, do recursive call
-  exprt true_case=dereference_rec(expr.true_case(), offset, type);
-  exprt false_case=dereference_rec(expr.false_case(), offset, type);
+
+  exprt t_inv=false_exprt();
+  exprt true_case=
+    dereference_rec(expr.true_case(), offset, type, t_inv);
+
+  exprt f_inv=false_exprt();
+  exprt false_case=
+    dereference_rec(expr.false_case(), offset, type, f_inv);
+
+  if(t_inv.is_true())
+  {
+    invalid_cond=or_exprt(expr.cond(), f_inv);
+    simplify(invalid_cond, ns);
+
+    return false_case;
+  }
+  else if(f_inv.is_true())
+  {
+    invalid_cond=or_exprt(not_exprt(expr.cond()), t_inv);
+    simplify(invalid_cond, ns);
+
+    return true_case;
+  }
+  else if(t_inv.is_false() && !f_inv.is_false())
+  {
+    invalid_cond=and_exprt(not_exprt(expr.cond()), f_inv);
+  }
+  else if(!t_inv.is_false() && f_inv.is_false())
+  {
+    invalid_cond=and_exprt(expr.cond(), t_inv);
+  }
+  else if(!t_inv.is_false() || !f_inv.is_false())
+  {
+    invalid_cond=
+      and_exprt(
+        or_exprt(expr.cond(), and_exprt(not_exprt(t_inv), f_inv)),
+        or_exprt(not_exprt(expr.cond()), and_exprt(t_inv, not_exprt(f_inv))));
+  }
+
+  simplify(invalid_cond, ns);
 
   return if_exprt(expr.cond(), true_case, false_case);
 }
 
+/// Compute *(p + c) for a pointer p and an integer c
 exprt dereferencet::dereference_plus(
   const exprt &expr,
   const exprt &offset,
-  const typet &type)
+  const typet &type,
+  exprt &invalid_cond)
 {
   exprt pointer=expr.op0();
   exprt integer=expr.op1();
@@ -227,57 +414,98 @@ exprt dereferencet::dereference_plus(
   // need not be binary
   if(expr.operands().size()>2)
   {
-    assert(expr.op0().type().id()==ID_pointer);
+    PRECONDITION(expr.op0().type().id()==ID_pointer);
 
     exprt::operandst plus_ops(
       ++expr.operands().begin(), expr.operands().end());
     integer.operands().swap(plus_ops);
   }
 
-  if(ns.follow(integer.type()).id()==ID_pointer)
-    std::swap(pointer, integer);
+  if(has_pointer(integer, ns) &&
+     (pointer.type().id()!=ID_pointer ||
+      integer.type().id()==ID_pointer))
+  {
+    if(has_pointer(pointer, ns))
+      throw "unsupported pointer arithmetic using sum of pointers";
 
-  // multiply integer by object size
-  exprt size=size_of_expr(pointer.type().subtype(), ns);
-  if(size.is_nil())
-    throw "dereference failed to get object size for pointer arithmetic";
+    std::swap(pointer, integer);
+  }
+  else if(!has_pointer(pointer, ns))
+    throw "missing pointer in pointer arithmetic";
+
+  exprt size=size_of_expr(char_type(), ns);
+  CHECK_RETURN(size.is_not_nil());
 
   // make types of offset and size match
   if(size.type()!=integer.type())
     integer.make_typecast(size.type());
 
+  if(ns.follow(pointer.type()).id()==ID_pointer)
+  {
+    const typet &object_type=ns.follow(pointer.type()).subtype();
+    if(object_type.id()!=ID_empty)
+      size=size_of_expr(object_type, ns);
+
+    if(size.is_nil())
+      throw "dereference failed to get object size for pointer arithmetic";
+  }
+  else if(pointer.id()==ID_typecast)
+  {
+    pointer=to_typecast_expr(pointer).op();
+  }
+
+  // multiply integer by object size
   exprt new_offset=plus_exprt(offset, mult_exprt(size, integer));
 
-  return dereference_rec(pointer, new_offset, type);
+  return dereference_rec(pointer, new_offset, type, invalid_cond);
 }
 
+/// Compute *((T)x)
 exprt dereferencet::dereference_typecast(
   const typecast_exprt &expr,
   const exprt &offset,
-  const typet &type)
+  const typet &type,
+  exprt &invalid_cond)
 {
+  const typet &expr_type=ns.follow(expr.type());
   const exprt &op=expr.op();
   const typet &op_type=ns.follow(op.type());
 
   // pointer type cast?
-  if(op_type.id()==ID_pointer)
-    return dereference_rec(op, offset, type); // just pass down
-  else if(op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv)
+  if(op_type.id()==ID_pointer &&
+     expr_type.id()==ID_pointer)
   {
-    // We got an integer-typed address A. We turn this back (!)
-    // into *(type *)(A+offset), and then let some other layer
-    // worry about it.
+    exprt result;
 
-    exprt integer=op;
+    // typecast from generic pointer type
+    if(is_generic_pointer_type(ns, op_type))
+      result=dereference_rec(op, offset, type, invalid_cond);
+    else
+      result=dereference_rec(op, offset, op_type.subtype(), invalid_cond);
 
-    if(!offset.is_zero())
-      integer=
-        plus_exprt(offset, typecast_exprt(op, offset.type()));
+    if(invalid_cond.is_true())
+      return result;
 
-    exprt new_typecast=
-      typecast_exprt(integer, pointer_type(type));
+    typet extract_type=type;
+    // typecast to a generic pointer type
+    if(is_generic_pointer_type(ns, expr_type) &&
+       !is_generic_pointer_type(ns, op_type) &&
+       !is_generic_pointer_type(ns, pointer_type(type)))
+      extract_type=op_type.subtype();
 
-    return dereference_exprt(new_typecast, type);
+    // zero extra offset
+    const exprt offset=exprt(ID_unknown);
+    return build_byte_extract(ns, result, offset, extract_type);
+  }
+  // integer-to-pointer or something-to-integer
+  else if((expr_type.id()==ID_pointer &&
+           (op_type.id()==ID_unsignedbv ||
+            op_type.id()==ID_signedbv)) ||
+          expr_type.id()==ID_unsignedbv ||
+          expr_type.id()==ID_signedbv)
+  {
+    // we can no longer rely on a sane relation of types
+    return dereference_rec(op, offset, type, invalid_cond);
   }
   else
     throw "dereferencet: unexpected cast";
