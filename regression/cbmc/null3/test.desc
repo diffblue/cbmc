@@ -3,7 +3,6 @@ main.c
 
 ^EXIT=0$
 ^SIGNAL=0$
-\(Starting CEGAR Loop\|^Generated 0 VCC(s), 0 remaining after simplification$\)
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
