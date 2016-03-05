@@ -1,7 +1,7 @@
-diff -rupN minisat-2.2.0/core/Solver.cc minisat-2.2.0.patched/core/Solver.cc
---- minisat-2.2.0/core/Solver.cc	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/core/Solver.cc	2015-05-22 19:06:39.000000000 +0100
-@@ -209,7 +209,7 @@ void Solver::cancelUntil(int level) {
+diff -urN minisat-2.2.1/minisat/core/Solver.cc minisat-2.2.1.patched/minisat/core/Solver.cc
+--- minisat-2.2.1/minisat/core/Solver.cc	2011-02-21 13:31:17.000000000 +0000
++++ minisat-2.2.1.patched/minisat/core/Solver.cc	2016-03-05 16:21:17.000000000 +0000
+@@ -210,7 +210,7 @@
          for (int c = trail.size()-1; c >= trail_lim[level]; c--){
              Var      x  = var(trail[c]);
              assigns [x] = l_Undef;
@@ -10,7 +10,7 @@ diff -rupN minisat-2.2.0/core/Solver.cc minisat-2.2.0.patched/core/Solver.cc
                  polarity[x] = sign(trail[c]);
              insertVarOrder(x); }
          qhead = trail_lim[level];
-@@ -657,7 +657,7 @@ lbool Solver::search(int nof_conflicts)
+@@ -666,7 +666,7 @@
  
          }else{
              // NO CONFLICT
@@ -19,10 +19,10 @@ diff -rupN minisat-2.2.0/core/Solver.cc minisat-2.2.0.patched/core/Solver.cc
                  // Reached bound on number of conflicts:
                  progress_estimate = progressEstimate();
                  cancelUntil(0);
-diff -rupN minisat-2.2.0/core/SolverTypes.h minisat-2.2.0.patched/core/SolverTypes.h
---- minisat-2.2.0/core/SolverTypes.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/core/SolverTypes.h	2015-05-22 19:06:39.000000000 +0100
-@@ -47,7 +47,7 @@ struct Lit {
+diff -urN minisat-2.2.1/minisat/core/SolverTypes.h minisat-2.2.1.patched/minisat/core/SolverTypes.h
+--- minisat-2.2.1/minisat/core/SolverTypes.h	2011-02-21 13:31:17.000000000 +0000
++++ minisat-2.2.1.patched/minisat/core/SolverTypes.h	2016-03-05 16:29:42.000000000 +0000
+@@ -47,7 +47,7 @@
      int     x;
  
      // Use this as a constructor:
@@ -31,7 +31,7 @@ diff -rupN minisat-2.2.0/core/SolverTypes.h minisat-2.2.0.patched/core/SolverTyp
  
      bool operator == (Lit p) const { return x == p.x; }
      bool operator != (Lit p) const { return x != p.x; }
-@@ -55,7 +55,7 @@ struct Lit {
+@@ -55,7 +55,7 @@
  };
  
  
@@ -40,10 +40,38 @@ diff -rupN minisat-2.2.0/core/SolverTypes.h minisat-2.2.0.patched/core/SolverTyp
  inline  Lit  operator ~(Lit p)              { Lit q; q.x = p.x ^ 1; return q; }
  inline  Lit  operator ^(Lit p, bool b)      { Lit q; q.x = p.x ^ (unsigned int)b; return q; }
  inline  bool sign      (Lit p)              { return p.x & 1; }
-diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
---- minisat-2.2.0/mtl/IntTypes.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/mtl/IntTypes.h	2015-05-22 19:06:39.000000000 +0100
-@@ -31,7 +31,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
+@@ -142,11 +142,12 @@
+         for (int i = 0; i < ps.size(); i++) 
+             data[i].lit = ps[i];
+ 
+-        if (header.has_extra)
++        if (header.has_extra) {
+             if (header.learnt)
+                 data[header.size].act = 0;
+             else
+                 calcAbstraction();
++        }
+     }
+ 
+     // NOTE: This constructor cannot be used directly (doesn't allocate enough memory).
+@@ -157,11 +158,12 @@
+         for (int i = 0; i < from.size(); i++)
+             data[i].lit = from[i];
+ 
+-        if (header.has_extra)
++        if (header.has_extra) {
+             if (header.learnt)
+                 data[header.size].act = from.data[header.size].act;
+             else 
+                 data[header.size].abs = from.data[header.size].abs;
++        }
+     }
+ 
+ public:
+diff -urN minisat-2.2.1/minisat/mtl/IntTypes.h minisat-2.2.1.patched/minisat/mtl/IntTypes.h
+--- minisat-2.2.1/minisat/mtl/IntTypes.h	2011-02-21 13:31:17.000000000 +0000
++++ minisat-2.2.1.patched/minisat/mtl/IntTypes.h	2016-03-05 16:21:17.000000000 +0000
+@@ -31,7 +31,9 @@
  #else
  
  #   include <stdint.h>
@@ -53,10 +81,10 @@ diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
  
  #endif
  
-diff -rupN minisat-2.2.0/mtl/Vec.h minisat-2.2.0.patched/mtl/Vec.h
---- minisat-2.2.0/mtl/Vec.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/mtl/Vec.h	2015-05-22 19:06:39.000000000 +0100
-@@ -96,7 +96,7 @@ template<class T>
+diff -urN minisat-2.2.1/minisat/mtl/Vec.h minisat-2.2.1.patched/minisat/mtl/Vec.h
+--- minisat-2.2.1/minisat/mtl/Vec.h	2011-02-21 13:31:17.000000000 +0000
++++ minisat-2.2.1.patched/minisat/mtl/Vec.h	2016-03-05 16:21:17.000000000 +0000
+@@ -96,7 +96,7 @@
  void vec<T>::capacity(int min_cap) {
      if (cap >= min_cap) return;
      int add = imax((min_cap - cap + 1) & ~1, ((cap >> 1) + 2) & ~1);   // NOTE: grow by approximately 3/2
@@ -65,10 +93,10 @@ diff -rupN minisat-2.2.0/mtl/Vec.h minisat-2.2.0.patched/mtl/Vec.h
          throw OutOfMemoryException();
   }
  
-diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolver.cc
---- minisat-2.2.0/simp/SimpSolver.cc	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/simp/SimpSolver.cc	2015-06-14 22:37:51.000000000 +0100
-@@ -130,8 +130,6 @@ lbool SimpSolver::solve_(bool do_simp, b
+diff -urN minisat-2.2.1/minisat/simp/SimpSolver.cc minisat-2.2.1.patched/minisat/simp/SimpSolver.cc
+--- minisat-2.2.1/minisat/simp/SimpSolver.cc	2011-02-21 13:31:17.000000000 +0000
++++ minisat-2.2.1.patched/minisat/simp/SimpSolver.cc	2016-03-05 16:21:17.000000000 +0000
+@@ -130,8 +130,6 @@
      return result;
  }
  
@@ -77,7 +105,7 @@ diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolve
  bool SimpSolver::addClause_(vec<Lit>& ps)
  {
  #ifndef NDEBUG
-@@ -227,10 +225,12 @@ bool SimpSolver::merge(const Clause& _ps
+@@ -227,10 +225,12 @@
          if (var(qs[i]) != v){
              for (int j = 0; j < ps.size(); j++)
                  if (var(ps[j]) == var(qs[i]))
@@ -90,7 +118,7 @@ diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolve
              out_clause.push(qs[i]);
          }
          next:;
-@@ -261,10 +261,12 @@ bool SimpSolver::merge(const Clause& _ps
+@@ -261,10 +261,12 @@
          if (var(__qs[i]) != v){
              for (int j = 0; j < ps.size(); j++)
                  if (var(__ps[j]) == var(__qs[i]))
@@ -103,10 +131,10 @@ diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolve
              size++;
          }
          next:;
-diff -rupN minisat-2.2.0/utils/Options.h minisat-2.2.0.patched/utils/Options.h
---- minisat-2.2.0/utils/Options.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/utils/Options.h	2015-06-14 22:33:24.000000000 +0100
-@@ -60,7 +60,7 @@ class Option
+diff -urN minisat-2.2.1/minisat/utils/Options.h minisat-2.2.1.patched/minisat/utils/Options.h
+--- minisat-2.2.1/minisat/utils/Options.h	2011-02-21 13:31:17.000000000 +0000
++++ minisat-2.2.1.patched/minisat/utils/Options.h	2016-03-05 16:21:17.000000000 +0000
+@@ -60,7 +60,7 @@
      struct OptionLt {
          bool operator()(const Option* x, const Option* y) {
              int test1 = strcmp(x->category, y->category);
@@ -115,7 +143,7 @@ diff -rupN minisat-2.2.0/utils/Options.h minisat-2.2.0.patched/utils/Options.h
          }
      };
  
-@@ -282,15 +282,15 @@ class Int64Option : public Option
+@@ -282,15 +282,15 @@
          if (range.begin == INT64_MIN)
              fprintf(stderr, "imin");
          else
@@ -134,10 +162,10 @@ diff -rupN minisat-2.2.0/utils/Options.h minisat-2.2.0.patched/utils/Options.h
          if (verbose){
              fprintf(stderr, "\n        %s\n", description);
              fprintf(stderr, "\n");
-diff -rupN minisat-2.2.0/utils/ParseUtils.h minisat-2.2.0.patched/utils/ParseUtils.h
---- minisat-2.2.0/utils/ParseUtils.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/utils/ParseUtils.h	2015-05-22 19:06:39.000000000 +0100
-@@ -24,7 +24,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
+diff -urN minisat-2.2.1/minisat/utils/ParseUtils.h minisat-2.2.1.patched/minisat/utils/ParseUtils.h
+--- minisat-2.2.1/minisat/utils/ParseUtils.h	2011-02-21 13:31:17.000000000 +0000
++++ minisat-2.2.1.patched/minisat/utils/ParseUtils.h	2016-03-05 16:21:17.000000000 +0000
+@@ -24,7 +24,7 @@
  #include <stdlib.h>
  #include <stdio.h>
  
@@ -146,7 +174,7 @@ diff -rupN minisat-2.2.0/utils/ParseUtils.h minisat-2.2.0.patched/utils/ParseUti
  
  namespace Minisat {
  
-@@ -35,7 +35,7 @@ static const int buffer_size = 1048576;
+@@ -35,7 +35,7 @@
  
  
  class StreamBuffer {
@@ -155,7 +183,7 @@ diff -rupN minisat-2.2.0/utils/ParseUtils.h minisat-2.2.0.patched/utils/ParseUti
      unsigned char buf[buffer_size];
      int           pos;
      int           size;
-@@ -43,10 +43,10 @@ class StreamBuffer {
+@@ -43,10 +43,10 @@
      void assureLookahead() {
          if (pos >= size) {
              pos  = 0;

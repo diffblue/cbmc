@@ -54,13 +54,13 @@ $(patsubst %, %_clean, $(DIRS)):
 # minisat 2 download, for your convenience
 
 minisat2-download:
-	@echo "Downloading Minisat 2.2.0"
-	@lwp-download http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.0.orig.tar.gz
-	@tar xfz minisat2_2.2.0.orig.tar.gz
-	@rm -Rf ../minisat-2.2.0
-	@mv minisat-2.2.0 ../minisat-2.2.0
-	@(cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
-	@rm minisat2_2.2.0.orig.tar.gz
+	@echo "Downloading Minisat 2.2.1"
+	@lwp-download http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
+	@tar xfz minisat2_2.2.1.orig.tar.gz
+	@rm -Rf ../minisat-2.2.1
+	@mv minisat2-2.2.1 ../minisat-2.2.1
+	@(cd ../minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
+	@rm minisat2_2.2.1.orig.tar.gz
 
 glucose-download:
 	@echo "Downloading glucose-syrup"
