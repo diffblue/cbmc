@@ -92,7 +92,7 @@ public:
     return column;
   }
 
-  inline void set_column(unsigned _column) const
+  inline void set_column(unsigned _column)
   {
     column=_column;
   }
