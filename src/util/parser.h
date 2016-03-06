@@ -92,6 +92,11 @@ public:
     return column;
   }
 
+  inline void set_column(unsigned _column) const
+  {
+    column=_column;
+  }
+
   inline void set_source_location(exprt &e)
   {
     // Only set line number when needed, as this destroys sharing.
