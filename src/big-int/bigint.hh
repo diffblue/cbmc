@@ -242,6 +242,7 @@ public:
   BigInt &operator/= (llong_t) _fast;
   BigInt &operator%= (llong_t) _fast;
 
+  BigInt &operator= (unsigned long x) { return (*this)=(ullong_t)x; }
   BigInt &operator+= (unsigned long x) { return (*this)+=(ullong_t)x; }
   BigInt &operator-= (unsigned long x) { return (*this)-=(ullong_t)x; }
   BigInt &operator*= (unsigned long x) { return (*this)*=(ullong_t)x; }
