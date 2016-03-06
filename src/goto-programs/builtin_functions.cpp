@@ -1201,12 +1201,14 @@ void goto_convertt::do_function_call_symbol(
     do_output(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "atomic_begin" ||
-          identifier=="__CPROVER::atomic_begin")
+          identifier=="__CPROVER::atomic_begin" ||
+          identifier=="__VERIFIER_atomic_begin")
   {
     do_atomic_begin(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "atomic_end" ||
-          identifier=="__CPROVER::atomic_end")
+          identifier=="__CPROVER::atomic_end" ||
+          identifier=="__VERIFIER_atomic_end")
   {
     do_atomic_end(lhs, function, arguments, dest);
   }
