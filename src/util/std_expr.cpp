@@ -154,6 +154,14 @@ static void build_object_descriptor_rec(
                  typecast_exprt(to_byte_extract_expr(expr).offset(),
                                 index_type));
   }
+  else if(expr.id()==ID_typecast)
+  {
+    const typecast_exprt &tc=to_typecast_expr(expr);
+
+    dest.object()=tc.op();
+
+    build_object_descriptor_rec(ns, tc.op(), dest);
+  }
 }
 
 /*******************************************************************\
