@@ -1084,7 +1084,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     convert_is_dynamic_object(expr, bool_as_bv);
   }
-  else if(expr.id()=="invalid-pointer")
+  else if(expr.id()==ID_invalid_pointer)
   {
     const typet &type=expr.type();
 
