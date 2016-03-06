@@ -501,6 +501,7 @@ reduction_xor
 reduction_xnor
 C_zero_initializer #zero_initializer
 body
+entity
 temporary_object
 overflow_plus overflow-+
 overflow_minus overflow--
