@@ -1,0 +1,10 @@
+CORE
+main.class
+package_friendly1.class package_friendly2.class --show-goto-functions
+^main[.]main[(][)].*$
+^package_friendly1[.]operation1[(][)].*$
+^package_friendly2[.]operation2[(][)].*$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
