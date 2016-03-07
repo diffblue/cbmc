@@ -48,7 +48,6 @@ protected:
 
   virtual int get_goto_program(
     const optionst &options,
-    bmct &bmc,
     goto_functionst &goto_functions);
 
   virtual bool process_goto_program(
