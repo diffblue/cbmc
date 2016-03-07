@@ -24,5 +24,5 @@ License
 =======
 4-clause BSD license, see `LICENSE` file.
 
-[build_img]: https://travis-ci.org/tautschnig/cbmc.svg?branch=master
-[travis]: https://travis-ci.org/tautschnig/cbmc
+[build_img]: https://travis-ci.org/diffblue/cbmc.svg?branch=master
+[travis]: https://travis-ci.org/diffblue/cbmc
