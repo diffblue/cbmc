@@ -17,8 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "satcheck_minisat2.h"
 
-#include <core/Solver.h>
-#include <simp/SimpSolver.h>
+#include <minisat/core/Solver.h>
+#include <minisat/simp/SimpSolver.h>
 
 #ifndef HAVE_MINISAT2
 #error "Expected HAVE_MINISAT2"
