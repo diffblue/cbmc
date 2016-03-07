@@ -18,6 +18,10 @@ void create_vtable_symbol(
   symbol_tablet &symbol_table,
   const class symbolt &class_symbol);
 
+bool has_vtable_info(
+  const symbol_tablet &symbol_table,
+  const symbolt &class_symbol);
+
 exprt make_vtable_function(
   const exprt &function,
   const exprt &this_obj);

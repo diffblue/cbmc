@@ -303,6 +303,26 @@ void create_vtable_symbol(
 
 /*******************************************************************
 
+ Function: has_vtable_info
+
+ Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool has_vtable_info(
+  const symbol_tablet &symbol_table,
+  const symbolt &class_symbol)
+{
+  return symbol_table.has_symbol(vtnamest::get_type(id2string(class_symbol.name)))
+      && to_struct_union_type(class_symbol.type).has_component(ID_vtable_pointer);
+}
+
+/*******************************************************************
+
  Function: create_vtable_pointer
 
  Inputs:

@@ -291,13 +291,19 @@ void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
   symbolt *class_symbol;
   
   if(symbol_table.move(new_symbol, class_symbol))
-    throw "failed to add stub class symbol "+id2string(new_symbol.name);
-
+  {
+    warning() << "stub class symbol "+id2string(new_symbol.name)+" already exists";
+    if (!has_vtable_info(symbol_table, *class_symbol))
+      throw "vt missing for pre-existing stub class symbol "+id2string(new_symbol.name);
+  }
+  else
+  {
   // create the virtual table
   create_vtable_symbol(symbol_table, *class_symbol);
 
   // create vtable pointer
   create_vtable_pointer(*class_symbol);
+  }
 }
 
 namespace {
