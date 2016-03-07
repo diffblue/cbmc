@@ -692,6 +692,8 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+// no pthread_barrier_t on the Mac
+#ifndef __APPLE__
 inline int pthread_barrier_init(
   pthread_barrier_t *restrict barrier,
   const pthread_barrierattr_t *restrict attr, unsigned count)
@@ -709,6 +711,7 @@ inline int pthread_barrier_init(
   int result;
   return result;
 }       
+#endif
 
 /* FUNCTION: pthread_barrier_destroy */
 
@@ -717,6 +720,8 @@ inline int pthread_barrier_init(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+// no pthread_barrier_t on the Mac
+#ifndef __APPLE__
 inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
@@ -734,6 +739,7 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
   int result;
   return result;
 }
+#endif
 
 /* FUNCTION: pthread_barrier_wait */
 
@@ -742,6 +748,8 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+// no pthread_barrier_t on the Mac
+#ifndef __APPLE__
 inline int pthread_barrier_wait(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
@@ -758,3 +766,4 @@ inline int pthread_barrier_wait(pthread_barrier_t *barrier)
   int result;
   return result;
 }
+#endif
