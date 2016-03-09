@@ -49,10 +49,12 @@ public:
   localst locals;
   local_cfgt cfg;
 
+  // given a pointer, returns possible aliases
   std::set<exprt> get(
     const goto_programt::const_targett t,
     const exprt &src) const;
 
+  // returns 'true' when pointers src1 and src2 may be aliases
   bool aliases(
     const goto_programt::const_targett t,
     const exprt &src1, const exprt &src2) const;
