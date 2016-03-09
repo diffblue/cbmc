@@ -241,6 +241,10 @@ bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
      to_side_effect_expr(expr).get_statement()==ID_nondet) 
     return false;
 
+  if(expr.id()==ID_side_effect && 
+     to_side_effect_expr(expr).get_statement()==ID_malloc) 
+    return false;
+
   if(expr.id()==ID_symbol)
     if(replace_const.expr_map.find(to_symbol_expr(expr).get_identifier()) ==
        replace_const.expr_map.end())
