@@ -268,11 +268,13 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 
   __CPROVER_set_must(mutex, "mutex-destroyed");
   __CPROVER_set_may(mutex, "mutex-destroyed");
-  #endif
+  #else
 
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==0,
     "lock held upon destroy");
   *((__CPROVER_mutex_t *)mutex)=-1;
+
+  #endif
 
   return 0;
 }
