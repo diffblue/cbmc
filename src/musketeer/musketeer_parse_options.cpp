@@ -170,7 +170,7 @@ void goto_fence_inserter_parse_optionst::get_goto_program(
     symbol_table, goto_functions, get_message_handler()))
     throw 0;
 
-  config.ansi_c.set_from_symbol_table(symbol_table);
+  config.set_from_symbol_table(symbol_table);
 }
 
 /*******************************************************************\
