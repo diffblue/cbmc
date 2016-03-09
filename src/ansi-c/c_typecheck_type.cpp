@@ -227,18 +227,19 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     static_cast<const exprt &>(type.find(ID_size));
 
   typecheck_expr(size_expr);
+  source_locationt source_location=size_expr.source_location();  
   make_constant_index(size_expr);
 
   mp_integer size_int;
   if(to_integer(size_expr, size_int))
   {
-    err_location(size_expr);
+    err_location(source_location);
     throw "failed to convert bit vector width to constant";
   }
 
-  if(size_int<1 || size_int>1024)
+  if(size_int<1)
   {
-    err_location(size_expr);
+    err_location(source_location);
     str << "bit vector width invalid";
     error_msg();
     throw 0;
@@ -584,7 +585,7 @@ Function: c_typecheck_baset::typecheck_vector_type
 void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 {
   exprt &size=type.size();
-  source_locationt size_location=size.find_source_location();
+  source_locationt source_location=size.find_source_location();
 
   typecheck_expr(size);
   
@@ -599,7 +600,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
      subtype.id()!=ID_floatbv &&
      subtype.id()!=ID_fixedbv)
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "cannot make a vector of subtype "
         << to_string(subtype);
     throw 0;
@@ -610,7 +611,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   mp_integer s;
   if(to_integer(size, s))
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "failed to convert constant: "
         << size.pretty();
     throw 0;
@@ -618,7 +619,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   if(s<=0)
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "vector size must be positive, "
            "but got " << s;
     throw 0;
@@ -633,7 +634,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   
   if(to_integer(size_expr, sub_size))
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "failed to determine size of vector base type `"
         << to_string(type.subtype()) << "'";
     throw 0;
@@ -641,7 +642,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   if(sub_size==0)
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "type had size 0: `"
         << to_string(type.subtype()) << "'";
     throw 0;
@@ -650,7 +651,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   // adjust by width of base type
   if(s%sub_size!=0)
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "vector size (" << s
         << ") expected to be multiple of base type size (" << sub_size
         << ")";
