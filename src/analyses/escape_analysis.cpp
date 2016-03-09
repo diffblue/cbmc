@@ -28,7 +28,8 @@ bool escape_domaint::is_tracked(const symbol_exprt &symbol)
 {
   const irep_idt &identifier=symbol.get_identifier();
   if(identifier=="__CPROVER_memory_leak" ||
-     identifier=="__CPROVER_malloc_object")
+     identifier=="__CPROVER_malloc_object" ||
+     identifier=="__CPROVER_deallocated")
     return false;
     
   return true;
