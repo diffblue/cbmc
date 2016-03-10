@@ -349,6 +349,7 @@ bool ai_baset::do_function_call(
 
   if(!goto_function.body_available())
   {
+    // if we don't have a body, we just do an edige call -> return
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
     tmp_state->transform(l_call, l_return, *this, ns);
 
@@ -356,7 +357,9 @@ bool ai_baset::do_function_call(
   }
     
   assert(!goto_function.body.instructions.empty());
-  
+
+  // This is the edge from call site to function head.
+    
   {
     // get the state at the beginning of the function
     locationt l_begin=goto_function.body.instructions.begin();
@@ -378,6 +381,8 @@ bool ai_baset::do_function_call(
       fixedpoint(goto_function.body, goto_functions, ns);
   }
 
+  // This is the edge from function end to return site.
+
   {
     // get location at end of the procedure we have called
     locationt l_end=--goto_function.body.instructions.end();
@@ -387,9 +392,7 @@ bool ai_baset::do_function_call(
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_end)));
     tmp_state->transform(l_end, l_return, *this, ns);
 
-    // Propagate those -- not exceedingly precise, this is,
-    // as still it contains all the state from the
-    // call site
+    // Propagate those
     return merge(*tmp_state, l_end, l_return);
   }
 }    
