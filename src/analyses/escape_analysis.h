@@ -28,6 +28,10 @@ class escape_analysist;
 class escape_domaint:public ai_domain_baset
 {
 public:
+  escape_domaint():is_bottom(true)
+  {
+  }
+  
   virtual void transform(
     locationt from,
     locationt to,
@@ -47,11 +51,13 @@ public:
   void make_bottom()
   {
     cleanup_map.clear();
+    is_bottom=true;
   }
   
   void make_top()
   {
     cleanup_map.clear();
+    is_bottom=false;
   }
   
   typedef union_find<irep_idt> aliasest;
@@ -64,6 +70,8 @@ public:
   
   typedef std::map<irep_idt, cleanupt > cleanup_mapt;
   cleanup_mapt cleanup_map;
+  
+  bool is_bottom;
 
 protected:  
   void assign_lhs_cleanup(const exprt &, const std::set<irep_idt> &);

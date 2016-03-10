@@ -335,6 +335,7 @@ void escape_domaint::transform(
     break;
   
   case END_FUNCTION:
+    // This is the edge to the call site.
     break;
 
   default:;
@@ -358,6 +359,12 @@ void escape_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
+  if(is_bottom)
+  {
+    out << "BOTTOM\n";
+    return;
+  }
+
   for(cleanup_mapt::const_iterator it=cleanup_map.begin();
       it!=cleanup_map.end();
       it++)
@@ -410,6 +417,15 @@ bool escape_domaint::merge(
   locationt from,
   locationt to)
 {
+  if(b.is_bottom)
+    return false; // no change
+
+  if(is_bottom)
+  {
+    *this=b;
+    return true; // change
+  }
+
   bool changed=false;
 
   for(cleanup_mapt::const_iterator b_it=b.cleanup_map.begin();
