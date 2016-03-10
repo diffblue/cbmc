@@ -513,7 +513,7 @@ void escape_domaint::check_lhs(
 
 /*******************************************************************\
 
-Function: escape_analysist::instrument
+Function: escape_analysist::insert_cleanup
 
   Inputs:
 
@@ -599,7 +599,7 @@ void escape_analysist::instrument(
       case DEAD:
         {
           const code_deadt &code_dead=to_code_dead(instruction.code);
-
+          
           std::set<irep_idt> cleanup_functions1;
           
           escape_domaint &d=operator[](i_it);
