@@ -29,6 +29,7 @@ bool escape_domaint::is_tracked(const symbol_exprt &symbol)
   const irep_idt &identifier=symbol.get_identifier();
   if(identifier=="__CPROVER_memory_leak" ||
      identifier=="__CPROVER_malloc_object" ||
+     identifier=="__CPROVER_dead_object" ||
      identifier=="__CPROVER_deallocated")
     return false;
     
@@ -84,7 +85,11 @@ void escape_domaint::assign_lhs_cleanup(
     if(is_tracked(symbol_expr))
     {
       irep_idt identifier=symbol_expr.get_identifier();
-      cleanup_map[identifier].cleanup_functions=cleanup_functions;
+      
+      if(cleanup_functions.empty())
+        cleanup_map.erase(identifier);
+      else
+        cleanup_map[identifier].cleanup_functions=cleanup_functions;
     }
   }
 }
