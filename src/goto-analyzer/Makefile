@@ -18,7 +18,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../json/json$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../util/util$(LIBEXT) \
-      ../miniz/miniz$(OBJEXT)
+      ../miniz/miniz$(OBJEXT) \
+      ../solvers/solvers$(LIBEXT)
 
 INCLUDES= -I ..
 
