@@ -392,7 +392,7 @@ bool gcc_modet::doit()
 
   // We can generate hybrid ELF and Mach-O binaries
   // containing both executable machine code and the goto-binary.
-  if(produce_hybrid_binary)
+  if(!result && produce_hybrid_binary)
   {
     if(gcc_hybrid_binary())
       result=true;
@@ -477,9 +477,11 @@ int gcc_modet::preprocess(
   // source file  
   new_argv.push_back(src);
   
+  const char *compiler=compiler_name();
+
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]=compiler_name();
+  new_argv[0]=compiler;
   
   #if 0
   std::cout << "RUN:";
@@ -488,7 +490,7 @@ int gcc_modet::preprocess(
   std::cout << std::endl;
   #endif
   
-  return run(compiler_name(), new_argv);
+  return run(compiler, new_argv);
 }
 
 /*******************************************************************\
@@ -656,7 +658,7 @@ int gcc_modet::gcc_hybrid_binary()
   // using objcopy
   for(std::list<std::string>::const_iterator
       it=output_files.begin();
-      it!=output_files.end();
+      result==0 && it!=output_files.end();
       it++)
   {
     debug() << "merging " << *it << eom;
@@ -672,7 +674,8 @@ int gcc_modet::gcc_hybrid_binary()
       objcopy_argv.push_back("--remove-section=goto-cc");
       objcopy_argv.push_back(*it);
       
-      run(objcopy_argv[0], objcopy_argv);
+      result=run(objcopy_argv[0], objcopy_argv);
+      if(result!=0) break;
     }
 
     // now add goto-binary as goto-cc section  
@@ -683,7 +686,7 @@ int gcc_modet::gcc_hybrid_binary()
     objcopy_argv.push_back("goto-cc="+saved);
     objcopy_argv.push_back(*it);
     
-    run(objcopy_argv[0], objcopy_argv);
+    result=run(objcopy_argv[0], objcopy_argv);
 
     remove(saved.c_str());
     #elif defined(__APPLE__)
@@ -700,7 +703,7 @@ int gcc_modet::gcc_hybrid_binary()
     lipo_argv.push_back("-output");
     lipo_argv.push_back(*it);
     
-    run(lipo_argv[0], lipo_argv);
+    result=run(lipo_argv[0], lipo_argv);
 
     remove(saved.c_str());
 
