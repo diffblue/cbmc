@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <algorithm>
+#include <iterator>
 
 #include <util/symbol.h>
 #include <util/symbol_table.h>
