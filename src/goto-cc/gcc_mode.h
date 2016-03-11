@@ -31,6 +31,7 @@ public:
   
 protected:
   bool act_as_ld;
+  std::string native_compiler_name;
   
   int preprocess(
     const std::string &language,
@@ -43,13 +44,30 @@ protected:
   
   static bool needs_preprocessing(const std::string &);
   
-  static inline const char *compiler_name()
+  inline const char *compiler_name()
   {
-    #ifdef __FreeBSD__
-    return "clang";
-    #else
-    return "gcc";
-    #endif
+    if(native_compiler_name.empty())
+    {
+      std::string::size_type pos=base_name.find("goto-gcc");
+
+      if(pos==std::string::npos ||
+         base_name=="goto-gcc" ||
+         base_name=="goto-ld")
+      {
+        #ifdef __FreeBSD__
+        native_compiler_name="clang";
+        #else
+        native_compiler_name="gcc";
+        #endif
+      }
+      else
+      {
+        native_compiler_name=base_name;
+        native_compiler_name.replace(pos, 8, "gcc");
+      }
+    }
+
+    return native_compiler_name.c_str();
   }
 };
 

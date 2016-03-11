@@ -24,7 +24,10 @@ Function: get_base_name
 
 std::string get_base_name(const std::string &in)
 {
-  size_t r=in.rfind('.', in.length()-1);
+  size_t r=std::string::npos;
+  #ifdef _MSC_VER
+  r=in.rfind('.', in.length()-1);
+  #endif
   if(r==std::string::npos) r=in.length();
 
   size_t f=in.rfind('/', in.length()-1);

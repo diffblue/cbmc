@@ -40,7 +40,9 @@ Function: to_lower_string
 std::string to_lower_string(const std::string &s)
 {
   std::string result=s;
+  #ifdef _MSC_VER
   transform(result.begin(), result.end(), result.begin(), tolower);
+  #endif
   return result;
 }
 
@@ -105,7 +107,10 @@ int main(int argc, const char **argv)
     armcc_mode.base_name=base_name;
     return armcc_mode.main(argc, argv);
   }
-  else if(base_name=="goto-gcc")
+  // handle GCC names like x86_64-apple-darwin14-llvm-gcc-4.2
+  // via x86_64-apple-darwin14-llvm-goto-gcc-4.2
+  else if(base_name=="goto-clang" ||
+          base_name.find("goto-gcc")!=std::string::npos)
   {
     // this produces ELF/Mach-O "hybrid binaries",
     // with a GCC-style command-line interface,
