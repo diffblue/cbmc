@@ -38,6 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 
 #include <goto-instrument/full_slicer.h>
+#include <goto-instrument/nondet_static.h>
 
 #include <linking/entry_point.h>
 
@@ -889,6 +890,15 @@ bool cbmc_parse_optionst::process_goto_program(
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
     
+    // ignore default/user-specified initialization
+    // of variables with static lifetime
+    if(cmdline.isset("nondet-static"))
+    {
+      status() << "Adding nondeterministic initialization "
+                  "of static/global variables" << eom;
+      nondet_static(ns, goto_functions);
+    }
+
     if(cmdline.isset("string-abstraction"))
     {
       status() << "String Abstraction" << eom;
