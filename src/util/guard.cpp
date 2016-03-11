@@ -99,7 +99,7 @@ void guardt::add(const exprt &expr)
 
   if(is_false() || expr.is_true())
     return;
-  else if(is_true())
+  else if(is_true() || expr.is_false())
   {
     *this=expr;
 
