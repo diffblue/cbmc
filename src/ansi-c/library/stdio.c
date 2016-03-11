@@ -46,7 +46,8 @@ inline int puts(const char *s)
 inline void fclose_cleanup(void *stream)
 {
   __CPROVER_HIDE:;
-  __CPROVER_assert(__CPROVER_get_must(stream, "closed"),
+  __CPROVER_assert(!__CPROVER_get_must(stream, "open") ||
+                   __CPROVER_get_must(stream, "closed"),
                    "resource leak: fopen file not closed");
 }
 #endif
