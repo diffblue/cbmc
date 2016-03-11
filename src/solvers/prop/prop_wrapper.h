@@ -65,7 +65,7 @@ class prop_wrappert:public virtual propt
   virtual literalt new_variable()
   { return p.new_variable(); }
 
-  virtual unsigned no_variables() const
+  virtual std::size_t no_variables() const
   { return p.no_variables(); }
   
   // solving

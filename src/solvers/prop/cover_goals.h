@@ -52,7 +52,7 @@ public:
   
   // statistics
 
-  inline unsigned number_covered() const
+  inline std::size_t number_covered() const
   {
     return _number_covered;
   }
@@ -90,7 +90,8 @@ public:
   }
   
 protected:
-  unsigned _number_covered, _iterations;
+  std::size_t _number_covered;
+  unsigned _iterations;
   prop_convt &prop_conv;
 
   typedef std::vector<observert *> observerst;

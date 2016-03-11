@@ -37,7 +37,7 @@ public:
 
   // statistics
 
-  inline unsigned number_satisfied() const
+  inline std::size_t number_satisfied() const
   {
     return _number_satisfied;
   }
@@ -47,7 +47,7 @@ public:
     return _iterations;
   }
   
-  inline unsigned size() const
+  inline std::size_t size() const
   {
     return _number_objectives;
   }
@@ -77,7 +77,8 @@ public:
   objectivest objectives;
 
 protected:
-  unsigned _iterations, _number_satisfied, _number_objectives;
+  unsigned _iterations;
+  std::size_t _number_satisfied, _number_objectives;
   weightt _value;
   prop_convt &prop_conv;
 
