@@ -1051,7 +1051,7 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
       continue;
 
     bool defargs = true;
-    for(unsigned i=2; i<parameters.size(); i++)
+    for(std::size_t i=2; i<parameters.size(); i++)
     {
       if(parameters[i].default_value().is_nil())
       {
@@ -1083,7 +1083,7 @@ bool cpp_typecheckt::find_assignop(const symbolt& symbol) const
   const struct_typet& struct_type = to_struct_type(symbol.type);
   const struct_typet::componentst& components = struct_type.components();
 
-  for(unsigned i = 0; i < components.size(); i++)
+  for(std::size_t i=0; i < components.size(); i++)
   {
     const struct_typet::componentt& component = components[i];
 

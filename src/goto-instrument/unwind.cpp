@@ -142,7 +142,7 @@ void unwind(
     
     // adjust the intra-loop branches
 
-    for(unsigned i=0; i<target_vector.size(); i++)
+    for(std::size_t i=0; i<target_vector.size(); i++)
     {
       goto_programt::targett t=target_vector[i];
 

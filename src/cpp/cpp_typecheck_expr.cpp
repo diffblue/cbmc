@@ -2002,7 +2002,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
     }
   }
 
-  for(unsigned i=0; i<expr.get_sub().size(); i++)
+  for(std::size_t i=0; i<expr.get_sub().size(); i++)
   {
     if(expr.get_sub()[i].id()==ID_cpp_name)
     {

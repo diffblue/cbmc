@@ -238,7 +238,7 @@ void template_mapt::build(
   if(instance.size()<template_parameters.size())
   {
     // check for default parameters
-    for(unsigned i=instance.size();
+    for(std::size_t i=instance.size();
         i<template_parameters.size();
         i++)
     {
@@ -365,7 +365,7 @@ cpp_template_args_tct template_mapt::build_template_args(
   cpp_template_args_tct template_args;
   template_args.arguments().resize(template_parameters.size());
   
-  for(unsigned i=0; i<template_parameters.size(); i++)
+  for(std::size_t i=0; i<template_parameters.size(); i++)
   {
     const template_parametert &t=template_parameters[i];
     
