@@ -121,7 +121,7 @@ int main(int argc, const char **argv)
     gcc_mode.produce_hybrid_binary=true;
     return gcc_mode.main(argc, argv);
   }
-  else if(base_name=="goto-ld")
+  else if(base_name.find("goto-ld")!=std::string::npos)
   {
     // this simulates "ld" for linking
     ld_cmdlinet cmdline;

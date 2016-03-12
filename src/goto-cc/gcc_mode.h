@@ -69,6 +69,28 @@ protected:
 
     return native_compiler_name.c_str();
   }
+
+  inline const char *linker_name()
+  {
+    if(native_compiler_name.empty())
+    {
+      std::string::size_type pos=base_name.find("goto-ld");
+
+      if(pos==std::string::npos ||
+         base_name=="goto-gcc" ||
+         base_name=="goto-ld")
+      {
+        native_compiler_name="ld";
+      }
+      else
+      {
+        native_compiler_name=base_name;
+        native_compiler_name.replace(pos, 7, "ld");
+      }
+    }
+
+    return native_compiler_name.c_str();
+  }
 };
 
 #endif /* GOTO_CC_GCC_MODE_H */

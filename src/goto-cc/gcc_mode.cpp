@@ -64,8 +64,8 @@ Function: gcc_modet::doit
 bool gcc_modet::doit()
 {
   act_as_ld=
-    has_prefix(base_name, "ld") ||
-    has_prefix(base_name, "goto-ld");
+    base_name=="ld" ||
+    base_name.find("goto-ld")!=std::string::npos;
 
   if(cmdline.isset('?') ||
      cmdline.isset("help"))
@@ -641,7 +641,7 @@ int gcc_modet::gcc_hybrid_binary()
   assert(new_argv.size()>=1);
   
   if(act_as_ld)
-    new_argv[0]="ld";
+    new_argv[0]=linker_name();
   else
     new_argv[0]=compiler_name();
   
