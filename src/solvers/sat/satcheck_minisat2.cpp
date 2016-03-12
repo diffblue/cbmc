@@ -118,7 +118,7 @@ Function: satcheck_minisat_no_simplifiert::solver_text
 
 const std::string satcheck_minisat_no_simplifiert::solver_text()
 {
-  return "MiniSAT 2.2.0 without simplifier";
+  return "MiniSAT 2.2.1 without simplifier";
 }
 
 /*******************************************************************\
@@ -135,7 +135,7 @@ Function: satcheck_minisat_simplifiert::solver_text
 
 const std::string satcheck_minisat_simplifiert::solver_text()
 {
-  return "MiniSAT 2.2.0 with simplifier";
+  return "MiniSAT 2.2.1 with simplifier";
 }
 
 /*******************************************************************\
