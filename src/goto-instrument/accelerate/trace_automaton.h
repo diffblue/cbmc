@@ -37,7 +37,7 @@ class automatont {
   void reverse(goto_programt::targett epsilon);
   void trim();
 
-  unsigned int count_transitions();
+  std::size_t count_transitions();
 
   void output(std::ostream &str);
 

@@ -83,8 +83,8 @@ void overflow_instrumentert::overflow_expr(const exprt &expr,
     }
 
     const typet &old_type = ns.follow(expr.op0().type());
-    unsigned new_width = expr.type().get_int(ID_width);
-    unsigned old_width = old_type.get_int(ID_width);
+    std::size_t new_width = expr.type().get_int(ID_width);
+    std::size_t old_width = old_type.get_int(ID_width);
 
     if (type.id() == ID_signedbv) {
       if (old_type.id() == ID_signedbv) {
@@ -160,7 +160,7 @@ void overflow_instrumentert::overflow_expr(const exprt &expr,
 
     if (expr.operands().size() >= 3) {
       // The overflow checks are binary.
-      for (unsigned i = 1; i < expr.operands().size(); i++) {
+      for (std::size_t i = 1; i < expr.operands().size(); i++) {
         exprt tmp;
 
         if (i == 1) {
