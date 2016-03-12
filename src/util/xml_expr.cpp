@@ -186,7 +186,7 @@ xmlt xml(
        type.id()==ID_signedbv ||
        type.id()==ID_c_bit_field)
     {
-      unsigned width=to_bitvector_type(type).get_width();
+      std::size_t width=to_bitvector_type(type).get_width();
     
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));

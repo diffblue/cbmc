@@ -645,7 +645,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     
   // try to merge constants
   
-  unsigned width=to_bitvector_type(expr.type()).get_width();
+  std::size_t width=to_bitvector_type(expr.type()).get_width();
     
   while(expr.operands().size()>=2)
   {
@@ -672,17 +672,17 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
                 
     if(expr.id()==ID_bitand)
     {
-      for(unsigned i=0; i<width; i++)
+      for(std::size_t i=0; i<width; i++)
         new_value[i]=(a_str[i]=='1' && b_str[i]=='1')?'1':'0';
     }
     else if(expr.id()==ID_bitor)
     {
-      for(unsigned i=0; i<width; i++)
+      for(std::size_t i=0; i<width; i++)
         new_value[i]=(a_str[i]=='1' || b_str[i]=='1')?'1':'0';
     }
     else if(expr.id()==ID_bitxor)
     {
-      for(unsigned i=0; i<width; i++)
+      for(std::size_t i=0; i<width; i++)
         new_value[i]=((a_str[i]=='1')!=(b_str[i]=='1'))?'1':'0';
     }
     else
@@ -767,7 +767,7 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
   if(!is_bitvector_type(op0_type))
     return true;
   
-  unsigned width=to_bitvector_type(op0_type).get_width();
+  std::size_t width=to_bitvector_type(op0_type).get_width();
 
   assert(expr.operands().size()==2);
 
@@ -1038,7 +1038,7 @@ bool simplify_exprt::simplify_extractbits(exprt &expr)
 
   if(expr.op0().is_constant())
   {
-    unsigned width=to_bitvector_type(op0_type).get_width();
+    std::size_t width=to_bitvector_type(op0_type).get_width();
     mp_integer start, end;
     
     if(to_integer(expr.op1(), start))

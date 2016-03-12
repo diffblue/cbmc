@@ -20,7 +20,7 @@ class typet;
 class bv_spect
 {
 public:
-  unsigned width;
+  std::size_t width;
   bool is_signed;
   
   bv_spect(const typet &type)

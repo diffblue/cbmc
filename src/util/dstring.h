@@ -50,7 +50,7 @@ public:
     return no==0; // string 0 is exactly the empty string
   }
   
-  inline char operator[](unsigned i) const
+  inline char operator[](size_t i) const
   {
     return as_string()[i];
   }
