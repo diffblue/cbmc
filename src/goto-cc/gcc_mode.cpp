@@ -520,11 +520,13 @@ int gcc_modet::run_gcc()
     new_argv.push_back(it->arg);
   }
   
-  const char *compiler=compiler_name();
-
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]=compiler;
+
+  if(act_as_ld)
+    new_argv[0]=linker_name();
+  else
+    new_argv[0]=compiler_name();
   
   #if 0
   std::cout << "RUN:";
@@ -533,7 +535,7 @@ int gcc_modet::run_gcc()
   std::cout << std::endl;
   #endif
   
-  return run(compiler, new_argv);
+  return run(new_argv[0], new_argv);
 }
 
 /*******************************************************************\
