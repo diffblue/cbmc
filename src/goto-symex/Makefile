@@ -8,7 +8,8 @@ SRC = symex_target.cpp symex_target_equation.cpp goto_symex.cpp \
       symex_catch.cpp symex_start_thread.cpp symex_assign.cpp \
       symex_throw.cpp symex_atomic_section.cpp memory_model.cpp \
       memory_model_sc.cpp partial_order_concurrency.cpp \
-      memory_model_tso.cpp memory_model_pso.cpp
+      memory_model_tso.cpp memory_model_pso.cpp \
+      memory_model_interrupt.cpp
 
 INCLUDES= -I ..
 

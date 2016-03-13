@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <iostream>
 
 #include <util/expr_util.h>
 #include <util/i2string.h>
@@ -226,7 +227,17 @@ void goto_symext::symex_function_call_symbol(
 
   const irep_idt &identifier=
     to_symbol_expr(code.function()).get_identifier();
-    
+   
+  if(state.is_start_thread)
+  {
+    state.is_start_thread=false;
+ 
+    #ifdef DEBUG
+    std::cout << "Thread id: " << identifier << std::endl;
+    std::cout << "Priority: " << state.source.priority << std::endl;
+    #endif
+  }
+ 
   if(identifier=="CBMC_trace")
   {
     symex_trace(state, code);
