@@ -396,7 +396,7 @@ safety_checkert::resultt bmct::run(
   else
   {
     error() << "Invalid memory model " << mm
-            << " -- use one of sc, tso, pso, isq" << eom;
+            << " -- use one of sc, tso, pso, irq" << eom;
     return safety_checkert::ERROR;
   }
 
