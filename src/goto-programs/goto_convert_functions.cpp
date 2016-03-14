@@ -79,7 +79,9 @@ void goto_convert_functionst::goto_convert()
   {
     if(!it->second.is_type &&
        it->second.type.id()==ID_code &&
-       (it->second.mode==ID_C || it->second.mode==ID_cpp))
+       (it->second.mode==ID_C ||
+        it->second.mode==ID_cpp ||
+        it->second.mode==ID_java))
       symbol_list.push_back(it->first);
   }
   
