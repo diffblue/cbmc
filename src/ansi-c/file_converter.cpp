@@ -21,9 +21,9 @@ int main()
       }
       else if((ch&0x80)!=0)
       {
-        char hexbuf[10];
-        snprintf(hexbuf, sizeof(hexbuf), "\\x%x", ch&0xff);
-        std::cout << hexbuf;
+        std::cout << "\\x" 
+                  << std::hex << (unsigned(ch)&0xff)
+                  << std::dec;
       }
       else
         std::cout << ch;
