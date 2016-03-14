@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cbmc/version.h>
 
 #include "goto_analyser_parse_options.h"
+#include "taint_analysis.h"
 
 /*******************************************************************\
 
@@ -473,6 +474,16 @@ int goto_analyser_parse_optionst::doit()
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
 
+  if(cmdline.isset("taint"))
+  {
+    const namespacet ns(symbol_table);
+    std::string taint_file=cmdline.get_value("taint");
+    bool result=
+      taint_analysis(goto_functions, ns, taint_file, get_message_handler());
+    return result?10:0;
+  }
+
+  #if 0  
   label_properties(goto_functions);
 
   if(cmdline.isset("show-properties")) // use this one
@@ -484,8 +495,7 @@ int goto_analyser_parse_optionst::doit()
 
   if(set_properties(goto_functions))
     return 7;
-
-
+  #endif
 
   return 0;
 }
@@ -647,8 +657,10 @@ int goto_analyser_parse_optionst::get_goto_program(
       return 0;
     }
 
+    #if 0
     if(entry_point(symbol_table, "main", get_message_handler()))
       return 6;
+    #endif
 
     status() << "Generating GOTO Program" << eom;
 
@@ -703,7 +715,8 @@ bool goto_analyser_parse_optionst::process_goto_program(
   try
   {
     namespacet ns(symbol_table);
-    
+
+    #if 0
     // Remove inline assembler; this needs to happen before
     // adding the library.
     remove_asm(symbol_table, goto_functions);
@@ -712,6 +725,7 @@ bool goto_analyser_parse_optionst::process_goto_program(
     status() << "Adding CPROVER library (" 
              << config.ansi_c.arch << ")" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
+    #endif
 
     // remove function pointers
     status() << "Function Pointer Removal" << eom;
@@ -726,10 +740,12 @@ bool goto_analyser_parse_optionst::process_goto_program(
     remove_returns(symbol_table, goto_functions);
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
-    
+
+    #if 0
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
+    #endif
     
     // recalculate numbers, etc.
     goto_functions.update();

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 #include <list>
+#include <iosfwd>
 
 #include <util/message.h>
 #include <util/irep.h>
@@ -27,10 +28,15 @@ public:
     irep_idt function_identifier;
     irep_idt taint;
     unsigned parameter_number;
+    std::string message;
+    
+    void output(std::ostream &) const;
   };
 
   typedef std::list<entryt> entriest;
   entriest entries;
+  
+  void output(std::ostream &) const;
 };
 
 bool taint_parser(

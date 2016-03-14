@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include <json/json_parser.h>
 
 #include "taint_parser.h"
@@ -28,8 +30,14 @@ bool taint_parser(
   message_handlert &message_handler)
 {
   jsont json;
+
   if(parse_json(file_name, message_handler, json))
+  {
+    messaget message(message_handler);
+    message.error() << "taint file is not a valid json file"
+                    << messaget::eom;
     return true;
+  }
 
   if(!json.is_array())
   {
@@ -58,6 +66,7 @@ bool taint_parser(
     const std::string function=(*it)["function"].value;
     const std::string where=(*it)["where"].value;
     const std::string taint=(*it)["taint"].value;
+    const std::string message=(*it)["message"].value;
     
     if(kind=="source")
       entry.kind=taint_parse_treet::entryt::SOURCE;
@@ -103,7 +112,61 @@ bool taint_parser(
     }
     
     entry.taint=taint;
+    entry.message=message;
+    
+    dest.entries.push_back(entry);
   }
   
   return false;
 }
+
+/*******************************************************************\
+
+Function: taint_parse_treet::entryt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void taint_parse_treet::entryt::output(std::ostream &out) const
+{
+  switch(kind)
+  {
+  case SOURCE: out << "SOURCE "; break;
+  case SINK: out << "SINK "; break;
+  }
+  
+  out << taint << " on ";
+  
+  switch(where)
+  {
+  case THIS: out << "this in " << function_identifier; break;
+  case PARAMETER: out << "parameter " << parameter_number << " of " << function_identifier; break;
+  case RETURN_VALUE: out << "return value of " << function_identifier; break;
+  }
+  
+  out << '\n';
+}
+
+/*******************************************************************\
+
+Function: taint_parse_treet::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void taint_parse_treet::output(std::ostream &out) const
+{
+  for(const auto & entry : entries)
+    entry.output(out);
+}
+
