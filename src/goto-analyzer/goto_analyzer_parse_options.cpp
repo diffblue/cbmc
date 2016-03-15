@@ -496,8 +496,11 @@ int goto_analyzer_parse_optionst::doit()
   if(set_properties(goto_functions))
     return 7;
   #endif
+  
+  error() << "no analysis option given -- consider reading --help"
+          << eom;
 
-  return 0;
+  return 8;
 }
 
 /*******************************************************************\
