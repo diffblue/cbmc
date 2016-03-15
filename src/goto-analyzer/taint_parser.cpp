@@ -83,7 +83,7 @@ bool taint_parser(
     if(function.empty())
     {
       messaget message(message_handler);
-      message.error() << "taint entry must have 'function'"
+      message.error() << "taint entry must have \"function\""
                       << messaget::eom;
       return true;
     }
