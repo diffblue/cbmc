@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
+#include <util/string2int.h>
+
 #include <json/json_parser.h>
 
 #include "taint_parser.h"
@@ -72,10 +74,13 @@ bool taint_parser(
       entry.kind=taint_parse_treet::entryt::SOURCE;
     else if(kind=="sink")
       entry.kind=taint_parse_treet::entryt::SINK;
+    else if(kind=="sanitizer")
+      entry.kind=taint_parse_treet::entryt::SANITIZER;
     else
     {
       messaget message(message_handler);
-      message.error() << "taint entry must have \"kind\" which is \"source\" or \"sink\""
+      message.error() << "taint entry must have \"kind\" which is "
+                         "\"source\" or \"sink\" or \"sanitizer\""
                       << messaget::eom;
       return true;
     }
@@ -101,6 +106,8 @@ bool taint_parser(
     else if(std::string(where, 0, 9)=="parameter")
     {
       entry.where=taint_parse_treet::entryt::PARAMETER;
+      entry.parameter_number=
+        safe_string2unsigned(std::string(where, 9, std::string::npos));
     }
     else
     {
@@ -138,6 +145,7 @@ void taint_parse_treet::entryt::output(std::ostream &out) const
   {
   case SOURCE: out << "SOURCE "; break;
   case SINK: out << "SINK "; break;
+  case SANITIZER: out << "SANITIZER "; break;
   }
   
   out << taint << " on ";

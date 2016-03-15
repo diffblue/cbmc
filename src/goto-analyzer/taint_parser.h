@@ -22,7 +22,7 @@ public:
   class entryt
   {
   public:
-    enum { SOURCE, SINK } kind;
+    enum { SOURCE, SINK, SANITIZER } kind;
     enum { THIS, PARAMETER, RETURN_VALUE } where;
 
     irep_idt function_identifier;
@@ -31,6 +31,10 @@ public:
     std::string message;
     
     void output(std::ostream &) const;
+    
+    inline entryt():parameter_number(0)
+    {
+    }
   };
 
   typedef std::list<entryt> entriest;
