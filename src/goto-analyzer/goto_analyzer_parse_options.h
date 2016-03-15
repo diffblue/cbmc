@@ -31,7 +31,7 @@ class optionst;
   "(gcc)(arch):" \
   "(taint):"
 
-class goto_analyser_parse_optionst:
+class goto_analyzer_parse_optionst:
   public parse_options_baset,
   public language_uit
 {
@@ -39,7 +39,7 @@ public:
   virtual int doit();
   virtual void help();
 
-  goto_analyser_parse_optionst(int argc, const char **argv);
+  goto_analyzer_parse_optionst(int argc, const char **argv);
 
 protected:
   virtual void register_languages();

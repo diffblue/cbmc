@@ -41,12 +41,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include "goto_analyser_parse_options.h"
+#include "goto_analyzer_parse_options.h"
 #include "taint_analysis.h"
 
 /*******************************************************************\
 
-Function: goto_analyser_parse_optionst::goto_analyser_parse_optionst
+Function: goto_analyzer_parse_optionst::goto_analyzer_parse_optionst
 
   Inputs:
 
@@ -56,7 +56,7 @@ Function: goto_analyser_parse_optionst::goto_analyser_parse_optionst
 
 \*******************************************************************/
 
-goto_analyser_parse_optionst::goto_analyser_parse_optionst(int argc, const char **argv):
+goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(int argc, const char **argv):
   parse_options_baset(GOTO_ANALYSER_OPTIONS, argc, argv),
   language_uit("GOTO-ANALYSER " CBMC_VERSION, cmdline)
 {
@@ -64,7 +64,7 @@ goto_analyser_parse_optionst::goto_analyser_parse_optionst(int argc, const char 
   
 /*******************************************************************\
 
-Function: goto_analyser_parse_optionst::register_languages
+Function: goto_analyzer_parse_optionst::register_languages
 
   Inputs:
 
@@ -74,7 +74,7 @@ Function: goto_analyser_parse_optionst::register_languages
 
 \*******************************************************************/
 
-void goto_analyser_parse_optionst::register_languages()
+void goto_analyzer_parse_optionst::register_languages()
 {
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);
@@ -83,7 +83,7 @@ void goto_analyser_parse_optionst::register_languages()
 
 /*******************************************************************\
 
-Function: goto_analyser_parse_optionst::eval_verbosity
+Function: goto_analyzer_parse_optionst::eval_verbosity
 
   Inputs:
 
@@ -93,7 +93,7 @@ Function: goto_analyser_parse_optionst::eval_verbosity
 
 \*******************************************************************/
 
-void goto_analyser_parse_optionst::eval_verbosity()
+void goto_analyzer_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
   unsigned int v=messaget::M_STATISTICS;
@@ -109,7 +109,7 @@ void goto_analyser_parse_optionst::eval_verbosity()
 
 /*******************************************************************\
 
-Function: goto_analyser_parse_optionst::get_command_line_options
+Function: goto_analyzer_parse_optionst::get_command_line_options
 
   Inputs:
 
@@ -119,7 +119,7 @@ Function: goto_analyser_parse_optionst::get_command_line_options
 
 \*******************************************************************/
 
-void goto_analyser_parse_optionst::get_command_line_options(optionst &options)
+void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
   {
@@ -430,7 +430,7 @@ void goto_analyser_parse_optionst::get_command_line_options(optionst &options)
 
 /*******************************************************************\
 
-Function: goto_analyser_parse_optionst::doit
+Function: goto_analyzer_parse_optionst::doit
 
   Inputs:
 
@@ -440,7 +440,7 @@ Function: goto_analyser_parse_optionst::doit
 
 \*******************************************************************/
 
-int goto_analyser_parse_optionst::doit()
+int goto_analyzer_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
@@ -502,7 +502,7 @@ int goto_analyser_parse_optionst::doit()
 
 /*******************************************************************\
 
-Function: goto_analyser_parse_optionst::set_properties
+Function: goto_analyzer_parse_optionst::set_properties
 
   Inputs:
 
@@ -512,7 +512,7 @@ Function: goto_analyser_parse_optionst::set_properties
 
 \*******************************************************************/
 
-bool goto_analyser_parse_optionst::set_properties(goto_functionst &goto_functions)
+bool goto_analyzer_parse_optionst::set_properties(goto_functionst &goto_functions)
 {
   try
   {
@@ -542,7 +542,7 @@ bool goto_analyser_parse_optionst::set_properties(goto_functionst &goto_function
 
 /*******************************************************************\
 
-Function: goto_analyser_parse_optionst::get_goto_program
+Function: goto_analyzer_parse_optionst::get_goto_program
 
   Inputs:
 
@@ -552,7 +552,7 @@ Function: goto_analyser_parse_optionst::get_goto_program
 
 \*******************************************************************/
   
-int goto_analyser_parse_optionst::get_goto_program(
+int goto_analyzer_parse_optionst::get_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
 {
@@ -698,7 +698,7 @@ int goto_analyser_parse_optionst::get_goto_program(
 
 /*******************************************************************\
 
-Function: goto_analyser_parse_optionst::process_goto_program
+Function: goto_analyzer_parse_optionst::process_goto_program
 
   Inputs:
 
@@ -708,7 +708,7 @@ Function: goto_analyser_parse_optionst::process_goto_program
 
 \*******************************************************************/
   
-bool goto_analyser_parse_optionst::process_goto_program(
+bool goto_analyzer_parse_optionst::process_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
 {
@@ -789,7 +789,7 @@ bool goto_analyser_parse_optionst::process_goto_program(
 
 /*******************************************************************\
 
-Function: goto_analyser_parse_optionst::help
+Function: goto_analyzer_parse_optionst::help
 
   Inputs:
 
@@ -799,7 +799,7 @@ Function: goto_analyser_parse_optionst::help
 
 \*******************************************************************/
 
-void goto_analyser_parse_optionst::help()
+void goto_analyzer_parse_optionst::help()
 {
   std::cout <<
     "\n"
@@ -815,8 +815,8 @@ void goto_analyser_parse_optionst::help()
     "\n"
     "Usage:                       Purpose:\n"
     "\n"
-    " goto-analyser [-h] [--help]  show help\n"
-    " goto-analyser file.c ...     source file names\n"
+    " goto-analyzer [-h] [--help]  show help\n"
+    " goto-analyzer file.c ...     source file names\n"
     "\n"
     "Analyses:\n"
     "\n"

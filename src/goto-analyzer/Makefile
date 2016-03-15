@@ -1,4 +1,4 @@
-SRC = goto_analyser_main.cpp goto_analyser_parse_options.cpp \
+SRC = goto_analyzer_main.cpp goto_analyzer_parse_options.cpp \
       taint_parser.cpp taint_analysis.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
@@ -18,9 +18,9 @@ LIBS =
 include ../config.inc
 include ../common
 
-CLEANFILES = goto-analyser$(EXEEXT)
+CLEANFILES = goto-analyzer$(EXEEXT)
 
-all: goto-analyser$(EXEEXT)
+all: goto-analyzer$(EXEEXT)
 
 ifneq ($(wildcard ../cpp/Makefile),)
   OBJ += ../cpp/cpp$(LIBEXT)
@@ -47,11 +47,11 @@ endif
 
 ###############################################################################
 
-goto-analyser$(EXEEXT): $(OBJ)
+goto-analyzer$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
-.PHONY: goto-analyser-mac-signed
+.PHONY: goto-analyzer-mac-signed
 
-goto-analyser-mac-signed: goto-analyser$(EXEEXT)
-	strip goto-analyser$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) goto-analyser$(EXEEXT)
+goto-analyzer-mac-signed: goto-analyzer$(EXEEXT)
+	strip goto-analyzer$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) goto-analyzer$(EXEEXT)
 
