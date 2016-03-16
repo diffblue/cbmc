@@ -31,6 +31,7 @@ public:
   void add_class_file(const irep_idt &file);
   
   static std::string file_to_class_name(const std::string &);
+  static std::string class_name_to_file(const irep_idt &);
 
 protected:
   struct jar_entryt

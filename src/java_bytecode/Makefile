@@ -14,7 +14,7 @@ include ../common
 CLEANFILES = java_bytecode$(LIBEXT)
 
 ifneq ($(LIBZIPINC),)
-  INCLUDES += -I $(LIBZIPINC)/include
+  INCLUDES += -I $(LIBZIPINC)/include -I /opt/local/include
   CP_CXXFLAGS += -DHAVE_LIBZIP
 endif
 

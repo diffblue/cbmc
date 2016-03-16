@@ -441,7 +441,7 @@ typet java_type_from_string(const std::string &src)
 
   case '[': // array type
     {
-      if(src.size()<=2) return nil_typet();
+      if(src.size()<=1) return nil_typet();
       const typet subtype=java_type_from_string(src.substr(1, std::string::npos));
       return java_array_type(subtype, 1);
     }

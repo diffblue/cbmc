@@ -114,7 +114,7 @@ protected:
   {
     for(unsigned i=0; i<bytes; i++)
     {
-      if(!*in) throw "unexpected end of input file";
+      if(!*in) throw "unexpected end of bytecode file";
       in->get();
     }
   }
@@ -124,7 +124,7 @@ protected:
     u8 result=0;
     for(unsigned i=0; i<bytes; i++)
     {
-      if(!*in) throw "unexpected end of input file";
+      if(!*in) throw "unexpected end of bytecode file";
       result<<=8;
       result|=in->get();
     }
