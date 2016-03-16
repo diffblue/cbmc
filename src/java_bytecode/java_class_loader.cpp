@@ -120,13 +120,12 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
       cp_it!=config.java.class_path.end();
       cp_it++)
   {
-    std::string full_path;
-    
-    #ifdef _WIN32
-    full_path=*cp_it+'\\'+id2string(class_name)+".class";
-    #else
-    full_path=*cp_it+'/'+id2string(class_name)+".class";
-    #endif
+    std::string full_path=
+      #ifdef _WIN32
+      *cp_it+'\\'+class_to_file_name(class_name);
+      #else
+      *cp_it+'/'+class_name_to_file(class_name);
+      #endif
   
     if(!java_bytecode_parse(
          full_path,
@@ -218,13 +217,44 @@ std::string java_class_loadert::file_to_class_name(const std::string &file)
 {
   std::string result=file;
 
-  // strip .class              
+  // strip .class
   if(has_suffix(result, ".class"))
     result.resize(result.size()-6);
     
   // slash to dot
   for(std::string::iterator it=result.begin(); it!=result.end(); it++)
     if(*it=='/') *it='.';
+
+  return result;
+}
+
+/*******************************************************************\
+
+Function: java_class_loadert::class_name_to_file
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string java_class_loadert::class_name_to_file(const irep_idt &class_name)
+{
+  std::string result=id2string(class_name);
+
+  // dots (package name separators) to slash, depending on OS
+  for(std::string::iterator it=result.begin(); it!=result.end(); it++)
+    if(*it=='.')
+      #ifdef _WIN32
+      *it='\\';
+      #else
+      *it='/';
+      #endif
+
+  // add .class suffix
+  result+=".class";
 
   return result;
 }
