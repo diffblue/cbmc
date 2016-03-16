@@ -125,7 +125,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   {
     std::string full_path=
       #ifdef _WIN32
-      *cp_it+'\\'+class_to_file_name(class_name);
+      *cp_it+'\\'+class_name_to_file(class_name);
       #else
       *cp_it+'/'+class_name_to_file(class_name);
       #endif
