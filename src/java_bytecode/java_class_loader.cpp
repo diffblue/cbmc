@@ -83,13 +83,16 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   
   if(c_j_it!=class_jar_map.end())
   {
-    std::vector<char> data;
+    debug() << "Getting class `" << class_name << "' from JAR "
+            << c_j_it->second.jar_file_name << eom;
 
+    std::string data;
+    
     if(get_jar_entry(
       c_j_it->second.jar_file_name.c_str(), c_j_it->second.index, data))
       return parse_tree; // error
-  
-    std::istringstream istream(data.data());
+
+    std::istringstream istream(data);
     
     java_bytecode_parse(
       istream,
@@ -183,6 +186,8 @@ void java_class_loadert::add_jar_file(const irep_idt &file)
     error() << "failed to open JAR file `" << file << "'" << eom;
     return;
   }
+  
+  debug() << "adding JAR file `" << file << "'" << eom;
   
   std::size_t number_of_files=entries.size();
   

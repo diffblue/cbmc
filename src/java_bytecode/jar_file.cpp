@@ -32,7 +32,7 @@ Function: get_jar_entry
 bool get_jar_entry(
   const std::string &jar_file,
   std::size_t index,
-  std::vector<char> &dest)
+  std::string &dest)
 {
   #ifdef HAVE_LIBZIP
   int zip_error;
@@ -148,11 +148,11 @@ bool get_jar_manifest(
 
   if(!found) return true;  
   
-  std::vector<char> dest; 
+  std::string dest; 
   if(get_jar_entry(jar_file, index, dest))
     return true;
 
-  std::istringstream in(dest.data());
+  std::istringstream in(dest);
 
   std::string line;
   while(std::getline(in, line))
