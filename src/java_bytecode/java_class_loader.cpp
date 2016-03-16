@@ -173,6 +173,11 @@ void java_class_loadert::add_jar_file(const irep_idt &file)
 {
   std::vector<std::string> entries;
   
+  #ifndef HAVE_LIBZIP
+  error() << "no support for reading JAR files configured" << eom;
+  return;
+  #endif
+  
   if(get_jar_index(file.c_str(), entries))
   {
     error() << "failed to open JAR file `" << file << "'" << eom;
