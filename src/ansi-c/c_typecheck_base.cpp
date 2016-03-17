@@ -711,13 +711,6 @@ void c_typecheck_baset::typecheck_declaration(
   {
     // get storage spec
     c_storage_spect c_storage_spec(declaration.type());
-  
-    declaration.set_is_inline(c_storage_spec.is_inline);
-    declaration.set_is_static(c_storage_spec.is_static);
-    declaration.set_is_extern(c_storage_spec.is_extern);
-    declaration.set_is_thread_local(c_storage_spec.is_thread_local);
-    declaration.set_is_register(c_storage_spec.is_register);
-    declaration.set_is_typedef(c_storage_spec.is_typedef);
 
     // first typecheck the type of the declaration
     typecheck_type(declaration.type());
@@ -743,6 +736,17 @@ void c_typecheck_baset::typecheck_declaration(
         d_it!=declaration.declarators().end();
         d_it++)
     {
+      c_storage_spect full_spec(declaration.full_type(*d_it));
+      full_spec|=c_storage_spec;
+
+      declaration.set_is_inline(full_spec.is_inline);
+      declaration.set_is_static(full_spec.is_static);
+      declaration.set_is_extern(full_spec.is_extern);
+      declaration.set_is_thread_local(full_spec.is_thread_local);
+      declaration.set_is_register(full_spec.is_register);
+      declaration.set_is_typedef(full_spec.is_typedef);
+      declaration.set_is_weak(full_spec.is_weak);
+
       symbolt symbol;
       declaration.to_symbol(*d_it, symbol);
       irep_idt identifier=symbol.name;
