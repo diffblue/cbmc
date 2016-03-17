@@ -25,7 +25,7 @@ public:
   inline literalt get_literal() const
   {
     literalt result;
-    result.set(get_long_long(ID_literal));
+    result.set(literalt::var_not(get_long_long(ID_literal)));
     return result;
   }
 

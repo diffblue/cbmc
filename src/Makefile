@@ -1,9 +1,9 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
        assembler analyses java_bytecode aa-path-symex path-symex musketeer \
-       json cegis
+       json cegis goto-analyzer
 
-all: cbmc.dir goto-cc.dir goto-instrument.dir path-symex.dir json.dir xmlrepair.dir
+all: cbmc.dir goto-cc.dir goto-instrument.dir path-symex.dir goto-analyzer.dir xmlrepair.dir
 
 ###############################################################################
 
@@ -21,13 +21,17 @@ languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir java_bytecode.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
-                     goto-symex.dir linking.dir analyses.dir solvers.dir
+                     goto-symex.dir linking.dir analyses.dir solvers.dir \
+                     json.dir
 
 musketeer.dir: goto-instrument.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir \
-          cegis.dir goto-instrument.dir
+          goto-instrument.dir
+
+goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
+                   json.dir goto-instrument.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 
@@ -56,13 +60,13 @@ $(patsubst %, %_clean, $(DIRS)):
 # minisat 2 download, for your convenience
 
 minisat2-download:
-	@echo "Downloading Minisat 2.2.0"
-	@lwp-download http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.0.orig.tar.gz
-	@tar xfz minisat2_2.2.0.orig.tar.gz
-	@rm -Rf ../minisat-2.2.0
-	@mv minisat-2.2.0 ../minisat-2.2.0
-	@(cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
-	@rm minisat2_2.2.0.orig.tar.gz
+	@echo "Downloading Minisat 2.2.1"
+	@lwp-download http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
+	@tar xfz minisat2_2.2.1.orig.tar.gz
+	@rm -Rf ../minisat-2.2.1
+	@mv minisat2-2.2.1 ../minisat-2.2.1
+	@(cd ../minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
+	@rm minisat2_2.2.1.orig.tar.gz
 
 glucose-download:
 	@echo "Downloading glucose-syrup"

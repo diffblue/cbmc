@@ -102,3 +102,26 @@ bool languaget::from_type(
   code=type.pretty();
   return false;
 }
+
+/*******************************************************************\
+
+Function: languaget::type_to_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool languaget::type_to_name(
+  const typet &type,
+  std::string &name,
+  const namespacet &ns)
+{
+  // probably ansi-c/type2name could be used as better fallback if moved to
+  // util/
+  name=type.pretty();
+  return false;
+}

@@ -68,7 +68,7 @@ void parameter_assignmentst::do_function_calls(
       
       goto_programt tmp;
       
-      for(unsigned nr=0; nr<code_type.parameters().size(); nr++)
+      for(std::size_t nr=0; nr<code_type.parameters().size(); nr++)
       {
         irep_idt p_identifier=code_type.parameters()[nr].get_identifier();
         
@@ -88,7 +88,7 @@ void parameter_assignmentst::do_function_calls(
         }
       }
       
-      unsigned count=tmp.instructions.size();
+      std::size_t count=tmp.instructions.size();
       goto_program.insert_before_swap(i_it, tmp);
       
       for(; count!=0; count--) i_it++;

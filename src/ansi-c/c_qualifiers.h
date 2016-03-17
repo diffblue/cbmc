@@ -35,10 +35,11 @@ public:
     is_atomic=false;
     is_ptr32=is_ptr64=false;
     is_transparent_union=false;
+    is_noreturn=false;
   }
 
   // standard ones
-  bool is_constant, is_volatile, is_restricted, is_atomic;
+  bool is_constant, is_volatile, is_restricted, is_atomic, is_noreturn;
   
   // MS Visual Studio extension
   bool is_ptr32, is_ptr64;
@@ -61,7 +62,8 @@ public:
            (!is_restricted || q.is_restricted) &&
            (!is_atomic || q.is_atomic) &&
            (!is_ptr32 || q.is_ptr32) &&
-           (!is_ptr64 || q.is_ptr64);
+           (!is_ptr64 || q.is_ptr64) &&
+           (!is_noreturn || q.is_noreturn);
 
     // is_transparent_union isn't checked
   }
@@ -76,7 +78,8 @@ public:
            a.is_atomic==b.is_atomic &&
            a.is_ptr32==b.is_ptr32 &&
            a.is_ptr64==b.is_ptr64 &&
-           a.is_transparent_union==b.is_transparent_union;
+           a.is_transparent_union==b.is_transparent_union &&
+           a.is_noreturn==b.is_noreturn;
   }
 
   friend bool operator != (
@@ -96,13 +99,14 @@ public:
     is_ptr32|=b.is_ptr32;
     is_ptr64|=b.is_ptr64;
     is_transparent_union|=b.is_transparent_union;
+    is_noreturn|=b.is_noreturn;
     return *this;
   }
   
   friend unsigned count(const c_qualifierst &q)
   {
     return q.is_constant+q.is_volatile+q.is_restricted+q.is_atomic+
-           q.is_ptr32+q.is_ptr64;
+           q.is_ptr32+q.is_ptr64+q.is_noreturn;
   }
 };
 

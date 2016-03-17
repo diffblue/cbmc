@@ -26,7 +26,7 @@ Function: count_eloc
 
 \*******************************************************************/
 
-unsigned count_eloc(const goto_programt &goto_program)
+std::size_t count_eloc(const goto_programt &goto_program)
 {
   hash_set_cont<irep_idt, irep_id_hash> lines;
 
@@ -52,10 +52,11 @@ Function: count_eloc
 
 void count_eloc(const goto_functionst &goto_functions)
 {
-  unsigned eloc=0;
+  std::size_t eloc=0;
+  
   forall_goto_functions(f_it, goto_functions)
     eloc+=count_eloc(f_it->second.body);
 
-  std::cout << "Effective lines of code: " << eloc << std::endl;
+  std::cout << "Effective lines of code: " << eloc << '\n';
 }
 

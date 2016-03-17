@@ -923,6 +923,22 @@ declaring_list:
           $$=$4;
           to_ansi_c_declaration(stack($$)).add_initializer(stack($5));
         }
+        | TOK_GCC_AUTO_TYPE declarator
+          post_declarator_attributes_opt '=' initializer
+        {
+          // handled as typeof(initializer)
+          stack($1).id(ID_typeof);
+          stack($1).copy_to_operands(stack($5));
+
+          $2=merge($3, $2);
+
+          // the symbol has to be visible during initialization
+          init($$, ID_declaration);
+          stack($$).type().swap(stack($1));
+          PARSER.add_declarator(stack($$), stack($2));
+          // add the initializer
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($5));
+        }
         | declaring_list ',' declarator
           post_declarator_attributes_opt
           {
@@ -1008,6 +1024,20 @@ type_qualifier:
         | TOK_PTR32                 { $$=$1; set($$, ID_ptr32); }
         | TOK_PTR64                 { $$=$1; set($$, ID_ptr64); }
         | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); mto($$, $3); }
+        | alignas_specifier
+        ;
+
+alignas_specifier:
+          TOK_ALIGNAS '(' comma_expression ')'
+        { $$ = $1;
+          stack($$).id(ID_aligned);
+          stack($$).set(ID_size, stack($3));
+        }
+        | TOK_ALIGNAS '(' type_name ')'
+        { $$ = $1;
+          stack($$).id(ID_aligned);
+          stack($3).set(ID_type_arg, stack($3));
+        }
         ;
 
 attribute_or_type_qualifier:
@@ -1504,6 +1534,8 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_gcc_attribute_mode); stack($$).set(ID_size, stack($3).get(ID_identifier)); }
         | TOK_GCC_ATTRIBUTE_GNU_INLINE TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
+        | TOK_NORETURN
+        { $$=$1; set($$, ID_noreturn); }
         | gcc_attribute_specifier
         ;
 

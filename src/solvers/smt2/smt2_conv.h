@@ -214,8 +214,8 @@ protected:
   
   // we use this to build a bit-vector encoding of the FPA theory
   void convert_floatbv(const exprt &expr);
-  static std::string type2id(const typet &);
-  static std::string floatbv_suffix(const exprt &);
+  std::string type2id(const typet &) const;
+  std::string floatbv_suffix(const exprt &) const;
   std::set<irep_idt> bvfp_set; // already converted
   
   class smt2_symbolt:public exprt

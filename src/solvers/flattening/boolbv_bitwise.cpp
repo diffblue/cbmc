@@ -22,7 +22,7 @@ Function: boolbvt::convert_bitwise
 
 void boolbvt::convert_bitwise(const exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -61,7 +61,7 @@ void boolbvt::convert_bitwise(const exprt &expr, bvt &bv)
         bv=op;
       else
       {
-        for(unsigned i=0; i<width; i++)
+        for(std::size_t i=0; i<width; i++)
         {
           if(expr.id()==ID_bitand)
             bv[i]=prop.land(bv[i], op[i]);

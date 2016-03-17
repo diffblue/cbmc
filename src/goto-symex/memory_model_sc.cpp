@@ -127,6 +127,44 @@ void memory_model_sct::thread_spawn(
 {
   // thread spawn: the spawn precedes the first
   // instruction of the new thread in program order
+
+  unsigned next_thread_id=0;
+  for(eventst::const_iterator
+      e_it=equation.SSA_steps.begin();
+      e_it!=equation.SSA_steps.end();
+      e_it++)
+  {
+    if(is_spawn(e_it))
+    {
+      per_thread_mapt::const_iterator next_thread=
+        per_thread_map.find(++next_thread_id);
+      if(next_thread==per_thread_map.end()) continue;
+      
+      // add a constraint for all events, 
+      // considering regression/cbmc-concurrency/pthread_create_tso1
+      for(event_listt::const_iterator
+          n_it=next_thread->second.begin();
+          n_it!=next_thread->second.end();
+          n_it++)
+      {
+        if(!(*n_it)->is_memory_barrier())
+          add_constraint(
+            equation,
+            before(e_it, *n_it),
+            "thread-spawn",
+            e_it->source);
+      }
+    }
+  }
+} 
+
+#if 0
+void memory_model_sct::thread_spawn(
+  symex_target_equationt &equation,
+  const per_thread_mapt &per_thread_map)
+{
+  // thread spawn: the spawn precedes the first
+  // instruction of the new thread in program order
   
   unsigned next_thread_id=0;
   for(eventst::const_iterator
@@ -161,6 +199,7 @@ void memory_model_sct::thread_spawn(
     }
   }
 }
+#endif
 
 /*******************************************************************\
 

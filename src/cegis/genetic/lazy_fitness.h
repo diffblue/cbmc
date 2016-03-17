@@ -20,11 +20,11 @@ typedef std::map<const program_individualt *, std::list<bool> > test_case_datat;
  *
  * @details
  */
-template<class test_runnert>
+template<class test_runnert, class cet>
 class lazy_fitnesst
 {
 public:
-  typedef std::map<const irep_idt, exprt> counterexamplet;
+  typedef cet counterexamplet;
   typedef std::deque<counterexamplet> counterexamplest;
   typedef program_populationt populationt;
   typedef program_individualt individualt;

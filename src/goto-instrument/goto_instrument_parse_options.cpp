@@ -82,6 +82,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "count_eloc.h"
 #include "horn_encoding.h"
 #include "thread_instrumentation.h"
+#include "skip_loops.h"
 
 /*******************************************************************\
 
@@ -385,7 +386,7 @@ int goto_instrument_parse_optionst::doit()
 
       forall_goto_functions(f_it, goto_functions)
       {
-        if(f_it->second.body_available)
+        if(f_it->second.body_available())
         {
           std::cout << "////" << std::endl;
           std::cout << "//// Function: " << f_it->first << std::endl;
@@ -408,7 +409,7 @@ int goto_instrument_parse_optionst::doit()
 
       forall_goto_functions(f_it, goto_functions)
       {
-        if(f_it->second.body_available)
+        if(f_it->second.body_available())
         {
           std::cout << "////" << std::endl;
           std::cout << "//// Function: " << f_it->first << std::endl;
@@ -493,7 +494,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("list-undefined-functions"))
     {
       Forall_goto_functions(it, goto_functions)
-        if(!it->second.body_available)
+        if(!it->second.body_available())
           std::cout << it->first << std::endl;
       return 0;
     }
@@ -857,6 +858,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     status() << "Unwinding loops" << eom;
     options.set_option("unwind", cmdline.get_value("unwind"));
+  }
+
+  // skip over selected loops
+  if(cmdline.isset("skip-loops"))
+  {
+    status() << "Adding gotos to skip loops" << eom;
+    if(skip_loops(
+        goto_functions,
+        cmdline.get_value("skip-loops"),
+        get_message_handler()))
+      throw 0;
   }
 
   // we add the library in some cases, as some analyses benefit
@@ -1310,6 +1322,7 @@ void goto_instrument_parse_optionst::help()
     " --base-case                  k-induction: do base-case\n"
     " --havoc-loops                over-approximate all loops\n"
     " --accelerate                 add loop accelerators\n"
+    " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n"
     "\n"
     "Memory model instrumentations:\n"
     " --mm <tso,pso,rmo,power>     instruments a weak memory model\n"

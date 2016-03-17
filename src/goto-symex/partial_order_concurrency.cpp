@@ -93,9 +93,9 @@ void partial_order_concurrencyt::add_init_writes(
       symex_target_equationt::SSA_stept &SSA_step=init_steps.back();
 
       SSA_step.guard=true_exprt();
-      // no SSA index, thus nondet value
-      SSA_step.ssa_lhs=e_it->original_lhs_object;
-      SSA_step.original_lhs_object=e_it->original_lhs_object;
+      // no SSA L2 index, thus nondet value
+      SSA_step.ssa_lhs=e_it->ssa_lhs;
+      SSA_step.ssa_lhs.remove_level_2();
       SSA_step.type=goto_trace_stept::SHARED_WRITE;
       SSA_step.atomic_section_id=0;
       SSA_step.source=e_it->source;
@@ -238,9 +238,10 @@ Function: partial_order_concurrencyt::is_shared_write
 bool partial_order_concurrencyt::is_shared_write(event_it event) const
 {
   if(!event->is_shared_write()) return false;
-  const irep_idt identifier=event->original_lhs_object.get_identifier();
-  if(identifier=="goto_symex::\\guard") return false;
-  const symbolt &symbol=ns.lookup(identifier);
+  const irep_idt obj_identifier=event->ssa_lhs.get_object_name();
+  if(obj_identifier=="goto_symex::\\guard") return false;
+
+  const symbolt &symbol=ns.lookup(obj_identifier);
   return !symbol.is_thread_local;
 }
 
@@ -259,9 +260,10 @@ Function: partial_order_concurrencyt::is_shared_read
 bool partial_order_concurrencyt::is_shared_read(event_it event) const
 {
   if(!event->is_shared_read()) return false;
-  const irep_idt identifier=event->original_lhs_object.get_identifier();
-  if(identifier=="goto_symex::\\guard") return false;
-  const symbolt &symbol=ns.lookup(identifier);
+  const irep_idt obj_identifier=event->ssa_lhs.get_object_name();
+  if(obj_identifier=="goto_symex::\\guard") return false;
+
+  const symbolt &symbol=ns.lookup(obj_identifier);
   return !symbol.is_thread_local;
 }
 

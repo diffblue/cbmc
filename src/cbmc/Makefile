@@ -21,13 +21,13 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../pointer-analysis/rewrite_index$(OBJEXT) \
       ../pointer-analysis/goto_program_dereference$(OBJEXT) \
       ../goto-instrument/full_slicer$(OBJEXT) \
+      ../goto-instrument/nondet_static$(OBJEXT) \
       ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
-      ../util/util$(LIBEXT) \
-      ../cegis/cegis$(LIBEXT)
+      ../util/util$(LIBEXT)
 
 INCLUDES= -I ..
 

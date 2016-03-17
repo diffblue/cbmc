@@ -153,7 +153,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
     {
       // gcc allows this, but clang doesn't.
       // We ignore for now.
-      type=type.subtype();
+      if(underlying_type.id()==ID_c_enum_tag)
+        type=follow_tag(to_c_enum_tag_type(underlying_type)).subtype();
+      else
+        type=type.subtype();
     }
     else if(underlying_type.id()==ID_floatbv)
     {
@@ -224,18 +227,19 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     static_cast<const exprt &>(type.find(ID_size));
 
   typecheck_expr(size_expr);
+  source_locationt source_location=size_expr.source_location();  
   make_constant_index(size_expr);
 
   mp_integer size_int;
   if(to_integer(size_expr, size_int))
   {
-    err_location(size_expr);
+    err_location(source_location);
     throw "failed to convert bit vector width to constant";
   }
 
-  if(size_int<1 || size_int>1024)
+  if(size_int<1)
   {
-    err_location(size_expr);
+    err_location(source_location);
     str << "bit vector width invalid";
     error_msg();
     throw 0;
@@ -581,7 +585,7 @@ Function: c_typecheck_baset::typecheck_vector_type
 void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 {
   exprt &size=type.size();
-  source_locationt size_location=size.find_source_location();
+  source_locationt source_location=size.find_source_location();
 
   typecheck_expr(size);
   
@@ -596,7 +600,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
      subtype.id()!=ID_floatbv &&
      subtype.id()!=ID_fixedbv)
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "cannot make a vector of subtype "
         << to_string(subtype);
     throw 0;
@@ -607,7 +611,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   mp_integer s;
   if(to_integer(size, s))
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "failed to convert constant: "
         << size.pretty();
     throw 0;
@@ -615,7 +619,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   if(s<=0)
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "vector size must be positive, "
            "but got " << s;
     throw 0;
@@ -630,7 +634,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   
   if(to_integer(size_expr, sub_size))
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "failed to determine size of vector base type `"
         << to_string(type.subtype()) << "'";
     throw 0;
@@ -638,7 +642,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   if(sub_size==0)
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "type had size 0: `"
         << to_string(type.subtype()) << "'";
     throw 0;
@@ -647,7 +651,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   // adjust by width of base type
   if(s%sub_size!=0)
   {
-    err_location(size_location);
+    err_location(source_location);
     str << "vector size (" << s
         << ") expected to be multiple of base type size (" << sub_size
         << ")";
@@ -1092,11 +1096,6 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       bits=config.ansi_c.int_width;
   }
   
-  // We use a subtype to store signed and width
-
-  type.subtype().id(is_signed?ID_signedbv:ID_unsignedbv);
-  type.subtype().set(ID_width, bits);
-  
   // tag?
   if(type.find(ID_tag).is_nil())
   {
@@ -1143,6 +1142,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       it++)
     body.push_back(*it);
 
+  // We use a subtype to store signed and width
+  enum_tag_symbol.type.subtype().id(is_signed?ID_signedbv:ID_unsignedbv);
+  enum_tag_symbol.type.subtype().set(ID_width, bits);
+
   // is it in the symbol table already?
   symbol_tablet::symbolst::iterator s_it=
     symbol_table.symbols.find(identifier);
@@ -1182,8 +1185,6 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   }
 
   // We produce a c_enum_tag as the resulting type.
-  // This retains the subtype; we may want to have
-  // that differ from the subtype of the c_enum type.
   type.id(ID_c_enum_tag);
   type.remove(ID_tag);
   type.set(ID_identifier, identifier);
@@ -1226,13 +1227,8 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     // Yes.
     const symbolt &symbol=s_it->second;
     
-    if(symbol.type.id()==ID_c_enum ||
-       symbol.type.id()==ID_incomplete_c_enum)
-    {
-      // copy subtype into tag
-      type.subtype()=symbol.type.subtype();
-    }
-    else
+    if(symbol.type.id()!=ID_c_enum &&
+       symbol.type.id()!=ID_incomplete_c_enum)
     {
       err_location(source_location);
       throw "use of tag that does not match previous declaration";
@@ -1256,8 +1252,6 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     
     symbolt *new_symbol;
     move_symbol(enum_tag_symbol, new_symbol);
-    
-    type.subtype()=new_type.subtype();
   }
   
   // Clean up resulting type

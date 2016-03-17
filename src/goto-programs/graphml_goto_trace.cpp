@@ -12,8 +12,7 @@ Author: Daniel Kroening
 #include <util/i2string.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>
-
-#include <goto-symex/ssa_expr.h>
+#include <util/ssa_expr.h>
 
 #include "graphml_goto_trace.h"
 

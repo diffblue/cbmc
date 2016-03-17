@@ -417,7 +417,7 @@ void goto_convertt::remove_function_call(
 
   new_name(new_symbol);
   
-  tmp_symbols.push_back(new_symbol.name);
+  tmp_symbols.push_back(new_symbol.symbol_expr());
   
   {
     code_declt decl;
@@ -488,7 +488,7 @@ void goto_convertt::remove_cpp_new(
   new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 
   new_name(new_symbol);
-  tmp_symbols.push_back(new_symbol.name);
+  tmp_symbols.push_back(new_symbol.symbol_expr());
 
   call=code_assignt(new_symbol.symbol_expr(), expr);
 
@@ -560,7 +560,7 @@ void goto_convertt::remove_malloc(
     new_symbol.location=expr.source_location();
 
     new_name(new_symbol);
-    tmp_symbols.push_back(new_symbol.name);
+    tmp_symbols.push_back(new_symbol.symbol_expr());
 
     code_declt decl;
     decl.symbol()=new_symbol.symbol_expr();

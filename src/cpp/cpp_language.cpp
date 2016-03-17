@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "expr2cpp.h"
 #include "cpp_parser.h"
 #include "cpp_typecheck.h"
+#include "cpp_type2name.h"
 
 /*******************************************************************\
 
@@ -378,6 +379,27 @@ bool cpp_languaget::from_type(
   const namespacet &ns)
 {
   code=type2cpp(type, ns);
+  return false;
+}
+
+/*******************************************************************\
+
+Function: cpp_languaget::type_to_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool cpp_languaget::type_to_name(
+  const typet &type,
+  std::string &name,
+  const namespacet &ns)
+{
+  name=cpp_type2name(type);
   return false;
 }
 

@@ -6,10 +6,10 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_MINI_BDD_EXPR_H
-#define CPROVER_MINI_BDD_EXPR_H
+#ifndef CPROVER_BDD_EXPR_H
+#define CPROVER_BDD_EXPR_H
 
-/*! \file util/bdd_expr.h
+/*! \file solvers/prop/bdd_expr.h
  * \brief Binary decision diagram
  *
  * \author Michael Tautschnig, michael.tautschnig@qmul.ac.uk

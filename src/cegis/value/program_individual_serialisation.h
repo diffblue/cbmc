@@ -42,12 +42,26 @@ program_individualt::instructiont to_program_individual_instruction(
  *
  * @details
  *
+ * @param prog
+ * @param trace
+ *
+ * @return
+ */
+program_individualt to_program_individual(const class invariant_programt &prog,
+    const class goto_tracet &trace);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param prog
  * @param trace
  *
  * @return
  */
 program_individualt to_program_individual(const class danger_programt &prog,
-    const class goto_tracet &trace);
+    const goto_tracet &trace);
 
 /**
  * @brief

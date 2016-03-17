@@ -80,7 +80,7 @@ bool write_goto_binary_v3(
 
   unsigned cnt=0;
   forall_goto_functions(it, functions)  
-    if(it->second.body_available)
+    if(it->second.body_available())
       cnt++;
 
   write_gb_word(out, cnt);
@@ -90,7 +90,7 @@ bool write_goto_binary_v3(
       it!=functions.function_map.end();
       it++)
   {
-    if(it->second.body_available)
+    if(it->second.body_available())
     {      
       // Since version 2, goto functions are not converted to ireps,
       // instead they are saved in a custom binary format      

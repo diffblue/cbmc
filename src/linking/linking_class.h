@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rename_symbol.h>
 #include <util/hash_cont.h>
 #include <util/typecheck.h>
+#include <util/std_expr.h>
 
 class linkingt:public typecheckt
 {
@@ -95,6 +96,30 @@ protected:
     const symbolt &symbol) const
   {
     return type_to_string_verbose(ns, symbol, symbol.type);
+  }
+
+  void detailed_conflict_report_rec(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const typet &type1,
+    const typet &type2,
+    unsigned depth,
+    exprt &conflict_path);
+
+  void detailed_conflict_report(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const typet &type1,
+    const typet &type2)
+  {
+    symbol_exprt conflict_path(ID_C_this);
+    detailed_conflict_report_rec(
+      old_symbol,
+      new_symbol,
+      type1,
+      type2,
+      10, // somewhat arbitrary limit
+      conflict_path);
   }
 
   void link_error(

@@ -35,7 +35,7 @@ void boolbvt::convert_constraint_select_one(const exprt &expr, bvt &bv)
  
   if(prop.has_set_to())
   {
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
     bv=prop.new_variables(width);
 
     bvt b;
@@ -56,7 +56,7 @@ void boolbvt::convert_constraint_select_one(const exprt &expr, bvt &bv)
   }
   else
   {
-    unsigned op_nr=0;
+    std::size_t op_nr=0;
     forall_operands(it, expr)
     {
       const bvt &op_bv=convert_bv(*it);
@@ -68,7 +68,7 @@ void boolbvt::convert_constraint_select_one(const exprt &expr, bvt &bv)
         if(op_bv.size()!=bv.size())
           return conversion_failed(expr, bv);
 
-        for(unsigned i=0; i<op_bv.size(); i++)
+        for(std::size_t i=0; i<op_bv.size(); i++)
           bv[i]=prop.lselect(prop.new_variable(), bv[i], op_bv[i]);
       }
 

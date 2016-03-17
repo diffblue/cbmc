@@ -131,8 +131,9 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
     // we keep the quantified variable unique by means of L2 renaming
     assert(expr.operands().size()==2);
     assert(expr.op0().id()==ID_symbol);
-    irep_idt identifier=to_symbol_expr(expr.op0()).get_identifier();
-    state.level2.increase_counter(state.level1(identifier));
+    symbol_exprt tmp0=
+      to_symbol_expr(to_ssa_expr(expr.op0()).get_original_expr());
+    symex_decl(state, tmp0);
     exprt tmp=expr.op1();
     expr.swap(tmp);
   }
@@ -330,14 +331,7 @@ bool goto_symext::symex_step(
 
   case ASSIGN:
     if(!state.guard.is_false())
-    {
-      code_assignt deref_code=to_code_assign(instruction.code);
-
-      clean_expr(deref_code.lhs(), state, true);
-      clean_expr(deref_code.rhs(), state, false);
-
-      symex_assign(state, deref_code);
-    }
+      symex_assign_rec(state, to_code_assign(instruction.code));
 
     state.source.pc++;
     break;
@@ -370,7 +364,7 @@ bool goto_symext::symex_step(
         // interrupt for checking guard if in incremental mode
         if(!state.guard.is_true() &&
            // no need to check recursive call if function body is not available
-           it->second.body_available)
+           it->second.body_available())
 	{
           exprt guard = state.guard.as_expr();
           bool do_break = check_break(identifier, true, state,

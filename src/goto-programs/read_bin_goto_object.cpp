@@ -155,7 +155,6 @@ bool read_bin_goto_object_v3(
     }
     
     f.body.update();
-    f.body_available=f.body.instructions.size()>0;    
     
     if(hidden) f.make_hidden();
   }

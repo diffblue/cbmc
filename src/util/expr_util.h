@@ -19,6 +19,7 @@ class exprt;
 class symbol_exprt;
 class update_exprt;
 class with_exprt;
+class if_exprt;
 class symbolt;
 class typet;
 class namespacet;
@@ -52,3 +53,10 @@ exprt is_not_zero(const exprt &, const namespacet &ns);
 /*! negate a Boolean expression, possibly removing a not_exprt,
     and swapping false and true */
 exprt boolean_negate(const exprt &);
+
+/*! returns true if the expression has a subexpresion with given ID */
+bool has_subexpr(const exprt &, const irep_idt &);
+
+/*! lift up an if_exprt one level */
+if_exprt lift_if(const exprt &, std::size_t operand_number);
+

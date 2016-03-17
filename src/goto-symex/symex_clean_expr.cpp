@@ -60,6 +60,15 @@ void goto_symext::process_array_expr_rec(
     expr.swap(tmp);
     process_array_expr_rec(expr, type);
   }
+  else if(expr.id()==ID_symbol &&
+          expr.get_bool(ID_C_SSA_symbol) &&
+          to_ssa_expr(expr).get_original_expr().id()==ID_index)
+  {
+    const ssa_exprt &ssa=to_ssa_expr(expr);
+    const index_exprt &index_expr=to_index_expr(ssa.get_original_expr());
+    exprt tmp=index_expr.array();
+    expr.swap(tmp);
+  }
   else
     Forall_operands(it, expr)
       process_array_expr_rec(*it, it->type());
@@ -121,6 +130,15 @@ void goto_symext::process_array_expr(exprt &expr)
     exprt tmp=to_address_of_expr(expr).op0();
     expr.swap(tmp);
     process_array_expr(expr);
+  }
+  else if(expr.id()==ID_symbol &&
+          expr.get_bool(ID_C_SSA_symbol) &&
+          to_ssa_expr(expr).get_original_expr().id()==ID_index)
+  {
+    const ssa_exprt &ssa=to_ssa_expr(expr);
+    const index_exprt &index_expr=to_index_expr(ssa.get_original_expr());
+    exprt tmp=index_expr.array();
+    expr.swap(tmp);
   }
   else
     Forall_operands(it, expr)

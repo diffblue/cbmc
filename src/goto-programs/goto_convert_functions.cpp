@@ -1,4 +1,4 @@
-/*******************************************************************\
+/**** ***************************************************************\
 
 Module: Goto Programs with Functions
 
@@ -79,7 +79,9 @@ void goto_convert_functionst::goto_convert()
   {
     if(!it->second.is_type &&
        it->second.type.id()==ID_code &&
-       (it->second.mode==ID_C || it->second.mode==ID_cpp))
+       (it->second.mode==ID_C ||
+        it->second.mode==ID_cpp ||
+        it->second.mode==ID_java))
       symbol_list.push_back(it->first);
   }
   
@@ -225,12 +227,11 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   temporary_counter=0;
   
   f.type=to_code_type(symbol.type);
-  if(!f.body.instructions.empty()) return; // already converted
-  f.body_available=
-    symbol.value.is_not_nil() &&
-    symbol.value.id()!="compiled"; /* goto_inline may have removed the body */
+  if(f.body_available()) return; // already converted
 
-  if(!f.body_available) return;
+  if(symbol.value.is_nil() ||
+     symbol.value.id()=="compiled") /* goto_inline may have removed the body */
+    return;
   
   if(symbol.value.id()!=ID_code)
   {

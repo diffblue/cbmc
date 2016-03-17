@@ -87,6 +87,16 @@ public:
     return line_no;
   }
 
+  inline unsigned get_column() const
+  {
+    return column;
+  }
+
+  inline void set_column(unsigned _column)
+  {
+    column=_column;
+  }
+
   inline void set_source_location(exprt &e)
   {
     // Only set line number when needed, as this destroys sharing.

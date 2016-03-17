@@ -124,6 +124,7 @@ void arrayst::collect_indices()
     collect_indices(arrays[i]);
   }
 }
+
 void arrayst::collect_indices(const exprt &expr)
 {
   if(expr.id()!=ID_index)
@@ -465,12 +466,12 @@ Function: arrayst::update_index_map
 
 \*******************************************************************/
 
-void arrayst::update_index_map(unsigned i)
+void arrayst::update_index_map(std::size_t i)
 {
   if(arrays.is_root_number(i)) 
     return;
 
-  unsigned root_number=arrays.find_number(i);
+  std::size_t root_number=arrays.find_number(i);
   assert(root_number!=i);
 
   index_sett &root_index_set=index_map[root_number];
@@ -489,11 +490,11 @@ void arrayst::update_index_map(bool update_all)
   //     (and we cannot do that in record_array_index())
   //  -- equivalence classes have been merged
   if(update_all)
-    for(unsigned i=0; i<arrays.size(); i++)
+    for(std::size_t i=0; i<arrays.size(); i++)
       update_index_map(i);
   else
   {
-    for(std::set<unsigned>::const_iterator 
+    for(std::set<std::size_t>::const_iterator 
         it=update_indices.begin();
         it!=update_indices.end(); it++)
       update_index_map(*it);

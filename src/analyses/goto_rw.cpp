@@ -835,7 +835,10 @@ void rw_range_set_value_sett::get_objects_dereference(
     new_size=std::min(size, new_size);
   }
 
-  if(object.is_not_nil() && object!=deref)
+  // value_set_dereferencet::build_reference_to will turn *p into
+  // DYNAMIC_OBJECT(p) ? *p : invalid_objectN
+  if(object.is_not_nil() &&
+     !value_set_dereferencet::has_dereference(object))
     get_objects_rec(mode, object, range_start, new_size);
 }
 

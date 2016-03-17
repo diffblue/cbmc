@@ -17,7 +17,7 @@ endif
 ifneq ($(MINISAT2),)
   MINISAT2_SRC=sat/satcheck_minisat2.cpp
   MINISAT2_INCLUDE=-I $(MINISAT2)
-  MINISAT2_LIB=$(MINISAT2)/simp/SimpSolver$(OBJEXT) $(MINISAT2)/core/Solver$(OBJEXT)
+  MINISAT2_LIB=$(MINISAT2)/minisat/simp/SimpSolver$(OBJEXT) $(MINISAT2)/minisat/core/Solver$(OBJEXT)
   CP_CXXFLAGS += -DHAVE_MINISAT2 -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
   override CXXFLAGS := $(filter-out -pedantic, $(CXXFLAGS))
 endif
@@ -125,12 +125,9 @@ INCLUDES= -I .. \
   $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
 	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
-CLEANFILES = solvers$(LIBEXT) \
-             smt2/smt2_parser_test$(EXEEXT) \
-             smt2/smt2_parser_test$(OBJEXT) \
-             smt2/smt2_parser_test.d \
+CLEANFILES = solvers$(LIBEXT)
 
-all: solvers$(LIBEXT) smt2/smt2_parser_test$(EXEEXT)
+all: solvers$(LIBEXT)
 
 ifneq ($(SQUOLEM2),)
   CP_CXXFLAGS += -DHAVE_QBF_CORE
@@ -150,7 +147,3 @@ solvers$(LIBEXT): $(OBJ) $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
         $(MINISAT2_LIB) $(SMVSAT_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
 	$(PRECOSAT_LIB) $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB)
 	$(LINKLIB)
-
-smt2/smt2_parser_test$(EXEEXT): smt2/smt2_parser$(OBJEXT) smt2/smt2_parser_test$(OBJEXT)
-	$(LINKBIN)
-

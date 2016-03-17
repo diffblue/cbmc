@@ -97,7 +97,7 @@ Function: irept::detach
 void irept::detach()
 {
   #ifdef IREP_DEBUG
-  std::cout << "DETATCH1: " << data << std::endl;
+  std::cout << "DETACH1: " << data << std::endl;
   #endif
 
   if(data==&empty_d)
@@ -124,45 +124,8 @@ void irept::detach()
   assert(data->ref_count==1);
 
   #ifdef IREP_DEBUG
-  std::cout << "DETATCH2: " << data << std::endl;
+  std::cout << "DETACH2: " << data << std::endl;
   #endif
-}
-#endif
-
-/*******************************************************************\
-
-Function: irept::recursive_detach
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#ifdef SHARING
-void irept::recursive_detach()
-{
-  detach();
-  
-  for(named_subt::iterator
-      it=data->named_sub.begin();
-      it!=data->named_sub.end();
-      it++)
-    it->second.recursive_detach();
-    
-  for(named_subt::iterator
-      it=data->comments.begin();
-      it!=data->comments.end();
-      it++)
-    it->second.recursive_detach();
-    
-  for(subt::iterator
-      it=data->sub.begin();
-      it!=data->sub.end();
-      it++)
-    it->recursive_detach();
 }
 #endif
 
@@ -285,28 +248,6 @@ void irept::nonrecursive_destructor(dt *old_data)
 
 /*******************************************************************\
 
-Function: irept::clear
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void irept::clear()
-{
-  #ifdef SHARING
-  remove_ref(data);
-  data=&empty_d;
-  #else
-  data.clear();
-  #endif
-}
-
-/*******************************************************************\
-
 Function: irept::move_to_named_sub
 
   Inputs:
@@ -400,7 +341,7 @@ Function: irept::get_bool
 
 bool irept::get_bool(const irep_namet &name) const
 {
-  return unsafe_string2int(get_string(name))!=0;
+  return get(name)==ID_1;
 }
 
 /*******************************************************************\

@@ -37,7 +37,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
 
   const exprt::operandst &operands=expr.operands();
 
-  if(expr.id()=="invalid-pointer")
+  if(expr.id()==ID_invalid_pointer)
   {
     if(operands.size()==1 &&
        is_ptr(operands[0].type()))
@@ -592,7 +592,7 @@ Function: bv_pointerst::bv_get_rec
 exprt bv_pointerst::bv_get_rec(
   const bvt &bv,
   const std::vector<bool> &unknown,
-  unsigned offset,
+  std::size_t offset,
   const typet &type) const
 {
   if(!is_ptr(type))

@@ -20,7 +20,7 @@ bool get_jar_index(
 bool get_jar_entry(
   const std::string &jar_file,
   std::size_t index,
-  std::vector<char> &);
+  std::string &);
 
 bool get_jar_manifest(
   const std::string &jar_file,

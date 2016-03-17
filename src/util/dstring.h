@@ -16,32 +16,27 @@ Author: Daniel Kroening, kroening@kroening.com
 class dstring
 {
 public:
-  #if __cplusplus > 199711L
   // this is safe for static objects
-  constexpr dstring():no(0)
+  #ifdef __GNUC__
+  constexpr 
+  #endif
+  dstring():no(0)
   {
   }
 
   // this is safe for static objects
   // the 2nd argument is to avoid accidental conversions
-  constexpr dstring(unsigned _no, unsigned):no(_no)
+  #ifdef __GNUC__
+  constexpr 
+  #endif
+  dstring(unsigned _no, unsigned):no(_no)
   {
   }
 
+  #if 0
   // This conversion allows the use of dstrings
   // in switch ... case statements.  
   constexpr operator int() const { return no; }
-  #else
-  // this is safe for static objects
-  inline dstring():no(0)
-  {
-  }
-
-  // this is safe for static objects
-  // the 2nd argument is to avoid accidental conversions
-  inline dstring(unsigned _no, unsigned):no(_no)
-  {
-  }
   #endif
 
   // this one is not safe for static objects
@@ -61,7 +56,7 @@ public:
     return no==0; // string 0 is exactly the empty string
   }
   
-  inline char operator[](unsigned i) const
+  inline char operator[](size_t i) const
   {
     return as_string()[i];
   }

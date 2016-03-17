@@ -632,8 +632,9 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
     
   // We will subtract the exponents;
   // to account for overflow, we add a bit.
-  const bvt exponent1=bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size()+1);
-  const bvt exponent2=bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size()+1);
+  // we add a second bit for the adjust by extra fraction bits
+  const bvt exponent1=bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size()+2);
+  const bvt exponent2=bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size()+2);
 
   // subtract exponents
   bvt added_exponent=bv_utils.sub(exponent1, exponent2);

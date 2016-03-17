@@ -58,7 +58,7 @@ public:
   literalt carry_out(const bvt &op0, const bvt &op1, literalt carry_in);
 
   typedef enum { LEFT, LRIGHT, ARIGHT } shiftt;
-  bvt shift(const bvt &op, const shiftt shift, unsigned distance);
+  bvt shift(const bvt &op, const shiftt shift, std::size_t distance);
   bvt shift(const bvt &op, const shiftt shift, const bvt &distance);
 
   bvt unsigned_multiplier(const bvt &op0, const bvt &op1);
@@ -144,19 +144,19 @@ public:
 
   bool is_constant(const bvt &bv);
 
-  bvt extension(const bvt &bv, unsigned new_size, representationt rep);
+  bvt extension(const bvt &bv, std::size_t new_size, representationt rep);
 
-  bvt sign_extension(const bvt &bv, unsigned new_size)
+  bvt sign_extension(const bvt &bv, std::size_t new_size)
   {
     return extension(bv, new_size, SIGNED);
   }
 
-  bvt zero_extension(const bvt &bv, unsigned new_size)
+  bvt zero_extension(const bvt &bv, std::size_t new_size)
   {
     return extension(bv, new_size, UNSIGNED);
   }
 
-  bvt zeros(unsigned new_size) const
+  bvt zeros(std::size_t new_size) const
   {
     bvt result;
     result.resize(new_size, const_literal(false));
@@ -173,13 +173,13 @@ public:
   bvt select(literalt s, const bvt &a, const bvt &b);
 
   // computes a[last:first]  
-  static bvt extract(const bvt &a, unsigned first, unsigned last);
+  static bvt extract(const bvt &a, std::size_t first, std::size_t last);
   
   // extracts the n most significant bits
-  static bvt extract_msb(const bvt &a, unsigned n);
+  static bvt extract_msb(const bvt &a, std::size_t n);
 
   // extracts the n least significant bits
-  static bvt extract_lsb(const bvt &a, unsigned n);
+  static bvt extract_lsb(const bvt &a, std::size_t n);
 
   // put a and b together, where a comes first (lower indices)
   bvt concatenate(const bvt &a, const bvt &b) const;

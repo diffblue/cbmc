@@ -256,7 +256,7 @@ public:
   const componentt &get_component(
     const irep_idt &component_name) const;
 
-  unsigned component_number(const irep_idt &component_name) const;
+  std::size_t component_number(const irep_idt &component_name) const;
   typet component_type(const irep_idt &component_name) const;
   
   irep_idt get_tag() const { return get(ID_tag); }
@@ -480,6 +480,35 @@ public:
     return get(ID_identifier);
   }  
 };
+
+/*! \brief Cast a generic typet to a \ref tag_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * tag_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref tag_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const tag_typet &to_tag_type(const typet &type)
+{
+  assert(type.id()==ID_c_enum_tag ||
+         type.id()==ID_struct_tag ||
+         type.id()==ID_union_tag);
+  return static_cast<const tag_typet &>(type);
+}
+
+/*! \copydoc to_tag_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline tag_typet &to_tag_type(typet &type)
+{
+  assert(type.id()==ID_c_enum_tag ||
+         type.id()==ID_struct_tag ||
+         type.id()==ID_union_tag);
+  return static_cast<tag_typet &>(type);
+}
 
 /*! \brief A struct tag type
 */
@@ -959,24 +988,24 @@ public:
   {
   }
 
-  inline bitvector_typet(const irep_idt &_id, const typet &_subtype, unsigned width):
+  inline bitvector_typet(const irep_idt &_id, const typet &_subtype, std::size_t width):
     type_with_subtypet(_id, _subtype)
   {
     set_width(width);
   }
 
-  inline bitvector_typet(const irep_idt &_id, unsigned width):
+  inline bitvector_typet(const irep_idt &_id, std::size_t width):
     type_with_subtypet(_id)
   {
     set_width(width);
   }
 
-  inline unsigned get_width() const
+  inline std::size_t get_width() const
   {
     return get_unsigned_int(ID_width);
   }
 
-  inline void set_width(unsigned width)
+  inline void set_width(std::size_t width)
   {
     set(ID_width, width);
   }
@@ -1033,7 +1062,7 @@ public:
   {
   }
 
-  inline explicit bv_typet(unsigned width):bitvector_typet(ID_bv)
+  inline explicit bv_typet(std::size_t width):bitvector_typet(ID_bv)
   {
     set_width(width);
   }
@@ -1073,7 +1102,7 @@ public:
   {
   }
 
-  inline explicit unsignedbv_typet(unsigned width):bitvector_typet(ID_unsignedbv, width)
+  inline explicit unsignedbv_typet(std::size_t width):bitvector_typet(ID_unsignedbv, width)
   {
   }
   
@@ -1118,7 +1147,7 @@ public:
   {
   }
 
-  inline explicit signedbv_typet(unsigned width):bitvector_typet(ID_signedbv, width)
+  inline explicit signedbv_typet(std::size_t width):bitvector_typet(ID_signedbv, width)
   {
   }
 
@@ -1163,14 +1192,14 @@ public:
   {
   }
 
-  inline unsigned get_fraction_bits() const
+  inline std::size_t get_fraction_bits() const
   {
     return get_width()-get_integer_bits();
   }
 
-  unsigned get_integer_bits() const;
+  std::size_t get_integer_bits() const;
 
-  inline void set_integer_bits(unsigned b)
+  inline void set_integer_bits(std::size_t b)
   {
     set(ID_integer_bits, b);
   }
@@ -1203,15 +1232,15 @@ public:
   {
   }
 
-  inline unsigned get_e() const
+  inline std::size_t get_e() const
   {
     // subtract one for sign bit
     return get_width()-get_f()-1;
   }
 
-  unsigned get_f() const;
+  std::size_t get_f() const;
 
-  inline void set_f(unsigned b)
+  inline void set_f(std::size_t b)
   {
     set(ID_f, b);
   }
@@ -1244,7 +1273,7 @@ public:
   {
   }
 
-  inline explicit c_bit_field_typet(const typet &subtype, unsigned width):
+  inline explicit c_bit_field_typet(const typet &subtype, std::size_t width):
     bitvector_typet(ID_c_bit_field, subtype, width)
   {
   }
@@ -1303,7 +1332,7 @@ public:
   {
   }
 
-  inline pointer_typet(const typet &_subtype, unsigned width):
+  inline pointer_typet(const typet &_subtype, std::size_t width):
     bitvector_typet(ID_pointer, _subtype, width)
   {
   }
@@ -1356,7 +1385,7 @@ public:
     set(ID_C_reference, true);
   }
 
-  inline reference_typet(const typet &_subtype, unsigned _width):
+  inline reference_typet(const typet &_subtype, std::size_t _width):
     pointer_typet(_subtype, _width)
   {
     set(ID_C_reference, true);
@@ -1379,7 +1408,7 @@ public:
   {
   }
 
-  explicit inline c_bool_typet(unsigned width):
+  explicit inline c_bool_typet(std::size_t width):
     bitvector_typet(ID_c_bool, width)
   {
   }

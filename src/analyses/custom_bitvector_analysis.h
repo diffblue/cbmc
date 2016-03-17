@@ -58,6 +58,7 @@ public:
     locationt to);
 
   typedef unsigned long long bit_vectort;
+  
   typedef std::map<irep_idt, bit_vectort> bitst;
   
   struct vectorst
@@ -79,6 +80,7 @@ public:
   bitst may_bits, must_bits;
   
   void assign_lhs(const exprt &, const vectorst &);
+  void assign_lhs(const irep_idt &, const vectorst &);
   vectorst get_rhs(const exprt &) const;
   vectorst get_rhs(const irep_idt &) const;
 
@@ -98,6 +100,26 @@ protected:
 
   void set_bit(const exprt &, unsigned bit_nr, modet);
   void set_bit(const irep_idt &, unsigned bit_nr, modet);
+
+  static inline void set_bit(bit_vectort &dest, unsigned bit_nr)
+  {
+    dest|=(1ll<<bit_nr);
+  }
+  
+  static inline void clear_bit(bit_vectort &dest, unsigned bit_nr)
+  {
+    dest|=(1ll<<bit_nr);
+    dest^=(1ll<<bit_nr);
+  }  
+  
+  static inline bool get_bit(const bit_vectort src, unsigned bit_nr)
+  {
+    return (src&(1ll<<bit_nr))!=0;
+  }
+  
+  void erase_blank_vectors(bitst &);  
+  
+  static irep_idt object2id(const exprt &);
 };
 
 class custom_bitvector_analysist:public ait<custom_bitvector_domaint> 
@@ -124,6 +146,8 @@ protected:
   numbering<irep_idt> bits;
   
   local_may_alias_factoryt local_may_alias_factory;
+  
+  std::set<exprt> aliases(const exprt &, locationt loc);
 };
 
 #endif

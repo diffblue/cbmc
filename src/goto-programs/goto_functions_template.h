@@ -27,7 +27,10 @@ public:
   typedef std::vector<irep_idt> parameter_identifierst;
   parameter_identifierst parameter_identifiers;
 
-  bool body_available;
+  inline bool body_available() const
+  {
+    return !body.instructions.empty();
+  }
 
   inline bool is_inlined() const
   {
@@ -43,8 +46,8 @@ public:
   {
     type.set(ID_C_hide, true);
   }
-  
-  goto_function_templatet():body_available(false)
+
+  goto_function_templatet()
   {
   }
   
@@ -53,7 +56,6 @@ public:
     body.clear();
     type.clear();
     parameter_identifiers.clear();
-    body_available=false;
   }
 
   void swap(goto_function_templatet &other)
@@ -61,7 +63,6 @@ public:
     body.swap(other.body);
     type.swap(other.type);
     parameter_identifiers.swap(other.parameter_identifiers);
-    std::swap(body_available, other.body_available);
   }
 
   void copy_from(const goto_function_templatet<bodyT> &other)
@@ -69,13 +70,11 @@ public:
     body.copy_from(other.body);
     type=other.type;
     parameter_identifiers=other.parameter_identifiers;
-    body_available=other.body_available;
   }
 
   goto_function_templatet(const goto_function_templatet<bodyT> &src):
     type(src.type),
-    parameter_identifiers(src.parameter_identifiers),
-    body_available(src.body_available)
+    parameter_identifiers(src.parameter_identifiers)
   {
     body.copy_from(src.body);
   }
@@ -164,7 +163,7 @@ void goto_functions_templatet<bodyT>::output(
       it!=function_map.end();
       it++)
   {
-    if(it->second.body_available)
+    if(it->second.body_available())
     {
       out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
       

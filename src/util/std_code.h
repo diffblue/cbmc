@@ -378,8 +378,13 @@ public:
   {
     return static_cast<const codet &>(op1());
   }
+  
+  inline bool has_else_case() const
+  {
+    return op2().is_not_nil();
+  }
 
-  inline const exprt &else_case() const
+  inline const codet &else_case() const
   {
     return static_cast<const codet &>(op2());
   }
@@ -389,7 +394,7 @@ public:
     return static_cast<codet &>(op1());
   }
 
-  inline exprt &else_case()
+  inline codet &else_case()
   {
     return static_cast<codet &>(op2());
   }

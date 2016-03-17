@@ -11,7 +11,7 @@ unsigned int SIZE;
 int linear_search(int *a, int n, int q) {
   unsigned int j=0;
   while (j<n && a[j]!=q) {
-  j;
+  j++;
   if (j==20) j=-1;
   }
   if (j<SIZE) return 1;

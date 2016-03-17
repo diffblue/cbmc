@@ -22,7 +22,7 @@ Function: boolbvt::convert_complex
 
 void boolbvt::convert_complex(const exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -35,7 +35,7 @@ void boolbvt::convert_complex(const exprt &expr, bvt &bv)
     
     if(operands.size()==2)
     {
-      unsigned op_width=width/operands.size();
+      std::size_t op_width=width/operands.size();
     
       forall_expr(it, operands)
       {
@@ -69,7 +69,7 @@ Function: boolbvt::convert_complex_real
 
 void boolbvt::convert_complex_real(const exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -97,7 +97,7 @@ Function: boolbvt::convert_complex_imag
 
 void boolbvt::convert_complex_imag(const exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);

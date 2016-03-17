@@ -72,8 +72,8 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       throw "operand type mismatch on overflow-*";
 
     assert(bv0.size()==bv1.size());
-    unsigned old_size=bv0.size();
-    unsigned new_size=old_size*2;
+    std::size_t old_size=bv0.size();
+    std::size_t new_size=old_size*2;
 
     // sign/zero extension
     bv0=bv_utils.extension(bv0, new_size, rep);
@@ -87,7 +87,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       bv_overflow.reserve(old_size);
 
       // get top result bits
-      for(unsigned i=old_size; i<result.size(); i++)
+      for(std::size_t i=old_size; i<result.size(); i++)
         bv_overflow.push_back(result[i]);
 
       return prop.lor(bv_overflow);
@@ -99,7 +99,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
 
       // get top result bits, plus one more
       assert(old_size!=0);
-      for(unsigned i=old_size-1; i<result.size(); i++)
+      for(std::size_t i=old_size-1; i<result.size(); i++)
         bv_overflow.push_back(result[i]);
 
       // these need to be either all 1's or all 0's
@@ -119,7 +119,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   }
   else if(has_prefix(expr.id_string(), "overflow-typecast-"))
   {
-    unsigned bits=unsafe_c_str2unsigned(expr.id().c_str()+18);
+    std::size_t bits=unsafe_c_str2unsigned(expr.id().c_str()+18);
 
     const exprt::operandst &operands=expr.operands();
 
@@ -137,7 +137,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     if(op.type().id()==ID_signedbv)
     {
       bvt tmp_bv;
-      for(unsigned i=bits; i<bv.size(); i++)
+      for(std::size_t i=bits; i<bv.size(); i++)
         tmp_bv.push_back(prop.lxor(bv[bits-1], bv[i]));
 
       return prop.lor(tmp_bv);
@@ -145,7 +145,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     else
     {
       bvt tmp_bv;
-      for(unsigned i=bits; i<bv.size(); i++)
+      for(std::size_t i=bits; i<bv.size(); i++)
         tmp_bv.push_back(bv[i]);
 
       return prop.lor(tmp_bv);

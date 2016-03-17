@@ -23,7 +23,7 @@ Function: fixedbv_typet::get_integer_bits
 
 \*******************************************************************/
 
-unsigned fixedbv_typet::get_integer_bits() const
+std::size_t fixedbv_typet::get_integer_bits() const
 {
   const irep_idt integer_bits=get(ID_integer_bits);
   assert(integer_bits!=irep_idt());
@@ -42,7 +42,7 @@ Function: floatbv_typet::get_f
 
 \*******************************************************************/
 
-unsigned floatbv_typet::get_f() const
+std::size_t floatbv_typet::get_f() const
 {
   const irep_idt &f=get(ID_f);
   assert(f!=irep_idt());
@@ -61,12 +61,12 @@ Function: struct_union_typet::component_number
 
 \*******************************************************************/
 
-unsigned struct_union_typet::component_number(
+std::size_t struct_union_typet::component_number(
   const irep_idt &component_name) const
 {
   const componentst &c=components();
 
-  unsigned number=0;
+  std::size_t number=0;
 
   for(componentst::const_iterator
       it=c.begin();

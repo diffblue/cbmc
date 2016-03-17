@@ -237,6 +237,19 @@ bool rename_symbolt::rename(typet &dest) const
       result=false;
     }
   }
+  else if(dest.id()==ID_c_enum_tag ||
+          dest.id()==ID_struct_tag ||
+          dest.id()==ID_union_tag)
+  {
+    type_mapt::const_iterator it=
+      type_map.find(to_tag_type(dest).get_identifier());
+
+    if(it!=type_map.end())
+    {
+      to_tag_type(dest).set_identifier(it->second);
+      result=false;
+    }
+  }
   else if(dest.id()==ID_array)
   {
     array_typet &array_type=to_array_type(dest);
@@ -307,6 +320,10 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
   }
   else if(dest.id()==ID_symbol)
     return type_map.find(dest.get(ID_identifier))!=type_map.end();
+  else if(dest.id()==ID_c_enum_tag ||
+          dest.id()==ID_struct_tag ||
+          dest.id()==ID_union_tag)
+    return type_map.find(to_tag_type(dest).get_identifier())!=type_map.end();
   else if(dest.id()==ID_array)
     return have_to_rename(to_array_type(dest).size());
 

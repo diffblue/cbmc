@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
  *
  * @return
  */
-int run_danger(class optionst &options, class messaget::mstreamt &result,
+int run_danger(class optionst &options, messaget::mstreamt &result,
     const class symbol_tablet &st, const class goto_functionst &gf);
 
 #endif /* CEGIS_DANGER_RUNNER_H_ */

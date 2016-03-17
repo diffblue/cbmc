@@ -3,16 +3,15 @@
 
 #include <goto-programs/goto_functions.h>
 
-#include <cegis/danger/meta/literals.h>
-#include <cegis/danger/util/copy_instructions.h>
-#include <cegis/danger/util/danger_program_helper.h>
+#include <cegis/invariant/meta/literals.h>
+#include <cegis/invariant/util/copy_instructions.h>
 #include <cegis/instructions/instruction_set_factory.h>
 
 namespace
 {
-const char FIRST_PREFIX[]="__CPROVER_danger_opcode_first_";
-const char LAST_PREFIX[]="__CPROVER_danger_opcode_last_";
-const char SINGLE_PREFIX[]="__CPROVER_danger_opcode_";
+const char FIRST_PREFIX[]=CEGIS_PREFIX "opcode_first_";
+const char LAST_PREFIX[]=CEGIS_PREFIX "opcode_last_";
+const char SINGLE_PREFIX[]=CEGIS_PREFIX "opcode_";
 
 class execute_instruction_handlert
 {

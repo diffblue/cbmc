@@ -67,7 +67,7 @@ public:
   // get literals for variables/expressions, if available
   virtual bool literal(
     const exprt &expr,
-    unsigned bit,
+    std::size_t bit,
     literalt &literal) const;
 
   using arrayst::literal;
@@ -205,9 +205,9 @@ protected:
 
   void convert_update_rec(
     const exprt::operandst &designator,
-    unsigned d,
+    std::size_t d,
     const typet &type,
-    unsigned offset,
+    std::size_t offset,
     const exprt &new_value,
     bvt &bv);
 
@@ -218,7 +218,7 @@ protected:
   virtual exprt bv_get_rec(
     const bvt &bv,
     const std::vector<bool> &unknown,
-    unsigned offset,
+    std::size_t offset,
     const typet &type) const;
 
   exprt bv_get(const bvt &bv, const typet &type) const;
@@ -241,7 +241,7 @@ protected:
   
   void post_process_quantifiers();
   
-  typedef std::vector<unsigned> offset_mapt;
+  typedef std::vector<std::size_t> offset_mapt;
   void build_offset_map(const struct_typet &src, offset_mapt &dest);
 };
 

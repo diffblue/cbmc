@@ -74,7 +74,7 @@ void link_to_library(
         f_it=goto_functions.function_map.find(*it);
       
       if(f_it!=goto_functions.function_map.end() &&
-         f_it->second.body_available)
+         f_it->second.body_available())
       {
         // it's overridden!
       }

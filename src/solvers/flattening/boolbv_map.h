@@ -47,7 +47,7 @@ public:
     {
     }
 
-    unsigned width;
+    std::size_t width;
     bvtypet bvtype;
     typet type;
     literal_mapt literal_map;
@@ -67,7 +67,7 @@ public:
   void get_literals(
     const irep_idt &identifier,
     const typet &type,
-    const unsigned width,
+    const std::size_t width,
     bvt &literals);
 
   void set_literals(

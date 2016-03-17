@@ -572,7 +572,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
   old_identifiers.swap(identifiers);
   
   // sort according to distance
-  std::multimap<unsigned, exprt> distance_map;
+  std::multimap<std::size_t, exprt> distance_map;
 
   for(resolve_identifierst::const_iterator
       it=old_identifiers.begin();
@@ -583,7 +583,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
     
     if(disambiguate_functions(*it, args_distance, fargs))
     {
-      unsigned template_distance=0;
+      std::size_t template_distance=0;
       
       if(it->type().get(ID_C_template)!="")
         template_distance=it->type().
@@ -591,11 +591,11 @@ void cpp_typecheck_resolvet::disambiguate_functions(
 
       // we give strong preference to functions that have
       // fewer template arguments
-      unsigned total_distance=
+      std::size_t total_distance=
         1000*template_distance+args_distance;
     
       distance_map.insert(
-        std::pair<unsigned, exprt>(total_distance, *it));
+        std::pair<std::size_t, exprt>(total_distance, *it));
     }
   }
 
@@ -604,9 +604,9 @@ void cpp_typecheck_resolvet::disambiguate_functions(
   // put in the top ones
   if(!distance_map.empty())
   {
-    unsigned distance=distance_map.begin()->first;
+    std::size_t distance=distance_map.begin()->first;
 
-    for(std::multimap<unsigned, exprt>::const_iterator
+    for(std::multimap<std::size_t, exprt>::const_iterator
         it=distance_map.begin();
         it!=distance_map.end() && it->first==distance;
         it++)

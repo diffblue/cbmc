@@ -36,7 +36,7 @@ void cpp_typecheckt::salvage_default_arguments(
   const template_typet::template_parameterst &old_parameters=old_type.template_parameters();
   template_typet::template_parameterst &new_parameters=new_type.template_parameters();
 
-  for(unsigned i=0; i<new_parameters.size(); i++)
+  for(std::size_t i=0; i<new_parameters.size(); i++)
   {
     if(i<old_parameters.size() &&
        old_parameters[i].has_default_argument() &&
@@ -452,7 +452,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   const irept &instantiated_with = 
     template_symbol.value.add("instantiated_with");
     
-  for(unsigned i=0; i<instantiated_with.get_sub().size(); i++)
+  for(std::size_t i=0; i<instantiated_with.get_sub().size(); i++)
   {
     const cpp_template_args_tct &tc_template_args=
       static_cast<const cpp_template_args_tct &>(instantiated_with.get_sub()[i]);
@@ -1008,7 +1008,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   old_template_map=template_map;
 
   // check for default arguments
-  for(unsigned i=0; i<parameters.size(); i++)
+  for(std::size_t i=0; i<parameters.size(); i++)
   {
     const template_parametert &parameter=parameters[i];
     cpp_save_scopet cpp_saved_scope(cpp_scopes);

@@ -1,9 +1,10 @@
 #include <algorithm>
 
-#include <cegis/danger/util/danger_program_helper.h>
-#include <cegis/danger/constraint/danger_constraint_factory.h>
+#include <cegis/invariant/instrument/meta_variables.h>
+#include <cegis/invariant/util/invariant_program_helper.h>
+#include <cegis/invariant/meta/meta_variable_names.h>
 #include <cegis/danger/meta/meta_variable_names.h>
-#include <cegis/danger/instrument/meta_variables.h>
+#include <cegis/danger/constraint/danger_constraint_factory.h>
 #include <cegis/danger/symex/verify/restrict_counterexamples.h>
 
 namespace
@@ -15,7 +16,7 @@ bool is_assert(const goto_programt::instructiont &instr)
 
 goto_programt::targett find_assertion(goto_functionst &gf)
 {
-  goto_programt &body=get_danger_body(gf);
+  goto_programt &body=get_entry_body(gf);
   goto_programt::instructionst &i=body.instructions;
   const goto_programt::targett it=std::find_if(i.begin(), i.end(), &is_assert);
   assert(i.end() != it);
@@ -24,12 +25,12 @@ goto_programt::targett find_assertion(goto_functionst &gf)
 
 goto_programt::targett add_assume(goto_functionst &gf)
 {
-  goto_programt &body=get_danger_body(gf);
+  goto_programt &body=get_entry_body(gf);
   goto_programt::targett pos=find_assertion(gf);
   if (goto_program_instruction_typet::ASSUME == (--pos)->type) return pos;
   pos=body.insert_after(pos);
   pos->type=goto_program_instruction_typet::ASSUME;
-  pos->source_location=default_danger_source_location();
+  pos->source_location=default_invariant_source_location();
   return pos;
 }
 

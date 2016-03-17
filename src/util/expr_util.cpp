@@ -60,9 +60,9 @@ exprt gen_zero(const typet &type)
           type_id==ID_c_bool)
   {
     std::string value;
-    unsigned width=to_bitvector_type(type).get_width();
+    std::size_t width=to_bitvector_type(type).get_width();
 
-    for(unsigned i=0; i<width; i++)
+    for(std::size_t i=0; i<width; i++)
       value+='0';
 
     return constant_exprt(value, type);
@@ -131,12 +131,12 @@ exprt gen_one(const typet &type)
           type_id==ID_c_bool)
   {
     std::string value;
-    unsigned width=to_bitvector_type(type).get_width();
+    std::size_t width=to_bitvector_type(type).get_width();
     
     if(width!=0)
     {
       value.reserve(width);
-      for(unsigned i=0; i<width-1; i++)
+      for(std::size_t i=0; i<width-1; i++)
         value+='0';
       value+='1';
     }
@@ -297,7 +297,7 @@ exprt make_binary(const exprt &expr)
 
   exprt previous=operands[0];
   
-  for(unsigned i=1; i<operands.size(); i++)
+  for(std::size_t i=1; i<operands.size(); i++)
   {
     exprt tmp=expr;
     tmp.operands().clear();
@@ -413,4 +413,59 @@ exprt boolean_negate(const exprt &src)
     return true_exprt();
   else
     return not_exprt(src);
+}
+
+/*******************************************************************\
+
+Function: has_subexpr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool has_subexpr(const exprt &src, const irep_idt &id)
+{
+  if(src.id()==id) return true;
+  
+  forall_operands(it, src)
+    if(has_subexpr(*it, id))
+      return true;
+
+  return false;      
+}
+
+/*******************************************************************\
+
+Function: lift_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+if_exprt lift_if(const exprt &src, std::size_t operand_number)
+{
+  assert(operand_number < src.operands().size());
+  assert(src.operands()[operand_number].id()==ID_if);
+
+  const if_exprt if_expr=to_if_expr(src.operands()[operand_number]);
+  const exprt true_case=if_expr.true_case();
+  const exprt false_case=if_expr.false_case();
+
+  if_exprt result;
+  result.cond()=if_expr.cond();
+  result.type()=src.type();
+  result.true_case()=src;
+  result.true_case().operands()[operand_number]=true_case;
+  result.false_case()=src;
+  result.false_case().operands()[operand_number]=false_case;
+  
+  return result;
 }

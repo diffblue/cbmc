@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "trans_unit.h"
 #include "c_preprocess.h"
 #include "ansi_c_internal_additions.h"
+#include "type2name.h"
 
 /*******************************************************************\
 
@@ -301,6 +302,27 @@ bool ansi_c_languaget::from_type(
   const namespacet &ns)
 {
   code=type2c(type, ns);
+  return false;
+}
+
+/*******************************************************************\
+
+Function: ansi_c_languaget::type_to_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool ansi_c_languaget::type_to_name(
+  const typet &type,
+  std::string &name,
+  const namespacet &ns)
+{
+  name=type2name(type, ns);
   return false;
 }
 

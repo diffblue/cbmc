@@ -23,13 +23,18 @@ Author: Daniel Kroening, kroening@kroening.com
 class literalt
 {
 public:
+  // We deliberately don't use size_t here to save some memory
+  // on 64-bit machines; i.e., in practice, we restrict ourselves
+  // to SAT instances with no more than 2^31 variables.
+  typedef unsigned var_not;
+
   // constructors
   inline literalt()
   {
     set(unused_var_no(), false);
   }
 
-  inline literalt(unsigned v, bool sign)
+  inline literalt(var_not v, bool sign)
   {
     set(v, sign);
   }
@@ -54,7 +59,7 @@ public:
   friend inline literalt operator^(const literalt a, const bool b)
   {
     literalt result=a;
-    result.l^=(unsigned)b;
+    result.l^=(var_not)b;
     return result;
   }
 
@@ -69,11 +74,11 @@ public:
   inline literalt operator^=(const bool a)
   {
     // we use the least significant bit to store the sign
-    l^=(unsigned)a;
+    l^=(var_not)a;
     return *this;
   }
 
-  inline unsigned var_no() const
+  inline var_not var_no() const
   {
     return l>>1;
   }
@@ -83,24 +88,24 @@ public:
     return l&1;
   }
   
-  inline void set(unsigned _l)
+  inline void set(var_not _l)
   {
     l=_l;
   }
   
-  inline void set(unsigned v, bool sign)
+  inline void set(var_not v, bool sign)
   {
-    l=(v<<1)|((unsigned)sign);
+    l=(v<<1)|((var_not)sign);
   }
   
-  inline unsigned get() const
+  inline var_not get() const
   {
     return l;
   }
   
   inline void invert()
   {
-    l^=(unsigned)1;
+    l^=(var_not)1;
   }
 
   //
@@ -168,21 +173,18 @@ public:
   friend inline literalt neg(literalt a) { return !a; }
   friend inline literalt pos(literalt a) { return a; }
 
-  static inline unsigned const_var_no()
+  static inline var_not const_var_no()
   {
-    return (unsigned(-1)<<1)>>1;
+    return (var_not(-1)<<1)>>1;
   }
 
-  static inline unsigned unused_var_no()
+  static inline var_not unused_var_no()
   {
-    return (unsigned(-2)<<1)>>1;
+    return (var_not(-2)<<1)>>1;
   }
   
 protected:
-  // We deliberately don't use size_t here to save some memory
-  // on 64-bit machines; i.e., in practice, we restrict ourselves
-  // to SAT instances with no more than 2^31 variables.
-  unsigned l;  
+  var_not l;
 };
 
 std::ostream & operator << (std::ostream &out, literalt l);

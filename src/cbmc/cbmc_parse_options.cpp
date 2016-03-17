@@ -37,9 +37,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 
-#include <cegis/danger/facade/danger_runner.h>
-
 #include <goto-instrument/full_slicer.h>
+#include <goto-instrument/nondet_static.h>
 
 #include <linking/entry_point.h>
 
@@ -473,43 +472,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("json-cex"))
     options.set_option("json-cex", cmdline.get_value("json-cex"));
-
-  if(cmdline.isset("danger"))
-  {
-    unsigned int min_prog_size=1u;
-    if (cmdline.isset("cegis-min-size"))
-      min_prog_size=string2integer(cmdline.get_value("cegis-min-size")).to_ulong();
-    options.set_option("cegis-min-size", min_prog_size);
-    unsigned int max_prog_size=5u;
-    if (cmdline.isset("cegis-max-size"))
-      max_prog_size=string2integer(cmdline.get_value("cegis-max-size")).to_ulong();
-    options.set_option("cegis-max-size", max_prog_size);
-    options.set_option("cegis-parallel-verify", cmdline.isset("cegis-parallel-verify"));
-    options.set_option("cegis-limit-wordsize", cmdline.isset("cegis-limit-wordsize"));
-    options.set_option("cegis-match-select", !cmdline.isset("cegis-tournament-select"));
-    options.set_option("cegis-statistics", cmdline.isset("cegis-statistics"));
-    options.set_option("cegis-genetic", cmdline.isset("cegis-genetic"));
-    unsigned int genetic_rounds=10u;
-    if (cmdline.isset("cegis-genetic-rounds"))
-      genetic_rounds=string2integer(cmdline.get_value("cegis-genetic-rounds")).to_ulong();
-    options.set_option("cegis-genetic-rounds", genetic_rounds);
-    unsigned int seed=747864937u;
-    if (cmdline.isset("cegis-seed"))
-      seed=string2integer(cmdline.get_value("cegis-seed")).to_ulong();
-    options.set_option("cegis-seed", seed);
-    unsigned int pop_size=2000u;
-    if (cmdline.isset("cegis-genetic-popsize"))
-      pop_size=string2integer(cmdline.get_value("cegis-genetic-popsize")).to_ulong();
-    options.set_option("cegis-genetic-popsize", pop_size);
-    unsigned int mutation_rate=1u;
-    if (cmdline.isset("cegis-genetic-mutation-rate"))
-      mutation_rate=string2integer(cmdline.get_value("cegis-genetic-mutation-rate")).to_ulong();
-    options.set_option("cegis-genetic-mutation-rate", mutation_rate);
-    unsigned int replace_rate=15u;
-    if (cmdline.isset("cegis-genetic-replace-rate"))
-      replace_rate=string2integer(cmdline.get_value("cegis-genetic-replace-rate")).to_ulong();
-    options.set_option("cegis-genetic-replace-rate", replace_rate);
-  }
 }
 
 /*******************************************************************\
@@ -687,9 +649,6 @@ int cbmc_parse_optionst::doit()
 
   if(set_properties(goto_functions))
     return 7;
-
-  if(cmdline.isset("danger"))
-    return run_danger(options, result(), symbol_table, goto_functions);
 
   // do actual BMC
   return do_bmc(*bmc, goto_functions);
@@ -1021,6 +980,15 @@ bool cbmc_parse_optionst::process_goto_program(
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
     
+    // ignore default/user-specified initialization
+    // of variables with static lifetime
+    if(cmdline.isset("nondet-static"))
+    {
+      status() << "Adding nondeterministic initialization "
+                  "of static/global variables" << eom;
+      nondet_static(ns, goto_functions);
+    }
+
     if(cmdline.isset("string-abstraction"))
     {
       status() << "String Abstraction" << eom;
@@ -1105,7 +1073,7 @@ int cbmc_parse_optionst::do_bmc(
   bmc.set_ui(get_ui());
 
   // do actual BMC
-  bool result=bmc(goto_functions);
+  bool result=(bmc(goto_functions)==safety_checkert::SAFE);
 
   // let's log some more statistics
   debug() << "Memory consumption:" << messaget::endl;
@@ -1114,7 +1082,7 @@ int cbmc_parse_optionst::do_bmc(
 
   // We return '0' if the property holds,
   // and '10' if it is violated.
-  return result?10:0;
+  return result?0:10;
 }
 
 /*******************************************************************\
@@ -1212,6 +1180,9 @@ void cbmc_parse_optionst::help()
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n"
     " --mm MM                      memory consistency model for concurrent programs\n"
+    "\n"
+    "Semantic transformations:\n"
+    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     "\n"
     "BMC options:\n"
     " --function name              set main function name\n"

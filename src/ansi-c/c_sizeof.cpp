@@ -41,8 +41,8 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   {
     // We round up to bytes.
     // See special treatment for bit-fields below.
-    unsigned bits=to_bitvector_type(type).get_width();
-    unsigned bytes=bits/8;
+    std::size_t bits=to_bitvector_type(type).get_width();
+    std::size_t bytes=bits/8;
     if((bits%8)!=0) bytes++;
     dest=from_integer(bytes, size_type());
   }
@@ -67,8 +67,8 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
     if(type.get_bool(ID_C_ptr32))
       return from_integer(4, size_type());
              
-    unsigned bits=config.ansi_c.pointer_width;
-    unsigned bytes=bits/8;
+    std::size_t bits=config.ansi_c.pointer_width;
+    std::size_t bytes=bits/8;
     if((bits%8)!=0) bytes++;
     dest=from_integer(bytes, size_type());
   }
@@ -177,7 +177,7 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
 
       if(sub_type.id()==ID_c_bit_field)
       {
-        unsigned width=to_c_bit_field_type(sub_type).get_width();
+        std::size_t width=to_c_bit_field_type(sub_type).get_width();
         tmp=
           from_integer(width/8, size_type());
       }

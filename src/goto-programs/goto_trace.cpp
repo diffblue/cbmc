@@ -112,8 +112,8 @@ void goto_trace_stept::output(
 
   if(pc->is_other() || pc->is_assign())
   {
-    irep_idt identifier=lhs_object.get_identifier();
-    out << "  " << identifier
+    irep_idt identifier=lhs_object.get_object_name();
+    out << "  " << from_expr(ns, identifier, lhs_object.get_original_expr())
         << " = " << from_expr(ns, identifier, lhs_object_value)
         << "\n";
   }
@@ -221,11 +221,11 @@ Function: trace_value
 void trace_value(
   std::ostream &out,
   const namespacet &ns,
-  const symbol_exprt &lhs_object,
+  const ssa_exprt &lhs_object,
   const exprt &full_lhs,
   const exprt &value)
 {
-  const irep_idt &identifier=lhs_object.get_identifier();
+  const irep_idt &identifier=lhs_object.get_object_name();
   std::string value_string;
   
   if(value.is_nil())

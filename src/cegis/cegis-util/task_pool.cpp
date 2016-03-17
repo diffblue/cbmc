@@ -2,21 +2,16 @@
 #include <signal.h>
 #include <sys/signal.h>
 #include <sys/wait.h>
-#else
-#ifndef __MINGW32__
-typedef unsigned int pid_t;
-#endif
 #endif
 
 #include <algorithm>
 #include <cstdlib>
 #include <iterator>
 #include <sstream>
-#include <stdexcept>
 
 #include <util/irep.h>
 
-#include "task_pool.h"
+#include <cegis/cegis-util/task_pool.h>
 
 task_poolt::task_poolt()
 {

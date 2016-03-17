@@ -22,7 +22,7 @@ Function: boolbvt::convert_constant
 
 void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
@@ -33,8 +33,8 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
   
   if(expr_type.id()==ID_array)
   {
-    unsigned op_width=width/expr.operands().size();
-    unsigned offset=0;
+    std::size_t op_width=width/expr.operands().size();
+    std::size_t offset=0;
 
     forall_operands(it, expr)
     {
@@ -43,7 +43,7 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
       if(tmp.size()!=op_width)
         throw "convert_constant: unexpected operand width";
 
-      for(unsigned j=0; j<op_width; j++)
+      for(std::size_t j=0; j<op_width; j++)
         bv[offset+j]=tmp[j];
 
       offset+=op_width;
@@ -59,7 +59,7 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
     
     std::string binary=integer2binary(v, width);
 
-    for(unsigned i=0; i<width; i++)
+    for(std::size_t i=0; i<width; i++)
     {
       bool bit=(binary[binary.size()-i-1]=='1');
       bv[i]=const_literal(bit);
@@ -83,7 +83,7 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
     if(binary.size()!=width)
       throw "wrong value length in constant: "+expr.to_string();
 
-    for(unsigned i=0; i<width; i++)
+    for(std::size_t i=0; i<width; i++)
     {
       bool bit=(binary[binary.size()-i-1]=='1');
       bv[i]=const_literal(bit);
@@ -96,8 +96,7 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
     const irept::subt &elements=to_enumeration_type(expr_type).elements();
     const irep_idt &value=expr.get_value();
 
-    unsigned i;
-    for(i=0; i<elements.size(); i++)
+    for(std::size_t i=0; i<elements.size(); i++)
       if(elements[i].id()==value)
       {
         bv=bv_utils.build_constant(i, width);
@@ -112,7 +111,7 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
     if(binary.size()*2!=width)
       throw "wrong value length in constant: "+expr.to_string();
 
-    for(unsigned i=0; i<binary.size(); i++)
+    for(std::size_t i=0; i<binary.size(); i++)
     {
       char bit=binary[binary.size()-i-1];
 

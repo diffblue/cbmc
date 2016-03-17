@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <algorithm>
+#include <iterator>
 
 #include <util/symbol.h>
 #include <util/symbol_table.h>
@@ -162,8 +163,8 @@ public:
     std::vector<class_typet> bases;
     extract_types(bases, class_type.bases(), method);
     //extract_types(bases, class_type.find(ID_interfaces).get_sub(), method);
-    for(std::vector<class_typet>::const_iterator b=bases.begin(); b != bases.end(); ++b)
-      add_vtable_entry(vtable_value, *b, class_type, method);
+    for(const std::vector<class_typet>::value_type &b : bases)
+      add_vtable_entry(vtable_value, b, class_type, method);
   }
 
   void create_vtable_entry(struct_exprt &vtable_value,
@@ -189,21 +190,21 @@ public:
     return symbol_table.has_symbol(vtnamest::get_type(class_name));
   }
 
-  void operator()(const std::pair<const irep_idt, symbolt> &named_symbol)
+  void operator()(const irep_idt &symbol_name)
   {
-    const symbolt &symbol(named_symbol.second);
+    const symbolt &symbol = symbol_table.lookup(symbol_name);
     if (!is_class_with_vt(symbol)) return;
     const class_typet &class_type(to_class_type(symbol.type));
-    const std::string &class_name(id2string(named_symbol.first));
+    const std::string &class_name(id2string(symbol_name));
     if (symbol_table.has_symbol(vtnamest::get_table(class_name))) return;
     symbolt vtable_symbol;
     create_vtable_symbol(vtable_symbol, class_type);
     const class_typet::methodst &methods(class_type.methods());
     struct_exprt vtable_value;
-    for (class_typet::methodst::const_iterator m=methods.begin(); m != methods.end(); ++m)
-      create_base_vtable_entries(vtable_value, class_type, *m);
-    for (class_typet::methodst::const_iterator m=methods.begin(); m != methods.end(); ++m)
-      create_vtable_entry(vtable_value, class_type, *m);
+    for (const class_typet::methodst::value_type &m : methods)
+      create_base_vtable_entries(vtable_value, class_type, m);
+    for (const class_typet::methodst::value_type &m : methods)
+      create_vtable_entry(vtable_value, class_type, m);
     set_vtable_value(vtable_symbol, class_type, vtable_value);
     assert(!symbol_table.add(vtable_symbol));
   }
@@ -228,12 +229,18 @@ bool java_bytecode_vtable(
   const std::string &module)
 {
   const symbol_tablet::symbolst &symbols(symbol_table.symbols);
+  std::vector<irep_idt> names;
+  names.reserve(symbols.size());
+  std::transform(symbols.begin(), symbols.end(), std::back_inserter(names),
+      [](const std::pair<irep_idt, symbolt> &entry)
+      { return entry.first;});
   java_bytecode_vtable_factoryt factory(symbol_table, module);
-  std::for_each(symbols.begin(), symbols.end(), factory);
+  std::for_each(names.begin(), names.end(), factory);
   return factory.has_error;
 }
 
-namespace {
+namespace
+{
 
 void create_vtable_type(const irep_idt &vt_name, symbol_tablet &symbol_table,
     const symbolt &class_symbol) {
@@ -252,6 +259,7 @@ void create_vtable_type(const irep_idt &vt_name, symbol_tablet &symbol_table,
 }
 
 const char ID_isvtptr[] = "is_vtptr";
+const char ID_vtable_pointer[] = "@vtable_pointer";
 
 void add_vtable_pointer_member(
   const irep_idt &vt_name,
@@ -260,9 +268,9 @@ void add_vtable_pointer_member(
   struct_typet::componentt comp;
 
   comp.type()=pointer_typet(symbol_typet(vt_name));
-  comp.set_name("@vtable_pointer");
-  comp.set_base_name("@vtable_pointer");
-  comp.set_pretty_name("@vtable_pointer");
+  comp.set_name(ID_vtable_pointer);
+  comp.set_base_name(ID_vtable_pointer);
+  comp.set_pretty_name(ID_vtable_pointer);
   comp.set(ID_isvtptr, true);
 
   struct_typet &class_type=to_struct_type(class_symbol.type);
@@ -292,6 +300,26 @@ void create_vtable_symbol(
   
   if(!symbol_table.has_symbol(vttype))
     create_vtable_type(vttype, symbol_table, class_symbol);
+}
+
+/*******************************************************************
+
+ Function: has_vtable_info
+
+ Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool has_vtable_info(
+  const symbol_tablet &symbol_table,
+  const symbolt &class_symbol)
+{
+  return symbol_table.has_symbol(vtnamest::get_type(id2string(class_symbol.name)))
+      && to_struct_union_type(class_symbol.type).has_component(ID_vtable_pointer);
 }
 
 /*******************************************************************
@@ -386,17 +414,22 @@ exprt make_vtable_function(
   const irep_idt &func_name(func.get(ID_identifier));
   const std::string class_id(get_full_class_name(id2string(func_name)));
 
-  //if (class_id.find("java.lang.") != std::string::npos) {
-    // TODO: Handle unavailable models!
-    //return func;
-  //}
+  // TODO: Handle unavailable models!
+  if (class_id.find("java.") != std::string::npos) {
+    // When translating a single java_bytecode_parse_treet, we don't know
+    // which classes will eventually be available yet. If we could provide
+    // access to the class loader here, we know which classes have been
+    // loaded successfully. For classes which have not been loaded, returning
+    // "func" is equivalent to an unimplemented function.
+    return func;
+  }
 
   const symbol_typet vtable_type(vtnamest::get_type(class_id));
-  const pointer_typet vtable_pointer_type(vtable_type);
+  const pointer_typet vt_ptr_type(vtable_type);
   const symbol_typet target_type(class_id);
   const exprt this_ref(get_ref(this_obj, target_type));
   const typet ref_type(this_ref.type());
-  const member_exprt vtable_member(this_ref, "@vtable_pointer", vtable_pointer_type);
+  const member_exprt vtable_member(this_ref, ID_vtable_pointer, vt_ptr_type);
   const dereference_exprt vtable(vtable_member, vtable_type); // TODO: cast?
   const pointer_typet func_ptr_type(func.type());
   const member_exprt func_ptr(vtable, func_name, func_ptr_type);

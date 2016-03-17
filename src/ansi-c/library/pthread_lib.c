@@ -107,8 +107,6 @@ typedef signed char __CPROVER_mutex_t;
 inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
-  __CPROVER_atomic_begin();
-
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
                    "mutex must be initialized");
@@ -125,15 +123,15 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)!=-1,
     "mutex not initialised or destroyed");
-  #endif
-
+  #else
+  __CPROVER_atomic_begin();
   __CPROVER_assume(!*((__CPROVER_mutex_t *)mutex));
-
   *((__CPROVER_mutex_t *)mutex)=1;
   __CPROVER_atomic_end();
 
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
                   "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+  #endif
 
   return 0; // we never fail
 }
@@ -221,7 +219,8 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
                    "mutex must not be destroyed");
 
   __CPROVER_clear_may(mutex, "mutex-locked");
-  #endif
+  
+  #else
 
   // the fence must be before the unlock
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
@@ -231,6 +230,7 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
     "must hold lock upon unlock");
   *((__CPROVER_mutex_t *)mutex)=0;
   __CPROVER_atomic_end();
+  #endif
 
   return 0; // we never fail
 }
@@ -268,11 +268,13 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 
   __CPROVER_set_must(mutex, "mutex-destroyed");
   __CPROVER_set_may(mutex, "mutex-destroyed");
-  #endif
+  #else
 
   __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==0,
     "lock held upon destroy");
   *((__CPROVER_mutex_t *)mutex)=-1;
+
+  #endif
 
   return 0;
 }
@@ -491,10 +493,6 @@ inline int pthread_create(
   this_thread_id=++__CPROVER_next_thread_id;
   __CPROVER_atomic_end();
   
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-  __CPROVER_set_must(thread, "pthread-id");
-  #endif
-
   if(thread)
   {
     #ifdef __APPLE__
@@ -505,16 +503,19 @@ inline int pthread_create(
     #endif
   }
 
-  if(attr) (void)*attr;
-
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
-  // Clear all locked mutexes; locking must happen in same thread.
-  __CPROVER_clear_must(0, "mutex-locked");
-  __CPROVER_clear_may(0, "mutex-locked");
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_set_must(thread, "pthread-id");
   #endif
+
+  if(attr) (void)*attr;
   
   __CPROVER_ASYNC_1:
     __CPROVER_thread_id=this_thread_id,
+    #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
+    // Clear all locked mutexes; locking must happen in same thread.
+    __CPROVER_clear_must(0, "mutex-locked"),
+    __CPROVER_clear_may(0, "mutex-locked"),
+    #endif
     start_routine(arg),
     __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
                     "WWcumul", "RRcumul", "RWcumul", "WRcumul"),

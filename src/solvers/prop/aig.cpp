@@ -78,7 +78,7 @@ Function: aigt::get_terminals_rec
 \*******************************************************************/
 
 const aigt::terminal_sett &aigt::get_terminals_rec(
-  unsigned n,
+  literalt::var_not n,
   terminalst &terminals) const
 {
   terminalst::iterator it=terminals.find(n);
@@ -95,13 +95,15 @@ const aigt::terminal_sett &aigt::get_terminals_rec(
   {
     if(!node.a.is_constant())
     {
-      const std::set<unsigned> &ta=get_terminals_rec(node.a.var_no(), terminals);
+      const std::set<literalt::var_not> &ta=
+        get_terminals_rec(node.a.var_no(), terminals);
       t.insert(ta.begin(), ta.end());
     }
 
     if(!node.b.is_constant())
     {
-      const std::set<unsigned> &tb=get_terminals_rec(node.b.var_no(), terminals);
+      const std::set<literalt::var_not> &tb=
+        get_terminals_rec(node.b.var_no(), terminals);
       t.insert(tb.begin(), tb.end());
     }
   }
@@ -140,7 +142,7 @@ void aigt::print(
     return;
   }
 
-  unsigned node_nr=a.var_no();
+  literalt::var_not node_nr=a.var_no();
 
   {
     const aig_nodet &node=nodes[node_nr];

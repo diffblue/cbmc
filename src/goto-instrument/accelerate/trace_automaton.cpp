@@ -299,10 +299,12 @@ void automatont::move(state_sett &s, goto_programt::targett a, state_sett &t) {
   }
 }
 
-void trace_automatont::get_transitions(sym_mapt &transitions) {
+void trace_automatont::get_transitions(sym_mapt &transitions)
+{
   automatont::transition_tablet &dtrans = dta.transitions;
 
-  for (unsigned int i = 0; i < dtrans.size(); ++i) {
+  for(std::size_t i = 0; i < dtrans.size(); ++i)
+  {
     automatont::transitionst &dta_transitions = dtrans[i];
 
     for (automatont::transitionst::iterator it = dta_transitions.begin();
@@ -318,13 +320,14 @@ void trace_automatont::get_transitions(sym_mapt &transitions) {
   }
 }
 
-void automatont::reverse(goto_programt::targett epsilon) {
+void automatont::reverse(goto_programt::targett epsilon)
+{
   transition_tablet old_table;
   statet new_init;
 
   old_table.swap(transitions);
 
-  for (unsigned int i = 0; i < old_table.size(); i++) {
+  for(std::size_t i = 0; i < old_table.size(); i++) {
     transitions.push_back(transitionst());
   }
 
@@ -354,7 +357,8 @@ void automatont::reverse(goto_programt::targett epsilon) {
 
   init_state = new_init;
 
-  for (unsigned int i = 0; i < old_table.size(); i++) {
+  for(std::size_t i = 0; i < old_table.size(); i++)
+  {
     transitionst &trans = old_table[i];
 
     for (transitionst::iterator it = trans.begin();
@@ -400,8 +404,10 @@ void automatont::trim() {
     tmp.swap(new_states);
   } while (!new_states.empty());
 
-  for (unsigned int i = 0; i < num_states; i++) {
-    if (reachable.find(i) == reachable.end()) {
+  for(std::size_t i = 0; i < num_states; i++)
+  {
+    if (reachable.find(i) == reachable.end())
+    {
       transitions[i] = transitionst();
       accept_states.erase(i);
     }
@@ -443,8 +449,9 @@ void automatont::output(std::ostream &str) {
   }
 }
 
-unsigned int automatont::count_transitions() {
-  unsigned int ret = 0;
+std::size_t automatont::count_transitions()
+{
+  std::size_t ret = 0;
 
   for (transition_tablet::iterator it = transitions.begin();
        it != transitions.end();

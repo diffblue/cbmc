@@ -116,7 +116,7 @@ Function: integer2binary
 
 \*******************************************************************/
 
-const std::string integer2binary(const mp_integer &n, unsigned width)
+const std::string integer2binary(const mp_integer &n, std::size_t width)
 {
   mp_integer a(n);
 
@@ -130,7 +130,7 @@ const std::string integer2binary(const mp_integer &n, unsigned width)
     a=a-1;
   }
 
-  unsigned len = a.digits(2) + 2;
+  std::size_t len = a.digits(2) + 2;
   char *buffer=(char *)malloc(len);
   char *s = a.as_string(buffer, len, 2);
 
@@ -148,7 +148,7 @@ const std::string integer2binary(const mp_integer &n, unsigned width)
     result=result.substr(result.size()-width, width);
 
   if(neg)
-    for(unsigned i=0; i<result.size(); i++)
+    for(std::size_t i=0; i<result.size(); i++)
       result[i]=(result[i]=='0')?'1':'0';
 
   return result;
@@ -193,7 +193,7 @@ Function: binary2integer
 
 const mp_integer binary2integer(const std::string &n, bool is_signed)
 {
-  if(n.empty() || n.find_first_not_of("01")!=std::string::npos)
+  if(n.empty())
     return 0;
 
   if(n.size()<=(sizeof(unsigned long)*8))
@@ -202,21 +202,24 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
 
     unsigned long mask=1;
     mask=mask << (n.size()-1);
-    mp_integer result=(n[0]=='1') ? mask : 0;
-    if(is_signed) result.negate();
+    mp_integer top_bit=(n[0]=='1') ? mask : 0;
+    if(is_signed) top_bit.negate();
     mask>>=1;
+    unsigned long other_bits=0;
 
     for(std::string::const_iterator it=++n.begin();
         it!=n.end();
         ++it)
     {
       if(*it=='1')
-        result+=mask;
+        other_bits+=mask;
+      else if(*it!='0')
+        return 0;
 
       mask>>=1;
     }
 
-    return result;
+    return top_bit+other_bits;
   }
 
   #if 0
@@ -240,6 +243,8 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
   return result;
 
   #else
+  if(n.find_first_not_of("01")!=std::string::npos)
+    return 0;
 
   if(is_signed && n[0]=='1')
   {

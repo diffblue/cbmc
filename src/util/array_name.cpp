@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include "namespace.h"
 #include "symbol.h"
+#include "ssa_expr.h"
 
 /*******************************************************************\
 
@@ -33,6 +34,12 @@ std::string array_name(
       throw "index takes two operands";
 
     return array_name(ns, expr.op0())+"[]";
+  }
+  else if(is_ssa_expr(expr))
+  {
+    const symbolt &symbol=
+      ns.lookup(to_ssa_expr(expr).get_object_name());
+    return "array `"+id2string(symbol.base_name)+"'";
   }
   else if(expr.id()==ID_symbol)
   {

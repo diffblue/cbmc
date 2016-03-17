@@ -962,7 +962,7 @@ Function: smt2_convt::type2id
 
 \*******************************************************************/
 
-std::string smt2_convt::type2id(const typet &type)
+std::string smt2_convt::type2id(const typet &type) const
 {
   if(type.id()==ID_floatbv)
   {
@@ -987,7 +987,7 @@ std::string smt2_convt::type2id(const typet &type)
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    return type2id(type.subtype());
+    return type2id(ns.follow_tag(to_c_enum_tag_type(type)).subtype());
   }
   else
   {
@@ -1008,7 +1008,7 @@ Function: smt2_convt::floatbv_suffix
 
 \*******************************************************************/
 
-std::string smt2_convt::floatbv_suffix(const exprt &expr)
+std::string smt2_convt::floatbv_suffix(const exprt &expr) const
 {
   assert(!expr.operands().empty());
   return "_"+type2id(expr.op0().type())+"->"+type2id(expr.type());
@@ -1573,7 +1573,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_is_dynamic_object(expr);
   }
-  else if(expr.id()=="invalid-pointer")
+  else if(expr.id()==ID_invalid_pointer)
   {
     assert(expr.operands().size()==1);
 
@@ -1936,6 +1936,9 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_forall || 
           expr.id()==ID_exists)
   {
+    if(solver==MATHSAT)
+      throw "MathSAT does not support quantifiers";
+  
     if(expr.id()==ID_forall)
       out << "(forall ";
     else if(expr.id()==ID_exists)
@@ -2610,7 +2613,8 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
       // We first convert to 'underlying type'
       floatbv_typecast_exprt tmp=expr;
-      tmp.op()=typecast_exprt(src, src_type.subtype());
+      tmp.op()=typecast_exprt(src,
+                              ns.follow_tag(to_c_enum_tag_type(src_type)).subtype());
       convert_floatbv_typecast(tmp);
     }
     else

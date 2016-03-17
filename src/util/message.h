@@ -179,6 +179,7 @@ public:
 
     unsigned message_level;
     messaget &message;
+    source_locationt source_location;
 
     template <class T>
     inline mstreamt &operator << (const T &x)
@@ -198,9 +199,10 @@ public:
   // the printing of the message
   static inline mstreamt &eom(mstreamt &m)
   {
-    m.message.print(m.message_level, m.str());
+    m.message.print(m.message_level, m.str(), -1, m.source_location);
     m.clear(); // clears error bits
     m.str(std::string()); // clears the string
+    m.source_location.clear();
     return m;
   }
 

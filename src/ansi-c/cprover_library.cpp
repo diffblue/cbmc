@@ -14,9 +14,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cprover_library.h"
 #include "ansi_c_language.h"
 
+struct cprover_library_entryt
+{
+  const char *function;
+  const char *model;
+} cprover_library[]=
+#include "cprover_library.inc"
+;
+
 /*******************************************************************\
 
-Function: add_cprover_library
+Function: get_cprover_library_text
 
   Inputs:
 
@@ -26,21 +34,10 @@ Function: add_cprover_library
 
 \*******************************************************************/
 
-struct cprover_library_entryt
-{
-  const char *function;
-  const char *model;
-} cprover_library[]=
-#include "cprover_library.inc"
-
-void add_cprover_library(
+std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  const symbol_tablet &symbol_table)
 {
-  if(config.ansi_c.lib==configt::ansi_ct::libt::LIB_NONE)
-    return;
-
   std::ostringstream library_text;
 
   library_text <<
@@ -50,14 +47,14 @@ void add_cprover_library(
   if(config.ansi_c.string_abstraction)
     library_text << "#define __CPROVER_STRING_ABSTRACTION\n";
 
-  unsigned count=0;
-  
+  std::size_t count=0;
+
   for(cprover_library_entryt *e=cprover_library;
       e->function!=NULL;
       e++)
   {
     irep_idt id=e->function;
-    
+
     if(functions.find(id)!=functions.end())
     {
       symbol_tablet::symbolst::const_iterator old=
@@ -71,24 +68,72 @@ void add_cprover_library(
       }
     }
   }
-
-  if(count>0)
-  {
-    std::istringstream in(library_text.str());
-    
-    // switch mode temporarily from gcc C++ to gcc C flavour
-    configt::ansi_ct::flavourt old_mode=config.ansi_c.mode;
-    
-    if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_CPP)
-      config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
-    
-    ansi_c_languaget ansi_c_language;
-    ansi_c_language.set_message_handler(message_handler);
-    ansi_c_language.parse(in, "");
-    
-    ansi_c_language.typecheck(symbol_table, "<built-in-library>");
-
-    config.ansi_c.mode=old_mode;
-  }
+  
+  if(count==0)
+    return std::string();
+  else
+    return library_text.str();
 }
 
+/*******************************************************************\
+
+Function: add_cprover_library
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void add_cprover_library(
+  const std::set<irep_idt> &functions,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
+{
+  if(config.ansi_c.lib==configt::ansi_ct::libt::LIB_NONE)
+    return;
+    
+  std::string library_text;
+
+  library_text=get_cprover_library_text(functions, symbol_table);
+  
+  add_library(library_text, symbol_table, message_handler);
+}
+
+/*******************************************************************\
+
+Function: add_library
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void add_library(
+  const std::string &src,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
+{
+  if(src.empty()) return;
+
+  std::istringstream in(src);
+
+  // switch mode temporarily from gcc C++ to gcc C flavour
+  configt::ansi_ct::flavourt old_mode=config.ansi_c.mode;
+  
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_CPP)
+    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
+  
+  ansi_c_languaget ansi_c_language;
+  ansi_c_language.set_message_handler(message_handler);
+  ansi_c_language.parse(in, "");
+  
+  ansi_c_language.typecheck(symbol_table, "<built-in-library>");
+
+  config.ansi_c.mode=old_mode;
+}

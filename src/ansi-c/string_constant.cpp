@@ -28,8 +28,6 @@ string_constantt::string_constantt():
   exprt(ID_string_constant)
 {
   set_value(irep_idt());
-  type()=array_typet();
-  type().subtype()=char_type();
 }
 
 /*******************************************************************\
@@ -48,8 +46,6 @@ string_constantt::string_constantt(const irep_idt &_value):
   exprt(ID_string_constant)
 {
   set_value(_value);
-  type()=array_typet();
-  type().subtype()=char_type();
 }
 
 /*******************************************************************\
@@ -67,7 +63,7 @@ Function: string_constantt::set_value
 void string_constantt::set_value(const irep_idt &value)
 {
   exprt size_expr=from_integer(value.size()+1, index_type());
-  type().add(ID_size).swap(size_expr);
+  type()=array_typet(char_type(), size_expr);
   set(ID_value, value);
 }
 
@@ -86,21 +82,19 @@ Function: string_constantt:to_array_expr
 array_exprt string_constantt::to_array_expr() const
 {
   const std::string &str=get_string(ID_value);
-  unsigned string_size=str.size()+1; // we add the zero
+  std::size_t string_size=str.size()+1; // we add the zero
   const typet &char_type=type().subtype();
   bool char_is_unsigned=char_type.id()==ID_unsignedbv;
 
   exprt size=from_integer(string_size, index_type());
 
   array_exprt dest;
-  dest.type()=array_typet();
-  dest.type().subtype()=char_type;
-  dest.type().set(ID_size, size);
+  dest.type()=array_typet(char_type, size);
 
   dest.operands().resize(string_size);
 
   exprt::operandst::iterator it=dest.operands().begin();
-  for(unsigned i=0; i<string_size; i++, it++)
+  for(std::size_t i=0; i<string_size; i++, it++)
   {
     // Are we at the end? Do implicit zero.
     int ch=i==string_size-1?0:str[i];

@@ -101,7 +101,7 @@ void goto_symext::initialize_auto_object(
         address_of_expr);
       
       code_assignt assignment(expr, rhs);
-      symex_assign(state, assignment); /* TODO: needs clean */
+      symex_assign_rec(state, assignment);
     }
   }
 }
@@ -122,21 +122,25 @@ void goto_symext::trigger_auto_object(
   const exprt &expr,
   statet &state)
 {
-  if(expr.id()==ID_symbol)
+  if(expr.id()==ID_symbol &&
+     expr.get_bool(ID_C_SSA_symbol))
   {
-    const symbol_exprt &symbol_expr=to_symbol_expr(expr);
-    const irep_idt &identifier=symbol_expr.get_identifier();
+    const ssa_exprt &ssa_expr=to_ssa_expr(expr);
+    const irep_idt &obj_identifier=ssa_expr.get_object_name();
     
-    const symbolt &symbol=
-      ns.lookup(state.get_original_name(identifier));
-      
-    if(has_prefix(id2string(symbol.base_name), "auto_object"))
+    if(obj_identifier!="goto_symex::\\guard")
     {
-      // done already?
-      if(state.level2.current_names.find(identifier)==
-         state.level2.current_names.end())
+      const symbolt &symbol=
+        ns.lookup(obj_identifier);
+        
+      if(has_prefix(id2string(symbol.base_name), "auto_object"))
       {
-        initialize_auto_object(expr, state);
+        // done already?
+        if(state.level2.current_names.find(ssa_expr.get_identifier())==
+           state.level2.current_names.end())
+        {
+          initialize_auto_object(expr, state);
+        }
       }
     }
   }

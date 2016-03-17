@@ -193,15 +193,17 @@ bool java_entry_point(
 
   if(matches.empty())
   {
-    messaget message(message_handler);
-
     if(config.main.empty())
-      message.error() << "main method not in symbol table" << messaget::eom;
+      return false; // we fail silently
     else
+    {
+      messaget message(message_handler);
+
       message.error() << "main method `" << config.main
                       << "' not in symbol table" << messaget::eom;
-      
-    return true; // give up with error, no main
+        
+      return true; // give up with error, no main
+    }
   }
 
   if(matches.size()>=2)
@@ -237,7 +239,12 @@ bool java_entry_point(
       symbol_table.symbols.find(INITIALIZE);
 
     if(init_it==symbol_table.symbols.end())
-      throw "failed to find " INITIALIZE " symbol";
+    {
+      messaget message(message_handler);
+      message.error() << "failed to find " INITIALIZE " symbol"
+                      << messaget::eom;
+      return true; // give up with error
+    }
 
     code_function_callt call_init;
     call_init.lhs().make_nil();

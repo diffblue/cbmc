@@ -106,10 +106,10 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         extract0.resize(bv0.size()/2);
         extract1.resize(bv1.size()/2);
         
-        for(unsigned i=0; i<extract0.size(); i++)
+        for(std::size_t i=0; i<extract0.size(); i++)
           extract0[i]=bv0[i*2];
         
-        for(unsigned i=0; i<extract1.size(); i++)
+        for(std::size_t i=0; i<extract1.size(); i++)
           extract1[i]=bv1[i*2];
           
         bv_utilst::representationt rep=bv_utilst::UNSIGNED;

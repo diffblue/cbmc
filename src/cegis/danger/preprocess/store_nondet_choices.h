@@ -17,7 +17,7 @@
  *
  * @param program
  */
-void store_skolem_choices(class danger_programt &program);
+void store_skolem_choices(class invariant_programt &program);
 
 /**
  * @brief
@@ -26,6 +26,6 @@ void store_skolem_choices(class danger_programt &program);
  *
  * @param program
  */
-void store_x0_choices(danger_programt &program);
+void store_x0_choices(invariant_programt &program);
 
 #endif /* CEGIS_DANGER_STORE_NONDET_CHOICES_H_ */

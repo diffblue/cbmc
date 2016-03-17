@@ -18,9 +18,9 @@ void create_vtable_symbol(
   symbol_tablet &symbol_table,
   const class symbolt &class_symbol);
 
-code_assignt make_vtable_assignment(
+bool has_vtable_info(
   const symbol_tablet &symbol_table,
-  const exprt &func);
+  const symbolt &class_symbol);
 
 exprt make_vtable_function(
   const exprt &function,
@@ -28,5 +28,9 @@ exprt make_vtable_function(
 
 void set_virtual_name(
   class_typet::methodt &method);
+
+bool java_bytecode_vtable(
+  symbol_tablet &symbol_table,
+  const std::string &module);
 
 #endif /* CPROVER_JAVA_BYTECODE_VTABLE_H */

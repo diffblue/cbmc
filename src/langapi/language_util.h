@@ -34,4 +34,11 @@ exprt to_expr(
   const irep_idt &identifier,
   const std::string &src);
 
+std::string type_to_name(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const typet &type);
+
+std::string type_to_name(const typet &type);
+
 #endif

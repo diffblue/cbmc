@@ -33,7 +33,10 @@ const typename concurrent_learnt<learner1t, learner2t>::candidatet &concurrent_l
 }
 
 // XXX: Symex headstart for PLDI benchmarks
-//size_t symex_count=2u;
+namespace
+{
+size_t symex_count=2u;
+}
 // XXX: Symex headstart for PLDI benchmarks
 
 template<class learner1t, class learner2t>
@@ -84,11 +87,11 @@ bool concurrent_learnt<learner1t, learner2t>::learn(itert first,
   irep_pipe.close_write();
   const bool genetic_success=learner1.learn(first, last);
   // XXX: Symex headstart for PLDI benchmarks
-  /*if (symex_count)
+  if (symex_count)
   {
     --symex_count;
     task_pool.join_all();
-  }*/
+  }
   // XXX: Symex headstart for PLDI benchmarks
   if (symex_running) task_pool.cancel(symex_task);
   irep_pipe.close_read();

@@ -255,7 +255,7 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_floatbv)
   {
-    unsigned width=to_floatbv_type(src).get_width();
+    std::size_t width=to_floatbv_type(src).get_width();
 
     if(width==config.ansi_c.single_width)
       return q+"float"+d;
@@ -272,7 +272,7 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_fixedbv)
   {
-    unsigned width=to_fixedbv_type(src).get_width();
+    std::size_t width=to_fixedbv_type(src).get_width();
 
     if(config.ansi_c.use_fixed_for_float)
     {
@@ -287,7 +287,7 @@ std::string expr2ct::convert_rec(
     }
     else
     {
-      unsigned fraction_bits=to_fixedbv_type(src).get_fraction_bits();
+      std::size_t fraction_bits=to_fixedbv_type(src).get_fraction_bits();
       return q+"__CPROVER_fixedbv["+i2string(width)+"]["+i2string(fraction_bits)+"]";
     }
   }
@@ -2179,7 +2179,7 @@ std::string expr2ct::convert_constant(
       else if(int_value=='\'')
         dest+="'\\''";
       else if(int_value=='\\')
-        dest+="'\\'";
+        dest+="'\\\\'";
       else if(int_value>=' ' && int_value<126)
       {
         dest+='\'';
@@ -3271,7 +3271,7 @@ std::string expr2ct::convert_code_decl(
   dest+=convert_rec(src.op0().type(), c_qualifierst(), declarator);
 
   if(src.operands().size()==2)
-    dest+=" = "+convert(src.op1());
+    dest+="="+convert(src.op1());
 
   dest+=';';
 

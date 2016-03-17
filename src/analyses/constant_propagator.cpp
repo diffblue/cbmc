@@ -39,17 +39,17 @@ void constant_propagator_domaint::assign_rec(
 
 #ifdef DEBUG
   std::cout << "assign: " << from_expr(ns, "", lhs)
-	    << " := " << from_type(ns, "", rhs_type) << std::endl;
+            << " := " << from_type(ns, "", rhs_type) << std::endl;
 #endif
 
   if(lhs.id()==ID_symbol && rhs_type.id()!=ID_array
                          && rhs_type.id()!=ID_struct
                          && rhs_type.id()!=ID_union)
   {
-    if(!values.maps_to_top(rhs))
-      assign(values, lhs, rhs, ns);
+    if(values.is_constant(rhs))
+      assign(values, to_symbol_expr(lhs), rhs, ns);
     else
-      values.set_to_top(lhs);
+      values.set_to_top(to_symbol_expr(lhs));
   }
 #if 0
   else //TODO: could make field or array element-sensitive
@@ -76,10 +76,10 @@ void constant_propagator_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-#ifdef DEBUG
+  #ifdef DEBUG
   std::cout << from->location_number << " --> "
-	    << to->location_number << std::endl;
-#endif
+            << to->location_number << '\n';
+  #endif
 
 #ifdef DEBUG
   std::cout << "before:\n";
@@ -88,7 +88,9 @@ void constant_propagator_domaint::transform(
   
   if(from->is_decl())
   {
-    values.set_to_top(to_code_decl(from->code).symbol());
+    const code_declt &code_decl=to_code_decl(from->code);
+    const symbol_exprt &symbol=to_symbol_expr(code_decl.symbol());
+    values.set_to_top(symbol);
   }
   else if(from->is_assign())
   {
@@ -112,12 +114,30 @@ void constant_propagator_domaint::transform(
   else if(from->is_dead())
   {
     const code_deadt &code_dead=to_code_dead(from->code);
-    values.set_to_top(code_dead.symbol());
+    values.set_to_top(to_symbol_expr(code_dead.symbol()));
   }
   else if(from->is_function_call())
   {
-    //set all to top
-    values.set_to_top();
+    const exprt &function=to_code_function_call(from->code).function();
+    
+    if(function.id()==ID_symbol)
+    {
+      const irep_idt &identifier=to_symbol_expr(function).get_identifier();
+
+      if(identifier=="__CPROVER_set_must" ||
+         identifier=="__CPROVER_get_must" ||
+         identifier=="__CPROVER_set_may" ||
+         identifier=="__CPROVER_get_may" ||
+         identifier=="__CPROVER_cleanup" ||
+         identifier=="__CPROVER_clear_may" ||
+         identifier=="__CPROVER_clear_must")
+      {
+      }
+      else
+        values.set_to_top();
+    }
+    else
+      values.set_to_top();
   }
 
 #ifdef DEBUG
@@ -156,8 +176,8 @@ bool constant_propagator_domaint::two_way_propagate_rec(
       change = false;
       
       forall_operands(it, expr)
-	if(two_way_propagate_rec(*it, ns))
-	  change = true;
+        if(two_way_propagate_rec(*it, ns))
+          change = true;
     }
     while(change);
   }
@@ -169,7 +189,8 @@ bool constant_propagator_domaint::two_way_propagate_rec(
     // two-way propagation 
     valuest copy_values = values;
     assign_rec(copy_values, lhs, rhs, ns);
-    assign_rec(values, rhs, lhs, ns);
+    if(!values.is_constant(rhs) || values.is_constant(lhs))
+      assign_rec(values, rhs, lhs, ns);
     change = values.meet(copy_values);
   }
 
@@ -193,7 +214,7 @@ Function: constant_propagator_domaint::assign
 
 void constant_propagator_domaint::assign(
   valuest &dest,
-  const exprt &lhs,
+  const symbol_exprt &lhs,
   exprt rhs,
   const namespacet &ns) const
 {
@@ -204,7 +225,7 @@ void constant_propagator_domaint::assign(
 
 /*******************************************************************\
 
-Function: constant_propagator_domaint::valuest::maps_to_top
+Function: constant_propagator_domaint::valuest::is_constant
 
   Inputs:
 
@@ -214,24 +235,56 @@ Function: constant_propagator_domaint::valuest::maps_to_top
 
 \*******************************************************************/
 
-bool constant_propagator_domaint::valuest::maps_to_top(const exprt &expr) const
+bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
 {
   if(expr.id()==ID_side_effect && 
      to_side_effect_expr(expr).get_statement()==ID_nondet) 
-    return true;
+    return false;
+
+  if(expr.id()==ID_side_effect && 
+     to_side_effect_expr(expr).get_statement()==ID_malloc) 
+    return false;
 
   if(expr.id()==ID_symbol)
     if(replace_const.expr_map.find(to_symbol_expr(expr).get_identifier()) ==
        replace_const.expr_map.end())
-      return true;
+      return false;
+
+  if(expr.id()==ID_address_of)
+    return is_constant_address_of(to_address_of_expr(expr).object());
 
   forall_operands(it, expr)
-  {
-    if(maps_to_top(*it))
-      return true;
-  }
+    if(!is_constant(*it))
+      return false;
 
-  return false;
+  return true;
+}
+
+/*******************************************************************\
+
+Function: constant_propagator_domaint::valuest::is_constant_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool constant_propagator_domaint::valuest::is_constant_address_of(const exprt &expr) const
+{
+  if(expr.id()==ID_index)
+    return is_constant_address_of(to_index_expr(expr).array()) &&
+           is_constant(to_index_expr(expr).index());
+  
+  if(expr.id()==ID_member)
+    return is_constant_address_of(to_member_expr(expr).struct_op());
+  
+  if(expr.id()==ID_dereference)
+    return is_constant(to_dereference_expr(expr).pointer());
+  
+  return true;
 }
 
 /*******************************************************************\
@@ -285,7 +338,7 @@ void constant_propagator_domaint::valuest::output(
     out << "  bottom\n";
 
   for(replace_symbolt::expr_mapt::const_iterator 
-	it=replace_const.expr_map.begin();
+        it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
       ++it)
     out << ' ' << it->first << "=" <<
@@ -342,7 +395,7 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
 
   //set everything to top that is not in src
   for(replace_symbolt::expr_mapt::const_iterator 
-      it=replace_const.expr_map.begin();
+        it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
       )
   {
@@ -369,8 +422,8 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
       // values are different, set to top
       if(c_it->second != it->second)
       {
-	changed = set_to_top(it->first);
-	assert(changed);
+        changed = set_to_top(it->first);
+        assert(changed);
       }
     }
     // is not in "this", ignore
@@ -416,8 +469,8 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
       if(c_it->second != it->second)
       {
         set_to_bottom();
-	changed = true;
-	break;
+        changed = true;
+        break;
       }
     }
     else
@@ -509,14 +562,17 @@ void constant_propagator_ait::replace(
     }
     else if(it->is_function_call())
     {
+      s_it->second.values.replace_const(to_code_function_call(it->code).function());
+      simplify_expr(to_code_function_call(it->code).function(), ns);
+    
       exprt::operandst &args = 
-	to_code_function_call(it->code).arguments();
+        to_code_function_call(it->code).arguments();
 
       for(exprt::operandst::iterator o_it = args.begin();
-	  o_it != args.end(); ++o_it)
+          o_it != args.end(); ++o_it)
       {
         s_it->second.values.replace_const(*o_it);
-	*o_it = simplify_expr(*o_it, ns);
+        *o_it = simplify_expr(*o_it, ns);
       }
     }
   }

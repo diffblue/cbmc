@@ -161,21 +161,11 @@ void preconditiont::compute_rec(exprt &dest)
     assert(dest.operands().size()==1);
     compute_address_of(dest.op0());
   }
-  else if(dest.id()==ID_symbol)
-  {
-    if(dest.get(ID_identifier)==
-       s.get_original_name(SSA_step.ssa_lhs.get_identifier()))
-    {
-      dest=SSA_step.ssa_rhs;
-      s.get_original_name(dest);
-    }
-  }
   else if(dest.id()==ID_dereference)
   {
     assert(dest.operands().size()==1);
 
-    const irep_idt &lhs_identifier=
-      s.get_original_name(SSA_step.ssa_lhs.get_identifier());
+    const irep_idt &lhs_identifier=SSA_step.ssa_lhs.get_object_name();
   
     // aliasing may happen here
 
@@ -203,6 +193,11 @@ void preconditiont::compute_rec(exprt &dest)
       // nah, ok
       compute_rec(dest.op0());
     }
+  }
+  else if(dest==SSA_step.ssa_lhs.get_original_expr())
+  {
+    dest=SSA_step.ssa_rhs;
+    s.get_original_name(dest);
   }
   else
     Forall_operands(it, dest)

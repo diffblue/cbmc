@@ -14,6 +14,30 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: escape_domaint::is_tracked
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+bool escape_domaint::is_tracked(const symbol_exprt &symbol)
+{
+  const irep_idt &identifier=symbol.get_identifier();
+  if(identifier=="__CPROVER_memory_leak" ||
+     identifier=="__CPROVER_malloc_object" ||
+     identifier=="__CPROVER_dead_object" ||
+     identifier=="__CPROVER_deallocated")
+    return false;
+    
+  return true;
+}
+
+/*******************************************************************\
+
 Function: escape_domaint::get_function
 
   Inputs:
@@ -57,8 +81,16 @@ void escape_domaint::assign_lhs_cleanup(
 {
   if(lhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(lhs).get_identifier();
-    cleanup_map[identifier].cleanup_functions=cleanup_functions;
+    const symbol_exprt &symbol_expr=to_symbol_expr(lhs);
+    if(is_tracked(symbol_expr))
+    {
+      irep_idt identifier=symbol_expr.get_identifier();
+      
+      if(cleanup_functions.empty())
+        cleanup_map.erase(identifier);
+      else
+        cleanup_map[identifier].cleanup_functions=cleanup_functions;
+    }
   }
 }
 
@@ -80,15 +112,19 @@ void escape_domaint::assign_lhs_aliases(
 {
   if(lhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(lhs).get_identifier();
-
-    aliases.isolate(identifier);
-
-    for(std::set<irep_idt>::const_iterator it=alias_set.begin();
-        it!=alias_set.end();
-        it++)
+    const symbol_exprt &symbol_expr=to_symbol_expr(lhs);
+    if(is_tracked(symbol_expr))
     {
-      aliases.make_union(identifier, *it);
+      irep_idt identifier=symbol_expr.get_identifier();
+
+      aliases.isolate(identifier);
+
+      for(std::set<irep_idt>::const_iterator it=alias_set.begin();
+          it!=alias_set.end();
+          it++)
+      {
+        aliases.make_union(identifier, *it);
+      }
     }
   }
 }
@@ -111,14 +147,18 @@ void escape_domaint::get_rhs_cleanup(
 {
   if(rhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(rhs).get_identifier();
+    const symbol_exprt &symbol_expr=to_symbol_expr(rhs);
+    if(is_tracked(symbol_expr))
+    {
+      irep_idt identifier=symbol_expr.get_identifier();
 
-    const escape_domaint::cleanup_mapt::const_iterator m_it=
-      cleanup_map.find(identifier);
+      const escape_domaint::cleanup_mapt::const_iterator m_it=
+        cleanup_map.find(identifier);
     
-    if(m_it!=cleanup_map.end())
-      cleanup_functions.insert(m_it->second.cleanup_functions.begin(),
-                               m_it->second.cleanup_functions.end());
+      if(m_it!=cleanup_map.end())
+        cleanup_functions.insert(m_it->second.cleanup_functions.begin(),
+                                 m_it->second.cleanup_functions.end());
+    }
   }
   else if(rhs.id()==ID_if)
   {
@@ -149,14 +189,18 @@ void escape_domaint::get_rhs_aliases(
 {
   if(rhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(rhs).get_identifier();
-    alias_set.insert(identifier);
+    const symbol_exprt &symbol_expr=to_symbol_expr(rhs);
+    if(is_tracked(symbol_expr))
+    {
+      irep_idt identifier=symbol_expr.get_identifier();
+      alias_set.insert(identifier);
     
-    for(aliasest::const_iterator it=aliases.begin();
-        it!=aliases.end();
-        it++)
-      if(aliases.same_set(*it, identifier))
-        alias_set.insert(*it);
+      for(aliasest::const_iterator it=aliases.begin();
+          it!=aliases.end();
+          it++)
+        if(aliases.same_set(*it, identifier))
+          alias_set.insert(*it);
+    }
   }
   else if(rhs.id()==ID_if)
   {
@@ -294,6 +338,10 @@ void escape_domaint::transform(
       }
     }
     break;
+  
+  case END_FUNCTION:
+    // This is the edge to the call site.
+    break;
 
   default:;
   }
@@ -316,6 +364,12 @@ void escape_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
+  if(is_bottom)
+  {
+    out << "BOTTOM\n";
+    return;
+  }
+
   for(cleanup_mapt::const_iterator it=cleanup_map.begin();
       it!=cleanup_map.end();
       it++)
@@ -368,6 +422,15 @@ bool escape_domaint::merge(
   locationt from,
   locationt to)
 {
+  if(b.is_bottom)
+    return false; // no change
+
+  if(is_bottom)
+  {
+    *this=b;
+    return true; // change
+  }
+
   bool changed=false;
 
   for(cleanup_mapt::const_iterator b_it=b.cleanup_map.begin();
@@ -471,7 +534,7 @@ void escape_domaint::check_lhs(
 
 /*******************************************************************\
 
-Function: escape_analysist::instrument
+Function: escape_analysist::insert_cleanup
 
   Inputs:
 
@@ -557,7 +620,7 @@ void escape_analysist::instrument(
       case DEAD:
         {
           const code_deadt &code_dead=to_code_dead(instruction.code);
-
+          
           std::set<irep_idt> cleanup_functions1;
           
           escape_domaint &d=operator[](i_it);

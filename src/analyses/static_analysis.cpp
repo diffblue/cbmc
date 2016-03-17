@@ -139,7 +139,7 @@ void static_analysis_baset::output(
       f_it!=goto_functions.function_map.end();
       f_it++)
   {
-    if(f_it->second.body_available)
+    if(f_it->second.body_available())
     {
       out << "////\n";
       out << "//// Function: " << f_it->first << "\n";
@@ -436,7 +436,7 @@ void static_analysis_baset::do_function_call(
 {
   const goto_functionst::goto_functiont &goto_function=f_it->second;
 
-  if(!goto_function.body_available)
+  if(!goto_function.body_available())
     return; // do nothing
     
   assert(!goto_function.body.instructions.empty());

@@ -88,17 +88,9 @@ protected:
   
   void invalidate(const exprt &lhs);
   
-  static bool has_dereference(const exprt &src)
+  inline static bool has_dereference(const exprt &src)
   {
-    if(src.id()==ID_dereference)
-      return true;
-    else
-    {
-      forall_operands(it, src)
-        if(has_dereference(*it)) return true;
-
-      return false;
-    }
+    return has_subexpr(src, ID_dereference);
   }
 
   bool enable_bounds_check;
@@ -1057,8 +1049,9 @@ void goto_checkt::bounds_check(
     return; // done by the pointer code
   else if(array_type.id()==ID_incomplete_array)
     throw "index got incomplete array";
-  else if(array_type.id()!=ID_array)
-    throw "bounds check expected array type, got "+array_type.id_string();
+  else if(array_type.id()!=ID_array && array_type.id()!=ID_vector)
+    throw "bounds check expected array or vector type, got "
+      +array_type.id_string();
 
   std::string name=array_name(expr.array());
   
@@ -1143,40 +1136,46 @@ void goto_checkt::bounds_check(
       expr.find_source_location(),
       expr,
       guard);
+
+    return;
   }
-  else if(to_array_type(array_type).size().is_nil())
+
+  const exprt &size=array_type.id()==ID_array ?
+                    to_array_type(array_type).size() :
+                    to_vector_type(array_type).size();
+
+  if(size.is_nil())
   {
     // Linking didn't complete, we don't have a size.
     // Not clear what to do.
   }
+  else if(size.id()==ID_infinity)
+  {
+  }
+  else if(size.is_zero() &&
+          expr.array().id()==ID_member)
+  {
+    // a variable sized struct member
+  }
   else
   {
-    const exprt &size=to_array_type(array_type).size();
+    binary_relation_exprt inequality(index, ID_lt, size);
 
-    if(size.id()==ID_infinity)
-    {
-    }
-    else if(size.is_zero() &&
-            expr.array().id()==ID_member)
-    {
-      // a variable sized struct member
-    }
-    else
-    {
-      binary_relation_exprt inequality(index, ID_lt, size);
+    // typecast size
+    if(inequality.op1().type()!=inequality.op0().type())
+      inequality.op1().make_typecast(inequality.op0().type());
 
-      // typecast size
-      if(inequality.op1().type()!=inequality.op0().type())
-        inequality.op1().make_typecast(inequality.op0().type());
+    // typecast size
+    if(inequality.op1().type()!=inequality.op0().type())
+      inequality.op1().make_typecast(inequality.op0().type());
 
-      add_guarded_claim(
-        inequality,
-        name+" upper bound",
-        "array bounds",
-        expr.find_source_location(),
-        expr,
-        guard);
-    }
+    add_guarded_claim(
+      inequality,
+      name+" upper bound",
+      "array bounds",
+      expr.find_source_location(),
+      expr,
+      guard);
   }
 }
 
@@ -1548,6 +1547,8 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
           goto_programt::targett t=new_code.add_instruction(ASSIGN);
           exprt address_of_expr=address_of_exprt(variable);
           exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
+          if(!base_type_eq(lhs.type(), address_of_expr.type(), ns))
+            address_of_expr.make_typecast(lhs.type());
           exprt rhs=if_exprt(
             side_effect_expr_nondett(bool_typet()), address_of_expr, lhs, lhs.type());
           t->source_location=i.source_location;

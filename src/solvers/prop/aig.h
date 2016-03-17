@@ -66,8 +66,8 @@ public:
     nodes.clear();
   }
   
-  typedef std::set<unsigned> terminal_sett;
-  typedef std::map<unsigned, terminal_sett> terminalst;
+  typedef std::set<literalt::var_not> terminal_sett;
+  typedef std::map<literalt::var_not, terminal_sett> terminalst;
 
   // produces the support set
   // should get re-written
@@ -130,8 +130,8 @@ public:
   std::string dot_label(nodest::size_type v) const;
 
 protected:  
-  const std::set<unsigned> &get_terminals_rec(
-    unsigned n,
+  const std::set<literalt::var_not> &get_terminals_rec(
+    literalt::var_not n,
     terminalst &terminals) const;
 };
 
