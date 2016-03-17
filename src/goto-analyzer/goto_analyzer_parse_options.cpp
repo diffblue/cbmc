@@ -464,6 +464,13 @@ int goto_analyzer_parse_optionst::doit()
            << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
+  if(!cmdline.isset("taint"))
+  {
+    error() << "no analysis option given -- consider reading --help"
+            << eom;
+    return 6;
+  }
+
   register_languages();
   
   goto_functionst goto_functions;
@@ -497,9 +504,6 @@ int goto_analyzer_parse_optionst::doit()
     return 7;
   #endif
   
-  error() << "no analysis option given -- consider reading --help"
-          << eom;
-
   return 8;
 }
 
@@ -564,7 +568,7 @@ int goto_analyzer_parse_optionst::get_goto_program(
     error() << "Please provide a program to verify" << eom;
     return 6;
   }
-
+  
   try
   {
     if(cmdline.isset("show-parse-tree"))
