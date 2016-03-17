@@ -17,6 +17,7 @@ Author: CM Wintersteiger, 2006
 
 #include "ms_cl_mode.h"
 #include "compile.h"
+#include "get_base_name.h"
 
 /*******************************************************************\
 
@@ -87,11 +88,10 @@ bool ms_cl_modet::doit()
     compiler.output_file_object=cmdline.get_value("Fo");
 
     // this could be a directory
-    if(is_directory(compiler.output_file_object))
-    {
-      if(cmdline.args.size()>=1)
-        compiler.output_file_object+=get_base_name(cmdline.args[0])+".obj";
-    }
+    if(is_directory(compiler.output_file_object) &&
+       cmdline.args.size()>=1)
+      compiler.output_file_object+=
+        get_base_name(cmdline.args[0], true)+".obj";
   }
 
   if(cmdline.isset("Fe"))
@@ -99,18 +99,18 @@ bool ms_cl_modet::doit()
     compiler.output_file_executable=cmdline.get_value("Fe");
 
     // this could be a directory
-    if(is_directory(compiler.output_file_executable))
-    {
-      if(cmdline.args.size()>=1)
-        compiler.output_file_executable+=get_base_name(cmdline.args[0])+".exe";
-    }
+    if(is_directory(compiler.output_file_executable) &&
+       cmdline.args.size()>=1)
+      compiler.output_file_executable+=
+        get_base_name(cmdline.args[0], true)+".exe";
   }
   else
   {
     // We need at least one argument.
     // CL uses the first file name it gets!
     if(cmdline.args.size()>=1)
-      compiler.output_file_executable=get_base_name(cmdline.args[0])+".exe";
+      compiler.output_file_executable=
+        get_base_name(cmdline.args[0], true)+".exe";
   }
   
   if(cmdline.isset('J'))

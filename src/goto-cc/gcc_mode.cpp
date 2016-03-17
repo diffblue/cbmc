@@ -20,6 +20,7 @@ Author: CM Wintersteiger, 2006
 
 #include "compile.h"
 #include "run.h"
+#include "get_base_name.h"
 
 #include "gcc_mode.h"
 
@@ -342,7 +343,8 @@ bool gcc_modet::doit()
           else
             new_suffix=has_suffix(arg_it->arg, ".c")?".i":".ii";
 
-          std::string new_name=get_base_name(arg_it->arg)+new_suffix;
+          std::string new_name=
+            get_base_name(arg_it->arg, true)+new_suffix;
           std::string dest=temp_dir(new_name);
 
           int exit_code=preprocess(language, arg_it->arg, dest);
@@ -581,11 +583,9 @@ int gcc_modet::gcc_hybrid_binary()
           i_it=cmdline.parsed_argv.begin();
           i_it!=cmdline.parsed_argv.end();
           i_it++)
-        if(i_it->is_infile_name)
-        {
-          if(needs_preprocessing(i_it->arg))
-            output_files.push_back(get_base_name(i_it->arg)+".o");
-        }
+        if(i_it->is_infile_name &&
+           needs_preprocessing(i_it->arg))
+          output_files.push_back(get_base_name(i_it->arg, true)+".o");
     }
   }
   else

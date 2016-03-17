@@ -10,4 +10,4 @@ Date:
 
 #include <string>
 
-std::string get_base_name(const std::string &in);
+std::string get_base_name(const std::string &in, bool strip_suffix);

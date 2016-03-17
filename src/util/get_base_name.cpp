@@ -22,12 +22,11 @@ Function: get_base_name
 
 \*******************************************************************/
 
-std::string get_base_name(const std::string &in)
+std::string get_base_name(const std::string &in, bool strip_suffix)
 {
   size_t r=std::string::npos;
-  #ifdef _MSC_VER
-  r=in.rfind('.', in.length()-1);
-  #endif
+  if(strip_suffix)
+    r=in.rfind('.', in.length()-1);
   if(r==std::string::npos) r=in.length();
 
   size_t f=in.rfind('/', in.length()-1);
