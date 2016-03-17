@@ -168,6 +168,7 @@ void ansi_c_declarationt::to_symbol(
   symbol.is_extern=get_is_extern();
   symbol.is_macro=get_is_typedef() || get_is_enum_constant();
   symbol.is_parameter=get_is_parameter();
+  symbol.is_weak=get_is_weak();
   
   // is it a function?
   

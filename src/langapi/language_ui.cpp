@@ -336,6 +336,7 @@ void language_uit::show_symbol_table_plain(
     if(symbol.is_macro)           out << " macro";
     if(symbol.is_parameter)       out << " parameter";
     if(symbol.is_auxiliary)       out << " auxiliary";
+    if(symbol.is_weak)            out << " weak";
     if(symbol.is_property)        out << " property";
     if(symbol.is_state_var)       out << " state_var";
     if(symbol.is_exported)        out << " exported";

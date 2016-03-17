@@ -181,6 +181,16 @@ public:
   {
     set(ID_is_static_assert, is_static_assert);
   }
+
+  inline bool get_is_weak() const
+  {
+    return get_bool(ID_is_weak);
+  }
+
+  inline void set_is_weak(bool is_weak)
+  {
+    set(ID_is_weak, is_weak);
+  }
   
   void to_symbol(
     const ansi_c_declaratort &,

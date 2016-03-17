@@ -715,3 +715,5 @@ noreturn
 C_noreturn #noreturn
 process
 signal
+weak
+is_weak

@@ -41,6 +41,8 @@ void c_storage_spect::read(const typet &type)
     is_typedef=true;
   else if(type.id()==ID_register)
     is_register=true;
+  else if(type.id()==ID_weak)
+    is_weak=true;
   else if(type.id()==ID_auto)
   {
     // ignore

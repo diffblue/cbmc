@@ -56,6 +56,7 @@ bool write_goto_binary_v3(
     write_gb_word(out, 0); // old: sym.ordering
 
     unsigned flags=0;    
+    flags = (flags << 1) | (int)sym.is_weak;
     flags = (flags << 1) | (int)sym.is_type; 
     flags = (flags << 1) | (int)sym.is_property;
     flags = (flags << 1) | (int)sym.is_macro;

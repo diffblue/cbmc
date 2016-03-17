@@ -33,10 +33,11 @@ public:
     is_static=false;
     is_register=false;
     is_inline=false;
+    is_weak=false;
   }
   
   bool is_typedef, is_extern, is_static, is_register,
-       is_inline, is_thread_local;
+       is_inline, is_thread_local, is_weak;
   
   friend bool operator == (
     const c_storage_spect &a,
@@ -47,7 +48,8 @@ public:
            a.is_static==b.is_static &&
            a.is_register==b.is_register &&
            a.is_thread_local==b.is_thread_local &&
-           a.is_inline==b.is_inline;
+           a.is_inline==b.is_inline &&
+           a.is_weak==b.is_weak;
   }
 
   friend bool operator != (
@@ -67,6 +69,7 @@ public:
     a.is_register     |=b.is_register;
     a.is_inline       |=b.is_inline;
     a.is_thread_local |=b.is_thread_local;
+    a.is_weak         |=b.is_weak;
     
     return a;
   }
