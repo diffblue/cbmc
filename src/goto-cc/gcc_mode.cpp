@@ -597,7 +597,9 @@ int gcc_modet::gcc_hybrid_binary()
       output_files.push_back("a.out");      
   }
 
-  if(output_files.empty()) return 0;
+  if(output_files.empty() ||
+     (output_files.size()==1 &&
+      output_files.front()=="/dev/null")) return 0;
 
   if(act_as_ld)
     debug() << "Running ld to generate hybrid binary" << eom;
