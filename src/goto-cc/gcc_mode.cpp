@@ -157,9 +157,10 @@ bool gcc_modet::doit()
   config.set(cmdline);
 
   // Intel-specific  
-  if(cmdline.isset("m16"))
-    config.ansi_c.set_16();
-  else if(cmdline.isset("m32") || cmdline.isset("mx32"))
+  // in GCC, m16 is 32-bit (!), as documented here:
+  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59672
+  if(cmdline.isset("m16") ||
+     cmdline.isset("m32") || cmdline.isset("mx32"))
   {
     config.ansi_c.arch="i386";
     config.ansi_c.set_arch_spec_i386();
