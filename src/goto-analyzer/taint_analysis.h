@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 
 bool taint_analysis(
-  const goto_functionst &,
+  goto_functionst &,
   const namespacet &,
   const std::string &taint_file_name,
   message_handlert &);
