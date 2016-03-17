@@ -810,11 +810,11 @@ void goto_analyzer_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* *   GOTO-ANALYSER " CBMC_VERSION " - Copyright (C) 2016 ";
+    "* * GOTO-ANALYSER " CBMC_VERSION " - Copyright (C) 2016 ";
     
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
     
-  std::cout << "   * *\n";
+  std::cout << " * *\n";
     
   std::cout <<
     "* *                Daniel Kroening, DiffBlue                * *\n"
