@@ -24,6 +24,21 @@ public:
   public:
     enum { SOURCE, SINK, SANITIZER } kind;
     enum { THIS, PARAMETER, RETURN_VALUE } where;
+    
+    inline bool is_source() const
+    {
+      return kind==SOURCE;
+    }
+
+    inline bool is_sink() const
+    {
+      return kind==SINK;
+    }
+
+    inline bool is_sanitizer() const
+    {
+      return kind==SANITIZER;
+    }
 
     irep_idt function_identifier;
     irep_idt taint;
