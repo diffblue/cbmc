@@ -217,6 +217,8 @@ void linkingt::detailed_conflict_report_rec(
     const struct_union_typet::componentst &components2=
       to_struct_union_type(t2).components();
 
+    exprt conflict_path_before=conflict_path;
+
     if(components1.size()!=components2.size())
     {
       msg="number of members is different (";
@@ -238,11 +240,25 @@ void linkingt::detailed_conflict_report_rec(
         }
         else if(!base_type_eq(subtype1, subtype2, ns))
         {
+          typedef hash_set_cont<typet, irep_hash> type_sett;
+          type_sett parent_types;
+
+          exprt e=conflict_path_before;
+          while(e.id()==ID_dereference ||
+                e.id()==ID_member ||
+                e.id()==ID_index)
+          {
+            parent_types.insert(e.type());
+            e=e.op0();
+          }
+
+          conflict_path=conflict_path_before;
           conflict_path.type()=t1;
           conflict_path=
             member_exprt(conflict_path, components1[i].get_name());
 
-          if(depth>0)
+          if(depth>0 &&
+             parent_types.find(t1)==parent_types.end())
             detailed_conflict_report_rec(
               old_symbol,
               new_symbol,
@@ -251,11 +267,29 @@ void linkingt::detailed_conflict_report_rec(
               depth-1,
               conflict_path);
           else
+          {
             msg="type of member "+
                 id2string(components1[i].get_name())+
                 " differs";
+            if(depth>0)
+            {
+              std::string msg_bak;
+              msg_bak.swap(msg);
+              symbol_exprt c(ID_C_this);
+              detailed_conflict_report_rec(
+                old_symbol,
+                new_symbol,
+                subtype1,
+                subtype2,
+                depth-1,
+                c);
+              msg.swap(msg_bak);
+            }
 
-          break;
+          }
+
+          if(parent_types.find(t1)==parent_types.end())
+            break;
         }
       }
   }
