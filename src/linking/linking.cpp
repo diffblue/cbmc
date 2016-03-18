@@ -846,6 +846,206 @@ void linkingt::duplicate_code_symbol(
 
 /*******************************************************************\
 
+Function: linkingt::adjust_object_type_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool linkingt::adjust_object_type_rec(
+  const typet &t1,
+  const typet &t2,
+  adjust_type_infot &info)
+{
+  if(base_type_eq(t1, t2, ns))
+    return false;
+
+  if(t1.id()==ID_symbol ||
+     t1.id()==ID_struct_tag ||
+     t1.id()==ID_union_tag ||
+     t1.id()==ID_c_enum_tag)
+  {
+    const irep_idt &identifier=t1.get(ID_identifier);
+
+    if(info.o_symbols.insert(identifier).second)
+    {
+      bool result=
+        adjust_object_type_rec(follow_tags_symbols(ns, t1), t2, info);
+      info.o_symbols.erase(identifier);
+
+      return result;
+    }
+
+    return false;
+  }
+  else if(t2.id()==ID_symbol ||
+          t2.id()==ID_struct_tag ||
+          t2.id()==ID_union_tag ||
+          t2.id()==ID_c_enum_tag)
+  {
+    const irep_idt &identifier=t2.get(ID_identifier);
+
+    if(info.n_symbols.insert(identifier).second)
+    {
+      bool result=
+        adjust_object_type_rec(t1, follow_tags_symbols(ns, t2), info);
+      info.n_symbols.erase(identifier);
+
+      return result;
+    }
+
+    return false;
+  }
+  else if(t1.id()==ID_pointer && t2.id()==ID_array)
+  {
+    info.set_to_new=true; // store new type
+
+    return false;
+  }
+  else if(t1.id()==ID_array && t2.id()==ID_pointer)
+  {
+    // ignore
+    return false;
+  }
+  else if((t1.id()==ID_incomplete_struct && t2.id()==ID_struct) ||
+          (t1.id()==ID_incomplete_union && t2.id()==ID_union))
+  {
+    info.set_to_new=true; // store new type
+
+    return false;
+  }
+  else if((t1.id()==ID_struct && t2.id()==ID_incomplete_struct) ||
+          (t1.id()==ID_union && t2.id()==ID_incomplete_union))
+  {
+    // ignore
+    return false;
+  }
+  else if(t1.id()!=t2.id())
+  {
+    // type classes do not match and can't be fixed
+    #ifdef DEBUG
+    str << "LINKING: cannot join " << t1.id() << " vs. " << t2.id();
+    debug_msg();
+    #endif
+
+    return true;
+  }
+
+  if(t1.id()==ID_pointer)
+  {
+    #if 0
+    bool s=info.set_to_new;
+    if(adjust_object_type_rec(t1.subtype(), t2.subtype(), info))
+    {
+      link_warning(
+        info.old_symbol,
+        info.new_symbol,
+        "conflicting pointer types for variable");
+      info.set_to_new=s;
+    }
+    #else
+    link_warning(
+      info.old_symbol,
+      info.new_symbol,
+      "conflicting pointer types for variable");
+    #endif
+
+    return false;
+  }
+  else if(t1.id()==ID_array &&
+          !adjust_object_type_rec(t1.subtype(), t2.subtype(), info))
+  {
+    // still need to compare size
+    const exprt &old_size=to_array_type(t1).size();
+    const exprt &new_size=to_array_type(t2).size();
+
+    if((old_size.is_nil() && new_size.is_not_nil()) ||
+       info.old_symbol.is_weak)
+    {
+      info.set_to_new=true; // store new type
+    }
+    else if(new_size.is_nil() || info.new_symbol.is_weak)
+    {
+      // ok, we will use the old type
+    }
+    else
+    {
+      equal_exprt eq(old_size, new_size);
+
+      if(!simplify_expr(eq, ns).is_true())
+        link_error(
+          info.old_symbol,
+          info.new_symbol,
+          "conflicting array sizes for variable");
+    }
+
+    return false;
+  }
+  else if(t1.id()==ID_struct || t1.id()==ID_union)
+  {
+    const struct_union_typet::componentst &components1=
+      to_struct_union_type(t1).components();
+
+    const struct_union_typet::componentst &components2=
+      to_struct_union_type(t2).components();
+
+    struct_union_typet::componentst::const_iterator
+      it1=components1.begin(), it2=components2.begin();
+    for( ;
+        it1!=components1.end() && it2!=components2.end();
+        ++it1, ++it2)
+    {
+      if(it1->get_name()!=it2->get_name() ||
+         adjust_object_type_rec(it1->type(), it2->type(), info))
+        return true;
+    }
+    if(it1!=components1.end() || it2!=components2.end())
+      return true;
+
+    return false;
+  }
+
+  return true;
+}
+
+/*******************************************************************\
+
+Function: linkingt::adjust_object_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool linkingt::adjust_object_type(
+  const symbolt &old_symbol,
+  const symbolt &new_symbol,
+  bool &set_to_new)
+{
+  #ifdef DEBUG
+  str << "LINKING: trying to adjust types of " << old_symbol.name;
+  debug_msg();
+  #endif
+
+  const typet &old_type=follow_tags_symbols(ns, old_symbol.type);
+  const typet &new_type=follow_tags_symbols(ns, new_symbol.type);
+
+  adjust_type_infot info(old_symbol, new_symbol);
+  bool result=adjust_object_type_rec(old_type, new_type, info);
+  set_to_new=info.set_to_new;
+
+  return result;
+}
+
+/*******************************************************************\
+
 Function: linkingt::duplicate_object_symbol
 
   Inputs:
@@ -864,63 +1064,14 @@ void linkingt::duplicate_object_symbol(
 
   if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
   {
-    const typet &old_type=ns.follow(old_symbol.type);
-    const typet &new_type=ns.follow(new_symbol.type);
-  
-    if(old_type.id()==ID_array && new_type.id()==ID_array &&
-       base_type_eq(old_type.subtype(), new_type.subtype(), ns))
+    bool set_to_new=false;
+    bool failed=
+      adjust_object_type(old_symbol, new_symbol, set_to_new);
+
+    if(failed)
     {
-      // still need to compare size
-      const exprt &old_size=to_array_type(old_type).size();
-      const exprt &new_size=to_array_type(new_type).size();
-      
-      if(old_size.is_nil() && new_size.is_not_nil())
-      {
-        old_symbol.type=new_symbol.type; // store new type
-      }
-      else if(old_size.is_not_nil() && new_size.is_nil())
-      {
-        // ok, we will use the old type
-      }
-      else
-        link_error(
-          old_symbol,
-          new_symbol,
-          "conflicting array sizes for variable");
-    }
-    else if(old_type.id()==ID_pointer && new_type.id()==ID_array)
-    {
-      // store new type
-      old_symbol.type=new_symbol.type;
-    }
-    else if(old_type.id()==ID_array && new_type.id()==ID_pointer)
-    {
-      // ignore
-    }
-    else if(old_type.id()==ID_pointer && new_type.id()==ID_pointer)
-    {
-      link_warning(
-        old_symbol,
-        new_symbol,
-        "conflicting pointer types for variable");
-    }
-    else if((old_type.id()==ID_incomplete_struct &&
-             new_type.id()==ID_struct) ||
-            (old_type.id()==ID_incomplete_union &&
-             new_type.id()==ID_union))
-    {
-      // store new type
-      old_symbol.type=new_symbol.type;
-    }
-    else if((old_type.id()==ID_struct &&
-             new_type.id()==ID_incomplete_struct) ||
-            (old_type.id()==ID_union &&
-             new_type.id()==ID_incomplete_union))
-    {
-      // ignore
-    }
-    else
-    {
+      const typet &old_type=follow_tags_symbols(ns, old_symbol.type);
+
       // provide additional diagnostic output for
       // struct/union/array/enum
       if(old_type.id()==ID_struct ||
@@ -938,6 +1089,8 @@ void linkingt::duplicate_object_symbol(
         new_symbol,
         "conflicting types for variable");
     }
+    else if(set_to_new)
+      old_symbol.type=new_symbol.type;
   }
 
   // care about initializers    
