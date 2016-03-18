@@ -597,6 +597,32 @@ void linkingt::duplicate_code_symbol(
         old_symbol.location=new_symbol.location;
       }
     }
+    // Linux kernel uses void f(void) as generic prototype
+    else if((old_t.return_type().id()==ID_empty &&
+             old_t.parameters().empty() &&
+             !old_t.has_ellipsis() &&
+             old_symbol.value.is_nil()) ||
+            (new_t.return_type().id()==ID_empty &&
+             new_t.parameters().empty() &&
+             !new_t.has_ellipsis() &&
+             new_symbol.value.is_nil()))
+    {
+      // issue a warning
+      link_warning(
+        old_symbol,
+        new_symbol,
+        "ignoring conflicting void f(void) function declaration");
+
+      if(old_t.return_type().id()==ID_empty &&
+         old_t.parameters().empty() &&
+         !old_t.has_ellipsis() &&
+         old_symbol.value.is_nil())
+      {
+        old_symbol.type=new_symbol.type;
+        old_symbol.location=new_symbol.location;
+        old_symbol.is_weak=new_symbol.is_weak;
+      }
+    }
     // mismatch on number of parameters is definitively an error
     else if((old_t.parameters().size()<new_t.parameters().size() &&
              !old_t.has_ellipsis()) ||
