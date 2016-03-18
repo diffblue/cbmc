@@ -1,0 +1,9 @@
+#!/bin/bash
+
+svn export http://svn.cprover.org/svn/cbmc
+mv cbmc cbmc-3.9
+tar czf cbmc-3.9.tar.gz cbmc-3.9
+wget http://www.minisat.se/downloads/minisat-2.2.0.tar.gz
+mkdir $HOME/rpmbuild/SOURCES
+mv cbmc-3.9.tar.gz minisat-2.2.0.tar.gz $HOME/rpmbuild/SOURCES
+rpmbuild -qa cbmc.spec
