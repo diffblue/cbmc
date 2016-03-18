@@ -502,7 +502,9 @@ bool linkingt::needs_renaming_non_type(
   // These are static functions, or static variables
   // inside static function bodies.
   if(new_symbol.is_file_local ||
-     old_symbol.is_file_local)
+     old_symbol.is_file_local ||
+     (new_symbol.is_weak &&
+      old_symbol.is_weak))
     return true;
   
   return false;
@@ -542,6 +544,7 @@ void linkingt::duplicate_code_symbol(
 
       old_symbol.type=new_symbol.type;
       old_symbol.location=new_symbol.location;
+      old_symbol.is_weak=new_symbol.is_weak;
     }
     else if(!new_symbol.location.get_function().empty() &&
             new_symbol.value.is_nil())
@@ -561,6 +564,42 @@ void linkingt::duplicate_code_symbol(
       {
         old_symbol.type=new_symbol.type;
         old_symbol.location=new_symbol.location;
+        old_symbol.is_weak=new_symbol.is_weak;
+      }
+    }
+    // replace weak symbols
+    else if(old_symbol.is_weak)
+    {
+      if(new_symbol.value.is_nil())
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "function declaration conflicts with with weak definition");
+      else
+      {
+        // new weak symbol should have been renamed
+        assert(!new_symbol.is_weak);
+        old_symbol.value.make_nil();
+        old_symbol.is_weak=false;
+      }
+    }
+    else if(new_symbol.is_weak)
+    {
+      if(new_symbol.value.is_nil() ||
+         old_symbol.value.is_not_nil())
+      {
+        new_symbol.value.make_nil();
+
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "ignoring conflicting weak function declaration");
+      }
+      else
+      {
+        // new weak symbol should have been renamed
+        assert(!old_symbol.is_weak);
+        old_symbol.is_weak=true;
       }
     }
     // mismatch on number of parameters is definitively an error
@@ -845,12 +884,13 @@ void linkingt::duplicate_object_symbol(
      !new_symbol.value.get_bool(ID_C_zero_initializer))
   {
     if(old_symbol.value.is_nil() ||
-       old_symbol.value.get_bool(ID_C_zero_initializer))
+       old_symbol.value.get_bool(ID_C_zero_initializer) ||
+       old_symbol.is_weak)
     {
       // new_symbol wins
       old_symbol.value=new_symbol.value;
     }
-    else
+    else if(!new_symbol.is_weak)
     {
       // try simplifier
       exprt tmp_old=old_symbol.value,

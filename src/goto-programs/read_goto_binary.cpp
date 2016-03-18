@@ -281,11 +281,13 @@ Function: link_functions
 static bool link_functions(
   symbol_tablet &dest_symbol_table,
   goto_functionst &dest_functions,
-  symbol_tablet &src_symbol_table,
+  const symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
-  const rename_symbolt &rename_symbol)
+  const rename_symbolt &rename_symbol,
+  const hash_set_cont<irep_idt, irep_id_hash> &weak_symbols)
 {
   namespacet ns(dest_symbol_table);
+  namespacet src_ns(src_symbol_table);
 
   // merge functions
   Forall_goto_functions(src_it, src_functions)
@@ -320,7 +322,8 @@ static bool link_functions(
 
       goto_functionst::goto_functiont &src_func=src_it->second;
 
-      if(in_dest_symbol_table.body.instructions.empty())
+      if(in_dest_symbol_table.body.instructions.empty() ||
+         weak_symbols.find(final_id)!=weak_symbols.end())
       {
         // the one with body wins!
         rename_symbols_in_function(src_func, rename_symbol);
@@ -328,7 +331,8 @@ static bool link_functions(
         in_dest_symbol_table.body.swap(src_func.body);
         in_dest_symbol_table.type=src_func.type;
       }
-      else if(src_func.body.instructions.empty())
+      else if(src_func.body.instructions.empty() ||
+              src_ns.lookup(src_it->first).is_weak)
       {
         // just keep the old one in dest
       }
@@ -377,6 +381,12 @@ bool read_object_and_link(
       message_handler))
     return true;
 
+  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
+  id_sett weak_symbols;
+  forall_symbols(it, symbol_table.symbols)
+    if(it->second.is_weak)
+      weak_symbols.insert(it->first);
+
   linkingt linking(symbol_table,
                    temp_model.symbol_table,
                    message_handler);
@@ -386,7 +396,7 @@ bool read_object_and_link(
 
   if(link_functions(symbol_table, functions,
                     temp_model.symbol_table, temp_model.goto_functions,
-                    linking.rename_symbol))
+                    linking.rename_symbol, weak_symbols))
     return true;
 
   return false;
