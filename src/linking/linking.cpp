@@ -598,8 +598,8 @@ void linkingt::duplicate_code_symbol(
 
       while(!conflicts.empty())
       {
-        const typet &t1=ns.follow(conflicts.front().first);
-        const typet &t2=ns.follow(conflicts.front().second);
+        const typet &t1=follow_tags_symbols(ns, conflicts.front().first);
+        const typet &t2=follow_tags_symbols(ns, conflicts.front().second);
 
         // void vs. non-void return type may be acceptable if the
         // return value is never used
@@ -626,7 +626,8 @@ void linkingt::duplicate_code_symbol(
                 old_symbol.value.is_nil()!=new_symbol.value.is_nil())
         {
           if(warn_msg.empty())
-            warn_msg="different pointer types in function";
+            warn_msg="pointer parameter types differ between "
+                     "declaration and definition";
           replace=new_symbol.value.is_not_nil();
         }
         // transparent union with (or entirely without) implementation is
@@ -812,7 +813,7 @@ void linkingt::duplicate_object_symbol(
       if(old_type.id()==ID_struct ||
          old_type.id()==ID_union ||
          old_type.id()==ID_array ||
-         old_type.id()==ID_c_enum_tag)
+         old_type.id()==ID_c_enum)
         detailed_conflict_report(
           old_symbol,
           new_symbol,
