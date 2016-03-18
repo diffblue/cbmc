@@ -89,5 +89,5 @@ libzip-download:
 	@tar xfz libzip-1.1.2.tar.gz
 	@rm -Rf ../libzip
 	@mv libzip-1.1.2 ../libzip
-	@rm libzip-1.2.2.tar.gz
+	@rm libzip-1.1.2.tar.gz
 
