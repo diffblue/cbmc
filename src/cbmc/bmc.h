@@ -59,7 +59,11 @@ public:
   friend class hw_cbmc_satt;
   friend class counterexample_beautification_greedyt;
   
-  void set_ui(language_uit::uit _ui) { ui=_ui; }
+  void set_ui(language_uit::uit _ui)
+  {
+    ui=_ui;
+    symex_ptr->set_ui(ui);
+  }
 
   // the safety_checkert interface
   // ENHANCE: it would be reasonable to pass the goto_functions 
