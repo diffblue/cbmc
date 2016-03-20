@@ -6,6 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
+#include <util/prefix.h>
+
+#include <analyses/custom_bitvector_analysis.h>
+
 #include "taint_analysis.h"
 #include "taint_parser.h"
 
@@ -71,6 +77,70 @@ Function: taint_analysist::instrument
 void taint_analysist::instrument(
   goto_functionst::goto_functiont &goto_function)
 {
+  for(goto_programt::instructionst::iterator
+      it=goto_function.body.instructions.begin();
+      it!=goto_function.body.instructions.end();
+      it++)
+  {
+    const goto_programt::instructiont &instruction=*it;
+    
+    goto_programt tmp;
+  
+    switch(instruction.type)
+    {
+    case FUNCTION_CALL:
+      {
+        const code_function_callt &function_call=
+          to_code_function_call(instruction.code);
+        const exprt &function=function_call.function();
+        if(function.id()==ID_symbol)
+        {
+          const irep_idt &identifier=
+            to_symbol_expr(function).get_identifier();
+        
+          for(const auto & e : taint.entries)
+          {
+            if(has_prefix(id2string(identifier), "java::"+id2string(e.function_identifier)+":"))
+            {
+              status() << "MATCH " << identifier << eom;
+              
+              switch(e.kind)
+              {
+              case taint_parse_treet::entryt::SOURCE:
+                {
+                  code_function_callt function_call;
+                  function_call.lhs().make_nil();
+                  function_call.function()=symbol_exprt("__CPROVER_set_may");
+                  function_call.arguments().resize(2);
+                  goto_programt::targett t=tmp.add_instruction();
+                  t->make_function_call(function_call);
+                  t->source_location=instruction.source_location;
+                }
+                break;
+              
+              case taint_parse_treet::entryt::SINK:
+                break;
+              
+              case taint_parse_treet::entryt::SANITIZER:
+                break;
+              }
+              
+            }
+          }
+        }
+      }
+      break;
+    
+    default:;
+    }
+    
+    if(!tmp.empty())
+    {
+      goto_programt::targett next=it;
+      next++;
+      goto_function.body.destructive_insert(next, tmp);
+    }
+  }
 }
 
 /*******************************************************************\
@@ -89,24 +159,53 @@ bool taint_analysist::operator()(
   const std::string &taint_file_name,
   goto_functionst &goto_functions)
 {
-  status() << "Reading taint file `" << taint_file_name
-           << "'" << eom;
-
-  if(taint_parser(taint_file_name, taint, get_message_handler()))
+  try
   {
-    error() << "Failed to read taint definition file" << eom;
+    status() << "Reading taint file `" << taint_file_name
+             << "'" << eom;
+
+    if(taint_parser(taint_file_name, taint, get_message_handler()))
+    {
+      error() << "Failed to read taint definition file" << eom;
+      return true;
+    }
+
+    status() << "Got " << taint.entries.size()
+             << " taint definitions" << eom;
+
+    taint.output(debug());
+    debug() << eom;
+
+    status() << "Instrumenting taint" << eom;
+
+    instrument(goto_functions);
+    goto_functions.update();
+
+    status() << "Data-flow analysis" << eom;
+
+    custom_bitvector_analysist custom_bitvector_analysis;
+    custom_bitvector_analysis(goto_functions, ns);
+
+    custom_bitvector_analysis.output(ns, goto_functions, std::cout);
+    
+    //custom_bitvector_analysis.check(ns, goto_functions, cmdline.isset("xml-ui"), std::cout);
+
+    return false;
+  }
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
     return true;
   }
-
-  status() << "Got " << taint.entries.size()
-           << " taint definitions" << eom;
-
-  taint.output(debug());
-  debug() << eom;
-
-  instrument(goto_functions);
-
-  return false;
+  catch(const std::string &error_msg)
+  {
+    error() << error_msg << eom;
+    return true;
+  }
+  catch(...)
+  {
+    return true;
+  }
 }
 
 /*******************************************************************\
