@@ -1141,7 +1141,7 @@ Function: linkingt::do_type_dependencies
 
 void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
 {
-  // Any type that uses a type that will be renamed also
+  // Any type that uses a symbol that will be renamed also
   // needs to be renamed, and so on, until saturation.
 
   used_byt used_by;
@@ -1150,12 +1150,13 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
   {
     if(s_it->second.is_type)
     {
-      find_symbols_sett type_symbols_used;
-      find_type_symbols(s_it->second.type, type_symbols_used);
+      // find type and array-size symbols
+      find_symbols_sett symbols_used;
+      find_type_and_expr_symbols(s_it->second.type, symbols_used);
 
       for(find_symbols_sett::const_iterator
-          it=type_symbols_used.begin();
-          it!=type_symbols_used.end();
+          it=symbols_used.begin();
+          it!=symbols_used.end();
           it++)
       {
         used_by[*it].insert(s_it->first);
