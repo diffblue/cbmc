@@ -299,8 +299,8 @@ bool taint_analysist::operator()(
       if(f_it->first=="__actual_thread_spawn")
         continue;
         
-      std::cout << "******** Function " << symbol.display_name() << '\n';
-
+      bool first=true;
+        
       forall_goto_program_instructions(i_it, f_it->second.body)
       {
         if(!i_it->is_assert()) continue;
@@ -313,6 +313,13 @@ bool taint_analysist::operator()(
         exprt result2=simplify_expr(result, ns);
 
         if(result2.is_true()) continue;
+
+        if(first)
+        {
+          first=false;
+          std::cout << "\n"
+                       "******** Function " << symbol.display_name() << '\n';
+        }
 
         std::cout << i_it->source_location;
         if(!i_it->source_location.get_comment().empty())
