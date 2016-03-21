@@ -146,7 +146,7 @@ public:
     inline void make_assertion(const guardT &g) { clear(ASSERT); guard=g; }
     inline void make_assumption(const guardT &g) { clear(ASSUME); guard=g; }
     inline void make_assignment() { clear(ASSIGN); }
-    inline void make_other() { clear(OTHER); }
+    inline void make_other(const codeT &_code) { clear(OTHER); code=_code; }
     inline void make_decl() { clear(DECL); }
     inline void make_dead() { clear(DEAD); }
     inline void make_atomic_begin() { clear(ATOMIC_BEGIN); }

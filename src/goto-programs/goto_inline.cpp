@@ -541,11 +541,9 @@ void goto_inlinet::expand_function_call(
     forall_expr(it, arguments)
     {
       goto_programt::targett t=tmp.add_instruction();
-      t->make_other();
+      t->make_other(code_expressiont(*it));
       t->source_location=target->source_location;
       t->function=target->function;
-      t->code=codet(ID_expression);
-      t->code.copy_to_operands(*it);
     }
     
     // return value
