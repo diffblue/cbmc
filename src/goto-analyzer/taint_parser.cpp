@@ -62,7 +62,7 @@ bool taint_parser(
       return true;
     }
     
-    taint_parse_treet::entryt entry;
+    taint_parse_treet::rulet rule;
     
     const std::string kind=(*it)["kind"].value;
     const std::string function=(*it)["function"].value;
@@ -71,15 +71,15 @@ bool taint_parser(
     const std::string message=(*it)["message"].value;
     
     if(kind=="source")
-      entry.kind=taint_parse_treet::entryt::SOURCE;
+      rule.kind=taint_parse_treet::rulet::SOURCE;
     else if(kind=="sink")
-      entry.kind=taint_parse_treet::entryt::SINK;
+      rule.kind=taint_parse_treet::rulet::SINK;
     else if(kind=="sanitizer")
-      entry.kind=taint_parse_treet::entryt::SANITIZER;
+      rule.kind=taint_parse_treet::rulet::SANITIZER;
     else
     {
       messaget message(message_handler);
-      message.error() << "taint entry must have \"kind\" which is "
+      message.error() << "taint rule must have \"kind\" which is "
                          "\"source\" or \"sink\" or \"sanitizer\""
                       << messaget::eom;
       return true;
@@ -88,40 +88,40 @@ bool taint_parser(
     if(function.empty())
     {
       messaget message(message_handler);
-      message.error() << "taint entry must have \"function\""
+      message.error() << "taint rule must have \"function\""
                       << messaget::eom;
       return true;
     }
     else
-      entry.function_identifier=function;
+      rule.function_identifier=function;
 
     if(where=="return_value")
     {
-      entry.where=taint_parse_treet::entryt::RETURN_VALUE;
+      rule.where=taint_parse_treet::rulet::RETURN_VALUE;
     }
     else if(where=="this")
     {
-      entry.where=taint_parse_treet::entryt::THIS;
+      rule.where=taint_parse_treet::rulet::THIS;
     }
     else if(std::string(where, 0, 9)=="parameter")
     {
-      entry.where=taint_parse_treet::entryt::PARAMETER;
-      entry.parameter_number=
+      rule.where=taint_parse_treet::rulet::PARAMETER;
+      rule.parameter_number=
         safe_string2unsigned(std::string(where, 9, std::string::npos));
     }
     else
     {
       messaget message(message_handler);
-      message.error() << "taint entry must have \"where\""
+      message.error() << "taint rule must have \"where\""
                       << " which is \"return_value\" or \"this\" or \"parameter1\"..."
                       << messaget::eom;
       return true;
     }
     
-    entry.taint=taint;
-    entry.message=message;
+    rule.taint=taint;
+    rule.message=message;
     
-    dest.entries.push_back(entry);
+    dest.rules.push_back(rule);
   }
   
   return false;
@@ -129,7 +129,7 @@ bool taint_parser(
 
 /*******************************************************************\
 
-Function: taint_parse_treet::entryt::output
+Function: taint_parse_treet::rulet::output
 
   Inputs:
 
@@ -139,8 +139,10 @@ Function: taint_parse_treet::entryt::output
 
 \*******************************************************************/
 
-void taint_parse_treet::entryt::output(std::ostream &out) const
+void taint_parse_treet::rulet::output(std::ostream &out) const
 {
+  if(!rule_id.empty()) out << rule_id << ": ";
+
   switch(kind)
   {
   case SOURCE: out << "SOURCE "; break;
@@ -174,7 +176,7 @@ Function: taint_parse_treet::output
 
 void taint_parse_treet::output(std::ostream &out) const
 {
-  for(const auto & entry : entries)
-    entry.output(out);
+  for(const auto & rule : rules)
+    rule.output(out);
 }
 

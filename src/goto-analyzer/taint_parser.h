@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class taint_parse_treet
 {
 public:
-  class entryt
+  class rulet
   {
   public:
     enum { SOURCE, SINK, SANITIZER } kind;
@@ -40,6 +40,7 @@ public:
       return kind==SANITIZER;
     }
 
+    irep_idt rule_id;
     irep_idt function_identifier;
     irep_idt taint;
     unsigned parameter_number;
@@ -47,13 +48,13 @@ public:
     
     void output(std::ostream &) const;
     
-    inline entryt():parameter_number(0)
+    inline rulet():parameter_number(0)
     {
     }
   };
 
-  typedef std::list<entryt> entriest;
-  entriest entries;
+  typedef std::list<rulet> rulest;
+  rulest rules;
   
   void output(std::ostream &) const;
 };

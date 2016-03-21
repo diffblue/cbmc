@@ -98,7 +98,7 @@ void taint_analysist::instrument(
           const irep_idt &identifier=
             to_symbol_expr(function).get_identifier();
         
-          for(const auto & e : taint.entries)
+          for(const auto & e : taint.rules)
           {
             if(has_prefix(id2string(identifier), "java::"+id2string(e.function_identifier)+":"))
             {
@@ -106,22 +106,33 @@ void taint_analysist::instrument(
               
               switch(e.kind)
               {
-              case taint_parse_treet::entryt::SOURCE:
+              case taint_parse_treet::rulet::SOURCE:
                 {
-                  code_function_callt function_call;
-                  function_call.lhs().make_nil();
-                  function_call.function()=symbol_exprt("__CPROVER_set_may");
-                  function_call.arguments().resize(2);
+                  codet code_set_may("set_may");
+                  code_set_may.operands().resize(2);
                   goto_programt::targett t=tmp.add_instruction();
-                  t->make_function_call(function_call);
+                  t->make_other(code_set_may);
                   t->source_location=instruction.source_location;
                 }
                 break;
               
-              case taint_parse_treet::entryt::SINK:
+              case taint_parse_treet::rulet::SINK:
+                {
+                  goto_programt::targett t=tmp.add_instruction();
+                  binary_predicate_exprt get_may("get_may");
+                  t->make_assertion(get_may);
+                  t->source_location=instruction.source_location;
+                }
                 break;
               
-              case taint_parse_treet::entryt::SANITIZER:
+              case taint_parse_treet::rulet::SANITIZER:
+                {
+                  codet code_set_may("clear_may");
+                  code_set_may.operands().resize(2);
+                  goto_programt::targett t=tmp.add_instruction();
+                  t->make_other(code_set_may);
+                  t->source_location=instruction.source_location;
+                }
                 break;
               }
               
@@ -170,7 +181,7 @@ bool taint_analysist::operator()(
       return true;
     }
 
-    status() << "Got " << taint.entries.size()
+    status() << "Got " << taint.rules.size()
              << " taint definitions" << eom;
 
     taint.output(debug());
