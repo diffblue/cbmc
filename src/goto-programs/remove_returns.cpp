@@ -84,8 +84,8 @@ void remove_returnst::replace_returns(
     auxiliary_symbolt new_symbol;
     new_symbol.is_static_lifetime=true;
     new_symbol.module=function_symbol.module;
-    new_symbol.base_name=id2string(function_symbol.base_name)+"#return_value";
-    new_symbol.name=id2string(function_symbol.name)+"#return_value";
+    new_symbol.base_name=id2string(function_symbol.base_name)+RETURN_VALUE_SUFFIX;
+    new_symbol.name=id2string(function_symbol.name)+RETURN_VALUE_SUFFIX;
     new_symbol.mode=function_symbol.mode;
     new_symbol.type=return_type;
 
@@ -107,7 +107,7 @@ void remove_returnst::replace_returns(
 
         // replace "return x;" by "fkt#return_value=x;"
         symbol_exprt lhs_expr;
-        lhs_expr.set_identifier(id2string(function_id)+"#return_value");
+        lhs_expr.set_identifier(id2string(function_id)+RETURN_VALUE_SUFFIX);
         lhs_expr.type()=return_type;
 
         code_assignt assignment(lhs_expr, i_it->code.op0());
@@ -171,7 +171,7 @@ void remove_returnst::do_function_calls(
           {
             symbol_exprt return_value;
             return_value.type()=function_call.lhs().type();
-            return_value.set_identifier(id2string(function_id)+"#return_value");
+            return_value.set_identifier(id2string(function_id)+RETURN_VALUE_SUFFIX);
             rhs=return_value;
           }
           else
@@ -282,7 +282,7 @@ bool remove_returnst::restore_returns(
   const irep_idt function_id=f_it->first;
 
   // do we have X#return_value?
-  std::string rv_name=id2string(function_id)+"#return_value";
+  std::string rv_name=id2string(function_id)+RETURN_VALUE_SUFFIX;
 
   symbol_tablet::symbolst::iterator rv_it=
     symbol_table.symbols.find(rv_name);
@@ -398,7 +398,7 @@ void remove_returnst::undo_function_calls(
       if(assign.rhs().id()!=ID_symbol)
         continue;
 
-      irep_idt rv_name=id2string(function_id)+"#return_value";
+      irep_idt rv_name=id2string(function_id)+RETURN_VALUE_SUFFIX;
       const symbol_exprt &rhs=to_symbol_expr(assign.rhs());
       if(rhs.get_identifier()!=rv_name)
         continue;
