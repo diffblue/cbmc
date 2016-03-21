@@ -69,6 +69,7 @@ bool taint_parser(
     const std::string where=(*it)["where"].value;
     const std::string taint=(*it)["taint"].value;
     const std::string message=(*it)["message"].value;
+    const std::string id=(*it)["id"].value;
     
     if(kind=="source")
       rule.kind=taint_parse_treet::rulet::SOURCE;
@@ -120,6 +121,7 @@ bool taint_parser(
     
     rule.taint=taint;
     rule.message=message;
+    rule.id=id;
     
     dest.rules.push_back(rule);
   }
@@ -141,7 +143,7 @@ Function: taint_parse_treet::rulet::output
 
 void taint_parse_treet::rulet::output(std::ostream &out) const
 {
-  if(!rule_id.empty()) out << rule_id << ": ";
+  if(!id.empty()) out << id << ": ";
 
   switch(kind)
   {

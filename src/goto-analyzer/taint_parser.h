@@ -40,10 +40,10 @@ public:
       return kind==SANITIZER;
     }
 
-    irep_idt rule_id;
+    irep_idt id;
     irep_idt function_identifier;
     irep_idt taint;
-    unsigned parameter_number;
+    unsigned parameter_number; // the frist one is '1'
     std::string message;
     
     void output(std::ostream &) const;
