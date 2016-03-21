@@ -464,8 +464,7 @@ int goto_analyzer_parse_optionst::doit()
            << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
-  if(!cmdline.isset("taint") &&
-     !cmdline.isset("show-taint"))
+  if(!cmdline.isset("taint"))
   {
     error() << "no analysis option given -- consider reading --help"
             << eom;
@@ -486,17 +485,18 @@ int goto_analyzer_parse_optionst::doit()
   {
     const namespacet ns(symbol_table);
     std::string taint_file=cmdline.get_value("taint");
-    bool result=
-      taint_analysis(goto_functions, ns, taint_file, get_message_handler(), false);
-    return result?10:0;
-  }
 
-  if(cmdline.isset("show-taint"))
-  {
-    const namespacet ns(symbol_table);
-    std::string taint_file=cmdline.get_value("taint");
-    taint_analysis(goto_functions, ns, taint_file, get_message_handler(), true);
-    return 0;
+    if(cmdline.isset("show-taint"))
+    {
+      taint_analysis(goto_functions, ns, taint_file, get_message_handler(), true);
+      return 0;
+    }
+    else
+    {
+      bool result=
+        taint_analysis(goto_functions, ns, taint_file, get_message_handler(), false);
+      return result?10:0;
+    }
   }
 
   #if 0  

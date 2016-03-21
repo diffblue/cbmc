@@ -29,7 +29,7 @@ class optionst;
   "(show-properties)(show-reachable-properties)(property):" \
   "(verbosity):(version)" \
   "(gcc)(arch):" \
-  "(taint):"
+  "(taint):(show-taint)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,
