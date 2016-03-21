@@ -314,7 +314,8 @@ bool taint_analysist::operator()(
 
         std::cout << i_it->source_location;
         if(!i_it->source_location.get_comment().empty())
-          std::cout << ", " << i_it->source_location.get_comment();
+          std::cout << ", " << i_it->source_location.get_comment()
+                    << " (" << i_it->source_location.get_property_class() << ")";
         std::cout << '\n';
       }
     }
