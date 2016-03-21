@@ -3573,6 +3573,10 @@ std::string expr2ct::convert_code(
   if(statement==ID_array_copy)
     return convert_code_array_copy(src, indent);
 
+  if(statement=="set_may" ||
+     statement=="set_must")
+    return indent_str(indent)+convert_function(src, id2string(statement), 16)+";";
+
   unsigned precedence;
   return convert_norep(src, precedence);
 }
