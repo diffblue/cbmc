@@ -52,6 +52,13 @@ public:
     is_bottom=false;
   }
 
+  virtual void make_entry()
+  {
+    may_bits.clear();
+    must_bits.clear();
+    is_bottom=false;
+  }
+
   bool merge(
     const custom_bitvector_domaint &b,
     locationt from,

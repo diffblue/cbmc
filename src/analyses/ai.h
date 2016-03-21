@@ -63,6 +63,11 @@ public:
   {
   }
   
+  // a reasonable entry-point state
+  virtual void make_entry()
+  {
+  }
+  
   // also add
   //
   //   bool merge(const T &b, locationt from, locationt to);
