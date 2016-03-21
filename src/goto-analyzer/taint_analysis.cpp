@@ -294,10 +294,12 @@ bool taint_analysist::operator()(
     {
       if(!f_it->second.body.has_assertion()) continue;
       
+      const symbolt &symbol=ns.lookup(f_it->first);
+
       if(f_it->first=="__actual_thread_spawn")
         continue;
-
-      std::cout << "******** Function " << f_it->first << '\n';
+        
+      std::cout << "******** Function " << symbol.display_name() << '\n';
 
       forall_goto_program_instructions(i_it, f_it->second.body)
       {
