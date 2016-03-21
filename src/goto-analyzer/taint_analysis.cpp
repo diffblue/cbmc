@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/prefix.h>
+#include <util/simplify_expr.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -283,7 +284,36 @@ bool taint_analysist::operator()(
     
     //custom_bitvector_analysis.output(ns, goto_functions, std::cout);
     
-    custom_bitvector_analysis.check(ns, goto_functions, false, std::cout);
+    //custom_bitvector_analysis.check(ns, goto_functions, false, std::cout);
+
+    forall_goto_functions(f_it, goto_functions)
+    {
+      if(!f_it->second.body.has_assertion()) continue;
+      
+      if(f_it->first=="__actual_thread_spawn")
+        continue;
+
+      std::cout << "******** Function " << f_it->first << '\n';
+
+      forall_goto_program_instructions(i_it, f_it->second.body)
+      {
+        if(!i_it->is_assert()) continue;
+        if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
+          continue;
+
+        if(custom_bitvector_analysis[i_it].is_bottom) continue;
+
+        exprt result=custom_bitvector_analysis.eval(i_it->guard, i_it);
+        exprt result2=simplify_expr(result, ns);
+
+        if(result2.is_true()) continue;
+
+        std::cout << i_it->source_location;
+        if(!i_it->source_location.get_comment().empty())
+          std::cout << ", " << i_it->source_location.get_comment();
+        std::cout << '\n';
+      }
+    }
 
     return false;
   }
