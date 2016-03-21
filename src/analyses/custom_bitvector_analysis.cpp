@@ -459,6 +459,76 @@ void custom_bitvector_domaint::transform(
     }
     break;
     
+  case OTHER:
+    {
+      const irep_idt &statement=instruction.code.get_statement();
+  
+      if(statement=="set_may" ||
+         statement=="set_must" ||
+         statement=="clear_may" ||
+         statement=="clear_must")
+      {
+        assert(instruction.code.operands().size()==2);
+
+        unsigned bit_nr=
+          cba.get_bit_nr(instruction.code.op1());
+          
+        modet mode;
+        
+        if(statement=="set_must")
+          mode=SET_MUST;
+        else if(statement=="clear_must")
+          mode=CLEAR_MUST;
+        else if(statement=="set_may")
+          mode=SET_MAY;
+        else if(statement=="clear_may")
+          mode=CLEAR_MAY;
+        else
+          assert(false);
+        
+        exprt lhs=instruction.code.op0();
+        
+        if(lhs.is_constant() &&
+           to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
+        {
+          if(mode==CLEAR_MAY)
+          {
+            for(bitst::iterator b_it=may_bits.begin();
+                b_it!=may_bits.end();
+                b_it++)
+              clear_bit(b_it->second, bit_nr);
+
+            // erase blank ones
+            erase_blank_vectors(may_bits);
+          }
+          else if(mode==CLEAR_MUST)
+          {
+            for(bitst::iterator b_it=must_bits.begin();
+                b_it!=must_bits.end();
+                b_it++)
+              clear_bit(b_it->second, bit_nr);
+
+            // erase blank ones
+            erase_blank_vectors(must_bits);
+          }
+        }
+        else
+        {
+          dereference_exprt deref(lhs);
+          
+          // may alias other stuff
+          std::set<exprt> lhs_set=cba.aliases(deref, from);
+          
+          for(std::set<exprt>::const_iterator
+              l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
+          {
+            set_bit(*l_it, bit_nr, mode);
+          }
+        }
+      }
+    }
+    break;
+    
   case GOTO:
     if(has_get_must_or_may(instruction.guard))
     {
