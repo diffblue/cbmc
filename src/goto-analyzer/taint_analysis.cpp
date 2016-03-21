@@ -37,7 +37,8 @@ public:
 
   bool operator()(
     const std::string &taint_file_name,
-    goto_functionst &goto_functions);
+    goto_functionst &goto_functions,
+    bool show_full);
 
 protected:
   const namespacet &ns;
@@ -210,7 +211,8 @@ Function: taint_analysist::operator()
 
 bool taint_analysist::operator()(
   const std::string &taint_file_name,
-  goto_functionst &goto_functions)
+  goto_functionst &goto_functions,
+  bool show_full)
 {
   try
   {
@@ -282,10 +284,12 @@ bool taint_analysist::operator()(
     custom_bitvector_analysist custom_bitvector_analysis;
     custom_bitvector_analysis(goto_functions, ns);
     
-    //custom_bitvector_analysis.output(ns, goto_functions, std::cout);
+    if(show_full)
+    {
+      custom_bitvector_analysis.output(ns, goto_functions, std::cout);
+      return false;
+    }
     
-    //custom_bitvector_analysis.check(ns, goto_functions, false, std::cout);
-
     forall_goto_functions(f_it, goto_functions)
     {
       if(!f_it->second.body.has_assertion()) continue;
@@ -349,10 +353,11 @@ bool taint_analysis(
   goto_functionst &goto_functions,
   const namespacet &ns,
   const std::string &taint_file_name,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  bool show_full)
 {
   taint_analysist taint_analysis(ns);
   taint_analysis.set_message_handler(message_handler);
-  return taint_analysis(taint_file_name, goto_functions);
+  return taint_analysis(taint_file_name, goto_functions, show_full);
 }
 

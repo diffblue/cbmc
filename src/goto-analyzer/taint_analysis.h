@@ -18,6 +18,7 @@ bool taint_analysis(
   goto_functionst &,
   const namespacet &,
   const std::string &taint_file_name,
-  message_handlert &);
+  message_handlert &,
+  bool show_full);
 
 #endif
