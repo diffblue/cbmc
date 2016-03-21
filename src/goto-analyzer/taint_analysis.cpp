@@ -232,12 +232,55 @@ bool taint_analysist::operator()(
 
     instrument(goto_functions);
     goto_functions.update();
+    
+    bool have_entry_point=
+      goto_functions.function_map.find(goto_functionst::entry_point())!=
+      goto_functions.function_map.end();
+
+    // do we have an entry point?
+    if(have_entry_point)
+    {
+      status() << "Working from entry point" << eom;
+    }
+    else
+    {
+      status() << "No entry point found; "
+                  "we will consider the heads of all functions as reachable" << eom;
+
+      goto_programt end, gotos, calls;
+      
+      end.add_instruction(END_FUNCTION);
+
+      forall_goto_functions(f_it, goto_functions)
+        if(f_it->second.body_available() &&
+           f_it->first!=goto_functionst::entry_point())
+        {
+          goto_programt::targett t=calls.add_instruction();
+          code_function_callt call;
+          call.function()=ns.lookup(f_it->first).symbol_expr();
+          t->make_function_call(call);
+          calls.add_instruction()->make_goto(end.instructions.begin());
+          goto_programt::targett g=gotos.add_instruction();
+          g->make_goto(t, side_effect_expr_nondett(bool_typet()));
+        }
+        
+      goto_functionst::goto_functiont &entry=
+        goto_functions.function_map[goto_functionst::entry_point()];
+
+      goto_programt &body=entry.body;
+
+      body.destructive_append(gotos);
+      body.destructive_append(calls);
+      body.destructive_append(end);
+      
+      goto_functions.update();
+    }
 
     status() << "Data-flow analysis" << eom;
 
     custom_bitvector_analysist custom_bitvector_analysis;
     custom_bitvector_analysis(goto_functions, ns);
-
+    
     custom_bitvector_analysis.output(ns, goto_functions, std::cout);
     
     //custom_bitvector_analysis.check(ns, goto_functions, cmdline.isset("xml-ui"), std::cout);
