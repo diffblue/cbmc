@@ -106,7 +106,7 @@ void taint_analysist::instrument(
           {
             if(has_prefix(id2string(identifier), "java::"+id2string(rule.function_identifier)+":"))
             {
-              status() << "MATCH " << rule.id << " on " << identifier << eom;
+              debug() << "MATCH " << rule.id << " on " << identifier << eom;
               
               exprt where=nil_exprt();
               
