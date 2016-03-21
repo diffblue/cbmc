@@ -157,7 +157,7 @@ void taint_analysist::instrument(
                   binary_predicate_exprt get_may("get_may");
                   get_may.op0()=where;
                   get_may.op1()=address_of_exprt(string_constantt(rule.taint));
-                  t->make_assertion(get_may);
+                  t->make_assertion(not_exprt(get_may));
                   t->source_location=instruction.source_location;
                   t->source_location.set_property_class("taint rule "+id2string(rule.id));
                   t->source_location.set_comment(rule.message);
