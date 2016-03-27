@@ -179,7 +179,8 @@ bool compilet::add_input_file(const std::string &file_name)
      ext=="i" ||
      ext=="ii" ||
      ext=="class" ||
-     ext=="jar")
+     ext=="jar" ||
+     ext=="jsil")
   {
     source_files.push_back(file_name);
   }
