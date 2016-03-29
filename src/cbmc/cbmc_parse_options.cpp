@@ -434,6 +434,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("stop-on-fail", true);
     options.set_option("trace", true);
   }
+
+  if(cmdline.isset("symex-coverage-report"))
+    options.set_option(
+      "symex-coverage-report",
+      cmdline.get_value("symex-coverage-report"));
 }
 
 /*******************************************************************\
@@ -1086,6 +1091,7 @@ void cbmc_parse_optionst::help()
     "\n"
     "Analysis options:\n"
     " --show-properties            show the properties, but don't run analysis\n" // NOLINT(*)
+    " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n"
     " --property id                only check one specific property\n"
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)

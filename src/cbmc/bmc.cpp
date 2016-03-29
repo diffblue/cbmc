@@ -528,6 +528,15 @@ safety_checkert::resultt bmct::run(
                    << " remaining after simplification" << eom;
     }
 
+    // coverage report
+    std::string cov_out=options.get_option("symex-coverage-report");
+    if(!cov_out.empty() &&
+       symex.output_coverage_report(goto_functions, cov_out))
+    {
+      error() << "Failed to write symex coverage report" << eom;
+      return safety_checkert::ERROR;
+    }
+
     if(options.get_bool_option("show-vcc"))
     {
       show_vcc();

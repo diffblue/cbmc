@@ -43,6 +43,8 @@ public:
     ui(ui_message_handlert::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
+    symex.record_coverage=
+      !options.get_option("symex-coverage-report").empty();
   }
 
   virtual resultt run(const goto_functionst &goto_functions);
