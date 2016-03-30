@@ -485,16 +485,17 @@ int goto_analyzer_parse_optionst::doit()
   {
     const namespacet ns(symbol_table);
     std::string taint_file=cmdline.get_value("taint");
+    bool json=cmdline.isset("json");
 
     if(cmdline.isset("show-taint"))
     {
-      taint_analysis(goto_functions, ns, taint_file, get_message_handler(), true);
+      taint_analysis(goto_functions, ns, taint_file, get_message_handler(), true, json);
       return 0;
     }
     else
     {
       bool result=
-        taint_analysis(goto_functions, ns, taint_file, get_message_handler(), false);
+        taint_analysis(goto_functions, ns, taint_file, get_message_handler(), false, json);
       return result?10:0;
     }
   }

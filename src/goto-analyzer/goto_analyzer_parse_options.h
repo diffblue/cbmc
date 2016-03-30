@@ -29,7 +29,8 @@ class optionst;
   "(show-properties)(show-reachable-properties)(property):" \
   "(verbosity):(version)" \
   "(gcc)(arch):" \
-  "(taint):(show-taint)"
+  "(taint):(show-taint)" \
+  "(json)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,

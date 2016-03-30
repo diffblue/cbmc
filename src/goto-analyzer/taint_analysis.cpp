@@ -38,7 +38,8 @@ public:
   bool operator()(
     const std::string &taint_file_name,
     goto_functionst &goto_functions,
-    bool show_full);
+    bool show_full,
+    bool json);
 
 protected:
   const namespacet &ns;
@@ -212,7 +213,8 @@ Function: taint_analysist::operator()
 bool taint_analysist::operator()(
   const std::string &taint_file_name,
   goto_functionst &goto_functions,
-  bool show_full)
+  bool show_full,
+  bool json)
 {
   try
   {
@@ -317,15 +319,27 @@ bool taint_analysist::operator()(
         if(first)
         {
           first=false;
-          std::cout << "\n"
-                       "******** Function " << symbol.display_name() << '\n';
+          if(!json)
+            std::cout << "\n"
+                         "******** Function " << symbol.display_name() << '\n';
         }
 
-        std::cout << i_it->source_location;
-        if(!i_it->source_location.get_comment().empty())
-          std::cout << ", " << i_it->source_location.get_comment()
-                    << " (" << i_it->source_location.get_property_class() << ")";
-        std::cout << '\n';
+        if(json)
+        {
+          std::cout << "{\n";
+          std::cout << "  \"bug_class\": \"" << i_it->source_location.get_property_class() << "\",\n";
+          std::cout << "  \"file\": \"" << i_it->source_location.get_file() << "\",\n";
+          std::cout << "  \"line\": " << i_it->source_location.get_line() << "\n";
+          std::cout << "}\n";
+        }
+        else
+        {
+          std::cout << i_it->source_location;
+          if(!i_it->source_location.get_comment().empty())
+            std::cout << ", " << i_it->source_location.get_comment()
+                      << " (" << i_it->source_location.get_property_class() << ")";
+          std::cout << '\n';
+        }
       }
     }
 
@@ -364,10 +378,11 @@ bool taint_analysis(
   const namespacet &ns,
   const std::string &taint_file_name,
   message_handlert &message_handler,
-  bool show_full)
+  bool show_full,
+  bool json)
 {
   taint_analysist taint_analysis(ns);
   taint_analysis.set_message_handler(message_handler);
-  return taint_analysis(taint_file_name, goto_functions, show_full);
+  return taint_analysis(taint_file_name, goto_functions, show_full, json);
 }
 

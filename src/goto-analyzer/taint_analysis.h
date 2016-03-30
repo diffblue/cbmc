@@ -19,6 +19,7 @@ bool taint_analysis(
   const namespacet &,
   const std::string &taint_file_name,
   message_handlert &,
-  bool show_full);
+  bool show_full,
+  bool json);
 
 #endif
