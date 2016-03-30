@@ -33,6 +33,7 @@ void java_bytecode_parse_treet::classt::swap(
   other.implements.swap(implements);
   other.fields.swap(fields);
   other.methods.swap(methods);
+  other.annotations.swap(annotations);
 }
 
 /*******************************************************************\
@@ -75,6 +76,12 @@ Function: java_bytecode_parse_treet::classt::output
 
 void java_bytecode_parse_treet::classt::output(std::ostream &out) const
 {
+  for(const auto & annotation : annotations)
+  {
+    annotation.output(out);
+    out << '\n';
+  }
+
   out << "class " << name;
   if(!extends.empty()) out << " extends " << extends;
   out << " {" << '\n';
@@ -99,7 +106,55 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
   
   out << '}' << '\n';
   out << '\n';
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parse_treet::annotationt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
+{
+  out << '@' << type;
   
+  if(!element_value_pairs.empty())
+  {
+    out << '(';
+    
+    bool first=true;
+    for(const auto & element_value_pair : element_value_pairs)
+    {
+      if(first) first=false; else out << ", ";
+      element_value_pair.output(out);
+    }
+    
+    out << ')';
+  }
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parse_treet::annotationt::element_value_pairt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_parse_treet::annotationt::element_value_pairt::output(std::ostream &out) const
+{
+  out << '"' << element_name << '"' << '=';
+  out << value;
 }
 
 /*******************************************************************\
@@ -116,6 +171,13 @@ Function: java_bytecode_parse_treet::methodt::output
 
 void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 {
+  for(const auto & annotation : annotations)
+  {
+    out << "  ";
+    annotation.output(out);
+    out << '\n';
+  }
+
   out << "  ";
 
   if(is_public)
@@ -174,6 +236,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   out << "  }" << '\n';
 
   out << '\n';
+
 }
 
 /*******************************************************************\
@@ -190,6 +253,13 @@ Function: java_bytecode_parse_treet::fieldt::output
 
 void java_bytecode_parse_treet::fieldt::output(std::ostream &out) const
 {
+  for(const auto & annotation : annotations)
+  {
+    out << "  ";
+    annotation.output(out);
+    out << '\n';
+  }
+
   out << "  ";
 
   if(is_public)
