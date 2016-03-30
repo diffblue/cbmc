@@ -97,3 +97,4 @@ libzip-build:
 	@echo "Building libzip"
 	@(cd ../libzip; BASE=`pwd`; ./configure --with-zlib=$(BASE)/zlib ; make)
 
+.PHONY: minisat2-download glucose-download zlib-download libzip-download libzip-build
