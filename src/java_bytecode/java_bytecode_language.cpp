@@ -103,28 +103,27 @@ bool java_bytecode_languaget::parse(
   {
     java_class_loader.add_class_file(path);
     main_class=java_class_loadert::file_to_class_name(path);
+    java_class_loader(main_class);
   }
   else if(has_suffix(path, ".jar"))
   {
     java_class_loader.add_jar_file(path);
 
-    // need to get entry point class from the manifest in the jar file
+    // Does it have a main class set in the manifest?
     std::map<std::string, std::string> manifest;
     get_jar_manifest(path, manifest);
-    
-    main_class=manifest["Main-Class"];
-    if(main_class=="")
+
+    std::string manifest_main_class=manifest["Main-Class"];
+    if(manifest_main_class!="")
     {
-      error() << "JAR has no Main-Class" << eom;
-      return true;
+      main_class=manifest_main_class;
+      status() << "Java main class: " << main_class << eom;
+      java_class_loader(main_class);
     }
-    
-    status() << "Java main class: " << main_class << eom;
   }
   else
     assert(false);
 
-  java_class_loader(main_class);
   return false;
 }
              
