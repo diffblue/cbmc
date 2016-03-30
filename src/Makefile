@@ -91,3 +91,9 @@ libzip-download:
 	@mv libzip-1.1.2 ../libzip
 	@rm libzip-1.1.2.tar.gz
 
+libzip-build:
+	@echo "Building zlib"
+	@(cd ../zlib; ./configure; make)
+	@echo "Building libzip"
+	@(cd ../libzip; BASE=`pwd`; ./configure --with-zlib=$(BASE)/zlib ; make)
+
