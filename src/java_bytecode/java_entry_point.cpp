@@ -39,7 +39,6 @@ Function: create_initialize
 \*******************************************************************/
 
 namespace {
-
 void create_initialize(symbol_tablet &symbol_table)
 {
   symbolt initialize;
@@ -65,7 +64,21 @@ void create_initialize(symbol_tablet &symbol_table)
   if(symbol_table.add(initialize))
     throw "failed to add "+std::string(INITIALIZE);
 }
+}
 
+/*******************************************************************\
+
+Function: gen_argument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+namespace {
 exprt gen_argument(const typet &type)
 {
   if(type.id()==ID_pointer)
@@ -80,7 +93,6 @@ exprt gen_argument(const typet &type)
   else
     return side_effect_expr_nondett(type);
 }
-
 }
 
 /*******************************************************************\
