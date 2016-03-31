@@ -1,5 +1,6 @@
 %option nounput
 %option noinput
+%option stack
 
 %{
 #ifdef _WIN32
@@ -60,6 +61,7 @@ string_lit      ["]{s_char}*["]
 %x COMMENT
 %x STRING_LITERAL
 %x STRING_LITERAL_COMMENT
+%x STATEMENTS
 
 %{
 void jsil_scanner_init()
@@ -78,10 +80,16 @@ void jsil_scanner_init()
                   yyless(0);    /* start again with this character */
                 }
 
-<GRAMMAR>"/*"   { BEGIN(COMMENT); } /* begin comment state */
+<GRAMMAR,STATEMENTS>{
+  "/*"          {
+                  yy_push_state(COMMENT); /* begin comment state */
+                  // make the compiler happy
+                  (void)yy_top_state();
+                }
+}
 
 <COMMENT>{
-  "*/"          { BEGIN(GRAMMAR); } /* end comment state, back to GRAMMAR */
+  "*/"          { yy_pop_state(); } /* end comment state, back to GRAMMAR */
   "/*"          { yyjsilerror("Probably nested comments"); }
   <<EOF>>       { yyjsilerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
   [^*/\n]*      { } /* ignore every char except '*' and NL (performance!) */
@@ -90,7 +98,7 @@ void jsil_scanner_init()
 }
 
 <STRING_LITERAL_COMMENT>{
-  "*/"          { BEGIN(STRING_LITERAL); } /* end comment state, back to STRING_LITERAL */
+  "*/"          { yy_pop_state(); } /* end comment state, back to STRING_LITERAL */
   "/*"          { yyjsilerror("Probably nested comments"); }
   <<EOF>>       { yyjsilerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
   [^*/\n]*      { } /* ignore every char except '*' and NL (performance!) */
@@ -98,31 +106,91 @@ void jsil_scanner_init()
   \n            { }
 }
 
-<GRAMMAR>{
+<STATEMENTS>{
   {string_lit}  {
                   PARSER.string_literal.clear();
                   PARSER.string_literal.append(yytext);
                   newstack(yyjsillval);
                   PARSER.set_source_location(stack(yyjsillval));
-                  // String literals can be continued in
-                  // the next line
-                  BEGIN(STRING_LITERAL);
+                  // String literals can be continued
+                  yy_push_state(STRING_LITERAL);
                 }
 }
 
 <STRING_LITERAL>{
   {string_lit}  { PARSER.string_literal.append(yytext); }
-  {newline}     { } /* ignore */
   {whitespace}  { } /* ignore */
-  "/*"          { BEGIN(STRING_LITERAL_COMMENT); } /* C comment, ignore */
-  .             { // anything else: back to normal
+  "/*"          { yy_push_state(STRING_LITERAL_COMMENT); } /* C comment, ignore */
+  {newline}|.   { // anything else: back to normal
                   source_locationt l=stack(yyjsillval).source_location();
                   stack(yyjsillval)=convert_string_literal(PARSER.string_literal);
                   stack(yyjsillval).add_source_location().swap(l);
-                  BEGIN(GRAMMAR); // back to normal
+                  yy_pop_state(); // back to normal
                   yyless(0); // put back
                   return TOK_STRING;
                 }
+}
+
+<GRAMMAR,STATEMENTS>{
+  "#global_is_nan" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#global_is_finite" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#boolean_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#boolean_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#boolean_prototype_to_string" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; } 
+  "#boolean_prototype_value_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#object_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#object_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#object_prototype_to_string" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#object_prototype_value_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#object_prototype_is_prototype_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#object_get_prototype_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#number_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#number_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#number_prototype_to_string" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#number_prototype_value_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#string_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#string_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#string_prototype_to_string" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#string_prototype_value_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#error_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#terror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#rerror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#serror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#evalerror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#rangeerror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#urierror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#function_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#function_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#function_protottype_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#array_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+  "#array_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
+
+  "#[[GetOwnPropertyDefault]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[GetOwnPropertyString]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#GetValue"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#PutValue"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[Get]]"    { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[GetDefault]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[GetFunction]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[Put]]"    { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[HasProperty]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[DefaultValue]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[DefineOwnPropery]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[DefineOwnProperyDefault]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#[[DefineOwnProperyArray]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#ToPrimitive" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#ToBoolean"  { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#ToNumber"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#ToNumberPrim" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#ToUint32"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#ToString"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#ToStringPrim" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#ToObject"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#CheckObjectCoercible" { make_identifier(); return TOK_SPEC_IDENTIFIER; } 
+  "#IsCallable" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#AbstractRelation" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#StrictEquality" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
+  "#StrictEqualitySameType" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
 }
 
 <GRAMMAR>{
@@ -135,6 +203,20 @@ void jsil_scanner_init()
   "returns"     { loc(); return TOK_RETURNS; }
   "to"          { loc(); return TOK_TO; }
   "throws"      { loc(); return TOK_THROWS; }
+
+  /*** scanner parsed tokens (these have a value!) ***/
+
+  {identifier}  { return make_identifier(); }
+
+  "{"           { loc(); BEGIN(STATEMENTS); return '{'; }
+  /* This catches all one-character operators */
+  .             { loc(); return yytext[0]; }
+}
+
+<STATEMENTS>{
+  {newline}     { loc(); return TOK_NEWLINE; }
+  {whitespace}  { } /* skipped */
+
   "eval"        { loc(); return TOK_EVAL; }
   "label"       { loc(); return TOK_LABEL; }
   "goto"        { loc(); return TOK_GOTO; }
@@ -246,66 +328,7 @@ void jsil_scanner_init()
   "#lap"        { make_identifier(); return TOK_BUILTIN_LOC; }
   "#ljson"      { make_identifier(); return TOK_BUILTIN_LOC; }
 
-  "#global_is_nan" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#global_is_finite" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#boolean_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#boolean_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#boolean_prototype_to_string" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; } 
-  "#boolean_prototype_value_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#object_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#object_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#object_prototype_to_string" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#object_prototype_value_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#object_prototype_is_prototype_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#object_get_prototype_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#number_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#number_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#number_prototype_to_string" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#number_prototype_value_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#string_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#string_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#string_prototype_to_string" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#string_prototype_value_of" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#error_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#terror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#rerror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#serror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#evalerror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#rangeerror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#urierror_call_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#function_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#function_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#function_protottype_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#array_call" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-  "#array_construct" { make_identifier(); return TOK_BUILTIN_IDENTIFIER; }
-
-  "#[[GetOwnPropertyDefault]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[GetOwnPropertyString]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#GetValue"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#PutValue"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[Get]]"    { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[GetDefault]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[GetFunction]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[Put]]"    { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[HasProperty]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[DefaultValue]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[DefineOwnPropery]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[DefineOwnProperyDefault]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#[[DefineOwnProperyArray]]" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#ToPrimitive" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#ToBoolean"  { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#ToNumber"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#ToNumberPrim" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#ToUint32"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#ToString"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#ToStringPrim" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#ToObject"   { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#CheckObjectCoercible" { make_identifier(); return TOK_SPEC_IDENTIFIER; } 
-  "#IsCallable" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#AbstractRelation" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#StrictEquality" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-  "#StrictEqualitySameType" { make_identifier(); return TOK_SPEC_IDENTIFIER; }
-
+  "}"           { loc(); BEGIN(GRAMMAR); return '}'; }
   /* This catches all one-character operators */
   .             { loc(); return yytext[0]; }
 }

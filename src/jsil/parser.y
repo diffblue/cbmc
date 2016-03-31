@@ -23,6 +23,7 @@ extern char *yyjsiltext;
 /*** special scanner reports ***/
 
 %token TOK_SCANNER_ERROR /* used by scanner to report errors */
+%token TOK_NEWLINE "<newline>"
 
 /*** keywords ***/
 
@@ -202,11 +203,11 @@ statements: statement
           }
           ;
 
-statement: ';'
+statement: TOK_NEWLINE
          {
            newstack($$)=code_skipt();
          }
-         | instruction ';'
+         | instruction TOK_NEWLINE
          {
            $$=$1;
          }
