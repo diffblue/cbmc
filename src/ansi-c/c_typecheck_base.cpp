@@ -759,6 +759,17 @@ void c_typecheck_baset::typecheck_declaration(
       // now check other half of type
       typecheck_type(symbol.type);
 
+      if(!full_spec.alias.empty())
+      {
+        if(symbol.value.is_not_nil())
+          throw "alias attribute cannot be used with a body";
+
+        // alias function need not have been declared yet, thus
+        // can't lookup
+        symbol.value=symbol_exprt(full_spec.alias);
+        symbol.is_macro=true;
+      }
+
       typecheck_symbol(symbol);
 
       // add code contract (if any); we typecheck this after the

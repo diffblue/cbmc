@@ -132,6 +132,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_MODE "mode"
 %token TOK_GCC_ATTRIBUTE_GNU_INLINE "__gnu_inline__"
 %token TOK_GCC_ATTRIBUTE_WEAK "weak"
+%token TOK_GCC_ATTRIBUTE_ALIAS "alias"
 %token TOK_GCC_ATTRIBUTE_NORETURN "noreturn"
 %token TOK_GCC_ATTRIBUTE_CONSTRUCTOR "constructor"
 %token TOK_GCC_ATTRIBUTE_DESTRUCTOR "destructor"
@@ -1564,6 +1565,8 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
         | TOK_GCC_ATTRIBUTE_WEAK TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_weak); }
+        | TOK_GCC_ATTRIBUTE_ALIAS '(' TOK_STRING ')' TOK_GCC_ATTRIBUTE_END
+        { $$=$1; set($$, ID_alias); mto($$, $3); }
         | TOK_NORETURN
         { $$=$1; set($$, ID_noreturn); }
         | TOK_GCC_ATTRIBUTE_NORETURN TOK_GCC_ATTRIBUTE_END
