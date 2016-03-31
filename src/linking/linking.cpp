@@ -564,7 +564,10 @@ void linkingt::duplicate_code_symbol(
       }
     }
     // mismatch on number of parameters is definitively an error
-    else if(old_t.parameters().size()!=new_t.parameters().size())
+    else if((old_t.parameters().size()<new_t.parameters().size() &&
+             !old_t.has_ellipsis()) ||
+            (old_t.parameters().size()>new_t.parameters().size() &&
+             !new_t.has_ellipsis()))
     {
       link_error(
         old_symbol,
@@ -584,16 +587,27 @@ void linkingt::duplicate_code_symbol(
         conflicts.push_back(
           std::make_pair(old_t.return_type(), new_t.return_type()));
 
-      code_typet::parameterst::const_iterator n_it=
-        new_t.parameters().begin();
-      for(code_typet::parameterst::const_iterator
-          o_it=old_t.parameters().begin();
-          o_it!=old_t.parameters().end();
+      code_typet::parameterst::const_iterator
+        n_it=new_t.parameters().begin(),
+        o_it=old_t.parameters().begin();
+      for( ;
+          o_it!=old_t.parameters().end() &&
+          n_it!=new_t.parameters().end();
           ++o_it, ++n_it)
       {
         if(!base_type_eq(o_it->type(), n_it->type(), ns))
           conflicts.push_back(
             std::make_pair(o_it->type(), n_it->type()));
+      }
+      if(o_it!=old_t.parameters().end())
+      {
+        assert(new_t.has_ellipsis());
+        replace=new_symbol.value.is_not_nil();
+      }
+      else if(n_it!=new_t.parameters().end())
+      {
+        assert(old_t.has_ellipsis());
+        replace=new_symbol.value.is_not_nil();
       }
 
       while(!conflicts.empty())
