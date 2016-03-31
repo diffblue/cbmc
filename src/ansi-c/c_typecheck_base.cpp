@@ -193,7 +193,8 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
 
   if(symbol.type.id()==ID_code)
   {
-    if(symbol.value.is_not_nil())
+    if(symbol.value.is_not_nil() &&
+       !symbol.is_macro)
       typecheck_function_body(symbol);
     else
     {
@@ -359,7 +360,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   }
 
   // do initializer, this may change the type
-  if(follow(new_symbol.type).id()!=ID_code)
+  if(follow(new_symbol.type).id()!=ID_code &&
+     !new_symbol.is_macro)
     do_initializer(new_symbol);
   
   const typet &final_new=follow(new_symbol.type);
@@ -462,7 +464,10 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         old_symbol.is_weak=true;
       }
 
-      typecheck_function_body(new_symbol);
+      if(new_symbol.is_macro)
+        old_symbol.is_macro=true;
+      else
+        typecheck_function_body(new_symbol);
     
       // overwrite location
       old_symbol.location=new_symbol.location;

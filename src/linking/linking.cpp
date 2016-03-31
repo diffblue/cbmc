@@ -805,6 +805,7 @@ void linkingt::duplicate_code_symbol(
       old_symbol.value=new_symbol.value;
       old_symbol.type=new_symbol.type; // for parameter identifiers
       old_symbol.is_weak=new_symbol.is_weak;
+      old_symbol.is_macro=new_symbol.is_macro;
     }
     else if(to_code_type(old_symbol.type).get_inlined())
     {
