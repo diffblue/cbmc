@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 #include <util/config.h>
-#include <util/replace_symbol.h>
 
 #include "cprover_library.h"
 #include "ansi_c_language.h"
