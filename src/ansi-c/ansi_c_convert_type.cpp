@@ -72,10 +72,11 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_qualifiers.is_ptr64=true;
   else if(type.id()==ID_volatile)
     c_qualifiers.is_volatile=true;
-  else if(type.id()==ID_asm)
+  else if(type.id()==ID_asm &&
+          type.has_subtype() &&
+          type.subtype().id()==ID_string_constant)
   {
-    // These are called 'asm labels' by GCC.
-    // ignore for now
+    c_storage_spec.asm_label=type.subtype().get(ID_value);
   }
   else if(type.id()==ID_const)
     c_qualifiers.is_constant=true;
