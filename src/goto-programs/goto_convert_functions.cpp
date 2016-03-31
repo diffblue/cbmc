@@ -77,6 +77,7 @@ void goto_convert_functionst::goto_convert()
   forall_symbols(it, symbol_table.symbols)
   {
     if(!it->second.is_type &&
+       !it->second.is_macro &&
        it->second.type.id()==ID_code &&
        (it->second.mode==ID_C ||
         it->second.mode==ID_cpp ||

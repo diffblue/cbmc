@@ -850,6 +850,7 @@ void compilet::convert_symbols(goto_functionst &dest)
       assert(s_it!=symbol_table.symbols.end());
 
       if(s_it->second.type.id()==ID_code &&
+         !s_it->second.is_macro &&
           s_it->second.value.id()!="compiled" &&
           s_it->second.value.is_not_nil())
       {
