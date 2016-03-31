@@ -649,12 +649,10 @@ void linkingt::duplicate_code_symbol(
         // _GNU_SOURCE consistent
         else if((t1.id()==ID_union &&
                  (t1.get_bool(ID_C_transparent_union) ||
-                  conflicts.front().first.get_bool(ID_C_transparent_union)) &&
-                 new_symbol.value.is_nil()) ||
+                  conflicts.front().first.get_bool(ID_C_transparent_union))) ||
                 (t2.id()==ID_union &&
                  (t2.get_bool(ID_C_transparent_union) ||
-                  conflicts.front().second.get_bool(ID_C_transparent_union)) &&
-                 old_symbol.value.is_nil()))
+                  conflicts.front().second.get_bool(ID_C_transparent_union))))
         {
           const bool use_old=
             t1.id()==ID_union &&
@@ -662,14 +660,14 @@ void linkingt::duplicate_code_symbol(
              conflicts.front().first.get_bool(ID_C_transparent_union)) &&
             new_symbol.value.is_nil();
 
-          const union_typet &dest_union_type=
-            to_union_type(use_old?t1:t2);
-          const typet &src_type=use_old?t2:t1;
+          const union_typet &union_type=
+            to_union_type(t1.id()==ID_union?t1:t2);
+          const typet &src_type=t1.id()==ID_union?t2:t1;
 
           bool found=false;
           for(union_typet::componentst::const_iterator
-              it=dest_union_type.components().begin();
-              !found && it!=dest_union_type.components().end();
+              it=union_type.components().begin();
+              !found && it!=union_type.components().end();
               it++)
             if(base_type_eq(it->type(), src_type, ns))
             {
