@@ -34,10 +34,14 @@ public:
     is_register=false;
     is_inline=false;
     is_weak=false;
+    alias.clear();
   }
   
   bool is_typedef, is_extern, is_static, is_register,
        is_inline, is_thread_local, is_weak;
+
+  // __attribute__((alias("foo")))
+  irep_idt alias;
   
   friend bool operator == (
     const c_storage_spect &a,
@@ -49,7 +53,8 @@ public:
            a.is_register==b.is_register &&
            a.is_thread_local==b.is_thread_local &&
            a.is_inline==b.is_inline &&
-           a.is_weak==b.is_weak;
+           a.is_weak==b.is_weak &&
+           a.alias==b.alias;
   }
 
   friend bool operator != (
@@ -70,6 +75,7 @@ public:
     a.is_inline       |=b.is_inline;
     a.is_thread_local |=b.is_thread_local;
     a.is_weak         |=b.is_weak;
+    if(!b.alias.empty()) a.alias=b.alias;
     
     return a;
   }

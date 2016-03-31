@@ -233,6 +233,12 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     constructor=true;
   else if(type.id()==ID_destructor)
     destructor=true;
+  else if(type.id()==ID_alias &&
+          type.has_subtype() &&
+          type.subtype().id()==ID_string_constant)
+  {
+    c_storage_spec.alias=type.subtype().get(ID_value);
+  }
   else
     other.push_back(type);
 }
