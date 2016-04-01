@@ -349,6 +349,33 @@ static bool link_functions(
     }
   }
 
+  // apply macros
+  rename_symbolt macro_application;
+
+  forall_symbols(it, dest_symbol_table.symbols)
+    if(it->second.is_macro)
+    {
+      const symbolt &symbol=it->second;
+
+      assert(symbol.value.id()==ID_symbol);
+      const irep_idt &id=to_symbol_expr(symbol.value).get_identifier();
+
+      #if 0
+      if(!base_type_eq(symbol.type, ns.lookup(id).type, ns))
+      {
+        std::cerr << symbol << std::endl;
+        std::cerr << ns.lookup(id) << std::endl;
+      }
+      assert(base_type_eq(symbol.type, ns.lookup(id).type, ns));
+      #endif
+
+      macro_application.insert_expr(symbol.name, id);
+    }
+
+  if(!macro_application.expr_map.empty())
+    Forall_goto_functions(dest_it, dest_functions)
+      rename_symbols_in_function(dest_it->second, macro_application);
+
   return false;
 }
 
