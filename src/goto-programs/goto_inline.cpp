@@ -50,14 +50,6 @@ void goto_inlinet::parameter_assignments(
       it2!=parameter_types.end();
       it2++)
   {
-    // if you run out of actual arguments there was a mismatch
-    if(it1==arguments.end())
-    {
-      err_location(source_location);
-      str << "call to `" << function_name << "': not enough arguments";
-      throw 0;
-    }
-
     const code_typet::parametert &parameter=*it2;
 
     // this is the type the n-th argument should be
@@ -82,15 +74,28 @@ void goto_inlinet::parameter_assignments(
       decl->function=function_name; 
     }
 
+    // this is the actual parameter
+    exprt actual;
+
+    // if you run out of actual arguments there was a mismatch
+    if(it1==arguments.end())
+    {
+      err_location(source_location);
+      str << "call to `" << function_name << "': "
+        "not enough arguments, inserting non-deterministic value";
+      warning_msg();
+
+      actual=side_effect_expr_nondett(par_type);
+    }
+    else
+      actual=*it1;
+
     // nil means "don't assign"
-    if(it1->is_nil())
+    if(actual.is_nil())
     {    
     }
     else
     {
-      // this is the actual parameter
-      exprt actual=*it1;
-
       // it should be the same exact type as the parameter,
       // subject to some exceptions
       if(!base_type_eq(par_type, actual.type(), ns))
@@ -118,7 +123,7 @@ void goto_inlinet::parameter_assignments(
         }
         else
         {
-          err_location(*it1);
+          err_location(actual);
 
           str << "function call: argument `" << identifier
               << "' type mismatch: argument is `"
@@ -141,7 +146,8 @@ void goto_inlinet::parameter_assignments(
       dest.instructions.back().function=function_name;      
     }
 
-    it1++;
+    if(it1!=arguments.end())
+      ++it1;
   }
 
   if(it1!=arguments.end())
