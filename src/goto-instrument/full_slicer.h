@@ -15,6 +15,11 @@ void full_slicer(
   goto_functionst &goto_functions,
   const namespacet &ns);
 
+void property_slicer(
+  goto_functionst &goto_functions,
+  const namespacet &ns,
+  const std::list<std::string> &properties);
+
 class slicing_criteriont
 {
 public:
