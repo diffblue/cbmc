@@ -111,7 +111,11 @@ void taint_analysist::instrument(
               
               exprt where=nil_exprt();
               
-              bool have_this=false;
+              const code_typet &code_type=to_code_type(function.type());
+              
+              bool have_this=
+                !code_type.parameters().empty() &&
+                code_type.parameters().front().get_bool(ID_C_this);
               
               switch(rule.where)
               {
