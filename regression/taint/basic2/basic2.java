@@ -4,11 +4,11 @@ class basic2
   {
     Object o=null;
     
-    my_f(o); // source
-    my_h(o); // sink
+    my_f(o); // T1 source
+    my_h(o); // T1,T2 sink
     
-    o=my_g(); // source
-    my_h(o); // sink
+    o=my_g(); // T2 source
+    my_h(o); // T1,T2 sink
   }
 
   void my_f(Object p) { }
