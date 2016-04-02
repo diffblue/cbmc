@@ -172,6 +172,7 @@ protected:
   void convert_expression(const code_expressiont &code, goto_programt &dest);
   void convert_assign(const code_assignt &code, goto_programt &dest);
   void convert_cpp_delete(const codet &code, goto_programt &dest);
+  void convert_loop_invariant(const codet &code, goto_programt::targett loop);
   void convert_for(const code_fort &code, goto_programt &dest);
   void convert_while(const code_whilet &code, goto_programt &dest);
   void convert_dowhile(const codet &code, goto_programt &dest);
