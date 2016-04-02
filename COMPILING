@@ -31,7 +31,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    The GNU Make needs to be version 3.81 or higher. On Debian-like
    distributions, do
 
-   apt-get install g++ gcc flex bison make subversion libz-dev libwww-perl patch libzip-dev
+   apt-get install g++ gcc flex bison make git libz-dev libwww-perl patch libzip-dev
 
    On Red Hat/Fedora or derivates, do
 
@@ -39,11 +39,11 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
 1) As a user, get the CBMC source via
 
-   svn co http://www.cprover.org/svn/cbmc/trunk cbmc-trunk
+   git clone https://github.com/diffblue/cbmc cbmc-git
 
 2) Do
 
-   cd cbmc-trunk/src
+   cd cbmc-git/src
    make minisat2-download
    make
 
@@ -58,15 +58,15 @@ COMPILATION ON SOLARIS 11
 1) As root, get the necessary development tools:
 
    pkg install system/header
-   /opt/csw/bin/pkgutil -i gzip coreutils wget CSWpm-libwww-perl subversion flex bison CSWgcc4g++
+   /opt/csw/bin/pkgutil -i gzip coreutils wget CSWpm-libwww-perl git flex bison CSWgcc4g++
 
 2) As a user, get the CBMC source via
 
-   svn co http://www.cprover.org/svn/cbmc/trunk cbmc-trunk
+   git clone https://github.com/diffblue/cbmc cbmc-git
 
 3) Get MiniSat2 by entering
 
-   cd cbmc-trunk
+   cd cbmc-git
    wget http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
    gtar xfz minisat_2.2.1.orig.tar.gz
    (cd minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
@@ -86,15 +86,15 @@ COMPILATION ON FREEBSD 10
 
 1) As root, get the necessary tools:
 
-   pkg install bash gmake subversion www/p5-libwww patch flex bison
+   pkg install bash gmake git www/p5-libwww patch flex bison
 
 2) As a user, get the CBMC source via
 
-   svn co http://www.cprover.org/svn/cbmc/trunk cbmc-trunk
+   git clone https://github.com/diffblue/cbmc cbmc-git
 
 3) Do
 
-   cd cbmc-trunk/src
+   cd cbmc-git/src
 
 4) Do
 
@@ -116,11 +116,11 @@ Follow these instructions:
 
 1) Then get the CBMC source via
 
-   svn co http://www.cprover.org/svn/cbmc/trunk cbmc-trunk
+   git clone https://github.com/diffblue/cbmc cbmc-git
 
 2) Then type
 
-   cd cbmc-trunk/src
+   cd cbmc-git/src
    make minisat2-download
    make
 
