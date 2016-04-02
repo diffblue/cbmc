@@ -34,8 +34,18 @@ protected:
     symex_target_equationt &equation,
     const per_thread_mapt &per_thread_map);
   void program_order(symex_target_equationt &equation);
-  void from_read(symex_target_equationt &equation);
+
+  // W-W pair
+  // built by the method below.
+  choice_symbolst ww_pair_symbols;
+
   void write_serialization_external(symex_target_equationt &equation);
+
+  typedef std::map<
+    std::pair<event_it, event_it>, std::pair<exprt, exprt> > ww_pairst;
+  ww_pairst ww_pairs;
+
+  void from_read(symex_target_equationt &equation);
 };
 
 #endif
