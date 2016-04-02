@@ -1224,6 +1224,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // add loop ids
   goto_functions.compute_loop_numbers();
   
+  // label the assertions
+  label_properties(goto_functions);
+
   // nondet volatile?
   if(cmdline.isset("nondet-volatile"))
   {
@@ -1246,7 +1249,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       symbol_table, goto_functions, cmdline.isset("pointer-check"));
 
     status() << "Performing a full slice" << eom;
-    full_slicer(goto_functions, ns);
+    if(cmdline.isset("property"))
+      property_slicer(goto_functions, ns, cmdline.get_values("property"));
+    else
+      full_slicer(goto_functions, ns);
   }
   
   // label the assertions
@@ -1347,6 +1353,7 @@ void goto_instrument_parse_optionst::help()
     "Slicing:\n"
     " --reachability-slice         slice away instructions that can't reach assertions\n"
     " --full-slice                 slice away instructions that don't affect assertions\n"
+    " --property id                slice with respect to specific property only\n"
     "\n"
     "Further transformations:\n"
     " --constant-propagator        propagate constants and simplify expressions\n"

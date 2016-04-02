@@ -118,4 +118,35 @@ public:
   }
 };
 
+class properties_criteriont:public slicing_criteriont
+{
+public:
+  explicit properties_criteriont(
+    const std::list<std::string> &properties):
+    property_ids(properties)
+  {
+  }
+
+  virtual bool operator()(goto_programt::const_targett target)
+  {
+    if(!target->is_assert())
+      return false;
+
+    const std::string &p_id=
+      id2string(target->source_location.get_property_id());
+
+    for(std::list<std::string>::const_iterator
+        it=property_ids.begin();
+        it!=property_ids.end();
+        ++it)
+      if(p_id==*it)
+        return true;
+
+    return false;
+  }
+
+protected:
+  const std::list<std::string> &property_ids;
+};
+
 #endif
