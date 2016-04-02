@@ -1050,6 +1050,40 @@ void goto_convertt::convert_assume(
 
 /*******************************************************************\
 
+Function: goto_convertt::convert_loop_invariant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::convert_loop_invariant(
+  const codet &code,
+  goto_programt::targett loop)
+{
+  exprt invariant=
+    static_cast<const exprt&>(code.find(ID_C_spec_loop_invariant));
+
+  if(invariant.is_nil())
+    return;
+
+  goto_programt no_sideeffects;
+  clean_expr(invariant, no_sideeffects);
+  if(!no_sideeffects.instructions.empty())
+  {
+    err_location(code);
+    throw "loop invariant is not side-effect free";
+  }
+
+  assert(loop->is_goto());
+  loop->guard.add(ID_C_spec_loop_invariant).swap(invariant);
+}
+
+/*******************************************************************\
+
 Function: goto_convertt::convert_for
 
   Inputs:
@@ -1145,6 +1179,9 @@ void goto_convertt::convert_for(
   y->guard=true_exprt();
   y->source_location=code.source_location();
 
+  // loop invariant
+  convert_loop_invariant(code, y);
+
   dest.destructive_append(sideeffects);
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
@@ -1214,6 +1251,9 @@ void goto_convertt::convert_while(
   y->make_goto(v);
   y->guard=true_exprt();
   y->source_location=code.source_location();
+
+  // loop invariant
+  convert_loop_invariant(code, y);
 
   dest.destructive_append(tmp_branch);
   dest.destructive_append(tmp_x);
@@ -1294,6 +1334,9 @@ void goto_convertt::convert_dowhile(
   y->make_goto(w);
   y->guard=cond;
   y->source_location=condition_location;
+
+  // loop invariant
+  convert_loop_invariant(code, y);
 
   dest.destructive_append(tmp_w);
   dest.destructive_append(sideeffects);
