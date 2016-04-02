@@ -176,6 +176,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_storage_spec.is_typedef=true;
   else if(type.id()==ID_register)
     c_storage_spec.is_register=true;
+  else if(type.id()==ID_weak)
+    c_storage_spec.is_weak=true;
   else if(type.id()==ID_auto)
   {
     // ignore

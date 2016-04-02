@@ -456,6 +456,11 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         old_symbol.is_extern=new_symbol.is_extern;
         old_symbol.is_file_local=new_symbol.is_file_local;
       }
+      else if(new_symbol.is_weak)
+      {
+        // weak symbols
+        old_symbol.is_weak=true;
+      }
 
       typecheck_function_body(new_symbol);
     
