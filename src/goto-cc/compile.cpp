@@ -25,7 +25,6 @@ Date: June 2006
 
 #include <ansi-c/ansi_c_language.h>
 
-#include <linking/linking_class.h>
 #include <linking/entry_point.h>
 
 #include <goto-programs/goto_convert.h>
