@@ -899,6 +899,9 @@ Function: bv_pointerst::post_process
 
 void bv_pointerst::post_process()
 {
+  // post-processing arrays may yield further objects, do this first
+  SUB::post_process();
+
   for(postponed_listt::const_iterator
       it=postponed_list.begin();
       it!=postponed_list.end();
@@ -907,6 +910,4 @@ void bv_pointerst::post_process()
 
   // Clear the list to avoid re-doing in case of incremental usage.
   postponed_list.clear();
-  
-  SUB::post_process();
 }
