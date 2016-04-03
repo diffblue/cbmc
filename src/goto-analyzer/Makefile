@@ -35,6 +35,11 @@ ifneq ($(wildcard ../java_bytecode/Makefile),)
   endif
 endif
 
+ifneq ($(wildcard ../jsil/Makefile),)
+  OBJ += ../jsil/jsil$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_JSIL
+endif
+
 ifneq ($(wildcard ../specc/Makefile),)
   OBJ += ../specc/specc$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_SPECC

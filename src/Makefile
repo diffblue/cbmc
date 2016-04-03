@@ -1,7 +1,7 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
        assembler analyses java_bytecode aa-path-symex path-symex musketeer \
-       json cegis goto-analyzer
+       json cegis goto-analyzer jsil
 
 all: cbmc.dir goto-cc.dir goto-instrument.dir path-symex.dir goto-analyzer.dir
 
@@ -18,7 +18,8 @@ $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 cpp.dir: ansi-c.dir linking.dir
 
 languages: util.dir langapi.dir \
-           cpp.dir ansi-c.dir xmllang.dir assembler.dir java_bytecode.dir
+           cpp.dir ansi-c.dir xmllang.dir assembler.dir java_bytecode.dir \
+           jsil.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir \

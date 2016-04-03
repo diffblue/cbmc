@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
 #include <java_bytecode/java_bytecode_language.h>
+#include <jsil/jsil_language.h>
 
 #include <goto-programs/set_properties.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -79,6 +80,7 @@ void goto_analyzer_parse_optionst::register_languages()
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);
   register_language(new_java_bytecode_language);
+  register_language(new_jsil_language);
 }
 
 /*******************************************************************\
