@@ -7,7 +7,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 \*******************************************************************/
 
 #include <util/symbol_table.h>
-#include <goto-cc/get_base_name.h>
+#include <util/get_base_name.h>
 
 #include "expr2jsil.h"
 #include "jsil_convert.h"
@@ -36,7 +36,6 @@ std::set<std::string> jsil_languaget::extensions() const
   s.insert("jsil");
   return s;
 }
-
 
 /*******************************************************************\
 

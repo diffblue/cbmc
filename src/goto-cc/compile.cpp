@@ -22,6 +22,7 @@ Date: June 2006
 #include <util/unicode.h>
 #include <util/irep_serialization.h>
 #include <util/suffix.h>
+#include <util/get_base_name.h>
 
 #include <ansi-c/ansi_c_language.h>
 
@@ -37,7 +38,6 @@ Date: June 2006
 
 #include <cbmc/version.h>
 
-#include "get_base_name.h"
 #include "compile.h"
 
 #define DOTGRAPHSETTINGS  "color=black;" \

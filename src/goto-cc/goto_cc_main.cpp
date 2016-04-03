@@ -12,8 +12,8 @@ Date: May 2006
 #include <iostream>
 
 #include <util/unicode.h>
+#include <util/get_base_name.h>
 
-#include "get_base_name.h"
 #include "gcc_cmdline.h"
 #include "armcc_cmdline.h"
 #include "ms_cl_cmdline.h"
