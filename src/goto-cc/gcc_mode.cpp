@@ -15,12 +15,12 @@ Author: CM Wintersteiger, 2006
 #include <util/config.h>
 #include <util/prefix.h>
 #include <util/suffix.h>
+#include <util/get_base_name.h>
 
 #include <cbmc/version.h>
 
 #include "compile.h"
 #include "run.h"
-#include "get_base_name.h"
 
 #include "gcc_mode.h"
 
