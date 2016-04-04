@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
 #include <cassert>
 
 #include <util/expr_util.h>
@@ -74,15 +75,6 @@ void goto_symext::parameter_assignments(
       it2!=parameter_types.end();
       it2++)
   {
-    // if you run out of actual arguments there was a mismatch
-    if(it1==arguments.end())
-    {
-      std::string error=
-        "call to `"+id2string(function_identifier)+"': "
-        "not enough arguments";
-      throw state.source.pc->source_location.as_string()+": "+error;
-    }
-
     const code_typet::parametert &parameter=*it2;
 
     // this is the type that the n-th argument should have
@@ -96,14 +88,27 @@ void goto_symext::parameter_assignments(
     const symbolt &symbol=ns.lookup(identifier);
     symbol_exprt lhs=symbol.symbol_expr();
 
-    if(it1->is_nil())
+    exprt rhs;
+
+    // if you run out of actual arguments there was a mismatch
+    if(it1==arguments.end())
+    {
+      std::string warn=
+        "call to `"+id2string(function_identifier)+"': "
+        "not enough arguments, inserting non-deterministic value\n";
+      std::cerr << state.source.pc->source_location.as_string()+": "+warn;
+
+      rhs=side_effect_expr_nondett(parameter_type);
+    }
+    else
+      rhs=*it1;
+
+    if(rhs.is_nil())
     {
       // 'nil' argument doesn't get assigned
     }
     else
     {
-      exprt rhs=*it1;
-
       // It should be the same exact type.
       if(!base_type_eq(parameter_type, rhs.type(), ns))
       {
@@ -130,7 +135,7 @@ void goto_symext::parameter_assignments(
         {
           std::string error="function call: parameter \""+
             id2string(identifier)+"\" type mismatch: got "+
-            it1->type().to_string()+", expected "+
+            rhs.type().to_string()+", expected "+
             parameter_type.to_string();
           throw error;
         }
@@ -139,7 +144,8 @@ void goto_symext::parameter_assignments(
       symex_assign_rec(state, code_assignt(lhs, rhs));
     }
 
-    it1++;
+    if(it1!=arguments.end())
+      it1++;
   }
 
   if(function_type.has_ellipsis())
