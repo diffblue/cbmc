@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_types.h"
 #include "java_bytecode_convert.h"
-#include "java_bytecode_vtable.h"
+#include "java_class_identifier.h"
 #include "bytecode_info.h"
 
 namespace {
@@ -249,12 +249,9 @@ void java_bytecode_convertt::convert(const classt &c)
       it++)
     convert(*class_symbol, *it);
 
-  // create the virtual table
-  create_vtable_symbol(symbol_table, *class_symbol);
-
   // is this a root class?
   if(c.extends.empty())
-    create_vtable_pointer(*class_symbol);
+    create_class_identifier(*class_symbol);
 }
 
 /*******************************************************************\
@@ -293,16 +290,11 @@ void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
   if(symbol_table.move(new_symbol, class_symbol))
   {
     warning() << "stub class symbol "+id2string(new_symbol.name)+" already exists";
-    if (!has_vtable_info(symbol_table, *class_symbol))
-      throw "vt missing for pre-existing stub class symbol "+id2string(new_symbol.name);
   }
   else
   {
-  // create the virtual table
-  create_vtable_symbol(symbol_table, *class_symbol);
-
-  // create vtable pointer
-  create_vtable_pointer(*class_symbol);
+    // create the class identifier
+    create_class_identifier(*class_symbol);
   }
 }
 
@@ -413,8 +405,10 @@ void java_bytecode_convertt::convert(
   method.set(ID_abstract, m.is_abstract);
   method.set(ID_is_virtual, is_virtual);
 
+  #if 0
   if(is_virtual)
     set_virtual_name(method);
+  #endif
 
   if(is_contructor(method))
     method.set(ID_constructor, true);
@@ -758,7 +752,8 @@ codet java_bytecode_convertt::convert_instructions(
         #if 0
         call.function()=make_vtable_function(arg0, this_arg);
         #else
-        call.function()=make_virtual_function(arg0, this_arg);
+        call.function()=make_virtual_function(
+          to_symbol_expr(arg0), this_arg);
         #endif
       }
       else

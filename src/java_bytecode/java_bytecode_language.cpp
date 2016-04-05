@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_internal_additions.h"
 #include "java_bytecode_typecheck.h"
 #include "java_bytecode_load_class.h"
-#include "java_bytecode_vtable.h"
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
@@ -158,10 +157,6 @@ bool java_bytecode_languaget::typecheck(
          c_it->second, symbol_table, get_message_handler()))
       return true;
   }
-
-  // Construct vtable symbols before typecheck
-  if (java_bytecode_vtable(symbol_table, module))
-    return true;
 
   // now typecheck all
   if(java_bytecode_typecheck(

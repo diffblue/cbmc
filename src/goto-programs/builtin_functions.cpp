@@ -1000,7 +1000,7 @@ Function: goto_convertt::do_function_call_symbol
 
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
@@ -1008,7 +1008,7 @@ void goto_convertt::do_function_call_symbol(
     return; // ignore
 
   // lookup symbol
-  const irep_idt &identifier=function.get(ID_identifier);
+  const irep_idt &identifier=function.get_identifier();
 
   const symbolt *symbol;
   if(ns.lookup(identifier, symbol))
