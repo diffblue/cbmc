@@ -143,13 +143,13 @@ protected:
 
   virtual void do_function_call_if(
     const exprt &lhs,
-    const exprt &function,
+    const if_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
 
   virtual void do_function_call_symbol(
     const exprt &lhs,
-    const exprt &function,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
 

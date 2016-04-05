@@ -91,11 +91,11 @@ void goto_convertt::do_function_call(
   }
   else if(new_function.id()==ID_if)
   {
-    do_function_call_if(new_lhs, new_function, new_arguments, dest);
+    do_function_call_if(new_lhs, to_if_expr(new_function), new_arguments, dest);
   }
   else if(new_function.id()==ID_symbol)
   {
-    do_function_call_symbol(new_lhs, new_function, new_arguments, dest);
+    do_function_call_symbol(new_lhs, to_symbol_expr(new_function), new_arguments, dest);
   }
   else if(new_function.id()=="NULL-object")
   {
@@ -121,16 +121,10 @@ Function: goto_convertt::do_function_call_if
 
 void goto_convertt::do_function_call_if(
   const exprt &lhs,
-  const exprt &function,
+  const if_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  if(function.operands().size()!=3)
-  {
-    err_location(function);
-    throw "if expects three operands";
-  }
-  
   // case split
 
   //    c?f():g()
@@ -158,7 +152,7 @@ void goto_convertt::do_function_call_if(
   goto_programt tmp_y;
   goto_programt::targett y;
 
-  do_function_call(lhs, function.op2(), arguments, tmp_y);
+  do_function_call(lhs, function.false_case(), arguments, tmp_y);
 
   if(tmp_y.instructions.empty())
     y=tmp_y.add_instruction(SKIP);
@@ -167,14 +161,14 @@ void goto_convertt::do_function_call_if(
 
   // v: if(!c) goto y;
   v->make_goto(y);
-  v->guard=function.op0();
+  v->guard=function.cond();
   v->guard.make_not();
-  v->source_location=function.op0().source_location();
+  v->source_location=function.cond().source_location();
 
   // w: f();
   goto_programt tmp_w;
 
-  do_function_call(lhs, function.op1(), arguments, tmp_w);
+  do_function_call(lhs, function.true_case(), arguments, tmp_w);
 
   if(tmp_w.instructions.empty())
     tmp_w.add_instruction(SKIP);
