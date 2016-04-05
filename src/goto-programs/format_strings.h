@@ -6,8 +6,8 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H_
-#define CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H_
+#ifndef CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H
+#define CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H
 
 #include <string>
 #include <list>
