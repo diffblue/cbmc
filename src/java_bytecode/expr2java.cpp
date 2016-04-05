@@ -355,7 +355,7 @@ std::string expr2javat::convert(
     return "?";
   else if(src.id()=="pod_constructor")
     return "pod_constructor";
-  else if(src.id()=="virtual_function")
+  else if(src.id()==ID_virtual_function)
     return convert_function(src, "VF", precedence=16);
   else
     return expr2ct::convert(src, precedence);

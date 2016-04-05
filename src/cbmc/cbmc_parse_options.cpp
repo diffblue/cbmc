@@ -867,7 +867,7 @@ bool cbmc_parse_optionst::process_goto_program(
         symbol_table, get_message_handler(), goto_functions);
 
     // remove function pointers
-    status() << "Function Pointer Removal and Virtual Functions" << eom;
+    status() << "Removal of Function Pointers Virtual Functions" << eom;
     remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
     remove_virtual_functions(symbol_table, goto_functions);

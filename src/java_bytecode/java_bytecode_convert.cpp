@@ -735,6 +735,28 @@ codet java_bytecode_convertt::convert_instructions(
       code_function_callt call;
       call.add_source_location()=i_it->source_location;
       call.arguments() = pop(parameters.size());
+      
+      if(use_this)
+      {
+        // 'this' may be a class type, which is the run-time
+        // info for that type, and are instances of java.lang.Class
+        assert(!call.arguments().empty());
+        
+        exprt this_arg=call.arguments().front();
+        
+        if(this_arg.id()==ID_type)
+        {
+          irep_idt class_id=this_arg.type().get(ID_identifier);
+          symbol_typet java_lang_Class("java::java.lang.Class");
+          symbol_exprt symbol_expr("java::"+id2string(class_id)+"@class_model", java_lang_Class);
+          address_of_exprt address_of_expr(symbol_expr);
+          this_arg=address_of_expr;
+        }
+        
+        assert(this_arg.type().id()==ID_pointer);
+        
+        std::cout << "F: " << arg0.pretty() << "\n";
+      }
 
       const typet &return_type=code_type.return_type();
 
@@ -747,6 +769,7 @@ codet java_bytecode_convertt::convert_instructions(
 
       if(is_virtual)
       {
+        assert(!call.arguments().empty());
         const exprt &this_arg=call.arguments().front();
         
         #if 0
