@@ -267,6 +267,10 @@ exprt zero_initializert::zero_initializer_rec(
 
     return result;
   }
+  else if(type_id==ID_string)
+  {
+    return constant_exprt(irep_idt(), type);
+  }
   else
   {
     err_location(source_location);
