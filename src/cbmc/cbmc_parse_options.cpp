@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
@@ -866,9 +867,10 @@ bool cbmc_parse_optionst::process_goto_program(
         symbol_table, get_message_handler(), goto_functions);
 
     // remove function pointers
-    status() << "Function Pointer Removal" << eom;
+    status() << "Function Pointer Removal and Virtual Functions" << eom;
     remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
+    remove_virtual_functions(symbol_table, goto_functions);
 
     // full slice?
     if(cmdline.isset("full-slice"))

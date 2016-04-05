@@ -44,6 +44,7 @@ void create_class_identifier(symbolt &class_symbol)
 {
   struct_typet::componentt component;
   component.set_name("@class_identifier");
+  component.set_pretty_name("@class_identifier");
   component.type()=class_identifier_type();
   
   // add at the beginning
@@ -68,7 +69,7 @@ exprt make_virtual_function(
   const symbol_exprt &func,
   const exprt &this_obj)
 {
-  exprt virtual_function("virtual_function");
+  exprt virtual_function("virtual_function", func.type());
   virtual_function.copy_to_operands(func, this_obj);
 
   return virtual_function;
