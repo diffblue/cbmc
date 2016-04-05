@@ -132,6 +132,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_MODE "mode"
 %token TOK_GCC_ATTRIBUTE_GNU_INLINE "__gnu_inline__"
 %token TOK_GCC_ATTRIBUTE_WEAK "weak"
+%token TOK_GCC_ATTRIBUTE_NORETURN "noreturn"
 %token TOK_GCC_ATTRIBUTE_END ")"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
@@ -1562,6 +1563,8 @@ gcc_type_attribute:
         | TOK_GCC_ATTRIBUTE_WEAK TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_weak); }
         | TOK_NORETURN
+        { $$=$1; set($$, ID_noreturn); }
+        | TOK_GCC_ATTRIBUTE_NORETURN TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_noreturn); }
         | gcc_attribute_specifier
         ;
