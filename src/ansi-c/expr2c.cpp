@@ -2300,6 +2300,10 @@ std::string expr2ct::convert_constant(
         return convert(src.op0(), precedence);
     }
   }
+  else if(type.id()==ID_string)
+  {
+    return '"'+id2string(src.get_value())+'"';
+  }
   else
     return convert_norep(src, precedence);
 
