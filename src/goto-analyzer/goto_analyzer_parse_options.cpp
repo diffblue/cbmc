@@ -867,6 +867,7 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     " --taint file_name            perform taint analysis using rules in given file\n"
     " --unreachable-instructions   list dead code\n"
+    " --interval                   interval analysis\n"
     "\n"
     "Analysis options:\n"
     " --show-properties            show the properties, but don't run analysis\n"

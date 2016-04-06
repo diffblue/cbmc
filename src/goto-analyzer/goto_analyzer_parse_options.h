@@ -31,7 +31,8 @@ class optionst;
   "(gcc)(arch):" \
   "(taint):(show-taint)" \
   "(json):" \
-  "(unreachable-instructions)"
+  "(unreachable-instructions)" \
+  "(intervals)(non-null)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,
