@@ -44,6 +44,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_analyzer_parse_options.h"
 #include "taint_analysis.h"
+#include "unreachable_instructions.h"
 
 /*******************************************************************\
 
@@ -466,7 +467,8 @@ int goto_analyzer_parse_optionst::doit()
            << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
-  if(!cmdline.isset("taint"))
+  if(!cmdline.isset("taint") &&
+     !cmdline.isset("unreachable-instructions"))
   {
     error() << "no analysis option given -- consider reading --help"
             << eom;
@@ -474,6 +476,7 @@ int goto_analyzer_parse_optionst::doit()
   }
 
   register_languages();
+  const namespacet ns(symbol_table);
   
   goto_functionst goto_functions;
 
@@ -485,7 +488,6 @@ int goto_analyzer_parse_optionst::doit()
 
   if(cmdline.isset("taint"))
   {
-    const namespacet ns(symbol_table);
     std::string taint_file=cmdline.get_value("taint");
 
     if(cmdline.isset("show-taint"))
@@ -500,6 +502,30 @@ int goto_analyzer_parse_optionst::doit()
         taint_analysis(goto_functions, ns, taint_file, get_message_handler(), false, json_file);
       return result?10:0;
     }
+  }
+
+  if(cmdline.isset("unreachable-instructions"))
+  {
+    const std::string json_file=cmdline.get_value("json");
+
+    if(json_file.empty())
+      unreachable_instructions(goto_functions, ns, false, std::cout);
+    else if(json_file=="-")
+      unreachable_instructions(goto_functions, ns, true, std::cout);
+    else
+    {
+      std::ofstream ofs(json_file);
+      if(!ofs)
+      {
+        error() << "Failed to open json output `"
+                << json_file << "'" << eom;
+        return 6;
+      }
+
+      unreachable_instructions(goto_functions, ns, true, ofs);
+    }
+
+    return 0;
   }
 
   #if 0  
@@ -840,6 +866,7 @@ void goto_analyzer_parse_optionst::help()
     "Analyses:\n"
     "\n"
     " --taint file_name            perform taint analysis using rules in given file\n"
+    " --unreachable-instructions   list dead code\n"
     "\n"
     "Analysis options:\n"
     " --show-properties            show the properties, but don't run analysis\n"
