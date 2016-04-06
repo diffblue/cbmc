@@ -10,8 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/config.h>
 
-#include <ansi-c/expr2c.h>
-
+#include "expr2java.h"
 #include "java_bytecode_typecheck.h"
 
 /*******************************************************************\
@@ -28,7 +27,7 @@ Function: java_bytecode_typecheckt::to_string
 
 std::string java_bytecode_typecheckt::to_string(const exprt &expr)
 { 
-  return expr2c(expr, ns);
+  return expr2java(expr, ns);
 }
 
 /*******************************************************************\
@@ -45,7 +44,7 @@ Function: java_bytecode_typecheckt::to_string
 
 std::string java_bytecode_typecheckt::to_string(const typet &type)
 { 
-  return type2c(type, ns);
+  return type2java(type, ns);
 }
 
 /*******************************************************************\
