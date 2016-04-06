@@ -45,6 +45,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_analyzer_parse_options.h"
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
+#include "static_analyzer.h"
 
 /*******************************************************************\
 
@@ -468,7 +469,9 @@ int goto_analyzer_parse_optionst::doit()
            << config.this_operating_system() << eom;
 
   if(!cmdline.isset("taint") &&
-     !cmdline.isset("unreachable-instructions"))
+     !cmdline.isset("unreachable-instructions") &&
+     !cmdline.isset("non-null") &&
+     !cmdline.isset("intervals"))
   {
     error() << "no analysis option given -- consider reading --help"
             << eom;
@@ -526,6 +529,17 @@ int goto_analyzer_parse_optionst::doit()
     }
 
     return 0;
+  }
+
+  if(cmdline.isset("non-null") ||
+     cmdline.isset("intervals"))
+  {
+    optionst options;
+    options.set_option("json", cmdline.get_value("json"));
+    options.set_option("xml", cmdline.get_value("xml"));
+    bool result=
+      static_analyzer(goto_functions, ns, options, get_message_handler());
+    return result?10:0;
   }
 
   #if 0  
@@ -868,9 +882,11 @@ void goto_analyzer_parse_optionst::help()
     " --taint file_name            perform taint analysis using rules in given file\n"
     " --unreachable-instructions   list dead code\n"
     " --interval                   interval analysis\n"
+    " --non-null                   non-null analysis\n"
     "\n"
     "Analysis options:\n"
-    " --show-properties            show the properties, but don't run analysis\n"
+    " --json file_name             output results in JSON format to given file\n"
+    " --xml file_name              output results in XML format to given file\n"
     "\n"
     "Frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -902,6 +918,7 @@ void goto_analyzer_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"
+    " --show-properties            show the properties, but don't run analysis\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

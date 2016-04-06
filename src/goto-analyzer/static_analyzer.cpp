@@ -6,8 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <fstream>
+
 #include <util/threeval.h>
 #include <util/json.h>
+#include <util/xml.h>
 
 #include "static_analyzer.h"
 
@@ -35,7 +38,8 @@ protected:
   message_handlert &message_handler;
 
   void plain_text_report();
-  void json_report();  
+  void json_report(const std::string &);  
+  void xml_report(const std::string &);  
   
   tvt eval(goto_programt::const_targett)
   {
@@ -58,7 +62,9 @@ Function: static_analyzert::operator()
 bool static_analyzert::operator()()
 {
   if(!options.get_option("json").empty())
-    json_report();
+    json_report(options.get_option("json"));
+  else if(!options.get_option("xml").empty())
+    xml_report(options.get_option("xml"));
   else
     plain_text_report();
 
@@ -135,8 +141,8 @@ Function: static_analyzert::json_report
 
 \*******************************************************************/
 
-void static_analyzert::json_report()
-{  
+void static_analyzert::json_report(const std::string &file_name)
+{
   json_arrayt json_result;
   
   forall_goto_functions(f_it, goto_functions)
@@ -167,6 +173,73 @@ void static_analyzert::json_report()
         i_it->source_location.get_comment()));
     }
   }
+
+  std::ofstream out(file_name);
+  if(!out)
+  {
+    error() << "failed to open JSON output file `"
+            << file_name << "'" << eom;
+    return;
+  }
+  
+  status() << "Writing report to `" << file_name << "'" << eom;
+  out << json_result;
+}
+
+/*******************************************************************\
+
+Function: static_analyzert::xml_report
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+void static_analyzert::xml_report(const std::string &file_name)
+{
+  xmlt xml_result;
+  
+  forall_goto_functions(f_it, goto_functions)
+  {
+    if(!f_it->second.body.has_assertion()) continue;
+    
+    if(f_it->first=="__actual_thread_spawn")
+      continue;
+
+    forall_goto_program_instructions(i_it, f_it->second.body)
+    {
+      if(!i_it->is_assert()) continue;
+      
+      tvt r=eval(i_it);
+
+      xmlt &x=xml_result.new_element("result");
+
+      if(r.is_true())
+        x.set_attribute("status", "SUCCESS");
+      else if(r.is_false())
+        x.set_attribute("status", "FAILURE");
+      else 
+        x.set_attribute("status", "UNKNOWN");
+
+      x.set_attribute("file", id2string(i_it->source_location.get_file()));
+      x.set_attribute("line", id2string(i_it->source_location.get_line()));      
+      x.set_attribute("description", id2string(i_it->source_location.get_comment()));
+    }
+  }
+
+  std::ofstream out(file_name);
+  if(!out)
+  {
+    error() << "failed to open XML output file `"
+            << file_name << "'" << eom;
+    return;
+  }
+  
+  status() << "Writing report to `" << file_name << "'" << eom;
+  out << xml_result;
 }
 
 /*******************************************************************\

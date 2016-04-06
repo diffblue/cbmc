@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-bool static_analysis(
+bool static_analyzer(
   const goto_functionst &,
   const namespacet &,
   const optionst &,

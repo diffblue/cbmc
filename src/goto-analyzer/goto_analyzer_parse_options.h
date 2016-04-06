@@ -30,7 +30,7 @@ class optionst;
   "(verbosity):(version)" \
   "(gcc)(arch):" \
   "(taint):(show-taint)" \
-  "(json):" \
+  "(json):(xml):" \
   "(unreachable-instructions)" \
   "(intervals)(non-null)"
 
