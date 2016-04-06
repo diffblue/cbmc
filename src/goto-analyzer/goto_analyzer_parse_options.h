@@ -32,7 +32,8 @@ class optionst;
   "(taint):(show-taint)" \
   "(json):(xml):" \
   "(unreachable-instructions)" \
-  "(intervals)(non-null)"
+  "(intervals)(show-intervals)" \
+  "(non-null)(show-non-null)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,

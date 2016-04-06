@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json.h>
 #include <util/xml.h>
 
+#include <analyses/interval_domain.h>
+
 #include "static_analyzer.h"
 
 class static_analyzert:public messaget
@@ -22,10 +24,11 @@ public:
     const namespacet &_ns,
     const optionst &_options,
     message_handlert &_message_handler):
+    messaget(_message_handler),
     goto_functions(_goto_functions),
     ns(_ns),
     options(_options),
-    message_handler(_message_handler)
+    interval_analysis(_ns)
   {
   }
   
@@ -35,16 +38,15 @@ protected:
   const goto_functionst &goto_functions;
   const namespacet &ns;
   const optionst &options;
-  message_handlert &message_handler;
+
+  // analyses
+  static_analysist<interval_domaint> interval_analysis;
 
   void plain_text_report();
   void json_report(const std::string &);  
   void xml_report(const std::string &);  
   
-  tvt eval(goto_programt::const_targett)
-  {
-    return tvt::unknown();
-  }
+  tvt eval(goto_programt::const_targett);
 };
 
 /*******************************************************************\
@@ -61,6 +63,9 @@ Function: static_analyzert::operator()
 
 bool static_analyzert::operator()()
 {
+  status() << "performing interval analysis" << eom;
+  interval_analysis(goto_functions);
+
   if(!options.get_option("json").empty())
     json_report(options.get_option("json"));
   else if(!options.get_option("xml").empty())
@@ -71,6 +76,26 @@ bool static_analyzert::operator()()
   return false;
 }
   
+/*******************************************************************\
+
+Function: static_analyzert::eval
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+tvt static_analyzert::eval(goto_programt::const_targett t)
+{
+  exprt guard=t->guard;
+  //exprt result=eval(guard, cba);
+  //exprt result2=simplify_expr(result, ns);
+  return tvt::unknown();          
+}
+
 /*******************************************************************\
 
 Function: static_analyzert::plain_text_report
