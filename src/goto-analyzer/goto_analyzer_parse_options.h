@@ -30,7 +30,8 @@ class optionst;
   "(verbosity):(version)" \
   "(gcc)(arch):" \
   "(taint):(show-taint)" \
-  "(json):"
+  "(json):" \
+  "(unreachable-instructions)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,
