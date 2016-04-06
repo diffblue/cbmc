@@ -271,7 +271,7 @@ void ui_message_handlert::json_ui_msg(
   const std::string &msg2,
   const source_locationt &location)
 {
-  jsont result=jsont::json_object();
+  json_objectt result;
 
   #if 0
   if(location.is_not_nil() &&

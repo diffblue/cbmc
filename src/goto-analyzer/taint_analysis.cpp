@@ -224,7 +224,7 @@ bool taint_analysist::operator()(
 {
   try
   {
-    jsont json_result=jsont::json_array();
+    json_arrayt json_result;
     bool use_json=!json_file_name.empty();
   
     status() << "Reading taint file `" << taint_file_name
@@ -335,10 +335,10 @@ bool taint_analysist::operator()(
 
         if(use_json)
         {
-          jsont json=jsont::json_object();
-          json["bug_class"]=jsont::json_string(id2string(i_it->source_location.get_property_class()));
-          json["file"]=jsont::json_string(id2string(i_it->source_location.get_file()));
-          json["line"]=jsont::json_number(id2string(i_it->source_location.get_line()));
+          json_objectt json;
+          json["bug_class"]=json_stringt(id2string(i_it->source_location.get_property_class()));
+          json["file"]=json_stringt(id2string(i_it->source_location.get_file()));
+          json["line"]=json_numbert(id2string(i_it->source_location.get_line()));
           json_result.array.push_back(json);
         }
         else

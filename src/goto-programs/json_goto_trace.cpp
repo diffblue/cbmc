@@ -30,19 +30,19 @@ Function: json
 
 jsont json(const source_locationt &source_location)
 {
-  jsont result=jsont::json_object();
+  json_objectt result;
 
   if(!source_location.get_file().empty())
-    result["file"]=jsont(id2string(source_location.get_file()));
+    result["file"]=json_stringt(id2string(source_location.get_file()));
 
   if(!source_location.get_line().empty())
-    result["line"]=jsont::json_number(id2string(source_location.get_line()));
+    result["line"]=json_numbert(id2string(source_location.get_line()));
 
   if(!source_location.get_column().empty())
-    result["column"]=jsont::json_number(id2string(source_location.get_column()));
+    result["column"]=json_numbert(id2string(source_location.get_column()));
 
   if(!source_location.get_function().empty())
-    result["function"]=jsont(id2string(source_location.get_function()));
+    result["function"]=json_stringt(id2string(source_location.get_function()));
     
   return result;
 }
@@ -64,7 +64,7 @@ void convert(
   const goto_tracet &goto_trace,
   jsont &dest)
 {
-  dest=jsont::json_array();
+  json_arrayt &dest_array=dest.make_array();
   
   source_locationt previous_source_location;
 
@@ -80,7 +80,7 @@ void convert(
     if(source_location.is_not_nil() && source_location.get_file()!="")
       json_location=json(source_location);
     else
-      json_location=jsont::json_null();
+      json_location=json_nullt();
     
     switch(it->type)
     {
@@ -98,13 +98,13 @@ void convert(
             i2string(it->pc->loop_number);
         }
       
-        jsont &json_failure=dest.push_back(jsont::json_object());
+        json_objectt &json_failure=dest_array.push_back().make_object();
         
-        json_failure["step_type"]=jsont("failure");
+        json_failure["step_type"]=json_stringt("failure");
         json_failure["hidden"]=jsont::json_boolean(it->hidden);
-        json_failure["thread"]=jsont::json_number(i2string(it->thread_nr));
-        json_failure["reason"]=jsont(id2string(it->comment));
-        json_failure["property"]=jsont(id2string(property_id));
+        json_failure["thread"]=json_numbert(i2string(it->thread_nr));
+        json_failure["reason"]=json_stringt(id2string(it->comment));
+        json_failure["property"]=json_stringt(id2string(property_id));
 
         if(!json_location.is_null())
           json_failure["source_location"]=json_location;
@@ -115,9 +115,9 @@ void convert(
     case goto_trace_stept::DECL:
       {
         irep_idt identifier=it->lhs_object.get_identifier();
-        jsont &json_assignment=dest.push_back(jsont::json_object());
+        json_objectt &json_assignment=dest_array.push_back().make_object();
         
-        json_assignment["step_type"]=jsont("assignment");
+        json_assignment["step_type"]=json_stringt("assignment");
 
         if(!json_location.is_null())
           json_assignment["source_location"]=json_location;
@@ -147,17 +147,17 @@ void convert(
           if(type_string=="")
             type_string=from_type(ns, identifier, symbol->type);
 
-          json_assignment["mode"]=jsont(id2string(symbol->mode));
+          json_assignment["mode"]=json_stringt(id2string(symbol->mode));
         }
 
-        json_assignment["value"]=jsont(full_lhs_value_string);
-        json_assignment["lhs"]=jsont(full_lhs_string);
+        json_assignment["value"]=json_stringt(full_lhs_value_string);
+        json_assignment["lhs"]=json_stringt(full_lhs_string);
         json_assignment["hidden"]=jsont::json_boolean(it->hidden);
-        json_assignment["thread"]=jsont::json_number(i2string(it->thread_nr));
+        json_assignment["thread"]=json_numbert(i2string(it->thread_nr));
 
         json_assignment["assignment_type"]=
-          jsont(it->assignment_type==goto_trace_stept::ACTUAL_PARAMETER?"actual_parameter":
-                "variable");
+          json_stringt(it->assignment_type==goto_trace_stept::ACTUAL_PARAMETER?"actual_parameter":
+                       "variable");
       }
       break;
       
@@ -174,17 +174,16 @@ void convert(
       {
         std::string tag=
           (it->type==goto_trace_stept::FUNCTION_CALL)?"function_call":"function_return";
-        jsont &json_call_return=dest.push_back(jsont::json_object());
+        json_objectt &json_call_return=dest_array.push_back().make_object();
         
-        json_call_return["step_type"]=jsont(tag);
+        json_call_return["step_type"]=json_stringt(tag);
         json_call_return["hidden"]=jsont::json_boolean(it->hidden);
-        json_call_return["thread"]=jsont::json_number(i2string(it->thread_nr));
+        json_call_return["thread"]=json_numbert(i2string(it->thread_nr));
 
         const symbolt &symbol=ns.lookup(it->identifier);
-        jsont &json_function=json_call_return["function"];
-        json_function=jsont::json_object();
-        json_function["display_name"]=jsont(id2string(symbol.display_name()));
-        json_function["identifier"]=jsont(id2string(it->identifier));
+        json_objectt &json_function=json_call_return["function"].make_object();
+        json_function["display_name"]=json_stringt(id2string(symbol.display_name()));
+        json_function["identifier"]=json_stringt(id2string(it->identifier));
         json_function["source_location"]=json(symbol.location);
 
         if(!json_location.is_null())
@@ -198,9 +197,10 @@ void convert(
         // just the source location
         if(!json_location.is_null())
         {
-          jsont &json_location_only=dest["location-only"];
+          json_objectt &json_location_only=dest_array.push_back().make_object();
+          json_location_only["step_type"]=json_stringt("location-only");
           json_location_only["hidden"]=jsont::json_boolean(it->hidden);
-          json_location_only["thread"]=jsont::json_number(i2string(it->thread_nr));
+          json_location_only["thread"]=json_numbert(i2string(it->thread_nr));
           json_location_only["source_location"]=json_location;
         }
       }

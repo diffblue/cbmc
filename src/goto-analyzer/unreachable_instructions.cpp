@@ -133,9 +133,9 @@ static void add_to_json(
   const namespacet &ns,
   const goto_programt &goto_program,
   const dead_mapt &dead_map,
-  jsont &dest)
+  json_arrayt &dest)
 {
-  jsont &entry=dest.push_back(jsont(jsont::J_OBJECT));
+  json_objectt &entry=dest.push_back().make_object();
 
   assert(!goto_program.instructions.empty());
   goto_programt::const_targett end_function=
@@ -143,20 +143,11 @@ static void add_to_json(
   --end_function;
   assert(end_function->is_end_function());
 
-  entry.object.insert(
-    std::make_pair(
-      "function",
-      jsont(id2string(end_function->function))));
-  entry.object.insert(
-    std::make_pair(
-      "file name",
-      jsont(id2string(end_function->source_location.get_file()))));
+  entry["function"]=json_stringt(id2string(end_function->function));
+  entry["file name"]=
+    json_stringt(id2string(end_function->source_location.get_file()));
 
-  jsont &dead_ins=
-    entry.object.insert(
-      std::make_pair(
-        "unreachable instructions",
-        jsont(jsont::J_ARRAY))).first->second;
+  json_arrayt &dead_ins=entry["unreachable instructions"].make_array();
 
   for(dead_mapt::const_iterator it=dead_map.begin();
       it!=dead_map.end();
@@ -175,12 +166,10 @@ static void add_to_json(
     assert(!s.empty());
     s.erase(s.size()-1);
 
-    jsont &i_entry=dead_ins.push_back(jsont(jsont::J_OBJECT));
-    i_entry.object.insert(
-      std::make_pair(
-        "source location",
-        jsont(it->second->source_location.as_string())));
-    i_entry.object.insert(std::make_pair("statement", jsont(s)));
+    json_objectt &i_entry=dead_ins.push_back().make_object();
+    i_entry["source location"]=
+        json_stringt(it->second->source_location.as_string());
+    i_entry["statement"]=json_stringt(s);
   }
 }
 
@@ -202,7 +191,7 @@ void unreachable_instructions(
   const bool json,
   std::ostream &os)
 {
-  jsont json_result(jsont::J_ARRAY);
+  json_arrayt json_result;
 
   std::set<irep_idt> called;
   compute_called_functions(goto_functions, called);
