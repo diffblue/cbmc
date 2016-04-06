@@ -7,9 +7,11 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <iostream>
+#include <fstream>
 
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
+#include <util/json.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -39,7 +41,7 @@ public:
     const std::string &taint_file_name,
     goto_functionst &goto_functions,
     bool show_full,
-    bool json);
+    const std::string &json_file_name);
 
 protected:
   const namespacet &ns;
@@ -218,10 +220,13 @@ bool taint_analysist::operator()(
   const std::string &taint_file_name,
   goto_functionst &goto_functions,
   bool show_full,
-  bool json)
+  const std::string &json_file_name)
 {
   try
   {
+    jsont json_result=jsont::json_array();
+    bool use_json=!json_file_name.empty();
+  
     status() << "Reading taint file `" << taint_file_name
              << "'" << eom;
 
@@ -323,18 +328,18 @@ bool taint_analysist::operator()(
         if(first)
         {
           first=false;
-          if(!json)
+          if(!use_json)
             std::cout << "\n"
                          "******** Function " << symbol.display_name() << '\n';
         }
 
-        if(json)
+        if(use_json)
         {
-          std::cout << "{\n";
-          std::cout << "  \"bug_class\": \"" << i_it->source_location.get_property_class() << "\",\n";
-          std::cout << "  \"file\": \"" << i_it->source_location.get_file() << "\",\n";
-          std::cout << "  \"line\": " << i_it->source_location.get_line() << "\n";
-          std::cout << "}\n";
+          jsont json=jsont::json_object();
+          json["bug_class"]=jsont::json_string(id2string(i_it->source_location.get_property_class()));
+          json["file"]=jsont::json_string(id2string(i_it->source_location.get_file()));
+          json["line"]=jsont::json_number(id2string(i_it->source_location.get_line()));
+          json_result.array.push_back(json);
         }
         else
         {
@@ -346,7 +351,24 @@ bool taint_analysist::operator()(
         }
       }
     }
+    
+    if(use_json)
+    {
+      std::ofstream json_out(json_file_name);
 
+      if(!json_out)
+      {
+        error() << "Failed to open json output `"
+                << json_file_name << "'" << eom;
+        return true;
+      }
+      
+      status() << "Analysis result is written to `"
+               << json_file_name << "'" << eom;
+      
+      json_out << json_result << '\n';
+    }
+  
     return false;
   }
   catch(const char *error_msg)
@@ -383,10 +405,11 @@ bool taint_analysis(
   const std::string &taint_file_name,
   message_handlert &message_handler,
   bool show_full,
-  bool json)
+  const std::string &json_file_name)
 {
   taint_analysist taint_analysis(ns);
   taint_analysis.set_message_handler(message_handler);
-  return taint_analysis(taint_file_name, goto_functions, show_full, json);
+  return taint_analysis(
+    taint_file_name, goto_functions, show_full, json_file_name);
 }
 

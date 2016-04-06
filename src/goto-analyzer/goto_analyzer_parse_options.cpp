@@ -487,17 +487,17 @@ int goto_analyzer_parse_optionst::doit()
   {
     const namespacet ns(symbol_table);
     std::string taint_file=cmdline.get_value("taint");
-    bool json=cmdline.isset("json");
 
     if(cmdline.isset("show-taint"))
     {
-      taint_analysis(goto_functions, ns, taint_file, get_message_handler(), true, json);
+      taint_analysis(goto_functions, ns, taint_file, get_message_handler(), true, "");
       return 0;
     }
     else
     {
+      std::string json_file=cmdline.get_value("json");
       bool result=
-        taint_analysis(goto_functions, ns, taint_file, get_message_handler(), false, json);
+        taint_analysis(goto_functions, ns, taint_file, get_message_handler(), false, json_file);
       return result?10:0;
     }
   }
