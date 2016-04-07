@@ -523,6 +523,7 @@ bool entry_point(
   new_symbol.name=goto_functionst::entry_point();
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
+  new_symbol.mode=symbol.mode;
   
   if(symbol_table.move(new_symbol))
   {
