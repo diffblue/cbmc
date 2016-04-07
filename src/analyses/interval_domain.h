@@ -44,7 +44,7 @@ public:
   {
     int_map.clear();
     float_map.clear();
-    is_bottom=true;
+    bottom=true;
   }
         
   // all states
@@ -52,7 +52,7 @@ public:
   {
     int_map.clear();
     float_map.clear();
-    is_bottom=false;
+    bottom=false;
   }
 
   exprt make_expression(const symbol_exprt &) const;
@@ -71,9 +71,14 @@ public:
   {
     return assume_rec(e);
   }
+  
+  inline bool is_bottom() const
+  {
+    return bottom;
+  }
 
 protected:
-  bool is_bottom;
+  bool bottom;
 
   typedef std::map<irep_idt, integer_intervalt> int_mapt;
   typedef std::map<irep_idt, ieee_float_intervalt> float_mapt;

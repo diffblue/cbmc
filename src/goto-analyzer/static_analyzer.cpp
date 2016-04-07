@@ -90,8 +90,9 @@ Function: static_analyzert::eval
 tvt static_analyzert::eval(goto_programt::const_targett t)
 {
   exprt guard=t->guard;
-  //exprt result=eval(guard, cba);
-  //exprt result2=simplify_expr(result, ns);
+  interval_domaint d=interval_analysis[t];
+  d.assume(not_exprt(guard));
+  if(d.is_bottom()) return tvt(true);
   return tvt::unknown();          
 }
 
