@@ -40,8 +40,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 
-#include <linking/entry_point.h>
-
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/goto_check.h>
@@ -726,9 +724,6 @@ int cbmc_parse_optionst::get_goto_program(
       show_symbol_table();
       return 0;
     }
-
-    if(entry_point(symbol_table, "main", get_message_handler()))
-      return 6;
 
     status() << "Generating GOTO Program" << eom;
 

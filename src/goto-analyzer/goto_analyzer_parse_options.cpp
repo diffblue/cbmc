@@ -30,8 +30,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
-#include <linking/entry_point.h>
-
 #include <langapi/mode.h>
 
 #include <util/language.h>
@@ -472,7 +470,7 @@ int goto_analyzer_parse_optionst::get_goto_program(
     {
       if(parse()) return 6;
       if(typecheck()) return 6;
-      if(binaries.empty() && final()) return 6;
+      if(final()) return 6;
 
       // we no longer need any parse trees or language files
       clear_parse();
@@ -497,11 +495,6 @@ int goto_analyzer_parse_optionst::get_goto_program(
       show_symbol_table();
       return 0;
     }
-
-    #if 1
-    if(entry_point(symbol_table, "main", get_message_handler()))
-      return 6;
-    #endif
 
     status() << "Generating GOTO Program" << eom;
 

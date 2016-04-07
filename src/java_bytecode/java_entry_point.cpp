@@ -16,8 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/message.h>
 
-#include <linking/entry_point.h>
 #include <goto-programs/goto_functions.h>
 
 #include "java_entry_point.h"

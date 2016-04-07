@@ -61,6 +61,8 @@ protected:
   bool set_properties(goto_functionst &goto_functions);
   
   void eval_verbosity();
+  
+  bool has_entry_point;
 };
 
 #endif

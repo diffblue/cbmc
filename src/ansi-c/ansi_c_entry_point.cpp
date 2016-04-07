@@ -21,10 +21,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 
 #include <goto-programs/goto_functions.h>
+#include <linking/static_lifetime_init.h>
 
-#include "entry_point.h"
-#include "zero_initializer.h"
-#include "static_lifetime_init.h"
+#include "ansi_c_entry_point.h"
 
 /*******************************************************************\
 
@@ -54,7 +53,7 @@ exprt::operandst build_function_environment(
 
 /*******************************************************************\
 
-Function: entry_point
+Function: ansi_c_entry_point
 
   Inputs:
 
@@ -64,7 +63,7 @@ Function: entry_point
 
 \*******************************************************************/
 
-bool entry_point(
+bool ansi_c_entry_point(
   symbol_tablet &symbol_table,
   const std::string &standard_main,
   message_handlert &message_handler)

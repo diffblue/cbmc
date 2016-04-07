@@ -25,8 +25,7 @@ Date: June 2006
 #include <util/get_base_name.h>
 
 #include <ansi-c/ansi_c_language.h>
-
-#include <linking/entry_point.h>
+#include <ansi-c/ansi_c_entry_point.h>
 
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_convert_functions.h>
@@ -413,7 +412,7 @@ bool compilet::link()
   
   if(mode==COMPILE_LINK_EXECUTABLE)
   {
-    if(entry_point(symbol_table, "main", ui_message_handler))
+    if(ansi_c_entry_point(symbol_table, "main", ui_message_handler))
       return true;
 
     // entry_point may (should) add some more functions.
