@@ -34,6 +34,12 @@ void interval_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
+  if(is_bottom)
+  {
+    out << "BOTTOM\n";
+    return;
+  }
+
   for(int_mapt::const_iterator
       i_it=int_map.begin(); i_it!=int_map.end(); i_it++)
   {
@@ -137,8 +143,8 @@ bool interval_domaint::merge(
   locationt from,
   locationt to)
 {
-  if(!b.seen) return false;
-  if(!seen) { *this=b; return true; }
+  if(b.is_bottom) return false;
+  if(is_bottom) { *this=b; return true; }
 
   bool result=false;
   

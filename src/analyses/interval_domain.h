@@ -22,12 +22,6 @@ public:
   // trivial, conjunctive interval domain for both float
   // and integers
   
-  typedef std::map<irep_idt, integer_intervalt> int_mapt;
-  typedef std::map<irep_idt, ieee_float_intervalt> float_mapt;
-
-  int_mapt int_map;
-  float_mapt float_map;
-
   virtual void transform(
     locationt from,
     locationt to,
@@ -56,8 +50,30 @@ public:
     return src.id()==ID_floatbv;
   }
 
+  // no states
+  virtual void make_bottom()
+  {
+    int_map.clear();
+    float_map.clear();
+    is_bottom=true;
+  }
+        
+  // all states
+  virtual void make_top()
+  {
+    int_map.clear();
+    float_map.clear();
+    is_bottom=false;
+  }
+
 protected:
-  bool seen;
+  bool is_bottom;
+
+  typedef std::map<irep_idt, integer_intervalt> int_mapt;
+  typedef std::map<irep_idt, ieee_float_intervalt> float_mapt;
+
+  int_mapt int_map;
+  float_mapt float_map;
 
   void havoc_rec(const exprt &);
   void assume_rec(const exprt &, bool negation=false);
