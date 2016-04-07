@@ -295,7 +295,12 @@ bool entry_point(
       symbol_table.symbols.find(CPROVER_PREFIX "initialize");
 
     if(init_it==symbol_table.symbols.end())
-      throw "failed to find " CPROVER_PREFIX "initialize symbol";
+    {
+      messaget message(message_handler);
+      message.error() << "failed to find " CPROVER_PREFIX "initialize symbol"
+                      << messaget::eom;
+      return true;
+    }
   
     code_function_callt call_init;
     call_init.lhs().make_nil();
