@@ -116,12 +116,7 @@ bool ansi_c_entry_point(
   symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(main_symbol);
   
   if(s_it==symbol_table.symbols.end())
-  {
-    messaget message(message_handler);
-    message.error() << "main symbol `" << id2string(main_symbol) 
-                    << "' not in symbol table" << messaget::eom;
-    return true; // give up, no main
-  }
+    return false; // give up silently
     
   const symbolt &symbol=s_it->second;
   
