@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "entry_point.h"
 #include "zero_initializer.h"
 
+#define INITIALIZE_FUNCTION CPROVER_PREFIX "initialize"
+
 /*******************************************************************\
 
 Function: build_function_environment
@@ -71,7 +73,7 @@ bool static_lifetime_init(
   namespacet ns(symbol_table);
       
   symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find(CPROVER_PREFIX "initialize");
+    symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
   if(s_it==symbol_table.symbols.end()) return false;
 
@@ -292,7 +294,7 @@ bool entry_point(
 
   {
     symbol_tablet::symbolst::iterator init_it=
-      symbol_table.symbols.find(CPROVER_PREFIX "initialize");
+      symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
     if(init_it==symbol_table.symbols.end())
     {
