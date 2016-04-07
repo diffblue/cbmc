@@ -27,8 +27,7 @@ public:
     messaget(_message_handler),
     goto_functions(_goto_functions),
     ns(_ns),
-    options(_options),
-    interval_analysis(_ns)
+    options(_options)
   {
   }
   
@@ -40,7 +39,7 @@ protected:
   const optionst &options;
 
   // analyses
-  static_analysist<interval_domaint> interval_analysis;
+  ait<interval_domaint> interval_analysis;
 
   void plain_text_report();
   void json_report(const std::string &);  
@@ -64,7 +63,7 @@ Function: static_analyzert::operator()
 bool static_analyzert::operator()()
 {
   status() << "performing interval analysis" << eom;
-  interval_analysis(goto_functions);
+  interval_analysis(goto_functions, ns);
 
   if(!options.get_option("json").empty())
     json_report(options.get_option("json"));
@@ -287,4 +286,26 @@ bool static_analyzer(
 {
   return static_analyzert(
     goto_functions, ns, options, message_handler)();
+}
+
+/*******************************************************************\
+
+Function: show_intervals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+void show_intervals(
+  const goto_functionst &goto_functions,
+  const namespacet &ns,
+  std::ostream &out)
+{
+  ait<interval_domaint> interval_analysis;
+  interval_analysis(goto_functions, ns);
+  interval_analysis.output(ns, goto_functions, out);
 }
