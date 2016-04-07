@@ -19,8 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class interval_domaint:public ai_domain_baset
 {
 public:
-  // trivial, conjunctive interval domain for both float
-  // and integers
+  // Trivial, conjunctive interval domain for both float
+  // and integers. The categorization 'float' and 'integers'
+  // is done by is_int and is_float.
   
   typedef std::map<irep_idt, integer_intervalt> int_mapt;
   typedef std::map<irep_idt, ieee_float_intervalt> float_mapt;
@@ -46,14 +47,19 @@ public:
   
   exprt make_expression(const symbol_exprt &) const;
   
-  static bool is_int(const typet &src)
+  inline static bool is_int(const typet &src)
   {
     return src.id()==ID_signedbv || src.id()==ID_unsignedbv;
   }
   
-  static bool is_float(const typet &src)
+  inline static bool is_float(const typet &src)
   {
     return src.id()==ID_floatbv;
+  }
+
+  inline void assume(const exprt &e)
+  {
+    return assume_rec(e);
   }
 
 protected:
