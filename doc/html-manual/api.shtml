@@ -199,6 +199,18 @@ the given value.
 Uninterpreted functions are documented <a href="modeling-nondet.shtml">here</a>.
 </p>
 
+<p class="justified">
+If the SMT2 back-end (<code>--smt2</code>) is enabled, then
+uninterpreted function named
+(<code>__CPROVER_uninterpreted_smt_escape</code>) will be handled
+differently.  The first argument, which must be a string literal,
+will be used as the function instead of it being uninterpreted.
+This allows arbitrary SMT-LIB expressions to be `escaped' and passed
+through CBMC.  Using other back-ends these will be treated as normal
+uninterpreted functions.
+</p>
+
+
 <h3>Predefined Types and Symbols</h3>
 
 <h4>__CPROVER_bitvector</h4>

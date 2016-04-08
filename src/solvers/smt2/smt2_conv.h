@@ -155,6 +155,9 @@ protected:
   
   std::string convert_identifier(const irep_idt &identifier);
   
+  bool uf_is_escaped_smt(const exprt &function);
+  std::string convert_function_name(const function_application_exprt &fa);
+
   // introduces a let-expression for operands
   exprt convert_operands(const exprt &);
   

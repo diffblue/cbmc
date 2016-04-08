@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <string.h>
+
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/std_types.h>
@@ -949,6 +951,82 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
   
   return result;
 }
+
+
+/*******************************************************************\
+
+Function: smt2_convt::uf_is_escaped_smt
+
+  Inputs: A symbol of the type uninterpreted function
+
+ Outputs: A boolean for if this function is actually escaped SMT-LIB.
+
+ Purpose: Uninterpreted functions whose names start:
+            __CPROVER_uninterpreted_smt_escape
+          are treated are "escaped" SMT-LIB.  They are
+          treated as uninterpreted functions in CPROVER
+          but then converted to an SMT-LIB functions.
+          This function isolates this special functionality
+          into one function call.
+
+\*******************************************************************/
+
+
+bool smt2_convt::uf_is_escaped_smt(const exprt &symbol) {
+  if (symbol.type().id() == ID_code)
+  {
+    const char *escapeName = "__CPROVER_uninterpreted_smt_escape";
+    size_t length = strlen(escapeName);
+
+    std::string id(id2string(to_symbol_expr(symbol).get_identifier()));
+
+    if (id.length() >= length)
+      return id.compare(0, length, escapeName, length) == 0;
+  }
+
+  return false;
+}
+
+
+
+/*******************************************************************\
+
+Function: smt2_convt::convert_function_name
+
+  Inputs: A function application
+
+ Outputs: The string giving the name of the function
+
+ Purpose: For the usual case of uninterpretted functions,
+          this simply converts them like any other symbol.
+          However if the function name indicates it is an
+          escaped SMT-LIB string then the first argument
+          (which must be a string literal) is used.
+
+\*******************************************************************/
+
+
+std::string smt2_convt::convert_function_name(const function_application_exprt &fa) {
+  symbol_exprt function(to_symbol_expr(fa.function()));
+
+  if (uf_is_escaped_smt(function))
+  {
+    exprt firstArgument(fa.arguments()[0]);
+
+    // We want a pointer to a string_constant
+    address_of_exprt addr(to_address_of_expr(firstArgument));
+    index_exprt head(to_index_expr(addr.object()));
+    exprt stringConst(head.array());
+
+    return id2string(stringConst.get(ID_value));
+  }
+  else
+  {
+    return '|' + convert_identifier(function.get_identifier()) + '|';
+  }
+}
+
+
 
 /*******************************************************************\
 
@@ -2001,6 +2079,27 @@ void smt2_convt::convert_expr(const exprt &expr)
     out << ")) ";
     convert_expr(let_expr.where());
     out << ')'; // let
+  }
+  else if (expr.id() == ID_function_application)
+  {
+    function_application_exprt functionApplication(to_function_application_expr(expr));
+    symbol_exprt function(to_symbol_expr(functionApplication.function()));
+
+    out << "( ";
+    out << convert_function_name(functionApplication) << ' ';
+
+    function_application_exprt::argumentst args(functionApplication.arguments());
+    function_application_exprt::argumentst::const_iterator it = args.begin();
+    if (uf_is_escaped_smt(function))
+      ++it;   // Skip the argument used as a name
+
+    for ( /* Empty */ ; it != args.end(); ++it)
+    {
+      convert_expr(*it);
+      out << ' ';
+    }
+
+    out << ") ";
   }
   else if(expr.id()==ID_constraint_select_one)
   {
@@ -4564,10 +4663,6 @@ void smt2_convt::find_symbols(const exprt &expr)
   if(expr.id()==ID_symbol ||
      expr.id()==ID_nondet_symbol)
   {
-    // we don't track function-typed symbols
-    if(expr.type().id()==ID_code)
-      return;
-
     irep_idt identifier;
 
     if(expr.id()==ID_symbol)
@@ -4577,7 +4672,7 @@ void smt2_convt::find_symbols(const exprt &expr)
 
     identifiert &id=identifier_map[identifier];
 
-    if(id.type.is_nil())
+    if(id.type.is_nil() && !uf_is_escaped_smt(expr))
     {
       id.type=expr.type();
       
@@ -4586,10 +4681,31 @@ void smt2_convt::find_symbols(const exprt &expr)
 
       out << "; find_symbols\n";
       out << "(declare-fun |"
-          << smt2_identifier
-          << "| () ";
-      convert_type(expr.type());
+	  << smt2_identifier
+	  << "| ";
+
+      if(expr.type().id()==ID_code)
+      {
+	code_typet functionType(to_code_type(expr.type()));
+	out << "( ";
+	code_typet::parameterst parameters(functionType.parameters());
+	for (code_typet::parameterst::const_iterator i = parameters.begin();
+	     i != parameters.end();
+	     ++i)
+	{
+	  convert_type((*i).type());
+	  out << " ";
+	}
+	out << ") ";
+	convert_type(functionType.return_type());
+      }
+      else
+      {
+	out << "() ";
+	convert_type(expr.type());
+      }
       out << ")" << "\n";
+
     }
   }
   else if(expr.id()==ID_array_of)
@@ -4742,7 +4858,6 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ")\n"; // define-fun
     }
   }
-
 }
 
 /*******************************************************************\
