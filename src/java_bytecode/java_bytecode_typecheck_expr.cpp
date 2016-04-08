@@ -165,6 +165,7 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
   // the member might be in a parent class
   const irep_idt component_name=expr.get_component_name();
 
+  #if 0
   while(1)
   {
     // TODO handle vtables
@@ -194,4 +195,5 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
     
     expr.struct_op()=m;
   }
+  #endif
 }
