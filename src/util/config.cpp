@@ -967,6 +967,9 @@ bool configt::set(const cmdlinet &cmdline)
     else
       set_classpath("."); // default
   }
+  
+  if(cmdline.isset("main-class"))
+    java.main_class=cmdline.get_value("main-class");
 
   if(cmdline.isset("include"))
     ansi_c.include_files=cmdline.get_values("include");

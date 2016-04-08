@@ -21,7 +21,7 @@ class optionst;
 #define GOTO_ANALYSER_OPTIONS \
   "(function):" \
   "D:I:(std89)(std99)(std11)" \
-  "(classpath):" \
+  "(classpath):(main-class):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-loops)" \
