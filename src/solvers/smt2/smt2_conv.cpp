@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <iostream>
 
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
@@ -123,6 +124,21 @@ void smt2_convt::write_header()
   // set-logic should come after setting options
   if(emit_set_logic && !logic.empty())
     out << "(set-logic " << logic << ")" << "\n";
+
+  if (solver == CVC4 && use_strings) {
+    out << "(define-fun ubv_to_int ((?x (_ BitVec "
+        << string_length_width << "))) "
+        << "Int ";
+    out << "(let ((bit0 (_ bv0 1))) (+ ";
+    mp_integer bit;
+    for (size_t i = 0; i < string_length_width; ++i) {
+      bit.setPower2(i);
+      out << "(ite (= ((_ extract " << i << " " << i << ") ?x) bit0) 0 "
+          << bit << ") ";
+    }
+    out << "0))"
+        << ")\n\n";
+  }
 }
 
 /*******************************************************************\
@@ -2005,6 +2021,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_constraint_select_one)
   {
     UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is not yet supported");
+  }
+  else if(expr.id()==ID_function_application)
+  {
+    convert_uninterpreted_function(expr);
   }
   else
     UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is unsupported");
@@ -4441,7 +4461,157 @@ void smt2_convt::convert_overflow(const exprt &expr)
   UNREACHABLE;
 }
 
-/*******************************************************************\
+
+void smt2_convt::convert_uninterpreted_function(const exprt &expr)
+{
+  const function_application_exprt &f = to_function_application_expr(expr);
+  const exprt &name = f.function();
+
+  // check if this is something we recognize
+  if (name.id() == ID_symbol) {
+    const irep_idt &id=to_symbol_expr(name).get_identifier();
+    if (use_strings) {
+      if (id == string_literal_func) {
+        return convert_string_literal(f);
+      } else if (id == string_char_at_func) {
+        return convert_string_char_at(f);
+      } else if (id == string_length_func) {
+        return convert_string_length(f);
+      } else if (id == string_concat_func) {
+        return convert_string_concat(f);
+      } else if (id == string_substring_func) {
+        return convert_string_substring(f);
+      } else if (id == string_is_prefix_func) {
+        return convert_string_is_prefix(f);
+      } else if (id == string_is_suffix_func) {
+        return convert_string_is_suffix(f);
+      }
+    }
+  }
+  
+  UNEXPECTEDCASE("unsupported uninterpreted function: " + name.id_string());
+}
+
+
+void smt2_convt::convert_string_literal(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 1) {
+    UNEXPECTEDCASE("args mismatch in string_literal");
+  }
+  const exprt &arg = args[0];
+  if (arg.operands().size() == 1 &&
+      arg.operands()[0].operands().size() == 1 &&
+      arg.operands()[0].operands()[0].operands().size() == 2 &&
+      arg.operands()[0].operands()[0].operands()[0].id() == ID_string_constant) {
+    const exprt &s = arg.operands()[0].operands()[0].operands()[0];
+    if (defined_expressions.find(s) != defined_expressions.end()) {
+      // TODO -- handle better (also quoting)
+      out << '"' << defined_expressions[s] << '"';
+      return;
+    }
+  }
+  UNEXPECTEDCASE("arg of string_literal not found");
+}
+
+
+void smt2_convt::convert_string_char_at(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_char_at");
+  }
+  out << "(str.at ";
+  convert_expr(args[0]);
+  out << " (ubv_to_int ";
+  typecast_exprt pos =
+    typecast_exprt(args[1], unsignedbv_typet(string_length_width));
+  convert_expr(pos);
+  out << "))";
+}
+
+
+void smt2_convt::convert_string_concat(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_concat");
+  }
+  out << "(str.++ ";
+  convert_expr(args[0]);
+  out << " ";
+  convert_expr(args[1]);
+  out << ")";
+}
+
+
+void smt2_convt::convert_string_substring(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 3) {
+    UNEXPECTEDCASE("args mismatch in string_substring");
+  }
+  out << "(str.substr ";
+  convert_expr(args[0]);
+  out << " ";
+  out << "(ubv_to_int ";
+  typecast_exprt pi =
+    typecast_exprt(args[1], unsignedbv_typet(string_length_width));
+  convert_typecast(pi);
+  out << ")";
+  out << " ";
+  out << "(ubv_to_int ";
+  typecast_exprt pj =
+    typecast_exprt(args[2], unsignedbv_typet(string_length_width));
+  convert_typecast(pj);
+  out << ")";
+  out << ")";
+}
+
+
+void smt2_convt::convert_string_is_prefix(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_is_prefix");
+  }
+  out << "(str.prefixof ";
+  convert_expr(args[0]);
+  out << " ";
+  convert_expr(args[1]);
+  out << ")";
+}
+
+
+void smt2_convt::convert_string_is_suffix(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_is_suffix");
+  }
+  out << "(str.suffixof ";
+  convert_expr(args[0]);
+  out << " ";
+  convert_expr(args[1]);
+  out << ")";
+}
+
+
+void smt2_convt::convert_string_length(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 1) {
+    UNEXPECTEDCASE("args mismatch in string_length");
+  }
+  if (string_lengths.find(f) != string_lengths.end()) {
+    out << string_lengths[f];
+  } else {
+    UNEXPECTEDCASE("string_length not found");
+  }
+}
+
+
+/*******************************************************************    \
 
 Function: smt2_convt::set_to
 
@@ -4642,26 +4812,31 @@ void smt2_convt::find_symbols(const exprt &expr)
   {
     if(defined_expressions.find(expr)==defined_expressions.end())
     {
-      // introduce a temporary array.
-      exprt tmp=to_string_constant(expr).to_array_expr();
-      const array_typet &array_type=to_array_type(tmp.type());
+      if (use_strings) {
+        irep_idt id = to_string_constant(expr).get_value();
+        defined_expressions[expr] = id;
+      } else {
+        // introduce a temporary array.
+        exprt tmp=to_string_constant(expr).to_array_expr();
+        const array_typet &array_type=to_array_type(tmp.type());
 
-      irep_idt id="string."+i2string(defined_expressions.size());
-      out << "; the following is a substitute for a string" << "\n";
-      out << "(declare-fun " << id << " () ";
-      convert_type(array_type);
-      out << ")" << "\n";
+        irep_idt id="string."+i2string(defined_expressions.size());
+        out << "; the following is a substitute for a string" << "\n";
+        out << "(declare-fun " << id << " () ";
+        convert_type(array_type);
+        out << ")" << "\n";
 
-      for(std::size_t i=0; i<tmp.operands().size(); i++)
-      {
-        out << "(assert (= (select " << id;
-        convert_expr(from_integer(i, array_type.size().type()));
-        out << ") "; // select
-        convert_expr(tmp.operands()[i]);
-        out << "))" << "\n";
+        for(std::size_t i=0; i<tmp.operands().size(); i++)
+        {
+          out << "(assert (= (select " << id;
+          convert_expr(from_integer(i, array_type.size().type()));
+          out << ") "; // select
+          convert_expr(tmp.operands()[i]);
+          out << "))" << "\n";
+        }
+
+        defined_expressions[expr]=id;
       }
-
-      defined_expressions[expr]=id;
     }
   }
   else if(expr.id()==ID_object_size &&
@@ -4743,6 +4918,36 @@ void smt2_convt::find_symbols(const exprt &expr)
     }
   }
 
+  if (use_strings && expr.id() == ID_function_application) {
+    const function_application_exprt &f = to_function_application_expr(expr);
+    const exprt &name = f.function();
+    if (name.id() == ID_symbol) {
+      const irep_idt &id=to_symbol_expr(name).get_identifier();
+      if (id == string_length_func &&
+          string_lengths.find(expr) == string_lengths.end()) {
+        const typet &type = f.type();
+        if (type.id()==ID_unsignedbv ||
+            type.id()==ID_signedbv) {
+          std::size_t w=to_bitvector_type(type).get_width();
+          const function_application_exprt::argumentst &args = f.arguments();
+          irep_idt id="string_length."+i2string(string_lengths.size());
+          typecast_exprt len = typecast_exprt(
+            symbol_exprt(id), unsignedbv_typet(string_length_width));
+          out << "(declare-fun " << id << " () ";
+          convert_type(expr.type());
+          out << ")\n";
+          out << "(assert (= (ubv_to_int ";
+          convert_typecast(len);
+          out << ") (str.len ";
+          convert_expr(args[0]);
+          out << ")))\n";
+          string_lengths[expr] = id;
+        } else {
+          UNEXPECTEDCASE("return type of string_length is not a bit-vector");
+        }
+      }
+    }
+  }
 }
 
 /*******************************************************************\
@@ -4818,6 +5023,10 @@ void smt2_convt::convert_type(const typet &type)
   }
   else if(type.id()==ID_struct)
   {
+    irep_idt tag = to_struct_type(type).get_tag();
+    if (use_strings && is_string_type(type)) {
+      out << "String";
+    } else
     if(use_datatypes)
     {
       assert(datatype_map.find(type)!=datatype_map.end());
@@ -4940,6 +5149,16 @@ void smt2_convt::convert_type(const typet &type)
   {
     UNEXPECTEDCASE("unsupported type: "+type.id_string());
   }
+}
+
+
+bool smt2_convt::is_string_type(const typet &type)
+{
+  if (type.id() == ID_struct) {
+    irep_idt tag = to_struct_type(type).get_tag();
+    return tag == irep_idt("__CPROVER_string");
+  }
+  return false;
 }
 
 /*******************************************************************\

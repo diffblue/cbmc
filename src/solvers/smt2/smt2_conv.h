@@ -42,6 +42,7 @@ public:
     use_datatypes(false),
     use_array_of_bool(false),
     emit_set_logic(true),
+    use_strings(false),
     out(_out),
     benchmark(_benchmark),
     notes(_notes),
@@ -67,6 +68,8 @@ public:
       break;
 
     case CVC4:
+      use_strings = true;
+      logic = "ALL_SUPPORTED";
       break;
 
     case MATHSAT:
@@ -85,6 +88,15 @@ public:
       break;
     }
 
+    string_literal_func = "__CPROVER_uninterpreted_string_literal";
+    string_char_at_func = "__CPROVER_uninterpreted_char_at";
+    string_length_func = "__CPROVER_uninterpreted_strlen";
+    string_concat_func = "__CPROVER_uninterpreted_strcat";
+    string_substring_func = "__CPROVER_uninterpreted_substring";
+    string_is_prefix_func = "__CPROVER_uninterpreted_strprefixof";
+    string_is_suffix_func = "__CPROVER_uninterpreted_strsuffixof";
+    string_length_width = 32; // TODO! 
+
     write_header();
   }
 
@@ -95,6 +107,7 @@ public:
   bool use_datatypes;
   bool use_array_of_bool;
   bool emit_set_logic;
+  bool use_strings;
 
   // overloading interfaces
   virtual literalt convert(const exprt &expr);
@@ -152,6 +165,7 @@ protected:
   void convert_overflow(const exprt &expr);
   void convert_with(const with_exprt &expr);
   void convert_update(const exprt &expr);
+  void convert_uninterpreted_function(const exprt &expr);
   
   std::string convert_identifier(const irep_idt &identifier);
   
@@ -292,6 +306,27 @@ protected:
   // Boolean part
   unsigned no_boolean_variables;
   std::vector<bool> boolean_assignment;
+
+  // string support
+  irep_idt string_literal_func;
+  irep_idt string_length_func;
+  irep_idt string_char_at_func;
+  irep_idt string_concat_func;
+  irep_idt string_substring_func;
+  irep_idt string_is_prefix_func;
+  irep_idt string_is_suffix_func;
+  size_t string_length_width;
+  
+  bool is_string_type(const typet &type);
+  void convert_string_literal(const function_application_exprt &f);
+  void convert_string_length(const function_application_exprt &f);
+  void convert_string_concat(const function_application_exprt &f);
+  void convert_string_char_at(const function_application_exprt &f);
+  void convert_string_substring(const function_application_exprt &f);
+  void convert_string_is_prefix(const function_application_exprt &f);
+  void convert_string_is_suffix(const function_application_exprt &f);
+
+  defined_expressionst string_lengths;
 };
 
 #endif
