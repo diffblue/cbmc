@@ -8,6 +8,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include <util/symbol.h>
 
+#include "jsil_types.h"
+
 #include "jsil_parse_tree.h"
 
 /*******************************************************************\
@@ -66,10 +68,19 @@ void jsil_declarationt::to_symbol(symbolt &symbol) const
   symbol_exprt s(to_symbol_expr(
       static_cast<const exprt&>(find(ID_declarator))));
 
+  code_typet symbol_type=to_code_type(s.type());
+
+  irep_idt proc_type=s.get("proc_type");
+
+  if(proc_type=="builtin")
+	  symbol_type=jsil_builtin_code_typet(symbol_type);
+  else if(proc_type=="spec")
+    symbol_type=jsil_spec_code_typet(symbol_type);
+
   symbol.name=s.get_identifier();
   symbol.base_name=s.get_identifier();
   symbol.mode="jsil";
-  symbol.type=s.type();
+  symbol.type=symbol_type;
   symbol.location=s.source_location();
 
   code_blockt code(to_code_block(
@@ -133,4 +144,3 @@ void jsil_parse_treet::output(std::ostream &out) const
     out << "\n";
   }
 }
-

@@ -120,7 +120,7 @@ Function: jsil_languaget::typecheck
 
  Outputs:
 
- Purpose:
+ Purpose: Converting from parse tree and type checking.
 
 \*******************************************************************/
 
@@ -130,6 +130,8 @@ bool jsil_languaget::typecheck(
 {
   if(jsil_convert(parse_tree, symbol_table, get_message_handler()))
     return true;
+
+  jsil_internal_additions(symbol_table);
 
   // now typecheck
   if(jsil_typecheck(symbol_table, get_message_handler()))
@@ -152,7 +154,6 @@ Function: jsil_languaget::final
 
 bool jsil_languaget::final(symbol_tablet &symbol_table)
 {
-  jsil_internal_additions(symbol_table);
 
   if(jsil_entry_point(
       symbol_table,

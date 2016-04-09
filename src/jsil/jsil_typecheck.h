@@ -11,6 +11,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include <util/typecheck.h>
 #include <util/namespace.h>
+#include "jsil_parse_tree.h"
 
 class codet;
 
@@ -31,29 +32,58 @@ public:
     message_handlert &_message_handler):
     legacy_typecheckt(_message_handler),
     symbol_table(_symbol_table),
-    ns(symbol_table)
+    ns(symbol_table),
+    proc_name("")
   {
   }
 
   virtual ~jsil_typecheckt() { }
 
   virtual void typecheck();
-  virtual void typecheck_expr(exprt &expr) {};
+  virtual void typecheck_expr(exprt &expr);
 
 protected:
   symbol_tablet &symbol_table;
   const namespacet ns;
+  // prefix to variables which is set in typecheck_declaration
+  irep_idt proc_name;
 
+  void update_expr_type (exprt &expr, const typet &type);
+  void make_type_compatible(exprt &expr, const typet &type, bool must);
   void typecheck_type_symbol(symbolt &symbol) {};
   void typecheck_non_type_symbol(symbolt &symbol);
+  void typecheck_symbol_expr(symbol_exprt &symbol_expr);
+  void typecheck_expr_side_effect(side_effect_exprt &expr) {};
+  void typecheck_expr_delete(exprt &expr);
+  void typecheck_expr_index(exprt &expr);
+  void typecheck_expr_proto_field(exprt &expr);
+  void typecheck_expr_proto_obj(exprt &expr);
+  void typecheck_expr_has_field(exprt &expr);
+  void typecheck_expr_ref(exprt &expr);
+  void typecheck_expr_field(exprt &expr);
+  void typecheck_expr_base(exprt &expr);
+  void typecheck_expr_constant(exprt &expr);
+  void typecheck_expr_concatenation(exprt &expr);
+  void typecheck_expr_subtype(exprt &expr);
+  void typecheck_expr_binary_boolean(exprt &expr);
+  void typecheck_expr_binary_arith(exprt &expr);
+  void typecheck_exp_binary_equal(exprt &expr);
+  void typecheck_expr_binary_compare(exprt &expr);
+  void typecheck_expr_unary_boolean(exprt &expr);
+  void typecheck_expr_unary_string(exprt &expr);
+  void typecheck_expr_unary_num(exprt &expr);
+  void typecheck_expr_operands(exprt &expr);
+  void typecheck_expr_main(exprt &expr);
   void typecheck_code(codet &code);
-  void typecheck_type(typet &type) {};
-#if 0
-  void typecheck_expr_symbol(symbol_exprt &expr);
-  void typecheck_expr_member(member_exprt &expr);
-  void typecheck_expr_java_new(side_effect_exprt &expr);
-  void typecheck_expr_java_new_array(side_effect_exprt &expr);
-#endif
+  void typecheck_function_call(code_function_callt &code) {};
+  void typecheck_decl(code_declt &code) {};
+  void typecheck_return(codet &code) {};
+  void typecheck_block(codet &code);
+  void typecheck_ifthenelse(code_ifthenelset &code);
+  void typecheck_assign(codet &code);
+  void typecheck_try_catch (code_try_catcht &code);
+  void typecheck_type(typet &type);
+  dstring add_prefix(const dstring &ds);
 
   // overload to use language-specific syntax
   virtual std::string to_string(const exprt &expr);
@@ -63,4 +93,3 @@ protected:
 };
 
 #endif
-
