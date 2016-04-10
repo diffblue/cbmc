@@ -44,6 +44,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_analyzer_parse_options.h"
 #include "taint_analysis.h"
+#include "unreachable_instructions.h"
+#include "static_analyzer.h"
 
 /*******************************************************************\
 
@@ -130,18 +132,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   }
 
   #if 0
-  if(cmdline.isset("program-only"))
-    options.set_option("program-only", true);
-
-  if(cmdline.isset("show-vcc"))
-    options.set_option("show-vcc", true);
-
-  if(cmdline.isset("cover"))
-    options.set_option("cover", cmdline.get_value("cover"));
-
-  if(cmdline.isset("mm"))
-    options.set_option("mm", cmdline.get_value("mm"));
-
   if(cmdline.isset("c89"))
     config.ansi_c.set_c89();
 
@@ -159,39 +149,9 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("cpp11"))
     config.cpp.set_cpp11();
+  #endif
 
-  if(cmdline.isset("no-simplify"))
-    options.set_option("simplify", false);
-  else
-    options.set_option("simplify", true);
-
-  if(cmdline.isset("all-claims") || // will go away
-     cmdline.isset("all-properties")) // use this one
-    options.set_option("all-properties", true);
-  else
-    options.set_option("all-properties", false);
-
-  if(cmdline.isset("unwind"))
-    options.set_option("unwind", cmdline.get_value("unwind"));
-
-  if(cmdline.isset("depth"))
-    options.set_option("depth", cmdline.get_value("depth"));
-
-  if(cmdline.isset("debug-level"))
-    options.set_option("debug-level", cmdline.get_value("debug-level"));
-
-  if(cmdline.isset("slice-by-trace"))
-    options.set_option("slice-by-trace", cmdline.get_value("slice-by-trace"));
-
-  if(cmdline.isset("unwindset"))
-    options.set_option("unwindset", cmdline.get_value("unwindset"));
-
-  // constant propagation
-  if(cmdline.isset("no-propagation"))
-    options.set_option("propagation", false);
-  else
-    options.set_option("propagation", true);
-
+  #if 0
   // check array bounds
   if(cmdline.isset("bounds-check"))
     options.set_option("bounds-check", true);
@@ -255,178 +215,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   // magic error label
   if(cmdline.isset("error-label"))
     options.set_option("error-label", cmdline.get_values("error-label"));
-
-  // generate unwinding assertions
-  if(cmdline.isset("cover"))
-    options.set_option("unwinding-assertions", false);
-  else
-    options.set_option("unwinding-assertions",
-      cmdline.isset("unwinding-assertions"));
-
-  // generate unwinding assumptions otherwise
-  options.set_option("partial-loops",
-   cmdline.isset("partial-loops"));
-   
-  if(options.get_bool_option("partial-loops") &&
-     options.get_bool_option("unwinding-assertions"))
-  {
-    error() << "--partial-loops and --unwinding-assertions must not be given together" << eom;
-    exit(1);
-  }
-
-  // remove unused equations
-  options.set_option("slice-formula",
-       cmdline.isset("slice-formula"));
-
-  // simplify if conditions and branches
-  if(cmdline.isset("no-simplify-if"))
-    options.set_option("simplify-if", false);
-  else
-    options.set_option("simplify-if", true);
-
-  if(cmdline.isset("arrays-uf-always"))
-    options.set_option("arrays-uf", "always");
-  else if(cmdline.isset("arrays-uf-never"))
-    options.set_option("arrays-uf", "never");
-  else
-    options.set_option("arrays-uf", "auto");
-
-  if(cmdline.isset("dimacs"))
-    options.set_option("dimacs", true);
-
-  if(cmdline.isset("refine-arrays"))
-  {
-    options.set_option("refine", true);
-    options.set_option("refine-arrays", true);
-  }
-
-  if(cmdline.isset("refine-arithmetic"))
-  {
-    options.set_option("refine", true);
-    options.set_option("refine-arithmetic", true);
-  }
-
-  if(cmdline.isset("refine"))
-  {
-    options.set_option("refine", true);
-    options.set_option("refine-arrays", true);
-    options.set_option("refine-arithmetic", true);
-  }
-
-  if(cmdline.isset("max-node-refinement"))
-    options.set_option("max-node-refinement", cmdline.get_value("max-node-refinement"));
-
-  if(cmdline.isset("aig"))
-    options.set_option("aig", true);
-
-  // SMT Options
-  bool version_set = false;
-
-  if(cmdline.isset("smt1"))
-  {
-    options.set_option("smt1", true);
-    options.set_option("smt2", false);
-    version_set = true;
-  }
-
-  if(cmdline.isset("smt2"))
-  {
-    options.set_option("smt1", false);// If both are given, smt2 takes precedence
-    options.set_option("smt2", true);
-    version_set = true;
-  }
-
-  if(cmdline.isset("fpa"))
-    options.set_option("fpa", true);
-
-  bool solver_set = false;
-
-  if(cmdline.isset("boolector"))
-  {
-    options.set_option("boolector", true), solver_set = true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set = true;
-  }
-
-  if(cmdline.isset("mathsat"))
-  {
-    options.set_option("mathsat", true), solver_set = true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set = true;
-  }
-
-  if(cmdline.isset("cvc3"))
-  {
-    options.set_option("cvc3", true), solver_set = true;
-    if(!version_set)
-      options.set_option("smt1", true), version_set = true;
-  }
-
-  if(cmdline.isset("cvc4"))
-  {
-    options.set_option("cvc4", true), solver_set = true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set = true;
-  }
-
-  if(cmdline.isset("yices"))
-  {
-    options.set_option("yices", true), solver_set = true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set = true;
-  }
-
-  if(cmdline.isset("z3"))
-  {
-    options.set_option("z3", true), solver_set = true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set = true;
-  }
-
-  if(cmdline.isset("opensmt"))
-  {
-    options.set_option("opensmt", true), solver_set = true;
-    if(!version_set)
-      options.set_option("smt1", true), version_set = true;
-  }
-
-  if(version_set && !solver_set)
-  {
-    if(cmdline.isset("outfile"))
-    {
-      // outfile and no solver should give standard compliant SMT-LIB
-      options.set_option("generic", true), solver_set = true;
-    }
-    else
-    {
-      if(options.get_bool_option("smt1"))
-      {
-        options.set_option("boolector", true), solver_set = true;
-      }
-      else
-      {
-        assert(options.get_bool_option("smt2"));
-        options.set_option("mathsat", true), solver_set = true;
-      }
-    }
-  }
-  // Either have solver and standard version set, or neither.
-  assert(version_set == solver_set);
-
-  if(cmdline.isset("beautify"))
-    options.set_option("beautify", true);
-
-  options.set_option("pretty-names", 
-                     !cmdline.isset("no-pretty-names"));
-
-  if(cmdline.isset("outfile"))
-    options.set_option("outfile", cmdline.get_value("outfile"));
-
-  if(cmdline.isset("graphml-cex"))
-    options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
-
-  if(cmdline.isset("json-cex"))
-    options.set_option("json-cex", cmdline.get_value("json-cex"));
   #endif
 }
 
@@ -466,14 +254,8 @@ int goto_analyzer_parse_optionst::doit()
            << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
-  if(!cmdline.isset("taint"))
-  {
-    error() << "no analysis option given -- consider reading --help"
-            << eom;
-    return 6;
-  }
-
   register_languages();
+  const namespacet ns(symbol_table);
   
   goto_functionst goto_functions;
 
@@ -485,7 +267,6 @@ int goto_analyzer_parse_optionst::doit()
 
   if(cmdline.isset("taint"))
   {
-    const namespacet ns(symbol_table);
     std::string taint_file=cmdline.get_value("taint");
 
     if(cmdline.isset("show-taint"))
@@ -502,10 +283,33 @@ int goto_analyzer_parse_optionst::doit()
     }
   }
 
-  #if 0  
+  if(cmdline.isset("unreachable-instructions"))
+  {
+    const std::string json_file=cmdline.get_value("json");
+
+    if(json_file.empty())
+      unreachable_instructions(goto_functions, ns, false, std::cout);
+    else if(json_file=="-")
+      unreachable_instructions(goto_functions, ns, true, std::cout);
+    else
+    {
+      std::ofstream ofs(json_file);
+      if(!ofs)
+      {
+        error() << "Failed to open json output `"
+                << json_file << "'" << eom;
+        return 6;
+      }
+
+      unreachable_instructions(goto_functions, ns, true, ofs);
+    }
+
+    return 0;
+  }
+
   label_properties(goto_functions);
 
-  if(cmdline.isset("show-properties")) // use this one
+  if(cmdline.isset("show-properties"))
   {
     const namespacet ns(symbol_table);
     show_properties(ns, get_ui(), goto_functions);
@@ -514,9 +318,27 @@ int goto_analyzer_parse_optionst::doit()
 
   if(set_properties(goto_functions))
     return 7;
-  #endif
   
-  return 8;
+  if(cmdline.isset("show-intervals"))
+  {
+    show_intervals(goto_functions, ns, std::cout);
+    return 0;
+  }
+
+  if(cmdline.isset("non-null") ||
+     cmdline.isset("intervals"))
+  {
+    optionst options;
+    options.set_option("json", cmdline.get_value("json"));
+    options.set_option("xml", cmdline.get_value("xml"));
+    bool result=
+      static_analyzer(goto_functions, ns, options, get_message_handler());
+    return result?10:0;
+  }
+
+  error() << "no analysis option given -- consider reading --help"
+          << eom;
+  return 6;
 }
 
 /*******************************************************************\
@@ -676,7 +498,7 @@ int goto_analyzer_parse_optionst::get_goto_program(
       return 0;
     }
 
-    #if 0
+    #if 1
     if(entry_point(symbol_table, "main", get_message_handler()))
       return 6;
     #endif
@@ -840,9 +662,13 @@ void goto_analyzer_parse_optionst::help()
     "Analyses:\n"
     "\n"
     " --taint file_name            perform taint analysis using rules in given file\n"
+    " --unreachable-instructions   list dead code\n"
+    " --interval                   interval analysis\n"
+    " --non-null                   non-null analysis\n"
     "\n"
     "Analysis options:\n"
-    " --show-properties            show the properties, but don't run analysis\n"
+    " --json file_name             output results in JSON format to given file\n"
+    " --xml file_name              output results in XML format to given file\n"
     "\n"
     "Frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -874,6 +700,7 @@ void goto_analyzer_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"
+    " --show-properties            show the properties, but don't run analysis\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

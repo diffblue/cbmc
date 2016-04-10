@@ -11,17 +11,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/value_sets.h>
 
-#include "static_analysis.h"
+#include "ai.h"
 #include "invariant_set_domain.h"
 
 class invariant_propagationt:public
-  static_analysist<invariant_set_domaint>
+  ait<invariant_set_domaint>
 {
 public:
   invariant_propagationt(
     const namespacet &_ns,
     value_setst &_value_sets):
-    static_analysist<invariant_set_domaint>(_ns),
+    ait<invariant_set_domaint>(),
+    ns(_ns),
     value_sets(_value_sets),
     object_store(_ns)
   {
@@ -41,9 +42,10 @@ public:
   void simplify(goto_programt &goto_program);
   void simplify(goto_functionst &goto_functions);
   
-  typedef static_analysist<invariant_set_domaint> baset;
+  typedef ait<invariant_set_domaint> baset;
   
 protected:
+  const namespacet &ns;
   value_setst &value_sets;
   
   inv_object_storet object_store;

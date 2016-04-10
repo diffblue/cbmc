@@ -217,7 +217,7 @@ bool entry_point(
   const std::string &standard_main,
   message_handlert &message_handler)
 {
-  // check if main is already there
+  // check if entry point is already there
   if(symbol_table.symbols.find(goto_functionst::entry_point())!=
      symbol_table.symbols.end())
     return false; // silently ignore
@@ -507,7 +507,7 @@ bool entry_point(
 
   init_code.move_to_operands(call_main);
 
-  // add "main"
+  // add the entry point symbol
   symbolt new_symbol;
 
   code_typet main_type;
