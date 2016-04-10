@@ -30,8 +30,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
-#include <linking/entry_point.h>
-
 #include <langapi/mode.h>
 
 #include <util/language.h>
@@ -472,7 +470,7 @@ int goto_analyzer_parse_optionst::get_goto_program(
     {
       if(parse()) return 6;
       if(typecheck()) return 6;
-      if(binaries.empty() && final()) return 6;
+      if(final()) return 6;
 
       // we no longer need any parse trees or language files
       clear_parse();
@@ -497,11 +495,6 @@ int goto_analyzer_parse_optionst::get_goto_program(
       show_symbol_table();
       return 0;
     }
-
-    #if 1
-    if(entry_point(symbol_table, "main", get_message_handler()))
-      return 6;
-    #endif
 
     status() << "Generating GOTO Program" << eom;
 
@@ -670,7 +663,7 @@ void goto_analyzer_parse_optionst::help()
     " --json file_name             output results in JSON format to given file\n"
     " --xml file_name              output results in XML format to given file\n"
     "\n"
-    "Frontend options:\n"
+    "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
     " -D macro                     define preprocessor macro (C/C++)\n"
     " --arch X                     set architecture (default: "
@@ -695,6 +688,10 @@ void goto_analyzer_parse_optionst::help()
     " --gcc                        use GCC as preprocessor\n"
     #endif
     " --no-library                 disable built-in abstract C library\n"
+    "\n"
+    "Java Bytecode frontend options:\n"
+    " --classpath dir/jar          set the classpath\n"
+    " --main-class class-name      set the name of the main class\n"
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"

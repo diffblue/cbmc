@@ -41,8 +41,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 
-#include <linking/entry_point.h>
-
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/goto_check.h>
@@ -728,9 +726,6 @@ int cbmc_parse_optionst::get_goto_program(
       return 0;
     }
 
-    if(entry_point(symbol_table, "main", get_message_handler()))
-      return 6;
-
     status() << "Generating GOTO Program" << eom;
 
     goto_convert(symbol_table, goto_functions, ui_message_handler);
@@ -1034,7 +1029,7 @@ void cbmc_parse_optionst::help()
     " --all-properties             check and report status of all properties\n"
     " --show-properties            show the properties, but don't run analysis\n"
     "\n"
-    "Frontend options:\n"
+    "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
     " -D macro                     define preprocessor macro (C/C++)\n"
     " --preprocess                 stop after preprocessing\n"
@@ -1092,6 +1087,10 @@ void cbmc_parse_optionst::help()
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n"
     " --mm MM                      memory consistency model for concurrent programs\n"
+    "\n"
+    "Java Bytecode frontend options:\n"
+    " --classpath dir/jar          set the classpath\n"
+    " --main-class class-name      set the name of the main class\n"
     "\n"
     "Semantic transformations:\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"

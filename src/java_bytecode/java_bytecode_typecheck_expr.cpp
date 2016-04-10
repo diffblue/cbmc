@@ -165,6 +165,7 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
   // the member might be in a parent class
   const irep_idt component_name=expr.get_component_name();
 
+  #if 0
   while(1)
   {
     // TODO handle vtables
@@ -179,8 +180,12 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
     
     if(components.empty())
     {
-      err_location(expr);
-      throw "failed to find field in class hierarchy";
+      #if 0
+      warning().sourc_location=expr.source_location();
+      warning() << "failed to find field `"
+                << component_name << "` in class hierarchy" << eom;
+      #endif
+      return;
     }
     
     const struct_typet::componentt &c=components.front();
@@ -190,4 +195,5 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
     
     expr.struct_op()=m;
   }
+  #endif
 }

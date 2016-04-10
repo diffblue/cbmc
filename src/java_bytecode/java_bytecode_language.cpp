@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/suffix.h>
+#include <util/config.h>
 
 #include "java_bytecode_language.h"
 #include "java_bytecode_convert.h"
@@ -101,27 +102,37 @@ bool java_bytecode_languaget::parse(
   if(has_suffix(path, ".class"))
   {
     java_class_loader.add_class_file(path);
-    main_class=java_class_loadert::file_to_class_name(path);
-    java_class_loader(main_class);
+    
+    if(config.java.main_class.empty())
+      main_class=java_class_loadert::file_to_class_name(path);
+    else
+      main_class=config.java.main_class;
   }
   else if(has_suffix(path, ".jar"))
   {
     java_class_loader.add_jar_file(path);
 
-    // Does it have a main class set in the manifest?
-    std::map<std::string, std::string> manifest;
-    get_jar_manifest(path, manifest);
-
-    std::string manifest_main_class=manifest["Main-Class"];
-    if(manifest_main_class!="")
+    if(config.java.main_class.empty())
     {
-      main_class=manifest_main_class;
-      status() << "Java main class: " << main_class << eom;
-      java_class_loader(main_class);
+      // Does it have a main class set in the manifest?
+      std::map<std::string, std::string> manifest;
+      get_jar_manifest(path, manifest);
+      std::string manifest_main_class=manifest["Main-Class"];
+
+      if(manifest_main_class!="")
+        main_class=manifest_main_class;
     }
+    else
+      main_class=config.java.main_class;
   }
   else
     assert(false);
+
+  if(!main_class.empty())
+  {
+    status() << "Java main class: " << main_class << eom;
+    java_class_loader(main_class);
+  }
 
   return false;
 }

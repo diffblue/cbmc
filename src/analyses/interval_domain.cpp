@@ -34,7 +34,7 @@ void interval_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
-  if(is_bottom)
+  if(bottom)
   {
     out << "BOTTOM\n";
     return;
@@ -48,7 +48,7 @@ void interval_domaint::output(
       out << i_it->second.lower << " <= ";
     out << i_it->first;
     if(i_it->second.upper_set)
-      out << " <= " << i_it->second.lower;
+      out << " <= " << i_it->second.upper;
     out << "\n";
   }
 
@@ -60,7 +60,7 @@ void interval_domaint::output(
       out << i_it->second.lower << " <= ";
     out << i_it->first;
     if(i_it->second.upper_set)
-      out << " <= " << i_it->second.lower;
+      out << " <= " << i_it->second.upper;
     out << "\n";
   }
 }
@@ -143,8 +143,8 @@ bool interval_domaint::merge(
   locationt from,
   locationt to)
 {
-  if(b.is_bottom) return false;
-  if(is_bottom) { *this=b; return true; }
+  if(b.bottom) return false;
+  if(bottom) { *this=b; return true; }
 
   bool result=false;
   
@@ -299,13 +299,17 @@ void interval_domaint::assume_rec(
       mp_integer tmp;
       to_integer(rhs, tmp);
       if(id==ID_lt) --tmp;
-      int_map[lhs_identifier].make_le_than(tmp);
+      integer_intervalt &ii=int_map[lhs_identifier];
+      ii.make_le_than(tmp);
+      if(ii.is_bottom()) make_bottom();
     }
     else if(is_float(lhs.type()) && is_float(rhs.type()))
     {
       ieee_floatt tmp(to_constant_expr(rhs));
       if(id==ID_lt) tmp.decrement();
-      float_map[lhs_identifier].make_le_than(tmp);
+      ieee_float_intervalt &fi=float_map[lhs_identifier];
+      fi.make_le_than(tmp);
+      if(fi.is_bottom()) make_bottom();
     }
   }
   else if(lhs.id()==ID_constant && rhs.id()==ID_symbol)
@@ -317,13 +321,17 @@ void interval_domaint::assume_rec(
       mp_integer tmp;
       to_integer(lhs, tmp);
       if(id==ID_lt) ++tmp;
-      int_map[rhs_identifier].make_ge_than(tmp);
+      integer_intervalt &ii=int_map[rhs_identifier];
+      ii.make_ge_than(tmp);
+      if(ii.is_bottom()) make_bottom();
     }
     else if(is_float(lhs.type()) && is_float(rhs.type()))
     {
       ieee_floatt tmp(to_constant_expr(lhs));
       if(id==ID_lt) tmp.increment();
-      float_map[rhs_identifier].make_ge_than(tmp);
+      ieee_float_intervalt &fi=float_map[rhs_identifier];
+      fi.make_ge_than(tmp);
+      if(fi.is_bottom()) make_bottom();
     }
   }
   else if(lhs.id()==ID_symbol && rhs.id()==ID_symbol)
@@ -337,6 +345,7 @@ void interval_domaint::assume_rec(
       integer_intervalt &rhs_i=int_map[rhs_identifier];
       lhs_i.meet(rhs_i);
       rhs_i=lhs_i;
+      if(rhs_i.is_bottom()) make_bottom();
     }
     else if(is_float(lhs.type()) && is_float(rhs.type()))
     {
@@ -344,6 +353,7 @@ void interval_domaint::assume_rec(
       ieee_float_intervalt &rhs_i=float_map[rhs_identifier];
       lhs_i.meet(rhs_i);
       rhs_i=lhs_i;
+      if(rhs_i.is_bottom()) make_bottom();
     }
   }
 }
@@ -360,7 +370,9 @@ Function: interval_domaint::assume_rec
 
 \*******************************************************************/
 
-void interval_domaint::assume_rec(const exprt &cond, bool negation)
+void interval_domaint::assume_rec(
+  const exprt &cond,
+  bool negation)
 {
   if(cond.id()==ID_lt || cond.id()==ID_le ||
      cond.id()==ID_gt || cond.id()==ID_ge ||

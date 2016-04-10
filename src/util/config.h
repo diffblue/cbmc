@@ -138,6 +138,7 @@ public:
   struct javat
   {
     std::list<std::string> class_path;
+    irep_idt main_class;
   } java;
 
   // this is the function to start executing
