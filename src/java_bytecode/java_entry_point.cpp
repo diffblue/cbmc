@@ -200,18 +200,14 @@ bool java_entry_point(
 
   if(matches.empty())
   {
-    messaget message(message_handler);
-
-    message.error() << "main method `" << main_class
-                    << "' not in symbol table" << messaget::eom;
-      
-    return true; // give up with error, no main
+    // Not found, silently ignore
+    return false;
   }
 
   if(matches.size()>=2)
   {
     messaget message(message_handler);
-    message.error() << "main method `" << main_class
+    message.error() << "main method in `" << main_class
                     << "' is ambiguous" << messaget::eom;
     return true; // give up with error, no main
   }

@@ -48,7 +48,7 @@ protected:
   };
 
   typedef std::vector<functiont> functionst;
-  void get_functions(const exprt &, functionst &);
+  void get_functions(const symbol_exprt &, functionst &);
   exprt get_method(const irep_idt &class_id, const symbol_exprt &);
   
   exprt build_class_identifier(const exprt &);
@@ -138,10 +138,11 @@ void remove_virtual_functionst::remove_virtual_function(
 
   const exprt &function=code.function();
   assert(function.id()==ID_virtual_function);
-  assert(function.operands().size()==2);
+  assert(function.operands().size()==1);
+  assert(!code.arguments().empty());
   
   functionst functions;
-  get_functions(function, functions);
+  get_functions(to_symbol_expr(function.op0()), functions);
   
   if(functions.empty())
   {
@@ -173,8 +174,16 @@ void remove_virtual_functionst::remove_virtual_function(
     // goto final
     goto_programt::targett t3=new_code_calls.add_instruction();
     t3->make_goto(t_final, true_exprt());
+
+    exprt this_expr=code.arguments()[0];    
+    if(this_expr.type().id()!=ID_pointer ||
+       this_expr.type().id()!=ID_struct)
+    {
+      symbol_typet symbol_type(it->class_id);
+      this_expr=typecast_exprt(this_expr, pointer_typet(symbol_type));
+    }
     
-    exprt deref=dereference_exprt(function.op1(), function.op1().type().subtype());
+    exprt deref=dereference_exprt(this_expr, this_expr.type().subtype());
     exprt c_id1=constant_exprt(it->class_id, string_typet());
     exprt c_id2=build_class_identifier(deref);
     
@@ -221,28 +230,28 @@ Function: remove_virtual_functionst::get_functions
 
 \*******************************************************************/
 
+#include <iostream>
+
 void remove_virtual_functionst::get_functions(
-  const exprt &virtual_function,
+  const symbol_exprt &function,
   functionst &functions)
 {
-  assert(virtual_function.id()==ID_virtual_function);
-  assert(virtual_function.operands().size()==2);
-  assert(virtual_function.op1().type().id()==ID_pointer);
-  assert(virtual_function.op1().type().subtype().id()==ID_symbol);
+  irep_idt class_id=function.get(ID_C_class);
+  assert(!class_id.empty());
   
-  const symbol_exprt &function_symbol=
-    to_symbol_expr(virtual_function.op0());
+  std::cout << "GETTING " << function.get_identifier() << " " << class_id << "\n"; 
   
-  irep_idt class_id=
-    to_symbol_type(virtual_function.op1().type().subtype()).get_identifier();
+  class_hierarchy.output(std::cout);
   
   // iterate over all children, transitively
   std::vector<irep_idt> children;
   class_hierarchy.get_children(class_id, children);
+    std::cout << "CHILDREN: " << children.size() << "\n";
 
   for(const auto & child : children)
   {
-    exprt method=get_method(child, function_symbol);
+    std::cout << "CHILD: " << child << "\n";
+    exprt method=get_method(child, function);
     if(method.is_not_nil())
     {
       functiont function;
@@ -257,7 +266,7 @@ void remove_virtual_functionst::get_functions(
   irep_idt c=class_id;
   while(!c.empty())
   {
-    exprt method=get_method(c, function_symbol);
+    exprt method=get_method(c, function);
     if(method.is_not_nil())
     {
       functiont function;

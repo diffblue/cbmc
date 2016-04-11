@@ -769,10 +769,7 @@ codet java_bytecode_convertt::convert_instructions(
       {
         assert(use_this);
         assert(!call.arguments().empty());
-        const exprt &this_arg=call.arguments().front();
-        
-        call.function()=make_virtual_function(
-          to_symbol_expr(arg0), this_arg);
+        call.function()=unary_exprt(ID_virtual_function, to_symbol_expr(arg0), arg0.type());
       }
       else
         call.function()=arg0;

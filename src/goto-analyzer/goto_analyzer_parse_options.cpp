@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/set_properties.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
@@ -562,9 +563,10 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     #endif
 
     // remove function pointers
-    status() << "Function Pointer Removal" << eom;
+    status() << "Removing function pointers and virtual functions" << eom;
     remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
+    remove_virtual_functions(symbol_table, goto_functions);
 
     // do partial inlining
     status() << "Partial Inlining" << eom;
