@@ -84,9 +84,9 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
     
     const auto &jm=jar_map[jf];
   
-    auto jm_it=jm.find(class_name);
+    auto jm_it=jm.entries.find(class_name);
     
-    if(jm_it!=jm.end())
+    if(jm_it!=jm.entries.end())
     {
       debug() << "Getting class `" << class_name << "' from JAR "
               << jf << eom;
@@ -118,9 +118,9 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
       
       const auto &jm=jar_map[cp];
     
-      auto jm_it=jm.find(class_name);
+      auto jm_it=jm.entries.find(class_name);
       
-      if(jm_it!=jm.end())
+      if(jm_it!=jm.entries.end())
       {
         debug() << "Getting class `" << class_name << "' from JAR "
                 << cp << eom;
@@ -196,7 +196,7 @@ void java_class_loadert::read_jar_file(const irep_idt &file)
   
   debug() << "adding JAR file `" << file << "'" << eom;
 
-  std::map<irep_idt, jar_entryt> &jm=jar_map[file];  
+  auto &jm=jar_map[file];  
   std::size_t number_of_files=entries.size();
   
   for(std::size_t index=0; index<number_of_files; index++)
@@ -209,7 +209,7 @@ void java_class_loadert::read_jar_file(const irep_idt &file)
       irep_idt class_name=file_to_class_name(file_name);
     
       // record
-      jm[class_name].index=index;
+      jm.entries[class_name].index=index;
     }
   }
 }

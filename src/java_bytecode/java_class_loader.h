@@ -33,13 +33,20 @@ public:
   }
 
 protected:
-  struct jar_entryt
+  class jar_filet
   {
-    std::size_t index;
+  public:
+    struct entryt
+    {
+      std::size_t index;
+    };
+  
+    typedef std::map<irep_idt, entryt> entriest;
+    entriest entries;
   };
 
   // maps jar files to maps of class names
-  typedef std::map<irep_idt, std::map<irep_idt, jar_entryt> > jar_mapt;
+  typedef std::map<irep_idt, jar_filet> jar_mapt;
   jar_mapt jar_map;
   
   void read_jar_file(const irep_idt &);
