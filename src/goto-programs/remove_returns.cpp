@@ -167,20 +167,10 @@ void remove_returnst::do_function_calls(
         {
           exprt rhs;
           
-          if(f_it->second.body_available())
-          {
-            symbol_exprt return_value;
-            return_value.type()=function_call.lhs().type();
-            return_value.set_identifier(id2string(function_id)+RETURN_VALUE_SUFFIX);
-            rhs=return_value;
-          }
-          else
-          {
-            // no body available
-            exprt nondet_value=side_effect_expr_nondett(function_call.lhs().type());
-            nondet_value.add_source_location()=i_it->source_location;
-            rhs=nondet_value;
-          }
+          symbol_exprt return_value;
+          return_value.type()=function_call.lhs().type();
+          return_value.set_identifier(id2string(function_id)+RETURN_VALUE_SUFFIX);
+          rhs=return_value;
 
           goto_programt::targett t_a=goto_program.insert_after(i_it);
           t_a->make_assignment();
@@ -384,8 +374,6 @@ void remove_returnst::undo_function_calls(
 
       // find "f(...); lhs=f#return_value; DEAD f#return_value;"
       // and revert to "lhs=f(...);"
-      // nondet assignments when the body of f isn't available are
-      // not reverted
       goto_programt::instructionst::iterator next=i_it;
       ++next;
       assert(next!=goto_program.instructions.end());
