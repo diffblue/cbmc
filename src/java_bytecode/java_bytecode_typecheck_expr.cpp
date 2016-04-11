@@ -164,10 +164,10 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
 {
   // The member might be in a parent class, which we resolve here.
   const irep_idt component_name=expr.get_component_name();
-
+  
   while(1)
   {
-    if(expr.struct_op().type().id()!=ID_struct)
+    if(ns.follow(expr.struct_op().type()).id()!=ID_struct)
       break; // give up
   
     const struct_typet &struct_type=
