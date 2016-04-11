@@ -8,6 +8,8 @@ Date: April 2016
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include <util/std_types.h>
 
 #include "class_hierarchy.h"
@@ -100,4 +102,24 @@ irep_idt class_hierarchyt::get_parent(const irep_idt &c) const
   class_mapt::const_iterator it=class_map.find(c);
   if(it==class_map.end()) return irep_idt();
   return it->second.parent;
+}
+
+/*******************************************************************\
+
+Function: class_hierarchyt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void class_hierarchyt::output(std::ostream &out) const
+{
+  for(const auto & c : class_map)
+  {
+    out << c.first << ": " << c.second.parent << '\n';
+  }
 }

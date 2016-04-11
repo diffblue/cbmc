@@ -11,6 +11,8 @@ Date: April 2016
 #ifndef CPROVER_CLASS_HIERARCHY_H
 #define CPROVER_CLASS_HIERARCHY_H
 
+#include <iosfwd>
+
 #include <util/symbol_table.h>
 
 class class_hierarchyt
@@ -33,6 +35,8 @@ public:
   void get_children(const irep_idt &, std::vector<irep_idt> &) const;
   
   irep_idt get_parent(const irep_idt &) const;
+  
+  void output(std::ostream &) const;
 };
 
 #endif
