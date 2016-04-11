@@ -468,20 +468,7 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_Class:
       {
         const std::string &s=id2string(pool_entry(it->ref1).s);
-      
-        if(!s.empty() &&
-           s[0]=='[')
-        {
-          it->expr=type_exprt(java_type_from_string(s));
-        }
-        else
-        {
-          std::string class_name=slash_to_dot(s);
-          irep_idt identifier="java::"+class_name;
-          symbol_typet symbol_type(identifier);
-          symbol_type.set(ID_C_base_name, class_name);
-          it->expr=type_exprt(symbol_type);
-        }
+        it->expr=type_exprt(java_classname(s));
       }
       break;
 
@@ -492,12 +479,12 @@ void java_bytecode_parsert::rconstant_pool()
         const pool_entryt &class_entry=pool_entry(it->ref1);
         const pool_entryt &class_name_entry=pool_entry(class_entry.ref1);
         typet type=type_entry(nameandtype_entry.ref2);
-        
-        irep_idt class_identifier=
-          "java::"+slash_to_dot(id2string(class_name_entry.s));
 
+        symbol_typet class_symbol=
+          java_classname(id2string(class_name_entry.s));
+        
         exprt fieldref("fieldref", type);
-        fieldref.set(ID_class, class_identifier);
+        fieldref.set(ID_class, class_symbol.get_identifier());
         fieldref.set(ID_component_name, name_entry.s);
 
         it->expr=fieldref;
@@ -513,15 +500,17 @@ void java_bytecode_parsert::rconstant_pool()
         const pool_entryt &class_name_entry=pool_entry(class_entry.ref1);
         typet type=type_entry(nameandtype_entry.ref2);
         
+        symbol_typet class_symbol=
+          java_classname(id2string(class_name_entry.s));
+        
         irep_idt identifier=
-          "java::"+slash_to_dot(id2string(class_name_entry.s))+
+          id2string(class_symbol.get_identifier())+
           "."+id2string(name_entry.s)+
           ":"+id2string(pool_entry(nameandtype_entry.ref2).s);
 
         symbol_exprt symbol_expr(identifier, type);
         symbol_expr.set(ID_C_base_name, name_entry.s);
-        symbol_expr.set(ID_C_class,
-          "java::"+slash_to_dot(id2string(class_name_entry.s)));
+        symbol_expr.set(ID_C_class, class_symbol.get_identifier());
 
         it->expr=symbol_expr;
       }
