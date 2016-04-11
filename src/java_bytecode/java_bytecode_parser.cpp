@@ -160,15 +160,6 @@ protected:
   {
     return read_bytes(8);
   }
-
-  // java/lang/Object -> java.lang.Object
-  static std::string slash_to_dot(const std::string &src)
-  {
-    std::string result=src;
-    for(std::string::iterator it=result.begin(); it!=result.end(); it++)
-      if(*it=='/') *it='.';
-    return result;
-  }
 };
 
 #define CONSTANT_Class                7
@@ -328,41 +319,23 @@ void java_bytecode_parsert::get_class_refs()
       else if(it->expr.type().id()==ID_array)
         parse_tree.class_refs.insert(it->expr.type().subtype().get(ID_C_base_name));
     }
-  }
-  
-  std::set<irep_idt> signatures;
-
-  for(methodst::const_iterator m_it=parse_tree.parsed_class.methods.begin();
-      m_it!=parse_tree.parsed_class.methods.end();
-      m_it++)
-    signatures.insert(m_it->signature);
-
-  for(fieldst::const_iterator m_it=parse_tree.parsed_class.fields.begin();
-      m_it!=parse_tree.parsed_class.fields.end();
-      m_it++)
-    signatures.insert(m_it->signature);
-
-  for(std::set<irep_idt>::const_iterator
-      it=signatures.begin();
-      it!=signatures.end();
-      it++)
-  {
-    // we scan for L<name>;
-    const std::string &s=id2string(*it);
-    for(std::string::const_iterator s_it=s.begin();
-        s_it!=s.end(); s_it++)
+    else if(it->tag==CONSTANT_NameAndType)
     {
-      if(*s_it=='L')
+      typet t=java_type_from_string(id2string(pool_entry(it->ref2).s));
+      if(t.id()==ID_code)
       {
-        s_it++;
-        std::string dest;
-        while(s_it!=s.end() && *s_it!=';')
-        {
-          dest+=*s_it;
-          s_it++;
-        }
-        
-        parse_tree.class_refs.insert(slash_to_dot(dest));
+        const code_typet &ct=to_code_type(t);
+        const typet &rt=ct.return_type();
+        if(rt.id()==ID_pointer && rt.subtype().id()==ID_symbol)
+          parse_tree.class_refs.insert(rt.subtype().get(ID_C_base_name));
+          
+        for(const auto & p : ct.parameters())
+          if(p.type().id()==ID_pointer && p.type().subtype().id()==ID_symbol)
+            parse_tree.class_refs.insert(p.type().subtype().get(ID_C_base_name));
+      }
+      else if(t.id()==ID_pointer && t.subtype().id()==ID_symbol)
+      {
+        parse_tree.class_refs.insert(t.subtype().get(ID_C_base_name));
       }
     }
   }
