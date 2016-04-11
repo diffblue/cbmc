@@ -49,7 +49,7 @@ protected:
 
   typedef std::vector<functiont> functionst;
   void get_functions(const exprt &, functionst &);
-  exprt get_method(const irep_idt &class_id, const exprt &);
+  exprt get_method(const irep_idt &class_id, const symbol_exprt &);
   
   exprt build_class_identifier(const exprt &);
 };
@@ -90,7 +90,31 @@ Function: remove_virtual_functionst::build_class_identifier
 exprt remove_virtual_functionst::build_class_identifier(
   const exprt &src)
 {
-  return nil_exprt();
+  // the class identifier is in the root class
+  exprt e=src;
+  
+  while(1)
+  {
+    const typet &type=ns.follow(e.type());
+    assert(type.id()==ID_struct);
+    
+    const struct_typet &struct_type=to_struct_type(type);
+    const struct_typet::componentst &components=struct_type.components();
+    assert(!components.empty());
+    
+    member_exprt member_expr(
+      e, components.front().get_name(), components.front().type());
+    
+    if(components.front().get_name()=="@class_identifier")
+    {
+      // found it
+      return member_expr;
+    }
+    else
+    {
+      e=member_expr;
+    }
+  }
 }
 
 /*******************************************************************\
@@ -120,7 +144,10 @@ void remove_virtual_functionst::remove_virtual_function(
   get_functions(function, functions);
   
   if(functions.empty())
+  {
+    target->make_skip();
     return; // give up
+  }
 
   // the final target is a skip
   goto_programt final_skip;
@@ -147,7 +174,7 @@ void remove_virtual_functionst::remove_virtual_function(
     goto_programt::targett t3=new_code_calls.add_instruction();
     t3->make_goto(t_final, true_exprt());
     
-    exprt deref=dereference_exprt(function.op1());
+    exprt deref=dereference_exprt(function.op1(), function.op1().type().subtype());
     exprt c_id1=constant_exprt(it->class_id, string_typet());
     exprt c_id2=build_class_identifier(deref);
     
@@ -203,16 +230,19 @@ void remove_virtual_functionst::get_functions(
   assert(virtual_function.op1().type().id()==ID_pointer);
   assert(virtual_function.op1().type().subtype().id()==ID_symbol);
   
+  const symbol_exprt &function_symbol=
+    to_symbol_expr(virtual_function.op0());
+  
   irep_idt class_id=
     to_symbol_type(virtual_function.op1().type().subtype()).get_identifier();
   
   // iterate over all children, transitively
   std::vector<irep_idt> children;
   class_hierarchy.get_children(class_id, children);
-  
+
   for(const auto & child : children)
   {
-    exprt method=get_method(child, virtual_function);
+    exprt method=get_method(child, function_symbol);
     if(method.is_not_nil())
     {
       functiont function;
@@ -227,7 +257,7 @@ void remove_virtual_functionst::get_functions(
   irep_idt c=class_id;
   while(!c.empty())
   {
-    exprt method=get_method(c, virtual_function);
+    exprt method=get_method(c, function_symbol);
     if(method.is_not_nil())
     {
       functiont function;
@@ -254,10 +284,10 @@ Function: remove_virtual_functionst::get_method
 
 exprt remove_virtual_functionst::get_method(
   const irep_idt &class_id,
-  const exprt &virtual_function)
+  const symbol_exprt &virtual_function)
 {
-  irep_idt f_id=virtual_function.op0().get(ID_identifier);
-  irep_idt c_id=virtual_function.op1().type().subtype().get(ID_identifier);
+  irep_idt f_id=virtual_function.get_identifier();
+  irep_idt c_id=virtual_function.get(ID_C_class);
 
   if(!has_prefix(id2string(f_id), id2string(c_id)))
     return nil_exprt();

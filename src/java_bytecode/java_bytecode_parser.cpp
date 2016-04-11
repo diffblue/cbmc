@@ -520,6 +520,8 @@ void java_bytecode_parsert::rconstant_pool()
 
         symbol_exprt symbol_expr(identifier, type);
         symbol_expr.set(ID_C_base_name, name_entry.s);
+        symbol_expr.set(ID_C_class,
+          "java::"+slash_to_dot(id2string(class_name_entry.s)));
 
         it->expr=symbol_expr;
       }
