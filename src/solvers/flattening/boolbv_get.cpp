@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/threeval.h>
+#include <util/std_types.h>
 
 #include "boolbv.h"
 #include "boolbv_type.h"
@@ -260,6 +261,17 @@ exprt boolbvt::bv_get_rec(
   switch(bvtype)
   {
   case IS_UNKNOWN:
+    if(type.id()==ID_string)
+    {
+      mp_integer int_value=binary2integer(value, false);
+      irep_idt s;
+      if(int_value>=string_numbering.size())
+        s=irep_idt();
+      else
+        s=string_numbering[int_value.to_long()];
+
+      return constant_exprt(s, type);
+    }
     break;
     
   case IS_RANGE:

@@ -742,45 +742,40 @@ codet java_bytecode_convertt::convert_instructions(
         // info for that type, and are instances of java.lang.Class
         assert(!call.arguments().empty());
         
-        exprt this_arg=call.arguments().front();
+        exprt &this_arg=call.arguments().front();
         
         if(this_arg.id()==ID_type)
         {
           irep_idt class_id=this_arg.type().get(ID_identifier);
           symbol_typet java_lang_Class("java::java.lang.Class");
-          symbol_exprt symbol_expr("java::"+id2string(class_id)+"@class_model", java_lang_Class);
+          symbol_exprt symbol_expr(id2string(class_id)+"@class_model", java_lang_Class);
           address_of_exprt address_of_expr(symbol_expr);
           this_arg=address_of_expr;
         }
         
         assert(this_arg.type().id()==ID_pointer);
-        
-        std::cout << "F: " << arg0.pretty() << "\n";
       }
 
       const typet &return_type=code_type.return_type();
 
-      if(ID_empty != return_type.id())
+      if(return_type.id()!=ID_empty)
       {
-        call.lhs() = tmp_variable(return_type);
+        call.lhs()=tmp_variable(return_type);
         results.resize(1);
-        results[0] = call.lhs();
+        results[0]=call.lhs();
       }
 
       if(is_virtual)
       {
+        assert(use_this);
         assert(!call.arguments().empty());
         const exprt &this_arg=call.arguments().front();
         
-        #if 0
-        call.function()=make_vtable_function(arg0, this_arg);
-        #else
         call.function()=make_virtual_function(
           to_symbol_expr(arg0), this_arg);
-        #endif
       }
       else
-        call.function() = arg0;
+        call.function()=arg0;
 
       call.function().add_source_location()=i_it->source_location;
       c = call;

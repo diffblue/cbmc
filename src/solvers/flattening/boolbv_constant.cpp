@@ -51,6 +51,13 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
     
     return;
   }
+  else if(expr_type.id()==ID_string)
+  {
+    // we use the numbering for strings
+    std::size_t number=string_numbering(expr.get_value());
+    bv=bv_utils.build_constant(number, bv.size());
+    return;
+  }
   else if(expr_type.id()==ID_range)
   {
     mp_integer from=to_range_type(expr_type).get_from();
