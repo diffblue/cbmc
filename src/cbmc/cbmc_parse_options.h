@@ -26,7 +26,7 @@ class optionst;
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
   "D:I:(c89)(c99)(c11)(cpp89)(cpp99)(cpp11)" \
-  "(classpath):(main-class):" \
+  "(classpath):(cp):(main-class):" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
   "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)(nan-check)" \
