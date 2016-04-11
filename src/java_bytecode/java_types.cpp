@@ -459,14 +459,16 @@ typet java_type_from_string(const std::string &src)
     {
       // ends on ;
       if(src[src.size()-1]!=';') return nil_typet();
-      std::string identifier="java::"+src.substr(1, src.size()-2);
+      std::string class_name=src.substr(1, src.size()-2);
 
-      for(unsigned i=0; i<identifier.size(); i++)
-        if(identifier[i]=='/') identifier[i]='.';
+      for(unsigned i=0; i<class_name.size(); i++)
+        if(class_name[i]=='/') class_name[i]='.';
+
+      std::string identifier="java::"+class_name;
 
       reference_typet result;
       result.subtype()=symbol_typet(identifier);
-
+      result.subtype().set(ID_C_base_name, class_name);
       return result;
     }
   
