@@ -22,7 +22,7 @@ class virtual3
   {
     A b = new B();
     A c = new C();
-    b.f();
+    b.f(); // really calls B.f
   }
 }
 
