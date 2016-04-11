@@ -1492,16 +1492,27 @@ void configt::set_classpath(const std::string &cp)
   std::string current;
   for(std::size_t pos=0; pos<cp.size(); pos++)
   {
-    // these are separated by colons
-    if(cp[pos]==':')
+    // These are separated by colons on Unix, and semicolons on
+    // Windows.
+    #ifdef _WIN32
+    const char cp_separator=';';
+    #else
+    const char cp_separator=':';
+    #endif
+    
+    if(cp[pos]==cp_separator)
     {
-      if(!current.empty()) java.class_path.push_back(current);
+      if(!current.empty())
+      {
+        java.classpath.push_back(current);
+        current.clear();
+      }
     }
     else
       current+=cp[pos];
   }
   
-  if(!current.empty()) java.class_path.push_back(current);
+  if(!current.empty()) java.classpath.push_back(current);
 }
 
 /*******************************************************************\

@@ -1,6 +1,6 @@
 CORE
 test.class
--classpath my_cp
+-classpath my_cp:.
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

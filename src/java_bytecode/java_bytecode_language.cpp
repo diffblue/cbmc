@@ -101,17 +101,14 @@ bool java_bytecode_languaget::parse(
   // look at extension
   if(has_suffix(path, ".class"))
   {
-    java_class_loader.add_class_file(path);
-    
-    if(config.java.main_class.empty())
-      main_class=java_class_loadert::file_to_class_name(path);
-    else
-      main_class=config.java.main_class;
+    // override main_class
+    main_class=java_class_loadert::file_to_class_name(path);
   }
   else if(has_suffix(path, ".jar"))
   {
+    #ifdef HAVE_LIBZIP
     java_class_loader.add_jar_file(path);
-
+    
     if(config.java.main_class.empty())
     {
       // Does it have a main class set in the manifest?
@@ -124,6 +121,10 @@ bool java_bytecode_languaget::parse(
     }
     else
       main_class=config.java.main_class;
+    #else
+    error() << "No support for reading JAR files" << eom;
+    return true;
+    #endif
   }
   else
     assert(false);
