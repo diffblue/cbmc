@@ -230,8 +230,6 @@ Function: remove_virtual_functionst::get_functions
 
 \*******************************************************************/
 
-#include <iostream>
-
 void remove_virtual_functionst::get_functions(
   const symbol_exprt &function,
   functionst &functions)
@@ -239,18 +237,12 @@ void remove_virtual_functionst::get_functions(
   irep_idt class_id=function.get(ID_C_class);
   assert(!class_id.empty());
   
-  std::cout << "GETTING " << function.get_identifier() << " " << class_id << "\n"; 
-  
-  class_hierarchy.output(std::cout);
-  
   // iterate over all children, transitively
   std::vector<irep_idt> children;
   class_hierarchy.get_children(class_id, children);
-    std::cout << "CHILDREN: " << children.size() << "\n";
 
   for(const auto & child : children)
   {
-    std::cout << "CHILD: " << child << "\n";
     exprt method=get_method(child, function);
     if(method.is_not_nil())
     {
