@@ -166,6 +166,32 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
 
 /*******************************************************************\
 
+Function: java_class_loadert::load_entire_jar
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_class_loadert::load_entire_jar(const std::string &file)
+{
+  read_jar_file(file);
+
+  const auto &jm=jar_map[file];
+
+  jar_files.push_front(file);
+
+  for(const auto &e : jm.entries)
+    operator()(e.first);
+  
+  jar_files.pop_front();  
+}
+
+/*******************************************************************\
+
 Function: java_class_loadert::read_jar_file
 
   Inputs:

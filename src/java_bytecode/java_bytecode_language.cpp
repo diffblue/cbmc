@@ -107,8 +107,6 @@ bool java_bytecode_languaget::parse(
   else if(has_suffix(path, ".jar"))
   {
     #ifdef HAVE_LIBZIP
-    java_class_loader.add_jar_file(path);
-    
     if(config.java.main_class.empty())
     {
       // Does it have a main class set in the manifest?
@@ -121,6 +119,16 @@ bool java_bytecode_languaget::parse(
     }
     else
       main_class=config.java.main_class;
+      
+    // Do we have one now?
+    if(main_class.empty())
+    {
+      status() << "JAR file without entry point: loading it all" << eom;
+      java_class_loader.load_entire_jar(path);
+    }
+    else
+      java_class_loader.add_jar_file(path);
+    
     #else
     error() << "No support for reading JAR files" << eom;
     return true;

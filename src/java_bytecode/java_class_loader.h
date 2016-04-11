@@ -31,6 +31,8 @@ public:
   {
     jar_files.push_back(f);
   }
+  
+  void load_entire_jar(const std::string &f);
 
 protected:
   class jar_filet
