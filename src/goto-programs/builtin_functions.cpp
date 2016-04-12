@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/pointer_predicates.h>
 #include <util/pointer_offset_size.h>
-#include <util/vtable.h>
 #include <util/namespace_utils.h>
 
 #include <linking/zero_initializer.h>

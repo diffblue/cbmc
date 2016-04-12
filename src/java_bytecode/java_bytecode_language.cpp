@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert.h"
 #include "java_bytecode_internal_additions.h"
 #include "java_bytecode_typecheck.h"
-#include "java_bytecode_load_class.h"
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
