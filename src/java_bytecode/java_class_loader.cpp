@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 #include <map>
+#include <fstream>
 
 #include <util/suffix.h>
 #include <util/config.h>
@@ -149,12 +150,15 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
         #else
         cp+'/'+class_name_to_file(class_name);
         #endif
-    
-      if(!java_bytecode_parse(
-           full_path,
-           parse_tree,
-           get_message_handler()))
-        return parse_tree;
+        
+      if(std::ifstream(full_path))
+      {
+        if(!java_bytecode_parse(
+             full_path,
+             parse_tree,
+             get_message_handler()))
+          return parse_tree;
+      }
     }
   }
     
