@@ -119,6 +119,7 @@ protected:
   void rcode_attribute(methodt &method);
   void rbytecode(methodt::instructionst &);
   void get_class_refs();
+  void get_class_refs_rec(const typet &);
   
   void skip_bytes(unsigned bytes) const
   {
@@ -307,37 +308,72 @@ void java_bytecode_parsert::get_class_refs()
   // Get the class references for the benefit of a dependency
   // analysis.
 
-  for(constant_poolt::iterator
-      it=constant_pool.begin();
-      it!=constant_pool.end();
-      it++)
+  for(const auto & c : constant_pool)
   {
-    if(it->tag==CONSTANT_Class)
+    if(c.tag==CONSTANT_Class)
     {
-      if(it->expr.type().id()==ID_symbol)
-        parse_tree.class_refs.insert(it->expr.type().get(ID_C_base_name));
-      else if(it->expr.type().id()==ID_array)
-        parse_tree.class_refs.insert(it->expr.type().subtype().get(ID_C_base_name));
+      if(c.expr.type().id()==ID_symbol)
+        parse_tree.class_refs.insert(c.expr.type().get(ID_C_base_name));
+      else if(c.expr.type().id()==ID_array)
+        parse_tree.class_refs.insert(c.expr.type().subtype().get(ID_C_base_name));
     }
-    else if(it->tag==CONSTANT_NameAndType)
+    else if(c.tag==CONSTANT_NameAndType)
     {
-      typet t=java_type_from_string(id2string(pool_entry(it->ref2).s));
-      if(t.id()==ID_code)
-      {
-        const code_typet &ct=to_code_type(t);
-        const typet &rt=ct.return_type();
-        if(rt.id()==ID_pointer && rt.subtype().id()==ID_symbol)
-          parse_tree.class_refs.insert(rt.subtype().get(ID_C_base_name));
-          
-        for(const auto & p : ct.parameters())
-          if(p.type().id()==ID_pointer && p.type().subtype().id()==ID_symbol)
-            parse_tree.class_refs.insert(p.type().subtype().get(ID_C_base_name));
-      }
-      else if(t.id()==ID_pointer && t.subtype().id()==ID_symbol)
-      {
-        parse_tree.class_refs.insert(t.subtype().get(ID_C_base_name));
-      }
+      typet t=java_type_from_string(id2string(pool_entry(c.ref2).s));
+      get_class_refs_rec(t);
     }
+  }
+
+  for(const auto & m : parse_tree.parsed_class.fields)
+  {
+    typet t=java_type_from_string(m.signature);
+    get_class_refs_rec(t);
+  }
+  
+  for(const auto & m : parse_tree.parsed_class.methods)
+  {
+    typet t=java_type_from_string(m.signature);
+    get_class_refs_rec(t);
+  }
+  
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::get_class_refs_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_parsert::get_class_refs_rec(const typet &src)
+{
+  if(src.id()==ID_code)
+  {
+    const code_typet &ct=to_code_type(src);
+    const typet &rt=ct.return_type();
+    get_class_refs_rec(rt);
+    for(const auto & p : ct.parameters()) get_class_refs_rec(p.type());
+  }
+  else if(src.id()==ID_pointer && src.subtype().id()==ID_symbol)
+  {
+    parse_tree.class_refs.insert(src.subtype().get(ID_C_base_name));
+  }
+  else if(src.id()==ID_pointer &&
+          src.subtype().id()==ID_struct)
+  {
+    const struct_typet &struct_type=to_struct_type(src.subtype());
+    for(const auto & c : struct_type.components())
+      get_class_refs_rec(c.type());
+  }
+  else if(src.id()==ID_pointer && src.subtype().id()==ID_pointer &&
+          src.subtype().subtype().id()==ID_symbol)
+  {
+    parse_tree.class_refs.insert(src.subtype().subtype().get(ID_C_base_name));
   }
 }
 
