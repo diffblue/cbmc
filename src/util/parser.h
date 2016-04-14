@@ -7,6 +7,7 @@
 
 #include "expr.h"
 #include "message.h"
+#include "file_util.h"
 
 class parsert:public messaget
 {
@@ -75,6 +76,8 @@ public:
   inline void set_file(const irep_idt &file)
   {
     source_location.set_file(file);
+    source_location.set_working_directory(
+      get_current_working_directory());
   }
   
   inline irep_idt get_file() const
