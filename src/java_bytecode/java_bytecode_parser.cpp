@@ -579,6 +579,10 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_InvokeDynamic:
       {
         it->expr.id("invokedynamic");
+        const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
+        //const pool_entryt &name_entry=pool_entry(nameandtype_entry.ref1);
+        typet type=type_entry(nameandtype_entry.ref2);
+        it->expr.type()=type;
       }
       break;
 

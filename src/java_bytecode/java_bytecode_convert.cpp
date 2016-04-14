@@ -681,11 +681,11 @@ codet java_bytecode_convertt::convert_instructions(
         integer_typet());
       statement=std::string(id2string(statement), 0, statement.size()-2);
     }
-
+    
     exprt::operandst op=pop(bytecode_info.pop);
     exprt::operandst results;
     results.resize(bytecode_info.push, nil_exprt());
-
+    
     if(statement=="aconst_null")
     {
       assert(results.size()==1);
@@ -706,7 +706,19 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="invokedynamic")
     {
-      // not used in Java, will need to investigate what it does
+      // not used in Java
+      code_typet &code_type=to_code_type(arg0.type());
+      const code_typet::parameterst &parameters(code_type.parameters());
+
+      pop(parameters.size());
+
+      const typet &return_type=code_type.return_type();
+
+      if(return_type.id()!=ID_empty)
+      {
+        results.resize(1);
+        results[0]=nil_exprt();
+      }
     }
     else if(statement=="invokeinterface" ||
             statement=="invokespecial" ||
