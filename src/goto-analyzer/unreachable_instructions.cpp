@@ -11,6 +11,7 @@ Date: April 2016
 #include <sstream>
 
 #include <util/json.h>
+#include <util/file_util.h>
 
 #include <analyses/cfg_dominators.h>
 
@@ -145,7 +146,9 @@ static void add_to_json(
 
   entry["function"]=json_stringt(id2string(end_function->function));
   entry["file name"]=
-    json_stringt(id2string(end_function->source_location.get_file()));
+    json_stringt(concat_dir_file(
+        id2string(end_function->source_location.get_working_directory()),
+        id2string(end_function->source_location.get_file())));
 
   json_arrayt &dead_ins=entry["unreachable instructions"].make_array();
 
