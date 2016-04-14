@@ -47,12 +47,6 @@ static void unreachable_instructions(
       it!=dominators.cfg.entry_map.end();
       ++it)
   {
-    if(it->first->is_dead() ||
-       (it->first->is_assign() &&
-        to_code_assign(it->first->code).lhs().get(ID_identifier)==
-        "__CPROVER_dead_object"))
-      continue;
-
     const cfg_dominatorst::cfgt::nodet &n=dominators.cfg[it->second];
     if(n.dominators.empty())
       dest.insert(std::make_pair(it->first->location_number,
@@ -78,11 +72,7 @@ static void all_unreachable(
   dead_mapt &dest)
 {
   forall_goto_program_instructions(it, goto_program)
-    if(!it->is_end_function() &&
-       !it->is_dead() &&
-       !(it->is_assign() &&
-         to_code_assign(it->code).lhs().get(ID_identifier)==
-         "__CPROVER_dead_object"))
+    if(!it->is_end_function())
       dest.insert(std::make_pair(it->location_number, it));
 }
 
