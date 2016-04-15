@@ -86,7 +86,7 @@ void unsigned_union_find::isolate(size_type a)
   // get its root
   size_type r=find(a);
   
-  assert(r!=a);
+  //assert(r!=a);
 
   nodes[r].count--;
   nodes[a].parent=a;
@@ -114,7 +114,9 @@ void unsigned_union_find::re_root(size_type old_root, size_type new_root)
   old_root=find(old_root);
   
   // same set?
-  assert(find(new_root)==old_root);
+  // assert(find(new_root)==old_root);
+  if(find(new_root)!=old_root)
+    return;
 
   // make sure we actually do s.th.
   assert(new_root!=old_root);
@@ -161,7 +163,7 @@ unsigned_union_find::size_type unsigned_union_find::get_other(size_type a)
     if(find(i)==a && i!=a)
       return i;
   
-  assert(false);
+//  assert(false);
   return 0;
 }
 

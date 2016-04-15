@@ -131,6 +131,8 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_VECTOR_SIZE "vector_size"
 %token TOK_GCC_ATTRIBUTE_MODE "mode"
 %token TOK_GCC_ATTRIBUTE_GNU_INLINE "__gnu_inline__"
+%token TOK_GCC_ATTRIBUTE_WEAK "weak"
+%token TOK_GCC_ATTRIBUTE_NORETURN "noreturn"
 %token TOK_GCC_ATTRIBUTE_END ")"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
@@ -165,6 +167,9 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_TRY "__CPROVER_try"
 %token TOK_CPROVER_FINALLY "__CPROVER_finally"
 %token TOK_CPROVER_ID  "__CPROVER_ID"
+%token TOK_CPROVER_LOOP_INVARIANT  "__CPROVER_loop_invariant"
+%token TOK_CPROVER_REQUIRES  "__CPROVER_requires"
+%token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_TRUE        "TRUE"
@@ -440,6 +445,27 @@ quantifier_expression:
           mto($$, $4);
           PARSER.pop_scope();
         }
+        ;
+
+loop_invariant_opt:
+        /* nothing */
+        { init($$); stack($$).make_nil(); }
+        | TOK_CPROVER_LOOP_INVARIANT '(' conditional_expression ')'
+        { $$=$3; }
+        ;
+
+requires_opt:
+        /* nothing */
+        { init($$); stack($$).make_nil(); }
+        | TOK_CPROVER_REQUIRES '(' conditional_expression ')'
+        { $$=$3; }
+        ;
+
+ensures_opt:
+        /* nothing */
+        { init($$); stack($$).make_nil(); }
+        | TOK_CPROVER_ENSURES '(' conditional_expression ')'
+        { $$=$3; }
         ;
 
 statement_expression: '(' compound_statement ')'
@@ -1534,7 +1560,11 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_gcc_attribute_mode); stack($$).set(ID_size, stack($3).get(ID_identifier)); }
         | TOK_GCC_ATTRIBUTE_GNU_INLINE TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
+        | TOK_GCC_ATTRIBUTE_WEAK TOK_GCC_ATTRIBUTE_END
+        { $$=$1; set($$, ID_weak); }
         | TOK_NORETURN
+        { $$=$1; set($$, ID_noreturn); }
+        | TOK_GCC_ATTRIBUTE_NORETURN TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_noreturn); }
         | gcc_attribute_specifier
         ;
@@ -2241,21 +2271,29 @@ declaration_or_expression_statement:
         ;
 
 iteration_statement:
-        TOK_WHILE '(' comma_expression_opt ')' statement
+        TOK_WHILE '(' comma_expression_opt ')'
+          loop_invariant_opt statement
         {
           $$=$1;
           statement($$, ID_while);
           stack($$).operands().reserve(2);
           mto($$, $3);
-          mto($$, $5);
+          mto($$, $6);
+
+          if(stack($5).is_not_nil())
+            stack($$).add(ID_C_spec_loop_invariant).swap(stack($5));
         }
-        | TOK_DO statement TOK_WHILE '(' comma_expression ')' ';'
+        | TOK_DO statement TOK_WHILE '(' comma_expression ')'
+          loop_invariant_opt ';'
         {
           $$=$1;
           statement($$, ID_dowhile);
           stack($$).operands().reserve(2);
           mto($$, $5);
           mto($$, $2);
+
+          if(stack($7).is_not_nil())
+            stack($$).add(ID_C_spec_loop_invariant).swap(stack($7));
         }
         | TOK_FOR
           {
@@ -2269,6 +2307,7 @@ iteration_statement:
           '(' declaration_or_expression_statement
               comma_expression_opt ';'
               comma_expression_opt ')'
+              loop_invariant_opt
           statement
         {
           $$=$1;
@@ -2277,7 +2316,10 @@ iteration_statement:
           mto($$, $4);
           mto($$, $5);
           mto($$, $7);
-          mto($$, $9);
+          mto($$, $10);
+
+          if(stack($9).is_not_nil())
+            stack($$).add(ID_C_spec_loop_invariant).swap(stack($9));
 
           if(PARSER.for_has_scope)
             PARSER.pop_scope(); // remove the C99 for-scope
@@ -2665,8 +2707,14 @@ asm_definition:
 
 function_definition:
           function_head
+          requires_opt
+          ensures_opt
           function_body
         {
+          if(stack($2).is_not_nil())
+            stack($1).add(ID_C_spec_requires).swap(stack($2));
+          if(stack($3).is_not_nil())
+            stack($1).add(ID_C_spec_ensures).swap(stack($3));
           // The head is a declaration with one declarator,
           // and the body becomes the 'value'.
           $$=$1;
@@ -2674,7 +2722,7 @@ function_definition:
             to_ansi_c_declaration(stack($$));
             
           assert(ansi_c_declaration.declarators().size()==1);
-          ansi_c_declaration.add_initializer(stack($2));
+          ansi_c_declaration.add_initializer(stack($4));
           
           // Kill the scope that 'function_head' creates.
           PARSER.pop_scope();

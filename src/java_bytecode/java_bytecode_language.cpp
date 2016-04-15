@@ -8,13 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/suffix.h>
+#include <util/config.h>
 
 #include "java_bytecode_language.h"
 #include "java_bytecode_convert.h"
 #include "java_bytecode_internal_additions.h"
 #include "java_bytecode_typecheck.h"
-#include "java_bytecode_load_class.h"
-#include "java_bytecode_vtable.h"
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
@@ -101,30 +100,48 @@ bool java_bytecode_languaget::parse(
   // look at extension
   if(has_suffix(path, ".class"))
   {
-    java_class_loader.add_class_file(path);
+    // override main_class
     main_class=java_class_loadert::file_to_class_name(path);
   }
   else if(has_suffix(path, ".jar"))
   {
-    java_class_loader.add_jar_file(path);
-
-    // need to get entry point class from the manifest in the jar file
-    std::map<std::string, std::string> manifest;
-    get_jar_manifest(path, manifest);
-    
-    main_class=manifest["Main-Class"];
-    if(main_class=="")
+    #ifdef HAVE_LIBZIP
+    if(config.java.main_class.empty())
     {
-      error() << "JAR has no Main-Class" << eom;
-      return true;
+      // Does it have a main class set in the manifest?
+      std::map<std::string, std::string> manifest;
+      get_jar_manifest(path, manifest);
+      std::string manifest_main_class=manifest["Main-Class"];
+
+      if(manifest_main_class!="")
+        main_class=manifest_main_class;
     }
+    else
+      main_class=config.java.main_class;
+      
+    // Do we have one now?
+    if(main_class.empty())
+    {
+      status() << "JAR file without entry point: loading it all" << eom;
+      java_class_loader.load_entire_jar(path);
+    }
+    else
+      java_class_loader.add_jar_file(path);
     
-    status() << "Java main class: " << main_class << eom;
+    #else
+    error() << "No support for reading JAR files" << eom;
+    return true;
+    #endif
   }
   else
     assert(false);
 
-  java_class_loader(main_class);
+  if(!main_class.empty())
+  {
+    status() << "Java main class: " << main_class << eom;
+    java_class_loader(main_class);
+  }
+
   return false;
 }
              
@@ -159,10 +176,6 @@ bool java_bytecode_languaget::typecheck(
          c_it->second, symbol_table, get_message_handler()))
       return true;
   }
-
-  // Construct vtable symbols before typecheck
-  if (java_bytecode_vtable(symbol_table, module))
-    return true;
 
   // now typecheck all
   if(java_bytecode_typecheck(

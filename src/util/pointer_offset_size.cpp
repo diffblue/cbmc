@@ -222,6 +222,10 @@ mp_integer pointer_offset_bits(
   {
     return 0;
   }
+  else if(type.id()==ID_string)
+  {
+    return 32;
+  }
   else
     return mp_integer(-1);
 }
@@ -478,6 +482,11 @@ exprt size_of_expr(
   else if(type.id()==ID_code)
   {
     return gen_zero(signedbv_typet(config.ansi_c.pointer_width));
+  }
+  else if(type.id()==ID_string)
+  {
+    return from_integer(
+      32/8, signedbv_typet(config.ansi_c.pointer_width));
   }
   else
     return nil_exprt();

@@ -1,0 +1,6 @@
+[
+{ "id": "my_f", "kind": "source", "where": "parameter1", "taint": "T1", "function": "basic2.my_f" },
+{ "id": "my_g", "kind": "source", "where": "return_value", "taint": "T2", "function": "basic2.my_g" },
+{ "id": "my_h1", "kind": "sink",   "where": "parameter1", "taint": "T1", "function": "basic2.my_h", "message": "There is a T1 flow" },
+{ "id": "my_h2", "kind": "sink",   "where": "parameter1", "taint": "T2", "function": "basic2.my_h", "message": "There is a T2 flow" }
+]

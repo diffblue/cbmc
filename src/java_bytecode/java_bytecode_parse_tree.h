@@ -17,6 +17,27 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_bytecode_parse_treet
 {
 public:
+  class annotationt
+  {
+  public:
+    typet type;
+  
+    class element_value_pairt
+    {
+    public:
+      irep_idt element_name;
+      exprt value;
+      void output(std::ostream &) const;
+    };
+    
+    typedef std::vector<element_value_pairt> element_value_pairst;
+    element_value_pairst element_value_pairs;
+    
+    void output(std::ostream &) const;
+  };
+  
+  typedef std::vector<annotationt> annotationst;
+
   class instructiont
   {
   public:
@@ -33,7 +54,8 @@ public:
     std::string signature;
     irep_idt name;
     bool is_public, is_protected, is_private, is_static, is_final;
-    
+    annotationst annotations;
+
     virtual void output(std::ostream &out) const = 0;
     
     inline membert():
@@ -90,6 +112,7 @@ public:
     typedef std::list<methodt> methodst;
     fieldst fields;
     methodst methods;
+    annotationst annotations;
     
     inline fieldt &add_field()
     {

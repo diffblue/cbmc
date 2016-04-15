@@ -243,6 +243,9 @@ protected:
   
   typedef std::vector<std::size_t> offset_mapt;
   void build_offset_map(const struct_typet &src, offset_mapt &dest);
+  
+  // strings
+  numbering<irep_idt> string_numbering;
 };
 
 #endif

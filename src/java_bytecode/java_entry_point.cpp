@@ -14,10 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/expr_util.h>
-#include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/message.h>
 
-#include <linking/entry_point.h>
 #include <goto-programs/goto_functions.h>
 
 #include "java_entry_point.h"
@@ -39,7 +38,6 @@ Function: create_initialize
 \*******************************************************************/
 
 namespace {
-
 void create_initialize(symbol_tablet &symbol_table)
 {
   symbolt initialize;
@@ -65,7 +63,21 @@ void create_initialize(symbol_tablet &symbol_table)
   if(symbol_table.add(initialize))
     throw "failed to add "+std::string(INITIALIZE);
 }
+}
 
+/*******************************************************************\
+
+Function: gen_argument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+namespace {
 exprt gen_argument(const typet &type)
 {
   if(type.id()==ID_pointer)
@@ -80,7 +92,6 @@ exprt gen_argument(const typet &type)
   else
     return side_effect_expr_nondett(type);
 }
-
 }
 
 /*******************************************************************\
@@ -165,16 +176,12 @@ bool java_entry_point(
      symbol_table.symbols.end())
     return false; // silently ignore
 
-  std::string entry_method;
-
-  // are we given a function?
-  if(config.main.empty())
-  {
-    // use main class
-    entry_method=id2string(main_class)+".main";
-  }
-  else
-    entry_method=id2string(config.main);
+  // are we given a main class?
+  if(main_class.empty())
+    return false; // silently ignore
+  
+  std::string entry_method=
+    id2string(main_class)+".main";
 
   std::string prefix="java::"+entry_method+":";
 
@@ -193,23 +200,14 @@ bool java_entry_point(
 
   if(matches.empty())
   {
-    if(config.main.empty())
-      return false; // we fail silently
-    else
-    {
-      messaget message(message_handler);
-
-      message.error() << "main method `" << config.main
-                      << "' not in symbol table" << messaget::eom;
-        
-      return true; // give up with error, no main
-    }
+    // Not found, silently ignore
+    return false;
   }
 
   if(matches.size()>=2)
   {
     messaget message(message_handler);
-    message.error() << "main method `" << config.main
+    message.error() << "main method in `" << main_class
                     << "' is ambiguous" << messaget::eom;
     return true; // give up with error, no main
   }
@@ -221,7 +219,7 @@ bool java_entry_point(
   if(symbol.value.is_nil())
   {
     messaget message(message_handler);
-    message.error() << "main method `" << config.main
+    message.error() << "main method `" << main_class
                     << "' has no body" << messaget::eom;
     return true; // give up with error
   }

@@ -35,7 +35,7 @@ void boolbvt::convert_struct(const struct_exprt &expr, bvt &bv)
     throw "struct: wrong number of arguments";
 
   bv.resize(width);
-
+  
   std::size_t offset=0, i=0;
 
   for(struct_typet::componentst::const_iterator

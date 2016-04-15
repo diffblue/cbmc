@@ -51,8 +51,13 @@ ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
   ifneq ($(LIBZIPLIB),)
-    LIBS += -L $(LIBZIPLIB) -lzip -lz
+    LIBS += $(LIBZIPLIB)
   endif
+endif
+
+ifneq ($(wildcard ../jsil/Makefile),)
+  OBJ += ../jsil/jsil$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_JSIL
 endif
 
 ifneq ($(wildcard ../specc/Makefile),)

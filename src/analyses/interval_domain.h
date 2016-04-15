@@ -12,46 +12,80 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/mp_arith.h>
 
-#include "static_analysis.h"
+#include "ai.h"
 #include "interval_analysis.h"
 #include "intervals.h"
 
-class interval_domaint:public domain_baset
+class interval_domaint:public ai_domain_baset
 {
 public:
-  // trivial, conjunctive interval domain for both float
-  // and integers
+  // Trivial, conjunctive interval domain for both float
+  // and integers. The categorization 'float' and 'integers'
+  // is done by is_int and is_float.
   
+  virtual void transform(
+    locationt from,
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns);
+              
+  virtual void output(
+    std::ostream &out,
+    const ai_baset &ai,
+    const namespacet &ns) const;
+
+  bool merge(
+    const interval_domaint &b,
+    locationt from,
+    locationt to);
+  
+  // no states
+  virtual void make_bottom()
+  {
+    int_map.clear();
+    float_map.clear();
+    bottom=true;
+  }
+        
+  // all states
+  virtual void make_top()
+  {
+    int_map.clear();
+    float_map.clear();
+    bottom=false;
+  }
+
+  exprt make_expression(const symbol_exprt &) const;
+  
+  inline static bool is_int(const typet &src)
+  {
+    return src.id()==ID_signedbv || src.id()==ID_unsignedbv;
+  }
+  
+  inline static bool is_float(const typet &src)
+  {
+    return src.id()==ID_floatbv;
+  }
+
+  inline void assume(const exprt &e)
+  {
+    return assume_rec(e);
+  }
+  
+  inline bool is_bottom() const
+  {
+    return bottom;
+  }
+
+protected:
+  bool bottom;
+
   typedef std::map<irep_idt, integer_intervalt> int_mapt;
   typedef std::map<irep_idt, ieee_float_intervalt> float_mapt;
 
   int_mapt int_map;
   float_mapt float_map;
 
-  virtual void transform(
-    const namespacet &ns,
-    locationt from,
-    locationt to);
-              
-  virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const;
-
-  bool merge(const interval_domaint &b, locationt to);
-  
-  exprt make_expression(const symbol_exprt &) const;
-  
-  static bool is_int(const typet &src)
-  {
-    return src.id()==ID_signedbv || src.id()==ID_unsignedbv;
-  }
-  
-  static bool is_float(const typet &src)
-  {
-    return src.id()==ID_floatbv;
-  }
-
-protected:
   void havoc_rec(const exprt &);
   void assume_rec(const exprt &, bool negation=false);
   void assume_rec(const exprt &lhs, irep_idt id, const exprt &rhs);

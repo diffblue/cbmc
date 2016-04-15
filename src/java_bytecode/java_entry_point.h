@@ -1,9 +1,10 @@
-/*******************************************************************
- Module:
+/*******************************************************************\
 
- Author: Daniel Kroening, kroening@kroening.com
+Module:
 
- \*******************************************************************/
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
 
 #ifndef CPROVER_JAVA_ENTRY_POINT_H
 #define CPROVER_JAVA_ENTRY_POINT_H

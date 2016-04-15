@@ -9,7 +9,7 @@ SRC = c_typecast.cpp ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_parser.cpp \
       preprocessor_line.cpp ansi_c_convert_type.cpp \
       type2name.cpp cprover_library.cpp anonymous_member.cpp \
       printf_formatter.cpp ansi_c_internal_additions.cpp padding.cpp \
-      ansi_c_declaration.cpp designator.cpp \
+      ansi_c_declaration.cpp designator.cpp ansi_c_entry_point.cpp \
       literals/parse_float.cpp literals/unescape_string.cpp \
       literals/convert_float_literal.cpp \
       literals/convert_character_literal.cpp \

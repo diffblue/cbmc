@@ -24,32 +24,39 @@ public:
   typedef std::map<irep_idt, java_bytecode_parse_treet> class_mapt;
   class_mapt class_map;
 
-  // add a JAR file, which will be searched
-  void add_jar_file(const irep_idt &);
-  
-  // add a .class file directly
-  void add_class_file(const irep_idt &file);
-  
   static std::string file_to_class_name(const std::string &);
   static std::string class_name_to_file(const irep_idt &);
+  
+  inline void add_jar_file(const std::string &f)
+  {
+    jar_files.push_back(f);
+  }
+  
+  void load_entire_jar(const std::string &f);
 
 protected:
-  struct jar_entryt
+  class jar_filet
   {
-    std::size_t index;
-    irep_idt jar_file_name;
+  public:
+    struct entryt
+    {
+      std::size_t index;
+    };
+  
+    typedef std::map<irep_idt, entryt> entriest;
+    entriest entries;
   };
+
+  // maps jar files to maps of class names
+  typedef std::map<irep_idt, jar_filet> jar_mapt;
+  jar_mapt jar_map;
   
-  // maps class names (no .class extension) to JAR file names
-  typedef std::map<irep_idt, jar_entryt> class_jar_mapt;
-  class_jar_mapt class_jar_map;
-  
-  // maps class names (no .class extension) to class file names
-  typedef std::map<irep_idt, irep_idt> class_file_mapt;
-  class_file_mapt class_file_map;
-  
-  // get a parse tree from JAR and then from .class files
+  void read_jar_file(const irep_idt &);
+
+  // get a parse tree for given class
   java_bytecode_parse_treet &get_parse_tree(const irep_idt &);
+  
+  std::list<std::string> jar_files;
 };
 
 #endif

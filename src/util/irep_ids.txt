@@ -209,6 +209,7 @@ cpp_new_array cpp_new[]
 cpp_delete_array cpp_delete[]
 java_new
 java_new_array
+java_string_literal
 printf
 input
 output
@@ -715,3 +716,9 @@ noreturn
 C_noreturn #noreturn
 process
 signal
+weak
+is_weak
+C_spec_loop_invariant #spec_loop_invariant
+C_spec_requires #spec_requires
+C_spec_ensures #spec_ensures
+virtual_function

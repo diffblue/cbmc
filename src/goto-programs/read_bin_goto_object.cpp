@@ -57,6 +57,7 @@ bool read_bin_goto_object_v3(
 
     std::size_t flags=irepconverter.read_gb_word(in);
     
+    sym.is_weak = (flags & (1 << 16))!=0;
     sym.is_type = (flags & (1 << 15))!=0;
     sym.is_property = (flags & (1 << 14))!=0; 
     sym.is_macro = (flags & (1 << 13))!=0;

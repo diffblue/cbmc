@@ -49,7 +49,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)" \
   "(inline)" \
-  "(show-claims)(show-properties)" \
+  "(show-claims)(show-properties)(property):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
   "(cav11)" \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
@@ -61,7 +61,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(interpreter)(show-reaching-definitions)(count-eloc)" \
   "(list-symbols)(list-undefined-functions)" \
   "(z3)(add-library)(show-dependence-graph)" \
-  "(horn)(skip-loops):"
+  "(horn)(skip-loops):(apply-code-contracts)"
 
 class goto_instrument_parse_optionst:
   public parse_options_baset,

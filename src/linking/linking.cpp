@@ -64,6 +64,34 @@ std::string linkingt::type_to_string(
 
 /*******************************************************************\
 
+Function: follow_tags_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static const typet &follow_tags_symbols(
+  const namespacet &ns,
+  const typet &type)
+{
+  if(type.id()==ID_symbol)
+    return ns.follow(type);
+  else if(type.id()==ID_c_enum_tag)
+    return ns.follow_tag(to_c_enum_tag_type(type));
+  else if(type.id()==ID_struct_tag)
+    return ns.follow_tag(to_struct_tag_type(type));
+  else if(type.id()==ID_union_tag)
+    return ns.follow_tag(to_union_tag_type(type));
+  else
+    return type;
+}
+
+/*******************************************************************\
+
 Function: linkingt::type_to_string_verbose
 
   Inputs:
@@ -79,7 +107,7 @@ std::string linkingt::type_to_string_verbose(
   const symbolt &symbol,
   const typet &type) const
 { 
-  const typet &followed=ns.follow(type);
+  const typet &followed=follow_tags_symbols(ns, type);
 
   if(followed.id()==ID_struct || followed.id()==ID_union)
   {
@@ -149,13 +177,13 @@ void linkingt::detailed_conflict_report_rec(
 {
   #ifdef DEBUG
   str << "<BEGIN DEPTH " << depth << ">";
-  debug();
+  debug_msg();
   #endif
 
   std::string msg;
 
-  const typet &t1=ns.follow(type1);
-  const typet &t2=ns.follow(type2);
+  const typet &t1=follow_tags_symbols(ns, type1);
+  const typet &t2=follow_tags_symbols(ns, type2);
 
   if(t1.id()!=t2.id())
     msg="type classes differ";
@@ -230,6 +258,49 @@ void linkingt::detailed_conflict_report_rec(
           break;
         }
       }
+  }
+  else if(t1.id()==ID_c_enum)
+  {
+    const c_enum_typet::memberst &members1=
+      to_c_enum_type(t1).members();
+
+    const c_enum_typet::memberst &members2=
+      to_c_enum_type(t2).members();
+
+    if(t1.subtype()!=t2.subtype())
+    {
+      msg="enum value types are different (";
+      msg+=type_to_string(ns, old_symbol.name, t1.subtype())+'/';
+      msg+=type_to_string(ns, new_symbol.name, t2.subtype())+')';
+    }
+    else if(members1.size()!=members2.size())
+    {
+      msg="number of enum members is different (";
+      msg+=i2string(members1.size())+'/';
+      msg+=i2string(members2.size())+')';
+    }
+    else
+      for(std::size_t i=0; i<members1.size(); ++i)
+      {
+        if(members1[i].get_base_name()!=members2[i].get_base_name())
+        {
+          msg="names of member "+i2string(i)+" differ (";
+          msg+=id2string(members1[i].get_base_name())+'/';
+          msg+=id2string(members2[i].get_base_name())+')';
+          break;
+        }
+        else if(members1[i].get_value()!=members2[i].get_value())
+        {
+          msg="values of member "+i2string(i)+" differ (";
+          msg+=id2string(members1[i].get_value())+'/';
+          msg+=id2string(members2[i].get_value())+')';
+          break;
+        }
+      }
+
+    msg+="\nenum declarations at\n";
+    msg+=t1.source_location().as_string()+" and\n";
+    msg+=t1.source_location().as_string();
   }
   else if(t1.id()==ID_code)
   {
@@ -309,7 +380,7 @@ void linkingt::detailed_conflict_report_rec(
 
   #ifdef DEBUG
   str << "<END DEPTH " << depth << ">";
-  debug();
+  debug_msg();
   #endif
 }
 
@@ -527,8 +598,8 @@ void linkingt::duplicate_code_symbol(
 
       while(!conflicts.empty())
       {
-        const typet &t1=ns.follow(conflicts.front().first);
-        const typet &t2=ns.follow(conflicts.front().second);
+        const typet &t1=follow_tags_symbols(ns, conflicts.front().first);
+        const typet &t2=follow_tags_symbols(ns, conflicts.front().second);
 
         // void vs. non-void return type may be acceptable if the
         // return value is never used
@@ -555,7 +626,8 @@ void linkingt::duplicate_code_symbol(
                 old_symbol.value.is_nil()!=new_symbol.value.is_nil())
         {
           if(warn_msg.empty())
-            warn_msg="different pointer types in function";
+            warn_msg="pointer parameter types differ between "
+                     "declaration and definition";
           replace=new_symbol.value.is_not_nil();
         }
         // transparent union with (or entirely without) implementation is
@@ -736,10 +808,12 @@ void linkingt::duplicate_object_symbol(
     }
     else
     {
-      // provide additional diagnostic output for struct/union/array
+      // provide additional diagnostic output for
+      // struct/union/array/enum
       if(old_type.id()==ID_struct ||
          old_type.id()==ID_union ||
-         old_type.id()==ID_array)
+         old_type.id()==ID_array ||
+         old_type.id()==ID_c_enum)
         detailed_conflict_report(
           old_symbol,
           new_symbol,
@@ -1040,8 +1114,8 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
       {
         queue.push(*d_it);
         #ifdef DEBUG
-        str << "LINKING: needs to be renamed (dependency): " << s_it->first;
-        debug();
+        str << "LINKING: needs to be renamed (dependency): " << *d_it;
+        debug_msg();
         #endif
       }
   }
@@ -1061,6 +1135,8 @@ Function: linkingt::rename_symbols
 
 void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
 {
+  namespacet src_ns(src_symbol_table);
+
   for(id_sett::const_iterator
       it=needs_to_be_renamed.begin();
       it!=needs_to_be_renamed.end();
@@ -1068,13 +1144,19 @@ void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
   {
     symbolt &new_symbol=src_symbol_table.symbols[*it];
 
-    irep_idt new_identifier=rename(*it);
+    irep_idt new_identifier;
+
+    if(new_symbol.is_type)
+      new_identifier=type_to_name(src_ns, *it, new_symbol.type);
+    else
+      new_identifier=rename(*it);
+
     new_symbol.name=new_identifier;
     
     #ifdef DEBUG
     str << "LINKING: renaming " << *it << " to "
         << new_identifier;
-    debug();
+    debug_msg();
     #endif
 
     if(new_symbol.is_type)
@@ -1182,7 +1264,7 @@ void linkingt::typecheck()
       needs_to_be_renamed.insert(s_it->first);
       #ifdef DEBUG
       str << "LINKING: needs to be renamed: " << s_it->first;
-      debug();
+      debug_msg();
       #endif
     }
   }

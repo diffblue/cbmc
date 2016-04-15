@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "i2string.h"
 #include "xml.h"
+#include "json.h"
 #include "xml_expr.h"
 #include "cout_message.h"
 #include "ui_message.h"
@@ -45,6 +46,10 @@ ui_message_handlert::ui_message_handlert(
     }
     break;
     
+  case JSON_UI:
+    std::cout << "[\n";
+    break;
+    
   case PLAIN:
     break;
     
@@ -66,8 +71,18 @@ Function: ui_message_handlert::~ui_message_handlert
 
 ui_message_handlert::~ui_message_handlert()
 {
-  if(get_ui()==XML_UI)
+  switch(get_ui())
+  {
+  case XML_UI:
     std::cout << "</cprover>" << "\n";
+    break;
+  
+  case JSON_UI:
+    std::cout << "]\n";
+    break;
+  
+  default:;
+  }
 }
 
 /*******************************************************************\
@@ -110,14 +125,18 @@ void ui_message_handlert::print(
 {
   if(verbosity>=level)
   {
-    if(get_ui()==XML_UI)
+    switch(get_ui())
     {
-      source_locationt location;
-      location.make_nil();
-      print(level, message, -1, location);
-    }
-    else
-    {
+    case XML_UI:
+    case JSON_UI:
+      {
+        source_locationt location;
+        location.make_nil();
+        print(level, message, -1, location);
+      }
+      break;
+      
+    default:
       console_message_handlert console_message_handler;
       console_message_handler.print(level, message);
     }
@@ -144,22 +163,26 @@ void ui_message_handlert::print(
 {
   if(verbosity>=level)
   {
-    if(get_ui()==XML_UI)
+    switch(get_ui())
     {
-      std::string tmp_message(message);
+    case XML_UI:
+    case JSON_UI:
+      {
+        std::string tmp_message(message);
 
-      if(!tmp_message.empty() && *tmp_message.rbegin()=='\n')
-        tmp_message.resize(tmp_message.size()-1);
-    
-      const char *type=level_string(level);
+        if(!tmp_message.empty() && *tmp_message.rbegin()=='\n')
+          tmp_message.resize(tmp_message.size()-1);
       
-      std::string sequence_number_str=
-        sequence_number>=0?i2string(sequence_number):"";
+        const char *type=level_string(level);
+        
+        std::string sequence_number_str=
+          sequence_number>=0?i2string(sequence_number):"";
 
-      ui_msg(type, tmp_message, sequence_number_str, location);
-    }
-    else
-    {
+        ui_msg(type, tmp_message, sequence_number_str, location);
+      }
+      break;
+      
+    default:
       message_handlert::print(
         level, message, sequence_number, location);
     }
@@ -184,7 +207,18 @@ void ui_message_handlert::ui_msg(
   const std::string &msg2,
   const source_locationt &location)
 {
-  xml_ui_msg(type, msg1, msg2, location);
+  switch(get_ui())
+  {
+  case XML_UI:
+    xml_ui_msg(type, msg1, msg2, location);
+    break;
+    
+  case JSON_UI:
+    json_ui_msg(type, msg1, msg2, location);
+    break;
+  
+  default:;
+  }
 }
 
 /*******************************************************************\
@@ -214,6 +248,39 @@ void ui_message_handlert::xml_ui_msg(
 
   result.new_element("text").data=msg1;
   result.set_attribute("type", type);
+  
+  std::cout << result;
+  std::cout << std::endl;
+}
+
+/*******************************************************************\
+
+Function: ui_message_handlert::json_ui_msg
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ui_message_handlert::json_ui_msg(
+  const std::string &type,
+  const std::string &msg1,
+  const std::string &msg2,
+  const source_locationt &location)
+{
+  json_objectt result;
+
+  #if 0
+  if(location.is_not_nil() &&
+     !location.get_file().empty())
+    result.new_element(xml(location));
+  #endif
+
+  result["text"].value=msg1;
+  result["type"].value=type;
   
   std::cout << result;
   std::cout << std::endl;

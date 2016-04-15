@@ -8,8 +8,8 @@ Date: June 2003
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_FUNCTION_POINTERS_H
-#define CPROVER_GOTO_FUNCTION_POINTERS_H
+#ifndef CPROVER_REMOVE_FUNCTION_POINTERS_H
+#define CPROVER_REMOVE_FUNCTION_POINTERS_H
 
 #include "goto_model.h"
 

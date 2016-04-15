@@ -247,6 +247,8 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   {
     entry.total_width=to_c_bit_field_type(type).get_width();
   }
+  else if(type_id==ID_string)
+    entry.total_width=32;
   
   return entry;
 }

@@ -22,11 +22,10 @@ Date: June 2006
 #include <util/unicode.h>
 #include <util/irep_serialization.h>
 #include <util/suffix.h>
+#include <util/get_base_name.h>
 
 #include <ansi-c/ansi_c_language.h>
-
-#include <linking/linking_class.h>
-#include <linking/entry_point.h>
+#include <ansi-c/ansi_c_entry_point.h>
 
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_convert_functions.h>
@@ -38,7 +37,6 @@ Date: June 2006
 
 #include <cbmc/version.h>
 
-#include "get_base_name.h"
 #include "compile.h"
 
 #define DOTGRAPHSETTINGS  "color=black;" \
@@ -180,7 +178,8 @@ bool compilet::add_input_file(const std::string &file_name)
      ext=="i" ||
      ext=="ii" ||
      ext=="class" ||
-     ext=="jar")
+     ext=="jar" ||
+     ext=="jsil")
   {
     source_files.push_back(file_name);
   }
@@ -413,7 +412,7 @@ bool compilet::link()
   
   if(mode==COMPILE_LINK_EXECUTABLE)
   {
-    if(entry_point(symbol_table, "main", ui_message_handler))
+    if(ansi_c_entry_point(symbol_table, "main", ui_message_handler))
       return true;
 
     // entry_point may (should) add some more functions.

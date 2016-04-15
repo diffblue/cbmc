@@ -15,9 +15,8 @@ class virtual2
 {
   public static void main(String[] args)
   {
-    A a=new A();
     A b=new B();
-    b.f();
+    b.f(); // this really calls B.f, not A.f
   }
 }
 

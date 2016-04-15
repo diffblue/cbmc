@@ -456,6 +456,11 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         old_symbol.is_extern=new_symbol.is_extern;
         old_symbol.is_file_local=new_symbol.is_file_local;
       }
+      else if(new_symbol.is_weak)
+      {
+        // weak symbols
+        old_symbol.is_weak=true;
+      }
 
       typecheck_function_body(new_symbol);
     
@@ -720,6 +725,18 @@ void c_typecheck_baset::typecheck_declaration(
     // mark as 'already typechecked'
     make_already_typechecked(declaration.type());
 
+    codet contract;
+
+    {
+      exprt spec_requires=
+        static_cast<const exprt&>(declaration.find(ID_C_spec_requires));
+      contract.add(ID_C_spec_requires).swap(spec_requires);
+
+      exprt spec_ensures=
+        static_cast<const exprt&>(declaration.find(ID_C_spec_ensures));
+      contract.add(ID_C_spec_ensures).swap(spec_ensures);
+    }
+
     // Now do declarators, if any.
     for(ansi_c_declarationt::declaratorst::iterator
         d_it=declaration.declarators().begin();
@@ -728,11 +745,38 @@ void c_typecheck_baset::typecheck_declaration(
     {
       symbolt symbol;
       declaration.to_symbol(*d_it, symbol);
+      irep_idt identifier=symbol.name;
 
       // now check other half of type
       typecheck_type(symbol.type);
 
       typecheck_symbol(symbol);
+
+      // add code contract (if any); we typecheck this after the
+      // function body done above, so as to have parameter symbols
+      // available
+      symbol_tablet::symbolst::iterator s_it=
+        symbol_table.symbols.find(identifier);
+      assert(s_it!=symbol_table.symbols.end());
+      symbolt &new_symbol=s_it->second;
+
+      typecheck_spec_expr(contract, ID_C_spec_requires);
+
+      typet ret_type=empty_typet();
+      if(new_symbol.type.id()==ID_code)
+        ret_type=to_code_type(new_symbol.type).return_type();
+      assert(parameter_map.empty());
+      if(ret_type.id()!=ID_empty)
+        parameter_map["__CPROVER_return_value"]=ret_type;
+      typecheck_spec_expr(contract, ID_C_spec_ensures);
+      parameter_map.clear();
+
+      if(contract.find(ID_C_spec_requires).is_not_nil())
+        new_symbol.type.add(ID_C_spec_requires)=
+          contract.find(ID_C_spec_requires);
+      if(contract.find(ID_C_spec_ensures).is_not_nil())
+        new_symbol.type.add(ID_C_spec_ensures)=
+          contract.find(ID_C_spec_ensures);
     }
   }
 }

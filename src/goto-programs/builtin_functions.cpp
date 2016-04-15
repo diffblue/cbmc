@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/pointer_predicates.h>
 #include <util/pointer_offset_size.h>
-#include <util/vtable.h>
 #include <util/namespace_utils.h>
 
 #include <linking/zero_initializer.h>
@@ -537,43 +536,40 @@ void goto_convertt::do_cpp_new(
   dest.destructive_append(tmp_initializer);
 }
 
-namespace {
-symbol_exprt get_vt(const irep_idt &class_name) {
-  const std::string &name(id2string(class_name));
-  const irep_idt vttype_name(vtnamest::get_type(name));
-  const irep_idt vt_name(vtnamest::get_table(name));
-  const symbol_typet vttype(vttype_name);
-  return symbol_exprt(vt_name, vttype);
-}
+/*******************************************************************\
 
-bool is_type_missing(const namespacet &ns, const symbol_typet &type)
-{
-  return !ns.get_symbol_table().has_symbol(type.get_identifier());
-}
+Function: set_class_identifier
 
-exprt &get_vt_pointer_member(struct_exprt &expr)
-{
-  // We assume the first member is vt_pointer or super class object.
-  assert(expr.has_operands());
-  exprt &op0=expr.op0();
-  if (ID_struct != op0.id()) return op0;
-  return get_vt_pointer_member(to_struct_expr(op0));
-}
+  Inputs:
 
-void set_vt_pointer(struct_exprt &expr, const namespacet &ns,
-    const symbol_typet &class_type)
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void set_class_identifier(
+  struct_exprt &expr,
+  const namespacet &ns,
+  const symbol_typet &class_type)
 {
-  if (is_type_missing(ns, class_type)) return;
-  const irep_idt &class_name(class_type.get_identifier());
-  const symbol_exprt vt(get_vt(class_name));
-  exprt &vt_pointer_member=get_vt_pointer_member(expr);
-  const typet &member_type=vt_pointer_member.type();
-  const address_of_exprt vt_pointer(vt);
-  if (type_eq(member_type, vt_pointer.type(), ns))
-    vt_pointer_member=vt_pointer;
+  const struct_typet &struct_type=
+    to_struct_type(ns.follow(expr.type()));
+  const struct_typet::componentst &components=struct_type.components();
+
+  if(components.empty()) return;
+  assert(!expr.operands().empty());
+  
+  if(components.front().get_name()=="@class_identifier")
+  {
+    assert(expr.op0().id()==ID_constant);
+    expr.op0()=constant_exprt(class_type.get_identifier(), string_typet());
+  }
   else
-    vt_pointer_member=typecast_exprt(vt_pointer, member_type);
-}
+  {
+    assert(expr.op0().id()==ID_struct);
+    set_class_identifier(to_struct_expr(expr.op0()), ns, class_type);
+  }
 }
 
 /*******************************************************************\
@@ -620,7 +616,7 @@ void goto_convertt::do_java_new(
   // zero-initialize the object
   dereference_exprt deref(lhs, object_type);
   exprt zero_object=zero_initializer(object_type, location, ns, get_message_handler());
-  set_vt_pointer(to_struct_expr(zero_object), ns, to_symbol_type(object_type));
+  set_class_identifier(to_struct_expr(zero_object), ns, to_symbol_type(object_type));
   goto_programt::targett t_i=dest.add_instruction(ASSIGN);
   t_i->code=code_assignt(deref, zero_object);
   t_i->source_location=location;
@@ -1000,7 +996,7 @@ Function: goto_convertt::do_function_call_symbol
 
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
@@ -1008,7 +1004,7 @@ void goto_convertt::do_function_call_symbol(
     return; // ignore
 
   // lookup symbol
-  const irep_idt &identifier=function.get(ID_identifier);
+  const irep_idt &identifier=function.get_identifier();
 
   const symbolt *symbol;
   if(ns.lookup(identifier, symbol))

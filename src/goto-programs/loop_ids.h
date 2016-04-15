@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_LOOP_IDS_H
-#define CPROVER_CBMC_LOOP_IDS_H
+#ifndef CPROVER_LOOP_IDS_H
+#define CPROVER_LOOP_IDS_H
 
 #include <util/ui_message.h>
 

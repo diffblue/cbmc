@@ -459,14 +459,16 @@ typet java_type_from_string(const std::string &src)
     {
       // ends on ;
       if(src[src.size()-1]!=';') return nil_typet();
-      std::string identifier="java::"+src.substr(1, src.size()-2);
+      std::string class_name=src.substr(1, src.size()-2);
 
-      for(unsigned i=0; i<identifier.size(); i++)
-        if(identifier[i]=='/') identifier[i]='.';
+      for(unsigned i=0; i<class_name.size(); i++)
+        if(class_name[i]=='/') class_name[i]='.';
+
+      std::string identifier="java::"+class_name;
 
       reference_typet result;
       result.subtype()=symbol_typet(identifier);
-
+      result.subtype().set(ID_C_base_name, class_name);
       return result;
     }
   
@@ -516,4 +518,75 @@ char java_char_from_type(const typet &type)
     return 'z';
 
   return 'a';
+}
+
+/*******************************************************************\
+
+Function: java_classname
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+// java/lang/Object -> java.lang.Object
+static std::string slash_to_dot(const std::string &src)
+{
+  std::string result=src;
+  for(std::string::iterator it=result.begin(); it!=result.end(); it++)
+    if(*it=='/') *it='.';
+  return result;
+}
+
+/*******************************************************************\
+
+Function: java_classname
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+symbol_typet java_classname(const std::string &id)
+{
+  std::string class_name=id;
+
+  if(!class_name.empty() && class_name[0]=='[')
+  {
+    assert(class_name.size()>=2);
+    
+    std::string suffix;
+
+    switch(class_name[1])
+    {
+    case 'F': suffix="float"; break;
+    case 'D': suffix="double"; break;
+    case 'I': suffix="int"; break;
+    case 'C': suffix="char"; break;
+    case 'S': suffix="short"; break;
+    case 'Z': suffix="boolean"; break;
+    case 'V': suffix="void"; break;
+    case 'J': suffix="long"; break;
+    case 'L':
+      assert(class_name.size()>=3);
+      assert(class_name[class_name.size()-1]==';');
+      suffix=std::string(class_name, 2, class_name.size()-3);
+      break;
+    }
+
+    // these are auto-generated, and derived from java.lang.Object
+    class_name="array_of_"+suffix;
+  }
+  
+  class_name=slash_to_dot(class_name);
+  irep_idt identifier="java::"+class_name;
+  symbol_typet symbol_type(identifier);
+  symbol_type.set(ID_C_base_name, class_name);
+  return symbol_type;
 }

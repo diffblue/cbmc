@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_types.h"
 #include "java_bytecode_convert.h"
-#include "java_bytecode_vtable.h"
+#include "java_class_identifier.h"
 #include "bytecode_info.h"
 
 namespace {
@@ -249,12 +249,9 @@ void java_bytecode_convertt::convert(const classt &c)
       it++)
     convert(*class_symbol, *it);
 
-  // create the virtual table
-  create_vtable_symbol(symbol_table, *class_symbol);
-
   // is this a root class?
   if(c.extends.empty())
-    create_vtable_pointer(*class_symbol);
+    create_class_identifier(*class_symbol);
 }
 
 /*******************************************************************\
@@ -293,16 +290,11 @@ void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
   if(symbol_table.move(new_symbol, class_symbol))
   {
     warning() << "stub class symbol "+id2string(new_symbol.name)+" already exists";
-    if (!has_vtable_info(symbol_table, *class_symbol))
-      throw "vt missing for pre-existing stub class symbol "+id2string(new_symbol.name);
   }
   else
   {
-  // create the virtual table
-  create_vtable_symbol(symbol_table, *class_symbol);
-
-  // create vtable pointer
-  create_vtable_pointer(*class_symbol);
+    // create the class identifier
+    create_class_identifier(*class_symbol);
   }
 }
 
@@ -413,8 +405,10 @@ void java_bytecode_convertt::convert(
   method.set(ID_abstract, m.is_abstract);
   method.set(ID_is_virtual, is_virtual);
 
+  #if 0
   if(is_virtual)
     set_virtual_name(method);
+  #endif
 
   if(is_contructor(method))
     method.set(ID_constructor, true);
@@ -687,11 +681,11 @@ codet java_bytecode_convertt::convert_instructions(
         integer_typet());
       statement=std::string(id2string(statement), 0, statement.size()-2);
     }
-
+    
     exprt::operandst op=pop(bytecode_info.pop);
     exprt::operandst results;
     results.resize(bytecode_info.push, nil_exprt());
-
+    
     if(statement=="aconst_null")
     {
       assert(results.size()==1);
@@ -712,7 +706,19 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="invokedynamic")
     {
-      // not used in Java, will need to investigate what it does
+      // not used in Java
+      code_typet &code_type=to_code_type(arg0.type());
+      const code_typet::parameterst &parameters(code_type.parameters());
+
+      pop(parameters.size());
+
+      const typet &return_type=code_type.return_type();
+
+      if(return_type.id()!=ID_empty)
+      {
+        results.resize(1);
+        results[0]=nil_exprt();
+      }
     }
     else if(statement=="invokeinterface" ||
             statement=="invokespecial" ||
@@ -741,23 +747,44 @@ codet java_bytecode_convertt::convert_instructions(
       code_function_callt call;
       call.add_source_location()=i_it->source_location;
       call.arguments() = pop(parameters.size());
+      
+      if(use_this)
+      {
+        // 'this' may be a class type, which is the run-time
+        // info for that type, and are instances of java.lang.Class
+        assert(!call.arguments().empty());
+        
+        exprt &this_arg=call.arguments().front();
+        
+        if(this_arg.id()==ID_type)
+        {
+          irep_idt class_id=this_arg.type().get(ID_identifier);
+          symbol_typet java_lang_Class("java::java.lang.Class");
+          symbol_exprt symbol_expr(id2string(class_id)+"@class_model", java_lang_Class);
+          address_of_exprt address_of_expr(symbol_expr);
+          this_arg=address_of_expr;
+        }
+        
+        assert(this_arg.type().id()==ID_pointer);
+      }
 
       const typet &return_type=code_type.return_type();
 
-      if(ID_empty != return_type.id())
+      if(return_type.id()!=ID_empty)
       {
-        call.lhs() = tmp_variable(return_type);
+        call.lhs()=tmp_variable(return_type);
         results.resize(1);
-        results[0] = call.lhs();
+        results[0]=call.lhs();
       }
 
       if(is_virtual)
       {
-        const exprt &this_arg=call.arguments().front();
-        call.function() = make_vtable_function(arg0, this_arg);
+        assert(use_this);
+        assert(!call.arguments().empty());
+        call.function()=unary_exprt(ID_virtual_function, to_symbol_expr(arg0), arg0.type());
       }
       else
-        call.function() = arg0;
+        call.function()=arg0;
 
       call.function().add_source_location()=i_it->source_location;
       c = call;

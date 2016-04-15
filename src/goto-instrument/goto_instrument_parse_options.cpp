@@ -83,6 +83,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "horn_encoding.h"
 #include "thread_instrumentation.h"
 #include "skip_loops.h"
+#include "code_contracts.h"
 
 /*******************************************************************\
 
@@ -326,10 +327,10 @@ int goto_instrument_parse_optionst::doit()
 
       status() << "Interval Analysis" << eom;
       namespacet ns(symbol_table);
-      static_analysist<interval_domaint> interval_analysis(ns);
-      interval_analysis(goto_functions);
+      ait<interval_domaint> interval_analysis;
+      interval_analysis(goto_functions, ns);
       
-      interval_analysis.output(goto_functions, std::cout);
+      interval_analysis.output(ns, goto_functions, std::cout);
       return 0;
     }
     
@@ -922,6 +923,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_functions.update();
   }
     
+  // verify and set invariants and pre/post-condition pairs
+  if(cmdline.isset("apply-code-contracts"))
+  {
+    status() << "Applying Code Contracts" << eom;
+    code_contracts(symbol_table, goto_functions);
+  }
+
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
@@ -1216,6 +1224,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // add loop ids
   goto_functions.compute_loop_numbers();
   
+  // label the assertions
+  label_properties(goto_functions);
+
   // nondet volatile?
   if(cmdline.isset("nondet-volatile"))
   {
@@ -1238,7 +1249,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       symbol_table, goto_functions, cmdline.isset("pointer-check"));
 
     status() << "Performing a full slice" << eom;
-    full_slicer(goto_functions, ns);
+    if(cmdline.isset("property"))
+      property_slicer(goto_functions, ns, cmdline.get_values("property"));
+    else
+      full_slicer(goto_functions, ns);
   }
   
   // label the assertions
@@ -1339,6 +1353,7 @@ void goto_instrument_parse_optionst::help()
     "Slicing:\n"
     " --reachability-slice         slice away instructions that can't reach assertions\n"
     " --full-slice                 slice away instructions that don't affect assertions\n"
+    " --property id                slice with respect to specific property only\n"
     "\n"
     "Further transformations:\n"
     " --constant-propagator        propagate constants and simplify expressions\n"

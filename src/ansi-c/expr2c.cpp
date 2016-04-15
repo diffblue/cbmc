@@ -238,6 +238,10 @@ std::string expr2ct::convert_rec(
   {
     return q+"_Bool"+d;
   }
+  else if(src.id()==ID_string)
+  {
+    return q+"__CPROVER_string"+d;
+  }
   else if(src.id()==ID_natural ||
           src.id()==ID_integer ||
           src.id()==ID_rational)
@@ -2299,6 +2303,10 @@ std::string expr2ct::convert_constant(
       else
         return convert(src.op0(), precedence);
     }
+  }
+  else if(type.id()==ID_string)
+  {
+    return '"'+id2string(src.get_value())+'"';
   }
   else
     return convert_norep(src, precedence);

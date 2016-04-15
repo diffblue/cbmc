@@ -21,7 +21,7 @@ class optionst;
 #define GOTO_ANALYSER_OPTIONS \
   "(function):" \
   "D:I:(std89)(std99)(std11)" \
-  "(classpath):" \
+  "(classpath):(cp):(main-class):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-loops)" \
@@ -29,7 +29,11 @@ class optionst;
   "(show-properties)(show-reachable-properties)(property):" \
   "(verbosity):(version)" \
   "(gcc)(arch):" \
-  "(taint):(show-taint)"
+  "(taint):(show-taint)" \
+  "(json):(xml):" \
+  "(unreachable-instructions)" \
+  "(intervals)(show-intervals)" \
+  "(non-null)(show-non-null)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,
@@ -57,6 +61,8 @@ protected:
   bool set_properties(goto_functionst &goto_functions);
   
   void eval_verbosity();
+  
+  bool has_entry_point;
 };
 
 #endif

@@ -19,6 +19,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/java_bytecode_language.h>
 #endif
 
+#ifdef HAVE_JSIL
+#include <jsil/jsil_language.h>
+#endif
+
 #include "cbmc_parse_options.h"
 
 /*******************************************************************\
@@ -44,6 +48,10 @@ void cbmc_parse_optionst::register_languages()
   
   #ifdef HAVE_JAVA_BYTECODE
   register_language(new_java_bytecode_language);
+  #endif
+
+  #ifdef HAVE_JSIL
+  register_language(new_jsil_language);
   #endif
 }
 
