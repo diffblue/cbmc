@@ -153,7 +153,7 @@ char *asctime(const struct tm *timeptr)
 #define __CPROVER_TIME_H_INCLUDED
 #endif
 
-char *ctime(const time_t *clock);
+char *ctime(const time_t *clock)
 {
   (void)*clock;
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
