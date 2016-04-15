@@ -58,11 +58,11 @@ int yyjsonerror(const std::string &error)
 
 %}
 
-%token	TOK_STRING
-%token	TOK_NUMBER
-%token	TOK_TRUE
-%token	TOK_FALSE
-%token	TOK_NULL
+%token TOK_STRING
+%token TOK_NUMBER
+%token TOK_TRUE
+%token TOK_FALSE
+%token TOK_NULL
 
 %%
 
