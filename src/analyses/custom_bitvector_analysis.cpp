@@ -851,6 +851,7 @@ void custom_bitvector_analysist::check(
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       exprt result;
+      irep_idt description;
     
       if(i_it->is_assert())
       {
@@ -861,6 +862,8 @@ void custom_bitvector_analysist::check(
 
         exprt tmp=eval(i_it->guard, i_it);
         result=simplify_expr(tmp, ns);
+        
+        description=i_it->source_location.get_comment();
       }
       else
         continue;
@@ -877,15 +880,15 @@ void custom_bitvector_analysist::check(
         out << "\">\n";
         out << xml(i_it->source_location);
         out << "<description>"
-            << i_it->source_location.get_comment()
+            << description
             << "</description>\n";
         out << "</result>\n\n";
       }
       else
       {
         out << i_it->source_location;
-        if(!i_it->source_location.get_comment().empty())
-          out << ", " << i_it->source_location.get_comment();
+        if(!description.empty())
+          out << ", " << description;
         out << ": ";
         out << from_expr(ns, f_it->first, result);
         out << '\n';
