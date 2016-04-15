@@ -726,3 +726,20 @@ inline char *strrchr(const char *src, int c)
   #endif
 }
 
+/* FUNCTION: strerror */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#include <string.h>
+#define __CPROVER_STRING_H_INCLUDED
+#endif
+
+char *strerror(int errnum)
+{
+  __CPROVER_HIDE:;
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_event("invalidate_pointer", "strerror_result");
+  char *strerror_result;
+  __CPROVER_set_must(strerror_result, "strerror_result");
+  return strerror_result;
+  #endif
+}
