@@ -575,7 +575,7 @@ void custom_bitvector_domaint::output(
       it!=may_bits.end();
       it++)
   {
-    out << it->first << " MAY: ";
+    out << it->first << " MAY:";
     bit_vectort b=it->second;
     
     for(unsigned i=0; b!=0; i++, b>>=1)
