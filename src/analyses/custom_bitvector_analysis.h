@@ -142,6 +142,9 @@ public:
 
   unsigned get_bit_nr(const exprt &);
 
+  typedef numbering<irep_idt> bitst;
+  bitst bits;
+  
 protected:
   virtual void initialize(const goto_functionst &_goto_functions)
   {
@@ -150,8 +153,6 @@ protected:
 
   friend class custom_bitvector_domaint;
 
-  numbering<irep_idt> bits;
-  
   local_may_alias_factoryt local_may_alias_factory;
   
   std::set<exprt> aliases(const exprt &, locationt loc);
