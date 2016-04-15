@@ -850,21 +850,27 @@ void custom_bitvector_analysist::check(
 
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
-      if(!i_it->is_assert()) continue;
-      if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
+      exprt result;
+    
+      if(i_it->is_assert())
+      {
+        if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
+          continue;
+
+        if(operator[](i_it).is_bottom) continue;
+
+        exprt tmp=eval(i_it->guard, i_it);
+        result=simplify_expr(tmp, ns);
+      }
+      else
         continue;
-
-      if(operator[](i_it).is_bottom) continue;
-
-      exprt result=eval(i_it->guard, i_it);
-      exprt result2=simplify_expr(result, ns);
 
       if(use_xml)
       {
         out << "<result status=\"";
-        if(result2.is_true())
+        if(result.is_true())
           out << "SUCCESS";
-        else if(result2.is_false())
+        else if(result.is_false())
           out << "FAILURE";
         else 
           out << "UNKNOWN";
@@ -881,13 +887,13 @@ void custom_bitvector_analysist::check(
         if(!i_it->source_location.get_comment().empty())
           out << ", " << i_it->source_location.get_comment();
         out << ": ";
-        out << from_expr(ns, f_it->first, result2);
+        out << from_expr(ns, f_it->first, result);
         out << '\n';
       }
 
-      if(result2.is_true())
+      if(result.is_true())
         pass++;
-      else if(result2.is_false())
+      else if(result.is_false())
         fail++;
       else
         unknown++;
