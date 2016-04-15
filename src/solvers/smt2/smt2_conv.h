@@ -42,7 +42,7 @@ public:
     use_datatypes(false),
     use_array_of_bool(false),
     emit_set_logic(true),
-    use_strings(false),
+    strings_mode(STRINGS_OFF),
     out(_out),
     benchmark(_benchmark),
     notes(_notes),
@@ -68,7 +68,7 @@ public:
       break;
 
     case CVC4:
-      use_strings = true;
+      strings_mode = STRINGS_SMTLIB;
       logic = "ALL_SUPPORTED";
       break;
 
@@ -85,16 +85,20 @@ public:
       use_array_of_bool=true;
       emit_set_logic=false;
       use_datatypes=true;
+      strings_mode = STRINGS_QARRAY;
       break;
     }
 
     string_literal_func = "__CPROVER_uninterpreted_string_literal";
-    string_char_at_func = "__CPROVER_uninterpreted_char_at";
+    char_literal_func = "__CPROVER_uninterpreted_char_literal";
     string_length_func = "__CPROVER_uninterpreted_strlen";
+    string_equal_func = "__CPROVER_uninterpreted_string_equal";
+    string_char_at_func = "__CPROVER_uninterpreted_char_at";
     string_concat_func = "__CPROVER_uninterpreted_strcat";
     string_substring_func = "__CPROVER_uninterpreted_substring";
     string_is_prefix_func = "__CPROVER_uninterpreted_strprefixof";
     string_is_suffix_func = "__CPROVER_uninterpreted_strsuffixof";
+    string_char_set_func = "__CPROVER_uninterpreted_char_set";
     string_length_width = 32; // TODO! 
 
     write_header();
@@ -107,7 +111,8 @@ public:
   bool use_datatypes;
   bool use_array_of_bool;
   bool emit_set_logic;
-  bool use_strings;
+  enum strings_modet { STRINGS_OFF, STRINGS_SMTLIB, STRINGS_QARRAY };
+  strings_modet strings_mode;
 
   // overloading interfaces
   virtual literalt convert(const exprt &expr);
@@ -309,22 +314,35 @@ protected:
 
   // string support
   irep_idt string_literal_func;
+  irep_idt char_literal_func;
   irep_idt string_length_func;
+  irep_idt string_equal_func;
   irep_idt string_char_at_func;
   irep_idt string_concat_func;
   irep_idt string_substring_func;
   irep_idt string_is_prefix_func;
   irep_idt string_is_suffix_func;
+  irep_idt string_char_set_func;
   size_t string_length_width;
   
   bool is_string_type(const typet &type);
-  void convert_string_literal(const function_application_exprt &f);
+  bool is_char_type(const typet &type);
+  void convert_string_equal(const function_application_exprt &f);
   void convert_string_length(const function_application_exprt &f);
   void convert_string_concat(const function_application_exprt &f);
   void convert_string_char_at(const function_application_exprt &f);
   void convert_string_substring(const function_application_exprt &f);
   void convert_string_is_prefix(const function_application_exprt &f);
   void convert_string_is_suffix(const function_application_exprt &f);
+
+  void define_string_literal(const function_application_exprt &f);
+  void define_char_literal(const function_application_exprt &f);
+  void define_string_equal(const function_application_exprt &f);
+  void define_string_concat(const function_application_exprt &f);
+  void define_string_substring(const function_application_exprt &f);
+  void define_string_is_prefix(const function_application_exprt &f);
+  void define_string_is_suffix(const function_application_exprt &f);
+  void define_string_char_set(const function_application_exprt &f);
 
   defined_expressionst string_lengths;
 };
