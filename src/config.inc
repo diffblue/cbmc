@@ -1,9 +1,12 @@
+# -*- Makefile -*-
 # Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
 BUILD_ENV = AUTO
 
 # Variables you may want to override
 #CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 #CXXFLAGS = -std=c++11
+CXXFLAGS = -O0 -g
+CXX = /home/alb/work/diffblue/rtags/g++
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk 
@@ -18,8 +21,8 @@ BUILD_ENV = AUTO
 MINISAT2 = ../../minisat-2.2.1
 #GLUCOSE = ../../glucose-syrup
 #SMVSAT =
-#LIBZIPLIB = ../../libzip/lib/.libs/libzip.a ../../zlib/libz.a
-#LIBZIPINC = ../../libzip/lib
+LIBZIPLIB = /usr/lib/libzip.so
+LIBZIPINC = /usr/include
 
 # Signing identity for MacOS Gatekeeper
 
