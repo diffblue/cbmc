@@ -212,11 +212,6 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_k_induction_hint(unsigned min, unsigned max, "
       "unsigned step, unsigned loop_free);\n"
     
-    // manual specification of predicates
-    "void __CPROVER_predicate(__CPROVER_bool predicate);\n"
-    "void __CPROVER_parameter_predicates();\n"
-    "void __CPROVER_return_predicates();\n"
-
     // pipes, write, read, close
     "struct __CPROVER_pipet {\n"
     "  _Bool widowed;\n"

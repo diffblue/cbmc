@@ -1019,45 +1019,8 @@ void goto_convertt::do_function_call_symbol(
     throw "error: function `"+id2string(identifier)+"' type mismatch: expected code";
   }
   
-  if(identifier==CPROVER_PREFIX "parameter_predicates" || 
-     identifier==CPROVER_PREFIX "return_predicates")
-  {
-    if(arguments.size() != 0)
-    {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have no arguments";
-    }
-
-    goto_programt::targett t = dest.add_instruction(OTHER);
-    t->source_location = function.source_location();
-    t->source_location.set("user-provided", true);
-    if(identifier==CPROVER_PREFIX "parameter_predicates")
-    {
-      t->code = codet(ID_user_specified_parameter_predicates);
-      t->code.set_statement(ID_user_specified_parameter_predicates);
-    }
-    else
-    {
-      t->code = codet(ID_user_specified_return_predicates);
-      t->code.set_statement(ID_user_specified_return_predicates);
-    }
-  }
-  else if(identifier==CPROVER_PREFIX "predicate")
-  {
-    if(arguments.size()!=1)
-    {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have one argument";
-    }
-
-    goto_programt::targett t=dest.add_instruction(OTHER);
-    t->guard=arguments.front();
-    t->source_location=function.source_location();
-    t->source_location.set("user-provided", true);
-    t->code=codet(ID_user_specified_predicate);
-  }
-  else if(identifier==CPROVER_PREFIX "assume" ||
-          identifier=="__VERIFIER_assume")
+  if(identifier==CPROVER_PREFIX "assume" ||
+     identifier=="__VERIFIER_assume")
   {
     if(arguments.size()!=1)
     {
