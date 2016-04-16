@@ -11,6 +11,8 @@ Author: Daniel Kroening
 #include <util/find_symbols.h>
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
+#include <util/message_stream.h>
+#include <util/file_util.h>
 
 #include "remove_internal_symbols.h"
 
@@ -31,7 +33,8 @@ void get_symbols_rec(
   const symbolt &symbol,
   find_symbols_sett &dest)
 {
-  dest.insert(symbol.name);
+  if(!dest.insert(symbol.name).second)
+    return;
   
   find_symbols_sett new_symbols;
 
@@ -60,11 +63,7 @@ void get_symbols_rec(
       it!=new_symbols.end();
       it++)
   {
-    if(dest.find(*it)==dest.end())
-    {
-      dest.insert(*it);
-      get_symbols_rec(ns, ns.lookup(*it), dest); // recursive call
-    }
+    get_symbols_rec(ns, ns.lookup(*it), dest); // recursive call
   }
 }
 
@@ -88,7 +87,9 @@ Function: remove_internal_symbols
 \*******************************************************************/
 
 void remove_internal_symbols(
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  const include_mapt &include_map,
+  message_handlert &message_handler)
 {
   namespacet ns(symbol_table);
   find_symbols_sett exported;
@@ -106,17 +107,46 @@ void remove_internal_symbols(
   special.insert(CPROVER_PREFIX "dead_object");
   special.insert(CPROVER_PREFIX "rounding_mode");
 
+  struct file_infot
+  {
+    file_infot():is_system_header(false), is_nested(false)
+    {
+    }
+
+    bool is_system_header;
+    bool is_nested;
+    source_locationt included_from;
+  };
+  hash_map_cont<irep_idt, file_infot, irep_id_hash> unused_files;
+
   for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();
       it!=symbol_table.symbols.end();
       it++)
   {
-    // already marked?
-    if(exported.find(it->first)!=exported.end())
-      continue;
-
-    // not marked yet  
     const symbolt &symbol=it->second;
+
+    const irep_idt &f=symbol.location.get_file();
+    if(!f.empty())
+    {
+      file_infot f_info;
+      f_info.is_system_header=symbol.location.get_hide();
+
+      include_mapt::const_iterator entry=include_map.find(f);
+      if(entry!=include_map.end() &&
+         !entry->second.get_file().empty())
+      {
+        f_info.included_from=entry->second;
+
+        entry=include_map.find(entry->second.get_file());
+        if(entry!=include_map.end() &&
+           !entry->second.get_file().empty() &&
+           !is_dot_i_file(id2string(entry->second.get_file())))
+          f_info.is_nested=true;
+      }
+
+      unused_files.insert(std::make_pair(f, f_info));
+    }
 
     if(special.find(symbol.name)!=special.end())
     {
@@ -171,15 +201,43 @@ void remove_internal_symbols(
   {
     if(exported.find(it->first)==exported.end())
     {
-      symbol_tablet::symbolst::iterator next=it;
-      ++next;
-      symbol_table.symbols.erase(it);
-      it=next;
+      it=symbol_table.symbols.erase(it);
     }
     else
     {
+      unused_files.erase(it->second.location.get_file());
       it++;
     }
+  }
+
+  unused_files.erase("gcc_builtin_headers_generic.h");
+  unused_files.erase("gcc_builtin_headers_ia32.h");
+  unused_files.erase("gcc_builtin_headers_ia32-2.h");
+  unused_files.erase("gcc_builtin_headers_alpha.h");
+  unused_files.erase("gcc_builtin_headers_arm.h");
+  unused_files.erase("gcc_builtin_headers_mips.h");
+  unused_files.erase("gcc_builtin_headers_power.h");
+  unused_files.erase("arm_builtin_headers.h");
+  unused_files.erase("cw_builtin_headers.h");
+  unused_files.erase("clang_builtin_headers.h");
+
+  // using deprecated message_streamt to set error location
+  message_streamt message(message_handler);
+
+  for(const std::pair<irep_idt, file_infot> &uf : unused_files)
+  {
+    message.err_location(uf.second.included_from);
+    std::string msg=
+      "warning: no declarations of #include "+
+      id2string(uf.first)+" used";
+
+    if(uf.second.is_system_header)
+      msg+=" (system header)";
+
+    if(!uf.second.is_nested)
+      message.warning_msg(msg);
+    else
+      message.debug_msg(msg);
   }
 }
 
