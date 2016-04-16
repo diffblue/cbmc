@@ -682,7 +682,8 @@ void goto_instrument_parse_optionst::do_function_pointer_removal()
   function_pointer_removal_done=true;
 
   status() << "Function Pointer Removal" << eom;
-  remove_function_pointers(symbol_table, goto_functions, false);
+  remove_function_pointers(
+    symbol_table, goto_functions, cmdline.isset("pointer-check"));
 }
 
 /*******************************************************************\
@@ -886,13 +887,28 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   namespacet ns(symbol_table);
 
+  // now do full inlining, if requested
+  if(cmdline.isset("inline"))
+  {
+    do_function_pointer_removal();
+
+    if(cmdline.isset("show-custom-bitvector-analysis") ||
+       cmdline.isset("custom-bitvector-analysis"))
+    {
+      do_remove_returns();
+      thread_exit_instrumentation(goto_functions);
+      mutex_init_instrumentation(symbol_table, goto_functions);
+    }
+
+    status() << "Performing full inlining" << eom;
+    goto_inline(goto_functions, ns, ui_message_handler);
+  }
+
   if(cmdline.isset("show-custom-bitvector-analysis") ||
      cmdline.isset("custom-bitvector-analysis"))
   {
-    partial_inlining_done=true;
-    status() << "Partial Inlining" << eom;
-    const namespacet ns(symbol_table);
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    do_partial_inlining();
+
     status() << "Propagating Constants" << eom;
     constant_propagator_ait constant_propagator_ai(goto_functions, ns);
     remove_skip(goto_functions);
@@ -904,8 +920,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_partial_inlining();
     do_remove_returns();
     parameter_assignments(symbol_table, goto_functions);
-
-    namespacet ns(symbol_table);
 
     // recalculate numbers, etc.
     goto_functions.update();
@@ -929,30 +943,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     code_contracts(symbol_table, goto_functions);
   }
 
-  // now do full inlining, if requested
-  if(cmdline.isset("inline"))
-  {
-    status() << "Function Pointer Removal" << eom;
-    remove_function_pointers(
-      symbol_table, goto_functions, cmdline.isset("pointer-check"));
-
-    if(cmdline.isset("show-custom-bitvector-analysis") ||
-       cmdline.isset("custom-bitvector-analysis"))
-    {
-      do_remove_returns();
-      thread_exit_instrumentation(goto_functions);
-      mutex_init_instrumentation(symbol_table, goto_functions);
-    }
-
-    status() << "Performing full inlining" << eom;
-    goto_inline(goto_functions, ns, ui_message_handler);
-  }
+  // replace function pointers, if explicitly requested
+  if(cmdline.isset("remove-function-pointers"))
+    do_function_pointer_removal();
 
   if(cmdline.isset("constant-propagator"))
   {
     do_function_pointer_removal();
-
-    namespacet ns(symbol_table);
 
     status() << "Propagating Constants" << eom;
 
@@ -1002,15 +999,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
      cmdline.isset("isr") ||
      cmdline.isset("concurrency"))
   {
-    if(!cmdline.isset("inline"))
-    {
-      status() << "Function Pointer Removal" << eom;
-      remove_function_pointers(symbol_table, goto_functions, cmdline.isset("pointer-check"));
-
-      // do partial inlining
-      status() << "Partial Inlining" << eom;
-      goto_partial_inline(goto_functions, ns, ui_message_handler);
-    }
+    do_function_pointer_removal();
+    do_partial_inlining();
     
     status() << "Pointer Analysis" << eom;
     value_set_analysist value_set_analysis(ns);
@@ -1243,9 +1233,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // full slice?
   if(cmdline.isset("full-slice"))
   {
-    status() << "Function Pointer Removal" << eom;
-    remove_function_pointers(
-      symbol_table, goto_functions, cmdline.isset("pointer-check"));
+    do_function_pointer_removal();
 
     status() << "Performing a full slice" << eom;
     if(cmdline.isset("property"))
@@ -1358,6 +1346,7 @@ void goto_instrument_parse_optionst::help()
     "Further transformations:\n"
     " --constant-propagator        propagate constants and simplify expressions\n"
     " --inline                     perform full inlining\n"
+    " --remove-function-pointers   replace function pointers by case statement over function calls\n"
     " --add-library                add models of C library functions\n"
     "\n"
     "Other options:\n"
