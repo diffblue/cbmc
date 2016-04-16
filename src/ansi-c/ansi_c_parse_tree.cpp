@@ -25,6 +25,7 @@ Function: ansi_c_parse_treet::swap
 void ansi_c_parse_treet::swap(ansi_c_parse_treet &ansi_c_parse_tree)
 {
   ansi_c_parse_tree.items.swap(items);
+  ansi_c_parse_tree.include_map.swap(include_map);
 }
 
 /*******************************************************************\
@@ -42,6 +43,7 @@ Function: ansi_c_parse_treet::clear
 void ansi_c_parse_treet::clear()
 {
   items.clear();
+  include_map.clear();
 }
 
 /*******************************************************************\
