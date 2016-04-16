@@ -82,4 +82,42 @@ void preprocessor_line(
   std::string file_name_tmp2;
   unescape_string(file_name_tmp, file_name_tmp2);
   parser.set_file(file_name_tmp2);
+
+  // GCC provides further information
+  // https://gcc.gnu.org/onlinedocs/cpp/Preprocessor-Output.html
+  if(*ptr=='"') ++ptr;
+  while(*ptr!='\n')
+  {
+    // skip WS
+    while(*ptr==' ' || *ptr=='\t') ++ptr;
+    if(!isdigit(*ptr))
+      break;
+
+    std::string flag_str;
+    while(isdigit(*ptr))
+    {
+      flag_str+=*ptr;
+      ++ptr;
+    }
+
+    unsigned flag=safe_string2unsigned(flag_str);
+
+    switch(flag)
+    {
+      case 1:
+        // opening a new file -- covered by parser.set_file
+        break;
+      case 2:
+        // return from included file -- ignored
+        break;
+      case 3:
+        parser.set_is_system_header();
+        break;
+      case 4:
+        // extern "C" -- ignored;
+        break;
+      default:
+        assert(false);
+    }
+  }
 }

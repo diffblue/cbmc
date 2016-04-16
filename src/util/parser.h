@@ -78,6 +78,7 @@ public:
     source_location.set_file(file);
     source_location.set_working_directory(
       get_current_working_directory());
+    source_location.remove(ID_hide);
   }
   
   inline irep_idt get_file() const
@@ -120,6 +121,12 @@ public:
   inline void advance_column(unsigned token_width)
   {
     column+=token_width;
+  }
+
+  inline void set_is_system_header()
+  {
+    // use hidden-flag to reflect being a system header
+    source_location.set_hide();
   }
   
 protected:
