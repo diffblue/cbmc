@@ -581,7 +581,7 @@ symbol_typet java_classname(const std::string &id)
     }
 
     // these are auto-generated, and derived from java.lang.Object
-    class_name="array_of_"+suffix;
+    class_name="array["+suffix+"]";
   }
   
   class_name=slash_to_dot(class_name);
