@@ -46,6 +46,7 @@ protected:
       std::size_t index;
     };
   
+    // class name to index map
     typedef std::map<irep_idt, entryt> entriest;
     entriest entries;
   };
