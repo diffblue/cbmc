@@ -1378,6 +1378,12 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 "noreturn" |
 "__noreturn__"      { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_NORETURN; }
 
+"constructor" |
+"__constructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_CONSTRUCTOR; }
+
+"destructor" |
+"__destructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_DESTRUCTOR; }
+
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
 {identifier}        { BEGIN(GCC_ATTRIBUTE4); }

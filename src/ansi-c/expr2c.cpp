@@ -694,6 +694,11 @@ std::string expr2ct::convert_rec(
   {
     return q+"__builtin_va_list"+d;
   }
+  else if(src.id()==ID_constructor ||
+          src.id()==ID_destructor)
+  {
+    return q+"__attribute__(("+id2string(src.id())+")) void"+d;
+  }
 
   {
     lispexprt lisp;
