@@ -33,7 +33,7 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
   const irep_idt &class_name)
 {
   std::stack<irep_idt> queue;
-
+  
   queue.push(class_name);
 
   while(!queue.empty())

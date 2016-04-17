@@ -320,14 +320,7 @@ void java_bytecode_parsert::get_class_refs()
   {
     if(c.tag==CONSTANT_Class)
     {
-      if(c.expr.type().id()==ID_symbol)
-      {
-        irep_idt name=c.expr.type().get(ID_C_base_name);
-        if(!has_prefix(id2string(name), "array["))
-          parse_tree.class_refs.insert(name);
-      }
-      else if(c.expr.type().id()==ID_array)
-        parse_tree.class_refs.insert(c.expr.type().subtype().get(ID_C_base_name));
+      get_class_refs_rec(c.expr.type());
     }
     else if(c.tag==CONSTANT_NameAndType)
     {
@@ -369,24 +362,23 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
     const code_typet &ct=to_code_type(src);
     const typet &rt=ct.return_type();
     get_class_refs_rec(rt);
-    for(const auto & p : ct.parameters()) get_class_refs_rec(p.type());
+    for(const auto & p : ct.parameters())
+      get_class_refs_rec(p.type());
   }
-  else if(src.id()==ID_pointer && src.subtype().id()==ID_symbol)
+  else if(src.id()==ID_symbol)
   {
-    parse_tree.class_refs.insert(src.subtype().get(ID_C_base_name));
+    irep_idt name=src.get(ID_C_base_name);
+    if(!has_prefix(id2string(name), "array["))
+      parse_tree.class_refs.insert(name);
   }
-  else if(src.id()==ID_pointer &&
-          src.subtype().id()==ID_struct)
+  else if(src.id()==ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(src.subtype());
+    const struct_typet &struct_type=to_struct_type(src);
     for(const auto & c : struct_type.components())
       get_class_refs_rec(c.type());
   }
-  else if(src.id()==ID_pointer && src.subtype().id()==ID_pointer &&
-          src.subtype().subtype().id()==ID_symbol)
-  {
-    parse_tree.class_refs.insert(src.subtype().subtype().get(ID_C_base_name));
-  }
+  else if(src.id()==ID_pointer)
+    get_class_refs_rec(src.subtype());
 }
 
 /*******************************************************************\
