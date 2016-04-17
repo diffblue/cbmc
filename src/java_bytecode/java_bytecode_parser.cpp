@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/prefix.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -313,7 +314,11 @@ void java_bytecode_parsert::get_class_refs()
     if(c.tag==CONSTANT_Class)
     {
       if(c.expr.type().id()==ID_symbol)
-        parse_tree.class_refs.insert(c.expr.type().get(ID_C_base_name));
+      {
+        irep_idt name=c.expr.type().get(ID_C_base_name);
+        if(!has_prefix(id2string(name), "array["))
+          parse_tree.class_refs.insert(name);
+      }
       else if(c.expr.type().id()==ID_array)
         parse_tree.class_refs.insert(c.expr.type().subtype().get(ID_C_base_name));
     }

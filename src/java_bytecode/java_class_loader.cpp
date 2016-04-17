@@ -54,7 +54,7 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
     for(java_bytecode_parse_treet::class_refst::const_iterator
         it=parse_tree.class_refs.begin();
         it!=parse_tree.class_refs.end();
-        it++)
+        it++)       
       queue.push(*it);
   }
   
