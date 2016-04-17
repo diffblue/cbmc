@@ -501,7 +501,7 @@ Function: java_classname
 symbol_typet java_classname(const std::string &id)
 {
   if(!id.empty() && id[0]=='[')
-    return to_symbol_type(java_type_from_string(id));
+    return to_symbol_type(java_type_from_string(id).subtype());
   
   std::string class_name=id;
 
