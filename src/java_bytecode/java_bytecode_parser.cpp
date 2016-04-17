@@ -761,22 +761,23 @@ void java_bytecode_parsert::rbytecode(
       address+=1;
       break;
       
-    case 'V': // local variable index (one byte) plus one signed byte
-      if(wide_instruction)
+    case 'V':
+      if(wide_instruction) // local variable index (two bytes) plus two signed bytes
       {
         u2 v=read_u2();
         instruction.args.push_back(from_integer(v, integer_typet()));
         signed short c=read_u2();
         instruction.args.push_back(from_integer(c, integer_typet()));
+        address+=4;
       }
-      else
+      else // local variable index (one byte) plus one signed byte
       {
         u1 v=read_u1();
         instruction.args.push_back(from_integer(v, integer_typet()));
         signed char c=read_u1();
         instruction.args.push_back(from_integer(c, integer_typet()));
+        address+=2;
       }
-      address+=2;
       break;
       
     case 'I': // two byte constant_pool index plus two bytes
@@ -826,20 +827,20 @@ void java_bytecode_parsert::rbytecode(
         while(((address+1)&3)!=0) { read_u1(); address++; }
         
         // now default value
-        u4 default_value=read_u4();
+        signed int default_value=read_u4();
         instruction.args.push_back(from_integer(base_offset+default_value, integer_typet()));
         address+=4;
         
         // now low value
-        u4 low_value=read_u4();
+        signed int low_value=read_u4();
         address+=4;
         
         // now high value
-        u4 high_value=read_u4();
+        signed int high_value=read_u4();
         address+=4;
 
         // there are high-low+1 offsets
-        for(unsigned i=low_value; i<=high_value; i++)
+        for(signed int i=low_value; i<=high_value; i++)
         {
           u4 offset=read_u4();
           instruction.args.push_back(from_integer(i, integer_typet()));
@@ -920,7 +921,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     u2 UNUSED max_locals=read_u2();
     
     rbytecode(method.instructions);
-
+    
     u2 exception_table_length=read_u2();
 
     for(unsigned e=0; e<exception_table_length; e++)
@@ -932,7 +933,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     }
 
     u2 attributes_count=read_u2();
-
+    
     for(unsigned j=0; j<attributes_count; j++)
       rcode_attribute(method);
       
@@ -1296,7 +1297,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   method.signature=id2string(pool_entry(descriptor_index).s);
   
   u2 attributes_count=read_u2();
-
+  
   for(unsigned j=0; j<attributes_count; j++)
     rmethod_attribute(method);
 }
