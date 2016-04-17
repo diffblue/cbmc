@@ -502,9 +502,7 @@ bool linkingt::needs_renaming_non_type(
   // These are static functions, or static variables
   // inside static function bodies.
   if(new_symbol.is_file_local ||
-     old_symbol.is_file_local ||
-     (new_symbol.is_weak &&
-      old_symbol.is_weak))
+     old_symbol.is_file_local)
     return true;
   
   return false;
