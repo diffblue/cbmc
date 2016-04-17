@@ -385,7 +385,9 @@ typet java_type_from_string(const std::string &src)
     {
       if(src.size()<=1) return nil_typet();
       const typet subtype=java_type_from_string(src.substr(1, std::string::npos));
-      return java_array_type('a');
+      typet tmp=java_array_type('a');
+      tmp.subtype().set(ID_C_element_type, subtype);
+      return tmp;
     }
     
   case 'B': return java_byte_type();
@@ -498,43 +500,11 @@ Function: java_classname
 
 symbol_typet java_classname(const std::string &id)
 {
+  if(!id.empty() && id[0]=='[')
+    return to_symbol_type(java_type_from_string(id));
+  
   std::string class_name=id;
 
-  if(!class_name.empty() && class_name[0]=='[')
-  {
-    assert(class_name.size()>=2);
-    
-    std::string suffix;
-
-    switch(class_name[1])
-    {
-    case 'B': suffix="byte"; break;
-    case 'F': suffix="float"; break;
-    case 'D': suffix="double"; break;
-    case 'I': suffix="int"; break;
-    case 'C': suffix="char"; break;
-    case 'S': suffix="short"; break;
-    case 'Z': suffix="boolean"; break;
-    case 'V': suffix="void"; break;
-    case 'J': suffix="long"; break;
-    case 'L':
-      //assert(class_name.size()>=3);
-      //assert(class_name[class_name.size()-1]==';');
-      //suffix=std::string(class_name, 2, class_name.size()-3);
-      suffix="reference";
-      break;
-      
-    case '[':
-      suffix="reference";
-      break;
-      
-    default: assert(false);
-    }
-
-    // these are auto-generated, and derived from java.lang.Object
-    class_name="array["+suffix+"]";
-  }
-  
   class_name=slash_to_dot(class_name);
   irep_idt identifier="java::"+class_name;
   symbol_typet symbol_type(identifier);
