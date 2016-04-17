@@ -196,6 +196,8 @@ std::string expr2javat::convert_rec(
     return q+"double"+d;
   else if(src==java_boolean_type())
     return q+"bool"+d;
+  else if(src==java_byte_type())
+    return q+"byte"+d;
   else if(src.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(src);

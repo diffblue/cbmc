@@ -446,6 +446,7 @@ typet java_type_from_string(const std::string &src)
       return java_array_type(subtype, 1);
     }
     
+  case 'B': return java_byte_type();
   case 'F': return java_float_type();    
   case 'D': return java_double_type();
   case 'I': return java_int_type();
@@ -565,6 +566,7 @@ symbol_typet java_classname(const std::string &id)
 
     switch(class_name[1])
     {
+    case 'B': suffix="byte"; break;
     case 'F': suffix="float"; break;
     case 'D': suffix="double"; break;
     case 'I': suffix="int"; break;
