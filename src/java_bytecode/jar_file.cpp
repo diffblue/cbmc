@@ -89,16 +89,18 @@ Function: jar_filet::get_entry
 
 #define ZIP_READ_SIZE 10000
 
-std::string jar_filet::get_entry(std::size_t index)
+std::string jar_filet::get_entry(std::size_t i)
 {
   if(zip==nullptr)
     return std::string("");
+    
+  assert(i<index.size());
 
   std::string dest;
   
   #ifdef HAVE_LIBZIP
   struct zip_file *zip_file=
-    zip_fopen_index(static_cast<struct zip *>(zip), index, 0);
+    zip_fopen_index(static_cast<struct zip *>(zip), i, 0);
   
   if(zip_file==NULL)
   {
