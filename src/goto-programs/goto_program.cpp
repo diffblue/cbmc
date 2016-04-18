@@ -53,7 +53,7 @@ std::ostream& goto_programt::output_instruction(
       out << " " << *l_it;
     }
     
-    out << std::endl;
+    out << '\n';
   }
 
   if(it->is_target())
@@ -64,7 +64,7 @@ std::ostream& goto_programt::output_instruction(
   switch(it->type)
   {
   case NO_INSTRUCTION_TYPE:
-    out << "NO INSTRUCTION TYPE SET" << std::endl;
+    out << "NO INSTRUCTION TYPE SET" << '\n';
     break;
   
   case GOTO:
@@ -86,7 +86,7 @@ std::ostream& goto_programt::output_instruction(
       out << (*gt_it)->target_number;
     }
       
-    out << std::endl;
+    out << '\n';
     break;
     
   case RETURN:
@@ -95,7 +95,7 @@ std::ostream& goto_programt::output_instruction(
   case DEAD:
   case FUNCTION_CALL:
   case ASSIGN:
-    out << from_expr(ns, identifier, it->code) << std::endl;
+    out << from_expr(ns, identifier, it->code) << '\n';
     break;
     
   case ASSUME:
@@ -112,19 +112,19 @@ std::ostream& goto_programt::output_instruction(
       if(comment!="") out << " // " << comment;
     }
       
-    out << std::endl;
+    out << '\n';
     break;
 
   case SKIP:
-    out << "SKIP" << std::endl;
+    out << "SKIP" << '\n';
     break;
     
   case END_FUNCTION:
-    out << "END_FUNCTION" << std::endl;
+    out << "END_FUNCTION" << '\n';
     break;
     
   case LOCATION:
-    out << "LOCATION" << std::endl;
+    out << "LOCATION" << '\n';
     break;
     
   case THROW:
@@ -144,7 +144,7 @@ std::ostream& goto_programt::output_instruction(
     if(it->code.operands().size()==1)
       out << ": " << from_expr(ns, identifier, it->code.op0());
     
-    out << std::endl;
+    out << '\n';
     break;
     
   case CATCH:
@@ -170,15 +170,15 @@ std::ostream& goto_programt::output_instruction(
     else
       out << "CATCH-POP";
       
-    out << std::endl;
+    out << '\n';
     break;
     
   case ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN" << std::endl;
+    out << "ATOMIC_BEGIN" << '\n';
     break;
     
   case ATOMIC_END:
-    out << "ATOMIC_END" << std::endl;
+    out << "ATOMIC_END" << '\n';
     break;
     
   case START_THREAD:
@@ -187,11 +187,11 @@ std::ostream& goto_programt::output_instruction(
     if(it->targets.size()==1)
       out << it->targets.front()->target_number;
     
-    out << std::endl;
+    out << '\n';
     break;
     
   case END_THREAD:
-    out << "END THREAD" << std::endl;
+    out << "END THREAD" << '\n';
     break;
     
   default:
