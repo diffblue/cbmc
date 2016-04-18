@@ -136,8 +136,8 @@ std::string MetaString(const std::string &in)
 {
   std::string result;
   
-  for(unsigned i=0; i<in.size(); i++)
-    MetaChar(result, in[i], true);
+  for(const auto & ch : in)
+    MetaChar(result, ch, true);
   
   return result;
 }

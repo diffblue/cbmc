@@ -60,11 +60,9 @@ Function: goto_convertt::finish_gotos
 
 void goto_convertt::finish_gotos()
 {
-  for(gotost::const_iterator it=targets.gotos.begin();
-      it!=targets.gotos.end();
-      it++)
+  for(const auto & it : targets.gotos)
   {
-    goto_programt::instructiont &i=**it;
+    goto_programt::instructiont &i=*it;
     
     if(i.code.get_statement()=="non-deterministic-goto")
     {
@@ -146,12 +144,9 @@ Function: goto_convertt::finish_computed_gotos
 
 void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
 {
-  for(computed_gotost::const_iterator
-      g_it=targets.computed_gotos.begin();
-      g_it!=targets.computed_gotos.end();
-      g_it++)
+  for(auto & g_it : targets.computed_gotos)
   {
-    goto_programt::instructiont &i=**g_it;
+    goto_programt::instructiont &i=*g_it;
     exprt destination=i.code.op0();
     
     assert(destination.id()==ID_dereference);
@@ -178,7 +173,7 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
       guard.rhs()=address_of_exprt(label_expr);
     
       goto_programt::targett t=
-        goto_program.insert_after(*g_it);
+        goto_program.insert_after(g_it);
 
       t->make_goto(l_it->second);
       t->source_location=i.source_location;
@@ -1451,18 +1446,16 @@ void goto_convertt::convert_switch(
 
   goto_programt tmp_cases;
 
-  for(casest::iterator it=targets.cases.begin();
-      it!=targets.cases.end();
-      it++)
+  for(auto & it : targets.cases)
   {
-    const caset &case_ops=it->second;
+    const caset &case_ops=it.second;
   
     assert(!case_ops.empty());    
   
     exprt guard_expr=case_guard(argument, case_ops);
 
     goto_programt::targett x=tmp_cases.add_instruction();
-    x->make_goto(it->first);
+    x->make_goto(it.first);
     x->guard.swap(guard_expr);
     x->source_location=case_ops.front().find_source_location();
   }

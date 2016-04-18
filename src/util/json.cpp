@@ -26,15 +26,14 @@ Function: jsont::escape_string
 
 void jsont::escape_string(const std::string &src, std::ostream &out)
 {
-  for(std::string::const_iterator
-      it=src.begin(); it!=src.end(); it++)
+  for(const auto & it : src)
   {
-    switch(*it)
+    switch(it)
     {
     case '\\':
     case '"':
       out << '\\';
-      out << *it;
+      out << it;
       break;
     
     case '\b':
@@ -58,7 +57,7 @@ void jsont::escape_string(const std::string &src, std::ostream &out)
       break;
       
     default:
-      out << *it;
+      out << it;
     }
   }
 }

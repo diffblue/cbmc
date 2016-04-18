@@ -125,15 +125,12 @@ void output_vcd(
   
   numbering<irep_idt> n;
 
-  for(goto_tracet::stepst::const_iterator
-      it=goto_trace.steps.begin();
-      it!=goto_trace.steps.end();
-      it++)
+  for(const auto & it : goto_trace.steps)
   {
-    if(it->is_assignment())
+    if(it.is_assignment())
     {
-      irep_idt identifier=it->lhs_object.get_identifier();
-      const typet &type=it->lhs_object.type();
+      irep_idt identifier=it.lhs_object.get_identifier();
+      const typet &type=it.lhs_object.type();
         
       unsigned number=n.number(identifier);
 
@@ -155,17 +152,14 @@ void output_vcd(
 
   unsigned timestamp=0;
 
-  for(goto_tracet::stepst::const_iterator
-      it=goto_trace.steps.begin();
-      it!=goto_trace.steps.end();
-      it++)
+  for(const auto & it : goto_trace.steps)
   {
-    switch(it->type)
+    switch(it.type)
     {
     case goto_trace_stept::ASSIGNMENT:
       {
-        irep_idt identifier=it->lhs_object.get_identifier();
-        const typet &type=it->lhs_object.type();
+        irep_idt identifier=it.lhs_object.get_identifier();
+        const typet &type=it.lhs_object.type();
 
         out << '#' << timestamp << "\n";
         timestamp++;
@@ -175,16 +169,16 @@ void output_vcd(
         // booleans are special in VCD
         if(type.id()==ID_bool)
         {
-          if(it->lhs_object_value.is_true())
+          if(it.lhs_object_value.is_true())
             out << "1" << "V" << number << "\n";
-          else if(it->lhs_object_value.is_false())
+          else if(it.lhs_object_value.is_false())
             out << "0" << "V" << number << "\n";
           else
             out << "x" << "V" << number << "\n";
         }
         else
         {
-          std::string binary=as_vcd_binary(it->lhs_object_value, ns);
+          std::string binary=as_vcd_binary(it.lhs_object_value, ns);
 
           if(binary!="")
             out << "b" << binary << " V" << number << " " << "\n";

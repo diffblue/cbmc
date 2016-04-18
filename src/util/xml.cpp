@@ -75,16 +75,13 @@ void xmlt::output(std::ostream &out, unsigned indent) const
 
   out << '<' << name;
 
-  for(attributest::const_iterator
-      it=attributes.begin();
-      it!=attributes.end();
-      it++)
+  for(const auto & it : attributes)
   {
-    // it->first needs to be non-empty
-    if(it->first=="") continue;
-    out << ' ' << it->first
+    // it.first needs to be non-empty
+    if(it.first=="") continue;
+    out << ' ' << it.first
         << '=' << '"';
-    escape_attribute(it->second, out);
+    escape_attribute(it.second, out);
     out << '"';
   }
 
@@ -102,11 +99,8 @@ void xmlt::output(std::ostream &out, unsigned indent) const
   {
     out << "\n";
 
-    for(elementst::const_iterator
-        it=elements.begin();
-        it!=elements.end();
-        it++)
-      it->output(out, indent+2);
+    for(const auto & it : elements)
+      it.output(out, indent+2);
 
     do_indent(out, indent);
   }
@@ -128,10 +122,8 @@ Function: xmlt::escape
 
 void xmlt::escape(const std::string &s, std::ostream &out)
 {
-  for(unsigned i=0; i<s.size(); i++)
+  for(const auto ch : s)
   {
-    const char ch=s[i];
-
     switch(ch)
     {
     case '&':
@@ -179,10 +171,8 @@ Function: xmlt::escape_attribute
 
 void xmlt::escape_attribute(const std::string &s, std::ostream &out)
 {
-  for(unsigned i=0; i<s.size(); i++)
+  for(const auto & ch : s)
   {
-    const char ch=s[i];
-
     switch(ch)
     {
     case '&':
