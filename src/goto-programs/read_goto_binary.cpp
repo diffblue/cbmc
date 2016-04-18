@@ -364,9 +364,9 @@ bool read_object_and_link(
   const std::string &file_name,
   symbol_tablet &symbol_table,
   goto_functionst &functions,
-  language_uit &language_ui)
+  message_handlert &message_handler)
 {
-  language_ui.print(8, "Reading: " + file_name);
+  message_handler.print(8, "Reading: " + file_name);
 
   // we read into a temporary symbol_table
   symbol_tablet temp_symbol_table;
@@ -376,7 +376,7 @@ bool read_object_and_link(
       file_name,
       temp_symbol_table,
       temp_functions,
-      language_ui.get_message_handler()))
+      message_handler))
     return true;
 
   std::set<irep_idt> seen_modes;
@@ -395,8 +395,9 @@ bool read_object_and_link(
 
   if(!seen_modes.empty())
   {
-    language_ui.error() << "Multi-language linking not supported"
-                        << messaget::eom;
+    messaget message(message_handler);
+    message.error() << "Multi-language linking not supported"
+                    << messaget::eom;
     return true;
   }
 
@@ -404,7 +405,7 @@ bool read_object_and_link(
 
   linkingt linking(symbol_table,
                    temp_symbol_table,
-                   language_ui.get_message_handler());
+                   message_handler);
 
   if(linking.typecheck_main())
     return true;

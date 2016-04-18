@@ -20,21 +20,19 @@ bool read_goto_binary(
   const std::string &filename,
   symbol_tablet &symbol_table,
   goto_functionst &dest,
-  message_handlert &message_handler);
+  message_handlert &);
   
 bool read_goto_binary(
   const std::string &filename,
   goto_modelt &dest,
-  message_handlert &message_handler);
+  message_handlert &);
   
 bool is_goto_binary(const std::string &filename);
-
-class language_uit;
 
 bool read_object_and_link(
   const std::string &file_name,
   symbol_tablet &symbol_table,
   goto_functionst &functions,
-  language_uit &language_ui);
+  message_handlert &);
 
 #endif
