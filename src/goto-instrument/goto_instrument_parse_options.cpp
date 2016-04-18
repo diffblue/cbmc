@@ -40,7 +40,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/natural_loops.h>
 #include <analyses/global_may_alias.h>
-#include <analyses/local_may_alias.h>
 #include <analyses/local_bitvector_analysis.h>
 #include <analyses/custom_bitvector_analysis.h>
 #include <analyses/escape_analysis.h>
@@ -159,29 +158,6 @@ int goto_instrument_parse_optionst::doit()
       value_set_analysis(goto_functions);
 
       show_value_sets(get_ui(), goto_functions, value_set_analysis);
-      return 0;
-    }
-
-    if(cmdline.isset("show-local-may-alias"))
-    {
-      do_function_pointer_removal();
-      do_partial_inlining();
-
-      // recalculate numbers, etc.
-      goto_functions.update();
-
-      namespacet ns(symbol_table);
-    
-      forall_goto_functions(it, goto_functions)
-      {
-        std::cout << ">>>>" << std::endl;
-        std::cout << ">>>> " << it->first << std::endl;
-        std::cout << ">>>>" << std::endl;
-        local_may_aliast local_may_alias(it->second);
-        local_may_alias.output(std::cout, it->second, ns);
-        std::cout << std::endl;
-      }
-
       return 0;
     }
 

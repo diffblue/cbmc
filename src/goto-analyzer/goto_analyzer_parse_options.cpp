@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 
 #include <analyses/goto_check.h>
+#include <analyses/local_may_alias.h>
 
 #include <langapi/mode.h>
 
@@ -301,6 +302,23 @@ int goto_analyzer_parse_optionst::doit()
       }
 
       unreachable_instructions(goto_functions, ns, true, ofs);
+    }
+
+    return 0;
+  }
+
+  if(cmdline.isset("show-local-may-alias"))
+  {
+    namespacet ns(symbol_table);
+  
+    forall_goto_functions(it, goto_functions)
+    {
+      std::cout << ">>>>\n";
+      std::cout << ">>>> " << it->first << '\n';
+      std::cout << ">>>>\n";
+      local_may_aliast local_may_alias(it->second);
+      local_may_alias.output(std::cout, it->second, ns);
+      std::cout << '\n';
     }
 
     return 0;
