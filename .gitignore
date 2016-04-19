@@ -1,0 +1,14 @@
+# compilation files
+*.lo
+*.od
+*.d
+*.o
+*.a
+*.inc
+
+# regression files
+*.out
+
+# files stored by editors
+*~
+libzip/
