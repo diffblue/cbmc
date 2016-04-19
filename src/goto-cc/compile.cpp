@@ -208,18 +208,7 @@ bool compilet::add_input_file(const std::string &file_name)
     }
 
     // unpack now
-    #ifdef _WIN32
-    if(file_name[0]!='/' && file_name[1]!=':')
-    #else
-    if(file_name[0]!='/')
-    #endif
-    {
-      cmd << "ar x " << concat_dir_file(working_directory, file_name);
-    }
-    else
-    {
-      cmd << "ar x " << file_name;
-    }
+    cmd << "ar x " << concat_dir_file(working_directory, file_name);
     
     FILE *stream;
 
