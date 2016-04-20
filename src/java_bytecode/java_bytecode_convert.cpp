@@ -375,11 +375,23 @@ void java_bytecode_convertt::convert(
   for(size_t i=0, param_index=0;
       i < parameters.size(); ++i)
   {
-    irep_idt base_name="arg"+i2string(param_index);
-    const typet &type=parameters[i].type();
-    irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_char_from_type(type);
-    parameters[i].set_base_name(base_name);
-    parameters[i].set_identifier(identifier);
+    irep_idt base_name, identifier;
+    
+    if(parameters[i].get_bool(ID_C_this))
+    {
+      base_name="this";
+      identifier=id2string(method_identifier)+"::"+id2string(base_name);
+      parameters[i].set_base_name(base_name);
+      parameters[i].set_identifier(identifier);
+    }
+    else
+    {
+      base_name="arg"+i2string(param_index);
+      const typet &type=parameters[i].type();
+      identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_char_from_type(type);
+      parameters[i].set_base_name(base_name);
+      parameters[i].set_identifier(identifier);
+    }
 
     // add to symbol table
     parameter_symbolt parameter_symbol;
@@ -732,6 +744,7 @@ codet java_bytecode_convertt::convert_instructions(
           pointer_typet object_ref_type(empty);
           code_typet::parametert this_p(object_ref_type);
           this_p.set(ID_C_this, true);
+          this_p.set_base_name("this");
           parameters.insert(parameters.begin(), this_p);
         }
       }

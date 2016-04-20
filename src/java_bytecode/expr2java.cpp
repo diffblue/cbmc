@@ -41,6 +41,7 @@ protected:
   virtual std::string convert_struct(const exprt &src, unsigned &precedence);
   virtual std::string convert_code(const codet &src, unsigned indent);
   virtual std::string convert_constant(const constant_exprt &src, unsigned &precedence);
+  virtual std::string convert_code_function_call(const code_function_callt &src, unsigned indent);
 
   virtual std::string convert_rec(
     const typet &src,
@@ -49,6 +50,91 @@ protected:
 
   typedef hash_set_cont<std::string, string_hash> id_sett;
 };
+
+/*******************************************************************\
+
+Function: expr2javat::convert_code_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2javat::convert_code_function_call(
+  const code_function_callt &src,
+  unsigned indent)
+{
+  if(src.operands().size()!=3)
+  {
+    unsigned precedence;
+    return convert_norep(src, precedence);
+  }
+
+  std::string dest=indent_str(indent);
+
+  if(src.lhs().is_not_nil())
+  {
+    unsigned p;
+    std::string lhs_str=convert(src.lhs(), p);
+
+    // TODO: ggf. Klammern je nach p
+    dest+=lhs_str;
+    dest+='=';
+  }
+  
+  const code_typet &code_type=
+    to_code_type(src.function().type());
+  
+  const code_typet::parameterst &parameters=
+    code_type.parameters();
+  
+  bool has_this=!parameters.empty() &&
+                parameters.front().get_bool(ID_C_this) &&
+                !src.arguments().empty();
+
+  if(has_this)
+  {
+    unsigned p;
+    std::string this_str=convert(src.arguments()[0], p);
+    dest+=this_str;
+    dest+=" . "; // extra spaces for readability
+  }
+
+  {
+    unsigned p;
+    std::string function_str=convert(src.function(), p);
+    dest+=function_str;
+  }
+
+  dest+='(';
+
+  const exprt::operandst &arguments=src.arguments();
+  
+  bool first=false;
+
+  forall_expr(it, arguments)
+  {
+    if(has_this && it==arguments.begin())
+    {
+    }
+    else
+    {
+      unsigned p;
+      std::string arg_str=convert(*it, p);
+
+      if(first) first=false; else dest+=", ";
+      // TODO: ggf. Klammern je nach p
+      dest+=arg_str;
+    }
+  }
+
+  dest+=");";
+
+  return dest;
+}
 
 /*******************************************************************\
 
@@ -386,6 +472,9 @@ std::string expr2javat::convert_code(
   if(statement==ID_java_new ||
      statement==ID_java_new_array)
     return convert_java_new(src,indent);
+
+  if(statement==ID_function_call)
+    return convert_code_function_call(to_code_function_call(src), indent);
 
   return expr2ct::convert_code(src, indent);
 }
