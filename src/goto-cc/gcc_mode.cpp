@@ -424,6 +424,8 @@ int gcc_modet::preprocess(
   const std::string &src,
   const std::string &dest)
 {
+  const char *compiler=compiler_name();
+
   // build new argv
   std::vector<std::string> new_argv;
 
@@ -457,10 +459,18 @@ int gcc_modet::preprocess(
     {
       // ignore
     }
-    else if(it->arg=="--function" || it->arg=="--verbosity")
+    else if(it->arg=="--function" ||
+            it->arg=="--verbosity" ||
+            it->arg=="--native-linker")
     {
       // ignore here
       skip_next=true;
+    }
+    else if(it->arg=="--native-compiler")
+    {
+      ++it;
+      assert(it!=cmdline.parsed_argv.end());
+      compiler=it->arg.c_str();
     }
     else
       new_argv.push_back(it->arg);
@@ -482,8 +492,6 @@ int gcc_modet::preprocess(
 
   // source file
   new_argv.push_back(src);
-
-  const char *compiler=compiler_name();
 
   // overwrite argv[0]
   assert(new_argv.size()>=1);
@@ -514,25 +522,19 @@ Function: gcc_modet::run_gcc
 int gcc_modet::run_gcc()
 {
   // build new argv
-  std::vector<std::string> new_argv;
+  std::vector<std::string> new_argv(1);
 
   new_argv.reserve(cmdline.parsed_argv.size());
 
-  for(gcc_cmdlinet::parsed_argvt::const_iterator
-      it=cmdline.parsed_argv.begin();
-      it!=cmdline.parsed_argv.end();
-      it++)
-  {
-    new_argv.push_back(it->arg);
-  }
-
   // overwrite argv[0]
-  assert(new_argv.size()>=1);
-
   if(act_as_ld)
     new_argv[0]=linker_name();
   else
     new_argv[0]=compiler_name();
+
+  assert(!cmdline.parsed_argv.empty());
+
+  bool skip_next=false;
 
   #if 0
   std::cout << "RUN:";
@@ -620,48 +622,7 @@ int gcc_modet::gcc_hybrid_binary()
     rename(it->c_str(), (*it+".goto-cc-saved").c_str());
   }
 
-  // build new argv
-  std::vector<std::string> new_argv;
-
-  new_argv.reserve(cmdline.parsed_argv.size());
-
-  bool skip_next=false;
-
-  for(gcc_cmdlinet::parsed_argvt::const_iterator
-      it=cmdline.parsed_argv.begin();
-      it!=cmdline.parsed_argv.end();
-      it++)
-  {
-    if(skip_next)
-    {
-      // skip
-      skip_next=false;
-    }
-    else if(it->arg=="--verbosity")
-    {
-      // ignore here
-      skip_next=true;
-    }
-    else
-      new_argv.push_back(it->arg);
-  }
-
-  // overwrite argv[0]
-  assert(new_argv.size()>=1);
-
-  if(act_as_ld)
-    new_argv[0]=linker_name();
-  else
-    new_argv[0]=compiler_name();
-
-  #if 0
-  std::cout << "RUN:";
-  for(std::size_t i=0; i<new_argv.size(); i++)
-    std::cout << " " << new_argv[i];
-  std::cout << std::endl;
-  #endif
-
-  int result=run(new_argv[0], new_argv, "");
+  int result=run_gcc();
 
   // merge output from gcc with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed

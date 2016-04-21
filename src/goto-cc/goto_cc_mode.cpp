@@ -84,6 +84,9 @@ void goto_cc_modet::help()
   "Usage:                       Purpose:\n"
   "\n"
   " --verbosity #               verbosity level\n"
+  " --function name             set entry point to name\n"
+  " --native-compiler cmd       command to invoke as preprocessor/compiler\n"
+  " --native-linker cmd         command to invoke as linker\n"
   "\n";
 }
 

@@ -52,6 +52,8 @@ const char *gcc_options_with_separated_argument[]=
 {
   "--verbosity", // non-gcc
   "--function",  // non-gcc
+  "--native-compiler", // non-gcc
+  "--native-linker", // non-gcc
   "-aux-info",
   "--param", // Apple only
   "-imacros",
