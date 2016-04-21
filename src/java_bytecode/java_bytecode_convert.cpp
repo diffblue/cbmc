@@ -782,14 +782,20 @@ codet java_bytecode_convertt::convert_instructions(
         results[0]=call.lhs();
       }
 
+      assert(arg0.id()==ID_virtual_function);
+
       if(is_virtual)
       {
+        // dynamic binding
         assert(use_this);
         assert(!call.arguments().empty());
-        call.function()=unary_exprt(ID_virtual_function, to_symbol_expr(arg0), arg0.type());
+        call.function()=arg0;
       }
       else
-        call.function()=arg0;
+      {
+        // static binding
+        call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
+      }
 
       call.function().add_source_location()=i_it->source_location;
       c = call;
