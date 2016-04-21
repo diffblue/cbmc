@@ -238,8 +238,8 @@ void remove_virtual_functionst::get_functions(
   assert(!class_id.empty());
   
   // iterate over all children, transitively
-  std::vector<irep_idt> children;
-  class_hierarchy.get_children(class_id, children);
+  std::vector<irep_idt> children=
+    class_hierarchy.get_children_trans(class_id);
 
   for(const auto & child : children)
   {
@@ -267,7 +267,12 @@ void remove_virtual_functionst::get_functions(
       functions.push_back(function);
       break; // abort
     }
-    c=class_hierarchy.get_parent(c);
+
+    const class_hierarchyt::idst &parents=
+      class_hierarchy.class_map[c].parents;
+
+    if(parents.empty()) break;
+    c=parents.front();
   }
 }
 

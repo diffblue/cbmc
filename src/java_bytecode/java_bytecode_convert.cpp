@@ -210,18 +210,14 @@ void java_bytecode_convertt::convert(const classt &c)
     class_type.components().push_back(base_class_field);
   }
 
-  #if 0
-  irept &impl=class_type.add(ID_interfaces);
+  // interfaces are recorded as bases
   const std::list<irep_idt> &ifc=c.implements;
 
-  for(std::list<irep_idt>::const_iterator it=ifc.begin();
-      it!=ifc.end(); ++it)
+  for(const auto & it : ifc)
   {
-    const irept base=make_base(*it);
-    class_type.bases().push_back(base); // TODO: Useful?
-    impl.get_sub().push_back(base);
+    symbol_typet base("java::"+id2string(it));
+    class_type.add_base(base);
   }
-  #endif
 
   // produce class symbol
   symbolt new_symbol;
