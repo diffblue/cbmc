@@ -134,8 +134,8 @@ void taint_analysist::instrument(
           {
             bool match=false;
             for(const auto & i : identifiers)
-              if(has_prefix(id2string(i), "java::"+id2string(rule.function_identifier)+":") ||
-                 id2string(i)==id2string(rule.function_identifier))
+              if(i==rule.function_identifier ||
+                 has_prefix(id2string(i), "java::"+id2string(rule.function_identifier)+":"))
               {
                 match=true;
                 break;
