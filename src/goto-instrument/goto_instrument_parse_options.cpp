@@ -456,6 +456,17 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("list-calls-args"))
+    {
+      do_indirect_call_and_rtti_removal();
+      do_partial_inlining();
+
+      namespacet ns(symbol_table);
+      list_calls_and_arguments(ns, goto_functions);
+
+      return 0;
+    }
+
     if(cmdline.isset("show-rw-set"))
     {
       namespacet ns(symbol_table);
@@ -1508,6 +1519,8 @@ void goto_instrument_parse_optionst::help()
     " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     " --show-natural-loops         show natural loop heads\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --list-calls-args            list all function calls with their arguments\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
