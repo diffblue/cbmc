@@ -12,6 +12,7 @@ Date: April 2016
 #define CPROVER_CLASS_HIERARCHY_H
 
 #include <iosfwd>
+#include <map>
 
 #include <util/namespace.h>
 
