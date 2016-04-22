@@ -249,6 +249,7 @@ void remove_virtual_functionst::get_functions(
       functiont function;
       function.class_id=child;
       function.symbol_expr=to_symbol_expr(method);
+      function.symbol_expr.set(ID_C_class, child);
       functions.push_back(function);
     }
   }
@@ -264,6 +265,7 @@ void remove_virtual_functionst::get_functions(
       functiont function;
       function.class_id=c;
       function.symbol_expr=to_symbol_expr(method);
+      function.symbol_expr.set(ID_C_class, c);
       functions.push_back(function);
       break; // abort
     }

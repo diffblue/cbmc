@@ -13,7 +13,7 @@ Date: April 2016
 
 #include <iosfwd>
 
-#include <util/symbol_table.h>
+#include <util/namespace.h>
 
 class class_hierarchyt
 {
@@ -39,10 +39,19 @@ public:
     return result;
   }
   
+  // transitively gets all parents
+  idst get_parents_trans(const irep_idt &id) const
+  {
+    idst result;
+    get_parents_trans_rec(id, result);
+    return result;
+  }
+  
   void output(std::ostream &) const;
 
 protected:
   void get_children_trans_rec(const irep_idt &, idst &) const;
+  void get_parents_trans_rec(const irep_idt &, idst &) const;
 };
 
 #endif

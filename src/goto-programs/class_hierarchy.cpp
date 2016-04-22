@@ -11,6 +11,7 @@ Date: April 2016
 #include <ostream>
 
 #include <util/std_types.h>
+#include <util/symbol_table.h>
 
 #include "class_hierarchy.h"
 
@@ -76,6 +77,34 @@ void class_hierarchyt::get_children_trans_rec(
   // recursive calls
   for(const auto & child : entry.children)
     get_children_trans_rec(child, dest);
+}
+
+/*******************************************************************\
+
+Function: class_hierarchyt::get_parents_trans_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void class_hierarchyt::get_parents_trans_rec(
+  const irep_idt &c,
+  idst &dest) const
+{
+  class_mapt::const_iterator it=class_map.find(c);
+  if(it==class_map.end()) return;
+  const entryt &entry=it->second;
+  
+  for(const auto & child : entry.parents)
+    dest.push_back(child);
+
+  // recursive calls
+  for(const auto & child : entry.parents)
+    get_parents_trans_rec(child, dest);
 }
 
 /*******************************************************************\
