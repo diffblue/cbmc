@@ -1,5 +1,6 @@
 SRC = goto_diff_main.cpp goto_diff_parse_options.cpp \
-      goto_diff_languages.cpp goto_diff_base.cpp syntactic_diff.cpp
+      goto_diff_languages.cpp goto_diff_base.cpp syntactic_diff.cpp \
+      unified_diff.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \

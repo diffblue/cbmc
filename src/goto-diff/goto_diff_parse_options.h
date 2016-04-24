@@ -22,7 +22,8 @@ class optionst;
 #define GOTO_DIFF_OPTIONS \
   "(json-ui)" \
   "(show-goto-functions)" \
-  "(verbosity):(version)"
+  "(verbosity):(version)" \
+  "u(unified)"
 
 class goto_diff_parse_optionst:
   public parse_options_baset,
