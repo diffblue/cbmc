@@ -79,7 +79,7 @@ class acceleratet {
                            symbol_exprt next_state,
                            scratch_programt &state_machine);
 
-  symbolt make_symbol(string name, typet type);
+  symbolt make_symbol(std::string name, typet type);
   void decl(symbol_exprt &sym, goto_programt::targett t);
   void decl(symbol_exprt &sym, goto_programt::targett t, exprt init);
 
@@ -93,7 +93,7 @@ class acceleratet {
   subsumed_pathst subsumed;
   acceleration_utilst utils;
 
-  typedef map<goto_programt::targett, goto_programt::targetst> overflow_mapt;
+  typedef std::map<goto_programt::targett, goto_programt::targetst> overflow_mapt;
   overflow_mapt overflow_locs;
 
   expr_mapt dirty_vars_map;

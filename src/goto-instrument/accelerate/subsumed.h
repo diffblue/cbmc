@@ -5,8 +5,9 @@
 
 #include <list>
 
-class subsumed_patht {
- public:
+class subsumed_patht
+{
+public:
   subsumed_patht(patht &_subsumed) {
     patht::iterator it = subsumed.begin();
     subsumed.insert(it, _subsumed.begin(), _subsumed.end());
@@ -17,6 +18,6 @@ class subsumed_patht {
   patht residue;
 };
 
-typedef list<subsumed_patht> subsumed_pathst;
+typedef std::list<subsumed_patht> subsumed_pathst;
 
 #endif // SUBSUMED_H

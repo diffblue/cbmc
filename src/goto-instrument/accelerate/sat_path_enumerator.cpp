@@ -45,7 +45,7 @@ bool sat_path_enumeratort::next(patht &path) {
   program.append(fixed);
 
   // Let's make sure that we get a path we have not seen before.
-  for (list<distinguish_valuest>::iterator it = accelerated_paths.begin();
+  for (std::list<distinguish_valuest>::iterator it = accelerated_paths.begin();
        it != accelerated_paths.end();
        ++it) {
     exprt new_path = false_exprt();
@@ -80,10 +80,10 @@ bool sat_path_enumeratort::next(patht &path) {
 
       return true;
     }
-  } catch (string s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+  } catch (std::string s) {
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   } catch (const char *s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   }
 
   return false;
@@ -188,7 +188,7 @@ void sat_path_enumeratort::build_path(
  */
 void sat_path_enumeratort::build_fixed() {
   scratch_programt scratch(symbol_table);
-  map<exprt, exprt> shadow_distinguishers;
+  std::map<exprt, exprt> shadow_distinguishers;
 
   fixed.copy_from(goto_program);
 
@@ -217,7 +217,7 @@ void sat_path_enumeratort::build_fixed() {
 
   // Create shadow distinguisher variables.  These guys identify the path that
   // is taken through the fixed-path body.
-  for (list<exprt>::iterator it = distinguishers.begin();
+  for (std::list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
     exprt &distinguisher = *it;
@@ -303,7 +303,7 @@ void sat_path_enumeratort::build_fixed() {
   // body is the same as the master path.  We do this by assuming that
   // each of the shadow-distinguisher variables is equal to its corresponding
   // master-distinguisher.
-  for (list<exprt>::iterator it = distinguishers.begin();
+  for (std::list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
     exprt &shadow = shadow_distinguishers[*it];
@@ -317,10 +317,11 @@ void sat_path_enumeratort::build_fixed() {
   remove_skip(fixed);
 }
 
-void sat_path_enumeratort::record_path(scratch_programt &program) {
+void sat_path_enumeratort::record_path(scratch_programt &program)
+{
   distinguish_valuest path_val;
 
-  for (list<exprt>::iterator it = distinguishers.begin();
+  for (std::list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
     path_val[*it] = program.eval(*it).is_true();

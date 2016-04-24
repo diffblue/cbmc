@@ -9,10 +9,9 @@
 
 #include <goto-programs/goto_program.h>
 
-using namespace std;
-
-class path_nodet {
- public:
+class path_nodet
+{
+public:
   path_nodet(goto_programt::targett &_loc) :
       loc(_loc),
       guard(nil_exprt())
@@ -32,8 +31,8 @@ class path_nodet {
   const exprt guard;
 };
 
-typedef list<path_nodet> patht;
-typedef list<patht> pathst; 
+typedef std::list<path_nodet> patht;
+typedef std::list<patht> pathst; 
 
 void output_path(patht &path, goto_programt &program, namespacet &ns, std::ostream &str);
 
