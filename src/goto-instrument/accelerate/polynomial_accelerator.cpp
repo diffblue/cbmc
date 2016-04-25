@@ -47,14 +47,14 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   }
 
   expr_sett targets;
-  map<exprt, polynomialt> polynomials;
+  std::map<exprt, polynomialt> polynomials;
   scratch_programt program(symbol_table);
   goto_programt::instructionst assigns;
 
   utils.find_modified(body, targets);
 
 #ifdef DEBUG
-  std::cout << "Polynomial accelerating program:" << endl;
+  std::cout << "Polynomial accelerating program:" << std::endl;
 
   for (goto_programt::instructionst::iterator it = body.begin();
        it != body.end();
@@ -62,12 +62,12 @@ bool polynomial_acceleratort::accelerate(patht &loop,
     program.output_instruction(ns, "scratch", std::cout, it);
   }
 
-  std::cout << "Modified:" << endl;
+  std::cout << "Modified:" << std::endl;
 
   for (expr_sett::iterator it = targets.begin();
        it != targets.end();
        ++it) {
-    std::cout << expr2c(*it, ns) << endl;
+    std::cout << expr2c(*it, ns) << std::endl;
   }
 #endif
 
@@ -117,11 +117,11 @@ bool polynomial_acceleratort::accelerate(patht &loop,
     }
 
     if (fit_polynomial_sliced(sliced_assigns, target, influence, poly)) {
-      map<exprt, polynomialt> this_poly;
+      std::map<exprt, polynomialt> this_poly;
       this_poly[target] = poly;
 
       if (check_inductive(this_poly, assigns)) {
-        polynomials.insert(make_pair(target, poly));
+        polynomials.insert(std::make_pair(target, poly));
       }
     } else {
 #ifdef DEBUG
@@ -152,15 +152,15 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   
   try {
     path_is_monotone = utils.do_assumptions(polynomials, loop, guard);
-  } catch (string s) {
+  } catch (std::string s) {
     // Couldn't do WP.
-    std::cout << "Assumptions error: " << s << endl;
+    std::cout << "Assumptions error: " << s << std::endl;
     return false;
   }
 
   guard_last = guard;
 
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     replace_expr(it->first, it->second.to_expr(), guard_last);
@@ -209,7 +209,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
 
   program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
 
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     program.assign(it->first, it->second.to_expr());
@@ -244,8 +244,8 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
                                                     expr_sett &influence,
                                                     polynomialt &polynomial) {
   // These are the variables that var depends on with respect to the body.
-  vector<expr_listt> parameters;
-  set<pair<expr_listt, exprt> > coefficients;
+  std::vector<expr_listt> parameters;
+  std::set<std::pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
   scratch_programt program(symbol_table);
   exprt overflow_var =
@@ -254,12 +254,12 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
 
 #ifdef DEBUG
   std::cout << "Fitting a polynomial for " << expr2c(var, ns) << ", which depends on:"
-       << endl;
+            << std::endl;
 
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
-    std::cout << expr2c(*it, ns) << endl;
+    std::cout << expr2c(*it, ns) << std::endl;
   }
 #endif
 
@@ -304,12 +304,12 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
     width=config.ansi_c.pointer_width;
   assert(width>0);
 
-  for (vector<expr_listt>::iterator it = parameters.begin();
+  for (std::vector<expr_listt>::iterator it = parameters.begin();
        it != parameters.end();
        ++it) {
     symbolt coeff = utils.fresh_symbol("polynomial::coeff",
         signedbv_typet(width));
-    coefficients.insert(make_pair(*it, coeff.symbol_expr()));
+    coefficients.insert(std::make_pair(*it, coeff.symbol_expr()));
   }
 
   // Build a set of values for all the parameters that allow us to fit a
@@ -321,7 +321,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
   // really be solving the path constraints a few times to get valid probe
   // values...
 
-  map<exprt, int> values;
+  std::map<exprt, int> values;
 
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
@@ -356,7 +356,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
   assert_for_values(program, values, coefficients, 2, body, var, overflow);
 
 #ifdef DEBUG
-  std::cout << "Fitting polynomial with program:" << endl;
+  std::cout << "Fitting polynomial with program:" << std::endl;
   program.output(ns, "", std::cout);
 #endif
 
@@ -372,10 +372,10 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
       utils.extract_polynomial(program, coefficients, polynomial);
       return true;
     }
-  } catch (string s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+  } catch (std::string s) {
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   } catch (const char *s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   }
 
   return false;
@@ -421,18 +421,18 @@ bool polynomial_acceleratort::fit_const(goto_programt::instructionst &body,
 
       return true;
     }
-  } catch (string s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+  } catch (std::string s) {
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   } catch (const char *s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   }
 
   return false;
 }
 
 void polynomial_acceleratort::assert_for_values(scratch_programt &program,
-                                                map<exprt, int> &values,
-                                                set<pair<expr_listt, exprt> >
+                                                std::map<exprt, int> &values,
+                                                std::set<std::pair<expr_listt, exprt> >
                                                    &coefficients,
                                                 int num_unwindings,
                                                 goto_programt::instructionst
@@ -442,7 +442,7 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
   // First figure out what the appropriate type for this expression is.
   typet expr_type = nil_typet();
 
-  for (map<exprt, int>::iterator it = values.begin();
+  for (std::map<exprt, int>::iterator it = values.begin();
       it != values.end();
       ++it) {
     typet this_type=it->first.type();
@@ -464,7 +464,7 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
 
 
   // Now set the initial values of the all the variables...
-  for (map<exprt, int>::iterator it = values.begin();
+  for (std::map<exprt, int>::iterator it = values.begin();
        it != values.end();
        ++it) {
     program.assign(it->first, from_integer(it->second, expr_type));
@@ -478,7 +478,7 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
   // Now build the polynomial for this point and assert it fits.
   exprt rhs = nil_exprt();
 
-  for (set<pair<expr_listt, exprt> >::iterator it = coefficients.begin();
+  for (std::set<std::pair<expr_listt, exprt> >::iterator it = coefficients.begin();
        it != coefficients.end();
        ++it) {
     int concrete_value = 1;
@@ -491,7 +491,7 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
       if (e == loop_counter) {
         concrete_value *= num_unwindings;
       } else {
-        map<exprt, int>::iterator v_it = values.find(e);
+        std::map<exprt, int>::iterator v_it = values.find(e);
 
         if (v_it != values.end()) {
           concrete_value *= v_it->second;
@@ -564,8 +564,10 @@ void polynomial_acceleratort::cone_of_influence(
   }
 }
 
-bool polynomial_acceleratort::check_inductive(map<exprt, polynomialt> polynomials,
-                                              goto_programt::instructionst &body) {
+bool polynomial_acceleratort::check_inductive(
+  std::map<exprt, polynomialt> polynomials,
+  goto_programt::instructionst &body)
+{
   // Checking that our polynomial is inductive with respect to the loop body is
   // equivalent to checking safety of the following program:
   //
@@ -578,12 +580,12 @@ bool polynomial_acceleratort::check_inductive(map<exprt, polynomialt> polynomial
   // assert (target2 == polynomial2);
   // ...
   scratch_programt program(symbol_table);
-  vector<exprt> polynomials_hold;
+  std::vector<exprt> polynomials_hold;
   substitutiont substitution;
 
   stash_polynomials(program, polynomials, substitution, body);
  
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     exprt holds = equal_exprt(it->first, it->second.to_expr());
@@ -598,14 +600,14 @@ bool polynomial_acceleratort::check_inductive(map<exprt, polynomialt> polynomial
                                         plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
   program.add_instruction(ASSIGN)->code = inc_loop_counter;
 
-  for (vector<exprt>::iterator it = polynomials_hold.begin();
+  for (std::vector<exprt>::iterator it = polynomials_hold.begin();
        it != polynomials_hold.end();
        ++it) {
     program.add_instruction(ASSERT)->guard = *it;
   }
 
 #ifdef DEBUG
-  std::cout << "Checking following program for inductiveness:" << endl;
+  std::cout << "Checking following program for inductiveness:" << std::endl;
   program.output(ns, "", std::cout);
 #endif
 
@@ -613,24 +615,24 @@ bool polynomial_acceleratort::check_inductive(map<exprt, polynomialt> polynomial
     if (program.check_sat()) {
       // We found a counterexample to inductiveness... :-(
   #ifdef DEBUG
-      std::cout << "Not inductive!" << endl;
+      std::cout << "Not inductive!" << std::endl;
   #endif
     return false;
     } else {
       return true;
     }
-  } catch (string s) {
-    std::cout << "Error in inductiveness SAT check: " << s << endl;
+  } catch (std::string s) {
+    std::cout << "Error in inductiveness SAT check: " << s << std::endl;
     return false;
   } catch (const  char *s) {
-    std::cout << "Error in inductiveness SAT check: " << s << endl;
+    std::cout << "Error in inductiveness SAT check: " << s << std::endl;
     return false;
   }
 }
 
 void polynomial_acceleratort::stash_polynomials(
     scratch_programt &program,
-    map<exprt, polynomialt> &polynomials,
+    std::map<exprt, polynomialt> &polynomials,
     substitutiont &substitution,
     goto_programt::instructionst &body) {
 
@@ -638,7 +640,7 @@ void polynomial_acceleratort::stash_polynomials(
   utils.find_modified(body, modified);
   stash_variables(program, modified, substitution);
 
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     it->second.substitute(substitution);

@@ -22,8 +22,6 @@
 
 #define DEBUG
 
-using namespace std;
-
 goto_programt::targett acceleratet::find_back_jump(
     goto_programt::targett loop_header) {
   natural_loops_mutablet::natural_loopt &loop =
@@ -75,7 +73,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   pathst loop_paths, exit_paths;
   goto_programt::targett back_jump = find_back_jump(loop_header);
   int num_accelerated = 0;
-  list<path_acceleratort> accelerators;
+  std::list<path_acceleratort> accelerators;
   natural_loops_mutablet::natural_loopt &loop =
     natural_loops.loop_map[loop_header];
 
@@ -139,7 +137,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   std::cout << "Overflow loc is " << overflow_loc->location_number << std::endl;
   std::cout << "Back jump is " << back_jump->location_number << std::endl;
 
-  for (list<path_acceleratort>::iterator it = accelerators.begin();
+  for (std::list<path_acceleratort>::iterator it = accelerators.begin();
        it != accelerators.end();
        ++it) {
     subsumed_patht inserted(it->path);
@@ -276,14 +274,14 @@ void acceleratet::restrict_traces() {
     automaton.add_path(double_accelerator);
   }
 
-  cout << "Building trace automaton..." << endl;
+  std::cout << "Building trace automaton..." << std::endl;
 
   automaton.build();
   insert_automaton(automaton);
 }
 
 void acceleratet::set_dirty_vars(path_acceleratort &accelerator) {
-  for (set<exprt>::iterator it = accelerator.dirty_vars.begin();
+  for (std::set<exprt>::iterator it = accelerator.dirty_vars.begin();
        it != accelerator.dirty_vars.end();
        ++it) {
     expr_mapt::iterator jt = dirty_vars_map.find(*it);
@@ -367,7 +365,7 @@ void acceleratet::add_dirty_checks() {
 }
 
 bool acceleratet::is_underapproximate(path_acceleratort &accelerator) {
-  for (set<exprt>::iterator it = accelerator.dirty_vars.begin();
+  for (std::set<exprt>::iterator it = accelerator.dirty_vars.begin();
        it != accelerator.dirty_vars.end();
        ++it) {
     if (it->id() == ID_symbol && it->type() == bool_typet()) {
@@ -388,7 +386,7 @@ bool acceleratet::is_underapproximate(path_acceleratort &accelerator) {
   return false;
 }
 
-symbolt acceleratet::make_symbol(string name, typet type) {
+symbolt acceleratet::make_symbol(std::string name, typet type) {
   symbolt ret;
   ret.module = "accelerate";
   ret.name = name;
@@ -435,10 +433,11 @@ void acceleratet::insert_automaton(trace_automatont &automaton) {
   automaton.get_transitions(transitions);
   automaton.accept_states(accept_states);
 
-  cout << "Inserting trace automaton with "
+  std::cout
+    << "Inserting trace automaton with "
     << automaton.num_states() << " states, "
     << accept_states.size() << " accepting states and "
-    << transitions.size() << " transitions" << endl;
+    << transitions.size() << " transitions" << std::endl;
 
   // Declare the variables we'll use to encode the state machine.
   goto_programt::targett t = program.instructions.begin();
@@ -467,7 +466,7 @@ void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator begin
                                       symbol_exprt state,
                                       symbol_exprt next_state,
                                       scratch_programt &state_machine) {
-  map<unsigned int, unsigned int> successor_counts;
+  std::map<unsigned int, unsigned int> successor_counts;
   unsigned int max_count = 0;
   unsigned int likely_next = 0;
 
@@ -560,13 +559,13 @@ int acceleratet::accelerate_loops()
   program.update();
 
   if (num_accelerated > 0) {
-    cout << "Engaging crush mode..." << endl;
+    std::cout << "Engaging crush mode..." << std::endl;
 
     restrict_traces();
     //add_dirty_checks();
     program.update();
 
-    cout << "Crush mode engaged." << endl;
+    std::cout << "Crush mode engaged." << std::endl;
   }
 
   return num_accelerated;
@@ -580,13 +579,13 @@ void accelerate_functions(
 {
   Forall_goto_functions (it, functions)
   {
-    cout << "Accelerating function " << it->first << endl;
+    std::cout << "Accelerating function " << it->first << std::endl;
     acceleratet accelerate(it->second.body, functions, symbol_table, use_z3);
 
     int num_accelerated = accelerate.accelerate_loops();
 
     if (num_accelerated > 0) {
-      cout << "Added " << num_accelerated << " accelerator(s)" << endl;
+      std::cout << "Added " << num_accelerated << " accelerator(s)" << std::endl;
     }
   }
 }
