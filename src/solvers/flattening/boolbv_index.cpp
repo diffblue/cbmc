@@ -340,9 +340,11 @@ void boolbvt::convert_index(
   {
     // in bounds
 
+    // The assertion below is disabled as we want to be able
+    // to run CBMC without simplifier.
     // Expression simplification should remove these cases
-    assert(array.id()!=ID_array_of &&
-           array.id()!=ID_array);
+    //assert(array.id()!=ID_array_of &&
+    //       array.id()!=ID_array);
     // If not there are large improvements possible as above
 
     for(std::size_t i=0; i<width; i++)
