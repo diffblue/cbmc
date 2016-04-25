@@ -414,6 +414,15 @@ void java_bytecode_convertt::convert(
     method.set(ID_constructor, true);
 
   method.type()=member_type;
+  
+  // do we have the method symbol already?
+  const auto s_it=symbol_table.symbols.find(method.get_name());
+  if(s_it!=symbol_table.symbols.end())
+  {
+    // erase if blank, we stubbed it
+    if(s_it->second.value.is_nil())
+      symbol_table.symbols.erase(s_it);
+  }
 
   // create method symbol
   symbolt method_symbol;
