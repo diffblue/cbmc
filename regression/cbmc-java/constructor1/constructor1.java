@@ -25,12 +25,12 @@ class constructor1
   public static void main(String[] args)
   {
     A some_a=new A();
-    assert(some_a.my_field==0);
-    assert(some_a.my_sub==null);
-    assert(some_a.something_static==3);
+    assert some_a.my_field==0;
+    assert some_a.my_sub==null;
+    assert some_a.something_static==3;
     A other_a=new A(1);
-    assert(other_a.my_field==2);
-    assert(other_a.my_sub==null);
+    assert other_a.my_field==2;
+    assert other_a.my_sub==null;
   }
 };
 
