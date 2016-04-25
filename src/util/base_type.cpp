@@ -29,7 +29,10 @@ Function: base_type_rec
 void base_type_rec(
   typet &type, const namespacet &ns, std::set<irep_idt> &symb)
 {
-  if(type.id()==ID_symbol)
+  if(type.id()==ID_symbol ||
+     type.id()==ID_c_enum_tag ||
+     type.id()==ID_struct_tag ||
+     type.id()==ID_union_tag)
   {
     const symbolt *symbol;
 
@@ -60,9 +63,12 @@ void base_type_rec(
     typet &subtype=to_pointer_type(type).subtype();
 
     // we need to avoid running into an infinite loop
-    if(subtype.id()==ID_symbol)
+    if(subtype.id()==ID_symbol ||
+       subtype.id()==ID_c_enum_tag ||
+       subtype.id()==ID_struct_tag ||
+       subtype.id()==ID_union_tag)
     {
-      const irep_idt &id=to_symbol_type(subtype).get_identifier();
+      const irep_idt &id=subtype.get(ID_identifier);
 
       if(symb.find(id)!=symb.end())
         return;
@@ -141,20 +147,26 @@ bool base_type_eqt::base_type_eq_rec(
   #endif
   
   // loop avoidance
-  if(type1.id()==ID_symbol &&
-     type2.id()==ID_symbol)
+  if((type1.id()==ID_symbol ||
+      type1.id()==ID_c_enum_tag ||
+      type1.id()==ID_struct_tag ||
+      type1.id()==ID_union_tag) &&
+     type2.id()==type1.id())
   {
     // already in same set?
     if(identifiers.make_union(
-         to_symbol_type(type1).get_identifier(),
-         to_symbol_type(type2).get_identifier()))
+         type1.get(ID_identifier),
+         type2.get(ID_identifier)))
       return true;
   }
 
-  if(type1.id()==ID_symbol)
+  if(type1.id()==ID_symbol ||
+     type1.id()==ID_c_enum_tag ||
+     type1.id()==ID_struct_tag ||
+     type1.id()==ID_union_tag)
   {
     const symbolt &symbol=
-      ns.lookup(to_symbol_type(type1).get_identifier());
+      ns.lookup(type1.get(ID_identifier));
 
     if(!symbol.is_type)
       return false;
@@ -162,10 +174,13 @@ bool base_type_eqt::base_type_eq_rec(
     return base_type_eq_rec(symbol.type, type2);
   }
 
-  if(type2.id()==ID_symbol)
+  if(type2.id()==ID_symbol ||
+     type2.id()==ID_c_enum_tag ||
+     type2.id()==ID_struct_tag ||
+     type2.id()==ID_union_tag)
   {
     const symbolt &symbol=
-      ns.lookup(to_symbol_type(type2).get_identifier());
+      ns.lookup(type2.get(ID_identifier));
 
     if(!symbol.is_type)
       return false;
