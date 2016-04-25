@@ -200,8 +200,8 @@ void remove_virtual_functionst::remove_virtual_function(
   // set locations
   Forall_goto_program_instructions(it, new_code)
   {
-    irep_idt property_class=it->source_location.get_property_class();
-    irep_idt comment=it->source_location.get_comment();
+    const irep_idt property_class=it->source_location.get_property_class();
+    const irep_idt comment=it->source_location.get_comment();
     it->source_location=target->source_location;
     it->function=target->function;
     if(!property_class.empty()) it->source_location.set_property_class(property_class);
@@ -233,8 +233,8 @@ void remove_virtual_functionst::get_functions(
   const exprt &function,
   functionst &functions)
 {
-  irep_idt class_id=function.get(ID_C_class);
-  irep_idt component_name=function.get(ID_component_name);
+  const irep_idt class_id=function.get(ID_C_class);
+  const irep_idt component_name=function.get(ID_component_name);
   assert(!class_id.empty());
   
   // iterate over all children, transitively
