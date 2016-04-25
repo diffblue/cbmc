@@ -18,8 +18,6 @@
 
 #include "path.h"
 
-using namespace std;
-
 class scratch_programt : public goto_programt {
  public:
   scratch_programt(symbol_tablet &_symbol_table) :

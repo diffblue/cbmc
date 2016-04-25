@@ -11,6 +11,7 @@ Date: April 2016
 #include <ostream>
 
 #include <util/std_types.h>
+#include <util/symbol_table.h>
 
 #include "class_hierarchy.h"
 
@@ -35,31 +36,24 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
       const struct_typet &struct_type=
         to_struct_type(it->second.type);
 
-      const struct_typet::componentst &components=
-        struct_type.components();
+      const irept::subt &bases=
+        struct_type.find(ID_bases).get_sub();
       
-      if(components.empty()) continue;
+      for(const auto & base : bases)
+      {
+        irep_idt parent=base.find(ID_type).get(ID_identifier);
+        if(parent.empty()) continue;
       
-      irep_idt name=components.front().get_name();
-      
-      if(name.empty()) continue;
-      
-      if(name[0]!='@') continue;
-      
-      if(components.front().type().id()!=ID_symbol) continue;
-      
-      irep_idt parent=
-        to_symbol_type(components.front().type()).get_identifier();
-      
-      class_map[parent].children.push_back(it->first);
-      class_map[it->first].parent=parent;
+        class_map[parent].children.push_back(it->first);
+        class_map[it->first].parents.push_back(parent);
+      }
     }
   }
 }
 
 /*******************************************************************\
 
-Function: class_hierarchyt::get_children
+Function: class_hierarchyt::get_children_trans_rec
 
   Inputs:
 
@@ -69,9 +63,9 @@ Function: class_hierarchyt::get_children
 
 \*******************************************************************/
 
-void class_hierarchyt::get_children(
+void class_hierarchyt::get_children_trans_rec(
   const irep_idt &c,
-  std::vector<irep_idt> &dest) const
+  idst &dest) const
 {
   class_mapt::const_iterator it=class_map.find(c);
   if(it==class_map.end()) return;
@@ -82,12 +76,12 @@ void class_hierarchyt::get_children(
 
   // recursive calls
   for(const auto & child : entry.children)
-    get_children(child, dest);
+    get_children_trans_rec(child, dest);
 }
 
 /*******************************************************************\
 
-Function: class_hierarchyt::get_parent
+Function: class_hierarchyt::get_parents_trans_rec
 
   Inputs:
 
@@ -97,11 +91,20 @@ Function: class_hierarchyt::get_parent
 
 \*******************************************************************/
 
-irep_idt class_hierarchyt::get_parent(const irep_idt &c) const
+void class_hierarchyt::get_parents_trans_rec(
+  const irep_idt &c,
+  idst &dest) const
 {
   class_mapt::const_iterator it=class_map.find(c);
-  if(it==class_map.end()) return irep_idt();
-  return it->second.parent;
+  if(it==class_map.end()) return;
+  const entryt &entry=it->second;
+  
+  for(const auto & child : entry.parents)
+    dest.push_back(child);
+
+  // recursive calls
+  for(const auto & child : entry.parents)
+    get_parents_trans_rec(child, dest);
 }
 
 /*******************************************************************\
@@ -118,8 +121,8 @@ Function: class_hierarchyt::output
 
 void class_hierarchyt::output(std::ostream &out) const
 {
-  for(const auto & c : class_map)
-  {
-    out << c.first << ": " << c.second.parent << '\n';
-  }
+  //for(const auto & c : class_map)
+  //{
+    //out << c.first << ": " << c.second.parent << '\n';
+  //}
 }

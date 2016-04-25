@@ -18,8 +18,6 @@
 #include "cone_of_influence.h"
 #include "overflow_instrumenter.h"
 
-using namespace std;
-
 class polynomial_acceleratort : public path_accelerationt {
  public:
   polynomial_acceleratort(const symbol_tablet &_symbol_table,
@@ -56,14 +54,14 @@ class polynomial_acceleratort : public path_accelerationt {
                              polynomialt &polynomial);
 
   void assert_for_values(scratch_programt &program,
-                         map<exprt, int> &values,
-                         set<pair<expr_listt, exprt> > &coefficients,
+                         std::map<exprt, int> &values,
+                         std::set<std::pair<expr_listt, exprt> > &coefficients,
                          int num_unwindings,
                          goto_programt::instructionst &loop_body,
                          exprt &target,
                          overflow_instrumentert &overflow);
   void extract_polynomial(scratch_programt &program,
-                          set<pair<expr_listt, exprt> > &coefficients,
+                          std::set<std::pair<expr_listt, exprt> > &coefficients,
                           polynomialt &polynomial);
   void cone_of_influence(goto_programt::instructionst &orig_body,
                          exprt &target,
@@ -74,24 +72,24 @@ class polynomial_acceleratort : public path_accelerationt {
                  exprt &target,
                  polynomialt &polynomial);
 
-  bool check_inductive(map<exprt, polynomialt> polynomials,
+  bool check_inductive(std::map<exprt, polynomialt> polynomials,
                        goto_programt::instructionst &body);
   void stash_variables(scratch_programt &program,
                        expr_sett modified,
                        substitutiont &substitution);
   void stash_polynomials(scratch_programt &program,
-                         map<exprt, polynomialt> &polynomials,
-                         map<exprt, exprt> &stashed,
+                         std::map<exprt, polynomialt> &polynomials,
+                         std::map<exprt, exprt> &stashed,
                          goto_programt::instructionst &body);
 
   exprt precondition(patht &path);
 
-  bool do_assumptions(map<exprt, polynomialt> polynomials,
+  bool do_assumptions(std::map<exprt, polynomialt> polynomials,
                       patht &body,
                       exprt &guard);
 
-  typedef pair<exprt, exprt> expr_pairt;
-  typedef vector<expr_pairt> expr_pairst;
+  typedef std::pair<exprt, exprt> expr_pairt;
+  typedef std::vector<expr_pairt> expr_pairst;
 
   typedef struct polynomial_array_assignment {
     exprt array;
@@ -99,21 +97,21 @@ class polynomial_acceleratort : public path_accelerationt {
     polynomialt value;
   } polynomial_array_assignmentt;
 
-  typedef vector<polynomial_array_assignmentt> polynomial_array_assignmentst;
+  typedef std::vector<polynomial_array_assignmentt> polynomial_array_assignmentst;
 
   bool do_arrays(goto_programt::instructionst &loop_body,
-                 map<exprt, polynomialt> &polynomials,
+                 std::map<exprt, polynomialt> &polynomials,
                  exprt &loop_counter,
                  substitutiont &substitution,
                  scratch_programt &program);
   expr_pairst gather_array_assignments(goto_programt::instructionst &loop_body,
                                        expr_sett &arrays_written);
   bool array_assignments2polys(expr_pairst &array_assignments,
-                               map<exprt, polynomialt> &polynomials,
+                               std::map<exprt, polynomialt> &polynomials,
                                polynomial_array_assignmentst &array_polynomials,
                                polynomialst &nondet_indices);
   bool expr2poly(exprt &expr,
-                 map<exprt, polynomialt> &polynomials,
+                 std::map<exprt, polynomialt> &polynomials,
                  polynomialt &poly);
 
   void ensure_no_overflows(goto_programt &program);

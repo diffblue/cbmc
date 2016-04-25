@@ -41,13 +41,13 @@
 
 bool disjunctive_polynomial_accelerationt::accelerate(
     path_acceleratort &accelerator) {
-  map<exprt, polynomialt> polynomials;
+  std::map<exprt, polynomialt> polynomials;
   scratch_programt program(symbol_table);
 
   accelerator.clear();
 
 #ifdef DEBUG
-  std::cout << "Polynomial accelerating program:" << endl;
+  std::cout << "Polynomial accelerating program:" << std::endl;
 
   for (goto_programt::instructionst::iterator it = goto_program.instructions.begin();
        it != goto_program.instructions.end();
@@ -57,12 +57,12 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     }
   }
 
-  std::cout << "Modified:" << endl;
+  std::cout << "Modified:" << std::endl;
 
   for (expr_sett::iterator it = modified.begin();
        it != modified.end();
        ++it) {
-    std::cout << expr2c(*it, ns) << endl;
+    std::cout << expr2c(*it, ns) << std::endl;
   }
 #endif
 
@@ -99,7 +99,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     }
 
     if (fit_polynomial(target, poly, path)) {
-      map<exprt, polynomialt> this_poly;
+      std::map<exprt, polynomialt> this_poly;
       this_poly[target] = poly;
 
       if (utils.check_inductive(this_poly, path)) {
@@ -181,7 +181,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     exprt target(*it);
 
     if (path_acceleration.fit_polynomial(assigns, target, poly)) {
-      map<exprt, polynomialt> this_poly;
+      std::map<exprt, polynomialt> this_poly;
       this_poly[target] = poly;
 
       if (utils.check_inductive(this_poly, accelerator.path)) {
@@ -215,15 +215,15 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   
   try {
     path_is_monotone = utils.do_assumptions(polynomials, path, guard);
-  } catch (string s) {
+  } catch (std::string s) {
     // Couldn't do WP.
-    std::cout << "Assumptions error: " << s << endl;
+    std::cout << "Assumptions error: " << s << std::endl;
     return false;
   }
 
   exprt pre_guard(guard);
 
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     replace_expr(it->first, it->second.to_expr(), guard);
@@ -270,7 +270,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   program.add_instruction(ASSUME)->guard = pre_guard;
   program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
 
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     program.assign(it->first, it->second.to_expr());
@@ -303,7 +303,7 @@ bool disjunctive_polynomial_accelerationt::find_path(patht &path) {
   program.append(fixed);
 
   // Let's make sure that we get a path we have not seen before.
-  for (list<distinguish_valuest>::iterator it = accelerated_paths.begin();
+  for (std::list<distinguish_valuest>::iterator it = accelerated_paths.begin();
        it != accelerated_paths.end();
        ++it) {
     exprt new_path = false_exprt();
@@ -338,10 +338,10 @@ bool disjunctive_polynomial_accelerationt::find_path(patht &path) {
 
       return true;
     }
-  } catch (string s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+  } catch (std::string s) {
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   } catch (const char *s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   }
 
   return false;
@@ -352,8 +352,8 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
                                              polynomialt &polynomial,
                                              patht &path) {
   // These are the variables that var depends on with respect to the body.
-  vector<expr_listt> parameters;
-  set<pair<expr_listt, exprt> > coefficients;
+  std::vector<expr_listt> parameters;
+  std::set<std::pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
   scratch_programt program(symbol_table);
   expr_sett influence;
@@ -362,12 +362,12 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
 
 #ifdef DEBUG
   std::cout << "Fitting a polynomial for " << expr2c(var, ns) << ", which depends on:"
-       << endl;
+            << std::endl;
 
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
-    std::cout << expr2c(*it, ns) << endl;
+    std::cout << expr2c(*it, ns) << std::endl;
   }
 #endif
 
@@ -403,7 +403,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   exprs.clear();
   parameters.push_back(exprs);
 
-  for (vector<expr_listt>::iterator it = parameters.begin();
+  for (std::vector<expr_listt>::iterator it = parameters.begin();
        it != parameters.end();
        ++it) {
     symbolt coeff = utils.fresh_symbol("polynomial::coeff", signedbv_typet(POLY_WIDTH));
@@ -421,9 +421,9 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   // Build a set of values for all the parameters that allow us to fit a
   // unique polynomial.
 
-  map<exprt, exprt> ivals1;
-  map<exprt, exprt> ivals2;
-  map<exprt, exprt> ivals3;
+  std::map<exprt, exprt> ivals1;
+  std::map<exprt, exprt> ivals2;
+  std::map<exprt, exprt> ivals3;
 
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
@@ -470,7 +470,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     //ivals1[*it] = from_integer(1, it->type());
   }
 
-  map<exprt, exprt> values;
+  std::map<exprt, exprt> values;
 
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
@@ -480,7 +480,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
 
   // Start building the program.  Begin by decl'ing each of the
   // master distinguishers.
-  for (list<exprt>::iterator it = distinguishers.begin();
+  for (std::list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
     program.add_instruction(DECL)->code = code_declt(*it);
@@ -514,7 +514,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   assert_for_values(program, values, coefficients, 2, fixed, var);
  
   // Let's make sure that we get a path we have not seen before.
-  for (list<distinguish_valuest>::iterator it = accelerated_paths.begin();
+  for (std::list<distinguish_valuest>::iterator it = accelerated_paths.begin();
        it != accelerated_paths.end();
        ++it) {
     exprt new_path = false_exprt();
@@ -556,26 +556,27 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
 
       return true;
     }
-  } catch (string s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+  } catch (std::string s) {
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   } catch (const char *s) {
-    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
   }
 
   return false;
 }
 
-void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &program,
-                                                map<exprt, exprt> &values,
-                                                set<pair<expr_listt, exprt> >
-                                                   &coefficients,
-                                                int num_unwindings,
-                                                goto_programt &loop_body,
-                                                exprt &target) {
+void disjunctive_polynomial_accelerationt::assert_for_values(
+  scratch_programt &program,
+  std::map<exprt, exprt> &values,
+  std::set<std::pair<expr_listt, exprt> > &coefficients,
+  int num_unwindings,
+  goto_programt &loop_body,
+  exprt &target)
+{
   // First figure out what the appropriate type for this expression is.
   typet expr_type = nil_typet();
 
-  for (map<exprt, exprt>::iterator it = values.begin();
+  for (std::map<exprt, exprt>::iterator it = values.begin();
       it != values.end();
       ++it) {
     if (expr_type == nil_typet()) {
@@ -586,7 +587,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &p
   }
 
   // Now set the initial values of the all the variables...
-  for (map<exprt, exprt>::iterator it = values.begin();
+  for (std::map<exprt, exprt>::iterator it = values.begin();
        it != values.end();
        ++it) {
     program.assign(it->first, it->second);
@@ -600,7 +601,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &p
   // Now build the polynomial for this point and assert it fits.
   exprt rhs = nil_exprt();
 
-  for (set<pair<expr_listt, exprt> >::iterator it = coefficients.begin();
+  for (std::set<std::pair<expr_listt, exprt> >::iterator it = coefficients.begin();
        it != coefficients.end();
        ++it) {
     exprt concrete_value = from_integer(1, expr_type);
@@ -615,7 +616,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &p
             concrete_value);
         mult.swap(concrete_value);
       } else {
-        map<exprt, exprt>::iterator v_it = values.find(e);
+        std::map<exprt, exprt>::iterator v_it = values.find(e);
 
         assert(v_it != values.end());
 
@@ -754,7 +755,7 @@ void disjunctive_polynomial_accelerationt::build_path(
  */
 void disjunctive_polynomial_accelerationt::build_fixed() {
   scratch_programt scratch(symbol_table);
-  map<exprt, exprt> shadow_distinguishers;
+  std::map<exprt, exprt> shadow_distinguishers;
 
   fixed.copy_from(goto_program);
 
@@ -783,7 +784,7 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
 
   // Create shadow distinguisher variables.  These guys identify the path that
   // is taken through the fixed-path body.
-  for (list<exprt>::iterator it = distinguishers.begin();
+  for (std::list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
     exprt &distinguisher = *it;
@@ -869,7 +870,7 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
   // body is the same as the master path.  We do this by assuming that
   // each of the shadow-distinguisher variables is equal to its corresponding
   // master-distinguisher.
-  for (list<exprt>::iterator it = distinguishers.begin();
+  for (std::list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
     exprt &shadow = shadow_distinguishers[*it];
@@ -886,7 +887,7 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
 void disjunctive_polynomial_accelerationt::record_path(scratch_programt &program) {
   distinguish_valuest path_val;
 
-  for (list<exprt>::iterator it = distinguishers.begin();
+  for (std::list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
     path_val[*it] = program.eval(*it).is_true();

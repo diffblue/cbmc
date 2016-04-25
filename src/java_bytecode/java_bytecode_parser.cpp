@@ -522,16 +522,22 @@ void java_bytecode_parsert::rconstant_pool()
         symbol_typet class_symbol=
           java_classname(id2string(class_name_entry.s));
         
-        irep_idt identifier=
-          id2string(class_symbol.get_identifier())+
-          "."+id2string(name_entry.s)+
+        irep_idt component_name=
+          id2string(name_entry.s)+
           ":"+id2string(pool_entry(nameandtype_entry.ref2).s);
 
-        symbol_exprt symbol_expr(identifier, type);
-        symbol_expr.set(ID_C_base_name, name_entry.s);
-        symbol_expr.set(ID_C_class, class_symbol.get_identifier());
+        irep_idt class_name=
+          class_symbol.get_identifier();
+          
+        irep_idt identifier=
+          id2string(class_name)+"."+id2string(component_name);
 
-        it->expr=symbol_expr;
+        exprt virtual_function(ID_virtual_function, type);
+        virtual_function.set(ID_component_name, component_name);
+        virtual_function.set(ID_C_class, class_name);
+        virtual_function.set(ID_identifier, identifier);
+        
+        it->expr=virtual_function;
       }
       break;
 

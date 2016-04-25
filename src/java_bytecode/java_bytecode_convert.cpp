@@ -210,18 +210,14 @@ void java_bytecode_convertt::convert(const classt &c)
     class_type.components().push_back(base_class_field);
   }
 
-  #if 0
-  irept &impl=class_type.add(ID_interfaces);
+  // interfaces are recorded as bases
   const std::list<irep_idt> &ifc=c.implements;
 
-  for(std::list<irep_idt>::const_iterator it=ifc.begin();
-      it!=ifc.end(); ++it)
+  for(const auto & it : ifc)
   {
-    const irept base=make_base(*it);
-    class_type.bases().push_back(base); // TODO: Useful?
-    impl.get_sub().push_back(base);
+    symbol_typet base("java::"+id2string(it));
+    class_type.add_base(base);
   }
-  #endif
 
   // produce class symbol
   symbolt new_symbol;
@@ -782,14 +778,20 @@ codet java_bytecode_convertt::convert_instructions(
         results[0]=call.lhs();
       }
 
+      assert(arg0.id()==ID_virtual_function);
+
       if(is_virtual)
       {
+        // dynamic binding
         assert(use_this);
         assert(!call.arguments().empty());
-        call.function()=unary_exprt(ID_virtual_function, to_symbol_expr(arg0), arg0.type());
+        call.function()=arg0;
       }
       else
-        call.function()=arg0;
+      {
+        // static binding
+        call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
+      }
 
       call.function().add_source_location()=i_it->source_location;
       c = call;
