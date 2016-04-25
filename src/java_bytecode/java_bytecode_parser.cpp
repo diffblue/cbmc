@@ -318,14 +318,20 @@ void java_bytecode_parsert::get_class_refs()
 
   for(const auto & c : constant_pool)
   {
-    if(c.tag==CONSTANT_Class)
+    switch(c.tag)
     {
+    case CONSTANT_Class:
       get_class_refs_rec(c.expr.type());
-    }
-    else if(c.tag==CONSTANT_NameAndType)
-    {
-      typet t=java_type_from_string(id2string(pool_entry(c.ref2).s));
-      get_class_refs_rec(t);
+      break;
+
+    case CONSTANT_NameAndType:
+      {
+        typet t=java_type_from_string(id2string(pool_entry(c.ref2).s));
+        get_class_refs_rec(t);
+      }
+      break;
+      
+    default:;
     }
   }
 
@@ -339,8 +345,7 @@ void java_bytecode_parsert::get_class_refs()
   {
     typet t=java_type_from_string(m.signature);
     get_class_refs_rec(t);
-  }
-  
+  } 
 }
 
 /*******************************************************************\
