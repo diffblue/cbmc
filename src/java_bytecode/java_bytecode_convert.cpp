@@ -780,6 +780,19 @@ codet java_bytecode_convertt::convert_instructions(
 
       assert(arg0.id()==ID_virtual_function);
 
+      // does the function symbol exist?
+      irep_idt id=arg0.get(ID_identifier);
+      if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
+      {
+        // no, create stub
+        symbolt symbol;
+        symbol.name=id;
+        symbol.type=arg0.type();
+        symbol.value.make_nil();
+        symbol.mode=ID_java;
+        symbol_table.add(symbol);
+      }
+
       if(is_virtual)
       {
         // dynamic binding
