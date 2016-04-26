@@ -398,6 +398,14 @@ bool compilet::link()
   
   if(mode==COMPILE_LINK_EXECUTABLE)
   {
+    // new symbols may have been added to a previously linked file
+    // make sure a new entry point is created that contains all
+    // static initializers
+    compiled_functions.function_map.erase("__CPROVER_initialize");
+
+    symbol_table.remove(goto_functionst::entry_point());
+    compiled_functions.function_map.erase(goto_functionst::entry_point());
+
     if(ansi_c_entry_point(symbol_table, "main", ui_message_handler))
       return true;
 
