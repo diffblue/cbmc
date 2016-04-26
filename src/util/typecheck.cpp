@@ -20,7 +20,7 @@ Function:
 
 \*******************************************************************/
 
-bool typecheckt::typecheck_main()
+bool legacy_typecheckt::typecheck_main()
 {
   try
   {
@@ -42,6 +42,43 @@ bool typecheckt::typecheck_main()
   {
     str << e;
     error_msg();
+  }
+
+  return error_found;
+}
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool typecheckt::typecheck_main()
+{
+  try
+  {
+    typecheck();
+  }
+
+  catch(int)
+  {
+    error_found=true;
+  }
+
+  catch(const char *e)
+  {
+    error() << e << eom;
+  }
+
+  catch(const std::string &e)
+  {
+    error() << e << eom;
   }
 
   return error_found;
