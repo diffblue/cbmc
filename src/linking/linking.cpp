@@ -933,6 +933,7 @@ void linkingt::duplicate_object_symbol(
     {
       // new_symbol wins
       old_symbol.value=new_symbol.value;
+      old_symbol.is_macro=new_symbol.is_macro;
     }
     else if(!new_symbol.is_weak)
     {
