@@ -597,6 +597,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     {
       old_symbol.value=new_symbol.value;
       old_symbol.type=new_symbol.type;
+      old_symbol.is_macro=new_symbol.is_macro;
     }
   }
   

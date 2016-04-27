@@ -74,7 +74,7 @@ bool static_lifetime_init(
   
     if(!symbol.is_static_lifetime) continue;
 
-    if(symbol.is_type) continue;
+    if(symbol.is_type || symbol.is_macro) continue;
 
     // special values
     if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
