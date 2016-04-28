@@ -51,9 +51,14 @@ void c_typecheck_baset::typecheck_type(typet &type)
     c_qualifierst c_qualifiers(type);
     c_qualifiers+=c_qualifierst(type.subtype());
     bool packed=type.get_bool(ID_C_packed);
+    exprt alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
+
     type.swap(type.subtype());
+
     c_qualifiers.write(type);
     if(packed) type.set(ID_C_packed, true);
+    if(alignment.is_not_nil()) type.add(ID_C_alignment, alignment);
+
     return; // done
   }
 
