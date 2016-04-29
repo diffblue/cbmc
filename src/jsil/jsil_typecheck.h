@@ -23,13 +23,13 @@ bool jsil_typecheck(
   message_handlert &message_handler,
   const namespacet &ns);
 
-class jsil_typecheckt:public typecheckt
+class jsil_typecheckt:public legacy_typecheckt
 {
 public:
   jsil_typecheckt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
-    typecheckt(_message_handler),
+    legacy_typecheckt(_message_handler),
     symbol_table(_symbol_table),
     ns(symbol_table)
   {
