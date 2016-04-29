@@ -5,13 +5,9 @@
 int main()
 {
     __CPROVER_string s;
-    int i;
-    int j;
-    i = 2;
+    int n;
     s = __CPROVER_string_literal("pippo");
-    if (__CPROVER_char_at(s, i) == __CPROVER_char_literal("p")) {
-        j = 1;
-    }
-    assert(j == 1);
+    n = __CPROVER_string_length(s);
+    assert(n == 5);
     return 0;
 }
