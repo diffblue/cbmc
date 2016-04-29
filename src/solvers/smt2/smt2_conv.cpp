@@ -4960,7 +4960,7 @@ void smt2_convt::find_symbols(const exprt &expr)
             std::size_t w=to_bitvector_type(type).get_width();
             irep_idt id="string_length."+i2string(string_lengths.size());
             typecast_exprt len = typecast_exprt(
-              symbol_exprt(id), unsignedbv_typet(string_length_width));
+              symbol_exprt(id, expr.type()), unsignedbv_typet(string_length_width));
             out << "(declare-fun " << id << " () ";
             convert_type(expr.type());
             out << ")\n";
