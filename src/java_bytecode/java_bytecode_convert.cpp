@@ -796,6 +796,7 @@ codet java_bytecode_convertt::convert_instructions(
         // no, create stub
         symbolt symbol;
         symbol.name=id;
+        symbol.base_name=arg0.get(ID_C_base_name);
         symbol.type=arg0.type();
         symbol.value.make_nil();
         symbol.mode=ID_java;
