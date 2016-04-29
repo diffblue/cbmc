@@ -75,6 +75,23 @@ inline FILE *fopen(const char *filename, const char *mode)
   return fopen_result;
 }
 
+/* FUNCTION: freopen */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+inline FILE* freopen(const char *filename, const char *mode, FILE *f)
+{
+  __CPROVER_HIDE:;
+  (void)*filename;
+  (void)*mode;
+  (void)*f;
+
+  return f;
+}
+
 /* FUNCTION: fclose */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
@@ -696,6 +713,7 @@ inline int fprintf(FILE *stream, const char *restrict format, ...)
 inline int vfprintf(FILE *stream, const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
+
   int result;
   (void)*stream;
   (void)*format;

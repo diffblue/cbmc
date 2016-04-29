@@ -17,7 +17,67 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: get_jar_entry
+Function: jar_filet::open
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void jar_filet::open(const std::string &filename)
+{
+  #ifdef HAVE_LIBZIP
+  if(zip!=nullptr)
+    zip_close(static_cast<struct zip *>(zip));
+
+  int zip_error;
+  zip=zip_open(filename.c_str(), 0, &zip_error);
+
+  if(zip!=nullptr)
+  {
+    std::size_t number_of_files=
+      zip_get_num_entries(static_cast<struct zip *>(zip), 0);
+      
+    index.reserve(number_of_files);
+    
+    for(std::size_t i=0; i<number_of_files; i++)
+    {
+      std::string file_name=
+        zip_get_name(static_cast<struct zip *>(zip), i, 0);
+      index.push_back(file_name);
+    }
+  }
+  #else
+  zip=nullptr;
+  #endif
+}
+    
+/*******************************************************************\
+
+Function: jar_filet::~jar_filet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+jar_filet::~jar_filet()
+{
+  #ifdef HAVE_LIBZIP
+  if(zip!=nullptr)
+    zip_close(static_cast<struct zip *>(zip));
+  #endif
+}
+    
+/*******************************************************************\
+
+Function: jar_filet::get_entry
 
   Inputs:
 
@@ -29,27 +89,24 @@ Function: get_jar_entry
 
 #define ZIP_READ_SIZE 10000
 
-bool get_jar_entry(
-  const std::string &jar_file,
-  std::size_t index,
-  std::string &dest)
+std::string jar_filet::get_entry(std::size_t i)
 {
-  #ifdef HAVE_LIBZIP
-  int zip_error;
+  if(zip==nullptr)
+    return std::string("");
+    
+  assert(i<index.size());
+
+  std::string dest;
   
-  struct zip *zip=
-    zip_open(jar_file.c_str(), 0, &zip_error);
-    
-  if(zip==NULL)
-    return true; // error
-    
+  #ifdef HAVE_LIBZIP
   struct zip_file *zip_file=
-    zip_fopen_index(zip, index, 0);
+    zip_fopen_index(static_cast<struct zip *>(zip), i, 0);
   
   if(zip_file==NULL)
   {
-    zip_close(zip);
-    return true; // error
+    zip_close(static_cast<struct zip *>(zip));
+    zip=nullptr;
+    return std::string(""); // error
   }
 
   std::vector<char> buffer;
@@ -65,17 +122,14 @@ bool get_jar_entry(
   }
 
   zip_fclose(zip_file);    
-  zip_close(zip);
-  
-  return false;
-  #else
-  return true;
   #endif
+  
+  return dest;
 }
 
 /*******************************************************************\
 
-Function: get_jar_index
+Function: jar_filet::get_manifest
 
   Inputs:
 
@@ -85,74 +139,29 @@ Function: get_jar_index
 
 \*******************************************************************/
 
-bool get_jar_index(
-  const std::string &jar_file,
-  std::vector<std::string> &entries)
+jar_filet::manifestt jar_filet::get_manifest()
 {
-  #ifdef HAVE_LIBZIP
-  int zip_error;
-  struct zip *zip=zip_open(jar_file.c_str(), 0, &zip_error);
-
-  if(zip==NULL)
-    return true;
-  
-  std::size_t number_of_files=zip_get_num_entries(zip, 0);
-  
-  for(std::size_t index=0; index<number_of_files; index++)
-  {
-    std::string file_name=zip_get_name(zip, index, 0);
-    entries.push_back(file_name);
-  }
-  
-  zip_close(zip);
-  
-  return false;
-  #else
-  return true;
-  #endif
-}
-
-/*******************************************************************\
-
-Function: get_jar_manifest
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool get_jar_manifest(
-  const std::string &jar_file,
-  std::map<std::string, std::string> &manifest)
-{
-  std::vector<std::string> entries;
-  if(get_jar_index(jar_file, entries))
-    return true;
-    
-  std::size_t index=0;
+  std::size_t i=0;
   bool found=false;
     
-  for(std::vector<std::string>::const_iterator
-      e_it=entries.begin(); e_it!=entries.end(); e_it++)
+  for(const auto & e : index)
   {
-    if(*e_it=="META-INF/MANIFEST.MF")
+    if(e=="META-INF/MANIFEST.MF")
     {
-      index=e_it-entries.begin();
       found=true;
       break;
     }
+    
+    i++;
   }
 
-  if(!found) return true;  
+  if(!found)
+    return manifestt();
   
-  std::string dest; 
-  if(get_jar_entry(jar_file, index, dest))
-    return true;
-
+  std::string dest=get_entry(i);
   std::istringstream in(dest);
+  
+  manifestt manifest;
 
   std::string line;
   while(std::getline(in, line))
@@ -175,5 +184,5 @@ bool get_jar_manifest(
     manifest[key]=value;
   }
   
-  return false;
+  return manifest;
 }

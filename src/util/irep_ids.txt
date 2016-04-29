@@ -57,6 +57,7 @@ if
 symbol
 next_symbol
 nondet_symbol
+predicate
 predicate_symbol
 predicate_next_symbol
 nondet_bool
@@ -722,3 +723,4 @@ C_spec_loop_invariant #spec_loop_invariant
 C_spec_requires #spec_requires
 C_spec_ensures #spec_ensures
 virtual_function
+C_element_type #element_type

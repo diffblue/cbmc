@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
-#include "jar_file.h"
 
 #include "expr2java.h"
 
@@ -109,8 +108,8 @@ bool java_bytecode_languaget::parse(
     if(config.java.main_class.empty())
     {
       // Does it have a main class set in the manifest?
-      std::map<std::string, std::string> manifest;
-      get_jar_manifest(path, manifest);
+      jar_filet::manifestt manifest=
+        java_class_loader.jar_pool(path).get_manifest();
       std::string manifest_main_class=manifest["Main-Class"];
 
       if(manifest_main_class!="")

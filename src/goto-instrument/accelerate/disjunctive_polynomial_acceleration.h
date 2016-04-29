@@ -19,8 +19,6 @@
 #include "cone_of_influence.h"
 #include "acceleration_utils.h"
 
-using namespace std;
-
 class disjunctive_polynomial_accelerationt : public loop_accelerationt {
  public:
   disjunctive_polynomial_accelerationt(symbol_tablet &_symbol_table,
@@ -52,8 +50,8 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
 
  protected:
   void assert_for_values(scratch_programt &program,
-                         map<exprt, exprt> &values,
-                         set<pair<expr_listt, exprt> > &coefficients,
+                         std::map<exprt, exprt> &values,
+                         std::set<std::pair<expr_listt, exprt> > &coefficients,
                          int num_unwindings,
                          goto_programt &loop_body,
                          exprt &target);
@@ -75,16 +73,16 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   natural_loops_mutablet::natural_loopt &loop;
   goto_programt::targett loop_header;
 
-  typedef map<goto_programt::targett, exprt> distinguish_mapt;
-  typedef map<exprt, bool> distinguish_valuest;
+  typedef std::map<goto_programt::targett, exprt> distinguish_mapt;
+  typedef std::map<exprt, bool> distinguish_valuest;
 
   acceleration_utilst utils;
   exprt loop_counter;
   distinguish_mapt distinguishing_points;
-  list<exprt> distinguishers;
+  std::list<exprt> distinguishers;
   expr_sett modified;
   goto_programt fixed;
-  list<distinguish_valuest> accelerated_paths;
+  std::list<distinguish_valuest> accelerated_paths;
 };
 
 #endif // DISJUNCTIVE_POLYNOMIAL_ACCELERATION_H

@@ -310,6 +310,14 @@ inline char *getenv(const char *name)
     "zero-termination of argument of getenv");
   #endif
 
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_event("invalidate_pointer", "getenv_result");
+  char *getenv_result;
+  __CPROVER_set_must(getenv_result, "getenv_result");
+  return getenv_result;
+
+  #else
+
   __CPROVER_bool found;
   if(!found) return 0;
 
@@ -325,6 +333,7 @@ inline char *getenv(const char *name)
   buffer[buf_size-1]=0;
 
   return buffer;
+  #endif
 }
 
 /* FUNCTION: realloc */

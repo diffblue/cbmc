@@ -48,8 +48,8 @@ protected:
   };
 
   typedef std::vector<functiont> functionst;
-  void get_functions(const symbol_exprt &, functionst &);
-  exprt get_method(const irep_idt &class_id, const symbol_exprt &);
+  void get_functions(const exprt &, functionst &);
+  exprt get_method(const irep_idt &class_id, const irep_idt &component_name);
   
   exprt build_class_identifier(const exprt &);
 };
@@ -138,11 +138,10 @@ void remove_virtual_functionst::remove_virtual_function(
 
   const exprt &function=code.function();
   assert(function.id()==ID_virtual_function);
-  assert(function.operands().size()==1);
   assert(!code.arguments().empty());
   
   functionst functions;
-  get_functions(to_symbol_expr(function.op0()), functions);
+  get_functions(function, functions);
   
   if(functions.empty())
   {
@@ -201,8 +200,8 @@ void remove_virtual_functionst::remove_virtual_function(
   // set locations
   Forall_goto_program_instructions(it, new_code)
   {
-    irep_idt property_class=it->source_location.get_property_class();
-    irep_idt comment=it->source_location.get_comment();
+    const irep_idt property_class=it->source_location.get_property_class();
+    const irep_idt comment=it->source_location.get_comment();
     it->source_location=target->source_location;
     it->function=target->function;
     if(!property_class.empty()) it->source_location.set_property_class(property_class);
@@ -231,24 +230,26 @@ Function: remove_virtual_functionst::get_functions
 \*******************************************************************/
 
 void remove_virtual_functionst::get_functions(
-  const symbol_exprt &function,
+  const exprt &function,
   functionst &functions)
 {
-  irep_idt class_id=function.get(ID_C_class);
+  const irep_idt class_id=function.get(ID_C_class);
+  const irep_idt component_name=function.get(ID_component_name);
   assert(!class_id.empty());
   
   // iterate over all children, transitively
-  std::vector<irep_idt> children;
-  class_hierarchy.get_children(class_id, children);
+  std::vector<irep_idt> children=
+    class_hierarchy.get_children_trans(class_id);
 
   for(const auto & child : children)
   {
-    exprt method=get_method(child, function);
+    exprt method=get_method(child, component_name);
     if(method.is_not_nil())
     {
       functiont function;
       function.class_id=child;
       function.symbol_expr=to_symbol_expr(method);
+      function.symbol_expr.set(ID_C_class, child);
       functions.push_back(function);
     }
   }
@@ -258,16 +259,22 @@ void remove_virtual_functionst::get_functions(
   irep_idt c=class_id;
   while(!c.empty())
   {
-    exprt method=get_method(c, function);
+    exprt method=get_method(c, component_name);
     if(method.is_not_nil())
     {
       functiont function;
       function.class_id=c;
       function.symbol_expr=to_symbol_expr(method);
+      function.symbol_expr.set(ID_C_class, c);
       functions.push_back(function);
       break; // abort
     }
-    c=class_hierarchy.get_parent(c);
+
+    const class_hierarchyt::idst &parents=
+      class_hierarchy.class_map[c].parents;
+
+    if(parents.empty()) break;
+    c=parents.front();
   }
 }
 
@@ -285,18 +292,10 @@ Function: remove_virtual_functionst::get_method
 
 exprt remove_virtual_functionst::get_method(
   const irep_idt &class_id,
-  const symbol_exprt &virtual_function)
+  const irep_idt &component_name)
 {
-  irep_idt f_id=virtual_function.get_identifier();
-  irep_idt c_id=virtual_function.get(ID_C_class);
-
-  if(!has_prefix(id2string(f_id), id2string(c_id)))
-    return nil_exprt();
-
-  std::string suffix=
-    std::string(id2string(f_id), c_id.size(), std::string::npos);
-    
-  irep_idt id=id2string(class_id)+suffix;
+  irep_idt id=id2string(class_id)+"."+
+              id2string(component_name);
   
   const symbolt *symbol;
   if(ns.lookup(id, symbol))

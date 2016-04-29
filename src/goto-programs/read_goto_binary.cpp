@@ -364,53 +364,28 @@ bool read_object_and_link(
   const std::string &file_name,
   symbol_tablet &symbol_table,
   goto_functionst &functions,
-  language_uit &language_ui)
+  message_handlert &message_handler)
 {
-  language_ui.print(8, "Reading: " + file_name);
+  message_handler.print(8, "Reading: " + file_name);
 
-  // we read into a temporary symbol_table
-  symbol_tablet temp_symbol_table;
-  goto_functionst temp_functions;
+  // we read into a temporary model
+  goto_modelt temp_model;
 
   if(read_goto_binary(
       file_name,
-      temp_symbol_table,
-      temp_functions,
-      language_ui.get_message_handler()))
+      temp_model,
+      message_handler))
     return true;
-
-  std::set<irep_idt> seen_modes;
-
-  for(symbol_tablet::symbolst::const_iterator
-      it=temp_symbol_table.symbols.begin();
-      it!=temp_symbol_table.symbols.end();
-      it++)
-  {
-    if(it->second.mode!="")
-      seen_modes.insert(it->second.mode);
-  }
-
-  seen_modes.erase(ID_cpp);
-  seen_modes.erase(ID_C);
-
-  if(!seen_modes.empty())
-  {
-    language_ui.error() << "Multi-language linking not supported"
-                        << messaget::eom;
-    return true;
-  }
-
-  // hardwired to C-style linking
 
   linkingt linking(symbol_table,
-                   temp_symbol_table,
-                   language_ui.get_message_handler());
+                   temp_model.symbol_table,
+                   message_handler);
 
   if(linking.typecheck_main())
     return true;
 
   if(link_functions(symbol_table, functions,
-                    temp_symbol_table, temp_functions,
+                    temp_model.symbol_table, temp_model.goto_functions,
                     linking.rename_symbol))
     return true;
 

@@ -12,18 +12,19 @@ Date: April 2016
 #define CPROVER_CLASS_HIERARCHY_H
 
 #include <iosfwd>
+#include <map>
 
-#include <util/symbol_table.h>
+#include <util/namespace.h>
 
 class class_hierarchyt
 {
 public:
+  typedef std::vector<irep_idt> idst;
+
   class entryt
   {
   public:
-    irep_idt parent;
-    typedef std::vector<irep_idt> childrent;
-    childrent children;
+    idst parents, children;
   };
 
   typedef std::map<irep_idt, entryt> class_mapt;
@@ -32,11 +33,26 @@ public:
   void operator()(const symbol_tablet &);
 
   // transitively gets all children
-  void get_children(const irep_idt &, std::vector<irep_idt> &) const;
+  idst get_children_trans(const irep_idt &id) const
+  {
+    idst result;
+    get_children_trans_rec(id, result);
+    return result;
+  }
   
-  irep_idt get_parent(const irep_idt &) const;
+  // transitively gets all parents
+  idst get_parents_trans(const irep_idt &id) const
+  {
+    idst result;
+    get_parents_trans_rec(id, result);
+    return result;
+  }
   
   void output(std::ostream &) const;
+
+protected:
+  void get_children_trans_rec(const irep_idt &, idst &) const;
+  void get_parents_trans_rec(const irep_idt &, idst &) const;
 };
 
 #endif

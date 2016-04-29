@@ -33,7 +33,7 @@ endif
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
-  CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.9 -std=c++11 -stdlib=libc++ -D STL_HASH_STD
+  CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.9 -std=c++11 -stdlib=libc++
   LINKFLAGS += -mmacosx-version-min=10.9 -stdlib=libc++
   LINKNATIVE += -mmacosx-version-min=10.9 -stdlib=libc++
 else
@@ -57,7 +57,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
     CXX    = clang++
   endif
 else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
-  CP_CXXFLAGS += -DSTL_HASH_STD
+  CP_CXXFLAGS +=
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^

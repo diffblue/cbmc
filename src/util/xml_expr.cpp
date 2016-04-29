@@ -133,12 +133,11 @@ xmlt xml(
     result.name="struct";
     const struct_typet::componentst &components=
       to_struct_type(type).components();
-    for(struct_typet::componentst::const_iterator
-        it=components.begin(); it!=components.end(); it++)
+    for(const auto & it : components)
     {
       xmlt &e=result.new_element("member");
-      e.set_attribute("name", id2string(it->get_name()));
-      e.new_element("type").new_element()=xml(it->type(), ns);
+      e.set_attribute("name", id2string(it.get_name()));
+      e.new_element("type").new_element()=xml(it.type(), ns);
     }
   }
   else if(type.id()==ID_union)
@@ -146,12 +145,11 @@ xmlt xml(
     result.name="union";
     const union_typet::componentst &components=
       to_union_type(type).components();
-    for(union_typet::componentst::const_iterator
-        it=components.begin(); it!=components.end(); it++)
+    for(const auto & it : components)
     {
       xmlt &e=result.new_element("member");
-      e.set_attribute("name", id2string(it->get_name()));
-      e.new_element("type").new_element()=xml(it->type(), ns);
+      e.set_attribute("name", id2string(it.get_name()));
+      e.new_element("type").new_element()=xml(it.type(), ns);
     }
   }
   else

@@ -94,8 +94,9 @@ void acceleration_utilst::find_modified(goto_programt::targett t,
 }
 
 
-bool acceleration_utilst::check_inductive(map<exprt, polynomialt> polynomials,
-                                              patht &path) {
+bool acceleration_utilst::check_inductive(
+  std::map<exprt, polynomialt> polynomials,
+  patht &path) {
   // Checking that our polynomial is inductive with respect to the loop body is
   // equivalent to checking safety of the following program:
   //
@@ -108,12 +109,12 @@ bool acceleration_utilst::check_inductive(map<exprt, polynomialt> polynomials,
   // assert (target2 == polynomial2);
   // ...
   scratch_programt program(symbol_table);
-  vector<exprt> polynomials_hold;
+  std::vector<exprt> polynomials_hold;
   substitutiont substitution;
 
   stash_polynomials(program, polynomials, substitution, path);
  
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     exprt holds = equal_exprt(it->first, it->second.to_expr());
@@ -130,14 +131,14 @@ bool acceleration_utilst::check_inductive(map<exprt, polynomialt> polynomials,
 
   ensure_no_overflows(program);
 
-  for (vector<exprt>::iterator it = polynomials_hold.begin();
+  for (std::vector<exprt>::iterator it = polynomials_hold.begin();
        it != polynomials_hold.end();
        ++it) {
     program.add_instruction(ASSERT)->guard = *it;
   }
 
 #ifdef DEBUG
-  std::cout << "Checking following program for inductiveness:" << endl;
+  std::cout << "Checking following program for inductiveness:" << std::endl;
   program.output(ns, "", std::cout);
 #endif
 
@@ -145,24 +146,24 @@ bool acceleration_utilst::check_inductive(map<exprt, polynomialt> polynomials,
     if (program.check_sat()) {
       // We found a counterexample to inductiveness... :-(
   #ifdef DEBUG
-      std::cout << "Not inductive!" << endl;
+      std::cout << "Not inductive!" << std::endl;
   #endif
     return false;
     } else {
       return true;
     }
-  } catch (string s) {
-    std::cout << "Error in inductiveness SAT check: " << s << endl;
+  } catch (std::string s) {
+    std::cout << "Error in inductiveness SAT check: " << s << std::endl;
     return false;
   } catch (const  char *s) {
-    std::cout << "Error in inductiveness SAT check: " << s << endl;
+    std::cout << "Error in inductiveness SAT check: " << s << std::endl;
     return false;
   }
 }
 
 void acceleration_utilst::stash_polynomials(
     scratch_programt &program,
-    map<exprt, polynomialt> &polynomials,
+    std::map<exprt, polynomialt> &polynomials,
     substitutiont &substitution,
     patht &path) {
   expr_sett modified;
@@ -170,7 +171,7 @@ void acceleration_utilst::stash_polynomials(
   find_modified(path, modified);
   stash_variables(program, modified, substitution);
 
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     it->second.substitute(substitution);
@@ -292,9 +293,10 @@ void acceleration_utilst::push_nondet(exprt &expr) {
 
 
 
-bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
-                                             patht &path,
-                                             exprt &guard) {
+bool acceleration_utilst::do_assumptions(
+  std::map<exprt, polynomialt> polynomials,
+  patht &path,
+  exprt &guard) {
   // We want to check that if an assumption fails, the next iteration can't be
   // feasible again.  To do this we check the following program for safety:
   //
@@ -325,9 +327,9 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
   substitutiont substitution;
   stash_polynomials(program, polynomials, substitution, path);
 
-  vector<exprt> polynomials_hold;
+  std::vector<exprt> polynomials_hold;
 
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     exprt lhs = it->first;
@@ -338,7 +340,7 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
 
   program.assign(loop_counter, from_integer(0, loop_counter.type()));
 
-  for (vector<exprt>::iterator it = polynomials_hold.begin();
+  for (std::vector<exprt>::iterator it = polynomials_hold.begin();
        it != polynomials_hold.end();
        ++it) {
     program.assume(*it);
@@ -348,7 +350,7 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
 
   program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
 
-  for (map<exprt, polynomialt>::iterator p_it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator p_it = polynomials.begin();
        p_it != polynomials.end();
        ++p_it) {
     program.assign(p_it->first, p_it->second.to_expr());
@@ -358,7 +360,7 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
   program.assign(loop_counter,
                  plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
 
-  for (map<exprt, polynomialt>::iterator p_it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator p_it = polynomials.begin();
        p_it != polynomials.end();
        ++p_it) {
     program.assign(p_it->first, p_it->second.to_expr());
@@ -372,23 +374,23 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
   simplify(guard, ns);
 
 #ifdef DEBUG
-  std::cout << "Checking following program for monotonicity:" << endl;
+  std::cout << "Checking following program for monotonicity:" << std::endl;
   program.output(ns, "", std::cout);
 #endif
 
   try {
     if (program.check_sat()) {
   #ifdef DEBUG
-      std::cout << "Path is not monotone" << endl;
+      std::cout << "Path is not monotone" << std::endl;
   #endif
 
       return false;
     }
-  } catch (string s) {
-    std::cout << "Error in monotonicity SAT check: " << s << endl;
+  } catch (std::string s) {
+    std::cout << "Error in monotonicity SAT check: " << s << std::endl;
      return false;
   } catch (const char *s) {
-    std::cout << "Error in monotonicity SAT check: " << s << endl;
+    std::cout << "Error in monotonicity SAT check: " << s << std::endl;
      return false;
   }
 
@@ -446,7 +448,7 @@ acceleration_utilst::expr_pairst acceleration_utilst::gather_array_assignments(
 
       if (assignment.lhs().id() == ID_index) {
         // This is an array assignment -- accumulate it in our list.
-        assignments.push_back(make_pair(assignment.lhs(), assignment.rhs()));
+        assignments.push_back(std::make_pair(assignment.lhs(), assignment.rhs()));
 
         // Also add this array to the set of arrays written to.
         index_exprt index_expr = to_index_expr(assignment.lhs());
@@ -467,13 +469,15 @@ acceleration_utilst::expr_pairst acceleration_utilst::gather_array_assignments(
   return assignments;
 }
 
-bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
-                                        map<exprt, polynomialt> &polynomials,
-                                        exprt &loop_counter,
-                                        substitutiont &substitution,
-                                        scratch_programt &program) {
+bool acceleration_utilst::do_arrays(
+  goto_programt::instructionst &loop_body,
+  std::map<exprt, polynomialt> &polynomials,
+  exprt &loop_counter,
+  substitutiont &substitution,
+  scratch_programt &program)
+{
 #ifdef DEBUG
-  std::cout << "Doing arrays..." << endl;
+  std::cout << "Doing arrays..." << std::endl;
 #endif
 
   expr_sett arrays_written;
@@ -498,7 +502,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
     // We weren't able to model some array assignment.  That means we need to
     // bail out altogether :-(
 #ifdef DEBUG
-    std::cout << "Couldn't model an array assignment :-(" << endl;
+    std::cout << "Couldn't model an array assignment :-(" << std::endl;
 #endif
     return false;
   }
@@ -549,10 +553,11 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
   // touch.
   for (expr_sett::iterator a_it = arrays_written.begin();
        a_it != arrays_written.end();
-       ++a_it) {
+       ++a_it)
+  {
     exprt array = *a_it;
     exprt old_array = substitution[array];
-    vector<polynomialt> indices;
+    std::vector<polynomialt> indices;
     bool nonlinear_index = false;
 
     for (polynomial_array_assignmentst::iterator it = poly_assignments.begin();
@@ -566,7 +571,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
         if (index.max_degree(loop_counter) > 1 ||
             (index.coeff(loop_counter) != 1 && index.coeff(loop_counter) != -1)) {
 #ifdef DEBUG
-          std::cout << expr2c(index.to_expr(), ns) << " is nonlinear" << endl;
+          std::cout << expr2c(index.to_expr(), ns) << " is nonlinear" << std::endl;
 #endif
           nonlinear_index = true;
         }
@@ -594,7 +599,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
 
       exprt::operandst unchanged_operands;
 
-      for (vector<polynomialt>::iterator it = indices.begin();
+      for (std::vector<polynomialt>::iterator it = indices.begin();
            it != indices.end();
            ++it) {
         polynomialt index = *it;
@@ -628,7 +633,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
       // indices.
       exprt::operandst idx_touched_operands;
 
-      for (vector<polynomialt>::iterator it = indices.begin();
+      for (std::vector<polynomialt>::iterator it = indices.begin();
            it != indices.end();
            ++it) {
         idx_touched_operands.push_back(not_exprt(equal_exprt(idx, it->to_expr())));
@@ -682,10 +687,11 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
 }
 
 bool acceleration_utilst::array_assignments2polys(
-    expr_pairst &array_assignments,
-    map<exprt, polynomialt> &polynomials,
-    polynomial_array_assignmentst &array_polynomials,
-    polynomialst &nondet_indices) {
+  expr_pairst &array_assignments,
+  std::map<exprt, polynomialt> &polynomials,
+  polynomial_array_assignmentst &array_polynomials,
+  polynomialst &nondet_indices)
+{
   for (expr_pairst::iterator it = array_assignments.begin();
        it != array_assignments.end();
        ++it) {
@@ -697,14 +703,14 @@ bool acceleration_utilst::array_assignments2polys(
     if (!expr2poly(index_expr.index(), polynomials, poly_assignment.index)) {
       // Couldn't convert the index -- bail out.
 #ifdef DEBUG
-      std::cout << "Couldn't convert index: " << expr2c(index_expr.index(), ns) << endl;
+      std::cout << "Couldn't convert index: " << expr2c(index_expr.index(), ns) << std::endl;
 #endif
       return false;
     }
 
 #ifdef DEBUG
     std::cout << "Converted index to: " << expr2c(poly_assignment.index.to_expr(), ns)
-        << endl;
+        << std::endl;
 #endif
 
     if (it->second.id() == ID_nondet) {
@@ -712,13 +718,13 @@ bool acceleration_utilst::array_assignments2polys(
     } else if (!expr2poly(it->second, polynomials, poly_assignment.value)) {
       // Couldn't conver the RHS -- bail out.
 #ifdef DEBUG
-      std::cout << "Couldn't convert RHS: " << expr2c(it->second, ns) << endl;
+      std::cout << "Couldn't convert RHS: " << expr2c(it->second, ns) << std::endl;
 #endif
       return false;
     } else {
 #ifdef DEBUG
       std::cout << "Converted RHS to: " << expr2c(poly_assignment.value.to_expr(), ns)
-          << endl;
+          << std::endl;
 #endif
 
       array_polynomials.push_back(poly_assignment);
@@ -728,19 +734,21 @@ bool acceleration_utilst::array_assignments2polys(
   return true;
 }
 
-bool acceleration_utilst::expr2poly(exprt &expr,
-                                        map<exprt, polynomialt> &polynomials,
-                                        polynomialt &poly) {
+bool acceleration_utilst::expr2poly(
+  exprt &expr,
+  std::map<exprt, polynomialt> &polynomials,
+  polynomialt &poly)
+{
   exprt subbed_expr = expr;
 
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     replace_expr(it->first, it->second.to_expr(), subbed_expr);
   }
 
 #ifdef DEBUG
-  std::cout << "expr2poly(" << expr2c(subbed_expr, ns) << ")" << endl;
+  std::cout << "expr2poly(" << expr2c(subbed_expr, ns) << ")" << std::endl;
 #endif
 
   try {
@@ -752,12 +760,14 @@ bool acceleration_utilst::expr2poly(exprt &expr,
   return true;
 }
 
-bool acceleration_utilst::do_nonrecursive(goto_programt::instructionst &body,
-                                          map<exprt, polynomialt> &polynomials,
-                                          exprt &loop_counter,
-                                          substitutiont &substitution,
-                                          expr_sett &nonrecursive,
-                                          scratch_programt &program) {
+bool acceleration_utilst::do_nonrecursive(
+  goto_programt::instructionst &body,
+  std::map<exprt, polynomialt> &polynomials,
+  exprt &loop_counter,
+  substitutiont &substitution,
+  expr_sett &nonrecursive,
+  scratch_programt &program)
+{
   // We have some variables that are defined non-recursively -- that is to say,
   // their value at the end of a loop iteration does not depend on their value
   // at the previous iteration.  We can solve for these variables by just forward
@@ -767,7 +777,7 @@ bool acceleration_utilst::do_nonrecursive(goto_programt::instructionst &body,
   expr_sett arrays_written;
   expr_sett arrays_read;
 
-  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+  for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
     const exprt &var = it->first;
@@ -1056,18 +1066,20 @@ void acceleration_utilst::gather_array_accesses(const exprt &e, expr_sett &array
   }
 }
 
-void acceleration_utilst::extract_polynomial(scratch_programt &program,
-                                                 set<pair<expr_listt, exprt> >
-                                                   &coefficients,
-                                                 polynomialt &polynomial) {
-  for (set<pair<expr_listt, exprt> >::iterator it = coefficients.begin();
+void acceleration_utilst::extract_polynomial(
+  scratch_programt &program,
+  std::set<std::pair<expr_listt, exprt> > &coefficients,
+  polynomialt &polynomial)
+{
+  for (std::set<std::pair<expr_listt, exprt> >::iterator it = coefficients.begin();
        it != coefficients.end();
-       ++it) {
+       ++it)
+  {
     monomialt monomial;
     expr_listt terms = it->first;
     exprt coefficient = it->second;
     constant_exprt concrete_term = to_constant_expr(program.eval(coefficient));
-    map<exprt, int> degrees;
+    std::map<exprt, int> degrees;
 
     mp_integer mp = binary2integer(concrete_term.get_value().c_str(), true);
     monomial.coeff = mp.to_long();
@@ -1088,7 +1100,7 @@ void acceleration_utilst::extract_polynomial(scratch_programt &program,
       }
     }
 
-    for (map<exprt, int>::iterator it = degrees.begin();
+    for (std::map<exprt, int>::iterator it = degrees.begin();
          it != degrees.end();
          ++it) {
       monomialt::termt term;
@@ -1101,11 +1113,11 @@ void acceleration_utilst::extract_polynomial(scratch_programt &program,
   }
 }
 
-symbolt acceleration_utilst::fresh_symbol(string base, typet type)
+symbolt acceleration_utilst::fresh_symbol(std::string base, typet type)
 {
   static int num_symbols = 0;
 
-  string name = base + "_" + i2string(num_symbols++);
+  std::string name = base + "_" + i2string(num_symbols++);
   symbolt ret;
   ret.module = "scratch";
   ret.name = name;

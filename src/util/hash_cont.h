@@ -17,13 +17,12 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define STL_HASH_TR1
 // #define STL_HASH_STD
 //
-// The default is 'STL_HASH_TR1', which will hopefully
-// change one day to 'STL_HASH_STD'.
+// The default is 'STL_HASH_STD'. This file will go away one day.
 
 #if !defined(STL_HASH_NONE) && !defined(STL_HASH_STDEXT) && \
     !defined(STL_HASH_GNU) && !defined(STL_HASH_TR1) && \
     !defined(STL_HASH_STD)
-#define STL_HASH_TR1
+#define STL_HASH_STD
 #endif
 
 #if defined(STL_HASH_NONE)

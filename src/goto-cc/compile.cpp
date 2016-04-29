@@ -404,7 +404,7 @@ bool compilet::link()
     object_files.pop_front();
 
     if(read_object_and_link(file_name, symbol_table,
-                            compiled_functions, *this))
+                            compiled_functions, get_message_handler()))
       return true;
   }
 

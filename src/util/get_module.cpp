@@ -120,9 +120,8 @@ const symbolt &get_module(
   
     message.error() << "multiple modules found, please select one:\n";
     
-    for(std::set<std::string>::const_iterator
-        s_it=modules.begin(); s_it!=modules.end(); s_it++)
-      message.error() << "  " << *s_it << '\n';
+    for(const auto & s_it : modules)
+      message.error() << "  " << s_it << '\n';
 
     message.error() << messaget::eom;
     throw 0;

@@ -9,6 +9,8 @@ class tableswitch1
 
     switch(i)
     {
+    case -1: j=0; break;
+    case  0: j=1; break;
     case  1: j=2; break;
     case  2: j=3; break;
     case  3: j=4; break;
@@ -20,12 +22,12 @@ class tableswitch1
     case  9: j=10; break;
     case 10: j=11; break;
     case 11: j=12; break;
-    default: j=-1;
+    default: j=1000;
     }
     
-    if(i>=1 && i<=11)
+    if(i>=-1 && i<=11)
       assert j==i+1;
     else
-      assert j==-1;
+      assert j==1000;
   }
 }

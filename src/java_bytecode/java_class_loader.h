@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 
 #include "java_bytecode_parse_tree.h"
+#include "jar_file.h"
 
 class java_class_loadert:public messaget
 {
@@ -33,9 +34,11 @@ public:
   }
   
   void load_entire_jar(const std::string &f);
+  
+  jar_poolt jar_pool;
 
 protected:
-  class jar_filet
+  class jar_map_entryt
   {
   public:
     struct entryt
@@ -43,12 +46,13 @@ protected:
       std::size_t index;
     };
   
+    // class name to index map
     typedef std::map<irep_idt, entryt> entriest;
     entriest entries;
   };
 
   // maps jar files to maps of class names
-  typedef std::map<irep_idt, jar_filet> jar_mapt;
+  typedef std::map<irep_idt, jar_map_entryt> jar_mapt;
   jar_mapt jar_map;
   
   void read_jar_file(const irep_idt &);

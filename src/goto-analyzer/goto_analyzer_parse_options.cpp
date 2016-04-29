@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 
 #include <analyses/goto_check.h>
+#include <analyses/local_may_alias.h>
 
 #include <langapi/mode.h>
 
@@ -270,14 +271,14 @@ int goto_analyzer_parse_optionst::doit()
 
     if(cmdline.isset("show-taint"))
     {
-      taint_analysis(goto_functions, ns, taint_file, get_message_handler(), true, "");
+      taint_analysis(symbol_table, goto_functions, taint_file, get_message_handler(), true, "");
       return 0;
     }
     else
     {
       std::string json_file=cmdline.get_value("json");
       bool result=
-        taint_analysis(goto_functions, ns, taint_file, get_message_handler(), false, json_file);
+        taint_analysis(symbol_table, goto_functions, taint_file, get_message_handler(), false, json_file);
       return result?10:0;
     }
   }
@@ -301,6 +302,23 @@ int goto_analyzer_parse_optionst::doit()
       }
 
       unreachable_instructions(goto_functions, ns, true, ofs);
+    }
+
+    return 0;
+  }
+
+  if(cmdline.isset("show-local-may-alias"))
+  {
+    namespacet ns(symbol_table);
+  
+    forall_goto_functions(it, goto_functions)
+    {
+      std::cout << ">>>>\n";
+      std::cout << ">>>> " << it->first << '\n';
+      std::cout << ">>>>\n";
+      local_may_aliast local_may_alias(it->second);
+      local_may_alias.output(std::cout, it->second, ns);
+      std::cout << '\n';
     }
 
     return 0;
@@ -484,7 +502,7 @@ int goto_analyzer_parse_optionst::get_goto_program(
     {
       status() << "Reading GOTO program from file " << eom;
 
-      if(read_object_and_link(*it, symbol_table, goto_functions, *this))
+      if(read_object_and_link(*it, symbol_table, goto_functions, get_message_handler()))
         return 6;
     }
 

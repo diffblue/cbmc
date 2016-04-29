@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/i2string.h>
 #include <util/expr_util.h>
+#include <util/prefix.h>
 
 #include <ansi-c/c_types.h>
 
@@ -67,6 +68,8 @@ public:
 
   void operator()(const java_bytecode_parse_treet &parse_tree)
   {
+    add_array_types();
+  
     if(parse_tree.loading_successful)
       convert(parse_tree.parsed_class);
     else
@@ -165,14 +168,14 @@ protected:
   void convert(symbolt &class_symbol, const fieldt &f);
   void convert(symbolt &class_symbol, const methodt &m);
   void convert(const instructiont &i);
-  typet convert(const typet &type);
-
+  
   codet convert_instructions(
     const instructionst &, const code_typet &);
 
   static const bytecode_infot &get_bytecode_info(const irep_idt &statement);
   
   void generate_class_stub(const irep_idt &class_name);
+  void add_array_types();
 };
 }
 
@@ -207,18 +210,14 @@ void java_bytecode_convertt::convert(const classt &c)
     class_type.components().push_back(base_class_field);
   }
 
-  #if 0
-  irept &impl=class_type.add(ID_interfaces);
+  // interfaces are recorded as bases
   const std::list<irep_idt> &ifc=c.implements;
 
-  for(std::list<irep_idt>::const_iterator it=ifc.begin();
-      it!=ifc.end(); ++it)
+  for(const auto & it : ifc)
   {
-    const irept base=make_base(*it);
-    class_type.bases().push_back(base); // TODO: Useful?
-    impl.get_sub().push_back(base);
+    symbol_typet base("java::"+id2string(it));
+    class_type.add_base(base);
   }
-  #endif
 
   // produce class symbol
   symbolt new_symbol;
@@ -237,17 +236,11 @@ void java_bytecode_convertt::convert(const classt &c)
     throw "failed to add class symbol "+id2string(new_symbol.name);
 
   // now do members  
-  for(classt::fieldst::const_iterator
-      it=c.fields.begin();
-      it!=c.fields.end();
-      it++)
-    convert(*class_symbol, *it);
+  for(const auto & it : c.fields)
+    convert(*class_symbol, it);
 
-  for(classt::methodst::const_iterator
-      it=c.methods.begin();
-      it!=c.methods.end();
-      it++)
-    convert(*class_symbol, *it);
+  for(const auto & it : c.methods)
+    convert(*class_symbol, it);
 
   // is this a root class?
   if(c.extends.empty())
@@ -378,11 +371,23 @@ void java_bytecode_convertt::convert(
   for(size_t i=0, param_index=0;
       i < parameters.size(); ++i)
   {
-    irep_idt base_name="arg"+i2string(param_index);
-    const typet &type=parameters[i].type();
-    irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_char_from_type(type);
-    parameters[i].set_base_name(base_name);
-    parameters[i].set_identifier(identifier);
+    irep_idt base_name, identifier;
+    
+    if(parameters[i].get_bool(ID_C_this))
+    {
+      base_name="this";
+      identifier=id2string(method_identifier)+"::"+id2string(base_name);
+      parameters[i].set_base_name(base_name);
+      parameters[i].set_identifier(identifier);
+    }
+    else
+    {
+      base_name="arg"+i2string(param_index);
+      const typet &type=parameters[i].type();
+      identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_char_from_type(type);
+      parameters[i].set_base_name(base_name);
+      parameters[i].set_identifier(identifier);
+    }
 
     // add to symbol table
     parameter_symbolt parameter_symbol;
@@ -405,15 +410,19 @@ void java_bytecode_convertt::convert(
   method.set(ID_abstract, m.is_abstract);
   method.set(ID_is_virtual, is_virtual);
 
-  #if 0
-  if(is_virtual)
-    set_virtual_name(method);
-  #endif
-
   if(is_contructor(method))
     method.set(ID_constructor, true);
 
   method.type()=member_type;
+  
+  // do we have the method symbol already?
+  const auto s_it=symbol_table.symbols.find(method.get_name());
+  if(s_it!=symbol_table.symbols.end())
+  {
+    // erase if blank, we stubbed it
+    if(s_it->second.value.is_nil())
+      symbol_table.symbols.erase(s_it);
+  }
 
   // create method symbol
   symbolt method_symbol;
@@ -740,6 +749,7 @@ codet java_bytecode_convertt::convert_instructions(
           pointer_typet object_ref_type(empty);
           code_typet::parametert this_p(object_ref_type);
           this_p.set(ID_C_this, true);
+          this_p.set_base_name("this");
           parameters.insert(parameters.begin(), this_p);
         }
       }
@@ -764,7 +774,7 @@ codet java_bytecode_convertt::convert_instructions(
           address_of_exprt address_of_expr(symbol_expr);
           this_arg=address_of_expr;
         }
-        
+
         assert(this_arg.type().id()==ID_pointer);
       }
 
@@ -777,14 +787,33 @@ codet java_bytecode_convertt::convert_instructions(
         results[0]=call.lhs();
       }
 
+      assert(arg0.id()==ID_virtual_function);
+
+      // does the function symbol exist?
+      irep_idt id=arg0.get(ID_identifier);
+      if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
+      {
+        // no, create stub
+        symbolt symbol;
+        symbol.name=id;
+        symbol.type=arg0.type();
+        symbol.value.make_nil();
+        symbol.mode=ID_java;
+        symbol_table.add(symbol);
+      }
+
       if(is_virtual)
       {
+        // dynamic binding
         assert(use_this);
         assert(!call.arguments().empty());
-        call.function()=unary_exprt(ID_virtual_function, to_symbol_expr(arg0), arg0.type());
+        call.function()=arg0;
       }
       else
-        call.function()=arg0;
+      {
+        // static binding
+        call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
+      }
 
       call.function().add_source_location()=i_it->source_location;
       c = call;
@@ -805,16 +834,15 @@ codet java_bytecode_convertt::convert_instructions(
     {
       assert(op.size()==3 && results.empty());
       
+      char type_char=statement[0];
+      
       exprt pointer=
-        typecast_exprt(op[0], java_array_type(statement[0]));
+        typecast_exprt(op[0], java_array_type(type_char));
 
       const dereference_exprt deref(pointer, pointer.type().subtype());
-      assert(pointer.type().subtype().id()==ID_struct);
-      const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
-      assert(struct_type.components().size()==2);
 
       const member_exprt data_ptr(
-        deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+        deref, "data", pointer_typet(java_type_from_char(type_char)));
 
       plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
       typet element_type=data_ptr.type().subtype();
@@ -839,16 +867,16 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?aload"))
     {
       assert(op.size() == 2 && results.size() == 1);
+      
+      char type_char=statement[0];
 
       exprt pointer=
-        typecast_exprt(op[0], java_array_type(statement[0]));
+        typecast_exprt(op[0], java_array_type(type_char));
 
       const dereference_exprt deref(pointer, pointer.type().subtype());
-      const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
-      assert(struct_type.components().size()==2);
 
       const member_exprt data_ptr(
-        deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+        deref, "data", pointer_typet(java_type_from_char(type_char)));
 
       plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
       typet element_type=data_ptr.type().subtype();
@@ -988,7 +1016,9 @@ codet java_bytecode_convertt::convert_instructions(
     {
       code_assignt code_assign;
       code_assign.lhs()=variable(loc_vars, arg0, 'i');
-      code_assign.rhs()=plus_exprt(variable(loc_vars, arg0, 'i'), typecast_exprt(arg1, java_int_type()));
+      code_assign.rhs()=plus_exprt(
+                          variable(loc_vars, arg0, 'i'),
+                          typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
     else if(statement==patternt("?xor"))
@@ -1227,33 +1257,35 @@ codet java_bytecode_convertt::convert_instructions(
       // the op is the array size
       assert(op.size()==1 && results.size()==1);
 
-      typet element_type;
+      char element_type;
       
       if(statement=="newarray")
       {
         irep_idt id=arg0.type().id();
 
         if(id==ID_bool)
-          element_type=java_byte_type();
+          element_type='z';
         else if(id==ID_char)
-          element_type=java_char_type();
+          element_type='c';
         else if(id==ID_float)
-          element_type=java_float_type();
+          element_type='f';
         else if(id==ID_double)
-          element_type=java_double_type();
+          element_type='d';
         else if(id==ID_byte)
-          element_type=java_byte_type();
+          element_type='b';
         else if(id==ID_short)
-          element_type=java_short_type();
+          element_type='s';
         else if(id==ID_int)
-          element_type=java_int_type();
+          element_type='i';
         else if(id==ID_long)
-          element_type=java_long_type();
+          element_type='j';
+        else
+          element_type='?';
       }
       else
-        element_type=java_reference_type(empty_typet());
+        element_type='a';
 
-      const typet ref_type=java_array_type(element_type, 1);
+      const pointer_typet ref_type=java_array_type(element_type);
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.copy_to_operands(op[0]);
@@ -1275,7 +1307,8 @@ codet java_bytecode_convertt::convert_instructions(
       op=pop(dimension);
       assert(results.size()==1);
 
-      const typet ref_type=java_array_type(arg0.type(), dimension);
+      // arg0.type()
+      const pointer_typet ref_type=java_array_type('a');
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.operands()=op;
@@ -1295,12 +1328,9 @@ codet java_bytecode_convertt::convert_instructions(
         typecast_exprt(op[0], java_array_type(statement[0]));
 
       const dereference_exprt array(pointer, pointer.type().subtype());
-      assert(pointer.type().subtype().id()==ID_struct);
-      const struct_typet &struct_type=to_struct_type(pointer.type().subtype());
-      assert(struct_type.components().size()==2);
+      assert(pointer.type().subtype().id()==ID_symbol);
 
-      const member_exprt length(
-        array, struct_type.components()[0].get_name(), struct_type.components()[0].type());
+      const member_exprt length(array, "length", java_int_type());
 
       results[0]=length;
     }
@@ -1408,7 +1438,7 @@ codet java_bytecode_convertt::convert_instructions(
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::convert
+Function: java_bytecode_convertt::add_array_types
 
   Inputs:
 
@@ -1418,30 +1448,34 @@ Function: java_bytecode_convertt::convert
 
 \*******************************************************************/
 
-typet java_bytecode_convertt::convert(const typet &type)
+void java_bytecode_convertt::add_array_types()
 {
-  if(type.id()==ID_void)
-    return empty_typet();
-  else if(type.id()==ID_code)
+  const char letters[]="ijsbcfdza";
+
+  for(unsigned i=0; letters[i]!=0; i++)
   {
-    code_typet code_type=to_code_type(type); // copy, will change
+    symbol_typet symbol_type=
+      to_symbol_type(java_array_type(letters[i]).subtype());
+    
+    struct_typet struct_type;
+    // we have the base class, java.lang.Object, length and data
+    // of appropriate type
+    struct_type.components().resize(3);
+    struct_type.components()[0].set_name("@java.lang.Object");
+    struct_type.components()[0].type()=symbol_typet("java::java.lang.Object");
+    struct_type.components()[1].set_name("length");
+    struct_type.components()[1].type()=java_int_type();
+    struct_type.components()[2].set_name("data");
+    struct_type.components()[2].type()=
+      pointer_typet(java_type_from_char(letters[i]));
 
-    code_type.return_type()=convert(code_type.return_type());
-
-    code_typet::parameterst &parameters=code_type.parameters();
-
-    for(code_typet::parameterst::iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
-    {
-      it->type()=convert(it->type());
-    }
-
-    return code_type;
+    symbolt symbol;
+    symbol.name=symbol_type.get_identifier();
+    symbol.base_name=symbol_type.get(ID_C_base_name);
+    symbol.is_type=true;
+    symbol.type=struct_type;
+    symbol_table.add(symbol);
   }
-  else
-    return type;
 }
 
 /*******************************************************************\

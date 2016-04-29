@@ -1,0 +1,4 @@
+[
+{ "id": "source_rule", "kind": "source", "where": "return_value", "taint": "superT", "function": "my_I.my_source" },
+{ "id": "sink_rule",   "kind": "sink",   "where": "parameter1", "taint": "superT", "function": "interface1.my_sink", "message": "There is a flow!" }
+]

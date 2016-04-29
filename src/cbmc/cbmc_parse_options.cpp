@@ -713,7 +713,7 @@ int cbmc_parse_optionst::get_goto_program(
     {
       status() << "Reading GOTO program from file " << eom;
 
-      if(read_object_and_link(*it, symbol_table, goto_functions, *this))
+      if(read_object_and_link(*it, symbol_table, goto_functions, get_message_handler()))
         return 6;
     }
 

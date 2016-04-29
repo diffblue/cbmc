@@ -33,7 +33,7 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
   const irep_idt &class_name)
 {
   std::stack<irep_idt> queue;
-
+  
   queue.push(class_name);
 
   while(!queue.empty())
@@ -54,7 +54,7 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
     for(java_bytecode_parse_treet::class_refst::const_iterator
         it=parse_tree.class_refs.begin();
         it!=parse_tree.class_refs.end();
-        it++)
+        it++)       
       queue.push(*it);
   }
   
@@ -92,10 +92,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
       debug() << "Getting class `" << class_name << "' from JAR "
               << jf << eom;
 
-      std::string data;
-      
-      if(get_jar_entry(jf, jm_it->second.index, data))
-        return parse_tree; // error
+      std::string data=jar_pool(jf).get_entry(jm_it->second.index);
 
       std::istringstream istream(data);
       
@@ -126,10 +123,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
         debug() << "Getting class `" << class_name << "' from JAR "
                 << cp << eom;
 
-        std::string data;
-        
-        if(get_jar_entry(cp, jm_it->second.index, data))
-          return parse_tree; // error
+        std::string data=jar_pool(cp).get_entry(jm_it->second.index);
 
         std::istringstream istream(data);
         
@@ -211,27 +205,27 @@ void java_class_loadert::read_jar_file(const irep_idt &file)
   // done already?
   if(jar_map.find(file)!=jar_map.end()) return;
 
-  std::vector<std::string> entries;
-  
   #ifndef HAVE_LIBZIP
   error() << "no support for reading JAR files configured" << eom;
   return;
   #endif
-  
-  if(get_jar_index(file.c_str(), entries))
+
+  jar_filet &jar_file=jar_pool(id2string(file));
+
+  if(!jar_file)
   {
     error() << "failed to open JAR file `" << file << "'" << eom;
     return;
   }
-  
+
   debug() << "adding JAR file `" << file << "'" << eom;
 
   auto &jm=jar_map[file];  
-  std::size_t number_of_files=entries.size();
+  std::size_t number_of_files=jar_file.index.size();
   
-  for(std::size_t index=0; index<number_of_files; index++)
+  for(std::size_t i=0; i<number_of_files; i++)
   {
-    std::string file_name=entries[index];
+    std::string file_name=jar_file.index[i];
     
     // does it end on .class?
     if(has_suffix(file_name, ".class"))
@@ -239,7 +233,7 @@ void java_class_loadert::read_jar_file(const irep_idt &file)
       irep_idt class_name=file_to_class_name(file_name);
     
       // record
-      jm.entries[class_name].index=index;
+      jm.entries[class_name].index=i;
     }
   }
 }

@@ -52,13 +52,8 @@ void base_type_rec(
     struct_union_typet::componentst &components=
       to_struct_union_type(type).components();
 
-    for(struct_union_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-    {
-      base_type_rec(it->type(), ns, symb);
-    }
+    for(auto & it : components)
+      base_type_rec(it.type(), ns, symb);
   }
   else if(type.id()==ID_pointer)
   {

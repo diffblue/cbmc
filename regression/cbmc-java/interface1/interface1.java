@@ -7,16 +7,16 @@ class B implements A
 {
   public void f()
   {
-    assert false;
+    assert false; // should fail
   }
 }
 
 class C implements A
 {
-  public void f(){}
+  public void f() { }
 }
 
-class virtual3
+class interface1
 {
   public static void main(String[] args)
   {

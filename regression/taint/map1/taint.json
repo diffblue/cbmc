@@ -1,0 +1,4 @@
+[
+{ "id": "my_source", "kind": "source", "where": "return_value", "taint": "T1", "function": "map1.my_source" },
+{ "id": "my_sink",   "kind": "sink",   "where": "parameter1", "taint": "T1", "function": "map1.my_sink", "message": "There is a flow" }
+]

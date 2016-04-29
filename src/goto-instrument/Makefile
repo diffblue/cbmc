@@ -50,6 +50,14 @@ include ../common
 
 all: goto-instrument$(EXEEXT)
 
+ifneq ($(wildcard ../java_bytecode/Makefile),)
+  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
+  ifneq ($(LIBZIPLIB),)
+    LIBS += $(LIBZIPLIB)
+  endif
+endif
+
 ifneq ($(LIB_GLPK),)
   LIBS += $(LIB_GLPK)
   CP_CXXFLAGS += -DHAVE_GLPK

@@ -575,7 +575,7 @@ void custom_bitvector_domaint::output(
       it!=may_bits.end();
       it++)
   {
-    out << it->first << " MAY: ";
+    out << it->first << " MAY:";
     bit_vectort b=it->second;
     
     for(unsigned i=0; b!=0; i++, b>>=1)
@@ -850,44 +850,53 @@ void custom_bitvector_analysist::check(
 
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
-      if(!i_it->is_assert()) continue;
-      if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
+      exprt result;
+      irep_idt description;
+    
+      if(i_it->is_assert())
+      {
+        if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
+          continue;
+
+        if(operator[](i_it).is_bottom) continue;
+
+        exprt tmp=eval(i_it->guard, i_it);
+        result=simplify_expr(tmp, ns);
+        
+        description=i_it->source_location.get_comment();
+      }
+      else
         continue;
-
-      if(operator[](i_it).is_bottom) continue;
-
-      exprt result=eval(i_it->guard, i_it);
-      exprt result2=simplify_expr(result, ns);
 
       if(use_xml)
       {
         out << "<result status=\"";
-        if(result2.is_true())
+        if(result.is_true())
           out << "SUCCESS";
-        else if(result2.is_false())
+        else if(result.is_false())
           out << "FAILURE";
         else 
           out << "UNKNOWN";
         out << "\">\n";
         out << xml(i_it->source_location);
         out << "<description>"
-            << i_it->source_location.get_comment()
+            << description
             << "</description>\n";
         out << "</result>\n\n";
       }
       else
       {
         out << i_it->source_location;
-        if(!i_it->source_location.get_comment().empty())
-          out << ", " << i_it->source_location.get_comment();
+        if(!description.empty())
+          out << ", " << description;
         out << ": ";
-        out << from_expr(ns, f_it->first, result2);
+        out << from_expr(ns, f_it->first, result);
         out << '\n';
       }
 
-      if(result2.is_true())
+      if(result.is_true())
         pass++;
-      else if(result2.is_false())
+      else if(result.is_false())
         fail++;
       else
         unknown++;
