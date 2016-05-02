@@ -44,9 +44,6 @@ exprt flatten_byte_extract(
   else
     assert(false);
   
-  if(src.id()==ID_byte_extract_big_endian) 
-    throw "byte_extract flattening of big endian not done yet";
-
   mp_integer size_bits=pointer_offset_bits(src.type(), ns);
   if(size_bits<0)
     throw "byte_extract flatting with non-constant size: "+src.pretty();
@@ -64,7 +61,7 @@ exprt flatten_byte_extract(
     // byte-array?
     if((subtype.id()==ID_unsignedbv ||
         subtype.id()==ID_signedbv) &&
-       subtype.get_int(ID_width)==8)
+       to_bitvector_type(subtype).get_width()==8)
     {
       // get 'width'-many bytes, and concatenate
       exprt::operandst op;
@@ -138,16 +135,27 @@ exprt flatten_byte_extract(
   }
   else // non-array
   {
+    mp_integer op0_bits=pointer_offset_bits(src.op0().type(), ns);
+    if(op0_bits<0)
+      throw "byte_extract flatting of non-constant source size: "+src.pretty();
+
     // We turn that into logical right shift and extractbits
     
     const exprt &offset=src.op1();
     const typet &offset_type=ns.follow(offset.type());
+    
+    // adjust for endianness
+    exprt adjusted_offset;
+    
+    if(little_endian)
+      adjusted_offset=offset;
+    else
+    {
+      exprt width_constant=from_integer(op0_bits/8-1, offset_type);
+      adjusted_offset=minus_exprt(width_constant, offset);
+    }
 
-    mult_exprt times_eight(offset, from_integer(8, offset_type));
-
-    mp_integer op0_bits=pointer_offset_bits(src.op0().type(), ns);
-    if(op0_bits<0)
-      throw "byte_extract flatting of non-constant source size: "+src.pretty();
+    mult_exprt times_eight(adjusted_offset, from_integer(8, offset_type));
 
     // cast to generic bit-vector
     std::size_t op0_width=integer2unsigned(op0_bits);
@@ -228,7 +236,7 @@ exprt flatten_byte_update(
             exprt byte_extract_expr(
               src.id()==ID_byte_update_little_endian?ID_byte_extract_little_endian:
               src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
-              throw "unexpected src.id()",
+              throw "unexpected src.id() in flatten_byte_update",
               subtype);
             
             byte_extract_expr.copy_to_operands(src.op2(), i_expr);

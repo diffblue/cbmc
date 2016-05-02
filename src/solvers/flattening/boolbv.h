@@ -211,9 +211,7 @@ protected:
     const exprt &new_value,
     bvt &bv);
 
-  virtual exprt bv_get_unbounded_array(
-    const irep_idt &identifier,
-    const array_typet &type) const;
+  virtual exprt bv_get_unbounded_array(const exprt &) const;
                     
   virtual exprt bv_get_rec(
     const bvt &bv,

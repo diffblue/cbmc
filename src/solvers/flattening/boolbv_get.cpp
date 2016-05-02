@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/threeval.h>
 #include <util/std_types.h>
+#include <util/simplify_expr.h>
 
 #include "boolbv.h"
 #include "boolbv_type.h"
@@ -43,9 +44,9 @@ exprt boolbvt::get(const exprt &expr) const
     if(it!=map.mapping.end())
     {
       const boolbv_mapt::map_entryt &map_entry=it->second;
-    
+      
       if(is_unbounded_array(map_entry.type))
-        return bv_get_unbounded_array(identifier, to_array_type(map_entry.type));
+        return bv_get_unbounded_array(expr);
         
       std::vector<bool> unknown;
       bvt bv;
@@ -351,14 +352,13 @@ Function: boolbvt::bv_get_unbounded_array
 
 \*******************************************************************/
 
-exprt boolbvt::bv_get_unbounded_array(
-  const irep_idt &identifier,
-  const array_typet &type) const
+exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
 {
   // first, try to get size
-  
-  const exprt &size_expr=type.size();
-  exprt size=get(size_expr);
+
+  const typet &type=expr.type();  
+  const exprt &size_expr=to_array_type(type).size();
+  exprt size=simplify_expr(get(size_expr), ns);
   
   // no size, give up
   if(size.is_nil()) return nil_exprt();
@@ -386,11 +386,7 @@ exprt boolbvt::bv_get_unbounded_array(
   {
     std::size_t number;
 
-    symbol_exprt array_expr;
-    array_expr.type()=type;
-    array_expr.set_identifier(identifier);
-
-    if(arrays.get_number(array_expr, number))
+    if(arrays.get_number(expr, number))
       return nil_exprt();
 
     // get root
@@ -408,7 +404,7 @@ exprt boolbvt::bv_get_unbounded_array(
     {
       index_exprt index;
       index.type()=type.subtype();
-      index.array()=array_expr;
+      index.array()=expr;
       index.index()=*it1;
       
       exprt value=bv_get_cache(index);
