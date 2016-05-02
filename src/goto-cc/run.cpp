@@ -20,6 +20,7 @@ Date: August 2012
 
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <fcntl.h>
 
 #endif
 
@@ -41,9 +42,13 @@ Function: run
   
 int run(
   const std::string &what,
-  const std::vector<std::string> &argv)
+  const std::vector<std::string> &argv,
+  const std::string &std_input)
 {
   #ifdef _WIN32
+  // we don't support stdin on Windows
+  assert(std_input.empty());
+
   // unicode version of the arguments
   std::vector<std::wstring> wargv;
   
@@ -70,6 +75,18 @@ int run(
   return status;
   
   #else
+  int stdin_fd=STDIN_FILENO;
+
+  if(!std_input.empty())
+  {
+    stdin_fd=open(std_input.c_str(), O_RDONLY);
+    if(stdin_fd==-1)
+    {
+      perror("Failed to open stdin copy");
+      return 1;
+    }
+  }
+
   pid_t childpid; /* variable to store the child's pid */
 
   /* now create new process */
@@ -85,6 +102,8 @@ int run(
 
       _argv[argv.size()]=NULL;
       
+      if(stdin_fd!=STDIN_FILENO)
+        dup2(stdin_fd, STDIN_FILENO);
       execvp(what.c_str(), _argv);
       /* usually no return */
       return 1;
@@ -99,13 +118,23 @@ int run(
         else
         {
           perror("Waiting for child process failed");
+          if(stdin_fd!=STDIN_FILENO)
+            close(stdin_fd);
           return 1;
         }
+
+      if(stdin_fd!=STDIN_FILENO)
+        close(stdin_fd);
 
       return WEXITSTATUS(status);
     }
   }
   else /* fork returns -1 on failure */
+  {
+      if(stdin_fd!=STDIN_FILENO)
+        close(stdin_fd);
+
     return 1;
+  }
   #endif
 }

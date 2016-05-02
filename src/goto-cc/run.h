@@ -16,6 +16,7 @@ Date: August 2012
   
 int run(
   const std::string &what,
-  const std::vector<std::string> &argv);
+  const std::vector<std::string> &argv,
+  const std::string &std_input);
 
 #endif /* GOTO_CC_RUN_H */
