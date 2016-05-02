@@ -660,17 +660,17 @@ int gcc_modet::gcc_hybrid_binary()
   int result=run(new_argv[0], new_argv);
   
   // merge output from gcc with goto-binaries
-  // using objcopy
+  // using objcopy, or do cleanup if an earlier call failed
   for(std::list<std::string>::const_iterator
       it=output_files.begin();
-      result==0 && it!=output_files.end();
+      it!=output_files.end();
       it++)
   {
     debug() << "merging " << *it << eom;
     std::string saved=*it+".goto-cc-saved";
 
     #ifdef __linux__
-    if(!cmdline.isset('c'))
+    if(result==0 && !cmdline.isset('c'))
     {
       // remove any existing goto-cc section
       std::vector<std::string> objcopy_argv;
@@ -680,35 +680,40 @@ int gcc_modet::gcc_hybrid_binary()
       objcopy_argv.push_back(*it);
       
       result=run(objcopy_argv[0], objcopy_argv, "");
-      if(result!=0) break;
     }
 
-    // now add goto-binary as goto-cc section  
-    std::vector<std::string> objcopy_argv;
-  
-    objcopy_argv.push_back("objcopy");
-    objcopy_argv.push_back("--add-section");
-    objcopy_argv.push_back("goto-cc="+saved);
-    objcopy_argv.push_back(*it);
-    
-    result=run(objcopy_argv[0], objcopy_argv, "");
+    if(result==0)
+    {
+      // now add goto-binary as goto-cc section  
+      std::vector<std::string> objcopy_argv;
+
+      objcopy_argv.push_back("objcopy");
+      objcopy_argv.push_back("--add-section");
+      objcopy_argv.push_back("goto-cc="+saved);
+      objcopy_argv.push_back(*it);
+
+      result=run(objcopy_argv[0], objcopy_argv, "");
+    }
 
     remove(saved.c_str());
     #elif defined(__APPLE__)
     // Mac
-    std::vector<std::string> lipo_argv;
-  
-    // now add goto-binary as hppa7100LC section  
-    lipo_argv.push_back("lipo");
-    lipo_argv.push_back(*it);
-    lipo_argv.push_back("-create");
-    lipo_argv.push_back("-arch");
-    lipo_argv.push_back("hppa7100LC");
-    lipo_argv.push_back(saved);
-    lipo_argv.push_back("-output");
-    lipo_argv.push_back(*it);
-    
-    result=run(lipo_argv[0], lipo_argv, "");
+    if(result==0)
+    {
+      std::vector<std::string> lipo_argv;
+
+      // now add goto-binary as hppa7100LC section  
+      lipo_argv.push_back("lipo");
+      lipo_argv.push_back(*it);
+      lipo_argv.push_back("-create");
+      lipo_argv.push_back("-arch");
+      lipo_argv.push_back("hppa7100LC");
+      lipo_argv.push_back(saved);
+      lipo_argv.push_back("-output");
+      lipo_argv.push_back(*it);
+
+      result=run(lipo_argv[0], lipo_argv, "");
+    }
 
     remove(saved.c_str());
 
