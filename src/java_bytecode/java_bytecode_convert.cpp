@@ -87,36 +87,30 @@ protected:
 
   irep_idt current_method;
   unsigned number_of_parameters;
+  bool method_has_this;
 
   // JVM local variables
-  symbol_exprt &variable(
-    std::map<irep_idt, symbol_exprt> &variables,
-    const exprt &arg,
-    char type_char)
+  const symbol_exprt variable(const exprt &arg, char type_char)
   {
     irep_idt number=to_constant_expr(arg).get_value();
+    irep_idt base_name;
     
-    std::string prefix=(safe_string2unsigned(id2string(number))<number_of_parameters)?"arg":"local";
-    irep_idt base_name=prefix+id2string(number)+type_char;
-    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
-
-    const std::map<irep_idt, symbol_exprt>::iterator variable=
-      variables.find(identifier);
-
-    if(variables.end() != variable)
+    if(method_has_this && number==ID_0)
     {
-      symbol_exprt &cached(variable->second);
-      if(!is_reference_type(type_char))
-        cached.type() = java_type_from_char(type_char);
-      return cached;
+      base_name=ID_this;
     }
+    else
+    {
+      std::string prefix=(safe_string2unsigned(id2string(number))<number_of_parameters)?"arg":"local";
+      base_name=prefix+id2string(number)+type_char;
+    }
+    
+    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
 
     symbol_exprt result(identifier, java_type_from_char(type_char));
     result.set(ID_C_base_name, base_name);
-    std::pair<std::map<irep_idt, symbol_exprt>::iterator, bool> it(variables.insert(std::make_pair(identifier, result)));
-    assert(it.second);
 
-    return it.first->second;
+    return result;
   }
 
   // temporary variables
@@ -451,6 +445,7 @@ void java_bytecode_convertt::convert(
   method_symbol.type=member_type;
   current_method=method_symbol.name;
   number_of_parameters=count_java_parameter_slots(parameters);
+  method_has_this=!parameters.empty() && parameters.front().get_bool(ID_C_this);
   tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
   symbol_table.add(method_symbol);
@@ -670,8 +665,6 @@ codet java_bytecode_convertt::convert_instructions(
     }
   }
 
-  std::map<irep_idt, symbol_exprt> loc_vars;
-
   std::set<unsigned> working_set;
   if(!instructions.empty())
     working_set.insert(instructions.front().address);
@@ -874,7 +867,7 @@ codet java_bytecode_convertt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
 
-      symbol_exprt var=variable(loc_vars, arg0, statement[0]);
+      symbol_exprt var=variable(arg0, statement[0]);
 
       const bool is_array('a' == statement[0]);
       
@@ -906,7 +899,7 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(loc_vars, arg0, statement[0]);
+      results[0]=variable(arg0, statement[0]);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -1034,9 +1027,9 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(loc_vars, arg0, 'i');
+      code_assign.lhs()=variable(arg0, 'i');
       code_assign.rhs()=plus_exprt(
-                          variable(loc_vars, arg0, 'i'),
+                          variable(arg0, 'i'),
                           typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
