@@ -17,35 +17,38 @@ echo $VERSION_FILE
 mkdir /tmp/cbmc-dist
 mkdir /tmp/cbmc-dist/package-root
 mkdir /tmp/cbmc-dist/package-root/usr
-mkdir /tmp/cbmc-dist/package-root/usr/bin
+mkdir /tmp/cbmc-dist/package-root/usr/local
+mkdir /tmp/cbmc-dist/package-root/usr/local/bin
 mkdir /tmp/cbmc-dist/resources
 mkdir /tmp/cbmc-dist/resources/en.lproj
 
 cp ../cbmc/cbmc ../goto-cc/goto-cc \
-  ../goto-instrument/goto-instrument /tmp/cbmc-dist/package-root/usr/bin
-cp ../../LICENSE /tmp/cbmc-dist/resources/License.txt
+  ../goto-instrument/goto-instrument /tmp/cbmc-dist/package-root/usr/local/bin/
+cp ../../LICENSE /tmp/cbmc-dist/resources/license.html
+cp distribution.xml /tmp/cbmc-dist/
 
 echo "Building cbmc-${VERSION_FILE}.pkg (${BITS} bits)"
 
-#/Applications/PackageMaker.app/Contents/MacOS/PackageMaker \
-#  --root /tmp/cbmc-dist/package-root/ \
-#  -o /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg \
-#  --version $VERSION \
-#  --title "CBMC ${VERSION}" \
-#  --resources /tmp/cbmc-dist/resources/ \
-#  --target 10.5 \
-#  --id org.cprover.cbmc
+# Do the 'component package'
 
 pkgbuild \
   --root /tmp/cbmc-dist/package-root/ \
   --identifier org.cprover.cbmc \
   --version $VERSION \
-  --verbose \
-  /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg  
+  /tmp/cbmc-dist/cbmc-component.pkg  
+  
+# Now do the 'product archive'
 
-#echo Copying.
-#scp /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg \
-#  kroening@dkr-srv.cs.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
+productbuild \
+  --distribution /tmp/cbmc-dist/distribution.xml \
+  --resources /tmp/cbmc-dist/resources/ \
+  --package-path /tmp/cbmc-dist \
+  --version $VERSION \
+  /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg
+
+echo Copying.
+scp /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg \
+  kroening@dkr-srv.cs.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
 
 #cd /tmp
 #rm -R /tmp/cbmc-dist

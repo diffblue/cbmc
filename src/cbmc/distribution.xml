@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <title>The CBMC Bounded Model Checker</title>
+    <organization>org.cprover.cbmc</organization>
+    <domains enable_localSystem="true"/>
+    <options customize="never" require-scripts="true" rootVolumeOnly="true" />
+    <!-- Define documents displayed at various steps -->
+    <welcome    file="welcome.html"    mime-type="text/html" />
+    <license    file="license.html"    mime-type="text/html" />
+    <conclusion file="conclusion.html" mime-type="text/html" />
+    <!-- List all component packages -->
+    <pkg-ref id="org.cprover.cbmc"
+             version="0"
+             auth="root">cbmc-component.pkg</pkg-ref>
+    <!-- List them again here. They can now be organized
+         as a hierarchy if you want. -->
+    <choices-outline>
+        <line choice="org.cprover.cbmc"/>
+    </choices-outline>
+    <!-- Define each choice above -->
+    <choice
+        id="org.cprover.cbmc"
+        visible="false"
+        title="CBMC"
+        description="The CBMC Model Checker"
+        start_selected="true">
+      <pkg-ref id="org.cprover.cbmc"/>
+    </choice>
+</installer-gui-script>
