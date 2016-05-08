@@ -440,8 +440,14 @@ void java_bytecode_convertt::convert(
   method_symbol.mode=ID_java;
   method_symbol.name=method.get_name();
   method_symbol.base_name=method.get_base_name();
-  method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                            id2string(method.get_base_name())+"()";
+  
+  if(method.get_base_name()=="<init>")
+    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
+                              id2string(class_symbol.base_name)+"()";
+  else
+    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
+                              id2string(method.get_base_name())+"()";
+  
   method_symbol.type=member_type;
   current_method=method_symbol.name;
   number_of_parameters=count_java_parameter_slots(parameters);
