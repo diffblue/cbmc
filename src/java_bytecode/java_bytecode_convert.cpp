@@ -120,14 +120,25 @@ protected:
   }
 
   // temporary variables
-  unsigned tmp_counter;
+  std::list<symbol_exprt> tmp_vars;
 
-  symbol_exprt tmp_variable(const typet &type)
+  symbol_exprt tmp_variable(const std::string &prefix, const typet &type)
   {
-    irep_idt base_name="tmp"+i2string(tmp_counter++);
+    irep_idt base_name=prefix+"_tmp"+i2string(tmp_vars.size());
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+
+    auxiliary_symbolt tmp_symbol;
+    tmp_symbol.base_name=base_name;
+    tmp_symbol.is_static_lifetime=false;
+    tmp_symbol.mode=ID_java;
+    tmp_symbol.name=identifier;
+    tmp_symbol.type=type;
+    symbol_table.add(tmp_symbol);
+
     symbol_exprt result(identifier, type);
     result.set(ID_C_base_name, base_name);
+    tmp_vars.push_back(result);
+
     return result;
   }
 
@@ -434,7 +445,7 @@ void java_bytecode_convertt::convert(
   method_symbol.type=member_type;
   current_method=method_symbol.name;
   number_of_parameters=count_java_parameter_slots(parameters);
-  tmp_counter=0;
+  tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
   symbol_table.add(method_symbol);
 }
@@ -464,6 +475,7 @@ void java_bytecode_convertt::convert(
 
   component.set_name(f.name);
   component.set_base_name(f.name);
+  component.set_pretty_name(f.name);
   component.type()=member_type;
   
   if(f.is_private)
@@ -782,7 +794,7 @@ codet java_bytecode_convertt::convert_instructions(
 
       if(return_type.id()!=ID_empty)
       {
-        call.lhs()=tmp_variable(return_type);
+        call.lhs()=tmp_variable("return", return_type);
         results.resize(1);
         results[0]=call.lhs();
       }
@@ -1004,7 +1016,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.empty());
       irep_idt number=to_constant_expr(arg0).get_value();
       code_ifthenelset code_branch;
-      const typecast_exprt lhs(op[0], pointer_typet());
+      const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
       const exprt rhs(gen_zero(lhs.type()));
       code_branch.cond()=binary_relation_exprt(lhs, ID_equal, rhs);
       code_branch.then_case()=code_gotot(label(number));
@@ -1248,7 +1260,7 @@ codet java_bytecode_convertt::convert_instructions(
       if(!i_it->source_location.get_line().empty())
         java_new_expr.add_source_location()=i_it->source_location;
 
-      const exprt tmp=tmp_variable(ref_type);
+      const exprt tmp=tmp_variable("new", ref_type);
       c=code_assignt(tmp, java_new_expr);
       results[0]=tmp;
     }
@@ -1294,7 +1306,7 @@ codet java_bytecode_convertt::convert_instructions(
       if(!i_it->source_location.get_line().empty())
         java_new_array.add_source_location()=i_it->source_location;
 
-      const exprt tmp=tmp_variable(ref_type);
+      const exprt tmp=tmp_variable("newarray", ref_type);
       c=code_assignt(tmp, java_new_array);
       results[0]=tmp;
     }
@@ -1317,7 +1329,7 @@ codet java_bytecode_convertt::convert_instructions(
       if(!i_it->source_location.get_line().empty())
         java_new_array.add_source_location()=i_it->source_location;
 
-      const exprt tmp=tmp_variable(ref_type);
+      const exprt tmp=tmp_variable("newarray", ref_type);
       c=code_assignt(tmp, java_new_array);
       results[0]=tmp;
     }
@@ -1418,15 +1430,18 @@ codet java_bytecode_convertt::convert_instructions(
 
   // TODO: add exception handlers from exception table
   code_blockt code;
-
-  for(address_mapt::const_iterator it=
-      address_map.begin();
-      it!=address_map.end();
-      ++it)
+  
+  // temporaries
+  for(const auto & var : tmp_vars)
   {
-    const unsigned address=it->first;
-    assert(it->first==it->second.source->address);
-    const codet &c=it->second.code;
+    code.add(code_declt(var));
+  }
+
+  for(const auto & it : address_map)
+  {
+    const unsigned address=it.first;
+    assert(it.first==it.second.source->address);
+    const codet &c=it.second.code;
 
     if(targets.find(address)!=targets.end())
       code.add(code_labelt(label(i2string(address)), c));
