@@ -45,6 +45,7 @@ Author: Peter Schrammel
 #include "goto_diff.h"
 #include "syntactic_diff.h"
 #include "unified_diff.h"
+#include "change_impact.h"
 
 /*******************************************************************\
 
@@ -334,6 +335,12 @@ int goto_diff_parse_optionst::doit()
     return 0;
   }
 
+  if(cmdline.isset("change-impact"))
+  {
+    change_impact(goto_model1, goto_model2);
+    return 0;
+  }
+
   if(cmdline.isset("unified") ||
      cmdline.isset('u'))
   {
@@ -529,6 +536,7 @@ void goto_diff_parse_optionst::help()
     " --show-functions             show functions (default)\n"
     " --syntactic                  do syntactic diff (default)\n"
     " -u | --unified               output unified diff\n"
+    " --change-impact              output unified diff with dependencies\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
