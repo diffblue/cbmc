@@ -195,6 +195,7 @@ void nested_interrupts(
   const goto_functionst::goto_functiont& goto_function,
 #endif
   goto_programt &goto_program,
+  const irep_idt &function_id,
   const symbol_exprt &scheduling_function,
   const isr_rw_set_mapt &isr_rw_set_map)
 {
@@ -221,6 +222,9 @@ void nested_interrupts(
         it!=isr_rw_set_map.end();
         ++it)
     {
+      if(it->first==function_id)
+        continue;
+
       const rw_set_function_rect &isr_rw_set=it->second;
 
       if(!race_on_read && potential_race_on_read(rw_set, isr_rw_set))
@@ -298,7 +302,7 @@ void nested_interrupts(
 #ifdef LOCAL_MAY
         f_it->second,
 #endif
-        f_it->second.body, sched_f, isr_rw_set_map);
+        f_it->second.body, f_it->first, sched_f, isr_rw_set_map);
 
   goto_functions.update();
 }
