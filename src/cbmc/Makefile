@@ -51,7 +51,7 @@ endif
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-  ifneq ($(LIBZIPLIB),)
+  ifneq ($(wildcard $(LIBZIPINC)),)
     LIBS += $(LIBZIPLIB)
   endif
 endif
