@@ -37,9 +37,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/remove_skip.h>
 
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
+#include <goto-instrument/cover.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -909,16 +911,43 @@ bool cbmc_parse_optionst::process_goto_program(
     
     // recalculate numbers, etc.
     goto_functions.update();
-
+    
     // add loop ids
     goto_functions.compute_loop_numbers();
     
-    // if we aim to cover assertions, replace
-    // all assertions by false to prevent simplification
+    // instrument cover goals
     
-    if(cmdline.isset("cover") &&
-       cmdline.get_value("cover")=="assertions")
-      make_assertions_false(goto_functions);
+    if(cmdline.isset("cover"))
+    {
+      std::string criterion=cmdline.get_value("cover");
+      
+      coverage_criteriont c;
+
+      if(criterion=="assertion" || criterion=="assertions")
+        c=coverage_criteriont::ASSERTION;
+      else if(criterion=="path" || criterion=="paths")
+        c=coverage_criteriont::PATH;
+      else if(criterion=="branch" || criterion=="branches")
+        c=coverage_criteriont::BRANCH;
+      else if(criterion=="location" || criterion=="locations")
+        c=coverage_criteriont::LOCATION;
+      else if(criterion=="decision" || criterion=="decisions")
+        c=coverage_criteriont::DECISION;
+      else if(criterion=="condition" || criterion=="conditions")
+        c=coverage_criteriont::CONDITION;
+      else if(criterion=="mcdc")
+        c=coverage_criteriont::MCDC;
+      else
+      {
+        error() << "unknown coverage criterion" << eom;
+        return false;
+      }
+          
+      instrument_cover_goals(symbol_table, goto_functions, c);
+    }
+      
+    // remove skips
+    remove_skip(goto_functions);
 
     // show it?
     if(cmdline.isset("show-loops"))
