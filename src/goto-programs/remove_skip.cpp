@@ -41,8 +41,10 @@ static bool is_skip(goto_programt::instructionst::iterator it)
     goto_programt::instructionst::iterator next_it=it;
     next_it++;
 
-    // a branch to the next instruction is a skip
-    return it->targets.front()==next_it;
+    // A branch to the next instruction is a skip
+    // We also require the guard to be 'true'
+    return it->guard.is_true() &&
+           it->targets.front()==next_it;
   }
   
   if(it->is_other())
