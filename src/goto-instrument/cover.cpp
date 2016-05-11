@@ -70,6 +70,35 @@ const char *as_string(coverage_criteriont c)
 
 /*******************************************************************\
 
+Function: collect_conditions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void collect_conditions(const exprt &src, std::set<exprt> &dest)
+{
+  if(src.id()==ID_and || src.id()==ID_or ||
+     src.id()==ID_not || src.id()==ID_implies)
+  {
+    forall_operands(it, src)
+      collect_conditions(*it, dest);
+  }
+  else if(src.is_true())
+  {
+  }
+  else
+  {
+    dest.insert(src); 
+  }
+}
+
+/*******************************************************************\
+
 Function: instrument_cover_goals
 
   Inputs:
@@ -85,6 +114,7 @@ void instrument_cover_goals(
   goto_programt &goto_program,
   coverage_criteriont criterion)
 {
+  const namespacet ns(symbol_table);
   basic_blockst basic_blocks(goto_program);
   std::set<unsigned> blocks_done;
   
@@ -93,6 +123,8 @@ void instrument_cover_goals(
     switch(criterion)
     {
     case coverage_criteriont::ASSERTION:
+      // turn into 'assert(false)' to avoid simplification
+      i_it->guard=false_exprt();
       break;
       
     case coverage_criteriont::LOCATION:
@@ -120,36 +152,48 @@ void instrument_cover_goals(
     case coverage_criteriont::BRANCH:
       if(i_it->is_goto() && !i_it->guard.is_true())
       {
-        #if 0
         std::string b=i2string(basic_blocks[i_it]);
-        goal_map[id(i_it, "TRUE")]=
-          goalt("function "+id2string(f_it->first)+" block "+b+" branch true",
-                i_it->source_location);
-        goal_map[id(i_it, "FALSE")]=
-          goalt("function "+id2string(f_it->first)+" block "+b+" branch false",
-                i_it->source_location);
-        #endif
+        std::string true_comment=
+          "function "+id2string(i_it->function)+" block "+b+" branch true";
+        std::string false_comment=
+          "function "+id2string(i_it->function)+" block "+b+" branch false";
+
+        exprt guard=i_it->guard;
+        source_locationt source_location=i_it->source_location;
+
+        goto_program.insert_before_swap(i_it);
+        i_it->make_assertion(guard);
+        i_it->source_location=source_location;
+        i_it->source_location.set_comment(true_comment);
+
+        goto_program.insert_before_swap(i_it);
+        i_it->make_assertion(not_exprt(guard));
+        i_it->source_location=source_location;
+        i_it->source_location.set_comment(false_comment);
       }
       break;
       
     case coverage_criteriont::CONDITION:
       if(i_it->is_goto())
       {
-        #if 0
         std::set<exprt> conditions;
 
         collect_conditions(i_it->guard, conditions);
         unsigned i=0;
 
+        exprt guard=i_it->guard;
+        source_locationt source_location=i_it->source_location;
+
         for(std::set<exprt>::const_iterator it=conditions.begin();
             it!=conditions.end();
             it++, i++)
         {
-          goal_map[id(i_it, "C"+i2string(i))]=
-            goalt("condition "+from_expr(bmc.ns, "", *it),
-                  i_it->source_location);
+          std::string comment="condition "+from_expr(ns, "", *it);
+          goto_program.insert_before_swap(i_it);
+          i_it->make_assertion(*it);
+          i_it->source_location=source_location;
+          i_it->source_location.set_comment(comment);
         }
-        #endif
       }
       break;
     
@@ -185,37 +229,6 @@ void instrument_cover_goals(
     instrument_cover_goals(symbol_table, f_it->second.body, criterion);
   }
 }
-
-/*******************************************************************\
-
-Function: bmc_covert::collect_conditions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-void bmc_covert::collect_conditions(const exprt &src, std::set<exprt> &dest)
-{
-  if(src.id()==ID_and || src.id()==ID_or ||
-     src.id()==ID_not || src.id()==ID_implies)
-  {
-    forall_operands(it, src)
-      collect_conditions(*it, dest);
-  }
-  else if(src.is_true())
-  {
-  }
-  else
-  {
-    dest.insert(src); 
-  }
-}
-#endif
 
 /*******************************************************************\
 
