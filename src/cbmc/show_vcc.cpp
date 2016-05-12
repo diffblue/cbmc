@@ -53,7 +53,7 @@ void bmct::show_vcc_plain(std::ostream &out)
       last_it=has_threads?equation.SSA_steps.end():s_it;
 
     for(unsigned count=1; p_it!=last_it; p_it++)
-      if(p_it->is_assume() || p_it->is_assignment() || p_it->is_constraint())
+      if(p_it->is_assignment() || p_it->is_constraint())
       {
         if(!p_it->ignore)
         {
@@ -120,8 +120,7 @@ void bmct::show_vcc_json(std::ostream &out)
           =equation.SSA_steps.begin();
         p_it!=last_it; p_it++)
     {
-      if((p_it->is_assume() ||
-         p_it->is_assignment() ||
+      if((p_it->is_assignment() ||
          p_it->is_constraint()) &&
          !p_it->ignore)
       {

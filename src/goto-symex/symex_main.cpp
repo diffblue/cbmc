@@ -47,10 +47,13 @@ void goto_symext::vcc(
   if(expr.is_true())
     return;
 
-  state.guard.guard_expr(expr);
+  exprt gexpr=expr;
+  state.guard.guard_expr(gexpr);
 
   remaining_vccs++;
-  target.assertion(state.guard.as_expr(), expr, msg, state.source);
+  target.assertion(state.guard.as_expr(), gexpr, msg, state.source);
+
+  state.guard.add(expr);
 }
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)
@@ -62,20 +65,7 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
   if(simplified_cond.is_true())
     return;
 
-  if(state.threads.size()==1)
-  {
-    exprt tmp=simplified_cond;
-    state.guard.guard_expr(tmp);
-    target.assumption(state.guard.as_expr(), tmp, state.source);
-  }
-  // symex_target_equationt::convert_assertions would fail to
-  // consider assumptions of threads that have a thread-id above that
-  // of the thread containing the assertion:
-  // T0                     T1
-  // x=0;                   assume(x==1);
-  // assert(x!=42);         x=42;
-  else
-    state.guard.add(simplified_cond);
+  state.guard.add(simplified_cond);
 
   if(state.atomic_section_id!=0 &&
      state.guard.is_false())

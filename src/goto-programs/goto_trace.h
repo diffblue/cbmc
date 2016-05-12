@@ -37,7 +37,6 @@ public:
   unsigned step_nr;
 
   bool is_assignment() const      { return type==typet::ASSIGNMENT; }
-  bool is_assume() const          { return type==typet::ASSUME; }
   bool is_assert() const          { return type==typet::ASSERT; }
   bool is_goto() const            { return type==typet::GOTO; }
   bool is_constraint() const      { return type==typet::CONSTRAINT; }
@@ -59,7 +58,6 @@ public:
   {
     NONE,
     ASSIGNMENT,
-    ASSUME,
     ASSERT,
     GOTO,
     LOCATION,
@@ -92,7 +90,7 @@ public:
   // this transition done by given thread number
   unsigned thread_nr;
 
-  // for assume, assert, goto
+  // for assert, goto
   bool cond_value;
   exprt cond_expr;
 

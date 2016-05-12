@@ -135,12 +135,6 @@ public:
     const irep_idt &input_id,
     const std::list<exprt> &args)=0;
 
-  // record an assumption
-  virtual void assumption(
-    const exprt &guard,
-    const exprt &cond,
-    const sourcet &source)=0;
-
   // record an assertion
   virtual void assertion(
     const exprt &guard,

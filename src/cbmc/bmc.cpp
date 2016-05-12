@@ -261,22 +261,6 @@ void bmct::show_program()
 
       count++;
     }
-    else if(step.is_assume())
-    {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
-      std::cout << "(" << count << ") ASSUME("
-                << string_value <<") " << "\n";
-
-      if(!step.guard.is_true())
-      {
-        languages.from_expr(step.guard, string_value);
-        std::cout << std::string(std::to_string(count).size()+3, ' ');
-        std::cout << "guard: " << string_value << "\n";
-      }
-
-      count++;
-    }
     else if(step.is_constraint())
     {
       std::string string_value;

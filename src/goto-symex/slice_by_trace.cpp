@@ -110,7 +110,7 @@ void symex_slice_by_tracet::slice_by_trace(
   SSA_step.guard=t_guard.as_expr();
   SSA_step.ssa_lhs.make_nil();
   SSA_step.cond_expr.swap(trace_condition);
-  SSA_step.type=goto_trace_stept::typet::ASSUME;
+  SSA_step.type=goto_trace_stept::typet::CONSTRAINT;
   SSA_step.source=empty_source;
 
   assign_merges(equation); // Now add the merge variable assignments to eqn

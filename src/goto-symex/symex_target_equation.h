@@ -110,12 +110,6 @@ public:
     const irep_idt &input_id,
     const std::list<exprt> &args);
 
-  // record an assumption
-  virtual void assumption(
-    const exprt &guard,
-    const exprt &cond,
-    const sourcet &source);
-
   // record an assertion
   virtual void assertion(
     const exprt &guard,
@@ -158,7 +152,6 @@ public:
   void convert(prop_convt &prop_conv);
   void convert_assignments(decision_proceduret &decision_procedure) const;
   void convert_decls(prop_convt &prop_conv) const;
-  void convert_assumptions(prop_convt &prop_conv);
   void convert_assertions(prop_convt &prop_conv);
   void convert_constraints(decision_proceduret &decision_procedure) const;
   void convert_goto_instructions(prop_convt &prop_conv);
@@ -175,8 +168,6 @@ public:
 
     // NOLINTNEXTLINE(whitespace/line_length)
     bool is_assert() const          { return type==goto_trace_stept::typet::ASSERT; }
-    // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_assume() const          { return type==goto_trace_stept::typet::ASSUME; }
     // NOLINTNEXTLINE(whitespace/line_length)
     bool is_assignment() const      { return type==goto_trace_stept::typet::ASSIGNMENT; }
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -218,7 +209,7 @@ public:
     exprt ssa_rhs;
     assignment_typet assignment_type;
 
-    // for ASSUME/ASSERT/GOTO/CONSTRAINT
+    // for ASSERT/GOTO/CONSTRAINT
     exprt cond_expr;
     literalt cond_literal;
     std::string comment;

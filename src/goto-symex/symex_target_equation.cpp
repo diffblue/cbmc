@@ -303,23 +303,6 @@ void symex_target_equationt::input(
   merge_ireps(SSA_step);
 }
 
-/// record an assumption
-void symex_target_equationt::assumption(
-  const exprt &guard,
-  const exprt &cond,
-  const sourcet &source)
-{
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::typet::ASSUME;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
-}
-
 /// record an assertion
 void symex_target_equationt::assertion(
   const exprt &guard,
@@ -381,7 +364,6 @@ void symex_target_equationt::convert(
   convert_guards(prop_conv);
   convert_assignments(prop_conv);
   convert_decls(prop_conv);
-  convert_assumptions(prop_conv);
   convert_assertions(prop_conv);
   convert_goto_instructions(prop_conv);
   convert_io(prop_conv);
@@ -428,23 +410,6 @@ void symex_target_equationt::convert_guards(
       step.guard_literal=const_literal(false);
     else
       step.guard_literal=prop_conv.convert(step.guard);
-  }
-}
-
-/// converts assumptions
-/// \return -
-void symex_target_equationt::convert_assumptions(
-  prop_convt &prop_conv)
-{
-  for(auto &step : SSA_steps)
-  {
-    if(step.is_assume())
-    {
-      if(step.ignore)
-        step.cond_literal=const_literal(true);
-      else
-        step.cond_literal=prop_conv.convert(step.cond_expr);
-    }
   }
 }
 
@@ -499,16 +464,12 @@ void symex_target_equationt::convert_assertions(
   if(number_of_assertions==1)
   {
     for(auto &step : SSA_steps)
-    {
       if(step.is_assert())
       {
         prop_conv.set_to_false(step.cond_expr);
         step.cond_literal=const_literal(false);
         return; // prevent further assumptions!
       }
-      else if(step.is_assume())
-        prop_conv.set_to_true(step.cond_expr);
-    }
 
     assert(false); // unreachable
   }
@@ -518,31 +479,15 @@ void symex_target_equationt::convert_assertions(
   or_exprt::operandst disjuncts;
   disjuncts.reserve(number_of_assertions);
 
-  exprt assumption=true_exprt();
-
   for(auto &step : SSA_steps)
   {
     if(step.is_assert())
     {
-      implies_exprt implication(
-        assumption,
-        step.cond_expr);
-
       // do the conversion
-      step.cond_literal=prop_conv.convert(implication);
+      step.cond_literal=prop_conv.convert(step.cond_expr);
 
       // store disjunct
       disjuncts.push_back(literal_exprt(!step.cond_literal));
-    }
-    else if(step.is_assume())
-    {
-      // the assumptions have been converted before
-      // avoid deep nesting of ID_and expressions
-      if(assumption.id()==ID_and)
-        assumption.copy_to_operands(literal_exprt(step.cond_literal));
-      else
-        assumption=
-          and_exprt(assumption, literal_exprt(step.cond_literal));
     }
   }
 
@@ -627,8 +572,6 @@ void symex_target_equationt::SSA_stept::output(
   {
   case goto_trace_stept::typet::ASSERT:
     out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'; break;
-  case goto_trace_stept::typet::ASSUME:
-    out << "ASSUME " << from_expr(ns, "", cond_expr) << '\n'; break;
   case goto_trace_stept::typet::LOCATION:
     out << "LOCATION" << '\n'; break;
   case goto_trace_stept::typet::INPUT:
@@ -691,7 +634,7 @@ void symex_target_equationt::SSA_stept::output(
   default: assert(false);
   }
 
-  if(is_assert() || is_assume() || is_assignment() || is_constraint())
+  if(is_assert() || is_assignment() || is_constraint())
     out << from_expr(ns, "", cond_expr) << '\n';
 
   if(is_assert() || is_constraint())

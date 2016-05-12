@@ -57,10 +57,6 @@ void build_goto_trace(
       trace_step.type=goto_trace_stept::typet::DEAD;
       break;
 
-    case ASSUME:
-      trace_step.type=goto_trace_stept::typet::ASSUME;
-      break;
-
     case FUNCTION_CALL:
       trace_step.type=goto_trace_stept::typet::FUNCTION_CALL;
       break;

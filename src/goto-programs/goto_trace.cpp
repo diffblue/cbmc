@@ -39,7 +39,6 @@ void goto_trace_stept::output(
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT: out << "ASSERT"; break;
-  case goto_trace_stept::typet::ASSUME: out << "ASSUME"; break;
   case goto_trace_stept::typet::LOCATION: out << "LOCATION"; break;
   case goto_trace_stept::typet::ASSIGNMENT: out << "ASSIGNMENT"; break;
   case goto_trace_stept::typet::GOTO: out << "GOTO"; break;
@@ -56,7 +55,7 @@ void goto_trace_stept::output(
   default: assert(false);
   }
 
-  if(type==typet::ASSERT || type==typet::ASSUME || type==typet::GOTO)
+  if(type==typet::ASSERT || type==typet::GOTO)
     out << " (" << cond_value << ")";
 
   if(hidden)
@@ -262,21 +261,6 @@ void show_goto_trace(
         out << "  " << step.comment << "\n";
 
         if(step.pc->is_assert())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
-
-        out << "\n";
-      }
-      break;
-
-    case goto_trace_stept::typet::ASSUME:
-      if(!step.cond_value)
-      {
-        out << "\n";
-        out << "Violated assumption:" << "\n";
-        if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
-
-        if(step.pc->is_assume())
           out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
 
         out << "\n";
