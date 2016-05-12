@@ -943,11 +943,14 @@ bool cbmc_parse_optionst::process_goto_program(
         return false;
       }
           
+      status() << "Instrumenting coverge goals" << eom;
       instrument_cover_goals(symbol_table, goto_functions, c);
+      goto_functions.update();
     }
-      
+
     // remove skips
     remove_skip(goto_functions);
+    goto_functions.update();
 
     // show it?
     if(cmdline.isset("show-loops"))
