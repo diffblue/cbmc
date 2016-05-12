@@ -137,13 +137,15 @@ void instrument_cover_goals(
           if(i_it->source_location.get_file()!="")
           {
             std::string comment=
-              "block "+i_it->source_location.as_string();
+              "block "+i_it->source_location.as_string()+" "+i2string(i_it->location_number);
 
             source_locationt source_location=i_it->source_location;
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(false_exprt());
             i_it->source_location=source_location;
             i_it->source_location.set_comment(comment);
+            
+            i_it++;
           }
         }
       }
@@ -170,6 +172,9 @@ void instrument_cover_goals(
         i_it->make_assertion(not_exprt(guard));
         i_it->source_location=source_location;
         i_it->source_location.set_comment(false_comment);
+        
+        i_it++;
+        i_it++;
       }
       break;
       
@@ -194,6 +199,9 @@ void instrument_cover_goals(
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment);
         }
+        
+        for(unsigned i=0; i<conditions.size(); i++)
+          i_it++;
       }
       break;
     
@@ -229,16 +237,3 @@ void instrument_cover_goals(
     instrument_cover_goals(symbol_table, f_it->second.body, criterion);
   }
 }
-
-/*******************************************************************\
-
-Function: bmc_covert::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-

@@ -86,25 +86,7 @@ public:
   {
   }
   
-  typedef enum { C_LOCATION, C_BRANCH, C_DECISION, C_CONDITION,
-                 C_PATH, C_MCDC, C_ASSERTION } criteriont;
-
-  const char *as_string(criteriont c)
-  {
-    switch(c)
-    {
-    case C_LOCATION: return "location";
-    case C_BRANCH: return "branch";
-    case C_DECISION: return "decision";
-    case C_CONDITION: return "condition";
-    case C_PATH: return "path";
-    case C_MCDC: return "MC/DC";
-    case C_ASSERTION: return "assertion";
-    default: return "";
-    }
-  }
-
-  bool operator()(const criteriont criterion);
+  bool operator()();
 
   virtual void goal_covered(const cover_goalst::goalt &);
 
@@ -270,7 +252,7 @@ Function: bmc_covert::operator()
 
 \*******************************************************************/
 
-bool bmc_covert::operator()(const criteriont criterion)
+bool bmc_covert::operator()()
 {
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
@@ -301,69 +283,11 @@ bool bmc_covert::operator()(const criteriont criterion)
     
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
-      if(i_it->function==ID__start ||
-         i_it->function=="__CPROVER_initialize")
-        continue;
-        
-      switch(criterion)
-      {
-      case C_ASSERTION:
-        if(i_it->is_assert())
-          goal_map[id(i_it)]=
-            goalt(
-              id2string(i_it->source_location.get_comment()),
-              i_it->source_location);
-        break;
-        
-      case C_LOCATION:
-        {
-          std::string b=i2string(basic_blocks[i_it]);
-          std::string id=id2string(f_it->first)+"#"+b;
-          location_map[i_it]=id;
-          if(goal_map[id].description=="" &&
-             i_it->source_location.get_file()!="")
-          {
-            goal_map[id]=goalt(
-              "block "+i_it->source_location.as_string(),
-              i_it->source_location);
-          }
-        }
-        break;
-      
-      case C_BRANCH:
-        if(i_it->is_goto() && !i_it->guard.is_true())
-        {
-          std::string b=i2string(basic_blocks[i_it]);
-          goal_map[id(i_it, "TRUE")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch true",
-                  i_it->source_location);
-          goal_map[id(i_it, "FALSE")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch false",
-                  i_it->source_location);
-        }
-        break;
-        
-      case C_CONDITION:
-        if(i_it->is_goto())
-        {
-          std::set<exprt> conditions;
-
-          collect_conditions(i_it->guard, conditions);
-          unsigned i=0;
-
-          for(std::set<exprt>::const_iterator it=conditions.begin();
-              it!=conditions.end();
-              it++, i++)
-          {
-            goal_map[id(i_it, "C"+i2string(i))]=
-              goalt("condition "+from_expr(bmc.ns, "", *it),
-                    i_it->source_location);
-          }
-        }
-        break;
-      
-      default:;
-      }
+      if(i_it->is_assert())
+        goal_map[id(i_it)]=
+          goalt(
+            id2string(i_it->source_location.get_comment()),
+            i_it->source_location);
     }
   }
   
@@ -380,51 +304,11 @@ bool bmc_covert::operator()(const criteriont criterion)
     if(it->is_assume())
       assumptions.push_back(literal_exprt(it->cond_literal));
   
-    if(it->source.pc->function==ID__start ||
-       it->source.pc->function=="__CPROVER_initialize")
-      continue;
-      
-    switch(criterion)
+    if(it->source.pc->is_assert())
     {
-    case C_ASSERTION:
-      if(it->source.pc->is_assert())
-      {
-        and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
-        literalt c=solver.convert(c_expr);
-        goal_map[id(it->source.pc)].add_instance(it, c);
-      }
-      break;
-      
-    case C_LOCATION:
-      if(it->assignment_type!=symex_targett::PHI &&
-         it->assignment_type!=symex_targett::GUARD)
-      {
-        and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
-        literalt c=solver.convert(c_expr);
-        irep_idt id=location_map[it->source.pc];
-        goal_map[id].add_instance(it, c);
-      }
-      break;
-    
-    case C_BRANCH:
-      if(it->is_goto() &&
-         it->source.pc->is_goto() &&
-         !it->source.pc->guard.is_true())
-      {
-        and_exprt c_true_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(!it->cond_literal));
-        and_exprt c_false_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(it->cond_literal));
-        literalt c_true=solver.convert(c_true_expr);
-        literalt c_false=solver.convert(c_false_expr);
-
-        // a branch can have three states:
-        // 1) taken 2) not taken 3) not executed!
-
-        goal_map[id(it->source.pc, "TRUE")].add_instance(it, c_true);
-        goal_map[id(it->source.pc, "FALSE")].add_instance(it, c_false);
-      }
-      break;
-      
-    default:;
+      and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
+      literalt c=solver.convert(c_expr);
+      goal_map[id(it->source.pc)].add_instance(it, c);
     }
   }
   
@@ -461,7 +345,7 @@ bool bmc_covert::operator()(const criteriont criterion)
   if(bmc.ui!=ui_message_handlert::XML_UI)
   {
     status() << eom;
-    status() << "** " << as_string(criterion) << " coverage results:" << eom;
+    status() << "** coverage results:" << eom;
   }
   
   unsigned goals_covered=0;
@@ -526,30 +410,7 @@ bool bmct::cover(
   const goto_functionst &goto_functions,
   const std::string &criterion)
 {
-  bmc_covert::criteriont c;
-  
-  if(criterion=="assertion" || criterion=="assertions")
-    c=bmc_covert::C_ASSERTION;
-  else if(criterion=="path" || criterion=="paths")
-    c=bmc_covert::C_PATH;
-  else if(criterion=="branch" || criterion=="branches")
-    c=bmc_covert::C_BRANCH;
-  else if(criterion=="location" || criterion=="locations")
-    c=bmc_covert::C_LOCATION;
-  else if(criterion=="decision" || criterion=="decisions")
-    c=bmc_covert::C_DECISION;
-  else if(criterion=="condition" || criterion=="conditions")
-    c=bmc_covert::C_CONDITION;
-  else if(criterion=="mcdc")
-    c=bmc_covert::C_MCDC;
-  else
-  {
-    error() << "coverage criterion `" << criterion << "' is unknown"
-            << eom;
-    return true;
-  }
-
   bmc_covert bmc_cover(goto_functions, *this);
   bmc_cover.set_message_handler(get_message_handler());
-  return bmc_cover(c);
+  return bmc_cover();
 }
