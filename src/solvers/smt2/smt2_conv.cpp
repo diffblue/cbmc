@@ -126,6 +126,7 @@ void smt2_convt::write_header()
     out << "(set-logic " << logic << ")" << "\n";
 
   if (strings_mode == STRINGS_SMTLIB) {
+    out << "; string support via QF_S SMT-LIB logic\n";
     out << "(define-sort cprover.String () String)\n";
     out << "(define-sort cprover.Char () String)\n";
     out << "(define-sort cprover.Pos () (_ BitVec "
@@ -142,6 +143,7 @@ void smt2_convt::write_header()
     out << "0))"
         << ")\n\n";
   } else if (strings_mode == STRINGS_QARRAY) {
+    out << "; string support via PASS-style quantified arrays\n";
     out << "(define-sort cprover.Char () (_ BitVec 8))\n"
         << "(define-sort cprover.Pos () (_ BitVec "
         << string_length_width << "))\n"
@@ -5001,17 +5003,38 @@ void smt2_convt::define_string_equal(const function_application_exprt &f)
   const exprt &s1 = args[0];
   const exprt &s2 = args[1];
 
-  irep_idt id = "string_equal."+i2string(defined_expressions.size());
+  out << "; string equal\n";
+  
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id = "string_equal." + index;
   out << "(declare-fun " << id << " () Bool)\n";
-  out << "(assert (= " << id << " (let "
-      << "((?s1 ";
+  irep_idt s1id = "string_equal.s1." + index;
+  irep_idt s2id = "string_equal.s2." + index;
+  out << "(define-fun " << s1id << " () cprover.String ";
   convert_expr(s1);
-  out << ") (?s2 ";
+  out << ")\n";
+  out << "(define-fun " << s2id << " () cprover.String ";
   convert_expr(s2);
-  out << ")) (and (= (cprover.str.len ?s1) (cprover.str.len ?s2))\n"
-      << "(forall ((?n cprover.Pos)) "
-      << "(=> (bvult ?n (cprover.str.len ?s1)) "
-      << "(= (select ?s1 ?n) (select ?s2 ?n))))))))\n";
+  out << ")\n";
+  irep_idt witness = "string_equal.idx." + index;
+  out << "(declare-fun " << witness << " () cprover.Pos)\n";
+  
+  out << "(assert (=> " << id
+      << " (= (cprover.str.len " << s1id << ") "
+      << "(cprover.str.len " << s2id << "))))\n";
+
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (and " << id << " (bvult ?n (cprover.str.len " << s1id << "))) "
+      << "(= (select " << s1id << " ?n) "
+      << "(select " << s2id << " ?n)))))\n";
+
+  out << "(assert (=> (not " << id << ") (or ";
+  out << "(not (= (cprover.str.len " << s1id << ") (cprover.str.len "
+      << s2id << ")))\n";
+  out << "(and (bvult " << witness << " (cprover.str.len " << s1id << ")) "
+      << "(not (= (select " << s1id << " " << witness << ") "
+      << "(select " << s2id << " " << witness << ")))";
+  out << "))))\n\n";
 
   defined_expressions[f] = id;
 }
@@ -5090,98 +5113,163 @@ void smt2_convt::define_char_literal(const function_application_exprt &f)
 
 void smt2_convt::define_string_concat(const function_application_exprt &f)
 {
-  irep_idt id="string_concat."+i2string(defined_expressions.size());
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id="string_concat." + index;
   const function_application_exprt::argumentst &args = f.arguments();
   defined_expressions[f] = id;
   
   out << "; string concatenation\n";
   out << "(declare-fun " << id << " () cprover.String)\n";
-  out << "(assert (let ((?s0 ";
+  irep_idt s0id = "string_concat.s0." + index;
+  irep_idt s1id = "string_concat.s1." + index;
+  out << "(define-fun " << s0id << " () cprover.String ";
   convert_expr(args[0]);
-  out << ") (?s1 ";
+  out << ")\n";
+  out << "(define-fun " << s1id << " () cprover.String ";
   convert_expr(args[1]);
-  out << ")) "
-      << "(and (forall ((?n cprover.Pos)) "
-      << "(and "
-      << "(=> (bvult ?n (cprover.str.len ?s0)) "
-      << "(= (select ?s0 ?n) (select " << id << " ?n))) "
-      << "(=> (bvult ?n (cprover.str.len ?s1)) "
-      << "(= (select ?s1 ?n) (select " << id
-      << " (bvadd (cprover.str.len ?s0) ?n))))))\n";
-  out << "(= (cprover.str.len " << id
-      << ") (bvadd (cprover.str.len ?s0) (cprover.str.len ?s1))))))\n";
+  out << ")\n";
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (bvult ?n (cprover.str.len " << s0id << ")) "
+      << "(= (select " << s0id << " ?n) (select " << id << " ?n)))))\n";
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (bvult ?n (cprover.str.len " << s1id << ")) "
+      << "(= (select " << s1id << " ?n) (select " << id
+      << " (bvadd (cprover.str.len " << s0id << ") ?n))))))\n";
+  out << "(assert (= (cprover.str.len " << id
+      << ") (bvadd (cprover.str.len " << s0id << ") "
+      << "(cprover.str.len " << s1id << "))))\n\n";
 }
 
 
 void smt2_convt::define_string_substring(const function_application_exprt &f)
 {
-  irep_idt id="string_substring."+i2string(defined_expressions.size());
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id="string_substring." + index;
   const function_application_exprt::argumentst &args = f.arguments();  
   defined_expressions[f] = id;
 
   out << "; substring\n";
   out << "(declare-fun " << id << " () cprover.String)\n";
-  out << "(assert (let ((?s ";
+
+  irep_idt sid = "string_substring.s." + index;
+  irep_idt iid = "string_substring.i." + index;
+  irep_idt jid = "string_substring.j." + index;
+
+  out << "(define-fun " << sid << " () cprover.String ";
   convert_expr(args[0]);
-  out << ") (?i ";
+  out << ")\n";
+  
   typecast_exprt i = typecast_exprt(
     args[1], unsignedbv_typet(string_length_width));
   typecast_exprt j = typecast_exprt(
     args[2], unsignedbv_typet(string_length_width));
+
+  out << "(define-fun " << iid << " () cprover.Pos ";
   convert_expr(i);
-  out << ") (?j ";
+  out << ")\n";
+  out << "(define-fun " << jid << " () cprover.Pos ";
   convert_expr(j);
-  out << ")) ";
-  out << "(and "
+  out << ")\n";
+  
+  out << "(assert "
       << "(forall ((?n cprover.Pos)) "
       << "(=> (bvult ?n (cprover.str.len " << id << "))\n"
-      << "(= (select " << id << " ?n) (select ?s (bvadd ?i ?n))))) "
-      << "(bvult ?i ?j) (bvule ?j (cprover.str.len ?s))\n"
-      << "(= (cprover.str.len " << id << ") (bvsub ?j ?i)))))\n";
+      << "(= (select " << id << " ?n) (select " << sid
+      << " (bvadd " << iid << " ?n))))))\n";
+
+  out << "(assert (and "
+      << "(bvult " << iid << " " << jid << ") "
+      << "(bvule " << jid << " (cprover.str.len " << sid << "))\n"
+      << "(= (cprover.str.len " << id << ") "
+      << "(bvsub " << jid << " " << iid << "))))\n";
 }
 
 
 void smt2_convt::define_string_is_prefix(const function_application_exprt &f)
 {
-  irep_idt id="string_isprefix."+i2string(defined_expressions.size());
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id="string_isprefix." + index;
   const function_application_exprt::argumentst &args = f.arguments();  
   defined_expressions[f] = id;
 
+  irep_idt sid = "string_prefix.s." + index;
+  irep_idt s1id = "string_prefix.s1." + index;
+  
   out << "; string is prefix\n"
       << "(declare-fun " << id << " () Bool)\n";
-  out << "(assert (= " << id
-      << "(let ((?s1 ";
+  out << "(define-fun " << s1id << " () cprover.String ";
   convert_expr(args[0]);
-  out << ") (?s ";
+  out << ")\n";
+  out << "(define-fun " << sid << " () cprover.String ";
   convert_expr(args[1]);
-  out << ")) "
-      << "(and (forall ((?n cprover.Pos)) "
-      << "(=> (bvult ?n (cprover.str.len ?s1)) "
-      << "(= (select ?s1 ?n) (select ?s ?n))))\n"
-      << "(bvuge (cprover.str.len ?s) (cprover.str.len ?s1))))))\n";
+
+  irep_idt ugeid = "string_prefix.uge." + index;
+  out << ")\n";
+  out << "(define-fun " << ugeid << " () Bool "
+      << " (bvuge (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << s1id << ")))\n";
+    
+  out << "(assert (=> " << id << " " << ugeid << "))\n";
+
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (and " << id << " (bvult ?n (cprover.str.len " << s1id << "))) "
+      << "(= (select " << s1id << " ?n) "
+      << "(select " << sid << " ?n)))))\n";
+
+  irep_idt witness = "string_prefix.idx." + index;
+  out << "(declare-fun " << witness << " () cprover.Pos)\n";
+  
+  out << "(assert (=> (not " << id << ") (or\n"
+      << "(not " << ugeid << ")\n"
+      << "(and (bvult " << witness << " (cprover.str.len " << s1id << ")) "
+      << "(not (= (select " << s1id << " " << witness << ") "
+      << "(select " << sid << " " << witness << "))))\n";
+  out << ")))\n\n";
 }
 
 
 void smt2_convt::define_string_is_suffix(const function_application_exprt &f)
 {
-  irep_idt id="string_issuffix."+i2string(defined_expressions.size());
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id="string_issuffix." + index;
   const function_application_exprt::argumentst &args = f.arguments();  
   defined_expressions[f] = id;
 
+  irep_idt sid = "string_suffix.s." + index;
+  irep_idt s1id = "string_suffix.s1." + index;
+  
   out << "; string is suffix\n"
       << "(declare-fun " << id << " () Bool)\n";
-  out << "(assert (= " << id
-      << "(let ((?s1 ";
+  out << "(define-fun " << s1id << " () cprover.String ";
   convert_expr(args[0]);
-  out << ") (?s ";
+  out << ")\n";
+  out << "(define-fun " << sid << " () cprover.String ";
   convert_expr(args[1]);
-  out << ")) "
-      << "(and (forall ((?n cprover.Pos)) "
-      << "(=> (bvult ?n (cprover.str.len ?s1)) "
-      << "(= (select ?s1 ?n) "
-      << "(select ?s (bvsub (cprover.str.len ?s) "
-      << "(bvadd ?n (cprover.str.len ?s1)))))))\n"
-      << "(bvuge (cprover.str.len ?s) (cprover.str.len ?s1))))))\n";
+
+  irep_idt ugeid = "string_suffix.uge." + index;
+  out << ")\n";
+  out << "(define-fun " << ugeid << " () Bool "
+      << " (bvuge (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << s1id << ")))\n";
+    
+  out << "(assert (=> " << id << " " << ugeid << "))\n";
+
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (and " << id << " (bvult ?n (cprover.str.len " << s1id << "))) "
+      << "(= (select " << s1id << " ?n) "
+      << "(select " << sid << " (bvsub (cprover.str.len " << sid << ") "
+      << "(bvadd ?n (cprover.str.len " << s1id << "))))))))\n";
+
+  irep_idt witness = "string_suffix.idx." + index;
+  out << "(declare-fun " << witness << " () cprover.Pos)\n";
+  
+  out << "(assert (=> (not " << id << ") (or\n"
+      << "(not " << ugeid << ")\n"
+      << "(and (bvult " << witness << " (cprover.str.len " << s1id << ")) "
+      << "(not (= (select " << s1id << " " << witness << ") "
+      << "(select " << sid << " (bvsub (cprover.str.len " << sid << ") "
+      << "(bvadd " << witness << " (cprover.str.len " << s1id << ")))))))\n";
+  out << ")))\n\n";
 }
 
 
@@ -5546,7 +5634,9 @@ void smt2_convt::find_symbols_rec(
      // Cater for mutually recursive struct types
      bool need_decl=false;
      if(use_datatypes &&
-        datatype_map.find(type)==datatype_map.end())
+        datatype_map.find(type)==datatype_map.end() &&
+        !(strings_mode != STRINGS_OFF &&
+          (is_string_type(type) || is_char_type(type))))
      {
        std::string smt_typename = "struct."+i2string(datatype_map.size());
        datatype_map[type] = smt_typename;
