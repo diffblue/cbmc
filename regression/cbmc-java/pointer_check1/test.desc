@@ -1,0 +1,8 @@
+CORE
+pointer_check1.class
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
