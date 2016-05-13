@@ -558,6 +558,12 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("print-path-lengths"))
+    {
+      print_path_lengths(goto_functions);
+      return 0;
+    }
+
     if(cmdline.isset("list-symbols"))
     {
       show_symbol_table(true);

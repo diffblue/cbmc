@@ -69,7 +69,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(list-symbols)(list-undefined-functions)" \
   "(z3)(add-library)(show-dependence-graph)" \
   "(horn)(skip-loops):(apply-code-contracts)(model-argc-argv):" \
-  "(show-threaded)(list-calls-args)"
+  "(show-threaded)(list-calls-args)(print-path-lengths)"
 
 class goto_instrument_parse_optionst:
   public parse_options_baset,
