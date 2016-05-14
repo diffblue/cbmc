@@ -736,10 +736,14 @@ inline char *strrchr(const char *src, int c)
 char *strerror(int errnum)
 {
   __CPROVER_HIDE:;
+  (void)errnum;
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_event("invalidate_pointer", "strerror_result");
   char *strerror_result;
   __CPROVER_set_must(strerror_result, "strerror_result");
+  return strerror_result;
+  #else
+  static char strerror_result[1];
   return strerror_result;
   #endif
 }
