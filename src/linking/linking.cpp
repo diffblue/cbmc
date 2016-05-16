@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/simplify_expr.h>
+#include <util/pointer_offset_size.h>
 
 #include <langapi/language_util.h>
 
@@ -619,26 +620,31 @@ void linkingt::duplicate_code_symbol(
           "ignoring conflicting weak function declaration");
       }
     }
-    // Linux kernel uses void f(void) as generic prototype
-    else if((old_t.return_type().id()==ID_empty &&
-             old_t.parameters().empty() &&
-             !old_t.has_ellipsis() &&
+    // aliasing may alter the type
+    else if((new_symbol.is_macro &&
+             new_symbol.value.is_not_nil() &&
              old_symbol.value.is_nil()) ||
-            (new_t.return_type().id()==ID_empty &&
-             new_t.parameters().empty() &&
-             !new_t.has_ellipsis() &&
+            (old_symbol.is_macro &&
+             old_symbol.value.is_not_nil() &&
              new_symbol.value.is_nil()))
     {
-      // issue a warning
       link_warning(
         old_symbol,
         new_symbol,
-        "ignoring conflicting void f(void) function declaration");
+        "ignoring conflicting function alias declaration");
+    }
+    // conflicting declarations without a definition, matching return
+    // types
+    else if(base_type_eq(old_t.return_type(), new_t.return_type(), ns) &&
+            old_symbol.value.is_nil() &&
+            new_symbol.value.is_nil())
+    {
+      link_warning(
+        old_symbol,
+        new_symbol,
+        "ignoring conflicting function declarations");
 
-      if(old_t.return_type().id()==ID_empty &&
-         old_t.parameters().empty() &&
-         !old_t.has_ellipsis() &&
-         old_symbol.value.is_nil())
+      if(old_t.parameters().size()<new_t.parameters().size())
       {
         old_symbol.type=new_symbol.type;
         old_symbol.location=new_symbol.location;
@@ -647,8 +653,10 @@ void linkingt::duplicate_code_symbol(
     }
     // mismatch on number of parameters is definitively an error
     else if((old_t.parameters().size()<new_t.parameters().size() &&
+             new_symbol.value.is_not_nil() &&
              !old_t.has_ellipsis()) ||
             (old_t.parameters().size()>new_t.parameters().size() &&
+             old_symbol.value.is_not_nil() &&
              !new_t.has_ellipsis()))
     {
       link_error(
@@ -683,12 +691,20 @@ void linkingt::duplicate_code_symbol(
       }
       if(o_it!=old_t.parameters().end())
       {
-        assert(new_t.has_ellipsis());
+        if(!new_t.has_ellipsis() && old_symbol.value.is_not_nil())
+          link_error(
+            old_symbol,
+            new_symbol,
+            "conflicting parameter counts of function declarations");
         replace=new_symbol.value.is_not_nil();
       }
       else if(n_it!=new_t.parameters().end())
       {
-        assert(old_t.has_ellipsis());
+        if(!old_t.has_ellipsis() && new_symbol.value.is_not_nil())
+          link_error(
+            old_symbol,
+            new_symbol,
+            "conflicting parameter counts of function declarations");
         replace=new_symbol.value.is_not_nil();
       }
 
@@ -709,7 +725,8 @@ void linkingt::duplicate_code_symbol(
             (old_symbol.value.is_nil() && t2.id()==ID_empty);
         }
         // different pointer arguments without implementation may work
-        else if(t1.id()==ID_pointer && t2.id()==ID_pointer &&
+        else if((t1.id()==ID_pointer || t2.id()==ID_pointer) &&
+                pointer_offset_bits(t1, ns)==pointer_offset_bits(t2, ns) &&
                 old_symbol.value.is_nil() && new_symbol.value.is_nil())
         {
           if(warn_msg.empty())
@@ -718,7 +735,8 @@ void linkingt::duplicate_code_symbol(
         // different pointer arguments with implementation - the
         // implementation is always right, even though such code may
         // be severely broken
-        else if(t1.id()==ID_pointer && t2.id()==ID_pointer &&
+        else if((t1.id()==ID_pointer || t2.id()==ID_pointer) &&
+                pointer_offset_bits(t1, ns)==pointer_offset_bits(t2, ns) &&
                 old_symbol.value.is_nil()!=new_symbol.value.is_nil())
         {
           if(warn_msg.empty())
