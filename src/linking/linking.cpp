@@ -574,12 +574,7 @@ void linkingt::duplicate_code_symbol(
           new_symbol,
           "function declaration conflicts with with weak definition");
       else
-      {
-        // new weak symbol should have been renamed
-        assert(!new_symbol.is_weak);
         old_symbol.value.make_nil();
-        old_symbol.is_weak=false;
-      }
     }
     else if(new_symbol.is_weak)
     {
@@ -592,12 +587,6 @@ void linkingt::duplicate_code_symbol(
           old_symbol,
           new_symbol,
           "ignoring conflicting weak function declaration");
-      }
-      else
-      {
-        // new weak symbol should have been renamed
-        assert(!old_symbol.is_weak);
-        old_symbol.is_weak=true;
       }
     }
     // mismatch on number of parameters is definitively an error
@@ -759,6 +748,7 @@ void linkingt::duplicate_code_symbol(
       rename_symbol(new_symbol.type);
       old_symbol.value=new_symbol.value;
       old_symbol.type=new_symbol.type; // for parameter identifiers
+      old_symbol.is_weak=new_symbol.is_weak;
     }
     else if(to_code_type(old_symbol.type).get_inlined())
     {
