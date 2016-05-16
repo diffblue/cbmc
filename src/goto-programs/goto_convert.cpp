@@ -2224,7 +2224,8 @@ void goto_convertt::generate_ifthenelse(
   goto_programt tmp_z;
   goto_programt::targett z=tmp_z.add_instruction();
   z->make_skip();
-  z->source_location=source_location;
+  // We deliberately don't set a location for 'z', it's a dummy
+  // target.
 
   // y: Q;
   goto_programt tmp_y;

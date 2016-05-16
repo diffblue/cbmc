@@ -27,14 +27,23 @@ public:
         
       block_map[it]=block_count;
       
+      if(!it->source_location.is_nil() &&
+         source_location_map.find(block_count)==source_location_map.end())
+        source_location_map[block_count]=it->source_location;
+      
       next_is_target=
         it->is_goto() || it->is_return() ||
         it->is_function_call() || it->is_assume();
     }
   }
-  
+
+  // map program locations to block numbers  
   typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
   block_mapt block_map;
+  
+  // map block numbers to source code locations
+  typedef std::map<unsigned, source_locationt> source_location_mapt;
+  source_location_mapt source_location_map;
   
   inline unsigned operator[](goto_programt::const_targett t)
   {
@@ -134,12 +143,14 @@ void instrument_cover_goals(
         {
           std::string b=i2string(block_nr);
           std::string id=id2string(i_it->function)+"#"+b;
-          if(i_it->source_location.get_file()!="")
+          source_locationt source_location=
+            basic_blocks.source_location_map[block_nr];
+          
+          if(source_location.get_file()!="")
           {
             std::string comment=
-              "block "+i_it->source_location.as_string()+" "+i2string(i_it->location_number);
+              "block "+source_location.as_string()+" "+i2string(i_it->location_number);
 
-            source_locationt source_location=i_it->source_location;
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(false_exprt());
             i_it->source_location=source_location;
