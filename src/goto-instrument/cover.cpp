@@ -79,6 +79,46 @@ const char *as_string(coverage_criteriont c)
 
 /*******************************************************************\
 
+Function: collect_conditions_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void collect_conditions_rec(const exprt &src, std::set<exprt> &dest)
+{
+  if(src.id()==ID_address_of)
+  {
+    return;
+  }
+
+  for(const auto & op : src.operands())
+    collect_conditions_rec(op, dest);
+
+  if(src.type().id()==ID_bool)
+  {
+    if(src.id()==ID_and || src.id()==ID_or ||
+       src.id()==ID_not || src.id()==ID_implies)
+    {
+      // ignore me
+    }
+    else if(src.is_constant())
+    {
+      // ignore me
+    }
+    else
+    {
+      dest.insert(src); 
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: collect_conditions
 
   Inputs:
@@ -89,21 +129,133 @@ Function: collect_conditions
 
 \*******************************************************************/
 
-void collect_conditions(const exprt &src, std::set<exprt> &dest)
+std::set<exprt> collect_conditions(const exprt &src)
 {
-  if(src.id()==ID_and || src.id()==ID_or ||
-     src.id()==ID_not || src.id()==ID_implies)
+  std::set<exprt> result;
+  collect_conditions_rec(src, result);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: collect_conditions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::set<exprt> collect_conditions(const goto_programt::const_targett t)
+{
+  switch(t->type)
   {
-    forall_operands(it, src)
-      collect_conditions(*it, dest);
+  case GOTO:
+  case ASSUME:
+  case ASSERT:
+    return collect_conditions(t->guard);
+  
+  case ASSIGN:
+  case FUNCTION_CALL:
+    return collect_conditions(t->code);
+    
+  default:;
   }
-  else if(src.is_true())
+  
+  return std::set<exprt>();
+}
+
+/*******************************************************************\
+
+Function: collect_decisions_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void collect_decisions_rec(const exprt &src, std::set<exprt> &dest)
+{
+  if(src.id()==ID_address_of)
   {
+    return;
+  }
+
+  if(src.type().id()==ID_bool)
+  {
+    if(src.is_constant())
+    {
+      // ignore me
+    }
+    else if(src.id()==ID_not)
+    {
+      collect_decisions_rec(src.op0(), dest);
+    }
+    else
+    {
+      dest.insert(src); 
+    }
   }
   else
   {
-    dest.insert(src); 
+    for(const auto & op : src.operands())
+      collect_decisions_rec(op, dest);
   }
+}
+
+/*******************************************************************\
+
+Function: collect_decisions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::set<exprt> collect_decisions(const exprt &src)
+{
+  std::set<exprt> result;
+  collect_decisions_rec(src, result);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: collect_decisions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::set<exprt> collect_decisions(const goto_programt::const_targett t)
+{
+  switch(t->type)
+  {
+  case GOTO:
+  case ASSUME:
+  case ASSERT:
+    return collect_decisions(t->guard);
+  
+  case ASSIGN:
+  case FUNCTION_CALL:
+    return collect_decisions(t->code);
+    
+  default:;
+  }
+  
+  return std::set<exprt>();
 }
 
 /*******************************************************************\
@@ -190,30 +342,71 @@ void instrument_cover_goals(
       break;
       
     case coverage_criteriont::CONDITION:
-      if(i_it->is_goto())
+      // Conditions are all atomic predicates in the programs.
       {
-        std::set<exprt> conditions;
+        std::set<exprt> conditions=
+          collect_conditions(i_it);
 
-        collect_conditions(i_it->guard, conditions);
-        unsigned i=0;
-
-        exprt guard=i_it->guard;
         source_locationt source_location=i_it->source_location;
 
-        for(std::set<exprt>::const_iterator it=conditions.begin();
-            it!=conditions.end();
-            it++, i++)
+        for(const auto & c : conditions)
         {
-          std::string comment="condition "+from_expr(ns, "", *it);
+          std::string comment_t="condition "+from_expr(ns, "", c)+" true";
           goto_program.insert_before_swap(i_it);
-          i_it->make_assertion(*it);
+          i_it->make_assertion(c);
           i_it->source_location=source_location;
-          i_it->source_location.set_comment(comment);
+          i_it->source_location.set_comment(comment_t);
+
+          std::string comment_f="condition "+from_expr(ns, "", c)+" false";
+          goto_program.insert_before_swap(i_it);
+          i_it->make_assertion(not_exprt(c));
+          i_it->source_location=source_location;
+          i_it->source_location.set_comment(comment_f);
         }
         
-        for(unsigned i=0; i<conditions.size(); i++)
+        for(unsigned i=0; i<conditions.size()*2; i++)
           i_it++;
       }
+      break;
+    
+    case coverage_criteriont::DECISION:
+      // Decisions are maximal Boolean combinations of conditions.
+      {
+        std::set<exprt> decisions=
+          collect_decisions(i_it);
+
+        source_locationt source_location=i_it->source_location;
+
+        for(const auto & d : decisions)
+        {
+          std::string comment_t="decision "+from_expr(ns, "", d)+" true";
+          goto_program.insert_before_swap(i_it);
+          i_it->make_assertion(d);
+          i_it->source_location=source_location;
+          i_it->source_location.set_comment(comment_t);
+
+          std::string comment_f="decision "+from_expr(ns, "", d)+" false";
+          goto_program.insert_before_swap(i_it);
+          i_it->make_assertion(not_exprt(d));
+          i_it->source_location=source_location;
+          i_it->source_location.set_comment(comment_f);
+        }
+        
+        for(unsigned i=0; i<decisions.size()*2; i++)
+          i_it++;
+      }
+      break;
+    
+      
+    case coverage_criteriont::MCDC:
+      // 1. Each entry and exit point is invoked
+      // 2. Each decision takes every possible outcome
+      // 3. Each condition in a decision takes every possible outcome
+      // 4. Each condition in a decision is shown to independently
+      //    affect the outcome of the decision.
+      break;
+
+    case coverage_criteriont::PATH:
       break;
     
     default:;
