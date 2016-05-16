@@ -47,12 +47,14 @@ public:
     add(ID_return).set(ID_label, label);
   }
 
-  const irep_idt &returns_value() const {
-	  return find(ID_return).get(ID_value);
+  const irep_idt &returns_value() const
+  {
+    return find(ID_return).get(ID_value);
   }
 
-  const irep_idt &returns_label() const {
-	  return find(ID_return).get(ID_label);
+  const irep_idt &returns_label() const
+  {
+    return find(ID_return).get(ID_label);
   }
 
   void add_throws(
@@ -63,12 +65,14 @@ public:
     add(ID_throw).set(ID_label, label);
   }
 
-  const irep_idt &throws_value() const {
-	  return find(ID_throw).get(ID_value);
+  const irep_idt &throws_value() const
+  {
+    return find(ID_throw).get(ID_value);
   }
 
-  const irep_idt &throws_label() const {
-	  return find(ID_throw).get(ID_label);
+  const irep_idt &throws_label() const
+  {
+    return find(ID_throw).get(ID_label);
   }
 
   void add_value(const code_blockt &code)
@@ -76,12 +80,14 @@ public:
     add(ID_value, code);
   }
 
-  const code_blockt &value() const {
-	  return static_cast<const code_blockt &> (find(ID_value));
+  const code_blockt &value() const
+  {
+    return static_cast<const code_blockt &>(find(ID_value));
   }
 
-  code_blockt &value() {
-	  return static_cast<code_blockt &> (add(ID_value));
+  code_blockt &value()
+  {
+    return static_cast<code_blockt &>(add(ID_value));
   }
 
   void to_symbol(symbolt &symbol) const;

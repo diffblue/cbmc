@@ -11,7 +11,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include <util/typecheck.h>
 #include <util/namespace.h>
-#include "jsil_parse_tree.h"
+#include <util/std_code.h>
+
 
 class codet;
 
@@ -33,7 +34,7 @@ public:
     legacy_typecheckt(_message_handler),
     symbol_table(_symbol_table),
     ns(symbol_table),
-    proc_name("")
+    proc_name()
   {
   }
 
@@ -53,7 +54,7 @@ protected:
   void typecheck_type_symbol(symbolt &symbol) {};
   void typecheck_non_type_symbol(symbolt &symbol);
   void typecheck_symbol_expr(symbol_exprt &symbol_expr);
-  void typecheck_expr_side_effect(side_effect_exprt &expr) {};
+  void typecheck_expr_side_effect_throw(side_effect_expr_throwt &expr);
   void typecheck_expr_delete(exprt &expr);
   void typecheck_expr_index(exprt &expr);
   void typecheck_expr_proto_field(exprt &expr);
@@ -75,15 +76,14 @@ protected:
   void typecheck_expr_operands(exprt &expr);
   void typecheck_expr_main(exprt &expr);
   void typecheck_code(codet &code);
-  void typecheck_function_call(code_function_callt &code) {};
-  void typecheck_decl(code_declt &code) {};
-  void typecheck_return(codet &code) {};
+  void typecheck_function_call(code_function_callt &function_call);
+  void typecheck_return(code_returnt &code);
   void typecheck_block(codet &code);
   void typecheck_ifthenelse(code_ifthenelset &code);
-  void typecheck_assign(codet &code);
+  void typecheck_assign(code_assignt &code);
   void typecheck_try_catch (code_try_catcht &code);
   void typecheck_type(typet &type);
-  dstring add_prefix(const dstring &ds);
+  irep_idt add_prefix(const irep_idt &ds);
 
   // overload to use language-specific syntax
   virtual std::string to_string(const exprt &expr);

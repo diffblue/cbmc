@@ -56,6 +56,14 @@ bool jsil_convertt::operator()(const jsil_parse_treet &parse_tree)
     if(convert_code(new_symbol, to_code(new_symbol.value)))
       return true;
 
+    if(symbol_table.has_symbol(new_symbol.name))
+    {
+      symbolt &s=symbol_table.lookup(new_symbol.name);
+      if(s.value.id()=="no-body-just-yet")
+      {
+        symbol_table.remove(s.name);
+      }
+    }
     if(symbol_table.add(new_symbol))
     {
       throw "duplicate symbol "+id2string(new_symbol.name);
@@ -104,7 +112,8 @@ bool jsil_convertt::convert_code(const symbolt &symbol, codet &code)
 
       code_try_catcht t_c;
       t_c.try_code().swap(t);
-      code_declt d(symbol.symbol_expr());
+      // Adding empty symbol to catch decl
+      code_declt d(symbol_exprt("decl_symbol"));
       t_c.add_catch(d, g);
       t_c.add_source_location()=code.source_location();
 

@@ -423,6 +423,11 @@ literal: TOK_IDENTIFIER
        }
        | TOK_FLOATING
        | TOK_STRING
+       {
+         constant_exprt c(to_string_constant(stack($$))
+           .get_value(), string_typet());
+         stack($$).swap(c);
+       }
        | TOK_BUILTIN_LOC
        | jsil_type
        | builtin_field
@@ -524,11 +529,11 @@ bitwise_op: '&'
           }
           | '|'
           {
-            newstack($$).id(ID_or);
+            newstack($$).id(ID_bitor);
           }
           | '^'
           {
-            newstack($$).id(ID_xor);
+            newstack($$).id(ID_bitxor);
           }
           | TOK_LEFT_SHIFT
           {

@@ -12,34 +12,38 @@ Author: Daiva Naudziuniene, daivan@amazon.com
 #include <util/type.h>
 #include <util/std_types.h>
 
-typet jsil_kindt();
-typet jsil_any_typet();
-typet jsil_value_or_emptyt();
-typet jsil_value_or_referencet();
-typet jsil_valuet();
-typet jsil_prim_typet();
-typet jsil_referencet();
-typet jsil_member_referencet();
-typet jsil_variable_referencet();
-typet jsil_objectt();
-typet jsil_user_objectt();
-typet jsil_builtin_objectt();
-typet jsil_nullt();
-typet jsil_undefinedt();
+typet jsil_kind();
+typet jsil_any_type();
+typet jsil_value_or_empty_type();
+typet jsil_value_or_reference_type();
+typet jsil_value_type();
+typet jsil_prim_type();
+typet jsil_reference_type();
+typet jsil_member_reference_type();
+typet jsil_variable_reference_type();
+typet jsil_object_type();
+typet jsil_user_object_type();
+typet jsil_builtin_object_type();
+typet jsil_null_type();
+typet jsil_undefined_type();
+typet jsil_empty_type();
 
 bool jsil_is_subtype(const typet &type1, const typet &type2);
+bool jsil_incompatible_types(const typet &type1, const typet &type2);
 typet jsil_union(const typet &type1, const typet &type2);
 
 class jsil_builtin_code_typet:public code_typet
 {
 public:
-  inline jsil_builtin_code_typet(code_typet &code):code_typet(code)
+  explicit inline jsil_builtin_code_typet(code_typet &code):
+    code_typet(code)
   {
     set("jsil_builtin_proceduret", true);
   }
 };
 
-extern inline jsil_builtin_code_typet &to_jsil_builtin_code_type(code_typet &code)
+extern inline jsil_builtin_code_typet &to_jsil_builtin_code_type(
+  code_typet &code)
 {
   assert(code.get_bool("jsil_builtin_proceduret"));
   return static_cast<jsil_builtin_code_typet &>(code);
@@ -54,13 +58,15 @@ extern inline bool is_jsil_builtin_code_type(const typet &type)
 class jsil_spec_code_typet:public code_typet
 {
 public:
-  inline jsil_spec_code_typet(code_typet &code):code_typet(code)
+  explicit inline jsil_spec_code_typet(code_typet &code):
+    code_typet(code)
   {
     set("jsil_spec_proceduret", true);
   }
 };
 
-extern inline jsil_spec_code_typet &to_jsil_spec_code_type(code_typet &code)
+extern inline jsil_spec_code_typet &to_jsil_spec_code_type(
+  code_typet &code)
 {
   assert(code.get_bool("jsil_spec_proceduret"));
   return static_cast<jsil_spec_code_typet &>(code);
@@ -77,10 +83,10 @@ class jsil_union_typet:public union_typet
 public:
   inline jsil_union_typet():union_typet() { }
 
-  inline jsil_union_typet(const typet &type)
+  explicit inline jsil_union_typet(const typet &type)
     :jsil_union_typet(std::vector<typet>({type})) { }
 
-  jsil_union_typet(const std::vector<typet> &types);
+  explicit jsil_union_typet(const std::vector<typet> &types);
 
   jsil_union_typet union_with(const jsil_union_typet &other) const;
 
@@ -97,7 +103,8 @@ extern inline jsil_union_typet &to_jsil_union_type(typet &type)
   return static_cast<jsil_union_typet &>(type);
 }
 
-extern inline const jsil_union_typet &to_jsil_union_type(const typet &type)
+extern inline const jsil_union_typet &to_jsil_union_type(
+  const typet &type)
 {
   assert(type.id()==ID_union);
   return static_cast<const jsil_union_typet &>(type);

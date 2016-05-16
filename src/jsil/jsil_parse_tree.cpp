@@ -73,7 +73,7 @@ void jsil_declarationt::to_symbol(symbolt &symbol) const
   irep_idt proc_type=s.get("proc_type");
 
   if(proc_type=="builtin")
-	  symbol_type=jsil_builtin_code_typet(symbol_type);
+    symbol_type=jsil_builtin_code_typet(symbol_type);
   else if(proc_type=="spec")
     symbol_type=jsil_spec_code_typet(symbol_type);
 

@@ -56,6 +56,27 @@ void jsil_languaget::modules_provided(std::set<std::string> &modules)
 
 /*******************************************************************\
 
+Function: jsil_languaget::interfaces
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Adding symbols for all procedure declarations
+
+\*******************************************************************/
+
+bool jsil_languaget::interfaces(symbol_tablet &symbol_table)
+{
+  if(jsil_convert(parse_tree, symbol_table, get_message_handler()))
+    return true;
+
+  jsil_internal_additions(symbol_table);
+  return false;
+}
+
+/*******************************************************************\
+
 Function: jsil_languaget::preprocess
 
   Inputs:
@@ -128,12 +149,6 @@ bool jsil_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  if(jsil_convert(parse_tree, symbol_table, get_message_handler()))
-    return true;
-
-  jsil_internal_additions(symbol_table);
-
-  // now typecheck
   if(jsil_typecheck(symbol_table, get_message_handler()))
     return true;
 
