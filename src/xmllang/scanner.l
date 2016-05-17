@@ -17,7 +17,7 @@ static int isatty(int) { return 0; }
 
 #define PARSER xml_parser
 
-//static int keep;			/* To store start condition */
+//static int keep;  /* To store start condition */
 
 static char *word(char *s)
 {
@@ -34,17 +34,17 @@ static char *word(char *s)
 %}
 
 
-nl		(\r\n|\r|\n)
-ws		[ \t\r\n]+
-open		{nl}?"<"
-close		">"{nl}?
-namestart	[A-Za-z\200-\377_]
-namechar	[A-Za-z\200-\377_0-9.:-]
-esc		"&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"|"&"[a-zA-Z]+";"
-name		{namestart}{namechar}*
-data		([^<\n&]|\n[^<&]|\n{esc}|{esc})+
-comment		{open}"!--"([^-]|"-"[^-])*"--"{close}
-string		\"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
+nl         (\r\n|\r|\n)
+ws         [ \t\r\n]+
+open       {nl}?"<"
+close      ">"{nl}?
+namestart  [A-Za-z\200-\377_]
+namechar   [A-Za-z\200-\377_0-9.:-]
+esc        "&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"|"&"[a-zA-Z]+";"
+name       {namestart}{namechar}*
+data       ([^<\n&]|\n[^<&]|\n{esc}|{esc})+
+comment    {open}"!--"([^-]|"-"[^-])*"--"{close}
+string     \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 
 /*
  * The CONTENT mode is used for the content of elements, i.e.,
@@ -59,28 +59,28 @@ string		\"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 
 %%
 
-<INITIAL,PI>{ws}		{/* skip */}
-<INITIAL>"/"		{return SLASH;}
-<INITIAL,PI>"="		{return EQ;}
-<INITIAL>{close}	{BEGIN(CONTENT); return CLOSE;}
-<INITIAL,PI>{name}		{yyxmllval.s=strdup(yytext); return NAME;}
-<INITIAL,PI>{string}	{yyxmllval.s=strdup(yytext); return VALUE;}
-<INITIAL,PI>"?"{close}	{BEGIN(INITIAL); return ENDPI;}
+<INITIAL,PI>{ws}  {/* skip */}
+<INITIAL>"/"      {return SLASH;}
+<INITIAL,PI>"="   {return EQ;}
+<INITIAL>{close}  {BEGIN(CONTENT); return CLOSE;}
+<INITIAL,PI>{name}    {yyxmllval.s=strdup(yytext); return NAME;}
+<INITIAL,PI>{string}  {yyxmllval.s=strdup(yytext); return VALUE;}
+<INITIAL,PI>"?"{close}  {BEGIN(INITIAL); return ENDPI;}
 
-{open}{ws}?{name}	{BEGIN(INITIAL); yyxmllval.s=word(yytext); return START;}
-{open}{ws}?"/"		{BEGIN(INITIAL); return END;}
-{open}"?xml"		{BEGIN(INITIAL); return STARTXMLDECL;}
-{open}"?"		{BEGIN(PI); yyxmllval.s=word(yytext); return STARTPI;}
-{comment}		{yyxmllval.s=strdup(yytext); return COMMENT;}
+{open}{ws}?{name} {BEGIN(INITIAL); yyxmllval.s=word(yytext); return START;}
+{open}{ws}?"/"    {BEGIN(INITIAL); return END;}
+{open}"?xml"      {BEGIN(INITIAL); return STARTXMLDECL;}
+{open}"?"         {BEGIN(PI); yyxmllval.s=word(yytext); return STARTPI;}
+{comment}         {yyxmllval.s=strdup(yytext); return COMMENT;}
 
-<CONTENT>{data}		{yyxmllval.s=strdup(yytext); return DATA;}
+<CONTENT>{data}   {yyxmllval.s=strdup(yytext); return DATA;}
 
 <INITIAL>{open}"!"{ws}?"DOCTYPE"   {BEGIN(DTD); /* skip */}
-<DTD>.   {/* skip */}
+<DTD>.            {/* skip */}
 <DTD>\]{close}    {BEGIN(INITIAL); /* skip */}
 
-.			{ yyxmlerror("unexpected character"); }
-{nl}			{/* skip, must be an extra one at EOF */;}
+.                 { yyxmlerror("unexpected character"); }
+{nl}              {/* skip, must be an extra one at EOF */;}
 
 %%
 

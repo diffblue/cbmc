@@ -48,7 +48,7 @@ misc_seq_opt
  ;
 
 misc
- : COMMENT			{ free($1); }
+ : COMMENT      { free($1); }
  | PI
  ;
 
@@ -58,24 +58,24 @@ PI
    attribute_seq_opt
    { xml_parser.stack.pop_back(); }
    ENDPI
- ;	
+ ;
 
 element
- : START			{ xml_parser.current().name=$1;
+ : START   { xml_parser.current().name=$1;
                                   free($1);
-				}
+           }
    attribute_seq_opt
    empty_or_content
  ;
 
 empty_or_content
- : SLASH CLOSE			{ }
- | CLOSE			{ }
-   content END name_opt CLOSE	{ free($5); }
+ : SLASH CLOSE  { }
+ | CLOSE  { }
+   content END name_opt CLOSE  { free($5); }
  ;
 
 content
- : content DATA			{ xml_parser.current().data+=xmlt::unescape($2); free($2); }
+ : content DATA  { xml_parser.current().data+=xmlt::unescape($2); free($2); }
  | content misc
  | content
    { xml_parser.new_level(); }
@@ -85,8 +85,8 @@ content
  ;
 
 name_opt
- : NAME				{ $$=$1; }
- | /*empty*/			{ $$=strdup(""); }
+ : NAME  { $$=$1; }
+ | /*empty*/  { $$=strdup(""); }
  ;
 
 attribute_seq_opt
@@ -95,7 +95,7 @@ attribute_seq_opt
  ;
 
 attribute
- : NAME EQ VALUE		{ xml_parser.current().set_attribute(
+ : NAME EQ VALUE  { xml_parser.current().set_attribute(
                                     xmlt::unescape($1), xmlt::unescape($3));
                                   free($1); free($3);}
  ;

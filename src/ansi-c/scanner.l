@@ -44,7 +44,7 @@ int make_identifier()
 
   // this hashes the identifier
   irep_idt base_name=yytext;
-  
+
   if(PARSER.cpp98)
   {
     stack(yyansi_clval).id(ID_symbol);
@@ -139,43 +139,43 @@ delimiter       [ \t\b\r]
 newline         [\n\f\v]|"\\\n"
 whitespace      {delimiter}+
 ws              {delimiter}*
-ucletter	[A-Z]
-lcletter	[a-z]
-letter		({ucletter}|{lcletter})
-digit		[0-9]
-bindigit	[01]
-octdigit	[0-7]
-hexdigit	[0-9a-fA-F]
-identifier	(({letter}|"_"|"$")({letter}|{digit}|"_"|"$")*)
-integer		{digit}+
-binary		{bindigit}+
+ucletter        [A-Z]
+lcletter        [a-z]
+letter          ({ucletter}|{lcletter})
+digit           [0-9]
+bindigit        [01]
+octdigit        [0-7]
+hexdigit        [0-9a-fA-F]
+identifier      (({letter}|"_"|"$")({letter}|{digit}|"_"|"$")*)
+integer         {digit}+
+binary          {bindigit}+
 msiw_suffix     ([iI]("8"|"16"|"32"|"64"|"128"))
 int_suffix      [uUlLiIjJ]*|[uU]?{msiw_suffix}
-bininteger	"0"[bB]({bindigit}|"'")+{int_suffix}
-decinteger	[1-9]({digit}|"'")*{int_suffix}
-octinteger	"0"({octdigit}|"'")*{int_suffix}
-hexinteger	"0"[xX]{hexdigit}({hexdigit}|"'")*{int_suffix}
+bininteger      "0"[bB]({bindigit}|"'")+{int_suffix}
+decinteger      [1-9]({digit}|"'")*{int_suffix}
+octinteger      "0"({octdigit}|"'")*{int_suffix}
+hexinteger      "0"[xX]{hexdigit}({hexdigit}|"'")*{int_suffix}
 integer_s       {decinteger}|{bininteger}|{octinteger}|{hexinteger}
-octchar		"\\"{octdigit}{1,3}
-hexchar		"\\x"{hexdigit}+
-exponent	[eE][+-]?{integer}
-fraction	{integer}
-float1		{integer}"."{fraction}?({exponent})?
-float2		"."{fraction}({exponent})?
-float3		{integer}{exponent}
+octchar         "\\"{octdigit}{1,3}
+hexchar         "\\x"{hexdigit}+
+exponent        [eE][+-]?{integer}
+fraction        {integer}
+float1          {integer}"."{fraction}?({exponent})?
+float2          "."{fraction}({exponent})?
+float3          {integer}{exponent}
 hexfloat1       "0"[xX]{hexdigit}+"."{hexdigit}+[pP][+-]?{integer}
 hexfloat2       "0"[xX]{hexdigit}+"."[pP][+-]?{integer}
 hexfloat3       "0"[xX]{hexdigit}+[pP][+-]?{integer}
 float_suffix    [fFlLiIjJ]*
 gcc_ext_float_suffix    [wWqQ]|[dD][fFdDlL]?
-float		{float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
+float           {float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
 float_s         {float}{float_suffix}|{integer}[fF]
-gcc_ext_float_s         {float}{gcc_ext_float_suffix}
-bitvector	{binary}[bB]
-bitvector_u	{binary}([uU][bB]|[bB][uU])
-cppstart	{ws}"#"{ws}
-cpplineno	{cppstart}"line"*{ws}{integer}{ws}.*{newline}
-cppdirective	{cppstart}.*
+gcc_ext_float_s {float}{gcc_ext_float_suffix}
+bitvector       {binary}[bB]
+bitvector_u     {binary}([uU][bB]|[bB][uU])
+cppstart        {ws}"#"{ws}
+cpplineno       {cppstart}"line"*{ws}{integer}{ws}.*{newline}
+cppdirective    {cppstart}.*
 
 escape_sequence [\\][^\n]
 c_char [^'\\\n]|{escape_sequence}
@@ -214,35 +214,35 @@ void ansi_c_scanner_init()
 %%
 
 <INITIAL>.|\n   { BEGIN(GRAMMAR);
-		  yyless(0);		/* start again with this character */
-		 }
+                  yyless(0); /* start again with this character */
+                }
 
 <GRAMMAR>"/*"   { BEGIN(COMMENT1); } /* begin C comment state */
 
 <COMMENT1>{
-   "*/"	        { BEGIN(GRAMMAR); } /* end comment state, back to GRAMMAR */
-   "/*"		{ yyansi_cerror("Probably nested comments"); }
-   <<EOF>>	{ yyansi_cerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
-   [^*/\n]*	{ /* ignore every char except '*' and NL (performance!) */ }
-   .		{ } /* all single characters within comments are ignored */
-   \n		{ }
-	}
+   "*/"         { BEGIN(GRAMMAR); } /* end comment state, back to GRAMMAR */
+   "/*"         { yyansi_cerror("Probably nested comments"); }
+   <<EOF>>      { yyansi_cerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
+   [^*/\n]*     { /* ignore every char except '*' and NL (performance!) */ }
+   .            { } /* all single characters within comments are ignored */
+   \n           { }
+}
 
 <STRING_LITERAL_COMMENT>{
-   "*/"	        { BEGIN(STRING_LITERAL); } /* end comment state, back to STRING_LITERAL */
-   "/*"		{ yyansi_cerror("Probably nested comments"); }
-   <<EOF>>	{ yyansi_cerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
-   [^*/\n]*	{ /* ignore every char except '*' and NL (performance!) */ }
-   .		{ } /* all single characters within comments are ignored */
-   \n		{ }
-	}
+   "*/"         { BEGIN(STRING_LITERAL); } /* end comment state, back to STRING_LITERAL */
+   "/*"         { yyansi_cerror("Probably nested comments"); }
+   <<EOF>>      { yyansi_cerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
+   [^*/\n]*     { /* ignore every char except '*' and NL (performance!) */ }
+   .            { } /* all single characters within comments are ignored */
+   \n           { }
+}
 
-<GRAMMAR>"//"	{ BEGIN(COMMENT2); }	/* begin C++ comment state */
+<GRAMMAR>"//"   { BEGIN(COMMENT2); } /* begin C++ comment state */
 
 <COMMENT2>{
-   \n		{ BEGIN(GRAMMAR); }	/* end comment state, back GRAMMAR */
-   .*		{ } /* all characters within comments are ignored */
-	}
+   \n           { BEGIN(GRAMMAR); } /* end comment state, back GRAMMAR */
+   .*           { } /* all characters within comments are ignored */
+}
 
 <GRAMMAR>{char_lit} {
                   newstack(yyansi_clval);
@@ -267,10 +267,10 @@ void ansi_c_scanner_init()
 <STRING_LITERAL>{cpplineno} {
                   preprocessor_line(yytext, PARSER);
                   PARSER.set_line_no(PARSER.get_line_no()-1);
-		 }
+                }
 <STRING_LITERAL>{cppdirective} { /* ignore */ }
 <STRING_LITERAL>"/*" { BEGIN(STRING_LITERAL_COMMENT); /* C comment, ignore */ }
-<STRING_LITERAL>"//".*\n	{ /* C++ comment, ignore */ }
+<STRING_LITERAL>"//".*\n { /* C++ comment, ignore */ }
 <STRING_LITERAL>. { // anything else: back to normal
                   source_locationt l=stack(yyansi_clval).source_location();
                   stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
@@ -280,140 +280,140 @@ void ansi_c_scanner_init()
                   return TOK_STRING;
                 }
 
-<GRAMMAR>{newline}	{ } /* skipped */
-<GRAMMAR>{whitespace}	{ } /* skipped */
+<GRAMMAR>{newline} { } /* skipped */
+<GRAMMAR>{whitespace} { } /* skipped */
 
-<GRAMMAR>{cpplineno}	{
+<GRAMMAR>{cpplineno} {
                   preprocessor_line(yytext, PARSER);
                   PARSER.set_line_no(PARSER.get_line_no()-1);
-		 }
+                }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"push"{ws}")"{ws}{newline} {
-                   // Done by Visual Studio and gcc
-                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
-                   // push, pop could also use identifiers
-                   if(PARSER.pragma_pack.empty())
-                     PARSER.pragma_pack.push_back(convert_integer_literal("0"));
-                   else
-                     PARSER.pragma_pack.push_back(PARSER.pragma_pack.back());
-		 }
+                  // Done by Visual Studio and gcc
+                  // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                  // push, pop could also use identifiers
+                  if(PARSER.pragma_pack.empty())
+                    PARSER.pragma_pack.push_back(convert_integer_literal("0"));
+                  else
+                    PARSER.pragma_pack.push_back(PARSER.pragma_pack.back());
+                }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"push"{ws}","{ws}{integer_s}{ws}")"{ws}{newline} {
-                   // Done by Visual Studio and gcc
-                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
-                   // push, pop could also use identifiers
-                   std::string tmp(yytext);
-                   std::string::size_type p=tmp.find(',')+1;
-                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
-                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
-                   exprt n=convert_integer_literal(value);
-                   PARSER.pragma_pack.push_back(n);
-		 }
+                  // Done by Visual Studio and gcc
+                  // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                  // push, pop could also use identifiers
+                  std::string tmp(yytext);
+                  std::string::size_type p=tmp.find(',')+1;
+                  while(tmp[p]==' ' || tmp[p]=='\t') ++p;
+                  std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
+                  exprt n=convert_integer_literal(value);
+                  PARSER.pragma_pack.push_back(n);
+                }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}{integer_s}{ws}")"{ws}{newline} {
-                   // Done by Visual Studio and gcc
-                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
-                   std::string tmp(yytext);
-                   std::string::size_type p=tmp.find('(')+1;
-                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
-                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
-                   exprt n=convert_integer_literal(value);
-                   PARSER.pragma_pack.push_back(n);
-		 }
+                  // Done by Visual Studio and gcc
+                  // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                  std::string tmp(yytext);
+                  std::string::size_type p=tmp.find('(')+1;
+                  while(tmp[p]==' ' || tmp[p]=='\t') ++p;
+                  std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
+                  exprt n=convert_integer_literal(value);
+                  PARSER.pragma_pack.push_back(n);
+                }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"pop"{ws}")"{ws}{newline} {
-                   // Done by Visual Studio and gcc
-                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
-                   // push, pop could also use identifiers
-                   if(!PARSER.pragma_pack.empty()) PARSER.pragma_pack.pop_back();
-		 }
+                  // Done by Visual Studio and gcc
+                  // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                  // push, pop could also use identifiers
+                  if(!PARSER.pragma_pack.empty()) PARSER.pragma_pack.pop_back();
+                }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}")"{ws}{newline} {
-                   // Done by Visual Studio and gcc
-                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
-                   // should be equivalent to pop-all
-                   PARSER.pragma_pack.clear();
-		 }
+                  // Done by Visual Studio and gcc
+                  // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                  // should be equivalent to pop-all
+                  PARSER.pragma_pack.clear();
+                }
 
 <GRAMMAR>{cppstart}"pragma"{ws}.* {
-                   // silently ignore other pragmas
-		 }
+                  // silently ignore other pragmas
+                }
 
 <GRAMMAR>{cppstart}"ident"{ws}.* { /* ignore */ }
 <GRAMMAR>{cppstart}"define"{ws}.* { /* ignore */ }
 <GRAMMAR>{cppstart}"undef"{ws}.* { /* ignore */ }
 
-<GRAMMAR>{cppdirective}	{
-		  yyansi_cerror("Preprocessor directive found");
-		  return TOK_SCANNER_ERROR;
-		 }
+<GRAMMAR>{cppdirective} {
+                  yyansi_cerror("Preprocessor directive found");
+                  return TOK_SCANNER_ERROR;
+                }
 
 %{
 /*** keywords ***/
 %}
 
 <GRAMMAR,GCC_ATTRIBUTE3>{
-"auto"		{ loc(); return TOK_AUTO; }
-"_Bool"		{ if(PARSER.cpp98)
+"auto"          { loc(); return TOK_AUTO; }
+"_Bool"         { if(PARSER.cpp98)
                     return make_identifier();
                   else
                   { loc(); return TOK_BOOL; }
                 }
-"break"		{ loc(); return TOK_BREAK; }
-"case"		{ loc(); return TOK_CASE; }
-"char"		{ loc(); return TOK_CHAR; }
-"_Complex"	{ loc(); return TOK_COMPLEX; }
-"const"		{ loc(); return TOK_CONST; }
-"continue"	{ loc(); return TOK_CONTINUE; }
-"default"	{ loc(); return TOK_DEFAULT; }
-"do"		{ loc(); return TOK_DO; }
-"double"	{ loc(); return TOK_DOUBLE; }
-"else"		{ loc(); return TOK_ELSE; }
-"enum"		{ loc(); PARSER.tag_following=true; return TOK_ENUM; }
-"extern"	{ loc(); return TOK_EXTERN; }
-"float"		{ loc(); return TOK_FLOAT; }
-"for"		{ loc(); return TOK_FOR; }
-"goto"		{ loc(); return TOK_GOTO; }
-"if"		{ loc(); return TOK_IF; }
-"inline"	{ loc(); return TOK_INLINE; }
-"int"		{ loc(); return TOK_INT; }
-"long"		{ loc(); return TOK_LONG; }
-"register"	{ loc(); return TOK_REGISTER; }
+"break"         { loc(); return TOK_BREAK; }
+"case"          { loc(); return TOK_CASE; }
+"char"          { loc(); return TOK_CHAR; }
+"_Complex"      { loc(); return TOK_COMPLEX; }
+"const"         { loc(); return TOK_CONST; }
+"continue"      { loc(); return TOK_CONTINUE; }
+"default"       { loc(); return TOK_DEFAULT; }
+"do"            { loc(); return TOK_DO; }
+"double"        { loc(); return TOK_DOUBLE; }
+"else"          { loc(); return TOK_ELSE; }
+"enum"          { loc(); PARSER.tag_following=true; return TOK_ENUM; }
+"extern"        { loc(); return TOK_EXTERN; }
+"float"         { loc(); return TOK_FLOAT; }
+"for"           { loc(); return TOK_FOR; }
+"goto"          { loc(); return TOK_GOTO; }
+"if"            { loc(); return TOK_IF; }
+"inline"        { loc(); return TOK_INLINE; }
+"int"           { loc(); return TOK_INT; }
+"long"          { loc(); return TOK_LONG; }
+"register"      { loc(); return TOK_REGISTER; }
 "restrict"      { loc(); return TOK_RESTRICT; }
-"return"	{ loc(); return TOK_RETURN; }
-"short" 	{ loc(); return TOK_SHORT; }
-"signed"	{ loc(); return TOK_SIGNED; }
-"sizeof"	{ loc(); return TOK_SIZEOF; }
-"static"	{ loc(); return TOK_STATIC; }
-"struct"	{ loc(); PARSER.tag_following=true; return TOK_STRUCT; }
-"switch"	{ loc(); return TOK_SWITCH; }
-"typedef"	{ loc(); return TOK_TYPEDEF; }
-"union"		{ loc(); PARSER.tag_following=true; return TOK_UNION; }
-"unsigned"	{ loc(); return TOK_UNSIGNED; }
-"void"		{ loc(); return TOK_VOID; }
-"volatile"	{ loc(); return TOK_VOLATILE; }
-"while"		{ loc(); return TOK_WHILE; }
+"return"        { loc(); return TOK_RETURN; }
+"short"         { loc(); return TOK_SHORT; }
+"signed"        { loc(); return TOK_SIGNED; }
+"sizeof"        { loc(); return TOK_SIZEOF; }
+"static"        { loc(); return TOK_STATIC; }
+"struct"        { loc(); PARSER.tag_following=true; return TOK_STRUCT; }
+"switch"        { loc(); return TOK_SWITCH; }
+"typedef"       { loc(); return TOK_TYPEDEF; }
+"union"         { loc(); PARSER.tag_following=true; return TOK_UNION; }
+"unsigned"      { loc(); return TOK_UNSIGNED; }
+"void"          { loc(); return TOK_VOID; }
+"volatile"      { loc(); return TOK_VOLATILE; }
+"while"         { loc(); return TOK_WHILE; }
 
 "__auto_type"   { if(PARSER.mode==ansi_c_parsert::GCC && !PARSER.cpp98)
-                    { loc(); return TOK_GCC_AUTO_TYPE; }
+                  { loc(); return TOK_GCC_AUTO_TYPE; }
                   else
                     return make_identifier();
                 }
 
-"__float80"	{ if(PARSER.mode==ansi_c_parsert::GCC)
-                    { loc(); return TOK_GCC_FLOAT80; }
+"__float80"     { if(PARSER.mode==ansi_c_parsert::GCC)
+                  { loc(); return TOK_GCC_FLOAT80; }
                   else
                     return make_identifier();
                 }
 
-"__float128"	{ if(PARSER.mode==ansi_c_parsert::GCC)
-                    { loc(); return TOK_GCC_FLOAT128; }
+"__float128"    { if(PARSER.mode==ansi_c_parsert::GCC)
+                  { loc(); return TOK_GCC_FLOAT128; }
                   else
                     return make_identifier();
                 }
 
-"__int128"	{ if(PARSER.mode==ansi_c_parsert::GCC)
-                    { loc(); return TOK_GCC_INT128; }
+"__int128"      { if(PARSER.mode==ansi_c_parsert::GCC)
+                  { loc(); return TOK_GCC_INT128; }
                   else
                     return make_identifier();
                 }
@@ -467,7 +467,7 @@ void ansi_c_scanner_init()
                 }
 
 "__real__" |
-"__real"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
+"__real"        { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_REAL; }
                   else
@@ -475,7 +475,7 @@ void ansi_c_scanner_init()
                 }
 
 "__imag__" |
-"__imag"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
+"__imag"        { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_IMAG; }
                   else
@@ -608,11 +608,11 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__wchar_t"     { if(PARSER.mode==ansi_c_parsert::MSC)  
-                    { loc(); return TOK_WCHAR_T; }  
+"__wchar_t"     { if(PARSER.mode==ansi_c_parsert::MSC)
+                    { loc(); return TOK_WCHAR_T; }
                   else
                     return make_identifier();
-                }                                                                          
+                }
 
 %{
 /* C++ Keywords and Operators */
@@ -658,7 +658,7 @@ typeid              { return cpp98_keyword(TOK_TYPEID); }
 typename            { return cpp98_keyword(TOK_TYPENAME); }
 using               { return cpp98_keyword(TOK_USING); }
 virtual             { return cpp98_keyword(TOK_VIRTUAL); }
-wchar_t	            { // CodeWarrior doesn't have wchar_t built in,
+wchar_t             { // CodeWarrior doesn't have wchar_t built in,
                       // and MSC has a command-line option to turn it off
                       if(PARSER.mode==ansi_c_parsert::CW)
                         return make_identifier();
@@ -737,14 +737,14 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 "["{ws}"emitidl" |
 "["{ws}"module" |
 "["{ws}"export"  { if(PARSER.mode==ansi_c_parsert::MSC)
-	             BEGIN(MSC_ANNOTATION);
+                     BEGIN(MSC_ANNOTATION);
                    else
-	           {
-	             yyless(1); // puts all but [ back into stream
-	             loc();
-	             PARSER.tag_following=false;
-	             return yytext[0]; // returns the [
-	           }
+                   {
+                     yyless(1); // puts all but [ back into stream
+                     loc();
+                     PARSER.tag_following=false;
+                     return yytext[0]; // returns the [
+                   }
                  }
 
 "__char16_t"     { if(PARSER.mode==ansi_c_parsert::GCC)
@@ -1013,8 +1013,8 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                     return make_identifier();
                 }
 
-"__inline"	{ loc(); return TOK_INLINE; }
-"__inline__"	{ loc(); return TOK_INLINE; }
+"__inline"      { loc(); return TOK_INLINE; }
+"__inline__"    { loc(); return TOK_INLINE; }
 
 "__label__"     { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
@@ -1144,10 +1144,10 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
   /* This is a C11 keyword. It can be used as a type qualifier
      and as a type specifier, which introduces ambiguity into the grammar.
      We thus have two different tokens.
-     
+
      6.7.2.4 - 4: If the _Atomic keyword is immediately followed by a left
      parenthesis, it is interpreted as a type specifier (with a type name),
-     not as a type qualifier.  
+     not as a type qualifier.
    */
 
 "_Atomic"{ws}"(" { // put back all but _Atomic
@@ -1224,29 +1224,29 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
   /* operators following */
 
 <GRAMMAR,GCC_ATTRIBUTE3>{
-"->"		{ loc(); return TOK_ARROW; }
-"++"		{ loc(); return TOK_INCR; }
-"--"		{ loc(); return TOK_DECR; }
-"<<"		{ loc(); return TOK_SHIFTLEFT; }
-">>"		{ loc(); return TOK_SHIFTRIGHT; }
-"<="		{ loc(); return TOK_LE; }
-">="		{ loc(); return TOK_GE; }
-"=="		{ loc(); return TOK_EQ; }
-"!="		{ loc(); return TOK_NE; }
-"&&"		{ loc(); return TOK_ANDAND; }
-"||"		{ loc(); return TOK_OROR; }
-"..."		{ loc(); return TOK_ELLIPSIS; }
+"->"            { loc(); return TOK_ARROW; }
+"++"            { loc(); return TOK_INCR; }
+"--"            { loc(); return TOK_DECR; }
+"<<"            { loc(); return TOK_SHIFTLEFT; }
+">>"            { loc(); return TOK_SHIFTRIGHT; }
+"<="            { loc(); return TOK_LE; }
+">="            { loc(); return TOK_GE; }
+"=="            { loc(); return TOK_EQ; }
+"!="            { loc(); return TOK_NE; }
+"&&"            { loc(); return TOK_ANDAND; }
+"||"            { loc(); return TOK_OROR; }
+"..."           { loc(); return TOK_ELLIPSIS; }
 
-"*="		{ loc(); return TOK_MULTASSIGN; }
-"/="		{ loc(); return TOK_DIVASSIGN; }
-"%="		{ loc(); return TOK_MODASSIGN; }
-"+="		{ loc(); return TOK_PLUSASSIGN; }
-"-="		{ loc(); return TOK_MINUSASSIGN; }
-"<<="		{ loc(); return TOK_SHLASSIGN; }
-">>="		{ loc(); return TOK_SHRASSIGN; }
-"&="		{ loc(); return TOK_ANDASSIGN; }
-"^="		{ loc(); return TOK_XORASSIGN; }
-"|="		{ loc(); return TOK_ORASSIGN; }
+"*="            { loc(); return TOK_MULTASSIGN; }
+"/="            { loc(); return TOK_DIVASSIGN; }
+"%="            { loc(); return TOK_MODASSIGN; }
+"+="            { loc(); return TOK_PLUSASSIGN; }
+"-="            { loc(); return TOK_MINUSASSIGN; }
+"<<="           { loc(); return TOK_SHLASSIGN; }
+">>="           { loc(); return TOK_SHRASSIGN; }
+"&="            { loc(); return TOK_ANDASSIGN; }
+"^="            { loc(); return TOK_XORASSIGN; }
+"|="            { loc(); return TOK_ORASSIGN; }
 
   /* digraphs */
 "<:"            { loc(); return '['; }
@@ -1257,7 +1257,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 
 <GRAMMAR>{
 
-{identifier}	{ return make_identifier(); }
+{identifier}    { return make_identifier(); }
 
 {integer_s}     { newstack(yyansi_clval);
                   stack(yyansi_clval)=convert_integer_literal(yytext);
@@ -1265,24 +1265,24 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   return TOK_INTEGER;
                 }
 
-{gcc_ext_float_s}	{ if(PARSER.mode!=ansi_c_parsert::GCC)
+{gcc_ext_float_s} { if(PARSER.mode!=ansi_c_parsert::GCC)
                     {
-		                  yyansi_cerror("Preprocessor directive found");
-		                  return TOK_SCANNER_ERROR;
+                      yyansi_cerror("Preprocessor directive found");
+                      return TOK_SCANNER_ERROR;
                     }
-                  newstack(yyansi_clval); 
+                    newstack(yyansi_clval);
+                    stack(yyansi_clval)=convert_float_literal(yytext);
+                    PARSER.set_source_location(stack(yyansi_clval));
+                    return TOK_FLOATING;
+                  }
+
+{float_s}       { newstack(yyansi_clval);
                   stack(yyansi_clval)=convert_float_literal(yytext);
                   PARSER.set_source_location(stack(yyansi_clval));
-		  return TOK_FLOATING;
-		}
+                  return TOK_FLOATING;
+                }
 
-{float_s}	{ newstack(yyansi_clval); 
-                  stack(yyansi_clval)=convert_float_literal(yytext);
-                  PARSER.set_source_location(stack(yyansi_clval));
-		  return TOK_FLOATING;
-		}
-
-"{"             { 
+"{"             {
                   PARSER.tag_following=false;
                   if(PARSER.asm_block_following) { BEGIN(ASM_BLOCK); }
                   loc();
@@ -1296,7 +1296,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
   /* This catches all one-character operators */
-.		{ loc(); PARSER.tag_following=false; return yytext[0]; }
+.               { loc(); PARSER.tag_following=false; return yytext[0]; }
 }
 
 <MSC_ANNOTATION>"]" { BEGIN(GRAMMAR); }
@@ -1419,7 +1419,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
-{identifier}	{ return make_identifier(); }
+{identifier}    { return make_identifier(); }
 .               { loc(); return yytext[0]; }
 }
 
@@ -1442,7 +1442,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
 }
 
-<<EOF>>		{ yyterminate(); /* done! */ }
+<<EOF>>         { yyterminate(); /* done! */ }
 
 %%
 
