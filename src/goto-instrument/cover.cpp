@@ -298,10 +298,11 @@ void instrument_cover_goals(
           source_locationt source_location=
             basic_blocks.source_location_map[block_nr];
           
-          if(source_location.get_file()!="")
+          if(!source_location.get_file().empty() &&
+             source_location.get_file()[0]!='<')
           {
             std::string comment=
-              "block "+source_location.as_string()+" "+i2string(i_it->location_number);
+              "block "+i2string(i_it->location_number);
 
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(false_exprt());
@@ -351,13 +352,13 @@ void instrument_cover_goals(
 
         for(const auto & c : conditions)
         {
-          std::string comment_t="condition "+from_expr(ns, "", c)+" true";
+          std::string comment_t="condition `"+from_expr(ns, "", c)+"' true";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(c);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
 
-          std::string comment_f="condition "+from_expr(ns, "", c)+" false";
+          std::string comment_f="condition `"+from_expr(ns, "", c)+"' false";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(not_exprt(c));
           i_it->source_location=source_location;
@@ -379,13 +380,13 @@ void instrument_cover_goals(
 
         for(const auto & d : decisions)
         {
-          std::string comment_t="decision "+from_expr(ns, "", d)+" true";
+          std::string comment_t="decision `"+from_expr(ns, "", d)+"' true";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(d);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
 
-          std::string comment_f="decision "+from_expr(ns, "", d)+" false";
+          std::string comment_f="decision `"+from_expr(ns, "", d)+"' false";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(not_exprt(d));
           i_it->source_location=source_location;

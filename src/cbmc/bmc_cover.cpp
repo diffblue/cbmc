@@ -377,7 +377,12 @@ bool bmc_covert::operator()()
     else
     {
       status() << "[" << it->first << "]";
+
+      if(goal.source_location.is_not_nil())
+        status() << ' ' << goal.source_location;
+        
       if(!goal.description.empty()) status() << ' ' << goal.description;
+
       status() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
                << eom;
     }
@@ -387,9 +392,11 @@ bool bmc_covert::operator()()
   
   status() << "** " << goals_covered
            << " of " << goal_map.size() << " covered ("
+           << std::fixed << std::setw(1) << std::setprecision(1)
+           << 100.0*goals_covered/goal_map.size() << "%), using "
            << cover_goals.iterations() << " iteration"
            << (cover_goals.iterations()==1?"":"s")
-           << ")" << eom;
+           << eom;
   
   return false;
 }
