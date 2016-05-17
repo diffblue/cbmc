@@ -407,6 +407,12 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("list-eloc"))
+    {
+      list_eloc(goto_functions);
+      return 0;
+    }
+
     if(cmdline.isset("list-symbols"))
     {
       show_symbol_table(true);
@@ -1271,6 +1277,7 @@ void goto_instrument_parse_optionst::help()
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
     " --count-eloc                 count effective lines of code\n"
+    " --list-eloc                  list full path names of lines containing code\n"
     "\n"
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
