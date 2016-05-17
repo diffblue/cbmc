@@ -153,7 +153,13 @@ proc_ident: TOK_IDENTIFIER
             newstack($$).swap(e);
           }
           | TOK_BUILTIN_IDENTIFIER
+          {
+            stack($$).set("proc_type", "builtin");
+          }
           | TOK_SPEC_IDENTIFIER
+          {
+            stack($$).set("proc_type", "spec");
+          }
           ;
 
 proc_ident_expr: proc_ident
@@ -417,6 +423,11 @@ literal: TOK_IDENTIFIER
        }
        | TOK_FLOATING
        | TOK_STRING
+       {
+         constant_exprt c(to_string_constant(stack($$))
+           .get_value(), string_typet());
+         stack($$).swap(c);
+       }
        | TOK_BUILTIN_LOC
        | jsil_type
        | builtin_field
@@ -518,11 +529,11 @@ bitwise_op: '&'
           }
           | '|'
           {
-            newstack($$).id(ID_or);
+            newstack($$).id(ID_bitor);
           }
           | '^'
           {
-            newstack($$).id(ID_xor);
+            newstack($$).id(ID_bitxor);
           }
           | TOK_LEFT_SHIFT
           {
@@ -570,11 +581,11 @@ unary_op: TOK_NOT
 
 jsil_type: TOK_T_NULL
          {
-           newstack($$).id(ID_null);
+           newstack($$).id("null_type");
          }
          | TOK_T_UNDEFINED
          {
-           newstack($$).id("undefined");
+           newstack($$).id("undefined_type");
          }
          | TOK_T_BOOLEAN
          {

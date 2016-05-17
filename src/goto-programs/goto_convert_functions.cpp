@@ -80,7 +80,8 @@ void goto_convert_functionst::goto_convert()
        it->second.type.id()==ID_code &&
        (it->second.mode==ID_C ||
         it->second.mode==ID_cpp ||
-        it->second.mode==ID_java))
+        it->second.mode==ID_java ||
+        it->second.mode=="jsil"))
       symbol_list.push_back(it->first);
   }
   
