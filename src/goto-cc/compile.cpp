@@ -214,12 +214,7 @@ bool compilet::add_input_file(const std::string &file_name)
     if(file_name[0]!='/')
     #endif
     {
-      cmd << "ar x " <<
-      #ifdef _WIN32
-        working_directory << "\\" << file_name;
-      #else
-        working_directory << "/" << file_name;
-      #endif
+      cmd << "ar x " << concat_dir_file(working_directory, file_name);
     }
     else
     {
