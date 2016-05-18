@@ -657,7 +657,7 @@ int gcc_modet::gcc_hybrid_binary()
   std::cout << std::endl;
   #endif
   
-  int result=run(new_argv[0], new_argv);
+  int result=run(new_argv[0], new_argv, "");
   
   // merge output from gcc with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed
