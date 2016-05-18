@@ -1,7 +1,6 @@
 CORE
 main.c
---path-merge
-^EXIT=0$
+
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
