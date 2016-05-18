@@ -21,6 +21,7 @@ public:
   explicit inline path_searcht(const namespacet &_ns):
     safety_checkert(_ns),
     show_vcc(false),
+	infeasible_set(true),
     depth_limit_set(false), // no limit
     context_bound_set(false),
     unwind_limit_set(false)
@@ -54,6 +55,8 @@ public:
   unsigned number_of_dropped_states;
   unsigned number_of_paths;
   unsigned number_of_steps;
+  unsigned number_of_feasible_paths;
+  unsigned number_of_infeasible_paths;
   unsigned number_of_VCCs;
   unsigned number_of_VCCs_after_simplification;
   unsigned number_of_failed_properties;
@@ -71,6 +74,8 @@ public:
   
   typedef std::map<irep_idt, property_entryt> property_mapt;
   property_mapt property_map;
+
+  bool infeasible_set;
 
 protected:
   typedef path_symex_statet statet;

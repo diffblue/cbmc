@@ -261,6 +261,8 @@ int symex_parse_optionst::doit()
       return 0;
     }
 
+    path_search.infeasible_set = !cmdline.isset("no-eager-infeasibility");
+
     // do actual symex
     switch(path_search(goto_functions))
     {

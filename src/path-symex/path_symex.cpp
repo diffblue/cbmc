@@ -678,15 +678,18 @@ void path_symext::function_call_rec(
     // add a 'further state' for the false-case
     
     {
+      state.is_branch=true;
       further_states.push_back(state);
       path_symex_statet &false_state=further_states.back();
       false_state.record_step();
+      false_state.is_branch=true;
       false_state.history->guard=not_exprt(guard);
       function_call_rec(further_states.back(), call, if_expr.false_case(), further_states);
     }
 
     // do the true-case in 'state'
     {
+      state.is_branch=true;
       state.record_step();
       state.history->guard=guard;
       function_call_rec(state, call, if_expr.true_case(), further_states);
@@ -791,6 +794,8 @@ void path_symext::do_goto(
     state.history->branch=stept::BRANCH_TAKEN;
     further_states.back().set_pc(loc.branch_target);
     further_states.back().history->guard=guard;
+    further_states.back().is_branch=true;
+    state.is_branch = true;
   }
 
   // branch not taken case

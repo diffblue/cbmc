@@ -26,7 +26,8 @@ public:
     history(_path_symex_history),
     current_thread(0),
     no_thread_interleavings(0),
-    depth(0)
+    depth(0),
+	is_branch(0)
   {
   }
   
@@ -215,6 +216,9 @@ protected:
     bool propagate);
 
   bool is_symbol_member_index(const exprt &src) const;
+
+public:
+  bool is_branch;
 };
 
 path_symex_statet initial_state(

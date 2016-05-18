@@ -1,0 +1,23 @@
+file concrete-sum-unsafe.c: Parsing
+Converting
+Type-checking concrete-sum-unsafe
+Generating GOTO Program
+Adding CPROVER library
+Partial Inlining
+Generic Property Instrumentation
+Checking property main.assertion.1
+Post-processing
+Solving with MiniSAT 2.2.0 with simplifier
+9 variables, 11 clauses
+SAT checker: negated claim is SATISFIABLE, i.e., does not hold
+Number of dropped states: 0
+Generated 1 VCC(s), 1 remaining after simplification
+Number of SAT queries made: 185362
+Number of new SAT instances: 0
+Number of feasible path: 0
+Number of infeasible path: 0
+Runtime: 29.576s total, 2.97s SAT
+[main.assertion.1] assertion sum != ((46340 * (46340 + 1)) / 2): FAILED
+
+** 1 of 1 failed
+VERIFICATION FAILED

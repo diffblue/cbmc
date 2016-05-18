@@ -46,6 +46,8 @@ path_searcht::resultt path_searcht::operator()(
   number_of_paths=0;
   number_of_VCCs=0;
   number_of_steps=0;
+  number_of_feasible_paths=0;
+  number_of_infeasible_paths=0;
   number_of_VCCs_after_simplification=0;
   number_of_failed_properties=0;
 
@@ -92,6 +94,8 @@ path_searcht::resultt path_searcht::operator()(
         do_show_vcc(*state, ns);
       else
       {
+
+    	number_of_feasible_paths++;
         check_assertion(*state, ns);
         
         // all assertions failed?
@@ -102,6 +106,18 @@ path_searcht::resultt path_searcht::operator()(
     
     // execute
     path_symex(*state, queue);
+
+    if(infeasible_set && state->is_branch) {
+      satcheckt satcheck;
+      bv_pointerst bv_pointers(ns, satcheck);
+      if(!state->is_feasible(bv_pointers)) {
+        queue.erase(state);
+        number_of_infeasible_paths++;
+        number_of_dropped_states++;
+      }
+      state->is_branch = false;
+      continue;
+    }
   }
   
   report_statistics();
