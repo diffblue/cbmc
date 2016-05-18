@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <initializer_list>    
-
 #include "std_types.h"
 
 /*! \defgroup gr_std_expr Conversion to specific expressions
@@ -1724,13 +1722,6 @@ public:
 
 exprt conjunction(const exprt::operandst &);
 
-/*! 1) generates a conjunction for two or more operands
- *  2) for one operand, returns the operand
- *  3) returns true otherwise 
-*/
-
-exprt conjunction(const std::initializer_list<exprt> &);
-
 /*! \brief Cast a generic exprt to a \ref and_exprt
  *
  * This is an unchecked conversion. \a expr must be known to be \ref
@@ -1832,13 +1823,6 @@ public:
 */
 
 exprt disjunction(const exprt::operandst &);
-
-/*! 1) generates a disjunction for two or more operands
- *  2) for one operand, returns the operand
- *  3) returns false otherwise 
-*/
-
-exprt disjunction(const std::initializer_list<exprt> &);
 
 /*! \brief Cast a generic exprt to a \ref or_exprt
  *

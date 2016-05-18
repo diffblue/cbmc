@@ -64,32 +64,6 @@ exprt disjunction(const exprt::operandst &op)
 
 /*******************************************************************\
 
-Function: disjunction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt disjunction(const std::initializer_list<exprt> &op)
-{
-  if(op.size()==0)
-    return false_exprt();
-  else if(op.size()==1)
-    return *op.begin();
-  else
-  {
-    or_exprt result;
-    result.operands()=exprt::operandst(op);
-    return result;
-  }
-}
-
-/*******************************************************************\
-
 Function: conjunction
 
   Inputs:
@@ -110,32 +84,6 @@ exprt conjunction(const exprt::operandst &op)
   {
     and_exprt result;
     result.operands()=op;
-    return result;
-  }
-}
-
-/*******************************************************************\
-
-Function: conjunction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt conjunction(const std::initializer_list<exprt> &op)
-{
-  if(op.size()==0)
-    return true_exprt();
-  else if(op.size()==1)
-    return *op.begin();
-  else
-  {
-    and_exprt result;
-    result.operands()=exprt::operandst(op);
     return result;
   }
 }
