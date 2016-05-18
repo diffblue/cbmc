@@ -74,17 +74,16 @@ Function: disjunction
 
 \*******************************************************************/
 
-exprt disjunction(const std::list<exprt> &op)
+exprt disjunction(const std::initializer_list<exprt> &op)
 {
-  if(op.empty())
+  if(op.size()==0)
     return false_exprt();
   else if(op.size()==1)
-    return op.front();
+    return *op.begin();
   else
   {
     or_exprt result;
-    result.operands().resize(op.size());
-    for(const auto & e : op) result.operands().push_back(e);
+    result.operands()=exprt::operandst(op);
     return result;
   }
 }
@@ -127,17 +126,16 @@ Function: conjunction
 
 \*******************************************************************/
 
-exprt conjunction(const std::list<exprt> &op)
+exprt conjunction(const std::initializer_list<exprt> &op)
 {
-  if(op.empty())
+  if(op.size()==0)
     return true_exprt();
   else if(op.size()==1)
-    return op.front();
+    return *op.begin();
   else
   {
     and_exprt result;
-    result.operands().resize(op.size());
-    for(const auto & e : op) result.operands().push_back(e);
+    result.operands()=exprt::operandst(op);
     return result;
   }
 }
