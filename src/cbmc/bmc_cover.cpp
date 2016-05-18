@@ -146,13 +146,9 @@ public:
     }
   };
   
-  inline irep_idt id(
-    goto_programt::const_targett loc,
-    const std::string suffix="")
+  inline irep_idt id(goto_programt::const_targett loc)
   {
-    return id2string(loc->function)+
-           "#"+i2string(loc->location_number)+
-           suffix;
+    return loc->source_location.get_property_id();
   }
 
   typedef std::map<irep_idt, goalt> goal_mapt;
@@ -261,20 +257,6 @@ bool bmc_covert::operator()()
   // stop the time
   absolute_timet sat_start=current_time();
 
-  // we don't want the assertions to become constraints
-  for(symex_target_equationt::SSA_stepst::iterator
-      it=bmc.equation.SSA_steps.begin();
-      it!=bmc.equation.SSA_steps.end();
-      it++)
-    if(it->type==goto_trace_stept::ASSERT)
-      it->type=goto_trace_stept::LOCATION;
-  
-  bmc.do_conversion();
-  
-  //bmc.equation.output(std::cout);
-  
-  std::map<goto_programt::const_targett, irep_idt> location_map;
-  
   // Collect _all_ goals in `goal_map'.
   // This maps property IDs to 'goalt'
   forall_goto_functions(f_it, goto_functions)
@@ -291,6 +273,12 @@ bool bmc_covert::operator()()
     }
   }
   
+  // Do conversion to next solver layer
+  
+  bmc.do_conversion();
+  
+  //bmc.equation.output(std::cout);
+  
   // collects assumptions
   and_exprt::operandst assumptions;
 
@@ -306,9 +294,13 @@ bool bmc_covert::operator()()
   
     if(it->source.pc->is_assert())
     {
-      and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
-      literalt c=solver.convert(c_expr);
-      goal_map[id(it->source.pc)].add_instance(it, c);
+      exprt c=
+        conjunction({
+          conjunction(assumptions), 
+          literal_exprt(it->guard_literal),
+          literal_exprt(it->cond_literal) });
+      literalt l_c=solver.convert(c);
+      goal_map[id(it->source.pc)].add_instance(it, l_c);
     }
   }
   
