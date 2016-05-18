@@ -1720,7 +1720,14 @@ public:
  *  3) returns true otherwise 
 */
 
-exprt conjunction(const exprt::operandst &op);
+exprt conjunction(const exprt::operandst &);
+
+/*! 1) generates a conjunction for two or more operands
+ *  2) for one operand, returns the operand
+ *  3) returns true otherwise 
+*/
+
+exprt conjunction(const std::list<exprt> &);
 
 /*! \brief Cast a generic exprt to a \ref and_exprt
  *
@@ -1822,7 +1829,14 @@ public:
  *  3) returns false otherwise 
 */
 
-exprt disjunction(const exprt::operandst &op);
+exprt disjunction(const exprt::operandst &);
+
+/*! 1) generates a disjunction for two or more operands
+ *  2) for one operand, returns the operand
+ *  3) returns false otherwise 
+*/
+
+exprt disjunction(const std::list<exprt> &);
 
 /*! \brief Cast a generic exprt to a \ref or_exprt
  *

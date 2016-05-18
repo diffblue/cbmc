@@ -64,6 +64,33 @@ exprt disjunction(const exprt::operandst &op)
 
 /*******************************************************************\
 
+Function: disjunction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt disjunction(const std::list<exprt> &op)
+{
+  if(op.empty())
+    return false_exprt();
+  else if(op.size()==1)
+    return op.front();
+  else
+  {
+    or_exprt result;
+    result.operands().resize(op.size());
+    for(const auto & e : op) result.operands().push_back(e);
+    return result;
+  }
+}
+
+/*******************************************************************\
+
 Function: conjunction
 
   Inputs:
@@ -84,6 +111,33 @@ exprt conjunction(const exprt::operandst &op)
   {
     and_exprt result;
     result.operands()=op;
+    return result;
+  }
+}
+
+/*******************************************************************\
+
+Function: conjunction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt conjunction(const std::list<exprt> &op)
+{
+  if(op.empty())
+    return true_exprt();
+  else if(op.size()==1)
+    return op.front();
+  else
+  {
+    and_exprt result;
+    result.operands().resize(op.size());
+    for(const auto & e : op) result.operands().push_back(e);
     return result;
   }
 }
