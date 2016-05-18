@@ -74,6 +74,7 @@ const char *gcc_options_with_separated_argument[]=
   "--include", // undocumented
   "-current_version", // on the Mac
   "-compatibility_version",  // on the Mac
+  "-z",
   NULL
 };
 

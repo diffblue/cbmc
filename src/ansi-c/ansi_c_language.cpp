@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/replace_symbol.h>
 #include <util/config.h>
+#include <util/get_base_name.h>
 
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
@@ -22,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_typecheck.h"
 #include "ansi_c_parser.h"
 #include "expr2c.h"
-#include "trans_unit.h"
 #include "c_preprocess.h"
 #include "ansi_c_internal_additions.h"
 #include "type2name.h"
@@ -61,7 +61,7 @@ Function: ansi_c_languaget::modules_provided
 
 void ansi_c_languaget::modules_provided(std::set<std::string> &modules)
 {
-  modules.insert(translation_unit(parse_path));
+  modules.insert(get_base_name(parse_path, true));
 }
 
 /*******************************************************************\

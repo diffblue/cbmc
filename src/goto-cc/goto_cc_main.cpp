@@ -72,9 +72,13 @@ int main(int argc, const char **argv)
     return 1;
   }
   
+  #ifdef _MSC_VER
   // we do 'to_lower_string' because of Windows
   std::string base_name=
-    to_lower_string(get_base_name(argv[0]));
+    to_lower_string(get_base_name(argv[0], true));
+  #else
+  std::string base_name=get_base_name(argv[0], false);
+  #endif
   
   if(base_name=="goto-link" || base_name=="link" ||
      base_name=="goto-cl" || base_name=="cl")
@@ -105,7 +109,10 @@ int main(int argc, const char **argv)
     armcc_mode.base_name=base_name;
     return armcc_mode.main(argc, argv);
   }
-  else if(base_name=="goto-gcc")
+  // handle GCC names like x86_64-apple-darwin14-llvm-gcc-4.2
+  // via x86_64-apple-darwin14-llvm-goto-gcc-4.2
+  else if(base_name=="goto-clang" ||
+          base_name.find("goto-gcc")!=std::string::npos)
   {
     // this produces ELF/Mach-O "hybrid binaries",
     // with a GCC-style command-line interface,
@@ -116,7 +123,7 @@ int main(int argc, const char **argv)
     gcc_mode.produce_hybrid_binary=true;
     return gcc_mode.main(argc, argv);
   }
-  else if(base_name=="goto-ld")
+  else if(base_name.find("goto-ld")!=std::string::npos)
   {
     // this simulates "ld" for linking
     ld_cmdlinet cmdline;

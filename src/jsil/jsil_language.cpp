@@ -51,7 +51,7 @@ Function: jsil_languaget::modules_provided
 
 void jsil_languaget::modules_provided(std::set<std::string> &modules)
 {
-  modules.insert(get_base_name(parse_path));
+  modules.insert(get_base_name(parse_path, true));
 }
 
 /*******************************************************************\

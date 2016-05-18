@@ -16,6 +16,8 @@ Date:   April 2010
 class goto_cc_cmdlinet:public cmdlinet
 {
 public:
+  ~goto_cc_cmdlinet();
+
   using cmdlinet::parse;
   virtual bool parse(int argc, const char **argv)=0;
   
@@ -65,17 +67,15 @@ public:
     return false;
   }
 
+  std::string stdin_file;
+
 protected:  
   void add_arg(const std::string &arg)
   {
     parsed_argv.push_back(argt(arg));
   }
 
-  void add_infile_arg(const std::string &arg)
-  {
-    parsed_argv.push_back(argt(arg));
-    parsed_argv.back().is_infile_name=true;
-  }
+  void add_infile_arg(const std::string &arg);
 };
 
 #endif /* GOTO_CC_CMDLINE_H */
