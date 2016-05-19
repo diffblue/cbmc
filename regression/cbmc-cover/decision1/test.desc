@@ -1,0 +1,8 @@
+CORE
+main.c
+--cover decision
+^EXIT=0$
+^SIGNAL=0$
+^\*\* 2 of 2 covered (100.0%), using 2 iterations$
+--
+^warning: ignoring

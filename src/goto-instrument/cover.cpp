@@ -301,9 +301,7 @@ void instrument_cover_goals(
           if(!source_location.get_file().empty() &&
              source_location.get_file()[0]!='<')
           {
-            std::string comment=
-              "block "+i2string(i_it->location_number);
-
+            std::string comment="block "+b;
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(false_exprt());
             i_it->source_location=source_location;
@@ -328,12 +326,12 @@ void instrument_cover_goals(
         source_locationt source_location=i_it->source_location;
 
         goto_program.insert_before_swap(i_it);
-        i_it->make_assertion(guard);
+        i_it->make_assertion(not_exprt(guard));
         i_it->source_location=source_location;
         i_it->source_location.set_comment(true_comment);
 
         goto_program.insert_before_swap(i_it);
-        i_it->make_assertion(not_exprt(guard));
+        i_it->make_assertion(guard);
         i_it->source_location=source_location;
         i_it->source_location.set_comment(false_comment);
         

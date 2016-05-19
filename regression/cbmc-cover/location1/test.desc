@@ -1,0 +1,13 @@
+CORE
+main.c
+--cover location
+^EXIT=0$
+^SIGNAL=0$
+^\[main.1\] file main.c line 3 function main block 1: SATISFIED$
+^\[main.2\] file main.c line 8 function main block 2: SATISFIED$
+^\[main.3\] file main.c line 11 function main block 3: SATISFIED$
+^\[main.4\] file main.c line 13 function main block 4: FAILED$
+^\[main.5\] file main.c line 15 function main block 5: SATISFIED$
+^\*\* 4 of 5 covered (80.0%)
+--
+^warning: ignoring

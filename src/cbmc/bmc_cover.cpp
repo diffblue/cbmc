@@ -272,6 +272,12 @@ bool bmc_covert::operator()()
             i_it->source_location);
     }
   }
+
+  for(symex_target_equationt::SSA_stepst::iterator
+      it=bmc.equation.SSA_steps.begin();
+      it!=bmc.equation.SSA_steps.end();
+      it++)
+    it->cond_literal=literalt(0, 0);
   
   // Do conversion to next solver layer
   
@@ -279,9 +285,6 @@ bool bmc_covert::operator()()
   
   //bmc.equation.output(std::cout);
   
-  // collects assumptions
-  and_exprt::operandst assumptions;
-
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals
   for(symex_target_equationt::SSA_stepst::iterator
@@ -289,16 +292,13 @@ bool bmc_covert::operator()()
       it!=bmc.equation.SSA_steps.end();
       it++)
   {
-    if(it->is_assume())
-      assumptions.push_back(literal_exprt(it->cond_literal));
-  
-    if(it->source.pc->is_assert())
+    if(it->is_assert())
     {
+      assert(it->source.pc->is_assert());
       exprt c=
         conjunction({
-          conjunction(assumptions), 
           literal_exprt(it->guard_literal),
-          literal_exprt(it->cond_literal) });
+          literal_exprt(!it->cond_literal) });
       literalt l_c=solver.convert(c);
       goal_map[id(it->source.pc)].add_instance(it, l_c);
     }
