@@ -8,6 +8,8 @@ Date: August 2012
 
 \*******************************************************************/
 
+#include <cassert>
+
 #ifdef _WIN32
 #include <process.h>
 #else
@@ -17,7 +19,6 @@ Date: August 2012
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
-#include <cassert>
 
 #include <sys/wait.h>
 #include <sys/types.h>
