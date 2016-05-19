@@ -17,6 +17,7 @@ Date: August 2012
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
+#include <cassert>
 
 #include <sys/wait.h>
 #include <sys/types.h>
