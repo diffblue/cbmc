@@ -466,7 +466,6 @@ protected:
   void do_printf        (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
   void do_input         (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
   void do_output        (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
-  void do_cover         (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
   void do_prob_coin     (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
   void do_prob_uniform  (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
 

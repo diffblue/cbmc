@@ -73,6 +73,7 @@ const char *as_string(coverage_criteriont c)
   case coverage_criteriont::PATH: return "path";
   case coverage_criteriont::MCDC: return "MC/DC";
   case coverage_criteriont::ASSERTION: return "assertion";
+  case coverage_criteriont::COVER: return "cover instructions";
   default: return "";
   }
 }
@@ -285,7 +286,29 @@ void instrument_cover_goals(
     {
     case coverage_criteriont::ASSERTION:
       // turn into 'assert(false)' to avoid simplification
-      i_it->guard=false_exprt();
+      if(i_it->is_assert())
+        i_it->guard=false_exprt();
+      break;
+      
+    case coverage_criteriont::COVER:
+      // turn __CPROVER_cover(x) into 'assert(!x)'
+      if(i_it->is_function_call())
+      {
+        const code_function_callt &code_function_call=
+          to_code_function_call(i_it->code);
+        if(code_function_call.function().id()==ID_symbol &&
+           to_symbol_expr(code_function_call.function()).get_identifier()==
+           "__CPROVER_cover" &&
+           code_function_call.arguments().size()==1)
+        {
+          const exprt c=code_function_call.arguments()[0];
+          std::string comment="condition `"+from_expr(ns, "", c)+"'";
+          i_it->guard=not_exprt(c);
+          i_it->type=ASSERT;
+          i_it->code.clear();
+          i_it->source_location.set_comment(comment);
+        }
+      }
       break;
       
     case coverage_criteriont::LOCATION:

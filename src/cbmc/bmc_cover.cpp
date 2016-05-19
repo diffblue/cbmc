@@ -385,7 +385,8 @@ bool bmc_covert::operator()()
   status() << "** " << goals_covered
            << " of " << goal_map.size() << " covered ("
            << std::fixed << std::setw(1) << std::setprecision(1)
-           << 100.0*goals_covered/goal_map.size() << "%), using "
+           << (goal_map.empty()?0.0:100.0*goals_covered/goal_map.size())
+           << "%), using "
            << cover_goals.iterations() << " iteration"
            << (cover_goals.iterations()==1?"":"s")
            << eom;

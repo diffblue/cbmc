@@ -937,10 +937,12 @@ bool cbmc_parse_optionst::process_goto_program(
         c=coverage_criteriont::CONDITION;
       else if(criterion=="mcdc")
         c=coverage_criteriont::MCDC;
+      else if(criterion=="cover")
+        c=coverage_criteriont::COVER;
       else
       {
         error() << "unknown coverage criterion" << eom;
-        return false;
+        return true;
       }
           
       status() << "Instrumenting coverge goals" << eom;
