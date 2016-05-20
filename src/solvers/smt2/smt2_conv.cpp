@@ -4784,6 +4784,11 @@ void smt2_convt::find_symbols(const exprt &expr)
           << "| () ";
       convert_type(expr.type());
       out << ")" << "\n";
+
+      if (strings_mode == STRINGS_QARRAY && is_string_type(expr.type())) {
+        out << "(assert (bvule (cprover.str.len |" << smt2_identifier << "|) "
+            << "(_ bv2147483647 32)))\n";
+      }
     }
   }
   else if(expr.id()==ID_array_of)
