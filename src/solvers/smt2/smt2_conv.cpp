@@ -133,15 +133,16 @@ void smt2_convt::write_header()
         << string_length_width << "))\n";
     out << "(define-fun cprover.ubv_to_int ((?x cprover.Pos)) "
         << "Int ";
-    out << "(let ((bit0 (_ bv0 1))) (+ ";
-    mp_integer bit;
-    for (size_t i = 0; i < string_length_width; ++i) {
-      bit.setPower2(i);
-      out << "(ite (= ((_ extract " << i << " " << i << ") ?x) bit0) 0 "
-          << bit << ") ";
-    }
-    out << "0))"
-        << ")\n\n";
+    out << "(bv2nat ?x))\n\n";
+    // out << "(let ((bit0 (_ bv0 1))) (+ ";
+    // mp_integer bit;
+    // for (size_t i = 0; i < string_length_width; ++i) {
+    //   bit.setPower2(i);
+    //   out << "(ite (= ((_ extract " << i << " " << i << ") ?x) bit0) 0 "
+    //       << bit << ") ";
+    // }
+    // out << "0))"
+    //     << ")\n\n";
   } else if (strings_mode == STRINGS_QARRAY) {
     out << "; string support via PASS-style quantified arrays\n";
     out << "(define-sort cprover.Char () (_ BitVec 8))\n"
@@ -4962,7 +4963,8 @@ void smt2_convt::find_symbols(const exprt &expr)
             std::size_t w=to_bitvector_type(type).get_width();
             irep_idt id="string_length."+i2string(string_lengths.size());
             typecast_exprt len = typecast_exprt(
-              symbol_exprt(id, expr.type()), unsignedbv_typet(string_length_width));
+              symbol_exprt(id, expr.type()),
+              unsignedbv_typet(string_length_width));
             out << "(declare-fun " << id << " () ";
             convert_type(expr.type());
             out << ")\n";
@@ -4971,6 +4973,11 @@ void smt2_convt::find_symbols(const exprt &expr)
             out << ") (str.len ";
             convert_expr(args[0]);
             out << ")))\n";
+            // out << "(define-fun " << id << " () ";
+            // convert_type(expr.type());
+            // out << " ((_ int2bv " << w << ") (str.len ";
+            // convert_expr(args[0]);
+            // out << ")))\n";
             string_lengths[expr] = id;
           } else {
             UNEXPECTEDCASE("return type of string_length is not a bit-vector");
