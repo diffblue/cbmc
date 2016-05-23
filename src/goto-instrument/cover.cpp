@@ -366,20 +366,21 @@ void instrument_cover_goals(
     case coverage_criteriont::CONDITION:
       // Conditions are all atomic predicates in the programs.
       {
-        std::set<exprt> conditions=
-          collect_conditions(i_it);
+        const std::set<exprt> conditions=collect_conditions(i_it);
 
-        source_locationt source_location=i_it->source_location;
+        const source_locationt source_location=i_it->source_location;
 
         for(const auto & c : conditions)
         {
-          std::string comment_t="condition `"+from_expr(ns, "", c)+"' true";
+          const std::string c_string=from_expr(ns, "", c);
+        
+          const std::string comment_t="condition `"+c_string+"' true";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(c);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
 
-          std::string comment_f="condition `"+from_expr(ns, "", c)+"' false";
+          const std::string comment_f="condition `"+c_string+"' false";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(not_exprt(c));
           i_it->source_location=source_location;
@@ -394,20 +395,21 @@ void instrument_cover_goals(
     case coverage_criteriont::DECISION:
       // Decisions are maximal Boolean combinations of conditions.
       {
-        std::set<exprt> decisions=
-          collect_decisions(i_it);
+        const std::set<exprt> decisions=collect_decisions(i_it);
 
-        source_locationt source_location=i_it->source_location;
+        const source_locationt source_location=i_it->source_location;
 
         for(const auto & d : decisions)
         {
-          std::string comment_t="decision `"+from_expr(ns, "", d)+"' true";
+          const std::string d_string=from_expr(ns, "", d);
+        
+          const std::string comment_t="decision `"+d_string+"' true";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(d);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
 
-          std::string comment_f="decision `"+from_expr(ns, "", d)+"' false";
+          const std::string comment_f="decision `"+d_string+"' false";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(not_exprt(d));
           i_it->source_location=source_location;
@@ -418,7 +420,6 @@ void instrument_cover_goals(
           i_it++;
       }
       break;
-    
       
     case coverage_criteriont::MCDC:
       // 1. Each entry and exit point is invoked
@@ -426,6 +427,44 @@ void instrument_cover_goals(
       // 3. Each condition in a decision takes every possible outcome
       // 4. Each condition in a decision is shown to independently
       //    affect the outcome of the decision.
+      {
+        const std::set<exprt> conditions=collect_conditions(i_it);
+        const std::set<exprt> decisions=collect_decisions(i_it);
+        
+        std::set<exprt> both;
+        std::set_union(conditions.begin(), conditions.end(),
+                       decisions.begin(), decisions.end(),
+                       inserter(both, both.end()));
+
+        const source_locationt source_location=i_it->source_location;
+
+        for(const auto & p : both)
+        {
+          bool is_decision=decisions.find(p)!=decisions.end();
+          bool is_condition=conditions.find(p)!=conditions.end();
+          
+          std::string description=
+            (is_decision && is_condition)?"decision/condition":
+            is_decision?"decision":"condition";
+            
+          std::string p_string=from_expr(ns, "", p);
+        
+          std::string comment_t=description+" `"+p_string+"' true";
+          goto_program.insert_before_swap(i_it);
+          i_it->make_assertion(p);
+          i_it->source_location=source_location;
+          i_it->source_location.set_comment(comment_t);
+
+          std::string comment_f=description+" `"+p_string+"' false";
+          goto_program.insert_before_swap(i_it);
+          i_it->make_assertion(not_exprt(p));
+          i_it->source_location=source_location;
+          i_it->source_location.set_comment(comment_f);
+        }
+        
+        for(unsigned i=0; i<both.size()*2; i++)
+          i_it++;
+      }
       break;
 
     case coverage_criteriont::PATH:
