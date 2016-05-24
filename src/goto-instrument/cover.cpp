@@ -8,6 +8,8 @@ Date: May 2016
 
 \*******************************************************************/
 
+#include <algorithm>
+
 #include <util/i2string.h>
 
 #include "cover.h"
