@@ -27,7 +27,7 @@ public:
     current_thread(0),
     no_thread_interleavings(0),
     depth(0),
-	is_branch(0)
+    is_branch(0)
   {
   }
   
