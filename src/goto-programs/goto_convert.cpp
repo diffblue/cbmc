@@ -542,7 +542,18 @@ void goto_convertt::convert(
   else
     copy(code, OTHER, dest);
 
+  // We only need to kill the temporaries if control
+  // can get to the end of the block.
+  #if 0
+  if(!dest.empty() &&
+     dest.instructions.back().is_goto() &&
+     dest.instructions.back().guard.is_true())
+    tmp_symbols.resize(old_tmp_symbols_size);
+  else
+    kill_tmp_symbols(old_tmp_symbols_size, dest);
+  #else
   kill_tmp_symbols(old_tmp_symbols_size, dest);
+  #endif
 
   // make sure dest is never empty
   if(dest.instructions.empty())
