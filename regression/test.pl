@@ -107,7 +107,7 @@ sub test($$$$$) {
           my $r;
           $result =~ s/\\/\\\\/g;
           $result =~ s/([^\\])\$/$1\\r\\\\?\$/;
-          system("bash", "-c", "grep \$'$result' '$name/$output' >/dev/null");
+          system("bash", "-c", "grep \$'$result' \"$name/$output\" >/dev/null");
           $r = ($included ? $? != 0 : $? == 0);
           if($r) {
             print LOG "$result [FAILED]\n";
