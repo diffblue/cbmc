@@ -204,20 +204,28 @@ void gen_nondet_init(
     // build size expression
     exprt object_size=size_of_expr(subtype, ns);
 
-    assert(!object_size.is_nil());
+    if(subtype.id()!=ID_empty && !object_size.is_nil())
+    {
+      // malloc expression
+      side_effect_exprt malloc_expr(ID_malloc);
+      malloc_expr.copy_to_operands(object_size);
+      malloc_expr.type()=pointer_type;
 
-    // malloc expression
-    side_effect_exprt malloc_expr(ID_malloc);
-    malloc_expr.copy_to_operands(object_size);
-    malloc_expr.type()=pointer_type;
+      code_assignt code(expr, malloc_expr);
+      init_code.copy_to_operands(code);
 
-    code_assignt code(expr, malloc_expr);
-    init_code.copy_to_operands(code);
+      // dereference expression
+      dereference_exprt deref_expr(expr, subtype);
 
-    // dereference expression
-    dereference_exprt deref_expr(expr, subtype);
-
-    gen_nondet_init(deref_expr, init_code, ns, recursion_set, false, "");
+      gen_nondet_init(deref_expr, init_code, ns, recursion_set, false, "");
+    }
+    else
+    {
+      // make null
+      null_pointer_exprt null_pointer_expr(pointer_type);
+      code_assignt code(expr, null_pointer_expr);
+      init_code.copy_to_operands(code);
+    }
   }
 }
 }
