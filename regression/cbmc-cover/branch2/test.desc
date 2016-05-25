@@ -1,0 +1,9 @@
+CORE
+main.c
+--cover branch --unwind 2
+^EXIT=0$
+^SIGNAL=0$
+^\[main.1\] file main.c line 6 function main function main block 5 branch false: SATISFIED
+^\[main.2\] file main.c line 6 function main function main block 5 branch true: SATISFIED
+--
+^warning: ignoring
