@@ -136,7 +136,7 @@ public:
       for(const auto &it : instances)
         tmp.push_back(literal_exprt(it.condition));
 
-      return conjunction(tmp);
+      return disjunction(tmp);
     }
   };
   
@@ -288,7 +288,7 @@ bool bmc_covert::operator()()
     }
   }
   
-  status() << "Aiming to cover " << goal_map.size() << " goals" << eom;
+  status() << "Aiming to cover " << goal_map.size() << " goal(s)" << eom;
   
   cover_goalst cover_goals(solver);
   
