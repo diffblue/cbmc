@@ -1,0 +1,8 @@
+CORE
+Main.class
+--function "java::D.fail:()V"
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
