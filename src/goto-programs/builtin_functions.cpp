@@ -270,53 +270,6 @@ void goto_convertt::do_input(
 
 /*******************************************************************\
 
-Function: goto_convertt::do_cover
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void goto_convertt::do_cover(
-  const exprt &lhs,
-  const exprt &function,
-  const exprt::operandst &arguments,
-  goto_programt &dest)
-{
-  codet output_code;
-  output_code.set_statement(ID_output);
-  output_code.add_source_location()=function.source_location();
-
-  if(arguments.size()!=1)
-  {
-    err_location(function);
-    throw "cover takes one argument";
-  }
-  
-  // build string constant
-  exprt string_constant(ID_string_constant);
-  string_constant.type()=array_typet();
-  string_constant.type().subtype()=char_type();
-  string_constant.set(ID_value, ID_cover);
-  
-  index_exprt index_expr;
-  index_expr.type()=char_type();
-  index_expr.array()=string_constant;
-  index_expr.index()=gen_zero(index_type());
-  
-  output_code.copy_to_operands(address_of_exprt(index_expr));
-  
-  forall_expr(it, arguments)
-    output_code.copy_to_operands(*it);
-    
-  copy(output_code, OTHER, dest);
-}
-
-/*******************************************************************\
-
 Function: goto_convertt::do_output
 
   Inputs:
@@ -1153,11 +1106,6 @@ void goto_convertt::do_function_call_symbol(
           identifier=="__CPROVER::input")
   {
     do_input(lhs, function, arguments, dest);
-  }
-  else if(identifier==CPROVER_PREFIX "cover" ||
-          identifier=="__CPROVER::cover")
-  {
-    do_cover(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "output" ||
           identifier=="__CPROVER::output")

@@ -7,6 +7,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../analyses/analyses$(LIBEXT) \
+      ../pointer-analysis/pointer-analysis$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../json/json$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
@@ -31,7 +32,7 @@ endif
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-  ifneq ($(LIBZIPLIB),)
+  ifneq ($(wildcard $(LIBZIPINC)),)
     LIBS += $(LIBZIPLIB)
   endif
 endif

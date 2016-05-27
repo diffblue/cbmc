@@ -11,12 +11,17 @@ Date: December 2012
 #include <iostream>
 
 #include <util/prefix.h>
+#include <util/file_util.h>
 
 #include "count_eloc.h"
 
+typedef hash_set_cont<irep_idt, irep_id_hash> linest;
+typedef hash_map_cont<irep_idt, linest, irep_id_hash> filest;
+typedef hash_map_cont<irep_idt, filest, irep_id_hash> working_dirst;
+
 /*******************************************************************\
 
-Function: count_eloc
+Function: collect_eloc
 
   Inputs:
 
@@ -26,16 +31,22 @@ Function: count_eloc
 
 \*******************************************************************/
 
-std::size_t count_eloc(const goto_programt &goto_program)
+static void collect_eloc(
+  const goto_functionst &goto_functions,
+  working_dirst &dest)
 {
-  hash_set_cont<irep_idt, irep_id_hash> lines;
+  forall_goto_functions(f_it, goto_functions)
+  {
+    forall_goto_program_instructions(it, f_it->second.body)
+    {
+      filest &files=dest[it->source_location.get_working_directory()];
+      const irep_idt &file=it->source_location.get_file();
 
-  forall_goto_program_instructions(it, goto_program)
-    if(it->source_location.is_not_nil() &&
-        !has_prefix(id2string(it->source_location.get_file()), "<built-in-"))
-      lines.insert(it->source_location.get_line());
-
-  return lines.size();
+      if(!file.empty() &&
+         !has_prefix(id2string(file), "<built-in-"))
+        files[file].insert(it->source_location.get_line());
+    }
+  }
 }
 
 /*******************************************************************\
@@ -53,10 +64,42 @@ Function: count_eloc
 void count_eloc(const goto_functionst &goto_functions)
 {
   std::size_t eloc=0;
-  
-  forall_goto_functions(f_it, goto_functions)
-    eloc+=count_eloc(f_it->second.body);
+
+  working_dirst eloc_map;
+  collect_eloc(goto_functions, eloc_map);
+
+  for(const std::pair<irep_idt, filest> &files : eloc_map)
+    for(const std::pair<irep_idt, linest> &lines : files.second)
+      eloc+=lines.second.size();
 
   std::cout << "Effective lines of code: " << eloc << '\n';
 }
 
+/*******************************************************************\
+
+Function: list_eloc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void list_eloc(const goto_functionst &goto_functions)
+{
+  working_dirst eloc_map;
+  collect_eloc(goto_functions, eloc_map);
+
+  for(const std::pair<irep_idt, filest> &files : eloc_map)
+    for(const std::pair<irep_idt, linest> &lines : files.second)
+    {
+      std::string file=id2string(lines.first);
+      if(!files.first.empty())
+        file=concat_dir_file(id2string(files.first), file);
+
+      for(const irep_idt &line : lines.second)
+        std::cout << file << ':' << line << '\n';
+    }
+}

@@ -116,11 +116,7 @@ Function: temp_dirt::operator()
 
 std::string temp_dirt::operator()(const std::string &file)
 {
-  #ifdef _WIN32
-  return path+"\\"+file;
-  #else
-  return path+"/"+file;
-  #endif
+  return concat_dir_file(path, file);
 }
 
 /*******************************************************************\

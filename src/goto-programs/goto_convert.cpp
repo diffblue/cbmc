@@ -2151,7 +2151,17 @@ void goto_convertt::generate_ifthenelse(
 {
   if(is_empty(true_case) &&
      is_empty(false_case))
+  {
+    // hmpf. Useless branch.
+    goto_programt tmp_z;
+    goto_programt::targett z=tmp_z.add_instruction();
+    z->make_skip();
+    goto_programt::targett v=dest.add_instruction();
+    v->make_goto(z, guard);
+    v->source_location=source_location;
+    dest.destructive_append(tmp_z);
     return;
+  }
 
   // do guarded gotos directly
   if(is_empty(false_case) &&
@@ -2224,7 +2234,8 @@ void goto_convertt::generate_ifthenelse(
   goto_programt tmp_z;
   goto_programt::targett z=tmp_z.add_instruction();
   z->make_skip();
-  z->source_location=source_location;
+  // We deliberately don't set a location for 'z', it's a dummy
+  // target.
 
   // y: Q;
   goto_programt tmp_y;

@@ -58,7 +58,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(accelerate)(constant-propagator)" \
   "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)(check-call-sequence)" \
-  "(interpreter)(show-reaching-definitions)(count-eloc)" \
+  "(interpreter)(show-reaching-definitions)(count-eloc)(list-eloc)" \
   "(list-symbols)(list-undefined-functions)" \
   "(z3)(add-library)(show-dependence-graph)" \
   "(horn)(skip-loops):(apply-code-contracts)"

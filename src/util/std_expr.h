@@ -1720,7 +1720,7 @@ public:
  *  3) returns true otherwise 
 */
 
-exprt conjunction(const exprt::operandst &op);
+exprt conjunction(const exprt::operandst &);
 
 /*! \brief Cast a generic exprt to a \ref and_exprt
  *
@@ -1822,7 +1822,7 @@ public:
  *  3) returns false otherwise 
 */
 
-exprt disjunction(const exprt::operandst &op);
+exprt disjunction(const exprt::operandst &);
 
 /*! \brief Cast a generic exprt to a \ref or_exprt
  *

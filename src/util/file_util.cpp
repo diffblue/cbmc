@@ -115,3 +115,24 @@ void delete_directory(const std::string &path)
   rmdir(path.c_str());
 }
 
+/*******************************************************************\
+
+Function: concat_dir_file
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string concat_dir_file(const std::string &directory,
+                            const std::string &file_name)
+{
+  #ifdef _WIN32
+  return directory+"\\"+file_name;
+  #else
+  return directory+"/"+file_name;
+  #endif
+}

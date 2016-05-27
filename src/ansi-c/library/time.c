@@ -143,6 +143,9 @@ char *asctime(const struct tm *timeptr)
   char *asctime_result;
   __CPROVER_set_must(asctime_result, "asctime_result");
   return asctime_result;
+  #else
+  static char asctime_result[1];
+  return asctime_result;
   #endif
 }
 
@@ -160,6 +163,9 @@ char *ctime(const time_t *clock)
   __CPROVER_event("invalidate_pointer", "ctime_result");
   char *ctime_result;
   __CPROVER_set_must(ctime_result, "ctime_result");
+  return ctime_result;
+  #else
+  static char ctime_result[1];
   return ctime_result;
   #endif
 }

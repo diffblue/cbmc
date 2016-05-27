@@ -1260,10 +1260,7 @@ std::string expr2ct::convert_literal(
   const exprt &src,
   unsigned &precedence)
 {
-  if(src.operands().size()==1)
-    return "L("+src.get_string(ID_literal)+")";
-  else
-    return convert_norep(src, precedence);
+  return "L("+src.get_string(ID_literal)+")";
 }
 
 /*******************************************************************\
@@ -4501,8 +4498,6 @@ std::string expr2ct::convert(
       return convert_prob_coin(src, precedence=16);
     else if(statement=="prob_unif")
       return convert_prob_uniform(src, precedence=16);
-    else if(statement==ID_literal)
-      return convert_literal(src, precedence=16);
     else if(statement==ID_statement_expression)
       return convert_statement_expression(src, precedence=15);
     else if(statement==ID_gcc_builtin_va_arg_next)
@@ -4511,6 +4506,9 @@ std::string expr2ct::convert(
       return convert_norep(src, precedence);
   }
 
+  else if(src.id()==ID_literal)
+    return convert_literal(src, precedence=16);
+    
   else if(src.id()==ID_not)
     return convert_unary(src, "!", precedence=15);
 

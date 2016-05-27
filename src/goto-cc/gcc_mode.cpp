@@ -15,6 +15,7 @@ Author: CM Wintersteiger, 2006
 #include <util/config.h>
 #include <util/prefix.h>
 #include <util/suffix.h>
+#include <util/get_base_name.h>
 
 #include <cbmc/version.h>
 
@@ -64,8 +65,8 @@ Function: gcc_modet::doit
 bool gcc_modet::doit()
 {
   act_as_ld=
-    has_prefix(base_name, "ld") ||
-    has_prefix(base_name, "goto-ld");
+    base_name=="ld" ||
+    base_name.find("goto-ld")!=std::string::npos;
 
   if(cmdline.isset('?') ||
      cmdline.isset("help"))
@@ -156,9 +157,10 @@ bool gcc_modet::doit()
   config.set(cmdline);
 
   // Intel-specific  
-  if(cmdline.isset("m16"))
-    config.ansi_c.set_16();
-  else if(cmdline.isset("m32") || cmdline.isset("mx32"))
+  // in GCC, m16 is 32-bit (!), as documented here:
+  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59672
+  if(cmdline.isset("m16") ||
+     cmdline.isset("m32") || cmdline.isset("mx32"))
   {
     config.ansi_c.arch="i386";
     config.ansi_c.set_arch_spec_i386();
@@ -342,7 +344,8 @@ bool gcc_modet::doit()
           else
             new_suffix=has_suffix(arg_it->arg, ".c")?".i":".ii";
 
-          std::string new_name=get_base_name(arg_it->arg)+new_suffix;
+          std::string new_name=
+            get_base_name(arg_it->arg, true)+new_suffix;
           std::string dest=temp_dir(new_name);
 
           int exit_code=preprocess(language, arg_it->arg, dest);
@@ -392,7 +395,7 @@ bool gcc_modet::doit()
 
   // We can generate hybrid ELF and Mach-O binaries
   // containing both executable machine code and the goto-binary.
-  if(produce_hybrid_binary)
+  if(!result && produce_hybrid_binary)
   {
     if(gcc_hybrid_binary())
       result=true;
@@ -477,9 +480,11 @@ int gcc_modet::preprocess(
   // source file  
   new_argv.push_back(src);
   
+  const char *compiler=compiler_name();
+
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]=compiler_name();
+  new_argv[0]=compiler;
   
   #if 0
   std::cout << "RUN:";
@@ -488,7 +493,7 @@ int gcc_modet::preprocess(
   std::cout << std::endl;
   #endif
   
-  return run(compiler_name(), new_argv);
+  return run(compiler, new_argv, cmdline.stdin_file);
 }
 
 /*******************************************************************\
@@ -518,11 +523,13 @@ int gcc_modet::run_gcc()
     new_argv.push_back(it->arg);
   }
   
-  const char *compiler=compiler_name();
-
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]=compiler;
+
+  if(act_as_ld)
+    new_argv[0]=linker_name();
+  else
+    new_argv[0]=compiler_name();
   
   #if 0
   std::cout << "RUN:";
@@ -531,7 +538,7 @@ int gcc_modet::run_gcc()
   std::cout << std::endl;
   #endif
   
-  return run(compiler, new_argv);
+  return run(new_argv[0], new_argv, cmdline.stdin_file);
 }
 
 /*******************************************************************\
@@ -577,11 +584,9 @@ int gcc_modet::gcc_hybrid_binary()
           i_it=cmdline.parsed_argv.begin();
           i_it!=cmdline.parsed_argv.end();
           i_it++)
-        if(i_it->is_infile_name)
-        {
-          if(needs_preprocessing(i_it->arg))
-            output_files.push_back(get_base_name(i_it->arg)+".o");
-        }
+        if(i_it->is_infile_name &&
+           needs_preprocessing(i_it->arg))
+          output_files.push_back(get_base_name(i_it->arg, true)+".o");
     }
   }
   else
@@ -593,7 +598,9 @@ int gcc_modet::gcc_hybrid_binary()
       output_files.push_back("a.out");      
   }
 
-  if(output_files.empty()) return 0;
+  if(output_files.empty() ||
+     (output_files.size()==1 &&
+      output_files.front()=="/dev/null")) return 0;
 
   if(act_as_ld)
     debug() << "Running ld to generate hybrid binary" << eom;
@@ -639,7 +646,7 @@ int gcc_modet::gcc_hybrid_binary()
   assert(new_argv.size()>=1);
   
   if(act_as_ld)
-    new_argv[0]="ld";
+    new_argv[0]=linker_name();
   else
     new_argv[0]=compiler_name();
   
@@ -650,10 +657,10 @@ int gcc_modet::gcc_hybrid_binary()
   std::cout << std::endl;
   #endif
   
-  int result=run(new_argv[0], new_argv);
+  int result=run(new_argv[0], new_argv, "");
   
   // merge output from gcc with goto-binaries
-  // using objcopy
+  // using objcopy, or do cleanup if an earlier call failed
   for(std::list<std::string>::const_iterator
       it=output_files.begin();
       it!=output_files.end();
@@ -663,7 +670,7 @@ int gcc_modet::gcc_hybrid_binary()
     std::string saved=*it+".goto-cc-saved";
 
     #ifdef __linux__
-    if(!cmdline.isset('c'))
+    if(result==0 && !cmdline.isset('c'))
     {
       // remove any existing goto-cc section
       std::vector<std::string> objcopy_argv;
@@ -672,35 +679,41 @@ int gcc_modet::gcc_hybrid_binary()
       objcopy_argv.push_back("--remove-section=goto-cc");
       objcopy_argv.push_back(*it);
       
-      run(objcopy_argv[0], objcopy_argv);
+      result=run(objcopy_argv[0], objcopy_argv, "");
     }
 
-    // now add goto-binary as goto-cc section  
-    std::vector<std::string> objcopy_argv;
-  
-    objcopy_argv.push_back("objcopy");
-    objcopy_argv.push_back("--add-section");
-    objcopy_argv.push_back("goto-cc="+saved);
-    objcopy_argv.push_back(*it);
-    
-    run(objcopy_argv[0], objcopy_argv);
+    if(result==0)
+    {
+      // now add goto-binary as goto-cc section  
+      std::vector<std::string> objcopy_argv;
+
+      objcopy_argv.push_back("objcopy");
+      objcopy_argv.push_back("--add-section");
+      objcopy_argv.push_back("goto-cc="+saved);
+      objcopy_argv.push_back(*it);
+
+      result=run(objcopy_argv[0], objcopy_argv, "");
+    }
 
     remove(saved.c_str());
     #elif defined(__APPLE__)
     // Mac
-    std::vector<std::string> lipo_argv;
-  
-    // now add goto-binary as hppa7100LC section  
-    lipo_argv.push_back("lipo");
-    lipo_argv.push_back(*it);
-    lipo_argv.push_back("-create");
-    lipo_argv.push_back("-arch");
-    lipo_argv.push_back("hppa7100LC");
-    lipo_argv.push_back(saved);
-    lipo_argv.push_back("-output");
-    lipo_argv.push_back(*it);
-    
-    run(lipo_argv[0], lipo_argv);
+    if(result==0)
+    {
+      std::vector<std::string> lipo_argv;
+
+      // now add goto-binary as hppa7100LC section  
+      lipo_argv.push_back("lipo");
+      lipo_argv.push_back(*it);
+      lipo_argv.push_back("-create");
+      lipo_argv.push_back("-arch");
+      lipo_argv.push_back("hppa7100LC");
+      lipo_argv.push_back(saved);
+      lipo_argv.push_back("-output");
+      lipo_argv.push_back(*it);
+
+      result=run(lipo_argv[0], lipo_argv, "");
+    }
 
     remove(saved.c_str());
 

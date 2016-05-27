@@ -17,7 +17,6 @@ Date: June 2003
 
 #include "goto_convert_functions.h"
 #include "goto_inline.h"
-#include "remove_skip.h"
 
 /*******************************************************************\
 
@@ -81,7 +80,8 @@ void goto_convert_functionst::goto_convert()
        it->second.type.id()==ID_code &&
        (it->second.mode==ID_C ||
         it->second.mode==ID_cpp ||
-        it->second.mode==ID_java))
+        it->second.mode==ID_java ||
+        it->second.mode=="jsil"))
       symbol_list.push_back(it->first);
   }
   
@@ -294,11 +294,6 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   Forall_goto_program_instructions(i_it, f.body)
     i_it->function=identifier;
   
-  // remove_skip depends on the target numbers
-  f.body.compute_target_numbers();
-
-  remove_skip(f.body);
-
   f.body.update();
 
   if(hide(f.body))

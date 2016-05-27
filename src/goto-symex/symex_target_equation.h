@@ -223,11 +223,13 @@ public:
       type(goto_trace_stept::NONE),
       hidden(false),
       guard(static_cast<const exprt &>(get_nil_irep())),
+      guard_literal(const_literal(false)),
       ssa_lhs(static_cast<const ssa_exprt &>(get_nil_irep())),
       ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
       cond_expr(static_cast<const exprt &>(get_nil_irep())),
+      cond_literal(const_literal(false)),
       formatted(false),
       atomic_section_id(0),
       ignore(false)

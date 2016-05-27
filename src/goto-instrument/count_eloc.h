@@ -15,4 +15,6 @@ Date: December 2012
 
 void count_eloc(const goto_functionst &goto_functions);
 
+void list_eloc(const goto_functionst &goto_functions);
+
 #endif

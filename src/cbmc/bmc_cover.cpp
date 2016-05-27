@@ -69,12 +69,9 @@ public:
     
     void output(std::ostream &out)
     {
-      for(block_mapt::const_iterator
-          b_it=block_map.begin();
-          b_it!=block_map.end();
-          b_it++)
-        out << b_it->first->source_location
-            << " -> " << b_it->second
+      for(const auto &b_it : block_map)
+        out << b_it.first->source_location
+            << " -> " << b_it.second
             << '\n';
     }
   };
@@ -86,25 +83,7 @@ public:
   {
   }
   
-  typedef enum { C_LOCATION, C_BRANCH, C_DECISION, C_CONDITION,
-                 C_PATH, C_MCDC, C_ASSERTION } criteriont;
-
-  const char *as_string(criteriont c)
-  {
-    switch(c)
-    {
-    case C_LOCATION: return "location";
-    case C_BRANCH: return "branch";
-    case C_DECISION: return "decision";
-    case C_CONDITION: return "condition";
-    case C_PATH: return "path";
-    case C_MCDC: return "MC/DC";
-    case C_ASSERTION: return "assertion";
-    default: return "";
-    }
-  }
-
-  bool operator()(const criteriont criterion);
+  bool operator()();
 
   virtual void goal_covered(const cover_goalst::goalt &);
 
@@ -154,23 +133,16 @@ public:
     {
       std::vector<exprt> tmp;
 
-      for(instancest::const_iterator
-          it=instances.begin();
-          it!=instances.end();
-          it++)
-        tmp.push_back(literal_exprt(it->condition));
+      for(const auto &it : instances)
+        tmp.push_back(literal_exprt(it.condition));
 
-      return conjunction(tmp);
+      return disjunction(tmp);
     }
   };
   
-  inline irep_idt id(
-    goto_programt::const_targett loc,
-    const std::string suffix="")
+  inline irep_idt id(goto_programt::const_targett loc)
   {
-    return id2string(loc->function)+
-           "#"+i2string(loc->location_number)+
-           suffix;
+    return loc->source_location.get_property_id();
   }
 
   typedef std::map<irep_idt, goalt> goal_mapt;
@@ -198,29 +170,23 @@ Function: bmc_covert::goal_covered
 
 void bmc_covert::goal_covered(const cover_goalst::goalt &)
 {
-  for(goal_mapt::iterator
-      g_it=goal_map.begin();
-      g_it!=goal_map.end();
-      g_it++)
+  for(auto &g_it : goal_map)
   {
-    goalt &g=g_it->second;
+    goalt &g=g_it.second;
     
     // covered already?
     if(g.satisfied) continue;
   
     // check whether satisfied
-    for(goalt::instancest::const_iterator
-        c_it=g.instances.begin();
-        c_it!=g.instances.end();
-        c_it++)
+    for(const auto &c_it : g.instances)
     {
-      literalt cond=c_it->condition;
+      literalt cond=c_it.condition;
       
       if(solver.l_get(cond).is_true())
       {
         status() << "Covered " << g.description << messaget::eom;
         g.satisfied=true;
-        symex_target_equationt::SSA_stepst::iterator next=c_it->step;
+        symex_target_equationt::SSA_stepst::iterator next=c_it.step;
         next++; // include the instruction itself
         build_goto_trace(bmc.equation, next, solver, bmc.ns, g.goto_trace);
         break;
@@ -270,7 +236,7 @@ Function: bmc_covert::operator()
 
 \*******************************************************************/
 
-bool bmc_covert::operator()(const criteriont criterion)
+bool bmc_covert::operator()()
 {
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
@@ -279,20 +245,6 @@ bool bmc_covert::operator()(const criteriont criterion)
   // stop the time
   absolute_timet sat_start=current_time();
 
-  // we don't want the assertions to become constraints
-  for(symex_target_equationt::SSA_stepst::iterator
-      it=bmc.equation.SSA_steps.begin();
-      it!=bmc.equation.SSA_steps.end();
-      it++)
-    if(it->type==goto_trace_stept::ASSERT)
-      it->type=goto_trace_stept::LOCATION;
-  
-  bmc.do_conversion();
-  
-  //bmc.equation.output(std::cout);
-  
-  std::map<goto_programt::const_targett, irep_idt> location_map;
-  
   // Collect _all_ goals in `goal_map'.
   // This maps property IDs to 'goalt'
   forall_goto_functions(f_it, goto_functions)
@@ -301,145 +253,50 @@ bool bmc_covert::operator()(const criteriont criterion)
     
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
-      if(i_it->function==ID__start ||
-         i_it->function=="__CPROVER_initialize")
-        continue;
-        
-      switch(criterion)
-      {
-      case C_ASSERTION:
-        if(i_it->is_assert())
-          goal_map[id(i_it)]=
-            goalt(
-              id2string(i_it->source_location.get_comment()),
-              i_it->source_location);
-        break;
-        
-      case C_LOCATION:
-        {
-          std::string b=i2string(basic_blocks[i_it]);
-          std::string id=id2string(f_it->first)+"#"+b;
-          location_map[i_it]=id;
-          if(goal_map[id].description=="" &&
-             i_it->source_location.get_file()!="")
-          {
-            goal_map[id]=goalt(
-              "block "+i_it->source_location.as_string(),
-              i_it->source_location);
-          }
-        }
-        break;
-      
-      case C_BRANCH:
-        if(i_it->is_goto() && !i_it->guard.is_true())
-        {
-          std::string b=i2string(basic_blocks[i_it]);
-          goal_map[id(i_it, "TRUE")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch true",
-                  i_it->source_location);
-          goal_map[id(i_it, "FALSE")]=
-            goalt("function "+id2string(f_it->first)+" block "+b+" branch false",
-                  i_it->source_location);
-        }
-        break;
-        
-      case C_CONDITION:
-        if(i_it->is_goto())
-        {
-          std::set<exprt> conditions;
-
-          collect_conditions(i_it->guard, conditions);
-          unsigned i=0;
-
-          for(std::set<exprt>::const_iterator it=conditions.begin();
-              it!=conditions.end();
-              it++, i++)
-          {
-            goal_map[id(i_it, "C"+i2string(i))]=
-              goalt("condition "+from_expr(bmc.ns, "", *it),
-                    i_it->source_location);
-          }
-        }
-        break;
-      
-      default:;
-      }
+      if(i_it->is_assert())
+        goal_map[id(i_it)]=
+          goalt(
+            id2string(i_it->source_location.get_comment()),
+            i_it->source_location);
     }
   }
-  
-  // collects assumptions
-  and_exprt::operandst assumptions;
 
+  for(auto & it : bmc.equation.SSA_steps)
+    it.cond_literal=literalt(0, 0);
+  
+  // Do conversion to next solver layer
+  
+  bmc.do_conversion();
+  
+  //bmc.equation.output(std::cout);
+  
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals
-  for(symex_target_equationt::SSA_stepst::iterator
-      it=bmc.equation.SSA_steps.begin();
+  for(auto it = bmc.equation.SSA_steps.begin();
       it!=bmc.equation.SSA_steps.end();
       it++)
   {
-    if(it->is_assume())
-      assumptions.push_back(literal_exprt(it->cond_literal));
-  
-    if(it->source.pc->function==ID__start ||
-       it->source.pc->function=="__CPROVER_initialize")
-      continue;
-      
-    switch(criterion)
+    if(it->is_assert())
     {
-    case C_ASSERTION:
-      if(it->source.pc->is_assert())
-      {
-        and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
-        literalt c=solver.convert(c_expr);
-        goal_map[id(it->source.pc)].add_instance(it, c);
-      }
-      break;
-      
-    case C_LOCATION:
-      if(it->assignment_type!=symex_targett::PHI &&
-         it->assignment_type!=symex_targett::GUARD)
-      {
-        and_exprt c_expr(conjunction(assumptions), literal_exprt(it->guard_literal));
-        literalt c=solver.convert(c_expr);
-        irep_idt id=location_map[it->source.pc];
-        goal_map[id].add_instance(it, c);
-      }
-      break;
-    
-    case C_BRANCH:
-      if(it->is_goto() &&
-         it->source.pc->is_goto() &&
-         !it->source.pc->guard.is_true())
-      {
-        and_exprt c_true_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(!it->cond_literal));
-        and_exprt c_false_expr(conjunction(assumptions), literal_exprt(it->guard_literal), literal_exprt(it->cond_literal));
-        literalt c_true=solver.convert(c_true_expr);
-        literalt c_false=solver.convert(c_false_expr);
-
-        // a branch can have three states:
-        // 1) taken 2) not taken 3) not executed!
-
-        goal_map[id(it->source.pc, "TRUE")].add_instance(it, c_true);
-        goal_map[id(it->source.pc, "FALSE")].add_instance(it, c_false);
-      }
-      break;
-      
-    default:;
+      assert(it->source.pc->is_assert());
+      exprt c=
+        conjunction({
+          literal_exprt(it->guard_literal),
+          literal_exprt(!it->cond_literal) });
+      literalt l_c=solver.convert(c);
+      goal_map[id(it->source.pc)].add_instance(it, l_c);
     }
   }
   
-  status() << "Aiming to cover " << goal_map.size() << " goals" << eom;
+  status() << "Aiming to cover " << goal_map.size() << " goal(s)" << eom;
   
   cover_goalst cover_goals(solver);
   
   cover_goals.register_observer(*this);
   
-  for(goal_mapt::const_iterator
-      it=goal_map.begin();
-      it!=goal_map.end();
-      it++)
+  for(const auto &it : goal_map)
   {
-    literalt l=solver.convert(it->second.as_expr());
+    literalt l=solver.convert(it.second.as_expr());
     cover_goals.add(l);
   }
   
@@ -461,24 +318,21 @@ bool bmc_covert::operator()(const criteriont criterion)
   if(bmc.ui!=ui_message_handlert::XML_UI)
   {
     status() << eom;
-    status() << "** " << as_string(criterion) << " coverage results:" << eom;
+    status() << "** coverage results:" << eom;
   }
   
   unsigned goals_covered=0;
   
-  for(goal_mapt::const_iterator
-      it=goal_map.begin();
-      it!=goal_map.end();
-      it++)
+  for(const auto & it : goal_map)
   {
-    const goalt &goal=it->second;
+    const goalt &goal=it.second;
     
     if(goal.satisfied) goals_covered++;
   
     if(bmc.ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
-      xml_result.set_attribute("goal", id2string(it->first));
+      xml_result.set_attribute("goal", id2string(it.first));
       xml_result.set_attribute("description", goal.description);
       xml_result.set_attribute("status", goal.satisfied?"SATISFIED":"FAILED");
       
@@ -492,8 +346,13 @@ bool bmc_covert::operator()(const criteriont criterion)
     }
     else
     {
-      status() << "[" << it->first << "]";
+      status() << "[" << it.first << "]";
+
+      if(goal.source_location.is_not_nil())
+        status() << ' ' << goal.source_location;
+        
       if(!goal.description.empty()) status() << ' ' << goal.description;
+
       status() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
                << eom;
     }
@@ -503,9 +362,12 @@ bool bmc_covert::operator()(const criteriont criterion)
   
   status() << "** " << goals_covered
            << " of " << goal_map.size() << " covered ("
+           << std::fixed << std::setw(1) << std::setprecision(1)
+           << (goal_map.empty()?0.0:100.0*goals_covered/goal_map.size())
+           << "%), using "
            << cover_goals.iterations() << " iteration"
            << (cover_goals.iterations()==1?"":"s")
-           << ")" << eom;
+           << eom;
   
   return false;
 }
@@ -526,30 +388,7 @@ bool bmct::cover(
   const goto_functionst &goto_functions,
   const std::string &criterion)
 {
-  bmc_covert::criteriont c;
-  
-  if(criterion=="assertion" || criterion=="assertions")
-    c=bmc_covert::C_ASSERTION;
-  else if(criterion=="path" || criterion=="paths")
-    c=bmc_covert::C_PATH;
-  else if(criterion=="branch" || criterion=="branches")
-    c=bmc_covert::C_BRANCH;
-  else if(criterion=="location" || criterion=="locations")
-    c=bmc_covert::C_LOCATION;
-  else if(criterion=="decision" || criterion=="decisions")
-    c=bmc_covert::C_DECISION;
-  else if(criterion=="condition" || criterion=="conditions")
-    c=bmc_covert::C_CONDITION;
-  else if(criterion=="mcdc")
-    c=bmc_covert::C_MCDC;
-  else
-  {
-    error() << "coverage criterion `" << criterion << "' is unknown"
-            << eom;
-    return true;
-  }
-
   bmc_covert bmc_cover(goto_functions, *this);
   bmc_cover.set_message_handler(get_message_handler());
-  return bmc_cover(c);
+  return bmc_cover();
 }

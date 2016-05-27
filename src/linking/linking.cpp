@@ -564,7 +564,10 @@ void linkingt::duplicate_code_symbol(
       }
     }
     // mismatch on number of parameters is definitively an error
-    else if(old_t.parameters().size()!=new_t.parameters().size())
+    else if((old_t.parameters().size()<new_t.parameters().size() &&
+             !old_t.has_ellipsis()) ||
+            (old_t.parameters().size()>new_t.parameters().size() &&
+             !new_t.has_ellipsis()))
     {
       link_error(
         old_symbol,
@@ -584,16 +587,27 @@ void linkingt::duplicate_code_symbol(
         conflicts.push_back(
           std::make_pair(old_t.return_type(), new_t.return_type()));
 
-      code_typet::parameterst::const_iterator n_it=
-        new_t.parameters().begin();
-      for(code_typet::parameterst::const_iterator
-          o_it=old_t.parameters().begin();
-          o_it!=old_t.parameters().end();
+      code_typet::parameterst::const_iterator
+        n_it=new_t.parameters().begin(),
+        o_it=old_t.parameters().begin();
+      for( ;
+          o_it!=old_t.parameters().end() &&
+          n_it!=new_t.parameters().end();
           ++o_it, ++n_it)
       {
         if(!base_type_eq(o_it->type(), n_it->type(), ns))
           conflicts.push_back(
             std::make_pair(o_it->type(), n_it->type()));
+      }
+      if(o_it!=old_t.parameters().end())
+      {
+        assert(new_t.has_ellipsis());
+        replace=new_symbol.value.is_not_nil();
+      }
+      else if(n_it!=new_t.parameters().end())
+      {
+        assert(old_t.has_ellipsis());
+        replace=new_symbol.value.is_not_nil();
       }
 
       while(!conflicts.empty())
@@ -635,12 +649,10 @@ void linkingt::duplicate_code_symbol(
         // _GNU_SOURCE consistent
         else if((t1.id()==ID_union &&
                  (t1.get_bool(ID_C_transparent_union) ||
-                  conflicts.front().first.get_bool(ID_C_transparent_union)) &&
-                 new_symbol.value.is_nil()) ||
+                  conflicts.front().first.get_bool(ID_C_transparent_union))) ||
                 (t2.id()==ID_union &&
                  (t2.get_bool(ID_C_transparent_union) ||
-                  conflicts.front().second.get_bool(ID_C_transparent_union)) &&
-                 old_symbol.value.is_nil()))
+                  conflicts.front().second.get_bool(ID_C_transparent_union))))
         {
           const bool use_old=
             t1.id()==ID_union &&
@@ -648,14 +660,14 @@ void linkingt::duplicate_code_symbol(
              conflicts.front().first.get_bool(ID_C_transparent_union)) &&
             new_symbol.value.is_nil();
 
-          const union_typet &dest_union_type=
-            to_union_type(use_old?t1:t2);
-          const typet &src_type=use_old?t2:t1;
+          const union_typet &union_type=
+            to_union_type(t1.id()==ID_union?t1:t2);
+          const typet &src_type=t1.id()==ID_union?t2:t1;
 
           bool found=false;
           for(union_typet::componentst::const_iterator
-              it=dest_union_type.components().begin();
-              !found && it!=dest_union_type.components().end();
+              it=union_type.components().begin();
+              !found && it!=union_type.components().end();
               it++)
             if(base_type_eq(it->type(), src_type, ns))
             {

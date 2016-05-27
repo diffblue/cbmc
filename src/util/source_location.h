@@ -25,6 +25,11 @@ public:
     return get(ID_file);
   }
 
+  inline const irep_idt &get_working_directory() const
+  {
+    return get(ID_working_directory);
+  }
+
   inline const irep_idt &get_line() const
   {
     return get(ID_line);
@@ -58,6 +63,11 @@ public:
   inline void set_file(const irep_idt &file)
   {
     set(ID_file, file);
+  }
+
+  inline void set_working_directory(const irep_idt &cwd)
+  {
+    set(ID_working_directory, cwd);
   }
 
   inline void set_line(const irep_idt &line)

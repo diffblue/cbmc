@@ -75,6 +75,4 @@ protected:
   void convert_symbols(goto_functionst &dest);
 };
 
-std::string get_base_name(const std::string &);
-
 #endif /*COMPILE_H_*/

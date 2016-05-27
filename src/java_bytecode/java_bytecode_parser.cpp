@@ -540,6 +540,7 @@ void java_bytecode_parsert::rconstant_pool()
         exprt virtual_function(ID_virtual_function, type);
         virtual_function.set(ID_component_name, component_name);
         virtual_function.set(ID_C_class, class_name);
+        virtual_function.set(ID_C_base_name, name_entry.s);
         virtual_function.set(ID_identifier, identifier);
         
         it->expr=virtual_function;

@@ -51,7 +51,28 @@ Function: jsil_languaget::modules_provided
 
 void jsil_languaget::modules_provided(std::set<std::string> &modules)
 {
-  modules.insert(get_base_name(parse_path));
+  modules.insert(get_base_name(parse_path, true));
+}
+
+/*******************************************************************\
+
+Function: jsil_languaget::interfaces
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Adding symbols for all procedure declarations
+
+\*******************************************************************/
+
+bool jsil_languaget::interfaces(symbol_tablet &symbol_table)
+{
+  if(jsil_convert(parse_tree, symbol_table, get_message_handler()))
+    return true;
+
+  jsil_internal_additions(symbol_table);
+  return false;
 }
 
 /*******************************************************************\
@@ -120,7 +141,7 @@ Function: jsil_languaget::typecheck
 
  Outputs:
 
- Purpose:
+ Purpose: Converting from parse tree and type checking.
 
 \*******************************************************************/
 
@@ -128,10 +149,6 @@ bool jsil_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  if(jsil_convert(parse_tree, symbol_table, get_message_handler()))
-    return true;
-
-  // now typecheck
   if(jsil_typecheck(symbol_table, get_message_handler()))
     return true;
 
@@ -152,7 +169,6 @@ Function: jsil_languaget::final
 
 bool jsil_languaget::final(symbol_tablet &symbol_table)
 {
-  jsil_internal_additions(symbol_table);
 
   if(jsil_entry_point(
       symbol_table,

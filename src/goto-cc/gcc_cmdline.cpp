@@ -74,6 +74,7 @@ const char *gcc_options_with_separated_argument[]=
   "--include", // undocumented
   "-current_version", // on the Mac
   "-compatibility_version",  // on the Mac
+  "-z",
   NULL
 };
 
@@ -241,7 +242,15 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
     }
     else if(has_prefix(argv_i, "-m")) // m-options
     {
-      set(argv_i);
+      // these sometimes come with a value separated by '=', e.g., -march=cpu_type
+    
+      std::size_t equal_pos=argv_i.find('=');
+      
+      if(equal_pos==std::string::npos)
+        set(argv_i); // no value
+      else
+        set(std::string(argv_i, 0, equal_pos),
+            std::string(argv_i, equal_pos+1, std::string::npos));
     }
     else if(in_list(argv[i], gcc_options_without_argument)) // without argument
     {

@@ -790,6 +790,83 @@ void configt::ansi_ct::set_arch_spec_v850()
 
 /*******************************************************************\
 
+Function: configt::ansi_ct::set_arch_spec_hppa
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_hppa()
+{
+  set_ILP32();
+  long_double_width=8*8; // different from i386
+  endianness=endiannesst::IS_BIG_ENDIAN;
+  char_is_unsigned=false;
+  NULL_is_zero=true;
+
+  switch(mode)
+  {
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
+    defines.push_back("__hppa__");
+    break;
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+    assert(false); // not supported by Visual Studio
+    break;
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
+    break;
+  case flavourt::NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_sh4
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_sh4()
+{
+  set_ILP32();
+  long_double_width=8*8; // different from i386
+  endianness=endiannesst::IS_LITTLE_ENDIAN;
+  char_is_unsigned=false;
+  NULL_is_zero=true;
+
+  switch(mode)
+  {
+  case flavourt::MODE_GCC_C:
+  case flavourt::MODE_GCC_CPP:
+    defines.push_back("__sh__");
+    defines.push_back("__SH4__");
+    break;
+  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+    assert(false); // not supported by Visual Studio
+    break;
+  case flavourt::MODE_CODEWARRIOR_C_CPP:
+  case flavourt::MODE_ARM_C_CPP:
+  case flavourt::MODE_ANSI_C_CPP:
+    break;
+  case flavourt::NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
 Function: configt::ansi_ct::default_c_standard
 
   Inputs:
@@ -889,6 +966,10 @@ void configt::set_arch(const irep_idt &arch)
     ansi_c.set_arch_spec_x32();
   else if(arch=="v850")
     ansi_c.set_arch_spec_v850();
+  else if(arch=="hppa")
+    ansi_c.set_arch_spec_hppa();
+  else if(arch=="sh4")
+    ansi_c.set_arch_spec_sh4();
   else if(arch=="x86_64")
     ansi_c.set_arch_spec_x86_64();
   else if(arch=="i386")
@@ -1467,6 +1548,10 @@ irep_idt configt::this_architecture()
   this_arch="x86_64";
   #elif _WIN32
   this_arch="i386";
+  #elif __hppa__
+  this_arch="hppa";
+  #elif __sh__
+  this_arch="sh4";
   #else
   // something new and unknown!
   this_arch="unknown";

@@ -88,7 +88,7 @@ void remove_returnst::replace_returns(
     new_symbol.name=id2string(function_symbol.name)+RETURN_VALUE_SUFFIX;
     new_symbol.mode=function_symbol.mode;
     new_symbol.type=return_type;
-
+    
     symbol_table.add(new_symbol);
   }
 
@@ -167,11 +167,18 @@ void remove_returnst::do_function_calls(
         {
           exprt rhs;
           
-          symbol_exprt return_value;
-          return_value.type()=function_call.lhs().type();
-          return_value.set_identifier(id2string(function_id)+RETURN_VALUE_SUFFIX);
-          rhs=return_value;
-
+          if(f_it->second.body_available())
+          {
+            symbol_exprt return_value;
+            return_value.type()=function_call.lhs().type();
+            return_value.set_identifier(id2string(function_id)+RETURN_VALUE_SUFFIX);
+            rhs=return_value;
+          }
+          else
+          {
+            rhs=side_effect_expr_nondett(function_call.lhs().type());
+          }
+          
           goto_programt::targett t_a=goto_program.insert_after(i_it);
           t_a->make_assignment();
           t_a->source_location=i_it->source_location;

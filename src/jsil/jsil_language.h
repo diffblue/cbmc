@@ -62,6 +62,7 @@ public:
   virtual std::set<std::string> extensions() const;
 
   virtual void modules_provided(std::set<std::string> &modules);
+  virtual bool interfaces(symbol_tablet &symbol_table);
 
 protected:
   jsil_parse_treet parse_tree;

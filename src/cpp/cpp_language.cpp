@@ -12,12 +12,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/config.h>
 #include <util/replace_symbol.h>
+#include <util/get_base_name.h>
 
 #include <linking/linking.h>
 
 #include <ansi-c/ansi_c_entry_point.h>
 #include <ansi-c/c_preprocess.h>
-#include <ansi-c/trans_unit.h>
 
 #include "cpp_internal_additions.h"
 #include "cpp_language.h"
@@ -70,7 +70,7 @@ Function: cpp_languaget::modules_provided
 
 void cpp_languaget::modules_provided(std::set<std::string> &modules)
 {
-  modules.insert(translation_unit(parse_path));
+  modules.insert(get_base_name(parse_path, true));
 }
 
 /*******************************************************************\

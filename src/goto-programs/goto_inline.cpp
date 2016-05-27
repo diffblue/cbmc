@@ -414,7 +414,8 @@ void goto_inlinet::expand_function_call(
      identifier=="__CPROVER_set_must" ||
      identifier=="__CPROVER_set_may" ||
      identifier=="__CPROVER_clear_must" ||
-     identifier=="__CPROVER_clear_may")
+     identifier=="__CPROVER_clear_may" ||
+     identifier=="__CPROVER_cover")
   {
     target++;
     return; // ignore

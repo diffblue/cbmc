@@ -96,6 +96,8 @@ public:
     void set_arch_spec_ia64();
     void set_arch_spec_x32();
     void set_arch_spec_v850();
+    void set_arch_spec_hppa();
+    void set_arch_spec_sh4();
     
     enum class flavourt { NO_MODE, MODE_ANSI_C_CPP, MODE_GCC_C, MODE_GCC_CPP,
                           MODE_VISUAL_STUDIO_C_CPP,

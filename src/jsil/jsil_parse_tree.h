@@ -29,12 +29,32 @@ public:
     add(ID_declarator, expr);
   }
 
+  const symbol_exprt &declarator() const
+  {
+    return static_cast<const symbol_exprt &>(find(ID_declarator));
+  }
+
+  symbol_exprt &declarator()
+  {
+    return static_cast<symbol_exprt &>(add(ID_declarator));
+  }
+
   void add_returns(
     const irep_idt &value,
     const irep_idt &label)
   {
     add(ID_return).set(ID_value, value);
     add(ID_return).set(ID_label, label);
+  }
+
+  const irep_idt &returns_value() const
+  {
+    return find(ID_return).get(ID_value);
+  }
+
+  const irep_idt &returns_label() const
+  {
+    return find(ID_return).get(ID_label);
   }
 
   void add_throws(
@@ -45,9 +65,29 @@ public:
     add(ID_throw).set(ID_label, label);
   }
 
+  const irep_idt &throws_value() const
+  {
+    return find(ID_throw).get(ID_value);
+  }
+
+  const irep_idt &throws_label() const
+  {
+    return find(ID_throw).get(ID_label);
+  }
+
   void add_value(const code_blockt &code)
   {
     add(ID_value, code);
+  }
+
+  const code_blockt &value() const
+  {
+    return static_cast<const code_blockt &>(find(ID_value));
+  }
+
+  code_blockt &value()
+  {
+    return static_cast<code_blockt &>(add(ID_value));
   }
 
   void to_symbol(symbolt &symbol) const;

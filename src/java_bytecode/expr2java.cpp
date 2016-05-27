@@ -113,7 +113,7 @@ std::string expr2javat::convert_code_function_call(
 
   const exprt::operandst &arguments=src.arguments();
   
-  bool first=false;
+  bool first=true;
 
   forall_expr(it, arguments)
   {

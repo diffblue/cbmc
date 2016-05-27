@@ -55,6 +55,7 @@ src/cbmc/cbmc
 src/goto-analyzer/goto-analyzer
 src/goto-cc/goto-cc
 src/goto-instrument/goto-instrument
+src/musketeer/musketeer
 
 # build tools
 src/ansi-c/file_converter

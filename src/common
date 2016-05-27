@@ -100,7 +100,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CP_CXXFLAGS = -MMD -MP -std=c++11 -U__STRICT_ANSI__
   LINKFLAGS = -static -std=c++11
   LINKLIB = ar rcT $@ $^
-  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS) -static 
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS) -static
   LINKNATIVE = $(HOSTCXX) -std=c++11 -o $@ $^ -static
 ifeq ($(origin CC),default)
   #CC = gcc
@@ -127,7 +127,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   CFLAGS ?= /W3 /O2 /GF
   CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF
   CP_CFLAGS =
-  CP_CXXFLAGS = 
+  CP_CXXFLAGS =
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ $^ $(LIBS)
   LINKNATIVE = $(HOSTCXX) /Fe$@ $^
@@ -161,7 +161,7 @@ CP_CXXFLAGS += $(CXXFLAGS) $(INCLUDES)
 OBJ += $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC)))
 OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 
-.SUFFIXES:	.cc .d .cpp
+.SUFFIXES: .cc .d .cpp
 
 %.o:%.cpp
 	$(CXX) -c $(CP_CXXFLAGS) -o $@ $<
