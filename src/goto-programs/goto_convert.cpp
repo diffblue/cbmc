@@ -419,8 +419,6 @@ void goto_convertt::convert(
   const codet &code,
   goto_programt &dest)
 {
-  std::size_t old_tmp_symbols_size=tmp_symbols.size();
-
   const irep_idt &statement=code.get_statement();
   
   if(statement==ID_block)
@@ -542,50 +540,12 @@ void goto_convertt::convert(
   else
     copy(code, OTHER, dest);
 
-  // We only need to kill the temporaries if control
-  // can get to the end of the block.
-  #if 0
-  if(!dest.empty() &&
-     dest.instructions.back().is_goto() &&
-     dest.instructions.back().guard.is_true())
-    tmp_symbols.resize(old_tmp_symbols_size);
-  else
-    kill_tmp_symbols(old_tmp_symbols_size, dest);
-  #else
-  kill_tmp_symbols(old_tmp_symbols_size, dest);
-  #endif
-
   // make sure dest is never empty
   if(dest.instructions.empty())
   {
     dest.add_instruction(SKIP);
     dest.instructions.back().code.make_nil();
     dest.instructions.back().source_location=code.source_location();
-  }
-}
-
-/*******************************************************************\
-
-Function: goto_convertt::kill_tmp_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void goto_convertt::kill_tmp_symbols(
-  std::size_t final_size,
-  goto_programt &dest)
-{
-  while(tmp_symbols.size()>final_size)
-  {
-    symbol_exprt symbol=tmp_symbols.back();
-    tmp_symbols.pop_back();
-    dest.add_instruction(DEAD);
-    dest.instructions.back().code=code_deadt(symbol);
   }
 }
 
@@ -617,7 +577,8 @@ void goto_convertt::convert_block(
     convert(b_code, dest);
   }
 
-  // see if we need to do any destructors
+  // see if we need to do any destructors -- may have been processed
+  // in a prior break/continue/return already, don't create dead code
   if(!dest.empty() &&
      dest.instructions.back().is_goto() &&
      dest.instructions.back().guard.is_true())
@@ -2564,11 +2525,10 @@ symbolt &goto_convertt::new_tmp_symbol(
     new_symbol.location=source_location;
   } while(symbol_table.move(new_symbol, symbol_ptr));    
   
-  tmp_symbols.push_back(symbol_ptr->symbol_expr());
-  
-  goto_programt::targett t=dest.add_instruction(DECL);
-  t->code=code_declt(symbol_ptr->symbol_expr());
-  t->source_location=source_location;
+  code_declt decl;
+  decl.symbol()=symbol_ptr->symbol_expr();
+  decl.add_source_location()=source_location;
+  convert_decl(decl, dest);
 
   return *symbol_ptr;  
 }

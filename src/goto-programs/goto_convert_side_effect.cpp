@@ -417,8 +417,6 @@ void goto_convertt::remove_function_call(
 
   new_name(new_symbol);
   
-  tmp_symbols.push_back(new_symbol.symbol_expr());
-  
   {
     code_declt decl;
     decl.symbol()=new_symbol.symbol_expr();
@@ -488,7 +486,11 @@ void goto_convertt::remove_cpp_new(
   new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 
   new_name(new_symbol);
-  tmp_symbols.push_back(new_symbol.symbol_expr());
+
+  code_declt decl;
+  decl.symbol()=new_symbol.symbol_expr();
+  decl.add_source_location()=new_symbol.location;
+  convert_decl(decl, dest);
 
   call=code_assignt(new_symbol.symbol_expr(), expr);
 
@@ -560,7 +562,6 @@ void goto_convertt::remove_malloc(
     new_symbol.location=expr.source_location();
 
     new_name(new_symbol);
-    tmp_symbols.push_back(new_symbol.symbol_expr());
 
     code_declt decl;
     decl.symbol()=new_symbol.symbol_expr();
@@ -703,15 +704,9 @@ void goto_convertt::remove_statement_expression(
            id2string(last.get(ID_statement))+"'";
 
   {
-    // this likely needs to be a proper stack
-    tmp_symbolst old_tmp_symbols;
-    old_tmp_symbols.swap(tmp_symbols);
-    
     goto_programt tmp;  
     convert(code, tmp);
     dest.destructive_append(tmp);
-  
-    old_tmp_symbols.swap(tmp_symbols);
   }
 
   static_cast<exprt &>(expr)=tmp_symbol_expr;

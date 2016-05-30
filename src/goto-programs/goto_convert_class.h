@@ -63,9 +63,6 @@ protected:
   symbol_exprt make_compound_literal(
     const exprt &expr,
     goto_programt &dest);
-  
-  typedef std::list<symbol_exprt> tmp_symbolst;
-  tmp_symbolst tmp_symbols;
 
   //
   // translation of C expressions (with side effects)
@@ -87,8 +84,6 @@ protected:
     exprt &expr,
     const std::string &suffix,
     goto_programt &);
-    
-  void kill_tmp_symbols(std::size_t, goto_programt &);
 
   void rewrite_boolean(exprt &dest);
 
