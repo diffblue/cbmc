@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <iostream>
+#include <sstream>
 #include <cassert>
 
 #include <util/expr_util.h>
@@ -121,23 +122,30 @@ void goto_symext::parameter_assignments(
             f_parameter_type.id()==ID_unsignedbv ||
             f_parameter_type.id()==ID_c_enum_tag ||
             f_parameter_type.id()==ID_bool ||
-            f_parameter_type.id()==ID_pointer) &&
+            f_parameter_type.id()==ID_pointer ||
+            f_parameter_type.id()==ID_union) &&
            (f_rhs_type.id()==ID_signedbv ||
             f_rhs_type.id()==ID_unsignedbv ||
             f_rhs_type.id()==ID_c_bit_field ||
             f_rhs_type.id()==ID_c_enum_tag ||
             f_rhs_type.id()==ID_bool ||
-            f_rhs_type.id()==ID_pointer))
+            f_rhs_type.id()==ID_pointer ||
+            f_rhs_type.id()==ID_union))
         {
-          rhs.make_typecast(parameter_type);
+          rhs=
+            byte_extract_exprt(
+              byte_extract_id(),
+              rhs,
+              gen_zero(index_type()),
+              parameter_type);
         }
         else
         {
-          std::string error="function call: parameter \""+
-            id2string(identifier)+"\" type mismatch: got "+
-            rhs.type().to_string()+", expected "+
-            parameter_type.to_string();
-          throw error;
+          std::ostringstream error;
+          error << "function call: parameter \"" << identifier
+                << "\" type mismatch: got " << rhs.type().pretty()
+                << ", expected " << parameter_type.pretty();
+          throw error.str();
         }
       }
       
