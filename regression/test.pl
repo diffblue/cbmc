@@ -59,7 +59,7 @@ sub load($) {
 
 sub test($$$$$) {
   my ($name, $test, $t_level, $cmd, $ign) = @_;
-  my ($level, $input, $options, @results) = load("$name/$test");
+  my ($level, $input, $options, @results) = load("$test");
   $options =~ s/$ign//g if(defined($ign));
 
   my $output = $input;
@@ -107,7 +107,7 @@ sub test($$$$$) {
           my $r;
           $result =~ s/\\/\\\\/g;
           $result =~ s/([^\\])\$/$1\\r\\\\?\$/;
-          system("bash", "-c", "grep \$'$result' '$name/$output' >/dev/null");
+          system("bash", "-c", "grep \$'$result' \"$name/$output\" >/dev/null");
           $r = ($included ? $? != 0 : $? == 0);
           if($r) {
             print LOG "$result [FAILED]\n";
@@ -212,7 +212,11 @@ open LOG,">tests.log";
 
 print "Loading\n";
 my @tests = @ARGV != 0 ? @ARGV : dirs();
-my $count = @tests;
+my $count = 0;
+for (@tests){
+  my @testfiles = glob "$_/*desc";
+  $count += $#testfiles+1;
+}
 print "  $count " . (1==$count?"test":"tests") . " found\n\n";
 
 use Cwd qw(getcwd);
@@ -225,20 +229,22 @@ sub do_test($)
 {
   my ($test) = @_;
   my $failed_skipped = 0;
+  my @files = glob "$test/*.desc";
+  for (0..$#files){
+    defined($pool) or print "  Running $files[$_]";
+    $failed_skipped = test($test, $files[$_], $t_level, $opt_c, $opt_i);
 
-  defined($pool) or print "  Running $test";
-  $failed_skipped = test($test, "test.desc", $t_level, $opt_c, $opt_i);
-
-  lock($skips);
-  defined($pool) and print "  Running $test";
-  if(2 == $failed_skipped) {
-    $skips++;
-    print "  [SKIPPED]\n";
-  } elsif(0 == $failed_skipped) {
-    print "  [OK]\n";
-  } else {
-    $failures++;
-    print "  [FAILED]\n";
+    lock($skips);
+    defined($pool) and print "  Running $test $files[$_]";
+    if(2 == $failed_skipped) {
+      $skips++;
+      print "  [SKIPPED]\n";
+    } elsif(0 == $failed_skipped) {
+      print "  [OK]\n";
+    } else {
+      $failures++;
+      print "  [FAILED]\n";
+    }
   }
 }
 
