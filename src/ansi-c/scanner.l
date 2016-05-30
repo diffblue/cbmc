@@ -195,6 +195,7 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %x MSC_PRAGMA
 %x MSC_ANNOTATION
 %x GCC_ATTRIBUTE1
+%x GCC_ATTRIBUTE1a
 %x GCC_ATTRIBUTE2
 %x GCC_ATTRIBUTE3
 %x GCC_ATTRIBUTE4
@@ -1346,8 +1347,22 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 }
 
 <GCC_ATTRIBUTE1>{
-"("{ws}"(" |
-"("{newline}"(" { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; }
+{cpplineno}     {
+                  preprocessor_line(yytext, PARSER);
+                  PARSER.set_line_no(PARSER.get_line_no()-1);
+                }
+{ws}            { /* ignore */ }
+{newline}       { /* ignore */ }
+"("             { BEGIN(GCC_ATTRIBUTE1a); }
+.               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
+}
+
+<GCC_ATTRIBUTE1a>{
+{cpplineno}     {
+                  preprocessor_line(yytext, PARSER);
+                  PARSER.set_line_no(PARSER.get_line_no()-1);
+                }
+"("             { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
@@ -1378,6 +1393,12 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 "noreturn" |
 "__noreturn__"      { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_NORETURN; }
 
+"constructor" |
+"__constructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_CONSTRUCTOR; }
+
+"destructor" |
+"__destructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_DESTRUCTOR; }
+
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
 {identifier}        { BEGIN(GCC_ATTRIBUTE4); }
@@ -1386,6 +1407,10 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 }
 
 <GCC_ATTRIBUTE3>{ // an attribute we do process
+{cpplineno}     {
+                  preprocessor_line(yytext, PARSER);
+                  PARSER.set_line_no(PARSER.get_line_no()-1);
+                }
 "("             { PARSER.parenthesis_counter++; loc(); return '('; }
 ")"             { if(PARSER.parenthesis_counter==0)
                   {
@@ -1436,6 +1461,10 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 }
 
 <GCC_ATTRIBUTE5>{ // end bit: the closing parenthesis
+{cpplineno}     {
+                  preprocessor_line(yytext, PARSER);
+                  PARSER.set_line_no(PARSER.get_line_no()-1);
+                }
 ")"             { BEGIN(GRAMMAR); }
 {ws}            { /* Throw away */ }
 {newline}       { /* Throw away */ }

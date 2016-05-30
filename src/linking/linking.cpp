@@ -217,6 +217,8 @@ void linkingt::detailed_conflict_report_rec(
     const struct_union_typet::componentst &components2=
       to_struct_union_type(t2).components();
 
+    exprt conflict_path_before=conflict_path;
+
     if(components1.size()!=components2.size())
     {
       msg="number of members is different (";
@@ -238,11 +240,25 @@ void linkingt::detailed_conflict_report_rec(
         }
         else if(!base_type_eq(subtype1, subtype2, ns))
         {
+          typedef hash_set_cont<typet, irep_hash> type_sett;
+          type_sett parent_types;
+
+          exprt e=conflict_path_before;
+          while(e.id()==ID_dereference ||
+                e.id()==ID_member ||
+                e.id()==ID_index)
+          {
+            parent_types.insert(e.type());
+            e=e.op0();
+          }
+
+          conflict_path=conflict_path_before;
           conflict_path.type()=t1;
           conflict_path=
             member_exprt(conflict_path, components1[i].get_name());
 
-          if(depth>0)
+          if(depth>0 &&
+             parent_types.find(t1)==parent_types.end())
             detailed_conflict_report_rec(
               old_symbol,
               new_symbol,
@@ -251,11 +267,29 @@ void linkingt::detailed_conflict_report_rec(
               depth-1,
               conflict_path);
           else
+          {
             msg="type of member "+
                 id2string(components1[i].get_name())+
                 " differs";
+            if(depth>0)
+            {
+              std::string msg_bak;
+              msg_bak.swap(msg);
+              symbol_exprt c(ID_C_this);
+              detailed_conflict_report_rec(
+                old_symbol,
+                new_symbol,
+                subtype1,
+                subtype2,
+                depth-1,
+                c);
+              msg.swap(msg_bak);
+            }
 
-          break;
+          }
+
+          if(parent_types.find(t1)==parent_types.end())
+            break;
         }
       }
   }
@@ -542,6 +576,7 @@ void linkingt::duplicate_code_symbol(
 
       old_symbol.type=new_symbol.type;
       old_symbol.location=new_symbol.location;
+      old_symbol.is_weak=new_symbol.is_weak;
     }
     else if(!new_symbol.location.get_function().empty() &&
             new_symbol.value.is_nil())
@@ -561,6 +596,57 @@ void linkingt::duplicate_code_symbol(
       {
         old_symbol.type=new_symbol.type;
         old_symbol.location=new_symbol.location;
+        old_symbol.is_weak=new_symbol.is_weak;
+      }
+    }
+    // replace weak symbols
+    else if(old_symbol.is_weak)
+    {
+      if(new_symbol.value.is_nil())
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "function declaration conflicts with with weak definition");
+      else
+        old_symbol.value.make_nil();
+    }
+    else if(new_symbol.is_weak)
+    {
+      if(new_symbol.value.is_nil() ||
+         old_symbol.value.is_not_nil())
+      {
+        new_symbol.value.make_nil();
+
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "ignoring conflicting weak function declaration");
+      }
+    }
+    // Linux kernel uses void f(void) as generic prototype
+    else if((old_t.return_type().id()==ID_empty &&
+             old_t.parameters().empty() &&
+             !old_t.has_ellipsis() &&
+             old_symbol.value.is_nil()) ||
+            (new_t.return_type().id()==ID_empty &&
+             new_t.parameters().empty() &&
+             !new_t.has_ellipsis() &&
+             new_symbol.value.is_nil()))
+    {
+      // issue a warning
+      link_warning(
+        old_symbol,
+        new_symbol,
+        "ignoring conflicting void f(void) function declaration");
+
+      if(old_t.return_type().id()==ID_empty &&
+         old_t.parameters().empty() &&
+         !old_t.has_ellipsis() &&
+         old_symbol.value.is_nil())
+      {
+        old_symbol.type=new_symbol.type;
+        old_symbol.location=new_symbol.location;
+        old_symbol.is_weak=new_symbol.is_weak;
       }
     }
     // mismatch on number of parameters is definitively an error
@@ -722,6 +808,7 @@ void linkingt::duplicate_code_symbol(
       rename_symbol(new_symbol.type);
       old_symbol.value=new_symbol.value;
       old_symbol.type=new_symbol.type; // for parameter identifiers
+      old_symbol.is_weak=new_symbol.is_weak;
     }
     else if(to_code_type(old_symbol.type).get_inlined())
     {
@@ -845,12 +932,13 @@ void linkingt::duplicate_object_symbol(
      !new_symbol.value.get_bool(ID_C_zero_initializer))
   {
     if(old_symbol.value.is_nil() ||
-       old_symbol.value.get_bool(ID_C_zero_initializer))
+       old_symbol.value.get_bool(ID_C_zero_initializer) ||
+       old_symbol.is_weak)
     {
       // new_symbol wins
       old_symbol.value=new_symbol.value;
     }
-    else
+    else if(!new_symbol.is_weak)
     {
       // try simplifier
       exprt tmp_old=old_symbol.value,
@@ -1081,7 +1169,7 @@ Function: linkingt::do_type_dependencies
 
 void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
 {
-  // Any type that uses a type that will be renamed also
+  // Any type that uses a symbol that will be renamed also
   // needs to be renamed, and so on, until saturation.
 
   used_byt used_by;
@@ -1090,12 +1178,13 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
   {
     if(s_it->second.is_type)
     {
-      find_symbols_sett type_symbols_used;
-      find_type_symbols(s_it->second.type, type_symbols_used);
+      // find type and array-size symbols
+      find_symbols_sett symbols_used;
+      find_type_and_expr_symbols(s_it->second.type, symbols_used);
 
       for(find_symbols_sett::const_iterator
-          it=type_symbols_used.begin();
-          it!=type_symbols_used.end();
+          it=symbols_used.begin();
+          it!=symbols_used.end();
           it++)
       {
         used_by[*it].insert(s_it->first);

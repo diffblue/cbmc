@@ -132,6 +132,15 @@ void remove_internal_symbols(
       symbol.value.is_not_nil() &&
       !symbol.value.get_bool(ID_C_zero_initializer);
 
+    // __attribute__((constructor)), __attribute__((destructor))
+    if(symbol.mode==ID_C && is_function && is_file_local)
+    {
+      const code_typet &code_type=to_code_type(symbol.type);
+      if(code_type.return_type().id()==ID_constructor ||
+         code_type.return_type().id()==ID_destructor)
+        is_file_local=false;
+    }
+
     if(is_type)
     {
       // never EXPORTED by itself

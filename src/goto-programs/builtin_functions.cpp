@@ -1198,60 +1198,31 @@ void goto_convertt::do_function_call_symbol(
   {
     do_printf(lhs, function, arguments, dest);
   }
-  else if(identifier=="__assert_fail")
+  else if(identifier=="__assert_fail" ||
+          identifier=="_assert" ||
+          identifier=="__assert_c99" ||
+          identifier=="_wassert")
   {
     // __assert_fail is Linux
     // These take four arguments:
     // "expression", "file.c", line, __func__
+    // klibc has __assert_fail with 3 arguments
+    // "expression", "file.c", line
 
-    if(arguments.size()!=4)
-    {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have four arguments";
-    }
-    
-    const irep_idt description=
-      "assertion "+id2string(get_string_constant(arguments[0]));
-
-    goto_programt::targett t=dest.add_instruction(ASSERT);
-    t->guard=false_exprt();
-    t->source_location=function.source_location();
-    t->source_location.set("user-provided", true);
-    t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment(description);
-    // we ignore any LHS
-  }
-  else if(identifier=="_assert")
-  {
     // MingW has
     // void _assert (const char*, const char*, int);
     // with three arguments:
     // "expression", "file.c", line
 
-    if(arguments.size()!=3)
-    {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have three arguments";
-    }
-    
-    const irep_idt description=
-      "assertion "+id2string(get_string_constant(arguments[0]));
-
-    goto_programt::targett t=dest.add_instruction(ASSERT);
-    t->guard=false_exprt();
-    t->source_location=function.source_location();
-    t->source_location.set("user-provided", true);
-    t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment(description);
-    // we ignore any LHS
-  }
-  else if(identifier=="__assert_c99")
-  {
     // This has been seen in Solaris 11.
     // Signature:
     // void __assert_c99(const char *desc, const char *file, int line, const char *func);
 
-    if(arguments.size()!=4)
+    // _wassert is Windows. The arguments are
+    // L"expression", L"file.c", line
+
+    if(arguments.size()!=4 &&
+       arguments.size()!=3)
     {
       err_location(function);
       throw "`"+id2string(identifier)+"' expected to have four arguments";
@@ -1317,28 +1288,6 @@ void goto_convertt::do_function_call_symbol(
 
     const irep_idt description=
       "assertion "+id2string(get_string_constant(arguments[3]));
-      goto_programt::targett t=dest.add_instruction(ASSERT);
-
-    t->guard=false_exprt();
-    t->source_location=function.source_location();
-    t->source_location.set("user-provided", true);
-    t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment(description);
-    // we ignore any LHS
-  }
-  else if(identifier=="_wassert")
-  {
-    // This is Windows. The arguments are
-    // L"expression", L"file.c", line
-
-    if(arguments.size()!=3)
-    {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have three arguments";
-    }
-
-    const irep_idt description=
-      "assertion "+id2string(get_string_constant(arguments[0]));
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();

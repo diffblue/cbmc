@@ -542,7 +542,18 @@ void goto_convertt::convert(
   else
     copy(code, OTHER, dest);
 
+  // We only need to kill the temporaries if control
+  // can get to the end of the block.
+  #if 0
+  if(!dest.empty() &&
+     dest.instructions.back().is_goto() &&
+     dest.instructions.back().guard.is_true())
+    tmp_symbols.resize(old_tmp_symbols_size);
+  else
+    kill_tmp_symbols(old_tmp_symbols_size, dest);
+  #else
   kill_tmp_symbols(old_tmp_symbols_size, dest);
+  #endif
 
   // make sure dest is never empty
   if(dest.instructions.empty())
@@ -607,7 +618,14 @@ void goto_convertt::convert_block(
   }
 
   // see if we need to do any destructors
-  unwind_destructor_stack(end_location, old_stack_size, dest);
+  if(!dest.empty() &&
+     dest.instructions.back().is_goto() &&
+     dest.instructions.back().guard.is_true())
+  {
+    // don't do destructors when we are unreachable
+  }
+  else
+    unwind_destructor_stack(end_location, old_stack_size, dest);
 
   // remove those destructors
   targets.destructor_stack.resize(old_stack_size);
@@ -1577,7 +1595,7 @@ void goto_convertt::convert_return(
   
   // Need to process _entire_ destructor stack.
   unwind_destructor_stack(code.source_location(), 0, dest);
-  
+
   // add goto to end-of-function
   goto_programt::targett t=dest.add_instruction();
   t->make_goto(targets.return_target, true_exprt());

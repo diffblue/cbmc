@@ -34,8 +34,7 @@ public:
         source_location_map[block_count]=it->source_location;
       
       next_is_target=
-        it->is_goto() || it->is_return() ||
-        it->is_function_call() || it->is_assume();
+        it->is_goto() || it->is_function_call();
     }
   }
 
@@ -156,7 +155,6 @@ std::set<exprt> collect_conditions(const goto_programt::const_targett t)
   switch(t->type)
   {
   case GOTO:
-  case ASSUME:
   case ASSERT:
     return collect_conditions(t->guard);
   
@@ -247,7 +245,6 @@ std::set<exprt> collect_decisions(const goto_programt::const_targett t)
   switch(t->type)
   {
   case GOTO:
-  case ASSUME:
   case ASSERT:
     return collect_decisions(t->guard);
   
@@ -311,9 +308,14 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment);
         }
       }
+      else if(i_it->is_assert())
+        i_it->make_skip();
       break;
       
     case coverage_criteriont::LOCATION:
+      if(i_it->is_assert())
+        i_it->make_skip();
+
       {
         unsigned block_nr=basic_blocks[i_it];
         if(blocks_done.insert(block_nr).second)
@@ -363,9 +365,15 @@ void instrument_cover_goals(
         i_it++;
         i_it++;
       }
+      else if(i_it->is_assert())
+        i_it->make_skip();
+
       break;
       
     case coverage_criteriont::CONDITION:
+      if(i_it->is_assert())
+        i_it->make_skip();
+
       // Conditions are all atomic predicates in the programs.
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
@@ -395,6 +403,9 @@ void instrument_cover_goals(
       break;
     
     case coverage_criteriont::DECISION:
+      if(i_it->is_assert())
+        i_it->make_skip();
+
       // Decisions are maximal Boolean combinations of conditions.
       {
         const std::set<exprt> decisions=collect_decisions(i_it);
@@ -424,6 +435,9 @@ void instrument_cover_goals(
       break;
       
     case coverage_criteriont::MCDC:
+      if(i_it->is_assert())
+        i_it->make_skip();
+
       // 1. Each entry and exit point is invoked
       // 2. Each decision takes every possible outcome
       // 3. Each condition in a decision takes every possible outcome
@@ -470,6 +484,8 @@ void instrument_cover_goals(
       break;
 
     case coverage_criteriont::PATH:
+      if(i_it->is_assert())
+        i_it->make_skip();
       break;
     
     default:;
