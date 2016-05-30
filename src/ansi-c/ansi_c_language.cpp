@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 
 #include <util/expr_util.h>
-#include <util/replace_symbol.h>
 #include <util/config.h>
 #include <util/get_base_name.h>
 
