@@ -191,14 +191,9 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
     expr.struct_op()=m;
   }
 
-  #if 0
   warning().source_location=expr.source_location();
   warning() << "failed to find field `"
             << component_name << "` in class hierarchy" << eom;
-  #else
-  warning_msg("failed to find field `"+
-              id2string(component_name)+"` in class hierarchy");
-  #endif
 
   // We replace by a non-det of same type
   side_effect_expr_nondett nondet(expr.type());
