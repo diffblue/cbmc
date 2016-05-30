@@ -576,6 +576,7 @@ void linkingt::duplicate_code_symbol(
 
       old_symbol.type=new_symbol.type;
       old_symbol.location=new_symbol.location;
+      old_symbol.is_weak=new_symbol.is_weak;
     }
     else if(!new_symbol.location.get_function().empty() &&
             new_symbol.value.is_nil())
@@ -595,6 +596,31 @@ void linkingt::duplicate_code_symbol(
       {
         old_symbol.type=new_symbol.type;
         old_symbol.location=new_symbol.location;
+        old_symbol.is_weak=new_symbol.is_weak;
+      }
+    }
+    // replace weak symbols
+    else if(old_symbol.is_weak)
+    {
+      if(new_symbol.value.is_nil())
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "function declaration conflicts with with weak definition");
+      else
+        old_symbol.value.make_nil();
+    }
+    else if(new_symbol.is_weak)
+    {
+      if(new_symbol.value.is_nil() ||
+         old_symbol.value.is_not_nil())
+      {
+        new_symbol.value.make_nil();
+
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "ignoring conflicting weak function declaration");
       }
     }
     // Linux kernel uses void f(void) as generic prototype
@@ -782,6 +808,7 @@ void linkingt::duplicate_code_symbol(
       rename_symbol(new_symbol.type);
       old_symbol.value=new_symbol.value;
       old_symbol.type=new_symbol.type; // for parameter identifiers
+      old_symbol.is_weak=new_symbol.is_weak;
     }
     else if(to_code_type(old_symbol.type).get_inlined())
     {
@@ -905,12 +932,13 @@ void linkingt::duplicate_object_symbol(
      !new_symbol.value.get_bool(ID_C_zero_initializer))
   {
     if(old_symbol.value.is_nil() ||
-       old_symbol.value.get_bool(ID_C_zero_initializer))
+       old_symbol.value.get_bool(ID_C_zero_initializer) ||
+       old_symbol.is_weak)
     {
       // new_symbol wins
       old_symbol.value=new_symbol.value;
     }
-    else
+    else if(!new_symbol.is_weak)
     {
       // try simplifier
       exprt tmp_old=old_symbol.value,
