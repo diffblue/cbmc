@@ -301,8 +301,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
   init_symbol.mode=ID_cpp;
   init_symbol.module=module;
   init_symbol.type=code_typet();
-  init_symbol.type.add(ID_return_type)=typet(ID_empty);
-  init_symbol.type.set("initialization", true);
+  init_symbol.type.add(ID_return_type)=typet(ID_constructor);
   init_symbol.is_type=false;
   init_symbol.is_macro=false;
 

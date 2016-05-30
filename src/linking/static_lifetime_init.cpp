@@ -160,8 +160,8 @@ bool static_lifetime_init(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    if(symbol.type.get_bool("initialization") &&
-       symbol.type.id()==ID_code)
+    if(symbol.type.id()==ID_code &&
+       to_code_type(symbol.type).return_type().id()==ID_constructor)
     {
       code_function_callt function_call;      
       function_call.function()=symbol.symbol_expr();
