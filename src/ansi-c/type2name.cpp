@@ -187,10 +187,10 @@ static std::string type2name(
   {
     const array_typet &t=to_array_type(type);
     mp_integer size;
-    if(to_integer(t.size(), size))
-      result+="ARR?";
-    else if(t.size().id()==ID_symbol)
+    if(t.size().id()==ID_symbol)
       result+="ARR"+t.size().get_string(ID_identifier);
+    else if(to_integer(t.size(), size))
+      result+="ARR?";
     else
       result+="ARR"+integer2string(size);
   }
