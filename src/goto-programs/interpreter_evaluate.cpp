@@ -418,7 +418,13 @@ void interpretert::evaluate(
 
     return;
   }
-
+  else if ((expr.id()==ID_array) || (expr.id()==ID_array_of))
+  {
+    forall_operands(it,expr) {
+      evaluate(*it,dest);
+    }
+    return;
+  }
   std::cout << "!! failed to evaluate expression: "
             << from_expr(ns, function->first, expr)
             << std::endl;

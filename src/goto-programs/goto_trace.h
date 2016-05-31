@@ -154,6 +154,11 @@ public:
     steps.push_back(step);
   }
 
+  inline goto_trace_stept &get_last_step()
+  {
+    return steps.back();
+  }
+
   // delete all steps after (not including) s  
   void trim_after(stepst::iterator s)
   {

@@ -13,6 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 #include <util/symbol_table.h>
+#include <util/ieee_float.h>
+#include <util/fixedbv.h>
+#include <util/std_expr.h>
+#include <ansi-c/c_types.h>
 
 #include "interpreter.h"
 #include "interpreter_class.h"
@@ -49,11 +53,31 @@ void interpretert::operator()()
     
   done=false;
   
-  while(!done)
+  try {
+	std::cout << "Type h for help";
+    while(!done)
+    {
+      num_steps=1;
+      stack_depth=-1;
+      show_state();
+      command();
+      while (!done && ((num_steps<0) || ((num_steps--)>0))) {
+        step();
+        show_state();
+      }
+      while (!done && (stack_depth<=call_stack.size()) && (stack_depth>=0)) {
+        step();
+        show_state();
+      }
+    }
+    std::cout << "Program End." << std::endl;
+  }
+  catch(const char *e)
   {
-    show_state();
+    std::cout << e << std::endl;
+  }
+  while(!done) {
     command();
-    if(!done) step();
   }
 }
 
@@ -82,7 +106,6 @@ void interpretert::show_state()
   }
   else
     function->second.body.output_instruction(ns, function->first, std::cout, PC);
-    
   std::cout << std::endl;
 }
 
@@ -112,6 +135,42 @@ void interpretert::command()
 
   if(ch=='q')
     done=true;
+  else if (ch=='h') {
+    num_steps=0;
+    std::cout << "Interpreter help" << std::endl;
+    std::cout << "h: display this menu" << std::endl;
+    std::cout << "j: output json trace" << std::endl;
+    std::cout << "o: output goto trace" << std::endl;
+    std::cout << "q: quit" << std::endl;
+    std::cout << "r: run until completion" << std::endl;
+    std::cout << "s#: step a number of instructions" << std::endl;
+    std::cout << "sa: step across a function" << std::endl;
+    std::cout << "so: step out of a function" << std::endl;
+  }
+  else if (ch=='j') {
+    num_steps=0;
+    jsont json_steps;
+    convert(ns,steps,json_steps);
+    json_steps.output(std::cout);
+  }
+  else if (ch=='o') {
+    num_steps=0;
+    steps.output(ns,std::cout);
+  }
+  else if (ch=='r') {
+    num_steps=-1;
+  }
+  else if (ch=='s') {
+    ch=tolower(command[1]);
+    if (ch=='o')
+      stack_depth=call_stack.size();
+    if (ch=='a')
+      stack_depth=call_stack.size()+1;
+    else {
+      num_steps=atoi(command+1);
+      if (num_steps==0) num_steps=1;
+    }
+  }
 }
 
 /*******************************************************************\
@@ -146,17 +205,24 @@ void interpretert::step()
   next_PC=PC;
   next_PC++;  
 
+  steps.add_step(goto_trace_stept());
+  goto_trace_stept &trace_step=steps.get_last_step();
+  trace_step.thread_nr=thread_id;
+  trace_step.pc=PC;
   switch(PC->type)
   {
   case GOTO:
+    trace_step.type=goto_trace_stept::GOTO;
     execute_goto();
     break;
   
   case ASSUME:
+    trace_step.type=goto_trace_stept::ASSUME;
     execute_assume();
     break;
   
   case ASSERT:
+    trace_step.type=goto_trace_stept::ASSERT;
     execute_assert();
     break;
   
@@ -165,15 +231,20 @@ void interpretert::step()
     break;
   
   case DECL:
+    trace_step.type=goto_trace_stept::DECL;
     execute_decl();
     break;
   
   case SKIP:
   case LOCATION:
+    trace_step.type=goto_trace_stept::LOCATION;
+    break;
   case END_FUNCTION:
+    trace_step.type=goto_trace_stept::FUNCTION_RETURN;
     break;
   
   case RETURN:
+    trace_step.type=goto_trace_stept::FUNCTION_RETURN;
     if(call_stack.empty())
       throw "RETURN without call";
 
@@ -189,14 +260,17 @@ void interpretert::step()
     break;
     
   case ASSIGN:
+    trace_step.type=goto_trace_stept::ASSIGNMENT;
     execute_assign();
     break;
     
   case FUNCTION_CALL:
+    trace_step.type=goto_trace_stept::FUNCTION_CALL;
     execute_function_call();
     break;
   
   case START_THREAD:
+    trace_step.type=goto_trace_stept::SPAWN;
     throw "START_THREAD not yet implemented";
   
   case END_THREAD:
@@ -204,13 +278,16 @@ void interpretert::step()
     break;
 
   case ATOMIC_BEGIN:
+    trace_step.type=goto_trace_stept::ATOMIC_BEGIN;
     throw "ATOMIC_BEGIN not yet implemented";
     
   case ATOMIC_END:
+    trace_step.type=goto_trace_stept::ATOMIC_END;
     throw "ATOMIC_END not yet implemented";
     
   case DEAD:
-    throw "DEAD not yet implemented";
+    trace_step.type=goto_trace_stept::DEAD;
+    break;//throw "DEAD not yet implemented";
   
   default:
     throw "encountered instruction with undefined instruction type";
@@ -317,8 +394,41 @@ void interpretert::execute_assign()
       std::cout << "!! failed to obtain rhs ("
                 << rhs.size() << " vs. "
                 << size << ")" << std::endl;
-    else
+    else {
+      goto_trace_stept &trace_step=steps.get_last_step();
       assign(address, rhs);
+      trace_step.full_lhs=code_assign.lhs();
+      trace_step.lhs_object=ssa_exprt(trace_step.full_lhs);
+      if(trace_step.full_lhs.type().id()==ID_struct)
+      {
+      }
+      else if(trace_step.full_lhs.type().id()==ID_floatbv)
+      {
+        ieee_floatt f;
+        f.spec=to_floatbv_type(trace_step.full_lhs.type());
+        f.unpack(rhs[0]);
+        lhs_at_pc=f.to_expr();
+      }
+      else if(trace_step.full_lhs.type().id()==ID_fixedbv)
+      {
+        fixedbvt f;
+        f.from_integer(rhs[0]);
+        lhs_at_pc=f.to_expr();
+      }
+      else if(trace_step.full_lhs.type().id()==ID_bool)
+      {
+        if (trace_step.full_lhs.is_true()) 
+          lhs_at_pc=true_exprt();
+        else 
+          lhs_at_pc=false_exprt();
+      }
+      else
+      {
+          lhs_at_pc=from_integer(rhs[0],size_type());
+      }
+      trace_step.full_lhs_value=lhs_at_pc;
+      trace_step.lhs_object_value = lhs_at_pc;
+    }
   }
 }
 
@@ -411,8 +521,10 @@ void interpretert::execute_function_call()
   else if(a>=memory.size())
     throw "out-of-range function call";
 
+  goto_trace_stept &trace_step=steps.get_last_step();
   const memory_cellt &cell=memory[integer2long(a)];
   const irep_idt &identifier=cell.identifier;
+  trace_step.identifier=identifier;
 
   const goto_functionst::function_mapt::const_iterator f_it=
     goto_functions.function_map.find(identifier);

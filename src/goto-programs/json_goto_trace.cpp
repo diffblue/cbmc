@@ -27,7 +27,8 @@ Function: json
  Purpose:
 
 \*******************************************************************/
-
+#include <cstdio>
+#include <iostream>
 jsont json(const source_locationt &source_location)
 {
   json_objectt result;
@@ -180,12 +181,13 @@ void convert(
         json_call_return["hidden"]=jsont::json_boolean(it->hidden);
         json_call_return["thread"]=json_numbert(i2string(it->thread_nr));
 
-        const symbolt &symbol=ns.lookup(it->identifier);
-        json_objectt &json_function=json_call_return["function"].make_object();
-        json_function["display_name"]=json_stringt(id2string(symbol.display_name()));
-        json_function["identifier"]=json_stringt(id2string(it->identifier));
-        json_function["source_location"]=json(symbol.location);
-
+        if (!it->identifier.empty()) {
+          const symbolt &symbol=ns.lookup(it->identifier);
+          json_objectt &json_function=json_call_return["function"].make_object();
+          json_function["display_name"]=json_stringt(id2string(symbol.display_name()));
+          json_function["identifier"]=json_stringt(id2string(it->identifier));
+          json_function["source_location"]=json(symbol.location);
+        }
         if(!json_location.is_null())
           json_call_return["source_location"]=json_location;
       }
