@@ -46,8 +46,6 @@ Author: CM Wintersteiger, 2006
 
 #include <goto-programs/read_goto_binary.h>
 
-#include <cbmc/version.h>
-
 #include "hybrid_binary.h"
 #include "linker_script_merge.h"
 

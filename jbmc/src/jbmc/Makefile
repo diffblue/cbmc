@@ -63,6 +63,8 @@ CLEANFILES = jbmc$(EXEEXT)
 
 all: jbmc$(EXEEXT)
 
+CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+
 ###############################################################################
 
 jbmc$(EXEEXT): $(OBJ)

@@ -38,6 +38,10 @@ if(${enable_cbmc_tests})
     enable_testing()
 endif()
 
+file(STRINGS src/config.inc config_inc_v REGEX "CBMC_VERSION *= *[0-9\.]+")
+string(REGEX REPLACE "^CBMC_VERSION *= *" "" CBMC_RELEASE ${config_inc_v})
+message(STATUS "CBMC release ${CBMC_RELEASE}")
+
 find_package(Git)
 
 macro(git_revision target files_var)

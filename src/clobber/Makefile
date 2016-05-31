@@ -30,6 +30,8 @@ CLEANFILES = clobber$(EXEEXT)
 
 all: clobber$(EXEEXT)
 
+CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+
 ###############################################################################
 
 clobber$(EXEEXT): $(OBJ)

@@ -37,8 +37,6 @@ Date: June 2006
 
 #include <linking/static_lifetime_init.h>
 
-#include <cbmc/version.h>
-
 #define DOTGRAPHSETTINGS  "color=black;" \
                           "orientation=portrait;" \
                           "fontsize=20;"\

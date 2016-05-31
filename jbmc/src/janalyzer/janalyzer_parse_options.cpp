@@ -50,8 +50,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/unicode.h>
 
-#include <cbmc/version.h>
-
 #include <goto-analyzer/static_show_domain.h>
 #include <goto-analyzer/static_simplifier.h>
 #include <goto-analyzer/static_verifier.h>

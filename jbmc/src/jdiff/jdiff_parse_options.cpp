@@ -55,8 +55,6 @@ Author: Peter Schrammel
 
 #include <langapi/mode.h>
 
-#include <cbmc/version.h>
-
 #include "java_syntactic_diff.h"
 #include <goto-diff/change_impact.h>
 #include <goto-diff/goto_diff.h>

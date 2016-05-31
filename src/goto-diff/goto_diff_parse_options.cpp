@@ -55,8 +55,6 @@ Author: Peter Schrammel
 #include <ansi-c/cprover_library.h>
 #include <cpp/cprover_library.h>
 
-#include <cbmc/version.h>
-
 #include "goto_diff.h"
 #include "syntactic_diff.h"
 #include "unified_diff.h"

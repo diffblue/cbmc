@@ -22,7 +22,6 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
-#include <cbmc/version.h>
 
 /// constructor
 goto_cc_modet::goto_cc_modet(

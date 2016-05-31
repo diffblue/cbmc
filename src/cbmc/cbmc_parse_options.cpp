@@ -62,7 +62,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-#include "version.h"
 #include "xml_interface.h"
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):

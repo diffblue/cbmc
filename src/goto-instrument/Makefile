@@ -101,6 +101,8 @@ include ../common
 
 all: goto-instrument$(EXEEXT) goto-instrument$(LIBEXT)
 
+CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+
 ifneq ($(LIB_GLPK),)
   LIBS += $(LIB_GLPK)
   CP_CXXFLAGS += -DHAVE_GLPK

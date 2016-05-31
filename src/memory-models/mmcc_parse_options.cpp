@@ -16,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cout_message.h>
 
-#include <cbmc/version.h>
-
 #include "mm_parser.h"
 #include "mm2cpp.h"
 

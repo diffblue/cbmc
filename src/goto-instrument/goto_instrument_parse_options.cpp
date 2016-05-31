@@ -65,8 +65,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/cprover_library.h>
 #include <cpp/cprover_library.h>
 
-#include <cbmc/version.h>
-
 #include "document_properties.h"
 #include "uninitialized.h"
 #include "full_slicer.h"

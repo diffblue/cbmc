@@ -54,7 +54,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/exit_codes.h>
 
-#include <cbmc/version.h>
 #include <goto-programs/adjust_float_expressions.h>
 
 #include "taint_analysis.h"

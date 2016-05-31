@@ -32,6 +32,8 @@ CLEANFILES = goto-analyzer$(EXEEXT)
 
 all: goto-analyzer$(EXEEXT)
 
+CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+
 ifneq ($(wildcard ../jsil/Makefile),)
   OBJ += ../jsil/jsil$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JSIL
