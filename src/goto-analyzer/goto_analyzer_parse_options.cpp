@@ -42,8 +42,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/unicode.h>
 
-#include <cbmc/version.h>
-
 #include "goto_analyzer_parse_options.h"
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"

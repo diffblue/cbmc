@@ -89,6 +89,8 @@ include ../common
 
 all: goto-instrument$(EXEEXT)
 
+CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(RELEASE_INFO))\""
+
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE

@@ -36,8 +36,6 @@ Author: Peter Schrammel
 
 #include <langapi/mode.h>
 
-#include <cbmc/version.h>
-
 #include "goto_diff_parse_options.h"
 #include "goto_diff.h"
 #include "syntactic_diff.h"

@@ -46,6 +46,8 @@ include ../common
 
 all: musketeer$(EXEEXT)
 
+CP_CXXFLAGS += -DGOTO_FENCE_INSERTER_VERSION="\"0.37 ($(RELEASE_INFO))\""
+
 ifneq ($(LIB_GLPK),)
   LIBS += $(LIB_GLPK)
   CP_CXXFLAGS += -DHAVE_GLPK

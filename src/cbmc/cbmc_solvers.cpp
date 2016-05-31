@@ -24,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_cbmc.h"
 #include "cbmc_dimacs.h"
 #include "counterexample_beautification.h"
-#include "version.h"
 
 /*******************************************************************\
 

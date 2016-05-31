@@ -35,8 +35,6 @@ Date: June 2006
 
 #include <langapi/mode.h>
 
-#include <cbmc/version.h>
-
 #include "compile.h"
 
 #define DOTGRAPHSETTINGS  "color=black;" \
