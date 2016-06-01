@@ -170,6 +170,55 @@ std::set<exprt> collect_conditions(const goto_programt::const_targett t)
 
 /*******************************************************************\
 
+Function: collect_mcdc_controlling_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void collect_mcdc_controlling_rec(
+  const exprt &src,
+  std::set<exprt> &result)
+{
+  if(src.id()==ID_and)
+  {
+  }
+  else if(src.id()==ID_or)
+  {
+  }
+  else if(src.id()==ID_not)
+    collect_mcdc_controlling_rec(to_not_expr(src).op(), result);
+}
+
+/*******************************************************************\
+
+Function: collect_mcdc_controlling
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::set<exprt> collect_mcdc_controlling(
+  const std::set<exprt> &decisions)
+{
+  std::set<exprt> result;
+  
+  for(const auto &d : decisions)
+    collect_mcdc_controlling_rec(d, result);
+
+  return result;
+}
+        
+/*******************************************************************\
+
 Function: collect_decisions_rec
 
   Inputs:
@@ -478,7 +527,21 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment_f);
         }
         
-        for(unsigned i=0; i<both.size()*2; i++)
+        std::set<exprt> controlling;
+        controlling=collect_mcdc_controlling(decisions);
+
+        for(const auto & p : controlling)
+        {
+          std::string description=
+            "MC/DC independence condition";
+            
+          goto_program.insert_before_swap(i_it);
+          i_it->make_assertion(p);
+          i_it->source_location=source_location;
+          i_it->source_location.set_comment(description);
+        }
+        
+        for(unsigned i=0; i<both.size()*2+controlling.size(); i++)
           i_it++;
       }
       break;
