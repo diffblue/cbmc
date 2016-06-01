@@ -35,6 +35,9 @@ static int isatty(int) { return 0; }
 
 #include "ansi_c_parser.h"
 #include "ansi_c_y.tab.h"
+#ifdef ANSI_C_DEBUG
+extern int yyansi_cdebug;
+#endif
 
 #define loc() \
   { newstack(yyansi_clval); PARSER.set_source_location(stack(yyansi_clval)); }
@@ -208,6 +211,9 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %{
 void ansi_c_scanner_init()
 {
+#ifdef ANSI_C_DEBUG
+  yyansi_cdebug=1;
+#endif
   YY_FLUSH_BUFFER;
   BEGIN(0);
 }
