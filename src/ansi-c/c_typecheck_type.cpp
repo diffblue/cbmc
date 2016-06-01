@@ -109,6 +109,17 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_type(type.subtype());
     
     typet underlying_type=type.subtype();
+
+    // gcc allows this, but clang doesn't; it's a compiler hint only,
+    // but we'll try to interpret it the GCC way
+    if(underlying_type.id()==ID_c_enum_tag)
+    {
+      underlying_type=
+        follow_tag(to_c_enum_tag_type(underlying_type)).subtype();
+
+      assert(underlying_type.id()==ID_signedbv ||
+             underlying_type.id()==ID_unsignedbv);
+    }
   
     if(underlying_type.id()==ID_signedbv ||
        underlying_type.id()==ID_unsignedbv)
@@ -151,17 +162,19 @@ void c_typecheck_baset::typecheck_type(typet &type)
       // save the location
       result.add_source_location()=type.source_location();
 
+      if(type.subtype().id()==ID_c_enum_tag)
+      {
+        const irep_idt &tag_name=
+          to_c_enum_tag_type(type.subtype()).get_identifier();
+
+        symbol_tablet::symbolst::iterator entry=
+          symbol_table.symbols.find(tag_name);
+        assert(entry!=symbol_table.symbols.end());
+
+        entry->second.type.subtype()=result;
+      }
+
       type=result;
-    }
-    else if(underlying_type.id()==ID_c_enum_tag ||
-            underlying_type.id()==ID_complex)
-    {
-      // gcc allows this, but clang doesn't.
-      // We ignore for now.
-      if(underlying_type.id()==ID_c_enum_tag)
-        type=follow_tag(to_c_enum_tag_type(underlying_type)).subtype();
-      else
-        type=type.subtype();
     }
     else if(underlying_type.id()==ID_floatbv)
     {
@@ -188,6 +201,25 @@ void c_typecheck_baset::typecheck_type(typet &type)
       result.add_source_location()=type.source_location();
 
       type=result;
+    }
+    else if(underlying_type.id()==ID_complex)
+    {
+      // gcc allows this, but clang doesn't -- see enums above
+      typet result;
+
+      if(mode=="__SC__") // 32 bits
+        result=float_type();
+      else if(mode=="__DC__") // 64 bits
+        result=double_type();
+      else if(mode=="__TC__") // 128 bits
+        result=gcc_float128_type();
+      else // give up, just use subtype
+        result=type.subtype();
+
+      // save the location
+      result.add_source_location()=type.source_location();
+
+      type=complex_typet(result);
     }
     else
     {
