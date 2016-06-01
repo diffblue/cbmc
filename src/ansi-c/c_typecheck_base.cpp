@@ -736,7 +736,9 @@ void c_typecheck_baset::apply_asm_label(
       }
       else
       {
-        str << "error: conflicting asm renaming";
+        str << "replacing asm renaming "
+            << asm_label_map[orig_name] << " by "
+            << asm_label;
         throw 0;
       }
     }
@@ -869,6 +871,7 @@ void c_typecheck_baset::typecheck_declaration(
         apply_asm_label(asm_name, symbol);
       }
       irep_idt identifier=symbol.name;
+      d_it->set_name(identifier);
 
       typecheck_symbol(symbol);
 
