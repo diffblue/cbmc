@@ -855,7 +855,19 @@ void c_typecheck_baset::typecheck_declaration(
         symbol.is_macro=true;
       }
 
-      apply_asm_label(full_spec.asm_label, symbol);
+      if(full_spec.section.empty())
+        apply_asm_label(full_spec.asm_label, symbol);
+      else
+      {
+        std::string asm_name;
+        asm_name=id2string(full_spec.section)+"$$";
+        if(!full_spec.asm_label.empty())
+          asm_name+=id2string(full_spec.asm_label);
+        else
+          asm_name+=id2string(symbol.name);
+
+        apply_asm_label(asm_name, symbol);
+      }
       irep_idt identifier=symbol.name;
 
       typecheck_symbol(symbol);
