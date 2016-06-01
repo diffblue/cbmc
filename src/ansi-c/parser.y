@@ -139,7 +139,6 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_NORETURN "noreturn"
 %token TOK_GCC_ATTRIBUTE_CONSTRUCTOR "constructor"
 %token TOK_GCC_ATTRIBUTE_DESTRUCTOR "destructor"
-%token TOK_GCC_ATTRIBUTE_END ")"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
 %token TOK_MSC_BASED   "__based"
@@ -903,7 +902,7 @@ post_declarator_attribute:
           stack($$).set(ID_flavor, ID_gcc);
           stack($$).operands().swap(stack($4).operands());
         }
-        | gcc_type_attribute
+        | gcc_attribute_specifier
         ;
 
 post_declarator_attributes:
@@ -1008,8 +1007,8 @@ declaration_qualifier_list:
         {
           $$=merge($1, $2);
         }
-        | gcc_type_attribute
-        | declaration_qualifier_list gcc_type_attribute
+        | gcc_attribute_specifier
+        | declaration_qualifier_list gcc_attribute_specifier
         {
           $$=merge($1, $2);
         }
@@ -1028,7 +1027,7 @@ type_qualifier_list:
         /* The following is to allow mixing of type attributes with
            type qualifiers, but the list has to start with a
            proper type qualifier. */
-        | type_qualifier_list gcc_type_attribute
+        | type_qualifier_list gcc_attribute_specifier
         {
           $$=merge($1, $2);
         }
@@ -1036,7 +1035,7 @@ type_qualifier_list:
 
 attribute_type_qualifier_list:
           attribute_or_type_qualifier
-        | type_qualifier_list attribute_or_type_qualifier
+        | attribute_type_qualifier_list attribute_or_type_qualifier
         {
           $$=merge($1, $2);
         }
@@ -1074,12 +1073,12 @@ alignas_specifier:
 
 attribute_or_type_qualifier:
           type_qualifier
-        | gcc_type_attribute
+        | gcc_attribute_specifier
         ;
 
 attribute_or_type_qualifier_or_storage_class:
           type_qualifier
-        | gcc_type_attribute
+        | gcc_attribute_specifier
         | storage_class
         ;
 
@@ -1498,6 +1497,33 @@ gcc_attribute_expression_list_opt:
         | gcc_attribute_expression_list
         ;
 
+gcc_type_attribute:
+          TOK_GCC_ATTRIBUTE_PACKED
+        { $$=$1; set($$, ID_packed); }
+        | TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION
+        { $$=$1; set($$, ID_transparent_union); }
+        | TOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')'
+        { $$=$1; set($$, ID_vector); stack($$).add(ID_size)=stack($3); }
+        | TOK_GCC_ATTRIBUTE_ALIGNED
+        { $$=$1; set($$, ID_aligned); }
+        | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression ')'
+        { $$=$1; set($$, ID_aligned); stack($$).set(ID_size, stack($3)); }
+        | TOK_GCC_ATTRIBUTE_MODE '(' identifier ')'
+        { $$=$1; set($$, ID_gcc_attribute_mode); stack($$).set(ID_size, stack($3).get(ID_identifier)); }
+        | TOK_GCC_ATTRIBUTE_GNU_INLINE
+        { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
+        | TOK_GCC_ATTRIBUTE_WEAK
+        { $$=$1; set($$, ID_weak); }
+        | TOK_GCC_ATTRIBUTE_ALIAS '(' TOK_STRING ')'
+        { $$=$1; set($$, ID_alias); mto($$, $3); }
+        | TOK_GCC_ATTRIBUTE_NORETURN
+        { $$=$1; set($$, ID_noreturn); }
+        | TOK_GCC_ATTRIBUTE_CONSTRUCTOR
+        { $$=$1; set($$, ID_constructor); }
+        | TOK_GCC_ATTRIBUTE_DESTRUCTOR
+        { $$=$1; set($$, ID_destructor); }
+        ;
+
 gcc_attribute:
           /* empty */
         {
@@ -1520,6 +1546,7 @@ gcc_attribute:
           stack($$).id(ID_gcc_attribute);
           stack($$).operands().swap(stack($3).operands());
         }
+        | gcc_type_attribute
         ;
 
 gcc_attribute_list:
@@ -1533,6 +1560,8 @@ gcc_attribute_list:
 gcc_attribute_specifier:
           TOK_GCC_ATTRIBUTE '(' '(' gcc_attribute_list ')' ')'
         { $$=$4; }
+        | TOK_NORETURN
+        { $$=$1; set($$, ID_noreturn); }
         ;
 
 gcc_type_attribute_opt:
@@ -1544,41 +1573,11 @@ gcc_type_attribute_opt:
         ;
 
 gcc_type_attribute_list:
-          gcc_type_attribute
-        | gcc_type_attribute_list gcc_type_attribute
+          gcc_attribute_specifier
+        | gcc_type_attribute_list gcc_attribute_specifier
         {
           $$=merge($1, $2);
         }
-        ;
-
-gcc_type_attribute:
-          TOK_GCC_ATTRIBUTE_PACKED TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_packed); }
-        | TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_transparent_union); }
-        | TOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')' TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_vector); stack($$).add(ID_size)=stack($3); }
-        | TOK_GCC_ATTRIBUTE_ALIGNED TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_aligned); }
-        | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression ')' TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_aligned); stack($$).set(ID_size, stack($3)); }
-        | TOK_GCC_ATTRIBUTE_MODE '(' identifier ')' TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_gcc_attribute_mode); stack($$).set(ID_size, stack($3).get(ID_identifier)); }
-        | TOK_GCC_ATTRIBUTE_GNU_INLINE TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
-        | TOK_GCC_ATTRIBUTE_WEAK TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_weak); }
-        | TOK_GCC_ATTRIBUTE_ALIAS '(' TOK_STRING ')' TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_alias); mto($$, $3); }
-        | TOK_NORETURN
-        { $$=$1; set($$, ID_noreturn); }
-        | TOK_GCC_ATTRIBUTE_NORETURN TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_noreturn); }
-        | TOK_GCC_ATTRIBUTE_CONSTRUCTOR TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_constructor); }
-        | TOK_GCC_ATTRIBUTE_DESTRUCTOR TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_destructor); }
-        | gcc_attribute_specifier
         ;
 
 member_declaration_list_opt:
@@ -2153,7 +2152,19 @@ declaration_statement:
         ;
 
 labeled_statement:
-          identifier_or_typedef_name ':' statement
+          identifier_or_typedef_name ':' gcc_attribute_specifier ';'
+        {
+          /* Only semicolons permitted after the attribute:
+             https://gcc.gnu.org/onlinedocs/gcc/Label-Attributes.html */
+          $$=$2;
+          statement($$, ID_label);
+          irep_idt identifier=PARSER.lookup_label(stack($1).get(ID_C_base_name));
+          stack($$).set(ID_label, identifier);
+          // attribute ignored
+          statement($3, ID_skip);
+          mto($$, $3);
+        }
+        | identifier_or_typedef_name ':' statement
         {
           $$=$2;
           statement($$, ID_label);

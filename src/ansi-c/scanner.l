@@ -816,14 +816,14 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    #if 1
                     if(PARSER.cpp98)
                       BEGIN(IGNORE_PARENS);
                     else
+                    {
                       BEGIN(GCC_ATTRIBUTE1);
-                    #else
-                    loc(); return TOK_GCC_ATTRIBUTE;
-                    #endif
+                      loc();
+                      return TOK_GCC_ATTRIBUTE;
+                    }
                   }
                   else
                     return make_identifier();
@@ -1362,7 +1362,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
-"("             { BEGIN(GCC_ATTRIBUTE1a); }
+"("             { BEGIN(GCC_ATTRIBUTE1a); return yytext[0]; }
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
 }
 
@@ -1371,7 +1371,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   preprocessor_line(yytext, PARSER);
                   PARSER.set_line_no(PARSER.get_line_no()-1);
                 }
-"("             { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; }
+"("             { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; return yytext[0]; }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
@@ -1414,7 +1414,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
 {identifier}        { BEGIN(GCC_ATTRIBUTE4); }
-")"                 { BEGIN(GCC_ATTRIBUTE5); }
+")"                 { BEGIN(GCC_ATTRIBUTE5); return yytext[0]; }
 .                   { /* ignore */ }
 }
 
@@ -1428,7 +1428,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   {
                     BEGIN(GCC_ATTRIBUTE5);
                     loc();
-                    return TOK_GCC_ATTRIBUTE_END;
+                    return yytext[0];
                   }
                   else
                   {
@@ -1441,7 +1441,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   {
                     BEGIN(GCC_ATTRIBUTE2);
                     loc();
-                    return TOK_GCC_ATTRIBUTE_END;
+                    return yytext[0];
                   }
                   else
                   {
@@ -1463,12 +1463,21 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 <GCC_ATTRIBUTE4>{ // an attribute we just ignore
 "("             { PARSER.parenthesis_counter++; }
 ")"             { if(PARSER.parenthesis_counter==0)
+                  {
                     BEGIN(GCC_ATTRIBUTE5);
+                    loc();
+                    return yytext[0];
+                  }
                   else
                     PARSER.parenthesis_counter--;
                 }
 ","             { if(PARSER.parenthesis_counter==0)
-                    BEGIN(GCC_ATTRIBUTE2); }
+                  {
+                    BEGIN(GCC_ATTRIBUTE2);
+                    loc();
+                    return yytext[0];
+                  }
+                }
 .               { /* Throw away */ }
 }
 
@@ -1477,7 +1486,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   preprocessor_line(yytext, PARSER);
                   PARSER.set_line_no(PARSER.get_line_no()-1);
                 }
-")"             { BEGIN(GRAMMAR); }
+")"             { BEGIN(GRAMMAR); loc(); return yytext[0]; }
 {ws}            { /* Throw away */ }
 {newline}       { /* Throw away */ }
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
