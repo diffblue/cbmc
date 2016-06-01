@@ -1476,27 +1476,6 @@ aggregate_key:
         | TOK_UNION
         { $$=$1; set($$, ID_union); }
         ;
-        
-gcc_attribute_expression_list:
-          assignment_expression
-        {
-          init($$, ID_expression_list);
-          mto($$, $1);
-        }
-        | gcc_attribute_expression_list ',' assignment_expression
-        {
-          $$=$1;
-          mto($$, $3);
-        }
-        ;
-
-gcc_attribute_expression_list_opt:
-          /* empty */
-        {
-          init($$, ID_expression_list);
-        }
-        | gcc_attribute_expression_list
-        ;
 
 gcc_type_attribute:
           TOK_GCC_ATTRIBUTE_PACKED
@@ -1531,23 +1510,6 @@ gcc_attribute:
           /* empty */
         {
           init($$);
-        }
-        | TOK_CONST
-        {
-          $$=$1;
-          stack($$).id(ID_gcc_attribute);
-          stack($$).set(ID_identifier, ID_const);
-        }
-        | identifier
-        {
-          $$=$1;
-          stack($$).id(ID_gcc_attribute);
-        }
-        | identifier '(' gcc_attribute_expression_list_opt ')'
-        {
-          $$=$1;
-          stack($$).id(ID_gcc_attribute);
-          stack($$).operands().swap(stack($3).operands());
         }
         | gcc_type_attribute
         ;
