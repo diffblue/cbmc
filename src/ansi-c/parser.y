@@ -2881,6 +2881,32 @@ function_head:
 declarator:
           identifier_declarator
         | typedef_declarator
+        | paren_attribute_declarator
+        ;
+
+paren_attribute_declarator:
+          '(' gcc_type_attribute_list identifier_declarator ')'
+        {
+          stack_type($1)=typet(ID_abstract);
+          $2=merge($2, $1); // dest=$2
+          make_subtype($3, $2); // dest=$3
+          $$=$3;
+        }
+        | '(' gcc_type_attribute_list identifier_declarator ')' postfixing_abstract_declarator
+        {
+          stack_type($1)=typet(ID_abstract);
+          $2=merge($2, $1); // dest=$2
+          make_subtype($3, $2); // dest=$3
+          /* note: this is (a pointer to) a function ($5) */
+          /* or an array ($5) with name ($3) */
+          $$=$3;
+          make_subtype($$, $5);
+        }
+        | '*' paren_attribute_declarator
+        {
+          $$=$2;
+          do_pointer($1, $2);
+        }
         ;
 
 typedef_declarator:
