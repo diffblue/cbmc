@@ -11,6 +11,7 @@ Date: May 2016
 #include <algorithm>
 
 #include <util/i2string.h>
+#include <util/expr_util.h>
 
 #include "cover.h"
 
@@ -186,6 +187,19 @@ void collect_mcdc_controlling_rec(
 {
   if(src.id()==ID_and)
   {
+    if(src.operands().size()==2)
+    {
+      exprt cond1=
+        conjunction({ src.op0(), not_exprt(src.op1()) });
+
+      exprt cond2=
+        conjunction({ not_exprt(src.op0()), src.op1() });
+        
+      result.insert(cond1);
+      result.insert(cond2);
+    }
+    else
+      collect_mcdc_controlling_rec(make_binary(src), result);
   }
   else if(src.id()==ID_or)
   {
@@ -532,8 +546,10 @@ void instrument_cover_goals(
 
         for(const auto & p : controlling)
         {
+          std::string p_string=from_expr(ns, "", p);
+
           std::string description=
-            "MC/DC independence condition";
+            "MC/DC independence condition `"+p_string+"'";
             
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(p);
