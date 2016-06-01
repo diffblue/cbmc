@@ -10,6 +10,9 @@
  * ftp://ftp.sra.co.jp/.a/pub/cmd/c++grammar2.0.tar.gz)
  */
 
+#ifdef ANSI_C_DEBUG
+#define YYDEBUG 1
+#endif
 #define PARSER ansi_c_parser
 
 #include "ansi_c_parser.h"
