@@ -36,6 +36,7 @@ public:
     is_weak=false;
     alias.clear();
     asm_label.clear();
+    section.clear();
   }
   
   bool is_typedef, is_extern, is_static, is_register,
@@ -46,6 +47,7 @@ public:
 
   // GCC asm labels __asm__("foo") - these change the symbol name
   irep_idt asm_label;
+  irep_idt section;
   
   friend bool operator == (
     const c_storage_spect &a,
@@ -59,7 +61,8 @@ public:
            a.is_inline==b.is_inline &&
            a.is_weak==b.is_weak &&
            a.alias==b.alias &&
-           a.asm_label==b.asm_label;
+           a.asm_label==b.asm_label &&
+           a.section==b.section;
   }
 
   friend bool operator != (
@@ -82,6 +85,7 @@ public:
     a.is_weak         |=b.is_weak;
     if(!b.alias.empty()) a.alias=b.alias;
     if(!b.asm_label.empty()) a.asm_label=b.asm_label;
+    if(!b.section.empty()) a.section=b.section;
     
     return a;
   }
