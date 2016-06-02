@@ -163,6 +163,8 @@ bool compilet::add_input_file(const std::string &file_name)
   if(r==std::string::npos)
   {
     // a file without extension; will ignore
+    warning() << "input file `" << file_name
+              << "' has no extension, not considered" << eom;
     return false;
   }
   
