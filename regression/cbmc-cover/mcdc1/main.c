@@ -1,16 +1,14 @@
 int main()
 {
-  int input1, input2;
-  
-  if(input1 && input2)
-  {
-    // ok
-  }
-  
-  if(!input1)
-    input2=1;
+  // Condition and decision coverage can be had with 2 tests,
+  // but MC/DC needs six (n+1 for n conditions).
 
-  if(input1 && input2) // masked!
+  __CPROVER_bool A, B, C, D, E;
+
+  if ((A || B) && C && D && E)
+  {
+  }
+  else
   {
   }
 }

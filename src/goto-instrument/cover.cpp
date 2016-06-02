@@ -64,6 +64,18 @@ public:
   }
 };
 
+/*******************************************************************\
+
+Function: as_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const char *as_string(coverage_criteriont c)
 {
   switch(c)
@@ -78,6 +90,30 @@ const char *as_string(coverage_criteriont c)
   case coverage_criteriont::COVER: return "cover instructions";
   default: return "";
   }
+}
+
+/*******************************************************************\
+
+Function: is_condition
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool is_condition(const exprt &src)
+{
+  if(src.type().id()!=ID_bool) return false;
+
+  // conditions are 'atomic predicates'
+  if(src.id()==ID_and || src.id()==ID_or ||
+     src.id()==ID_not || src.id()==ID_implies)
+    return false;
+  
+  return true;
 }
 
 /*******************************************************************\
@@ -102,22 +138,8 @@ void collect_conditions_rec(const exprt &src, std::set<exprt> &dest)
   for(const auto & op : src.operands())
     collect_conditions_rec(op, dest);
 
-  if(src.type().id()==ID_bool)
-  {
-    if(src.id()==ID_and || src.id()==ID_or ||
-       src.id()==ID_not || src.id()==ID_implies)
-    {
-      // ignore me
-    }
-    else if(src.is_constant())
-    {
-      // ignore me
-    }
-    else
-    {
-      dest.insert(src); 
-    }
-  }
+  if(is_condition(src) && !src.is_constant())
+    dest.insert(src); 
 }
 
 /*******************************************************************\
@@ -171,6 +193,29 @@ std::set<exprt> collect_conditions(const goto_programt::const_targett t)
 
 /*******************************************************************\
 
+Function: collect_operands
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void collect_operands(const exprt &src, std::vector<exprt> &dest)
+{
+  for(const exprt &op : src.operands())
+  {
+    if(op.id()==src.id())
+      collect_operands(op, dest);
+    else
+      dest.push_back(op);
+  }
+}
+
+/*******************************************************************\
+
 Function: collect_mcdc_controlling_rec
 
   Inputs:
@@ -183,29 +228,67 @@ Function: collect_mcdc_controlling_rec
 
 void collect_mcdc_controlling_rec(
   const exprt &src,
+  const std::vector<exprt> &conditions,
   std::set<exprt> &result)
 {
-  if(src.id()==ID_and)
+  if(src.id()==ID_and ||
+     src.id()==ID_or)
   {
-    if(src.operands().size()==2)
-    {
-      exprt cond1=
-        conjunction({ src.op0(), not_exprt(src.op1()) });
+    std::vector<exprt> operands;
+    collect_operands(src, operands);
 
-      exprt cond2=
-        conjunction({ not_exprt(src.op0()), src.op1() });
-        
-      result.insert(cond1);
-      result.insert(cond2);
+    if(operands.size()==1)
+    {
+      exprt e=*operands.begin();
+      collect_mcdc_controlling_rec(e, conditions, result);
     }
-    else
-      collect_mcdc_controlling_rec(make_binary(src), result);
-  }
-  else if(src.id()==ID_or)
-  {
+    else if(!operands.empty())
+    {
+      for(unsigned i=0; i<operands.size(); i++)
+      {
+        const exprt op=operands[i];
+      
+        if(is_condition(op))
+        {
+          std::vector<exprt> o=operands;
+        
+          // 'o[i]' needs to be true and false
+          std::vector<exprt> new_conditions=conditions;
+          new_conditions.push_back(conjunction(o));
+          result.insert(conjunction(new_conditions));
+
+          o[i].make_not();
+          new_conditions.back()=conjunction(o);
+          result.insert(conjunction(new_conditions));
+        }
+        else
+        {
+          std::vector<exprt> others;
+          others.reserve(operands.size()-1);
+
+          for(unsigned j=0; j<operands.size(); j++)
+            if(i!=j)
+            {
+              if(src.id()==ID_or)
+                others.push_back(not_exprt(operands[j]));
+              else
+                others.push_back(operands[j]);
+            }
+            
+          exprt c=conjunction(others);
+          std::vector<exprt> new_conditions=conditions;
+          new_conditions.push_back(c);
+
+          collect_mcdc_controlling_rec(op, new_conditions, result);
+        }
+      }
+    }
   }
   else if(src.id()==ID_not)
-    collect_mcdc_controlling_rec(to_not_expr(src).op(), result);
+  {
+    exprt e=to_not_expr(src).op();
+    collect_mcdc_controlling_rec(e, conditions, result);
+  }
 }
 
 /*******************************************************************\
@@ -226,7 +309,7 @@ std::set<exprt> collect_mcdc_controlling(
   std::set<exprt> result;
   
   for(const auto &d : decisions)
-    collect_mcdc_controlling_rec(d, result);
+    collect_mcdc_controlling_rec(d, { }, result);
 
   return result;
 }
