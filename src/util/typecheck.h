@@ -44,7 +44,18 @@ public:
     return messaget::error();
   }
 
+  // not pretty, but makes transition easier  
+  inline void err_location(const exprt &src)
+  {
+    error().source_location=src.find_source_location();
+  }
+
   bool error_found;
+  
+  inline bool get_error_found() const
+  {
+    return error_found;
+  }
 
 protected:
   // main function -- overload this one

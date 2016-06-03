@@ -1,0 +1,8 @@
+CORE
+main.c
+--cover mcdc
+^EXIT=0$
+^SIGNAL=0$
+^\*\* .* of .* covered (100.0%), using 6 iterations$
+--
+^warning: ignoring

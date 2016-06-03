@@ -229,6 +229,10 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   }
   else if(type.id()==ID_noreturn)
     c_qualifiers.is_noreturn=true;
+  else if(type.id()==ID_constructor)
+    constructor=true;
+  else if(type.id()==ID_destructor)
+    destructor=true;
   else
     other.push_back(type);
 }
@@ -274,6 +278,33 @@ void ansi_c_convert_typet::write(typet &type)
     }
 
     type.swap(other.front());
+
+    if(constructor || destructor)
+    {
+      if(constructor && destructor)
+      {
+        err_location(source_location);
+        str << "combining constructor and destructor not supported";
+        error_msg();
+        throw 0;
+      }
+      else if(type.id()!=ID_empty)
+      {
+        err_location(source_location);
+        str << "constructor and destructor required to be type void";
+        error_msg();
+        throw 0;
+      }
+
+      type.id(constructor ? ID_constructor : ID_destructor);
+    }
+  }
+  else if(constructor || destructor)
+  {
+    err_location(source_location);
+    str << "constructor and destructor required to be type void";
+    error_msg();
+    throw 0;
   }
   else if(gcc_float128_cnt)
   {

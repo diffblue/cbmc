@@ -15,14 +15,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/typecheck.h>
 #include <util/std_expr.h>
 
-class linkingt:public legacy_typecheckt
+class linkingt:public typecheckt
 {
 public:
   linkingt(
     symbol_tablet &_main_symbol_table,
     symbol_tablet &_src_symbol_table,
     message_handlert &_message_handler):
-    legacy_typecheckt(_message_handler),
+    typecheckt(_message_handler),
     main_symbol_table(_main_symbol_table),
     src_symbol_table(_src_symbol_table),
     ns(_main_symbol_table)

@@ -24,7 +24,8 @@ Function: c_storage_spect::read
 
 void c_storage_spect::read(const typet &type)
 {
-  if(type.id()==ID_merged_type)
+  if(type.id()==ID_merged_type ||
+     type.id()==ID_code)
   {
     forall_subtypes(it, type)
       read(*it);

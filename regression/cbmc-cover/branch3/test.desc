@@ -1,0 +1,8 @@
+CORE
+main.c
+--cover branch --unwind 6
+^EXIT=0$
+^SIGNAL=0$
+^\*\* 22 of 22 covered (100.0%), using .* iterations$
+--
+^warning: ignoring
