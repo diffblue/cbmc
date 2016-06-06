@@ -288,21 +288,28 @@ void ansi_c_convert_typet::write(typet &type)
         error_msg();
         throw 0;
       }
-      else if(type.id()!=ID_empty)
+
+      typet *type_p=&type;
+      if(type.id()==ID_code)
+        type_p=&(to_code_type(type).return_type());
+
+      else if(type_p->id()!=ID_empty)
       {
         err_location(source_location);
-        str << "constructor and destructor required to be type void";
+        str << "constructor and destructor required to be type void, "
+            << "found " << type_p->pretty();
         error_msg();
         throw 0;
       }
 
-      type.id(constructor ? ID_constructor : ID_destructor);
+      type_p->id(constructor ? ID_constructor : ID_destructor);
     }
   }
   else if(constructor || destructor)
   {
     err_location(source_location);
-    str << "constructor and destructor required to be type void";
+    str << "constructor and destructor required to be type void, "
+        << "found " << type.pretty();
     error_msg();
     throw 0;
   }
