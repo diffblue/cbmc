@@ -599,6 +599,7 @@ codet java_bytecode_convertt::convert_instructions(
 
     instructionst::const_iterator source;
     std::list<unsigned> successors;
+    std::set<unsigned> predecessors;
     codet code;
     stackt stack;
     bool done;
@@ -624,7 +625,8 @@ codet java_bytecode_convertt::convert_instructions(
 
     if(i_it->statement!="goto" &&
        i_it->statement!="return" &&
-       !(i_it->statement==patternt("?return")))
+       !(i_it->statement==patternt("?return")) &&
+       i_it->statement!="athrow")
     {
       instructionst::const_iterator next=i_it;
       if(++next!=instructions.end())
@@ -665,6 +667,20 @@ codet java_bytecode_convertt::convert_instructions(
     }
   }
 
+  for(address_mapt::iterator
+      it=address_map.begin();
+      it!=address_map.end();
+      ++it)
+  {
+    for(unsigned s : it->second.successors)
+    {
+      address_mapt::iterator a_it=address_map.find(s);
+      assert(a_it!=address_map.end());
+
+      a_it->second.predecessors.insert(it->first);
+    }
+  }
+
   std::set<unsigned> working_set;
   if(!instructions.empty())
     working_set.insert(instructions.front().address);
@@ -684,6 +700,11 @@ codet java_bytecode_convertt::convert_instructions(
     stack.swap(a_it->second.stack);
     a_it->second.stack.clear();
     codet &c=a_it->second.code;
+
+    assert(stack.empty() ||
+           a_it->second.predecessors.size()<=1 ||
+           has_prefix(stack.front().get_string(ID_C_base_name),
+                      "$stack"));
 
     irep_idt statement=i_it->statement;
     exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
@@ -1423,11 +1444,64 @@ codet java_bytecode_convertt::convert_instructions(
       address_mapt::iterator a_it2=address_map.find(*it);
       assert(a_it2!=address_map.end());
 
+      if(!stack.empty() && a_it2->second.predecessors.size()>1)
+      {
+        // copy into temporaries
+        code_blockt more_code;
+
+        // introduce temporaries when successor is seen for the first
+        // time
+        if(a_it2->second.stack.empty())
+        {
+          for(stackt::iterator s_it=stack.begin();
+              s_it!=stack.end();
+              ++s_it)
+          {
+            symbol_exprt lhs=tmp_variable("$stack", s_it->type());
+            code_assignt a(lhs, *s_it);
+            more_code.copy_to_operands(a);
+
+            s_it->swap(lhs);
+          }
+        }
+        else
+        {
+          assert(a_it2->second.stack.size()==stack.size());
+          stackt::const_iterator os_it=a_it2->second.stack.begin();
+          for(stackt::iterator s_it=stack.begin();
+              s_it!=stack.end();
+              ++s_it)
+          {
+            assert(has_prefix(os_it->get_string(ID_C_base_name),
+                              "$stack"));
+            symbol_exprt lhs=to_symbol_expr(*os_it);
+            code_assignt a(lhs, *s_it);
+            more_code.copy_to_operands(a);
+
+            s_it->swap(lhs);
+            ++os_it;
+          }
+        }
+
+        if(results.empty())
+        {
+          more_code.copy_to_operands(c);
+          c.swap(more_code);
+        }
+        else
+        {
+          c.make_block();
+          forall_operands(o_it, more_code)
+            c.copy_to_operands(*o_it);
+        }
+      }
+
       a_it2->second.stack=stack;
     }
   }
 
   // TODO: add exception handlers from exception table
+  // review successor computation of athrow!
   code_blockt code;
   
   // temporaries
