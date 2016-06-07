@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/i2string.h>
+#include <util/prefix.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -366,10 +367,6 @@ bool java_entry_point(
      symbol_table.symbols.end())
     return false; // silently ignore
 
-#if 0
-  std::cout << "Main: " << config.main << std::endl;
-#endif
-
   messaget message(message_handler);
 
   code_blockt struct_init_code; // struct init code if needed
@@ -381,15 +378,57 @@ bool java_entry_point(
   // find main symbol
   if(config.main!="")
   {
-    // look it up
-    symbol_tablet::symbolst::const_iterator s_it
-      =symbol_table.symbols.find(config.main);
-
-    if(s_it==symbol_table.symbols.end())
+    // Add java:: prefix
+    std::string main_identifier="java::"+config.main;
+    
+    symbol_tablet::symbolst::const_iterator s_it;
+    
+    // Does it have a type signature? (':' suffix)
+    if(config.main.rfind(':')==std::string::npos)
     {
-      message.error() << "main symbol `" << config.main
-                      << "' not found" << messaget::eom;
-      return true;
+      std::string prefix=main_identifier+':';
+      std::set<irep_idt> matches;
+      
+      for(const auto & s : symbol_table.symbols)
+        if(has_prefix(id2string(s.first), prefix) &&
+           s.second.type.id()==ID_code)
+          matches.insert(s.first);
+
+      if(matches.empty())
+      {
+        message.error() << "main symbol `" << config.main
+                        << "' not found" << messaget::eom;
+        return true;
+      }
+      else if(matches.size()==1)
+      {
+        s_it=symbol_table.symbols.find(*matches.begin());
+        assert(s_it!=symbol_table.symbols.end());
+      }
+      else
+      {
+        message.error() << "main symbol `" << config.main
+                        << "' is ambiguous:\n";
+
+        for(const auto & s : matches)
+          message.error() << "  " << s << '\n';
+        
+        message.error() << messaget::eom;
+
+        return true;
+      }
+    }
+    else
+    {
+      // just look it up
+      s_it=symbol_table.symbols.find(main_identifier);
+
+      if(s_it==symbol_table.symbols.end())
+      {
+        message.error() << "main symbol `" << config.main
+                        << "' not found" << messaget::eom;
+        return true;
+      }
     }
 
     // function symbol
@@ -411,13 +450,10 @@ bool java_entry_point(
     }
 
     // get name of associated struct
-    size_t idx=config.main.rfind(".");
+    size_t idx=config.main.rfind('.');
     assert(idx!=std::string::npos);
     assert(idx<config.main.size());
     std::string st=config.main.substr(0, idx);
-#if 0
-    std::cout << "Struct name: " << st << std::endl;
-#endif
 
     // look it up
     symbol_tablet::symbolst::const_iterator st_it
