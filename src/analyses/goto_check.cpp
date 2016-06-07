@@ -944,23 +944,34 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(flags.is_unknown() || flags.is_dynamic_heap())
-    add_guarded_claim(
-      not_exprt(deallocated(pointer, ns)),
-      "dereference failure: deallocated dynamic object",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
 
-  if(flags.is_unknown() || flags.is_dynamic_local())
-    add_guarded_claim(
-      not_exprt(dead_object(pointer, ns)),
-      "dereference failure: dead object",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
+  symbol_tablet symbol_table = ns.get_symbol_table();
+      
+  symbol_tablet::symbolst::iterator s_it=
+    symbol_table.symbols.find(CPROVER_PREFIX "initialize");
+
+  // For Java don't check dereference of a deallocated or dead object 
+  if (s_it==symbol_table.symbols.end() || (s_it->second).mode != ID_java) 
+  {
+
+    if(flags.is_unknown() || flags.is_dynamic_heap())
+      add_guarded_claim(
+        not_exprt(deallocated(pointer, ns)),
+	"dereference failure: deallocated dynamic object",
+	"pointer dereference",
+	expr.find_source_location(),
+	expr,
+	guard);
+
+    if(flags.is_unknown() || flags.is_dynamic_local())
+      add_guarded_claim(
+	not_exprt(dead_object(pointer, ns)),
+	"dereference failure: dead object",
+	"pointer dereference",
+	expr.find_source_location(),
+	expr,
+	guard);
+  }
 
   if(enable_bounds_check)
   {
