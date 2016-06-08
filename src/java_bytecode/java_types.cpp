@@ -347,11 +347,9 @@ typet java_type_from_string(const std::string &src)
       if(e_pos==std::string::npos) return nil_typet();
 
       code_typet result;
-
-      // return types are promoted
+      
       result.return_type()=
-        java_bytecode_promotion(
-          java_type_from_string(std::string(src, e_pos+1, std::string::npos)));
+        java_type_from_string(std::string(src, e_pos+1, std::string::npos));
 
       for(std::size_t i=1; i<src.size() && src[i]!=')'; i++)
       {

@@ -86,6 +86,7 @@ protected:
   symbol_tablet &symbol_table;
 
   irep_idt current_method;
+  typet method_return_type;
 
   class variablet
   {
@@ -364,6 +365,7 @@ void java_bytecode_convertt::convert(
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
 
   code_typet &code_type=to_code_type(member_type);
+  method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
 
   // do we need to add 'this' as a parameter?
@@ -373,9 +375,11 @@ void java_bytecode_convertt::convert(
     const empty_typet empty;
     const pointer_typet object_ref_type(empty);
     this_p.type()=object_ref_type;
-    this_p.set(ID_C_this, true);
+    this_p.set_this();
     parameters.insert(parameters.begin(), this_p);
   }
+  
+  variables.clear();
 
   // assign names to parameters
   for(std::size_t i=0, param_index=0;
@@ -383,7 +387,7 @@ void java_bytecode_convertt::convert(
   {
     irep_idt base_name, identifier;
     
-    if(parameters[i].get_bool(ID_C_this))
+    if(i==0 && parameters[i].get_this())
     {
       base_name="this";
       identifier=id2string(method_identifier)+"::"+id2string(base_name);
@@ -455,7 +459,7 @@ void java_bytecode_convertt::convert(
   
   method_symbol.type=member_type;
   current_method=method_symbol.name;
-  method_has_this=!parameters.empty() && parameters.front().get_bool(ID_C_this);
+  method_has_this=!parameters.empty() && parameters.front().get_this();
   tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
   symbol_table.add(method_symbol);
@@ -786,12 +790,12 @@ codet java_bytecode_convertt::convert_instructions(
 
       if(use_this)
       {
-        if(parameters.empty() || !parameters[0].get_bool(ID_C_this))
+        if(parameters.empty() || !parameters[0].get_this())
         {
           const empty_typet empty;
           pointer_typet object_ref_type(empty);
           code_typet::parametert this_p(object_ref_type);
-          this_p.set(ID_C_this, true);
+          this_p.set_this();
           this_p.set_base_name("this");
           parameters.insert(parameters.begin(), this_p);
         }
@@ -825,9 +829,11 @@ codet java_bytecode_convertt::convert_instructions(
 
       if(return_type.id()!=ID_empty)
       {
+        // return types are promoted in Java
         call.lhs()=tmp_variable("return", return_type);
+        exprt promoted=java_bytecode_promotion(call.lhs());
         results.resize(1);
-        results[0]=call.lhs();
+        results[0]=promoted;
       }
 
       assert(arg0.id()==ID_virtual_function);
@@ -869,10 +875,12 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement==patternt("?return"))
     {
+      // Return types are promoted in java, so this might need
+      // conversion.
       assert(op.size()==1 && results.empty());
-      // return values are promoted
-      exprt retval=java_bytecode_promotion(op[0]);
-      c=code_returnt(retval);
+      exprt r=op[0];
+      if(r.type()!=method_return_type) r=typecast_exprt(r, method_return_type);
+      c=code_returnt(r);
     }
     else if(statement==patternt("?astore"))
     {

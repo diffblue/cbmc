@@ -92,7 +92,7 @@ std::string expr2javat::convert_code_function_call(
     code_type.parameters();
   
   bool has_this=!parameters.empty() &&
-                parameters.front().get_bool(ID_C_this) &&
+                parameters.front().get_this() &&
                 !src.arguments().empty();
 
   if(has_this)

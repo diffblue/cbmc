@@ -561,7 +561,7 @@ bool java_entry_point(
       param_number++)
   {
     bool is_this=param_number==0 &&
-                 parameters[param_number].get_bool(ID_C_this);
+                 parameters[param_number].get_this();
     main_arguments[param_number]=
       gen_argument(parameters[param_number].type(), 
                    init_code, is_this, symbol_table);
