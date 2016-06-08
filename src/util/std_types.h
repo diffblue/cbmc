@@ -780,6 +780,16 @@ public:
     {
       return get(ID_C_base_name);
     }
+    
+    inline bool get_this() const
+    {
+      return get_bool(ID_C_this);
+    }
+
+    inline void set_this()
+    {
+      set(ID_C_this, true);
+    }
   };
   
   inline bool has_ellipsis() const
