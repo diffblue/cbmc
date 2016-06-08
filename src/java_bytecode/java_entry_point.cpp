@@ -369,9 +369,9 @@ bool java_entry_point(
 
   messaget message(message_handler);
 
-  code_blockt struct_init_code; // struct init code if needed
-  bool have_struct=false;
-  symbol_exprt struct_ptr;
+  code_blockt object_init_code; // object initialization code if needed
+  bool have_object=false;
+  symbol_exprt object_this_ptr;
 
   symbolt symbol; // main function symbol
 
@@ -449,15 +449,15 @@ bool java_entry_point(
       return true;
     }
 
-    // get name of associated struct
+    // get name of associated class
     size_t idx=config.main.rfind('.');
     assert(idx!=std::string::npos);
     assert(idx<config.main.size());
-    std::string st=config.main.substr(0, idx);
+    std::string class_name=config.main.substr(0, idx);
 
     // look it up
-    symbol_tablet::symbolst::const_iterator st_it
-      =symbol_table.symbols.find(st);
+    symbol_tablet::symbolst::const_iterator st_it=
+      symbol_table.symbols.find(class_name);
 
     if(st_it!=symbol_table.symbols.end() &&
        st_it->second.type.id()==ID_struct)
@@ -471,12 +471,12 @@ bool java_entry_point(
       aux_symbol.type=pointer_type;
       aux_symbol.is_static_lifetime=true;
 
-      struct_ptr=aux_symbol.symbol_expr();
+      object_this_ptr=aux_symbol.symbol_expr();
 
       namespacet ns(symbol_table);
-      gen_nondet_init(struct_ptr, struct_init_code, ns);
+      gen_nondet_init(object_this_ptr, object_init_code, ns);
 
-      have_struct=true;
+      have_object=true;
     }
   }
   else
@@ -561,20 +561,12 @@ bool java_entry_point(
     init_code.move_to_operands(call_init);
   }
 
-  // add struct init code
+  // add object initialization code
 
-  if(have_struct)
-  {
-    typedef code_blockt::operandst operandst;
-    const operandst &operands=struct_init_code.operands();
+  if(have_object && !object_init_code.operands().empty())
+    init_code.add(object_init_code);
 
-    for(operandst::const_iterator it=operands.begin(); it!=operands.end(); it++)
-    {
-      init_code.add((const codet&)*it);
-    }
-  }
-
-  // build call to main method
+  // build call to the main method
 
   code_function_callt call_main;
   call_main.add_source_location()=symbol.location;
@@ -588,9 +580,10 @@ bool java_entry_point(
 
   unsigned i=0;
 
-  if(have_struct && parameters.size()>=1)
+  if(have_object)
   {
-    main_arguments[0]=struct_ptr;
+    assert(parameters.size()>=1);
+    main_arguments[0]=object_this_ptr;
     i++;
   }
 
