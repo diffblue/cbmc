@@ -736,6 +736,7 @@ codet java_bytecode_convertt::convert_instructions(
     {
       assert(op.size()==1 && results.size()==1);
       side_effect_expr_throwt throw_expr;
+      throw_expr.add_source_location()=i_it->source_location;
       throw_expr.copy_to_operands(op[0]);
       c=code_expressiont(throw_expr);
       results[0]=op[0];
