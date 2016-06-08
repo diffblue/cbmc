@@ -3,6 +3,7 @@ NullPointer1.class
 --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
+^  file NullPointer1.java line 16$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
