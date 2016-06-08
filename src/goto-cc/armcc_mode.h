@@ -17,7 +17,7 @@ Date: June 2006
 class armcc_modet:public goto_cc_modet
 {
 public:
-  virtual bool doit();
+  virtual int doit();
   virtual void help_mode();
 
   explicit armcc_modet(armcc_cmdlinet &_armcc_cmdline):

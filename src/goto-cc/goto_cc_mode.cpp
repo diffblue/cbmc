@@ -108,10 +108,7 @@ int goto_cc_modet::main(int argc, const char **argv)
 
   try
   {
-    if(doit())
-      return EX_USAGE; // error
-    else
-      return EX_OK;
+    return doit();
   }
 
   catch(const char *e)

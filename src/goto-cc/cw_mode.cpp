@@ -6,6 +6,14 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+#ifdef _WIN32
+#define EX_OK 0
+#define EX_USAGE 64
+#define EX_SOFTWARE 70
+#else
+#include <sysexits.h>
+#endif
+
 #include <iostream>
 
 #include <util/string2int.h>
@@ -28,12 +36,12 @@ Function: cw_modet::doit
 
 \*******************************************************************/
 
-bool cw_modet::doit()
+int cw_modet::doit()
 {
   if(cmdline.isset('?') || cmdline.isset("help"))
   {
     help();
-    return false;
+    return EX_OK;
   }
 
   unsigned int verbosity=1;
@@ -173,7 +181,7 @@ bool cw_modet::doit()
   }
 
   // Parse input program, convert to goto program, write output
-  return compiler.doit();
+  return compiler.doit() ? EX_USAGE : EX_OK;
 }
 
 /*******************************************************************\
