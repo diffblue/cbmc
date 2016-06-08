@@ -86,31 +86,41 @@ protected:
   symbol_tablet &symbol_table;
 
   irep_idt current_method;
-  unsigned number_of_parameters;
+
+  class variablet
+  {
+  public:
+    symbol_exprt symbol_expr;
+  };
+  
+  std::vector<variablet> variables;
+  
   bool method_has_this;
 
   // JVM local variables
-  const symbol_exprt variable(const exprt &arg, char type_char)
+  const exprt variable(const exprt &arg, char type_char)
   {
     irep_idt number=to_constant_expr(arg).get_value();
-    irep_idt base_name;
     
-    if(method_has_this && number==ID_0)
+    unsigned number_int=safe_string2unsigned(id2string(number));
+    typet t=java_type_from_char(type_char);
+
+    if(number_int<variables.size())
     {
-      base_name=ID_this;
+      exprt result=variables[number_int].symbol_expr;
+      if(t!=result.type()) result=typecast_exprt(result, t);
+      return result;
     }
     else
     {
-      std::string prefix=(safe_string2unsigned(id2string(number))<number_of_parameters)?"arg":"local";
-      base_name=prefix+id2string(number)+type_char;
+      irep_idt base_name="local"+id2string(number)+type_char;
+      irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+
+      symbol_exprt result(identifier, t);
+      result.set(ID_C_base_name, base_name);
+
+      return result;
     }
-    
-    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
-
-    symbol_exprt result(identifier, java_type_from_char(type_char));
-    result.set(ID_C_base_name, base_name);
-
-    return result;
   }
 
   // temporary variables
@@ -311,11 +321,6 @@ size_t get_variable_slots(const code_typet::parametert &param)
   return count_slots(0, param);
 }
 
-size_t count_java_parameter_slots(const code_typet::parameterst &p)
-{
-  return std::accumulate(p.begin(), p.end(), 0, &count_slots);
-}
-
 bool is_contructor(const class_typet::methodt &method)
 {
   const std::string &name(id2string(method.get_name()));
@@ -394,7 +399,7 @@ void java_bytecode_convertt::convert(
       parameters[i].set_base_name(base_name);
       parameters[i].set_identifier(identifier);
     }
-
+    
     // add to symbol table
     parameter_symbolt parameter_symbol;
     parameter_symbol.base_name=base_name;
@@ -402,7 +407,12 @@ void java_bytecode_convertt::convert(
     parameter_symbol.name=identifier;
     parameter_symbol.type=parameters[i].type();
     symbol_table.add(parameter_symbol);
-    param_index+=get_variable_slots(parameters[i]);
+
+    // add as a JVM variable
+    unsigned slots=get_variable_slots(parameters[i]);
+    variables.resize(param_index+slots);
+    variables[param_index].symbol_expr=parameter_symbol.symbol_expr();
+    param_index+=slots;
   }
 
   class_type.methods().push_back(class_typet::methodt());
@@ -445,7 +455,6 @@ void java_bytecode_convertt::convert(
   
   method_symbol.type=member_type;
   current_method=method_symbol.name;
-  number_of_parameters=count_java_parameter_slots(parameters);
   method_has_this=!parameters.empty() && parameters.front().get_bool(ID_C_this);
   tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
@@ -890,7 +899,7 @@ codet java_bytecode_convertt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
 
-      symbol_exprt var=variable(arg0, statement[0]);
+      exprt var=variable(arg0, statement[0]);
 
       const bool is_array('a' == statement[0]);
       
