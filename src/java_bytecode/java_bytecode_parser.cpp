@@ -1048,6 +1048,25 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
         it->second->source_location.set_line(line_number);
     }
   }
+  else if(attribute_name=="LocalVariableTable")
+  {
+    u2 local_variable_table_length=read_u2();
+    
+    method.local_variable_table.resize(local_variable_table_length);
+
+    for(unsigned i=0; i<local_variable_table_length; i++)
+    {
+      UNUSED u2 start_pc=read_u2();
+      UNUSED u2 length=read_u2();
+      u2 name_index=read_u2();
+      u2 descriptor_index=read_u2();
+      u2 index=read_u2();
+      
+      method.local_variable_table[i].index=index;
+      method.local_variable_table[i].name=pool_entry(name_index).s;
+      method.local_variable_table[i].signature=id2string(pool_entry(descriptor_index).s);
+    }
+  }
   else
     skip_bytes(attribute_length);
 }

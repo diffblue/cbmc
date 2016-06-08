@@ -380,7 +380,7 @@ void java_bytecode_convertt::convert(
   }
   
   variables.clear();
-
+  
   // assign names to parameters
   for(std::size_t i=0, param_index=0;
       i < parameters.size(); ++i)
@@ -396,9 +396,18 @@ void java_bytecode_convertt::convert(
     }
     else
     {
-      const typet &type=parameters[i].type();
-      char suffix=java_char_from_type(type);
-      base_name="arg"+i2string(param_index)+suffix;
+      // in the variable table?
+      for(const auto & v : m.local_variable_table)
+        if(v.index==param_index)
+          base_name=v.name;
+
+      if(base_name.empty())
+      {
+        const typet &type=parameters[i].type();
+        char suffix=java_char_from_type(type);
+        base_name="arg"+i2string(param_index)+suffix;
+      }
+    
       identifier=id2string(method_identifier)+"::"+id2string(base_name);
       parameters[i].set_base_name(base_name);
       parameters[i].set_identifier(identifier);
@@ -418,6 +427,13 @@ void java_bytecode_convertt::convert(
     variables[param_index].symbol_expr=parameter_symbol.symbol_expr();
     param_index+=slots;
   }
+
+  // Do the locals in the variable table
+  //for(const auto & v : m.local_variable_table)
+  //{
+    //if(v.index>=variables.size()) variables.resize(v.index+1);
+    //  base_name=v.name;
+  //}
 
   class_type.methods().push_back(class_typet::methodt());
   class_typet::methodt &method=class_type.methods().back();
