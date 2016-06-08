@@ -73,35 +73,6 @@ void create_initialize(symbol_tablet &symbol_table)
 
 /*******************************************************************\
 
-Function: gen_argument
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-namespace {
-exprt gen_argument(const typet &type)
-{
-  if(type.id()==ID_pointer)
-  {
-    /*
-    side_effect_exprt result(ID_java_new);
-    result.operands().resize(1);
-    return result;
-    */
-    return side_effect_expr_nondett(type);
-  }
-  else
-    return side_effect_expr_nondett(type);
-}
-}
-
-/*******************************************************************\
-
 Function: gen_nondet_init
 
   Inputs:
@@ -287,6 +258,50 @@ symbolt &new_tmp_symbol(symbol_tablet &symbol_table)
 
 /*******************************************************************\
 
+Function: gen_argument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+namespace {
+exprt gen_argument(
+  const typet &type,
+  code_blockt &init_code,
+  bool is_this,
+  symbol_tablet &symbol_table)
+{
+  if(type.id()==ID_pointer)
+  {
+    symbolt &aux_symbol=new_tmp_symbol(symbol_table);
+    aux_symbol.type=type;
+    aux_symbol.is_static_lifetime=true;
+
+    exprt object_this_ptr=aux_symbol.symbol_expr();
+
+    const namespacet ns(symbol_table);
+    gen_nondet_init(object_this_ptr, init_code, ns);
+
+    return side_effect_expr_nondett(type);
+  }
+  else if(type.id()==ID_c_bool)
+  {
+    // We force this to 0 and 1 and won't consider
+    // other values.
+    //return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
+    return typecast_exprt(false_exprt(), type);
+  }
+  else
+    return side_effect_expr_nondett(type);
+}
+}
+
+/*******************************************************************\
+
 Function: java_static_lifetime_init
 
   Inputs:
@@ -369,10 +384,6 @@ bool java_entry_point(
 
   messaget message(message_handler);
 
-  code_blockt object_init_code; // object initialization code if needed
-  bool have_object=false;
-  symbol_exprt object_this_ptr;
-
   symbolt symbol; // main function symbol
 
   // find main symbol
@@ -440,43 +451,13 @@ bool java_entry_point(
                       << "' not a function" << messaget::eom;
       return true;
     }
-
+    
     // check if it has a body
     if(symbol.value.is_nil())
     {
       message.error() << "main method `" << main_class
                       << "' has no body" << messaget::eom;
       return true;
-    }
-
-    // get name of associated class
-    size_t idx=config.main.rfind('.');
-    assert(idx!=std::string::npos);
-    assert(idx<config.main.size());
-    std::string class_name=config.main.substr(0, idx);
-
-    // look it up
-    symbol_tablet::symbolst::const_iterator st_it=
-      symbol_table.symbols.find(class_name);
-
-    if(st_it!=symbol_table.symbols.end() &&
-       st_it->second.type.id()==ID_struct)
-    {
-      const symbolt &struct_symbol=st_it->second;
-      assert(struct_symbol.type.id()==ID_struct);
-      const struct_typet &struct_type=to_struct_type(struct_symbol.type);
-      const pointer_typet pointer_type(struct_type);
-
-      symbolt &aux_symbol=new_tmp_symbol(symbol_table);
-      aux_symbol.type=pointer_type;
-      aux_symbol.is_static_lifetime=true;
-
-      object_this_ptr=aux_symbol.symbol_expr();
-
-      namespacet ns(symbol_table);
-      gen_nondet_init(object_this_ptr, object_init_code, ns);
-
-      have_object=true;
     }
   }
   else
@@ -534,6 +515,8 @@ bool java_entry_point(
   assert(!symbol.value.is_nil());
   assert(symbol.type.id()==ID_code);
 
+  const code_typet &code_type=to_code_type(symbol.type);
+    
   create_initialize(symbol_table);
 
   if(java_static_lifetime_init(symbol_table, symbol.location, message_handler))
@@ -561,11 +544,6 @@ bool java_entry_point(
     init_code.move_to_operands(call_init);
   }
 
-  // add object initialization code
-
-  if(have_object && !object_init_code.operands().empty())
-    init_code.add(object_init_code);
-
   // build call to the main method
 
   code_function_callt call_main;
@@ -573,22 +551,21 @@ bool java_entry_point(
   call_main.function()=symbol.symbol_expr();
 
   const code_typet::parameterst &parameters=
-    to_code_type(symbol.type).parameters();
+    code_type.parameters();
 
   exprt::operandst main_arguments;
   main_arguments.resize(parameters.size());
-
-  unsigned i=0;
-
-  if(have_object)
+  
+  for(std::size_t param_number=0;
+      param_number<parameters.size();
+      param_number++)
   {
-    assert(parameters.size()>=1);
-    main_arguments[0]=object_this_ptr;
-    i++;
+    bool is_this=param_number==0 &&
+                 parameters[param_number].get_bool(ID_C_this);
+    main_arguments[param_number]=
+      gen_argument(parameters[param_number].type(), 
+                   init_code, is_this, symbol_table);
   }
-
-  for(; i<parameters.size(); i++)
-    main_arguments[i]=gen_argument(parameters[i].type());
 
   call_main.arguments()=main_arguments;
 
