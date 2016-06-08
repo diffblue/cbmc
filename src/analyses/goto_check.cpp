@@ -900,116 +900,126 @@ void goto_checkt::pointer_validity_check(
 
   assert(base_type_eq(pointer_type.subtype(), expr.type(), ns));
 
-  #if 0
-  add_guarded_claim(
-    good_pointer(expr.pointer()),
-    "dereference failure: pointer not valid",
-    "pointer dereference",
-    expr.find_source_location(),
-    expr,
-    guard);    
-  #else
-  
   local_bitvector_analysist::flagst flags=
     local_bitvector_analysis->get(t, pointer);
     
   const typet &dereference_type=pointer_type.subtype();
 
-  if(flags.is_unknown() || flags.is_null())
+  irep_idt mode;
+
   {
-    add_guarded_claim(
-      not_exprt(null_pointer(pointer)),
-      "dereference failure: pointer NULL",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
+    const symbolt *init_symbol;
+    if(!ns.lookup(CPROVER_PREFIX "initialize", init_symbol))
+      mode=init_symbol->mode;
   }
 
-  if(flags.is_unknown())
-    add_guarded_claim(
-      not_exprt(invalid_pointer(pointer)),
-      "dereference failure: pointer invalid",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
-
-  if(flags.is_uninitialized())
-    add_guarded_claim(
-      not_exprt(invalid_pointer(pointer)),
-      "dereference failure: pointer uninitialized",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
-
-  symbol_tablet symbol_table = ns.get_symbol_table();
-
-  symbol_tablet::symbolst::iterator s_it =
-    symbol_table.symbols.find(CPROVER_PREFIX "initialize");
-
-  // For Java don't check dereference of a deallocated or dead object
-  if (s_it == symbol_table.symbols.end() || (s_it->second).mode != ID_java)
+  // For Java, we only need to check for null
+  if(mode==ID_java)
   {
-    if(flags.is_unknown() || flags.is_dynamic_heap())
-      add_guarded_claim(
-        not_exprt(deallocated(pointer, ns)),
-        "dereference failure: deallocated dynamic object",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-
-    if(flags.is_unknown() || flags.is_dynamic_local())
-      add_guarded_claim(
-        not_exprt(dead_object(pointer, ns)),
-        "dereference failure: dead object",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-  }
-
-  if(enable_bounds_check)
-  {
-    if(flags.is_unknown() || flags.is_dynamic_heap())
+    if(flags.is_unknown() || flags.is_null())
     {
-      exprt dynamic_bounds=
-        or_exprt(dynamic_object_lower_bound(pointer),
-                 dynamic_object_upper_bound(pointer, dereference_type, ns));
+      notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+      //exprt not_eq_null=not_exprt(null_pointer(pointer));
 
       add_guarded_claim(
-        implies_exprt(malloc_object(pointer, ns), not_exprt(dynamic_bounds)),
-        "dereference failure: dynamic object bounds",
+        not_eq_null,
+        "reference is null",
         "pointer dereference",
         expr.find_source_location(),
         expr,
         guard);
     }
   }
-
-  if(enable_bounds_check)
+  else
   {
-    if(flags.is_unknown() ||
-       flags.is_dynamic_local() ||
-       flags.is_static_lifetime())
+    if(flags.is_unknown() || flags.is_null())
     {
-      exprt object_bounds=
-        or_exprt(object_lower_bound(pointer),
-                 object_upper_bound(pointer, dereference_type, ns));
-
       add_guarded_claim(
-        or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
-        "dereference failure: object bounds",
+        not_exprt(null_pointer(pointer)),
+        "dereference failure: pointer NULL",
         "pointer dereference",
         expr.find_source_location(),
         expr,
         guard);
     }
-  }
 
-  #endif
+    if(flags.is_unknown())
+      add_guarded_claim(
+        not_exprt(invalid_pointer(pointer)),
+        "dereference failure: pointer invalid",
+        "pointer dereference",
+        expr.find_source_location(),
+        expr,
+        guard);
+
+    if(flags.is_uninitialized())
+      add_guarded_claim(
+        not_exprt(invalid_pointer(pointer)),
+        "dereference failure: pointer uninitialized",
+        "pointer dereference",
+        expr.find_source_location(),
+        expr,
+        guard);
+
+    if(mode != ID_java)
+    {
+      if(flags.is_unknown() || flags.is_dynamic_heap())
+        add_guarded_claim(
+          not_exprt(deallocated(pointer, ns)),
+          "dereference failure: deallocated dynamic object",
+          "pointer dereference",
+          expr.find_source_location(),
+          expr,
+          guard);
+
+      if(flags.is_unknown() || flags.is_dynamic_local())
+        add_guarded_claim(
+          not_exprt(dead_object(pointer, ns)),
+          "dereference failure: dead object",
+          "pointer dereference",
+          expr.find_source_location(),
+          expr,
+          guard);
+    }
+
+    if(enable_bounds_check)
+    {
+      if(flags.is_unknown() || flags.is_dynamic_heap())
+      {
+        exprt dynamic_bounds=
+          or_exprt(dynamic_object_lower_bound(pointer),
+                   dynamic_object_upper_bound(pointer, dereference_type, ns));
+
+        add_guarded_claim(
+          implies_exprt(malloc_object(pointer, ns), not_exprt(dynamic_bounds)),
+          "dereference failure: dynamic object bounds",
+          "pointer dereference",
+          expr.find_source_location(),
+          expr,
+          guard);
+      }
+    }
+
+    if(enable_bounds_check)
+    {
+      if(flags.is_unknown() ||
+         flags.is_dynamic_local() ||
+         flags.is_static_lifetime())
+      {
+        exprt object_bounds=
+          or_exprt(object_lower_bound(pointer),
+                   object_upper_bound(pointer, dereference_type, ns));
+
+        add_guarded_claim(
+          or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
+          "dereference failure: object bounds",
+          "pointer dereference",
+          expr.find_source_location(),
+          expr,
+          guard);
+      }
+    }
+  }
 }
 
 /*******************************************************************\
