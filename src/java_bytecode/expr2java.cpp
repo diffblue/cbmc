@@ -230,11 +230,17 @@ std::string expr2javat::convert_constant(
 {
   if(src.type().id()==ID_bool)
   {
-    // C++ has built-in Boolean constants, in contrast to C
+    // Java has built-in Boolean constants, in contrast to C
     if(src.is_true())
       return "true";
     else if(src.is_false())
       return "false";
+  }
+  else if(src.type().id()==ID_pointer)
+  {
+    // Java writes 'null' for the null reference
+    if(src.is_zero())
+      return "null";
   }
 
   return expr2ct::convert_constant(src, precedence);
