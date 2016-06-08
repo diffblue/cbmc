@@ -429,11 +429,19 @@ void java_bytecode_convertt::convert(
   }
 
   // Do the locals in the variable table
-  //for(const auto & v : m.local_variable_table)
-  //{
-    //if(v.index>=variables.size()) variables.resize(v.index+1);
-    //  base_name=v.name;
-  //}
+  for(const auto & v : m.local_variable_table)
+  {
+    if(v.index>=variables.size()) variables.resize(v.index+1);
+
+    if(variables[v.index].symbol_expr.get_identifier().empty())    
+    {
+      typet t=java_type_from_string(v.signature);
+      irep_idt identifier=id2string(current_method)+"::"+id2string(v.name);
+      symbol_exprt result(identifier, t);
+      result.set(ID_C_base_name, v.name);
+      variables[v.index].symbol_expr=result;
+    }
+  }
 
   class_type.methods().push_back(class_typet::methodt());
   class_typet::methodt &method=class_type.methods().back();
