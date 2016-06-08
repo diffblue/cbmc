@@ -1541,17 +1541,21 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
          i.code.op0().operands().size()==1)
       {
         // must not throw NULL
-
+        
         exprt pointer=i.code.op0().op0();
-        notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
 
-        add_guarded_claim(
-          not_eq_null,
-          "throwing null",
-          "pointer dereference",
-          i.source_location,
-          pointer,
-          guardt());
+        if(pointer.type().subtype().get(ID_identifier)!="java::java.lang.AssertionError")
+        {        
+          notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+
+          add_guarded_claim(
+            not_eq_null,
+            "throwing null",
+            "pointer dereference",
+            i.source_location,
+            pointer,
+            guardt());
+        }
       }
 
       // this has no successor
