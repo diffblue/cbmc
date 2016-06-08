@@ -2,12 +2,23 @@
 
 unsigned int sleep(unsigned int seconds)
 {
+  __CPROVER_HIDE:;
   // do nothing, but return nondet value
   unsigned remaining_time;
   
   if(remaining_time>seconds) remaining_time=seconds;
   
   return remaining_time;
+}
+
+/* FUNCTION: _sleep */
+
+unsigned int sleep(unsigned int seconds);
+
+inline unsigned int _sleep(unsigned int seconds)
+{
+  __CPROVER_HIDE:;
+  return sleep(seconds);
 }
 
 /* FUNCTION: unlink */
@@ -64,15 +75,6 @@ int pipe(int fildes[2])
 
 /* FUNCTION: close */
 
-#ifdef _WIN32
-#include <io.h>
-#else
-#ifndef __CPROVER_UNISTD_H_INCLUDED
-#include <unistd.h>
-#define __CPROVER_UNISTD_H_INCLUDED
-#endif
-#endif
-
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
@@ -98,24 +100,31 @@ int close(int fildes)
   return retval;
 }
 
+/* FUNCTION: _close */
+
+inline int _close(int fildes)
+{
+  __CPROVER_HIDE:;
+  return close(fildes);
+}
+
 /* FUNCTION: write */
 
-#ifdef _WIN32
-#include <io.h>
+// do not include unistd.h as this might trigger GCC asm renaming of
+// write to _write; this is covered by the explicit definition of
+// _write below
+#ifdef _MSC_VER
+#define ssize_t signed long
 #else
-#ifndef __CPROVER_UNISTD_H_INCLUDED
-#include <unistd.h>
-#define __CPROVER_UNISTD_H_INCLUDED
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#include <sys/types.h>
+#define __CPROVER_SYS_TYPES_H_INCLUDED
 #endif
 #endif
 
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
-
-#ifdef _MSC_VER
-#define ssize_t signed long
-#endif
 
 ssize_t write(int fildes, const void *buf, size_t nbyte)
 {
@@ -146,24 +155,42 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
   return retval;
 }
 
+/* FUNCTION: _write */
+
+#ifdef _MSC_VER
+#define ssize_t signed long
+#else
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#include <sys/types.h>
+#define __CPROVER_SYS_TYPES_H_INCLUDED
+#endif
+#endif
+
+ssize_t write(int fildes, const void *buf, size_t nbyte);
+
+inline ssize_t _write(int fildes, const void *buf, size_t nbyte)
+{
+  __CPROVER_HIDE:;
+  return write(fildes, buf, nbyte);
+}
+
 /* FUNCTION: read */
 
-#ifdef _WIN32
-#include <io.h>
+// do not include unistd.h as this might trigger GCC asm renaming of
+// read to _read; this is covered by the explicit definition of _read
+// below
+#ifdef _MSC_VER
+#define ssize_t signed long
 #else
-#ifndef __CPROVER_UNISTD_H_INCLUDED
-#include <unistd.h>
-#define __CPROVER_UNISTD_H_INCLUDED
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#include <sys/types.h>
+#define __CPROVER_SYS_TYPES_H_INCLUDED
 #endif
 #endif
 
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
-
-#ifdef _MSC_VER
-#define ssize_t signed long
-#endif
 
 ssize_t read(int fildes, void *buf, size_t nbyte)
 {
@@ -209,3 +236,21 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
   return retval;
 }
 
+/* FUNCTION: _read */
+
+#ifdef _MSC_VER
+#define ssize_t signed long
+#else
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#include <sys/types.h>
+#define __CPROVER_SYS_TYPES_H_INCLUDED
+#endif
+#endif
+
+ssize_t read(int fildes, void *buf, size_t nbyte);
+
+inline ssize_t _read(int fildes, void *buf, size_t nbyte)
+{
+  __CPROVER_HIDE:;
+  return read(fildes, buf, nbyte);
+}
