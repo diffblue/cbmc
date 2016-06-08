@@ -461,7 +461,8 @@ int gcc_modet::preprocess(
     }
     else if(it->arg=="--function" ||
             it->arg=="--verbosity" ||
-            it->arg=="--native-linker")
+            it->arg=="--native-linker" ||
+            it->arg=="--print-rejected-preprocessed-source")
     {
       // ignore here
       skip_next=true;

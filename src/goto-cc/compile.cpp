@@ -446,7 +446,20 @@ bool compilet::compile()
 
     bool r=parse_source(file_name); // don't break the program!
 
-    if(r) return true; // parser/typecheck error
+    if(r)
+    {
+      const std::string &debug_outfile=
+        cmdline.get_value("print-rejected-preprocessed-source");
+      if(!debug_outfile.empty())
+      {
+        std::ifstream in(file_name, std::ios::binary);
+        std::ofstream out(debug_outfile, std::ios::binary);
+        out << in.rdbuf();
+        warning() << "Failed sources in " << debug_outfile << eom;
+      }
+
+      return true; // parser/typecheck error
+    }
 
     if(mode==COMPILE_ONLY || mode==ASSEMBLE_ONLY)
     {

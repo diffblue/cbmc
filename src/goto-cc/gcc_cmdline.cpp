@@ -54,6 +54,7 @@ const char *gcc_options_with_separated_argument[]=
   "--function",  // non-gcc
   "--native-compiler", // non-gcc
   "--native-linker", // non-gcc
+  "--print-rejected-preprocessed-source", // non-gcc
   "-aux-info",
   "--param", // Apple only
   "-imacros",
