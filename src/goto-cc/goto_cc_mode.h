@@ -21,7 +21,7 @@ public:
   std::string base_name;
 
   virtual int main(int argc, const char **argv);
-  virtual bool doit()=0;
+  virtual int doit()=0;
   virtual void help_mode()=0;
   virtual void help();
   virtual void usage_error();

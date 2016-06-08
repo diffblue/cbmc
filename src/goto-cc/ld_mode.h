@@ -17,7 +17,7 @@ Date: June 2006
 class ld_modet:public goto_cc_modet
 {
 public:
-  virtual bool doit();
+  virtual int doit();
   virtual void help_mode();
 
   explicit ld_modet(ld_cmdlinet &_ld_cmdline):

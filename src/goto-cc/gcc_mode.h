@@ -17,7 +17,7 @@ Date: June 2006
 class gcc_modet:public goto_cc_modet
 {
 public:
-  virtual bool doit();
+  virtual int doit();
   virtual void help_mode();
 
   explicit gcc_modet(goto_cc_cmdlinet &_cmdline):
