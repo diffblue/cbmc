@@ -919,7 +919,6 @@ void goto_checkt::pointer_validity_check(
     if(flags.is_unknown() || flags.is_null())
     {
       notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
-      //exprt not_eq_null=not_exprt(null_pointer(pointer));
 
       add_guarded_claim(
         not_eq_null,
@@ -1537,6 +1536,24 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     }
     else if(i.is_throw())
     {
+      if(i.code.get_statement()==ID_expression &&
+         i.code.operands().size()==1 &&
+         i.code.op0().operands().size()==1)
+      {
+        // must not throw NULL
+
+        exprt pointer=i.code.op0().op0();
+        notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+
+        add_guarded_claim(
+          not_eq_null,
+          "throwing null",
+          "pointer dereference",
+          i.source_location,
+          pointer,
+          guardt());
+      }
+
       // this has no successor
       assertions.clear();
     }
