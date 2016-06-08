@@ -164,6 +164,9 @@ Function: java_boolean_type
 
 typet java_boolean_type()
 {
+  // The Java standard doesn't really prescribe the width
+  // of a boolean. However, JNI suggests that it's 8 bits.
+  // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/types.html
   return c_bool_typet(8);
 }
 
@@ -371,7 +374,7 @@ typet java_type_from_string(const std::string &src)
         
         std::string sub_str=src.substr(start, i-start+1);
         param.type()=java_type_from_string(sub_str);
-
+        
         if(param.type().id()==ID_symbol)
           param.type()=java_reference_type(param.type());
         
@@ -436,8 +439,9 @@ Function: java_char_from_type
 
 char java_char_from_type(const typet &type)
 {
-  const irep_idt &id(type.id());
-  if (ID_signedbv == id)
+  const irep_idt &id=type.id();
+
+  if(id==ID_signedbv)
   {
     const unsigned int width(type.get_unsigned_int(ID_width));
     if(java_int_type().get_unsigned_int(ID_width) == width)
@@ -449,9 +453,9 @@ char java_char_from_type(const typet &type)
     else if(java_byte_type().get_unsigned_int(ID_width) == width)
       return 'b';
   }
-  else if(ID_unsignedbv == id)
+  else if(id==ID_unsignedbv)
     return 'c';
-  else if(ID_floatbv == id)
+  else if(id==ID_floatbv)
   {
     const unsigned int width(type.get_unsigned_int(ID_width));
     if(java_float_type().get_unsigned_int(ID_width) == width)
@@ -459,7 +463,7 @@ char java_char_from_type(const typet &type)
     else if(java_double_type().get_unsigned_int(ID_width) == width)
       return 'd';
   }
-  else if(ID_bool == id)
+  else if(id==ID_c_bool)
     return 'z';
 
   return 'a';
