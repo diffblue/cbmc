@@ -373,7 +373,7 @@ void java_bytecode_convertt::convert(
   }
 
   // assign names to parameters
-  for(size_t i=0, param_index=0;
+  for(std::size_t i=0, param_index=0;
       i < parameters.size(); ++i)
   {
     irep_idt base_name, identifier;
@@ -387,9 +387,10 @@ void java_bytecode_convertt::convert(
     }
     else
     {
-      base_name="arg"+i2string(param_index);
       const typet &type=parameters[i].type();
-      identifier=id2string(method_identifier)+"::"+id2string(base_name)+java_char_from_type(type);
+      char suffix=java_char_from_type(type);
+      base_name="arg"+i2string(param_index)+suffix;
+      identifier=id2string(method_identifier)+"::"+id2string(base_name);
       parameters[i].set_base_name(base_name);
       parameters[i].set_identifier(identifier);
     }
