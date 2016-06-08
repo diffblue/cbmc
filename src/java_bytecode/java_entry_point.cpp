@@ -273,6 +273,7 @@ exprt gen_argument(
   const typet &type,
   code_blockt &init_code,
   bool is_this,
+  bool allow_null,
   symbol_tablet &symbol_table)
 {
   if(type.id()==ID_pointer)
@@ -282,7 +283,7 @@ exprt gen_argument(
     aux_symbol.is_static_lifetime=true;
 
     exprt object_this_ptr=aux_symbol.symbol_expr();
-
+    
     const namespacet ns(symbol_table);
     gen_nondet_init(object_this_ptr, init_code, ns);
 
@@ -292,8 +293,7 @@ exprt gen_argument(
   {
     // We force this to 0 and 1 and won't consider
     // other values.
-    //return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
-    return typecast_exprt(false_exprt(), type);
+    return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
   }
   else
     return side_effect_expr_nondett(type);
@@ -562,9 +562,11 @@ bool java_entry_point(
   {
     bool is_this=param_number==0 &&
                  parameters[param_number].get_this();
+    bool allow_null=config.main!="";
+    
     main_arguments[param_number]=
       gen_argument(parameters[param_number].type(), 
-                   init_code, is_this, symbol_table);
+                   init_code, is_this, allow_null, symbol_table);
   }
 
   call_main.arguments()=main_arguments;
