@@ -23,12 +23,17 @@ Function: remove_unused_functions
 \*******************************************************************/
 
 void remove_unused_functions(
+  const irep_idt &start,
   goto_functionst &functions,
   message_handlert &message_handler)
 {
   std::set<irep_idt> used_functions;
   std::list<goto_functionst::function_mapt::iterator> unused_functions;
-  find_used_functions(goto_functionst::entry_point(), functions, used_functions);
+  find_used_functions(start, functions, used_functions);
+
+  //maybe an error should be thrown in this case
+  if(functions.function_map.find(start) == functions.function_map.end())
+    used_functions.clear();
     
   for(goto_functionst::function_mapt::iterator it=
         functions.function_map.begin();
@@ -39,8 +44,11 @@ void remove_unused_functions(
       unused_functions.push_back(it);
   }
   
+  assert(unused_functions.size() + used_functions.size() ==
+	 functions.function_map.size());
+
   messaget message(message_handler);
-  
+
   if(unused_functions.size()>0)
   {
     message.statistics()
@@ -54,6 +62,26 @@ void remove_unused_functions(
       it!=unused_functions.end();
       it++)
     functions.function_map.erase(*it); 
+}
+
+/*******************************************************************\
+
+Function: remove_unused_functions
+
+  Inputs: 
+
+ Outputs: 
+
+ Purpose: 
+
+\*******************************************************************/
+
+void remove_unused_functions(
+  goto_functionst &functions,
+  message_handlert &message_handler)
+{
+  remove_unused_functions(goto_functionst::entry_point(), 
+			  functions, message_handler);
 }
 
 /*******************************************************************\

@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/time_stopping.h>
 #include <util/message_stream.h>
+#include <util/json.h>
 
 #include <langapi/mode.h>
 #include <langapi/languages.h>
@@ -87,8 +88,14 @@ void bmct::error_trace()
     }
     break;
   
-  default:
-    assert(false);
+  case ui_message_handlert::JSON_UI:
+    {
+      json_objectt counterexample;
+      jsont &json_trace=counterexample["counterexample"];
+      convert(ns, goto_trace, json_trace);
+      std::cout << ",\n" << counterexample << "\n";
+    }
+    break;  
   }
 
   const std::string graphml=options.get_option("graphml-cex");
@@ -105,22 +112,6 @@ void bmct::error_trace()
       write_graphml(cex_graph, out);
     }
   }
-
-  if(options.get_option("json-cex")!="")
-  {
-    jsont json_trace;
-    convert(ns, goto_trace, json_trace);
-  
-    if(options.get_option("json-cex")=="-")
-    {
-      std::cout << json_trace;
-    }
-    else
-    {
-      std::ofstream out(options.get_option("json-cex").c_str());
-      out << json_trace << '\n';
-    }
-  }  
 }
 
 /*******************************************************************\
@@ -223,6 +214,14 @@ void bmct::report_success()
       std::cout << "\n";
     }
     break;
+
+  case ui_message_handlert::JSON_UI:
+    {
+      json_objectt json_result;
+      json_result["cProverStatus"]=json_stringt("success");
+      std::cout << ",\n" << json_result; 
+    }
+    break;
     
   default:
     assert(false);
@@ -258,9 +257,14 @@ void bmct::report_failure()
       std::cout << "\n";
     }
     break;
-    
-  default:
-    assert(false);
+
+  case ui_message_handlert::JSON_UI:
+    {
+      json_objectt json_result;
+      json_result["cProverStatus"]=json_stringt("failure");
+      std::cout << ",\n" << json_result; 
+    }
+    break;
   }
 }
 
