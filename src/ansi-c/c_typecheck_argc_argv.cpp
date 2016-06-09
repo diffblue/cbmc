@@ -35,7 +35,8 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
      parameters.size()!=3)
   {
     err_location(main_symbol.location);
-    throw "main expected to have no or two or three parameters";
+    str << "main expected to have no or two or three parameters";
+    throw 0;
   }
 
   symbolt *argc_new_symbol;

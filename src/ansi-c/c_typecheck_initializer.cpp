@@ -52,7 +52,8 @@ void c_typecheck_baset::do_initializer(
     if(result.id()!=ID_array)
     {
       err_location(result);
-      throw "invalid array initializer";
+      str << "invalid array initializer " << to_string(result);
+      throw 0;
     }
   }
     
@@ -113,13 +114,16 @@ exprt c_typecheck_baset::do_initializer_rec(
       if(to_integer(to_array_type(full_type).size(), array_size))
       {
         err_location(value);
-        throw "array size needs to be constant";
+        str << "array size needs to be constant, got "
+            << to_string(to_array_type(full_type).size());
+        throw 0;
       }
       
       if(array_size<0)
       {
         err_location(value);
-        throw "array size must not be negative";
+        str << "array size must not be negative";
+        throw 0;
       }
 
       if(mp_integer(tmp.operands().size())>array_size)
@@ -163,13 +167,16 @@ exprt c_typecheck_baset::do_initializer_rec(
       if(to_integer(to_array_type(full_type).size(), array_size))
       {
         err_location(value);
-        throw "array size needs to be constant";
+        str << "array size needs to be constant, got "
+            << to_string(to_array_type(full_type).size());
+        throw 0;
       }
       
       if(array_size<0)
       {
         err_location(value);
-        throw "array size must not be negative";
+        str << "array size must not be negative";
+        throw 0;
       }
 
       if(mp_integer(tmp2.operands().size())>array_size)
@@ -704,7 +711,8 @@ designatort c_typecheck_baset::make_designator(
       if(d_op.id()!=ID_index)
       {
         err_location(d_op);
-        throw "expected array index designator";
+        str << "expected array index designator";
+        throw 0;
       }
 
       assert(d_op.operands().size()==1);
@@ -716,7 +724,8 @@ designatort c_typecheck_baset::make_designator(
       if(to_integer(tmp_index, index))
       {
         err_location(d_op.op0());
-        throw "expected constant array index designator";
+        str << "expected constant array index designator";
+        throw 0;
       }
 
       if(to_array_type(full_type).size().is_nil())
@@ -724,7 +733,8 @@ designatort c_typecheck_baset::make_designator(
       else if(to_integer(to_array_type(full_type).size(), size))
       {
         err_location(d_op.op0());
-        throw "expected constant array size";
+        str << "expected constant array size";
+        throw 0;
       }
       
       entry.index=integer2long(index);
@@ -739,7 +749,8 @@ designatort c_typecheck_baset::make_designator(
       if(d_op.id()!=ID_member)
       {
         err_location(d_op);
-        throw "expected member designator";
+        str << "expected member designator";
+        throw 0;
       }
 
       const irep_idt &component_name=d_op.get(ID_component_name);

@@ -71,8 +71,9 @@ void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
   if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
-    throw "failed to move symbol `"+id2string(symbol.name)+
-          "' into symbol table";
+    str << "failed to move symbol `" << symbol.name
+        << "' into symbol table";
+    throw 0;
   }
 }
 
@@ -117,7 +118,8 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   else if(!is_function && symbol.value.id()==ID_code)
   {
     err_location(symbol.value);
-    throw "only functions can have a function body";
+    str << "only functions can have a function body";
+    throw 0;
   }
   
   // set the pretty name
@@ -371,7 +373,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     if(final_new.id()==ID_code)
     {
       err_location(new_symbol.location);
-      throw "function type not allowed for K&R function parameter";
+      str << "function type not allowed for K&R function parameter";
+      throw 0;
     }
     
     // fix up old symbol -- we now got the type
@@ -446,7 +449,6 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
           err_location(new_symbol.location);
           str << "function body `" << new_symbol.display_name()
               << "' defined twice";
-          error_msg();
           throw 0;
         }
       }
