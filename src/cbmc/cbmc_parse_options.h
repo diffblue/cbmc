@@ -31,18 +31,18 @@ class optionst;
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
   "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)(nan-check)" \
   "(no-assertions)(no-assumptions)" \
-  "(xml-ui)(xml-interface)(vcd):" \
+  "(xml-ui)(xml-interface)" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
-  "(floatbv)(fixedbv)" \
+  "(fixedbv)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)(aig)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
   "(show-claims)(claim):(show-properties)(show-reachable-properties)(property):" \
-  "(all-claims)(all-properties)" \
+  "(stop-on-fail)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
   "(cover):" \
@@ -53,7 +53,7 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-cex):(json-cex):" \
-  "(decide)" // legacy, and will eventually disappear
+  "(floatbv)(all-claims)(all-properties)(decide)" // legacy, and will eventually disappear
 
 class cbmc_parse_optionst:
   public parse_options_baset,
