@@ -10,10 +10,16 @@ Author: CM Wintersteiger
 #define CPROVER_GOTO_PROGRAMS_REMOVE_UNUSED_FUNCTIONS_H
 
 #include <util/message.h>
+#include <util/config.h>
 
 #include <goto-programs/goto_functions.h>
 
 void remove_unused_functions( 
+  goto_functionst &functions,
+  message_handlert &message_handler);
+
+void remove_unused_functions( 
+  const irep_idt &current,
   goto_functionst &functions,
   message_handlert &message_handler);
 
