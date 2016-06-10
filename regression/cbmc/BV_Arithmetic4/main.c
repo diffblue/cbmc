@@ -1,3 +1,5 @@
+#include <assert.h>
+
 /* Copy new sign bit to the left */
 int test_extend2(int x, unsigned width)
 {
