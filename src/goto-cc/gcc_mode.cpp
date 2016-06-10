@@ -302,6 +302,9 @@ int gcc_modet::doit()
   if(cmdline.isset('l'))
     compiler.libraries=cmdline.get_values('l');
 
+  if(cmdline.isset("static"))
+    compiler.libraries.push_back("c");
+
   if(cmdline.isset('o'))
   {
     // given gcc -o file1 -o file2,
