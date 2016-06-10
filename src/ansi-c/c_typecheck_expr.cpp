@@ -289,7 +289,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     if(expr.op0().get(ID_statement)!=ID_decl)
     {
       err_location(expr);
-      throw "expected declaration as operand of quantifier";
+      str << "expected declaration as operand of quantifier";
+      throw 0;
     }
 
     // replace declaration by symbol expression
@@ -320,8 +321,9 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       if(!is_number(op_type))
       {
         err_location(expr.op0());
-        throw "real/imag expect numerical operand, "
-              "but got `"+to_string(op_type)+"'";
+        str << "real/imag expect numerical operand, "
+            << "but got `" << to_string(op_type) << "'";
+        throw 0;
       }
 
       // we could compile away, I suppose      
@@ -349,7 +351,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     if(expr.operands().size()!=1)
     {
       err_location(expr);
-      throw "_Generic expects one operand";
+      str << "_Generic expects one operand";
+      throw 0;
     }
 
     // This is one of the few places where it's detectable
@@ -547,7 +550,8 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
   if(!expr.operands().empty())
   {
     err_location(expr);
-    throw "builtin_offsetof expects no operands";
+    str << "builtin_offsetof expects no operands";
+    throw 0;
   }
 
   typet &type=static_cast<typet &>(expr.add(ID_type_arg));
@@ -567,8 +571,9 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       if(type.id()!=ID_union && type.id()!=ID_struct)
       {
         err_location(expr);
-        throw "offsetof of member expects struct/union type, "
-              "but got `"+to_string(type)+"'";
+        str << "offsetof of member expects struct/union type, "
+            << "but got `" << to_string(type) << "'";
+        throw 0;
       }
       
       bool found=false;
@@ -656,8 +661,9 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
           if(!found2)
           {
             err_location(expr);    
-            throw "offset-of of member failed to find component `"+
-                  id2string(component_name)+"' in `"+to_string(type)+"'";
+            str << "offset-of of member failed to find component `"
+                << component_name << "' in `" << to_string(type) << "'";
+            throw 0;
           }
         }
       }
@@ -669,7 +675,8 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       if(type.id()!=ID_array)
       {
         err_location(expr);
-        throw "offsetof of index expects array type";
+        str << "offsetof of index expects array type";
+        throw 0;
       }
 
       exprt index=m_it->op0();
@@ -733,7 +740,8 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
     if(declaration.declarators().size()!=1)
     {
       err_location(expr);
-      throw "expected one declarator exactly";
+      str << "expected one declarator exactly";
+      throw 0;
     }
 
     irep_idt identifier=
@@ -757,7 +765,8 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
        !is_complete_type(symbol.type) || symbol.type.id()==ID_code)
     {
       err_location(expr);
-      throw "unexpected quantified symbol";
+      str << "unexpected quantified symbol";
+      throw 0;
     }
     
     code_declt decl;
@@ -1567,7 +1576,6 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
   {
     err_location(expr);
     str << "ptrmember operator expects one operand";
-    error_msg();
     throw 0;
   }
 
@@ -1615,7 +1623,6 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   {
     err_location(expr);
     str << "member operator expects one operand";
-    error_msg();
     throw 0;
   }
 
@@ -1827,7 +1834,6 @@ void c_typecheck_baset::typecheck_side_effect_gcc_conditional_expression(
   {
     err_location(expr);
     str << "gcc conditional_expr expects two operands";
-    error_msg();
     throw 0;
   }
 
@@ -1865,7 +1871,6 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   {
     err_location(expr);
     str << "unary operator & expects one operand";
-    error_msg();
     throw 0;
   }
 
@@ -1875,7 +1880,6 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   {
     err_location(expr);
     str << "cannot take address of a bit field";
-    error_msg();
     throw 0;
   }
   
@@ -2133,7 +2137,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   if(expr.operands().size()!=2)
   {
     err_location(expr);
-    throw "function_call side effect expects two operands";
+    str << "function_call side effect expects two operands";
+    throw 0;
   }
 
   exprt &f_op=expr.function();
@@ -2215,7 +2220,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   if(f_op.type().id()!=ID_code)
   {
     err_location(f_op);
-    throw "expected code as argument";
+    str << "expected code as argument";
+    throw 0;
   }
 
   const code_typet &code_type=to_code_type(f_op.type());
@@ -2259,7 +2265,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=2)
     {
       err_location(f_op);
-      throw "same_object expects two operands";
+      str << "same_object expects two operands";
+      throw 0;
     }
 
     exprt same_object_expr=same_object(expr.arguments()[0], expr.arguments()[1]);
@@ -2272,7 +2279,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=2)
     {
       err_location(f_op);
-      throw "get_must expects two operands";
+      str << "get_must expects two operands";
+      throw 0;
     }
 
     typecheck_function_call_arguments(expr);
@@ -2288,7 +2296,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=2)
     {
       err_location(f_op);
-      throw "get_may expects two operands";
+      str << "get_may expects two operands";
+      throw 0;
     }
 
     typecheck_function_call_arguments(expr);
@@ -2304,7 +2313,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "invalid_pointer expects one operand";
+      str << "invalid_pointer expects one operand";
+      throw 0;
     }
 
     predicate_exprt same_object_expr(ID_invalid_pointer);
@@ -2318,7 +2328,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "buffer_size expects one operand";
+      str << "buffer_size expects one operand";
+      throw 0;
     }
 
     exprt buffer_size_expr("buffer_size", size_type());
@@ -2332,7 +2343,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "is_zero_string expects one operand";
+      str << "is_zero_string expects one operand";
+      throw 0;
     }
 
     predicate_exprt is_zero_string_expr("is_zero_string");
@@ -2347,7 +2359,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "zero_string_length expects one operand";
+      str << "zero_string_length expects one operand";
+      throw 0;
     }
 
     exprt zero_string_length_expr("zero_string_length", size_type());
@@ -2360,7 +2373,11 @@ exprt c_typecheck_baset::do_special_functions(
   else if(identifier==CPROVER_PREFIX "DYNAMIC_OBJECT")
   {
     if(expr.arguments().size()!=1)
-      throw "dynamic_object expects one argument";
+    {
+      err_location(f_op);
+      str << "dynamic_object expects one argument";
+      throw 0;
+    }
 
     exprt dynamic_object_expr=exprt(ID_dynamic_object, expr.type());
     dynamic_object_expr.operands()=expr.arguments();
@@ -2371,7 +2388,11 @@ exprt c_typecheck_baset::do_special_functions(
   else if(identifier==CPROVER_PREFIX "POINTER_OFFSET")
   {
     if(expr.arguments().size()!=1)
-      throw "pointer_offset expects one argument";
+    {
+      err_location(f_op);
+      str << "pointer_offset expects one argument";
+      throw 0;
+    }
 
     exprt pointer_offset_expr=exprt(ID_pointer_offset, expr.type());
     pointer_offset_expr.operands()=expr.arguments();
@@ -2382,7 +2403,11 @@ exprt c_typecheck_baset::do_special_functions(
   else if(identifier==CPROVER_PREFIX "POINTER_OBJECT")
   {
     if(expr.arguments().size()!=1)
-      throw "pointer_object expects one argument";
+    {
+      err_location(f_op);
+      str << "pointer_object expects one argument";
+      throw 0;
+    }
 
     exprt pointer_object_expr=exprt(ID_pointer_object, expr.type());
     pointer_object_expr.operands()=expr.arguments();
@@ -2398,7 +2423,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "isnan expects one operand";
+      str << "isnan expects one operand";
+      throw 0;
     }
 
     exprt isnan_expr(ID_isnan, bool_typet());
@@ -2414,7 +2440,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "isfinite expects one operand";
+      str << "isfinite expects one operand";
+      throw 0;
     }
 
     exprt isfinite_expr(ID_isfinite, bool_typet());
@@ -2459,7 +2486,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "abs-functions expect one operand";
+      str << "abs-functions expect one operand";
+      throw 0;
     }
 
     exprt abs_expr(ID_abs, expr.type());
@@ -2473,7 +2501,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "malloc expects one operand";
+      str << "malloc expects one operand";
+      throw 0;
     }
 
     exprt malloc_expr=side_effect_exprt(ID_malloc);
@@ -2491,7 +2520,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "isinf expects one operand";
+      str << "isinf expects one operand";
+      throw 0;
     }
 
     exprt isinf_expr(ID_isinf, bool_typet());
@@ -2507,7 +2537,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "isnormal expects one operand";
+      str << "isnormal expects one operand";
+      throw 0;
     }
 
     exprt isnormal_expr(ID_isnormal, bool_typet());
@@ -2526,7 +2557,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "sign expects one operand";
+      str << "sign expects one operand";
+      throw 0;
     }
 
     exprt sign_expr(ID_sign, bool_typet());
@@ -2545,7 +2577,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw id2string(identifier)+" expects one operand";
+      str << id2string(identifier)+" expects one operand";
+      throw 0;
     }
 
     exprt popcount_expr(ID_popcount, expr.type());
@@ -2559,7 +2592,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=2)
     {
       err_location(f_op);
-      throw "equal expects two operands";
+      str << "equal expects two operands";
+      throw 0;
     }
     
     equal_exprt equality_expr;
@@ -2570,7 +2604,8 @@ exprt c_typecheck_baset::do_special_functions(
                      equality_expr.rhs().type(), *this))
     {
       err_location(f_op);
-      throw "equal expects two operands of same type";
+      str << "equal expects two operands of same type";
+      throw 0;
     }
 
     return equality_expr;
@@ -2586,7 +2621,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=2)
     {
       err_location(f_op);
-      throw "__builtin_expect expects two arguments";
+      str << "__builtin_expect expects two arguments";
+      throw 0;
     }
 
     return typecast_exprt(expr.arguments()[0], expr.type());
@@ -2600,7 +2636,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=2)
     {
       err_location(f_op);
-      throw "__builtin_object_size expects two arguments";
+      str << "__builtin_object_size expects two arguments";
+      throw 0;
     }
 
     make_constant(expr.arguments()[1]);
@@ -2641,7 +2678,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=3)
     {
       err_location(f_op);
-      throw "__builtin_choose_expr expects three arguments";
+      str << "__builtin_choose_expr expects three arguments";
+      throw 0;
     }
     
     expr.arguments()[0].make_typecast(bool_typet());
@@ -2659,7 +2697,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "__builtin_constant_p expects one argument";
+      str << "__builtin_constant_p expects one argument";
+      throw 0;
     }
 
     // try to produce constant
@@ -2695,7 +2734,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      throw "__builtin_classify_type expects one argument";
+      str << "__builtin_classify_type expects one argument";
+      throw 0;
     }
     
     exprt object=expr.arguments()[0];
@@ -2730,7 +2770,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=2)
     {
       err_location(f_op);
-      throw "float_debug expects two operands";
+      str << "float_debug expects two operands";
+      throw 0;
     }
 
     const irep_idt &id=
@@ -2766,7 +2807,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()<1)
     {
       err_location(f_op);
-      throw "__sync_* primitives take as least one argument";
+      str << "__sync_* primitives take as least one argument";
+      throw 0;
     }
     
     exprt &ptr_arg=expr.arguments().front();
@@ -2774,7 +2816,8 @@ exprt c_typecheck_baset::do_special_functions(
     if(ptr_arg.type().id()!=ID_pointer)
     {
       err_location(f_op);
-      throw "__sync_* primitives take pointer as first argument";
+      str << "__sync_* primitives take pointer as first argument";
+      throw 0;
     }
     
     expr.type()=expr.arguments().front().type().subtype();
@@ -2825,7 +2868,8 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     if(parameter_types.size()>arguments.size())
     {
       err_location(expr);
-      throw "not enough function arguments";
+      str << "not enough function arguments";
+      throw 0;
     }
   }
   else if(parameter_types.size()!=arguments.size())
@@ -3231,7 +3275,8 @@ void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
   if(subtype.id()==ID_incomplete_struct)
   {
     err_location(expr);
-    throw "pointer arithmetic with unknown object size";
+    str << "pointer arithmetic with unknown object size";
+    throw 0;
   }
 }
 
@@ -3621,7 +3666,8 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
      expr.id()!=ID_infinity)
   {
     err_location(expr.find_source_location());
-    throw "conversion to integer constant failed";
+    str << "conversion to integer constant failed";
+    throw 0;
   }
 }
 
