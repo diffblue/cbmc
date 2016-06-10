@@ -4784,11 +4784,6 @@ void smt2_convt::find_symbols(const exprt &expr)
           << "| () ";
       convert_type(expr.type());
       out << ")" << "\n";
-
-      if (strings_mode == STRINGS_QARRAY && is_string_type(expr.type())) {
-        out << "(assert (bvule (cprover.str.len |" << smt2_identifier << "|) "
-            << "(_ bv2147483647 32)))\n";
-      }
     }
   }
   else if(expr.id()==ID_array_of)
@@ -5149,7 +5144,11 @@ void smt2_convt::define_string_concat(const function_application_exprt &f)
       << " (bvadd (cprover.str.len " << s0id << ") ?n))))))\n";
   out << "(assert (= (cprover.str.len " << id
       << ") (bvadd (cprover.str.len " << s0id << ") "
-      << "(cprover.str.len " << s1id << "))))\n\n";
+      << "(cprover.str.len " << s1id << "))))\n";
+  out << "(assert (bvuge (cprover.str.len " << id << ") "
+      << "(cprover.str.len " << s0id << ")))\n";
+  out << "(assert (bvuge (cprover.str.len " << id << ") "
+      << "(cprover.str.len " << s1id << ")))\n\n";
 }
 
 
@@ -5194,6 +5193,9 @@ void smt2_convt::define_string_substring(const function_application_exprt &f)
       << "(bvule " << jid << " (cprover.str.len " << sid << "))\n"
       << "(= (cprover.str.len " << id << ") "
       << "(bvsub " << jid << " " << iid << "))))\n";
+
+  out << "(assert (bvuge (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << id << ")))\n\n";
 }
 
 
