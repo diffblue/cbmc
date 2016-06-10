@@ -259,9 +259,15 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
            << cover_goals.iterations() << " iteration"
            << (cover_goals.iterations()==1?"":"s")
            << ")" << eom;
+
+  bool safe=(cover_goals.number_covered()==0);
+
+  if(safe)
+    bmc.report_success(); // legacy, might go away
+  else
+    bmc.report_failure(); // legacy, might go away
   
-  return (cover_goals.number_covered()==0)?
-    safety_checkert::SAFE:safety_checkert::UNSAFE;
+  return safe?safety_checkert::SAFE:safety_checkert::UNSAFE;
 }
 
 /*******************************************************************\

@@ -557,9 +557,28 @@ safety_checkert::resultt bmct::decide(
 {
   prop_conv.set_message_handler(get_message_handler());
 
-  if(options.get_bool_option("all-properties"))
+  if(options.get_bool_option("stop-on-fail"))
+    return stop_on_fail(goto_functions, prop_conv);
+  else
     return all_properties(goto_functions, prop_conv);
+}
 
+/*******************************************************************\
+
+Function: bmct::stop_on_fail
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+safety_checkert::resultt bmct::stop_on_fail(
+  const goto_functionst &goto_functions,
+  prop_convt &prop_conv)
+{
   switch(run_decision_procedure(prop_conv))
   {
   case decision_proceduret::D_UNSATISFIABLE:

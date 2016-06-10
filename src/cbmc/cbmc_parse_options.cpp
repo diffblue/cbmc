@@ -177,11 +177,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("simplify", true);
 
-  if(cmdline.isset("all-claims") || // will go away
-     cmdline.isset("all-properties")) // use this one
-    options.set_option("all-properties", true);
+  if(cmdline.isset("stop-on-fail") ||
+     cmdline.isset("property"))
+    options.set_option("stop-on-fail", true);
   else
-    options.set_option("all-properties", false);
+    options.set_option("stop-on-fail", false);
 
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
@@ -1060,8 +1060,9 @@ void cbmc_parse_optionst::help()
     " cbmc file.c ...              source file names\n"
     "\n"
     "Analysis options:\n"
-    " --all-properties             check and report status of all properties\n"
     " --show-properties            show the properties, but don't run analysis\n"
+    " --property id                only check one specific property\n"
+    " --stop-on-fail               stop analysis once a failed property is detected\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -1101,6 +1102,7 @@ void cbmc_parse_optionst::help()
     " --round-to-plus-inf          rounding towards plus infinity\n"
     " --round-to-minus-inf         rounding towards minus infinity\n"
     " --round-to-zero              rounding towards zero\n"
+    " --function name              set main function name\n"
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
@@ -1130,8 +1132,6 @@ void cbmc_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     "\n"
     "BMC options:\n"
-    " --function name              set main function name\n"
-    " --property id                only check one specific property\n"
     " --program-only               only show program expression\n"
     " --show-loops                 show the loops in the program\n"
     " --depth nr                   limit search depth\n"

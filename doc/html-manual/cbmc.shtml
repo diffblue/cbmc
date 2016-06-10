@@ -59,10 +59,10 @@ domains</a>.  More detail on automatically generated properties is provided
 <a href="properties.shtml">here</a>.</p>
 
 <p class="justified">
-Note that automatically generated properties need not necessarily correspond
-to bugs &ndash; these are just <i>potential</i> flaws, as abstract
-interpretation might be imprecise.  Whether one of these properties
-holds or corresponds to a bug needs to be determined by further analysis.
+Note that these automatically generated properties need not necessarily
+correspond to bugs &ndash; these are just <i>potential</i> flaws, as
+abstract interpretation might be imprecise.  Whether these properties
+hold or correspond to actual bugs needs to be determined by further analysis.
 </p>
 
 <p class="justified">
@@ -87,17 +87,40 @@ holds. Let's run the decision procedure:</p>
 </code>
 
 <p class="justified">
-CBMC transforms the equation you have seen before into CNF and passes it
-to a SAT solver (more background on this step is in the book
-on <a href="http://www.decision-procedures.org/">Decision Procedures</a>).
-CBMC can now detect that the equation is actually not valid,
-and thus, there is a bug in the program. It prints a counterexample trace,
-i.e., a program trace that ends in a state which violates the property. In
-our example, the program trace ends in the faulty array access. It also
-shows the values the input variables must have for the bug to occur. In this
-example, <code>argc</code> must be one to trigger the out-of-bounds array access.
-If you add a branch to the example that requires that <code>argc&gt;=3</code>,
-the bug is fixed and CBMC will report a successful verification run.</p>
+CBMC transforms the equation you have seen before into CNF and passes it to
+a SAT solver (more background on this step is in the book on <a
+href="http://www.decision-procedures.org/">Decision Procedures</a>).  It
+then determines which of the properties that it has generated for the
+program hold and which do not.  Using the SAT solver, CBMC detects that the
+property for the object bounds of <code>argv</code> does not hold, and will
+thus print a line as follows:
+</p>
+
+<code>
+[main.pointer_dereference.6] dereference failure: object bounds in argv[(signed long int)2]: FAILED
+</code>
+
+<h3>Counterexample Traces</h3>
+
+<p class="justified">
+Let us have a closer look at this property and why it fails. To aid the
+understanding of the problem, CBMC can generate a <i>counterexample
+trace</i> for failed properties. To obtain this trace, run
+</P
+
+<code>
+&nbsp;&nbsp;cbmc file1.c --bounds-check --pointer-check --property main.pointer_dereference.6
+</code>
+
+<p class="justified">
+CBMC then prints a counterexample trace, i.e., a program trace that begins
+with <code>main</code> and ends in a state which violates the property.  In
+our example, the program trace ends in the faulty array access.  It also
+shows the values the input variables must have for the bug to occur.  In
+this example, <code>argc</code> must be one to trigger the out-of-bounds
+array access.  If you add a branch to the example that requires that
+<code>argc&gt;=3</code>, the bug is fixed and CBMC will report that all
+properties are OK.</p>
 
 <h3>Verifying Modules</h3>
 
@@ -129,14 +152,21 @@ In order to set the entry point to the <code>sum</code> function, run
 &nbsp;&nbsp;cbmc file2.c --function sum --bounds-check
 </code>
 
+<p class="justified">
+It is often necessary to build a suitable <i>harness</i> for the function
+in order to set up the environment appropriately.
+</p>
+
 <h3>Loop Unwinding</h3>
 
 <p class="justified">
-You will note that CBMC unwinds the <code>for</code> loop in the program.
-As CBMC performs Bounded Model Checking, all loops have to have a finite
-upper run-time bound in order to guarantee that all bugs are found.  CBMC
-can optionally check that enough unwinding is performed.  As an example, consider
-the program <a href="binsearch.c">binsearch.c</a>:</p>
+When running the previous example, you will have noted that CBMC unwinds the
+<code>for</code> loop in the program.  As CBMC performs Bounded Model
+Checking, all loops have to have a finite upper run-time bound in order to
+guarantee that all bugs are found.  CBMC can optionally check that enough
+unwinding is performed.  As an example, consider the program <a
+href="binsearch.c">binsearch.c</a>:
+</p>
 
 <hr>
 <code>
@@ -171,10 +201,13 @@ command line argument:</p>
 <p class="justified">
 CBMC verifies that verifies the array accesses are within the bounds; note
 that this actually depends on the result of the right shift.  In addition,
-as CBMC is given the option <code>--unwinding-assertions</code>, it also
-checks that enough unwinding is done, i.e., it proves a run-time bound.  For
-any lower unwinding bound, there are traces that require more loop
-iterations.  Thus, CBMC will produce an appropriate counterexample.
+as CBMC is given the option
+<nobr><code>--unwinding-assertions</code></nobr>, it also checks that enough
+unwinding is done, i.e., it proves a run-time bound.  For any lower
+unwinding bound, there are traces that require more loop iterations.  Thus,
+CBMC will report that the unwinding assertion has failed. As usual, a counterexample
+trace that documents this can be obtained with the option
+<code>--property</code>.
 </p>
 
 <h3>Unbounded Loops</h3>
@@ -244,7 +277,7 @@ the number of program steps to be processed.</li>
 Given the option <code>--unwinding-assertions</code>, CBMC checks whether
 the arugment to <code>--unwind</code> is large enough to cover all program
 paths. If the argument is too small, CBMC will detect that not enough
-unwinding is done and aborts with an unwinding assertion violation.
+unwinding is done reports that an unwinding assertion has failed.
 </p>
 
 <p class="justified">
