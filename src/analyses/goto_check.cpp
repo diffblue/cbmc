@@ -1412,6 +1412,14 @@ void goto_checkt::check_rec(
     pointer_rel_check(expr, guard);
   else if(expr.id()==ID_dereference)
     pointer_validity_check(to_dereference_expr(expr), guard);
+
+  else if(expr.id() == ID_side_effect && to_side_effect_expr(expr).get_statement() == ID_nondet)
+  {
+    // search if there is a dereference
+    const irept &deref=expr.find("previous-dereference");
+    if (deref.is_not_nil())
+      pointer_validity_check(to_dereference_expr(static_cast<const exprt &>(deref)), guard);
+  }
 }
 
 /*******************************************************************\
