@@ -46,6 +46,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/add_failed_symbols.h>
 
+#include <test_gen/java_test_case_generator.h>
+
 #include <analyses/goto_check.h>
 
 #include <langapi/mode.h>
@@ -445,6 +447,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("graphml-cex"))
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
+
+  if(cmdline.isset("gen-java-test-case"))
+    options.set_option("gen-java-test-case", true);
 }
 
 /*******************************************************************\
@@ -560,6 +565,9 @@ int cbmc_parse_optionst::doit()
 
   if(set_properties(goto_functions))
     return 7;
+
+  if(options.get_bool_option("gen-java-test-case"))
+    return generate_java_test_case(options, symbol_table, goto_functions, bmc);
 
   // do actual BMC
   return do_bmc(bmc, goto_functions);
