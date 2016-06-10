@@ -5281,8 +5281,9 @@ void smt2_convt::define_string_is_suffix(const function_application_exprt &f)
       << "(not " << ugeid << ")\n"
       << "(and (bvult " << witness << " (cprover.str.len " << s1id << ")) "
       << "(not (= (select " << s1id << " " << witness << ") "
-      << "(select " << sid << " (bvsub (cprover.str.len " << sid << ") "
-      << "(bvadd " << witness << " (cprover.str.len " << s1id << ")))))))\n";
+      << "(select " << sid << " (bvadd " << witness
+      << " (bvsub (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << s1id << ")))))))\n";
   out << ")))\n\n";
 }
 
