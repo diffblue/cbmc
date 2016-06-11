@@ -1,6 +1,6 @@
 CORE
 NullPointer1.class
---pointer-check
+--pointer-check --stop-on-fail
 ^EXIT=10$
 ^SIGNAL=0$
 ^  file NullPointer1.java line 16$

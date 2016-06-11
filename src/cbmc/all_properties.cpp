@@ -247,7 +247,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
     else
     {
       status() << "[" << it->first << "] "
-               << it->second.description << ": " << (it->second.failed?"FAILED":"OK")
+               << it->second.description << ": " << (it->second.failed?"FAILURE":"SUCCESS")
                << eom;
     }
   }
