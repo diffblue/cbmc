@@ -97,7 +97,7 @@ thus print a line as follows:
 </p>
 
 <code>
-[main.pointer_dereference.6] dereference failure: object bounds in argv[(signed long int)2]: FAILED
+[main.pointer_dereference.6] dereference failure: object bounds in argv[(signed long int)2]: FAILURE
 </code>
 
 <h3>Counterexample Traces</h3>
@@ -119,8 +119,8 @@ our example, the program trace ends in the faulty array access.  It also
 shows the values the input variables must have for the bug to occur.  In
 this example, <code>argc</code> must be one to trigger the out-of-bounds
 array access.  If you add a branch to the example that requires that
-<code>argc&gt;=3</code>, the bug is fixed and CBMC will report that all
-properties are OK.</p>
+<code>argc&gt;=3</code>, the bug is fixed and CBMC will report that the
+proofs of all properties have been successful.</p>
 
 <h3>Verifying Modules</h3>
 
