@@ -1,3 +1,5 @@
+#include <assert.h>
+
 int main()
 {
   assert(((long long int)(unsigned long long)-1)==-1);
