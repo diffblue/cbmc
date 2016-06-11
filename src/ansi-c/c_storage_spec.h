@@ -34,10 +34,18 @@ public:
     is_register=false;
     is_inline=false;
     is_weak=false;
+    alias.clear();
+    asm_label.clear();
   }
   
   bool is_typedef, is_extern, is_static, is_register,
        is_inline, is_thread_local, is_weak;
+
+  // __attribute__((alias("foo")))
+  irep_idt alias;
+
+  // GCC asm labels __asm__("foo") - these change the symbol name
+  irep_idt asm_label;
   
   friend bool operator == (
     const c_storage_spect &a,
@@ -49,7 +57,9 @@ public:
            a.is_register==b.is_register &&
            a.is_thread_local==b.is_thread_local &&
            a.is_inline==b.is_inline &&
-           a.is_weak==b.is_weak;
+           a.is_weak==b.is_weak &&
+           a.alias==b.alias &&
+           a.asm_label==b.asm_label;
   }
 
   friend bool operator != (
@@ -70,6 +80,8 @@ public:
     a.is_inline       |=b.is_inline;
     a.is_thread_local |=b.is_thread_local;
     a.is_weak         |=b.is_weak;
+    if(!b.alias.empty()) a.alias=b.alias;
+    if(!b.asm_label.empty()) a.asm_label=b.asm_label;
     
     return a;
   }

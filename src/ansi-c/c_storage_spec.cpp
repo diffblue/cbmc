@@ -55,4 +55,16 @@ void c_storage_spect::read(const typet &type)
       if(it->id()==ID_thread)
         is_thread_local=true;
   }
+  else if(type.id()==ID_alias &&
+          type.has_subtype() &&
+          type.subtype().id()==ID_string_constant)
+  {
+    alias=type.subtype().get(ID_value);
+  }
+  else if(type.id()==ID_asm &&
+          type.has_subtype() &&
+          type.subtype().id()==ID_string_constant)
+  {
+    asm_label=type.subtype().get(ID_value);
+  }
 }

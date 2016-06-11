@@ -799,7 +799,7 @@ Function: c_typecheck_baset::typecheck_expr_symbol
 
 void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
 {
-  const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
+  irep_idt identifier=to_symbol_expr(expr).get_identifier();
   
   // Is it a parameter? We do this while checking parameter lists.
   id_type_mapt::const_iterator p_it=parameter_map.find(identifier);
@@ -809,6 +809,15 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     expr.type()=p_it->second;
     expr.set(ID_C_lvalue, true);
     return;
+  }
+
+  // renaming via GCC asm label
+  asm_label_mapt::const_iterator entry=
+    asm_label_map.find(identifier);
+  if(entry!=asm_label_map.end())
+  {
+    identifier=entry->second;
+    to_symbol_expr(expr).set_identifier(identifier);
   }
 
   // look it up
@@ -839,11 +848,13 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     // preserve enum key
     irep_idt base_name=expr.get(ID_C_base_name);
 
-    expr=symbol.value;
+    follow_macros(expr);
 
     if(expr.id()==ID_constant &&
        !base_name.empty())
       expr.set(ID_C_cformat, base_name);
+    else
+      typecheck_expr(expr);
 
     // preserve location
     expr.add_source_location()=source_location;
@@ -2149,8 +2160,12 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
   if(f_op.id()==ID_symbol)
   {
-    const irep_idt &identifier=
-      to_symbol_expr(f_op).get_identifier();
+    irep_idt identifier=to_symbol_expr(f_op).get_identifier();
+
+    asm_label_mapt::const_iterator entry=
+      asm_label_map.find(identifier);
+    if(entry!=asm_label_map.end())
+      identifier=entry->second;
 
     if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {

@@ -195,7 +195,8 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
 
   if(symbol.type.id()==ID_code)
   {
-    if(symbol.value.is_not_nil())
+    if(symbol.value.is_not_nil() &&
+       !symbol.is_macro)
       typecheck_function_body(symbol);
     else
     {
@@ -361,7 +362,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   }
 
   // do initializer, this may change the type
-  if(follow(new_symbol.type).id()!=ID_code)
+  if(follow(new_symbol.type).id()!=ID_code &&
+     !new_symbol.is_macro)
     do_initializer(new_symbol);
   
   const typet &final_new=follow(new_symbol.type);
@@ -464,7 +466,10 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         old_symbol.is_weak=true;
       }
 
-      typecheck_function_body(new_symbol);
+      if(new_symbol.is_macro)
+        old_symbol.is_macro=true;
+      else
+        typecheck_function_body(new_symbol);
     
       // overwrite location
       old_symbol.location=new_symbol.location;
@@ -592,6 +597,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     {
       old_symbol.value=new_symbol.value;
       old_symbol.type=new_symbol.type;
+      old_symbol.is_macro=new_symbol.is_macro;
     }
   }
   
@@ -690,6 +696,89 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 
 /*******************************************************************\
 
+Function: c_typecheck_baset::apply_asm_label
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::apply_asm_label(
+  const irep_idt &asm_label,
+  symbolt &symbol)
+{
+  const irep_idt orig_name=symbol.name;
+
+  // restrict renaming to functions and global variables;
+  // procedure-local ones would require fixing the scope, as we
+  // do for parameters below
+  if(!asm_label.empty() &&
+     !symbol.is_type &&
+     (symbol.type.id()==ID_code || symbol.is_static_lifetime))
+  {
+    symbol.name=asm_label;
+    symbol.base_name=asm_label;
+  }
+
+  if(symbol.name!=orig_name)
+  {
+    if(!asm_label_map.insert(
+        std::make_pair(orig_name, asm_label)).second)
+    {
+      err_location(symbol.location);
+      if(asm_label_map[orig_name]==asm_label)
+      {
+        str << "duplicate (consistent) asm renaming";
+        warning_msg();
+      }
+      else
+      {
+        str << "error: conflicting asm renaming";
+        throw 0;
+      }
+    }
+  }
+  else if(asm_label.empty())
+  {
+    asm_label_mapt::const_iterator entry=
+      asm_label_map.find(symbol.name);
+    if(entry!=asm_label_map.end())
+    {
+      symbol.name=entry->second;
+      symbol.base_name=entry->second;
+    }
+  }
+
+  if(symbol.name!=orig_name &&
+     symbol.type.id()==ID_code &&
+     symbol.value.is_not_nil() && !symbol.is_macro)
+  {
+    const code_typet &code_type=to_code_type(symbol.type);
+
+    for(code_typet::parameterst::const_iterator
+        p_it=code_type.parameters().begin();
+        p_it!=code_type.parameters().end();
+        ++p_it)
+    {
+      const irep_idt &p_bn=p_it->get_base_name();
+      if(p_bn.empty())
+        continue;
+
+      irep_idt p_id=id2string(orig_name)+"::"+id2string(p_bn);
+      irep_idt p_new_id=id2string(symbol.name)+"::"+id2string(p_bn);
+
+      if(!asm_label_map.insert(
+          std::make_pair(p_id, p_new_id)).second)
+        assert(asm_label_map[p_id]==p_new_id);
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: c_typecheck_baset::typecheck_declaration
 
   Inputs:
@@ -751,10 +840,23 @@ void c_typecheck_baset::typecheck_declaration(
 
       symbolt symbol;
       declaration.to_symbol(*d_it, symbol);
-      irep_idt identifier=symbol.name;
 
       // now check other half of type
       typecheck_type(symbol.type);
+
+      if(!full_spec.alias.empty())
+      {
+        if(symbol.value.is_not_nil())
+          throw "alias attribute cannot be used with a body";
+
+        // alias function need not have been declared yet, thus
+        // can't lookup
+        symbol.value=symbol_exprt(full_spec.alias);
+        symbol.is_macro=true;
+      }
+
+      apply_asm_label(full_spec.asm_label, symbol);
+      irep_idt identifier=symbol.name;
 
       typecheck_symbol(symbol);
 
