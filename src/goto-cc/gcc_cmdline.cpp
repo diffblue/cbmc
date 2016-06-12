@@ -39,6 +39,7 @@ const char *gcc_options_with_argument[]=
   "-V",
   "-D",
   "-L",
+  "-l",
   "-MT",
   "-MQ",
   "-MF",
@@ -84,7 +85,6 @@ const char *gcc_options_with_concatenated_argument[]=
   "-g",
   "-A",
   "-U",
-  "-l",
   NULL
 };
 
