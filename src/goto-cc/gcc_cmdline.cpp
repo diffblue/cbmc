@@ -243,7 +243,18 @@ bool gcc_cmdlinet::parse_arguments(
     // options file?
     if(has_prefix(argv_i, "@"))
     {
-      // TODO
+      std::ifstream opts_file(argv_i.substr(1));
+      std::string line;
+
+      while(std::getline(opts_file, line))
+      {
+        // erase leading whitespace
+        line.erase(0, line.find_first_not_of("\t "));
+
+        if(!line.empty())
+          parse_specs_line(line);
+      }
+
       continue;
     }
 
