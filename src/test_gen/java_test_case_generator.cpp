@@ -10,13 +10,28 @@
 
 namespace
 {
+bool is_meta(const irep_idt &id)
+{
+  return std::string::npos != id2string(id).find("$assertionsDisabled");
+}
+
 inputst generate_inputs(const symbol_tablet &st, const goto_functionst &gf,
     const goto_tracet &trace)
 {
   std::map<const irep_idt, exprt> result;
   for (const goto_trace_stept &step : trace.steps)
+  {
     if (goto_trace_stept::ASSIGNMENT == step.type)
-      result.insert(std::make_pair(step.identifier, step.full_lhs_value));
+    {
+      const exprt &lhs=step.full_lhs;
+      if (ID_symbol == lhs.id())
+      {
+        const irep_idt &id=to_symbol_expr(lhs).get_identifier();
+        if (st.has_symbol(id) && !is_meta(id))
+          result.insert(std::make_pair(id, step.full_lhs_value));
+      }
+    }
+  }
   return result;
 }
 
@@ -42,9 +57,10 @@ const irep_idt &get_entry_function_id(const goto_functionst &gf)
 typedef std::function<
     std::string(const symbol_tablet &, const irep_idt &, const inputst &)> test_case_generatort;
 
-int generate_test_case(const optionst &options, const symbol_tablet &st,
+int generate_test_case(optionst &options, const symbol_tablet &st,
     const goto_functionst &gf, bmct &bmc, const test_case_generatort generate)
 {
+  options.set_option("stop-on-fail", true);
   switch (bmc(gf))
   {
   case safety_checkert::SAFE:
@@ -71,12 +87,15 @@ int generate_test_case(const optionst &options, const symbol_tablet &st,
 }
 }
 
-int generate_java_test_case(const optionst &o, const symbol_tablet &st,
+int generate_java_test_case(optionst &o, const symbol_tablet &st,
     const goto_functionst &gf, bmct &bmc)
 {
-  try {
-  return generate_test_case(o, st, gf, bmc, generate_java_test_case_from_inputs);
-  } catch (const std::string &ex) {
+  try
+  {
+    return generate_test_case(o, st, gf, bmc,
+        generate_java_test_case_from_inputs);
+  } catch (const std::string &ex)
+  {
     std::cerr << ex << std::endl;
     throw;
   }

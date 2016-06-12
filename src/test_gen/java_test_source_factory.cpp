@@ -3,37 +3,52 @@
 #include <util/substitute.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
+#include <util/namespace.h>
+
+#include <java_bytecode/expr2java.h>
 
 #include <test_gen/java_test_source_factory.h>
 
+#define INDENT_SPACES "  "
+
 namespace
 {
+std::string &indent(std::string &result, const size_t num_indent=1u)
+{
+  for (size_t i=0u; i < num_indent; ++i)
+    result+=INDENT_SPACES;
+  return result;
+}
+
 void add_test_class_name(std::string &result, const std::string &func_name)
 {
   result+="class ";
   result+=func_name;
   result+="Test {\n";
-  result+="  public void test";
+  indent(result)+="public void test";
   result+=func_name;
   result+="() {\n";
 }
 
-void add_symbol(std::string &result, const symbolt &symbol)
+void add_symbol(std::string &result, const symbolt &s)
 {
-  // TODO: Implement
+  // XXX: Should be expr2java(...) once functional.
+  const irep_idt &n=s.pretty_name.empty() ? s.base_name : s.pretty_name;
+  result+=id2string(n);
 }
 
-void add_value(std::string &result, const exprt &value)
+void add_value(std::string &result, const symbol_tablet &st, const exprt &value)
 {
-  // TODO: Implement
+  const namespacet ns(st);
+  result+=expr2java(value, ns);
 }
 
-void add_assign_value(std::string &result, const symbolt &symbol,
-    const exprt &value)
+void add_assign_value(std::string &result, const symbol_tablet &st,
+    const symbolt &symbol, const exprt &value)
 {
   add_symbol(result, symbol);
   result+='=';
-  add_value(result, value);
+  add_value(result, st, value);
   result+=";\n";
 }
 
@@ -44,13 +59,16 @@ void add_global_state_assignments(std::string &result, const symbol_tablet &st,
   {
     const symbolt &symbol=st.lookup(input.first);
     if (!symbol.is_static_lifetime) continue;
-    add_assign_value(result, symbol, input.second);
+    add_assign_value(indent(result, 2u), st, symbol, input.second);
   }
 }
 
-void add_decl_with_init_prefix(std::string &result, const symbolt &symbol)
+void add_decl_with_init_prefix(std::string &result, const symbol_tablet &st,
+    const symbolt &symbol)
 {
-  // TODO: Implement
+  const namespacet ns(st);
+  result+=type2java(symbol.type, ns);
+  result+=' ';
 }
 
 std::set<irep_idt> get_parameters(const symbolt &func)
@@ -73,16 +91,31 @@ void add_func_call_parameters(std::string &result, const symbol_tablet &st,
     const symbolt &symbol=st.lookup(param);
     const inputst::const_iterator value=inputs.find(param);
     assert(inputs.end() != value);
-    add_decl_with_init_prefix(result, symbol);
-    add_assign_value(result, symbol, value->second);
+    add_decl_with_init_prefix(indent(result, 2u), st, symbol);
+    add_assign_value(result, st, symbol, value->second);
   }
 }
 
 std::string &add_func_call(std::string &result, const symbol_tablet &st,
     const irep_idt &func_id)
 {
-  // TODO: Implement
-  return result;
+  // XXX: Should be expr2java(...) once functional.
+  const symbolt &s=st.lookup(func_id);
+  const std::string func_name_with_brackets(id2string(s.pretty_name));
+  const size_t sz=func_name_with_brackets.size();
+  assert(sz >= 2u);
+  indent(result, 2u)+=func_name_with_brackets.substr(0, sz - 2);
+  result+='(';
+  const std::set<irep_idt> params(get_parameters(s));
+  for (const irep_idt &param : params)
+  {
+    add_symbol(result, st.lookup(param));
+    result+=',';
+  }
+  (*result.rbegin())=')';
+  result+=";\n";
+  indent(result)+="}\n";
+  return result+="}\n";
 }
 
 std::string get_escaped_func_name(const symbolt &symbol)

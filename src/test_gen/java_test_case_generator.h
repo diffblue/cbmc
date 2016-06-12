@@ -25,7 +25,7 @@
  * @param bmc
  */
 int generate_java_test_case(
-    const class optionst &options,
+    class optionst &options,
     const class symbol_tablet &st,
     const class goto_functionst &gf,
     class bmct &bmc);

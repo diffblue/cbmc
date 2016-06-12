@@ -35,10 +35,7 @@ public class TestGenTest
 {
   public static void f(B param0, C param1, int param2)
   {
-    B b = null;
-    int x=b.b_field_0;
-    assert x != 0;
-    /*int a_field_0=param0.a_field_0;
+    int a_field_0=param0.a_field_0;
     int a_field_1=param0.a_field_1;
     int b_field_0=param0.b_field_0;
     int c_field_0=param1.c_field_0;
@@ -53,6 +50,6 @@ public class TestGenTest
            c_field_1_a_field_0 != 495 ||
            c_field_1_a_field_1 != 494 ||
            c_field_1_b_field_0 != 493 ||
-           param2              != 492;*/
+           param2              != 492;
   }
 }
