@@ -9,6 +9,7 @@ Author: CM Wintersteiger, 2006
 #include <cassert>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 
 #include <util/prefix.h>
 
@@ -210,7 +211,11 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
   for(int i=1; i<argc; i++)
     args.push_back(argv[i]);
 
-  return parse_arguments(args);
+  bool result=parse_arguments(args, false);
+
+  parse_specs();
+
+  return result;
 }
 
 /*******************************************************************\
@@ -225,7 +230,9 @@ Function: gcc_cmdlinet::parse_arguments
 
 \*******************************************************************/
 
-bool gcc_cmdlinet::parse_arguments(const argst &args)
+bool gcc_cmdlinet::parse_arguments(
+  const argst &args,
+  bool in_spec_file)
 {
   for(argst::const_iterator it=args.begin();
       it!=args.end();
@@ -243,12 +250,14 @@ bool gcc_cmdlinet::parse_arguments(const argst &args)
     // file?
     if(argv_i=="-" || !has_prefix(argv_i, "-"))
     {
-      add_infile_arg(argv_i);
+      if(!spec_file)
+        add_infile_arg(argv_i);
       continue;
     }
 
     // add to new_argv
-    add_arg(argv_i);
+    if(!spec_file)
+      add_arg(argv_i);
 
     // also store in cmdlinet
 
@@ -302,7 +311,8 @@ bool gcc_cmdlinet::parse_arguments(const argst &args)
           if(next!=args.end())
           {
             set(argv_i, *next);
-            add_arg(*next);
+            if(!in_spec_file)
+              add_arg(*next);
             ++it;
           }
           else
@@ -326,7 +336,8 @@ bool gcc_cmdlinet::parse_arguments(const argst &args)
           if(next!=args.end())
           {
             set(argv_i, *next);
-            add_arg(*next);
+            if(!in_spec_file)
+              add_arg(*next);
             ++it;
           }
           else
@@ -361,4 +372,83 @@ bool gcc_cmdlinet::parse_arguments(const argst &args)
   }
 
   return false;
+}
+
+/*******************************************************************\
+
+Function: gcc_cmdlinet::parse_specs_line
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Parse GCC spec files
+          https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
+
+\*******************************************************************/
+
+void gcc_cmdlinet::parse_specs_line(const std::string &line)
+{
+  // initial whitespace has been stripped
+  assert(!line.empty());
+  assert(line[0]!=' ' && line[0]!='\t');
+
+  argst args;
+
+  for(std::string::size_type arg_start=0, arg_end=0;
+      arg_end!=std::string::npos;
+      arg_start=line.find_first_not_of("\t ", arg_end))
+  {
+    arg_end=line.find_first_of("\t ", arg_start);
+    args.push_back(line.substr(arg_start, arg_end-arg_start));
+  }
+
+  parse_arguments(args, true);
+}
+
+/*******************************************************************\
+
+Function: gcc_cmdlinet::parse_specs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Parse GCC spec files
+          https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
+
+\*******************************************************************/
+
+void gcc_cmdlinet::parse_specs()
+{
+  const std::string &specs_file_name=get_value("specs");
+  if(specs_file_name.empty())
+    return;
+
+  std::ifstream specs_file(specs_file_name);
+  std::string line;
+  bool use_line=false;
+
+  while(std::getline(specs_file, line))
+  {
+    // erase leading whitespace
+    line.erase(0, line.find_first_not_of("\t "));
+
+    if(line.empty())
+      // blank lines reset the mode
+      use_line=false;
+    else if(!use_line &&
+            (line=="*link_libgcc:" ||
+             line=="*lib:" ||
+             line=="*libgcc:" ||
+             line=="*link:"))
+      use_line=true;
+    else if(use_line)
+      parse_specs_line(line);
+    else
+    {
+      // TODO need message interface
+      // debug() << "Warning: ignoring spec " << line << eom;
+    }
+  }
 }
