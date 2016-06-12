@@ -22,6 +22,11 @@ public:
   gcc_cmdlinet()
   {
   }
+
+protected:
+  typedef std::vector<std::string> argst;
+
+  bool parse_arguments(const argst &args);
 };
 
 #endif // CPROVER_GOTO_CC_GCC_CMDLINE_H

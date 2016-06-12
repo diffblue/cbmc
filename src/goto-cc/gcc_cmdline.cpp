@@ -204,9 +204,34 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
   assert(argc>0);
   add_arg(argv[0]);
 
+  argst args;
+  args.reserve(argc-1);
+
   for(int i=1; i<argc; i++)
+    args.push_back(argv[i]);
+
+  return parse_arguments(args);
+}
+
+/*******************************************************************\
+
+Function: gcc_cmdlinet::parse_arguments
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool gcc_cmdlinet::parse_arguments(const argst &args)
+{
+  for(argst::const_iterator it=args.begin();
+      it!=args.end();
+      ++it)
   {
-    std::string argv_i=argv[i];
+    const std::string &argv_i=*it;
 
     // options file?
     if(has_prefix(argv_i, "@"))
@@ -237,7 +262,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       // to the preprocessor.
       if(has_prefix(argv_i, "-Wp,"))
       {
-        std::string value=std::string(argv[i]+4);
+        std::string value=argv_i.substr(4);
         set("-WP,", value);
       }
       else
@@ -245,35 +270,40 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
     }
     else if(has_prefix(argv_i, "-m")) // m-options
     {
-      // these sometimes come with a value separated by '=', e.g., -march=cpu_type
-
+      // these sometimes come with a value separated by '=', e.g.,
+      // -march=cpu_type
       std::size_t equal_pos=argv_i.find('=');
 
       if(equal_pos==std::string::npos)
         set(argv_i); // no value
       else
-        set(std::string(argv_i, 0, equal_pos),
-            std::string(argv_i, equal_pos+1, std::string::npos));
+        set(argv_i.substr(0, equal_pos), argv_i.substr(equal_pos+1));
     }
-    else if(in_list(argv[i], gcc_options_without_argument)) // without argument
+    // without argument
+    else if(in_list(argv_i.c_str(), gcc_options_without_argument))
     {
       set(argv_i);
     }
     else
     {
+      argst::const_iterator next=it;
+      ++next;
+
       bool found=false;
 
       // separated only, and also allow concatenation with "="
-      for(const char **o=gcc_options_with_separated_argument; *o!=NULL && !found; o++)
+      for(const char **o=gcc_options_with_separated_argument;
+          *o!=NULL && !found;
+          ++o)
       {
         if(argv_i==*o) // separated
         {
           found=true;
-          if(i!=argc-1)
+          if(next!=args.end())
           {
-            set(argv_i, argv[i+1]);
-            add_arg(argv[i+1]);
-            i++;
+            set(argv_i, *next);
+            add_arg(*next);
+            ++it;
           }
           else
             set(argv_i, "");
@@ -281,21 +311,23 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
         else if(has_prefix(argv_i, std::string(*o)+"=")) // concatenated with "="
         {
           found=true;
-          set(*o, argv[i]+strlen(*o)+1);
+          set(*o, argv_i.substr(strlen(*o)+1));
         }
       }
 
       // concatenated _or_ separated, e.g., -I
-      for(const char **o=gcc_options_with_argument; *o!=NULL && !found; o++)
+      for(const char **o=gcc_options_with_argument;
+          *o!=NULL && !found;
+          ++o)
       {
         if(argv_i==*o) // separated
         {
           found=true;
-          if(i!=argc-1)
+          if(next!=args.end())
           {
-            set(argv_i, argv[i+1]);
-            add_arg(argv[i+1]);
-            i++;
+            set(argv_i, *next);
+            add_arg(*next);
+            ++it;
           }
           else
             set(argv_i, "");
@@ -303,24 +335,27 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
         else if(has_prefix(argv_i, *o)) // concatenated
         {
           found=true;
-          set(*o, argv[i]+strlen(*o));
+          set(*o, argv_i.substr(strlen(*o)));
         }
       }
 
       // concatenated only
-      for(const char **o=gcc_options_with_concatenated_argument; *o!=NULL && !found; o++)
+      for(const char **o=gcc_options_with_concatenated_argument;
+          *o!=NULL && !found;
+          ++o)
       {
         if(has_prefix(argv_i, *o)) // concatenated
         {
           found=true;
-          set(*o, argv[i]+strlen(*o));
+          set(*o, argv_i.substr(strlen(*o)));
         }
       }
 
       if(!found)
       {
         // unrecognized option
-        std::cerr << "Warning: uninterpreted gcc option '" << argv[i] << "'" << std::endl;
+        std::cerr << "Warning: uninterpreted gcc option '" << argv_i
+                  << "'" << std::endl;
       }
     }
   }
