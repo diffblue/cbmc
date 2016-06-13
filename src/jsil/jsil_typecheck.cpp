@@ -1155,9 +1155,9 @@ void jsil_typecheckt::typecheck_function_call(
         // if there are too few arguments, add undefined
         if(codet.parameters().size()>call.arguments().size())
         {
-          for(int i=call.arguments().size();
-                  i<codet.parameters().size();
-                  i++)
+          for(std::size_t i=call.arguments().size();
+              i<codet.parameters().size();
+              ++i)
             call.arguments().push_back(
               exprt("undefined", jsil_undefined_type()));
         }
