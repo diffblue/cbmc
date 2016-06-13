@@ -49,14 +49,14 @@ performed during type checking, which is done by a call to the
 </p>
 
 <pre>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
+#include &lt;iostream&rt;
+#include &lt;fstream&rt;
+#include &lt;sstream&rt;
+#include &lt;string&rt;
 
-#include <ansi-c/ansi_c_language.h>
-#include <util/cmdline.h>
-#include <util/config.h>
+#include &lt;ansi-c/ansi_c_language.h&rt;
+#include &lt;util/cmdline.h&rt;
+#include &lt;util/config.h&rt;
 
 int main(int argc, const char* argv[])
 {
@@ -70,7 +70,7 @@ int main(int argc, const char* argv[])
      config.ansi_c.include_paths=cmdl.get_values('I');
 
    // Set language to C
-   std::auto_ptr<languaget> clang(new_ansi_c_language());
+   std::auto_ptr&lt;languaget&rt; clang(new_ansi_c_language());
 
    // Symbol table
    contextt my_context;
@@ -79,17 +79,17 @@ int main(int argc, const char* argv[])
        sit != cmdl.args.end();sit++)
    {
      // Source code stream
-     std::ifstream in(sit->c_str());	
+     std::ifstream in(sit-&rt;c_str());	
 
      // Parse
-     clang->parse(in, "", std::cerr);
+     clang-&rt;parse(in, "", std::cerr);
 
      // Typecheck
-     clang->typecheck(my_context, *sit, std::cerr);
+     clang-&rt;typecheck(my_context, *sit, std::cerr);
   }
 
   // Do some final adjustements
-  clang->final(my_context, std::cerr);
+  clang-&rt;final(my_context, std::cerr);
 
   my_context.show(std::cout);
 
@@ -147,7 +147,7 @@ The field <i>data</i> of class <i>dt</i> is a (hashed) string
 representing the label of the nodes. The fields <i>named_sub</i>,
 <i>comments</i> and <i>sub</i> are links to childs. Edges are either
 labeled with a string or ordered. The string-labeled edges are stored in the
-map <i>comments</i> if their first character is '\#'. Otherwise, they are
+map <i>comments</i> if their first character is '#'. Otherwise, they are
 stored in the map <i>named_sub</i>. The labels of edges are unique for a
 given node; however, their ordering is not preserved. The field <i>sub</i>
 is a vector of nodes that is used for storing the ordered children. The order
@@ -175,8 +175,8 @@ The second method returns false if the label of the node is equal to "nil".
 <h5>id</h5>
 
 <pre>
-const irep_idt &id();
-void id(const irep_idt &_data);
+const irep_idt &amp;id();
+void id(const irep_idt &amp;_data);
 </pre>
 
 <p class="justified">
@@ -187,9 +187,9 @@ second method sets the label of the node.
 <h5>find, add and get</h5>
 
 <pre>
-const irept &find(const irep_namet &name) const;
-irept &add(const irep_namet &name);
-const irep_idt &get(const irep_namet &name) const;
+const irept &amp;find(const irep_namet &amp;name) const;
+irept &amp;add(const irep_namet &amp;name);
+const irep_idt &amp;get(const irep_namet &amp;name) const;
 </pre>
 
 <ol>
@@ -214,10 +214,10 @@ string is returned.
 <h5>set</h5>
 
 <pre>
-void set(const irep_namet &name,
-         const irep_idt &value);
-void set(const irep_namet &name, const long value);
-void set(const irep_namet &name, const irept &irep);
+void set(const irep_namet &amp;name,
+         const irep_idt &amp;value);
+void set(const irep_namet &amp;name, const long value);
+void set(const irep_namet &amp;name, const irept &amp;irep);
 </pre>
 
 <p class="justified">
@@ -238,7 +238,7 @@ string and set as node-label of the new child.
 <h5>remove</h5>
 
 <pre>
-void remove(const irep_namet &name);
+void remove(const irep_namet &amp;name);
 </pre>
 
 <p class="justified">
@@ -248,8 +248,8 @@ and removes it.
 <h5>move_to_sub and move_to_named_sub</h5>
 
 <pre>
-void move_to_sub(irept &irep);
-void move_to_named_sub(const irep_namet &name, irept &irep);
+void move_to_sub(irept &amp;irep);
+void move_to_named_sub(const irep_namet &amp;name, irept &amp;irep);
 </pre>
 
 <p class="justified">
@@ -265,7 +265,7 @@ The second method does the same but for labeled edges.
 <h5>swap</h5>
 
 <pre>
-void swap(irept &irep);
+void swap(irept &amp;irep);
 </pre>
 
 <p class="justified">
@@ -279,15 +279,15 @@ void make_nil();
 </pre>
 
 <p class="justified">
-Set the label of the node to ``nil'' and remove all outgoing edges.
+Set the label of the node to "nil" and remove all outgoing edges.
 </p>
 
 <h5>get_sub and get_named_sub and get_comments</h5>
 
 <pre>
-const subt &get_sub();
-const named_subt &get_named_sub();
-const named_subt &get_comments();
+const subt &amp;get_sub();
+const named_subt &amp;get_named_sub();
+const named_subt &amp;get_comments();
 </pre>
 
 <p class="justified">
@@ -321,8 +321,8 @@ The first method returns true if the a subtype node exists. is not
 <h5>subtype and subtypes</h5>
 
 <pre>
-typet &subtype();
-typest &subtypes();
+typet &amp;subtype();
+typest &amp;subtypes();
 </pre>
 
 <p class="justified">
@@ -333,45 +333,45 @@ The second method returns a reference to the vector of subtypes.
 <h4>Subtypes of <i>typet</i></h4>
 
 <p class="justified">
-A number of subtypes of \texttt{typet} exist which allow convenient creation
-and manipulation of \texttt{typet} objects for special types.
+A number of subtypes of <code>typet</code> exist which allow convenient
+creation and manipulation of <code>typet</code> objects for special types.
 </p>
 
 <table>
 <tr><th>Class</th><th>Description</th></tr>
-\texttt{bool_typet}</td>
+<code>bool_typet</code></td>
 <td>Boolean type</td></tr>
-\hline
-\texttt{symbol_typet}</td>
-<td>Symbol type. Has edge ``identifier'' to a string value, which can be accessed with \texttt{get_identifier} and \texttt{set_identifier}.</td></tr>
-\hline
-\texttt{struct_typet}, \texttt{union_typet}</td>
-<td>Represent a struct, resp.~union types. Convenience functions to access components \texttt{components()}.</td></tr>
-\hline
-\texttt{code_typet}</td>
-<td>The type of a function/procedure. Convenience functions to access \texttt{arguments()} and \texttt{return_type()}. </td></tr>
-\hline
-\texttt{array_typet}</td>
-<td>Convenience function \texttt{size()} to access size of the array.</td></tr>
-\hline
-\texttt{pointer_typet}</td>
+<tr><td>
+<code>symbol_typet</code></td>
+<td>Symbol type. Has edge "identifier" to a string value, which can be accessed with <code>get_identifier</code> and <code>set_identifier</code>.</td></tr>
+<tr><td>
+<code>struct_typet</code>, <code>union_typet</code></td>
+<td>Represent a struct, resp.~union types. Convenience functions to access components <code>components()</code>.</td></tr>
+<tr><td>
+<code>code_typet</code></td>
+<td>The type of a function/procedure. Convenience functions to access <code>arguments()</code> and <code>return_type()</code>. </td></tr>
+<tr><td>
+<code>array_typet</code></td>
+<td>Convenience function <code>size()</code> to access size of the array.</td></tr>
+<tr><td>
+<code>pointer_typet</code></td>
 <td>Pointer type, subtype stores the type of the object pointed to.</td></tr>
-\hline
-\texttt{reference_typet}</td>
+<tr><td>
+<code>reference_typet</code></td>
 <td>Represents a reference type, subtype stores the type of the object referenced to. </td></tr>
-\hline
-\texttt{bv_typet}</td>
+<tr><td>
+<code>bv_typet</code></td>
 <td>Represents a bit vector type with variable width.</td></tr>
-\hline
-\texttt{fixed_bv_typet}</td>
+<tr><td>
+<code>fixed_bv_typet</code></td>
 <td>Represents a bit vector that encodes a fixed-point number.</td></tr>
-\hline
-\texttt{floatbv_typet}</td>
+<tr><td>
+<code>floatbv_typet</code></td>
 <td>Represents a bit vector that encodes a floating-point number.</td></tr>
-\hline
-\texttt{string_typet}</td>
+<tr><td>
+<code>string_typet</code></td>
 <td>Represents a string type. </td></tr>
-\hline
+<tr><td>
 </table>
 
 <h3>Source Locations</h3>
@@ -379,7 +379,7 @@ and manipulation of \texttt{typet} objects for special types.
 <p class="justified">
 The class <i>locationt</i> inherits from the class <i>irept</i>. It is
 used to store locations in text files. It adds specialized methods to
-manipulate the edges named ``file'', ``line'', ``column'', ``function''.
+manipulate the edges named "file", "line", "column", "function".
 </p>
 
 <h3>Expressions</h3>
@@ -387,7 +387,7 @@ manipulate the edges named ``file'', ``line'', ``column'', ``function''.
 <p class="justified">
 The class <i>exprt</i> inherits from class <i>irept</i>. Expressions
 have operands and a type. This is modeled with two edges labeled
-``operands" and ``type", respectively. The class <i>exprt</i> only adds
+"operands" and "type", respectively. The class <i>exprt</i> only adds
 specialized methods for accessing operands and type information to the
 interface of <i>irept</i>.
 </p>
@@ -400,7 +400,7 @@ interface of <i>irept</i>.
 <h5>constructors</h5>
 
 <pre>
-explicit exprt(const irep_idt &id);
+explicit exprt(const irep_idt &amp;id);
 </pre>
 
 <p class="justified">
@@ -408,7 +408,7 @@ Creates an <i>exprt</i> object with a given label and no type.
 </p>
  
 <pre>
-exprt(const irep_idt &id, const typet &type);
+exprt(const irep_idt &amp;id, const typet &amp;type);
 </pre>
 
 <p class="justified">
@@ -418,8 +418,8 @@ Creates an <i>exprt</i> object with a given label and type.
 <h5>type</h5>
 
 <pre>
-const typet &type() const;
-typet &type();
+const typet &amp;type() const;
+typet &amp;type();
 </pre>
 
 <p class="justified">
@@ -439,7 +439,7 @@ Return true if the expression has operands.
 <h5>operands</h5>
 
 <pre>
-const operandst &operands() const;
+const operandst &amp;operands() const;
 </pre>
 
 <p class="justified">
@@ -447,14 +447,14 @@ Return a reference to the vector of operands.
 </p>
 
 <pre>
-const exprt &op0();
-const exprt &op1();
-const exprt &op2();
-const exprt &op3();
-exprt &op0();
-exprt &op1();
-exprt &op2();
-exprt &op3();
+const exprt &amp;op0();
+const exprt &amp;op1();
+const exprt &amp;op2();
+const exprt &amp;op3();
+exprt &amp;op0();
+exprt &amp;op1();
+exprt &amp;op2();
+exprt &amp;op3();
 </pre>
 
 <p class="justified">
@@ -470,13 +470,13 @@ void make_bool(bool value);
 </pre>
 
 <p class="justified">
-Turn the current <i>exprt</i> instance into a expression of type ``bool''
-with label ``constant'' and a single edge labeled ``value'', which points to
-a new node with label either ``true'' or ``false''.
+Turn the current <i>exprt</i> instance into a expression of type "bool"
+with label "constant" and a single edge labeled "value", which points to
+a new node with label either "true" or "false".
 </p>
 
 <pre>
-void make_typecast(const typet &_type);
+void make_typecast(const typet &amp;_type);
 </pre> 
 
 <p class="justified">
@@ -491,41 +491,52 @@ void make_not();
 
 <p class="justified">
 Turns the current <i>exprt</i> instance into an expression with label
-``not'' of the same type as the original expression.  The old value of the
-instance is appended as the operand of the ``not''-node.  If the original
-expression is of type ``bool'', the result represents the negation of the
+"not" of the same type as the original expression.  The old value of the
+instance is appended as the operand of the "not"-node.  If the original
+expression is of type "bool", the result represents the negation of the
 original expression with the following simplifications possibly applied:
 </p>
 
-\begin{itemize}
-\item $\neg \neg f = f$
-\item $\neg \mbox{true} = \mbox{false}$
-\item $\neg \mbox{false} = \mbox{true}$
-\end{itemize}
+<ul>
+<li>$\neg \neg f = f$</li>
+<li>$\neg \mbox{true} = \mbox{false}$</li>
+<li>$\neg \mbox{false} = \mbox{true}$</li>
+</ul>
 
 <pre>
 void negate();
 </pre> 
 
 <p class="justified">
-Turns the current <i>exprt</i> instance into a negation of itself, depending on its type:
+Turns the current <i>exprt</i> instance into a negation of itself, depending
+on its type:
 </p>
 
-\begin{itemize}
-\item For boolean expressions, \texttt{make_not} is called.
-\item For integers, the current instance is turned into a numeric negation expression ``unary-'' of its old value. Chains of ''unary-'' nodes and negations of integer constants are simplified.
-\item For all other types, \texttt{irept::make_nil} is called.
-\end{itemize}
+<ul>
+
+<li>For boolean expressions, <code>make_not</code> is called.</li>
+
+<li> For integers, the current instance is turned into a numeric negation
+expression "unary-" of its old value.  Chains of "unary-" nodes and
+negations of integer constants are simplified.</li>
+
+<li>For all other types, <code>irept::make_nil</code> is called.</li>
+
+</ul>
 
 <pre>
-bool sum(const exprt &expr);
-bool mul(const exprt &expr);
-bool subtract(const exprt &expr);
+bool sum(const exprt &amp;expr);
+bool mul(const exprt &amp;expr);
+bool subtract(const exprt &amp;expr);
 </pre> 
 
 <p class="justified">
-Expect the ``this'' object and the function argument to be constants of the same numeric type.  Turn the current \texttt{exprt} instance into a constant expression of the same type, whose ``value'' edge points to the result of the sum, product, or difference of the two expressions.
-If the operation fails for some reason (e.g., the types are different), \texttt{true} is returned.
+Expect the "this" object and the function argument to be constants of the
+same numeric type.  Turn the current <code>exprt</code> instance into a
+constant expression of the same type, whose "value" edge points to the
+result of the sum, product, or difference of the two expressions.  If the
+operation fails for some reason (e.g., the types are different),
+<code>true</code> is returned.
 </p>
 
 <h5>Testing common expressions</h5>
@@ -535,14 +546,14 @@ bool is_constant() const;
 </pre> 
 
 <p class="justified">
-Returns true if the expression label is ``constant''.
+Returns true if the expression label is "constant".
 
 <pre>
 bool is_boolean() const;
 </pre> 
 
 <p class="justified">
-Returns true if the label of the type is ``bool''.
+Returns true if the label of the type is "bool".
 
 <pre>
 bool is_false() const;
@@ -550,7 +561,7 @@ bool is_true() const;
 </pre> 
 
 <p class="justified">
-The first function returns true if the expression is a boolean constant with value ``false''. The second function returns true for any boolean constant that is not of value ``false".
+The first function returns true if the expression is a boolean constant with value "false". The second function returns true for any boolean constant that is not of value "false".
 </p>
 
 <pre>
@@ -568,66 +579,96 @@ value "1".
 <h4>Subtypes of <i>exprt</i></h4>
 
 <p class="justified">
-A number of subtypes of \texttt{exprt} provide further convenience functions
+A number of subtypes of <code>exprt</code> provide further convenience functions
 for edge access or other specialized behaviour:
 </p>
 
 <table>
+
 <tr><th>Class</th><th>Description</th></tr>
-<tr><td>\texttt{transt}</td>
-<td>Represents a SMV-style transition system with invariants \texttt{invar()}, initial state \texttt{init()} and transition function \texttt{trans()}.
-</td></tr>
-\texttt{true_exprt}</td>
-<td>Boolean constant true expression. </td></tr>
-\hline 
-\texttt{false_exprt}</td>
-<td>Boolean constant false expression. </td></tr>
-\hline 
-\texttt{symbol_exprt}</td>
-<td>Represents a symbol (e.g., a variable occurrence), convenience function for manipulating ``identifier''-edge \texttt{set_identifier} and \texttt{get_identifier}</td></tr>
-\hline 
-\texttt{predicate_exprt}</td>
-<td>Convenience constructors to create expressions of type ``bool''. </td></tr>
-\hline 
-\texttt{binary_relation_exprt : predicate_exprt}</td>
-<td>Convenience functions to create and manipulate binary expressions of type ``bool''. </td></tr>
-\hline
-\texttt{equality_exprt : binary_relation_exprt}</td>
-<td>Convenience functions to create and manipulate equality expressions such as ``a == b". </td></tr>
-\hline 
-\texttt{ieee_float_equal_exprt : binary_relation_exprt} </td>
+
+<tr><td><code>transt</code></td>
+<td>Represents a SMV-style transition system with invariants <code>invar()</code>, initial state <code>init()</code> and transition function <code>trans()</code>.</td>
+</tr>
+
+<tr><code>true_exprt</code></td>
+<td>Boolean constant true expression.</td>
+</tr>
+
+<tr><td> 
+<code>false_exprt</code></td>
+<td>Boolean constant false expression.</td>
+</tr>
+
+<tr><td> 
+<code>symbol_exprt</code></td>
+<td>Represents a symbol (e.g., a variable occurrence), convenience function for manipulating "identifier"-edge <code>set_identifier</code> and <code>get_identifier</code></td>
+</tr>
+
+<tr><td> 
+<code>predicate_exprt</code></td>
+<td>Convenience constructors to create expressions of type "bool".</td>
+</tr>
+
+<tr><td> 
+<code>binary_relation_exprt : predicate_exprt</code></td>
+<td>Convenience functions to create and manipulate binary expressions of type "bool". </td>
+</tr>
+
+<tr><td>
+<code>equality_exprt : binary_relation_exprt</code></td>
+<td>Convenience functions to create and manipulate equality expressions such as "a == b". </td>
+</tr>
+
+<tr><td> 
+<code>ieee_float_equal_exprt : binary_relation_exprt</code> </td>
 <td>Convenience functions to create and manipulate equality expressions between floating-point numbers. 
-</td></tr>
-\hline 
-\texttt{index_exprt}</td>
-<td>Represents an array access expression such as ``a[i]''. Convenience functions \texttt{array()} and \texttt{index()} for accessing the array expressions and indexing expression.</td></tr>
-\hline 
-\texttt{typecast_exprt}</td>
-<td>Represents a cast to the type of the expression.</td></tr>
-\hline 
-\texttt{and_exprt},
-\texttt{implies_exprt},
-\texttt{or_exprt},
-\texttt{not_exprt}</td>
-<td>Representations of logical operators with convenience constructors.</td></tr>
-\hline 
-\texttt{address_of_exprt}</td>
-<td>Representation of a C-style \texttt{\&a} address-of operation. Convenience function \texttt{object()} for accessing operand. </td></tr>
-\hline 
-\texttt{dereference_exprt}</td>
-<td>Representation of a C-style \texttt{*a} pointer-dereference operation. Convenience function \texttt{object()} for accessing operand. </td></tr>
-\hline 
-\texttt{if_exprt}</td>
-<td>Representation of a conditional expresion, with convenience functions \texttt{cond()}, \texttt{true_case()} and \texttt{false_case()} for accessing operands.</td></tr>
-\hline 
-\texttt{member_exprt}</td>
-<td>Represents a \texttt{some_struct.some_field} member access. </td></tr>
-%\hline 
-%\multicolumn{2}{l}{} </td></tr>
-%\multicolumn{2}{l}{\it util/std_code.h} </td></tr>
-%\hline 
-%\texttt{codet}</td>
-<td>Represents a segment of code. </td></tr>
+</td>
+</tr>
+
+<tr><td> 
+<code>index_exprt</code></td>
+<td>Represents an array access expression such as "a[i]". Convenience functions <code>array()</code> and <code>index()</code> for accessing the array expressions and indexing expression.</td>
+</tr>
+
+<tr><td> 
+<code>typecast_exprt</code></td>
+<td>Represents a cast to the type of the expression.</td>
+</tr>
+
+<tr><td> 
+<code>and_exprt</code>,
+<code>implies_exprt</code>,
+<code>or_exprt</code>,
+<code>not_exprt</code></td>
+<td>Representations of logical operators with convenience constructors.</td>
+</tr>
+
+<tr><td> 
+<code>address_of_exprt</code></td>
+<td>Representation of a C-style <code>\&a</code> address-of operation. Convenience function <code>object()</code> for accessing operand. </td>
+</tr>
+
+<tr><td> 
+<code>dereference_exprt</code></td>
+<td>Representation of a C-style <code>*a</code> pointer-dereference operation. Convenience function <code>object()</code> for accessing operand. </td>
+</tr>
+
+<tr><td> 
+<code>if_exprt</code></td>
+<td>Representation of a conditional expresion, with convenience functions <code>cond()</code>, <code>true_case()</code> and <code>false_case()</code> for accessing operands.</td>
+</tr>
+
+<tr><td> 
+<code>member_exprt</code></td>
+<td>Represents a <code>some_struct.some_field</code> member access.</td>
+</tr>
+
+<tr><td>
+<code>codet</code></td>
+<td>Represents a segment of code. </td>
+</tr>
+
 </table>
 
 <h3>Symbols and the Symbol Table</h3>
@@ -635,8 +676,8 @@ for edge access or other specialized behaviour:
 <h4>Symbol</h4>
 
 <p class="justified">
-A symbol is an object of class <i>symbolt</i>. This class
-is declared in ``util/symbol.h". The code below shows a partial
+A symbol is an object of class <code>symbolt</code>. This class
+is declared in "util/symbol.h". The code below shows a partial
 declaration of the interface:
 </p>
 
@@ -652,7 +693,7 @@ to symbols:
 <h4>Symbol Table</h4>
 
 <p class="justified">
-A symbol table is an object of class <i>contextt</i>. This class
+A symbol table is an object of class <code>contextt</code>. This class
 is declared in "util/context.h". The code below shows a partial
 declaration of the interface:
 </p>
@@ -674,15 +715,15 @@ whose definition can be found again in
 </p>
 
 <p class="justified">
-In the class \texttt{goto_programt}, the control flow graph is represented
+In the class <code>goto_programt</code>, the control flow graph is represented
 as a mixture of sequential transitions between nodes, and non-sequential
 transitions at goto-nodes.  The sequential flow of the program is captured
-by the list \texttt{instructions} that is a field of the class
-\texttt{goto_programt}.  Transitions via goto statements are represented in
-the list \texttt{targets}, which is a field of the class
-\texttt{goto_programt::instructiont}, i.e., each goto-instruction carries a
-list of possible jump destinations.  The latter list \texttt{targets} is a
-list of iterators which point to elements of the list \texttt{instructions}. 
+by the list <code>instructions</code> that is a field of the class
+<code>goto_programt</code>.  Transitions via goto statements are represented in
+the list <code>targets</code>, which is a field of the class
+<code>goto_programt::instructiont</code>, i.e., each goto-instruction carries a
+list of possible jump destinations.  The latter list <code>targets</code> is a
+list of iterators which point to elements of the list <code>instructions</code>. 
 An illustration is given in Figure \ref{fig:goto_program}.
 </p>
 
@@ -691,36 +732,60 @@ An illustration is given in Figure \ref{fig:goto_program}.
 
 <p class="justified">
 Instructions can have a number of different types as represented by
-\texttt{enum goto_program_instruction_typet} and can be accessed via the
-field \texttt{type} in \texttt{instructiont}.  These include:
+<code>enum goto_program_instruction_typet</code> and can be accessed via the
+field <code>type</code> in <code>instructiont</code>.  These include:
 </p>
 
-\begin{description}
-\item[\texttt{GOTO}] Represents a non-deterministic branch to the instructions given in the list \texttt{targets}. Goto statements are guarded, i.e., the non-deterministic branch is only taken if the expression in \texttt{guard} evaluates to true, otherwise the program continues sequentially.  
+<table>
+<tr><td><code>GOTO</code></td>
+<td>Represents a non-deterministic branch to the instructions given in the list <code>targets</code>. Goto statements are guarded, i.e., the non-deterministic branch is only taken if the expression in <code>guard</code> evaluates to true, otherwise the program continues sequentially.
 Guarded gotos can be used, for example, to model if statements. The guard is then set to the negated condition of the statement, and goto target is set to bypass the conditionally executed code if this guard evaluates to true.
-\item[\texttt{ASSUME}] An assumption statement that restricts viable paths reaching the instruction location to the ones that make the expression \texttt{guard} evaluate to true.
-\item[\texttt{ASSERT}] An assertion whose \texttt{guard} is checked for validity when the instruction is reached.
-\item[\texttt{RETURN}] A return statement in a function.
-\item[\texttt{FUNCTION_END}] Denotes the end of a function.
-\item[\texttt{ASSIGN}] A variable assignment.
-\item[\texttt{SKIP}] No operation.
-\item[\texttt{OTHER}] Any operation not covered by \texttt{enum goto_program_instruction_typet}.
-\end{description}
+</tr>
+
+<tr><td><code>ASSUME</code></td>
+<td>An assumption statement that restricts viable paths reaching the instruction location to the ones that make the expression <code>guard</code> evaluate to true.
+</tr>
+
+<tr><td><code>ASSERT</code></td>
+<td>An assertion whose <code>guard</code> is checked for validity when the instruction is reached.
+</tr>
+
+<tr><td><code>RETURN</code></td>
+<td>A return statement in a function.
+</tr>
+
+<tr><td><code>FUNCTION_END</code></td>
+<td>Denotes the end of a function.
+</tr>
+
+<tr><td><code>ASSIGN</code></td>
+<td>A variable assignment.
+</tr>
+
+<tr><td><code>SKIP</code></td>
+<td>No operation.
+</tr>
+
+<tr><td><code>OTHER</code></td>
+<td>Any operation not covered by <code>enum goto_program_instruction_typet</code>.
+</tr>
+
+</table>
 
 <p class="justified">
-A number of convenience functions in \texttt{instructiont}, such as
-\texttt{is_goto()}, \texttt{is_assume()}, etc., simplify type queries. 
+A number of convenience functions in <code>instructiont</code>, such as
+<code>is_goto()</code>, <code>is_assume()</code>, etc., simplify type queries. 
 The following code segment shows a partial interface declaration of
-\texttt{goto_program_template} and \texttt{instructiont}.
+<code>goto_program_template</code> and <code>instructiont</code>.
 </p>
 
 <pre>
-template <class codeT, class guardT>
+template &lt;class codeT, class guardT&rt;
 class goto_program_templatet
 {
 public:
   //list of instruction type
-  typedef std::list<class instructiont> instructionst;
+  typedef std::list&lt;class instructiont&rt; instructionst;
 
   //a reference to an instruction in the list
   typedef typename 
@@ -737,7 +802,7 @@ public:
   target_numberst target_numbers;
 
   //Get the successors of a given instruction 
-  void get_successors(targett target, targetst &successors); 
+  void get_successors(targett target, targetst &amp;successors); 
 
   ...
 
@@ -763,7 +828,7 @@ public:
     targetst targets;
    
     //set of all predecessors (sequential, and gotos)
-    std::set<targett> incoming_edges;
+    std::set&lt;targett&rt; incoming_edges;
     
     // a globally unique number to identify a 
     // program location. It is guaranteed to be 
