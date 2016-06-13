@@ -19,15 +19,12 @@ essentially amounts to <i>unwinding loops</i>.  This concept is best
 illustrated with a generic example:
 </p>
 
-<hr>
-<code>
-int main(int argc, char **argv) {<br>
-&nbsp;&nbsp;while(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE</font><br>
-&nbsp;&nbsp;}<br>
+<pre><code>int main(int argc, char **argv) {
+  while(cond) {
+    <font color="#3030f0">BODY CODE</font>
+  }
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 A BMC instance that will find bugs with up to 5 iterations of the loop would
@@ -35,27 +32,24 @@ contain 5 copies of the loop body, and essentially corresponds to checking
 the following loop-free program:
 </p>
 
-<hr>
-<pre><code>
-int main(int argc, char **argv) {<br>
-  if(cond) {<br>
-    <font color="#3030f0">BODY CODE COPY 1</font><br>
-    if(cond) {<br>
-      <font color="#3030f0">BODY CODE COPY 2</font><br>
-      if(cond) {<br>
-        <font color="#3030f0">BODY CODE COPY 3</font><br>
-        if(cond) {<br>
-          <font color="#3030f0">BODY CODE COPY 4</font><br>
-          if(cond) {<br>
-            <font color="#3030f0">BODY CODE COPY 5</font><br>
-          }<br>
-        }<br>
-      }<br>
-    }<br>
-  }<br>
+<pre><code>int main(int argc, char **argv) {
+  if(cond) {
+    <font color="#3030f0">BODY CODE COPY 1</font>
+    if(cond) {
+      <font color="#3030f0">BODY CODE COPY 2</font>
+      if(cond) {
+        <font color="#3030f0">BODY CODE COPY 3</font>
+        if(cond) {
+          <font color="#3030f0">BODY CODE COPY 4</font>
+          if(cond) {
+            <font color="#3030f0">BODY CODE COPY 5</font>
+          }
+        }
+      }
+    }
+  }
 }
 </code></pre>
-<hr>
 
 <p class="justified">
 Note the use of the <code>if</code> statement to prevent the execution of
@@ -156,28 +150,25 @@ this unwinding assertion for a bound of 5 corresponds to checking the
 following loop-free program:
 </p>
 
-<hr>
-<code>
-int main(int argc, char **argv) {<br>
-&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 1</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 2</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 3</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 4</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 5</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#ff3030">assert(!cond);</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;}<br>
+<code>int main(int argc, char **argv) {
+  if(cond) {
+    <font color="#3030f0">BODY CODE COPY 1</font>
+    if(cond) {
+      <font color="#3030f0">BODY CODE COPY 2</font>
+      if(cond) {
+        <font color="#3030f0">BODY CODE COPY 3</font>
+        if(cond) {
+          <font color="#3030f0">BODY CODE COPY 4</font>
+          if(cond) {
+            <font color="#3030f0">BODY CODE COPY 5</font>
+            <font color=#ff3030">assert(!cond);</font>
+          }
+        }
+      }
+    }
+  }
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 The unwinding assertions can be verified just like any other generated
@@ -193,17 +184,14 @@ of code that follows the loop. As an example, consider the
 following program:
 </p>
 
-<hr>
-<code>
-int main() {<br>
-&nbsp;&nbsp;for(int i=0; i<10000; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE</font><br>
-&nbsp;&nbsp;}<br>
-<br>  
-&nbsp;&nbsp;assert(0);<br>
+<pre><code>int main() {
+  for(int i=0; i<10000; i++) {
+    <font color="#3030f0">BODY CODE</font>
+  }
+  
+  assert(0);
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 In the example above, small values of <code>--unwind</code> will
