@@ -21,7 +21,7 @@ The following Verilog module implements a 4-bit counter
 (<a href="counter.v">counter.v</a>):
 </p>
 
-<pre><code>
+<pre><code class="verilog">
 module top(input clk);
 
   reg [3:0] counter;
@@ -194,27 +194,24 @@ The following program is using the bound variable to check the counter value
 in all cycles:
 </p>
 
-<hr>
-<code>
-void next_timeframe();<br>
-extern const unsigned int bound;<br>
-<br>
-struct module_top {<br>
-&nbsp;&nbsp;unsigned int counter;<br>
-};<br>
-<br>
-extern struct module_top top;<br>
-<br>
-int main() {<br>
-&nbsp;&nbsp;unsigned cycle;<br>
-<br>
-&nbsp;&nbsp;for(cycle=0; cycle&lt;bound; cycle++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;assert(top.counter==(cycle & 15));<br>
-&nbsp;&nbsp;&nbsp;&nbsp;next_timeframe();<br>
-&nbsp;&nbsp;}<br>
+<pre><code>void next_timeframe();
+extern const unsigned int bound;
+
+struct module_top {
+  unsigned int counter;
+};
+
+extern struct module_top top;
+
+int main() {
+  unsigned cycle;
+
+  for(cycle=0; cycle&lt;bound; cycle++) {
+    assert(top.counter==(cycle & 15));
+    next_timeframe();
+  }
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 CBMC performs bounds checking, and restricts the number of times that
