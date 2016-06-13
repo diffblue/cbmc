@@ -60,17 +60,17 @@ The driver contains following functions:</p>
   </p>
 
 <hr>
-<code>
-int usecount;<br>
-<br>
-int register_chrdev (unsigned int major, const char* name)<br>
-{<br>
-&nbsp;&nbsp;usecount = 0;<br>
-&nbsp;&nbsp;if (major == 0)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return MAJOR_NUMBER;<br>
-&nbsp;&nbsp;return major;<br>
-}</code>
-<hr>
+<pre><code>
+int usecount;
+
+int register_chrdev (unsigned int major, const char* name)
+{
+  usecount = 0;
+  if (major == 0)
+    return MAJOR_NUMBER;
+  return major;
+}</code></pre>
+
 </li>
 
   <li><p class="justified"> <code>unregister_chrdev</code>: (in spec.c)
@@ -79,18 +79,17 @@ int register_chrdev (unsigned int major, const char* name)<br>
     anymore (we use the macro <code>MOD_IN_USE</code> to check this).
   </p>
 
-<hr>
-<code>
-int unregister_chrdev (unsigned int major, const char* name)<br>
-{<br>
-&nbsp;&nbsp;if (MOD_IN_USE)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;{<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ERROR: assert (0);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;else<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return 0;<br>
-}</code>
-<hr></li>
+<pre><code>
+int unregister_chrdev (unsigned int major, const char* name)
+{
+  if (MOD_IN_USE)
+    {
+    ERROR: assert (0);
+    }
+  else
+    return 0;
+}</code></pre>
+</li>
 
   <li><p class="justified"> <code>dummy_open</code>: (in
     <a href="boop-example/driver.c">driver.c</a>) This function
@@ -155,27 +154,27 @@ dispatching functions:
 
 <hr>
 <code>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;random = nondet_uchar ();<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__CPROVER_assume (0 &lt;= random && random &lt;= 3);<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;switch (random)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 1: <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rval = dummy_open (&amp;inode, &amp;my_file);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (rval == 0)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lock_held = TRUE;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 2:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__CPROVER_assume (lock_held);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count = dummy_read (&amp;my_file, buffer, BUF_SIZE); <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 3:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dummy_release (&amp;inode, &amp;my_file);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lock_held = FALSE;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+      random = nondet_uchar ();
+      __CPROVER_assume (0 &lt;= random && random &lt;= 3);
+
+      switch (random)
+      {
+      case 1: 
+        rval = dummy_open (&amp;inode, &amp;my_file);
+        if (rval == 0)
+          lock_held = TRUE;
+        break;
+      case 2:
+        __CPROVER_assume (lock_held);
+        count = dummy_read (&amp;my_file, buffer, BUF_SIZE); 
+        break;
+      case 3:
+        dummy_release (&amp;inode, &amp;my_file);
+        lock_held = FALSE;
+        break;
+      default:
+        break;
+      }
 </code>
 <hr>
 
