@@ -23,8 +23,7 @@ As an example, consider the following Verilog file
 (<a href="hierarchy.v">hierarchy.v</a>):
 </p>
 
-<pre><code>
-module counter(input clk, input [7:0] increment);
+<pre><code class="verilog">module counter(input clk, input [7:0] increment);
 
   reg [7:0] counter;
 
@@ -51,31 +50,28 @@ module instances have separate instances of the register. CBMC and SATABS
 use the following data structures for this example:
 </p>
 
-<hr>
-<code>
-void next_timeframe();<br>
-extern const unsigned int bound;<br>
-<br>
-struct counter {<br>
-  unsigned char increment;<br>
-  unsigned char counter;<br>
-};<br>
-<br>
-struct module_top {<br>
-  struct module_counter c1, c2;<br>
-};<br>
-<br>
-extern struct module_top top;<br>
-<br>
-int main() {<br>
-  next_timeframe();<br>
-  next_timeframe();<br>
-  next_timeframe();<br>
-  assert(top.c1.counter==3);<br>
-  assert(top.c2.counter==6);<br>
+<pre><code>void next_timeframe();
+extern const unsigned int bound;
+
+struct counter {
+  unsigned char increment;
+  unsigned char counter;
+};
+
+struct module_top {
+  struct module_counter c1, c2;
+};
+
+extern struct module_top top;
+
+int main() {
+  next_timeframe();
+  next_timeframe();
+  next_timeframe();
+  assert(top.c1.counter==3);
+  assert(top.c2.counter==6);
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 The <code>main</code> function reads both counter values for cycle 3. A deeper
