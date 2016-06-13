@@ -42,7 +42,7 @@ before calling <code>next_timeframe()</code>.
 Consider the following example:
 </p>
 
-<pre><code>void next_timeframe();
+<pre><code class="c">void next_timeframe();
 void set_inputs();
 extern const unsigned int bound;
 
@@ -77,7 +77,7 @@ active-low. The following C fragment drives this input to be active in the
 first cycle, and not active in any subsequent cycle:
 </p>
 
-<pre><code>  top.resetn=0;
+<pre><code class="c">  top.resetn=0;
   set_inputs(); next_timeframe();
 
   for(i=1; i&lt;bound; i++) {
