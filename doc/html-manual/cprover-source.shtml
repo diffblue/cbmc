@@ -1,5 +1,9 @@
 <!--#include virtual="header.inc" -->
 
+<link rel="stylesheet" href="highlight/styles/default.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
 <p><a href="./">CPROVER Manual TOC</a></p>
 
 <h2>The CPROVER Source Code Reference</h2>
@@ -48,8 +52,7 @@ performed during type checking, which is done by a call to the
 <i>symbolt</i> data structure.
 </p>
 
-<pre>
-#include &lt;iostream&gt;
+<pre><code class="c++">#include &lt;iostream&gt;
 #include &lt;fstream&gt;
 #include &lt;sstream&gt;
 #include &lt;string&gt;
@@ -95,7 +98,7 @@ int main(int argc, const char* argv[])
 
   return 0;
 }
-</pre>
+</code></pre>
 
 <p class="justified">
 The parse trees are implemented using a class called <i>irept</i>.  Its
@@ -107,8 +110,7 @@ declaration and definiton can be found in the files "util/irep.h" and
 The code below gives some details of the class <i>irept</i>:
 </p>
 
-<pre>
-class irept
+<pre><code class="c++">class irept
 {
 public:
   typedef std::vector<irept> subt;
@@ -131,7 +133,7 @@ protected:
   dt *data;
   ...
 };
-</pre>
+</pre></code>
 
 <p class="justified">
 Every node of any tree is an object of class <i>irept</i>. Each node has a
@@ -162,10 +164,9 @@ b;</i>.</center>
 
 <h5>is_nil and is_not_nil</h5>
 
-<pre>
-virtual bool is_nil() const;
+<pre><code class="c++">virtual bool is_nil() const;
 virtual bool is_not_nil() const;
-</pre>
+</code></pre>
 
 <p class="justified">
 The first  method returns true if the label of the node is equal to  "nil".
@@ -174,10 +175,9 @@ The second method returns false if the label of the node is equal to "nil".
 
 <h5>id</h5>
 
-<pre>
-const irep_idt &amp;id();
+<pre><code class="c++">const irep_idt &amp;id();
 void id(const irep_idt &amp;_data);
-</pre>
+</code></pre>
 
 <p class="justified">
 The first method returns a constant reference to the label of the node. The
@@ -186,11 +186,10 @@ second method sets the label of the node.
 
 <h5>find, add and get</h5>
 
-<pre>
-const irept &amp;find(const irep_namet &amp;name) const;
+<pre><code class="c++">const irept &amp;find(const irep_namet &amp;name) const;
 irept &amp;add(const irep_namet &amp;name);
 const irep_idt &amp;get(const irep_namet &amp;name) const;
-</pre>
+</code></pre>
 
 <ol>
 
@@ -213,12 +212,11 @@ string is returned.
 
 <h5>set</h5>
 
-<pre>
-void set(const irep_namet &amp;name,
+<pre><code class="c++">void set(const irep_namet &amp;name,
          const irep_idt &amp;value);
 void set(const irep_namet &amp;name, const long value);
 void set(const irep_namet &amp;name, const irept &amp;irep);
-</pre>
+</code></pre>
 
 <p class="justified">
 These methods create a new edge with label <i>name</i>.
@@ -237,9 +235,8 @@ string and set as node-label of the new child.
 
 <h5>remove</h5>
 
-<pre>
-void remove(const irep_namet &amp;name);
-</pre>
+<pre><code class="c++">void remove(const irep_namet &amp;name);
+</code></pre>
 
 <p class="justified">
 This method looks for an edge with label <i>name</i>
@@ -247,10 +244,9 @@ and removes it.
 
 <h5>move_to_sub and move_to_named_sub</h5>
 
-<pre>
-void move_to_sub(irept &amp;irep);
+<pre><code class="c++">void move_to_sub(irept &amp;irep);
 void move_to_named_sub(const irep_namet &amp;name, irept &amp;irep);
-</pre>
+</code></pre>
 
 <p class="justified">
 The first method creates a new ordered edge with a child equal to
@@ -264,9 +260,8 @@ The second method does the same but for labeled edges.
 
 <h5>swap</h5>
 
-<pre>
-void swap(irept &amp;irep);
-</pre>
+<pre><code class="c++">void swap(irept &amp;irep);
+</code></pre>
 
 <p class="justified">
 Exchange the content of the invoked node with the one of <i>irep</i>.
@@ -274,9 +269,8 @@ Exchange the content of the invoked node with the one of <i>irep</i>.
 
 <h5>make_nil</h5>
 
-<pre>
-void make_nil();
-</pre>
+<pre><code class="c++">void make_nil();
+</code></pre>
 
 <p class="justified">
 Set the label of the node to "nil" and remove all outgoing edges.
@@ -284,11 +278,10 @@ Set the label of the node to "nil" and remove all outgoing edges.
 
 <h5>get_sub and get_named_sub and get_comments</h5>
 
-<pre>
-const subt &amp;get_sub();
+<pre><code class="c++">const subt &amp;get_sub();
 const named_subt &amp;get_named_sub();
 const named_subt &amp;get_comments();
-</pre>
+</code></pre>
 
 <p class="justified">
 Return a constant reference to
@@ -308,10 +301,9 @@ information to the interface of <i>irept</i>.
 
 <h5>has_subtype and has_subtypes</h5>
 
-<pre>
-bool has_subtype() const;
+<pre><code class="c++">bool has_subtype() const;
 bool has_subtypes() const;
-</pre>
+</code></pre>
 
 <p class="justified">
 The first method returns true if the a subtype node exists. is not
@@ -320,8 +312,7 @@ The first method returns true if the a subtype node exists. is not
 
 <h5>subtype and subtypes</h5>
 
-<pre>
-typet &amp;subtype();
+<pre><code class="c++">typet &amp;subtype();
 typest &amp;subtypes();
 </pre>
 
@@ -400,16 +391,14 @@ interface of <i>irept</i>.
 
 <h5>constructors</h5>
 
-<pre>
-explicit exprt(const irep_idt &amp;id);
-</pre>
+<pre><code class="c++">explicit exprt(const irep_idt &amp;id);
+</code></pre>
 
 <p class="justified">
 Creates an <i>exprt</i> object with a given label and no type.
 </p>
  
-<pre>
-exprt(const irep_idt &amp;id, const typet &amp;type);
+<pre><code class="c++">exprt(const irep_idt &amp;id, const typet &amp;type);
 </pre>
 
 <p class="justified">
@@ -418,8 +407,7 @@ Creates an <i>exprt</i> object with a given label and type.
 
 <h5>type</h5>
 
-<pre>
-const typet &amp;type() const;
+<pre><code class="c++">const typet &amp;type() const;
 typet &amp;type();
 </pre>
 
@@ -429,9 +417,8 @@ Return a reference to the 'type' node
 
 <h5>has_operands</h5>
 
-<pre>
-bool has_operands() const;
-</pre>
+<pre><code class="c++">bool has_operands() const;
+</code></pre>
 
 <p class="justified">
 Return true if the expression has operands.
@@ -439,16 +426,14 @@ Return true if the expression has operands.
 
 <h5>operands</h5>
 
-<pre>
-const operandst &amp;operands() const;
-</pre>
+<pre><code class="c++">const operandst &amp;operands() const;
+</code></pre>
 
 <p class="justified">
 Return a reference to the vector of operands.
 </p>
 
-<pre>
-const exprt &amp;op0();
+<pre><code class="c++">const exprt &amp;op0();
 const exprt &amp;op1();
 const exprt &amp;op2();
 const exprt &amp;op3();
@@ -456,7 +441,7 @@ exprt &amp;op0();
 exprt &amp;op1();
 exprt &amp;op2();
 exprt &amp;op3();
-</pre>
+</code></pre>
 
 <p class="justified">
 Return a reference to a specific operand.
@@ -464,11 +449,10 @@ Return a reference to a specific operand.
 
 <h5>Constructing common expressions</h5>
 
-<pre>
-void make_true();
+<pre><code class="c++">void make_true();
 void make_false();
 void make_bool(bool value);
-</pre>
+</code></pre>
 
 <p class="justified">
 Turn the current <i>exprt</i> instance into a expression of type "bool"
@@ -476,9 +460,8 @@ with label "constant" and a single edge labeled "value", which points to
 a new node with label either "true" or "false".
 </p>
 
-<pre>
-void make_typecast(const typet &amp;_type);
-</pre> 
+<pre><code class="c++">void make_typecast(const typet &amp;_type);
+</code></pre> 
 
 <p class="justified">
 Turns the current <i>exprt</i> instance into a typecast.  The old value of
@@ -486,9 +469,8 @@ the instance is appended as the single operand of the typecast, i.e., the
 result is a typecast-expression of the old expression to the indicated type.
 </p>
 
-<pre>
-void make_not();
-</pre> 
+<pre><code class="c++">void make_not();
+</code></pre> 
 
 <p class="justified">
 Turns the current <i>exprt</i> instance into an expression with label
@@ -778,8 +760,7 @@ The following code segment shows a partial interface declaration of
 <code>goto_program_template</code> and <code>instructiont</code>.
 </p>
 
-<pre>
-template &lt;class codeT, class guardT&gt;
+<pre><code class="c++">template &lt;class codeT, class guardT&gt;
 class goto_program_templatet
 {
 public:
@@ -845,7 +826,7 @@ public:
   };
 
 }
-</pre>  
+</code></pre>
 
 <!--
 <h3>Data Structures</h3>
