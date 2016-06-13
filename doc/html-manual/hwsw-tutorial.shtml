@@ -17,20 +17,18 @@ The following Verilog module implements a 4-bit counter
 (<a href="counter.v">counter.v</a>):
 </p>
 
-<hr>
-<code>
-module top(input clk);<br>
-<br>
-&nbsp;&nbsp;reg [3:0] counter;<br>
-<br>
-&nbsp;&nbsp;initial counter=0;<br>
-<br>
-&nbsp;&nbsp;always @(posedge clk)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;counter=counter+1;<br>
-<br>
-endmodule<br>
-</code>
-<hr>
+<pre><code>
+module top(input clk);
+
+  reg [3:0] counter;
+
+  initial counter=0;
+
+  always @(posedge clk)
+    counter=counter+1;
+
+endmodule
+</code></pre>
 
 <p class="justified">
 HW-CBMC can take Verilog modules as the one above as additional input. Similar
@@ -41,10 +39,10 @@ of the <code>counter</code> register:
 </p>
 
 <code>
-struct module_top {<br>
-&nbsp;&nbsp;unsigned int counter;<br>
-};<br>
-<br>
+struct module_top {
+  unsigned int counter;
+};
+
 extern struct module_top top;
 </code>
 
@@ -86,25 +84,23 @@ two values of the trace of the counter module
 (<a href="counter.c">counter.c</a>):
 </p>
 
-<hr>
-<code>
-void next_timeframe();<br>
-<br>
-struct module_top {<br>
-&nbsp;&nbsp;unsigned int counter;<br>
-};<br>
-<br>
-extern struct module_top top;<br>
-<br>
-int main() {<br>
-&nbsp;&nbsp;next_timeframe();<br>
-&nbsp;&nbsp;next_timeframe();<br>
-&nbsp;&nbsp;assert(top.counter==2);<br>
-&nbsp;&nbsp;next_timeframe();<br>
-&nbsp;&nbsp;assert(top.counter==3);<br>
+<pre><code>
+void next_timeframe();
+
+struct module_top {
+  unsigned int counter;
+};
+
+extern struct module_top top;
+
+int main() {
+  next_timeframe();
+  next_timeframe();
+  assert(top.counter==2);
+  next_timeframe();
+  assert(top.counter==3);
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 The following CBMC command line checks these assertions with a bound of

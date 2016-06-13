@@ -61,18 +61,17 @@ Now consider the first few lines of the <code>main</code> function
 of Aeon:
 </p>
 
-<code>
-int main(int argc, char **argv)}<br>
-{<br>
-&nbsp;&nbsp;char settings[MAX_SETTINGS][MAX_LEN];}<br>
-&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;numSet = getConfig(settings);<br>
-&nbsp;&nbsp;if (numSet == -1) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;logEntry("Missing config file!");<br>
-&nbsp;&nbsp;&nbsp;&nbsp;exit(1);<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;...
-</code>
+<pre><code>int main(int argc, char **argv)
+{
+  char settings[MAX_SETTINGS][MAX_LEN];
+  ...
+  numSet = getConfig(settings);
+  if (numSet == -1) {
+    logEntry("Missing config file!");
+    exit(1);
+  }
+  ...
+</code></pre>
 
 <p class="justified">
 and the function <code>getConfig</code> in <code>lib_aeon.c</code>:
