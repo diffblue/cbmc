@@ -12,7 +12,9 @@ namespace
 {
 bool is_meta(const irep_idt &id)
 {
-  return std::string::npos != id2string(id).find("$assertionsDisabled");
+  const std::string &n=id2string(id);
+  return std::string::npos != n.find("$assertionsDisabled")
+      || std::string::npos != n.find("tmp_struct_init$");
 }
 
 inputst generate_inputs(const symbol_tablet &st, const goto_functionst &gf,

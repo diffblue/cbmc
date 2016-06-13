@@ -33,6 +33,6 @@ typedef std::map<const irep_idt, exprt> inputst;
 std::string generate_java_test_case_from_inputs(
     const class symbol_tablet &st,
     const irep_idt &func_id,
-    const inputst &inputs);
+    inputst inputs);
 
 #endif /* JAVA_TEST_SOURCE_FACTORY_H_ */
