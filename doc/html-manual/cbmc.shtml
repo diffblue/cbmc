@@ -31,15 +31,12 @@ As an example, consider the following simple program, named
 <a href="file1.c">file1.c</a>:
 <p/>
 
-<hr>
-<pre><code class="c">
-int puts(const char *s) { }
+<pre><code class="c">int puts(const char *s) { }
 
 int main(int argc, char **argv) {
   puts(argv[2]);
 }
 </code></pre>
-<hr>
 
 <p class="justified">
 Of course, this program is faulty, as the <code>argv</code> array might have fewer
@@ -137,17 +134,15 @@ is also useful for verifying program modules. Consider the following example,
 called <a href="file2.c">file2.c</a>:
 </p>
 
-<hr>
-<code>
-int array[10];<br><br>
-int sum() {<br>
-&nbsp;&nbsp;unsigned i, sum;<br><br>
-&nbsp;&nbsp;sum=0;<br>
-&nbsp;&nbsp;for(i=0; i&lt;10; i++)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;sum+=array[i];<br>
+<pre><code>int array[10];
+int sum() {
+  unsigned i, sum;
+
+  sum=0;
+  for(i=0; i&lt;10; i++)
+    sum+=array[i];
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 In order to set the entry point to the <code>sum</code> function, run
@@ -173,25 +168,25 @@ unwinding is performed.  As an example, consider the program <a
 href="binsearch.c">binsearch.c</a>:
 </p>
 
-<hr>
-<code>
-int binsearch(int x) {<br>
-&nbsp;&nbsp;int a[16];<br>
-&nbsp;&nbsp;signed low=0, high=16;<br><br>
-&nbsp;&nbsp;while(low&lt;high) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;signed middle=low+((high-low)>>1);<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(a[middle]&lt;x)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;high=middle;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;else if(a[middle]&gt;x)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;low=middle+1;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;else // a[middle]=x !<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return middle;<br>
-&nbsp;&nbsp;}<br><br>   
-&nbsp;&nbsp;return -1;<br>
+<pre><code>
+int binsearch(int x) {
+  int a[16];
+  signed low=0, high=16;
+
+  while(low&lt;high) {
+    signed middle=low+((high-low)>>1);
+
+    if(a[middle]&lt;x)
+      high=middle;
+    else if(a[middle]&gt;x)
+      low=middle+1;
+    else // a[middle]==x
+      return middle;
+  }
+
+  return -1;
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 If you run CBMC on this function, you will notice that the unwinding
@@ -224,48 +219,46 @@ all bugs. The following program
 (<a href="lock-example.c">lock-example.c</a>) is an example
 of a program with a user-specified property:</p>
 
-<hr>
-<code>
-_Bool nondet_bool();<br>
-_Bool LOCK = 0;<br>
-<br>
-_Bool lock() {<br>
-&nbsp;&nbsp;if(nondet_bool()) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;assert(!LOCK);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;LOCK=1;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return 1; }<br>
-<br>
-&nbsp;&nbsp;return 0;<br>
-}<br>
-<br>
-void unlock() {<br>
-&nbsp;&nbsp;assert(LOCK);<br>
-&nbsp;&nbsp;LOCK=0;<br>
-}<br>
-<br>
-int main() {<br>
-&nbsp;&nbsp;unsigned got_lock = 0;<br>
-&nbsp;&nbsp;int times;<br>
-<br>
-&nbsp;&nbsp;while(times > 0) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(lock()) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;got_lock++;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* critical section */<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(got_lock!=0)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unlock();<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;got_lock--;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;times--;<br>
+<pre><code>
+_Bool nondet_bool();
+_Bool LOCK = 0;
+
+_Bool lock() {
+  if(nondet_bool()) {
+    assert(!LOCK);
+    LOCK=1;
+    return 1; }
+
+  return 0;
+}
+
+void unlock() {
+  assert(LOCK);
+  LOCK=0;
+}
+
+int main() {
+  unsigned got_lock = 0;
+  int times;
+
+  while(times > 0) {
+    if(lock()) {
+      got_lock++;
+      /* critical section */
+    }
+
+    if(got_lock!=0)
+      unlock();
+
+    got_lock--;
+    times--;
 } }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
-The <code>while</code> loop in the <code>main</code> function has no (useful) run-time
-bound. Thus, a bound has to be set on the amount of unwinding that
-CBMC performs. There are two ways to do so:
+The <code>while</code> loop in the <code>main</code> function has no
+(useful) run-time bound.  Thus, a bound has to be set on the amount of
+unwinding that CBMC performs.  There are two ways to do so:
 </p>
 
 <ol>
