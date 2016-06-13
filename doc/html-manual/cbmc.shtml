@@ -1,5 +1,9 @@
 <!--#include virtual="header.inc" -->
 
+<link rel="stylesheet" href="highlight/styles/default.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
 <p><a href="./">CPROVER Manual TOC</a></p>
 
 <h2>CBMC: Bounded Model Checking for C/C++ and Java</h2>
@@ -28,12 +32,13 @@ As an example, consider the following simple program, named
 <p/>
 
 <hr>
-<code>
-int puts(const char *s) { }<br><br>
-int main(int argc, char **argv) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;puts(argv[2]);<br>
+<pre><code class="c">
+int puts(const char *s) { }
+
+int main(int argc, char **argv) {
+  puts(argv[2]);
 }
-</code>
+</code></pre>
 <hr>
 
 <p class="justified">
