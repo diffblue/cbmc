@@ -592,48 +592,40 @@ for edge access or other specialized behaviour:
 <td>Represents a SMV-style transition system with invariants <code>invar()</code>, initial state <code>init()</code> and transition function <code>trans()</code>.</td>
 </tr>
 
-<tr><code>true_exprt</code></td>
+<tr><td valign=top><code>true_exprt</code></td>
 <td>Boolean constant true expression.</td>
 </tr>
 
-<tr><td valign=top> 
-<code>false_exprt</code></td>
+<tr><td valign=top><code>false_exprt</code></td>
 <td>Boolean constant false expression.</td>
 </tr>
 
-<tr><td valign=top> 
-<code>symbol_exprt</code></td>
+<tr><td valign=top><code>symbol_exprt</code></td>
 <td>Represents a symbol (e.g., a variable occurrence), convenience function for manipulating "identifier"-edge <code>set_identifier</code> and <code>get_identifier</code></td>
 </tr>
 
-<tr><td valign=top> 
-<code>predicate_exprt</code></td>
+<tr><td valign=top><code>predicate_exprt</code></td>
 <td>Convenience constructors to create expressions of type "bool".</td>
 </tr>
 
-<tr><td valign=top> 
-<code>binary_relation_exprt : predicate_exprt</code></td>
+<tr><td valign=top><code>binary_relation_exprt : predicate_exprt</code></td>
 <td>Convenience functions to create and manipulate binary expressions of type "bool". </td>
 </tr>
 
-<tr><td valign=top>
-<code>equality_exprt : binary_relation_exprt</code></td>
+<tr><td valign=top><code>equality_exprt : binary_relation_exprt</code></td>
 <td>Convenience functions to create and manipulate equality expressions such as "a == b". </td>
 </tr>
 
-<tr><td valign=top> 
-<code>ieee_float_equal_exprt : binary_relation_exprt</code> </td>
+<tr><td valign=top><code>ieee_float_equal_exprt : binary_relation_exprt</code></td>
 <td>Convenience functions to create and manipulate equality expressions between floating-point numbers. 
 </td>
 </tr>
 
-<tr><td valign=top> 
-<code>index_exprt</code></td>
+<tr><td valign=top><code>index_exprt</code></td>
 <td>Represents an array access expression such as "a[i]". Convenience functions <code>array()</code> and <code>index()</code> for accessing the array expressions and indexing expression.</td>
 </tr>
 
-<tr><td valign=top> 
-<code>typecast_exprt</code></td>
+<tr><td valign=top><code>typecast_exprt</code></td>
 <td>Represents a cast to the type of the expression.</td>
 </tr>
 
@@ -645,29 +637,24 @@ for edge access or other specialized behaviour:
 <td>Representations of logical operators with convenience constructors.</td>
 </tr>
 
-<tr><td valign=top> 
-<code>address_of_exprt</code></td>
+<tr><td valign=top><code>address_of_exprt</code></td>
 <td>Representation of a C-style <code>\&a</code> address-of operation. Convenience function <code>object()</code> for accessing operand. </td>
 </tr>
 
-<tr><td valign=top> 
-<code>dereference_exprt</code></td>
+<tr><td valign=top><code>dereference_exprt</code></td>
 <td>Representation of a C-style <code>*a</code> pointer-dereference operation. Convenience function <code>object()</code> for accessing operand. </td>
 </tr>
 
-<tr><td valign=top> 
-<code>if_exprt</code></td>
+<tr><td valign=top><code>if_exprt</code></td>
 <td>Representation of a conditional expresion, with convenience functions <code>cond()</code>, <code>true_case()</code> and <code>false_case()</code> for accessing operands.</td>
 </tr>
 
-<tr><td valign=top> 
-<code>member_exprt</code></td>
+<tr><td valign=top><code>member_exprt</code></td>
 <td>Represents a <code>some_struct.some_field</code> member access.</td>
 </tr>
 
-<tr><td valign=top>
-<code>codet</code></td>
-<td>Represents a segment of code. </td>
+<tr><td valign=top><code>codet</code></td>
+<td>Represents a segment of code.</td>
 </tr>
 
 </table>
@@ -725,7 +712,7 @@ the list <code>targets</code>, which is a field of the class
 <code>goto_programt::instructiont</code>, i.e., each goto-instruction carries a
 list of possible jump destinations.  The latter list <code>targets</code> is a
 list of iterators which point to elements of the list <code>instructions</code>. 
-An illustration is given in Figure \ref{fig:goto_program}.
+An illustration is given in the figure below.
 </p>
 
 <center><img src="goto_program.svg" width=500></center>
@@ -739,36 +726,47 @@ field <code>type</code> in <code>instructiont</code>.  These include:
 
 <table>
 <tr><td valign=top><code>GOTO</code></td>
-<td>Represents a non-deterministic branch to the instructions given in the list <code>targets</code>. Goto statements are guarded, i.e., the non-deterministic branch is only taken if the expression in <code>guard</code> evaluates to true, otherwise the program continues sequentially.
-Guarded gotos can be used, for example, to model if statements. The guard is then set to the negated condition of the statement, and goto target is set to bypass the conditionally executed code if this guard evaluates to true.
+<td>Represents a non-deterministic branch to the instructions given in the
+list <code>targets</code>.  Goto statements are guarded, i.e., the
+non-deterministic branch is only taken if the expression in
+<code>guard</code> evaluates to true, otherwise the program continues
+sequentially.  Guarded gotos can be used, for example, to model if
+statements.  The guard is then set to the negated condition of the
+statement, and goto target is set to bypass the conditionally executed code
+if this guard evaluates to true.
+</td>
 </tr>
 
 <tr><td valign=top><code>ASSUME</code></td>
-<td>An assumption statement that restricts viable paths reaching the instruction location to the ones that make the expression <code>guard</code> evaluate to true.
+<td>An assumption statement that restricts viable paths reaching the
+instruction location to the ones that make the expression <code>guard</code>
+evaluate to true.</td>
 </tr>
 
 <tr><td valign=top><code>ASSERT</code></td>
-<td>An assertion whose <code>guard</code> is checked for validity when the instruction is reached.
+<td>An assertion whose <code>guard</code> is checked for validity when the instruction is
+reached.</td>
 </tr>
 
 <tr><td valign=top><code>RETURN</code></td>
-<td>A return statement in a function.
+<td>A return statement in a function.</td>
 </tr>
 
 <tr><td valign=top><code>END_FUNCTION</code></td>
-<td>Denotes the end of a function.
+<td>Denotes the end of a function.</td>
 </tr>
 
 <tr><td valign=top><code>ASSIGN</code></td>
-<td>A variable assignment.
+<td>A variable assignment.</td>
 </tr>
 
 <tr><td valign=top><code>SKIP</code></td>
-<td>No operation.
+<td>No operation.</td>
 </tr>
 
 <tr><td valign=top><code>OTHER</code></td>
-<td>Any operation not covered by <code>enum goto_program_instruction_typet</code>.
+<td>Any operation not covered by <code>enum
+goto_program_instruction_typet</code>.</td>
 </tr>
 
 </table>
