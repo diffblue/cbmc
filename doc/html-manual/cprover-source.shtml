@@ -314,7 +314,7 @@ The first method returns true if the a subtype node exists. is not
 
 <pre><code class="c++">typet &amp;subtype();
 typest &amp;subtypes();
-</pre>
+</code></pre>
 
 <p class="justified">
 The first method returns a reference to the 'subtype' node.
@@ -507,11 +507,10 @@ negations of integer constants are simplified.</li>
 
 </ul>
 
-<pre>
-bool sum(const exprt &amp;expr);
+<pre><code class="c++">bool sum(const exprt &amp;expr);
 bool mul(const exprt &amp;expr);
 bool subtract(const exprt &amp;expr);
-</pre> 
+</code></pre> 
 
 <p class="justified">
 Expect the "this" object and the function argument to be constants of the
@@ -524,27 +523,27 @@ operation fails for some reason (e.g., the types are different),
 
 <h5>Testing common expressions</h5>
  
-<pre>
-bool is_constant() const;
-</pre> 
+<pre><code class="c++">bool is_constant() const;
+</code></pre> 
 
 <p class="justified">
 Returns true if the expression label is "constant".
+</p>
 
-<pre>
-bool is_boolean() const;
-</pre> 
+<pre><code class="c++">bool is_boolean() const;
+</code></pre> 
 
 <p class="justified">
 Returns true if the label of the type is "bool".
 
-<pre>
-bool is_false() const;
+<pre><code class="c++">bool is_false() const;
 bool is_true() const;
-</pre> 
+</code></pre> 
 
 <p class="justified">
-The first function returns true if the expression is a boolean constant with value "false". The second function returns true for any boolean constant that is not of value "false".
+The first function returns true if the expression is a boolean constant with
+value "false".  The second function returns true for any boolean constant
+that is not of value "false".
 </p>
 
 <pre>
@@ -591,15 +590,15 @@ for edge access or other specialized behaviour:
 </tr>
 
 <tr><td valign=top><code>binary_relation_exprt : predicate_exprt</code></td>
-<td>Convenience functions to create and manipulate binary expressions of type "bool". </td>
+<td>Convenience functions to create and manipulate binary expressions of type "bool".</td>
 </tr>
 
 <tr><td valign=top><code>equality_exprt : binary_relation_exprt</code></td>
-<td>Convenience functions to create and manipulate equality expressions such as "a == b". </td>
+<td>Convenience functions to create and manipulate equality expressions such as "a == b".</td>
 </tr>
 
 <tr><td valign=top><code>ieee_float_equal_exprt : binary_relation_exprt</code></td>
-<td>Convenience functions to create and manipulate equality expressions between floating-point numbers. 
+<td>Convenience functions to create and manipulate equality expressions between floating-point numbers.
 </td>
 </tr>
 
@@ -620,11 +619,11 @@ for edge access or other specialized behaviour:
 </tr>
 
 <tr><td valign=top><code>address_of_exprt</code></td>
-<td>Representation of a C-style <code>\&a</code> address-of operation. Convenience function <code>object()</code> for accessing operand. </td>
+<td>Representation of a C-style <code>\&a</code> address-of operation. Convenience function <code>object()</code> for accessing operand.</td>
 </tr>
 
 <tr><td valign=top><code>dereference_exprt</code></td>
-<td>Representation of a C-style <code>*a</code> pointer-dereference operation. Convenience function <code>object()</code> for accessing operand. </td>
+<td>Representation of a C-style <code>*a</code> pointer-dereference operation. Convenience function <code>object()</code> for accessing operand.</td>
 </tr>
 
 <tr><td valign=top><code>if_exprt</code></td>
