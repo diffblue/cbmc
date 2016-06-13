@@ -168,8 +168,7 @@ unwinding is performed.  As an example, consider the program <a
 href="binsearch.c">binsearch.c</a>:
 </p>
 
-<pre><code>
-int binsearch(int x) {
+<pre><code>int binsearch(int x) {
   int a[16];
   signed low=0, high=16;
 
@@ -219,8 +218,7 @@ all bugs. The following program
 (<a href="lock-example.c">lock-example.c</a>) is an example
 of a program with a user-specified property:</p>
 
-<pre><code>
-_Bool nondet_bool();
+<pre><code>_Bool nondet_bool();
 _Bool LOCK = 0;
 
 _Bool lock() {
