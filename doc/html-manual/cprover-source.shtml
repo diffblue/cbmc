@@ -546,8 +546,7 @@ value "false".  The second function returns true for any boolean constant
 that is not of value "false".
 </p>
 
-<pre><code class="c++">
-bool is_zero() const;
+<pre><code class="c++">bool is_zero() const;
 bool is_one() const;
 </code></pre> 
 
@@ -619,7 +618,7 @@ for edge access or other specialized behaviour:
 </tr>
 
 <tr><td valign=top><code>address_of_exprt</code></td>
-<td>Representation of a C-style <code>\&a</code> address-of operation. Convenience function <code>object()</code> for accessing operand.</td>
+<td>Representation of a C-style <code>&amp;a</code> address-of operation. Convenience function <code>object()</code> for accessing operand.</td>
 </tr>
 
 <tr><td valign=top><code>dereference_exprt</code></td>
