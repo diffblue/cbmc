@@ -40,7 +40,7 @@ pointer) is relative to the beginning of the object; it uses byte
 granularity. As an example, the code fragment
 </p>
 
-<pre><code>  unsigned array[10];
+<pre><code class="c">  unsigned array[10];
   char *p;
 
   p=(char *)(array+1);

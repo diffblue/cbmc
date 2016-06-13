@@ -145,8 +145,7 @@ We use the following model checking harness for calling the
 dispatching functions:
 </p>
 
-<pre><code>
-      random = nondet_uchar ();
+<pre><code class="c">      random = nondet_uchar ();
       __CPROVER_assume (0 &lt;= random && random &lt;= 3);
 
       switch (random)
@@ -240,7 +239,7 @@ leading to a <code>usecount</code> of 2. The second call of course fails
 with <code>rval=-1</code>, but the counter is increased nevertheless:
 </p>
 
-<pre><code>int dummy_open (struct inode *inode, struct file *filp)
+<pre><code class="c">int dummy_open (struct inode *inode, struct file *filp)
 {
   __CPROVER_assert(MAJOR (inode-&gt;i_rdev) == dummy_major,
       "i_rdev mismatch");

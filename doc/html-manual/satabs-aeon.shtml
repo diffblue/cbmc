@@ -65,7 +65,7 @@ Now consider the first few lines of the <code>main</code> function
 of Aeon:
 </p>
 
-<pre><code>int main(int argc, char **argv)
+<pre><code class="c">int main(int argc, char **argv)
 {
   char settings[MAX_SETTINGS][MAX_LEN];
   ...
