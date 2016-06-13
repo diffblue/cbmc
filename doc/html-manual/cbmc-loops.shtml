@@ -36,25 +36,25 @@ the following loop-free program:
 </p>
 
 <hr>
-<code>
+<pre><code>
 int main(int argc, char **argv) {<br>
-&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 1</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 2</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 3</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 4</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 5</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;}<br>
+  if(cond) {<br>
+    <font color="#3030f0">BODY CODE COPY 1</font><br>
+    if(cond) {<br>
+      <font color="#3030f0">BODY CODE COPY 2</font><br>
+      if(cond) {<br>
+        <font color="#3030f0">BODY CODE COPY 3</font><br>
+        if(cond) {<br>
+          <font color="#3030f0">BODY CODE COPY 4</font><br>
+          if(cond) {<br>
+            <font color="#3030f0">BODY CODE COPY 5</font><br>
+          }<br>
+        }<br>
+      }<br>
+    }<br>
+  }<br>
 }
-</code>
+</code></pre>
 <hr>
 
 <p class="justified">
@@ -72,8 +72,7 @@ number of loop iterations. This may even work when the number of loop
 unwindings is not constant. Consider the following example:
 </p>
 
-<pre><code>
-_Bool f();
+<pre><code>_Bool f();
 
 int main() {
   for(int i=0; i<100; i++) {
