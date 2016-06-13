@@ -59,9 +59,7 @@ The driver contains following functions:</p>
     specified by the user otherwise).
   </p>
 
-<hr>
-<pre><code>
-int usecount;
+<pre><code>int usecount;
 
 int register_chrdev (unsigned int major, const char* name)
 {
@@ -79,8 +77,7 @@ int register_chrdev (unsigned int major, const char* name)
     anymore (we use the macro <code>MOD_IN_USE</code> to check this).
   </p>
 
-<pre><code>
-int unregister_chrdev (unsigned int major, const char* name)
+<pre><code>int unregister_chrdev (unsigned int major, const char* name)
 {
   if (MOD_IN_USE)
     {
@@ -97,13 +94,9 @@ int unregister_chrdev (unsigned int major, const char* name)
     some other process <code>dummy_open</code> returns -1. Otherwise
     it locks the device for the caller.     
   </p>
-
-
 </li>
 
-
-
-  <li><p class="justified"> <code>dummy_read</code>: (in driver.c) This function
+<li><p class="justified"> <code>dummy_read</code>: (in driver.c) This function
     "simulates" a read access to the device. In fact it does 
     nothing, since we are currently not interested in the potential buffer
     overflow that may result from a call to this function.
@@ -118,17 +111,13 @@ int unregister_chrdev (unsigned int major, const char* name)
     return a value between 0 and  <code>max</code>. If the lock is not held,
     then <code>dummy_read</code> returns -1.
   </p>
-
 </li>
 
-  <li><p class="justified"> <code>dummy_release</code>: (in driver.c) If the lock
-    is held, then <code>dummy_release</code> decreases
-    the <code>usecount</code>, releases the lock, and returns 0. Otherwise,
-    the function returns -1.
-  </p>
-
-
-</li>
+<li><p class="justified"> <code>dummy_release</code>: (in driver.c) If the lock
+is held, then <code>dummy_release</code> decreases
+the <code>usecount</code>, releases the lock, and returns 0. Otherwise,
+the function returns -1.
+</p></li>
 
 </ol>
 
@@ -152,8 +141,7 @@ We use the following model checking harness for calling the
 dispatching functions:
 </p>
 
-<hr>
-<code>
+<pre><code>
       random = nondet_uchar ();
       __CPROVER_assume (0 &lt;= random && random &lt;= 3);
 
@@ -175,8 +163,7 @@ dispatching functions:
       default:
         break;
       }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 The variable <code>random</code> is assigned non-deterministically.
@@ -249,24 +236,19 @@ leading to a <code>usecount</code> of 2. The second call of course fails
 with <code>rval=-1</code>, but the counter is increased nevertheless:
 </p>
 
-<p>
-<hr>
-<code>
-int dummy_open (struct inode *inode, struct file *filp)<br>
-{<br>
-&nbsp;&nbsp;__CPROVER_assert(MAJOR (inode-&gt;i_rdev) == dummy_major,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"i_rdev mismatch");<br>
-&nbsp;&nbsp;MOD_INC_USE_COUNT;<br>
-<br>
-&nbsp;&nbsp;if (locked)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return -1;<br>
-&nbsp;&nbsp;locked = TRUE;<br>
-<br>
-&nbsp;&nbsp;return 0; /* success */<br>
-}<br>
-</code>
-<hr>
-</p>
+<pre><code>int dummy_open (struct inode *inode, struct file *filp)
+{
+  __CPROVER_assert(MAJOR (inode-&gt;i_rdev) == dummy_major,
+      "i_rdev mismatch");
+  MOD_INC_USE_COUNT;
+
+  if (locked)
+    return -1;
+  locked = TRUE;
+
+  return 0; /* success */
+}
+</code></pre>
 
 <p class="justified">
 Then, <code>dummy_release</code> is called to release the lock on the

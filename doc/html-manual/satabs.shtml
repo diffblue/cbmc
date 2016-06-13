@@ -32,8 +32,7 @@ an example, reconsider the following program
 (<a href="lock-example-fixed.c">lock-example-fixed.c</a>):
 </p>
 
-<pre><code>
-_Bool nondet_bool();
+<pre><code>_Bool nondet_bool();
 _Bool LOCK = 0;
 
 _Bool lock() {
