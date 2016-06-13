@@ -41,13 +41,12 @@ fragment shows the definition of the variable that holds the value
 of the <code>counter</code> register:
 </p>
 
-<code>
-struct module_top {
+<pre><code class="c">struct module_top {
   unsigned int counter;
 };
 
 extern struct module_top top;
-</code>
+</code></pre>
 
 <p class="justified">
 Using this definition, the value of the <code>counter</code> register in the
@@ -87,8 +86,7 @@ two values of the trace of the counter module
 (<a href="counter.c">counter.c</a>):
 </p>
 
-<pre><code>
-void next_timeframe();
+<pre><code class="c">void next_timeframe();
 
 struct module_top {
   unsigned int counter;
