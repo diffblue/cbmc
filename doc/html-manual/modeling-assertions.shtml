@@ -46,8 +46,7 @@ to check a range of choices.  As an example, the following code fragment
 asserts that <b>all</b> elements of the array are zero:
 </p>
 
-<pre><code>
-  int a[100], i;
+<pre><code>  int a[100], i;
 
   ...
 
