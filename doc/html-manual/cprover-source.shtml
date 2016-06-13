@@ -399,7 +399,7 @@ Creates an <i>exprt</i> object with a given label and no type.
 </p>
  
 <pre><code class="c++">exprt(const irep_idt &amp;id, const typet &amp;type);
-</pre>
+</code></pre>
 
 <p class="justified">
 Creates an <i>exprt</i> object with a given label and type.
@@ -409,7 +409,7 @@ Creates an <i>exprt</i> object with a given label and type.
 
 <pre><code class="c++">const typet &amp;type() const;
 typet &amp;type();
-</pre>
+</code></pre>
 
 <p class="justified">
 Return a reference to the 'type' node
@@ -481,9 +481,9 @@ original expression with the following simplifications possibly applied:
 </p>
 
 <ul>
-<li>\neg \neg f = f$</li>
-<li>\neg <i>true</i> = <i>false</i></li>
-<li>\neg <i>false</i> = <i>true</i></li>
+<li>&not; &not; f = f</li>
+<li>&not; <i>true</i> = <i>false</i></li>
+<li>&not; <i>false</i> = <i>true</i></li>
 </ul>
 
 <pre>
@@ -546,10 +546,10 @@ value "false".  The second function returns true for any boolean constant
 that is not of value "false".
 </p>
 
-<pre>
+<pre><code class="c++">
 bool is_zero() const;
 bool is_one() const;
-</pre> 
+</code></pre> 
 
 <p class="justified">
 The first function returns true if the expression represents a zero numeric
