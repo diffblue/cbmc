@@ -21,8 +21,7 @@ The following Verilog module implements a 4-bit counter
 (<a href="counter.v">counter.v</a>):
 </p>
 
-<pre><code class="verilog">
-module top(input clk);
+<pre><code class="verilog">module top(input clk);
 
   reg [3:0] counter;
 
