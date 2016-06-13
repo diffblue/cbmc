@@ -46,29 +46,28 @@ to check a range of choices.  As an example, the following code fragment
 asserts that <b>all</b> elements of the array are zero:
 </p>
 
-<code>
-&nbsp;&nbsp;int a[100], i;<br>
-<br>
-&nbsp;&nbsp;...<br>
-<br>
-&nbsp;&nbsp;i=nondet_uint();<br>
-&nbsp;&nbsp;if(i>=0 && i<100)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;assert(a[i]==0);
-</code>
+<pre><code>
+  int a[100], i;
+
+  ...
+
+  i=nondet_uint();
+  if(i>=0 && i<100)
+    assert(a[i]==0);
+</code></pre>
 
 <p class="justified">The nondeterministic choice will guess the
 element of the array that is nonzero. The code fragment above
 is therefore equivalent to
 </p>
 
-<code>
-&nbsp;&nbsp;int a[100], i;<br>
-<br>
-&nbsp;&nbsp;...<br>
-<br>
-&nbsp;&nbsp;for(i=0; i<100; i++)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;assert(a[i]==0);
-</code>
+<pre><code>  int a[100], i;
+
+  ...
+
+  for(i=0; i<100; i++)
+    assert(a[i]==0);
+</code></pre>
 
 <p class="justified">Future CPROVER releases will
 support explicit quantifiers with a syntax that resembles Spec#:
@@ -110,7 +109,7 @@ the assumption has no effect on the assertion, which means that
 the assertion will fail:
 </p>
 
-<pre><code>x=nondet_uint();
+<pre><code>  x=nondet_uint();
   assert(x==100);
   __CPROVER_assume(x==100);
 </code></pre>
@@ -134,8 +133,7 @@ As an example, the following program will pass:</p>
 the effect of universal quantification in assumptions. As an example,
 </p>
 
-<pre><code>
-int main() {
+<pre><code>int main() {
   int a[10], x, y;
 
   x=nondet_int();
