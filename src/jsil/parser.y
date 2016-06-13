@@ -393,10 +393,10 @@ atom_expression: literal
                }
                | TOK_TYPEOF '(' expression ')'
                {
-                 exprt typeof(ID_typeof);
-                 typeof.move_to_operands(stack($3));
+                 exprt typeof_expr(ID_typeof);
+                 typeof_expr.move_to_operands(stack($3));
 
-                 newstack($$).swap(typeof);
+                 newstack($$).swap(typeof_expr);
                }
                ;
 
