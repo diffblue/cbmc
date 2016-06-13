@@ -49,14 +49,14 @@ performed during type checking, which is done by a call to the
 </p>
 
 <pre>
-#include &lt;iostream&rt;
-#include &lt;fstream&rt;
-#include &lt;sstream&rt;
-#include &lt;string&rt;
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;sstream&gt;
+#include &lt;string&gt;
 
-#include &lt;ansi-c/ansi_c_language.h&rt;
-#include &lt;util/cmdline.h&rt;
-#include &lt;util/config.h&rt;
+#include &lt;ansi-c/ansi_c_language.h&gt;
+#include &lt;util/cmdline.h&gt;
+#include &lt;util/config.h&gt;
 
 int main(int argc, const char* argv[])
 {
@@ -70,7 +70,7 @@ int main(int argc, const char* argv[])
      config.ansi_c.include_paths=cmdl.get_values('I');
 
    // Set language to C
-   std::auto_ptr&lt;languaget&rt; clang(new_ansi_c_language());
+   std::auto_ptr&lt;languaget&gt; clang(new_ansi_c_language());
 
    // Symbol table
    contextt my_context;
@@ -79,17 +79,17 @@ int main(int argc, const char* argv[])
        sit != cmdl.args.end();sit++)
    {
      // Source code stream
-     std::ifstream in(sit-&rt;c_str());	
+     std::ifstream in(sit-&gt;c_str());	
 
      // Parse
-     clang-&rt;parse(in, "", std::cerr);
+     clang-&gt;parse(in, "", std::cerr);
 
      // Typecheck
-     clang-&rt;typecheck(my_context, *sit, std::cerr);
+     clang-&gt;typecheck(my_context, *sit, std::cerr);
   }
 
   // Do some final adjustements
-  clang-&rt;final(my_context, std::cerr);
+  clang-&gt;final(my_context, std::cerr);
 
   my_context.show(std::cout);
 
@@ -339,46 +339,47 @@ creation and manipulation of <code>typet</code> objects for special types.
 
 <table>
 <tr><th>Class</th><th>Description</th></tr>
-<code>bool_typet</code></td>
+
+<tr><td valign=top><code>bool_typet</code></td>
 <td>Boolean type</td></tr>
-<tr><td>
-<code>symbol_typet</code></td>
+
+<tr><td valign=top><code>symbol_typet</code></td>
 <td>Symbol type. Has edge "identifier" to a string value, which can be accessed with <code>get_identifier</code> and <code>set_identifier</code>.</td></tr>
-<tr><td>
-<code>struct_typet</code>, <code>union_typet</code></td>
-<td>Represent a struct, resp.~union types. Convenience functions to access components <code>components()</code>.</td></tr>
-<tr><td>
-<code>code_typet</code></td>
+
+<tr><td valign=top><code>struct_typet</code>, <code>union_typet</code></td>
+<td>Represent a struct, resp.&nbsp;union types. Convenience functions to access components <code>components()</code>.</td></tr>
+
+<tr><td valign=top><code>code_typet</code></td>
 <td>The type of a function/procedure. Convenience functions to access <code>arguments()</code> and <code>return_type()</code>. </td></tr>
-<tr><td>
-<code>array_typet</code></td>
+
+<tr><td valign=top><code>array_typet</code></td>
 <td>Convenience function <code>size()</code> to access size of the array.</td></tr>
-<tr><td>
-<code>pointer_typet</code></td>
+
+<tr><td valign=top><code>pointer_typet</code></td>
 <td>Pointer type, subtype stores the type of the object pointed to.</td></tr>
-<tr><td>
-<code>reference_typet</code></td>
+
+<tr><td valign=top><code>reference_typet</code></td>
 <td>Represents a reference type, subtype stores the type of the object referenced to. </td></tr>
-<tr><td>
-<code>bv_typet</code></td>
+
+<tr><td valign=top><code>bv_typet</code></td>
 <td>Represents a bit vector type with variable width.</td></tr>
-<tr><td>
-<code>fixed_bv_typet</code></td>
+
+<tr><td valign=top><code>fixed_bv_typet</code></td>
 <td>Represents a bit vector that encodes a fixed-point number.</td></tr>
-<tr><td>
-<code>floatbv_typet</code></td>
+
+<tr><td valign=top><code>floatbv_typet</code></td>
 <td>Represents a bit vector that encodes a floating-point number.</td></tr>
-<tr><td>
-<code>string_typet</code></td>
-<td>Represents a string type. </td></tr>
-<tr><td>
+
+<tr><td valign=top><code>string_typet</code></td>
+<td>Represents a string type.</td></tr>
+
 </table>
 
 <h3>Source Locations</h3>
 
 <p class="justified">
-The class <i>locationt</i> inherits from the class <i>irept</i>. It is
-used to store locations in text files. It adds specialized methods to
+The class <i>source_locationt</i> inherits from the class <i>irept</i>.  It
+is used to store locations in text files.  It adds specialized methods to
 manipulate the edges named "file", "line", "column", "function".
 </p>
 
@@ -498,9 +499,9 @@ original expression with the following simplifications possibly applied:
 </p>
 
 <ul>
-<li>$\neg \neg f = f$</li>
-<li>$\neg \mbox{true} = \mbox{false}$</li>
-<li>$\neg \mbox{false} = \mbox{true}$</li>
+<li>\neg \neg f = f$</li>
+<li>\neg <i>true</i> = <i>false</i></li>
+<li>\neg <i>false</i> = <i>true</i></li>
 </ul>
 
 <pre>
@@ -516,7 +517,7 @@ on its type:
 
 <li>For boolean expressions, <code>make_not</code> is called.</li>
 
-<li> For integers, the current instance is turned into a numeric negation
+<li>For integers, the current instance is turned into a numeric negation
 expression "unary-" of its old value.  Chains of "unary-" nodes and
 negations of integer constants are simplified.</li>
 
@@ -587,7 +588,7 @@ for edge access or other specialized behaviour:
 
 <tr><th>Class</th><th>Description</th></tr>
 
-<tr><td><code>transt</code></td>
+<tr><td valign=top><code>transt</code></td>
 <td>Represents a SMV-style transition system with invariants <code>invar()</code>, initial state <code>init()</code> and transition function <code>trans()</code>.</td>
 </tr>
 
@@ -595,48 +596,48 @@ for edge access or other specialized behaviour:
 <td>Boolean constant true expression.</td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>false_exprt</code></td>
 <td>Boolean constant false expression.</td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>symbol_exprt</code></td>
 <td>Represents a symbol (e.g., a variable occurrence), convenience function for manipulating "identifier"-edge <code>set_identifier</code> and <code>get_identifier</code></td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>predicate_exprt</code></td>
 <td>Convenience constructors to create expressions of type "bool".</td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>binary_relation_exprt : predicate_exprt</code></td>
 <td>Convenience functions to create and manipulate binary expressions of type "bool". </td>
 </tr>
 
-<tr><td>
+<tr><td valign=top>
 <code>equality_exprt : binary_relation_exprt</code></td>
 <td>Convenience functions to create and manipulate equality expressions such as "a == b". </td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>ieee_float_equal_exprt : binary_relation_exprt</code> </td>
 <td>Convenience functions to create and manipulate equality expressions between floating-point numbers. 
 </td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>index_exprt</code></td>
 <td>Represents an array access expression such as "a[i]". Convenience functions <code>array()</code> and <code>index()</code> for accessing the array expressions and indexing expression.</td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>typecast_exprt</code></td>
 <td>Represents a cast to the type of the expression.</td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>and_exprt</code>,
 <code>implies_exprt</code>,
 <code>or_exprt</code>,
@@ -644,27 +645,27 @@ for edge access or other specialized behaviour:
 <td>Representations of logical operators with convenience constructors.</td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>address_of_exprt</code></td>
 <td>Representation of a C-style <code>\&a</code> address-of operation. Convenience function <code>object()</code> for accessing operand. </td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>dereference_exprt</code></td>
 <td>Representation of a C-style <code>*a</code> pointer-dereference operation. Convenience function <code>object()</code> for accessing operand. </td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>if_exprt</code></td>
 <td>Representation of a conditional expresion, with convenience functions <code>cond()</code>, <code>true_case()</code> and <code>false_case()</code> for accessing operands.</td>
 </tr>
 
-<tr><td> 
+<tr><td valign=top> 
 <code>member_exprt</code></td>
 <td>Represents a <code>some_struct.some_field</code> member access.</td>
 </tr>
 
-<tr><td>
+<tr><td valign=top>
 <code>codet</code></td>
 <td>Represents a segment of code. </td>
 </tr>
@@ -737,36 +738,36 @@ field <code>type</code> in <code>instructiont</code>.  These include:
 </p>
 
 <table>
-<tr><td><code>GOTO</code></td>
+<tr><td valign=top><code>GOTO</code></td>
 <td>Represents a non-deterministic branch to the instructions given in the list <code>targets</code>. Goto statements are guarded, i.e., the non-deterministic branch is only taken if the expression in <code>guard</code> evaluates to true, otherwise the program continues sequentially.
 Guarded gotos can be used, for example, to model if statements. The guard is then set to the negated condition of the statement, and goto target is set to bypass the conditionally executed code if this guard evaluates to true.
 </tr>
 
-<tr><td><code>ASSUME</code></td>
+<tr><td valign=top><code>ASSUME</code></td>
 <td>An assumption statement that restricts viable paths reaching the instruction location to the ones that make the expression <code>guard</code> evaluate to true.
 </tr>
 
-<tr><td><code>ASSERT</code></td>
+<tr><td valign=top><code>ASSERT</code></td>
 <td>An assertion whose <code>guard</code> is checked for validity when the instruction is reached.
 </tr>
 
-<tr><td><code>RETURN</code></td>
+<tr><td valign=top><code>RETURN</code></td>
 <td>A return statement in a function.
 </tr>
 
-<tr><td><code>FUNCTION_END</code></td>
+<tr><td valign=top><code>END_FUNCTION</code></td>
 <td>Denotes the end of a function.
 </tr>
 
-<tr><td><code>ASSIGN</code></td>
+<tr><td valign=top><code>ASSIGN</code></td>
 <td>A variable assignment.
 </tr>
 
-<tr><td><code>SKIP</code></td>
+<tr><td valign=top><code>SKIP</code></td>
 <td>No operation.
 </tr>
 
-<tr><td><code>OTHER</code></td>
+<tr><td valign=top><code>OTHER</code></td>
 <td>Any operation not covered by <code>enum goto_program_instruction_typet</code>.
 </tr>
 
@@ -780,12 +781,12 @@ The following code segment shows a partial interface declaration of
 </p>
 
 <pre>
-template &lt;class codeT, class guardT&rt;
+template &lt;class codeT, class guardT&gt;
 class goto_program_templatet
 {
 public:
   //list of instruction type
-  typedef std::list&lt;class instructiont&rt; instructionst;
+  typedef std::list&lt;class instructiont&gt; instructionst;
 
   //a reference to an instruction in the list
   typedef typename 
@@ -828,7 +829,7 @@ public:
     targetst targets;
    
     //set of all predecessors (sequential, and gotos)
-    std::set&lt;targett&rt; incoming_edges;
+    std::set&lt;targett&gt; incoming_edges;
     
     // a globally unique number to identify a 
     // program location. It is guaranteed to be 
