@@ -199,17 +199,17 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
   bool previous_dereference(true);
 
   // We will search for the dereference in the member expr
-  while (compound.id() != ID_dereference) 
+  while(compound.id()!=ID_dereference) 
   {
-    if (compound.id() == ID_member) 
+    if(compound.id()==ID_member) 
     {
       // If it's a member we go deeper
-      compound = to_member_expr(compound).compound();
+      compound=to_member_expr(compound).compound();
     }
     else 
     {
       // Otherwise, we give up
-      previous_dereference = false;  
+      previous_dereference=false;  
       break; 
     }
   }
@@ -218,12 +218,12 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
    // Create a non-det of same type
   side_effect_expr_nondett nondet(expr.type());
 
-  if (previous_dereference) 
+  if(previous_dereference) 
   {
-    assert(compound.id() == ID_dereference);
-    nondet.set("previous-dereference", compound); // Attach the dereference
+    assert(compound.id()==ID_dereference);
+    // Attach the dereference
+    nondet.set("previous-dereference", compound); 
   }
-
 
   // We replace by the non-det
   expr.swap(nondet);
