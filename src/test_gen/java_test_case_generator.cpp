@@ -30,7 +30,10 @@ inputst generate_inputs(const symbol_tablet &st, const goto_functionst &gf,
       {
         const irep_idt &id=to_symbol_expr(lhs).get_identifier();
         if (st.has_symbol(id) && !is_meta(id))
-          result.insert(std::make_pair(id, step.full_lhs_value));
+        {
+          const exprt &value=step.full_lhs_value;
+          result.insert(std::make_pair(id, value));
+        }
       }
     }
   }
