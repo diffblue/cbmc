@@ -372,8 +372,7 @@ void java_bytecode_convertt::convert(
   if(!m.is_static)
   {
     code_typet::parametert this_p;
-    const empty_typet empty;
-    const pointer_typet object_ref_type(empty);
+    const pointer_typet object_ref_type(class_type);
     this_p.type()=object_ref_type;
     this_p.set_this();
     parameters.insert(parameters.begin(), this_p);

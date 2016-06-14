@@ -282,12 +282,12 @@ exprt gen_argument(
     aux_symbol.type=type;
     aux_symbol.is_static_lifetime=true;
 
-    exprt object_this_ptr=aux_symbol.symbol_expr();
+    exprt object_ptr=aux_symbol.symbol_expr();
     
     const namespacet ns(symbol_table);
-    gen_nondet_init(object_this_ptr, init_code, ns);
+    gen_nondet_init(object_ptr, init_code, ns);
 
-    return side_effect_expr_nondett(type);
+    return object_ptr;
   }
   else if(type.id()==ID_c_bool)
   {
