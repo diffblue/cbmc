@@ -64,11 +64,11 @@ bool cbmc_dimacst::write_dimacs(std::ostream &out)
       s_it++)
   {
     if(s_it->second.is_constant())
-      out << "c " << (s_it->second.is_true()?"TRUE":"FALSE") << " "
-          << s_it->first << "\n";
+      out << "c " << s_it->first << " "
+          << (s_it->second.is_true()?"TRUE":"FALSE") << "\n";
     else
-      out << "c " << s_it->second.dimacs() << " "
-          << s_it->first << "\n";
+      out << "c " << s_it->first << " "
+          << s_it->second.dimacs() << "\n";
   }
 
   // dump mapping for selected bit-vectors
@@ -80,7 +80,8 @@ bool cbmc_dimacst::write_dimacs(std::ostream &out)
       m_it++)
   {
     if(m_it->second.bvtype==IS_SIGNED ||
-       m_it->second.bvtype==IS_UNSIGNED)
+       m_it->second.bvtype==IS_UNSIGNED ||
+       m_it->second.bvtype==IS_C_BOOL)
     {
       const boolbv_mapt::literal_mapt &literal_map=m_it->second.literal_map;
       out << "c " << m_it->first;
