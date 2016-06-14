@@ -476,8 +476,11 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("list-undefined-functions"))
     {
+      const namespacet ns(symbol_table);
+
       Forall_goto_functions(it, goto_functions)
-        if(!it->second.body_available())
+        if(!ns.lookup(it->first).is_macro &&
+           !it->second.body_available())
           std::cout << it->first << std::endl;
       return 0;
     }
