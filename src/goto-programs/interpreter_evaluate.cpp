@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: interpretert::evaluate
+Function: interpretert::read
 
   Inputs:
 
@@ -36,13 +36,61 @@ void interpretert::read(
   {
     mp_integer value;
     
-    if(address<memory.size())
-      value=memory[integer2long(address)].value;
+    if(address<memory.size()) {
+      const memory_cellt &cell=memory[integer2long(address)];
+      value=cell.value;
+      if (cell.initialised==0) cell.initialised=-1;
+    }
     else
       value=0;
       
     dest[i]=value;
   }
+}
+
+/*******************************************************************\
+
+Function: interpretert::allocate
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void interpretert::allocate(
+  mp_integer address,
+  unsigned size)
+{
+  // randomize memory region
+  for(unsigned i=0; i<size; i++, ++address)
+  {
+    if(address<memory.size()) {
+      memory_cellt &cell= memory[integer2long(address)];
+      cell.value=0;
+      cell.initialised=0;
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: interpretert::allocate
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void interpretert::clear_input_flags()
+{
+  for(unsigned long i=0; i<memory.size(); i++)
+    memory[i].initialised=0;
 }
 
 /*******************************************************************\
@@ -418,7 +466,13 @@ void interpretert::evaluate(
 
     return;
   }
-
+  else if ((expr.id()==ID_array) || (expr.id()==ID_array_of))
+  {
+    forall_operands(it,expr) {
+      evaluate(*it,dest);
+    }
+    return;
+  }
   std::cout << "!! failed to evaluate expression: "
             << from_expr(ns, function->first, expr)
             << std::endl;
