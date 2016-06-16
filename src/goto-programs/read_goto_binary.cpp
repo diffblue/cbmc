@@ -370,7 +370,8 @@ bool read_object_and_link(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
-  message_handler.print(8, "Reading: " + file_name);
+  messaget(message_handler).statistics() << "Reading: " 
+                                         << file_name << messaget::eom;
 
   // we read into a temporary model
   goto_modelt temp_model;

@@ -33,6 +33,9 @@ ui_message_handlert::ui_message_handlert(
 {
   switch(__ui)
   {
+  case PLAIN:
+    break;
+
   case XML_UI:
     std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << "\n";
     std::cout << "<cprover>" << "\n";
@@ -47,13 +50,13 @@ ui_message_handlert::ui_message_handlert(
     break;
     
   case JSON_UI:
-    std::cout << "[\n";
+    {
+      std::cout << "[\n";
+      json_objectt json_program;
+      json_program["program"] = json_stringt(program);
+      std::cout << json_program;
+    }
     break;
-    
-  case PLAIN:
-    break;
-    
-  default:;
   }
 }
 
@@ -78,10 +81,11 @@ ui_message_handlert::~ui_message_handlert()
     break;
   
   case JSON_UI:
-    std::cout << "]\n";
+    std::cout << "\n]\n";
     break;
-  
-  default:;
+
+  case PLAIN:
+    break;
   }
 }
 
@@ -127,18 +131,21 @@ void ui_message_handlert::print(
   {
     switch(get_ui())
     {
-    case XML_UI:
-    case JSON_UI:
-      {
-        source_locationt location;
-        location.make_nil();
-        print(level, message, -1, location);
-      }
-      break;
-      
-    default:
+    case PLAIN:
+    {
       console_message_handlert console_message_handler;
       console_message_handler.print(level, message);
+    }
+    break;
+
+    case XML_UI:
+    case JSON_UI:
+    {
+      source_locationt location;
+      location.make_nil();
+      print(level, message, -1, location);
+    }
+    break;
     }
   }
 }
@@ -165,26 +172,27 @@ void ui_message_handlert::print(
   {
     switch(get_ui())
     {
-    case XML_UI:
-    case JSON_UI:
-      {
-        std::string tmp_message(message);
-
-        if(!tmp_message.empty() && *tmp_message.rbegin()=='\n')
-          tmp_message.resize(tmp_message.size()-1);
-      
-        const char *type=level_string(level);
-        
-        std::string sequence_number_str=
-          sequence_number>=0?i2string(sequence_number):"";
-
-        ui_msg(type, tmp_message, sequence_number_str, location);
-      }
-      break;
-      
-    default:
+    case PLAIN:
       message_handlert::print(
         level, message, sequence_number, location);
+      break;
+
+    case XML_UI:
+    case JSON_UI:
+    {
+      std::string tmp_message(message);
+
+      if(!tmp_message.empty() && *tmp_message.rbegin()=='\n')
+        tmp_message.resize(tmp_message.size()-1);
+      
+      const char *type=level_string(level);
+        
+      std::string sequence_number_str=
+        sequence_number>=0?i2string(sequence_number):"";
+
+      ui_msg(type, tmp_message, sequence_number_str, location);
+    }
+    break;
     }
   }
 }
@@ -209,6 +217,9 @@ void ui_message_handlert::ui_msg(
 {
   switch(get_ui())
   {
+  case PLAIN:
+    break;
+
   case XML_UI:
     xml_ui_msg(type, msg1, msg2, location);
     break;
@@ -216,8 +227,6 @@ void ui_message_handlert::ui_msg(
   case JSON_UI:
     json_ui_msg(type, msg1, msg2, location);
     break;
-  
-  default:;
   }
 }
 
@@ -279,10 +288,12 @@ void ui_message_handlert::json_ui_msg(
     result.new_element(xml(location));
   #endif
 
-  result["text"].value=msg1;
-  result["type"].value=type;
-  
-  std::cout << result;
-  std::cout << std::endl;
+  result["messageType"] = json_stringt(type);
+  result["messageText"] = json_stringt(msg1);
+
+  //By convention a leading comma is created by every new array entry.
+  //The first entry is generated in the constructor and does not have
+  //  a trailing comma.
+  std::cout << ",\n" << result;
 }
 

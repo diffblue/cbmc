@@ -54,7 +54,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(cav11)" \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
   "(error-label):(string-abstraction)" \
-  "(verbosity):(version)(xml-ui)(show-loops)" \
+  "(verbosity):(version)(xml-ui)(json-ui)(show-loops)" \
   "(accelerate)(constant-propagator)" \
   "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)(check-call-sequence)" \

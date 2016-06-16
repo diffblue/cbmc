@@ -31,7 +31,7 @@ class optionst;
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
   "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)(nan-check)" \
   "(no-assertions)(no-assumptions)" \
-  "(xml-ui)(xml-interface)" \
+  "(xml-ui)(xml-interface)(json-ui)" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
@@ -52,7 +52,7 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(graphml-cex):(json-cex):" \
+  "(graphml-cex):" \
   "(floatbv)(all-claims)(all-properties)(decide)" // legacy, and will eventually disappear
 
 class cbmc_parse_optionst:
