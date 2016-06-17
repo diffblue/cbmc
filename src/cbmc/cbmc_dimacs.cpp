@@ -79,23 +79,21 @@ bool cbmc_dimacst::write_dimacs(std::ostream &out)
       m_it!=boolbv_map.mapping.end();
       m_it++)
   {
-    if(m_it->second.bvtype==IS_SIGNED ||
-       m_it->second.bvtype==IS_UNSIGNED ||
-       m_it->second.bvtype==IS_C_BOOL)
-    {
-      const boolbv_mapt::literal_mapt &literal_map=m_it->second.literal_map;
-      out << "c " << m_it->first;
+    const boolbv_mapt::literal_mapt &literal_map=m_it->second.literal_map;
 
-      for(unsigned i=0; i<literal_map.size(); i++)
-        if(!literal_map[i].is_set)
-          out << " " << "?";
-        else if(literal_map[i].l.is_constant())
-          out << " " << (literal_map[i].l.is_true()?"TRUE":"FALSE");
-        else
-          out << " " << literal_map[i].l.dimacs();
+    if(literal_map.empty()) continue;
 
-      out << "\n";
-    }
+    out << "c " << m_it->first;
+
+    for(unsigned i=0; i<literal_map.size(); i++)
+      if(!literal_map[i].is_set)
+        out << " " << "?";
+      else if(literal_map[i].l.is_constant())
+        out << " " << (literal_map[i].l.is_true()?"TRUE":"FALSE");
+      else
+        out << " " << literal_map[i].l.dimacs();
+
+    out << "\n";
   }
   
   return false;
