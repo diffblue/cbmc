@@ -5049,6 +5049,10 @@ void smt2_convt::define_string_equal(const function_application_exprt &f)
 
 void smt2_convt::define_string_literal(const function_application_exprt &f)
 {
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+    
   const function_application_exprt::argumentst &args = f.arguments();
   if (args.size() != 1) {
     UNEXPECTEDCASE("args mismatch in string_literal");
@@ -5087,6 +5091,10 @@ void smt2_convt::define_string_literal(const function_application_exprt &f)
 
 void smt2_convt::define_char_literal(const function_application_exprt &f)
 {
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
   const function_application_exprt::argumentst &args = f.arguments();
   if (args.size() != 1) {
     UNEXPECTEDCASE("args mismatch in string_literal");
@@ -5120,6 +5128,10 @@ void smt2_convt::define_char_literal(const function_application_exprt &f)
 
 void smt2_convt::define_string_concat(const function_application_exprt &f)
 {
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+  
   std::string index = i2string(defined_expressions.size());
   irep_idt id="string_concat." + index;
   const function_application_exprt::argumentst &args = f.arguments();
@@ -5154,6 +5166,10 @@ void smt2_convt::define_string_concat(const function_application_exprt &f)
 
 void smt2_convt::define_string_substring(const function_application_exprt &f)
 {
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
   std::string index = i2string(defined_expressions.size());
   irep_idt id="string_substring." + index;
   const function_application_exprt::argumentst &args = f.arguments();  
@@ -5201,6 +5217,10 @@ void smt2_convt::define_string_substring(const function_application_exprt &f)
 
 void smt2_convt::define_string_is_prefix(const function_application_exprt &f)
 {
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
   std::string index = i2string(defined_expressions.size());
   irep_idt id="string_isprefix." + index;
   const function_application_exprt::argumentst &args = f.arguments();  
@@ -5244,6 +5264,10 @@ void smt2_convt::define_string_is_prefix(const function_application_exprt &f)
 
 void smt2_convt::define_string_is_suffix(const function_application_exprt &f)
 {
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
   std::string index = i2string(defined_expressions.size());
   irep_idt id="string_issuffix." + index;
   const function_application_exprt::argumentst &args = f.arguments();  
@@ -5290,6 +5314,10 @@ void smt2_convt::define_string_is_suffix(const function_application_exprt &f)
 
 void smt2_convt::define_string_char_set(const function_application_exprt &f)
 {
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
   irep_idt id="string_char_set."+i2string(defined_expressions.size());
   const function_application_exprt::argumentst &args = f.arguments();  
   defined_expressions[f] = id;
