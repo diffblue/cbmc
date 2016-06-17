@@ -1,0 +1,8 @@
+CORE
+Main.class
+--function "Other.fail:()V" --show-goto-functions
+^SIGNAL=0$
+MALLOC.*Other
+struct_init.*Other.fail
+--
+^warning: ignoring
