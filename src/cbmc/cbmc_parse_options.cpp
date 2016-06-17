@@ -442,9 +442,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("graphml-cex"))
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
-
-  if(cmdline.isset("json-cex"))
-    options.set_option("json-cex", cmdline.get_value("json-cex"));
 }
 
 /*******************************************************************\
@@ -652,7 +649,8 @@ int cbmc_parse_optionst::get_goto_program(
                 
       if(!infile)
       {
-        error() << "failed to open input file `" << filename << "'" << eom;
+        error() << "failed to open input file `" 
+                << filename << "'" << eom;
         return 6;
       }
                               
@@ -660,7 +658,8 @@ int cbmc_parse_optionst::get_goto_program(
       
       if(language==NULL)
       {
-        error() << "failed to figure out type of file `" <<  filename << "'" << eom;
+        error() << "failed to figure out type of file `" 
+                <<  filename << "'" << eom;
         return 6;
       }
       
@@ -715,7 +714,8 @@ int cbmc_parse_optionst::get_goto_program(
     {
       status() << "Reading GOTO program from file " << eom;
 
-      if(read_object_and_link(*it, symbol_table, goto_functions, get_message_handler()))
+      if(read_object_and_link(*it, symbol_table, goto_functions, 
+                              get_message_handler()))
         return 6;
     }
 
@@ -964,6 +964,7 @@ bool cbmc_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
+      namespacet ns(symbol_table);
       goto_functions.output(ns, std::cout);
       return true;
     }
@@ -1164,5 +1165,6 @@ void cbmc_parse_optionst::help()
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --xml-interface              bi-directional XML interface\n"
+    " --json-ui                    use JSON-formatted output\n"
     "\n";
 }
