@@ -9,12 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 #include "source_location.h"
+#include "file_util.h"
 
 /*******************************************************************\
 
 Function: source_locationt::as_string
 
-  Inputs:
+  Inputs: print_cwd, print the absolute path to the file
 
  Outputs:
 
@@ -22,7 +23,7 @@ Function: source_locationt::as_string
 
 \*******************************************************************/
 
-std::string source_locationt::as_string() const
+std::string source_locationt::as_string(bool print_cwd) const
 {
   std::string dest;
 
@@ -31,7 +32,16 @@ std::string source_locationt::as_string() const
   const irep_idt &column=get_column();
   const irep_idt &function=get_function();
 
-  if(!file.empty())     { if(dest!="") dest+=' '; dest+="file "+id2string(file); }
+  if(!file.empty())
+  {
+    if(dest!="") dest+=' ';
+    dest+="file ";
+    if(print_cwd)
+      dest+=concat_dir_file(id2string(get_working_directory()),
+                            id2string(file));
+    else
+      dest+=id2string(file);
+  }
   if(!line.empty())     { if(dest!="") dest+=' '; dest+="line "+id2string(line); }
   if(!column.empty())   { if(dest!="") dest+=' '; dest+="column "+id2string(column); }
   if(!function.empty()) { if(dest!="") dest+=' '; dest+="function "+id2string(function); }

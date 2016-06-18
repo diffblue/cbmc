@@ -159,9 +159,10 @@ static void add_to_json(
     assert(!s.empty());
     s.erase(s.size()-1);
 
+    // print info for file actually with full path
     json_objectt &i_entry=dead_ins.push_back().make_object();
-    i_entry["source location"]=
-        json_stringt(it->second->source_location.as_string());
+    const source_locationt &l=it->second->source_location;
+    i_entry["source location"]=json_stringt(l.as_string_with_cwd());
     i_entry["statement"]=json_stringt(s);
   }
 }

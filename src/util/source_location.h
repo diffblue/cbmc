@@ -18,7 +18,15 @@ public:
   {
   }
 
-  std::string as_string() const;
+  inline std::string as_string() const
+  {
+    return as_string(false);
+  }
+
+  inline std::string as_string_with_cwd() const
+  {
+    return as_string(true);
+  }
   
   inline const irep_idt &get_file() const
   {
@@ -124,6 +132,9 @@ public:
   {
     return static_cast<const source_locationt &>(get_nil_irep());
   }
+
+protected:
+  std::string as_string(bool print_cwd) const;
 };
 
 // will go away
