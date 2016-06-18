@@ -78,6 +78,12 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     c_storage_spec.asm_label=type.subtype().get(ID_value);
   }
+  else if(type.id()==ID_section &&
+          type.has_subtype() &&
+          type.subtype().id()==ID_string_constant)
+  {
+    c_storage_spec.section=type.subtype().get(ID_value);
+  }
   else if(type.id()==ID_const)
     c_qualifiers.is_constant=true;
   else if(type.id()==ID_restrict)
@@ -109,9 +115,6 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_gcc_attribute_mode)
   {
     gcc_attribute_mode=type;
-  }
-  else if(type.id()==ID_gcc_attribute)
-  {
   }
   else if(type.id()==ID_msc_based)
   {

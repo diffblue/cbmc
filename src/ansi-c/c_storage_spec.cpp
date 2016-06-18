@@ -67,4 +67,10 @@ void c_storage_spect::read(const typet &type)
   {
     asm_label=type.subtype().get(ID_value);
   }
+  else if(type.id()==ID_section &&
+          type.has_subtype() &&
+          type.subtype().id()==ID_string_constant)
+  {
+    section=type.subtype().get(ID_value);
+  }
 }
