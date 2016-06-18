@@ -90,10 +90,16 @@ void bmct::error_trace()
   
   case ui_message_handlert::JSON_UI:
     {
-      json_objectt counterexample;
-      jsont &json_trace=counterexample["counterexample"];
+      json_objectt json_result;
+      json_arrayt &result_array=json_result["result"].make_array();
+      json_objectt &result=result_array.push_back().make_object();
+      const goto_trace_stept &step=goto_trace.steps.back();
+      result["property"]=
+        json_stringt(id2string(step.pc->source_location.get_property_id()));
+      result["status"]=json_stringt("failed");
+      jsont &json_trace=result["counterexample"];
       convert(ns, goto_trace, json_trace);
-      std::cout << ",\n" << counterexample << "\n";
+      std::cout << ",\n" << json_result;
     }
     break;
   }

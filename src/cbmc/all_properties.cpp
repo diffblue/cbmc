@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/time_stopping.h>
 #include <util/xml.h>
+#include <util/json.h>
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/prop/cover_goals.h>
@@ -17,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/json_goto_trace.h>
 
 #include "bmc.h"
 #include "bv_cbmc.h"
@@ -211,7 +213,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   status() << "Running " << solver.decision_procedure_text() << eom;
 
-  cover_goals();  
+  cover_goals();
 
   // output runtime
 
@@ -222,43 +224,74 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   }
   
   // report
-  if(bmc.ui!=ui_message_handlert::XML_UI)
+  switch(bmc.ui)
   {
-    status() << eom;
-    status() << "** Results:" << eom;
-  }
-  
-  for(goal_mapt::const_iterator
-      it=goal_map.begin();
-      it!=goal_map.end();
-      it++)
-  {
-    if(bmc.ui==ui_message_handlert::XML_UI)
+    case ui_message_handlert::PLAIN:
     {
-      xmlt xml_result("result");
-      xml_result.set_attribute("property", id2string(it->first));
-      xml_result.set_attribute("status", it->second.failed?"FAILURE":"SUCCESS");
-
-      if(it->second.failed)
-        convert(bmc.ns, it->second.goto_trace, xml_result.new_element());
-
-      std::cout << xml_result << "\n";
+      status() << eom;
+      status() << "** Results:" << eom;
+      for(goal_mapt::const_iterator
+            it=goal_map.begin();
+          it!=goal_map.end();
+          it++)
+      {
+        status() << "[" << it->first << "] "
+                 << it->second.description << ": "
+                 << (it->second.failed?"FAILURE":"SUCCESS")
+                 << eom;
+      }
+      status() << eom;
+  
+      status() << "** " << cover_goals.number_covered()
+               << " of " << cover_goals.size() << " failed ("
+               << cover_goals.iterations() << " iteration"
+               << (cover_goals.iterations()==1?"":"s")
+               << ")" << eom;
+      break;
     }
-    else
+    case ui_message_handlert::XML_UI:
     {
-      status() << "[" << it->first << "] "
-               << it->second.description << ": " << (it->second.failed?"FAILURE":"SUCCESS")
-               << eom;
+      for(goal_mapt::const_iterator
+            it=goal_map.begin();
+          it!=goal_map.end();
+          it++)
+      {
+        xmlt xml_result("result");
+        xml_result.set_attribute("property", id2string(it->first));
+        xml_result.set_attribute("status",
+                                 it->second.failed?"FAILURE":"SUCCESS");
+
+        if(it->second.failed)
+          convert(bmc.ns, it->second.goto_trace, xml_result.new_element());
+
+        std::cout << xml_result << "\n";
+      }
+      break;
+    }
+    case ui_message_handlert::JSON_UI:
+    {
+      json_objectt json_result;
+      json_arrayt &result_array=json_result["result"].make_array();
+      for(goal_mapt::const_iterator
+            it=goal_map.begin();
+          it!=goal_map.end();
+          it++)
+      {
+        json_objectt &result=result_array.push_back().make_object();
+        result["property"]=json_stringt(id2string(it->first));
+        result["status"]=json_stringt(it->second.failed?"failure":"success");
+
+        if(it->second.failed)
+        {
+          jsont &json_trace=result["counterexample"];
+          convert(bmc.ns, it->second.goto_trace, json_trace);
+        }
+      }
+      std::cout << ",\n" << json_result;
+      break;
     }
   }
 
-  status() << eom;
-  
-  status() << "** " << cover_goals.number_covered()
-           << " of " << cover_goals.size() << " failed ("
-           << cover_goals.iterations() << " iteration"
-           << (cover_goals.iterations()==1?"":"s")
-           << ")" << eom;
 
   bool safe=(cover_goals.number_covered()==0);
 
