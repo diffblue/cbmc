@@ -330,6 +330,41 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
   return 0;
 }
 
+/* FUNCTION: _pthread_join */
+
+// This is for Apple
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#include <errno.h>
+#define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+extern __CPROVER_bool __CPROVER_threads_exited[];
+extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
+extern unsigned long __CPROVER_next_thread_id;
+
+inline int pthread_join(pthread_t thread, void **value_ptr)
+{
+  __CPROVER_HIDE:;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(&thread, "pthread-id"),
+                   "phtread_join must be given valid thread ID");
+  #endif
+
+  if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
+  if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
+  if(value_ptr!=0) (void)**(char**)value_ptr;
+  __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread]);
+
+  return 0;
+}
+
 /* FUNCTION: pthread_rwlock_destroy */
 
 #ifndef __CPROVER_PTHREAD_H_INCLUDED
