@@ -43,7 +43,9 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__PTRDIFF_TYPE__=int"\
   " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long long int\""\
-  " -D__UINTMAX_TYPE__=\"long long unsigned int\""
+  " -D__UINTMAX_TYPE__=\"long long unsigned int\""\
+  " -D__INTPTR_TYPE__=\"int\""\
+  " -D__UINTPTR_TYPE__=\"unsigned int\""  
 
 #define GCC_DEFINES_32 \
   " -D__INT_MAX__=2147483647"\
@@ -56,7 +58,9 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__PTRDIFF_TYPE__=int"\
   " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long long int\""\
-  " -D__UINTMAX_TYPE__=\"long long unsigned int\""
+  " -D__UINTMAX_TYPE__=\"long long unsigned int\""\
+  " -D__INTPTR_TYPE__=\"long int\""\
+  " -D__UINTPTR_TYPE__=\"long unsigned int\""  
                         
 #define GCC_DEFINES_LP64 \
   " -D__INT_MAX__=2147483647"\
@@ -69,7 +73,9 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__PTRDIFF_TYPE__=long"\
   " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long int\""\
-  " -D__UINTMAX_TYPE__=\"long unsigned int\""
+  " -D__UINTMAX_TYPE__=\"long unsigned int\""\
+  " -D__INTPTR_TYPE__=\"long int\""\
+  " -D__UINTPTR_TYPE__=\"long unsigned int\""  
 
 #define GCC_DEFINES_LLP64 \
   " -D__INT_MAX__=2147483647"\
@@ -82,7 +88,9 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__PTRDIFF_TYPE__=\"long long\""\
   " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long long int\""\
-  " -D__UINTMAX_TYPE__=\"long long unsigned int\""
+  " -D__UINTMAX_TYPE__=\"long long unsigned int\""\
+  " -D__INTPTR_TYPE__=\"long long int\""\
+  " -D__UINTPTR_TYPE__=\"long long unsigned int\""  
 
 /*******************************************************************\
 
