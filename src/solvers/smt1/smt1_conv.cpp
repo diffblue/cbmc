@@ -2691,7 +2691,7 @@ void smt1_convt::convert_with(const exprt &expr)
       else if(struct_op_type.id()==ID_union)
         offset=0;
       else
-        assert(false);
+        throw "failed to get offset";
 
       std::size_t width=boolbv_width(expr.type());
 
