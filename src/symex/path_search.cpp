@@ -60,41 +60,54 @@ path_searcht::resultt path_searcht::operator()(
   
     // Pick a state from the queue,
     // according to some heuristic.
-    queuet::iterator state=pick_state();
+    // The state moves to the head of the queue.
+    pick_state();
+
+    // move into temporary queue
+    queuet tmp_queue;
+    tmp_queue.splice(
+      tmp_queue.begin(), queue, queue.begin(), ++queue.begin());
     
     try
     {
-      if(drop_state(*state))
+      statet &state=tmp_queue.front();
+      
+      debug() << "Queue: " << queue.size()
+              << ", depth: " << state.get_depth();
+      for(const auto & s : queue)
+        debug() << ' ' << s.get_depth();
+        
+      debug() << eom;
+    
+      if(drop_state(state))
       {
         number_of_dropped_states++;
         number_of_paths++;
-        queue.erase(state);
         continue;
       }
       
-      if(!state->is_executable())
+      if(!state.is_executable())
       {
         number_of_paths++;
-        queue.erase(state);
         continue;
       }
       
       if(number_of_steps%1000==0)
       {
         status() << "Queue " << queue.size()
-                 << " thread " << state->get_current_thread()
-                 << "/" << state->threads.size()
-                 << " PC " << state->pc() << messaget::eom;
+                 << " thread " << state.get_current_thread()
+                 << "/" << state.threads.size()
+                 << " PC " << state.pc() << messaget::eom;
       }
 
       // an error, possibly?
-      if(state->get_instruction()->is_assert())
+      if(state.get_instruction()->is_assert())
       {
         if(show_vcc)
-          do_show_vcc(*state, ns);
+          do_show_vcc(state, ns);
         else
         {
-          check_assertion(*state, ns);
+          check_assertion(state, ns);
           
           // all assertions failed?
           if(number_of_failed_properties==property_map.size())
@@ -103,24 +116,24 @@ path_searcht::resultt path_searcht::operator()(
       }
       
       // execute
-      path_symex(*state, queue);
+      path_symex(state, tmp_queue);
+      
+      // put at head of main queue
+      queue.splice(queue.begin(), tmp_queue);
     }
     catch(const std::string &e)
     {
       error() << e << eom;
       number_of_dropped_states++;
-      queue.erase(state);
     }
     catch(const char *e)
     {
       error() << e << eom;
       number_of_dropped_states++;
-      queue.erase(state);
     }
     catch(int)
     {
       number_of_dropped_states++;
-      queue.erase(state);
     }
   }
   
@@ -172,10 +185,24 @@ Function: path_searcht::pick_state
 
 \*******************************************************************/
 
-path_searcht::queuet::iterator path_searcht::pick_state()
+void path_searcht::pick_state()
 {
-  // Picking the first one is a DFS.
-  return queue.begin();
+  switch(search_heuristic)
+  {
+  case search_heuristict::DFS:
+    // Picking the first one (most recently added) is a DFS.
+    return;
+  
+  case search_heuristict::BFS:
+    // Picking the last one is a BFS.
+    if(queue.size()>=2)
+      // move last to first position
+      queue.splice(queue.begin(), queue, --queue.end(), queue.end());
+    return;
+    
+  case search_heuristict::LOCS:
+    return;
+  }  
 }
 
 /*******************************************************************\

@@ -23,7 +23,8 @@ public:
     show_vcc(false),
     depth_limit_set(false), // no limit
     context_bound_set(false),
-    unwind_limit_set(false)
+    unwind_limit_set(false),
+    search_heuristic(search_heuristict::DFS)
   {
   }
 
@@ -69,6 +70,10 @@ public:
     goto_tracet error_trace;
   };
   
+  inline void set_dfs() { search_heuristic=search_heuristict::DFS; }
+  inline void set_bfs() { search_heuristic=search_heuristict::BFS; }
+  inline void set_locs() { search_heuristic=search_heuristict::LOCS; }
+  
   typedef std::map<irep_idt, property_entryt> property_mapt;
   property_mapt property_map;
 
@@ -79,7 +84,10 @@ protected:
   typedef std::list<statet> queuet;
   queuet queue;
   
-  queuet::iterator pick_state();
+  // search heuristic
+  void pick_state();
+  std::vector<unsigned> locs_weight;
+  std::vector<unsigned> locs_source;
   
   bool execute(queuet::iterator state, const namespacet &);
   
@@ -97,6 +105,8 @@ protected:
   unsigned context_bound;
   unsigned unwind_limit;
   bool depth_limit_set, context_bound_set, unwind_limit_set;
+
+  enum class search_heuristict { DFS, BFS, LOCS } search_heuristic;
 };
 
 #endif

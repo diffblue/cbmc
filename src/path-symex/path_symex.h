@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // Transform a state by executing a single statement.
 // May occasionally yield more than one successor state
 // (branches, function calls with trinary operator),
-// which are put into "further_states".
+// which are put at the end of "further_states".
 
 void path_symex(
   path_symex_statet &state,
