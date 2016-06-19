@@ -604,9 +604,9 @@ void symex_parse_optionst::report_properties(
 
       switch(it->second.status)
       {
-      case path_searcht::PASS: status_string="OK"; break;
+      case path_searcht::PASS: status_string="SUCCESS"; break;
       case path_searcht::FAIL: status_string="FAILURE"; break;
-      case path_searcht::NOT_REACHED: status_string="OK"; break;
+      case path_searcht::NOT_REACHED: status_string="SUCCESS"; break;
       }
 
       xml_result.set_attribute("status", status_string);
@@ -619,9 +619,9 @@ void symex_parse_optionst::report_properties(
                << it->second.description << ": ";
       switch(it->second.status)
       {
-      case path_searcht::PASS: status() << "OK"; break;
-      case path_searcht::FAIL: status() << "FAILED"; break;
-      case path_searcht::NOT_REACHED: status() << "OK"; break;
+      case path_searcht::PASS: status() << "SUCCESS"; break;
+      case path_searcht::FAIL: status() << "FAILURE"; break;
+      case path_searcht::NOT_REACHED: status() << "SUCCESS"; break;
       }
       status() << eom;
     }
