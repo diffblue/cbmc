@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml.h>
 #include <util/xml_expr.h>
 #include <util/json.h>
+#include <util/json_expr.h>
 
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
@@ -398,6 +399,9 @@ bool bmc_covert::operator()()
         result["status"]=json_stringt(goal.satisfied?"satisfied":"failed");
         result["goal"]=json_stringt(id2string(it.first));
         result["description"]=json_stringt(goal.description);
+
+        if(goal.source_location.is_not_nil())
+          result["sourceLocation"]=json(goal.source_location);
 
         if(goal.satisfied)
         {

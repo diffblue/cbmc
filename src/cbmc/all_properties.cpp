@@ -185,8 +185,9 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
       else if(it->source.pc->is_goto())
       {
         // this is likely an unwinding assertion
-        property_id=id2string(it->source.pc->source_location.get_function())+".unwind."+
-                    i2string(it->source.pc->loop_number);
+        property_id=id2string(
+          it->source.pc->source_location.get_function())+".unwind."+
+          i2string(it->source.pc->loop_number);
         goal_map[property_id].description=it->comment;
       }
       else

@@ -114,8 +114,8 @@ void show_loop_ids_json(
       std::string id=id2string(it->function)+"."+i2string(loop_id);
 
       json_objectt &loop=loops.push_back().make_object();
-      loop["id"]=json_stringt(id);
-      loop["location"]=json(it->source_location);
+      loop["name"]=json_stringt(id);
+      loop["sourceLocation"]=json(it->source_location);
     }
   }
 }

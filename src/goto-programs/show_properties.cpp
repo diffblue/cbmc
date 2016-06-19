@@ -153,7 +153,7 @@ void show_properties_json(
       json_properties.push_back(jsont()).make_object();
     json_property["name"]=json_stringt(id2string(property_id));
     json_property["class"]=json_stringt(id2string(property_class));
-    json_property["location"]=json(it->source_location);
+    json_property["sourceLocation"]=json(it->source_location);
     json_property["description"]=json_stringt(id2string(description));
     json_property["expression"]=
       json_stringt(from_expr(ns, identifier, it->guard));
