@@ -69,6 +69,7 @@ public:
     irep_idt current_function;
     loc_reft return_location;
     exprt return_lhs;
+    exprt return_rhs;
     var_state_mapt saved_local_vars;
   };
 
