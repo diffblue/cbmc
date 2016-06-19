@@ -1,3 +1,5 @@
+#include <assert.h>
+
 void (*f_ptr)(void);
 
 int global;

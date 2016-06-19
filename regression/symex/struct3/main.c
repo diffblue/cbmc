@@ -1,3 +1,5 @@
+#include <assert.h>
+
 struct S
 {
   char a, b, c, d;
