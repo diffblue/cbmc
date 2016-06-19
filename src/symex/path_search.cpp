@@ -96,7 +96,7 @@ path_searcht::resultt path_searcht::operator()(
       {
         status() << "Queue " << queue.size()
                  << " thread " << state.get_current_thread()
-                 << "/" << state.threads.size()
+                 << '/' << state.threads.size()
                  << " PC " << state.pc() << messaget::eom;
       }
 
@@ -230,10 +230,10 @@ void path_searcht::do_show_vcc(
   mstreamt &out=result();
 
   if(instruction.source_location.is_not_nil())
-    out << instruction.source_location << "\n";
+    out << instruction.source_location << '\n';
   
   if(instruction.source_location.get_comment()!="")
-    out << instruction.source_location.get_comment() << "\n";
+    out << instruction.source_location.get_comment() << '\n';
     
   unsigned count=1;
   
@@ -248,7 +248,7 @@ void path_searcht::do_show_vcc(
     if((*s_it)->guard.is_not_nil())
     {
       std::string string_value=from_expr(ns, "", (*s_it)->guard);
-      out << "{-" << count << "} " << string_value << "\n";
+      out << "{-" << count << "} " << string_value << '\n';
       count++;
     }
 
@@ -256,17 +256,17 @@ void path_searcht::do_show_vcc(
     {
       equal_exprt equality((*s_it)->ssa_lhs, (*s_it)->ssa_rhs);
       std::string string_value=from_expr(ns, "", equality);
-      out << "{-" << count << "} " << string_value << "\n";
+      out << "{-" << count << "} " << string_value << '\n';
       count++;
     }
   }
 
-  out << "|--------------------------" << "\n";
+  out << "|--------------------------" << '\n';
   
   exprt assertion=state.read(instruction.guard);
 
   out << "{" << 1 << "} "
-      << from_expr(ns, "", assertion) << "\n";
+      << from_expr(ns, "", assertion) << '\n';
 
   if(!assertion.is_true())
     number_of_VCCs_after_simplification++;

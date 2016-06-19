@@ -81,6 +81,7 @@ protected:
   typedef path_symex_statet statet;
 
   // State queue. Iterators are stable.
+  // The states most recently executed are at the head.
   typedef std::list<statet> queuet;
   queuet queue;
   
