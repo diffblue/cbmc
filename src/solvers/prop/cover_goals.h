@@ -33,16 +33,17 @@ public:
   
   virtual ~cover_goalst();
 
-  void operator()();
+  // returns result of last run on success
+  decision_proceduret::resultt operator()();
 
   // the goals
 
   struct goalt
   {
     literalt condition;
-    bool covered;
+    enum class statust { UNKNOWN, COVERED, UNCOVERED, ERROR } status;
     
-    goalt():covered(false)
+    goalt():status(statust::UNKNOWN)
     {
     }
   };
