@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/pointer_offset_size.h>
+#include <util/byte_operators.h>
+#include <util/namespace.h>
 
 #include "flatten_byte_operators.h"
 
@@ -28,11 +30,9 @@ Function: flatten_byte_extract
 \*******************************************************************/
 
 exprt flatten_byte_extract(
-  const exprt &src,
+  const byte_extract_exprt &src,
   const namespacet &ns)
 {
-  assert(src.id()==ID_byte_extract_little_endian ||
-         src.id()==ID_byte_extract_big_endian);
   assert(src.operands().size()==2);
 
   bool little_endian;
@@ -186,11 +186,9 @@ Function: flatten_byte_update
 \*******************************************************************/
 
 exprt flatten_byte_update(
-  const exprt &src,
+  const byte_update_exprt &src,
   const namespacet &ns)
 {
-  assert(src.id()==ID_byte_update_little_endian ||
-         src.id()==ID_byte_update_big_endian);
   assert(src.operands().size()==3);
 
   mp_integer element_size=
@@ -233,7 +231,7 @@ exprt flatten_byte_update(
           }
           else
           {
-            exprt byte_extract_expr(
+            byte_extract_exprt byte_extract_expr(
               src.id()==ID_byte_update_little_endian?ID_byte_extract_little_endian:
               src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
               throw "unexpected src.id() in flatten_byte_update",
@@ -265,7 +263,7 @@ exprt flatten_byte_update(
         
           index_exprt index_expr(src.op0(), div_offset, array_type.subtype());
           
-          exprt byte_update_expr(src.id(), array_type.subtype());
+          byte_update_exprt byte_update_expr(src.id(), array_type.subtype());
           byte_update_expr.copy_to_operands(index_expr, mod_offset, src.op2());
 
           // Call recurisvely, the array is gone!            
@@ -380,10 +378,10 @@ exprt flatten_byte_operators(const exprt &src, const namespacet &ns)
 
   if(src.id()==ID_byte_update_little_endian ||
      src.id()==ID_byte_update_big_endian)
-    return flatten_byte_update(tmp, ns);
+    return flatten_byte_update(to_byte_update_expr(tmp), ns);
   else if(src.id()==ID_byte_extract_little_endian ||
           src.id()==ID_byte_extract_big_endian)
-    return flatten_byte_extract(tmp, ns);
+    return flatten_byte_extract(to_byte_extract_expr(tmp), ns);
   else
     return tmp;
 }
