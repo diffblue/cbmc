@@ -256,7 +256,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
           it!=goal_map.end();
           it++)
       {
-        xmlt xml_result("result");
+        xmlt xml_result("results");
         xml_result.set_attribute("property", id2string(it->first));
         xml_result.set_attribute("status",
                                  it->second.failed?"FAILURE":"SUCCESS");
@@ -279,11 +279,12 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
       {
         json_objectt &result=result_array.push_back().make_object();
         result["property"]=json_stringt(id2string(it->first));
+        result["description"]=json_stringt(id2string(it->second.description));
         result["status"]=json_stringt(it->second.failed?"failure":"success");
 
         if(it->second.failed)
         {
-          jsont &json_trace=result["counterexample"];
+          jsont &json_trace=result["trace"];
           convert(bmc.ns, it->second.goto_trace, json_trace);
         }
       }

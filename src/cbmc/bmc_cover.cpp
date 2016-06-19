@@ -11,12 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/time_stopping.h>
 #include <util/xml.h>
 #include <util/xml_expr.h>
+#include <util/json.h>
 
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/json_goto_trace.h>
 
 #include "bmc.h"
 #include "bv_cbmc.h"
@@ -315,60 +317,101 @@ bool bmc_covert::operator()()
   }
   
   // report
-  if(bmc.ui!=ui_message_handlert::XML_UI)
-  {
-    status() << eom;
-    status() << "** coverage results:" << eom;
-  }
-  
   unsigned goals_covered=0;
-  
-  for(const auto & it : goal_map)
+  switch(bmc.ui)
   {
-    const goalt &goal=it.second;
-    
-    if(goal.satisfied) goals_covered++;
-  
-    if(bmc.ui==ui_message_handlert::XML_UI)
+    case ui_message_handlert::PLAIN:
     {
-      xmlt xml_result("result");
-      xml_result.set_attribute("goal", id2string(it.first));
-      xml_result.set_attribute("description", goal.description);
-      xml_result.set_attribute("status", goal.satisfied?"SATISFIED":"FAILED");
-      
-      if(goal.source_location.is_not_nil())
-        xml_result.new_element()=xml(goal.source_location);
+      status() << eom;
+      status() << "** coverage results:" << eom;
+      for(const auto & it : goal_map)
+      {
+        const goalt &goal=it.second;
 
-      if(goal.satisfied)
-        convert(bmc.ns, goal.goto_trace, xml_result.new_element());
+        if(goal.satisfied) goals_covered++;
 
-      std::cout << xml_result << "\n";
-    }
-    else
-    {
-      status() << "[" << it.first << "]";
+        status() << "[" << it.first << "]";
 
-      if(goal.source_location.is_not_nil())
-        status() << ' ' << goal.source_location;
-        
-      if(!goal.description.empty()) status() << ' ' << goal.description;
+        if(goal.source_location.is_not_nil())
+          status() << ' ' << goal.source_location;
 
-      status() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
+        if(!goal.description.empty()) status() << ' ' << goal.description;
+
+        status() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
+                 << eom;
+      }
+      status() << eom;
+      status() << "** " << goals_covered
+               << " of " << goal_map.size() << " covered ("
+               << std::fixed << std::setw(1) << std::setprecision(1)
+               << (goal_map.empty()?0.0:100.0*goals_covered/goal_map.size())
+               << "%), using "
+               << cover_goals.iterations() << " iteration"
+               << (cover_goals.iterations()==1?"":"s")
                << eom;
+      break;
+    }
+    case ui_message_handlert::XML_UI:
+    {
+      for(const auto & it : goal_map)
+      {
+        const goalt &goal=it.second;
+
+        if(goal.satisfied) goals_covered++;
+
+        xmlt xml_result("result");
+        xml_result.set_attribute("goal", id2string(it.first));
+        xml_result.set_attribute("description", goal.description);
+        xml_result.set_attribute("status", goal.satisfied?"SATISFIED":"FAILED");
+
+        if(goal.source_location.is_not_nil())
+          xml_result.new_element()=xml(goal.source_location);
+
+        if(goal.satisfied)
+          convert(bmc.ns, goal.goto_trace, xml_result.new_element());
+
+        std::cout << xml_result << "\n";
+      }
+
+      status() << eom;
+      status() << "** " << goals_covered
+               << " of " << goal_map.size() << " covered ("
+               << std::fixed << std::setw(1) << std::setprecision(1)
+               << (goal_map.empty()?0.0:100.0*goals_covered/goal_map.size())
+               << "%), using "
+               << cover_goals.iterations() << " iteration"
+               << (cover_goals.iterations()==1?"":"s")
+               << eom;
+      break;
+    }
+    case ui_message_handlert::JSON_UI:
+    {
+      json_objectt json_result;
+      json_arrayt &result_array=json_result["results"].make_array();
+      for(const auto & it : goal_map)
+      {
+        const goalt &goal=it.second;
+
+        if(goal.satisfied) goals_covered++;
+
+        json_objectt &result=result_array.push_back().make_object();
+        result["status"]=json_stringt(goal.satisfied?"satisfied":"failed");
+        result["goal"]=json_stringt(id2string(it.first));
+        result["description"]=json_stringt(goal.description);
+
+        if(goal.satisfied)
+        {
+          jsont &json_trace=result["trace"];
+          convert(bmc.ns, goal.goto_trace, json_trace);
+        }
+      }
+      json_result["totalGoals"]=json_numbert(i2string(goal_map.size()));
+      json_result["goalsCovered"]=json_numbert(i2string(goals_covered));
+      std::cout << ",\n" << json_result;
+      break;
     }
   }
 
-  status() << eom;
-  
-  status() << "** " << goals_covered
-           << " of " << goal_map.size() << " covered ("
-           << std::fixed << std::setw(1) << std::setprecision(1)
-           << (goal_map.empty()?0.0:100.0*goals_covered/goal_map.size())
-           << "%), using "
-           << cover_goals.iterations() << " iteration"
-           << (cover_goals.iterations()==1?"":"s")
-           << eom;
-  
   return false;
 }
 
