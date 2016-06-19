@@ -91,7 +91,7 @@ tvt static_analyzert::eval(goto_programt::const_targett t)
 {
   exprt guard=t->guard;
   interval_domaint d=interval_analysis[t];
-  d.assume(not_exprt(guard));
+  d.assume(not_exprt(guard), ns);
   if(d.is_bottom()) return tvt(true);
   return tvt::unknown();          
 }

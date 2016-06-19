@@ -599,7 +599,9 @@ void path_symext::function_call_rec(
     // do we have a body?
     if(function_entry_point==loc_reft())
     {
-      // no body, this is a skip
+      // no body
+      
+      // this is a skip
       if(call.lhs().is_not_nil())
         assign(state, call.lhs(), nil_exprt());
 

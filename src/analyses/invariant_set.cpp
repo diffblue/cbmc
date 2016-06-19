@@ -1303,7 +1303,7 @@ bool invariant_sett::make_union_bounds_map(const bounds_mapt &other)
     {
       boundst old(it->second);
       it->second.approx_union_with(o_it->second);
-      if(!(it->second==old).is_true()) changed=true;
+      if(it->second!=old) changed=true;
       it++;
     }
   }
