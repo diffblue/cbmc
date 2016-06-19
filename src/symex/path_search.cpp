@@ -62,46 +62,66 @@ path_searcht::resultt path_searcht::operator()(
     // according to some heuristic.
     queuet::iterator state=pick_state();
     
-    if(drop_state(*state))
+    try
+    {
+      if(drop_state(*state))
+      {
+        number_of_dropped_states++;
+        number_of_paths++;
+        queue.erase(state);
+        continue;
+      }
+      
+      if(!state->is_executable())
+      {
+        number_of_paths++;
+        queue.erase(state);
+        continue;
+      }
+      
+      if(number_of_steps%1000==0)
+      {
+        status() << "Queue " << queue.size()
+                 << " thread " << state->get_current_thread()
+                 << "/" << state->threads.size()
+                 << " PC " << state->pc() << messaget::eom;
+      }
+
+      // an error, possibly?
+      if(state->get_instruction()->is_assert())
+      {
+        if(show_vcc)
+          do_show_vcc(*state, ns);
+        else
+        {
+          check_assertion(*state, ns);
+          
+          // all assertions failed?
+          if(number_of_failed_properties==property_map.size())
+            break;
+        }
+      }
+      
+      // execute
+      path_symex(*state, queue);
+    }
+    catch(const std::string &e)
+    {
+      error() << e << eom;
+      number_of_dropped_states++;
+      queue.erase(state);
+    }
+    catch(const char *e)
+    {
+      error() << e << eom;
+      number_of_dropped_states++;
+      queue.erase(state);
+    }
+    catch(int)
     {
       number_of_dropped_states++;
-      number_of_paths++;
       queue.erase(state);
-      continue;
     }
-    
-    if(!state->is_executable())
-    {
-      number_of_paths++;
-      queue.erase(state);
-      continue;
-    }
-    
-    if(number_of_steps%1000==0)
-    {
-      status() << "Queue " << queue.size()
-               << " thread " << state->get_current_thread()
-               << "/" << state->threads.size()
-               << " PC " << state->pc() << messaget::eom;
-    }
-
-    // an error, possibly?
-    if(state->get_instruction()->is_assert())
-    {
-      if(show_vcc)
-        do_show_vcc(*state, ns);
-      else
-      {
-        check_assertion(*state, ns);
-        
-        // all assertions failed?
-        if(number_of_failed_properties==property_map.size())
-          break;
-      }
-    }
-    
-    // execute
-    path_symex(*state, queue);
   }
   
   report_statistics();
