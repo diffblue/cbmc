@@ -70,6 +70,10 @@ public:
       case SUCCESS: return "SUCCESS";
       case ERROR: return "ERROR";
       }
+
+      // make some poor compilers happy
+      assert(false);
+      return "";
     }
     
     explicit goalt(
