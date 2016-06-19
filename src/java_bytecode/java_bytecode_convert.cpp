@@ -1592,6 +1592,7 @@ void java_bytecode_convertt::add_array_types()
     struct_typet struct_type;
     // we have the base class, java.lang.Object, length and data
     // of appropriate type
+    struct_type.set_tag(symbol_type.get_identifier());
     struct_type.components().resize(3);
     struct_type.components()[0].set_name("@java.lang.Object");
     struct_type.components()[0].type()=symbol_typet("java::java.lang.Object");
