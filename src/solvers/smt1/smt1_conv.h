@@ -20,6 +20,7 @@ Revision: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 #include <solvers/flattening/pointer_logic.h>
 #include <solvers/flattening/boolbv_width.h>
 
+class byte_extract_exprt;
 class typecast_exprt;
 class constant_exprt;
 class index_exprt;
@@ -77,7 +78,9 @@ protected:
   
   // specific expressions go here
   void convert_byte_update(const exprt &expr, bool bool_as_bv);
-  void convert_byte_extract(const exprt &expr, bool bool_as_bv);
+  void convert_byte_extract(
+    const byte_extract_exprt &expr,
+    bool bool_as_bv);
   void convert_typecast(const typecast_exprt &expr, bool bool_as_bv);
   void convert_struct(const exprt &expr);
   void convert_union(const exprt &expr);

@@ -127,6 +127,12 @@ public:
     operands().resize(3);
   }
 
+  inline byte_update_exprt(irep_idt _id, const typet &_type):
+    exprt(_id, _type)
+  {
+    operands().resize(3);
+  }
+
   inline byte_update_exprt(
     irep_idt _id,
     const exprt &_op, const exprt &_offset, const exprt &_value):
