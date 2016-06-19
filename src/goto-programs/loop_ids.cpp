@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml.h>
 #include <util/xml_expr.h>
 #include <util/json.h>
+#include <util/json_expr.h>
 #include <util/i2string.h>
 
 #include "loop_ids.h"
@@ -114,7 +115,7 @@ void show_loop_ids_json(
 
       json_objectt &loop=loops.push_back().make_object();
       loop["id"]=json_stringt(id);
-      //loop["location"]=json(it->source_location); //TODO
+      loop["location"]=json(it->source_location);
     }
   }
 }
