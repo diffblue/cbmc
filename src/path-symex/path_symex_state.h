@@ -26,6 +26,7 @@ public:
     history(_path_symex_history),
     current_thread(0),
     no_thread_interleavings(0),
+    no_branches(0),
     depth(0)
   {
   }
@@ -178,6 +179,11 @@ public:
     return depth;
   }
   
+  inline unsigned get_no_branches() const
+  {
+    return no_branches;
+  }
+  
   bool is_feasible(class decision_proceduret &) const;
 
   bool check_assertion(class decision_proceduret &);
@@ -193,6 +199,7 @@ public:
 protected:
   unsigned current_thread;
   unsigned no_thread_interleavings;
+  unsigned no_branches;
   unsigned depth;
 
   exprt read(

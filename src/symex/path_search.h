@@ -24,6 +24,7 @@ public:
     depth_limit_set(false), // no limit
     context_bound_set(false),
     unwind_limit_set(false),
+    branch_bound_set(false),
     search_heuristic(search_heuristict::DFS)
   {
   }
@@ -41,6 +42,12 @@ public:
   {
     context_bound_set=true;
     context_bound=limit;
+  }
+
+  void set_branch_bound(unsigned limit)
+  {
+    branch_bound_set=true;
+    branch_bound=limit;
   }
 
   void set_unwind_limit(unsigned limit)
@@ -104,8 +111,9 @@ protected:
 
   unsigned depth_limit;
   unsigned context_bound;
+  unsigned branch_bound;
   unsigned unwind_limit;
-  bool depth_limit_set, context_bound_set, unwind_limit_set;
+  bool depth_limit_set, context_bound_set, unwind_limit_set, branch_bound_set;
 
   enum class search_heuristict { DFS, BFS, LOCS } search_heuristic;
 };

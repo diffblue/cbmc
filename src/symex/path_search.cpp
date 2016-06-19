@@ -289,10 +289,16 @@ Function: path_searcht::drop_state
 bool path_searcht::drop_state(const statet &state) const
 {
   // depth limit
-  if(depth_limit_set && state.get_depth()>depth_limit) return true;
+  if(depth_limit_set && state.get_depth()>depth_limit)
+    return true;
   
   // context bound
-  if(context_bound_set && state.get_no_thread_interleavings()) return true;
+  if(context_bound_set && state.get_no_thread_interleavings()>context_bound)
+    return true;
+  
+  // branch bound
+  if(branch_bound_set && state.get_no_branches()>branch_bound)
+    return true;
   
   // unwinding limit -- loops
   if(unwind_limit_set && state.get_instruction()->is_backwards_goto())

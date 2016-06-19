@@ -253,6 +253,9 @@ int symex_parse_optionst::doit()
     if(cmdline.isset("context-bound"))
       path_search.set_context_bound(unsafe_string2unsigned(cmdline.get_value("context-bound")));
 
+    if(cmdline.isset("branch-bound"))
+      path_search.set_branch_bound(unsafe_string2unsigned(cmdline.get_value("branch-bound")));
+
     if(cmdline.isset("unwind"))
       path_search.set_unwind_limit(unsafe_string2unsigned(cmdline.get_value("unwind")));
 
@@ -849,9 +852,10 @@ void symex_parse_optionst::help()
     "Symex options:\n"
     " --function name              set main function name\n"
     " --property nr                only check one specific property\n"
+    " --unwind nr                  unwind nr times\n"
     " --depth nr                   limit search depth\n"
     " --context-bound nr           limit number of context switches\n"
-    " --unwind nr                  unwind nr times\n"
+    " --branch-bound nr            limit number of branches taken\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
