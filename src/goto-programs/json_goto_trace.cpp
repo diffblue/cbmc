@@ -11,41 +11,11 @@ Author: Daniel Kroening
 #include <cassert>
 
 #include <util/i2string.h>
+#include <util/json_expr.h>
 
 #include <langapi/language_util.h>
 
 #include "json_goto_trace.h"
-
-/*******************************************************************\
-
-Function: json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-jsont json(const source_locationt &source_location)
-{
-  json_objectt result;
-
-  if(!source_location.get_file().empty())
-    result["file"]=json_stringt(id2string(source_location.get_file()));
-
-  if(!source_location.get_line().empty())
-    result["line"]=json_numbert(id2string(source_location.get_line()));
-
-  if(!source_location.get_column().empty())
-    result["column"]=json_numbert(id2string(source_location.get_column()));
-
-  if(!source_location.get_function().empty())
-    result["function"]=json_stringt(id2string(source_location.get_function()));
-    
-  return result;
-}
 
 /*******************************************************************\
 
