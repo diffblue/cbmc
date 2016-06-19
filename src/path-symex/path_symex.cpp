@@ -922,6 +922,7 @@ void path_symext::operator()(
   case RETURN:
     // sets the return value
     state.record_step();
+    state.next_pc();
 
     if(instruction.code.operands().size()==1)
       set_return_value(state, instruction.code.op0());
