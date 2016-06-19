@@ -195,7 +195,8 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   }
   
   cover_goalst cover_goals(solver);
-  
+
+  cover_goals.set_message_handler(get_message_handler());  
   cover_goals.register_observer(*this);
   
   for(goal_mapt::const_iterator
