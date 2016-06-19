@@ -654,8 +654,13 @@ void path_symext::function_call_rec(
           throw "function_call " + id2string(function_identifier) + " no identifier for function parameter";
 
         symbol_exprt lhs(identifier, function_parameter.type());
+        exprt rhs=call_arguments[i];
+        
+        // lhs/rhs types might not match
+        if(lhs.type()!=rhs.type())
+          rhs.make_typecast(lhs.type());
             
-        assign(state, lhs, call_arguments[i]);
+        assign(state, lhs, rhs);
       }
     }
 
@@ -691,6 +696,11 @@ void path_symext::function_call_rec(
       state.history->guard=guard;
       function_call_rec(state, call, if_expr.true_case(), further_states);
     }
+  }
+  else if(function.id()==ID_typecast)
+  {
+    // ignore
+    function_call_rec(state, call, to_typecast_expr(function).op(), further_states);
   }
   else
     throw "TODO: function_call "+function.id_string();
