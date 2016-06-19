@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
+#include <java_bytecode/java_bytecode_language.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/show_properties.h>
@@ -203,6 +204,7 @@ int symex_parse_optionst::doit()
 
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);
+  register_language(new_java_bytecode_language);
 
   //
   // command line options
