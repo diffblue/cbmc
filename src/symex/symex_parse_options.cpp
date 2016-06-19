@@ -612,6 +612,9 @@ Function: symex_parse_optionst::report_properties
 void symex_parse_optionst::report_properties(
   const path_searcht::property_mapt &property_map)
 {
+  if(get_ui()==ui_message_handlert::PLAIN)
+    status() << "\n** Results:" << eom;
+  
   for(path_searcht::property_mapt::const_iterator
       it=property_map.begin();
       it!=property_map.end();
