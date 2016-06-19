@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
---all-properties --bounds-check --32 --no-simplify
+--bounds-check --32 --no-simplify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.array_bounds\.5\] array.List upper bound: FAILED$
