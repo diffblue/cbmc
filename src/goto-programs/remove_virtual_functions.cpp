@@ -148,6 +148,16 @@ void remove_virtual_functionst::remove_virtual_function(
     target->make_skip();
     return; // give up
   }
+  
+  // only one option?
+  if(functions.size()==1)
+  {
+    assert(target->is_function_call());
+    to_code_function_call(target->code).function()=
+      functions.begin()->symbol_expr;
+
+    return;
+  }
 
   // the final target is a skip
   goto_programt final_skip;
