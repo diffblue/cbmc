@@ -107,7 +107,12 @@ public:
     current_thread=_thread;
   }
   
-  goto_programt::const_targett get_instruction() const;
+  loc_reft get_pc() const;
+  
+  inline goto_programt::const_targett get_instruction() const
+  {
+    return locs[get_pc()].target;
+  }
   
   inline bool is_executable() const
   {

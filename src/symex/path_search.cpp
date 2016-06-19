@@ -48,6 +48,7 @@ path_searcht::resultt path_searcht::operator()(
   number_of_steps=0;
   number_of_VCCs_after_simplification=0;
   number_of_failed_properties=0;
+  number_of_locs=locs.size();
 
   // stop the time
   start_time=current_time();
@@ -62,7 +63,7 @@ path_searcht::resultt path_searcht::operator()(
     // according to some heuristic.
     // The state moves to the head of the queue.
     pick_state();
-
+    
     // move into temporary queue
     queuet tmp_queue;
     tmp_queue.splice(
@@ -72,6 +73,9 @@ path_searcht::resultt path_searcht::operator()(
     {
       statet &state=tmp_queue.front();
       
+      // record we have seen it
+      loc_data[state.get_pc().loc_number].visited=true;
+
       debug() << "Queue: " << queue.size()
               << ", depth: " << state.get_depth();
       for(const auto & s : queue)
@@ -156,7 +160,21 @@ Function: path_searcht::report_statistics
 
 void path_searcht::report_statistics()
 {
+  std::size_t number_of_visited_locations=0;
+  for(const auto & l : loc_data)
+    if(l.visited)
+      number_of_visited_locations++;
+
+  #if 0
+  for(unsigned l=0; l<loc_data.size(); l++)
+    if(!loc_data[l].visited) status() << "NV: " << l << eom;
+  #endif
+
   // report a bit
+  status() << "Number of visited locations: "
+           << number_of_visited_locations << " (out of "
+           << number_of_locs << ')' << messaget::eom;
+
   status() << "Number of dropped states: "
            << number_of_dropped_states << messaget::eom;
 
