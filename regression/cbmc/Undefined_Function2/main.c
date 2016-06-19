@@ -1,3 +1,5 @@
+#include <assert.h>
+
 int asd();
 
 int main()
