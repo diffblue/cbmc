@@ -256,6 +256,15 @@ int symex_parse_optionst::doit()
     if(cmdline.isset("unwind"))
       path_search.set_unwind_limit(unsafe_string2unsigned(cmdline.get_value("unwind")));
 
+    if(cmdline.isset("dfs"))
+      path_search.set_dfs();
+
+    if(cmdline.isset("bfs"))
+      path_search.set_bfs();
+
+    if(cmdline.isset("locs"))
+      path_search.set_locs();
+
     if(cmdline.isset("show-vcc"))
     {
       path_search.show_vcc=true;
