@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_PATH_SEARCH_H
 
 #include <util/time_stopping.h>
+#include <util/expanding_vector.h>
 
 #include <goto-programs/safety_checker.h>
 
@@ -65,6 +66,7 @@ public:
   unsigned number_of_VCCs;
   unsigned number_of_VCCs_after_simplification;
   unsigned number_of_failed_properties;
+  std::size_t number_of_locs;
   absolute_timet start_time;
   time_periodt sat_time;
 
@@ -94,8 +96,14 @@ protected:
   
   // search heuristic
   void pick_state();
-  std::vector<unsigned> locs_weight;
-  std::vector<unsigned> locs_source;
+
+  struct loc_datat
+  {
+    bool visited;
+    loc_datat():visited(false) { }
+  };
+
+  expanding_vector<loc_datat> loc_data;
   
   bool execute(queuet::iterator state, const namespacet &);
   

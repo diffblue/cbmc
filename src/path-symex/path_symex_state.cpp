@@ -56,7 +56,7 @@ path_symex_statet initial_state(
 
 /*******************************************************************\
 
-Function: path_symex_statet::output
+Function: path_symex_statet::get_pc
 
   Inputs:
 
@@ -66,10 +66,10 @@ Function: path_symex_statet::output
 
 \*******************************************************************/
 
-goto_programt::const_targett path_symex_statet::get_instruction() const
+loc_reft path_symex_statet::get_pc() const
 {
   assert(current_thread<threads.size());
-  return locs[threads[current_thread].pc].target;
+  return threads[current_thread].pc;
 }
 
 /*******************************************************************\
