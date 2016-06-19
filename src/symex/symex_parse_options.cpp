@@ -28,6 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_vector.h>
 
 #include <analyses/goto_check.h>
 
@@ -521,6 +523,10 @@ bool symex_parse_optionst::process_goto_program(
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
+
+    // remove stuff    
+    remove_complex(symbol_table, goto_functions);
+    remove_vector(symbol_table, goto_functions);
     
     // recalculate numbers, etc.
     goto_functions.update();
