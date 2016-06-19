@@ -1,3 +1,5 @@
+#include <assert.h>
+
 struct some_struct
 {
   int x, y, z;
