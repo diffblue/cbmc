@@ -126,15 +126,18 @@ void static_analyzert::plain_text_report()
       if(!i_it->is_assert()) continue;
       
       tvt r=eval(i_it);
+      
+      result() << '[' << i_it->source_location.get_property_id()
+               << ']' << ' ';
 
       result() << i_it->source_location;
       if(!i_it->source_location.get_comment().empty())
         result() << ", " << i_it->source_location.get_comment();
       result() << ": ";
       if(r.is_true())
-        result() << "TRUE";
+        result() << "SUCCESS";
       else if(r.is_false())
-        result() << "FALSE";
+        result() << "FAILURE";
       else
         result() << "UNKNOWN";
       result() << eom;
