@@ -551,9 +551,9 @@ void java_bytecode_parsert::rconstant_pool()
       // These produce java.lang.String objects
       {
         symbol_typet string_type("java::java.lang.String");
-        exprt result(ID_java_string_literal, pointer_typet(string_type));
-        result.set(ID_value, pool_entry(it->ref1).s);
-        it->expr=result;
+        exprt string_literal(ID_java_string_literal, pointer_typet(string_type));
+        string_literal.set(ID_value, pool_entry(it->ref1).s);
+        it->expr=string_literal;
       }
       break;
 

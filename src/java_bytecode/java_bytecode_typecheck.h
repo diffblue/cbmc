@@ -48,14 +48,15 @@ protected:
   symbol_tablet &symbol_table;
   const namespacet ns;
 
-  void typecheck_type_symbol(symbolt &symbol);
-  void typecheck_non_type_symbol(symbolt &symbol);
-  void typecheck_code(codet &code);
-  void typecheck_type(typet &type);
-  void typecheck_expr_symbol(symbol_exprt &expr);
-  void typecheck_expr_member(member_exprt &expr);
-  void typecheck_expr_java_new(side_effect_exprt &expr);
-  void typecheck_expr_java_new_array(side_effect_exprt &expr);
+  void typecheck_type_symbol(symbolt &);
+  void typecheck_non_type_symbol(symbolt &);
+  void typecheck_code(codet &);
+  void typecheck_type(typet &);
+  void typecheck_expr_symbol(symbol_exprt &);
+  void typecheck_expr_java_string_literal(exprt &);
+  void typecheck_expr_member(member_exprt &);
+  void typecheck_expr_java_new(side_effect_exprt &);
+  void typecheck_expr_java_new_array(side_effect_exprt &);
 
   // overload to use language-specific syntax
   virtual std::string to_string(const exprt &expr);
