@@ -225,7 +225,11 @@ void trace_value(
   const exprt &full_lhs,
   const exprt &value)
 {
-  const irep_idt &identifier=lhs_object.get_object_name();
+  irep_idt identifier;
+
+  if(lhs_object.is_not_nil())
+    identifier=lhs_object.get_object_name();
+
   std::string value_string;
   
   if(value.is_nil())
@@ -366,7 +370,7 @@ void show_goto_trace(
           prev_step_nr=it->step_nr;
           show_state_header(out, *it, it->pc->source_location, it->step_nr);
         }
-
+        
         // see if the full lhs is something clean
         if(is_index_member_symbol(it->full_lhs))
           trace_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
