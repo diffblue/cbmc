@@ -676,7 +676,7 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     " --taint file_name            perform taint analysis using rules in given file\n"
     " --unreachable-instructions   list dead code\n"
-    " --interval                   interval analysis\n"
+    " --intervals                  interval analysis\n"
     " --non-null                   non-null analysis\n"
     "\n"
     "Analysis options:\n"
