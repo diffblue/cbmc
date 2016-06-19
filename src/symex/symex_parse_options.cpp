@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
 
 #include <analyses/goto_check.h>
@@ -539,6 +540,7 @@ bool symex_parse_optionst::process_goto_program(
     // remove stuff    
     remove_complex(symbol_table, goto_functions);
     remove_vector(symbol_table, goto_functions);
+    remove_returns(symbol_table, goto_functions);
     
     // recalculate numbers, etc.
     goto_functions.update();
