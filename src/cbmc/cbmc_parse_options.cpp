@@ -424,7 +424,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       else
       {
         assert(options.get_bool_option("smt2"));
-        options.set_option("mathsat", true), solver_set = true;
+        options.set_option("z3", true), solver_set = true;
       }
     }
   }
@@ -1154,8 +1154,8 @@ void cbmc_parse_optionst::help()
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n"
-    " --smt1                       output subgoals in SMT1 syntax (obsolete)\n"
-    " --smt2                       output subgoals in SMT2 syntax\n"
+    " --smt1                       use default SMT1 solver (obsolete)\n"
+    " --smt2                       use default SMT2 solver (Z3)\n"
     " --boolector                  use Boolector\n"
     " --mathsat                    use MathSAT\n"
     " --cvc4                       use CVC4\n"
