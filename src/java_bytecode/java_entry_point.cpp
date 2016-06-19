@@ -93,66 +93,10 @@ void gen_nondet_init(
   irep_idt class_identifier)
 {
   const typet &type=ns.follow(expr.type());
-
-  if(type.id()==ID_struct)
+  
+  if(type.id()==ID_pointer)
   {
-    typedef struct_typet::componentt componentt;
-    typedef struct_typet::componentst componentst;
-
-    const struct_typet &struct_type=to_struct_type(type);
-    const irep_idt struct_tag=struct_type.get_tag();
-
-    componentst components=struct_type.components();
-
-    if(!is_sub)
-      class_identifier=struct_tag;
-
-    recursion_set.insert(struct_tag);
-    assert(!recursion_set.empty());
-
-    for(componentst::const_iterator it=components.begin();
-        it!=components.end(); it++)
-    {
-      const componentt &component=*it;
-      const typet &component_type=component.type();
-      irep_idt name=component.get_name();
-
-      member_exprt me(expr, name, component_type);
-
-      if(name=="@class_identifier")
-      {
-        constant_exprt ci(class_identifier, string_typet());
-
-        code_assignt code(me, ci);
-        init_code.copy_to_operands(code);
-      }
-      else
-      {
-        irep_idt new_class_identifier;
-        assert(!name.empty());
-
-        is_sub = name[0]=='@';
-
-        gen_nondet_init(
-          me, init_code, ns, recursion_set, is_sub, class_identifier);
-      }
-    }
-
-    recursion_set.erase(struct_tag);
-  }
-  else if(type.id()!=ID_pointer)
-  {
-    assert(type.id()!= ID_struct);
-
-    side_effect_expr_nondett se=side_effect_expr_nondett(type);
-
-    code_assignt code(expr, se);
-    init_code.copy_to_operands(code);
-  }
-  else
-  {
-    assert(type.id()==ID_pointer);
-
+    #if 0
     // dereferenced type
     const pointer_typet &pointer_type=to_pointer_type(type);
     const typet &subtype=ns.follow(pointer_type.subtype());
@@ -198,6 +142,55 @@ void gen_nondet_init(
       code_assignt code(expr, null_pointer_expr);
       init_code.copy_to_operands(code);
     }
+    #endif
+  }
+  else if(type.id()==ID_struct)
+  {
+    typedef struct_typet::componentst componentst;
+
+    const struct_typet &struct_type=to_struct_type(type);
+    const irep_idt struct_tag=struct_type.get_tag();
+
+    const componentst &components=struct_type.components();
+    
+    recursion_set.insert(struct_tag);
+    assert(!recursion_set.empty());
+    
+    for(const auto & component : components)
+    {
+      const typet &component_type=component.type();
+      irep_idt name=component.get_name();
+
+      member_exprt me(expr, name, component_type);
+
+      if(name=="@class_identifier")
+      {
+        constant_exprt ci(class_identifier, string_typet());
+
+        code_assignt code(me, ci);
+        init_code.copy_to_operands(code);
+      }
+      else
+      {
+        assert(!name.empty());
+
+        bool _is_sub = name[0]=='@';
+        irep_idt _class_identifier=
+          _is_sub?(class_identifier.empty()?struct_tag:class_identifier):"";
+
+        gen_nondet_init(
+          me, init_code, ns, recursion_set, _is_sub, _class_identifier);
+      }
+    }
+
+    recursion_set.erase(struct_tag);
+  }
+  else
+  {
+    side_effect_expr_nondett se=side_effect_expr_nondett(type);
+
+    code_assignt code(expr, se);
+    init_code.copy_to_operands(code);
   }
 }
 }
@@ -279,15 +272,16 @@ exprt gen_argument(
   if(type.id()==ID_pointer)
   {
     symbolt &aux_symbol=new_tmp_symbol(symbol_table);
-    aux_symbol.type=type;
+    aux_symbol.type=type.subtype();
     aux_symbol.is_static_lifetime=true;
 
-    exprt object_this_ptr=aux_symbol.symbol_expr();
+    exprt object=aux_symbol.symbol_expr();
     
     const namespacet ns(symbol_table);
-    gen_nondet_init(object_this_ptr, init_code, ns);
+    gen_nondet_init(object, init_code, ns);
 
-    return side_effect_expr_nondett(type);
+    // todo: need to pass null, possibly
+    return address_of_exprt(object);
   }
   else if(type.id()==ID_c_bool)
   {
