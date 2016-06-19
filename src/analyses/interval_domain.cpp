@@ -270,6 +270,9 @@ void interval_domaint::assume_rec(
     return;
   }
   
+  if(id==ID_notequal)
+    return; // won't do split
+  
   if(id==ID_ge)
     return assume_rec(rhs, ID_le, lhs);    
     
