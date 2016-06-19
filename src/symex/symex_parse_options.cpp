@@ -175,7 +175,7 @@ void symex_parse_optionst::get_command_line_options(optionst &options)
 
   // magic error label
   if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_value("error-label"));
+    options.set_option("error-label", cmdline.get_values("error-label"));
 }
 
 /*******************************************************************\
