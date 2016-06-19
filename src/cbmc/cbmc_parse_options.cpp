@@ -180,8 +180,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("stop-on-fail") ||
      cmdline.isset("property") ||
-     cmdline.isset("smt1") ||
-     cmdline.isset("smt2") ||
      cmdline.isset("dimacs") ||
      cmdline.isset("outfile"))
     options.set_option("stop-on-fail", true);
