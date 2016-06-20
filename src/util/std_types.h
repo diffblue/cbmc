@@ -796,6 +796,12 @@ public:
   {
     return find(ID_parameters).get_bool(ID_ellipsis);
   }
+  
+  inline bool has_this() const
+  {
+    const parameterst &p=parameters();
+    return !p.empty() && p.front().get_this();
+  }
 
   inline bool is_KnR() const
   {

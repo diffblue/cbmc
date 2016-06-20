@@ -88,11 +88,7 @@ std::string expr2javat::convert_code_function_call(
   const code_typet &code_type=
     to_code_type(src.function().type());
   
-  const code_typet::parameterst &parameters=
-    code_type.parameters();
-  
-  bool has_this=!parameters.empty() &&
-                parameters.front().get_this() &&
+  bool has_this=code_type.has_this() &&
                 !src.arguments().empty();
 
   if(has_this)

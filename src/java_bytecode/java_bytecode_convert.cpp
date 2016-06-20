@@ -483,7 +483,7 @@ void java_bytecode_convertt::convert(
   
   method_symbol.type=member_type;
   current_method=method_symbol.name;
-  method_has_this=!parameters.empty() && parameters.front().get_this();
+  method_has_this=code_type.has_this();
   tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
   symbol_table.add(method_symbol);
