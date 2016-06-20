@@ -27,6 +27,40 @@ Function: gcc_cmdlinet::parse
 
 \*******************************************************************/
 
+// non-gcc options
+const char *goto_cc_options_with_separated_argument[]=
+{
+  "--verbosity",
+  "--function",
+  "--native-compiler",
+  "--native-linker",
+  "--print-rejected-preprocessed-source",
+  NULL
+};
+
+// non-gcc options
+const char *goto_cc_options_without_argument[]=
+{
+  "--show-symbol-table",
+  "--show-function-table",
+  "--ppc-macos",
+  "--i386-linux",
+  "--i386-win32",
+  "--i386-macos",
+  "--winx64",
+  "--string-abstraction",
+  "--no-library",
+  "--16",
+  "--32",
+  "--64",
+  "--little-endian",
+  "--big-endian",
+  "--no-arch",
+  "--partial-inlining",
+  "-?",
+  NULL
+};
+
 // separated or concatenated
 const char *gcc_options_with_argument[]=
 {
@@ -51,11 +85,6 @@ const char *gcc_options_with_argument[]=
 
 const char *gcc_options_with_separated_argument[]=
 {
-  "--verbosity", // non-gcc
-  "--function",  // non-gcc
-  "--native-compiler", // non-gcc
-  "--native-linker", // non-gcc
-  "--print-rejected-preprocessed-source", // non-gcc
   "-aux-info",
   "--param", // Apple only
   "-imacros",
@@ -94,25 +123,8 @@ const char *gcc_options_with_concatenated_argument[]=
 
 const char *gcc_options_without_argument[]=
 {
-  "--show-symbol-table", // NON-GCC
-  "--show-function-table", // NON-GCC
-  "--ppc-macos", // NON-GCC
-  "--i386-linux", // NON-GCC
-  "--i386-win32", // NON-GCC
-  "--i386-macos", // NON-GCC
-  "--winx64", // NON_GCC
-  "--string-abstraction", // NON-GCC
-  "--no-library", // NON-GCC
-  "--16", // NON-GCC
-  "--32", // NON-GCC
-  "--64", // NON-GCC
-  "--little-endian", // NON-GCC
-  "--big-endian", // NON-GCC
-  "--no-arch", // NON-GCC
-  "--partial-inlining", // NON-GCC
+  "--help",
   "-h",
-  "--help", // NON-GCC
-  "-?", // NON-GCC
   "-r", // for ld mimicking
   "-dylib", // for ld mimicking on MacOS
   "-c",
@@ -261,14 +273,55 @@ bool gcc_cmdlinet::parse_arguments(
     // file?
     if(argv_i=="-" || !has_prefix(argv_i, "-"))
     {
-      if(!spec_file)
+      if(!in_spec_file)
         add_infile_arg(argv_i);
       continue;
     }
 
-    // add to new_argv
-    if(!spec_file)
+    if(!in_spec_file)
+    {
+      argst::const_iterator next=it;
+      ++next;
+
+      bool found=false;
+
+      if(in_list(argv_i.c_str(),
+                 goto_cc_options_without_argument)) // without argument
+      {
+        set(argv_i);
+        found=true;
+      }
+
+      // separated only, and also allow concatenation with "="
+      for(const char **o=goto_cc_options_with_separated_argument;
+          *o!=NULL && !found;
+          ++o)
+      {
+        if(argv_i==*o) // separated
+        {
+          found=true;
+          if(next!=args.end())
+          {
+            set(argv_i, *next);
+            ++it;
+          }
+          else
+            set(argv_i, "");
+        }
+        // concatenated with "="
+        else if(has_prefix(argv_i, std::string(*o)+"="))
+        {
+          found=true;
+          set(*o, argv_i.substr(strlen(*o)+1));
+        }
+      }
+
+      if(found)
+        continue;
+
+      // add to new_argv
       add_arg(argv_i);
+    }
 
     // also store in cmdlinet
 

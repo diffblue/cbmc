@@ -25,6 +25,14 @@ Function: ld_cmdlinet::parse
 
 \*******************************************************************/
 
+const char *goto_ld_options_with_argument[]=
+{
+  "--verbosity",
+  "--native-compiler",
+  "--native-linker",
+  NULL
+};
+
 const char *ld_options_with_argument[]=
 {
   "-a",
@@ -93,7 +101,6 @@ const char *ld_options_with_argument[]=
   "--wrap",
   "--hash-style",
   "-z",
-  "--verbosity", // non-ld
   "--arch", // Apple only
   "--ios_version_min", // Apple only
   "--macosx_version_min", // Apple only
@@ -258,12 +265,45 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
       continue;
     }
 
+    bool found=false;
+
+    for(const char **o=goto_ld_options_with_argument;
+        *o!=NULL && !found;
+        ++o)
+    {
+      std::string os(*o);
+
+      // separated?
+      if(argv_i==os ||
+         (os.size()>=3 && os[0]=='-' && os[1]=='-' && "-"+argv_i==os))
+      {
+        found=true;
+        if(i!=argc-1)
+        {
+          set(os, argv[i+1]);
+          i++;
+        }
+        else
+        {
+          std::cerr << "Warning: missing argument for " << argv_i << std::endl;
+          set(os, ""); // end of command line
+        }
+      }
+      else if(os.size()>2 && has_prefix(argv_i, os+"=")) // concatenated, long
+      {
+        found=true;
+        set(os, argv[i]+os.size()+1);
+      }
+    }
+
+    // goto-ld-only command line argument found
+    if(found)
+      continue;
+
     // add to new_argv
     add_arg(argv_i);
 
     // also store in cmdlinet
-
-    bool found=false;
 
     for(const char **o=ld_options_without_argument; *o!=NULL && !found; o++)
     {

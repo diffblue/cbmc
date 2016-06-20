@@ -565,20 +565,6 @@ int gcc_modet::preprocess(
     {
       // ignore
     }
-    else if(it->arg=="--function" ||
-            it->arg=="--verbosity" ||
-            it->arg=="--native-linker" ||
-            it->arg=="--print-rejected-preprocessed-source")
-    {
-      // ignore here
-      skip_next=true;
-    }
-    else if(it->arg=="--native-compiler")
-    {
-      ++it;
-      assert(it!=cmdline.parsed_argv.end());
-      compiler=it->arg.c_str();
-    }
     else
       new_argv.push_back(it->arg);
   }
@@ -634,10 +620,13 @@ Function: gcc_modet::run_gcc
 
 int gcc_modet::run_gcc()
 {
-  // build new argv
-  std::vector<std::string> new_argv(1);
+  assert(!cmdline.parsed_argv.empty());
 
+  // build new argv
+  std::vector<std::string> new_argv;
   new_argv.reserve(cmdline.parsed_argv.size());
+  for(const auto &a : cmdline.parsed_argv)
+    new_argv.push_back(a.arg);
 
   // overwrite argv[0]
   new_argv[0]=native_tool_name;
