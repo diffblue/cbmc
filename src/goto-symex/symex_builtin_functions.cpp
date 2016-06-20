@@ -94,8 +94,26 @@ void goto_symext::symex_malloc(
         // Did the size get multiplied?
         mp_integer elem_size=pointer_offset_size(tmp_type, ns);
         mp_integer alloc_size;
-        if(elem_size<0 || to_integer(tmp_size, alloc_size))
+
+        if(elem_size<0)
         {
+        }
+        else if(to_integer(tmp_size, alloc_size) &&
+                tmp_size.id()==ID_mult &&
+                tmp_size.operands().size()==2 &&
+                (tmp_size.op0().is_constant() ||
+                 tmp_size.op1().is_constant()))
+        {
+          exprt s=tmp_size.op0();
+          if(s.is_constant())
+          {
+            s=tmp_size.op1();
+            assert(c_sizeof_type_rec(tmp_size.op0())==tmp_type);
+          }
+          else
+            assert(c_sizeof_type_rec(tmp_size.op1())==tmp_type);
+
+          object_type=array_typet(tmp_type, s);
         }
         else
         {

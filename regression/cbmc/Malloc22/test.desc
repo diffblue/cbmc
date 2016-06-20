@@ -1,0 +1,7 @@
+CORE
+main.c
+--unwind 2 --smt2 --outfile main.smt2
+^EXIT=0$
+^SIGNAL=0$
+--
+^Invalid expression: failed to get width of byte_update

@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/pointer_offset_size.h>
+#include <util/byte_operators.h>
+#include <util/namespace.h>
 
 #include "flatten_byte_operators.h"
 
@@ -28,11 +30,9 @@ Function: flatten_byte_extract
 \*******************************************************************/
 
 exprt flatten_byte_extract(
-  const exprt &src,
+  const byte_extract_exprt &src,
   const namespacet &ns)
 {
-  assert(src.id()==ID_byte_extract_little_endian ||
-         src.id()==ID_byte_extract_big_endian);
   assert(src.operands().size()==2);
 
   bool little_endian;
@@ -47,39 +47,45 @@ exprt flatten_byte_extract(
   mp_integer size_bits=pointer_offset_bits(src.type(), ns);
   if(size_bits<0)
     throw "byte_extract flatting with non-constant size: "+src.pretty();
-  std::size_t width_bits=integer2unsigned(size_bits);
-
-  std::size_t width_bytes=width_bits/8+(width_bits%8==0?0:1);
   
-  const typet &t=src.op0().type();
-  
-  if(t.id()==ID_array)
+  if(src.op0().type().id()==ID_array)
   {
-    const array_typet &array_type=to_array_type(t);
+    const exprt &root=src.op0();
+    const exprt &offset=src.op1();
+
+    const array_typet &array_type=to_array_type(root.type());
     const typet &subtype=array_type.subtype();
+
+    mp_integer element_width=pointer_offset_bits(subtype, ns);
+    if(element_width<0) // failed
+      throw "failed to flatten array with unknown element width";
+
+    mp_integer num_elements=
+      size_bits/element_width+((size_bits%element_width==0)?0:1);
+
+    const typet &offset_type=ns.follow(offset.type());
     
     // byte-array?
-    if((subtype.id()==ID_unsignedbv ||
-        subtype.id()==ID_signedbv) &&
-       to_bitvector_type(subtype).get_width()==8)
+    if(element_width==8)
     {
       // get 'width'-many bytes, and concatenate
+      std::size_t width_bytes=integer2unsigned(num_elements);
       exprt::operandst op;
-      op.resize(width_bytes);
+      op.reserve(width_bytes);
       
       for(std::size_t i=0; i<width_bytes; i++)
       {
         // the most significant byte comes first in the concatenation!
-        std::size_t offset_i=
+        std::size_t offset_int=
           little_endian?(width_bytes-i-1):i;
         
-        plus_exprt offset(from_integer(offset_i, src.op1().type()), src.op1());
-        index_exprt index_expr(subtype);
-        index_expr.array()=src.op0();
-        index_expr.index()=offset;
-        op[i]=index_expr;
+        plus_exprt offset_i(from_integer(offset_int, offset_type), offset);
+        index_exprt index_expr(root, offset_i);
+        op.push_back(index_expr);
       }
       
+      // TODO this doesn't seem correct if size_bits%8!=0 as more
+      // bits than the original expression will be returned.
       if(width_bytes==1)
         return op[0];
       else // width_bytes>=2
@@ -91,44 +97,36 @@ exprt flatten_byte_extract(
     }
     else // non-byte array
     {
-      const exprt &root=src.op0();
-      const exprt &offset=src.op1();
-      const typet &array_type=ns.follow(root.type());
-      const typet &offset_type=ns.follow(offset.type());
-      const typet &element_type=ns.follow(array_type.subtype());
-      mp_integer element_width=pointer_offset_size(element_type, ns);
-      
-      if(element_width==-1) // failed
-        throw "failed to flatten non-byte array with unknown element width";
-
-      mp_integer result_width=pointer_offset_size(src.type(), ns);
-      mp_integer num_elements=(element_width+result_width-2)/element_width+1;
+      // add an extra element as the access need not be aligned with
+      // element boundaries and could thus stretch over extra elements
+      ++num_elements;
 
       // compute new root and offset
       concatenation_exprt concat(
-        unsignedbv_typet(integer2unsigned(element_width*8*num_elements)));
+        unsignedbv_typet(integer2unsigned(element_width*num_elements)));
 
+      assert(element_width%8==0);
       exprt first_index=
-        (element_width==1)?offset 
-        : div_exprt(offset, from_integer(element_width, offset_type)); // 8*offset/el_w
+        div_exprt(offset, from_integer(element_width/8, offset_type));
 
-      for(mp_integer i=num_elements; i>0; --i)
+      // byte extract will do the appropriate mapping, thus MSB comes
+      // last here (as opposed to the above, where no further byte
+      // extract is involved)
+      for(mp_integer i=0; i<num_elements; ++i)
       {
-        plus_exprt index(first_index, from_integer(i-1, offset_type));
+        // the most significant byte comes first in the concatenation!
+        plus_exprt index(first_index, from_integer(i, offset_type));
         concat.copy_to_operands(index_exprt(root, index));
       }
 
-      // the new offset is width%offset
-      exprt new_offset;
-      
-      if(element_width==1)
-        new_offset=from_integer(0, offset_type);
-      else
-        new_offset=mod_exprt(offset, from_integer(element_width, offset_type));
+      // the new offset is offset%width
+      mod_exprt new_offset(offset,
+                           from_integer(element_width/8, offset_type));
 
       // build new byte-extract expression
-      exprt tmp(src.id(), src.type());
-      tmp.copy_to_operands(concat, new_offset);
+      byte_extract_exprt tmp(src);
+      tmp.op()=concat;
+      tmp.offset()=new_offset;
 
       return tmp;
     }
@@ -166,7 +164,7 @@ exprt flatten_byte_extract(
     
     extractbits.src()=left_shift;
     extractbits.type()=src.type();
-    extractbits.upper()=from_integer(width_bits-1, offset_type);
+    extractbits.upper()=from_integer(size_bits-1, offset_type);
     extractbits.lower()=from_integer(0, offset_type);
       
     return extractbits;
@@ -186,11 +184,9 @@ Function: flatten_byte_update
 \*******************************************************************/
 
 exprt flatten_byte_update(
-  const exprt &src,
+  const byte_update_exprt &src,
   const namespacet &ns)
 {
-  assert(src.id()==ID_byte_update_little_endian ||
-         src.id()==ID_byte_update_big_endian);
   assert(src.operands().size()==3);
 
   mp_integer element_size=
@@ -233,7 +229,7 @@ exprt flatten_byte_update(
           }
           else
           {
-            exprt byte_extract_expr(
+            byte_extract_exprt byte_extract_expr(
               src.id()==ID_byte_update_little_endian?ID_byte_extract_little_endian:
               src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
               throw "unexpected src.id() in flatten_byte_update",
@@ -265,7 +261,7 @@ exprt flatten_byte_update(
         
           index_exprt index_expr(src.op0(), div_offset, array_type.subtype());
           
-          exprt byte_update_expr(src.id(), array_type.subtype());
+          byte_update_exprt byte_update_expr(src.id(), array_type.subtype());
           byte_update_expr.copy_to_operands(index_expr, mod_offset, src.op2());
 
           // Call recurisvely, the array is gone!            
@@ -380,10 +376,10 @@ exprt flatten_byte_operators(const exprt &src, const namespacet &ns)
 
   if(src.id()==ID_byte_update_little_endian ||
      src.id()==ID_byte_update_big_endian)
-    return flatten_byte_update(tmp, ns);
+    return flatten_byte_update(to_byte_update_expr(tmp), ns);
   else if(src.id()==ID_byte_extract_little_endian ||
           src.id()==ID_byte_extract_big_endian)
-    return flatten_byte_extract(tmp, ns);
+    return flatten_byte_extract(to_byte_extract_expr(tmp), ns);
   else
     return tmp;
 }
