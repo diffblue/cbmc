@@ -264,19 +264,23 @@ exprt flatten_byte_update(
       
         for(mp_integer i=0; i<element_size; ++i)
         {
-          exprt i_expr=from_integer(i, ns.follow(src.op1().type()));
-
           exprt new_value;
           
           if(element_size==1)
             new_value=src.op2();
           else
           {
+            exprt i_expr=from_integer(i, ns.follow(src.op1().type()));
+
             byte_extract_exprt byte_extract_expr(
               src.id()==ID_byte_update_little_endian?ID_byte_extract_little_endian:
               src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
               throw "unexpected src.id() in flatten_byte_update",
               array_type.subtype());
+            
+            byte_extract_expr.op()=src.op2();
+            byte_extract_expr.offset()=i_expr;
+              
             new_value=byte_extract_expr;
           }
           
