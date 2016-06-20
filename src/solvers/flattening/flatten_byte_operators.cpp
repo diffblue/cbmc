@@ -100,6 +100,8 @@ exprt flatten_byte_extract(
       // add an extra element as the access need not be aligned with
       // element boundaries and could thus stretch over extra elements
       ++num_elements;
+      
+      assert(element_width!=0);
 
       // compute new root and offset
       concatenation_exprt concat(
@@ -314,7 +316,9 @@ exprt flatten_byte_update(
           t.id()==ID_pointer)
   {
     // do a shift, mask and OR
-    std::size_t width=to_bitvector_type(t).get_width();
+    std::size_t width=integer2long(pointer_offset_size(t, ns)*8);
+    
+    assert(width!=0);
     
     if(element_size*8>width)
       throw "flatten_byte_update to update element that is too large";
@@ -333,10 +337,15 @@ exprt flatten_byte_update(
     // do the 'AND'
     bitand_exprt bitand_expr(src.op0(), mask);
 
-    // zero-extend the value
-    concatenation_exprt value_extended(
-      from_integer(0, unsignedbv_typet(width-integer2unsigned(element_size)*8)), 
-      src.op2(), t);
+    // zero-extend the value, but only if needed
+    exprt value_extended;
+    
+    if(width>integer2unsigned(element_size)*8)
+      value_extended=concatenation_exprt(
+        from_integer(0, unsignedbv_typet(width-integer2unsigned(element_size)*8)), 
+        src.op2(), t);
+    else
+      value_extended=src.op2();
     
     // shift the value
     shl_exprt value_shifted(value_extended, offset_times_eight);
