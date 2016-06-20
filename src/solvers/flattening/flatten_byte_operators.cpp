@@ -236,8 +236,10 @@ exprt flatten_byte_update(
               src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
               throw "unexpected src.id() in flatten_byte_update",
               subtype);
-            
-            byte_extract_expr.copy_to_operands(src.op2(), i_expr);
+              
+            byte_extract_expr.op()=src.op2();
+            byte_extract_expr.offset()=i_expr;
+
             new_value=flatten_byte_extract(byte_extract_expr, ns);
           }
 
@@ -256,27 +258,47 @@ exprt flatten_byte_update(
       }
       else // sub_size!=1
       {
-        if(element_size==1) // byte-granularity update
+        exprt result=src.op0();
+      
+        for(mp_integer i=0; i<element_size; ++i)
         {
+          exprt i_expr=from_integer(i, ns.follow(src.op1().type()));
+
+          exprt new_value;
+          
+          if(element_size==1)
+            new_value=src.op2();
+          else
+          {
+            byte_extract_exprt byte_extract_expr(
+              src.id()==ID_byte_update_little_endian?ID_byte_extract_little_endian:
+              src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
+              throw "unexpected src.id() in flatten_byte_update",
+              array_type.subtype());
+            new_value=byte_extract_expr;
+          }
+          
           div_exprt div_offset(src.op1(), from_integer(sub_size, src.op1().type()));
           mod_exprt mod_offset(src.op1(), from_integer(sub_size, src.op1().type()));
         
           index_exprt index_expr(src.op0(), div_offset, array_type.subtype());
           
           byte_update_exprt byte_update_expr(src.id(), array_type.subtype());
-          byte_update_expr.copy_to_operands(index_expr, mod_offset, src.op2());
+          byte_update_expr.op()=index_expr;
+          byte_update_expr.offset()=mod_offset;
+          byte_update_expr.value()=new_value;
 
           // Call recurisvely, the array is gone!            
           exprt flattened_byte_update_expr=
             flatten_byte_update(byte_update_expr, ns);
             
           with_exprt with_expr(
-            src.op0(), div_offset, flattened_byte_update_expr);
+            result, div_offset, flattened_byte_update_expr);
             
-          return with_expr;
+          result=with_expr;
         }
-        else
-          throw "flatten_byte_update can only do byte updates of non-byte arrays right now";
+        
+        return result;
       }
     }
     else
@@ -287,7 +309,9 @@ exprt flatten_byte_update(
   }
   else if(t.id()==ID_signedbv ||
           t.id()==ID_unsignedbv ||
-          t.id()==ID_floatbv)
+          t.id()==ID_floatbv ||
+          t.id()==ID_c_bool ||
+          t.id()==ID_pointer)
   {
     // do a shift, mask and OR
     std::size_t width=to_bitvector_type(t).get_width();
@@ -324,7 +348,8 @@ exprt flatten_byte_update(
   }
   else
   {
-    throw "flatten_byte_update can only do array and scalars right now";
+    throw "flatten_byte_update can only do array and scalars "
+          "right now, but "+t.id_string();
   }
 }
 
