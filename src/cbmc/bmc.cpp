@@ -598,7 +598,7 @@ safety_checkert::resultt bmct::stop_on_fail(
   default:
     if(options.get_bool_option("dimacs") ||
        options.get_option("outfile")!="")
-      return ERROR;
+      return SAFE;
       
     error() << "decision procedure failed" << eom;
 
