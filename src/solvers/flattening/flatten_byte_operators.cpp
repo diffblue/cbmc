@@ -202,7 +202,9 @@ exprt flatten_byte_update(
     // array of bitvectors?
     if(subtype.id()==ID_unsignedbv ||
        subtype.id()==ID_signedbv ||
-       subtype.id()==ID_floatbv)
+       subtype.id()==ID_floatbv ||
+       subtype.id()==ID_c_bool ||
+       subtype.id()==ID_pointer)
     {
       mp_integer sub_size=pointer_offset_size(subtype, ns);
       
@@ -279,7 +281,8 @@ exprt flatten_byte_update(
     }
     else
     {
-      throw "flatten_byte_update can only do arrays of scalars right now";
+      throw "flatten_byte_update can only do arrays of scalars right now, but got "+
+            subtype.id_string();
     }
   }
   else if(t.id()==ID_signedbv ||
