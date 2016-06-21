@@ -120,10 +120,10 @@ path_searcht::resultt path_searcht::operator()(
       if(state.get_instruction()->is_assert())
       {
         if(show_vcc)
-          do_show_vcc(state, ns);
+          do_show_vcc(state);
         else
         {
-          check_assertion(state, ns);
+          check_assertion(state);
           
           // all assertions failed?
           if(number_of_failed_properties==property_map.size())
