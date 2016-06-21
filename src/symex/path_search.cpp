@@ -247,9 +247,7 @@ Function: path_searcht::do_show_vcc
 
 \*******************************************************************/
 
-void path_searcht::do_show_vcc(
-  statet &state,
-  const namespacet &ns)
+void path_searcht::do_show_vcc(statet &state)
 {
   // keep statistics
   number_of_VCCs++;
@@ -367,9 +365,7 @@ Function: path_searcht::check_assertion
 
 \*******************************************************************/
 
-void path_searcht::check_assertion(
-  statet &state,
-  const namespacet &ns)
+void path_searcht::check_assertion(statet &state)
 {
   // keep statistics
   number_of_VCCs++;

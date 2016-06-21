@@ -109,11 +109,11 @@ protected:
 
   expanding_vector<loc_datat> loc_data;
   
-  bool execute(queuet::iterator state, const namespacet &);
+  bool execute(queuet::iterator state);
   
-  void check_assertion(statet &state, const namespacet &);
+  void check_assertion(statet &state);
   bool is_feasible(statet &state);
-  void do_show_vcc(statet &state, const namespacet &);
+  void do_show_vcc(statet &state);
   
   bool drop_state(const statet &state) const;
   
