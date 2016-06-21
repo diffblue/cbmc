@@ -71,6 +71,34 @@ protected:
   void duplicate_object_symbol(
     symbolt &old_symbol,
     symbolt &new_symbol);
+
+  bool adjust_object_type(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    bool &set_to_new);
+
+  struct adjust_type_infot
+  {
+    adjust_type_infot(
+      const symbolt &_old_symbol,
+      const symbolt &_new_symbol):
+      old_symbol(_old_symbol),
+      new_symbol(_new_symbol),
+      set_to_new(false)
+    {
+    }
+
+    const symbolt &old_symbol;
+    const symbolt &new_symbol;
+    bool set_to_new;
+    id_sett o_symbols;
+    id_sett n_symbols;
+  };
+
+  bool adjust_object_type_rec(
+    const typet &type1,
+    const typet &type2,
+    adjust_type_infot &info);
   
   void duplicate_type_symbol(
     symbolt &old_symbol,
