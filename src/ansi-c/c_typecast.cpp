@@ -794,6 +794,9 @@ void c_typecastt::implicit_typecast_arithmetic(
   implicit_typecast_arithmetic(expr1, max_type);
   implicit_typecast_arithmetic(expr2, max_type);
 
+  // arithmetic typecasts only, otherwise this can't be used from
+  // typecheck_expr_trinary
+  #if 0
   if(max_type==PTR)
   {
     if(c_type1==VOIDPTR)
@@ -802,6 +805,7 @@ void c_typecastt::implicit_typecast_arithmetic(
     if(c_type2==VOIDPTR)
       do_typecast(expr2, expr1.type());
   }
+  #endif
 }
 
 /*******************************************************************\

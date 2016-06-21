@@ -534,6 +534,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
           return false;
         }
       }
+      else if(expr_type_id==ID_pointer &&
+              operand.is_false() &&
+              config.ansi_c.NULL_is_zero)
+      {
+        expr=gen_zero(expr_type);
+        assert(expr.is_not_nil());
+        return false;
+      }
     }
     else if(op_type_id==ID_unsignedbv ||
             op_type_id==ID_signedbv ||
