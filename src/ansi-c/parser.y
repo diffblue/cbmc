@@ -3134,7 +3134,7 @@ parameter_postfixing_abstract_declarator:
               id2string(PARSER.current_scope().last_declarator)+"::");
           }
           parameter_type_list
-          ')'
+          ')' KnR_parameter_header_opt
         {
           $$=$1;
           set($$, ID_code);
@@ -3142,6 +3142,12 @@ parameter_postfixing_abstract_declarator:
           stack_type($$).add(ID_parameters).get_sub().
             swap((irept::subt &)(stack_type($3).subtypes()));
           PARSER.pop_scope();
+
+          if(stack($5).is_not_nil())
+          {
+            adjust_KnR_parameters(stack($$).add(ID_parameters), stack($5));
+            stack($$).set(ID_C_KnR, true);
+          }
         }
         ;
 
