@@ -58,8 +58,6 @@ public:
   // build a forward-traversible version of the history  
   void build_history(std::vector<path_symex_step_reft> &dest) const;
   
-  inline bool is_branch() const;
-
 protected:
   // we use a vector to store all steps
   std::size_t index;
@@ -164,12 +162,6 @@ inline path_symex_stept &path_symex_step_reft::get() const
   assert(history!=0);
   assert(!is_nil());
   return history->step_container[index];
-}
-
-inline bool path_symex_step_reft::is_branch() const
-{
-  if(is_nil()) return false;
-  return get().is_branch();
 }
 
 #endif

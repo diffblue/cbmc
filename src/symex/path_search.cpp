@@ -100,7 +100,7 @@ path_searcht::resultt path_searcht::operator()(
       }
 
       if(eager_infeasibility &&
-         state.history->is_branch() &&
+         state.last_was_branch() &&
          !is_feasible(state))
       {
         number_of_infeasible_paths++;
@@ -192,6 +192,9 @@ void path_searcht::report_statistics()
 
   status() << "Number of paths: "
            << number_of_paths << messaget::eom;
+
+  status() << "Number of infeasible paths: "
+           << number_of_infeasible_paths << messaget::eom;
 
   status() << "Generated " << number_of_VCCs << " VCC(s), "
            << number_of_VCCs_after_simplification
