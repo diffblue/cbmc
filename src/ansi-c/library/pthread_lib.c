@@ -344,6 +344,7 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
 #define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
+#ifdef __APPLE_
 extern __CPROVER_bool __CPROVER_threads_exited[];
 extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
 extern unsigned long __CPROVER_next_thread_id;
@@ -364,6 +365,7 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
 
   return 0;
 }
+#endif
 
 /* FUNCTION: pthread_rwlock_destroy */
 
