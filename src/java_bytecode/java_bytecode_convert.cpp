@@ -368,6 +368,48 @@ void java_bytecode_convertt::convert(
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
 
+  class_type.methods().push_back(class_typet::methodt());
+  class_typet::methodt &method=class_type.methods().back();
+
+  method.set_base_name(m.base_name);
+  method.set_name(method_identifier);
+
+  const bool is_virtual=!m.is_static && !m.is_final;
+
+  method.set(ID_abstract, m.is_abstract);
+  method.set(ID_is_virtual, is_virtual);
+
+  if(is_contructor(method))
+    method.set(ID_constructor, true);
+
+  method.type()=member_type;
+
+  // do we have the method symbol already?
+  const auto s_it=symbol_table.symbols.find(method.get_name());
+  if(s_it!=symbol_table.symbols.end())
+  {
+    // erase if blank, we stubbed it
+    if(s_it->second.value.is_nil())
+      symbol_table.symbols.erase(s_it);
+  }
+
+  // create method symbol
+  symbolt method_symbol;
+  method_symbol.mode=ID_java;
+  method_symbol.name=method.get_name();
+  method_symbol.base_name=method.get_base_name();
+
+  if(method.get_base_name()=="<init>")
+    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
+                              id2string(class_symbol.base_name)+"()";
+  else
+    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
+                              id2string(method.get_base_name())+"()";
+
+  method_symbol.type=member_type;
+  current_method=method_symbol.name;
+  method_has_this=code_type.has_this();
+
   // do we need to add 'this' as a parameter?
   if(!m.is_static)
   {
@@ -378,15 +420,15 @@ void java_bytecode_convertt::convert(
     this_p.set_this();
     parameters.insert(parameters.begin(), this_p);
   }
-  
+
   variables.clear();
-  
+
   // assign names to parameters
   for(std::size_t i=0, param_index=0;
       i < parameters.size(); ++i)
   {
     irep_idt base_name, identifier;
-    
+
     if(i==0 && parameters[i].get_this())
     {
       base_name="this";
@@ -407,12 +449,12 @@ void java_bytecode_convertt::convert(
         char suffix=java_char_from_type(type);
         base_name="arg"+i2string(param_index)+suffix;
       }
-    
+
       identifier=id2string(method_identifier)+"::"+id2string(base_name);
       parameters[i].set_base_name(base_name);
       parameters[i].set_identifier(identifier);
     }
-    
+
     // add to symbol table
     parameter_symbolt parameter_symbol;
     parameter_symbol.base_name=base_name;
@@ -433,7 +475,7 @@ void java_bytecode_convertt::convert(
   {
     if(v.index>=variables.size()) variables.resize(v.index+1);
 
-    if(variables[v.index].symbol_expr.get_identifier().empty())    
+    if(variables[v.index].symbol_expr.get_identifier().empty())
     {
       typet t=java_type_from_string(v.signature);
       irep_idt identifier=id2string(current_method)+"::"+id2string(v.name);
@@ -443,47 +485,6 @@ void java_bytecode_convertt::convert(
     }
   }
 
-  class_type.methods().push_back(class_typet::methodt());
-  class_typet::methodt &method=class_type.methods().back();
-
-  method.set_base_name(m.base_name);
-  method.set_name(method_identifier);
-
-  const bool is_virtual=!m.is_static && !m.is_final;
-
-  method.set(ID_abstract, m.is_abstract);
-  method.set(ID_is_virtual, is_virtual);
-
-  if(is_contructor(method))
-    method.set(ID_constructor, true);
-
-  method.type()=member_type;
-  
-  // do we have the method symbol already?
-  const auto s_it=symbol_table.symbols.find(method.get_name());
-  if(s_it!=symbol_table.symbols.end())
-  {
-    // erase if blank, we stubbed it
-    if(s_it->second.value.is_nil())
-      symbol_table.symbols.erase(s_it);
-  }
-
-  // create method symbol
-  symbolt method_symbol;
-  method_symbol.mode=ID_java;
-  method_symbol.name=method.get_name();
-  method_symbol.base_name=method.get_base_name();
-  
-  if(method.get_base_name()=="<init>")
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(class_symbol.base_name)+"()";
-  else
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(method.get_base_name())+"()";
-  
-  method_symbol.type=member_type;
-  current_method=method_symbol.name;
-  method_has_this=code_type.has_this();
   tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
   symbol_table.add(method_symbol);
