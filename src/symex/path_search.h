@@ -22,6 +22,7 @@ public:
   explicit inline path_searcht(const namespacet &_ns):
     safety_checkert(_ns),
     show_vcc(false),
+    eager_infeasibility(false),
     depth_limit_set(false), // no limit
     context_bound_set(false),
     unwind_limit_set(false),
@@ -58,11 +59,14 @@ public:
   }
 
   bool show_vcc;
+  bool eager_infeasibility;
   
   // statistics
   unsigned number_of_dropped_states;
   unsigned number_of_paths;
   unsigned number_of_steps;
+  unsigned number_of_feasible_paths;
+  unsigned number_of_infeasible_paths;
   unsigned number_of_VCCs;
   unsigned number_of_VCCs_after_simplification;
   unsigned number_of_failed_properties;
@@ -108,6 +112,7 @@ protected:
   bool execute(queuet::iterator state, const namespacet &);
   
   void check_assertion(statet &state, const namespacet &);
+  bool is_feasible(statet &state);
   void do_show_vcc(statet &state, const namespacet &);
   
   bool drop_state(const statet &state) const;

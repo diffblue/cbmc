@@ -201,7 +201,7 @@ bool path_symex_statet::is_feasible(
   
   case decision_proceduret::D_UNSATISFIABLE: return false;
   
-  case decision_proceduret::D_ERROR: throw "error from decsion procedure";
+  case decision_proceduret::D_ERROR: throw "error from decision procedure";
   }
   
   return true; // not really reachable

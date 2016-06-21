@@ -46,6 +46,8 @@ path_searcht::resultt path_searcht::operator()(
   number_of_paths=0;
   number_of_VCCs=0;
   number_of_steps=0;
+  number_of_feasible_paths=0;
+  number_of_infeasible_paths=0;
   number_of_VCCs_after_simplification=0;
   number_of_failed_properties=0;
   number_of_locs=locs.size();
@@ -96,6 +98,15 @@ path_searcht::resultt path_searcht::operator()(
         number_of_paths++;
         continue;
       }
+
+      if(eager_infeasibility &&
+         state.history->is_branch() &&
+         !is_feasible(state))
+      {
+        number_of_infeasible_paths++;
+        number_of_paths++;
+        continue;
+      }
       
       if(number_of_steps%1000==0)
       {
@@ -119,7 +130,7 @@ path_searcht::resultt path_searcht::operator()(
             break;
         }
       }
-      
+
       // execute
       path_symex(state, tmp_queue);
       
@@ -402,6 +413,38 @@ void path_searcht::check_assertion(
   }
   
   sat_time+=current_time()-sat_start_time;
+}
+
+/*******************************************************************\
+
+Function: path_searcht::is_feasible
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool path_searcht::is_feasible(statet &state)
+{
+  status() << "Feasibility check" << eom;
+
+  // take the time
+  absolute_timet sat_start_time=current_time();
+
+  satcheckt satcheck;
+  bv_pointerst bv_pointers(ns, satcheck);
+  
+  satcheck.set_message_handler(get_message_handler());
+  bv_pointers.set_message_handler(get_message_handler());
+
+  bool result=state.is_feasible(bv_pointers);
+  
+  sat_time+=current_time()-sat_start_time;
+  
+  return result;
 }
 
 /*******************************************************************\
