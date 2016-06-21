@@ -19,8 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "type.h"
 #include "mp_arith.h"
+#include "replace_expr.h"
 
+class byte_extract_exprt;
+class byte_update_exprt;
 class exprt;
+class if_exprt;
 class index_exprt;
 class member_exprt;
 class namespacet;
@@ -40,7 +44,6 @@ public:
     ,debug_on(false)
 #endif
   {
-    setup_jump_table();
 #ifdef DEBUG_ON_DEMAND
     struct stat f;
     debug_on=stat("SIMP_DEBUG", &f)==0;
@@ -56,8 +59,6 @@ public:
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
 
-  // jump table entries
-
   bool simplify_typecast(exprt &expr);
   bool simplify_extractbit(exprt &expr);
   bool simplify_extractbits(exprt &expr);
@@ -71,7 +72,8 @@ public:
   bool simplify_floatbv_typecast(exprt &expr);
   bool simplify_shifts(exprt &expr);
   bool simplify_bitwise(exprt &expr);
-  bool simplify_if(exprt &expr);
+  bool simplify_if_preorder(if_exprt &expr);
+  bool simplify_if(if_exprt &expr);
   bool simplify_bitnot(exprt &expr);
   bool simplify_not(exprt &expr);
   bool simplify_boolean(exprt &expr);
@@ -82,8 +84,8 @@ public:
   bool simplify_update(exprt &expr);
   bool simplify_index(exprt &expr);
   bool simplify_member(exprt &expr);
-  bool simplify_byte_update(exprt &expr);
-  bool simplify_byte_extract(exprt &expr);
+  bool simplify_byte_update(byte_update_exprt &expr);
+  bool simplify_byte_extract(byte_extract_exprt &expr);
   bool simplify_pointer_object(exprt &expr);
   bool simplify_object_size(exprt &expr);
   bool simplify_dynamic_size(exprt &expr);
@@ -137,8 +139,6 @@ public:
            type.id()==ID_bv;
   }
   
-  typedef bool (simplify_exprt::*jump_table_entryt)(exprt &);
-  
   // bit-level conversions
   exprt bits2expr(const std::string &bits, const typet &type, bool little_endian);
   std::string expr2bits(const exprt &expr, bool little_endian);
@@ -148,8 +148,7 @@ protected:
 #ifdef DEBUG_ON_DEMAND
   bool debug_on;
 #endif
-  
-  void setup_jump_table();
+  replace_mapt local_replace_map;
 };
 
 #endif
