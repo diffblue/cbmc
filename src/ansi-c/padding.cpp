@@ -30,30 +30,46 @@ Function: alignment
 
 mp_integer alignment(const typet &type, const namespacet &ns)
 {
+  // we need to consider a number of different cases:
+  // - alignment specified in the source, which will be recorded in
+  // ID_C_alignment
+  // - alignment induced by packing ("The alignment of a member will
+  // be on a boundary that is either a multiple of n or a multiple of
+  // the size of the member, whichever is smaller."); both
+  // ID_C_alignment and ID_C_packed will be set
+  // - natural alignment, when neither ID_C_alignment nor ID_C_packed
+  // are set
+  // - dense packing with only ID_C_packed set.
+
   // is the alignment given?
   const exprt &given_alignment=
     static_cast<const exprt &>(type.find(ID_C_alignment));
 
-  if(given_alignment.is_not_nil())
-  {
-    mp_integer a_int;
-    if(!to_integer(given_alignment, a_int))
-      return a_int;
-      // we trust it blindly, no matter how nonsensical
-  }
+  mp_integer a_int;
+
+  // we trust it blindly, no matter how nonsensical
+  if(given_alignment.is_nil() ||
+     to_integer(given_alignment, a_int))
+    a_int=0;
+
+  // alignment but no packing
+  if(a_int>0 && !type.get_bool(ID_C_packed))
+    return a_int;
+  // no alignment, packing
+  else if(a_int==0 && type.get_bool(ID_C_packed))
+    return 1;
 
   // compute default
+  mp_integer result;
 
   if(type.id()==ID_array)
-  {
-    return alignment(type.subtype(), ns);
-  }
+    result=alignment(type.subtype(), ns);
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
     const struct_union_typet::componentst &components=
       to_struct_union_type(type).components();
 
-    mp_integer result=1;
+    result=1;
 
     // get the max
     // (should really be the smallest common denominator)
@@ -62,8 +78,6 @@ mp_integer alignment(const typet &type, const namespacet &ns)
         it!=components.end();
         it++)
       result=std::max(result, alignment(it->type(), ns));
-
-    return result;
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -72,30 +86,33 @@ mp_integer alignment(const typet &type, const namespacet &ns)
           type.id()==ID_c_bool)
   {
     std::size_t width=to_bitvector_type(type).get_width();
-    return width%8?width/8+1:width/8;
+    result=width%8?width/8+1:width/8;
   }
   else if(type.id()==ID_c_enum)
-  {
-    return alignment(type.subtype(), ns);
-  }
+    result=alignment(type.subtype(), ns);
   else if(type.id()==ID_c_enum_tag)
-  {
-    return alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
-  }
+    result=alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
   else if(type.id()==ID_pointer)
   {
     std::size_t width=config.ansi_c.pointer_width;
-    return width%8?width/8+1:width/8;
+    result=width%8?width/8+1:width/8;
   }
   else if(type.id()==ID_symbol)
-    return alignment(ns.follow(type), ns);
+    result=alignment(ns.follow(type), ns);
   else if(type.id()==ID_c_bit_field)
   {
     // we align these according to the 'underlying type'
-    return alignment(type.subtype(), ns);
+    result=alignment(type.subtype(), ns);
   }
+  else
+    result=1;
 
-  return 1;
+  // if an alignment had been provided and packing was requested, take
+  // the smallest alignment
+  if(a_int>0 && a_int<result)
+    result=a_int;
+
+  return result;
 }
 
 /*******************************************************************\
@@ -187,6 +204,9 @@ void add_padding(struct_typet &type, const namespacet &ns)
   {
     const typet &it_type=it->type();
     mp_integer a=1;
+
+    const bool packed=it_type.get_bool(ID_C_packed) ||
+                      ns.follow(it_type).get_bool(ID_C_packed);
     
     if(it_type.id()==ID_c_bit_field)
     {
@@ -211,16 +231,11 @@ void add_padding(struct_typet &type, const namespacet &ns)
         continue;
       }
     }
-    else if(it->type().get_bool(ID_C_packed) ||
-            ns.follow(it->type()).get_bool(ID_C_packed))
-    {
-      // the field or type is "packed"
-    }
     else
       a=alignment(it_type, ns);
       
     // check minimum alignment
-    if(a<config.ansi_c.alignment)
+    if(a<config.ansi_c.alignment && !packed)
       a=config.ansi_c.alignment;
       
     if(max_alignment<a) 

@@ -1605,7 +1605,19 @@ member_declaring_list:
         {
           if(!PARSER.pragma_pack.empty() &&
              !PARSER.pragma_pack.back().is_zero())
-            stack($2).set(ID_C_alignment, PARSER.pragma_pack.back());
+          {
+            // communicate #pragma pack(n) alignment constraints by
+            // by both setting packing AND alignment; see padding.cpp
+            // for more details
+            init($$);
+            set($$, ID_packed);
+            $2=merge($2, $$);
+
+            init($$);
+            set($$, ID_aligned);
+            stack($$).set(ID_size, PARSER.pragma_pack.back());
+            $2=merge($2, $$);
+          }
 
           $2=merge($2, $1);
 
