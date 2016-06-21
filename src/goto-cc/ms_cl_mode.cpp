@@ -6,6 +6,14 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+#ifdef _WIN32
+#define EX_OK 0
+#define EX_USAGE 64
+#define EX_SOFTWARE 70
+#else
+#include <sysexits.h>
+#endif
+
 #include <iostream>
 
 #include <util/string2int.h>
@@ -39,13 +47,13 @@ static bool is_directory(const std::string &s)
   return last_char=='\\' || last_char=='/';
 }
 
-bool ms_cl_modet::doit()
+int ms_cl_modet::doit()
 {
   if(cmdline.isset('?') || 
      cmdline.isset("help"))
   {
     help();
-    return false;
+    return EX_OK;
   }
 
   unsigned int verbosity=1;
@@ -165,7 +173,7 @@ bool ms_cl_modet::doit()
   }
 
   // Parse input program, convert to goto program, write output
-  return compiler.doit();
+  return compiler.doit() ? EX_USAGE : EX_OK;
 }
 
 /*******************************************************************\
