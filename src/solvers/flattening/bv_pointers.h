@@ -30,7 +30,7 @@ protected:
   
   void encode(unsigned object, bvt &bv);
   
-  virtual void convert_pointer_type(const exprt &expr, bvt &bv);
+  virtual bvt convert_pointer_type(const exprt &expr);
   
   virtual void add_addr(const exprt &expr, bvt &bv);
   
