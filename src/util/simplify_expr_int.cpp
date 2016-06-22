@@ -1016,6 +1016,40 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
 
 /*******************************************************************\
 
+Function: simplify_exprt::simplify_power
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_power(exprt &expr)
+{
+  if(!is_number(expr.type()))
+    return true;
+
+  if(expr.operands().size()!=2)
+    return true;
+
+  mp_integer base, exponent;
+  
+  if(to_integer(expr.op0(), base))
+    return true;
+    
+  if(to_integer(expr.op1(), exponent))
+    return true;
+    
+  mp_integer result=power(base, exponent);
+  
+  expr=from_integer(result, expr.type());
+  return false;
+}
+
+/*******************************************************************\
+
 Function: simplify_exprt::simplify_extractbits
 
   Inputs:

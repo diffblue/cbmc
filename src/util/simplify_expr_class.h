@@ -71,6 +71,7 @@ public:
   bool simplify_floatbv_op(exprt &expr);
   bool simplify_floatbv_typecast(exprt &expr);
   bool simplify_shifts(exprt &expr);
+  bool simplify_power(exprt &expr);
   bool simplify_bitwise(exprt &expr);
   bool simplify_if_preorder(if_exprt &expr);
   bool simplify_if(if_exprt &expr);
