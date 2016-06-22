@@ -3,6 +3,8 @@
 #include <util/arith_tools.h>
 
 #include "goto_functions.h"
+#include "goto_trace.h"
+#include "json_goto_trace.h"
 
 /*******************************************************************\
 
@@ -81,13 +83,18 @@ protected:
     memory_mapt local_map;
     unsigned old_stack_pointer;
   };
-  
+
   typedef std::stack<stack_framet> call_stackt;
-  call_stackt call_stack;
   
+  call_stackt call_stack;  
   goto_functionst::function_mapt::const_iterator function;
   goto_programt::const_targett PC, next_PC;
+  goto_tracet steps;
+  exprt lhs_at_pc;
   bool done;
+  int num_steps;
+  int stack_depth;
+  int thread_id;
   
   bool evaluate_boolean(const exprt &expr) const
   {
