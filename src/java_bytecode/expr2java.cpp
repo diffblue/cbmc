@@ -36,6 +36,7 @@ public:
 protected:
   virtual std::string convert(const exprt &src, unsigned &precedence);
   virtual std::string convert_java_this(const exprt &src, unsigned precedence);
+  virtual std::string convert_java_instanceof(const exprt &src, unsigned precedence);
   virtual std::string convert_java_new(const exprt &src, unsigned precedence);
   virtual std::string convert_code_java_delete(const exprt &src, unsigned precedence);
   virtual std::string convert_struct(const exprt &src, unsigned &precedence);
@@ -348,6 +349,31 @@ std::string expr2javat::convert_java_this(
 
 /*******************************************************************\
 
+Function: expr2javat::convert_java_instanceof
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2javat::convert_java_instanceof(
+  const exprt &src,
+  unsigned precedence)
+{
+  if(src.operands().size()!=2)
+  {
+    unsigned precedence;
+    return convert_norep(src, precedence);
+  }
+  
+  return convert(src.op0())+" instanceof "+convert(src.op1().type());
+}
+
+/*******************************************************************\
+
 Function: expr2javat::convert_java_new
 
   Inputs:
@@ -432,6 +458,8 @@ std::string expr2javat::convert(
 {
   if(src.id()=="java-this")
     return convert_java_this(src, precedence=15);
+  if(src.id()=="java_instanceof")
+    return convert_java_instanceof(src, precedence=15);
   else if(src.id()==ID_side_effect &&
           (src.get(ID_statement)==ID_java_new ||
            src.get(ID_statement)==ID_java_new_array))

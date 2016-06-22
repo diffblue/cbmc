@@ -1467,6 +1467,13 @@ codet java_bytecode_convertt::convert_instructions(
          op[0].type().get_unsigned_int(ID_width)==32)
         pop(1);
     }
+    else if(statement=="instanceof")
+    {
+      assert(op.size()==1 && results.size()==1);
+
+      results[0]=
+        binary_predicate_exprt(op[0], "java_instanceof", arg0);
+    }
     else
     {
       c=codet(statement);
