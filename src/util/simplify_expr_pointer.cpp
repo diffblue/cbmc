@@ -352,13 +352,13 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     exprt::operandst ptr_expr;
     exprt::operandst int_expr;
     
-    forall_operands(it, ptr)
+    for(const auto & op : ptr.operands())
     {
-      if(it->type().id()==ID_pointer)
-        ptr_expr.push_back(*it);
-      else if(!it->is_zero())
+      if(op.type().id()==ID_pointer)
+        ptr_expr.push_back(op);
+      else if(!op.is_zero())
       {
-        exprt tmp=*it;
+        exprt tmp=op;
         if(tmp.type()!=expr.type())
         {
           tmp.make_typecast(expr.type());
@@ -380,9 +380,9 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     if(element_size==0) return true;
     
     // this might change the type of the pointer!
-    exprt ptr_off(ID_pointer_offset, expr.type());
-    ptr_off.copy_to_operands(ptr_expr.front());
-    simplify_node(ptr_off);
+    exprt pointer_offset(ID_pointer_offset, expr.type());
+    pointer_offset.copy_to_operands(ptr_expr.front());
+    simplify_node(pointer_offset);
 
     exprt sum;
     
@@ -403,7 +403,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   
     simplify_node(product);
     
-    expr=binary_exprt(ptr_off, ID_plus, product, expr.type());
+    expr=binary_exprt(pointer_offset, ID_plus, product, expr.type());
 
     simplify_node(expr);
     
