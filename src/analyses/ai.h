@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <iosfwd>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 // forward reference
 class ai_baset;
@@ -109,6 +109,14 @@ public:
     initialize(goto_functions);
     entry_state(goto_functions);
     fixedpoint(goto_functions, ns);
+  }
+
+  inline void operator()(const goto_modelt &goto_model)
+  {
+    const namespacet ns(goto_model.symbol_table);
+    initialize(goto_model.goto_functions);
+    entry_state(goto_model.goto_functions);
+    fixedpoint(goto_model.goto_functions, ns);
   }
 
   inline void operator()(
