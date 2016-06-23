@@ -18,8 +18,8 @@ class goto_modelt;
 
 bool read_goto_binary(
   const std::string &filename,
-  symbol_tablet &symbol_table,
-  goto_functionst &dest,
+  symbol_tablet &,
+  goto_functionst &,
   message_handlert &);
   
 bool read_goto_binary(
@@ -31,8 +31,13 @@ bool is_goto_binary(const std::string &filename);
 
 bool read_object_and_link(
   const std::string &file_name,
-  symbol_tablet &symbol_table,
-  goto_functionst &functions,
+  symbol_tablet &,
+  goto_functionst &,
+  message_handlert &);
+
+bool read_object_and_link(
+  const std::string &file_name,
+  goto_modelt &,
   message_handlert &);
 
 #endif
