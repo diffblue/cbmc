@@ -4,7 +4,7 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       remove_function_pointers.cpp goto_functions.cpp goto_inline.cpp \
       remove_skip.cpp goto_convert_functions.cpp string_instrumentation.cpp \
       builtin_functions.cpp show_properties.cpp set_properties.cpp \
-      read_goto_binary.cpp goto_asm.cpp elf_reader.cpp \
+      read_goto_binary.cpp goto_asm.cpp elf_reader.cpp show_symbol_table.cpp \
       string_abstraction.cpp destructor.cpp remove_asm.cpp \
       read_bin_goto_object.cpp goto_program_irep.cpp interpreter.cpp \
       interpreter_evaluate.cpp json_goto_trace.cpp \
