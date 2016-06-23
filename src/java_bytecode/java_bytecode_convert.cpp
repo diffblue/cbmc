@@ -781,6 +781,9 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="checkcast")
     {
+      // checkcast throws an exception in case a cast of object
+      // on stack to given type fails.
+      // The stack isn't modified.
       assert(op.size()==1 && results.size()==1);
       results[0]=op[0];
     }
