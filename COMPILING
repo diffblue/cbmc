@@ -122,6 +122,9 @@ Follow these instructions:
 
    cd cbmc-git/src
    make minisat2-download
+  make libzip-download
+  make zlib-download
+  make libzip-build
    make
 
 
