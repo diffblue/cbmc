@@ -848,6 +848,24 @@ codet java_bytecode_convertt::convert_instructions(
 
         assert(this_arg.type().id()==ID_pointer);
       }
+      
+      // do some type adjustment for the arguments,
+      // as Java promotes arguments
+
+      for(unsigned i=0; i<parameters.size(); i++)
+      {
+        const typet &type=parameters[i].type();
+        if(type==java_boolean_type() ||
+           type==java_char_type() ||
+           type==java_byte_type() ||
+           type==java_short_type())
+        {
+          assert(i<call.arguments().size());
+          call.arguments()[i].make_typecast(type);
+        }
+      }
+      
+      // do some type adjustment for return values
 
       const typet &return_type=code_type.return_type();
 
