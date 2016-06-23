@@ -139,6 +139,14 @@ public:
     std::ostream &out) const;
 
   inline void output(
+    const goto_modelt &goto_model,
+    std::ostream &out) const
+  {
+    const namespacet ns(goto_model.symbol_table);
+    output(ns, goto_model.goto_functions, out);
+  }
+
+  inline void output(
     const namespacet &ns,
     const goto_programt &goto_program,
     std::ostream &out) const
