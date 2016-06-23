@@ -160,7 +160,10 @@ protected:
   exprt::operandst pop(unsigned n)
   {
     if(stack.size()<n)
-      throw "malformed bytecode (pop too high)";
+    {
+      error() << "malformed bytecode (pop too high)" << eom;
+      throw 0;
+    }
 
     exprt::operandst operands;
     operands.resize(n);
@@ -188,7 +191,7 @@ protected:
   codet convert_instructions(
     const instructionst &, const code_typet &);
 
-  static const bytecode_infot &get_bytecode_info(const irep_idt &statement);
+  const bytecode_infot &get_bytecode_info(const irep_idt &statement);
   
   void generate_class_stub(const irep_idt &class_name);
   void add_array_types();
@@ -249,7 +252,10 @@ void java_bytecode_convertt::convert(const classt &c)
   
   // add before we do members
   if(symbol_table.move(new_symbol, class_symbol))
-    throw "failed to add class symbol "+id2string(new_symbol.name);
+  {
+    error() << "failed to add class symbol " << new_symbol.name << eom;
+    throw 0;
+  }
 
   // now do members  
   for(const auto & it : c.fields)
@@ -542,7 +548,10 @@ void java_bytecode_convertt::convert(
     new_symbol.value=gen_zero(member_type);
 
     if(symbol_table.add(new_symbol))
-      throw "failed to add static field symbol";
+    {
+      error() << "failed to add static field symbol" << eom;
+      throw 0;
+    }
   }
 }
 
@@ -564,8 +573,9 @@ const bytecode_infot &java_bytecode_convertt::get_bytecode_info(
   for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
     if(statement==p->mnemonic) return *p;
 
-  throw std::string("failed to find bytecode mnemonic `")+
-        id2string(statement)+"'";
+  error() << "failed to find bytecode mnemonic `"
+          << statement << '\'' << eom;
+  throw 0;
 }
 
 namespace {
