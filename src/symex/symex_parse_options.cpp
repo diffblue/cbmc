@@ -215,28 +215,28 @@ int symex_parse_optionst::doit()
 
   eval_verbosity();
 
-  goto_functionst goto_functions;
-
-  if(get_goto_program(options, goto_functions))
+  if(goto_model(cmdline.args))
+    return 6;
+  
+  if(process_goto_program(options))
     return 6;
     
-  label_properties(goto_functions);
+  label_properties(goto_model);
 
   if(cmdline.isset("show-properties"))
   {
-    const namespacet ns(symbol_table);
-    show_properties(ns, get_ui(), goto_functions);
+    show_properties(goto_model, get_ui());
     return 0;
   }
 
-  if(set_properties(goto_functions))
+  if(set_properties())
     return 7;
     
   if(cmdline.isset("show-locs"))
   {
-    const namespacet ns(symbol_table);
+    const namespacet ns(goto_model.symbol_table);
     locst locs(ns);
-    locs.build(goto_functions);
+    locs.build(goto_model.goto_functions);
     locs.output(std::cout);    
     return 0;
   }
@@ -245,7 +245,7 @@ int symex_parse_optionst::doit()
 
   try
   {
-    const namespacet ns(symbol_table);
+    const namespacet ns(goto_model.symbol_table);
     path_searcht path_search(ns);
     
     path_search.set_message_handler(get_message_handler());
@@ -274,7 +274,7 @@ int symex_parse_optionst::doit()
     if(cmdline.isset("show-vcc"))
     {
       path_search.show_vcc=true;
-      path_search(goto_functions);
+      path_search(goto_model.goto_functions);
       return 0;
     }
 
@@ -282,7 +282,7 @@ int symex_parse_optionst::doit()
       cmdline.isset("eager-infeasibility");
 
     // do actual symex
-    switch(path_search(goto_functions))
+    switch(path_search(goto_model.goto_functions))
     {
     case safety_checkert::SAFE:
       report_properties(path_search.property_map);
@@ -331,12 +331,12 @@ Function: symex_parse_optionst::set_properties
 
 \*******************************************************************/
 
-bool symex_parse_optionst::set_properties(goto_functionst &goto_functions)
+bool symex_parse_optionst::set_properties()
 {
   try
   {
     if(cmdline.isset("property"))
-      ::set_properties(goto_functions, cmdline.get_values("property"));
+      ::set_properties(goto_model.goto_functions, cmdline.get_values("property"));
   }
 
   catch(const char *e)
@@ -353,161 +353,6 @@ bool symex_parse_optionst::set_properties(goto_functionst &goto_functions)
   
   catch(int)
   {
-    return true;
-  }
-  
-  return false;
-}
-
-/*******************************************************************\
-
-Function: symex_parse_optionst::get_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-  
-bool symex_parse_optionst::get_goto_program(
-  const optionst &options,
-  goto_functionst &goto_functions)
-{
-  if(cmdline.args.empty())
-  {
-    error() << "Please provide a program to verify" << eom;
-    return true;
-  }
-
-  try
-  {
-    if(cmdline.args.size()==1 &&
-       is_goto_binary(cmdline.args[0]))
-    {
-      status() << "Reading GOTO program from file" << eom;
-
-      if(read_goto_binary(cmdline.args[0],
-           symbol_table, goto_functions, get_message_handler()))
-        return true;
-        
-      config.set_from_symbol_table(symbol_table);
-
-      if(cmdline.isset("show-symbol-table"))
-      {
-        show_symbol_table();
-        return true;
-      }
-      
-      irep_idt entry_point=goto_functions.entry_point();
-      
-      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
-      {
-        error() << "The goto binary has no entry point; please complete linking" << eom;
-        return true;
-      }
-    }
-    else if(cmdline.isset("show-parse-tree"))
-    {
-      if(cmdline.args.size()!=1)
-      {
-        error() << "Please give one source file only" << eom;
-        return true;
-      }
-      
-      std::string filename=cmdline.args[0];
-      
-      #ifdef _MSC_VER
-      std::ifstream infile(widen(filename).c_str());
-      #else
-      std::ifstream infile(filename.c_str());
-      #endif
-                
-      if(!infile)
-      {
-        error() << "failed to open input file `" << filename << "'" << eom;
-        return true;
-      }
-                              
-      languaget *language=get_language_from_filename(filename);
-                                                
-      if(language==NULL)
-      {
-        error() << "failed to figure out type of file `" <<  filename << "'" << eom;
-        return true;
-      }
-      
-      language->set_message_handler(get_message_handler());
-                                                                
-      status("Parsing", filename);
-  
-      if(language->parse(infile, filename))
-      {
-        error() << "PARSING ERROR" << eom;
-        return true;
-      }
-      
-      language->show_parse(std::cout);
-      return true;
-    }
-    else
-    {
-    
-      if(parse()) return true;
-      if(typecheck()) return true;
-      if(final()) return true;
-
-      // we no longer need any parse trees or language files
-      clear_parse();
-
-      if(cmdline.isset("show-symbol-table"))
-      {
-        show_symbol_table();
-        return true;
-      }
-
-      irep_idt entry_point=goto_functions.entry_point();
-      
-      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
-      {
-        error() << "No entry point; please provide a main function" << eom;
-        return true;
-      }
-
-      status() << "Generating GOTO Program" << eom;
-
-      goto_convert(symbol_table, goto_functions, ui_message_handler);
-    }
-
-    // finally add the library
-    status() << "Adding CPROVER library" << eom;
-    link_to_library(symbol_table, goto_functions, ui_message_handler);
-
-    if(process_goto_program(options, goto_functions))
-      return true;
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string e)
-  {
-    error() << e << eom;
-    return true;
-  }
-  
-  catch(int)
-  {
-    return true;
-  }
-  
-  catch(std::bad_alloc)
-  {
-    error() << "Out of memory" << eom;
     return true;
   }
   
@@ -526,50 +371,51 @@ Function: symex_parse_optionst::process_goto_program
 
 \*******************************************************************/
   
-bool symex_parse_optionst::process_goto_program(
-  const optionst &options,
-  goto_functionst &goto_functions)
+bool symex_parse_optionst::process_goto_program(const optionst &options)
 {
   try
   {
-    namespacet ns(symbol_table);
-
+    // we add the library
+    status() << "Adding CPROVER library" << eom;
+    link_to_library(goto_model, ui_message_handler);
+  
     // do partial inlining
     status() << "Partial Inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    goto_partial_inline(goto_model, ui_message_handler);
     
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
-    goto_check(ns, options, goto_functions);
+    goto_check(options, goto_model);
 
     // remove stuff    
-    remove_complex(symbol_table, goto_functions);
-    remove_vector(symbol_table, goto_functions);
-    remove_virtual_functions(symbol_table, goto_functions);
+    remove_complex(goto_model);
+    remove_vector(goto_model);
+    remove_virtual_functions(goto_model);
     
     // recalculate numbers, etc.
-    goto_functions.update();
+    goto_model.goto_functions.update();
 
     // add loop ids
-    goto_functions.compute_loop_numbers();
+    goto_model.goto_functions.compute_loop_numbers();
     
     // if we aim to cover, replace
     // all assertions by false to prevent simplification
     
     if(cmdline.isset("cover-assertions"))
-      make_assertions_false(goto_functions);
+      make_assertions_false(goto_model.goto_functions);
 
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(get_ui(), goto_functions);
+      show_loop_ids(get_ui(), goto_model.goto_functions);
       return true;
     }
 
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      goto_functions.output(ns, std::cout);
+      const namespacet ns(goto_model.symbol_table);
+      goto_model.goto_functions.output(ns, std::cout);
       return true;
     }
   }
@@ -728,12 +574,12 @@ Function: symex_parse_optionst::show_counterexample
 void symex_parse_optionst::show_counterexample(
   const goto_tracet &error_trace)
 {
-  const namespacet ns(symbol_table);
+  const namespacet ns(goto_model.symbol_table);
 
   switch(get_ui())
   {
   case ui_message_handlert::PLAIN:
-    std::cout << std::endl << "Counterexample:" << std::endl;
+    std::cout << '\n' << "Counterexample:" << '\n';
     show_goto_trace(std::cout, ns, error_trace);
     break;
   
@@ -741,7 +587,7 @@ void symex_parse_optionst::show_counterexample(
     {
       xmlt xml;
       convert(ns, error_trace, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << std::flush;
     }
     break;
   

@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 
+#include <goto-programs/get_goto_model.h>
+
 #include <langapi/language_ui.h>
 
 #include "path_search.h"
@@ -50,23 +52,13 @@ public:
   virtual void help();
 
   symex_parse_optionst(int argc, const char **argv);
-  symex_parse_optionst(
-    int argc,
-    const char **argv,
-    const std::string &extra_options);
 
 protected:
+  get_goto_modelt goto_model;
+
   void get_command_line_options(optionst &options);
-
-  bool get_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
-
-  bool process_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
-    
-  bool set_properties(goto_functionst &goto_functions);
+  bool process_goto_program(const optionst &options);
+  bool set_properties();
 
   void report_success();
   void report_failure();

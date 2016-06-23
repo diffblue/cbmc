@@ -15,7 +15,7 @@ Date: April 2016
 
 #include <analyses/cfg_dominators.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 #include <goto-programs/compute_called_functions.h>
 
 #include "unreachable_instructions.h"
@@ -36,7 +36,6 @@ Function: unreachable_instructions
 
 static void unreachable_instructions(
   const goto_programt &goto_program,
-  const namespacet &ns,
   dead_mapt &dest)
 {
   cfg_dominatorst dominators;
@@ -68,7 +67,6 @@ Function: all_unreachable
 
 static void all_unreachable(
   const goto_programt &goto_program,
-  const namespacet &ns,
   dead_mapt &dest)
 {
   forall_goto_program_instructions(it, goto_program)
@@ -180,17 +178,18 @@ Function: unreachable_instructions
 \*******************************************************************/
 
 void unreachable_instructions(
-  const goto_functionst &goto_functions,
-  const namespacet &ns,
+  const goto_modelt &goto_model,
   const bool json,
   std::ostream &os)
 {
   json_arrayt json_result;
 
   std::set<irep_idt> called;
-  compute_called_functions(goto_functions, called);
+  compute_called_functions(goto_model, called);
+  
+  const namespacet ns(goto_model.symbol_table);
 
-  forall_goto_functions(f_it, goto_functions)
+  forall_goto_functions(f_it, goto_model.goto_functions)
   {
     if(!f_it->second.body_available()) continue;
 
@@ -198,9 +197,9 @@ void unreachable_instructions(
     dead_mapt dead_map;
 
     if(called.find(f_it->first)!=called.end())
-      unreachable_instructions(goto_program, ns, dead_map);
+      unreachable_instructions(goto_program, dead_map);
     else
-      all_unreachable(goto_program, ns, dead_map);
+      all_unreachable(goto_program, dead_map);
 
     if(!dead_map.empty())
     {
