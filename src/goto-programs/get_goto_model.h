@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GET_GOTO_PROGRAM_H
-#define CPROVER_GET_GOTO_PROGRAM_H
+#ifndef CPROVER_GET_GOTO_MODEL_H
+#define CPROVER_GET_GOTO_MODEL_H
 
 #include <util/message.h>
 
