@@ -2509,6 +2509,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_bitwise(expr) && result;
   else if(expr.id()==ID_ashr || expr.id()==ID_lshr || expr.id()==ID_shl)
     result=simplify_shifts(expr) && result;
+  else if(expr.id()==ID_power)
+    result=simplify_power(expr) && result;
   else if(expr.id()==ID_plus)
     result=simplify_plus(expr) && result;
   else if(expr.id()==ID_minus)
