@@ -82,10 +82,7 @@ public:
     a.is_register     |=b.is_register;
     a.is_inline       |=b.is_inline;
     a.is_thread_local |=b.is_thread_local;
-    a.is_weak         |=b.is_weak;
-    if(!b.alias.empty()) a.alias=b.alias;
-    if(!b.asm_label.empty()) a.asm_label=b.asm_label;
-    if(!b.section.empty()) a.section=b.section;
+    // attributes belong to the declarator, don't replace them
     
     return a;
   }
