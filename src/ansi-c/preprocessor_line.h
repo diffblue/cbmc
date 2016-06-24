@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_LANGUAGE_PREPROCESSOR_LINE_H
 #define CPROVER_ANSI_C_LANGUAGE_PREPROCESSOR_LINE_H
 
-class parsert;
+class ansi_c_parsert;
 
 void preprocessor_line(
   const char *text,
-  parsert &parser);
+  ansi_c_parsert &parser);
 
 #endif

@@ -18,6 +18,10 @@ public:
   typedef std::list<ansi_c_declarationt> itemst;
   itemst items;
 
+  typedef hash_map_cont<irep_idt, source_locationt, irep_id_hash>
+    include_mapt;
+  include_mapt include_map;
+
   void swap(ansi_c_parse_treet &other);
   void clear();
   void output(std::ostream &out) const;

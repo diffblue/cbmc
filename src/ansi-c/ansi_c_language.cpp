@@ -200,7 +200,10 @@ bool ansi_c_languaget::typecheck(
   if(ansi_c_typecheck(parse_tree, new_symbol_table, module, get_message_handler()))
     return true;
 
-  remove_internal_symbols(new_symbol_table);
+  remove_internal_symbols(
+    new_symbol_table,
+    parse_tree.include_map,
+    get_message_handler());
   
   if(linking(symbol_table, new_symbol_table, get_message_handler()))
     return true;

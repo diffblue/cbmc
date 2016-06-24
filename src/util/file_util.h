@@ -18,4 +18,6 @@ std::string get_current_working_directory();
 std::string concat_dir_file(const std::string &directory,
                             const std::string &file_name);
 
+bool is_dot_i_file(const std::string &path);
+
 #endif

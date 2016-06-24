@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/arith_tools.h>
 #include <util/std_types.h>
+#include <util/file_util.h>
 
 #include "c_types.h"
 #include "c_preprocess.h"
@@ -232,27 +233,6 @@ bool c_preprocess(
   unlink(file.c_str());
   
   return result;
-}
-
-/*******************************************************************\
-
-Function: is_dot_i_file
-
-  Inputs:
-
- Outputs:
-
- Purpose: ANSI-C preprocessing
-
-\*******************************************************************/
-
-static bool is_dot_i_file(const std::string &path)
-{
-  const char *ext=strrchr(path.c_str(), '.');
-  if(ext==NULL) return false;
-  if(std::string(ext)==".i" ||
-     std::string(ext)==".ii") return true;
-  return false;
 }
 
 /*******************************************************************\

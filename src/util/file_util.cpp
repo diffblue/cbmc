@@ -31,6 +31,8 @@ Date: January 2012
 #define pclose _pclose
 #endif
 
+#include <cstring>
+
 #include "file_util.h"
 
 /*******************************************************************\
@@ -140,4 +142,25 @@ std::string concat_dir_file(const std::string &directory,
   return (!file_name.empty() && file_name[0]=='/') ?
           file_name : directory+"/"+file_name;
   #endif
+}
+
+/*******************************************************************\
+
+Function: is_dot_i_file
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool is_dot_i_file(const std::string &path)
+{
+  const char *ext=strrchr(path.c_str(), '.');
+  if(ext==NULL) return false;
+  if(std::string(ext)==".i" ||
+     std::string(ext)==".ii") return true;
+  return false;
 }
