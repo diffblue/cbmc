@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/expr_util.h>
 #include <util/prefix.h>
+#include <util/expanding_vector.h>
 
 #include <ansi-c/c_types.h>
 
@@ -94,7 +95,7 @@ protected:
     symbol_exprt symbol_expr;
   };
   
-  std::vector<variablet> variables;
+  expanding_vector<variablet> variables;
   
   bool method_has_this;
 
@@ -106,20 +107,21 @@ protected:
     unsigned number_int=safe_string2unsigned(id2string(number));
     typet t=java_type_from_char(type_char);
 
-    if(number_int<variables.size())
+    if(variables[number_int].symbol_expr.get_identifier().empty())
     {
-      exprt result=variables[number_int].symbol_expr;
-      if(t!=result.type()) result=typecast_exprt(result, t);
-      return result;
-    }
-    else
-    {
+      // an un-named local variable
       irep_idt base_name="local"+id2string(number)+type_char;
       irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
 
       symbol_exprt result(identifier, t);
       result.set(ID_C_base_name, base_name);
 
+      return result;
+    }
+    else
+    {
+      exprt result=variables[number_int].symbol_expr;
+      if(t!=result.type()) result=typecast_exprt(result, t);
       return result;
     }
   }
@@ -387,6 +389,25 @@ void java_bytecode_convertt::convert(
 
   variables.clear();
 
+  // Do the parameters and locals in the variable table,
+  // which is only available when compiled with -g
+  for(const auto & v : m.local_variable_table)
+  {
+    typet t=java_type_from_string(v.signature);
+    irep_idt identifier=id2string(method_identifier)+"::"+id2string(v.name);
+    symbol_exprt result(identifier, t);
+    result.set(ID_C_base_name, v.name);
+    variables[v.index].symbol_expr=result;
+  }
+
+  // set up variables array
+  for(std::size_t i=0, param_index=0;
+      i < parameters.size(); ++i)
+  {
+    variables[param_index];
+    param_index+=get_variable_slots(parameters[i]);
+  }
+
   // assign names to parameters
   for(std::size_t i=0, param_index=0;
       i < parameters.size(); ++i)
@@ -403,18 +424,17 @@ void java_bytecode_convertt::convert(
     else
     {
       // in the variable table?
-      for(const auto & v : m.local_variable_table)
-        if(v.index==param_index)
-          base_name=v.name;
-
+      base_name=variables[param_index].symbol_expr.get(ID_C_base_name);
+      identifier=variables[param_index].symbol_expr.get(ID_identifier);
+      
       if(base_name.empty())
       {
         const typet &type=parameters[i].type();
         char suffix=java_char_from_type(type);
         base_name="arg"+i2string(param_index)+suffix;
+        identifier=id2string(method_identifier)+"::"+id2string(base_name);
       }
-
-      identifier=id2string(method_identifier)+"::"+id2string(base_name);
+      
       parameters[i].set_base_name(base_name);
       parameters[i].set_identifier(identifier);
     }
@@ -429,26 +449,10 @@ void java_bytecode_convertt::convert(
 
     // add as a JVM variable
     unsigned slots=get_variable_slots(parameters[i]);
-    variables.resize(param_index+slots);
     variables[param_index].symbol_expr=parameter_symbol.symbol_expr();
     param_index+=slots;
   }
 
-  // Do the locals in the variable table
-  for(const auto & v : m.local_variable_table)
-  {
-    if(v.index>=variables.size()) variables.resize(v.index+1);
-
-    if(variables[v.index].symbol_expr.get_identifier().empty())
-    {
-      typet t=java_type_from_string(v.signature);
-      irep_idt identifier=id2string(method_identifier)+"::"+id2string(v.name);
-      symbol_exprt result(identifier, t);
-      result.set(ID_C_base_name, v.name);
-      variables[v.index].symbol_expr=result;
-    }
-  }
-  
   class_type.methods().push_back(class_typet::methodt());
   class_typet::methodt &method=class_type.methods().back();
 
@@ -951,7 +955,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.empty());
 
       exprt var=variable(arg0, statement[0]);
-
+      
       const bool is_array('a' == statement[0]);
       
       if(is_array)
