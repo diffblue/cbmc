@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <iostream>
+#include <memory>
 
 #include <util/language.h>
 #include <langapi/mode.h>
