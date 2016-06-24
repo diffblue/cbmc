@@ -108,8 +108,8 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
 
   symbol_tablet::symbolst::const_iterator s_it=
     symbol_table.symbols.find(identifier);
-    
-  const typet string_type=expr.type().subtype();
+
+  const symbol_typet string_type("java::java.lang.String");
   
   if(s_it==symbol_table.symbols.end())
   {

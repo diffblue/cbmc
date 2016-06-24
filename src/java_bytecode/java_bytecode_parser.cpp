@@ -548,10 +548,9 @@ void java_bytecode_parsert::rconstant_pool()
       break;
 
     case CONSTANT_String:
-      // These produce java.lang.String objects
       {
-        symbol_typet string_type("java::java.lang.String");
-        exprt string_literal(ID_java_string_literal, pointer_typet(string_type));
+        // ldc turns these into references to java.lang.String
+        exprt string_literal(ID_java_string_literal);
         string_literal.set(ID_value, pool_entry(it->ref1).s);
         it->expr=string_literal;
       }

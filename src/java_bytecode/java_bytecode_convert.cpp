@@ -841,24 +841,11 @@ codet java_bytecode_convertt::convert_instructions(
       code_function_callt call;
       call.add_source_location()=i_it->source_location;
       call.arguments() = pop(parameters.size());
-      
+
+      // double-check a bit      
       if(use_this)
       {
-        // 'this' may be a class type, which is the run-time
-        // info for that type, and are instances of java.lang.Class
-        assert(!call.arguments().empty());
-        
-        exprt &this_arg=call.arguments().front();
-        
-        if(this_arg.id()==ID_type)
-        {
-          irep_idt class_id=this_arg.type().get(ID_identifier);
-          symbol_typet java_lang_Class("java::java.lang.Class");
-          symbol_exprt symbol_expr(id2string(class_id)+"@class_model", java_lang_Class);
-          address_of_exprt address_of_expr(symbol_expr);
-          this_arg=address_of_expr;
-        }
-
+        const exprt &this_arg=call.arguments().front();
         assert(this_arg.type().id()==ID_pointer);
       }
       
@@ -1000,7 +987,41 @@ codet java_bytecode_convertt::convert_instructions(
             statement=="ldc2" || statement=="ldc2_w")
     {
       assert(op.empty() && results.size()==1);
-      results[0]=arg0;
+      
+      // 1) Pushing a String causes a reference to a java.lang.String object
+      // to be constructed and pushed onto the operand stack.
+
+      // 2) Pushing an int or a float causes a primitive value to be pushed
+      // onto the stack.
+      
+      // 3) Pushing a Class constant causes a reference to a java.lang.Class
+      // to be pushed onto the operand stack
+      
+      if(arg0.id()==ID_java_string_literal)
+      {
+        // these need to be references to java.lang.String
+        results[0]=arg0;
+        symbol_typet string_type("java::java.lang.String");
+        results[0].type()=pointer_typet(string_type);
+      }
+      else if(arg0.id()==ID_type)
+      {
+        irep_idt class_id=arg0.type().get(ID_identifier);
+        symbol_typet java_lang_Class("java::java.lang.Class");
+        symbol_exprt symbol_expr(id2string(class_id)+"@class_model", java_lang_Class);
+        address_of_exprt address_of_expr(symbol_expr);
+        results[0]=address_of_expr;
+      }
+      else if(arg0.id()==ID_constant)
+      {
+        results[0]=arg0;
+      }
+      else
+      {
+        error() << "unexpected ldc argument" << eom;
+        throw 0;
+      }
+      
     }
     else if(statement=="goto" || statement=="goto_w")
     {
