@@ -971,18 +971,19 @@ declaring_list:
           // add the initializer
           to_ansi_c_declaration(stack($$)).add_initializer(stack($5));
         }
-        | declaring_list ',' declarator
+        | declaring_list ',' gcc_type_attribute_opt declarator
           post_declarator_attributes_opt
           {
             // type attribute goes into declarator
-            $3=merge($4, $3);
-            PARSER.add_declarator(stack($1), stack($3));
+            $5=merge($5, $3);
+            $4=merge($5, $4);
+            PARSER.add_declarator(stack($1), stack($4));
           }
           initializer_opt
         {
           // add in the initializer
           $$=$1;
-          to_ansi_c_declaration(stack($$)).add_initializer(stack($6));
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($7));
         }
         ;
 
