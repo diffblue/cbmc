@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/byte_operators.h>
 
+#include <goto-programs/goto_model.h>
+
 #include <ansi-c/c_types.h>
 
 #include "rewrite_union.h"
@@ -56,4 +58,65 @@ void rewrite_union(
       byte_update_id(), nondet, offset, union_expr.op());
     expr=tmp;
   }
+}
+
+/*******************************************************************\
+
+Function: rewrite_union
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+static void rewrite_union(
+  goto_functionst::goto_functiont &goto_function,
+  const namespacet &ns)
+{
+  Forall_goto_program_instructions(it, goto_function.body)
+  {
+    rewrite_union(it->code, ns);
+    rewrite_union(it->guard, ns);
+  }
+}
+
+/*******************************************************************\
+
+Function: rewrite_union
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void rewrite_union(
+  goto_functionst &goto_functions,
+  const namespacet &ns)
+{
+  Forall_goto_functions(it, goto_functions)
+    rewrite_union(it->second, ns);
+}
+
+/*******************************************************************\
+
+Function: rewrite_union
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void rewrite_union(goto_modelt &goto_model)
+{
+  namespacet ns(goto_model.symbol_table);
+  rewrite_union(goto_model.goto_functions, ns);
 }

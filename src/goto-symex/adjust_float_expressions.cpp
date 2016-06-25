@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/arith_tools.h>
 
+#include <goto-programs/goto_model.h>
+
 #include "adjust_float_expressions.h"
 
 /*******************************************************************\
@@ -32,6 +34,15 @@ void adjust_float_expressions(
   exprt &expr,
   const namespacet &ns)
 {
+  if(expr.id()==ID_floatbv_plus ||
+     expr.id()==ID_floatbv_minus ||
+     expr.id()==ID_floatbv_mult ||
+     expr.id()==ID_floatbv_div ||
+     expr.id()==ID_floatbv_div ||
+     expr.id()==ID_floatbv_rem ||
+     expr.id()==ID_floatbv_typecast)
+    return;
+
   Forall_operands(it, expr)
     adjust_float_expressions(*it, ns);
 
@@ -125,4 +136,65 @@ void adjust_float_expressions(
         from_integer(ieee_floatt::ROUND_TO_ZERO, rounding_mode.type());
     }
   }
+}
+
+/*******************************************************************\
+
+Function: adjust_float_expressions
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+static void adjust_float_expressions(
+  goto_functionst::goto_functiont &goto_function,
+  const namespacet &ns)
+{
+  Forall_goto_program_instructions(it, goto_function.body)
+  {
+    adjust_float_expressions(it->code, ns);
+    adjust_float_expressions(it->guard, ns);
+  }
+}
+
+/*******************************************************************\
+
+Function: adjust_float_expressions
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void adjust_float_expressions(
+  goto_functionst &goto_functions,
+  const namespacet &ns)
+{
+  Forall_goto_functions(it, goto_functions)
+    adjust_float_expressions(it->second, ns);
+}
+
+/*******************************************************************\
+
+Function: adjust_float_expressions
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void adjust_float_expressions(goto_modelt &goto_model)
+{
+  namespacet ns(goto_model.symbol_table);
+  adjust_float_expressions(goto_model.goto_functions, ns);
 }

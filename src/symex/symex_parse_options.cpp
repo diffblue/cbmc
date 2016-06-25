@@ -33,6 +33,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
 
+#include <goto-symex/rewrite_union.h>
+#include <goto-symex/adjust_float_expressions.h>
+
 #include <goto-instrument/cover.h>
 
 #include <langapi/mode.h>
@@ -359,6 +362,8 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     remove_complex(goto_model);
     remove_vector(goto_model);
     remove_virtual_functions(goto_model);
+    rewrite_union(goto_model);
+    adjust_float_expressions(goto_model);
 
     // recalculate numbers, etc.
     goto_model.goto_functions.update();
