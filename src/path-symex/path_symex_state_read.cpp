@@ -11,9 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/dereference.h>
 
-#include <goto-symex/adjust_float_expressions.h>
-#include <goto-symex/rewrite_union.h>
-
 #include "path_symex_state.h"
 
 //#define DEBUG
@@ -41,21 +38,13 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
 
-  // This has five phases!
-  // 1. Floating-point expression adjustment (rounding mode)
-  // 2. Rewrite unions into byte operators
-  // 3. Dereferencing, including propagation of pointers.
-  // 4. Rewriting to SSA symbols
-  // 5. Simplifier
-
-  exprt tmp1=src;
-  adjust_float_expressions(tmp1, var_map.ns);
-
-  exprt tmp2=tmp1;
-  rewrite_union(tmp2, var_map.ns);
+  // This has three phases!
+  // 1. Dereferencing, including propagation of pointers.
+  // 2. Rewriting to SSA symbols
+  // 3. Simplifier
 
   // we force propagation for dereferencing
-  exprt tmp3=dereference_rec(tmp2, true);
+  exprt tmp3=dereference_rec(src, true);
 
   exprt tmp4=instantiate_rec(tmp3, propagate);
 

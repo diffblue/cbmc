@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 
-#include "adjust_float_expressions.h"
-#include "rewrite_union.h"
 #include "goto_symex.h"
 
 /*******************************************************************\
@@ -199,9 +197,7 @@ void goto_symext::clean_expr(
   statet &state,
   const bool write)
 {
-  rewrite_union(expr, ns);
   replace_nondet(expr);
   dereference(expr, state, write);
   replace_array_equal(expr);
-  adjust_float_expressions(expr, ns);
 }
