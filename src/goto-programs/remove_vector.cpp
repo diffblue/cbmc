@@ -12,8 +12,6 @@ Date:   September 2014
 
 #include "remove_vector.h"
 
-void remove_vector(typet &);
-void remove_vector(exprt &);
 
 /*******************************************************************\
 
@@ -27,7 +25,9 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(exprt &expr)
+static void remove_vector(typet &);
+
+static void remove_vector(exprt &expr)
 {
   Forall_operands(it, expr)
     remove_vector(*it);
@@ -109,7 +109,7 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(typet &type)
+static void remove_vector(typet &type)
 {
   if(type.id()==ID_struct || type.id()==ID_union)
   {
@@ -155,7 +155,7 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(symbolt &symbol)
+static void remove_vector(symbolt &symbol)
 {
   remove_vector(symbol.value);
   remove_vector(symbol.type);
@@ -173,7 +173,7 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(symbol_tablet &symbol_table)
+static void remove_vector(symbol_tablet &symbol_table)
 {
   Forall_symbols(it, symbol_table.symbols)
     remove_vector(it->second);
@@ -214,7 +214,7 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(goto_functionst &goto_functions)
+static void remove_vector(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
     remove_vector(it->second);
