@@ -137,6 +137,8 @@ protected:
   bool depth_limit_set, context_bound_set, unwind_limit_set, branch_bound_set;
 
   enum class search_heuristict { DFS, BFS, LOCS } search_heuristic;
+
+  source_locationt last_source_location;
 };
 
 #endif // CPROVER_SYMEX_PATH_SEARCH_H

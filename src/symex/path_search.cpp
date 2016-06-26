@@ -267,6 +267,19 @@ bool path_searcht::drop_state(const statet &state)
 {
   goto_programt::const_targett pc=state.get_instruction();
 
+  const source_locationt &source_location=pc->source_location;
+
+  if(!source_location.is_nil() &&
+     last_source_location!=source_location)
+  {
+    debug() << "SYMEX at file " << source_location.get_file()
+            << " line " << source_location.get_line()
+            << " function " << source_location.get_function()
+            << eom;
+
+    last_source_location=source_location;
+  }
+
   // depth limit
   if(depth_limit_set && state.get_depth()>depth_limit)
     return true;
@@ -282,17 +295,55 @@ bool path_searcht::drop_state(const statet &state)
   // unwinding limit -- loops
   if(unwind_limit_set && state.get_instruction()->is_backwards_goto())
   {
+    bool stop=false;
+
     for(const auto &loop_info : state.unwinding_map)
       if(loop_info.second>unwind_limit)
-        return true;
+      {
+        stop=true;
+        break;
+      }
+
+    const irep_idt id=goto_programt::loop_id(pc);
+    path_symex_statet::unwinding_mapt::const_iterator entry=
+      state.unwinding_map.find(state.pc());
+    debug() << (stop?"Not unwinding":"Unwinding")
+      << " loop " << id << " iteration "
+      << (entry==state.unwinding_map.end()?-1:entry->second)
+      << " (" << unwind_limit << " max)"
+      << " " << source_location
+      << " thread " << state.get_current_thread() << eom;
+
+    if(stop)
+      return true;
   }
 
   // unwinding limit -- recursion
   if(unwind_limit_set && state.get_instruction()->is_function_call())
   {
+    bool stop=false;
+
     for(const auto &rec_info : state.recursion_map)
       if(rec_info.second>unwind_limit)
-        return true;
+      {
+        stop=true;
+        break;
+      }
+
+    exprt function=to_code_function_call(pc->code).function();
+    const irep_idt id=function.get(ID_identifier); // could be nil
+    path_symex_statet::recursion_mapt::const_iterator entry=
+      state.recursion_map.find(id);
+    if(entry!=state.recursion_map.end())
+      debug() << (stop?"Not unwinding":"Unwinding")
+        << " recursion " << id << " iteration "
+        << entry->second
+        << " (" << unwind_limit << " max)"
+        << " " << source_location
+        << " thread " << state.get_current_thread() << eom;
+
+    if(stop)
+      return true;
   }
 
   if(pc->is_assume() &&
