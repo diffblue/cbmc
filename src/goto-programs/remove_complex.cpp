@@ -12,9 +12,6 @@ Date:   September 2014
 
 #include "remove_complex.h"
 
-void remove_complex(typet &);
-void remove_complex(exprt &);
-
 /*******************************************************************\
 
 Function: complex_member
@@ -27,7 +24,7 @@ Purpose:
 
 \*******************************************************************/
 
-exprt complex_member(const exprt &expr, irep_idt id)
+static exprt complex_member(const exprt &expr, irep_idt id)
 {
   if(expr.id()==ID_struct && expr.operands().size()==2)
   {
@@ -60,7 +57,9 @@ Purpose: removes complex data type
 
 \*******************************************************************/
 
-void remove_complex(exprt &expr)
+static void remove_complex(typet &);
+
+static void remove_complex(exprt &expr)
 {
   if(expr.id()==ID_typecast)
   {
@@ -200,7 +199,7 @@ Purpose: removes complex data type
 
 \*******************************************************************/
 
-void remove_complex(typet &type)
+static void remove_complex(typet &type)
 {
   if(type.id()==ID_struct || type.id()==ID_union)
   {
@@ -250,7 +249,7 @@ Purpose: removes complex data type
 
 \*******************************************************************/
 
-void remove_complex(symbolt &symbol)
+static void remove_complex(symbolt &symbol)
 {
   remove_complex(symbol.value);
   remove_complex(symbol.type);
@@ -286,7 +285,8 @@ Purpose: removes complex data type
 
 \*******************************************************************/
 
-void remove_complex(goto_functionst::goto_functiont &goto_function)
+static void remove_complex(
+  goto_functionst::goto_functiont &goto_function)
 {
   remove_complex(goto_function.type);
 
@@ -309,7 +309,7 @@ Purpose: removes complex data type
 
 \*******************************************************************/
 
-void remove_complex(goto_functionst &goto_functions)
+static void remove_complex(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
     remove_complex(it->second);
