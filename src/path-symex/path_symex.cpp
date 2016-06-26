@@ -422,6 +422,14 @@ void path_symext::assign_rec(
       var_state.value=propagate(ssa_rhs)?ssa_rhs:nil_exprt();
     }
   }
+  else if(ssa_lhs.id()==ID_typecast)
+  {
+    // dereferencing might yield a typecast
+    const exprt &new_lhs=to_typecast_expr(ssa_lhs).op();
+    typecast_exprt new_rhs(ssa_rhs, new_lhs.type());
+
+    assign_rec(state, guard, new_lhs, new_rhs);
+  }
   else if(ssa_lhs.id()==ID_member)
   {
     #ifdef DEBUG
