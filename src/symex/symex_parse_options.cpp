@@ -186,6 +186,10 @@ int symex_parse_optionst::doit()
       path_search.set_unwind_limit(
         unsafe_string2unsigned(cmdline.get_value("unwind")));
 
+    if(cmdline.isset("max-search-time"))
+      path_search.set_time_limit(
+        safe_string2unsigned(cmdline.get_value("max-search-time")));
+
     if(cmdline.isset("dfs"))
       path_search.set_dfs();
 
@@ -607,6 +611,7 @@ void symex_parse_optionst::help()
     " --depth nr                   limit search depth\n"
     " --context-bound nr           limit number of context switches\n"
     " --branch-bound nr            limit number of branches taken\n"
+    " --max-search-time s          limit search to approximately s seconds\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

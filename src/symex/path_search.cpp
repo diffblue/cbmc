@@ -281,19 +281,19 @@ bool path_searcht::drop_state(const statet &state)
   }
 
   // depth limit
-  if(depth_limit_set && state.get_depth()>depth_limit)
+  if(depth_limit>=0 && state.get_depth()>depth_limit)
     return true;
 
   // context bound
-  if(context_bound_set && state.get_no_thread_interleavings()>context_bound)
+  if(context_bound>=0 && state.get_no_thread_interleavings()>context_bound)
     return true;
 
   // branch bound
-  if(branch_bound_set && state.get_no_branches()>branch_bound)
+  if(branch_bound>=0 && state.get_no_branches()>branch_bound)
     return true;
 
   // unwinding limit -- loops
-  if(unwind_limit_set && state.get_instruction()->is_backwards_goto())
+  if(unwind_limit>=0 && pc->is_backwards_goto())
   {
     bool stop=false;
 
@@ -319,7 +319,7 @@ bool path_searcht::drop_state(const statet &state)
   }
 
   // unwinding limit -- recursion
-  if(unwind_limit_set && state.get_instruction()->is_function_call())
+  if(unwind_limit>=0 && pc->is_function_call())
   {
     bool stop=false;
 
@@ -345,6 +345,11 @@ bool path_searcht::drop_state(const statet &state)
     if(stop)
       return true;
   }
+
+  // search time limit (--max-search-time)
+  if(time_limit>=0 &&
+     current_time().get_t()>start_time.get_t()+time_limit*1000)
+    return true;
 
   if(pc->is_assume() &&
      simplify_expr(pc->guard, ns).is_false())

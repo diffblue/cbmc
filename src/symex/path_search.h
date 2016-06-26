@@ -26,10 +26,11 @@ public:
     safety_checkert(_ns),
     show_vcc(false),
     eager_infeasibility(false),
-    depth_limit_set(false), // no limit
-    context_bound_set(false),
-    unwind_limit_set(false),
-    branch_bound_set(false),
+    depth_limit(-1), // no limit
+    context_bound(-1),
+    branch_bound(-1),
+    unwind_limit(-1),
+    time_limit(-1),
     search_heuristic(search_heuristict::DFS)
   {
   }
@@ -37,42 +38,43 @@ public:
   virtual resultt operator()(
     const goto_functionst &goto_functions);
 
-  void set_depth_limit(unsigned limit)
+  void set_depth_limit(int limit)
   {
-    depth_limit_set=true;
     depth_limit=limit;
   }
 
-  void set_context_bound(unsigned limit)
+  void set_context_bound(int limit)
   {
-    context_bound_set=true;
     context_bound=limit;
   }
 
-  void set_branch_bound(unsigned limit)
+  void set_branch_bound(int limit)
   {
-    branch_bound_set=true;
     branch_bound=limit;
   }
 
-  void set_unwind_limit(unsigned limit)
+  void set_unwind_limit(int limit)
   {
-    unwind_limit_set=true;
     unwind_limit=limit;
+  }
+
+  void set_time_limit(int limit)
+  {
+    time_limit=limit;
   }
 
   bool show_vcc;
   bool eager_infeasibility;
 
   // statistics
-  unsigned number_of_dropped_states;
-  unsigned number_of_paths;
-  unsigned number_of_steps;
-  unsigned number_of_feasible_paths;
-  unsigned number_of_infeasible_paths;
-  unsigned number_of_VCCs;
-  unsigned number_of_VCCs_after_simplification;
-  unsigned number_of_failed_properties;
+  std::size_t number_of_dropped_states;
+  std::size_t number_of_paths;
+  std::size_t number_of_steps;
+  std::size_t number_of_feasible_paths;
+  std::size_t number_of_infeasible_paths;
+  std::size_t number_of_VCCs;
+  std::size_t number_of_VCCs_after_simplification;
+  std::size_t number_of_failed_properties;
   std::size_t number_of_locs;
   absolute_timet start_time;
   time_periodt sat_time;
@@ -130,11 +132,11 @@ protected:
   void initialize_property_map(
     const goto_functionst &goto_functions);
 
-  unsigned depth_limit;
-  unsigned context_bound;
-  unsigned branch_bound;
-  unsigned unwind_limit;
-  bool depth_limit_set, context_bound_set, unwind_limit_set, branch_bound_set;
+  int depth_limit;
+  int context_bound;
+  int branch_bound;
+  int unwind_limit;
+  int time_limit;
 
   enum class search_heuristict { DFS, BFS, LOCS } search_heuristic;
 
