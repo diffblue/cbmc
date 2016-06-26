@@ -500,7 +500,37 @@ exprt path_symex_statet::dereference_rec(
     exprt address=read(dereference_expr.pointer(), propagate);
 
     // now hand over to dereference
-    exprt address_dereferenced=::dereference(address, var_map.ns);
+    exprt is_invalid;
+
+    exprt address_dereferenced=
+      ::dereference(address, var_map.ns, is_invalid);
+
+    if(!is_invalid.is_false())
+    {
+      #ifdef DEBUG
+      std::cout << "Pointer " << from_expr(var_map.ns, "", src.op0())
+                << " may be invalid when "
+                << from_expr(var_map.ns, "", is_invalid)
+                << " evaluates to true.\n";
+      #endif
+
+      irep_idt id="symex::nondet"+std::to_string(var_map.nondet_count);
+      var_map.nondet_count++;
+
+      auxiliary_symbolt nondet_symbol;
+      nondet_symbol.name=id;
+      nondet_symbol.base_name=id;
+      nondet_symbol.type=src.type();
+      var_map.new_symbols.add(nondet_symbol);
+
+      symbol_exprt nondet=nondet_symbol.symbol_expr();
+
+      if(is_invalid.is_true())
+        address_dereferenced=nondet;
+      else
+        address_dereferenced=
+          if_exprt(is_invalid, nondet, address_dereferenced);
+    }
 
     // the dereferenced address is a mixture of non-SSA and SSA symbols
     // (e.g., if-guards and array indices)
