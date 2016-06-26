@@ -68,9 +68,9 @@ path_searcht::resultt path_searcht::operator()(
       statet &state=tmp_queue.front();
 
       // record we have seen it
-      loc_data[state.get_pc().loc_number].visited=true;
+      loc_data[state.pc().loc_number].visited=true;
 
-      debug() << "Loc: #" << state.get_pc().loc_number
+      debug() << "Loc: #" << state.pc().loc_number
               << ", queue: " << queue.size()
               << ", depth: " << state.get_depth();
       for(const auto &s : queue)
