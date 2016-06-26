@@ -103,7 +103,7 @@ path_searcht::resultt path_searcht::operator()(
       if(number_of_steps%1000==0)
       {
         status() << "Queue " << queue.size()
-                 << " thread " << state.get_current_thread()
+                 << " thread " << state.get_current_thread()+1
                  << '/' << state.threads.size()
                  << " PC " << state.pc() << messaget::eom;
       }
