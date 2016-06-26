@@ -19,6 +19,40 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: have_to_rewrite_union
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static bool have_to_rewrite_union(
+  const exprt &expr,
+  const namespacet &ns)
+{
+  if(expr.id()==ID_member)
+  {
+    const exprt &op=to_member_expr(expr).struct_op();
+    const typet &op_type=ns.follow(op.type());
+
+    if(op_type.id()==ID_union)
+      return true;
+  }
+  else if(expr.id()==ID_union)
+    return true;
+
+  forall_operands(it, expr)
+    if(have_to_rewrite_union(*it, ns))
+      return true;
+
+  return false;
+}
+
+/*******************************************************************\
+
 Function: rewrite_union
 
   Inputs:
@@ -34,6 +68,9 @@ void rewrite_union(
   exprt &expr,
   const namespacet &ns)
 {
+  if(!have_to_rewrite_union(expr, ns))
+    return;
+
   Forall_operands(it, expr)
     rewrite_union(*it, ns);
 
