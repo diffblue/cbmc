@@ -78,6 +78,7 @@ const char *gcc_options_with_argument[]=
   "-MT",
   "-MQ",
   "-MF",
+  "-U",
   "-u", // goes to linker
   "-T", // goes to linker
   NULL
@@ -117,7 +118,6 @@ const char *gcc_options_with_concatenated_argument[]=
   "-d",
   "-g",
   "-A",
-  "-U",
   NULL
 };
 
