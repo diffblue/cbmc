@@ -738,5 +738,6 @@ void symex_parse_optionst::help()
     "Other options:\n"
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
+    " --verbosity #                verbosity level\n"
     "\n";
 }
