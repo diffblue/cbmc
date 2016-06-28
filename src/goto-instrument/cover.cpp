@@ -9,6 +9,7 @@ Date: May 2016
 \*******************************************************************/
 
 #include <algorithm>
+#include <iterator>
 
 #include <util/prefix.h>
 #include <util/i2string.h>
