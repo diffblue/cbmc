@@ -1,0 +1,8 @@
+CORE
+iterator2.class
+--cover location --unwind 3 --function iterator2.f 
+^EXIT=0$
+^SIGNAL=0$
+^.*SATISFIED$
+--
+^warning: ignoring
