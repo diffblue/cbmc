@@ -1528,8 +1528,18 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    const irep_idt description=
-      "assertion "+id2string(get_string_constant(arguments[3]));
+    irep_idt description;
+    try
+    {
+      description="assertion "+id2string(get_string_constant(arguments[3]));
+    }
+    catch(int)
+    {
+      // we might be building newlib, where __assert_func is passed
+      // a pointer-typed symbol; the warning will still have been
+      // printed
+      description="assertion";
+    }
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
