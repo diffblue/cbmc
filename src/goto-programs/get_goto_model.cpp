@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/language.h>
 #include <util/config.h>
+#include <util/unicode.h>
 
 #include <langapi/mode.h>
 #include <langapi/language_ui.h>
