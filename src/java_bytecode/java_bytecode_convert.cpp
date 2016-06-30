@@ -469,17 +469,12 @@ void java_bytecode_convertt::convert(
 
   method.type()=member_type;
 
-  // do we have the method symbol already?
-  const auto s_it=symbol_table.symbols.find(method.get_name());
-  if(s_it!=symbol_table.symbols.end())
-  {
-    // erase if blank, we stubbed it
-    if(s_it->second.value.is_nil())
-      symbol_table.symbols.erase(s_it);
-  }
+  // we add the symbol for the method
 
-  // create method symbol
   symbolt method_symbol;
+
+  method_symbol.name=method.get_name();
+  method_symbol.base_name=method.get_base_name();
   method_symbol.mode=ID_java;
   method_symbol.name=method.get_name();
   method_symbol.base_name=method.get_base_name();
@@ -497,7 +492,13 @@ void java_bytecode_convertt::convert(
 
   tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
-  symbol_table.add(method_symbol, true);
+
+  // do we have the method symbol already?
+  const auto s_it=symbol_table.symbols.find(method.get_name());
+  if(s_it!=symbol_table.symbols.end())
+    symbol_table.symbols.erase(s_it); // erase, we stubbed it
+    
+  symbol_table.add(method_symbol);
 }
 
 /*******************************************************************\
