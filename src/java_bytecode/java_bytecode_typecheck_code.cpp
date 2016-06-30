@@ -54,6 +54,11 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
     if(code_ifthenelse.else_case().is_not_nil())
       typecheck_code(code_ifthenelse.else_case());
   }
+  else if(statement==ID_switch)
+  {
+    code_switcht &code_switch = to_code_switch(code);
+    typecheck_expr(code_switch.value());
+  }
   else if(statement==ID_return)
   {
     if(code.operands().size()==1)
