@@ -33,6 +33,15 @@ bool symbol_tablet::add(const symbolt &symbol)
   return false;
 }
 
+bool symbol_tablet::add(const symbolt &symbol, bool replace)
+{
+  symbolst::iterator it = symbols.find(symbol.name);
+  if(it != symbols.end())
+    symbols.erase(it);
+
+  return add(symbol);
+}
+
 /*******************************************************************\
 
 Function: symbol_tablet::move
