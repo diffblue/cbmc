@@ -497,7 +497,7 @@ void java_bytecode_convertt::convert(
 
   tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
-  symbol_table.add(method_symbol);
+  symbol_table.add(method_symbol, true);
 }
 
 /*******************************************************************\
