@@ -58,7 +58,6 @@ public:
   symbol_module_mapt symbol_module_map;
   
   bool add(const symbolt &symbol);
-  bool add(const symbolt &symbol, bool replace);
   
   bool move(symbolt &symbol, symbolt *&new_symbol);
 
