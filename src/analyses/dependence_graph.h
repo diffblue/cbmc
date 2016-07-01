@@ -97,6 +97,11 @@ public:
     }
   }
 
+  kindt get() const
+  {
+    return kind;
+  }
+
 protected:
   kindt kind;
 };
