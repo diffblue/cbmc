@@ -26,7 +26,10 @@ struct evtchn_status {
 
 int main()
 {
+  #ifdef __GNUC__
   STATIC_ASSERT(__builtin_offsetof(struct evtchn_status,u.interdomain.port)==20);
+  #endif
+
   STATIC_ASSERT(sizeof(struct evtchn_status)==28);
   return 0;
 };
