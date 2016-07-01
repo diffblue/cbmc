@@ -71,8 +71,9 @@ void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
   if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
-    throw "failed to move symbol `"+id2string(symbol.name)+
-          "' into symbol table";
+    error() << "failed to move symbol `" << symbol.name
+            << "' into symbol table" << eom;
+    throw 0;
   }
 }
 
@@ -117,7 +118,8 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   else if(!is_function && symbol.value.id()==ID_code)
   {
     err_location(symbol.value);
-    throw "only functions can have a function body";
+    error() << "only functions can have a function body" << eom;
+    throw 0;
   }
   
   // set the pretty name
@@ -160,8 +162,8 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     if(old_it->second.is_type!=symbol.is_type)
     {
       err_location(symbol.location);
-      str << "redeclaration of `" << symbol.display_name()
-          << "' as a different kind of symbol";
+      error() << "redeclaration of `" << symbol.display_name()
+              << "' as a different kind of symbol" << eom;
       throw 0;
     }
 
@@ -193,7 +195,8 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
 
   if(symbol.type.id()==ID_code)
   {
-    if(symbol.value.is_not_nil())
+    if(symbol.value.is_not_nil() &&
+       !symbol.is_macro)
       typecheck_function_body(symbol);
     else
     {
@@ -272,9 +275,9 @@ void c_typecheck_baset::typecheck_redefinition_type(
     else
     {
       err_location(new_symbol.location);
-      str << "error: conflicting definition of type symbol `"
-          << new_symbol.display_name()
-          << "'";
+      error() << "error: conflicting definition of type symbol `"
+              << new_symbol.display_name()
+              << "'" << eom;
       throw 0;
     }
   }
@@ -293,9 +296,9 @@ void c_typecheck_baset::typecheck_redefinition_type(
       {
         // arg! new tag type
         err_location(new_symbol.location);
-        str << "error: conflicting definition of tag symbol `"
-            << new_symbol.display_name()
-            << "'";
+        error() << "error: conflicting definition of tag symbol `"
+                << new_symbol.display_name()
+                << "'" << eom;
         throw 0;
       }
     }
@@ -319,10 +322,10 @@ void c_typecheck_baset::typecheck_redefinition_type(
       if(follow(new_symbol.type)!=follow(old_symbol.type))
       {
         err_location(new_symbol.location);
-        str << "error: type symbol `" << new_symbol.display_name()
-            << "' defined twice:" << "\n";
-        str << "Original: " << to_string(old_symbol.type) << "\n";
-        str << "     New: " << to_string(new_symbol.type);
+        error() << "error: type symbol `"
+                << new_symbol.display_name() << "' defined twice:\n"
+                << "Original: " << to_string(old_symbol.type) << "\n"
+                << "     New: " << to_string(new_symbol.type) << eom;
         throw 0;
       }
     }
@@ -359,7 +362,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   }
 
   // do initializer, this may change the type
-  if(follow(new_symbol.type).id()!=ID_code)
+  if(follow(new_symbol.type).id()!=ID_code &&
+     !new_symbol.is_macro)
     do_initializer(new_symbol);
   
   const typet &final_new=follow(new_symbol.type);
@@ -371,7 +375,9 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     if(final_new.id()==ID_code)
     {
       err_location(new_symbol.location);
-      throw "function type not allowed for K&R function parameter";
+      error() << "function type not allowed for K&R function parameter"
+              << eom;
+      throw 0;
     }
     
     // fix up old symbol -- we now got the type
@@ -388,10 +394,11 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     if(final_old.id()!=ID_code)
     {
       err_location(new_symbol.location);
-      str << "error: function symbol `" << new_symbol.display_name()
-          << "' redefined with a different type:" << "\n";
-      str << "Original: " << to_string(old_symbol.type) << "\n";
-      str << "     New: " << to_string(new_symbol.type);
+      error() << "error: function symbol `"
+              << new_symbol.display_name()
+              << "' redefined with a different type:\n"
+              << "Original: " << to_string(old_symbol.type) << "\n"
+              << "     New: " << to_string(new_symbol.type) << eom;
       throw 0;
     }
 
@@ -444,9 +451,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         else
         {
           err_location(new_symbol.location);
-          str << "function body `" << new_symbol.display_name()
-              << "' defined twice";
-          error_msg();
+          error() << "function body `" << new_symbol.display_name()
+                  << "' defined twice" << eom;
           throw 0;
         }
       }
@@ -462,7 +468,10 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         old_symbol.is_weak=true;
       }
 
-      typecheck_function_body(new_symbol);
+      if(new_symbol.is_macro)
+        old_symbol.is_macro=true;
+      else
+        typecheck_function_body(new_symbol);
     
       // overwrite location
       old_symbol.location=new_symbol.location;
@@ -497,8 +506,9 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         if(s_it==symbol_table.symbols.end())
         {
           err_location(old_symbol.location);
-          str << "typecheck_redefinition_non_type: "
-                 "failed to find symbol `" << identifier << "'";
+          error() << "typecheck_redefinition_non_type: "
+                  << "failed to find symbol `" << identifier << "'"
+                  << eom;
           throw 0;
         }
                   
@@ -540,10 +550,10 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     else
     {
       err_location(new_symbol.location);
-      str << "error: symbol `" << new_symbol.display_name()
-          << "' redefined with a different type:" << "\n";
-      str << "Original: " << to_string(old_symbol.type) << "\n";
-      str << "     New: " << to_string(new_symbol.type);
+      error() << "error: symbol `" << new_symbol.display_name()
+              << "' redefined with a different type:\n"
+              << "Original: " << to_string(old_symbol.type) << "\n"
+              << "     New: " << to_string(new_symbol.type) << eom;
       throw 0;
     }
   }
@@ -580,8 +590,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         else
         {
           err_location(new_symbol.value);
-          str << "symbol `" << new_symbol.display_name()
-              << "' already has an initial value";
+          error() << "symbol `" << new_symbol.display_name()
+                  << "' already has an initial value" << eom;
           warning_msg();
         }
       }
@@ -590,6 +600,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     {
       old_symbol.value=new_symbol.value;
       old_symbol.type=new_symbol.type;
+      old_symbol.is_macro=new_symbol.is_macro;
     }
   }
   
@@ -679,9 +690,94 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     if(labels_defined.find(it->first)==labels_defined.end())
     {
       err_location(it->second);
-      str << "branching label `" << it->first
-          << "' is not defined in function";
+      error() << "branching label `" << it->first
+              << "' is not defined in function" << eom;
       throw 0;
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::apply_asm_label
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::apply_asm_label(
+  const irep_idt &asm_label,
+  symbolt &symbol)
+{
+  const irep_idt orig_name=symbol.name;
+
+  // restrict renaming to functions and global variables;
+  // procedure-local ones would require fixing the scope, as we
+  // do for parameters below
+  if(!asm_label.empty() &&
+     !symbol.is_type &&
+     (symbol.type.id()==ID_code || symbol.is_static_lifetime))
+  {
+    symbol.name=asm_label;
+    symbol.base_name=asm_label;
+  }
+
+  if(symbol.name!=orig_name)
+  {
+    if(!asm_label_map.insert(
+        std::make_pair(orig_name, asm_label)).second)
+    {
+      err_location(symbol.location);
+      if(asm_label_map[orig_name]==asm_label)
+      {
+        str << "duplicate (consistent) asm renaming";
+        warning_msg();
+      }
+      else
+      {
+        error() << "replacing asm renaming "
+                << asm_label_map[orig_name] << " by "
+                << asm_label << eom;
+        throw 0;
+      }
+    }
+  }
+  else if(asm_label.empty())
+  {
+    asm_label_mapt::const_iterator entry=
+      asm_label_map.find(symbol.name);
+    if(entry!=asm_label_map.end())
+    {
+      symbol.name=entry->second;
+      symbol.base_name=entry->second;
+    }
+  }
+
+  if(symbol.name!=orig_name &&
+     symbol.type.id()==ID_code &&
+     symbol.value.is_not_nil() && !symbol.is_macro)
+  {
+    const code_typet &code_type=to_code_type(symbol.type);
+
+    for(code_typet::parameterst::const_iterator
+        p_it=code_type.parameters().begin();
+        p_it!=code_type.parameters().end();
+        ++p_it)
+    {
+      const irep_idt &p_bn=p_it->get_base_name();
+      if(p_bn.empty())
+        continue;
+
+      irep_idt p_id=id2string(orig_name)+"::"+id2string(p_bn);
+      irep_idt p_new_id=id2string(symbol.name)+"::"+id2string(p_bn);
+
+      if(!asm_label_map.insert(
+          std::make_pair(p_id, p_new_id)).second)
+        assert(asm_label_map[p_id]==p_new_id);
     }
   }
 }
@@ -749,10 +845,41 @@ void c_typecheck_baset::typecheck_declaration(
 
       symbolt symbol;
       declaration.to_symbol(*d_it, symbol);
-      irep_idt identifier=symbol.name;
 
       // now check other half of type
       typecheck_type(symbol.type);
+
+      if(!full_spec.alias.empty())
+      {
+        if(symbol.value.is_not_nil())
+        {
+          err_location(symbol.location);
+          error() << "alias attribute cannot be used with a body"
+                  << eom;
+          throw 0;
+        }
+
+        // alias function need not have been declared yet, thus
+        // can't lookup
+        symbol.value=symbol_exprt(full_spec.alias);
+        symbol.is_macro=true;
+      }
+
+      if(full_spec.section.empty())
+        apply_asm_label(full_spec.asm_label, symbol);
+      else
+      {
+        std::string asm_name;
+        asm_name=id2string(full_spec.section)+"$$";
+        if(!full_spec.asm_label.empty())
+          asm_name+=id2string(full_spec.asm_label);
+        else
+          asm_name+=id2string(symbol.name);
+
+        apply_asm_label(asm_name, symbol);
+      }
+      irep_idt identifier=symbol.name;
+      d_it->set_name(identifier);
 
       typecheck_symbol(symbol);
 

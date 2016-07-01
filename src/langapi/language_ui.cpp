@@ -36,6 +36,9 @@ static ui_message_handlert::uit get_ui_cmdline(const cmdlinet &cmdline)
   if(cmdline.isset("xml-ui"))
     return ui_message_handlert::XML_UI;
 
+  if(cmdline.isset("json-ui"))
+    return ui_message_handlert::JSON_UI;
+
   return ui_message_handlert::PLAIN;
 }
 

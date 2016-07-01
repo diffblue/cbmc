@@ -1,0 +1,8 @@
+CORE
+main.c
+--cover branch
+^EXIT=0$
+^SIGNAL=0$
+^\*\* 1 of 1 covered (100.0%), using 1 iteration$
+--
+^warning: ignoring

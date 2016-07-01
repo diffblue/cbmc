@@ -36,6 +36,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       cegis-util/task_pool.cpp cegis-util/constant_width.cpp cegis-util/irep_pipe.cpp \
       runner/cegis_parse_options.cpp runner/cegis_main.cpp \
       ../goto-instrument/dump_c.cpp ../goto-instrument/goto_program2code.cpp \
+      ../goto-instrument/nondet_static.cpp ../goto-instrument/cover.cpp \
       ../cbmc/cbmc_parse_options.cpp ../cbmc/bmc.cpp ../cbmc/cbmc_solvers.cpp ../cbmc/symex_bmc.cpp \
       ../cbmc/xml_interface.cpp ../cbmc/cover.cpp ../cbmc/bv_cbmc.cpp ../cbmc/counterexample_beautification.cpp \
       ../cbmc/cbmc_languages.cpp ../cbmc/show_vcc.cpp ../cbmc/cbmc_dimacs.cpp ../cbmc/all_properties.cpp
@@ -72,6 +73,19 @@ include ../config.inc
 include ../common
 
 CLEANFILES = cegis$(EXEEXT)
+
+ifneq ($(wildcard ../java_bytecode/Makefile),)
+  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
+  ifneq ($(wildcard $(LIBZIPINC)),)
+    LIBS += $(LIBZIPLIB)
+  endif
+endif
+
+ifneq ($(wildcard ../jsil/Makefile),)
+  OBJ += ../jsil/jsil$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_JSIL
+endif
 
 all: cegis$(EXEEXT)
 

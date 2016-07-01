@@ -6,6 +6,14 @@ Author: Daniel Kroening, 2013
 
 \*******************************************************************/
 
+#ifdef _WIN32
+#define EX_OK 0
+#define EX_USAGE 64
+#define EX_SOFTWARE 70
+#else
+#include <sysexits.h>
+#endif
+
 #include <iostream>
 
 #include <util/string2int.h>
@@ -28,12 +36,12 @@ Function: ld_modet::doit
 
 \*******************************************************************/
 
-bool ld_modet::doit()
+int ld_modet::doit()
 {
   if(cmdline.isset("help"))
   {
     help();
-    return false;
+    return EX_OK;
   }
 
   unsigned int verbosity=1;
@@ -54,7 +62,7 @@ bool ld_modet::doit()
   {
     std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
     std::cout << "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n";
-    return false; // Exit!
+    return EX_OK; // Exit!
   }
 
   if(cmdline.isset("verbosity"))
@@ -112,7 +120,8 @@ bool ld_modet::doit()
   }
     
   // do all the rest
-  bool result=compiler.doit();
+  if(compiler.doit())
+    return 1; // ld uses exit code 1 for all sorts of errors
 
   #if 0
   if(produce_hybrid_binary)
@@ -122,7 +131,7 @@ bool ld_modet::doit()
   }
   #endif
   
-  return result;
+  return EX_OK;
 }
 
 /*******************************************************************\

@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/simplify_expr.h>
+#include <util/pointer_offset_size.h>
 
 #include <langapi/language_util.h>
 
@@ -619,26 +620,31 @@ void linkingt::duplicate_code_symbol(
           "ignoring conflicting weak function declaration");
       }
     }
-    // Linux kernel uses void f(void) as generic prototype
-    else if((old_t.return_type().id()==ID_empty &&
-             old_t.parameters().empty() &&
-             !old_t.has_ellipsis() &&
+    // aliasing may alter the type
+    else if((new_symbol.is_macro &&
+             new_symbol.value.is_not_nil() &&
              old_symbol.value.is_nil()) ||
-            (new_t.return_type().id()==ID_empty &&
-             new_t.parameters().empty() &&
-             !new_t.has_ellipsis() &&
+            (old_symbol.is_macro &&
+             old_symbol.value.is_not_nil() &&
              new_symbol.value.is_nil()))
     {
-      // issue a warning
       link_warning(
         old_symbol,
         new_symbol,
-        "ignoring conflicting void f(void) function declaration");
+        "ignoring conflicting function alias declaration");
+    }
+    // conflicting declarations without a definition, matching return
+    // types
+    else if(base_type_eq(old_t.return_type(), new_t.return_type(), ns) &&
+            old_symbol.value.is_nil() &&
+            new_symbol.value.is_nil())
+    {
+      link_warning(
+        old_symbol,
+        new_symbol,
+        "ignoring conflicting function declarations");
 
-      if(old_t.return_type().id()==ID_empty &&
-         old_t.parameters().empty() &&
-         !old_t.has_ellipsis() &&
-         old_symbol.value.is_nil())
+      if(old_t.parameters().size()<new_t.parameters().size())
       {
         old_symbol.type=new_symbol.type;
         old_symbol.location=new_symbol.location;
@@ -647,8 +653,10 @@ void linkingt::duplicate_code_symbol(
     }
     // mismatch on number of parameters is definitively an error
     else if((old_t.parameters().size()<new_t.parameters().size() &&
+             new_symbol.value.is_not_nil() &&
              !old_t.has_ellipsis()) ||
             (old_t.parameters().size()>new_t.parameters().size() &&
+             old_symbol.value.is_not_nil() &&
              !new_t.has_ellipsis()))
     {
       link_error(
@@ -683,12 +691,20 @@ void linkingt::duplicate_code_symbol(
       }
       if(o_it!=old_t.parameters().end())
       {
-        assert(new_t.has_ellipsis());
+        if(!new_t.has_ellipsis() && old_symbol.value.is_not_nil())
+          link_error(
+            old_symbol,
+            new_symbol,
+            "conflicting parameter counts of function declarations");
         replace=new_symbol.value.is_not_nil();
       }
       else if(n_it!=new_t.parameters().end())
       {
-        assert(old_t.has_ellipsis());
+        if(!old_t.has_ellipsis() && new_symbol.value.is_not_nil())
+          link_error(
+            old_symbol,
+            new_symbol,
+            "conflicting parameter counts of function declarations");
         replace=new_symbol.value.is_not_nil();
       }
 
@@ -709,7 +725,8 @@ void linkingt::duplicate_code_symbol(
             (old_symbol.value.is_nil() && t2.id()==ID_empty);
         }
         // different pointer arguments without implementation may work
-        else if(t1.id()==ID_pointer && t2.id()==ID_pointer &&
+        else if((t1.id()==ID_pointer || t2.id()==ID_pointer) &&
+                pointer_offset_bits(t1, ns)==pointer_offset_bits(t2, ns) &&
                 old_symbol.value.is_nil() && new_symbol.value.is_nil())
         {
           if(warn_msg.empty())
@@ -718,7 +735,8 @@ void linkingt::duplicate_code_symbol(
         // different pointer arguments with implementation - the
         // implementation is always right, even though such code may
         // be severely broken
-        else if(t1.id()==ID_pointer && t2.id()==ID_pointer &&
+        else if((t1.id()==ID_pointer || t2.id()==ID_pointer) &&
+                pointer_offset_bits(t1, ns)==pointer_offset_bits(t2, ns) &&
                 old_symbol.value.is_nil()!=new_symbol.value.is_nil())
         {
           if(warn_msg.empty())
@@ -805,6 +823,7 @@ void linkingt::duplicate_code_symbol(
       old_symbol.value=new_symbol.value;
       old_symbol.type=new_symbol.type; // for parameter identifiers
       old_symbol.is_weak=new_symbol.is_weak;
+      old_symbol.is_macro=new_symbol.is_macro;
     }
     else if(to_code_type(old_symbol.type).get_inlined())
     {
@@ -827,6 +846,209 @@ void linkingt::duplicate_code_symbol(
 
 /*******************************************************************\
 
+Function: linkingt::adjust_object_type_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool linkingt::adjust_object_type_rec(
+  const typet &t1,
+  const typet &t2,
+  adjust_type_infot &info)
+{
+  if(base_type_eq(t1, t2, ns))
+    return false;
+
+  if(t1.id()==ID_symbol ||
+     t1.id()==ID_struct_tag ||
+     t1.id()==ID_union_tag ||
+     t1.id()==ID_c_enum_tag)
+  {
+    const irep_idt &identifier=t1.get(ID_identifier);
+
+    if(info.o_symbols.insert(identifier).second)
+    {
+      bool result=
+        adjust_object_type_rec(follow_tags_symbols(ns, t1), t2, info);
+      info.o_symbols.erase(identifier);
+
+      return result;
+    }
+
+    return false;
+  }
+  else if(t2.id()==ID_symbol ||
+          t2.id()==ID_struct_tag ||
+          t2.id()==ID_union_tag ||
+          t2.id()==ID_c_enum_tag)
+  {
+    const irep_idt &identifier=t2.get(ID_identifier);
+
+    if(info.n_symbols.insert(identifier).second)
+    {
+      bool result=
+        adjust_object_type_rec(t1, follow_tags_symbols(ns, t2), info);
+      info.n_symbols.erase(identifier);
+
+      return result;
+    }
+
+    return false;
+  }
+  else if(t1.id()==ID_pointer && t2.id()==ID_array)
+  {
+    info.set_to_new=true; // store new type
+
+    return false;
+  }
+  else if(t1.id()==ID_array && t2.id()==ID_pointer)
+  {
+    // ignore
+    return false;
+  }
+  else if((t1.id()==ID_incomplete_struct && t2.id()==ID_struct) ||
+          (t1.id()==ID_incomplete_union && t2.id()==ID_union))
+  {
+    info.set_to_new=true; // store new type
+
+    return false;
+  }
+  else if((t1.id()==ID_struct && t2.id()==ID_incomplete_struct) ||
+          (t1.id()==ID_union && t2.id()==ID_incomplete_union))
+  {
+    // ignore
+    return false;
+  }
+  else if(t1.id()!=t2.id())
+  {
+    // type classes do not match and can't be fixed
+    #ifdef DEBUG
+    str << "LINKING: cannot join " << t1.id() << " vs. " << t2.id();
+    debug_msg();
+    #endif
+
+    return true;
+  }
+
+  if(t1.id()==ID_pointer)
+  {
+    #if 0
+    bool s=info.set_to_new;
+    if(adjust_object_type_rec(t1.subtype(), t2.subtype(), info))
+    {
+      link_warning(
+        info.old_symbol,
+        info.new_symbol,
+        "conflicting pointer types for variable");
+      info.set_to_new=s;
+    }
+    #else
+    link_warning(
+      info.old_symbol,
+      info.new_symbol,
+      "conflicting pointer types for variable");
+    #endif
+
+    return false;
+  }
+  else if(t1.id()==ID_array &&
+          !adjust_object_type_rec(t1.subtype(), t2.subtype(), info))
+  {
+    // still need to compare size
+    const exprt &old_size=to_array_type(t1).size();
+    const exprt &new_size=to_array_type(t2).size();
+
+    if((old_size.is_nil() && new_size.is_not_nil()) ||
+       (old_size.is_zero() && new_size.is_not_nil()) ||
+       info.old_symbol.is_weak)
+    {
+      info.set_to_new=true; // store new type
+    }
+    else if(new_size.is_nil() ||
+            new_size.is_zero() ||
+            info.new_symbol.is_weak)
+    {
+      // ok, we will use the old type
+    }
+    else
+    {
+      equal_exprt eq(old_size, new_size);
+
+      if(!simplify_expr(eq, ns).is_true())
+        link_error(
+          info.old_symbol,
+          info.new_symbol,
+          "conflicting array sizes for variable");
+    }
+
+    return false;
+  }
+  else if(t1.id()==ID_struct || t1.id()==ID_union)
+  {
+    const struct_union_typet::componentst &components1=
+      to_struct_union_type(t1).components();
+
+    const struct_union_typet::componentst &components2=
+      to_struct_union_type(t2).components();
+
+    struct_union_typet::componentst::const_iterator
+      it1=components1.begin(), it2=components2.begin();
+    for( ;
+        it1!=components1.end() && it2!=components2.end();
+        ++it1, ++it2)
+    {
+      if(it1->get_name()!=it2->get_name() ||
+         adjust_object_type_rec(it1->type(), it2->type(), info))
+        return true;
+    }
+    if(it1!=components1.end() || it2!=components2.end())
+      return true;
+
+    return false;
+  }
+
+  return true;
+}
+
+/*******************************************************************\
+
+Function: linkingt::adjust_object_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool linkingt::adjust_object_type(
+  const symbolt &old_symbol,
+  const symbolt &new_symbol,
+  bool &set_to_new)
+{
+  #ifdef DEBUG
+  str << "LINKING: trying to adjust types of " << old_symbol.name;
+  debug_msg();
+  #endif
+
+  const typet &old_type=follow_tags_symbols(ns, old_symbol.type);
+  const typet &new_type=follow_tags_symbols(ns, new_symbol.type);
+
+  adjust_type_infot info(old_symbol, new_symbol);
+  bool result=adjust_object_type_rec(old_type, new_type, info);
+  set_to_new=info.set_to_new;
+
+  return result;
+}
+
+/*******************************************************************\
+
 Function: linkingt::duplicate_object_symbol
 
   Inputs:
@@ -845,63 +1067,14 @@ void linkingt::duplicate_object_symbol(
 
   if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
   {
-    const typet &old_type=ns.follow(old_symbol.type);
-    const typet &new_type=ns.follow(new_symbol.type);
-  
-    if(old_type.id()==ID_array && new_type.id()==ID_array &&
-       base_type_eq(old_type.subtype(), new_type.subtype(), ns))
+    bool set_to_new=false;
+    bool failed=
+      adjust_object_type(old_symbol, new_symbol, set_to_new);
+
+    if(failed)
     {
-      // still need to compare size
-      const exprt &old_size=to_array_type(old_type).size();
-      const exprt &new_size=to_array_type(new_type).size();
-      
-      if(old_size.is_nil() && new_size.is_not_nil())
-      {
-        old_symbol.type=new_symbol.type; // store new type
-      }
-      else if(old_size.is_not_nil() && new_size.is_nil())
-      {
-        // ok, we will use the old type
-      }
-      else
-        link_error(
-          old_symbol,
-          new_symbol,
-          "conflicting array sizes for variable");
-    }
-    else if(old_type.id()==ID_pointer && new_type.id()==ID_array)
-    {
-      // store new type
-      old_symbol.type=new_symbol.type;
-    }
-    else if(old_type.id()==ID_array && new_type.id()==ID_pointer)
-    {
-      // ignore
-    }
-    else if(old_type.id()==ID_pointer && new_type.id()==ID_pointer)
-    {
-      link_warning(
-        old_symbol,
-        new_symbol,
-        "conflicting pointer types for variable");
-    }
-    else if((old_type.id()==ID_incomplete_struct &&
-             new_type.id()==ID_struct) ||
-            (old_type.id()==ID_incomplete_union &&
-             new_type.id()==ID_union))
-    {
-      // store new type
-      old_symbol.type=new_symbol.type;
-    }
-    else if((old_type.id()==ID_struct &&
-             new_type.id()==ID_incomplete_struct) ||
-            (old_type.id()==ID_union &&
-             new_type.id()==ID_incomplete_union))
-    {
-      // ignore
-    }
-    else
-    {
+      const typet &old_type=follow_tags_symbols(ns, old_symbol.type);
+
       // provide additional diagnostic output for
       // struct/union/array/enum
       if(old_type.id()==ID_struct ||
@@ -919,6 +1092,8 @@ void linkingt::duplicate_object_symbol(
         new_symbol,
         "conflicting types for variable");
     }
+    else if(set_to_new)
+      old_symbol.type=new_symbol.type;
   }
 
   // care about initializers    
@@ -932,6 +1107,7 @@ void linkingt::duplicate_object_symbol(
     {
       // new_symbol wins
       old_symbol.value=new_symbol.value;
+      old_symbol.is_macro=new_symbol.is_macro;
     }
     else if(!new_symbol.is_weak)
     {

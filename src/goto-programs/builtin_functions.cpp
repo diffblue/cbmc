@@ -1043,6 +1043,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location=function.source_location();
     t->source_location.set("user-provided", true);
     t->source_location.set_property_class(ID_assertion);    
+    t->source_location.set_comment("assertion at "+function.source_location().as_string());
   }
   else if(identifier=="assert" &&
           !ns.lookup(identifier).location.get_function().empty())

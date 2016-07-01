@@ -163,3 +163,23 @@ void compute_called_functions(
   }
   
 }
+
+/*******************************************************************\
+
+Function: compute_called_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: computes the functions that are (potentially) called
+
+\*******************************************************************/
+
+void compute_called_functions(
+  const goto_modelt &goto_model,
+  std::set<irep_idt> &functions)
+{
+  compute_called_functions(goto_model.goto_functions, functions);
+}
+

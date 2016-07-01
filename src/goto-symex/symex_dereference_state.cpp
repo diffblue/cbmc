@@ -118,12 +118,12 @@ void symex_dereference_statet::get_value_set(
   
   #if 0
   std::cout << "**************************\n";
-  state.value_set.output(renaming_ns, std::cout);
+  state.value_set.output(goto_symex.ns, std::cout);
   std::cout << "**************************\n";
   #endif
   
   #if 0
-  std::cout << "E: " << from_expr(renaming_ns, "", expr) << std::endl;
+  std::cout << "E: " << from_expr(goto_symex.ns, "", expr) << std::endl;
   #endif
   
   #if 0
@@ -131,7 +131,7 @@ void symex_dereference_statet::get_value_set(
   for(value_setst::valuest::const_iterator it=value_set.begin();
       it!=value_set.end();
       it++)
-    std::cout << from_expr(renaming_ns, "", *it) << std::endl;
+    std::cout << from_expr(goto_symex.ns, "", *it) << std::endl;
   std::cout << "**************************\n";
   #endif
 }

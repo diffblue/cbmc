@@ -6,8 +6,15 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+#ifdef _WIN32
+#define EX_OK 0
+#define EX_USAGE 64
+#define EX_SOFTWARE 70
+#else
+#include <sysexits.h>
+#endif
+
 #include <cstdio>
-#include <cstdlib> // exit()
 #include <iostream>
 
 #include <util/string2int.h>
@@ -62,7 +69,7 @@ Function: gcc_modet::doit
 
 \*******************************************************************/
 
-bool gcc_modet::doit()
+int gcc_modet::doit()
 {
   act_as_ld=
     base_name=="ld" ||
@@ -72,7 +79,7 @@ bool gcc_modet::doit()
      cmdline.isset("help"))
   {
     help();
-    return false;
+    return EX_OK;
   }
 
   unsigned int verbosity=1;
@@ -101,13 +108,13 @@ bool gcc_modet::doit()
       "Architecture: " << config.this_architecture() << '\n' <<
       "OS: " << config.this_operating_system() << '\n';
 
-    return false; // Exit!
+    return EX_OK; // Exit!
   }
 
   if(cmdline.isset("dumpversion"))
   {
     std::cout << "3.4.4" << std::endl;
-    return false;
+    return EX_OK;
   }
 
   if(cmdline.isset("Wall"))
@@ -147,11 +154,7 @@ bool gcc_modet::doit()
           cmdline.isset('S') ||
           cmdline.isset('E') ||
           !cmdline.have_infile_arg())
-  {
-    int result;
-    result=run_gcc();
-    exit(result);
-  }
+    return run_gcc(); // exit!
   
   // get configuration
   config.set(cmdline);
@@ -299,6 +302,12 @@ bool gcc_modet::doit()
   if(cmdline.isset('l'))
     compiler.libraries=cmdline.get_values('l');
 
+  if(cmdline.isset("static"))
+    compiler.libraries.push_back("c");
+
+  if(cmdline.isset("pthread"))
+    compiler.libraries.push_back("pthread");
+
   if(cmdline.isset('o'))
   {
     // given gcc -o file1 -o file2,
@@ -353,7 +362,7 @@ bool gcc_modet::doit()
           if(exit_code!=0)
           {
             error() << "preprocessing has failed" << eom;
-            return true;
+            return exit_code;
           }
           
           compiler.add_input_file(dest);
@@ -383,25 +392,18 @@ bool gcc_modet::doit()
 
   if(compiler.source_files.empty() &&
      compiler.object_files.empty())
-  {
-    temp_dir.clear();
-    int result;
-    result=run_gcc();
-    exit(result);
-  }
+    return run_gcc(); // exit!
 
   // do all the rest
-  bool result=compiler.doit();
+  if(compiler.doit())
+    return 1; // GCC exit code for all kinds of errors
 
   // We can generate hybrid ELF and Mach-O binaries
   // containing both executable machine code and the goto-binary.
-  if(!result && produce_hybrid_binary)
-  {
-    if(gcc_hybrid_binary())
-      result=true;
-  }
+  if(produce_hybrid_binary)
+    return gcc_hybrid_binary();
   
-  return result;
+  return EX_OK;
 }
 
 /*******************************************************************\
@@ -566,7 +568,7 @@ int gcc_modet::gcc_hybrid_binary()
         have_files=true;
 
     if(!have_files)
-      return 0;
+      return EX_OK;
   }
 
   std::list<std::string> output_files;
@@ -600,7 +602,8 @@ int gcc_modet::gcc_hybrid_binary()
 
   if(output_files.empty() ||
      (output_files.size()==1 &&
-      output_files.front()=="/dev/null")) return 0;
+      output_files.front()=="/dev/null"))
+    return EX_OK;
 
   if(act_as_ld)
     debug() << "Running ld to generate hybrid binary" << eom;
@@ -723,7 +726,7 @@ int gcc_modet::gcc_hybrid_binary()
     #endif
   }
   
-  return result!=0;
+  return result;
 }
 
 /*******************************************************************\

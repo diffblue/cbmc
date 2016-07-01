@@ -135,15 +135,14 @@ As an example, we begin with small C program we call
 </p>
 
 <hr>
-<code>
-int *ptr;<br>
-<br>
-int main(void) {<br>
-&nbsp;&nbsp;if (ptr)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*ptr = 0;<br>
-&nbsp;&nbsp;if (!ptr)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*ptr = 1;<br>
-}</code>
+<pre><code>int *ptr;
+
+int main(void) {
+  if (ptr)
+    *ptr = 0;
+  if (!ptr)
+    *ptr = 1;
+}</code></pre>
 <hr>
 
 <p class="justified">

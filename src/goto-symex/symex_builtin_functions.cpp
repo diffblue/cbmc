@@ -94,8 +94,26 @@ void goto_symext::symex_malloc(
         // Did the size get multiplied?
         mp_integer elem_size=pointer_offset_size(tmp_type, ns);
         mp_integer alloc_size;
-        if(elem_size<0 || to_integer(tmp_size, alloc_size))
+
+        if(elem_size<0)
         {
+        }
+        else if(to_integer(tmp_size, alloc_size) &&
+                tmp_size.id()==ID_mult &&
+                tmp_size.operands().size()==2 &&
+                (tmp_size.op0().is_constant() ||
+                 tmp_size.op1().is_constant()))
+        {
+          exprt s=tmp_size.op0();
+          if(s.is_constant())
+          {
+            s=tmp_size.op1();
+            assert(c_sizeof_type_rec(tmp_size.op0())==tmp_type);
+          }
+          else
+            assert(c_sizeof_type_rec(tmp_size.op1())==tmp_type);
+
+          object_type=array_typet(tmp_type, s);
         }
         else
         {
@@ -216,6 +234,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
 
   exprt tmp=code.op0();
   state.rename(tmp, ns); // to allow constant propagation
+  do_simplify(tmp);
   irep_idt id=get_symbol(tmp);
 
   exprt rhs=gen_zero(lhs.type());
@@ -328,6 +347,7 @@ void goto_symext::symex_printf(
 
   exprt tmp_rhs=rhs;
   state.rename(tmp_rhs, ns);
+  do_simplify(tmp_rhs);
 
   const exprt::operandst &operands=tmp_rhs.operands();
   std::list<exprt> args;
@@ -373,6 +393,7 @@ void goto_symext::symex_input(
   {
     args.push_back(code.operands()[i]);
     state.rename(args.back(), ns);
+    do_simplify(args.back());
   }
 
   const irep_idt input_id=get_string_argument(id_arg, ns);
@@ -409,6 +430,7 @@ void goto_symext::symex_output(
   {
     args.push_back(code.operands()[i]);
     state.rename(args.back(), ns);
+    do_simplify(args.back());
   }
 
   const irep_idt output_id=get_string_argument(id_arg, ns);

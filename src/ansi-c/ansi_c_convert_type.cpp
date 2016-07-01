@@ -33,14 +33,6 @@ void ansi_c_convert_typet::read(const typet &type)
   clear();
   source_location=type.source_location();
   read_rec(type);
-
-  if(!aligned &&
-     type.find(ID_C_alignment).is_not_nil())
-  {
-    aligned=true;
-
-    alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
-  }
 }
 
 /*******************************************************************\
@@ -72,10 +64,17 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_qualifiers.is_ptr64=true;
   else if(type.id()==ID_volatile)
     c_qualifiers.is_volatile=true;
-  else if(type.id()==ID_asm)
+  else if(type.id()==ID_asm &&
+          type.has_subtype() &&
+          type.subtype().id()==ID_string_constant)
   {
-    // These are called 'asm labels' by GCC.
-    // ignore for now
+    c_storage_spec.asm_label=type.subtype().get(ID_value);
+  }
+  else if(type.id()==ID_section &&
+          type.has_subtype() &&
+          type.subtype().id()==ID_string_constant)
+  {
+    c_storage_spec.section=type.subtype().get(ID_value);
   }
   else if(type.id()==ID_const)
     c_qualifiers.is_constant=true;
@@ -108,9 +107,6 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_gcc_attribute_mode)
   {
     gcc_attribute_mode=type;
-  }
-  else if(type.id()==ID_gcc_attribute)
-  {
   }
   else if(type.id()==ID_msc_based)
   {
@@ -233,6 +229,12 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     constructor=true;
   else if(type.id()==ID_destructor)
     destructor=true;
+  else if(type.id()==ID_alias &&
+          type.has_subtype() &&
+          type.subtype().id()==ID_string_constant)
+  {
+    c_storage_spec.alias=type.subtype().get(ID_value);
+  }
   else
     other.push_back(type);
 }
@@ -288,21 +290,28 @@ void ansi_c_convert_typet::write(typet &type)
         error_msg();
         throw 0;
       }
-      else if(type.id()!=ID_empty)
+
+      typet *type_p=&type;
+      if(type.id()==ID_code)
+        type_p=&(to_code_type(type).return_type());
+
+      else if(type_p->id()!=ID_empty)
       {
         err_location(source_location);
-        str << "constructor and destructor required to be type void";
+        str << "constructor and destructor required to be type void, "
+            << "found " << type_p->pretty();
         error_msg();
         throw 0;
       }
 
-      type.id(constructor ? ID_constructor : ID_destructor);
+      type_p->id(constructor ? ID_constructor : ID_destructor);
     }
   }
   else if(constructor || destructor)
   {
     err_location(source_location);
-    str << "constructor and destructor required to be type void";
+    str << "constructor and destructor required to be type void, "
+        << "found " << type.pretty();
     error_msg();
     throw 0;
   }

@@ -56,7 +56,7 @@ path_symex_statet initial_state(
 
 /*******************************************************************\
 
-Function: path_symex_statet::output
+Function: path_symex_statet::get_pc
 
   Inputs:
 
@@ -66,10 +66,10 @@ Function: path_symex_statet::output
 
 \*******************************************************************/
 
-goto_programt::const_targett path_symex_statet::get_instruction() const
+loc_reft path_symex_statet::get_pc() const
 {
   assert(current_thread<threads.size());
-  return locs[threads[current_thread].pc].target;
+  return threads[current_thread].pc;
 }
 
 /*******************************************************************\
@@ -163,6 +163,9 @@ void path_symex_statet::record_step()
   // update our statistics
   depth++;
   
+  if(get_instruction()->is_goto())
+    no_branches++;
+    
   // add the step
   history.generate_successor();
   stept &step=*history;
@@ -198,7 +201,7 @@ bool path_symex_statet::is_feasible(
   
   case decision_proceduret::D_UNSATISFIABLE: return false;
   
-  case decision_proceduret::D_ERROR: throw "error from decsion procedure";
+  case decision_proceduret::D_ERROR: throw "error from decision procedure";
   }
   
   return true; // not really reachable

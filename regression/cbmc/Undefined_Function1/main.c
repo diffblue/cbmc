@@ -1,3 +1,5 @@
+#include <assert.h>
+
 int f(int i, int j);
 
 int main()

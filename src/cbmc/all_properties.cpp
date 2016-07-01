@@ -58,17 +58,32 @@ public:
     std::string description;
     
     // if failed, we compute a goto_trace for the first failing instance
-    bool failed;
+    enum statust { UNKNOWN, FAILURE, SUCCESS, ERROR } status;
     goto_tracet goto_trace;
+    
+    std::string status_string() const
+    {
+      switch(status)
+      {
+      case UNKNOWN: return "UNKNOWN";
+      case FAILURE: return "FAILURE";
+      case SUCCESS: return "SUCCESS";
+      case ERROR: return "ERROR";
+      }
+
+      // make some poor compilers happy
+      assert(false);
+      return "";
+    }
     
     explicit goalt(
       const goto_programt::instructiont &instruction):
-      failed(false)
+      status(statust::UNKNOWN)
     {
       description=id2string(instruction.source_location.get_comment());
     }
     
-    goalt():failed(false)
+    goalt():status(statust::UNKNOWN)
     {
     }
     
@@ -115,7 +130,7 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
     goalt &g=g_it->second;
     
     // failed already?
-    if(g.failed) continue;
+    if(g.status==goalt::statust::FAILURE) continue;
   
     // check whether failed
     for(goalt::instancest::const_iterator
@@ -127,7 +142,7 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
       
       if(solver.l_get(cond).is_false())
       {
-        g.failed=true;
+        g.status=goalt::statust::FAILURE;
         symex_target_equationt::SSA_stepst::iterator next=*c_it;
         next++; // include the assertion
         build_goto_trace(bmc.equation, next, solver, bmc.ns, g.goto_trace);
@@ -195,23 +210,35 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   }
   
   cover_goalst cover_goals(solver);
-  
+
+  cover_goals.set_message_handler(get_message_handler());  
   cover_goals.register_observer(*this);
   
-  for(goal_mapt::const_iterator
-      it=goal_map.begin();
-      it!=goal_map.end();
-      it++)
+  for(const auto & g : goal_map)
   {
     // Our goal is to falsify a property, i.e., we will
     // add the negation of the property as goal.
-    literalt p=!solver.convert(it->second.as_expr());
+    literalt p=!solver.convert(g.second.as_expr());
     cover_goals.add(p);
   }
 
   status() << "Running " << solver.decision_procedure_text() << eom;
+  
+  bool error=false;
 
-  cover_goals();  
+  if(cover_goals()==decision_proceduret::D_ERROR)
+  {
+    error=true;
+    for(auto & g : goal_map)
+      if(g.second.status==goalt::statust::UNKNOWN)
+        g.second.status=goalt::statust::ERROR;
+  }
+  else
+  {
+    for(auto & g : goal_map)
+      if(g.second.status==goalt::statust::UNKNOWN)
+        g.second.status=goalt::statust::SUCCESS;
+  }
 
   // output runtime
 
@@ -237,9 +264,9 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
     {
       xmlt xml_result("result");
       xml_result.set_attribute("property", id2string(it->first));
-      xml_result.set_attribute("status", it->second.failed?"FAILURE":"SUCCESS");
+      xml_result.set_attribute("status", it->second.status_string());
 
-      if(it->second.failed)
+      if(it->second.status==goalt::statust::FAILURE)
         convert(bmc.ns, it->second.goto_trace, xml_result.new_element());
 
       std::cout << xml_result << "\n";
@@ -247,7 +274,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
     else
     {
       status() << "[" << it->first << "] "
-               << it->second.description << ": " << (it->second.failed?"FAILED":"OK")
+               << it->second.description << ": " << it->second.status_string()
                << eom;
     }
   }
@@ -259,9 +286,18 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
            << cover_goals.iterations() << " iteration"
            << (cover_goals.iterations()==1?"":"s")
            << ")" << eom;
+
+  if(error)
+    return safety_checkert::ERROR;
+
+  bool safe=(cover_goals.number_covered()==0);
+
+  if(safe)
+    bmc.report_success(); // legacy, might go away
+  else
+    bmc.report_failure(); // legacy, might go away
   
-  return (cover_goals.number_covered()==0)?
-    safety_checkert::SAFE:safety_checkert::UNSAFE;
+  return safe?safety_checkert::SAFE:safety_checkert::UNSAFE;
 }
 
 /*******************************************************************\

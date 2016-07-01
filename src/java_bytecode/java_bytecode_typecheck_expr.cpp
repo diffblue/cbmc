@@ -42,6 +42,8 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     else if(statement==ID_java_new_array)
       typecheck_expr_java_new_array(to_side_effect_expr(expr));
   }
+  else if(expr.id()==ID_java_string_literal)
+    typecheck_expr_java_string_literal(expr);
   else if(expr.id()==ID_member)
     typecheck_expr_member(to_member_expr(expr));
 }
@@ -86,6 +88,54 @@ void java_bytecode_typecheckt::typecheck_expr_java_new_array(side_effect_exprt &
 
 /*******************************************************************\
 
+Function: java_bytecode_typecheckt::typecheck_expr_java_string_literal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
+{ 
+  const irep_idt value=expr.get(ID_value);
+
+  // we create a symbol for these
+  const irep_idt identifier="java::java.lang.String.Literal."+
+    id2string(value);
+
+  symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table.symbols.find(identifier);
+
+  const symbol_typet string_type("java::java.lang.String");
+  
+  if(s_it==symbol_table.symbols.end())
+  {
+    // no, create the symbol
+    symbolt new_symbol;
+    new_symbol.name=identifier;
+    new_symbol.type=string_type;
+    new_symbol.base_name="Literal";
+    new_symbol.pretty_name=value;
+    new_symbol.mode=ID_java;
+    new_symbol.is_type=false;
+    new_symbol.is_lvalue=true;
+    
+    if(symbol_table.add(new_symbol))
+    {
+      error() << "failed to add string literal symbol to symbol table" << eom;
+      throw 0;
+    }
+  }
+  
+  expr=address_of_exprt(
+    symbol_exprt(identifier, string_type));
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_typecheckt::typecheck_expr_symbol
 
   Inputs:
@@ -106,7 +156,6 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
   
   if(s_it==symbol_table.symbols.end())
   {
-    #if 1
     assert(has_prefix(id2string(identifier), "java::"));
   
     // no, create the symbol
@@ -128,13 +177,10 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
     }
     
     if(symbol_table.add(new_symbol))
-      throw "failed to add expression symbol to symbol table";
-    #else
-    str << "failed to find expression symbol `"
-        << identifier << "' in symbol table";
-    throw 0;
-    
-    #endif
+    {
+      error() << "failed to add expression symbol to symbol table" << eom;
+      throw 0;
+    }
   }
   else
   {

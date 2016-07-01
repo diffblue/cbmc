@@ -1,5 +1,9 @@
 <!--#include virtual="header.inc" -->
 
+<link rel="stylesheet" href="highlight/styles/default.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
 <p><a href="./">CPROVER Manual TOC</a></p>
 
 <h2>Modeling with Assertions and Assumptions</h2>
@@ -14,9 +18,8 @@ href="http://en.wikipedia.org/wiki/Assert.h">assert.h</a>, which offers a
 macro <code>assert(cond)</code>. When executing a statement such
 as</p>
 
-<code>
-&nbsp;&nbsp;assert(p!=NULL);
-</code>
+<pre><code>  assert(p!=NULL);
+</code></pre>
 
 <p class="justified">the execution is aborted with an error message if the
 condition evaluates to <i>false</i>, i.e., if <code>p</code> is NULL in the
@@ -29,9 +32,8 @@ using the <code>--no-assertions</code> command line option.</p>
 <p class="justified">In addition, there is a CPROVER-specific way
 to specify assertions, using the built-in function __CPROVER_assert:</p>
 
-<code>
-&nbsp;&nbsp;__CPROVER_assert(p!=NULL, "p is not NULL");
-</code>
+<pre><code>  __CPROVER_assert(p!=NULL, "p is not NULL");
+</code></pre>
 
 <p class="justified">The (mandatory) string that is passed as the
 second argument provides an informal description of the assertion.
@@ -44,29 +46,27 @@ to check a range of choices.  As an example, the following code fragment
 asserts that <b>all</b> elements of the array are zero:
 </p>
 
-<code>
-&nbsp;&nbsp;int a[100], i;<br>
-<br>
-&nbsp;&nbsp;...<br>
-<br>
-&nbsp;&nbsp;i=nondet_uint();<br>
-&nbsp;&nbsp;if(i>=0 && i<100)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;assert(a[i]==0);
-</code>
+<pre><code>  int a[100], i;
+
+  ...
+
+  i=nondet_uint();
+  if(i>=0 && i<100)
+    assert(a[i]==0);
+</code></pre>
 
 <p class="justified">The nondeterministic choice will guess the
 element of the array that is nonzero. The code fragment above
 is therefore equivalent to
 </p>
 
-<code>
-&nbsp;&nbsp;int a[100], i;<br>
-<br>
-&nbsp;&nbsp;...<br>
-<br>
-&nbsp;&nbsp;for(i=0; i<100; i++)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;assert(a[i]==0);
-</code>
+<pre><code>  int a[100], i;
+
+  ...
+
+  for(i=0; i<100; i++)
+    assert(a[i]==0);
+</code></pre>
 
 <p class="justified">Future CPROVER releases will
 support explicit quantifiers with a syntax that resembles Spec#:
@@ -87,20 +87,19 @@ a nondeterministic choice that returns a number from 1 to 100. There
 is no integer type with this range. We therefore use __CPROVER_assume
 to restrict the range of a nondeterministically chosen integer:</p>
 
-<code>
-unsigned int nondet_uint();<br>
-<br>
-unsigned int one_to_hundred()<br>
-{<br>
-&nbsp;&nbsp;unsigned int result=nondet_uint();<br>
-&nbsp;&nbsp;__CPROVER_assume(result>=1 && result<=100);<br>
-&nbsp;&nbsp;return result;<br>
-}</code>
+<pre><code>unsigned int nondet_uint();
+
+unsigned int one_to_hundred()
+{
+  unsigned int result=nondet_uint();
+  __CPROVER_assume(result>=1 && result<=100);
+  return result;
+}</code></pre>
 
 <p class="justified">The function above returns the desired integer from 1
-to 100.  <font color="#ef2020">You must ensure that the condition given as an assumption is
-actually satisfiable by some nondeterministic choice, or otherwise
-the model checking step will pass vacuously.</font></p>
+to 100.  <font color="#ef2020">You must ensure that the condition given as
+an assumption is actually satisfiable by some nondeterministic choice, or
+otherwise the model checking step will pass vacuously.</font></p>
 
 <p class="justified">Also note that assumptions are never retroactive: They
 only affect assertions (or other properties) that follow them in program
@@ -109,45 +108,42 @@ the assumption has no effect on the assertion, which means that
 the assertion will fail:
 </p>
 
-<code>
-&nbsp;&nbsp;x=nondet_uint();<br>
-&nbsp;&nbsp;assert(x==100);<br>
-&nbsp;&nbsp;__CPROVER_assume(x==100);<br>
-</code>
+<pre><code>  x=nondet_uint();
+  assert(x==100);
+  __CPROVER_assume(x==100);
+</code></pre>
 
 <p class="justified">
 Assumptions do restrict the search space, but only for assertions that follow.
 As an example, the following program will pass:</p>
 
-<code>
-int main() {<br>
-&nbsp;&nbsp;int x;<br>
-<br>
-&nbsp;&nbsp;__CPROVER_assume(x>=1 && x<=100000);<br>
-<br>
-&nbsp;&nbsp;x*=-1;<br>
-<br>
-&nbsp;&nbsp;__CPROVER_assert(x<0, "x is negative");<br>
+<pre><code>int main() {
+  int x;
+
+  __CPROVER_assume(x>=1 && x<=100000);
+
+  x*=-1;
+
+  __CPROVER_assert(x<0, "x is negative");
 }
-</code>
+</code></pre>
 
 <p class="justified">Beware that nondeterminism cannot be used to obtain
 the effect of universal quantification in assumptions. As an example,
 </p>
 
-<code>
-int main() {<br>
-&nbsp;&nbsp;int a[10], x, y;<br>
-<br>
-&nbsp;&nbsp;x=nondet_int();<br>
-&nbsp;&nbsp;y=nondet_int();<br>
-&nbsp;&nbsp;__CPROVER_assume(x>=0 && x<10 && y>=0 && y<10);<br>
-<br>
-&nbsp;&nbsp;__CPROVER_assume(a[x]>=0);<br>
-<br>
-&nbsp;&nbsp;assert(a[y]>=0);<br>
+<pre><code>int main() {
+  int a[10], x, y;
+
+  x=nondet_int();
+  y=nondet_int();
+  __CPROVER_assume(x>=0 && x<10 && y>=0 && y<10);
+
+  __CPROVER_assume(a[x]>=0);
+
+  assert(a[y]>=0);
 }
-</code>
+</code></pre>
 
 <p class="justified">fails, as there is a choice of x and y which
 results in a counterexample (any choice in which x and y are different).

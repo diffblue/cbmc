@@ -163,6 +163,8 @@ bool compilet::add_input_file(const std::string &file_name)
   if(r==std::string::npos)
   {
     // a file without extension; will ignore
+    warning() << "input file `" << file_name
+              << "' has no extension, not considered" << eom;
     return false;
   }
   
@@ -208,18 +210,7 @@ bool compilet::add_input_file(const std::string &file_name)
     }
 
     // unpack now
-    #ifdef _WIN32
-    if(file_name[0]!='/' && file_name[1]!=':')
-    #else
-    if(file_name[0]!='/')
-    #endif
-    {
-      cmd << "ar x " << concat_dir_file(working_directory, file_name);
-    }
-    else
-    {
-      cmd << "ar x " << file_name;
-    }
+    cmd << "ar x " << concat_dir_file(working_directory, file_name);
     
     FILE *stream;
 
@@ -407,6 +398,14 @@ bool compilet::link()
   
   if(mode==COMPILE_LINK_EXECUTABLE)
   {
+    // new symbols may have been added to a previously linked file
+    // make sure a new entry point is created that contains all
+    // static initializers
+    compiled_functions.function_map.erase("__CPROVER_initialize");
+
+    symbol_table.remove(goto_functionst::entry_point());
+    compiled_functions.function_map.erase(goto_functionst::entry_point());
+
     if(ansi_c_entry_point(symbol_table, "main", ui_message_handler))
       return true;
 
@@ -850,6 +849,7 @@ void compilet::convert_symbols(goto_functionst &dest)
       assert(s_it!=symbol_table.symbols.end());
 
       if(s_it->second.type.id()==ID_code &&
+         !s_it->second.is_macro &&
           s_it->second.value.id()!="compiled" &&
           s_it->second.value.is_not_nil())
       {

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 
@@ -103,14 +104,14 @@ void interval_domaint::transform(
       locationt next=from;
       next++;
       if(next==to)
-        assume_rec(not_exprt(instruction.guard));
+        assume(not_exprt(instruction.guard), ns);
       else
-        assume_rec(instruction.guard);
+        assume(instruction.guard, ns);
     }
     break;
   
   case ASSUME:
-    assume_rec(instruction.guard);
+    assume(instruction.guard, ns);
     break;
   
   case FUNCTION_CALL:
@@ -154,16 +155,14 @@ bool interval_domaint::merge(
     const int_mapt::const_iterator b_it=b.int_map.begin();
     if(b_it==b.int_map.end())
     {
-      int_mapt::iterator next=it;
-      next++; // will go away with C++11, as erase() returns next
-      int_map.erase(it);
-      it=next;
+      it=int_map.erase(it);
       result=true;
     }
     else
     {
-      if(it->second.join(b_it->second))
-        result=true;
+      integer_intervalt previous=it->second;
+      it->second.join(b_it->second);
+      if(it->second!=previous) result=true;
         
       it++;
     }
@@ -175,16 +174,14 @@ bool interval_domaint::merge(
     const float_mapt::const_iterator b_it=b.float_map.begin();
     if(b_it==b.float_map.end())
     {
-      float_mapt::iterator next=it;
-      next++; // will go away with C++11, as erase() returns next
-      float_map.erase(it);
-      it=next;
+      it=float_map.erase(it);
       result=true;
     }
     else
     {
-      if(it->second.join(b_it->second))
-        result=true;
+      ieee_float_intervalt previous=it->second;
+      it->second.join(b_it->second);
+      if(it->second!=previous) result=true;
         
       it++;
     }
@@ -273,12 +270,15 @@ void interval_domaint::assume_rec(
     return;
   }
   
+  if(id==ID_notequal)
+    return; // won't do split
+  
   if(id==ID_ge)
     return assume_rec(rhs, ID_le, lhs);    
     
   if(id==ID_gt)
     return assume_rec(rhs, ID_lt, lhs);    
-    
+
   // we now have lhs <  rhs or
   //             lhs <= rhs
 
@@ -356,6 +356,25 @@ void interval_domaint::assume_rec(
       if(rhs_i.is_bottom()) make_bottom();
     }
   }
+}
+
+/*******************************************************************\
+
+Function: interval_domaint::assume_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void interval_domaint::assume(
+  const exprt &cond,
+  const namespacet &ns)
+{
+  assume_rec(simplify_expr(cond, ns), false);
 }
 
 /*******************************************************************\

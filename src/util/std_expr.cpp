@@ -125,20 +125,15 @@ static void build_object_descriptor_rec(
   {
     const member_exprt &member=to_member_expr(expr);
     const exprt &struct_op=member.struct_op();
-    const typet &struct_type=ns.follow(struct_op.type());
 
     build_object_descriptor_rec(ns, struct_op, dest);
 
-    if(struct_type.id()==ID_union)
-      return;
-
-    mp_integer offset=
-      member_offset(to_struct_type(struct_type),
-                    member.get_component_name(), ns);
-    assert(offset>=0);
+    exprt offset=member_offset_expr(member, ns);
+    assert(offset.is_not_nil());
 
     dest.offset()=
-      plus_exprt(dest.offset(), from_integer(offset, index_type));
+      plus_exprt(dest.offset(),
+                 typecast_exprt(offset, index_type));
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
@@ -153,6 +148,14 @@ static void build_object_descriptor_rec(
       plus_exprt(dest.offset(),
                  typecast_exprt(to_byte_extract_expr(expr).offset(),
                                 index_type));
+  }
+  else if(expr.id()==ID_typecast)
+  {
+    const typecast_exprt &tc=to_typecast_expr(expr);
+
+    dest.object()=tc.op();
+
+    build_object_descriptor_rec(ns, tc.op(), dest);
   }
 }
 

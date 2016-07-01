@@ -1,7 +1,11 @@
 
 class A
 {
-  public void dummy() {}
+  public void dummy()
+  {
+    // check some setup
+    assert this instanceof A;
+  }
 
   public B b;
 }

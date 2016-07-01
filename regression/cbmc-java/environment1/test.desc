@@ -1,0 +1,9 @@
+CORE
+Main.class
+--all-properties
+^EXIT=10$
+^SIGNAL=0$
+^\[assertion.1\] assertion at file Main.java line 5: SUCCESS$
+^\[assertion.2\] assertion at file Main.java line 6: FAILURE$
+--
+^warning: ignoring

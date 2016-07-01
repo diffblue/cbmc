@@ -119,9 +119,10 @@ void delete_directory(const std::string &path)
 
 Function: concat_dir_file
 
-  Inputs:
+  Inputs: directory name and file name
 
- Outputs:
+ Outputs: concatenation of directory and file, if the file path is
+          relative
 
  Purpose:
 
@@ -131,8 +132,12 @@ std::string concat_dir_file(const std::string &directory,
                             const std::string &file_name)
 {
   #ifdef _WIN32
-  return directory+"\\"+file_name;
+  return  (file_name.size()>1 &&
+           file_name[0]!='/' &&
+           file_name[1]!=':') ?
+           file_name : directory+"\\"+file_name;
   #else
-  return directory+"/"+file_name;
+  return (!file_name.empty() && file_name[0]=='/') ?
+          file_name : directory+"/"+file_name;
   #endif
 }

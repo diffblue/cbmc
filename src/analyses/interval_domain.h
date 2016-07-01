@@ -11,10 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ieee_float.h>
 #include <util/mp_arith.h>
+#include <util/interval_template.h>
 
 #include "ai.h"
-#include "interval_analysis.h"
-#include "intervals.h"
+
+typedef interval_template<mp_integer> integer_intervalt;
+typedef interval_template<ieee_floatt> ieee_float_intervalt;
 
 class interval_domaint:public ai_domain_baset
 {
@@ -57,6 +59,8 @@ public:
 
   exprt make_expression(const symbol_exprt &) const;
   
+  void assume(const exprt &, const namespacet &);
+
   inline static bool is_int(const typet &src)
   {
     return src.id()==ID_signedbv || src.id()==ID_unsignedbv;
@@ -67,11 +71,6 @@ public:
     return src.id()==ID_floatbv;
   }
 
-  inline void assume(const exprt &e)
-  {
-    return assume_rec(e);
-  }
-  
   inline bool is_bottom() const
   {
     return bottom;

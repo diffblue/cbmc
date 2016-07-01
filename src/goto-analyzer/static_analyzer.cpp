@@ -20,13 +20,12 @@ class static_analyzert:public messaget
 {
 public:
   static_analyzert(
-    const goto_functionst &_goto_functions,
-    const namespacet &_ns,
+    const goto_modelt &_goto_model,
     const optionst &_options,
     message_handlert &_message_handler):
     messaget(_message_handler),
-    goto_functions(_goto_functions),
-    ns(_ns),
+    goto_functions(_goto_model.goto_functions),
+    ns(_goto_model.symbol_table),
     options(_options)
   {
   }
@@ -35,7 +34,7 @@ public:
 
 protected:
   const goto_functionst &goto_functions;
-  const namespacet &ns;
+  const namespacet ns;
   const optionst &options;
 
   // analyses
@@ -91,7 +90,7 @@ tvt static_analyzert::eval(goto_programt::const_targett t)
 {
   exprt guard=t->guard;
   interval_domaint d=interval_analysis[t];
-  d.assume(not_exprt(guard));
+  d.assume(not_exprt(guard), ns);
   if(d.is_bottom()) return tvt(true);
   return tvt::unknown();          
 }
@@ -126,15 +125,18 @@ void static_analyzert::plain_text_report()
       if(!i_it->is_assert()) continue;
       
       tvt r=eval(i_it);
+      
+      result() << '[' << i_it->source_location.get_property_id()
+               << ']' << ' ';
 
       result() << i_it->source_location;
       if(!i_it->source_location.get_comment().empty())
         result() << ", " << i_it->source_location.get_comment();
       result() << ": ";
       if(r.is_true())
-        result() << "TRUE";
+        result() << "SUCCESS";
       else if(r.is_false())
-        result() << "FALSE";
+        result() << "FAILURE";
       else
         result() << "UNKNOWN";
       result() << eom;
@@ -280,13 +282,12 @@ Function: static_analyzer
 \*******************************************************************/
 
 bool static_analyzer(
-  const goto_functionst &goto_functions,
-  const namespacet &ns,
+  const goto_modelt &goto_model,
   const optionst &options,
   message_handlert &message_handler)
 {
   return static_analyzert(
-    goto_functions, ns, options, message_handler)();
+    goto_model, options, message_handler)();
 }
 
 /*******************************************************************\
@@ -302,11 +303,10 @@ Function: show_intervals
 \*******************************************************************/
 
 void show_intervals(
-  const goto_functionst &goto_functions,
-  const namespacet &ns,
+  const goto_modelt &goto_model,
   std::ostream &out)
 {
   ait<interval_domaint> interval_analysis;
-  interval_analysis(goto_functions, ns);
-  interval_analysis.output(ns, goto_functions, out);
+  interval_analysis(goto_model);
+  interval_analysis.output(goto_model, out);
 }

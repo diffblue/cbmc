@@ -780,11 +780,27 @@ public:
     {
       return get(ID_C_base_name);
     }
+    
+    inline bool get_this() const
+    {
+      return get_bool(ID_C_this);
+    }
+
+    inline void set_this()
+    {
+      set(ID_C_this, true);
+    }
   };
   
   inline bool has_ellipsis() const
   {
     return find(ID_parameters).get_bool(ID_ellipsis);
+  }
+  
+  inline bool has_this() const
+  {
+    const parameterst &p=parameters();
+    return !p.empty() && p.front().get_this();
   }
 
   inline bool is_KnR() const

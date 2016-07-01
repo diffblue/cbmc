@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 
+#include <goto-programs/get_goto_model.h>
+
 #include <langapi/language_ui.h>
 
 #include "path_search.h"
@@ -22,7 +24,7 @@ class optionst;
 #define SYMEX_OPTIONS \
   "(function):" \
   "D:I:" \
-  "(depth):(context-bound):(unwind):" \
+  "(depth):(context-bound):(branch-bound):(unwind):" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
   "(signed-overflow-check)(unsigned-overflow-check)(nan-check)" \
   "(float-overflow-check)" \
@@ -31,12 +33,13 @@ class optionst;
   "(little-endian)(big-endian)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
+  "(bfs)(dfs)(locs)" \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \
   "(ppc-macos)(unsigned-char)" \
   "(string-abstraction)(no-arch)(arch):(floatbv)(fixedbv)" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(show-locs)(show-vcc)(show-properties)(show-trace)(show-goto-functions)" \
-  "(property):" \
+  "(property):(stop-on-fail)(eager-infeasibility)" \
   "(no-simplify)(no-unwinding-assertions)(no-propagation)"
   // the last line is for CBMC-regression testing only
 
@@ -49,23 +52,13 @@ public:
   virtual void help();
 
   symex_parse_optionst(int argc, const char **argv);
-  symex_parse_optionst(
-    int argc,
-    const char **argv,
-    const std::string &extra_options);
 
 protected:
+  get_goto_modelt goto_model;
+
   void get_command_line_options(optionst &options);
-
-  bool get_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
-
-  bool process_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
-    
-  bool set_properties(goto_functionst &goto_functions);
+  bool process_goto_program(const optionst &options);
+  bool set_properties();
 
   void report_success();
   void report_failure();

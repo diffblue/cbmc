@@ -1,5 +1,9 @@
 <!--#include virtual="header.inc" -->
 
+<link rel="stylesheet" href="highlight/styles/default.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
 <p><a href="./">CPROVER Manual TOC</a></p>
 
 <h2>CBMC: Bounded Model Checking for C/C++ and Java</h2>
@@ -27,14 +31,12 @@ As an example, consider the following simple program, named
 <a href="file1.c">file1.c</a>:
 <p/>
 
-<hr>
-<code>
-int puts(const char *s) { }<br><br>
-int main(int argc, char **argv) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;puts(argv[2]);<br>
+<pre><code class="c">int puts(const char *s) { }
+
+int main(int argc, char **argv) {
+  puts(argv[2]);
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 Of course, this program is faulty, as the <code>argv</code> array might have fewer
@@ -59,10 +61,10 @@ domains</a>.  More detail on automatically generated properties is provided
 <a href="properties.shtml">here</a>.</p>
 
 <p class="justified">
-Note that automatically generated properties need not necessarily correspond
-to bugs &ndash; these are just <i>potential</i> flaws, as abstract
-interpretation might be imprecise.  Whether one of these properties
-holds or corresponds to a bug needs to be determined by further analysis.
+Note that these automatically generated properties need not necessarily
+correspond to bugs &ndash; these are just <i>potential</i> flaws, as
+abstract interpretation might be imprecise.  Whether these properties
+hold or correspond to actual bugs needs to be determined by further analysis.
 </p>
 
 <p class="justified">
@@ -87,17 +89,40 @@ holds. Let's run the decision procedure:</p>
 </code>
 
 <p class="justified">
-CBMC transforms the equation you have seen before into CNF and passes it
-to a SAT solver (more background on this step is in the book
-on <a href="http://www.decision-procedures.org/">Decision Procedures</a>).
-CBMC can now detect that the equation is actually not valid,
-and thus, there is a bug in the program. It prints a counterexample trace,
-i.e., a program trace that ends in a state which violates the property. In
-our example, the program trace ends in the faulty array access. It also
-shows the values the input variables must have for the bug to occur. In this
-example, <code>argc</code> must be one to trigger the out-of-bounds array access.
-If you add a branch to the example that requires that <code>argc&gt;=3</code>,
-the bug is fixed and CBMC will report a successful verification run.</p>
+CBMC transforms the equation you have seen before into CNF and passes it to
+a SAT solver (more background on this step is in the book on <a
+href="http://www.decision-procedures.org/">Decision Procedures</a>).  It
+then determines which of the properties that it has generated for the
+program hold and which do not.  Using the SAT solver, CBMC detects that the
+property for the object bounds of <code>argv</code> does not hold, and will
+thus print a line as follows:
+</p>
+
+<code>
+[main.pointer_dereference.6] dereference failure: object bounds in argv[(signed long int)2]: FAILURE
+</code>
+
+<h3>Counterexample Traces</h3>
+
+<p class="justified">
+Let us have a closer look at this property and why it fails. To aid the
+understanding of the problem, CBMC can generate a <i>counterexample
+trace</i> for failed properties. To obtain this trace, run
+</P
+
+<code>
+&nbsp;&nbsp;cbmc file1.c --bounds-check --pointer-check --property main.pointer_dereference.6
+</code>
+
+<p class="justified">
+CBMC then prints a counterexample trace, i.e., a program trace that begins
+with <code>main</code> and ends in a state which violates the property.  In
+our example, the program trace ends in the faulty array access.  It also
+shows the values the input variables must have for the bug to occur.  In
+this example, <code>argc</code> must be one to trigger the out-of-bounds
+array access.  If you add a branch to the example that requires that
+<code>argc&gt;=3</code>, the bug is fixed and CBMC will report that the
+proofs of all properties have been successful.</p>
 
 <h3>Verifying Modules</h3>
 
@@ -109,17 +134,15 @@ is also useful for verifying program modules. Consider the following example,
 called <a href="file2.c">file2.c</a>:
 </p>
 
-<hr>
-<code>
-int array[10];<br><br>
-int sum() {<br>
-&nbsp;&nbsp;unsigned i, sum;<br><br>
-&nbsp;&nbsp;sum=0;<br>
-&nbsp;&nbsp;for(i=0; i&lt;10; i++)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;sum+=array[i];<br>
+<pre><code>int array[10];
+int sum() {
+  unsigned i, sum;
+
+  sum=0;
+  for(i=0; i&lt;10; i++)
+    sum+=array[i];
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 In order to set the entry point to the <code>sum</code> function, run
@@ -129,34 +152,40 @@ In order to set the entry point to the <code>sum</code> function, run
 &nbsp;&nbsp;cbmc file2.c --function sum --bounds-check
 </code>
 
+<p class="justified">
+It is often necessary to build a suitable <i>harness</i> for the function
+in order to set up the environment appropriately.
+</p>
+
 <h3>Loop Unwinding</h3>
 
 <p class="justified">
-You will note that CBMC unwinds the <code>for</code> loop in the program.
-As CBMC performs Bounded Model Checking, all loops have to have a finite
-upper run-time bound in order to guarantee that all bugs are found.  CBMC
-can optionally check that enough unwinding is performed.  As an example, consider
-the program <a href="binsearch.c">binsearch.c</a>:</p>
+When running the previous example, you will have noted that CBMC unwinds the
+<code>for</code> loop in the program.  As CBMC performs Bounded Model
+Checking, all loops have to have a finite upper run-time bound in order to
+guarantee that all bugs are found.  CBMC can optionally check that enough
+unwinding is performed.  As an example, consider the program <a
+href="binsearch.c">binsearch.c</a>:
+</p>
 
-<hr>
-<code>
-int binsearch(int x) {<br>
-&nbsp;&nbsp;int a[16];<br>
-&nbsp;&nbsp;signed low=0, high=16;<br><br>
-&nbsp;&nbsp;while(low&lt;high) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;signed middle=low+((high-low)>>1);<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(a[middle]&lt;x)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;high=middle;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;else if(a[middle]&gt;x)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;low=middle+1;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;else // a[middle]=x !<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return middle;<br>
-&nbsp;&nbsp;}<br><br>   
-&nbsp;&nbsp;return -1;<br>
+<pre><code>int binsearch(int x) {
+  int a[16];
+  signed low=0, high=16;
+
+  while(low&lt;high) {
+    signed middle=low+((high-low)>>1);
+
+    if(a[middle]&lt;x)
+      high=middle;
+    else if(a[middle]&gt;x)
+      low=middle+1;
+    else // a[middle]==x
+      return middle;
+  }
+
+  return -1;
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 If you run CBMC on this function, you will notice that the unwinding
@@ -171,10 +200,13 @@ command line argument:</p>
 <p class="justified">
 CBMC verifies that verifies the array accesses are within the bounds; note
 that this actually depends on the result of the right shift.  In addition,
-as CBMC is given the option <code>--unwinding-assertions</code>, it also
-checks that enough unwinding is done, i.e., it proves a run-time bound.  For
-any lower unwinding bound, there are traces that require more loop
-iterations.  Thus, CBMC will produce an appropriate counterexample.
+as CBMC is given the option
+<nobr><code>--unwinding-assertions</code></nobr>, it also checks that enough
+unwinding is done, i.e., it proves a run-time bound.  For any lower
+unwinding bound, there are traces that require more loop iterations.  Thus,
+CBMC will report that the unwinding assertion has failed. As usual, a counterexample
+trace that documents this can be obtained with the option
+<code>--property</code>.
 </p>
 
 <h3>Unbounded Loops</h3>
@@ -186,48 +218,45 @@ all bugs. The following program
 (<a href="lock-example.c">lock-example.c</a>) is an example
 of a program with a user-specified property:</p>
 
-<hr>
-<code>
-_Bool nondet_bool();<br>
-_Bool LOCK = 0;<br>
-<br>
-_Bool lock() {<br>
-&nbsp;&nbsp;if(nondet_bool()) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;assert(!LOCK);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;LOCK=1;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return 1; }<br>
-<br>
-&nbsp;&nbsp;return 0;<br>
-}<br>
-<br>
-void unlock() {<br>
-&nbsp;&nbsp;assert(LOCK);<br>
-&nbsp;&nbsp;LOCK=0;<br>
-}<br>
-<br>
-int main() {<br>
-&nbsp;&nbsp;unsigned got_lock = 0;<br>
-&nbsp;&nbsp;int times;<br>
-<br>
-&nbsp;&nbsp;while(times > 0) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(lock()) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;got_lock++;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* critical section */<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(got_lock!=0)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unlock();<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;got_lock--;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;times--;<br>
+<pre><code>_Bool nondet_bool();
+_Bool LOCK = 0;
+
+_Bool lock() {
+  if(nondet_bool()) {
+    assert(!LOCK);
+    LOCK=1;
+    return 1; }
+
+  return 0;
+}
+
+void unlock() {
+  assert(LOCK);
+  LOCK=0;
+}
+
+int main() {
+  unsigned got_lock = 0;
+  int times;
+
+  while(times > 0) {
+    if(lock()) {
+      got_lock++;
+      /* critical section */
+    }
+
+    if(got_lock!=0)
+      unlock();
+
+    got_lock--;
+    times--;
 } }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
-The <code>while</code> loop in the <code>main</code> function has no (useful) run-time
-bound. Thus, a bound has to be set on the amount of unwinding that
-CBMC performs. There are two ways to do so:
+The <code>while</code> loop in the <code>main</code> function has no
+(useful) run-time bound.  Thus, a bound has to be set on the amount of
+unwinding that CBMC performs.  There are two ways to do so:
 </p>
 
 <ol>
@@ -244,7 +273,7 @@ the number of program steps to be processed.</li>
 Given the option <code>--unwinding-assertions</code>, CBMC checks whether
 the arugment to <code>--unwind</code> is large enough to cover all program
 paths. If the argument is too small, CBMC will detect that not enough
-unwinding is done and aborts with an unwinding assertion violation.
+unwinding is done reports that an unwinding assertion has failed.
 </p>
 
 <p class="justified">

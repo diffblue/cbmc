@@ -208,21 +208,18 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 
   out << "  {" << '\n';
 
-  for(instructionst::const_iterator
-      i_it=instructions.begin();
-      i_it!=instructions.end();
-      i_it++)
+  for(const auto & i : instructions)
   {
-    if(i_it->source_location.get_line()!=irep_idt())
-      out << "    // " << i_it->source_location << '\n';
+    if(i.source_location.get_line()!=irep_idt())
+      out << "    // " << i.source_location << '\n';
 
-    out << "    " << i_it->address << ": ";
-    out << i_it->statement;
+    out << "    " << i.address << ": ";
+    out << i.statement;
     
     for(std::vector<exprt>::const_iterator
-        a_it=i_it->args.begin(); a_it!=i_it->args.end(); a_it++)
+        a_it=i.args.begin(); a_it!=i.args.end(); a_it++)
     {
-      if(a_it!=i_it->args.begin()) out << ',';
+      if(a_it!=i.args.begin()) out << ',';
       #if 0
       out << ' ' << from_expr(*a_it);
       #else
@@ -236,7 +233,15 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   out << "  }" << '\n';
 
   out << '\n';
+  
+  out << "  Locals:\n";
+  for(const auto & v : local_variable_table)
+  {
+    out << "    " << v.index << ": " << v.name << ' '
+        << v.signature << '\n';
+  }
 
+  out << '\n';  
 }
 
 /*******************************************************************\

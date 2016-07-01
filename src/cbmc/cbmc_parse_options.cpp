@@ -38,6 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/show_goto_functions.h>
 
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
@@ -177,11 +178,13 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("simplify", true);
 
-  if(cmdline.isset("all-claims") || // will go away
-     cmdline.isset("all-properties")) // use this one
-    options.set_option("all-properties", true);
+  if(cmdline.isset("stop-on-fail") ||
+     cmdline.isset("property") ||
+     cmdline.isset("dimacs") ||
+     cmdline.isset("outfile"))
+    options.set_option("stop-on-fail", true);
   else
-    options.set_option("all-properties", false);
+    options.set_option("stop-on-fail", false);
 
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
@@ -419,7 +422,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       else
       {
         assert(options.get_bool_option("smt2"));
-        options.set_option("mathsat", true), solver_set = true;
+        options.set_option("z3", true), solver_set = true;
       }
     }
   }
@@ -442,9 +445,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("graphml-cex"))
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
-
-  if(cmdline.isset("json-cex"))
-    options.set_option("json-cex", cmdline.get_value("json-cex"));
 }
 
 /*******************************************************************\
@@ -652,7 +652,8 @@ int cbmc_parse_optionst::get_goto_program(
                 
       if(!infile)
       {
-        error() << "failed to open input file `" << filename << "'" << eom;
+        error() << "failed to open input file `" 
+                << filename << "'" << eom;
         return 6;
       }
                               
@@ -660,7 +661,8 @@ int cbmc_parse_optionst::get_goto_program(
       
       if(language==NULL)
       {
-        error() << "failed to figure out type of file `" <<  filename << "'" << eom;
+        error() << "failed to figure out type of file `" 
+                <<  filename << "'" << eom;
         return 6;
       }
       
@@ -715,7 +717,8 @@ int cbmc_parse_optionst::get_goto_program(
     {
       status() << "Reading GOTO program from file " << eom;
 
-      if(read_object_and_link(*it, symbol_table, goto_functions, get_message_handler()))
+      if(read_object_and_link(*it, symbol_table, goto_functions, 
+                              get_message_handler()))
         return 6;
     }
 
@@ -964,7 +967,8 @@ bool cbmc_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      goto_functions.output(ns, std::cout);
+      namespacet ns(symbol_table);
+      show_goto_functions(ns, get_ui(), goto_functions);
       return true;
     }
   }
@@ -1060,8 +1064,9 @@ void cbmc_parse_optionst::help()
     " cbmc file.c ...              source file names\n"
     "\n"
     "Analysis options:\n"
-    " --all-properties             check and report status of all properties\n"
     " --show-properties            show the properties, but don't run analysis\n"
+    " --property id                only check one specific property\n"
+    " --stop-on-fail               stop analysis once a failed property is detected\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -1101,6 +1106,7 @@ void cbmc_parse_optionst::help()
     " --round-to-plus-inf          rounding towards plus infinity\n"
     " --round-to-minus-inf         rounding towards minus infinity\n"
     " --round-to-zero              rounding towards zero\n"
+    " --function name              set main function name\n"
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
@@ -1130,8 +1136,6 @@ void cbmc_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     "\n"
     "BMC options:\n"
-    " --function name              set main function name\n"
-    " --property id                only check one specific property\n"
     " --program-only               only show program expression\n"
     " --show-loops                 show the loops in the program\n"
     " --depth nr                   limit search depth\n"
@@ -1148,8 +1152,8 @@ void cbmc_parse_optionst::help()
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n"
-    " --smt1                       output subgoals in SMT1 syntax (obsolete)\n"
-    " --smt2                       output subgoals in SMT2 syntax\n"
+    " --smt1                       use default SMT1 solver (obsolete)\n"
+    " --smt2                       use default SMT2 solver (Z3)\n"
     " --boolector                  use Boolector\n"
     " --mathsat                    use MathSAT\n"
     " --cvc4                       use CVC4\n"
@@ -1164,5 +1168,6 @@ void cbmc_parse_optionst::help()
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --xml-interface              bi-directional XML interface\n"
+    " --json-ui                    use JSON-formatted output\n"
     "\n";
 }

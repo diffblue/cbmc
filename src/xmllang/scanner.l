@@ -8,9 +8,9 @@
 static int isatty(int) { return 0; }
 #endif
 
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstring>
+#include <cstdlib>
 
 #include "xml_parser.h"
 #include "xml_y.tab.h"

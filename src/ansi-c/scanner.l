@@ -1,5 +1,6 @@
 %option nounput
 %option noinput
+%option stack
 
 %{
 
@@ -34,6 +35,9 @@ static int isatty(int) { return 0; }
 
 #include "ansi_c_parser.h"
 #include "ansi_c_y.tab.h"
+#ifdef ANSI_C_DEBUG
+extern int yyansi_cdebug;
+#endif
 
 #define loc() \
   { newstack(yyansi_clval); PARSER.set_source_location(stack(yyansi_clval)); }
@@ -207,6 +211,9 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %{
 void ansi_c_scanner_init()
 {
+#ifdef ANSI_C_DEBUG
+  yyansi_cdebug=1;
+#endif
   YY_FLUSH_BUFFER;
   BEGIN(0);
 }
@@ -230,7 +237,7 @@ void ansi_c_scanner_init()
 }
 
 <STRING_LITERAL_COMMENT>{
-   "*/"         { BEGIN(STRING_LITERAL); } /* end comment state, back to STRING_LITERAL */
+   "*/"         { yy_pop_state(); } /* end comment state, back to STRING_LITERAL */
    "/*"         { yyansi_cerror("Probably nested comments"); }
    <<EOF>>      { yyansi_cerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
    [^*/\n]*     { /* ignore every char except '*' and NL (performance!) */ }
@@ -252,14 +259,16 @@ void ansi_c_scanner_init()
                   return TOK_CHARACTER;
                 }
 
-<GRAMMAR>{string_lit} {
+<GRAMMAR,GCC_ATTRIBUTE3>{string_lit} {
                   PARSER.string_literal.clear();
                   PARSER.string_literal.append(yytext);
                   newstack(yyansi_clval);
                   PARSER.set_source_location(stack(yyansi_clval));
                   // String literals can be continued in
                   // the next line
-                  BEGIN(STRING_LITERAL);
+                  yy_push_state(STRING_LITERAL);
+                  // use yy_top_state() to keep the compiler happy
+                  (void)yy_top_state();
                 }
 
 <STRING_LITERAL>{string_lit} { PARSER.string_literal.append(yytext); }
@@ -270,13 +279,13 @@ void ansi_c_scanner_init()
                   PARSER.set_line_no(PARSER.get_line_no()-1);
                 }
 <STRING_LITERAL>{cppdirective} { /* ignore */ }
-<STRING_LITERAL>"/*" { BEGIN(STRING_LITERAL_COMMENT); /* C comment, ignore */ }
+<STRING_LITERAL>"/*" { yy_push_state(STRING_LITERAL_COMMENT); /* C comment, ignore */ }
 <STRING_LITERAL>"//".*\n { /* C++ comment, ignore */ }
 <STRING_LITERAL>. { // anything else: back to normal
                   source_locationt l=stack(yyansi_clval).source_location();
                   stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
                   stack(yyansi_clval).add_source_location().swap(l);
-                  BEGIN(GRAMMAR); // back to normal
+                  yy_pop_state(); // back to normal
                   yyless(0); // put back
                   return TOK_STRING;
                 }
@@ -807,14 +816,14 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    #if 1
                     if(PARSER.cpp98)
                       BEGIN(IGNORE_PARENS);
                     else
+                    {
                       BEGIN(GCC_ATTRIBUTE1);
-                    #else
-                    loc(); return TOK_GCC_ATTRIBUTE;
-                    #endif
+                      loc();
+                      return TOK_GCC_ATTRIBUTE;
+                    }
                   }
                   else
                     return make_identifier();
@@ -1353,7 +1362,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
-"("             { BEGIN(GCC_ATTRIBUTE1a); }
+"("             { BEGIN(GCC_ATTRIBUTE1a); return yytext[0]; }
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
 }
 
@@ -1362,7 +1371,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   preprocessor_line(yytext, PARSER);
                   PARSER.set_line_no(PARSER.get_line_no()-1);
                 }
-"("             { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; }
+"("             { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; return yytext[0]; }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
@@ -1390,6 +1399,12 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 "weak" |
 "__weak__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_WEAK; }
 
+"alias" |
+"__alias__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_ALIAS; }
+
+"section" |
+"__section__"       { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_SECTION; }
+
 "noreturn" |
 "__noreturn__"      { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_NORETURN; }
 
@@ -1402,7 +1417,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
 {identifier}        { BEGIN(GCC_ATTRIBUTE4); }
-")"                 { BEGIN(GCC_ATTRIBUTE5); }
+")"                 { BEGIN(GCC_ATTRIBUTE5); return yytext[0]; }
 .                   { /* ignore */ }
 }
 
@@ -1416,7 +1431,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   {
                     BEGIN(GCC_ATTRIBUTE5);
                     loc();
-                    return TOK_GCC_ATTRIBUTE_END;
+                    return yytext[0];
                   }
                   else
                   {
@@ -1429,7 +1444,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   {
                     BEGIN(GCC_ATTRIBUTE2);
                     loc();
-                    return TOK_GCC_ATTRIBUTE_END;
+                    return yytext[0];
                   }
                   else
                   {
@@ -1451,12 +1466,21 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 <GCC_ATTRIBUTE4>{ // an attribute we just ignore
 "("             { PARSER.parenthesis_counter++; }
 ")"             { if(PARSER.parenthesis_counter==0)
+                  {
                     BEGIN(GCC_ATTRIBUTE5);
+                    loc();
+                    return yytext[0];
+                  }
                   else
                     PARSER.parenthesis_counter--;
                 }
 ","             { if(PARSER.parenthesis_counter==0)
-                    BEGIN(GCC_ATTRIBUTE2); }
+                  {
+                    BEGIN(GCC_ATTRIBUTE2);
+                    loc();
+                    return yytext[0];
+                  }
+                }
 .               { /* Throw away */ }
 }
 
@@ -1465,7 +1489,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   preprocessor_line(yytext, PARSER);
                   PARSER.set_line_no(PARSER.get_line_no()-1);
                 }
-")"             { BEGIN(GRAMMAR); }
+")"             { BEGIN(GRAMMAR); loc(); return yytext[0]; }
 {ws}            { /* Throw away */ }
 {newline}       { /* Throw away */ }
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }

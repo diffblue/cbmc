@@ -1,0 +1,9 @@
+CORE
+NullPointer4.class
+--pointer-check --stop-on-fail
+^EXIT=10$
+^SIGNAL=0$
+^  file NullPointer4.java line 6$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

@@ -95,6 +95,18 @@ public:
 
   std::ostringstream str;
   
+  inline std::ostream &error()
+  {
+    return str;
+  }
+
+  // API stub, intentional noop
+  static inline std::ostream &eom(std::ostream &m)
+  {
+    return m;
+  }
+
+  
   bool get_error_found() const
   {
     return error_found;

@@ -13,12 +13,10 @@ Date: April 2016
 
 #include <ostream>
 
-class goto_functionst;
-class namespacet;
+class goto_modelt;
 
 void unreachable_instructions(
-  const goto_functionst &goto_functions,
-  const namespacet &ns,
+  const goto_modelt &,
   const bool json,
   std::ostream &os);
 

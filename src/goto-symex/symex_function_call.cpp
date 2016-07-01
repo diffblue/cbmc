@@ -501,9 +501,9 @@ void goto_symext::locality(
     while(state.l1_history.find(l1_name)!=state.l1_history.end())
     {
       state.level1.increase_counter(l0_name);
+      ++offset;
       ssa.set_level_1(frame_nr+offset);
       l1_name=ssa.get_identifier();
-      ++offset;
     }
     
     // now unique -- store

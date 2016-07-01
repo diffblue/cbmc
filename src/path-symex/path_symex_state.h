@@ -26,6 +26,7 @@ public:
     history(_path_symex_history),
     current_thread(0),
     no_thread_interleavings(0),
+    no_branches(0),
     depth(0)
   {
   }
@@ -68,6 +69,7 @@ public:
     irep_idt current_function;
     loc_reft return_location;
     exprt return_lhs;
+    exprt return_rhs;
     var_state_mapt saved_local_vars;
   };
 
@@ -106,7 +108,12 @@ public:
     current_thread=_thread;
   }
   
-  goto_programt::const_targett get_instruction() const;
+  loc_reft get_pc() const;
+  
+  inline goto_programt::const_targett get_instruction() const
+  {
+    return locs[get_pc()].target;
+  }
   
   inline bool is_executable() const
   {
@@ -178,6 +185,16 @@ public:
     return depth;
   }
   
+  inline unsigned get_no_branches() const
+  {
+    return no_branches;
+  }
+  
+  inline bool last_was_branch() const
+  {
+    return !history.is_nil() && history->is_branch();
+  }
+  
   bool is_feasible(class decision_proceduret &) const;
 
   bool check_assertion(class decision_proceduret &);
@@ -193,6 +210,7 @@ public:
 protected:
   unsigned current_thread;
   unsigned no_thread_interleavings;
+  unsigned no_branches;
   unsigned depth;
 
   exprt read(

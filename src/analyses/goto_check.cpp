@@ -54,6 +54,8 @@ public:
 
   void goto_check(goto_functiont &goto_function);
     
+  irep_idt mode;
+
 protected:
   const namespacet &ns;
   local_bitvector_analysist *local_bitvector_analysis;
@@ -900,107 +902,117 @@ void goto_checkt::pointer_validity_check(
 
   assert(base_type_eq(pointer_type.subtype(), expr.type(), ns));
 
-  #if 0
-  add_guarded_claim(
-    good_pointer(expr.pointer()),
-    "dereference failure: pointer not valid",
-    "pointer dereference",
-    expr.find_source_location(),
-    expr,
-    guard);    
-  #else
-  
   local_bitvector_analysist::flagst flags=
     local_bitvector_analysis->get(t, pointer);
     
   const typet &dereference_type=pointer_type.subtype();
 
-  if(flags.is_unknown() || flags.is_null())
+  // For Java, we only need to check for null
+  if(mode==ID_java)
   {
-    add_guarded_claim(
-      not_exprt(null_pointer(pointer)),
-      "dereference failure: pointer NULL",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
-  }
-
-  if(flags.is_unknown())
-    add_guarded_claim(
-      not_exprt(invalid_pointer(pointer)),
-      "dereference failure: pointer invalid",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
-
-  if(flags.is_uninitialized())
-    add_guarded_claim(
-      not_exprt(invalid_pointer(pointer)),
-      "dereference failure: pointer uninitialized",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
-
-  if(flags.is_unknown() || flags.is_dynamic_heap())
-    add_guarded_claim(
-      not_exprt(deallocated(pointer, ns)),
-      "dereference failure: deallocated dynamic object",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
-
-  if(flags.is_unknown() || flags.is_dynamic_local())
-    add_guarded_claim(
-      not_exprt(dead_object(pointer, ns)),
-      "dereference failure: dead object",
-      "pointer dereference",
-      expr.find_source_location(),
-      expr,
-      guard);
-
-  if(enable_bounds_check)
-  {
-    if(flags.is_unknown() || flags.is_dynamic_heap())
+    if(flags.is_unknown() || flags.is_null())
     {
-      exprt dynamic_bounds=
-        or_exprt(dynamic_object_lower_bound(pointer),
-                 dynamic_object_upper_bound(pointer, dereference_type, ns));
+      notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
 
       add_guarded_claim(
-        implies_exprt(malloc_object(pointer, ns), not_exprt(dynamic_bounds)),
-        "dereference failure: dynamic object bounds",
+        not_eq_null,
+        "reference is null",
         "pointer dereference",
         expr.find_source_location(),
         expr,
         guard);
     }
   }
-
-  if(enable_bounds_check)
+  else
   {
-    if(flags.is_unknown() ||
-       flags.is_dynamic_local() ||
-       flags.is_static_lifetime())
+    if(flags.is_unknown() || flags.is_null())
     {
-      exprt object_bounds=
-        or_exprt(object_lower_bound(pointer),
-                 object_upper_bound(pointer, dereference_type, ns));
-
       add_guarded_claim(
-        or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
-        "dereference failure: object bounds",
+        not_exprt(null_pointer(pointer)),
+        "dereference failure: pointer NULL",
         "pointer dereference",
         expr.find_source_location(),
         expr,
         guard);
     }
-  }
 
-  #endif
+    if(flags.is_unknown())
+      add_guarded_claim(
+        not_exprt(invalid_pointer(pointer)),
+        "dereference failure: pointer invalid",
+        "pointer dereference",
+        expr.find_source_location(),
+        expr,
+        guard);
+
+    if(flags.is_uninitialized())
+      add_guarded_claim(
+        not_exprt(invalid_pointer(pointer)),
+        "dereference failure: pointer uninitialized",
+        "pointer dereference",
+        expr.find_source_location(),
+        expr,
+        guard);
+
+    if(mode != ID_java)
+    {
+      if(flags.is_unknown() || flags.is_dynamic_heap())
+        add_guarded_claim(
+          not_exprt(deallocated(pointer, ns)),
+          "dereference failure: deallocated dynamic object",
+          "pointer dereference",
+          expr.find_source_location(),
+          expr,
+          guard);
+
+      if(flags.is_unknown() || flags.is_dynamic_local())
+        add_guarded_claim(
+          not_exprt(dead_object(pointer, ns)),
+          "dereference failure: dead object",
+          "pointer dereference",
+          expr.find_source_location(),
+          expr,
+          guard);
+    }
+
+    if(enable_bounds_check)
+    {
+      if(flags.is_unknown() || flags.is_dynamic_heap())
+      {
+        exprt dynamic_bounds=
+          or_exprt(dynamic_object_lower_bound(pointer),
+                   dynamic_object_upper_bound(pointer, dereference_type, ns));
+
+        add_guarded_claim(
+          implies_exprt(malloc_object(pointer, ns), not_exprt(dynamic_bounds)),
+          "dereference failure: dynamic object bounds",
+          "pointer dereference",
+          expr.find_source_location(),
+          expr,
+          guard);
+      }
+    }
+
+    if(enable_bounds_check)
+    {
+      if(flags.is_unknown() ||
+         flags.is_dynamic_local() ||
+         flags.is_static_lifetime())
+      {
+        exprt object_bounds=
+          or_exprt(object_lower_bound(pointer),
+                   object_upper_bound(pointer, dereference_type, ns));
+
+        add_guarded_claim(
+          or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
+          "dereference failure: object bounds",
+          "pointer dereference",
+          expr.find_source_location(),
+          expr,
+          guard);
+      }
+    }
+  }
 }
 
 /*******************************************************************\
@@ -1428,6 +1440,12 @@ Function: goto_checkt::goto_check
 
 void goto_checkt::goto_check(goto_functiont &goto_function)
 {
+  {
+    const symbolt *init_symbol;
+    if(!ns.lookup(CPROVER_PREFIX "initialize", init_symbol))
+      mode=init_symbol->mode;
+  }
+
   assertions.clear();
   
   local_bitvector_analysist local_bitvector_analysis_obj(goto_function);
@@ -1500,6 +1518,33 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     {
       const code_function_callt &code_function_call=
         to_code_function_call(i.code);
+        
+      // for Java, need to check whether 'this' is null
+      // on non-static method invocations
+      if(mode==ID_java &&
+         enable_pointer_check &&
+         !code_function_call.arguments().empty() &&
+         code_function_call.function().type().id()==ID_code &&
+         to_code_type(code_function_call.function().type()).has_this())
+      {
+        exprt pointer=code_function_call.arguments()[0];
+      
+        local_bitvector_analysist::flagst flags=
+          local_bitvector_analysis->get(t, pointer);
+          
+        if(flags.is_unknown() || flags.is_null())
+        {
+          notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+
+          add_guarded_claim(
+            not_eq_null,
+            "this is null on method invokation",
+            "pointer dereference",
+            i.source_location,
+            pointer,
+            guardt());
+        }
+      }
     
       forall_operands(it, code_function_call)
         check(*it);
@@ -1518,6 +1563,28 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     }
     else if(i.is_throw())
     {
+      if(i.code.get_statement()==ID_expression &&
+         i.code.operands().size()==1 &&
+         i.code.op0().operands().size()==1)
+      {
+        // must not throw NULL
+        
+        exprt pointer=i.code.op0().op0();
+
+        if(pointer.type().subtype().get(ID_identifier)!="java::java.lang.AssertionError")
+        {        
+          notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+
+          add_guarded_claim(
+            not_eq_null,
+            "throwing null",
+            "pointer dereference",
+            i.source_location,
+            pointer,
+            guardt());
+        }
+      }
+
       // this has no successor
       assertions.clear();
     }

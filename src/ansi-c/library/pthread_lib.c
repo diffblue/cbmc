@@ -330,6 +330,43 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
   return 0;
 }
 
+/* FUNCTION: _pthread_join */
+
+// This is for Apple
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#include <errno.h>
+#define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifdef __APPLE_
+extern __CPROVER_bool __CPROVER_threads_exited[];
+extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
+extern unsigned long __CPROVER_next_thread_id;
+
+inline int pthread_join(pthread_t thread, void **value_ptr)
+{
+  __CPROVER_HIDE:;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(&thread, "pthread-id"),
+                   "phtread_join must be given valid thread ID");
+  #endif
+
+  if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
+  if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
+  if(value_ptr!=0) (void)**(char**)value_ptr;
+  __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread]);
+
+  return 0;
+}
+#endif
+
 /* FUNCTION: pthread_rwlock_destroy */
 
 #ifndef __CPROVER_PTHREAD_H_INCLUDED
@@ -692,6 +729,8 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+// no pthread_barrier_t on the Mac
+#ifndef __APPLE__
 inline int pthread_barrier_init(
   pthread_barrier_t *restrict barrier,
   const pthread_barrierattr_t *restrict attr, unsigned count)
@@ -709,6 +748,7 @@ inline int pthread_barrier_init(
   int result;
   return result;
 }       
+#endif
 
 /* FUNCTION: pthread_barrier_destroy */
 
@@ -717,6 +757,8 @@ inline int pthread_barrier_init(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+// no pthread_barrier_t on the Mac
+#ifndef __APPLE__
 inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
@@ -734,6 +776,7 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
   int result;
   return result;
 }
+#endif
 
 /* FUNCTION: pthread_barrier_wait */
 
@@ -742,6 +785,8 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+// no pthread_barrier_t on the Mac
+#ifndef __APPLE__
 inline int pthread_barrier_wait(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
@@ -758,3 +803,4 @@ inline int pthread_barrier_wait(pthread_barrier_t *barrier)
   int result;
   return result;
 }
+#endif

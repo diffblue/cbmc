@@ -1,5 +1,9 @@
 <!--#include virtual="header.inc" -->
 
+<link rel="stylesheet" href="highlight/styles/default.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
 <p><a href="./">CPROVER Manual TOC</a></p>
 
 <h2>CBMC: Bounded Model Checking for C/C++ and Java</h2>
@@ -15,49 +19,43 @@ essentially amounts to <i>unwinding loops</i>.  This concept is best
 illustrated with a generic example:
 </p>
 
-<hr>
-<code>
-int main(int argc, char **argv) {<br>
-&nbsp;&nbsp;while(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE</font><br>
-&nbsp;&nbsp;}<br>
+<pre><code>int main(int argc, char **argv) {
+  while(cond) {
+    <font color="#3030f0">BODY CODE</font>
+  }
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
-A BMC instance that will find bugs with up to 5 iterations of the loop would
-contain 5 copies of the loop body, and essentially corresponds to checking
+A BMC instance that will find bugs with up to five iterations of the loop would
+contain five copies of the loop body, and essentially corresponds to checking
 the following loop-free program:
 </p>
 
-<hr>
-<code>
-int main(int argc, char **argv) {<br>
-&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 1</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 2</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 3</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 4</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 5</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;}<br>
+<pre><code>int main(int argc, char **argv) {
+  if(cond) {
+    <font color="#3030f0">BODY CODE COPY 1</font>
+    if(cond) {
+      <font color="#3030f0">BODY CODE COPY 2</font>
+      if(cond) {
+        <font color="#3030f0">BODY CODE COPY 3</font>
+        if(cond) {
+          <font color="#3030f0">BODY CODE COPY 4</font>
+          if(cond) {
+            <font color="#3030f0">BODY CODE COPY 5</font>
+          }
+        }
+      }
+    }
+  }
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 Note the use of the <code>if</code> statement to prevent the execution of
-the loop body in the case that the loop ends before 5 iterations are executed.
+the loop body in the case that the loop ends before five iterations are executed.
 The construction above is meant to produce a program that is trace equivalent
-with the original programs for those traces that contain up to 5 iterations
+with the original programs for those traces that contain up to five iterations
 of the loop.
 </p>
 
@@ -68,19 +66,16 @@ number of loop iterations. This may even work when the number of loop
 unwindings is not constant. Consider the following example:
 </p>
 
-<hr>
-<code>
-_Bool f();<br>
-<br>
-int main() {<br>
-&nbsp;&nbsp;for(int i=0; i<100; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(f()) break;<br>
-&nbsp;&nbsp;}<br>
-<br>  
-&nbsp;&nbsp;assert(0);<br>
+<pre><code>_Bool f();
+
+int main() {
+  for(int i=0; i<100; i++) {
+    if(f()) break;
+  }
+  
+  assert(0);
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 The loop in the program above has an obvious upper bound on the number of
@@ -151,32 +146,29 @@ problem, CBMC can optionally insert checks that the given unwinding bound is
 actually sufficiently large.  These checks are called <i>unwinding
 assertions</i>, and are enabled with the option
 <code>--unwinding-assertions</code>.  Continuing the generic example above,
-this unwinding assertion for a bound of 5 corresponds to checking the
+this unwinding assertion for a bound of five corresponds to checking the
 following loop-free program:
 </p>
 
-<hr>
-<code>
-int main(int argc, char **argv) {<br>
-&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 1</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 2</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 3</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 4</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 5</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#ff3030">assert(!cond);</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;}<br>
+<pre><code>int main(int argc, char **argv) {
+  if(cond) {
+    <font color="#3030f0">BODY CODE COPY 1</font>
+    if(cond) {
+      <font color="#3030f0">BODY CODE COPY 2</font>
+      if(cond) {
+        <font color="#3030f0">BODY CODE COPY 3</font>
+        if(cond) {
+          <font color="#3030f0">BODY CODE COPY 4</font>
+          if(cond) {
+            <font color="#3030f0">BODY CODE COPY 5</font>
+            <font color=#ff3030">assert(!cond);</font>
+          }
+        }
+      }
+    }
+  }
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 The unwinding assertions can be verified just like any other generated
@@ -192,17 +184,14 @@ of code that follows the loop. As an example, consider the
 following program:
 </p>
 
-<hr>
-<code>
-int main() {<br>
-&nbsp;&nbsp;for(int i=0; i<10000; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE</font><br>
-&nbsp;&nbsp;}<br>
-<br>  
-&nbsp;&nbsp;assert(0);<br>
+<pre><code>int main() {
+  for(int i=0; i<10000; i++) {
+    <font color="#3030f0">BODY CODE</font>
+  }
+  
+  assert(0);
 }
-</code>
-<hr>
+</code></pre>
 
 <p class="justified">
 In the example above, small values of <code>--unwind</code> will

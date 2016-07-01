@@ -349,6 +349,33 @@ static bool link_functions(
     }
   }
 
+  // apply macros
+  rename_symbolt macro_application;
+
+  forall_symbols(it, dest_symbol_table.symbols)
+    if(it->second.is_macro)
+    {
+      const symbolt &symbol=it->second;
+
+      assert(symbol.value.id()==ID_symbol);
+      const irep_idt &id=to_symbol_expr(symbol.value).get_identifier();
+
+      #if 0
+      if(!base_type_eq(symbol.type, ns.lookup(id).type, ns))
+      {
+        std::cerr << symbol << std::endl;
+        std::cerr << ns.lookup(id) << std::endl;
+      }
+      assert(base_type_eq(symbol.type, ns.lookup(id).type, ns));
+      #endif
+
+      macro_application.insert_expr(symbol.name, id);
+    }
+
+  if(!macro_application.expr_map.empty())
+    Forall_goto_functions(dest_it, dest_functions)
+      rename_symbols_in_function(dest_it->second, macro_application);
+
   return false;
 }
 
@@ -370,7 +397,8 @@ bool read_object_and_link(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
-  message_handler.print(8, "Reading: " + file_name);
+  messaget(message_handler).statistics() << "Reading: " 
+                                         << file_name << messaget::eom;
 
   // we read into a temporary model
   goto_modelt temp_model;
@@ -400,5 +428,29 @@ bool read_object_and_link(
     return true;
 
   return false;
+}
+
+/*******************************************************************\
+
+Function: read_object_and_link
+
+  Inputs: a file_name
+
+ Outputs: true on error, false otherwise
+
+ Purpose: reads an object file
+
+\*******************************************************************/
+
+bool read_object_and_link(
+  const std::string &file_name,
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  return read_object_and_link(
+    file_name,
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    message_handler);
 }
 

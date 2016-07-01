@@ -61,9 +61,9 @@ protected:
     const exprt &function,
     std::list<path_symex_statet> &further_states);
     
-  void return_from_function(
-    path_symex_statet &state,
-    const exprt &return_value);
+  void return_from_function(path_symex_statet &state);
+  
+  void set_return_value(path_symex_statet &, const exprt &);
 
   void symex_malloc(
     path_symex_statet &state,

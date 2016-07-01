@@ -121,8 +121,14 @@ Function: class_hierarchyt::output
 
 void class_hierarchyt::output(std::ostream &out) const
 {
-  //for(const auto & c : class_map)
-  //{
-    //out << c.first << ": " << c.second.parent << '\n';
-  //}
+  for(const auto & c : class_map)
+  {
+    for(const auto & pa : c.second.parents)
+      out << "Parent of " << c.first << ": "
+          << pa << '\n';
+
+    for(const auto & ch : c.second.children)
+      out << "Child of " << c.first << ": "
+          << ch << '\n';
+  }
 }

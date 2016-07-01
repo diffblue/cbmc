@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/time_stopping.h>
 #include <util/message_stream.h>
+#include <util/json.h>
 
 #include <langapi/mode.h>
 #include <langapi/languages.h>
@@ -87,8 +88,14 @@ void bmct::error_trace()
     }
     break;
   
-  default:
-    assert(false);
+  case ui_message_handlert::JSON_UI:
+    {
+      json_objectt counterexample;
+      jsont &json_trace=counterexample["counterexample"];
+      convert(ns, goto_trace, json_trace);
+      std::cout << ",\n" << counterexample << "\n";
+    }
+    break;
   }
 
   const std::string graphml=options.get_option("graphml-cex");
@@ -105,22 +112,6 @@ void bmct::error_trace()
       write_graphml(cex_graph, out);
     }
   }
-
-  if(options.get_option("json-cex")!="")
-  {
-    jsont json_trace;
-    convert(ns, goto_trace, json_trace);
-  
-    if(options.get_option("json-cex")=="-")
-    {
-      std::cout << json_trace;
-    }
-    else
-    {
-      std::ofstream out(options.get_option("json-cex").c_str());
-      out << json_trace << '\n';
-    }
-  }  
 }
 
 /*******************************************************************\
@@ -223,9 +214,14 @@ void bmct::report_success()
       std::cout << "\n";
     }
     break;
-    
-  default:
-    assert(false);
+
+  case ui_message_handlert::JSON_UI:
+    {
+      json_objectt json_result;
+      json_result["cProverStatus"]=json_stringt("success");
+      std::cout << ",\n" << json_result;
+    }
+    break;
   }
 }
 
@@ -258,9 +254,14 @@ void bmct::report_failure()
       std::cout << "\n";
     }
     break;
-    
-  default:
-    assert(false);
+
+  case ui_message_handlert::JSON_UI:
+    {
+      json_objectt json_result;
+      json_result["cProverStatus"]=json_stringt("failure");
+      std::cout << ",\n" << json_result;
+    }
+    break;
   }
 }
 
@@ -557,9 +558,28 @@ safety_checkert::resultt bmct::decide(
 {
   prop_conv.set_message_handler(get_message_handler());
 
-  if(options.get_bool_option("all-properties"))
+  if(options.get_bool_option("stop-on-fail"))
+    return stop_on_fail(goto_functions, prop_conv);
+  else
     return all_properties(goto_functions, prop_conv);
+}
 
+/*******************************************************************\
+
+Function: bmct::stop_on_fail
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+safety_checkert::resultt bmct::stop_on_fail(
+  const goto_functionst &goto_functions,
+  prop_convt &prop_conv)
+{
   switch(run_decision_procedure(prop_conv))
   {
   case decision_proceduret::D_UNSATISFIABLE:
@@ -578,7 +598,7 @@ safety_checkert::resultt bmct::decide(
   default:
     if(options.get_bool_option("dimacs") ||
        options.get_option("outfile")!="")
-      return ERROR;
+      return SAFE;
       
     error() << "decision procedure failed" << eom;
 

@@ -9,17 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CEGAR_INVARIANT_SET_H
 #define CPROVER_CEGAR_INVARIANT_SET_H
 
-/*
-#include <ref_expr_set.h>
-
-*/
-
 #include <util/std_code.h>
 #include <util/numbering.h>
 #include <util/union_find.h>
 #include <util/threeval.h>
 #include <util/mp_arith.h>
-#include <util/interval.h>
+#include <util/interval_template.h>
 
 #include <pointer-analysis/value_sets.h>
 
@@ -89,7 +84,7 @@ public:
   ineq_sett ne_set;
   
   // bounds
-  typedef interval<mp_integer> boundst;
+  typedef interval_template<mp_integer> boundst;
   typedef std::map<unsigned, boundst> bounds_mapt;
   bounds_mapt bounds_map;
   

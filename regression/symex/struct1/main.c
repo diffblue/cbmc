@@ -1,3 +1,5 @@
+#include <assert.h>
+
 struct inner_struct
 {
   int a, b, c;

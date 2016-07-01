@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/i2string.h>
+#include <util/prefix.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -72,35 +73,6 @@ void create_initialize(symbol_tablet &symbol_table)
 
 /*******************************************************************\
 
-Function: gen_argument
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-namespace {
-exprt gen_argument(const typet &type)
-{
-  if(type.id()==ID_pointer)
-  {
-    /*
-    side_effect_exprt result(ID_java_new);
-    result.operands().resize(1);
-    return result;
-    */
-    return side_effect_expr_nondett(type);
-  }
-  else
-    return side_effect_expr_nondett(type);
-}
-}
-
-/*******************************************************************\
-
 Function: gen_nondet_init
 
   Inputs:
@@ -121,66 +93,10 @@ void gen_nondet_init(
   irep_idt class_identifier)
 {
   const typet &type=ns.follow(expr.type());
-
-  if(type.id()==ID_struct)
+  
+  if(type.id()==ID_pointer)
   {
-    typedef struct_typet::componentt componentt;
-    typedef struct_typet::componentst componentst;
-
-    const struct_typet &struct_type=to_struct_type(type);
-    const irep_idt struct_tag=struct_type.get_tag();
-
-    componentst components=struct_type.components();
-
-    if(!is_sub)
-      class_identifier=struct_tag;
-
-    recursion_set.insert(struct_tag);
-    assert(!recursion_set.empty());
-
-    for(componentst::const_iterator it=components.begin();
-        it!=components.end(); it++)
-    {
-      const componentt &component=*it;
-      const typet &component_type=component.type();
-      irep_idt name=component.get_name();
-
-      member_exprt me(expr, name, component_type);
-
-      if(name=="@class_identifier")
-      {
-        constant_exprt ci(class_identifier, string_typet());
-
-        code_assignt code(me, ci);
-        init_code.copy_to_operands(code);
-      }
-      else
-      {
-        irep_idt new_class_identifier;
-        assert(!name.empty());
-
-        is_sub = name[0]=='@';
-
-        gen_nondet_init(
-          me, init_code, ns, recursion_set, is_sub, class_identifier);
-      }
-    }
-
-    recursion_set.erase(struct_tag);
-  }
-  else if(type.id()!=ID_pointer)
-  {
-    assert(type.id()!= ID_struct);
-
-    side_effect_expr_nondett se=side_effect_expr_nondett(type);
-
-    code_assignt code(expr, se);
-    init_code.copy_to_operands(code);
-  }
-  else
-  {
-    assert(type.id()==ID_pointer);
-
+    #if 0
     // dereferenced type
     const pointer_typet &pointer_type=to_pointer_type(type);
     const typet &subtype=ns.follow(pointer_type.subtype());
@@ -226,6 +142,55 @@ void gen_nondet_init(
       code_assignt code(expr, null_pointer_expr);
       init_code.copy_to_operands(code);
     }
+    #endif
+  }
+  else if(type.id()==ID_struct)
+  {
+    typedef struct_typet::componentst componentst;
+
+    const struct_typet &struct_type=to_struct_type(type);
+    const irep_idt struct_tag=struct_type.get_tag();
+
+    const componentst &components=struct_type.components();
+    
+    recursion_set.insert(struct_tag);
+    assert(!recursion_set.empty());
+    
+    for(const auto & component : components)
+    {
+      const typet &component_type=component.type();
+      irep_idt name=component.get_name();
+
+      member_exprt me(expr, name, component_type);
+
+      if(name=="@class_identifier")
+      {
+        constant_exprt ci(class_identifier, string_typet());
+
+        code_assignt code(me, ci);
+        init_code.copy_to_operands(code);
+      }
+      else
+      {
+        assert(!name.empty());
+
+        bool _is_sub = name[0]=='@';
+        irep_idt _class_identifier=
+          _is_sub?(class_identifier.empty()?struct_tag:class_identifier):"";
+
+        gen_nondet_init(
+          me, init_code, ns, recursion_set, _is_sub, _class_identifier);
+      }
+    }
+
+    recursion_set.erase(struct_tag);
+  }
+  else
+  {
+    side_effect_expr_nondett se=side_effect_expr_nondett(type);
+
+    code_assignt code(expr, se);
+    init_code.copy_to_operands(code);
   }
 }
 }
@@ -281,6 +246,51 @@ symbolt &new_tmp_symbol(symbol_tablet &symbol_table)
   } while(symbol_table.move(new_symbol, symbol_ptr));
 
   return *symbol_ptr;
+}
+}
+
+/*******************************************************************\
+
+Function: gen_argument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+namespace {
+exprt gen_argument(
+  const typet &type,
+  code_blockt &init_code,
+  bool is_this,
+  bool allow_null,
+  symbol_tablet &symbol_table)
+{
+  if(type.id()==ID_pointer)
+  {
+    symbolt &aux_symbol=new_tmp_symbol(symbol_table);
+    aux_symbol.type=type.subtype();
+    aux_symbol.is_static_lifetime=true;
+
+    exprt object=aux_symbol.symbol_expr();
+    
+    const namespacet ns(symbol_table);
+    gen_nondet_init(object, init_code, ns);
+
+    // todo: need to pass null, possibly
+    return address_of_exprt(object);
+  }
+  else if(type.id()==ID_c_bool)
+  {
+    // We force this to 0 and 1 and won't consider
+    // other values.
+    return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
+  }
+  else
+    return side_effect_expr_nondett(type);
 }
 }
 
@@ -366,30 +376,64 @@ bool java_entry_point(
      symbol_table.symbols.end())
     return false; // silently ignore
 
-#if 0
-  std::cout << "Main: " << config.main << std::endl;
-#endif
-
   messaget message(message_handler);
-
-  code_blockt struct_init_code; // struct init code if needed
-  bool have_struct=false;
-  symbol_exprt struct_ptr;
 
   symbolt symbol; // main function symbol
 
   // find main symbol
   if(config.main!="")
   {
-    // look it up
-    symbol_tablet::symbolst::const_iterator s_it
-      =symbol_table.symbols.find(config.main);
-
-    if(s_it==symbol_table.symbols.end())
+    // Add java:: prefix
+    std::string main_identifier="java::"+config.main;
+    
+    symbol_tablet::symbolst::const_iterator s_it;
+    
+    // Does it have a type signature? (':' suffix)
+    if(config.main.rfind(':')==std::string::npos)
     {
-      message.error() << "main symbol `" << config.main
-                      << "' not found" << messaget::eom;
-      return true;
+      std::string prefix=main_identifier+':';
+      std::set<irep_idt> matches;
+      
+      for(const auto & s : symbol_table.symbols)
+        if(has_prefix(id2string(s.first), prefix) &&
+           s.second.type.id()==ID_code)
+          matches.insert(s.first);
+
+      if(matches.empty())
+      {
+        message.error() << "main symbol `" << config.main
+                        << "' not found" << messaget::eom;
+        return true;
+      }
+      else if(matches.size()==1)
+      {
+        s_it=symbol_table.symbols.find(*matches.begin());
+        assert(s_it!=symbol_table.symbols.end());
+      }
+      else
+      {
+        message.error() << "main symbol `" << config.main
+                        << "' is ambiguous:\n";
+
+        for(const auto & s : matches)
+          message.error() << "  " << s << '\n';
+        
+        message.error() << messaget::eom;
+
+        return true;
+      }
+    }
+    else
+    {
+      // just look it up
+      s_it=symbol_table.symbols.find(main_identifier);
+
+      if(s_it==symbol_table.symbols.end())
+      {
+        message.error() << "main symbol `" << config.main
+                        << "' not found" << messaget::eom;
+        return true;
+      }
     }
 
     // function symbol
@@ -401,46 +445,13 @@ bool java_entry_point(
                       << "' not a function" << messaget::eom;
       return true;
     }
-
+    
     // check if it has a body
     if(symbol.value.is_nil())
     {
       message.error() << "main method `" << main_class
                       << "' has no body" << messaget::eom;
       return true;
-    }
-
-    // get name of associated struct
-    size_t idx=config.main.rfind(".");
-    assert(idx!=std::string::npos);
-    assert(idx<config.main.size());
-    std::string st=config.main.substr(0, idx);
-#if 0
-    std::cout << "Struct name: " << st << std::endl;
-#endif
-
-    // look it up
-    symbol_tablet::symbolst::const_iterator st_it
-      =symbol_table.symbols.find(st);
-
-    if(st_it!=symbol_table.symbols.end() &&
-       st_it->second.type.id()==ID_struct)
-    {
-      const symbolt &struct_symbol=st_it->second;
-      assert(struct_symbol.type.id()==ID_struct);
-      const struct_typet &struct_type=to_struct_type(struct_symbol.type);
-      const pointer_typet pointer_type(struct_type);
-
-      symbolt &aux_symbol=new_tmp_symbol(symbol_table);
-      aux_symbol.type=pointer_type;
-      aux_symbol.is_static_lifetime=true;
-
-      struct_ptr=aux_symbol.symbol_expr();
-
-      namespacet ns(symbol_table);
-      gen_nondet_init(struct_ptr, struct_init_code, ns);
-
-      have_struct=true;
     }
   }
   else
@@ -498,6 +509,8 @@ bool java_entry_point(
   assert(!symbol.value.is_nil());
   assert(symbol.type.id()==ID_code);
 
+  const code_typet &code_type=to_code_type(symbol.type);
+    
   create_initialize(symbol_table);
 
   if(java_static_lifetime_init(symbol_table, symbol.location, message_handler))
@@ -525,41 +538,30 @@ bool java_entry_point(
     init_code.move_to_operands(call_init);
   }
 
-  // add struct init code
-
-  if(have_struct)
-  {
-    typedef code_blockt::operandst operandst;
-    const operandst &operands=struct_init_code.operands();
-
-    for(operandst::const_iterator it=operands.begin(); it!=operands.end(); it++)
-    {
-      init_code.add((const codet&)*it);
-    }
-  }
-
-  // build call to main method
+  // build call to the main method
 
   code_function_callt call_main;
   call_main.add_source_location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
 
   const code_typet::parameterst &parameters=
-    to_code_type(symbol.type).parameters();
+    code_type.parameters();
 
   exprt::operandst main_arguments;
   main_arguments.resize(parameters.size());
-
-  unsigned i=0;
-
-  if(have_struct && parameters.size()>=1)
+  
+  for(std::size_t param_number=0;
+      param_number<parameters.size();
+      param_number++)
   {
-    main_arguments[0]=struct_ptr;
-    i++;
+    bool is_this=param_number==0 &&
+                 parameters[param_number].get_this();
+    bool allow_null=config.main!="";
+    
+    main_arguments[param_number]=
+      gen_argument(parameters[param_number].type(), 
+                   init_code, is_this, allow_null, symbol_table);
   }
-
-  for(; i<parameters.size(); i++)
-    main_arguments[i]=gen_argument(parameters[i].type());
 
   call_main.arguments()=main_arguments;
 

@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_LISPEXPR_H
 
 #if defined(_WIN32) && !defined(__MINGW32__)
-#include <string.h>
+#include <cstring>
 #define strcasecmp _strcmpi
 #else
 #include <strings.h>

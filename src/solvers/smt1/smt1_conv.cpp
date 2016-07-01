@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/base_type.h>
 #include <util/ieee_float.h>
+#include <util/byte_operators.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -470,7 +471,7 @@ Function: smt1_convt::convert_byte_extract
 \*******************************************************************/
 
 void smt1_convt::convert_byte_extract(
-  const exprt &expr,
+  const byte_extract_exprt &expr,
   bool bool_as_bv)
 {
   // we just run the flattener
@@ -1183,7 +1184,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    convert_byte_extract(expr, bool_as_bv);
+    convert_byte_extract(to_byte_extract_expr(expr), bool_as_bv);
   }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
@@ -2691,7 +2692,7 @@ void smt1_convt::convert_with(const exprt &expr)
       else if(struct_op_type.id()==ID_union)
         offset=0;
       else
-        assert(false);
+        throw "failed to get offset";
 
       std::size_t width=boolbv_width(expr.type());
 

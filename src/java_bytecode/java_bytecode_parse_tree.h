@@ -86,6 +86,17 @@ public:
     
     typedef std::vector<exceptiont> exception_tablet;
     exception_tablet exception_table;
+    
+    class local_variablet
+    {
+    public:
+      irep_idt name;
+      std::string signature;
+      std::size_t index;
+    };
+    
+    typedef std::vector<local_variablet> local_variable_tablet;
+    local_variable_tablet local_variable_table;
 
     virtual void output(std::ostream &out) const;
     

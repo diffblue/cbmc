@@ -599,7 +599,9 @@ void path_symext::function_call_rec(
     // do we have a body?
     if(function_entry_point==loc_reft())
     {
-      // no body, this is a skip
+      // no body
+      
+      // this is a skip
       if(call.lhs().is_not_nil())
         assign(state, call.lhs(), nil_exprt());
 
@@ -613,6 +615,7 @@ void path_symext::function_call_rec(
     thread.call_stack.back().current_function=function_identifier;
     thread.call_stack.back().return_location=thread.pc.next_loc();
     thread.call_stack.back().return_lhs=call.lhs();
+    thread.call_stack.back().return_rhs=nil_exprt();
 
     #if 0
     for(loc_reft l=function_entry_point; ; ++l)
@@ -654,8 +657,13 @@ void path_symext::function_call_rec(
           throw "function_call " + id2string(function_identifier) + " no identifier for function parameter";
 
         symbol_exprt lhs(identifier, function_parameter.type());
+        exprt rhs=call_arguments[i];
+        
+        // lhs/rhs types might not match
+        if(lhs.type()!=rhs.type())
+          rhs.make_typecast(lhs.type());
             
-        assign(state, lhs, call_arguments[i]);
+        assign(state, lhs, rhs);
       }
     }
 
@@ -692,6 +700,11 @@ void path_symext::function_call_rec(
       function_call_rec(state, call, if_expr.true_case(), further_states);
     }
   }
+  else if(function.id()==ID_typecast)
+  {
+    // ignore
+    function_call_rec(state, call, to_typecast_expr(function).op(), further_states);
+  }
   else
     throw "TODO: function_call "+function.id_string();
 }
@@ -708,9 +721,7 @@ Function: path_symext::return_from_function
 
 \*******************************************************************/
 
-void path_symext::return_from_function(
-  path_symex_statet &state,
-  const exprt &return_value)
+void path_symext::return_from_function(path_symex_statet &state)
 {
   path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
 
@@ -728,9 +739,10 @@ void path_symext::return_from_function(
     thread.pc=thread.call_stack.back().return_location;
 
     // assign the return value
-    if(return_value.is_not_nil() &&
+    if(thread.call_stack.back().return_rhs.is_not_nil() &&
        thread.call_stack.back().return_lhs.is_not_nil())
-      assign(state, thread.call_stack.back().return_lhs, return_value);
+      assign(state, thread.call_stack.back().return_lhs,
+                    thread.call_stack.back().return_rhs);
 
     // restore the local variables
     for(path_symex_statet::var_state_mapt::const_iterator
@@ -742,6 +754,30 @@ void path_symext::return_from_function(
     // kill the frame
     thread.call_stack.pop_back();
   }
+}
+
+/*******************************************************************\
+
+Function: path_symext::set_return_value
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symext::set_return_value(
+  path_symex_statet &state,
+  const exprt &v)
+{
+  path_symex_statet::threadt &thread=
+    state.threads[state.get_current_thread()];
+
+  // returning from very last function?
+  if(!thread.call_stack.empty())
+    thread.call_stack.back().return_rhs=v;
 }
 
 /*******************************************************************\
@@ -880,17 +916,17 @@ void path_symext::operator()(
   case END_FUNCTION:
     // pop the call stack
     state.record_step();
-    return_from_function(state, nil_exprt());
+    return_from_function(state);
     break;
     
   case RETURN:
-    // pop the call stack
-    {
-      state.record_step();
-      exprt return_val=instruction.code.operands().size()==1?
-                       instruction.code.op0():nil_exprt();
-      return_from_function(state, return_val);
-    }
+    // sets the return value
+    state.record_step();
+    state.next_pc();
+
+    if(instruction.code.operands().size()==1)
+      set_return_value(state, instruction.code.op0());
+
     break;
     
   case START_THREAD:
