@@ -595,11 +595,15 @@ safety_checkert::resultt bmct::stop_on_fail(
     return SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
-    if(options.get_bool_option("beautify"))
-      counterexample_beautificationt()(
-        dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
-  
-    error_trace();
+    if(options.get_bool_option("trace"))
+    {
+      if(options.get_bool_option("beautify"))
+        counterexample_beautificationt()(
+          dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
+
+      error_trace();
+    }
+    
     report_failure();
     return UNSAFE;
 

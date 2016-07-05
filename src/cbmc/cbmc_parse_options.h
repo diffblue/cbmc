@@ -42,7 +42,7 @@ class optionst;
   "(show-goto-functions)(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
   "(show-claims)(claim):(show-properties)(show-reachable-properties)(property):" \
-  "(stop-on-fail)" \
+  "(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
   "(cover):" \

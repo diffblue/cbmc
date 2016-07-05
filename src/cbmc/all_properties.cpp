@@ -259,10 +259,19 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   case ui_message_handlert::PLAIN:
     {
       status() << "\n** Results:" << eom;
+
       for(const auto & it : goal_map)
         status() << "[" << it.first << "] "
                  << it.second.description << ": " << it.second.status_string()
                  << eom;
+
+      if(bmc.options.get_bool_option("trace"))
+        for(const auto & it : goal_map)
+          if(it.second.status==goalt::statust::FAILURE)
+          {
+            std::cout << "\n" << "Trace for " << it.first << ":" << "\n";
+            show_goto_trace(std::cout, bmc.ns, it.second.goto_trace);
+          }
 
       status() << "\n** " << cover_goals.number_covered()
                << " of " << cover_goals.size() << " failed ("

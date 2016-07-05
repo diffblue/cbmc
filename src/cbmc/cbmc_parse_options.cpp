@@ -186,6 +186,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("stop-on-fail", false);
 
+  if(cmdline.isset("trace") ||
+     cmdline.isset("stop-on-fail") ||
+     cmdline.isset("property"))
+    options.set_option("trace", true);
+
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
 

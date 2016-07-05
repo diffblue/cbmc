@@ -108,17 +108,17 @@ thus print a line as follows:
 Let us have a closer look at this property and why it fails. To aid the
 understanding of the problem, CBMC can generate a <i>counterexample
 trace</i> for failed properties. To obtain this trace, run
-</P
+</p>
 
 <code>
-&nbsp;&nbsp;cbmc file1.c --bounds-check --pointer-check --property main.pointer_dereference.6
+&nbsp;&nbsp;cbmc file1.c --bounds-check --trace
 </code>
 
 <p class="justified">
 CBMC then prints a counterexample trace, i.e., a program trace that begins
 with <code>main</code> and ends in a state which violates the property.  In
 our example, the program trace ends in the faulty array access.  It also
-shows the values the input variables must have for the bug to occur.  In
+gives the values the input variables must have for the bug to occur.  In
 this example, <code>argc</code> must be one to trigger the out-of-bounds
 array access.  If you add a branch to the example that requires that
 <code>argc&gt;=3</code>, the bug is fixed and CBMC will report that the
