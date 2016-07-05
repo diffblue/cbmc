@@ -500,7 +500,8 @@ void symex_parse_optionst::report_properties(
       status() << eom;
     }
 
-    if(cmdline.isset("show-trace") &&
+    if((cmdline.isset("show-trace") ||
+        cmdline.isset("trace")) &&
        it->second.status==path_searcht::FAIL)
       show_counterexample(it->second.error_trace);
   }
@@ -663,6 +664,12 @@ void symex_parse_optionst::help()
     " symex [-?] [-h] [--help]     show help\n"
     " symex file.c ...             source file names\n"
     "\n"
+    "Analysis options:\n"
+    " --show-properties            show the properties, but don't run analysis\n"
+    " --property id                only check one specific property\n"
+    " --stop-on-fail               stop analysis once a failed property is detected\n"
+    " --trace                      give a counterexample trace for failed properties\n"
+    "\n"
     "Frontend options:\n"
     " -I path                      set include path (C/C++)\n"
     " -D macro                     define preprocessor macro (C/C++)\n"
@@ -691,6 +698,7 @@ void symex_parse_optionst::help()
     " --round-to-plus-inf          IEEE floating point rounding mode\n"
     " --round-to-minus-inf         IEEE floating point rounding mode\n"
     " --round-to-zero              IEEE floating point rounding mode\n"
+    " --function name              set main function name\n"
     "\n"
     "Program instrumentation options:\n"
     " --bounds-check               enable array bounds checks\n"
@@ -700,14 +708,11 @@ void symex_parse_optionst::help()
     " --signed-overflow-check      enable arithmetic over- and underflow checks\n"
     " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
     " --nan-check                  check floating-point for NaN\n"
-    " --show-properties            show the properties\n"
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
     "\n"
     "Symex options:\n"
-    " --function name              set main function name\n"
-    " --property nr                only check one specific property\n"
     " --unwind nr                  unwind nr times\n"
     " --depth nr                   limit search depth\n"
     " --context-bound nr           limit number of context switches\n"

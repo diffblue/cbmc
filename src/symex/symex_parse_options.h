@@ -38,8 +38,8 @@ class optionst;
   "(ppc-macos)(unsigned-char)" \
   "(string-abstraction)(no-arch)(arch):(floatbv)(fixedbv)" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(show-locs)(show-vcc)(show-properties)(show-trace)(show-goto-functions)" \
-  "(property):(stop-on-fail)(eager-infeasibility)" \
+  "(show-locs)(show-vcc)(show-properties)(show-goto-functions)" \
+  "(property):(trace)(show-trace)(stop-on-fail)(eager-infeasibility)" \
   "(no-simplify)(no-unwinding-assertions)(no-propagation)"
   // the last line is for CBMC-regression testing only
 
