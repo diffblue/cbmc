@@ -150,6 +150,29 @@ public:
 
   typedef std::map<irep_idt, goalt> goal_mapt;
   goal_mapt goal_map;
+  
+  std::string get_test(const goto_tracet &goto_trace)
+  {
+    bool first=true;
+    std::string test;
+    for(const auto & step : goto_trace.steps)
+    {
+      if(step.is_input())
+      {
+        test+=id2string(step.io_id)+"=";
+        if(step.io_args.size()==1)
+        {
+          if(first)
+            first=false;
+          else
+            test+=", ";
+
+          test+=from_expr(bmc.ns, "", step.io_args.front());
+        }
+      }
+    }
+    return test;
+  }
 
 protected:
   const goto_functionst &goto_functions;
@@ -346,6 +369,7 @@ bool bmc_covert::operator()()
 
       break;
     }
+
     case ui_message_handlert::XML_UI:
     {
       for(const auto & it : goal_map)
@@ -363,7 +387,29 @@ bool bmc_covert::operator()()
           xml_result.new_element()=xml(goal.source_location);
 
         if(goal.satisfied)
-          convert(bmc.ns, goal.goto_trace, xml_result.new_element());
+        {
+          if(bmc.options.get_bool_option("trace"))
+          {
+            convert(bmc.ns, goal.goto_trace, xml_result.new_element());
+          }
+          else
+          {
+            xmlt &xml_test=xml_result.new_element("test");
+
+            for(const auto & step : goal.goto_trace.steps)
+            {
+              if(step.is_input())
+              {
+                xmlt &xml_input=xml_test.new_element("input");
+                xml_input.set_attribute("id", id2string(step.io_id));
+                if(step.io_args.size()==1)
+                  xml_input.new_element("value")=
+                    xml(step.io_args.front(), bmc.ns);
+              }
+            }
+            
+          }
+        }
 
         std::cout << xml_result << "\n";
       }
@@ -390,8 +436,28 @@ bool bmc_covert::operator()()
 
         if(goal.satisfied)
         {
-          jsont &json_trace=result["trace"];
-          convert(bmc.ns, goal.goto_trace, json_trace);
+          if(bmc.options.get_bool_option("trace"))
+          {
+            jsont &json_trace=result["trace"];
+            convert(bmc.ns, goal.goto_trace, json_trace);
+          }
+          else
+          {
+            json_arrayt &json_test=result["test"].make_array();
+
+            for(const auto & step : goal.goto_trace.steps)
+            {
+              if(step.is_input())
+              {
+                json_objectt json_input;
+                json_input["id"]=json_stringt(id2string(step.io_id));
+                if(step.io_args.size()==1)
+                  json_input["value"]=json(step.io_args.front(), bmc.ns);
+                json_test.push_back(json_input);
+              }
+            }
+            
+          }
         }
       }
       json_result["totalGoals"]=json_numbert(i2string(goal_map.size()));
@@ -409,6 +475,20 @@ bool bmc_covert::operator()()
            << cover_goals.iterations() << " iteration"
            << (cover_goals.iterations()==1?"":"s")
            << eom;
+
+  if(bmc.ui==ui_message_handlert::PLAIN)
+  {
+    std::set<std::string> tests;
+
+    for(const auto & it : goal_map)
+      if(it.second.satisfied)
+        tests.insert(get_test(it.second.goto_trace));
+    
+    std::cout << "Test suite:" << '\n';
+
+    for(const auto & t : tests)
+      std::cout << t << '\n';
+  }
   
   return false;
 }
