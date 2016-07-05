@@ -17,8 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
+#include <util/i2string.h>
 
 #include <ansi-c/c_types.h>
+#include <ansi-c/string_constant.h>
 
 #include <goto-programs/goto_functions.h>
 #include <linking/static_lifetime_init.h>
@@ -38,14 +40,50 @@ Function: build_function_environment
 \*******************************************************************/
 
 exprt::operandst build_function_environment(
-  const code_typet::parameterst &parameters)
+  const code_typet::parameterst &parameters,
+  code_blockt &init_code,
+  symbol_tablet &symbol_table)
 {
   exprt::operandst result;
   result.resize(parameters.size());
+  
+  std::size_t i=0;
 
-  for(unsigned i=0; i<parameters.size(); i++)
+  for(const auto & p : parameters)
   {
-    result[i]=side_effect_expr_nondett(parameters[i].type());
+    irep_idt base_name=p.get_base_name();
+    if(base_name.empty()) base_name="argument#"+i2string(i);
+    irep_idt identifier=id2string(goto_functionst::entry_point())+
+      "::"+id2string(base_name);
+  
+    {  
+      auxiliary_symbolt new_symbol;
+      new_symbol.mode=ID_C;
+      new_symbol.is_static_lifetime=false;
+      new_symbol.name=identifier;
+      new_symbol.type=p.type();
+    
+      symbol_table.move(new_symbol);
+    }
+    
+    symbol_exprt symbol_expr(identifier, p.type());
+
+    code_declt decl;
+    decl.symbol()=symbol_expr;
+    
+    init_code.add(decl);
+    
+    codet input(ID_input);
+    input.operands().resize(2);
+
+    // record as an input
+    input.op0()=address_of_exprt(
+      index_exprt(string_constantt(base_name), gen_zero(index_type())));
+    input.op1()=symbol_expr;
+    init_code.move_to_operands(input);
+    
+    result[i]=symbol_expr;
+    i++;
   }
   
   return result;
@@ -113,7 +151,8 @@ bool ansi_c_entry_point(
     main_symbol=standard_main;
     
   // look it up
-  symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(main_symbol);
+  symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table.symbols.find(main_symbol);
   
   if(s_it==symbol_table.symbols.end())
     return false; // give up silently
@@ -206,6 +245,16 @@ bool ansi_c_entry_point(
         assumption.set_statement(ID_assume);
         assumption.move_to_operands(le);
         init_code.move_to_operands(assumption);
+      }
+      
+      {
+        // record argc as an input
+        codet input(ID_input);
+        input.operands().resize(2);
+        input.op0()=address_of_exprt(
+          index_exprt(string_constantt("argc"), gen_zero(index_type())));
+        input.op1()=argc_symbol.symbol_expr();
+        init_code.move_to_operands(input);
       }
       
       if(parameters.size()==3)
@@ -353,7 +402,8 @@ bool ansi_c_entry_point(
   else
   {
     // produce nondet arguments
-    call_main.arguments()=build_function_environment(parameters);
+    call_main.arguments()=
+      build_function_environment(parameters, init_code, symbol_table);
   }
 
   init_code.move_to_operands(call_main);
