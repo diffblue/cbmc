@@ -159,16 +159,15 @@ public:
     {
       if(step.is_input())
       {
-        test+=id2string(step.io_id)+"=";
-        if(step.io_args.size()==1)
-        {
-          if(first)
-            first=false;
-          else
-            test+=", ";
+        if(first)
+          first=false;
+        else
+          test+=", ";
 
+        test+=id2string(step.io_id)+"=";
+
+        if(step.io_args.size()==1)
           test+=from_expr(bmc.ns, "", step.io_args.front());
-        }
       }
     }
     return test;
