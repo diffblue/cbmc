@@ -215,6 +215,8 @@ int symex_parse_optionst::doit()
 
   eval_verbosity();
 
+  goto_model.set_message_handler(get_message_handler());
+
   if(goto_model(cmdline.args))
     return 6;
   
