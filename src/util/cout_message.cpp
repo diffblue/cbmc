@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: cout_message_handlert::print
+Function: cout_message_handlert::cout_message_handlert
 
   Inputs:
 
@@ -30,23 +30,14 @@ Function: cout_message_handlert::print
 
 \*******************************************************************/
 
-void cout_message_handlert::print(
-  unsigned level,
-  const std::string &message)
+cout_message_handlert::cout_message_handlert():
+  stream_message_handlert(std::cout)
 {
-  if(verbosity>=level)
-  {
-    std::cout << message << '\n';
-
-    // We flush for level 6 or below.
-    if(level<=6)
-      std::cout << std::flush;
-  }
 }
 
 /*******************************************************************\
 
-Function: cerr_message_handlert::print
+Function: cerr_message_handlert::cerr_message_handlert
 
   Inputs:
 
@@ -56,12 +47,9 @@ Function: cerr_message_handlert::print
 
 \*******************************************************************/
 
-void cerr_message_handlert::print(
-  unsigned level,
-  const std::string &message)
+cerr_message_handlert::cerr_message_handlert():
+  stream_message_handlert(std::cerr)
 {
-  if(verbosity>=level)
-    std::cerr << message << '\n' << std::flush;
 }
 
 /*******************************************************************\

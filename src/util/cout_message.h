@@ -11,22 +11,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "message.h"
 
-class cout_message_handlert:public message_handlert
+class cout_message_handlert:public stream_message_handlert
 {
 public:
-  // all messages go to cout
-  virtual void print(
-    unsigned level,
-    const std::string &message) override;
+  // all messages go to stdout
+  cout_message_handlert();
 };
 
-class cerr_message_handlert:public message_handlert
+class cerr_message_handlert:public stream_message_handlert
 {
 public:
-  // all messages go to cerr
-  virtual void print(
-    unsigned level,
-    const std::string &message) override;
+  // all messages go to stderr
+  cerr_message_handlert();
 };
 
 class console_message_handlert:public message_handlert

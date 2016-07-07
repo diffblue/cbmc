@@ -65,7 +65,12 @@ public:
   }
 
   virtual void print(unsigned level, const std::string &message)
-  { out << message << '\n'; }
+  {
+    if(verbosity>=level)
+    {
+      out << message << '\n';
+    }
+  }
 
 protected:
   std::ostream &out;
