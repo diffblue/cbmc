@@ -31,6 +31,8 @@ public:
     _ui=__ui;
   }
 
+  virtual void flush(unsigned level);
+
 protected:
   uit _ui;
 

@@ -30,6 +30,11 @@ public:
     int sequence_number,
     const source_locationt &location);
 
+  virtual void flush(unsigned level)
+  {
+    // no-op by default
+  }
+
   virtual ~message_handlert()
   {
   }
@@ -82,6 +87,11 @@ public:
       message_handlert::print(level, message);
       out << message << '\n';
     }
+  }
+
+  virtual void flush(unsigned level)
+  {
+    out << std::flush;
   }
 
 protected:
@@ -216,7 +226,15 @@ public:
   // the printing of the message
   static inline mstreamt &eom(mstreamt &m)
   {
-    m.message.print(m.message_level, m.str(), -1, m.source_location);
+    if(m.message.message_handler)
+    {
+      m.message.message_handler->print(
+        m.message_level,
+        m.str(),
+        -1,
+        m.source_location);
+      m.message.message_handler->flush(m.message_level);
+    }
     m.clear(); // clears error bits
     m.str(std::string()); // clears the string
     m.source_location.clear();

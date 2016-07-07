@@ -32,6 +32,8 @@ public:
   virtual void print(
     unsigned level,
     const std::string &message) override;
+
+  virtual void flush(unsigned level) override;
 };
 
 class gcc_message_handlert:public message_handlert

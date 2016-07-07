@@ -323,3 +323,35 @@ void ui_message_handlert::json_ui_msg(
   //  a trailing comma.
   std::cout << ",\n" << result;
 }
+
+/*******************************************************************\
+
+Function: ui_message_handlert::flush
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ui_message_handlert::flush(unsigned level)
+{
+  switch(get_ui())
+  {
+  case uit::PLAIN:
+  {
+    console_message_handlert console_message_handler;
+    console_message_handler.flush(level);
+  }
+  break;
+
+  case uit::XML_UI:
+  case uit::JSON_UI:
+  {
+    std::cout << std::flush;
+  }
+  break;
+  }
+}
