@@ -23,7 +23,6 @@ Date: May 2006
 #include "cw_mode.h"
 #include "ms_cl_mode.h"
 #include "armcc_mode.h"
-#include "ld_mode.h"
 
 /*******************************************************************\
 
