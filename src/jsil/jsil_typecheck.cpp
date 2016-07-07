@@ -87,7 +87,10 @@ void jsil_typecheckt::update_expr_type(exprt &expr, const typet &type)
     const irep_idt &id=to_symbol_expr(expr).get_identifier();
 
     if(!symbol_table.has_symbol(id))
-      throw "unexpected symbol: "+id2string(id);
+    {
+      error() << "unexpected symbol: " << id << eom;
+      throw 0;
+    }
 
     symbolt &s=symbol_table.lookup(id);
     if(s.type.id().empty() || s.type.is_nil())
@@ -924,7 +927,10 @@ void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
       symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())
-      throw "unexpected internal symbol: "+id2string(identifier);
+    {
+      error() << "unexpected internal symbol: " << identifier << eom;
+      throw 0;
+    }
     else
     {
       // symbol already exists
@@ -1006,7 +1012,12 @@ void jsil_typecheckt::typecheck_code(codet &code)
   else if(statement==ID_expression)
   {
     if(code.operands().size()!=1)
-      throw "expression statement expected to have one operand";
+    {
+      err_location(code);
+      error() << "expression statement expected to have one operand"
+              << eom;
+      throw 0;
+    }
 
     typecheck_expr(code.op0());
   }
@@ -1090,7 +1101,11 @@ void jsil_typecheckt::typecheck_try_catch(code_try_catcht &code)
 {
   // A special case of try catch with one catch clause
   if(code.operands().size()!=3)
-    throw "try_catch expected to have three operands";
+  {
+    err_location(code);
+    error() << "try_catch expected to have three operands" << eom;
+    throw 0;
+  }
 
   // function call
   typecheck_function_call(to_code_function_call(code.try_code()));
@@ -1116,7 +1131,11 @@ void jsil_typecheckt::typecheck_function_call(
   code_function_callt &call)
 {
   if(call.operands().size()!=3)
-    throw "function call expected to have three operands";
+  {
+    err_location(call);
+    error() << "function call expected to have three operands" << eom;
+    throw 0;
+  }
 
   exprt &lhs=call.lhs();
   typecheck_expr(lhs);
@@ -1194,7 +1213,12 @@ void jsil_typecheckt::typecheck_function_call(
       make_type_compatible(lhs, jsil_any_type(), true);
 
       if(symbol_table.add(new_symbol))
-        throw "failed to add expression symbol to symbol table";
+      {
+        err_location(new_symbol.location);
+        error() << "failed to add expression symbol to symbol table"
+                << eom;
+        throw 0;
+      }
     }
   }
   else
@@ -1287,8 +1311,12 @@ void jsil_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
     // Do nothing
   }
   else
-    throw "non-type symbol value expected code, but got "+
-      symbol.value.pretty();
+  {
+    err_location(symbol.location);
+    error() << "non-type symbol value expected code, but got "
+            << symbol.value.pretty() << eom;
+    throw 0;
+  }
 }
 
 /*******************************************************************\

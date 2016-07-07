@@ -158,9 +158,7 @@ bool language_uit::typecheck()
 
   if(language_files.typecheck(symbol_table))
   {
-    if(get_ui()==ui_message_handlert::PLAIN)
-      std::cerr << "CONVERSION ERROR" << std::endl;
-
+    error() << "CONVERSION ERROR" << eom;
     return true;
   }
 
@@ -185,9 +183,7 @@ bool language_uit::final()
 
   if(language_files.final(symbol_table))
   {
-    if(get_ui()==ui_message_handlert::PLAIN)
-      std::cerr << "CONVERSION ERROR" << std::endl;
-
+    error() << "CONVERSION ERROR" << eom;
     return true;
   }
 
