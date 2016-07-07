@@ -148,7 +148,7 @@ bool interval_domaint::merge(
   if(bottom) { *this=b; return true; }
 
   bool result=false;
-  
+
   for(int_mapt::iterator it=int_map.begin();
       it!=int_map.end(); ) // no it++
   {
@@ -293,7 +293,7 @@ void interval_domaint::assume_rec(
   if(lhs.id()==ID_symbol && rhs.id()==ID_constant)
   {
     irep_idt lhs_identifier=to_symbol_expr(lhs).get_identifier();
-    
+
     if(is_int(lhs.type()) && is_int(rhs.type()))
     {
       mp_integer tmp;
@@ -429,9 +429,9 @@ void interval_domaint::assume_rec(
   }
   else if(cond.id()==ID_or)
   {
-    if(negation)
+    if(!negation)
       forall_operands(it, cond)
-        assume_rec(*it, true);
+        assume_rec(*it, false);
   }
 }
 
