@@ -88,7 +88,7 @@ void message_handlert::print(
 
 /*******************************************************************\
 
-Function: messaget::print
+Function: messaget::~messaget
 
   Inputs:
 
@@ -98,65 +98,6 @@ Function: messaget::print
 
 \*******************************************************************/
 
-void messaget::print(unsigned level, const std::string &message)
+messaget::~messaget()
 {
-  if(message_handler!=NULL)
-    message_handler->print(level, message);
-}
-
-/*******************************************************************\
-
-Function: messaget::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void messaget::print(
-  unsigned level,
-  const std::string &message,
-  int sequence_number,
-  const source_locationt &location)
-{
-  if(message_handler!=NULL)
-    message_handler->print(level, message, sequence_number,
-                           location);
-}
-
-/*******************************************************************\
-
-Function: message_clientt::~message_clientt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-message_clientt::~message_clientt()
-{
-}
-
-/*******************************************************************\
-
-Function: message_clientt::set_message_handler
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void message_clientt::set_message_handler(
-  message_handlert &_message_handler)
-{
-  message_handler=&_message_handler;
 }

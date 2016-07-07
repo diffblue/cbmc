@@ -383,7 +383,7 @@ Function: compilet::link
 bool compilet::link()
 {
   // "compile" hitherto uncompiled functions
-  print(8, "Compiling functions");
+  statistics() << "Compiling functions" << eom;
   convert_symbols(compiled_functions);
 
   // parse object files
@@ -554,7 +554,7 @@ bool compilet::parse(const std::string &file_name)
 
   if(mode==PREPROCESS_ONLY)
   {
-    print(8, "Preprocessing: "+file_name);
+    statistics() << "Preprocessing: " << file_name << eom;
 
     std::ostream *os = &std::cout;
     std::ofstream ofs;
@@ -576,7 +576,7 @@ bool compilet::parse(const std::string &file_name)
   }
   else
   {
-    print(8, "Parsing: "+file_name);
+    statistics() << "Parsing: " << file_name << eom;
 
     if(language.parse(infile, file_name))
     {
@@ -608,7 +608,7 @@ bool compilet::parse_stdin()
 
   language.set_message_handler(get_message_handler());
 
-  print(8, "Parsing: (stdin)");
+  statistics() << "Parsing: (stdin)" << eom;
 
   if(mode==PREPROCESS_ONLY)
   {
@@ -872,7 +872,7 @@ void compilet::convert_symbols(goto_functionst &dest)
           s_it->second.value.id()!="compiled" &&
           s_it->second.value.is_not_nil())
       {
-        print(9, "Compiling "+id2string(s_it->first));
+        debug() << "Compiling " << s_it->first << eom;
         converter.convert_function(s_it->first);
         s_it->second.value=exprt("compiled");
       }

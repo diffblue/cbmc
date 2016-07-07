@@ -91,7 +91,10 @@ bool initialize_goto_model(
 
         if(lf.language==NULL)
         {
-          msg.error("failed to figure out type of file", filename);
+          source_locationt location;
+          location.set_file(filename);
+          msg.error().source_location=location;
+          msg.error() << "failed to figure out type of file" << messaget::eom;
           return true;
         }
 

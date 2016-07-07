@@ -115,7 +115,10 @@ bool language_uit::parse(const std::string &filename)
 
   if(lf.language==NULL)
   {
-    error("failed to figure out type of file", filename);
+    source_locationt location;
+    location.set_file(filename);
+    error().source_location=location;
+    error() << "failed to figure out type of file" << eom;
     return true;
   }
 

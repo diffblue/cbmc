@@ -190,9 +190,9 @@ void gcc_message_handlert::print(
     else
       dest+=id2string(column)+": ";
 
-    if(level==message_clientt::M_ERROR)
+    if(level==messaget::M_ERROR)
       dest+="error: ";
-    else if(level==message_clientt::M_WARNING)
+    else if(level==messaget::M_WARNING)
       dest+="warning: ";
   }
 
