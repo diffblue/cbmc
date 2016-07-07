@@ -272,6 +272,15 @@ void ansi_c_convert_typet::write(typet &type)
       throw 0;
     }
 
+    // asm blocks (cf. regression/ansi-c/asm1) - ignore the asm
+    if(other.size()==2)
+    {
+      if(other.front().id()==ID_asm && other.back().id()==ID_empty)
+        other.pop_front();
+      else if(other.front().id()==ID_empty && other.back().id()==ID_asm)
+        other.pop_back();
+    }
+
     if(other.size()!=1)
     {
       error().source_location=source_location;
