@@ -97,6 +97,8 @@ void ui_message_handlert::print(
     {
     case uit::PLAIN:
     {
+      message_handlert::print(level, message);
+
       console_message_handlert console_message_handler;
       console_message_handler.print(level, message);
     }
@@ -134,6 +136,8 @@ void ui_message_handlert::print(
     case uit::XML_UI:
     case uit::JSON_UI:
     {
+      message_handlert::print(level, message);
+
       std::string tmp_message(message);
 
       if(!tmp_message.empty() && *tmp_message.rbegin()=='\n')

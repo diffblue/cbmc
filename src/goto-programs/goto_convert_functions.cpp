@@ -259,7 +259,6 @@ void goto_convert(
   {
     goto_convert_functions.error() << e << messaget::eom;
   }
-
   if(message_handler.get_message_count(messaget::M_ERROR)!=errors_before)
     throw 0;
 }
