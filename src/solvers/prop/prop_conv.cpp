@@ -303,8 +303,8 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   if(expr.type().id()!=ID_bool)
   {
     std::string msg="prop_convt::convert_bool got "
-                    "non-boolean expression:\n";
-    msg+=expr.to_string();
+                    "non-boolean expression: ";
+    msg+=expr.pretty();
     throw msg;
   }
 
@@ -317,7 +317,7 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
     else if(expr.is_false())
       return const_literal(false);
     else
-      throw "unknown boolean constant: "+expr.to_string();
+      throw "unknown boolean constant: "+expr.pretty();
   }
   else if(expr.id()==ID_symbol)
   {
@@ -500,8 +500,8 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
   if(expr.type().id()!=ID_bool)
   {
     std::string msg="prop_convt::set_to got "
-                    "non-boolean expression:\n";
-    msg+=expr.to_string();
+                    "non-boolean expression: ";
+    msg+=expr.pretty();
     throw msg;
   }
   

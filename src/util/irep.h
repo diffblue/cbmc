@@ -223,10 +223,6 @@ public:
   friend inline bool operator!=(const irept &i1, const irept &i2)
   { return !(i1==i2); }
 
-  friend std::ostream& operator<< (std::ostream& out, const irept &irep);
-  
-  std::string to_string() const;
-  
   inline void swap(irept &irep)
   {
     std::swap(irep.data, data);

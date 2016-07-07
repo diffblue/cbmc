@@ -971,8 +971,8 @@ void value_set_fivrnst::assign(
       {
         if (!base_type_eq(rhs.type(), type, ns))
         {
-          std::cout << "RHS: " << rhs.type() << std::endl;
-          std::cout << "LHS: " << type << std::endl;
+          std::cout << "RHS: " << rhs.type().pretty() << std::endl;
+          std::cout << "LHS: " << type.pretty() << std::endl;
         }
         
         assert(base_type_eq(rhs.type(), type, ns));

@@ -142,12 +142,12 @@ void prop_conv_storet::constraintt::print(std::ostream &out) const
   {
   case SET_TO:
     out << "SET_TO " << (value?"TRUE":"FALSE") << ": ";
-    out << expr << "\n";
+    out << expr.pretty() << "\n";
     break;
   
   case CONVERT:
     out << "CONVERT(" << literal.dimacs() << "): ";
-    out << expr << "\n";
+    out << expr.pretty() << "\n";
     break;
   
   default:
