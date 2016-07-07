@@ -83,6 +83,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "thread_instrumentation.h"
 #include "skip_loops.h"
 #include "code_contracts.h"
+#include "unwind.h"
+#include "loop_utils.h"
+
 
 /*******************************************************************\
 
@@ -143,6 +146,54 @@ int goto_instrument_parse_optionst::doit()
 
     get_goto_program();
     instrument_goto_program();
+
+    if(cmdline.isset("unwind"))
+    {
+      // here we simply unwind all loops in the goto program
+      // each loop body is repeated k times and is exited
+      // the number of unwinding
+      int k = stoi(cmdline.get_value("unwind"));
+
+      Forall_goto_functions(it, goto_functions)
+      {
+        goto_functionst::goto_functiont &goto_function=it->second;
+
+        if(!goto_function.body_available())
+        {
+          continue;
+        }
+
+        goto_programt &goto_program=goto_function.body;
+
+        natural_loops_mutablet natural_loops(goto_program);
+        typedef const natural_loops_mutablet::natural_loopt loopt;
+        for(natural_loops_mutablet::loop_mapt::const_iterator
+            l_it=natural_loops.loop_map.begin();
+            l_it!=natural_loops.loop_map.end();
+            l_it++)
+        {
+          // save a copy of the loop guard
+          const exprt loop_guard=l_it->first->guard;
+
+          const loopt &loop=l_it->second;
+          assert(!loop.empty());
+          goto_programt::targett loop_exit=get_loop_exit(loop);
+
+
+          unwind(goto_program, l_it->first, loop_exit, k);
+          goto_programt::instructiont assume(ASSUME);
+          assume.guard=loop_guard;
+          goto_programt::targett t=goto_function.body.insert_before(loop_exit);
+          *t=assume;
+          //goto_functions.update();
+          //goto_functions.compute_loop_numbers();
+        }
+      }
+
+      //remove_skip(goto_functions);
+      goto_functions.update();
+      goto_functions.compute_loop_numbers();
+    }
 
     if(cmdline.isset("show-value-sets"))
     {
