@@ -55,14 +55,17 @@ void goto_convertt::do_prob_uniform(
   // make it a side effect if there is an LHS
   if(arguments.size()!=2)
   {
-    err_location(function);
-    throw "`"+id2string(identifier)+"' expected to have two arguments";
+    error().source_location=function.find_source_location();
+    error() << "`" << identifier
+            << "' expected to have two arguments" << eom;
+    throw 0;
   }
 
   if(lhs.is_nil())
   {
-    err_location(function);
-    throw "`"+id2string(identifier)+"' expected to have LHS";
+    error().source_location=function.find_source_location();
+    error() << "`" << identifier << "' expected to have LHS" << eom;
+    throw 0;
   }
 
   exprt rhs=side_effect_exprt("prob_uniform", lhs.type());
@@ -71,22 +74,27 @@ void goto_convertt::do_prob_uniform(
   if(lhs.type().id()!=ID_unsignedbv &&
      lhs.type().id()!=ID_signedbv)
   {
-    err_location(function);
-    throw "`"+id2string(identifier)+"' expected other type";
+    error().source_location=function.find_source_location();
+    error() << "`" << identifier << "' expected other type" << eom;
+    throw 0;
   }
 
   if(arguments[0].type().id()!=lhs.type().id() ||
      arguments[1].type().id()!=lhs.type().id())
   {
-    err_location(function);
-    throw "`"+id2string(identifier)+"' expected operands to be of same type as LHS";
+    error().source_location=function.find_source_location();
+    error() << "`" << identifier
+            << "' expected operands to be of same type as LHS" << eom;
+    throw 0;
   }
 
   if(!arguments[0].is_constant() ||
      !arguments[1].is_constant())
   {
-    err_location(function);
-    throw "`"+id2string(identifier)+"' expected operands to be constant literals";
+    error().source_location=function.find_source_location();
+    error() << "`" << identifier
+            << "' expected operands to be constant literals" << eom;
+    throw 0;
   }
 
   mp_integer lb, ub;
@@ -94,14 +102,17 @@ void goto_convertt::do_prob_uniform(
   if(to_integer(arguments[0], lb) ||
      to_integer(arguments[1], ub))
   {
-    err_location(function);
-    throw "error converting operands";
+    error().source_location=function.find_source_location();
+    error() << "error converting operands" << eom;
+    throw 0;
   }
 
   if(lb > ub)
   {
-    err_location(function);
-    throw "expected lower bound to be smaller or equal to the upper bound";
+    error().source_location=function.find_source_location();
+    error() << "expected lower bound to be smaller or equal to the "
+            << "upper bound" << eom;
+    throw 0;
   }
 
   rhs.copy_to_operands(arguments[0], arguments[1]);
@@ -134,14 +145,17 @@ void goto_convertt::do_prob_coin(
   // make it a side effect if there is an LHS
   if(arguments.size()!=2) 
   {
-    err_location(function);
-    throw "`"+id2string(identifier)+"' expected to have two arguments";
+    error().source_location=function.find_source_location();
+    error() << "`" << identifier << "' expected to have two arguments"
+            << eom;
+    throw 0;
   }
   
   if(lhs.is_nil())
   {
-    err_location(function);
-    throw "`"+id2string(identifier)+"' expected to have LHS";
+    error().source_location=function.find_source_location();
+    error() << "`" << identifier << "' expected to have LHS" << eom;
+    throw 0;
   }
 
   exprt rhs=side_effect_exprt("prob_coin", lhs.type());
@@ -149,16 +163,18 @@ void goto_convertt::do_prob_coin(
 
   if(lhs.type()!=bool_typet())
   {
-    err_location(function);
-    throw "`"+id2string(identifier)+"' expected bool";
+    error().source_location=function.find_source_location();
+    error() << "`" << identifier << "' expected bool" << eom;
+    throw 0;
   }
 
   if(arguments[0].type().id()!=ID_unsignedbv ||
      arguments[0].id()!=ID_constant)
   {
-    err_location(function);
-    throw "`"+id2string(identifier)+"' expected first "
-          "operand to be a constant literal of type unsigned long";
+    error().source_location=function.find_source_location();
+    error() << "`" << identifier << "' expected first operand to be "
+            << "a constant literal of type unsigned long" << eom;
+    throw 0;
   }
 
   mp_integer num, den;
@@ -166,20 +182,23 @@ void goto_convertt::do_prob_coin(
   if(to_integer(arguments[0], num) ||
      to_integer(arguments[1], den))
   {
-    err_location(function);
-    throw "error converting operands";
+    error().source_location=function.find_source_location();
+    error() << "error converting operands" << eom;
+    throw 0;
   }
 
   if(num-den > mp_integer(0))
   {
-    err_location(function);
-    throw "probability has to be smaller than 1";
+    error().source_location=function.find_source_location();
+    error() << "probability has to be smaller than 1" << eom;
+    throw 0;
   }
 
   if(den == mp_integer(0))
   {
-    err_location(function);
-    throw "denominator may not be zero";
+    error().source_location=function.find_source_location();
+    error() << "denominator may not be zero" << eom;
+    throw 0;
   }
 
   rationalt numerator(num), denominator(den);
@@ -262,7 +281,7 @@ void goto_convertt::do_scanf(
   {
     if(arguments.size()<1)
     {
-      err_location(function);
+      error().source_location=function.find_source_location();
       error() << "scanf takes at least one argument" << eom;
       throw 0;
     }
@@ -372,8 +391,9 @@ void goto_convertt::do_input(
   
   if(arguments.size()<2)
   {
-    err_location(function);
-    throw "input takes at least two arguments";
+    error().source_location=function.find_source_location();
+    error() << "input takes at least two arguments" << eom;
+    throw 0;
   }
     
   copy(input_code, OTHER, dest);
@@ -404,8 +424,9 @@ void goto_convertt::do_output(
   
   if(arguments.size()<2)
   {
-    err_location(function);
-    throw "output takes at least two arguments";
+    error().source_location=function.find_source_location();
+    error() << "output takes at least two arguments" << eom;
+    throw 0;
   }
     
   copy(output_code, OTHER, dest);
@@ -431,14 +452,16 @@ void goto_convertt::do_atomic_begin(
 {
   if(lhs.is_not_nil())
   {
-    err_location(lhs);
-    throw "atomic_begin does not expect an LHS";
+    error().source_location=lhs.find_source_location();
+    error() << "atomic_begin does not expect an LHS" << eom;
+    throw 0;
   }
 
   if(!arguments.empty())
   {
-    err_location(function);
-    throw "atomic_begin takes no arguments";
+    error().source_location=function.find_source_location();
+    error() << "atomic_begin takes no arguments" << eom;
+    throw 0;
   }
 
   goto_programt::targett t=dest.add_instruction(ATOMIC_BEGIN);
@@ -465,14 +488,16 @@ void goto_convertt::do_atomic_end(
 {
   if(lhs.is_not_nil())
   {
-    err_location(lhs);
-    throw "atomic_end does not expect an LHS";
+    error().source_location=lhs.find_source_location();
+    error() << "atomic_end does not expect an LHS" << eom;
+    throw 0;
   }
 
   if(!arguments.empty())
   {
-    err_location(function);
-    throw "atomic_end takes no arguments";
+    error().source_location=function.find_source_location();
+    error() << "atomic_end takes no arguments" << eom;
+    throw 0;
   }
 
   goto_programt::targett t=dest.add_instruction(ATOMIC_END);
@@ -497,7 +522,11 @@ void goto_convertt::do_cpp_new(
   goto_programt &dest)
 {
   if(lhs.is_nil())
-    throw "do_cpp_new without lhs is yet to be implemented";
+  {
+    error().source_location=lhs.find_source_location();
+    error() << "do_cpp_new without lhs is yet to be implemented" << eom;
+    throw 0;
+  }
   
   // build size expression
   exprt object_size=
@@ -586,7 +615,11 @@ void goto_convertt::do_cpp_new(
     convert(new_call, dest);
   }
   else
-    throw "cpp_new expected to have 0 or 1 operands";
+  {
+    error().source_location=rhs.find_source_location();
+    error() << "cpp_new expected to have 0 or 1 operands" << eom;
+    throw 0;
+  }
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(
@@ -654,14 +687,22 @@ void goto_convertt::do_java_new(
   goto_programt &dest)
 {
   if(lhs.is_nil())
-    throw "do_java_new without lhs is yet to be implemented";
+  {
+    error().source_location=lhs.find_source_location();
+    error() << "do_java_new without lhs is yet to be implemented" << eom;
+    throw 0;
+  }
     
   source_locationt location=rhs.source_location();
 
   assert(rhs.operands().empty());
 
   if(rhs.type().id()!=ID_pointer)
-    throw "do_java_new returns pointer";
+  {
+    error().source_location=rhs.find_source_location();
+    error() << "do_java_new returns pointer" << eom;
+    throw 0;
+  }
 
   typet object_type=rhs.type().subtype();
   
@@ -669,7 +710,11 @@ void goto_convertt::do_java_new(
   exprt object_size=size_of_expr(object_type, ns);
   
   if(object_size.is_nil())
-    throw "do_java_new got nil object_size";
+  {
+    error().source_location=rhs.find_source_location();
+    error() << "do_java_new got nil object_size" << eom;
+    throw 0;
+  }
 
   // we produce a malloc side-effect, which stays
   side_effect_exprt malloc_expr(ID_malloc);
@@ -707,14 +752,23 @@ void goto_convertt::do_java_new_array(
   goto_programt &dest)
 {
   if(lhs.is_nil())
-    throw "do_java_new_array without lhs is yet to be implemented";
+  {
+    error().source_location=lhs.find_source_location();
+    error() << "do_java_new_array without lhs is yet to be implemented"
+            << eom;
+    throw 0;
+  }
     
   source_locationt location=rhs.source_location();
 
   assert(rhs.operands().size()>=1); // one per dimension
   
   if(rhs.type().id()!=ID_pointer)
-    throw "do_java_new_array returns pointer";
+  {
+    error().source_location=rhs.find_source_location();
+    error() << "do_java_new_array returns pointer" << eom;
+    throw 0;
+  }
 
   typet object_type=rhs.type().subtype();
   
@@ -722,7 +776,11 @@ void goto_convertt::do_java_new_array(
   exprt object_size=size_of_expr(object_type, ns);
   
   if(object_size.is_nil())
-    throw "do_java_new_array got nil object_size";
+  {
+    error().source_location=rhs.find_source_location();
+    error() << "do_java_new_array got nil object_size" << eom;
+    throw 0;
+  }
 
   // we produce a malloc side-effect, which stays
   side_effect_exprt malloc_expr(ID_malloc);
@@ -859,24 +917,27 @@ exprt goto_convertt::get_array_argument(const exprt &src)
 
   if(src.id()!=ID_address_of)
   {
-    err_location(src);
-    throw "expected array-pointer as argument";
+    error().source_location=src.find_source_location();
+    error() << "expected array-pointer as argument" << eom;
+    throw 0;
   }
   
   assert(src.operands().size()==1);
 
   if(src.op0().id()!=ID_index)
   {
-    err_location(src);
-    throw "expected array-element as argument";
+    error().source_location=src.find_source_location();
+    error() << "expected array-element as argument" << eom;
+    throw 0;
   }
   
   assert(src.op0().operands().size()==2);
 
   if(ns.follow(src.op0().op0().type()).id()!=ID_array)
   {
-    err_location(src);
-    throw "expected array as argument";
+    error().source_location=src.find_source_location();
+    error() << "expected array as argument" << eom;
+    throw 0;
   }
 
   return src.op0().op0();
@@ -902,8 +963,9 @@ void goto_convertt::do_array_set(
 {
   if(arguments.size()!=2)
   {
-    err_location(function);
-    throw "array_set expects two arguments";
+    error().source_location=function.find_source_location();
+    error() << "array_set expects two arguments" << eom;
+    throw 0;
   }
 
   codet array_set_statement;
@@ -933,8 +995,9 @@ void goto_convertt::do_array_copy(
 {
   if(arguments.size()!=2)
   {
-    err_location(function);
-    throw "array_copy expects two arguments";
+    error().source_location=function.find_source_location();
+    error() << "array_copy expects two arguments" << eom;
+    throw 0;
   }
 
   codet array_copy_statement;
@@ -964,8 +1027,9 @@ void goto_convertt::do_array_equal(
 {
   if(arguments.size()!=2)
   {
-    err_location(function);
-    throw "array_equal expects two arguments";
+    error().source_location=function.find_source_location();
+    error() << "array_equal expects two arguments" << eom;
+    throw 0;
   }
   
   const typet &arg0_type=ns.follow(arguments[0].type());
@@ -974,8 +1038,9 @@ void goto_convertt::do_array_equal(
   if(arg0_type.id()!=ID_pointer ||
      arg1_type.id()!=ID_pointer)
   {
-    err_location(function);
-    throw "array_equal expects pointer arguments";
+    error().source_location=function.find_source_location();
+    error() << "array_equal expects pointer arguments" << eom;
+    throw 0;
   }
   
   if(lhs.is_not_nil())
@@ -1078,14 +1143,18 @@ void goto_convertt::do_function_call_symbol(
   const symbolt *symbol;
   if(ns.lookup(identifier, symbol))
   {
-    err_location(function);
-    throw "error: function `"+id2string(identifier)+"' not found";
+    error().source_location=function.find_source_location();
+    error() << "error: function `" << identifier << "' not found"
+            << eom;
+    throw 0;
   }
 
   if(symbol->type.id()!=ID_code)
   {
-    err_location(function);
-    throw "error: function `"+id2string(identifier)+"' type mismatch: expected code";
+    error().source_location=function.find_source_location();
+    error() << "error: function `" << identifier
+            << "' type mismatch: expected code" << eom;
+    throw 0;
   }
   
   if(identifier==CPROVER_PREFIX "assume" ||
@@ -1093,8 +1162,10 @@ void goto_convertt::do_function_call_symbol(
   {
     if(arguments.size()!=1)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have one argument";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have one argument"
+              << eom;
+      throw 0;
     }
 
     goto_programt::targett t=dest.add_instruction(ASSUME);
@@ -1108,16 +1179,19 @@ void goto_convertt::do_function_call_symbol(
 
     if(lhs.is_not_nil())
     {
-      err_location(function);
-      throw id2string(identifier)+" expected not to have LHS";
+      error().source_location=function.find_source_location();
+      error() << identifier << " expected not to have LHS" << eom;
+      throw 0;
     }
   }
   else if(identifier=="__VERIFIER_error")
   {
     if(!arguments.empty())
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have no arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have no arguments"
+              << eom;
+      throw 0;
     }
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
@@ -1128,8 +1202,9 @@ void goto_convertt::do_function_call_symbol(
 
     if(lhs.is_not_nil())
     {
-      err_location(function);
-      throw id2string(identifier)+" expected not to have LHS";
+      error().source_location=function.find_source_location();
+      error() << identifier << " expected not to have LHS" << eom;
+      throw 0;
     }
   }
   else if(has_prefix(id2string(identifier), "java::java.lang.AssertionError.<init>:"))
@@ -1145,8 +1220,10 @@ void goto_convertt::do_function_call_symbol(
 
     if(arguments.size()!=1 && arguments.size()!=2)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have one or two arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have one or two arguments" << eom;
+      throw 0;
     }
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
@@ -1161,8 +1238,10 @@ void goto_convertt::do_function_call_symbol(
   {
     if(arguments.size()!=1)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have one argument";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have one argument"
+              << eom;
+      throw 0;
     }
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
@@ -1178,16 +1257,19 @@ void goto_convertt::do_function_call_symbol(
 
     if(lhs.is_not_nil())
     {
-      err_location(function);
-      throw id2string(identifier)+" expected not to have LHS";
+      error().source_location=function.find_source_location();
+      error() << identifier << " expected not to have LHS" << eom;
+      throw 0;
     }
   }
   else if(identifier==CPROVER_PREFIX "assert")
   {
     if(arguments.size()!=2)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have two arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have two arguments"
+              << eom;
+      throw 0;
     }
     
     const irep_idt description=
@@ -1206,8 +1288,9 @@ void goto_convertt::do_function_call_symbol(
 
     if(lhs.is_not_nil())
     {
-      err_location(function);
-      throw id2string(identifier)+" expected not to have LHS";
+      error().source_location=function.find_source_location();
+      error() << identifier << " expected not to have LHS" << eom;
+      throw 0;
     }
   }
   else if(identifier==CPROVER_PREFIX "printf")
@@ -1340,8 +1423,10 @@ void goto_convertt::do_function_call_symbol(
     if(arguments.size()!=4 &&
        arguments.size()!=3)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have four arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have four arguments"
+              << eom;
+      throw 0;
     }
     
     const irep_idt description=
@@ -1379,8 +1464,10 @@ void goto_convertt::do_function_call_symbol(
     }
     else
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have four arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have four arguments"
+              << eom;
+      throw 0;
     }
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
@@ -1398,8 +1485,10 @@ void goto_convertt::do_function_call_symbol(
     // "file.c", line, __func__, "expression"
     if(arguments.size()!=4)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have four arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have four arguments"
+              << eom;
+      throw 0;
     }
 
     const irep_idt description=
@@ -1417,8 +1506,10 @@ void goto_convertt::do_function_call_symbol(
   {
     if(arguments.size()<1)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have at least one argument";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have at least one argument" << eom;
+      throw 0;
     }
 
     goto_programt::targett t=dest.add_instruction(OTHER);
@@ -1449,8 +1540,10 @@ void goto_convertt::do_function_call_symbol(
 
     if(arguments.size()!=1)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have one argument";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have one argument"
+              << eom;
+      throw 0;
     }
     
     exprt list_arg=make_va_list(arguments[0]);
@@ -1480,8 +1573,10 @@ void goto_convertt::do_function_call_symbol(
   {
     if(arguments.size()!=2)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have two arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have two arguments"
+              << eom;
+      throw 0;
     }
     
     exprt dest_expr=make_va_list(arguments[0]);
@@ -1489,8 +1584,9 @@ void goto_convertt::do_function_call_symbol(
 
     if(!is_lvalue(dest_expr))
     {
-      err_location(dest_expr);
-      throw "va_copy argument expected to be lvalue";
+      error().source_location=dest_expr.find_source_location();
+      error() << "va_copy argument expected to be lvalue" << eom;
+      throw 0;
     }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
@@ -1503,8 +1599,10 @@ void goto_convertt::do_function_call_symbol(
     // parameter argument.
     if(arguments.size()!=2)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have two arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have two arguments"
+              << eom;
+      throw 0;
     }
     
     exprt dest_expr=make_va_list(arguments[0]);
@@ -1513,8 +1611,9 @@ void goto_convertt::do_function_call_symbol(
 
     if(!is_lvalue(dest_expr))
     {
-      err_location(dest_expr);
-      throw "va_start argument expected to be lvalue";
+      error().source_location=dest_expr.find_source_location();
+      error() << "va_start argument expected to be lvalue" << eom;
+      throw 0;
     }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
@@ -1526,16 +1625,19 @@ void goto_convertt::do_function_call_symbol(
     // Invalidates the argument. We do so by setting it to NULL.
     if(arguments.size()!=1)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have one argument";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have one argument"
+              << eom;
+      throw 0;
     }
     
     exprt dest_expr=make_va_list(arguments[0]);
     
     if(!is_lvalue(dest_expr))
     {
-      err_location(dest_expr);
-      throw "va_end argument expected to be lvalue";
+      error().source_location=dest_expr.find_source_location();
+      error() << "va_end argument expected to be lvalue" << eom;
+      throw 0;
     }    
 
     // our __builtin_va_list is a pointer
@@ -1558,14 +1660,18 @@ void goto_convertt::do_function_call_symbol(
 
     if(arguments.size()<2)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have at least two arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have at least two arguments" << eom;
+      throw 0;
     }
 
     if(arguments[0].type().id()!=ID_pointer)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have pointer argument";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have pointer argument"
+              << eom;
+      throw 0;
     }
     
     // build *ptr
@@ -1623,14 +1729,18 @@ void goto_convertt::do_function_call_symbol(
 
     if(arguments.size()<2)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have at least two arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have at least two arguments" << eom;
+      throw 0;
     }
 
     if(arguments[0].type().id()!=ID_pointer)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have pointer argument";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have pointer argument" << eom;
+      throw 0;
     }
     
     // build *ptr
@@ -1691,14 +1801,18 @@ void goto_convertt::do_function_call_symbol(
     
     if(arguments.size()<3)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have at least three arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have at least three arguments" << eom;
+      throw 0;
     }
 
     if(arguments[0].type().id()!=ID_pointer)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have pointer argument";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have pointer argument" << eom;
+      throw 0;
     }
 
     // build *ptr
@@ -1745,14 +1859,18 @@ void goto_convertt::do_function_call_symbol(
     // type __sync_val_compare_and_swap (type *ptr, type oldval, type newval, ...)
     if(arguments.size()<3)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have at least three arguments";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have at least three arguments" << eom;
+      throw 0;
     }
 
     if(arguments[0].type().id()!=ID_pointer)
     {
-      err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have pointer argument";
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have pointer argument" << eom;
+      throw 0;
     }
 
     // build *ptr
