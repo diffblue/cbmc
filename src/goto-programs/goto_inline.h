@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INLINE_H
 #define CPROVER_GOTO_INLINE_H
 
-#include <util/message_stream.h>
-
 #include "goto_model.h"
+
+class message_handlert;
 
 // do a full inlining
 void goto_inline(
