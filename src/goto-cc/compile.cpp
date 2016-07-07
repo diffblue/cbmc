@@ -121,6 +121,9 @@ bool compilet::doit()
     return true;
   }
 
+  const unsigned warnings_before=
+    get_message_handler().get_message_count(messaget::M_WARNING);
+
   if(source_files.size()>0)
     if(compile())
       return true;
@@ -133,7 +136,10 @@ bool compilet::doit()
       return true;
   }
 
-  return false;
+  return
+    warning_is_fatal &&
+    get_message_handler().get_message_count(messaget::M_WARNING)!=
+    warnings_before;
 }
 
 /*******************************************************************\
@@ -156,8 +162,8 @@ bool compilet::add_input_file(const std::string &file_name)
     std::ifstream in(file_name);
     if(!in)
     {
-      error() << "failed to open file `" << file_name << "'" << eom;
-      return false; // generously ignore
+      warning() << "failed to open file `" << file_name << "'" << eom;
+      return warning_is_fatal; // generously ignore unless -Werror
     }
   }
 
@@ -168,7 +174,7 @@ bool compilet::add_input_file(const std::string &file_name)
     // a file without extension; will ignore
     warning() << "input file `" << file_name
               << "' has no extension, not considered" << eom;
-    return false;
+    return warning_is_fatal;
   }
 
   std::string ext = file_name.substr(r+1, file_name.length());
@@ -329,7 +335,7 @@ bool compilet::find_library(const std::string &name)
       else if(is_elf_file(libname))
       {
         warning() << "Warning: Cannot read ELF library " << libname << eom;
-        return false;
+        return warning_is_fatal;
       }
     }
   }
@@ -752,11 +758,12 @@ Function: compilet::compilet
 
 \*******************************************************************/
 
-compilet::compilet(cmdlinet &_cmdline):
+compilet::compilet(cmdlinet &_cmdline, bool Werror):
   language_uit(_cmdline, ui_message_handler),
   ui_message_handler(_cmdline, "goto-cc " CBMC_VERSION),
   ns(symbol_table),
-  cmdline(_cmdline)
+  cmdline(_cmdline),
+  warning_is_fatal(Werror)
 {
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;

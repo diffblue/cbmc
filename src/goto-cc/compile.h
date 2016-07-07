@@ -45,7 +45,7 @@ public:
   std::string object_file_extension;
   std::string output_file_object, output_file_executable;
 
-  explicit compilet(cmdlinet &_cmdline);
+  compilet(cmdlinet &_cmdline, bool Werror);
 
   ~compilet();
 
@@ -72,6 +72,7 @@ public:
 
 protected:
   cmdlinet &cmdline;
+  bool warning_is_fatal;
 
   unsigned function_body_count(const goto_functionst &);
 

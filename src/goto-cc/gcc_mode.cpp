@@ -218,7 +218,7 @@ int gcc_modet::doit()
     return EX_OK;
   }
 
-  if(cmdline.isset("Wall"))
+  if(cmdline.isset("Wall") || cmdline.isset("Wextra"))
     verbosity=2;
 
   if(cmdline.isset("verbosity"))
@@ -303,7 +303,10 @@ int gcc_modet::doit()
     config.ansi_c.double_width=config.ansi_c.single_width;
 
   // determine actions to be undertaken
-  compilet compiler(cmdline);
+  compilet compiler(cmdline,
+                    cmdline.isset("Werror") &&
+                    cmdline.isset("Wextra") &&
+                    !cmdline.isset("Wno-error"));
   compiler.set_message_handler(get_message_handler());
 
   if(act_as_ld)
