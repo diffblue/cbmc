@@ -82,11 +82,10 @@ public:
 
   virtual void print(unsigned level, const std::string &message)
   {
+    message_handlert::print(level, message);
+
     if(verbosity>=level)
-    {
-      message_handlert::print(level, message);
       out << message << '\n';
-    }
   }
 
   virtual void flush(unsigned level)
