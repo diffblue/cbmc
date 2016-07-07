@@ -47,6 +47,7 @@ public:
   std::string object_file_extension;
   std::string output_file_object, output_file_executable;
 
+
   compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror);
 
   ~compilet();

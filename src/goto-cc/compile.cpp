@@ -117,7 +117,11 @@ bool compilet::doit()
   const unsigned warnings_before=
     get_message_handler().get_message_count(messaget::M_WARNING);
 
+<<<<<<< 0bc503ae07a912ec82d5c337f453520219aac395
   if(!source_files.empty())
+=======
+  if(source_files.size()>0)
+>>>>>>> HEAD~84
     if(compile())
       return true;
 
@@ -644,7 +648,8 @@ bool compilet::parse_source(const std::string &file_name)
 /// constructor
 /// \return nothing
 compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):
-  language_uit(_cmdline, mh),
+  language_uit(_cmdline, ui_message_handler),
+  ui_message_handler(_cmdline, "goto-cc " CBMC_VERSION),
   ns(symbol_table),
   cmdline(_cmdline),
   warning_is_fatal(Werror)
