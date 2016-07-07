@@ -94,11 +94,6 @@ public:
     out << std::flush;
   }
 
-  virtual void flush(unsigned level)
-  {
-    out << std::flush;
-  }
-
 protected:
   std::ostream &out;
 };

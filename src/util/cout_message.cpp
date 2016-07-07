@@ -38,8 +38,6 @@ void console_message_handlert::print(
   if(verbosity<level)
     return;
 
-  message_handlert::print(level, message);
-
   #ifdef _WIN32
   HANDLE out_handle=
     GetStdHandle((level>1)?STD_OUTPUT_HANDLE:STD_ERROR_HANDLE);
