@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class message_handlert
 {
 public:
-  message_handlert():verbosity(10)
+  message_handlert():verbosity(10), message_count(10, 0)
   {
   }
 
@@ -37,8 +37,17 @@ public:
   void set_verbosity(unsigned _verbosity) { verbosity=_verbosity; }
   unsigned get_verbosity() const { return verbosity; }
 
+  inline unsigned get_message_count(unsigned level) const
+  {
+    if(level>=message_count.size())
+      return 0;
+
+    return message_count[level];
+  }
+
 protected:
   unsigned verbosity;
+  std::vector<unsigned> message_count;
 };
 
 class null_message_handlert:public message_handlert
@@ -46,6 +55,7 @@ class null_message_handlert:public message_handlert
 public:
   virtual void print(unsigned level, const std::string &message)
   {
+    message_handlert::print(level, message);
   }
 
   virtual void print(
@@ -54,6 +64,7 @@ public:
     int sequence_number,
     const source_locationt &location)
   {
+    print(level, message);
   }
 };
 
@@ -68,6 +79,7 @@ public:
   {
     if(verbosity>=level)
     {
+      message_handlert::print(level, message);
       out << message << '\n';
     }
   }

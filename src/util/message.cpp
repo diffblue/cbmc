@@ -67,6 +67,27 @@ void message_handlert::print(
 
 /*******************************************************************\
 
+Function: message_handlert::print
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void message_handlert::print(
+  unsigned level,
+  const std::string &message)
+{
+  if(level>=message_count.size())
+    message_count.resize(level+1, 0);
+  ++message_count[level];
+}
+
+/*******************************************************************\
+
 Function: messaget::print
 
   Inputs:
