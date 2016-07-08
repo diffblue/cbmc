@@ -16,6 +16,7 @@ Author: CM Wintersteiger, 2006
 
 #include <cstdio>
 #include <iostream>
+#include <fstream>
 
 #include <util/string2int.h>
 #include <util/tempdir.h>
@@ -248,8 +249,7 @@ int gcc_modet::doit()
 
   // In gcc mode, we have just pass on to gcc to handle the following:
   // * if -M or -MM is given, we do dependencies only
-  // * assembly (-S)
-  // * preprocessing (-E).
+  // * preprocessing (-E)
   // * no input files given
 
   if(act_as_ld)
@@ -257,7 +257,6 @@ int gcc_modet::doit()
   }
   else if(cmdline.isset('M') ||
           cmdline.isset("MM") ||
-          cmdline.isset('S') ||
           cmdline.isset('E') ||
           !cmdline.have_infile_arg())
     return run_gcc(); // exit!
@@ -308,13 +307,10 @@ int gcc_modet::doit()
 
   if(act_as_ld)
     compiler.mode=compilet::LINK_LIBRARY;
+  else if(cmdline.isset('S'))
+    compiler.mode=compilet::ASSEMBLE_ONLY;
   else if(cmdline.isset('c'))
     compiler.mode=compilet::COMPILE_ONLY;
-  else if(cmdline.isset('S'))
-  {
-    compiler.mode=compilet::ASSEMBLE_ONLY;
-    assert(false);
-  }
   else if(cmdline.isset('E'))
   {
     compiler.mode=compilet::PREPROCESS_ONLY;
@@ -503,13 +499,16 @@ int gcc_modet::doit()
      compiler.object_files.empty())
     return run_gcc(); // exit!
 
+  if(compiler.mode==compilet::ASSEMBLE_ONLY)
+    return asm_output(act_as_bcc, compiler.source_files);
+
   // do all the rest
   if(compiler.doit())
     return 1; // GCC exit code for all kinds of errors
 
   // We can generate hybrid ELF and Mach-O binaries
   // containing both executable machine code and the goto-binary.
-  if(produce_hybrid_binary)
+  if(produce_hybrid_binary && !act_as_bcc)
     return gcc_hybrid_binary();
 
   return EX_OK;
@@ -794,6 +793,109 @@ int gcc_modet::gcc_hybrid_binary()
   }
 
   return result;
+}
+
+/*******************************************************************\
+
+Function: gcc_modet::asm_output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+int gcc_modet::asm_output(
+  bool act_as_bcc,
+  const std::list<std::string> &preprocessed_source_files)
+{
+  {
+    bool have_files=false;
+
+    for(goto_cc_cmdlinet::parsed_argvt::const_iterator
+        it=cmdline.parsed_argv.begin();
+        it!=cmdline.parsed_argv.end();
+        it++)
+      if(it->is_infile_name)
+        have_files=true;
+
+    if(!have_files)
+      return EX_OK;
+  }
+
+  if(produce_hybrid_binary)
+  {
+    debug() << "Running " << native_tool_name
+      << " to generate native asm output" << eom;
+
+    int result=run_gcc();
+    if(result!=0)
+      // native tool failed
+      return result;
+  }
+
+  std::map<std::string, std::string> output_files;
+
+  if(cmdline.isset('o'))
+  {
+    // there should be only one input file
+    if(preprocessed_source_files.size()!=1)
+    {
+      error() << "Expected exactly one input file as -o is in effect"
+              << eom;
+      return 1;
+    }
+
+    output_files[preprocessed_source_files.front()]=
+      cmdline.get_value('o');
+  }
+  else
+  {
+    for(const std::string &s : preprocessed_source_files)
+      output_files.insert(
+        std::make_pair(s, get_base_name(s, true)+".s"));
+  }
+
+  if(output_files.empty() ||
+     (output_files.size()==1 &&
+      output_files.begin()->second=="/dev/null"))
+    return EX_OK;
+
+  debug()
+    << "Appending preprocessed sources to generate hybrid asm output"
+    << eom;
+
+  for(const auto &so : output_files)
+  {
+    std::ifstream is(so.first);
+    if(!is.is_open())
+    {
+      error() << "Failed to open input source " << so.first << eom;
+      return 1;
+    }
+
+    std::ofstream os(so.second, std::ios::app);
+    if(!os.is_open())
+    {
+      error() << "Failed to open output file " << so.second << eom;
+      return 1;
+    }
+
+    const char comment=act_as_bcc ? ':' : '#';
+
+    os << comment << comment << " GOTO-CC" << '\n';
+
+    std::string line;
+
+    while(std::getline(is, line))
+    {
+      os << comment << comment << line << '\n';
+    }
+  }
+
+  return EX_OK;
 }
 
 /*******************************************************************\

@@ -40,6 +40,10 @@ protected:
 
   int gcc_hybrid_binary();
 
+  int asm_output(
+    bool act_as_bcc,
+    const std::list<std::string> &preprocessed_source_files);
+
   static bool needs_preprocessing(const std::string &);
 };
 

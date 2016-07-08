@@ -129,8 +129,9 @@ int main(int argc, const char **argv)
   {
     // this simulates Bruce's C Compiler
     bcc_cmdlinet cmdline;
-    // bcc does not build ELF objects, no hybrid binaries
-    gcc_modet gcc_mode(cmdline, base_name, false);
+    // bcc does not build ELF objects -- hybrid mode is used
+    // with -S only
+    gcc_modet gcc_mode(cmdline, base_name, true);
     return gcc_mode.main(argc, argv);
   }
   else
