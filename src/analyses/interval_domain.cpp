@@ -429,9 +429,9 @@ void interval_domaint::assume_rec(
   }
   else if(cond.id()==ID_or)
   {
-    if(!negation)
+    if(negation)
       forall_operands(it, cond)
-        assume_rec(*it, false);
+        assume_rec(*it, true);
   }
 }
 
