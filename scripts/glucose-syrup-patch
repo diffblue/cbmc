@@ -1,6 +1,6 @@
 diff -rupN glucose-syrup/core/Solver.cc glucose-syrup-patched/core/Solver.cc
 --- glucose-syrup/core/Solver.cc	2014-10-03 10:10:21.000000000 +0100
-+++ glucose-syrup-patched/core/Solver.cc	2015-10-16 12:16:50.000000000 +0100
++++ glucose-syrup-patched/core/Solver.cc	2016-07-08 13:06:02.772186004 +0100
 @@ -931,7 +931,6 @@ void Solver::uncheckedEnqueue(Lit p, CRe
  CRef Solver::propagate() {
      CRef confl = CRef_Undef;
@@ -9,7 +9,7 @@ diff -rupN glucose-syrup/core/Solver.cc glucose-syrup-patched/core/Solver.cc
      watches.cleanAll();
      watchesBin.cleanAll();
      unaryWatches.cleanAll();
-@@ -1405,7 +1404,9 @@ lbool Solver::search(int nof_conflicts) 
+@@ -1405,7 +1404,9 @@ lbool Solver::search(int nof_conflicts)
                  decisions++;
                  next = pickBranchLit();
                  if (next == lit_Undef) {
@@ -21,7 +21,7 @@ diff -rupN glucose-syrup/core/Solver.cc glucose-syrup-patched/core/Solver.cc
                  }
 diff -rupN glucose-syrup/core/SolverTypes.h glucose-syrup-patched/core/SolverTypes.h
 --- glucose-syrup/core/SolverTypes.h	2014-10-03 10:10:22.000000000 +0100
-+++ glucose-syrup-patched/core/SolverTypes.h	2015-10-16 12:14:25.000000000 +0100
++++ glucose-syrup-patched/core/SolverTypes.h	2016-07-08 13:06:02.772186004 +0100
 @@ -53,7 +53,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  
  #include <assert.h>
@@ -34,7 +34,7 @@ diff -rupN glucose-syrup/core/SolverTypes.h glucose-syrup-patched/core/SolverTyp
  #include "mtl/Alg.h"
 diff -rupN glucose-syrup/mtl/IntTypes.h glucose-syrup-patched/mtl/IntTypes.h
 --- glucose-syrup/mtl/IntTypes.h	2014-10-03 10:10:22.000000000 +0100
-+++ glucose-syrup-patched/mtl/IntTypes.h	2015-10-16 12:14:25.000000000 +0100
++++ glucose-syrup-patched/mtl/IntTypes.h	2016-07-08 13:06:02.772186004 +0100
 @@ -31,7 +31,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #else
  
@@ -47,7 +47,21 @@ diff -rupN glucose-syrup/mtl/IntTypes.h glucose-syrup-patched/mtl/IntTypes.h
  
 diff -rupN glucose-syrup/simp/SimpSolver.cc glucose-syrup-patched/simp/SimpSolver.cc
 --- glucose-syrup/simp/SimpSolver.cc	2014-10-03 10:10:22.000000000 +0100
-+++ glucose-syrup-patched/simp/SimpSolver.cc	2015-10-16 12:17:24.000000000 +0100
++++ glucose-syrup-patched/simp/SimpSolver.cc	2016-07-08 13:07:00.396187548 +0100
+@@ -687,11 +687,11 @@ bool SimpSolver::eliminate(bool turn_off
+     //
+ 
+     int toPerform = clauses.size()<=4800000;
+-    
++#if 0
+     if(!toPerform) {
+       printf("c Too many clauses... No preprocessing\n");
+     }
+-
++#endif
+     while (toPerform && (n_touched > 0 || bwdsub_assigns < trail.size() || elim_heap.size() > 0)){
+ 
+         gatherTouchedClauses();
 @@ -760,10 +760,11 @@ bool SimpSolver::eliminate(bool turn_off
          checkGarbage();
      }
@@ -63,7 +77,7 @@ diff -rupN glucose-syrup/simp/SimpSolver.cc glucose-syrup-patched/simp/SimpSolve
  
 diff -rupN glucose-syrup/utils/ParseUtils.h glucose-syrup-patched/utils/ParseUtils.h
 --- glucose-syrup/utils/ParseUtils.h	2014-10-03 10:10:22.000000000 +0100
-+++ glucose-syrup-patched/utils/ParseUtils.h	2015-10-16 12:14:25.000000000 +0100
++++ glucose-syrup-patched/utils/ParseUtils.h	2016-07-08 13:06:02.772186004 +0100
 @@ -25,7 +25,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #include <stdio.h>
  #include <math.h>
@@ -97,7 +111,7 @@ diff -rupN glucose-syrup/utils/ParseUtils.h glucose-syrup-patched/utils/ParseUti
      void operator ++ ()       { pos++; assureLookahead(); }
 diff -rupN glucose-syrup/utils/System.h glucose-syrup-patched/utils/System.h
 --- glucose-syrup/utils/System.h	2014-10-03 10:10:22.000000000 +0100
-+++ glucose-syrup-patched/utils/System.h	2015-10-16 12:14:25.000000000 +0100
++++ glucose-syrup-patched/utils/System.h	2016-07-08 13:06:02.776186005 +0100
 @@ -60,8 +60,11 @@ static inline double Glucose::cpuTime(vo
  
  // Laurent: I know that this will not compile directly under Windows... sorry for that
