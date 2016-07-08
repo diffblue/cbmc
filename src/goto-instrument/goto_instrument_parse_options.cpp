@@ -181,12 +181,10 @@ int goto_instrument_parse_optionst::doit()
 
 
           unwind(goto_program, l_it->first, loop_exit, k);
-          goto_programt::instructiont assume(ASSUME);
-          assume.guard=loop_guard;
+          // add the assumption that the loop guard is violated
           goto_programt::targett t=goto_function.body.insert_before(loop_exit);
-          *t=assume;
-          //goto_functions.update();
-          //goto_functions.compute_loop_numbers();
+          t->make_assumption(loop_guard);
+
         }
       }
 
