@@ -33,7 +33,8 @@ protected:
   int preprocess(
     const std::string &language,
     const std::string &src,
-    const std::string &dest);
+    const std::string &dest,
+    bool act_as_bcc);
 
   int run_gcc(); // call gcc with original command line
 

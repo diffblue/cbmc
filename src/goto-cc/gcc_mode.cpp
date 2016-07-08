@@ -49,6 +49,10 @@ static std::string compiler_name(
   if(cmdline.isset("native-compiler"))
     return cmdline.get_value("native-compiler");
 
+  if(base_name=="bcc" ||
+     base_name.find("goto-bcc")!=std::string::npos)
+    return "bcc";
+
   std::string::size_type pos=base_name.find("goto-gcc");
 
   if(pos==std::string::npos ||
@@ -177,6 +181,10 @@ int gcc_modet::doit()
 
   unsigned int verbosity=1;
 
+  bool act_as_bcc=
+    base_name=="bcc" ||
+    base_name.find("goto-bcc")!=std::string::npos;
+
   if(cmdline.isset('v') ||
      cmdline.isset("version"))
   {
@@ -185,6 +193,8 @@ int gcc_modet::doit()
 
     if(act_as_ld)
       std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
+    else if(act_as_bcc)
+      std::cout << "bcc: version 0.16.17 (goto-cc " CBMC_VERSION ")\n";
     else
       std::cout << "gcc version 3.4.4 (goto-cc " CBMC_VERSION ")\n";
   }
@@ -220,6 +230,13 @@ int gcc_modet::doit()
       debug() << "LD mode (hybrid)" << eom;
     else
       debug() << "LD mode" << eom;
+  }
+  else if(act_as_bcc)
+  {
+    if(produce_hybrid_binary)
+      debug() << "BCC mode (hybrid)" << eom;
+    else
+      debug() << "BCC mode" << eom;
   }
   else
   {
@@ -448,7 +465,8 @@ int gcc_modet::doit()
             get_base_name(arg_it->arg, true)+new_suffix;
           std::string dest=temp_dir(new_name);
 
-          int exit_code=preprocess(language, arg_it->arg, dest);
+          int exit_code=
+            preprocess(language, arg_it->arg, dest, act_as_bcc);
 
           if(exit_code!=0)
           {
@@ -512,7 +530,8 @@ Function: gcc_modet::preprocess
 int gcc_modet::preprocess(
   const std::string &language,
   const std::string &src,
-  const std::string &dest)
+  const std::string &dest,
+  bool act_as_bcc)
 {
   // build new argv
   std::vector<std::string> new_argv;
@@ -569,8 +588,14 @@ int gcc_modet::preprocess(
   new_argv.push_back("-E");
 
   // destination file
-  new_argv.push_back("-o");
-  new_argv.push_back(dest);
+  std::string stdout_file;
+  if(act_as_bcc)
+    stdout_file=dest;
+  else
+  {
+    new_argv.push_back("-o");
+    new_argv.push_back(dest);
+  }
 
   // language, if given
   if(language!="")
@@ -593,7 +618,7 @@ int gcc_modet::preprocess(
   std::cout << std::endl;
   #endif
 
-  return run(new_argv[0], new_argv, cmdline.stdin_file, "");
+  return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file);
 }
 
 /*******************************************************************\

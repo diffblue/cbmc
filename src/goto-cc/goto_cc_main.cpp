@@ -18,6 +18,7 @@ Date: May 2006
 #include "armcc_cmdline.h"
 #include "ms_cl_cmdline.h"
 #include "ld_cmdline.h"
+#include "bcc_cmdline.h"
 
 #include "gcc_mode.h"
 #include "cw_mode.h"
@@ -122,6 +123,14 @@ int main(int argc, const char **argv)
     // this simulates "ld" for linking
     ld_cmdlinet cmdline;
     gcc_modet gcc_mode(cmdline, base_name, true);
+    return gcc_mode.main(argc, argv);
+  }
+  else if(base_name.find("goto-bcc")!=std::string::npos)
+  {
+    // this simulates Bruce's C Compiler
+    bcc_cmdlinet cmdline;
+    // bcc does not build ELF objects, no hybrid binaries
+    gcc_modet gcc_mode(cmdline, base_name, false);
     return gcc_mode.main(argc, argv);
   }
   else
