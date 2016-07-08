@@ -19,11 +19,14 @@ Date: May 2006
 #include "ms_cl_cmdline.h"
 #include "ld_cmdline.h"
 #include "bcc_cmdline.h"
+#include "as_cmdline.h"
+#include "as86_cmdline.h"
 
 #include "gcc_mode.h"
 #include "cw_mode.h"
 #include "ms_cl_mode.h"
 #include "armcc_mode.h"
+#include "as_mode.h"
 
 /*******************************************************************\
 
@@ -133,6 +136,21 @@ int main(int argc, const char **argv)
     // with -S only
     gcc_modet gcc_mode(cmdline, base_name, true);
     return gcc_mode.main(argc, argv);
+  }
+  else if(base_name.find("goto-as86")!=std::string::npos)
+  {
+    // assembler used by Bruce's C Compiler
+    as86_cmdlinet cmdline;
+    // as86 does not build ELF objects, no hybrid binaries
+    as_modet as_mode(cmdline, base_name, false);
+    return as_mode.main(argc, argv);
+  }
+  else if(base_name.find("goto-as")!=std::string::npos)
+  {
+    // GNU assembler
+    as_cmdlinet cmdline;
+    as_modet as_mode(cmdline, base_name, true);
+    return as_mode.main(argc, argv);
   }
   else
   {

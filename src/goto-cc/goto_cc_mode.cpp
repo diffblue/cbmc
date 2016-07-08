@@ -90,6 +90,9 @@ void goto_cc_modet::help()
   " --function name             set entry point to name\n"
   " --native-compiler cmd       command to invoke as preprocessor/compiler\n"
   " --native-linker cmd         command to invoke as linker\n"
+  " --native-assembler cmd      command to invoke as assembler (goto-as only)\n"
+  " --print-rejected-preprocessed-source file\n"
+  "                             copy failing (preprocessed) source to file\n"
   "\n";
 }
 
