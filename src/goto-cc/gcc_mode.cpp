@@ -32,6 +32,99 @@ Author: CM Wintersteiger, 2006
 
 /*******************************************************************\
 
+Function: compiler_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static std::string compiler_name(
+  const cmdlinet &cmdline,
+  const std::string &base_name)
+{
+  if(cmdline.isset("native-compiler"))
+    return cmdline.get_value("native-compiler");
+
+  std::string::size_type pos=base_name.find("goto-gcc");
+
+  if(pos==std::string::npos ||
+     base_name=="goto-gcc" ||
+     base_name=="goto-ld")
+  {
+    #ifdef __FreeBSD__
+    return "clang";
+    #else
+    return "gcc";
+    #endif
+  }
+
+  std::string result=base_name;
+  result.replace(pos, 8, "gcc");
+
+  return result;
+}
+
+/*******************************************************************\
+
+Function: linker_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static std::string linker_name(
+  const cmdlinet &cmdline,
+  const std::string &base_name)
+{
+  if(cmdline.isset("native-linker"))
+    return cmdline.get_value("native-linker");
+
+  std::string::size_type pos=base_name.find("goto-ld");
+
+  if(pos==std::string::npos ||
+     base_name=="goto-gcc" ||
+     base_name=="goto-ld")
+    return "ld";
+
+  std::string result=base_name;
+  result.replace(pos, 7, "ld");
+
+  return result;
+}
+
+/*******************************************************************\
+
+Function: gcc_modet::gcc_modet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+gcc_modet::gcc_modet(
+  goto_cc_cmdlinet &_cmdline,
+  const std::string &_base_name,
+  bool _produce_hybrid_binary):
+  goto_cc_modet(_cmdline, _base_name),
+  produce_hybrid_binary(_produce_hybrid_binary),
+  act_as_ld(base_name=="ld" ||
+            base_name.find("goto-ld")!=std::string::npos)
+{
+}
+
+/*******************************************************************\
+
 Function: gcc_modet::needs_preprocessing
 
   Inputs:
@@ -70,10 +163,6 @@ Function: gcc_modet::doit
 
 int gcc_modet::doit()
 {
-  act_as_ld=
-    base_name=="ld" ||
-    base_name.find("goto-ld")!=std::string::npos;
-
   if(cmdline.isset('?') ||
      cmdline.isset("help"))
   {
@@ -81,9 +170,15 @@ int gcc_modet::doit()
     return EX_OK;
   }
 
+  native_tool_name=
+    act_as_ld ?
+    linker_name(cmdline, base_name) :
+    compiler_name(cmdline, base_name);
+
   unsigned int verbosity=1;
 
-  if(cmdline.isset('v'))
+  if(cmdline.isset('v') ||
+     cmdline.isset("version"))
   {
     // This a) prints the version and b) increases verbosity.
     // Compilation continues, don't exit!
@@ -96,12 +191,7 @@ int gcc_modet::doit()
 
   if(cmdline.isset("version"))
   {
-    if(act_as_ld)
-      std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
-    else
-      std::cout << "gcc (GCC) 3.4.4 (goto-cc " CBMC_VERSION ")\n\n";
-
-    std::cout <<
+    std::cout << '\n' <<
       "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
       "CBMC version: " CBMC_VERSION << '\n' <<
       "Architecture: " << config.this_architecture() << '\n' <<
@@ -424,8 +514,6 @@ int gcc_modet::preprocess(
   const std::string &src,
   const std::string &dest)
 {
-  const char *compiler=compiler_name();
-
   // build new argv
   std::vector<std::string> new_argv;
 
@@ -433,7 +521,7 @@ int gcc_modet::preprocess(
 
   bool skip_next=false;
 
-  for(gcc_cmdlinet::parsed_argvt::const_iterator
+  for(goto_cc_cmdlinet::parsed_argvt::const_iterator
       it=cmdline.parsed_argv.begin();
       it!=cmdline.parsed_argv.end();
       it++)
@@ -496,7 +584,7 @@ int gcc_modet::preprocess(
 
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]=compiler;
+  new_argv[0]=native_tool_name.c_str();
 
   #if 0
   std::cout << "RUN:";
@@ -505,7 +593,7 @@ int gcc_modet::preprocess(
   std::cout << std::endl;
   #endif
 
-  return run(compiler, new_argv, cmdline.stdin_file);
+  return run(new_argv[0], new_argv, cmdline.stdin_file);
 }
 
 /*******************************************************************\
@@ -528,14 +616,7 @@ int gcc_modet::run_gcc()
   new_argv.reserve(cmdline.parsed_argv.size());
 
   // overwrite argv[0]
-  if(act_as_ld)
-    new_argv[0]=linker_name();
-  else
-    new_argv[0]=compiler_name();
-
-  assert(!cmdline.parsed_argv.empty());
-
-  bool skip_next=false;
+  new_argv[0]=native_tool_name;
 
   #if 0
   std::cout << "RUN:";
@@ -564,7 +645,7 @@ int gcc_modet::gcc_hybrid_binary()
   {
     bool have_files=false;
 
-    for(gcc_cmdlinet::parsed_argvt::const_iterator
+    for(goto_cc_cmdlinet::parsed_argvt::const_iterator
         it=cmdline.parsed_argv.begin();
         it!=cmdline.parsed_argv.end();
         it++)
@@ -586,7 +667,7 @@ int gcc_modet::gcc_hybrid_binary()
     }
     else
     {
-      for(gcc_cmdlinet::parsed_argvt::const_iterator
+      for(goto_cc_cmdlinet::parsed_argvt::const_iterator
           i_it=cmdline.parsed_argv.begin();
           i_it!=cmdline.parsed_argv.end();
           i_it++)
@@ -609,10 +690,8 @@ int gcc_modet::gcc_hybrid_binary()
       output_files.front()=="/dev/null"))
     return EX_OK;
 
-  if(act_as_ld)
-    debug() << "Running ld to generate hybrid binary" << eom;
-  else
-    debug() << "Running gcc to generate hybrid binary" << eom;
+  debug() << "Running " << native_tool_name
+          << " to generate hybrid binary" << eom;
 
   // save the goto-cc output files
   for(std::list<std::string>::const_iterator

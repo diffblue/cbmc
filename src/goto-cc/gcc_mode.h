@@ -12,7 +12,6 @@ Date: June 2006
 #define CPROVER_GOTO_CC_GCC_MODE_H
 
 #include "goto_cc_mode.h"
-#include "gcc_cmdline.h"
 
 class gcc_modet:public goto_cc_modet
 {
@@ -20,18 +19,16 @@ public:
   virtual int doit();
   virtual void help_mode();
 
-  explicit gcc_modet(goto_cc_cmdlinet &_cmdline):
-    goto_cc_modet(_cmdline),
-    produce_hybrid_binary(false),
-    act_as_ld(false)
-  {
-  }
-
-  bool produce_hybrid_binary;
+  gcc_modet(
+    goto_cc_cmdlinet &_cmdline,
+    const std::string &_base_name,
+    bool _produce_hybrid_binary);
 
 protected:
-  bool act_as_ld;
-  std::string native_compiler_name;
+  const bool produce_hybrid_binary;
+
+  const bool act_as_ld;
+  std::string native_tool_name;
 
   int preprocess(
     const std::string &language,
@@ -43,54 +40,6 @@ protected:
   int gcc_hybrid_binary();
 
   static bool needs_preprocessing(const std::string &);
-
-  inline const char *compiler_name()
-  {
-    if(native_compiler_name.empty())
-    {
-      std::string::size_type pos=base_name.find("goto-gcc");
-
-      if(pos==std::string::npos ||
-         base_name=="goto-gcc" ||
-         base_name=="goto-ld")
-      {
-        #ifdef __FreeBSD__
-        native_compiler_name="clang";
-        #else
-        native_compiler_name="gcc";
-        #endif
-      }
-      else
-      {
-        native_compiler_name=base_name;
-        native_compiler_name.replace(pos, 8, "gcc");
-      }
-    }
-
-    return native_compiler_name.c_str();
-  }
-
-  inline const char *linker_name()
-  {
-    if(native_compiler_name.empty())
-    {
-      std::string::size_type pos=base_name.find("goto-ld");
-
-      if(pos==std::string::npos ||
-         base_name=="goto-gcc" ||
-         base_name=="goto-ld")
-      {
-        native_compiler_name="ld";
-      }
-      else
-      {
-        native_compiler_name=base_name;
-        native_compiler_name.replace(pos, 7, "ld");
-      }
-    }
-
-    return native_compiler_name.c_str();
-  }
 };
 
 #endif // CPROVER_GOTO_CC_GCC_MODE_H

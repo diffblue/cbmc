@@ -20,8 +20,10 @@ public:
   virtual int doit();
   virtual void help_mode();
 
-  explicit armcc_modet(armcc_cmdlinet &_armcc_cmdline):
-    goto_cc_modet(_armcc_cmdline),
+  armcc_modet(
+    armcc_cmdlinet &_armcc_cmdline,
+    const std::string &_base_name):
+    goto_cc_modet(_armcc_cmdline, _base_name),
     cmdline(_armcc_cmdline)
   {
   }

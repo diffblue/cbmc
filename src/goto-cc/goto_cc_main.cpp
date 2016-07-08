@@ -85,8 +85,7 @@ int main(int argc, const char **argv)
     // this is the Visual Studio personality
     ms_cl_cmdlinet cmdline;
     cmdline.parse_env();
-    ms_cl_modet ms_cl_mode(cmdline);
-    ms_cl_mode.base_name=base_name;
+    ms_cl_modet ms_cl_mode(cmdline, base_name);
     return ms_cl_mode.main(argc, argv);
   }
   else if(base_name=="goto-cw" ||
@@ -95,8 +94,7 @@ int main(int argc, const char **argv)
     // this is the CodeWarrior personality,
     // but we use the gcc command line interface
     gcc_cmdlinet cmdline;
-    cw_modet cw_mode(cmdline);
-    cw_mode.base_name=base_name;
+    cw_modet cw_mode(cmdline, base_name);
     return cw_mode.main(argc, argv);
   }
   else if(base_name=="goto-armcc" ||
@@ -104,8 +102,7 @@ int main(int argc, const char **argv)
   {
     // this is the armcc personality
     armcc_cmdlinet cmdline;
-    armcc_modet armcc_mode(cmdline);
-    armcc_mode.base_name=base_name;
+    armcc_modet armcc_mode(cmdline, base_name);
     return armcc_mode.main(argc, argv);
   }
   // handle GCC names like x86_64-apple-darwin14-llvm-gcc-4.2
@@ -117,27 +114,21 @@ int main(int argc, const char **argv)
     // with a GCC-style command-line interface,
     // but also disables CPROVER language extensions
     gcc_cmdlinet cmdline;
-    gcc_modet gcc_mode(cmdline);
-    gcc_mode.base_name=base_name;
-    gcc_mode.produce_hybrid_binary=true;
+    gcc_modet gcc_mode(cmdline, base_name, true);
     return gcc_mode.main(argc, argv);
   }
   else if(base_name.find("goto-ld")!=std::string::npos)
   {
     // this simulates "ld" for linking
     ld_cmdlinet cmdline;
-    gcc_modet gcc_mode(cmdline);
-    gcc_mode.base_name=base_name;
-    gcc_mode.produce_hybrid_binary=true;
+    gcc_modet gcc_mode(cmdline, base_name, true);
     return gcc_mode.main(argc, argv);
   }
   else
   {
     // the default personality is GCC-style
     gcc_cmdlinet cmdline;
-    gcc_modet gcc_mode(cmdline);
-    gcc_mode.base_name=base_name;
-    gcc_mode.produce_hybrid_binary=false;
+    gcc_modet gcc_mode(cmdline, base_name, false);
     return gcc_mode.main(argc, argv);
   }
 }
