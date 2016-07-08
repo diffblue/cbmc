@@ -4,12 +4,12 @@
 
 #include <goto-programs/goto_trace.h>
 
+#include <cegis/cegis-util/program_helper.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/value/program_individual.h>
-#include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/danger/value/danger_goto_solution.h>
 #include <cegis/danger/options/danger_program.h>
 #include <cegis/danger/meta/literals.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/danger/symex/learn/read_x0.h>
 
 namespace
@@ -22,7 +22,7 @@ bool is_placeholder_of(const goto_programt::targett &x0,
     return false;
   std::string placeholder_base(DANGER_X0_PLACEHOLDER_PREFIX);
   placeholder_base+=id2string(get_affected_variable(*x0));
-  const std::string placeholder_name(get_invariant_meta_name(placeholder_base));
+  const std::string placeholder_name(get_cegis_meta_name(placeholder_base));
   return placeholder_name == id2string(get_affected_variable(placeholder_instr));
 }
 
@@ -41,7 +41,7 @@ public:
 
   void operator()(const goto_programt::targett &x0)
   {
-    const goto_tracet::stepst::const_iterator &end=trace.steps.end();
+    const goto_tracet::stepst::const_iterator end(trace.steps.end());
     while (end != current_step && !is_placeholder_of(x0, current_step->pc))
       ++current_step;
     assert(end != current_step);
@@ -67,7 +67,7 @@ void danger_read_x0(program_individualt &ind, const danger_programt &prog,
   for (const danger_goto_solutiont::nondet_choicest::value_type &choice : tmp.x0_choices)
   {
     const bv_arithmetict arith(choice);
-    const mp_integer::ullong_t value=arith.to_integer().to_ulong();
+    const mp_integer::llong_t value=arith.to_integer().to_long();
     x0.push_back(static_cast<program_individualt::x0t::value_type>(value));
   }
 }

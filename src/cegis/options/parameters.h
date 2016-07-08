@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
  \*******************************************************************/
 
@@ -19,5 +19,6 @@
 #define CEGIS_LIMIT_WORDSIZE "cegis-limit-wordsize"
 #define CEGIS_PARALLEL_VERIFY "cegis-parallel-verify"
 #define CEGIS_MATCH_SELECT "cegis-match-select"
+#define CEGIS_SYMEX_HEAD_START "cegis-symex-head-start"
 
 #endif /* CEGIS_INVARIANT_PARAMETERS_H_ */

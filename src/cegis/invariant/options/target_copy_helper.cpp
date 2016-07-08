@@ -2,6 +2,7 @@
 #include <iterator>
 #include <functional>
 
+#include <cegis/cegis-util/iterator_helper.h>
 #include <cegis/invariant/options/target_copy_helper.h>
 
 target_copy_helpert::target_copy_helpert(const goto_programt &old_body,
@@ -17,13 +18,14 @@ target_copy_helpert::~target_copy_helpert()
 goto_programt::targett target_copy_helpert::operator()(
     const goto_programt::targett &target) const
 {
-  const goto_programt::targett empty;
-  if (empty == target) return empty;
-  const goto_programt::const_targett old_target=target;
-  const size_t old_distance=std::distance(old_instrs.begin(), old_target);
-  goto_programt::targett new_target=new_instrs.begin();
-  std::advance(new_target, old_distance);
-  return new_target;
+  return copy_iterator(old_instrs, new_instrs, target);
+}
+
+void target_copy_helpert::operator()(goto_programt::targetst &tgt,
+    const goto_programt::targetst &src) const
+{
+  tgt.resize(src.size());
+  std::transform(src.begin(), src.end(), tgt.begin(), *this);
 }
 
 invariant_programt::program_ranget target_copy_helpert::operator()(

@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -41,6 +41,8 @@ private:
   const encoded_deserialisert encoded_deserialiser;
   bool is_decoded_candidate;
   candidatet decoded_candidate;
+  size_t num_ces;
+  const size_t num_symex_ces;
 public:
   /**
    * @brief
@@ -52,10 +54,11 @@ public:
    * @param serialiser
    * @param deserialiser
    * @param encoded_deserialiser
+   * @param learner1_head_start
    */
   concurrent_learnt(learner1t &learner1, learner2t &learner2,
       serialisert serialiser, deserialisert deserialiser,
-      encoded_deserialisert encoded_deserialiser);
+      encoded_deserialisert encoded_deserialiser, size_t learner1_head_start);
 
   /**
    * @brief

@@ -2,11 +2,11 @@
 
 #include <util/expr_util.h>
 
+#include <cegis/instrument/cegis_library.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/invariant/util/invariant_constraint_variables.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/invariant/symex/learn/add_counterexamples.h>
-#include <cegis/invariant/symex/learn/invariant_library.h>
 #include <cegis/danger/meta/literals.h>
 #include <cegis/danger/options/danger_program_printer.h>
 #include <cegis/danger/constraint/danger_constraint_factory.h>
@@ -34,14 +34,16 @@ void danger_learn_configt::process(const counterexamplest &ces,
   const size_t num_vars=var_ids.size();
   null_message_handlert msg;
   const std::string name(DANGER_EXECUTE);
-  add_invariant_library(program, msg, num_vars, num_consts, max_sz, name);
+  symbol_tablet &st=program.st;
+  goto_functionst &gf=program.gf;
+  add_cegis_library(st, gf, msg, num_vars, num_consts, max_sz, name);
   link_user_program_variables(program, var_ids);
   link_meta_variables(program, var_ids.size(), max_sz);
   danger_add_programs_to_learn(program, max_sz);
   danger_add_x0_placeholders(program);
-  invariant_add_learned_counterexamples(program, ces, create_danger_constraint,
-      true);
-  program.gf.update();
+  const danger_constraint constr(program.use_ranking);
+  invariant_add_learned_counterexamples(program, ces, std::cref(constr), true);
+  gf.update();
 }
 
 void danger_learn_configt::process(const size_t max_solution_size)
@@ -49,7 +51,7 @@ void danger_learn_configt::process(const size_t max_solution_size)
   constraint_varst ce_vars;
   get_invariant_constraint_vars(ce_vars, original_program);
   counterexamplet dummy_ce;
-  const typet type(invariant_meta_type());  // XXX: Currently single data type
+  const typet type(cegis_default_integer_type());  // XXX: Currently single data type
   const exprt zero(gen_zero(type));
   for (const symbol_exprt &var : ce_vars)
     dummy_ce.insert(std::make_pair(var.get_identifier(), zero));

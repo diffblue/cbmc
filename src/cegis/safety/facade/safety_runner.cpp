@@ -5,6 +5,7 @@
 #include <cegis/danger/meta/literals.h>
 
 #include <cegis/facade/cegis.h>
+#include <cegis/options/parameters.h>
 #include <cegis/statistics/cegis_statistics_wrapper.h>
 #include <cegis/genetic/genetic_preprocessing.h>
 #include <cegis/genetic/genetic_constant_strategy.h>
@@ -16,15 +17,15 @@
 #include <cegis/genetic/match_select.h>
 #include <cegis/genetic/lazy_fitness.h>
 #include <cegis/genetic/ga_learn.h>
+#include <cegis/genetic/tournament_select.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/symex/cegis_symex_learn.h>
 #include <cegis/symex/cegis_symex_verify.h>
 #include <cegis/seed/null_seed.h>
 #include <cegis/learn/concurrent_learn.h>
 #include <cegis/value/program_individual_serialisation.h>
-#include <cegis/invariant/options/parameters.h>
 #include <cegis/invariant/constant/constant_strategy.h>
 #include <cegis/invariant/constant/default_constant_strategy.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/invariant/fitness/concrete_fitness_source_provider.h>
 #include <cegis/invariant/symex/learn/invariant_body_provider.h>
 #include <cegis/safety/value/safety_goto_ce.h>
@@ -74,7 +75,7 @@ int configure_backend(mstreamt &os, const optionst &o,
   instruction_set_info_factoryt info_fac(std::ref(body));
   const size_t pop_size=o.get_unsigned_int_option(CEGIS_POPSIZE);
   const size_t rounds=o.get_unsigned_int_option(CEGIS_ROUNDS);
-  const typet type=invariant_meta_type(); // XXX: Currently single user data type.
+  const typet type=cegis_default_integer_type(); // XXX: Currently single user data type.
   random_individualt rnd(type, info_fac, lazy);
   safety_fitness_configt safety_fitness_config(info_fac, prog);
   concrete_fitness_source_providert<safety_programt, safety_learn_configt> src(
@@ -84,15 +85,33 @@ int configure_backend(mstreamt &os, const optionst &o,
   lazy_fitnesst<dynamic_safety_test_runnert, safety_goto_cet> fit(test_runner);
   random_mutatet mutate(rnd, lazy.num_consts_provder());
   random_crosst cross(rnd);
-  match_selectt select(fit.get_test_case_data(), rnd, pop_size, rounds);
-  typedef ga_learnt<match_selectt, random_mutatet, random_crosst,
+  const size_t symex_head_start=o.get_unsigned_int_option(CEGIS_SYMEX_HEAD_START);
+  if (o.get_bool_option(CEGIS_MATCH_SELECT))
+  {
+    match_selectt select(fit.get_test_case_data(), rnd, pop_size, rounds);
+    typedef ga_learnt<match_selectt, random_mutatet, random_crosst,
+        lazy_fitnesst<dynamic_safety_test_runnert, safety_goto_cet>,
+        safety_fitness_configt> ga_learnt;
+    ga_learnt ga_learn(o, select, mutate, cross, fit, safety_fitness_config);
+#ifndef _WIN32
+    const individual_to_safety_solution_deserialisert deser(prog, info_fac);
+    concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn,
+        serialise, std::ref(deser), deserialise, symex_head_start);
+#else
+    // TODO: Remove once task_pool supports Windows.
+    ga_learnt &learner=ga_learn;
+#endif
+    return configure_ui_and_run(os, o, learner, verify, pre);
+  }
+  tournament_selectt select(rnd, pop_size, rounds);
+  typedef ga_learnt<tournament_selectt, random_mutatet, random_crosst,
       lazy_fitnesst<dynamic_safety_test_runnert, safety_goto_cet>,
       safety_fitness_configt> ga_learnt;
   ga_learnt ga_learn(o, select, mutate, cross, fit, safety_fitness_config);
 #ifndef _WIN32
   const individual_to_safety_solution_deserialisert deser(prog, info_fac);
   concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn, serialise,
-      std::ref(deser), deserialise);
+      std::ref(deser), deserialise, symex_head_start);
 #else
   // TODO: Remove once task_pool supports Windows.
   ga_learnt &learner=ga_learn;

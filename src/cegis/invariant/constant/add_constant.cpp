@@ -2,20 +2,14 @@
 
 #include <ansi-c/expr2c.h>
 
+#include <cegis/cegis-util/program_helper.h>
+#include <cegis/instrument/literals.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/invariant/constant/add_constant.h>
 #include <cegis/danger/options/danger_program.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 
 namespace
 {
-const char BUILTIN[]="<built-in-additions>";
-
-bool is_builtin(const goto_programt::targett &pos)
-{
-  const std::string &file=id2string(pos->source_location.get_file());
-  return file.empty() || BUILTIN == file;
-}
-
 const char NS_SEP[]="::";
 bool is_meta_or_not_global(const symbolt &symbol)
 {
@@ -43,8 +37,6 @@ bool contains_constant(const symbol_tablet &st, const exprt &value)
   return false;
 }
 
-const char CONSTANT_PREFIX[]="INVARIANT_CONSTANT_";
-
 bool is_empty(const exprt &expr)
 {
   return exprt() == expr;
@@ -56,39 +48,21 @@ void add_danger_constant(invariant_programt &program, const exprt &value)
   symbol_tablet &st=program.st;
   if (contains_constant(st, value)) return;
   const namespacet ns(st);
-  std::string name(CONSTANT_PREFIX);
+  std::string name(CEGIS_CONSTANT_PREFIX);
   name+=expr2c(value, ns);
   add_danger_constant(program, name, value);
 }
 
-namespace
-{
-#if 0
-void add_danger_constant(danger_programt &prog, const std::string &name,
-    const exprt &value, typet type)
+void add_danger_constant(invariant_programt &prog, const std::string &name,
+    const exprt &value)
 {
   goto_programt::targett pos=prog.invariant_range.begin;
-  while (is_builtin(pos))
-  ++pos;
+  while (is_builtin(pos->source_location))
+    ++pos;
+  typet type=value.type();
   type.set(ID_C_constant, true);
   symbol_tablet &st=prog.st;
-  create_invariant_symbol(st, name, type).value=value;
+  create_cegis_symbol(st, name, type).value=value;
   if (!is_empty(value))
-  pos=danger_assign_user_variable(st, prog.gf, pos, name, value);
-}
-#endif
-}
-
-void add_danger_constant(invariant_programt &prog, const std::string &name,
-  const exprt &value)
-{
-goto_programt::targett pos=prog.invariant_range.begin;
-while (is_builtin(pos))
-  ++pos;
-typet type=value.type();
-type.set(ID_C_constant, true);
-symbol_tablet &st=prog.st;
-create_invariant_symbol(st, name, type).value=value;
-if (!is_empty(value))
-  pos=invariant_assign_user_variable(st, prog.gf, pos, name, value);
+    pos=cegis_assign_user_variable(st, prog.gf, pos, name, value);
 }

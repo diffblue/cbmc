@@ -4,8 +4,8 @@
 
 #include <goto-instrument/dump_c.h>
 
-#include <cegis/invariant/meta/literals.h>
-#include <cegis/invariant/symex/learn/invariant_library.h>
+#include <cegis/instrument/cegis_library.h>
+#include <cegis/instrument/literals.h>
 #include <cegis/invariant/fitness/concrete_fitness_source_provider.h>
 
 namespace
@@ -23,7 +23,7 @@ void add_danger_execute(std::string &source, const size_t num_vars,
     const size_t num_consts, const size_t max_prog_size,
     const std::string &exec_func_name)
 {
-  std::string text=get_invariant_library_text(num_vars, num_consts,
+  std::string text=get_cegis_library_text(num_vars, num_consts,
       max_prog_size, exec_func_name);
   substitute(text, "#define opcode program[i].opcode",
       "const opcodet opcode=program[i].opcode;");

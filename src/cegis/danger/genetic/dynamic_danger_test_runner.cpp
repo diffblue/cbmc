@@ -1,6 +1,6 @@
 #include <cstdlib>
 
-#include <cegis/invariant/meta/literals.h>
+#include <cegis/instrument/literals.h>
 #include <cegis/genetic/dynamic_test_runner_helper.h>
 #include <cegis/danger/genetic/dynamic_danger_test_runner.h>
 

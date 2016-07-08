@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -36,8 +36,38 @@ void add_invariant_variables(class invariant_programt &program,
  *
  * @param program
  * @param max_program_length
+ * @param inv0_name
+ * @param inv_name
+ * @param inv_prime_name
+ * @param type
+ */
+void add_invariant_variables(class invariant_programt &program,
+    const std::string &inv0_name, const inv_name_factoryt inv_name,
+    const inv_name_factoryt inv_prime_name, const class typet &type);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param program
+ * @param max_program_length
  */
 void create_tmp_variables(invariant_programt &program,
     const size_t max_program_length);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param program
+ * @param max_program_length
+ * @param type
+ */
+void create_tmp_variables(
+    invariant_programt &program,
+    const size_t max_program_length,
+    const class typet &type);
 
 #endif /* CEGIS_INVARIANT_ADD_INVARIANT_AND_TEMP_VARIABLES_H_ */

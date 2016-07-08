@@ -1,6 +1,6 @@
 #include <util/namespace_utils.h>
 
-#include <cegis/invariant/instrument/meta_variables.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/invariant/symex/learn/replace_operators.h>
 
 namespace
@@ -57,7 +57,7 @@ public:
     const invariant_variable_namest::const_iterator name=names.find(op);
     assert(names.end() != name);
     const symbol_exprt symbol(st.lookup(name->second).symbol_expr());
-    const typet danger_type(invariant_meta_type());
+    const typet danger_type(cegis_default_integer_type());
     if (type_eq(danger_type, symbol.type(), ns)) expr=symbol;
     else expr=typecast_exprt(symbol, danger_type); // XXX: Change if operations for other types are added.
   }
@@ -80,7 +80,7 @@ void replace_ops_in_instr(const symbol_tablet &st, const std::string &func,
 }
 
 void reverse_invariant_var_ids(invariant_variable_namest &names,
-    const invariant_variable_idst &ids)
+    const operand_variable_idst &ids)
 {
   for (const auto id : ids)
     names.insert(std::make_pair(id.second, id.first));

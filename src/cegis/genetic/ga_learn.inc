@@ -181,6 +181,7 @@ void ga_learnt<selectt, mutatet, crosst, fitnesst, convertt>::add_paragon(
       if (pop.end() == sacrifice || sacrifice->fitness < candidate->fitness)
         sacrifice=candidate;
     }
+    assert(sacrifice->programs.size() == ind.programs.size());
     *sacrifice=ind;
     set_fitness(*sacrifice);
     assert(sacrifice->fitness == fitness.get_target_fitness());
