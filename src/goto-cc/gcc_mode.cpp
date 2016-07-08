@@ -593,7 +593,7 @@ int gcc_modet::preprocess(
   std::cout << std::endl;
   #endif
 
-  return run(new_argv[0], new_argv, cmdline.stdin_file);
+  return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
 
 /*******************************************************************\
@@ -625,7 +625,7 @@ int gcc_modet::run_gcc()
   std::cout << std::endl;
   #endif
 
-  return run(new_argv[0], new_argv, cmdline.stdin_file);
+  return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
 
 /*******************************************************************\
@@ -724,7 +724,7 @@ int gcc_modet::gcc_hybrid_binary()
       objcopy_argv.push_back("--remove-section=goto-cc");
       objcopy_argv.push_back(*it);
 
-      result=run(objcopy_argv[0], objcopy_argv, "");
+      result=run(objcopy_argv[0], objcopy_argv, "", "");
     }
 
     if(result==0)
@@ -737,7 +737,7 @@ int gcc_modet::gcc_hybrid_binary()
       objcopy_argv.push_back("goto-cc="+saved);
       objcopy_argv.push_back(*it);
 
-      result=run(objcopy_argv[0], objcopy_argv, "");
+      result=run(objcopy_argv[0], objcopy_argv, "", "");
     }
 
     remove(saved.c_str());
@@ -757,7 +757,7 @@ int gcc_modet::gcc_hybrid_binary()
       lipo_argv.push_back("-output");
       lipo_argv.push_back(*it);
 
-      result=run(lipo_argv[0], lipo_argv, "");
+      result=run(lipo_argv[0], lipo_argv, "", "");
     }
 
     remove(saved.c_str());

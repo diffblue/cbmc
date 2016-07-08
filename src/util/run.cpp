@@ -50,7 +50,7 @@ int run_shell(const std::string &command)
   std::vector<std::string> argv;
   argv.push_back(shell);
   argv.push_back(command);
-  return run(shell, argv, "");
+  return run(shell, argv, "", "");
 }
 
 /*******************************************************************\
@@ -68,11 +68,13 @@ Function: run
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
-  const std::string &std_input)
+  const std::string &std_input,
+  const std::string &std_output)
 {
   #ifdef _WIN32
-  // we don't support stdin on Windows
+  // we don't support stdin/stdout redirection on Windows
   assert(std_input.empty());
+  assert(std_output.empty());
 
   // unicode version of the arguments
   std::vector<std::wstring> wargv;
@@ -93,7 +95,7 @@ int run(
 
   std::wstring wide_what=widen(what);
 
-  int status=(int)_wspawnvp(_P_WAIT, wide_what.c_str(), _argv);
+  int status=_wspawnvp(_P_WAIT, wide_what.c_str(), _argv);
 
   delete[] _argv;
 
@@ -108,6 +110,18 @@ int run(
     if(stdin_fd==-1)
     {
       perror("Failed to open stdin copy");
+      return 1;
+    }
+  }
+
+  int stdout_fd=STDOUT_FILENO;
+
+  if(!std_output.empty())
+  {
+    stdout_fd=open(std_output.c_str(), O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
+    if(stdout_fd==-1)
+    {
+      perror("Failed to open stdout copy");
       return 1;
     }
   }
@@ -127,7 +141,7 @@ int run(
       // resume signals
       remove_signal_catcher();
       sigprocmask(SIG_SETMASK, &old_mask, NULL);
-      
+
       char **_argv=new char * [argv.size()+1];
       for(std::size_t i=0; i<argv.size(); i++)
         _argv[i]=strdup(argv[i].c_str());
@@ -136,7 +150,8 @@ int run(
 
       if(stdin_fd!=STDIN_FILENO)
         dup2(stdin_fd, STDIN_FILENO);
-
+      if(stdout_fd!=STDOUT_FILENO)
+        dup2(stdout_fd, STDOUT_FILENO);
       execvp(what.c_str(), _argv);
 
       /* usually no return */
@@ -149,7 +164,8 @@ int run(
 
       int status;     /* parent process: child's exit status */
 
-      while(waitpid(childpid, &status, 0)==-1) /* wait for child to exit, and store its status */
+      /* wait for child to exit, and store its status */
+      while(waitpid(childpid, &status, 0)==-1)
         if(errno==EINTR)
           continue; // try again
         else
@@ -157,11 +173,15 @@ int run(
           perror("Waiting for child process failed");
           if(stdin_fd!=STDIN_FILENO)
             close(stdin_fd);
+          if(stdout_fd!=STDOUT_FILENO)
+            close(stdout_fd);
           return 1;
         }
 
       if(stdin_fd!=STDIN_FILENO)
         close(stdin_fd);
+      if(stdout_fd!=STDOUT_FILENO)
+        close(stdout_fd);
 
       return WEXITSTATUS(status);
     }
@@ -173,6 +193,8 @@ int run(
 
     if(stdin_fd!=STDIN_FILENO)
       close(stdin_fd);
+    if(stdout_fd!=STDOUT_FILENO)
+      close(stdout_fd);
 
     return 1;
   }
