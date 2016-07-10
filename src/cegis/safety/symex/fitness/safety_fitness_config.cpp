@@ -1,6 +1,7 @@
+#include <cegis/cegis-util/program_helper.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/genetic/instruction_set_info_factory.h>
 #include <cegis/invariant/util/invariant_program_helper.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/invariant/symex/learn/instrument_vars.h>
 #include <cegis/invariant/symex/verify/insert_constraint.h>
 #include <cegis/safety/value/safety_goto_ce.h>
@@ -26,7 +27,7 @@ void safety_fitness_configt::convert(candidatet &current_candidate,
 {
   const symbol_tablet &st=original_program.st;
   const goto_functionst &gf=original_program.gf;
-  invariant_variable_idst ids;
+  operand_variable_idst ids;
   get_invariant_variable_ids(st, ids);
   create_safety_solution(current_candidate, st, gf, ind, ids, info_fac);
 }
@@ -86,7 +87,7 @@ void safety_fitness_configt::set_test_case(const counterexamplet &ce)
       goto_programt::targett assignment=quantifier;
       erase_target(get_entry_body(gf).instructions, ++assignment);
     }
-    invariant_assign_user_variable(st, gf, quantifier, var, it->second);
+    cegis_assign_user_variable(st, gf, quantifier, var, it->second);
   }
   gf.update();
   program_contains_ce=true;

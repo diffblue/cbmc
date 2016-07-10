@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -27,27 +27,37 @@ public:
    *
    * @details
    *
-   * @param old_offset
-   */
-  copy_instructionst();
-
-  /**
-   * @brief
-   *
-   * @details
-   */
-  ~copy_instructionst();
-
-  /**
-   * @brief
-   *
-   * @details
-   *
    * @param new_target
    * @param old_target
    */
   void operator()(const goto_programt::targett &new_target,
       const goto_programt::const_targett &old_target);
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param new_instrs
+   * @param old_instrs
+   */
+  void operator()(
+      goto_programt::instructionst &new_instrs,
+      const goto_programt::instructionst &old_instrs);
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param new_instrs
+   * @param pos
+   * @param old_instrs
+   */
+  goto_programt::targett operator()(
+      goto_programt::instructionst &new_instrs,
+      goto_programt::targett pos,
+      const goto_programt::instructionst &old_instrs);
 
   /**
    * @brief
@@ -76,5 +86,31 @@ public:
  * @param instrs
  */
 void invariant_make_presentable(goto_programt::instructionst &instrs);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param target
+ * @param source
+ */
+void copy_instructions(
+    goto_programt::instructionst &target,
+    const goto_programt::instructionst &source);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param target
+ * @param pos
+ * @param source
+ */
+goto_programt::targett copy_instructions(
+    goto_programt::instructionst &target,
+    goto_programt::targett pos,
+    const goto_programt::instructionst &source);
 
 #endif /* SRC_CEGIS_DANGER_UTIL_COPY_INSTRUCTIONS_H_ */

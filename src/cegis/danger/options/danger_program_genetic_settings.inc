@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include <cegis/invariant/options/parameters.h>
+#include <cegis/options/parameters.h>
 #include <cegis/invariant/symex/learn/instrument_vars.h>
 #include <cegis/danger/options/danger_program.h>
 
@@ -25,6 +25,7 @@ size_t danger_program_genetic_settingst<preproct>::min_prog_sz(
 
 namespace
 {
+const size_t RANKING_PROG_INDEX=1u;
 const size_t SKOLEM_PROG_INDEX=2u;
 const size_t PROGS_PER_LOOP=3u;
 }
@@ -34,14 +35,21 @@ size_t danger_program_genetic_settingst<preproct>::max_prog_sz(
     const size_t prog_index)
 {
   const size_t user_max_prog_size=opt.get_unsigned_int_option(CEGIS_MAX_SIZE);
-  if (SKOLEM_PROG_INDEX == prog_index % PROGS_PER_LOOP)
+  switch (prog_index)
+  {
+  case RANKING_PROG_INDEX:
+    if (prog.use_ranking) return user_max_prog_size;
+    return 0u;
+  case SKOLEM_PROG_INDEX:
   {
     const size_t loop_index=prog_index / PROGS_PER_LOOP;
     const size_t num_skolem=prog.loops[loop_index].skolem_choices.size();
     if (num_skolem == 0u) return 0u;
     return std::max(num_skolem, user_max_prog_size);
   }
-  return user_max_prog_size;
+  default:
+    return user_max_prog_size;
+  }
 }
 
 template<class preproct>
@@ -70,7 +78,7 @@ size_t danger_program_genetic_settingst<preproct>::num_progs()
 template<class preproct>
 size_t danger_program_genetic_settingst<preproct>::num_vars()
 {
-  invariant_variable_idst vars;
+  operand_variable_idst vars;
   get_invariant_variable_ids(prog.st, vars);
   return vars.size();
 }
@@ -78,7 +86,7 @@ size_t danger_program_genetic_settingst<preproct>::num_vars()
 template<class preproct>
 size_t danger_program_genetic_settingst<preproct>::num_consts()
 {
-  invariant_variable_idst vars;
+  operand_variable_idst vars;
   return get_invariant_variable_ids(prog.st, vars);
 }
 

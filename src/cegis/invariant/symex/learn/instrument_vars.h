@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -19,7 +19,7 @@
  *
  * @details
  */
-typedef std::map<const irep_idt, size_t> invariant_variable_idst;
+typedef std::map<const irep_idt, size_t> operand_variable_idst;
 
 /**
  * @brief
@@ -70,26 +70,11 @@ goto_programt::targett set_rops_reference(const symbol_tablet &st,
  *
  * @details
  *
- * @param st
- * @param body
- * @param pos
- * @param name
- * @param id
- */
-goto_programt::targett set_ops_reference(const symbol_tablet &st,
-    goto_programt &body, const goto_programt::targett &pos,
-    const irep_idt &name, const unsigned int id);
-
-/**
- * @brief
- *
- * @details
- *
  * @param prog
  * @param var_ids
  */
 void link_user_program_variables(class invariant_programt &prog,
-    const invariant_variable_idst &var_ids);
+    const operand_variable_idst &var_ids);
 
 /**
  * @brief
@@ -102,6 +87,6 @@ void link_user_program_variables(class invariant_programt &prog,
  * @return
  */
 size_t get_invariant_variable_ids(const class symbol_tablet &st,
-    invariant_variable_idst &ids);
+    operand_variable_idst &ids);
 
 #endif /* CEGIS_INVARIANT_INSTRUMENT_VARS_H_ */

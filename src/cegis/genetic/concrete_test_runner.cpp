@@ -9,7 +9,7 @@
 #include <util/bv_arithmetic.h>
 #include <util/mp_arith.h>
 
-#include <cegis/invariant/meta/literals.h>
+#include <cegis/instrument/literals.h>
 #include <cegis/genetic/concrete_test_runner.h>
 
 #define EXECUTABLE_PREFIX "test_runner"

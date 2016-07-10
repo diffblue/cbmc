@@ -2,19 +2,38 @@
 
 #include <cegis/invariant/util/copy_instructions.h>
 
-copy_instructionst::copy_instructionst()
-{
-}
-
-copy_instructionst::~copy_instructionst()
-{
-}
-
 void copy_instructionst::operator()(const goto_programt::targett &new_target,
     const goto_programt::const_targett &old_target)
 {
   *new_target=*old_target;
   target_mapping.insert(std::make_pair(old_target, new_target));
+}
+
+void copy_instructionst::operator()(goto_programt::instructionst &new_instrs,
+    const goto_programt::instructionst &old_instrs)
+{
+  for (goto_programt::const_targett pos=old_instrs.begin();
+      pos != old_instrs.end(); ++pos)
+  {
+    new_instrs.push_back(goto_programt::instructiont());
+    operator()(std::prev(new_instrs.end()), pos);
+  }
+}
+
+goto_programt::targett copy_instructionst::operator()(
+    goto_programt::instructionst &new_instrs,
+    goto_programt::targett insert_after,
+    const goto_programt::instructionst &old_instrs)
+{
+  assert(!old_instrs.empty());
+  ++insert_after;
+  for (goto_programt::const_targett pos=old_instrs.begin();
+      pos != old_instrs.end(); ++pos)
+  {
+    insert_after=new_instrs.insert(insert_after, goto_programt::instructiont());
+    operator()(insert_after++, pos);
+  }
+  return std::prev(insert_after);
 }
 
 namespace
@@ -109,16 +128,12 @@ public:
     }
   }
 
-  void operator()(
-      const std::pair<goto_programt::targett, goto_programt::targett> &skip)
-  {
-    for (goto_programt::targett it=instrs.begin(); it != instrs.end(); ++it)
-      replace_targets(*it);
-  }
-
   void remove()
   {
-    std::for_each(skips.begin(), skips.end(), *this);
+    for (goto_programt::instructiont &instr : instrs)
+      replace_targets(instr);
+    for (const skipst::value_type &skip : skips)
+      instrs.erase(skip.first);
   }
 };
 }
@@ -126,8 +141,26 @@ public:
 void invariant_make_presentable(goto_programt::instructionst &instrs)
 {
   const goto_programt::targett &begin=instrs.begin();
-  goto_programt::targett last=instrs.end();
+  const goto_programt::targett &last=instrs.end();
   if (begin == last) return;
   skip_removert op(instrs);
-  op(begin, --last);
+  op(begin, std::prev(last));
+  op.remove();
+}
+
+void copy_instructions(goto_programt::instructionst &target,
+    const goto_programt::instructionst &source)
+{
+  copy_instructionst copy;
+  copy(target, source);
+  copy.finalize();
+}
+
+goto_programt::targett copy_instructions(goto_programt::instructionst &target,
+    goto_programt::targett pos, const goto_programt::instructionst &source)
+{
+  copy_instructionst copy;
+  goto_programt::targett result=copy(target, pos, source);
+  copy.finalize();
+  return result;
 }

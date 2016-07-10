@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -44,6 +44,7 @@ public:
   typedef std::vector<loopt> loopst;
 
   loopst loops;
+  bool use_ranking;
 
   /**
    * @brief
@@ -68,8 +69,12 @@ public:
    *
    * @param st
    * @param gf
+   * @param use_ranking
    */
-  danger_programt(const symbol_tablet &st, const goto_functionst &gf);
+  danger_programt(
+      const symbol_tablet &st,
+      const goto_functionst &gf,
+      const bool use_ranking);
 
   /**
    * @brief

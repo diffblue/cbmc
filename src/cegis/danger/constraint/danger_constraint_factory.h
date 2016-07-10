@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -16,12 +16,28 @@
  * @brief
  *
  * @details
- *
- * @param number_of_loops
- *
- * @return
  */
-exprt create_danger_constraint(const size_t number_of_loops);
+class danger_constraint {
+  const bool use_ranking;
+public:
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param use_ranking
+   */
+  danger_constraint(bool use_ranking);
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param number_of_loops
+   */
+  exprt operator()(size_t number_of_loops) const;
+};
 
 /**
  * @brief

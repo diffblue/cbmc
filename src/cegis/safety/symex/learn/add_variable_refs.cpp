@@ -3,7 +3,7 @@
 #include <cegis/safety/symex/learn/add_variable_refs.h>
 
 void add_safety_learning_variable_refs(invariant_programt &prog,
-    const invariant_variable_idst &var_ids, const size_t max_sz)
+    const operand_variable_idst &var_ids, const size_t max_sz)
 {
   link_user_program_variables(prog, var_ids);
   const symbol_tablet &st=prog.st;

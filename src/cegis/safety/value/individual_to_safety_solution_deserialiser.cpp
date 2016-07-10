@@ -19,7 +19,7 @@ void individual_to_safety_solution_deserialisert::operator()(
 {
   program_individualt ind;
   deserialise(ind, sdu);
-  invariant_variable_idst ids;
+  operand_variable_idst ids;
   const symbol_tablet &st=prog.st;
   get_invariant_variable_ids(st, ids);
   create_safety_solution(result, st, prog.gf, ind, ids, info_fac);

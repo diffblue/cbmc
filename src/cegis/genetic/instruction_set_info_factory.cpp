@@ -85,7 +85,7 @@ void initialise(instruction_set_infot &info, instruction_sett &ins,
 {
   if (!info.empty()) return;
   const goto_programt &body=body_provider();
-  extract_instruction_set(ins, body);
+  ins=extract_instruction_set(body);
   const transform_to_info op;
   std::transform(ins.begin(), ins.end(), std::inserter(info, info.end()), op);
 }

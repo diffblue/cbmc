@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
- Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+ Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
  \*******************************************************************/
 
@@ -34,7 +34,7 @@ private:
   candidatet current_candidate;
   counterexamplest counterexamples;
 
-  safety_checkert::resultt run_bmc(message_handlert &msg, const optionst &opt);
+  safety_checkert::resultt run_bmc();
   bool learn_at_current_size();
 public:
   /**
