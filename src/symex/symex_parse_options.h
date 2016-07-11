@@ -68,6 +68,8 @@ protected:
   void show_counterexample(const class goto_tracet &);
             
   void eval_verbosity();
+
+  std::string get_test(const goto_tracet &goto_trace);
 };
 
 #endif
