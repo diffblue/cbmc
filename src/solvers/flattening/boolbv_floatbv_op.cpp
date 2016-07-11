@@ -27,8 +27,7 @@ Function: boolbvt::convert_floatbv_typecast
 
 \*******************************************************************/
 
-void boolbvt::convert_floatbv_typecast(
-  const floatbv_typecast_exprt &expr, bvt &bv)
+bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {
   const exprt &op0=expr.op(); // number to convert
   const exprt &op1=expr.rounding_mode(); // rounding mode
@@ -40,10 +39,7 @@ void boolbvt::convert_floatbv_typecast(
   const typet &dest_type=ns.follow(expr.type());
   
   if(src_type==dest_type) // redundant type cast?
-  {
-    bv=bv0;
-    return;
-  }
+    return bv0;
 
   float_utilst float_utils(prop);
   
@@ -53,36 +49,36 @@ void boolbvt::convert_floatbv_typecast(
      dest_type.id()==ID_floatbv)
   {
     float_utils.spec=to_floatbv_type(src_type);
-    bv=float_utils.conversion(bv0, to_floatbv_type(dest_type));
+    return float_utils.conversion(bv0, to_floatbv_type(dest_type));
   }
   else if(src_type.id()==ID_signedbv &&
           dest_type.id()==ID_floatbv)
   {
     float_utils.spec=to_floatbv_type(dest_type);
-    bv=float_utils.from_signed_integer(bv0);
+    return float_utils.from_signed_integer(bv0);
   }
   else if(src_type.id()==ID_unsignedbv &&
           dest_type.id()==ID_floatbv)
   {
     float_utils.spec=to_floatbv_type(dest_type);
-    bv=float_utils.from_unsigned_integer(bv0);
+    return float_utils.from_unsigned_integer(bv0);
   }
   else if(src_type.id()==ID_floatbv &&
           dest_type.id()==ID_signedbv)
   {
     std::size_t dest_width=to_signedbv_type(dest_type).get_width();
     float_utils.spec=to_floatbv_type(src_type);
-    bv=float_utils.to_signed_integer(bv0, dest_width);
+    return float_utils.to_signed_integer(bv0, dest_width);
   }
   else if(src_type.id()==ID_floatbv &&
           dest_type.id()==ID_unsignedbv)
   {
     std::size_t dest_width=to_unsignedbv_type(dest_type).get_width();
     float_utils.spec=to_floatbv_type(src_type);
-    bv=float_utils.to_unsigned_integer(bv0, dest_width);
+    return float_utils.to_unsigned_integer(bv0, dest_width);
   }
   else
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 }
 
 /*******************************************************************\
@@ -97,7 +93,7 @@ Function: boolbvt::convert_floatbv_op
 
 \*******************************************************************/
 
-void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
+bvt boolbvt::convert_floatbv_op(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
   
@@ -129,15 +125,15 @@ void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
     float_utils.spec=to_floatbv_type(expr.type());
 
     if(expr.id()==ID_floatbv_plus)
-      bv=float_utils.add_sub(bv0, bv1, false);
+      return float_utils.add_sub(bv0, bv1, false);
     else if(expr.id()==ID_floatbv_minus)
-      bv=float_utils.add_sub(bv0, bv1, true);
+      return float_utils.add_sub(bv0, bv1, true);
     else if(expr.id()==ID_floatbv_mult)
-      bv=float_utils.mul(bv0, bv1);
+      return float_utils.mul(bv0, bv1);
     else if(expr.id()==ID_floatbv_div)
-      bv=float_utils.div(bv0, bv1);
+      return float_utils.div(bv0, bv1);
     else if(expr.id()==ID_floatbv_rem)
-      bv=float_utils.rem(bv0, bv1);
+      return float_utils.rem(bv0, bv1);
     else
       assert(false);
   }
@@ -156,6 +152,7 @@ void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
         throw "convert_floatbv_op: unexpected vector operand width";
 
       std::size_t size=width/sub_width;
+      bvt bv;
       bv.resize(width);
 
       for(std::size_t i=0; i<size; i++)
@@ -180,11 +177,13 @@ void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
         assert(i*sub_width+sub_width-1<bv.size());
         std::copy(tmp_bv.begin(), tmp_bv.end(), bv.begin()+i*sub_width);
       }
+      
+      return bv;
     }
     else
-      return conversion_failed(expr, bv);
+      return conversion_failed(expr);
   }
   else
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 }
 

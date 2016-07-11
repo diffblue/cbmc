@@ -27,7 +27,7 @@ Function: boolbvt::convert_index
 
 \*******************************************************************/
 
-void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
+bvt boolbvt::convert_index(const index_exprt &expr)
 {
   if(expr.id()!=ID_index)
     throw "expected index expression";
@@ -40,6 +40,8 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
   
   const typet &array_op_type=ns.follow(array.type());
   
+  bvt bv;
+  
   if(array_op_type.id()==ID_array)
   {
     const array_typet &array_type=
@@ -48,7 +50,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
     std::size_t width=boolbv_width(expr.type());
     
     if(width==0)
-      return conversion_failed(expr, bv);
+      return conversion_failed(expr);
     
     // see if the array size is constant
 
@@ -73,7 +75,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
       // make sure we have the index in the cache
       convert_bv(index);
       
-      return;
+      return bv;
     }
 
     // Must have a finite size
@@ -86,7 +88,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
     // but variable location writes will block this
     mp_integer index_value;
     if(!to_integer(index, index_value))
-      return convert_index(array, index_value, bv);
+      return convert_index(array, index_value);
 
     // Special case : arrays of one thing (useful for constants)
     // TODO : merge with ACTUAL_ARRAY_HACK so that ranges of the same
@@ -142,7 +144,8 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
       // Simplify may remove the lower bound if the type
       // is correct.
       prop.l_set_to_true(convert(simplify_expr(implication, ns)));
-      return;
+
+      return bv;
     }
     #endif
 
@@ -198,7 +201,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
                                                  value_equality)));
       }
       
-      return;
+      return bv;
     }
       
 #endif
@@ -292,7 +295,9 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
     }
   }
   else
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
+    
+  return bv;
 }
 
 /*******************************************************************\
@@ -307,10 +312,9 @@ Function: boolbvt::convert_index
 
 \*******************************************************************/
 
-void boolbvt::convert_index(
+bvt boolbvt::convert_index(
   const exprt &array,
-  const mp_integer &index,
-  bvt &bv)
+  const mp_integer &index)
 {
   const array_typet &array_type=
     to_array_type(ns.follow(array.type()));
@@ -318,8 +322,9 @@ void boolbvt::convert_index(
   std::size_t width=boolbv_width(array_type.subtype());
 
   if(width==0)
-    return conversion_failed(array, bv);
+    return conversion_failed(array);
 
+  bvt bv;
   bv.resize(width);
 
   // TODO: If the underlying array can use one of the
@@ -356,4 +361,6 @@ void boolbvt::convert_index(
     for(std::size_t i=0; i<width; i++)
       bv[i]=prop.new_variable();
   }
+  
+  return bv;
 }

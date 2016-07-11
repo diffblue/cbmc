@@ -57,9 +57,7 @@ Function: boolbvt::convert_byte_extract
 
 \*******************************************************************/
 
-void boolbvt::convert_byte_extract(
-  const byte_extract_exprt &expr,
-  bvt &bv)
+bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 {
   if(expr.operands().size()!=2)
     throw "byte_extract takes two operands";
@@ -68,8 +66,7 @@ void boolbvt::convert_byte_extract(
   if(is_unbounded_array(expr.op().type()))
   {
     exprt tmp=flatten_byte_extract(expr, ns);
-    bv=convert_bv(tmp);
-    return;
+    return convert_bv(tmp);
   }
   
   std::size_t width=boolbv_width(expr.type());
@@ -91,7 +88,7 @@ void boolbvt::convert_byte_extract(
   #endif
 
   if(width==0)
-    return conversion_failed(expr, bv);    
+    return conversion_failed(expr);
     
   const exprt &op=expr.op();
   const exprt &offset=expr.offset();
@@ -112,6 +109,7 @@ void boolbvt::convert_byte_extract(
 
   // do result
   endianness_mapt result_map(expr.type(), little_endian, ns);
+  bvt bv;
   bv.resize(width);
 
   // see if the byte number is constant
@@ -205,4 +203,6 @@ void boolbvt::convert_byte_extract(
 
   // shuffle the result
   bv=map_bv(result_map, bv);
+  
+  return bv;
 }

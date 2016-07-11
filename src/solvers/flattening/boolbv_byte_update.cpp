@@ -27,9 +27,7 @@ Function: boolbvt::convert_byte_update
 
 \*******************************************************************/
 
-void boolbvt::convert_byte_update(
-  const byte_update_exprt &expr,
-  bvt &bv)
+bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 {
   if(expr.operands().size()!=3)
     throw "byte_update takes three operands";
@@ -47,7 +45,7 @@ void boolbvt::convert_byte_update(
   else
     assert(false);
 
-  bv=convert_bv(op);
+  bvt bv=convert_bv(op);
   
   const bvt &value_bv=convert_bv(value);
   std::size_t update_width=value_bv.size();
@@ -95,7 +93,7 @@ void boolbvt::convert_byte_update(
       }
     }
 
-    return;
+    return bv;
   }
 
   // byte_update with variable index
@@ -119,4 +117,6 @@ void boolbvt::convert_byte_update(
         bv[bv_o]=prop.lselect(equal, value_bv[value_bv_o], bv[bv_o]);
       }
   }
+  
+  return bv;
 }

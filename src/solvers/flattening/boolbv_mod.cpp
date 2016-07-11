@@ -20,7 +20,7 @@ Function: boolbvt::convert_mod
 
 \*******************************************************************/
 
-void boolbvt::convert_mod(const mod_exprt &expr, bvt &bv)
+bvt boolbvt::convert_mod(const mod_exprt &expr)
 {
   if(expr.type().id()==ID_floatbv)
   {
@@ -28,12 +28,12 @@ void boolbvt::convert_mod(const mod_exprt &expr, bvt &bv)
 
   if(expr.type().id()!=ID_unsignedbv &&
      expr.type().id()!=ID_signedbv)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   if(expr.op0().type().id()!=expr.type().id() ||
      expr.op1().type().id()!=expr.type().id())
@@ -54,5 +54,5 @@ void boolbvt::convert_mod(const mod_exprt &expr, bvt &bv)
 
   bv_utils.divider(op0, op1, res, rem, rep);
 
-  bv=rem;
+  return rem;
 }

@@ -25,7 +25,7 @@ Function: boolbvt::convert_member
 
 \*******************************************************************/
 
-void boolbvt::convert_member(const member_exprt &expr, bvt &bv)
+bvt boolbvt::convert_member(const member_exprt &expr)
 {
   const exprt &struct_op=expr.struct_op();
   const typet &struct_op_type=ns.follow(struct_op.type());
@@ -34,13 +34,11 @@ void boolbvt::convert_member(const member_exprt &expr, bvt &bv)
 
   if(struct_op_type.id()==ID_union)
   {
-    bv=convert_bv(
+    return convert_bv(
       byte_extract_exprt(byte_extract_id(),
                          struct_op,
                          gen_zero(integer_typet()),
                          expr.type()));
-
-    return;
   }
   else if(struct_op_type.id()==ID_struct)
   {
@@ -71,13 +69,14 @@ void boolbvt::convert_member(const member_exprt &expr, bvt &bv)
             expr.type().to_string();
         }
 
+        bvt bv;
         bv.resize(sub_width);
         assert(offset+sub_width<=struct_bv.size());
 
         for(std::size_t i=0; i<sub_width; i++)
           bv[i]=struct_bv[offset+i];
 
-        return;
+        return bv;
       }
 
       offset+=sub_width;

@@ -23,7 +23,7 @@ Function: bv_cbmct::convert_waitfor
 
 \*******************************************************************/
 
-void bv_cbmct::convert_waitfor(const exprt &expr, bvt &bv)
+bvt bv_cbmct::convert_waitfor(const exprt &expr)
 {
   if(expr.operands().size()!=4)
     throw "waitfor expected to have four operands";
@@ -133,7 +133,7 @@ void bv_cbmct::convert_waitfor(const exprt &expr, bvt &bv)
   }
 
   // result: new_cycle
-  return convert_bitvector(new_cycle, bv);
+  return convert_bitvector(new_cycle);
 }
 
 /*******************************************************************\
@@ -148,7 +148,7 @@ Function: bv_cbmct::convert_waitfor_symbol
 
 \*******************************************************************/
 
-void bv_cbmct::convert_waitfor_symbol(const exprt &expr, bvt &bv)
+bvt bv_cbmct::convert_waitfor_symbol(const exprt &expr)
 {
   if(expr.operands().size()!=1)
     throw "waitfor_symbol expected to have one operand";
@@ -164,7 +164,7 @@ void bv_cbmct::convert_waitfor_symbol(const exprt &expr, bvt &bv)
   rel_expr.copy_to_operands(result, bound);
   set_to_true(rel_expr);
 
-  return convert_bitvector(result, bv);
+  return convert_bitvector(result);
 }
 
 /*******************************************************************\
@@ -179,13 +179,13 @@ Function: bv_cbmct::convert_bitvector
 
 \*******************************************************************/
 
-void bv_cbmct::convert_bitvector(const exprt &expr, bvt &bv)
+bvt bv_cbmct::convert_bitvector(const exprt &expr)
 {
   if(expr.id()=="waitfor")
-    return convert_waitfor(expr, bv);
+    return convert_waitfor(expr);
 
   if(expr.id()=="waitfor_symbol")
-    return convert_waitfor_symbol(expr, bv);
+    return convert_waitfor_symbol(expr);
 
-  return bv_pointerst::convert_bitvector(expr, bv);
+  return bv_pointerst::convert_bitvector(expr);
 }

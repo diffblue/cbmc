@@ -27,11 +27,7 @@ bvt boolbvt::convert_power(const binary_exprt &expr)
   std::size_t width=boolbv_width(type);
   
   if(width==0)
-  {
-    bvt bv;
-    conversion_failed(expr, bv);
-    return bv;
-  }
+    return conversion_failed(expr);
 
   if(type.id()==ID_unsignedbv ||
      type.id()==ID_signedbv)
@@ -46,14 +42,10 @@ bvt boolbvt::convert_power(const binary_exprt &expr)
     bvt one=bv_utils.build_constant(1, width);
     bvt shift=bv_utils.shift(one, bv_utilst::LEFT, op1);
     
-    bvt nondet;
-    nondet.resize(width);
-    for(auto & l : nondet) l=prop.new_variable();
+    bvt nondet=prop.new_variables(width);
     
     return bv_utils.select(eq_2, shift, nondet);
   }
 
-  bvt bv;
-  conversion_failed(expr, bv);
-  return bv;
+  return conversion_failed(expr);
 }

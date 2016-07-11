@@ -26,7 +26,7 @@ Function: boolbvt::convert_add_sub
 
 \*******************************************************************/
 
-void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
+bvt boolbvt::convert_add_sub(const exprt &expr)
 {
   const typet &type=ns.follow(expr.type());
   
@@ -37,12 +37,12 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
      type.id()!=ID_range &&
      type.id()!=ID_complex &&
      type.id()!=ID_vector)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   std::size_t width=boolbv_width(type);
   
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
     
   const exprt::operandst &operands=expr.operands();
 
@@ -57,7 +57,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
     throw "add/sub with mixed types";
   }
 
-  bv=convert_bv(op0);
+  bvt bv=convert_bv(op0);
 
   if(bv.size()!=width)
     throw "convert_add_sub: unexpected operand 0 width";
@@ -155,5 +155,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
     else
       bv=bv_utils.add_sub(bv, op, subtract);
   }
+  
+  return bv;
 }
 

@@ -23,7 +23,7 @@ Function: boolbvt::convert_struct
 
 \*******************************************************************/
 
-void boolbvt::convert_struct(const struct_exprt &expr, bvt &bv)
+bvt boolbvt::convert_struct(const struct_exprt &expr)
 {
   const struct_typet &struct_type=to_struct_type(ns.follow(expr.type()));
 
@@ -34,6 +34,7 @@ void boolbvt::convert_struct(const struct_exprt &expr, bvt &bv)
   if(expr.operands().size()!=components.size())
     throw "struct: wrong number of arguments";
 
+  bvt bv;
   bv.resize(width);
   
   std::size_t offset=0, i=0;
@@ -71,4 +72,6 @@ void boolbvt::convert_struct(const struct_exprt &expr, bvt &bv)
   }
   
   assert(offset==width);
+  
+  return bv;
 }

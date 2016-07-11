@@ -20,13 +20,14 @@ Function: boolbvt::convert_constant
 
 \*******************************************************************/
 
-void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
+bvt boolbvt::convert_constant(const constant_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
+  bvt bv;
   bv.resize(width);
   
   const typet &expr_type=expr.type();
@@ -49,14 +50,13 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
       offset+=op_width;
     }   
     
-    return;
+    return bv;
   }
   else if(expr_type.id()==ID_string)
   {
     // we use the numbering for strings
     std::size_t number=string_numbering(expr.get_value());
-    bv=bv_utils.build_constant(number, bv.size());
-    return;
+    return bv_utils.build_constant(number, bv.size());
   }
   else if(expr_type.id()==ID_range)
   {
@@ -72,7 +72,7 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
       bv[i]=const_literal(bit);
     }
 
-    return;
+    return bv;
   }
   else if(expr_type.id()==ID_unsignedbv ||
           expr_type.id()==ID_signedbv ||
@@ -96,7 +96,7 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
       bv[i]=const_literal(bit);
     }
 
-    return;
+    return bv;
   }
   else if(expr_type.id()==ID_enumeration)
   {
@@ -105,10 +105,7 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
 
     for(std::size_t i=0; i<elements.size(); i++)
       if(elements[i].id()==value)
-      {
-        bv=bv_utils.build_constant(i, width);
-        return;
-      }
+        return bv_utils.build_constant(i, width);
   }
   else if(expr_type.id()==ID_verilog_signedbv ||
           expr_type.id()==ID_verilog_unsignedbv)
@@ -150,8 +147,8 @@ void boolbvt::convert_constant(const constant_exprt &expr, bvt &bv)
       }
     }
 
-    return;
+    return bv;
   }
   
-  conversion_failed(expr, bv);
+  return conversion_failed(expr);
 }

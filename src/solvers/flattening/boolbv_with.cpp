@@ -28,7 +28,7 @@ Function: boolbvt::convert_with
 
 \*******************************************************************/
 
-void boolbvt::convert_with(const exprt &expr, bvt &bv)
+bvt boolbvt::convert_with(const exprt &expr)
 {
   if(expr.operands().size()<3)
     throw "with takes at least three operands";
@@ -36,12 +36,12 @@ void boolbvt::convert_with(const exprt &expr, bvt &bv)
   if((expr.operands().size()%2)!=1)
     throw "with takes an odd number of operands";
 
-  bv=convert_bv(expr.op0());
+  bvt bv=convert_bv(expr.op0());
 
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   if(bv.size()!=width)
     throw "unexpected operand 0 width";
@@ -61,6 +61,8 @@ void boolbvt::convert_with(const exprt &expr, bvt &bv)
                  prev_bv,
                  bv);
   }
+  
+  return bv;
 }
 
 /*******************************************************************\

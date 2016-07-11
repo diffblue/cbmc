@@ -313,21 +313,15 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   }
   else if(expr.id()==ID_if)
   {
-    bvt bv;
-    SUB::convert_if(to_if_expr(expr), bv);
-    return bv;
+    return SUB::convert_if(to_if_expr(expr));
   }
   else if(expr.id()==ID_index)
   {
-    bvt bv;
-    SUB::convert_index(to_index_expr(expr), bv);
-    return bv;
+    return SUB::convert_index(to_index_expr(expr));
   }
   else if(expr.id()==ID_member)
   {
-    bvt bv;
-    SUB::convert_member(to_member_expr(expr), bv);
-    return bv;
+    return SUB::convert_member(to_member_expr(expr));
   }
   else if(expr.id()==ID_address_of)
   {
@@ -463,35 +457,25 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   else if(expr.id()==ID_lshr || 
           expr.id()==ID_shl)
   {
-    bvt bv;
-    SUB::convert_shift(to_shift_expr(expr), bv);
-    return bv;
+    return SUB::convert_shift(to_shift_expr(expr));
   }
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
           expr.id()==ID_bitnot)
   {
-    bvt bv;
-    SUB::convert_bitwise(expr, bv);
-    return bv;
+    return convert_bitwise(expr);
   }
   else if(expr.id()==ID_concatenation)
   {
-    bvt bv;
-    SUB::convert_concatenation(expr, bv);
-    return bv;
+    return SUB::convert_concatenation(expr);
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    bvt bv;
-    SUB::convert_byte_extract(to_byte_extract_expr(expr), bv);
-    return bv;
+    return SUB::convert_byte_extract(to_byte_extract_expr(expr));
   }
 
-  bvt bv;
-  conversion_failed(expr, bv);
-  return bv;
+  return conversion_failed(expr);
 }
 
 /*******************************************************************\
@@ -506,13 +490,10 @@ Function: bv_pointerst::convert_bitvector
 
 \*******************************************************************/
 
-void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
+bvt bv_pointerst::convert_bitvector(const exprt &expr)
 {
   if(is_ptr(expr.type()))
-  {
-    bv=convert_pointer_type(expr);
-    return;
-  }
+    return convert_pointer_type(expr);
 
   if(expr.id()==ID_minus &&
      expr.operands().size()==2 &&
@@ -526,13 +507,13 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     std::size_t width=boolbv_width(expr.type());
     
     if(width==0)
-      return conversion_failed(expr, bv);
+      return conversion_failed(expr);
 
     // we do a zero extension
     op0=bv_utils.zero_extension(op0, width);
     op1=bv_utils.zero_extension(op1, width);
 
-    bv=bv_utils.sub(op0, op1);
+    bvt bv=bv_utils.sub(op0, op1);
     
     mp_integer element_size=
       pointer_offset_size(expr.op0().type().subtype(), ns);
@@ -544,7 +525,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
       bv=bv_utils.divider(bv, element_size_bv, bv_utilst::SIGNED);
     }
 
-    return;
+    return bv;
   }
   else if(expr.id()==ID_pointer_offset &&
           expr.operands().size()==1 &&
@@ -555,15 +536,13 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     std::size_t width=boolbv_width(expr.type());
 
     if(width==0)
-      return conversion_failed(expr, bv);
+      return conversion_failed(expr);
       
     // we need to strip off the object part
     op0.resize(offset_bits);
 
     // we do a sign extension to permit negative offsets
-    bv=bv_utils.sign_extension(op0, width);
-
-    return;
+    return bv_utils.sign_extension(op0, width);
   }
   else if(expr.id()==ID_object_size &&
           expr.operands().size()==1 &&
@@ -572,6 +551,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     // we postpone until we know the objects
     std::size_t width=boolbv_width(expr.type());
     
+    bvt bv;
     bv.resize(width);
     
     for(std::size_t i=0; i<width; i++)
@@ -583,7 +563,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     postponed_list.back().bv=bv;
     postponed_list.back().expr=expr;
     
-    return;
+    return bv;
   }
   else if(expr.id()==ID_pointer_object &&
           expr.operands().size()==1 &&
@@ -594,15 +574,13 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     std::size_t width=boolbv_width(expr.type());
     
     if(width==0)
-      return conversion_failed(expr, bv);
+      return conversion_failed(expr);
       
     // erase offset bits
     
     op0.erase(op0.begin()+0, op0.begin()+offset_bits);
 
-    bv=bv_utils.zero_extension(op0, width);
-
-    return;
+    return bv_utils.zero_extension(op0, width);
   }
   else if(expr.id()==ID_typecast &&
           expr.operands().size()==1 &&
@@ -616,14 +594,12 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     std::size_t width=boolbv_width(expr.type());
 
     if(width==0)
-      return conversion_failed(expr, bv);
+      return conversion_failed(expr);
 
-    bv=bv_utils.zero_extension(op0, width);
-
-    return;
+    return bv_utils.zero_extension(op0, width);
   }
 
-  return SUB::convert_bitvector(expr, bv);
+  return SUB::convert_bitvector(expr);
 }
 
 /*******************************************************************\
