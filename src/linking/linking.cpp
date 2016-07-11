@@ -1133,17 +1133,20 @@ void linkingt::duplicate_object_symbol(
       }
       else
       {
-        err_location(new_symbol.value);
-        error() << "error: conflicting initializers for variable \""
-                << old_symbol.name
-                << "\"" << '\n';
-        error() << "old value in module " << old_symbol.module
-                << " " << old_symbol.value.find_source_location() << '\n'
-                << expr_to_string(ns, old_symbol.name, tmp_old) << '\n';
-        error() << "new value in module " << new_symbol.module
-                << " " << new_symbol.value.find_source_location() << '\n'
-                << expr_to_string(ns, new_symbol.name, tmp_new) << eom;
-        throw 0;
+        warning().source_location=new_symbol.location;
+
+        warning() << "warning: conflicting initializers for"
+                  << " variable \"" << old_symbol.name << "\"\n";
+        warning() << "using old value in module "
+                  << old_symbol.module << " "
+                  << old_symbol.value.find_source_location() << '\n'
+                  << expr_to_string(ns, old_symbol.name, tmp_old)
+                  << '\n';
+        warning() << "ignoring new value in module "
+                  << new_symbol.module << " "
+                  << new_symbol.value.find_source_location() << '\n'
+                  << expr_to_string(ns, new_symbol.name, tmp_new)
+                  << eom;
       }
     }
   }
