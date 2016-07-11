@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/source_location.h>
 #include <util/time_stopping.h>
-#include <util/message_stream.h>
+#include <util/message.h>
 #include <util/json.h>
 
 #include <langapi/mode.h>
@@ -431,19 +431,19 @@ safety_checkert::resultt bmct::run(
 
   catch(const std::string &error_str)
   {
-    message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_source_location);
-    message_stream.str << error_str;
-    message_stream.error_msg();
+    messaget message(get_message_handler());
+    message.error().source_location=symex.last_source_location;
+    message.error() << error_str << messaget::eom;
+
     return safety_checkert::ERROR;
   }
 
   catch(const char *error_str)
   {
-    message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_source_location);
-    message_stream.str << error_str;
-    message_stream.error_msg();
+    messaget message(get_message_handler());
+    message.error().source_location=symex.last_source_location;
+    message.error() << error_str << messaget::eom;
+
     return safety_checkert::ERROR;
   }
 
