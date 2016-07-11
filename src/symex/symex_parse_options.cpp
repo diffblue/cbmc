@@ -519,8 +519,8 @@ void symex_parse_optionst::report_properties(
 
       switch(it->second.status)
       {
-      case path_searcht::PASS: status_string="SUCCESS"; break;
-      case path_searcht::FAIL: status_string="FAILURE"; break;
+      case path_searcht::SUCCESS: status_string="SUCCESS"; break;
+      case path_searcht::FAILURE: status_string="FAILURE"; break;
       case path_searcht::NOT_REACHED: status_string="SUCCESS"; break;
       }
 
@@ -534,8 +534,8 @@ void symex_parse_optionst::report_properties(
                << it->second.description << ": ";
       switch(it->second.status)
       {
-      case path_searcht::PASS: status() << "SUCCESS"; break;
-      case path_searcht::FAIL: status() << "FAILURE"; break;
+      case path_searcht::SUCCESS: status() << "SUCCESS"; break;
+      case path_searcht::FAILURE: status() << "FAILURE"; break;
       case path_searcht::NOT_REACHED: status() << "SUCCESS"; break;
       }
       status() << eom;
@@ -543,7 +543,7 @@ void symex_parse_optionst::report_properties(
 
     if((cmdline.isset("show-trace") ||
         cmdline.isset("trace")) &&
-       it->second.status==path_searcht::FAIL)
+       it->second.status==path_searcht::FAILURE)
       show_counterexample(it->second.error_trace);
   }
 
@@ -557,30 +557,13 @@ void symex_parse_optionst::report_properties(
         it=property_map.begin();
         it!=property_map.end();
         it++)
-      if(it->second.status==path_searcht::FAIL)
+      if(it->second.status==path_searcht::FAILURE)
         failed++;
     
     status() << "** " << failed
              << " of " << property_map.size() << " failed"
              << eom;  
   }
-}
-
-/*******************************************************************\
-
-Function: symex_parse_optionst::report_cover
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void symex_parse_optionst::report_cover(
-  const path_searcht::property_mapt &property_map)
-{
 }
 
 /*******************************************************************\

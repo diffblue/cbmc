@@ -74,7 +74,7 @@ public:
   absolute_timet start_time;
   time_periodt sat_time;
 
-  enum statust { NOT_REACHED, PASS, FAIL };
+  enum statust { NOT_REACHED, SUCCESS, FAILURE };
 
   struct property_entryt
   {
