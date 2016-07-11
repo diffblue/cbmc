@@ -82,6 +82,10 @@ public:
     irep_idt description;
     goto_tracet error_trace;
     source_locationt source_location;
+    
+    inline bool is_success() const { return status==SUCCESS; }
+    inline bool is_failure() const { return status==FAILURE; }
+    inline bool is_not_reached() const { return status==NOT_REACHED; }
   };
   
   inline void set_dfs() { search_heuristic=search_heuristict::DFS; }

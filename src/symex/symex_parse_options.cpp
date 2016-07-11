@@ -543,7 +543,7 @@ void symex_parse_optionst::report_properties(
 
     if((cmdline.isset("show-trace") ||
         cmdline.isset("trace")) &&
-       it->second.status==path_searcht::FAILURE)
+       it->second.is_failure())
       show_counterexample(it->second.error_trace);
   }
 
@@ -557,7 +557,7 @@ void symex_parse_optionst::report_properties(
         it=property_map.begin();
         it!=property_map.end();
         it++)
-      if(it->second.status==path_searcht::FAILURE)
+      if(it->second.is_failure())
         failed++;
     
     status() << "** " << failed
