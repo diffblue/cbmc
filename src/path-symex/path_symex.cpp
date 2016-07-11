@@ -1041,6 +1041,10 @@ void path_symext::operator()(
       {
         // ignore for SC
       }
+      else if(statement==ID_input)
+      {
+        // just needs to be recorded
+      }
       else
         throw "unexpected OTHER statement: "+id2string(statement);
     }
