@@ -1,4 +1,5 @@
-SRC = symex_main.cpp symex_parse_options.cpp path_search.cpp
+SRC = symex_main.cpp symex_parse_options.cpp path_search.cpp \
+      symex_cover.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../linking/linking$(LIBEXT) \
