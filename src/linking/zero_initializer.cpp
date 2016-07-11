@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/message_stream.h>
+#include <util/message.h>
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/std_types.h>
@@ -18,13 +18,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "zero_initializer.h"
 
-class zero_initializert:public message_streamt
+class zero_initializert:public messaget
 {
 public:
   zero_initializert(
     const namespacet &_ns,
     message_handlert &_message_handler):
-    message_streamt(_message_handler),
+    messaget(_message_handler),
     ns(_ns)
   {
   }
@@ -96,9 +96,8 @@ exprt zero_initializert::zero_initializer_rec(
   }
   else if(type_id==ID_code)
   {
-    err_location(source_location);
-    str << "cannot zero-initialize code-type";
-    error_msg();
+    error().source_location=source_location;
+    error() << "cannot zero-initialize code-type" << eom;
     throw 0;
   }
   else if(type_id==ID_array)
@@ -130,18 +129,17 @@ exprt zero_initializert::zero_initializer_rec(
       }
       else if(to_integer(array_type.size(), array_size))
       {
-        err_location(source_location);
-        str << "failed to zero-initialize array of non-fixed size `"
-            << to_string(array_type.size()) << "'";
-        error_msg();
+        error().source_location=source_location;
+        error() << "failed to zero-initialize array of non-fixed size `"
+                << to_string(array_type.size()) << "'" << eom;
         throw 0;
       }
         
       if(array_size<0)
       {
-        err_location(source_location);
-        str << "failed to zero-initialize array of with negative size";
-        error_msg();
+        error().source_location=source_location;
+        error() << "failed to zero-initialize array of with negative size"
+                << eom;
         throw 0;
       }
 
@@ -161,18 +159,17 @@ exprt zero_initializert::zero_initializer_rec(
 
     if(to_integer(vector_type.size(), vector_size))
     {
-      err_location(source_location);
-      str << "failed to zero-initialize vector of non-fixed size `"
-          << to_string(vector_type.size()) << "'";
-      error_msg();
+      error().source_location=source_location;
+      error() << "failed to zero-initialize vector of non-fixed size `"
+              << to_string(vector_type.size()) << "'" << eom;
       throw 0;
     }
       
     if(vector_size<0)
     {
-      err_location(source_location);
-      str << "failed to zero-initialize vector of with negative size";
-      error_msg();
+      error().source_location=source_location;
+      error() << "failed to zero-initialize vector of with negative size"
+              << eom;
       throw 0;
     }
 
@@ -273,10 +270,9 @@ exprt zero_initializert::zero_initializer_rec(
   }
   else
   {
-    err_location(source_location);
-    str << "failed to zero-initialize `" << to_string(type)
-        << "'";
-    error_msg();
+    error().source_location=source_location;
+    error() << "failed to zero-initialize `" << to_string(type)
+            << "'" << eom;
     throw 0;
   }
 }
