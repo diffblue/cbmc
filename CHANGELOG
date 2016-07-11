@@ -4,6 +4,7 @@
 * GOTO-INSTRUMENT: New option --list-calls-args
 * GOTO-INSTRUMENT: New option --print-path-lenghts
 * GOTO-ANALYZER: New option --unreachable-functions, --reachable-functions
+* GOTO-INSTRUMENT: New option --undefined-function-is-assume-false
 
 
 5.7

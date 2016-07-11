@@ -89,6 +89,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "code_contracts.h"
 #include "unwind.h"
 #include "model_argc_argv.h"
+#include "undefined_functions.h"
 
 /*******************************************************************\
 
@@ -628,11 +629,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("list-undefined-functions"))
     {
       const namespacet ns(symbol_table);
-
-      Forall_goto_functions(it, goto_functions)
-        if(!ns.lookup(it->first).is_macro &&
-           !it->second.body_available())
-          std::cout << it->first << std::endl;
+      list_undefined_functions(goto_functions, ns, std::cout);
       return 0;
     }
 
@@ -767,6 +764,13 @@ int goto_instrument_parse_optionst::doit()
 
       status() << "Removing unused functions" << eom;
       remove_unused_functions(goto_functions, get_message_handler());
+    }
+
+    if(cmdline.isset("undefined-function-is-assume-false"))
+    {
+      do_indirect_call_and_rtti_removal();
+
+      undefined_function_abort_path(goto_functions);
     }
 
     // write new binary?
@@ -1549,6 +1553,8 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --check-invariant function   instruments invariant checking function\n"
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
+    " --undefined-function-is-assume-false\n"
+    "                              convert each call to an undefined function to assume(false)\n"
     "\n"
     "Loop transformations:\n"
     " --k-induction <k>            check loops with k-induction\n"
