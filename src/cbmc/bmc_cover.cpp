@@ -468,10 +468,12 @@ bool bmc_covert::operator()()
            << " of " << goal_map.size() << " covered ("
            << std::fixed << std::setw(1) << std::setprecision(1)
            << (goal_map.empty()?100.0:100.0*goals_covered/goal_map.size())
-           << "%), using "
-           << cover_goals.iterations() << " iteration"
-           << (cover_goals.iterations()==1?"":"s")
-           << eom;
+           << "%)" << eom;
+           
+  statistics() << "** Used "
+               << cover_goals.iterations() << " iteration"
+               << (cover_goals.iterations()==1?"":"s")
+               << eom;
 
   if(bmc.ui==ui_message_handlert::PLAIN)
   {
