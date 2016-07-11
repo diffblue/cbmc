@@ -150,42 +150,48 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("unwind"))
     {
       // here we simply unwind all loops in the goto program
-      // each loop body is repeated k times and is exited
-      // the number of unwinding
+      // each loop body is repeated k times, then an assumption is added
       int k = stoi(cmdline.get_value("unwind"));
 
       Forall_goto_functions(it, goto_functions)
       {
         goto_functionst::goto_functiont &goto_function=it->second;
-
         if(!goto_function.body_available())
         {
           continue;
         }
-
         goto_programt &goto_program=goto_function.body;
 
-        natural_loops_mutablet natural_loops(goto_program);
-        typedef const natural_loops_mutablet::natural_loopt loopt;
-        for(natural_loops_mutablet::loop_mapt::const_iterator
-            l_it=natural_loops.loop_map.begin();
-            l_it!=natural_loops.loop_map.end();
-            l_it++)
+        // the unwinding continues until there is no loop in the function
+        while(true)
         {
-          // save a copy of the loop guard
-          const exprt loop_guard=l_it->first->guard;
+          natural_loops_mutablet natural_loops(goto_program);
+          // if there is no loop anymore in the current function,
+          // then go to the next function for unwinding
+          if(natural_loops.loop_map.size()==0)
+          {
+            break;
+          }
+          typedef const natural_loops_mutablet::natural_loopt loopt;
+          for(natural_loops_mutablet::loop_mapt::const_iterator
+              l_it=natural_loops.loop_map.begin();
+              l_it!=natural_loops.loop_map.end();
+              l_it++)
+          {
+            // save a copy of the loop guard
+            const exprt loop_guard=l_it->first->guard;
 
-          const loopt &loop=l_it->second;
-          assert(!loop.empty());
-          goto_programt::targett loop_exit=get_loop_exit(loop);
+            const loopt &loop=l_it->second;
+            assert(!loop.empty());
+            goto_programt::targett loop_exit=get_loop_exit(loop);
 
+            unwind(goto_program, l_it->first, loop_exit, k);
+            // add the assumption that the loop guard is violated
+            goto_programt::targett t=goto_function.body.insert_before(loop_exit);
+            t->make_assumption(loop_guard);
 
-          unwind(goto_program, l_it->first, loop_exit, k);
-          // add the assumption that the loop guard is violated
-          goto_programt::targett t=goto_function.body.insert_before(loop_exit);
-          t->make_assumption(loop_guard);
-
-        }
+          }
+    	}
       }
 
       //remove_skip(goto_functions);
