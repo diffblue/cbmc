@@ -484,6 +484,7 @@ void path_searcht::initialize_property_map(
         property_entryt &property_entry=property_map[property_name];
         property_entry.status=NOT_REACHED;
         property_entry.description=source_location.get_comment();
+        property_entry.source_location=source_location;
       }
     }    
 }

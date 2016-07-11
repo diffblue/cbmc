@@ -81,6 +81,7 @@ public:
     statust status;
     irep_idt description;
     goto_tracet error_trace;
+    source_locationt source_location;
   };
   
   inline void set_dfs() { search_heuristic=search_heuristict::DFS; }
