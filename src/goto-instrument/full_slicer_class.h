@@ -38,6 +38,11 @@ echo 'digraph g {' > c.dot ; cat c.goto | \
 class full_slicert
 {
 public:
+  explicit full_slicert(const namespacet &ns):
+    cfg(ns)
+  {
+  }
+
   void operator()(
     goto_functionst &goto_functions,
     const namespacet &ns,

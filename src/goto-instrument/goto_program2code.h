@@ -63,7 +63,8 @@ public:
     local_static(_local_static),
     type_names(_type_names),
     typedef_names(_typedef_names),
-    system_headers(_system_headers)
+    system_headers(_system_headers),
+    loops(ns)
   {
     assert(local_static.empty());
 
@@ -88,7 +89,18 @@ protected:
   std::set<std::string> &system_headers;
   std::unordered_set<exprt, irep_hash> va_list_expr;
 
-  natural_loopst loops;
+  typedef natural_loops_templatet<
+            const goto_programt,
+            goto_programt::const_targett,
+            true>
+          natural_loops_no_simpt;
+  typedef cfg_dominators_templatet<
+            const goto_programt,
+            goto_programt::const_targett,
+            false,
+            true>
+          syntactic_dominatorst;
+  natural_loops_no_simpt loops;
   loopt loop_map;
   id_sett labels_in_use;
   dead_mapt dead_map;
@@ -184,12 +196,12 @@ protected:
 
   bool set_block_end_points(
     goto_programt::const_targett upper_bound,
-    const cfg_dominatorst &dominators,
+    const syntactic_dominatorst &dominators,
     cases_listt &cases,
     std::set<unsigned> &processed_locations);
 
   bool remove_default(
-    const cfg_dominatorst &dominators,
+    const syntactic_dominatorst &dominators,
     const cases_listt &cases,
     goto_programt::const_targett default_target);
 

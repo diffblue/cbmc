@@ -29,9 +29,10 @@ typedef std::map<unsigned, goto_programt::const_targett> dead_mapt;
 
 static void unreachable_instructions(
   const goto_programt &goto_program,
-  dead_mapt &dest)
+  dead_mapt &dest,
+  const namespacet &ns)
 {
-  cfg_dominatorst dominators;
+  cfg_dominatorst dominators(ns);
   dominators(goto_program);
 
   for(cfg_dominatorst::cfgt::entry_mapt::const_iterator
@@ -188,7 +189,7 @@ void unreachable_instructions(
     // base_name instead; do not list inlined functions
     if(called.find(decl.base_name)!=called.end() ||
        f_it->second.is_inlined())
-      unreachable_instructions(goto_program, dead_map);
+      unreachable_instructions(goto_program, dead_map, ns);
     else
       all_unreachable(goto_program, dead_map);
 

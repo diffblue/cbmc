@@ -15,11 +15,13 @@ void show_natural_loops(
   const goto_modelt &goto_model,
   std::ostream &out)
 {
+  namespacet ns(goto_model.symbol_table);
+
   forall_goto_functions(it, goto_model.goto_functions)
   {
     out << "*** " << it->first << '\n';
 
-    natural_loopst natural_loops;
+    natural_loopst natural_loops(ns);
     natural_loops(it->second.body);
     natural_loops.output(out);
 

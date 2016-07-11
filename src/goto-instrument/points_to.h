@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class points_tot
 {
 public:
-  points_tot()
+  explicit points_tot(const namespacet &ns):cfg(ns)
   {
   }
 

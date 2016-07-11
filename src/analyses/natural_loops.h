@@ -20,7 +20,7 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 #include "cfg_dominators.h"
 
-template<class P, class T>
+template<class P, class T, bool syntactic>
 class natural_loops_templatet
 {
 public:
@@ -38,23 +38,27 @@ public:
 
   void output(std::ostream &) const;
 
-  const cfg_dominators_templatet<P, T, false> &get_dominator_info() const
+  const cfg_dominators_templatet<P, T, false, syntactic>&
+    get_dominator_info() const
   {
     return cfg_dominators;
   }
 
-  natural_loops_templatet()
+  explicit natural_loops_templatet(const namespacet &ns):
+    cfg_dominators(ns)
   {
   }
 
-  explicit natural_loops_templatet(P &program)
+  natural_loops_templatet(P &program, const namespacet &ns):
+    cfg_dominators(ns)
   {
     compute(program);
   }
 
 protected:
-  cfg_dominators_templatet<P, T, false> cfg_dominators;
-  typedef typename cfg_dominators_templatet<P, T, false>::cfgt::nodet nodet;
+  cfg_dominators_templatet<P, T, false, syntactic> cfg_dominators;
+  typedef typename cfg_dominators_templatet<P, T, false, syntactic>::
+    cfgt::nodet nodet;
 
   void compute(P &program);
   void compute_natural_loop(T, T);
@@ -62,11 +66,19 @@ protected:
 
 class natural_loopst:
     public natural_loops_templatet<const goto_programt,
-                                   goto_programt::const_targett>
+                                   goto_programt::const_targett,
+                                   false>
 {
+public:
+  explicit natural_loopst(const namespacet &ns):
+    natural_loops_templatet<const goto_programt,
+                            goto_programt::const_targett,
+                            false>(ns)
+  {
+  }
 };
 
-typedef natural_loops_templatet<goto_programt, goto_programt::targett>
+typedef natural_loops_templatet<goto_programt, goto_programt::targett, false>
     natural_loops_mutablet;
 
 void show_natural_loops(
@@ -78,8 +90,8 @@ void show_natural_loops(
 #include <iostream>
 #endif
 
-template<class P, class T>
-void natural_loops_templatet<P, T>::compute(P &program)
+template<class P, class T, bool S>
+void natural_loops_templatet<P, T, S>::compute(P &program)
 {
   cfg_dominators(program);
 
@@ -115,8 +127,8 @@ void natural_loops_templatet<P, T>::compute(P &program)
 }
 
 /// Computes the natural loop for a given back-edge (see Muchnick section 7.4)
-template<class P, class T>
-void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
+template<class P, class T, bool S>
+void natural_loops_templatet<P, T, S>::compute_natural_loop(T m, T n)
 {
   assert(n->location_number<=m->location_number);
 
@@ -150,8 +162,8 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
 }
 
 /// Print all natural loops that were found
-template<class P, class T>
-void natural_loops_templatet<P, T>::output(std::ostream &out) const
+template<class P, class T, bool S>
+void natural_loops_templatet<P, T, S>::output(std::ostream &out) const
 {
   for(const auto &loop : loop_map)
   {

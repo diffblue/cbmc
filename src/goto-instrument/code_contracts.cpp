@@ -225,7 +225,7 @@ void code_contractst::code_contracts(
   goto_functionst::goto_functiont &goto_function)
 {
   local_may_aliast local_may_alias(goto_function);
-  natural_loops_mutablet natural_loops(goto_function.body);
+  natural_loops_mutablet natural_loops(goto_function.body, ns);
 
   // iterate over the (natural) loops in the function
   for(natural_loops_mutablet::loop_mapt::const_iterator

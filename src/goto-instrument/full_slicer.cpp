@@ -307,7 +307,13 @@ void full_slicert::operator()(
       add_to_queue(queue, e_it->second, e_it->first);
     else if(implicit(e_it->first))
       add_to_queue(queue, e_it->second, e_it->first);
-    else if((e_it->first->is_goto() && e_it->first->guard.is_true()) ||
+    // any jump (control transfer to an instruction other than the next one)
+    // that will always be taken, i.e., also include conditional jumps the
+    // condition of which always evaluates to true
+    else if((e_it->first->is_goto() &&
+             cfg[e_it->second].out.size()==1 &&
+             cfg[cfg[e_it->second].out.begin()->first].PC!=
+             std::next(e_it->first)) ||
             e_it->first->is_throw())
       jumps.push_back(e_it->second);
     else if(e_it->first->is_decl())
@@ -372,7 +378,8 @@ void full_slicer(
   const namespacet &ns,
   slicing_criteriont &criterion)
 {
-  full_slicert()(goto_functions, ns, criterion);
+  full_slicert s(ns);
+  s(goto_functions, ns, criterion);
 }
 
 void full_slicer(
@@ -380,14 +387,15 @@ void full_slicer(
   const namespacet &ns)
 {
   assert_criteriont a;
-  full_slicert()(goto_functions, ns, a);
+  full_slicert s(ns);
+  s(goto_functions, ns, a);
 }
 
 void full_slicer(goto_modelt &goto_model)
 {
   assert_criteriont a;
   const namespacet ns(goto_model.symbol_table);
-  full_slicert()(goto_model.goto_functions, ns, a);
+  full_slicer(goto_model.goto_functions, ns);
 }
 
 void property_slicer(
@@ -396,7 +404,8 @@ void property_slicer(
   const std::list<std::string> &properties)
 {
   properties_criteriont p(properties);
-  full_slicert()(goto_functions, ns, p);
+  full_slicert s(ns);
+  s(goto_functions, ns, p);
 }
 
 void property_slicer(

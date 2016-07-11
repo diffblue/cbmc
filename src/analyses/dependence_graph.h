@@ -211,7 +211,8 @@ public:
     if(!goto_program.empty())
     {
       const irep_idt id=goto_programt::get_function_id(goto_program);
-      cfg_post_dominatorst &pd=post_dominators[id];
+      cfg_post_dominatorst &pd=
+        post_dominators.insert({id, cfg_post_dominatorst(ns)}).first->second;
       pd(goto_program);
     }
   }

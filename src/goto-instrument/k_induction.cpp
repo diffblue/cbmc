@@ -28,11 +28,12 @@ public:
 
   k_inductiont(
     goto_functiont &_goto_function,
+    const namespacet &ns,
     bool _base_case, bool _step_case,
     unsigned _k):
     goto_function(_goto_function),
     local_may_alias(_goto_function),
-    natural_loops(_goto_function.body),
+    natural_loops(_goto_function.body, ns),
     base_case(_base_case), step_case(_step_case), k(_k)
   {
     k_induction();
@@ -154,6 +155,8 @@ void k_induction(
   bool base_case, bool step_case,
   unsigned k)
 {
+  namespacet ns(goto_model.symbol_table);
+
   Forall_goto_functions(it, goto_model.goto_functions)
-    k_inductiont(it->second, base_case, step_case, k);
+    k_inductiont(it->second, ns, base_case, step_case, k);
 }

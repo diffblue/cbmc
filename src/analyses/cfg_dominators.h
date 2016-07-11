@@ -22,10 +22,14 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 #include <goto-programs/goto_program.h>
 #include <goto-programs/cfg.h>
 
-template <class P, class T, bool post_dom>
+template <class P, class T, bool post_dom, bool syntactic=false>
 class cfg_dominators_templatet
 {
 public:
+  explicit cfg_dominators_templatet(const namespacet &ns):cfg(ns)
+  {
+  }
+
   typedef std::set<T> target_sett;
 
   struct nodet
@@ -33,7 +37,7 @@ public:
     target_sett dominators;
   };
 
-  typedef procedure_local_cfg_baset<nodet, P, T> cfgt;
+  typedef procedure_local_cfg_baset<nodet, P, T, !syntactic> cfgt;
   cfgt cfg;
 
   void operator()(P &program);
@@ -48,33 +52,36 @@ protected:
 };
 
 /// Print the result of the dominator computation
-template <class P, class T, bool post_dom>
+template <class P, class T, bool post_dom, bool syntactic>
 std::ostream &operator << (
   std::ostream &out,
-  const cfg_dominators_templatet<P, T, post_dom> &cfg_dominators)
+  const cfg_dominators_templatet<P, T, post_dom, syntactic> &cfg_dominators)
 {
   cfg_dominators.output(out);
   return out;
 }
 
 /// Compute dominators
-template <class P, class T, bool post_dom>
-void cfg_dominators_templatet<P, T, post_dom>::operator()(P &program)
+template <class P, class T, bool post_dom, bool syntactic>
+void cfg_dominators_templatet<P, T, post_dom, syntactic>::operator()(
+  P &program)
 {
   initialise(program);
   fixedpoint(program);
 }
 
 /// Initialises the elements of the fixed point analysis
-template <class P, class T, bool post_dom>
-void cfg_dominators_templatet<P, T, post_dom>::initialise(P &program)
+template <class P, class T, bool post_dom, bool syntactic>
+void cfg_dominators_templatet<P, T, post_dom, syntactic>::initialise(
+  P &program)
 {
   cfg(program);
 }
 
 /// Computes the MOP for the dominator analysis
-template <class P, class T, bool post_dom>
-void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
+template <class P, class T, bool post_dom, bool syntactic>
+void cfg_dominators_templatet<P, T, post_dom, syntactic>::fixedpoint(
+  P &program)
 {
   std::list<T> worklist;
 
@@ -181,8 +188,9 @@ inline void dominators_pretty_print_node(
 }
 
 /// Print the result of the dominator computation
-template <class P, class T, bool post_dom>
-void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
+template <class P, class T, bool post_dom, bool syntactic>
+void cfg_dominators_templatet<P, T, post_dom, syntactic>::output(
+  std::ostream &out) const
 {
   for(const auto &node : cfg.entry_map)
   {
@@ -206,11 +214,11 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
 }
 
 typedef cfg_dominators_templatet<
-          const goto_programt, goto_programt::const_targett, false>
+          const goto_programt, goto_programt::const_targett, false, false>
         cfg_dominatorst;
 
 typedef cfg_dominators_templatet<
-          const goto_programt, goto_programt::const_targett, true>
+          const goto_programt, goto_programt::const_targett, true, false>
         cfg_post_dominatorst;
 
 template<>

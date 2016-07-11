@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 #include <util/graph.h>
+#include <util/simplify_expr.h>
 
 #include "goto_functions.h"
 
@@ -58,8 +59,9 @@ struct cfg_base_nodet:public graph_nodet<empty_edget>, public T
 ///   specific edges constructed by operator() can be different in those.
 template<class T,
          typename P=const goto_programt,
-         typename I=goto_programt::const_targett>
-class cfg_baset:public grapht< cfg_base_nodet<T, I> >
+         typename I=goto_programt::const_targett,
+         bool simp=true>
+class cfg_baset:public grapht< cfg_base_nodet<T,I> >
 {
 public:
   typedef std::size_t entryt;
@@ -70,8 +72,6 @@ public:
     data_typet data;
 
   public:
-    grapht< cfg_base_nodet<T, I> > &container;
-
     // NOLINTNEXTLINE(readability/identifiers)
     typedef data_typet::iterator iterator;
     // NOLINTNEXTLINE(readability/identifiers)
@@ -102,10 +102,25 @@ public:
 
       return e.first->second;
     }
+
+  private:
+    friend cfg_baset<T, P, I, simp>;
+
+    grapht< cfg_base_nodet<T, I> > &container;
+
+    entry_mapt(
+      const entry_mapt &other,
+      grapht< cfg_base_nodet<T, I> > &_container):
+      data(other.data),
+      container(_container)
+    {
+    }
   };
   entry_mapt entry_map;
 
 protected:
+  const namespacet &ns;
+
   virtual void compute_edges_goto(
     const goto_programt &goto_program,
     const goto_programt::instructiont &instruction,
@@ -150,11 +165,16 @@ protected:
     const goto_functionst &goto_functions);
 
 public:
-  cfg_baset():entry_map(*this)
+  explicit cfg_baset(const namespacet &_ns):entry_map(*this), ns(_ns)
   {
   }
 
   virtual ~cfg_baset()
+  {
+  }
+
+  cfg_baset(const cfg_baset &other):
+    entry_map(other.entry_map, *this), ns(other.ns)
   {
   }
 
@@ -177,56 +197,82 @@ public:
 
 template<class T,
          typename P=const goto_programt,
-         typename I=goto_programt::const_targett>
-class concurrent_cfg_baset:public virtual cfg_baset<T, P, I>
+         typename I=goto_programt::const_targett,
+         bool simp=true>
+class concurrent_cfg_baset:public virtual cfg_baset<T, P, I, simp>
 {
+public:
+  explicit concurrent_cfg_baset(const namespacet &ns):
+    cfg_baset<T, P, I, simp>(ns)
+  {
+  }
+
 protected:
   virtual void compute_edges_start_thread(
     const goto_programt &goto_program,
     const goto_programt::instructiont &instruction,
     goto_programt::const_targett next_PC,
-    typename cfg_baset<T, P, I>::entryt &entry);
+    typename cfg_baset<T, P, I, simp>::entryt &entry);
 };
 
 template<class T,
          typename P=const goto_programt,
-         typename I=goto_programt::const_targett>
-class procedure_local_cfg_baset:public virtual cfg_baset<T, P, I>
+         typename I=goto_programt::const_targett,
+         bool simp=true>
+class procedure_local_cfg_baset:public virtual cfg_baset<T, P, I, simp>
 {
+public:
+  explicit procedure_local_cfg_baset(const namespacet &ns):
+    cfg_baset<T, P, I, simp>(ns)
+  {
+  }
+
 protected:
   virtual void compute_edges_function_call(
     const goto_functionst &goto_functions,
     const goto_programt &goto_program,
     const goto_programt::instructiont &instruction,
     goto_programt::const_targett next_PC,
-    typename cfg_baset<T, P, I>::entryt &entry);
+    typename cfg_baset<T, P, I, simp>::entryt &entry);
 };
 
 template<class T,
          typename P=const goto_programt,
-         typename I=goto_programt::const_targett>
+         typename I=goto_programt::const_targett,
+         bool simp=true>
 class procedure_local_concurrent_cfg_baset:
-  public concurrent_cfg_baset<T, P, I>,
-  public procedure_local_cfg_baset<T, P, I>
+  public concurrent_cfg_baset<T, P, I, simp>,
+  public procedure_local_cfg_baset<T, P, I, simp>
 {
+public:
+  explicit procedure_local_concurrent_cfg_baset(const namespacet &ns):
+    concurrent_cfg_baset<T, P, I, simp>(ns),
+    procedure_local_cfg_baset<T, P, I, simp>(ns)
+  {
+  }
 };
 
-template<class T, typename P, typename I>
-void cfg_baset<T, P, I>::compute_edges_goto(
+template<class T, typename P, typename I, bool S>
+void cfg_baset<T, P, I, S>::compute_edges_goto(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
   entryt &entry)
 {
   if(next_PC!=goto_program.instructions.end() &&
-     !instruction.guard.is_true())
+     !instruction.guard.is_true() &&
+     (!S || !simplify_expr(instruction.guard, ns).is_true()))
     this->add_edge(entry, entry_map[next_PC]);
 
-  this->add_edge(entry, entry_map[instruction.get_target()]);
+  if(!instruction.guard.is_false() &&
+     (!S || !simplify_expr(instruction.guard, ns).is_false()))
+    for(const auto &t : instruction.targets)
+      if(t!=goto_program.instructions.end())
+        this->add_edge(entry, entry_map[t]);
 }
 
-template<class T, typename P, typename I>
-void cfg_baset<T, P, I>::compute_edges_catch(
+template<class T, typename P, typename I, bool S>
+void cfg_baset<T, P, I, S>::compute_edges_catch(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
@@ -243,8 +289,8 @@ void cfg_baset<T, P, I>::compute_edges_catch(
       this->add_edge(entry, entry_map[t]);
 }
 
-template<class T, typename P, typename I>
-void cfg_baset<T, P, I>::compute_edges_throw(
+template<class T, typename P, typename I, bool S>
+void cfg_baset<T, P, I, S>::compute_edges_throw(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
@@ -253,8 +299,8 @@ void cfg_baset<T, P, I>::compute_edges_throw(
   // no (trivial) successors
 }
 
-template<class T, typename P, typename I>
-void cfg_baset<T, P, I>::compute_edges_start_thread(
+template<class T, typename P, typename I, bool S>
+void cfg_baset<T, P, I, S>::compute_edges_start_thread(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
@@ -264,14 +310,14 @@ void cfg_baset<T, P, I>::compute_edges_start_thread(
     this->add_edge(entry, entry_map[next_PC]);
 }
 
-template<class T, typename P, typename I>
-void concurrent_cfg_baset<T, P, I>::compute_edges_start_thread(
+template<class T, typename P, typename I, bool S>
+void concurrent_cfg_baset<T, P, I, S>::compute_edges_start_thread(
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
-  typename cfg_baset<T, P, I>::entryt &entry)
+  typename cfg_baset<T, P, I, S>::entryt &entry)
 {
-  cfg_baset<T, P, I>::compute_edges_start_thread(
+  cfg_baset<T, P, I, S>::compute_edges_start_thread(
     goto_program,
     instruction,
     next_PC,
@@ -280,8 +326,8 @@ void concurrent_cfg_baset<T, P, I>::compute_edges_start_thread(
   this->add_edge(entry, this->entry_map[instruction.get_target()]);
 }
 
-template<class T, typename P, typename I>
-void cfg_baset<T, P, I>::compute_edges_function_call(
+template<class T, typename P, typename I, bool S>
+void cfg_baset<T, P, I, S>::compute_edges_function_call(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
@@ -331,13 +377,13 @@ void cfg_baset<T, P, I>::compute_edges_function_call(
     this->add_edge(entry, entry_map[next_PC]);
 }
 
-template<class T, typename P, typename I>
-void procedure_local_cfg_baset<T, P, I>::compute_edges_function_call(
+template<class T, typename P, typename I, bool S>
+void procedure_local_cfg_baset<T, P, I, S>::compute_edges_function_call(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,
-  typename cfg_baset<T, P, I>::entryt &entry)
+  typename cfg_baset<T, P, I, S>::entryt &entry)
 {
   const exprt &function=
     to_code_function_call(instruction.code).function();
@@ -349,14 +395,15 @@ void procedure_local_cfg_baset<T, P, I>::compute_edges_function_call(
     this->add_edge(entry, this->entry_map[next_PC]);
 }
 
-template<class T, typename P, typename I>
-void cfg_baset<T, P, I>::compute_edges(
+template<class T, typename P, typename I, bool S>
+void cfg_baset<T, P, I, S>::compute_edges(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program,
   I PC)
 {
   const goto_programt::instructiont &instruction=*PC;
   entryt entry=entry_map[PC];
+  assert(this->size()>entry);
   (*this)[entry].PC=PC;
   goto_programt::const_targett next_PC(PC);
   next_PC++;
@@ -399,12 +446,13 @@ void cfg_baset<T, P, I>::compute_edges(
     break;
 
   case ASSUME:
+  case ASSERT:
     // false guard -> no successor
-    if(instruction.guard.is_false())
+    if(instruction.guard.is_false() ||
+       (S && simplify_expr(instruction.guard, ns).is_false()))
       break;
 
   case ASSIGN:
-  case ASSERT:
   case OTHER:
   case RETURN:
   case SKIP:
@@ -423,8 +471,8 @@ void cfg_baset<T, P, I>::compute_edges(
   }
 }
 
-template<class T, typename P, typename I>
-void cfg_baset<T, P, I>::compute_edges(
+template<class T, typename P, typename I, bool S>
+void cfg_baset<T, P, I, S>::compute_edges(
   const goto_functionst &goto_functions,
   P &goto_program)
 {
@@ -434,8 +482,8 @@ void cfg_baset<T, P, I>::compute_edges(
     compute_edges(goto_functions, goto_program, it);
 }
 
-template<class T, typename P, typename I>
-void cfg_baset<T, P, I>::compute_edges(
+template<class T, typename P, typename I, bool S>
+void cfg_baset<T, P, I, S>::compute_edges(
   const goto_functionst &goto_functions)
 {
   forall_goto_functions(it, goto_functions)

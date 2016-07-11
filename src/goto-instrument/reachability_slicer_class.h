@@ -22,6 +22,10 @@ class slicing_criteriont;
 class reachability_slicert
 {
 public:
+  explicit reachability_slicert(const namespacet &ns):cfg(ns)
+  {
+  }
+
   void operator()(
     goto_functionst &goto_functions,
     slicing_criteriont &criterion,

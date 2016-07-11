@@ -116,7 +116,8 @@ void reachability_slicer(
   goto_modelt &goto_model,
   const bool include_forward_reachability)
 {
-  reachability_slicert s;
+  namespacet ns(goto_model.symbol_table);
+  reachability_slicert s(ns);
   assert_criteriont a;
   s(goto_model.goto_functions, a, include_forward_reachability);
 }
@@ -133,7 +134,8 @@ void reachability_slicer(
   const std::list<std::string> &properties,
   const bool include_forward_reachability)
 {
-  reachability_slicert s;
+  namespacet ns(goto_model.symbol_table);
+  reachability_slicert s(ns);
   properties_criteriont p(properties);
   s(goto_model.goto_functions, p, include_forward_reachability);
 }

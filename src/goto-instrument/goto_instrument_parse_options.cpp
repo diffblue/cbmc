@@ -395,7 +395,7 @@ int goto_instrument_parse_optionst::doit()
       namespacet ns(goto_model.symbol_table);
 
       status() << "Pointer Analysis" << eom;
-      points_tot points_to;
+      points_tot points_to(ns);
       points_to(goto_model);
       points_to.output(std::cout);
       return CPROVER_EXIT_SUCCESS;

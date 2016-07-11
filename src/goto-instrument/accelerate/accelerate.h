@@ -40,6 +40,7 @@ public:
       goto_functions(_goto_model.goto_functions),
       symbol_table(_goto_model.symbol_table),
       ns(_goto_model.symbol_table),
+      natural_loops(ns),
       utils(symbol_table, message_handler, goto_functions),
       use_z3(_use_z3)
   {

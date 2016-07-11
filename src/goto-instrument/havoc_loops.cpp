@@ -27,11 +27,12 @@ public:
 
   havoc_loopst(
     function_modifiest &_function_modifies,
-    goto_functiont &_goto_function):
+    goto_functiont &_goto_function,
+    const namespacet &ns):
     goto_function(_goto_function),
     local_may_alias(_goto_function),
     function_modifies(_function_modifies),
-    natural_loops(_goto_function.body)
+    natural_loops(_goto_function.body, ns)
   {
     havoc_loops();
   }
@@ -187,7 +188,8 @@ void havoc_loopst::havoc_loops()
 void havoc_loops(goto_modelt &goto_model)
 {
   function_modifiest function_modifies(goto_model.goto_functions);
+  namespacet ns(goto_model.symbol_table);
 
   Forall_goto_functions(it, goto_model.goto_functions)
-    havoc_loopst(function_modifies, it->second);
+    havoc_loopst(function_modifies, it->second, ns);
 }

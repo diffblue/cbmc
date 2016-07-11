@@ -97,7 +97,8 @@ void print_path_lengths(const goto_modelt &goto_model)
   };
 
   typedef cfg_baset<visited_cfg_nodet> cfgt;
-  cfgt cfg;
+  namespacet ns(goto_model.symbol_table);
+  cfgt cfg(ns);
   cfg(goto_model.goto_functions);
 
   const goto_programt &start_program=start->second.body;
