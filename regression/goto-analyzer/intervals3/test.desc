@@ -1,0 +1,8 @@
+CORE
+intervals3.c
+--intervals
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] file intervals3.c line 7 function main, assertion x > -10 || x < 100: SUCCESS$
+--
+^warning: ignoring
