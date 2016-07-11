@@ -288,6 +288,8 @@ int symex_parse_optionst::doit()
     if(cmdline.isset("cover"))
     {
       // test-suite generation
+      path_search(goto_model.goto_functions);
+      report_cover(path_search.property_map);
       return 0;
     }
     else
@@ -562,6 +564,23 @@ void symex_parse_optionst::report_properties(
              << " of " << property_map.size() << " failed"
              << eom;  
   }
+}
+
+/*******************************************************************\
+
+Function: symex_parse_optionst::report_cover
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_parse_optionst::report_cover(
+  const path_searcht::property_mapt &property_map)
+{
 }
 
 /*******************************************************************\
