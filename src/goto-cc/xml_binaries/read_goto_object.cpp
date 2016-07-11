@@ -11,7 +11,7 @@ Date: June 2006
 #include <xmllang/xml_parser.h>
 #include <util/namespace.h>
 #include <util/base_type.h>
-#include <util/message_stream.h>
+#include <util/message.h>
 
 #define XML_VERSION "1.4"
 
@@ -42,7 +42,7 @@ bool read_goto_object(
   goto_functionst &functions,
   message_handlert &message_handler)
 { 
-  message_streamt message_stream(message_handler);
+  messaget message(message_handler);
 
   xml_parser.clear();
   xml_parser.filename = filename;
@@ -56,10 +56,9 @@ bool read_goto_object(
   
   if (top.get_attribute("version")!=XML_VERSION) 
   {
-    message_stream.str <<
+    message.error() <<
       "The input was compiled with a different version of "
-      "goto-cc, please recompile.";
-    message_stream.error();
+      "goto-cc, please recompile." << messaget::eom;
     return true;
   }
   
@@ -125,9 +124,8 @@ bool read_goto_object(
       }
       else
       {
-        message_stream.str << "Unknown Section '"
-          << sec.name << "' in object file.";
-        message_stream.error();
+        message.error() << "Unknown Section '" << sec.name
+                        << "' in object file." << messaget::eom;
         return true;
       }
 
@@ -135,7 +133,7 @@ bool read_goto_object(
   }
   else
   {
-    message_stream.error("no goto-object");
+    message.error() << "no goto-object" << messaget::eom;
     return true;
   }  
     
