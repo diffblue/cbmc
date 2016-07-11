@@ -41,7 +41,7 @@ goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 
 symex.dir: languages goto-programs.dir pointer-analysis.dir \
            goto-symex.dir linking.dir analyses.dir solvers.dir \
-           path-symex.dir
+           path-symex.dir goto-instrument.dir
 
 # building for a particular directory
 
