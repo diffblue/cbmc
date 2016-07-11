@@ -26,7 +26,11 @@ Function: bv_cbmct::convert_waitfor
 bvt bv_cbmct::convert_waitfor(const exprt &expr)
 {
   if(expr.operands().size()!=4)
-    throw "waitfor expected to have four operands";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "waitfor expected to have four operands" << eom;
+    throw 0;
+  }
 
   exprt new_cycle;
   const exprt &old_cycle=expr.op0();
@@ -38,7 +42,11 @@ bvt bv_cbmct::convert_waitfor(const exprt &expr)
 
   mp_integer bound_value;
   if(to_integer(bound, bound_value))
-    throw "waitfor bound must be a constant";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "waitfor bound must be a constant" << eom;
+    throw 0;
+  }
 
   {
     // constraint: new_cycle>=old_cycle
@@ -151,7 +159,11 @@ Function: bv_cbmct::convert_waitfor_symbol
 bvt bv_cbmct::convert_waitfor_symbol(const exprt &expr)
 {
   if(expr.operands().size()!=1)
-    throw "waitfor_symbol expected to have one operand";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "waitfor_symbol expected to have one operand" << eom;
+    throw 0;
+  }
 
   exprt result;
   const exprt &bound=expr.op0();

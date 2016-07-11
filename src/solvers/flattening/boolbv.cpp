@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <map>
 #include <set>
-#include <iostream>
 #include <cstdlib> // abort()
 
 #include <util/symbol.h>
@@ -160,7 +159,7 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
     if(freeze_all && !it->is_constant()) prop.set_frozen(*it);
     if(it->var_no()==literalt::unused_var_no())
     {
-      std::cout << "unused_var_no: " << expr.pretty() << std::endl;
+      error() << "unused_var_no: " << expr.pretty() << eom;
       assert(false);
     }
   }
@@ -496,7 +495,8 @@ bvt boolbvt::convert_symbol(const exprt &expr)
       if(it->var_no()>=prop.no_variables() &&
         !it->is_constant())
       {
-        std::cout << identifier << std::endl; abort();
+        error() << identifier << eom;
+        assert(false);
       }
   }
   
@@ -519,8 +519,9 @@ literalt boolbvt::convert_rest(const exprt &expr)
 {
   if(expr.type().id()!=ID_bool)
   {
-    std::cerr << expr << std::endl;
-    throw "boolbvt::convert_rest got non-boolean operand";
+    error() << "boolbvt::convert_rest got non-boolean operand: "
+            << expr.pretty() << eom;
+    throw 0;
   }
   
   const exprt::operandst &operands=expr.operands();
@@ -742,8 +743,9 @@ void boolbvt::set_to(const exprt &expr, bool value)
 {
   if(expr.type().id()!=ID_bool)
   {
-    std::cerr << expr << std::endl;
-    throw "boolbvt::set_to got non-boolean operand";
+    error() << "boolbvt::set_to got non-boolean operand: "
+            << expr.pretty() << eom;
+    throw 0;
   }
 
   if(value)
@@ -798,7 +800,10 @@ void boolbvt::make_free_bv_expr(const typet &type, exprt &dest)
   std::size_t width=boolbv_width(type);
 
   if(width==0)
-    throw "failed to get width of "+type.to_string();
+  {
+    error() << "failed to get width of " << type.pretty() << eom;
+    throw 0;
+  }
 
   bvt bv;
   bv.resize(width);

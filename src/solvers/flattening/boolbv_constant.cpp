@@ -42,7 +42,11 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
       const bvt &tmp=convert_bv(*it);
 
       if(tmp.size()!=op_width)
-        throw "convert_constant: unexpected operand width";
+      {
+        error().source_location=expr.find_source_location();
+        error() << "convert_constant: unexpected operand width" << eom;
+        throw 0;
+      }
 
       for(std::size_t j=0; j<op_width; j++)
         bv[offset+j]=tmp[j];
@@ -88,7 +92,12 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
     const std::string &binary=id2string(expr.get_value());
 
     if(binary.size()!=width)
-      throw "wrong value length in constant: "+expr.to_string();
+    {
+      error().source_location=expr.find_source_location();
+      error() << "wrong value length in constant: "
+              << expr.pretty() << eom;
+      throw 0;
+    }
 
     for(std::size_t i=0; i<width; i++)
     {
@@ -113,7 +122,12 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
     const std::string &binary=id2string(expr.get_value());
 
     if(binary.size()*2!=width)
-      throw "wrong value length in constant: "+expr.to_string();
+    {
+      error().source_location=expr.find_source_location();
+      error() << "wrong value length in constant: "
+              << expr.pretty() << eom;
+      throw 0;
+    }
 
     for(std::size_t i=0; i<binary.size(); i++)
     {
@@ -143,7 +157,10 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
         break;
         
       default:
-        throw "unknown character in Verilog constant:"+expr.to_string();
+        error().source_location=expr.find_source_location();
+        error() << "unknown character in Verilog constant:"
+                << expr.pretty() << eom;
+        throw 0;
       }
     }
 

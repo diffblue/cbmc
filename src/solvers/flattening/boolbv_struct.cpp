@@ -32,7 +32,11 @@ bvt boolbvt::convert_struct(const struct_exprt &expr)
   const struct_typet::componentst &components=struct_type.components();
 
   if(expr.operands().size()!=components.size())
-    throw "struct: wrong number of arguments";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "struct: wrong number of arguments" << eom;
+    throw 0;
+  }
 
   bvt bv;
   bv.resize(width);
@@ -48,9 +52,13 @@ bvt boolbvt::convert_struct(const struct_exprt &expr)
     const exprt &op=expr.operands()[i];
 
     if(!base_type_eq(subtype, op.type(), ns))
-      throw "struct: component type does not match: "+
-        subtype.to_string()+" vs. "+
-        op.type().to_string();
+    {
+      error().source_location=expr.find_source_location();
+      error() << "struct: component type does not match: "
+              << subtype.pretty() << " vs. "
+              << op.type().pretty() << eom;
+      throw 0;
+    }
         
     std::size_t subtype_width=boolbv_width(subtype);
 

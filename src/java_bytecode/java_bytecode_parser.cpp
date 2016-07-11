@@ -81,9 +81,8 @@ protected:
   {
     if(index==0 || index>=constant_pool.size())
     {
-      std::string message=
-        "invalid constant pool index ("+i2string(index)+")";
-      throw message;
+      error() << "invalid constant pool index (" << index << ")" << eom;
+      throw 0;
     }
     
     return constant_pool[index];
@@ -129,43 +128,51 @@ protected:
   void get_class_refs();
   void get_class_refs_rec(const typet &);
   
-  void skip_bytes(unsigned bytes) const
+  void skip_bytes(unsigned bytes)
   {
     for(unsigned i=0; i<bytes; i++)
     {
-      if(!*in) throw "unexpected end of bytecode file";
+      if(!*in)
+      {
+        error() << "unexpected end of bytecode file" << eom;
+        throw 0;
+      }
       in->get();
     }
   }
   
-  u8 read_bytes(unsigned bytes) const
+  u8 read_bytes(unsigned bytes)
   {
     u8 result=0;
     for(unsigned i=0; i<bytes; i++)
     {
-      if(!*in) throw "unexpected end of bytecode file";
+      if(!*in)
+      {
+        error() << "unexpected end of bytecode file" << eom;
+        throw 0;
+      }
       result<<=8;
       result|=in->get();
     }
     return result;
   }
 
-  u1 read_u1() const
+  u1 read_u1()
   {
     return (u1)read_bytes(1);
   }
   
-  inline u2 read_u2() const
+  inline u2 read_u2()
   {
     return (u2)read_bytes(2);
   }
   
-  u4 read_u4() const
+  u4 read_u4()
   {
     return (u4)read_bytes(4);
   }
   
-  u8 read_u8() const
+  u8 read_u8()
   {
     return read_bytes(8);
   }
@@ -265,10 +272,17 @@ void java_bytecode_parsert::rClassFile()
   u2 UNUSED minor_version=read_u2();
   u2 major_version=read_u2();
   
-  if(magic!=0xCAFEBABE) throw "wrong magic";
+  if(magic!=0xCAFEBABE)
+  {
+    error() << "wrong magic" << eom;
+    throw 0;
+  }
 
   if(major_version<44)
-    throw "unexpected major version";
+  {
+    error() << "unexpected major version" << eom;
+    throw 0;
+  }
   
   rconstant_pool();
 
@@ -407,7 +421,11 @@ Function: java_bytecode_parsert::rconstant_pool
 void java_bytecode_parsert::rconstant_pool()
 {
   u2 constant_pool_count=read_u2();
-  if(constant_pool_count==0) throw "invalid constant_pool_count";
+  if(constant_pool_count==0)
+  {
+    error() << "invalid constant_pool_count" << eom;
+    throw 0;
+  }
   
   constant_pool.resize(constant_pool_count);
   
@@ -451,7 +469,11 @@ void java_bytecode_parsert::rconstant_pool()
       it->number=read_u8();
       // Eight-byte constants take up two entires
       // in the constant_pool table, for annoying this programmer.
-      if(it==constant_pool.end()) throw "invalid double entry";
+      if(it==constant_pool.end())
+      {
+        error() << "invalid double entry" << eom;
+        throw 0;
+      }
       it++;
       it->tag=0;
       break;
@@ -473,8 +495,9 @@ void java_bytecode_parsert::rconstant_pool()
       break;
 
     default:
-      throw std::string("unknown constant pool entry (")+
-            i2string(it->tag)+")";
+      error() << "unknown constant pool entry (" << it->tag << ")"
+              << eom;
+      throw 0;
     }
   }
 
@@ -903,7 +926,10 @@ void java_bytecode_parsert::rbytecode(
   }
   
   if(address!=code_length)
-    throw "bytecode length mismatch";
+  {
+    error() << "bytecode length mismatch" << eom;
+    throw 0;
+  }
 }
 
 /*******************************************************************\

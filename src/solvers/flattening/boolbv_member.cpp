@@ -64,9 +64,11 @@ bvt boolbvt::convert_member(const member_exprt &expr)
           std::cout << "DEBUG " << expr.pretty() << "\n";
           #endif
 
-          throw "member: component type does not match: "+
-            subtype.to_string()+" vs. "+
-            expr.type().to_string();
+          error().source_location=expr.find_source_location();
+          error() << "member: component type does not match: "
+                  << subtype.pretty() << " vs. "
+                  << expr.type().pretty() << eom;
+          throw 0;
         }
 
         bvt bv;
@@ -82,8 +84,15 @@ bvt boolbvt::convert_member(const member_exprt &expr)
       offset+=sub_width;
     }
 
-    throw "component "+id2string(component_name)+" not found in structure";
+    error().source_location=expr.find_source_location();
+    error() << "component " << component_name
+            << " not found in structure" << eom;
+    throw 0;
   }
   else
-    throw "member takes struct or union operand";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "member takes struct or union operand" << eom;
+    throw 0;
+  }
 }

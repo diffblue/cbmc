@@ -1107,7 +1107,11 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     }
   }
   else
-    throw "explicit typecast expects 0 or 1 operands";
+  {
+    err_location(expr);
+    error() << "explicit typecast expects 0 or 1 operands" << eom;
+    throw 0;
+  }
 }
 
 /*******************************************************************\
@@ -1191,7 +1195,11 @@ Purpose:
 void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
 {
   if(expr.operands().size()!=1)
-    throw "delete expects one operand";
+  {
+    err_location(expr);
+    error() << "delete expects one operand" << eom;
+    throw 0;
+  }
     
   const irep_idt statement=expr.get(ID_statement);
 
@@ -2680,7 +2688,12 @@ Purpose:
 void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 {
   if(expr.operands().size()!=2)
-    throw "assignment side effect expected to have two operands";
+  {
+    err_location(expr);
+    error() << "assignment side effect expected to have two operands"
+            << eom;
+    throw 0;
+  }
     
   typet type0=expr.op0().type();
 
@@ -2775,9 +2788,12 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   side_effect_exprt &expr)
 {
   if(expr.operands().size()!=1)
-    throw std::string("statement ")+
-          id2string(expr.get_statement())+
-          " expected to have one operand";
+  {
+    err_location(expr);
+    error() << "statement " << expr.get_statement()
+            << " expected to have one operand" << eom;
+    throw 0;
+  }
 
   add_implicit_dereference(expr.op0());
 
