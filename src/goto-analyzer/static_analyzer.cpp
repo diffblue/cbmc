@@ -6,6 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+//#define DEBUG
+
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <fstream>
 
 #include <util/threeval.h>
@@ -90,9 +96,27 @@ tvt static_analyzert::eval(goto_programt::const_targett t)
 {
   exprt guard=t->guard;
   interval_domaint d=interval_analysis[t];
-  d.assume(not_exprt(guard), ns);
-  if(d.is_bottom()) return tvt(true);
-  return tvt::unknown();          
+
+  if (guard.id()==ID_and)
+  {
+    interval_domaint a(d);
+    a.make_top();
+    a.assume(guard,ns);
+    #ifdef DEBUG
+      a.output(std::cout, interval_analysis, ns);
+      d.output(std::cout, interval_analysis, ns);
+    #endif
+    if (a.merge(d, t, t))
+      return tvt::unknown();
+    else
+      return tvt(true);
+  }
+  else
+  {
+    d.assume(not_exprt(guard), ns);
+    if(d.is_bottom()) return tvt(true);
+    return tvt::unknown();
+  }
 }
 
 /*******************************************************************\

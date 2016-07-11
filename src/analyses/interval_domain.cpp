@@ -152,7 +152,7 @@ bool interval_domaint::merge(
   for(int_mapt::iterator it=int_map.begin();
       it!=int_map.end(); ) // no it++
   {
-    const int_mapt::const_iterator b_it=b.int_map.begin();
+    const int_mapt::const_iterator b_it=b.int_map.find(it->first);
     if(b_it==b.int_map.end())
     {
       it=int_map.erase(it);
