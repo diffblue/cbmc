@@ -168,8 +168,8 @@ int as_modet::doit()
   }
   else
   {
-    compiler.mode=compilet::COMPILE_ONLY;
-    debug() << "Compiling only" << eom;
+    compiler.mode=compilet::COMPILE_LINK;
+    debug() << "Compiling and linking a library" << eom;
   }
 
   config.ansi_c.mode=configt::ansi_ct::flavourt::GCC;
@@ -213,40 +213,55 @@ int as_modet::doit()
       return 1;
     }
 
-    std::string new_name=
-      get_base_name(arg_it->arg, true)+".i";
-    std::string dest=temp_dir(new_name);
-
-    std::ofstream os(dest);
-    if(!os.is_open())
-    {
-      error() << "Failed to tmp output file " << dest << eom;
-      return 1;
-    }
+    // there could be multiple source files in case GCC's --combine
+    // was used
+    unsigned outputs=0;
+    std::string line;
+    std::ofstream os;
+    std::string dest;
 
     const std::string comment2=act_as_as86 ? "::" : "##";
 
-    bool found=false;
-    std::string line;
-
     // search for comment2 GOTO-CC
     // strip comment2 from all subsequent lines
-
     while(std::getline(is, line))
     {
-      if(!found)
+      if(line==comment2+" GOTO-CC")
       {
-        if(line==comment2+" GOTO-CC")
-          found=true;
+        if(outputs>0)
+        {
+          assert(!dest.empty());
+          compiler.add_input_file(dest);
+          os.close();
+        }
+
+        ++outputs;
+        std::string new_name=
+          get_base_name(arg_it->arg, true)+"_"+
+          std::to_string(outputs)+".i";
+        dest=temp_dir(new_name);
+
+        os.open(dest);
+        if(!os.is_open())
+        {
+          error() << "Failed to tmp output file " << dest << eom;
+          return 1;
+        }
+
         continue;
       }
+      else if(outputs==0)
+        continue;
 
       if(line.size()>2)
         os << line.substr(2) << '\n';
     }
 
-    if(found)
+    if(outputs>0)
+    {
+      assert(!dest.empty());
       compiler.add_input_file(dest);
+    }
     else
       warning() << "No GOTO-CC section found in " << arg_it->arg << eom;
   }

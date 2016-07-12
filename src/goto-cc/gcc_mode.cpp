@@ -840,16 +840,9 @@ int gcc_modet::asm_output(
 
   if(cmdline.isset('o'))
   {
-    // there should be only one input file
-    if(preprocessed_source_files.size()!=1)
-    {
-      error() << "Expected exactly one input file as -o is in effect"
-              << eom;
-      return 1;
-    }
-
-    output_files[preprocessed_source_files.front()]=
-      cmdline.get_value('o');
+    // GCC --combine supports more than one source file
+    for(const auto &s : preprocessed_source_files)
+      output_files.insert(std::make_pair(s, cmdline.get_value('o')));
   }
   else
   {
