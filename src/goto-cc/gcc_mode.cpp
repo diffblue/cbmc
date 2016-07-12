@@ -186,8 +186,8 @@ int gcc_modet::doit()
     base_name=="bcc" ||
     base_name.find("goto-bcc")!=std::string::npos;
 
-  if(cmdline.isset('v') ||
-     cmdline.isset("version"))
+  if((cmdline.isset('v') || cmdline.isset("version")) &&
+     cmdline.have_infile_arg()) // let the native tool print the version
   {
     // This a) prints the version and b) increases verbosity.
     // Compilation continues, don't exit!
