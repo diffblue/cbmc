@@ -7,14 +7,16 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/std_expr.h>
-
+#include <goto-programs/goto_functions.h>
 #include "unwind.h"
+#include "loop_utils.h"
+
 
 /*******************************************************************\
 
 Function: unwind
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -36,7 +38,7 @@ void unwind(
 
 Function: unwind
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -169,4 +171,139 @@ void unwind(
 
   // update it all
   goto_program.update();
+}
+
+/*******************************************************************\
+
+Function: goto_unwind
+
+ Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_unwind(
+  goto_functionst &goto_functions,
+  const unsigned k)
+{
+  // here we simply unwind all loops in the goto program
+  // each loop body is repeated k times, then an assumption is added
+  Forall_goto_functions(it, goto_functions)
+  {
+    goto_functionst::goto_functiont &goto_function=it->second;
+	if(!goto_function.body_available())
+	{
+	  continue;
+	}
+	goto_programt &goto_program=goto_function.body;
+
+	// the unwinding continues until there is no loop in the function
+	while(true)
+	{
+	  natural_loops_mutablet natural_loops(goto_program);
+	  // if there is no loop anymore in the current function,
+	  // then go to the next function for unwinding
+	  if(natural_loops.loop_map.size()==0)
+	  {
+	    break;
+	  }
+	  typedef const natural_loops_mutablet::natural_loopt loopt;
+	  for(natural_loops_mutablet::loop_mapt::const_iterator
+	        l_it=natural_loops.loop_map.begin();
+	        l_it!=natural_loops.loop_map.end();
+	        l_it++)
+	  {
+	     // save a copy of the loop guard
+	     const exprt loop_guard=l_it->first->guard;
+
+	     const loopt &loop=l_it->second;
+	     assert(!loop.empty());
+	     goto_programt::targett loop_exit=get_loop_exit(loop);
+
+	     unwind(goto_program, l_it->first, loop_exit, k);
+	     // add the assumption that the loop guard is violated
+	     goto_programt::targett t=goto_function.body.insert_before(loop_exit);
+	     t->make_assumption(loop_guard);
+	  }
+	}
+  }
+}
+
+/*******************************************************************\
+
+Function: goto_unwind_type2
+
+ Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_unwind_type2(
+  goto_functionst &goto_functions,
+  const unsigned k)
+{
+    // another chance is that we repeat the loop body "k" times,
+    // after which we continue with the loop
+    std::vector<std::pair<goto_programt::targett, goto_programt::targett> > loop_points;
+
+    Forall_goto_functions(it, goto_functions)
+    {
+      goto_functionst::goto_functiont &goto_function=it->second;
+      if(!goto_function.body_available())
+      {
+        continue;
+      }
+      goto_programt &goto_program=goto_function.body;
+
+      while(true)
+      {
+        natural_loops_mutablet natural_loops(goto_program);
+        if(natural_loops.loop_map.size()==0)
+          break;
+        typedef const natural_loops_mutablet::natural_loopt loopt;
+        for(natural_loops_mutablet::loop_mapt::const_iterator
+              l_it=natural_loops.loop_map.begin();
+      	    l_it!=natural_loops.loop_map.end();
+      	    l_it++)
+        {
+      	// save a copy of the loop guard
+      	const exprt loop_guard=l_it->first->guard;
+
+      	const loopt &loop=l_it->second;
+      	assert(!loop.empty());
+      	goto_programt::targett loop_exit=get_loop_exit(loop);
+      	goto_programt::targett loop_head=l_it->first;
+
+      	//unwind(goto_program, l_it->first, loop_exit, k);
+      	std::vector<goto_programt::targett> exit_points;
+      	unwind(goto_program, loop_head, loop_exit, k, exit_points);
+
+      	goto_programt::targett t=goto_program.insert_before(loop_exit);
+
+      	t->make_goto();
+
+      	// to avoid the infinite while loop, we delay the specification of t's target;
+      	// be careful that there is a temporary inconsistent status as the goto statement
+      	// t does not have a target
+      	if(k>1)
+      	  loop_points.push_back(make_pair(t, exit_points[k-2]));
+      	else
+      	  loop_points.push_back(make_pair(t, loop_head));
+        }
+
+      }
+
+    }
+    // it is time to add the complete loop at the end of each unwinding operation
+    for(std::vector<std::pair<goto_programt::targett, goto_programt::targett> >::iterator
+          jt=loop_points.begin(); jt!=loop_points.end(); ++jt)
+    {
+      jt->first->targets.push_back(jt->second);
+    }
 }
