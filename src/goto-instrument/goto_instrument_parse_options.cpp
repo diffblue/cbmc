@@ -152,8 +152,8 @@ int goto_instrument_parse_optionst::doit()
 
       int k = stoi(cmdline.get_value("unwind"));
 
-//#define UNWIND_DEFAULT
-#define UNWIND_TYPE2
+#define UNWIND_DEFAULT
+//#define UNWIND_TYPE2
 
 #ifdef UNWIND_DEFAULT
       // here we simply unwind all loops in the goto program
