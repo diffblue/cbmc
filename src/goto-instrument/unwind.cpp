@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 Function: unwind
 
- Inputs:
+  Inputs:
 
  Outputs:
 
@@ -38,7 +38,7 @@ void unwind(
 
 Function: unwind
 
- Inputs:
+  Inputs:
 
  Outputs:
 
@@ -177,7 +177,7 @@ void unwind(
 
 Function: goto_unwind
 
- Inputs:
+  Inputs:
 
  Outputs:
 
@@ -236,7 +236,7 @@ void goto_unwind(
 
 Function: goto_unwind_type2
 
- Inputs:
+  Inputs:
 
  Outputs:
 
