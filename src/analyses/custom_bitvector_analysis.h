@@ -70,7 +70,8 @@ public:
   bool merge(
     const custom_bitvector_domaint &b,
     locationt from,
-    locationt to);
+    locationt to,
+    const namespacet &ns);
 
   typedef unsigned long long bit_vectort;
 

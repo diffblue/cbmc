@@ -629,7 +629,8 @@ bool rd_range_domaint::merge_inner(
 bool rd_range_domaint::merge(
   const rd_range_domaint &other,
   locationt from,
-  locationt to)
+  locationt to,
+  const namespacet &ns)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

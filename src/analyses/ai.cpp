@@ -367,7 +367,7 @@ bool ai_baset::visit(
 
       new_values.transform(l, to_l, *this, ns);
 
-      if(merge(new_values, l, to_l))
+      if(merge(new_values, l, to_l, ns))
         have_new_values=true;
     }
 
@@ -400,7 +400,7 @@ bool ai_baset::do_function_call(
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
     tmp_state->transform(l_call, l_return, *this, ns);
 
-    return merge(*tmp_state, l_call, l_return);
+    return merge(*tmp_state, l_call, l_return, ns);
   }
 
   assert(!goto_function.body.instructions.empty());
@@ -420,7 +420,7 @@ bool ai_baset::do_function_call(
     bool new_data=false;
 
     // merge the new stuff
-    if(merge(*tmp_state, l_call, l_begin))
+    if(merge(*tmp_state, l_call, l_begin, ns))
       new_data=true;
 
     // do we need to do/re-do the fixedpoint of the body?
@@ -445,7 +445,7 @@ bool ai_baset::do_function_call(
     tmp_state->transform(l_end, l_return, *this, ns);
 
     // Propagate those
-    return merge(*tmp_state, l_end, l_return);
+    return merge(*tmp_state, l_end, l_return, ns);
   }
 }
 
@@ -581,7 +581,7 @@ void ai_baset::concurrent_fixedpoint(
       put_in_working_set(working_set, wl_pair.second);
 
       statet &begin_state=get_state(wl_pair.second);
-      merge(begin_state, sh_target, wl_pair.second);
+      merge(begin_state, sh_target, wl_pair.second, ns);
 
       while(!working_set.empty())
       {

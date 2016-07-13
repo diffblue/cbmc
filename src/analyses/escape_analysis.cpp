@@ -302,7 +302,8 @@ void escape_domaint::output(
 bool escape_domaint::merge(
   const escape_domaint &b,
   locationt from,
-  locationt to)
+  locationt to,
+  const namespacet &ns)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

@@ -40,7 +40,8 @@ public:
   bool merge(
     const escape_domaint &b,
     locationt from,
-    locationt to);
+    locationt to,
+    const namespacet &ns);
 
   void make_bottom() final override
   {

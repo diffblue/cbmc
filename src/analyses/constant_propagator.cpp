@@ -498,7 +498,8 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
 bool constant_propagator_domaint::merge(
   const constant_propagator_domaint &other,
   locationt from,
-  locationt to)
+  locationt to,
+  const namespacet &ns)
 {
   return values.merge(other.values);
 }

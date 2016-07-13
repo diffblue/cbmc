@@ -164,7 +164,8 @@ public:
   bool merge(
     const rd_range_domaint &other,
     locationt from,
-    locationt to);
+    locationt to,
+    const namespacet &ns);
 
   bool merge_shared(
     const rd_range_domaint &other,

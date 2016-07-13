@@ -40,7 +40,8 @@ public:
   bool merge(
     const global_may_alias_domaint &b,
     locationt from,
-    locationt to);
+    locationt to,
+    const namespacet &ns);
 
   void make_bottom() final override
   {

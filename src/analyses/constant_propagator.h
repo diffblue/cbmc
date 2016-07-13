@@ -25,7 +25,7 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai_base,
-    const namespacet &ns) final override;
+    const namespacet &ns) override;
 
   virtual void output(
     std::ostream &out,
@@ -35,7 +35,8 @@ public:
   bool merge(
     const constant_propagator_domaint &other,
     locationt from,
-    locationt to);
+    locationt to,
+    const namespacet &);
 
   virtual bool ai_simplify(
     exprt &condition,

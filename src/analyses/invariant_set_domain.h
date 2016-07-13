@@ -32,7 +32,8 @@ public:
   bool merge(
     const invariant_set_domaint &other,
     locationt from,
-    locationt to)
+    locationt to,
+    const namespacet &ns)
   {
     bool changed=invariant_set.make_union(other.invariant_set) ||
                  has_values.is_false();

@@ -35,7 +35,9 @@ struct procedure_local_cfg_baset<
   typedef std::map<unsigned, unsigned> entry_mapt;
   entry_mapt entry_map;
 
-  procedure_local_cfg_baset() {}
+  explicit procedure_local_cfg_baset(const namespacet &_ns):ns(_ns)
+  {
+  }
 
   void operator()(const method_with_amapt &args)
   {
@@ -96,6 +98,9 @@ struct procedure_local_cfg_baset<
   {
     return args.second.empty();
   }
+
+protected:
+  const namespacet &ns;
 };
 
 // Grab some class typedefs for brevity:
@@ -708,7 +713,8 @@ void java_bytecode_convert_methodt::setup_local_variables(
   const address_mapt &amap)
 {
   // Compute CFG dominator tree
-  java_cfg_dominatorst dominator_analysis;
+  const namespacet ns(symbol_table);
+  java_cfg_dominatorst dominator_analysis(ns);
   method_with_amapt dominator_args(m, amap);
   dominator_analysis(dominator_args);
 

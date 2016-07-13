@@ -31,7 +31,8 @@ public:
   bool merge(
     const is_threaded_domaint &src,
     locationt from,
-    locationt to)
+    locationt to,
+    const namespacet &ns)
   {
     INVARIANT(src.reachable,
               "Abstract states are only merged at reachable locations");

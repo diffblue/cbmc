@@ -159,7 +159,8 @@ void global_may_alias_domaint::output(
 bool global_may_alias_domaint::merge(
   const global_may_alias_domaint &b,
   locationt from,
-  locationt to)
+  locationt to,
+  const namespacet &ns)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

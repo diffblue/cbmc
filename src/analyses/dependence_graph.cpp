@@ -24,7 +24,8 @@ Date: August 2013
 bool dep_graph_domaint::merge(
   const dep_graph_domaint &src,
   goto_programt::const_targett from,
-  goto_programt::const_targett to)
+  goto_programt::const_targett to,
+  const namespacet &ns)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

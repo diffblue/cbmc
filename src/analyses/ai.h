@@ -360,7 +360,11 @@ protected:
 
   // abstract methods
 
-  virtual bool merge(const statet &src, locationt from, locationt to)=0;
+  virtual bool merge(
+    const statet &src,
+    locationt from,
+    locationt to,
+    const namespacet &ns)=0;
   // for concurrent fixedpoint
   virtual bool merge_shared(
     const statet &src,
@@ -436,11 +440,15 @@ protected:
     return it->second;
   }
 
-  bool merge(const statet &src, locationt from, locationt to) override
+  virtual bool merge(
+    const statet &src,
+    locationt from,
+    locationt to,
+    const namespacet &ns) override
   {
     statet &dest=get_state(to);
     return static_cast<domainT &>(dest).merge(
-      static_cast<const domainT &>(src), from, to);
+      static_cast<const domainT &>(src), from, to, ns);
   }
 
   std::unique_ptr<statet> make_temporary_state(const statet &s) override

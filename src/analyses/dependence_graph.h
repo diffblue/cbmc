@@ -77,7 +77,8 @@ public:
   bool merge(
     const dep_graph_domaint &src,
     goto_programt::const_targett from,
-    goto_programt::const_targett to);
+    goto_programt::const_targett to,
+    const namespacet &ns);
 
   void transform(
     goto_programt::const_targett from,

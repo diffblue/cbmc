@@ -590,7 +590,8 @@ void custom_bitvector_domaint::output(
 bool custom_bitvector_domaint::merge(
   const custom_bitvector_domaint &b,
   locationt from,
-  locationt to)
+  locationt to,
+  const namespacet &ns)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

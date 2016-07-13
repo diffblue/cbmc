@@ -83,7 +83,8 @@ void uninitialized_domaint::output(
 bool uninitialized_domaint::merge(
   const uninitialized_domaint &other,
   locationt from,
-  locationt to)
+  locationt to,
+  const namespacet &ns)
 {
   auto old_uninitialized=uninitialized.size();
 
