@@ -168,23 +168,23 @@ void parse_conversion_specifier(
   switch(*it)
   {
     case 'd':
-    case 'i': curtok.type=format_tokent::SIGNED_DEC; break;
-    case 'o': curtok.type=format_tokent::UNSIGNED_OCT; break;
-    case 'u': curtok.type=format_tokent::UNSIGNED_DEC; break;
+    case 'i': curtok.type=format_tokent::INT; curtok.representation=format_tokent::SIGNED_DEC; break;
+    case 'o': curtok.type=format_tokent::INT; curtok.representation=format_tokent::UNSIGNED_OCT; break;
+    case 'u': curtok.type=format_tokent::INT; curtok.representation=format_tokent::UNSIGNED_DEC; break;
     case 'x':
-    case 'X': curtok.type=format_tokent::UNSIGNED_HEX; break;
+    case 'X': curtok.type=format_tokent::INT; curtok.representation=format_tokent::UNSIGNED_HEX; break;
     case 'e':
-    case 'E': curtok.type=format_tokent::DOUBLE_ENG; break;
+    case 'E': curtok.type=format_tokent::FLOAT; break;
     case 'f':
-    case 'F': curtok.type=format_tokent::DOUBLE; break;
+    case 'F': curtok.type=format_tokent::FLOAT; break;
     case 'g':
-    case 'G': curtok.type=format_tokent::DOUBLE_G; break;
+    case 'G': curtok.type=format_tokent::FLOAT; break;
     case 'a':
-    case 'A': curtok.type=format_tokent::DOUBLE_HEX; break;
+    case 'A': curtok.type=format_tokent::FLOAT; break;
     case 'c': curtok.type=format_tokent::CHAR; break;
     case 's': curtok.type=format_tokent::STRING; break;
     case 'p': curtok.type=format_tokent::POINTER; break;
-    case '%': curtok.type=format_tokent::PERCENT; break;
+    case '%': curtok.type=format_tokent::TEXT; curtok.value="%"; break;
     case '[': // pattern matching in, e.g., fscanf.
     {
       std::string tmp;
