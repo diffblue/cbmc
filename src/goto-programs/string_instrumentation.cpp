@@ -522,8 +522,8 @@ void string_instrumentationt::do_format_string_read(
      format_arg.op0().id()==ID_index &&
      format_arg.op0().op0().id()==ID_string_constant)
   {
-    format_token_listt token_list;
-    parse_format_string(format_arg.op0().op0(), token_list);
+    format_token_listt token_list=
+      parse_format_string(format_arg.op0().op0().get_string(ID_value));
     
     unsigned args=0;
     
@@ -636,8 +636,8 @@ void string_instrumentationt::do_format_string_write(
      format_arg.op0().id()==ID_index &&
      format_arg.op0().op0().id()==ID_string_constant) // constant format
   {
-    format_token_listt token_list;
-    parse_format_string(format_arg.op0().op0(), token_list);
+    format_token_listt token_list=
+      parse_format_string(format_arg.op0().op0().get_string(ID_value));
     
     unsigned args=0;
     

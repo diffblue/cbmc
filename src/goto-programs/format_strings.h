@@ -39,8 +39,8 @@ public:
                    
   typedef enum { LEN_h, LEN_l, LEN_L, LEN_j, LEN_t } length_modifierst;
   
-  format_tokent(token_typet _type) : type(_type) {}
-  format_tokent(void) : type(UNKNOWN) {}
+  explicit format_tokent(token_typet _type) : type(_type) { }
+  format_tokent(): type(UNKNOWN) { }
   
   token_typet type;  
   std::list<flag_typet> flags;  
@@ -50,10 +50,8 @@ public:
   irep_idt value; // for text and pattern matching
 };
 
-class format_token_listt : public std::list<format_tokent> {};
+class format_token_listt : public std::list<format_tokent> { };
 
-bool parse_format_string(
-  const exprt &format_arg,
-  format_token_listt &token_list);
+format_token_listt parse_format_string(const std::string &);
 
 #endif /*CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H_*/

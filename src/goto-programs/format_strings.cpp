@@ -222,47 +222,38 @@ Function: parse_format_string
 
 \*******************************************************************/
 
-bool parse_format_string(
-  const exprt &format_arg,
-  format_token_listt &token_list)
+format_token_listt parse_format_string(const std::string &arg_string)
 {
-  token_list.clear();
+  format_token_listt token_list;
 
-  if(format_arg.id()==ID_string_constant)
+  std::string::const_iterator it=arg_string.begin();
+
+  while(it!=arg_string.end())
   {
-    const std::string &arg_string = id2string(format_arg.get(ID_value));
-
-    std::string::const_iterator it=arg_string.begin();
-
-    while(it!=arg_string.end())
+    if(*it=='%')
     {
-      if(*it=='%')
-      {
-        token_list.push_back(format_tokent());
-        format_tokent &curtok=token_list.back();
-        it++;
+      token_list.push_back(format_tokent());
+      format_tokent &curtok=token_list.back();
+      it++;
 
-        parse_flags(it, curtok);
-        parse_field_width(it, curtok);
-        parse_precision(it, curtok);
-        parse_length_modifier(it, curtok);
-        parse_conversion_specifier(arg_string, it, curtok);
-      }
-      else
-      {
-        if(token_list.back().type!=format_tokent::TEXT)
-          token_list.push_back(format_tokent(format_tokent::TEXT));
-
-        std::string tmp;
-        for(;it!=arg_string.end() && *it!='%';it++)
-          tmp+=*it;
-
-        token_list.back().value=tmp;
-      }
+      parse_flags(it, curtok);
+      parse_field_width(it, curtok);
+      parse_precision(it, curtok);
+      parse_length_modifier(it, curtok);
+      parse_conversion_specifier(arg_string, it, curtok);
     }
+    else
+    {
+      if(token_list.back().type!=format_tokent::TEXT)
+        token_list.push_back(format_tokent(format_tokent::TEXT));
 
-    return true;
+      std::string tmp;
+      for(;it!=arg_string.end() && *it!='%';it++)
+        tmp+=*it;
+
+      token_list.back().value=tmp;
+    }
   }
 
-  return false; // non-const format string
+  return token_list;
 }
