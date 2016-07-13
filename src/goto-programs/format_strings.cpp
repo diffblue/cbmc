@@ -6,6 +6,9 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+#include <util/std_types.h>
+#include <ansi-c/c_types.h>
+
 #include <cctype>
 
 #include "format_strings.h"
@@ -258,4 +261,65 @@ format_token_listt parse_format_string(const std::string &arg_string)
   }
 
   return token_list;
+}
+
+/*******************************************************************\
+
+Function: get_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet get_type(const format_tokent &token)
+{
+  switch(token.type)
+  {
+  case format_tokent::INT:
+    switch(token.length_modifier)
+    {
+    case format_tokent::LEN_l:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_long_int_type();
+      else
+        return unsigned_long_int_type();
+
+    case format_tokent::LEN_ll:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_long_long_int_type();
+      else
+        return unsigned_long_long_int_type();
+
+    default:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_int_type();
+      else
+        return unsigned_int_type();
+    }
+
+  case format_tokent::FLOAT:
+    switch(token.length_modifier)
+    {
+    case format_tokent::LEN_l: return double_type();
+    case format_tokent::LEN_ll: return long_double_type();
+    default: return float_type();
+    }
+
+  case format_tokent::CHAR:
+    switch(token.length_modifier)
+    {
+    case format_tokent::LEN_l: return wchar_t_type();
+    default: return char_type();
+    }
+
+  case format_tokent::POINTER:
+    return pointer_type(void_type());
+
+  default:
+    return nil_typet();
+  }
 }

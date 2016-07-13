@@ -50,4 +50,6 @@ class format_token_listt : public std::list<format_tokent> { };
 
 format_token_listt parse_format_string(const std::string &);
 
+typet get_type(const format_tokent &);
+
 #endif /*CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H_*/

@@ -211,6 +211,9 @@ void ansi_c_internal_additions(std::string &code)
     // k-induction
     "void __CPROVER_k_induction_hint(unsigned min, unsigned max, "
       "unsigned step, unsigned loop_free);\n"
+      
+    // format string-related
+    "int __CPROVER_scanf(const char *, ...);\n"
     
     // pipes, write, read, close
     "struct __CPROVER_pipet {\n"

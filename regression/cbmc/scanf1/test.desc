@@ -1,8 +1,8 @@
-FUTURE
+CORE
 main.c
 
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
+^\*\* 6 of 6 failed
 --
 ^warning: ignoring

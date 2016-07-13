@@ -7,15 +7,17 @@ int main(void)
   int i=0;
   float f=0;
   double d=0;
+  long double ld=0;
   long int li=0;
   void *p=0;
   
-  scanf("%c", &c);
-  scanf("%d", &i);
-  scanf("%f", &f);
-  scanf("%lf", &d);
-  scanf("%ld", &li);
-  scanf("%p", &p);
+  __CPROVER_scanf("%c", &c);
+  __CPROVER_scanf("%d", &i);
+  __CPROVER_scanf("%f", &f);
+  __CPROVER_scanf("%lf", &d);
+  __CPROVER_scanf("%llf", &ld);
+  __CPROVER_scanf("%li", &li);
+  __CPROVER_scanf("%p", &p);
 
   assert(c==0); // may fail
   assert(i==0); // may fail

@@ -27,8 +27,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/zero_initializer.h>
 
 #include <ansi-c/c_types.h>
+#include <ansi-c/string_constant.h>
 
 #include "goto_convert_class.h"
+#include "format_strings.h"
 
 /*******************************************************************\
 
@@ -230,6 +232,82 @@ void goto_convertt::do_printf(
       printf_code.id(ID_code);
       printf_code.type()=typet(ID_code);
       copy(to_code(printf_code), OTHER, dest);
+    }
+  }
+  else
+    assert(false);
+}
+
+/*******************************************************************\
+
+Function: goto_convertt::do_scanf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::do_scanf(
+  const exprt &lhs,
+  const exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest)
+{
+  const irep_idt &f_id=function.get(ID_identifier);
+
+  if(f_id==CPROVER_PREFIX "scanf")
+  {
+    if(arguments.size()<1)
+    {
+      err_location(function);
+      error() << "scanf takes at least one argument" << eom;
+      throw 0;
+    }
+    
+    irep_idt format_string;
+    
+    if(!get_string_constant(arguments[0], format_string))
+    {
+      // use our model
+      format_token_listt token_list=parse_format_string(id2string(format_string));
+        
+      std::size_t argument_number=1;
+      
+      for(const auto & t : token_list)
+      {
+        typet type=get_type(t);
+      
+        if(type.is_not_nil())
+        {
+          if(argument_number<arguments.size())
+          {
+            exprt ptr=
+              typecast_exprt(arguments[argument_number], pointer_type(type));
+            argument_number++;
+
+            // make it nondet for now
+            exprt lhs=dereference_exprt(ptr, type);
+            exprt rhs=side_effect_expr_nondett(type);
+            code_assignt assign(lhs, rhs);
+            assign.add_source_location()=function.source_location();
+            copy(assign, ASSIGN, dest);
+          }
+        }
+      }
+    }
+    else
+    {
+      // we'll just do nothing
+      code_function_callt function_call;
+      function_call.lhs()=lhs;
+      function_call.function()=function;
+      function_call.arguments()=arguments;
+      function_call.add_source_location()=function.source_location();
+
+      copy(function_call, FUNCTION_CALL, dest);
     }
   }
   else
@@ -1102,6 +1180,10 @@ void goto_convertt::do_function_call_symbol(
   else if(identifier==CPROVER_PREFIX "printf")
   {
     do_printf(lhs, function, arguments, dest);
+  }
+  else if(identifier==CPROVER_PREFIX "scanf")
+  {
+    do_scanf(lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "input" ||
           identifier=="__CPROVER::input")
