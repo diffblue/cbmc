@@ -30,7 +30,7 @@ public:
   typedef enum { ALTERNATE, ZERO_PAD, LEFT_ADJUST, 
                  SIGNED_SPACE, SIGN, ASTERISK } flag_typet;
                    
-  typedef enum { LEN_h, LEN_l, LEN_ll, LEN_L, LEN_j, LEN_t } length_modifierst;
+  typedef enum { LEN_h, LEN_hh, LEN_l, LEN_ll, LEN_L, LEN_j, LEN_t } length_modifierst;
   
   typedef enum { SIGNED_DEC, UNSIGNED_DEC, UNSIGNED_OCT, UNSIGNED_HEX } representationt;
   

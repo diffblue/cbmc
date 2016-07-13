@@ -4,6 +4,7 @@
 int main(void)
 {
   char c=0;
+  short int si=0;
   int i=0;
   float f=0;
   double d=0;
@@ -12,14 +13,16 @@ int main(void)
   void *p=0;
   
   __CPROVER_scanf("%c", &c);
+  __CPROVER_scanf("%hhd", &si);
   __CPROVER_scanf("%d", &i);
   __CPROVER_scanf("%f", &f);
   __CPROVER_scanf("%lf", &d);
-  __CPROVER_scanf("%llf", &ld);
+  __CPROVER_scanf("%Lf", &ld);
   __CPROVER_scanf("%li", &li);
   __CPROVER_scanf("%p", &p);
 
   assert(c==0); // may fail
+  assert(si==0); // may fail
   assert(i==0); // may fail
   assert(f==0); // may fail
   assert(d==0); // may fail

@@ -282,6 +282,18 @@ typet get_type(const format_tokent &token)
   case format_tokent::INT:
     switch(token.length_modifier)
     {
+    case format_tokent::LEN_h:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_char_type();
+      else
+        return unsigned_char_type();
+
+    case format_tokent::LEN_hh:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_short_int_type();
+      else
+        return unsigned_short_int_type();
+
     case format_tokent::LEN_l:
       if(token.representation==format_tokent::SIGNED_DEC)
         return signed_long_int_type();
@@ -305,7 +317,7 @@ typet get_type(const format_tokent &token)
     switch(token.length_modifier)
     {
     case format_tokent::LEN_l: return double_type();
-    case format_tokent::LEN_ll: return long_double_type();
+    case format_tokent::LEN_L: return long_double_type();
     default: return float_type();
     }
 
