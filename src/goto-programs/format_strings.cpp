@@ -244,13 +244,15 @@ format_token_listt parse_format_string(const std::string &arg_string)
     }
     else
     {
-      if(token_list.back().type!=format_tokent::TEXT)
+      if(token_list.empty() ||
+         token_list.back().type!=format_tokent::TEXT)
         token_list.push_back(format_tokent(format_tokent::TEXT));
 
       std::string tmp;
       for(;it!=arg_string.end() && *it!='%';it++)
         tmp+=*it;
 
+      assert(!token_list.empty());
       token_list.back().value=tmp;
     }
   }
