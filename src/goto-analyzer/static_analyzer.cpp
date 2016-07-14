@@ -97,6 +97,7 @@ tvt static_analyzert::eval(goto_programt::const_targett t)
   exprt guard=t->guard;
   interval_domaint d=interval_analysis[t];
 
+  //merge intervals to properly handle conjunction
   if (guard.id()==ID_and)
   {
     interval_domaint a(d);
@@ -106,10 +107,8 @@ tvt static_analyzert::eval(goto_programt::const_targett t)
       a.output(std::cout, interval_analysis, ns);
       d.output(std::cout, interval_analysis, ns);
     #endif
-    if (a.merge(d, t, t))
-      return tvt::unknown();
-    else
-      return tvt(true);
+    if (a.merge(d, t, t)) return tvt::unknown();
+    return tvt(true);
   }
   else
   {
