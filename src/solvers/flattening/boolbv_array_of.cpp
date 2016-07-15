@@ -23,7 +23,7 @@ Function: boolbvt::convert_array_of
 
 \*******************************************************************/
 
-void boolbvt::convert_array_of(const array_of_exprt &expr, bvt &bv)
+bvt boolbvt::convert_array_of(const array_of_exprt &expr)
 {
   if(expr.type().id()!=ID_array)
     throw "array_of must be array-typed";
@@ -31,22 +31,23 @@ void boolbvt::convert_array_of(const array_of_exprt &expr, bvt &bv)
   const array_typet &array_type=to_array_type(expr.type());
   
   if(is_unbounded_array(array_type))
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   std::size_t width=boolbv_width(array_type);
   
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   const exprt &array_size=array_type.size();
 
   mp_integer size;
 
   if(to_integer(array_size, size))
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
     
   const bvt &tmp=convert_bv(expr.op0());
-    
+
+  bvt bv;    
   bv.resize(width);
 
   if(size*tmp.size()!=width)
@@ -61,4 +62,6 @@ void boolbvt::convert_array_of(const array_of_exprt &expr, bvt &bv)
   }
   
   assert(offset==bv.size());
+  
+  return bv;
 }

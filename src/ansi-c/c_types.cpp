@@ -590,6 +590,40 @@ typet pointer_diff_type()
 
 /*******************************************************************\
 
+Function: pointer_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet pointer_type(const typet &subtype)
+{
+  return pointer_typet(subtype);
+}
+
+/*******************************************************************\
+
+Function: void_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet void_type()
+{
+  return empty_typet();
+}
+
+/*******************************************************************\
+
 Function: gcc_unsigned_int128_type
 
   Inputs:

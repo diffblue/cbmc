@@ -93,10 +93,10 @@ protected:
   void freeze_lazy_constraints();
   
   // we refine expensive arithmetic
-  virtual void convert_mult(const exprt &expr, bvt &bv);
-  virtual void convert_div(const div_exprt &expr, bvt &bv);
-  virtual void convert_mod(const mod_exprt &expr, bvt &bv);
-  virtual void convert_floatbv_op(const exprt &expr, bvt &bv);
+  virtual bvt convert_mult(const exprt &expr);
+  virtual bvt convert_div(const div_exprt &expr);
+  virtual bvt convert_mod(const mod_exprt &expr);
+  virtual bvt convert_floatbv_op(const exprt &expr);
 
   // for collecting statistics
   virtual void set_to(const exprt &expr, bool value);

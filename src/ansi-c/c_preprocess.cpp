@@ -128,7 +128,7 @@ Function: shell_quote
 
 \*******************************************************************/
 
-std::string shell_quote(const std::string &src)
+static std::string shell_quote(const std::string &src)
 {
   #ifdef _WIN32
   // first check if quoting is needed at all

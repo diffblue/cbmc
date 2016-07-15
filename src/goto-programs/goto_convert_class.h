@@ -448,7 +448,8 @@ protected:
   //
   // misc
   //
-  const irep_idt get_string_constant(const exprt &expr);
+  irep_idt get_string_constant(const exprt &expr);
+  bool get_string_constant(const exprt &expr, irep_idt &);
   exprt get_constant(const exprt &expr);
 
   // some built-in functions    
@@ -459,6 +460,7 @@ protected:
   void do_array_equal   (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
   void do_array_copy    (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
   void do_printf        (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
+  void do_scanf         (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
   void do_input         (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
   void do_output        (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
   void do_prob_coin     (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);

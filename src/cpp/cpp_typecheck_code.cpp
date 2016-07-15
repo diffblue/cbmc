@@ -548,7 +548,12 @@ void cpp_typecheckt::typecheck_assign(codet &code)
 {
 
   if(code.operands().size()!=2)
-    throw "assignment statement expected to have two operands";
+  {
+    err_location(code);
+    error() << "assignment statement expected to have two operands"
+            << eom;
+    throw 0;
+  }
 
   // turn into a sideeffect
   side_effect_exprt expr(code.get(ID_statement));

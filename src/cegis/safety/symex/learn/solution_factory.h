@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -12,7 +12,7 @@
 
 #include <cegis/safety/value/safety_goto_solution.h>
 
-typedef std::map<const irep_idt, size_t> invariant_variable_idst;
+typedef std::map<const irep_idt, size_t> operand_variable_idst;
 
 /**
  * @brief
@@ -27,7 +27,7 @@ typedef std::map<const irep_idt, size_t> invariant_variable_idst;
  */
 void create_safety_solution(safety_goto_solutiont &solution,
     const class safety_programt &prog, const class goto_tracet &trace,
-    const invariant_variable_idst &var_ids, size_t max_solution_size);
+    const operand_variable_idst &var_ids, size_t max_solution_size);
 
 /**
  * @brief
@@ -43,7 +43,7 @@ void create_safety_solution(safety_goto_solutiont &solution,
 void create_safety_solution(safety_goto_solutiont &solution,
     const symbol_tablet &st, const class goto_functionst &gf,
     const class program_individualt &ind,
-    const invariant_variable_idst &var_ids);
+    const operand_variable_idst &var_ids);
 
 /**
  * @brief
@@ -60,7 +60,7 @@ void create_safety_solution(safety_goto_solutiont &solution,
 void create_safety_solution(safety_goto_solutiont &solution,
     const symbol_tablet &st, const class goto_functionst &gf,
     const program_individualt &ind,
-    const invariant_variable_idst &var_ids,
+    const operand_variable_idst &var_ids,
     class instruction_set_info_factoryt &info_fac);
 
 #endif /* CEGIS_SAFETY_SOLUTION_FACTORY_H_ */

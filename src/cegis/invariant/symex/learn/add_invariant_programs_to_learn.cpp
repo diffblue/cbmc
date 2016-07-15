@@ -4,11 +4,13 @@
 
 #include <util/arith_tools.h>
 
+#include <cegis/cegis-util/program_helper.h>
+#include <cegis/instrument/meta_variables.h>
+#include <cegis/instrument/instrument_var_ops.h>
 #include <cegis/invariant/util/invariant_program_helper.h>
-#include <cegis/invariant/meta/literals.h>
+#include <cegis/instrument/literals.h>
 #include <cegis/danger/meta/literals.h>
 #include <cegis/danger/options/danger_program.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 
 namespace
 {
@@ -31,10 +33,10 @@ void execute_inv_prog(const symbol_tablet &st, goto_functionst &gf,
   goto_programt::targett pos=decl;
   goto_programt::targett execution=body.insert_after(++pos);
   execution->type=goto_program_instruction_typet::FUNCTION_CALL;
-  execution->source_location=default_invariant_source_location();
+  execution->source_location=default_cegis_source_location();
   code_function_callt call;
   call.function()=st.lookup(DANGER_EXECUTE).symbol_expr();
-  const std::string prog_name(get_invariant_meta_name(prog_base_name));
+  const std::string prog_name(get_cegis_meta_name(prog_base_name));
   const symbol_exprt prog_symbol(st.lookup(prog_name).symbol_expr());
   const typet size_type(unsigned_int_type());
   const constant_exprt index(from_integer(0u, size_type));
@@ -63,7 +65,7 @@ goto_programt::targett add_inv_prog(invariant_programt &prog,
   const constant_exprt size(from_integer(max_solution_size, size_type));
   const symbol_typet instr_type(CEGIS_INSTRUCTION_TYPE_NAME);
   const array_typet prog_type(instr_type, size);
-  pos=declare_invariant_variable(st, gf, pos, base_name, prog_type);
+  pos=declare_cegis_meta_variable(st, gf, pos, base_name, prog_type);
   execute_inv_prog(st, gf, max_solution_size, decl);
   return pos;
 }

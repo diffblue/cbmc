@@ -186,6 +186,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("stop-on-fail", false);
 
+  if(cmdline.isset("trace") ||
+     cmdline.isset("stop-on-fail") ||
+     cmdline.isset("property"))
+    options.set_option("trace", true);
+
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
 
@@ -1067,6 +1072,7 @@ void cbmc_parse_optionst::help()
     " --show-properties            show the properties, but don't run analysis\n"
     " --property id                only check one specific property\n"
     " --stop-on-fail               stop analysis once a failed property is detected\n"
+    " --trace                      give a counterexample trace for failed properties\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"

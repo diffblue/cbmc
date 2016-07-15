@@ -1,9 +1,9 @@
 #include <algorithm>
 
-#include <cegis/invariant/util/invariant_program_helper.h>
+#include <cegis/cegis-util/program_helper.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/danger/options/danger_program.h>
 #include <cegis/danger/meta/literals.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/danger/symex/learn/add_x0_placeholders.h>
 
 namespace
@@ -40,10 +40,10 @@ public:
     base_name+=id2string(x0_name);
     goto_programt::targett pos=prog.invariant_range.begin;
     const typet &type=get_type(target);
-    declare_invariant_variable(st, gf, --pos, base_name, type);
-    const std::string full_name(get_invariant_meta_name(base_name));
+    declare_cegis_meta_variable(st, gf, --pos, base_name, type);
+    const std::string full_name(get_cegis_meta_name(base_name));
     const symbol_exprt placeholder(full_name, type);
-    invariant_assign_user_variable(st, gf, target, x0_name, placeholder);
+    cegis_assign_user_variable(st, gf, target, x0_name, placeholder);
   }
 };
 }

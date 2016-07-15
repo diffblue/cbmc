@@ -37,7 +37,7 @@ protected:
   // overloading
   virtual literalt convert_rest(const exprt &expr);
   
-  virtual void convert_bitvector(const exprt &expr, bvt &bv); // no cache
+  virtual bvt convert_bitvector(const exprt &expr); // no cache
 
   virtual exprt bv_get_rec(
     const bvt &bv,

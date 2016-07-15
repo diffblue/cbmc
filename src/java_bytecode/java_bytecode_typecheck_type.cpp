@@ -33,7 +33,10 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
     
     // must exist already in the symbol table
     if(s_it==symbol_table.symbols.end())
-      throw "failed to find type symbol "+id2string(identifier);
+    {
+      error() << "failed to find type symbol "<< identifier << eom;
+      throw 0;
+    }
     
     assert(s_it->second.is_type);
   }

@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -13,7 +13,7 @@
 #include <goto-programs/goto_program.h>
 
 typedef std::map<size_t, const irep_idt> invariant_variable_namest;
-typedef std::map<const irep_idt, size_t> invariant_variable_idst;
+typedef std::map<const irep_idt, size_t> operand_variable_idst;
 
 /**
  * @brief
@@ -24,7 +24,7 @@ typedef std::map<const irep_idt, size_t> invariant_variable_idst;
  * @param ids
  */
 void reverse_invariant_var_ids(invariant_variable_namest &names,
-    const invariant_variable_idst &ids);
+    const operand_variable_idst &ids);
 
 /**
  * @brief

@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -11,6 +11,8 @@
 #define CEGIS_INVARIANT_META_VARIABLE_NAMES_H_
 
 #include <string>
+
+#define DANGER_CE_QUANTIFIER_LABEL_PREFIX "__CPROVER_danger_ceq_"
 
 /**
  * @brief

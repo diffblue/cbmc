@@ -6,6 +6,9 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+#include <util/std_types.h>
+#include <ansi-c/c_types.h>
+
 #include <cctype>
 
 #include "format_strings.h"
@@ -168,23 +171,23 @@ void parse_conversion_specifier(
   switch(*it)
   {
     case 'd':
-    case 'i': curtok.type=format_tokent::SIGNED_DEC; break;
-    case 'o': curtok.type=format_tokent::UNSIGNED_OCT; break;
-    case 'u': curtok.type=format_tokent::UNSIGNED_DEC; break;
+    case 'i': curtok.type=format_tokent::INT; curtok.representation=format_tokent::SIGNED_DEC; break;
+    case 'o': curtok.type=format_tokent::INT; curtok.representation=format_tokent::UNSIGNED_OCT; break;
+    case 'u': curtok.type=format_tokent::INT; curtok.representation=format_tokent::UNSIGNED_DEC; break;
     case 'x':
-    case 'X': curtok.type=format_tokent::UNSIGNED_HEX; break;
+    case 'X': curtok.type=format_tokent::INT; curtok.representation=format_tokent::UNSIGNED_HEX; break;
     case 'e':
-    case 'E': curtok.type=format_tokent::DOUBLE_ENG; break;
+    case 'E': curtok.type=format_tokent::FLOAT; break;
     case 'f':
-    case 'F': curtok.type=format_tokent::DOUBLE; break;
+    case 'F': curtok.type=format_tokent::FLOAT; break;
     case 'g':
-    case 'G': curtok.type=format_tokent::DOUBLE_G; break;
+    case 'G': curtok.type=format_tokent::FLOAT; break;
     case 'a':
-    case 'A': curtok.type=format_tokent::DOUBLE_HEX; break;
+    case 'A': curtok.type=format_tokent::FLOAT; break;
     case 'c': curtok.type=format_tokent::CHAR; break;
     case 's': curtok.type=format_tokent::STRING; break;
     case 'p': curtok.type=format_tokent::POINTER; break;
-    case '%': curtok.type=format_tokent::PERCENT; break;
+    case '%': curtok.type=format_tokent::TEXT; curtok.value="%"; break;
     case '[': // pattern matching in, e.g., fscanf.
     {
       std::string tmp;
@@ -222,47 +225,113 @@ Function: parse_format_string
 
 \*******************************************************************/
 
-bool parse_format_string(
-  const exprt &format_arg,
-  format_token_listt &token_list)
+format_token_listt parse_format_string(const std::string &arg_string)
 {
-  token_list.clear();
+  format_token_listt token_list;
 
-  if(format_arg.id()==ID_string_constant)
+  std::string::const_iterator it=arg_string.begin();
+
+  while(it!=arg_string.end())
   {
-    const std::string &arg_string = id2string(format_arg.get(ID_value));
-
-    std::string::const_iterator it=arg_string.begin();
-
-    while(it!=arg_string.end())
+    if(*it=='%')
     {
-      if(*it=='%')
-      {
-        token_list.push_back(format_tokent());
-        format_tokent &curtok=token_list.back();
-        it++;
+      token_list.push_back(format_tokent());
+      format_tokent &curtok=token_list.back();
+      it++;
 
-        parse_flags(it, curtok);
-        parse_field_width(it, curtok);
-        parse_precision(it, curtok);
-        parse_length_modifier(it, curtok);
-        parse_conversion_specifier(arg_string, it, curtok);
-      }
-      else
-      {
-        if(token_list.back().type!=format_tokent::TEXT)
-          token_list.push_back(format_tokent(format_tokent::TEXT));
-
-        std::string tmp;
-        for(;it!=arg_string.end() && *it!='%';it++)
-          tmp+=*it;
-
-        token_list.back().value=tmp;
-      }
+      parse_flags(it, curtok);
+      parse_field_width(it, curtok);
+      parse_precision(it, curtok);
+      parse_length_modifier(it, curtok);
+      parse_conversion_specifier(arg_string, it, curtok);
     }
+    else
+    {
+      if(token_list.empty() ||
+         token_list.back().type!=format_tokent::TEXT)
+        token_list.push_back(format_tokent(format_tokent::TEXT));
 
-    return true;
+      std::string tmp;
+      for(;it!=arg_string.end() && *it!='%';it++)
+        tmp+=*it;
+
+      assert(!token_list.empty());
+      token_list.back().value=tmp;
+    }
   }
 
-  return false; // non-const format string
+  return token_list;
+}
+
+/*******************************************************************\
+
+Function: get_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet get_type(const format_tokent &token)
+{
+  switch(token.type)
+  {
+  case format_tokent::INT:
+    switch(token.length_modifier)
+    {
+    case format_tokent::LEN_h:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_char_type();
+      else
+        return unsigned_char_type();
+
+    case format_tokent::LEN_hh:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_short_int_type();
+      else
+        return unsigned_short_int_type();
+
+    case format_tokent::LEN_l:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_long_int_type();
+      else
+        return unsigned_long_int_type();
+
+    case format_tokent::LEN_ll:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_long_long_int_type();
+      else
+        return unsigned_long_long_int_type();
+
+    default:
+      if(token.representation==format_tokent::SIGNED_DEC)
+        return signed_int_type();
+      else
+        return unsigned_int_type();
+    }
+
+  case format_tokent::FLOAT:
+    switch(token.length_modifier)
+    {
+    case format_tokent::LEN_l: return double_type();
+    case format_tokent::LEN_L: return long_double_type();
+    default: return float_type();
+    }
+
+  case format_tokent::CHAR:
+    switch(token.length_modifier)
+    {
+    case format_tokent::LEN_l: return wchar_t_type();
+    default: return char_type();
+    }
+
+  case format_tokent::POINTER:
+    return pointer_type(void_type());
+
+  default:
+    return nil_typet();
+  }
 }

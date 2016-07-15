@@ -7,9 +7,9 @@
 #include <goto-programs/goto_functions.h>
 
 #include <cegis/value/program_individual_serialisation.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/instructions/instruction_set_factory.h>
 #include <cegis/invariant/util/copy_instructions.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/invariant/meta/meta_variable_names.h>
 #include <cegis/invariant/symex/learn/replace_operators.h>
 #include <cegis/danger/meta/literals.h>
@@ -21,18 +21,10 @@
 
 namespace
 {
-#if 0
-const program_individualt::instructiont::opt get_const_value(const exprt &expr)
-{
-  const bv_arithmetict bv(expr);
-  return static_cast<program_individualt::instructiont::opt>(bv.to_integer().to_ulong());
-}
-#endif
-
 size_t create_temps(invariant_variable_namest &rnames, const size_t num_tmp)
 {
   for (size_t i=0; i < num_tmp; ++i)
-    rnames.insert(std::make_pair(i, get_invariant_meta_name(get_tmp(i))));
+    rnames.insert(std::make_pair(i, get_cegis_meta_name(get_tmp(i))));
   return num_tmp;
 }
 
@@ -80,9 +72,12 @@ class read_instrt
     {
     case INV:
     {
-      const size_t idx=create_temps(rnames, prog_size - 1);
-      const std::string result(get_invariant_meta_name(get_Rx(loop_index, 0))); // XXX: Lexicographical ranking?
-      rnames.insert(std::make_pair(idx, result));
+      if (prog_size)
+      {
+        const size_t idx=create_temps(rnames, prog_size - 1);
+        const std::string result(get_cegis_meta_name(get_Rx(loop_index, 0))); // XXX: Lexicographical ranking?
+        rnames.insert(std::make_pair(idx, result));
+      }
       prog_type=RNK;
       break;
     }
@@ -94,7 +89,7 @@ class read_instrt
       for (size_t i=num_temps; i < prog_size; ++i)
       {
         const size_t sk=i - num_temps;
-        const std::string name(get_invariant_meta_name(get_Sx(loop_index, sk)));
+        const std::string name(get_cegis_meta_name(get_Sx(loop_index, sk)));
         rnames.insert(std::make_pair(i, name));
       }
       prog_type=SKO;
@@ -105,7 +100,7 @@ class read_instrt
     {
       const size_t idx=create_temps(rnames, prog_size - 1);
       const std::string result_name(
-          get_invariant_meta_name(get_Dx(loop_index)));
+          get_cegis_meta_name(get_Dx(loop_index)));
       rnames.insert(std::make_pair(idx, result_name));
       prog_type=INV;
       break;
@@ -208,13 +203,13 @@ void extract_instruction_set(instruction_sett &instr_set,
   const function_mapt &function_map=gf.function_map;
   const function_mapt::const_iterator it=function_map.find(DANGER_EXECUTE);
   assert(function_map.end() != it);
-  extract_instruction_set(instr_set, it->second.body);
+  instr_set=extract_instruction_set(it->second.body);
 }
 }
 
 void create_danger_solution(danger_goto_solutiont &result,
     const danger_programt &prog, const goto_tracet &trace,
-    const invariant_variable_idst &ids, const size_t max_size)
+    const operand_variable_idst &ids, const size_t max_size)
 {
   invariant_variable_namest names;
   reverse_invariant_var_ids(names, ids);
@@ -227,7 +222,7 @@ void create_danger_solution(danger_goto_solutiont &result,
 
 void create_danger_solution(danger_goto_solutiont &result,
     const danger_programt &prog, const program_individualt &ind,
-    const instruction_sett &instr_set, const invariant_variable_idst &ids)
+    const instruction_sett &instr_set, const operand_variable_idst &ids)
 {
   invariant_variable_namest names;
   reverse_invariant_var_ids(names, ids);
@@ -244,14 +239,14 @@ void create_danger_solution(danger_goto_solutiont &result,
   }
   danger_goto_solutiont::nondet_choicest &nondet=result.x0_choices;
   nondet.clear();
-  const typet type=invariant_meta_type(); // XXX: Currently single data type.
+  const typet type=cegis_default_integer_type(); // XXX: Currently single data type.
   for (const individualt::x0t::value_type &x0 : ind.x0)
     nondet.push_back(from_integer(x0, type));
 }
 
 void create_danger_solution(danger_goto_solutiont &result,
     const danger_programt &prog, const program_individualt &ind,
-    const invariant_variable_idst &ids)
+    const operand_variable_idst &ids)
 {
   instruction_sett instr_set;
   extract_instruction_set(instr_set, prog.gf);

@@ -135,7 +135,7 @@ bool jsil_entry_point(
   if(symbol.value.is_nil())
   {
     messaget message(message_handler);
-    message.error() << "main symbol `" << id2string(main_symbol)
+    message.error() << "main symbol `" << main_symbol
                     << "' has no body" << messaget::eom;
     return false; // give up
   }

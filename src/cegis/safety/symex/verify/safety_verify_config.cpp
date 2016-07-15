@@ -18,7 +18,11 @@ void safety_verify_configt::process(const candidatet &candidate)
 {
   program=original_program;
   quantifiers.clear();
-  invariant_insert_constraint(quantifiers, program, create_safety_constraint);
+  const safety_programt &prog=program;
+  const invariant_programt::const_invariant_loopst loops(prog.get_loops());
+  assert(!loops.empty());
+  const size_t offset(program.x0_choices.size() + loops.front()->skolem_choices.size());
+  invariant_insert_constraint(quantifiers, program, create_safety_constraint, offset);
   safety_insert_candidate(program, candidate);
   program.gf.update();
 }

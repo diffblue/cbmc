@@ -26,6 +26,7 @@ regression/ansi-c/tests.log
 regression/cbmc-java/tests.log
 regression/cbmc/tests.log
 src/big-int/test-bigint
+src/big-int/test-bigint.exe
 
 # files stored by editors
 *~
@@ -57,12 +58,15 @@ src/goto-analyzer/goto-analyzer
 src/goto-analyzer/goto-analyzer.exe
 src/goto-cc/goto-cc
 src/goto-cc/goto-cc.exe
+src/goto-cc/goto-cl.exe
 src/goto-instrument/goto-instrument
 src/goto-instrument/goto-instrument.exe
 src/musketeer/musketeer
 src/musketeer/musketeer.exe
 src/symex/symex
 src/symex/symex.exe
+src/goto-diff/goto-diff
+src/goto-diff/goto-diff.exe
 
 # build tools
 src/ansi-c/file_converter

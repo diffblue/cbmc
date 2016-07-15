@@ -22,13 +22,14 @@ Function: boolbvt::convert_mult
 
 \*******************************************************************/
 
-void boolbvt::convert_mult(const exprt &expr, bvt &bv)
+bvt boolbvt::convert_mult(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
+  bvt bv;
   bv.resize(width);
 
   const exprt::operandst &operands=expr.operands();
@@ -74,7 +75,7 @@ void boolbvt::convert_mult(const exprt &expr, bvt &bv)
     // cut it down again
     bv.erase(bv.begin(), bv.begin()+fraction_bits);
 
-    return;
+    return bv;
   }
   else if(expr.type().id()==ID_unsignedbv ||
           expr.type().id()==ID_signedbv)
@@ -108,8 +109,8 @@ void boolbvt::convert_mult(const exprt &expr, bvt &bv)
         bv=bv_utils.multiplier(bv, op, rep);
     }    
 
-    return;
+    return bv;
   }
   
-  conversion_failed(expr, bv);
+  return conversion_failed(expr);
 }

@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: boolbvt::convert_typecast
+Function: boolbvt::convert_bv_typecast
 
   Inputs:
 
@@ -28,15 +28,19 @@ Function: boolbvt::convert_typecast
 
 \*******************************************************************/
 
-void boolbvt::convert_typecast(const typecast_exprt &expr, bvt &bv)
+bvt boolbvt::convert_bv_typecast(const typecast_exprt &expr)
 {
   const typet &expr_type=ns.follow(expr.type());
   const exprt &op=expr.op();
   const typet &op_type=ns.follow(op.type());
   const bvt &op_bv=convert_bv(op);  
 
+  bvt bv;
+
   if(type_conversion(op_type, op_bv, expr_type, bv))
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
+
+  return bv;
 }
 
 /*******************************************************************\

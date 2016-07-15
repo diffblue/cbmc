@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/xml.h>
-#include <util/json.h>
-#include <util/i2string.h>
 #include <util/xml_expr.h>
+#include <util/json.h>
+#include <util/json_expr.h>
+#include <util/i2string.h>
 
 #include <langapi/language_util.h>
 
@@ -152,9 +153,7 @@ void show_properties_json(
       json_properties.push_back(jsont()).make_object();
     json_property["name"]=json_stringt(id2string(property_id));
     json_property["class"]=json_stringt(id2string(property_class));
-#if 0 //TODO
-    json_property["location"]=json(it->source_location);
-#endif
+    json_property["sourceLocation"]=json(it->source_location);
     json_property["description"]=json_stringt(id2string(description));
     json_property["expression"]=
       json_stringt(from_expr(ns, identifier, it->guard));

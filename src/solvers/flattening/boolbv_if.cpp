@@ -20,12 +20,12 @@ Function: boolbvt::convert_if
 
 \*******************************************************************/
 
-void boolbvt::convert_if(const if_exprt &expr, bvt &bv)
+bvt boolbvt::convert_if(const if_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   literalt cond=convert(expr.cond());
   
@@ -35,5 +35,5 @@ void boolbvt::convert_if(const if_exprt &expr, bvt &bv)
   if(op1_bv.size()!=width || op2_bv.size()!=width)
     throw "operand size mismatch for if "+expr.pretty();
 
-  bv=bv_utils.select(cond, op1_bv, op2_bv);
+  return bv_utils.select(cond, op1_bv, op2_bv);
 }

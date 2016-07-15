@@ -22,15 +22,16 @@ Function: boolbvt::convert_cond
 
 \*******************************************************************/
 
-void boolbvt::convert_cond(const exprt &expr, bvt &bv)
+bvt boolbvt::convert_cond(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
 
   std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
+  bvt bv;
   bv.resize(width);
 
   if(operands.size()<2)
@@ -101,4 +102,6 @@ void boolbvt::convert_cond(const exprt &expr, bvt &bv)
         bv[i]=prop.lselect(cond_literal, op[i], bv[i]);
     }
   }
+  
+  return bv;
 }

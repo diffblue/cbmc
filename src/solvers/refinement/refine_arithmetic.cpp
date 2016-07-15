@@ -72,16 +72,18 @@ Function: bv_refinementt::convert_floatbv_op
 
 \*******************************************************************/
 
-void bv_refinementt::convert_floatbv_op(const exprt &expr, bvt &bv)
+bvt bv_refinementt::convert_floatbv_op(const exprt &expr)
 {
   if(!do_arithmetic_refinement)
-    return SUB::convert_floatbv_op(expr, bv);
+    return SUB::convert_floatbv_op(expr);
   
   if(ns.follow(expr.type()).id()!=ID_floatbv ||
      expr.operands().size()!=3)
-    return SUB::convert_floatbv_op(expr, bv);
+    return SUB::convert_floatbv_op(expr);
 
+  bvt bv;
   add_approximation(expr, bv);
+  return bv;
 }
 
 /*******************************************************************\
@@ -96,10 +98,10 @@ Function: bv_refinementt::convert_mult
 
 \*******************************************************************/
 
-void bv_refinementt::convert_mult(const exprt &expr, bvt &bv)
+bvt bv_refinementt::convert_mult(const exprt &expr)
 {
   if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
-    return SUB::convert_mult(expr, bv);
+    return SUB::convert_mult(expr);
   
   // we catch any multiplication
   // unless it involves a constant
@@ -111,15 +113,16 @@ void bv_refinementt::convert_mult(const exprt &expr, bvt &bv)
   assert(operands.size()>=2);
 
   if(operands.size()>2)
-    return convert_mult(make_binary(expr), bv); // make binary
+    return convert_mult(make_binary(expr)); // make binary
 
   // we keep multiplication by a constant for integers
   if(type.id()!=ID_floatbv)
     if(operands[0].is_constant() || operands[1].is_constant())
-      return SUB::convert_mult(expr, bv);
+      return SUB::convert_mult(expr);
 
+  bvt bv;
   approximationt &a=add_approximation(expr, bv);
-  
+
   // initially, we have a partial interpretation for integers
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv)
@@ -139,6 +142,8 @@ void bv_refinementt::convert_mult(const exprt &expr, bvt &bv)
     prop.l_set_to_true(prop.limplies(op0_one, res_op1));
     prop.l_set_to_true(prop.limplies(op1_one, res_op0));
   }
+  
+  return bv;
 }
 
 /*******************************************************************\
@@ -153,10 +158,10 @@ Function: bv_refinementt::convert_div
 
 \*******************************************************************/
 
-void bv_refinementt::convert_div(const div_exprt &expr, bvt &bv)
+bvt bv_refinementt::convert_div(const div_exprt &expr)
 {
   if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
-    return SUB::convert_div(expr, bv);
+    return SUB::convert_div(expr);
 
   // we catch any division
   // unless it's integer division by a constant
@@ -164,9 +169,11 @@ void bv_refinementt::convert_div(const div_exprt &expr, bvt &bv)
   assert(expr.operands().size()==2);
 
   if(expr.op1().is_constant())
-    return SUB::convert_div(expr, bv);
+    return SUB::convert_div(expr);
 
+  bvt bv;
   add_approximation(expr, bv);
+  return bv;
 }
 
 /*******************************************************************\
@@ -181,10 +188,10 @@ Function: bv_refinementt::convert_mod
 
 \*******************************************************************/
 
-void bv_refinementt::convert_mod(const mod_exprt &expr, bvt &bv)
+bvt bv_refinementt::convert_mod(const mod_exprt &expr)
 {
   if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
-    return SUB::convert_mod(expr, bv);
+    return SUB::convert_mod(expr);
 
   // we catch any mod
   // unless it's integer + constant
@@ -192,9 +199,11 @@ void bv_refinementt::convert_mod(const mod_exprt &expr, bvt &bv)
   assert(expr.operands().size()==2);
 
   if(expr.op1().is_constant())
-    return SUB::convert_mod(expr, bv);
+    return SUB::convert_mod(expr);
 
+  bvt bv;
   add_approximation(expr, bv);
+  return bv;
 }
 
 /*******************************************************************\

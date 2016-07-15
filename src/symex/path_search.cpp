@@ -379,10 +379,10 @@ void path_searcht::check_assertion(statet &state)
   irep_idt property_name=instruction.source_location.get_property_id();
   property_entryt &property_entry=property_map[property_name];
   
-  if(property_entry.status==FAIL)
+  if(property_entry.status==FAILURE)
     return; // already failed
   else if(property_entry.status==NOT_REACHED)
-    property_entry.status=PASS; // well, for now!
+    property_entry.status=SUCCESS; // well, for now!
 
   // the assertion in SSA
   exprt assertion=
@@ -407,7 +407,7 @@ void path_searcht::check_assertion(statet &state)
   if(!state.check_assertion(bv_pointers))
   {
     build_goto_trace(state, bv_pointers, property_entry.error_trace);
-    property_entry.status=FAIL;
+    property_entry.status=FAILURE;
     number_of_failed_properties++;
   }
   
@@ -484,6 +484,7 @@ void path_searcht::initialize_property_map(
         property_entryt &property_entry=property_map[property_name];
         property_entry.status=NOT_REACHED;
         property_entry.description=source_location.get_comment();
+        property_entry.source_location=source_location;
       }
     }    
 }

@@ -117,33 +117,37 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
 
   case J_ARRAY:
     out << '[';
-    for(arrayt::const_iterator a_it=array.begin();
-        a_it!=array.end();
-        a_it++)
-    {
-      if(a_it!=array.begin())
-        out << ',';
 
-      if(a_it->is_object())
+    if(array.empty())
+      out << ' ';
+    else
+    {
+      for(arrayt::const_iterator a_it=array.begin();
+          a_it!=array.end();
+          a_it++)
       {
-        out << '\n';
-        out << std::string((indent+1)*2, ' ');
+        if(a_it!=array.begin())
+          out << ',';
+
+        if(a_it->is_object())
+        {
+          out << '\n';
+          out << std::string((indent+1)*2, ' ');
+        }
+        else
+          out << ' ';
+
+        a_it->output_rec(out, indent+1);
       }
-      else
-        out << ' ';
 
-      a_it->output_rec(out, indent+1);
-    }
-
-    if(!array.empty())
-    {
       if(array.back().is_object())
         out << '\n';
       else
         out << ' ';
+
+      out << std::string(indent*2, ' ');
     }
 
-    out << std::string(indent*2, ' ');
     out << ']';
     break;
     
