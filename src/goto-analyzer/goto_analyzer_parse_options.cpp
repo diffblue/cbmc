@@ -47,6 +47,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
 #include "static_analyzer.h"
+#include "static_simplifier.h"
 
 /*******************************************************************\
 
@@ -341,18 +342,35 @@ int goto_analyzer_parse_optionst::doit()
     return 0;
   }
 
-  if(cmdline.isset("non-null") ||
-     cmdline.isset("intervals"))
+  if(cmdline.isset("verify"))
   {
-    optionst options;
-    options.set_option("json", cmdline.get_value("json"));
-    options.set_option("xml", cmdline.get_value("xml"));
-    bool result=
-      static_analyzer(goto_model, options, get_message_handler());
-    return result?10:0;
+    if(cmdline.isset("non-null") ||
+       cmdline.isset("intervals"))
+    {
+      optionst options;
+      options.set_option("json", cmdline.get_value("json"));
+      options.set_option("xml", cmdline.get_value("xml"));
+      bool result=
+        static_analyzer(goto_model, options, get_message_handler());
+      return result?10:0;
+    }
   }
 
-  error() << "no analysis option given -- consider reading --help"
+  if(cmdline.isset("simplify"))
+  {
+    if(cmdline.isset("non-null") ||
+       cmdline.isset("intervals"))
+    {
+	  optionst options;
+	  options.set_option("json", cmdline.get_value("json"));
+	  options.set_option("xml", cmdline.get_value("xml"));
+	  bool result=
+	    static_simplifier(goto_model, options, get_message_handler());
+	  return result?10:0;
+	}
+  }
+
+  error() << "no analysis/verification option given -- consider reading --help"
           << eom;
   return 6;
 }
@@ -525,14 +543,14 @@ void goto_analyzer_parse_optionst::help()
     " goto-analyzer [-h] [--help]  show help\n"
     " goto-analyzer file.c ...     source file names\n"
     "\n"
-    "Analyses:\n"
+    "Abstract domains:\n"
     "\n"
     " --taint file_name            perform taint analysis using rules in given file\n"
     " --unreachable-instructions   list dead code\n"
     " --intervals                  interval analysis\n"
     " --non-null                   non-null analysis\n"
     "\n"
-    "Analysis options:\n"
+    "Results options:\n"
     " --json file_name             output results in JSON format to given file\n"
     " --xml file_name              output results in XML format to given file\n"
     "\n"
