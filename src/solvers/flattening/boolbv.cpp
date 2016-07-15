@@ -334,8 +334,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   }
   else if(expr.id()==ID_function_application)
   {
-    return convert_function_application(to_function_application_expr(expr), bv);
-    return prop.new_variables(boolbv_width(expr.type()));
+    return convert_function_application(to_function_application_expr(expr));
   }
   else if(expr.id()==ID_reduction_or  || expr.id()==ID_reduction_and  ||
           expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||

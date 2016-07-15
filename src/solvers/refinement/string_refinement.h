@@ -32,7 +32,7 @@ protected:
     explicit string_axiomt(unsigned i=0): id_nr(i) {}
     
     unsigned id_nr;
-    literalt lit;
+    exprt lit;
     exprt idx;
     exprt premise;
     exprt body;
@@ -68,11 +68,13 @@ protected:
   bvt convert_string_char_at(const function_application_exprt &f);
   bvt convert_string_char_set(const function_application_exprt &f);
 
-  void add_instantiations();
+  void add_instantiations(bool first=false);
   bool check_axioms();
   void update_index_set(const exprt &formula);
+  void update_index_set(const string_axiomt &axiom);
   exprt instantiate(const string_axiomt &axiom, const exprt &str,
                     const exprt &val);
+  void add_lemma(const exprt &lemma);
 
   symbol_exprt fresh_symbol(const irep_idt &prefix,
                             const typet &tp=bool_typet());
@@ -80,6 +82,7 @@ protected:
   typet char_type();
   exprt make_array(const exprt &str);
   exprt make_length(const exprt &str);
+  exprt get_array(const exprt &arr, const exprt &size);
 
   void expect(bool cond, const char *errmsg=NULL);
 
@@ -103,6 +106,8 @@ protected:
   expr_sett seen_instances;
   index_sett index_set;
   unsigned next_symbol_id;
+
+  std::vector<exprt> cur;
 };
 
 #endif
