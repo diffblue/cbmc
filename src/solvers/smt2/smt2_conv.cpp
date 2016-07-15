@@ -5295,8 +5295,9 @@ void smt2_convt::define_string_is_suffix(const function_application_exprt &f)
   out << "(assert (forall ((?n cprover.Pos)) "
       << "(=> (and " << id << " (bvult ?n (cprover.str.len " << s1id << "))) "
       << "(= (select " << s1id << " ?n) "
-      << "(select " << sid << " (bvsub (cprover.str.len " << sid << ") "
-      << "(bvadd ?n (cprover.str.len " << s1id << "))))))))\n";
+      << "(select " << sid << " (bvadd ?n "
+      << "(bvsub (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << s1id << "))))))))\n";
 
   irep_idt witness = "string_suffix.idx." + index;
   out << "(declare-fun " << witness << " () cprover.Pos)\n";

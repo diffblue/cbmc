@@ -513,15 +513,14 @@ Function: boolbvt::convert_function_application
 
 \*******************************************************************/
 
-void boolbvt::convert_function_application(
-  const function_application_exprt &expr, bvt &bv)
+bvt boolbvt::convert_function_application(
+  const function_application_exprt &expr)
 {
-  // make it free bits
-  bv=prop.new_variables(boolbv_width(expr.type()));
-
   // record
   functions.record(expr);
-  return;
+
+  // make it free bits
+  return prop.new_variables(boolbv_width(expr.type()));
 }
 
    
