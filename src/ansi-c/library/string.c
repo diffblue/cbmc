@@ -693,10 +693,12 @@ inline char *strchr(const char *src, int c)
   __CPROVER_size_t i;
   return found?src+i:0;
   #else
-  for(__CPROVER_size_t i=0; src[i]!=0; i++)
+  for(__CPROVER_size_t i=0; ; i++)
+  {
     if(src[i]==(char)c)
       return ((char *)src)+i; // cast away const-ness
-
+    if(src[i]==0) break;
+  }
   return 0;
   #endif
 }
@@ -720,8 +722,11 @@ inline char *strrchr(const char *src, int c)
   return found?((char *)src)+i:0;
   #else
   char *res=0;
-  for(__CPROVER_size_t i=0; src[i]!=0; i++)
+  for(__CPROVER_size_t i=0; ; i++)
+  {
     if(src[i]==(char)c) res=((char *)src)+i;
+    if(src[i]==0) break;
+  }
   return res;
   #endif
 }
