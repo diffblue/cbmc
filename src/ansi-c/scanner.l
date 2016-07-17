@@ -290,8 +290,7 @@ void ansi_c_scanner_init()
 <GRAMMAR,GCC_ATTRIBUTE3>{string_lit} {
                   PARSER.string_literal.clear();
                   PARSER.string_literal.append(yytext);
-                  newstack(yyansi_clval);
-                  PARSER.set_source_location(stack(yyansi_clval));
+                  loc();
                   // String literals can be continued in
                   // the next line
                   yy_push_state(STRING_LITERAL);
@@ -380,6 +379,23 @@ void ansi_c_scanner_init()
 <GRAMMAR>{cppstart}"ident"{ws}.* { /* ignore */ }
 <GRAMMAR>{cppstart}"define"{ws}.* { /* ignore */ }
 <GRAMMAR>{cppstart}"undef"{ws}.* { /* ignore */ }
+
+<GRAMMAR>{cppstart}"asm" {
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)  // really, this is BCC
+                  {
+                    BEGIN(ASM_BLOCK);
+                    PARSER.string_literal.clear();
+                    loc();
+                    return '{';
+                  }
+                  else
+                    return make_identifier();
+                }
+
+<GRAMMAR>{cppstart}"endasm" {
+                  loc();
+                  return '}';
+                }
 
 <GRAMMAR>{cppdirective} {
                   yyansi_cerror("Preprocessor directive found");
@@ -1374,7 +1390,11 @@ __decltype          { if(PARSER.cpp98 &&
 
 "{"             {
                   PARSER.tag_following=false;
-                  if(PARSER.asm_block_following) { BEGIN(ASM_BLOCK); }
+                  if(PARSER.asm_block_following)
+                  {
+                    BEGIN(ASM_BLOCK);
+                    PARSER.string_literal.clear();
+                  }
                   loc();
                   return yytext[0];
                 }
@@ -1392,7 +1412,12 @@ __decltype          { if(PARSER.cpp98 &&
 <MSC_ANNOTATION>"]" { BEGIN(GRAMMAR); }
 <MSC_ANNOTATION>. { /* ignore */ }
 
-<MSC_ASM>{ws}"{" { BEGIN(ASM_BLOCK); loc(); return '{'; }
+<MSC_ASM>{ws}"{" {
+                  BEGIN(ASM_BLOCK);
+                  PARSER.string_literal.clear();
+                  loc();
+                  return '{';
+                }
 <MSC_ASM>[^{^}^\n]* { loc();
                   source_locationt l=stack(yyansi_clval).source_location();
                   stack(yyansi_clval)=string_constantt(yytext);
@@ -1401,13 +1426,20 @@ __decltype          { if(PARSER.cpp98 &&
                   return TOK_ASM_STRING;
                 }
 
-<ASM_BLOCK>[^}]* { loc();
-                  source_locationt l=stack(yyansi_clval).source_location();
-                  stack(yyansi_clval)=string_constantt(yytext);
-                  stack(yyansi_clval).add_source_location()=l;
-                  return TOK_ASM_STRING; }
-<ASM_BLOCK>"}"  { PARSER.asm_block_following=false;
-                  BEGIN(GRAMMAR); loc(); return '}'; }
+<ASM_BLOCK>{
+{ws}            { /* ignore */ }
+{newline}       { /* ignore */ }
+[^#}\n][^\n}]*[\n] { PARSER.string_literal.append(yytext); }
+[^#}\n][^\n}]*  { PARSER.string_literal.append(yytext); }
+.               { // anything else: back to normal
+                  PARSER.asm_block_following=false;
+                  loc();
+                  stack(yyansi_clval)=string_constantt(PARSER.string_literal);
+                  BEGIN(GRAMMAR);
+                  yyless(0); // put back
+                  return TOK_ASM_STRING;
+                }
+}
 
 <IGNORE_PARENS>")"    { PARSER.parenthesis_counter--;
                         if(PARSER.parenthesis_counter==0)
