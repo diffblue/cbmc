@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 
 #include "value_set_domain_fivr.h"
+#include "value_set_domain.h"
 
 /*******************************************************************\
 
@@ -23,10 +24,11 @@ Function: value_set_domain_fivrt::transform
 
 \*******************************************************************/
 
-bool value_set_domain_fivrt::transform(
-  const namespacet &ns,
+void value_set_domain_fivrt::transform(
   locationt from_l,
-  locationt to_l)
+    locationt to_l,
+    ai_baset &ai,
+    const namespacet &ns)
 {   
   value_set.set_from(from_l->function, from_l->location_number);
   value_set.set_to(to_l->function, to_l->location_number);
@@ -40,7 +42,7 @@ bool value_set_domain_fivrt::transform(
   switch(from_l->type)
   {
   case END_FUNCTION:    
-    value_set.do_end_function(get_return_lhs(to_l), ns);
+    value_set.do_end_function(value_set_domaint::get_return_lhs(to_l), ns);
     break;
   
   case RETURN:
@@ -61,5 +63,5 @@ bool value_set_domain_fivrt::transform(
   default:;    
   }
   
-  return value_set.handover();
+//  return value_set.handover(); //TODO: not sure what to do with this
 }

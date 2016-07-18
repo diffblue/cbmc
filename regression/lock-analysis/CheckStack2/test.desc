@@ -1,0 +1,8 @@
+CORE
+main.c
+"--check-stack main,0,function_call;func1,30,function_call;thread,6,function_call"
+^EXIT=0$
+^SIGNAL=0$
+false$
+--
+^warning: ignoring

@@ -1,0 +1,8 @@
+CORE
+main.c
+"--verbosity 10 --is-non-concurrent --stack1 _start,12,function_call --loc1 1 --stack2 _start,12,function_call;main,2,thread_create --loc2 8"
+^EXIT=0$
+^SIGNAL=0$
+^Result: true$
+--
+^warning: ignoring

@@ -24,33 +24,34 @@ public:
   
   // constructor
   value_set_analysis_fivrnst(
-    const namespacet &_ns, 
     track_optionst _track_options=TRACK_ALL_POINTERS):
-    flow_insensitive_analysist<value_set_domain_fivrnst>(_ns),
+    flow_insensitive_analysist<value_set_domain_fivrnst>() ,
     track_options(_track_options)
   {
   }
     
   typedef flow_insensitive_analysist<value_set_domain_fivrnst> baset;
 
-  virtual void initialize(const goto_programt &goto_program);
-  virtual void initialize(const goto_functionst &goto_functions);
+  virtual void initialize(const goto_programt &goto_program,
+			  const namespacet &ns);
+  virtual void initialize(const goto_functionst &goto_functions,
+			  const namespacet &ns);
 
   using baset::output;
 
-  virtual void output(locationt l, std::ostream &out)
+  virtual void output(const namespacet &ns, locationt l, std::ostream &out)
   {
     state.value_set.set_from(l->function, l->location_number);
     state.value_set.set_to(l->function, l->location_number);    
-    state.output(ns, out);
+    state.output(out, *this, ns);
   }
   
-  void output(const goto_programt &goto_program, std::ostream &out)
+  void output(const namespacet &ns, const goto_programt &goto_program, std::ostream &out)
   {
     forall_goto_program_instructions(it, goto_program)
     {
       out << "**** " << it->source_location << std::endl;      
-      output(it, out);
+      output(ns, it, out);
       out << std::endl;
       goto_program.output_instruction(ns, "", out, it);
       out << std::endl;
@@ -60,27 +61,34 @@ public:
 protected:
   track_optionst track_options;
   
-  bool check_type(const typet &type);
-  void get_globals(std::list<value_set_fivrnst::entryt> &dest);
-  void add_vars(const goto_functionst &goto_functions);
-  void add_vars(const goto_programt &goto_programa);
+  bool check_type(const typet &type,
+		  const namespacet &ns);
+  void get_globals(std::list<value_set_fivrnst::entryt> &dest,
+		   const namespacet &ns);
+  void add_vars(const goto_functionst &goto_functions,
+		const namespacet &ns);
+  void add_vars(const goto_programt &goto_program,
+		const namespacet &ns);
 
   void get_entries(
     const symbolt &symbol,
-    std::list<value_set_fivrnst::entryt> &dest);
+    std::list<value_set_fivrnst::entryt> &dest,
+    const namespacet &ns);
 
   void get_entries_rec(
     const irep_idt &identifier,
     const std::string &suffix,
     const typet &type,
-    std::list<value_set_fivrnst::entryt> &dest);
+    std::list<value_set_fivrnst::entryt> &dest,
+    const namespacet &ns);
   
 public:
   // interface value_sets
   virtual void get_values(
     locationt l,
     const exprt &expr,
-    std::list<exprt> &dest)
+    std::list<exprt> &dest,
+    const namespacet &ns)
   {    
     state.value_set.from_function = 
       state.value_set.function_numbering.number(l->function);

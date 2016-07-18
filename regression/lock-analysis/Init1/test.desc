@@ -1,0 +1,8 @@
+CORE
+main.c
+"--pointer-check --static-pointer-check"
+^EXIT=0$
+^SIGNAL=0$
+^Value set check: properties 7 passed 1 failed 0 inconclusive$
+--
+^warning: ignoring

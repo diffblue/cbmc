@@ -1,0 +1,11 @@
+CORE
+main.c
+"--show-sharing"
+^EXIT=0$
+^SIGNAL=0$
+^* tracked shared objects 1$
+^* race-free objects      1$
+^* races                  0$
+^* potential races        0$
+^* potential race (lock?) 0$
+^* potential race (obj?)  0$

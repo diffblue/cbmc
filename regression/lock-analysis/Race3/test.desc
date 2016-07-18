@@ -1,0 +1,10 @@
+CORE
+main.c
+ --show-sharing
+^EXIT=0$
+^SIGNAL=0$
+* tracked shared objects 1$
+* race-free objects      0$
+* races                  1$
+--
+^warning: ignoring

@@ -1,0 +1,8 @@
+CORE
+main.c
+ --which-threads
+^EXIT=0$
+^SIGNAL=0$
+^  Nr of Shared functions 1$
+--
+^warning: ignoring

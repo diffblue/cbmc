@@ -1,0 +1,9 @@
+CORE
+main.c
+"--show-value-sets --xml-ui"
+^EXIT=0$
+^SIGNAL=0$
+^        <location file="main.c" function="main" line="11"/>$
+^      </instruction>$
+--
+^warning: ignoring

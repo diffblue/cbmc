@@ -333,9 +333,10 @@ Function: invariant_propagationt::initialize
 
 \*******************************************************************/
 
-void invariant_propagationt::initialize(const goto_programt &goto_program)
+void invariant_propagationt::initialize(const goto_programt &goto_program,
+					const namespacet &ns)
 {
-  baset::initialize(goto_program);
+  baset::initialize(goto_program, ns);
 
   forall_goto_program_instructions(it, goto_program)
   {
@@ -366,15 +367,16 @@ Function: invariant_propagationt::initialize
 
 \*******************************************************************/
 
-void invariant_propagationt::initialize(const goto_functionst &goto_functions)
+void invariant_propagationt::initialize(const goto_functionst &goto_functions,
+					const namespacet &ns)
 {
-  baset::initialize(goto_functions);
+  baset::initialize(goto_functions, ns);
 
   for(goto_functionst::function_mapt::const_iterator f_it=
         goto_functions.function_map.begin();
       f_it!=goto_functions.function_map.end(); 
       f_it++)
-    initialize(f_it->second.body);
+    initialize(f_it->second.body, ns);
 }
 
 /*******************************************************************\

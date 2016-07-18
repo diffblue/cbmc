@@ -9,17 +9,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_INVARIANT_SET_DOMAIN_H
 #define CPROVER_POINTER_ANALYSIS_INVARIANT_SET_DOMAIN_H
 
-#include "static_analysis.h"
+#include "ai.h"
 #include "invariant_set.h"
 
-class invariant_set_domaint:public domain_baset
+class invariant_set_domaint:public ai_domain_baset
 {
 public:
   invariant_sett invariant_set;
 
   // overloading  
 
-  inline bool merge(const invariant_set_domaint &other, locationt to)
+  inline bool merge(const invariant_set_domaint &other, 
+		    locationt from, locationt to)
   {
     return invariant_set.make_union(other.invariant_set);
   }
@@ -39,9 +40,16 @@ public:
   }
 
   virtual void transform(
-    const namespacet &ns,
     locationt from_l,
-    locationt to_l);
+    locationt to_l,
+    ai_baset &ai,
+    const namespacet &ns);
+
+protected:
+  exprt get_guard(
+    locationt from,
+    locationt to);
+
 };
 
 #endif

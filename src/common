@@ -29,8 +29,8 @@ ifeq ($(BUILD_ENV_),MinGW)
 else
   EXEEXT =
 endif
-  CFLAGS ?= -Wall -O2
-  CXXFLAGS ?= -Wall -O2
+  CFLAGS ?= -Wall -O2 -g
+  CXXFLAGS ?= -Wall -O2 -g
   CP_CFLAGS = -MMD -MP
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.9 -std=c++11 -stdlib=libc++ -D STL_HASH_STD

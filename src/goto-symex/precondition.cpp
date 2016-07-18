@@ -170,7 +170,7 @@ void preconditiont::compute_rec(exprt &dest)
     // aliasing may happen here
 
     value_setst::valuest expr_set;
-    value_sets.get_values(target, dest.op0(), expr_set);
+    value_sets.get_values(target, dest.op0(), expr_set, ns);
     hash_set_cont<irep_idt, irep_id_hash> symbols;
 
     for(value_setst::valuest::const_iterator

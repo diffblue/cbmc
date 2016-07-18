@@ -8,9 +8,9 @@ Date: January 2010
 
 \*******************************************************************/
 
-#include "static_analysis.h"
+#include "ai.h"
 
-class uninitialized_domaint:public domain_baset
+class uninitialized_domaint:public ai_domain_baset
 {
 public:
   // locals that are not initialized
@@ -18,21 +18,23 @@ public:
   uninitializedt uninitialized;
 
   virtual void transform(
-    const namespacet &ns,
     locationt from,
-    locationt to);
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns);
 
   virtual void output(
     const namespacet &ns,
     std::ostream &out) const;
   
   // returns true iff there is s.th. new
-  bool merge(const uninitialized_domaint &other, locationt to);
+  bool merge(const uninitialized_domaint &other, 
+	     locationt from, locationt to);
   
 protected:
   void assign(const exprt &lhs);
 };
 
-typedef static_analysist<uninitialized_domaint>
+typedef ait<uninitialized_domaint>
   uninitialized_analysist;
 

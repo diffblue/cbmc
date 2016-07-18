@@ -93,11 +93,15 @@ std::ostream& goto_programt::output_instruction(
   case OTHER:
   case DECL:
   case DEAD:
-  case FUNCTION_CALL:
   case ASSIGN:
     out << from_expr(ns, identifier, it->code) << std::endl;
     break;
     
+  case FUNCTION_CALL:
+    //out << (it->code).op0().pretty() << std::endl;
+    out << from_expr(ns, identifier, it->code) << std::endl;
+    break;
+
   case ASSUME:
   case ASSERT:
     if(it->is_assume())

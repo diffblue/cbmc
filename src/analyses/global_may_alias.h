@@ -66,7 +66,8 @@ protected:
 class global_may_alias_analysist:public ait<global_may_alias_domaint> 
 {
 protected:
-  virtual void initialize(const goto_functionst &_goto_functions)
+  virtual void initialize(const goto_functionst &_goto_functions,
+    const namespacet &ns)
   {
   }
 };

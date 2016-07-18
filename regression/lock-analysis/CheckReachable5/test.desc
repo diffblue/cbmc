@@ -1,0 +1,8 @@
+CORE
+main.c
+"--check-reachable --loc 9"
+^EXIT=0$
+^SIGNAL=0$
+true$
+--
+^warning: ignoring

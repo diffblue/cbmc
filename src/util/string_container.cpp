@@ -6,7 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <string.h>
+#include <cassert>
+#include <cstring>
+
+#include <iostream>
 
 #include "string_container.h"
 
@@ -100,6 +103,8 @@ Function: string_containert::get
 
 unsigned string_containert::get(const char *s)
 {
+  assert(s!=NULL);
+
   string_ptrt string_ptr(s);
 
   hash_tablet::iterator it=hash_table.find(string_ptr);

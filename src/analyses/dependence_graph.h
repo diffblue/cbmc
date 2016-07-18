@@ -123,13 +123,15 @@ public:
   {
   }
 
-  void initialize(const goto_functionst &goto_functions)
+  void initialize(const goto_functionst &goto_functions,
+		  const namespacet &ns)
   {
-    ait<dep_graph_domaint>::initialize(goto_functions);
+    ait<dep_graph_domaint>::initialize(goto_functions, ns);
     rd(goto_functions, ns);
   }
 
-  void initialize(const goto_programt &goto_program)
+  void initialize(const goto_programt &goto_program,
+		  const namespacet &ns)
   {
     post_dominators(goto_program);
   }

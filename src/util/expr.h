@@ -154,6 +154,7 @@ public:
   
   void visit(class expr_visitort &visitor);
   void visit(class const_expr_visitort &visitor) const;
+  void visit(class const_cond_expr_visitort &visitor) const;
 };
 
 typedef std::list<exprt> expr_listt;
@@ -170,6 +171,13 @@ class const_expr_visitort
 public:
   virtual ~const_expr_visitort() { }
   virtual void operator()(const exprt &expr) { }
+};
+
+class const_cond_expr_visitort
+{
+public:
+  virtual ~const_cond_expr_visitort() { }
+  virtual bool operator()(const exprt &expr) { return false; }
 };
 
 #endif

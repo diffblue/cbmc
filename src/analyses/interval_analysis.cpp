@@ -24,7 +24,7 @@ Function: instrument_intervals
 \*******************************************************************/
 
 void instrument_intervals(
-  const static_analysist<interval_domaint> &interval_analysis,
+  const ait<interval_domaint> &interval_analysis,
   goto_functionst::goto_functiont &goto_function)
 {
   std::set<symbol_exprt> symbols;
@@ -103,9 +103,9 @@ void interval_analysis(
   const namespacet &ns,
   goto_functionst &goto_functions)
 {
-  static_analysist<interval_domaint> interval_analysis(ns);
+  ait<interval_domaint> interval_analysis;
   
-  interval_analysis(goto_functions);
+  interval_analysis(goto_functions, ns);
 
   Forall_goto_functions(f_it, goto_functions)
     instrument_intervals(interval_analysis, f_it->second);

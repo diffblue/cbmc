@@ -48,7 +48,7 @@ Function: my_mkstemps
 
 \*******************************************************************/
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__sun)
 #define mkstemps my_mkstemps
 int my_mkstemps(char *template_str, int suffix_len)
 {

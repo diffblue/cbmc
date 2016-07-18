@@ -12,11 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/mp_arith.h>
 
-#include "static_analysis.h"
+#include "ai.h"
 #include "interval_analysis.h"
 #include "intervals.h"
 
-class interval_domaint:public domain_baset
+class interval_domaint:public ai_domain_baset
 {
 public:
   // trivial, conjunctive interval domain for both float
@@ -29,15 +29,17 @@ public:
   float_mapt float_map;
 
   virtual void transform(
-    const namespacet &ns,
     locationt from,
-    locationt to);
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns);
               
   virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const;
+    std::ostream &out,
+    const ai_baset &ai,
+    const namespacet &ns) const;
 
-  bool merge(const interval_domaint &b, locationt to);
+  bool merge(const interval_domaint &, locationt from, locationt to);
   
   exprt make_expression(const symbol_exprt &) const;
   

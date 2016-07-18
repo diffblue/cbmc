@@ -1,0 +1,11 @@
+CORE
+main.c
+"--show-value-sets --xml-ui"
+^EXIT=0$
+^SIGNAL=0$
+^        <variable>$
+^          <identifier>main::1::s1.t.next</identifier>$
+^          <value>&amp;lt;s2, 0, struct S&amp;gt;</value>$
+^        </variable>$
+--
+^warning: ignoring

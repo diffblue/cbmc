@@ -20,6 +20,8 @@ public:
 
   std::string get_value(char option) const;
   std::string get_value(const char *option) const;
+  std::string get_value_with_default(const char *option,
+				     const char *_default) const;
 
   const std::list<std::string> &get_values(const std::string &option) const;
   const std::list<std::string> &get_values(char option) const;

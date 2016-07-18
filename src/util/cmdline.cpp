@@ -121,6 +121,7 @@ std::string cmdlinet::get_value(char option) const
   return options[i].values.front();
 }
 
+
 /*******************************************************************\
 
 Function: cmdlinet::set
@@ -196,6 +197,27 @@ std::string cmdlinet::get_value(const char *option) const
   int i=getoptnr(option);
   if(i<0) return "";
   if(options[i].values.empty()) return "";
+  return options[i].values.front();
+}
+
+/*******************************************************************\
+
+Function: cmdlinet::get_value_with_default
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string cmdlinet::get_value_with_default(const char *option,
+  const char* _default) const
+{
+  int i=getoptnr(option);
+  if(i<0) return _default;
+  if(options[i].values.empty()) return _default;
   return options[i].values.front();
 }
 

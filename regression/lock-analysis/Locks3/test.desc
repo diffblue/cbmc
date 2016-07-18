@@ -1,0 +1,9 @@
+FUTURE
+main.c
+ --show-sharing
+^EXIT=0$
+^SIGNAL=0$
+^* race-free objects      0$
+^* races                  3$
+--
+^warning: ignoring

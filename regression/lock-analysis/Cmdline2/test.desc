@@ -1,0 +1,8 @@
+CORE
+main.c
+"--print-option x\s*=\s*1"
+^EXIT=0$
+^SIGNAL=0$
+x\\s\*=\\s\*1$
+--
+^warning: ignoring

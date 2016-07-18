@@ -1,0 +1,8 @@
+CORE
+main.c
+"--show-must-lock-sets"
+^EXIT=0$
+^SIGNAL=0$
+--
+lock.*lock.*lock
+^warning: ignoring

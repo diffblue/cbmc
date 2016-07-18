@@ -1,0 +1,8 @@
+CORE
+main.c
+ --which-threads
+^EXIT=0$
+^SIGNAL=0$
+^spawn =1\*=> thr1$
+--
+^warning: ignoring

@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cmdline.h"
 #include "simplify_expr.h"
 #include "i2string.h"
+#include "string2int.h"
 #include "std_expr.h"
 #include "cprover_prefix.h"
 
@@ -930,6 +931,21 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
   ansi_c.NULL_is_zero=(size_t)((void*)0)==0;
   
+  ansi_c.create_thread = cmdline.get_value_with_default(
+    "create-thread-function", "pthread_create"); 
+  ansi_c.create_thread_arg_no_of_function = safe_string2int(
+    cmdline.get_value_with_default(
+      "create-thread-arg-no", "2"));
+  ansi_c.create_thread_arg_no_of_arg = safe_string2int(
+    cmdline.get_value_with_default(
+      "create-thread-arg-no-of-arg", "3"));
+  ansi_c.join_thread = cmdline.get_value_with_default(
+    "join-thread-function", "pthread_join");
+  ansi_c.lock_function = cmdline.get_value_with_default(
+    "lock-function", "pthread_mutex_lock"); 
+  ansi_c.unlock_function = cmdline.get_value_with_default(
+    "unlock-function", "pthread_mutex_unlock"); 
+   
   // Default is ROUND_TO_EVEN, justified by C99:
   // 1 At program startup the floating-point environment is initialized as
   // prescribed by IEC 60559:

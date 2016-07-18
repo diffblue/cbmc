@@ -136,7 +136,8 @@ public:
   unsigned get_bit_nr(const exprt &);
 
 protected:
-  virtual void initialize(const goto_functionst &_goto_functions)
+  virtual void initialize(const goto_functionst &_goto_functions,
+    const namespacet &ns)
   {
     local_may_alias_factory(_goto_functions);
   }

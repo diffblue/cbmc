@@ -1,0 +1,9 @@
+CORE
+main.c
+ --show-sharing
+^EXIT=0$
+^SIGNAL=0$
+^* race-free objects      1$
+^* races                  2$
+--
+^warning: ignoring

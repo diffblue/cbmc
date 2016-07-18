@@ -1,0 +1,8 @@
+FUTURE
+main.c
+--show-deadlocks
+^EXIT=0$
+^SIGNAL=0$
+^* potential deadlocks    2$
+--
+^warning: ignoring

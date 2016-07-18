@@ -23,15 +23,16 @@ Function: invariant_set_domaint::transform
 \*******************************************************************/
 
 void invariant_set_domaint::transform(
-  const namespacet &ns,
   locationt from_l,
-  locationt to_l)
+  locationt to_l,
+  ai_baset &ai,
+  const namespacet &ns)
 {
   switch(from_l->type)
   {
   case GOTO:
     {
-      exprt tmp(static_analysis_baset::get_guard(from_l, to_l));
+      exprt tmp(get_guard(from_l, to_l));
       simplify(tmp, ns);
       invariant_set.strengthen(tmp);
     }
@@ -77,4 +78,36 @@ void invariant_set_domaint::transform(
   default:;
     // do nothing
   }
+}
+
+/*******************************************************************\
+
+Function: invariant_set_domaint::get_guard
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt invariant_set_domaint::get_guard(
+  locationt from,
+  locationt to)
+{
+  if(!from->is_goto())
+    return true_exprt();
+
+  locationt next=from;
+  next++;
+
+  if(next==to)
+  {
+    exprt tmp(from->guard);
+    tmp.make_not();
+    return tmp;
+  }
+  
+  return from->guard;
 }

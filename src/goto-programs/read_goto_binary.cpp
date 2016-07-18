@@ -299,6 +299,13 @@ static bool link_functions(
     if(e_it!=rename_symbol.expr_map.end())
       final_id=e_it->second;
 
+#if 1
+    // rename function tags
+    if(src_it->second.body_available())
+      Forall_goto_program_instructions(i_it, src_it->second.body)
+        i_it->function=final_id;
+#endif
+
     // already there?
     goto_functionst::function_mapt::iterator dest_f_it=
       dest_functions.function_map.find(final_id);

@@ -28,7 +28,7 @@ public:
   uninitializedt(symbol_tablet &_symbol_table):
     symbol_table(_symbol_table),
     ns(_symbol_table),
-    uninitialized_analysis(ns)
+    uninitialized_analysis()
   {
   }
 
@@ -93,7 +93,7 @@ Function: uninitializedt::add_assertions
 
 void uninitializedt::add_assertions(goto_programt &goto_program)
 {
-  uninitialized_analysis(goto_program);
+  uninitialized_analysis(goto_program, ns);
   
   // find out which variables need tracking
 
@@ -166,7 +166,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
       //const code_function_callt &code_function_call=
       //  to_code_function_call(instruction.code);
 
-      assert(uninitialized_analysis.has_location(i_it));
+      //assert(uninitialized_analysis.has_location(i_it));
       const std::set<irep_idt> &uninitialized=
         uninitialized_analysis[i_it].uninitialized;
 
@@ -273,9 +273,9 @@ void show_uninitialized(
       out << "//// Function: " << f_it->first << std::endl;
       out << "////" << std::endl;
       out << std::endl;
-      uninitialized_analysist uninitialized_analysis(ns);
-      uninitialized_analysis(f_it->second.body);
-      uninitialized_analysis.output(f_it->second.body, out);
+      uninitialized_analysist uninitialized_analysis;
+      uninitialized_analysis(f_it->second.body, ns);
+      uninitialized_analysis.output(ns, f_it->second.body, out);
     }
   }
 

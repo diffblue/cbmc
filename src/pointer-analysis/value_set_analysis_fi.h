@@ -23,42 +23,46 @@ public:
   
   // constructor
   value_set_analysis_fit(
-    const namespacet &_ns,
     track_optionst _track_options=TRACK_ALL_POINTERS):
-      flow_insensitive_analysist<value_set_domain_fit>(_ns),
+      flow_insensitive_analysist<value_set_domain_fit>(),
       track_options(_track_options)
   {
   }
     
   typedef flow_insensitive_analysist<value_set_domain_fit> baset;
 
-  virtual void initialize(const goto_programt &goto_program);
-  virtual void initialize(const goto_functionst &goto_functions);
-  
 protected:
   track_optionst track_options;
   
-  bool check_type(const typet &type);
-  void get_globals(std::list<value_set_fit::entryt> &dest);
-  void add_vars(const goto_functionst &goto_functions);
-  void add_vars(const goto_programt &goto_programa);
+  virtual void initialize(const goto_programt &goto_program, const namespacet &ns);
+  virtual void initialize(const goto_functionst &goto_functions, const namespacet &ns);
+  
+  bool check_type(const typet &type,
+		  const namespacet &ns);
+  void get_globals(std::list<value_set_fit::entryt> &dest,
+		   const namespacet &ns);
+  void add_vars(const goto_functionst &goto_functions, const namespacet &ns);
+  void add_vars(const goto_programt &goto_program, const namespacet &ns);
 
   void get_entries(
     const symbolt &symbol,
-    std::list<value_set_fit::entryt> &dest);
+    std::list<value_set_fit::entryt> &dest,
+    const namespacet &ns);
 
   void get_entries_rec(
     const irep_idt &identifier,
     const std::string &suffix,
     const typet &type,
-    std::list<value_set_fit::entryt> &dest);
+    std::list<value_set_fit::entryt> &dest,
+    const namespacet &ns);
   
 public:
   // interface value_sets
   virtual void get_values(
     locationt l,
     const exprt &expr,
-    std::list<exprt> &dest)
+    std::list<exprt> &dest,
+    const namespacet &ns)
   {
     state.value_set.from_function = 
       state.value_set.function_numbering.number(l->function);
@@ -70,4 +74,4 @@ public:
   }  
 };
 
-#endif /*VALUE_PROPAGATION_FUI_H_*/
+#endif /*CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_FI_H_*/

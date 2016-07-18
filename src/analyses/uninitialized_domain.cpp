@@ -26,9 +26,10 @@ Function: uninitialized_domaint::transform
 \*******************************************************************/
 
 void uninitialized_domaint::transform(
-  const namespacet &ns,
   locationt from,
-  locationt to)
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns)
 {
   switch(from->type)
   {
@@ -115,6 +116,7 @@ Function: uninitialized_domaint::merge
 
 bool uninitialized_domaint::merge(
   const uninitialized_domaint &other,
+  locationt from,
   locationt to)
 {
   unsigned old_uninitialized=uninitialized.size();

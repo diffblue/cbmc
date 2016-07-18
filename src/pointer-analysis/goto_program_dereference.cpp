@@ -289,7 +289,7 @@ void goto_program_dereferencet::get_value_set(
   const exprt &expr,
   value_setst::valuest &dest)
 {
-  value_sets.get_values(current_target, expr, dest);
+  value_sets.get_values(current_target, expr, dest, ns);
 }
 
 /*******************************************************************\
