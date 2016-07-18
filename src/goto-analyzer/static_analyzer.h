@@ -9,21 +9,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_STATIC_ANALYZER_H
 #define CPROVER_STATIC_ANALYZER_H
 
-#include <iosfwd>
+#include "ai_analysis.h"
 
-#include <util/message.h>
-#include <util/namespace.h>
-#include <util/options.h>
-
-#include <goto-programs/goto_model.h>
-
-bool static_analyzer(
-  const goto_modelt &,
-  const optionst &,
-  message_handlert &);
-
-void show_intervals(
-  const goto_modelt &,
-  std::ostream &);
+class static_analyzert: public ai_analysist
+{
+  public:
+	static_analyzert(
+	  const goto_modelt &_goto_model,
+	  const optionst &_options,
+	  message_handlert &_message_handler):
+	  ai_analysist(_goto_model,_options,_message_handler)
+    {
+    }
+};
 
 #endif

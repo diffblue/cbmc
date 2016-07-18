@@ -47,6 +47,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
 #include "static_analyzer.h"
+#include "ai_analysis.h"
 #include "static_simplifier.h"
 
 /*******************************************************************\
@@ -338,36 +339,38 @@ int goto_analyzer_parse_optionst::doit()
   
   if(cmdline.isset("show-intervals"))
   {
-    show_intervals(goto_model, std::cout);
+    if(cmdline.isset("verify"))
+    {
+	  static_analyzert analyzer(goto_model, options, get_message_handler());
+	  analyzer.show_intervals(goto_model, std::cout);
+    }
+    else if (cmdline.isset("simplify"))
+    {
+  	  static_simplifiert simplifier(goto_model, options, get_message_handler());
+  	  simplifier.show_intervals(goto_model, std::cout);
+    }
     return 0;
   }
 
-  if(cmdline.isset("verify"))
+  if(cmdline.isset("non-null") ||
+     cmdline.isset("intervals"))
   {
-    if(cmdline.isset("non-null") ||
-       cmdline.isset("intervals"))
-    {
       optionst options;
       options.set_option("json", cmdline.get_value("json"));
       options.set_option("xml", cmdline.get_value("xml"));
-      bool result=
-        static_analyzer(goto_model, options, get_message_handler());
-      return result?10:0;
-    }
-  }
+      bool result=0;
 
-  if(cmdline.isset("simplify"))
-  {
-    if(cmdline.isset("non-null") ||
-       cmdline.isset("intervals"))
-    {
-	  optionst options;
-	  options.set_option("json", cmdline.get_value("json"));
-	  options.set_option("xml", cmdline.get_value("xml"));
-	  bool result=
-	    static_simplifier(goto_model, options, get_message_handler());
-	  return result?10:0;
-	}
+      if(cmdline.isset("verify"))
+      {
+        static_analyzert analyzer(goto_model, options, get_message_handler());
+        result=analyzer();
+      }
+      else if (cmdline.isset("simplify"))
+      {
+        static_simplifiert simplifier(goto_model, options, get_message_handler());
+        result=simplifier();
+      }
+      return result?10:0;
   }
 
   error() << "no analysis/verification option given -- consider reading --help"

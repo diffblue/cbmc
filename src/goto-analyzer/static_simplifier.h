@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 
@@ -9,17 +9,18 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 #ifndef CPROVER_STATIC_SIMPLIFIER_H
 #define CPROVER_STATIC_SIMPLIFIER_H
 
-#include <iosfwd>
+#include "ai_analysis.h"
 
-#include <util/message.h>
-#include <util/namespace.h>
-#include <util/options.h>
-
-#include <goto-programs/goto_model.h>
-
-bool static_simplifier(
-  const goto_modelt &,
-  const optionst &,
-  message_handlert &);
+class static_simplifiert: public ai_analysist
+{
+  public:
+	static_simplifiert(
+	  const goto_modelt &_goto_model,
+	  const optionst &_options,
+	  message_handlert &_message_handler):
+	  ai_analysist(_goto_model,_options,_message_handler)
+    {
+    }
+};
 
 #endif
