@@ -1,0 +1,8 @@
+CORE
+main.c
+"--check-reachable --stack _start,rmain\(\),function_call;main,rfunc1\(\),function_call;func1,rpthread_create\(.*\),thread_create;thread,rfunc2\(\),function_call --loc rx\s*=\s*3"
+^EXIT=0$
+^SIGNAL=0$
+true$
+--
+^warning: ignoring

@@ -5,6 +5,10 @@ Module: Value Set Propagation (Flow Insensitive)
 Author: Daniel Kroening, kroening@kroening.com
         CM Wintersteiger
 
+//Comment PS: suggested enhancement:
+              this code is identical to value_set_analysis_fi,
+              only the domains are different...
+
 \*******************************************************************/
 
 #include <util/prefix.h>
@@ -29,10 +33,11 @@ Function: value_set_analysis_fivrt::initialize
 \*******************************************************************/
 
 void value_set_analysis_fivrt::initialize(
-  const goto_programt &goto_program)
+  const goto_programt &goto_program,
+  const namespacet &ns)
 {
-  baset::initialize(goto_program);
-  add_vars(goto_program);
+  baset::initialize(goto_program, ns);
+  add_vars(goto_program, ns);
 }
 
 /*******************************************************************\
@@ -48,10 +53,11 @@ Function: value_set_analysis_fivrt::initialize
 \*******************************************************************/
 
 void value_set_analysis_fivrt::initialize(
-  const goto_functionst &goto_functions)
+  const goto_functionst &goto_functions,
+  const namespacet &ns)
 {
-  baset::initialize(goto_functions);
-  add_vars(goto_functions);
+  baset::initialize(goto_functions, ns);
+  add_vars(goto_functions, ns);
 }
 
 /*******************************************************************\
@@ -67,13 +73,14 @@ Function: value_set_analysis_fivrt::add_vars
 \*******************************************************************/
 
 void value_set_analysis_fivrt::add_vars(
-  const goto_programt &goto_program)
+  const goto_programt &goto_program,
+  const namespacet &ns)
 {
   typedef std::list<value_set_fivrt::entryt> entry_listt;
   
   // get the globals
   entry_listt globals;
-  get_globals(globals);
+  get_globals(globals, ns);
 
   // get the locals
   goto_programt::decl_identifierst locals;
@@ -105,7 +112,7 @@ void value_set_analysis_fivrt::add_vars(
         const symbolt &symbol=ns.lookup(*l_it);
         
         std::list<value_set_fivrt::entryt> &entries=entry_cache[*l_it];
-        get_entries(symbol, entries);
+        get_entries(symbol, entries, ns);
         v.add_vars(entries);
       }
       else
@@ -128,9 +135,10 @@ Function: value_set_analysis_fivrt::get_entries
 
 void value_set_analysis_fivrt::get_entries(
   const symbolt &symbol,
-  std::list<value_set_fivrt::entryt> &dest)
+  std::list<value_set_fivrt::entryt> &dest,
+  const namespacet &ns)
 {
-  get_entries_rec(symbol.name, "", symbol.type, dest);
+  get_entries_rec(symbol.name, "", symbol.type, dest, ns);
 }
 
 /*******************************************************************\
@@ -149,7 +157,8 @@ void value_set_analysis_fivrt::get_entries_rec(
   const irep_idt &identifier,
   const std::string &suffix,
   const typet &type,
-  std::list<value_set_fivrt::entryt> &dest)
+  std::list<value_set_fivrt::entryt> &dest,
+  const namespacet &ns)
 {
   const typet &t=ns.follow(type);
 
@@ -169,14 +178,15 @@ void value_set_analysis_fivrt::get_entries_rec(
         identifier,
         suffix+"."+it->get_string(ID_name),
         it->type(),
-        dest);
+        dest,
+	ns);
     }
   }
   else if(t.id()==ID_array)
   {
-    get_entries_rec(identifier, suffix+"[]", t.subtype(), dest);
+    get_entries_rec(identifier, suffix+"[]", t.subtype(), dest, ns);
   }
-  else if(check_type(t))
+  else if(check_type(t, ns))
   {
     dest.push_back(value_set_fivrt::entryt(identifier, suffix));
   }
@@ -195,11 +205,12 @@ Function: value_set_analysis_fivrt::add_vars
 \*******************************************************************/
 
 void value_set_analysis_fivrt::add_vars(
-  const goto_functionst &goto_functions)
+  const goto_functionst &goto_functions,
+  const namespacet &ns)
 {
   // get the globals
   std::list<value_set_fivrt::entryt> globals;
-  get_globals(globals);
+  get_globals(globals, ns);
   
   value_set_fivrt &v=state.value_set;
 
@@ -224,7 +235,7 @@ void value_set_analysis_fivrt::add_vars(
         const symbolt &symbol=ns.lookup(*l_it);
         
         std::list<value_set_fivrt::entryt> entries;
-        get_entries(symbol, entries);
+        get_entries(symbol, entries, ns);
         v.add_vars(entries);
       }
     }
@@ -244,13 +255,14 @@ Function: value_set_analysis_fivrt::get_globals
 \*******************************************************************/
 
 void value_set_analysis_fivrt::get_globals(
-  std::list<value_set_fivrt::entryt> &dest)
+  std::list<value_set_fivrt::entryt> &dest,
+  const namespacet &ns)
 {
   // static ones
   forall_symbols(it, ns.get_symbol_table().symbols)
     if(it->second.is_lvalue &&
        it->second.is_static_lifetime)
-      get_entries(it->second, dest);
+      get_entries(it->second, dest, ns);
 }    
 
 /*******************************************************************\
@@ -265,7 +277,8 @@ Function: value_set_analysis_fivrt::check_type
 
 \*******************************************************************/
 
-bool value_set_analysis_fivrt::check_type(const typet &type)
+bool value_set_analysis_fivrt::check_type(const typet &type,
+					  const namespacet &ns)
 {
   if(type.id()==ID_pointer)
   {
@@ -301,13 +314,13 @@ bool value_set_analysis_fivrt::check_type(const typet &type)
         it!=components.end();
         it++)
     {
-      if(check_type(it->type())) return true;
+      if(check_type(it->type(), ns)) return true;
     }    
   }
   else if(type.id()==ID_array)
-    return check_type(type.subtype());
+    return check_type(type.subtype(), ns);
   else if(type.id()==ID_symbol)
-    return check_type(ns.follow(type));
+    return check_type(ns.follow(type), ns);
   
   return false;      
 }    

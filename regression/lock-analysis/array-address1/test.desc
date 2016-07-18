@@ -1,0 +1,11 @@
+CORE
+main.c
+"--show-value-sets --xml-ui"
+^EXIT=0$
+^SIGNAL=0$
+^        <variable>$
+^          <identifier>main::1::s</identifier>$
+^          <value>\*</value>$
+^        </variable>$
+--
+^warning: ignoring

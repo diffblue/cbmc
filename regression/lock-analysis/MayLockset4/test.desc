@@ -1,0 +1,9 @@
+CORE
+main.c
+"--show-may-lock-sets"
+^EXIT=0$
+^SIGNAL=0$
+--
+lock1.*lock2
+lock2.*lock1
+^warning: ignoring

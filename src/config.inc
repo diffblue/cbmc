@@ -1,9 +1,9 @@
 # Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
 BUILD_ENV = AUTO
 
-# Variables you may want to override
-#CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
-#CXXFLAGS = -std=c++11
+# Variables you may want to override -Werror 
+#CXXFLAGS = -Wall -O0 -g -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
+#CXXFLAGS = -O2 -g -Wall 
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk 
@@ -18,8 +18,8 @@ BUILD_ENV = AUTO
 MINISAT2 = ../../minisat-2.2.1
 #GLUCOSE = ../../glucose-syrup
 #SMVSAT =
-LIBZIPLIB = ../../libzip/lib/.libs/libzip.a ../../zlib/libz.a
-LIBZIPINC = ../../libzip/lib
+#LIBZIPLIB = ../../libzip/lib/.libs/libzip.a ../../zlib/libz.a
+#LIBZIPINC = ../../libzip/lib
 
 # Signing identity for MacOS Gatekeeper
 

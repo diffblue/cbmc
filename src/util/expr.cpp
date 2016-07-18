@@ -796,3 +796,36 @@ void exprt::visit(const_expr_visitort &visitor) const
       stack.push(&(*it));
   }
 }
+
+/*******************************************************************\
+
+Function: exprt::visit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void exprt::visit(const_cond_expr_visitort &visitor) const
+{
+  std::stack<const exprt *> stack;
+
+  stack.push(this);
+
+  while(!stack.empty())
+  {
+    const exprt &expr=*stack.top();
+    stack.pop();
+
+    bool b=visitor(expr);
+
+    if(!b)
+      continue; // do not visit subexpressions
+
+    forall_operands(it, expr)
+      stack.push(&(*it));
+  }
+}

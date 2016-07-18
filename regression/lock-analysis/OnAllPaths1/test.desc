@@ -1,0 +1,8 @@
+CORE
+main.c
+"--on-all-paths 3:12:17"
+^EXIT=0$
+^SIGNAL=0$
+true$
+--
+^warning: ignoring

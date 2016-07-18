@@ -14,16 +14,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_fivr.h"
 
-class value_set_domain_fivrt:public flow_insensitive_abstract_domain_baset
+class value_set_domain_fivrt:public ai_domain_baset
 {
 public:
   value_set_fivrt value_set;
 
   // overloading  
 
+  virtual bool merge(const value_set_domain_fivrt &other,    
+		     locationt from,
+		     locationt to)
+  {
+    return value_set.handover(); //TODO: Not sure this is correct
+  }
+
   virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const
+    std::ostream &out,
+    ai_baset &ai,
+    const namespacet &ns) const
   {
     value_set.output(ns, out);
   }
@@ -34,18 +42,11 @@ public:
     value_set.clear();    
   }
 
-  virtual bool transform(
-    const namespacet &ns,
+  virtual void transform(
     locationt from_l,
-    locationt to_l);
-
-  virtual void get_reference_set(
-    const namespacet &ns,
-    const exprt &expr,
-    expr_sett &expr_set)
-  {
-    value_set.get_reference_set(expr, expr_set, ns);
-  }
+    locationt to_l,
+    ai_baset &ai,
+    const namespacet &ns);
   
   virtual void clear( void )
   {

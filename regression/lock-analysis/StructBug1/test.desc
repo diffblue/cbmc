@@ -1,0 +1,9 @@
+CORE
+main.c
+" --show-value-sets --xml-ui"
+^EXIT=0$
+^SIGNAL=0$
+^          <identifier>main::1::ptr_struct.a</identifier>$
+^          <value>\&amp;lt;x, 0, signed int\&amp;gt;</value>$
+--
+^warning: ignoring

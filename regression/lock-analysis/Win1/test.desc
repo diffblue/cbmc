@@ -1,0 +1,8 @@
+CORE
+main.c
+"--show-deadlocks --create-thread-function CreateThread --create-thread-arg-no 2 --create-thread-arg-no-of-arg 2 --lock-function WaitForSingleObject --unlock-function ReleaseMutex"
+^EXIT=0$
+^SIGNAL=0$
+^* potential deadlocks    1$
+--
+^warning: ignoring

@@ -33,8 +33,10 @@ public:
     return (*this)[l].invariant_set;
   }
 
-  virtual void initialize(const goto_programt &goto_program);
-  virtual void initialize(const goto_functionst &goto_functions);
+  virtual void initialize(const goto_programt &goto_program,
+			  const namespacet &ns);
+  virtual void initialize(const goto_functionst &goto_functions,
+			  const namespacet &ns);
 
   void make_all_true();
   void make_all_false();

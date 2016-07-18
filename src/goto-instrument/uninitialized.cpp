@@ -27,7 +27,8 @@ class uninitializedt
 public:
   uninitializedt(symbol_tablet &_symbol_table):
     symbol_table(_symbol_table),
-    ns(_symbol_table)
+    ns(_symbol_table),
+    uninitialized_analysis()
   {
   }
 

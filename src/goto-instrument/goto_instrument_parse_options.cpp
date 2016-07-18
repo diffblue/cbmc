@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/string2int.h>
 #include <util/unicode.h>
+#include <util/time_stopping.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -32,24 +33,43 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/parameter_assignments.h>
+#include <goto-programs/goto_functions.h>
 
 #include <pointer-analysis/value_set_analysis.h>
+#include <pointer-analysis/value_set_analysis_cs.h>
+#include <pointer-analysis/value_set_analysis_fics.h>
+#include <pointer-analysis/value_set_check.h>
 #include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/add_failed_symbols.h>
-#include <pointer-analysis/show_value_sets.h>
+#include <pointer-analysis/sharing_analysis.h>
 
 #include <analyses/natural_loops.h>
-#include <analyses/global_may_alias.h>
+#include <analyses/local_may_alias.h>
 #include <analyses/local_bitvector_analysis.h>
-#include <analyses/custom_bitvector_analysis.h>
-#include <analyses/escape_analysis.h>
 #include <analyses/goto_check.h>
+
 #include <analyses/call_graph.h>
 #include <analyses/interval_analysis.h>
 #include <analyses/interval_domain.h>
 #include <analyses/reaching_definitions.h>
+#include <analyses/which_threads.h>
+#include <analyses/lock_set_analysis.h>
+#include <analyses/lock_set_analysis_cs.h>
+#include <analyses/lock_graph_analysis.h>
+#include <analyses/lock_graph_analysis_cs.h>
+#include <analyses/escape_analysis.h>
+#include <analyses/global_may_alias.h>
+#include <analyses/custom_bitvector_analysis.h>
 #include <analyses/dependence_graph.h>
 #include <analyses/constant_propagator.h>
+#include <analyses/ai_cs.h>
+#include <analyses/cfg_dominators.h>
+#include <analyses/in_loop.h>
+#include <analyses/non_concurrent.h>
+#include <analyses/print_locks_analysis_cs.h>
+#include <analyses/get_target.h>
+#include <analyses/simple_dependency_analysis.h>
+#include <analyses/global_dependency_analysis.h>
 
 #include <cbmc/version.h>
 
@@ -85,6 +105,42 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "code_contracts.h"
 #include "unwind.h"
 
+#define CONTEXT_SENSITIVE
+
+void goto_instrument_parse_optionst::sanitize_location_tags()
+{
+  status() << "Checking location tags" << eom;
+
+  bool done_something=false;
+
+  Forall_goto_functions(f_it, goto_functions)
+  {
+    goto_functionst::goto_functiont &goto_function=f_it->second;
+
+    if(!goto_function.body_available())
+      continue;
+
+    goto_programt &goto_program=goto_function.body;
+
+    Forall_goto_program_instructions(i_it, goto_program)
+    {
+      if(i_it->function!=f_it->first)
+      {
+        done_something=true;
+        i_it->function=f_it->first;
+      }
+    }
+  }
+
+  if(done_something)
+  {
+    status() << "Sanitized location tag(s)" << eom;
+  }
+  else
+  {
+    status() << "Sanitization was not necessary" << eom;
+  }
+}
 
 
 /*******************************************************************\
@@ -147,6 +203,1165 @@ int goto_instrument_parse_optionst::doit()
     get_goto_program();
     instrument_goto_program();
 
+    bool debug;
+    debug=ui_message_handler.get_verbosity()>=message_clientt::M_DEBUG;
+
+#if 0
+    bool stats;
+    stats=ui_message_handler.get_verbosity()>=message_clientt::M_STATISTICS;
+#endif
+
+    typedef get_targett::rest rest;
+    typedef ai_cs_stackt::locationt locationt;
+
+    if(cmdline.isset("check-instructions"))
+    {
+      namespacet ns(symbol_table);
+
+      if(cmdline.isset("remove-function-pointers"))
+      {
+        do_function_pointer_removal();
+      }
+
+      forall_goto_functions(f_it, goto_functions)
+      {
+        typedef goto_functionst::goto_functiont goto_functiont;
+
+        const goto_functiont &goto_function=f_it->second;
+
+        if(!goto_function.body_available())
+          continue;
+
+        std::cout << f_it->first << std::endl;
+        std::cout << goto_function.type.pretty() << std::endl;
+        std::cout << "========" << std::endl;
+
+        const goto_programt &goto_program=goto_function.body;
+
+        forall_goto_program_instructions(i_it, goto_program)
+        {
+          const goto_programt::instructiont &ins=*i_it;
+
+          std::cout << ins.type << std::endl;
+          if(ins.is_function_call())
+          {
+            const code_function_callt &code=to_code_function_call(ins.code);
+            std::cout << code.pretty() << std::endl;
+          }
+
+          goto_program.output_instruction(ns, f_it->first, std::cout, i_it);
+        }
+      }
+
+      return 0;
+    }
+
+
+    // to check arguments passed in from regression tests
+    if(cmdline.isset("print-option"))
+    {
+      std::string s=cmdline.get_value("print-option");
+      std::cout << "Option: " << s << std::endl;
+      return 0;
+    }
+
+
+    if(cmdline.isset("print-code"))
+    {
+      namespacet ns(symbol_table);
+
+      do_function_pointer_removal();
+      do_remove_returns();
+
+      get_targett get_target(goto_functions,  ns);
+      std::string spec=cmdline.get_value("print-code");
+      get_targett::rest res=get_target.from_spec(spec);
+      chk(res.first, "");
+      goto_programt::const_targett l=res.second;
+      assert(!l->function.empty());
+
+      std::ostringstream sstream;
+      const goto_programt &goto_program
+        =goto_functions.function_map.at(l->function).body;
+
+      goto_program.output_instruction(ns, l->function, sstream, l);
+
+      const codet &code=l->code;
+
+      std::cout << code.pretty() << std::endl;
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-lock-dependencies-global"))
+    {
+      namespacet ns(symbol_table);
+
+      do_function_pointer_removal();
+      do_remove_returns();
+
+      typedef goto_functionst::goto_functiont goto_functiont;
+      typedef global_dependency_analysist::location_sett location_sett;
+
+      std::vector<exprt> lock_exprs;
+      location_sett lock_locations;
+      collect_lock_operations(goto_functions, lock_exprs, lock_locations);
+      if(lock_exprs.empty())
+      {
+        std::cout << "No lock functions found" << std::endl;
+        return 0;
+      }
+
+      location_sett result_locations;
+      global_dependency_analysist gda(goto_functions, ns);
+      gda(lock_exprs, result_locations);
+
+      unsigned num_assignments=0;
+      unsigned num_locations=0;
+
+      forall_goto_functions(f_it, goto_functions)
+      {
+        const goto_functiont &goto_function=f_it->second;
+
+        if(!goto_function.body_available())
+          continue;
+
+        const goto_programt &goto_program=goto_function.body;
+
+        forall_goto_program_instructions(i_it, goto_program)
+        {
+          if(i_it->is_assign())
+            num_assignments++;
+
+          num_locations++;
+        }
+      }
+
+      std::cout << "Number of lock expressions: " << lock_exprs.size()
+        << std::endl;
+
+      std::cout << "Number of assignments: " << num_assignments << std::endl;
+
+      global_dependency_analysist::location_sett assignment_locations;
+      for(location_sett::const_iterator it=result_locations.begin();
+        it!=result_locations.end(); it++)
+      {
+        if((*it)->is_assign())
+          assignment_locations.insert(*it);
+      }
+
+      std::cout << "Number of significant assignments: " <<
+        assignment_locations.size() << std::endl;
+
+      std::cout << "Number of locations: " << num_locations << std::endl;
+
+      std::cout << "Number of significant locations: " <<
+        result_locations.size() << std::endl;
+
+      std::cout << "Lock statements: " << std::endl;
+      for(location_sett::const_iterator it=lock_locations.begin();
+          it!=lock_locations.end(); it++)
+      {
+        misc::output_goto_instruction(goto_functions, ns, std::cout, *it);
+        std::cout << std::endl;
+      }
+
+#if 0
+      std::cout << "Lock expressions: " << std::endl;
+      for(std::vector<exprt>::const_iterator it=lock_exprs.begin();
+          it!=lock_exprs.end(); it++)
+      {
+        std::cout << it->pretty() << std::endl;
+      }
+#endif
+
+      std::cout << "Significant locations: " << std::endl;
+      for(location_sett::const_iterator it=result_locations.begin();
+          it!=result_locations.end(); it++)
+      {
+        misc::output_goto_instruction(goto_functions, ns, std::cout, *it);
+        std::cout << std::endl;
+      }
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-branch-dependencies-global"))
+    {
+      namespacet ns(symbol_table);
+
+      do_function_pointer_removal();
+      do_remove_returns();
+
+      typedef goto_functionst::goto_functiont goto_functiont;
+      typedef global_dependency_analysist::location_sett location_sett;
+
+      // collect branch expressions
+      std::vector<exprt> branch_exprs;
+      forall_goto_functions(f_it, goto_functions)
+      {
+        const goto_functiont &goto_function=f_it->second;
+
+        if(!goto_function.body_available())
+          continue;
+
+        const goto_programt &goto_program=goto_function.body;
+
+        forall_goto_program_instructions(i_it, goto_program)
+        {
+          if(i_it->is_goto())
+          {
+            const exprt &guard=i_it->guard;
+            branch_exprs.push_back(guard);
+          }
+        }
+      }
+      if(branch_exprs.empty())
+      {
+        std::cout << "No gotos found" << std::endl;
+        return 0;
+      }
+
+      // do dependency analysis
+      location_sett result_locations;
+      global_dependency_analysist gda(goto_functions, ns);
+      gda(branch_exprs, result_locations);
+
+      unsigned num_assignments=0;
+      unsigned num_locations=0;
+
+      // count assignment locations and other locations
+      forall_goto_functions(f_it, goto_functions)
+      {
+        const goto_functiont &goto_function=f_it->second;
+
+        if(!goto_function.body_available())
+          continue;
+
+        const goto_programt &goto_program=goto_function.body;
+
+        forall_goto_program_instructions(i_it, goto_program)
+        {
+          if(i_it->is_assign())
+            num_assignments++;
+
+          num_locations++;
+        }
+      }
+
+      std::cout << "Number of branch expressions: " << branch_exprs.size()
+        << std::endl;
+
+      std::cout << "Number of assignments: " << num_assignments << std::endl;
+
+      location_sett assignment_locations;
+      for(location_sett::const_iterator it=result_locations.begin();
+        it!=result_locations.end(); it++)
+      {
+        if((*it)->is_assign())
+          assignment_locations.insert(*it);
+      }
+
+      std::cout << "Number of significant assignments: " <<
+        assignment_locations.size() << std::endl;
+
+      std::cout << "Number of locations: " << num_locations << std::endl;
+
+      std::cout << "Number of significant locations: " <<
+        result_locations.size() << std::endl;
+
+      return 0;
+    }
+
+
+    // show assignments that could affect a lock operation
+    if(cmdline.isset("show-lock-dependencies-simple"))
+    {
+      namespacet ns(symbol_table);
+
+      do_function_pointer_removal();
+      do_remove_returns();
+
+      typedef goto_functionst::goto_functiont goto_functiont;
+
+      // lock expressions
+      typedef std::vector<exprt> expr_vect;
+      expr_vect expr_vec;
+
+      // locations of lock expressions
+      typedef std::set<goto_programt::const_targett> location_sett;
+      location_sett lock_location_set;
+
+      unsigned num_assignments=0;
+      unsigned num_locations=0;
+
+      // Gather expressions used in lock operations, count number of
+      // assignment statements
+      forall_goto_functions(f_it, goto_functions)
+      {
+        const goto_functiont &goto_function=f_it->second;
+
+        if(!goto_function.body_available())
+          continue;
+
+        const goto_programt &goto_program=goto_function.body;
+
+        forall_goto_program_instructions(i_it, goto_program)
+        {
+          if(i_it->is_function_call())
+          {
+            irep_idt id=misc::get_function_name(i_it);
+            if(id.empty())
+              continue;
+
+            std::string name=id2string(id);
+            if(name==config.ansi_c.lock_function ||
+               name==config.ansi_c.unlock_function)
+            {
+              const code_function_callt &code=to_code_function_call(i_it->code);
+              const exprt &expr=code.op2();
+              expr_vec.push_back(expr);
+              lock_location_set.insert(i_it);
+            }
+          }
+          else if(i_it->is_assign())
+          {
+#if 0
+            if(id2string(f_it->first)=="main")
+            {
+              const code_assignt &assignment=to_code_assign(i_it->code);
+              std::cout << assignment.pretty() << std::endl;
+            }
+#endif
+
+            num_assignments++;
+          }
+
+          num_locations++;
+        }
+      }
+
+      location_sett location_set;
+      std::set<irep_idt> id_set;
+
+      simple_dependency_analysist sda(goto_functions);
+      if(!expr_vec.empty())
+        sda(expr_vec, location_set, id_set);
+
+      std::cout << "Number of lock expressions: " << expr_vec.size()
+        << std::endl;
+
+      std::cout << "Number of assignments: " << num_assignments << std::endl;
+
+      location_sett assignment_locations;
+      for(location_sett::const_iterator it=location_set.begin();
+          it!=location_set.end(); it++)
+      {
+        if((*it)->is_assign())
+          assignment_locations.insert(*it);
+      }
+
+      std::cout << "Number of significant assignments: " <<
+        assignment_locations.size() << std::endl;
+
+      std::cout << "Number of locations: " << num_locations << std::endl;
+
+      std::cout << "Number of significant locations: " << location_set.size()
+        << std::endl;
+
+      std::cout << "Lock statements: " << std::endl;
+      for(location_sett::const_iterator it=lock_location_set.begin();
+          it!=lock_location_set.end(); it++)
+      {
+        misc::output_goto_instruction(goto_functions, ns, std::cout, *it);
+        std::cout << std::endl;
+      }
+
+      std::cout << "Significant locations: " << std::endl;
+      for(location_sett::const_iterator it=location_set.begin();
+          it!=location_set.end(); it++)
+      {
+        misc::output_goto_instruction(goto_functions, ns, std::cout, *it);
+        std::cout << std::endl;
+      }
+
+      return 0;
+    }
+
+
+    // Show lock operations in the code (including stacks, locations,
+    // and abstract thread ids)
+    if(cmdline.isset("print-locks"))
+    {
+      namespacet ns(symbol_table);
+
+      do_function_pointer_removal();
+      do_remove_returns();
+
+      in_loopt in_loop(goto_functions);
+      ai_cst<print_locks_domain_cst> print_locks_analysis(in_loop);
+      print_locks_analysis(goto_functions, ns);
+      print_locks_analysis.output(ns, goto_functions, std::cout);
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("non-concurrent") ||
+       cmdline.isset("is-lock-protected") ||
+       cmdline.isset("is-non-concurrent"))
+    {
+      namespacet ns(symbol_table);
+      get_targett get_target(goto_functions, ns);
+
+      chk(cmdline.isset("stack1"), "");
+      chk(cmdline.isset("stack2"), "");
+      chk(cmdline.isset("loc1"), "");
+      chk(cmdline.isset("loc2"), "");
+
+      std::string ss1=cmdline.get_value("stack1");
+      std::string ss2=cmdline.get_value("stack2");
+      std::string sl1=cmdline.get_value("loc1");
+      std::string sl2=cmdline.get_value("loc2");
+
+      in_loopt in_loop(goto_functions);
+      value_set_analysis_cst value_set_analysis(in_loop);
+      value_set_analysis(goto_functions, ns);
+
+      must_lock_set_analysis_cst must_lock_set_analysis(
+        in_loop, value_set_analysis);
+      must_lock_set_analysis(goto_functions, ns);
+
+      if(debug)
+      {
+        must_lock_set_analysis.show(ns, get_ui(), goto_functions);
+      }
+
+      non_concurrentt non_concurrent(
+        goto_functions,
+        in_loop,
+        value_set_analysis,
+        must_lock_set_analysis,
+        ns);
+
+      ai_cs_stackt stack1;
+      stack1.parse_stack(goto_functions, ns, ss1);
+      ai_cs_stackt stack2;
+      stack2.parse_stack(goto_functions, ns, ss2);
+
+      rest res;
+
+      res=get_target.from_spec(sl1);
+      chk(res.first, "");
+      locationt loc1=res.second;
+
+      res=get_target.from_spec(sl2);
+      chk(res.first, "");
+      locationt loc2=res.second;
+
+      typedef ai_cs_baset::placet placet;
+
+      placet place1(stack1, loc1);
+      placet place2(stack2, loc2);
+
+      bool nc=false;
+      if(cmdline.isset("non-concurrent"))
+      {
+        status() << "Full non concurrency check" << eom;
+        nc=non_concurrent.non_concurrent(place1, place2);
+      }
+      else if(cmdline.isset("is-lock-protected"))
+      {
+        status() << "Lock protected check" << eom;
+        nc=non_concurrent.is_lock_protected(place1, place2);
+      }
+      else if(cmdline.isset("is-non-concurrent"))
+      {
+        status() << "Non concurrency check" << eom;
+        nc=non_concurrent.is_non_concurrent(place1, place2);
+      }
+      else
+      {
+        assert(false);
+      }
+
+#if 0
+      std::cout << "Stack 1:" << std::endl;
+      std::cout << stack1 << "\n" << std::endl;
+
+      std::cout << "Stack 2" << std::endl;
+      std::cout << stack2 << "\n" << std::endl;
+
+      std::cout << "Location 1: " << loc1->location_number << std::endl;
+      std::cout << "Location 2: " << loc2->location_number << std::endl;
+#endif
+
+      std::cout << "Result: ";
+      std::cout << (nc ? "true" : "false") << std::endl;
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("has-path"))
+    {
+      status() << "Checking path" << eom;
+
+      namespacet ns(symbol_table);
+
+      std::string opt=cmdline.get_value("has-path");
+
+      std::vector<std::string> svec;
+      misc::split_string(opt, ':', svec, true);
+      chk(svec.size()==2, "wrong argument");
+
+      get_targett get_target(goto_functions, ns);
+      get_targett::rest res;
+
+      res=get_target.from_spec(svec[0]);
+      chk(res.first, "");
+      goto_programt::const_targett l1=res.second;
+
+      res=get_target.from_spec(svec[1]);
+      chk(res.first, "");
+      goto_programt::const_targett l2=res.second;
+
+      in_loopt in_loop(goto_functions);
+      value_set_analysis_cst value_set_analysis(in_loop);
+      must_lock_set_analysis_cst must_lock_set_analysis(
+        in_loop, value_set_analysis);
+      must_lock_set_analysis(goto_functions, ns);
+
+      non_concurrentt non_concurrent(
+        goto_functions,
+        in_loop,
+        value_set_analysis,
+        must_lock_set_analysis,
+        ns);
+
+      bool hp=non_concurrent.has_path(l1, l2);
+      std::cout << "Has path: ";
+      std::cout << (hp ? "true" : "false") << std::endl;
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("on-all-paths"))
+    {
+      status() << "Checking if loc is on all paths" << eom;
+
+      namespacet ns(symbol_table);
+
+      std::string opt=cmdline.get_value("on-all-paths");
+
+      std::vector<std::string> svec;
+      misc::split_string(opt, ':', svec, true);
+      chk(svec.size()==3, "wrong argument");
+
+      get_targett get_target(goto_functions, ns);
+      get_targett::rest res;
+
+      res=get_target.from_spec(svec[0]);
+      chk(res.first, "");
+      goto_programt::const_targett l1=res.second;
+
+      res=get_target.from_spec(svec[1]);
+      chk(res.first, "");
+      goto_programt::const_targett l2=res.second;
+
+      res=get_target.from_spec(svec[2]);
+      chk(res.first, "");
+      goto_programt::const_targett l3=res.second;
+
+      in_loopt in_loop(goto_functions);
+      value_set_analysis_cst value_set_analysis(in_loop);
+      must_lock_set_analysis_cst must_lock_set_analysis(
+        in_loop, value_set_analysis);
+      must_lock_set_analysis(goto_functions, ns);
+
+      non_concurrentt non_concurrent(
+        goto_functions,
+        in_loop,
+        value_set_analysis,
+        must_lock_set_analysis,
+        ns);
+
+      bool oap=non_concurrent.on_all_paths(l1, l2, l3);
+      std::cout << "On all paths: ";
+      std::cout << (oap ? "true" : "false") << std::endl;
+
+      return 0;
+    }
+
+
+    if (cmdline.isset("in-loop"))
+    {
+      status() << "Checking if loc is in loop" << eom;
+
+      namespacet ns(symbol_table);
+
+      std::string opt=cmdline.get_value("in-loop");
+
+      get_targett get_target(goto_functions, ns);
+      get_targett::rest res;
+
+      res=get_target.from_spec(opt);
+      chk(res.first, "");
+      goto_programt::const_targett loc=res.second;
+
+      in_loopt in_loop(goto_functions);
+
+      bool il=in_loop.is_in_loop(loc);
+      std::cout << "Is in loop: ";
+      std::cout << (il ? "true" : "false") << std::endl;
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("print-reachable"))
+    {
+      status() << "Printing reachable locations with context" << eom;
+
+      namespacet ns(symbol_table);
+
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+
+      in_loopt in_loop(goto_functions);
+
+      ai_cst<ai_cs_domain_empty> ai_cs(in_loop);
+      ai_cs(goto_functions, ns);
+      ai_cs.output(ns, goto_functions, std::cout);
+
+      std::cout << "Statistics" << std::endl;
+      ai_cs.output_stats(std::cout);
+      std::cout << std::endl;
+
+      return 0;
+    }
+
+
+    if (cmdline.isset("check-stack"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Checking stack" << eom;
+
+      std::string ss=cmdline.get_value("check-stack");
+
+      ai_cs_stackt stack;
+      stack.parse_stack(goto_functions, ns, ss);
+
+      bool ivs=stack.is_valid_stack(goto_functions);
+      std::cout << "Valid stack: ";
+      std::cout << (ivs ? "true" : "false") << std::endl;
+
+      return 0;
+    }
+
+
+    if (cmdline.isset("check-reachable"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Checking reachable locations with context" << eom;
+
+      chk(cmdline.isset("loc"), "");
+
+      std::string ss=cmdline.get_value_with_default("stack", "");
+      std::string sl=cmdline.get_value("loc");
+
+      ai_cs_stackt stack;
+      stack.parse_stack(goto_functions, ns, ss);
+      chk(stack.is_valid_stack(goto_functions), "invalid stack");
+
+      get_targett get_target(goto_functions, ns);
+      get_targett::rest res;
+
+      res=get_target.from_spec(sl);
+      chk(res.first, "");
+      goto_programt::const_targett loc=res.second;
+
+      in_loopt in_loop(goto_functions);
+
+      ai_cst<ai_cs_domain_empty> ai_cs(in_loop);
+      ai_cs(goto_functions, ns);
+
+      ai_cs_baset::placet place(stack, loc);
+      bool h=ai_cs.has(place);
+      std::cout << "Is reachable: ";
+      std::cout << (h ? "true" : "false") << std::endl;
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-dominators"))
+    {
+      status() << "Printing dominators" << eom;
+
+      irep_idt id(cmdline.get_value("show-dominators"));
+
+      goto_functionst::function_mapt::const_iterator it
+        =goto_functions.function_map.find(id);
+      if (it==goto_functions.function_map.end())
+      {
+        error() << "Function not found" << eom;
+        return 0;
+      }
+      const goto_functionst::goto_functiont &goto_function=it->second;
+      const goto_programt &goto_program=goto_function.body;
+
+      cfg_dominatorst dominators;
+
+      if(cmdline.isset("dominator-start"))
+      {
+        unsigned location_number;
+        location_number=unsafe_string2unsigned(
+          cmdline.get_value("dominator-start"));
+
+        goto_programt::instructiont::const_targett target;
+        forall_goto_program_instructions(it, goto_program)
+        {
+          if(it->location_number==location_number)
+          {
+            target=it;
+            break;
+          }
+        }
+
+        dominators(it->second.body, target);
+      }
+      else
+      {
+        dominators(it->second.body);
+      }
+
+      dominators.output(std::cout);
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-post-dominators"))
+    {
+      status() << "Printing post-dominators" << eom;
+
+      irep_idt id(cmdline.get_value("show-post-dominators"));
+
+      goto_functionst::function_mapt::const_iterator it
+        =goto_functions.function_map.find(id);
+      if (it==goto_functions.function_map.end())
+      {
+        error() << "Function not found" << eom;
+        return 0;
+      }
+      const goto_functionst::goto_functiont &goto_function=it->second;
+      const goto_programt &goto_program=goto_function.body;
+
+      cfg_post_dominatorst post_dominators;
+
+      if(cmdline.isset("dominator-start"))
+      {
+        unsigned location_number;
+        location_number=unsafe_string2unsigned(
+          cmdline.get_value("dominator-start"));
+
+        goto_programt::instructiont::const_targett target;
+        forall_goto_program_instructions(it, goto_program)
+        {
+          if(it->location_number==location_number)
+          {
+            target=it;
+            break;
+          }
+        }
+
+        post_dominators(it->second.body, target);
+      }
+      else
+      {
+        post_dominators(it->second.body);
+      }
+
+      post_dominators.output(std::cout);
+      return 0;
+    }
+
+
+    if(cmdline.isset("which-threads"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+    
+      status() << "Which-Thread Analysis" << eom;
+      which_threadst which_threads(goto_functions);
+
+      which_threads.output(std::cout);
+      return 0;
+    }
+
+    if(cmdline.isset("show-value-sets"))
+    {
+      namespacet ns(symbol_table);
+
+      /*status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);*/
+    
+      status() << "Pointer Analysis" << eom;
+#ifdef CONTEXT_SENSITIVE
+      in_loopt in_loop(goto_functions);
+      value_set_analysis_cst value_set_analysis(in_loop);
+
+#else
+      value_set_analysist value_set_analysis;
+#endif
+      value_set_analysis(goto_functions, ns);
+
+      status() << "Value Set Output" << eom;
+
+      value_set_analysis.show(ns, get_ui(), goto_functions);
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-value-sets-fi"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+
+      status() << "Pointer Analysis" << eom;
+      in_loopt in_loop(goto_functions);
+      value_set_analysis_ficst value_set_analysis(goto_functions, in_loop);
+      value_set_analysis(goto_functions, ns);
+      
+#if 0
+      status() << "Value Set Output" << eom;
+      value_set_analysis.show(ns, get_ui(), goto_functions);
+#endif
+      
+      return 0;
+    }
+
+
+    if(cmdline.isset("static-pointer-check"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+
+      status() << "Pointer Analysis" << eom;
+      value_set_analysist value_set_analysis;
+      value_set_analysis(goto_functions, ns);
+
+      status() << "Pointer Checks" << eom;
+      value_set_checkt value_set_check(value_set_analysis, ns);
+      value_set_check(goto_functions);
+
+      show_value_set_check(get_ui(), value_set_check);
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-sharing"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+
+      status() << "Pointer Analysis" << eom;
+      value_set_analysist value_set_analysis;
+      value_set_analysis(goto_functions, ns);
+
+      status() << "Lock set Analysis" << eom;
+      lock_set_analysist lock_set_analysis(value_set_analysis);
+      lock_set_analysis(goto_functions, ns);
+
+      status() << "Sharing Analysis" << eom;
+      sharing_analysist sharing_analysis(
+        ns,
+        goto_functions,
+        value_set_analysis,
+        lock_set_analysis);
+
+      show_sharing_analysis(get_ui(), sharing_analysis);
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-non-concurrency-stats"))
+    {
+      status() << "Non-concurrency stats" << eom;
+
+      sanitize_location_tags();
+
+      do_function_pointer_removal();
+      do_remove_returns();
+
+      // recalculate numbers, etc.
+      goto_functions.update();
+
+      namespacet ns(symbol_table);
+
+      in_loopt in_loop(goto_functions);
+
+#if 0
+      goto_functions.output(ns, status());
+      status() << eom;
+#endif
+
+      typedef ai_cs_domain_empty edt;
+
+      // find all places
+      ai_cst<edt> ai_cs(in_loop);
+      ai_cs(goto_functions, ns);
+
+      // pointer information for non-concurrency analysis
+      status() << "Pointer analysis" << eom;
+      value_set_analysis_ficst vsa(goto_functions, in_loop);
+      vsa(goto_functions, ns);
+
+      // must lockset information for non-concurrency analysis
+      status() << "Must lockset analysis" << eom;
+      must_lock_set_analysis_cst must_lock_set_analysis(
+        in_loop, vsa);
+      must_lock_set_analysis(goto_functions, ns);
+
+      non_concurrentt non_concurrent(
+        goto_functions,
+        in_loop,
+        vsa,
+        must_lock_set_analysis,
+        ns);
+
+      const ai_cst<edt>::state_mapt &state_map=ai_cs.get_state_map();
+
+      const unsigned num_stacks=ai_cs.num_stacks();
+
+      const unsigned num_pairs=1000; // pairs to collect
+      const unsigned same_thread_threshold=50000;
+
+      // pairs of places to collect
+      typedef std::list<std::pair<ai_cst<edt>::placet, ai_cst<edt>::placet>>
+        tmpt;
+      tmpt places;
+
+      srand(time(NULL));
+
+      unsigned same_thread=0;
+      unsigned i; // pairs collected so far
+
+      status() << "Collecting all pairs" << eom;
+
+      for(i=0; i<num_pairs && same_thread<same_thread_threshold;)
+{
+        unsigned stack_idx1=rand()%num_stacks;
+        unsigned stack_idx2=rand()%num_stacks;
+  
+        ai_cst<edt>::state_mapt::const_iterator it1=state_map.begin();
+        ai_cst<edt>::state_mapt::const_iterator it2=state_map.begin();
+
+        std::advance(it1, stack_idx1);
+        std::advance(it2, stack_idx2);
+        assert(it1!=state_map.end());
+        assert(it2!=state_map.end());
+
+        // get stacks of places
+        ai_cs_stackt stack1=ai_cs.get_stack(it1->first);
+        ai_cs_stackt stack2=ai_cs.get_stack(it2->first);
+
+        // copy
+        ai_cs_stackt tid1=stack1;
+        ai_cs_stackt tid2=stack2;
+
+        // get thread ids associated with stacks
+        tid1.remove_top_calls();
+        tid2.remove_top_calls();
+
+        if(tid1==tid2)
+  {
+          same_thread++;
+          continue; // ignore same thread pairs
+  }
+  
+        const ai_cst<edt>::location_mapt &lm1=it1->second;
+        const ai_cst<edt>::location_mapt &lm2=it2->second;
+
+        unsigned location_idx1=rand()%lm1.size();
+        unsigned location_idx2=rand()%lm2.size();
+
+        ai_cst<edt>::location_mapt::const_iterator l_it1=lm1.begin();
+        ai_cst<edt>::location_mapt::const_iterator l_it2=lm2.begin();
+
+        std::advance(l_it1, location_idx1);
+        std::advance(l_it2, location_idx2);
+        assert(l_it1!=lm1.end());
+        assert(l_it2!=lm2.end());
+
+        // get locations of places
+        locationt l1=l_it1->first;
+        locationt l2=l_it2->first;
+
+        ai_cst<edt>::placet p1(stack1, l1);
+        ai_cst<edt>::placet p2(stack2, l2);
+
+        places.push_back(std::make_pair(p1, p2));
+        i++;
+}
+
+      if(i<num_pairs)
+      {
+        result() << "Not enough places" << eom;
+        return 0;
+      }
+
+      unsigned num_lock_protected=0;
+      unsigned num_non_concurrent=0;
+      unsigned num_create_join=0;
+
+      absolute_timet time_start;
+      time_periodt time_period;
+
+      status() << "Non-concurrency check all" << eom;
+
+      time_start=current_time();
+
+      for(tmpt::const_iterator it=places.begin(); it!=places.end(); it++)
+      {
+        bool b1=non_concurrent.is_non_concurrent(it->first, it->second);
+        bool b2=non_concurrent.is_lock_protected(it->first, it->second);
+
+        if(b1)
+          num_create_join++;
+
+        if(b2)
+          num_lock_protected++;
+
+        if(b1 || b2)
+          num_non_concurrent++;
+      }
+
+      time_period=current_time()-time_start;
+
+      statistics() << "*** Statistics all" << eom;
+      statistics() << "Non-concurrency runtime all: " << time_period << eom;
+      statistics() << "Trials all: " << i << eom;
+      statistics() << "Lock protected all: " << num_lock_protected << eom;
+      statistics() << "Create join all: " << num_create_join << eom;
+      statistics() << "Non concurrent all: " << num_non_concurrent << eom;
+
+      status() << "Collecting lock places" << eom;
+
+      // find lock places
+      typedef list<ai_cst<edt>::placet> lock_placest;
+      lock_placest lock_places;
+
+      for(ai_cst<edt>::state_mapt::const_iterator it=state_map.begin();
+          it!=state_map.end(); it++)
+{
+        const ai_cst<edt>::location_mapt &lm=it->second;
+
+        for(ai_cst<edt>::location_mapt::const_iterator l_it=lm.begin();
+            l_it!=lm.end(); l_it++)
+  {
+          if(l_it->first->is_function_call())
+          {
+            irep_idt id=misc::get_function_name(l_it->first);
+            if(id.empty())
+              continue;
+
+            std::string name=id2string(id);
+            if(name==config.ansi_c.lock_function ||
+               name==config.ansi_c.unlock_function)
+            {
+              ai_cs_stackt stack=ai_cs.get_stack(it->first);
+              ai_cst<edt>::placet p(stack, l_it->first);
+              lock_places.push_back(p);
+            }
+          }
+        }
+  }
+  
+      unsigned num_lock_trials=0;
+      unsigned num_lock_lock_protected=0;
+      unsigned num_lock_non_concurrent=0;
+      unsigned num_lock_create_join=0;
+
+      status() << "Non-concurrency check locks" << eom;
+
+      for(lock_placest::const_iterator it1=lock_places.begin();
+          it1!=lock_places.end(); it1++)
+  {
+        for(lock_placest::const_iterator it2=lock_places.begin();
+            it2!=lock_places.end(); it2++)
+        {
+          ai_cs_stackt stack1=it1->first;
+          ai_cs_stackt stack2=it2->first;
+          stack1.remove_top_calls();
+          stack2.remove_top_calls();
+
+          if(stack1==stack2)
+            continue;
+
+          num_lock_trials++;
+
+          bool b1=non_concurrent.is_non_concurrent(*it1, *it2);
+          bool b2=non_concurrent.is_lock_protected(*it1, *it2);
+
+          if(b1)
+            num_lock_create_join++;
+
+          if(b2)
+            num_lock_lock_protected++;
+
+          if(b1 || b2)
+            num_lock_non_concurrent++;
+        }
+
+        if(num_lock_trials>=10*num_pairs)
+        {
+          break;
+        }
+      }
+
+      statistics() << "*** Statistics locks" << eom;
+      statistics() << "Trials locks: " << num_lock_trials << eom;
+      statistics() << "Lock protected locks: " << num_lock_lock_protected <<
+        eom;
+      statistics() << "Create join locks: " << num_lock_create_join << eom;
+      statistics() << "Non concurrent locks: " << num_lock_non_concurrent <<
+        eom;
+
+    return 0;
+  }
+  
     if(cmdline.isset("unwind"))
     {
 
@@ -158,20 +1373,378 @@ int goto_instrument_parse_optionst::doit()
       goto_functions.compute_loop_numbers();
     }
 
-    if(cmdline.isset("show-value-sets"))
+    if(cmdline.isset("show-framework-stats"))
     {
+      status() << "Framework stats" << eom;
+
+      sanitize_location_tags();
+
       do_function_pointer_removal();
-      do_partial_inlining();
-    
-      // recalculate numbers, etc.
+      do_remove_returns();
       goto_functions.update();
 
-      status() << "Pointer Analysis" << eom;
       namespacet ns(symbol_table);
-      value_set_analysist value_set_analysis(ns);
-      value_set_analysis(goto_functions);
 
-      show_value_sets(get_ui(), goto_functions, value_set_analysis);
+      in_loopt in_loop(goto_functions);
+
+      stack_numberingt stack_numbering;
+      trie_stack_numberingt trie_stack_numbering;
+
+      ai_cst<ai_cs_domain_empty> *ai_cs;
+
+      if(cmdline.isset("use-trie-numbering"))
+        ai_cs=new ai_cst<ai_cs_domain_empty>(in_loop, trie_stack_numbering);
+      else
+        ai_cs=new ai_cst<ai_cs_domain_empty>(in_loop, stack_numbering);
+
+      (*ai_cs)(goto_functions, ns);
+      ai_cs->output_stats(statistics());
+      statistics() << eom;
+
+      delete ai_cs;
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-simple-dependency-analysis-stats"))
+    {
+      status() << "Simple dependency analysis stats" << eom;
+
+      sanitize_location_tags();
+
+      do_function_pointer_removal();
+      do_remove_returns();
+      goto_functions.update();
+    
+      namespacet ns(symbol_table);
+
+      // collect lock operations
+      std::vector<exprt> lock_exprs;
+      simple_dependency_analysist::location_sett lock_locations;
+      collect_lock_operations(goto_functions, lock_exprs, lock_locations);
+      if(lock_exprs.empty())
+      {
+        result() << "No lock operations" << eom;
+        return 0;
+      }
+
+      assert(!lock_exprs.empty());
+
+      simple_dependency_analysist::id_sett id_set;
+      simple_dependency_analysist::location_sett location_set;
+      simple_dependency_analysist sda(goto_functions, true);
+
+      absolute_timet time_start;
+      time_periodt time_period;
+
+      time_start=current_time();
+
+      sda(lock_exprs, location_set, id_set);
+
+      time_period=current_time()-time_start;
+      statistics() << " (" << time_period << "s)" << eom;
+
+      sda.output_stats(statistics());
+      statistics() << eom;
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-deadlocks"))
+    {
+#if 0
+      //sanitize missing function names in goto program
+      Forall_goto_functions(f_it, goto_functions)
+      {
+        if(!f_it->second.body_available())
+          continue;
+#if 0
+        if(f_it->first != f_it->second.body.instructions.begin()->function)
+          status() << "FUN!=BEGIN: " << f_it->first << " != " << f_it->second.body.instructions.begin()->function << eom;
+        if(f_it->first != (--f_it->second.body.instructions.end())->function)
+          status() << "FUN!=END:   " << f_it->first << " != " << (--f_it->second.body.instructions.end())->function << eom;
+        if(f_it->second.body.instructions.begin()->function != (--f_it->second.body.instructions.end())->function)
+          status() << "BEGIN!=END: " << f_it->second.body.instructions.begin()->function  << " != " << (--f_it->second.body.instructions.end())->function << eom;
+#endif  
+        f_it->second.body.instructions.begin()->function=f_it->first;
+        (--f_it->second.body.instructions.end())->function=f_it->first;
+        assert(f_it->second.body.instructions.begin()->function==f_it->first);
+        assert(f_it->second.body.instructions.begin()->function==(--f_it->second.body.instructions.end())->function);
+      }
+#endif 
+
+      sanitize_location_tags();
+
+      absolute_timet time_start;
+      time_periodt time_period;
+#if 1
+      do_function_pointer_removal();
+      do_remove_returns();
+      goto_functions.update();
+#endif
+
+      namespacet ns(symbol_table);
+
+      // collect lock operations
+      std::vector<exprt> lock_exprs;
+      simple_dependency_analysist::location_sett lock_locations;
+      collect_lock_operations(goto_functions, lock_exprs, lock_locations);
+      if(lock_exprs.empty())
+      {
+        result() << "No lock operations" << eom;
+        result() << "* potential deadlocks 0" << eom;
+        return 0;
+      }
+
+#ifdef CONTEXT_SENSITIVE
+      in_loopt in_loop(goto_functions);
+
+#if 0
+      status() << "Gathering statistics" << eom;
+      ai_cst<ai_cs_domain_empty> ai_cs(in_loop);
+      ai_cs(goto_functions, ns);
+      ai_cs.output_stats(statistics());
+      statistics() << eom;
+      ai_cs.clear(); // free memory
+#endif
+
+      // stack numbering used by all analyses
+      stack_numberingt stack_numbering;
+
+      value_set_analysis_cst *vsa;
+      if(cmdline.isset("flow-insensitive-value-set-analysis"))
+        vsa=new value_set_analysis_ficst(
+          goto_functions,
+          in_loop,
+          stack_numbering);
+      else
+        vsa=new value_set_analysis_cst(
+          in_loop,
+          stack_numbering);
+      value_set_analysis_cst &value_set_analysis=*vsa;
+
+      bool sda_ii=cmdline.isset("simple-dependency-analysis-ii");
+      bool sda_is=cmdline.isset("simple-dependency-analysis-is");
+      assert(!(sda_ii && sda_is));
+
+      if(sda_ii || sda_is)
+      {
+        status() << "Simple Dependency Analysis";
+
+        assert(!lock_exprs.empty());
+
+        time_start=current_time();
+
+        simple_dependency_analysist::id_sett id_set;
+        simple_dependency_analysist sda(goto_functions, sda_ii);
+        sda(lock_exprs, value_set_analysis.get_slice(), id_set);
+
+        time_period=current_time()-time_start;
+        statistics() << " (" << time_period << "s)" << eom;
+
+        sda.output_stats(statistics());
+        statistics() << eom;
+      }
+
+#if 0
+      std::vector<exprt> lock_exprs;
+      global_dependency_analysist::location_sett lock_locations;
+      collect_lock_operations(goto_functions, lock_exprs, lock_locations);
+      if(!lock_exprs.empty())
+      {
+        global_dependency_analysist gda(goto_functions, ns);
+        gda(lock_exprs, value_set_analysis.get_slice());
+      }
+#endif
+
+      status() << "Pointer Analysis";
+
+      time_start=current_time();
+      value_set_analysis(goto_functions, ns);
+      time_period=current_time()-time_start;
+      statistics() << " (" << time_period << "s)" << eom;
+#if defined(USE_MAP_ONE) && !(defined(FLOW_INSENSITIVE))
+      const value_set_analysis_cst::state_map_onet &smo
+        =value_set_analysis.get_state_map_one();
+      statistics() << "Number of stacks/states: " << smo.size() << eom;;
+      statistics() << "Number of unique states: " << smo.size_unique() << eom;
+#endif
+
+#if 0
+      goto_functions.output(ns, status());
+#endif
+
+      time_start=current_time();
+      status() << "May Lock Set Analysis";
+      may_lock_set_analysis_cst lock_set_analysis(
+        in_loop,
+        value_set_analysis,
+        stack_numbering);
+      lock_set_analysis(goto_functions, ns);
+      time_period=current_time()-time_start;
+      statistics() << " (" << time_period << "s)" << eom;
+      
+      time_start=current_time();
+      status() << "Must Lock Set Analysis";
+      must_lock_set_analysis_cst must_lock_set_analysis(
+        in_loop, value_set_analysis, stack_numbering);
+      must_lock_set_analysis(goto_functions, ns);
+      time_period=current_time()-time_start;
+      statistics() << " (" << time_period << "s)" << eom;
+      must_lock_set_analysis.output_stats(statistics());
+
+      time_start = current_time();
+      status() << "Construct Lock Graph";
+      non_concurrentt non_concurrent(
+        goto_functions,
+        in_loop,
+        value_set_analysis,
+        must_lock_set_analysis,
+        ns);
+      lock_graph_analysis_cst lock_graph_analysis(
+        in_loop,
+        non_concurrent,
+        lock_set_analysis,
+        stack_numbering);
+      lock_graph_analysis(goto_functions, ns);
+      time_period=current_time()-time_start;
+      statistics() << " (" << time_period << "s)" << eom;
+      lock_graph_analysis.show(ns, get_ui(), goto_functions);
+
+      time_start=current_time();
+      status() << "Check Cycles";
+      lock_graph_analysis.detect_deadlocks();
+      time_period=current_time()-time_start;
+      statistics() << " (" << time_period << "s)" << eom;
+      lock_graph_analysis.show_deadlocks(ns, get_ui());
+
+      delete vsa; // value set analysis
+
+#else
+      status() << "Pointer Analysis" << eom;
+      value_set_analysist value_set_analysis;
+      value_set_analysis(goto_functions, ns);
+
+      status() << "Which-Thread Analysis" << eom;
+      which_threads_internalt which_threads(goto_functions);
+
+      status() << "Lock Set Analysis" << eom;
+      lock_set_analysist lock_set_analysis(value_set_analysis);
+      lock_set_analysis(goto_functions, ns);
+
+      status() << "Construct Lock Graph" << eom;
+      lock_graph_analysist lock_graph_analysis(lock_set_analysis, which_threads);
+      lock_graph_analysis(goto_functions, ns);
+      lock_graph_analysis.show(ns, get_ui(), goto_functions);
+
+      lock_graph_analysis.detect_deadlocks();
+      show_deadlocks(ns, get_ui(), goto_functions, lock_graph_analysis);
+#endif
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-may-lock-sets"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Pointer Analysis" << eom;
+      in_loopt in_loop(goto_functions);
+      value_set_analysis_cst value_set_analysis(in_loop);
+
+      std::vector<exprt> lock_exprs;
+      simple_dependency_analysist::location_sett lock_locations;
+      collect_lock_operations(goto_functions, lock_exprs, lock_locations);
+      if(!lock_exprs.empty())
+      {
+	simple_dependency_analysist::id_sett id_set;
+        simple_dependency_analysist sda(goto_functions);
+        sda(lock_exprs, value_set_analysis.get_slice(), id_set);
+      }
+
+      value_set_analysis(goto_functions, ns);
+
+      status() << "Lock set Analysis" << eom;
+      may_lock_set_analysis_cst lock_set_analysis(in_loop, value_set_analysis);
+      lock_set_analysis(goto_functions, ns);
+      lock_set_analysis.show(ns, get_ui(), goto_functions);
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-must-lock-sets"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Pointer Analysis" << eom;
+      in_loopt in_loop(goto_functions);
+      value_set_analysis_cst value_set_analysis(in_loop);
+
+      std::vector<exprt> lock_exprs;
+      simple_dependency_analysist::location_sett lock_locations;
+      collect_lock_operations(goto_functions, lock_exprs, lock_locations);
+      if(!lock_exprs.empty())
+      {
+	simple_dependency_analysist::id_sett id_set;
+        simple_dependency_analysist sda(goto_functions);
+        sda(lock_exprs, value_set_analysis.get_slice(), id_set);
+      }
+
+      value_set_analysis(goto_functions, ns);
+
+      status() << "Lock set Analysis" << eom;
+      must_lock_set_analysis_cst lock_set_analysis(in_loop, value_set_analysis);
+      lock_set_analysis(goto_functions, ns);
+      lock_set_analysis.show(ns, get_ui(), goto_functions);
+
+      return 0;
+    }
+
+
+    if(cmdline.isset("show-lock-sets"))
+    {
+      namespacet ns(symbol_table);
+
+#ifndef CONTEXT_SENSITIVE
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+#endif
+
+      status() << "Pointer Analysis" << eom;
+#ifdef CONTEXT_SENSITIVE
+      in_loopt in_loop(goto_functions);
+      value_set_analysis_cst value_set_analysis(in_loop);
+
+      std::vector<exprt> lock_exprs;
+      simple_dependency_analysist::location_sett lock_locations;
+      collect_lock_operations(goto_functions, lock_exprs, lock_locations);
+      if(!lock_exprs.empty())
+      {
+	simple_dependency_analysist::id_sett id_set;
+        simple_dependency_analysist sda(goto_functions);
+        sda(lock_exprs, value_set_analysis.get_slice(), id_set);
+      }
+#else
+      value_set_analysist value_set_analysis;
+#endif
+      value_set_analysis(goto_functions, ns);
+
+      goto_functions.output(ns, std::cout);
+
+      status() << "Lock set Analysis" << eom;
+#ifdef CONTEXT_SENSITIVE
+      may_lock_set_analysis_cst lock_set_analysis(in_loop, value_set_analysis);
+#else
+      lock_set_analysist lock_set_analysis(value_set_analysis);
+#endif
+      lock_set_analysis(goto_functions, ns);
+
+      lock_set_analysis.show(ns, get_ui(), goto_functions);
+
       return 0;
     }
 
@@ -351,8 +1924,8 @@ int goto_instrument_parse_optionst::doit()
       }
     
       status() << "Pointer Analysis" << eom;
-      value_set_analysist value_set_analysis(ns);
-      value_set_analysis(goto_functions);
+      value_set_analysist value_set_analysis;
+      value_set_analysis(goto_functions, ns);
       
       const symbolt &symbol=ns.lookup(ID_main);
       symbol_exprt main(symbol.name, symbol.type);
@@ -484,6 +2057,16 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-goto-functions"))
     {
       namespacet ns(symbol_table);
+
+      if(cmdline.isset("remove-function-pointers"))
+      {
+        do_function_pointer_removal();
+      }
+      if(cmdline.isset("remove-returns"))
+      {
+        do_remove_returns();
+      }
+
       goto_functions.output(ns, std::cout);
       return 0;
     }
@@ -1013,8 +2596,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     }
     
     status() << "Pointer Analysis" << eom;
-    value_set_analysist value_set_analysis(ns);
-    value_set_analysis(goto_functions);
+    value_set_analysist value_set_analysis;
+    value_set_analysis(goto_functions, ns);
 
     if(cmdline.isset("remove-pointers"))
     {
@@ -1305,6 +2888,10 @@ void goto_instrument_parse_optionst::help()
     " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n"
     " --show-natural-loops         show natural loop heads\n"
+    " --show-value-sets            show results of pointer analysis (full output with xml-ui)\n"
+    " --show-sharing               show results of sharing analysis (full output with xml-ui)\n"
+    " --show-lock-sets             show results of lock-set analysis (full output with xml-ui)\n"
+    " --show-deadlocks             show results of deadlock analysis (full output with xml-ui)\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"

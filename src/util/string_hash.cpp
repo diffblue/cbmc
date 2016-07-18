@@ -8,6 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_hash.h"
 
+#include <cassert>
+#include <iostream>
+
 /*******************************************************************\
 
 Function: hash_string

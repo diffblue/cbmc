@@ -155,7 +155,7 @@ bool interval_domaint::merge(
     const int_mapt::const_iterator b_it=b.int_map.begin();
     if(b_it==b.int_map.end())
     {
-      it=int_map.erase(it);
+      it=int_map.erase(it); // since C++11 erase() returns next
       result=true;
     }
     else

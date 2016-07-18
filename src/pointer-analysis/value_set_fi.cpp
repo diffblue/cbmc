@@ -303,7 +303,7 @@ Function: value_set_fit::make_union
 
 bool value_set_fit::make_union(const value_set_fit::valuest &new_values)
 {
-  assert(0);
+  //assert(0); //TODO: Not sure why this should not be called...
   bool result=false;
   
   for(valuest::const_iterator

@@ -1,0 +1,8 @@
+CORE
+main.c
+"--show-sharing --xml-ui"
+^EXIT=0$
+^SIGNAL=0$
+^    <race>$
+--
+^warning: ignoring

@@ -8,14 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <util/xml.h>
-
-#include "value_set_analysis.h"
-#include "show_value_sets.h"
+#include "show_analysis.h"
 
 /*******************************************************************\
 
-Function: show_value_sets
+Function: show_analysist::show
 
   Inputs:
 
@@ -25,23 +22,23 @@ Function: show_value_sets
 
 \*******************************************************************/
 
-void show_value_sets(
+void show_analysist::show(
+  const namespacet &ns,
   ui_message_handlert::uit ui,
-  const goto_functionst &goto_functions,
-  const value_set_analysist &value_set_analysis)
+  const goto_functionst &goto_functions)
 {
   switch(ui)
   {
   case ui_message_handlert::XML_UI:
     {
       xmlt xml;
-      convert(goto_functions, value_set_analysis, xml);
+      convert(ns, goto_functions, xml);
       std::cout << xml << std::endl;
     }
     break;
     
   case ui_message_handlert::PLAIN:
-    value_set_analysis.output(goto_functions, std::cout);
+    output(ns, goto_functions, std::cout);
     break;
       
   default:;
@@ -50,7 +47,7 @@ void show_value_sets(
 
 /*******************************************************************\
 
-Function: show_value_sets
+Function: show_analysist::show
 
   Inputs:
 
@@ -60,23 +57,23 @@ Function: show_value_sets
 
 \*******************************************************************/
 
-void show_value_sets(
+void show_analysist::show(
+  const namespacet &ns,
   ui_message_handlert::uit ui,
-  const goto_programt &goto_program,
-  const value_set_analysist &value_set_analysis)
+  const goto_programt &goto_program)
 {
   switch(ui)
   {
   case ui_message_handlert::XML_UI:
     {
       xmlt xml;
-      convert(goto_program, value_set_analysis, xml);
+      convert(ns, goto_program, xml);
       std::cout << xml << std::endl;
     }
     break;
     
   case ui_message_handlert::PLAIN:
-    value_set_analysis.output(goto_program, std::cout);
+    output(ns, goto_program, std::cout);
     break;
       
   default:;

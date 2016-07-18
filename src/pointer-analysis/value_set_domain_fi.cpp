@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 
 #include "value_set_domain_fi.h"
+#include "value_set_domain.h"
 
 /*******************************************************************\
 
@@ -23,10 +24,11 @@ Function: value_set_domain_fit::transform
 
 \*******************************************************************/
 
-bool value_set_domain_fit::transform(
-  const namespacet &ns,
+void value_set_domain_fit::transform(
   locationt from_l,
-  locationt to_l)
+    locationt to_l,
+    ai_baset &ai,
+    const namespacet &ns)
 { 
   value_set.changed = false;
   
@@ -44,7 +46,7 @@ bool value_set_domain_fit::transform(
     break;
 
   case END_FUNCTION:    
-    value_set.do_end_function(get_return_lhs(to_l), ns);
+    value_set.do_end_function(value_set_domaint::get_return_lhs(to_l), ns);
     break;
   
   case RETURN:
@@ -65,6 +67,4 @@ bool value_set_domain_fit::transform(
   default:;
     // do nothing
   }
-  
-  return (value_set.changed);
 }

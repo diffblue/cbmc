@@ -949,16 +949,17 @@ Function: reaching_definitions_analysist::initialize
 \*******************************************************************/
 
 void reaching_definitions_analysist::initialize(
-  const goto_functionst &goto_functions)
+  const goto_functionst &goto_functions,
+  const namespacet &ns)
 {
-  value_set_analysis_fit *value_sets_=new value_set_analysis_fit(ns);
-  (*value_sets_)(goto_functions);
+  value_set_analysis_fit *value_sets_=new value_set_analysis_fit;
+  (*value_sets_)(goto_functions, ns);
   value_sets=value_sets_;
 
   is_threaded=new is_threadedt(goto_functions);
 
   is_dirty=new dirtyt(goto_functions);
 
-  concurrency_aware_ait<rd_range_domaint>::initialize(goto_functions);
+  concurrency_aware_ait<rd_range_domaint>::initialize(goto_functions, ns);
 }
 

@@ -84,3 +84,35 @@ void invariant_set_domaint::transform(
     // do nothing
   }
 }
+
+/*******************************************************************\
+
+Function: invariant_set_domaint::get_guard
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt invariant_set_domaint::get_guard(
+  locationt from,
+  locationt to)
+{
+  if(!from->is_goto())
+    return true_exprt();
+
+  locationt next=from;
+  next++;
+
+  if(next==to)
+  {
+    exprt tmp(from->guard);
+    tmp.make_not();
+    return tmp;
+  }
+  
+  return from->guard;
+}

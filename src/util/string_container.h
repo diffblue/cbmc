@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 #include <vector>
+#include <iostream>
 
 #include "hash_cont.h"
 #include "string_hash.h"
@@ -39,7 +40,10 @@ bool operator==(const string_ptrt a, const string_ptrt b);
 class string_ptr_hash
 {
 public:
-  size_t operator()(const string_ptrt s) const { return hash_string(s.s); }
+  size_t operator()(const string_ptrt s) const
+  {
+    return hash_string(s.s);
+  }
 };
 
 class string_containert

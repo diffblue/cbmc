@@ -209,7 +209,8 @@ public:
   virtual ~reaching_definitions_analysist();
 
   virtual void initialize(
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions,
+    const namespacet &ns);
 
   virtual statet &get_state(goto_programt::const_targett l)
   {

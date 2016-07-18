@@ -1,0 +1,11 @@
+CORE
+main.c
+--print-reachable
+^EXIT=0$
+^SIGNAL=0$
+^func1::f -> thread1$
+^func1::f -> thread2$
+^func2::f -> thread1$
+^func2::f -> thread2$
+--
+^warning: ignoring

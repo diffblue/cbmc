@@ -1,0 +1,7 @@
+CORE
+main.c
+"--verbosity 10 --is-lock-protected --stack1 _start,12,function_call;main,2,thread_create --loc1 rx\s*=\s*2 --stack2 _start,12,function_call;main,3,thread_create --loc2 ry\s*=\s*1"
+^EXIT=11$
+^SIGNAL=0$
+--
+^warning: ignoring

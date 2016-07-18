@@ -1,0 +1,8 @@
+CORE
+main.c
+"--in-loop 1"
+^EXIT=0$
+^SIGNAL=0$
+true$
+--
+^warning: ignoring

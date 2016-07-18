@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_model.h>
 
+#include "show_analysis.h"
+
 // forward reference
 class ai_baset;
 
@@ -78,7 +80,7 @@ public:
 
 // don't use me -- I am just a base class
 // use ait instead
-class ai_baset
+class ai_baset : public show_analysist
 {
 public:
   typedef ai_domain_baset statet;
@@ -97,7 +99,7 @@ public:
     const namespacet &ns)
   {
     goto_functionst goto_functions;
-    initialize(goto_program);
+    initialize(goto_program, ns);
     entry_state(goto_program);
     fixedpoint(goto_program, goto_functions, ns);
   }
@@ -106,7 +108,7 @@ public:
     const goto_functionst &goto_functions,
     const namespacet &ns)
   {
-    initialize(goto_functions);
+    initialize(goto_functions, ns);
     entry_state(goto_functions);
     fixedpoint(goto_functions, ns);
   }
@@ -124,7 +126,7 @@ public:
     const namespacet &ns)
   {
     goto_functionst goto_functions;
-    initialize(goto_function);
+    initialize(goto_function, ns);
     entry_state(goto_function.body);
     fixedpoint(goto_function.body, goto_functions, ns);
   }
@@ -164,9 +166,9 @@ public:
 
 protected:
   // overload to add a factory
-  virtual void initialize(const goto_programt &);
-  virtual void initialize(const goto_functionst::goto_functiont &);
-  virtual void initialize(const goto_functionst &);
+  virtual void initialize(const goto_programt &, const namespacet &);
+  virtual void initialize(const goto_functionst::goto_functiont &, const namespacet &);
+  virtual void initialize(const goto_functionst &, const namespacet &);
 
   void entry_state(const goto_programt &);
   void entry_state(const goto_functionst &);
@@ -247,7 +249,7 @@ protected:
   virtual statet* make_temporary_state(const statet &s)=0;
 };
 
-// domainT is expected to be derived from ai_domain_baseT
+// domainT is expected to be derived from ai_domain_baset
 template<typename domainT>
 class ait:public ai_baset
 {

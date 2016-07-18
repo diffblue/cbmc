@@ -95,7 +95,8 @@ public:
     const namespacet &);
 
 protected:
-  virtual void initialize(const goto_functionst &_goto_functions)
+  virtual void initialize(const goto_functionst &_goto_functions,
+    const namespacet &ns)
   {
   }
 

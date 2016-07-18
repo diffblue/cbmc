@@ -12,6 +12,10 @@ Author: CM Wintersteiger
 #include <direct.h>
 #endif
 
+#ifdef __sun
+#include "sys/stat.h"
+#endif
+
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
@@ -77,7 +81,21 @@ std::string get_temporary_directory(const std::string &name_template)
 
     char t[1000];
     strncpy(t, prefixed_name_template.c_str(), 1000);
+    
+    #ifdef __sun
+    const char *td = 0;
+
+    {
+      char *dname;
+      if ((dname = mktemp(t))) {
+        if (mkdir(dname, 0700) >= 0) {
+          td = dname;
+        }
+      }
+    }
+    #else
     const char *td = mkdtemp(t);
+    #endif
     if(!td) throw "mkdtemp failed";
     result=std::string(td);
   #endif

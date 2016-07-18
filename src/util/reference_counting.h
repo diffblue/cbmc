@@ -87,7 +87,7 @@ protected:
 
   void remove_ref(dt *old_d);
   
-  void detatch();
+  virtual void detatch();
   
   void copy_from(const reference_counting &other)
   {
@@ -186,5 +186,55 @@ inline bool operator!=(
   const reference_counting<T> &i1,
   const reference_counting<T> &i2)
 { return !(i1==i2); }
+
+#if 0
+template<typename T, typename U>
+class reference_counting_arg:public reference_counting<T>
+{
+public:
+  reference_counting_arg(const U &v) : v(v) {}
+
+  using reference_counting<T>::d;
+  using reference_counting<T>::remove_ref;
+  using typename reference_counting<T>::dt;
+
+  virtual void detatch()
+  {
+    #ifdef REFERENCE_COUNTING_DEBUG
+    std::cout << "DETATCH1: " << d << std::endl;
+    #endif
+
+    if(d==NULL)
+    {
+      d=new dt(v);
+
+      #ifdef REFERENCE_COUNTING_DEBUG
+      std::cout << "ALLOCATED " << d << std::endl;
+      #endif
+    }
+    else if(d->ref_count>1)
+    {
+      dt *old_d(d);
+      d=new dt(*old_d);
+
+      #ifdef REFERENCE_COUNTING_DEBUG
+      std::cout << "ALLOCATED " << d << std::endl;
+      #endif
+
+      d->ref_count=1;
+      remove_ref(old_d);
+    }
+
+    assert(d->ref_count==1);
+
+    #ifdef REFERENCE_COUNTING_DEBUG
+    std::cout << "DETATCH2: " << d << std::endl;
+    #endif
+  }
+
+private:
+  const U &v;
+};
+#endif
 
 #endif

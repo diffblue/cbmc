@@ -14,43 +14,33 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_fi.h"
 
-class value_set_domain_fit:public flow_insensitive_abstract_domain_baset
+class value_set_domain_fit:public ai_domain_baset
 {
 public:
   value_set_fit value_set;
 
   // overloading  
 
-//  virtual bool merge(const value_set_domain_fit &other)
-//  {
-//    return value_set.make_union(other.value_set);
-//  }
-
+  virtual bool merge(const value_set_domain_fit &other,    
+		     locationt from,
+		     locationt to)
+  {
+    return value_set.make_union(other.value_set);
+  }
+    
   virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const
+    std::ostream &out,
+    const ai_baset &ai,
+    const namespacet &ns) const
   {
     value_set.output(ns, out);
   }
-    
-  virtual void initialize(
-    const namespacet &ns)
-  {
-    value_set.clear();    
-  }
 
-  virtual bool transform(
-    const namespacet &ns,
-    locationt from_l,
-    locationt to_l);
-
-  virtual void get_reference_set(
-    const namespacet &ns,
-    const exprt &expr,
-    expr_sett &expr_set)
-  {
-    value_set.get_reference_set(expr, expr_set, ns);
-  }
+  virtual void transform(
+    locationt from,
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns);
   
   virtual void clear( void )
   {

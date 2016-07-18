@@ -117,6 +117,16 @@ public:
     libt lib;
 
     bool string_abstraction;
+    
+    std::string create_thread;
+    unsigned create_thread_arg_no_of_function;
+    unsigned create_thread_arg_no_of_arg;
+    
+    std::string join_thread;
+
+    std::string lock_function;
+    std::string unlock_function;
+
   } ansi_c;
   
   struct cppt
