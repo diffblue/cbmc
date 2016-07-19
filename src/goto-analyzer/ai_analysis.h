@@ -24,7 +24,7 @@ class ai_analysist:public messaget {
 
   public:
     ai_analysist(
-	  const goto_modelt &_goto_model,
+	  goto_modelt &_goto_model,
 	  const optionst &_options,
 	  message_handlert &_message_handler):
 	  messaget(_message_handler),
@@ -46,7 +46,7 @@ class ai_analysist:public messaget {
       std::ostream &);
 
   protected:
-    const goto_functionst &goto_functions;
+    goto_functionst &goto_functions;
     const namespacet ns;
     const optionst &options;
 

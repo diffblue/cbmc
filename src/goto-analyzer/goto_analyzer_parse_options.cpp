@@ -368,7 +368,8 @@ int goto_analyzer_parse_optionst::doit()
       else if (cmdline.isset("simplify"))
       {
         static_simplifiert simplifier(goto_model, options, get_message_handler());
-        result=simplifier();
+        simplifier.simplify_guards();
+        return 0;
       }
       return result?10:0;
   }
