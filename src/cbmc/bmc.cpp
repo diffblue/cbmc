@@ -35,6 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_pso.h>
 
 #include "counterexample_beautification.h"
+#include "fault_localization.h"
 #include "bmc.h"
 
 /*******************************************************************\
@@ -588,6 +589,11 @@ safety_checkert::resultt bmct::stop_on_fail(
   const goto_functionst &goto_functions,
   prop_convt &prop_conv)
 {
+  if(options.get_bool_option("localize-faults"))
+  {
+    //ENHANCE: currently, requires only freezing of guards
+    prop_conv.set_all_frozen();
+  }
   switch(run_decision_procedure(prop_conv))
   {
   case decision_proceduret::D_UNSATISFIABLE:
@@ -602,6 +608,11 @@ safety_checkert::resultt bmct::stop_on_fail(
           dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
 
       error_trace();
+    }
+    if(options.get_bool_option("localize-faults"))
+    {
+      fault_localizationt fault_localization(options);
+      fault_localization(dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
     }
     
     report_failure();
