@@ -476,8 +476,13 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
+      //check whether we should simplify the goto-program before showing it
+      if (cmdline.isset("simplify"))
+      {
+        static_simplifiert simplifier(goto_model, options, get_message_handler());
+      	simplifier.simplify_guards();
+      }
       namespacet ns(goto_model.symbol_table);
-
       goto_model.goto_functions.output(ns, std::cout);
       return true;
     }

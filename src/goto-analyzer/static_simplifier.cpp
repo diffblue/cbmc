@@ -8,7 +8,7 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 
 #include "static_simplifier.h"
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -49,14 +49,15 @@ void static_simplifiert::simplify_guards()
         tvt r=eval(i_it);
 
         if(r.is_true())
-    	  i_it->guard=true_exprt();
-        else if(r.is_false())
-    	  i_it->guard=false_exprt();
-
-        if(r.is_true())
+        {
           pass++;
+    	  i_it->guard=true_exprt();
+        }
         else if(r.is_false())
+        {
           fail++;
+    	  i_it->guard=false_exprt();
+        }
         else
           unknown++;
       }
