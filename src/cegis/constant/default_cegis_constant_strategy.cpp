@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <cegis/cegis-util/constant_width.h>
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/instrument/literals.h>
