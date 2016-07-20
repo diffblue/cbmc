@@ -3365,7 +3365,10 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
       int_op=&op0;
     }
     else
+    {
+      p_op=int_op=nullptr;
       assert(false);
+    }
 
     const typet &int_op_type=follow(int_op->type());
 
