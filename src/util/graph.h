@@ -25,7 +25,7 @@ template<class E=empty_edget>
 class graph_nodet
 {
 public:
-  typedef unsigned node_indext;
+  typedef std::size_t node_indext;
 
   typedef E edget;
   typedef std::map<node_indext, edget> edgest;
@@ -39,7 +39,7 @@ public:
   
   inline void add_out(node_indext n)
   {
-    out.insert(std::pair<unsigned, edget>(n, edget()));
+    out.insert(std::pair<node_indext, edget>(n, edget()));
   }
 
   inline void erase_in(node_indext n)
@@ -229,12 +229,12 @@ protected:
     std::vector<unsigned> depth;
     std::vector<unsigned> lowlink;
     std::vector<bool> in_scc;
-    std::stack<unsigned> scc_stack;
-    std::vector<unsigned> &subgraph_nr;
+    std::stack<node_indext> scc_stack;
+    std::vector<node_indext> &subgraph_nr;
 
-    unsigned scc_count, max_dfs;
+    std::size_t scc_count, max_dfs;
 
-    tarjant(unsigned n, std::vector<unsigned> &_subgraph_nr):
+    tarjant(std::size_t n, std::vector<node_indext> &_subgraph_nr):
       subgraph_nr(_subgraph_nr)
     {
       visited.resize(n, false);
@@ -246,7 +246,7 @@ protected:
     }  
   };
 
-  void tarjan(class tarjant &t, unsigned v);
+  void tarjan(class tarjant &t, node_indext v);
 
   void shortest_path(
     node_indext src,
@@ -518,7 +518,7 @@ std::size_t graph<N>::connected_subgraphs(
   visited.resize(nodes.size(), false);
   subgraph_nr.resize(nodes.size(), 0);
 
-  unsigned nr=0;
+  std::size_t nr=0;
   
   for(node_indext src=0; src<size(); src++)
   {
@@ -566,7 +566,7 @@ Function: graph::tarjan
 \*******************************************************************/
 
 template<class N>
-void graph<N>::tarjan(tarjant &t, unsigned v)
+void graph<N>::tarjan(tarjant &t, node_indext v)
 {
   t.scc_stack.push(v);
   t.in_scc[v]=true;
@@ -581,7 +581,7 @@ void graph<N>::tarjan(tarjant &t, unsigned v)
       it!=node.out.end();
       it++)
   {
-    unsigned vp=it->first;
+    node_indext vp=it->first;
     if(!t.visited[vp])
     {
       tarjan(t, vp);
@@ -597,7 +597,7 @@ void graph<N>::tarjan(tarjant &t, unsigned v)
     while(true)
     {
       assert(!t.scc_stack.empty());
-      unsigned vp=t.scc_stack.top();
+      node_indext vp=t.scc_stack.top();
       t.scc_stack.pop();
       t.in_scc[vp]=false;
       t.subgraph_nr[vp]=t.scc_count;
