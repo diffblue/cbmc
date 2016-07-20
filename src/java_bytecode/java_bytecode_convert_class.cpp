@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#include "java_bytecode_convert.h"
+#include "java_bytecode_convert_class.h"
 #include "java_class_identifier.h"
 #include "java_types.h"
 #include "java_bytecode_convert_method.h"
@@ -21,10 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 
 namespace {
-class java_bytecode_convertt:public messaget
+class java_bytecode_convert_classt:public messaget
 {
 public:
-  java_bytecode_convertt(
+  java_bytecode_convert_classt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
     messaget(_message_handler),
@@ -59,7 +59,7 @@ protected:
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::convert
+Function: java_bytecode_convert_classt::convert
 
   Inputs:
 
@@ -69,7 +69,7 @@ Function: java_bytecode_convertt::convert
 
 \*******************************************************************/
 
-void java_bytecode_convertt::convert(const classt &c)
+void java_bytecode_convert_classt::convert(const classt &c)
 {
   class_typet class_type;
 
@@ -132,7 +132,7 @@ void java_bytecode_convertt::convert(const classt &c)
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::generate_class_stub
+Function: java_bytecode_convert_classt::generate_class_stub
 
   Inputs:
 
@@ -142,7 +142,7 @@ Function: java_bytecode_convertt::generate_class_stub
 
 \*******************************************************************/
 
-void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
+void java_bytecode_convert_classt::generate_class_stub(const irep_idt &class_name)
 {
   class_typet class_type;
 
@@ -176,7 +176,7 @@ void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::convert
+Function: java_bytecode_convert_classt::convert
 
   Inputs:
 
@@ -186,7 +186,7 @@ Function: java_bytecode_convertt::convert
 
 \*******************************************************************/
 
-void java_bytecode_convertt::convert(
+void java_bytecode_convert_classt::convert(
   symbolt &class_symbol,
   const fieldt &f)
 {
@@ -236,7 +236,7 @@ void java_bytecode_convertt::convert(
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::add_array_types
+Function: java_bytecode_convert_classt::add_array_types
 
   Inputs:
 
@@ -246,7 +246,7 @@ Function: java_bytecode_convertt::add_array_types
 
 \*******************************************************************/
 
-void java_bytecode_convertt::add_array_types()
+void java_bytecode_convert_classt::add_array_types()
 {
   const char letters[]="ijsbcfdza";
 
@@ -279,7 +279,7 @@ void java_bytecode_convertt::add_array_types()
 
 /*******************************************************************\
 
-Function: java_bytecode_convert
+Function: java_bytecode_convert_class
 
   Inputs:
 
@@ -289,17 +289,17 @@ Function: java_bytecode_convert
 
 \*******************************************************************/
 
-bool java_bytecode_convert(
+bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  java_bytecode_convertt java_bytecode_convert(
+  java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table, message_handler);
 
   try
   {
-    java_bytecode_convert(parse_tree);
+    java_bytecode_convert_class(parse_tree);
     return false;
   }
 
@@ -309,12 +309,12 @@ bool java_bytecode_convert(
 
   catch(const char *e)
   {
-    java_bytecode_convert.error() << e << messaget::eom;
+    java_bytecode_convert_class.error() << e << messaget::eom;
   }
 
   catch(const std::string &e)
   {
-    java_bytecode_convert.error() << e << messaget::eom;
+    java_bytecode_convert_class.error() << e << messaget::eom;
   }
 
   return true;
