@@ -319,7 +319,7 @@ Function: dep_graph_domaint::output
 
 void dep_graph_domaint::output(
   std::ostream &out,
-  const ai_baset &ai,
+  const ai_baset &,
   const namespacet &ns) const
 {
   if(!control_deps.empty())

@@ -49,7 +49,7 @@ public:
   };
 
   typedef graph<nodet> grapht;
-  typedef std::map<irep_idt,std::list<unsigned> > current_lockst;
+  typedef std::map<irep_idt,std::list<std::size_t> > current_lockst;
 
   static bool has_node(const grapht &_graph, const nodet &node, grapht::node_indext &n);
   void push_lock(const namespacet &ns,

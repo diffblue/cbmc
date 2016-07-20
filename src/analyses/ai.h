@@ -116,7 +116,7 @@ public:
   inline void operator()(const goto_modelt &goto_model)
   {
     const namespacet ns(goto_model.symbol_table);
-    initialize(goto_model.goto_functions);
+    initialize(goto_model.goto_functions, ns);
     entry_state(goto_model.goto_functions);
     fixedpoint(goto_model.goto_functions, ns);
   }

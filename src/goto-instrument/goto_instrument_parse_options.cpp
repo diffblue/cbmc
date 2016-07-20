@@ -1280,7 +1280,7 @@ int goto_instrument_parse_optionst::doit()
       status() << "Collecting lock places" << eom;
 
       // find lock places
-      typedef list<ai_cst<edt>::placet> lock_placest;
+      typedef std::list<ai_cst<edt>::placet> lock_placest;
       lock_placest lock_places;
 
       for(ai_cst<edt>::state_mapt::const_iterator it=state_map.begin();

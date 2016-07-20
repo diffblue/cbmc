@@ -67,7 +67,7 @@ public:
 
   virtual void output(
     std::ostream &out,
-    const ai_baset &ai,
+    const ai_baset &,
     const namespacet &ns) const
   {
     value_sett::output(ns, out, object_map);

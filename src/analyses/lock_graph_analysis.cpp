@@ -180,7 +180,7 @@ void lock_graph_domaint::push_lock(const namespacet &ns,
   assert(!lock_graph_analysis.current_locks[thread_category].empty());
   unsigned prev_index = lock_graph_analysis.current_locks[thread_category].back();
   nodet node(lock);
-  unsigned node_index = -1;
+  std::size_t node_index = -1;
   bool node_exists = has_node(lock_graph_analysis.lock_graph,node,node_index);
   bool edge_exists = false;
   

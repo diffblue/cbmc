@@ -94,24 +94,26 @@ public:
   }
 
   virtual void transform(
-      locationt from,
-      locationt to,
-      ai_baset &ai,
-      const namespacet &ns);
+    locationt from,
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns);
 
   virtual void output(
-      std::ostream &out,
-      const ai_baset &ai,
-      const namespacet &ns) const
+    std::ostream &out,
+    const ai_baset &,
+    const namespacet &) const
   {
     output(out);
   }
 
   // returns true iff there is s.th. new
+
   bool merge(
     const rd_range_domaint &other,
     locationt from,
     locationt to);
+
   bool merge_shared(
     const rd_range_domaint &other,
     locationt from,

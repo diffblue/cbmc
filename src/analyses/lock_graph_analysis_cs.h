@@ -114,11 +114,11 @@ public:
 
   struct statisticst {
     std::set<ai_cs_stackt> threads;
-    unsigned no_lock_operations;
-    unsigned no_indet_lock_operations;
-    unsigned long size_largest_lock_set;
-    unsigned no_non_concurrent_checks;
-    unsigned no_cycles;
+    std::size_t no_lock_operations;
+    std::size_t no_indet_lock_operations;
+    std::size_t size_largest_lock_set;
+    std::size_t no_non_concurrent_checks;
+    std::size_t no_cycles;
 
     statisticst() :
       no_lock_operations(0),
