@@ -64,11 +64,11 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_qualifiers.is_ptr64=true;
   else if(type.id()==ID_volatile)
     c_qualifiers.is_volatile=true;
-  else if(type.id()==ID_asm &&
-          type.has_subtype() &&
-          type.subtype().id()==ID_string_constant)
+  else if(type.id()==ID_asm)
   {
-    c_storage_spec.asm_label=type.subtype().get(ID_value);
+    if(type.has_subtype() &&
+       type.subtype().id()==ID_string_constant)
+      c_storage_spec.asm_label=type.subtype().get(ID_value);
   }
   else if(type.id()==ID_section &&
           type.has_subtype() &&
