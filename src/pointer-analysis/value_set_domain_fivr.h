@@ -30,7 +30,7 @@ public:
 
   virtual void output(
     std::ostream &out,
-    ai_baset &ai,
+    const ai_baset &,
     const namespacet &ns) const
   {
     value_set.output(ns, out);

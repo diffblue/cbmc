@@ -24,8 +24,9 @@ public:
     const namespacet &ns);
 
   virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const;
+    std::ostream &out,
+    const ai_baset &ai,
+    const namespacet &ns) const;
   
   // returns true iff there is s.th. new
   bool merge(const uninitialized_domaint &other, 

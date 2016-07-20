@@ -39,9 +39,9 @@ public:
     const namespacet &ns);
 
   virtual void output(
-      std::ostream &out,
-      const ai_baset &ai,
-      const namespacet &ns) const;
+    std::ostream &,
+    const ai_baset &,
+    const namespacet &) const;
 
   void set_node_id(unsigned id)
   {

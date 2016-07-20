@@ -92,8 +92,9 @@ Function: uninitialized_domaint::output
 \*******************************************************************/
 
 void uninitialized_domaint::output(
-  const namespacet &ns,
-  std::ostream &out) const
+  std::ostream &out,
+  const ai_baset &,
+  const namespacet &ns) const
 {
   for(uninitializedt::const_iterator
       it=uninitialized.begin();

@@ -30,9 +30,9 @@ Function: interval_domaint::output
 \*******************************************************************/
 
 void interval_domaint::output(
-    std::ostream &out,
-    const ai_baset &ai,
-    const namespacet &ns) const
+  std::ostream &out,
+  const ai_baset &,
+  const namespacet &ns) const
 {
   for(int_mapt::const_iterator
       i_it=int_map.begin(); i_it!=int_map.end(); i_it++)

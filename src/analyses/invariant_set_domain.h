@@ -26,8 +26,9 @@ public:
   }
 
   virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const
+    std::ostream &out,
+    const ai_baset &ai,
+    const namespacet &ns) const
   {
     invariant_set.output("", out);
   }
