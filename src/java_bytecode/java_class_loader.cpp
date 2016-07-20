@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 
 #include <util/suffix.h>
+#include <util/prefix.h>
 #include <util/config.h>
 
 #include "java_bytecode_parser.h"
@@ -254,10 +255,21 @@ std::string java_class_loadert::file_to_class_name(const std::string &file)
 {
   std::string result=file;
 
-  // strip .class
+  // Strip .class. Note that the Java class loader would
+  // not do that.
   if(has_suffix(result, ".class"))
     result.resize(result.size()-6);
     
+  // Strip a "./" prefix. Note that the Java class loader
+  // would not do that.
+  #ifdef _WIN32
+  while(has_prefix(result, ".\\"))
+    result=std::string(result, 2, std::string::npos);
+  #else
+  while(has_prefix(result, "./"))
+    result=std::string(result, 2, std::string::npos);
+  #endif
+
   // slash to dot
   for(std::string::iterator it=result.begin(); it!=result.end(); it++)
     if(*it=='/') *it='.';
