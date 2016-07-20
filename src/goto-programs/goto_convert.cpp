@@ -999,7 +999,7 @@ void goto_convertt::convert_skip(
 
 /*******************************************************************\
 
-Function: goto_convertt::convert_assert
+Function: goto_convertt::convert_assume
 
   Inputs:
 
