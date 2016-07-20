@@ -1650,7 +1650,10 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
         else if(expr.id()==ID_equal)
           tmp=(int_value0 == int_value1);
         else
+        {
+          tmp=false;
           assert(0);
+        }
 
         if(first)
         {
