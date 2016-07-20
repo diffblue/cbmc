@@ -1352,7 +1352,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.empty() && results.size()==1);
       symbol_exprt symbol_expr(arg0.type());
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+arg0.get_string(ID_component_name));
-      results[0]=symbol_expr;
+      results[0]=java_bytecode_promotion(symbol_expr);
     }
     else if(statement=="putfield")
     {
