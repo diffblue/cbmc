@@ -7,32 +7,16 @@ if [ -e gcc-builtins.h ] ; then
   exit 1
 fi
 
-echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/builtin-types.def
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/builtin-types.def > /dev/null
+builtin_defs=" \
+  builtin-types.def builtins.def sync-builtins.def \
+  omp-builtins.def gtm-builtins.def cilk-builtins.def cilkplus.def \
+  sanitizer.def chkp-builtins.def hsa-builtins.def"
 
-echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/builtins.def
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/builtins.def > /dev/null
-
-echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/sync-builtins.def
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/sync-builtins.def > /dev/null
-
-echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/omp-builtins.def
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/omp-builtins.def > /dev/null
-
-echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/gtm-builtins.def
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/gtm-builtins.def > /dev/null
-
-echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/cilk-builtins.def
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/cilk-builtins.def > /dev/null
-
-echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/cilkplus.def
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/cilkplus.def > /dev/null
-
-echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/sanitizer.def
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/sanitizer.def > /dev/null
-
-echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/chkp-builtins.def
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/chkp-builtins.def > /dev/null
+for f in $builtin_defs ; do
+  [ ! -s $f ] || continue
+  echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/$f
+  svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/$f > /dev/null
+done
 
 cat > gcc-builtins.h <<EOF
 #include <inttypes.h>
@@ -78,6 +62,7 @@ cat > builtins.h <<EOF
 #define uint32_type_node uint32_t
 #define uint64_type_node uint64_t
 #define pid_type_node pid_t
+#define const_tm_ptr_type_node const struct tm*
 
 // some newer versions of GCC apparently support __floatXYZ
 #define dfloat32_type_node __float32
@@ -87,6 +72,7 @@ cat > builtins.h <<EOF
 #define build_qualified_type(t, q) q t
 #define build_pointer_type(t) t*
 #define TYPE_QUAL_VOLATILE volatile
+#define TYPE_QUAL_CONST const
 
 #define DEF_PRIMITIVE_TYPE(ENUM, TYPE) \
 NEXTDEF ENUM TYPE
@@ -106,11 +92,17 @@ NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5)
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)
 #define DEF_FUNCTION_TYPE_7(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7) \
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)
-#define DEF_FUNCTION_TYPE_8(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8)
+#define DEF_FUNCTION_TYPE_8(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8) \
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8)
+#define DEF_FUNCTION_TYPE_9(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9) \
+NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9)
+#define DEF_FUNCTION_TYPE_10(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9, ARG10) \
+NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9, ARG10)
+#define DEF_FUNCTION_TYPE_11(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9, ARG10, ARG11) \
+NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9, ARG10, ARG11)
 
 #define DEF_FUNCTION_TYPE_VAR_0(ENUM, RETURN) \
-NEXTDEF ENUM(name) /* RETURN name(...) -- this is a macro */
+NEXTDEF ENUM(name) RETURN name()
 #define DEF_FUNCTION_TYPE_VAR_1(ENUM, RETURN, ARG1) \
 NEXTDEF ENUM(name) RETURN name(ARG1, ...)
 #define DEF_FUNCTION_TYPE_VAR_2(ENUM, RETURN, ARG1, ARG2) \
@@ -121,6 +113,10 @@ NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ...)
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ...)
 #define DEF_FUNCTION_TYPE_VAR_5(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5) \
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ...)
+#define DEF_FUNCTION_TYPE_VAR_6(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6) \
+NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ...)
+#define DEF_FUNCTION_TYPE_VAR_7(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7) \
+NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ...)
 
 #define DEF_POINTER_TYPE(ENUM, TYPE) \
 NEXTDEF ENUM TYPE*
@@ -137,15 +133,25 @@ gcc -E builtins.h | sed 's/^NEXTDEF/#define/' | cat - builtins.def | \
   sed 's/MANGLE("__builtin_" "\(.*\)")/__builtin_\1/' | \
   sed '/^;$/d' >> gcc-builtins.h
 
-rm builtin-types.def builtins.def sync-builtins.def omp-builtins.def gtm-builtins.def cilk-builtins.def cilkplus.def sanitizer.def
-rm builtins.h
+rm $builtin_defs builtins.h
 
 # for some we don't know how to handle them - removing symbols should be safe
-sed -i '/MANGLE/d' gcc-builtins.h
-sed -i '/builtin_type_for_size/d' gcc-builtins.h
-sed -i '/BT_FN/d' gcc-builtins.h
-sed -i '/lang_hooks.types.type_for_mode/d' gcc-builtins.h
-sed -i '/__float/d' gcc-builtins.h
+remove_line() {
+  local pattern="$1"
+  if sed --version >/dev/null 2>&1 ; then
+    # GNU sed
+    sed -i "/$pattern/d" gcc-builtins.h
+  else
+    sed -i '' "/$pattern/d" gcc-builtins.h
+  fi
+}
+
+remove_line MANGLE
+remove_line builtin_type_for_size
+remove_line BT_FN
+remove_line lang_hooks.types.type_for_mode
+remove_line __float
+remove_line pointer_bounds_type_node
 
 cat gcc-builtins.h | sed 's/__builtin/XX__builtin/' | \
   gcc -c -fno-builtin -x c - -o gcc-builtins.o
