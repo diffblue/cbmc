@@ -107,8 +107,8 @@ void cpp_typecheckt::convert(cpp_itemt &item)
     convert(item.get_static_assert());
   else
   {
-    err_location(item);
-    throw "unknown parse-tree element: "+item.id_string();
+    error() << "unknown parse-tree element: " << item.id() << eom;
+    throw 0;
   }
 }
 
@@ -194,19 +194,17 @@ bool cpp_typecheck(
 
   catch(int)
   {
-    cpp_typecheck.error_msg();
+    cpp_typecheck.error();
   }
 
   catch(const char *e)
   {
-    cpp_typecheck.str << e;
-    cpp_typecheck.error_msg();
+    cpp_typecheck.error() << e << messaget::eom;
   }
 
   catch(const std::string &e)
   {
-    cpp_typecheck.str << e;
-    cpp_typecheck.error_msg();
+    cpp_typecheck.error() << e << messaget::eom;
   }
 
   return cpp_typecheck.get_error_found();

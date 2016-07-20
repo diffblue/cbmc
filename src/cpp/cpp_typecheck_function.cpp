@@ -63,9 +63,9 @@ void cpp_typecheckt::convert_parameter(
 
   if(symbol_table.move(symbol, new_symbol))
   {
-    err_location(symbol.location);
-    str << "cpp_typecheckt::convert_parameter: symbol_table.move("
-        << symbol.name << ") failed";
+    error().source_location=symbol.location;
+    error() << "cpp_typecheckt::convert_parameter: symbol_table.move("
+            << symbol.name << ") failed" << eom;
     throw 0;
   }
 

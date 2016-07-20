@@ -70,7 +70,7 @@ void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
 
   if(symbol_table.move(symbol, new_symbol))
   {
-    err_location(symbol.location);
+    error().source_location=symbol.location;
     error() << "failed to move symbol `" << symbol.name
             << "' into symbol table" << eom;
     throw 0;
@@ -117,7 +117,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
   else if(!is_function && symbol.value.id()==ID_code)
   {
-    err_location(symbol.value);
+    error().source_location=symbol.value.find_source_location();
     error() << "only functions can have a function body" << eom;
     throw 0;
   }
@@ -161,7 +161,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   {
     if(old_it->second.is_type!=symbol.is_type)
     {
-      err_location(symbol.location);
+      error().source_location=symbol.location;
       error() << "redeclaration of `" << symbol.display_name()
               << "' as a different kind of symbol" << eom;
       throw 0;
@@ -274,10 +274,10 @@ void c_typecheck_baset::typecheck_redefinition_type(
       return;
     else
     {
-      err_location(new_symbol.location);
-      error() << "error: conflicting definition of type symbol `"
+      error().source_location=new_symbol.location;
+      error() << "conflicting definition of type symbol `"
               << new_symbol.display_name()
-              << "'" << eom;
+              << '\'' << eom;
       throw 0;
     }
   }
@@ -295,10 +295,10 @@ void c_typecheck_baset::typecheck_redefinition_type(
       else
       {
         // arg! new tag type
-        err_location(new_symbol.location);
-        error() << "error: conflicting definition of tag symbol `"
+        error().source_location=new_symbol.location;
+        error() << "conflicting definition of tag symbol `"
                 << new_symbol.display_name()
-                << "'" << eom;
+                << '\'' << eom;
         throw 0;
       }
     }
@@ -321,8 +321,8 @@ void c_typecheck_baset::typecheck_redefinition_type(
       // see if it changed
       if(follow(new_symbol.type)!=follow(old_symbol.type))
       {
-        err_location(new_symbol.location);
-        error() << "error: type symbol `"
+        error().source_location=new_symbol.location;
+        error() << "type symbol `"
                 << new_symbol.display_name() << "' defined twice:\n"
                 << "Original: " << to_string(old_symbol.type) << "\n"
                 << "     New: " << to_string(new_symbol.type) << eom;
@@ -374,7 +374,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     // check the type
     if(final_new.id()==ID_code)
     {
-      err_location(new_symbol.location);
+      error().source_location=new_symbol.location;
       error() << "function type not allowed for K&R function parameter"
               << eom;
       throw 0;
@@ -393,7 +393,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         
     if(final_old.id()!=ID_code)
     {
-      err_location(new_symbol.location);
+      error().source_location=new_symbol.location;
       error() << "error: function symbol `"
               << new_symbol.display_name()
               << "' redefined with a different type:\n"
@@ -450,7 +450,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         }
         else
         {
-          err_location(new_symbol.location);
+          error().source_location=new_symbol.location;
           error() << "function body `" << new_symbol.display_name()
                   << "' defined twice" << eom;
           throw 0;
@@ -505,7 +505,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   
         if(s_it==symbol_table.symbols.end())
         {
-          err_location(old_symbol.location);
+          error().source_location=old_symbol.location;
           error() << "typecheck_redefinition_non_type: "
                   << "failed to find symbol `" << identifier << "'"
                   << eom;
@@ -549,8 +549,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     }
     else
     {
-      err_location(new_symbol.location);
-      error() << "error: symbol `" << new_symbol.display_name()
+      error().source_location=new_symbol.location;
+      error() << "symbol `" << new_symbol.display_name()
               << "' redefined with a different type:\n"
               << "Original: " << to_string(old_symbol.type) << "\n"
               << "     New: " << to_string(new_symbol.type) << eom;
@@ -589,10 +589,9 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         }
         else
         {
-          err_location(new_symbol.value);
-          error() << "symbol `" << new_symbol.display_name()
-                  << "' already has an initial value" << eom;
-          warning_msg();
+          warning().source_location=new_symbol.value.find_source_location();
+          warning() << "symbol `" << new_symbol.display_name()
+                    << "' already has an initial value" << eom;
         }
       }
     }
@@ -689,7 +688,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   {
     if(labels_defined.find(it->first)==labels_defined.end())
     {
-      err_location(it->second);
+      error().source_location=it->second;
       error() << "branching label `" << it->first
               << "' is not defined in function" << eom;
       throw 0;
@@ -731,14 +730,14 @@ void c_typecheck_baset::apply_asm_label(
     if(!asm_label_map.insert(
         std::make_pair(orig_name, asm_label)).second)
     {
-      err_location(symbol.location);
       if(asm_label_map[orig_name]==asm_label)
       {
-        str << "duplicate (consistent) asm renaming";
-        warning_msg();
+        warning().source_location=symbol.location;
+        warning() << "duplicate (consistent) asm renaming" << eom;
       }
       else
       {
+        error().source_location=symbol.location;
         error() << "replacing asm renaming "
                 << asm_label_map[orig_name] << " by "
                 << asm_label << eom;
@@ -853,7 +852,7 @@ void c_typecheck_baset::typecheck_declaration(
       {
         if(symbol.value.is_not_nil())
         {
-          err_location(symbol.location);
+          error().source_location=symbol.location;
           error() << "alias attribute cannot be used with a body"
                   << eom;
           throw 0;

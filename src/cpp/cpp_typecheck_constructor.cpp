@@ -542,7 +542,7 @@ void cpp_typecheckt::default_assignop_value(
 
       if(size_expr.id()==ID_infinity)
       {
-        // err_location(object);
+        // error().source_location=object);
         // err << "cannot copy array of infinite size" << std::endl;
         // throw 0;
         continue;
@@ -629,8 +629,9 @@ void cpp_typecheckt::check_member_initializers(
 
       if(!ok)
       {
-        err_location(member_name.source_location());
-        str << "invalid initializer `" << member_name.to_string() << "'";
+        error().source_location=member_name.source_location();
+        error() << "invalid initializer `" << member_name.to_string()
+                << "'" << eom;
         throw 0;
       }
       return;
@@ -707,8 +708,8 @@ void cpp_typecheckt::check_member_initializers(
 
     if(!ok)
     {
-      err_location(member_name.source_location());
-      str << "invalid initializer `" << base_name << "'";
+      error().source_location=member_name.source_location();
+      error() << "invalid initializer `" << base_name << "'" << eom;
       throw 0;
     }
   }
@@ -969,8 +970,8 @@ void cpp_typecheckt::full_member_initialization(
        mem_it->find(ID_type).id()==ID_pointer &&
        mem_it->find(ID_type).get_bool(ID_C_reference))
     {
-      err_location(*mem_it);
-      str << "reference must be explicitly initialized";
+      error().source_location=mem_it->source_location();
+      error() << "reference must be explicitly initialized" << eom;
       throw 0;
     }
 

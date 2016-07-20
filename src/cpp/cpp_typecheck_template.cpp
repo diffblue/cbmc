@@ -48,6 +48,7 @@ void cpp_typecheckt::salvage_default_arguments(
   }
 }
 
+#if 0
 /*******************************************************************\
 
 Function: cpp_typecheckt::check_template_restrictions
@@ -72,13 +73,15 @@ void cpp_typecheckt::check_template_restrictions(
     if(final_type.subtype().id()!=ID_struct &&
        final_type.subtype().id()!=ID_code)
     {
-      err_location(cpp_name);
-      str << "template only allowed with classes or functions,"
-             " but got `" << to_string(final_type.subtype()) << "'";
+      error().source_location=cpp_name.location();
+      error() << "template only allowed with classes or functions,"
+              << " but got `" << to_string(final_type.subtype())
+              << "'" << eom;
       throw 0;
     }
   }
 }
+#endif
 
 /*******************************************************************\
 
@@ -109,14 +112,16 @@ void cpp_typecheckt::typecheck_class_template(
 
   if(cpp_name.is_nil())
   {
-    err_location(type.source_location());
-    throw "class templates must not be anonymous";
+    error().source_location=type.source_location();
+    error() << "class templates must not be anonymous" << eom;
+    throw 0;
   }
 
   if(!cpp_name.is_simple_name())
   {
-    err_location(cpp_name.source_location());
-    throw "simple name expected as class template tag";
+    error().source_location=cpp_name.source_location();
+    error() << "simple name expected as class template tag" << eom;
+    throw 0;
   }
 
   irep_idt base_name=cpp_name.get_base_name();
@@ -144,7 +149,7 @@ void cpp_typecheckt::typecheck_class_template(
       const symbolt &previous=lookup((*id_set.begin())->identifier);
       if(previous.name!=symbol_name || id_set.size()>1)
       {
-        err_location(cpp_name.source_location());
+        error().source_location=cpp_name.source_location();
         str << "template declaration of `" << base_name.c_str()
             << " does not match previous declaration\n";
         str << "location of previous definition: " << previous.location;
@@ -171,11 +176,11 @@ void cpp_typecheckt::typecheck_class_template(
     // check if we have 2 bodies
     if(has_body && previous_has_body)
     {
-      err_location(cpp_name.source_location());
-      str << "template struct `" << base_name
-          << "' defined previously" << std::endl;
-      str << "location of previous definition: "
-          << previous_symbol->second.location;
+      error().source_location=cpp_name.source_location();
+      error() << "template struct `" << base_name
+              << "' defined previously\n"
+              << "location of previous definition: "
+              << previous_symbol->second.location << eom;
       throw 0;
     }
     
@@ -233,7 +238,7 @@ void cpp_typecheckt::typecheck_class_template(
   symbolt *new_symbol;
   if(symbol_table.move(symbol, new_symbol))
   {
-    err_location(symbol.location);
+    error().source_location=symbol.location;
     error() << "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed"
             << eom;
     throw 0;
@@ -277,8 +282,8 @@ void cpp_typecheckt::typecheck_function_template(
 
   if(!cpp_name.is_simple_name())
   {
-    err_location(declaration);
-    str << "function template must have simple name";
+    error().source_location=declaration.source_location();
+    error() << "function template must have simple name" << eom;
     throw 0;
   }
 
@@ -312,11 +317,11 @@ void cpp_typecheckt::typecheck_function_template(
 
     if(has_value && previous_has_value)
     {
-      err_location(cpp_name.source_location());
-      str << "function template symbol `" << base_name
-          << "' declared previously" << std::endl;
-      str << "location of previous definition: "
-          << previous_symbol->second.location;
+      error().source_location=cpp_name.source_location();
+      error() << "function template symbol `" << base_name
+              << "' declared previously\n"
+              << "location of previous definition: "
+              << previous_symbol->second.location << eom;
       throw 0;
     }
 
@@ -346,7 +351,7 @@ void cpp_typecheckt::typecheck_function_template(
   symbolt *new_symbol;
   if(symbol_table.move(symbol, new_symbol))
   {
-    err_location(symbol.location);
+    error().source_location=symbol.location;
     error() << "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed"
             << eom;
     throw 0;
@@ -406,8 +411,8 @@ void cpp_typecheckt::typecheck_class_template_member(
   else
   {
     return; // TODO
-    err_location(cpp_name);
-    str << "bad template name";
+    error().source_location=cpp_name.source_location();
+    error() << "bad template name" << eom;
     throw 0;
   }
 
@@ -422,28 +427,28 @@ void cpp_typecheckt::typecheck_class_template_member(
 
   if(id_set.empty())
   {
-    str << cpp_scopes.current_scope();
-    err_location(cpp_name);
-    str << "class template `"
-        << cpp_name.get_sub().front().get(ID_identifier)
-        << "' not found";
+    error() << cpp_scopes.current_scope();
+    error().source_location=cpp_name.source_location();
+    error() << "class template `"
+            << cpp_name.get_sub().front().get(ID_identifier)
+            << "' not found" << eom;
     throw 0;
   }
   else if(id_set.size()>1)
   {
-    err_location(cpp_name);
-    str << "class template `"
-        << cpp_name.get_sub().front().get(ID_identifier)
-        << "' is ambiguous";
+    error().source_location=cpp_name.source_location();
+    error() << "class template `"
+            << cpp_name.get_sub().front().get(ID_identifier)
+            << "' is ambiguous" << eom;
     throw 0;
   }
   else if((*(id_set.begin()))->id_class!=cpp_idt::TEMPLATE)
   {
     // std::cerr << *(*id_set.begin()) << std::endl;
-    err_location(cpp_name);
-    str << "class template `"
-        << cpp_name.get_sub().front().get(ID_identifier)
-        << "' is not a template";
+    error().source_location=cpp_name.source_location();
+    error() << "class template `"
+            << cpp_name.get_sub().front().get(ID_identifier)
+            << "' is not a template" << eom;
     throw 0;
   }
 
@@ -611,8 +616,8 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   if(cpp_name.is_qualified())
   {
-    err_location(cpp_name.source_location());
-    str << "qualifiers not expected here";
+    error().source_location=cpp_name.source_location();
+    error() << "qualifiers not expected here" << eom;
     throw 0;
   }
   
@@ -622,8 +627,8 @@ void cpp_typecheckt::convert_class_template_specialization(
   {
     // currently we are more restrictive
     // than the standard
-    err_location(cpp_name.source_location());
-    str << "bad template-class-sepcialization name";                                                
+    error().source_location=cpp_name.source_location();
+    error() << "bad template-class-sepcialization name" << eom;
     throw 0;
   }
 
@@ -662,14 +667,15 @@ void cpp_typecheckt::convert_class_template_specialization(
   // only one should be left
   if(id_set.empty())
   {
-    err_location(type.source_location());
-    str << "class template `" << base_name << "' not found";
+    error().source_location=type.source_location();
+    error() << "class template `" << base_name << "' not found" << eom;
     throw 0;
   }
   else if(id_set.size()>1)
   {
-    err_location(type);
-    str << "class template `" << base_name << "' is ambiguous";
+    error().source_location=type.source_location();
+    error() << "class template `" << base_name << "' is ambiguous"
+            << eom;
     throw 0;
   }
   
@@ -682,8 +688,8 @@ void cpp_typecheckt::convert_class_template_specialization(
     
   if(!template_symbol.type.get_bool(ID_is_template))
   {
-    err_location(type);
-    str << "expected a template";
+    error().source_location=type.source_location();
+    error() << "expected a template" << eom;
   }
 
   #if 0
@@ -737,8 +743,8 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   if(declaration.declarators().size()!=1 ||
      declaration.declarators().front().type().id()!=ID_function_type)
   {
-    err_location(declaration.type());
-    str << "expected function template specialization";
+    error().source_location=declaration.type().source_location();
+    error() << "expected function template specialization" << eom;
     throw 0;
   }
 
@@ -748,8 +754,8 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
 
   if(cpp_name.is_qualified())
   {
-    err_location(cpp_name.source_location());
-    str << "qualifiers not expected here";
+    error().source_location=cpp_name.source_location();
+    error() << "qualifiers not expected here" << eom;
     throw 0;
   }
   
@@ -767,8 +773,8 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
     {
       // currently we are more restrictive
       // than the standard
-      err_location(cpp_name.source_location());
-      str << "bad template-function-specialization name";
+      error().source_location=cpp_name.source_location();
+      error() << "bad template-function-specialization name" << eom;
       throw 0;
     }
 
@@ -781,14 +787,17 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
 
     if(id_set.empty())
     {
-      err_location(cpp_name.source_location());
-      str << "template function `" << base_name << "' not found";
+      error().source_location=cpp_name.source_location();
+      error() << "template function `" << base_name << "' not found"
+              << eom;
       throw 0;
     }
     else if(id_set.size()>1)
     {
-      err_location(cpp_name.source_location());
-      str << "template function `" << base_name << "' is ambiguous";
+      error().source_location=cpp_name.source_location();
+      error() << "template function `" << base_name
+              << "' is ambiguous" << eom;
+      throw 0;
     }
     
     const symbolt &template_symbol=
@@ -895,8 +904,9 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     if(declarator.name().get_sub().size()!=1 ||
        declarator.name().get_sub().front().id()!=ID_name)
     {
-      err_location(declaration);
-      throw "template parameter must be simple name";
+      error().source_location=declaration.source_location();
+      error() << "template parameter must be simple name" << eom;
+      throw 0;
     }
     
     cpp_scopet &scope=cpp_scopes.current_scope();
@@ -1006,10 +1016,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     
   if(parameters.size()<args.size())
   {
-    err_location(source_location);
-    str << "too many template arguments (expected "
-        << parameters.size() << ", but got "
-        << args.size() << ")";
+    error().source_location=source_location;
+    error() << "too many template arguments (expected "
+            << parameters.size() << ", but got "
+            << args.size() << ")" << eom;
     throw 0;
   }
 
@@ -1029,9 +1039,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // These may depend on previous arguments.
       if(!parameter.has_default_argument())
       {
-        err_location(source_location);
-        str << "not enough template arguments (expected "
-            << parameters.size() << ", but got " << args.size() << ")";
+        error().source_location=source_location;
+        error() << "not enough template arguments (expected "
+                << parameters.size() << ", but got " << args.size()
+                << ")" << eom;
         throw 0;
       }
 
@@ -1062,8 +1073,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       }
       else
       {
-        err_location(arg);
-        str << "expected type, but got expression";
+        error().source_location=arg.source_location();
+        error() << "expected type, but got expression" << eom;
         throw 0;
       }
     }
@@ -1071,8 +1082,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     {
       if(arg.id()==ID_type)
       {
-        err_location(arg);
-        str << "expected expression, but got type";
+        error().source_location=arg.source_location();
+        error() << "expected expression, but got type" << eom;
         throw 0;
       }
       else if(arg.id()=="ambiguous")
@@ -1136,15 +1147,16 @@ void cpp_typecheckt::convert_template_declaration(
 
   if(declaration.member_spec().is_virtual())
   {
-    err_location(declaration);
-    str <<  "invalid use of 'virtual' in template declaration";
+    error().source_location=declaration.source_location();
+    error() <<  "invalid use of 'virtual' in template declaration"
+            << eom;
     throw 0;
   }
 
   if(declaration.is_typedef())
   {
-    err_location(declaration);
-    str << "template declaration for typedef";
+    error().source_location=declaration.source_location();
+    error() << "template declaration for typedef" << eom;
     throw 0;
   }
 
@@ -1161,15 +1173,18 @@ void cpp_typecheckt::convert_template_declaration(
     // there should not be declarators
     if(!declaration.declarators().empty())
     {
-      err_location(declaration);
-      throw "class template not expected to have declarators";
+      error().source_location=declaration.source_location();
+      error() << "class template not expected to have declarators"
+              << eom;
+      throw 0;
     }
 
     // it needs to be a class template
     if(type.id()!=ID_struct)
     {
-      err_location(declaration);
-      throw "expected class template";
+      error().source_location=declaration.source_location();
+      error() << "expected class template" << eom;
+      throw 0;
     }
 
     // Is it class template specialization?
@@ -1190,8 +1205,10 @@ void cpp_typecheckt::convert_template_declaration(
     // there should be declarators in either case
     if(declaration.declarators().empty())
     {
-      err_location(declaration);
-      throw "non-class template is expected to have a declarator";
+      error().source_location=declaration.source_location();
+      error() << "non-class template is expected to have a declarator"
+              << eom;
+      throw 0;
     }
 
     // Is it function template specialization?

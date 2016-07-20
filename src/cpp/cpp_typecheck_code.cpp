@@ -300,7 +300,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       if(access==ID_private || access=="noaccess")
       {
         #if 0
-        err_location(code.source_location());
+        error().source_location=code.source_location());
         str << "error: constructor of `"
             << to_string(symbol_expr)
             << "' is not accessible";
@@ -361,8 +361,9 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         // it's a reference member
         if(code.operands().size()!= 1)
         {
-          err_location(code);
-          str << " reference `"+to_string(symbol_expr)+"' expects one initializer";
+          error().source_location=code.find_source_location();
+          error() << " reference `" << to_string(symbol_expr)
+                  << "' expects one initializer" << eom;
           throw 0;
         }
 
@@ -403,8 +404,9 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     }
     else
     {
-      err_location(code);
-      str << "invalid member initializer `" << to_string(symbol_expr) << "'";
+      error().source_location=code.find_source_location();
+      error() << "invalid member initializer `"
+              << to_string(symbol_expr) << "'" << eom;
       throw 0;
     }
   }
@@ -426,8 +428,9 @@ void cpp_typecheckt::typecheck_decl(codet &code)
 {
   if(code.operands().size()!=1)
   {
-    err_location(code);
-    throw "declaration expected to have one operand";
+    error().source_location=code.find_source_location();
+    error() << "declaration expected to have one operand" << eom;
+    throw 0;
   }
 
   assert(code.op0().id()==ID_cpp_declaration);
@@ -447,8 +450,10 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   {
     if(follow(type).id()!=ID_union)
     {
-      err_location(code);
-      throw "declaration statement does not declare anything";
+      error().source_location=code.find_source_location();
+      error() << "declaration statement does not declare anything"
+              << eom;
+      throw 0;
     }
 
     convert_anonymous_union(declaration, code);
@@ -546,10 +551,9 @@ Function: cpp_typecheckt::typecheck_assign
 
 void cpp_typecheckt::typecheck_assign(codet &code)
 {
-
   if(code.operands().size()!=2)
   {
-    err_location(code);
+    error().source_location=code.find_source_location();
     error() << "assignment statement expected to have two operands"
             << eom;
     throw 0;

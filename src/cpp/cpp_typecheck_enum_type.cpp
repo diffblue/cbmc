@@ -49,7 +49,11 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
       implicit_typecast(value, c_enum_type.subtype());
       make_constant(value);
       if(to_integer(value, i))
-        throw "failed to produce integer for enum constant";
+      {
+        error().source_location=value.find_source_location();
+        error() << "failed to produce integer for enum constant" << eom;
+        throw 0;
+      }
     }
     
     exprt value_expr=from_integer(i, c_enum_type.subtype());
@@ -69,7 +73,12 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     
     symbolt *new_symbol;
     if(symbol_table.move(symbol, new_symbol))
-      throw "cpp_typecheckt::typecheck_enum_body: symbol_table.move() failed";
+    {
+      error().source_location=symbol.location;
+      error() << "cpp_typecheckt::typecheck_enum_body: symbol_table.move() failed"
+              << eom;
+      throw 0;
+    }
 
     cpp_idt &scope_identifier=
       cpp_scopes.put_into_scope(*new_symbol);
@@ -115,8 +124,9 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
       base_name=tag.get_base_name();
     else
     {
-      err_location(type);
-      throw "enum tag is expected to be a simple name";
+      error().source_location=type.source_location();
+      error() << "enum tag is expected to be a simple name" << eom;
+      throw 0;
     }
   }
 
@@ -142,11 +152,11 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
 
     if(has_body)
     {
-      err_location(type);
-      str << "error: enum symbol `" << base_name
-          << "' declared previously\n";
-      str << "location of previous definition: "
-          << symbol.location;
+      error().source_location=type.source_location();
+      error() << "error: enum symbol `" << base_name
+              << "' declared previously\n"
+              << "location of previous definition: "
+              << symbol.location << eom;
       throw 0;
     }
   }
@@ -169,8 +179,8 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
       }
       else
       {
-        err_location(type);
-        str << "underlying type must be integral";
+        error().source_location=type.source_location();
+        error() << "underlying type must be integral" << eom;
         throw 0;
       }
     }
@@ -192,7 +202,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     symbolt *new_symbol;
     if(symbol_table.move(symbol, new_symbol))
     {
-      err_location(symbol.location);
+      error().source_location=symbol.location;
       error() << "cpp_typecheckt::typecheck_enum_type: symbol_table.move() failed"
               << eom;
       throw 0;
@@ -208,9 +218,9 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   }
   else
   {
-    err_location(type);
-    str << "use of enum `" << base_name
-        << "' without previous declaration";
+    error().source_location=type.source_location();
+    error() << "use of enum `" << base_name
+            << "' without previous declaration" << eom;
     throw 0;
   }
 

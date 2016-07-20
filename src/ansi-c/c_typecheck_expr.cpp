@@ -2200,9 +2200,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       symbolt *symbol_ptr;
       move_symbol(new_symbol, symbol_ptr);
 
-      err_location(f_op);
-      error() << "function `" << identifier << "' is not declared" << eom;
-      warning_msg();
+      warning().source_location=f_op.find_source_location();
+      warning() << "function `" << identifier << "' is not declared" << eom;
     }
   }
 
@@ -2921,9 +2920,8 @@ void c_typecheck_baset::typecheck_function_call_arguments(
          op.get(ID_statement)==ID_assign &&
          op.type().id()!=ID_bool)
       {
-        err_location(expr);
-        str << "assignment where Boolean argument is expected" << eom;
-        warning_msg();
+        warning().source_location=expr.find_source_location();
+        warning() << "assignment where Boolean argument is expected" << eom;
       }
 
       implicit_typecast(op, op_type);
@@ -3659,7 +3657,7 @@ void c_typecheck_baset::make_constant(exprt &expr)
   if(!expr.is_constant() &&
      expr.id()!=ID_infinity)
   {
-    err_location(expr.find_source_location());
+    error().source_location=expr.find_source_location();
     error() << "expected constant expression, but got `"
             << to_string(expr) << "'" << eom;
     throw 0;
@@ -3687,7 +3685,7 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
   if(!expr.is_constant() &&
      expr.id()!=ID_infinity)
   {
-    err_location(expr.find_source_location());
+    error().source_location=expr.find_source_location();
     error() << "conversion to integer constant failed" << eom;
     throw 0;
   }

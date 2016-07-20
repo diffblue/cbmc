@@ -69,10 +69,10 @@ std::string cpp_typecheckt::template_suffix(
         i=0;
       else if(to_integer(e, i))
       {
-        err_location(*it);
-        str << "template argument expression expected to be "
-               "scalar constant, but got `"
-            << to_string(e) << "'";
+        error().source_location=it->find_source_location();
+        error() << "template argument expression expected to be "
+                << "scalar constant, but got `"
+                << to_string(e) << "'" << eom;
         throw 0;
       }
 
@@ -146,9 +146,10 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   // do we have args?
   if(full_template_args.arguments().empty())
   {
-    err_location(source_location);
-    str << "`" << template_symbol.base_name
-        << "' is a template; thus, expected template arguments";
+    error().source_location=source_location;
+    error() << "`" << template_symbol.base_name
+            << "' is a template; thus, expected template arguments"
+            << eom;
     throw 0;
   }
   
@@ -265,9 +266,9 @@ const symbolt &cpp_typecheckt::instantiate_template(
 {
   if(instantiation_stack.size()==MAX_DEPTH)
   {
-    err_location(source_location);
-    str << "reached maximum template recursion depth ("
-        << MAX_DEPTH << ")";
+    error().source_location=source_location;
+    error() << "reached maximum template recursion depth ("
+            << MAX_DEPTH << ")" << eom;
     throw 0;
   }
   
@@ -306,9 +307,10 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // do we have arguments?
   if(full_template_args.arguments().empty())
   {
-    err_location(source_location);
-    str << "`" << template_symbol.base_name
-        << "' is a template; thus, expected template arguments";
+    error().source_location=source_location;
+    error() << "`" << template_symbol.base_name
+            << "' is a template; thus, expected template arguments"
+            << eom;
     throw 0;
   }
   
@@ -321,9 +323,10 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(template_scope==NULL)
   {
-    err_location(source_location);
-    str << "identifier: " << template_symbol.name << '\n';
-    throw "template instantiation error: scope not found";
+    error().source_location=source_location;
+    error() << "identifier: " << template_symbol.name << '\n'
+            << "template instantiation error: scope not found" << eom;
+    throw 0;
   }
   
   assert(template_scope!=NULL);
@@ -501,15 +504,16 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     if(new_decl.member_spec().is_virtual())
     {
-      err_location(new_decl);
-      str << "invalid use of `virtual' in template declaration";
+      error().source_location=new_decl.source_location();
+      error() << "invalid use of `virtual' in template declaration"
+              << eom;
       throw 0;
     }
     
     if(new_decl.is_typedef())
     {
-      err_location(new_decl);
-      str << "template declaration for typedef";
+      error().source_location=new_decl.source_location();
+      error() << "template declaration for typedef" << eom;
       throw 0;
     }
 
@@ -518,8 +522,9 @@ const symbolt &cpp_typecheckt::instantiate_template(
        new_decl.storage_spec().is_register() ||
        new_decl.storage_spec().is_mutable())
     {
-      err_location(new_decl);
-      str << "invalid storage class specified for template field";
+      error().source_location=new_decl.source_location();
+      error() << "invalid storage class specified for template field"
+              << eom;
       throw 0;
     }
 

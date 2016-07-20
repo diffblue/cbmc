@@ -12,6 +12,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/hash_cont.h>
+#include <util/c_misc.h>
+#include <util/lispirep.h>
+#include <util/lispexpr.h>
 
 #include <ansi-c/expr2c_class.h>
 
@@ -318,7 +321,11 @@ std::string expr2cppt::convert_rec(
       else if(argument.id()==ID_type)
         dest+=convert(argument.type());
       else
-        dest+=argument.to_string();
+      {
+        lispexprt lisp;
+        irep2lisp(argument, lisp);
+        dest+="irep(\""+MetaString(lisp.expr2string())+"\")";
+      }
     }
 
     dest+="> "+convert(src.subtype());
