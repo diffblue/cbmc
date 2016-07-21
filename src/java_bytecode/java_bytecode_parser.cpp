@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define DEBUG
 #ifdef DEBUG
 #include <iostream>
+#include <string>
 #endif
 
 class java_bytecode_parsert:public parsert
@@ -1096,10 +1097,9 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
   }
   else if(attribute_name=="StackMapTable")
   {
-    std::cout << "reading StackMapTable" << std::endl;
-    u2 attribute_name_index=read_u2();
-    u4 attribute_length=read_u4();
     u2 stack_map_entries=read_u2();
+
+    std::cout << "reading StackMapTable; length: " << std::to_string(stack_map_entries) << std::endl;
 
     method.stack_map_table.resize(stack_map_entries);
 
@@ -1107,14 +1107,18 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
     {
       u1 frame_type=read_u1();
 
+      std::cout << "frame type " << std::to_string(frame_type) << std::endl;
+
       if(0 <= frame_type && frame_type <= 63)
         {
+          std::cout << "FRAME: SAME" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
         }
       else if(64 <= frame_type && frame_type <= 127)
         {
+          std::cout << "FRAME: SAME_LOCALS_ONE_STACK" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(1);
@@ -1124,18 +1128,21 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
         }
       else if(frame_type == 247)
         {
+          std::cout << "FRAME: SAME_LOCALS_ONE_STACK_EXTENDED" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK_EXTENDED;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(1);
         }
       else if(248 <= frame_type && frame_type <= 250)
         {
+          std::cout << "FRAME: CHOP" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::CHOP;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
         }
       else if(frame_type == 251)
         {
+          std::cout << "FRAME: SAME_EXTENDED" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_EXTENDED;
           u2 offset=read_u2();
           method.stack_map_table[i].locals.resize(0);
@@ -1143,12 +1150,14 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
         }
       else if(252 <= frame_type && frame_type <= 254)
         {
+          std::cout << "FRAME: APPEND" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::APPEND;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
         }
       else if(frame_type == 255)
         {
+          std::cout << "FRAME: SAME_EXTENDED" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_EXTENDED;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
@@ -1165,19 +1174,33 @@ void java_bytecode_parsert::read_verification_type_info(methodt::verification_ty
 {
   u1 tag = read_u1();
   if(tag == 0)
-    v.type=methodt::verification_type_infot::TOP;
+    {
+      v.type=methodt::verification_type_infot::TOP;
+    }
   else if(tag == 1)
-    v.type=methodt::verification_type_infot::INTEGER;
+    {
+      v.type=methodt::verification_type_infot::INTEGER;
+    }
   else if(tag == 2)
-    v.type=methodt::verification_type_infot::FLOAT;
+    {
+      v.type=methodt::verification_type_infot::FLOAT;
+    }
   else if(tag == 3)
-    v.type=methodt::verification_type_infot::LONG;
+    {
+      v.type=methodt::verification_type_infot::LONG;
+    }
   else if(tag == 4)
-    v.type=methodt::verification_type_infot::DOUBLE;
+    {
+      v.type=methodt::verification_type_infot::DOUBLE;
+    }
   else if(tag == 5)
-    v.type=methodt::verification_type_infot::ITEM_NULL;
+    {
+      v.type=methodt::verification_type_infot::ITEM_NULL;
+    }
   else if(tag == 6)
-    v.type=methodt::verification_type_infot::UNINITIALIZED_THIS;
+    {
+      v.type=methodt::verification_type_infot::UNINITIALIZED_THIS;
+    }
   else if(tag == 7)
     {
       v.type=methodt::verification_type_infot::OBJECT;
