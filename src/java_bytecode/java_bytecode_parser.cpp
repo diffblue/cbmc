@@ -1107,7 +1107,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
     {
       u1 frame_type=read_u1();
 
-      std::cout << "frame type " << std::to_string(frame_type) << std::endl;
+      std::cout << std::to_string(i) << " th frame is of type " << std::to_string(frame_type) << std::endl;
 
       if(0 <= frame_type && frame_type <= 63)
         {
@@ -1132,6 +1132,11 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK_EXTENDED;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(1);
+          methodt::verification_type_infot verification_type_info;
+          read_verification_type_info(verification_type_info);
+          method.stack_map_table[i].stack[0] = verification_type_info;
+          u2 offset_delta = read_u2();
+          method.stack_map_table[i].offset_delta = offset_delta;
         }
       else if(248 <= frame_type && frame_type <= 250)
         {
@@ -1139,6 +1144,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::CHOP;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
+          u2 offset_delta = read_u2();
+          method.stack_map_table[i].offset_delta = offset_delta;
         }
       else if(frame_type == 251)
         {
@@ -1147,20 +1154,48 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
           u2 offset=read_u2();
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
+          u2 offset_delta = read_u2();
+          method.stack_map_table[i].offset_delta = offset_delta;
         }
       else if(252 <= frame_type && frame_type <= 254)
         {
+          size_t new_locals = (size_t) (frame_type - 251);
           std::cout << "FRAME: APPEND" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::APPEND;
-          method.stack_map_table[i].locals.resize(0);
+          method.stack_map_table[i].locals.resize(new_locals);
           method.stack_map_table[i].stack.resize(0);
+          u2 offset_delta = read_u2();
+          method.stack_map_table[i].offset_delta = offset_delta;
+          for(size_t k = 0; k < new_locals; k++)
+            {
+              method.stack_map_table[i].locals.push_back(methodt::verification_type_infot());
+              methodt::verification_type_infot &v = method.stack_map_table[i].locals.back();
+              read_verification_type_info(v);
+            }
         }
       else if(frame_type == 255)
         {
-          std::cout << "FRAME: SAME_EXTENDED" << std::endl;
-          method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_EXTENDED;
-          method.stack_map_table[i].locals.resize(0);
-          method.stack_map_table[i].stack.resize(0);
+          std::cout << "FRAME: FULL" << std::endl;
+          method.stack_map_table[i].type = methodt::stack_map_table_entryt::FULL;
+
+          u2 offset_delta = read_u2();
+          u2 number_locals = read_u2();
+          method.stack_map_table[i].locals.resize(number_locals);
+          for (size_t k = 0; k < (size_t) number_locals; k++)
+            {
+              method.stack_map_table[i].locals.push_back(methodt::verification_type_infot());
+              methodt::verification_type_infot &v = method.stack_map_table[i].locals.back();
+              read_verification_type_info(v);
+            }
+
+          u2 number_stack_items = read_u2();
+          method.stack_map_table[i].stack.resize(number_stack_items);
+          for (size_t k = 0; k < (size_t) number_stack_items; k++)
+            {
+              method.stack_map_table[i].stack.push_back(methodt::verification_type_infot());
+              methodt::verification_type_infot &v = method.stack_map_table[i].stack.back();
+              read_verification_type_info(v);
+            }
         }
       else
         throw "ERROR: unknown stack frame type encountered";
