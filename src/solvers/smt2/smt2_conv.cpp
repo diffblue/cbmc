@@ -356,7 +356,7 @@ constant_exprt smt2_convt::parse_literal(
       std::string bits=id2string(s1.get_value())+
                        id2string(s2.get_value())+
                        id2string(s3.get_value());
-      value=binary2integer(bits, 2);
+      value=binary2integer(bits, false);
     }
     else
       value=0;
