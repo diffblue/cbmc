@@ -109,7 +109,7 @@ int pipe_stream::run()
     return -1;
 
   // now execute the child process
-  STARTUPINFO si;
+  STARTUPINFOW si;
   
   ZeroMemory (&si, sizeof(STARTUPINFO));
   si.cb=sizeof(STARTUPINFO);
@@ -124,7 +124,12 @@ int pipe_stream::run()
         command += L" " + ::widen(s);
 
   LPWSTR lpCommandLine = new wchar_t[command.length()+1];
+  
+  #ifdef _MSC_VER
   wcscpy_s(lpCommandLine, command.length()+1, command.c_str());
+  #else
+  wcsncpy(lpCommandLine, command.c_str(), command.length()+1);
+  #endif
 
   BOOL ret=CreateProcessW(NULL, lpCommandLine, NULL, NULL, TRUE,
                           CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
