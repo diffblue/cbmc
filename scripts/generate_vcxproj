@@ -1,6 +1,6 @@
 #/bin/bash
 
-dest=../
+dest=..
 
 if ! [ -e $dest/src/Makefile ] ; then echo Makefile not found ; exit 1; fi
 
