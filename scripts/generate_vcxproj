@@ -1,3 +1,5 @@
+#/bin/bash
+
 dest=../src
 
 if ! [ -e $dest/Makefile ] ; then echo Makefile not found ; exit 1; fi
