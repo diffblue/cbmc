@@ -1139,7 +1139,7 @@ void jsil_typecheckt::typecheck_function_call(
       {
         code_typet &codet=to_code_type(s.type);
 
-        for (int i=0; i<codet.parameters().size(); i++)
+        for(std::size_t i=0; i<codet.parameters().size(); i++)
         {
           if(i>=call.arguments().size()) break;
 
