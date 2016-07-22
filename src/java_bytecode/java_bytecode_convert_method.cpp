@@ -88,8 +88,14 @@ protected:
   
   bool method_has_this;
 
+  typedef enum instruction_sizet
+  {
+    INST_INDEX = 2, INST_INDEX_CONST = 3
+  } instruction_sizet;
+
   // return corresponding reference of variable
-  variablet &find_variable_for_slot(unsigned number_int, size_t address, variablest &var_list)
+  variablet &find_variable_for_slot(unsigned number_int, size_t address,
+                                    variablest &var_list, instruction_sizet inst_size)
   {
     size_t var_list_length = var_list.size();
     if(var_list_length > 1)
@@ -98,15 +104,16 @@ protected:
           {
             size_t start_pc = var.start_pc;
             size_t length = var.length;
-            if (address >= start_pc && address <= start_pc + length)
+            if (address + (size_t) inst_size >= start_pc && address <= start_pc + length)
               {
                 std::cout << "found for address " << std::to_string(address)
                           << " starting at " << std::to_string(start_pc)
-                          << " length: " << std::to_string(length) << std::endl;
+                          << " length: " << std::to_string(length)
+                          << var.symbol_expr << std::endl;
                 return var;
               }
           }
-        std::cout << "end of list reached without correct frame found" << std::endl;
+        std::cout << "end of list reached, address " << std::to_string(address) << std::endl;
         return var_list[0];
       }
     else if(var_list_length == 1)
@@ -119,7 +126,7 @@ protected:
   }
   
   // JVM local variables
-  const exprt variable(const exprt &arg, char type_char, size_t address)
+  const exprt variable(const exprt &arg, char type_char, size_t address, instruction_sizet inst_size)
   {
     irep_idt number=to_constant_expr(arg).get_value();
     
@@ -138,7 +145,7 @@ protected:
       std::cout << "no variable with this index" << std::endl;
 
     // search variable in list for correct frame / address if necessary
-    variablet &var = find_variable_for_slot(number_int, address, var_list);
+    variablet &var = find_variable_for_slot(number_int, address, var_list, inst_size);
 
     std::cout << "look at number " << std::to_string(number_int) << std::endl;    
     if(var.symbol_expr.get_identifier().empty())
@@ -525,7 +532,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     stackt stack;
     bool done;
   };
-  
+
   typedef std::map<unsigned, converted_instructiont> address_mapt;
   address_mapt address_map;
   std::set<unsigned> targets;
@@ -822,7 +829,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
 
-      exprt var=variable(arg0, statement[0], i_it->address);
+      exprt var=variable(arg0, statement[0], i_it->address, INST_INDEX);
       
       const bool is_array('a' == statement[0]);
       
@@ -854,7 +861,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg0, statement[0], i_it->address);
+      results[0]=variable(arg0, statement[0], i_it->address, INST_INDEX);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -1016,9 +1023,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0, 'i', i_it->address);
+      code_assign.lhs()=variable(arg0, 'i', i_it->address, INST_INDEX_CONST);
       code_assign.rhs()=plus_exprt(
-                                 variable(arg0, 'i', i_it->address),
+                                   variable(arg0, 'i', i_it->address, INST_INDEX_CONST),
                           typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
