@@ -53,7 +53,7 @@ function doit {
 dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking cbmc"
 doit cbmc
 
-dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-cc"
+dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking jsil goto-cc"
 doit goto-cc
 
 dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-instrument"
