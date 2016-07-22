@@ -44,7 +44,7 @@ function doit {
   echo "  </ItemGroup>" >> $dest/$1.vcxproj.filters
 
   for dir in $dirs minisat2 ; do
-    echo "  <ItemGroup><Filter Include=\"src\\${dir}\"/></ItemGroup>" >> $dest/$1.vcxproj.filters
+    echo "  <ItemGroup><Filter Include=\"${dir}\"/></ItemGroup>" >> $dest/$1.vcxproj.filters
   done
 
   echo "</Project>" >> $dest/$1.vcxproj.filters
