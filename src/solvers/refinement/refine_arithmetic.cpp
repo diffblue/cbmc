@@ -281,7 +281,7 @@ void bv_refinementt::check_SAT(approximationt &a)
     exprt rounding_mode_expr = get(a.expr.op2());
     to_integer(rounding_mode_expr, rounding_mode_int);
     ieee_floatt::rounding_modet rounding_mode = 
-      (ieee_floatt::rounding_modet)integer2long(rounding_mode_int);
+      (ieee_floatt::rounding_modet)integer2ulong(rounding_mode_int);
 
     ieee_floatt result=o0;
     o0.rounding_mode=rounding_mode;

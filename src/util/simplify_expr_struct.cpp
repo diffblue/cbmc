@@ -205,7 +205,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
       
       if(mp_integer(bits.size())>=target_bits)
       {
-        std::string bits_cut=std::string(bits, 0, integer2long(target_bits));
+        std::string bits_cut=std::string(bits, 0, integer2size_t(target_bits));
       
         exprt tmp=bits2expr(bits_cut, expr.type(), true);
 

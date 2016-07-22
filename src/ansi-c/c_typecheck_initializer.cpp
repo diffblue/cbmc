@@ -130,7 +130,7 @@ exprt c_typecheck_baset::do_initializer_rec(
       if(mp_integer(tmp.operands().size())>array_size)
       {
         // cut off long strings. gcc does a warning for this
-        tmp.operands().resize(integer2long(array_size));
+        tmp.operands().resize(integer2size_t(array_size));
         tmp.type()=type;
       }
       else if(mp_integer(tmp.operands().size())<array_size)
@@ -139,7 +139,7 @@ exprt c_typecheck_baset::do_initializer_rec(
         tmp.type()=type;
         exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
                                     *this, get_message_handler());
-        tmp.operands().resize(integer2long(array_size), zero);
+        tmp.operands().resize(integer2size_t(array_size), zero);
       }
     }
     
@@ -183,7 +183,7 @@ exprt c_typecheck_baset::do_initializer_rec(
       if(mp_integer(tmp2.operands().size())>array_size)
       {
         // cut off long strings. gcc does a warning for this
-        tmp2.operands().resize(integer2long(array_size));
+        tmp2.operands().resize(integer2size_t(array_size));
         tmp2.type()=type;
       }
       else if(mp_integer(tmp2.operands().size())<array_size)
@@ -192,7 +192,7 @@ exprt c_typecheck_baset::do_initializer_rec(
         tmp2.type()=type;
         exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
                                     *this, get_message_handler());
-        tmp2.operands().resize(integer2long(array_size), zero);
+        tmp2.operands().resize(integer2size_t(array_size), zero);
       }
     }
     
@@ -360,7 +360,7 @@ void c_typecheck_baset::designator_enter(
         throw 0;
       }
 
-      entry.size=integer2long(array_size);
+      entry.size=integer2size_t(array_size);
       entry.subtype=array_type.subtype();
     }
   }
@@ -378,7 +378,7 @@ void c_typecheck_baset::designator_enter(
       throw 0;
     }
 
-    entry.size=integer2long(vector_size);
+    entry.size=integer2size_t(vector_size);
     entry.subtype=vector_type.subtype();
   }
   else
@@ -443,7 +443,7 @@ void c_typecheck_baset::do_designated_initializer(
         {
           // we are willing to grow an incomplete or zero-sized array
           exprt zero=zero_initializer(full_type.subtype(), value.source_location(), *this, get_message_handler());
-          dest->operands().resize(integer2long(index)+1, zero);
+          dest->operands().resize(integer2size_t(index)+1, zero);
           
           // todo: adjust type!
         }
@@ -457,7 +457,7 @@ void c_typecheck_baset::do_designated_initializer(
         }
       }
 
-      dest=&(dest->operands()[integer2long(index)]);
+      dest=&(dest->operands()[integer2size_t(index)]);
     }
     else if(full_type.id()==ID_struct)
     {
@@ -740,8 +740,8 @@ designatort c_typecheck_baset::make_designator(
         throw 0;
       }
       
-      entry.index=integer2long(index);
-      entry.size=integer2long(size);
+      entry.index=integer2size_t(index);
+      entry.size=integer2size_t(size);
       entry.subtype=full_type.subtype();
     }
     else if(full_type.id()==ID_struct ||

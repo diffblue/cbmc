@@ -241,7 +241,7 @@ void rw_range_sett::get_objects_byte_extract(
       be.id()==ID_byte_extract_little_endian,
       ns);
     assert(index<std::numeric_limits<size_t>::max());
-    range_spect offset=range_start + map.map_bit(integer2long(index));
+    range_spect offset=range_start + map.map_bit(integer2size_t(index));
     get_objects_rec(mode, be.op(), offset, size);
   }
 }

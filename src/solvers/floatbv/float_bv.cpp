@@ -1369,9 +1369,9 @@ exprt float_bvt::rounder(
         aligned_exponent=src.exponent;
 
   {
-    unsigned exponent_bits=
-      std::max((unsigned long)integer2long(address_bits(spec.f)),
-               (unsigned long)spec.e)+1;
+    std::size_t exponent_bits=
+      std::max((std::size_t)integer2size_t(address_bits(spec.f)),
+               (std::size_t)spec.e)+1;
 
     // before normalization, make sure exponent is large enough
     if(to_signedbv_type(aligned_exponent.type()).get_width()<exponent_bits)

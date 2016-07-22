@@ -320,7 +320,7 @@ exprt flatten_byte_update(
           t.id()==ID_pointer)
   {
     // do a shift, mask and OR
-    std::size_t width=integer2long(pointer_offset_size(t, ns)*8);
+    std::size_t width=integer2size_t(pointer_offset_size(t, ns)*8);
     
     assert(width!=0);
     

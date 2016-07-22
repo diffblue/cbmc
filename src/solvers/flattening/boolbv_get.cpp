@@ -448,7 +448,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
     result=exprt(ID_array, type);
     result.type().set(ID_size, size);
 
-    std::size_t size_int=integer2long(size_mpint);
+    std::size_t size_int=integer2size_t(size_mpint);
 
     // allocate operands
     result.operands().resize(size_int);
@@ -462,7 +462,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
         it!=values.end();
         it++)
       if(it->first>=0 && it->first<size_mpint)
-        result.operands()[integer2long(it->first)].swap(it->second);
+        result.operands()[integer2size_t(it->first)].swap(it->second);
   }
   
   return result;

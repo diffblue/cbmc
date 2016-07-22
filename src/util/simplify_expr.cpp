@@ -1455,7 +1455,7 @@ bool simplify_exprt::simplify_with(exprt &expr)
         if(i<0 || i>=expr.op0().operands().size())
           break;
 
-        expr.op0().operands()[integer2long(i)].swap(expr.op2());
+        expr.op0().operands()[integer2size_t(i)].swap(expr.op2());
 
         expr.operands().erase(++expr.operands().begin());
         expr.operands().erase(++expr.operands().begin());
@@ -1518,7 +1518,7 @@ bool simplify_exprt::simplify_update(exprt &expr)
       if(i<0 || i>=value_ptr->operands().size())
         return true;
 
-      value_ptr=&value_ptr->operands()[integer2long(i)];
+      value_ptr=&value_ptr->operands()[integer2size_t(i)];
     }
     else if(it->id()==ID_member_designator &&
             value_ptr->id()==ID_struct)
@@ -1740,8 +1740,8 @@ exprt simplify_exprt::bits2expr(
       std::string comp_bits=
         std::string(
           bits,
-          integer2long(m_offset_bits),
-          integer2long(m_size));
+          integer2size_t(m_offset_bits),
+          integer2size_t(m_size));
       exprt comp=bits2expr(comp_bits, it->type(), little_endian);
       if(comp.is_nil())
         return nil_exprt();
@@ -1759,10 +1759,10 @@ exprt simplify_exprt::bits2expr(
     mp_integer size;
     if(to_integer(array_type.size(), size))
       assert(false);
-    std::size_t n_el=integer2long(size);
+    std::size_t n_el=integer2size_t(size);
 
     std::size_t el_size=
-      integer2long(pointer_offset_bits(type.subtype(), ns));
+      integer2size_t(pointer_offset_bits(type.subtype(), ns));
     assert(el_size>0);
 
     exprt result=array_exprt(array_type);
@@ -1953,14 +1953,14 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
                 byte_extract_id()==ID_byte_extract_little_endian);
 
     // double the string until we have sufficiently many bits
-    while(const_bits.size()<integer2long(offset*8+el_size))
+    while(mp_integer(const_bits.size())<offset*8+el_size)
       const_bits+=const_bits;
 
     std::string el_bits=
       std::string(
         const_bits,
-        integer2long(offset*8),
-        integer2long(el_size));
+        integer2size_t(offset*8),
+        integer2size_t(el_size));
 
     exprt tmp=
       bits2expr(
@@ -1997,8 +1997,8 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
     std::string bits_cut=
       std::string(
         bits,
-        integer2long(offset*8),
-        integer2long(el_size));
+        integer2size_t(offset*8),
+        integer2size_t(el_size));
 
     exprt tmp=
       bits2expr(bits_cut,

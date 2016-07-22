@@ -47,7 +47,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     if(o<0 || o>=bv0.size())
       return prop.new_variable(); // out of range!
     else
-      return bv0[integer2long(o)];
+      return bv0[integer2size_t(o)];
   }
 
   if(operands[0].type().id()==ID_verilog_signedbv ||
