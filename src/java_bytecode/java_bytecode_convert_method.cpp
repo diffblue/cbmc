@@ -79,21 +79,69 @@ protected:
   {
   public:
     symbol_exprt symbol_expr;
+    size_t start_pc;
+    size_t length;
   };
-  
-  expanding_vector<variablet> variables;
+
+  typedef std::vector<variablet> variablest;
+  expanding_vector<variablest> variables;
   
   bool method_has_this;
 
+  // return corresponding reference of variable
+  variablet &find_variable_for_slot(unsigned number_int, size_t address, variablest &var_list)
+  {
+    size_t var_list_length = var_list.size();
+    if(var_list_length > 1)
+      {
+        for(variablet &var : var_list)
+          {
+            size_t start_pc = var.start_pc;
+            size_t length = var.length;
+            if (address >= start_pc && address <= start_pc + length)
+              {
+                std::cout << "found for address " << std::to_string(address)
+                          << " starting at " << std::to_string(start_pc)
+                          << " length: " << std::to_string(length) << std::endl;
+                return var;
+              }
+          }
+        std::cout << "end of list reached without correct frame found" << std::endl;
+        return var_list[0];
+      }
+    else if(var_list_length == 1)
+      return var_list[0];
+    else
+      {
+        std::cout << "no local variable exists!" << std::endl;
+        return var_list[0];
+      }
+  }
+  
   // JVM local variables
-  const exprt variable(const exprt &arg, char type_char)
+  const exprt variable(const exprt &arg, char type_char, size_t address)
   {
     irep_idt number=to_constant_expr(arg).get_value();
     
     std::size_t number_int=safe_string2size_t(id2string(number));
     typet t=java_type_from_char(type_char);
 
-    if(variables[number_int].symbol_expr.get_identifier().empty())
+    std::cout << "getting the variable list for number " << std::to_string(number_int) << std::endl;
+    variablest &var_list = variables[number_int];
+
+    size_t var_list_length = var_list.size();
+    if(var_list_length == 1)
+      std::cout << "only single variable" << std::endl;
+    else if (var_list_length > 1)
+      std::cout << "multiple variables (" << std::to_string(var_list_length) << ") with this index" << std::endl;
+    else
+      std::cout << "no variable with this index" << std::endl;
+
+    // search variable in list for correct frame / address if necessary
+    variablet &var = find_variable_for_slot(number_int, address, var_list);
+
+    std::cout << "look at number " << std::to_string(number_int) << std::endl;    
+    if(var.symbol_expr.get_identifier().empty())
     {
       // an un-named local variable
       irep_idt base_name="local"+id2string(number)+type_char;
@@ -106,7 +154,7 @@ protected:
     }
     else
     {
-      exprt result=variables[number_int].symbol_expr;
+      exprt result=var.symbol_expr;
       if(t!=result.type()) result=typecast_exprt(result, t);
       return result;
     }
@@ -231,6 +279,8 @@ void java_bytecode_convert_methodt::convert(
 {
   //const class_typet &class_type=to_class_type(class_symbol.type);
 
+  std::cout << "--------\n" << m.name << std::endl;
+
   typet member_type=java_type_from_string(m.signature);
 
   assert(member_type.id()==ID_code);
@@ -256,16 +306,23 @@ void java_bytecode_convert_methodt::convert(
   variables.clear();
 
   // Do the parameters and locals in the variable table,
-  // which is only available when compiled with -g
+  // which is available when compiled with -g
+  // or with methods with many local variables
+  // in the latter case, different variables can have
+  // the same index, depending on the context!
   for(const auto & v : m.local_variable_table)
   {
     typet t=java_type_from_string(v.signature);
     irep_idt identifier=id2string(method_identifier)+"::"+id2string(v.name);
     symbol_exprt result(identifier, t);
     result.set(ID_C_base_name, v.name);
-    variables[v.index].symbol_expr=result;
+    size_t number_index_entries = variables[v.index].size();
+    variables[v.index].resize(number_index_entries + 1);
+    variables[v.index][number_index_entries].symbol_expr = result;
+    variables[v.index][number_index_entries].start_pc = v.start_pc;
+    variables[v.index][number_index_entries].length = v.length;
   }
-
+  
   // set up variables array
   for(std::size_t i=0, param_index=0;
       i < parameters.size(); ++i)
@@ -290,8 +347,8 @@ void java_bytecode_convert_methodt::convert(
     else
     {
       // in the variable table?
-      base_name=variables[param_index].symbol_expr.get(ID_C_base_name);
-      identifier=variables[param_index].symbol_expr.get(ID_identifier);
+      base_name=variables[param_index][0].symbol_expr.get(ID_C_base_name);
+      identifier=variables[param_index][0].symbol_expr.get(ID_identifier);
       
       if(base_name.empty())
       {
@@ -315,7 +372,7 @@ void java_bytecode_convert_methodt::convert(
 
     // add as a JVM variable
     std::size_t slots=get_variable_slots(parameters[i]);
-    variables[param_index].symbol_expr=parameter_symbol.symbol_expr();
+    variables[param_index][0].symbol_expr=parameter_symbol.symbol_expr();
     param_index+=slots;
   }
 
@@ -765,7 +822,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
 
-      exprt var=variable(arg0, statement[0]);
+      exprt var=variable(arg0, statement[0], i_it->address);
       
       const bool is_array('a' == statement[0]);
       
@@ -797,7 +854,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg0, statement[0]);
+      results[0]=variable(arg0, statement[0], i_it->address);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -959,9 +1016,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0, 'i');
+      code_assign.lhs()=variable(arg0, 'i', i_it->address);
       code_assign.rhs()=plus_exprt(
-                          variable(arg0, 'i'),
+                                 variable(arg0, 'i', i_it->address),
                           typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }

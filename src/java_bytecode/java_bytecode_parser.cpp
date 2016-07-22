@@ -1084,8 +1084,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
 
     for(unsigned i=0; i<local_variable_table_length; i++)
     {
-      UNUSED u2 start_pc=read_u2();
-      UNUSED u2 length=read_u2();
+      u2 start_pc=read_u2();
+      u2 length=read_u2();
       u2 name_index=read_u2();
       u2 descriptor_index=read_u2();
       u2 index=read_u2();
@@ -1093,6 +1093,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       method.local_variable_table[i].index=index;
       method.local_variable_table[i].name=pool_entry(name_index).s;
       method.local_variable_table[i].signature=id2string(pool_entry(descriptor_index).s);
+      method.local_variable_table[i].start_pc=start_pc;
+      method.local_variable_table[i].length=length;
     }
   }
   else if(attribute_name=="StackMapTable")

@@ -98,6 +98,8 @@ public:
       irep_idt name;
       std::string signature;
       std::size_t index;
+      std::size_t start_pc;
+      std::size_t length;
     };
 
     typedef std::vector<local_variablet> local_variable_tablet;
