@@ -11,6 +11,7 @@ int main(void)
   long double ld=0;
   long int li=0;
   void *p=0;
+  char buffer[10];
   
   __CPROVER_scanf("%c", &c);
   __CPROVER_scanf("%hhd", &si);
@@ -20,6 +21,7 @@ int main(void)
   __CPROVER_scanf("%Lf", &ld);
   __CPROVER_scanf("%li", &li);
   __CPROVER_scanf("%p", &p);
+  __CPROVER_scanf("%s", buffer);
 
   assert(c==0); // may fail
   assert(si==0); // may fail
@@ -28,6 +30,7 @@ int main(void)
   assert(d==0); // may fail
   assert(li==0); // may fail
   assert(p==0); // may fail
+  assert(buffer[0]==0); // may fail
 
   return 0;
 }

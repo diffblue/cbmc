@@ -7,6 +7,8 @@ Author: CM Wintersteiger
 \*******************************************************************/
 
 #include <util/std_types.h>
+#include <util/std_expr.h>
+
 #include <ansi-c/c_types.h>
 
 #include <cctype>
@@ -330,6 +332,13 @@ typet get_type(const format_tokent &token)
 
   case format_tokent::POINTER:
     return pointer_type(void_type());
+
+  case format_tokent::STRING:
+    switch(token.length_modifier)
+    {
+    case format_tokent::LEN_l: return array_typet(wchar_t_type(), nil_exprt());
+    default: return array_typet(char_type(), nil_exprt());
+    }
 
   default:
     return nil_typet();

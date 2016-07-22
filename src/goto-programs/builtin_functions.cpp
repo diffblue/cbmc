@@ -288,12 +288,45 @@ void goto_convertt::do_scanf(
               typecast_exprt(arguments[argument_number], pointer_type(type));
             argument_number++;
 
-            // make it nondet for now
-            exprt lhs=dereference_exprt(ptr, type);
-            exprt rhs=side_effect_expr_nondett(type);
-            code_assignt assign(lhs, rhs);
-            assign.add_source_location()=function.source_location();
-            copy(assign, ASSIGN, dest);
+            if(type.id()==ID_array)
+            {
+              #if 0
+              // A string. We first need a nondeterministic size.
+              exprt size=side_effect_expr_nondett(size_type());
+              to_array_type(type).size()=size;
+
+              const symbolt &tmp_symbol=
+                new_tmp_symbol(type, "scanf_string", dest, function.source_location());
+                
+              exprt rhs=address_of_exprt(
+                index_exprt(tmp_symbol.symbol_expr(), gen_zero(index_type())));
+    
+              // now use array copy
+              codet array_copy_statement;
+              array_copy_statement.set_statement(ID_array_copy);
+              array_copy_statement.operands().resize(2);
+              array_copy_statement.op0()=ptr;
+\              array_copy_statement.op1()=rhs;
+              array_copy_statement.add_source_location()=function.source_location();
+
+              copy(array_copy_statement, OTHER, dest);
+              #else
+              exprt lhs=dereference_exprt(ptr, type.subtype());
+              exprt rhs=side_effect_expr_nondett(type.subtype());
+              code_assignt assign(lhs, rhs);
+              assign.add_source_location()=function.source_location();
+              copy(assign, ASSIGN, dest);
+              #endif
+            }
+            else
+            {
+              // make it nondet for now
+              exprt lhs=dereference_exprt(ptr, type);
+              exprt rhs=side_effect_expr_nondett(type);
+              code_assignt assign(lhs, rhs);
+              assign.add_source_location()=function.source_location();
+              copy(assign, ASSIGN, dest);
+            }
           }
         }
       }
@@ -904,11 +937,11 @@ void goto_convertt::do_array_copy(
     throw "array_copy expects two arguments";
   }
 
-  codet array_set_statement;
-  array_set_statement.set_statement(ID_array_copy);
-  array_set_statement.operands()=arguments;
+  codet array_copy_statement;
+  array_copy_statement.set_statement(ID_array_copy);
+  array_copy_statement.operands()=arguments;
 
-  copy(array_set_statement, OTHER, dest);
+  copy(array_copy_statement, OTHER, dest);
 }
 
 /*******************************************************************\
