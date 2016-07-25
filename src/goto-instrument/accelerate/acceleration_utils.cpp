@@ -527,7 +527,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
             stashed_value.to_expr()));
   }
 
-  exprt arrays_expr=conjunction(array_operands);
+  exprt arrays_expr=::conjunction(array_operands);
 
   symbolt k_sym = fresh_symbol("polynomial::k", unsignedbv_typet(POLY_WIDTH));
   exprt k = k_sym.symbol_expr();
@@ -618,7 +618,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
         unchanged_operands.push_back(unchanged_by_this_one);
       }
 
-      idx_never_touched = conjunction(unchanged_operands);
+      idx_never_touched = ::conjunction(unchanged_operands);
     }
     else
     {
@@ -634,7 +634,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
         idx_touched_operands.push_back(not_exprt(equal_exprt(idx, it->to_expr())));
       }
 
-      exprt idx_not_touched=conjunction(idx_touched_operands);
+      exprt idx_not_touched=::conjunction(idx_touched_operands);
 
       // OK, we have an expression saying idx is not touched by the
       // loop_counter'th iteration.  Let's quantify that to say that idx is not
