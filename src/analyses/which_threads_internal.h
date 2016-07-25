@@ -19,19 +19,18 @@ class which_threads_internalt
 {
 protected:
   const goto_functionst &goto_functions;
+
 public:
-
   explicit which_threads_internalt(const goto_functionst&);
-
 
   bool is_threaded(const goto_programt::const_targett t) const
   {
-    return is_threaded_set.count(t);
+    return is_threaded_set.count(t)!=0;
   }
 
   bool is_shared(const goto_programt::const_targett t) const
   {
-    return is_shared_set.count(t);
+    return is_shared_set.count(t)!=0;
   }
 
   bool is_thread_entry(const irep_idt &name) const
