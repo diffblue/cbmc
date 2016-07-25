@@ -122,9 +122,7 @@ protected:
     
     std::size_t number_int=safe_string2size_t(id2string(number));
     typet t=java_type_from_char(type_char);
-
     variablest &var_list = variables[number_int];
-    size_t var_list_length = var_list.size();
 
     // search variable in list for correct frame / address if necessary
     variablet &var = find_variable_for_slot(number_int, address, var_list, inst_size);
@@ -291,14 +289,6 @@ void java_bytecode_convert_methodt::convert(
 
   variables.clear();
 
-  // set up variables array
-  for(std::size_t i=0, param_index=0;
-      i < parameters.size(); ++i)
-  {
-    variables[param_index].resize(1);
-    param_index+=get_variable_slots(parameters[i]);
-  }
-
   // Do the parameters and locals in the variable table, which is available when
   // compiled with -g or for methods with many local variables in the latter
   // case, different variables can have the same index, depending on the
@@ -318,6 +308,14 @@ void java_bytecode_convert_methodt::convert(
     variables[v.index][number_index_entries].symbol_expr = result;
     variables[v.index][number_index_entries].start_pc = v.start_pc;
     variables[v.index][number_index_entries].length = v.length;
+  }
+
+  // set up variables array
+  for(std::size_t i=0, param_index=0;
+      i < parameters.size(); ++i)
+  {
+    variables[param_index].resize(1);
+    param_index+=get_variable_slots(parameters[i]);
   }
 
   // assign names to parameters
