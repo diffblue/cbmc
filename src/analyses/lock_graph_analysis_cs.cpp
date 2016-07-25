@@ -16,6 +16,7 @@ Author: Peter Schrammel
 #endif
 
 #include <algorithm>
+
 #include <util/config.h>
 #include <util/xml_expr.h>
 #include <util/xml.h>
@@ -397,7 +398,7 @@ void lock_graph_analysis_cst::output_statistics2(std::ostream &out)
   out << "  Number of non-concurrency checks: "
       << statistics.no_non_concurrent_checks << std::endl;
 
-  unsigned long len_longest_valid_cycle = 0;
+  std::size_t len_longest_valid_cycle = 0;
   for(deadlockst::const_iterator d_it = potential_deadlocks.begin();
       d_it != potential_deadlocks.end(); ++d_it)
     len_longest_valid_cycle = std::max(len_longest_valid_cycle,
