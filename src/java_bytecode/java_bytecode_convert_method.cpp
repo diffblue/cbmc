@@ -104,7 +104,7 @@ protected:
           {
             size_t start_pc = var.start_pc;
             size_t length = var.length;
-            if (address + (size_t) inst_size >= start_pc && address <= start_pc + length)
+            if (address + (size_t) inst_size >= start_pc && address < start_pc + length)
               return var;
           }
         throw ("end of list reached, address " + std::to_string(address) + " not found");
