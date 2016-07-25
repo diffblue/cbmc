@@ -116,8 +116,6 @@ void java_bytecode_convert_classt::convert(const classt &c)
     throw 0;
   }
 
-  std::cout << "-----------\nclass: " << c.name << std::endl;
-  
   // now do fields
   for(const auto & it : c.fields)
     convert(*class_symbol, it);

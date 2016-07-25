@@ -105,26 +105,16 @@ protected:
             size_t start_pc = var.start_pc;
             size_t length = var.length;
             if (address + (size_t) inst_size >= start_pc && address <= start_pc + length)
-              {
-                std::cout << "found for address " << std::to_string(address)
-                          << " starting at " << std::to_string(start_pc)
-                          << " length: " << std::to_string(length)
-                          << var.symbol_expr << std::endl;
-                return var;
-              }
+              return var;
           }
-        std::cout << "end of list reached, address " << std::to_string(address) << std::endl;
-        return var_list[0];
+        throw ("end of list reached, address " + std::to_string(address) + " not found");
       }
     else if(var_list_length == 1)
       return var_list[0];
     else
-      {
-        std::cout << "no local variable exists!" << std::endl;
-        return var_list[0];
-      }
+      throw ("local variable " + std::to_string(number_int) + " not found");
   }
-  
+
   // JVM local variables
   const exprt variable(const exprt &arg, char type_char, size_t address, instruction_sizet inst_size)
   {
@@ -133,21 +123,12 @@ protected:
     std::size_t number_int=safe_string2size_t(id2string(number));
     typet t=java_type_from_char(type_char);
 
-    std::cout << "getting the variable list for number " << std::to_string(number_int) << std::endl;
     variablest &var_list = variables[number_int];
-
     size_t var_list_length = var_list.size();
-    if(var_list_length == 1)
-      std::cout << "only single variable" << std::endl;
-    else if (var_list_length > 1)
-      std::cout << "multiple variables (" << std::to_string(var_list_length) << ") with this index" << std::endl;
-    else
-      std::cout << "no variable with this index" << std::endl;
 
     // search variable in list for correct frame / address if necessary
     variablet &var = find_variable_for_slot(number_int, address, var_list, inst_size);
 
-    std::cout << "look at number " << std::to_string(number_int) << std::endl;    
     if(var.symbol_expr.get_identifier().empty())
     {
       // an un-named local variable
@@ -286,8 +267,6 @@ void java_bytecode_convert_methodt::convert(
 {
   //const class_typet &class_type=to_class_type(class_symbol.type);
 
-  std::cout << "--------\n" << m.name << std::endl;
-
   typet member_type=java_type_from_string(m.signature);
 
   assert(member_type.id()==ID_code);
@@ -316,7 +295,6 @@ void java_bytecode_convert_methodt::convert(
   for(std::size_t i=0, param_index=0;
       i < parameters.size(); ++i)
   {
-    std::cout << "parameter " << std::to_string(param_index) << " " << parameters[i] << std::endl;
     variables[param_index].resize(1);
     param_index+=get_variable_slots(parameters[i]);
   }

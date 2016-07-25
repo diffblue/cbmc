@@ -23,10 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "bytecode_info.h"
 
-#define DEBUG
 #ifdef DEBUG
 #include <iostream>
-#include <string>
 #endif
 
 class java_bytecode_parsert:public parsert
@@ -1101,26 +1099,19 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
   {
     u2 stack_map_entries=read_u2();
 
-    std::cout << "reading StackMapTable; length: " << std::to_string(stack_map_entries) << std::endl;
-
     method.stack_map_table.resize(stack_map_entries);
 
     for(size_t i=0; i<stack_map_entries; i++)
     {
       u1 frame_type=read_u1();
-
-      std::cout << std::to_string(i) << " th frame is of type " << std::to_string(frame_type) << std::endl;
-
       if(0 <= frame_type && frame_type <= 63)
         {
-          std::cout << "FRAME: SAME" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
         }
       else if(64 <= frame_type && frame_type <= 127)
         {
-          std::cout << "FRAME: SAME_LOCALS_ONE_STACK" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(1);
@@ -1130,7 +1121,6 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
         }
       else if(frame_type == 247)
         {
-          std::cout << "FRAME: SAME_LOCALS_ONE_STACK_EXTENDED" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK_EXTENDED;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(1);
@@ -1142,7 +1132,6 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
         }
       else if(248 <= frame_type && frame_type <= 250)
         {
-          std::cout << "FRAME: CHOP" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::CHOP;
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
@@ -1151,7 +1140,6 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
         }
       else if(frame_type == 251)
         {
-          std::cout << "FRAME: SAME_EXTENDED" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_EXTENDED;
           u2 offset=read_u2();
           method.stack_map_table[i].locals.resize(0);
@@ -1162,7 +1150,6 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       else if(252 <= frame_type && frame_type <= 254)
         {
           size_t new_locals = (size_t) (frame_type - 251);
-          std::cout << "FRAME: APPEND" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::APPEND;
           method.stack_map_table[i].locals.resize(new_locals);
           method.stack_map_table[i].stack.resize(0);
@@ -1177,7 +1164,6 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
         }
       else if(frame_type == 255)
         {
-          std::cout << "FRAME: FULL" << std::endl;
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::FULL;
 
           u2 offset_delta = read_u2();
@@ -1250,7 +1236,7 @@ void java_bytecode_parsert::read_verification_type_info(methodt::verification_ty
     }
   else
     throw "ERROR: unknown verification type info encountered";
-}  
+}
 
 /*******************************************************************\
 
