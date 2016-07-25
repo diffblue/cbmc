@@ -312,11 +312,23 @@ void java_bytecode_convert_methodt::convert(
 
   variables.clear();
 
-  // Do the parameters and locals in the variable table,
-  // which is available when compiled with -g
-  // or with methods with many local variables
-  // in the latter case, different variables can have
-  // the same index, depending on the context!
+  // set up variables array
+  for(std::size_t i=0, param_index=0;
+      i < parameters.size(); ++i)
+  {
+    std::cout << "parameter " << std::to_string(param_index) << " " << parameters[i] << std::endl;
+    variables[param_index].resize(1);
+    param_index+=get_variable_slots(parameters[i]);
+  }
+
+  // Do the parameters and locals in the variable table, which is available when
+  // compiled with -g or for methods with many local variables in the latter
+  // case, different variables can have the same index, depending on the
+  // context.
+  //
+  // to calculate which variable to use, one uses the address of the instruction
+  // that uses the variable, the size of the instruction and the start_pc /
+  // length values in the local variable table
   for(const auto & v : m.local_variable_table)
   {
     typet t=java_type_from_string(v.signature);
@@ -328,14 +340,6 @@ void java_bytecode_convert_methodt::convert(
     variables[v.index][number_index_entries].symbol_expr = result;
     variables[v.index][number_index_entries].start_pc = v.start_pc;
     variables[v.index][number_index_entries].length = v.length;
-  }
-  
-  // set up variables array
-  for(std::size_t i=0, param_index=0;
-      i < parameters.size(); ++i)
-  {
-    variables[param_index];
-    param_index+=get_variable_slots(parameters[i]);
   }
 
   // assign names to parameters
