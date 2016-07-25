@@ -1349,6 +1349,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results[0]=
         binary_predicate_exprt(op[0], "java_instanceof", arg0);
     }
+    else if(statement=="monitorenter")
+      warning() << "critical section with lock object is ignored ("
+                << i_it->source_location << ")" << eom;
+    else if(statement=="monitorexit")
+      // just skip, is always preceeded with "monitorenter"
+    {
+    }
     else
     {
       c=codet(statement);
