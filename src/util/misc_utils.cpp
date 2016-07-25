@@ -1,3 +1,5 @@
+#include <cctype>
+
 #include <util/ui_message.h>
 
 #include "misc_utils.h"
