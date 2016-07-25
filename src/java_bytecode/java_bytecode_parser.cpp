@@ -1141,7 +1141,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       else if(frame_type == 251)
         {
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_EXTENDED;
-          u2 offset=read_u2();
+          UNUSED u2 offset=read_u2();
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
           u2 offset_delta = read_u2();
@@ -1166,7 +1166,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
         {
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::FULL;
 
-          u2 offset_delta = read_u2();
+          UNUSED u2 offset_delta = read_u2();
           u2 number_locals = read_u2();
           method.stack_map_table[i].locals.resize(number_locals);
           for (size_t k = 0; k < (size_t) number_locals; k++)
