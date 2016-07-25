@@ -17,8 +17,10 @@ class static_analyzert: public ai_analysist
 	static_analyzert(
 	  goto_modelt &_goto_model,
 	  const optionst &_options,
-	  message_handlert &_message_handler):
-	  ai_analysist(_goto_model,_options,_message_handler)
+	  message_handlert &_message_handler,
+	  const bool &_constant_propagation):
+	  ai_analysist(_goto_model,_options,_message_handler,
+			  _constant_propagation)
     {
     }
 };

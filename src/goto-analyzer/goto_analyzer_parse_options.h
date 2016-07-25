@@ -38,7 +38,8 @@ class optionst;
   "(intervals)(show-intervals)" \
   "(non-null)(show-non-null)" \
   "(verify)(simplify)" \
-  "(generate)"
+  "(generate)(constant-propagation)" \
+  "(dump-c)(dump-cpp)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,

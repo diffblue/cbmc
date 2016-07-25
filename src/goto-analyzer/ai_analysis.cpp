@@ -59,6 +59,10 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
   exprt guard=t->guard;
   interval_domaint d=interval_analysis[t];
 
+  //check whether the guard is a constant
+  if (guard.is_false()) return tvt(true);
+  else if (guard.is_true()) return tvt(false);
+
   //merge intervals to properly handle conjunction
   if (guard.id()==ID_and)
   {
@@ -95,7 +99,10 @@ Function: ai_analysist::plain_text_report
 void ai_analysist::plain_text_report()
 {
   unsigned pass=0, fail=0, unknown=0;
-  
+
+  if (constant_propagation)
+    propagate_constants();
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
@@ -156,7 +163,10 @@ Function: ai_analysist::json_report
 void ai_analysist::json_report(const std::string &file_name)
 {
   json_arrayt json_result;
-  
+
+  if (constant_propagation)
+    propagate_constants();
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
@@ -213,7 +223,10 @@ Function: ai_analysist::xml_report
 void ai_analysist::xml_report(const std::string &file_name)
 {
   xmlt xml_result;
-  
+
+  if (constant_propagation)
+    propagate_constants();
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
@@ -271,6 +284,32 @@ void ai_analysist::show_intervals(
   std::ostream &out)
 {
   ait<interval_domaint> interval_analysis;
+
+  if (constant_propagation)
+    propagate_constants();
+
   interval_analysis(goto_model);
   interval_analysis.output(goto_model, out);
+}
+
+/*******************************************************************\
+
+Function: ai_analysist::propagate_constants
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ai_analysist::propagate_constants()
+{
+  status() << "propagating constants" << eom;
+
+  Forall_goto_functions(f_it, goto_functions)
+  {
+    constant_propagator_ait(f_it->second,ns);
+  }
 }

@@ -339,40 +339,63 @@ int goto_analyzer_parse_optionst::doit()
   
   if(cmdline.isset("show-intervals"))
   {
+  	const bool cp=cmdline.isset("constant-propagation");
+
     if(cmdline.isset("verify"))
     {
-	  static_analyzert analyzer(goto_model, options, get_message_handler());
+	  static_analyzert analyzer(goto_model, options, get_message_handler(), cp);
 	  analyzer.show_intervals(goto_model, std::cout);
     }
     else if (cmdline.isset("simplify"))
     {
-  	  static_simplifiert simplifier(goto_model, options, get_message_handler());
+  	  static_simplifiert simplifier(goto_model, options, get_message_handler(), cp);
   	  simplifier.show_intervals(goto_model, std::cout);
     }
     return 0;
   }
 
   if(cmdline.isset("non-null") ||
-     cmdline.isset("intervals"))
+     cmdline.isset("intervals") ||
+     cmdline.isset("constant-propagation"))
   {
       optionst options;
       options.set_option("json", cmdline.get_value("json"));
       options.set_option("xml", cmdline.get_value("xml"));
       bool result=0;
+  	  const bool cp=cmdline.isset("constant-propagation");
 
       if(cmdline.isset("verify"))
       {
-        static_analyzert analyzer(goto_model, options, get_message_handler());
+        static_analyzert analyzer(goto_model, options, get_message_handler(), cp);
         result=analyzer();
       }
       else if (cmdline.isset("simplify"))
       {
-        static_simplifiert simplifier(goto_model, options, get_message_handler());
-        simplifier.simplify_guards();
+        static_simplifiert simplifier(goto_model, options, get_message_handler(), cp);
+        simplifier.simplify_guards(cp);
         return 0;
       }
       return result?10:0;
   }
+
+#if 0
+  if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
+  {
+    const bool is_cpp=cmdline.isset("dump-cpp");
+    const bool h=cmdline.isset("use-system-headers");
+    namespacet ns(symbol_table);
+
+    // restore RETURN instructions in case remove_returns had been
+    // applied
+    restore_returns(symbol_table, goto_model.goto_functions);
+
+    dump_c(goto_model.goto_functions, h, ns, std::cout);
+
+    //(is_cpp ? dump_cpp : dump_c)(goto_model.goto_functions, h, ns, std::cout);
+
+    return 0;
+  }
+#endif
 
   error() << "no analysis/verification option given -- consider reading --help"
           << eom;
@@ -476,11 +499,17 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      //check whether we should simplify the goto-program before showing it
+      const bool cp=cmdline.isset("constant-propagation");
+      // check whether we should simplify the goto-program before showing it
       if (cmdline.isset("simplify"))
       {
-        static_simplifiert simplifier(goto_model, options, get_message_handler());
-      	simplifier.simplify_guards();
+        static_simplifiert simplifier(goto_model, options, get_message_handler(),cp);
+      	simplifier.simplify_guards(cp);
+      }
+      else if (cmdline.isset("verify"))
+      {
+        static_analyzert analyzer(goto_model, options, get_message_handler(), cp);
+        analyzer();
       }
       namespacet ns(goto_model.symbol_table);
       goto_model.goto_functions.output(ns, std::cout);
@@ -558,6 +587,7 @@ void goto_analyzer_parse_optionst::help()
     " --unreachable-instructions   list dead code\n"
     " --intervals                  interval analysis\n"
     " --non-null                   non-null analysis\n"
+    " --constant-propagation       propagate constants\n"
     "\n"
     "Results options:\n"
     " --json file_name             output results in JSON format to given file\n"

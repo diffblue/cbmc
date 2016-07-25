@@ -19,6 +19,7 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 #include <util/xml.h>
 
 #include <analyses/interval_domain.h>
+#include <analyses/constant_propagator.h>
 
 class ai_analysist:public messaget {
 
@@ -26,11 +27,13 @@ class ai_analysist:public messaget {
     ai_analysist(
 	  goto_modelt &_goto_model,
 	  const optionst &_options,
-	  message_handlert &_message_handler):
+	  message_handlert &_message_handler,
+	  const bool &_constant_propagation):
 	  messaget(_message_handler),
 	  goto_functions(_goto_model.goto_functions),
 	  ns(_goto_model.symbol_table),
-	  options(_options)
+	  options(_options),
+	  constant_propagation(_constant_propagation)
 	  {
 	  }
 
@@ -49,6 +52,7 @@ class ai_analysist:public messaget {
     goto_functionst &goto_functions;
     const namespacet ns;
     const optionst &options;
+    const bool &constant_propagation;
 
     // analyses
     ait<interval_domaint> interval_analysis;
@@ -56,6 +60,7 @@ class ai_analysist:public messaget {
     void plain_text_report();
     void json_report(const std::string &);
     void xml_report(const std::string &);
+    void propagate_constants();
 
     tvt eval(goto_programt::const_targett);
 };

@@ -17,11 +17,13 @@ class static_simplifiert: public ai_analysist
 	static_simplifiert(
 	  goto_modelt &_goto_model,
 	  const optionst &_options,
-	  message_handlert &_message_handler):
-	  ai_analysist(_goto_model,_options,_message_handler)
+	  message_handlert &_message_handler,
+	  const bool &_constant_propagation):
+	  ai_analysist(_goto_model,_options,_message_handler,
+			  _constant_propagation)
     {
     }
-	void simplify_guards();
+	void simplify_guards(const bool constant_propagation);
 };
 
 #endif
