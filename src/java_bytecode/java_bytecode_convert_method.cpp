@@ -112,7 +112,12 @@ protected:
     else if(var_list_length == 1)
       return var_list[0];
     else
-      throw ("local variable " + std::to_string(number_int) + " not found");
+      {
+        // return reference to unnamed local variable
+        variablet var;
+        variablet &v = var;
+        return v;
+      }
   }
 
   // JVM local variables
