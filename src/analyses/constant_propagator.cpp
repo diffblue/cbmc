@@ -399,24 +399,22 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
 
   for(replace_symbolt::expr_mapt::iterator
 	  it=replace_const.expr_map.begin();
-      it!=replace_const.expr_map.end(); ) // no it++
+      it!=replace_const.expr_map.end();
+      ++it)
   {
     const replace_symbolt::expr_mapt::const_iterator  b_it=src.replace_const.expr_map.find(it->first);
 
     if(b_it==src.replace_const.expr_map.end())
     {
       //cannot use set_to_top here
-      replace_const.expr_map.erase(it++);
+      replace_const.expr_map.erase(it);
       changed = true;
     }
     else if (b_it->first == it->first)
     {
       replace_const.expr_map[b_it->first]=b_it->second;
       if (it->second != b_it->second ) changed = true;
-      it++;
     }
-    else
-      it++;
   }
 
 #ifdef DEBUG
