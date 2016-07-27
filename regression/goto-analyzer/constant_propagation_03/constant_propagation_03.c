@@ -9,5 +9,5 @@ int main()
     i++;
     j++;
   }
-  assert(j!=3);
+  assert(j==3);
 }
