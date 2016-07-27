@@ -402,7 +402,8 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
       it!=replace_const.expr_map.end();
       ++it)
   {
-    const replace_symbolt::expr_mapt::const_iterator  b_it=src.replace_const.expr_map.find(it->first);
+    const replace_symbolt::expr_mapt::const_iterator
+      b_it=src.replace_const.expr_map.find(it->first);
 
     if(b_it==src.replace_const.expr_map.end())
     {
