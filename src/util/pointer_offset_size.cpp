@@ -21,8 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_offset_size.h"
 
-member_offset_iterator::member_offset_iterator(const struct_typet _type,
-                                               const namespacet _ns) :
+member_offset_iterator::member_offset_iterator(const struct_typet& _type,
+                                               const namespacet& _ns) :
   type(_type),
   ns(_ns),
   bit_field_bits(0),
