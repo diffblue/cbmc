@@ -397,41 +397,26 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
   
   bool changed = false;
 
-  //set everything to top that is not in src
-  for(replace_symbolt::expr_mapt::const_iterator 
-        it=replace_const.expr_map.begin();
-      it!=replace_const.expr_map.end();
-      )
+  for(replace_symbolt::expr_mapt::iterator
+	  it=replace_const.expr_map.begin();
+      it!=replace_const.expr_map.end(); ) // no it++
   {
-    if(src.replace_const.expr_map.find(it->first) ==
-       src.replace_const.expr_map.end())
+    const replace_symbolt::expr_mapt::const_iterator  b_it=src.replace_const.expr_map.find(it->first);
+
+    if(b_it==src.replace_const.expr_map.end())
     {
       //cannot use set_to_top here
       replace_const.expr_map.erase(it++);
       changed = true;
     }
-    else ++it;
-  }
-
-  for(replace_symbolt::expr_mapt::const_iterator 
-      it=src.replace_const.expr_map.begin();
-      it!=src.replace_const.expr_map.end();
-      ++it)
-  {      
-    replace_symbolt::expr_mapt::iterator 
-      c_it = replace_const.expr_map.find(it->first);
-
-    if(c_it != replace_const.expr_map.end())
+    else if (b_it->first == it->first)
     {
-      // values are different, set to top
-      if(c_it->second != it->second)
-      {
-        changed = set_to_top(it->first);
-        assert(changed);
-      }
+      replace_const.expr_map[b_it->first]=b_it->second;
+      if (it->second != b_it->second ) changed = true;
+      it++;
     }
-    // is not in "this", ignore
-    else { }
+    else
+      it++;
   }
 
 #ifdef DEBUG

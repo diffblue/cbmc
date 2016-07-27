@@ -60,8 +60,8 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
   interval_domaint d=interval_analysis[t];
 
   //check whether the guard is a constant
-  if (guard.is_false()) return tvt(true);
-  else if (guard.is_true()) return tvt(false);
+  if (guard.is_true()) return tvt(true);
+  else if (guard.is_false()) return tvt(false);
 
   //merge intervals to properly handle conjunction
   if (guard.id()==ID_and)
