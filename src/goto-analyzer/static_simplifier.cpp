@@ -31,11 +31,11 @@ void static_simplifiert::simplify_guards(const bool constant_propagation)
 {
   unsigned pass=0, fail=0, unknown=0;
 
-  status() << "simplifying guards" << eom;
-  interval_analysis(goto_functions, ns);
-
   if (constant_propagation)
     propagate_constants();
+
+  status() << "simplifying guards" << eom;
+  interval_analysis(goto_functions, ns);
 
   Forall_goto_functions(f_it, goto_functions)
   {
