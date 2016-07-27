@@ -409,7 +409,7 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     {
       //cannot use set_to_top here
       replace_const.expr_map.erase(it);
-      changed = true;
+      return true;
     }
     else if (b_it->first == it->first)
     {
@@ -417,10 +417,6 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
       if (it->second != b_it->second ) changed = true;
     }
   }
-
-#ifdef DEBUG
-  std::cout << "merged: " << changed << '\n';
-#endif
 
   return changed;
 }
