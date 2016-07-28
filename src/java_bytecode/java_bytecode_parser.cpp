@@ -1125,9 +1125,9 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(1);
           methodt::verification_type_infot verification_type_info;
+          u2 offset_delta = read_u2();
           read_verification_type_info(verification_type_info);
           method.stack_map_table[i].stack[0] = verification_type_info;
-          u2 offset_delta = read_u2();
           method.stack_map_table[i].offset_delta = offset_delta;
         }
       else if(248 <= frame_type && frame_type <= 250)
@@ -1141,7 +1141,6 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       else if(frame_type == 251)
         {
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_EXTENDED;
-          UNUSED u2 offset=read_u2();
           method.stack_map_table[i].locals.resize(0);
           method.stack_map_table[i].stack.resize(0);
           u2 offset_delta = read_u2();
@@ -1165,8 +1164,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       else if(frame_type == 255)
         {
           method.stack_map_table[i].type = methodt::stack_map_table_entryt::FULL;
-
-          UNUSED u2 offset_delta = read_u2();
+          u2 offset_delta = read_u2();
+          method.stack_map_table[i].offset_delta = offset_delta;
           u2 number_locals = read_u2();
           method.stack_map_table[i].locals.resize(number_locals);
           for (size_t k = 0; k < (size_t) number_locals; k++)
@@ -1175,7 +1174,6 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
               methodt::verification_type_infot &v = method.stack_map_table[i].locals.back();
               read_verification_type_info(v);
             }
-
           u2 number_stack_items = read_u2();
           method.stack_map_table[i].stack.resize(number_stack_items);
           for (size_t k = 0; k < (size_t) number_stack_items; k++)
