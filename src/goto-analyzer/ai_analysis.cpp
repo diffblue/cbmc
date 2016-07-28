@@ -68,19 +68,32 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
     interval_domaint a(d);
     a.make_top();
     a.assume(guard,ns);
+
     #ifdef DEBUG
       a.output(std::cout, interval_analysis, ns);
       d.output(std::cout, interval_analysis, ns);
     #endif
+
     if (a.merge(d, t, t)) return tvt::unknown();
     return tvt(true);
   }
-  else
+  else if (guard.id()==ID_not)
   {
-    d.assume(not_exprt(guard), ns);
-    if(d.is_bottom()) return tvt(true);
-    return tvt::unknown();
+	if (guard.op0().id()==ID_ge
+	  || guard.op0().id()==ID_gt)
+	{
+      interval_domaint a(d);
+	  a.make_top();
+	  a.assume(not_exprt(guard),ns);
+	  if (a.merge(d, t, t)) return tvt(true);
+	  return tvt::unknown();
+	}
   }
+
+  d.assume(not_exprt(guard), ns);
+  if(d.is_bottom()) return tvt(true);
+  return tvt::unknown();
+
 }
 
 /*******************************************************************\
