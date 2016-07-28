@@ -6,7 +6,7 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -111,7 +111,10 @@ void constant_propagator_domaint::transform(
     else
       g = simplify_expr(not_exprt(from->guard), ns);
 
-    two_way_propagate_rec(g, ns);
+    if (g.is_constant())
+      values.set_to_top();
+    else
+      two_way_propagate_rec(g, ns);
   }
   else if(from->is_dead())
   {
@@ -414,7 +417,7 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     else if (b_it->first == it->first)
     {
       replace_const.expr_map[b_it->first]=b_it->second;
-      if (it->second != b_it->second ) changed = true;
+      if (it->second != b_it->second ) return true;
     }
   }
 
