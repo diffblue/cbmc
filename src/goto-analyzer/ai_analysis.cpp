@@ -6,7 +6,7 @@ Author: Lucas Cordeiro, lucas.cordeiro@kcs.ox.ac.uk
 
 \*******************************************************************/
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -77,22 +77,12 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
     if (a.merge(d, t, t)) return tvt::unknown();
     return tvt(true);
   }
-  else if (guard.id()==ID_not)
+  else
   {
-	if (guard.op0().id()==ID_ge
-	  || guard.op0().id()==ID_gt)
-	{
-      interval_domaint a(d);
-	  a.make_top();
-	  a.assume(not_exprt(guard),ns);
-	  if (a.merge(d, t, t)) return tvt(true);
-	  return tvt::unknown();
-	}
+    d.assume(not_exprt(guard), ns);
+    if(d.is_bottom()) return tvt(true);
+    return tvt::unknown();
   }
-
-  d.assume(not_exprt(guard), ns);
-  if(d.is_bottom()) return tvt(true);
-  return tvt::unknown();
 
 }
 
