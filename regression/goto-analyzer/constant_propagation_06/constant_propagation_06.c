@@ -20,7 +20,7 @@ int main()
     assert(j>=10); // success
 
   if(i>=j)
-    assert(i>=j); // success
+    assert(i>=j); // fails
 
   if(i>10)
     assert(i>=11); // success
