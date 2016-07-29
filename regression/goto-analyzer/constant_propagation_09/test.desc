@@ -1,10 +1,9 @@
 CORE
-constant_propagation_08.c
+constant_propagation_09.c
 --constant-propagation --intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file constant_propagation_08.c line 12 function main, assertion i<50: UNKNOWN$
-^\[main.assertion.2\] file constant_propagation_08.c line 13 function main, assertion i<51: UNKNOWN$
-^\[main.assertion.3\] file constant_propagation_08.c line 14 function main, assertion i<52: SUCCESS$
+******** Function main
+^\[main.assertion.1\] file constant_propagation_09.c line 12 function main, assertion j<52: UNKNOWN$
 --
 ^warning: ignoring
