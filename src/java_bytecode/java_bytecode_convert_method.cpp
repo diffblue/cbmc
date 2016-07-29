@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bytecode_info.h"
 #include "java_types.h"
 
+#include <limits>
+
 namespace {
 class patternt
 {
@@ -107,13 +109,22 @@ protected:
             if (address + (size_t) inst_size >= start_pc && address < start_pc + length)
               return var;
           }
-        throw ("end of list reached, address " + std::to_string(address) + " not found");
+        // add unnamed local variable to end of list at this index
+        // with scope from 0 to INT_MAX
+        // as it is at the end of the vector, it will only be taken into account
+        // if no other variable is valid
+        size_t list_length = var_list.size();
+        var_list.resize(list_length + 1);
+        var_list[list_length].start_pc = 0;
+        var_list[list_length].length = std::numeric_limits<size_t>::max();
+        return var_list[list_length];
       }
     else if(var_list_length == 1)
       return var_list[0];
     else
       {
         // return reference to unnamed local variable
+        // if no local variable is defined for this index
         var_list.resize(1);
         return var_list[0];
       }
