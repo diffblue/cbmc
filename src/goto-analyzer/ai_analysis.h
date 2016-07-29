@@ -41,10 +41,6 @@ class ai_analysist:public messaget {
 	{
 	}
 
-    void show_intervals(
-      const goto_modelt &,
-      std::ostream &);
-
   protected:
     goto_functionst &goto_functions;
     const namespacet ns;

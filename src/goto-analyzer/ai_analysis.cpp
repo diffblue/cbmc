@@ -62,31 +62,6 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
 
 /*******************************************************************\
 
-Function: ai_analysist::show_intervals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void ai_analysist::show_intervals(
-  const goto_modelt &goto_model,
-  std::ostream &out)
-{
-  ait<interval_domaint> interval_analysis;
-
-  if (constant_propagation)
-    propagate_constants();
-
-  interval_analysis(goto_model);
-  interval_analysis.output(goto_model, out);
-}
-
-/*******************************************************************\
-
 Function: ai_analysist::propagate_constants
 
   Inputs:

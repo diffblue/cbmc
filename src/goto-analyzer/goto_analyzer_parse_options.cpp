@@ -46,9 +46,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_analyzer_parse_options.h"
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
-#include "static_verifier.h"
 #include "ai_analysis.h"
 #include "static_simplifier.h"
+#include "static_verifier.h"
+#include "static_analyser.h"
 
 /*******************************************************************\
 
@@ -340,17 +341,8 @@ int goto_analyzer_parse_optionst::doit()
   if(cmdline.isset("show-intervals"))
   {
   	const bool cp=cmdline.isset("constant-propagation");
-
-    if(cmdline.isset("verify"))
-    {
-	  static_verifiert verifier(goto_model, options, get_message_handler(), cp);
-	  verifier.show_intervals(goto_model, std::cout);
-    }
-    else if (cmdline.isset("simplify"))
-    {
-  	  static_simplifiert simplifier(goto_model, options, get_message_handler(), cp);
-  	  simplifier.show_intervals(goto_model, std::cout);
-    }
+    static_analysert analyser(goto_model, options, get_message_handler(), cp);
+    analyser.show_intervals(goto_model, std::cout);
     return 0;
   }
 
@@ -377,25 +369,6 @@ int goto_analyzer_parse_optionst::doit()
       }
       return result?10:0;
   }
-
-#if 0
-  if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
-  {
-    const bool is_cpp=cmdline.isset("dump-cpp");
-    const bool h=cmdline.isset("use-system-headers");
-    namespacet ns(symbol_table);
-
-    // restore RETURN instructions in case remove_returns had been
-    // applied
-    restore_returns(symbol_table, goto_model.goto_functions);
-
-    dump_c(goto_model.goto_functions, h, ns, std::cout);
-
-    //(is_cpp ? dump_cpp : dump_c)(goto_model.goto_functions, h, ns, std::cout);
-
-    return 0;
-  }
-#endif
 
   error() << "no analysis/verification option given -- consider reading --help"
           << eom;

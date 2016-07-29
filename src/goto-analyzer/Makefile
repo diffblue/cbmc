@@ -1,7 +1,7 @@
 SRC = goto_analyzer_main.cpp goto_analyzer_parse_options.cpp \
       taint_parser.cpp taint_analysis.cpp static_verifier.cpp \
       static_simplifier.cpp unreachable_instructions.cpp \
-      ai_analysis.cpp
+      ai_analysis.cpp static_analyser.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
