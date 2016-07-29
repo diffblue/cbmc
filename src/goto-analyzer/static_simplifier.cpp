@@ -29,7 +29,7 @@ Function: static_simplifiert::simplify_guards
 
 void static_simplifiert::simplify_guards(const bool constant_propagation)
 {
-  unsigned pass=0, fail=0, unknown=0;
+  unsigned simplified[]={0,0,0}, unknown[]={0,0,0};
 
   if (constant_propagation)
     propagate_constants();
@@ -52,20 +52,36 @@ void static_simplifiert::simplify_guards(const bool constant_propagation)
         tvt r=eval(i_it);
 
         if(r.is_true())
-        {
-          pass++;
     	  i_it->guard=true_exprt();
-        }
         else if(r.is_false())
-        {
-          fail++;
     	  i_it->guard=false_exprt();
+
+        //summarize the simplification results
+        if (r.is_true() || r.is_false())
+        {
+      	  if (i_it->is_assert())
+      	    simplified[0]+=1;
+      	  else if (i_it->is_assume())
+      		simplified[1]+=1;
+      	  else
+      		simplified[2]+=1;
         }
         else
-          unknown++;
+        {
+       	  if (i_it->is_assert())
+       		unknown[0]+=1;
+       	  else if (i_it->is_assume())
+       		unknown[1]+=1;
+       	  else
+       		unknown[2]+=1;
+        }
       }
     }
   }
-  status() << "SUMMARY: " << pass << " pass, " << fail << " fail, "
-           << unknown << " unknown" << eom;
+  status() << "SIMPLIFIED: " << " assert: " << simplified[0]
+		   << ", assume: " << simplified[1]
+		   << ", goto: " << simplified[2] << "\n"
+		   << "UNKNOWN: " << "    assert: " << unknown[0]
+		   << ", assume: " << unknown[1]
+		   << ", goto: " << unknown[2] << eom;
 }

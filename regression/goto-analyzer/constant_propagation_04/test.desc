@@ -3,6 +3,7 @@ constant_propagation_04.c
 --constant-propagation --simplify
 ^EXIT=0$
 ^SIGNAL=0$
-^SUMMARY: 0 pass, 0 fail, 0 unknown$
+^SIMPLIFIED:  assert: 0, assume: 0, goto: 0$
+^UNKNOWN:     assert: 0, assume: 0, goto: 0$
 --
 ^warning: ignoring
