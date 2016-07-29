@@ -11,10 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ai_analysis.h"
 
-class static_analyzert: public ai_analysist
+class static_verifiert: public ai_analysist
 {
   public:
-	static_analyzert(
+	static_verifiert(
 	  goto_modelt &_goto_model,
 	  const optionst &_options,
 	  message_handlert &_message_handler,
@@ -23,6 +23,15 @@ class static_analyzert: public ai_analysist
 			  _constant_propagation)
     {
     }
-};
 
+	bool operator()();
+
+  private:
+
+	//all available report types
+    void plain_text_report();
+    void json_report(const std::string &);
+    void xml_report(const std::string &);
+
+};
 #endif

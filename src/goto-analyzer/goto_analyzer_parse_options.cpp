@@ -46,7 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_analyzer_parse_options.h"
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
-#include "static_analyzer.h"
+#include "static_verifier.h"
 #include "ai_analysis.h"
 #include "static_simplifier.h"
 
@@ -343,8 +343,8 @@ int goto_analyzer_parse_optionst::doit()
 
     if(cmdline.isset("verify"))
     {
-	  static_analyzert analyzer(goto_model, options, get_message_handler(), cp);
-	  analyzer.show_intervals(goto_model, std::cout);
+	  static_verifiert verifier(goto_model, options, get_message_handler(), cp);
+	  verifier.show_intervals(goto_model, std::cout);
     }
     else if (cmdline.isset("simplify"))
     {
@@ -366,8 +366,8 @@ int goto_analyzer_parse_optionst::doit()
 
       if(cmdline.isset("verify"))
       {
-        static_analyzert analyzer(goto_model, options, get_message_handler(), cp);
-        result=analyzer();
+        static_verifiert verifier(goto_model, options, get_message_handler(), cp);
+        result=verifier();
       }
       else if (cmdline.isset("simplify"))
       {
@@ -508,8 +508,8 @@ bool goto_analyzer_parse_optionst::process_goto_program(
       }
       else if (cmdline.isset("verify"))
       {
-        static_analyzert analyzer(goto_model, options, get_message_handler(), cp);
-        analyzer();
+        static_verifiert verifier(goto_model, options, get_message_handler(), cp);
+        verifier();
       }
       namespacet ns(goto_model.symbol_table);
       goto_model.goto_functions.output(ns, std::cout);

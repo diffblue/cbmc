@@ -1,5 +1,5 @@
 SRC = goto_analyzer_main.cpp goto_analyzer_parse_options.cpp \
-      taint_parser.cpp taint_analysis.cpp static_analyzer.cpp \
+      taint_parser.cpp taint_analysis.cpp static_verifier.cpp \
       static_simplifier.cpp unreachable_instructions.cpp \
       ai_analysis.cpp
 

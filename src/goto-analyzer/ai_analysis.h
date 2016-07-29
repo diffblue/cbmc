@@ -37,9 +37,6 @@ class ai_analysist:public messaget {
 	  {
 	  }
 
-	bool operator()();
-
-
 	virtual ~ai_analysist()
 	{
 	}
@@ -57,9 +54,6 @@ class ai_analysist:public messaget {
     // analyses
     ait<interval_domaint> interval_analysis;
 
-    void plain_text_report();
-    void json_report(const std::string &);
-    void xml_report(const std::string &);
     void propagate_constants();
 
     tvt eval(goto_programt::const_targett);
