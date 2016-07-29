@@ -111,10 +111,16 @@ void constant_propagator_domaint::transform(
     else
       g = simplify_expr(not_exprt(from->guard), ns);
 
-    if (g.is_constant())
-      values.set_to_top();
+    if (g.is_false())
+     values.set_to_bottom();
     else
-      two_way_propagate_rec(g, ns);
+    {
+      //TODO: we need to support widening!
+      if (g.is_constant())
+        values.set_to_top();
+      else
+        two_way_propagate_rec(g, ns);
+    }
   }
   else if(from->is_dead())
   {
