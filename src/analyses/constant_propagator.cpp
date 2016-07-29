@@ -417,12 +417,13 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     {
       //cannot use set_to_top here
       replace_const.expr_map.erase(it);
-      return true;
+      changed = true;
+      break;
     }
     else
     {
       replace_const.expr_map[b_it->first]=b_it->second;
-      if (it->second != b_it->second ) return true;
+      if (it->second != b_it->second ) changed = true;
 
       it++;
     }
