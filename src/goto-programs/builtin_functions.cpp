@@ -335,7 +335,9 @@ void goto_convertt::do_scanf(
 
               copy(array_copy_statement, OTHER, dest);
               #else
-              exprt lhs=dereference_exprt(ptr, type.subtype());
+              exprt lhs=
+                index_exprt(
+                  dereference_exprt(ptr, type), from_integer(0, index_type()));
               exprt rhs=side_effect_expr_nondett(type.subtype());
               code_assignt assign(lhs, rhs);
               assign.add_source_location()=function.source_location();
