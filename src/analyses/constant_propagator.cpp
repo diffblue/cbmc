@@ -422,8 +422,9 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     }
     else
     {
+      const exprt previous=it->second;
       replace_const.expr_map[b_it->first]=b_it->second;
-      if (it->second != b_it->second ) changed = true;
+      if (it->second != previous) changed = true;
 
       it++;
     }
