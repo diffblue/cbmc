@@ -333,6 +333,14 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
+  if (cmdline.isset("strings"))
+  {
+    options.set_option("strings", true);
+    options.set_option("refine-arrays", true);
+    options.set_option("arrays-uf-always", true);
+    options.set_option("propagation", false);
+  }
+
   if(cmdline.isset("max-node-refinement"))
     options.set_option("max-node-refinement", cmdline.get_value("max-node-refinement"));
 
@@ -1169,6 +1177,7 @@ void cbmc_parse_optionst::help()
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n"
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n"
+    " --strings                    enable support for strings (experimental)\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

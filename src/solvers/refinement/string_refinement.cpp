@@ -30,6 +30,8 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   string_char_set_func = "__CPROVER_uninterpreted_char_set";
   string_length_width = 32; // TODO!
   next_symbol_id = 1;
+
+  equality_propagation = false;
 }
 
 
@@ -40,6 +42,10 @@ string_refinementt::~string_refinementt()
 
 void string_refinementt::post_process()
 {
+  for (size_t i = 0; i < cur.size(); ++i) {
+    set_to_true(cur[i]);
+  }
+  
   // Ackermann expansion for string lengths
   for (expr_mapt::iterator i = string2length.begin(), end = string2length.end();
        i != end; ++i) {
@@ -52,11 +58,27 @@ void string_refinementt::post_process()
       exprt lenj = j->second;
 
       implies_exprt lemma(equal_exprt(si, sj), equal_exprt(leni, lenj));
-      prop.l_set_to_true(convert(lemma));
+      //prop.l_set_to_true(convert(lemma));
+      set_to_true(lemma);
     }
   }
 
   add_instantiations(true);
+
+  SUB::post_process();
+}
+
+
+bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
+{
+  if (!is_string_type(expr.lhs().type())) {
+    return SUB::boolbv_set_equality_to_true(expr);
+  }
+  convert(expr);
+  exprt a = make_array(expr.lhs());
+  exprt b = make_array(expr.rhs());
+  prop.l_set_to_true(record_array_equality(equal_exprt(a, b)));
+  return false;
 }
 
 
@@ -418,13 +440,13 @@ bvt string_refinementt::convert_string_literal(
     bv = convert_bv(arr);
 
     for (std::size_t i = 0; i < sval.size(); ++i) {
-      constant_exprt idx(i2string(i), index_type());
-      constant_exprt c(i2string(int(sval[i])), char_type());
+      constant_exprt idx(i2idx(i), index_type());
+      constant_exprt c(i2chr(int(sval[i])), char_type());
       equal_exprt lemma(index_exprt(arr, idx), c);
       add_lemma(lemma);
     }
     exprt len = make_length(f);
-    equal_exprt lemma(len, constant_exprt(i2string(sval.size()), index_type()));
+    equal_exprt lemma(len, constant_exprt(i2idx(sval.size()), index_type()));
     add_lemma(lemma);
   } else {
     expect(false, "bad arg to string literal");
@@ -450,7 +472,7 @@ bvt string_refinementt::convert_char_literal(
     irep_idt sval = to_string_constant(s).get_value();
     expect(sval.size() == 1, "bad literal in char literal");
 
-    bv = convert_bv(constant_exprt(i2string(int(sval[0])), char_type()));
+    bv = convert_bv(constant_exprt(i2chr(int(sval[0])), char_type()));
   } else {
     expect(false, "char literal");
   }
@@ -505,10 +527,13 @@ bvt string_refinementt::convert_string_char_set(
 }
 
 
-void string_refinementt::add_lemma(const exprt &lemma)
+void string_refinementt::add_lemma(const exprt &lemma, bool immediately)
 {
-  prop.l_set_to_true(convert(lemma));
   cur.push_back(lemma);
+  if (immediately) {
+    //prop.l_set_to_true(convert(lemma));
+    set_to_true(lemma);
+  }
 }
 
 
@@ -534,7 +559,7 @@ void string_refinementt::add_instantiations(bool first)
       for (size_t k = 0; k < string_axioms.size(); ++k) {
         exprt lemma = instantiate(string_axioms[k], s, val);
         if (lemma.is_not_nil() && seen_instances.insert(lemma).second) {
-          add_lemma(lemma);
+          add_lemma(lemma, true);
         }
       }
     }
@@ -601,7 +626,7 @@ bool string_refinementt::check_axioms()
     replace_expr(axiom.idx, val, body);
     implies_exprt instance(premise, body);
     if (seen_instances.insert(instance).second) {
-      add_lemma(instance);
+      add_lemma(instance, true);
     }
     // TODO - add backwards instantiations
   }
@@ -611,6 +636,18 @@ bool string_refinementt::check_axioms()
 
 
 namespace {
+
+template <class T> std::string i2bin(T n, size_t w)
+{
+  size_t r(n);
+  std::string ret(w, '0');
+  for (size_t i = 0; i < w; ++i) {
+    if (r & (size_t(1) << i)) {
+      ret[i] = '1';
+    }
+  }
+  return ret;
+}
 
 void get_bounds(const exprt &qvar, const exprt &expr, std::vector<exprt> &out)
 {
@@ -829,6 +866,18 @@ symbol_exprt string_refinementt::fresh_symbol(const irep_idt &prefix,
   std::string s = buf.str();
   irep_idt name(s.c_str());
   return symbol_exprt(name, tp);
+}
+
+
+std::string string_refinementt::i2idx(size_t n)
+{
+  return i2bin(n, string_length_width);
+}
+
+
+std::string string_refinementt::i2chr(int n)
+{
+  return i2bin(n, 8);
 }
 
 

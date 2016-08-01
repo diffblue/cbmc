@@ -55,6 +55,7 @@ protected:
   bool is_string_type(const typet &type);
   bool is_char_type(const typet &type);
 
+  bool boolbv_set_equality_to_true(const equal_exprt &expr);
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
   
   bvt convert_string_equal(const function_application_exprt &f);
@@ -74,10 +75,12 @@ protected:
   void update_index_set(const string_axiomt &axiom);
   exprt instantiate(const string_axiomt &axiom, const exprt &str,
                     const exprt &val);
-  void add_lemma(const exprt &lemma);
+  void add_lemma(const exprt &lemma, bool immediately=false);
 
   symbol_exprt fresh_symbol(const irep_idt &prefix,
                             const typet &tp=bool_typet());
+  std::string i2idx(size_t n);
+  std::string i2chr(int n);
   typet index_type();
   typet char_type();
   exprt make_array(const exprt &str);
