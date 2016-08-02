@@ -57,7 +57,7 @@ void goto_symext::symex_atomic_end(statet &state)
         it=++(r_it->second.second.begin());
         it!=r_it->second.second.end();
         ++it)
-      read_guard|=*it;
+      read_guard.logical_or(*it, ns);
     exprt read_guard_expr=read_guard.as_expr();
     do_simplify(read_guard_expr);
 
@@ -83,7 +83,7 @@ void goto_symext::symex_atomic_end(statet &state)
         it=++(w_it->second.begin());
         it!=w_it->second.end();
         ++it)
-      write_guard|=*it;
+      write_guard.logical_or(*it, ns);
     exprt write_guard_expr=write_guard.as_expr();
     do_simplify(write_guard_expr);
 

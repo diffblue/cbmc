@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr.h"
 
+class namespacet;
+
 class guardt:public exprt
 {
 public:
@@ -61,7 +63,7 @@ public:
 #endif
 
   friend guardt &operator -= (guardt &g1, const guardt &g2);
-  friend guardt &operator |= (guardt &g1, const guardt &g2);
+  guardt& logical_or(const guardt &g2, const namespacet &ns);
 
 #if 0
   void swap(guardt &g)
