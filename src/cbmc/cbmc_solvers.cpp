@@ -323,7 +323,6 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
   return new cbmc_solver_with_propt(bv_refinement, prop);
 }
 
-
 /*******************************************************************\
 
 Function: cbmc_solverst::get_string_refinement
@@ -338,33 +337,13 @@ Function: cbmc_solverst::get_string_refinement
  
 cbmc_solverst::solvert* cbmc_solverst::get_string_refinement()
 {
+  std::cout << "get_string_refinement" << std::endl;
   propt *prop;
-
-  // // We offer the option to disable the SAT preprocessor
-  // if(0 && options.get_bool_option("sat-preprocessor"))
-  // {
-  //   no_beautification();
-  //   prop=new satcheckt();
-  // }
-  // else
-  // TODO
   prop=new satcheck_no_simplifiert();
-  
   prop->set_message_handler(get_message_handler());
 
   string_refinementt *string_refinement = new string_refinementt(ns, *prop);
   string_refinement->set_ui(ui);
-
-  // we allow setting some parameters  
-  if(options.get_option("max-node-refinement")!="")
-    string_refinement->max_node_refinement = 
-      options.get_unsigned_int_option("max-node-refinement");
-
-  string_refinement->do_array_refinement = 
-    options.get_bool_option("refine-arrays");
-  string_refinement->do_arithmetic_refinement = 
-    options.get_bool_option("refine-arithmetic");
-
   return new cbmc_solver_with_propt(string_refinement, prop);
 }
 

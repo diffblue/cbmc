@@ -333,10 +333,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
-  if (cmdline.isset("strings"))
+  if(cmdline.isset("pass"))
   {
-    options.set_option("strings", true);
-    options.set_option("refine-arrays", true);
+    options.set_option("pass", true);
   }
 
   if(cmdline.isset("max-node-refinement"))
@@ -748,6 +747,21 @@ int cbmc_parse_optionst::get_goto_program(
 
     if(process_goto_program(options, goto_functions))
       return 6;
+
+    // show it?
+    if(cmdline.isset("show-loops"))
+    {
+      show_loop_ids(get_ui(), goto_functions);
+      return 0;
+    }
+
+    // show it?
+    if(cmdline.isset("show-goto-functions"))
+    {
+      namespacet ns(symbol_table);
+      show_goto_functions(ns, get_ui(), goto_functions);
+      return 0;
+    }
   }
 
   catch(const char *e)
@@ -967,21 +981,6 @@ bool cbmc_parse_optionst::process_goto_program(
     // remove skips
     remove_skip(goto_functions);
     goto_functions.update();
-
-    // show it?
-    if(cmdline.isset("show-loops"))
-    {
-      show_loop_ids(get_ui(), goto_functions);
-      return true;
-    }
-
-    // show it?
-    if(cmdline.isset("show-goto-functions"))
-    {
-      namespacet ns(symbol_table);
-      show_goto_functions(ns, get_ui(), goto_functions);
-      return true;
-    }
   }
 
   catch(const char *e)
@@ -1172,10 +1171,10 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --pass                       use pass procedure (experimental)\n"
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n"
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n"
-    " --strings                    enable support for strings (experimental)\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
