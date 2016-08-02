@@ -30,8 +30,6 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   string_char_set_func = "__CPROVER_uninterpreted_char_set";
   string_length_width = 32; // TODO!
   next_symbol_id = 1;
-
-  equality_propagation = false;
 }
 
 
@@ -77,7 +75,8 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
   convert(expr);
   exprt a = make_array(expr.lhs());
   exprt b = make_array(expr.rhs());
-  prop.l_set_to_true(record_array_equality(equal_exprt(a, b)));
+  equal_exprt e(a, b);
+  prop.l_set_to_true(record_array_equality(e));
   return false;
 }
 
@@ -643,7 +642,7 @@ template <class T> std::string i2bin(T n, size_t w)
   std::string ret(w, '0');
   for (size_t i = 0; i < w; ++i) {
     if (r & (size_t(1) << i)) {
-      ret[i] = '1';
+      ret[(w-1) - i] = '1';
     }
   }
   return ret;
