@@ -62,7 +62,7 @@ public:
   void make_false();
 #endif
 
-  friend guardt &operator -= (guardt &g1, const guardt &g2);
+  guardt& operator -= (const guardt &g2);
   guardt& logical_or(const guardt &g2, const namespacet &ns);
 
 #if 0

@@ -94,8 +94,10 @@ void guardt::add(const exprt &expr)
     op.push_back(expr);
 }
 
-guardt &operator -= (guardt &g1, const guardt &g2)
+guardt& guardt::operator -= (const guardt &g2)
 {
+  guardt &g1=*this;
+
   if(g1.id()!=ID_and || g2.id()!=ID_and)
     return g1;
 
