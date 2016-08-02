@@ -87,4 +87,7 @@ void static_simplifiert::simplify_guards()
 		   << "UNKNOWN: " << "    assert: " << unknown[0]
 		   << ", assume: " << unknown[1]
 		   << ", goto: " << unknown[2] << eom;
+
+  //make sure the references are correct
+  goto_functions.update();
 }
