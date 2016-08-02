@@ -11,6 +11,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <ansi-c/string_constant.h>
 #include <util/i2string.h>
 #include <util/replace_expr.h>
+#include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <sstream>
 
@@ -539,8 +540,9 @@ bvt string_refinementt::convert_string_char_set(
     prop.set_equal(bva[i], bvc[i]);
   }
 
+  with_exprt sarrnew(sarr, idx, c);
   implies_exprt lemma(binary_relation_exprt(idx, ID_lt, slen),
-                      and_exprt(equal_exprt(arr, update_exprt(sarr, idx, c)),
+                      and_exprt(equal_exprt(arr, sarrnew),
                                 equal_exprt(len, slen)));
   add_lemma(lemma);
 
@@ -570,6 +572,7 @@ void string_refinementt::add_instantiations(bool first)
   }
 
   cur.clear();
+  size_t added = 0;
 
   for (index_sett::iterator i = index_set.begin(), end = index_set.end();
        i != end; ++i) {
@@ -581,10 +584,14 @@ void string_refinementt::add_instantiations(bool first)
         exprt lemma = instantiate(string_axioms[k], s, val);
         if (lemma.is_not_nil() && seen_instances.insert(lemma).second) {
           add_lemma(lemma, true);
+          ++added;
         }
       }
     }
   }
+
+  status() << "string-refinement: added " << added << " axiom instances"
+           << eom;
 }
 
 
@@ -617,6 +624,7 @@ bool string_refinementt::check_axioms()
 
     exprt negaxiom = and_exprt(axiom.premise, not_exprt(axiom.body));
     replace_expr(fmodel, negaxiom);
+//    negaxiom = simplify_expr(negaxiom, ns);
 
     satcheck_no_simplifiert sat_check;
     SUB solver(ns, sat_check);
@@ -635,11 +643,15 @@ bool string_refinementt::check_axioms()
   }
 
   if (violated.empty()) {
+    status() << "string-refinement: no axiom violation found" << eom;
     return true;
   }
 
   for (size_t i = 0; i < violated.size(); ++i) {
     const exprt &val = violated[i].second;
+    status() << "string-refinement: axiom " << violated[i].first
+             << " violated by index "
+             << to_constant_expr(val).get_value() << eom;
     const string_axiomt &axiom = string_axioms[violated[i].first];
     exprt premise(axiom.premise);
     exprt body(axiom.body);
@@ -651,6 +663,9 @@ bool string_refinementt::check_axioms()
     }
     // TODO - add backwards instantiations
   }
+
+  status() << "string-refinement: found " << violated.size()
+           << " violated axioms" << eom;
   
   return false;
 }
@@ -674,7 +689,8 @@ void get_bounds(const exprt &qvar, const exprt &expr, std::vector<exprt> &out)
 {
   if (expr.id() == ID_lt && expr.op0() == qvar) {
     const exprt &b = expr.op1();
-    constant_exprt one("1", b.type());
+    constant_exprt one(i2bin(1, to_bitvector_type(b.type()).get_width()),
+                       b.type());
     out.push_back(minus_exprt(b, one));
   } else if (expr.id() == ID_le && expr.op0() == qvar) {
     out.push_back(expr.op1());
@@ -808,12 +824,12 @@ void string_refinementt::update_index_set(const string_axiomt &axiom)
       const exprt &i = cur.op1();
 
       find_qvar_visitor v(axiom.idx);
+      expr_sett &idxs = index_set[s];
+      idxs.insert(bounds.begin(), bounds.end());
       try {
         i.visit(v);
       } catch (stop_visit &) {}
       if (!v.found) {
-        expr_sett &idxs = index_set[s];
-        idxs.insert(bounds.begin(), bounds.end());
         idxs.insert(i);
       }
     } else {
@@ -948,14 +964,15 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 
   exprt ret =
     array_of_exprt(to_unsignedbv_type(char_type()).zero_expr(),
-                   array_typet(char_type(), size));
+                   // array_typet(char_type(), size));
+                   array_typet(char_type(), infinity_exprt(integer_typet())));
 
   for (size_t i = 0; i < val.operands().size()/2; ++i) {
     exprt tmp_index = val.operands()[i*2];
     typecast_exprt idx(tmp_index, index_type());
     exprt tmp_value = val.operands()[i*2+1];
     typecast_exprt value(tmp_value, char_type());
-    ret = update_exprt(ret, idx, value);
+    ret = with_exprt(ret, idx, value);
   }
 
   return ret;

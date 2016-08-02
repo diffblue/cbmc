@@ -7,6 +7,8 @@ int main()
     __CPROVER_string s, s2, s3;
     int i;
 
+    __CPROVER_assume(i < 10);
+
     s = __CPROVER_string_concat(s2, s3);
     __CPROVER_assume(__CPROVER_string_length(s2) == i);
     __CPROVER_assume(

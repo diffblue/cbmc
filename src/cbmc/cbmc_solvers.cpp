@@ -340,14 +340,15 @@ cbmc_solverst::solvert* cbmc_solverst::get_string_refinement()
 {
   propt *prop;
 
-  // We offer the option to disable the SAT preprocessor
-  if(options.get_bool_option("sat-preprocessor"))
-  {
-    no_beautification();
-    prop=new satcheckt();
-  }
-  else
-    prop=new satcheck_no_simplifiert();
+  // // We offer the option to disable the SAT preprocessor
+  // if(0 && options.get_bool_option("sat-preprocessor"))
+  // {
+  //   no_beautification();
+  //   prop=new satcheckt();
+  // }
+  // else
+  // TODO
+  prop=new satcheck_no_simplifiert();
   
   prop->set_message_handler(get_message_handler());
 
