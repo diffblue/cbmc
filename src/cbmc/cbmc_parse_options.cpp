@@ -337,8 +337,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     options.set_option("strings", true);
     options.set_option("refine-arrays", true);
-    options.set_option("arrays-uf-always", true);
-    options.set_option("propagation", false);
   }
 
   if(cmdline.isset("max-node-refinement"))
