@@ -25,6 +25,7 @@ class static_simplifiert: public ai_analysist
     {
     }
 	void simplify_guards();
+	bool write_goto_program(const std::string &filename);
 };
 
 #endif

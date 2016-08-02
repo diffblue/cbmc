@@ -14,6 +14,7 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 #include <iostream>
 #endif
 
+#include <goto-programs/write_goto_binary.h>
 
 /*******************************************************************\
 
@@ -91,3 +92,28 @@ void static_simplifiert::simplify_guards()
   //make sure the references are correct
   goto_functions.update();
 }
+
+/*******************************************************************\
+
+Function: static_simplifiert::write_goto_program
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool static_simplifiert::write_goto_program(const std::string &filename)
+{
+  status() << "Writing GOTO program to `" << filename << "'" << eom;
+
+  //write the simplified goto program
+  if(write_goto_binary(
+	 filename, symbol_table, goto_functions, get_message_handler()))
+    return 1;
+  else
+    return 0;
+}
+

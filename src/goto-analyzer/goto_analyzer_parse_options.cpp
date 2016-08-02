@@ -470,13 +470,22 @@ bool goto_analyzer_parse_optionst::process_goto_program(
 
     // add loop ids
     goto_model.goto_functions.compute_loop_numbers();
-    
+
+    const bool cp=cmdline.isset("constant-propagation");
+    const bool ia=cmdline.isset("intervals");
+
+    //dump it?
+    if (cmdline.isset("dump-goto"))
+    {
+      static_simplifiert simplifier(goto_model, options, get_message_handler(), cp, ia);
+   	  simplifier.simplify_guards();
+      std::string goto_file=cmdline.get_value("dump-goto");
+      simplifier.write_goto_program(goto_file);
+      return true;
+    }
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      const bool cp=cmdline.isset("constant-propagation");
-      const bool ia=cmdline.isset("intervals");
-
       // check whether we should simplify the goto-program before showing it
       if (cmdline.isset("simplify"))
       {
@@ -488,8 +497,10 @@ bool goto_analyzer_parse_optionst::process_goto_program(
         static_verifiert verifier(goto_model, options, get_message_handler(), cp, ia);
         verifier();
       }
+
       namespacet ns(goto_model.symbol_table);
       goto_model.goto_functions.output(ns, std::cout);
+
       return true;
     }
 
@@ -606,6 +617,7 @@ void goto_analyzer_parse_optionst::help()
     " --main-class class-name      set the name of the main class\n"
     "\n"
     "Program representations:\n"
+    " --dump-goto                  generate goto binary\n"
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"

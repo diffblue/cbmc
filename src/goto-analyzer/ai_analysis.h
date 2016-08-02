@@ -31,6 +31,7 @@ class ai_analysist:public messaget {
 	  const bool &_constant_propagation,
 	  const bool &_intervals):
 	  messaget(_message_handler),
+	  symbol_table(_goto_model.symbol_table),
 	  goto_functions(_goto_model.goto_functions),
 	  ns(_goto_model.symbol_table),
 	  options(_options),
@@ -44,6 +45,7 @@ class ai_analysist:public messaget {
 	}
 
   protected:
+	symbol_tablet &symbol_table;
     goto_functionst &goto_functions;
     const namespacet ns;
     const optionst &options;

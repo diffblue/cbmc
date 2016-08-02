@@ -60,6 +60,8 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
       return tvt::unknown();
     }
   }
+
+  return tvt::unknown();
 }
 
 

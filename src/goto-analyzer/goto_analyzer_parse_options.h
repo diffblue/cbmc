@@ -39,7 +39,8 @@ class optionst;
   "(non-null)(show-non-null)" \
   "(verify)(simplify)" \
   "(generate)(constant-propagation)" \
-  "(dump-c)(dump-cpp)"
+  "(dump-c)(dump-cpp)" \
+  "(dump-goto):"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,
