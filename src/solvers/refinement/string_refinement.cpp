@@ -81,6 +81,29 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 }
 
 
+literalt string_refinementt::convert_rest(const exprt &expr)
+{
+  if (expr.id() == ID_function_application) {
+    function_application_exprt f = to_function_application_expr(expr);
+    const exprt &name = f.function();
+
+    // check if this is something we recognize
+    if (name.id() == ID_symbol) {
+      const irep_idt &id = to_symbol_expr(name).get_identifier();
+      if (id == string_equal_func) {
+        return convert_string_equal(f)[0];
+      } else if (id == string_is_prefix_func) {
+        return convert_string_is_prefix(f)[0];
+      } else if (id == string_is_suffix_func) {
+        return convert_string_is_suffix(f)[0];
+      }
+    }
+  }
+  
+  return SUB::convert_rest(expr);
+}
+
+
 bvt string_refinementt::convert_symbol(const exprt &expr)
 {
   const typet &type = expr.type();
@@ -116,7 +139,6 @@ bvt string_refinementt::convert_function_application(
   const function_application_exprt &expr)
 {
   const exprt &name = expr.function();
-  bool ok = false;
 
   // check if this is something we recognize
   if (name.id() == ID_symbol) {
@@ -754,7 +776,7 @@ exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f)
   }
 
   assert(found);
-  if (ret.is_nil()) {
+  if (!ret.is_nil()) {
     ret = minus_exprt(val, ret);
   } else {
     ret = val;

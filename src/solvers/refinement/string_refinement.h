@@ -50,6 +50,7 @@ protected:
   virtual bvt convert_struct(const struct_exprt &expr);
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
+  virtual literalt convert_rest(const exprt &expr);
   virtual void check_SAT();
 
   bool is_string_type(const typet &type);
