@@ -28,12 +28,14 @@ class ai_analysist:public messaget {
 	  goto_modelt &_goto_model,
 	  const optionst &_options,
 	  message_handlert &_message_handler,
-	  const bool &_constant_propagation):
+	  const bool &_constant_propagation,
+	  const bool &_intervals):
 	  messaget(_message_handler),
 	  goto_functions(_goto_model.goto_functions),
 	  ns(_goto_model.symbol_table),
 	  options(_options),
-	  constant_propagation(_constant_propagation)
+	  constant_propagation(_constant_propagation),
+	  intervals(_intervals)
 	  {
 	  }
 
@@ -46,6 +48,7 @@ class ai_analysist:public messaget {
     const namespacet ns;
     const optionst &options;
     const bool &constant_propagation;
+    const bool &intervals;
 
     // analyses
     ait<interval_domaint> interval_analysis;

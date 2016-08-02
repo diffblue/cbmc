@@ -8,7 +8,7 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 
 #include "static_simplifier.h"
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -27,15 +27,17 @@ Function: static_simplifiert::simplify_guards
 
 \*******************************************************************/
 
-void static_simplifiert::simplify_guards(const bool constant_propagation)
+void static_simplifiert::simplify_guards()
 {
   unsigned simplified[]={0,0,0}, unknown[]={0,0,0};
 
   if (constant_propagation)
     propagate_constants();
 
+  if (intervals)
+    interval_analysis(goto_functions, ns);
+
   status() << "simplifying guards" << eom;
-  interval_analysis(goto_functions, ns);
 
   Forall_goto_functions(f_it, goto_functions)
   {
@@ -46,6 +48,7 @@ void static_simplifiert::simplify_guards(const bool constant_propagation)
 
     Forall_goto_program_instructions(i_it, f_it->second.body)
     {
+
       if(i_it->is_assert() || i_it->is_assume()
         || i_it->is_goto())
       {

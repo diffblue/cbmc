@@ -341,7 +341,8 @@ int goto_analyzer_parse_optionst::doit()
   if(cmdline.isset("show-intervals"))
   {
   	const bool cp=cmdline.isset("constant-propagation");
-    static_analysert analyser(goto_model, options, get_message_handler(), cp);
+  	const bool ia=cmdline.isset("intervals");
+    static_analysert analyser(goto_model, options, get_message_handler(), cp, ia);
     analyser.show_intervals(goto_model, std::cout);
     return 0;
   }
@@ -355,16 +356,17 @@ int goto_analyzer_parse_optionst::doit()
       options.set_option("xml", cmdline.get_value("xml"));
       bool result=0;
   	  const bool cp=cmdline.isset("constant-propagation");
+  	  const bool ia=cmdline.isset("intervals");
 
       if(cmdline.isset("verify"))
       {
-        static_verifiert verifier(goto_model, options, get_message_handler(), cp);
+        static_verifiert verifier(goto_model, options, get_message_handler(), cp, ia);
         result=verifier();
       }
       else if (cmdline.isset("simplify"))
       {
-        static_simplifiert simplifier(goto_model, options, get_message_handler(), cp);
-        simplifier.simplify_guards(cp);
+        static_simplifiert simplifier(goto_model, options, get_message_handler(), cp, ia);
+        simplifier.simplify_guards();
         return 0;
       }
       return result?10:0;
@@ -473,15 +475,17 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     if(cmdline.isset("show-goto-functions"))
     {
       const bool cp=cmdline.isset("constant-propagation");
+      const bool ia=cmdline.isset("intervals");
+
       // check whether we should simplify the goto-program before showing it
       if (cmdline.isset("simplify"))
       {
-        static_simplifiert simplifier(goto_model, options, get_message_handler(),cp);
-      	simplifier.simplify_guards(cp);
+        static_simplifiert simplifier(goto_model, options, get_message_handler(), cp, ia);
+      	simplifier.simplify_guards();
       }
       else if (cmdline.isset("verify"))
       {
-        static_verifiert verifier(goto_model, options, get_message_handler(), cp);
+        static_verifiert verifier(goto_model, options, get_message_handler(), cp, ia);
         verifier();
       }
       namespacet ns(goto_model.symbol_table);

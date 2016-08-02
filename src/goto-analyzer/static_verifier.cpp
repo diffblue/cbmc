@@ -24,8 +24,15 @@ Function: static_verifiertt::operator()
 
 bool static_verifiert::operator()()
 {
-  status() << "performing interval analysis" << eom;
-  interval_analysis(goto_functions, ns);
+
+  if (constant_propagation)
+    propagate_constants();
+
+  if (intervals)
+  {
+    status() << "performing interval analysis" << eom;
+    interval_analysis(goto_functions, ns);
+  }
 
   if(!options.get_option("json").empty())
     json_report(options.get_option("json"));
@@ -52,9 +59,6 @@ Function: static_verifiert::plain_text_report
 void static_verifiert::plain_text_report()
 {
   unsigned pass=0, fail=0, unknown=0;
-
-  if (constant_propagation)
-    propagate_constants();
 
   forall_goto_functions(f_it, goto_functions)
   {
@@ -117,9 +121,6 @@ void static_verifiert::json_report(const std::string &file_name)
 {
   json_arrayt json_result;
 
-  if (constant_propagation)
-    propagate_constants();
-
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
@@ -176,9 +177,6 @@ Function: static_verifiert::xml_report
 void static_verifiert::xml_report(const std::string &file_name)
 {
   xmlt xml_result;
-
-  if (constant_propagation)
-    propagate_constants();
 
   forall_goto_functions(f_it, goto_functions)
   {

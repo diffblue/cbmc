@@ -6,7 +6,7 @@ Author: Lucas Cordeiro, lucas.cordeiro@kcs.ox.ac.uk
 
 \*******************************************************************/
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -30,33 +30,36 @@ Function: ai_analysist::eval
 tvt ai_analysist::eval(goto_programt::const_targett t)
 {
   exprt guard=t->guard;
-  interval_domaint d=interval_analysis[t];
 
   //check whether the guard is a constant
   if (guard.is_true()) return tvt(true);
 
-  //merge intervals to properly handle conjunction
-  if (guard.id()==ID_and)
+  if (intervals)
   {
-    interval_domaint a(d);
-    a.make_top();
-    a.assume(guard,ns);
+    interval_domaint d=interval_analysis[t];
 
-    #ifdef DEBUG
-      a.output(std::cout, interval_analysis, ns);
-      d.output(std::cout, interval_analysis, ns);
-    #endif
+    //merge intervals to properly handle conjunction
+    if (guard.id()==ID_and)
+    {
+      interval_domaint a(d);
+      a.make_top();
+      a.assume(guard,ns);
 
-    if (a.merge(d, t, t)) return tvt::unknown();
-    return tvt(true);
+      #ifdef DEBUG
+        a.output(std::cout, interval_analysis, ns);
+        d.output(std::cout, interval_analysis, ns);
+      #endif
+
+      if (a.merge(d, t, t)) return tvt::unknown();
+      return tvt(true);
+    }
+    else
+    {
+      d.assume(not_exprt(guard), ns);
+      if(d.is_bottom()) return tvt(true);
+      return tvt::unknown();
+    }
   }
-  else
-  {
-    d.assume(not_exprt(guard), ns);
-    if(d.is_bottom()) return tvt(true);
-    return tvt::unknown();
-  }
-
 }
 
 
