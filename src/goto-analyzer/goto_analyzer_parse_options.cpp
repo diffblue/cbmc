@@ -617,7 +617,7 @@ void goto_analyzer_parse_optionst::help()
     " --main-class class-name      set the name of the main class\n"
     "\n"
     "Program representations:\n"
-    " --dump-goto                  generate goto binary\n"
+    " --dump-goto                  generate simplified goto binary\n"
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"
