@@ -42,8 +42,6 @@ void static_simplifiert::simplify_guards()
 
   Forall_goto_functions(f_it, goto_functions)
   {
-    if(!f_it->second.body.has_assertion()) continue;
-
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
