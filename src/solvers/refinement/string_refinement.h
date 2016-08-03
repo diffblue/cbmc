@@ -56,7 +56,10 @@ protected:
   bool is_char_type(const typet &type);
 
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
-  
+
+  // The following functions convert different string functions to 
+  // bit vectors and add the corresponding lemmas to a list of
+  // properties to be checked  
   bvt convert_string_equal(const function_application_exprt &f);
   bvt convert_string_length(const function_application_exprt &f);
   bvt convert_string_concat(const function_application_exprt &f);

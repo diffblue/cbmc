@@ -14,8 +14,9 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/sat/satcheck.h>
 #include <sstream>
 
-#include <util/arith_tools.h>
-#include <util/std_expr.h>
+#include <iostream>
+//#include <util/arith_tools.h>
+//#include <util/std_expr.h>
 
 string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
     SUB(_ns, _prop)
@@ -31,13 +32,15 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   string_is_prefix_func = "__CPROVER_uninterpreted_strprefixof";
   string_is_suffix_func = "__CPROVER_uninterpreted_strsuffixof";
   string_char_set_func = "__CPROVER_uninterpreted_char_set";
+  next_symbol_id = 1;
+
 
   // 32; // TODO!
   string_length_width = to_bitvector_type(index_type()).get_width();
   debug() << "string_length_width : " << to_bitvector_type(index_type()).get_width() << endl;
   string_length_width = string_length_width ? string_length_width : 32;
   /// 
-  next_symbol_id = 1;
+
 }
 
 
@@ -45,6 +48,16 @@ string_refinementt::~string_refinementt()
 {
 }
 
+typet string_refinementt::index_type()
+{
+  return unsignedbv_typet(string_length_width);
+}
+
+
+typet string_refinementt::char_type()
+{
+  return unsignedbv_typet(8);
+}
 
 void string_refinementt::post_process()
 {
@@ -67,15 +80,17 @@ void string_refinementt::post_process()
   add_instantiations(true);
 }
 
-
+// Convert an expression to a bit vector
 bvt string_refinementt::convert_symbol(const exprt &expr)
 {
   const typet &type = expr.type();
   const irep_idt &identifier = expr.get(ID_identifier);
+  debug() << "string_refinementt::convert_symbol(" << identifier << ")" << eom;
   
   if (is_string_type(type)) {
-    bvt ret = convert_bv(make_array(expr));
     make_length(expr); // ensure there is a length for this string
+    bvt ret = convert_bv(make_array(expr));
+    debug () << "We should encode the length of the string in a bit vector, otherwise affectation does not preserve length" << eom;
     map.set_literals(identifier, type, ret);
     return ret;
   } else if (is_char_type(expr.type())) {
@@ -227,8 +242,16 @@ bvt string_refinementt::convert_string_length(
   const function_application_exprt::argumentst &args = f.arguments();
   expect(args.size() == 1, "bad args to string length");
 
-  exprt len = make_length(args[0]);
-  bv = convert_bv(len);
+  debug() << "Warning: changed the behaviour of convert_string_length" << eom;
+  //  exprt len = make_length(args[0]);
+  //bv = convert_bv(len);
+  exprt arr = make_array(args[0]);
+  //std::string idx_binary = integer2binary(0,string_length_width);
+  std::string idx_binary = integer2binary(0,8);
+  //constant_exprt idx(idx_binary, index_type());
+  constant_exprt idx(idx_binary, char_type());
+  bv = convert_bv(index_exprt(arr, idx));
+  //bv = convert_constant(constant_exprt("00001010",char_type()));
   return bv;
 }
 
@@ -418,9 +441,9 @@ bvt string_refinementt::convert_string_literal(
 
   const exprt &arg = args[0];
   if (arg.operands().size() == 1 &&
-      arg.operands()[0].operands().size() == 1 &&
-      arg.operands()[0].operands()[0].operands().size() == 2 &&
-      arg.operands()[0].operands()[0].operands()[0].id() == ID_string_constant){
+      arg.op0().operands().size() == 1 &&
+      arg.op0().op0().operands().size() == 2 &&
+      arg.op0().op0().op0().id() == ID_string_constant){
     const exprt &s = arg.operands()[0].operands()[0].operands()[0];
     irep_idt sval = to_string_constant(s).get_value();
     exprt arr = make_array(f);
@@ -428,7 +451,9 @@ bvt string_refinementt::convert_string_literal(
 
     for (std::size_t i = 0; i < sval.size(); ++i) {
       // This needs to be checked
-      std::string idx_binary = integer2binary(i,string_length_width);
+
+      debug() << "Warning: we switched indexes in strings to encode the length" << eom;
+      std::string idx_binary = integer2binary(i+1,string_length_width);
       constant_exprt idx(idx_binary, index_type());
 
       //exprt idx = constant_exprt::integer_constant((unsigned)i);
@@ -444,14 +469,27 @@ bvt string_refinementt::convert_string_literal(
     }
     
     exprt len = make_length(f);
-    std::string sval_size_string = integer2binary(unsigned(sval.size()),string_length_width);
-    equal_exprt lemma(len, constant_exprt(sval_size_string, index_type()));
+    debug() << "Warning: we are limit the maximal string length to 255 in order to have a simple encoding" << eom;
+
+    //std::string sval_size_string = integer2binary(unsigned(sval.size()),string_length_width);
+    std::string sval_size_string = integer2binary(unsigned(sval.size()),8);
+
+    equal_exprt lemma1(len, constant_exprt(sval_size_string, char_type()));
+    add_lemma(lemma1);
+
+    //std::string idx_binary = integer2binary(0,string_length_width);
+    std::string idx_binary = integer2binary(0,8);
+    //constant_exprt idx0(idx_binary, index_type());
+    constant_exprt idx0(idx_binary, char_type());
+    //equal_exprt lemma(index_exprt(arr, idx0),constant_exprt(sval_size_string, index_type()));
+    equal_exprt lemma(index_exprt(arr, idx0),constant_exprt(sval_size_string, char_type()));
+    debug() << "adding length constraint : " << arr.pretty() << " : " << idx0.pretty() << "  == " << sval_size_string << eom;
+
     add_lemma(lemma);
   } else {
     expect(false, "bad arg to string literal");
   }
 
-  debug() << "end of string_refinementt::convert_string_literal" << eom;
   return bv;
 }
 
@@ -486,9 +524,9 @@ bvt string_refinementt::convert_char_literal(
   //sval_string.resize(char_width); 
   std::string binary=integer2binary(unsigned(sval[0]), char_width);
   constant_exprt e(binary, char_type());
-  debug() << " e = " << e.pretty() << eom;
   bv = convert_bv(e);
   //constant_exprt e(s, char_type()); bv = convert_bv(e);
+  debug() << "converted char literal "<< binary << eom;
   return bv;
 }
 
@@ -496,14 +534,16 @@ bvt string_refinementt::convert_char_literal(
 bvt string_refinementt::convert_string_char_at(
   const function_application_exprt &f)
 {
-  debug() << "convert_string_char_at" << eom;
   bvt bv;
   const function_application_exprt::argumentst &args = f.arguments();
   expect(args.size() == 2, "string_char_at expects 2 arguments");
 
+  debug() << "convert_string_char_at:" << eom;
   exprt arr = make_array(args[0]);
-  typecast_exprt pos(args[1], index_type());
-  bv = convert_bv(index_exprt(arr, pos));
+  debug() << "[" << args[1].pretty() << "]" << eom;
+  //typecast_exprt pos(args[1], index_type());
+  debug() << "string_refinementt::convert_string_char_at: warning: removed typecast" << eom;
+  bv = convert_bv(index_exprt(arr, args[1]));
   return bv;
 }
 
@@ -576,11 +616,23 @@ void string_refinementt::add_instantiations(bool first)
   }
 }
 
+std::ostream & print_array(std::ostream & out, const exprt &val) {
+  exprt e = val; 
+  while(e.operands().size() == 3) {  
+    exprt tmp_index = e.op1();
+    exprt tmp_value = e.op2();
+    out << tmp_index.get(ID_value) << "->" << ((tmp_value.get(ID_value)!="")?tmp_value.get(ID_value):tmp_value.pretty()) << " ; ";
+    e = e.op0();
+  }
+  return out;
+}
 
 bool string_refinementt::check_axioms()
 {
   // build the interpretation from the model of the prop_solver
+  debug() << "string_refinementt::check_axioms: build the interpretation from the model of the prop_solver" << eom;
   replace_mapt fmodel;
+  
   for (expr_mapt::iterator it = string2length.begin(),
          end = string2length.end(); it != end; ++it) {
     const exprt &s = it->first;
@@ -590,14 +642,19 @@ bool string_refinementt::check_axioms()
     const exprt &a = j->second;
 
     exprt len = get(l);
+    debug() << "string_refinementt::check_axioms: get_array(" << a.get(ID_identifier) << ","<< len.get(ID_value) << ")" << eom;
     exprt arr = get_array(a, len);
     fmodel[l] = len;
     fmodel[a] = arr;
+    debug() << "check_axioms adds to the model:" << a.get(ID_identifier) << " := ";
+    print_array(debug(), arr);
+    debug() << eom;
   }
 
   std::vector< std::pair<size_t, exprt> > violated;
 
   for (size_t i = 0; i < string_axioms.size(); ++i) {
+    debug() << "string axiom " << i << eom;
     const string_axiomt &axiom = string_axioms[i];
     if (axiom.lit.is_not_nil()) {
       exprt lit = get(axiom.lit);
@@ -613,10 +670,12 @@ bool string_refinementt::check_axioms()
 
     switch (solver()) {
     case decision_proceduret::D_SATISFIABLE: {
+      debug() << "satisfiable" << eom;
       exprt val = solver.get(axiom.idx);
       violated.push_back(std::make_pair(i, val));
     } break;
     case decision_proceduret::D_UNSATISFIABLE:
+      debug() << "unsatisfiable" << eom;
       break;
     default:
       expect(false, "failure in checking axiom");
@@ -624,10 +683,12 @@ bool string_refinementt::check_axioms()
   }
 
   if (violated.empty()) {
+    debug() << "no violated property" << eom;
     return true;
   }
 
   for (size_t i = 0; i < violated.size(); ++i) {
+    debug() << "violated " << i << eom;
     const exprt &val = violated[i].second;
     const string_axiomt &axiom = string_axioms[violated[i].first];
     exprt premise(axiom.premise);
@@ -717,6 +778,7 @@ public:
   //////////////////////////////////////////////////////////
 exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f)
 {
+  std::cout << "string_refinement::compute_subst" << std::endl ;
   std::vector< std::pair<exprt, bool> > to_process, elems;
   to_process.push_back(std::make_pair(f, true));
 
@@ -875,45 +937,40 @@ symbol_exprt string_refinementt::fresh_symbol(const irep_idt &prefix,
 }
 
 
-typet string_refinementt::index_type()
-{
-  return unsignedbv_typet(string_length_width);
-}
 
-
-typet string_refinementt::char_type()
-{
-  return unsignedbv_typet(8);
-}
-
-
-exprt string_refinementt::make_length(const exprt &str)
-{
-  debug() << "string_refinementt::make_length" << eom;
-  expr_mapt::iterator it = string2length.find(str);
-  if (it != string2length.end()) {
-    return it->second;
-  }
-  symbol_exprt len = fresh_symbol("string_length", index_type());
-  string2length[str] = len;
-  length2string[len] = str;
-  return len;
-}
-
-
+// Find the symbol corresponding to an array. 
+// Create a fresh one if it cannot be found
 exprt string_refinementt::make_array(const exprt &str)
 {
   expr_mapt::iterator it = string2array.find(str);
   if (it != string2array.end()) {
+    debug() << "found in string2array" << eom;
     return it->second;
   }
   symbol_exprt arr = fresh_symbol("string_array",
                                   array_typet(char_type(),
                                               infinity_exprt(integer_typet())));
+
+  debug() << "string_refinementt::make_array(" << str.get(ID_identifier) << ") -> new symbol " << arr.get(ID_identifier) << eom;
   string2array[str] = arr;
   return arr;
 }
 
+// Find the symbol corresponding to the length of an array. 
+// This should be integrated in make array
+exprt string_refinementt::make_length(const exprt &str)
+{
+  debug() << "Warning: called make_length" << eom;
+  expr_mapt::iterator it = string2length.find(str);
+  if (it != string2length.end()) {
+    return it->second;
+  }
+  //symbol_exprt len = fresh_symbol("string_length", index_type());
+  symbol_exprt len = fresh_symbol("string_length", char_type());
+  string2length[str] = len;
+  length2string[len] = str;
+  return len;
+}
 
 exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 {
@@ -924,17 +981,18 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
     array_of_exprt(to_unsignedbv_type(char_type()).zero_expr(),
                    array_typet(char_type(), size));
 
-  for (size_t i = 0; i < val.operands().size()/2; ++i) {
+  for (size_t i = 0; i < val.operands().size()/2; ++i) {  
     exprt tmp_index = val.operands()[i*2];
-    typecast_exprt idx(tmp_index, index_type());
+    debug() << "string_refinementt::get_array: warning: removed typecast" << eom;
+    //typecast_exprt idx(tmp_index, index_type());
     exprt tmp_value = val.operands()[i*2+1];
-    typecast_exprt value(tmp_value, char_type());
-    ret = update_exprt(ret, idx, value);
+    //typecast_exprt value(tmp_value, char_type());
+    ret = update_exprt(ret, tmp_index, tmp_value);
   }
 
   return ret;
 }
-
+ 
 
 void string_refinementt::expect(bool cond, const char *msg)
 {
