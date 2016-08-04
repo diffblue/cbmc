@@ -47,7 +47,6 @@ void static_simplifiert::simplify_guards()
 
     Forall_goto_program_instructions(i_it, f_it->second.body)
     {
-
       if(i_it->is_assert() || i_it->is_assume()
         || i_it->is_goto())
       {

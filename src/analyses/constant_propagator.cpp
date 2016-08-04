@@ -555,6 +555,8 @@ void constant_propagator_ait::replace(
       exprt &rhs = to_code_assign(it->code).rhs();
       s_it->second.values.replace_const(rhs);
       rhs = simplify_expr(rhs, ns);
+      if (rhs.id()==ID_constant)
+        rhs.add_source_location()=it->code.op0().source_location();
     }
     else if(it->is_function_call())
     {
