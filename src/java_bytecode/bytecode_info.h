@@ -1,3 +1,5 @@
+#pragma once
+
 // http://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 
 // The 'result_type' is one of the following:
@@ -38,3 +40,7 @@ struct bytecode_infot
 
 extern struct bytecode_infot const bytecode_info[];
 
+typedef unsigned char u1;
+typedef unsigned short u2;
+typedef unsigned int u4;
+typedef unsigned long long u8;

@@ -14,14 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/std_types.h>
 
+#include "bytecode_info.h"
+
 class java_bytecode_parse_treet
 {
 public:
-  typedef unsigned char u1;
-  typedef unsigned short u2;
-  typedef unsigned int u4;
-  typedef unsigned long long u8;
-
   class annotationt
   {
   public:
