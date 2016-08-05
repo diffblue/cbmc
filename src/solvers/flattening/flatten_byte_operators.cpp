@@ -117,7 +117,7 @@ exprt flatten_byte_extract(
       for(mp_integer i=0; i<num_elements; ++i)
       {
         // the most significant byte comes first in the concatenation!
-        plus_exprt index(first_index, from_integer(i, offset_type));
+        plus_exprt index(first_index, from_integer(num_elements-i-1, offset_type));
         concat.copy_to_operands(index_exprt(root, index));
       }
 
