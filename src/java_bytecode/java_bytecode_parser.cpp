@@ -359,6 +359,11 @@ void java_bytecode_parsert::get_class_refs()
   {
     typet t=java_type_from_string(m.signature);
     get_class_refs_rec(t);
+    for(const auto & var : m.local_variable_table)
+    {
+      typet var_type=java_type_from_string(var.signature);
+      get_class_refs_rec(var_type);
+    }
   } 
 }
 
