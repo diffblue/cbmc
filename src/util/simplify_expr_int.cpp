@@ -113,7 +113,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
   {
     exprt product(operands.front());
     expr.swap(product);
-
+    expr.remove(ID_C_cformat);
     result = false;
   }
   else

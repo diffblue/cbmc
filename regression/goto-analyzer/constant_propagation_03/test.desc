@@ -4,6 +4,6 @@ constant_propagation_03.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^SIMPLIFIED:  assert: 1, assume: 0, goto: 0$
-^UNKNOWN:     assert: 0, assume: 0, goto: 2$
+^UNKNOWN:     assert: 0, assume: 0, goto: 0$
 --
 ^warning: ignoring

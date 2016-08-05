@@ -12,6 +12,8 @@ Author: Lucas Cordeiro, lucas.cordeiro@kcs.ox.ac.uk
 #include <iostream>
 #endif
 
+#include <goto-programs/remove_skip.h>
+
 #include "ai_analysis.h"
 
   
@@ -85,4 +87,6 @@ void ai_analysist::propagate_constants()
   {
     constant_propagator_ait(f_it->second,ns);
   }
+
+  remove_skip(goto_functions);
 }
