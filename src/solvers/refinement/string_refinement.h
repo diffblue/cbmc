@@ -25,6 +25,29 @@ public:
   
   typedef bv_refinementt SUB;
 
+  // Internal type used for strings
+  inline typet get_string_type() { return string_type; };
+  // Type of characters
+  inline typet get_char_type() { return char_type; };
+  // Type of character indexes in the string
+  inline typet get_index_type() { return index_type; };
+  // Type to encode the length of a string
+  inline typet get_string_length_type() 
+  { return (to_struct_type(string_type)).components()[0].type();}
+  // Type for the content (list of characters) of a string
+  inline typet get_string_content_type() 
+  { return (to_struct_type(string_type)).components()[1].type();}
+  inline size_t get_char_width() 
+  { return to_bitvector_type(char_type).get_width();}
+  inline size_t get_string_length_width()
+  { return to_bitvector_type(get_string_length_type()).get_width();}
+
+  
+private:
+  typet index_type;
+  typet char_type;
+  typet string_type;
+
 protected:
   struct string_axiomt
   {
@@ -52,8 +75,8 @@ protected:
     const function_application_exprt &expr);
   virtual void check_SAT();
 
-  bool is_string_type(const typet &type);
-  bool is_char_type(const typet &type);
+  bool is_unrefined_string_type(const typet &type);
+  bool is_unrefined_char_type(const typet &type);
 
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
 
@@ -79,12 +102,21 @@ protected:
                     const exprt &val);
   void add_lemma(const exprt &lemma);
 
+  // Generate a new symbol of the given type tp with a prefix 
   symbol_exprt fresh_symbol(const irep_idt &prefix,
                             const typet &tp=bool_typet());
-  typet index_type();
-  typet char_type();
-  exprt make_array(const exprt &str);
-  exprt make_length(const exprt &str);
+
+
+  // Gives the string corresponding to an expression
+  exprt make_string(const exprt &str);
+
+  // Get the expression corresponding to the length of a string 
+  // The string should have type string_type.
+  exprt expr_length(const exprt &str);
+  // Get the expression corresponding to the content of a string 
+  exprt expr_content(const exprt &str);
+
+  // Get a model of the given array
   exprt get_array(const exprt &arr, const exprt &size);
 
   void expect(bool cond, const char *errmsg=NULL);
@@ -99,13 +131,13 @@ protected:
   irep_idt string_is_prefix_func;
   irep_idt string_is_suffix_func;
   irep_idt string_char_set_func;
-  size_t string_length_width;
 
   axiom_vect string_axioms;
   expr_sett strings;
-  expr_mapt string2length;
-  expr_mapt length2string;
-  expr_mapt string2array;
+  //expr_mapt string2length;
+  //expr_mapt length2string;
+  //expr_mapt string2array;
+  expr_mapt refined_string;
   expr_sett seen_instances;
   index_sett index_set;
   unsigned next_symbol_id;
