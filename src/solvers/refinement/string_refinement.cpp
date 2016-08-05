@@ -101,7 +101,6 @@ void string_refinementt::post_process()
 {
   // Ackermann expansion for string lengths
   //for (expr_mapt::iterator i = string2length.begin(), end = string2length.end();
-  debug() << "Not sure about what string_refinementt::post_process() does" << eom;
   
   for (expr_mapt::iterator i = refined_string.begin(),
        end = refined_string.end(); 
@@ -109,21 +108,14 @@ void string_refinementt::post_process()
     {
       exprt unrefined_i = i -> first;
       exprt stri = i->second;
-      //exprt leni = expr_length(stri);
-      //exprt si = expr_content(stri);
     
       expr_mapt::iterator j = i;
       for (++j; j != end; ++j) {
 	exprt unrefined_j = j -> first;
 	exprt strj = j->second;
-	//exprt lenj = expr_length(strj);
-	//exprt sj = expr_content(strj);
       
 	implies_exprt lemma(equal_exprt(unrefined_i, unrefined_j), equal_exprt(stri, strj));
 	prop.l_set_to_true(convert(lemma));
-	//implies_exprt lemma(equal_exprt(stri, strj), equal_exprt(leni, lenj));prop.l_set_to_true(convert(lemma));
-	//implies_exprt lemma1(equal_exprt(stri, strj), equal_exprt(si, sj));
-	//prop.l_set_to_true(convert(lemma1));
     }
   }
   add_instantiations(true);
