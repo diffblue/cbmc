@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 // http://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 
 // The 'result_type' is one of the following:
@@ -40,7 +42,7 @@ struct bytecode_infot
 
 extern struct bytecode_infot const bytecode_info[];
 
-typedef unsigned char u1;
-typedef unsigned short u2;
-typedef unsigned int u4;
-typedef unsigned long long u8;
+typedef uint8_t  u1;
+typedef uint16_t u2;
+typedef uint32_t u4;
+typedef uint64_t u8;
