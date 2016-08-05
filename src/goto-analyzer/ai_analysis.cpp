@@ -13,6 +13,7 @@ Author: Lucas Cordeiro, lucas.cordeiro@kcs.ox.ac.uk
 #endif
 
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unreachable.h>
 
 #include "ai_analysis.h"
 
@@ -86,6 +87,7 @@ void ai_analysist::propagate_constants()
   Forall_goto_functions(f_it, goto_functions)
   {
     constant_propagator_ait(f_it->second,ns);
+    remove_unreachable(f_it->second.body);
   }
 
   remove_skip(goto_functions);
