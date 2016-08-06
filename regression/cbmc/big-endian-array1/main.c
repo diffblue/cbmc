@@ -7,7 +7,8 @@ int main()
   unsigned size;
   __CPROVER_assume(size==1);
 
-  array=malloc(size*sizeof(int)); // produce unbounded array
+  // produce unbounded array that does not have byte granularity
+  array=malloc(size*sizeof(int));
   array[0]=0x01020304;
 
   int array0=array[0];
