@@ -335,13 +335,9 @@ int goto_diff_parse_optionst::doit()
     return 0;
   }
 
-  if(cmdline.isset("change-impact") || cmdline.isset("forward-impact") || cmdline.isset("backward-impact"))
+  if(cmdline.isset("change-impact"))
   {
-	impact_modet impact_mode =
-				cmdline.isset("forward-impact") ?
-						FORWARD :
-						(cmdline.isset("backward-impact") ? BACKWARD : BOTH);
-    change_impact(goto_model1, goto_model2, impact_mode, cmdline.isset("demo-output"));
+    change_impact(goto_model1, goto_model2);
     return 0;
   }
 
@@ -540,10 +536,7 @@ void goto_diff_parse_optionst::help()
     " --show-functions             show functions (default)\n"
     " --syntactic                  do syntactic diff (default)\n"
     " -u | --unified               output unified diff\n"
-    " --change-impact              output unified diff with forward and backward dependencies\n"
-    " --forward-impact 			   output unified diff with forward dependencies\n"
-    " --backward-impact 		   output unified diff with backward dependencies\n"
-    " --demo-output 		   	   output dependencies in demo mode\n"
+    " --change-impact              output unified diff with dependencies\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

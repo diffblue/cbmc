@@ -239,16 +239,11 @@ class change_impactt
 public:
   change_impactt(
     const goto_modelt &model_old,
-    const goto_modelt &model_new,
-    impact_modet impact_mode,
-    bool demo_output);
+    const goto_modelt &model_new);
 
   void operator()();
 
 protected:
-  impact_modet impact_mode;
-  bool demo_output;
-
   const goto_functionst &old_goto_functions;
   const namespacet ns_old;
   const goto_functionst &new_goto_functions;
@@ -293,11 +288,6 @@ protected:
   		const dependence_grapht &dep_graph,
   		goto_functions_change_impactt &change_impact, bool del);
 
-  void demo_output_change_impact(
-    const irep_idt &function,
-    const goto_program_change_impactt &c_i,
-    const goto_functionst &goto_functions,
-    const namespacet &ns) const;
   void output_change_impact(
     const irep_idt &function,
     const goto_program_change_impactt &c_i,
@@ -327,11 +317,7 @@ Function: change_impactt::change_impactt
 
 change_impactt::change_impactt(
     const goto_modelt &model_old,
-    const goto_modelt &model_new,
-    impact_modet _impact_mode,
-    bool _demo_output):
-  impact_mode(_impact_mode),
-  demo_output(_demo_output),
+    const goto_modelt &model_new):
   old_goto_functions(model_old.goto_functions),
   ns_old(model_old.symbol_table),
   new_goto_functions(model_new.goto_functions),
@@ -438,10 +424,9 @@ void change_impactt::change_impact(
         {
           const dependence_grapht::nodet &d_node=
             old_dep_graph[old_dep_graph[o_it].get_node_id()];
-          if (impact_mode == BACKWARD || impact_mode == BOTH)
-        	  propogate_dep_back(d_node, old_dep_graph, old_change_impact, true);
-          if (impact_mode == FORWARD || impact_mode == BOTH)
-        	  propogate_dep_forward(d_node, old_dep_graph, old_change_impact, true);
+
+          propogate_dep_back(d_node, old_dep_graph, old_change_impact, true);
+          propogate_dep_forward(d_node, old_dep_graph, old_change_impact, true);
         }
         old_impact[o_it]|=DELETED;
         ++o_it;
@@ -453,10 +438,8 @@ void change_impactt::change_impact(
           const dependence_grapht::nodet &d_node=
             new_dep_graph[new_dep_graph[n_it].get_node_id()];
 
-          if (impact_mode == BACKWARD || impact_mode == BOTH)
-        	  propogate_dep_back(d_node, new_dep_graph, new_change_impact, false);
-          if (impact_mode == FORWARD || impact_mode == BOTH)
-        	  propogate_dep_forward(d_node, new_dep_graph, new_change_impact, false);
+          propogate_dep_back(d_node, new_dep_graph, new_change_impact, false);
+          propogate_dep_forward(d_node, new_dep_graph, new_change_impact, false);
         }
         new_impact[n_it]|=NEW;
         ++n_it;
@@ -590,12 +573,36 @@ void change_impactt::operator()()
       nc_it!=new_change_impact.end();
       ++nc_it)
   {
-		if (demo_output)
-			demo_output_change_impact(nc_it->first, nc_it->second,
-					new_goto_functions, ns_new);
-		else
-			output_change_impact(nc_it->first, nc_it->second,
-								new_goto_functions, ns_new);
+    for( ;
+        oc_it!=old_change_impact.end() && oc_it->first<nc_it->first;
+        ++oc_it)
+      output_change_impact(
+        oc_it->first,
+        oc_it->second,
+        old_goto_functions,
+        ns_old);
+
+    if(oc_it==old_change_impact.end() || nc_it->first<oc_it->first)
+      output_change_impact(
+        nc_it->first,
+        nc_it->second,
+        new_goto_functions,
+        ns_new);
+    else
+    {
+      assert(oc_it->first==nc_it->first);
+
+      output_change_impact(
+        nc_it->first,
+        oc_it->second,
+        old_goto_functions,
+        ns_old,
+        nc_it->second,
+        new_goto_functions,
+        ns_new);
+
+      ++oc_it;
+    }
   }
 }
 
@@ -653,51 +660,6 @@ void change_impactt::output_change_impact(
 
     std::cout << prefix;
     goto_program.output_instruction(ns, function, std::cout, target);
-  }
-}
-
-/*******************************************************************\
-
-Function: change_impact::demo_output_change_impact
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void change_impactt::demo_output_change_impact(
-  const irep_idt &function,
-  const goto_program_change_impactt &c_i,
-  const goto_functionst &goto_functions,
-  const namespacet &ns) const
-{
-  goto_functionst::function_mapt::const_iterator f_it=
-    goto_functions.function_map.find(function);
-  assert(f_it!=goto_functions.function_map.end());
-  const goto_programt &goto_program=f_it->second.body;
-
-  forall_goto_program_instructions(target, goto_program)
-  {
-    goto_program_change_impactt::const_iterator c_entry=
-      c_i.find(target);
-    const unsigned mod_flags=
-      c_entry==c_i.end() ? SAME : c_entry->second;
-
-    // syntactic changes are preferred over data/control-dependence
-    // modifications
-    if(mod_flags==SAME);
-    else if(mod_flags&NEW) {
-    	std::cout << "added: " << id2string(target->source_location.get_line()) <<std::endl;
-    }
-    else if((mod_flags&NEW_DATA_DEP) || (mod_flags&NEW_CTRL_DEP)
-    		|| (mod_flags&DEL_DATA_DEP) || (mod_flags&DEL_CTRL_DEP)) {
-    	std::cout << "affected: " << id2string(target->source_location.get_line()) <<std::endl;
-    }
-    else
-      assert(false);
   }
 }
 
@@ -831,7 +793,7 @@ void change_impactt::output_change_impact(
       assert(false);
 
     std::cout << prefix;
-    std::cout << o_target->source_location.as_string() <<std::endl;
+    goto_program.output_instruction(o_ns, function, std::cout, o_target);
   }
 }
 
@@ -849,10 +811,8 @@ Function: change_impact
 
 void change_impact(
   const goto_modelt &model_old,
-  const goto_modelt &model_new,
-  impact_modet impact_mode,
-  bool demo_output)
+  const goto_modelt &model_new)
 {
-  change_impactt c(model_old, model_new, impact_mode,demo_output);
+  change_impactt c(model_old, model_new);
   c();
 }

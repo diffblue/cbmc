@@ -13,12 +13,8 @@ Date: April 2016
 
 class goto_modelt;
 
-typedef enum {FORWARD, BACKWARD, BOTH} impact_modet;
-
 void change_impact(
   const goto_modelt &model_old,
-  const goto_modelt &model_new,
-  impact_modet impact_mode,
-  bool demo_output);
+  const goto_modelt &model_new);
 
 #endif
