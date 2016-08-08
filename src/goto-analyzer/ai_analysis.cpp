@@ -36,6 +36,7 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
 
   if (intervals)
   {
+	if (guard.id()==ID_symbol) return tvt::unknown();
     interval_domaint d=interval_analysis[t];
 
     //merge intervals to properly handle conjunction
