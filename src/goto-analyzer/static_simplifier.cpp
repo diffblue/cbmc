@@ -42,11 +42,18 @@ void static_simplifiert::simplify_guards()
 
   Forall_goto_functions(f_it, goto_functions)
   {
+	if(f_it->first=="pthread_create")
+	{
+	  error() << "we do not support C/Pthreads yet" << eom;
+	  throw 0;
+	}
+
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
     Forall_goto_program_instructions(i_it, f_it->second.body)
     {
+
       if(i_it->is_assert() || i_it->is_assume()
         || i_it->is_goto())
       {
