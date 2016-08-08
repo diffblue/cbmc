@@ -34,15 +34,6 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
 {
   exprt guard=t->guard;
 
-#if 0
-  if (constant_propagation)
-  {
-    //check whether the guard is a constant
-    if (guard.is_true()) return tvt(true);
-    else if (guard.is_false()) return tvt(false);
-  }
-#endif
-
   if (intervals)
   {
     interval_domaint d=interval_analysis[t];
