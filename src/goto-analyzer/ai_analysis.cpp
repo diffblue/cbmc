@@ -36,7 +36,6 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
 
   if (intervals)
   {
-	if (guard.id()==ID_symbol) return tvt::unknown();
     interval_domaint d=interval_analysis[t];
 
     //merge intervals to properly handle conjunction
@@ -53,6 +52,11 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
 
       if (a.merge(d, t, t)) return tvt::unknown();
       return tvt(true);
+    }
+    else if (guard.id()==ID_symbol)
+    {
+      //TODO: we have to handle symbol expression
+      return tvt::unknown();
     }
     else
     {
