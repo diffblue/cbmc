@@ -3,6 +3,6 @@ constant_propagation_05.c
 --constant-propagation --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file constant_propagation_05.c line 12 function main, assertion j!=3: UNKNOWN$
+^\[main.assertion.1\] file constant_propagation_05.c line 12 function main, assertion j!=3: FAILURE$
 --
 ^warning: ignoring

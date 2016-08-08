@@ -34,8 +34,14 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
 {
   exprt guard=t->guard;
 
-  //check whether the guard is a constant
-  if (guard.is_true()) return tvt(true);
+#if 0
+  if (constant_propagation)
+  {
+    //check whether the guard is a constant
+    if (guard.is_true()) return tvt(true);
+    else if (guard.is_false()) return tvt(false);
+  }
+#endif
 
   if (intervals)
   {
@@ -62,6 +68,13 @@ tvt ai_analysist::eval(goto_programt::const_targett t)
       if(d.is_bottom()) return tvt(true);
       return tvt::unknown();
     }
+  }
+
+  if (constant_propagation)
+  {
+    //check whether the guard is a constant
+    if (guard.is_true()) return tvt(true);
+    else if (guard.is_false()) return tvt(false);
   }
 
   return tvt::unknown();
@@ -91,4 +104,7 @@ void ai_analysist::propagate_constants()
   }
 
   remove_skip(goto_functions);
+
+  // recalculate numbers, etc.
+  goto_functions.update();
 }
