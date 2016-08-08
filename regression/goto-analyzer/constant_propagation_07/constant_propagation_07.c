@@ -9,7 +9,6 @@ int main()
     i++;
     j++;
   }
-  assert(i<50);
   assert(i<51);
 }
 

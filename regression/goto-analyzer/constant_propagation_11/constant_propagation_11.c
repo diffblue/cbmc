@@ -10,7 +10,7 @@ int main()
   else
     a[1]=2;
 
-  assert(a[0]=1 || a[1]==2);
+  assert(a[0]==1 || a[1]==2);
 
   return 0;
 }
