@@ -41,6 +41,8 @@ public:
   { return to_bitvector_type(char_type).get_width();}
   inline size_t get_string_length_width()
   { return to_bitvector_type(get_string_length_type()).get_width();}
+  inline size_t get_string_width()
+  { return boolbv_width(string_type);}
 
   
 private:
@@ -70,6 +72,8 @@ protected:
   
   virtual void post_process();
   virtual bvt convert_symbol(const exprt &expr);
+  // Find the string expression corresponding to a string symbol
+  exprt expr_symbol(const exprt &expr);
   virtual bvt convert_struct(const struct_exprt &expr);
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
@@ -84,6 +88,7 @@ protected:
   // bit vectors and add the corresponding lemmas to a list of
   // properties to be checked  
   bvt convert_string_equal(const function_application_exprt &f);
+  bvt convert_string_copy(const function_application_exprt &f);
   bvt convert_string_length(const function_application_exprt &f);
   bvt convert_string_concat(const function_application_exprt &f);
   bvt convert_string_substring(const function_application_exprt &f);
@@ -94,6 +99,7 @@ protected:
   bvt convert_string_char_at(const function_application_exprt &f);
   bvt convert_string_char_set(const function_application_exprt &f);
 
+  bool boolbv_set_equality_to_true(const equal_exprt &expr);
   void add_instantiations(bool first=false);
   bool check_axioms();
   void update_index_set(const exprt &formula);
@@ -110,21 +116,29 @@ protected:
   // Gives the string corresponding to an expression
   exprt make_string(const exprt &str);
 
+  // Gives the character corresponding to an expression
+  exprt make_char(const exprt &chr);
+
   // Get the expression corresponding to the length of a string 
   // The string should have type string_type.
   exprt expr_length(const exprt &str);
   // Get the expression corresponding to the content of a string 
   exprt expr_content(const exprt &str);
 
+  bvt bv_length(bvt struct_bv);
+  bvt bv_content(bvt struct_bv);
+  //symbol_exprt symbol_length(const exprt & str);
+  //symbol_exprt symbol_content(const exprt & str);
+
+
   // Get a model of the given array
   exprt get_array(const exprt &arr, const exprt &size);
-
-  void expect(bool cond, const char *errmsg=NULL);
 
   irep_idt string_literal_func;
   irep_idt char_literal_func;
   irep_idt string_length_func;
   irep_idt string_equal_func;
+  irep_idt string_copy_func;
   irep_idt string_char_at_func;
   irep_idt string_concat_func;
   irep_idt string_substring_func;
@@ -132,17 +146,24 @@ protected:
   irep_idt string_is_suffix_func;
   irep_idt string_char_set_func;
 
+
+
   axiom_vect string_axioms;
   expr_sett strings;
-  //expr_mapt string2length;
-  //expr_mapt length2string;
-  //expr_mapt string2array;
+  // gives the length and content symbols associated to a string symbol
   expr_mapt refined_string;
+  expr_mapt refined_char;
   expr_sett seen_instances;
   index_sett index_set;
   unsigned next_symbol_id;
 
   std::vector<exprt> cur;
+
+  // These are now unused:
+  //expr_mapt string2length;
+  //expr_mapt length2string;
+  //expr_mapt string2array;
+
 };
 
 #endif

@@ -1,7 +1,6 @@
 #include <assert.h>
 #include "../cprover-string-hack.h"
 
-
 int main()
 {
     __CPROVER_string s;

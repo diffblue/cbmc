@@ -10,6 +10,9 @@ typedef struct __CPROVER_char { char c; } __CPROVER_char;
 /* string equality */
 #define __CPROVER_string_equal(s1, s2) __CPROVER_uninterpreted_string_equal(s1, s2)
 
+/* string copy */
+#define __CPROVER_string_copy(dest, src) __CPROVER_uninterpreted_string_copy(dest, src)
+
 /* defines a string literal, e.g. __CPROVER_string_literal("foo") */
 #define __CPROVER_string_literal(s) __CPROVER_uninterpreted_string_literal(s)
 
