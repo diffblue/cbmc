@@ -40,7 +40,7 @@ public:
   inline size_t get_char_width() 
   { return to_bitvector_type(char_type).get_width();}
   inline size_t get_string_length_width()
-  { return to_bitvector_type(get_string_length_type()).get_width();}
+  { return boolbv_width(get_string_length_type());}
   inline size_t get_string_width()
   { return boolbv_width(string_type);}
 
@@ -125,10 +125,14 @@ protected:
   // Get the expression corresponding to the content of a string 
   exprt expr_content(const exprt &str);
 
-  bvt bv_length(bvt struct_bv);
-  bvt bv_content(bvt struct_bv);
+  inline bvt bv_length(bvt string_bv) 
+  { return bv_component(string_bv, "length",get_string_length_type()); }
+
+  inline bvt bv_content(bvt string_bv)
+  { return bv_component(string_bv, "content",get_string_content_type()); }
+
   //symbol_exprt symbol_length(const exprt & str);
-  //symbol_exprt symbol_content(const exprt & str);
+  symbol_exprt symbol_content(const exprt & str);
 
 
   // Get a model of the given array
@@ -163,6 +167,9 @@ protected:
   //expr_mapt string2length;
   //expr_mapt length2string;
   //expr_mapt string2array;
+
+private:
+  bvt bv_component(const bvt & struct_bv, const std::string & name, const typet & subtype);
 
 };
 
