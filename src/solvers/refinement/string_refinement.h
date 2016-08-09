@@ -14,6 +14,65 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include <solvers/refinement/bv_refinement.h>
 
+
+// Internal type used for strings
+class string_ref_typet : public typet {
+public:
+  string_ref_typet();
+
+  inline typet get_string_type() { return string_type; };
+  // Type of characters
+  inline typet get_char_type() { return char_type; };
+  // Type of character indexes in the string
+  inline typet get_index_type() { return index_type; };
+  // Type to encode the length of a string
+  inline typet get_length_type() 
+  { return to_struct_type(string_type).components()[0].type();}
+  // Type for the content (list of characters) of a string
+  inline array_typet get_content_type() 
+  { return to_array_type((to_struct_type(string_type)).components()[1].type());}
+
+
+private:
+  typet index_type;
+  typet char_type;
+  typet string_type;
+  
+};
+
+
+class string_exprt : public struct_exprt {
+public:
+  string_exprt();
+  string_exprt(exprt length, exprt content);
+  string_exprt(symbol_exprt sym);
+
+  // returns a list of lemmas which should hold  
+  std::vector<exprt> of_expr(exprt unrefined_string, size_t char_width, size_t string_length_width);
+  std::vector<exprt> of_function_application(const function_application_exprt &expr, size_t char_width, size_t string_length_width);
+  std::vector<exprt> of_symbol(const symbol_exprt &expr);
+  std::vector<exprt> of_string_literal(const function_application_exprt &expr, size_t char_width, size_t string_length_width);
+  std::vector<exprt> of_string_concat(const function_application_exprt &expr);
+  std::vector<exprt> of_string_substring(const function_application_exprt &expr);
+  
+  inline exprt length()  { return op0();}
+  inline exprt content() { return op1();}
+  
+  friend inline string_exprt &to_string_expr(exprt expr)
+  {
+    assert(expr.id()==ID_struct);
+    return static_cast<string_exprt &>(expr);
+  }
+
+
+  //private:
+
+};
+
+string_exprt &to_string_expr(exprt expr);
+
+
+
 class string_refinementt: public bv_refinementt
 {
 public:
@@ -25,30 +84,25 @@ public:
   
   typedef bv_refinementt SUB;
 
-  // Internal type used for strings
-  inline typet get_string_type() { return string_type; };
-  // Type of characters
-  inline typet get_char_type() { return char_type; };
-  // Type of character indexes in the string
-  inline typet get_index_type() { return index_type; };
-  // Type to encode the length of a string
-  inline typet get_string_length_type() 
-  { return (to_struct_type(string_type)).components()[0].type();}
-  // Type for the content (list of characters) of a string
-  inline typet get_string_content_type() 
-  { return (to_struct_type(string_type)).components()[1].type();}
-  inline size_t get_char_width() 
-  { return to_bitvector_type(char_type).get_width();}
-  inline size_t get_string_length_width()
-  { return boolbv_width(get_string_length_type());}
+  inline size_t get_char_width() {return char_width;}
+  inline size_t get_string_length_width() {return string_length_width;}
   inline size_t get_string_width()
   { return boolbv_width(string_type);}
 
+  static bool is_unrefined_string_type(const typet &type);
+  static bool is_unrefined_char_type(const typet &type);
   
+  // Generate a new symbol of the given type tp with a prefix 
+  static symbol_exprt fresh_symbol(const irep_idt &prefix,
+				   const typet &tp=bool_typet());
+  static unsigned next_symbol_id;
+
 private:
+  string_ref_typet string_type;
   typet index_type;
   typet char_type;
-  typet string_type;
+  size_t char_width;
+  size_t string_length_width;
 
 protected:
   struct string_axiomt
@@ -79,9 +133,6 @@ protected:
     const function_application_exprt &expr);
   virtual void check_SAT();
 
-  bool is_unrefined_string_type(const typet &type);
-  bool is_unrefined_char_type(const typet &type);
-
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
 
   // The following functions convert different string functions to 
@@ -108,13 +159,13 @@ protected:
                     const exprt &val);
   void add_lemma(const exprt &lemma);
 
-  // Generate a new symbol of the given type tp with a prefix 
-  symbol_exprt fresh_symbol(const irep_idt &prefix,
-                            const typet &tp=bool_typet());
+
 
 
   // Gives the string corresponding to an expression
-  exprt make_string(const exprt &str);
+  string_exprt make_string(const exprt &str);
+  // Associate the string to the given symbol
+  void make_string(const symbol_exprt & sym, const exprt &str);
 
   // Gives the character corresponding to an expression
   exprt make_char(const exprt &chr);
@@ -125,11 +176,13 @@ protected:
   // Get the expression corresponding to the content of a string 
   exprt expr_content(const exprt &str);
 
+  /*
   inline bvt bv_length(bvt string_bv) 
-  { return bv_component(string_bv, "length",get_string_length_type()); }
+  { return bv_component(string_bv, "length",string_type.get_length_type()); }
 
   inline bvt bv_content(bvt string_bv)
-  { return bv_component(string_bv, "content",get_string_content_type()); }
+  { return bv_component(string_bv, "content",string_type.get_length_type()); }
+  */
 
   //symbol_exprt symbol_length(const exprt & str);
   symbol_exprt symbol_content(const exprt & str);
@@ -150,8 +203,6 @@ protected:
   irep_idt string_is_suffix_func;
   irep_idt string_char_set_func;
 
-
-
   axiom_vect string_axioms;
   expr_sett strings;
   // gives the length and content symbols associated to a string symbol
@@ -159,7 +210,6 @@ protected:
   expr_mapt refined_char;
   expr_sett seen_instances;
   index_sett index_set;
-  unsigned next_symbol_id;
 
   std::vector<exprt> cur;
 

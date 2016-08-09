@@ -32,6 +32,9 @@ std::string pretty_short(exprt expr) {
   } else return expr.pretty();
 }
 
+// associate a string to symbols
+std::map<irep_idt, string_exprt> symbol_to_string;
+
 // Defines the type of strings that will be used by our refinement
 typet make_string_type(const typet & index_type, const typet & char_type)
 {
@@ -52,6 +55,12 @@ typet make_string_type(const typet & index_type, const typet & char_type)
   return s;
 }
 
+string_ref_typet::string_ref_typet() {
+  index_type  = unsignedbv_typet(STRING_LENGTH_WIDTH);
+  char_type   = unsignedbv_typet(CHAR_WIDTH);
+  string_type = make_string_type(index_type,char_type);
+}
+
 string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   SUB(_ns, _prop)
 {
@@ -66,11 +75,11 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   string_is_prefix_func = "__CPROVER_uninterpreted_strprefixof";
   string_is_suffix_func = "__CPROVER_uninterpreted_strsuffixof";
   string_char_set_func = "__CPROVER_uninterpreted_char_set";
-  next_symbol_id = 1;
-
-  index_type  = unsignedbv_typet(STRING_LENGTH_WIDTH);
-  char_type   = unsignedbv_typet(CHAR_WIDTH);
-  string_type = make_string_type(index_type,char_type);
+  //next_symbol_id = 1;
+  index_type = string_type.get_index_type();
+  char_type = string_type.get_char_type();
+  char_width = boolbv_width(string_type.get_char_type());
+  string_length_width = boolbv_width(string_type.get_length_type());
 }
 
 string_refinementt::~string_refinementt()
@@ -95,6 +104,8 @@ bool string_refinementt::is_unrefined_char_type(const typet &type)
   return false;
 }
 
+unsigned string_refinementt::next_symbol_id = 1;
+
 symbol_exprt string_refinementt::fresh_symbol(const irep_idt &prefix,
                                               const typet &tp)
 {
@@ -105,37 +116,117 @@ symbol_exprt string_refinementt::fresh_symbol(const irep_idt &prefix,
   return symbol_exprt(name, tp);
 }
 
-// the argument of make_string is probably not useful apart from debugging
-exprt string_refinementt::make_string(const exprt &str) 
+string_exprt::string_exprt(exprt length, exprt content) : struct_exprt(string_ref_typet())
 {
-  debug() << "string_refinementt::make_string(" 
-	  << pretty_short(str) << ")" << eom;
-  assert(is_unrefined_string_type(str.type())); 
-
-  expr_mapt::iterator it = refined_string.find(str);
-  if (it != refined_string.end()) return it->second;
-  
-  symbol_exprt length = fresh_symbol("string_length",get_string_length_type());
-  symbol_exprt content = fresh_symbol("string_content",get_string_content_type());
-  
-  struct_exprt struct_string(string_type);
-  struct_string.move_to_operands(length,content);
-  refined_string[str] = struct_string;
-  return struct_string;
+  string_ref_typet t;
+  assert(length.type() == t.get_length_type());
+  assert(content.type() == t.get_content_type());
+  move_to_operands(length,content);
 }
 
-symbol_exprt string_refinementt::symbol_content(const exprt & str)
+string_exprt::string_exprt() : struct_exprt(string_ref_typet())
 {
-  assert(str.type() == string_type);
-  assert(str.operands().size() == 2);
-  return to_symbol_expr(str.op1());
+  string_ref_typet t;
+  symbol_exprt length = string_refinementt::fresh_symbol("string_length",t.get_length_type());
+  symbol_exprt content = string_refinementt::fresh_symbol("string_content",t.get_content_type());
+  move_to_operands(length,content);
 }
 
 
+string_exprt::string_exprt(symbol_exprt sym) : string_exprt()
+{
+  std::cout << "associating " << pretty_short(sym) << " to " << pretty_short(*this) << std::endl;
+  symbol_to_string[sym.get_identifier()] = *this;
+}
+
+std::vector<exprt> string_exprt::of_expr(exprt unrefined_string, size_t char_width, size_t string_length_width) 
+{
+  std::cout << "string_exprt::of_expr(" << pretty_short(unrefined_string) << ")"<< std::endl;
+  if(unrefined_string.id()==ID_function_application)
+    return of_function_application(to_function_application_expr(unrefined_string),char_width, string_length_width);
+  else if(unrefined_string.id()==ID_symbol) {
+    return of_symbol(to_symbol_expr(unrefined_string));
+  }
+  else
+    throw "string_exprt of something else than function application not implemented";
+}
+
+std::vector<exprt> string_exprt::of_symbol(const symbol_exprt & expr) {
+  std::vector<exprt> lemmas;
+  string_exprt s = symbol_to_string[expr.get_identifier()];
+  std::cout << "string_exprt::of_symbol " << pretty_short(expr) << " gives " << s.pretty() << std::endl;
+  lemmas.push_back(equal_exprt(s.content(),content()));
+  lemmas.push_back(equal_exprt(s.length(),length()));
+  return lemmas;
+}
+
+std::vector<exprt> string_exprt::of_function_application(const function_application_exprt & expr, size_t char_width, size_t string_length_width)
+{
+  const exprt &name = expr.function();
+  if (name.id() == ID_symbol) {
+    const irep_idt &id = to_symbol_expr(name).get_identifier();
+    std::cout << "string_exprt::of_function_application(" 
+	      << id << ")" << std::endl;
+    if (id == "__CPROVER_uninterpreted_string_literal") {
+      return of_string_literal(expr, char_width, string_length_width);
+    } else if (id == "__CPROVER_uninterpreted_strcat") {
+      return of_string_concat(expr);
+    } else if (id == "__CPROVER_uninterpreted_substring") {
+      return of_string_substring(expr);
+    } 
+  }
+  throw "non string function";
+}
+
+std::vector<exprt> string_exprt::of_string_literal(const function_application_exprt &f, size_t char_width, size_t string_length_width)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 1); //bad args to string literal?
+  const exprt &arg = args[0];
+  std::vector<exprt> lemmas;
+
+  assert (arg.operands().size() == 1 &&
+	  arg.op0().operands().size() == 1 &&
+	  arg.op0().op0().operands().size() == 2 &&
+	  arg.op0().op0().op0().id() == ID_string_constant); // bad arg to string literal?
+      
+  const exprt &s = arg.op0().op0().op0();
+  irep_idt sval = to_string_constant(s).get_value();
+
+  //  debug() << 
+  std::cout << "string_exprtt::convert_string_literal(" << sval << ")" << std::endl;
+
+  for (std::size_t i = 0; i < sval.size(); ++i) {
+    std::string idx_binary = integer2binary(i,string_length_width);
+    constant_exprt idx(idx_binary, string_ref_typet().get_index_type());
+    std::string sval_binary=integer2binary(unsigned(sval[i]), char_width);
+    constant_exprt c(sval_binary,string_ref_typet().get_char_type());
+    equal_exprt lemma(index_exprt(content(), idx), c);
+    lemmas.push_back(lemma);
+  }
+
+  std::string s_length_binary = integer2binary(unsigned(sval.size()),32);
+  exprt s_length = constant_exprt(s_length_binary, string_ref_typet().get_length_type());
+  equal_exprt lemma(length(),s_length);
+  lemmas.push_back(lemma);
+  return lemmas;
+}
+
+std::vector<exprt> string_exprt::of_string_concat(const function_application_exprt &expr) 
+{
+  throw "of_string_concat: not implemented";
+}
+
+std::vector<exprt> string_exprt::of_string_substring(const function_application_exprt &expr)
+{
+  throw "of_string_substring: not implemented";
+}
+
+/*
 exprt string_refinementt::expr_length(const exprt & str)
 {
   assert(str.type() == string_type);
-  member_exprt m (str,"length",get_string_length_type());
+  member_exprt m (str,"length",string_type.get_length_type());
   return m;
 }
 
@@ -174,16 +265,14 @@ bvt string_refinementt::bv_component(const bvt & struct_bv, const std::string & 
 exprt string_refinementt::expr_content(const exprt & str)
 {
   assert(str.type() == string_type);
-  return member_exprt(str,"content",get_string_content_type());
+  return member_exprt(str,"content",string_type.get_content_type());
 }
-
+*/
 
 exprt string_refinementt::make_char(const exprt &chr)
 {
-  debug() << "string_refinementt::make_char(" 
-	  << pretty_short(chr) << ")" << eom;
-  assert(is_unrefined_char_type(chr.type())); 
-  symbol_exprt c = fresh_symbol("char", char_type);
+  assert(string_refinementt::is_unrefined_char_type(chr.type())); 
+  symbol_exprt c = string_refinementt::fresh_symbol("char", string_ref_typet().get_char_type());
   refined_char[chr] = c;
   return c;
 }
@@ -209,15 +298,8 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      type.id()!=ID_bool)
   {
     if(is_unrefined_string_type(type)) {
-      const irep_idt &identifier = 
-	to_symbol_expr(expr.lhs()).get_identifier();
-      //exprt str = make_string(expr.lhs());
-
-      const bvt &bv=convert_bv(expr.rhs());
-      refined_string[expr.lhs()] = expr.rhs();// not really useful
-      map.set_literals(identifier, get_string_type(), bv);
-      if(freeze_all) set_frozen(bv);
-    
+      symbol_exprt sym = to_symbol_expr(expr.lhs());
+      make_string(sym,expr.rhs());
       return false;
     }
     else
@@ -319,6 +401,29 @@ void string_refinementt::add_lemma(const exprt &lemma)
   cur.push_back(lemma);
 }
 
+void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
+{
+  string_exprt s(sym);
+  debug() << "make_string of symbol " << pretty_short(sym) << eom;
+  std::vector<exprt> lemmas = s.of_expr(str,char_width,string_length_width);
+  for(std::vector<exprt>::iterator it = lemmas.begin(); it != lemmas.end(); it++)
+    {
+      debug() << "adding lemma " << it->pretty() << eom;
+      add_lemma(*it);
+    }
+}
+
+string_exprt string_refinementt::make_string(const exprt & str) 
+{
+  string_exprt s;
+  std::vector<exprt> lemmas = s.of_expr(str,char_width,string_length_width);
+  for(std::vector<exprt>::iterator it = lemmas.begin(); it != lemmas.end(); it++)
+    {
+      debug() << "adding lemma " << it->pretty() << eom;
+      add_lemma(*it);
+    }
+  return s;
+}
 
 bvt string_refinementt::convert_string_equal(
   const function_application_exprt &f)
@@ -332,12 +437,12 @@ bvt string_refinementt::convert_string_equal(
   const exprt &s1 = args[0];
   const exprt &s2 = args[1];
 
-  exprt s1string = make_string(s1);
-  exprt s2string = make_string(s2);
-  exprt s1len = expr_length(s1string);
-  exprt s1arr = expr_content(s1string);
-  exprt s2len = expr_length(s2string);
-  exprt s2arr = expr_content(s2string);
+  string_exprt s1string = make_string(s1);
+  string_exprt s2string = make_string(s2);
+  exprt s1len = s1string.length();
+  exprt s1arr = s1string.content();
+  exprt s2len = s2string.length();
+  exprt s2arr = s2string.content();
 
   symbol_exprt witness = fresh_symbol("index", index_type);
 
@@ -372,8 +477,9 @@ bvt string_refinementt::convert_string_length(
   debug() << "string_refinementt::convert_string_length(" 
 	  << pretty_short(args[0]) << " ) " << eom;
 
-  bvt str = convert_bv(args[0]);
-  bvt bv = bv_length(str);
+  string_exprt str = make_string(args[0]);
+  exprt length = str.length();
+  bvt bv = convert_bv(length);
   return bv;
 }
 
@@ -390,15 +496,15 @@ bvt string_refinementt::convert_string_concat(
   debug() << "string_refinementt::convert_string_length(" 
 	  << pretty_short(s1) << ", " << pretty_short(s2) << ") " << eom;
 
-  exprt str = make_string(f);
-  exprt s1string = make_string(s1);
-  exprt s2string = make_string(s2);
-  exprt len = expr_length(f);
-  exprt s1len = expr_length(s1string);
-  exprt s2len = expr_length(s2string);
-  exprt arr = expr_content(str);
-  exprt s1arr = expr_content(s1string);
-  exprt s2arr = expr_content(s2string);
+  string_exprt str = make_string(f);
+  string_exprt s1string = make_string(s1);
+  string_exprt s2string = make_string(s2);
+  exprt len = str.length();
+  exprt s1len = s1string.length();
+  exprt s2len = s2string.length();
+  exprt arr = str.content();
+  exprt s1arr = s1string.content();
+  exprt s2arr = s2string.content();
   bvt bv = convert_bv(str);
 
   equal_exprt lemma1(len, plus_exprt(s1len, s2len));
@@ -438,12 +544,12 @@ bvt string_refinementt::convert_string_substring(
   const function_application_exprt::argumentst &args = f.arguments();  
   assert(args.size() == 3); // bad args to string substring?
 
-  exprt str = make_string(f);
-  exprt len = expr_length(str);
-  exprt arr = expr_content(str);
-  exprt arg_str = make_string(args[0]);
-  exprt arg_len = expr_length(arg_str);
-  exprt arg_arr = expr_content(arg_str);
+  string_exprt str = make_string(f);
+  exprt len = str.length();
+  exprt arr = str.content();
+  string_exprt arg_str = make_string(args[0]);
+  exprt arg_len = arg_str.length();
+  exprt arg_arr = arg_str.content();
   typecast_exprt i(args[1], index_type);
   typecast_exprt j(args[2], index_type);
   bvt bv = convert_bv(arr);
@@ -477,12 +583,12 @@ bvt string_refinementt::convert_string_is_prefix(
 
   symbol_exprt isprefix = fresh_symbol("isprefix");
 
-  exprt s0str = make_string(args[0]);
-  exprt s0len = expr_length(s0str);
-  exprt s0arr = expr_content(s0str);
-  exprt s1str = make_string(args[1]);
-  exprt s1len = expr_length(s1str);
-  exprt s1arr = expr_content(s1str);
+  string_exprt s0str = make_string(args[0]);
+  exprt s0len = s0str.length();
+  exprt s0arr = s0str.content();
+  string_exprt s1str = make_string(args[1]);
+  exprt s1len = s1str.length();
+  exprt s1arr = s1str.content();
   bvt bv = convert_bool_bv(isprefix, f);
 
   implies_exprt lemma1(isprefix, binary_relation_exprt(s0len, ID_ge, s1len));
@@ -519,12 +625,12 @@ bvt string_refinementt::convert_string_is_suffix(
   symbol_exprt issuffix = fresh_symbol("issuffix");
   bvt bv = convert_bool_bv(issuffix, f);
 
-  exprt s0 = make_string(args[0]);
-  exprt s0len = expr_length(s0);
-  exprt s0arr = expr_content(s0);
-  exprt s1 = make_string(args[1]);
-  exprt s1len = expr_length(s1);
-  exprt s1arr = expr_content(s1);
+  string_exprt s0 = make_string(args[0]);
+  exprt s0len = s0.length();
+  exprt s0arr = s0.content();
+  string_exprt s1 = make_string(args[1]);
+  exprt s1len = s1.length();
+  exprt s1arr = s1.content();
 
   implies_exprt lemma1(issuffix, binary_relation_exprt(s0len, ID_ge, s1len));
   add_lemma(lemma1);
@@ -561,8 +667,7 @@ bvt string_refinementt::convert_string_literal(
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 1); //bad args to string literal?
   const exprt &arg = args[0];
-  size_t char_width = get_char_width();
-  size_t string_length_width = get_string_length_width();
+
 
   assert (arg.operands().size() == 1 &&
 	  arg.op0().operands().size() == 1 &&
@@ -572,11 +677,12 @@ bvt string_refinementt::convert_string_literal(
   const exprt &s = arg.op0().op0().op0();
   irep_idt sval = to_string_constant(s).get_value();
 
-  debug() << "string_refinementt::convert_string_literal("
-	  << sval << ")" << eom;
+  debug() << "Warning : string_refinementt::convert_string_literal("
+	  << sval << ") should not be used anymore" << eom;
 
   exprt str = make_string(f);
   bvt bv_str = convert_bv(str);
+  /*
 
   bvt content = bv_content(bv_str);
 
@@ -590,12 +696,12 @@ bvt string_refinementt::convert_string_literal(
   }
 
   std::string s_length_binary = integer2binary(unsigned(sval.size()),32);
-  exprt s_length = constant_exprt(s_length_binary, get_string_length_type());
+  exprt s_length = constant_exprt(s_length_binary, string_type.get_length_type());
   exprt length = expr_length(str);
   equal_exprt lemma(length,s_length);
 
   add_lemma(lemma);
-
+  */
   return bv_str;
 }
 
@@ -629,15 +735,32 @@ bvt string_refinementt::convert_char_literal(
 bvt string_refinementt::convert_string_char_at(
   const function_application_exprt &f)
 {
-  bvt bv;
+  debug() << "string_refinementt::convert_char_at" << eom;
+  //bvt bv;
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //string_char_at expects 2 arguments
 
   exprt chr = make_char(f);
-  exprt str = make_string(args[0]);
-  exprt content = expr_content(str);
+
+  // copied from bvt boolbvt::convert_index(const index_exprt &expr)  
+  bvt bv;
+  /*
+  std::size_t width=get_char_width();
+  bv.resize(width);
+
+  const array_typet &array_type= string_type.get_content_type();
+  
+  for(std::size_t i=0; i<width; i++)
+    bv[i]=prop.new_variable();
+  record_array_index(f);
+
+  return bv;
+  */
+  debug() << "string_refinementt::convert_char_at : we should look for "
+	<< "symbol corresponding to " << pretty_short(args[0]) << eom;
+  string_exprt str = make_string(args[0]);
   typecast_exprt pos(args[1], index_type);
-  index_exprt char_at(content, pos);
+  index_exprt char_at(str.content(), pos);
   debug() << "string_refinementt::convert_char_at adds char constr. : "
 	  << chr.get(ID_identifier) << " == " 
 	  << char_at.pretty() << eom;
@@ -654,14 +777,14 @@ bvt string_refinementt::convert_string_char_set(
   const function_application_exprt::argumentst &args = f.arguments();  
   assert(args.size() == 3); //bad args to string_char_set?
 
-  exprt str = make_string(f);
-  exprt arr = expr_content(str);
-  exprt len = expr_length(str);
+  string_exprt str = make_string(f);
+  exprt arr = str.content();
+  exprt len = str.length();
   bvt bv = convert_bv(arr);
 
-  exprt sarg = make_string(args[0]);
-  exprt sarr = expr_content(sarg);
-  exprt slen = expr_length(sarg);
+  string_exprt sarg = make_string(args[0]);
+  exprt sarr = sarg.content();
+  exprt slen = sarg.length();
   typecast_exprt idx(args[1], index_type);
 
   symbol_exprt c = fresh_symbol("char", char_type);
@@ -742,9 +865,9 @@ bool string_refinementt::check_axioms()
 
   for (expr_mapt::iterator it = refined_string.begin(),      
 	 end = refined_string.end(); it != end; ++it) {
-    const exprt &refined = it->second;
-    const exprt &econtent = expr_content(refined);
-    const exprt &elength  = expr_length(refined);
+    string_exprt refined = to_string_expr(it->second);
+    const exprt &econtent = refined.content();
+    const exprt &elength  = refined.length();
 
     exprt len = get(elength);
     exprt arr = get_array(econtent, len);
