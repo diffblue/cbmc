@@ -312,17 +312,19 @@ void collect_mcdc_controlling_rec(
   else if(src.id()==ID_not)
   {
     exprt e=to_not_expr(src).op();
-    if(not is_condition(e))
-      collect_mcdc_controlling_rec(e, conditions, result);
-    else
-    {
-      std::vector<exprt> new_conditions1=conditions;
-      new_conditions1.push_back(src);
-      result.insert(conjunction(new_conditions1));
-      std::vector<exprt> new_conditions2=conditions;
-      new_conditions2.push_back(e);
-      result.insert(conjunction(new_conditions2));
-    }
+    collect_mcdc_controlling_rec(e, conditions, result);
+  }
+  else if(is_condition(src)) 
+  {
+    exprt e=src;
+    std::vector<exprt> new_conditions1=conditions;
+    new_conditions1.push_back(e);
+    result.insert(conjunction(new_conditions1));
+
+    //e.make_not();
+    std::vector<exprt> new_conditions2=conditions;
+    new_conditions2.push_back(not_exprt(e));
+    result.insert(conjunction(new_conditions2));
   }
 }
 
@@ -357,8 +359,8 @@ Function: replacement_conjunction
 
  Outputs:
 
- Purpose: To replace the i-th exprt of operands with each
-          exprt inside new_exprts.
+ Purpose: To replace the i-th exprt of ''operands'' with each
+          exprt inside ''replacement_exprts''.
 
 \*******************************************************************/
 
@@ -391,9 +393,9 @@ Function: collect_mcdc_controlling_nested
 
  Outputs:
 
- Purpose: The nested method iteratively applies 
+ Purpose: This nested method iteratively applies 
           ''collect_mcdc_controlling'' to every non-atomic exprt
-          of a decision
+          within a decision
 
 \*******************************************************************/
 
@@ -412,6 +414,11 @@ std::set<exprt> collect_mcdc_controlling_nested(
       bool changed=false;
       for(auto &x : s1)
       {
+        if(is_condition(x))
+        {
+          s2.insert(x);
+          continue;
+        }
         std::vector<exprt> operands;
         collect_operands(x, operands);
         for(int i=0; i<operands.size(); i++)
@@ -470,7 +477,9 @@ Function: sign_of_exprt
 
 void sign_of_exprt(const exprt &e, const exprt &E, std::set<signed> &signs)
 {
-  auto &ops = E.operands();
+  std::vector<exprt> ops;
+  collect_operands(E, ops);
+  //auto &ops = E.operands();
   for(auto &x : ops)
   {
     exprt y(x);
@@ -589,10 +598,12 @@ bool eval_exprt(
   const std::map<exprt, bool> &atomic_exprts, 
   const exprt &src)
 {
+  std::vector<exprt> operands;
+  collect_operands(src, operands);
   // src is AND
   if(src.id()==ID_and)
   {
-    for(auto &x : src.operands())
+    for(auto &x : operands)
       if(not eval_exprt(atomic_exprts, x))
         return false;
     return true;
@@ -601,10 +612,10 @@ bool eval_exprt(
   else if(src.id()==ID_or)
   {
     unsigned fcount=0;
-    for(auto &x : src.operands())
+    for(auto &x : operands)
       if(not eval_exprt(atomic_exprts, x))
         fcount++;
-    if(fcount<src.operands().size())
+    if(fcount<operands.size())
       return true;
     else
       return false;
