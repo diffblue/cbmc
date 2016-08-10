@@ -14,29 +14,45 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include <solvers/refinement/bv_refinement.h>
 
+#define INDEX_WIDTH 32
+#define CHAR_WIDTH 8
+
 
 // Internal type used for strings
 class string_ref_typet : public struct_typet {
 public:
   string_ref_typet();
 
-  // Type of characters
-  inline typet get_char_type() { return char_type; };
-  // Type of character indexes in the string
-  inline typet get_index_type() { return index_type; };
-  // Type to encode the length of a string
-  inline typet get_length_type() 
-  { return to_struct_type(*this).components()[0].type();}
   // Type for the content (list of characters) of a string
   inline array_typet get_content_type() 
   { return to_array_type((to_struct_type(*this)).components()[1].type());}
 
-
-private:
-  typet index_type;
-  typet char_type;
-  
 };
+
+
+class string_axiomt
+{
+public:
+  //unsigned id_nr;
+  exprt lit;
+
+  // index symbol
+  symbol_exprt idx;
+  exprt premise;
+  exprt body;
+  
+  //std::string as_string() const;
+  //explicit string_axiomt(unsigned i=0): id_nr(i) {}
+
+  string_axiomt(symbol_exprt index, exprt prem, exprt bod);
+
+  // axiom with no premise
+  string_axiomt(exprt bod);
+
+  inline bool is_quantified() {return (premise != true_exprt());}
+};
+
+typedef std::vector<string_axiomt> axiom_vect;
 
 
 class string_exprt : public struct_exprt {
@@ -46,17 +62,17 @@ public:
   string_exprt(symbol_exprt sym);
 
   // returns a list of lemmas which should hold  
-  std::vector<exprt> of_expr(exprt unrefined_string, size_t char_width, size_t string_length_width);
-  std::vector<exprt> of_function_application(const function_application_exprt &expr, size_t char_width, size_t string_length_width);
-  std::vector<exprt> of_symbol(const symbol_exprt &expr);
-  std::vector<exprt> of_string_literal(const function_application_exprt &expr, size_t char_width, size_t string_length_width);
-  std::vector<exprt> of_string_concat(const function_application_exprt &expr);
-  std::vector<exprt> of_string_substring(const function_application_exprt &expr);
+  axiom_vect of_expr(exprt unrefined_string);
+  axiom_vect of_function_application(const function_application_exprt &expr);
+  axiom_vect of_symbol(const symbol_exprt &expr);
+  axiom_vect of_string_literal(const function_application_exprt &expr);
+  axiom_vect of_string_concat(const function_application_exprt &expr);
+  axiom_vect of_string_substring(const function_application_exprt &expr);
   
   inline exprt length()  { return op0();}
   inline exprt content() { return op1();}
   
-  friend inline string_exprt &to_string_expr(exprt expr)
+  friend inline string_exprt &to_string_expr(exprt &expr)
   {
     assert(expr.id()==ID_struct);
     return static_cast<string_exprt &>(expr);
@@ -78,8 +94,6 @@ public:
   
   typedef bv_refinementt SUB;
 
-  inline size_t get_char_width() {return char_width;}
-  inline size_t get_string_length_width() {return string_length_width;}
   inline size_t get_string_width()
   { return boolbv_width(string_type);}
 
@@ -93,27 +107,9 @@ public:
 
 private:
   string_ref_typet string_type;
-  typet index_type;
-  typet char_type;
-  size_t char_width;
-  size_t string_length_width;
 
 protected:
-  struct string_axiomt
-  {
-  public:
-    explicit string_axiomt(unsigned i=0): id_nr(i) {}
-    
-    unsigned id_nr;
-    exprt lit;
-    exprt idx;
-    exprt premise;
-    exprt body;
 
-    std::string as_string() const;
-  };
-
-  typedef std::vector<string_axiomt> axiom_vect;
   typedef std::set<exprt> expr_sett;
   typedef std::map<exprt, exprt> expr_mapt;
   typedef std::map<exprt, expr_sett> index_sett;
@@ -152,7 +148,7 @@ protected:
   exprt instantiate(const string_axiomt &axiom, const exprt &str,
                     const exprt &val);
   void add_lemma(const exprt &lemma);
-  void add_lemmas(std::vector<exprt> & lemmas);
+  void add_lemmas(axiom_vect & lemmas);
 
 
 
