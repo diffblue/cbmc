@@ -125,8 +125,4 @@ protected:
 
 };
 
-exprt concatenate_array_id(const exprt &array,
-		                     const exprt &index,
-		                     const typet &type);
-
 #endif

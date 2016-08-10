@@ -51,6 +51,30 @@ exprt concatenate_array_id(
 
 /*******************************************************************\
 
+Function: concatenate_array_id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt concatenate_array_id(
+		const exprt &array, const mp_integer &index,
+		const typet &type)
+{
+  std::string a, identifier;
+  a = array.get_string(ID_identifier);
+  identifier=a+"["+integer2string(index)+"]";
+  symbol_exprt new_expr(identifier, type);
+
+  return new_expr;
+}
+
+/*******************************************************************\
+
 Function: constant_propagator_domaint::assign_rec
 
   Inputs:
@@ -66,6 +90,7 @@ void constant_propagator_domaint::assign_rec(
   const exprt &lhs, const exprt &rhs,
   const namespacet &ns)
 {
+  const typet & lhs_type = ns.follow(lhs.type());
   const typet & rhs_type = ns.follow(rhs.type());
 
 #ifdef DEBUG
@@ -81,6 +106,18 @@ void constant_propagator_domaint::assign_rec(
       assign(values, to_symbol_expr(lhs), rhs, ns);
     else
       values.set_to_top(to_symbol_expr(lhs));
+  }
+  else if (lhs.id()==ID_symbol && lhs_type.id()==ID_array
+		                       && rhs_type.id()==ID_array)
+  {
+	exprt new_expr;
+	mp_integer idx=0;
+    forall_operands(it, rhs)
+	{
+  	  new_expr=concatenate_array_id(lhs, idx, it->type());
+  	  assign(values, to_symbol_expr(new_expr), *it, ns);
+  	  idx = idx +1;
+	}
   }
   else if (lhs.id()==ID_index)
   {
