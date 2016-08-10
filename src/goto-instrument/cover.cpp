@@ -755,14 +755,14 @@ bool is_mcdc_pair(
     values_of_atomic_exprts(e2, conditions);
   
   // A mcdc pair should result in different ''decision''
-  if(eval_exprt(atomic_exprts_e1, decision)
-    ==eval_exprt(atomic_exprts_e2, decision))
+  if(eval_exprt(atomic_exprts_e1, decision)==
+     eval_exprt(atomic_exprts_e2, decision))
     return false;
 
   // A mcdc pair regarding an atomic exprt ''c''
   // should have different values of ''c''
   if(atomic_exprts_e1.find(c)->second==
-    atomic_exprts_e2.find(c)->second)
+     atomic_exprts_e2.find(c)->second)
     return false;
 
   /**
