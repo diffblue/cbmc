@@ -20,6 +20,37 @@ Author: Peter Schrammel
 
 /*******************************************************************\
 
+Function: concatenate_array_id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt concatenate_array_id(
+		const exprt &array, const exprt &index,
+		const typet &type)
+{
+  std::string a, idx, identifier;
+  a = array.get_string(ID_identifier);
+
+  if (index.id()==ID_typecast)
+    idx = index.op0().get_string(ID_value);
+  else
+    idx = index.get_string(ID_value);
+
+  mp_integer i=string2integer(idx);
+  identifier=a+"["+integer2string(i)+"]";
+  symbol_exprt new_expr(identifier, type);
+
+  return new_expr;
+}
+
+/*******************************************************************\
+
 Function: constant_propagator_domaint::assign_rec
 
   Inputs:
@@ -50,6 +81,15 @@ void constant_propagator_domaint::assign_rec(
       assign(values, to_symbol_expr(lhs), rhs, ns);
     else
       values.set_to_top(to_symbol_expr(lhs));
+  }
+  else if (lhs.id()==ID_index)
+  {
+	if (values.is_constant(lhs.op1())
+	 && values.is_constant(rhs))
+	{
+	  exprt new_expr=concatenate_array_id(lhs.op0(), lhs.op1(), rhs.type());
+      assign(values, to_symbol_expr(new_expr), rhs, ns);
+	}
   }
 #if 0
   else //TODO: could make field or array element-sensitive
@@ -235,6 +275,30 @@ void constant_propagator_domaint::assign(
 
 /*******************************************************************\
 
+Function: constant_propagator_domaint::is_array_constant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool constant_propagator_domaint::valuest::is_array_constant(const exprt &expr) const
+{
+  exprt new_expr = concatenate_array_id(expr.op0(),
+		  expr.op1(), expr.type());
+
+  if (replace_const.expr_map.find(to_symbol_expr(new_expr).get_identifier()) ==
+         replace_const.expr_map.end())
+    return false;
+
+  return true;
+}
+
+/*******************************************************************\
+
 Function: constant_propagator_domaint::valuest::is_constant
 
   Inputs:
@@ -259,6 +323,9 @@ bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
     if(replace_const.expr_map.find(to_symbol_expr(expr).get_identifier()) ==
        replace_const.expr_map.end())
       return false;
+
+  if (expr.id()==ID_index)
+	return is_array_constant(expr);
 
   if(expr.id()==ID_address_of)
     return is_constant_address_of(to_address_of_expr(expr).object());
@@ -521,6 +588,34 @@ void constant_propagator_ait::replace(
 
 /*******************************************************************\
 
+Function: constant_propagator_ait::replace_array_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void constant_propagator_ait::replace_array_symbol(exprt &expr)
+{
+  if (expr.id()==ID_index)
+	expr = concatenate_array_id(expr.op0(),
+			  expr.op1(), expr.type());
+
+  Forall_operands(it, expr)
+  {
+	if (it->id()==ID_equal)
+	  replace_array_symbol(it->op0());
+	else if (it->id()==ID_index)
+	  replace_array_symbol(expr.op0());
+  }
+
+}
+
+/*******************************************************************\
+
 Function: constant_propagator_ait::replace
 
   Inputs:
@@ -547,6 +642,7 @@ void constant_propagator_ait::replace(
 
     if(it->is_goto() || it->is_assume() || it->is_assert())
     {
+      replace_array_symbol(it->guard);
       s_it->second.values.replace_const(it->guard);
       it->guard = simplify_expr(it->guard, ns);
     }
