@@ -50,6 +50,8 @@ public:
   string_axiomt(exprt bod);
 
   inline bool is_quantified() {return (premise != true_exprt());}
+
+  std::string to_string() const;
 };
 
 typedef std::vector<string_axiomt> axiom_vect;
@@ -131,11 +133,9 @@ protected:
   bvt convert_string_equal(const function_application_exprt &f);
   bvt convert_string_copy(const function_application_exprt &f);
   bvt convert_string_length(const function_application_exprt &f);
-  bvt convert_string_concat(const function_application_exprt &f);
   bvt convert_string_substring(const function_application_exprt &f);
   bvt convert_string_is_prefix(const function_application_exprt &f);
   bvt convert_string_is_suffix(const function_application_exprt &f);
-  bvt convert_string_literal(const function_application_exprt &f);
   bvt convert_char_literal(const function_application_exprt &f);
   bvt convert_string_char_at(const function_application_exprt &f);
   bvt convert_string_char_set(const function_application_exprt &f);
