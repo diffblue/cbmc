@@ -395,7 +395,7 @@ void string_refinementt::add_lemma(const exprt &lemma)
   if(lemma.operands().size() == 2) 
     {
       //debug() << "adding lemma " << pretty_short(lemma.op0()) << " ~ " << pretty_short(lemma.op1()) << eom;
-      debug() << "adding lemma " << lemma.op0().pretty() << " ~ " << lemma.op1().pretty() << eom;
+      debug() << "adding lemma " << lemma << eom;
     }
   prop.l_set_to_true(convert(lemma));
   cur.push_back(lemma);
