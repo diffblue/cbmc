@@ -16,27 +16,25 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 
 // Internal type used for strings
-class string_ref_typet : public typet {
+class string_ref_typet : public struct_typet {
 public:
   string_ref_typet();
 
-  inline typet get_string_type() { return string_type; };
   // Type of characters
   inline typet get_char_type() { return char_type; };
   // Type of character indexes in the string
   inline typet get_index_type() { return index_type; };
   // Type to encode the length of a string
   inline typet get_length_type() 
-  { return to_struct_type(string_type).components()[0].type();}
+  { return to_struct_type(*this).components()[0].type();}
   // Type for the content (list of characters) of a string
   inline array_typet get_content_type() 
-  { return to_array_type((to_struct_type(string_type)).components()[1].type());}
+  { return to_array_type((to_struct_type(*this)).components()[1].type());}
 
 
 private:
   typet index_type;
   typet char_type;
-  typet string_type;
   
 };
 
@@ -63,10 +61,6 @@ public:
     assert(expr.id()==ID_struct);
     return static_cast<string_exprt &>(expr);
   }
-
-
-  //private:
-
 };
 
 string_exprt &to_string_expr(exprt expr);
@@ -158,13 +152,15 @@ protected:
   exprt instantiate(const string_axiomt &axiom, const exprt &str,
                     const exprt &val);
   void add_lemma(const exprt &lemma);
+  void add_lemmas(std::vector<exprt> & lemmas);
 
 
 
-
-  // Gives the string corresponding to an expression
+  // Create a new string expression and add the necessary lemma
+  // to ensure its equal to the given string expression.
   string_exprt make_string(const exprt &str);
-  // Associate the string to the given symbol
+  // Same thing but associates the string to the given symbol instead 
+  // of returning it.
   void make_string(const symbol_exprt & sym, const exprt &str);
 
   // Gives the character corresponding to an expression
@@ -205,21 +201,10 @@ protected:
 
   axiom_vect string_axioms;
   expr_sett strings;
-  // gives the length and content symbols associated to a string symbol
-  expr_mapt refined_string;
-  expr_mapt refined_char;
   expr_sett seen_instances;
   index_sett index_set;
 
   std::vector<exprt> cur;
-
-  // These are now unused:
-  //expr_mapt string2length;
-  //expr_mapt length2string;
-  //expr_mapt string2array;
-
-private:
-  bvt bv_component(const bvt & struct_bv, const std::string & name, const typet & subtype);
 
 };
 
