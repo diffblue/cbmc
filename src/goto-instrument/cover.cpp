@@ -224,7 +224,8 @@ Function: collect_mcdc_controlling_rec
 
  Outputs:
 
- Purpose:
+ Purpose: To recursively collect controlling exprts for
+          for mcdc coverage.
 
 \*******************************************************************/
 
@@ -233,6 +234,7 @@ void collect_mcdc_controlling_rec(
   const std::vector<exprt> &conditions,
   std::set<exprt> &result)
 {
+  // src is conjunction (ID_and) or disjunction (ID_or)
   if(src.id()==ID_and ||
      src.id()==ID_or)
   {
@@ -326,6 +328,10 @@ void collect_mcdc_controlling_rec(
     new_conditions2.push_back(not_exprt(e));
     result.insert(conjunction(new_conditions2));
   }
+  else
+  {
+    throw "Unexpected exprt for MC/DC coverage";
+  }
 }
 
 /*******************************************************************\
@@ -402,28 +408,49 @@ Function: collect_mcdc_controlling_nested
 std::set<exprt> collect_mcdc_controlling_nested(
   const std::set<exprt> &decisions)
 {
+  // To obtain the 1st-level controlling conditions
   std::set<exprt> controlling = collect_mcdc_controlling(decisions);
+
   std::set<exprt> result;
+  // For each controlling condition, to check if it contains
+  // non-atomic exprts
   for(auto &src : controlling)
   {
     std::set<exprt> s1, s2;
+    /**
+     * The final controlling conditions resulted from ''src''
+     * will be stored in ''s1''; ''s2'' is usd to hold the
+     * temporary expansion.
+     **/
     s1.insert(src);
     
-    while(true) //dual-loop structure to eliminate complex non-conditional terms
+    // dual-loop structure to eliminate complex 
+    // non-atomic-conditional terms
+    while(true) 
     {
       bool changed=false;
+      // the 2nd loop
       for(auto &x : s1)
       {
+        // if ''x'' is atomic conditional term, there
+        // is no expansion
         if(is_condition(x))
         {
           s2.insert(x);
           continue;
         }
+        // otherwise, we apply the ''nested'' method to
+        // each of its operands
         std::vector<exprt> operands;
         collect_operands(x, operands);
         for(int i=0; i<operands.size(); i++)
         {
           std::set<exprt> res;
+          /**
+           * To expand an operand if it is not atomic,
+           * and label the ''changed'' flag; the resulted 
+           * expansion of such an operand is stored in ''res''.
+           **/
           if(operands[i].id()==ID_not)
           {
             exprt no=operands[i].op0();
@@ -443,17 +470,24 @@ std::set<exprt> collect_mcdc_controlling_nested(
             res=collect_mcdc_controlling(ctrl);
           }
 
-          std::set<exprt> co=replacement_conjunction(res, operands, i);
+          // To replace a non-atomic exprt with its expansion
+          std::set<exprt> co=
+            replacement_conjunction(res, operands, i);
           s2.insert(co.begin(), co.end());
           if(res.size() > 0) break;
         }
+        // if there is no change x.r.t current operands of ''x'',
+        // i.e., they are all atomic, we reserve ''x''
         if(not changed) s2.insert(x);
       }
+      // update ''s1'' and check if change happens
       s1=s2;
       if(not changed) {break;}
       s2.clear();
     }
 
+    // The expansions of each ''src'' should be added into
+    // the ''result''
     result.insert(s1.begin(), s1.end());
   }
   
@@ -475,11 +509,12 @@ Function: sign_of_exprt
 
 \*******************************************************************/
 
-void sign_of_exprt(const exprt &e, const exprt &E, std::set<signed> &signs)
+std::set<signed> sign_of_exprt(const exprt &e, const exprt &E)
 {
+  std::set<signed> signs;
+
   std::vector<exprt> ops;
   collect_operands(E, ops);
-  //auto &ops = E.operands();
   for(auto &x : ops)
   {
     exprt y(x);
@@ -490,14 +525,18 @@ void sign_of_exprt(const exprt &e, const exprt &E, std::set<signed> &signs)
       if(y==e) signs.insert(-1);
       if(not is_condition(y))
       {
-        sign_of_exprt(e, y, signs);
+        std::set<signed> re=sign_of_exprt(e, y);
+        signs.insert(re.begin(), re.end());
       }
     }
     else if(not is_condition(y))
     {
-      sign_of_exprt(e, y, signs);
+      std::set<signed> re=sign_of_exprt(e, y);
+      signs.insert(re.begin(), re.end());
     }
   }
+
+  return signs;
 }
 
 /*******************************************************************\
@@ -524,15 +563,15 @@ void remove_repetition(std::set<exprt> &exprts)
     std::set<exprt> new_conditions = collect_conditions(x);
     conditions.insert(new_conditions.begin(), new_conditions.end());
   }
-  // exprt that contains multiple signs should be removed
+  // exprt that contains multiple (inconsistent) signs should
+  // be removed
   std::set<exprt> new_exprts;
   for(auto &x : exprts)
   {
     bool kept=true;
     for(auto &c : conditions)
     {
-      std::set<signed> signs;
-      sign_of_exprt(c, x, signs);
+      std::set<signed> signs=sign_of_exprt(c, x);
       if(signs.size()>1)
       {
         kept=false;
@@ -547,15 +586,21 @@ void remove_repetition(std::set<exprt> &exprts)
   for(auto &x: exprts)
   {
     bool red=false;
+    /**
+     * To check if ''x'' is identical with some
+     * exprt in ''new_exprts''. Two exprts ''x''
+     * and ''y'' are identical iff they have the
+     * same sign for every atomic condition ''c''.
+     **/
     for(auto &y: new_exprts)
     {
       bool iden = true;
       for(auto &c : conditions)
       {
-        std::set<signed> signs1, signs2;
-        sign_of_exprt(c, x, signs1);
-        sign_of_exprt(c, y, signs2);
+        std::set<signed> signs1=sign_of_exprt(c, x);
+        std::set<signed> signs2=sign_of_exprt(c, y);
         int s1=signs1.size(), s2=signs2.size();
+        // it is easy to check non-equivalence;
         if(s1!=s2)
         {
           iden=false;
@@ -564,6 +609,7 @@ void remove_repetition(std::set<exprt> &exprts)
         else
         {
           if(s1==0 && s2==0) continue;
+          // it is easy to check non-equivalence
           if(*(signs1.begin())!=*(signs2.begin()))
           {
             iden=false;
@@ -571,14 +617,23 @@ void remove_repetition(std::set<exprt> &exprts)
           }
         }
       }
+      /**
+       * If ''x'' is found identical w.r.t some
+       * exprt in ''new_conditions, we label it
+       * and break.
+       **/
       if(iden) 
       {
         red=true;
         break;
       }
     }
+    // an exprt is added into ''new_exprts''
+    // if it is not found repetitive
     if(not red) new_exprts.insert(x);
   }
+
+  // update the original ''exprts''
   exprts = new_exprts;
 }
 
@@ -590,7 +645,7 @@ Function: eval_exprt
 
  Outputs:
 
- Purpose: To evaluate the value of exprt ''E'', according to
+ Purpose: To evaluate the value of exprt ''src'', according to
           the atomic exprt values
 
 \*******************************************************************/
@@ -631,6 +686,10 @@ bool eval_exprt(
   {
     return atomic_exprts.find(src)->second;
   }
+  else
+  {
+    throw "Unexpected exprt when evaluating a boolean expression";
+  }
 }
 
 /*******************************************************************\
@@ -652,11 +711,12 @@ std::map<exprt, bool> values_of_atomic_exprts(
   std::map<exprt, bool> atomic_exprts;
   for(auto &c : conditions)
   {
-    std::set<signed> signs;
-    sign_of_exprt(c, e, signs);
+    std::set<signed> signs=sign_of_exprt(c, e);
     if(signs.size()!=1) continue;
-    if(*signs.begin()==1) atomic_exprts.insert(std::pair<exprt, bool>(c, true));
-    if(*signs.begin()==-1) atomic_exprts.insert(std::pair<exprt, bool>(c, false));
+    if(*signs.begin()==1)
+      atomic_exprts.insert(std::pair<exprt, bool>(c, true));
+    if(*signs.begin()==-1) 
+      atomic_exprts.insert(std::pair<exprt, bool>(c, false));
   }
   return atomic_exprts;
 }
@@ -669,8 +729,11 @@ Function: is_mcdc_pair
 
  Outputs:
 
- Purpose: To check if the two input exprts are mcdc pairs regarding
-          the given atomic exprt ''c''
+ Purpose: To check if the two input controlling exprts are mcdc
+          pairs regarding an atomic exprt ''c''. A mcdc pair of
+          (e1, e2) regarding ''c'' means that ''e1'' and ''e2''
+          result in different ''decision'' values, and this is 
+          caused by the different choice of ''c'' value.
 
 \*******************************************************************/
 
@@ -681,31 +744,52 @@ bool is_mcdc_pair(
   const std::set<exprt> &conditions,
   const exprt &decision)
 {
+  // An controlling exprt cannot be mcdc pair of itself
   if(e1==e2) return false;
-  std::map<exprt, bool> atomic_exprts_e1=values_of_atomic_exprts(e1, conditions);
-  std::map<exprt, bool> atomic_exprts_e2=values_of_atomic_exprts(e2, conditions);
-  if(eval_exprt(atomic_exprts_e1, decision)==eval_exprt(atomic_exprts_e2, decision))
+  
+  // To obtain values of each atomic condition within ''e1'' 
+  // and ''e2''
+  std::map<exprt, bool> atomic_exprts_e1=
+    values_of_atomic_exprts(e1, conditions);
+  std::map<exprt, bool> atomic_exprts_e2=
+    values_of_atomic_exprts(e2, conditions);
+  
+  // A mcdc pair should result in different ''decision''
+  if(eval_exprt(atomic_exprts_e1, decision)
+    ==eval_exprt(atomic_exprts_e2, decision))
     return false;
-  if(atomic_exprts_e1.find(c)->second==atomic_exprts_e2.find(c)->second)
+
+  // A mcdc pair regarding an atomic exprt ''c''
+  // should have different values of ''c''
+  if(atomic_exprts_e1.find(c)->second==
+    atomic_exprts_e2.find(c)->second)
     return false;
+
+  /**
+   *  A mcdc pair of controlling exprts regarding ''c''
+   *  can have different values for only one atomic
+   *  exprt, i.e., ''c''. Otherwise, they are not
+   *  a mcdc pair.
+   **/
   int diff_count=0;
-  auto eit=atomic_exprts_e1.begin();
-  auto xit=atomic_exprts_e2.begin();
-  while(eit!=atomic_exprts_e1.end())
+  auto e1_it=atomic_exprts_e1.begin();
+  auto e2_it=atomic_exprts_e2.begin();
+  while(e1_it!=atomic_exprts_e1.end())
   {
-    if(eit->second!=xit->second)
+    if(e1_it->second!=e2_it->second)
     diff_count++;
     if(diff_count>1) break;
-    eit++;
-    xit++;
+    e1_it++;
+    e2_it++;
   }
+
   if(diff_count==1) return true;
   else return false;
 }
 
 /*******************************************************************\
 
-Function: find_mcdc_pair
+Function: has_mcdc_pair
 
   Inputs: 
 
@@ -716,7 +800,7 @@ Function: find_mcdc_pair
 
 \*******************************************************************/
 
-bool find_mcdc_pair(
+bool has_mcdc_pair(
   const exprt &c,
   const std::set<exprt> &exprt_set,
   const std::set<exprt> &conditions,
@@ -741,13 +825,15 @@ Function: minimize_mcdc_controlling
 
   Inputs: The input ''controlling'' should have been processed by
           ''collect_mcdc_controlling_nested''
-          and
+                  and
           ''remove_repetition''
 
  Outputs:
 
  Purpose: This method minimizes the controlling conditions for
-          mcdc coverage
+          mcdc coverage. The minimum is in a sense that by deleting
+          any controlling condition in the set, the mcdc coverage
+          for the decision will be not complete.
 
 \*******************************************************************/
 
@@ -767,16 +853,41 @@ void minimize_mcdc_controlling(
   {
     std::set<exprt> new_controlling;
     bool ctrl_update=false;
+    /**
+     * Iteratively, we test that after removing an item ''x''
+     * from the ''controlling'', can a complete mcdc coverage 
+     * over ''decision'' still be reserved?
+     *
+     * If yes, we update ''controlling'' with the 
+     * ''new_controlling'' without ''x''; otherwise, we should 
+     * keep ''x'' within ''controlling''.
+     *
+     * If in the end all elements ''x'' in ''controlling'' are 
+     * reserved, this means that current ''controlling'' set is 
+     * minimum and the ''while'' loop should be breaked.
+     *
+     * Note:  implementaion here for the above procedure is 
+     *        not (meant to be) optimal.
+     **/
     for(auto &x : controlling)
     {
+      // To create a new ''controlling'' set without ''x''
       new_controlling.clear();
       for(auto &y : controlling)
         if(y!=x) new_controlling.insert(y);
 
       bool removing_x=true;
+      // For each atomic exprt condition ''c'', to check if its is
+      // covered by at least a mcdc pair.
       for(auto &c : conditions)
       {
-        bool cOK=find_mcdc_pair(c, new_controlling, conditions, decision);
+        bool cOK=
+          has_mcdc_pair(c, new_controlling, conditions, decision);
+        /**
+         *  If there is no mcdc pair for an atomic condition ''c'',
+         *  then ''x'' should not be removed from the original 
+         *  ''controlling'' set
+         **/
         if(not cOK)
         {
           removing_x=false;
@@ -784,12 +895,15 @@ void minimize_mcdc_controlling(
         }
       }
 
+      // If ''removing_x'' is valid, it is safe to remove ''x'' 
+      // from the original ''controlling''
       if(removing_x)
       {
         ctrl_update=true;
         break;
       }
     }
+    // Update ''controlling'' or break the while loop
     if(ctrl_update)
     {
       controlling=new_controlling;
