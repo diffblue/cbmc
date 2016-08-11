@@ -1719,6 +1719,10 @@ void value_set_fit::apply_code(
   else if(statement==ID_fence)
   {
   }
+  else if(statement==ID_input)
+  {
+	  // doesn't do anything
+  }
   else
     throw
       code.pretty()+"\n"+
