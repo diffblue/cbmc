@@ -393,8 +393,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
     std::cout << "boolbv_get.cpp get root: " << number << std::endl;
     number=arrays.find_number(number);
     
-    std::cout << "warning: boolbv_get.cpp, removing assertion" << std::endl;
-    //assert(number<index_map.size());
+    assert(number<index_map.size());
     index_mapt::const_iterator it=index_map.find(number);
     assert(it!=index_map.end());
     const index_sett &index_set=it->second;
