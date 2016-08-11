@@ -281,6 +281,13 @@ protected:
     goto_program_change_impactt &old_impact,
     goto_program_change_impactt &new_impact);
 
+  void propogate_dep_back(const dependence_grapht::nodet &d_node,
+  		const dependence_grapht &dep_graph,
+  		goto_functions_change_impactt &change_impact, bool del);
+  void propogate_dep_forward(const dependence_grapht::nodet &d_node,
+  		const dependence_grapht &dep_graph,
+  		goto_functions_change_impactt &change_impact, bool del);
+
   void output_change_impact(
     const irep_idt &function,
     const goto_program_change_impactt &c_i,
@@ -418,35 +425,8 @@ void change_impactt::change_impact(
           const dependence_grapht::nodet &d_node=
             old_dep_graph[old_dep_graph[o_it].get_node_id()];
 
-          for(dependence_grapht::edgest::const_iterator
-              it=d_node.in.begin();
-              it!=d_node.in.end();
-              ++it)
-          {
-            goto_programt::const_targett src=
-              old_dep_graph[it->first].PC;
-
-            if(it->second.get()==dep_edget::DATA ||
-               it->second.get()==dep_edget::BOTH)
-              old_change_impact[src->function][src]|=DEL_DATA_DEP;
-            else
-              old_change_impact[src->function][src]|=DEL_CTRL_DEP;
-          }
-
-          for(dependence_grapht::edgest::const_iterator
-              it=d_node.out.begin();
-              it!=d_node.out.end();
-              ++it)
-          {
-            goto_programt::const_targett src=
-              old_dep_graph[it->first].PC;
-
-            if(it->second.get()==dep_edget::DATA ||
-               it->second.get()==dep_edget::BOTH)
-              old_change_impact[src->function][src]|=DEL_DATA_DEP;
-            else
-              old_change_impact[src->function][src]|=DEL_CTRL_DEP;
-          }
+          propogate_dep_back(d_node, old_dep_graph, old_change_impact, true);
+          propogate_dep_forward(d_node, old_dep_graph, old_change_impact, true);
         }
         old_impact[o_it]|=DELETED;
         ++o_it;
@@ -458,41 +438,90 @@ void change_impactt::change_impact(
           const dependence_grapht::nodet &d_node=
             new_dep_graph[new_dep_graph[n_it].get_node_id()];
 
-          for(dependence_grapht::edgest::const_iterator
-              it=d_node.in.begin();
-              it!=d_node.in.end();
-              ++it)
-          {
-            goto_programt::const_targett src=
-              new_dep_graph[it->first].PC;
-
-            if(it->second.get()==dep_edget::DATA ||
-               it->second.get()==dep_edget::BOTH)
-              new_change_impact[src->function][src]|=NEW_DATA_DEP;
-            else
-              new_change_impact[src->function][src]|=NEW_CTRL_DEP;
-          }
-
-          for(dependence_grapht::edgest::const_iterator
-              it=d_node.out.begin();
-              it!=d_node.out.end();
-              ++it)
-          {
-            goto_programt::const_targett dst=
-              new_dep_graph[it->first].PC;
-
-            if(it->second.get()==dep_edget::DATA ||
-               it->second.get()==dep_edget::BOTH)
-              new_change_impact[dst->function][dst]|=NEW_DATA_DEP;
-            else
-              new_change_impact[dst->function][dst]|=NEW_CTRL_DEP;
-          }
+          propogate_dep_back(d_node, new_dep_graph, new_change_impact, false);
+          propogate_dep_forward(d_node, new_dep_graph, new_change_impact, false);
         }
         new_impact[n_it]|=NEW;
         ++n_it;
         break;
     }
   }
+}
+
+
+/*******************************************************************\
+
+Function: change_impactt::propogate_dep_forward
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void change_impactt::propogate_dep_forward(const dependence_grapht::nodet &d_node,
+		const dependence_grapht &dep_graph,
+		goto_functions_change_impactt &change_impact, bool del) {
+	for (dependence_grapht::edgest::const_iterator it = d_node.out.begin();
+			it != d_node.out.end(); ++it) {
+		goto_programt::const_targett src = dep_graph[it->first].PC;
+
+		mod_flagt data_flag = del ? DEL_DATA_DEP : NEW_DATA_DEP;
+		mod_flagt ctrl_flag = del ? DEL_CTRL_DEP : NEW_CTRL_DEP;
+
+			if ((change_impact[src->function][src] & data_flag)
+					|| (change_impact[src->function][src] & ctrl_flag))
+				continue;
+			if (it->second.get() == dep_edget::DATA
+					|| it->second.get() == dep_edget::BOTH)
+				change_impact[src->function][src] |= data_flag;
+			else
+				change_impact[src->function][src] |= ctrl_flag;
+			propogate_dep_forward(
+					dep_graph[dep_graph[src].get_node_id()], dep_graph,
+					change_impact, del);
+	}
+
+}
+
+/*******************************************************************\
+
+Function: change_impactt::propogate_dep_back
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void change_impactt::propogate_dep_back(const dependence_grapht::nodet &d_node,
+		const dependence_grapht &dep_graph,
+		goto_functions_change_impactt &change_impact, bool del) {
+	for (dependence_grapht::edgest::const_iterator it = d_node.in.begin();
+			it != d_node.in.end(); ++it) {
+		goto_programt::const_targett src = dep_graph[it->first].PC;
+
+		mod_flagt data_flag = del ? DEL_DATA_DEP : NEW_DATA_DEP;
+		mod_flagt ctrl_flag = del ? DEL_CTRL_DEP : NEW_CTRL_DEP;
+
+		if ((change_impact[src->function][src] & data_flag)
+				|| (change_impact[src->function][src] & ctrl_flag)) {
+			continue;
+		}
+		if (it->second.get() == dep_edget::DATA
+				|| it->second.get() == dep_edget::BOTH)
+			change_impact[src->function][src] |= data_flag;
+		else
+			change_impact[src->function][src] |= ctrl_flag;
+
+		propogate_dep_back(
+				dep_graph[dep_graph[src].get_node_id()], dep_graph,
+				change_impact, del);
+	}
 }
 
 /*******************************************************************\
