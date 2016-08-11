@@ -94,10 +94,12 @@ void ai_analysist::propagate_constants()
   status() << "propagating constants" << eom;
 
   Forall_goto_functions(f_it, goto_functions)
-  {
     constant_propagator_ait(f_it->second,ns);
+
+  remove_skip(goto_functions);
+
+  Forall_goto_functions(f_it, goto_functions)
     remove_unreachable(f_it->second.body);
-  }
 
   remove_skip(goto_functions);
 

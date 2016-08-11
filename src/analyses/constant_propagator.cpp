@@ -98,7 +98,28 @@ void constant_propagator_domaint::assign_rec(
             << " := " << from_type(ns, "", rhs_type) << std::endl;
 #endif
 
-  if(lhs.id()==ID_symbol && rhs_type.id()!=ID_array
+  if(lhs.id()==ID_symbol && rhs.id()==ID_if)
+  {
+	exprt cond=rhs.op0();
+	assert(cond.operands().size()==2);
+	if(values.is_constant(cond.op0())
+			&& values.is_constant(cond.op1()))
+	{
+      if(cond.op0().id()==ID_index)
+      {
+    	exprt index=cond.op0();
+        exprt new_expr=concatenate_array_id(index.op0(), index.op1(), index.type());
+        values.replace_const(new_expr);
+        cond.op0()=new_expr;
+        cond = simplify_expr(cond,ns);
+      }
+      else
+        assert(0);
+
+      assign(values, to_symbol_expr(lhs), cond, ns);
+	}
+  }
+  else if(lhs.id()==ID_symbol && rhs_type.id()!=ID_array
                          && rhs_type.id()!=ID_struct
                          && rhs_type.id()!=ID_union)
   {
@@ -107,7 +128,7 @@ void constant_propagator_domaint::assign_rec(
     else
       values.set_to_top(to_symbol_expr(lhs));
   }
-  else if (lhs.id()==ID_symbol && lhs_type.id()==ID_array
+  else if(lhs.id()==ID_symbol && lhs_type.id()==ID_array
 		                       && rhs_type.id()==ID_array)
   {
 	exprt new_expr;
@@ -162,7 +183,7 @@ void constant_propagator_domaint::transform(
   std::cout << "before:\n";
   output(std::cout,ai,ns);
 #endif
-  
+
   if(from->is_decl())
   {
     const code_declt &code_decl=to_code_decl(from->code);
@@ -182,7 +203,7 @@ void constant_propagator_domaint::transform(
   }
   else if(from->is_goto())
   {
-    exprt g; 
+	exprt g;
     if(from->get_target()==to)
       g = simplify_expr(from->guard, ns);
     else
@@ -227,6 +248,7 @@ void constant_propagator_domaint::transform(
     else
       values.set_to_top();
   }
+
 #ifdef DEBUG
   std::cout << "after:\n";
   output(std::cout,ai,ns);
@@ -531,6 +553,21 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
       if (it->second != previous) changed = true;
 
       it++;
+    }
+  }
+
+  for(replace_symbolt::expr_mapt::const_iterator
+      it=src.replace_const.expr_map.begin();
+      it!=src.replace_const.expr_map.end();
+      ++it)
+  {
+    replace_symbolt::expr_mapt::iterator
+      c_it = replace_const.expr_map.find(it->first);
+
+    if(c_it == replace_const.expr_map.end())
+    {
+      replace_const.expr_map[it->first]=it->second;
+      changed = true;
     }
   }
 
