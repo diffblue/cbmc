@@ -708,16 +708,14 @@ bool eval_expr(
     no_op.make_not();
     return not eval_expr(atomic_exprs, no_op);
   }
-  else if(is_condition(src))
+  else //if(is_condition(src))
   {
+    // ''src'' should be guaranteed to be consistent
+    // with ''atomic_exprs''
     if(atomic_exprs.find(src)->second==+1)
       return true;
-    else if(atomic_exprs.find(src)->second==-1)
+    else //if(atomic_exprs.find(src)->second==-1)
       return false;
-  }
-  else
-  {
-    throw "Unexpected expr when evaluating a boolean expression";
   }
 }
 
@@ -1304,6 +1302,8 @@ void instrument_cover_goals(
         //controlling=collect_mcdc_controlling(decisions);
         controlling=collect_mcdc_controlling_nested(decisions);
         remove_repetition(controlling);
+        // for now, we restrict to the case of a single ''decision'';
+        // however, this is not true, e.g., ''? :'' operator.
         minimize_mcdc_controlling(controlling, *decisions.begin());
 
         for(const auto & p : controlling)
