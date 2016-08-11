@@ -1,0 +1,1520 @@
+GOTO-ANALYSER version 5.4 64-bit x86_64 linux
+Parsing constant_propagation_15.c
+Converting
+Type-checking constant_propagation_15
+Generating GOTO Program
+Removing function pointers and virtual functions
+Partial Inlining
+propagating constants
+0 --> 1
+before:
+const map:
+  bottom
+from->is_decl()
+after:
+const map:
+  bottom
+1 --> 2
+before:
+const map:
+  bottom
+from->is_assign()
+assign: i := signed int
+after:
+const map:
+ main::1::i=0
+2 --> 3
+before:
+const map:
+ main::1::i=0
+from->is_decl()
+after:
+const map:
+ main::1::i=0
+3 --> 5
+before:
+const map:
+ main::1::i=0
+from->is_goto()
+from->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::i
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+from->guard.id(): not
+passou aqui 2 
+before from->guard.op0().op0(): symbol
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * identifier: main::1::i
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 6
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+after tmp: constant
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * value: 00000000000000000000000000000000
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 4
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #cformat: 0
+before g: not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::i
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+from->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::i
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+after g: not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::i
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+two_way_propagate_rec: !(i == 0)
+expr.id(): not
+2lhs.pretty(): =
+  * type: bool
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 6
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  0: symbol
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * identifier: main::1::i
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #lvalue: 1
+  1: constant
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * value: 00000000000000000000000000000000
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #cformat: 0
+2rhs.pretty(): constant
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * value: 00000000000000000000000000000001
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 7
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #cformat: 1
+two_way_propagate_rec: 0
+after:
+const map:
+ main::1::i=0
+3 --> 4
+before:
+const map:
+ main::1::i=0
+from->is_goto()
+from->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::i
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+from->guard.id(): not
+passou aqui 2 
+before from->guard.op0().op0(): symbol
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * identifier: main::1::i
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 6
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+after tmp: constant
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * value: 00000000000000000000000000000000
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 4
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #cformat: 0
+before g: not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::i
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+from->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::i
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+after g: =
+  * type: bool
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 6
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  0: symbol
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * identifier: main::1::i
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #lvalue: 1
+  1: constant
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * value: 00000000000000000000000000000000
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #cformat: 0
+two_way_propagate_rec: i == 0
+expr.id(): =
+assign: i := signed int
+1lhs.pretty(): symbol
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * identifier: main::1::i
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 6
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+1rhs.pretty(): constant
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * value: 00000000000000000000000000000000
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 6
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #cformat: 0
+passou aqui1
+assign: 0 := signed int
+two_way_propagate_rec: 0
+after:
+const map:
+ main::1::i=0
+4 --> 5
+before:
+const map:
+ main::1::i=0
+from->is_assign()
+assign: y := signed int
+after:
+const map:
+ main::1::y=1
+ main::1::i=0
+5 --> 6
+before:
+const map:
+ main::1::i=0
+transform from->code.pretty(): code
+  * type: code
+after:
+const map:
+ main::1::i=0
+6 --> 7
+before:
+const map:
+ main::1::i=0
+from->is_goto()
+from->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+from->guard.id(): not
+passou aqui 2 
+before from->guard.op0().op0(): symbol
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * identifier: main::1::y
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+after tmp: symbol
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * identifier: main::1::y
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+two_way_propagate_rec: y == 1
+expr.id(): =
+assign: y := signed int
+1lhs.pretty(): symbol
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * identifier: main::1::y
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+1rhs.pretty(): constant
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * value: 00000000000000000000000000000001
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #cformat: 1
+two_way_propagate_rec: 1
+before g: not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+from->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+after g: not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+two_way_propagate_rec: !(y == 1)
+expr.id(): not
+2lhs.pretty(): =
+  * type: bool
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  0: symbol
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * identifier: main::1::y
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #lvalue: 1
+  1: constant
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * value: 00000000000000000000000000000001
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #cformat: 1
+2rhs.pretty(): symbol
+  * type: code
+      * return_type: empty
+          * #source_location: 
+            * file: /usr/include/assert.h
+            * line: 67
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * parameters: 
+        0: parameter
+            * type: pointer
+                * #source_location: 
+                  * file: /usr/include/assert.h
+                  * line: 67
+                  * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+                0: signedbv
+                    * width: 8
+                    * #constant: 1
+                    * #c_type: char
+            * #source_location: 
+              * file: /usr/include/assert.h
+              * line: 67
+              * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+            * #base_name: __assertion
+            * #identifier: 
+        1: parameter
+            * type: pointer
+                * #source_location: 
+                  * file: /usr/include/assert.h
+                  * line: 67
+                  * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+                0: signedbv
+                    * width: 8
+                    * #constant: 1
+                    * #c_type: char
+            * #source_location: 
+              * file: /usr/include/assert.h
+              * line: 67
+              * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+            * #base_name: __file
+            * #identifier: 
+        2: parameter
+            * type: unsignedbv
+                * width: 32
+                * #c_type: unsigned_int
+            * #source_location: 
+              * file: /usr/include/assert.h
+              * line: 68
+              * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+            * #base_name: __line
+            * #identifier: 
+        3: parameter
+            * type: pointer
+                * #source_location: 
+                  * file: /usr/include/assert.h
+                  * line: 68
+                  * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+                0: signedbv
+                    * width: 8
+                    * #constant: 1
+                    * #c_type: char
+            * #source_location: 
+              * file: /usr/include/assert.h
+              * line: 68
+              * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+            * #base_name: __function
+            * #identifier: 
+      * #source_location: 
+        * file: /usr/include/assert.h
+        * line: 67
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #noreturn: 1
+  * identifier: __assert_fail
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+two_way_propagate_rec: 0
+after:
+const map:
+ main::1::y=1
+ main::1::i=0
+6 --> 7
+before:
+const map:
+ main::1::i=0
+from->is_goto()
+from->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+from->guard.id(): not
+passou aqui 2 
+before from->guard.op0().op0(): symbol
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * identifier: main::1::y
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+after tmp: symbol
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * identifier: main::1::y
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+two_way_propagate_rec: y == 1
+expr.id(): =
+assign: y := signed int
+1lhs.pretty(): symbol
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * identifier: main::1::y
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+1rhs.pretty(): constant
+  * type: signedbv
+      * width: 32
+      * #c_type: signed_int
+  * value: 00000000000000000000000000000001
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #cformat: 1
+two_way_propagate_rec: 1
+before g: not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+from->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+after g: not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+two_way_propagate_rec: !(y == 1)
+expr.id(): not
+2lhs.pretty(): =
+  * type: bool
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  0: symbol
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * identifier: main::1::y
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #lvalue: 1
+  1: constant
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * value: 00000000000000000000000000000001
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #cformat: 1
+2rhs.pretty(): symbol
+  * type: code
+      * return_type: empty
+          * #source_location: 
+            * file: /usr/include/assert.h
+            * line: 67
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * parameters: 
+        0: parameter
+            * type: pointer
+                * #source_location: 
+                  * file: /usr/include/assert.h
+                  * line: 67
+                  * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+                0: signedbv
+                    * width: 8
+                    * #constant: 1
+                    * #c_type: char
+            * #source_location: 
+              * file: /usr/include/assert.h
+              * line: 67
+              * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+            * #base_name: __assertion
+            * #identifier: 
+        1: parameter
+            * type: pointer
+                * #source_location: 
+                  * file: /usr/include/assert.h
+                  * line: 67
+                  * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+                0: signedbv
+                    * width: 8
+                    * #constant: 1
+                    * #c_type: char
+            * #source_location: 
+              * file: /usr/include/assert.h
+              * line: 67
+              * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+            * #base_name: __file
+            * #identifier: 
+        2: parameter
+            * type: unsignedbv
+                * width: 32
+                * #c_type: unsigned_int
+            * #source_location: 
+              * file: /usr/include/assert.h
+              * line: 68
+              * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+            * #base_name: __line
+            * #identifier: 
+        3: parameter
+            * type: pointer
+                * #source_location: 
+                  * file: /usr/include/assert.h
+                  * line: 68
+                  * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+                0: signedbv
+                    * width: 8
+                    * #constant: 1
+                    * #c_type: char
+            * #source_location: 
+              * file: /usr/include/assert.h
+              * line: 68
+              * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+            * #base_name: __function
+            * #identifier: 
+      * #source_location: 
+        * file: /usr/include/assert.h
+        * line: 67
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #noreturn: 1
+  * identifier: __assert_fail
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  * #lvalue: 1
+two_way_propagate_rec: 0
+after:
+const map:
+ main::1::y=1
+ main::1::i=0
+7 --> 8
+before:
+const map:
+ main::1::y=1
+ main::1::i=0
+from->is_assign()
+assign: main#return_value := signed int
+after:
+const map:
+ main#return_value=0
+ main::1::y=1
+ main::1::i=0
+8 --> 9
+before:
+const map:
+ main#return_value=0
+ main::1::y=1
+ main::1::i=0
+from->is_dead()
+after:
+const map:
+ main#return_value=0
+ main::1::i=0
+9 --> 10
+before:
+const map:
+ main#return_value=0
+ main::1::i=0
+from->is_dead()
+after:
+const map:
+ main#return_value=0
+before replacing it->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::i
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+after replacing it->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 6
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 4
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000000
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 6
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 0
+before replacing it->guard.pretty(): =
+  * type: bool
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  0: symbol
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * identifier: main::1::y
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #lvalue: 1
+  1: constant
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * value: 00000000000000000000000000000001
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #cformat: 1
+after replacing it->guard.pretty(): =
+  * type: bool
+  * #source_location: 
+    * file: constant_propagation_15.c
+    * line: 9
+    * function: main
+    * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+  0: symbol
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * identifier: main::1::y
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #lvalue: 1
+  1: constant
+      * type: signedbv
+          * width: 32
+          * #c_type: signed_int
+      * value: 00000000000000000000000000000001
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      * #cformat: 1
+before replacing it->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+after replacing it->guard.pretty(): not
+  * type: bool
+  0: =
+      * type: bool
+      * #source_location: 
+        * file: constant_propagation_15.c
+        * line: 9
+        * function: main
+        * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+      0: symbol
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * identifier: main::1::y
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #lvalue: 1
+      1: constant
+          * type: signedbv
+              * width: 32
+              * #c_type: signed_int
+          * value: 00000000000000000000000000000001
+          * #source_location: 
+            * file: constant_propagation_15.c
+            * line: 9
+            * function: main
+            * working_directory: /home/lcordeiro/cbmc/regression/goto-analyzer/constant_propagation_15
+          * #cformat: 1
+11 --> 12
+before:
+const map:
+  bottom
+from->is_function_call()
+after:
+const map:
+12 --> 13
+before:
+const map:
+from->is_function_call()
+after:
+const map:
+14 --> 15
+before:
+const map:
+  bottom
+transform from->code.pretty(): code
+  * type: code
+  * statement: skip
+after:
+const map:
+  bottom
+15 --> 16
+before:
+const map:
+  bottom
+from->is_assign()
+assign: __CPROVER_dead_object := const void *
+after:
+const map:
+ __CPROVER_dead_object=NULL
+16 --> 17
+before:
+const map:
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_deallocated := const void *
+after:
+const map:
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+17 --> 18
+before:
+const map:
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_malloc_is_new_array := _Bool
+after:
+const map:
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+18 --> 19
+before:
+const map:
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_malloc_object := const void *
+after:
+const map:
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+19 --> 20
+before:
+const map:
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_malloc_size := unsigned long int
+after:
+const map:
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+20 --> 21
+before:
+const map:
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_memory_leak := const void *
+after:
+const map:
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+21 --> 22
+before:
+const map:
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_next_thread_id := unsigned long int
+after:
+const map:
+ __CPROVER_next_thread_id=0ul
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+22 --> 23
+before:
+const map:
+ __CPROVER_next_thread_id=0ul
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_pipe_count := unsigned int
+after:
+const map:
+ __CPROVER_pipe_count=0u
+ __CPROVER_next_thread_id=0ul
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+23 --> 24
+before:
+const map:
+ __CPROVER_pipe_count=0u
+ __CPROVER_next_thread_id=0ul
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_rounding_mode := signed int
+after:
+const map:
+ __CPROVER_pipe_count=0u
+ __CPROVER_next_thread_id=0ul
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_rounding_mode=0
+ __CPROVER_dead_object=NULL
+24 --> 25
+before:
+const map:
+ __CPROVER_pipe_count=0u
+ __CPROVER_next_thread_id=0ul
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_rounding_mode=0
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_thread_id := unsigned long int
+after:
+const map:
+ __CPROVER_thread_id=0ul
+ __CPROVER_pipe_count=0u
+ __CPROVER_next_thread_id=0ul
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_rounding_mode=0
+ __CPROVER_dead_object=NULL
+25 --> 26
+before:
+const map:
+ __CPROVER_thread_id=0ul
+ __CPROVER_pipe_count=0u
+ __CPROVER_next_thread_id=0ul
+ __CPROVER_memory_leak=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_deallocated=NULL
+ __CPROVER_rounding_mode=0
+ __CPROVER_dead_object=NULL
+from->is_assign()
+assign: __CPROVER_threads_exited := _Bool [INFINITY()]
+after:
+const map:
+ __CPROVER_threads_exited[0]=FALSE
+ __CPROVER_rounding_mode=0
+ __CPROVER_deallocated=NULL
+ __CPROVER_malloc_is_new_array=FALSE
+ __CPROVER_malloc_object=NULL
+ __CPROVER_malloc_size=0ul
+ __CPROVER_memory_leak=NULL
+ __CPROVER_dead_object=NULL
+ __CPROVER_next_thread_id=0ul
+ __CPROVER_pipe_count=0u
+ __CPROVER_thread_id=0ul
+simplifying guards
+SIMPLIFIED:  assert: 0, assume: 0, goto: 0
+UNKNOWN:     assert: 1, assume: 0, goto: 1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+main /* main */
+        // 0 file constant_propagation_15.c line 4 function main
+        signed int i;
+        // 1 file constant_propagation_15.c line 4 function main
+        i = 0;
+        // 2 file constant_propagation_15.c line 4 function main
+        signed int y;
+        // 3 file constant_propagation_15.c line 7 function main
+        y = 1;
+        // 4 file constant_propagation_15.c line 9 function main
+        ASSERT y == 1 // assertion y==1
+        // 5 file constant_propagation_15.c line 9 function main
+        IF !(y == 1) THEN GOTO 1
+        // 6 file constant_propagation_15.c line 18 function main
+     1: main#return_value = 0;
+        // 7 file constant_propagation_15.c line 18 function main
+        dead y;
+        // 8 file constant_propagation_15.c line 18 function main
+        dead i;
+        // 9 file constant_propagation_15.c line 19 function main
+        END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+_start /* _start */
+        // 10 no location
+        __CPROVER_initialize();
+        // 11 file constant_propagation_15.c line 2
+        main();
+        // 12 no location
+        END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+__CPROVER_initialize /* __CPROVER_initialize */
+        // 13 no location
+        // Labels: __CPROVER_HIDE
+        SKIP
+        // 14 file <built-in-additions> line 39
+        __CPROVER_dead_object = NULL;
+        // 15 file <built-in-additions> line 38
+        __CPROVER_deallocated = NULL;
+        // 16 file <built-in-additions> line 42
+        __CPROVER_malloc_is_new_array = FALSE;
+        // 17 file <built-in-additions> line 40
+        __CPROVER_malloc_object = NULL;
+        // 18 file <built-in-additions> line 41
+        __CPROVER_malloc_size = 0ul;
+        // 19 file <built-in-additions> line 43
+        __CPROVER_memory_leak = NULL;
+        // 20 file <built-in-additions> line 31
+        __CPROVER_next_thread_id = 0ul;
+        // 21 file <built-in-additions> line 85
+        __CPROVER_pipe_count = 0u;
+        // 22 file <built-in-additions> line 65
+        __CPROVER_rounding_mode = 0;
+        // 23 file <built-in-additions> line 29
+        __CPROVER_thread_id = 0ul;
+        // 24 file <built-in-additions> line 30
+        __CPROVER_threads_exited = ARRAY_OF(FALSE);
+        // 25 no location
+        END_FUNCTION
