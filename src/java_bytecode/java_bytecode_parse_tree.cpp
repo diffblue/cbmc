@@ -8,7 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
+#include <util/symbol_table.h>
+#include <util/namespace.h>
+
 #include <langapi/language_util.h>
+
+#include "expr2java.h"
 
 #include "java_bytecode_parse_tree.h"
 
@@ -122,7 +127,10 @@ Function: java_bytecode_parse_treet::annotationt::output
 
 void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
 {
-  out << '@' << type;
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  out << '@' << type2java(type, ns);
   
   if(!element_value_pairs.empty())
   {
@@ -153,8 +161,11 @@ Function: java_bytecode_parse_treet::annotationt::element_value_pairt::output
 
 void java_bytecode_parse_treet::annotationt::element_value_pairt::output(std::ostream &out) const
 {
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
   out << '"' << element_name << '"' << '=';
-  out << value;
+  out << expr2java(value, ns);
 }
 
 /*******************************************************************\
@@ -171,6 +182,9 @@ Function: java_bytecode_parse_treet::methodt::output
 
 void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 {
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
   for(const auto & annotation : annotations)
   {
     out << "  ";
@@ -223,7 +237,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
       #if 0
       out << ' ' << from_expr(*a_it);
       #else
-      out << ' ' << *a_it;
+      out << ' ' << expr2java(*a_it, ns);
       #endif
     }
 

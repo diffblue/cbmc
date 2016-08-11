@@ -72,7 +72,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
       error().source_location=main_symbol.location;
       error() << "argv argument expected to be pointer-to-pointer type, "
                  "but got `"
-              << to_string(op1.type()) << '\'';
+              << to_string(op1.type()) << '\'' << eom;
       throw 0;
     }
 

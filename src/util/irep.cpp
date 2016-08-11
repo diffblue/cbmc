@@ -640,46 +640,6 @@ bool full_eq(const irept &i1, const irept &i2)
 
 /*******************************************************************\
 
-Function: irept::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#include "lispirep.h"
-#include "lispexpr.h"
-
-std::string irept::to_string() const
-{
-  lispexprt lispexpr;
-  irep2lisp(*this, lispexpr);
-  return lispexpr.expr2string();
-}
-
-/*******************************************************************\
-
-Function: operator<<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::ostream& operator<< (std::ostream& out, const irept &irep)
-{
-  out << irep.to_string();
-  return out;
-}
-
-/*******************************************************************\
-
 Function: ordering
 
   Inputs:

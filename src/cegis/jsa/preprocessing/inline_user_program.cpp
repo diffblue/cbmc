@@ -1,4 +1,5 @@
 #include <util/cprover_prefix.h>
+#include <util/message.h>
 
 #include <goto-programs/goto_inline.h>
 

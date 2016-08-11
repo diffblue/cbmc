@@ -30,8 +30,8 @@ public:
   virtual ~message_streamt() { }
 
   // overload to use language specific syntax
-  virtual std::string to_string(const exprt &expr) { return expr.to_string(); }
-  virtual std::string to_string(const typet &type) { return type.to_string(); }
+  virtual std::string to_string(const exprt &expr) { return expr.pretty(); }
+  virtual std::string to_string(const typet &type) { return type.pretty(); }
 
   void err_location(const exprt &expr) { saved_error_location=expr.find_source_location(); }
   void err_location(const typet &type) { saved_error_location=type.source_location(); }

@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include <util/options.h>
+#include <util/message.h>
 
 #include <goto-programs/goto_inline.h>
 

@@ -87,7 +87,7 @@ void var_mapt::var_infot::output(std::ostream &out) const
   
   out << "number: " << number << "\n";
   
-  out << "type: " << type << "\n";
+  out << "type: " << type.pretty() << "\n";
   
   out << "\n";
 }

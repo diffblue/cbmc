@@ -730,15 +730,10 @@ void c_typecheck_baset::apply_asm_label(
     if(!asm_label_map.insert(
         std::make_pair(orig_name, asm_label)).second)
     {
-      if(asm_label_map[orig_name]==asm_label)
-      {
-        warning().source_location=symbol.location;
-        warning() << "duplicate (consistent) asm renaming" << eom;
-      }
-      else
+      if(asm_label_map[orig_name]!=asm_label)
       {
         error().source_location=symbol.location;
-        error() << "replacing asm renaming "
+        error() << "error: replacing asm renaming "
                 << asm_label_map[orig_name] << " by "
                 << asm_label << eom;
         throw 0;

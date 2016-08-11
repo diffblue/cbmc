@@ -16,11 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_expr.h>
 #include <util/guard.h>
 #include <util/std_code.h>
-#include <util/message_stream.h>
+#include <util/message.h>
 
 #include "goto_program.h"
 
-class goto_convertt:public message_streamt
+class goto_convertt:public messaget
 {
 public:
   void goto_convert(const codet &code, goto_programt &dest);
@@ -28,7 +28,7 @@ public:
   goto_convertt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
-    message_streamt(_message_handler),
+    messaget(_message_handler),
     symbol_table(_symbol_table),
     ns(_symbol_table),
     temporary_counter(0),
@@ -52,7 +52,7 @@ protected:
   // tools for symbols
   // 
   void new_name(symbolt &symbol);
-  const symbolt &lookup(const irep_idt &identifier) const;
+  const symbolt &lookup(const irep_idt &identifier);
   
   symbolt &new_tmp_symbol(
     const typet &type,

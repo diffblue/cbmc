@@ -466,6 +466,8 @@ void linkingt::link_warning(
     const symbolt &new_symbol,
     const std::string &msg)
 {
+  warning().source_location=new_symbol.location;
+
   warning() << "warning: " << msg << " \""
             << old_symbol.display_name()
             << "\"" << '\n';
@@ -832,6 +834,8 @@ void linkingt::duplicate_code_symbol(
     else if(base_type_eq(old_symbol.type, new_symbol.type, ns))
     {
       // keep the one in old_symbol -- libraries come last!
+      warning().source_location=new_symbol.location;
+
       warning() << "function `" << old_symbol.name << "' in module `"
         << new_symbol.module << "' is shadowed by a definition in module `"
         << old_symbol.module << "'" << eom;

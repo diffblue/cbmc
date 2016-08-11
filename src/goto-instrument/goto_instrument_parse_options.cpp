@@ -83,6 +83,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "thread_instrumentation.h"
 #include "skip_loops.h"
 #include "code_contracts.h"
+#include "unwind.h"
+
+
 
 /*******************************************************************\
 
@@ -143,6 +146,17 @@ int goto_instrument_parse_optionst::doit()
 
     get_goto_program();
     instrument_goto_program();
+
+    if(cmdline.isset("unwind"))
+    {
+
+      int k = stoi(cmdline.get_value("unwind"));
+
+      goto_unwind(goto_functions, k);
+
+      goto_functions.update();
+      goto_functions.compute_loop_numbers();
+    }
 
     if(cmdline.isset("show-value-sets"))
     {
