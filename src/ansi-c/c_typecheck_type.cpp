@@ -507,8 +507,9 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     // We simplify it, for the benefit of array initialisation.
     
     exprt tmp_size=size;
+    add_rounding_mode(tmp_size);
     simplify(tmp_size, *this);
-
+    
     if(tmp_size.is_constant())
     {
       mp_integer s;

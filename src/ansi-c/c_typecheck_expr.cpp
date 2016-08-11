@@ -62,6 +62,51 @@ void c_typecheck_baset::typecheck_expr(exprt &expr)
 
 /*******************************************************************\
 
+Function: c_typecheck_baset::add_rounding_mode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::add_rounding_mode(exprt &expr)
+{
+  for(auto & op : expr.operands())
+    add_rounding_mode(op);
+
+  if(expr.id()==ID_div ||
+     expr.id()==ID_mult ||
+     expr.id()==ID_plus ||
+     expr.id()==ID_minus)
+  {
+    if(expr.type().id()==ID_floatbv &&
+       expr.operands().size()==2)
+    {
+      // The rounding mode to be used at compile time is non-obvious.
+      // We'll simply use round to even (0), arbitrarily.
+      expr.operands().resize(3);
+
+      if(expr.id()==ID_div)
+        expr.id(ID_floatbv_div);
+      else if(expr.id()==ID_mult)
+        expr.id(ID_floatbv_mult);
+      else if(expr.id()==ID_plus)
+        expr.id(ID_floatbv_plus);
+      else if(expr.id()==ID_minus)
+        expr.id(ID_floatbv_minus);
+      else
+        assert(false);
+
+      expr.op2()=gen_zero(unsigned_int_type());
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: c_typecheck_baset::gcc_types_compatible_p
 
   Inputs:
