@@ -314,23 +314,28 @@ void collect_mcdc_controlling_rec(
   else if(src.id()==ID_not)
   {
     exprt e=to_not_expr(src).op();
-    collect_mcdc_controlling_rec(e, conditions, result);
-  }
-  else if(is_condition(src)) 
-  {
-    exprt e=src;
-    std::vector<exprt> new_conditions1=conditions;
-    new_conditions1.push_back(e);
-    result.insert(conjunction(new_conditions1));
+    if(not is_condition(e))
+      collect_mcdc_controlling_rec(e, conditions, result);
+    else
+    {
+      // to store a copy of ''src''
+      std::vector<exprt> new_conditions1=conditions;
+      new_conditions1.push_back(src);
+      result.insert(conjunction(new_conditions1));
 
-    //e.make_not();
-    std::vector<exprt> new_conditions2=conditions;
-    new_conditions2.push_back(not_exprt(e));
-    result.insert(conjunction(new_conditions2));
+      // to store a copy of its negation, i.e., ''e''
+      std::vector<exprt> new_conditions2=conditions;
+      new_conditions2.push_back(e);
+      result.insert(conjunction(new_conditions2));
+    }
   }
   else
   {
-    throw "Unexpected exprt for MC/DC coverage";
+    /**
+     * It may happen that ''is_condition(src)'' is valid,
+     * but we ignore this case here as it can be handled
+     * by the routine decision/condition detection.
+     **/
   }
 }
 
