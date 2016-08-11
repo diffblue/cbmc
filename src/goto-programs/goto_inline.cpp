@@ -735,7 +735,7 @@ void goto_inline(
   message_handlert &message_handler)
 {
   goto_inlinet goto_inline(goto_functions, ns, message_handler);
-
+  
   try
   {
     // find entry point
@@ -751,21 +751,21 @@ void goto_inline(
   catch(int)
   {
     goto_inline.error();
+    throw 0;
   }
 
   catch(const char *e)
   {
     goto_inline.error() << e << messaget::eom;
+    throw 0;
   }
 
   catch(const std::string &e)
   {
     goto_inline.error() << e << messaget::eom;
+    throw 0;
   }
   
-  if(goto_inline.get_error_found())
-    throw 0;
-
   // clean up
   for(goto_functionst::function_mapt::iterator
       it=goto_functions.function_map.begin();
@@ -819,7 +819,7 @@ void goto_partial_inline(
     message_handler);
   
   goto_inline.smallfunc_limit=_smallfunc_limit;
-
+  
   try
   {
     for(goto_functionst::function_mapt::iterator
@@ -833,20 +833,20 @@ void goto_partial_inline(
   catch(int)
   {
     goto_inline.error();
+    throw 0;
   }
 
   catch(const char *e)
   {
     goto_inline.error() << e << messaget::eom;
+    throw 0;
   }
 
   catch(const std::string &e)
   {
     goto_inline.error() << e << messaget::eom;
-  }
-
-  if(goto_inline.get_error_found())
     throw 0;
+  }
 }
 
 /*******************************************************************\
