@@ -224,7 +224,7 @@ Function: collect_mcdc_controlling_rec
 
  Outputs:
 
- Purpose: To recursively collect controlling exprts for
+ Purpose: To recursively collect controlling exprs for
           for mcdc coverage.
 
 \*******************************************************************/
@@ -370,18 +370,18 @@ Function: replacement_conjunction
 
  Outputs:
 
- Purpose: To replace the i-th exprt of ''operands'' with each
-          exprt inside ''replacement_exprts''.
+ Purpose: To replace the i-th expr of ''operands'' with each
+          expr inside ''replacement_exprs''.
 
 \*******************************************************************/
 
 std::set<exprt> replacement_conjunction(
-  const std::set<exprt> &replacement_exprts,
+  const std::set<exprt> &replacement_exprs,
   const std::vector<exprt> &operands,
   const int i)
 {
   std::set<exprt> result;
-  for(auto &y : replacement_exprts)
+  for(auto &y : replacement_exprs)
   {
     std::vector<exprt> others;
     for(unsigned j=0; j<operands.size(); j++)
@@ -405,7 +405,7 @@ Function: collect_mcdc_controlling_nested
  Outputs:
 
  Purpose: This nested method iteratively applies 
-          ''collect_mcdc_controlling'' to every non-atomic exprt
+          ''collect_mcdc_controlling'' to every non-atomic expr
           within a decision
 
 \*******************************************************************/
@@ -418,7 +418,7 @@ std::set<exprt> collect_mcdc_controlling_nested(
 
   std::set<exprt> result;
   // For each controlling condition, to check if it contains
-  // non-atomic exprts
+  // non-atomic exprs
   for(auto &src : controlling)
   {
     std::set<exprt> s1, s2;
@@ -475,7 +475,7 @@ std::set<exprt> collect_mcdc_controlling_nested(
             res=collect_mcdc_controlling(ctrl);
           }
 
-          // To replace a non-atomic exprt with its expansion
+          // To replace a non-atomic expr with its expansion
           std::set<exprt> co=
             replacement_conjunction(res, operands, i);
           s2.insert(co.begin(), co.end());
@@ -501,23 +501,44 @@ std::set<exprt> collect_mcdc_controlling_nested(
 
 /*******************************************************************\
 
-Function: sign_of_exprt
+Function: sign_of_expr
 
   Inputs: E should be the pre-processed output by
           ''collect_mcdc_controlling_nested''
 
  Outputs: +1 : not negated
-           0 : not contained in E
           -1 : negated
 
- Purpose: The sign of exprt ''e'' within the super-exprt ''E''
+ Purpose: The sign of expr ''e'' within the super-expr ''E''
 
 \*******************************************************************/
 
-std::set<signed> sign_of_exprt(const exprt &e, const exprt &E)
+std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
 {
   std::set<signed> signs;
 
+  // At fist, we pre-screen the case such that ''E'' 
+  // is an atomic condition
+  if(is_condition(E))
+  {
+    if(e==E)
+      signs.insert(+1);
+    return signs;
+  }
+
+  // or, ''E'' is the negation of ''e''?
+  if(E.id()==ID_not)
+  {
+    if(e==E.op0())
+    {
+      signs.insert(-1);
+      return signs;
+    }
+  }
+
+  /**
+   * In the general case, we analyze each operand of ''E''.
+   **/
   std::vector<exprt> ops;
   collect_operands(E, ops);
   for(auto &x : ops)
@@ -530,13 +551,13 @@ std::set<signed> sign_of_exprt(const exprt &e, const exprt &E)
       if(y==e) signs.insert(-1);
       if(not is_condition(y))
       {
-        std::set<signed> re=sign_of_exprt(e, y);
+        std::set<signed> re=sign_of_expr(e, y);
         signs.insert(re.begin(), re.end());
       }
     }
     else if(not is_condition(y))
     {
-      std::set<signed> re=sign_of_exprt(e, y);
+      std::set<signed> re=sign_of_expr(e, y);
       signs.insert(re.begin(), re.end());
     }
   }
@@ -553,57 +574,57 @@ Function: remove_repetition
  Outputs:
 
  Purpose: After the ''collect_mcdc_controlling_nested'', there
-          can be the recurrence of the same exprt in the resulted
-          set of exprts, and this method will remove the
+          can be the recurrence of the same expr in the resulted
+          set of exprs, and this method will remove the
           repetitive ones.
 
 \*******************************************************************/
 
-void remove_repetition(std::set<exprt> &exprts)
+void remove_repetition(std::set<exprt> &exprs)
 {
   // to obtain the set of atomic conditions
   std::set<exprt> conditions;
-  for(auto &x: exprts)
+  for(auto &x: exprs)
   {
     std::set<exprt> new_conditions = collect_conditions(x);
     conditions.insert(new_conditions.begin(), new_conditions.end());
   }
   // exprt that contains multiple (inconsistent) signs should
   // be removed
-  std::set<exprt> new_exprts;
-  for(auto &x : exprts)
+  std::set<exprt> new_exprs;
+  for(auto &x : exprs)
   {
     bool kept=true;
     for(auto &c : conditions)
     {
-      std::set<signed> signs=sign_of_exprt(c, x);
+      std::set<signed> signs=sign_of_expr(c, x);
       if(signs.size()>1)
       {
         kept=false;
         break;
       }
     }
-    if(kept) new_exprts.insert(x);
+    if(kept) new_exprs.insert(x);
   }
-  exprts=new_exprts;
-  new_exprts.clear();
+  exprs=new_exprs;
+  new_exprs.clear();
 
-  for(auto &x: exprts)
+  for(auto &x: exprs)
   {
     bool red=false;
     /**
      * To check if ''x'' is identical with some
-     * exprt in ''new_exprts''. Two exprts ''x''
+     * expr in ''new_exprs''. Two exprs ''x''
      * and ''y'' are identical iff they have the
      * same sign for every atomic condition ''c''.
      **/
-    for(auto &y: new_exprts)
+    for(auto &y: new_exprs)
     {
       bool iden = true;
       for(auto &c : conditions)
       {
-        std::set<signed> signs1=sign_of_exprt(c, x);
-        std::set<signed> signs2=sign_of_exprt(c, y);
+        std::set<signed> signs1=sign_of_expr(c, x);
+        std::set<signed> signs2=sign_of_expr(c, y);
         int s1=signs1.size(), s2=signs2.size();
         // it is easy to check non-equivalence;
         if(s1!=s2)
@@ -624,7 +645,7 @@ void remove_repetition(std::set<exprt> &exprts)
       }
       /**
        * If ''x'' is found identical w.r.t some
-       * exprt in ''new_conditions, we label it
+       * expr in ''new_conditions, we label it
        * and break.
        **/
       if(iden) 
@@ -633,29 +654,29 @@ void remove_repetition(std::set<exprt> &exprts)
         break;
       }
     }
-    // an exprt is added into ''new_exprts''
+    // an expr is added into ''new_exprs''
     // if it is not found repetitive
-    if(not red) new_exprts.insert(x);
+    if(not red) new_exprs.insert(x);
   }
 
-  // update the original ''exprts''
-  exprts = new_exprts;
+  // update the original ''exprs''
+  exprs = new_exprs;
 }
 
 /*******************************************************************\
 
-Function: eval_exprt
+Function: eval_expr
 
   Inputs:
 
  Outputs:
 
- Purpose: To evaluate the value of exprt ''src'', according to
-          the atomic exprt values
+ Purpose: To evaluate the value of expr ''src'', according to
+          the atomic expr values
 
 \*******************************************************************/
-bool eval_exprt(
-  const std::map<exprt, bool> &atomic_exprts, 
+bool eval_expr(
+  const std::map<exprt, signed> &atomic_exprs, 
   const exprt &src)
 {
   std::vector<exprt> operands;
@@ -664,7 +685,7 @@ bool eval_exprt(
   if(src.id()==ID_and)
   {
     for(auto &x : operands)
-      if(not eval_exprt(atomic_exprts, x))
+      if(not eval_expr(atomic_exprs, x))
         return false;
     return true;
   }
@@ -673,7 +694,7 @@ bool eval_exprt(
   {
     unsigned fcount=0;
     for(auto &x : operands)
-      if(not eval_exprt(atomic_exprts, x))
+      if(not eval_expr(atomic_exprs, x))
         fcount++;
     if(fcount<operands.size())
       return true;
@@ -685,45 +706,54 @@ bool eval_exprt(
   {
     exprt no_op(src);
     no_op.make_not();
-    return not eval_exprt(atomic_exprts, no_op);
+    return not eval_expr(atomic_exprs, no_op);
   }
   else if(is_condition(src))
   {
-    return atomic_exprts.find(src)->second;
+    if(atomic_exprs.find(src)->second==+1)
+      return true;
+    else if(atomic_exprs.find(src)->second==-1)
+      return false;
   }
   else
   {
-    throw "Unexpected exprt when evaluating a boolean expression";
+    throw "Unexpected expr when evaluating a boolean expression";
   }
 }
 
 /*******************************************************************\
 
-Function: values_of_atomic_exprts
+Function: values_of_atomic_exprs
 
   Inputs: 
 
  Outputs:
 
- Purpose: To obtain values of atomic exprts within the super exprt
+ Purpose: To obtain values of atomic exprs within the super expr
 
 \*******************************************************************/
 
-std::map<exprt, bool> values_of_atomic_exprts(
+std::map<exprt, signed> values_of_atomic_exprs(
   const exprt &e,
   const std::set<exprt> &conditions)
 {
-  std::map<exprt, bool> atomic_exprts;
+  std::map<exprt, signed> atomic_exprs;
   for(auto &c : conditions)
   {
-    std::set<signed> signs=sign_of_exprt(c, e);
+    std::set<signed> signs=sign_of_expr(c, e);
+    if(signs.size()==0)
+    {
+      // ''c'' is not contained in ''e''
+      atomic_exprs.insert(std::pair<exprt, signed>(c, 0));
+      continue;
+    }
+    // we do not consider inconsistent expr ''e''
     if(signs.size()!=1) continue;
-    if(*signs.begin()==1)
-      atomic_exprts.insert(std::pair<exprt, bool>(c, true));
-    if(*signs.begin()==-1) 
-      atomic_exprts.insert(std::pair<exprt, bool>(c, false));
+
+    atomic_exprs.insert(
+      std::pair<exprt, signed>(c, *signs.begin()));
   }
-  return atomic_exprts;
+  return atomic_exprs;
 }
 
 /*******************************************************************\
@@ -734,8 +764,8 @@ Function: is_mcdc_pair
 
  Outputs:
 
- Purpose: To check if the two input controlling exprts are mcdc
-          pairs regarding an atomic exprt ''c''. A mcdc pair of
+ Purpose: To check if the two input controlling exprs are mcdc
+          pairs regarding an atomic expr ''c''. A mcdc pair of
           (e1, e2) regarding ''c'' means that ''e1'' and ''e2''
           result in different ''decision'' values, and this is 
           caused by the different choice of ''c'' value.
@@ -749,37 +779,43 @@ bool is_mcdc_pair(
   const std::set<exprt> &conditions,
   const exprt &decision)
 {
-  // An controlling exprt cannot be mcdc pair of itself
+  // An controlling expr cannot be mcdc pair of itself
   if(e1==e2) return false;
   
   // To obtain values of each atomic condition within ''e1'' 
   // and ''e2''
-  std::map<exprt, bool> atomic_exprts_e1=
-    values_of_atomic_exprts(e1, conditions);
-  std::map<exprt, bool> atomic_exprts_e2=
-    values_of_atomic_exprts(e2, conditions);
+  std::map<exprt, signed> atomic_exprs_e1=
+    values_of_atomic_exprs(e1, conditions);
+  std::map<exprt, signed> atomic_exprs_e2=
+    values_of_atomic_exprs(e2, conditions);
+
+  // the sign of ''c'' inside ''e1'' and ''e2''
+  signed cs1=atomic_exprs_e1.find(c)->second;
+  signed cs2=atomic_exprs_e2.find(c)->second;
+  // a mcdc pair should both contain ''c'', i.e., sign=+1 or -1
+  if(cs1==0||cs2==0)
+    return false;
   
-  // A mcdc pair should result in different ''decision''
-  if(eval_exprt(atomic_exprts_e1, decision)==
-     eval_exprt(atomic_exprts_e2, decision))
+  // A mcdc pair regarding an atomic expr ''c''
+  // should have different values of ''c''
+  if(cs1==cs2)
     return false;
 
-  // A mcdc pair regarding an atomic exprt ''c''
-  // should have different values of ''c''
-  if(atomic_exprts_e1.find(c)->second==
-     atomic_exprts_e2.find(c)->second)
+  // A mcdc pair should result in different ''decision''
+  if(eval_expr(atomic_exprs_e1, decision)==
+     eval_expr(atomic_exprs_e2, decision))
     return false;
 
   /**
-   *  A mcdc pair of controlling exprts regarding ''c''
+   *  A mcdc pair of controlling exprs regarding ''c''
    *  can have different values for only one atomic
-   *  exprt, i.e., ''c''. Otherwise, they are not
+   *  expr, i.e., ''c''. Otherwise, they are not
    *  a mcdc pair.
    **/
   int diff_count=0;
-  auto e1_it=atomic_exprts_e1.begin();
-  auto e2_it=atomic_exprts_e2.begin();
-  while(e1_it!=atomic_exprts_e1.end())
+  auto e1_it=atomic_exprs_e1.begin();
+  auto e2_it=atomic_exprs_e2.begin();
+  while(e1_it!=atomic_exprs_e1.end())
   {
     if(e1_it->second!=e2_it->second)
     diff_count++;
@@ -801,19 +837,19 @@ Function: has_mcdc_pair
  Outputs:
 
  Purpose: To check if we can find the mcdc pair of the 
-          input ''exprt_set'' regarding the atomic exprt ''c''
+          input ''expr_set'' regarding the atomic expr ''c''
 
 \*******************************************************************/
 
 bool has_mcdc_pair(
   const exprt &c,
-  const std::set<exprt> &exprt_set,
+  const std::set<exprt> &expr_set,
   const std::set<exprt> &conditions,
   const exprt &decision)
 {
-  for(auto y1 : exprt_set)
+  for(auto y1 : expr_set)
   {
-    for(auto y2 : exprt_set)
+    for(auto y2 : expr_set)
     {
       if(is_mcdc_pair(y1, y2, c, conditions, decision))
       {
@@ -882,7 +918,7 @@ void minimize_mcdc_controlling(
         if(y!=x) new_controlling.insert(y);
 
       bool removing_x=true;
-      // For each atomic exprt condition ''c'', to check if its is
+      // For each atomic expr condition ''c'', to check if its is
       // covered by at least a mcdc pair.
       for(auto &c : conditions)
       {
@@ -1249,14 +1285,16 @@ void instrument_cover_goals(
         
           std::string comment_t=description+" `"+p_string+"' true";
           goto_program.insert_before_swap(i_it);
-          i_it->make_assertion(p);
+          //i_it->make_assertion(p);
+          i_it->make_assertion(not_exprt(p));
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
           i_it->source_location.set_property_class("coverage");
 
           std::string comment_f=description+" `"+p_string+"' false";
           goto_program.insert_before_swap(i_it);
-          i_it->make_assertion(not_exprt(p));
+          //i_it->make_assertion(not_exprt(p));
+          i_it->make_assertion(p);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_f);
           i_it->source_location.set_property_class("coverage");
