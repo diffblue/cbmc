@@ -236,7 +236,7 @@ void goto_convertt::clean_expr(
     
     if(!if_expr.cond().is_boolean())
       throw "first argument of `if' must be boolean, but got "
-        +if_expr.cond().to_string();
+        +if_expr.cond().pretty();
 
     const source_locationt source_location=expr.find_source_location();
   

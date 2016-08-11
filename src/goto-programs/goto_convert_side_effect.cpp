@@ -225,7 +225,7 @@ void goto_convertt::remove_pre(
     else
     {
       err_location(expr);
-      throw "no constant one of type "+op_type.to_string();
+      throw "no constant one of type "+op_type.pretty();
     }
 
     exprt constant=gen_one(constant_type);
@@ -323,7 +323,7 @@ void goto_convertt::remove_post(
     else
     {
       err_location(expr);
-      throw "no constant one of type "+op_type.to_string();
+      throw "no constant one of type "+op_type.pretty();
     }
 
     exprt constant=gen_one(constant_type);
