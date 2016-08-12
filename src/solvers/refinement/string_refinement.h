@@ -149,7 +149,6 @@ protected:
   
   virtual void post_process();
   virtual bvt convert_symbol(const exprt &expr);
-  virtual bvt convert_struct(const struct_exprt &expr);
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
   virtual void check_SAT();
