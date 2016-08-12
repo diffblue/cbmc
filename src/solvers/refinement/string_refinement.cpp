@@ -331,8 +331,6 @@ literalt string_refinementt::convert_rest(const exprt &expr)
 
 bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
-  debug() << "string_refinementt::boolbv_set_equality_to_true ";
-
   if(!equality_propagation) return true;
 
   const typet &type=ns.follow(expr.lhs().type());
