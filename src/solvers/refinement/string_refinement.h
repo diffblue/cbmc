@@ -181,7 +181,10 @@ protected:
   // of returning it.
   void make_string(const symbol_exprt & sym, const exprt &str);
 
+  //void set_to(const exprt &expr, bool value);
   bool boolbv_set_equality_to_true(const equal_exprt &expr);
+  //bool set_equality_to_true(const equal_exprt &expr);
+  literalt convert_rest(const exprt &expr);
 
   void add_lemma(const exprt &lemma);
   void add_lemmas(axiom_vect & lemmas);
@@ -212,6 +215,7 @@ protected:
   expr_sett strings;
   expr_sett seen_instances;
 
+  // current set of lemmas (unquantified)
   std::vector<exprt> cur;
 
 };

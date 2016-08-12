@@ -342,9 +342,151 @@ bvt string_refinementt::convert_struct(const struct_exprt &expr)
   return SUB::convert_struct(expr);
 }
 
+/*
+void string_refinementt::set_to(const exprt &expr, bool value)
+{
+  debug() << "string_refinementt::set_to" << eom;
+  assert(expr.type().id()==ID_bool);
+  
+  
+  bool boolean=true;
+
+  forall_operands(it, expr)
+    if(it->type().id()!=ID_bool)
+    {
+      boolean=false;
+      break;
+    }
+
+  debug() << "string_refinementt::set_to boolean " << boolean << eom;
+  if(boolean)
+    {
+    if(expr.id()==ID_not)
+    {
+      if(expr.operands().size()==1)
+      {
+        set_to(expr.op0(), !value);
+        return;
+      }
+    }
+    else
+    {
+      if(value)
+      {
+        debug() << "set_to_true" << eom;
+
+        if(expr.id()==ID_and)
+        {
+	  debug() << "and" << eom;
+          forall_operands(it, expr)
+            set_to_true(*it);
+
+          return;
+        }
+        else if(expr.id()==ID_or)
+        {
+	  debug() << "or" << eom;
+          // Special case for a CNF-clause,
+          // i.e., a constraint that's a disjunction.
+          
+          if(expr.operands().size()>0)
+          {
+            bvt bv;
+            bv.reserve(expr.operands().size());
+
+            forall_operands(it, expr)
+              bv.push_back(convert(*it));
+
+            prop.lcnf(bv);
+            return;
+          }
+        }
+        else if(expr.id()==ID_implies)
+	  {
+	    debug() << "implies" << eom;
+	    if(expr.operands().size()==2)
+          {
+            literalt l0=convert(expr.op0());
+            literalt l1=convert(expr.op1());
+            prop.lcnf(!l0, l1);
+            return;
+          }
+	  }
+        else if(expr.id()==ID_equal)
+        {
+          if(!set_equality_to_true(to_equal_expr(expr)))
+            return;
+        } 
+      }
+      else
+      {
+        debug() << "set_to_false" << eom;
+        if(expr.id()==ID_implies) // !(a=>b)  ==  (a && !b)
+        {
+          assert(expr.operands().size()==2);
+          set_to_true(expr.op0());
+          set_to_false(expr.op1());
+          return;
+        }
+        else if(expr.id()==ID_or) // !(a || b)  ==  (!a && !b)
+        {
+          forall_operands(it, expr)
+            set_to_false(*it);
+          return;
+        }
+      }
+    }
+  }
+  
+  debug() << "fall back to convert" << eom;
+  prop.l_set_to(convert(expr), value);
+
+}
+
+
+
+bool string_refinementt::set_equality_to_true(const equal_exprt &expr)
+{
+  debug() << "set equality to true " << expr << eom;
+  
+  if(!equality_propagation) return true;
+  if(expr.lhs().id()==ID_symbol)
+  {
+    const irep_idt &identifier=
+      to_symbol_expr(expr.lhs()).get_identifier();
+
+    debug() << "This needs to be changed: [[[ " << eom;
+    literalt tmp=convert(expr.rhs());
+    debug() << "]]] " << eom;
+
+    std::pair<symbolst::iterator, bool> result=
+      symbols.insert(std::pair<irep_idt, literalt>(identifier, tmp));
+
+    if(result.second) return false; 
+  }
+
+  return true;
+}
+*/
+
+literalt string_refinementt::convert_rest(const exprt &expr)
+{
+  debug() << "string_refinementt::convert_rest(" << expr << ")" << eom;
+  if(expr.id()==ID_function_application)
+    {
+      bvt bv = convert_function_application(to_function_application_expr(expr));
+      assert(bv.size() == 1); 
+      return bv[0];
+    }
+  else
+    return SUB::convert_rest(expr);
+}
+
 
 bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
+  debug() << "string_refinementt::boolbv_set_equality_to_true ";
+
   if(!equality_propagation) return true;
 
   const typet &type=ns.follow(expr.lhs().type());
@@ -353,6 +495,7 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      type==ns.follow(expr.rhs().type()) &&
      type.id()!=ID_bool)
   {
+    debug() << pretty_short(expr.lhs()) << " == " << pretty_short(expr.rhs()) << eom;
     if(is_unrefined_string_type(type)) {
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       make_string(sym,expr.rhs());
@@ -405,7 +548,9 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 bvt string_refinementt::convert_function_application(
        const function_application_exprt &expr)
 {
+  debug() << "string_refinementt::convert_function_application ..."  << eom;
   const exprt &name = expr.function();
+
 
   if (name.id() == ID_symbol) {
     const irep_idt &id = to_symbol_expr(name).get_identifier();
@@ -460,7 +605,7 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 
 void string_refinementt::add_lemma(const exprt &lemma)
 {
-  debug() << "adding lemma " << lemma << eom;
+  debug() << "adding lemma " << eom; //lemma << eom;
   prop.l_set_to_true(convert(lemma));
   cur.push_back(lemma);
 }
@@ -661,6 +806,8 @@ bvt string_refinementt::convert_string_char_at(
 // PASS Algorithm //
 ////////////////////
 
+// We compute the index set for all formulas, instantiate the formulas
+// with the found indexes, and add them as lemmas.
 void string_refinementt::add_instantiations(bool first)
 {
   debug() << "string_refinementt::add_instantiations" << eom;
@@ -675,27 +822,34 @@ void string_refinementt::add_instantiations(bool first)
 
   cur.clear();
 
+  //debug() << "going through the index set:" << eom;
   for (std::map<exprt, expr_sett>::iterator i = index_set.begin(),
 	 end = index_set.end(); i != end; ++i) {
     const exprt &s = i->first;
+    //debug() << pretty_short(s) << " : ";
+
     for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
          j != end; ++j) {
       const exprt &val = *j;
+      //debug() << val << " ; ";
+
       for (size_t k = 0; k < string_axioms.size(); ++k) {
         exprt lemma = instantiate(string_axioms[k], s, val);
         if (lemma.is_not_nil() && seen_instances.insert(lemma).second) {
           add_lemma(lemma);
         }
       }
+
     }
+    //debug() << eom;
   }
 }
 
 
 exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 {
-  debug() << "string_refinementt::get_array(" << arr.get(ID_identifier) 
-	  << "," << size.get(ID_value) << ")" << eom;
+  //debug() << "string_refinementt::get_array(" << arr.get(ID_identifier) 
+  //<< "," << size.get(ID_value) << ")" << eom;
   exprt val = get(arr);
   
   if(val.id() == "array-list") {
@@ -744,27 +898,27 @@ bool string_refinementt::check_axioms()
 
       fmodel[elength] = len;
       fmodel[econtent] = arr;
-      debug() << "check_axioms: " << it->first << " := " << arr << eom;
+      //debug() << "check_axioms: " << it->first << " := " << arr << eom;
     }
 
   for(std::vector<exprt>::iterator it = boolean_symbols.begin();
       it != boolean_symbols.end(); it++) {
-    debug() << "check_axioms: " << *it << " := " << get(*it) << eom;
+    debug() << "check_axioms boolean_symbol: " << *it << eom; 
+    // " := " << get(*it) << eom;  
     fmodel[*it] = get(*it);
   }
 
   std::vector< std::pair<size_t, exprt> > violated;
 
+  debug() << "there are " << string_axioms.size() << " string axioms" << eom;
   for (size_t i = 0; i < string_axioms.size(); ++i) {
-    debug() << "string axiom " << i << eom;
     const string_axiomt &axiom = string_axioms[i];
-
 
     exprt negaxiom = and_exprt(axiom.premise, not_exprt(axiom.body));
     replace_expr(fmodel, negaxiom);
 
-    debug() << "string axiom = " << axiom.to_string() << eom;
-    debug() << "neg axiom = " << negaxiom.pretty() << eom;
+    //debug() << "string axiom = " << axiom.to_string() << eom;
+    //debug() << "neg axiom = " << negaxiom.pretty() << eom;
 
     satcheck_no_simplifiert sat_check;
     SUB solver(ns, sat_check);
@@ -790,8 +944,10 @@ bool string_refinementt::check_axioms()
     return true;
   }
 
+  bool all_seen = true;
+  
+  debug() << violated.size() << " string axioms can be violated" << eom;
   for (size_t i = 0; i < violated.size(); ++i) {
-    debug() << "violated " << i << eom;
     const exprt &val = violated[i].second;
     const string_axiomt &axiom = string_axioms[violated[i].first];
     exprt premise(axiom.premise);
@@ -801,11 +957,12 @@ bool string_refinementt::check_axioms()
     implies_exprt instance(premise, body);
     if (seen_instances.insert(instance).second) {
       add_lemma(instance);
-    }
+      all_seen = false;
+    } else debug() << "instance already seen" << eom;
     // TODO - add backwards instantiations
   }
   
-  return false;
+  return all_seen;
 }
 
 
@@ -836,10 +993,11 @@ namespace {
 
 
 
-
   //////////////////////////////////////////////////////////
   // For expressions f of a certain form, 		  //
   // returns an expression corresponding to $f^{−1}(val)$.//
+  // i.e. the value that is necessary for qvar for f to   //
+  // be equal to val.                                     //
   // Takes an expression containing + and − operations 	  //
   // in which qvar appears exactly once. 		  //
   // Rewrites it as a sum of qvar and elements in list	  //
@@ -848,15 +1006,20 @@ namespace {
   //////////////////////////////////////////////////////////
 exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f)
 {
-  //std::cout << "string_refinement::compute_subst" << std::endl ;
-  std::vector< std::pair<exprt, bool> > to_process, elems;
-  to_process.push_back(std::make_pair(f, true));
+  std::vector< std::pair<exprt, bool> > to_process;
+
+  // number of time the element should be added (can be negative)
+  std::map< exprt, int> elems;
+  // qvar has to be equal to val - f(0) if it appears positively in f 
+  // (ie if f(qvar) = f(0) + qvar) and f(0) - val if it appears negatively 
+  // in f. So we start by computing val - f(0).
+  to_process.push_back(std::make_pair(val,true));
+  to_process.push_back(std::make_pair(f, false));
 
   while (!to_process.empty()) {
     exprt cur = to_process.back().first;
     bool positive = to_process.back().second;
     to_process.pop_back();
-    //    std::cout << "processing " << cur.pretty() << std::endl;
     if (cur.id() == ID_plus) {
       to_process.push_back(std::make_pair(cur.op1(), positive));
       to_process.push_back(std::make_pair(cur.op0(), positive));
@@ -866,32 +1029,37 @@ exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f)
     } else if (cur.id() == ID_unary_minus) {
       to_process.push_back(std::make_pair(cur.op0(), !positive));
     } else {
-      elems.push_back(std::make_pair(cur, positive));
+      if(positive) elems[cur] = elems[cur]+1;
+      else elems[cur] = elems[cur] - 1;
     }
   }
 
   exprt ret = nil_exprt();
   bool found = false;
-  bool neg = false;
+  bool neg = false; // true if qvar appears negatively
   
-  for (size_t i = 0; (i < elems.size()) ; ++i) {
-    exprt &t = elems[i].first;
+  for (std::map<exprt,int>::iterator it = elems.begin();
+       it != elems.end(); it++) {
+    const exprt &t = it->first;
     if (t == qvar) {
+      assert(it->second == 1 || it->second == -1);
       assert(!found);
       found = true;
-      neg = !elems[i].second;
+      neg = (it->second == -1);
     } else {
-      if (!elems[i].second) {
-        t = unary_minus_exprt(t);
+      if (it->second == 0) {
+      } else if (it->second == -1) {
+	if(ret.is_nil()) ret = unary_minus_exprt(t);
+	else ret = minus_exprt(ret, t);
+      } else if (it->second == 1) {
+	if(ret.is_nil()) ret = t;
+	else ret = plus_exprt(ret, t);
       }
-      ret = (ret.is_nil())?t:plus_exprt(ret, t);
     }
   }
-
+  
   assert(found);
-  ret = (ret.is_nil())?val:minus_exprt(val, ret);
-
-  if (neg) return unary_minus_exprt(ret);
+  if (neg && !ret.is_nil()) return unary_minus_exprt(ret);
   else return ret;
 }
   
@@ -938,11 +1106,7 @@ void string_refinementt::update_index_set(const string_axiomt &axiom)
       // if cur is of the form s[i] and qvar does not appear in i...
       if(!find_qvar(i,axiom.qvar)) {
 	assert(s.type() == string_type.get_content_type());
-	//debug() << "map_content_to_string " << s << eom;
-	//string_exprt str = string_exprt::by_content(s);
-	//debug() << " --> " << str << eom;
 	expr_sett &idxs = index_set[s];
-	// we add the bounds to the index set 
         idxs.insert(bounds.begin(), bounds.end());
         idxs.insert(i);
       }
@@ -966,9 +1130,7 @@ void string_refinementt::update_index_set(const exprt &formula)
     if (cur.id() == ID_index) {
       const exprt &s = cur.op0();
       const exprt &i = cur.op1();
-      //debug() << "map_content_to_string " << s << eom;
-      //string_exprt str = string_exprt::by_content(s);
-      //debug() << " --> " << str << eom;
+      assert(s.type() == string_type.get_content_type());
       index_set[s].insert(i);
     } else {
       forall_operands(it, cur) {
@@ -1012,7 +1174,6 @@ exprt find_index(const exprt & expr, const exprt & str) {
 exprt string_refinementt::instantiate(const string_axiomt &axiom,
                                       const exprt &str, const exprt &val)
 {
-  //debug() << "string_refinementt::instantiate(" << axiom.to_string() << ")" << eom;
   exprt idx = find_index(axiom.body,str);
   if(idx.is_nil()) return nil_exprt();
   if(!find_qvar(idx,axiom.qvar)) return nil_exprt(); 
@@ -1022,8 +1183,10 @@ exprt string_refinementt::instantiate(const string_axiomt &axiom,
   exprt body(axiom.body);
   // replace_expr(what,by,dest) replaces in dest all occurances of [what]
   // by expression [by]
+  //debug() << "string_refinementt::instantiate(" << axiom.to_string() << ")" << eom;
   implies_exprt instance(premise, body);
   replace_expr(axiom.qvar, r, instance);
+  //debug() << "== replaced instance : " << instance.pretty() << eom;
   return instance;
 }
 
