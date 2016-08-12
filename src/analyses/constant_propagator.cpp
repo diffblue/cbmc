@@ -555,22 +555,6 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
       it++;
     }
   }
-
-  for(replace_symbolt::expr_mapt::const_iterator
-      it=src.replace_const.expr_map.begin();
-      it!=src.replace_const.expr_map.end();
-      ++it)
-  {
-    replace_symbolt::expr_mapt::iterator
-      c_it = replace_const.expr_map.find(it->first);
-
-    if(c_it == replace_const.expr_map.end())
-    {
-      replace_const.expr_map[it->first]=it->second;
-      changed = true;
-    }
-  }
-
   return changed;
 }
 

@@ -359,9 +359,6 @@ int goto_analyzer_parse_optionst::doit()
   	  const bool cp=cmdline.isset("constant-propagation");
   	  const bool ia=cmdline.isset("intervals");
 
-      //remove_skip(goto_model.goto_functions);
-      //goto_model.goto_functions.update();
-
       if(cmdline.isset("verify"))
       {
         static_verifiert verifier(goto_model, options, get_message_handler(), cp, ia);
@@ -490,9 +487,6 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      remove_skip(goto_model.goto_functions);
-      goto_model.goto_functions.update();
-
       // check whether we should simplify the goto-program before showing it
       if (cmdline.isset("simplify"))
       {
