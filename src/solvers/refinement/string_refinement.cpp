@@ -235,14 +235,16 @@ axiom_vect string_exprt::of_string_concat(const function_application_exprt &f)
   symbol_exprt idx = string_refinementt::fresh_symbol("index", index_type);
   
   string_axiomt a1(idx, binary_relation_exprt(idx, ID_lt, s1.length()),
-		   equal_exprt(index_exprt(s1.content(), idx),
+		   equal_exprt(s1[idx],
 			       index_exprt(content(), idx)));
   axioms.push_back(a1);
 
-  string_axiomt a2(idx, binary_relation_exprt(idx, ID_lt, s2.length()),
-		   equal_exprt(index_exprt(s2.content(), idx),
+  symbol_exprt idx2 = string_refinementt::fresh_symbol("index", index_type);
+
+  string_axiomt a2(idx, binary_relation_exprt(idx2, ID_lt, s2.length()),
+		   equal_exprt(s2[idx2],
 			       index_exprt(content(), 
-					   plus_exprt(s1.length(), idx))));
+					   plus_exprt(s1.length(), idx2))));
   axioms.push_back(a2);
   return axioms;
 }
@@ -444,7 +446,7 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 
 void string_refinementt::add_lemma(const exprt &lemma)
 {
-  debug() << "adding lemma" << eom;
+  debug() << "adding lemma " << lemma.pretty() << eom;
   prop.l_set_to_true(convert(lemma));
   cur.push_back(lemma);
 }
@@ -500,12 +502,13 @@ bvt string_refinementt::convert_string_equal(
   // !eq => s1.length != s2.length || (witness < s1.length && s1[witness] != s2[witness])
 
   symbol_exprt witness = fresh_symbol("index", index_type);
+  symbol_exprt qvar = fresh_symbol("qvar", index_type);
 
   add_lemma(implies_exprt(eq, equal_exprt(s1.length(), s2.length())));
 
-  string_axioms.emplace_back(witness,
-			     and_exprt(eq, s1 > witness),
-			     equal_exprt(s1[witness],s2[witness]));
+  string_axioms.emplace_back(qvar,
+			     and_exprt(eq, s1 > qvar),
+			     equal_exprt(s1[qvar],s2[qvar]));
 
   implies_exprt 
     lemma2(not_exprt(eq),
@@ -543,12 +546,14 @@ bvt string_refinementt::convert_string_is_prefix(
   bvt bv = convert_bv(isprefix); 
 
   add_lemma(implies_exprt(isprefix, s0 >= s1));
+
+  symbol_exprt qvar = fresh_symbol("qvar", index_type);
+  string_axioms.emplace_back(qvar, and_exprt(isprefix, s1 > qvar),
+			     equal_exprt(s1[qvar],s0[qvar]));
 	     
   symbol_exprt witness = fresh_symbol("index", index_type);
 
   // forall witness < s1.length. isprefix => s1[witness] = s2[witness]
-  string_axioms.emplace_back(witness, and_exprt(isprefix, s1 > witness),
-			     equal_exprt(s1[witness],s0[witness]));
 
   or_exprt s1_notpref_s0(not_exprt(s0 >= s1),
 			 and_exprt(s1 > witness, 
@@ -576,15 +581,20 @@ bvt string_refinementt::convert_string_is_suffix(
   //     issufix => s1[witness] = s0[witness + s0.length - s1.length]
   // && !issuffix => s1.length > s0.length 
   //       || (s1.length > witness && s1[witness] != s0[witness + s0.length - s1.length]
-  symbol_exprt witness = fresh_symbol("index", index_type);
+  symbol_exprt qvar = fresh_symbol("qvar", index_type);
 
   add_lemma(implies_exprt(issuffix, s0 >= s1));
 
+
+  exprt qvar_shifted = plus_exprt(qvar, 
+				  minus_exprt(s0.length(), s1.length()));
+  string_axioms.emplace_back(qvar, and_exprt(issuffix, s1 > qvar),
+			     equal_exprt(s1[qvar],s0[qvar_shifted]));
+
+  symbol_exprt witness = fresh_symbol("index", index_type);
+
   exprt shifted = plus_exprt(witness, 
 			     minus_exprt(s0.length(), s1.length()));
-
-  string_axioms.emplace_back(witness, and_exprt(issuffix, s1 > witness),
-			     equal_exprt(s1[witness],s0[shifted]));
 
   implies_exprt lemma2(not_exprt(issuffix),
 		       or_exprt(s1 > s0,
@@ -655,16 +665,16 @@ void string_refinementt::add_instantiations(bool first)
 
   cur.clear();
 
-  //debug() << "going through the index set:" << eom;
+  debug() << "going through the index set:" << eom;
   for (std::map<exprt, expr_sett>::iterator i = index_set.begin(),
 	 end = index_set.end(); i != end; ++i) {
     const exprt &s = i->first;
-    //debug() << pretty_short(s) << " : ";
+    debug() << pretty_short(s) << " ---- " << eom;
 
     for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
          j != end; ++j) {
       const exprt &val = *j;
-      //debug() << val << " ; ";
+      debug() << "val " << val << " : " << eom;
 
       for (size_t k = 0; k < string_axioms.size(); ++k) {
         exprt lemma = instantiate(string_axioms[k], s, val);
@@ -674,7 +684,7 @@ void string_refinementt::add_instantiations(bool first)
       }
 
     }
-    //debug() << eom;
+    debug() << eom;
   }
 }
 
@@ -732,9 +742,9 @@ bool string_refinementt::check_axioms()
       //debug() << "check_axioms: " << it->first << " := " << arr << eom;
     }
 
-  for(std::vector<exprt>::iterator it = boolean_symbols.begin();
+  for(std::vector<symbol_exprt>::iterator it = boolean_symbols.begin();
       it != boolean_symbols.end(); it++) {
-    debug() << "check_axioms boolean_symbol: " << *it << eom; 
+    debug() << "check_axioms boolean_symbol: " << it->get_identifier() << eom; 
     // " := " << get(*it) << eom;  
     fmodel[*it] = get(*it);
   }
@@ -775,6 +785,7 @@ bool string_refinementt::check_axioms()
   bool all_seen = true;
   
   debug() << violated.size() << " string axioms can be violated" << eom;
+
   for (size_t i = 0; i < violated.size(); ++i) {
     const exprt &val = violated[i].second;
     const string_axiomt &axiom = string_axioms[violated[i].first];
@@ -819,21 +830,13 @@ namespace {
     }
   }
 
+} // namespace
 
 
-  //////////////////////////////////////////////////////////
-  // For expressions f of a certain form, 		  //
-  // returns an expression corresponding to $f^{−1}(val)$.//
-  // i.e. the value that is necessary for qvar for f to   //
-  // be equal to val.                                     //
-  // Takes an expression containing + and − operations 	  //
-  // in which qvar appears exactly once. 		  //
-  // Rewrites it as a sum of qvar and elements in list	  //
-  // elems different from qvar. 			  //
-  // Takes e minus the sum of the element in elems.	  //
-  //////////////////////////////////////////////////////////
-exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f)
+exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, const exprt &f)
 {
+
+  std::cout << "compute_subst (" << pretty_short(qvar) << "," << val << "," << f << ")" << std::endl;
   std::vector< std::pair<exprt, bool> > to_process;
 
   // number of time the element should be added (can be negative)
@@ -864,16 +867,17 @@ exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f)
 
   exprt ret = nil_exprt();
   bool found = false;
-  bool neg = false; // true if qvar appears negatively
+  bool neg = false; // true if qvar appears negatively in f, ie positively in the elements
   
   for (std::map<exprt,int>::iterator it = elems.begin();
        it != elems.end(); it++) {
     const exprt &t = it->first;
     if (t == qvar) {
-      assert(it->second == 1 || it->second == -1);
-      assert(!found);
-      found = true;
-      neg = (it->second == -1);
+      if(it->second == 1 || it->second == -1){
+	found = true;
+	neg = (it->second == 1);
+      } else 
+	std::cout << "in compute_subst: warning: occurences of qvar canceled out " << std::endl;
     } else {
       if (it->second == 0) {
       } else if (it->second == -1) {
@@ -886,12 +890,16 @@ exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f)
     }
   }
   
-  assert(found);
+  if (!found) { 
+    // we should add a lemma to say that val == f
+    debug() << "not sure we need to add a lemma: " << eom;
+    //add_lemma(equal_exprt(val,f));
+    return qvar;
+  }
   if (neg && !ret.is_nil()) return unary_minus_exprt(ret);
   else return ret;
 }
   
-} // namespace
 
 
 class find_qvar_visitor: public const_expr_visitort {
@@ -937,6 +945,7 @@ void string_refinementt::update_index_set(const string_axiomt &axiom)
 	expr_sett &idxs = index_set[s];
         idxs.insert(bounds.begin(), bounds.end());
         idxs.insert(i);
+	debug() << "update_index_set(" << axiom.to_string() << ") -> i: " << i << eom;
       }
     } else {
       forall_operands(it, cur) {
@@ -960,6 +969,7 @@ void string_refinementt::update_index_set(const exprt &formula)
       const exprt &i = cur.op1();
       assert(s.type() == string_type.get_content_type());
       index_set[s].insert(i);
+      debug() << "update_index_set(formula " << formula.pretty() << ") -> i: " << i << eom ;
     } else {
       forall_operands(it, cur) {
         to_process.push_back(*it);
@@ -1003,14 +1013,16 @@ exprt string_refinementt::instantiate(const string_axiomt &axiom,
                                       const exprt &str, const exprt &val)
 {
   exprt idx = find_index(axiom.body,str);
+  // what if idx is qvar or if there are several indexes?
   if(idx.is_nil()) return nil_exprt();
   if(!find_qvar(idx,axiom.qvar)) return nil_exprt(); 
 
   exprt r = compute_subst(axiom.qvar, val, idx);
   exprt premise(axiom.premise);
   exprt body(axiom.body);
-  //debug() << "string_refinementt::instantiate : replaces occurances of" << axiom.qvar << " by " << instance << " in " << axiom.to_string() << eom;
   implies_exprt instance(premise, body);
+
+  debug() << "string_refinementt::instantiate : replaces occurances of" << axiom.qvar << " by " << r  << " in " << instance << eom;
   replace_expr(axiom.qvar, r, instance);
   return instance;
 }

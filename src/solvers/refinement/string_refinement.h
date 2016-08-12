@@ -169,7 +169,7 @@ protected:
 
   // Boolean symbols that are used to know whether the results 
   // of some functions should be true.
-  std::vector<exprt> boolean_symbols;
+  std::vector<symbol_exprt> boolean_symbols;
   axiom_vect string_axioms;
 
   // Create a new string expression and add the necessary lemma
@@ -206,6 +206,17 @@ protected:
   // Then substitutes [axiom.idx] with [r] in [axiom].
   exprt instantiate(const string_axiomt &axiom, const exprt &str,
                     const exprt &val);
+
+  // For expressions f of a certain form, 		  //
+  // returns an expression corresponding to $f^{−1}(val)$.//
+  // i.e. the value that is necessary for qvar for f to   //
+  // be equal to val.                                     //
+  // Takes an expression containing + and − operations 	  //
+  // in which qvar appears exactly once. 		  //
+  // Rewrites it as a sum of qvar and elements in list	  //
+  // elems different from qvar. 			  //
+  // Takes e minus the sum of the element in elems.	  //
+  exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f);
 
   // Gets a model of an array and put it in a certain form
   exprt get_array(const exprt &arr, const exprt &size);
