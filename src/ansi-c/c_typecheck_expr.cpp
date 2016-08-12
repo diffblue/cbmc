@@ -86,7 +86,8 @@ void c_typecheck_baset::add_rounding_mode(exprt &expr)
        expr.operands().size()==2)
     {
       // The rounding mode to be used at compile time is non-obvious.
-      // We'll simply use round to even (0), arbitrarily.
+      // We'll simply use round to even (0), which is suggested
+      // by Sec. F.7.2 Translation, ISO-9899:1999.
       expr.operands().resize(3);
 
       if(expr.id()==ID_div)
