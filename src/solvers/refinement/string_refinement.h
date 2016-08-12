@@ -61,17 +61,18 @@ class string_exprt : public struct_exprt {
 
 public:
   string_exprt();
-  string_exprt(exprt length, exprt content);
-  string_exprt(symbol_exprt sym);
+  //string_exprt(exprt length, exprt content);
+  string_exprt(const symbol_exprt & sym);
+  //string_exprt(symbol_exprt sym, exprt unrefined_string);
 
   // returns a list of lemmas which should hold  
-  axiom_vect of_expr(exprt unrefined_string);
-  axiom_vect of_function_application(const function_application_exprt &expr);
-  axiom_vect of_symbol(const symbol_exprt &expr);
-  axiom_vect of_string_literal(const function_application_exprt &expr);
-  axiom_vect of_string_concat(const function_application_exprt &expr);
-  axiom_vect of_string_substring(const function_application_exprt &expr);
-  axiom_vect of_string_char_set(const function_application_exprt &expr);
+  static string_exprt of_expr(const exprt & unrefined_string, axiom_vect & axioms);
+  void of_function_application(const function_application_exprt &expr, axiom_vect & axioms);
+  void of_symbol(const symbol_exprt &expr,axiom_vect &axioms);
+  void of_string_literal(const function_application_exprt &f,axiom_vect &axioms);
+  void of_string_concat(const function_application_exprt &f,axiom_vect &axioms);
+  void of_string_substring(const function_application_exprt &expr,axiom_vect &axioms);
+  void of_string_char_set(const function_application_exprt &expr,axiom_vect &axioms);
   
   inline const exprt & length() const { return op0();};
   inline const exprt & content() const { return op1();};
@@ -99,7 +100,7 @@ public:
     return static_cast<string_exprt &>(expr);
   }
   
-  static string_exprt & by_content (const exprt & content);
+  //static string_exprt & by_content (const exprt & content);
 };
 
 string_exprt &to_string_expr(exprt expr);
