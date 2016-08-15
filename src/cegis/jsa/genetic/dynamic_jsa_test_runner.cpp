@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstdlib>
 
 #include <cegis/cegis-util/module_helper.h>
 #include <cegis/genetic/dynamic_test_runner_helper.h>
