@@ -30,18 +30,7 @@ constant_exprt index_max(integer2binary(1<<30, INDEX_WIDTH), index_type);
 
 
 // Succinct version of pretty()
-std::string string_refinementt::pretty_short(exprt expr) {
-  /*  std::ostringstream buf;
-  if(expr.get(ID_identifier) != "") {
-    buf << expr.get(ID_identifier);
-  } else if (expr.operands().size() > 0) {
-    for (int i =0; i<expr.operands().size(); i++)
-      buf << expr.operands()[i].get(ID_identifier) << ";";
-  } else if(expr.get(ID_value) != "") {
-    buf << expr.get(ID_value);
-  } else buf << expr.pretty();
-  return buf.str();*/
-
+std::string string_refinementt::pretty_short(const exprt & expr) {
   languagest languages(ns, new_ansi_c_language());
   std::string string_value;
   languages.from_expr(expr, string_value);
@@ -77,13 +66,6 @@ string_axiomt::string_axiomt(exprt bod)
   body = bod;
 }
 
-std::string string_axiomt::to_string() const
-{
-  std::ostringstream buf;
-  buf << "forall " << qvar.get_identifier() << ". (" 
-      << premise.pretty() << ") ==> " << body.pretty();
-  return buf.str();
-}
 
 string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   SUB(_ns, _prop)
@@ -135,16 +117,6 @@ symbol_exprt string_refinementt::fresh_symbol(const irep_idt &prefix,
   return symbol_exprt(name, tp);
 }
 
-/*
-string_exprt::string_exprt(exprt length, exprt content) : struct_exprt(string_ref_typet())
-{
-  string_ref_typet t;
-  assert(length.type() == index_type);
-  assert(content.type() == t.get_content_type());
-  move_to_operands(length,content);
-}
-*/
-
 string_exprt::string_exprt() : struct_exprt(string_ref_typet())
 {
   string_ref_typet t;
@@ -152,12 +124,6 @@ string_exprt::string_exprt() : struct_exprt(string_ref_typet())
   symbol_exprt content = string_refinementt::fresh_symbol("string_content",t.get_content_type());
   move_to_operands(length,content);
 }
-
-/*
-string_exprt::string_exprt(const symbol_exprt & sym) : string_exprt()
-{
-  symbol_to_string[sym.get_identifier()] = *this;
-}*/
 
 string_exprt string_exprt::find_symbol(const symbol_exprt & expr){
   return symbol_to_string[expr.get_identifier()];
@@ -168,17 +134,12 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & 
   if(unrefined_string.id()==ID_function_application) {
     string_exprt s;
     s.of_function_application(to_function_application_expr(unrefined_string), axioms);
-    //binary_relation_exprt lem1(s.length(), ID_le,index_max);
-    //axioms.push_back(string_axiomt(lem1));
     return s;
   }
   else if(unrefined_string.id()==ID_symbol) {
     return find_symbol(to_symbol_expr(unrefined_string));
-    //return symbol_to_string[to_symbol_expr(unrefined_string).get_identifier()];
-    //return of_symbol(to_symbol_expr(unrefined_string));
   }
   else {
-    //std:: cout << "of_expr( " << unrefined_string.pretty() << std::endl;
     throw ("string_exprt of " + unrefined_string.pretty() 
 	   + "which is not a symbol or a function application");
   }

@@ -33,54 +33,45 @@ public:
 class string_axiomt
 {
 public:
-  //unsigned id_nr;
-  //exprt lit;
-  //quantified symbol
+  // Universally quantified symbol
   symbol_exprt qvar;
   exprt premise;
   exprt body;
-  
-  //std::string as_string() const;
-  //explicit string_axiomt(unsigned i=0): id_nr(i) {}
 
+  // Axiom of the form: forall index. prem ==> bod
   string_axiomt(symbol_exprt index, exprt prem, exprt bod);
 
-  // axiom with no premise
+  // Axiom with no quantification
   string_axiomt(exprt bod);
 
   inline bool is_quantified() {return (premise != true_exprt());}
-
-  std::string to_string() const;
 };
 
 typedef std::vector<string_axiomt> axiom_vect;
 
-
+// Expressions that encode strings
 class string_exprt : public struct_exprt {
 public:
   string_exprt();
-  //string_exprt(exprt length, exprt content);
-  //  string_exprt(const symbol_exprt & sym);
-  //string_exprt(symbol_exprt sym, exprt unrefined_string);
 
-  // returns a list of lemmas which should hold  
+  // Add to the list of axioms, lemmas which should hold for the string to be 
+  // equal to the given expression.
   static string_exprt of_expr(const exprt & unrefined_string, axiom_vect & axioms);
+
+  // Find the string corresponding to the given symbol if it exists.
+  // Otherwise a new string is created.
   static string_exprt find_symbol(const symbol_exprt &expr);
 
-  void of_function_application(const function_application_exprt &expr, axiom_vect & axioms);
-  //void of_symbol(const symbol_exprt &expr,axiom_vect &axioms);
-  void of_string_literal(const function_application_exprt &f,axiom_vect &axioms);
-  void of_string_concat(const function_application_exprt &f,axiom_vect &axioms);
-  void of_string_substring(const function_application_exprt &expr,axiom_vect &axioms);
-  void of_string_char_set(const function_application_exprt &expr,axiom_vect &axioms);
-  
+  // Expression corresponding to the length of the string
   inline const exprt & length() const { return op0();};
+  // Expression corresponding to the content (array of characters) of the string
   inline const exprt & content() const { return op1();};
 
+  // Expression of the character at position idx in the string
   inline index_exprt operator[] (exprt idx)
-  { //typecast_exprt pos(idx, index_type); 
-    return index_exprt(content(), idx);}
+  { return index_exprt(content(), idx);}
 
+  // Comparison on the length of the strings
   inline binary_relation_exprt operator< (string_exprt rhs)
   { return binary_relation_exprt(length(), ID_lt, rhs.length()); }
   inline binary_relation_exprt operator> (string_exprt rhs)
@@ -94,13 +85,21 @@ public:
   inline binary_relation_exprt operator> (const symbol_exprt & rhs)
   { return binary_relation_exprt(rhs, ID_lt, length()); }
 
+private:
+  // Auxiliary functions for of_expr
+  void of_function_application(const function_application_exprt &expr, axiom_vect & axioms);
+
+  void of_string_literal(const function_application_exprt &f,axiom_vect &axioms);
+  void of_string_concat(const function_application_exprt &f,axiom_vect &axioms);
+  void of_string_substring(const function_application_exprt &expr,axiom_vect &axioms);
+  void of_string_char_set(const function_application_exprt &expr,axiom_vect &axioms);
+  
   friend inline string_exprt &to_string_expr(exprt &expr)
   {
     assert(expr.id()==ID_struct);
     return static_cast<string_exprt &>(expr);
   }
   
-  //static string_exprt & by_content (const exprt & content);
 };
 
 string_exprt &to_string_expr(exprt expr);
@@ -114,11 +113,6 @@ public:
 
   virtual std::string decision_procedure_text() const
   { return "string refinement loop with "+prop.solver_text(); }
-  
-  typedef bv_refinementt SUB;
-
-  inline size_t get_string_width()
-  { return boolbv_width(string_type);}
 
   static bool is_unrefined_string_type(const typet &type);
   static bool is_unrefined_char_type(const typet &type);
@@ -126,6 +120,13 @@ public:
   // Generate a new symbol of the given type tp with a prefix 
   static symbol_exprt fresh_symbol(const irep_idt &prefix,
 				   const typet &tp=bool_typet());
+
+
+  inline std::string axiom_to_string(const string_axiomt & ax) {
+    return ("forall " + pretty_short(ax.qvar) + ". (" 
+	    + pretty_short(ax.premise) + ") ==> " + pretty_short(ax.body));
+  }
+
 
   irep_idt string_literal_func;
   irep_idt char_literal_func;
@@ -139,8 +140,14 @@ public:
   irep_idt string_is_suffix_func;
   irep_idt string_char_set_func;
 
-private:
+private:  
+  typedef bv_refinementt SUB;
+
   string_ref_typet string_type;
+
+  inline size_t get_string_width()
+  { return boolbv_width(string_type);}
+
   static unsigned next_symbol_id;
 
 protected:
@@ -168,6 +175,7 @@ protected:
   bvt convert_char_literal(const function_application_exprt &f);
   bvt convert_string_char_at(const function_application_exprt &f);
 
+private:
   // Boolean symbols that are used to know whether the results 
   // of some functions should be true.
   std::vector<symbol_exprt> boolean_symbols;
@@ -200,8 +208,8 @@ protected:
   void update_index_set(const exprt &formula);
   void update_index_set(const string_axiomt &axiom);
 
-  //takes an universaly quantified formula [axiom], a array of char variable [s], 
-  // and an index expression [val]. 
+  // Takes an universaly quantified formula [axiom], 
+  // an array of char variable [s], and an index expression [val]. 
   // Computes one index [v1] in which [axiom.idx] appears, takes the
   // corresponding substitition [r] (obtained with [compute_subst]).
   // Then substitutes [axiom.idx] with [r] in [axiom].
@@ -222,16 +230,17 @@ protected:
   // Gets a model of an array and put it in a certain form
   exprt get_array(const exprt &arr, const exprt &size);
 
+  // Convert the content of a string to a more readable representation
   std::string string_of_array(const exprt &arr, const exprt &size);
 
-  expr_sett strings;
+  // Lemmas that were already added
   expr_sett seen_instances;
 
   // current set of lemmas (unquantified)
   std::vector<exprt> cur;
 
   // succinct and pretty way to display an expression
-  std::string pretty_short(exprt expr);
+  std::string pretty_short(const exprt & expr);
 
 };
 
