@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "cprover-string-hack.h"
+#include "../cprover-string-hack.h"
 
 
 int main()
@@ -10,7 +10,7 @@ int main()
   t = __CPROVER_string_literal("xyz");
   len_s = __CPROVER_string_length(s);
   len_t = __CPROVER_string_length(t);
-  int b = ( len_s == len_t );
+  unsigned b = ( len_s == len_t );
   assert(b);
   return 0;
 }
