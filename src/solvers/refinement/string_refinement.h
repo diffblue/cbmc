@@ -222,6 +222,7 @@ protected:
   // Gets a model of an array and put it in a certain form
   exprt get_array(const exprt &arr, const exprt &size);
 
+  std::string string_of_array(const exprt &arr, const exprt &size);
 
   expr_sett strings;
   expr_sett seen_instances;

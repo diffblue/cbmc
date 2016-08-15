@@ -313,6 +313,8 @@ void string_exprt::of_string_char_set
 void string_refinementt::post_process()
 {  
   debug() << "string_refinementt::post_process()" << eom;
+  add_instantiations(true);
+
   SUB::post_process();
 }
 
@@ -694,10 +696,43 @@ void string_refinementt::add_instantiations(bool first)
 }
 
 
+unsigned integer_of_expr(const constant_exprt & expr) {
+  return integer2unsigned(string2integer(as_string(expr.get_value()),2));
+}
+
+std::string string_refinementt::string_of_array(const exprt &arr, const exprt &size)
+{
+  unsigned n = integer_of_expr(to_constant_expr(size));
+  if(n>500) return "array-too-big";
+  if(n==0) return "\"\"";
+  unsigned str[n];
+  exprt val = get(arr);
+  if(val.id() == "array-list") {
+    for (size_t i = 0; i < val.operands().size()/2; i++) {  
+      exprt index = val.operands()[i*2];
+      unsigned idx = integer_of_expr(to_constant_expr(index));
+      if(idx < n){
+	exprt value = val.operands()[i*2+1];
+	str[idx] = integer_of_expr(to_constant_expr(value));
+      }
+    }
+  } else {
+    debug() << "unable to get array-list value of " << pretty_short(val) << eom;
+  }
+
+  std::ostringstream buf;
+  for(unsigned i = 0; i < n; i++) {
+    char c = (char) str[i];
+    buf << c << ":";
+  }
+  
+  return buf.str();
+}
+
 exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 {
   //debug() << "string_refinementt::get_array(" << arr.get(ID_identifier) 
-  //<< "," << size.get(ID_value) << ")" << eom;
+  //	  << "," << size.get(ID_value) << ")" << eom;
   exprt val = get(arr);
   
   if(val.id() == "array-list") {
@@ -744,13 +779,12 @@ bool string_refinementt::check_axioms()
 
       fmodel[elength] = len;
       fmodel[econtent] = arr;
-      //debug() << "check_axioms: " << it->first << " := " << arr << eom;
+      debug() << "check_axioms: " << it->first << " = " << it->second << " of length " << pretty_short(len) <<" := " << string_of_array(econtent,len) << eom;
     }
 
   for(std::vector<symbol_exprt>::iterator it = boolean_symbols.begin();
       it != boolean_symbols.end(); it++) {
-    debug() << "check_axioms boolean_symbol: " << it->get_identifier() << eom; 
-    // " := " << get(*it) << eom;  
+    debug() << "check_axioms boolean_symbol: " << it->get_identifier() << " := " << get(*it) << eom;  
     fmodel[*it] = get(*it);
   }
 
@@ -807,6 +841,7 @@ bool string_refinementt::check_axioms()
   }
   
   return all_seen;
+  //return false;
 }
 
 
