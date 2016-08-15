@@ -70,7 +70,7 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
       jsa_predicates[index][instr_index++]=instr;
 
     jsa_predicates_arg[index]=jsa_predicates[index];
-    jsa_predicate_sizes[index++]=pred.size();
+    jsa_predicate_sizes[index++]=__CPROVER_jsa_index_t(pred.size());
   }
 
   const std::size_t num_heaps=count_heaps(counterexample);
