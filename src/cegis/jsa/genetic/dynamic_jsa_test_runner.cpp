@@ -34,6 +34,7 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
   const std::string lib(shared_library());
   const std::string opt(get_compile_options());
   prepare_fitness_tester_library(handle, fitness_tester, source_code, lib, opt);
+
   const individualt::queryt &query=individual.query;
   const std::size_t jsa_query_size=query.size();
   std::vector<__CPROVER_jsa_query_instructiont> jsa_query;
@@ -41,44 +42,55 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
   size_t index=0;
   for (const individualt::queryt::value_type &instr : query)
     jsa_query[index++]=instr;
+
   const individualt::invariantt &invariant=individual.invariant;
   const __CPROVER_jsa_index_t jsa_invariant_size=invariant.size();
-  __CPROVER_jsa_invariant_instructiont jsa_invariant[jsa_invariant_size];
+  std::vector<__CPROVER_jsa_invariant_instructiont> jsa_invariant;
+  jsa_invariant.resize(jsa_invariant_size);
   index=0;
-  for (const individualt::invariantt::value_type &instr : invariant)
+  for(const individualt::invariantt::value_type &instr : invariant)
     jsa_invariant[index++]=instr;
+
   const individualt::predicatest &preds=individual.predicates;
   const size_t num_preds=preds.size();
   const size_t max_pred_size=
-      std::max_element(preds.begin(), preds.begin(),
+    std::max_element(preds.begin(), preds.begin(),
           [](const individualt::predicatet &lhs, const individualt::predicatet &rhs)
           { return lhs.size() < rhs.size();})->size();
-  __CPROVER_jsa_index_t jsa_predicate_sizes[num_preds];
+  std::vector<__CPROVER_jsa_index_t> jsa_predicate_sizes;
+  jsa_predicate_sizes.resize(num_preds);
+
   __CPROVER_jsa_pred_instructiont jsa_predicates[num_preds][max_pred_size];
   const __CPROVER_jsa_pred_instructiont *jsa_predicates_arg[num_preds];
   index=0;
-  size_t instr_index=0;
-  for (const individualt::predicatet &pred : preds)
+  std::size_t instr_index=0;
+  for(const individualt::predicatet &pred : preds)
   {
     for (const individualt::predicatet::value_type &instr : pred)
       jsa_predicates[index][instr_index++]=instr;
+
     jsa_predicates_arg[index]=jsa_predicates[index];
     jsa_predicate_sizes[index++]=pred.size();
   }
-  const size_t num_heaps=count_heaps(counterexample);
-  __CPROVER_jsa_abstract_heapt heaps[num_heaps];
-  retrieve_heaps(counterexample, heaps);
-  const size_t num_words=count_words(counterexample);
-  __CPROVER_jsa_word_t words[num_words];
-  retrieve_words(counterexample, words);
+
+  const std::size_t num_heaps=count_heaps(counterexample);
+  std::vector<__CPROVER_jsa_abstract_heapt> heaps;
+  heaps.resize(num_heaps);
+  retrieve_heaps(counterexample, heaps.data());
+
+  const std::size_t num_words=count_words(counterexample);
+  std::vector<__CPROVER_jsa_word_t> words;
+  words.resize(num_words);
+  retrieve_words(counterexample, words.data());
+
   on_complete(EXIT_SUCCESS == fitness_tester(
       jsa_query_size, jsa_query.data(),
       jsa_invariant_size,
-      jsa_invariant,
-      jsa_predicate_sizes,
+      jsa_invariant.data(),
+      jsa_predicate_sizes.data(),
       jsa_predicates_arg,
-      heaps,
-      words));
+      heaps.data(),
+      words.data()));
 }
 
 void dynamic_jsa_test_runnert::join()
