@@ -43,7 +43,7 @@ public:
    *
    * @param program
    */
-  jsa_symex_learnt(const jsa_programt &program);
+  explicit jsa_symex_learnt(const jsa_programt &program);
 
   /**
    * @brief

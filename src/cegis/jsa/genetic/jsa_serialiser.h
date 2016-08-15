@@ -28,7 +28,7 @@ public:
    *
    * @param prog
    */
-  jsa_serialisert(const jsa_programt &prog);
+  explicit jsa_serialisert(const jsa_programt &prog);
 
   /**
    * @brief

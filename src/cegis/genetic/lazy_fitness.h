@@ -42,7 +42,7 @@ public:
    *
    * @param test_runner
    */
-  lazy_fitnesst(test_runnert &);
+  explicit lazy_fitnesst(test_runnert &);
 
   /**
    * @brief

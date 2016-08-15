@@ -61,7 +61,7 @@ public:
    *
    * @param other
    */
-  parallel_danger_verify_taskt(const parallel_danger_verify_taskt &other);
+  explicit parallel_danger_verify_taskt(const parallel_danger_verify_taskt &other);
 
   /**
    * @brief

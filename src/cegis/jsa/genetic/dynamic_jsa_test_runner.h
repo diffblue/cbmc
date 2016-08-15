@@ -50,7 +50,7 @@ public:
    *
    * @param source_code_provider
    */
-  dynamic_jsa_test_runnert(
+  explicit dynamic_jsa_test_runnert(
       const std::function<std::string(void)> &source_code_provider);
 
   /**

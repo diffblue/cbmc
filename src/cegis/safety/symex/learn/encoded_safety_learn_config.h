@@ -34,7 +34,7 @@ public:
    *
    * @param config
    */
-  encoded_safety_learn_configt(safety_learn_configt &config);
+  explicit encoded_safety_learn_configt(safety_learn_configt &config);
 
   /**
    * @brief

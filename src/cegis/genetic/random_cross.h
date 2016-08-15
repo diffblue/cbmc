@@ -32,7 +32,7 @@ public:
    *
    * @param random
    */
-  random_crosst(random_individualt &random);
+  explicit random_crosst(random_individualt &random);
 
   /**
    * @brief

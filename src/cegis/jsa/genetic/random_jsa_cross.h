@@ -34,7 +34,7 @@ public:
    *
    * @param random
    */
-  random_jsa_crosst(const jsa_randomt &random);
+  explicit random_jsa_crosst(const jsa_randomt &random);
 
   /**
    * @brief

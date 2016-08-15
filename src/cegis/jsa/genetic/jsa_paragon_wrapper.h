@@ -33,7 +33,7 @@ public:
    *
    * @param wrapped
    */
-  jsa_paragon_wrappert(jsa_symex_learnt &wrapped);
+  explicit jsa_paragon_wrappert(jsa_symex_learnt &wrapped);
 
   /**
    * @brief

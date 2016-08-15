@@ -39,7 +39,7 @@ public:
    *
    * @param program
    */
-  jsa_symex_verifyt(const jsa_programt &program);
+  explicit jsa_symex_verifyt(const jsa_programt &program);
 
   /**
    * @brief

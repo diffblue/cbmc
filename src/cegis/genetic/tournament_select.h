@@ -36,7 +36,7 @@ public:
    * @param random
    * @param rounds
    */
-  tournament_selectt(size_t rounds);
+  explicit tournament_selectt(size_t rounds);
 
   /**
    * @brief

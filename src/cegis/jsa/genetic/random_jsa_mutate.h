@@ -28,7 +28,7 @@ public:
    *
    * @param random
    */
-  random_jsa_mutatet(const jsa_randomt &random);
+  explicit random_jsa_mutatet(const jsa_randomt &random);
 
   /**
    * @brief

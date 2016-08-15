@@ -52,7 +52,7 @@ public:
    *
    * @param program
    */
-  danger_verify_configt(const danger_programt &program);
+  explicit danger_verify_configt(const danger_programt &program);
 
   /**
    * @brief

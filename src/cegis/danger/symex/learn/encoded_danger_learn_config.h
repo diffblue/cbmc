@@ -34,7 +34,7 @@ public:
    *
    * @param program
    */
-  encoded_danger_learn_configt(const danger_programt &program);
+  explicit encoded_danger_learn_configt(const danger_programt &program);
 
   /**
    * @brief

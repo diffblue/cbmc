@@ -31,7 +31,7 @@ public:
    *
    * @param learn
    */
-  jsa_genetic_convertt(const jsa_symex_learnt &learn);
+  explicit jsa_genetic_convertt(const jsa_symex_learnt &learn);
 
   /**
    * @brief
