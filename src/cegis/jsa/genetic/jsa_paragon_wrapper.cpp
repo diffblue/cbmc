@@ -29,6 +29,7 @@ void jsa_paragon_wrappert::convert(candidatet &current_candidate,
 {
   const jsa_programt &prog=wrapped.get_jsa_program();
   extract_jsa_genetic_candidate(current_candidate, prog, trace);
+  current_candidate.fitness=0;
 }
 
 const symbol_tablet &jsa_paragon_wrappert::get_symbol_table() const

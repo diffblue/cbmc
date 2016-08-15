@@ -1,4 +1,7 @@
 #!/bin/bash
+# Experiment script. Copy to "<cbmc_workspace>/regression/". Use as follows:
+# ./run-danger.sh [cegis|cegis-no-ranking] [cegis/cegis_danger_benchmark_<benchmark_id>]
+
 defaultArgs='--cegis-statistics --cegis-genetic main.c'
 cegisOut='main.cegis.out'
 cegisHeadStartOut='main.cegis-symex-head-start.out'
@@ -13,12 +16,10 @@ baseDir=`pwd`
 
 trap '' SIGTERM
 
-#for config in 'cegis' 'cegis-no-ranking'; do
-for config in 'cegis'; do
+for config in $1; do
  resultFile="${baseDir}/${config}.txt"
- #truncate -s 0 "${resultFile}"
- #for benchmark in ${baseDir}/${config}/cegis_danger_benchmark_*; do
- for benchmark in ${baseDir}/${config}/cegis_danger_benchmark_01_19/; do
+ truncate -s 0 "${resultFile}"
+ for benchmark in ${baseDir}/$2; do
   echo "${benchmark}"
   cd "${benchmark}"
   echo -n `basename ${benchmark}` >>"${resultFile}"

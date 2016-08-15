@@ -101,7 +101,10 @@ void cegis_parse_optionst::get_command_line_options(optionst &options)
       replace_rate=string2integer(cmdline.get_value("cegis-genetic-replace-rate")).to_ulong();
     options.set_option("cegis-genetic-replace-rate", replace_rate);
     options.set_option("danger-no-ranking", cmdline.isset("danger-no-ranking"));
-    options.set_option(CEGIS_SYMEX_HEAD_START, cmdline.isset(CEGIS_SYMEX_HEAD_START));
+    unsigned int cegis_symex_head_start=0u;
+    if (cmdline.isset(CEGIS_SYMEX_HEAD_START))
+      cegis_symex_head_start=string2integer(cmdline.get_value(CEGIS_SYMEX_HEAD_START)).to_ulong();
+    options.set_option(CEGIS_SYMEX_HEAD_START, cegis_symex_head_start);
     options.set_option(CEGIS_SHOW_ITERATIONS, cmdline.isset(CEGIS_SHOW_ITERATIONS));
     options.set_option(CEGIS_KEEP_GOTO_PROGRAMS, cmdline.isset(CEGIS_KEEP_GOTO_PROGRAMS));
   }

@@ -62,7 +62,7 @@ void read_element(__CPROVER_jsa_word_t &e, const exprt &value)
 template<class structt>
 void make_zero(structt &value)
 {
-  value=(const structt ) { 0 };
+  value={};
 }
 
 void read_element(__CPROVER_jsa_concrete_nodet &e, const exprt &value)

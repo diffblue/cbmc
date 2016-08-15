@@ -98,7 +98,7 @@ int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
     const size_t rounds, fitnesst &fitness, mutatet &mutate, crosst &cross,
     convertert &converter, preproct &preproc, symex_learnt &symex_learn)
 {
-  const size_t symex_head_start=opt.get_bool_option(CEGIS_SYMEX_HEAD_START);
+  const size_t symex_head_start=opt.get_unsigned_int_option(CEGIS_SYMEX_HEAD_START);
   const individual_to_danger_solution_deserialisert deser(prog, info_fac);
   if (opt.get_bool_option(CEGIS_MATCH_SELECT))
   {

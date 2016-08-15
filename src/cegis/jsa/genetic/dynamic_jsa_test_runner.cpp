@@ -44,7 +44,7 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
     jsa_query[index++]=instr;
 
   const individualt::invariantt &invariant=individual.invariant;
-  const __CPROVER_jsa_index_t jsa_invariant_size=invariant.size();
+  const __CPROVER_jsa_index_t jsa_invariant_size=__CPROVER_jsa_index_t(invariant.size());
   std::vector<__CPROVER_jsa_invariant_instructiont> jsa_invariant;
   jsa_invariant.resize(jsa_invariant_size);
   index=0;
@@ -53,24 +53,19 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
 
   const individualt::predicatest &preds=individual.predicates;
   const size_t num_preds=preds.size();
-  const size_t max_pred_size=
-    std::max_element(preds.begin(), preds.begin(),
-          [](const individualt::predicatet &lhs, const individualt::predicatet &rhs)
-          { return lhs.size() < rhs.size();})->size();
   std::vector<__CPROVER_jsa_index_t> jsa_predicate_sizes;
-  jsa_predicate_sizes.resize(num_preds);
-
-  __CPROVER_jsa_pred_instructiont jsa_predicates[num_preds][max_pred_size];
-  const __CPROVER_jsa_pred_instructiont *jsa_predicates_arg[num_preds];
-  index=0;
-  std::size_t instr_index=0;
+  jsa_predicate_sizes.reserve(num_preds);
+  std::vector<std::vector<__CPROVER_jsa_pred_instructiont> > jsa_predicates;
+  jsa_predicates.reserve(num_preds);
+  std::vector<const __CPROVER_jsa_pred_instructiont *> jsa_predicates_arg;
   for(const individualt::predicatet &pred : preds)
   {
+    jsa_predicates.push_back(decltype(jsa_predicates)::value_type());
     for (const individualt::predicatet::value_type &instr : pred)
-      jsa_predicates[index][instr_index++]=instr;
+      jsa_predicates.back().push_back(instr);
 
-    jsa_predicates_arg[index]=jsa_predicates[index];
-    jsa_predicate_sizes[index++]=__CPROVER_jsa_index_t(pred.size());
+    jsa_predicates_arg.push_back(jsa_predicates.back().data());
+    jsa_predicate_sizes.push_back(__CPROVER_jsa_index_t(pred.size()));
   }
 
   const std::size_t num_heaps=count_heaps(counterexample);
@@ -88,7 +83,7 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
       jsa_invariant_size,
       jsa_invariant.data(),
       jsa_predicate_sizes.data(),
-      jsa_predicates_arg,
+      jsa_predicates_arg.data(),
       heaps.data(),
       words.data()));
 }

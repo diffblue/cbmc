@@ -8,7 +8,7 @@ jsa_serialisert::jsa_serialisert(const jsa_programt &prog) :
 }
 
 #define FITNESS "fitness"
-#define OP0 "op1"
+#define OP0 "op0"
 #define OP1 "op1"
 #define RESULT_OP "result_op"
 #define OPCODE "opcode"
@@ -92,7 +92,7 @@ void jsa_serialisert::operator()(jsa_genetic_solutiont &entity,
   }
   const const_iterator query=named_sub.find(QUERY);
   assert(named_sub.end() != query);
-  for (const irept &instruction : invariant->second.get_sub())
+  for (const irept &instruction : query->second.get_sub())
   {
     jsa_genetic_solutiont::queryt::value_type instr;
     instr.opcode=instruction.get_long_long(OPCODE);
