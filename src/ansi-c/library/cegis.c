@@ -1,3 +1,7 @@
+#ifndef __CPROVER_CEGIS_H_
+#define __CPROVER_CEGIS_H_
+#endif
+
 #ifndef __CPROVER_cegis_number_of_vars
 #define __CPROVER_cegis_number_of_vars 2
 #endif
