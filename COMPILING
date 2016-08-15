@@ -15,7 +15,8 @@ environments:
 - Cygwin
   (We recommend the i686-pc-mingw32-g++ cross compiler, version 4.7 or above.)
 
-- Microsoft's Visual Studio 2012, 2013 or 2015 (older versions won't work)
+- Microsoft's Visual Studio version 12 (2013), version 14 (2015),
+  or version 15 (older versions won't work)
 
 The rest of this document is split up into three parts: compilation on
 Linux, MacOS, Windows.  Please read the section appropriate for your
@@ -164,7 +165,7 @@ Follow these instructions:
    BUILD_ENV = MinGW
 
 3B) To compile with Visual Studio, make sure you have at least Visual
-   Studio 2012, and adjust the second line of config.inc to say
+   Studio version 12 (2013), and adjust the second line of config.inc to say
 
    BUILD_ENV = MSVC
 
