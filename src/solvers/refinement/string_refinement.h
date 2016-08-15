@@ -230,6 +230,9 @@ protected:
   // current set of lemmas (unquantified)
   std::vector<exprt> cur;
 
+  // succinct and pretty way to display an expression
+  std::string pretty_short(exprt expr);
+
 };
 
 #endif

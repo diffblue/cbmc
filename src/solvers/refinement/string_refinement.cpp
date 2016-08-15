@@ -14,7 +14,11 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/sat/satcheck.h>
 #include <sstream>
 
-#include <iostream>
+
+// This is mostly for debugging:
+#include <langapi/languages.h>
+#include <ansi-c/ansi_c_language.h>
+//#include <iostream>
 
 // Types used in this refinement
 unsignedbv_typet char_type(CHAR_WIDTH);
@@ -26,8 +30,8 @@ constant_exprt index_max(integer2binary(1<<30, INDEX_WIDTH), index_type);
 
 
 // Succinct version of pretty()
-std::string pretty_short(exprt expr) {
-  std::ostringstream buf;
+std::string string_refinementt::pretty_short(exprt expr) {
+  /*  std::ostringstream buf;
   if(expr.get(ID_identifier) != "") {
     buf << expr.get(ID_identifier);
   } else if (expr.operands().size() > 0) {
@@ -36,7 +40,12 @@ std::string pretty_short(exprt expr) {
   } else if(expr.get(ID_value) != "") {
     buf << expr.get(ID_value);
   } else buf << expr.pretty();
-  return buf.str();
+  return buf.str();*/
+
+  languagest languages(ns, new_ansi_c_language());
+  std::string string_value;
+  languages.from_expr(expr, string_value);
+  return string_value;
 }
 
 // associate a string to symbols
@@ -159,8 +168,8 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & 
   if(unrefined_string.id()==ID_function_application) {
     string_exprt s;
     s.of_function_application(to_function_application_expr(unrefined_string), axioms);
-    binary_relation_exprt lem1(s.length(), ID_le,index_max);
-    axioms.push_back(string_axiomt(lem1));
+    //binary_relation_exprt lem1(s.length(), ID_le,index_max);
+    //axioms.push_back(string_axiomt(lem1));
     return s;
   }
   else if(unrefined_string.id()==ID_symbol) {
@@ -169,8 +178,9 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & 
     //return of_symbol(to_symbol_expr(unrefined_string));
   }
   else {
-    std:: cout << "of_expr( " << unrefined_string.pretty() << std::endl;
-    throw "string_exprt of something else than function application not implemented";
+    //std:: cout << "of_expr( " << unrefined_string.pretty() << std::endl;
+    throw ("string_exprt of " + unrefined_string.pretty() 
+	   + "which is not a symbol or a function application");
   }
 }
 
@@ -186,8 +196,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
   const exprt &name = expr.function();
   if (name.id() == ID_symbol) {
     const irep_idt &id = to_symbol_expr(name).get_identifier();
-    std::cout << "string_exprt::of_function_application(" 
-	      << id << ")" << std::endl;
+    //std::cout << "string_exprt::of_function_application(" 
+    //<< id << ")" << std::endl;
     if (id == "__CPROVER_uninterpreted_string_literal") {
       return of_string_literal(expr,axioms);
     } else if (id == "__CPROVER_uninterpreted_strcat") {
@@ -300,8 +310,7 @@ void string_exprt::of_string_char_set
   string_exprt str = of_expr(args[0],axioms);
   symbol_exprt c = string_refinementt::fresh_symbol("char", char_type);
   
-  std::cout << "of_string_char_set : this has to be checked" << std::endl;
-  
+  //THIS HAS NOT BEEN CHECKED:  
   axioms.push_back(equal_exprt(c,args[2]));
   with_exprt sarrnew(str.content(), args[1], c);
   implies_exprt lemma(binary_relation_exprt(args[1], ID_lt, str.length()),
@@ -320,10 +329,10 @@ void string_exprt::of_string_char_set
 ///////////////////////
 
 
-// Nothing particular is done there for now
+// We add instantiations before launching the solver
 void string_refinementt::post_process()
 {  
-  debug() << "string_refinementt::post_process()" << eom;
+  //debug() << "string_refinementt::post_process()" << eom;
   add_instantiations(true);
 
   SUB::post_process();
@@ -378,7 +387,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
     throw "string_refinementt::convert_symbol got empty identifier";
 
   if (is_unrefined_string_type(type)) {
-    debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
+    //debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
     // this can happen because of boolbvt::convert_equality
     string_exprt str = string_exprt::find_symbol(to_symbol_expr(expr));
     bvt bv = convert_bv(str);
@@ -406,8 +415,8 @@ bvt string_refinementt::convert_function_application(
 
   if (name.id() == ID_symbol) {
     const irep_idt &id = to_symbol_expr(name).get_identifier();
-    debug() << "string_refinementt::convert_function_application(" 
-	    << id << ")" << eom;
+    //debug() << "string_refinementt::convert_function_application(" 
+    // << id << ")" << eom;
     if (id == string_literal_func 
 	|| id == string_concat_func 
 	|| id == string_substring_func
@@ -457,7 +466,9 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 
 void string_refinementt::add_lemma(const exprt &lemma)
 {
-  debug() << "adding lemma " << lemma.pretty() << eom;
+  debug() << "adding lemma " << pretty_short(lemma) << eom;
+  //lemma.pretty() << eom;
+
   prop.l_set_to_true(convert(lemma));
   cur.push_back(lemma);
 }
@@ -665,8 +676,8 @@ bvt string_refinementt::convert_string_char_at(
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //string_char_at expects 2 arguments
   string_exprt str = make_string(args[0]);
-  debug() << "in convert_string_char_at: we need to add something to"
-	  << " the list of lemmas" << eom;
+  debug() << "in convert_string_char_at: we add the index to the"
+	  << " index set" << eom;
   index_set[str.content()].insert(args[1]);
   return convert_bv(str[args[1]]);
 }
@@ -681,7 +692,7 @@ bvt string_refinementt::convert_string_char_at(
 // with the found indexes, and add them as lemmas.
 void string_refinementt::add_instantiations(bool first)
 {
-  debug() << "string_refinementt::add_instantiations" << eom;
+  //debug() << "string_refinementt::add_instantiations" << eom;
   if (first) {
     for (size_t i = 0; i < string_axioms.size(); ++i) {
       update_index_set(string_axioms[i]);
@@ -693,16 +704,22 @@ void string_refinementt::add_instantiations(bool first)
 
   cur.clear();
 
-  debug() << "going through the index set:" << eom;
+  debug() << "string_refinementt::add_instantiations: "
+	  << "going through the index set:" << eom;
   for (std::map<exprt, expr_sett>::iterator i = index_set.begin(),
 	 end = index_set.end(); i != end; ++i) {
     const exprt &s = i->first;
-    debug() << pretty_short(s) << " ---- " << eom;
+    debug() << "IS(" << pretty_short(s) << ") == {";
+
+    for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
+         j != end; ++j) 
+      debug() << pretty_short (*j) << "; ";
+    debug() << "}"  << eom;
+
 
     for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
          j != end; ++j) {
       const exprt &val = *j;
-      debug() << "val " << val << " : " << eom;
 
       for (size_t k = 0; k < string_axioms.size(); ++k) {
         exprt lemma = instantiate(string_axioms[k], s, val);
@@ -712,7 +729,6 @@ void string_refinementt::add_instantiations(bool first)
       }
 
     }
-    debug() << eom;
   }
 }
 
@@ -724,7 +740,7 @@ unsigned integer_of_expr(const constant_exprt & expr) {
 std::string string_refinementt::string_of_array(const exprt &arr, const exprt &size)
 {
   unsigned n = integer_of_expr(to_constant_expr(size));
-  if(n>500) return "array-too-big";
+  if(n>500) return "very long string";
   if(n==0) return "\"\"";
   unsigned str[n];
   exprt val = get(arr);
@@ -742,11 +758,16 @@ std::string string_refinementt::string_of_array(const exprt &arr, const exprt &s
   }
 
   std::ostringstream buf;
+  buf << "\"";
   for(unsigned i = 0; i < n; i++) {
     char c = (char) str[i];
-    buf << c << ":";
+    if(31<c)
+      buf << c ;
+    else
+      buf << "?";
   }
   
+  buf << "\"";
   return buf.str();
 }
 
@@ -800,12 +821,12 @@ bool string_refinementt::check_axioms()
 
       fmodel[elength] = len;
       fmodel[econtent] = arr;
-      debug() << "check_axioms: " << it->first << " = " << it->second << " of length " << pretty_short(len) <<" := " << string_of_array(econtent,len) << eom;
+      debug() << "check_axioms: " << it->first << " = " << pretty_short(it->second) << " of length " << pretty_short(len) <<" := " << string_of_array(econtent,len) << eom;
     }
 
   for(std::vector<symbol_exprt>::iterator it = boolean_symbols.begin();
       it != boolean_symbols.end(); it++) {
-    debug() << "check_axioms boolean_symbol: " << it->get_identifier() << " := " << get(*it) << eom;  
+    debug() << "check_axioms boolean_symbol: " << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;  
     fmodel[*it] = get(*it);
   }
 
@@ -937,7 +958,8 @@ exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, con
 	found = true;
 	neg = (it->second == 1);
       } else 
-	std::cout << "in compute_subst: warning: occurences of qvar canceled out " << std::endl;
+	debug() << "in string_refinementt::compute_subst:"
+		<< " warning: occurences of qvar canceled out " << eom;
     } else {
       if (it->second == 0) {
       } else if (it->second == -1) {
@@ -1079,7 +1101,10 @@ exprt string_refinementt::instantiate(const string_axiomt &axiom,
   exprt body(axiom.body);
   implies_exprt instance(premise, body);
 
-  debug() << "string_refinementt::instantiate : replaces occurances of" << axiom.qvar << " by " << r  << " in " << instance << eom;
+  /*debug() << "string_refinementt::instantiate : replaces " << eom 
+	  << "occurances of" << pretty_short(axiom.qvar) << eom
+	  << "by " << pretty_short(r)  << eom <<
+	  << "in " << pretty_short(instance) << eom;*/
   replace_expr(axiom.qvar, r, instance);
   return instance;
 }
