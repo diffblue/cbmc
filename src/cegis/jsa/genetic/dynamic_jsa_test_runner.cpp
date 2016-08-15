@@ -35,8 +35,9 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
   const std::string opt(get_compile_options());
   prepare_fitness_tester_library(handle, fitness_tester, source_code, lib, opt);
   const individualt::queryt &query=individual.query;
-  const __CPROVER_jsa_index_t jsa_query_size=query.size();
-  __CPROVER_jsa_query_instructiont jsa_query[jsa_query_size];
+  const std::size_t jsa_query_size=query.size();
+  std::vector<__CPROVER_jsa_query_instructiont> jsa_query;
+  jsa_query.resize(jsa_query_size);
   size_t index=0;
   for (const individualt::queryt::value_type &instr : query)
     jsa_query[index++]=instr;
@@ -71,7 +72,7 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
   __CPROVER_jsa_word_t words[num_words];
   retrieve_words(counterexample, words);
   on_complete(EXIT_SUCCESS == fitness_tester(
-      jsa_query_size,jsa_query,
+      jsa_query_size, jsa_query.data(),
       jsa_invariant_size,
       jsa_invariant,
       jsa_predicate_sizes,
