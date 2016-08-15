@@ -119,6 +119,20 @@ void add_cegis_library(symbol_tablet &st, goto_functionst &gf,
   const std::string library_src(
       get_cegis_library_text(num_vars, num_consts, max_solution_size,
           func_name));
+
+  //if(cmdline.isset("gcc"))
+  /*{
+    // There are gcc versions that target Windows (MinGW for example),
+    // and we support that.
+    config.ansi_c.preprocessor=configt::ansi_ct::preprocessort::PP_GCC;
+    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
+
+    // enable Cygwin
+    #ifdef _WIN32
+    config.ansi_c.defines.push_back("__CYGWIN__");
+    #endif
+  }*/
+
   add_library(library_src, st, msg);
   goto_convert(func_name, st, gf, msg);
   set_loop_id(gf, func_name);

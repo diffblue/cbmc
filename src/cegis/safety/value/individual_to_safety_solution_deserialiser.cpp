@@ -10,10 +10,6 @@ individual_to_safety_solution_deserialisert::individual_to_safety_solution_deser
 {
 }
 
-individual_to_safety_solution_deserialisert::~individual_to_safety_solution_deserialisert()
-{
-}
-
 void individual_to_safety_solution_deserialisert::operator()(
     safety_goto_solutiont &result, const irept &sdu) const
 {

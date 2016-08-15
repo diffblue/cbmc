@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
  * @param program
  * @param solution
  */
-void print_danger_program(
+void print_jsa_solution(
     messaget::mstreamt &os,
     const class jsa_programt &program,
     const class jsa_solutiont &solution);

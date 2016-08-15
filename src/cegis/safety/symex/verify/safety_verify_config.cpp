@@ -1,3 +1,4 @@
+#include <cegis/value/assignments_printer.h>
 #include <cegis/invariant/symex/verify/insert_constraint.h>
 #include <cegis/invariant/symex/verify/extract_counterexample.h>
 #include <cegis/safety/constraint/safety_constraint_factory.h>
@@ -21,8 +22,10 @@ void safety_verify_configt::process(const candidatet &candidate)
   const safety_programt &prog=program;
   const invariant_programt::const_invariant_loopst loops(prog.get_loops());
   assert(!loops.empty());
-  const size_t offset(program.x0_choices.size() + loops.front()->skolem_choices.size());
-  invariant_insert_constraint(quantifiers, program, create_safety_constraint, offset);
+  const size_t offset(
+      program.x0_choices.size() + loops.front()->skolem_choices.size());
+  invariant_insert_constraint(quantifiers, program, create_safety_constraint,
+      offset);
   safety_insert_candidate(program, candidate);
   program.gf.update();
 }
@@ -54,4 +57,23 @@ void safety_verify_configt::convert(counterexamplest &counterexamples,
   assert(!loops.empty());
   // TODO: Implement for multiple loops (change constraint, instrumentation)
   invariant_extract_counterexample(ass, trace, loops.front()->skolem_choices);
+}
+
+void safety_verify_configt::show_counterexample(messaget::mstreamt &os,
+    const counterexamplet &counterexample) const
+{
+  os << "<safety_counterexample>" << messaget::endl;
+  os << "  <x0>" << messaget::endl;
+  const symbol_tablet &st=get_symbol_table();
+  print_assignments(os, st, counterexample.x0);
+  os << "  </x0>" << messaget::endl;
+  os << "  <loops>" << messaget::endl;
+  for (const counterexamplet::assignments_per_loopt::value_type &loop : counterexample.x)
+  {
+    os << "    <loop>" << messaget::endl;
+    print_assignments(os, st, loop);
+    os << "    </loop>" << messaget::endl;
+  }
+  os << "  </loops>" << messaget::endl;
+  os << "</safety_counterexample>" << messaget::endl << messaget::eom;
 }

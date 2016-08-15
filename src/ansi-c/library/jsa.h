@@ -21,6 +21,8 @@
 #ifndef __CPROVER
 #include <assert.h>
 #include <string.h>
+#include <setjmp.h>
+extern jmp_buf __CPROVER_jsa_jump_buffer;
 #endif
 #include <stdbool.h>
 
@@ -156,8 +158,8 @@ typedef struct __CPROVER_jsa_abstract_heap
 #define __CPROVER_jsa_assume(c) __CPROVER_assume(c)
 #define __CPROVER_jsa_assert(c, str) __CPROVER_assert(c, str)
 #else
-#define __CPROVER_jsa_assume(c) assert(c)
-#define __CPROVER_jsa_assert(c, str) assert(c && str)
+#define __CPROVER_jsa_assume(c) do { if (!(c)) longjmp(__CPROVER_jsa_jump_buffer, 1); } while(false)
+#define __CPROVER_jsa_assert(c, str) assert((c) && str)
 #endif
 
 // Heap comparison
@@ -278,7 +280,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa__internal_set_previous(
 #define __CPROVER_jsa__internal_get_previous(heap_ptr, node) \
   (__CPROVER_jsa__internal_is_concrete_node(node) ? (heap_ptr)->concrete_nodes[node].previous : (heap_ptr)->abstract_nodes[__CPROVER_jsa__internal_get_abstract_node_index(node)].previous)
 
-__CPROVER_jsa_inline void __CPROVER_jsa__internal_remove(
+__CPROVER_jsa_inline __CPROVER_jsa_node_id_t __CPROVER_jsa__internal_remove(
     __CPROVER_jsa_abstract_heapt * const heap,
     const __CPROVER_jsa_node_id_t node_id_to_remove)
 #ifdef __CPROVER_JSA_DEFINE_TRANSFORMERS
@@ -286,6 +288,8 @@ __CPROVER_jsa_inline void __CPROVER_jsa__internal_remove(
   __CPROVER_jsa_assume(__CPROVER_jsa__internal_is_concrete_node(node_id_to_remove));
   const __CPROVER_jsa_id_t previous_node_id=heap->concrete_nodes[node_id_to_remove].previous;
   const __CPROVER_jsa_id_t next_node_id=heap->concrete_nodes[node_id_to_remove].next;
+  __CPROVER_jsa__internal_set_next(heap, node_id_to_remove, __CPROVER_jsa_null);
+  __CPROVER_jsa__internal_set_previous(heap, node_id_to_remove, __CPROVER_jsa_null);
   if (__CPROVER_jsa_null != previous_node_id)
     __CPROVER_jsa__internal_set_next(heap, previous_node_id, next_node_id);
   else
@@ -295,6 +299,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa__internal_remove(
   }
   if (__CPROVER_jsa_null != next_node_id)
     __CPROVER_jsa__internal_set_previous(heap, next_node_id, previous_node_id);
+  return next_node_id;
 }
 #else
 ;
@@ -630,7 +635,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa_remove(
 #ifdef __CPROVER_JSA_DEFINE_TRANSFORMERS
 {
   const __CPROVER_jsa_id_t node_id_to_remove=heap->iterators[it].previous_node_id;
-  __CPROVER_jsa__internal_remove(heap, node_id_to_remove);
+  heap->iterators[it].node_id=__CPROVER_jsa__internal_remove(heap, node_id_to_remove);
   heap->iterators[it].previous_node_id=__CPROVER_jsa_null;
 }
 #else
@@ -793,6 +798,8 @@ __CPROVER_jsa_extern __CPROVER_jsa_word_t *__CPROVER_JSA_PRED_OPS[__CPROVER_JSA_
 __CPROVER_jsa_extern __CPROVER_jsa_word_t *__CPROVER_JSA_PRED_RESULT_OPS[__CPROVER_JSA_NUM_PRED_RESULT_OPS];
 __CPROVER_jsa_extern __CPROVER_jsa_word_t __CPROVER_JSA_MAX_PRED_SIZE_RELAY[__CPROVER_JSA_MAX_PRED_SIZE];
 __CPROVER_jsa_extern __CPROVER_jsa_word_t __CPROVER_JSA_MAX_QUERY_SIZE_RELAY[__CPROVER_JSA_MAX_QUERY_SIZE];
+__CPROVER_jsa_extern __CPROVER_jsa_word_t __CPROVER_JSA_MAX_ITERATORS_RELAY[__CPROVER_JSA_MAX_ITERATORS];
+__CPROVER_jsa_extern __CPROVER_jsa_word_t __CPROVER_JSA_MAX_LISTS_RELAY[__CPROVER_JSA_MAX_LISTS];
 //__CPROVER_jsa_extern __CPROVER_jsa_word_t __CPROVER_JSA_HEAP_VARS[__CPROVER_JSA_NUM_PRED_RESULT_OPS];
 //__CPROVER_jsa_extern __CPROVER_jsa_word_t __CPROVER_JSA_ORG_HEAP_VARS[__CPROVER_JSA_NUM_PRED_RESULT_OPS];
 //__CPROVER_jsa_extern __CPROVER_jsa_word_t __CPROVER_JSA_QUERIED_HEAP_VARS[__CPROVER_JSA_NUM_PRED_RESULT_OPS];
@@ -913,6 +920,13 @@ __CPROVER_jsa_inline __CPROVER_jsa_word_t __CPROVER_jsa_execute_pred(
 
 // Instrumentation adds a lambda variable at program entry. It'll have id 0.
 #define __CPROVER_jsa__internal_lambda_op_id 0
+#define FILTER_QUERY_INSTR_ID 0
+typedef enum {
+  FILTER = 0,
+  COPY_IF = 1,
+  MAP = 2,
+  MAP_IN_PLACE = 3
+} __CPROVER_jsa_query_idt;
 
 __CPROVER_jsa_inline void __CPROVER_jsa_stream_op(
     __CPROVER_jsa_abstract_heapt * const heap,
@@ -935,20 +949,20 @@ __CPROVER_jsa_inline void __CPROVER_jsa_stream_op(
       const __CPROVER_jsa_word_t pred_result=__CPROVER_jsa_execute_pred(pred_id);
       switch(id)
       {
-      case 0: // filter
+      case FILTER:
         if (pred_result == 0)
-          __CPROVER_jsa__internal_remove(heap, node);
+          node=__CPROVER_jsa__internal_remove(heap, node);
         else
           node=__CPROVER_jsa__internal_get_next(heap, node);
         break;
-      case 1: // copy_if
+      case COPY_IF:
         if (pred_result != 0)
           __CPROVER_jsa_add(heap, copy, value);
         break;
-      case 2: // map
+      case MAP:
         __CPROVER_jsa_add(heap, copy, pred_result);
         break;
-      case 3: // map_in_place
+      case MAP_IN_PLACE:
         heap->concrete_nodes[node].value=pred_result;
         break;
       }
@@ -967,7 +981,7 @@ typedef struct __CPROVER_jsa_query_instruction
   __CPROVER_jsa_opt op1;
 } __CPROVER_jsa_query_instructiont;
 
-#define __CPROVER_JSA_NUM_QUERY_INSTRUCTIONS 1u
+#define __CPROVER_JSA_NUM_QUERY_INSTRUCTIONS 4u
 
 __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_query(
     const __CPROVER_jsa_abstract_heapt * const heap,
@@ -987,16 +1001,16 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_query(
     __CPROVER_jsa_assume(instr.op0 < __CPROVER_JSA_NUM_PREDS);
     switch(instr.opcode)
     {
-      case 0: // filter
+      case FILTER:
         __CPROVER_jsa_assume(__CPROVER_jsa_null == instr.op1);
         break;
-      case 1:// copy_if
+      case COPY_IF:
         __CPROVER_jsa_assume_valid_list(heap, instr.op1);
         break;
-      case 2:// map
+      case MAP:
         __CPROVER_jsa_assume_valid_list(heap, instr.op1);
         break;
-      case 3:// map_in_place
+      case MAP_IN_PLACE:
         __CPROVER_jsa_assume(__CPROVER_jsa_null == instr.op1);
         break;
       default:
@@ -1024,7 +1038,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa_query_execute(
 
 __CPROVER_jsa_inline void __CPROVER_jsa_full_query_execute(
     __CPROVER_jsa_abstract_heapt * const heap,
-    __CPROVER_jsa_query_instructiont * const query,
+    const __CPROVER_jsa_query_instructiont * const query,
     const __CPROVER_jsa__internal_index_t query_size)
 {
   const __CPROVER_jsa_iterator_id_t it=query[0].op0;

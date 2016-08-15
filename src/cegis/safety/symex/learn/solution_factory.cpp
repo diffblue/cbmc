@@ -114,7 +114,7 @@ void create_safety_solution(safety_goto_solutiont &solution,
   size_t loop_idx=0;
   for (const goto_trace_stept &step : trace.steps)
   {
-    if (!is_program_indivdual_decl(step)) continue;
+    if (!is_program_individual_decl(step)) continue;
     const exprt::operandst &instrs=step.full_lhs_value.operands();
     set_result_var(result_var_names, idx, loop_idx++);
     solution.push_back(goto_programt::instructionst());

@@ -42,7 +42,8 @@ public:
     const std::string::size_type op_id_pos=id.find(OP_SIGNIFIER);
     if (std::string::npos == op_id_pos) return;
     const std::string::size_type value_pos=op_id_pos + strlen(OP_SIGNIFIER);
-    const size_t op_id=string2integer(id.substr(value_pos)).to_ulong();
+    const mp_integer::llong_t v=string2integer(id.substr(value_pos)).to_long();
+    const size_t op_id=static_cast<size_t>(v);
     count=std::max(count, op_id + 1);
   }
 

@@ -44,14 +44,14 @@ namespace
 typedef messaget::mstreamt mstreamt;
 
 template<class learnt, class verifyt, class preproct>
-int configure_ui_and_run(mstreamt &os, const optionst &options, learnt &learn,
+int configure_ui_and_run(mstreamt &os, const optionst &opt, learnt &learn,
     verifyt &verify, preproct &preproc)
 {
   null_seedt seed;
-  const size_t max_prog_size=options.get_unsigned_int_option(CEGIS_MAX_SIZE);
-  if (!options.get_bool_option(CEGIS_STATISTICS))
+  const size_t max_prog_size=opt.get_unsigned_int_option(CEGIS_MAX_SIZE);
+  if (!opt.get_bool_option(CEGIS_STATISTICS))
     return run_cegis(learn, verify, preproc, seed, max_prog_size, os);
-  cegis_statistics_wrappert<learnt, verifyt, mstreamt> stat(learn, verify, os);
+  cegis_statistics_wrappert<learnt, verifyt, mstreamt> stat(learn, verify, os, opt);
   return run_cegis(stat, stat, preproc, seed, max_prog_size, os);
 }
 
@@ -73,7 +73,6 @@ int configure_backend(mstreamt &os, const optionst &o,
   lazy_genetic_settingst<safety_program_genetic_settingst<preproct> > lazy(set);
   invariant_exec_body_providert<safety_programt> body(DANGER_EXECUTE, prog);
   instruction_set_info_factoryt info_fac(std::ref(body));
-  const size_t pop_size=o.get_unsigned_int_option(CEGIS_POPSIZE);
   const size_t rounds=o.get_unsigned_int_option(CEGIS_ROUNDS);
   const typet type=cegis_default_integer_type(); // XXX: Currently single user data type.
   random_individualt rnd(type, info_fac, lazy);
@@ -82,32 +81,36 @@ int configure_backend(mstreamt &os, const optionst &o,
       prog, lazy.max_prog_sz_provider(), DANGER_EXECUTE);
   dynamic_safety_test_runnert test_runner(std::ref(src),
       lazy.max_prog_sz_per_index_provider());
-  lazy_fitnesst<dynamic_safety_test_runnert, safety_goto_cet> fit(test_runner);
+  typedef lazy_fitnesst<program_populationt, dynamic_safety_test_runnert,
+      safety_goto_cet> fitnesst;
+  fitnesst fit(test_runner);
   random_mutatet mutate(rnd, lazy.num_consts_provder());
   random_crosst cross(rnd);
   const size_t symex_head_start=o.get_unsigned_int_option(CEGIS_SYMEX_HEAD_START);
   if (o.get_bool_option(CEGIS_MATCH_SELECT))
   {
-    match_selectt select(fit.get_test_case_data(), rnd, pop_size, rounds);
-    typedef ga_learnt<match_selectt, random_mutatet, random_crosst,
-        lazy_fitnesst<dynamic_safety_test_runnert, safety_goto_cet>,
-        safety_fitness_configt> ga_learnt;
-    ga_learnt ga_learn(o, select, mutate, cross, fit, safety_fitness_config);
+    typedef match_selectt<program_populationt> selectt;
+    selectt select(fit.get_test_case_data(), rnd, rounds);
+    typedef ga_learnt<selectt, random_mutatet, random_crosst,
+        lazy_fitnesst<program_populationt, dynamic_safety_test_runnert,
+            safety_goto_cet>, safety_fitness_configt> ga_learnt;
+    ga_learnt ga_learn(o, rnd, select, mutate, cross, fit, safety_fitness_config);
 #ifndef _WIN32
     const individual_to_safety_solution_deserialisert deser(prog, info_fac);
     concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn,
-        serialise, std::ref(deser), deserialise, symex_head_start);
+        serialise, deser, deserialise, symex_head_start);
 #else
     // TODO: Remove once task_pool supports Windows.
     ga_learnt &learner=ga_learn;
 #endif
     return configure_ui_and_run(os, o, learner, verify, pre);
   }
-  tournament_selectt select(rnd, pop_size, rounds);
-  typedef ga_learnt<tournament_selectt, random_mutatet, random_crosst,
-      lazy_fitnesst<dynamic_safety_test_runnert, safety_goto_cet>,
-      safety_fitness_configt> ga_learnt;
-  ga_learnt ga_learn(o, select, mutate, cross, fit, safety_fitness_config);
+  typedef tournament_selectt<program_populationt> selectt;
+  selectt select(rounds);
+  typedef ga_learnt<selectt, random_mutatet, random_crosst,
+      lazy_fitnesst<program_populationt, dynamic_safety_test_runnert,
+          safety_goto_cet>, safety_fitness_configt> ga_learnt;
+  ga_learnt ga_learn(o, rnd, select, mutate, cross, fit, safety_fitness_config);
 #ifndef _WIN32
   const individual_to_safety_solution_deserialisert deser(prog, info_fac);
   concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn, serialise,

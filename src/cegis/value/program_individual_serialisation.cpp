@@ -10,7 +10,7 @@
 #include <cegis/genetic/instruction_set_info_factory.h>
 #include <cegis/value/program_individual_serialisation.h>
 
-bool is_program_indivdual_decl(const goto_trace_stept &step)
+bool is_program_individual_decl(const goto_trace_stept &step)
 {
   if (goto_trace_stept::DECL != step.type) return false;
   const exprt &value=step.full_lhs_value;
@@ -48,7 +48,7 @@ program_individualt to_program_individual(const invariant_programt &prog,
   program_individualt individual;
   individual.fitness=0u;
   for (const goto_trace_stept &step : trace.steps)
-    if (is_program_indivdual_decl(step))
+    if (is_program_individual_decl(step))
     {
       program_individualt::programt prog;
       for (const exprt &op : step.full_lhs_value.operands())
