@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 
 #include <cegis/jsa/options/jsa_program_info.h>

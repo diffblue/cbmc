@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <cegis/jsa/genetic/jsa_random.h>
 #include <cegis/jsa/genetic/solution_helper.h>
 #include <cegis/jsa/genetic/random_jsa_cross.h>
