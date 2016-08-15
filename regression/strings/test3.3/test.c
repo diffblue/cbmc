@@ -8,6 +8,7 @@ int main()
     int i;
 
     s = __CPROVER_string_concat(s2, s3);
+    __CPROVER_assume(i < 10);
     __CPROVER_assume(__CPROVER_string_length(s2) == i);
     __CPROVER_assume(
         __CPROVER_string_equal(s3, __CPROVER_string_literal("pippo")));

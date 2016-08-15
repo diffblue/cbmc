@@ -20,6 +20,10 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 unsignedbv_typet char_type(CHAR_WIDTH);
 unsignedbv_typet index_type(INDEX_WIDTH);
 
+constant_exprt index_zero(integer2binary(0, INDEX_WIDTH), index_type);
+constant_exprt index_one(integer2binary(1, INDEX_WIDTH), index_type);
+constant_exprt index_max(integer2binary(1<<30, INDEX_WIDTH), index_type);
+
 
 // Succinct version of pretty()
 std::string pretty_short(exprt expr) {
@@ -140,10 +144,14 @@ string_exprt::string_exprt() : struct_exprt(string_ref_typet())
   move_to_operands(length,content);
 }
 
-
+/*
 string_exprt::string_exprt(const symbol_exprt & sym) : string_exprt()
 {
   symbol_to_string[sym.get_identifier()] = *this;
+}*/
+
+string_exprt string_exprt::find_symbol(const symbol_exprt & expr){
+  return symbol_to_string[expr.get_identifier()];
 }
 
 string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & axioms)
@@ -151,10 +159,13 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & 
   if(unrefined_string.id()==ID_function_application) {
     string_exprt s;
     s.of_function_application(to_function_application_expr(unrefined_string), axioms);
+    binary_relation_exprt lem1(s.length(), ID_le,index_max);
+    axioms.push_back(string_axiomt(lem1));
     return s;
   }
   else if(unrefined_string.id()==ID_symbol) {
-    return symbol_to_string[to_symbol_expr(unrefined_string).get_identifier()];
+    return find_symbol(to_symbol_expr(unrefined_string));
+    //return symbol_to_string[to_symbol_expr(unrefined_string).get_identifier()];
     //return of_symbol(to_symbol_expr(unrefined_string));
   }
   else {
@@ -163,11 +174,12 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & 
   }
 }
 
+/*
 void string_exprt::of_symbol(const symbol_exprt & expr, axiom_vect & axioms) {
   string_exprt s = symbol_to_string[expr.get_identifier()];
   axioms.push_back(string_axiomt(equal_exprt(s.content(),content())));
   axioms.push_back(string_axiomt(equal_exprt(s.length(),length())));
-}
+  }*/
 
 void string_exprt::of_function_application(const function_application_exprt & expr, axiom_vect & axioms)
 {
@@ -218,7 +230,6 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
   axioms.push_back(string_axiomt(equal_exprt(length(),s_length)));
 }
 
-constant_exprt index_one(integer2binary(1, INDEX_WIDTH), index_type);
 
 void string_exprt::of_string_concat(const function_application_exprt &f, axiom_vect & axioms)
 {
@@ -231,10 +242,10 @@ void string_exprt::of_string_concat(const function_application_exprt &f, axiom_v
   equal_exprt length_sum_lem(length(), plus_exprt(s1.length(), s2.length()));
   axioms.push_back(string_axiomt(length_sum_lem));
   // We can run into problems if the length of the string exceed 32 bits?
-  /*binary_relation_exprt lem1(length(), ID_ge, s1.length());
+  binary_relation_exprt lem1(length(), ID_ge, s1.length());
   axioms.push_back(string_axiomt(lem1));
   binary_relation_exprt lem2(length(), ID_ge, s2.length());
-  axioms.push_back(string_axiomt(lem2));*/
+  axioms.push_back(string_axiomt(lem2));
 
   symbol_exprt idx = string_refinementt::fresh_symbol("index", index_type);
   
@@ -369,7 +380,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
   if (is_unrefined_string_type(type)) {
     debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
     // this can happen because of boolbvt::convert_equality
-    string_exprt str = string_exprt(to_symbol_expr(expr));
+    string_exprt str = string_exprt::find_symbol(to_symbol_expr(expr));
     bvt bv = convert_bv(str);
     return bv;
   } else if (is_unrefined_char_type(expr.type())) {
@@ -470,7 +481,7 @@ void string_refinementt::add_lemmas(axiom_vect & lemmas)
 void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
 {
   if(str.id()==ID_symbol) {
-    symbol_to_string[sym.get_identifier()] = symbol_to_string[to_symbol_expr(str).get_identifier()];
+    symbol_to_string[sym.get_identifier()] = string_exprt::find_symbol(to_symbol_expr(str));
   }
   else {
     axiom_vect lemmas;
@@ -481,10 +492,17 @@ void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str
 
 string_exprt string_refinementt::make_string(const exprt & str) 
 {
-  axiom_vect lemmas;
-  string_exprt s = string_exprt::of_expr(str,lemmas);
-  add_lemmas(lemmas);
-  return s;
+  if(str.id()==ID_symbol) {
+    string_exprt s = string_exprt::find_symbol(to_symbol_expr(str));
+    //symbol_to_string[sym.get_identifier()] = s;
+    return s;
+  }
+  else {
+    axiom_vect lemmas;
+    string_exprt s = string_exprt::of_expr(str,lemmas);
+    add_lemmas(lemmas);
+    return s;
+  }
 }
 
 bvt string_refinementt::convert_string_equal(
@@ -647,6 +665,9 @@ bvt string_refinementt::convert_string_char_at(
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //string_char_at expects 2 arguments
   string_exprt str = make_string(args[0]);
+  debug() << "in convert_string_char_at: we need to add something to"
+	  << " the list of lemmas" << eom;
+  index_set[str.content()].insert(args[1]);
   return convert_bv(str[args[1]]);
 }
 
