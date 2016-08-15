@@ -10,6 +10,8 @@
 #ifndef CEGIS_INDIVIDUAL_TO_SAFETY_SOLUTION_DESERIALISER_H_
 #define CEGIS_INDIVIDUAL_TO_SAFETY_SOLUTION_DESERIALISER_H_
 
+#include <functional>
+
 #include <cegis/safety/value/safety_goto_solution.h>
 
 /**
@@ -37,18 +39,11 @@ public:
    * @brief
    *
    * @details
-   */
-  ~individual_to_safety_solution_deserialisert();
-
-  /**
-   * @brief
    *
-   * @details
-   *
-   * @param result
+   * @param entity
    * @param sdu
    */
-  void operator()(safety_goto_solutiont &result, const irept &sdu) const;
+  void operator()(safety_goto_solutiont &entity, const irept &sdu) const;
 };
 
 #endif /* CEGIS_INDIVIDUAL_TO_SAFETY_SOLUTION_DESERIALISER_H_ */

@@ -94,6 +94,17 @@ public:
    * @return <code>true</code> if the last solution holds, <code>false</code> otherwise.
    */
   bool success() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param counterexample
+   */
+  void show_counterexample(
+      messaget::mstreamt &os,
+      const counterexamplet &counterexample) const;
 };
 
 #endif /* CEGIS_PARALLEL_DANGER_VERIFIER_H_ */

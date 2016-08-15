@@ -27,6 +27,7 @@ void make_constraint_call(const symbol_tablet &st, goto_functionst &gf,
   call.function()=st.lookup(JSA_INV_EXEC).symbol_expr();
   call.arguments()=args;
   pos->code=call;
+  remove_return(body, pos);
 }
 
 void make_constraint_call(const symbol_tablet &st, goto_functionst &gf,

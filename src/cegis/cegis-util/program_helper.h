@@ -211,4 +211,34 @@ goto_programt::targett cegis_assign_user_variable(const symbol_tablet &st,
     goto_functionst &gf, const goto_programt::targett &insert_after_pos,
     const irep_idt &name, const exprt &value);
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param pos
+ */
+void remove_return(
+    goto_programt &body,
+    goto_programt::targett pos);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param pos
+ * @param func_id
+ * @param value
+ *
+ * @return
+ */
+goto_programt::targett add_return_assignment(
+    goto_programt &body,
+    goto_programt::targett pos,
+    const irep_idt &func_id,
+    const exprt &value);
+
 #endif /* CEGIS_PROGRAM_HELPER_H_ */

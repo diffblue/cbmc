@@ -30,6 +30,7 @@ class cegis_statistics_wrappert
   millisecondst learner_time;
   millisecondst verifier_time;
   std::chrono::high_resolution_clock::time_point start_time;
+  const bool show_iterations;
 public:
   typedef typename learnt::counterexamplet counterexamplet;
   typedef typename learnt::candidatet candidatet;
@@ -43,8 +44,13 @@ public:
    * @param learner
    * @param verifier
    * @param os
+   * @param options
    */
-  cegis_statistics_wrappert(learnt &learner, verifyt &verifier, mstreamt &os);
+  cegis_statistics_wrappert(
+      learnt &learner,
+      verifyt &verifier,
+      mstreamt &os,
+      const optionst &options);
 
   /**
    * @brief

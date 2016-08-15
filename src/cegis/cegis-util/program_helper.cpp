@@ -2,6 +2,7 @@
 
 #include <util/type_eq.h>
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/remove_returns.h>
 
 #include <cegis/instrument/literals.h>
 #include <cegis/instrument/instrument_var_ops.h>
@@ -243,4 +244,38 @@ goto_programt::targett cegis_assign_user_variable(const symbol_tablet &st,
 {
   const symbol_exprt lhs(st.lookup(name).symbol_expr());
   return cegis_assign(st, gf, insert_after_pos, lhs, value);
+}
+
+symbol_exprt get_ret_val_var(const irep_idt &func_id, const typet &type)
+{
+  return symbol_exprt(id2string(func_id) + RETURN_VALUE_SUFFIX, type);
+}
+
+void remove_return(goto_programt &body, const goto_programt::targett pos)
+{
+  code_function_callt &call=to_code_function_call(pos->code);
+  const irep_idt &id=to_symbol_expr(call.function()).get_identifier();
+  const typet &type=call.lhs().type();
+  const source_locationt &loc=pos->source_location;
+  const irep_idt &func=pos->function;
+  const goto_programt::targett assign=body.insert_after(pos);
+  assign->make_assignment();
+  assign->source_location=loc;
+  assign->code=code_assignt(call.lhs(), get_ret_val_var(id, type));
+  assign->function=func;
+  call.lhs().make_nil();
+}
+
+goto_programt::targett add_return_assignment(
+    goto_programt &body,
+    goto_programt::targett pos,
+    const irep_idt &func_id,
+    const exprt &value)
+{
+  const source_locationt &loc=pos->source_location;
+  pos=body.insert_after(pos);
+  pos->make_assignment();
+  pos->source_location=loc;
+  pos->code=code_assignt(get_ret_val_var(func_id, value.type()), value);
+  return pos;
 }

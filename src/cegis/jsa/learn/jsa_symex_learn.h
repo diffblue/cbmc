@@ -11,7 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CEGIS_JSA_SYMEX_LEARN_H_
 
 #include <deque>
+#include <functional>
+
 #include <util/message.h>
+
 #include <cegis/jsa/options/jsa_program.h>
 #include <cegis/jsa/value/jsa_counterexample.h>
 #include <cegis/jsa/value/jsa_solution.h>
@@ -66,6 +69,15 @@ public:
    *
    * @details
    *
+   * @param max_solution_size
+   */
+  void process(size_t max_solution_size);
+
+  /**
+   * @brief
+   *
+   * @details
+   *
    * @param word_width_in_bits
    */
   void set_word_width(size_t word_width_in_bits);
@@ -107,12 +119,39 @@ public:
    *
    * @details
    *
+   * @return
+   */
+  const jsa_programt &get_jsa_program() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
    * @param os
    * @param candidate
    */
   void show_candidate(
       messaget::mstreamt &os,
-      const candidatet &candidate);
+      const candidatet &candidate) const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  std::function<size_t()> get_pred_ops_count() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  std::function<size_t()> get_const_pred_ops_count() const;
 };
 
 #endif /* CEGIS_JSA_SYMEX_LEARN_H_ */

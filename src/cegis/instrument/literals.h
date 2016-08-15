@@ -19,5 +19,6 @@
 #define CEGIS_TMP_PREFIX CEGIS_PREFIX "tmp_"
 #define CEGIS_PRIME_SUFFIX "_prime"
 #define CEGIS_CONSTANT_PREFIX "CEGIS_CONSTANT_"
+#define CEGIS_FITNESS_TEST_FUNC "__CPROVER_cegis_test_fitness"
 
 #endif /* CEGIS_LITERALS_H_ */

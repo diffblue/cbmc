@@ -19,10 +19,43 @@ Author: Daniel Kroening, kroening@kroening.com
  *
  * @details
  */
+#define OPERANDS_PER_JSA_INVARIANT_INSTRUCTION 1
+
+/**
+ * @brief
+ *
+ * @details
+ */
+#define OPERANDS_PER_JSA_PREDICATE_INSTRUCTION 4
+
+/**
+ * @brief
+ *
+ * @details
+ */
+#define OPERANDS_PER_JSA_QUERY_INSTRUCTION 3
+
+/**
+ * @brief
+ *
+ * @details
+ */
 class jsa_genetic_solutiont
 {
 public:
-  typedef std::vector<std::vector<__CPROVER_jsa_pred_instructiont> > predicatest;
+  /**
+   * @brief
+   *
+   * @details
+   */
+  typedef std::vector<__CPROVER_jsa_pred_instructiont> predicatet;
+
+  /**
+   * @brief
+   *
+   * @details
+   */
+  typedef std::vector<predicatet> predicatest;
 
   /**
    * @brief
@@ -36,14 +69,49 @@ public:
    *
    * @details
    */
-  std::vector<__CPROVER_jsa_query_instructiont> query;
+  typedef std::vector<__CPROVER_jsa_query_instructiont> queryt;
 
   /**
    * @brief
    *
    * @details
    */
-  std::vector<__CPROVER_jsa_invariant_instructiont> invariant;
+  queryt query;
+
+  /**
+   * @brief
+   *
+   * @details
+   */
+  typedef std::vector<__CPROVER_jsa_invariant_instructiont> invariantt;
+
+  /**
+   * @brief
+   *
+   * @details
+   */
+  invariantt invariant;
+
+  /**
+   * @brief
+   *
+   * @details
+   */
+  typedef size_t fitnesst;
+
+  /**
+   * @brief
+   *
+   * @details
+   */
+  fitnesst fitness;
 };
+
+/**
+ * @brief
+ *
+ * @details
+ */
+typedef std::vector<jsa_genetic_solutiont> jsa_populationt;
 
 #endif /* CEGIS_JSA_GENETIC_SOLUTION_H_ */

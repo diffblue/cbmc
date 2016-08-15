@@ -6,16 +6,8 @@
 #include <cegis/danger/value/danger_goto_solution.h>
 #include <cegis/danger/options/danger_program_printer.h>
 
-// XXX: Debug
-#include <iostream>
-// XXX: Debug
-
 namespace
 {
-// XXX: Debug
-size_t idx=0;
-// XXX: Debug
-
 class danger_program_printert
 {
   const namespacet ns;

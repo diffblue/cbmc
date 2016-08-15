@@ -25,9 +25,12 @@ public:
   typedef typename fitnesst::counterexamplet counterexamplet;
   typedef typename fitnesst::counterexamplest counterexamplest;
   typedef typename selectt::populationt populationt;
+  typedef typename selectt::individualt individualt;
+  typedef individualt paragont;
   typedef typename selectt::selectiont selectiont;
 private:
   const class optionst &options;
+  const std::function<void(individualt &)> havoc;
   selectt &select;
   mutatet &mutate;
   crosst &cross;
@@ -36,10 +39,9 @@ private:
   populationt pop;
   selectiont selection;
   candidatet current_candidate;
-  bool is_population_initialised;
   std::function<bool(void)> is_evolving;
 
-  bool set_fitness(typename selectt::individualt &ind);
+  bool set_fitness(individualt &ind);
 public:
   /**
    * @brief
@@ -47,21 +49,18 @@ public:
    * @details
    *
    * @param options
+   * @param random
    * @param select
    * @param mutate
    * @param cross
    * @param fitness
    * @param convert
-   */
-  ga_learnt(const optionst &options, selectt &select, mutatet &mutate,
-      crosst &cross, fitnesst &fitness, convertt &convert);
-
-  /**
-   * @brief
    *
-   * @details
+   * @tparam randomt
    */
-  ~ga_learnt();
+  template<class randomt>
+  ga_learnt(const optionst &options, randomt &random, selectt &select,
+      mutatet &mutate, crosst &cross, fitnesst &fitness, convertt &convert);
 
 
   /**
@@ -108,6 +107,14 @@ public:
    */
   void show_candidate(messaget::mstreamt &os) const;
 
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param os
+   * @param candidate
+   */
   void show_candidate(messaget::mstreamt &os, const candidatet &candidate) const;
 
   /**
@@ -136,7 +143,7 @@ public:
    *
    * @param ind
    */
-  void add_paragon(typename selectt::individualt ind);
+  void add_paragon(paragont ind);
 };
 
 #include "ga_learn.inc"
