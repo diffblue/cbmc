@@ -107,6 +107,10 @@ void cegis_parse_optionst::get_command_line_options(optionst &options)
     options.set_option(CEGIS_SYMEX_HEAD_START, cegis_symex_head_start);
     options.set_option(CEGIS_SHOW_ITERATIONS, cmdline.isset(CEGIS_SHOW_ITERATIONS));
     options.set_option(CEGIS_KEEP_GOTO_PROGRAMS, cmdline.isset(CEGIS_KEEP_GOTO_PROGRAMS));
+    unsigned int cegis_max_runtime_in_seconds=300u;
+    if (cmdline.isset(CEGIS_MAX_RUNTIME))
+      cegis_max_runtime_in_seconds=string2integer(cmdline.get_value(CEGIS_MAX_RUNTIME)).to_ulong();
+    options.set_option(CEGIS_MAX_RUNTIME, cegis_max_runtime_in_seconds);
   }
 }
 
