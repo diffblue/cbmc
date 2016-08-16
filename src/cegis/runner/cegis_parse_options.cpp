@@ -49,6 +49,18 @@ cegis_parse_optionst::~cegis_parse_optionst()
 {
 }
 
+namespace
+{
+void set_integer_option(optionst &opt, const cmdlinet &cmd,
+    const char * const name, const unsigned int default_value)
+{
+  if (!cmd.isset(name)) return opt.set_option(name, default_value);
+  const std::string text_value(cmd.get_value(name));
+  const mp_integer::ullong_t value=string2integer(text_value).to_ulong();
+  opt.set_option(name, static_cast<unsigned int>(value));
+}
+}
+
 /*******************************************************************\
 
 Function: cegis_parse_optionst::get_command_line_options
@@ -67,50 +79,23 @@ void cegis_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("danger") || cmdline.isset("safety") || cmdline.isset("jsa"))
   {
-    unsigned int min_prog_size=1u;
-    if (cmdline.isset("cegis-min-size"))
-      min_prog_size=string2integer(cmdline.get_value("cegis-min-size")).to_ulong();
-    options.set_option("cegis-min-size", min_prog_size);
-    unsigned int max_prog_size=5u;
-    if (cmdline.isset("cegis-max-size"))
-      max_prog_size=string2integer(cmdline.get_value("cegis-max-size")).to_ulong();
-    options.set_option("cegis-max-size", max_prog_size);
+    set_integer_option(options, cmdline, "cegis-min-size", 1u);
+    set_integer_option(options, cmdline, "cegis-max-size", 5u);
     options.set_option("cegis-parallel-verify", cmdline.isset("cegis-parallel-verify"));
     options.set_option("cegis-limit-wordsize", cmdline.isset("cegis-limit-wordsize"));
     options.set_option("cegis-match-select", !cmdline.isset("cegis-tournament-select"));
     options.set_option("cegis-statistics", cmdline.isset("cegis-statistics"));
     options.set_option(CEGIS_GENETIC, cmdline.isset(CEGIS_GENETIC));
-    unsigned int genetic_rounds=10u;
-    if (cmdline.isset("cegis-genetic-rounds"))
-      genetic_rounds=string2integer(cmdline.get_value("cegis-genetic-rounds")).to_ulong();
-    options.set_option("cegis-genetic-rounds", genetic_rounds);
-    unsigned int seed=747864937u;
-    if (cmdline.isset("cegis-seed"))
-      seed=string2integer(cmdline.get_value("cegis-seed")).to_ulong();
-    options.set_option("cegis-seed", seed);
-    unsigned int pop_size=2000u;
-    if (cmdline.isset("cegis-genetic-popsize"))
-      pop_size=string2integer(cmdline.get_value("cegis-genetic-popsize")).to_ulong();
-    options.set_option("cegis-genetic-popsize", pop_size);
-    unsigned int mutation_rate=1u;
-    if (cmdline.isset("cegis-genetic-mutation-rate"))
-      mutation_rate=string2integer(cmdline.get_value("cegis-genetic-mutation-rate")).to_ulong();
-    options.set_option("cegis-genetic-mutation-rate", mutation_rate);
-    unsigned int replace_rate=15u;
-    if (cmdline.isset("cegis-genetic-replace-rate"))
-      replace_rate=string2integer(cmdline.get_value("cegis-genetic-replace-rate")).to_ulong();
-    options.set_option("cegis-genetic-replace-rate", replace_rate);
+    set_integer_option(options, cmdline, "cegis-genetic-rounds", 10u);
+    set_integer_option(options, cmdline, "cegis-seed", 747864937u);
+    set_integer_option(options, cmdline, "cegis-genetic-popsize", 2000u);
+    set_integer_option(options, cmdline, "cegis-genetic-mutation-rate", 1u);
+    set_integer_option(options, cmdline, "cegis-genetic-replace-rate", 15u);
     options.set_option("danger-no-ranking", cmdline.isset("danger-no-ranking"));
-    unsigned int cegis_symex_head_start=0u;
-    if (cmdline.isset(CEGIS_SYMEX_HEAD_START))
-      cegis_symex_head_start=string2integer(cmdline.get_value(CEGIS_SYMEX_HEAD_START)).to_ulong();
-    options.set_option(CEGIS_SYMEX_HEAD_START, cegis_symex_head_start);
+    set_integer_option(options, cmdline, CEGIS_SYMEX_HEAD_START, 0u);
     options.set_option(CEGIS_SHOW_ITERATIONS, cmdline.isset(CEGIS_SHOW_ITERATIONS));
     options.set_option(CEGIS_KEEP_GOTO_PROGRAMS, cmdline.isset(CEGIS_KEEP_GOTO_PROGRAMS));
-    unsigned int cegis_max_runtime_in_seconds=300u;
-    if (cmdline.isset(CEGIS_MAX_RUNTIME))
-      cegis_max_runtime_in_seconds=string2integer(cmdline.get_value(CEGIS_MAX_RUNTIME)).to_ulong();
-    options.set_option(CEGIS_MAX_RUNTIME, cegis_max_runtime_in_seconds);
+    set_integer_option(options, cmdline, CEGIS_MAX_RUNTIME, 300u);
   }
 }
 
