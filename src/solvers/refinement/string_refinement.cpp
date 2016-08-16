@@ -145,13 +145,6 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & 
   }
 }
 
-/*
-void string_exprt::of_symbol(const symbol_exprt & expr, axiom_vect & axioms) {
-  string_exprt s = symbol_to_string[expr.get_identifier()];
-  axioms.push_back(string_axiomt(equal_exprt(s.content(),content())));
-  axioms.push_back(string_axiomt(equal_exprt(s.length(),length())));
-  }*/
-
 void string_exprt::of_function_application(const function_application_exprt & expr, axiom_vect & axioms)
 {
   const exprt &name = expr.function();
@@ -715,7 +708,7 @@ std::string string_refinementt::string_of_array(const exprt &arr, const exprt &s
       }
     }
   } else {
-    debug() << "unable to get array-list value of " << pretty_short(val) << eom;
+    return "unable to get array-list";
   }
 
   std::ostringstream buf;
@@ -782,12 +775,12 @@ bool string_refinementt::check_axioms()
 
       fmodel[elength] = len;
       fmodel[econtent] = arr;
-      debug() << "check_axioms: " << it->first << " = " << pretty_short(it->second) << " of length " << pretty_short(len) <<" := " << string_of_array(econtent,len) << eom;
+      debug() << it->first << " = " << pretty_short(it->second) << " of length " << pretty_short(len) <<" := " << string_of_array(econtent,len) << eom;
     }
 
   for(std::vector<symbol_exprt>::iterator it = boolean_symbols.begin();
       it != boolean_symbols.end(); it++) {
-    debug() << "check_axioms boolean_symbol: " << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;  
+    debug() << "" << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;  
     fmodel[*it] = get(*it);
   }
 
@@ -806,12 +799,12 @@ bool string_refinementt::check_axioms()
 
     switch (solver()) {
     case decision_proceduret::D_SATISFIABLE: {
-      debug() << "satisfiable" << eom;
+      //debug() << "satisfiable" << eom;
       exprt val = solver.get(axiom.qvar);
       violated.push_back(std::make_pair(i, val));
     } break;
     case decision_proceduret::D_UNSATISFIABLE:
-      debug() << "unsatisfiable" << eom;
+      //debug() << "unsatisfiable" << eom;
       break;
     default:
       throw "failure in checking axiom";

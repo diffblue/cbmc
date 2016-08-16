@@ -390,7 +390,6 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
       return nil_exprt();
 
     // get root
-    std::cout << "boolbv_get.cpp get root: " << number << std::endl;
     number=arrays.find_number(number);
     
     assert(number<index_map.size());
