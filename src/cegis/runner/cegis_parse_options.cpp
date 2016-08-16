@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
+#include <cbmc/version.h>
 #include <util/mp_arith.h>
 #include <util/options.h>
 
@@ -30,22 +33,6 @@ Function: cegis_parse_optionst::cegis_parse_optionst
 
 cegis_parse_optionst::cegis_parse_optionst(int argc, const char **argv):
   cbmc_parse_optionst(argc, argv, CEGIS_OPTIONS)
-{
-}
-
-/*******************************************************************\
-
-Function: cegis_parse_optionst::~cegis_parse_optionst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-cegis_parse_optionst::~cegis_parse_optionst()
 {
 }
 
@@ -126,4 +113,55 @@ int cegis_parse_optionst::do_bmc(
     return run_jsa(options, result(), symbol_table, goto_functions);
 
   return cbmc_parse_optionst::do_bmc(bmc, goto_functions);
+}
+
+void cegis_parse_optionst::help()
+{
+  std::cout <<
+    "\n"
+    "* *   CEGIS " CBMC_VERSION " - Copyright (C) 2001-2014 ";
+
+  std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
+
+  std::cout << "   * *\n";
+
+  std::cout <<
+    "* *              Daniel Kroening, Edmund Clarke             * *\n"
+    "* * Carnegie Mellon University, Computer Science Department * *\n"
+    "* *                 kroening@kroening.com                   * *\n"
+    "* *        Protected in part by U.S. patent 7,225,417       * *\n"
+    "\n"
+    "Usage:                                Purpose:\n"
+    "\n"
+    " cegis [-?] [-h] [--help]              show help\n"
+    " cegis [--danger|--safety] file.c ...  source file names\n"
+    "\n"
+    "Invariant options:\n"
+    " --danger                              synthesise danger invariant\n"
+    " --safety                              synthesise safety invariant\n"
+    "\n"
+    "GA options:\n"
+    " --cegis-genetic                       use symex and genetic back-end\n"
+    " --cegis-match-select                  use \"match\" genetic selector\n"
+    " --cegis-tournament-select             use \"tournament\" genetic selector\n"
+    " --cegis-genetic-rounds                number of wheel rounds per evolution step\n"
+    " --cegis-genetic-popsize               population size\n"
+    " --cegis-genetic-mutation-rate         likelihood of mutation (1-100)\n"
+    " --cegis-genetic-replace-rate          evolutionary pressure (1-100)\n"
+    "\n"
+    "Output options:\n"
+    " --cegis-statistics                    show runtime and CEGIS statistics\n"
+    " --cegis-keep-goto-programs            keep generated GOTO programs\n"
+    " --cegis-show-iterations               show intermediate solutions in CEGIS loop\n"
+    "\n"
+    "Experiment options:\n"
+    " --cegis-max-runtime                   maximum runtime timeout\n"
+    " --cegis-min-size                      minimum solution length to consider\n"
+    " --cegis-max-size                      maximum solution length to consider\n"
+    " --cegis-parallel-verify               find multiple counterexamples concurrently\n"
+    " --cegis-limit-wordsize                allow inductive conjecture with limited word size\n"
+    " --cegis-seed                          starting seed for random number generator\n"
+    " --danger-no-ranking                   use total danger invariants\n"
+    " --cegis-symex-head-start              number of iterations head-start for symex over GA \n"
+    "\n";
 }

@@ -21,7 +21,8 @@ class cegis_parse_optionst: public cbmc_parse_optionst
 {
 public:
   cegis_parse_optionst(int argc, const char **argv);
-  virtual ~cegis_parse_optionst();
+  virtual ~cegis_parse_optionst()=default;
+  virtual void help();
 protected:
   virtual void get_command_line_options(optionst &options);
   virtual int do_bmc(bmct &bmc, const goto_functionst &goto_functions);
