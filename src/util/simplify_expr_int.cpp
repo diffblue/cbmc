@@ -23,6 +23,50 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: simplify_exprt::simplify_bswap
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_bswap(exprt &expr)
+{
+  if(expr.type().id()==ID_unsignedbv &&
+     expr.operands().size()==1 &&
+     expr.op0().type()==expr.type() &&
+     expr.op0().is_constant())
+  {
+    std::size_t width=to_bitvector_type(expr.type()).get_width();
+    mp_integer value;
+    to_integer(expr.op0(), value);
+    std::vector<mp_integer> bytes;
+
+    // take apart
+    for(std::size_t bit=0; bit<width; bit+=8)
+      bytes.push_back((value>>bit)%256);
+      
+    // put back together, but backwards
+    mp_integer new_value=0;
+    for(std::size_t bit=0; bit<width; bit+=8)
+    {
+      assert(!bytes.empty());
+      new_value+=bytes.back()<<bit;
+      bytes.pop_back();
+    }
+    
+    expr=from_integer(new_value, expr.type());
+    return false;
+  }
+  
+  return true;
+}
+
+/*******************************************************************\
+
 Function: simplify_exprt::simplify_mult
 
   Inputs:
