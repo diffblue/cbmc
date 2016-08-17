@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CEGIS_GENETIC_GA_LEARN_H_
 #define CEGIS_GENETIC_GA_LEARN_H_
 
+#include <chrono>
 #include <functional>
 
 /**
@@ -29,6 +30,8 @@ public:
   typedef individualt paragont;
   typedef typename selectt::selectiont selectiont;
 private:
+  typedef std::chrono::high_resolution_clock clockt;
+  typedef clockt::time_point time_pointt;
   const class optionst &options;
   const std::function<void(individualt &)> havoc;
   selectt &select;
@@ -36,6 +39,8 @@ private:
   crosst &cross;
   fitnesst &fitness;
   convertt &convert;
+  time_pointt program_startup;
+  const size_t max_runtime_in_seconds;
   populationt pop;
   selectiont selection;
   candidatet current_candidate;

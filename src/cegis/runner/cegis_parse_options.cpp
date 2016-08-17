@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
+#include <cbmc/version.h>
 #include <util/mp_arith.h>
 #include <util/options.h>
 
@@ -33,20 +36,16 @@ cegis_parse_optionst::cegis_parse_optionst(int argc, const char **argv):
 {
 }
 
-/*******************************************************************\
-
-Function: cegis_parse_optionst::~cegis_parse_optionst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-cegis_parse_optionst::~cegis_parse_optionst()
+namespace
 {
+void set_integer_option(optionst &opt, const cmdlinet &cmd,
+    const char * const name, const unsigned int default_value)
+{
+  if (!cmd.isset(name)) return opt.set_option(name, default_value);
+  const std::string text_value(cmd.get_value(name));
+  const mp_integer::ullong_t value=string2integer(text_value).to_ulong();
+  opt.set_option(name, static_cast<unsigned int>(value));
+}
 }
 
 /*******************************************************************\
@@ -67,46 +66,23 @@ void cegis_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("danger") || cmdline.isset("safety") || cmdline.isset("jsa"))
   {
-    unsigned int min_prog_size=1u;
-    if (cmdline.isset("cegis-min-size"))
-      min_prog_size=string2integer(cmdline.get_value("cegis-min-size")).to_ulong();
-    options.set_option("cegis-min-size", min_prog_size);
-    unsigned int max_prog_size=5u;
-    if (cmdline.isset("cegis-max-size"))
-      max_prog_size=string2integer(cmdline.get_value("cegis-max-size")).to_ulong();
-    options.set_option("cegis-max-size", max_prog_size);
+    set_integer_option(options, cmdline, "cegis-min-size", 1u);
+    set_integer_option(options, cmdline, "cegis-max-size", 5u);
     options.set_option("cegis-parallel-verify", cmdline.isset("cegis-parallel-verify"));
     options.set_option("cegis-limit-wordsize", cmdline.isset("cegis-limit-wordsize"));
     options.set_option("cegis-match-select", !cmdline.isset("cegis-tournament-select"));
     options.set_option("cegis-statistics", cmdline.isset("cegis-statistics"));
     options.set_option(CEGIS_GENETIC, cmdline.isset(CEGIS_GENETIC));
-    unsigned int genetic_rounds=10u;
-    if (cmdline.isset("cegis-genetic-rounds"))
-      genetic_rounds=string2integer(cmdline.get_value("cegis-genetic-rounds")).to_ulong();
-    options.set_option("cegis-genetic-rounds", genetic_rounds);
-    unsigned int seed=747864937u;
-    if (cmdline.isset("cegis-seed"))
-      seed=string2integer(cmdline.get_value("cegis-seed")).to_ulong();
-    options.set_option("cegis-seed", seed);
-    unsigned int pop_size=2000u;
-    if (cmdline.isset("cegis-genetic-popsize"))
-      pop_size=string2integer(cmdline.get_value("cegis-genetic-popsize")).to_ulong();
-    options.set_option("cegis-genetic-popsize", pop_size);
-    unsigned int mutation_rate=1u;
-    if (cmdline.isset("cegis-genetic-mutation-rate"))
-      mutation_rate=string2integer(cmdline.get_value("cegis-genetic-mutation-rate")).to_ulong();
-    options.set_option("cegis-genetic-mutation-rate", mutation_rate);
-    unsigned int replace_rate=15u;
-    if (cmdline.isset("cegis-genetic-replace-rate"))
-      replace_rate=string2integer(cmdline.get_value("cegis-genetic-replace-rate")).to_ulong();
-    options.set_option("cegis-genetic-replace-rate", replace_rate);
+    set_integer_option(options, cmdline, "cegis-genetic-rounds", 10u);
+    set_integer_option(options, cmdline, "cegis-seed", 747864937u);
+    set_integer_option(options, cmdline, "cegis-genetic-popsize", 2000u);
+    set_integer_option(options, cmdline, "cegis-genetic-mutation-rate", 1u);
+    set_integer_option(options, cmdline, "cegis-genetic-replace-rate", 15u);
     options.set_option("danger-no-ranking", cmdline.isset("danger-no-ranking"));
-    unsigned int cegis_symex_head_start=0u;
-    if (cmdline.isset(CEGIS_SYMEX_HEAD_START))
-      cegis_symex_head_start=string2integer(cmdline.get_value(CEGIS_SYMEX_HEAD_START)).to_ulong();
-    options.set_option(CEGIS_SYMEX_HEAD_START, cegis_symex_head_start);
+    set_integer_option(options, cmdline, CEGIS_SYMEX_HEAD_START, 0u);
     options.set_option(CEGIS_SHOW_ITERATIONS, cmdline.isset(CEGIS_SHOW_ITERATIONS));
     options.set_option(CEGIS_KEEP_GOTO_PROGRAMS, cmdline.isset(CEGIS_KEEP_GOTO_PROGRAMS));
+    set_integer_option(options, cmdline, CEGIS_MAX_RUNTIME, 300u);
   }
 }
 
@@ -137,4 +113,55 @@ int cegis_parse_optionst::do_bmc(
     return run_jsa(options, result(), symbol_table, goto_functions);
 
   return cbmc_parse_optionst::do_bmc(bmc, goto_functions);
+}
+
+void cegis_parse_optionst::help()
+{
+  std::cout <<
+    "\n"
+    "* *   CEGIS " CBMC_VERSION " - Copyright (C) 2001-2014 ";
+
+  std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
+
+  std::cout << "   * *\n";
+
+  std::cout <<
+    "* *              Daniel Kroening, Edmund Clarke             * *\n"
+    "* * Carnegie Mellon University, Computer Science Department * *\n"
+    "* *                 kroening@kroening.com                   * *\n"
+    "* *        Protected in part by U.S. patent 7,225,417       * *\n"
+    "\n"
+    "Usage:                                Purpose:\n"
+    "\n"
+    " cegis [-?] [-h] [--help]              show help\n"
+    " cegis [--danger|--safety] file.c ...  source file names\n"
+    "\n"
+    "Invariant options:\n"
+    " --danger                              synthesise danger invariant\n"
+    " --safety                              synthesise safety invariant\n"
+    "\n"
+    "GA options:\n"
+    " --cegis-genetic                       use symex and genetic back-end\n"
+    " --cegis-match-select                  use \"match\" genetic selector\n"
+    " --cegis-tournament-select             use \"tournament\" genetic selector\n"
+    " --cegis-genetic-rounds                number of wheel rounds per evolution step\n"
+    " --cegis-genetic-popsize               population size\n"
+    " --cegis-genetic-mutation-rate         likelihood of mutation (1-100)\n"
+    " --cegis-genetic-replace-rate          evolutionary pressure (1-100)\n"
+    "\n"
+    "Output options:\n"
+    " --cegis-statistics                    show runtime and CEGIS statistics\n"
+    " --cegis-keep-goto-programs            keep generated GOTO programs\n"
+    " --cegis-show-iterations               show intermediate solutions in CEGIS loop\n"
+    "\n"
+    "Experiment options:\n"
+    " --cegis-max-runtime                   maximum runtime timeout\n"
+    " --cegis-min-size                      minimum solution length to consider\n"
+    " --cegis-max-size                      maximum solution length to consider\n"
+    " --cegis-parallel-verify               find multiple counterexamples concurrently\n"
+    " --cegis-limit-wordsize                allow inductive conjecture with limited word size\n"
+    " --cegis-seed                          starting seed for random number generator\n"
+    " --danger-no-ranking                   use total danger invariants\n"
+    " --cegis-symex-head-start              number of iterations head-start for symex over GA \n"
+    "\n";
 }

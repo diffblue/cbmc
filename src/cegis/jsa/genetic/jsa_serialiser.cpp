@@ -63,7 +63,7 @@ void jsa_serialisert::operator()(irept &sdu,
 void jsa_serialisert::operator()(jsa_genetic_solutiont &entity,
     const irept &sdu) const
 {
-  entity.fitness=sdu.get_long_long(FITNESS);
+  entity.fitness=jsa_genetic_solutiont::fitnesst(sdu.get_long_long(FITNESS));
   const irept::named_subt &named_sub=sdu.get_named_sub();
   typedef irept::named_subt::const_iterator const_iterator;
   const const_iterator invariant=named_sub.find(INVARIANT);
@@ -71,7 +71,7 @@ void jsa_serialisert::operator()(jsa_genetic_solutiont &entity,
   for (const irept &instruction : invariant->second.get_sub())
   {
     jsa_genetic_solutiont::invariantt::value_type instr;
-    instr.opcode=instruction.get_long_long(OPCODE);
+    instr.opcode=__CPROVER_jsa_opcodet(instruction.get_long_long(OPCODE));
     entity.invariant.push_back(instr);
   }
   const const_iterator predicates=named_sub.find(PREDICATES);
@@ -82,10 +82,10 @@ void jsa_serialisert::operator()(jsa_genetic_solutiont &entity,
     for (const irept &instruction : predicate.get_sub())
     {
       jsa_genetic_solutiont::predicatet::value_type instr;
-      instr.opcode=instruction.get_long_long(OPCODE);
-      instr.op0=instruction.get_long_long(OP0);
-      instr.op1=instruction.get_long_long(OP1);
-      instr.result_op=instruction.get_long_long(RESULT_OP);
+      instr.opcode=__CPROVER_jsa_opcodet(instruction.get_long_long(OPCODE));
+      instr.op0=__CPROVER_jsa_opt(instruction.get_long_long(OP0));
+      instr.op1=__CPROVER_jsa_opt(instruction.get_long_long(OP1));
+      instr.result_op=__CPROVER_jsa_opt(instruction.get_long_long(RESULT_OP));
       pred.push_back(instr);
     }
     entity.predicates.push_back(pred);
@@ -95,9 +95,9 @@ void jsa_serialisert::operator()(jsa_genetic_solutiont &entity,
   for (const irept &instruction : query->second.get_sub())
   {
     jsa_genetic_solutiont::queryt::value_type instr;
-    instr.opcode=instruction.get_long_long(OPCODE);
-    instr.op0=instruction.get_long_long(OP0);
-    instr.op1=instruction.get_long_long(OP1);
+    instr.opcode=__CPROVER_jsa_opcodet(instruction.get_long_long(OPCODE));
+    instr.op0=__CPROVER_jsa_opt(instruction.get_long_long(OP0));
+    instr.op1=__CPROVER_jsa_opt(instruction.get_long_long(OP1));
     entity.query.push_back(instr);
   }
 }
