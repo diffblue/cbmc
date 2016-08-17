@@ -35,6 +35,8 @@ typedef struct __CPROVER_char { char c; } __CPROVER_char;
 
 /* test whether p is a suffix of s */
 #define __CPROVER_string_issuffix(p, s) __CPROVER_uninterpreted_strsuffixof(p, s)
+/* test whether p contains s */
+#define __CPROVER_string_contains(p, s) __CPROVER_uninterpreted_strcontains(p, s)
 
 /* returns a new string obtained from s by setting s[p] = c */
 #define __CPROVER_char_set(s, p, c) __CPROVER_uninterpreted_char_set(s, p, c)
@@ -52,5 +54,6 @@ extern unsigned __CPROVER_uninterpreted_strlen(__CPROVER_string str);
 extern __CPROVER_string __CPROVER_uninterpreted_substring(__CPROVER_string str, unsigned i, unsigned j);
 extern __CPROVER_bool __CPROVER_uninterpreted_strprefixof(__CPROVER_string pref, __CPROVER_string str);
 extern __CPROVER_bool __CPROVER_uninterpreted_strsuffixof(__CPROVER_string suff, __CPROVER_string str);
+extern __CPROVER_bool __CPROVER_uninterpreted_strcontains(__CPROVER_string str1, __CPROVER_string str2);
 extern __CPROVER_string __CPROVER_uninterpreted_char_set(__CPROVER_string str, unsigned pos, __CPROVER_char c);
 

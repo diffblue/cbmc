@@ -34,17 +34,28 @@ class string_axiomt
 {
 public:
   // Universally quantified symbol
-  symbol_exprt qvar;
+  symbol_exprt univ_var;
+  // Existentially quantified symbol
+  std::vector<symbol_exprt> exists_var;
+  std::vector<exprt> exists_bounds;
   exprt premise;
   exprt body;
+  bool is_quantified;
 
-  // Axiom of the form: forall index. prem ==> bod
-  string_axiomt(symbol_exprt index, exprt prem, exprt bod);
+  // Axiom of the form: forall qvar. prem ==> bod
+  string_axiomt(symbol_exprt qvar, exprt prem, exprt bod);
+
+  // Axiom of the form: forall univ. prem ==> exists evar < b. bod
+  string_axiomt(symbol_exprt univ, symbol_exprt evar, exprt bound, exprt prem, exprt bod);
 
   // Axiom with no quantification
+  string_axiomt(exprt prem, exprt bod);
+
+  // Axiom with no quantification, and no premise
   string_axiomt(exprt bod);
 
-  inline bool is_quantified() {return (premise != true_exprt());}
+  // True axiom
+  string_axiomt();
 };
 
 typedef std::vector<string_axiomt> axiom_vect;
@@ -80,9 +91,9 @@ public:
   { return binary_relation_exprt(length(), ID_le, rhs.length()); }
   inline binary_relation_exprt operator>= (string_exprt rhs)
   { return binary_relation_exprt(length(), ID_ge, rhs.length()); }
-  inline binary_relation_exprt operator< (const symbol_exprt & rhs)
+  inline binary_relation_exprt operator< (const exprt & rhs)
   { return binary_relation_exprt(length(), ID_lt, rhs); }
-  inline binary_relation_exprt operator> (const symbol_exprt & rhs)
+  inline binary_relation_exprt operator> (const exprt & rhs)
   { return binary_relation_exprt(rhs, ID_lt, length()); }
 
 private:
@@ -123,8 +134,10 @@ public:
 
 
   inline std::string axiom_to_string(const string_axiomt & ax) {
-    return ("forall " + pretty_short(ax.qvar) + ". (" 
-	    + pretty_short(ax.premise) + ") ==> " + pretty_short(ax.body));
+    return ("forall " + pretty_short(ax.univ_var) + ". (" 
+	    + pretty_short(ax.premise) + ") ==> " 
+	    + (ax.exists_var.size() >= 1 ?("exists "+pretty_short(ax.exists_var[0])+". "):"")
+	    + pretty_short(ax.body));
   }
 
 
@@ -138,6 +151,7 @@ public:
   irep_idt string_substring_func;
   irep_idt string_is_prefix_func;
   irep_idt string_is_suffix_func;
+  irep_idt string_contains_func;
   irep_idt string_char_set_func;
 
 private:  
@@ -172,6 +186,7 @@ protected:
   bvt convert_string_length(const function_application_exprt &f);
   bvt convert_string_is_prefix(const function_application_exprt &f);
   bvt convert_string_is_suffix(const function_application_exprt &f);
+  bvt convert_string_contains(const function_application_exprt &f);
   bvt convert_char_literal(const function_application_exprt &f);
   bvt convert_string_char_at(const function_application_exprt &f);
 
@@ -179,6 +194,10 @@ private:
   // Boolean symbols that are used to know whether the results 
   // of some functions should be true.
   std::vector<symbol_exprt> boolean_symbols;
+
+  // Symbols used in existential quantifications
+  std::vector<symbol_exprt> index_symbols;
+
   axiom_vect string_axioms;
 
   // Create a new string expression and add the necessary lemma
@@ -196,6 +215,9 @@ private:
 
   void add_lemma(const exprt &lemma);
   void add_lemmas(axiom_vect & lemmas);
+  // Check that the precondition is satisfiable before adding a lemma, and that we haven't added it before
+  void add_implies_lemma(const exprt &prem, const exprt &body);
+
 
   void add_instantiations(bool first=false);
   bool check_axioms();
@@ -213,7 +235,7 @@ private:
   // Computes one index [v1] in which [axiom.idx] appears, takes the
   // corresponding substitition [r] (obtained with [compute_subst]).
   // Then substitutes [axiom.idx] with [r] in [axiom].
-  exprt instantiate(const string_axiomt &axiom, const exprt &str,
+  string_axiomt instantiate(const string_axiomt &axiom, const exprt &str,
                     const exprt &val);
 
   // For expressions f of a certain form, 		  //
@@ -225,7 +247,7 @@ private:
   // Rewrites it as a sum of qvar and elements in list	  //
   // elems different from qvar. 			  //
   // Takes e minus the sum of the element in elems.	  //
-  exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f);
+  exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f, exprt & positive, exprt & negative);
 
   // Gets a model of an array and put it in a certain form
   exprt get_array(const exprt &arr, const exprt &size);

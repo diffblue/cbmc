@@ -11,5 +11,6 @@ int main()
   __CPROVER_assume(__CPROVER_string_length(s2) >= __CPROVER_string_length(s3));
 
   assert(__CPROVER_string_length(s3) == 0);
+  assert(__CPROVER_string_length(s3) < 2);
   return 0;
 }

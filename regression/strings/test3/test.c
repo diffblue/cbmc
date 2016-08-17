@@ -13,7 +13,7 @@ int main()
         __CPROVER_string_equal(s3, __CPROVER_string_literal("pippo")));
 
     assert(__CPROVER_string_length(s) == i + 5);
-    assert(__CPROVER_string_issuffix(s,__CPROVER_string_literal("po")));
+    assert(__CPROVER_string_issuffix(__CPROVER_string_literal("po"),s));
     assert(__CPROVER_char_at(s, i) == __CPROVER_char_literal("p"));
 
     return 0;
