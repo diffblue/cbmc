@@ -248,7 +248,7 @@ void collect_mcdc_controlling_rec(
     }
     else if(!operands.empty())
     {
-      for(unsigned i=0; i<operands.size(); i++)
+      for(std::size_t i=0; i<operands.size(); i++)
       {
         const exprt op=operands[i];
       
@@ -263,7 +263,7 @@ void collect_mcdc_controlling_rec(
               others2.push_back(conjunction(conditions));
             }
             
-            for(unsigned j=0; j<operands.size(); j++)
+            for(std::size_t j=0; j<operands.size(); j++)
             {
               others1.push_back(not_exprt(operands[j]));
               if(i!=j)
@@ -293,7 +293,7 @@ void collect_mcdc_controlling_rec(
           std::vector<exprt> others;
           others.reserve(operands.size()-1);
 
-          for(unsigned j=0; j<operands.size(); j++)
+          for(std::size_t j=0; j<operands.size(); j++)
             if(i!=j)
             {
               if(src.id()==ID_or)
@@ -378,17 +378,16 @@ Function: replacement_conjunction
 std::set<exprt> replacement_conjunction(
   const std::set<exprt> &replacement_exprs,
   const std::vector<exprt> &operands,
-  const int i)
+  const std::size_t i)
 {
   std::set<exprt> result;
   for(auto &y : replacement_exprs)
   {
     std::vector<exprt> others;
-    for(unsigned j=0; j<operands.size(); j++)
+    for(std::size_t j=0; j<operands.size(); j++)
       if(i!=j)
-      {
         others.push_back(operands[j]);
-      }
+
     others.push_back(y);
     exprt c=conjunction(others);
     result.insert(c);
@@ -448,7 +447,8 @@ std::set<exprt> collect_mcdc_controlling_nested(
         // each of its operands
         std::vector<exprt> operands;
         collect_operands(x, operands);
-        for(int i=0; i<operands.size(); i++)
+
+        for(std::size_t i=0; i<operands.size(); i++)
         {
           std::set<exprt> res;
           /**
@@ -692,10 +692,12 @@ bool eval_expr(
   // src is OR
   else if(src.id()==ID_or)
   {
-    unsigned fcount=0;
+    std::size_t fcount=0;
+
     for(auto &x : operands)
       if(not eval_expr(atomic_exprs, x))
         fcount++;
+
     if(fcount<operands.size())
       return true;
     else
@@ -1211,7 +1213,7 @@ void instrument_cover_goals(
           i_it->source_location.set_property_class("coverage");
         }
         
-        for(unsigned i=0; i<conditions.size()*2; i++)
+        for(std::size_t i=0; i<conditions.size()*2; i++)
           i_it++;
       }
       break;
@@ -1245,7 +1247,7 @@ void instrument_cover_goals(
           i_it->source_location.set_property_class("coverage");
         }
         
-        for(unsigned i=0; i<decisions.size()*2; i++)
+        for(std::size_t i=0; i<decisions.size()*2; i++)
           i_it++;
       }
       break;
@@ -1321,7 +1323,7 @@ void instrument_cover_goals(
           i_it->source_location.set_property_class("coverage");
         }
         
-        for(unsigned i=0; i<both.size()*2+controlling.size(); i++)
+        for(std::size_t i=0; i<both.size()*2+controlling.size(); i++)
           i_it++;
       }
       break;
