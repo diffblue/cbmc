@@ -167,9 +167,9 @@ fraction        {integer}
 float1          {integer}"."{fraction}?({exponent})?
 float2          "."{fraction}({exponent})?
 float3          {integer}{exponent}
-hexfloat1       "0"[xX]{hexdigit}+"."{hexdigit}+[pP][+-]?{integer}
-hexfloat2       "0"[xX]{hexdigit}+"."[pP][+-]?{integer}
-hexfloat3       "0"[xX]{hexdigit}+[pP][+-]?{integer}
+hexfloat1       "0"[xX]{hexdigit}*"."{hexdigit}+[pP][+-]?{integer}
+hexfloat2       "0"[xX]{hexdigit}*"."[pP][+-]?{integer}
+hexfloat3       "0"[xX]{hexdigit}*[pP][+-]?{integer}
 float_suffix    [fFlLiIjJ]*
 gcc_ext_float_suffix    [wWqQ]|[dD][fFdDlL]?
 float           {float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
