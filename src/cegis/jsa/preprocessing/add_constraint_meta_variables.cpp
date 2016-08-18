@@ -11,6 +11,7 @@
 
 namespace
 {
+#if 0
 symbolt &create_jsa_symbol(symbol_tablet &st, const std::string &full_name,
     const typet &type)
 {
@@ -29,6 +30,7 @@ symbolt &create_jsa_symbol(symbol_tablet &st, const std::string &full_name,
   assert(!st.add(new_symbol));
   return st.lookup(new_symbol.name);
 }
+#endif
 
 void declare_lambda(jsa_programt &p, goto_programt &body)
 {

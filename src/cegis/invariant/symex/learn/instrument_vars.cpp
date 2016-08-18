@@ -11,6 +11,7 @@
 #include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/invariant/symex/learn/instrument_vars.h>
 
+#if 0
 namespace
 {
 null_pointer_exprt get_null()
@@ -19,6 +20,7 @@ null_pointer_exprt get_null()
   return null_pointer_exprt(void_pointer_type);
 }
 }
+#endif
 
 void link_result_var(const symbol_tablet &st, goto_functionst &gf,
     const size_t num_user_vars, const size_t max_solution_size,
@@ -63,6 +65,7 @@ void link_user_program_variables(invariant_programt &prog,
       is_instrumentable_user_variable, begin, end);
 }
 
+#if 0
 namespace
 {
 void link_user_symbols(const symbol_tablet &st, operand_variable_idst &var_ids,
@@ -80,6 +83,7 @@ void link_user_symbols(const symbol_tablet &st, operand_variable_idst &var_ids,
   }
 }
 }
+#endif
 
 size_t get_invariant_variable_ids(const symbol_tablet &st,
     operand_variable_idst &ids)

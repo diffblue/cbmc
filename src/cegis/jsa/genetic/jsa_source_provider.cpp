@@ -9,9 +9,10 @@
 #include <cegis/jsa/learn/jsa_symex_learn.h>
 #include <cegis/jsa/genetic/jsa_source_provider.h>
 
-jsa_source_providert::jsa_source_providert(const optionst &options,
-    jsa_symex_learnt &lcfg) :
-    options(options), lcfg(lcfg)
+jsa_source_providert::jsa_source_providert(
+  const optionst &,
+  jsa_symex_learnt &lcfg) :
+    /* options(options), */ lcfg(lcfg)
 {
 }
 
