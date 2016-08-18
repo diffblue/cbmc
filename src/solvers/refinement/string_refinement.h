@@ -56,6 +56,43 @@ public:
 
   // True axiom
   string_axiomt();
+  
+  // Warning: this assume no premise:
+  inline string_axiomt operator&&(const string_axiomt & a) {
+    assert(premise == true_exprt());
+    return string_axiomt(and_exprt(this->body, a.body));
+  }
+
+  inline string_axiomt operator&&(const exprt & a) {
+    assert(premise == true_exprt());
+    return string_axiomt(and_exprt(this->body, a));
+  }
+
+  // Warning: this assume no premise:
+  inline string_axiomt operator||(const string_axiomt & a) {
+    assert(premise == true_exprt());
+    return string_axiomt(or_exprt(this->body, a.body));
+  }
+
+  inline string_axiomt operator||(const exprt & a) {
+    assert(premise == true_exprt());
+    return string_axiomt(or_exprt(this->body, a));
+  }
+
+  // Add an universal quantifier, assume the premise are empty
+  inline string_axiomt forall(symbol_exprt univ, exprt bound) {
+    assert(premise == true_exprt());
+    return string_axiomt(univ,binary_relation_exprt(univ,ID_lt,bound), body);
+  }
+
+  inline static string_axiomt equality(const exprt & a, const exprt &b) {
+    return string_axiomt(equal_exprt(a,b));
+  }
+
+  inline string_axiomt operator!() {
+    assert(premise == true_exprt());
+    return string_axiomt(not_exprt(body));
+  }
 };
 
 typedef std::vector<string_axiomt> axiom_vect;
@@ -104,6 +141,8 @@ private:
   void of_string_concat(const function_application_exprt &f,axiom_vect &axioms);
   void of_string_substring(const function_application_exprt &expr,axiom_vect &axioms);
   void of_string_char_set(const function_application_exprt &expr,axiom_vect &axioms);
+
+  void of_if(const if_exprt &expr, axiom_vect & axioms);
   
   friend inline string_exprt &to_string_expr(exprt &expr)
   {
@@ -115,6 +154,11 @@ private:
 
 string_exprt &to_string_expr(exprt expr);
 
+/*
+class char_exprt : public exprt {
+public:
+  char_exprt(const exprt & unrefined_char);
+  };*/
 
 class string_refinementt: public bv_refinementt
 {
@@ -132,6 +176,8 @@ public:
   static symbol_exprt fresh_symbol(const irep_idt &prefix,
 				   const typet &tp=bool_typet());
 
+  symbol_exprt fresh_index(const irep_idt &prefix);
+  symbol_exprt fresh_boolean(const irep_idt &prefix);
 
   inline std::string axiom_to_string(const string_axiomt & ax) {
     return ("forall " + pretty_short(ax.univ_var) + ". (" 
@@ -153,6 +199,10 @@ public:
   irep_idt string_is_suffix_func;
   irep_idt string_contains_func;
   irep_idt string_char_set_func;
+  irep_idt string_index_of_func;
+  irep_idt string_last_index_of_func;
+
+  static exprt is_positive(const exprt & x);
 
 private:  
   typedef bv_refinementt SUB;
@@ -187,6 +237,8 @@ protected:
   bvt convert_string_is_prefix(const function_application_exprt &f);
   bvt convert_string_is_suffix(const function_application_exprt &f);
   bvt convert_string_contains(const function_application_exprt &f);
+  bvt convert_string_index_of(const function_application_exprt &f);
+  bvt convert_string_last_index_of(const function_application_exprt &f);
   bvt convert_char_literal(const function_application_exprt &f);
   bvt convert_string_char_at(const function_application_exprt &f);
 
@@ -263,6 +315,7 @@ private:
 
   // succinct and pretty way to display an expression
   std::string pretty_short(const exprt & expr);
+
 
 };
 
