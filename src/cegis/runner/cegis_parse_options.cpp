@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: CBMC Command Line Option Processing
+Module: CEGIS Command Line Option Processing
 
 Author: Daniel Kroening, kroening@kroening.com
 
