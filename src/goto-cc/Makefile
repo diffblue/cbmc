@@ -9,6 +9,7 @@ OBJ += ../big-int/big-int$(LIBEXT) \
       ../util/util$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../ansi-c/ansi-c$(LIBEXT) \
+      ../cpp/cpp$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../langapi/langapi$(LIBEXT)
@@ -26,11 +27,6 @@ ifeq ($(BUILD_ENV_),MSVC)
 all: goto-cl$(EXEEXT)
 endif
 all: goto-cc$(EXEEXT)
-
-ifneq ($(wildcard ../cpp/Makefile),)
-  OBJ += ../cpp/cpp$(LIBEXT)
-  CP_CXXFLAGS += -D HAVE_CPP
-endif
 
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
