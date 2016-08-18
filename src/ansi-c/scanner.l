@@ -160,8 +160,6 @@ decinteger      [1-9]({digit}|"'")*{int_suffix}
 octinteger      "0"({octdigit}|"'")*{int_suffix}
 hexinteger      "0"[xX]{hexdigit}({hexdigit}|"'")*{int_suffix}
 integer_s       {decinteger}|{bininteger}|{octinteger}|{hexinteger}
-octchar         "\\"{octdigit}{1,3}
-hexchar         "\\x"{hexdigit}+
 exponent        [eE][+-]?{integer}
 fraction        {integer}
 float1          {integer}"."{fraction}?({exponent})?
