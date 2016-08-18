@@ -56,12 +56,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       cegis-util/temporary_output_block.cpp cegis-util/cbmc_runner.cpp cegis-util/module_helper.cpp \
       constant/add_constant.cpp constant/literals_collector.cpp constant/default_cegis_constant_strategy.cpp \
       instrument/cegis_library.cpp instrument/instrument_var_ops.cpp instrument/meta_variables.cpp \
-      runner/cegis_parse_options.cpp runner/cegis_main.cpp \
-      ../goto-instrument/dump_c.cpp ../goto-instrument/goto_program2code.cpp ../goto-instrument/nondet_static.cpp \
-      ../goto-instrument/cover.cpp \
-      ../cbmc/cbmc_parse_options.cpp ../cbmc/bmc.cpp ../cbmc/cbmc_solvers.cpp ../cbmc/symex_bmc.cpp \
-      ../cbmc/xml_interface.cpp ../cbmc/bmc_cover.cpp ../cbmc/bv_cbmc.cpp ../cbmc/counterexample_beautification.cpp \
-      ../cbmc/cbmc_languages.cpp ../cbmc/show_vcc.cpp ../cbmc/cbmc_dimacs.cpp ../cbmc/all_properties.cpp \
+      runner/cegis_parse_options.cpp runner/cegis_main.cpp
  
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../jsil/jsil$(LIBEXT) \
@@ -86,7 +81,14 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
-      ../util/util$(LIBEXT)
+      ../util/util$(LIBEXT) \
+      ../goto-instrument/dump_c$(OBJEXT) ../goto-instrument/goto_program2code$(OBJEXT) \
+      ../goto-instrument/nondet_static$(OBJEXT) ../goto-instrument/cover$(OBJEXT) \
+      ../cbmc/cbmc_parse_options$(OBJEXT) ../cbmc/bmc$(OBJEXT) ../cbmc/cbmc_solvers$(OBJEXT) \
+      ../cbmc/symex_bmc$(OBJEXT) ../cbmc/xml_interface$(OBJEXT) ../cbmc/bmc_cover$(OBJEXT) \
+      ../cbmc/bv_cbmc$(OBJEXT) ../cbmc/counterexample_beautification$(OBJEXT) \
+      ../cbmc/cbmc_languages$(OBJEXT) ../cbmc/show_vcc$(OBJEXT) \
+      ../cbmc/cbmc_dimacs$(OBJEXT) ../cbmc/all_properties$(OBJEXT)
 
 INCLUDES= -I ..
 
