@@ -88,7 +88,8 @@ public:
   
   bool operator()();
 
-  virtual void goal_covered(const cover_goalst::goalt &);
+  // gets called by prop_covert
+  virtual void satisfying_assignment();
 
   struct goalt
   {
@@ -183,7 +184,7 @@ protected:
 
 /*******************************************************************\
 
-Function: bmc_covert::goal_covered
+Function: bmc_covert::satisfying_assignment
 
   Inputs:
 
@@ -193,7 +194,7 @@ Function: bmc_covert::goal_covered
 
 \*******************************************************************/
 
-void bmc_covert::goal_covered(const cover_goalst::goalt &)
+void bmc_covert::satisfying_assignment()
 {
   for(auto &g_it : goal_map)
   {
