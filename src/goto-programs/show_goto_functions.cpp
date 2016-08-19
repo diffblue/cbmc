@@ -12,6 +12,8 @@ Author: Peter Schrammel
 #include <util/json.h>
 #include <util/i2string.h>
 #include <util/xml_expr.h>
+#include <util/cprover_prefix.h>
+#include <util/prefix.h>
 
 #include <langapi/language_util.h>
 
@@ -67,6 +69,11 @@ void show_goto_functions(
       json_objectt &json_function=
         json_functions.push_back(jsont()).make_object();
       json_function["name"]=json_stringt(id2string(it->first));
+      json_function["isBodyAvailable"]=
+        jsont::json_boolean(it->second.body_available());
+      bool is_internal=(has_prefix(id2string(it->first), CPROVER_PREFIX) ||
+                        it->first==ID__start);
+      json_function["isInternal"]=jsont::json_boolean(is_internal);
     }
     json_objectt json_result;
     json_result["functions"]=json_functions;
