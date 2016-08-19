@@ -129,11 +129,53 @@ void convert(
       break;
       
     case goto_trace_stept::OUTPUT:
-      // TODO
+      {
+        json_objectt &json_output=dest_array.push_back().make_object();
+        
+        json_output["stepType"]=json_stringt("output");
+        json_output["hidden"]=jsont::json_boolean(it.hidden);
+        json_output["thread"]=json_numbert(i2string(it.thread_nr));
+        json_output["outputID"]=json_stringt(id2string(it.io_id));
+
+        json_arrayt &json_values=json_output["values"].make_array();
+
+        for(const auto l_it : it.io_args)
+        {
+          if(l_it.is_nil())
+            json_values.push_back(json_stringt(""));
+          else
+            json_values.push_back(
+              json_stringt(from_expr(ns, "", l_it)));
+        }
+
+        if(!json_location.is_null())
+          json_output["sourceLocation"]=json_location;
+      }
       break;
       
     case goto_trace_stept::INPUT:
-      // TODO
+      {
+        json_objectt &json_input=dest_array.push_back().make_object();
+        
+        json_input["stepType"]=json_stringt("input");
+        json_input["hidden"]=jsont::json_boolean(it.hidden);
+        json_input["thread"]=json_numbert(i2string(it.thread_nr));
+        json_input["inputID"]=json_stringt(id2string(it.io_id));
+        
+        json_arrayt &json_values=json_input["values"].make_array();
+
+        for(const auto l_it : it.io_args)
+        {
+          if(l_it.is_nil())
+            json_values.push_back(json_stringt(""));
+          else
+            json_values.push_back(
+              json_stringt(from_expr(ns, "", l_it)));
+        }
+
+        if(!json_location.is_null())
+          json_input["sourceLocation"]=json_location;
+      }
       break;
       
     case goto_trace_stept::FUNCTION_CALL:
