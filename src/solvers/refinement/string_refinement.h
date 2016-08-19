@@ -279,6 +279,7 @@ private:
 
   // See the definition in the PASS article
   // this is indexed by array_expressions
+  std::map<exprt, expr_sett> current_index_set;
   std::map<exprt, expr_sett> index_set;
 
   // Add to the index set all the indices that appear in the formula
@@ -306,6 +307,13 @@ private:
   // Takes e minus the sum of the element in elems.	  //
   exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f);
   //, exprt & positive, exprt & negative);
+  
+  // Rewrite a sum in a simple form: sum m_i * expr_i
+  std::map< exprt, int> map_of_sum(const exprt &f);
+  exprt sum_of_map(std::map<exprt,int> &m,bool negated=false);
+
+  // Simplify a sum (an expression with only plus and minus expr)
+  exprt simplify_sum(const exprt &f);
 
   // Gets a model of an array and put it in a certain form
   exprt get_array(const exprt &arr, const exprt &size);

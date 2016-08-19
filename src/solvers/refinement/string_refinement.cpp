@@ -465,9 +465,9 @@ void string_refinementt::check_SAT()
   if(!progress){
     if(!check_axioms()) 
       {
-	index_set.clear(); 
+	current_index_set.clear(); 
 	update_index_set(cur); 
-	progress=(!index_set.empty());
+	progress=(!current_index_set.empty());
 	cur.clear();
 	add_instantiations();
 
@@ -702,17 +702,17 @@ bvt string_refinementt::convert_string_contains(
 
   string_axioms.emplace_back(implies_exprt(contains,and_exprt(is_positive(startpos),binary_relation_exprt(startpos, ID_le, minus_exprt(s0.length(),s1.length())))));
 
-  symbol_exprt qvar = fresh_symbol("qvar_contains", index_type);
+  symbol_exprt qvar = fresh_symbol("QA_contains", index_type);
   exprt qvar_shifted = plus_exprt(qvar, startpos);
-  string_axioms.emplace_back(qvar, and_exprt(contains, s1 > qvar),
+  string_axioms.emplace_back(qvar, and_exprt(contains, and_exprt(is_positive(qvar),s1 > qvar)),
 			     equal_exprt(s1[qvar],s0[qvar_shifted]));
 
   // We rewrite the axiom for !contains as:
   // forall startpos. exists witness. (!contains && |s0| >= |s1| && stratpos <= |s0| - |s1|)
   //      ==> witness < |s1| && s1[witness] != s0[startpos+witness]
 
-  symbol_exprt qstartpos = fresh_symbol("qstartpos_contains", index_type);
-  symbol_exprt witness = fresh_symbol("witness_not_contains", index_type);
+  symbol_exprt qstartpos = fresh_symbol("QA_startpos_contains", index_type);
+  symbol_exprt witness = fresh_symbol("QE_witness_not_contains", index_type);
   exprt shifted = plus_exprt(witness, qstartpos);
   string_axioms.emplace_back(is_positive(witness));
 
@@ -720,9 +720,12 @@ bvt string_refinementt::convert_string_contains(
     (qstartpos,witness,s1.length(),
      and_exprt(not_exprt(contains),
 	       and_exprt(s0 >= s1,
-			 binary_relation_exprt
-			 (qstartpos,ID_le,
-			  minus_exprt(s0.length(),s1.length())))),
+			 and_exprt(
+				   binary_relation_exprt
+				   (qstartpos,ID_le,
+				    minus_exprt(s0.length(),s1.length())),
+				   is_positive(qstartpos)
+				   ))),
      notequal_exprt(s1[witness],s0[shifted]));
 
 
@@ -823,17 +826,6 @@ bvt string_refinementt::convert_string_char_at(
 // PASS Algorithm //
 ////////////////////
 
-void string_refinementt::update_index_set(const axiom_vect & string_axioms) {
-  for (size_t i = 0; i < string_axioms.size(); ++i) {
-    update_index_set(string_axioms[i]);
-  }
-}
-
-void string_refinementt::update_index_set(const std::vector<exprt> & cur) {
-  for (size_t i = 0; i < cur.size(); ++i) {
-    update_index_set(cur[i]);
-  }
-}
 
 // We compute the index set for all formulas, instantiate the formulas
 // with the found indexes, and add them as lemmas.
@@ -841,9 +833,9 @@ void string_refinementt::add_instantiations()
 {
   //debug() << "string_refinementt::add_instantiations" << eom;
   debug() << "string_refinementt::add_instantiations: "
-	  << "going through the index set:" << eom;
-  for (std::map<exprt, expr_sett>::iterator i = index_set.begin(),
-	 end = index_set.end(); i != end; ++i) {
+	  << "going through the current index set:" << eom;
+  for (std::map<exprt, expr_sett>::iterator i = current_index_set.begin(),
+	 end = current_index_set.end(); i != end; ++i) {
     const exprt &s = i->first;
     debug() << "IS(" << pretty_short(s) << ") == {";
 
@@ -1065,19 +1057,13 @@ namespace {
 } // namespace
 
 
-exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, const exprt &f) //, exprt & positive, exprt & negative)
-{
-  exprt positive, negative;
-  //std::cout << "compute_subst (" << pretty_short(qvar) << "," << val << "," << f << ")" << std::endl;
-  std::vector< std::pair<exprt, bool> > to_process;
 
+std::map< exprt, int> string_refinementt::map_of_sum(const exprt &f) {
   // number of time the element should be added (can be negative)
   std::map< exprt, int> elems;
-  // qvar has to be equal to val - f(0) if it appears positively in f 
-  // (ie if f(qvar) = f(0) + qvar) and f(0) - val if it appears negatively 
-  // in f. So we start by computing val - f(0).
-  to_process.push_back(std::make_pair(val,true));
-  to_process.push_back(std::make_pair(f, false));
+
+  std::vector< std::pair<exprt, bool> > to_process;
+  to_process.push_back(std::make_pair(f, true));
 
   while (!to_process.empty()) {
     exprt cur = to_process.back().first;
@@ -1096,13 +1082,54 @@ exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, con
       else elems[cur] = elems[cur] - 1;
     }
   }
+  return elems;
+}
+
+
+exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
+  exprt sum = index_of_int(0);
+
+  for (std::map<exprt,int>::iterator it = m.begin();
+       it != m.end(); it++) {
+    const exprt &t = it->first;
+    int second = negated?(-it->second):it->second;
+    if (second != 0)
+      if (second == -1) 
+	if(sum == index_of_int(0)) sum = unary_minus_exprt(t);
+	else sum = minus_exprt(sum,t);
+      else if (second == 1)
+	if(sum == index_of_int(0)) sum = t;
+	else sum = plus_exprt(sum, t);
+      else {
+	debug() << "in string_refinementt::sum_of_map:"
+		<< " warning: several occurences of the same variable " << eom;
+	if(second > 1)
+	  for(int i = 0; i < second; i++)
+	    sum = plus_exprt(sum, t);
+	else
+	  for(int i = 0; i > second; i--)
+	    sum = minus_exprt(sum, t);
+      }
+  }
+  return sum;
+}
+
+exprt string_refinementt::simplify_sum(const exprt &f) {
+  std::map<exprt,int> map = map_of_sum(f);
+  return sum_of_map(map);
+}
+
+exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, const exprt &f) //, exprt & positive, exprt & negative)
+{
+  exprt positive, negative;
+  // number of time the element should be added (can be negative)
+  // qvar has to be equal to val - f(0) if it appears positively in f 
+  // (ie if f(qvar) = f(0) + qvar) and f(0) - val if it appears negatively 
+  // in f. So we start by computing val - f(0).
+  std::map< exprt, int> elems = map_of_sum(minus_exprt(val,f));
 
   bool found = false;
   bool neg = false; // true if qvar appears negatively in f, ie positively in the elements
-
-  negative = index_of_int(0);
-  positive = index_of_int(0);  
-
 
   for (std::map<exprt,int>::iterator it = elems.begin();
        it != elems.end(); it++) {
@@ -1111,28 +1138,13 @@ exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, con
       if(it->second == 1 || it->second == -1){
 	found = true;
 	neg = (it->second == 1);
-      } else 
+      } else {
 	debug() << "in string_refinementt::compute_subst:"
 		<< " warning: occurences of qvar canceled out " << eom;
-    } else 
-      if (it->second != 0)
-	if (it->second == -1) 
-	  if(negative == index_of_int(0)) negative = t;
-	  else negative = plus_exprt(negative,t);
-	else if (it->second == 1)
-	  if(positive == index_of_int(0)) positive = t;
-	  else positive = plus_exprt(positive, t);
-	else {
-	debug() << "in string_refinementt::compute_subst:"
-		<< " warning: several occurences of the same variable " << eom;
-	if(it->second > 1)
-	  for(int i = 0; i < it->second; i++)
-	    positive = plus_exprt(positive, t);
-	else
-	  for(int i = 0; i > it->second; i--)
-	    negative = plus_exprt(negative, t);
-	//assert(false);
-	}
+	assert(it->second == 0);
+      }
+      elems.erase(it);
+    }
   }
   
   
@@ -1143,18 +1155,7 @@ exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, con
     return qvar;
   }
 
-  if (neg) positive.swap(negative);
-  
-  if(negative == index_of_int(0)) 
-    return positive;  
-  else 
-    if(positive == index_of_int(0)) 
-      {
-	debug() << "return unary_minus_exprt: this probably shouldn't happen" << eom;
-	return unary_minus_exprt(negative);
-      }
-    else 
-      return minus_exprt(positive,negative);
+  return sum_of_map(elems,neg);
 }
   
 
@@ -1181,6 +1182,18 @@ bool find_qvar(const exprt index, const symbol_exprt & qvar) {
 }
 
 
+void string_refinementt::update_index_set(const axiom_vect & string_axioms) {
+  for (size_t i = 0; i < string_axioms.size(); ++i) {
+    update_index_set(string_axioms[i]);
+  }
+}
+
+void string_refinementt::update_index_set(const std::vector<exprt> & cur) {
+  for (size_t i = 0; i < cur.size(); ++i) {
+    update_index_set(cur[i]);
+  }
+}
+
 void string_refinementt::update_index_set(const string_axiomt &axiom)
 {
   std::vector<exprt> bounds;
@@ -1195,12 +1208,20 @@ void string_refinementt::update_index_set(const string_axiomt &axiom)
       const exprt &s = cur.op0();
       const exprt &i = cur.op1();
 
-      // if cur is of the form s[i] and qvar does not appear in i...
-      if(!find_qvar(i,axiom.univ_var)) {
+      bool has_quant_var = find_qvar(i,axiom.univ_var);
+      if(!has_quant_var) {
+	for(int j = 0; j < axiom.exists_var.size(); j++)
+	  has_quant_var = (has_quant_var || find_qvar(i,axiom.exists_var[j]));
+      }
+
+      // if cur is of the form s[i] and no quantified variable appears in i
+      if(!has_quant_var){
 	assert(s.type() == string_type.get_content_type());
 	expr_sett &idxs = index_set[s];
         idxs.insert(bounds.begin(), bounds.end());
         idxs.insert(i);
+	current_index_set[s].insert(bounds.begin(), bounds.end());
+        current_index_set[s].insert(i);
       }
     } else {
       forall_operands(it, cur) {
@@ -1223,7 +1244,9 @@ void string_refinementt::update_index_set(const exprt &formula)
       const exprt &s = cur.op0();
       const exprt &i = cur.op1();
       assert(s.type() == string_type.get_content_type());
-      index_set[s].insert(i);
+      const exprt &simplified = simplify_sum(i);
+      if(index_set[s].insert(simplified).second)
+	current_index_set[s].insert(simplified);
     } else {
       forall_operands(it, cur) {
         to_process.push_back(*it);
@@ -1270,17 +1293,17 @@ string_axiomt string_refinementt::instantiate(const string_axiomt &axiom,
   exprt idx = find_index(axiom.body,str);
   // what if idx is qvar or if there are several indexes?
   if(idx.is_nil()) return string_axiomt();
+  if(!find_qvar(idx,axiom.univ_var)) return string_axiomt(); 
+
+  exprt r = compute_subst(axiom.univ_var, val, idx);
   //debug() << "string_refinementt::instantiate : replaces " << eom 	  << "occurances of " << pretty_short(axiom.univ_var) << eom	  << "in " << pretty_short(axiom.premise) << " ===> " 	  << pretty_short(axiom.body) << eom ;
-
-  if(!find_qvar(idx,axiom.univ_var)) { debug() << "! find qvar" << eom; return string_axiomt(); }
-
-  //exprt positive;
-  //exprt negative;
-  exprt r = compute_subst(axiom.univ_var, val, idx);//,positive,negative);
   //debug() << "by " << pretty_short(r) << eom;
+
   exprt premise(axiom.premise);
   exprt body(axiom.body);
 
+  replace_expr(axiom.univ_var, r, premise);
+  replace_expr(axiom.univ_var, r, body);
 
   for(unsigned i=0; i < axiom.exists_var.size(); i++) {
     debug() << "string_refinementt::instantiate : generate a fresh variable for existentially quantified variables, assume it has to be positive" << eom;
@@ -1288,25 +1311,16 @@ string_axiomt string_refinementt::instantiate(const string_axiomt &axiom,
     index_symbols.push_back(fresh_var);
     add_lemma(is_positive(fresh_var));
     add_lemma(binary_relation_exprt(fresh_var,ID_lt,axiom.exists_bounds[i]));
-    /*if(find_qvar(premise,axiom.exists_var[i])){
+    /*
+    if(find_qvar(premise,axiom.exists_var[i])){
       debug() << "warning: existential variable appearing on the premise of axiom : "
-	      << axiom_to_string(axiom) << eom
-	      << "we should probably disregard this lemma." << eom;
-      debug() << " r = " << pretty_short(r) << eom;
+	      << " r = " << pretty_short(r) << eom;
       debug() << " str = " << pretty_short(str) << eom;
       debug() << " val = " << pretty_short(val) << eom;
       }*/
     replace_expr(axiom.exists_var[i],fresh_var,body);
-    //replace_expr(axiom.exists_var[i],fresh_var,positive);
-    //replace_expr(axiom.exists_var[i],fresh_var,negative);
     replace_expr(axiom.exists_var[i],fresh_var,premise);
   }
-
-  replace_expr(axiom.univ_var, r, premise);
-  replace_expr(axiom.univ_var, r, body);
-  //replace_expr(axiom.univ_var, r, positive);
-  //replace_expr(axiom.univ_var, r, negative);
-
 
 
   //debug() << "Warning: adding condition saying that " << axiom.univ_var.get_identifier() << " is positive" << eom;     //return string_axiomt(and_exprt(binary_relation_exprt(positive,ID_ge,negative),premise),body); 
