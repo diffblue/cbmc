@@ -89,20 +89,19 @@ void convert(
         if(!json_location.is_null())
           json_assignment["sourceLocation"]=json_location;
 
-        std::string value_string, binary_string, type_string,
-                    full_lhs_string, full_lhs_value_string;
-        
-        //if(it.lhs_object_value.is_not_nil())
-        //  value_string=from_expr(ns, identifier, it.lhs_object_value);
+        std::string value_string, binary_string, type_string, full_lhs_string;
+        json_objectt full_lhs_value;
 
         if(it.full_lhs.is_not_nil())
           full_lhs_string=from_expr(ns, identifier, it.full_lhs);
 
+#if 0
         if(it.full_lhs_value.is_not_nil())
           full_lhs_value_string=from_expr(ns, identifier, it.full_lhs_value);
+#endif
 
-        //if(it.lhs_object_value.type().is_not_nil())
-        //  type_string=from_type(ns, identifier, it.lhs_object_value.type());
+        if(it.full_lhs_value.is_not_nil())
+          full_lhs_value = json(it.full_lhs_value, ns);
 
         const symbolt *symbol;
         irep_idt base_name, display_name;
@@ -117,7 +116,7 @@ void convert(
           json_assignment["mode"]=json_stringt(id2string(symbol->mode));
         }
 
-        json_assignment["value"]=json_stringt(full_lhs_value_string);
+        json_assignment["value"]=full_lhs_value;
         json_assignment["lhs"]=json_stringt(full_lhs_string);
         json_assignment["hidden"]=jsont::json_boolean(it.hidden);
         json_assignment["thread"]=json_numbert(i2string(it.thread_nr));
@@ -144,8 +143,7 @@ void convert(
           if(l_it.is_nil())
             json_values.push_back(json_stringt(""));
           else
-            json_values.push_back(
-              json_stringt(from_expr(ns, "", l_it)));
+            json_values.push_back(json(l_it, ns));
         }
 
         if(!json_location.is_null())
@@ -169,8 +167,7 @@ void convert(
           if(l_it.is_nil())
             json_values.push_back(json_stringt(""));
           else
-            json_values.push_back(
-              json_stringt(from_expr(ns, "", l_it)));
+            json_values.push_back(json(l_it, ns));
         }
 
         if(!json_location.is_null())
