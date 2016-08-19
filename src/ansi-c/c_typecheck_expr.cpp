@@ -2480,6 +2480,25 @@ exprt c_typecheck_baset::do_special_functions(
 
     return pointer_object_expr;
   }
+  else if(identifier=="__builtin_bswap16" ||
+          identifier=="__builtin_bswap32" ||
+          identifier=="__builtin_bswap64")
+  {
+    typecheck_function_call_arguments(expr);
+
+    if(expr.arguments().size()!=1)
+    {
+      err_location(f_op);
+      error() << identifier << " expects one operand" << eom;
+      throw 0;
+    }
+    
+    exprt bswap_expr(ID_bswap, expr.type());
+    bswap_expr.operands()=expr.arguments();
+    bswap_expr.add_source_location()=source_location;
+    
+    return bswap_expr;
+  }
   else if(identifier==CPROVER_PREFIX "isnanf" || 
           identifier==CPROVER_PREFIX "isnand" ||
           identifier==CPROVER_PREFIX "isnanld" ||

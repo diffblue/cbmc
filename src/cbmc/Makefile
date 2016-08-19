@@ -4,6 +4,7 @@ SRC = cbmc_main.cpp cbmc_parse_options.cpp bmc.cpp cbmc_dimacs.cpp \
       xml_interface.cpp bmc_cover.cpp all_properties.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
+      ../cpp/cpp$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -41,11 +42,6 @@ all: cbmc$(EXEEXT)
 ifneq ($(wildcard ../bv_refinement/Makefile),)
   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_BV_REFINEMENT
-endif
-
-ifneq ($(wildcard ../cpp/Makefile),)
-  OBJ += ../cpp/cpp$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_CPP
 endif
 
 ifneq ($(wildcard ../java_bytecode/Makefile),)

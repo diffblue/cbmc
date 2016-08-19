@@ -37,7 +37,7 @@ void add_inductive_step_renondets(jsa_programt &prog)
   const symbol_tablet &st=prog.st;
   goto_functionst &gf=prog.gf;
   goto_programt::instructionst &body=get_entry_body(gf).instructions;
-  const goto_programt::targett first=body.begin();
+  //const goto_programt::targett first=body.begin();
   const goto_programt::targett last=prog.base_case;
   goto_programt::targett pos=prog.base_case;
   for (goto_programt::targett it=body.begin(); it != last; ++it)

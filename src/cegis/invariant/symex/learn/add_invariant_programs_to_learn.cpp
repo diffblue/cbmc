@@ -42,7 +42,8 @@ void execute_inv_prog(const symbol_tablet &st, goto_functionst &gf,
   const constant_exprt index(from_integer(0u, size_type));
   const index_exprt first_elem(prog_symbol, index);
   call.arguments().push_back(address_of_exprt(first_elem));
-  const constant_exprt size(from_integer(max_solution_size, size_type));
+  const typet size_arg_type(unsigned_char_type());
+  const constant_exprt size(from_integer(max_solution_size, size_arg_type));
   call.arguments().push_back(size);
   execution->code=call;
 }

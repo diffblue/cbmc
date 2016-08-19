@@ -32,6 +32,7 @@ Author: Peter Schrammel
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/remove_returns.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -330,14 +331,24 @@ int goto_diff_parse_optionst::doit()
     namespacet ns1(goto_model1.symbol_table);
     goto_model1.goto_functions.output(ns1, std::cout);
     std::cout << "*******************************************************\n";
-    namespacet ns2(goto_model1.symbol_table);
+    namespacet ns2(goto_model2.symbol_table);
     goto_model2.goto_functions.output(ns2, std::cout);
     return 0;
   }
 
-  if(cmdline.isset("change-impact"))
+  if(cmdline.isset("change-impact") ||
+     cmdline.isset("forward-impact")||
+	 cmdline.isset("backward-impact"))
   {
-    change_impact(goto_model1, goto_model2);
+    //Workaround to avoid deps not propagating between return and end_func
+    remove_returns(goto_model1);
+    remove_returns(goto_model2);
+
+    impact_modet impact_mode =
+        cmdline.isset("forward-impact") ?
+            FORWARD : (cmdline.isset("backward-impact") ? BACKWARD : BOTH);
+    change_impact(goto_model1, goto_model2, impact_mode,
+          cmdline.isset("compact-output"));
     return 0;
   }
 
@@ -536,7 +547,10 @@ void goto_diff_parse_optionst::help()
     " --show-functions             show functions (default)\n"
     " --syntactic                  do syntactic diff (default)\n"
     " -u | --unified               output unified diff\n"
-    " --change-impact              output unified diff with dependencies\n"
+    " --change-impact | \n"
+    "  --forward-impact |\n"
+    "  --backward-impact           output unified diff with forward&backward/forward/backward dependencies\n"
+    " --compact-output             output dependencies in compact mode\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

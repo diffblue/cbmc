@@ -19,7 +19,7 @@
  */
 class jsa_source_providert
 {
-  const class optionst &options;
+  //const class optionst &options;
   class jsa_symex_learnt &lcfg;
   std::string source;
 public:
