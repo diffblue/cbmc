@@ -1,7 +1,8 @@
 CORE
 test.c
 --pass 
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^\[main.assertion.1\] assertion c1 == c2: SUCCESS$
+^\[main.assertion.2\] assertion c1 != c2: FAILURE$
 --

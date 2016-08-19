@@ -8,5 +8,6 @@ int main()
     s = __CPROVER_string_literal("pippo");
     n = __CPROVER_string_length(s);
     assert(n == 5);
+    assert(n != 5);
     return 0;
 }

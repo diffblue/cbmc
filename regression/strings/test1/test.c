@@ -13,5 +13,6 @@ int main()
     c1 = __CPROVER_char_at(s, i);
     c2 = __CPROVER_char_literal("p");
     assert (c1 == c2);
+    assert (c1 != c2);
     return 0;
 }

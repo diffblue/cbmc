@@ -252,6 +252,8 @@ private:
 
   axiom_vect string_axioms;
 
+  int nb_sat_iteration;
+
   // Create a new string expression and add the necessary lemma
   // to ensure its equal to the given string expression.
   string_exprt make_string(const exprt &str);
@@ -266,12 +268,13 @@ private:
   literalt convert_rest(const exprt &expr);
 
   void add_lemma(const exprt &lemma);
-  void add_lemmas(axiom_vect & lemmas);
   // Check that the precondition is satisfiable before adding a lemma, and that we haven't added it before
   void add_implies_lemma(const exprt &prem, const exprt &body);
 
+  // Instantiate forall constraints with index from the index set
+  void add_instantiations();
 
-  void add_instantiations(bool first=false);
+  // Return true if the current model satisfies all the axioms
   bool check_axioms();
 
   // See the definition in the PASS article
@@ -280,7 +283,9 @@ private:
 
   // Add to the index set all the indices that appear in the formula
   void update_index_set(const exprt &formula);
+  void update_index_set(const std::vector<exprt> &cur);
   void update_index_set(const string_axiomt &axiom);
+  void update_index_set(const axiom_vect &string_axioms);
 
   // Takes an universaly quantified formula [axiom], 
   // an array of char variable [s], and an index expression [val]. 
@@ -299,7 +304,8 @@ private:
   // Rewrites it as a sum of qvar and elements in list	  //
   // elems different from qvar. 			  //
   // Takes e minus the sum of the element in elems.	  //
-  exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f, exprt & positive, exprt & negative);
+  exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f);
+  //, exprt & positive, exprt & negative);
 
   // Gets a model of an array and put it in a certain form
   exprt get_array(const exprt &arr, const exprt &size);
@@ -310,8 +316,9 @@ private:
   // Lemmas that were already added
   expr_sett seen_instances;
 
-  // current set of lemmas (unquantified)
+  // Unquantified lemmas that have newly been added
   std::vector<exprt> cur;
+  expr_sett all_lemmas;
 
   // succinct and pretty way to display an expression
   std::string pretty_short(const exprt & expr);
