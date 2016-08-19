@@ -305,7 +305,6 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     exprt tmp=expr.op0();
     tmp.type()=expr.type();
     to_constant_expr(tmp).set_value(ID_NULL);
-    tmp.remove(ID_C_cformat);
     expr.swap(tmp);
     return false;
   }

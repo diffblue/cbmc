@@ -105,7 +105,6 @@ exprt convert_integer_literal(const std::string &src)
     type.set(ID_C_c_type, c_type);
 
     exprt result=from_integer(value, type);
-    result.set(ID_C_cformat, src);
     
     return result;    
   }
@@ -194,7 +193,7 @@ exprt convert_integer_literal(const std::string &src)
   else
   {
     result=from_integer(value, type);
-    result.set(ID_C_cformat, src);
+    result.set(ID_C_base, base);
   }
 
   return result;
