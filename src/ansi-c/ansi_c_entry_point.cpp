@@ -80,6 +80,8 @@ exprt::operandst build_function_environment(
     input.op0()=address_of_exprt(
       index_exprt(string_constantt(base_name), gen_zero(index_type())));
     input.op1()=symbol_expr;
+    input.add_source_location()=p.source_location();
+    
     init_code.move_to_operands(input);
     
     result[i]=symbol_expr;
