@@ -15,7 +15,7 @@ trap '' SIGTERM
 config_input=$1
 if [ -z "$1" ]; then config_input='cegis'; fi
 
-for config in $1; do
+for config in ${config_input}; do
  resultFile="${baseDir}/${config}.txt"
  truncate -s 0 "${resultFile}"
  for benchmark in ${baseDir}/cegis/cegis_danger_benchmark_*; do
