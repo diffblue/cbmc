@@ -222,13 +222,12 @@ void bmc_covert::satisfying_assignment()
         status() << "Covered " << g.description << messaget::eom;
         g.satisfied=true;
         test.covered_goals.push_back(g_it.first);
-        symex_target_equationt::SSA_stepst::iterator next=c_it.step;
-        next++; // include the instruction itself
-        build_goto_trace(bmc.equation, next, solver, bmc.ns, test.goto_trace);
         break;
       }
     }
   }
+  build_goto_trace(bmc.equation, bmc.equation.SSA_steps.end(), 
+                   solver, bmc.ns, test.goto_trace);
 }
 
 /*******************************************************************\
