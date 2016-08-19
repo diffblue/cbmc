@@ -87,7 +87,7 @@ int goto_fence_inserter_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << GOTO_FENCE_INSERTER_VERSION << std::endl;
+    std::cout << MUSKETEER_VERSION << std::endl;
     return 0;
   }
   
@@ -447,7 +447,7 @@ void goto_fence_inserter_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* *     musketeer " GOTO_FENCE_INSERTER_VERSION "     * *\n"
+    "* *     musketeer " MUSKETEER_VERSION "     * *\n"
     "\n"
     "              ~__\n"
     "               |)\n"
