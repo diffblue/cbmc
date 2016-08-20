@@ -115,6 +115,18 @@ int cegis_parse_optionst::do_bmc(
   return cbmc_parse_optionst::do_bmc(bmc, goto_functions);
 }
 
+/*******************************************************************\
+
+Function: cegis_parse_optionst::help
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: print help
+
+\*******************************************************************/
+
 void cegis_parse_optionst::help()
 {
   std::cout <<
