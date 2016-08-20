@@ -522,7 +522,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         if(is_label)
         {
-          const unsigned target=safe_string2size_t(
+          const unsigned target=safe_string2unsigned(
             id2string(to_constant_expr(*a_it).get_value()));
           targets.insert(target);
           a_entry.first->second.successors.push_back(target);
