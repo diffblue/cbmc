@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Test-Suite Generation
+Module: Test-Suite Generation with BMC
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -147,8 +147,6 @@ protected:
   const goto_functionst &goto_functions;
   prop_convt &solver;
   bmct &bmc;
-
-  void collect_conditions(const exprt &src, std::set<exprt> &dest);
 };
 
 /*******************************************************************\
@@ -190,35 +188,6 @@ void bmc_covert::satisfying_assignment()
   }
   build_goto_trace(bmc.equation, bmc.equation.SSA_steps.end(), 
                    solver, bmc.ns, test.goto_trace);
-}
-
-/*******************************************************************\
-
-Function: bmc_covert::collect_conditions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void bmc_covert::collect_conditions(const exprt &src, std::set<exprt> &dest)
-{
-  if(src.id()==ID_and || src.id()==ID_or ||
-     src.id()==ID_not || src.id()==ID_implies)
-  {
-    forall_operands(it, src)
-      collect_conditions(*it, dest);
-  }
-  else if(src.is_true())
-  {
-  }
-  else
-  {
-    dest.insert(src); 
-  }
 }
 
 /*******************************************************************\
