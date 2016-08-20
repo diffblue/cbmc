@@ -130,6 +130,23 @@ unsigned safe_string2unsigned(const std::string &str, int base)
 
 /*******************************************************************\
 
+Function: safe_string2size_t
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::size_t safe_string2size_t(const std::string &str, int base)
+{
+  return str2number<std::size_t>(str.c_str(), base, true);
+}
+
+/*******************************************************************\
+
 Function: unsafe_c_str2int
 
   Inputs:

@@ -36,7 +36,7 @@ public:
   // match with '?'  
   friend bool operator==(const irep_idt &what, const patternt &pattern)
   {
-    for(unsigned i=0; i<what.size(); i++)
+    for(std::size_t i=0; i<what.size(); i++)
       if(pattern.p[i]==0)
         return false;
       else if(pattern.p[i]!='?' && pattern.p[i]!=what[i])
@@ -90,7 +90,7 @@ protected:
   {
     irep_idt number=to_constant_expr(arg).get_value();
     
-    unsigned number_int=safe_string2unsigned(id2string(number));
+    std::size_t number_int=safe_string2size_t(id2string(number));
     typet t=java_type_from_char(type_char);
 
     if(variables[number_int].symbol_expr.get_identifier().empty())
@@ -145,7 +145,7 @@ protected:
   typedef std::vector<exprt> stackt;
   stackt stack;
 
-  exprt::operandst pop(unsigned n)
+  exprt::operandst pop(std::size_t n)
   {
     if(stack.size()<n)
     {
@@ -155,7 +155,7 @@ protected:
 
     exprt::operandst operands;
     operands.resize(n);
-    for(unsigned i=0; i<n; i++)
+    for(std::size_t i=0; i<n; i++)
       operands[i]=stack[stack.size()-n+i];
 
     stack.resize(stack.size()-n);
@@ -166,7 +166,7 @@ protected:
   {
     stack.resize(stack.size()+o.size());
 
-    for(unsigned i=0; i<o.size(); i++)
+    for(std::size_t i=0; i<o.size(); i++)
       stack[stack.size()-o.size()+i]=o[i];
   }
 
@@ -187,7 +187,7 @@ const size_t SLOTS_PER_INTEGER(1u);
 const size_t INTEGER_WIDTH(64u);
 size_t count_slots(const size_t value, const code_typet::parametert &param)
 {
-  const unsigned int width(param.type().get_unsigned_int(ID_width));
+  const std::size_t width(param.type().get_unsigned_int(ID_width));
   return value + SLOTS_PER_INTEGER + width / INTEGER_WIDTH;
 }
 
@@ -314,7 +314,7 @@ void java_bytecode_convert_methodt::convert(
     symbol_table.add(parameter_symbol);
 
     // add as a JVM variable
-    unsigned slots=get_variable_slots(parameters[i]);
+    std::size_t slots=get_variable_slots(parameters[i]);
     variables[param_index].symbol_expr=parameter_symbol.symbol_expr();
     param_index+=slots;
   }
@@ -410,7 +410,7 @@ irep_idt get_if_cmp_operator(const irep_idt &stmt)
 
 constant_exprt as_number(const mp_integer value, const typet &type)
 {
-  const unsigned int java_int_width(type.get_unsigned_int(ID_width));
+  const std::size_t java_int_width(type.get_unsigned_int(ID_width));
   const std::string significant_bits(integer2string(value, 2));
   std::string binary_width(java_int_width - significant_bits.length(), '0');
   return constant_exprt(binary_width += significant_bits, type);
@@ -522,7 +522,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         if(is_label)
         {
-          const unsigned target=safe_string2unsigned(
+          const unsigned target=safe_string2size_t(
             id2string(to_constant_expr(*a_it).get_value()));
           targets.insert(target);
           a_entry.first->second.successors.push_back(target);
@@ -668,7 +668,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // do some type adjustment for the arguments,
       // as Java promotes arguments
 
-      for(unsigned i=0; i<parameters.size(); i++)
+      for(std::size_t i=0; i<parameters.size(); i++)
       {
         const typet &type=parameters[i].type();
         if(type==java_boolean_type() ||
@@ -995,7 +995,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==2 && results.size()==1);
       const typet type=java_type_from_char(statement[0]);
 
-      const unsigned int width=type.get_unsigned_int(ID_width);
+      const std::size_t width=type.get_size_t(ID_width);
       typet target=unsignedbv_typet(width);
 
       const typecast_exprt lhs(op[0], target);
@@ -1245,7 +1245,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // The first argument is the type, the second argument is the dimension.
       // The size of each dimension is on the stack.
       irep_idt number=to_constant_expr(arg1).get_value();
-      unsigned dimension=safe_c_str2unsigned(number.c_str());
+      std::size_t dimension=safe_string2size_t(id2string(number));
 
       op=pop(dimension);
       assert(results.size()==1);
