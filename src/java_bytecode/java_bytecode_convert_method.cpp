@@ -25,14 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bytecode_info.h"
 #include "java_types.h"
 
-#if 0
-#include <numeric>
-#include <set>
-#include <stack>
-
-#include "java_class_identifier.h"
-#endif
-
 namespace {
 class patternt
 {
