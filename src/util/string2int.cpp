@@ -215,6 +215,23 @@ unsigned unsafe_string2unsigned(const std::string &str, int base)
 
 /*******************************************************************\
 
+Function: unsafe_string2size_t
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::size_t unsafe_string2size_t(const std::string &str, int base)
+{
+  return str2number<std::size_t>(str.c_str(), base, false);
+}
+
+/*******************************************************************\
+
 Function: unsafe_string2signedlonglong
 
   Inputs:

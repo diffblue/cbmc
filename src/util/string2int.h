@@ -30,6 +30,7 @@ unsigned unsafe_c_str2unsigned(const char *str, int base=10);
 
 int unsafe_string2int(const std::string &str, int base=10);
 unsigned unsafe_string2unsigned(const std::string &str, int base=10);
+std::size_t unsafe_string2size_t(const std::string &str, int base=10);
 
 // Same for atoll
 long long int unsafe_string2signedlonglong(const std::string &str, int base=10);

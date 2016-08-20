@@ -1795,7 +1795,7 @@ std::string expr2ct::convert_member(
     return dest;
   }  
 
-  unsigned n=src.get_component_number();
+  std::size_t n=src.get_component_number();
   
   if(n>=struct_union_type.components().size())
     return convert_norep(src, precedence);
