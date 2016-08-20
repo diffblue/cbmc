@@ -37,7 +37,7 @@ public:
         source_location_map[block_count]=it->source_location;
       
       next_is_target=
-        it->is_goto() || it->is_function_call();
+        it->is_goto() || it->is_function_call() || it->is_assume();
     }
   }
 
