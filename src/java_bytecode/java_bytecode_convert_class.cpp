@@ -190,29 +190,12 @@ void java_bytecode_convert_classt::convert(
   symbolt &class_symbol,
   const fieldt &f)
 {
-  class_typet &class_type=to_class_type(class_symbol.type);
-
-  typet member_type=java_type_from_string(f.signature);
-
-  class_type.components().push_back(class_typet::componentt());
-  class_typet::componentt &component=class_type.components().back();
-
-  component.set_name(f.name);
-  component.set_base_name(f.name);
-  component.set_pretty_name(f.name);
-  component.type()=member_type;
-  
-  if(f.is_private)
-    component.set_access(ID_private);
-  else if(f.is_protected)
-    component.set_access(ID_protected);
-  else if(f.is_public)
-    component.set_access(ID_public);
+  typet field_type=java_type_from_string(f.signature);
 
   // is this a static field?
   if(f.is_static)
   {
-    // create the symbol
+    // Create the symbol; we won't add to the struct type.
     symbolt new_symbol;
 
     new_symbol.is_static_lifetime=true;
@@ -220,17 +203,36 @@ void java_bytecode_convert_classt::convert(
     new_symbol.is_state_var=true;
     new_symbol.name=id2string(class_symbol.name)+"."+id2string(f.name);
     new_symbol.base_name=f.name;
-    new_symbol.type=member_type;
+    new_symbol.type=field_type;
     new_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+id2string(f.name);
     new_symbol.mode=ID_java;
     new_symbol.is_type=false;  
-    new_symbol.value=gen_zero(member_type);
+    new_symbol.value=gen_zero(field_type);
 
     if(symbol_table.add(new_symbol))
     {
       error() << "failed to add static field symbol" << eom;
       throw 0;
     }
+  }
+  else
+  {
+    class_typet &class_type=to_class_type(class_symbol.type);
+
+    class_type.components().push_back(class_typet::componentt());
+    class_typet::componentt &component=class_type.components().back();
+
+    component.set_name(f.name);
+    component.set_base_name(f.name);
+    component.set_pretty_name(f.name);
+    component.type()=field_type;
+    
+    if(f.is_private)
+      component.set_access(ID_private);
+    else if(f.is_protected)
+      component.set_access(ID_protected);
+    else if(f.is_public)
+      component.set_access(ID_public);
   }
 }
 
