@@ -41,44 +41,6 @@ class bmc_covert:
   public messaget
 {
 public:
-  class basic_blockst
-  {
-  public:
-    explicit basic_blockst(const goto_programt &_goto_program)
-    {
-      bool next_is_target=true;
-      unsigned block_count=0;
-
-      forall_goto_program_instructions(it, _goto_program)
-      {
-        if(next_is_target || it->is_target())
-          block_count++;
-          
-        block_map[it]=block_count;
-        
-        next_is_target=
-          it->is_goto() || it->is_return() ||
-          it->is_function_call() || it->is_assume();
-      }
-    }
-    
-    typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
-    block_mapt block_map;
-    
-    inline unsigned operator[](goto_programt::const_targett t)
-    {
-      return block_map[t];
-    }
-    
-    void output(std::ostream &out)
-    {
-      for(const auto &b_it : block_map)
-        out << b_it.first->source_location
-            << " -> " << b_it.second
-            << '\n';
-    }
-  };
-
   bmc_covert(
     const goto_functionst &_goto_functions,
     bmct &_bmc):
@@ -284,8 +246,6 @@ bool bmc_covert::operator()()
   // This maps property IDs to 'goalt'
   forall_goto_functions(f_it, goto_functions)
   {
-    basic_blockst basic_blocks(f_it->second.body);
-    
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(i_it->is_assert())
