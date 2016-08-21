@@ -109,11 +109,8 @@ void record_function_outputs(
   code_blockt &init_code,
   symbol_tablet &symbol_table)
 {
-  const code_typet::parameterst &parameters=
-    to_code_type(function.type).parameters();
-
-  exprt::operandst result;
-  result.reserve(parameters.size()+1);
+  //const code_typet::parameterst &parameters=
+  //  to_code_type(function.type).parameters();
 
   bool has_return_value=
     to_code_type(function.type).return_type()!=empty_typet();
@@ -129,21 +126,20 @@ void record_function_outputs(
     output.op0()=address_of_exprt(
       index_exprt(string_constantt(return_symbol.base_name), 
                   gen_zero(index_type())));
+
     output.op1()=return_symbol.symbol_expr();
-    output.add_source_location()=
-      function.value.operands().back().source_location();
+    output.add_source_location()=function.location;
 
     init_code.move_to_operands(output);
   }
 
+  #if 0
   std::size_t i=0;
 
   for(const auto & p : parameters)
   {
-    irep_idt base_name=p.get_base_name();
-    if(base_name.empty()) base_name="argument#"+i2string(i);
-    irep_idt identifier=id2string(function.name)+
-      "::"+id2string(base_name);
+    irep_idt identifier=p.get_identifier();
+    if(identifier.empty()) continue;
 
     const symbolt &symbol = symbol_table.lookup(identifier);
 
@@ -163,6 +159,7 @@ void record_function_outputs(
 
     i++;
   }
+  #endif
 }
 
 /*******************************************************************\
@@ -277,6 +274,7 @@ bool ansi_c_entry_point(
   call_main.add_source_location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
   call_main.function().add_source_location()=symbol.location;
+
   if(to_code_type(symbol.type).return_type()!=empty_typet())
   {
     auxiliary_symbolt return_symbol;
@@ -498,7 +496,7 @@ bool ansi_c_entry_point(
 
   // TODO: add read/modified (recursively in call graph) globals as INPUT/OUTPUT
 
-  //record_function_outputs(symbol, init_code, symbol_table);
+  record_function_outputs(symbol, init_code, symbol_table);
 
   // add the entry point symbol
   symbolt new_symbol;
