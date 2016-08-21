@@ -4,8 +4,10 @@
 
 #include <goto-instrument/dump_c.h>
 
+#include <cegis/genetic/program_individual_test_runner_helper.h>
 #include <cegis/instrument/cegis_library.h>
 #include <cegis/instrument/literals.h>
+#include <cegis/danger/meta/literals.h>
 #include <cegis/invariant/fitness/concrete_fitness_source_provider.h>
 
 namespace
@@ -199,7 +201,7 @@ bool handle_internals(const std::string &line)
       || "static signed int assert#return_value;" == line;
 }
 
-std::string &post_process(std::string &source, std::stringstream &ss)
+void post_process(std::string &source, std::stringstream &ss)
 {
   bool deserialise_initialised=false;
   bool ce_initialised=false;
@@ -218,7 +220,6 @@ std::string &post_process(std::string &source, std::stringstream &ss)
     source+=line;
     source+='\n';
   }
-  return source;
 }
 
 void add_first_prog_offset(std::string &source, const size_t num_ce_vars)
@@ -234,11 +235,15 @@ std::string &post_process_fitness_source(std::string &result,
     const size_t num_ce_vars, const size_t num_vars, const size_t num_consts,
     const size_t max_prog_size, const std::string &exec)
 {
+  const bool danger=DANGER_EXECUTE == exec;
+  implement_program_individual_deserialise(result, danger);
   const namespacet ns(st);
   std::stringstream ss;
   dump_c(gf, true, ns, ss);
   add_first_prog_offset(result, num_ce_vars);
   add_assume_implementation(result);
   add_danger_execute(result, num_vars, num_consts, max_prog_size, exec);
-  return post_process(result, ss);
+  post_process(result, ss);
+  transform_program_individual_main_to_lib(result, danger);
+  return result;
 }

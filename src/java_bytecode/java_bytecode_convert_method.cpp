@@ -12,25 +12,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#include <numeric>
-#include <set>
-#include <stack>
-
-#include <util/string2int.h>
 #include <util/std_expr.h>
+#include <util/expanding_vector.h>
+#include <util/string2int.h>
+#include <util/i2string.h>
+#include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
-#include <util/i2string.h>
 #include <util/expr_util.h>
-#include <util/prefix.h>
-#include <util/expanding_vector.h>
 
-#include <ansi-c/c_types.h>
-
-#include "java_types.h"
-#include "java_bytecode_convert.h"
-#include "java_class_identifier.h"
+#include "java_bytecode_convert_method.h"
 #include "bytecode_info.h"
+#include "java_types.h"
 
 namespace {
 class patternt
@@ -43,7 +36,7 @@ public:
   // match with '?'  
   friend bool operator==(const irep_idt &what, const patternt &pattern)
   {
-    for(unsigned i=0; i<what.size(); i++)
+    for(std::size_t i=0; i<what.size(); i++)
       if(pattern.p[i]==0)
         return false;
       else if(pattern.p[i]!='?' && pattern.p[i]!=what[i])
@@ -56,10 +49,10 @@ protected:
   const char *p;
 };
 
-class java_bytecode_convertt:public messaget
+class java_bytecode_convert_methodt:public messaget
 {
 public:
-  java_bytecode_convertt(
+  java_bytecode_convert_methodt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
     messaget(_message_handler),
@@ -67,21 +60,14 @@ public:
   {
   }
 
-  void operator()(const java_bytecode_parse_treet &parse_tree)
-  {
-    add_array_types();
-  
-    if(parse_tree.loading_successful)
-      convert(parse_tree.parsed_class);
-    else
-      generate_class_stub(parse_tree.parsed_class.name);
-  }
-
-  typedef java_bytecode_parse_treet::classt classt;
   typedef java_bytecode_parse_treet::methodt methodt;
-  typedef java_bytecode_parse_treet::fieldt fieldt;
   typedef java_bytecode_parse_treet::instructiont instructiont;
   typedef methodt::instructionst instructionst;
+
+  void operator()(const symbolt &class_symbol, const methodt &method)
+  {
+    convert(class_symbol, method);
+  }
 
 protected:
   symbol_tablet &symbol_table;
@@ -104,7 +90,7 @@ protected:
   {
     irep_idt number=to_constant_expr(arg).get_value();
     
-    unsigned number_int=safe_string2unsigned(id2string(number));
+    std::size_t number_int=safe_string2size_t(id2string(number));
     typet t=java_type_from_char(type_char);
 
     if(variables[number_int].symbol_expr.get_identifier().empty())
@@ -159,7 +145,7 @@ protected:
   typedef std::vector<exprt> stackt;
   stackt stack;
 
-  exprt::operandst pop(unsigned n)
+  exprt::operandst pop(std::size_t n)
   {
     if(stack.size()<n)
     {
@@ -169,7 +155,7 @@ protected:
 
     exprt::operandst operands;
     operands.resize(n);
-    for(unsigned i=0; i<n; i++)
+    for(std::size_t i=0; i<n; i++)
       operands[i]=stack[stack.size()-n+i];
 
     stack.resize(stack.size()-n);
@@ -180,139 +166,19 @@ protected:
   {
     stack.resize(stack.size()+o.size());
 
-    for(unsigned i=0; i<o.size(); i++)
+    for(std::size_t i=0; i<o.size(); i++)
       stack[stack.size()-o.size()+i]=o[i];
   }
 
   // conversion
-  void convert(const classt &c);
-  void convert(symbolt &class_symbol, const fieldt &f);
-  void convert(symbolt &class_symbol, const methodt &m);
-  void convert(const instructiont &i);
+  void convert(const symbolt &class_symbol, const methodt &);
+  void convert(const instructiont &);
   
   codet convert_instructions(
     const instructionst &, const code_typet &);
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
-  
-  void generate_class_stub(const irep_idt &class_name);
-  void add_array_types();
 };
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_convertt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void java_bytecode_convertt::convert(const classt &c)
-{
-  class_typet class_type;
-
-  class_type.set_tag(c.name);
-  class_type.set(ID_base_name, c.name);
-
-  if(!c.extends.empty())
-  {
-    symbol_typet base("java::"+id2string(c.extends));
-    class_type.add_base(base);
-    class_typet::componentt base_class_field;
-    base_class_field.type()=base;
-    base_class_field.set_name("@"+id2string(c.extends));
-    base_class_field.set_base_name("@"+id2string(c.extends));
-    base_class_field.set_pretty_name("@"+id2string(c.extends));
-    class_type.components().push_back(base_class_field);
-  }
-
-  // interfaces are recorded as bases
-  const std::list<irep_idt> &ifc=c.implements;
-
-  for(const auto & it : ifc)
-  {
-    symbol_typet base("java::"+id2string(it));
-    class_type.add_base(base);
-  }
-
-  // produce class symbol
-  symbolt new_symbol;
-  new_symbol.base_name=c.name;
-  new_symbol.pretty_name=c.name;
-  new_symbol.name="java::"+id2string(c.name);
-  class_type.set(ID_name, new_symbol.name);
-  new_symbol.type=class_type;
-  new_symbol.mode=ID_java;
-  new_symbol.is_type=true;
-  
-  symbolt *class_symbol;
-  
-  // add before we do members
-  if(symbol_table.move(new_symbol, class_symbol))
-  {
-    error() << "failed to add class symbol " << new_symbol.name << eom;
-    throw 0;
-  }
-
-  // now do members  
-  for(const auto & it : c.fields)
-    convert(*class_symbol, it);
-
-  for(const auto & it : c.methods)
-    convert(*class_symbol, it);
-
-  // is this a root class?
-  if(c.extends.empty())
-    create_class_identifier(*class_symbol);
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_convertt::generate_class_stub
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void java_bytecode_convertt::generate_class_stub(const irep_idt &class_name)
-{
-  class_typet class_type;
-
-  class_type.set_tag(class_name);
-  class_type.set(ID_base_name, class_name);
-
-  class_type.set(ID_incomplete_class, true);
-
-  // produce class symbol
-  symbolt new_symbol;
-  new_symbol.base_name=class_name;
-  new_symbol.pretty_name=class_name;
-  new_symbol.name="java::"+id2string(class_name);
-  class_type.set(ID_name, new_symbol.name);
-  new_symbol.type=class_type;
-  new_symbol.mode=ID_java;
-  new_symbol.is_type=true;
-  
-  symbolt *class_symbol;
-  
-  if(symbol_table.move(new_symbol, class_symbol))
-  {
-    warning() << "stub class symbol "+id2string(new_symbol.name)+" already exists";
-  }
-  else
-  {
-    // create the class identifier
-    create_class_identifier(*class_symbol);
-  }
 }
 
 namespace {
@@ -321,7 +187,7 @@ const size_t SLOTS_PER_INTEGER(1u);
 const size_t INTEGER_WIDTH(64u);
 size_t count_slots(const size_t value, const code_typet::parametert &param)
 {
-  const unsigned int width(param.type().get_unsigned_int(ID_width));
+  const std::size_t width(param.type().get_unsigned_int(ID_width));
   return value + SLOTS_PER_INTEGER + width / INTEGER_WIDTH;
 }
 
@@ -349,7 +215,7 @@ void cast_if_necessary(binary_relation_exprt &condition)
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::convert
+Function: java_bytecode_convert_methodt::convert
 
   Inputs:
 
@@ -359,11 +225,11 @@ Function: java_bytecode_convertt::convert
 
 \*******************************************************************/
 
-void java_bytecode_convertt::convert(
-  symbolt &class_symbol,
+void java_bytecode_convert_methodt::convert(
+  const symbolt &class_symbol,
   const methodt &m)
 {
-  class_typet &class_type=to_class_type(class_symbol.type);
+  //const class_typet &class_type=to_class_type(class_symbol.type);
 
   typet member_type=java_type_from_string(m.signature);
 
@@ -380,8 +246,8 @@ void java_bytecode_convertt::convert(
   if(!m.is_static)
   {
     code_typet::parametert this_p;
-    const empty_typet empty;
-    const pointer_typet object_ref_type(empty);
+    const reference_typet object_ref_type(
+      symbol_typet(class_symbol.name));
     this_p.type()=object_ref_type;
     this_p.set_this();
     parameters.insert(parameters.begin(), this_p);
@@ -448,18 +314,22 @@ void java_bytecode_convertt::convert(
     symbol_table.add(parameter_symbol);
 
     // add as a JVM variable
-    unsigned slots=get_variable_slots(parameters[i]);
+    std::size_t slots=get_variable_slots(parameters[i]);
     variables[param_index].symbol_expr=parameter_symbol.symbol_expr();
     param_index+=slots;
   }
 
+  const bool is_virtual=!m.is_static && !m.is_final;
+
+  #if 0
   class_type.methods().push_back(class_typet::methodt());
   class_typet::methodt &method=class_type.methods().back();
+  #else
+  class_typet::methodt method;
+  #endif
 
   method.set_base_name(m.base_name);
   method.set_name(method_identifier);
-
-  const bool is_virtual=!m.is_static && !m.is_final;
 
   method.set(ID_abstract, m.is_abstract);
   method.set(ID_is_virtual, is_virtual);
@@ -503,7 +373,7 @@ void java_bytecode_convertt::convert(
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::convert
+Function: java_bytecode_convert_methodt::get_bytecode_info
 
   Inputs:
 
@@ -513,67 +383,7 @@ Function: java_bytecode_convertt::convert
 
 \*******************************************************************/
 
-void java_bytecode_convertt::convert(
-  symbolt &class_symbol,
-  const fieldt &f)
-{
-  class_typet &class_type=to_class_type(class_symbol.type);
-
-  typet member_type=java_type_from_string(f.signature);
-
-  class_type.components().push_back(class_typet::componentt());
-  class_typet::componentt &component=class_type.components().back();
-
-  component.set_name(f.name);
-  component.set_base_name(f.name);
-  component.set_pretty_name(f.name);
-  component.type()=member_type;
-  
-  if(f.is_private)
-    component.set_access(ID_private);
-  else if(f.is_protected)
-    component.set_access(ID_protected);
-  else if(f.is_public)
-    component.set_access(ID_public);
-
-  // is this a static field?
-  if(f.is_static)
-  {
-    // create the symbol
-    symbolt new_symbol;
-
-    new_symbol.is_static_lifetime=true;
-    new_symbol.is_lvalue=true;
-    new_symbol.is_state_var=true;
-    new_symbol.name=id2string(class_symbol.name)+"."+id2string(f.name);
-    new_symbol.base_name=f.name;
-    new_symbol.type=member_type;
-    new_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+id2string(f.name);
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;  
-    new_symbol.value=gen_zero(member_type);
-
-    if(symbol_table.add(new_symbol))
-    {
-      error() << "failed to add static field symbol" << eom;
-      throw 0;
-    }
-  }
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_convertt::get_bytecode_info
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-const bytecode_infot &java_bytecode_convertt::get_bytecode_info(
+const bytecode_infot &java_bytecode_convert_methodt::get_bytecode_info(
   const irep_idt &statement)
 {
   for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
@@ -600,7 +410,7 @@ irep_idt get_if_cmp_operator(const irep_idt &stmt)
 
 constant_exprt as_number(const mp_integer value, const typet &type)
 {
-  const unsigned int java_int_width(type.get_unsigned_int(ID_width));
+  const std::size_t java_int_width(type.get_unsigned_int(ID_width));
   const std::string significant_bits(integer2string(value, 2));
   std::string binary_width(java_int_width - significant_bits.length(), '0');
   return constant_exprt(binary_width += significant_bits, type);
@@ -622,7 +432,7 @@ member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::convert_instructions
+Function: java_bytecode_convert_methodt::convert_instructions
 
   Inputs:
 
@@ -632,7 +442,7 @@ Function: java_bytecode_convertt::convert_instructions
 
 \*******************************************************************/
 
-codet java_bytecode_convertt::convert_instructions(
+codet java_bytecode_convert_methodt::convert_instructions(
   const instructionst &instructions,
   const code_typet &method_type)
 {
@@ -858,7 +668,7 @@ codet java_bytecode_convertt::convert_instructions(
       // do some type adjustment for the arguments,
       // as Java promotes arguments
 
-      for(unsigned i=0; i<parameters.size(); i++)
+      for(std::size_t i=0; i<parameters.size(); i++)
       {
         const typet &type=parameters[i].type();
         if(type==java_boolean_type() ||
@@ -1183,11 +993,10 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?ushr"))
     {
       assert(op.size()==2 && results.size()==1);
-      const typet type(java_type_from_char(statement[0]));
+      const typet type=java_type_from_char(statement[0]);
 
-      const unsigned int width(type.get_unsigned_int(ID_width));
-      typet target=unsigned_long_int_type();
-      target.set(ID_width, width);
+      const std::size_t width=type.get_size_t(ID_width);
+      typet target=unsignedbv_typet(width);
 
       const typecast_exprt lhs(op[0], target);
       const typecast_exprt rhs(op[1], target);
@@ -1345,14 +1154,14 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="getfield")
     {
       assert(op.size()==1 && results.size()==1);
-      results[0]=to_member(op[0], arg0);
+      results[0]=java_bytecode_promotion(to_member(op[0], arg0));
     }
     else if(statement=="getstatic")
     {
       assert(op.empty() && results.size()==1);
       symbol_exprt symbol_expr(arg0.type());
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+arg0.get_string(ID_component_name));
-      results[0]=symbol_expr;
+      results[0]=java_bytecode_promotion(symbol_expr);
     }
     else if(statement=="putfield")
     {
@@ -1436,7 +1245,7 @@ codet java_bytecode_convertt::convert_instructions(
       // The first argument is the type, the second argument is the dimension.
       // The size of each dimension is on the stack.
       irep_idt number=to_constant_expr(arg1).get_value();
-      unsigned dimension=safe_c_str2unsigned(number.c_str());
+      std::size_t dimension=safe_string2size_t(id2string(number));
 
       op=pop(dimension);
       assert(results.size()==1);
@@ -1531,6 +1340,13 @@ codet java_bytecode_convertt::convert_instructions(
 
       results[0]=
         binary_predicate_exprt(op[0], "java_instanceof", arg0);
+    }
+    else if(statement=="monitorenter")
+      warning() << "critical section with lock object is ignored ("
+                << i_it->source_location << ")" << eom;
+    else if(statement=="monitorexit")
+      // just skip, is always preceeded with "monitorenter"
+    {
     }
     else
     {
@@ -1635,7 +1451,7 @@ codet java_bytecode_convertt::convert_instructions(
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::add_array_types
+Function: java_bytecode_convert_method
 
   Inputs:
 
@@ -1645,76 +1461,14 @@ Function: java_bytecode_convertt::add_array_types
 
 \*******************************************************************/
 
-void java_bytecode_convertt::add_array_types()
-{
-  const char letters[]="ijsbcfdza";
-
-  for(unsigned i=0; letters[i]!=0; i++)
-  {
-    symbol_typet symbol_type=
-      to_symbol_type(java_array_type(letters[i]).subtype());
-    
-    struct_typet struct_type;
-    // we have the base class, java.lang.Object, length and data
-    // of appropriate type
-    struct_type.set_tag(symbol_type.get_identifier());
-    struct_type.components().resize(3);
-    struct_type.components()[0].set_name("@java.lang.Object");
-    struct_type.components()[0].type()=symbol_typet("java::java.lang.Object");
-    struct_type.components()[1].set_name("length");
-    struct_type.components()[1].type()=java_int_type();
-    struct_type.components()[2].set_name("data");
-    struct_type.components()[2].type()=
-      pointer_typet(java_type_from_char(letters[i]));
-
-    symbolt symbol;
-    symbol.name=symbol_type.get_identifier();
-    symbol.base_name=symbol_type.get(ID_C_base_name);
-    symbol.is_type=true;
-    symbol.type=struct_type;
-    symbol_table.add(symbol);
-  }
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool java_bytecode_convert(
-  const java_bytecode_parse_treet &parse_tree,
+void java_bytecode_convert_method(
+  const symbolt &class_symbol,
+  const java_bytecode_parse_treet::methodt &method,
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  java_bytecode_convertt java_bytecode_convert(
+  java_bytecode_convert_methodt java_bytecode_convert_method(
     symbol_table, message_handler);
 
-  try
-  {
-    java_bytecode_convert(parse_tree);
-    return false;
-  }
-
-  catch(int)
-  {
-  }
-
-  catch(const char *e)
-  {
-    java_bytecode_convert.error() << e << messaget::eom;
-  }
-
-  catch(const std::string &e)
-  {
-    java_bytecode_convert.error() << e << messaget::eom;
-  }
-
-  return true;
+  java_bytecode_convert_method(class_symbol, method);
 }

@@ -54,6 +54,8 @@ src/xmllang/xml_y.tab.h
 # binaries
 src/cbmc/cbmc
 src/cbmc/cbmc.exe
+src/cegis/cegis
+src/cegis/cegis.exe
 src/goto-analyzer/goto-analyzer
 src/goto-analyzer/goto-analyzer.exe
 src/goto-cc/goto-cc

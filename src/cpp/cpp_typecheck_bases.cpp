@@ -45,8 +45,8 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol_expr.id()!=ID_type)
     {
-      err_location(name.source_location());
-      str << "expected type as struct/class base";
+      error().source_location=name.source_location();
+      error() << "expected type as struct/class base" << eom;
       throw 0;
     }
     
@@ -55,8 +55,8 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol_expr.type().id()!=ID_symbol)
     {
-      err_location(name.source_location());
-      str << "expected type symbol as struct/class base";
+      error().source_location=name.source_location();
+      error() << "expected type symbol as struct/class base" << eom;
       throw 0;
     }
 
@@ -65,15 +65,15 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol.type.id()==ID_incomplete_struct)
     {
-      err_location(name.source_location());
-      str << "base type is incomplete";
+      error().source_location=name.source_location();
+      error() << "base type is incomplete" << eom;
       throw 0;
     }
     else if(base_symbol.type.id()!=ID_struct)
     {
-      err_location(name.source_location());
-      str << "expected struct or class as base, but got `"
-          << to_string(base_symbol.type) << "'";
+      error().source_location=name.source_location();
+      error() << "expected struct or class as base, but got `"
+              << to_string(base_symbol.type) << "'" << eom;
       throw 0;
     }
 
@@ -152,9 +152,9 @@ void cpp_typecheckt::add_base_components(
 
   if(bases.find(from_name)!=bases.end())
   {
-    err_location(to);
-    str << "error: non-virtual base class " << from_name
-        << " inherited multiple times";
+    error().source_location=to.source_location();
+    error() << "error: non-virtual base class " << from_name
+            << " inherited multiple times" << eom;
     throw 0;
   }
 

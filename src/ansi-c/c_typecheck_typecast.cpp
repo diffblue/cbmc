@@ -37,13 +37,12 @@ void c_typecheck_baset::implicit_typecast(
       it!=c_typecast.errors.end();
       it++)
   {
-    err_location(expr);
-    str << "in expression `" << to_string(expr) << "':\n";
-    str << "conversion from `"
-        << to_string(src_type) << "' to `"
-        << to_string(dest_type) << "': "
-        << *it;
-    error_msg();
+    error().source_location=expr.find_source_location();
+    error() << "in expression `" << to_string(expr) << "':\n"
+            << "conversion from `"
+            << to_string(src_type) << "' to `"
+            << to_string(dest_type) << "': "
+            << *it << eom;
   }
   
   if(!c_typecast.errors.empty())
@@ -54,13 +53,12 @@ void c_typecheck_baset::implicit_typecast(
       it!=c_typecast.warnings.end();
       it++)
   {
-    err_location(expr);
-    str << "warning: conversion from `"
-        << to_string(src_type)
-        << "' to `"
-        << to_string(dest_type)
-        << "': " << *it;
-    warning_msg();
+    warning().source_location=expr.find_source_location();
+    warning() << "warning: conversion from `"
+              << to_string(src_type)
+              << "' to `"
+              << to_string(dest_type)
+              << "': " << *it << eom;
   }
 }
 

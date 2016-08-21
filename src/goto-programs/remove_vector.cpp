@@ -50,7 +50,7 @@ void remove_vector(exprt &expr)
       // do component-wise:
       // x+y -> vector(x[0]+y[0],x[1]+y[1],...)
       array_exprt array_expr(array_type);
-      array_expr.operands().resize(integer2long(dimension));
+      array_expr.operands().resize(integer2size_t(dimension));
 
       for(unsigned i=0; i<array_expr.operands().size(); i++)
       {
@@ -76,7 +76,7 @@ void remove_vector(exprt &expr)
       // do component-wise:
       // -x -> vector(-x[0],-x[1],...)
       array_exprt array_expr(array_type);
-      array_expr.operands().resize(integer2long(dimension));
+      array_expr.operands().resize(integer2size_t(dimension));
 
       for(unsigned i=0; i<array_expr.operands().size(); i++)
       {

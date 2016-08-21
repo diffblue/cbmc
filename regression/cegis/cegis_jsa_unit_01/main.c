@@ -33,10 +33,9 @@ int main(void)
   const __CPROVER_jsa_data_t limit=3;
   __CPROVER_jsa_iterator_id_t __CPROVER_jsa_iterator_it=__CPROVER_jsa_iterator(&heap, __CPROVER_jsa_list_list);
 
-  __CPROVER_jsa_pred_instructiont __CPROVER_jsa_predicate_yyy;
   unsigned char pred_size=1;
-  __CPROVER_jsa_pred_instructiont __CPROVER_jsa_predicate_xxx[] = { { .opcode=0, .result_op=0, .op0=1, .op1=0 } };
-  __CPROVER_JSA_PREDICATES[0]=__CPROVER_jsa_predicate_xxx;
+  __CPROVER_jsa_pred_instructiont __CPROVER_jsa_predicate[] = { { .opcode=0, .result_op=0, .op0=1, .op1=0 } };
+  __CPROVER_JSA_PREDICATES[0]=__CPROVER_jsa_predicate;
   __CPROVER_JSA_PREDICATE_SIZES[0]=pred_size;
   unsigned char lambda_op=0;
   unsigned char tmp0=0;
@@ -49,7 +48,7 @@ int main(void)
   __CPROVER_JSA_PRED_RESULT_OPS[2]=&tmp2;
   unsigned char query_size=2;
   __CPROVER_assume(query_size >= 1 && query_size <= __CPROVER_JSA_MAX_QUERY_SIZE);
-  __CPROVER_jsa_query_instructiont __CPROVER_jsa_query[] = { { .opcode=0, .op0=0, .op1=0 }, { .opcode=0, .op0=0, .op1=0 } };
+  __CPROVER_jsa_query_instructiont __CPROVER_jsa_query[] = { { .opcode=0, .op0=0, .op1=0 }, { .opcode=0, .op0=0, .op1=__CPROVER_jsa_null } };
   unsigned char invariant_size;
   __CPROVER_assume(invariant_size >= 1 && invariant_size <= 1);
   __CPROVER_jsa_invariant_instructiont invariant[] = { { .opcode=0 } };

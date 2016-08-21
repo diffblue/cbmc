@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "designator.h"
 
 class c_typecheck_baset:
-  public legacy_typecheckt,
+  public typecheckt,
   public namespacet
 {
 public:
@@ -28,7 +28,7 @@ public:
     symbol_tablet &_symbol_table,
     const std::string &_module,
     message_handlert &_message_handler):
-    legacy_typecheckt(_message_handler),
+    typecheckt(_message_handler),
     namespacet(_symbol_table),
     symbol_table(_symbol_table),
     module(_module),
@@ -41,7 +41,7 @@ public:
     const symbol_tablet &_symbol_table2,
     const std::string &_module,
     message_handlert &_message_handler):
-    legacy_typecheckt(_message_handler),
+    typecheckt(_message_handler),
     namespacet(_symbol_table1, _symbol_table2),
     symbol_table(_symbol_table1),
     module(_module),
@@ -168,6 +168,7 @@ protected:
   virtual void typecheck_expr_rel(binary_relation_exprt &expr);
   virtual void typecheck_expr_rel_vector(binary_relation_exprt &expr);
   virtual void adjust_float_rel(exprt &expr);
+  static void add_rounding_mode(exprt &);
   virtual void typecheck_expr_index(exprt &expr);
   virtual void typecheck_expr_typecast(exprt &expr);
   virtual void typecheck_expr_symbol(exprt &expr);

@@ -3,6 +3,7 @@ SRC = goto_analyzer_main.cpp goto_analyzer_parse_options.cpp \
       unreachable_instructions.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
+      ../cpp/cpp$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -23,11 +24,6 @@ include ../common
 CLEANFILES = goto-analyzer$(EXEEXT)
 
 all: goto-analyzer$(EXEEXT)
-
-ifneq ($(wildcard ../cpp/Makefile),)
-  OBJ += ../cpp/cpp$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_CPP
-endif
 
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)

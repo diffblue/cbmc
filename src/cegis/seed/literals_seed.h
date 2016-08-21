@@ -29,7 +29,7 @@ public:
    *
    * @param prog
    */
-  danger_literals_seedt(const danger_programt &prog);
+  explicit danger_literals_seedt(const danger_programt &prog);
 
   /**
    * @brief

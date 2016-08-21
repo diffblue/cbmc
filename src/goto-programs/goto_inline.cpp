@@ -59,8 +59,9 @@ void goto_inlinet::parameter_assignments(
 
     if(identifier==irep_idt())
     {
-      err_location(source_location);
-      throw "no identifier for function parameter";
+      error().source_location=source_location;
+      error() << "no identifier for function parameter" << eom;
+      throw 0;
     }
 
     {
@@ -80,10 +81,10 @@ void goto_inlinet::parameter_assignments(
     // if you run out of actual arguments there was a mismatch
     if(it1==arguments.end())
     {
-      err_location(source_location);
-      str << "call to `" << function_name << "': "
-        "not enough arguments, inserting non-deterministic value";
-      warning_msg();
+      warning().source_location=source_location;
+      warning() << "call to `" << function_name << "': "
+                << "not enough arguments, "
+                << "inserting non-deterministic value" << eom;
 
       actual=side_effect_expr_nondett(par_type);
     }
@@ -123,15 +124,15 @@ void goto_inlinet::parameter_assignments(
         }
         else
         {
-          err_location(actual);
+          error().source_location=actual.find_source_location();
 
-          str << "function call: argument `" << identifier
-              << "' type mismatch: argument is `"
-              // << from_type(ns, identifier, actual.type())
-              << actual.type().pretty()
-              << "', parameter is `"
-              << from_type(ns, identifier, par_type)
-              << "'";
+          error() << "function call: argument `" << identifier
+                  << "' type mismatch: argument is `"
+                  // << from_type(ns, identifier, actual.type())
+                  << actual.type().pretty()
+                  << "', parameter is `"
+                  << from_type(ns, identifier, par_type)
+                  << "'" << eom;
           throw 0;
         }
       }
@@ -189,8 +190,9 @@ void goto_inlinet::parameter_destruction(
 
     if(identifier==irep_idt())
     {
-      err_location(source_location);
-      throw "no identifier for function parameter";
+      error().source_location=source_location;
+      error() << "no identifier for function parameter" << eom;
+      throw 0;
     }
 
     {
@@ -235,7 +237,7 @@ void goto_inlinet::replace_return(
       {
         if(it->code.operands().size()!=1)
         {
-          err_location(it->code);
+          error().source_location=it->code.find_source_location();
           str << "return expects one operand!";
           warning_msg();
           continue;
@@ -287,10 +289,9 @@ void goto_inlinet::replace_return(
       {
         if(it->code.operands().size()!=1)
         {
-          err_location(it->code);
-          str << "return expects one operand!";
-          str << '\n' << it->code.pretty();
-          warning_msg();
+          warning().source_location=it->code.find_source_location();
+          warning() << "return expects one operand!\n"
+                    << it->code.pretty() << eom;
           continue;
         }
       
@@ -432,9 +433,8 @@ void goto_inlinet::expand_function_call(
 
     // it's really recursive, and we need full inlining.
     // Uh. Buh. Give up.
-    err_location(function);
-    str << "recursion is ignored";
-    warning_msg();
+    warning().source_location=function.find_source_location();
+    warning() << "recursion is ignored" << eom;
     target->make_skip();
     
     target++;
@@ -452,8 +452,8 @@ void goto_inlinet::expand_function_call(
       return; // simply ignore, we don't do full inlining, it's ok
     }
 
-    err_location(function);
-    str << "failed to find function `" << identifier << "'";
+    error().source_location=function.find_source_location();
+    error() << "failed to find function `" << identifier << "'" << eom;
     throw 0;
   }
   
@@ -536,9 +536,8 @@ void goto_inlinet::expand_function_call(
   {
     if(no_body_set.insert(identifier).second)
     {
-      err_location(function);
-      str << "no body for function `" << identifier << "'";
-      warning_msg();
+      warning().source_location=function.find_source_location();
+      warning() << "no body for function `" << identifier << "'" << eom;
     }
 
     goto_programt tmp;
@@ -736,7 +735,7 @@ void goto_inline(
   message_handlert &message_handler)
 {
   goto_inlinet goto_inline(goto_functions, ns, message_handler);
-
+  
   try
   {
     // find entry point
@@ -751,24 +750,22 @@ void goto_inline(
 
   catch(int)
   {
-    goto_inline.error_msg();
+    goto_inline.error();
+    throw 0;
   }
 
   catch(const char *e)
   {
-    goto_inline.str << e;
-    goto_inline.error_msg();
+    goto_inline.error() << e << messaget::eom;
+    throw 0;
   }
 
   catch(const std::string &e)
   {
-    goto_inline.str << e;
-    goto_inline.error_msg();
+    goto_inline.error() << e << messaget::eom;
+    throw 0;
   }
   
-  if(goto_inline.get_error_found())
-    throw 0;
-
   // clean up
   for(goto_functionst::function_mapt::iterator
       it=goto_functions.function_map.begin();
@@ -822,7 +819,7 @@ void goto_partial_inline(
     message_handler);
   
   goto_inline.smallfunc_limit=_smallfunc_limit;
-
+  
   try
   {
     for(goto_functionst::function_mapt::iterator
@@ -835,23 +832,21 @@ void goto_partial_inline(
 
   catch(int)
   {
-    goto_inline.error_msg();
+    goto_inline.error();
+    throw 0;
   }
 
   catch(const char *e)
   {
-    goto_inline.str << e;
-    goto_inline.error_msg();
+    goto_inline.error() << e << messaget::eom;
+    throw 0;
   }
 
   catch(const std::string &e)
   {
-    goto_inline.str << e;
-    goto_inline.error_msg();
-  }
-
-  if(goto_inline.get_error_found())
+    goto_inline.error() << e << messaget::eom;
     throw 0;
+  }
 }
 
 /*******************************************************************\

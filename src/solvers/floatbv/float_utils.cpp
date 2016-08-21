@@ -1244,9 +1244,9 @@ bvt float_utilst::rounder(const unbiased_floatt &src)
       aligned_exponent=src.exponent;
 
   {
-    unsigned exponent_bits=
-      std::max((unsigned long)integer2long(address_bits(spec.f)),
-               (unsigned long)spec.e)+1;
+    std::size_t exponent_bits=
+      std::max((std::size_t)integer2size_t(address_bits(spec.f)),
+               (std::size_t)spec.e)+1;
 
     // before normalization, make sure exponent is large enough
     if(aligned_exponent.size()<exponent_bits)

@@ -1,6 +1,6 @@
 CORE
 main.c
---gcc -D __CPROVER
+--gcc --stop-on-fail -D __CPROVER
 ^  0 == 1$
 ^VERIFICATION FAILED$
 ^EXIT=10$

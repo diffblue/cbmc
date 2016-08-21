@@ -1381,12 +1381,9 @@ std::string expr2ct::convert_complex(
      src.op0().is_zero() &&
      src.op1().id()==ID_constant)
   {
-    const irep_idt &cformat=src.op1().get(ID_C_cformat);
-
-    if(!cformat.empty())
-      return id2string(cformat);
-    else
-      return convert(src.op1(), precedence)+"i";
+    // This is believed to be gcc only; check if this is sensible
+    // in MSC mode.
+    return convert(src.op1(), precedence)+"i";
   }
 
   // ISO C11 offers:
@@ -1798,7 +1795,7 @@ std::string expr2ct::convert_member(
     return dest;
   }  
 
-  unsigned n=src.get_component_number();
+  std::size_t n=src.get_component_number();
   
   if(n>=struct_union_type.components().size())
     return convert_norep(src, precedence);
@@ -2102,11 +2099,7 @@ std::string expr2ct::convert_constant(
   const constant_exprt &src,
   unsigned &precedence)
 {
-  const irep_idt &cformat=src.get(ID_C_cformat);
-
-  if(!cformat.empty())
-    return id2string(cformat);
-
+  const irep_idt &base=src.get(ID_C_base);
   const typet &type=ns.follow(src.type());
   const irep_idt value=src.get_value();
   std::string dest;
@@ -2169,7 +2162,8 @@ std::string expr2ct::convert_constant(
           type.id()==ID_c_bit_field ||
           type.id()==ID_c_bool)
   {
-    mp_integer int_value=binary2integer(id2string(value), type.id()==ID_signedbv);
+    mp_integer int_value=
+      binary2integer(id2string(value), type.id()==ID_signedbv);
     
     const irep_idt &c_type=
       type.id()==ID_c_bit_field?type.subtype().get(ID_C_c_type):
@@ -2198,7 +2192,7 @@ std::string expr2ct::convert_constant(
       else if(int_value>=' ' && int_value<126)
       {
         dest+='\'';
-        dest+=char(integer2long(int_value));
+        dest+=char(integer2ulong(int_value));
         dest+='\'';
       }
       else
@@ -2206,7 +2200,14 @@ std::string expr2ct::convert_constant(
     }
     else
     {
-      dest=integer2string(int_value);
+      if(base=="16")
+        dest="0x"+integer2string(int_value, 16);
+      else if(base=="8")
+        dest="0"+integer2string(int_value, 8);
+      else if(base=="2")
+        dest="0b"+integer2string(int_value, 2);
+      else
+        dest=integer2string(int_value);
       
       if(c_type==ID_unsigned_int)
         dest+='u';
@@ -3541,6 +3542,9 @@ std::string expr2ct::convert_code(
   if(statement==ID_input)
     return convert_code_input(src, indent);
 
+  if(statement==ID_output)
+    return convert_code_output(src, indent);
+
   if(statement==ID_assume)
     return convert_code_assume(src, indent);
 
@@ -3878,6 +3882,38 @@ std::string expr2ct::convert_code_input(
 
     if(it!=src.operands().begin()) dest+=", ";
     // TODO: ggf. Klammern je nach p
+    dest+=arg_str;
+  }
+
+  dest+=");";
+
+  return dest;
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_code_output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_code_output(
+  const codet &src,
+  unsigned indent)
+{
+  std::string dest=indent_str(indent)+"OUTPUT(";
+
+  forall_operands(it, src)
+  {
+    unsigned p;
+    std::string arg_str=convert(*it, p);
+
+    if(it!=src.operands().begin()) dest+=", ";
     dest+=arg_str;
   }
 
@@ -4400,6 +4436,9 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_isinf)
     return convert_function(src, "isinf", precedence=16);
+
+  else if(src.id()==ID_bswap)
+    return convert_function(src, "bswap", precedence=16);
 
   else if(src.id()==ID_isnormal)
     return convert_function(src, "isnormal", precedence=16);

@@ -9,18 +9,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS
 #define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS
 
-#include <util/message_stream.h>
+#include <util/message.h>
 
 #include "goto_functions.h"
 
-class goto_inlinet:public message_streamt
+class goto_inlinet:public messaget
 {
 public:
   goto_inlinet(
     goto_functionst &_goto_functions,
     const namespacet &_ns,
     message_handlert &_message_handler):
-    message_streamt(_message_handler),
+    messaget(_message_handler),
     smallfunc_limit(0),
     goto_functions(_goto_functions),
     ns(_ns)

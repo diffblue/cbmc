@@ -17,26 +17,16 @@
  *
  * @details
  */
+template<class population_typet>
 class tournament_selectt
 {
-  class random_individualt &random;
-  const size_t pop_size;
   const size_t rounds;
 public:
-  typedef program_populationt populationt;
-  typedef populationt::value_type individualt;
-  typedef std::deque<populationt::iterator> individualst;
-  class selectiont
-  {
-  public:
-    individualst parents;
-    individualst children;
-
-    bool can_mutate() const;
-    bool can_cross() const;
-    populationt::value_type &mutation_lhs();
-    const populationt::value_type &mutation_rhs() const;
-  };
+  typedef population_typet populationt;
+  typedef typename populationt::value_type individualt;
+  typedef family_selectiont<populationt> selectiont;
+  typedef typename selectiont::individualst individualst;
+  typedef typename populationt::iterator contestantt;
 
   /**
    * @brief
@@ -44,11 +34,9 @@ public:
    * @details
    *
    * @param random
-   * @param pop_size
    * @param rounds
    */
-  tournament_selectt(random_individualt &random, size_t pop_size,
-      size_t rounds);
+  explicit tournament_selectt(size_t rounds);
 
   /**
    * @brief
@@ -63,19 +51,12 @@ public:
    * @details
    *
    * @param population
-   */
-  void init(populationt &population);
-
-  /**
-   * @brief
-   *
-   * @details
-   *
-   * @param population
    *
    * @return
    */
   selectiont select(populationt &population);
 };
+
+#include "tournament_select.inc"
 
 #endif /* CEGIS_GENETIC_TOURNAMENT_SELECT_H_ */

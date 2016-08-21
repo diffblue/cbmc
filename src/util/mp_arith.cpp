@@ -260,7 +260,7 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
 
 /*******************************************************************\
 
-Function:
+Function: integer2ulong
 
   Inputs:
 
@@ -270,10 +270,30 @@ Function:
 
 \*******************************************************************/
 
-mp_integer::ullong_t integer2long(const mp_integer &n)
+mp_integer::ullong_t integer2ulong(const mp_integer &n)
 {
   assert(n.is_ulong());
   return n.to_ulong();
+}
+
+/*******************************************************************\
+
+Function: integer2size_t
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::size_t integer2size_t(const mp_integer &n)
+{
+  assert(n>=0);
+  mp_integer::ullong_t ull=integer2ulong(n);
+  assert(ull <= std::numeric_limits<std::size_t>::max());
+  return (std::size_t)ull;
 }
 
 /*******************************************************************\
@@ -291,7 +311,7 @@ Function: integer2unsigned
 unsigned integer2unsigned(const mp_integer &n)
 {
   assert(n>=0);
-  mp_integer::ullong_t ull=integer2long(n);
+  mp_integer::ullong_t ull=integer2ulong(n);
   assert(ull <= std::numeric_limits<unsigned>::max());
   return (unsigned)ull;
 }

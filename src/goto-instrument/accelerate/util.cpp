@@ -89,7 +89,7 @@ typet join_types(const typet &t1, const typet &t2) {
   }
 
   std::cerr << "Tried to join types: "
-            << t1.to_string() << " and " << t2.to_string()
+            << t1.pretty() << " and " << t2.pretty()
             << std::endl;
   assert(!"Couldn't join types");
 }

@@ -122,7 +122,7 @@ void boolbvt::convert_update_rec(
       
     bvt tmp_bv=bv;
     
-    for(std::size_t i=0; i!=integer2long(size); ++i)
+    for(std::size_t i=0; i!=integer2size_t(size); ++i)
     {
       std::size_t new_offset=offset+i*element_size;
       

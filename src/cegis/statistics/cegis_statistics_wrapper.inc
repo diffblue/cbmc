@@ -1,10 +1,13 @@
+#include <cegis/options/parameters.h>
+
 typedef std::chrono::high_resolution_clock my_clockt;
 
 template<class learnt, class verifyt, class mstreamt>
 cegis_statistics_wrappert<learnt, verifyt, mstreamt>::cegis_statistics_wrappert(
-    learnt &learner, verifyt &verifier, mstreamt &os) :
+    learnt &learner, verifyt &verifier, mstreamt &os, const optionst &options) :
     learner(learner), verifier(verifier), os(os), num_ces(0), learner_time(0), verifier_time(
-        0), start_time(my_clockt::now())
+        0), start_time(my_clockt::now()), show_iterations(
+        options.get_bool_option(CEGIS_SHOW_ITERATIONS))
 {
 }
 
@@ -38,7 +41,7 @@ bool cegis_statistics_wrappert<learnt, verifyt, mstreamt>::learn(itert first,
   my_time_pointt before=my_clockt::now();
   const bool result=learner.learn(first, last);
   my_time_pointt after=my_clockt::now();
-  learner_time+=std::chrono::duration_cast < millisecondst > (after - before);
+  learner_time+=std::chrono::duration_cast<millisecondst>(after - before);
   return result;
 }
 
@@ -71,6 +74,19 @@ void cegis_statistics_wrappert<learnt, verifyt, mstreamt>::verify(
   verifier.verify(candidate);
   my_time_pointt after=my_clockt::now();
   verifier_time+=std::chrono::duration_cast < millisecondst > (after - before);
+  if (show_iterations)
+  {
+    os << "<counterexamples>" << messaget::endl;
+    const const_iterator last=counterexamples_end();
+    for (const_iterator it=counterexamples_begin(); it != last; ++it)
+    {
+      os << "<counterexample>" << messaget::endl;
+      verifier.show_counterexample(os, *it);
+      os << "</counterexample>" << messaget::endl;
+    }
+    os << "</counterexamples>" << messaget::endl;
+    show_candidate(os);
+  }
 }
 
 template<class learnt, class verifyt, class mstreamt>

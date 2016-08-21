@@ -37,7 +37,7 @@ void interpretert::read(
     mp_integer value;
     
     if(address<memory.size())
-      value=memory[integer2long(address)].value;
+      value=memory[integer2size_t(address)].value;
     else
       value=0;
       

@@ -13,10 +13,6 @@
 #include <cegis/jsa/preprocessing/clone_heap.h>
 #include <cegis/jsa/verify/insert_solution.h>
 
-// XXX: Debug
-#include <iostream>
-// XXX: Debug
-
 #define JSA_PRED_RESULT JSA_PREFIX "pred_result"
 #define SYNC_IT "__CPROVER_jsa_verify_synchronise_iterator"
 #define MAKE_NULL "__CPROVER_jsa__internal_make_null"
@@ -39,10 +35,7 @@ void add_predicates(jsa_programt &prog, const jsa_solutiont::predicatest &preds)
   const std::string result(get_cegis_meta_name(JSA_PRED_RESULT));
   const symbol_exprt ret_val(st.lookup(result).symbol_expr());
   const goto_programt::targett first=pos;
-  pos=body.insert_after(pos);
-  pos->source_location=jsa_builtin_source_location();
-  pos->type=goto_program_instruction_typet::RETURN;
-  pos->code=code_returnt(ret_val);
+  pos=add_return_assignment(body, pos, JSA_PRED_EXEC, ret_val);
   const goto_programt::targett end=pos;
   pos=body.insert_after(pos);
   pos->source_location=jsa_builtin_source_location();
@@ -98,6 +91,7 @@ void insert_invariant(const symbol_tablet &st, const goto_functionst &gf, goto_p
   args.push_back(address_of_exprt(get_user_heap(gf)));
   args.push_back(address_of_exprt(get_queried_heap(st)));
   pos->code=call;
+  remove_return(body, pos);
 }
 
 const exprt &get_iterator_arg(const codet &code)
@@ -159,20 +153,6 @@ void insert_jsa_solution(jsa_programt &prog, const jsa_solutiont &solution)
   const symbol_tablet &st=prog.st;
   goto_functionst &gf=prog.gf;
   goto_programt &body=get_entry_body(gf);
-
-  // XXX: Debug
-  const namespacet ns(st);
-  goto_programt tmp;
-  for (const auto &pred : solution.predicates)
-  {
-    tmp.instructions=pred;
-    tmp.compute_incoming_edges();
-    tmp.compute_target_numbers();
-    std::cout << "<pred>" << std::endl;
-    tmp.output(ns, "", std::cout);
-    std::cout << "</pred>" << std::endl;
-  }
-  // XXX: Debug
 
   insert_before(body, prog.base_case, solution.query);
   insert_invariant(st, gf, body, prog.base_case, solution.invariant);

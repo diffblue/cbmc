@@ -53,8 +53,8 @@ codet cpp_typecheckt::cpp_constructor(
 
     if(!operands.empty() && !operands.front().get_bool("#array_ini"))
     {
-      err_location(source_location);
-      str << "bad array initializer";
+      error().source_location=source_location;
+      error() << "bad array initializer" << eom;
       throw 0;
     }
 
@@ -84,9 +84,9 @@ codet cpp_typecheckt::cpp_constructor(
     mp_integer s;
     if(to_integer(tmp_size, s))
     {
-      err_location(source_location);
-      str << "array size `" << to_string(size_expr)
-          << "' is not a constant";
+      error().source_location=source_location;
+      error() << "array size `" << to_string(size_expr)
+              << "' is not a constant" << eom;
       throw 0;
     }
 
@@ -177,9 +177,9 @@ codet cpp_typecheckt::cpp_constructor(
     }
     else
     {
-      err_location(source_location);
-      str << "initialization of POD requires one argument, "
-             "but got " << operands.size() << std::endl;
+      error().source_location=source_location;
+      error() << "initialization of POD requires one argument, "
+                 "but got " << operands.size() << eom;
       throw 0;
     }
     

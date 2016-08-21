@@ -24,4 +24,8 @@ void unwind(
   const unsigned k,
   std::vector<goto_programt::targett> &iteration_points);
 
+void goto_unwind(
+  goto_functionst &goto_functions,
+  const unsigned k);
+
 #endif

@@ -757,9 +757,8 @@ void aig_prop_solvert::convert_aig()
   this->compute_phase(n_pos, n_neg);
   #endif
 
-
   // 2. Do nodes
-  for(unsigned n = aig.nodes.size() - 1; n != 0; n--)
+  for(std::size_t n = aig.nodes.size() - 1; n != 0; n--)
   {
     if(aig.nodes[n].is_and())
       {
@@ -774,13 +773,8 @@ void aig_prop_solvert::convert_aig()
 
   
   // 3. Do constraints
-  for(aig_plus_constraintst::constraintst::const_iterator
-      c_it=aig.constraints.begin();
-      c_it!=aig.constraints.end();
-      c_it++)
-  {
-    solver.l_set_to(*c_it, true);
-  }
+  for(const auto & c_it : aig.constraints)
+    solver.l_set_to(c_it, true);
 
   // HACK!
   aig.nodes.clear();

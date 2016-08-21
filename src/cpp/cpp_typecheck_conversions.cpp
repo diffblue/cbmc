@@ -1729,11 +1729,11 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 
   if(!implicit_conversion_sequence(e, type, expr))
   {
-    show_instantiation_stack(str);
-    err_location(e);
-    str << "invalid implicit conversion from `"
-        << to_string(e.type()) << "' to `"
-        << to_string(type) << "'";
+    show_instantiation_stack(error());
+    error().source_location=e.find_source_location();
+    error() << "invalid implicit conversion from `"
+            << to_string(e.type()) << "' to `"
+            << to_string(type) << "'" << eom;
     #if 0
     str << "\n " << follow(e.type()).pretty() << std::endl;
     str << "\n " << type.pretty() << std::endl;
@@ -1812,8 +1812,8 @@ void cpp_typecheckt::reference_initializer(
     return;
   }
 
-  err_location(expr);
-  str << "bad reference initializer";
+  error().source_location=expr.find_source_location();
+  error() << "bad reference initializer" << eom;
   throw 0;
 }
 

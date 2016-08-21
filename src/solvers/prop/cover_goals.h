@@ -82,7 +82,8 @@ public:
   class observert
   {
   public:
-    virtual void goal_covered(const goalt &)=0;
+    virtual void goal_covered(const goalt &) { }
+    virtual void satisfying_assignment() { }
   };
   
   inline void register_observer(observert &o)

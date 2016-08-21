@@ -100,6 +100,7 @@ public:
   bool simplify_dereference(exprt &expr);
   bool simplify_address_of(exprt &expr);
   bool simplify_pointer_offset(exprt &expr);
+  bool simplify_bswap(exprt &expr);
   bool simplify_isinf(exprt &expr);
   bool simplify_isnan(exprt &expr);
   bool simplify_isnormal(exprt &expr);

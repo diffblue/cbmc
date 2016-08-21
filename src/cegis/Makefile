@@ -28,7 +28,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       invariant/symex/learn/replace_operators.cpp invariant/symex/verify/extract_counterexample.cpp \
       invariant/symex/verify/insert_constraint.cpp invariant/symex/verify/insert_program.cpp \
       invariant/fitness/concrete_fitness_source_provider.cpp \
-      jsa/facade/jsa_runner.cpp jsa/options/jsa_program.cpp \
+      jsa/facade/jsa_runner.cpp jsa/options/jsa_program.cpp jsa/options/jsa_program_info.cpp \
       jsa/preprocessing/jsa_preprocessing.cpp jsa/preprocessing/remove_loop.cpp \
       jsa/preprocessing/add_constraint_meta_variables.cpp jsa/preprocessing/inline_user_program.cpp \
       jsa/preprocessing/default_jsa_constant_strategy.cpp jsa/preprocessing/create_temp_variables.cpp \
@@ -39,25 +39,24 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       jsa/verify/jsa_symex_verify.cpp jsa/verify/extract_counterexample.cpp jsa/verify/renondet_inputs.cpp \
       jsa/verify/insert_solution.cpp \
       jsa/constraint/jsa_constraint_factory.cpp \
-      jsa/converters/counterexample.cpp jsa/converters/solution.cpp jsa/converters/translate_to_goto_program.cpp \
-      jsa/converters/replace_operators.cpp \
+      jsa/converters/solution.cpp jsa/converters/translate_to_goto_program.cpp jsa/converters/replace_operators.cpp \
+      jsa/converters/counterexample.cpp \
       jsa/instrument/jsa_meta_data.cpp \
-      jsa/value/jsa_solution.cpp jsa/value/jsa_solution_printer.cpp jsa/value/jsa_types.cpp \
-      wordsize/restrict_bv_size.cpp value/program_individual_serialisation.cpp \
-      seed/literals_seed.cpp genetic/tournament_select.cpp genetic/match_select.cpp \
+      jsa/value/jsa_solution.cpp jsa/value/jsa_solution_printer.cpp jsa/value/jsa_types.cpp jsa/value/jsa_counterexample_printer.cpp \
+      jsa/genetic/jsa_source_provider.cpp jsa/genetic/dynamic_jsa_test_runner.cpp jsa/genetic/random_jsa_mutate.cpp \
+      jsa/genetic/random_jsa_cross.cpp jsa/genetic/jsa_genetic_convert.cpp jsa/genetic/jsa_random.cpp \
+      jsa/genetic/solution_helper.cpp jsa/genetic/jsa_serialiser.cpp jsa/genetic/jsa_paragon_wrapper.cpp \
+      wordsize/restrict_bv_size.cpp value/program_individual_serialisation.cpp value/assignments_printer.cpp \
+      seed/literals_seed.cpp \
       genetic/instruction_set_info_factory.cpp genetic/random_mutate.cpp genetic/random_cross.cpp \
       genetic/random_individual.cpp genetic/genetic_constant_strategy.cpp instructions/instruction_set_factory.cpp \
-      genetic/concrete_test_runner.cpp genetic/dynamic_test_runner_helper.cpp genetic/genetic_settings.cpp \
+      genetic/dynamic_test_runner_helper.cpp genetic/genetic_settings.cpp \
+      genetic/serialise_individual.cpp genetic/program_individual_test_runner_helper.cpp \
       cegis-util/task_pool.cpp cegis-util/constant_width.cpp cegis-util/irep_pipe.cpp cegis-util/program_helper.cpp \
-      cegis-util/temporary_output_block.cpp cegis-util/cbmc_runner.cpp \
+      cegis-util/temporary_output_block.cpp cegis-util/cbmc_runner.cpp cegis-util/module_helper.cpp \
       constant/add_constant.cpp constant/literals_collector.cpp constant/default_cegis_constant_strategy.cpp \
       instrument/cegis_library.cpp instrument/instrument_var_ops.cpp instrument/meta_variables.cpp \
-      runner/cegis_parse_options.cpp runner/cegis_main.cpp \
-      ../goto-instrument/dump_c.cpp ../goto-instrument/goto_program2code.cpp ../goto-instrument/nondet_static.cpp \
-      ../goto-instrument/cover.cpp \
-      ../cbmc/cbmc_parse_options.cpp ../cbmc/bmc.cpp ../cbmc/cbmc_solvers.cpp ../cbmc/symex_bmc.cpp \
-      ../cbmc/xml_interface.cpp ../cbmc/bmc_cover.cpp ../cbmc/bv_cbmc.cpp ../cbmc/counterexample_beautification.cpp \
-      ../cbmc/cbmc_languages.cpp ../cbmc/show_vcc.cpp ../cbmc/cbmc_dimacs.cpp ../cbmc/all_properties.cpp \
+      runner/cegis_parse_options.cpp runner/cegis_main.cpp
  
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../jsil/jsil$(LIBEXT) \
@@ -82,7 +81,14 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
-      ../util/util$(LIBEXT)
+      ../util/util$(LIBEXT) \
+      ../goto-instrument/dump_c$(OBJEXT) ../goto-instrument/goto_program2code$(OBJEXT) \
+      ../goto-instrument/nondet_static$(OBJEXT) ../goto-instrument/cover$(OBJEXT) \
+      ../cbmc/cbmc_parse_options$(OBJEXT) ../cbmc/bmc$(OBJEXT) ../cbmc/cbmc_solvers$(OBJEXT) \
+      ../cbmc/symex_bmc$(OBJEXT) ../cbmc/xml_interface$(OBJEXT) ../cbmc/bmc_cover$(OBJEXT) \
+      ../cbmc/bv_cbmc$(OBJEXT) ../cbmc/counterexample_beautification$(OBJEXT) \
+      ../cbmc/cbmc_languages$(OBJEXT) ../cbmc/show_vcc$(OBJEXT) \
+      ../cbmc/cbmc_dimacs$(OBJEXT) ../cbmc/all_properties$(OBJEXT)
 
 INCLUDES= -I ..
 
@@ -98,6 +104,14 @@ include ../common
 CLEANFILES = cegis$(EXEEXT)
 
 all: cegis$(EXEEXT)
+
+ifneq ($(wildcard ../java_bytecode/Makefile),)
+  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
+  ifneq ($(wildcard $(LIBZIPINC)),)
+    LIBS += $(LIBZIPLIB)
+  endif
+endif
 
 ###############################################################################
 

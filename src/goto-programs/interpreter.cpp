@@ -411,7 +411,7 @@ void interpretert::execute_function_call()
   else if(a>=memory.size())
     throw "out-of-range function call";
 
-  const memory_cellt &cell=memory[integer2long(a)];
+  const memory_cellt &cell=memory[integer2size_t(a)];
   const irep_idt &identifier=cell.identifier;
 
   const goto_functionst::function_mapt::const_iterator f_it=

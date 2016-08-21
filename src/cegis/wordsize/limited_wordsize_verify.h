@@ -13,6 +13,8 @@
 #include <deque>
 #include <functional>
 
+#include <util/message.h>
+
 /**
  * @brief
  *
@@ -99,6 +101,18 @@ public:
    * @return <code>true</code> if the last solution holds, <code>false</code> otherwise.
    */
   bool success() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param os
+   * @param counterexample
+   */
+  void show_counterexample(
+      messaget::mstreamt &os,
+      const counterexamplet &counterexample) const;
 };
 
 #include "limited_wordsize_verify.inc"

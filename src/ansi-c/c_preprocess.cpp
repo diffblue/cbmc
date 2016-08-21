@@ -23,11 +23,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/i2string.h>
-#include <util/message_stream.h>
+#include <util/message.h>
 #include <util/tempfile.h>
 #include <util/unicode.h>
 #include <util/arith_tools.h>
 #include <util/std_types.h>
+#include <util/prefix.h>
 
 #include "c_types.h"
 #include "c_preprocess.h"
@@ -203,6 +204,161 @@ static std::string shell_quote(const std::string &src)
 
 /*******************************************************************\
 
+Function: error_parse_line
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static void error_parse_line(
+  const std::string &line,
+  bool warning_only,
+  messaget &message)
+{
+  std::string error_msg=line;
+  source_locationt saved_error_location;
+
+  if(has_prefix(line, "file "))
+  {
+    const char *tptr=line.c_str();
+    int state=0;
+    std::string file, line_no, column, _error_msg, function;
+
+    tptr+=5;
+
+    char previous=0;
+
+    while(*tptr!=0)
+    {
+      if(strncmp(tptr, " line ", 6)==0 && state!=4)
+      {
+        state=1;
+        tptr+=6;
+        continue;
+      }
+      else if(strncmp(tptr, " column ", 8)==0 && state!=4)
+      {
+        state=2;
+        tptr+=8;
+        continue;
+      }
+      else if(strncmp(tptr, " function ", 10)==0 && state!=4)
+      {
+        state=3;
+        tptr+=10;
+        continue;
+      }
+      else if(*tptr==':' && state!=4)
+      {
+        if(tptr[1]==' ' && previous!=':')
+        {
+          state=4;
+          tptr++;
+          while(*tptr==' ') tptr++;
+          continue;
+        }
+      }
+
+      if(state==0) // file
+        file+=*tptr;
+      else if(state==1) // line number
+        line_no+=*tptr;
+      else if(state==2) // column
+        column+=*tptr;
+      else if(state==3) // function
+        function+=*tptr;
+      else if(state==4) // error message
+        _error_msg+=*tptr;
+
+      previous=*tptr;
+
+      tptr++;
+    }
+
+    if(state==4)
+    {
+      saved_error_location.set_file(file);
+      saved_error_location.set_function(function);
+      saved_error_location.set_line(line_no);
+      saved_error_location.set_column(column);
+      error_msg=_error_msg;
+    }
+  }
+  else if(has_prefix(line, "In file included from "))
+  {
+  }
+  else
+  {
+    const char *tptr=line.c_str();
+    int state=0;
+    std::string file, line_no;
+
+    while(*tptr!=0)
+    {
+      if(state==0)
+      {
+        if(*tptr==':')
+          state++;
+        else
+          file+=*tptr;
+      }
+      else if(state==1)
+      {
+        if(*tptr==':')
+          state++;
+        else if(isdigit(*tptr))
+          line_no+=*tptr;
+        else
+          state=3;
+      }
+
+      tptr++;
+    }
+
+    if(state==2)
+    {
+      saved_error_location.set_file(file);
+      saved_error_location.set_function("");
+      saved_error_location.set_line(line_no);
+      saved_error_location.set_column("");
+    }
+  }
+
+  messaget::mstreamt &m=
+    warning_only ? message.warning() : message.error();
+  m.source_location=saved_error_location;
+  m << error_msg << messaget::eom;
+}
+
+/*******************************************************************\
+
+Function: error_parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static void error_parse(
+  std::istream &errors,
+  bool warning_only,
+  messaget &message)
+{
+  std::string line;
+
+  while(std::getline(errors, line))
+    error_parse_line(line, warning_only, message);
+}
+
+/*******************************************************************\
+
 Function: c_preprocess
 
   Inputs:
@@ -324,7 +480,7 @@ bool c_preprocess_visual_studio(
   if(is_dot_i_file(file))
     return c_preprocess_none(file, outstream, message_handler);
 
-  message_streamt message_stream(message_handler);
+  messaget message(message_handler);
 
   // use Visual Studio's CL
   
@@ -404,8 +560,8 @@ bool c_preprocess_visual_studio(
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
     unlink(command_file_name.c_str());
-    message_stream.str << "CL Preprocessing failed (fopen failed)";
-    message_stream.error_msg();
+    message.error() << "CL Preprocessing failed (fopen failed)"
+                    << messaget::eom;
     return true;
   }
 
@@ -420,24 +576,16 @@ bool c_preprocess_visual_studio(
   unlink(command_file_name.c_str());
 
   // errors/warnings
-  {
-    std::ifstream stderr_stream(stderr_file.c_str());
-    char ch;
-    while(stderr_stream.read(&ch, 1))
-      message_stream.str << ch;
-  }
+  std::ifstream stderr_stream(stderr_file.c_str());
+  error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
 
   if(result!=0)
   {
-    message_stream.error_parse(1);
-    message_stream.str << "CL Preprocessing failed";
-    message_stream.error_msg();
+    message.error() << "CL Preprocessing failed" << messaget::eom;
     return true;
   }
-  else
-    message_stream.error_parse(2);  
 
   return false;
 }
@@ -511,7 +659,7 @@ bool c_preprocess_codewarrior(
     return c_preprocess_none(file, outstream, message_handler);
 
   // preprocessing
-  message_streamt message_stream(message_handler);
+  messaget message(message_handler);
 
   std::string stderr_file=get_temporary_file("tmp.stderr", "");
 
@@ -565,30 +713,22 @@ bool c_preprocess_codewarrior(
   {
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
-    message_stream.str << "Preprocessing failed (fopen failed)";
-    message_stream.error_msg();
+    message.error() << "Preprocessing failed (fopen failed)"
+                    << messaget::eom;
     return true;
   }
 
   // errors/warnings
-  {
-    std::ifstream stderr_stream(stderr_file.c_str());
-    char ch;
-    while(stderr_stream.read(&ch, 1))
-      message_stream.str << ch;
-  }
+  std::ifstream stderr_stream(stderr_file.c_str());
+  error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
 
   if(result!=0)
   {
-    message_stream.error_parse(1);
-    message_stream.str << "Preprocessing failed";
-    message_stream.error_msg();
+    message.error() << "Preprocessing failed" << messaget::eom;
     return true;
   }
-  else
-    message_stream.error_parse(2);
 
   return false;
 }
@@ -616,7 +756,7 @@ bool c_preprocess_gcc_clang(
     return c_preprocess_none(file, outstream, message_handler);
 
   // preprocessing
-  message_streamt message_stream(message_handler);
+  messaget message(message_handler);
 
   std::string stderr_file=get_temporary_file("tmp.stderr", "");
 
@@ -855,12 +995,8 @@ bool c_preprocess_gcc_clang(
   FILE *stream=fopen(tmpi.c_str(), "r");
 
   // errors/warnings
-  {
-    std::ifstream stderr_stream(stderr_file.c_str());
-    char ch;
-    while(stderr_stream.read(&ch, 1))
-      message_stream.str << ch;
-  }
+  std::ifstream stderr_stream(stderr_file.c_str());
+  error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
 
@@ -876,7 +1012,8 @@ bool c_preprocess_gcc_clang(
   else
   {
     unlink(tmpi.c_str());
-    message_stream.str << "GCC preprocessing failed (fopen failed)" << std::endl;
+    message.error() << "GCC preprocessing failed (fopen failed)"
+                    << messaget::eom;
     result=1;
   }
   #else
@@ -895,16 +1032,14 @@ bool c_preprocess_gcc_clang(
   }
   else
   {
-    message_stream.str << "GCC preprocessing failed (popen failed)" << std::endl;
+    message.error() << "GCC preprocessing failed (popen failed)"
+                    << messaget::eom;
     result=1;
   }
 
   // errors/warnings
-  {
-    std::ifstream stderr_stream(stderr_file.c_str());
-    if(stderr_stream)
-      message_stream.str << stderr_stream.rdbuf();
-  }
+  std::ifstream stderr_stream(stderr_file.c_str());
+  error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
 
@@ -912,13 +1047,9 @@ bool c_preprocess_gcc_clang(
 
   if(result!=0)
   {
-    message_stream.error_parse(1);
-    message_stream.str << "GCC preprocessing failed";
-    message_stream.error_msg();
+    message.error() << "GCC preprocessing failed" << messaget::eom;
     return true;
   }
-  else
-    message_stream.error_parse(2);
 
   return false;
 }
@@ -945,7 +1076,7 @@ bool c_preprocess_arm(
     return c_preprocess_none(file, outstream, message_handler);
 
   // preprocessing using armcc
-  message_streamt message_stream(message_handler);
+  messaget message(message_handler);
 
   std::string stderr_file=get_temporary_file("tmp.stderr", "");
 
@@ -1023,8 +1154,8 @@ bool c_preprocess_arm(
   {
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
-    message_stream.str << "ARMCC preprocessing failed (fopen failed)";
-    message_stream.error_msg();
+    message.error() << "ARMCC preprocessing failed (fopen failed)"
+                    << messaget::eom;
     return true;
   }
   #else
@@ -1044,31 +1175,23 @@ bool c_preprocess_arm(
   else
   {
     unlink(stderr_file.c_str());
-    message_stream.str << "ARMCC preprocessing failed (popen failed)";
-    message_stream.error_msg();
+    message.error() << "ARMCC preprocessing failed (popen failed)"
+                    << messaget::eom;
     return true;
   }
   #endif
 
   // errors/warnings
-  {
-    std::ifstream stderr_stream(stderr_file.c_str());
-    char ch;
-    while(stderr_stream.read(&ch, 1))
-      message_stream.str << ch;
-  }
+  std::ifstream stderr_stream(stderr_file.c_str());
+  error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
 
   if(result!=0)
   {
-    message_stream.error_parse(1);
-    message_stream.str << "ARMCC preprocessing failed";
-    message_stream.error_msg();
+    message.error() << "ARMCC preprocessing failed" << messaget::eom;
     return true;
   }
-  else
-    message_stream.error_parse(2);
 
   return false;
 }
@@ -1098,9 +1221,8 @@ bool c_preprocess_none(
   
   if(!infile)
   {
-    message_streamt message_stream(message_handler);
-    message_stream.str << "failed to open `" << file << "'";
-    message_stream.error_msg();
+    messaget message(message_handler);
+    message.error() << "failed to open `" << file << "'" << messaget::eom;
     return true;
   }
   

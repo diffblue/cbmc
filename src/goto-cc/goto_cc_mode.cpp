@@ -123,7 +123,7 @@ int goto_cc_modet::main(int argc, const char **argv)
     return EX_SOFTWARE;
   }
 
-  catch(int e)
+  catch(int)
   {
     return EX_SOFTWARE;
   }

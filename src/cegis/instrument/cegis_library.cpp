@@ -61,21 +61,6 @@ void add_execute_placeholder(symbol_tablet &symbol_table,
   symbol_table.add(symbol);
 }
 
-void set_loop_id(goto_functionst &gf, const std::string &func_name)
-{
-  goto_functionst::function_mapt &fm=gf.function_map;
-  goto_functionst::function_mapt::iterator execute=fm.find(func_name);
-  assert(fm.end() != execute);
-  goto_programt &body=execute->second.body;
-  goto_programt::instructionst &instrs=body.instructions;
-  unsigned loop_number=0;
-  for (goto_programt::targett it=instrs.begin(); it != instrs.end(); ++it)
-  {
-    goto_programt::instructiont &instr=*it;
-    if (instr.is_backwards_goto()) instr.loop_number=loop_number++;
-  }
-}
-
 goto_programt::targett init_array(const symbol_tablet &st, goto_programt &body,
     const char * const name, goto_programt::targett pos)
 {
@@ -119,9 +104,11 @@ void add_cegis_library(symbol_tablet &st, goto_functionst &gf,
   const std::string library_src(
       get_cegis_library_text(num_vars, num_consts, max_solution_size,
           func_name));
+
   add_library(library_src, st, msg);
   goto_convert(func_name, st, gf, msg);
-  set_loop_id(gf, func_name);
+  gf.compute_loop_numbers();
+  gf.update();
   set_init_values(st, gf);
 }
 

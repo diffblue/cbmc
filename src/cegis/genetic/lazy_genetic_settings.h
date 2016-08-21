@@ -32,7 +32,7 @@ public:
    *
    * @details
    */
-  lazy_genetic_settingst(const wrappedt &wrapped);
+  explicit lazy_genetic_settingst(const wrappedt &wrapped);
 
   /**
    * @brief

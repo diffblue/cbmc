@@ -205,6 +205,8 @@ void rw_range_sett::get_objects_dereference(
 {
   const exprt &pointer=deref.pointer();
   get_objects_rec(READ, pointer);
+  if(mode!=READ)
+    get_objects_rec(mode, pointer);
 }
 
 /*******************************************************************\
@@ -241,7 +243,7 @@ void rw_range_sett::get_objects_byte_extract(
       be.id()==ID_byte_extract_little_endian,
       ns);
     assert(index<std::numeric_limits<size_t>::max());
-    range_spect offset=range_start + map.map_bit(integer2long(index));
+    range_spect offset=range_start + map.map_bit(integer2size_t(index));
     get_objects_rec(mode, be.op(), offset, size);
   }
 }
@@ -583,13 +585,14 @@ Function: rw_range_sett::get_objects_address_of
 
 void rw_range_sett::get_objects_address_of(const exprt &object)
 {
-  if(object.id()==ID_symbol ||
-     object.id()==ID_string_constant ||
+  if(object.id()==ID_string_constant ||
      object.id()==ID_label ||
      object.id()==ID_array ||
      object.id()=="NULL-object")
     // constant, nothing to do
     return;
+  else if(object.id()==ID_symbol)
+    get_objects_rec(READ, object);
   else if(object.id()==ID_dereference)
     get_objects_rec(READ, object);
   else if(object.id()==ID_index)
@@ -751,6 +754,11 @@ void rw_range_sett::get_objects_rec(
           expr.id()==ID_string_constant)
   {
     // dereferencing may yield some weird ones, ignore these
+  }
+  else if(mode==LHS_W)
+  {
+    forall_operands(it, expr)
+      get_objects_rec(mode, *it);
   }
   else
     throw "rw_range_sett: assignment to `"+expr.id_string()+"' not handled";
@@ -1030,7 +1038,12 @@ void goto_rw(goto_programt::const_targett target,
     break;
     
   case OTHER:
-    // don't know
+    //if it's printf, mark the operands as read here
+    if (target->code.get(ID_statement)==ID_printf)
+    {
+      forall_expr(it, target->code.operands())
+        rw_set.get_objects_rec(target, rw_range_sett::READ, *it);
+    }
     break;
     
   case SKIP:

@@ -38,15 +38,12 @@ void show_properties(
   ui_message_handlert::uit ui,
   const goto_programt &goto_program)
 {
-  for(goto_programt::instructionst::const_iterator
-      it=goto_program.instructions.begin();
-      it!=goto_program.instructions.end();
-      it++)
+  for(const auto & it : goto_program.instructions)
   {
-    if(!it->is_assert())
+    if(!it.is_assert())
       continue;
       
-    const source_locationt &source_location=it->source_location;
+    const source_locationt &source_location=it.source_location;
       
     const irep_idt &comment=source_location.get_comment();
     //const irep_idt &function=location.get_function();
@@ -67,11 +64,11 @@ void show_properties(
         xml_claim.set_attribute("name", id2string(property_id)); // use this one
         
         xmlt &l=xml_claim.new_element();
-        l=xml(it->source_location);
+        l=xml(it.source_location);
         
         xml_claim.new_element("description").data=id2string(description);        
         xml_claim.new_element("property").data=id2string(property_class);
-        xml_claim.new_element("expression").data=from_expr(ns, identifier, it->guard);
+        xml_claim.new_element("expression").data=from_expr(ns, identifier, it.guard);
         xml_claim.new_element("source").data="";
 
         std::cout << xml_claim << std::endl;
@@ -83,10 +80,10 @@ void show_properties(
         xml_property.set_attribute("class", id2string(property_class)); // use this one
         
         xmlt &property_l=xml_property.new_element();
-        property_l=xml(it->source_location);
+        property_l=xml(it.source_location);
         
         xml_property.new_element("description").data=id2string(description);        
-        xml_property.new_element("expression").data=from_expr(ns, identifier, it->guard);
+        xml_property.new_element("expression").data=from_expr(ns, identifier, it.guard);
 
         std::cout << xml_property << std::endl;
       }
@@ -99,9 +96,9 @@ void show_properties(
     case ui_message_handlert::PLAIN:
       std::cout << "Property " << property_id << ":" << std::endl;
 
-      std::cout << "  " << it->source_location << std::endl
+      std::cout << "  " << it.source_location << std::endl
                 << "  " << description << std::endl
-                << "  " << from_expr(ns, identifier, it->guard) << std::endl;
+                << "  " << from_expr(ns, identifier, it.guard) << std::endl;
 
       std::cout << std::endl;
       break;
@@ -131,15 +128,12 @@ void show_properties_json(
   const irep_idt &identifier,
   const goto_programt &goto_program)
 {
-  for(goto_programt::instructionst::const_iterator
-      it=goto_program.instructions.begin();
-      it!=goto_program.instructions.end();
-      it++)
+  for(const auto & it : goto_program.instructions)
   {
-    if(!it->is_assert())
+    if(!it.is_assert())
       continue;
 
-    const source_locationt &source_location=it->source_location;
+    const source_locationt &source_location=it.source_location;
 
     const irep_idt &comment=source_location.get_comment();
     //const irep_idt &function=location.get_function();
@@ -153,10 +147,10 @@ void show_properties_json(
       json_properties.push_back(jsont()).make_object();
     json_property["name"]=json_stringt(id2string(property_id));
     json_property["class"]=json_stringt(id2string(property_class));
-    json_property["sourceLocation"]=json(it->source_location);
+    json_property["sourceLocation"]=json(it.source_location);
     json_property["description"]=json_stringt(id2string(description));
     json_property["expression"]=
-      json_stringt(from_expr(ns, identifier, it->guard));
+      json_stringt(from_expr(ns, identifier, it.guard));
   }
 }
 
@@ -177,14 +171,13 @@ void show_properties_json(
   const goto_functionst &goto_functions)
 {
   json_arrayt json_properties;
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+
+  for(const auto & it : goto_functions.function_map)
   {
-    if(!it->second.is_inlined())
-      show_properties_json(json_properties, ns, it->first, it->second.body);
+    if(!it.second.is_inlined())
+      show_properties_json(json_properties, ns, it.first, it.second.body);
   }
+
   json_objectt json_result;
   json_result["properties"] = json_properties;
   std::cout << ",\n" << json_result;
@@ -210,12 +203,9 @@ void show_properties(
   if(ui == ui_message_handlert::JSON_UI)
     show_properties_json(ns, goto_functions);
   else
-    for(goto_functionst::function_mapt::const_iterator
-	  it=goto_functions.function_map.begin();
-	it!=goto_functions.function_map.end();
-	it++)
-      if(!it->second.is_inlined())
-	show_properties(ns, it->first, ui, it->second.body);
+    for(const auto & it : goto_functions.function_map)
+      if(!it.second.is_inlined())
+	show_properties(ns, it.first, ui, it.second.body);
 }
 
 /*******************************************************************\

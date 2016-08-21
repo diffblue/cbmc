@@ -46,7 +46,7 @@ size_t genetic_constant_strategy(invariant_programt &prog,
     if (!constants_printed)
     {
       std::cout << "<id>" << const_index << "</id>" << std::endl;
-      std::cout << "<value>" << expr.to_string() << "</value>" << std::endl;
+      std::cout << "<value>" << expr << "</value>" << std::endl;
     }
     // XXX: Debug
     const std::string base_name(get_name(const_index++));

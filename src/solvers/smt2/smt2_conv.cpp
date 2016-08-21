@@ -356,7 +356,7 @@ constant_exprt smt2_convt::parse_literal(
       std::string bits=id2string(s1.get_value())+
                        id2string(s2.get_value())+
                        id2string(s3.get_value());
-      value=binary2integer(bits, 2);
+      value=binary2integer(bits, false);
     }
     else
       value=0;
@@ -591,7 +591,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
     // split into object and offset
     mp_integer pow=power(2, width-BV_ADDR_BITS);
     pointer_logict::pointert ptr;
-    ptr.object=integer2long(v/pow);
+    ptr.object=integer2size_t(v/pow);
     ptr.offset=v%pow;
     return pointer_logic.pointer_expr(ptr, type);
   }

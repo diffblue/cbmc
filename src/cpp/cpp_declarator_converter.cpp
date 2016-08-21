@@ -134,10 +134,11 @@ symbolt &cpp_declarator_convertert::convert(
 
       if(c_it==cpp_typecheck.symbol_table.symbols.end())
       {
-        cpp_typecheck.err_location(declarator.name());
-        cpp_typecheck.str << "member `" << base_name
-                          << "' not found in scope `"
-                          << scope->identifier << "'";
+        cpp_typecheck.error().source_location=declarator.name().source_location();
+        cpp_typecheck.error() << "member `" << base_name
+                              << "' not found in scope `"
+                              << scope->identifier << "'"
+                              << messaget::eom;
         throw 0;
       }
     }
@@ -164,8 +165,9 @@ symbolt &cpp_declarator_convertert::convert(
       if(symbol_expr.id()!=ID_type ||
          symbol_expr.type().id()!=ID_symbol)
       {
-        cpp_typecheck.err_location(name.source_location());
-        cpp_typecheck.str << "error: expected type";
+        cpp_typecheck.error().source_location=name.source_location();
+        cpp_typecheck.error() << "error: expected type"
+                              << messaget::eom;
         throw 0;
       }
 
@@ -203,8 +205,9 @@ symbolt &cpp_declarator_convertert::convert(
     if(final_type.id()==ID_code &&
        to_code_type(final_type).return_type().id()==ID_constructor)
     {
-      cpp_typecheck.err_location(declarator.name().source_location());
-      cpp_typecheck.str << "function must have return type";
+      cpp_typecheck.error().source_location=declarator.name().source_location();
+      cpp_typecheck.error() << "function must have return type"
+                            << messaget::eom;
       throw 0;
     }
 
@@ -289,14 +292,15 @@ void cpp_declarator_convertert::combine_types(
           // The 'this' parameter of virtual functions mismatches
           if(i!=0 || !symbol_code_type.get_bool("#is_virtual"))
           {
-            cpp_typecheck.err_location(source_location);
-            cpp_typecheck.str << "symbol `" << symbol.display_name()
-                              << "': parameter " << (i+1) << " type mismatch"
-                              << std::endl;
-            cpp_typecheck.str << "previous type: "
-                              << cpp_typecheck.to_string(symbol_parameter.type()) << std::endl;
-            cpp_typecheck.str << "new type: "
-                              << cpp_typecheck.to_string(decl_parameter.type());
+            cpp_typecheck.error().source_location=source_location;
+            cpp_typecheck.error() << "symbol `" << symbol.display_name()
+                                  << "': parameter " << (i+1)
+                                  << " type mismatch\n"
+                                  << "previous type: "
+                                  << cpp_typecheck.to_string(symbol_parameter.type())
+                                  << "\nnew type: "
+                                  << cpp_typecheck.to_string(decl_parameter.type())
+                                  << messaget::eom;
             throw 0;
           }
         }
@@ -324,14 +328,14 @@ void cpp_declarator_convertert::combine_types(
     return; // ok
   }
 
-  cpp_typecheck.err_location(source_location);
-  cpp_typecheck.str << "symbol `" << symbol.display_name()
-                    << "' already declared with different type:"
-                    << std::endl;
-  cpp_typecheck.str << "original: "
-                    << cpp_typecheck.to_string(symbol.type) << std::endl;
-  cpp_typecheck.str << "     new: "
-                    << cpp_typecheck.to_string(final_type);
+  cpp_typecheck.error().source_location=source_location;
+  cpp_typecheck.error() << "symbol `" << symbol.display_name()
+                        << "' already declared with different type:\n"
+                        << "original: "
+                        << cpp_typecheck.to_string(symbol.type)
+                        << "\n     new: "
+                        << cpp_typecheck.to_string(final_type)
+                        << messaget::eom;
   throw 0;
 }
 
@@ -404,7 +408,7 @@ void cpp_declarator_convertert::handle_initializer(
   else
   {
     #if 0
-    cpp_typecheck.err_location(declarator.name());
+    cpp_typecheck.error().source_location=declarator.name());
 
     if(is_code)
       cpp_typecheck.str << "body of function `"
@@ -551,8 +555,10 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         }
         else if(storage_spec.is_extern())
         {
-          cpp_typecheck.err_location(storage_spec);
-          throw "external storage not permitted here";
+          cpp_typecheck.error().source_location=storage_spec.location();
+          cpp_typecheck.error() << "external storage not permitted here"
+                                << messaget::eom;
+          throw 0;
         }
       }
     }
@@ -565,7 +571,13 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbolt *new_symbol;
 
   if(cpp_typecheck.symbol_table.move(symbol, new_symbol))
-    throw "cpp_typecheckt::convert_declarator: symbol_table.move() failed";
+  {
+    cpp_typecheck.error().source_location=symbol.location;
+    cpp_typecheck.error()
+      << "cpp_typecheckt::convert_declarator: symbol_table.move() failed"
+      << messaget::eom;
+    throw 0;
+  }
 
   if(!is_code)
   {
@@ -585,8 +597,10 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
       if(!id.is_class() && !id.is_enum())
       {
-        cpp_typecheck.err_location(new_symbol->location);
-        cpp_typecheck.str << "`" << base_name << "' already in scope";
+        cpp_typecheck.error().source_location=new_symbol->location;
+        cpp_typecheck.error() << "`" << base_name
+                              << "' already in scope"
+                              << messaget::eom;
         throw 0;
       }
     }
@@ -696,8 +710,9 @@ void cpp_declarator_convertert::main_function_rules(
   {
     if(symbol.type.id()!=ID_code)
     {
-      cpp_typecheck.err_location(symbol.location);
-      throw "main must be function";
+      cpp_typecheck.error().source_location=symbol.location;
+      cpp_typecheck.error() << "main must be function" << messaget::eom;
+      throw 0;
     }
 
     const typet &return_type=
@@ -707,7 +722,7 @@ void cpp_declarator_convertert::main_function_rules(
     {
       // Too many embedded compilers ignore this rule.
       //
-      //cpp_typecheck.err_location(symbol.location);
+      //cpp_typecheck.error().source_location=symbol.location);
       //throw "main must return int";
     }
   }

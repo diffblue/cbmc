@@ -172,6 +172,15 @@ public:
    * @param ind
    */
   void post_process(program_individualt &ind) const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  operator std::function<unsigned int()>() const;
 };
 
 #endif /* CEGIS_GENETIC_RANDOM_INDIVIDUAL_H_ */

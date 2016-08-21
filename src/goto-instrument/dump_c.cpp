@@ -1373,6 +1373,7 @@ void dump_ct::cleanup_expr(exprt &expr)
   else if(expr.id()==ID_constant &&
           expr.type().id()==ID_signedbv)
   {
+    #if 0
     const irep_idt &cformat=expr.get(ID_C_cformat);
 
     if(!cformat.empty())
@@ -1387,6 +1388,7 @@ void dump_ct::cleanup_expr(exprt &expr)
               !std::isdigit(id2string(cformat)[0]))
         expr.remove(ID_C_cformat);
     }
+    #endif
   }
 }
 

@@ -74,7 +74,7 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
     if(i<0 || i>std::numeric_limits<signed>::max())
       distance=0;
     else
-      distance=integer2long(i);
+      distance=integer2size_t(i);
 
     if(type_id==ID_verilog_signedbv ||
        type_id==ID_verilog_unsignedbv)

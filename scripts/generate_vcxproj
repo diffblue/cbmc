@@ -1,6 +1,8 @@
-dest=../src
+#/bin/bash
 
-if ! [ -e $dest/Makefile ] ; then echo Makefile not found ; exit 1; fi
+dest=..
+
+if ! [ -e $dest/src/Makefile ] ; then echo Makefile not found ; exit 1; fi
 
 echo Generating Visual Studio Project files in $dest
 
@@ -12,13 +14,13 @@ function doit {
   # this collects all the files needed
   echo "  <ItemGroup>" >> $dest/$1.vcxproj
   for dir in $dirs ; do
-    sources="`(cd $dest/$dir; make sources)`"
+    sources="`(cd $dest/src/$dir; make sources)`"
     for s in $sources ; do
-      echo "    <ClCompile Include=\"${dir}\\${s}\"/>" >> $dest/$1.vcxproj
+      echo "    <ClCompile Include=\"src\\${dir}\\${s}\"/>" >> $dest/$1.vcxproj
     done
   done
-  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\core\\Solver.cc\"/>" >> $dest/$1.vcxproj
-  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\simp\\SimpSolver.cc\"/>" >> $dest/$1.vcxproj
+  echo "    <ClCompile Include=\"minisat-2.2.1\\minisat\\core\\Solver.cc\"/>" >> $dest/$1.vcxproj
+  echo "    <ClCompile Include=\"minisat-2.2.1\\minisat\\simp\\SimpSolver.cc\"/>" >> $dest/$1.vcxproj
   echo "  </ItemGroup>" >> $dest/$1.vcxproj
 
   cat vcxproj.2 >> $dest/$1.vcxproj
@@ -32,13 +34,13 @@ function doit {
 
   echo "  <ItemGroup>" >> $dest/$1.vcxproj.filters
   for dir in $dirs ; do
-    sources="`(cd $dest/$dir; make sources)`"
+    sources="`(cd $dest/src/$dir; make sources)`"
     for s in $sources ; do
-      echo "    <ClCompile Include=\"${dir}\\${s}\"><Filter>${dir}</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
+      echo "    <ClCompile Include=\"src\\${dir}\\${s}\"><Filter>${dir}</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
     done
   done
-  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\core\\Solver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
-  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\simp\\SimpSolver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
+  echo "    <ClCompile Include=\"minisat-2.2.1\\minisat\\core\\Solver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
+  echo "    <ClCompile Include=\"minisat-2.2.1\\minisat\\simp\\SimpSolver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
   echo "  </ItemGroup>" >> $dest/$1.vcxproj.filters
 
   for dir in $dirs minisat2 ; do
@@ -51,7 +53,7 @@ function doit {
 dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking cbmc"
 doit cbmc
 
-dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-cc"
+dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking jsil goto-cc"
 doit goto-cc
 
 dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-instrument"

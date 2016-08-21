@@ -82,8 +82,8 @@ void goto_convertt::remove_assignment(
   {
     if(expr.operands().size()!=2)
     {
-      err_location(expr);
-      str << statement << " takes two arguments";
+      error().source_location=expr.find_source_location();
+      error() << statement << " takes two arguments" << eom;
       throw 0;
     }
 
@@ -113,8 +113,9 @@ void goto_convertt::remove_assignment(
       new_id=ID_bitor;
     else
     {
-      err_location(expr);
-      str << "assignment `" << statement << "' not yet supproted";
+      error().source_location=expr.find_source_location();
+      error() << "assignment `" << statement << "' not yet supproted"
+              << eom;
       throw 0;
     }
 
@@ -174,7 +175,11 @@ void goto_convertt::remove_pre(
   bool result_is_used)
 {
   if(expr.operands().size()!=1)
-    throw "preincrement/predecrement must have one operand";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "preincrement/predecrement must have one operand" << eom;
+    throw 0;
+  }
 
   const irep_idt statement=expr.get_statement();
 
@@ -224,8 +229,9 @@ void goto_convertt::remove_pre(
       constant_type=op_type;
     else
     {
-      err_location(expr);
-      throw "no constant one of type "+op_type.to_string();
+      error().source_location=expr.find_source_location();
+      error() << "no constant one of type " << op_type.pretty() << eom;
+      throw 0;
     }
 
     exprt constant=gen_one(constant_type);
@@ -272,7 +278,12 @@ void goto_convertt::remove_post(
   // we have ...(op++)...
 
   if(expr.operands().size()!=1)
-    throw "postincrement/postdecrement must have one operand";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "postincrement/postdecrement must have one operand"
+            << eom;
+    throw 0;
+  }
 
   const irep_idt statement=expr.get_statement();
 
@@ -322,8 +333,9 @@ void goto_convertt::remove_post(
       constant_type=op_type;
     else
     {
-      err_location(expr);
-      throw "no constant one of type "+op_type.to_string();
+      error().source_location=expr.find_source_location();
+      error() << "no constant one of type " << op_type.pretty() << eom;
+      throw 0;
     }
 
     exprt constant=gen_one(constant_type);
@@ -393,10 +405,18 @@ void goto_convertt::remove_function_call(
 
   if(expr.id()!=ID_side_effect ||
      expr.get(ID_statement)!=ID_function_call)
-    throw "expected function call";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "expected function call" << eom;
+    throw 0;
+  }
 
   if(expr.operands().empty())
-    throw "function_call expects at least one operand";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "function_call expects at least one operand" << eom;
+    throw 0;
+  }
 
   if(expr.op0().id()==ID_symbol)
   {
@@ -601,7 +621,11 @@ void goto_convertt::remove_temporary_object(
 {
   if(expr.operands().size()!=1 &&
      !expr.operands().empty())
-    throw "temporary_object takes 0 or 1 operands";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "temporary_object takes 0 or 1 operands" << eom;
+    throw 0;
+  }
 
   symbolt &new_symbol=
     new_tmp_symbol(expr.type(), "obj", dest, expr.find_source_location());
@@ -653,10 +677,18 @@ void goto_convertt::remove_statement_expression(
   // scope is destoyed.
 
   if(expr.operands().size()!=1)
-    throw "statement_expression takes 1 operand";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "statement_expression takes 1 operand" << eom;
+    throw 0;
+  }
 
   if(expr.op0().id()!=ID_code)
-    throw "statement_expression takes code as operand";
+  {
+    error().source_location=expr.op0().find_source_location();
+    error() << "statement_expression takes code as operand" << eom;
+    throw 0;
+  }
 
   codet &code=to_code(expr.op0());
   
@@ -668,10 +700,19 @@ void goto_convertt::remove_statement_expression(
   }
   
   if(code.get_statement()!=ID_block)
-    throw "statement_expression takes block as operand";
+  {
+    error().source_location=code.find_source_location();
+    error() << "statement_expression takes block as operand" << eom;
+    throw 0;
+  }
   
   if(code.operands().empty())
-    throw "statement_expression takes non-empty block as operand";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "statement_expression takes non-empty block as operand"
+            << eom;
+    throw 0;
+  }
   
   // get last statement from block, following labels
   codet &last=to_code_block(code).find_last_statement();
@@ -699,9 +740,12 @@ void goto_convertt::remove_statement_expression(
     code.operands().push_back(assignment);
   }
   else
-    throw "statement_expression expects expression as "
-           "last statement, but got `"+
-           id2string(last.get(ID_statement))+"'";
+  {
+    error() << "statement_expression expects expression as "
+            << "last statement, but got `"
+            << last.get(ID_statement) << "'" << eom;
+    throw 0;
+  }
 
   {
     goto_programt tmp;  
@@ -785,7 +829,8 @@ void goto_convertt::remove_side_effect(
   }
   else
   {
-    str << "cannot remove side effect (" << statement << ")";
+    error().source_location=expr.find_source_location();
+    error() << "cannot remove side effect (" << statement << ")" << eom;
     throw 0;
   }
 }

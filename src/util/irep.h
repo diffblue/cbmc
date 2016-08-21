@@ -206,6 +206,7 @@ public:
   bool get_bool(const irep_namet &name) const;
   signed int get_int(const irep_namet &name) const;
   unsigned int get_unsigned_int(const irep_namet &name) const;
+  std::size_t get_size_t(const irep_namet &name) const;
   long long get_long_long(const irep_namet &name) const;
 
   inline void set(const irep_namet &name, const irep_idt &value)
@@ -223,10 +224,6 @@ public:
   friend inline bool operator!=(const irept &i1, const irept &i2)
   { return !(i1==i2); }
 
-  friend std::ostream& operator<< (std::ostream& out, const irept &irep);
-  
-  std::string to_string() const;
-  
   inline void swap(irept &irep)
   {
     std::swap(irep.data, data);

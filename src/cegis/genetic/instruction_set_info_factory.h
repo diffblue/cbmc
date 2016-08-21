@@ -35,7 +35,7 @@ public:
    *
    * @param body
    */
-  instruction_set_info_factoryt(const goto_programt &body);
+  explicit instruction_set_info_factoryt(const goto_programt &body);
 
   /**
    * @brief

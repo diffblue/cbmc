@@ -60,7 +60,7 @@ public:
    *
    * @param program
    */
-  danger_learn_configt(const danger_programt &program);
+  explicit danger_learn_configt(const danger_programt &program);
 
   /**
    * @brief

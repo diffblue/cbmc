@@ -27,7 +27,7 @@ public:
    *
    * @param use_ranking
    */
-  danger_constraint(bool use_ranking);
+  explicit danger_constraint(bool use_ranking);
 
   /**
    * @brief

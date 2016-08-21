@@ -99,3 +99,10 @@ bool limited_wordsize_verifyt<verifyt>::success() const
 {
   return is_success;
 }
+
+template<class verifyt>
+void limited_wordsize_verifyt<verifyt>::show_counterexample(
+    messaget::mstreamt &os, const counterexamplet &counterexample) const
+{
+  verifier.show_counterexample(os, counterexample);
+}

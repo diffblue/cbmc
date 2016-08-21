@@ -312,7 +312,7 @@ void cpp_languaget::show_parse(
     out << "USING ";
     if(cpp_using.get_namespace())
       out << "NAMESPACE ";
-    out << cpp_using.name() << std::endl;
+    out << cpp_using.name().pretty() << std::endl;
     out << std::endl;
   }
   else if(item.is_declaration())
@@ -320,7 +320,7 @@ void cpp_languaget::show_parse(
     item.get_declaration().output(out);
   }
   else
-    out << "UNKNOWN: " << item << std::endl;
+    out << "UNKNOWN: " << item.pretty() << std::endl;
 }
 
 /*******************************************************************\

@@ -85,19 +85,17 @@ bool ansi_c_typecheck(
 
   catch(int)
   {
-    ansi_c_typecheck.error_msg();
+    ansi_c_typecheck.error();
   }
 
   catch(const char *e)
   {
-    ansi_c_typecheck.str << e;
-    ansi_c_typecheck.error_msg();
+    ansi_c_typecheck.error() << e << messaget::eom;
   }
 
   catch(const std::string &e)
   {
-    ansi_c_typecheck.str << e;
-    ansi_c_typecheck.error_msg();
+    ansi_c_typecheck.error() << e << messaget::eom;
   }
   
   return ansi_c_typecheck.get_error_found();

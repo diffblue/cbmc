@@ -14,6 +14,8 @@
 
 #include "../../../src/ansi-c/library/jsa.h"
 
+#include <stdio.h>
+
 int main(void)
 {
   __CPROVER_jsa_abstract_heapt heap;
@@ -29,7 +31,7 @@ int main(void)
   __CPROVER_jsa_add(&heap, __CPROVER_jsa_list_nonZero, tmp);
   __CPORVER_assert(!__CPROVER_jsa_hasNext(&heap, __CPROVER_jsa_iterator_it));
   const __CPROVER_jsa_iterator_id_t __CPROVER_jsa_iterator_copy_it=__CPROVER_jsa_iterator(&heap, __CPROVER_jsa_list_nonZero);
-  const __CPROVER_jsa_data_t tmp2=__CPROVER_jsa_next(&heap, __CPROVER_jsa_iterator_it);
+  const __CPROVER_jsa_data_t tmp2=__CPROVER_jsa_next(&heap, __CPROVER_jsa_iterator_copy_it);
   __CPROVER_jsa_assume(tmp == tmp2);
 
   __CPROVER_assert(0 == 1, "");

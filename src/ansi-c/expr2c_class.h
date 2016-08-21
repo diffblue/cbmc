@@ -172,6 +172,7 @@ protected:
   std::string convert_code_printf(const codet &src, unsigned indent);
   std::string convert_code_fence(const codet &src, unsigned indent);
   std::string convert_code_input(const codet &src, unsigned indent);
+  std::string convert_code_output(const codet &src, unsigned indent);
   std::string convert_code_array_set(const codet &src, unsigned indent);
   std::string convert_code_array_copy(const codet &src, unsigned indent);
 

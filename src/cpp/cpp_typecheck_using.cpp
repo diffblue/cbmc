@@ -45,11 +45,11 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
 
   if(id_set.empty())
   {
-    err_location(cpp_using.name().source_location());
-    str << "using "
-        << (using_directive?"namespace":"identifier")
-        << " `"
-        << base_name << "' not found";
+    error().source_location=cpp_using.name().source_location();
+    error() << "using "
+            << (using_directive?"namespace":"identifier")
+            << " `"
+            << base_name << "' not found" << eom;
     throw 0;
   }
 
