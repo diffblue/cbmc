@@ -61,6 +61,7 @@ exprt::operandst build_function_environment(
       new_symbol.mode=ID_C;
       new_symbol.is_static_lifetime=false;
       new_symbol.name=identifier;
+      new_symbol.base_name=base_name;
       new_symbol.type=p.type();
     
       symbol_table.move(new_symbol);
@@ -89,6 +90,79 @@ exprt::operandst build_function_environment(
   }
   
   return result;
+}
+
+/*******************************************************************\
+
+Function: record_function_outputs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void record_function_outputs(
+  const symbolt &function,
+  code_blockt &init_code,
+  symbol_tablet &symbol_table)
+{
+  const code_typet::parameterst &parameters=
+    to_code_type(function.type).parameters();
+
+  exprt::operandst result;
+  result.reserve(parameters.size()+1);
+
+  bool has_return_value=
+    to_code_type(function.type).return_type()!=empty_typet();
+
+  if(has_return_value)
+  {
+    //record return value
+    codet output(ID_output);
+    output.operands().resize(2);
+
+    const symbolt &return_symbol=symbol_table.lookup("return'");
+
+    output.op0()=address_of_exprt(
+      index_exprt(string_constantt(return_symbol.base_name), 
+                  gen_zero(index_type())));
+    output.op1()=return_symbol.symbol_expr();
+    output.add_source_location()=
+      function.value.operands().back().source_location();
+
+    init_code.move_to_operands(output);
+  }
+
+  std::size_t i=0;
+
+  for(const auto & p : parameters)
+  {
+    irep_idt base_name=p.get_base_name();
+    if(base_name.empty()) base_name="argument#"+i2string(i);
+    irep_idt identifier=id2string(function.name)+
+      "::"+id2string(base_name);
+
+    const symbolt &symbol = symbol_table.lookup(identifier);
+
+    if(symbol.type.id()==ID_pointer)
+    {
+      codet output(ID_output);
+      output.operands().resize(2);
+
+      output.op0()=address_of_exprt(
+        index_exprt(string_constantt(symbol.base_name), 
+                    gen_zero(index_type())));
+      output.op1()=symbol.symbol_expr();
+      output.add_source_location()=p.source_location();
+
+      init_code.move_to_operands(output);
+    }
+
+    i++;
+  }
 }
 
 /*******************************************************************\
@@ -203,6 +277,18 @@ bool ansi_c_entry_point(
   call_main.add_source_location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
   call_main.function().add_source_location()=symbol.location;
+  if(to_code_type(symbol.type).return_type()!=empty_typet())
+  {
+    auxiliary_symbolt return_symbol;
+    return_symbol.mode=ID_C;
+    return_symbol.is_static_lifetime=false;
+    return_symbol.name="return'";
+    return_symbol.base_name="return";
+    return_symbol.type=to_code_type(symbol.type).return_type();
+
+    symbol_table.add(return_symbol);
+    call_main.lhs()=return_symbol.symbol_expr();
+  }
 
   const code_typet::parameterst &parameters=
     to_code_type(symbol.type).parameters();
@@ -409,6 +495,10 @@ bool ansi_c_entry_point(
   }
 
   init_code.move_to_operands(call_main);
+
+  // TODO: add read/modified (recursively in call graph) globals as INPUT/OUTPUT
+
+  record_function_outputs(symbol, init_code, symbol_table);
 
   // add the entry point symbol
   symbolt new_symbol;
