@@ -108,6 +108,7 @@ protected:
 
   friend class bmc_all_propertiest;
   friend class bmc_covert;
+  friend class fault_localizationt;
 };
 
 #endif

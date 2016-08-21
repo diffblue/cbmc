@@ -16,26 +16,35 @@ Author: Peter Schrammel
 
 #include <goto-symex/symex_target_equation.h>
 
-#include "bv_cbmc.h"
+#include "bmc.h"
+#include "all_properties_class.h"
 
-class fault_localizationt
+class fault_localizationt:
+  public bmc_all_propertiest
 {
 public:
-  fault_localizationt(const optionst &_options)
-    : options(_options)
+  explicit fault_localizationt(
+    const goto_functionst &_goto_functions,
+    bmct &_bmc,
+    const optionst &_options)
+    :
+    bmc_all_propertiest(_goto_functions, _bmc.prop_conv, _bmc),
+    goto_functions(_goto_functions), 
+    bmc(_bmc), 
+    options(_options)
   {
+    set_message_handler(bmc.get_message_handler());
   }
 
-  virtual ~fault_localizationt()
-  {
-  }
+  safety_checkert::resultt operator()();
+  safety_checkert::resultt stop_on_fail();
 
-  void operator()(
-    bv_cbmct &bv_cbmc,
-    const symex_target_equationt &equation,
-    const namespacet &ns);
+  //override bmc_all_propertiest
+  virtual void goal_covered(const cover_goalst::goalt &);
 
 protected:
+  const goto_functionst &goto_functions;
+  bmct &bmc;
   const optionst &options;
 
   // the failed property
@@ -47,34 +56,44 @@ protected:
     unsigned score;
   };
   typedef std::map<literalt, lpointt> lpointst;
-  lpointst lpoints;
+  typedef std::map<irep_idt, lpointst> lpoints_mapt;
+  lpoints_mapt lpoints_map;
+
+  // this does the actual work
+  void run(irep_idt goal_id);
 
   // this collects the guards as lpoints
-  void collect_guards(
-    const symex_target_equationt &equation);
+  void collect_guards(lpointst &lpoints);
+  void freeze_guards();
 
   // specify an lpoint combination to check
   typedef std::vector<tvt> lpoints_valuet;
-  bool check(
-    prop_convt &prop_conv,
-    const lpoints_valuet& value);
-  void update_scores(
-    const prop_convt &prop_conv,
-    const lpoints_valuet& value);
+  bool check(const lpointst &lpoints, const lpoints_valuet& value);
+  void update_scores(lpointst &lpoints,
+                     const lpoints_valuet& value);
 
   // localization method: flip each point
-  void localize_linear(
-    prop_convt &prop_conv);
+  void localize_linear(lpointst &lpoints);
 
   // localization method: TBD
   //void localize_TBD(
   //  prop_convt &prop_conv);
 
-  symex_target_equationt::SSA_stepst::const_iterator get_failed_property(
-    const prop_convt &prop_conv,
-    const symex_target_equationt &equation);
+  symex_target_equationt::SSA_stepst::const_iterator get_failed_property();
 
-  void report(bv_cbmct &bv_cbmc);
+  decision_proceduret::resultt
+    run_decision_procedure(prop_convt &prop_conv);
+
+  void report(irep_idt goal_id);
+
+  //override bmc_all_propertiest
+  virtual void report(const cover_goalst &cover_goals);
+
+  //override bmc_all_propertiest
+  virtual void do_before_solving() 
+  {
+    freeze_guards();
+  }
 };
 
 #endif

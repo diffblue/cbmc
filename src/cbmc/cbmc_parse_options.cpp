@@ -181,8 +181,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("stop-on-fail") ||
      cmdline.isset("property") ||
      cmdline.isset("dimacs") ||
-     cmdline.isset("outfile") ||
-     cmdline.isset("localize-faults"))
+     cmdline.isset("outfile"))
     options.set_option("stop-on-fail", true);
   else
     options.set_option("stop-on-fail", false);

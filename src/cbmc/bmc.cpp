@@ -513,6 +513,13 @@ safety_checkert::resultt bmct::run(
         safety_checkert::ERROR:safety_checkert::SAFE;
     }
 
+    if(options.get_option("localize-faults")!="")
+    {
+      fault_localizationt fault_localization(
+        goto_functions, *this, options);
+      return fault_localization();
+    }
+
     // any properties to check at all?
     if(!options.get_bool_option("program-only") &&
        symex.remaining_vccs==0)
@@ -589,11 +596,6 @@ safety_checkert::resultt bmct::stop_on_fail(
   const goto_functionst &goto_functions,
   prop_convt &prop_conv)
 {
-  if(options.get_bool_option("localize-faults"))
-  {
-    //ENHANCE: currently, requires only freezing of guards
-    prop_conv.set_all_frozen();
-  }
   switch(run_decision_procedure(prop_conv))
   {
   case decision_proceduret::D_UNSATISFIABLE:
@@ -608,11 +610,6 @@ safety_checkert::resultt bmct::stop_on_fail(
           dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
 
       error_trace();
-    }
-    if(options.get_bool_option("localize-faults"))
-    {
-      fault_localizationt fault_localization(options);
-      fault_localization(dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
     }
     
     report_failure();
