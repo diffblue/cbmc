@@ -498,7 +498,7 @@ bool ansi_c_entry_point(
 
   // TODO: add read/modified (recursively in call graph) globals as INPUT/OUTPUT
 
-  record_function_outputs(symbol, init_code, symbol_table);
+  //record_function_outputs(symbol, init_code, symbol_table);
 
   // add the entry point symbol
   symbolt new_symbol;
