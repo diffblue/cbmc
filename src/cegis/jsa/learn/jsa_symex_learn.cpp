@@ -16,10 +16,6 @@ jsa_symex_learnt::jsa_symex_learnt(const jsa_programt &program) :
 {
 }
 
-jsa_symex_learnt::~jsa_symex_learnt()
-{
-}
-
 void jsa_symex_learnt::process(const counterexamplest &counterexamples,
     const size_t max_solution_size)
 {
@@ -85,7 +81,7 @@ const jsa_programt &jsa_symex_learnt::get_jsa_program() const
 void jsa_symex_learnt::show_candidate(messaget::mstreamt &os,
     const candidatet &candidate) const
 {
-  print_jsa_solution(os, program, candidate);
+  print_jsa_solution(os, program, candidate, op_ids, const_op_ids);
 }
 
 std::function<size_t()> jsa_symex_learnt::get_pred_ops_count() const

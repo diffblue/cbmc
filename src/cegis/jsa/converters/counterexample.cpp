@@ -25,6 +25,7 @@
 #define ITERATOR_INDEX_COMP_INDEX 2
 #define PREV_ITERATOR_INDEX_COMP_INDEX 3
 #define ITERATOR_LIST_COMP_INDEX 4
+#define NUM_ABSTRACT_HEAP_MEMBERS 7
 
 namespace
 {
@@ -141,6 +142,7 @@ void retrieve_heaps(const jsa_counterexamplet &ce,
       __CPROVER_jsa_abstract_heapt &heap=heaps[index++];
       struct_exprt::operandst ops(value.operands());
       remove_padding(ops, value.type());
+      assert(NUM_ABSTRACT_HEAP_MEMBERS == ops.size());
       read_array(heap.concrete_nodes, ops[CONCRETE_NODES_COMP_INDEX]);
       read_array(heap.abstract_nodes, ops[ABSTRACT_NODES_COMP_INDEX]);
       read_array(heap.abstract_ranges, ops[ABSTRACT_RANGES_COMP_INDEX]);

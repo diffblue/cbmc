@@ -9,10 +9,8 @@
 #include <cegis/jsa/learn/jsa_symex_learn.h>
 #include <cegis/jsa/genetic/jsa_source_provider.h>
 
-jsa_source_providert::jsa_source_providert(
-  const optionst &,
-  jsa_symex_learnt &lcfg) :
-    /* options(options), */ lcfg(lcfg)
+jsa_source_providert::jsa_source_providert(jsa_symex_learnt &lcfg) :
+    lcfg(lcfg)
 {
 }
 
@@ -36,9 +34,11 @@ void add_jsa_defines(std::string &result, const jsa_symex_learnt &lcfg)
 {
   const symbol_tablet &st=lcfg.get_symbol_table();
   result+="#define __CPROVER_assume(c) __CPROVER_jsa_assume(c)\n"
-      "#define __CPROVER_JSA_MAX_CONCRETE_NODES 1u\n"
-      "#define __CPROVER_JSA_MAX_ABSTRACT_NODES 0u\n"
-      "#define JSA_SYNTHESIS_H_\n"
+      "#define __CPROVER_JSA_MAX_CONCRETE_NODES ";
+  result+=std::to_string(get_max_concrete_nodes(st));
+  result+="\n#define __CPROVER_JSA_MAX_ABSTRACT_NODES ";
+  result+=std::to_string(get_max_abstract_nodes(st));
+  result+="\n#define JSA_SYNTHESIS_H_\n"
       "#define __CPROVER_JSA_DEFINE_TRANSFORMERS\n";
   result+="#define __CPROVER_JSA_MAX_ITERATORS ";
   result+=std::to_string(get_max_iterators(st));
@@ -50,6 +50,8 @@ void add_jsa_defines(std::string &result, const jsa_symex_learnt &lcfg)
   result+=std::to_string(get_max_pred_size(st));
   result+="\n#define __CPROVER_JSA_NUM_PREDS ";
   result+=std::to_string(get_num_jsa_preds(st));
+  result+="\n#define __CPROVER_JSA_MAX_NODES_PER_LIST ";
+  result+=std::to_string(get_max_nodes_per_list(st));
   result+="\n\n";
 }
 

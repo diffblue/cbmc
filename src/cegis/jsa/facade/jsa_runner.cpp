@@ -33,10 +33,11 @@ template<class oraclet, class prept>
 int run_with_ga(const symbol_tablet &st, const optionst &o, mstreamt &result,
     jsa_symex_learnt &l, oraclet &oracle, prept &prep)
 {
-  jsa_source_providert source_provider(o, l);
+  jsa_source_providert source_provider(l);
   dynamic_jsa_test_runnert test_runner(std::ref(source_provider));
-  typedef lazy_fitnesst<jsa_populationt, dynamic_jsa_test_runnert,
-      jsa_counterexamplet> fitnesst;
+  typedef lazy_fitnesst<jsa_populationt,
+                        dynamic_jsa_test_runnert,
+                        jsa_counterexamplet> fitnesst;
   fitnesst fitness(test_runner);
   typedef match_selectt<jsa_populationt> selectt;
   const selectt::test_case_datat &test_case_data=fitness.get_test_case_data();

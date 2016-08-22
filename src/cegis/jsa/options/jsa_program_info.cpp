@@ -5,10 +5,15 @@
 #include <cegis/jsa/value/jsa_genetic_synthesis.h>
 #include <cegis/jsa/options/jsa_program_info.h>
 
+size_t to_size(const exprt &expr)
+{
+  const bv_arithmetict bv(expr);
+  return static_cast<size_t>(bv.to_integer().to_long());
+}
+
 size_t get_size(const symbol_tablet &st, const char * const id)
 {
-  const bv_arithmetict bv(to_array_type(st.lookup(id).type).size());
-  return bv.to_integer().to_long();
+  return to_size(to_array_type(st.lookup(id).type).size());
 }
 
 #define PRED_RELAY "__CPROVER_JSA_MAX_PRED_SIZE_RELAY"
@@ -62,4 +67,34 @@ size_t get_max_iterators(const symbol_tablet &st)
 size_t get_max_lists(const symbol_tablet &st)
 {
   return get_size(st, MAX_LIST);
+}
+
+namespace
+{
+const size_t get_heap_comp_size(const symbol_tablet &st,
+    const char * const name)
+{
+  const symbolt &symbol=st.lookup("tag-__CPROVER_jsa_abstract_heap");
+  const struct_typet &struct_type=to_struct_type(symbol.type);
+  const struct_typet::componentt &comp=struct_type.get_component(name);
+  const array_typet &array_type=to_array_type(comp.type());
+  return to_size(array_type.size());
+}
+}
+
+size_t get_max_concrete_nodes(const symbol_tablet &st)
+{
+  return get_heap_comp_size(st, "concrete_nodes");
+}
+
+size_t get_max_abstract_nodes(const symbol_tablet &st)
+{
+  return 0;
+}
+
+#define MAX_NODES_PER_LIST "__CPROVER_JSA_MAX_NODES_PER_LIST_RELAY"
+
+size_t get_max_nodes_per_list(const symbol_tablet &st)
+{
+  return get_size(st, MAX_NODES_PER_LIST);
 }
