@@ -191,6 +191,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
      cmdline.isset("property"))
     options.set_option("trace", true);
 
+  if(cmdline.isset("localize-faults"))
+    options.set_option("localize-faults", true);
+  if(cmdline.isset("localize-faults-method"))
+    options.set_option("localize-faults-method", 
+                       cmdline.get_value("localize-faults-method"));
+
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
 
@@ -1158,6 +1164,7 @@ void cbmc_parse_optionst::help()
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n"
+    " --localize-faults            localize faults (experimental)\n"
     " --smt1                       use default SMT1 solver (obsolete)\n"
     " --smt2                       use default SMT2 solver (Z3)\n"
     " --boolector                  use Boolector\n"
