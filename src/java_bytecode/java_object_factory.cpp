@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/i2string.h>
 #include <util/namespace.h>
+#include <util/expr_util.h>
 
 #include "java_object_factory.h"
 
@@ -113,6 +114,11 @@ void gen_nondet_init(
         constant_exprt ci(class_identifier, string_typet());
 
         code_assignt code(me, ci);
+        init_code.copy_to_operands(code);
+      }
+      else if(name=="@lock")
+      {
+        code_assignt code(me, gen_zero(me.type()));
         init_code.copy_to_operands(code);
       }
       else

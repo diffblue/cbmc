@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include "java_bytecode_convert_class.h"
-#include "java_class_identifier.h"
+#include "java_root_class.h"
 #include "java_types.h"
 #include "java_bytecode_convert_method.h"
 
@@ -127,7 +127,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
 
   // is this a root class?
   if(c.extends.empty())
-    create_class_identifier(*class_symbol);
+    java_root_class(*class_symbol);
 }
 
 /*******************************************************************\
@@ -169,8 +169,8 @@ void java_bytecode_convert_classt::generate_class_stub(const irep_idt &class_nam
   }
   else
   {
-    // create the class identifier
-    create_class_identifier(*class_symbol);
+    // create the class identifier etc
+    java_root_class(*class_symbol);
   }
 }
 

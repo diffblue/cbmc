@@ -1401,11 +1401,32 @@ codet java_bytecode_convert_methodt::convert_instructions(
         binary_predicate_exprt(op[0], "java_instanceof", arg0);
     }
     else if(statement=="monitorenter")
-      warning() << "critical section with lock object is ignored ("
-                << i_it->source_location << ")" << eom;
-    else if(statement=="monitorexit")
-      // just skip, is always preceeded with "monitorenter"
     {
+      // becomes a function call
+      code_typet type;
+      type.return_type()=void_typet();
+      type.parameters().resize(1);
+      type.parameters()[0].type()=reference_typet(void_typet());
+      code_function_callt call;
+      call.function()=symbol_exprt("java::monitorenter", type);
+      call.lhs().make_nil();
+      call.arguments().push_back(op[0]);
+      call.add_source_location()=i_it->source_location;
+      c=call;
+    }
+    else if(statement=="monitorexit")
+    {
+      // becomes a function call
+      code_typet type;
+      type.return_type()=void_typet();
+      type.parameters().resize(1);
+      type.parameters()[0].type()=reference_typet(void_typet());
+      code_function_callt call;
+      call.function()=symbol_exprt("java::monitorexit", type);
+      call.lhs().make_nil();
+      call.arguments().push_back(op[0]);
+      call.add_source_location()=i_it->source_location;
+      c=call;
     }
     else
     {
