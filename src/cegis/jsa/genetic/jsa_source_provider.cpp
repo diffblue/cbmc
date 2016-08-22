@@ -5,6 +5,7 @@
 
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/instrument/literals.h>
+#include <cegis/jsa/value/jsa_genetic_synthesis.h>
 #include <cegis/jsa/options/jsa_program_info.h>
 #include <cegis/jsa/learn/jsa_symex_learn.h>
 #include <cegis/jsa/genetic/jsa_source_provider.h>
@@ -28,30 +29,44 @@ jsa_source_providert::jsa_source_providert(jsa_symex_learnt &lcfg) :
       "const __CPROVER_jsa_word_t *__CPROVER_jsa_counterexample_words)"
 #define CE_ASSIGNMENT_MARKER "= __CPROVER_jsa_ce_array___CPROVER_jsa_predicate_ce_marker_"
 
+#define __CPROVER_JSA_MAX_CONCRETE_NODES 2u
+#define __CPROVER_JSA_MAX_ABSTRACT_NODES 0u
+#define __CPROVER_JSA_MAX_LISTS 2u
+#define __CPROVER_JSA_MAX_NODES_PER_LIST 1u
+#define __CPROVER_JSA_MAX_ITERATORS 2u
+
+#define __CPROVER_JSA_MAX_QUERY_SIZE 3u
+#define __CPROVER_JSA_MAX_PRED_SIZE 2u
+#define __CPROVER_JSA_NUM_PRED_OPS 7u
+#define __CPROVER_JSA_NUM_PRED_RESULT_OPS 3u
+
 namespace
 {
 void add_jsa_defines(std::string &result, const jsa_symex_learnt &lcfg)
 {
-  const symbol_tablet &st=lcfg.get_symbol_table();
   result+="#define __CPROVER_assume(c) __CPROVER_jsa_assume(c)\n"
       "#define __CPROVER_JSA_MAX_CONCRETE_NODES ";
-  result+=std::to_string(get_max_concrete_nodes(st));
+  result+=std::to_string(__CPROVER_JSA_MAX_CONCRETE_NODES);
   result+="\n#define __CPROVER_JSA_MAX_ABSTRACT_NODES ";
-  result+=std::to_string(get_max_abstract_nodes(st));
+  result+=std::to_string(__CPROVER_JSA_MAX_ABSTRACT_NODES);
   result+="\n#define JSA_SYNTHESIS_H_\n"
       "#define __CPROVER_JSA_DEFINE_TRANSFORMERS\n";
-  result+="#define __CPROVER_JSA_MAX_ITERATORS ";
-  result+=std::to_string(get_max_iterators(st));
   result+="\n#define __CPROVER_JSA_MAX_LISTS ";
-  result+=std::to_string(get_max_lists(st));
-  result+="\n#define __CPROVER_JSA_MAX_QUERY_SIZE ";
-  result+=std::to_string(get_max_query_size(st));
-  result+="\n#define __CPROVER_JSA_MAX_PRED_SIZE ";
-  result+=std::to_string(get_max_pred_size(st));
-  result+="\n#define __CPROVER_JSA_NUM_PREDS ";
-  result+=std::to_string(get_num_jsa_preds(st));
+  result+=std::to_string(__CPROVER_JSA_MAX_LISTS);
   result+="\n#define __CPROVER_JSA_MAX_NODES_PER_LIST ";
-  result+=std::to_string(get_max_nodes_per_list(st));
+  result+=std::to_string(__CPROVER_JSA_MAX_NODES_PER_LIST);
+  result+="\n#define __CPROVER_JSA_MAX_ITERATORS ";
+  result+=std::to_string(__CPROVER_JSA_MAX_ITERATORS);
+  result+="\n#define __CPROVER_JSA_MAX_QUERY_SIZE ";
+  result+=std::to_string(__CPROVER_JSA_MAX_QUERY_SIZE);
+  result+="\n#define __CPROVER_JSA_MAX_PRED_SIZE ";
+  result+=std::to_string(__CPROVER_JSA_MAX_PRED_SIZE);
+  result+="\n#define __CPROVER_JSA_NUM_PRED_OPS ";
+  result+=std::to_string(__CPROVER_JSA_NUM_PRED_OPS);
+  result+="\n#define __CPROVER_JSA_NUM_PRED_RESULT_OPS ";
+  result+=std::to_string(__CPROVER_JSA_NUM_PRED_RESULT_OPS);
+  result+="\n#define __CPROVER_JSA_NUM_PREDS ";
+  result+=std::to_string(__CPROVER_JSA_NUM_PREDS);
   result+="\n\n";
 }
 
