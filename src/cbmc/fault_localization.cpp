@@ -12,9 +12,12 @@ Author: Peter Schrammel
 #include <util/symbol.h>
 #include <util/std_expr.h>
 #include <util/message.h>
+#include <util/time_stopping.h>
 
 #include <solvers/prop/minimize.h>
 #include <solvers/prop/literal_expr.h>
+
+#include <goto-symex/build_goto_trace.h>
 
 #include "fault_localization.h"
 #include "counterexample_beautification.h"
