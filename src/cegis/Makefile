@@ -88,7 +88,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cbmc/symex_bmc$(OBJEXT) ../cbmc/xml_interface$(OBJEXT) ../cbmc/bmc_cover$(OBJEXT) \
       ../cbmc/bv_cbmc$(OBJEXT) ../cbmc/counterexample_beautification$(OBJEXT) \
       ../cbmc/cbmc_languages$(OBJEXT) ../cbmc/show_vcc$(OBJEXT) \
-      ../cbmc/cbmc_dimacs$(OBJEXT) ../cbmc/all_properties$(OBJEXT)
+      ../cbmc/cbmc_dimacs$(OBJEXT) ../cbmc/all_properties$(OBJEXT) \
+      ../cbmc/fault_localization$(OBJEXT)
 
 INCLUDES= -I ..
 
