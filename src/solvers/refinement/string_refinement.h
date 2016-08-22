@@ -41,6 +41,7 @@ public:
   exprt premise;
   exprt body;
   bool is_quantified;
+  
 
   // Axiom of the form: forall qvar. prem ==> bod
   string_axiomt(symbol_exprt qvar, exprt prem, exprt bod);
@@ -57,6 +58,17 @@ public:
   // True axiom
   string_axiomt();
   
+
+  // Given a value for the universaly quantified variable, gives the corresponding witness
+  exprt witness(const exprt & qval, std::vector<exprt> & lemmas);
+
+private:
+  // For values of the universal variable we give a symbol for the existential one
+  // The following symbol as type array
+  symbol_exprt existential_instantiation;
+
+
+public:
   // Warning: this assume no premise:
   inline string_axiomt operator&&(const string_axiomt & a) {
     assert(premise == true_exprt());
@@ -93,6 +105,8 @@ public:
     assert(premise == true_exprt());
     return string_axiomt(not_exprt(body));
   }
+
+
 };
 
 typedef std::vector<string_axiomt> axiom_vect;
@@ -165,6 +179,15 @@ class string_refinementt: public bv_refinementt
 public:
   string_refinementt(const namespacet &_ns, propt &_prop);
   ~string_refinementt();
+
+  // Should we use counter examples at each iteration?
+  bool use_counter_example;
+
+  // Bound on the existential witnesses we use for instantiation
+  int witness_bound;
+
+  // Number of time we refine the index set before actually launching the solver
+  int initial_loop_bound;
 
   virtual std::string decision_procedure_text() const
   { return "string refinement loop with "+prop.solver_text(); }
@@ -268,6 +291,8 @@ private:
   literalt convert_rest(const exprt &expr);
 
   void add_lemma(const exprt &lemma);
+  void add_again_lemmas();
+
   // Check that the precondition is satisfiable before adding a lemma, and that we haven't added it before
   void add_implies_lemma(const exprt &prem, const exprt &body);
 
@@ -282,6 +307,9 @@ private:
   std::map<exprt, expr_sett> current_index_set;
   std::map<exprt, expr_sett> index_set;
 
+  // Tells if there is a index in the index set where the same variable occurs several time.
+  bool variable_with_multiple_occurence_in_index;
+
   // Add to the index set all the indices that appear in the formula
   void update_index_set(const exprt &formula);
   void update_index_set(const std::vector<exprt> &cur);
@@ -293,6 +321,8 @@ private:
   // Computes one index [v1] in which [axiom.idx] appears, takes the
   // corresponding substitition [r] (obtained with [compute_subst]).
   // Then substitutes [axiom.idx] with [r] in [axiom].
+  // axiom is not constant because we may record some information about 
+  // instantiation of existential variables.
   string_axiomt instantiate(const string_axiomt &axiom, const exprt &str,
                     const exprt &val);
 
