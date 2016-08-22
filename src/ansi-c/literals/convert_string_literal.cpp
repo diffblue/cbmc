@@ -34,7 +34,7 @@ void convert_one_string_literal(
   std::basic_string<unsigned int> &value)
 {
   assert(src.size()>=2);
-
+  
   if(src[0]=='u' && src[1]=='8')
   {
     assert(src[src.size()-1]=='"');
@@ -63,6 +63,14 @@ void convert_one_string_literal(
     assert(src[src.size()-1]=='"');
 
     unescape_wide_string(std::string(src, 1, src.size()-2), value);
+
+    // turn into utf-8
+    std::string utf8_value=utf32_to_utf8(value);
+
+    // pad into wide string
+    value.resize(utf8_value.size());
+    for(unsigned i=0; i<utf8_value.size(); i++)
+      value[i]=utf8_value[i];
   }
 }
 

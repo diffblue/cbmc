@@ -150,7 +150,8 @@ digit           [0-9]
 bindigit        [01]
 octdigit        [0-7]
 hexdigit        [0-9a-fA-F]
-identifier      (({letter}|"_"|"$")({letter}|{digit}|"_"|"$")*)
+utf8letter      [\x80-\xff]
+identifier      (({letter}|"_"|"$"|{utf8letter})({letter}|{digit}|"_"|"$"|{utf8letter})*)
 integer         {digit}+
 binary          {bindigit}+
 msiw_suffix     ([iI]("8"|"16"|"32"|"64"|"128"))
