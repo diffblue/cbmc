@@ -93,14 +93,14 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I ..
 
+include ../config.inc
+include ../common
+
 ifeq ($(filter-out Unix MinGW Cygwin OSX OSX_Universal,$(BUILD_ENV_)),)
   DLFCN_LINKFLAGS = -ldl
 endif
 
 LIBS = $(DLFCN_LINKFLAGS)
-
-include ../config.inc
-include ../common
 
 CLEANFILES = cegis$(EXEEXT)
 
