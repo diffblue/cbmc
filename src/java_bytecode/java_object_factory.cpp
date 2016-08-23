@@ -111,7 +111,8 @@ void gen_nondet_init(
 
       if(name=="@class_identifier")
       {
-        constant_exprt ci(class_identifier, string_typet());
+        std::string qualified_clsid="java::"+as_string(class_identifier);
+	constant_exprt ci(qualified_clsid, string_typet());
 
         code_assignt code(me, ci);
         init_code.copy_to_operands(code);
