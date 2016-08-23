@@ -93,7 +93,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I ..
 
-ifeq ($(filter-out Unix MinGW Cygwin OSX OSX_Universal FreeBSD,$(BUILD_ENV_)),)
+ifeq ($(filter-out Unix MinGW Cygwin OSX OSX_Universal,$(BUILD_ENV_)),)
   DLFCN_LINKFLAGS = -ldl
 endif
 
