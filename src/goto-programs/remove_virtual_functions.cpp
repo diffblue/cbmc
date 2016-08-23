@@ -170,28 +170,39 @@ void remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_calls;
   goto_programt new_code_gotos;
 
+  // Get a pointer from which we can extract a clsid.
+  // If it's already a pointer to an object of some sort, just use it;
+  // if it's void* then use the parent of all possible candidates,
+  // which by the nature of get_functions happens to be the last candidate.
+
+  exprt this_expr=code.arguments()[0];
+  assert(this_expr.type().id()==ID_pointer &&
+         "Non-pointer this-arg in remove-virtuals?");
+  const auto& points_to=this_expr.type().subtype();
+  if(points_to==empty_typet())
+  {
+    symbol_typet symbol_type(functions.back().class_id);
+    this_expr=typecast_exprt(this_expr, pointer_typet(symbol_type));
+  }
+  exprt deref=dereference_exprt(this_expr, this_expr.type().subtype());
+  exprt c_id2=build_class_identifier(deref);
+
   for(const auto &fun : functions)
   {
     // call function
     goto_programt::targett t1=new_code_calls.add_instruction();
     t1->make_function_call(code);
-    to_code_function_call(t1->code).function()=fun.symbol_expr;
+    auto& newcall=to_code_function_call(t1->code);
+    newcall.function()=fun.symbol_expr;
+    pointer_typet need_type(symbol_typet(fun.class_id));
+    if(newcall.arguments()[0].type()!=need_type)
+      newcall.arguments()[0].make_typecast(need_type);
 
     // goto final
     goto_programt::targett t3=new_code_calls.add_instruction();
     t3->make_goto(t_final, true_exprt());
 
-    exprt this_expr=code.arguments()[0];
-    if(this_expr.type().id()!=ID_pointer ||
-       this_expr.type().id()!=ID_struct)
-    {
-      symbol_typet symbol_type(fun.class_id);
-      this_expr=typecast_exprt(this_expr, pointer_typet(symbol_type));
-    }
-
-    exprt deref=dereference_exprt(this_expr, this_expr.type().subtype());
     exprt c_id1=constant_exprt(fun.class_id, string_typet());
-    exprt c_id2=build_class_identifier(deref);
 
     goto_programt::targett t4=new_code_gotos.add_instruction();
     t4->make_goto(t1, equal_exprt(c_id1, c_id2));
