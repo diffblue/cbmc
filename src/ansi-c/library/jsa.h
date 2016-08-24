@@ -933,11 +933,15 @@ __CPROVER_jsa_inline void __CPROVER_jsa_stream_op(
     __CPROVER_jsa_abstract_heapt * const heap,
     const __CPROVER_jsa_list_id_t list,
     const __CPROVER_jsa_iterator_id_t it,
-    const __CPROVER_jsa_list_id_t copy,
+    const __CPROVER_jsa_list_id_t source,
     const __CPROVER_jsa_pred_id_t pred_id,
     const __CPROVER_jsa__internal_index_t id)
 {
-  __CPROVER_jsa_node_id_t node=__CPROVER_jsa__internal_get_head_node(heap, list);
+  __CPROVER_jsa_node_id_t node;
+  if (__CPROVER_jsa_null == source)
+    node = __CPROVER_jsa__internal_get_head_node(heap, list);
+  else
+    node = __CPROVER_jsa__internal_get_head_node(heap, source);
   const __CPROVER_jsa_node_id_t end=heap->iterators[it].node_id;
   for (__CPROVER_jsa__internal_index_t i=0; i < __CPROVER_JSA_MAX_NODES_PER_LIST; ++i)
   {
@@ -958,10 +962,10 @@ __CPROVER_jsa_inline void __CPROVER_jsa_stream_op(
         break;
       case COPY_IF:
         if (pred_result != 0)
-          __CPROVER_jsa_add(heap, copy, value);
+          __CPROVER_jsa_add(heap, list, value);
         break;
       case MAP:
-        __CPROVER_jsa_add(heap, copy, pred_result);
+        __CPROVER_jsa_add(heap, list, pred_result);
         break;
       case MAP_IN_PLACE:
         heap->concrete_nodes[node].value=pred_result;

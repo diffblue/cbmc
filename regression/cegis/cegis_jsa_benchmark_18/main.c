@@ -28,10 +28,8 @@ int main(void)
        __CPROVER_jsa_hasNext(&heap, __CPROVER_jsa_iterator_it);)
   {
     const __CPROVER_jsa_data_t integer=__CPROVER_jsa_next(&heap, __CPROVER_jsa_iterator_it);
-    //if ((integer - min) > 0)
     if (integer > min)
     {
-      //__CPROVER_jsa_add(&heap, __CPROVER_jsa_list_newList, integer - min);
       __CPROVER_jsa_add(&heap, __CPROVER_jsa_list_newList, integer);
     }
   }
