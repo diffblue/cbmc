@@ -363,6 +363,8 @@ void java_bytecode_convert_methodt::convert(
     // add as a JVM variable
     std::size_t slots=get_variable_slots(parameters[i]);
     variables[param_index][0].symbol_expr=parameter_symbol.symbol_expr();
+    variables[param_index][0].start_pc=0;
+    variables[param_index][0].length = std::numeric_limits<size_t>::max();
     param_index+=slots;
   }
 
