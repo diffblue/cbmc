@@ -99,7 +99,6 @@ protected:
   variablet &find_variable_for_slot(unsigned number_int, size_t address,
                                     variablest &var_list, instruction_sizet inst_size)
   {
-    size_t var_list_length = var_list.size();
     for(variablet &var : var_list)
     {
       size_t start_pc = var.start_pc;
