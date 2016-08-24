@@ -1,0 +1,7 @@
+CORE
+LocalVarTable2.class
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+--
+return_value.*(void \*)i

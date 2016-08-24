@@ -99,35 +99,22 @@ protected:
   variablet &find_variable_for_slot(unsigned number_int, size_t address,
                                     variablest &var_list, instruction_sizet inst_size)
   {
-    size_t var_list_length = var_list.size();
-    if(var_list_length > 1)
-      {
-        for(variablet &var : var_list)
-          {
-            size_t start_pc = var.start_pc;
-            size_t length = var.length;
-            if (address + (size_t) inst_size >= start_pc && address < start_pc + length)
-              return var;
-          }
-        // add unnamed local variable to end of list at this index
-        // with scope from 0 to INT_MAX
-        // as it is at the end of the vector, it will only be taken into account
-        // if no other variable is valid
-        size_t list_length = var_list.size();
-        var_list.resize(list_length + 1);
-        var_list[list_length].start_pc = 0;
-        var_list[list_length].length = std::numeric_limits<size_t>::max();
-        return var_list[list_length];
-      }
-    else if(var_list_length == 1)
-      return var_list[0];
-    else
-      {
-        // return reference to unnamed local variable
-        // if no local variable is defined for this index
-        var_list.resize(1);
-        return var_list[0];
-      }
+    for(variablet &var : var_list)
+    {
+      size_t start_pc = var.start_pc;
+      size_t length = var.length;
+      if (address + (size_t) inst_size >= start_pc && address < start_pc + length)
+        return var;
+    }
+    // add unnamed local variable to end of list at this index
+    // with scope from 0 to INT_MAX
+    // as it is at the end of the vector, it will only be taken into account
+    // if no other variable is valid
+    size_t list_length = var_list.size();
+    var_list.resize(list_length + 1);
+    var_list[list_length].start_pc = 0;
+    var_list[list_length].length = std::numeric_limits<size_t>::max();
+    return var_list[list_length];
   }
 
   // JVM local variables
@@ -375,6 +362,8 @@ void java_bytecode_convert_methodt::convert(
     // add as a JVM variable
     std::size_t slots=get_variable_slots(parameters[i]);
     variables[param_index][0].symbol_expr=parameter_symbol.symbol_expr();
+    variables[param_index][0].start_pc=0;
+    variables[param_index][0].length = std::numeric_limits<size_t>::max();
     param_index+=slots;
   }
 
