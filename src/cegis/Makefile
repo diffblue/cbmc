@@ -41,8 +41,9 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       jsa/constraint/jsa_constraint_factory.cpp \
       jsa/converters/solution.cpp jsa/converters/translate_to_goto_program.cpp jsa/converters/replace_operators.cpp \
       jsa/converters/counterexample.cpp \
-      jsa/instrument/jsa_meta_data.cpp \
-      jsa/value/jsa_solution.cpp jsa/value/jsa_solution_printer.cpp jsa/value/jsa_types.cpp jsa/value/jsa_counterexample_printer.cpp \
+      jsa/instrument/jsa_meta_data.cpp jsa/instrument/temps_helper.cpp \
+      jsa/value/jsa_solution.cpp jsa/value/jsa_solution_printer.cpp jsa/value/jsa_types.cpp \
+      jsa/value/default_solution.cpp jsa/value/jsa_counterexample_printer.cpp \
       jsa/genetic/jsa_source_provider.cpp jsa/genetic/dynamic_jsa_test_runner.cpp jsa/genetic/random_jsa_mutate.cpp \
       jsa/genetic/random_jsa_cross.cpp jsa/genetic/jsa_genetic_convert.cpp jsa/genetic/jsa_random.cpp \
       jsa/genetic/solution_helper.cpp jsa/genetic/jsa_serialiser.cpp jsa/genetic/jsa_paragon_wrapper.cpp \

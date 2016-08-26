@@ -1,8 +1,9 @@
+#include <util/config.h>
+#include <util/substitute.h>
 #include <cbmc/cbmc_parse_options.h>
 #include <cbmc/bmc.h>
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/write_goto_binary.h>
-#include <util/config.h>
 
 #include <cegis/options/parameters.h>
 #include <cegis/cegis-util/temporary_output_block.h>

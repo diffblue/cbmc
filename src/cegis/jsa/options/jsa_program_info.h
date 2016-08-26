@@ -124,37 +124,4 @@ size_t get_max_iterators(const symbol_tablet &st);
  */
 size_t get_max_lists(const symbol_tablet &st);
 
-/**
- * @brief
- *
- * @details
- *
- * @param st
- *
- * @return
- */
-size_t get_max_concrete_nodes(const symbol_tablet &st);
-
-/**
- * @brief
- *
- * @details
- *
- * @param st
- *
- * @return
- */
-size_t get_max_abstract_nodes(const symbol_tablet &st);
-
-/**
- * @brief
- *
- * @details
- *
- * @param st
- *
- * @return
- */
-size_t get_max_nodes_per_list(const symbol_tablet &st);
-
 #endif /* CEGIS_JSA_PROGRAM_INFO_H_ */

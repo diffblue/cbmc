@@ -51,7 +51,7 @@ void print_jsa_solution(messaget::mstreamt &os, const jsa_programt &program,
     const jsa_solutiont &solution, const pred_op_idst &op_ids,
     const pred_op_idst &const_op_ids)
 {
-  if (solution.query.empty())
+  if (solution.query.empty() || program.st.symbols.empty())
   {
     os << "<jsa_solution />" << messaget::endl << messaget::eom;
     return;
@@ -69,7 +69,11 @@ void print_jsa_solution(messaget::mstreamt &os, const jsa_programt &program,
   os << "  <predicates>" << messaget::endl;
   const jsa_solutiont::predicatest &predicates=solution.predicates;
   for (const goto_programt::instructionst &predicate : predicates)
+  {
+    os << "    <predicate>" << messaget::endl;
     print_instructions(os, program, predicate);
+    os << "    </predicate>" << messaget::endl;
+  }
   os << "  </predicates>" << messaget::endl;
   os << "  <query>" << messaget::endl;
   print_instructions(os, program, solution.query);

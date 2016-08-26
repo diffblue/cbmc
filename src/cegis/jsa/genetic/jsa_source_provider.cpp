@@ -29,17 +29,6 @@ jsa_source_providert::jsa_source_providert(jsa_symex_learnt &lcfg) :
       "const __CPROVER_jsa_word_t *__CPROVER_jsa_counterexample_words)"
 #define CE_ASSIGNMENT_MARKER "= __CPROVER_jsa_ce_array___CPROVER_jsa_predicate_ce_marker_"
 
-#define __CPROVER_JSA_MAX_CONCRETE_NODES 2u
-#define __CPROVER_JSA_MAX_ABSTRACT_NODES 0u
-#define __CPROVER_JSA_MAX_LISTS 2u
-#define __CPROVER_JSA_MAX_NODES_PER_LIST 1u
-#define __CPROVER_JSA_MAX_ITERATORS 2u
-
-#define __CPROVER_JSA_MAX_QUERY_SIZE 3u
-#define __CPROVER_JSA_MAX_PRED_SIZE 2u
-#define __CPROVER_JSA_NUM_PRED_OPS 7u
-#define __CPROVER_JSA_NUM_PRED_RESULT_OPS 3u
-
 namespace
 {
 void add_jsa_defines(std::string &result, const jsa_symex_learnt &lcfg)
@@ -53,8 +42,8 @@ void add_jsa_defines(std::string &result, const jsa_symex_learnt &lcfg)
       "#define __CPROVER_JSA_DEFINE_TRANSFORMERS\n";
   result+="\n#define __CPROVER_JSA_MAX_LISTS ";
   result+=std::to_string(__CPROVER_JSA_MAX_LISTS);
-  result+="\n#define __CPROVER_JSA_MAX_NODES_PER_LIST ";
-  result+=std::to_string(__CPROVER_JSA_MAX_NODES_PER_LIST);
+  result+="\n#define __CPROVER_JSA_MAX_NODES_PER_CE_LIST ";
+  result+=std::to_string(__CPROVER_JSA_MAX_NODES_PER_CE_LIST);
   result+="\n#define __CPROVER_JSA_MAX_ITERATORS ";
   result+=std::to_string(__CPROVER_JSA_MAX_ITERATORS);
   result+="\n#define __CPROVER_JSA_MAX_QUERY_SIZE ";

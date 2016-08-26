@@ -157,20 +157,6 @@ void assign_ce_values(jsa_programt &prog)
     }
   }
 }
-
-void zero_temps(jsa_programt &prog)
-{
-  symbol_tablet &st=prog.st;
-  goto_functionst &gf=prog.gf;
-  goto_programt::targett pos=std::next(prog.synthetic_variables);
-  for (const symbol_tablet::symbolst::value_type &symbol : st.symbols)
-  {
-    if (std::string::npos == id2string(symbol.first).find(JSA_TMP_PREFIX))
-      continue;
-    const symbol_exprt lhs(symbol.second.symbol_expr());
-    pos=jsa_assign(st, gf, pos, lhs, gen_zero(lhs.type()));
-  }
-}
 }
 
 void insert_counterexamples(jsa_programt &program,
@@ -181,7 +167,6 @@ void insert_counterexamples(jsa_programt &program,
   insert_jsa_constraint(program, true);
   add_array_declarations(program, ces);
   add_array_index(program);
-  zero_temps(program);
   add_ce_goto(program, ces.size());
   assign_ce_values(program);
 }

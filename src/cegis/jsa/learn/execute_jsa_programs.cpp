@@ -6,6 +6,7 @@
 #include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/jsa/options/jsa_program.h>
 #include <cegis/jsa/instrument/jsa_meta_data.h>
+#include <cegis/jsa/instrument/temps_helper.h>
 #include <cegis/jsa/preprocessing/clone_heap.h>
 #include <cegis/jsa/learn/execute_jsa_programs.h>
 
@@ -42,11 +43,19 @@ void make_constraint_call(const symbol_tablet &st, goto_functionst &gf,
   make_constraint_call(st, gf, pos, args);
 }
 
-void make_query_call(const symbol_tablet &st, goto_functionst &gf,
-    goto_programt::targett pos, const bool full_query=false)
+void make_query_call(jsa_programt &prog, const symbol_tablet &st,
+    goto_functionst &gf, goto_programt::targett pos,
+    const bool full_query=false)
 {
   goto_programt &body=get_entry_body(gf);
   pos=insert_before_preserve_labels(body, pos);
+  const goto_programt::targett temps_end=zero_jsa_temps(prog, pos);
+  if (pos != temps_end)
+  {
+    move_labels(body, pos, std::next(pos));
+    body.instructions.erase(pos);
+    pos=body.insert_after(temps_end);
+  }
   pos->type=goto_program_instruction_typet::FUNCTION_CALL;
   pos->source_location=jsa_builtin_source_location();
   code_function_callt call;
@@ -84,13 +93,13 @@ void execute_jsa_learn_programs(jsa_programt &prog)
   const symbol_tablet &st=prog.st;
   goto_functionst &gf=prog.gf;
   make_constraint_call(st, gf, prog.base_case);
-  make_query_call(st, gf, prog.base_case);
+  make_query_call(prog, st, gf, prog.base_case);
   make_constraint_call(st, gf, prog.inductive_assumption);
-  make_query_call(st, gf, prog.inductive_assumption);
+  make_query_call(prog, st, gf, prog.inductive_assumption);
   make_constraint_call(st, gf, prog.inductive_step);
   make_sync_call(st, gf, prog.inductive_step);
-  make_query_call(st, gf, prog.inductive_step);
+  make_query_call(prog, st, gf, prog.inductive_step);
   make_constraint_call(st, gf, prog.property_entailment);
-  make_query_call(st, gf, prog.property_entailment, true);
+  make_query_call(prog, st, gf, prog.property_entailment, true);
   make_sync_call(st, gf, prog.property_entailment);
 }
