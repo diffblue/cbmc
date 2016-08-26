@@ -771,6 +771,18 @@ __CPROVER_jsa_inline __CPROVER_jsa_word_t  __CPROVER_jsa_mult(
 ;
 #endif
 
+__CPROVER_jsa_inline __CPROVER_jsa_word_t  __CPROVER_jsa_div(
+    const __CPROVER_jsa_word_t lhs,
+    const __CPROVER_jsa_word_t rhs)
+#ifdef __CPROVER_JSA_DEFINE_TRANSFORMERS
+{
+  if (rhs == 0) return __CPROVER_jsa_word_max;
+  return lhs / rhs;
+}
+#else
+;
+#endif
+
 __CPROVER_jsa_inline __CPROVER_jsa_word_t  __CPROVER_jsa_ite(
     const __CPROVER_jsa_word_t res,
     const __CPROVER_jsa_word_t lhs,
@@ -830,7 +842,7 @@ __CPROVER_jsa_extern __CPROVER_jsa__internal_index_t __CPROVER_JSA_PRED_RESULT_O
 __CPROVER_jsa_extern const __CPROVER_jsa_pred_instructiont *__CPROVER_JSA_PREDICATES[__CPROVER_JSA_NUM_PREDS];
 __CPROVER_jsa_extern __CPROVER_jsa__internal_index_t __CPROVER_JSA_PREDICATE_SIZES[__CPROVER_JSA_NUM_PREDS];
 
-#define __CPROVER_JSA_NUM_PRED_INSTRUCTIONS 7u
+#define __CPROVER_JSA_NUM_PRED_INSTRUCTIONS 8u
 
 typedef __CPROVER_jsa_word_t __CPROVER_jsa_pred_id_t;
 
@@ -922,6 +934,10 @@ __CPROVER_jsa_inline __CPROVER_jsa_word_t __CPROVER_jsa_execute_pred(
     case 6:
       __CPROVER_jsa_pred_opcode_first_6: __CPROVER_jsa_execute_pred_result=__CPROVER_jsa_mult(__CPROVER_jsa_execute_pred_op0, __CPROVER_jsa_execute_pred_op1);
       __CPROVER_jsa_pred_opcode_last_6: __CPROVER_jsa_execute_pred_result=__CPROVER_jsa_execute_pred_result;
+      break;
+    case 7:
+      __CPROVER_jsa_pred_opcode_first_7: __CPROVER_jsa_execute_pred_result=__CPROVER_jsa_div(__CPROVER_jsa_execute_pred_op0, __CPROVER_jsa_execute_pred_op1);
+      __CPROVER_jsa_pred_opcode_last_7: __CPROVER_jsa_execute_pred_result=__CPROVER_jsa_execute_pred_result;
       break;
     }
     result=__CPROVER_jsa_execute_pred_result;
