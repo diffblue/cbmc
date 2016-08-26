@@ -216,10 +216,9 @@ symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
 }
 
 goto_programt::targett cegis_assign(const symbol_tablet &st,
-    goto_functionst &gf, const goto_programt::targett &insert_after_pos,
+    goto_programt &body, const goto_programt::targett &insert_after_pos,
     const exprt &lhs, const exprt &rhs, const source_locationt &loc)
 {
-  goto_programt &body=get_entry_body(gf);
   goto_programt::targett assign=body.insert_after(insert_after_pos);
   assign->type=goto_program_instruction_typet::ASSIGN;
   assign->source_location=loc;
@@ -228,6 +227,14 @@ goto_programt::targett cegis_assign(const symbol_tablet &st,
   if (type_eq(type, rhs.type(), ns)) assign->code=code_assignt(lhs, rhs);
   else assign->code=code_assignt(lhs, typecast_exprt(rhs, type));
   return assign;
+}
+
+goto_programt::targett cegis_assign(const symbol_tablet &st,
+    goto_functionst &gf, const goto_programt::targett &insert_after_pos,
+    const exprt &lhs, const exprt &rhs, const source_locationt &loc)
+{
+  goto_programt &body=get_entry_body(gf);
+  return cegis_assign(st, body, insert_after_pos, lhs, rhs, loc);
 }
 
 goto_programt::targett cegis_assign(const symbol_tablet &st,

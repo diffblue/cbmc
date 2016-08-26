@@ -182,6 +182,24 @@ goto_programt::targett cegis_assign(const symbol_tablet &st,
  * @details
  *
  * @param st
+ * @param body
+ * @param insert_after_pos
+ * @param lhs
+ * @param rhs
+ * @param loc
+ *
+ * @return
+ */
+goto_programt::targett cegis_assign(const symbol_tablet &st,
+    goto_programt &body, const goto_programt::targett &insert_after_pos,
+    const exprt &lhs, const exprt &rhs, const source_locationt &loc);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
  * @param gf
  * @param insert_after_pos
  * @param lhs

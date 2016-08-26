@@ -72,6 +72,7 @@ void add_predicates(jsa_programt &prog, const jsa_solutiont::predicatest &preds)
     pos->targets.push_back(*std::next(it));
   }
   pred_begins.back()->targets.push_back(end);
+  add_zero_jsa_temps_to_pred_exec(prog);
 
   body.compute_incoming_edges();
   body.compute_target_numbers();

@@ -2,6 +2,7 @@
 
 #include <cegis/cegis-util/program_helper.h>
 
+#include <cegis/jsa/instrument/temps_helper.h>
 #include <cegis/jsa/preprocessing/add_constraint_meta_variables.h>
 #include <cegis/jsa/preprocessing/clone_heap.h>
 #include <cegis/jsa/preprocessing/collect_variables.h>
@@ -40,6 +41,7 @@ void jsa_preprocessingt::operator()(const size_t max_length)
   current_program=original_program;
   goto_functionst &gf=current_program.gf;
   create_jsa_temp_variables(current_program, max_length);
+  add_zero_jsa_temps_to_pred_exec(current_program);
   gf.update();
 }
 
