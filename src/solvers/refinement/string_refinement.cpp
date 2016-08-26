@@ -970,26 +970,7 @@ bool string_refinementt::check_axioms()
   for (size_t i = 0; i < string_axioms.size(); ++i) {
     const string_constraintt &axiom = string_axioms[i];
 
-    exprt negaxiom = false_exprt();
-
-    if(axiom.exists_var.size()>0) {
-      for(int i = 0; i < witness_bound + 1; i++){
-	exprt n = axiom.body;
-	exprt index = index_of_int(i);
-	exprt within_bounds = and_exprt(binary_relation_exprt(index,ID_ge,index_of_int(0)), binary_relation_exprt(index,ID_lt,axiom.exists_bounds[0]));
-	replace_expr(axiom.exists_var[0],index,n);
-	negaxiom = or_exprt(negaxiom,and_exprt(within_bounds,n));
-      }
-
-      for(int i = 0; i < witness_bound; i++){
-	exprt n = axiom.body;
-	replace_expr(axiom.exists_var[0],minus_exprt(axiom.exists_bounds[0],index_of_int(i+1)),n);
-	negaxiom = or_exprt(negaxiom,n);
-	}
-
-      negaxiom = and_exprt(axiom.premise, not_exprt(negaxiom));
-    }
-    else negaxiom = and_exprt(axiom.premise, not_exprt(axiom.body));
+    exprt negaxiom = and_exprt(axiom.premise(), not_exprt(axiom.body()));
     replace_expr(fmodel, negaxiom);
 
     debug() << "negaxiom: " << pretty_short(negaxiom) << eom;
@@ -1000,7 +981,6 @@ bool string_refinementt::check_axioms()
 
     switch (solver()) {
     case decision_proceduret::D_SATISFIABLE: {
-      //debug() << "satisfiable" << eom;
       exprt val = solver.get(axiom.univ_var);
       violated.push_back(std::make_pair(i, val));
     } break;
@@ -1008,7 +988,6 @@ bool string_refinementt::check_axioms()
       break;
     default:
       throw "failure in checking axiom";
-      //expect(false, "failure in checking axiom");
     }
   }
 
