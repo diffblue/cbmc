@@ -31,13 +31,6 @@ constant_exprt index_of_int(int i) {
 
 constant_exprt zero = index_of_int(0);
 
-// Succinct version of pretty()
-std::string string_refinementt::pretty_short(const exprt & expr) {
-  languagest languages(ns, new_ansi_c_language());
-  std::string string_value;
-  languages.from_expr(expr, string_value);
-  return string_value;
-}
 
 // associate a string to symbols
 std::map<irep_idt, string_exprt> symbol_to_string;
@@ -56,6 +49,23 @@ string_ref_typet::string_ref_typet() : struct_typet() {
 }
 
 
+// Succinct version of pretty()
+std::string string_refinementt::pretty_short(const exprt & expr) {
+  languagest languages(ns, new_ansi_c_language());
+  std::string string_value;
+  languages.from_expr(expr, string_value);
+  return string_value;
+}
+
+
+std::string string_refinementt::constraint_to_string(const string_constraintt & sc) {
+  if(sc.is_simple()) return(pretty_short(sc));
+  else if(sc.is_univ_quant())
+    return ("forall " + pretty_short(sc.get_univ_var()) + ". (" 
+	    + pretty_short(sc));
+  else
+    return "forall QA. exists QE s1 != s2 ...";
+}
 
 
 
@@ -139,11 +149,11 @@ void string_exprt::of_if(const if_exprt &expr, axiom_vect & axioms)
 
   axioms.emplace_back(implies_exprt(expr.cond(),equal_exprt(length(),t.length())));
   symbol_exprt qvar = string_refinementt::fresh_symbol("string_if",index_type);
-  axioms.emplace_back(qvar,and_exprt(t>qvar,expr.cond()),equal_exprt((*this)[qvar],t[qvar]))
+  axioms.push_back(string_constraintt(expr.cond(),equal_exprt((*this)[qvar],t[qvar])).forall(qvar,zero,t.length()));
 ;
-  axioms.emplace_back(implies_exprt(not_exprt(expr.cond()),equal_exprt(length(),f.length())));
+ axioms.emplace_back(implies_exprt(not_exprt(expr.cond()),equal_exprt(length(),f.length())));
   symbol_exprt qvar2 = string_refinementt::fresh_symbol("string_if",index_type);
-  axioms.emplace_back(qvar2,and_exprt(t>qvar2,expr.cond()),equal_exprt((*this)[qvar],f[qvar]));
+  axioms.push_back(string_constraintt(not_exprt(expr.cond()),equal_exprt((*this)[qvar],f[qvar])).forall(qvar2,zero,f.length()));
 }
 
 string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & axioms)
@@ -578,9 +588,9 @@ bvt string_refinementt::convert_string_equal(
 
   string_axioms.emplace_back(eq, equal_exprt(s1.length(), s2.length()));
 
-  string_axioms.emplace_back(qvar,
-			     and_exprt(eq,string_exprt::within_bounds(qvar,s1.length())),
-			     equal_exprt(s1[qvar],s2[qvar]));
+  string_axioms.push_back
+    (string_constraintt(eq,equal_exprt(s1[qvar],s2[qvar])
+			).forall(qvar,zero,s1.length()));
 
   string_axioms.emplace_back
     (not_exprt(eq),
@@ -622,8 +632,9 @@ bvt string_refinementt::convert_string_is_prefix(
   string_axioms.emplace_back(implies_exprt(isprefix, s1 >= s0));
 
   symbol_exprt qvar = fresh_symbol("QA_isprefix", index_type);
-  string_axioms.emplace_back(qvar, and_exprt(isprefix, s0 > qvar),
-			     equal_exprt(s0[qvar],s1[qvar]));
+  string_axioms.push_back
+    (string_constraintt(isprefix, equal_exprt(s0[qvar],s1[qvar])
+			).forall(qvar,zero,s0.length()));
 	     
   symbol_exprt witness = fresh_index("witness_not_isprefix");
 
@@ -660,8 +671,9 @@ bvt string_refinementt::convert_string_is_suffix(
   symbol_exprt qvar = fresh_symbol("QA_suffix", index_type);
   exprt qvar_shifted = plus_exprt(qvar, 
 				  minus_exprt(s1.length(), s0.length()));
-  string_axioms.emplace_back(qvar, and_exprt(issuffix, s0 > qvar),
-			     equal_exprt(s0[qvar],s1[qvar_shifted]));
+  string_axioms.push_back
+    (string_constraintt(issuffix, equal_exprt(s0[qvar],s1[qvar_shifted])
+			).forall(qvar,zero,s0.length()));
 
   symbol_exprt witness = fresh_index("witness_not_suffix");
 
@@ -710,34 +722,21 @@ bvt string_refinementt::convert_string_contains(
 
   symbol_exprt qvar = fresh_symbol("QA_contains", index_type);
   exprt qvar_shifted = plus_exprt(qvar, startpos);
-  string_axioms.emplace_back(qvar, and_exprt(contains, and_exprt(is_positive(qvar),s1 > qvar)),
-			     equal_exprt(s1[qvar],s0[qvar_shifted]));
+  string_axioms.push_back
+    (string_constraintt(contains,equal_exprt(s1[qvar],s0[qvar_shifted])
+			).forall(qvar,zero,s1.length()));
 
   // We rewrite the axiom for !contains as:
-  // forall startpos. exists witness. (!contains && |s0| >= |s1| && stratpos <= |s0| - |s1|)
-  //      ==> witness < |s1| && s1[witness] != s0[startpos+witness]
+  // forall startpos <= |s0| - |s1|.  (!contains && |s0| >= |s1| )
+  //      ==> exists witness < |s1|. s1[witness] != s0[startpos+witness]
 
-
-
-
-  symbol_exprt qstartpos = fresh_symbol("QA_startpos_contains", index_type);
-  symbol_exprt witness = fresh_symbol("QE_witness_not_contains", index_type);
-  exprt shifted = plus_exprt(witness, qstartpos);
-  //string_axioms.emplace_back(is_positive(witness));
-
-  string_axioms.emplace_back
-    (qstartpos,witness,s1.length(),
-     and_exprt(not_exprt(contains),
-	       and_exprt(s0 >= s1,
-			 string_exprt::within_bounds(qstartpos,
-						     plus_exprt(index_of_int(1),minus_exprt(s0.length(),s1.length()))))),
-     notequal_exprt(s1[witness],s0[shifted]));
-
+  string_axioms.push_back
+    (string_constraintt::not_contains
+     (zero,plus_exprt(index_of_int(1),minus_exprt(s0.length(),s1.length())), 
+      and_exprt(not_exprt(contains),s0 >= s1),zero,s1.length(),s0,s1));
 
   assert(f.type() == bool_typet());
-  bvt bv = convert_bv(contains);
-
-  return bv;
+  return convert_bv(contains);
 }
 
 
@@ -767,9 +766,9 @@ bvt string_refinementt::convert_string_index_of(
   
   string_axioms.push_back((string_constraintt(str > index) && is_positive(index)) || equal_exprt(index,index_of_int(-1)));
 
-  symbol_exprt n = fresh_symbol("qvar",index_type);
+  symbol_exprt n = fresh_symbol("QA_index_of",index_type);
 
-  string_axioms.push_back((! string_constraintt(equal_exprt(str[n],c))).forall(n,index));
+  string_axioms.push_back((! string_constraintt(equal_exprt(str[n],c))).forall(n,zero,index));
 
   bvt bv = convert_bv(index);
   return bv;
@@ -981,7 +980,7 @@ bool string_refinementt::check_axioms()
 
     switch (solver()) {
     case decision_proceduret::D_SATISFIABLE: {
-      exprt val = solver.get(axiom.univ_var);
+      exprt val = solver.get(axiom.get_univ_var());
       violated.push_back(std::make_pair(i, val));
     } break;
     case decision_proceduret::D_UNSATISFIABLE:
@@ -1006,15 +1005,15 @@ bool string_refinementt::check_axioms()
       for (size_t i = 0; i < violated.size(); ++i) {
 	
 	new_axioms[i] = string_axioms[violated[i].first];
-	debug() << " axiom " << i <<" "<< axiom_to_string(new_axioms[i]) << eom;
+	debug() << " axiom " << i <<" "<< constraint_to_string(new_axioms[i]) << eom;
 	const exprt &val = violated[i].second;
 	const string_constraintt &axiom = string_axioms[violated[i].first];
 	
-	exprt premise(axiom.premise);
-	exprt body(axiom.body);
+	exprt premise(axiom.premise());
+	exprt body(axiom.body());
 	implies_exprt instance(premise, body);
 	debug() << "warning: we don't eliminate the existential quantifier" << eom;
-	replace_expr(axiom.univ_var, val, instance);
+	replace_expr(axiom.get_univ_var(), val, instance);
 	if (seen_instances.insert(instance).second) {
 	  add_implies_lemma(premise,body);
 	} else debug() << "instance already seen" << eom;
@@ -1195,11 +1194,13 @@ void string_refinementt::update_index_set(const std::vector<exprt> & cur) {
 
 void string_refinementt::update_index_set(const string_constraintt &axiom)
 {
+  debug() << "string_refinementt::update_index_set needs to be rewriten" << eom;
+  assert(axiom.is_univ_quant());
   std::vector<exprt> bounds;
-  get_bounds(axiom.univ_var, axiom.premise, bounds);
+  get_bounds(axiom.get_univ_var(), axiom.premise(), bounds);
 
   std::vector<exprt> to_process;
-  to_process.push_back(axiom.body);
+  to_process.push_back(axiom.body());
   while (!to_process.empty()) {
     exprt cur = to_process.back();
     to_process.pop_back();
@@ -1207,11 +1208,7 @@ void string_refinementt::update_index_set(const string_constraintt &axiom)
       const exprt &s = cur.op0();
       const exprt &i = cur.op1();
 
-      bool has_quant_var = find_qvar(i,axiom.univ_var);
-      if(!has_quant_var) {
-	for(int j = 0; j < axiom.exists_var.size(); j++)
-	  has_quant_var = (has_quant_var || find_qvar(i,axiom.exists_var[j]));
-      }
+      bool has_quant_var = find_qvar(i,axiom.get_univ_var());
 
       // if cur is of the form s[i] and no quantified variable appears in i
       if(!has_quant_var){
@@ -1236,6 +1233,7 @@ void string_refinementt::update_index_set(const string_constraintt &axiom)
 
 void string_refinementt::update_index_set(const exprt &formula)
 {
+  debug() << "string_refinementt::update_index_set needs to be rewriten" << eom;
   std::vector<exprt> to_process;
   to_process.push_back(formula);
 
@@ -1294,73 +1292,14 @@ exprt find_index(const exprt & expr, const exprt & str) {
 string_constraintt string_refinementt::instantiate(const string_constraintt &axiom,
 				     const exprt &str, const exprt &val)
 {
-
-  exprt idx = find_index(axiom.body,str);
-  // what if idx is qvar or if there are several indexes?
+  assert(axiom.is_univ_quant());
+  exprt idx = find_index(axiom.body(),str);
   if(idx.is_nil()) return string_constraintt();
-  if(!find_qvar(idx,axiom.univ_var)) return string_constraintt();
+  if(!find_qvar(idx,axiom.get_univ_var())) return string_constraintt();
 
-  bool has_exist_var = false;
-  for(unsigned i=0; i < axiom.exists_var.size(); i++)
-    if(find_qvar(idx,axiom.exists_var[i])) 
-      has_exist_var = true;
-  
-  if (has_exist_var) {
-    // only support for one existential variable for now:
-    assert(axiom.exists_var.size() == 1); 
-    // Not true anymore:
-    // we need to replace QA by r in prem(QA) => exists QE. body(QE,QA)
-    // we add a fresh variable e and if it equals witness[r] then prem(r) => body(e,r),
-    //  so  we add the lemma (e=witness[r] && prem(r)) => body(e,r)
-    //symbol_exprt sym = string_refinementt::fresh_index("exists_remove");
-    //add_lemma(and_exprt(is_positive(sym),binary_relation_exprt(sym,ID_lt,bound)));
-    // exists_var may appear in r
-    /*
-    std::vector<exprt> lemmas;
-    exprt witness = axiom.witness(r,lemmas);
-    for(int i = 0; i < lemmas.size(); i++) {
-      replace_expr(exists_var, sym, lemmas[i]);
-      add_lemma(lemmas[i]);
-      }
-      debug() << "this may not be correct" << eom;
-      string_constraintt ax(and_exprt(equal_exprt(sym,witness),premise),body);
-    */
-
-    exprt exists_var = axiom.exists_var[0];
-    exprt bound = axiom.exists_bounds[0];
-    exprt r = compute_subst(axiom.univ_var, val, idx);
-    exprt lemma = false_exprt();
-
-    for(int i = 0; i < witness_bound; i++){
-      exprt premise(axiom.premise);
-      exprt body(axiom.body);
-      exprt index = index_of_int(i);
-      replace_expr(axiom.univ_var, r, premise);
-      replace_expr(axiom.univ_var, r, body);
-      replace_expr(exists_var, index,premise);
-      replace_expr(exists_var, index,body);
-      lemma = or_exprt(lemma,and_exprt(string_exprt::within_bounds(index,bound),implies_exprt(premise,body)));
-    }
-
-    /*for(int i = 0; i < witness_bound; i++){
-      exprt premise(axiom.premise);
-      exprt body(axiom.body);
-      replace_expr(axiom.univ_var, r, premise);
-      replace_expr(axiom.univ_var, r, body);
-      replace_expr(exists_var, minus_exprt(bound,index_of_int(i)),premise);
-      replace_expr(exists_var, minus_exprt(bound,index_of_int(i)),body);
-      lemma = or_exprt(lemma,implies_exprt(premise,body));
-      }*/
-    return string_constraintt(lemma);
-  }
-  else {
-    exprt r = compute_subst(axiom.univ_var, val, idx);
-    exprt premise(axiom.premise);
-    exprt body(axiom.body);
-    replace_expr(axiom.univ_var, r, premise);
-    replace_expr(axiom.univ_var, r, body);
-    return string_constraintt(premise,body);     
-  }
-
+  exprt r = compute_subst(axiom.get_univ_var(), val, idx);
+  exprt instance(axiom);
+  replace_expr(axiom.get_univ_var(), r, instance);
+  return string_constraintt(instance);     
 }
 

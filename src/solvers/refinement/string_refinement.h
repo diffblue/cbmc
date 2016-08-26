@@ -285,6 +285,8 @@ private:
   // succinct and pretty way to display an expression
   std::string pretty_short(const exprt & expr);
 
+  std::string constraint_to_string(const string_constraintt & sc);
+
 
 };
 

@@ -11,6 +11,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_SOLVER_STRING_CONSTRAINT_H
 
 #include <langapi/language_ui.h>
+#include <solvers/refinement/bv_refinement.h>
 
 class string_constraintt : public exprt 
 {
@@ -42,25 +43,24 @@ public:
 
   // Add an universal quantifier, assume the premise are empty
   string_constraintt forall(symbol_exprt univ, exprt bound_inf, exprt bound_sup);
-  string_constraintt forall(symbol_exprt univ, exprt bound_sup);
   
   static string_constraintt not_contains
   (exprt univ_lower_bound, exprt univ_bound_sup, exprt premise, 
    exprt exists_bound_inf, exprt exists_bound_sup, exprt s1, exprt s2);
 
-  bool is_simple() { return (form == SIMPLE); };
-  bool is_univ_quant() { return (form == UNIV_QUANT); };
-  bool is_not_contains() { return (form == NOT_CONTAINS); };
+  bool is_simple() const { return (form == SIMPLE); };
+  bool is_univ_quant() const { return (form == UNIV_QUANT); };
+  bool is_not_contains() const { return (form == NOT_CONTAINS); };
   
-  exprt premise();
+  exprt premise() const;
 
-  exprt body();
+  exprt body() const;
 
-  inline symbol_exprt get_univ_var() { assert(form==UNIV_QUANT); return quantified_variable;}
-  inline exprt univ_bound_inf(){ return bounds[0]; }
-  inline exprt univ_bound_sup(){ return bounds[1]; }
-  inline exprt exists_bound_inf(){ return bounds[2]; }
-  inline exprt exists_bound_sup(){ return bounds[3]; }
+  inline symbol_exprt get_univ_var() const { assert(form==UNIV_QUANT); return quantified_variable;}
+  inline exprt univ_bound_inf() const { return bounds[0]; }
+  inline exprt univ_bound_sup() const { return bounds[1]; }
+  inline exprt exists_bound_inf() const { return bounds[2]; }
+  inline exprt exists_bound_sup() const { return bounds[3]; }
 
  // Warning: this assumes a simple form
  inline string_constraintt operator&&(const exprt & a) {
@@ -77,17 +77,7 @@ public:
    assert(form == SIMPLE);
    return string_constraintt(not_exprt(*this));
  }
-
-  std::string to_string(std::string *expr_to_string(exprt)) {
-    if(form == SIMPLE) 
-      return(*expr_to_string(*this));
-    else if(form == UNIV_QUANT)
-      return ("forall " + *expr_to_string(get_univ_var()) + ". (" 
-	      + *expr_to_string(*this));
-    else
-      return "forall QA. exists QE s1 != s2 ...";
-  }
-
+ 
 
 };
 
