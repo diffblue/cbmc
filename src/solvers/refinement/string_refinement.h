@@ -13,6 +13,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <langapi/language_ui.h>
 
 #include <solvers/refinement/bv_refinement.h>
+#include <solvers/refinement/string_constraint.h>
 
 #define INDEX_WIDTH 32
 #define CHAR_WIDTH 8
@@ -30,86 +31,8 @@ public:
 };
 
 
-class string_axiomt
-{
-public:
-  // Universally quantified symbol
-  symbol_exprt univ_var;
-  // Existentially quantified symbol
-  std::vector<symbol_exprt> exists_var;
-  std::vector<exprt> exists_bounds;
-  exprt premise;
-  exprt body;
-  bool is_quantified;
-  
 
-  // Axiom of the form: forall qvar. prem ==> bod
-  string_axiomt(symbol_exprt qvar, exprt prem, exprt bod);
-
-  // Axiom of the form: forall univ. prem ==> exists evar < b. bod
-  string_axiomt(symbol_exprt univ, symbol_exprt evar, exprt bound, exprt prem, exprt bod);
-
-  // Axiom with no quantification
-  string_axiomt(exprt prem, exprt bod);
-
-  // Axiom with no quantification, and no premise
-  string_axiomt(exprt bod);
-
-  // True axiom
-  string_axiomt();
-  
-
-  // Given a value for the universaly quantified variable, gives the corresponding witness
-  exprt witness(const exprt & qval, std::vector<exprt> & lemmas);
-
-private:
-  // For values of the universal variable we give a symbol for the existential one
-  // The following symbol as type array
-  symbol_exprt existential_instantiation;
-
-
-public:
-  // Warning: this assume no premise:
-  inline string_axiomt operator&&(const string_axiomt & a) {
-    assert(premise == true_exprt());
-    return string_axiomt(and_exprt(this->body, a.body));
-  }
-
-  inline string_axiomt operator&&(const exprt & a) {
-    assert(premise == true_exprt());
-    return string_axiomt(and_exprt(this->body, a));
-  }
-
-  // Warning: this assume no premise:
-  inline string_axiomt operator||(const string_axiomt & a) {
-    assert(premise == true_exprt());
-    return string_axiomt(or_exprt(this->body, a.body));
-  }
-
-  inline string_axiomt operator||(const exprt & a) {
-    assert(premise == true_exprt());
-    return string_axiomt(or_exprt(this->body, a));
-  }
-
-  // Add an universal quantifier, assume the premise are empty
-  inline string_axiomt forall(symbol_exprt univ, exprt bound) {
-    assert(premise == true_exprt());
-    return string_axiomt(univ,binary_relation_exprt(univ,ID_lt,bound), body);
-  }
-
-  inline static string_axiomt equality(const exprt & a, const exprt &b) {
-    return string_axiomt(equal_exprt(a,b));
-  }
-
-  inline string_axiomt operator!() {
-    assert(premise == true_exprt());
-    return string_axiomt(not_exprt(body));
-  }
-
-
-};
-
-typedef std::vector<string_axiomt> axiom_vect;
+typedef std::vector<string_constraintt> axiom_vect;
 
 // Expressions that encode strings
 class string_exprt : public struct_exprt {
@@ -129,6 +52,8 @@ public:
   // Expression corresponding to the content (array of characters) of the string
   inline const exprt & content() const { return op1();};
 
+  static exprt within_bounds(const exprt & idx, const exprt & bound);
+
   // Expression of the character at position idx in the string
   inline index_exprt operator[] (exprt idx)
   { return index_exprt(content(), idx);}
@@ -146,6 +71,10 @@ public:
   { return binary_relation_exprt(length(), ID_lt, rhs); }
   inline binary_relation_exprt operator> (const exprt & rhs)
   { return binary_relation_exprt(rhs, ID_lt, length()); }
+  inline binary_relation_exprt operator>= (const exprt & rhs)
+  { return binary_relation_exprt(length(), ID_ge, rhs); }
+  inline binary_relation_exprt operator<= (const exprt & rhs)
+  { return binary_relation_exprt(length(), ID_le, rhs); }
 
 private:
   // Auxiliary functions for of_expr
@@ -201,13 +130,6 @@ public:
 
   symbol_exprt fresh_index(const irep_idt &prefix);
   symbol_exprt fresh_boolean(const irep_idt &prefix);
-
-  inline std::string axiom_to_string(const string_axiomt & ax) {
-    return ("forall " + pretty_short(ax.univ_var) + ". (" 
-	    + pretty_short(ax.premise) + ") ==> " 
-	    + (ax.exists_var.size() >= 1 ?("exists "+pretty_short(ax.exists_var[0])+". "):"")
-	    + pretty_short(ax.body));
-  }
 
 
   irep_idt string_literal_func;
@@ -275,6 +197,8 @@ private:
 
   axiom_vect string_axioms;
 
+  axiom_vect not_contains_axioms;
+
   int nb_sat_iteration;
 
   // Create a new string expression and add the necessary lemma
@@ -313,7 +237,7 @@ private:
   // Add to the index set all the indices that appear in the formula
   void update_index_set(const exprt &formula);
   void update_index_set(const std::vector<exprt> &cur);
-  void update_index_set(const string_axiomt &axiom);
+  void update_index_set(const string_constraintt &axiom);
   void update_index_set(const axiom_vect &string_axioms);
 
   // Takes an universaly quantified formula [axiom], 
@@ -323,7 +247,7 @@ private:
   // Then substitutes [axiom.idx] with [r] in [axiom].
   // axiom is not constant because we may record some information about 
   // instantiation of existential variables.
-  string_axiomt instantiate(const string_axiomt &axiom, const exprt &str,
+  string_constraintt instantiate(const string_constraintt &axiom, const exprt &str,
                     const exprt &val);
 
   // For expressions f of a certain form, 		  //

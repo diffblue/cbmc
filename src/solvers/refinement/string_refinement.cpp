@@ -29,6 +29,8 @@ constant_exprt index_of_int(int i) {
   return constant_exprt(integer2binary(i, INDEX_WIDTH), index_type);
 }
 
+constant_exprt zero = index_of_int(0);
+
 // Succinct version of pretty()
 std::string string_refinementt::pretty_short(const exprt & expr) {
   languagest languages(ns, new_ansi_c_language());
@@ -53,47 +55,6 @@ string_ref_typet::string_ref_typet() : struct_typet() {
   components()[1].type()=char_array;
 }
 
-string_axiomt::string_axiomt(symbol_exprt qvar, exprt prem, exprt bod) :
-  univ_var(qvar), premise(prem), body(bod), is_quantified(true)
-{}
-
-string_axiomt::string_axiomt(symbol_exprt univ, symbol_exprt evar, exprt bound, exprt prem, exprt bod) : string_axiomt(univ,prem,bod)
-{ 
-  exists_var.push_back(evar);
-  exists_bounds.push_back(bound);
-  array_typet index_array(index_type,infinity_exprt(index_type));
-  existential_instantiation = string_refinementt::fresh_symbol("existential_instantiation",index_array);
-}
-
-exprt string_axiomt::witness(const exprt & qval, std::vector<exprt> & lemmas)
-{ 
-  exprt w = index_exprt(existential_instantiation, qval);
-  assert(exists_bounds.size() == 1);
-  lemmas.push_back(binary_relation_exprt(w,ID_lt,exists_bounds[0]));
-  lemmas.push_back(binary_relation_exprt(w,ID_ge,index_of_int(0)));
-  return w;
-}
-
-string_axiomt::string_axiomt(exprt prem, exprt bod)
-{
-  premise = prem;
-  is_quantified = false;
-  body = bod;
-}
-
-string_axiomt::string_axiomt(exprt bod)
-{
-  premise = true_exprt();
-  is_quantified = false;
-  body = bod;
-}
-
-string_axiomt::string_axiomt()
-{
-  premise = false_exprt();
-  body = true_exprt();
-  is_quantified = false;
-}
 
 
 
@@ -102,7 +63,7 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   SUB(_ns, _prop)
 {
   use_counter_example = false;
-  witness_bound = 1;
+  witness_bound = 2;
   variable_with_multiple_occurence_in_index = false;
   initial_loop_bound = 10;
 
@@ -202,6 +163,12 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & 
   return s;
 }
 
+exprt string_exprt::within_bounds(const exprt & idx, const exprt & bound)
+{
+  return and_exprt(binary_relation_exprt(idx, ID_ge, index_of_int(0)),
+		   binary_relation_exprt(idx, ID_lt, bound));
+}
+
 void string_exprt::of_function_application(const function_application_exprt & expr, axiom_vect & axioms)
 {
   const exprt &name = expr.function();
@@ -242,13 +209,13 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
     std::string sval_binary=integer2binary(unsigned(sval[i]), CHAR_WIDTH);
     constant_exprt c(sval_binary,char_type);
     equal_exprt lemma(index_exprt(content(), idx), c);
-    axioms.push_back(string_axiomt(lemma));
+    axioms.emplace_back(lemma);
   }
 
   std::string s_length_binary = integer2binary(unsigned(sval.size()),INDEX_WIDTH);
   exprt s_length = constant_exprt(s_length_binary, index_type);
 
-  axioms.push_back(string_axiomt(equal_exprt(length(),s_length)));
+  axioms.emplace_back(equal_exprt(length(),s_length));
 }
 
 
@@ -261,27 +228,24 @@ void string_exprt::of_string_concat(const function_application_exprt &f, axiom_v
   string_exprt s2 = string_exprt::of_expr(args[1],axioms);
 
   equal_exprt length_sum_lem(length(), plus_exprt(s1.length(), s2.length()));
-  axioms.push_back(string_axiomt(length_sum_lem));
+  axioms.emplace_back(length_sum_lem);
   // We can run into problems if the length of the string exceed 32 bits?
   //binary_relation_exprt lem1(length(), ID_ge, s1.length());
-  //axioms.push_back(string_axiomt(lem1));
+  //axioms.push_back(string_constraintt(lem1));
   //binary_relation_exprt lem2(length(), ID_ge, s2.length());
-  //axioms.push_back(string_axiomt(lem2));
+  //axioms.push_back(string_constraintt(lem2));
 
-  symbol_exprt idx = string_refinementt::fresh_symbol("index_concat",index_type);
+  symbol_exprt idx = string_refinementt::fresh_symbol("QA_index_concat",index_type);
 
-  string_axiomt a1(idx, and_exprt(string_refinementt::is_positive(idx),binary_relation_exprt(idx, ID_lt, s1.length())),
-		   equal_exprt(s1[idx],
-			       index_exprt(content(), idx)));
+  string_constraintt a1(equal_exprt(s1[idx],(*this)[idx]));
+  axioms.push_back(a1.forall(idx, zero, s1.length()));
 
-  symbol_exprt idx2 = string_refinementt::fresh_symbol("index_concat2",index_type);
 
-  string_axiomt a2(idx2, and_exprt(string_refinementt::is_positive(idx2),binary_relation_exprt(idx2, ID_lt, s2.length())),
-		   equal_exprt(s2[idx2],
-			       index_exprt(content(), 
-					   plus_exprt(idx2,s1.length()))));
-  axioms.push_back(a2);
-  axioms.push_back(a1);
+  symbol_exprt idx2 = string_refinementt::fresh_symbol("QA_index_concat2",index_type);
+
+  string_constraintt a2(equal_exprt(s2[idx2],(*this)[plus_exprt(idx2,s1.length())]));
+  axioms.push_back(a2.forall(idx2, zero, s2.length()));
+  
 }
 
 void string_exprt::of_string_substring
@@ -291,25 +255,22 @@ void string_exprt::of_string_substring
   assert(args.size() == 3); // bad args to string substring?
 
   string_exprt str = of_expr(args[0],axioms);
-  typecast_exprt i(args[1], index_type);
-  typecast_exprt j(args[2], index_type);
+  exprt i(args[1]);
+  assert(i.type() == index_type);
+  exprt j(args[2]);
+  assert(j.type() == index_type);
 
   symbol_exprt idx = string_refinementt::fresh_symbol("index_substring", index_type);
 
+  axioms.emplace_back(equal_exprt(length(), minus_exprt(j, i)));
+  axioms.emplace_back(binary_relation_exprt(i, ID_lt, j));
+  axioms.emplace_back(str >= j);
+
   // forall idx < str.length, str[idx] = arg_str[idx+i]
-  string_axiomt a(idx,
-		  binary_relation_exprt(idx, ID_lt, length()),
-		  equal_exprt(index_exprt(content(),idx), 
-			      str[plus_exprt(i, idx)]));
-  axioms.push_back(a);
-
-  and_exprt lemma1(binary_relation_exprt(i, ID_lt, j),
-                   and_exprt(binary_relation_exprt(j, ID_le, str.length()),
-                             equal_exprt(length(), minus_exprt(j, i))));
-  axioms.push_back(string_axiomt(lemma1));
-
-  binary_relation_exprt lemma2(str.length(), ID_ge, length());
-  axioms.push_back(string_axiomt(lemma2));
+  string_constraintt a(equal_exprt(index_exprt(content(),idx), 
+				   str[plus_exprt(i, idx)]));
+  
+  axioms.push_back(a.forall(idx,zero,length()));
 }
 
 void string_exprt::of_string_char_set
@@ -322,7 +283,7 @@ void string_exprt::of_string_char_set
   symbol_exprt c = string_refinementt::fresh_symbol("char", char_type);
   
   //THIS HAS NOT BEEN CHECKED:  
-  axioms.push_back(equal_exprt(c,args[2]));
+  axioms.emplace_back(equal_exprt(c,args[2]));
   with_exprt sarrnew(str.content(), args[1], c);
   implies_exprt lemma(binary_relation_exprt(args[1], ID_lt, str.length()),
                       and_exprt(equal_exprt(content(), 
@@ -344,12 +305,14 @@ void string_exprt::of_string_char_set
 void string_refinementt::post_process()
 {  
   //debug() << "string_refinementt::post_process()" << eom;
-  std::vector<string_axiomt> new_axioms;
+  std::vector<string_constraintt> new_axioms;
   for(int i = 0; i < string_axioms.size(); i++)
-    if(!string_axioms[i].is_quantified)
-      add_implies_lemma(string_axioms[i].premise,string_axioms[i].body);
-    else 
+    if(string_axioms[i].is_simple())
+      add_implies_lemma(string_axioms[i].premise(),string_axioms[i].body());
+    else if(string_axioms[i].is_univ_quant())
       new_axioms.push_back(string_axioms[i]);
+    else 
+      not_contains_axioms.push_back(string_axioms[i]);
 
   string_axioms = new_axioms;
   //add_instantiations(true);
@@ -371,6 +334,7 @@ void string_refinementt::post_process()
       add_instantiations();
     }
 
+  debug()<< "post_process: " << initial_loop_bound << " steps skipped" << eom;
   SUB::post_process();
 }
 
@@ -505,8 +469,12 @@ void string_refinementt::check_SAT()
       else{*/
     if(!check_axioms()) {
       //just_checked_axiom = true;
-      progress = true;
-    } else progress = false;
+      //progress = true;
+      debug() << "check_SAT: warning, got sat but the model is not correct" << eom;
+      progress = false;
+    } 
+    else
+      progress = false;
   }
   //} 
 }
@@ -544,7 +512,6 @@ void string_refinementt::add_implies_lemma(const exprt &prem, const exprt & body
 
   if(body == true_exprt()) return; // tautology
   
-  /*
   satcheck_no_simplifiert sat_check;
   SUB solver(ns, sat_check);
   solver << prem;
@@ -555,13 +522,16 @@ void string_refinementt::add_implies_lemma(const exprt &prem, const exprt & body
     break;
   case decision_proceduret::D_SATISFIABLE: 
   default:
-    add_lemma(implies_exprt(prem,body));
+    if(prem  == true_exprt()) 
+      add_lemma(body);
+    else
+      add_lemma(implies_exprt(prem,body));
   }
-  */
+  /*
   if(prem  == true_exprt()) 
     add_lemma(body);
   else
-    add_lemma(implies_exprt(prem,body));
+  add_lemma(implies_exprt(prem,body));*/
 }
 
 void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
@@ -609,15 +579,14 @@ bvt string_refinementt::convert_string_equal(
   string_axioms.emplace_back(eq, equal_exprt(s1.length(), s2.length()));
 
   string_axioms.emplace_back(qvar,
-			     and_exprt(and_exprt(eq, s1 > qvar),is_positive(qvar)),
+			     and_exprt(eq,string_exprt::within_bounds(qvar,s1.length())),
 			     equal_exprt(s1[qvar],s2[qvar]));
 
   string_axioms.emplace_back
     (not_exprt(eq),
      or_exprt(notequal_exprt(s1.length(), s2.length()),
-	      and_exprt(s1 > witness,
-			and_exprt(is_positive(witness),
-				  notequal_exprt(s1[witness],s2[witness])))));
+	      and_exprt(string_exprt::within_bounds(witness,s1.length()),
+			notequal_exprt(s1[witness],s2[witness]))));
 
   return bv;
 }
@@ -652,7 +621,7 @@ bvt string_refinementt::convert_string_is_prefix(
 
   string_axioms.emplace_back(implies_exprt(isprefix, s1 >= s0));
 
-  symbol_exprt qvar = fresh_symbol("qvar_isprefix", index_type);
+  symbol_exprt qvar = fresh_symbol("QA_isprefix", index_type);
   string_axioms.emplace_back(qvar, and_exprt(isprefix, s0 > qvar),
 			     equal_exprt(s0[qvar],s1[qvar]));
 	     
@@ -675,9 +644,7 @@ bvt string_refinementt::convert_string_is_suffix(
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); // bad args to string issuffix?
 
-  symbol_exprt issuffix = fresh_symbol("issuffix");
-  boolean_symbols.push_back(issuffix);
-
+  symbol_exprt issuffix = fresh_boolean("issuffix");
   string_exprt s0 = make_string(args[0]);
   string_exprt s1 = make_string(args[1]);
 
@@ -690,7 +657,7 @@ bvt string_refinementt::convert_string_is_suffix(
 
   string_axioms.emplace_back(implies_exprt(issuffix, s1 >= s0));
 
-  symbol_exprt qvar = fresh_symbol("qvar_suffix", index_type);
+  symbol_exprt qvar = fresh_symbol("QA_suffix", index_type);
   exprt qvar_shifted = plus_exprt(qvar, 
 				  minus_exprt(s1.length(), s0.length()));
   string_axioms.emplace_back(qvar, and_exprt(issuffix, s0 > qvar),
@@ -762,12 +729,8 @@ bvt string_refinementt::convert_string_contains(
     (qstartpos,witness,s1.length(),
      and_exprt(not_exprt(contains),
 	       and_exprt(s0 >= s1,
-			 and_exprt(
-				   binary_relation_exprt
-				   (qstartpos,ID_le,
-				    minus_exprt(s0.length(),s1.length())),
-				   is_positive(qstartpos)
-				   ))),
+			 string_exprt::within_bounds(qstartpos,
+						     plus_exprt(index_of_int(1),minus_exprt(s0.length(),s1.length()))))),
      notequal_exprt(s1[witness],s0[shifted]));
 
 
@@ -802,13 +765,11 @@ bvt string_refinementt::convert_string_index_of(
   assert(is_unrefined_char_type(c.type()));
   // (i = -1 || 0 <= i < s && s[i] = c) && forall n. n < i => s[n] != c 
   
-  string_axioms.push_back((string_axiomt(str > index) && is_positive(index)) || equal_exprt(index,index_of_int(-1)));
+  string_axioms.push_back((string_constraintt(str > index) && is_positive(index)) || equal_exprt(index,index_of_int(-1)));
 
   symbol_exprt n = fresh_symbol("qvar",index_type);
 
-  string_axioms.push_back((! string_axiomt::equality(str[n],c))
-			  .forall(n,index));
-			  
+  string_axioms.push_back((! string_constraintt(equal_exprt(str[n],c))).forall(n,index));
 
   bvt bv = convert_bv(index);
   return bv;
@@ -886,13 +847,11 @@ void string_refinementt::add_instantiations()
       const exprt &val = *j;
 
       for (size_t k = 0; k < string_axioms.size(); ++k) {
-	if(string_axioms[k].is_quantified) {
-	  string_axiomt lemma = instantiate(string_axioms[k], s, val);
-	  assert(!lemma.is_quantified);
-	  add_implies_lemma(lemma.premise,lemma.body);
-	}
+	assert(string_axioms[k].is_univ_quant());
+	string_constraintt lemma = instantiate(string_axioms[k], s, val);
+	assert(lemma.is_simple());
+	add_implies_lemma(lemma.premise(),lemma.body());
       }
-
     }
   }
 }
@@ -1009,24 +968,25 @@ bool string_refinementt::check_axioms()
 
   debug() << "there are " << string_axioms.size() << " string axioms" << eom;
   for (size_t i = 0; i < string_axioms.size(); ++i) {
-    const string_axiomt &axiom = string_axioms[i];
+    const string_constraintt &axiom = string_axioms[i];
 
     exprt negaxiom = false_exprt();
 
     if(axiom.exists_var.size()>0) {
-      for(int i = 0; i < witness_bound; i++){
+      for(int i = 0; i < witness_bound + 1; i++){
 	exprt n = axiom.body;
 	exprt index = index_of_int(i);
 	exprt within_bounds = and_exprt(binary_relation_exprt(index,ID_ge,index_of_int(0)), binary_relation_exprt(index,ID_lt,axiom.exists_bounds[0]));
 	replace_expr(axiom.exists_var[0],index,n);
 	negaxiom = or_exprt(negaxiom,and_exprt(within_bounds,n));
       }
-      /*
+
       for(int i = 0; i < witness_bound; i++){
 	exprt n = axiom.body;
 	replace_expr(axiom.exists_var[0],minus_exprt(axiom.exists_bounds[0],index_of_int(i+1)),n);
 	negaxiom = or_exprt(negaxiom,n);
-	}*/
+	}
+
       negaxiom = and_exprt(axiom.premise, not_exprt(negaxiom));
     }
     else negaxiom = and_exprt(axiom.premise, not_exprt(axiom.body));
@@ -1061,7 +1021,7 @@ bool string_refinementt::check_axioms()
 
     if(use_counter_example) {
       
-      std::vector<string_axiomt> new_axioms(violated.size());
+      std::vector<string_constraintt> new_axioms(violated.size());
       
       // Checking if the current solution satisfies the constraints
       for (size_t i = 0; i < violated.size(); ++i) {
@@ -1069,7 +1029,7 @@ bool string_refinementt::check_axioms()
 	new_axioms[i] = string_axioms[violated[i].first];
 	debug() << " axiom " << i <<" "<< axiom_to_string(new_axioms[i]) << eom;
 	const exprt &val = violated[i].second;
-	const string_axiomt &axiom = string_axioms[violated[i].first];
+	const string_constraintt &axiom = string_axioms[violated[i].first];
 	
 	exprt premise(axiom.premise);
 	exprt body(axiom.body);
@@ -1254,7 +1214,7 @@ void string_refinementt::update_index_set(const std::vector<exprt> & cur) {
   }
 }
 
-void string_refinementt::update_index_set(const string_axiomt &axiom)
+void string_refinementt::update_index_set(const string_constraintt &axiom)
 {
   std::vector<exprt> bounds;
   get_bounds(axiom.univ_var, axiom.premise, bounds);
@@ -1352,14 +1312,14 @@ exprt find_index(const exprt & expr, const exprt & str) {
 
 
 
-string_axiomt string_refinementt::instantiate(const string_axiomt &axiom,
+string_constraintt string_refinementt::instantiate(const string_constraintt &axiom,
 				     const exprt &str, const exprt &val)
 {
 
   exprt idx = find_index(axiom.body,str);
   // what if idx is qvar or if there are several indexes?
-  if(idx.is_nil()) return string_axiomt();
-  if(!find_qvar(idx,axiom.univ_var)) return string_axiomt();
+  if(idx.is_nil()) return string_constraintt();
+  if(!find_qvar(idx,axiom.univ_var)) return string_constraintt();
 
   bool has_exist_var = false;
   for(unsigned i=0; i < axiom.exists_var.size(); i++)
@@ -1384,7 +1344,7 @@ string_axiomt string_refinementt::instantiate(const string_axiomt &axiom,
       add_lemma(lemmas[i]);
       }
       debug() << "this may not be correct" << eom;
-      string_axiomt ax(and_exprt(equal_exprt(sym,witness),premise),body);
+      string_constraintt ax(and_exprt(equal_exprt(sym,witness),premise),body);
     */
 
     exprt exists_var = axiom.exists_var[0];
@@ -1395,11 +1355,12 @@ string_axiomt string_refinementt::instantiate(const string_axiomt &axiom,
     for(int i = 0; i < witness_bound; i++){
       exprt premise(axiom.premise);
       exprt body(axiom.body);
+      exprt index = index_of_int(i);
       replace_expr(axiom.univ_var, r, premise);
       replace_expr(axiom.univ_var, r, body);
-      replace_expr(exists_var, index_of_int(i),premise);
-      replace_expr(exists_var, index_of_int(i),body);
-      lemma = or_exprt(lemma,implies_exprt(premise,body));
+      replace_expr(exists_var, index,premise);
+      replace_expr(exists_var, index,body);
+      lemma = or_exprt(lemma,and_exprt(string_exprt::within_bounds(index,bound),implies_exprt(premise,body)));
     }
 
     /*for(int i = 0; i < witness_bound; i++){
@@ -1411,7 +1372,7 @@ string_axiomt string_refinementt::instantiate(const string_axiomt &axiom,
       replace_expr(exists_var, minus_exprt(bound,index_of_int(i)),body);
       lemma = or_exprt(lemma,implies_exprt(premise,body));
       }*/
-    return string_axiomt(lemma);
+    return string_constraintt(lemma);
   }
   else {
     exprt r = compute_subst(axiom.univ_var, val, idx);
@@ -1419,7 +1380,7 @@ string_axiomt string_refinementt::instantiate(const string_axiomt &axiom,
     exprt body(axiom.body);
     replace_expr(axiom.univ_var, r, premise);
     replace_expr(axiom.univ_var, r, body);
-    return string_axiomt(premise,body);     
+    return string_constraintt(premise,body);     
   }
 
 }

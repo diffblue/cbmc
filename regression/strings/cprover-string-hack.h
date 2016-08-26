@@ -28,7 +28,7 @@ typedef unsigned char __CPROVER_char;
 /* return the length of s */
 #define __CPROVER_string_length(s) __CPROVER_uninterpreted_strlen(s)
 
-/* extracts the substring between positions i and j */
+/* extracts the substring between positions i and j (j not included) */
 #define __CPROVER_string_substring(s, i, j) __CPROVER_uninterpreted_substring(s, i, j)
 
 /* test whether p is a prefix of s */
