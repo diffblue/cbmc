@@ -448,6 +448,10 @@ __CPROVER_jsa_inline void __CPROVER_jsa__internal_assume_is_neighbour(
 ;
 #endif
 
+#ifdef __CPROVER_JSA_DYNAMIC_TEST_RUNNER
+void __CPROVER_jsa_internal__clear_temps(void);
+#endif
+
 __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_list(
     const __CPROVER_jsa_abstract_heapt * const h,
     const __CPROVER_jsa_list_id_t list)
@@ -942,6 +946,9 @@ __CPROVER_jsa_inline __CPROVER_jsa_word_t __CPROVER_jsa_execute_pred(
     }
     result=__CPROVER_jsa_execute_pred_result;
   }
+#ifdef __CPROVER_JSA_DYNAMIC_TEST_RUNNER
+  __CPROVER_jsa_internal__clear_temps();
+#endif
   return result;
 }
 
