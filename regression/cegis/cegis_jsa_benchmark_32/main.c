@@ -25,7 +25,7 @@ int main(void)
   for (;__CPROVER_jsa_hasNext(&heap, __CPROVER_jsa_iterator_it);)
   {
     const __CPROVER_jsa_data_t integer=__CPROVER_jsa_next(&heap, __CPROVER_jsa_iterator_it);
-    if(pp%integer == 0)
+    if(__CPROVER_jsa_mod(pp, integer) == 0)
       break;
     else
       __CPROVER_jsa_add(&heap, __CPROVER_jsa_list_ps, pp);

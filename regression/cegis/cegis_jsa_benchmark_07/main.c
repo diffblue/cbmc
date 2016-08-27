@@ -25,7 +25,7 @@ int main(void)
        __CPROVER_jsa_hasNext(&heap, __CPROVER_jsa_iterator_it);)
   {
     const __CPROVER_jsa_data_t num=__CPROVER_jsa_next(&heap, __CPROVER_jsa_iterator_it);
-    if (num%2 == 0)
+    if (__CPROVER_jsa_mod(num, 2) == 0)
     {
       __CPROVER_jsa_remove(&heap, __CPROVER_jsa_iterator_it);
     }

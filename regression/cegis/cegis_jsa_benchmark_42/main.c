@@ -1,4 +1,3 @@
-
 #ifdef __CPROVER
 #define __CPROVER_JSA_MAX_CONCRETE_NODES 1u
 #define __CPROVER_JSA_MAX_ABSTRACT_NODES 0u
@@ -22,14 +21,15 @@ int main(void)
   const __CPROVER_jsa_list_id_t __CPROVER_jsa_list_list;
   __CPROVER_jsa_assume_valid_list(&heap, __CPROVER_jsa_list_list);
   const __CPROVER_jsa_iterator_id_t __CPROVER_jsa_iterator_it=__CPROVER_jsa_iterator(&heap, __CPROVER_jsa_list_list);
-  while (__CPROVER_jsa_hasNext(&heap, __CPROVER_jsa_iterator_it))
+  for (;__CPROVER_jsa_hasNext(&heap, __CPROVER_jsa_iterator_it);)
   {
     const __CPROVER_jsa_data_t i=__CPROVER_jsa_next(&heap, __CPROVER_jsa_iterator_it);
-    if (__CPROVER_jsa_mod(i, 2) == 0)
+    if (i == 2)
     {
       __CPROVER_jsa_remove(&heap, __CPROVER_jsa_iterator_it);
+      // Transformed "find" to "filter" to accomodate for front-end limitations
+      //break;
     }
-    // System_out_println(list);
   }
 
   return 0;

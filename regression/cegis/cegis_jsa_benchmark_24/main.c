@@ -26,7 +26,7 @@ int main(void)
        __CPROVER_jsa_hasNext(&heap, __CPROVER_jsa_iterator_it);)
   {
     const __CPROVER_jsa_word_t x=__CPROVER_jsa_next(&heap, __CPROVER_jsa_iterator_it);
-    if(x % two == zero)
+    if(__CPROVER_jsa_mod(x, two) == zero)
     {
       __CPROVER_jsa_set(&heap, __CPROVER_jsa_iterator_it, 0);
     }
