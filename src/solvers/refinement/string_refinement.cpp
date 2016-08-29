@@ -7,12 +7,12 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 \*******************************************************************/
 
-#include <solvers/refinement/string_refinement.h>
 #include <ansi-c/string_constant.h>
 #include <util/i2string.h>
 #include <util/replace_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <sstream>
+#include <solvers/refinement/string_refinement.h>
 
 
 // This is mostly for debugging:
@@ -20,34 +20,14 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <ansi-c/ansi_c_language.h>
 #include <iostream>
 
-// Types used in this refinement
-unsignedbv_typet char_type(CHAR_WIDTH);
-//unsignedbv_typet index_type(INDEX_WIDTH);
-signedbv_typet index_type(INDEX_WIDTH);
+unsignedbv_typet char_type = string_ref_typet::char_type();
+signedbv_typet index_type = string_ref_typet::index_type();
 
 constant_exprt index_of_int(int i) {
-  return constant_exprt(integer2binary(i, INDEX_WIDTH), index_type);
+return constant_exprt(integer2binary(i, INDEX_WIDTH), index_type);
 }
 
 constant_exprt zero = index_of_int(0);
-
-
-// associate a string to symbols
-std::map<irep_idt, string_exprt> symbol_to_string;
-
-string_ref_typet::string_ref_typet() : struct_typet() {
-  components().resize(2);
-
-  components()[0].set_name("length");
-  components()[0].set_pretty_name("length");
-  components()[0].type()=index_type;
-
-  array_typet char_array(char_type,infinity_exprt(index_type));
-  components()[1].set_name("content");
-  components()[1].set_pretty_name("content");
-  components()[1].type()=char_array;
-}
-
 
 // Succinct version of pretty()
 std::string string_refinementt::pretty_short(const exprt & expr) {
@@ -95,213 +75,6 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
 
 string_refinementt::~string_refinementt()
 {
-}
-
-bool string_refinementt::is_unrefined_string_type(const typet &type)
-{
-  if (type.id() == ID_struct) {
-    irep_idt tag = to_struct_type(type).get_tag();
-    return tag == irep_idt("__CPROVER_string");
-  }
-  return false;
-}
-
-bool string_refinementt::is_unrefined_char_type(const typet &type)
-{
-/*if (type.id() == ID_struct) {
-  irep_idt tag = to_struct_type(type).get_tag();
-  return tag == irep_idt("__CPROVER_char");
-  }
-  return false;*/
-  return (type == char_type);
-}
-
-unsigned string_refinementt::next_symbol_id = 1;
-
-symbol_exprt string_refinementt::fresh_symbol(const irep_idt &prefix,
-                                              const typet &tp)
-{
-  std::ostringstream buf;
-  buf << "string_refinement#" << prefix << "#" << (next_symbol_id++);
-  std::string s = buf.str();
-  irep_idt name(s.c_str());
-  return symbol_exprt(name, tp);
-}
-
-string_exprt::string_exprt() : struct_exprt(string_ref_typet())
-{
-  string_ref_typet t;
-  symbol_exprt length = string_refinementt::fresh_symbol("string_length",index_type);
-  symbol_exprt content = string_refinementt::fresh_symbol("string_content",t.get_content_type());
-  move_to_operands(length,content);
-}
-
-string_exprt string_exprt::find_symbol(const symbol_exprt & expr){
-  return symbol_to_string[expr.get_identifier()];
-}
-
-void string_exprt::of_if(const if_exprt &expr, axiom_vect & axioms)
-{
-  assert(string_refinementt::is_unrefined_string_type(expr.true_case().type()));
-  string_exprt t = of_expr(expr.true_case(),axioms);
-  assert(string_refinementt::is_unrefined_string_type(expr.false_case().type()));
-  string_exprt f = of_expr(expr.false_case(),axioms);
-
-  axioms.emplace_back(implies_exprt(expr.cond(),equal_exprt(length(),t.length())));
-  symbol_exprt qvar = string_refinementt::fresh_symbol("string_if",index_type);
-  axioms.push_back(string_constraintt(expr.cond(),equal_exprt((*this)[qvar],t[qvar])).forall(qvar,zero,t.length()));
-;
- axioms.emplace_back(implies_exprt(not_exprt(expr.cond()),equal_exprt(length(),f.length())));
-  symbol_exprt qvar2 = string_refinementt::fresh_symbol("string_if",index_type);
-  axioms.push_back(string_constraintt(not_exprt(expr.cond()),equal_exprt((*this)[qvar],f[qvar])).forall(qvar2,zero,f.length()));
-}
-
-string_exprt string_exprt::of_expr(const exprt & unrefined_string, axiom_vect & axioms)
-{
-  string_exprt s;
-  if(unrefined_string.id()==ID_function_application) 
-    s.of_function_application(to_function_application_expr(unrefined_string), axioms);
-  else if(unrefined_string.id()==ID_symbol) 
-    s = find_symbol(to_symbol_expr(unrefined_string));
-  else if(unrefined_string.id()==ID_if) 
-    s.of_if(to_if_expr(unrefined_string),axioms);
-  else 
-    throw ("string_exprt of:\n" + unrefined_string.pretty() 
-	   + "\nwhich is not a symbol or a function application");
-
-  axioms.emplace_back(string_refinementt::is_positive(s.length()));
-  return s;
-}
-
-exprt string_exprt::within_bounds(const exprt & idx, const exprt & bound)
-{
-  return and_exprt(binary_relation_exprt(idx, ID_ge, index_of_int(0)),
-		   binary_relation_exprt(idx, ID_lt, bound));
-}
-
-void string_exprt::of_function_application(const function_application_exprt & expr, axiom_vect & axioms)
-{
-  const exprt &name = expr.function();
-  if (name.id() == ID_symbol) {
-    const irep_idt &id = to_symbol_expr(name).get_identifier();
-    //std::cout << "string_exprt::of_function_application(" 
-    //<< id << ")" << std::endl;
-    if (id == "__CPROVER_uninterpreted_string_literal") {
-      return of_string_literal(expr,axioms);
-    } else if (id == "__CPROVER_uninterpreted_strcat") {
-      return of_string_concat(expr,axioms);
-    } else if (id == "__CPROVER_uninterpreted_substring") {
-      return of_string_substring(expr,axioms);
-    } else if (id == "__CPROVER_uninterpreted_char_set") {
-      return of_string_char_set(expr,axioms);
-    } 
-  }
-  throw "non string function";
-}
-					   
-void string_exprt::of_string_literal(const function_application_exprt &f, axiom_vect & axioms)
-{
-  const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 1); //bad args to string literal?
-  const exprt &arg = args[0];
-
-  assert (arg.operands().size() == 1 &&
-	  arg.op0().operands().size() == 1 &&
-	  arg.op0().op0().operands().size() == 2 &&
-	  arg.op0().op0().op0().id() == ID_string_constant); // bad arg to string literal?
-      
-  const exprt &s = arg.op0().op0().op0();
-  irep_idt sval = to_string_constant(s).get_value();
-
-  for (std::size_t i = 0; i < sval.size(); ++i) {
-    std::string idx_binary = integer2binary(i,INDEX_WIDTH);
-    constant_exprt idx(idx_binary, index_type);
-    std::string sval_binary=integer2binary(unsigned(sval[i]), CHAR_WIDTH);
-    constant_exprt c(sval_binary,char_type);
-    equal_exprt lemma(index_exprt(content(), idx), c);
-    axioms.emplace_back(lemma);
-  }
-
-  std::string s_length_binary = integer2binary(unsigned(sval.size()),INDEX_WIDTH);
-  exprt s_length = constant_exprt(s_length_binary, index_type);
-
-  axioms.emplace_back(equal_exprt(length(),s_length));
-}
-
-
-void string_exprt::of_string_concat(const function_application_exprt &f, axiom_vect & axioms)
-{
-  const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 2); //bad args to string concat
-  
-  string_exprt s1 = string_exprt::of_expr(args[0],axioms);
-  string_exprt s2 = string_exprt::of_expr(args[1],axioms);
-
-  equal_exprt length_sum_lem(length(), plus_exprt(s1.length(), s2.length()));
-  axioms.emplace_back(length_sum_lem);
-  // We can run into problems if the length of the string exceed 32 bits?
-  //binary_relation_exprt lem1(length(), ID_ge, s1.length());
-  //axioms.push_back(string_constraintt(lem1));
-  //binary_relation_exprt lem2(length(), ID_ge, s2.length());
-  //axioms.push_back(string_constraintt(lem2));
-
-  symbol_exprt idx = string_refinementt::fresh_symbol("QA_index_concat",index_type);
-
-  string_constraintt a1(equal_exprt(s1[idx],(*this)[idx]));
-  axioms.push_back(a1.forall(idx, zero, s1.length()));
-
-
-  symbol_exprt idx2 = string_refinementt::fresh_symbol("QA_index_concat2",index_type);
-
-  string_constraintt a2(equal_exprt(s2[idx2],(*this)[plus_exprt(idx2,s1.length())]));
-  axioms.push_back(a2.forall(idx2, zero, s2.length()));
-  
-}
-
-void string_exprt::of_string_substring
-(const function_application_exprt &expr, axiom_vect & axioms)
-{
-  const function_application_exprt::argumentst &args = expr.arguments();  
-  assert(args.size() == 3); // bad args to string substring?
-
-  string_exprt str = of_expr(args[0],axioms);
-  exprt i(args[1]);
-  assert(i.type() == index_type);
-  exprt j(args[2]);
-  assert(j.type() == index_type);
-
-  symbol_exprt idx = string_refinementt::fresh_symbol("index_substring", index_type);
-
-  axioms.emplace_back(equal_exprt(length(), minus_exprt(j, i)));
-  axioms.emplace_back(binary_relation_exprt(i, ID_lt, j));
-  axioms.emplace_back(str >= j);
-
-  // forall idx < str.length, str[idx] = arg_str[idx+i]
-  string_constraintt a(equal_exprt(index_exprt(content(),idx), 
-				   str[plus_exprt(i, idx)]));
-  
-  axioms.push_back(a.forall(idx,zero,length()));
-}
-
-void string_exprt::of_string_char_set
-(const function_application_exprt &expr,axiom_vect & axioms)
-{
-  const function_application_exprt::argumentst &args = expr.arguments();  
-  assert(args.size() == 3); //bad args to string_char_set?
-
-  string_exprt str = of_expr(args[0],axioms);
-  symbol_exprt c = string_refinementt::fresh_symbol("char", char_type);
-  
-  //THIS HAS NOT BEEN CHECKED:  
-  axioms.emplace_back(equal_exprt(c,args[2]));
-  with_exprt sarrnew(str.content(), args[1], c);
-  implies_exprt lemma(binary_relation_exprt(args[1], ID_lt, str.length()),
-                      and_exprt(equal_exprt(content(), 
-					    // update_exprt(str.content(), args[1], c)),
-					    sarrnew),
-                                equal_exprt(length(), str.length())));
-  axioms.push_back(lemma);
-
 }
 
 
@@ -371,12 +144,12 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      type==ns.follow(expr.rhs().type()) &&
      type.id()!=ID_bool)
   {
-    if(is_unrefined_string_type(type)) {
+    if(string_ref_typet::is_unrefined_string_type(type)) {
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       make_string(sym,expr.rhs());
       return false;
     }
-    else if(is_unrefined_char_type(type)) {
+    else if(string_ref_typet::char_type() == type) {
       const bvt &bv1=convert_bv(expr.rhs());
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       const irep_idt &identifier = sym.get_identifier();
@@ -396,13 +169,13 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
   if(identifier.empty())
     throw "string_refinementt::convert_symbol got empty identifier";
 
-  if (is_unrefined_string_type(type)) {
+  if (string_ref_typet::is_unrefined_string_type(type)) {
     //debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
     // this can happen because of boolbvt::convert_equality
-    string_exprt str = string_exprt::find_symbol(to_symbol_expr(expr));
+    string_exprt str = string_of_symbol(to_symbol_expr(expr));
     bvt bv = convert_bv(str);
     return bv;
-  } else if (is_unrefined_char_type(expr.type())) {
+  } else if (expr.type() == char_type) {
     bvt bv;
     bv.resize(CHAR_WIDTH);
     map.get_literals(identifier, char_type, CHAR_WIDTH, bv);
@@ -547,19 +320,17 @@ void string_refinementt::add_implies_lemma(const exprt &prem, const exprt & body
 void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
 {
   if(str.id()==ID_symbol) 
-    symbol_to_string[sym.get_identifier()] = 
-      string_exprt::find_symbol(to_symbol_expr(str));
+    assign_to_symbol(sym,string_of_symbol(to_symbol_expr(str)));
   else
-    symbol_to_string[sym.get_identifier()] = 
-      string_exprt::of_expr(str,string_axioms);
+    assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
 }
 
 string_exprt string_refinementt::make_string(const exprt & str) 
 {
   if(str.id()==ID_symbol) 
-    return string_exprt::find_symbol(to_symbol_expr(str));
+    return string_of_symbol(to_symbol_expr(str));
   else
-    return string_exprt::of_expr(str,string_axioms);
+    return string_exprt::of_expr(str,symbol_to_string,string_axioms);
 }
 
 bvt string_refinementt::convert_string_equal(
@@ -584,7 +355,7 @@ bvt string_refinementt::convert_string_equal(
   // !eq => s1.length != s2.length || (witness < s1.length && s1[witness] != s2[witness])
 
   symbol_exprt witness = fresh_index("witness_unequal");
-  symbol_exprt qvar = fresh_symbol("qvar_equal", index_type);
+  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_equal", index_type);
 
   string_axioms.emplace_back(eq, equal_exprt(s1.length(), s2.length()));
 
@@ -595,8 +366,7 @@ bvt string_refinementt::convert_string_equal(
   string_axioms.emplace_back
     (not_exprt(eq),
      or_exprt(notequal_exprt(s1.length(), s2.length()),
-	      and_exprt(string_exprt::within_bounds(witness,s1.length()),
-			notequal_exprt(s1[witness],s2[witness]))));
+	      string_constraintt(notequal_exprt(s1[witness],s2[witness])).exists(witness,zero,s1.length())));
 
   return bv;
 }
@@ -626,12 +396,10 @@ bvt string_refinementt::convert_string_is_prefix(
   symbol_exprt isprefix = fresh_boolean("isprefix");
   string_exprt s0 = make_string(args[0]);
   string_exprt s1 = make_string(args[1]);
-  assert(f.type() == bool_typet());
-  bvt bv = convert_bv(isprefix); 
 
-  string_axioms.emplace_back(implies_exprt(isprefix, s1 >= s0));
+  string_axioms.emplace_back(isprefix, s1 >= s0);
 
-  symbol_exprt qvar = fresh_symbol("QA_isprefix", index_type);
+  symbol_exprt qvar = string_exprt::fresh_symbol("QA_isprefix", index_type);
   string_axioms.push_back
     (string_constraintt(isprefix, equal_exprt(s0[qvar],s1[qvar])
 			).forall(qvar,zero,s0.length()));
@@ -645,7 +413,9 @@ bvt string_refinementt::convert_string_is_prefix(
 				   notequal_exprt(s0[witness],s1[witness])));
 		       
   string_axioms.emplace_back(implies_exprt (not_exprt(isprefix),and_exprt(is_positive(witness),s0_notpref_s1)));
-  return bv;
+
+  assert(f.type() == bool_typet());
+  return convert_bv(isprefix); 
 }
 
 
@@ -668,7 +438,7 @@ bvt string_refinementt::convert_string_is_suffix(
 
   string_axioms.emplace_back(implies_exprt(issuffix, s1 >= s0));
 
-  symbol_exprt qvar = fresh_symbol("QA_suffix", index_type);
+  symbol_exprt qvar = string_exprt::fresh_symbol("QA_suffix", index_type);
   exprt qvar_shifted = plus_exprt(qvar, 
 				  minus_exprt(s1.length(), s0.length()));
   string_axioms.push_back
@@ -720,7 +490,7 @@ bvt string_refinementt::convert_string_contains(
   string_axioms.emplace_back(//implies_exprt(contains,
 			     and_exprt(is_positive(startpos),binary_relation_exprt(startpos, ID_le, minus_exprt(s0.length(),s1.length()))));
 
-  symbol_exprt qvar = fresh_symbol("QA_contains", index_type);
+  symbol_exprt qvar = string_exprt::fresh_symbol("QA_contains", index_type);
   exprt qvar_shifted = plus_exprt(qvar, startpos);
   string_axioms.push_back
     (string_constraintt(contains,equal_exprt(s1[qvar],s0[qvar_shifted])
@@ -741,13 +511,13 @@ bvt string_refinementt::convert_string_contains(
 
 
 symbol_exprt string_refinementt::fresh_index(const irep_idt &prefix){
-  symbol_exprt i = fresh_symbol(prefix,index_type);
+  symbol_exprt i = string_exprt::fresh_symbol(prefix,index_type);
   index_symbols.push_back(i);
   return i;
 }
 
 symbol_exprt string_refinementt::fresh_boolean(const irep_idt &prefix){
-  symbol_exprt b = fresh_symbol(prefix,bool_typet());
+  symbol_exprt b = string_exprt::fresh_symbol(prefix,bool_typet());
   boolean_symbols.push_back(b);
   return b;
 }
@@ -761,12 +531,12 @@ bvt string_refinementt::convert_string_index_of(
   symbol_exprt index = fresh_index("index_of");
   string_exprt str = make_string(args[0]);
   exprt c = args[1];
-  assert(is_unrefined_char_type(c.type()));
+  assert(c.type() == char_type);
   // (i = -1 || 0 <= i < s && s[i] = c) && forall n. n < i => s[n] != c 
   
   string_axioms.push_back((string_constraintt(str > index) && is_positive(index)) || equal_exprt(index,index_of_int(-1)));
 
-  symbol_exprt n = fresh_symbol("QA_index_of",index_type);
+  symbol_exprt n = string_exprt::fresh_symbol("QA_index_of",index_type);
 
   string_axioms.push_back((! string_constraintt(equal_exprt(str[n],c))).forall(n,zero,index));
 
@@ -781,6 +551,7 @@ bvt string_refinementt::convert_string_last_index_of(
   assert(args.size() == 2); // bad args to string last index of?
 
   symbol_exprt index = fresh_index("last_index_of");
+  throw "not implemented";
   bvt bv = convert_bv(index);
   return bv;
 }
@@ -817,7 +588,7 @@ bvt string_refinementt::convert_string_char_at(
   debug() << "in convert_string_char_at: we add the index to the"
 	  << " index set" << eom;
 
-  symbol_exprt char_sym = fresh_symbol("char",char_type);
+  symbol_exprt char_sym = string_exprt::fresh_symbol("char",char_type);
   string_axioms.emplace_back(equal_exprt(char_sym,str[args[1]]));
   return convert_bv(char_sym);
 }
@@ -935,6 +706,7 @@ bool string_refinementt::check_axioms()
   std::map<irep_idt, string_exprt>::iterator it;
   for (it = symbol_to_string.begin(); it != symbol_to_string.end(); ++it) 
     {
+      debug() << it->first << " := " << it->second.pretty() << eom;
       string_exprt refined = it->second;
       const exprt &econtent = refined.content();
       const exprt &elength  = refined.length();

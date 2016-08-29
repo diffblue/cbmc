@@ -14,94 +14,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_constraint.h>
-
-#define INDEX_WIDTH 32
-#define CHAR_WIDTH 8
-
-
-// Internal type used for strings
-class string_ref_typet : public struct_typet {
-public:
-  string_ref_typet();
-
-  // Type for the content (list of characters) of a string
-  inline array_typet get_content_type() 
-  { return to_array_type((to_struct_type(*this)).components()[1].type());}
-
-};
-
-
-
-typedef std::vector<string_constraintt> axiom_vect;
-
-// Expressions that encode strings
-class string_exprt : public struct_exprt {
-public:
-  string_exprt();
-
-  // Add to the list of axioms, lemmas which should hold for the string to be 
-  // equal to the given expression.
-  static string_exprt of_expr(const exprt & unrefined_string, axiom_vect & axioms);
-
-  // Find the string corresponding to the given symbol if it exists.
-  // Otherwise a new string is created.
-  static string_exprt find_symbol(const symbol_exprt &expr);
-
-  // Expression corresponding to the length of the string
-  inline const exprt & length() const { return op0();};
-  // Expression corresponding to the content (array of characters) of the string
-  inline const exprt & content() const { return op1();};
-
-  static exprt within_bounds(const exprt & idx, const exprt & bound);
-
-  // Expression of the character at position idx in the string
-  inline index_exprt operator[] (exprt idx)
-  { return index_exprt(content(), idx);}
-
-  // Comparison on the length of the strings
-  inline binary_relation_exprt operator< (string_exprt rhs)
-  { return binary_relation_exprt(length(), ID_lt, rhs.length()); }
-  inline binary_relation_exprt operator> (string_exprt rhs)
-  { return binary_relation_exprt(rhs.length(), ID_lt, length()); }
-  inline binary_relation_exprt operator<= (string_exprt rhs)
-  { return binary_relation_exprt(length(), ID_le, rhs.length()); }
-  inline binary_relation_exprt operator>= (string_exprt rhs)
-  { return binary_relation_exprt(length(), ID_ge, rhs.length()); }
-  inline binary_relation_exprt operator< (const exprt & rhs)
-  { return binary_relation_exprt(length(), ID_lt, rhs); }
-  inline binary_relation_exprt operator> (const exprt & rhs)
-  { return binary_relation_exprt(rhs, ID_lt, length()); }
-  inline binary_relation_exprt operator>= (const exprt & rhs)
-  { return binary_relation_exprt(length(), ID_ge, rhs); }
-  inline binary_relation_exprt operator<= (const exprt & rhs)
-  { return binary_relation_exprt(length(), ID_le, rhs); }
-
-private:
-  // Auxiliary functions for of_expr
-  void of_function_application(const function_application_exprt &expr, axiom_vect & axioms);
-
-  void of_string_literal(const function_application_exprt &f,axiom_vect &axioms);
-  void of_string_concat(const function_application_exprt &f,axiom_vect &axioms);
-  void of_string_substring(const function_application_exprt &expr,axiom_vect &axioms);
-  void of_string_char_set(const function_application_exprt &expr,axiom_vect &axioms);
-
-  void of_if(const if_exprt &expr, axiom_vect & axioms);
-  
-  friend inline string_exprt &to_string_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_struct);
-    return static_cast<string_exprt &>(expr);
-  }
-  
-};
-
-string_exprt &to_string_expr(exprt expr);
-
-/*
-class char_exprt : public exprt {
-public:
-  char_exprt(const exprt & unrefined_char);
-  };*/
+#include <solvers/refinement/string_expr.h>
 
 class string_refinementt: public bv_refinementt
 {
@@ -121,16 +34,8 @@ public:
   virtual std::string decision_procedure_text() const
   { return "string refinement loop with "+prop.solver_text(); }
 
-  static bool is_unrefined_string_type(const typet &type);
-  static bool is_unrefined_char_type(const typet &type);
-  
-  // Generate a new symbol of the given type tp with a prefix 
-  static symbol_exprt fresh_symbol(const irep_idt &prefix,
-				   const typet &tp=bool_typet());
-
   symbol_exprt fresh_index(const irep_idt &prefix);
   symbol_exprt fresh_boolean(const irep_idt &prefix);
-
 
   irep_idt string_literal_func;
   irep_idt char_literal_func;
@@ -156,8 +61,6 @@ private:
 
   inline size_t get_string_width()
   { return boolbv_width(string_type);}
-
-  static unsigned next_symbol_id;
 
 protected:
 
@@ -194,6 +97,15 @@ private:
 
   // Symbols used in existential quantifications
   std::vector<symbol_exprt> index_symbols;
+
+  std::map<irep_idt, string_exprt> symbol_to_string;
+  inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr){
+    symbol_to_string[sym.get_identifier()]= expr;
+  }  
+
+  inline string_exprt string_of_symbol(const symbol_exprt & sym){
+    return symbol_to_string[sym.get_identifier()];
+  }  
 
   axiom_vect string_axioms;
 

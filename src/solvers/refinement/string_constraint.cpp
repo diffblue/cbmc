@@ -31,7 +31,7 @@ exprt string_constraintt::body() const {
   } else throw "string_constraintt::body() should not be applied to NOT_CONTAINS expression";
 }
 
-string_constraintt string_constraintt::forall(symbol_exprt univ, exprt bound_inf, exprt bound_sup)
+string_constraintt string_constraintt::forall(const symbol_exprt & univ, const exprt & bound_inf, const exprt & bound_sup)
 {
   string_constraintt sc(*this);
   sc.form = UNIV_QUANT;
@@ -57,3 +57,11 @@ string_constraintt string_constraintt::not_contains(exprt univ_bound_inf, exprt 
   return sc;
 }
 
+string_constraintt string_constraintt::exists(const symbol_exprt & exist, const exprt & bound_inf, const exprt & bound_sup)
+{
+  assert(form == SIMPLE);
+  return string_constraintt
+    (and_exprt(*this, 
+	       and_exprt(binary_relation_exprt(exist, ID_ge, bound_inf),
+			 binary_relation_exprt(exist, ID_lt, bound_sup))));
+}
