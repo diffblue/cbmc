@@ -73,7 +73,8 @@ public:
 
   goto_instrument_parse_optionst(int argc, const char **argv):
     parse_options_baset(GOTO_INSTRUMENT_OPTIONS, argc, argv),
-    language_uit("goto-instrument", cmdline),
+    language_uit(cmdline, ui_message_handler),
+    ui_message_handler(language_uit::get_ui_cmdline(cmdline),"goto-instrument"),
     function_pointer_removal_done(false),
     partial_inlining_done(false),
     remove_returns_done(false)
@@ -81,6 +82,7 @@ public:
   }
   
 protected:
+  ui_message_handlert ui_message_handler;
   virtual void register_languages();
 
   void get_goto_program();

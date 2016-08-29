@@ -62,7 +62,9 @@ Function: goto_analyzer_parse_optionst::goto_analyzer_parse_optionst
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(int argc, const char **argv):
   parse_options_baset(GOTO_ANALYSER_OPTIONS, argc, argv),
-  language_uit("GOTO-ANALYSER " CBMC_VERSION, cmdline)
+  language_uit(cmdline, ui_message_handler),
+  ui_message_handler(language_uit::get_ui_cmdline(cmdline),
+                     "GOTO-ANALYZER " CBMC_VERSION)
 {
 }
   

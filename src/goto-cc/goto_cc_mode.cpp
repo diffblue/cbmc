@@ -34,7 +34,9 @@ Function: goto_cc_modet::goto_cc_modet
 \*******************************************************************/
 
 goto_cc_modet::goto_cc_modet(goto_cc_cmdlinet &_cmdline):
-  language_uit("goto-cc " CBMC_VERSION, _cmdline),
+  language_uit(_cmdline, ui_message_handler),
+  ui_message_handler(language_uit::get_ui_cmdline(_cmdline),
+                     "goto-cc " CBMC_VERSION),
   cmdline(_cmdline)
 {
   register_languages();

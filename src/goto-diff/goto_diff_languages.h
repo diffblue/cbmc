@@ -16,9 +16,10 @@ class goto_diff_languagest :
   public language_uit
 {
 public:
-  explicit goto_diff_languagest(const std::string& tool, 
-                                const cmdlinet& cmdline) :
-  language_uit(tool, cmdline)
+  explicit goto_diff_languagest(
+    const cmdlinet& cmdline,
+    ui_message_handlert &ui_message_handler) :
+  language_uit(cmdline, ui_message_handler)
   {
     register_languages();
   }

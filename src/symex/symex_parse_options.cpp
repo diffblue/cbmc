@@ -60,7 +60,9 @@ Function: symex_parse_optionst::symex_parse_optionst
 
 symex_parse_optionst::symex_parse_optionst(int argc, const char **argv):
   parse_options_baset(SYMEX_OPTIONS, argc, argv),
-  language_uit("Symex " CBMC_VERSION, cmdline)
+  language_uit(cmdline, ui_message_handler),
+  ui_message_handler(language_uit::get_ui_cmdline(cmdline),
+                     "Symex " CBMC_VERSION)
 {
 }
   

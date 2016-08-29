@@ -43,6 +43,7 @@ public:
     const std::string &extra_options);
 
 protected:
+  ui_message_handlert ui_message_handler;
   goto_diff_languagest languages2;
 
   virtual void get_command_line_options(optionst &options);
