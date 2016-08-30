@@ -91,12 +91,39 @@ protected:
   bvt convert_string_char_at(const function_application_exprt &f);
 
 private:
+  // All constraints produced by the code
+  axiom_vect string_axioms;
+
+  // Simple constraints that have been given to the solver
+  expr_sett seen_instances;
+  // 
+  axiom_vect universal_axioms;
+  //
+  axiom_vect not_contains_axioms;
+
+  int nb_sat_iteration;
+
   // Boolean symbols that are used to know whether the results 
   // of some functions should be true.
   std::vector<symbol_exprt> boolean_symbols;
 
   // Symbols used in existential quantifications
   std::vector<symbol_exprt> index_symbols;
+
+
+  // Unquantified lemmas that have newly been added
+  std::vector<exprt> cur;
+
+  // See the definition in the PASS article
+  // Warning: this is indexed by array_expressions and not string expressions
+  std::map<exprt, expr_sett> current_index_set;
+  std::map<exprt, expr_sett> index_set;
+
+  // for debugging
+  void display_index_set();
+
+  // Tells if there is a index in the index set where the same variable occurs several time.
+  bool variable_with_multiple_occurence_in_index;
 
   std::map<irep_idt, string_exprt> symbol_to_string;
   inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr){
@@ -107,11 +134,6 @@ private:
     return symbol_to_string[sym.get_identifier()];
   }  
 
-  axiom_vect string_axioms;
-
-  axiom_vect not_contains_axioms;
-
-  int nb_sat_iteration;
 
   // Create a new string expression and add the necessary lemma
   // to ensure its equal to the given string expression.
@@ -121,30 +143,18 @@ private:
   // of returning it.
   void make_string(const symbol_exprt & sym, const exprt &str);
 
+  void add_lemma(const exprt &lemma);
+
   //void set_to(const exprt &expr, bool value);
   bool boolbv_set_equality_to_true(const equal_exprt &expr);
   //bool set_equality_to_true(const equal_exprt &expr);
   literalt convert_rest(const exprt &expr);
-
-  void add_lemma(const exprt &lemma);
-  void add_again_lemmas();
-
-  // Check that the precondition is satisfiable before adding a lemma, and that we haven't added it before
-  void add_implies_lemma(const exprt &prem, const exprt &body);
 
   // Instantiate forall constraints with index from the index set
   void add_instantiations();
 
   // Return true if the current model satisfies all the axioms
   bool check_axioms();
-
-  // See the definition in the PASS article
-  // this is indexed by array_expressions
-  std::map<exprt, expr_sett> current_index_set;
-  std::map<exprt, expr_sett> index_set;
-
-  // Tells if there is a index in the index set where the same variable occurs several time.
-  bool variable_with_multiple_occurence_in_index;
 
   // Add to the index set all the indices that appear in the formula
   void update_index_set(const exprt &formula);
@@ -162,6 +172,8 @@ private:
   string_constraintt instantiate(const string_constraintt &axiom, const exprt &str,
                     const exprt &val);
 
+  void instantiate_not_contains(const string_constraintt &axiom, std::vector<exprt> & new_lemmas);
+
   // For expressions f of a certain form, 		  //
   // returns an expression corresponding to $f^{−1}(val)$.//
   // i.e. the value that is necessary for qvar for f to   //
@@ -172,7 +184,6 @@ private:
   // elems different from qvar. 			  //
   // Takes e minus the sum of the element in elems.	  //
   exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f);
-  //, exprt & positive, exprt & negative);
   
   // Rewrite a sum in a simple form: sum m_i * expr_i
   std::map< exprt, int> map_of_sum(const exprt &f);
@@ -187,16 +198,10 @@ private:
   // Convert the content of a string to a more readable representation
   std::string string_of_array(const exprt &arr, const exprt &size);
 
-  // Lemmas that were already added
-  expr_sett seen_instances;
-
-  // Unquantified lemmas that have newly been added
-  std::vector<exprt> cur;
-  expr_sett all_lemmas;
-
   // succinct and pretty way to display an expression
   std::string pretty_short(const exprt & expr);
 
+  // string to display a constraint
   std::string constraint_to_string(const string_constraintt & sc);
 
 

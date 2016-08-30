@@ -83,6 +83,18 @@ string_refinementt::~string_refinementt()
 // String refinement //
 ///////////////////////
 
+void string_refinementt::display_index_set() {
+  for (std::map<exprt, expr_sett>::iterator i = index_set.begin(),
+	 end = index_set.end(); i != end; ++i) {
+    const exprt &s = i->first;
+    debug() << "IS(" << pretty_short(s) << ") == {";
+    
+    for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
+         j != end; ++j) 
+      debug() << pretty_short (*j) << "; ";
+    debug() << "}"  << eom;
+  }
+}
 
 // We add instantiations before launching the solver
 void string_refinementt::post_process()
@@ -91,23 +103,24 @@ void string_refinementt::post_process()
   std::vector<string_constraintt> new_axioms;
   for(int i = 0; i < string_axioms.size(); i++)
     if(string_axioms[i].is_simple())
-      add_implies_lemma(string_axioms[i].premise(),string_axioms[i].body());
+      add_lemma(string_axioms[i]);
     else if(string_axioms[i].is_univ_quant())
-      new_axioms.push_back(string_axioms[i]);
-    else 
+      universal_axioms.push_back(string_axioms[i]);
+    else {
+      assert(string_axioms[i].is_not_contains());
+      string_axioms[i].witness = string_exprt::fresh_symbol
+	("not_contains_witness",
+	 array_typet(string_ref_typet::index_type(),
+		     infinity_exprt(string_ref_typet::index_type())));
       not_contains_axioms.push_back(string_axioms[i]);
-
-  string_axioms = new_axioms;
-  //add_instantiations(true);
-
+    }
+  debug() << not_contains_axioms.size() << " not_contains constraints" << eom;
   nb_sat_iteration = 0;
 
-  update_index_set(string_axioms);
+  update_index_set(universal_axioms);
   update_index_set(cur); 
   cur.clear();
   add_instantiations();
-  // We should check at each step whether the lemmas are satisfiable or not
-  //  while(!index_set.empty()) {cur.clear();   add_instantiations();    index_set.clear();     update_index_set(cur);   }
 
   while(!current_index_set.empty() && initial_loop_bound-- > 0 && !variable_with_multiple_occurence_in_index)
     {
@@ -116,8 +129,22 @@ void string_refinementt::post_process()
       cur.clear();
       add_instantiations();
     }
-
+  
   debug()<< "post_process: " << initial_loop_bound << " steps skipped" << eom;
+
+
+  display_index_set();
+  debug()<< "instantiating NOT_CONTAINS constraints" << eom;
+  for(int i=0; i<not_contains_axioms.size(); i++) {
+    debug()<< "constraint " << i << eom;
+    std::vector<exprt> lemmas;
+    instantiate_not_contains(not_contains_axioms[i],lemmas);
+    for(int j=0; j<lemmas.size(); j++) {
+      add_lemma(lemmas[j]);
+    }
+  }
+
+
   SUB::post_process();
 }
 
@@ -275,26 +302,17 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 
 void string_refinementt::add_lemma(const exprt &lemma)
 {
+  if (!seen_instances.insert(lemma).second) return;
+
+  if(lemma == true_exprt()) { debug() << "add_lemma : tautology" << eom; return; }// tautology
+
   debug() << "adding lemma " << pretty_short(lemma) << eom;
 
   prop.l_set_to_true(convert(lemma));
   cur.push_back(lemma);
-  all_lemmas.insert(lemma);
-}
 
-void string_refinementt::add_again_lemmas() {
-  for(expr_sett::iterator it = all_lemmas.begin(); it != all_lemmas.end(); it++)
-    prop.l_set_to_true(convert(*it));
-}
-
-
-void string_refinementt::add_implies_lemma(const exprt &prem, const exprt & body)
-{
-  if (!seen_instances.insert(implies_exprt(prem,body)).second)
-    return;
-
-  if(body == true_exprt()) return; // tautology
-  
+  //all_lemmas.insert(lemma);
+  /*
   satcheck_no_simplifiert sat_check;
   SUB solver(ns, sat_check);
   solver << prem;
@@ -310,7 +328,7 @@ void string_refinementt::add_implies_lemma(const exprt &prem, const exprt & body
     else
       add_lemma(implies_exprt(prem,body));
   }
-  /*
+
   if(prem  == true_exprt()) 
     add_lemma(body);
   else
@@ -616,11 +634,11 @@ void string_refinementt::add_instantiations()
          j != end; ++j) {
       const exprt &val = *j;
 
-      for (size_t k = 0; k < string_axioms.size(); ++k) {
-	assert(string_axioms[k].is_univ_quant());
-	string_constraintt lemma = instantiate(string_axioms[k], s, val);
+      for (size_t k = 0; k < universal_axioms.size(); ++k) {
+	assert(universal_axioms[k].is_univ_quant());
+	string_constraintt lemma = instantiate(universal_axioms[k], s, val);
 	assert(lemma.is_simple());
-	add_implies_lemma(lemma.premise(),lemma.body());
+	add_lemma(lemma);
       }
     }
   }
@@ -706,7 +724,6 @@ bool string_refinementt::check_axioms()
   std::map<irep_idt, string_exprt>::iterator it;
   for (it = symbol_to_string.begin(); it != symbol_to_string.end(); ++it) 
     {
-      debug() << it->first << " := " << it->second.pretty() << eom;
       string_exprt refined = it->second;
       const exprt &econtent = refined.content();
       const exprt &elength  = refined.length();
@@ -737,9 +754,9 @@ bool string_refinementt::check_axioms()
   debug() << "in check axiom, the model may be incomplete" << eom;
   std::vector< std::pair<size_t, exprt> > violated;
 
-  debug() << "there are " << string_axioms.size() << " string axioms" << eom;
-  for (size_t i = 0; i < string_axioms.size(); ++i) {
-    const string_constraintt &axiom = string_axioms[i];
+  debug() << "there are " << universal_axioms.size() << " universal axioms" << eom;
+  for (size_t i = 0; i < universal_axioms.size(); ++i) {
+    const string_constraintt &axiom = universal_axioms[i];
 
     exprt negaxiom = and_exprt(axiom.premise(), not_exprt(axiom.body()));
     replace_expr(fmodel, negaxiom);
@@ -762,6 +779,15 @@ bool string_refinementt::check_axioms()
     }
   }
 
+
+  debug() << "there are " << not_contains_axioms.size() << " not_contains axioms" << eom;
+  for (size_t i = 0; i < not_contains_axioms.size(); ++i) {
+    // We always consider than these aximos can be violated
+    exprt val = get(not_contains_axioms[i].witness_of(zero));
+    violated.push_back(std::make_pair(i, val));
+  }
+
+
   if (violated.empty()) {
     debug() << "no violated property" << eom;
     return true;
@@ -776,10 +802,10 @@ bool string_refinementt::check_axioms()
       // Checking if the current solution satisfies the constraints
       for (size_t i = 0; i < violated.size(); ++i) {
 	
-	new_axioms[i] = string_axioms[violated[i].first];
+	new_axioms[i] = universal_axioms[violated[i].first];
 	debug() << " axiom " << i <<" "<< constraint_to_string(new_axioms[i]) << eom;
 	const exprt &val = violated[i].second;
-	const string_constraintt &axiom = string_axioms[violated[i].first];
+	const string_constraintt &axiom = universal_axioms[violated[i].first];
 	
 	exprt premise(axiom.premise());
 	exprt body(axiom.body());
@@ -787,7 +813,7 @@ bool string_refinementt::check_axioms()
 	debug() << "warning: we don't eliminate the existential quantifier" << eom;
 	replace_expr(axiom.get_univ_var(), val, instance);
 	if (seen_instances.insert(instance).second) {
-	  add_implies_lemma(premise,body);
+	  add_lemma(instance);
 	} else debug() << "instance already seen" << eom;
 	// TODO - add backwards instantiations
       }
@@ -984,15 +1010,11 @@ void string_refinementt::update_index_set(const string_constraintt &axiom)
 
       // if cur is of the form s[i] and no quantified variable appears in i
       if(!has_quant_var){
-	if(s.type() == string_type.get_content_type()){
-	  expr_sett &idxs = index_set[s];
-	  idxs.insert(bounds.begin(), bounds.end());
-	  idxs.insert(i);
-	  current_index_set[s].insert(bounds.begin(), bounds.end());
-	  current_index_set[s].insert(i);
-	} else {
-	  debug() << "update_index_set: index expression of non string" << eom;
-	}
+	assert(s.type() == string_type.get_content_type());
+	current_index_set[s].insert(bounds.begin(), bounds.end());
+	current_index_set[s].insert(i);
+	index_set[s].insert(bounds.begin(), bounds.end());
+	index_set[s].insert(i);
       }
     } else {
       forall_operands(it, cur) {
@@ -1068,10 +1090,37 @@ string_constraintt string_refinementt::instantiate(const string_constraintt &axi
   exprt idx = find_index(axiom.body(),str);
   if(idx.is_nil()) return string_constraintt();
   if(!find_qvar(idx,axiom.get_univ_var())) return string_constraintt();
-
+  
   exprt r = compute_subst(axiom.get_univ_var(), val, idx);
   exprt instance(axiom);
   replace_expr(axiom.get_univ_var(), r, instance);
   return string_constraintt(instance);     
 }
 
+
+void string_refinementt::instantiate_not_contains(const string_constraintt & axiom, std::vector<exprt> & new_lemmas){
+  assert(axiom.is_not_contains());
+  exprt s0 = axiom.s0();
+  exprt s1 = axiom.s1();
+
+  debug() << "instantiate not contains " << pretty_short(s0) << " : " << pretty_short(s1) << eom;
+  expr_sett index_set0 = index_set[to_string_expr(s0).content()];
+  expr_sett index_set1 = index_set[to_string_expr(s1).content()];
+
+  for(expr_sett::iterator it0 = index_set0.begin(); it0 != index_set0.end(); it0++)
+    for(expr_sett::iterator it1 = index_set1.begin(); it1 != index_set1.end(); it1++)
+      {
+	debug() << pretty_short(*it0) << " : " << pretty_short(*it1) << eom;
+	exprt val = minus_exprt(*it0,*it1);
+	exprt lemma = implies_exprt(and_exprt(axiom.premise(),equal_exprt(axiom.witness_of(val), *it1)), not_exprt(equal_exprt(to_string_expr(s0)[*it0],to_string_expr(s1)[*it1])));
+	new_lemmas.push_back(lemma);
+	// we put bounds on the witnesses: 0 <= v <= |s0| - |s1| ==> 0 <= v+w[v] < |s0| && 0 <= w[v] < |s1|
+	exprt witness_bounds = implies_exprt
+	  (and_exprt(binary_relation_exprt(zero,ID_le,val), binary_relation_exprt(minus_exprt(to_string_expr(s0).length(),to_string_expr(s1).length()),ID_ge,val)),
+	   and_exprt(binary_relation_exprt(zero,ID_le,plus_exprt(val,axiom.witness_of(val))),
+		     and_exprt(binary_relation_exprt(to_string_expr(s0).length(),ID_gt,plus_exprt(val,axiom.witness_of(val))), 
+			       and_exprt(binary_relation_exprt(to_string_expr(s1).length(),ID_gt,axiom.witness_of(val)), 
+					 binary_relation_exprt(zero,ID_le,axiom.witness_of(val))))));
+	new_lemmas.push_back(witness_bounds);
+      }
+}

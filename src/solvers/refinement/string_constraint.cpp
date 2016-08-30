@@ -43,7 +43,7 @@ string_constraintt string_constraintt::forall(const symbol_exprt & univ, const e
 
 string_constraintt string_constraintt::not_contains(exprt univ_bound_inf, exprt univ_bound_sup, 
 				 exprt premise, exprt exists_bound_inf, 
-				 exprt exists_bound_sup, exprt s1, exprt s2)
+				 exprt exists_bound_sup, exprt s0, exprt s1)
 { 
   string_constraintt sc(premise);
   sc.form = NOT_CONTAINS;
@@ -52,8 +52,8 @@ string_constraintt string_constraintt::not_contains(exprt univ_bound_inf, exprt 
   sc.bounds.push_back(univ_bound_sup);
   sc.bounds.push_back(exists_bound_inf);
   sc.bounds.push_back(exists_bound_sup);
+  sc.compared_strings.push_back(s0);
   sc.compared_strings.push_back(s1);
-  sc.compared_strings.push_back(s2);
   return sc;
 }
 
