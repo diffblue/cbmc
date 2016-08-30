@@ -1,0 +1,10 @@
+CORE
+test.c
+--pass
+^EXIT=10$
+^SIGNAL=0$
+\[main.assertion.1\] assertion firstSlash == 3: SUCCESS
+\[main.assertion.2\] assertion lastSlash == 7: SUCCESS
+\[main.assertion.3\] assertion firstSlash != 3: FAILURE
+\[main.assertion.4\] assertion lastSlash != 7: FAILURE
+--

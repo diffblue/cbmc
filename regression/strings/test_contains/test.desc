@@ -1,0 +1,9 @@
+CORE
+test.c
+--pass
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] assertion !__CPROVER_uninterpreted_strcontains(t, __CPROVER_uninterpreted_string_literal(\"3\")): SUCCESS$
+^\[main.assertion.2\] assertion __CPROVER_uninterpreted_strcontains(t, __CPROVER_uninterpreted_string_literal(\"12\")): SUCCESS$
+^\[main.assertion.3\] assertion !__CPROVER_uninterpreted_strcontains(t, __CPROVER_uninterpreted_string_literal(\"b\")): FAILURE$
+--
