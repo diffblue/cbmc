@@ -22,7 +22,7 @@ href="https://en.wikipedia.org/wiki/Code_coverage">code coverage</a>
 criterion.  Common coverage criteria include branch coverage, condition
 coverage and <a
 href="https://en.wikipedia.org/wiki/Modified_condition/decision_coverage">Modified
-Condition/ Decision Coverage (MC/DC)</a>.  Among others, MC/DC is required
+Condition/Decision Coverage (MC/DC)</a>.  Among others, MC/DC is required
 by several avionics software development guidelines to ensure adequate testing
 of safety critical software.  Briefly, in order to satisfy MC/DC,
 for every conditional statement containing boolean decisions, each Boolean
@@ -119,23 +119,19 @@ specifies the function to be analyzed.
 
 <p class="justified">
 The printed outputs will display the configurations of conditions that have
-been covered by CBMC.  At first, for each conditional statement, the
+been covered by CBMC.  For each conditional statement, the
 configuration for its decision to be <em>true</em>/<em>false</em> will be
-covered.
-
-On the other hand, to fullfil the requirement of MC/DC, more configurations
-need to be taken into account.  For example, at line 36, there is
+covered. To fullfil the requirement of MC/DC, further tests are required.
+For example, at line 36, there is
 </p>
 
 <pre>
 <code> pprz>=0 && pprz<=MAX_PPRZ
 </code></pre>
 
-To respect with MC/DC on such a decision (either <em>true</em> or
-<em>false</em>), three configurations for its conditions (boolean
-expressions) are finally covered and reported by CBMC.  We show them here,
-and the labels are added for the purpose of convenient explanation in this
-tutorial.
+<p class="justified"
+To satisfy MC/DC on such a decision, three requirements for its conditions (boolean
+expressions) are finally generated and reported by CBMC:
 
 <pre>
 <code>C1: !(pprz >= (float)0) && pprz <= (float)(16 * 600)
@@ -144,8 +140,7 @@ C3: pprz >= (float)0 && pprz <= (float)(16 * 600)
 </code></pre>
 
 <p class="justified">
-In the end of the run of CBMC, test cases are automatically reported and formatted.
-We put the test suite generated for the case study in below, with labels for convenience.
+CBMC generates the following test suite:
 </p>
 <pre><code>Test suite:
 T1: desired_climb=6.250003e-2f, estimator_z_dot=1.000000f, old_climb_sum_err=8.988036e+0f
@@ -156,20 +151,15 @@ T5: desired_climb=9.999999e-1f, estimator_z_dot=-1.000000f, old_climb_sum_err=-1
 </code></pre>
 
 <p class="justified">
-Corresponding to conditions covered for the MC/DC requirement, T1 and T2 are
-both tests that make C3 to be <em>true</em>, T3 and T4 are eligible to cover
-C1, and T5 is for C2.  Similarly, conditional statements at line 39, 43 and
-44 can be analyzed.
+The tests T1 and T3 are both tests that cause C3 evaluate to <em>true</em>, T3 and
+T4 cover C1, and T5 is for C2.  Similar observations can be made for the conditional
+statements at line 39, 43 and 44.
 </p>
 
 <p class="justified">
-More detailed information can be outputted together with these test cases
-(e.g., in xml format) by specifying options like <code>--trace</code> and
-<code>--xml-ui</code> when running CBMC.  Finally, besides <code>--cover
-mcdc</code>, other coverage criteria like <code>branch</code>,
-<code>decision</code>, <code>path</code> etc. are also available when
-calling CBMC.
+In addition to <code>--cover mcdc</code>, other coverage criteria
+like <code>branch</code>, <code>decision</code>, <code>path</code>
+etc. are also available when calling CBMC.
 </p>
 
-
-
+<!--#include virtual="footer.inc" -->
