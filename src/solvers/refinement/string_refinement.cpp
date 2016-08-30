@@ -550,7 +550,7 @@ bvt string_refinementt::convert_string_index_of(
   string_exprt str = make_string(args[0]);
   exprt c = args[1];
   assert(c.type() == char_type);
-  // (i = -1 || 0 <= i < s && s[i] = c) && forall n. n < i => s[n] != c 
+  // (i = -1 || 0 <= i < s && s[i] = c) && forall n. 0 < n < i => s[n] != c 
   
   string_axioms.push_back((string_constraintt(str > index) && is_positive(index)) || equal_exprt(index,index_of_int(-1)));
 
@@ -569,7 +569,18 @@ bvt string_refinementt::convert_string_last_index_of(
   assert(args.size() == 2); // bad args to string last index of?
 
   symbol_exprt index = fresh_index("last_index_of");
-  throw "not implemented";
+  string_exprt str = make_string(args[0]);
+  exprt c = args[1];
+  assert(c.type() == char_type);
+  // (i = -1 || 0 <= i < s && s[i] = c) && forall n. |s| > n > i => s[n] != c 
+
+  string_axioms.push_back((string_constraintt(str > index) && is_positive(index)) || equal_exprt(index,index_of_int(-1)));
+
+  symbol_exprt n = string_exprt::fresh_symbol("QA_last_index_of",index_type);
+
+  string_axioms.push_back(string_constraintt(implies_exprt(not_exprt(equal_exprt(index,index_of_int(-1))),not_exprt(equal_exprt(str[n],c)))).forall(n,index,str.length()));
+
+
   bvt bv = convert_bv(index);
   return bv;
 }
