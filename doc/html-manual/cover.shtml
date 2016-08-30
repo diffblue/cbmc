@@ -129,7 +129,7 @@ For example, at line 36, there is
 <code> pprz>=0 && pprz<=MAX_PPRZ
 </code></pre>
 
-<p class="justified"
+<p class="justified">
 To satisfy MC/DC on such a decision, three requirements for its conditions (boolean
 expressions) are finally generated and reported by CBMC:
 </p>
