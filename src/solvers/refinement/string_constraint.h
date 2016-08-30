@@ -71,6 +71,9 @@ public:
   inline symbol_exprt get_univ_var() const { assert(form==UNIV_QUANT); return quantified_variable;}
   inline exprt univ_bound_inf() const { return bounds[0]; }
   inline exprt univ_bound_sup() const { return bounds[1]; }
+  inline exprt univ_within_bounds() const 
+  { return and_exprt(binary_relation_exprt(bounds[0],ID_le,get_univ_var()),
+		     binary_relation_exprt(bounds[1],ID_gt,get_univ_var())); }
   inline exprt exists_bound_inf() const { return bounds[2]; }
   inline exprt exists_bound_sup() const { return bounds[3]; }
 
