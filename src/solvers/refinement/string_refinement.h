@@ -41,7 +41,6 @@ public:
   irep_idt char_literal_func;
   irep_idt string_length_func;
   irep_idt string_equal_func;
-  irep_idt string_copy_func;
   irep_idt string_char_at_func;
   irep_idt string_concat_func;
   irep_idt string_substring_func;
@@ -80,7 +79,6 @@ protected:
   // bit vectors and add the corresponding lemmas to a list of
   // properties to be checked  
   bvt convert_string_equal(const function_application_exprt &f);
-  bvt convert_string_copy(const function_application_exprt &f);
   bvt convert_string_length(const function_application_exprt &f);
   bvt convert_string_is_prefix(const function_application_exprt &f);
   bvt convert_string_is_suffix(const function_application_exprt &f);

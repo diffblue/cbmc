@@ -61,7 +61,6 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   char_literal_func = "__CPROVER_uninterpreted_char_literal";
   string_length_func = "__CPROVER_uninterpreted_strlen";
   string_equal_func = "__CPROVER_uninterpreted_string_equal";
-  string_copy_func = "__CPROVER_uninterpreted_string_copy";
   string_char_at_func = "__CPROVER_uninterpreted_char_at";
   string_concat_func = "__CPROVER_uninterpreted_strcat";
   string_substring_func = "__CPROVER_uninterpreted_substring";
