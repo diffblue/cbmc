@@ -216,22 +216,28 @@ protected:
   // exceptions
   //
 
+  typedef std::vector<codet> destructor_stackt;
+
   symbol_exprt exception_flag();
   void unwind_destructor_stack(
     const source_locationt &,
     std::size_t stack_size,
     goto_programt &dest);
+  void unwind_destructor_stack(
+    const source_locationt &,
+    std::size_t stack_size,
+    goto_programt &dest,
+    destructor_stackt &stack);
 
   //
   // gotos
   //
 
-  void finish_gotos();
+  void finish_gotos(goto_programt &dest);
   void finish_computed_gotos(goto_programt &dest);
 
-  typedef std::vector<codet> destructor_stackt;
-  typedef std::map<irep_idt, goto_programt::targett> labelst;
-  typedef std::list<goto_programt::targett> gotost;
+  typedef std::map<irep_idt, std::pair<goto_programt::targett, destructor_stackt> > labelst;
+  typedef std::list<std::pair<goto_programt::targett, destructor_stackt> > gotost;
   typedef std::list<goto_programt::targett> computed_gotost;
   typedef exprt::operandst caset;
   typedef std::list<std::pair<goto_programt::targett, caset> > casest;

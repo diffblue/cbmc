@@ -57,11 +57,11 @@ Function: goto_convertt::finish_gotos
 
 \*******************************************************************/
 
-void goto_convertt::finish_gotos()
+void goto_convertt::finish_gotos(goto_programt &dest)
 {
   for(const auto &g_it : targets.gotos)
   {
-    goto_programt::instructiont &i=*g_it;
+    goto_programt::instructiont &i=*(g_it.first);
 
     if(i.code.get_statement()=="non-deterministic-goto")
     {
@@ -81,7 +81,7 @@ void goto_convertt::finish_gotos()
           throw 0;
         }
 
-        i.targets.push_back(l_it->second);
+        i.targets.push_back(l_it->second.first);
       }
     }
     else if(i.is_start_thread())
@@ -98,7 +98,7 @@ void goto_convertt::finish_gotos()
         throw 0;
       }
 
-      i.targets.push_back(l_it->second);
+      i.targets.push_back(l_it->second.first);
     }
     else if(i.code.get_statement()==ID_goto)
     {
@@ -114,7 +114,48 @@ void goto_convertt::finish_gotos()
       }
 
       i.targets.clear();
-      i.targets.push_back(l_it->second);
+      i.targets.push_back(l_it->second.first);
+
+      // If the goto recorded a destructor stack, execute as much as is
+      // appropriate for however many automatic variables leave scope.
+      // We don't currently handle variables *entering* scope.
+      auto goto_stack=g_it.second;
+      const auto& label_stack=l_it->second.second;
+      bool stack_is_prefix=true;
+      if(label_stack.size()>goto_stack.size())
+        stack_is_prefix=false;
+      for(unsigned i=0, ilim=label_stack.size();
+          i!=ilim && stack_is_prefix;
+          ++i)
+      {
+        if(goto_stack[i]!=label_stack[i])
+          stack_is_prefix=false;
+      }
+
+      if(!stack_is_prefix)
+      {
+        warning() << "Encountered goto (" << goto_label <<
+          ") that enters one or more lexical blocks;" <<
+          "omitting constructors and destructors." << eom;
+      }
+      else
+      {
+        auto unwind_to_size=label_stack.size();
+        if(unwind_to_size<goto_stack.size())
+        {
+          status() << "Adding goto-destructor code on jump to " <<
+            goto_label << eom;
+          goto_programt destructor_code;
+          unwind_destructor_stack(
+            i.code.add_source_location(),
+            unwind_to_size,
+            destructor_code,
+            goto_stack);
+          dest.destructive_insert(g_it.first, destructor_code);
+          // This should leave iterators intact, as long as
+          // goto_programt::instructionst is std::list.
+        }
+      }
     }
     else
     {
@@ -169,7 +210,7 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
       goto_programt::targett t=
         goto_program.insert_after(g_it);
 
-      t->make_goto(label.second);
+      t->make_goto(label.second.first);
       t->source_location=i.source_location;
       t->guard=guard;
     }
@@ -213,7 +254,7 @@ void goto_convertt::goto_convert_rec(
 {
   convert(code, dest);
 
-  finish_gotos();
+  finish_gotos(dest);
   finish_computed_gotos(dest);
 }
 
@@ -282,8 +323,7 @@ void goto_convertt::convert_label(
   goto_programt::targett target=tmp.instructions.begin();
   dest.destructive_append(tmp);
 
-  targets.labels.insert(std::pair<irep_idt, goto_programt::targett>
-                        (label, target));
+  targets.labels.insert({label, {target, targets.destructor_stack}});
   target->labels.push_front(label);
 }
 
@@ -1622,13 +1662,21 @@ void goto_convertt::convert_goto(
   const codet &code,
   goto_programt &dest)
 {
+  // Precede with a 'skip', which will be replaced by any pre-departure
+  // destructor code if appropriate. Without this the goto can be amalgamated
+  // into a control-flow structure, such as IF x THEN GOTO 1;, leaving
+  // nowhere for the destructors to go.
+  goto_programt::targett skip=dest.add_instruction(SKIP);
+  skip->source_location=code.source_location();
+  skip->code=code_skipt();
+
   goto_programt::targett t=dest.add_instruction();
   t->make_goto();
   t->source_location=code.source_location();
   t->code=code;
 
   // remember it to do target later
-  targets.gotos.push_back(t);
+  targets.gotos.push_back(std::make_pair(t,targets.destructor_stack));
 }
 
 /*******************************************************************\

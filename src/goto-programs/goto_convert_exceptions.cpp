@@ -375,22 +375,35 @@ void goto_convertt::unwind_destructor_stack(
   std::size_t final_stack_size,
   goto_programt &dest)
 {
+  unwind_destructor_stack(
+    source_location,
+    final_stack_size,
+    dest,
+    targets.destructor_stack);
+}
+
+void goto_convertt::unwind_destructor_stack(
+  const source_locationt &source_location,
+  std::size_t final_stack_size,
+  goto_programt &dest,
+  destructor_stackt &destructor_stack)
+{
   // There might be exceptions happening in the exception
   // handler. We thus pop off the stack, and then later
   // one restore the original stack.
-  destructor_stackt old_stack=targets.destructor_stack;
+  destructor_stackt old_stack=destructor_stack;
 
-  while(targets.destructor_stack.size()>final_stack_size)
+  while(destructor_stack.size()>final_stack_size)
   {
-    codet d_code=targets.destructor_stack.back();
+    codet d_code=destructor_stack.back();
     d_code.add_source_location()=source_location;
 
     // pop now to avoid doing this again
-    targets.destructor_stack.pop_back();
+    destructor_stack.pop_back();
 
     convert(d_code, dest);
   }
 
   // Now restore old stack.
-  old_stack.swap(targets.destructor_stack);
+  old_stack.swap(destructor_stack);
 }
