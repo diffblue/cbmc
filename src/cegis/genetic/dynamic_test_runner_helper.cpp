@@ -37,6 +37,7 @@ void write_file(const char * const path, const std::string &content)
 #define CLANG_COMPILE_COMMAND "clang -std=c99 -g0 -O2 -shared -rdynamic -fPIC "
 #else
 #define COMPILE_COMMAND "gcc -std=c99 -g0 -O2 -shared "
+#define CLANG_COMPILE_COMMAND "clang -std=c99 -g0 -O2 "
 #endif
 #define ARTIFACT_SEPARATOR " -o "
 #define COMPLING_FAILED "Compiling test runner failed."
