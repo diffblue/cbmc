@@ -37,11 +37,13 @@ public:
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
     const optionst &_options,
-    dereference_callbackt &_dereference_callback):
+    dereference_callbackt &_dereference_callback,
+    const irep_idt _language_mode = irep_idt()):
     ns(_ns),
     new_symbol_table(_new_symbol_table),
     options(_options),
-    dereference_callback(_dereference_callback)
+    dereference_callback(_dereference_callback),
+    language_mode(_language_mode)
   { }
 
   virtual ~value_set_dereferencet() { }
@@ -78,6 +80,7 @@ private:
   symbol_tablet &new_symbol_table;
   const optionst &options;
   dereference_callbackt &dereference_callback;
+  const irep_idt language_mode;
   static unsigned invalid_counter;
 
   bool dereference_type_compare(
