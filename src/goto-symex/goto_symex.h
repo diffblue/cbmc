@@ -51,6 +51,7 @@ public:
     new_symbol_table(_new_symbol_table),
     ns(_ns),
     target(_target),
+    mode(),
     atomic_section_counter(0),
     guard_identifier("goto_symex::\\guard")
   {
@@ -95,9 +96,11 @@ public:
   optionst options;
   symbol_tablet &new_symbol_table;
 
+  irep_idt mode;
+
 protected:
   const namespacet &ns;
-  symex_targett &target;  
+  symex_targett &target;
   unsigned atomic_section_counter;
 
   friend class symex_dereference_statet;
