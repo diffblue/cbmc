@@ -198,7 +198,12 @@ void unreachable_instructions(
     const goto_programt &goto_program=f_it->second.body;
     dead_mapt dead_map;
 
-    if(called.find(f_it->first)!=called.end())
+    const symbolt &decl=ns.lookup(f_it->first);
+
+    // f_it->first may be a link-time renamed version, use the
+    // base_name instead; do not list inlined functions
+    if(called.find(decl.base_name)!=called.end() ||
+       f_it->second.is_inlined())
       unreachable_instructions(goto_program, dead_map);
     else
       all_unreachable(goto_program, dead_map);
@@ -210,6 +215,111 @@ void unreachable_instructions(
       else
         add_to_json(ns, goto_program, dead_map, json_result);
     }
+  }
+
+  if(json && !json_result.array.empty())
+    os << json_result << std::endl;
+}
+
+/*******************************************************************\
+
+Function: output_unreachable_function
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static void json_output_unreachable_function(
+  const irep_idt &function,
+  const source_locationt &first_location,
+  const source_locationt &last_location,
+  json_arrayt &dest)
+{
+  json_objectt &entry=dest.push_back().make_object();
+
+  entry["function"]=json_stringt(id2string(function));
+  entry["file name"]=
+    json_stringt(concat_dir_file(
+        id2string(first_location.get_working_directory()),
+        id2string(first_location.get_file())));
+  entry["first line"]=
+    json_numbert(id2string(first_location.get_line()));
+  entry["last line"]=
+    json_numbert(id2string(last_location.get_line()));
+}
+
+/*******************************************************************\
+
+Function: unreachable_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void unreachable_functions(
+  const goto_modelt &goto_model,
+  const bool json,
+  std::ostream &os)
+{
+  json_arrayt json_result;
+
+  std::set<irep_idt> called;
+  compute_called_functions(goto_model, called);
+
+  const namespacet ns(goto_model.symbol_table);
+
+  forall_goto_functions(f_it, goto_model.goto_functions)
+  {
+    const symbolt &decl=ns.lookup(f_it->first);
+
+    // f_it->first may be a link-time renamed version, use the
+    // base_name instead; do not list inlined functions
+    if(called.find(decl.base_name)!=called.end() ||
+       f_it->second.is_inlined())
+      continue;
+
+    source_locationt first_location=decl.location;
+
+    source_locationt last_location;
+    if(f_it->second.body_available())
+    {
+      const goto_programt &goto_program=f_it->second.body;
+
+      goto_programt::const_targett end_function=
+        goto_program.instructions.end();
+      --end_function;
+      assert(end_function->is_end_function());
+      last_location=end_function->source_location;
+    }
+    else
+      // completely ignore functions without a body, both for
+      // reachable and unreachable functions; we could also restrict
+      // this to macros/asm renaming
+      continue;
+
+    if(!json)
+    {
+      os << concat_dir_file(
+              id2string(first_location.get_working_directory()),
+              id2string(first_location.get_file())) << " "
+         << decl.base_name << " "
+         << first_location.get_line() << " "
+         << last_location.get_line() << "\n";
+    }
+    else
+      json_output_unreachable_function(
+        decl.base_name,
+        first_location,
+        last_location,
+        json_result);
   }
 
   if(json && !json_result.array.empty())
