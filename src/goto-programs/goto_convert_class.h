@@ -235,6 +235,7 @@ protected:
 
   void finish_gotos(goto_programt &dest);
   void finish_computed_gotos(goto_programt &dest);
+  void finish_guarded_gotos(goto_programt &dest);
 
   typedef std::map<irep_idt, std::pair<goto_programt::targett, destructor_stackt> > labelst;
   typedef std::list<std::pair<goto_programt::targett, destructor_stackt> > gotost;
@@ -417,6 +418,14 @@ protected:
     bool leave_set;
     std::size_t leave_stack_size;
   };
+
+  struct guarded_gotot {
+    goto_programt::targett ifiter;
+    goto_programt::targett gotoiter;
+    exprt guard;
+  };
+  typedef std::list<guarded_gotot> guarded_gotost;
+  guarded_gotost guarded_gotos;
 
   exprt case_guard(
     const exprt &value,

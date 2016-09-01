@@ -118,7 +118,8 @@ void goto_convertt::finish_gotos(goto_programt &dest)
 
       // If the goto recorded a destructor stack, execute as much as is
       // appropriate for however many automatic variables leave scope.
-      // We don't currently handle variables *entering* scope.
+      // We don't currently handle variables *entering* scope, which is illegal
+      // for C++ non-pod types and impossible in Java in any case.
       auto goto_stack=g_it.second;
       const auto& label_stack=l_it->second.second;
       bool stack_is_prefix=true;
@@ -221,6 +222,50 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
 
 /*******************************************************************\
 
+Function: goto_convertt::finish_guarded_gotos
+
+  Inputs: Destination goto program
+
+ Outputs:
+
+ Purpose: For each if(x) goto z; goto y; z: emitted,
+          see if any destructor statements were inserted
+          between goto z and z, and if not, simplify into
+          if(!x) goto y;
+
+\*******************************************************************/
+
+void goto_convertt::finish_guarded_gotos(goto_programt &dest)
+{
+  for(auto& gg : guarded_gotos)
+  {
+    // Check if any destructor code has been inserted:
+    bool destructor_present=false;
+    for(auto it=gg.ifiter;
+        it!=gg.gotoiter && !destructor_present;
+        ++it)
+    {
+      if(!(it->is_goto() || it->is_skip()))
+        destructor_present=true;
+    }
+
+    // If so, can't simplify.
+    if(destructor_present)
+      continue;
+
+    // Simplify: remove whatever code was generated for the condition
+    // and attach the original guard to the goto instruction.
+    gg.gotoiter->guard=gg.guard;
+    // goto_programt doesn't provide an erase operation,
+    // perhaps for a good reason, so let's be cautious and just
+    // flatten the un-needed instructions into skips.
+    for(auto it=gg.ifiter, itend=gg.gotoiter; it!=itend; ++it)
+      it->make_skip();
+  }
+}
+
+/*******************************************************************\
+
 Function: goto_convertt::goto_convert
 
   Inputs:
@@ -256,6 +301,7 @@ void goto_convertt::goto_convert_rec(
 
   finish_gotos(dest);
   finish_computed_gotos(dest);
+  finish_guarded_gotos(dest);
 }
 
 /*******************************************************************\
@@ -1662,14 +1708,6 @@ void goto_convertt::convert_goto(
   const codet &code,
   goto_programt &dest)
 {
-  // Precede with a 'skip', which will be replaced by any pre-departure
-  // destructor code if appropriate. Without this the goto can be amalgamated
-  // into a control-flow structure, such as IF x THEN GOTO 1;, leaving
-  // nowhere for the destructors to go.
-  goto_programt::targett skip=dest.add_instruction(SKIP);
-  skip->source_location=code.source_location();
-  skip->code=code_skipt();
-
   goto_programt::targett t=dest.add_instruction();
   t->make_goto();
   t->source_location=code.source_location();
@@ -2178,6 +2216,24 @@ void goto_convertt::collect_operands(
 
 /*******************************************************************\
 
+Function: is_size_one
+
+  Inputs: Goto program 'g'
+
+ Outputs: True if 'g' has one instruction
+
+ Purpose: This is (believed to be) faster than using std::list.size
+
+\*******************************************************************/
+
+static inline bool is_size_one(const goto_programt &g)
+{
+  return (!g.instructions.empty()) &&
+    ++g.instructions.begin()==g.instructions.end();
+}
+
+/*******************************************************************\
+
 Function: goto_convertt::generate_ifthenelse
 
   Inputs:
@@ -2209,24 +2265,24 @@ void goto_convertt::generate_ifthenelse(
     return;
   }
 
+  bool is_guarded_goto=false;
+
   // do guarded gotos directly
   if(is_empty(false_case) &&
-     // true_case.instructions.size()==1 optimised
-     !true_case.instructions.empty() &&
-     ++true_case.instructions.begin()==true_case.instructions.end() &&
+     is_size_one(true_case) &&
      true_case.instructions.back().is_goto() &&
      true_case.instructions.back().guard.is_true() &&
      true_case.instructions.back().labels.empty())
   {
     // The above conjunction deliberately excludes the instance
     // if(some) { label: goto somewhere; }
-    true_case.instructions.back().guard=guard;
-    dest.destructive_append(true_case);
-    return;
+    // Don't perform the transformation here, as code might get inserted into
+    // the true case to perform destructors. This will be attempted in finish_guarded_gotos.
+    is_guarded_goto=true;
   }
 
   // similarly, do guarded assertions directly
-  if(true_case.instructions.size()==1 &&
+  if(is_size_one(true_case) &&
      true_case.instructions.back().is_assert() &&
      true_case.instructions.back().guard.is_false() &&
      true_case.instructions.back().labels.empty())
@@ -2239,7 +2295,7 @@ void goto_convertt::generate_ifthenelse(
   }
 
   // similarly, do guarded assertions directly
-  if(false_case.instructions.size()==1 &&
+  if(is_size_one(false_case) &&
      false_case.instructions.back().is_assert() &&
      false_case.instructions.back().guard.is_false() &&
      false_case.instructions.back().labels.empty())
@@ -2305,6 +2361,15 @@ void goto_convertt::generate_ifthenelse(
   x->make_goto(z);
   assert(!tmp_w.instructions.empty());
   x->source_location=tmp_w.instructions.back().source_location;
+
+  // See if we can simplify this guarded goto later.
+  // Note this depends on the fact that `instructions` is a std::list
+  // and so goto-program-destructive-append preserves iterator validity.
+  if(is_guarded_goto)
+    guarded_gotos.push_back({
+      tmp_v.instructions.begin(),
+      tmp_w.instructions.begin(),
+      guard});
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
