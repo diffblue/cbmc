@@ -17,6 +17,8 @@ enum class coverage_criteriont {
   LOCATION, BRANCH, DECISION, CONDITION,
   PATH, MCDC, ASSERTION, COVER };
 
+void set_existing_goals(std::string goal);
+
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
