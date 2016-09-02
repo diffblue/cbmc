@@ -98,6 +98,47 @@ public:
 
 /*******************************************************************\
 
+Function: coverage_goals::set_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void coverage_goals::set_goals(std::string goal)
+{
+  existing_goals.push_back(goal);
+}
+
+/*******************************************************************\
+
+Function: coverage_goals::get_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const bool coverage_goals::get_goals(const char* goal)
+{
+  std::vector<std::string>::iterator it;
+  it = find (existing_goals.begin(), existing_goals.end(), goal);
+
+  if(it == existing_goals.end())
+    return true;
+  else
+	return false;
+}
+
+
+/*******************************************************************\
+
 Function: as_string
 
   Inputs:
@@ -1108,7 +1149,8 @@ Function: instrument_cover_goals
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  coverage_criteriont criterion)
+  coverage_criteriont criterion,
+  coverage_goals &goals)
 {
   const namespacet ns(symbol_table);
   basic_blockst basic_blocks(goto_program);
@@ -1176,7 +1218,9 @@ void instrument_cover_goals(
           source_locationt source_location=
             basic_blocks.source_location_map[block_nr];
 
-          if(!source_location.get_file().empty() &&
+          //check whether the current goal already exists
+          if(goals.get_goals(source_location.get_line().c_str()) &&
+		 !source_location.get_file().empty() &&
              source_location.get_file()[0]!='<')
           {
             std::string comment="block "+b;
@@ -1426,7 +1470,8 @@ Function: instrument_cover_goals
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  coverage_criteriont criterion)
+  coverage_criteriont criterion,
+  coverage_goals &goals)
 {
   Forall_goto_functions(f_it, goto_functions)
   {
@@ -1437,6 +1482,7 @@ void instrument_cover_goals(
     instrument_cover_goals(
       symbol_table,
       f_it->second.body,
-      criterion);
+      criterion,
+      goals);
   }
 }
