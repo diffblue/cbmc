@@ -1140,6 +1140,7 @@ void cbmc_parse_optionst::help()
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n"
+    " --existing-coverage file     instrument non-covered test goals\n"
     " --mm MM                      memory consistency model for concurrent programs\n"
     "\n"
     "Java Bytecode frontend options:\n"
