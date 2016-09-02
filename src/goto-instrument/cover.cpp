@@ -17,6 +17,8 @@ Date: May 2016
 
 #include "cover.h"
 
+std::vector<std::string> existing_goals;
+
 class basic_blockst
 {
 public:
@@ -65,6 +67,23 @@ public:
           << '\n';
   }
 };
+
+/*******************************************************************\
+
+Function: set_existing_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void set_existing_goals(std::string goal)
+{
+  existing_goals.push_back(goal);
+}
 
 /*******************************************************************\
 
@@ -1120,7 +1139,13 @@ void instrument_cover_goals(
           source_locationt source_location=
             basic_blocks.source_location_map[block_nr];
           
-          if(!source_location.get_file().empty() &&
+          //check whether the current goal already exists
+          std::vector<std::string>::iterator it;
+          it = find (existing_goals.begin(), existing_goals.end(),
+        		  	  source_location.get_line().c_str());
+
+          if(it == existing_goals.end() &&
+        	 !source_location.get_file().empty() &&
              source_location.get_file()[0]!='<')
           {
             std::string comment="block "+b;
