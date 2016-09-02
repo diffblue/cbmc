@@ -968,6 +968,34 @@ bool cbmc_parse_optionst::process_goto_program(
                         << messaget::eom;
         return true;
       }
+
+      //make sure that we have an array of elements
+      if(!json.is_array())
+      {
+        messaget message(get_message_handler());
+        message.error() << "expecting an array in the " <<  coverage << " file, but got "
+                        << json << messaget::eom;
+        return true;
+      }
+
+      for(jsont::arrayt::const_iterator
+           it=json.array.begin();
+           it!=json.array.end();
+           it++)
+       {
+    	 //get the goals array
+         if ((*it)["goals"].is_array())
+    	 {
+    	   for(jsont::arrayt::const_iterator
+    	       itg=(*it)["goals"].array.begin();
+    	       itg!=(*it)["goals"].array.end();
+    	       itg++)
+    	   {
+        	 //get the line of each goal
+    	     const unsigned int line=std::stoi((*itg)["sourceLocation"]["line"].value);
+    	   }
+    	 }
+       }
     }
 
     // instrument cover goals
