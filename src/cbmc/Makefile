@@ -27,6 +27,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
+      ../json/json$(LIBEXT) \
       ../util/util$(LIBEXT)
 
 INCLUDES= -I ..
