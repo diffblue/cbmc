@@ -952,9 +952,11 @@ bool cbmc_parse_optionst::process_goto_program(
     // add loop ids
     goto_functions.compute_loop_numbers();
 
-    // instrument non-covered test goals
+    // check existing test goals
     if(cmdline.isset("existing-coverage"))
     {
+      status() << "Check existing coverage goals" << eom;
+
       //get file with covered test goals
       const std::string coverage=cmdline.get_value("existing-coverage");
 
@@ -992,7 +994,8 @@ bool cbmc_parse_optionst::process_goto_program(
     	       itg++)
     	   {
         	 //get the line of each goal
-    	     const unsigned int line=std::stoi((*itg)["sourceLocation"]["line"].value);
+    	     const std::string line=(*itg)["sourceLocation"]["line"].value;
+    	     set_existing_goals(line);
     	   }
     	 }
        }
