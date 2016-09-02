@@ -50,6 +50,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
+#include <json/json_parser.h>
+
 #include "cbmc_solvers.h"
 #include "cbmc_parse_options.h"
 #include "bmc.h"
@@ -458,6 +460,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("graphml-cex"))
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
+
+  if(cmdline.isset("existing-coverage"))
+    options.set_option("existing-coverage", cmdline.get_value("existing-coverage"));
+
 }
 
 /*******************************************************************\
@@ -945,7 +951,25 @@ bool cbmc_parse_optionst::process_goto_program(
     
     // add loop ids
     goto_functions.compute_loop_numbers();
-    
+
+    // instrument non-covered test goals
+    if(cmdline.isset("existing-coverage"))
+    {
+      //get file with covered test goals
+      const std::string coverage=cmdline.get_value("existing-coverage");
+
+      jsont json;
+
+      //check coverage file
+      if(parse_json(coverage, get_message_handler(), json))
+      {
+        messaget message(get_message_handler());
+        message.error() << coverage << " file is not a valid json file"
+                        << messaget::eom;
+        return true;
+      }
+    }
+
     // instrument cover goals
     
     if(cmdline.isset("cover"))
