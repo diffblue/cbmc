@@ -19,6 +19,8 @@
 static int isatty(int) { return 0; }
 #endif
 
+#include <util/unicode.h>
+
 #include "c_types.h"
 #include "preprocessor_line.h"
 #include "string_constant.h"
@@ -27,6 +29,7 @@ static int isatty(int) { return 0; }
 #include "literals/convert_integer_literal.h"
 #include "literals/convert_character_literal.h"
 #include "literals/convert_string_literal.h"
+#include "literals/unescape_string.h"
 
 #define PARSER ansi_c_parser
 #define YYSTYPE unsigned
@@ -45,9 +48,34 @@ extern int yyansi_cdebug;
 int make_identifier()
 {
   loc();
-
+  
+  // deal with universal identifiers
+  std::string final_identifier;
+  final_identifier.reserve(yyleng);
+  
+  for(const char *p=yytext; *p!=0; p++)
+  {
+    if(p[0]=='\\' && (p[1]=='u' || p[1]=='U'))
+    {
+      p++;
+      unsigned digits=(*p=='u')?4:8;
+      p++;
+      unsigned letter=hex_to_unsigned(p, digits);
+      for(; *p!=0 && digits>0; digits--, p++);
+      
+      std::basic_string<unsigned> utf32;
+      utf32+=letter;
+      
+      // turn into utf-8
+      std::string utf8_value=utf32_to_utf8(utf32);
+      final_identifier+=utf8_value;
+    }
+    else
+      final_identifier+=*p;
+  }
+  
   // this hashes the identifier
-  irep_idt base_name=yytext;
+  irep_idt base_name=final_identifier;
 
   if(PARSER.cpp98)
   {
