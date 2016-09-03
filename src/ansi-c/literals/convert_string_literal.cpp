@@ -29,9 +29,8 @@ Function: convert_one_string_literal
 
 \*******************************************************************/
 
-void convert_one_string_literal(
-  const std::string &src,
-  std::basic_string<unsigned int> &value)
+std::basic_string<unsigned int> convert_one_string_literal(
+  const std::string &src)
 {
   assert(src.size()>=2);
   
@@ -40,7 +39,8 @@ void convert_one_string_literal(
     assert(src[src.size()-1]=='"');
     assert(src[2]=='"');
 
-    unescape_wide_string(std::string(src, 3, src.size()-4), value);
+    std::basic_string<unsigned int> value=
+      unescape_wide_string(std::string(src, 3, src.size()-4));
     
     // turn into utf-8
     std::string utf8_value=utf32_to_utf8(value);
@@ -49,20 +49,23 @@ void convert_one_string_literal(
     value.resize(utf8_value.size());
     for(unsigned i=0; i<utf8_value.size(); i++)
       value[i]=utf8_value[i];
+
+    return value;
   }
   else if(src[0]=='L' || src[0]=='u' || src[0]=='U')
   {
     assert(src[src.size()-1]=='"');
     assert(src[1]=='"');
     
-    unescape_wide_string(std::string(src, 2, src.size()-3), value);
+    return unescape_wide_string(std::string(src, 2, src.size()-3));
   }
   else
   {
     assert(src[0]=='"');
     assert(src[src.size()-1]=='"');
 
-    unescape_wide_string(std::string(src, 1, src.size()-2), value);
+    std::basic_string<unsigned int> value=
+      unescape_wide_string(std::string(src, 1, src.size()-2));
 
     // turn into utf-8
     std::string utf8_value=utf32_to_utf8(value);
@@ -71,6 +74,8 @@ void convert_one_string_literal(
     value.resize(utf8_value.size());
     for(unsigned i=0; i<utf8_value.size(); i++)
       value[i]=utf8_value[i];
+
+    return value;
   }
 }
 
@@ -124,8 +129,8 @@ exprt convert_string_literal(const std::string &src)
     if(j<src.size())
     {
       std::string tmp_src=std::string(src, i, j-i+1);
-      std::basic_string<unsigned int> tmp_value;
-      convert_one_string_literal(tmp_src, tmp_value);
+      std::basic_string<unsigned int> tmp_value=
+        convert_one_string_literal(tmp_src);
       value.append(tmp_value);
       i=j;
     }

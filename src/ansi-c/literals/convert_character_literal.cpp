@@ -42,8 +42,8 @@ exprt convert_character_literal(
     assert(src[1]=='\'');
     assert(src[src.size()-1]=='\'');
   
-    std::basic_string<unsigned int> value;
-    unescape_wide_string(std::string(src, 2, src.size()-3), value);
+    std::basic_string<unsigned int> value=
+      unescape_wide_string(std::string(src, 2, src.size()-3));
     
     // L is wchar_t, u is char16_t, U is char32_t
     typet type=wchar_t_type();
@@ -79,8 +79,8 @@ exprt convert_character_literal(
     assert(src[0]=='\'');
     assert(src[src.size()-1]=='\'');
 
-    std::string value;
-    unescape_string(std::string(src, 1, src.size()-2), value);
+    std::string value=
+      unescape_string(std::string(src, 1, src.size()-2));
 
     if(value.empty())
       throw "empty character literal";
