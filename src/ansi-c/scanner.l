@@ -62,6 +62,7 @@ int make_identifier()
       p++;
       unsigned letter=hex_to_unsigned(p, digits);
       for(; *p!=0 && digits>0; digits--, p++);
+      p--; // go back for p++ later
       
       std::basic_string<unsigned> utf32;
       utf32+=letter;
