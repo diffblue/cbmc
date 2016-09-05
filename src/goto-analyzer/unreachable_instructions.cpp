@@ -223,7 +223,7 @@ void unreachable_instructions(
 
 /*******************************************************************\
 
-Function: output_unreachable_function
+Function: json_output_function
 
   Inputs:
 
@@ -233,7 +233,7 @@ Function: output_unreachable_function
 
 \*******************************************************************/
 
-static void json_output_unreachable_function(
+static void json_output_function(
   const irep_idt &function,
   const source_locationt &first_location,
   const source_locationt &last_location,
@@ -254,7 +254,7 @@ static void json_output_unreachable_function(
 
 /*******************************************************************\
 
-Function: unreachable_functions
+Function: list_functions
 
   Inputs:
 
@@ -264,10 +264,11 @@ Function: unreachable_functions
 
 \*******************************************************************/
 
-void unreachable_functions(
+static void list_functions(
   const goto_modelt &goto_model,
   const bool json,
-  std::ostream &os)
+  std::ostream &os,
+  bool unreachable)
 {
   json_arrayt json_result;
 
@@ -282,8 +283,9 @@ void unreachable_functions(
 
     // f_it->first may be a link-time renamed version, use the
     // base_name instead; do not list inlined functions
-    if(called.find(decl.base_name)!=called.end() ||
-       f_it->second.is_inlined())
+    if(unreachable ==
+       (called.find(decl.base_name)!=called.end() ||
+        f_it->second.is_inlined()))
       continue;
 
     source_locationt first_location=decl.location;
@@ -315,7 +317,7 @@ void unreachable_functions(
          << last_location.get_line() << "\n";
     }
     else
-      json_output_unreachable_function(
+      json_output_function(
         decl.base_name,
         first_location,
         last_location,
@@ -324,4 +326,44 @@ void unreachable_functions(
 
   if(json && !json_result.array.empty())
     os << json_result << std::endl;
+}
+
+/*******************************************************************\
+
+Function: unreachable_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void unreachable_functions(
+  const goto_modelt &goto_model,
+  const bool json,
+  std::ostream &os)
+{
+  list_functions(goto_model, json, os, true);
+}
+
+/*******************************************************************\
+
+Function: reachable_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void reachable_functions(
+  const goto_modelt &goto_model,
+  const bool json,
+  std::ostream &os)
+{
+  list_functions(goto_model, json, os, false);
 }

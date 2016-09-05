@@ -289,6 +289,30 @@ int goto_analyzer_parse_optionst::doit()
     return 0;
   }
 
+  if(cmdline.isset("reachable-functions"))
+  {
+    const std::string json_file=cmdline.get_value("json");
+
+    if(json_file.empty())
+      reachable_functions(goto_model, false, std::cout);
+    else if(json_file=="-")
+      reachable_functions(goto_model, true, std::cout);
+    else
+    {
+      std::ofstream ofs(json_file);
+      if(!ofs)
+      {
+        error() << "Failed to open json output `"
+                << json_file << "'" << eom;
+        return 6;
+      }
+
+      reachable_functions(goto_model, true, ofs);
+    }
+
+    return 0;
+  }
+
   if(cmdline.isset("show-local-may-alias"))
   {
     namespacet ns(goto_model.symbol_table);
@@ -515,6 +539,8 @@ void goto_analyzer_parse_optionst::help()
     " --unreachable-instructions   list dead code\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --unreachable-functions      list functions unreachable from the entry point\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --reachable-functions        list functions reachable from the entry point\n"
     " --intervals                  interval analysis\n"
     " --non-null                   non-null analysis\n"
     "\n"
