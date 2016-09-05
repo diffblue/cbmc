@@ -1,0 +1,485 @@
+[
+{
+  "program": "CBMC 5.5"
+},
+{
+  "messageText": "CBMC version 5.5 64-bit x86_64 linux",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Parsing if_expr1.class",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Java main class: if_expr1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "failed to load class `java.lang.String'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "failed to load class `java.io.IOException'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "failed to load class `java.lang.Class'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "failed to load class `java.lang.AssertionError'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "failed to load class `java.lang.System'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "failed to load class `java.io.InputStream'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "failed to load class `java.lang.Object'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "Converting",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generating GOTO Program",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Adding CPROVER library (x86_64)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Removal of function pointers and virtual functions",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Partial Inlining",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generic Property Instrumentation",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Instrumenting coverage goals",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Starting Bounded Model Checking",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "**** WARNING: no body for function java::java.lang.Class.desiredAssertionStatus:()Z",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "**** WARNING: no body for function java::java.io.InputStream.read:()I",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "**** WARNING: no body for function java::java.lang.AssertionError.<init>:()V",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "size of program expression: 110 steps",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generated 19 VCC(s), 19 remaining after simplification",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Passing problem to propositional reduction",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "converting SSA",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Aiming to cover 20 goal(s)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Running propositional reduction",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Post-processing",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "1418 variables, 2976 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker: instance is SATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 2",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 4",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 5",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 10",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 11",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 14",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 2",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 4",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 5",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "1418 variables, 39 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker: instance is SATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 3",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "1418 variables, 22 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker: instance is SATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 3",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 6",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "1418 variables, 2 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker: instance is SATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 7",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "1418 variables, 0 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker inconsistent: instance is UNSATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Runtime decision procedure: 0.014s",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "goals": [
+    {
+      "description": "block 1",
+      "goal": "coverage.1",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "1"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 1",
+      "goal": "coverage.2",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "5"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 2",
+      "goal": "coverage.3",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "5"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 3",
+      "goal": "coverage.4",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "6"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 4",
+      "goal": "coverage.5",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "6"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 5",
+      "goal": "coverage.6",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "6"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 6",
+      "goal": "coverage.7",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "8"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 7",
+      "goal": "coverage.8",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "8"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 8",
+      "goal": "coverage.9",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "8"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 9",
+      "goal": "coverage.10",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "8"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 10",
+      "goal": "coverage.11",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "10"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 11",
+      "goal": "coverage.12",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "10"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 12",
+      "goal": "coverage.13",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "10"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 13",
+      "goal": "coverage.14",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "10"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 14",
+      "goal": "coverage.15",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "11"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 1",
+      "goal": "coverage.16",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "1"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 2",
+      "goal": "coverage.17",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "1"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 3",
+      "goal": "coverage.18",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "1"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 4",
+      "goal": "coverage.19",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "1"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 5",
+      "goal": "coverage.20",
+      "sourceLocation": {
+        "file": "if_expr1.java",
+        "line": "1"
+      },
+      "status": "satisfied"
+    }
+  ],
+  "goalsCovered": 15,
+  "tests": [
+    {
+      "coveredGoals": [ "coverage.2", "coverage.3", "coverage.5", "coverage.6", "coverage.11", "coverage.12", "coverage.15", "coverage.16", "coverage.17", "coverage.19", "coverage.20" ],
+      "inputs": [
+        {
+          "id": "arg0a",
+          "value": {
+            "binary": "0000001000000000000000000000000000000000000000000000000000000000",
+            "name": "pointer"
+          }
+        }
+      ]
+    },
+    {
+      "coveredGoals": [ "coverage.18" ],
+      "inputs": [
+        {
+          "id": "arg0a",
+          "value": {
+            "binary": "0000001000000000000000000000000000000000000000000000000000000000",
+            "name": "pointer"
+          }
+        }
+      ]
+    },
+    {
+      "coveredGoals": [ "coverage.4", "coverage.7" ],
+      "inputs": [
+        {
+          "id": "arg0a",
+          "value": {
+            "binary": "0000001000000000000000000000000000000000000000000000000000000000",
+            "name": "pointer"
+          }
+        }
+      ]
+    },
+    {
+      "coveredGoals": [ "coverage.8" ],
+      "inputs": [
+        {
+          "id": "arg0a",
+          "value": {
+            "binary": "0000001000000000000000000000000000000000000000000000000000000000",
+            "name": "pointer"
+          }
+        }
+      ]
+    }
+  ],
+  "totalGoals": 20
+},
+{
+  "messageText": "** 15 of 20 covered (75.0%)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "** Used 5 iterations",
+  "messageType": "STATUS-MESSAGE"
+}
+]
