@@ -95,7 +95,7 @@ Function: coverage_goals::get_goals
 
 \*******************************************************************/
 
-bool coverage_goals::get_goals(const char* goal)
+bool coverage_goals::is_existing_goal(const char* goal)
 {
   std::vector<std::string>::iterator it;
   it = find (existing_goals.begin(), existing_goals.end(), goal);
@@ -1163,7 +1163,7 @@ void instrument_cover_goals(
             basic_blocks.source_location_map[block_nr];
           
           //check whether the current goal already exists
-          if(goals.get_goals(source_location.get_line().c_str()) &&
+          if(goals.is_existing_goal(source_location.get_line().c_str()) &&
         	 !source_location.get_file().empty() &&
              source_location.get_file()[0]!='<')
           {
