@@ -867,7 +867,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
   coverage_criteriont criterion,
-  coverage_goals &goals)
+  coverage_goalst &goals)
 {
   const namespacet ns(symbol_table);
   basic_blockst basic_blocks(goto_program);
@@ -938,7 +938,7 @@ void instrument_cover_goals(
              !source_location.is_built_in())
 =======
           //check whether the current goal already exists
-          if(goals.get_goals(source_location.get_line().c_str()) &&
+          if(goals.is_existing_goal(source_location.get_line().c_str()) &&
 		 !source_location.get_file().empty() &&
              source_location.get_file()[0]!='<')
 >>>>>>> generate goals only if they do not exist in the json file
@@ -1183,7 +1183,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   coverage_criteriont criterion,
-  coverage_goals &goals)
+  coverage_goalst &goals)
 {
   Forall_goto_functions(f_it, goto_functions)
   {
