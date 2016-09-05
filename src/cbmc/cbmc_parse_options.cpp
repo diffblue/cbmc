@@ -952,55 +952,6 @@ bool cbmc_parse_optionst::process_goto_program(
     // add loop ids
     goto_functions.compute_loop_numbers();
 
-    // check existing test goals
-    if(cmdline.isset("existing-coverage"))
-    {
-      status() << "Check existing coverage goals" << eom;
-
-      //get file with covered test goals
-      const std::string coverage=cmdline.get_value("existing-coverage");
-
-      jsont json;
-
-      //check coverage file
-      if(parse_json(coverage, get_message_handler(), json))
-      {
-        messaget message(get_message_handler());
-        message.error() << coverage << " file is not a valid json file"
-                        << messaget::eom;
-        return true;
-      }
-
-      //make sure that we have an array of elements
-      if(!json.is_array())
-      {
-        messaget message(get_message_handler());
-        message.error() << "expecting an array in the " <<  coverage << " file, but got "
-                        << json << messaget::eom;
-        return true;
-      }
-
-      for(jsont::arrayt::const_iterator
-           it=json.array.begin();
-           it!=json.array.end();
-           it++)
-       {
-    	 //get the goals array
-         if ((*it)["goals"].is_array())
-    	 {
-    	   for(jsont::arrayt::const_iterator
-    	       itg=(*it)["goals"].array.begin();
-    	       itg!=(*it)["goals"].array.end();
-    	       itg++)
-    	   {
-        	 //get the line of each goal
-    	     const std::string line=(*itg)["sourceLocation"]["line"].value;
-    	     set_existing_goals(line);
-    	   }
-    	 }
-       }
-    }
-
     // instrument cover goals
     
     if(cmdline.isset("cover"))
@@ -1030,9 +981,58 @@ bool cbmc_parse_optionst::process_goto_program(
         error() << "unknown coverage criterion" << eom;
         return true;
       }
-          
+
+      // check existing test goals
+      coverage_goals goals;
+      if(cmdline.isset("existing-coverage"))
+      {
+        status() << "Check existing coverage goals" << eom;
+
+        //get file with covered test goals
+        const std::string coverage=cmdline.get_value("existing-coverage");
+
+        jsont json;
+
+        //check coverage file
+        if(parse_json(coverage, get_message_handler(), json))
+        {
+          messaget message(get_message_handler());
+          message.error() << coverage << " file is not a valid json file"
+                          << messaget::eom;
+          return true;
+        }
+
+        //make sure that we have an array of elements
+        if(!json.is_array())
+        {
+          messaget message(get_message_handler());
+          message.error() << "expecting an array in the " <<  coverage << " file, but got "
+                          << json << messaget::eom;
+          return true;
+        }
+
+        for(jsont::arrayt::const_iterator
+             it=json.array.begin();
+             it!=json.array.end();
+             it++)
+        {
+      	 //get the goals array
+           if ((*it)["goals"].is_array())
+      	   {
+      	     for(jsont::arrayt::const_iterator
+      	       itg=(*it)["goals"].array.begin();
+      	       itg!=(*it)["goals"].array.end();
+      	       itg++)
+      	    {
+          	  //get the line of each goal
+      	      const std::string line=(*itg)["sourceLocation"]["line"].value;
+      	      goals.set_goals(line);
+      	    }
+      	  }
+        }
+      }
       status() << "Instrumenting coverage goals" << eom;
-      instrument_cover_goals(symbol_table, goto_functions, c);
+      instrument_cover_goals(symbol_table, goto_functions, c, goals);
       goto_functions.update();
     }
 
