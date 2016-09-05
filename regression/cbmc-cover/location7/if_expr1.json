@@ -367,15 +367,6 @@
       "status": "failed"
     },
     {
-      "description": "block 14",
-      "goal": "coverage.15",
-      "sourceLocation": {
-        "file": "if_expr1.java",
-        "line": "11"
-      },
-      "status": "satisfied"
-    },
-    {
       "description": "block 1",
       "goal": "coverage.16",
       "sourceLocation": {

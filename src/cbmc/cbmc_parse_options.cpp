@@ -1024,7 +1024,7 @@ bool cbmc_parse_optionst::process_goto_program(
       	       itg!=(*it)["goals"].array.end();
       	       itg++)
       	    {
-          	  //get the line of each goal
+          	  //get the line of each existing goal
       	      const std::string line=(*itg)["sourceLocation"]["line"].value;
       	      goals.set_goals(line);
       	    }
