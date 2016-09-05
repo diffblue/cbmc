@@ -17,7 +17,7 @@ class coverage_goals
 {
 public:
 	void set_goals(std::string goal);
-	const bool get_goals(const char* goal);
+	bool get_goals(const char* goal);
 
 private:
 	std::vector<std::string> existing_goals;

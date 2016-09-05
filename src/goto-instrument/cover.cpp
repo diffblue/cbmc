@@ -95,7 +95,7 @@ Function: coverage_goals::get_goals
 
 \*******************************************************************/
 
-const bool coverage_goals::get_goals(const char* goal)
+bool coverage_goals::get_goals(const char* goal)
 {
   std::vector<std::string>::iterator it;
   it = find (existing_goals.begin(), existing_goals.end(), goal);
