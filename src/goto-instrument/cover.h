@@ -16,11 +16,11 @@ Date: May 2016
 class coverage_goals
 {
 public:
-	void set_goals(std::string goal);
-	bool get_goals(const char* goal);
+  void set_goals(std::string goal);
+  bool is_existing_goal(const char* goal);
 
 private:
-	std::vector<std::string> existing_goals;
+  std::vector<std::string> existing_goals;
 };
 
 enum class coverage_criteriont {
