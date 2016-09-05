@@ -103,7 +103,7 @@ bool coverage_goals::get_goals(const char* goal)
   if(it == existing_goals.end())
     return true;
   else
-	return false;
+    return false;
 }
 
 
