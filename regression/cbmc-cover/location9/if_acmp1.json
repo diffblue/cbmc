@@ -1,0 +1,855 @@
+[
+{
+  "program": "CBMC 5.5"
+},
+{
+  "messageText": "CBMC version 5.5 64-bit x86_64 linux",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Parsing if_acmp1.class",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Java main class: if_acmp1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "failed to load class `java.lang.String'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "failed to load class `java.lang.Class'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "failed to load class `java.lang.AssertionError'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "failed to load class `java.lang.Object'",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "Converting",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generating GOTO Program",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Adding CPROVER library (x86_64)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Removal of function pointers and virtual functions",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Partial Inlining",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generic Property Instrumentation",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Instrumenting coverage goals",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Starting Bounded Model Checking",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "**** WARNING: no body for function java::java.lang.Class.desiredAssertionStatus:()Z",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "**** WARNING: no body for function java::java.lang.Object.<init>:()V",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "size of program expression: 223 steps",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generated 42 VCC(s), 42 remaining after simplification",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Passing problem to propositional reduction",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "converting SSA",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Aiming to cover 61 goal(s)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Running propositional reduction",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Post-processing",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "1525 variables, 191 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker: instance is SATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 2",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 2",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 3",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 4",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 5",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 6",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 10",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 14",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 18",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 22",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 26",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 30",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 34",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 38",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 42",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 46",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 47",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 51",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 2",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 3",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 5",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "1525 variables, 25 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker: instance is SATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 7",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 11",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 15",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 19",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 23",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 27",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 31",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 35",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 39",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 43",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 48",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 4",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "1525 variables, 25 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker inconsistent: instance is UNSATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Runtime decision procedure: 0.011s",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "goals": [
+    {
+      "description": "block 1",
+      "goal": "coverage.1",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "4"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 1",
+      "goal": "coverage.2",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "1"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 1",
+      "goal": "coverage.3",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "10"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 2",
+      "goal": "coverage.4",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "10"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 1",
+      "goal": "coverage.5",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "7"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 1",
+      "goal": "coverage.6",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "15"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 2",
+      "goal": "coverage.7",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "15"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 4",
+      "goal": "coverage.9",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "17"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 7",
+      "goal": "coverage.12",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "20"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 8",
+      "goal": "coverage.13",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "20"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 9",
+      "goal": "coverage.14",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "20"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 10",
+      "goal": "coverage.15",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "21"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 11",
+      "goal": "coverage.16",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "21"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 12",
+      "goal": "coverage.17",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "21"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 13",
+      "goal": "coverage.18",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "21"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 14",
+      "goal": "coverage.19",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "22"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 15",
+      "goal": "coverage.20",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "22"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 16",
+      "goal": "coverage.21",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "22"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 17",
+      "goal": "coverage.22",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "22"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 18",
+      "goal": "coverage.23",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "23"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 19",
+      "goal": "coverage.24",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "23"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 20",
+      "goal": "coverage.25",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "23"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 21",
+      "goal": "coverage.26",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "23"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 22",
+      "goal": "coverage.27",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "24"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 23",
+      "goal": "coverage.28",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "24"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 24",
+      "goal": "coverage.29",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "24"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 25",
+      "goal": "coverage.30",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "24"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 26",
+      "goal": "coverage.31",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "25"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 27",
+      "goal": "coverage.32",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "25"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 28",
+      "goal": "coverage.33",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "25"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 29",
+      "goal": "coverage.34",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "25"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 30",
+      "goal": "coverage.35",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "26"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 31",
+      "goal": "coverage.36",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "26"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 32",
+      "goal": "coverage.37",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "26"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 33",
+      "goal": "coverage.38",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "26"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 34",
+      "goal": "coverage.39",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "27"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 35",
+      "goal": "coverage.40",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "27"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 36",
+      "goal": "coverage.41",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "27"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 37",
+      "goal": "coverage.42",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "27"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 38",
+      "goal": "coverage.43",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "28"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 39",
+      "goal": "coverage.44",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "28"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 40",
+      "goal": "coverage.45",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "28"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 41",
+      "goal": "coverage.46",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "28"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 42",
+      "goal": "coverage.47",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "29"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 43",
+      "goal": "coverage.48",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "30"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 44",
+      "goal": "coverage.49",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "30"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 45",
+      "goal": "coverage.50",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "30"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 46",
+      "goal": "coverage.51",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "31"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 47",
+      "goal": "coverage.52",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "31"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 48",
+      "goal": "coverage.53",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "34"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 49",
+      "goal": "coverage.54",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "34"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 50",
+      "goal": "coverage.55",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "34"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 51",
+      "goal": "coverage.56",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "35"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 1",
+      "goal": "coverage.57",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "7"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 2",
+      "goal": "coverage.58",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "7"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 3",
+      "goal": "coverage.59",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "7"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 4",
+      "goal": "coverage.60",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "7"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 5",
+      "goal": "coverage.61",
+      "sourceLocation": {
+        "file": "if_acmp1.java",
+        "line": "7"
+      },
+      "status": "satisfied"
+    }
+  ],
+  "goalsCovered": 38,
+  "tests": [
+    {
+      "coveredGoals": [ "coverage.1", "coverage.2", "coverage.3", "coverage.4", "coverage.6", "coverage.7", "coverage.8", "coverage.9", "coverage.10", "coverage.11", "coverage.15", "coverage.19", "coverage.23", "coverage.27", "coverage.31", "coverage.35", "coverage.39", "coverage.43", "coverage.47", "coverage.51", "coverage.52", "coverage.56", "coverage.57", "coverage.58", "coverage.59", "coverage.61" ],
+      "inputs": [
+        {
+          "id": "arg0a",
+          "value": {
+            "binary": "0000001000000000000000000000000000000000000000000000000000000000",
+            "name": "pointer"
+          }
+        }
+      ]
+    },
+    {
+      "coveredGoals": [ "coverage.12", "coverage.16", "coverage.20", "coverage.24", "coverage.28", "coverage.32", "coverage.36", "coverage.40", "coverage.44", "coverage.48", "coverage.53", "coverage.60" ],
+      "inputs": [
+        {
+          "id": "arg0a",
+          "value": {
+            "binary": "0000001000000000000000000000000000000000000000000000000000000000",
+            "name": "pointer"
+          }
+        }
+      ]
+    }
+  ],
+  "totalGoals": 61
+},
+{
+  "messageText": "** 38 of 61 covered (62.3%)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "** Used 3 iterations",
+  "messageType": "STATUS-MESSAGE"
+}
+]

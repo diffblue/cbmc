@@ -1,0 +1,11 @@
+CORE
+if_acmp1.class
+--cover location --existing-coverage if_acmp1.json
+^EXIT=0$
+^SIGNAL=0$
+^\[coverage.1\] file if_acmp1.java line 16 block 3: SATISFIED$
+^\[coverage.2\] file if_acmp1.java line 18 block 5: SATISFIED$
+^\[coverage.3\] file if_acmp1.java line 19 block 6: SATISFIED$
+^\*\* 3 of 3 covered (100.0%)
+--
+^warning: ignoring
