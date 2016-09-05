@@ -1,0 +1,633 @@
+[
+{
+  "program": "CBMC 5.5"
+},
+{
+  "messageText": "CBMC version 5.5 64-bit x86_64 linux",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Parsing main.c",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "<command-line>:0:0: warning: \"__STDC_VERSION__\" redefined",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "<built-in>: note: this is the location of the previous definition",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "Parsing single-linked-list.c",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "<command-line>:0:0: warning: \"__STDC_VERSION__\" redefined",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "<built-in>: note: this is the location of the previous definition",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "Converting",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Type-checking main",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Type-checking single-linked-list",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generating GOTO Program",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Adding CPROVER library (x86_64)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "<command-line>:0:0: warning: \"__STDC_VERSION__\" redefined",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "<built-in>: note: this is the location of the previous definition",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "Removal of function pointers and virtual functions",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Partial Inlining",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generic Property Instrumentation",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Instrumenting coverage goals",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Starting Bounded Model Checking",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Unwinding loop main.0 iteration 1 (2 max) file main.c line 19 function main thread 0",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Not unwinding loop main.0 iteration 2 (2 max) file main.c line 19 function main thread 0",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Unwinding loop search_list.0 iteration 1 (2 max) file single-linked-list.c line 10 function search_list thread 0",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Not unwinding loop search_list.0 iteration 2 (2 max) file single-linked-list.c line 10 function search_list thread 0",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Unwinding loop delete_list.0 iteration 1 (2 max) file single-linked-list.c line 23 function delete_list thread 0",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Not unwinding loop delete_list.0 iteration 2 (2 max) file single-linked-list.c line 23 function delete_list thread 0",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Unwinding loop main.1 iteration 1 (2 max) file main.c line 35 function main thread 0",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Not unwinding loop main.1 iteration 2 (2 max) file main.c line 35 function main thread 0",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "size of program expression: 358 steps",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generated 57 VCC(s), 57 remaining after simplification",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Passing problem to propositional reduction",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "converting SSA",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Aiming to cover 40 goal(s)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Running propositional reduction",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Post-processing",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "3368 variables, 1698 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker: instance is SATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 2",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 3",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 4",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 5",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 6",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 7",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 2",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 3",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 4",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "3368 variables, 0 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker inconsistent: instance is UNSATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Runtime decision procedure: 0.007s",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "goals": [
+    {
+      "description": "free called for new[] object",
+      "goal": "",
+      "sourceLocation": {
+        "file": "<builtin-library-free>",
+        "function": "free",
+        "line": "22"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 1",
+      "goal": "main.coverage.1",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "8"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 2",
+      "goal": "main.coverage.2",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "12"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 3",
+      "goal": "main.coverage.3",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "13"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 4",
+      "goal": "main.coverage.4",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "14"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 5",
+      "goal": "main.coverage.5",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "16"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 6",
+      "goal": "main.coverage.6",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "19"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 7",
+      "goal": "main.coverage.7",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "21"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 8",
+      "goal": "main.coverage.8",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "24"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 9",
+      "goal": "main.coverage.9",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "26"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 10",
+      "goal": "main.coverage.10",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "30"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 11",
+      "goal": "main.coverage.11",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "32"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 12",
+      "goal": "main.coverage.12",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "35"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 13",
+      "goal": "main.coverage.13",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "37"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 14",
+      "goal": "main.coverage.14",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "40"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 1",
+      "goal": "search_list.coverage.1",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "search_list",
+        "line": "9"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 2",
+      "goal": "search_list.coverage.2",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "search_list",
+        "line": "10"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 3",
+      "goal": "search_list.coverage.3",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "search_list",
+        "line": "10"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 4",
+      "goal": "search_list.coverage.4",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "search_list",
+        "line": "10"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 5",
+      "goal": "search_list.coverage.5",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "search_list",
+        "line": "10"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 6",
+      "goal": "search_list.coverage.6",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "search_list",
+        "line": "10"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 7",
+      "goal": "search_list.coverage.7",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "search_list",
+        "line": "15"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 1",
+      "goal": "delete_list.coverage.1",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "19"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 2",
+      "goal": "delete_list.coverage.2",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "23"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 3",
+      "goal": "delete_list.coverage.3",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "24"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 4",
+      "goal": "delete_list.coverage.4",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "25"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 5",
+      "goal": "delete_list.coverage.5",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "29"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 6",
+      "goal": "delete_list.coverage.6",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "31"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 7",
+      "goal": "delete_list.coverage.7",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "31"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 8",
+      "goal": "delete_list.coverage.8",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "31"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 9",
+      "goal": "delete_list.coverage.9",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "31"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 10",
+      "goal": "delete_list.coverage.10",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "31"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 11",
+      "goal": "delete_list.coverage.11",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "31"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 12",
+      "goal": "delete_list.coverage.12",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "31"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 13",
+      "goal": "delete_list.coverage.13",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "31"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 14",
+      "goal": "delete_list.coverage.14",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "delete_list",
+        "line": "31"
+      },
+      "status": "failed"
+    },
+    {
+      "description": "block 1",
+      "goal": "insert_list.coverage.1",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "insert_list",
+        "line": "37"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 2",
+      "goal": "insert_list.coverage.2",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "insert_list",
+        "line": "40"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 3",
+      "goal": "insert_list.coverage.3",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "insert_list",
+        "line": "45"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 4",
+      "goal": "insert_list.coverage.4",
+      "sourceLocation": {
+        "file": "single-linked-list.c",
+        "function": "insert_list",
+        "line": "48"
+      },
+      "status": "satisfied"
+    }
+  ],
+  "goalsCovered": 11,
+  "tests": [
+    {
+      "coveredGoals": [ "main.coverage.1", "main.coverage.2", "main.coverage.3", "main.coverage.4", "main.coverage.5", "main.coverage.6", "main.coverage.7", "insert_list.coverage.1", "insert_list.coverage.2", "insert_list.coverage.3", "insert_list.coverage.4" ],
+      "inputs": [ ]
+    }
+  ],
+  "totalGoals": 40
+},
+{
+  "messageText": "** 11 of 40 covered (27.5%)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "** Used 2 iterations",
+  "messageType": "STATUS-MESSAGE"
+}
+]
