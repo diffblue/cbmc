@@ -1,0 +1,187 @@
+[
+{
+  "program": "CBMC 5.5"
+},
+{
+  "messageText": "CBMC version 5.5 64-bit x86_64 linux",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Parsing main.c",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "<command-line>:0:0: warning: \"__STDC_VERSION__\" redefined",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "<built-in>: note: this is the location of the previous definition",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "Converting",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Type-checking main",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "function `assert' is not declared",
+  "messageType": "WARNING"
+},
+{
+  "messageText": "Generating GOTO Program",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Adding CPROVER library (x86_64)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Removal of function pointers and virtual functions",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Partial Inlining",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generic Property Instrumentation",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Instrumenting coverage goals",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Starting Bounded Model Checking",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "size of program expression: 45 steps",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Generated 4 VCC(s), 4 remaining after simplification",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Passing problem to propositional reduction",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "converting SSA",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Aiming to cover 4 goal(s)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Running propositional reduction",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Post-processing",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "265 variables, 522 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker: instance is SATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 1",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 3",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 4",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Solving with MiniSAT 2.2.1 with simplifier",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "265 variables, 0 clauses",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "SAT checker: instance is SATISFIABLE",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Covered block 2",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "Runtime decision procedure: 0.001s",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "goals": [
+    {
+      "description": "block 1",
+      "goal": "main.coverage.1",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "3"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 2",
+      "goal": "main.coverage.2",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "8"
+      },
+      "status": "satisfied"
+    },
+    {
+      "description": "block 4",
+      "goal": "main.coverage.4",
+      "sourceLocation": {
+        "file": "main.c",
+        "function": "main",
+        "line": "12"
+      },
+      "status": "satisfied"
+    }
+  ],
+  "goalsCovered": 4,
+  "tests": [
+    {
+      "coveredGoals": [ "main.coverage.1", "main.coverage.3", "main.coverage.4" ],
+      "inputs": [ ]
+    },
+    {
+      "coveredGoals": [ "main.coverage.2" ],
+      "inputs": [ ]
+    }
+  ],
+  "totalGoals": 4
+},
+{
+  "messageText": "** 4 of 4 covered (100.0%)",
+  "messageType": "STATUS-MESSAGE"
+},
+{
+  "messageText": "** Used 2 iterations",
+  "messageType": "STATUS-MESSAGE"
+}
+]
