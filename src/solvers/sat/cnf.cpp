@@ -55,7 +55,7 @@ Function: cnft::gate_and
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of conjunction of two literals
 
 \*******************************************************************/
 
@@ -88,7 +88,7 @@ Function: cnft::gate_or
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of disjunction of two literals
 
 \*******************************************************************/
 
@@ -120,7 +120,7 @@ Function: cnft::gate_xor
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of XOR of two literals
 
 \*******************************************************************/
 
@@ -161,7 +161,7 @@ Function: cnft::gate_nand
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of NAND of two literals
 
 \*******************************************************************/
 
@@ -193,7 +193,7 @@ Function: cnft::gate_nor
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of NOR of two literals
 
 \*******************************************************************/
 
@@ -225,7 +225,7 @@ Function: cnft::gate_equal
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of equality between two literals
 
 \*******************************************************************/
 
@@ -242,7 +242,7 @@ Function: cnft::gate_implies
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of implication between two literals
 
 \*******************************************************************/
 
@@ -259,7 +259,7 @@ Function: cnft::land
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of conjunction between multiple literals
 
 \*******************************************************************/
 
@@ -310,7 +310,7 @@ Function: cnft::lor
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of disjunction between multiple literals
 
 \*******************************************************************/
 
@@ -361,7 +361,7 @@ Function: cnft::lxor
 
  Outputs:
 
- Purpose:
+ Purpose: Tseitin encoding of XOR between multiple literals
 
 \*******************************************************************/
 
@@ -387,7 +387,7 @@ Function: cnft::land
 
  Outputs:
 
- Purpose:
+ Purpose: 
 
 \*******************************************************************/
 
@@ -583,7 +583,7 @@ Function: cnft::new_variable
 
  Outputs:
 
- Purpose:
+ Purpose: Generate a new variable and return it as a literal
 
 \*******************************************************************/
 
@@ -605,7 +605,7 @@ Function: cnft::eliminate_duplicates
 
  Outputs:
 
- Purpose:
+ Purpose: eliminate duplicates from given vector of literals
 
 \*******************************************************************/
 
@@ -628,7 +628,8 @@ Function: cnft::process_clause
 
  Outputs:
 
- Purpose:
+ Purpose: filter 'true' from clause, eliminate duplicates,
+          recognise trivially satisfied clauses
 
 \*******************************************************************/
 
