@@ -19,14 +19,14 @@ Date: May 2016
 
 class message_handlert;
 
-class coverage_goals
+class coverage_goalst
 {
 public:
-	void set_goals(std::string goal);
-	const bool get_goals(const char* goal);
+  void set_goals(std::string goal);
+  bool is_existing_goal(const char* goal);
 
 private:
-	std::vector<std::string> existing_goals;
+  std::vector<std::string> existing_goals;
 };
 
 enum class coverage_criteriont
@@ -38,13 +38,13 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
   coverage_criteriont,
-  coverage_goals &goals);
+  coverage_goalst &goals);
 
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   coverage_criteriont,
-  coverage_goals &goals);
+  coverage_goalst &goals);
 
 bool instrument_cover_goals(
   const cmdlinet &cmdline,
