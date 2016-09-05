@@ -17,8 +17,6 @@ Date: May 2016
 
 #include "cover.h"
 
-std::vector<std::string> existing_goals;
-
 class basic_blockst
 {
 public:
@@ -70,7 +68,7 @@ public:
 
 /*******************************************************************\
 
-Function: set_existing_goals
+Function: coverage_goals::set_goals
 
   Inputs:
 
@@ -80,10 +78,34 @@ Function: set_existing_goals
 
 \*******************************************************************/
 
-void set_existing_goals(std::string goal)
+void coverage_goals::set_goals(std::string goal)
 {
   existing_goals.push_back(goal);
 }
+
+/*******************************************************************\
+
+Function: coverage_goals::get_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const bool coverage_goals::get_goals(const char* goal)
+{
+  std::vector<std::string>::iterator it;
+  it = find (existing_goals.begin(), existing_goals.end(), goal);
+
+  if(it == existing_goals.end())
+    return true;
+  else
+	return false;
+}
+
 
 /*******************************************************************\
 
@@ -1077,7 +1099,8 @@ Function: instrument_cover_goals
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  coverage_criteriont criterion)
+  coverage_criteriont criterion,
+  coverage_goals &goals)
 {
   const namespacet ns(symbol_table);
   basic_blockst basic_blocks(goto_program);
@@ -1140,11 +1163,7 @@ void instrument_cover_goals(
             basic_blocks.source_location_map[block_nr];
           
           //check whether the current goal already exists
-          std::vector<std::string>::iterator it;
-          it = find (existing_goals.begin(), existing_goals.end(),
-        		  	  source_location.get_line().c_str());
-
-          if(it == existing_goals.end() &&
+          if(goals.get_goals(source_location.get_line().c_str()) &&
         	 !source_location.get_file().empty() &&
              source_location.get_file()[0]!='<')
           {
@@ -1379,7 +1398,8 @@ Function: instrument_cover_goals
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  coverage_criteriont criterion)
+  coverage_criteriont criterion,
+  coverage_goals &goals)
 {
   Forall_goto_functions(f_it, goto_functions)
   {
@@ -1387,6 +1407,7 @@ void instrument_cover_goals(
        f_it->first=="__CPROVER_initialize")
       continue;
       
-    instrument_cover_goals(symbol_table, f_it->second.body, criterion);
+    instrument_cover_goals(symbol_table, f_it->second.body,
+    					   criterion, goals);
   }
 }
