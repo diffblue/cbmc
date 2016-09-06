@@ -50,8 +50,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-#include <json/json_parser.h>
-
 #include "cbmc_solvers.h"
 #include "cbmc_parse_options.h"
 #include "bmc.h"
@@ -990,47 +988,10 @@ bool cbmc_parse_optionst::process_goto_program(
 
         //get file with covered test goals
         const std::string coverage=cmdline.get_value("existing-coverage");
+        goals.get_coverage(coverage,get_message_handler());
 
-        jsont json;
-
-        //check coverage file
-        if(parse_json(coverage, get_message_handler(), json))
-        {
-          messaget message(get_message_handler());
-          message.error() << coverage << " file is not a valid json file"
-                          << messaget::eom;
-          return true;
-        }
-
-        //make sure that we have an array of elements
-        if(!json.is_array())
-        {
-          messaget message(get_message_handler());
-          message.error() << "expecting an array in the " <<  coverage << " file, but got "
-                          << json << messaget::eom;
-          return true;
-        }
-
-        for(jsont::arrayt::const_iterator
-             it=json.array.begin();
-             it!=json.array.end();
-             it++)
-        {
-      	 //get the goals array
-           if ((*it)["goals"].is_array())
-      	   {
-      	     for(jsont::arrayt::const_iterator
-      	       itg=(*it)["goals"].array.begin();
-      	       itg!=(*it)["goals"].array.end();
-      	       itg++)
-      	    {
-          	  //get the line of each existing goal
-      	      const std::string line=(*itg)["sourceLocation"]["line"].value;
-      	      goals.set_goals(line);
-      	    }
-      	  }
-        }
       }
+
       status() << "Instrumenting coverage goals" << eom;
       instrument_cover_goals(symbol_table, goto_functions, c, goals);
       goto_functions.update();
