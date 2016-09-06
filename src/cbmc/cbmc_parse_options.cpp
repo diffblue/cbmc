@@ -980,16 +980,16 @@ bool cbmc_parse_optionst::process_goto_program(
         return true;
       }
 
+
       // check existing test goals
       coverage_goalst goals;
       if(cmdline.isset("existing-coverage"))
       {
         status() << "Check existing coverage goals" << eom;
-
         //get file with covered test goals
         const std::string coverage=cmdline.get_value("existing-coverage");
-        goals.get_coverage(coverage,get_message_handler());
-
+        //get a coverage_goalst object
+        goals = coverage_goalst::get_coverage_goals(coverage,get_message_handler());;
       }
 
       status() << "Instrumenting coverage goals" << eom;
