@@ -16,39 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: cnft::cnft
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-cnft::cnft() :
-  _no_variables(1) // for CNF, we don't use 0 as a matter of principle
-{
-}
-
-/*******************************************************************\
-
-Function: cnft::~cnft
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-cnft::~cnft()
-{
-}
-
-/*******************************************************************\
-
 Function: cnft::gate_and
 
   Inputs:
