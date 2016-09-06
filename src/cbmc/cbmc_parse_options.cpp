@@ -983,7 +983,7 @@ bool cbmc_parse_optionst::process_goto_program(
       }
 
       // check existing test goals
-      coverage_goals goals;
+      coverage_goalst goals;
       if(cmdline.isset("existing-coverage"))
       {
         status() << "Check existing coverage goals" << eom;
