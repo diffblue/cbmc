@@ -16,6 +16,8 @@ Date: May 2016
 #include <util/prefix.h>
 #include <util/string2int.h>
 
+#include <json/json_parser.h>
+
 #include "cover.h"
 
 class basic_blockst
@@ -95,6 +97,62 @@ public:
           << '\n';
   }
 };
+
+/*******************************************************************\
+
+Function: coverage_goalst::get_coverage
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void coverage_goalst::get_coverage(const std::string &coverage,
+                                   message_handlert &message_handler)
+{
+  jsont json;
+
+  //check coverage file
+  if(parse_json(coverage, message_handler, json))
+  {
+    messaget message(message_handler);
+    message.error() << coverage << " file is not a valid json file"
+                    << messaget::eom;
+    exit(0);
+  }
+
+  //make sure that we have an array of elements
+  if(!json.is_array())
+  {
+    messaget message(message_handler);
+    message.error() << "expecting an array in the " <<  coverage << " file, but got "
+                    << json << messaget::eom;
+    exit(0);
+  }
+
+  for(jsont::arrayt::const_iterator
+      it=json.array.begin();
+      it!=json.array.end();
+      it++)
+  {
+    //get the goals array
+    if ((*it)["goals"].is_array())
+	{
+	  for(jsont::arrayt::const_iterator
+	      itg=(*it)["goals"].array.begin();
+	      itg!=(*it)["goals"].array.end();
+	      itg++)
+	  {
+        //get the line of each existing goal
+	    const std::string line=(*itg)["sourceLocation"]["line"].value;
+	    set_goals(line);
+	  }
+	}
+  }
+}
 
 /*******************************************************************\
 
