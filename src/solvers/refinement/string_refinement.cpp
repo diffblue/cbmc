@@ -158,15 +158,11 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      type.id()!=ID_bool)
   {
     if(string_ref_typet::is_unrefined_string_type(type)) {
-      debug() << "boolbv_set_equality_to_true found unrefined string" << eom
-	      << expr.pretty() << eom;
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       make_string(sym,expr.rhs());
       return false;
     }
     else if(type == char_type) {
-      debug() << "boolbv_set_equality_to_true found char type" << eom
-	      << expr.pretty() << eom;
       const bvt &bv1=convert_bv(expr.rhs());
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       const irep_idt &identifier = sym.get_identifier();
@@ -175,8 +171,6 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
       return false;
     } 
     else if(type == java_char_type) {
-      debug() << "boolbv_set_equality_to_true found java char type" << eom
-	      << expr.pretty() << eom;
       const bvt &bv1=convert_bv(expr.rhs());
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       const irep_idt &identifier = sym.get_identifier();
@@ -185,9 +179,7 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
       return false;
     } 
     else { 
-      debug() << "boolbv_set_equality_to_true non string or char: " << eom
-	      << expr.pretty() << eom;
-	return SUB::boolbv_set_equality_to_true(expr);
+      return SUB::boolbv_set_equality_to_true(expr);
     }
   }
 
@@ -741,17 +733,24 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
   //debug() << "string_refinementt::get_array(" << arr.get(ID_identifier) 
   //	  << "," << size.get(ID_value) << ")" << eom;
   exprt val = get(arr);
-  
+  unsignedbv_typet chart;
+  if(arr.type().subtype() == char_type)
+    chart = char_type;
+  else { 
+    assert(arr.type().subtype() == java_char_type);
+    chart = java_char_type;
+  }
+
   if(val.id() == "array-list") {
     exprt ret =
-      array_of_exprt(char_type.zero_expr(), array_typet(char_type, infinity_exprt(index_type)));
+      array_of_exprt(chart.zero_expr(), array_typet(chart, infinity_exprt(index_type)));
     // size));
     
     for (size_t i = 0; i < val.operands().size()/2; i++) {  
       exprt index = val.operands()[i*2];
       assert(index.type() == index_type);
       exprt value = val.operands()[i*2+1];
-      assert(value.type() == char_type);
+      assert(value.type() == char_type || value.type() == java_char_type);
       ret = with_exprt(ret, index, value);
     }
     return ret;
@@ -1095,7 +1094,11 @@ void string_refinementt::update_index_set(const exprt &formula)
 	if(index_set[s].insert(simplified).second)
 	  current_index_set[s].insert(simplified);
       } else {
-	debug() << "update_index_set: index expression of non string" << eom;
+	debug() << "update_index_set: index expression of non string" << eom
+		<< "Warning: concidering it as a string anyway" << eom;
+	const exprt &simplified = simplify_sum(i);
+	if(index_set[s].insert(simplified).second)
+	  current_index_set[s].insert(simplified);
       }
     } else {
       forall_operands(it, cur) {

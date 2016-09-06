@@ -13,6 +13,20 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 // For debuggin
 #include <iostream>
 
+enum {UNDEFINED_MODE, USE_JAVA_STRINGS, USE_C_STRINGS } string_language_mode;
+
+void ensure_java_strings(){
+  if(string_language_mode == UNDEFINED_MODE)
+    string_language_mode = USE_JAVA_STRINGS;
+  assert(string_language_mode == USE_JAVA_STRINGS);
+}
+    
+void ensure_c_strings(){
+  if(string_language_mode == UNDEFINED_MODE)
+    string_language_mode = USE_C_STRINGS;
+  assert(string_language_mode == USE_C_STRINGS);
+}
+
 string_ref_typet::string_ref_typet() : struct_typet() {
   components().resize(2);
   components()[0].set_name("length");
@@ -74,6 +88,8 @@ bool string_ref_typet::is_java_string_type(const typet &type)
 string_exprt::string_exprt() : struct_exprt(string_ref_typet())
 {
   string_ref_typet t;
+  if(string_language_mode == USE_JAVA_STRINGS)
+    t = string_ref_typet(string_ref_typet::java_char_type());
   symbol_exprt length = fresh_symbol("string_length",string_ref_typet::index_type());
   symbol_exprt content = fresh_symbol("string_content",t.get_content_type());
   move_to_operands(length,content);
@@ -82,6 +98,8 @@ string_exprt::string_exprt() : struct_exprt(string_ref_typet())
 string_exprt::string_exprt(unsignedbv_typet char_type) : struct_exprt(string_ref_typet())
 {
   string_ref_typet t(char_type);
+  if(char_type == string_ref_typet::java_char_type())
+    ensure_java_strings();
   symbol_exprt length = fresh_symbol("string_length",string_ref_typet::index_type());
   symbol_exprt content = fresh_symbol("string_content",t.get_content_type());
   move_to_operands(length,content);
@@ -128,6 +146,8 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
     s.of_function_application(to_function_application_expr(unrefined_string), symbol_to_string,axioms);
   else if(unrefined_string.id()==ID_symbol) 
     s = symbol_to_string[to_symbol_expr(unrefined_string).get_identifier()];
+  else if(unrefined_string.id()==ID_nondet_symbol) 
+    s = symbol_to_string[unrefined_string.get(ID_identifier)];
   else if(unrefined_string.id()==ID_address_of) {
     assert(unrefined_string.op0().id()==ID_symbol);
     s = symbol_to_string[to_symbol_expr(unrefined_string.op0()).get_identifier()];
