@@ -14,8 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class cnft:public propt
 {
 public:
-  cnft();
-  virtual ~cnft();
+  // For CNF, we don't use index 0 as a matter of principle,
+  // so we'll start counting variables at 1.
+  inline cnft():_no_variables(1) { }
+  virtual ~cnft() { }
 
   virtual literalt land(literalt a, literalt b);
   virtual literalt lor(literalt a, literalt b);
@@ -41,7 +43,7 @@ public:
   void gate_equal(literalt a, literalt b, literalt o);
   void gate_implies(literalt a, literalt b, literalt o);  
 
-  static void eliminate_duplicates(const bvt &bv, bvt &dest);
+  static bvt eliminate_duplicates(const bvt &);
 
 protected:
   size_t _no_variables;
