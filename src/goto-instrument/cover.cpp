@@ -1486,3 +1486,33 @@ void instrument_cover_goals(
       goals);
   }
 }
+
+/*******************************************************************\
+
+Function: instrument_cover_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void instrument_cover_goals(
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  coverage_criteriont criterion)
+{
+  Forall_goto_functions(f_it, goto_functions)
+  {
+    if(f_it->first==ID__start ||
+       f_it->first=="__CPROVER_initialize")
+      continue;
+
+    //empty set of existing goals
+    coverage_goalst goals;
+    instrument_cover_goals(symbol_table, f_it->second.body,
+					   criterion, goals);
+  }
+}
