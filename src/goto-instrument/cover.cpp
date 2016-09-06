@@ -102,6 +102,55 @@ public:
   }
 };
 
+coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
+                                   message_handlert &message_handler)
+{
+  jsont json;
+  coverage_goalst goals;
+  source_locationt source_location;
+
+  //check coverage file
+  if(parse_json(coverage, message_handler, json))
+  {
+    messaget message(message_handler);
+    message.error() << coverage << " file is not a valid json file"
+                    << messaget::eom;
+    exit(0);
+  }
+
+  //make sure that we have an array of elements
+  if(!json.is_array())
+  {
+    messaget message(message_handler);
+    message.error() << "expecting an array in the " <<  coverage << " file, but got "
+                    << json << messaget::eom;
+    exit(0);
+  }
+
+  irep_idt line_number;
+  for(jsont::arrayt::const_iterator
+      it=json.array.begin();
+      it!=json.array.end();
+      it++)
+  {
+    //get the goals array
+    if ((*it)["goals"].is_array())
+	{
+	  for(jsont::arrayt::const_iterator
+	      itg=(*it)["goals"].array.begin();
+	      itg!=(*it)["goals"].array.end();
+	      itg++)
+	  {
+        //get the line of each existing goal
+		line_number=(*itg)["sourceLocation"]["line"].value;
+	    source_location.set_line(line_number);
+	    goals.set_goals(source_location);
+	  }
+	}
+  }
+  return goals;
+}
+
 bool coverage_goalst::is_existing_goal(source_locationt source_location)
 {
   std::vector<source_locationt>::iterator it = existing_goals.begin();
