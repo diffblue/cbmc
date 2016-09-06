@@ -22,6 +22,8 @@ Date: May 2016
 #include <util/message.h>
 #include <util/string2int.h>
 
+#include <json/json_parser.h>
+
 class basic_blockst
 {
 public:
