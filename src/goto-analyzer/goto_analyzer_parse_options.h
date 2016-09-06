@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_PARSEOPTIONS_H
-#define CPROVER_CBMC_PARSEOPTIONS_H
+#ifndef CPROVER_GOTO_ANALYZER_PARSEOPTIONS_H
+#define CPROVER_GOTO_ANALYZER_PARSEOPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
