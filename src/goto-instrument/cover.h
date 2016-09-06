@@ -40,4 +40,9 @@ void instrument_cover_goals(
   coverage_criteriont,
   coverage_goalst &goals);
 
+void instrument_cover_goals(
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  coverage_criteriont);
+
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_H
