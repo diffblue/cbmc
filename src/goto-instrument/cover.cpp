@@ -104,10 +104,13 @@ public:
 
 bool coverage_goalst::is_existing_goal(source_locationt source_location)
 {
-  std::vector<std::string>::iterator it;
-  it = find (existing_goals.begin(), existing_goals.end(),
-		  source_location.get_line().c_str());
-
+  std::vector<source_locationt>::iterator it = existing_goals.begin();
+  while (it!=existing_goals.end())
+  {
+    if (!source_location.get_line().compare(it->get_line()))
+      break;
+    ++it;
+  }
   if(it == existing_goals.end())
     return true;
   else
