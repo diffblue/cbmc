@@ -8,8 +8,6 @@ Date: May 2016
 
 \*******************************************************************/
 
-#include <iostream>
-
 #include <algorithm>
 #include <iterator>
 
