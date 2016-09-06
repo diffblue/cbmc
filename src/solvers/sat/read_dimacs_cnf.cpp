@@ -88,8 +88,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
           #endif
           if(parsed_lit == 0) 
           {
-            bvt no_dup;
-            cnft::eliminate_duplicates(new_bv, no_dup);
+            bvt no_dup=cnft::eliminate_duplicates(new_bv);
             #ifdef VERBOSE
             std::cout << "calling lcnf " << new_bv.size() << std::endl;
             #endif

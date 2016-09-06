@@ -43,7 +43,7 @@ public:
   void gate_equal(literalt a, literalt b, literalt o);
   void gate_implies(literalt a, literalt b, literalt o);  
 
-  static void eliminate_duplicates(const bvt &bv, bvt &dest);
+  static bvt eliminate_duplicates(const bvt &);
 
 protected:
   size_t _no_variables;

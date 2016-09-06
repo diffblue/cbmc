@@ -244,9 +244,7 @@ literalt cnft::land(const bvt &bv)
   if(is_all(bv, const_literal(true)))
     return const_literal(true);
 
-  bvt new_bv;
-
-  eliminate_duplicates(bv, new_bv);
+  bvt new_bv=eliminate_duplicates(bv);
 
   bvt lits(2);
   literalt literal=new_variable();
@@ -295,9 +293,7 @@ literalt cnft::lor(const bvt &bv)
   if(is_all(bv, const_literal(false)))
     return const_literal(false);
 
-  bvt new_bv;
-
-  eliminate_duplicates(bv, new_bv);
+  bvt new_bv=eliminate_duplicates(bv);
 
   bvt lits(2);
   literalt literal=new_variable();
@@ -577,15 +573,18 @@ Function: cnft::eliminate_duplicates
 
 \*******************************************************************/
 
-void cnft::eliminate_duplicates(const bvt &bv, bvt &dest)
+bvt cnft::eliminate_duplicates(const bvt &bv)
 {
   std::set<literalt> s;
 
+  bvt dest;
   dest.reserve(bv.size());
 
   forall_literals(it, bv)
     if(s.insert(*it).second)
       dest.push_back(*it);
+
+  return dest;
 }
 
 /*******************************************************************\
