@@ -119,6 +119,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       refinement/bv_refinement_loop.cpp refinement/refine_arithmetic.cpp \
       refinement/refine_arrays.cpp \
       refinement/string_constraint.cpp \
+      refinement/string_functions.cpp \
       refinement/string_expr.cpp \
       refinement/string_refinement.cpp \
       miniBDD/miniBDD.cpp

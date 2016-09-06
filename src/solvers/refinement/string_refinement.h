@@ -37,20 +37,6 @@ public:
   symbol_exprt fresh_index(const irep_idt &prefix);
   symbol_exprt fresh_boolean(const irep_idt &prefix);
 
-  irep_idt string_literal_func;
-  irep_idt char_literal_func;
-  irep_idt string_length_func;
-  irep_idt string_equal_func;
-  irep_idt string_char_at_func;
-  irep_idt string_concat_func;
-  irep_idt string_substring_func;
-  irep_idt string_is_prefix_func;
-  irep_idt string_is_suffix_func;
-  irep_idt string_contains_func;
-  irep_idt string_char_set_func;
-  irep_idt string_index_of_func;
-  irep_idt string_last_index_of_func;
-
   static exprt is_positive(const exprt & x);
 
 private:  

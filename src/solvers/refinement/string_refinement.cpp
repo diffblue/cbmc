@@ -22,6 +22,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 unsignedbv_typet char_type = string_ref_typet::char_type();
 signedbv_typet index_type = string_ref_typet::index_type();
+unsignedbv_typet java_char_type = string_ref_typet::java_char_type();
 
 constant_exprt index_of_int(int i) {
 return constant_exprt(integer2binary(i, INDEX_WIDTH), index_type);
@@ -48,7 +49,6 @@ std::string string_refinementt::constraint_to_string(const string_constraintt & 
 }
 
 
-
 string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   SUB(_ns, _prop)
 {
@@ -57,19 +57,6 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   variable_with_multiple_occurence_in_index = false;
   initial_loop_bound = 10;
 
-  string_literal_func = "__CPROVER_uninterpreted_string_literal";
-  char_literal_func = "__CPROVER_uninterpreted_char_literal";
-  string_length_func = "__CPROVER_uninterpreted_strlen";
-  string_equal_func = "__CPROVER_uninterpreted_string_equal";
-  string_char_at_func = "__CPROVER_uninterpreted_char_at";
-  string_concat_func = "__CPROVER_uninterpreted_strcat";
-  string_substring_func = "__CPROVER_uninterpreted_substring";
-  string_is_prefix_func = "__CPROVER_uninterpreted_strprefixof";
-  string_is_suffix_func = "__CPROVER_uninterpreted_strsuffixof";
-  string_contains_func = "__CPROVER_uninterpreted_strcontains";
-  string_char_set_func = "__CPROVER_uninterpreted_char_set";
-  string_index_of_func = "__CPROVER_uninterpreted_strindexof";
-  string_last_index_of_func = "__CPROVER_uninterpreted_strlastindexof";
 }
 
 string_refinementt::~string_refinementt()
@@ -171,18 +158,37 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      type.id()!=ID_bool)
   {
     if(string_ref_typet::is_unrefined_string_type(type)) {
+      debug() << "boolbv_set_equality_to_true found unrefined string" << eom
+	      << expr.pretty() << eom;
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       make_string(sym,expr.rhs());
       return false;
     }
-    else if(string_ref_typet::char_type() == type) {
+    else if(type == char_type) {
+      debug() << "boolbv_set_equality_to_true found char type" << eom
+	      << expr.pretty() << eom;
       const bvt &bv1=convert_bv(expr.rhs());
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       const irep_idt &identifier = sym.get_identifier();
       map.set_literals(identifier, char_type, bv1);
       if(freeze_all) set_frozen(bv1);
       return false;
-    } else return SUB::boolbv_set_equality_to_true(expr);
+    } 
+    else if(type == java_char_type) {
+      debug() << "boolbv_set_equality_to_true found java char type" << eom
+	      << expr.pretty() << eom;
+      const bvt &bv1=convert_bv(expr.rhs());
+      symbol_exprt sym = to_symbol_expr(expr.lhs());
+      const irep_idt &identifier = sym.get_identifier();
+      map.set_literals(identifier, java_char_type, bv1);
+      if(freeze_all) set_frozen(bv1);
+      return false;
+    } 
+    else { 
+      debug() << "boolbv_set_equality_to_true non string or char: " << eom
+	      << expr.pretty() << eom;
+	return SUB::boolbv_set_equality_to_true(expr);
+    }
   }
 
   return true;
@@ -195,8 +201,9 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
   if(identifier.empty())
     throw "string_refinementt::convert_symbol got empty identifier";
 
+  debug() << "string_refinementt::convert_symbol " << identifier << " of type " << type << eom;
   if (string_ref_typet::is_unrefined_string_type(type)) {
-    //debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
+    debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
     // this can happen because of boolbvt::convert_equality
     string_exprt str = string_of_symbol(to_symbol_expr(expr));
     bvt bv = convert_bv(str);
@@ -205,6 +212,18 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
     bvt bv;
     bv.resize(CHAR_WIDTH);
     map.get_literals(identifier, char_type, CHAR_WIDTH, bv);
+
+    forall_literals(it, bv)
+      if(it->var_no()>=prop.no_variables() && !it->is_constant())
+	{
+	  error() << identifier << eom;
+	  assert(false);
+	}
+    return bv;
+  } else if (expr.type() == java_char_type) {
+    bvt bv;
+    bv.resize(JAVA_CHAR_WIDTH);
+    map.get_literals(identifier, java_char_type, JAVA_CHAR_WIDTH, bv);
 
     forall_literals(it, bv)
       if(it->var_no()>=prop.no_variables() && !it->is_constant())
@@ -224,32 +243,32 @@ bvt string_refinementt::convert_function_application(
 
   if (name.id() == ID_symbol) {
     const irep_idt &id = to_symbol_expr(name).get_identifier();
-    //debug() << "string_refinementt::convert_function_application(" 
-    // << id << ")" << eom;
-    if (id == string_literal_func 
-	|| id == string_concat_func 
-	|| id == string_substring_func
-	|| id == string_char_set_func) {
+    debug() << "string_refinementt::convert_function_application(" 
+	    << id << ")" << eom;
+    if (is_string_literal_func(id)
+	|| is_string_concat_func(id)
+	|| is_string_substring_func(id)
+	|| is_string_char_set_func(id)) {
       string_exprt str = make_string(expr);
       bvt bv = convert_bv(str);
       return bv;
-    } else if (id == char_literal_func) {
+    } else if (is_char_literal_func(id)) {
       return convert_char_literal(expr);
-    } else if (id == string_length_func) {
+    } else if (is_string_length_func(id)) {
       return convert_string_length(expr);
-    } else if (id == string_equal_func) {
+    } else if (is_string_equal_func(id)) {
       return convert_string_equal(expr);
-    } else if (id == string_char_at_func) {
+    } else if (is_string_char_at_func(id)) {
       return convert_string_char_at(expr);
-    } else if (id == string_is_prefix_func) {
+    } else if (is_string_is_prefix_func(id)) {
       return convert_string_is_prefix(expr);
-    } else if (id == string_is_suffix_func) {
+    } else if (is_string_is_suffix_func(id)) {
       return convert_string_is_suffix(expr);
-    } else if (id == string_contains_func) {
+    } else if (is_string_contains_func(id)) {
       return convert_string_contains(expr);
-    } else if (id == string_index_of_func) {
+    } else if (is_string_index_of_func(id)) {
       return convert_string_index_of(expr);
-    } else if (id == string_last_index_of_func) {
+    } else if (is_string_last_index_of_func(id)) {
       return convert_string_last_index_of(expr);
     }
   }
@@ -549,7 +568,7 @@ bvt string_refinementt::convert_string_index_of(
   symbol_exprt contains = fresh_boolean("contains_in_index_of");
   string_exprt str = make_string(args[0]);
   exprt c = args[1];
-  assert(c.type() == char_type);
+  assert(c.type() == char_type || c.type() == java_char_type);
   // 0 <= i < |s| && (i = -1 <=> !contains) && (contains => s[i] = c)
   // && forall n. 0 < n < i => s[n] != c 
   
@@ -580,7 +599,7 @@ bvt string_refinementt::convert_string_last_index_of(
   symbol_exprt contains = fresh_boolean("contains_in_index_of");
   string_exprt str = make_string(args[0]);
   exprt c = args[1];
-  assert(c.type() == char_type);
+  assert(c.type() == char_type || c.type() == java_char_type);
 
   string_axioms.push_back(string_constraintt(equal_exprt(index,index_of_int(-1)),not_exprt(contains)).exists(index,index_of_int(-1),str.length()));
   string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,index_of_int(-1)));
@@ -603,19 +622,24 @@ bvt string_refinementt::convert_char_literal(
   assert(args.size() == 1); // there should be exactly 1 argument to char literal
 
   const exprt &arg = args[0];
-  // argument to char literal should be one string constant of size one
-  assert(arg.operands().size() == 1 &&
-	 arg.op0().operands().size() == 1 &&
-	 arg.op0().op0().operands().size() == 2 &&
-	 arg.op0().op0().op0().id() == ID_string_constant); 
-
-  const string_constantt s = to_string_constant(arg.op0().op0().op0());
-  irep_idt sval = s.get_value();
-  assert(sval.size() == 1); 
-
-  std::string binary=integer2binary(unsigned(sval[0]), CHAR_WIDTH);
-
-  return convert_bv(constant_exprt(binary, char_type));
+  // for C programs argument to char literal should be one string constant of size one
+  if(arg.operands().size() == 1 &&
+     arg.op0().operands().size() == 1 &&
+     arg.op0().op0().operands().size() == 2 &&
+     arg.op0().op0().op0().id() == ID_string_constant)
+  {
+    const string_constantt s = to_string_constant(arg.op0().op0().op0());
+    irep_idt sval = s.get_value();
+    assert(sval.size() == 1); 
+    
+    std::string binary=integer2binary(unsigned(sval[0]), CHAR_WIDTH);
+    
+    return convert_bv(constant_exprt(binary, char_type));
+  }
+  else {
+    throw "convert_char_literal unimplemented";
+  }
+    
 }
 
 
@@ -628,9 +652,16 @@ bvt string_refinementt::convert_string_char_at(
   debug() << "in convert_string_char_at: we add the index to the"
 	  << " index set" << eom;
 
-  symbol_exprt char_sym = string_exprt::fresh_symbol("char",char_type);
-  string_axioms.emplace_back(equal_exprt(char_sym,str[args[1]]));
-  return convert_bv(char_sym);
+  if(f.type() == char_type) {
+    symbol_exprt char_sym = string_exprt::fresh_symbol("char",char_type);
+    string_axioms.emplace_back(equal_exprt(char_sym,str[args[1]]));
+    return convert_bv(char_sym);
+  } else {
+    assert(f.type() == java_char_type);
+    symbol_exprt char_sym = string_exprt::fresh_symbol("char",java_char_type);
+    string_axioms.emplace_back(equal_exprt(char_sym,str[args[1]]));
+    return convert_bv(char_sym);
+  }
 }
 
 

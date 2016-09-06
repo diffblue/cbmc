@@ -14,15 +14,19 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_constraint.h>
+#include <solvers/refinement/string_functions.h>
 
 #define INDEX_WIDTH 32
 #define CHAR_WIDTH 8
+#define JAVA_CHAR_WIDTH 16
 
 
 // Internal type used for strings
 class string_ref_typet : public struct_typet {
 public:
+  // default is with C type of characters
   string_ref_typet();
+  string_ref_typet(unsignedbv_typet char_type);
 
   // Type for the content (list of characters) of a string
   inline array_typet get_content_type() 
@@ -30,12 +34,21 @@ public:
 
   // Types used in this refinement
   static inline unsignedbv_typet char_type() { return unsignedbv_typet(CHAR_WIDTH);}
+
+  static inline unsignedbv_typet java_char_type() { return unsignedbv_typet(JAVA_CHAR_WIDTH);}
+
   //unsignedbv_typet index_type(INDEX_WIDTH);
   static inline signedbv_typet index_type() { return signedbv_typet(INDEX_WIDTH);}
 
   static inline exprt index_zero() { return constant_exprt(integer2binary(0, INDEX_WIDTH), index_type());}
 
-  static bool is_unrefined_string_type(const typet & type);
+  // For C the unrefined string type is __CPROVER_string, for java it is a 
+  // pointer to a strict with tag java.lang.String
+
+  static bool is_c_string_type(const typet & type);
+  static bool is_java_string_type(const typet & type);
+  static inline bool is_unrefined_string_type(const typet & type)
+  {  return (is_c_string_type(type) || is_java_string_type(type)); }
 };
 
 typedef std::vector<string_constraintt> axiom_vect;
@@ -44,6 +57,7 @@ typedef std::vector<string_constraintt> axiom_vect;
 class string_exprt : public struct_exprt {
 public:
   string_exprt();
+  string_exprt(unsignedbv_typet char_type);
 
 
   // Add to the list of axioms, lemmas which should hold for the string to be 
@@ -94,6 +108,8 @@ private:
   void of_string_char_set(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
 
   void of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
+
+  void of_struct(const struct_exprt & expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 
   static unsigned next_symbol_id;
 

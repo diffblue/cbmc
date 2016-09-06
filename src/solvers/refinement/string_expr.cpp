@@ -10,6 +10,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_expr.h>
 #include <ansi-c/string_constant.h>
 
+// For debuggin
+#include <iostream>
+
 string_ref_typet::string_ref_typet() : struct_typet() {
   components().resize(2);
   components()[0].set_name("length");
@@ -17,6 +20,18 @@ string_ref_typet::string_ref_typet() : struct_typet() {
   components()[0].type()=string_ref_typet::index_type();
 
   array_typet char_array(string_ref_typet::char_type(),infinity_exprt(string_ref_typet::index_type()));
+  components()[1].set_name("content");
+  components()[1].set_pretty_name("content");
+  components()[1].type()=char_array;
+}
+
+string_ref_typet::string_ref_typet(unsignedbv_typet char_type) : struct_typet() {
+  components().resize(2);
+  components()[0].set_name("length");
+  components()[0].set_pretty_name("length");
+  components()[0].type()=string_ref_typet::index_type();
+
+  array_typet char_array(char_type,infinity_exprt(string_ref_typet::index_type()));
   components()[1].set_name("content");
   components()[1].set_pretty_name("content");
   components()[1].type()=char_array;
@@ -36,19 +51,37 @@ symbol_exprt string_exprt::fresh_symbol(const irep_idt &prefix,
   return symbol_exprt(name, tp);
 }
 
-bool string_ref_typet::is_unrefined_string_type(const typet &type)
+bool string_ref_typet::is_c_string_type(const typet &type)
 {
   if (type.id() == ID_struct) {
     irep_idt tag = to_struct_type(type).get_tag();
-    return tag == irep_idt("__CPROVER_string");
-  }
-  return false;
+    return (tag == irep_idt("__CPROVER_string"));
+  } else return false;
 }
 
+bool string_ref_typet::is_java_string_type(const typet &type)
+{
+  if(type.id() == ID_pointer) {
+    pointer_typet pt = to_pointer_type(type);
+    typet subtype = pt.subtype();
+    if(subtype.id() == ID_struct) {
+      irep_idt tag = to_struct_type(subtype).get_tag();
+      return (tag == irep_idt("java.lang.String"));
+    } else return false;
+  } else return false;
+}
 
 string_exprt::string_exprt() : struct_exprt(string_ref_typet())
 {
   string_ref_typet t;
+  symbol_exprt length = fresh_symbol("string_length",string_ref_typet::index_type());
+  symbol_exprt content = fresh_symbol("string_content",t.get_content_type());
+  move_to_operands(length,content);
+}
+
+string_exprt::string_exprt(unsignedbv_typet char_type) : struct_exprt(string_ref_typet())
+{
+  string_ref_typet t(char_type);
   symbol_exprt length = fresh_symbol("string_length",string_ref_typet::index_type());
   symbol_exprt content = fresh_symbol("string_content",t.get_content_type());
   move_to_operands(length,content);
@@ -88,12 +121,21 @@ symbol_exprt qvar2 = fresh_symbol("string_if",string_ref_typet::index_type());
 string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   string_exprt s;
+  if(string_ref_typet::is_java_string_type(unrefined_string.type()))
+    s = string_exprt(string_ref_typet::java_char_type());
+
   if(unrefined_string.id()==ID_function_application) 
     s.of_function_application(to_function_application_expr(unrefined_string), symbol_to_string,axioms);
   else if(unrefined_string.id()==ID_symbol) 
     s = symbol_to_string[to_symbol_expr(unrefined_string).get_identifier()];
+  else if(unrefined_string.id()==ID_address_of) {
+    assert(unrefined_string.op0().id()==ID_symbol);
+    s = symbol_to_string[to_symbol_expr(unrefined_string.op0()).get_identifier()];
+  }
   else if(unrefined_string.id()==ID_if) 
     s.of_if(to_if_expr(unrefined_string),symbol_to_string,axioms);
+  else if(unrefined_string.id()==ID_struct) 
+    s.of_struct(to_struct_expr(unrefined_string),symbol_to_string,axioms);
   else 
     throw ("string_exprt of:\n" + unrefined_string.pretty() 
 	   + "\nwhich is not a function application, a symbol of an if expression");
@@ -103,6 +145,12 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
 }
 
 
+void string_exprt::of_struct(const struct_exprt & expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  // Warning: we do nothing here!!!!
+  return;
+}
+
 void string_exprt::of_function_application(const function_application_exprt & expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const exprt &name = expr.function();
@@ -110,13 +158,13 @@ void string_exprt::of_function_application(const function_application_exprt & ex
     const irep_idt &id = to_symbol_expr(name).get_identifier();
     //std::cout << "string_exprt::of_function_application(" 
     //<< id << ")" << std::endl;
-    if (id == "__CPROVER_uninterpreted_string_literal") {
+    if (is_string_literal_func(id)) {
       return of_string_literal(expr,axioms);
-    } else if (id == "__CPROVER_uninterpreted_strcat") {
+    } else if (is_string_concat_func(id)) {
       return of_string_concat(expr,symbol_to_string,axioms);
-    } else if (id == "__CPROVER_uninterpreted_substring") {
+    } else if (is_string_substring_func(id)) {
       return of_string_substring(expr,symbol_to_string,axioms);
-    } else if (id == "__CPROVER_uninterpreted_char_set") {
+    } else if (is_string_char_set_func(id)) {
       return of_string_char_set(expr,symbol_to_string,axioms);
     } 
   }
@@ -129,23 +177,45 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
   assert(args.size() == 1); //bad args to string literal?
   const exprt &arg = args[0];
 
-  assert (arg.operands().size() == 1 &&
-	  arg.op0().operands().size() == 1 &&
-	  arg.op0().op0().operands().size() == 2 &&
-	  arg.op0().op0().op0().id() == ID_string_constant); // bad arg to string literal?
+  irep_idt sval; 
+  int char_width;
+  unsignedbv_typet char_type;
+  
+  if (arg.operands().size() == 1 &&
+      arg.op0().operands().size() == 1 &&
+      arg.op0().op0().operands().size() == 2 &&
+      arg.op0().op0().op0().id() == ID_string_constant) {
+    // C string constant
       
-  const exprt &s = arg.op0().op0().op0();
-  irep_idt sval = to_string_constant(s).get_value();
+    const exprt &s = arg.op0().op0().op0();
+    sval = to_string_constant(s).get_value();
+    char_width = CHAR_WIDTH;
+    char_type = string_ref_typet::char_type();
+
+  } else {
+    // Java string constant
+    assert (arg.operands().size() == 1); 
+    assert(string_ref_typet::is_unrefined_string_type(arg.type()));
+    const exprt &s = arg.op0();
+    std::cout << "it seems the value of the string is lost, " 
+	      << "we need to recover it from the identifier" << std::endl;
+    std::string tmp(s.get(ID_identifier).c_str());
+    std::string value = tmp.substr(31);
+    std::cout << "of_string_litteral: " << value << std::endl;
+    sval = irep_idt(value);
+    char_width = JAVA_CHAR_WIDTH;
+    char_type = string_ref_typet::java_char_type();
+  }
 
   for (std::size_t i = 0; i < sval.size(); ++i) {
     std::string idx_binary = integer2binary(i,INDEX_WIDTH);
     constant_exprt idx(idx_binary, string_ref_typet::index_type());
-    std::string sval_binary=integer2binary(unsigned(sval[i]), CHAR_WIDTH);
-    constant_exprt c(sval_binary,string_ref_typet::char_type());
+    std::string sval_binary=integer2binary(unsigned(sval[i]), char_width);
+    constant_exprt c(sval_binary,char_type);
     equal_exprt lemma(index_exprt(content(), idx), c);
     axioms.emplace_back(lemma);
   }
-
+  
   std::string s_length_binary = integer2binary(unsigned(sval.size()),INDEX_WIDTH);
   exprt s_length = constant_exprt(s_length_binary, string_ref_typet::index_type());
 

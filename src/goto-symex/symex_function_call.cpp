@@ -279,6 +279,8 @@ void goto_symext::symex_function_call_code(
   
   // find code in function map
   
+  std::cout << "goto_symext::symex_function_call_code(" << identifier << ")" << std::endl;
+
   goto_functionst::function_mapt::const_iterator it=
     goto_functions.function_map.find(identifier);
 
@@ -318,7 +320,12 @@ void goto_symext::symex_function_call_code(
   if(!goto_function.body_available())
   {
     no_body(identifier);
-    
+
+    if(identifier == irep_idt("java::java.lang.String.charAt:(I)C"))
+      std::cout << "this is string_char_at" << std::endl;
+    else 
+      std::cout << "this is not string_char_at" << std::endl;
+
     // record the return
     target.function_return(state.guard.as_expr(), identifier, state.source);
   

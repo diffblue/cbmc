@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_preprocess.h>
 
 #include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/pass_preprocess.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
@@ -891,6 +892,17 @@ bool cbmc_parse_optionst::process_goto_program(
       string_instrumentation(
         symbol_table, get_message_handler(), goto_functions);
 
+
+    /*
+    debug() << "adding symbol for strings" << eom;  
+    irep_idt function_char_at_name("java::java.lang.String.charAt:(I)C");
+    goto_programt::targett ret = goto_functions.function_map[function_char_at_name].body.add_instruction();
+    ret->make_return();
+    code_function_callt function_call;
+    symbol_exprt function("__CPROVER_uninterpreted_string_char_at",void_typet());
+    //END_FUNCTION*/
+    show_symbol_table();
+
     // remove function pointers
     status() << "Removal of function pointers and virtual functions" << eom;
     remove_function_pointers(symbol_table, goto_functions,
@@ -907,16 +919,33 @@ bool cbmc_parse_optionst::process_goto_program(
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
+
+    debug() << "After partial inlining:" << eom;  goto_functions.output(ns,debug());  debug() << "=================" << eom;
+
     
+    if(cmdline.isset("pass")) {
+      status() << "PASS Preprocessing " << eom;
+      pass_preprocess(symbol_table, goto_functions);
+    }
+
+    debug() << "After PASS preprocessing:" << eom;  goto_functions.output(ns,debug());  debug() << "=================" << eom;
+
     // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
+    
+    //goto_functions.function_map[irep_idt("java::java.lang.String.charAt:(I)C")].clear();
+
+    debug() << "After remove returns" << eom;
+    goto_functions.output(ns,debug());
+    debug() << "=================" << eom;
+
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
     
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
-    
+
     // ignore default/user-specified initialization
     // of variables with static lifetime
     if(cmdline.isset("nondet-static"))
