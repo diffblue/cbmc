@@ -16,8 +16,8 @@ Date: May 2016
 class coverage_goalst
 {
 public:
-  void get_coverage(const std::string &coverage,
-                    message_handlert &message_handler);
+  static coverage_goalst get_coverage_goals(const std::string &coverage,
+                                      message_handlert &message_handler);
   void set_goals(source_locationt goal);
   bool is_existing_goal(source_locationt source_location);
 

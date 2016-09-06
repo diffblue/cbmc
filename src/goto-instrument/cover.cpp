@@ -8,8 +8,6 @@ Date: May 2016
 
 \*******************************************************************/
 
-#include <iostream>
-
 #include <algorithm>
 #include <iterator>
 #include <unordered_set>
@@ -112,10 +110,11 @@ Function: coverage_goalst::get_coverage
 
 \*******************************************************************/
 
-void coverage_goalst::get_coverage(const std::string &coverage,
+coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
                                    message_handlert &message_handler)
 {
   jsont json;
+  coverage_goalst goals;
   source_locationt source_location;
 
   //check coverage file
@@ -153,10 +152,11 @@ void coverage_goalst::get_coverage(const std::string &coverage,
         //get the line of each existing goal
 		line_number=(*itg)["sourceLocation"]["line"].value;
 	    source_location.set_line(line_number);
-	    set_goals(source_location);
+	    goals.set_goals(source_location);
 	  }
 	}
   }
+  return goals;
 }
 
 /*******************************************************************\
