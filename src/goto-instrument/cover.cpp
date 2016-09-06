@@ -8,6 +8,8 @@ Date: May 2016
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <algorithm>
 #include <iterator>
 #include <unordered_set>
@@ -114,6 +116,7 @@ void coverage_goalst::get_coverage(const std::string &coverage,
                                    message_handlert &message_handler)
 {
   jsont json;
+  source_locationt source_location;
 
   //check coverage file
   if(parse_json(coverage, message_handler, json))
@@ -133,6 +136,7 @@ void coverage_goalst::get_coverage(const std::string &coverage,
     exit(0);
   }
 
+  irep_idt line_number;
   for(jsont::arrayt::const_iterator
       it=json.array.begin();
       it!=json.array.end();
@@ -147,8 +151,9 @@ void coverage_goalst::get_coverage(const std::string &coverage,
 	      itg++)
 	  {
         //get the line of each existing goal
-	    const std::string line=(*itg)["sourceLocation"]["line"].value;
-	    set_goals(line);
+		line_number=(*itg)["sourceLocation"]["line"].value;
+	    source_location.set_line(line_number);
+	    set_goals(source_location);
 	  }
 	}
   }
@@ -166,7 +171,7 @@ Function: coverage_goalst::set_goals
 
 \*******************************************************************/
 
-void coverage_goalst::set_goals(std::string goal)
+void coverage_goalst::set_goals(source_locationt goal)
 {
   existing_goals.push_back(goal);
 }
@@ -185,10 +190,13 @@ Function: coverage_goalst::is_existing_goal
 
 bool coverage_goalst::is_existing_goal(source_locationt source_location)
 {
-  std::vector<std::string>::iterator it;
-  it = find (existing_goals.begin(), existing_goals.end(),
-		  source_location.get_line().c_str());
-
+  std::vector<source_locationt>::iterator it = existing_goals.begin();
+  while (it!=existing_goals.end())
+  {
+    if (!source_location.get_line().compare(it->get_line()))
+      break;
+    ++it;
+  }
   if(it == existing_goals.end())
     return true;
   else
