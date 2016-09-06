@@ -13,7 +13,7 @@ Date: May 2016
 
 #include <goto-programs/goto_model.h>
 
-class coverage_goals
+class coverage_goalst
 {
 public:
   void set_goals(std::string goal);
@@ -31,12 +31,12 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
   coverage_criteriont,
-  coverage_goals &goals);
+  coverage_goalst &goals);
 
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   coverage_criteriont,
-  coverage_goals &goals);
+  coverage_goalst &goals);
 
 #endif
