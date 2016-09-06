@@ -23,7 +23,7 @@ class coverage_goalst
 {
 public:
   void set_goals(std::string goal);
-  bool is_existing_goal(const char* goal);
+  bool is_existing_goal(source_locationt source_location);
 
 private:
   std::vector<std::string> existing_goals;
