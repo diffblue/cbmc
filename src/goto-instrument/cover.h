@@ -46,10 +46,9 @@ void instrument_cover_goals(
   coverage_criteriont,
   coverage_goalst &goals);
 
-bool instrument_cover_goals(
-  const cmdlinet &cmdline,
+void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  message_handlert &msgh);
+  coverage_criteriont);
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_H

@@ -933,15 +933,10 @@ void instrument_cover_goals(
           source_locationt source_location=
             basic_blocks.source_location_map[block_nr];
 
-<<<<<<< HEAD
-          if(!source_location.get_file().empty() &&
-             !source_location.is_built_in())
-=======
           //check whether the current goal already exists
           if(goals.is_existing_goal(source_location.get_line().c_str()) &&
-		 !source_location.get_file().empty() &&
-             source_location.get_file()[0]!='<')
->>>>>>> generate goals only if they do not exist in the json file
+             !source_location.get_file().empty() &&
+             !source_location.is_built_in())
           {
             std::string comment="block "+b;
             goto_program.insert_before_swap(i_it);
@@ -1200,80 +1195,20 @@ void instrument_cover_goals(
   }
 }
 
-bool instrument_cover_goals(
-  const cmdlinet &cmdline,
+void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  message_handlert &msgh)
+  coverage_criteriont criterion)
 {
-  messaget msg(msgh);
-  std::list<std::string> criteria_strings=cmdline.get_values("cover");
-  std::set<coverage_criteriont> criteria;
-  bool keep_assertions=false;
-
-  for(const auto &criterion_string : criteria_strings)
+  Forall_goto_functions(f_it, goto_functions)
   {
-    coverage_criteriont c;
+    if(f_it->first==ID__start ||
+       f_it->first=="__CPROVER_initialize")
+      continue;
 
-    if(criterion_string=="assertion" || criterion_string=="assertions")
-    {
-      keep_assertions=true;
-      c=coverage_criteriont::ASSERTION;
-    }
-    else if(criterion_string=="path" || criterion_string=="paths")
-      c=coverage_criteriont::PATH;
-    else if(criterion_string=="branch" || criterion_string=="branches")
-      c=coverage_criteriont::BRANCH;
-    else if(criterion_string=="location" || criterion_string=="locations")
-      c=coverage_criteriont::LOCATION;
-    else if(criterion_string=="decision" || criterion_string=="decisions")
-      c=coverage_criteriont::DECISION;
-    else if(criterion_string=="condition" || criterion_string=="conditions")
-      c=coverage_criteriont::CONDITION;
-    else if(criterion_string=="mcdc")
-      c=coverage_criteriont::MCDC;
-    else if(criterion_string=="cover")
-      c=coverage_criteriont::COVER;
-    else
-    {
-      msg.error() << "unknown coverage criterion "
-                  << '\'' << criterion_string << '\''
-                  << messaget::eom;
-      return true;
-    }
-
-    criteria.insert(c);
+    //empty set of existing goals
+    coverage_goalst goals;
+    instrument_cover_goals(symbol_table, f_it->second.body,
+					   criterion, goals);
   }
-
-  if(keep_assertions && criteria_strings.size()>1)
-  {
-    msg.error() << "assertion coverage cannot currently be used together with "
-                << "other coverage criteria" << messaget::eom;
-    return true;
-  }
-
-  msg.status() << "Rewriting existing assertions as assumptions"
-               << messaget::eom;
-
-  if(!keep_assertions)
-  {
-    // turn assertions (from generic checks) into assumptions
-    Forall_goto_functions(f_it, goto_functions)
-    {
-      goto_programt &body=f_it->second.body;
-      Forall_goto_program_instructions(i_it, body)
-      {
-        if(i_it->is_assert())
-          i_it->type=goto_program_instruction_typet::ASSUME;
-      }
-    }
-  }
-
-  msg.status() << "Instrumenting coverage goals" << messaget::eom;
-
-  for(const auto &criterion : criteria)
-    instrument_cover_goals(symbol_table, goto_functions, criterion);
-
-  goto_functions.update();
-  return false;
 }
