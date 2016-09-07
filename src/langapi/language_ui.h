@@ -22,7 +22,7 @@ public:
   language_filest language_files;
   symbol_tablet symbol_table;
   
-  explicit language_uit(
+  language_uit(
     const cmdlinet &__cmdline,
     ui_message_handlert &ui_message_handler);
   virtual ~language_uit();
