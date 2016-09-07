@@ -67,8 +67,8 @@ protected:
   // properties to be checked  
   bvt convert_string_equal(const function_application_exprt &f);
   bvt convert_string_length(const function_application_exprt &f);
-  bvt convert_string_is_prefix(const function_application_exprt &f);
-  bvt convert_string_is_suffix(const function_application_exprt &f);
+  bvt convert_string_is_prefix(const function_application_exprt &f, bool swap_arguments=false);
+  bvt convert_string_is_suffix(const function_application_exprt &f, bool swap_arguments=false);
   bvt convert_string_contains(const function_application_exprt &f);
   bvt convert_string_index_of(const function_application_exprt &f);
   bvt convert_string_last_index_of(const function_application_exprt &f);

@@ -18,6 +18,8 @@ Date:   September 2016
 #define string_substring_func "__CPROVER_uninterpreted_substring"
 #define string_is_prefix_func "__CPROVER_uninterpreted_strprefixof"
 #define string_is_suffix_func "__CPROVER_uninterpreted_strsuffixof"
+#define string_endswith_func "__CPROVER_uninterpreted_string_endswith"
+#define string_startswith_func "__CPROVER_uninterpreted_string_startswith"
 #define string_contains_func "__CPROVER_uninterpreted_strcontains"
 #define string_char_set_func "__CPROVER_uninterpreted_char_set"
 #define string_index_of_func "__CPROVER_uninterpreted_strindexof"
@@ -57,6 +59,12 @@ bool is_string_is_prefix_func(irep_idt id) {
 }
 bool is_string_is_suffix_func(irep_idt id) {
   return (starts_with(id2string(id),string_is_suffix_func));
+}
+bool is_string_startswith_func(irep_idt id) {
+  return (starts_with(id2string(id),string_startswith_func));
+}
+bool is_string_endswith_func(irep_idt id) {
+  return (starts_with(id2string(id),string_endswith_func));
 }
 bool is_string_contains_func(irep_idt id) {
   return (starts_with(id2string(id),string_contains_func));

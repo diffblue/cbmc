@@ -255,6 +255,10 @@ bvt string_refinementt::convert_function_application(
       return convert_string_is_prefix(expr);
     } else if (is_string_is_suffix_func(id)) {
       return convert_string_is_suffix(expr);
+    } else if (is_string_startswith_func(id)) {
+      return convert_string_is_prefix(expr,true);
+    } else if (is_string_endswith_func(id)) {
+      return convert_string_is_suffix(expr,true);
     } else if (is_string_contains_func(id)) {
       return convert_string_contains(expr);
     } else if (is_string_index_of_func(id)) {
@@ -417,15 +421,15 @@ exprt string_refinementt::is_positive(const exprt & x)
 { return binary_relation_exprt(x, ID_ge, index_of_int(0)); }
 
 
-bvt string_refinementt::convert_string_is_prefix(
-  const function_application_exprt &f)
+bvt string_refinementt::convert_string_is_prefix
+(const function_application_exprt &f, bool swap_arguments)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //bad args to string isprefix
 
   symbol_exprt isprefix = fresh_boolean("isprefix");
-  string_exprt s0 = make_string(args[0]);
-  string_exprt s1 = make_string(args[1]);
+  string_exprt s0 = make_string(args[swap_arguments?1:0]);
+  string_exprt s1 = make_string(args[swap_arguments?0:1]);
 
   string_axioms.emplace_back(isprefix, s1 >= s0);
 
@@ -449,15 +453,15 @@ bvt string_refinementt::convert_string_is_prefix(
 }
 
 
-bvt string_refinementt::convert_string_is_suffix(
-  const function_application_exprt &f)
+bvt string_refinementt::convert_string_is_suffix
+(const function_application_exprt &f, bool swap_arguments)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); // bad args to string issuffix?
 
   symbol_exprt issuffix = fresh_boolean("issuffix");
-  string_exprt s0 = make_string(args[0]);
-  string_exprt s1 = make_string(args[1]);
+  string_exprt s0 = make_string(args[swap_arguments?1:0]);
+  string_exprt s1 = make_string(args[swap_arguments?0:1]);
 
 
   // issufix(s1,s0) => s0.length >= s1.length

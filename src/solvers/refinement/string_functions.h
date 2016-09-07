@@ -26,6 +26,8 @@ bool is_string_concat_func(irep_idt id);
 bool is_string_substring_func(irep_idt id);
 bool is_string_is_prefix_func(irep_idt id);
 bool is_string_is_suffix_func(irep_idt id);
+bool is_string_startswith_func(irep_idt id);
+bool is_string_endswith_func(irep_idt id);
 bool is_string_contains_func(irep_idt id);
 bool is_string_char_set_func(irep_idt id);
 bool is_string_index_of_func(irep_idt id);
