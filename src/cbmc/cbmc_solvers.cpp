@@ -337,7 +337,6 @@ Function: cbmc_solverst::get_string_refinement
  
 cbmc_solverst::solvert* cbmc_solverst::get_string_refinement()
 {
-  std::cout << "get_string_refinement" << std::endl;
   propt *prop;
   prop=new satcheck_no_simplifiert();
   prop->set_message_handler(get_message_handler());

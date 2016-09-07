@@ -193,7 +193,6 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
   if(identifier.empty())
     throw "string_refinementt::convert_symbol got empty identifier";
 
-  debug() << "string_refinementt::convert_symbol " << identifier << " of type " << type << eom;
   if (string_ref_typet::is_unrefined_string_type(type)) {
     debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
     // this can happen because of boolbvt::convert_equality
@@ -364,9 +363,12 @@ string_exprt string_refinementt::make_string(const exprt & str)
 bvt string_refinementt::convert_string_equal(
   const function_application_exprt &f)
 {
-  assert(f.type() == bool_typet()); 
+  debug() << "convert_string_equal of f of type "<< f.type().pretty() << eom;
+  assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
+    
   symbol_exprt eq = fresh_boolean("equal");
-  bvt bv = convert_bv(eq);
+  typecast_exprt tc_eq(eq,f.type());
+  bvt bv = convert_bv(tc_eq);
 
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //bad args to string equal?
@@ -555,12 +557,22 @@ bvt string_refinementt::convert_string_index_of(
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); // bad args to string index of?
-
+  if(f.type() != index_type) {
+    debug() << "convert_string_index_of of the wrong type "<< f.type().pretty() << eom;
+    assert(false);
+  }
+    
   symbol_exprt index = fresh_index("index_of");
   symbol_exprt contains = fresh_boolean("contains_in_index_of");
   string_exprt str = make_string(args[0]);
   exprt c = args[1];
-  assert(c.type() == char_type || c.type() == java_char_type);
+
+  if(!(c.type() == char_type || c.type() == java_char_type)){
+    debug() << "warning: argument to string_index_of does not have char type: " 
+	    << c.type().pretty() << eom;    
+    c = typecast_exprt(c,java_char_type);
+  }
+
   // 0 <= i < |s| && (i = -1 <=> !contains) && (contains => s[i] = c)
   // && forall n. 0 < n < i => s[n] != c 
   
