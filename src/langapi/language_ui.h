@@ -41,8 +41,6 @@ public:
   virtual void show_symbol_table_plain(std::ostream &out, bool brief);
   virtual void show_symbol_table_xml_ui(bool brief);
 
-  static ui_message_handlert::uit get_ui_cmdline(const cmdlinet &cmdline);
-
   typedef ui_message_handlert::uit uit;
   
   uit get_ui()

@@ -63,8 +63,7 @@ Function: goto_diff_parse_optionst::goto_diff_parse_optionst
 goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv):
   parse_options_baset(GOTO_DIFF_OPTIONS, argc, argv),
   goto_diff_languagest(cmdline, ui_message_handler),
-  ui_message_handler(language_uit::get_ui_cmdline(cmdline), 
-    "GOTO-DIFF " CBMC_VERSION),
+  ui_message_handler(cmdline, "GOTO-DIFF " CBMC_VERSION),
   languages2(cmdline, ui_message_handler)
 {
 }
@@ -87,8 +86,7 @@ Function: goto_diff_parse_optionst::goto_diff_parse_optionst
   const std::string &extra_options):
   parse_options_baset(GOTO_DIFF_OPTIONS+extra_options, argc, argv),
   goto_diff_languagest(cmdline, ui_message_handler),
-  ui_message_handler(language_uit::get_ui_cmdline(cmdline), 
-    "GOTO-DIFF " CBMC_VERSION),
+  ui_message_handler(cmdline, "GOTO-DIFF " CBMC_VERSION),
   languages2(cmdline, ui_message_handler)
 {
 }

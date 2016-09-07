@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "xml_expr.h"
 #include "cout_message.h"
 #include "ui_message.h"
+#include "cmdline.h"
 
 /*******************************************************************\
 
@@ -58,6 +59,29 @@ ui_message_handlert::ui_message_handlert(
     }
     break;
   }
+}
+
+/*******************************************************************\
+
+Function: ui_message_handlert::ui_message_handlert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+ui_message_handlert::ui_message_handlert(
+  const class cmdlinet &cmdline,
+  const std::string &program):
+  ui_message_handlert(
+    cmdline.isset("xml-ui")?XML_UI:
+    cmdline.isset("json-ui")?JSON_UI:
+    PLAIN,
+    program)
+{
 }
 
 /*******************************************************************\

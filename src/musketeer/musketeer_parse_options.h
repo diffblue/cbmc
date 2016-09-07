@@ -35,7 +35,7 @@ public:
   goto_fence_inserter_parse_optionst(int argc, const char **argv):
     parse_options_baset(GOTO_FENCE_INSERTER_OPTIONS, argc, argv),
     language_uit(cmdline, ui_message_handler),
-    ui_message_handler(get_ui_cmdline(cmdline), "musketeer")
+    ui_message_handler(cmdline, "musketeer")
   {
   }
   

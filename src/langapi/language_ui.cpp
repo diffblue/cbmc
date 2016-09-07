@@ -21,29 +21,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
-Function: get_ui_cmdline
-
-  Inputs:
-
- Outputs:
-
- Purpose: Constructor
-
-\*******************************************************************/
-
-ui_message_handlert::uit language_uit::get_ui_cmdline(const cmdlinet &cmdline)
-{
-  if(cmdline.isset("xml-ui"))
-    return ui_message_handlert::XML_UI;
-
-  if(cmdline.isset("json-ui"))
-    return ui_message_handlert::JSON_UI;
-
-  return ui_message_handlert::PLAIN;
-}
-
-/*******************************************************************\
-
 Function: language_uit::language_uit
 
   Inputs:
