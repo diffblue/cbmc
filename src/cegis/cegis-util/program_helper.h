@@ -81,6 +81,17 @@ bool is_nondet(
  *
  * @details
  *
+ * @param name
+ *
+ * @return
+ */
+bool is_return_value_name(const std::string &name);
+
+/**
+ * @brief
+ *
+ * @details
+ *
  * @param body
  * @return
  */
