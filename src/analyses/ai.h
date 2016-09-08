@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/json.h>
 #include <util/xml.h>
+#include <util/expr.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -94,6 +95,17 @@ public:
   //
   // This computes the join between "this" and "b".
   // Return true if "this" has changed.
+
+  // This method allows an expression to be simplified / evaluated using the
+  // current value of the domain.  It is used to evaluate assertions and in
+  // program simplification
+  virtual exprt domain_simplify(
+    const exprt &condition,
+    const namespacet &ns,
+    const bool lhs=false) const
+  {
+    return condition;
+  }
 };
 
 // don't use me -- I am just a base class
