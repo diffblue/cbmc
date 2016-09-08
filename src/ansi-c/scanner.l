@@ -86,11 +86,10 @@ int make_identifier()
     // this hashes the base name
     irep_idt base_name=final_base_name;
 
-    std::string identifier(id2string(base_name));
-
     // figure out if this is a typedef or something else
+    irep_idt identifier;
     ansi_c_id_classt result=
-      PARSER.lookup(identifier, PARSER.tag_following, false);
+      PARSER.lookup(base_name, identifier, PARSER.tag_following, false);
 
     PARSER.tag_following=false;
 

@@ -26,15 +26,16 @@ Function: ansi_c_parsert::lookup
 \*******************************************************************/
 
 ansi_c_id_classt ansi_c_parsert::lookup(
-  std::string &name,
+  const irep_idt &base_name,
+  irep_idt &identifier, // output
   bool tag,
   bool label)
 {
   // labels and tags have a separate name space
-  const std::string scope_name=
-    tag?"tag-"+name:
-    label?"label-"+name:
-    name;
+  const irep_idt scope_name=
+    tag?"tag-"+id2string(base_name):
+    label?"label-"+id2string(base_name):
+    base_name;
   
   for(scopest::const_reverse_iterator it=scopes.rbegin();
       it!=scopes.rend();
@@ -45,8 +46,8 @@ ansi_c_id_classt ansi_c_parsert::lookup(
 
     if(n_it!=it->name_map.end())
     {
-      assert(id2string(n_it->second.prefixed_name)==it->prefix+scope_name);
-      name=id2string(n_it->second.prefixed_name);
+      assert(id2string(n_it->second.prefixed_name)==it->prefix+id2string(scope_name));
+      identifier=n_it->second.prefixed_name;
       return n_it->second.id_class;
     }
   }
@@ -55,14 +56,16 @@ ansi_c_id_classt ansi_c_parsert::lookup(
   // If it's a tag, we will add to current scope.
   if(tag)
   {
-    ansi_c_identifiert &identifier=
+    ansi_c_identifiert &i=
       current_scope().name_map[scope_name];
-    identifier.id_class=ANSI_C_TAG;
-    identifier.prefixed_name=current_scope().prefix+scope_name;
-    name=id2string(identifier.prefixed_name);
+    i.id_class=ANSI_C_TAG;
+    i.prefixed_name=current_scope().prefix+id2string(scope_name);
+    i.base_name=base_name;
+    identifier=i.prefixed_name;
     return ANSI_C_TAG;
   }
 
+  identifier=base_name;
   return ANSI_C_UNKNOWN;
 }
 
