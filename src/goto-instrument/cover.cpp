@@ -127,24 +127,33 @@ coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
     exit(0);
   }
 
-  irep_idt line_number;
+  irep_idt file, function, line;
   for(jsont::arrayt::const_iterator
       it=json.array.begin();
       it!=json.array.end();
       it++)
   {
-    //get the goals array
-    if ((*it)["goals"].is_array())
+
+    //get the file of each existing goal
+    file=(*it)["file"].value;
+    source_location.set_file(file);
+
+    //get the function of each existing goal
+    function=(*it)["function"].value;
+    source_location.set_function(function);
+
+    //get the lines array
+    if ((*it)["lines"].is_array())
 	{
 	  for(jsont::arrayt::const_iterator
-	      itg=(*it)["goals"].array.begin();
-	      itg!=(*it)["goals"].array.end();
+	      itg=(*it)["lines"].array.begin();
+	      itg!=(*it)["lines"].array.end();
 	      itg++)
 	  {
         //get the line of each existing goal
-		line_number=(*itg)["sourceLocation"]["line"].value;
-	    source_location.set_line(line_number);
-	    goals.set_goals(source_location);
+        line=(*itg)["number"].value;
+        source_location.set_line(line);
+        goals.set_goals(source_location);
 	  }
 	}
   }
@@ -156,7 +165,9 @@ bool coverage_goalst::is_existing_goal(source_locationt source_location)
   std::vector<source_locationt>::iterator it = existing_goals.begin();
   while (it!=existing_goals.end())
   {
-    if (!source_location.get_line().compare(it->get_line()))
+    if (!source_location.get_file().compare(it->get_file()) &&
+	!source_location.get_function().compare(it->get_function()) &&
+	!source_location.get_line().compare(it->get_line()))
       break;
     ++it;
   }
