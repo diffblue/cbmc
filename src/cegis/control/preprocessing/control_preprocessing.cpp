@@ -26,3 +26,8 @@ size_t control_preprocessingt::get_min_solution_size() const
 {
   return 1u;
 }
+
+const control_programt &control_preprocessingt::get_program() const
+{
+  return control_program;
+}

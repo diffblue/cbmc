@@ -30,7 +30,7 @@ void collect_counterexample_locations(
     goto_programt::targetst &locs,
     const char * const marker_label_prefix,
     goto_programt &prog,
-    const std::function<bool(const goto_programt::targett &target)> is_meta);
+    const std::function<bool(goto_programt::const_targett target)> is_meta);
 
 /**
  * @brief

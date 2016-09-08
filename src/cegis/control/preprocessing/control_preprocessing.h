@@ -57,6 +57,15 @@ public:
    * @return
    */
   size_t get_min_solution_size() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  const control_programt &get_program() const;
 };
 
-#endif /* SRC_CEGIS_CONTROL_PREPROCESSING_CONTROL_PREPROCESSING_H_ */
+#endif /* CEGIS_CONTROL_PREPROCESSING_H_ */

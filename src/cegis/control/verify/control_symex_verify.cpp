@@ -1,25 +1,26 @@
+#include <cegis/control/verify/insert_solution.h>
 #include <cegis/control/verify/control_symex_verify.h>
 
-control_symex_verifyt::control_symex_verifyt()
+control_symex_verifyt::control_symex_verifyt(
+    const control_programt &original_program) :
+    original_program(original_program)
 {
 }
 
-void control_symex_verifyt::process(const candidatet &candidate) const
+void control_symex_verifyt::process(const candidatet &candidate)
 {
-  // TODO: Implement
-  assert(false);
+  current_program=original_program;
+  insert_solution(current_program, candidate);
 }
 
 const symbol_tablet &control_symex_verifyt::get_symbol_table() const
 {
-  // TODO: Implement
-  assert(false);
+  return current_program.st;
 }
 
 const goto_functionst &control_symex_verifyt::get_goto_functions() const
 {
-  // TODO: Implement
-  assert(false);
+  return current_program.gf;
 }
 
 void control_symex_verifyt::convert(counterexamplest &counterexamples,

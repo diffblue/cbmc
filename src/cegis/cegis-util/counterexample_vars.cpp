@@ -6,7 +6,7 @@
 
 void collect_counterexample_locations(goto_programt::targetst &locs,
     const char * const marker_prefix, goto_programt &prog,
-    const std::function<bool(const goto_programt::targett &target)> is_meta)
+    const std::function<bool(goto_programt::const_targett target)> is_meta)
 {
   goto_programt::instructionst &body=prog.instructions;
   const goto_programt::targett end(body.end());
@@ -22,9 +22,13 @@ void collect_counterexample_locations(goto_programt::targetst &locs,
 
 namespace
 {
-bool is_meta(const goto_programt::targett pos)
+bool is_meta(const goto_programt::const_targett pos)
 {
-  const std::string &name=id2string(get_affected_variable(*pos));
+  const goto_programt::instructiont &instr=*pos;
+  const goto_program_instruction_typet type=instr.type;
+  if (goto_program_instruction_typet::ASSIGN == type
+      && ID_symbol != to_code_assign(instr.code).rhs().id()) return false;
+  const std::string &name=id2string(get_affected_variable(instr));
   return contains(name, CPROVER_PREFIX) || is_return_value_name(name);
 }
 }

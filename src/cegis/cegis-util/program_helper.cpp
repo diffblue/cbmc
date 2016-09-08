@@ -93,15 +93,15 @@ bool contains(const exprt &rhs, const irep_idt &id)
 }
 }
 
-bool is_nondet(const goto_programt::targett &target,
-    const goto_programt::targett &end)
+bool is_nondet(goto_programt::const_targett target,
+    goto_programt::const_targett end)
 {
   const goto_programt::instructiont &instr=*target;
   switch (instr.type)
   {
   case goto_program_instruction_typet::DECL:
   {
-    goto_programt::targett next=std::next(target);
+    goto_programt::const_targett next=std::next(target);
     if (next == end) return true;
     if (goto_program_instruction_typet::FUNCTION_CALL == next->type)
     {

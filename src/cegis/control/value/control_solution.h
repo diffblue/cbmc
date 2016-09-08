@@ -10,6 +10,8 @@
 #ifndef CEGIS_CONTROL_SOLUTION_H_
 #define CEGIS_CONTROL_SOLUTION_H_
 
+#include <vector>
+
 /**
  * @brief
  *
@@ -31,6 +33,15 @@ public:
    * @details
    */
   std::vector<double> b;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  bool empty() const;
 };
 
 #endif /* CEGIS_CONTROL_SOLUTION_H_ */

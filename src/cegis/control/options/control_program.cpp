@@ -28,6 +28,10 @@ control_programt::control_programt(const control_programt &other) :
   copy(*this, other);
 }
 
+control_programt::control_programt()
+{
+}
+
 control_programt &control_programt::operator =(const control_programt &other)
 {
   st.clear();

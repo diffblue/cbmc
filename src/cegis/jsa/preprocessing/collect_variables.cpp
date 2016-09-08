@@ -11,7 +11,7 @@
 
 namespace
 {
-bool is_meta(const goto_programt::targett pos)
+bool is_meta(const goto_programt::const_targett pos)
 {
   const std::string &name=id2string(get_affected_variable(*pos));
   if (is_jsa_list(name) || is_jsa_iterator(name)) return false;

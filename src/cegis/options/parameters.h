@@ -23,5 +23,6 @@
 #define CEGIS_SHOW_ITERATIONS "cegis-show-iterations"
 #define CEGIS_KEEP_GOTO_PROGRAMS "cegis-keep-goto-programs"
 #define CEGIS_MAX_RUNTIME "cegis-max-runtime"
+#define CEGIS_CONTROL "cegis-control"
 
 #endif /* CEGIS_INVARIANT_PARAMETERS_H_ */

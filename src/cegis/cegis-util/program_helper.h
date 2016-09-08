@@ -73,8 +73,8 @@ const goto_programt &get_body(
  * @return
  */
 bool is_nondet(
-    const goto_programt::targett &target,
-    const goto_programt::targett &end);
+    goto_programt::const_targett target,
+    goto_programt::const_targett end);
 
 /**
  * @brief

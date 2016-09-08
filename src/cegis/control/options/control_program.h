@@ -53,6 +53,13 @@ public:
    * @brief
    *
    * @details
+   */
+  control_programt();
+
+  /**
+   * @brief
+   *
+   * @details
    *
    * @param other
    */

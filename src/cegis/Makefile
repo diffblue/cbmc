@@ -49,7 +49,8 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       control/facade/control_runner.cpp control/preprocessing/control_preprocessing.cpp \
       control/options/control_program.cpp \
       control/learn/control_symex_learn.cpp \
-      control/verify/control_symex_verify.cpp \
+      control/verify/control_symex_verify.cpp control/verify/insert_solution.cpp \
+      control/value/control_types.cpp \
       wordsize/restrict_bv_size.cpp value/program_individual_serialisation.cpp value/assignments_printer.cpp \
       seed/literals_seed.cpp \
       genetic/instruction_set_info_factory.cpp genetic/random_mutate.cpp genetic/random_cross.cpp \

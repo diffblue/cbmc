@@ -10,10 +10,11 @@ int run_control(optionst &o, messaget::mstreamt &result,
     const symbol_tablet &st, const goto_functionst &gf)
 {
   control_preprocessingt prep(st, gf);
-  const control_symex_learnt lcfg;
+  const control_programt &program=prep.get_program();
+  const control_symex_learnt lcfg(program);
   cegis_symex_learnt<control_preprocessingt,
                      const control_symex_learnt> learn(o, prep, lcfg);
-  const control_symex_verifyt vcfg;
-  cegis_symex_verifyt<const control_symex_verifyt> oracle(o, vcfg);
+  control_symex_verifyt vcfg(program);
+  cegis_symex_verifyt<control_symex_verifyt> oracle(o, vcfg);
   return run_cegis_with_statistics_wrapper(result, o, learn, oracle, prep);
 }

@@ -14,6 +14,7 @@
 
 #include <cegis/control/value/control_counterexample.h>
 #include <cegis/control/value/control_solution.h>
+#include <cegis/control/options/control_program.h>
 
 /**
  * @brief
@@ -22,6 +23,8 @@
  */
 class control_symex_learnt
 {
+  const control_programt &original_program;
+  control_programt current_program;
 public:
   typedef control_counterexamplet counterexamplet;
   typedef control_counterexamplest counterexamplest;
@@ -30,8 +33,10 @@ public:
    * @brief
    *
    * @details
+   *
+   * @param original_program
    */
-  explicit control_symex_learnt();
+  explicit control_symex_learnt(const control_programt &original_program);
 
   /**
    * @brief
