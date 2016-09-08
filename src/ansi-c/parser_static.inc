@@ -351,14 +351,11 @@ static void create_function_scope(const YYSTYPE d)
     code_typet::parameterst &parameters=code_type.parameters();
     
     // Add the parameter declarations to the scope.
-    for(code_typet::parameterst::iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
+    for(auto & it : parameters)
     {
-      if(it->id()==ID_declaration)
+      if(it.id()==ID_declaration)
       {
-        ansi_c_declarationt &param_decl=to_ansi_c_declaration(*it);
+        ansi_c_declarationt &param_decl=to_ansi_c_declaration(it);
 
         // we record the function name in the location
         param_decl.add_source_location().set_function(function_name);
@@ -406,12 +403,9 @@ static void adjust_KnR_parameters(
     ansi_c_declarationt::declaratorst &declarators=
       declaration.declarators();
 
-    for(ansi_c_declarationt::declaratorst::const_iterator
-        it=declarators.begin();
-        it!=declarators.end();
-        it++)
+    for(const auto & it : declarators)
     {
-      irep_idt base_name=it->get_base_name();
+      irep_idt base_name=it.get_base_name();
 
       // we just do a linear search over the parameters
       // this could be improved with a hash map
@@ -426,7 +420,7 @@ static void adjust_KnR_parameters(
           // This copies the declaration type, which can be a
           // problem if there are compound bodies in there.
           p_decl.type()=declaration.type();
-          p_decl.declarator().type()=it->type();
+          p_decl.declarator().type()=it.type();
           break;
         }
       }
