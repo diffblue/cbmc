@@ -54,7 +54,7 @@ class optionst;
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-cex):" \
   "(localize-faults)(localize-faults-method):" \
-  "(floatbv)(all-claims)(all-properties)(decide)" // legacy, and will eventually disappear
+  "(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear
 
 class cbmc_parse_optionst:
   public parse_options_baset,
