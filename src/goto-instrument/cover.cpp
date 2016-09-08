@@ -131,10 +131,9 @@ coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
   	      itg++)
   	  {
         //get the line of each existing goal
-  		line=(*itg)["number"].value;
-  	    source_location.set_line(line);
-  	    goals.set_goals(source_location);
-
+        line=(*itg)["number"].value;
+        source_location.set_line(line);
+        goals.set_goals(source_location);
   	  }
   	}
   }
