@@ -478,7 +478,9 @@ void goto_symext::symex_cpp_new(
   {
     symbol.type=array_typet();
     symbol.type.subtype()=code.type().subtype();
-    symbol.type.set(ID_size, code.find(ID_size));
+    exprt size_arg=static_cast<const exprt&>(code.find(ID_size));
+    clean_expr(size_arg, state, false);
+    symbol.type.set(ID_size, size_arg);
   }
   else
     symbol.type=code.type().subtype();
