@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 #include <sstream>
 
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
 
@@ -60,6 +61,58 @@ xmlt ai_domain_baset::output_xml(
   xmlt xml("domain");
   xml.data=out.str();
   return xml;
+}
+
+/*******************************************************************\
+
+Function: variable_sensitivity_domaint::ai_simplify_lhs
+
+  Inputs:
+   condition - the expression to simplify
+   ns - the namespace
+
+ Outputs: True if condition did not change. False otherwise. condition
+          will be updated with the simplified condition if it has worked
+
+ Purpose: Use the information in the domain to simplify the expression
+          on the LHS of an assignment. This for example won't simplify symbols
+          to their values, but does simplify indices in arrays, members of
+          structs and dereferencing of pointers
+\*******************************************************************/
+
+bool ai_domain_baset::ai_simplify_lhs(
+  exprt &condition, const namespacet &ns) const
+{
+  // Care must be taken here to give something that is still writable
+  if(condition.id()==ID_index)
+  {
+    index_exprt ie=to_index_expr(condition);
+    bool changed=ai_simplify(ie.index(), ns);
+    if(changed)
+      condition=simplify_expr(ie, ns);
+
+    return !changed;
+  }
+  else if(condition.id()==ID_dereference)
+  {
+    dereference_exprt de=to_dereference_expr(condition);
+    bool changed=ai_simplify(de.pointer(), ns);
+    if(changed)
+      condition=simplify_expr(de, ns);  // So *(&x) -> x
+
+    return !changed;
+  }
+  else if(condition.id()==ID_member)
+  {
+    member_exprt me=to_member_expr(condition);
+    bool changed=ai_simplify_lhs(me.compound(), ns); // <-- lhs!
+    if(changed)
+      condition=simplify_expr(me, ns);
+
+    return !changed;
+  }
+  else
+    return true;
 }
 
 /*******************************************************************\

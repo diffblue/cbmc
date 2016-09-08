@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/json.h>
 #include <util/xml.h>
+#include <util/expr.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -80,6 +81,23 @@ public:
   //
   // This computes the join between "this" and "b".
   // Return true if "this" has changed.
+
+  // This method allows an expression to be simplified / evaluated using the
+  // current state.  It is used to evaluate assertions and in program
+  // simplification
+
+  // return true if unchanged
+  virtual bool ai_simplify(
+    exprt &condition,
+    const namespacet &ns) const
+  {
+    return true;
+  }
+
+  // Simplifies the expression but keeps it as an l-value
+  virtual bool ai_simplify_lhs(
+    exprt &condition,
+    const namespacet &ns) const;
 };
 
 // don't use me -- I am just a base class
