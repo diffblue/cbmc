@@ -94,7 +94,7 @@ public:
   void show(std::ostream &out) const;
 
   // serialization
-  void to_irep(irept &dest) const;
+  irept to_irep() const;
   void from_irep(const irept &src);
   
   class symbol_exprt symbol_expr() const;
