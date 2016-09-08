@@ -1,7 +1,9 @@
 #include <util/config.h>
 #include <util/substitute.h>
+
 #include <cbmc/cbmc_parse_options.h>
 #include <cbmc/bmc.h>
+
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/write_goto_binary.h>
 
@@ -45,10 +47,14 @@ class cbmc_runnert: public cbmc_parse_optionst
   cbmc_resultt &result;
   safety_checkert::resultt bmc_result;
   const bool keep_goto_programs;
+
 public:
-  cbmc_runnert(const symbol_tablet &st, const goto_functionst &gf,
-      cbmc_resultt &result, const bool keep_goto_programs) :
-      cbmc_parse_optionst(get_argc(), get_argv()), st(st), gf(gf), result(
+  cbmc_runnert(
+    const symbol_tablet &st,
+    const goto_functionst &gf,
+    cbmc_resultt &result,
+    const bool keep_goto_programs) :
+    cbmc_parse_optionst(get_argc(), get_argv()), st(st), gf(gf), result(
           result), bmc_result(safety_checkert::UNSAFE), keep_goto_programs(
           keep_goto_programs)
   {
@@ -56,20 +62,23 @@ public:
 
   virtual ~cbmc_runnert()=default;
 
-  virtual int get_goto_program(const optionst &options, bmct &bmc,
-      goto_functionst &goto_functions)
+  virtual int get_goto_program(
+    const optionst &options,
+    bmct &bmc,
+    goto_functionst &goto_functions)
   {
     symbol_table.clear();
     symbol_table=st;
     goto_functions.clear();
     goto_functions.copy_from(gf);
-    if (process_goto_program(options, goto_functions)) return 6;
-    if (keep_goto_programs)
+    if(process_goto_program(options, goto_functions)) return 6;
+    if(keep_goto_programs)
     {
       const std::string path(get_next_goto_file_name());
       message_handlert &msg=get_message_handler();
       write_goto_binary(path, symbol_table, goto_functions, msg);
     }
+
     return -1;
   }
 
@@ -92,9 +101,11 @@ public:
 };
 }
 
-safety_checkert::resultt run_cbmc(const symbol_tablet &st,
-    const goto_functionst &gf, cbmc_resultt &cbmc_result,
-    const bool keep_goto_programs)
+safety_checkert::resultt run_cbmc(
+  const symbol_tablet &st,
+  const goto_functionst &gf,
+  cbmc_resultt &cbmc_result,
+  const bool keep_goto_programs)
 {
   const temporary_output_blockt disable_output;
   cbmc_runnert runner(st, gf, cbmc_result, keep_goto_programs);
@@ -105,9 +116,11 @@ safety_checkert::resultt run_cbmc(const symbol_tablet &st,
   return runner.get_bmc_result();
 }
 
-safety_checkert::resultt run_cbmc(const symbol_tablet &st,
-    const goto_functionst &gf, cbmc_resultt &cbmc_result,
-    const optionst &o)
+safety_checkert::resultt run_cbmc(
+  const symbol_tablet &st,
+  const goto_functionst &gf,
+  cbmc_resultt &cbmc_result,
+  const optionst &o)
 {
   return run_cbmc(st, gf, cbmc_result, o.get_bool_option(CEGIS_KEEP_GOTO_PROGRAMS));
 }
