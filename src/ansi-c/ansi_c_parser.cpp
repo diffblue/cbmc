@@ -45,7 +45,8 @@ ansi_c_id_classt ansi_c_parsert::lookup(
 
     if(n_it!=it->name_map.end())
     {
-      name=it->prefix+scope_name;
+      assert(id2string(n_it->second.prefixed_name)==it->prefix+scope_name);
+      name=id2string(n_it->second.prefixed_name);
       return n_it->second.id_class;
     }
   }
@@ -54,8 +55,11 @@ ansi_c_id_classt ansi_c_parsert::lookup(
   // If it's a tag, we will add to current scope.
   if(tag)
   {
-    current_scope().name_map[scope_name].id_class=ANSI_C_TAG;
-    name=current_scope().prefix+scope_name;
+    ansi_c_identifiert &identifier=
+      current_scope().name_map[scope_name];
+    identifier.id_class=ANSI_C_TAG;
+    identifier.prefixed_name=current_scope().prefix+scope_name;
+    name=id2string(identifier.prefixed_name);
     return ANSI_C_TAG;
   }
 
@@ -79,13 +83,16 @@ void ansi_c_parsert::add_tag_with_body(irept &tag)
   const std::string scope_name=
     "tag-"+tag.get_string(ID_C_base_name);
 
-  irep_idt identifier=current_scope().prefix+scope_name;
+  irep_idt prefixed_name=current_scope().prefix+scope_name;
   
-  if(identifier!=tag.get(ID_identifier))
+  if(prefixed_name!=tag.get(ID_identifier))
   {
     // re-defined in a deeper scope
-    current_scope().name_map[scope_name].id_class=ANSI_C_TAG;
-    tag.set(ID_identifier, identifier);
+    ansi_c_identifiert &identifier=
+      current_scope().name_map[scope_name];
+    identifier.id_class=ANSI_C_TAG;
+    identifier.prefixed_name=prefixed_name;
+    tag.set(ID_identifier, prefixed_name);
   }
 }
 
@@ -175,14 +182,16 @@ void ansi_c_parsert::add_declarator(
     scopet &scope=
       force_root_scope?root_scope():current_scope();
 
-    // add to scope  
-    scope.name_map[base_name].id_class=id_class;
-
     // set the final name    
-    irep_idt name=force_root_scope?
+    irep_idt prefixed_name=force_root_scope?
              base_name:
              current_scope().prefix+id2string(base_name);
-    new_declarator.set_name(name);
+    new_declarator.set_name(prefixed_name);
+
+    // add to scope  
+    ansi_c_identifiert &identifier=scope.name_map[base_name];
+    identifier.id_class=id_class;
+    identifier.prefixed_name=prefixed_name;
   }
   
   ansi_c_declaration.declarators().push_back(new_declarator);

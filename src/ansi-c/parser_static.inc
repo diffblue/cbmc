@@ -366,8 +366,11 @@ static void create_function_scope(const YYSTYPE d)
         if(!param_decl.declarators().empty())
         {
           // add to scope
+          ansi_c_identifiert &identifier=
           PARSER.current_scope().name_map
-            [param_decl.declarator().get_base_name()].id_class=ANSI_C_SYMBOL;
+            [param_decl.declarator().get_base_name()];
+          identifier.id_class=ANSI_C_SYMBOL;
+          identifier.prefixed_name=param_decl.declarator().get_name();
         }
       }
     }
