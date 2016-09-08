@@ -49,9 +49,9 @@ int make_identifier()
 {
   loc();
   
-  // deal with universal identifiers
-  std::string final_identifier;
-  final_identifier.reserve(yyleng);
+  // deal with universal charater names
+  std::string final_base_name;
+  final_base_name.reserve(yyleng);
   
   for(const char *p=yytext; *p!=0; p++)
   {
@@ -69,23 +69,23 @@ int make_identifier()
       
       // turn into utf-8
       std::string utf8_value=utf32_to_utf8(utf32);
-      final_identifier+=utf8_value;
+      final_base_name+=utf8_value;
     }
     else
-      final_identifier+=*p;
+      final_base_name+=*p;
   }
   
-  // this hashes the identifier
-  irep_idt base_name=final_identifier;
-
   if(PARSER.cpp98)
   {
     stack(yyansi_clval).id(ID_symbol);
-    stack(yyansi_clval).set(ID_C_base_name, base_name);
+    stack(yyansi_clval).set(ID_C_base_name, final_base_name);
     return TOK_IDENTIFIER;
   }
   else
   {
+    // this hashes the base name
+    irep_idt base_name=final_base_name;
+
     std::string identifier(id2string(base_name));
 
     // figure out if this is a typedef or something else
