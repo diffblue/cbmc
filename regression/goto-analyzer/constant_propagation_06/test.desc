@@ -1,0 +1,15 @@
+CORE
+constant_propagation_06.c
+--intervals --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] file constant_propagation_06.c line 8 function main, assertion i>=10: SUCCESS$
+^\[main.assertion.2\] file constant_propagation_06.c line 11 function main, assertion i!=30: SUCCESS$
+^\[main.assertion.3\] file constant_propagation_06.c line 14 function main, assertion i!=15: UNKNOWN$
+^\[main.assertion.4\] file constant_propagation_06.c line 17 function main, assertion 0: SUCCESS$
+^\[main.assertion.5\] file constant_propagation_06.c line 20 function main, assertion j>=10: SUCCESS$
+^\[main.assertion.6\] file constant_propagation_06.c line 23 function main, assertion i>=j: UNKNOWN$
+^\[main.assertion.7\] file constant_propagation_06.c line 26 function main, assertion i>=11: SUCCESS$
+^\[main.assertion.8\] file constant_propagation_06.c line 29 function main, assertion j<100: SUCCESS$
+--
+^warning: ignoring
