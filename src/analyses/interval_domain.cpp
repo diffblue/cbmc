@@ -129,7 +129,7 @@ void interval_domaint::transform(
 
 /*******************************************************************\
 
-Function: interval_domaint::merge
+Function: interval_domaint::join
 
   Inputs:
 
@@ -139,10 +139,8 @@ Function: interval_domaint::merge
 
 \*******************************************************************/
 
-bool interval_domaint::merge(
-  const interval_domaint &b,
-  locationt from,
-  locationt to)
+bool interval_domaint::join(
+  const interval_domaint &b)
 {
   if(b.bottom) return false;
   if(bottom) { *this=b; return true; }
@@ -513,7 +511,8 @@ Function: interval_domaint::domain_simplify
 
 \*******************************************************************/
 
-exprt interval_domaint::domain_simplify (const exprt &condition) const
+exprt interval_domaint::domain_simplify (const exprt &condition,
+					 const namespacet &ns) const
 {
   interval_domaint d(*this);
   
@@ -529,7 +528,7 @@ exprt interval_domaint::domain_simplify (const exprt &condition) const
     d.output(std::cout, interval_analysis, ns);
 #endif
     
-    if (!a.merge(d, t, t))
+    if (!a.join(d))
       goto make_true;
   }
   else if (condition.id()==ID_symbol)
