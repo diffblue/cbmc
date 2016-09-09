@@ -189,6 +189,7 @@ void remove_virtual_functionst::remove_virtual_function(
   exprt deref=dereference_exprt(this_expr, this_expr.type().subtype());
   exprt c_id2=build_class_identifier(deref);
 
+  goto_programt::targett last_function;
   for(const auto &fun : functions)
   {
     goto_programt::targett t1=new_code_calls.add_instruction();
@@ -208,6 +209,8 @@ void remove_virtual_functionst::remove_virtual_function(
       t1->make_assertion(false_exprt());
     }
 
+    last_function=t1;
+
     // goto final
     goto_programt::targett t3=new_code_calls.add_instruction();
     t3->make_goto(t_final, true_exprt());
@@ -217,6 +220,11 @@ void remove_virtual_functionst::remove_virtual_function(
     goto_programt::targett t4=new_code_gotos.add_instruction();
     t4->make_goto(t1, equal_exprt(c_id1, c_id2));
   }
+
+  // In any other case (most likely a stub class) call the most basic
+  // version of the method we know to exist:
+  goto_programt::targett fallthrough=new_code_gotos.add_instruction();
+  fallthrough->make_goto(last_function);
 
   goto_programt new_code;
 
