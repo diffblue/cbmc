@@ -441,12 +441,6 @@ int goto_analyzer_parse_optionst::doit()
   if(set_properties())
     return 7;
 
-  if(cmdline.isset("show-intervals"))
-  {
-    show_intervals(goto_model, std::cout);
-    return 0;
-  }
-
 
   // Output file factory
   std::ostream *out;
