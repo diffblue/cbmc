@@ -1,0 +1,9 @@
+CORE
+constant_propagation_09.c
+--intervals --verify
+^EXIT=0$
+^SIGNAL=0$
+******** Function main
+^\[main.assertion.1\] file constant_propagation_09.c line 12 function main, assertion j<52: UNKNOWN$
+--
+^warning: ignoring
