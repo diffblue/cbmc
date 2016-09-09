@@ -120,10 +120,11 @@ void static_simplifiert<analyzerT>::simplify_program()
     unsigned assumes;
     unsigned gotos;
     unsigned assigns;
+    unsigned function_calls;
   };
   
-  counters simplified = {0,0,0,0};
-  counters unmodified = {0,0,0,0};
+  counters simplified = {0,0,0,0,0};
+  counters unmodified = {0,0,0,0,0};
 
   Forall_goto_functions(f_it, goto_functions)
   {
@@ -163,6 +164,30 @@ void static_simplifiert<analyzerT>::simplify_program()
 	assign.rhs() = simplified_rhs;
 	i_it->code = assign;
       }
+      else if (i_it->is_function_call())
+      {
+	unsigned result = 0;
+	code_function_callt fcall(to_code_function_call(i_it->code));
+	
+	exprt new_function = domain[i_it].domain_simplify(fcall.function(), ns);
+	result |= (new_function == fcall.function()) ? 0 : 1;
+	fcall.function() = new_function;
+	
+	exprt::operandst &args = fcall.arguments();
+
+	for(exprt::operandst::iterator o_it = args.begin();
+          o_it != args.end(); ++o_it)
+	{
+	  exprt new_arg = domain[i_it].domain_simplify(*o_it, ns);
+	  result |= (new_arg == *o_it) ? 0 : 1;
+	  *o_it = new_arg;
+	}
+
+	i_it->code = fcall;
+	
+	simplified.function_calls += result;
+	unmodified.function_calls += (1 - result);
+      }
     }
   }
   
@@ -175,12 +200,14 @@ void static_simplifiert<analyzerT>::simplify_program()
 	   << ", assume: " << simplified.assumes
 	   << ", goto: " << simplified.gotos
 	   << ", assigns: " << simplified.assigns
+	   << ", function calls: " << simplified.function_calls
 	   << "\n"
 	   << "UNMODIFIED: "
 	   << " assert: " << unmodified.asserts
 	   << ", assume: " << unmodified.assumes
 	   << ", goto: " << unmodified.gotos
 	   << ", assigns: " << unmodified.assigns
+	   << ", function calls: " << unmodified.function_calls
 	   << eom;
 
   return;
