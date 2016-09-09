@@ -108,7 +108,7 @@ void static_analyzert<analyzerT>::plain_text_report()
     {
       if(!i_it->is_assert()) continue;
 
-      exprt simplified = domain[i_it].domain_simplify(i_it->guard);
+      exprt simplified = domain[i_it].domain_simplify(i_it->guard, ns);
       
       result() << '[' << i_it->source_location.get_property_id()
                << ']' << ' ';
@@ -162,7 +162,7 @@ void static_analyzert<analyzerT>::json_report()
     {
       if(!i_it->is_assert()) continue;
 
-      exprt simplified = domain[i_it].domain_simplify(i_it->guard);
+      exprt simplified = domain[i_it].domain_simplify(i_it->guard, ns);
 
       json_objectt &j=json_result.push_back().make_object();
 
@@ -212,7 +212,7 @@ void static_analyzert<analyzerT>::xml_report()
     {
       if(!i_it->is_assert()) continue;
       
-      exprt simplified = domain[i_it].domain_simplify(i_it->guard);
+      exprt simplified = domain[i_it].domain_simplify(i_it->guard, ns);
 
       xmlt &x=xml_result.new_element("result");
 

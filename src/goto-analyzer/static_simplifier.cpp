@@ -94,7 +94,7 @@ Function: static_simplifiert<analyzerT>::simplify_guard
 template <class analyzerT>
 unsigned static_simplifiert<analyzerT>::simplify_guard(goto_programt::instructionst::iterator &i_it)
 {
-  exprt simplified = domain[i_it].domain_simplify(i_it->guard);
+  exprt simplified = domain[i_it].domain_simplify(i_it->guard, ns);
   unsigned return_value = (simplified == i_it->guard) ? 0 : 1;
   i_it->guard = simplified;
   return return_value;
@@ -151,8 +151,8 @@ void static_simplifiert<analyzerT>::simplify_program()
       {
 	code_assignt assign(to_code_assign(i_it->code));
 	
-	exprt simplified_lhs = domain[i_it].domain_simplify(assign.lhs());
-	exprt simplified_rhs = domain[i_it].domain_simplify(assign.rhs());
+	exprt simplified_lhs = domain[i_it].domain_simplify(assign.lhs(), ns);
+	exprt simplified_rhs = domain[i_it].domain_simplify(assign.rhs(), ns);
 
 	unsigned result = (simplified_lhs == assign.lhs() &&
 			   simplified_rhs == assign.rhs()) ? 0 : 1;
