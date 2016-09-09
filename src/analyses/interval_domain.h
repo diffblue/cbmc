@@ -75,7 +75,9 @@ public:
   {
     return bottom;
   }
-
+  
+  virtual exprt domain_simplify (const exprt &condition) const;
+  
 protected:
   bool bottom;
 

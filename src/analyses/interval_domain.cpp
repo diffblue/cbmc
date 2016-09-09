@@ -500,3 +500,54 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
   else
     return true_exprt();
 }
+
+/*******************************************************************\
+
+Function: interval_domaint::domain_simplify
+
+  Inputs: The expression to simplify.
+
+ Outputs: A simplified version of the expression.
+
+ Purpose: Uses the domain to simplify a given expression using context-specific information.
+
+\*******************************************************************/
+
+exprt interval_domaint::domain_simplify (const exprt &condition) const
+{
+  interval_domaint d(*this);
+  
+  //merge intervals to properly handle conjunction
+  if (condition.id()==ID_and)
+  {
+    interval_domaint a;
+    a.make_top();
+    a.assume(condition,ns);
+    
+#ifdef DEBUG
+    a.output(std::cout, interval_analysis, ns);
+    d.output(std::cout, interval_analysis, ns);
+#endif
+    
+    if (!a.merge(d, t, t))
+      goto make_true;
+  }
+  else if (condition.id()==ID_symbol)
+  {
+    //TODO: we have to handle symbol expression
+  }
+  else
+  {
+    d.assume(not_exprt(condition), ns);
+    if(d.is_bottom())
+      goto make_true;
+  }
+
+  return condition;
+  
+ make_true:
+  exprt e;
+  e.make_true();
+  return e;
+}
+ 
