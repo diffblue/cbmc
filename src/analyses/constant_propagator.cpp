@@ -333,6 +333,32 @@ void constant_propagator_domaint::assign(
 
 /*******************************************************************\
 
+Function: constant_propagator_domaint::domain_simplify
+
+  Inputs: The condition to simplify and its namespace.
+
+ Outputs: The simplified condition.
+
+ Purpose: Simplify the condition given context-sensitive knowledge from the domain.
+
+\*******************************************************************/
+
+exprt constant_propagator_domaint::domain_simplify (const exprt &condition,
+						    const namespacet &ns,
+						    const bool lhs) const
+{
+  if (lhs) {
+    // For now do not simplify the left hand sides of assignments
+    return condition;
+  } else {
+    exprt e(condition);
+    values.replace_const(e);
+    return simplify_expr(e, ns);
+  }
+}
+
+/*******************************************************************\
+
 Function: constant_propagator_domaint::is_array_constant
 
   Inputs:
