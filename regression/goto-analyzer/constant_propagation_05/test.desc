@@ -1,6 +1,6 @@
 CORE
 constant_propagation_05.c
---constant-propagation --verify
+--constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file constant_propagation_05.c line 12 function main, assertion j!=3: FAILURE$

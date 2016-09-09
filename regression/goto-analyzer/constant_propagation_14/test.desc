@@ -1,6 +1,6 @@
 CORE
 constant_propagation_14.c
---constant-propagation --simplify
+--constants --simplify out.goto
 ^EXIT=0$
 ^SIGNAL=0$
 ^SIMPLIFIED:  assert: 1, assume: 0, goto: 0$

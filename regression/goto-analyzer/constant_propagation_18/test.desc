@@ -1,6 +1,6 @@
 CORE
 constant_propagation_18.c
---constant-propagation --verify
+--constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file constant_propagation_18.c line 9 function main, assertion a\[0\]==2: FAILURE$
