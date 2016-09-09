@@ -29,6 +29,7 @@ public:
   void make_bottom() final { values.set_to_bottom(); }
   void make_entry() final { values.set_to_top(); }
   bool merge(const constant_propagator_domaint &, locationt, locationt);
+  virtual exprt domain_simplify (const exprt &condition, const namespacet &ns, const bool lhs = false) const;
 
   struct valuest
   {
