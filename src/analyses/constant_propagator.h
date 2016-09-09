@@ -30,6 +30,10 @@ public:
   void make_entry() final { values.set_to_top(); }
   bool merge(const constant_propagator_domaint &, locationt, locationt);
 
+  virtual bool ai_simplify(
+    exprt &condition,
+    const namespacet &ns) const override;
+
   struct valuest
   {
   public:
