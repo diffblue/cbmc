@@ -246,12 +246,3 @@ bool static_analyzer(
   m.status() << "Task / Interpreter / Domain combination not supported" << messaget::eom;
   return true;
 }
-
-void show_intervals(
-  const goto_modelt &goto_model,
-  std::ostream &out)
-{
-  ait<interval_domaint> interval_analysis;
-  interval_analysis(goto_model);
-  interval_analysis.output(goto_model, out);
-}
