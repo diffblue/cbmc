@@ -23,8 +23,4 @@ bool static_analyzer(
   message_handlert &,
   std::ostream &);
 
-void show_intervals(
-  const goto_modelt &,
-  std::ostream &);
-
 #endif
