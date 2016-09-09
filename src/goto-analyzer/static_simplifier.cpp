@@ -156,8 +156,8 @@ void static_simplifiert<analyzerT>::simplify_program()
 
 	unsigned result = (simplified_lhs == assign.lhs() &&
 			   simplified_rhs == assign.rhs()) ? 0 : 1;
-	simplified.assign += result;
-	unmodified.assign += (1 - result);
+	simplified.assigns += result;
+	unmodified.assigns += (1 - result);
 
 	assign.lhs() = simplified_lhs;
 	assign.rhs() = simplified_rhs;
