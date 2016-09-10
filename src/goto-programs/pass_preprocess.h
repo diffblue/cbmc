@@ -14,6 +14,8 @@ Date:   September 2016
 
 #include <goto-programs/goto_model.h>
 
+
+exprt replace_string_literals(symbol_tablet &, goto_functionst &,const exprt & );
 void pass_preprocess(symbol_tablet &, goto_functionst &);
 
 #endif

@@ -40,7 +40,9 @@ void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_f
   rhs.type()=old_type.return_type();
   rhs.add_source_location()=function_call.source_location();
   rhs.function()=symbol_exprt(function_name);
-  rhs.arguments()=function_call.arguments();
+  //rhs.arguments()=function_call.arguments();
+  for(int i = 0; i < function_call.arguments().size(); i++)
+    rhs.arguments().push_back(replace_string_literals(symbol_table,goto_functions,function_call.arguments()[i]));
   code_assignt assignment(function_call.lhs(), rhs);
   assignment.add_source_location()=function_call.source_location();
   i_it->make_assignment();
@@ -60,12 +62,13 @@ void make_string_function_of_assign(symbol_tablet & symbol_table, goto_functions
   tmp_symbol.mode=ID_java;
   tmp_symbol.name=function_name;
   symbol_table.add(tmp_symbol);
-    
-  function_application_exprt rhs;
+  
+  exprt rhs = replace_string_literals(symbol_table,goto_functions,assign.rhs().op0());
+  /*function_application_exprt rhs;
   rhs.type()=old_type;
   rhs.add_source_location()=assign.source_location();
   rhs.function()=symbol_exprt(function_name);
-  rhs.arguments().push_back(address_of_exprt(assign.rhs().op0()));
+  rhs.arguments().push_back(address_of_exprt(assign.rhs().op0()));*/
   code_assignt assignment(assign.lhs(), rhs);
   assignment.add_source_location()=assign.source_location();
   i_it->make_assignment();
@@ -90,7 +93,7 @@ void make_string_function_call(symbol_tablet & symbol_table, goto_functionst & g
   rhs.add_source_location()=function_call.source_location();
   rhs.function()=symbol_exprt(function_name);
   for(int i = 1; i < function_call.arguments().size(); i++)
-    rhs.arguments().push_back(function_call.arguments()[i]);
+    rhs.arguments().push_back(replace_string_literals(symbol_table,goto_functions,function_call.arguments()[i]));
   code_assignt assignment(function_call.arguments()[0], rhs);
   assignment.add_source_location()=function_call.source_location();
   i_it->make_assignment();
@@ -138,13 +141,20 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	} else if(function_id == irep_idt("java::java.lang.String.endsWith:(Ljava/lang/String;)Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_endswith");
 	} else if(function_id == irep_idt("java::java.lang.String.<init>:(Ljava/lang/String;)V")) {
-	  make_string_function_call(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_literal");
+	  make_string_function_call(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_copy");
 	}
       } 
     } else {
       //std::cout << "processing a none function call " << i_it->code.pretty() << std::endl;
       if(i_it->is_assign()) {
+	std::cout << "found a string assignment: " << i_it->code.pretty() << std::endl;
 	code_assignt assignment = to_code_assign(i_it->code);
+	exprt new_rhs = replace_string_literals(symbol_table,goto_functions,assignment.rhs());
+	code_assignt new_assignment(assignment.lhs(),new_rhs);
+	new_assignment.add_source_location()=assignment.source_location();
+	i_it->make_assignment();
+	i_it->code=new_assignment;
+	/*
 	if(has_java_string_type(assignment.rhs()) ) {
 	  std::cout << "found a string assignment: " << i_it->code.pretty() << std::endl;
 	  if(assignment.rhs().operands().size() == 1 && 
@@ -154,10 +164,36 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	    if(id.substr(0,31) == "java::java.lang.String.Literal.")
 	      make_string_function_of_assign(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_literal");
 	  }
-	}
-      }}
+	  }*/
+      }
+    }
   }
   return;
+}
+
+exprt replace_string_literals(symbol_tablet & symbol_table,goto_functionst & goto_functions,
+			      const exprt & expr) {
+  if(has_java_string_type(expr) ) {
+    if(expr.operands().size() == 1 && expr.op0().id() ==ID_symbol) {
+      std::string id(to_symbol_expr(expr.op0()).get_identifier().c_str());
+      std::cout << "id = \"" << id.substr(0,31) << "\"" << std::endl;
+      if(id.substr(0,31) == "java::java.lang.String.Literal."){
+	function_application_exprt rhs;
+	rhs.type()=expr.type();
+	rhs.add_source_location()=expr.source_location();
+	rhs.function()=symbol_exprt("__CPROVER_uninterpreted_string_literal");
+	goto_functions.function_map[irep_idt("__CPROVER_uninterpreted_string_literal")];
+	rhs.arguments().push_back(address_of_exprt(expr.op0()));
+	auxiliary_symbolt tmp_symbol;
+	tmp_symbol.is_static_lifetime=false;
+	tmp_symbol.mode=ID_java;
+	tmp_symbol.name="__CPROVER_uninterpreted_string_literal";
+	symbol_table.add(tmp_symbol);
+	return rhs;
+      }
+    }
+  }
+  return expr;
 }
 
 void pass_preprocess(symbol_tablet & symbol_table, goto_functionst & goto_functions){
