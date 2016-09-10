@@ -98,10 +98,13 @@ public:
   inline binary_relation_exprt operator<= (const exprt & rhs)
   { return binary_relation_exprt(length(), ID_le, rhs); }
 
+  static irep_idt extract_java_string(const symbol_exprt & s);
+
+  void of_string_constant(irep_idt sval, int char_width, unsignedbv_typet char_type, axiom_vect &axioms);
+
 private:
   // Auxiliary functions for of_expr
   void of_function_application(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
-
   void of_string_literal(const function_application_exprt &f,axiom_vect &axioms);
   void of_string_concat(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_substring(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);

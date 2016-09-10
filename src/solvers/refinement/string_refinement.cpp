@@ -348,6 +348,20 @@ void string_refinementt::add_lemma(const exprt &lemma)
   add_lemma(implies_exprt(prem,body));*/
 }
 
+
+
+string_exprt string_refinementt::string_of_symbol(const symbol_exprt & sym){
+  if(string_ref_typet::is_java_string_type(sym.type()) 
+     && starts_with(std::string(sym.get(ID_identifier).c_str()),"java::java.lang.String.Literal.")) {
+    string_exprt s;
+    s.of_string_constant(string_exprt::extract_java_string(sym),JAVA_CHAR_WIDTH,string_ref_typet::java_char_type(),string_axioms);
+    return s;
+  }
+  else
+    return symbol_to_string[sym.get_identifier()];
+}  
+
+
 void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
 {
   if(str.id()==ID_symbol) 
@@ -358,6 +372,8 @@ void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str
 
 string_exprt string_refinementt::make_string(const exprt & str) 
 {
+  debug() << " make_string of " << str.pretty() << eom;
+
   if(str.id()==ID_symbol) 
     return string_of_symbol(to_symbol_expr(str));
   else
@@ -367,12 +383,10 @@ string_exprt string_refinementt::make_string(const exprt & str)
 bvt string_refinementt::convert_string_equal(
   const function_application_exprt &f)
 {
-  debug() << "convert_string_equal of f of type "<< f.type().pretty() << eom;
   assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
-    
+  
   symbol_exprt eq = fresh_boolean("equal");
   typecast_exprt tc_eq(eq,f.type());
-  bvt bv = convert_bv(tc_eq);
 
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //bad args to string equal?
@@ -402,7 +416,7 @@ bvt string_refinementt::convert_string_equal(
      or_exprt(notequal_exprt(s1.length(), s2.length()),
 	      string_constraintt(notequal_exprt(s1[witness],s2[witness])).exists(witness,zero,s1.length())));
 
-  return bv;
+  return convert_bv(tc_eq);
 }
 
 
@@ -413,8 +427,7 @@ bvt string_refinementt::convert_string_length(
   assert(args.size() == 1); //bad args to string length?
   string_exprt str = make_string(args[0]);
   exprt length = str.length();
-  bvt bv = convert_bv(length);
-  return bv;
+  return convert_bv(length);
 }
 
 exprt string_refinementt::is_positive(const exprt & x)
@@ -426,8 +439,10 @@ bvt string_refinementt::convert_string_is_prefix
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //bad args to string isprefix
+  assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
 
   symbol_exprt isprefix = fresh_boolean("isprefix");
+  typecast_exprt tc_isprefix(isprefix,f.type());
   string_exprt s0 = make_string(args[swap_arguments?1:0]);
   string_exprt s1 = make_string(args[swap_arguments?0:1]);
 
@@ -443,13 +458,15 @@ bvt string_refinementt::convert_string_is_prefix
   // forall witness < s0.length. isprefix => s0[witness] = s2[witness]
 
   or_exprt s0_notpref_s1(not_exprt(s1 >= s0),
-			 and_exprt(s0 > witness, 
-				   notequal_exprt(s0[witness],s1[witness])));
+			 and_exprt(is_positive(witness),
+				   and_exprt(s0 > witness, 
+					     notequal_exprt(s0[witness],s1[witness]))));
 		       
-  string_axioms.emplace_back(implies_exprt (not_exprt(isprefix),and_exprt(is_positive(witness),s0_notpref_s1)));
+  debug() << "Warning: the generated axiom for prefix is not correct?" << eom;
+  string_axioms.emplace_back(implies_exprt (not_exprt(isprefix),s0_notpref_s1));
 
-  assert(f.type() == bool_typet());
-  return convert_bv(isprefix); 
+
+  return convert_bv(tc_isprefix); 
 }
 
 
@@ -458,8 +475,10 @@ bvt string_refinementt::convert_string_is_suffix
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); // bad args to string issuffix?
+  assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
 
   symbol_exprt issuffix = fresh_boolean("issuffix");
+  typecast_exprt tc_issuffix(issuffix,f.type());
   string_exprt s0 = make_string(args[swap_arguments?1:0]);
   string_exprt s1 = make_string(args[swap_arguments?0:1]);
 
@@ -492,10 +511,7 @@ bvt string_refinementt::convert_string_is_suffix
 
   string_axioms.emplace_back(lemma2);
 
-  assert(f.type() == bool_typet());
-  bvt bv = convert_bv(issuffix);
-
-  return bv;
+  return convert_bv(tc_issuffix);
 }
 
 

@@ -115,10 +115,7 @@ private:
     symbol_to_string[sym.get_identifier()]= expr;
   }  
 
-  inline string_exprt string_of_symbol(const symbol_exprt & sym){
-    return symbol_to_string[sym.get_identifier()];
-  }  
-
+  string_exprt string_of_symbol(const symbol_exprt & sym);
 
   // Create a new string expression and add the necessary lemma
   // to ensure its equal to the given string expression.

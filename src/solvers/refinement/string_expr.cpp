@@ -190,7 +190,30 @@ void string_exprt::of_function_application(const function_application_exprt & ex
   }
   throw "non string function";
 }
-					   
+
+irep_idt string_exprt::extract_java_string(const symbol_exprt & s){
+  std::string tmp(s.get(ID_identifier).c_str());
+  std::string value = tmp.substr(31);
+  std::cout << "of_string_litteral: " << value << std::endl;
+  return irep_idt(value);
+}
+
+void string_exprt::of_string_constant(irep_idt sval, int char_width, unsignedbv_typet char_type, axiom_vect &axioms){
+  for (std::size_t i = 0; i < sval.size(); ++i) {
+    std::string idx_binary = integer2binary(i,INDEX_WIDTH);
+    constant_exprt idx(idx_binary, string_ref_typet::index_type());
+    std::string sval_binary=integer2binary(unsigned(sval[i]), char_width);
+    constant_exprt c(sval_binary,char_type);
+    equal_exprt lemma(index_exprt(content(), idx), c);
+    axioms.emplace_back(lemma);
+  }
+  
+  std::string s_length_binary = integer2binary(unsigned(sval.size()),INDEX_WIDTH);
+  exprt s_length = constant_exprt(s_length_binary, string_ref_typet::index_type());
+
+  axioms.emplace_back(equal_exprt(length(),s_length));
+}
+				   
 void string_exprt::of_string_literal(const function_application_exprt &f, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = f.arguments();
@@ -217,29 +240,18 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
     assert (arg.operands().size() == 1); 
     assert(string_ref_typet::is_unrefined_string_type(arg.type()));
     const exprt &s = arg.op0();
+    
     std::cout << "it seems the value of the string is lost, " 
 	      << "we need to recover it from the identifier" << std::endl;
-    std::string tmp(s.get(ID_identifier).c_str());
+    /*std::string tmp(s.get(ID_identifier).c_str());
     std::string value = tmp.substr(31);
-    std::cout << "of_string_litteral: " << value << std::endl;
-    sval = irep_idt(value);
+    std::cout << "of_string_litteral: " << value << std::endl;*/
+    sval = extract_java_string(to_symbol_expr(s));
     char_width = JAVA_CHAR_WIDTH;
     char_type = string_ref_typet::java_char_type();
   }
 
-  for (std::size_t i = 0; i < sval.size(); ++i) {
-    std::string idx_binary = integer2binary(i,INDEX_WIDTH);
-    constant_exprt idx(idx_binary, string_ref_typet::index_type());
-    std::string sval_binary=integer2binary(unsigned(sval[i]), char_width);
-    constant_exprt c(sval_binary,char_type);
-    equal_exprt lemma(index_exprt(content(), idx), c);
-    axioms.emplace_back(lemma);
-  }
-  
-  std::string s_length_binary = integer2binary(unsigned(sval.size()),INDEX_WIDTH);
-  exprt s_length = constant_exprt(s_length_binary, string_ref_typet::index_type());
-
-  axioms.emplace_back(equal_exprt(length(),s_length));
+  of_string_constant(sval,char_width,char_type,axioms);
 }
 
 
