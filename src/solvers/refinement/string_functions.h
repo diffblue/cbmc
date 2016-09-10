@@ -32,6 +32,7 @@ bool is_string_contains_func(irep_idt id);
 bool is_string_char_set_func(irep_idt id);
 bool is_string_index_of_func(irep_idt id);
 bool is_string_last_index_of_func(irep_idt id);
+bool is_string_copy_func(irep_idt id);
 
 
 #endif

@@ -186,6 +186,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_substring(expr,symbol_to_string,axioms);
     } else if (is_string_char_set_func(id)) {
       return of_string_char_set(expr,symbol_to_string,axioms);
+    } else if (is_string_copy_func(id)) {
+      return of_string_copy(expr,symbol_to_string,axioms);
     } 
   }
   throw "non string function";
@@ -282,6 +284,18 @@ void string_exprt::of_string_concat(const function_application_exprt &f, std::ma
   string_constraintt a2(equal_exprt(s2[idx2],(*this)[plus_exprt(idx2,s1.length())]));
   axioms.push_back(a2.forall(idx2, index_zero, s2.length()));
   
+}
+
+void string_exprt::of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 1); //bad args to string copy
+  
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  axioms.emplace_back(equal_exprt(length(), s1.length()));
+  symbol_exprt idx = fresh_symbol("QA_index_copy",string_ref_typet::index_type());
+  string_constraintt a1(equal_exprt(s1[idx],(*this)[idx]));
+  axioms.push_back(a1.forall(idx, index_zero, s1.length()));  
 }
 
 void string_exprt::of_string_substring

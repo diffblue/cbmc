@@ -1,8 +1,7 @@
 public class test_prefix {
 
     public static void main(String[] argv) {
-	String s = "Hello World!"; 
-	//new String("Hello World!");
+	String s = new String("Hello World!");
 	//String t = new String("Hello");
 	//String u = new String("Wello");
 	String u = "Wello";

@@ -25,6 +25,7 @@ Date:   September 2016
 #define string_index_of_func "__CPROVER_uninterpreted_strindexof"
 #define string_last_index_of_func "__CPROVER_uninterpreted_strlastindexof"
 #define string_literal_func "__CPROVER_uninterpreted_string_literal"
+#define string_copy_func "__CPROVER_uninterpreted_string_copy"
 
 bool starts_with(std::string s, std::string t) {
   for(int i = 0; i < t.length(); i++)
@@ -74,6 +75,9 @@ bool is_string_char_set_func(irep_idt id) {
 }
 bool is_string_index_of_func(irep_idt id) {
   return (starts_with(id2string(id),string_index_of_func));
+}
+bool is_string_copy_func(irep_idt id) {
+  return (starts_with(id2string(id),string_copy_func));
 }
 bool is_string_last_index_of_func(irep_idt id) {
   return (starts_with(id2string(id),string_last_index_of_func));

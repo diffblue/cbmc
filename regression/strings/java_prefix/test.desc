@@ -3,6 +3,6 @@ test_prefix.class
 --pass
 ^EXIT=10$
 ^SIGNAL=0$
-^\[assertion.1\] assertion at file test_prefix.java line 13: SUCCESS$
-^\[assertion.2\] assertion at file test_prefix.java line 14: FAILURE$
+^\[assertion.1\] assertion at file test_prefix.java line 12: SUCCESS$
+^\[assertion.2\] assertion at file test_prefix.java line 13: FAILURE$
 --
