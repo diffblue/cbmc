@@ -372,7 +372,7 @@ void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str
 
 string_exprt string_refinementt::make_string(const exprt & str) 
 {
-  debug() << " make_string of " << str.pretty() << eom;
+  //debug() << " make_string of " << str.pretty() << eom;
 
   if(str.id()==ID_symbol) 
     return string_of_symbol(to_symbol_expr(str));
@@ -462,7 +462,6 @@ bvt string_refinementt::convert_string_is_prefix
 				   and_exprt(s0 > witness, 
 					     notequal_exprt(s0[witness],s1[witness]))));
 		       
-  debug() << "Warning: the generated axiom for prefix is not correct?" << eom;
   string_axioms.emplace_back(implies_exprt (not_exprt(isprefix),s0_notpref_s1));
 
 
@@ -598,7 +597,7 @@ bvt string_refinementt::convert_string_index_of(
   
   string_axioms.push_back(string_constraintt(equal_exprt(index,index_of_int(-1)),not_exprt(contains)).exists(index,index_of_int(-1),str.length()));
   string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,index_of_int(-1)));
-  string_axioms.emplace_back(contains,equal_exprt(str[index],c));
+  string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(zero,ID_le,index),equal_exprt(str[index],c)));
 
 
   symbol_exprt n = string_exprt::fresh_symbol("QA_index_of",index_type);
@@ -623,11 +622,15 @@ bvt string_refinementt::convert_string_last_index_of(
   symbol_exprt contains = fresh_boolean("contains_in_index_of");
   string_exprt str = make_string(args[0]);
   exprt c = args[1];
-  assert(c.type() == char_type || c.type() == java_char_type);
+  if(!(c.type() == char_type || c.type() == java_char_type)){
+    debug() << "warning: argument to string_index_of does not have char type: " 
+	    << c.type().pretty() << eom;    
+    c = typecast_exprt(c,java_char_type);
+  }
 
   string_axioms.push_back(string_constraintt(equal_exprt(index,index_of_int(-1)),not_exprt(contains)).exists(index,index_of_int(-1),str.length()));
   string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,index_of_int(-1)));
-  string_axioms.emplace_back(contains,equal_exprt(str[index],c));
+  string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(zero,ID_le,index),equal_exprt(str[index],c)));
   
   symbol_exprt n = string_exprt::fresh_symbol("QA_last_index_of",index_type);
   string_axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,plus_exprt(index,index_of_int(1)),str.length()));
@@ -1182,7 +1185,8 @@ string_constraintt string_refinementt::instantiate(const string_constraintt &axi
   exprt r = compute_subst(axiom.get_univ_var(), val, idx);
   exprt instance(axiom);
   replace_expr(axiom.get_univ_var(), r, instance);
-  exprt bounds = axiom.univ_within_bounds();
+  // We are not sure the index set contains only positive numbers
+  exprt bounds = and_exprt(axiom.univ_within_bounds(),binary_relation_exprt(zero,ID_le,val));
   replace_expr(axiom.get_univ_var(), r, bounds);
   return string_constraintt(bounds,instance);     
 }

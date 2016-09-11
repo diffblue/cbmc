@@ -14,13 +14,12 @@ Date:   September 2016
 
 #include "pass_preprocess.h"
 
-#include <iostream>
+// #include <iostream> // only for debugging
 #include <solvers/refinement/string_expr.h>
 
 void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_functions,
-			  goto_programt::instructionst::iterator & i_it, irep_idt function_name){
+			  goto_programt::instructionst::iterator & i_it, irep_idt function_name) {
   // replace "lhs=s.charAt(x)" by "lhs=__CPROVER_uninterpreted_string_char_at(s,i)"
-	  
   //to_symbol_expr(function_call.function()).set_identifier(irep_idt("__CPROVER_uninterpreted_string_char_at"));
 
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -33,6 +32,8 @@ void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_f
   tmp_symbol.name=function_name;
   // tmp_symbol.type=type;
   symbol_table.add(tmp_symbol);
+  // make sure it is in the function map
+  goto_functions.function_map[irep_idt(function_name)];
   
   //debug() << "we should replace the function call by  function application?" << "see builtin_functions.cpp" << eom;
   
@@ -47,8 +48,6 @@ void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_f
   assignment.add_source_location()=function_call.source_location();
   i_it->make_assignment();
   i_it->code=assignment;
-  // make sure it is in the function map
-  goto_functions.function_map[irep_idt(function_name)];
 }
 
 void make_string_function_of_assign(symbol_tablet & symbol_table, goto_functionst & goto_functions,
@@ -130,6 +129,8 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_char_at");
 	} else if(function_id == irep_idt("java::java.lang.String.indexOf:(I)I")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strindexof");
+	} else if(function_id == irep_idt("java::java.lang.String.lastIndexOf:(I)I")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strlastindexof");
 	} else if(function_id == irep_idt("java::java.lang.String.concat:(Ljava/lang/String;)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strcat");
 	} else if(function_id == irep_idt("java::java.lang.String.length:()I")) {
@@ -147,7 +148,7 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
     } else {
       //std::cout << "processing a none function call " << i_it->code.pretty() << std::endl;
       if(i_it->is_assign()) {
-	std::cout << "found a string assignment: " << i_it->code.pretty() << std::endl;
+	//std::cout << "found a string assignment: " << i_it->code.pretty() << std::endl;
 	code_assignt assignment = to_code_assign(i_it->code);
 	exprt new_rhs = replace_string_literals(symbol_table,goto_functions,assignment.rhs());
 	code_assignt new_assignment(assignment.lhs(),new_rhs);
@@ -176,7 +177,7 @@ exprt replace_string_literals(symbol_tablet & symbol_table,goto_functionst & got
   if(has_java_string_type(expr) ) {
     if(expr.operands().size() == 1 && expr.op0().id() ==ID_symbol) {
       std::string id(to_symbol_expr(expr.op0()).get_identifier().c_str());
-      std::cout << "id = \"" << id.substr(0,31) << "\"" << std::endl;
+      //std::cout << "id = \"" << id.substr(0,31) << "\"" << std::endl;
       if(id.substr(0,31) == "java::java.lang.String.Literal."){
 	function_application_exprt rhs;
 	rhs.type()=expr.type();

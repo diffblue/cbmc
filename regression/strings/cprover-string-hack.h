@@ -62,4 +62,5 @@ extern __CPROVER_bool __CPROVER_uninterpreted_strcontains(__CPROVER_string str1,
 extern int __CPROVER_uninterpreted_strindexof(__CPROVER_string str, __CPROVER_char c);
 extern int __CPROVER_uninterpreted_strlastindexof(__CPROVER_string str, __CPROVER_char c);
 extern __CPROVER_string __CPROVER_uninterpreted_char_set(__CPROVER_string str, int pos, __CPROVER_char c);
+extern __CPROVER_string __CPROVER_uninterpreted_string_copy(__CPROVER_string str);
 

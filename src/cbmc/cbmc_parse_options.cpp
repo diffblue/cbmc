@@ -888,6 +888,10 @@ bool cbmc_parse_optionst::process_goto_program(
              << config.ansi_c.arch << ")" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
 
+    debug () << "beggining" << eom;
+    show_goto_functions(ns, get_ui(), goto_functions);
+
+
     if(cmdline.isset("string-abstraction"))
       string_instrumentation(
         symbol_table, get_message_handler(), goto_functions);
@@ -897,6 +901,8 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
     remove_virtual_functions(symbol_table, goto_functions);
+    show_goto_functions(ns, get_ui(), goto_functions);
+
 
     // full slice?
     if(cmdline.isset("full-slice"))
@@ -916,9 +922,11 @@ bool cbmc_parse_optionst::process_goto_program(
 
     // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
+
+
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
-    
+
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
@@ -938,6 +946,8 @@ bool cbmc_parse_optionst::process_goto_program(
       string_abstraction(symbol_table,
         get_message_handler(), goto_functions);
     }
+
+    // for debuggin: show_goto_functions(ns, get_ui(), goto_functions);
 
     // add failed symbols
     // needs to be done before pointer analysis
@@ -987,6 +997,15 @@ bool cbmc_parse_optionst::process_goto_program(
     // remove skips
     remove_skip(goto_functions);
     goto_functions.update();
+
+    // for debuggin: 
+    show_goto_functions(ns, get_ui(), goto_functions);
+
+    /*    debug() << "DETAILS:" << eom;
+    Forall_goto_functions(it,goto_functions) 
+      Forall_goto_program_instructions(it2,it->second.body){
+      debug() << "program instruction: " << it2->code.pretty() << eom;
+      }*/
   }
 
   catch(const char *e)
