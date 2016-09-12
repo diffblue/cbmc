@@ -84,8 +84,9 @@ bool string_ref_typet::is_java_string_type(const typet &type)
       return (tag == irep_idt("java.lang.String"));
     } 
     else {
-      std::cout << "string_ref_typet::is_java_string_type: warning: incomplete string type" << std::endl;
-      return true;
+      std::cout << "string_ref_typet::is_java_string_type: warning: incomplete string type " 
+		<< type.pretty() << std::endl;
+      return false;
     }
   } else return false;
 }
@@ -145,7 +146,14 @@ symbol_exprt qvar2 = fresh_symbol("string_if",string_ref_typet::index_type());
 string_exprt string_exprt::get_string_of_symbol(std::map<irep_idt, string_exprt> & symbol_to_string, const symbol_exprt & sym) {
   std::cout << "get_string_of_symbol : " << sym.pretty() << std::endl;
   
-  if(string_ref_typet::is_java_string_type(sym.type())) {
+  if(string_ref_typet::is_c_string_type(sym.type())) {
+    irep_idt id = sym.get_identifier();
+    std::map<irep_idt, string_exprt>::iterator f = symbol_to_string.find(id);
+    if(f == symbol_to_string.end()) {
+      symbol_to_string[id]= string_exprt(string_ref_typet::char_type());
+      return symbol_to_string[id];
+    } else return f->second;
+  }  else { // otherwise we assume it is a java string
     irep_idt id = sym.get_identifier();
     std::map<irep_idt, string_exprt>::iterator f = symbol_to_string.find(id);
     if(f == symbol_to_string.end()) {
@@ -153,31 +161,19 @@ string_exprt string_exprt::get_string_of_symbol(std::map<irep_idt, string_exprt>
       return symbol_to_string[id];
     } else return f->second;
   }
-  else {
-    irep_idt id = sym.get_identifier();
-    std::map<irep_idt, string_exprt>::iterator f = symbol_to_string.find(id);
-    if(f == symbol_to_string.end()) {
-      symbol_to_string[id]= string_exprt(string_ref_typet::char_type());
-      return symbol_to_string[id];
-    } else return f->second;
-  }
+
 }
 
 string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   unsignedbv_typet char_type;
-  if(!string_ref_typet::is_unrefined_string_type(unrefined_string.type())) {
-    std::cout << "string_exprt::of_expr: wrong type for expression "
-	      << unrefined_string.pretty() << std::endl;
-    assert(false);
-  }
 
-  if(string_ref_typet::is_java_string_type(unrefined_string.type())) {
-    std::cout << "string_exprt::of_expr(java_string)" << std::endl;
-    char_type = string_ref_typet::java_char_type();
-  } else {
+  if(string_ref_typet::is_c_string_type(unrefined_string.type())) {
     std::cout << "string_exprt::of_expr(c_string)" << std::endl;
     char_type = string_ref_typet::char_type();
+  } else {
+    std::cout << "string_exprt::of_expr(java_string)" << std::endl;
+    char_type = string_ref_typet::java_char_type();
   }
 
   string_exprt s(char_type);
