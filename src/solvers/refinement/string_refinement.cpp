@@ -357,8 +357,10 @@ string_exprt string_refinementt::string_of_symbol(const symbol_exprt & sym){
     s.of_string_constant(string_exprt::extract_java_string(sym),JAVA_CHAR_WIDTH,string_ref_typet::java_char_type(),string_axioms);
     return s;
   }
-  else
-    return symbol_to_string[sym.get_identifier()];
+  else {
+    return string_exprt::get_string_of_symbol(symbol_to_string,sym);
+  }
+  //return symbol_to_string[sym.get_identifier()];
 }  
 
 

@@ -64,6 +64,9 @@ public:
   // equal to the given expression.
   static string_exprt of_expr(const exprt & unrefined_string, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 
+  // We maintain a map from symbols to strings. If a symbol is not yet present we will create a new one with the correct type depending on whether this is a java or c string
+  static string_exprt get_string_of_symbol(std::map<irep_idt, string_exprt> & symbol_to_string, const symbol_exprt & sym);
+
   // Generate a new symbol of the given type tp with a prefix 
   static symbol_exprt fresh_symbol(const irep_idt &prefix,
 				   const typet &tp=bool_typet());

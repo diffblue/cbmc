@@ -14,7 +14,7 @@ Date:   September 2016
 
 #include "pass_preprocess.h"
 
-// #include <iostream> // only for debugging
+#include <iostream> // only for debugging
 #include <solvers/refinement/string_expr.h>
 
 void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_functions,
@@ -22,6 +22,7 @@ void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_f
   // replace "lhs=s.charAt(x)" by "lhs=__CPROVER_uninterpreted_string_char_at(s,i)"
   //to_symbol_expr(function_call.function()).set_identifier(irep_idt("__CPROVER_uninterpreted_string_char_at"));
 
+  std::cout << "Warning: in pass_preprocess::make_string_function: we should introduce an intermediary variable for each argument" << std::endl;
   code_function_callt &function_call=to_code_function_call(i_it->code);
   code_typet old_type=to_code_type(function_call.function().type());
 
@@ -141,6 +142,8 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_startswith");
 	} else if(function_id == irep_idt("java::java.lang.String.endsWith:(Ljava/lang/String;)Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_endswith");
+	} else if(function_id == irep_idt("java::java.lang.String.substring:(II)Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_substring");
 	} else if(function_id == irep_idt("java::java.lang.String.<init>:(Ljava/lang/String;)V")) {
 	  make_string_function_call(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_copy");
 	}

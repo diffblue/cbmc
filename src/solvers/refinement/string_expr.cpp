@@ -49,6 +49,7 @@ string_ref_typet::string_ref_typet(unsignedbv_typet char_type) : struct_typet() 
   components()[1].set_name("content");
   components()[1].set_pretty_name("content");
   components()[1].type()=char_array;
+  std::cout << "string_ref_typet() --> " << this->pretty() << std::endl;
 }
 
 exprt index_zero = string_ref_typet::index_zero();
@@ -81,13 +82,18 @@ bool string_ref_typet::is_java_string_type(const typet &type)
     if(subtype.id() == ID_struct) {
       irep_idt tag = to_struct_type(subtype).get_tag();
       return (tag == irep_idt("java.lang.String"));
-    } else return false;
+    } 
+    else {
+      std::cout << "string_ref_typet::is_java_string_type: warning: incomplete string type" << std::endl;
+      return true;
+    }
   } else return false;
 }
 
 string_exprt::string_exprt() : struct_exprt(string_ref_typet())
 {
   string_ref_typet t;
+  std::cout << "string_exprt::string_exprt(): warning: initializing a string expression without knowing its type" << std::endl;
   if(string_language_mode == USE_JAVA_STRINGS)
     t = string_ref_typet(string_ref_typet::java_char_type());
   symbol_exprt length = fresh_symbol("string_length",string_ref_typet::index_type());
@@ -95,14 +101,13 @@ string_exprt::string_exprt() : struct_exprt(string_ref_typet())
   move_to_operands(length,content);
 }
 
-string_exprt::string_exprt(unsignedbv_typet char_type) : struct_exprt(string_ref_typet())
+string_exprt::string_exprt(unsignedbv_typet char_type) : struct_exprt(string_ref_typet(char_type))
 {
   string_ref_typet t(char_type);
-  if(char_type == string_ref_typet::java_char_type())
-    ensure_java_strings();
   symbol_exprt length = fresh_symbol("string_length",string_ref_typet::index_type());
   symbol_exprt content = fresh_symbol("string_content",t.get_content_type());
   move_to_operands(length,content);
+  std::cout << "string_exprt::string_exprt()-> " << this->pretty() << std::endl;
 }
 
 /*
@@ -136,21 +141,60 @@ symbol_exprt qvar2 = fresh_symbol("string_if",string_ref_typet::index_type());
   axioms.push_back(string_constraintt(not_exprt(expr.cond()),equal_exprt((*this)[qvar],f[qvar])).forall(qvar2,index_zero,f.length()));
 }
 
+
+string_exprt string_exprt::get_string_of_symbol(std::map<irep_idt, string_exprt> & symbol_to_string, const symbol_exprt & sym) {
+  std::cout << "get_string_of_symbol : " << sym.pretty() << std::endl;
+  
+  if(string_ref_typet::is_java_string_type(sym.type())) {
+    irep_idt id = sym.get_identifier();
+    std::map<irep_idt, string_exprt>::iterator f = symbol_to_string.find(id);
+    if(f == symbol_to_string.end()) {
+      symbol_to_string[id]= string_exprt(string_ref_typet::java_char_type());
+      return symbol_to_string[id];
+    } else return f->second;
+  }
+  else {
+    irep_idt id = sym.get_identifier();
+    std::map<irep_idt, string_exprt>::iterator f = symbol_to_string.find(id);
+    if(f == symbol_to_string.end()) {
+      symbol_to_string[id]= string_exprt(string_ref_typet::char_type());
+      return symbol_to_string[id];
+    } else return f->second;
+  }
+}
+
 string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
-  string_exprt s;
-  if(string_ref_typet::is_java_string_type(unrefined_string.type()))
-    s = string_exprt(string_ref_typet::java_char_type());
+  unsignedbv_typet char_type;
+  if(!string_ref_typet::is_unrefined_string_type(unrefined_string.type())) {
+    std::cout << "string_exprt::of_expr: wrong type for expression "
+	      << unrefined_string.pretty() << std::endl;
+    assert(false);
+  }
+
+  if(string_ref_typet::is_java_string_type(unrefined_string.type())) {
+    std::cout << "string_exprt::of_expr(java_string)" << std::endl;
+    char_type = string_ref_typet::java_char_type();
+  } else {
+    std::cout << "string_exprt::of_expr(c_string)" << std::endl;
+    char_type = string_ref_typet::char_type();
+  }
+
+  string_exprt s(char_type);
+    
+    
+  std::cout << "string_exprt::of_expr(" << unrefined_string.pretty() << ")" << std::endl << "--> s = "
+	    << s.pretty() << std::endl;
 
   if(unrefined_string.id()==ID_function_application) 
     s.of_function_application(to_function_application_expr(unrefined_string), symbol_to_string,axioms);
   else if(unrefined_string.id()==ID_symbol) 
-    s = symbol_to_string[to_symbol_expr(unrefined_string).get_identifier()];
+    s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string));
   else if(unrefined_string.id()==ID_nondet_symbol) 
-    s = symbol_to_string[unrefined_string.get(ID_identifier)];
+    s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string));
   else if(unrefined_string.id()==ID_address_of) {
     assert(unrefined_string.op0().id()==ID_symbol);
-    s = symbol_to_string[to_symbol_expr(unrefined_string.op0()).get_identifier()];
+    s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string.op0()));
   }
   else if(unrefined_string.id()==ID_if) 
     s.of_if(to_if_expr(unrefined_string),symbol_to_string,axioms);
@@ -304,7 +348,10 @@ void string_exprt::of_string_substring
   const function_application_exprt::argumentst &args = expr.arguments();  
   assert(args.size() == 3); // bad args to string substring?
 
+  std::cout << "of_string_substring(" << args[0].pretty() << ")" << std::endl;
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
+
+  std::cout << "gives str = (" << str.pretty() << ")" << std::endl;
   exprt i(args[1]);
   assert(i.type() == string_ref_typet::index_type());
   exprt j(args[2]);
