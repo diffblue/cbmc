@@ -521,8 +521,10 @@ bvt string_refinementt::convert_string_contains(
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); // bad args to string contains?
+  assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
 
   symbol_exprt contains = fresh_boolean("contains");
+  typecast_exprt tc_contains(contains,f.type());
   string_exprt s0 = make_string(args[0]);
   string_exprt s1 = make_string(args[1]);
 
@@ -556,8 +558,7 @@ bvt string_refinementt::convert_string_contains(
      (zero,plus_exprt(index_of_int(1),minus_exprt(s0.length(),s1.length())), 
       and_exprt(not_exprt(contains),s0 >= s1),zero,s1.length(),s0,s1));
 
-  assert(f.type() == bool_typet());
-  return convert_bv(contains);
+  return convert_bv(tc_contains);
 }
 
 
