@@ -7,32 +7,20 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_SOLUTION_H_
-#define CEGIS_CONTROL_SOLUTION_H_
+#ifndef CEGIS_FIND_CPROVER_INITIALIZE_H_
+#define CEGIS_FIND_CPROVER_INITIALIZE_H_
 
-#include <vector>
+#include <goto-programs/goto_program.h>
 
 /**
  * @brief
  *
  * @details
+ *
+ * @param body
+ *
+ * @return
  */
-class control_solutiont
-{
-public:
-  /**
-   * @brief
-   *
-   * @details
-   */
-  std::vector<double> a;
+goto_programt::targett find_cprover_initialize(goto_programt &body);
 
-  /**
-   * @brief
-   *
-   * @details
-   */
-  std::vector<double> b;
-};
-
-#endif /* CEGIS_CONTROL_SOLUTION_H_ */
+#endif /* CEGIS_FIND_CPROVER_INITIALIZE_H_ */

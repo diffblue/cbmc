@@ -6,7 +6,7 @@
 
 #include <cegis/cegis-util/string_helper.h>
 #include <cegis/cegis-util/program_helper.h>
-#include <cegis/instrument/literals.h>
+#include <cegis/instrument/find_cprover_initialize.h>
 
 #include <cegis/control/value/control_vars.h>
 #include <cegis/control/value/control_types.h>
@@ -16,25 +16,6 @@
 
 namespace
 {
-goto_programt::targett find_cprover_initialize(goto_programt &body)
-{
-  goto_programt::instructionst &instrs=body.instructions;
-  goto_programt::targett pos;
-  const goto_programt::targett end=instrs.end();
-  for (pos=instrs.begin(); pos != end; ++pos)
-  {
-    const goto_programt::instructiont &instr=*pos;
-    if (goto_program_instruction_typet::FUNCTION_CALL != instr.type) continue;
-    const code_function_callt &call=to_code_function_call(instr.code);
-    const exprt &func=call.function();
-    if (ID_symbol != func.id()) continue;
-    const std::string &func_id=id2string(to_symbol_expr(func).get_identifier());
-    if (CPROVER_INIT == func_id) break;
-  }
-  assert(end != pos);
-  return pos;
-}
-
 constant_exprt to_double_expr(const symbol_tablet &st, const double value)
 {
   const typet &data_type=control_float_value_type(st);
@@ -87,7 +68,7 @@ void insert_solution(control_programt &program,
 {
   goto_functionst &gf=program.gf;
   goto_programt &body=get_entry_body(gf);
-  goto_programt::targett pos=find_cprover_initialize(body);
+  const goto_programt::targett pos=find_cprover_initialize(body);
   const irep_idt name(CEGIS_CONTROL_SOLUTION_VAR_NAME);
   const symbol_tablet &st=program.st;
   const source_locationt &loc=pos->source_location;

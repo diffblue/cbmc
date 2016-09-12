@@ -7,32 +7,19 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_SOLUTION_H_
-#define CEGIS_CONTROL_SOLUTION_H_
-
-#include <vector>
+#ifndef CEGIS_CONTROL_LEARN_NONDET_SOLUTION_H_
+#define CEGIS_CONTROL_LEARN_NONDET_SOLUTION_H_
 
 /**
  * @brief
  *
  * @details
+ *
+ * @param st
+ * @param gf
  */
-class control_solutiont
-{
-public:
-  /**
-   * @brief
-   *
-   * @details
-   */
-  std::vector<double> a;
+void nondet_control_solution(
+    const class symbol_tablet &st,
+    class goto_functionst &gf);
 
-  /**
-   * @brief
-   *
-   * @details
-   */
-  std::vector<double> b;
-};
-
-#endif /* CEGIS_CONTROL_SOLUTION_H_ */
+#endif /* CEGIS_CONTROL_LEARN_NONDET_SOLUTION_H_ */

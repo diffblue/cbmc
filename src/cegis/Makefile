@@ -48,7 +48,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       jsa/genetic/solution_helper.cpp jsa/genetic/jsa_serialiser.cpp jsa/genetic/jsa_paragon_wrapper.cpp \
       control/facade/control_runner.cpp control/preprocessing/control_preprocessing.cpp \
       control/options/control_program.cpp \
-      control/learn/control_symex_learn.cpp \
+      control/learn/control_symex_learn.cpp control/learn/nondet_solution.cpp \
       control/verify/control_symex_verify.cpp control/verify/insert_solution.cpp \
       control/value/control_types.cpp \
       wordsize/restrict_bv_size.cpp value/program_individual_serialisation.cpp value/assignments_printer.cpp \
@@ -62,6 +62,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       cegis-util/inline_user_program.cpp cegis-util/counterexample_vars.cpp cegis-util/string_helper.cpp \
       constant/add_constant.cpp constant/literals_collector.cpp constant/default_cegis_constant_strategy.cpp \
       instrument/cegis_library.cpp instrument/instrument_var_ops.cpp instrument/meta_variables.cpp \
+      instrument/find_cprover_initialize.cpp \
       runner/cegis_parse_options.cpp runner/cegis_main.cpp
  
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \

@@ -48,7 +48,7 @@ public:
    */
   void process(
       const counterexamplest &counterexamples,
-      size_t max_solution_size) const;
+      size_t max_solution_size);
 
   /**
    * @brief

@@ -11,9 +11,12 @@ int run_control(optionst &o, messaget::mstreamt &result,
 {
   control_preprocessingt prep(st, gf);
   const control_programt &program=prep.get_program();
-  const control_symex_learnt lcfg(program);
+  control_symex_learnt lcfg(program);
+  const std::function<void(control_solutiont &)> default_solution=
+      [](control_solutiont &solution)
+      { if (solution.a.empty()) solution.a.push_back(0.0);};
   cegis_symex_learnt<control_preprocessingt,
-                     const control_symex_learnt> learn(o, prep, lcfg);
+                     control_symex_learnt> learn(o, prep, lcfg, default_solution);
   control_symex_verifyt vcfg(program);
   cegis_symex_verifyt<control_symex_verifyt> oracle(o, vcfg);
   return run_cegis_with_statistics_wrapper(result, o, learn, oracle, prep);

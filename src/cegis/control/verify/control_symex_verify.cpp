@@ -1,3 +1,4 @@
+#include <cegis/cegis-util/counterexample_vars.h>
 #include <cegis/control/verify/insert_solution.h>
 #include <cegis/control/verify/control_symex_verify.h>
 
@@ -26,13 +27,11 @@ const goto_functionst &control_symex_verifyt::get_goto_functions() const
 void control_symex_verifyt::convert(counterexamplest &counterexamples,
     const goto_tracet &trace) const
 {
-  // TODO: Implement
-  assert(false);
+  counterexamples.push_back(extract_counterexample(trace));
 }
 
 void control_symex_verifyt::show_counterexample(messaget::mstreamt &os,
     const counterexamplet &counterexample) const
 {
-  // TODO: Implement
-  assert(false);
+  show_assignments(os, counterexample);
 }
