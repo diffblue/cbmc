@@ -47,8 +47,12 @@ public:
 
   static bool is_c_string_type(const typet & type);
   static bool is_java_string_type(const typet & type);
+  static bool is_java_string_builder_type(const typet & type);
   static inline bool is_unrefined_string_type(const typet & type)
-  {  return (is_c_string_type(type) || is_java_string_type(type)); }
+  {  return (is_c_string_type(type) || is_java_string_type(type) || is_java_string_builder_type(type)); }
+  static inline bool is_unrefined_string(const exprt & expr)
+  {  return (is_unrefined_string_type(expr.type())); }
+
 };
 
 typedef std::vector<string_constraintt> axiom_vect;

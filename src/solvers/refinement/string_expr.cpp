@@ -13,20 +13,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 // For debuggin
 #include <iostream>
 
-enum {UNDEFINED_MODE, USE_JAVA_STRINGS, USE_C_STRINGS } string_language_mode;
-
-void ensure_java_strings(){
-  if(string_language_mode == UNDEFINED_MODE)
-    string_language_mode = USE_JAVA_STRINGS;
-  assert(string_language_mode == USE_JAVA_STRINGS);
-}
-    
-void ensure_c_strings(){
-  if(string_language_mode == UNDEFINED_MODE)
-    string_language_mode = USE_C_STRINGS;
-  assert(string_language_mode == USE_C_STRINGS);
-}
-
 string_ref_typet::string_ref_typet() : struct_typet() {
   components().resize(2);
   components()[0].set_name("length");
@@ -81,6 +67,19 @@ bool string_ref_typet::is_java_string_type(const typet &type)
     if(subtype.id() == ID_struct) {
       irep_idt tag = to_struct_type(subtype).get_tag();
       return (tag == irep_idt("java.lang.String"));
+    } 
+    else return false;
+  } else return false;
+}
+
+bool string_ref_typet::is_java_string_builder_type(const typet &type)
+{
+  if(type.id() == ID_pointer) {
+    pointer_typet pt = to_pointer_type(type);
+    typet subtype = pt.subtype();
+    if(subtype.id() == ID_struct) {
+      irep_idt tag = to_struct_type(subtype).get_tag();
+      return (tag == irep_idt("java.lang.StringBuilder"));
     } 
     else return false;
   } else return false;
