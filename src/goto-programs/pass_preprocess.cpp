@@ -175,6 +175,8 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_copy");
 	} else if(function_id == irep_idt("java::java.lang.String.<init>:(Ljava/lang/String;)V")) {
 	  make_string_function_call(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_copy");
+	} else if(function_id == irep_idt("java::java.lang.StringBuilder.<init>:()V")) {
+	  make_string_function_call(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_empty_string");
 	}
       } 
     } else {

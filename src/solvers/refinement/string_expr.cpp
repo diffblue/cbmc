@@ -190,6 +190,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_substring(expr,symbol_to_string,axioms);
     } else if (is_string_char_set_func(id)) {
       return of_string_char_set(expr,symbol_to_string,axioms);
+    } else if (is_string_empty_string_func(id)) {
+      return of_empty_string(expr,axioms);
     } else if (is_string_copy_func(id)) {
       return of_string_copy(expr,symbol_to_string,axioms);
     } 
@@ -219,6 +221,12 @@ void string_exprt::of_string_constant(irep_idt sval, int char_width, unsignedbv_
   axioms.emplace_back(equal_exprt(length(),s_length));
 }
 				   
+void string_exprt::of_empty_string(const function_application_exprt &f, axiom_vect & axioms)
+{
+  assert(f.arguments().size() == 0); 
+  axioms.emplace_back(equal_exprt(length(),index_zero));
+}
+
 void string_exprt::of_string_literal(const function_application_exprt &f, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = f.arguments();
