@@ -20,9 +20,8 @@ Date:   September 2016
 void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_functions,
 			  goto_programt::instructionst::iterator & i_it, irep_idt function_name) {
   // replace "lhs=s.charAt(x)" by "lhs=__CPROVER_uninterpreted_string_char_at(s,i)"
-  //to_symbol_expr(function_call.function()).set_identifier(irep_idt("__CPROVER_uninterpreted_string_char_at"));
-
-  std::cout << "Warning: in pass_preprocess::make_string_function: we should introduce an intermediary variable for each argument" << std::endl;
+  // Warning: in pass_preprocess::make_string_function: 
+  // we should introduce an intermediary variable for each argument
   code_function_callt &function_call=to_code_function_call(i_it->code);
   code_typet old_type=to_code_type(function_call.function().type());
 
@@ -36,13 +35,10 @@ void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_f
   // make sure it is in the function map
   goto_functions.function_map[irep_idt(function_name)];
   
-  //debug() << "we should replace the function call by  function application?" << "see builtin_functions.cpp" << eom;
-  
   function_application_exprt rhs;
   rhs.type()=old_type.return_type();
   rhs.add_source_location()=function_call.source_location();
   rhs.function()=symbol_exprt(function_name);
-  //rhs.arguments()=function_call.arguments();
   for(int i = 0; i < function_call.arguments().size(); i++)
     rhs.arguments().push_back(replace_string_literals(symbol_table,goto_functions,function_call.arguments()[i]));
   code_assignt assignment(function_call.lhs(), rhs);
@@ -151,26 +147,13 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	}
       } 
     } else {
-      //std::cout << "processing a none function call " << i_it->code.pretty() << std::endl;
       if(i_it->is_assign()) {
-	//std::cout << "found a string assignment: " << i_it->code.pretty() << std::endl;
 	code_assignt assignment = to_code_assign(i_it->code);
 	exprt new_rhs = replace_string_literals(symbol_table,goto_functions,assignment.rhs());
 	code_assignt new_assignment(assignment.lhs(),new_rhs);
 	new_assignment.add_source_location()=assignment.source_location();
 	i_it->make_assignment();
 	i_it->code=new_assignment;
-	/*
-	if(has_java_string_type(assignment.rhs()) ) {
-	  std::cout << "found a string assignment: " << i_it->code.pretty() << std::endl;
-	  if(assignment.rhs().operands().size() == 1 && 
-	     assignment.rhs().op0().id() ==ID_symbol) {
-	    std::string id(to_symbol_expr(assignment.rhs().op0()).get_identifier().c_str());
-	    std::cout << "id = \"" << id.substr(0,31) << "\"" << std::endl;
-	    if(id.substr(0,31) == "java::java.lang.String.Literal.")
-	      make_string_function_of_assign(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_literal");
-	  }
-	  }*/
       }
     }
   }
@@ -182,7 +165,6 @@ exprt replace_string_literals(symbol_tablet & symbol_table,goto_functionst & got
   if(has_java_string_type(expr) ) {
     if(expr.operands().size() == 1 && expr.op0().id() ==ID_symbol) {
       std::string id(to_symbol_expr(expr.op0()).get_identifier().c_str());
-      //std::cout << "id = \"" << id.substr(0,31) << "\"" << std::endl;
       if(id.substr(0,31) == "java::java.lang.String.Literal."){
 	function_application_exprt rhs;
 	rhs.type()=expr.type();
