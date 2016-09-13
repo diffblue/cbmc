@@ -86,7 +86,7 @@ void __sync_lock_release();
 // other
 int __builtin_choose_expr(_Bool, ...);
 int __builtin_classify_type();
-int __builtin_constant_p();
+int __builtin_constant_p(int);
 void __builtin_trap(void);
 void __builtin_unreachable(void);
 

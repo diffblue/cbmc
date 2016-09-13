@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 \*******************************************************************/
 
 #include <util/source_location.h>
+#include <util/simplify_expr.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -126,7 +127,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
     exprt &size_expr=to_array_type(type).size();
 
     if(size_expr.is_not_nil())
+    {
       typecheck_expr(size_expr);
+      simplify(size_expr, *this);
+    }
 
     typecheck_type(type.subtype());
 
