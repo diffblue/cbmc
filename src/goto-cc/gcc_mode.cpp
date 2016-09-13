@@ -726,6 +726,14 @@ int gcc_modet::gcc_hybrid_binary()
     rename(it->c_str(), (*it+".goto-cc-saved").c_str());
   }
 
+  std::string objcopy_cmd;
+  if(has_suffix(linker_name(cmdline, base_name), "-ld"))
+  {
+    objcopy_cmd=linker_name(cmdline, base_name);
+    objcopy_cmd.erase(objcopy_cmd.size()-2);
+  }
+  objcopy_cmd+="objcopy";
+
   int result=run_gcc();
 
   // merge output from gcc with goto-binaries
@@ -744,7 +752,7 @@ int gcc_modet::gcc_hybrid_binary()
       // remove any existing goto-cc section
       std::vector<std::string> objcopy_argv;
 
-      objcopy_argv.push_back("objcopy");
+      objcopy_argv.push_back(objcopy_cmd);
       objcopy_argv.push_back("--remove-section=goto-cc");
       objcopy_argv.push_back(*it);
 
@@ -756,7 +764,7 @@ int gcc_modet::gcc_hybrid_binary()
       // now add goto-binary as goto-cc section
       std::vector<std::string> objcopy_argv;
 
-      objcopy_argv.push_back("objcopy");
+      objcopy_argv.push_back(objcopy_cmd);
       objcopy_argv.push_back("--add-section");
       objcopy_argv.push_back("goto-cc="+saved);
       objcopy_argv.push_back(*it);
