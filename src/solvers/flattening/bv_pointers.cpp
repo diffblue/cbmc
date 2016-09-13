@@ -296,7 +296,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     const typet &op_type=ns.follow(op.type());
 
     if(op_type.id()==ID_pointer)
-      return convert_pointer_type(op);
+      return convert_bv(op);
     else if(op_type.id()==ID_signedbv ||
             op_type.id()==ID_unsignedbv ||
             op_type.id()==ID_bool ||
