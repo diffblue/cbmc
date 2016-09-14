@@ -8,6 +8,10 @@ public class test_int {
 	char e = s.charAt(3);
 	assert(c == '3');
 	assert(d == '4');
-	assert(e == '2');
+
+	int i = Integer.parseInt("1234");
+	
+	assert(i == 1234);
+	assert(e == '2' || i < 1234);
     }
 }
