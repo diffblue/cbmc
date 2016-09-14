@@ -8,8 +8,6 @@ Date: May 2016
 
 \*******************************************************************/
 
-#include <iostream>
-
 #include <algorithm>
 #include <iterator>
 #include <unordered_set>
@@ -102,6 +100,23 @@ public:
 
 /*******************************************************************\
 
+Function: coverage_goalst::coverage_goalst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+coverage_goalst::coverage_goalst()
+{
+  no_trivial_tests=false;
+}
+
+/*******************************************************************\
+
 Function: coverage_goalst::get_coverage
 
   Inputs:
@@ -118,6 +133,7 @@ coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
   jsont json;
   coverage_goalst goals;
   source_locationt source_location;
+  goals.set_no_trivial_tests(false);
 
   //check coverage file
   if(parse_json(coverage, message_handler, json))
@@ -216,6 +232,39 @@ bool coverage_goalst::is_existing_goal(source_locationt source_location)
     return false;
 }
 
+/*******************************************************************\
+
+Function: coverage_goalst::set_no_trivial_tests
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void coverage_goalst::set_no_trivial_tests(const bool trivial)
+{
+  no_trivial_tests=trivial;
+}
+
+/*******************************************************************\
+
+Function: coverage_goalst::get_no_trivial_tests
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const bool coverage_goalst::get_no_trivial_tests()
+{
+  return no_trivial_tests;
+}
 
 /*******************************************************************\
 
@@ -1590,16 +1639,13 @@ void instrument_cover_goals(
        f_it->first=="__CPROVER_initialize")
       continue;
 
-    //exclude trivial coverage goals of a goto program
-    if (consider_goals(f_it->second.body))
-    {
-      //empty set of existing goals
-      coverage_goalst goals;
-      instrument_cover_goals(symbol_table, f_it->second.body,
-					     criterion, goals);
-    }
+    //empty set of existing goals
+    coverage_goalst goals;
+    instrument_cover_goals(symbol_table, f_it->second.body,
+					       criterion, goals);
   }
 }
+
 /*******************************************************************\
 
 Function: consider_goals
@@ -1613,8 +1659,13 @@ Function: consider_goals
 \*******************************************************************/
 
 bool consider_goals(
-  const goto_programt &goto_program)
+  const goto_programt &goto_program,
+  coverage_goalst &goals)
 {
+  //check whether we should eliminate trivial goals
+  if (!goals.get_no_trivial_tests())
+    return true;
+
   bool result;
   unsigned long count_assignments=0, count_goto=0, count_decl=0;
 
@@ -1634,3 +1685,4 @@ bool consider_goals(
 
   return result;
 }
+
