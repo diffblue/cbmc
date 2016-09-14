@@ -72,8 +72,8 @@ void make_string_function_of_assign(symbol_tablet & symbol_table, goto_functions
   goto_functions.function_map[irep_idt(function_name)];
 }
 
-void make_string_function_call(symbol_tablet & symbol_table, goto_functionst & goto_functions,
-			  goto_programt::instructionst::iterator & i_it, irep_idt function_name){
+void make_string_function_call(symbol_tablet & symbol_table, goto_functionst & goto_functions, 
+			       goto_programt::instructionst::iterator & i_it, irep_idt function_name){
   // replace "s.init(x)" by "s=__CPROVER_uninterpreted_string_literal(x)"
   code_function_callt &function_call=to_code_function_call(i_it->code);
   code_typet old_type=to_code_type(function_call.function().type());
@@ -98,7 +98,7 @@ void make_string_function_call(symbol_tablet & symbol_table, goto_functionst & g
   goto_functions.function_map[irep_idt(function_name)];
 }
 
-void make_string_function_side_effect(symbol_tablet & symbol_table, goto_functionst & goto_functions,
+void make_string_function_side_effect(symbol_tablet & symbol_table, goto_functionst & goto_functions, goto_programt & goto_program,
 			  goto_programt::instructionst::iterator & i_it, irep_idt function_name){
   // replace "s.append(x)" by "s=__CPROVER_uninterpreted_strcat(s,x)"
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -117,11 +117,16 @@ void make_string_function_side_effect(symbol_tablet & symbol_table, goto_functio
   for(int i = 0; i < function_call.arguments().size(); i++)
     rhs.arguments().push_back(replace_string_literals(symbol_table,goto_functions,function_call.arguments()[i]));
   code_assignt assignment(function_call.arguments()[0], rhs);
+  code_assignt assignment2(function_call.lhs(), function_call.arguments()[0]);
   assignment.add_source_location()=function_call.source_location();
   i_it->make_assignment();
   i_it->code=assignment;
   // make sure it is in the function map
   goto_functions.function_map[irep_idt(function_name)];
+
+  i_it = goto_program.insert_after(i_it);
+  i_it->make_assignment();
+  i_it->code=assignment2;
 }
 
 
@@ -177,7 +182,7 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	} else if(function_id == irep_idt("java::java.lang.String.contains:(Ljava/lang/CharSequence;)Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strcontains");
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strcat");
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat");
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.toString:()Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_copy");
 	} else if(function_id == irep_idt("java::java.lang.String.<init>:(Ljava/lang/String;)V")) {
