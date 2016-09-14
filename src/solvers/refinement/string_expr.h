@@ -53,6 +53,10 @@ public:
   static inline bool is_unrefined_string(const exprt & expr)
   {  return (is_unrefined_string_type(expr.type())); }
 
+  static inline constant_exprt index_of_int(int i) {
+    return constant_exprt(integer2binary(i, INDEX_WIDTH), index_type());
+  }
+
 };
 
 typedef std::vector<string_constraintt> axiom_vect;
@@ -118,6 +122,7 @@ private:
   void of_string_char_set(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_empty_string(const function_application_exprt &f, axiom_vect & axioms);
+  void of_int(const function_application_exprt &f, axiom_vect & axioms);
 
   void of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 
@@ -126,7 +131,9 @@ private:
   static unsigned next_symbol_id;
 
   friend inline string_exprt &to_string_expr(exprt &expr);
-  
+
+public:
+  exprt convert_string_equal(const function_application_exprt &f, axiom_vect & axioms);
 };
 
 
@@ -134,22 +141,6 @@ extern inline string_exprt &to_string_expr(exprt &expr){
   assert(expr.id()==ID_struct);
   return static_cast<string_exprt &>(expr);
 }
-
-// The following functions convert different string functions to 
-// bit vectors and add the corresponding lemmas to a list of
-// properties to be checked  
-bvt convert_string_equal(const function_application_exprt &f);
-bvt convert_string_copy(const function_application_exprt &f);
-bvt convert_string_length(const function_application_exprt &f);
-bvt convert_string_is_prefix(const function_application_exprt &f);
-bvt convert_string_is_suffix(const function_application_exprt &f);
-bvt convert_string_contains(const function_application_exprt &f);
-bvt convert_string_index_of(const function_application_exprt &f);
-bvt convert_string_last_index_of(const function_application_exprt &f);
-bvt convert_char_literal(const function_application_exprt &f);
-bvt convert_string_char_at(const function_application_exprt &f);
-
-
 
 
 #endif

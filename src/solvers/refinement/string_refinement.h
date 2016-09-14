@@ -62,10 +62,9 @@ protected:
   // fills as many 0 as necessary in the bit vectors to have the right width
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
 
-  // The following functions convert different string functions to 
-  // bit vectors and add the corresponding lemmas to a list of
-  // properties to be checked  
-  bvt convert_string_equal(const function_application_exprt &f);
+  // The following functions convert different string functions 
+  // and add the corresponding lemmas to a list of properties to be checked  
+  exprt convert_string_equal(const function_application_exprt &f);
   bvt convert_string_length(const function_application_exprt &f);
   bvt convert_string_is_prefix(const function_application_exprt &f, bool swap_arguments=false);
   bvt convert_string_is_suffix(const function_application_exprt &f, bool swap_arguments=false);
@@ -74,6 +73,7 @@ protected:
   bvt convert_string_last_index_of(const function_application_exprt &f);
   bvt convert_char_literal(const function_application_exprt &f);
   bvt convert_string_char_at(const function_application_exprt &f);
+  exprt convert_string_parse_int(const function_application_exprt &f);
 
 private:
   // All constraints produced by the code
@@ -124,6 +124,9 @@ private:
   // Same thing but associates the string to the given symbol instead 
   // of returning it.
   void make_string(const symbol_exprt & sym, const exprt &str);
+
+  // Natural number expression corresponding to a constant integer
+  constant_exprt constant_of_nat(int i);
 
   void add_lemma(const exprt &lemma);
 

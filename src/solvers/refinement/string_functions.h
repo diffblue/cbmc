@@ -34,5 +34,7 @@ bool is_string_index_of_func(irep_idt id);
 bool is_string_last_index_of_func(irep_idt id);
 bool is_string_copy_func(irep_idt id);
 bool is_string_empty_string_func(irep_idt id);
+bool is_string_parse_int_func(irep_idt id);
+bool is_string_of_int_func(irep_idt id);
 
 #endif

@@ -152,8 +152,7 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
     s.of_function_application(to_function_application_expr(unrefined_string), symbol_to_string,axioms);
   else if(unrefined_string.id()==ID_symbol) 
     s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string));
-  else if(unrefined_string.id()==ID_nondet_symbol) 
-    s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string));
+  //else if(unrefined_string.id()==ID_nondet_symbol) s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string));
   else if(unrefined_string.id()==ID_address_of) {
     assert(unrefined_string.op0().id()==ID_symbol);
     s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string.op0()));
@@ -194,6 +193,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_empty_string(expr,axioms);
     } else if (is_string_copy_func(id)) {
       return of_string_copy(expr,symbol_to_string,axioms);
+    } else if (is_string_of_int_func(id)) {
+      return of_int(expr,axioms);
     } 
   }
   throw "non string function";
@@ -309,14 +310,21 @@ void string_exprt::of_string_substring
 (const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = expr.arguments();  
-  assert(args.size() == 3); // bad args to string substring?
+  assert(args.size() >= 2);
 
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
 
   exprt i(args[1]);
   assert(i.type() == string_ref_typet::index_type());
-  exprt j(args[2]);
-  assert(j.type() == string_ref_typet::index_type());
+
+  exprt j;
+  if(args.size() == 3){
+    j = args[2];
+    assert(j.type() == string_ref_typet::index_type());
+  }
+  else {
+    j = str.length();
+  }
 
   symbol_exprt idx = fresh_symbol("index_substring", string_ref_typet::index_type());
 
@@ -330,6 +338,55 @@ void string_exprt::of_string_substring
   
   axioms.push_back(a.forall(idx,index_zero,length()));
 }
+
+constant_exprt constant_of_nat(int i,int width, typet t) {
+  return constant_exprt(integer2binary(i,width), t);
+}
+
+void string_exprt::of_int
+(const function_application_exprt &expr,axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = expr.arguments();  
+  assert(args.size() == 1);
+  
+  exprt i = args[0];
+  typet type = i.type();
+  int width = type.get_unsigned_int(ID_width);
+  exprt ten = constant_of_nat(10,width,type);
+  exprt zero_char = constant_of_nat(48,CHAR_WIDTH,string_ref_typet::char_type());
+  exprt nine_char = constant_of_nat(57,CHAR_WIDTH,string_ref_typet::char_type());
+  int max_size = 10;
+
+  axioms.emplace_back(and_exprt(*this > index_zero,*this <= string_ref_typet::index_of_int(max_size)));
+
+
+  for(int size=1; size<=max_size;size++) {
+    exprt sum = constant_of_nat(0,width,type);
+    exprt all_numbers = true_exprt();
+
+    for(int j=0; j<size; j++) {
+      exprt chr = (*this)[string_ref_typet::index_of_int(j)];
+      sum = plus_exprt(mult_exprt(sum,ten),typecast_exprt(minus_exprt(chr,zero_char),type));
+      all_numbers = and_exprt(all_numbers,and_exprt
+			      (binary_relation_exprt(chr,ID_ge,zero_char),
+			       binary_relation_exprt(chr,ID_le,nine_char)));
+    }
+
+    equal_exprt premise(length(), string_ref_typet::index_of_int(size));
+    axioms.emplace_back(premise,and_exprt(equal_exprt(i,sum),all_numbers));
+    //we have to be careful when exceeding the maximal size of integers
+    if(size == max_size) {
+      exprt smallest_with_10_digits = constant_of_nat(1000000000,width,type);
+      axioms.emplace_back(premise,binary_relation_exprt(i,ID_ge,smallest_with_10_digits));
+    }
+  }
+  
+  //disallow 0s at the beggining
+  axioms.emplace_back(not_exprt(equal_exprt((*this)[index_zero],zero_char)));
+
+
+}
+
 
 void string_exprt::of_string_char_set
 (const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
@@ -351,4 +408,5 @@ void string_exprt::of_string_char_set
   axioms.push_back(lemma);
 
 }
+
 

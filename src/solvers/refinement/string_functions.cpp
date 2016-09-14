@@ -12,6 +12,7 @@ Date:   September 2016
 
 #define char_literal_func "__CPROVER_uninterpreted_char_literal"
 #define string_length_func "__CPROVER_uninterpreted_strlen"
+#define string_set_length_func "__CPROVER_uninterpreted_set_length"
 #define string_equal_func "__CPROVER_uninterpreted_string_equal"
 #define string_char_at_func "__CPROVER_uninterpreted_char_at"
 #define string_concat_func "__CPROVER_uninterpreted_strcat"
@@ -27,6 +28,9 @@ Date:   September 2016
 #define string_literal_func "__CPROVER_uninterpreted_string_literal"
 #define string_copy_func "__CPROVER_uninterpreted_string_copy"
 #define string_empty_string_func "__CPROVER_uninterpreted_empty_string"
+#define string_parse_int_func "__CPROVER_uninterpreted_parse_int"
+#define string_of_int_func "__CPROVER_uninterpreted_string_of_int"
+
 
 bool starts_with(std::string s, std::string t) {
   for(int i = 0; i < t.length(); i++)
@@ -85,5 +89,11 @@ bool is_string_last_index_of_func(irep_idt id) {
 }
 bool is_string_empty_string_func(irep_idt id) {
   return (starts_with(id2string(id),string_empty_string_func));
+}
+bool is_string_parse_int_func(irep_idt id) {
+  return (starts_with(id2string(id),string_parse_int_func));
+}
+bool is_string_of_int_func(irep_idt id) {
+  return (starts_with(id2string(id),string_of_int_func));
 }
 

@@ -46,6 +46,11 @@ typedef unsigned char __CPROVER_char;
 #define __CPROVER_char_set(s, p, c) __CPROVER_uninterpreted_char_set(s, p, c)
 
 
+#define __CPROVER_string_copy(s) __CPROVER_uninterpreted_string_copy(s)
+#define __CPROVER_parse_int(s) __CPROVER_uninterpreted_parse_int(s)
+#define __CPROVER_string_of_int(i) __CPROVER_uninterpreted_string_of_int(i)
+
+
 /******************************************************************************
  * don't use these directly
  ******************************************************************************/
@@ -63,4 +68,6 @@ extern int __CPROVER_uninterpreted_strindexof(__CPROVER_string str, __CPROVER_ch
 extern int __CPROVER_uninterpreted_strlastindexof(__CPROVER_string str, __CPROVER_char c);
 extern __CPROVER_string __CPROVER_uninterpreted_char_set(__CPROVER_string str, int pos, __CPROVER_char c);
 extern __CPROVER_string __CPROVER_uninterpreted_string_copy(__CPROVER_string str);
+extern unsigned __CPROVER_uninterpreted_parse_int(__CPROVER_string str);
+extern __CPROVER_string __CPROVER_uninterpreted_string_of_int(unsigned i);
 

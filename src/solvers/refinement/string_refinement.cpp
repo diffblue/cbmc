@@ -248,7 +248,7 @@ bvt string_refinementt::convert_function_application(
     } else if (is_string_length_func(id)) {
       return convert_string_length(expr);
     } else if (is_string_equal_func(id)) {
-      return convert_string_equal(expr);
+      return convert_bv(convert_string_equal(expr));
     } else if (is_string_char_at_func(id)) {
       return convert_string_char_at(expr);
     } else if (is_string_is_prefix_func(id)) {
@@ -265,6 +265,8 @@ bvt string_refinementt::convert_function_application(
       return convert_string_index_of(expr);
     } else if (is_string_last_index_of_func(id)) {
       return convert_string_last_index_of(expr);
+    } else if (is_string_parse_int_func(id)) {
+      return convert_bv(convert_string_parse_int(expr));
     }
   }
 
@@ -382,9 +384,7 @@ string_exprt string_refinementt::make_string(const exprt & str)
     return string_exprt::of_expr(str,symbol_to_string,string_axioms);
 }
 
-bvt string_refinementt::convert_string_equal(
-  const function_application_exprt &f)
-{
+exprt string_refinementt::convert_string_equal(const function_application_exprt &f) {
   assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   
   symbol_exprt eq = fresh_boolean("equal");
@@ -418,7 +418,7 @@ bvt string_refinementt::convert_string_equal(
      or_exprt(notequal_exprt(s1.length(), s2.length()),
 	      string_constraintt(notequal_exprt(s1[witness],s2[witness])).exists(witness,zero,s1.length())));
 
-  return convert_bv(tc_eq);
+  return tc_eq;
 }
 
 
@@ -692,6 +692,34 @@ bvt string_refinementt::convert_string_char_at(
     string_axioms.emplace_back(equal_exprt(char_sym,str[args[1]]));
     return convert_bv(char_sym);
   }
+}
+
+constant_exprt string_refinementt::constant_of_nat(int i) {
+  return constant_exprt(integer2binary(i, boolbv_width(natural_typet())), natural_typet());
+}
+
+exprt string_refinementt::convert_string_parse_int
+(const function_application_exprt &expr)
+{
+  const function_application_exprt::argumentst &args = expr.arguments();  
+  assert(args.size() == 1);
+
+  string_exprt str = make_string(args[0]);
+  symbol_exprt i = string_exprt::fresh_symbol("parsed_int",natural_typet());
+
+  exprt ten = constant_of_nat(10);
+  exprt zero_char = constant_of_nat(48);
+
+  for(int size=1; size<=10;size++) {
+    exprt sum = constant_of_nat(0);
+  
+    for(int j=0; j<size; j++)
+      sum = plus_exprt(mult_exprt(sum,ten),minus_exprt(str[index_of_int(j)],zero_char));
+
+    equal_exprt premise(str.length(), constant_of_nat(size));
+    string_axioms.emplace_back(implies_exprt(premise,equal_exprt(i,sum)));
+  }
+  return i;
 }
 
 
