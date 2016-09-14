@@ -188,8 +188,11 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function_call(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_empty_string");
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.<init>:()V")) {
 	  make_string_function_call(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_empty_string");
+	} else if(function_id == irep_idt("java::java.lang.Integer.toString:(I)Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_of_int");
 	}
       } 
+
     } else {
       if(i_it->is_assign()) {
 	code_assignt assignment = to_code_assign(i_it->code);

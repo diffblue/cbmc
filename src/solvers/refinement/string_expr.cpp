@@ -152,7 +152,6 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
     s.of_function_application(to_function_application_expr(unrefined_string), symbol_to_string,axioms);
   else if(unrefined_string.id()==ID_symbol) 
     s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string));
-  //else if(unrefined_string.id()==ID_nondet_symbol) s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string));
   else if(unrefined_string.id()==ID_address_of) {
     assert(unrefined_string.op0().id()==ID_symbol);
     s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string.op0()));
@@ -161,6 +160,10 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
     s.of_if(to_if_expr(unrefined_string),symbol_to_string,axioms);
   else if(unrefined_string.id()==ID_struct) 
     s.of_struct(to_struct_expr(unrefined_string),symbol_to_string,axioms);
+  else if(unrefined_string.id()==ID_nondet_symbol) {
+    // We ignore non deterministic symbols
+    //s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string));
+  }
   else 
     throw ("string_exprt of:\n" + unrefined_string.pretty() 
 	   + "\nwhich is not a function application, a symbol of an if expression");
@@ -353,8 +356,17 @@ void string_exprt::of_int
   typet type = i.type();
   int width = type.get_unsigned_int(ID_width);
   exprt ten = constant_of_nat(10,width,type);
-  exprt zero_char = constant_of_nat(48,CHAR_WIDTH,string_ref_typet::char_type());
-  exprt nine_char = constant_of_nat(57,CHAR_WIDTH,string_ref_typet::char_type());
+  exprt zero_char;
+  exprt nine_char;
+
+  if(string_ref_typet::is_c_string_type(expr.type())) {
+    zero_char = constant_of_nat(48,CHAR_WIDTH,string_ref_typet::char_type());
+    nine_char = constant_of_nat(57,CHAR_WIDTH,string_ref_typet::char_type());
+  } else {     
+    zero_char = constant_of_nat(48,JAVA_CHAR_WIDTH,string_ref_typet::java_char_type());
+    nine_char = constant_of_nat(57,JAVA_CHAR_WIDTH,string_ref_typet::java_char_type());
+  }
+
   int max_size = 10;
 
   axioms.emplace_back(and_exprt(*this > index_zero,*this <= string_ref_typet::index_of_int(max_size)));
