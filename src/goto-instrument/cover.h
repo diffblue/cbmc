@@ -30,6 +30,9 @@ enum class coverage_criteriont
   LOCATION, BRANCH, DECISION, CONDITION,
   PATH, MCDC, ASSERTION, COVER };
 
+bool consider_goals(
+  const goto_programt &goto_program);
+
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
