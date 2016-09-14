@@ -1283,9 +1283,47 @@ void instrument_cover_goals(
        f_it->first=="__CPROVER_initialize")
       continue;
 
-    //empty set of existing goals
-    coverage_goalst goals;
-    instrument_cover_goals(symbol_table, f_it->second.body,
-					   criterion, goals);
+    //exclude trivial coverage goals of a goto program
+    if (consider_goals(f_it->second.body))
+    {
+      //empty set of existing goals
+      coverage_goalst goals;
+      instrument_cover_goals(symbol_table, f_it->second.body,
+					     criterion, goals);
+    }
   }
+}
+/*******************************************************************\
+
+Function: consider_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool consider_goals(
+  const goto_programt &goto_program)
+{
+  bool result;
+  unsigned long count_assignments=0, count_goto=0, count_decl=0;
+
+  forall_goto_program_instructions(i_it, goto_program)
+  {
+    if(i_it->is_goto())
+	  ++count_goto;
+    else if (i_it->is_assign())
+      ++count_assignments;
+    else if (i_it->is_decl())
+      ++count_decl;
+  }
+
+  //this might be a get or set method (pattern)
+  result = !((count_decl==0) && (count_goto<=1) &&
+		   (count_assignments>0 && count_assignments<5));
+
+  return result;
 }
