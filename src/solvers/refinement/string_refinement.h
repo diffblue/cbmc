@@ -126,7 +126,7 @@ private:
   void make_string(const symbol_exprt & sym, const exprt &str);
 
   // Natural number expression corresponding to a constant integer
-  constant_exprt constant_of_nat(int i);
+  constant_exprt constant_of_nat(int i,typet t);
 
   void add_lemma(const exprt &lemma);
 

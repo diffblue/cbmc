@@ -24,11 +24,8 @@ unsignedbv_typet char_type = string_ref_typet::char_type();
 signedbv_typet index_type = string_ref_typet::index_type();
 unsignedbv_typet java_char_type = string_ref_typet::java_char_type();
 
-constant_exprt index_of_int(int i) {
-return constant_exprt(integer2binary(i, INDEX_WIDTH), index_type);
-}
 
-constant_exprt zero = index_of_int(0);
+constant_exprt zero = string_ref_typet::index_of_int(0);
 
 // Succinct version of pretty()
 std::string string_refinementt::pretty_short(const exprt & expr) {
@@ -433,7 +430,7 @@ bvt string_refinementt::convert_string_length(
 }
 
 exprt string_refinementt::is_positive(const exprt & x)
-{ return binary_relation_exprt(x, ID_ge, index_of_int(0)); }
+{ return binary_relation_exprt(x, ID_ge, string_ref_typet::index_of_int(0)); }
 
 
 bvt string_refinementt::convert_string_is_prefix
@@ -555,7 +552,7 @@ bvt string_refinementt::convert_string_contains(
 
   string_axioms.push_back
     (string_constraintt::not_contains
-     (zero,plus_exprt(index_of_int(1),minus_exprt(s0.length(),s1.length())), 
+     (zero,plus_exprt(string_ref_typet::index_of_int(1),minus_exprt(s0.length(),s1.length())), 
       and_exprt(not_exprt(contains),s0 >= s1),zero,s1.length(),s0,s1));
 
   return convert_bv(tc_contains);
@@ -598,8 +595,8 @@ bvt string_refinementt::convert_string_index_of(
   // 0 <= i < |s| && (i = -1 <=> !contains) && (contains => s[i] = c)
   // && forall n. 0 < n < i => s[n] != c 
   
-  string_axioms.push_back(string_constraintt(equal_exprt(index,index_of_int(-1)),not_exprt(contains)).exists(index,index_of_int(-1),str.length()));
-  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,index_of_int(-1)));
+  string_axioms.push_back(string_constraintt(equal_exprt(index,string_ref_typet::index_of_int(-1)),not_exprt(contains)).exists(index,string_ref_typet::index_of_int(-1),str.length()));
+  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,string_ref_typet::index_of_int(-1)));
   string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(zero,ID_le,index),equal_exprt(str[index],c)));
 
 
@@ -631,12 +628,12 @@ bvt string_refinementt::convert_string_last_index_of(
     c = typecast_exprt(c,java_char_type);
   }
 
-  string_axioms.push_back(string_constraintt(equal_exprt(index,index_of_int(-1)),not_exprt(contains)).exists(index,index_of_int(-1),str.length()));
-  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,index_of_int(-1)));
+  string_axioms.push_back(string_constraintt(equal_exprt(index,string_ref_typet::index_of_int(-1)),not_exprt(contains)).exists(index,string_ref_typet::index_of_int(-1),str.length()));
+  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,string_ref_typet::index_of_int(-1)));
   string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(zero,ID_le,index),equal_exprt(str[index],c)));
   
   symbol_exprt n = string_exprt::fresh_symbol("QA_last_index_of",index_type);
-  string_axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,plus_exprt(index,index_of_int(1)),str.length()));
+  string_axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,plus_exprt(index,string_ref_typet::index_of_int(1)),str.length()));
 
   symbol_exprt m = string_exprt::fresh_symbol("QA_last_index_of",index_type);
   string_axioms.push_back(string_constraintt(not_exprt(contains),not_exprt(equal_exprt(str[m],c))).forall(m,zero,str.length()));
@@ -694,8 +691,8 @@ bvt string_refinementt::convert_string_char_at(
   }
 }
 
-constant_exprt string_refinementt::constant_of_nat(int i) {
-  return constant_exprt(integer2binary(i, boolbv_width(natural_typet())), natural_typet());
+constant_exprt string_refinementt::constant_of_nat(int i,typet t) {
+  return constant_exprt(integer2binary(i, boolbv_width(t)), t);
 }
 
 exprt string_refinementt::convert_string_parse_int
@@ -705,18 +702,28 @@ exprt string_refinementt::convert_string_parse_int
   assert(args.size() == 1);
 
   string_exprt str = make_string(args[0]);
-  symbol_exprt i = string_exprt::fresh_symbol("parsed_int",natural_typet());
+  typet type = expr.type();
+  symbol_exprt i = string_exprt::fresh_symbol("parsed_int",type);
 
-  exprt ten = constant_of_nat(10);
-  exprt zero_char = constant_of_nat(48);
+  exprt zero_char;
+  if(string_ref_typet::is_c_string_type(args[0].type())) {
+    debug() << "string_refinementt::convert_string_parse_int of c string" << eom;
+    zero_char = constant_of_nat(48,string_ref_typet::char_type());
+  }
+  else {
+    debug() << "string_refinementt::convert_string_parse_int of non c string" << eom;
+    zero_char = constant_of_nat(48,string_ref_typet::java_char_type());
+  }
+
+  exprt ten = constant_of_nat(10,type);
 
   for(int size=1; size<=10;size++) {
-    exprt sum = constant_of_nat(0);
+    exprt sum = constant_of_nat(0,type);
   
     for(int j=0; j<size; j++)
-      sum = plus_exprt(mult_exprt(sum,ten),minus_exprt(str[index_of_int(j)],zero_char));
+      sum = plus_exprt(mult_exprt(sum,ten),typecast_exprt(minus_exprt(str[string_ref_typet::index_of_int(j)],zero_char),type));
 
-    equal_exprt premise(str.length(), constant_of_nat(size));
+    equal_exprt premise(str.length(), string_ref_typet::index_of_int(size));
     string_axioms.emplace_back(implies_exprt(premise,equal_exprt(i,sum)));
   }
   return i;
@@ -956,7 +963,7 @@ namespace {
       to_treat.pop_back();
       if (e.id() == ID_lt && e.op0() == qvar) {
 	assert(e.op1().type() == index_type || e.op1().type() == integer_typet());
-	out.push_back(minus_exprt(e.op1(), index_of_int(1)));
+	out.push_back(minus_exprt(e.op1(), string_ref_typet::index_of_int(1)));
       } else if (e.id() == ID_le && e.op0() == qvar) {
 	out.push_back(e.op1());
       } else {
@@ -1000,7 +1007,7 @@ std::map< exprt, int> string_refinementt::map_of_sum(const exprt &f) {
 
 
 exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
-  exprt sum = index_of_int(0);
+  exprt sum = string_ref_typet::string_ref_typet::index_of_int(0);
 
   for (std::map<exprt,int>::iterator it = m.begin();
        it != m.end(); it++) {
@@ -1008,10 +1015,10 @@ exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
     int second = negated?(-it->second):it->second;
     if (second != 0)
       if (second == -1) 
-	if(sum == index_of_int(0)) sum = unary_minus_exprt(t);
+	if(sum == string_ref_typet::index_of_int(0)) sum = unary_minus_exprt(t);
 	else sum = minus_exprt(sum,t);
       else if (second == 1)
-	if(sum == index_of_int(0)) sum = t;
+	if(sum == string_ref_typet::index_of_int(0)) sum = t;
 	else sum = plus_exprt(sum, t);
       else {
 	debug() << "in string_refinementt::sum_of_map:"
