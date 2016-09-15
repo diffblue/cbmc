@@ -110,22 +110,23 @@ coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
   source_locationt source_location;
   goals.set_no_trivial_tests(false);
 
-  //check coverage file
+  // check coverage file
   if(parse_json(coverage, message_handler, json))
   {
     messaget message(message_handler);
     message.error() << coverage << " file is not a valid json file"
                     << messaget::eom;
-    exit(0);
+    exit(6);
   }
 
-  //make sure that we have an array of elements
+  // make sure that we have an array of elements
   if(!json.is_array())
   {
     messaget message(message_handler);
-    message.error() << "expecting an array in the " <<  coverage << " file, but got "
+    message.error() << "expecting an array in the " <<  coverage
+                    << " file, but got "
                     << json << messaget::eom;
-    exit(0);
+    exit(6);
   }
 
   irep_idt file, function, line;
@@ -134,29 +135,28 @@ coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
       it!=json.array.end();
       it++)
   {
-
-    //get the file of each existing goal
+    // get the file of each existing goal
     file=(*it)["file"].value;
     source_location.set_file(file);
 
-    //get the function of each existing goal
+    // get the function of each existing goal
     function=(*it)["function"].value;
     source_location.set_function(function);
 
-    //get the lines array
-    if ((*it)["lines"].is_array())
-	{
-	  for(jsont::arrayt::const_iterator
-	      itg=(*it)["lines"].array.begin();
-	      itg!=(*it)["lines"].array.end();
-	      itg++)
-	  {
-        //get the line of each existing goal
+    // get the lines array
+    if((*it)["lines"].is_array())
+    {
+      for(jsont::arrayt::const_iterator
+          itg=(*it)["lines"].array.begin();
+          itg!=(*it)["lines"].array.end();
+          itg++)
+      {
+        // get the line of each existing goal
         line=(*itg)["number"].value;
         source_location.set_line(line);
         goals.set_goals(source_location);
-	  }
-	}
+      }
+    }
   }
   return goals;
 }
@@ -164,12 +164,12 @@ coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
 bool coverage_goalst::is_existing_goal(source_locationt source_location)
 {
   std::vector<source_locationt>::iterator it = existing_goals.begin();
-  while (it!=existing_goals.end())
+  while(it!=existing_goals.end())
   {
-    if (!source_location.get_file().compare(it->get_file()) &&
-	!source_location.get_function().compare(it->get_function()) &&
-	!source_location.get_line().compare(it->get_line()))
-      break;
+    if(!source_location.get_file().compare(it->get_file()) &&
+       !source_location.get_function().compare(it->get_function()) &&
+       !source_location.get_line().compare(it->get_line()))
+         break;
     ++it;
   }
   if(it == existing_goals.end())
@@ -1011,7 +1011,7 @@ void instrument_cover_goals(
           source_locationt source_location=
             basic_blocks.source_location_map[block_nr];
 
-          //check whether the current goal already exists
+          // check whether the current goal already exists
           if(goals.is_existing_goal(source_location) &&
              !source_location.get_file().empty() &&
              !source_location.is_built_in())
@@ -1284,10 +1284,10 @@ void instrument_cover_goals(
        f_it->first=="__CPROVER_initialize")
       continue;
 
-    //empty set of existing goals
+    // empty set of existing goals
     coverage_goalst goals;
     instrument_cover_goals(symbol_table, f_it->second.body,
-					       criterion, goals);
+                           criterion, goals);
   }
 }
 
@@ -1307,8 +1307,8 @@ bool consider_goals(
   const goto_programt &goto_program,
   coverage_goalst &goals)
 {
-  //check whether we should eliminate trivial goals
-  if (!goals.get_no_trivial_tests())
+  // check whether we should eliminate trivial goals
+  if(!goals.get_no_trivial_tests())
     return true;
 
   bool result;
@@ -1317,16 +1317,19 @@ bool consider_goals(
   forall_goto_program_instructions(i_it, goto_program)
   {
     if(i_it->is_goto())
-	  ++count_goto;
-    else if (i_it->is_assign())
+      ++count_goto;
+    else if(i_it->is_assign())
       ++count_assignments;
-    else if (i_it->is_decl())
+    else if(i_it->is_decl())
       ++count_decl;
   }
 
-  //this might be a get or set method (pattern)
-  result = !((count_decl==0) && (count_goto<=1) &&
-		   (count_assignments>0 && count_assignments<5));
+  // check whether this is a constructor/destructor or a get/set (pattern)
+  if(!count_goto && !count_assignments && !count_decl)
+    result=false;
+  else
+    result = !((count_decl==0) && (count_goto<=1) &&
+             (count_assignments>0 && count_assignments<5));
 
   return result;
 }
