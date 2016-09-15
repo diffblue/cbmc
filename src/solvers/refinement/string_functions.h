@@ -23,6 +23,7 @@ bool is_string_length_func(irep_idt id);
 bool is_string_equal_func(irep_idt id);
 bool is_string_char_at_func(irep_idt id);
 bool is_string_concat_func(irep_idt id);
+bool is_string_concat_int_func(irep_idt id);
 bool is_string_substring_func(irep_idt id);
 bool is_string_is_prefix_func(irep_idt id);
 bool is_string_is_suffix_func(irep_idt id);

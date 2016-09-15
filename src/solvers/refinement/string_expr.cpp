@@ -274,7 +274,7 @@ void string_exprt::of_string_concat(const function_application_exprt &f, std::ma
   assert(args.size() == 2); //bad args to string concat
   
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2 = string_exprt::of_expr(args[1],symbol_to_string,axioms);
+  string_exprt s2 = string_exprt::of_expr(args[1],symbol_to_string,axioms); 
 
   equal_exprt length_sum_lem(length(), plus_exprt(s1.length(), s2.length()));
   axioms.emplace_back(length_sum_lem);
@@ -349,54 +349,83 @@ constant_exprt constant_of_nat(int i,int width, typet t) {
 void string_exprt::of_int
 (const function_application_exprt &expr,axiom_vect & axioms)
 {
-  const function_application_exprt::argumentst &args = expr.arguments();  
-  assert(args.size() == 1);
-  
-  exprt i = args[0];
+  assert(expr.arguments().size() == 1);
+  of_int(expr.arguments()[0],axioms,string_ref_typet::is_c_string_type(expr.type()),10);
+}
+
+void string_exprt::of_long
+(const function_application_exprt &expr,axiom_vect & axioms)
+{
+  assert(expr.arguments().size() == 1);
+  of_int(expr.arguments()[0],axioms,string_ref_typet::is_c_string_type(expr.type()),30);
+}
+
+
+void string_exprt::of_int
+(const exprt &i,axiom_vect & axioms,bool is_c_string, int max_size)
+{
   typet type = i.type();
   int width = type.get_unsigned_int(ID_width);
   exprt ten = constant_of_nat(10,width,type);
   exprt zero_char;
   exprt nine_char;
+  exprt minus_char;
 
-  if(string_ref_typet::is_c_string_type(expr.type())) {
+  if(is_c_string) {
+    minus_char = constant_of_nat(45,CHAR_WIDTH,string_ref_typet::char_type());
     zero_char = constant_of_nat(48,CHAR_WIDTH,string_ref_typet::char_type());
     nine_char = constant_of_nat(57,CHAR_WIDTH,string_ref_typet::char_type());
   } else {     
+    minus_char = constant_of_nat(45,JAVA_CHAR_WIDTH,string_ref_typet::java_char_type());
     zero_char = constant_of_nat(48,JAVA_CHAR_WIDTH,string_ref_typet::java_char_type());
     nine_char = constant_of_nat(57,JAVA_CHAR_WIDTH,string_ref_typet::java_char_type());
   }
 
-  int max_size = 10;
-
   axioms.emplace_back(and_exprt(*this > index_zero,*this <= string_ref_typet::index_of_int(max_size)));
-
 
   for(int size=1; size<=max_size;size++) {
     exprt sum = constant_of_nat(0,width,type);
     exprt all_numbers = true_exprt();
 
-    for(int j=0; j<size; j++) {
-      exprt chr = (*this)[string_ref_typet::index_of_int(j)];
+    exprt chr = (*this)[string_ref_typet::index_of_int(0)];
+    exprt starts_with_minus = equal_exprt(chr,minus_char);
+    exprt starts_with_digit = and_exprt
+      (binary_relation_exprt(chr,ID_ge,zero_char),
+       binary_relation_exprt(chr,ID_le,nine_char));
+    exprt first_value = typecast_exprt(minus_exprt(chr,zero_char),type);
+
+    for(int j=1; j<size; j++) {
+      chr = (*this)[string_ref_typet::index_of_int(j)];
       sum = plus_exprt(mult_exprt(sum,ten),typecast_exprt(minus_exprt(chr,zero_char),type));
+      first_value = mult_exprt(first_value,ten);
       all_numbers = and_exprt(all_numbers,and_exprt
 			      (binary_relation_exprt(chr,ID_ge,zero_char),
 			       binary_relation_exprt(chr,ID_le,nine_char)));
     }
 
     equal_exprt premise(length(), string_ref_typet::index_of_int(size));
-    axioms.emplace_back(premise,and_exprt(equal_exprt(i,sum),all_numbers));
+    axioms.emplace_back(premise,or_exprt(starts_with_digit,starts_with_minus));
+    axioms.emplace_back(and_exprt(premise,starts_with_digit),
+			and_exprt(equal_exprt(i,plus_exprt(sum,first_value)),
+				  all_numbers));
+
+    axioms.emplace_back(and_exprt(premise,starts_with_minus),
+			and_exprt(equal_exprt(i,unary_minus_exprt(sum)),
+				  all_numbers));
+    //disallow 0s at the beggining
+    axioms.emplace_back(and_exprt(premise,starts_with_digit),
+			not_exprt(equal_exprt((*this)[index_zero],zero_char)));
+    axioms.emplace_back(and_exprt(premise,starts_with_minus),
+			not_exprt(equal_exprt((*this)[string_ref_typet::index_of_int(1)],zero_char)));
+
     //we have to be careful when exceeding the maximal size of integers
+    // Warning this should be different depending on max size
     if(size == max_size) {
       exprt smallest_with_10_digits = constant_of_nat(1000000000,width,type);
       axioms.emplace_back(premise,binary_relation_exprt(i,ID_ge,smallest_with_10_digits));
     }
   }
   
-  //disallow 0s at the beggining
-  axioms.emplace_back(not_exprt(equal_exprt((*this)[index_zero],zero_char)));
-
-
 }
 
 

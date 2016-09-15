@@ -12,6 +12,11 @@ public class test_int {
 	int i = Integer.parseInt("1234");
 	
 	assert(i == 1234);
-	assert(e == '2' || i < 1234);
+
+
+	String t = Integer.toString(-2345);
+	assert(t.charAt(0) == '-');
+
+	assert(e == '2' || i < 1234 || t.charAt(0) != '-');
     }
 }

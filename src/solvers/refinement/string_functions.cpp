@@ -16,6 +16,7 @@ Date:   September 2016
 #define string_equal_func "__CPROVER_uninterpreted_string_equal"
 #define string_char_at_func "__CPROVER_uninterpreted_char_at"
 #define string_concat_func "__CPROVER_uninterpreted_strcat"
+#define string_concat_int_func "__CPROVER_uninterpreted_strcat_int"
 #define string_substring_func "__CPROVER_uninterpreted_substring"
 #define string_is_prefix_func "__CPROVER_uninterpreted_strprefixof"
 #define string_is_suffix_func "__CPROVER_uninterpreted_strsuffixof"
@@ -56,6 +57,9 @@ bool is_string_char_at_func(irep_idt id) {
 }
 bool is_string_concat_func(irep_idt id) {
   return (starts_with(id2string(id),string_concat_func));
+}
+bool is_string_concat_int_func(irep_idt id) {
+  return (starts_with(id2string(id),string_concat_int_func));
 }
 bool is_string_substring_func(irep_idt id) {
   return (starts_with(id2string(id),string_substring_func));

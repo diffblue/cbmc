@@ -769,6 +769,7 @@ unsigned integer_of_expr(const constant_exprt & expr) {
 
 std::string string_refinementt::string_of_array(const exprt &arr, const exprt &size)
 {
+  if(size.id() != ID_constant) return "string of unknown size";
   unsigned n = integer_of_expr(to_constant_expr(size));
   if(n>500) return "very long string";
   if(n==0) return "\"\"";

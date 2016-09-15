@@ -123,6 +123,8 @@ private:
   void of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_empty_string(const function_application_exprt &f, axiom_vect & axioms);
   void of_int(const function_application_exprt &f, axiom_vect & axioms);
+  void of_long(const function_application_exprt &f, axiom_vect & axioms);
+  void of_int(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
 
   void of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 

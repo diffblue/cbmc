@@ -6,5 +6,6 @@ test_int.class
 ^\[assertion.1\] assertion at file test_int.java line 9: SUCCESS$
 ^\[assertion.2\] assertion at file test_int.java line 10: SUCCESS$
 ^\[assertion.3\] assertion at file test_int.java line 14: SUCCESS$
-^\[assertion.4\] assertion at file test_int.java line 15: FAILURE$
+^\[assertion.4\] assertion at file test_int.java line 18: SUCCESS$
+^\[assertion.5\] assertion at file test_int.java line 20: FAILURE$
 --
