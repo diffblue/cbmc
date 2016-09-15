@@ -64,12 +64,17 @@ bool string_ref_typet::is_java_string_type(const typet &type)
   if(type.id() == ID_pointer) {
     pointer_typet pt = to_pointer_type(type);
     typet subtype = pt.subtype();
-    if(subtype.id() == ID_struct) {
-      irep_idt tag = to_struct_type(subtype).get_tag();
-      return (tag == irep_idt("java.lang.String"));
-    } 
-    else return false;
+    return is_java_deref_string_type(subtype);
   } else return false;
+}
+
+bool string_ref_typet::is_java_deref_string_type(const typet &type)
+{
+  if(type.id() == ID_struct) {
+    irep_idt tag = to_struct_type(type).get_tag();
+    return (tag == irep_idt("java.lang.String"));
+  } 
+  else return false;
 }
 
 bool string_ref_typet::is_java_string_builder_type(const typet &type)
@@ -108,13 +113,13 @@ void string_exprt::of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> 
   assert(string_ref_typet::is_unrefined_string_type(expr.false_case().type()));
   string_exprt f = of_expr(expr.false_case(),symbol_to_string,axioms);
 
-  axioms.emplace_back(implies_exprt(expr.cond(),equal_exprt(length(),t.length())));
-  symbol_exprt qvar = fresh_symbol("string_if",string_ref_typet::index_type());
+  axioms.emplace_back(expr.cond(),equal_exprt(length(),t.length()));
+  symbol_exprt qvar = fresh_symbol("string_if_true",string_ref_typet::index_type());
   axioms.push_back(string_constraintt(expr.cond(),equal_exprt((*this)[qvar],t[qvar])).forall(qvar,index_zero,t.length()));
-;
- axioms.emplace_back(implies_exprt(not_exprt(expr.cond()),equal_exprt(length(),f.length())));
-symbol_exprt qvar2 = fresh_symbol("string_if",string_ref_typet::index_type());
-  axioms.push_back(string_constraintt(not_exprt(expr.cond()),equal_exprt((*this)[qvar],f[qvar])).forall(qvar2,index_zero,f.length()));
+  
+  axioms.emplace_back(not_exprt(expr.cond()),equal_exprt(length(),f.length()));
+  symbol_exprt qvar2 = fresh_symbol("string_if_false",string_ref_typet::index_type());
+  axioms.push_back(string_constraintt(not_exprt(expr.cond()),equal_exprt((*this)[qvar2],f[qvar2])).forall(qvar2,index_zero,f.length()));
 }
 
 
@@ -336,8 +341,7 @@ void string_exprt::of_string_substring
   axioms.emplace_back(str >= j);
 
   // forall idx < str.length, str[idx] = arg_str[idx+i]
-  string_constraintt a(equal_exprt(index_exprt(content(),idx), 
-				   str[plus_exprt(i, idx)]));
+  string_constraintt a(equal_exprt((*this)[idx], str[plus_exprt(i, idx)]));
   
   axioms.push_back(a.forall(idx,index_zero,length()));
 }

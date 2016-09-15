@@ -100,6 +100,8 @@ void string_refinementt::post_process()
   debug() << not_contains_axioms.size() << " not_contains constraints" << eom;
   nb_sat_iteration = 0;
 
+  debug() << "string_refinementt::post_process: warning update_index_set has to be checked" << eom;
+
   update_index_set(universal_axioms);
   update_index_set(cur); 
   cur.clear();
@@ -155,6 +157,13 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      type.id()!=ID_bool)
   {
     if(string_ref_typet::is_unrefined_string_type(type)) {
+      symbol_exprt sym = to_symbol_expr(expr.lhs());
+      make_string(sym,expr.rhs());
+      return false;
+    }
+    else if(string_ref_typet::is_java_deref_string_type(type)) {
+      debug() << "string_refinementt::boolbv_set_equality_to_true: warning"
+	      << " non pointer string " << eom;
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       make_string(sym,expr.rhs());
       return false;
@@ -316,7 +325,7 @@ void string_refinementt::add_lemma(const exprt &lemma)
 {
   if (!seen_instances.insert(lemma).second) return;
 
-  if(lemma == true_exprt()) { debug() << "add_lemma : tautology" << eom; return; }// tautology
+  if(lemma == true_exprt()) { debug() << "string_refinementt::add_lemma : tautology" << eom; return; }
 
   debug() << "adding lemma " << pretty_short(lemma) << eom;
 
@@ -1083,12 +1092,12 @@ exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, con
     }
   }
   
-  
   if (!found) { 
-    // we should add a lemma to say that val == f
-    debug() << "not sure we need to add a lemma: to say val == f" << eom;
-    add_lemma(equal_exprt(val,f));
-    return qvar;
+    debug() << "string_refinementt::compute_subst: qvar not found" << eom;
+    debug() << "qvar = " << qvar.pretty() << eom
+	    << "val = " << val.pretty() << eom
+	    << "f = " << f.pretty() << eom;
+    assert(false);
   }
 
   return sum_of_map(elems,neg);
@@ -1132,7 +1141,6 @@ void string_refinementt::update_index_set(const std::vector<exprt> & cur) {
 
 void string_refinementt::update_index_set(const string_constraintt &axiom)
 {
-  debug() << "string_refinementt::update_index_set needs to be rewriten" << eom;
   assert(axiom.is_univ_quant());
   std::vector<exprt> bounds;
   get_bounds(axiom.get_univ_var(), axiom.premise(), bounds);
@@ -1150,7 +1158,6 @@ void string_refinementt::update_index_set(const string_constraintt &axiom)
 
       // if cur is of the form s[i] and no quantified variable appears in i
       if(!has_quant_var){
-	assert(s.type() == string_type.get_content_type());
 	current_index_set[s].insert(bounds.begin(), bounds.end());
 	current_index_set[s].insert(i);
 	index_set[s].insert(bounds.begin(), bounds.end());
@@ -1167,7 +1174,6 @@ void string_refinementt::update_index_set(const string_constraintt &axiom)
 
 void string_refinementt::update_index_set(const exprt &formula)
 {
-  debug() << "string_refinementt::update_index_set needs to be rewriten" << eom;
   std::vector<exprt> to_process;
   to_process.push_back(formula);
 
