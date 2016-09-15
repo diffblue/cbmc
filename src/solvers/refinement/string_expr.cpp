@@ -383,15 +383,17 @@ void string_exprt::of_int
 
   axioms.emplace_back(and_exprt(*this > index_zero,*this <= string_ref_typet::index_of_int(max_size)));
 
+  exprt chr = (*this)[string_ref_typet::index_of_int(0)];
+  exprt starts_with_minus = equal_exprt(chr,minus_char);
+  exprt starts_with_digit = and_exprt
+    (binary_relation_exprt(chr,ID_ge,zero_char),
+     binary_relation_exprt(chr,ID_le,nine_char));
+  axioms.emplace_back(or_exprt(starts_with_digit,starts_with_minus));
+
   for(int size=1; size<=max_size;size++) {
     exprt sum = constant_of_nat(0,width,type);
     exprt all_numbers = true_exprt();
-
-    exprt chr = (*this)[string_ref_typet::index_of_int(0)];
-    exprt starts_with_minus = equal_exprt(chr,minus_char);
-    exprt starts_with_digit = and_exprt
-      (binary_relation_exprt(chr,ID_ge,zero_char),
-       binary_relation_exprt(chr,ID_le,nine_char));
+    chr = (*this)[string_ref_typet::index_of_int(0)];
     exprt first_value = typecast_exprt(minus_exprt(chr,zero_char),type);
 
     for(int j=1; j<size; j++) {
@@ -404,19 +406,20 @@ void string_exprt::of_int
     }
 
     equal_exprt premise(length(), string_ref_typet::index_of_int(size));
-    axioms.emplace_back(premise,or_exprt(starts_with_digit,starts_with_minus));
     axioms.emplace_back(and_exprt(premise,starts_with_digit),
-			and_exprt(equal_exprt(i,plus_exprt(sum,first_value)),
-				  all_numbers));
+    			and_exprt(equal_exprt(i,plus_exprt(sum,first_value)),
+    				  all_numbers));
 
     axioms.emplace_back(and_exprt(premise,starts_with_minus),
 			and_exprt(equal_exprt(i,unary_minus_exprt(sum)),
 				  all_numbers));
     //disallow 0s at the beggining
-    axioms.emplace_back(and_exprt(premise,starts_with_digit),
-			not_exprt(equal_exprt((*this)[index_zero],zero_char)));
-    axioms.emplace_back(and_exprt(premise,starts_with_minus),
-			not_exprt(equal_exprt((*this)[string_ref_typet::index_of_int(1)],zero_char)));
+    if(size>1) {
+      axioms.emplace_back(and_exprt(premise,starts_with_digit),
+			  not_exprt(equal_exprt((*this)[index_zero],zero_char)));
+      axioms.emplace_back(and_exprt(premise,starts_with_minus),
+			  not_exprt(equal_exprt((*this)[string_ref_typet::index_of_int(1)],zero_char)));
+			  }
 
     //we have to be careful when exceeding the maximal size of integers
     // Warning this should be different depending on max size

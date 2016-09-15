@@ -706,25 +706,39 @@ exprt string_refinementt::convert_string_parse_int
   symbol_exprt i = string_exprt::fresh_symbol("parsed_int",type);
 
   exprt zero_char;
+  exprt minus_char;  
+  exprt plus_char;
   if(string_ref_typet::is_c_string_type(args[0].type())) {
-    debug() << "string_refinementt::convert_string_parse_int of c string" << eom;
+    plus_char = constant_of_nat(43,string_ref_typet::char_type());
+    minus_char = constant_of_nat(45,string_ref_typet::char_type());
     zero_char = constant_of_nat(48,string_ref_typet::char_type());
   }
   else {
-    debug() << "string_refinementt::convert_string_parse_int of non c string" << eom;
+    plus_char = constant_of_nat(43,string_ref_typet::java_char_type());
+    minus_char = constant_of_nat(45,string_ref_typet::java_char_type());
     zero_char = constant_of_nat(48,string_ref_typet::java_char_type());
   }
 
   exprt ten = constant_of_nat(10,type);
 
+  exprt chr = str[string_ref_typet::index_of_int(0)];
+  exprt starts_with_minus = equal_exprt(chr,minus_char);
+  exprt starts_with_plus = equal_exprt(chr,plus_char);
+  exprt starts_with_digit = binary_relation_exprt(chr,ID_ge,zero_char); //and_exprt(binary_relation_exprt(chr,ID_le,nine_char));
+  
   for(int size=1; size<=10;size++) {
     exprt sum = constant_of_nat(0,type);
-  
-    for(int j=0; j<size; j++)
+    exprt first_value = typecast_exprt(minus_exprt(chr,zero_char),type);
+    
+    for(int j=1; j<size; j++){
       sum = plus_exprt(mult_exprt(sum,ten),typecast_exprt(minus_exprt(str[string_ref_typet::index_of_int(j)],zero_char),type));
+      first_value = mult_exprt(first_value,ten);
+    }
 
     equal_exprt premise(str.length(), string_ref_typet::index_of_int(size));
-    string_axioms.emplace_back(implies_exprt(premise,equal_exprt(i,sum)));
+    string_axioms.emplace_back(and_exprt(premise,starts_with_digit),equal_exprt(i,plus_exprt(sum,first_value)));
+    string_axioms.emplace_back(and_exprt(premise,starts_with_plus),equal_exprt(i,sum));
+    string_axioms.emplace_back(and_exprt(premise,starts_with_minus),equal_exprt(i,unary_minus_exprt(sum)));
   }
   return i;
 }
