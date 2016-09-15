@@ -258,8 +258,17 @@ void fault_localizationt::report(irep_idt goal_id)
 {
   if(goal_id==ID_nil)
     goal_id=failed->source.pc->source_location.get_property_id();
+
   lpointst &lpoints = lpoints_map[goal_id];
-  assert(!lpoints.empty());
+
+  if(lpoints.empty())
+  {
+    status() << "["+id2string(goal_id)+"]: \n"
+                   << "   unable to localize fault"
+                   << eom;
+    return;
+  }
+
   debug() << "Fault localization scores:" << eom;
   lpointt &max=lpoints.begin()->second;
   for(auto &l : lpoints)
@@ -443,11 +452,14 @@ void fault_localizationt::report(
   switch(bmc.ui)
   {
   case ui_message_handlert::PLAIN:
-    status() << "\n** Most likely fault location:" << eom;
-    for(auto &g : goal_map)
+    if(cover_goals.number_covered()>0)
     {
-      if(g.second.status!=goalt::statust::FAILURE) continue;
-      report(g.first);
+      status() << "\n** Most likely fault location:" << eom;
+      for(auto &g : goal_map)
+      {
+        if(g.second.status!=goalt::statust::FAILURE) continue;
+        report(g.first);
+      }
     }
     break;
   case ui_message_handlert::XML_UI:
