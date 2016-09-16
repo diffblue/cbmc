@@ -23,8 +23,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 unsignedbv_typet char_type = refined_string_typet::char_type();
 signedbv_typet index_type = refined_string_typet::index_type();
 unsignedbv_typet java_char_type = refined_string_typet::java_char_type();
-
-
 constant_exprt zero = refined_string_typet::index_of_int(0);
 
 // Succinct version of pretty()
@@ -35,17 +33,6 @@ std::string string_refinementt::pretty_short(const exprt & expr) {
   return string_value;
 }
 
-
-std::string string_refinementt::constraint_to_string(const string_constraintt & sc) {
-  if(sc.is_simple()) return(pretty_short(sc));
-  else if(sc.is_univ_quant())
-    return ("forall " + pretty_short(sc.get_univ_var()) + ". (" 
-	    + pretty_short(sc));
-  else
-    return "forall QA. exists QE s1 != s2 ...";
-}
-
-
 string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   SUB(_ns, _prop)
 {
@@ -55,16 +42,6 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   initial_loop_bound = 10;
 
 }
-
-string_refinementt::~string_refinementt()
-{
-}
-
-
-
-///////////////////////
-// String refinement //
-///////////////////////
 
 void string_refinementt::display_index_set() {
   for (std::map<exprt, expr_sett>::iterator i = index_set.begin(),
@@ -117,7 +94,6 @@ void string_refinementt::post_process()
   
   debug()<< "post_process: " << initial_loop_bound << " steps skipped" << eom;
 
-
   display_index_set();
   debug()<< "instantiating NOT_CONTAINS constraints" << eom;
   for(int i=0; i<not_contains_axioms.size(); i++) {
@@ -128,7 +104,6 @@ void string_refinementt::post_process()
       add_lemma(lemmas[j]);
     }
   }
-
 
   SUB::post_process();
 }
@@ -331,29 +306,6 @@ void string_refinementt::add_lemma(const exprt &lemma)
 
   prop.l_set_to_true(convert(lemma));
   cur.push_back(lemma);
-
-  //all_lemmas.insert(lemma);
-  /*
-  satcheck_no_simplifiert sat_check;
-  SUB solver(ns, sat_check);
-  solver << prem;
-
-  switch (solver()) {
-  case decision_proceduret::D_UNSATISFIABLE:
-    debug() << "add_implies_lemma: precondition unsatisfiable" << eom;
-    break;
-  case decision_proceduret::D_SATISFIABLE: 
-  default:
-    if(prem  == true_exprt()) 
-      add_lemma(body);
-    else
-      add_lemma(implies_exprt(prem,body));
-  }
-
-  if(prem  == true_exprt()) 
-    add_lemma(body);
-  else
-  add_lemma(implies_exprt(prem,body));*/
 }
 
 
@@ -368,7 +320,6 @@ string_exprt string_refinementt::string_of_symbol(const symbol_exprt & sym){
   else {
     return string_exprt::get_string_of_symbol(symbol_to_string,sym);
   }
-  //return symbol_to_string[sym.get_identifier()];
 }  
 
 
@@ -382,8 +333,6 @@ void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str
 
 string_exprt string_refinementt::make_string(const exprt & str) 
 {
-  //debug() << " make_string of " << str.pretty() << eom;
-
   if(str.id()==ID_symbol) 
     return string_of_symbol(to_symbol_expr(str));
   else
@@ -733,7 +682,7 @@ exprt string_refinementt::convert_string_parse_int
   exprt chr = str[refined_string_typet::index_of_int(0)];
   exprt starts_with_minus = equal_exprt(chr,minus_char);
   exprt starts_with_plus = equal_exprt(chr,plus_char);
-  exprt starts_with_digit = binary_relation_exprt(chr,ID_ge,zero_char); //and_exprt(binary_relation_exprt(chr,ID_le,nine_char));
+  exprt starts_with_digit = binary_relation_exprt(chr,ID_ge,zero_char); 
   
   for(int size=1; size<=10;size++) {
     exprt sum = constant_of_nat(0,type);
@@ -751,8 +700,6 @@ exprt string_refinementt::convert_string_parse_int
   }
   return i;
 }
-
-
 
 // We compute the index set for all formulas, instantiate the formulas
 // with the found indexes, and add them as lemmas.
@@ -827,8 +774,6 @@ std::string string_refinementt::string_of_array(const exprt &arr, const exprt &s
 
 exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 {
-  //debug() << "string_refinementt::get_array(" << arr.get(ID_identifier) 
-  //	  << "," << size.get(ID_value) << ")" << eom;
   exprt val = get(arr);
   unsignedbv_typet chart;
   if(arr.type().subtype() == char_type)
@@ -841,7 +786,6 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
   if(val.id() == "array-list") {
     exprt ret =
       array_of_exprt(chart.zero_expr(), array_typet(chart, infinity_exprt(index_type)));
-    // size));
     
     for (size_t i = 0; i < val.operands().size()/2; i++) {  
       exprt index = val.operands()[i*2];
@@ -931,7 +875,6 @@ bool string_refinementt::check_axioms()
 
   debug() << "there are " << not_contains_axioms.size() << " not_contains axioms" << eom;
   for (size_t i = 0; i < not_contains_axioms.size(); ++i) {
-    // We always consider than these aximos can be violated
     exprt val = get(not_contains_axioms[i].witness_of(zero));
     violated.push_back(std::make_pair(i, val));
   }
@@ -952,7 +895,7 @@ bool string_refinementt::check_axioms()
       for (size_t i = 0; i < violated.size(); ++i) {
 	
 	new_axioms[i] = universal_axioms[violated[i].first];
-	debug() << " axiom " << i <<" "<< constraint_to_string(new_axioms[i]) << eom;
+
 	const exprt &val = violated[i].second;
 	const string_constraintt &axiom = universal_axioms[violated[i].first];
 	
@@ -964,7 +907,6 @@ bool string_refinementt::check_axioms()
 	if (seen_instances.insert(instance).second) {
 	  add_lemma(instance);
 	} else debug() << "instance already seen" << eom;
-	// TODO - add backwards instantiations
       }
     }
 
@@ -974,11 +916,8 @@ bool string_refinementt::check_axioms()
 }
 
 
-namespace {
-
-
-  // Gets the upper bounds that are applied to [qvar], in the expression [expr]
-  void get_bounds(const exprt &qvar, const exprt &expr, std::vector<exprt> & out)
+// Gets the upper bounds that are applied to [qvar], in the expression [expr]
+void get_bounds(const exprt &qvar, const exprt &expr, std::vector<exprt> & out)
   {
     std::vector<exprt> to_treat;
     to_treat.push_back(expr);
@@ -997,8 +936,6 @@ namespace {
       }
     }
   }
-
-} // namespace
 
 
 
@@ -1064,7 +1001,7 @@ exprt string_refinementt::simplify_sum(const exprt &f) {
   return sum_of_map(map);
 }
 
-exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, const exprt &f) //, exprt & positive, exprt & negative)
+exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, const exprt &f) 
 {
   exprt positive, negative;
   // number of time the element should be added (can be negative)

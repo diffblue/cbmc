@@ -23,13 +23,12 @@ typedef std::vector<string_constraintt> axiom_vect;
 // Expressions that encode strings
 class string_exprt : public struct_exprt {
 public:
+
   // Initialize string from the type of characters
   string_exprt(unsignedbv_typet char_type);
 
   // Default uses C character type
   string_exprt() : string_exprt(refined_string_typet::char_type()) {};
-  
-
 
   // Add to the list of axioms, lemmas which should hold for the string to be 
   // equal to the given expression.
@@ -41,10 +40,10 @@ public:
   // Generate a new symbol of the given type tp with a prefix 
   static symbol_exprt fresh_symbol(const irep_idt &prefix,
 				   const typet &tp=bool_typet());
-  
 
   // Expression corresponding to the length of the string
   inline const exprt & length() const { return op0();};
+
   // Expression corresponding to the content (array of characters) of the string
   inline const exprt & content() const { return op1();};
 
@@ -82,7 +81,6 @@ private:
   void of_string_literal(const function_application_exprt &f,axiom_vect &axioms);
   void of_string_concat(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_substring(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
-  void of_string_char_set(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_empty_string(const function_application_exprt &f, axiom_vect & axioms);
   void of_int(const function_application_exprt &f, axiom_vect & axioms);
@@ -90,8 +88,6 @@ private:
   void of_int(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
 
   void of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
-
-  void of_struct(const struct_exprt & expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 
   static unsigned next_symbol_id;
 

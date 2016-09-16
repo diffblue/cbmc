@@ -20,7 +20,7 @@ class string_refinementt: public bv_refinementt
 {
 public:
   string_refinementt(const namespacet &_ns, propt &_prop);
-  ~string_refinementt();
+  ~string_refinementt() {};
 
   // Should we use counter examples at each iteration?
   bool use_counter_example;
@@ -41,11 +41,6 @@ public:
 
 private:  
   typedef bv_refinementt SUB;
-
-  // for now this is C string type but this probably needs to be generalized
-  //refined_string_typet string_type;
-
-  //inline size_t get_string_width()  { return boolbv_width(string_type);}
 
 protected:
 
@@ -184,10 +179,6 @@ private:
 
   // succinct and pretty way to display an expression
   std::string pretty_short(const exprt & expr);
-
-  // string to display a constraint
-  std::string constraint_to_string(const string_constraintt & sc);
-
 
 };
 

@@ -91,11 +91,8 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
   }
   else if(unrefined_string.id()==ID_if) 
     s.of_if(to_if_expr(unrefined_string),symbol_to_string,axioms);
-  else if(unrefined_string.id()==ID_struct) 
-    s.of_struct(to_struct_expr(unrefined_string),symbol_to_string,axioms);
-  else if(unrefined_string.id()==ID_nondet_symbol) {
-    // We ignore non deterministic symbols
-    //s = get_string_of_symbol(symbol_to_string,to_symbol_expr(unrefined_string));
+  else if(unrefined_string.id()==ID_nondet_symbol || unrefined_string.id()==ID_struct) {
+    // We ignore non deterministic symbols and struct
   }
   else 
     throw ("string_exprt of:\n" + unrefined_string.pretty() 
@@ -103,13 +100,6 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
 
   axioms.emplace_back(s >= index_zero);
   return s;
-}
-
-
-void string_exprt::of_struct(const struct_exprt & expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
-{
-  // Warning: we do nothing here!!!!
-  return;
 }
 
 void string_exprt::of_function_application(const function_application_exprt & expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
@@ -123,8 +113,6 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_concat(expr,symbol_to_string,axioms);
     } else if (is_string_substring_func(id)) {
       return of_string_substring(expr,symbol_to_string,axioms);
-    } else if (is_string_char_set_func(id)) {
-      return of_string_char_set(expr,symbol_to_string,axioms);
     } else if (is_string_empty_string_func(id)) {
       return of_empty_string(expr,axioms);
     } else if (is_string_copy_func(id)) {
@@ -211,11 +199,6 @@ void string_exprt::of_string_concat(const function_application_exprt &f, std::ma
 
   equal_exprt length_sum_lem(length(), plus_exprt(s1.length(), s2.length()));
   axioms.emplace_back(length_sum_lem);
-  // We can run into problems if the length of the string exceed 32 bits?
-  //binary_relation_exprt lem1(length(), ID_ge, s1.length());
-  //axioms.push_back(string_constraintt(lem1));
-  //binary_relation_exprt lem2(length(), ID_ge, s2.length());
-  //axioms.push_back(string_constraintt(lem2));
 
   symbol_exprt idx = fresh_symbol("QA_index_concat",refined_string_typet::index_type());
 
@@ -233,7 +216,7 @@ void string_exprt::of_string_concat(const function_application_exprt &f, std::ma
 void string_exprt::of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 1); //bad args to string copy
+  assert(args.size() == 1);
   
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
   axioms.emplace_back(equal_exprt(length(), s1.length()));
@@ -254,13 +237,9 @@ void string_exprt::of_string_substring
   assert(i.type() == refined_string_typet::index_type());
 
   exprt j;
-  if(args.size() == 3){
-    j = args[2];
-    assert(j.type() == refined_string_typet::index_type());
-  }
-  else {
-    j = str.length();
-  }
+  if(args.size() == 3) j = args[2];
+  else j = str.length();
+  assert(j.type() == refined_string_typet::index_type());
 
   symbol_exprt idx = fresh_symbol("index_substring", refined_string_typet::index_type());
 
@@ -362,27 +341,3 @@ void string_exprt::of_int
   }
   
 }
-
-
-void string_exprt::of_string_char_set
-(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
-{
-  const function_application_exprt::argumentst &args = expr.arguments();  
-  assert(args.size() == 3); //bad args to string_char_set?
-
-  string_exprt str = of_expr(args[0],symbol_to_string,axioms);
-  symbol_exprt c = fresh_symbol("char", refined_string_typet::char_type());
-  
-  //THIS HAS NOT BEEN CHECKED:  
-  axioms.emplace_back(equal_exprt(c,args[2]));
-  with_exprt sarrnew(str.content(), args[1], c);
-  implies_exprt lemma(binary_relation_exprt(args[1], ID_lt, str.length()),
-                      and_exprt(equal_exprt(content(), 
-					    // update_exprt(str.content(), args[1], c)),
-					    sarrnew),
-                                equal_exprt(length(), str.length())));
-  axioms.push_back(lemma);
-
-}
-
-
