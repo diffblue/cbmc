@@ -10,34 +10,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_expr.h>
 #include <ansi-c/string_constant.h>
 
-// For debuggin
-#include <iostream>
-
-string_ref_typet::string_ref_typet() : struct_typet() {
-  components().resize(2);
-  components()[0].set_name("length");
-  components()[0].set_pretty_name("length");
-  components()[0].type()=string_ref_typet::index_type();
-
-  array_typet char_array(string_ref_typet::char_type(),infinity_exprt(string_ref_typet::index_type()));
-  components()[1].set_name("content");
-  components()[1].set_pretty_name("content");
-  components()[1].type()=char_array;
-}
-
-string_ref_typet::string_ref_typet(unsignedbv_typet char_type) : struct_typet() {
-  components().resize(2);
-  components()[0].set_name("length");
-  components()[0].set_pretty_name("length");
-  components()[0].type()=string_ref_typet::index_type();
-
-  array_typet char_array(char_type,infinity_exprt(string_ref_typet::index_type()));
-  components()[1].set_name("content");
-  components()[1].set_pretty_name("content");
-  components()[1].type()=char_array;
-}
-
-exprt index_zero = string_ref_typet::index_zero();
+exprt index_zero = refined_string_typet::index_zero();
 unsigned string_exprt::next_symbol_id = 1;
 
 
@@ -51,91 +24,46 @@ symbol_exprt string_exprt::fresh_symbol(const irep_idt &prefix,
   return symbol_exprt(name, tp);
 }
 
-bool string_ref_typet::is_c_string_type(const typet &type)
-{
-  if (type.id() == ID_struct) {
-    irep_idt tag = to_struct_type(type).get_tag();
-    return (tag == irep_idt("__CPROVER_string"));
-  } else return false;
-}
 
-bool string_ref_typet::is_java_string_type(const typet &type)
+string_exprt::string_exprt(unsignedbv_typet char_type) : struct_exprt(refined_string_typet(char_type))
 {
-  if(type.id() == ID_pointer) {
-    pointer_typet pt = to_pointer_type(type);
-    typet subtype = pt.subtype();
-    return is_java_deref_string_type(subtype);
-  } else return false;
-}
-
-bool string_ref_typet::is_java_deref_string_type(const typet &type)
-{
-  if(type.id() == ID_struct) {
-    irep_idt tag = to_struct_type(type).get_tag();
-    return (tag == irep_idt("java.lang.String"));
-  } 
-  else return false;
-}
-
-bool string_ref_typet::is_java_string_builder_type(const typet &type)
-{
-  if(type.id() == ID_pointer) {
-    pointer_typet pt = to_pointer_type(type);
-    typet subtype = pt.subtype();
-    if(subtype.id() == ID_struct) {
-      irep_idt tag = to_struct_type(subtype).get_tag();
-      return (tag == irep_idt("java.lang.StringBuilder"));
-    } 
-    else return false;
-  } else return false;
-}
-
-string_exprt::string_exprt() : struct_exprt(string_ref_typet())
-{
-  string_ref_typet t;
-  symbol_exprt length = fresh_symbol("string_length",string_ref_typet::index_type());
+  refined_string_typet t(char_type);
+  symbol_exprt length = fresh_symbol("string_length",refined_string_typet::index_type());
   symbol_exprt content = fresh_symbol("string_content",t.get_content_type());
   move_to_operands(length,content);
 }
 
-string_exprt::string_exprt(unsignedbv_typet char_type) : struct_exprt(string_ref_typet(char_type))
-{
-  string_ref_typet t(char_type);
-  symbol_exprt length = fresh_symbol("string_length",string_ref_typet::index_type());
-  symbol_exprt content = fresh_symbol("string_content",t.get_content_type());
-  move_to_operands(length,content);
-}
 
 void string_exprt::of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
-  assert(string_ref_typet::is_unrefined_string_type(expr.true_case().type()));
+  assert(refined_string_typet::is_unrefined_string_type(expr.true_case().type()));
   string_exprt t = of_expr(expr.true_case(),symbol_to_string,axioms);
-  assert(string_ref_typet::is_unrefined_string_type(expr.false_case().type()));
+  assert(refined_string_typet::is_unrefined_string_type(expr.false_case().type()));
   string_exprt f = of_expr(expr.false_case(),symbol_to_string,axioms);
 
   axioms.emplace_back(expr.cond(),equal_exprt(length(),t.length()));
-  symbol_exprt qvar = fresh_symbol("string_if_true",string_ref_typet::index_type());
+  symbol_exprt qvar = fresh_symbol("string_if_true",refined_string_typet::index_type());
   axioms.push_back(string_constraintt(expr.cond(),equal_exprt((*this)[qvar],t[qvar])).forall(qvar,index_zero,t.length()));
   
   axioms.emplace_back(not_exprt(expr.cond()),equal_exprt(length(),f.length()));
-  symbol_exprt qvar2 = fresh_symbol("string_if_false",string_ref_typet::index_type());
+  symbol_exprt qvar2 = fresh_symbol("string_if_false",refined_string_typet::index_type());
   axioms.push_back(string_constraintt(not_exprt(expr.cond()),equal_exprt((*this)[qvar2],f[qvar2])).forall(qvar2,index_zero,f.length()));
 }
 
 
 string_exprt string_exprt::get_string_of_symbol(std::map<irep_idt, string_exprt> & symbol_to_string, const symbol_exprt & sym) {
-  if(string_ref_typet::is_c_string_type(sym.type())) {
+  if(refined_string_typet::is_c_string_type(sym.type())) {
     irep_idt id = sym.get_identifier();
     std::map<irep_idt, string_exprt>::iterator f = symbol_to_string.find(id);
     if(f == symbol_to_string.end()) {
-      symbol_to_string[id]= string_exprt(string_ref_typet::char_type());
+      symbol_to_string[id]= string_exprt(refined_string_typet::char_type());
       return symbol_to_string[id];
     } else return f->second;
   }  else { // otherwise we assume it is a java string
     irep_idt id = sym.get_identifier();
     std::map<irep_idt, string_exprt>::iterator f = symbol_to_string.find(id);
     if(f == symbol_to_string.end()) {
-      symbol_to_string[id]= string_exprt(string_ref_typet::java_char_type());
+      symbol_to_string[id]= string_exprt(refined_string_typet::java_char_type());
       return symbol_to_string[id];
     } else return f->second;
   }
@@ -146,10 +74,10 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
 {
   unsignedbv_typet char_type;
 
-  if(string_ref_typet::is_c_string_type(unrefined_string.type())) 
-    char_type = string_ref_typet::char_type();
+  if(refined_string_typet::is_c_string_type(unrefined_string.type())) 
+    char_type = refined_string_typet::char_type();
   else
-    char_type = string_ref_typet::java_char_type();
+    char_type = refined_string_typet::java_char_type();
 
   string_exprt s(char_type);
     
@@ -216,16 +144,16 @@ irep_idt string_exprt::extract_java_string(const symbol_exprt & s){
 
 void string_exprt::of_string_constant(irep_idt sval, int char_width, unsignedbv_typet char_type, axiom_vect &axioms){
   for (std::size_t i = 0; i < sval.size(); ++i) {
-    std::string idx_binary = integer2binary(i,INDEX_WIDTH);
-    constant_exprt idx(idx_binary, string_ref_typet::index_type());
+    std::string idx_binary = integer2binary(i,STRING_SOLVER_INDEX_WIDTH);
+    constant_exprt idx(idx_binary, refined_string_typet::index_type());
     std::string sval_binary=integer2binary(unsigned(sval[i]), char_width);
     constant_exprt c(sval_binary,char_type);
     equal_exprt lemma(index_exprt(content(), idx), c);
     axioms.emplace_back(lemma);
   }
   
-  std::string s_length_binary = integer2binary(unsigned(sval.size()),INDEX_WIDTH);
-  exprt s_length = constant_exprt(s_length_binary, string_ref_typet::index_type());
+  std::string s_length_binary = integer2binary(unsigned(sval.size()),STRING_SOLVER_INDEX_WIDTH);
+  exprt s_length = constant_exprt(s_length_binary, refined_string_typet::index_type());
 
   axioms.emplace_back(equal_exprt(length(),s_length));
 }
@@ -254,19 +182,19 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
       
     const exprt &s = arg.op0().op0().op0();
     sval = to_string_constant(s).get_value();
-    char_width = CHAR_WIDTH;
-    char_type = string_ref_typet::char_type();
+    char_width = STRING_SOLVER_CHAR_WIDTH;
+    char_type = refined_string_typet::char_type();
 
   } else {
     // Java string constant
     assert (arg.operands().size() == 1); 
-    assert(string_ref_typet::is_unrefined_string_type(arg.type()));
+    assert(refined_string_typet::is_unrefined_string_type(arg.type()));
     const exprt &s = arg.op0();
     
     //it seems the value of the string is lost, we need to recover it from the identifier
     sval = extract_java_string(to_symbol_expr(s));
-    char_width = JAVA_CHAR_WIDTH;
-    char_type = string_ref_typet::java_char_type();
+    char_width = JAVA_STRING_SOLVER_CHAR_WIDTH;
+    char_type = refined_string_typet::java_char_type();
   }
 
   of_string_constant(sval,char_width,char_type,axioms);
@@ -289,13 +217,13 @@ void string_exprt::of_string_concat(const function_application_exprt &f, std::ma
   //binary_relation_exprt lem2(length(), ID_ge, s2.length());
   //axioms.push_back(string_constraintt(lem2));
 
-  symbol_exprt idx = fresh_symbol("QA_index_concat",string_ref_typet::index_type());
+  symbol_exprt idx = fresh_symbol("QA_index_concat",refined_string_typet::index_type());
 
   string_constraintt a1(equal_exprt(s1[idx],(*this)[idx]));
   axioms.push_back(a1.forall(idx, index_zero, s1.length()));
 
 
-  symbol_exprt idx2 = fresh_symbol("QA_index_concat2",string_ref_typet::index_type());
+  symbol_exprt idx2 = fresh_symbol("QA_index_concat2",refined_string_typet::index_type());
 
   string_constraintt a2(equal_exprt(s2[idx2],(*this)[plus_exprt(idx2,s1.length())]));
   axioms.push_back(a2.forall(idx2, index_zero, s2.length()));
@@ -309,7 +237,7 @@ void string_exprt::of_string_copy(const function_application_exprt &f, std::map<
   
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
   axioms.emplace_back(equal_exprt(length(), s1.length()));
-  symbol_exprt idx = fresh_symbol("QA_index_copy",string_ref_typet::index_type());
+  symbol_exprt idx = fresh_symbol("QA_index_copy",refined_string_typet::index_type());
   string_constraintt a1(equal_exprt(s1[idx],(*this)[idx]));
   axioms.push_back(a1.forall(idx, index_zero, s1.length()));  
 }
@@ -323,18 +251,18 @@ void string_exprt::of_string_substring
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
 
   exprt i(args[1]);
-  assert(i.type() == string_ref_typet::index_type());
+  assert(i.type() == refined_string_typet::index_type());
 
   exprt j;
   if(args.size() == 3){
     j = args[2];
-    assert(j.type() == string_ref_typet::index_type());
+    assert(j.type() == refined_string_typet::index_type());
   }
   else {
     j = str.length();
   }
 
-  symbol_exprt idx = fresh_symbol("index_substring", string_ref_typet::index_type());
+  symbol_exprt idx = fresh_symbol("index_substring", refined_string_typet::index_type());
 
   axioms.emplace_back(equal_exprt(length(), minus_exprt(j, i)));
   axioms.emplace_back(binary_relation_exprt(i, ID_lt, j));
@@ -354,14 +282,14 @@ void string_exprt::of_int
 (const function_application_exprt &expr,axiom_vect & axioms)
 {
   assert(expr.arguments().size() == 1);
-  of_int(expr.arguments()[0],axioms,string_ref_typet::is_c_string_type(expr.type()),10);
+  of_int(expr.arguments()[0],axioms,refined_string_typet::is_c_string_type(expr.type()),10);
 }
 
 void string_exprt::of_long
 (const function_application_exprt &expr,axiom_vect & axioms)
 {
   assert(expr.arguments().size() == 1);
-  of_int(expr.arguments()[0],axioms,string_ref_typet::is_c_string_type(expr.type()),30);
+  of_int(expr.arguments()[0],axioms,refined_string_typet::is_c_string_type(expr.type()),30);
 }
 
 
@@ -376,18 +304,18 @@ void string_exprt::of_int
   exprt minus_char;
 
   if(is_c_string) {
-    minus_char = constant_of_nat(45,CHAR_WIDTH,string_ref_typet::char_type());
-    zero_char = constant_of_nat(48,CHAR_WIDTH,string_ref_typet::char_type());
-    nine_char = constant_of_nat(57,CHAR_WIDTH,string_ref_typet::char_type());
+    minus_char = constant_of_nat(45,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    zero_char = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    nine_char = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
   } else {     
-    minus_char = constant_of_nat(45,JAVA_CHAR_WIDTH,string_ref_typet::java_char_type());
-    zero_char = constant_of_nat(48,JAVA_CHAR_WIDTH,string_ref_typet::java_char_type());
-    nine_char = constant_of_nat(57,JAVA_CHAR_WIDTH,string_ref_typet::java_char_type());
+    minus_char = constant_of_nat(45,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    zero_char = constant_of_nat(48,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    nine_char = constant_of_nat(57,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
   }
 
-  axioms.emplace_back(and_exprt(*this > index_zero,*this <= string_ref_typet::index_of_int(max_size)));
+  axioms.emplace_back(and_exprt(*this > index_zero,*this <= refined_string_typet::index_of_int(max_size)));
 
-  exprt chr = (*this)[string_ref_typet::index_of_int(0)];
+  exprt chr = (*this)[refined_string_typet::index_of_int(0)];
   exprt starts_with_minus = equal_exprt(chr,minus_char);
   exprt starts_with_digit = and_exprt
     (binary_relation_exprt(chr,ID_ge,zero_char),
@@ -397,11 +325,11 @@ void string_exprt::of_int
   for(int size=1; size<=max_size;size++) {
     exprt sum = constant_of_nat(0,width,type);
     exprt all_numbers = true_exprt();
-    chr = (*this)[string_ref_typet::index_of_int(0)];
+    chr = (*this)[refined_string_typet::index_of_int(0)];
     exprt first_value = typecast_exprt(minus_exprt(chr,zero_char),type);
 
     for(int j=1; j<size; j++) {
-      chr = (*this)[string_ref_typet::index_of_int(j)];
+      chr = (*this)[refined_string_typet::index_of_int(j)];
       sum = plus_exprt(mult_exprt(sum,ten),typecast_exprt(minus_exprt(chr,zero_char),type));
       first_value = mult_exprt(first_value,ten);
       all_numbers = and_exprt(all_numbers,and_exprt
@@ -409,7 +337,7 @@ void string_exprt::of_int
 			       binary_relation_exprt(chr,ID_le,nine_char)));
     }
 
-    equal_exprt premise(length(), string_ref_typet::index_of_int(size));
+    equal_exprt premise(length(), refined_string_typet::index_of_int(size));
     axioms.emplace_back(and_exprt(premise,starts_with_digit),
     			and_exprt(equal_exprt(i,plus_exprt(sum,first_value)),
     				  all_numbers));
@@ -422,7 +350,7 @@ void string_exprt::of_int
       axioms.emplace_back(and_exprt(premise,starts_with_digit),
 			  not_exprt(equal_exprt((*this)[index_zero],zero_char)));
       axioms.emplace_back(and_exprt(premise,starts_with_minus),
-			  not_exprt(equal_exprt((*this)[string_ref_typet::index_of_int(1)],zero_char)));
+			  not_exprt(equal_exprt((*this)[refined_string_typet::index_of_int(1)],zero_char)));
 			  }
 
     //we have to be careful when exceeding the maximal size of integers
@@ -443,7 +371,7 @@ void string_exprt::of_string_char_set
   assert(args.size() == 3); //bad args to string_char_set?
 
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
-  symbol_exprt c = fresh_symbol("char", string_ref_typet::char_type());
+  symbol_exprt c = fresh_symbol("char", refined_string_typet::char_type());
   
   //THIS HAS NOT BEEN CHECKED:  
   axioms.emplace_back(equal_exprt(c,args[2]));

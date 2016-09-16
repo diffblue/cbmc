@@ -15,58 +15,20 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_constraint.h>
 #include <solvers/refinement/string_functions.h>
+#include <solvers/refinement/refined_string_type.h>
 
-#define INDEX_WIDTH 32
-#define CHAR_WIDTH 8
-#define JAVA_CHAR_WIDTH 16
-
-
-// Internal type used for strings
-class string_ref_typet : public struct_typet {
-public:
-  // default is with C type of characters
-  string_ref_typet();
-  string_ref_typet(unsignedbv_typet char_type);
-
-  // Type for the content (list of characters) of a string
-  inline array_typet get_content_type() 
-  { return to_array_type((to_struct_type(*this)).components()[1].type());}
-
-  // Types used in this refinement
-  static inline unsignedbv_typet char_type() { return unsignedbv_typet(CHAR_WIDTH);}
-
-  static inline unsignedbv_typet java_char_type() { return unsignedbv_typet(JAVA_CHAR_WIDTH);}
-
-  //unsignedbv_typet index_type(INDEX_WIDTH);
-  static inline signedbv_typet index_type() { return signedbv_typet(INDEX_WIDTH);}
-
-  static inline exprt index_zero() { return constant_exprt(integer2binary(0, INDEX_WIDTH), index_type());}
-
-  // For C the unrefined string type is __CPROVER_string, for java it is a 
-  // pointer to a strict with tag java.lang.String
-
-  static bool is_c_string_type(const typet & type);
-  static bool is_java_string_type(const typet & type);
-  static bool is_java_deref_string_type(const typet & type);
-  static bool is_java_string_builder_type(const typet & type);
-  static inline bool is_unrefined_string_type(const typet & type)
-  {  return (is_c_string_type(type) || is_java_string_type(type) || is_java_string_builder_type(type)); }
-  static inline bool is_unrefined_string(const exprt & expr)
-  {  return (is_unrefined_string_type(expr.type())); }
-
-  static inline constant_exprt index_of_int(int i) {
-    return constant_exprt(integer2binary(i, INDEX_WIDTH), index_type());
-  }
-
-};
 
 typedef std::vector<string_constraintt> axiom_vect;
 
 // Expressions that encode strings
 class string_exprt : public struct_exprt {
 public:
-  string_exprt();
+  // Initialize string from the type of characters
   string_exprt(unsignedbv_typet char_type);
+
+  // Default uses C character type
+  string_exprt() : string_exprt(refined_string_typet::char_type()) {};
+  
 
 
   // Add to the list of axioms, lemmas which should hold for the string to be 

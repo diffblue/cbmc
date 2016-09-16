@@ -20,12 +20,12 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <ansi-c/ansi_c_language.h>
 #include <iostream>
 
-unsignedbv_typet char_type = string_ref_typet::char_type();
-signedbv_typet index_type = string_ref_typet::index_type();
-unsignedbv_typet java_char_type = string_ref_typet::java_char_type();
+unsignedbv_typet char_type = refined_string_typet::char_type();
+signedbv_typet index_type = refined_string_typet::index_type();
+unsignedbv_typet java_char_type = refined_string_typet::java_char_type();
 
 
-constant_exprt zero = string_ref_typet::index_of_int(0);
+constant_exprt zero = refined_string_typet::index_of_int(0);
 
 // Succinct version of pretty()
 std::string string_refinementt::pretty_short(const exprt & expr) {
@@ -93,8 +93,8 @@ void string_refinementt::post_process()
       assert(string_axioms[i].is_not_contains());
       string_axioms[i].witness = string_exprt::fresh_symbol
 	("not_contains_witness",
-	 array_typet(string_ref_typet::index_type(),
-		     infinity_exprt(string_ref_typet::index_type())));
+	 array_typet(refined_string_typet::index_type(),
+		     infinity_exprt(refined_string_typet::index_type())));
       not_contains_axioms.push_back(string_axioms[i]);
     }
   debug() << not_contains_axioms.size() << " not_contains constraints" << eom;
@@ -156,12 +156,12 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      type==ns.follow(expr.rhs().type()) &&
      type.id()!=ID_bool)
   {
-    if(string_ref_typet::is_unrefined_string_type(type)) {
+    if(refined_string_typet::is_unrefined_string_type(type)) {
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       make_string(sym,expr.rhs());
       return false;
     }
-    else if(string_ref_typet::is_java_deref_string_type(type)) {
+    else if(refined_string_typet::is_java_deref_string_type(type)) {
       debug() << "string_refinementt::boolbv_set_equality_to_true: warning"
 	      << " non pointer string " << eom;
       symbol_exprt sym = to_symbol_expr(expr.lhs());
@@ -199,7 +199,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
   if(identifier.empty())
     throw "string_refinementt::convert_symbol got empty identifier";
 
-  if (string_ref_typet::is_unrefined_string_type(type)) {
+  if (refined_string_typet::is_unrefined_string_type(type)) {
     debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
     // this can happen because of boolbvt::convert_equality
     string_exprt str = string_of_symbol(to_symbol_expr(expr));
@@ -207,8 +207,8 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
     return bv;
   } else if (expr.type() == char_type) {
     bvt bv;
-    bv.resize(CHAR_WIDTH);
-    map.get_literals(identifier, char_type, CHAR_WIDTH, bv);
+    bv.resize(STRING_SOLVER_CHAR_WIDTH);
+    map.get_literals(identifier, char_type, STRING_SOLVER_CHAR_WIDTH, bv);
 
     forall_literals(it, bv)
       if(it->var_no()>=prop.no_variables() && !it->is_constant())
@@ -219,8 +219,8 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
     return bv;
   } else if (expr.type() == java_char_type) {
     bvt bv;
-    bv.resize(JAVA_CHAR_WIDTH);
-    map.get_literals(identifier, java_char_type, JAVA_CHAR_WIDTH, bv);
+    bv.resize(JAVA_STRING_SOLVER_CHAR_WIDTH);
+    map.get_literals(identifier, java_char_type, JAVA_STRING_SOLVER_CHAR_WIDTH, bv);
 
     forall_literals(it, bv)
       if(it->var_no()>=prop.no_variables() && !it->is_constant())
@@ -359,10 +359,10 @@ void string_refinementt::add_lemma(const exprt &lemma)
 
 
 string_exprt string_refinementt::string_of_symbol(const symbol_exprt & sym){
-  if(string_ref_typet::is_java_string_type(sym.type()) 
+  if(refined_string_typet::is_java_string_type(sym.type()) 
      && starts_with(std::string(sym.get(ID_identifier).c_str()),"java::java.lang.String.Literal.")) {
     string_exprt s;
-    s.of_string_constant(string_exprt::extract_java_string(sym),JAVA_CHAR_WIDTH,string_ref_typet::java_char_type(),string_axioms);
+    s.of_string_constant(string_exprt::extract_java_string(sym),JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type(),string_axioms);
     return s;
   }
   else {
@@ -439,7 +439,7 @@ bvt string_refinementt::convert_string_length(
 }
 
 exprt string_refinementt::is_positive(const exprt & x)
-{ return binary_relation_exprt(x, ID_ge, string_ref_typet::index_of_int(0)); }
+{ return binary_relation_exprt(x, ID_ge, refined_string_typet::index_of_int(0)); }
 
 
 bvt string_refinementt::convert_string_is_prefix
@@ -561,7 +561,7 @@ bvt string_refinementt::convert_string_contains(
 
   string_axioms.push_back
     (string_constraintt::not_contains
-     (zero,plus_exprt(string_ref_typet::index_of_int(1),minus_exprt(s0.length(),s1.length())), 
+     (zero,plus_exprt(refined_string_typet::index_of_int(1),minus_exprt(s0.length(),s1.length())), 
       and_exprt(not_exprt(contains),s0 >= s1),zero,s1.length(),s0,s1));
 
   return convert_bv(tc_contains);
@@ -604,8 +604,8 @@ bvt string_refinementt::convert_string_index_of(
   // 0 <= i < |s| && (i = -1 <=> !contains) && (contains => s[i] = c)
   // && forall n. 0 < n < i => s[n] != c 
   
-  string_axioms.push_back(string_constraintt(equal_exprt(index,string_ref_typet::index_of_int(-1)),not_exprt(contains)).exists(index,string_ref_typet::index_of_int(-1),str.length()));
-  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,string_ref_typet::index_of_int(-1)));
+  string_axioms.push_back(string_constraintt(equal_exprt(index,refined_string_typet::index_of_int(-1)),not_exprt(contains)).exists(index,refined_string_typet::index_of_int(-1),str.length()));
+  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,refined_string_typet::index_of_int(-1)));
   string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(zero,ID_le,index),equal_exprt(str[index],c)));
 
 
@@ -637,12 +637,12 @@ bvt string_refinementt::convert_string_last_index_of(
     c = typecast_exprt(c,java_char_type);
   }
 
-  string_axioms.push_back(string_constraintt(equal_exprt(index,string_ref_typet::index_of_int(-1)),not_exprt(contains)).exists(index,string_ref_typet::index_of_int(-1),str.length()));
-  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,string_ref_typet::index_of_int(-1)));
+  string_axioms.push_back(string_constraintt(equal_exprt(index,refined_string_typet::index_of_int(-1)),not_exprt(contains)).exists(index,refined_string_typet::index_of_int(-1),str.length()));
+  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,refined_string_typet::index_of_int(-1)));
   string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(zero,ID_le,index),equal_exprt(str[index],c)));
   
   symbol_exprt n = string_exprt::fresh_symbol("QA_last_index_of",index_type);
-  string_axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,plus_exprt(index,string_ref_typet::index_of_int(1)),str.length()));
+  string_axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,plus_exprt(index,refined_string_typet::index_of_int(1)),str.length()));
 
   symbol_exprt m = string_exprt::fresh_symbol("QA_last_index_of",index_type);
   string_axioms.push_back(string_constraintt(not_exprt(contains),not_exprt(equal_exprt(str[m],c))).forall(m,zero,str.length()));
@@ -668,7 +668,7 @@ bvt string_refinementt::convert_char_literal(
     irep_idt sval = s.get_value();
     assert(sval.size() == 1); 
     
-    std::string binary=integer2binary(unsigned(sval[0]), CHAR_WIDTH);
+    std::string binary=integer2binary(unsigned(sval[0]), STRING_SOLVER_CHAR_WIDTH);
     
     return convert_bv(constant_exprt(binary, char_type));
   }
@@ -717,20 +717,20 @@ exprt string_refinementt::convert_string_parse_int
   exprt zero_char;
   exprt minus_char;  
   exprt plus_char;
-  if(string_ref_typet::is_c_string_type(args[0].type())) {
-    plus_char = constant_of_nat(43,string_ref_typet::char_type());
-    minus_char = constant_of_nat(45,string_ref_typet::char_type());
-    zero_char = constant_of_nat(48,string_ref_typet::char_type());
+  if(refined_string_typet::is_c_string_type(args[0].type())) {
+    plus_char = constant_of_nat(43,refined_string_typet::char_type());
+    minus_char = constant_of_nat(45,refined_string_typet::char_type());
+    zero_char = constant_of_nat(48,refined_string_typet::char_type());
   }
   else {
-    plus_char = constant_of_nat(43,string_ref_typet::java_char_type());
-    minus_char = constant_of_nat(45,string_ref_typet::java_char_type());
-    zero_char = constant_of_nat(48,string_ref_typet::java_char_type());
+    plus_char = constant_of_nat(43,refined_string_typet::java_char_type());
+    minus_char = constant_of_nat(45,refined_string_typet::java_char_type());
+    zero_char = constant_of_nat(48,refined_string_typet::java_char_type());
   }
 
   exprt ten = constant_of_nat(10,type);
 
-  exprt chr = str[string_ref_typet::index_of_int(0)];
+  exprt chr = str[refined_string_typet::index_of_int(0)];
   exprt starts_with_minus = equal_exprt(chr,minus_char);
   exprt starts_with_plus = equal_exprt(chr,plus_char);
   exprt starts_with_digit = binary_relation_exprt(chr,ID_ge,zero_char); //and_exprt(binary_relation_exprt(chr,ID_le,nine_char));
@@ -740,11 +740,11 @@ exprt string_refinementt::convert_string_parse_int
     exprt first_value = typecast_exprt(minus_exprt(chr,zero_char),type);
     
     for(int j=1; j<size; j++){
-      sum = plus_exprt(mult_exprt(sum,ten),typecast_exprt(minus_exprt(str[string_ref_typet::index_of_int(j)],zero_char),type));
+      sum = plus_exprt(mult_exprt(sum,ten),typecast_exprt(minus_exprt(str[refined_string_typet::index_of_int(j)],zero_char),type));
       first_value = mult_exprt(first_value,ten);
     }
 
-    equal_exprt premise(str.length(), string_ref_typet::index_of_int(size));
+    equal_exprt premise(str.length(), refined_string_typet::index_of_int(size));
     string_axioms.emplace_back(and_exprt(premise,starts_with_digit),equal_exprt(i,plus_exprt(sum,first_value)));
     string_axioms.emplace_back(and_exprt(premise,starts_with_plus),equal_exprt(i,sum));
     string_axioms.emplace_back(and_exprt(premise,starts_with_minus),equal_exprt(i,unary_minus_exprt(sum)));
@@ -987,7 +987,7 @@ namespace {
       to_treat.pop_back();
       if (e.id() == ID_lt && e.op0() == qvar) {
 	assert(e.op1().type() == index_type || e.op1().type() == integer_typet());
-	out.push_back(minus_exprt(e.op1(), string_ref_typet::index_of_int(1)));
+	out.push_back(minus_exprt(e.op1(), refined_string_typet::index_of_int(1)));
       } else if (e.id() == ID_le && e.op0() == qvar) {
 	out.push_back(e.op1());
       } else {
@@ -1031,7 +1031,7 @@ std::map< exprt, int> string_refinementt::map_of_sum(const exprt &f) {
 
 
 exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
-  exprt sum = string_ref_typet::string_ref_typet::index_of_int(0);
+  exprt sum = refined_string_typet::refined_string_typet::index_of_int(0);
 
   for (std::map<exprt,int>::iterator it = m.begin();
        it != m.end(); it++) {
@@ -1039,10 +1039,10 @@ exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
     int second = negated?(-it->second):it->second;
     if (second != 0)
       if (second == -1) 
-	if(sum == string_ref_typet::index_of_int(0)) sum = unary_minus_exprt(t);
+	if(sum == refined_string_typet::index_of_int(0)) sum = unary_minus_exprt(t);
 	else sum = minus_exprt(sum,t);
       else if (second == 1)
-	if(sum == string_ref_typet::index_of_int(0)) sum = t;
+	if(sum == refined_string_typet::index_of_int(0)) sum = t;
 	else sum = plus_exprt(sum, t);
       else {
 	debug() << "in string_refinementt::sum_of_map:"
@@ -1183,17 +1183,10 @@ void string_refinementt::update_index_set(const exprt &formula)
     if (cur.id() == ID_index) {
       const exprt &s = cur.op0();
       const exprt &i = cur.op1();
-      if(s.type() == string_type.get_content_type()){
-	const exprt &simplified = simplify_sum(i);
-	if(index_set[s].insert(simplified).second)
-	  current_index_set[s].insert(simplified);
-      } else {
-	debug() << "update_index_set: index expression of non string" << eom
-		<< "Warning: concidering it as a string anyway" << eom;
-	const exprt &simplified = simplify_sum(i);
-	if(index_set[s].insert(simplified).second)
-	  current_index_set[s].insert(simplified);
-      }
+      assert(s.type().id() == ID_array);
+      const exprt &simplified = simplify_sum(i);
+      if(index_set[s].insert(simplified).second)
+	current_index_set[s].insert(simplified);
     } else {
       forall_operands(it, cur) {
         to_process.push_back(*it);

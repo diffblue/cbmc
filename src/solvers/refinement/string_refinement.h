@@ -43,10 +43,9 @@ private:
   typedef bv_refinementt SUB;
 
   // for now this is C string type but this probably needs to be generalized
-  string_ref_typet string_type;
+  //refined_string_typet string_type;
 
-  inline size_t get_string_width()
-  { return boolbv_width(string_type);}
+  //inline size_t get_string_width()  { return boolbv_width(string_type);}
 
 protected:
 
