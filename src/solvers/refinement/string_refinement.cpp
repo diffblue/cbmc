@@ -38,6 +38,7 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   SUB(_ns, _prop)
 {
   use_counter_example = false;
+  //use_counter_example = true;
   variable_with_multiple_occurence_in_index = false;
   initial_loop_bound = 100;
 }
@@ -287,8 +288,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 	  cur.clear();
 	  add_instantiations();
 	  
-	  if(variable_with_multiple_occurence_in_index)
-	    return D_ERROR;
+	  if(variable_with_multiple_occurence_in_index) {
+	    debug() << "WARNING: some variable appears multiple times" << eom;
+	    return D_SATISFIABLE;
+	    //return D_ERROR;
+	  }
 	  
 	  if(current_index_set.empty()){
 	    debug() << "current index set is empty" << eom;
