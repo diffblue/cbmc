@@ -12,13 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <algorithm>
 
+#include <util/expr_util.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
 
 #include "goto_symex.h"
 
-void goto_symext::symex_goto(statet &state)
+
+bool goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
   statet::framet &frame=state.top();
@@ -30,7 +33,11 @@ void goto_symext::symex_goto(statet &state)
   state.rename(new_guard, ns);
   do_simplify(new_guard);
 
-  if(new_guard.is_false() ||
+  const irep_idt loop_id=goto_programt::loop_id(state.source.pc);
+
+  // Testing for "is_false", we need to explicitly simplify despite "no-simplify".
+  const exprt incr_test_guard=simplify_expr(old_guard, ns);
+  if(incr_test_guard.is_false() || new_guard.is_false() ||
      state.guard.is_false())
   {
     if(!state.guard.is_false())
@@ -38,11 +45,16 @@ void goto_symext::symex_goto(statet &state)
 
     // reset unwinding counter
     if(instruction.is_backwards_goto())
-      frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count=0;
+    {
+      goto_symex_statet::framet::loop_infot &loop_info=
+        frame.loop_iterations[loop_id];
+      loop_info.count=0;
+      loop_info.fully_unwound=false;
+    }
 
     // next instruction
     state.source.pc++;
-    return; // nothing to do
+    return false; // nothing to do
   }
 
   target.goto_instruction(state.guard.as_expr(), new_guard, state.source);
@@ -81,12 +93,14 @@ void goto_symext::symex_goto(statet &state)
       return;
     }
 
-    unsigned &unwind=
-      frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count;
+    goto_symex_statet::framet::loop_infot &loop_info=
+    	frame.loop_iterations[loop_id];
+    unsigned &unwind=loop_info.count;
+
     unwind++;
 
     // continue unwinding?
-    if(get_unwind(state.source, unwind))
+    if(loop_info.fully_unwound || get_unwind(state.source, unwind))
     {
       // no!
       loop_bound_exceeded(state, new_guard);
@@ -96,13 +110,16 @@ void goto_symext::symex_goto(statet &state)
 
       // next instruction
       state.source.pc++;
-      return;
+
+      // do not break, but continue symex to the end of the program
+      return false;
     }
 
-    if(new_guard.is_true())
+    if(new_guard.is_true()) // continue looping
     {
+      bool do_break=check_break(loop_id,false,state,new_guard,unwind);
       state.source.pc=goto_target;
-      return; // nothing else to do
+      return do_break;
     }
   }
 
@@ -195,7 +212,21 @@ void goto_symext::symex_goto(statet &state)
       new_state.guard.add(guard_expr);
     }
   }
+  return false;
 }
+
+
+bool goto_symext::check_break(
+  const irep_idt &id,
+  bool is_function,
+  statet &state,
+  const exprt &cond,
+  unsigned unwind)
+{
+  // dummy implementation
+  return false;
+}
+
 
 void goto_symext::symex_step_goto(statet &state, bool taken)
 {
@@ -376,6 +407,7 @@ void goto_symext::phi_function(
       symex_targett::assignment_typet::PHI);
   }
 }
+
 
 void goto_symext::loop_bound_exceeded(
   statet &state,

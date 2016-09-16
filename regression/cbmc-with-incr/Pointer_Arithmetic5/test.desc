@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --bounds-check --function f
+--pointer-check --bounds-check --function f --stop-on-fail
 ^SIGNAL=0$
 ^Counterexample:$
 ^VERIFICATION FAILED$

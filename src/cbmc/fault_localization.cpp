@@ -229,7 +229,8 @@ fault_localizationt::run_decision_procedure(prop_convt &prop_conv)
   return dec_result;
 }
 
-safety_checkert::resultt fault_localizationt::stop_on_fail()
+
+safety_checkert::resultt fault_localizationt::stop_on_fail(bool show_report)
 {
   switch(run_decision_procedure(bmc.prop_conv))
   {
@@ -260,6 +261,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
 
     return safety_checkert::resultt::ERROR;
   }
+  assert(false);
 }
 
 void fault_localizationt::goal_covered(

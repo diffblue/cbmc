@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "literal_expr.h"
 #include "cover_goals.h"
 
+
 cover_goalst::~cover_goalst()
 {
 }
@@ -38,13 +39,17 @@ void cover_goalst::mark()
     }
 }
 
+
 /// Build clause
+
 void cover_goalst::constraint()
 {
   exprt::operandst disjuncts;
 
   // cover at least one unknown goal
 
+  disjuncts.push_back(literal_exprt(activation_literal));
+   
   for(std::list<goalt>::const_iterator
       g_it=goals.begin();
       g_it!=goals.end();

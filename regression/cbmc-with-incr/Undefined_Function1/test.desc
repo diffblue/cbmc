@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--stop-on-fail
 ^SIGNAL=0$
 ^\*\*\*\* WARNING: no body for function f$
 ^Counterexample:$

@@ -52,6 +52,10 @@ class optionst;
   "(nondet-static)" \
   "(version)" \
   "(cover):(symex-coverage-report):" \
+  "(incremental-check):(incremental)(earliest-loop-exit)" \
+  "(ignore-assertions-before-unwind-min)(stop-when-unsat)" \
+  "(unwind-max):(unwind-min):" \
+  "(magic-numbers)" \
   "(mm):" \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \
   "(ppc-macos)(unsigned-char)" \

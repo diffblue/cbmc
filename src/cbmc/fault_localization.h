@@ -40,7 +40,7 @@ public:
   }
 
   safety_checkert::resultt operator()();
-  safety_checkert::resultt stop_on_fail();
+  safety_checkert::resultt stop_on_fail(bool show_report=true);
 
   // override bmc_all_propertiest
   virtual void goal_covered(const cover_goalst::goalt &);

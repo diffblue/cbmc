@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --bounds-check
+--pointer-check --bounds-check --stop-on-fail
 ^EXIT=10$
 ^SIGNAL=0$
 ^Counterexample:$

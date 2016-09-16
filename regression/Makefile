@@ -6,6 +6,10 @@ DIRS = ansi-c \
        goto-analyzer \
        goto-instrument \
        goto-instrument-typedef \
+       goto-instrument-unwind \
+       cbmc-incr-oneloop \
+       cbmc-incr \
+       cbmc-with-incr \
        test-script \
        # Empty last line
 
@@ -19,3 +23,4 @@ clean:
 			$(MAKE) -C "$$dir" clean; \
 		fi; \
 	done;
+

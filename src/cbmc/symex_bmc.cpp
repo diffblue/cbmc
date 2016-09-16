@@ -28,7 +28,7 @@ symex_bmct::symex_bmct(
 }
 
 /// show progress
-void symex_bmct::symex_step(
+bool symex_bmct::symex_step(
   const goto_functionst &goto_functions,
   statet &state)
 {
@@ -62,7 +62,7 @@ void symex_bmct::symex_step(
     statistics() << eom;
   }
 
-  goto_symext::symex_step(goto_functions, state);
+  bool symex_step_result =  goto_symext::symex_step(goto_functions, state);
 
   if(record_coverage &&
      // avoid an invalid iterator in state.source.pc
@@ -82,6 +82,7 @@ void symex_bmct::symex_step(
     else if(!state.guard.is_false())
       symex_coverage.covered(cur_pc, state.source.pc);
   }
+  return symex_step_result;
 }
 
 void symex_bmct::merge_goto(
@@ -101,6 +102,7 @@ void symex_bmct::merge_goto(
      // branches only, no single-successor goto
      !prev_pc->guard.is_true())
     symex_coverage.covered(prev_pc, state.source.pc);
+
 }
 
 bool symex_bmct::get_unwind(

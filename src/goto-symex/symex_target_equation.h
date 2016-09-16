@@ -156,14 +156,14 @@ public:
     const sourcet &source);
 
   void convert(prop_convt &prop_conv);
-  void convert_assignments(decision_proceduret &decision_procedure) const;
-  void convert_decls(prop_convt &prop_conv) const;
+  void convert_assignments(decision_proceduret &decision_procedure);
+  void convert_decls(prop_convt &prop_conv);
   void convert_assumptions(prop_convt &prop_conv);
   void convert_assertions(prop_convt &prop_conv);
-  void convert_constraints(decision_proceduret &decision_procedure) const;
-  void convert_goto_instructions(prop_convt &prop_conv);
+  void convert_constraints(decision_proceduret &decision_procedure);
   void convert_guards(prop_convt &prop_conv);
   void convert_io(decision_proceduret &decision_procedure);
+  void convert_goto_instructions(prop_convt &prop_conv);
 
   exprt make_expression() const;
 
@@ -238,6 +238,9 @@ public:
     // for slicing
     bool ignore;
 
+    // for incremental conversion
+    bool converted;
+
     SSA_stept():
       type(goto_trace_stept::typet::NONE),
       hidden(false),
@@ -251,7 +254,8 @@ public:
       cond_literal(const_literal(false)),
       formatted(false),
       atomic_section_id(0),
-      ignore(false)
+      ignore(false),
+      converted(false)
     {
     }
 
@@ -281,6 +285,12 @@ public:
         i++;
     return i;
   }
+
+  // for incremental solving
+  bool is_incremental;
+  bvt activate_assertions;
+  literalt current_activation_literal();
+  void new_activation_literal(prop_convt &prop_conv);
 
   typedef std::list<SSA_stept> SSA_stepst;
   SSA_stepst SSA_steps;
@@ -316,6 +326,7 @@ public:
 
 protected:
   const namespacet &ns;
+  unsigned io_count;
 
   // for enforcing sharing in the expressions stored
   merge_irept merge_irep;

@@ -1,6 +1,8 @@
 SRC = all_properties.cpp \
       bmc.cpp \
       bmc_cover.cpp \
+      bmc_incremental.cpp \
+      bmc_incremental_one_loop.cpp \
       bv_cbmc.cpp \
       cbmc_dimacs.cpp \
       cbmc_languages.cpp \
@@ -11,6 +13,8 @@ SRC = all_properties.cpp \
       fault_localization.cpp \
       show_vcc.cpp \
       symex_bmc.cpp \
+      symex_bmc_incremental.cpp \
+      symex_bmc_incremental_one_loop.cpp \
       symex_coverage.cpp \
       xml_interface.cpp \
       # Empty last line

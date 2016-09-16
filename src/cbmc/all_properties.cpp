@@ -77,7 +77,8 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
       it!=bmc.equation.SSA_steps.end();
       it++)
   {
-    if(it->is_assert())
+    if(it->is_assert() &&
+       it->comment!=SYMEX_CONTINUATION_CHECK)
     {
       irep_idt property_id;
 
@@ -94,6 +95,9 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
       else
         continue;
 
+      //need to convert again as the context of the expression
+      //  may have changed
+      it->cond_literal=solver.convert(it->cond_expr);
       goal_map[property_id].instances.push_back(it);
     }
   }
@@ -101,6 +105,14 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   do_before_solving();
 
   cover_goalst cover_goals(solver);
+
+  //set activation literal for incremental checking
+  cover_goals.activation_literal=bmc.equation.current_activation_literal();
+
+#if 0
+  std::cout << "cover_goals.activation_literal = "
+            << cover_goals.activation_literal << std::endl;
+#endif
 
   cover_goals.set_message_handler(get_message_handler());
   cover_goals.register_observer(*this);
@@ -117,6 +129,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   bool error=false;
 
+  solver.set_assumptions(bmc.equation.activate_assertions);
   decision_proceduret::resultt result=cover_goals();
 
   if(result==decision_proceduret::resultt::D_ERROR)

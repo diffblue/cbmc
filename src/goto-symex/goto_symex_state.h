@@ -26,6 +26,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class dirtyt;
 
+#define SYMEX_CONTINUATION_CHECK "symex_continuation_check"
+
+
 // central data structure: state
 class goto_symex_statet
 {
@@ -265,11 +268,13 @@ public:
     {
       loop_infot():
         count(0),
+        fully_unwound(false),
         is_recursion(false)
       {
       }
 
       unsigned count;
+      bool fully_unwound;
       bool is_recursion;
     };
     typedef std::unordered_map<irep_idt, loop_infot, irep_id_hash>

@@ -29,6 +29,7 @@ public:
     const namespacet &_ns,
     message_handlert &_message_handler);
 
+
   enum class resultt { SAFE, UNSAFE, ERROR };
 
   // check whether all assertions in goto_functions are safe

@@ -221,7 +221,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   }
   if(cmdline.isset("earliest-loop-exit"))
     options.set_option("earliest-loop-exit", true);
+<<<<<<< 0bc503ae07a912ec82d5c337f453520219aac395
   // heuristic unwinding numbers used for SV-COMP
+=======
+>>>>>>> HEAD~15
   if(cmdline.isset("magic-numbers"))
     options.set_option("magic-numbers", true);
 
@@ -1173,6 +1176,8 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --refine-arrays              use refinement procedure for arrays (experimental)\n"
+    " --refine-arithmetic          use refinement procedure for arithmetic (experimental)\n"
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)

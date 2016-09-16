@@ -45,6 +45,7 @@ public:
 
   typedef std::list<goalt> goalst;
   goalst goals;
+  literalt activation_literal; // for incremental solving
 
   // statistics
 

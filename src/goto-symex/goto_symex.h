@@ -53,6 +53,7 @@ public:
     constant_propagation(true),
     new_symbol_table(_new_symbol_table),
     language_mode(),
+    ignore_assertions(false),
     ns(_ns),
     target(_target),
     atomic_section_counter(0),
@@ -78,13 +79,13 @@ public:
     const goto_programt &goto_program);
 
   /** start symex in a given state */
-  virtual void operator()(
+  virtual bool operator()(
     statet &state,
     const goto_functionst &goto_functions,
     const goto_programt &goto_program);
 
   /** execute just one step */
-  virtual void symex_step(
+  virtual bool symex_step(
     const goto_functionst &goto_functions,
     statet &state);
 
@@ -98,6 +99,7 @@ public:
 
   optionst options;
   symbol_tablet &new_symbol_table;
+  bool ignore_assertions;
 
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.
@@ -109,6 +111,13 @@ protected:
   unsigned atomic_section_counter;
 
   friend class symex_dereference_statet;
+
+  virtual bool check_break(
+    const irep_idt &id, 
+    bool is_function, 
+    statet &state, 
+    const exprt &cond, 
+    unsigned unwind);
 
   void new_name(symbolt &symbol);
 
@@ -156,7 +165,7 @@ protected:
 
   // symex
 
-  virtual void symex_goto(statet &state);
+  virtual bool symex_goto(statet &state);
   virtual void symex_start_thread(statet &state);
   virtual void symex_atomic_begin(statet &state);
   virtual void symex_atomic_end(statet &state);
@@ -207,19 +216,19 @@ protected:
   {
   }
 
-  virtual void symex_function_call(
+  virtual bool symex_function_call(
     const goto_functionst &goto_functions,
     statet &state,
     const code_function_callt &call);
 
   virtual void symex_end_of_function(statet &state);
 
-  virtual void symex_function_call_symbol(
+  virtual bool symex_function_call_symbol(
     const goto_functionst &goto_functions,
     statet &state,
     const code_function_callt &call);
 
-  virtual void symex_function_call_code(
+  virtual bool symex_function_call_code(
     const goto_functionst &goto_functions,
     statet &state,
     const code_function_callt &call);

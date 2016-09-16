@@ -1,6 +1,6 @@
 CORE
 main.c
---signed-overflow-check
+--signed-overflow-check --stop-on-fail
 ^SIGNAL=0$
 ^Counterexample:$
 ^VERIFICATION FAILED$

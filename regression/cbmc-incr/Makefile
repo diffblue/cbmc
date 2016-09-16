@@ -1,6 +1,6 @@
 default: tests.log
 
-PARAM = --incremental --magic-numbers
+PARAM = --incremental 
 # --refine   --slice-formula
 
 test:

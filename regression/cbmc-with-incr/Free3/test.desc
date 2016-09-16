@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check
+--pointer-check --stop-on-fail
 ^SIGNAL=0$
 ^Counterexample:$
 ^VERIFICATION FAILED$
