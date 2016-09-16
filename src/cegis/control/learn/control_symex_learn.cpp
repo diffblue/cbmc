@@ -20,6 +20,7 @@ void control_symex_learnt::process(const counterexamplest &counterexamples,
   const goto_programt::targetst &ce_locs=
       current_program.counterexample_locations;
   insert_counterexamples(st, gf, counterexamples, ce_locs);
+  gf.update();
 }
 
 const symbol_tablet &control_symex_learnt::get_symbol_table() const

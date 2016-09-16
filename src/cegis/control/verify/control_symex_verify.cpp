@@ -12,6 +12,7 @@ void control_symex_verifyt::process(const candidatet &candidate)
 {
   current_program=original_program;
   insert_solution(current_program, candidate);
+  current_program.gf.update();
 }
 
 const symbol_tablet &control_symex_verifyt::get_symbol_table() const
