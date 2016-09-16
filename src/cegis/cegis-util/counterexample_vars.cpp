@@ -100,3 +100,28 @@ void show_assignments(std::ostream &os,
     os << "</assignment>" << std::endl;
   }
 }
+
+namespace
+{
+bool is_marker(const irep_idt &label)
+{
+  return std::string::npos != id2string(label).find(DEFAULT_MARKER_LABEL_PREFIX);
+}
+
+typedef goto_programt::instructiont::labelst labelst;
+}
+
+bool has_counterexample_marker(const goto_programt::const_targett pos)
+{
+  const labelst &l=pos->labels;
+  return l.end() != std::find_if(l.begin(), l.end(), is_marker);
+}
+
+const irep_idt &get_counterexample_marker(
+    const goto_programt::const_targett pos)
+{
+  const labelst &l=pos->labels;
+  const labelst::const_iterator it=std::find_if(l.begin(), l.end(), is_marker);
+  assert(l.end() != it);
+  return *it;
+}

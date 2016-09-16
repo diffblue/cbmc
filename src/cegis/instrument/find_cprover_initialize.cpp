@@ -19,3 +19,10 @@ goto_programt::targett find_cprover_initialize(goto_programt &body)
   assert(end != pos);
   return pos;
 }
+
+goto_programt::targett find_last_instr(goto_programt &body)
+{
+  goto_programt::targett result=body.instructions.end();
+  assert(goto_program_instruction_typet::END_FUNCTION == (--result)->type);
+  return --result;
+}
