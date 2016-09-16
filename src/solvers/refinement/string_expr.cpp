@@ -113,6 +113,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_concat(expr,symbol_to_string,axioms);
     } else if (is_string_substring_func(id)) {
       return of_string_substring(expr,symbol_to_string,axioms);
+    } else if (is_string_char_set_func(id)) {
+      return of_string_char_set(expr,symbol_to_string,axioms);
     } else if (is_string_empty_string_func(id)) {
       return of_empty_string(expr,axioms);
     } else if (is_string_copy_func(id)) {
@@ -339,5 +341,22 @@ void string_exprt::of_int
       axioms.emplace_back(premise,binary_relation_exprt(i,ID_ge,smallest_with_10_digits));
     }
   }
+}
+
+void string_exprt::of_string_char_set
+(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = expr.arguments();  
+  assert(args.size() == 3); //bad args to string_char_set?
+
+  string_exprt str = of_expr(args[0],symbol_to_string,axioms);
+  symbol_exprt c = fresh_symbol("char", refined_string_typet::char_type());
   
+  axioms.emplace_back(equal_exprt(c,args[2]));
+  with_exprt sarrnew(str.content(), args[1], c);
+  implies_exprt lemma(binary_relation_exprt(args[1], ID_lt, str.length()),
+                      and_exprt(equal_exprt(content(), sarrnew),
+                                equal_exprt(length(), str.length())));
+  axioms.push_back(lemma);
+
 }

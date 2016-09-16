@@ -18,7 +18,8 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 // This is mostly for debugging:
 #include <langapi/languages.h>
 #include <ansi-c/ansi_c_language.h>
-#include <iostream>
+#include <chrono>
+
 
 unsignedbv_typet char_type = refined_string_typet::char_type();
 signedbv_typet index_type = refined_string_typet::index_type();
@@ -37,10 +38,8 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   SUB(_ns, _prop)
 {
   use_counter_example = false;
-  witness_bound = 2;
   variable_with_multiple_occurence_in_index = false;
-  initial_loop_bound = 10;
-
+  initial_loop_bound = 100;
 }
 
 void string_refinementt::display_index_set() {
@@ -56,57 +55,10 @@ void string_refinementt::display_index_set() {
   }
 }
 
-// We add instantiations before launching the solver
-void string_refinementt::post_process()
-{  
-  //debug() << "string_refinementt::post_process()" << eom;
-  std::vector<string_constraintt> new_axioms;
-  for(int i = 0; i < string_axioms.size(); i++)
-    if(string_axioms[i].is_simple())
-      add_lemma(string_axioms[i]);
-    else if(string_axioms[i].is_univ_quant())
-      universal_axioms.push_back(string_axioms[i]);
-    else {
-      assert(string_axioms[i].is_not_contains());
-      string_axioms[i].witness = string_exprt::fresh_symbol
-	("not_contains_witness",
-	 array_typet(refined_string_typet::index_type(),
-		     infinity_exprt(refined_string_typet::index_type())));
-      not_contains_axioms.push_back(string_axioms[i]);
-    }
-  debug() << not_contains_axioms.size() << " not_contains constraints" << eom;
-  nb_sat_iteration = 0;
 
-  debug() << "string_refinementt::post_process: warning update_index_set has to be checked" << eom;
+std::chrono::high_resolution_clock::time_point start_time = std::chrono::high_resolution_clock::now();
 
-  update_index_set(universal_axioms);
-  update_index_set(cur); 
-  cur.clear();
-  add_instantiations();
 
-  while(!current_index_set.empty() && initial_loop_bound-- > 0 && !variable_with_multiple_occurence_in_index)
-    {
-      current_index_set.clear(); 
-      update_index_set(cur); 
-      cur.clear();
-      add_instantiations();
-    }
-  
-  debug()<< "post_process: " << initial_loop_bound << " steps skipped" << eom;
-
-  display_index_set();
-  debug()<< "instantiating NOT_CONTAINS constraints" << eom;
-  for(int i=0; i<not_contains_axioms.size(); i++) {
-    debug()<< "constraint " << i << eom;
-    std::vector<exprt> lemmas;
-    instantiate_not_contains(not_contains_axioms[i],lemmas);
-    for(int j=0; j<lemmas.size(); j++) {
-      add_lemma(lemmas[j]);
-    }
-  }
-
-  SUB::post_process();
-}
 
 literalt string_refinementt::convert_rest(const exprt &expr)
 {
@@ -120,9 +72,15 @@ literalt string_refinementt::convert_rest(const exprt &expr)
     return SUB::convert_rest(expr);
 }
 
-
 bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
+  std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t1-start_time).count();
+
+  debug() << "string_refinementt::boolbv_set_equality_to_true time in ms: " 
+	  << (duration / 1000) << eom;
+
   if(!equality_propagation) return true;
 
   const typet &type=ns.follow(expr.lhs().type());
@@ -254,36 +212,110 @@ bvt string_refinementt::convert_function_application(
   return SUB::convert_function_application(expr);
 }
 
-bool just_checked_axiom = false;
 
-void string_refinementt::check_SAT()
-{
-  SUB::check_SAT();
-
-  if(!progress){
-  /*    if(just_checked_axiom)
-      {
-	current_index_set.clear(); 
-	update_index_set(cur); 
-	if(current_index_set.empty())
-	  debug() << "inconclusive: the model is not correct but there is nothing to add the index set" << eom;
-	progress=(!current_index_set.empty());
-	cur.clear();
-	add_instantiations();
-	just_checked_axiom = false;
-      }
-      else{*/
-    if(!check_axioms()) {
-      //just_checked_axiom = true;
-      //progress = true;
-      debug() << "check_SAT: warning, got sat but the model is not correct" << eom;
-      progress = false;
-    } 
-    else
-      progress = false;
-  }
-  //} 
+void string_refinementt::print_time(std::string s) {
+  debug() << s << " TIME == "
+	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
 }
+
+// We add instantiations before launching the solver
+void string_refinementt::post_process()
+{  
+  print_time("post_process");
+  for(int i = 0; i < string_axioms.size(); i++)
+    if(string_axioms[i].is_simple())
+      add_lemma(string_axioms[i]);
+    else if(string_axioms[i].is_univ_quant())
+      universal_axioms.push_back(string_axioms[i]);
+    else {
+      assert(string_axioms[i].is_not_contains());
+      string_axioms[i].witness = string_exprt::fresh_symbol
+	("not_contains_witness",
+	 array_typet(refined_string_typet::index_type(),
+		     infinity_exprt(refined_string_typet::index_type())));
+      not_contains_axioms.push_back(string_axioms[i]);
+    }
+
+  string_axioms.clear();
+
+  /*
+  debug() << not_contains_axioms.size() << " not_contains constraints" << eom;
+  nb_sat_iteration = 0;
+  debug() << "string_refinementt::post_process  at step" << step++ << " time in ms "
+	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
+
+  debug() << "string_refinementt::post_process: warning update_index_set has to be checked" << eom;
+  update_index_set(universal_axioms);
+  update_index_set(cur); 
+  cur.clear();
+  add_instantiations();
+  debug() << "string_refinementt::post_process  at step" << step++ << " time in ms "
+	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
+  */
+
+  SUB::post_process();
+}
+
+decision_proceduret::resultt string_refinementt::dec_solve()
+{
+
+  debug() << "string_refinementt::post_process: warning update_index_set has to be checked" << eom;
+  update_index_set(universal_axioms);
+  update_index_set(cur); 
+  cur.clear();
+  add_instantiations();
+
+  while(initial_loop_bound-- > 0)
+    {
+      print_time("string_refinementt::dec_solve");
+      decision_proceduret::resultt res = SUB::dec_solve();
+      
+      switch(res) 
+	{
+	case D_SATISFIABLE:
+	  if(!check_axioms()) {
+	    debug() << "check_SAT: got SAT but the model is not correct" << eom;
+	  } 
+	  else {
+	    debug() << "check_SAT: the model is correct" << eom;
+	    return D_SATISFIABLE;
+	  }
+	  
+	  debug() <<  "refining.." << eom;
+	  current_index_set.clear(); 
+	  update_index_set(cur); 
+	  cur.clear();
+	  add_instantiations();
+	  
+	  if(variable_with_multiple_occurence_in_index)
+	    return D_ERROR;
+	  
+	  if(current_index_set.empty()){
+	    debug() << "current index set is empty" << eom;
+	    return D_SATISFIABLE;
+	  } 
+
+	  display_index_set();
+	  debug()<< "instantiating NOT_CONTAINS constraints" << eom;
+	  for(int i=0; i<not_contains_axioms.size(); i++) {
+	    debug()<< "constraint " << i << eom;
+	    std::vector<exprt> lemmas;
+	    instantiate_not_contains(not_contains_axioms[i],lemmas);
+	    for(int j=0; j<lemmas.size(); j++) {
+	      add_lemma(lemmas[j]);
+	    }
+	  }
+	  break;
+	default: 
+	  return res;
+	}
+
+
+    } 
+  debug () << "string_refinementt::dec_solve reached the maximum number of steps allowed";
+  return D_ERROR;
+}
+
 
 bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 {

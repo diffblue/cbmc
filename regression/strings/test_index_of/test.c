@@ -14,8 +14,7 @@ int main(){
   assert(firstSlash == 3);
   assert(lastSlash == 7);
 
-  assert(firstSlash != 3);
-  assert(lastSlash != 7);
+  assert(firstSlash != 3 || lastSlash != 7);
 
   return 0;
 }

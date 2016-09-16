@@ -25,9 +25,6 @@ public:
   // Should we use counter examples at each iteration?
   bool use_counter_example;
 
-  // Bound on the existential witnesses we use for instantiation
-  int witness_bound;
-
   // Number of time we refine the index set before actually launching the solver
   int initial_loop_bound;
 
@@ -51,7 +48,7 @@ protected:
   virtual bvt convert_symbol(const exprt &expr);
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
-  virtual void check_SAT();
+  decision_proceduret::resultt dec_solve();
 
   // fills as many 0 as necessary in the bit vectors to have the right width
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
@@ -180,6 +177,7 @@ private:
   // succinct and pretty way to display an expression
   std::string pretty_short(const exprt & expr);
 
+  void print_time(std::string s);
 };
 
 #endif
