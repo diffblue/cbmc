@@ -85,7 +85,7 @@ bool Non_Crossing_Biased_Climb()
 	result = !(Own_Below_Threat()) || ((Own_Below_Threat()) && (!(Down_Separation >= ALIM())));
     }
     else
-    {
+    {	
 	result = Own_Above_Threat() && (Cur_Vertical_Sep >= MINSEP) && (Up_Separation >= ALIM());
     }
     return result;
@@ -128,9 +128,9 @@ int alt_sep_test()
     enabled = High_Confidence && (Own_Tracked_Alt_Rate <= OLEV) && (Cur_Vertical_Sep > MAXALTDIFF);
     tcas_equipped = Other_Capability == TCAS_TA;
     intent_not_known = Two_of_Three_Reports_Valid && Other_RAC == NO_INTENT;
-
+    
     alt_sep = UNRESOLVED;
-
+    
     if (enabled && ((tcas_equipped && intent_not_known) || !tcas_equipped))
     {
 	need_upward_RA = Non_Crossing_Biased_Climb() && Own_Below_Threat();
@@ -147,7 +147,7 @@ int alt_sep_test()
 	else
 	    alt_sep = UNRESOLVED;
     }
-
+    
     return alt_sep;
 }
 
@@ -155,17 +155,17 @@ main(int argc, char*argv[])
 {
 
   initialize();
-  Cur_Vertical_Sep =  860;
-  High_Confidence = 1;
-  Two_of_Three_Reports_Valid = 1;
-  Own_Tracked_Alt =  618;
-  Own_Tracked_Alt_Rate =  329;
-  Other_Tracked_Alt =  574;
-  Alt_Layer_Value =  4;
-  Up_Separation =  893;
-  Down_Separation =  914;
-  Other_RAC =  0;
-  Other_Capability =  2;
-  Climb_Inhibit =  0;
+  Cur_Vertical_Sep =  860; 
+  High_Confidence = 1; 
+  Two_of_Three_Reports_Valid = 1; 
+  Own_Tracked_Alt =  618; 
+  Own_Tracked_Alt_Rate =  329; 
+  Other_Tracked_Alt =  574; 
+  Alt_Layer_Value =  4; 
+  Up_Separation =  893; 
+  Down_Separation =  914; 
+  Other_RAC =  0; 
+  Other_Capability =  2; 
+  Climb_Inhibit =  0; 
   assert(alt_sep_test()==0);
 }

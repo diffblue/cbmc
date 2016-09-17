@@ -20,7 +20,7 @@ int main (void)
 
   float smallestNormalFloat = 0x1.0p-126f;
   float largestSubnormalFloat = 0x1.fffffcp-127f;
-
+  
   double v = 0x1.FFFFFFp-127;
 
   float f;
@@ -59,7 +59,7 @@ int main (void)
   f = nondet_float();
   __CPROVER_assume(fpclassify(f) == FP_SUBNORMAL);
   assert( ((float)((double)f)) == f );
-
+  
   #endif
 
   return 0;

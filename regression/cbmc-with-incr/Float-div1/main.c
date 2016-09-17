@@ -23,7 +23,7 @@ void simplifiedInductiveStepHunt (float nextState)
 
   // Implies nextState == 0x1p+124f;
   __CPROVER_assume((0x1.fffffep+123f < nextState) && (nextState < 0x1.000002p+124f));
-
+  
   float oneAfter = (target / nextState);
 
   // Is true and correctly proven by constant evaluation
