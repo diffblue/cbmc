@@ -1,3 +1,5 @@
+#include <cegis/learn/constraint_helper.h>
+#include <cegis/learn/insert_counterexample.h>
 #include <cegis/control/learn/nondet_solution.h>
 #include <cegis/control/learn/control_symex_learn.h>
 
@@ -11,11 +13,14 @@ void control_symex_learnt::process(const counterexamplest &counterexamples,
     const size_t max_solution_size)
 {
   current_program=original_program;
-  const symbol_tablet &st=current_program.st;
+  symbol_tablet &st=current_program.st;
   goto_functionst &gf=current_program.gf;
   nondet_control_solution(st, gf);
-  // TODO: Implement
-  assert(false);
+  transform_asserts_to_assumes(gf);
+  const goto_programt::targetst &ce_locs=
+      current_program.counterexample_locations;
+  insert_counterexamples(st, gf, counterexamples, ce_locs);
+  gf.update();
 }
 
 const symbol_tablet &control_symex_learnt::get_symbol_table() const

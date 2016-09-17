@@ -69,7 +69,7 @@ void insert_solution(control_programt &program,
   goto_functionst &gf=program.gf;
   goto_programt &body=get_entry_body(gf);
   const goto_programt::targett pos=find_cprover_initialize(body);
-  const irep_idt name(CEGIS_CONTROL_SOLUTION_VAR_NAME);
+  const std::string name(CEGIS_CONTROL_SOLUTION_VAR_NAME);
   const symbol_tablet &st=program.st;
   const source_locationt &loc=pos->source_location;
   const struct_exprt value(to_struct_expr(st, solution, loc));

@@ -23,4 +23,15 @@
  */
 goto_programt::targett find_cprover_initialize(goto_programt &body);
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ *
+ * @return
+ */
+goto_programt::targett find_last_instr(goto_programt &body);
+
 #endif /* CEGIS_FIND_CPROVER_INITIALIZE_H_ */

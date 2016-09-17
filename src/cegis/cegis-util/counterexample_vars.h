@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_program.h>
 
+#include <cegis/cegis-util/labelled_assignments.h>
+
 #define DEFAULT_MARKER_LABEL_PREFIX CPROVER_PREFIX "_cegis_ce_location_"
 
 /**
@@ -93,8 +95,7 @@ bool default_cegis_meta_criterion(const goto_programt::const_targett pos);
  *
  * @return
  */
-std::map<const irep_idt, exprt::operandst> extract_counterexample(
-    const class goto_tracet &trace);
+labelled_assignmentst extract_counterexample(const class goto_tracet &trace);
 
 /**
  * @brief
@@ -104,6 +105,28 @@ std::map<const irep_idt, exprt::operandst> extract_counterexample(
  * @param assignments
  */
 void show_assignments(std::ostream &os,
-    const std::map<const irep_idt, exprt::operandst> &assignments);
+    const labelled_assignmentst &assignments);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param pos
+ *
+ * @return
+ */
+bool has_counterexample_marker(goto_programt::const_targett pos);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param pos
+ *
+ * @return
+ */
+const irep_idt &get_counterexample_marker(goto_programt::const_targett pos);
 
 #endif /* CEGIS_COUNTEREXAMPLE_VARS_H_ */

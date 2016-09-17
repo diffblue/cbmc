@@ -60,6 +60,8 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       cegis-util/task_pool.cpp cegis-util/constant_width.cpp cegis-util/irep_pipe.cpp cegis-util/program_helper.cpp \
       cegis-util/temporary_output_block.cpp cegis-util/cbmc_runner.cpp cegis-util/module_helper.cpp \
       cegis-util/inline_user_program.cpp cegis-util/counterexample_vars.cpp cegis-util/string_helper.cpp \
+      cegis-util/type_helper.cpp \
+      learn/insert_counterexample.cpp learn/constraint_helper.cpp \
       constant/add_constant.cpp constant/literals_collector.cpp constant/default_cegis_constant_strategy.cpp \
       instrument/cegis_library.cpp instrument/instrument_var_ops.cpp instrument/meta_variables.cpp \
       instrument/find_cprover_initialize.cpp \

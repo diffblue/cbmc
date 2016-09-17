@@ -4,6 +4,7 @@
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/jsa/value/jsa_solution_printer.h>
 #include <cegis/jsa/preprocessing/add_synthesis_library.h>
+#include <cegis/jsa/constraint/jsa_constraint_factory.h>
 #include <cegis/jsa/learn/insert_counterexample.h>
 #include <cegis/jsa/learn/insert_predicates_and_queries.h>
 #include <cegis/jsa/learn/instrument_pred_ops.h>
@@ -23,6 +24,7 @@ void jsa_symex_learnt::process(const counterexamplest &counterexamples,
   const goto_programt::targetst pred_ops(collect_pred_ops(program));
   //add_jsa_library(program, max_solution_size, pred_ops);
   instrument_pred_ops(program, pred_ops, op_ids, const_op_ids);
+  insert_jsa_constraint(program, true);
   insert_counterexamples(program, counterexamples);
   declare_jsa_predicates(program, max_solution_size);
   declare_jsa_query(program, max_solution_size);
