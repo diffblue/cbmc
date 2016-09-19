@@ -189,6 +189,10 @@ bvt string_refinementt::convert_function_application(
       return convert_string_length(expr);
     } else if (is_string_equal_func(id)) {
       return convert_bv(convert_string_equal(expr));
+    } else if (is_string_equals_ignore_case_func(id)) {
+      return convert_bv(convert_string_equals_ignore_case(expr));
+    } else if (is_string_is_empty_func(id)) {
+      return convert_bv(convert_string_is_empty(expr));
     } else if (is_string_char_at_func(id)) {
       return convert_string_char_at(expr);
     } else if (is_string_is_prefix_func(id)) {
@@ -412,6 +416,36 @@ exprt string_refinementt::convert_string_equal(const function_application_exprt 
   return tc_eq;
 }
 
+exprt string_refinementt::convert_string_equals_ignore_case(const function_application_exprt &f) {
+  assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
+  
+  symbol_exprt eq = fresh_boolean("equal");
+  typecast_exprt tc_eq(eq,f.type());
+
+  debug() << "WARNING: implementation of convert_string_equals_ignore_case is incomplete" << eom;
+  assert(false);
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2); //bad args to string equal?
+
+  string_exprt s1 = make_string(args[0]);
+  string_exprt s2 = make_string(args[1]);
+  symbol_exprt witness = fresh_index("witness_unequal");
+  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_equal", index_type);
+
+  string_axioms.emplace_back(eq, equal_exprt(s1.length(), s2.length()));
+
+  string_axioms.push_back
+    (string_constraintt(eq,equal_exprt(s1[qvar],s2[qvar])
+			).forall(qvar,zero,s1.length()));
+
+  string_axioms.emplace_back
+    (not_exprt(eq),
+     or_exprt(notequal_exprt(s1.length(), s2.length()),
+	      string_constraintt(notequal_exprt(s1[witness],s2[witness])).exists(witness,zero,s1.length())));
+
+  return tc_eq;
+}
+
 
 bvt string_refinementt::convert_string_length(
   const function_application_exprt &f)
@@ -461,6 +495,20 @@ bvt string_refinementt::convert_string_is_prefix
   return convert_bv(tc_isprefix); 
 }
 
+exprt string_refinementt::convert_string_is_empty
+(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 1);
+  assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
+
+  symbol_exprt is_empty = fresh_boolean("is_empty");
+  string_exprt s0 = make_string(args[0]);
+  string_axioms.emplace_back(implies_exprt(is_empty, equal_exprt(s0.length(),zero)));
+  string_axioms.emplace_back(implies_exprt(equal_exprt(s0.length(),zero),is_empty));
+  return typecast_exprt(is_empty,f.type());
+
+}
 
 bvt string_refinementt::convert_string_is_suffix
 (const function_application_exprt &f, bool swap_arguments)

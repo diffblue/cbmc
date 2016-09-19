@@ -31,6 +31,15 @@ Date:   September 2016
 #define string_empty_string_func "__CPROVER_uninterpreted_empty_string"
 #define string_parse_int_func "__CPROVER_uninterpreted_parse_int"
 #define string_of_int_func "__CPROVER_uninterpreted_string_of_int"
+#define string_of_long_func "__CPROVER_uninterpreted_string_of_long"
+#define string_of_bool_func "__CPROVER_uninterpreted_string_of_bool"
+#define string_of_float_func "__CPROVER_uninterpreted_string_of_float"
+#define string_of_double_func "__CPROVER_uninterpreted_string_of_double"
+#define string_equals_ignore_case_func "__CPROVER_uninterpreted_string_equals_ignore_case"
+#define string_trim_func "__CPROVER_uninterpreted_string_trim"
+#define string_to_lower_case_func "__CPROVER_uninterpreted_string_to_lower_case"
+#define string_to_upper_case_func "__CPROVER_uninterpreted_string_to_upper_case"
+#define string_is_empty_func "__CPROVER_uninterpreted_string_is_empty"
 
 
 bool starts_with(std::string s, std::string t) {
@@ -100,4 +109,32 @@ bool is_string_parse_int_func(irep_idt id) {
 bool is_string_of_int_func(irep_idt id) {
   return (starts_with(id2string(id),string_of_int_func));
 }
+bool is_string_of_long_func(irep_idt id) {
+  return (starts_with(id2string(id),string_of_int_func));
+}
+bool is_string_of_bool_func(irep_idt id){
+  return (starts_with(id2string(id),string_of_bool_func));
+}
+bool is_string_of_float_func(irep_idt id){
+  return (starts_with(id2string(id),string_of_float_func));
+}
+bool is_string_of_double_func(irep_idt id){
+  return (starts_with(id2string(id),string_of_double_func));
+}
+bool is_string_equals_ignore_case_func(irep_idt id){
+  return (starts_with(id2string(id),string_equals_ignore_case_func));
+}
+bool is_string_trim_func(irep_idt id){
+  return (starts_with(id2string(id),string_trim_func));
+}
+bool is_string_to_lower_case_func(irep_idt id){
+  return (starts_with(id2string(id),string_to_lower_case_func));
+}
+bool is_string_to_upper_case_func(irep_idt id){
+  return (starts_with(id2string(id),string_to_upper_case_func));
+}
+bool is_string_is_empty_func(irep_idt id){
+  return (starts_with(id2string(id),string_is_empty_func));
+}
+
 

@@ -81,11 +81,18 @@ private:
   void of_string_literal(const function_application_exprt &f,axiom_vect &axioms);
   void of_string_concat(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_substring(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_trim(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_to_lower_case(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_to_upper_case(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_char_set(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_empty_string(const function_application_exprt &f, axiom_vect & axioms);
   void of_int(const function_application_exprt &f, axiom_vect & axioms);
   void of_long(const function_application_exprt &f, axiom_vect & axioms);
+  // Warning the specifications of these functions is only partial:
+  void of_float(const function_application_exprt &f, axiom_vect & axioms);
+  void of_double(const function_application_exprt &f, axiom_vect & axioms);
+  void of_bool(const function_application_exprt &f, axiom_vect & axioms);
   void of_int(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
 
   void of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);

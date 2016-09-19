@@ -56,6 +56,8 @@ protected:
   // The following functions convert different string functions 
   // and add the corresponding lemmas to a list of properties to be checked  
   exprt convert_string_equal(const function_application_exprt &f);
+  exprt convert_string_equals_ignore_case(const function_application_exprt &f);
+  exprt convert_string_is_empty(const function_application_exprt &f);
   bvt convert_string_length(const function_application_exprt &f);
   bvt convert_string_is_prefix(const function_application_exprt &f, bool swap_arguments=false);
   bvt convert_string_is_suffix(const function_application_exprt &f, bool swap_arguments=false);

@@ -37,5 +37,14 @@ bool is_string_copy_func(irep_idt id);
 bool is_string_empty_string_func(irep_idt id);
 bool is_string_parse_int_func(irep_idt id);
 bool is_string_of_int_func(irep_idt id);
+bool is_string_of_long_func(irep_idt id);
+bool is_string_of_bool_func(irep_idt id);
+bool is_string_of_float_func(irep_idt id);
+bool is_string_of_double_func(irep_idt id);
+bool is_string_equals_ignore_case_func(irep_idt id);
+bool is_string_trim_func(irep_idt id);
+bool is_string_to_lower_case_func(irep_idt id);
+bool is_string_to_upper_case_func(irep_idt id);
+bool is_string_is_empty_func(irep_idt id);
 
 #endif

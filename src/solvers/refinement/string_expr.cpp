@@ -24,6 +24,9 @@ symbol_exprt string_exprt::fresh_symbol(const irep_idt &prefix,
   return symbol_exprt(name, tp);
 }
 
+constant_exprt constant_of_nat(int i,int width, typet t) {
+  return constant_exprt(integer2binary(i,width), t);
+}
 
 string_exprt::string_exprt(unsignedbv_typet char_type) : struct_exprt(refined_string_typet(char_type))
 {
@@ -113,6 +116,12 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_concat(expr,symbol_to_string,axioms);
     } else if (is_string_substring_func(id)) {
       return of_string_substring(expr,symbol_to_string,axioms);
+    } else if (is_string_trim_func(id)) {
+      return of_string_trim(expr,symbol_to_string,axioms);
+    } else if (is_string_to_lower_case_func(id)) {
+      return of_string_to_lower_case(expr,symbol_to_string,axioms);
+    } else if (is_string_to_upper_case_func(id)) {
+      return of_string_to_upper_case(expr,symbol_to_string,axioms);
     } else if (is_string_char_set_func(id)) {
       return of_string_char_set(expr,symbol_to_string,axioms);
     } else if (is_string_empty_string_func(id)) {
@@ -121,6 +130,14 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_copy(expr,symbol_to_string,axioms);
     } else if (is_string_of_int_func(id)) {
       return of_int(expr,axioms);
+    } else if (is_string_of_float_func(id)) {
+      return of_float(expr,axioms);
+    } else if (is_string_of_double_func(id)) {
+      return of_double(expr,axioms);
+    } else if (is_string_of_long_func(id)) {
+      return of_long(expr,axioms);
+    } else if (is_string_of_bool_func(id)) {
+      return of_bool(expr,axioms);
     } 
   }
   throw "non string function";
@@ -255,9 +272,87 @@ void string_exprt::of_string_substring
   axioms.push_back(a.forall(idx,index_zero,length()));
 }
 
-constant_exprt constant_of_nat(int i,int width, typet t) {
-  return constant_exprt(integer2binary(i,width), t);
+void string_exprt::of_string_trim
+(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = expr.arguments();  
+  assert(args.size() == 1);
+  string_exprt str = of_expr(args[0],symbol_to_string,axioms);
+  symbol_exprt idx = fresh_symbol("index_trim", refined_string_typet::index_type());
+
+  exprt space_char = constant_of_nat(32,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+
+  // m + |s1| <= |str|
+  axioms.emplace_back(str >= plus_exprt(idx, length()));
+
+  symbol_exprt n = fresh_symbol("QA_index_trim",refined_string_typet::index_type());
+  // forall n < m, str[n] = ' '
+  string_constraintt a(equal_exprt((*this)[n], space_char));
+  axioms.push_back(a.forall(idx,index_zero,idx));
+
+  symbol_exprt n2 = fresh_symbol("QA_index_trim2",refined_string_typet::index_type());
+  // forall n < |str|-m-|s1|, str[m+|s1|+n] = ' '
+  string_constraintt a1(equal_exprt((*this)[plus_exprt(idx,plus_exprt(length(),n2))], space_char));
+  axioms.push_back(a1.forall(n2,index_zero,minus_exprt(str.length(),plus_exprt(idx,length()))));
+
+  symbol_exprt n3 = fresh_symbol("QA_index_trim3",refined_string_typet::index_type());
+  // forall n < |s1|, s[idx+n] = s1[n]
+  string_constraintt a2(equal_exprt((*this)[idx], str[plus_exprt(n3, idx)]));
+  axioms.push_back(a2.forall(n3,index_zero,length()));
+  // s[m] != ' ' && s[m+|s1|-1] != ' '
+  axioms.emplace_back(not_exprt(equal_exprt(str[idx],space_char)));
+  axioms.emplace_back(not_exprt(equal_exprt(str[minus_exprt(plus_exprt(idx,length()),refined_string_typet::index_of_int(1))],space_char)));
 }
+
+void string_exprt::of_string_to_lower_case
+(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = expr.arguments();  
+  assert(args.size() >= 2);
+
+  string_exprt str = of_expr(args[0],symbol_to_string,axioms);
+  exprt char_a = constant_of_nat(97,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_A = constant_of_nat(65,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_z = constant_of_nat(122,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_Z = constant_of_nat(90,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+
+  axioms.emplace_back(equal_exprt(length(), str.length()));
+
+  symbol_exprt idx = fresh_symbol("QA_lower_case",refined_string_typet::index_type());
+  // forall idx < str.length, this[idx] = 'A'<=str[idx]<='Z' ? str[idx]+'a'-'A' : str[idx]
+  exprt is_upper_case = and_exprt(binary_relation_exprt(char_A,ID_le,str[idx]),
+				  binary_relation_exprt(str[idx],ID_le,char_Z));
+  equal_exprt convert((*this)[idx],plus_exprt(str[idx],minus_exprt(char_a,char_A)));
+  equal_exprt eq((*this)[idx], str[idx]);
+  string_constraintt a(and_exprt(implies_exprt(is_upper_case,convert),implies_exprt(not_exprt(is_upper_case),eq)));
+  axioms.push_back(a.forall(idx,index_zero,length()));
+}
+
+
+void string_exprt::of_string_to_upper_case
+(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = expr.arguments();  
+  assert(args.size() >= 2);
+
+  string_exprt str = of_expr(args[0],symbol_to_string,axioms);
+  exprt char_a = constant_of_nat(97,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_A = constant_of_nat(65,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_z = constant_of_nat(122,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_Z = constant_of_nat(90,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+
+  axioms.emplace_back(equal_exprt(length(), str.length()));
+
+  symbol_exprt idx = fresh_symbol("QA_upper_case",refined_string_typet::index_type());
+  // forall idx < str.length, this[idx] = 'a'<=str[idx]<='z' ? str[idx]+'A'-'a' : str[idx]
+  exprt is_lower_case = and_exprt(binary_relation_exprt(char_a,ID_le,str[idx]),
+				  binary_relation_exprt(str[idx],ID_le,char_z));
+  equal_exprt convert((*this)[idx],plus_exprt(str[idx],minus_exprt(char_A,char_a)));
+  equal_exprt eq((*this)[idx], str[idx]);
+  string_constraintt a(and_exprt(implies_exprt(is_lower_case,convert),implies_exprt(not_exprt(is_lower_case),eq)));
+  axioms.push_back(a.forall(idx,index_zero,length()));
+}
+
 
 void string_exprt::of_int
 (const function_application_exprt &expr,axiom_vect & axioms)
@@ -271,6 +366,64 @@ void string_exprt::of_long
 {
   assert(expr.arguments().size() == 1);
   of_int(expr.arguments()[0],axioms,refined_string_typet::is_c_string_type(expr.type()),30);
+}
+
+
+void string_exprt::of_float
+(const function_application_exprt &expr,axiom_vect & axioms)
+{
+  // Warning this is only a partial specification
+  assert(expr.arguments().size() == 1);
+  axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(11)));
+
+  exprt char_0 = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_9 = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_dot = constant_of_nat(46,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+
+
+  symbol_exprt idx = fresh_symbol("QA_float",refined_string_typet::index_type());
+  exprt c = (*this)[idx];
+  exprt is_digit = 
+    or_exprt(and_exprt(binary_relation_exprt(char_0,ID_le,c),
+		       binary_relation_exprt(c,ID_le,char_9)),
+	     equal_exprt(c,char_dot)
+	     );
+  string_constraintt a(is_digit);
+  axioms.push_back(a.forall(idx,index_zero,length()));
+
+}
+
+void string_exprt::of_double
+(const function_application_exprt &expr,axiom_vect & axioms)
+{
+  // Warning this is only a partial specification
+  assert(expr.arguments().size() == 1);
+  axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(20)));
+
+  exprt char_0 = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_9 = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_dot = constant_of_nat(46,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+
+  symbol_exprt idx = fresh_symbol("QA_double",refined_string_typet::index_type());
+  exprt c = (*this)[idx];
+
+  exprt is_digit = 
+    or_exprt(and_exprt(binary_relation_exprt(char_0,ID_le,c),
+		       binary_relation_exprt(c,ID_le,char_9)),
+	     equal_exprt(c,char_dot)
+	     );
+  string_constraintt a(is_digit);
+  axioms.push_back(a.forall(idx,index_zero,length()));
+
+}
+
+void string_exprt::of_bool
+(const function_application_exprt &expr,axiom_vect & axioms)
+{
+  // Warning this is only a partial specification
+  assert(expr.arguments().size() == 1);
+  axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(5)));
+  axioms.emplace_back(binary_relation_exprt(length(), ID_ge, refined_string_typet::index_of_int(4)));
 }
 
 

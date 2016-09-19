@@ -173,6 +173,8 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strlen");
 	} else if(function_id == irep_idt("java::java.lang.String.equals:(Ljava/lang/Object;)Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_equal");
+	} else if(function_id == irep_idt("java::java.lang.String.equalsIgnoreCase:(Ljava/lang/Object;)Z")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_equals_ignore_case");
 	} else if(function_id == irep_idt("java::java.lang.String.startsWith:(Ljava/lang/String;)Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_startswith");
 	} else if(function_id == irep_idt("java::java.lang.String.endsWith:(Ljava/lang/String;)Z")) {
@@ -184,12 +186,24 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 		  || function_id == irep_idt("java::java.lang.StringBuilder.substring:(II)Ljava/lang/String;")
 		  || function_id == irep_idt("java::java.lang.StringBuilder.substring:(I)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_substring");
+	} else if(function_id == irep_idt("java::java.lang.String.trim:()Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_trim");
+	} else if(function_id == irep_idt("java::java.lang.String.toLowerCase:()Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_to_lower_case");
+	} else if(function_id == irep_idt("java::java.lang.String.toUpperCase:()Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_to_upper_case");
 	} else if(function_id == irep_idt("java::java.lang.String.contains:(Ljava/lang/CharSequence;)Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strcontains");
+	} else if(function_id == irep_idt("java::java.lang.String.isEmpty:()Z")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_is_empty");
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")) {
 	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat");
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(I)Ljava/lang/StringBuilder;")) {
-	  throw "unimplemented";
+	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(J)Ljava/lang/StringBuilder;")) {
+	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(Z)Ljava/lang/StringBuilder;")) {
+	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(C)Ljava/lang/StringBuilder;")) {
+	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(D)Ljava/lang/StringBuilder;")) {
+	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(F)Ljava/lang/StringBuilder;")) {
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.toString:()Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_copy");
 	} else if(function_id == irep_idt("java::java.lang.String.<init>:(Ljava/lang/String;)V")) {
