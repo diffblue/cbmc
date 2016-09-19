@@ -20,3 +20,4 @@ void main() {
   // deadlock in the threads; assertion should not be reachable
   assert(0);
 } 
+
