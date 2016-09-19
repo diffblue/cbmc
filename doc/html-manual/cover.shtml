@@ -41,126 +41,159 @@ embedded on Unmanned Aerial Vehicles (UAVs).  It is adjusted mildly for our
 purposes.
 </p>
 
+<p class="justified">
+The aim of function <code> climb_pid_run </code> is to control the vertical climb of a UAV.
+Details on the theory behind this operation are documented in the <a
+href="https://wiki.paparazziuav.org/wiki/Theory_of_Operation">wiki</a> for the Paparazzi UAV project.
+The behaviour of this simple controller, supposing that the desired speed is 0.5 meter per second, 
+is plotted as in the Figure below.
+</p>
+
+<center>
+  <!--<embed src="pid.pdf" width="400px" height="250px" /> -->
+<img src="pid.png" width="400px" height="250px" alt="The pid controller">
+
+</center>
+
 <pre><code class="c numbered">01:  // CONSTANTS:
-02:  #define MAX_CLIMB_SUM_ERR 150
-03:  #define MAX_CLIMB 1
+02: #define MAX_CLIMB_SUM_ERR 100
+03: #define MAX_CLIMB 1
 04:
-05:  #define CLOCK 16
-06:  #define MAX_PPRZ (CLOCK*600)
-07:  
-08:  #define CLIMB_LEVEL_GAZ 0.31
-09:  #define CLIMB_GAZ_OF_CLIMB 0.2
-10:  #define CLIMB_PITCH_OF_VZ_PGAIN 0.05
-11:  #define CLIMB_PGAIN -0.03
-12:  #define CLIMB_IGAIN 0.1
-13:  
-14:  const float pitch_of_vz_pgain=CLIMB_PITCH_OF_VZ_PGAIN;
-15:  const float climb_pgain=CLIMB_PGAIN;
-16:  const float climb_igain=CLIMB_IGAIN;
-17:  const float nav_pitch=0;
-18:  
-19:  // OUTPUTS:
-20:  float desired_gaz;
-21:  float desired_pitch;
-22:  float climb_sum_err;
-23:  
-24:  /** Computes desired_gaz and desired_pitch */
-25:  void climb_pid_run (float desired_climb,  float estimator_z_dot, float old_climb_sum_err) {
-26:    /** Range of inputs */ 
-27:    __CPROVER_assume(desired_climb>=-MAX_CLIMB && desired_climb<=MAX_CLIMB);
-28:    __CPROVER_assume(estimator_z_dot>=-MAX_CLIMB && estimator_z_dot<=MAX_CLIMB);
-29:    __CPROVER_assume(old_climb_sum_err>=-MAX_CLIMB_SUM_ERR && old_climb_sum_err<=MAX_CLIMB_SUM_ERR);
-30:  
-31:    float err=estimator_z_dot-desired_climb;
-32:
-33:    float fgaz=climb_pgain*(err+climb_igain*old_climb_sum_err)+CLIMB_LEVEL_GAZ+CLIMB_GAZ_OF_CLIMB*desired_climb;
-34:  
-35:    float pprz=fgaz*MAX_PPRZ;
-36:    desired_gaz=((pprz>=0 && pprz<=MAX_PPRZ) ? pprz : (pprz>MAX_PPRZ ? MAX_PPRZ : 0));
-37:                      
-38:    /** pitch offset for climb */
-39:    float pitch_of_vz=(desired_climb>0) ? desired_climb*pitch_of_vz_pgain : 0;
-40:    desired_pitch=nav_pitch+pitch_of_vz;
-41:  
-42:    climb_sum_err=err+old_climb_sum_err;
-43:    if (climb_sum_err>MAX_CLIMB_SUM_ERR) climb_sum_err=MAX_CLIMB_SUM_ERR;
-44:    if (climb_sum_err<-MAX_CLIMB_SUM_ERR) climb_sum_err=-MAX_CLIMB_SUM_ERR;
-45:  
-46:  }
+05: #define CLOCK 16
+06: #define MAX_PPRZ (CLOCK*600)
+07: 
+08: #define CLIMB_LEVEL_GAZ 0.31
+09: #define CLIMB_GAZ_OF_CLIMB 0.75
+10: #define CLIMB_PITCH_OF_VZ_PGAIN 0.05
+11: #define CLIMB_PGAIN -0.03
+12: #define CLIMB_IGAIN 0.1
+13:
+14: const float pitch_of_vz_pgain=CLIMB_PITCH_OF_VZ_PGAIN;
+15: const float climb_pgain=CLIMB_PGAIN;
+16: const float climb_igain=CLIMB_IGAIN;
+17: const float nav_pitch=0;
+18: 
+19: // 1) the target speed in vertical direction
+20: float desired_climb;
+21: // 2) vertical speed of the UAV, estimated by a control function
+22: float estimator_z_dot;
+23: 
+24: /** PID funciton OUTPUTS */
+25: float desired_gaz;
+26: float desired_pitch;
+27: // Accumulated error in the system
+28: float climb_sum_err;
+29: 
+30: /** Computes desired_gaz and desired_pitch */
+31: void climb_pid_run() 
+32: {
+33:  
+34:   float err=estimator_z_dot-desired_climb;
+35:  
+36:   float fgaz=climb_pgain*(err+climb_igain*climb_sum_err)+CLIMB_LEVEL_GAZ+CLIMB_GAZ_OF_CLIMB*desired_climb;
+37:  
+38:   float pprz=fgaz*MAX_PPRZ;
+39:   desired_gaz=((pprz>=0 && pprz<=MAX_PPRZ) ? pprz : (pprz>MAX_PPRZ ? MAX_PPRZ : 0));
+40:           
+41:   /** pitch offset for climb */
+42:   float pitch_of_vz=(desired_climb>0) ? desired_climb*pitch_of_vz_pgain : 0;
+43:   desired_pitch=nav_pitch+pitch_of_vz;
+44:   
+45:   climb_sum_err=err+climb_sum_err;
+46:   if (climb_sum_err>MAX_CLIMB_SUM_ERR) climb_sum_err=MAX_CLIMB_SUM_ERR;
+47:   if (climb_sum_err<-MAX_CLIMB_SUM_ERR) climb_sum_err=-MAX_CLIMB_SUM_ERR;
+48:  
+49:   /** Estimates the vertical speed */
+50:   estimator_z_dot=climb_pgain * err + desired_climb;
+51: }
+52:
+53: int main()
+54: {
+55:   /** Random initialisation */ 
+56:   desired_climb=nondet_float();
+57:   estimator_z_dot=nondet_float();
+58:  
+59:   /** Range of initial values of variables */ 
+60:   __CPROVER_assume(desired_climb>=-MAX_CLIMB && desired_climb<=MAX_CLIMB);
+61:   __CPROVER_assume(estimator_z_dot>=-MAX_CLIMB && estimator_z_dot<=MAX_CLIMB);
+62:  
+63:   while(1)
+64:   {
+65:     climb_pid_run(); 
+66:   } 
+67:  
+68:   return 0;
+69: }
 </code></pre>
 
 <p class="justified">
-The function <code>climb_pid_run</code> is part of the PID control
-procedure.  Its input arguments <code>desired_climb</code> and
-<code>estimator_z_dot</code> represent respectively the desired and
-estimated speed in meters per second in the vertical direction;
-<code>old_climb_sum_err</code> is the current accumulated error between
-<code>desired_climb</code> and <code>estimator_z_dot</code>.  Given inputs,
-the function then computes the <code>desired_gaz</code> and
-<code>desired_pitch</code> parameters, and updates the accumulated
-<code>climb_sum_err</code>.
-</p>
+Codes in the above program are largely self-explanatory with the comments.
+In order to test the PID controller, we construct a loop context
+to repeatedly call function <code>climb_pid_run</code>, at line 65. 
+In the beginning of the main function, values of the desired speed <code>desired_climb</code>
+and the estimated speed <code>estimated_z_dot</code> are non-deterministically initialised.
+Then, the <code>__CPROVER_assume</code> macro at line 60 and line 61 guarantees that
+their values are bounded within a valid range.
 
 <p class="justified">
-There are four conditional statements in the function: line 36, line 39, and
-line 43 and line 44.  Suppose we aim to obtain code coverage 
-that satisfies the MC/DC criterion.  This can be done
-using CBMC by calling
-</p>
+To demonstrate the automatic test suites generation in CBMC,
+we call the following command
+<pre>
+<code>cbmc pid.c --cover mcdc --unwind 25 --trace --xml-ui
+</code></pre>
+The option <code>--cover mcdc</code> specifies the code coverage criterion.
+There are four conditional statements in the PID function: line 39, line 42, and
+line 46 and line 47. 
+When it comes to MC/DC, besides assessing each conditional statement to be <em>true</em>/<em>false</em>,
+more fine-grained coverage goals are needed.
+
+For instance, given the condition <code>"pprz>=0 && pprz<=MAX_PPRZ"</code> at line 39, CBMC
+instruments three coverage goals to control the respective evaluated results of <code>"pprz>=0"</code> and 
+<code>"pprz<=MAX_PPRZ"</code>. 
+We list them in below and they satisfy the MC/DC rules.
+(Note that <code>MAX_PPRZ</code> is defined as 16 * 600 at line 06 of the program.)
 
 <pre>
-<code>cbmc pid.c --cover mcdc --function climb_pid_run
+<code>!(pprz >= (float)0) && pprz <= (float)(16 * 600)  id="climb_pid_run.coverage.1"
+pprz >= (float)0 && !(pprz <= (float)(16 * 600))  id="climb_pid_run.coverage.2"
+pprz >= (float)0 && pprz <= (float)(16 * 600)     id="climb_pid_run.coverage.3"
 </code></pre>
 
-<p class="justified">
-The <code>--cover mcdc</code> option chooses the coverage criterion, and <code>--function climb_pid_run</code>
-specifies the function to be analyzed.
+The "id" of each coverage goal is automatically assigned by CBMC.
+For every coverage goal, a trace (if there exists) of the program execution that satisfies such a goal is printed out in the format 
+of XML, due to the choice of <code>--trace --xml-ui</code>.
+Note that multiple coverage goals can share the same trace, when the corresponding execution of the program
+satisfy all these goals at the same time. Each trace maps to a test suite.
+By parsing through a trace, the test suite can then be easily built.
 </p>
 
 <p class="justified">
-The printed outputs will display the configurations of conditions that have
-been covered by CBMC.  For each conditional statement, the
-configuration for its decision to be <em>true</em>/<em>false</em> will be
-covered. To fullfil the requirement of MC/DC, further tests are required.
-For example, at line 36, there is
-</p>
-
-<pre>
-<code> pprz>=0 && pprz<=MAX_PPRZ
-</code></pre>
-
-<p class="justified">
-To satisfy MC/DC on such a decision, three requirements for its conditions (boolean
-expressions) are finally generated and reported by CBMC:
-</p>
-
-<pre>
-<code>C1: !(pprz >= (float)0) && pprz <= (float)(16 * 600)
-C2: pprz >= (float)0 && !(pprz <= (float)(16 * 600))
-C3: pprz >= (float)0 && pprz <= (float)(16 * 600)
-</code></pre>
-
-<p class="justified">
-CBMC generates the following test suite:
-</p>
+Regarding the above example, following test suites are generated.
 <pre><code>Test suite:
-T1: desired_climb=6.250003e-2f, estimator_z_dot=1.000000f, old_climb_sum_err=8.988036e+0f
-T2: desired_climb=0.000000f, estimator_z_dot=6.134232e-38f, old_climb_sum_err=-6.232042e-37f
-T3: desired_climb=6.750841e-20f, estimator_z_dot=-6.011939e-1f, old_climb_sum_err=1.156406e+2f
-T4: desired_climb=-9.999999e-1f, estimator_z_dot=1.000000f, old_climb_sum_err=150.000000f
-T5: desired_climb=9.999999e-1f, estimator_z_dot=-1.000000f, old_climb_sum_err=-150.000000f
+T1: desired_climb=-1.000000f, estimator_z_dot=1.000000f
+    (goal id: climb_pid_run.coverage.1)
+T2: desired_climb=1.000000f, estimator_z_dot=-1.000000f
+    (goal id: climb_pid_run.coverage.2)
+T3: desired_climb=0.000000f, estimator_z_dot=0.000000f
+    (goal id: climb_pid_run.coverage.3)
 </code></pre>
+</p>
+
 
 <p class="justified">
-The tests T1 and T3 are both tests that cause C3 evaluate to <em>true</em>, T3 and
-T4 cover C1, and T5 is for C2.  Similar observations can be made for the conditional
-statements at line 39, 43 and 44.
+The option <code>--unwind 25</code> unwinds the loop inside the main function body 25 times.
+The number of the unwinding operation is adjustable, and
+an introduction for the use of loop unwinding can be found in
+<a href="cbmc-loops.shtml">Understanding Loop Unwinding</a>. 
 </p>
 
 <p class="justified">
+In this small tutorial, we present the automatic test suite generation functionality of CBMC, by applying
+the MC/DC code coverage criterion upon a PID controller case study.
 In addition to <code>--cover mcdc</code>, other coverage criteria
 like <code>branch</code>, <code>decision</code>, <code>path</code>
 etc. are also available when calling CBMC.
 </p>
+
 
 <!--#include virtual="footer.inc" -->
