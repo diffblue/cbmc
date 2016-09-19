@@ -129,14 +129,14 @@ is plotted as in the Figure below.
 <p class="justified">
 Codes in the above program are largely self-explanatory with the comments.
 In order to test the PID controller, we construct a loop context
-to repeatedly call function <code>climb_pid_run</code>, at line 65. 
+to repeatedly trigger the function <code>climb_pid_run</code>, at line 65. 
 In the beginning of the main function, values of the desired speed <code>desired_climb</code>
 and the estimated speed <code>estimated_z_dot</code> are non-deterministically initialised.
 Then, the <code>__CPROVER_assume</code> macro at line 60 and line 61 guarantees that
 their values are bounded within a valid range.
 
 <p class="justified">
-To demonstrate the automatic test suites generation in CBMC,
+To demonstrate the automatic test suite generation in CBMC,
 we call the following command
 <pre>
 <code>cbmc pid.c --cover mcdc --unwind 25 --trace --xml-ui
@@ -162,7 +162,7 @@ pprz >= (float)0 && pprz <= (float)(16 * 600)     id="climb_pid_run.coverage.3"
 The "id" of each coverage goal is automatically assigned by CBMC.
 For every coverage goal, a trace (if there exists) of the program execution that satisfies such a goal is printed out in the format 
 of XML, due to the choice of <code>--trace --xml-ui</code>.
-Note that multiple coverage goals can share the same trace, when the corresponding execution of the program
+Multiple coverage goals can share a trace, when the corresponding execution of the program
 satisfy all these goals at the same time. Each trace maps to a test suite.
 By parsing through a trace, the test suite can then be easily built.
 </p>
