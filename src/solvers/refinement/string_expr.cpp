@@ -293,20 +293,24 @@ void string_exprt::of_string_trim
 
   // m + |s1| <= |str|
   axioms.emplace_back(str >= plus_exprt(idx, length()));
+  axioms.emplace_back(binary_relation_exprt(idx, ID_ge, index_zero));
+  axioms.emplace_back(str >= idx);
+  axioms.emplace_back(str >= length());
+  ///axioms.emplace_back(binary_relation_exprt(length(), ID_gt, index_zero));
 
   symbol_exprt n = fresh_symbol("QA_index_trim",refined_string_typet::index_type());
   // forall n < m, str[n] = ' '
-  string_constraintt a(equal_exprt((*this)[n], space_char));
-  axioms.push_back(a.forall(idx,index_zero,idx));
+  string_constraintt a(equal_exprt(str[n], space_char));
+  axioms.push_back(a.forall(n,index_zero,idx));
 
   symbol_exprt n2 = fresh_symbol("QA_index_trim2",refined_string_typet::index_type());
   // forall n < |str|-m-|s1|, str[m+|s1|+n] = ' '
-  string_constraintt a1(equal_exprt((*this)[plus_exprt(idx,plus_exprt(length(),n2))], space_char));
+  string_constraintt a1(equal_exprt(str[plus_exprt(idx,plus_exprt(length(),n2))], space_char));
   axioms.push_back(a1.forall(n2,index_zero,minus_exprt(str.length(),plus_exprt(idx,length()))));
 
   symbol_exprt n3 = fresh_symbol("QA_index_trim3",refined_string_typet::index_type());
   // forall n < |s1|, s[idx+n] = s1[n]
-  string_constraintt a2(equal_exprt((*this)[idx], str[plus_exprt(n3, idx)]));
+  string_constraintt a2(equal_exprt((*this)[n3], str[plus_exprt(n3, idx)]));
   axioms.push_back(a2.forall(n3,index_zero,length()));
   // s[m] != ' ' && s[m+|s1|-1] != ' '
   axioms.emplace_back(not_exprt(equal_exprt(str[idx],space_char)));
