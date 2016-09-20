@@ -8,13 +8,10 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 
 #include "static_simplifier.h"
 
-//#define DEBUG
-
-#ifdef DEBUG
 #include <iostream>
-#endif
 
 #include <goto-programs/write_goto_binary.h>
+#include <goto-instrument/dump_c.h>
 
 /*******************************************************************\
 
@@ -120,3 +117,22 @@ bool static_simplifiert::write_goto_program(const std::string &filename)
     return 0;
 }
 
+/*******************************************************************\
+
+Function: static_simplifiert::write_c_program
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void static_simplifiert::write_c_program(const bool h)
+{
+  status() << "Writing C program" << eom;
+
+  //write the simplified C program
+  dump_c(goto_functions, h, ns, std::cout);
+}

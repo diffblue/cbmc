@@ -355,17 +355,16 @@ int goto_analyzer_parse_optionst::doit()
       optionst options;
       options.set_option("json", cmdline.get_value("json"));
       options.set_option("xml", cmdline.get_value("xml"));
-      bool result=0;
   	  const bool cp=cmdline.isset("constant-propagation");
   	  const bool ia=cmdline.isset("intervals");
 
       if(cmdline.isset("verify"))
       {
         static_verifiert verifier(goto_model, options, get_message_handler(), cp, ia);
-        result=verifier();
+        verifier();
         return 0;
       }
-      else if (cmdline.isset("simplify"))
+      else if(cmdline.isset("simplify"))
       {
         static_simplifiert simplifier(goto_model, options, get_message_handler(), cp, ia);
         simplifier.simplify_guards();
@@ -476,12 +475,20 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     const bool ia=cmdline.isset("intervals");
 
     //dump it?
-    if (cmdline.isset("dump-goto"))
+    if (cmdline.isset("dump-goto") || cmdline.isset("dump-c"))
     {
       static_simplifiert simplifier(goto_model, options, get_message_handler(), cp, ia);
    	  simplifier.simplify_guards();
-      std::string goto_file=cmdline.get_value("dump-goto");
-      simplifier.write_goto_program(goto_file);
+      if (cmdline.isset("dump-goto"))
+      {
+    	std::string goto_file=cmdline.get_value("dump-goto");
+        simplifier.write_goto_program(goto_file);
+      }
+      else
+      {
+    	const bool h=cmdline.isset("use-system-headers");
+    	simplifier.write_c_program(h);
+      }
       return true;
     }
     // show it?
@@ -619,6 +626,7 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Program representations:\n"
     " --dump-goto                  generate simplified goto binary\n"
+    " --dump-c                     generate simplified C program\n"
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"
