@@ -98,8 +98,10 @@ void make_string_function_call(symbol_tablet & symbol_table, goto_functionst & g
   goto_functions.function_map[irep_idt(function_name)];
 }
 
-void make_string_function_side_effect(symbol_tablet & symbol_table, goto_functionst & goto_functions, goto_programt & goto_program,
-			  goto_programt::instructionst::iterator & i_it, irep_idt function_name){
+void make_string_function_side_effect
+(symbol_tablet & symbol_table, goto_functionst & goto_functions, 
+ goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
+ irep_idt function_name, std::map<exprt, exprt> & string_builders){
   // replace "s.append(x)" by "s=__CPROVER_uninterpreted_strcat(s,x)"
   code_function_callt &function_call=to_code_function_call(i_it->code);
   code_typet old_type=to_code_type(function_call.function().type());
@@ -119,16 +121,20 @@ void make_string_function_side_effect(symbol_tablet & symbol_table, goto_functio
     rhs.arguments().push_back(replace_string_literals(symbol_table,goto_functions,function_call.arguments()[i]));
   //code_assignt assignment(dereference_exprt(function_call.arguments()[0]), rhs);
   code_assignt assignment(function_call.arguments()[0], rhs);
-  code_assignt assignment2(function_call.lhs(), function_call.arguments()[0]);
+  //code_assignt assignment2(function_call.lhs(), function_call.arguments()[0]);
+  // add a mapping from the left hand side to the first argument
+  string_builders[function_call.lhs()]=function_call.arguments()[0]; 
   assignment.add_source_location()=function_call.source_location();
   i_it->make_assignment();
   i_it->code=assignment;
   // make sure it is in the function map
   goto_functions.function_map[irep_idt(function_name)];
 
-  i_it = goto_program.insert_after(i_it);
-  i_it->make_assignment();
-  i_it->code=assignment2;
+  //i_it = goto_program.insert_after(i_it);
+  //i_it->make_assignment();
+  //i_it->code=assignment2;
+  // add a mapping from the left hand side to the first argument
+  //string_builders[function_call.lhs()]=function_call.arguments()[0]; 
 }
 
 
@@ -149,10 +155,17 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
   goto_functionst::function_mapt::iterator f_it)
 {
   goto_programt &goto_program=f_it->second.body;
+  // map several names of a string builder to a unique one
+  std::map<exprt, exprt> string_builders;
   
   Forall_goto_program_instructions(i_it, goto_program) {  
     if(i_it->is_function_call()) {
+
       code_function_callt &function_call=to_code_function_call(i_it->code);
+      for(int i = 0; i < function_call.arguments().size(); i++)
+	if(string_builders.find(function_call.arguments()[i]) != string_builders.end())
+	  function_call.arguments()[i]= string_builders[function_call.arguments()[i]];
+
       if(function_call.function().id()==ID_symbol){
 	const irep_idt function_id=
 	  to_symbol_expr(function_call.function()).get_identifier();
@@ -189,7 +202,7 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	} else if(function_id == irep_idt("java::java.lang.String.trim:()Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_trim");
 	} else if(function_id == irep_idt("java::java.lang.String.toLowerCase:()Ljava/lang/String;")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_to_lower_case");
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_to_lower_case");
 	} else if(function_id == irep_idt("java::java.lang.String.toUpperCase:()Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_to_upper_case");
 	} else if(function_id == irep_idt("java::java.lang.String.contains:(Ljava/lang/CharSequence;)Z")) {
@@ -197,7 +210,7 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	} else if(function_id == irep_idt("java::java.lang.String.isEmpty:()Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_is_empty");
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat");
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat",string_builders);
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(I)Ljava/lang/StringBuilder;")) {
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(J)Ljava/lang/StringBuilder;")) {
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(Z)Ljava/lang/StringBuilder;")) {

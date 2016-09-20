@@ -138,9 +138,13 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_long(expr,axioms);
     } else if (is_string_of_bool_func(id)) {
       return of_bool(expr,axioms);
-    } 
+    } else {
+      std::string msg("string_exprt::of_function_application: unknown symbol :");
+      msg+=id.c_str();
+      throw msg;
+    }
   }
-  throw "non string function";
+  throw "string_exprt::of_function_application: not a string function";
 }
 
 irep_idt string_exprt::extract_java_string(const symbol_exprt & s){
@@ -280,7 +284,12 @@ void string_exprt::of_string_trim
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
   symbol_exprt idx = fresh_symbol("index_trim", refined_string_typet::index_type());
 
-  exprt space_char = constant_of_nat(32,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  bool is_c_string = refined_string_typet::is_c_string_type(expr.type());
+  exprt space_char;
+  if(is_c_string)
+    space_char = constant_of_nat(32,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  else 
+    space_char = constant_of_nat(32,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
 
   // m + |s1| <= |str|
   axioms.emplace_back(str >= plus_exprt(idx, length()));
@@ -308,13 +317,25 @@ void string_exprt::of_string_to_lower_case
 (const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = expr.arguments();  
-  assert(args.size() >= 2);
+  assert(args.size() == 1);
 
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
-  exprt char_a = constant_of_nat(97,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_A = constant_of_nat(65,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_z = constant_of_nat(122,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_Z = constant_of_nat(90,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  bool is_c_string = refined_string_typet::is_c_string_type(expr.type());
+  exprt char_a;
+  exprt char_A;
+  exprt char_z;
+  exprt char_Z;
+  if(is_c_string) {
+    char_a = constant_of_nat(97,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_A = constant_of_nat(65,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_z = constant_of_nat(122,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_Z = constant_of_nat(90,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  } else { 
+    char_a = constant_of_nat(97,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_A = constant_of_nat(65,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_z = constant_of_nat(122,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_Z = constant_of_nat(90,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+  }
 
   axioms.emplace_back(equal_exprt(length(), str.length()));
 
@@ -333,13 +354,26 @@ void string_exprt::of_string_to_upper_case
 (const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = expr.arguments();  
-  assert(args.size() >= 2);
+  assert(args.size() == 1);
 
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
-  exprt char_a = constant_of_nat(97,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_A = constant_of_nat(65,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_z = constant_of_nat(122,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_Z = constant_of_nat(90,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  bool is_c_string = refined_string_typet::is_c_string_type(expr.type());
+  exprt char_a;
+  exprt char_A;
+  exprt char_z;
+  exprt char_Z;
+
+  if(is_c_string) {
+    char_a = constant_of_nat(97,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_A = constant_of_nat(65,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_z = constant_of_nat(122,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_Z = constant_of_nat(90,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  } else { 
+    char_a = constant_of_nat(97,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_A = constant_of_nat(65,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_z = constant_of_nat(122,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_Z = constant_of_nat(90,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+  }
 
   axioms.emplace_back(equal_exprt(length(), str.length()));
 
@@ -376,10 +410,19 @@ void string_exprt::of_float
   assert(expr.arguments().size() == 1);
   axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(11)));
 
-  exprt char_0 = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_9 = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_dot = constant_of_nat(46,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-
+  bool is_c_string = refined_string_typet::is_c_string_type(expr.type());
+  exprt char_0;
+  exprt char_9;
+  exprt char_dot;
+  if(is_c_string) {
+    char_0 = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_9 = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_dot = constant_of_nat(46,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  } else { 
+    char_0 = constant_of_nat(48,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_9 = constant_of_nat(57,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_dot = constant_of_nat(46,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+  }
 
   symbol_exprt idx = fresh_symbol("QA_float",refined_string_typet::index_type());
   exprt c = (*this)[idx];
@@ -400,9 +443,20 @@ void string_exprt::of_double
   assert(expr.arguments().size() == 1);
   axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(20)));
 
-  exprt char_0 = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_9 = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  exprt char_dot = constant_of_nat(46,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  exprt char_0;
+  exprt char_9;
+  exprt char_dot;
+  bool is_c_string = refined_string_typet::is_c_string_type(expr.type());
+
+  if(is_c_string) {
+    char_0 = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_9 = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    char_dot = constant_of_nat(46,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  } else { 
+    char_0 = constant_of_nat(48,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_9 = constant_of_nat(57,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_dot = constant_of_nat(46,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+  }
 
   symbol_exprt idx = fresh_symbol("QA_double",refined_string_typet::index_type());
   exprt c = (*this)[idx];
