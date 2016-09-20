@@ -487,7 +487,8 @@ bool goto_analyzer_parse_optionst::process_goto_program(
       else
       {
     	const bool h=cmdline.isset("use-system-headers");
-    	simplifier.write_c_program(h);
+    	std::string c_file=cmdline.get_value("dump-c");
+    	simplifier.write_c_program(c_file,h);
       }
       return true;
     }

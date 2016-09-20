@@ -9,6 +9,8 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 #include "static_simplifier.h"
 
 #include <iostream>
+#include <fstream>
+#include <string>
 
 #include <goto-programs/write_goto_binary.h>
 #include <goto-instrument/dump_c.h>
@@ -129,9 +131,13 @@ Function: static_simplifiert::write_c_program
 
 \*******************************************************************/
 
-void static_simplifiert::write_c_program(const bool h)
+void static_simplifiert::write_c_program(const std::string &filename, const bool h)
 {
-  status() << "Writing C program" << eom;
+	status() << "Writing simplified C program to `" << filename << "'" << eom;
+
+  //redirect std::cout to filename
+  std::ofstream out(filename);
+  std::cout.rdbuf(out.rdbuf());
 
   //write the simplified C program
   dump_c(goto_functions, h, ns, std::cout);
