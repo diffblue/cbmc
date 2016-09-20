@@ -1,0 +1,9 @@
+CORE
+constant_propagation_19.c
+--constant-propagation --simplify
+^EXIT=0$
+^SIGNAL=0$
+^\SIMPLIFIED:  assert: 3, assume: 0, goto: 395$
+^\UNKNOWN:     assert: 20, assume: 1, goto: 500$
+--
+^warning: ignoring
