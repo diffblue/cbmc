@@ -15,6 +15,64 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 #include <goto-programs/write_goto_binary.h>
 #include <goto-instrument/dump_c.h>
 
+
+/*******************************************************************\
+
+Function: collect_operands
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void collect_operands(const exprt &src, std::vector<exprt> &dest)
+{
+  for(const exprt &op : src.operands())
+  {
+    if(op.id()==src.id())
+      collect_operands(op, dest);
+    else
+      dest.push_back(op);
+  }
+}
+
+bool static_simplifiert::has_global_variable(const exprt &guard)
+{
+  bool result=false;
+  std::vector<exprt> operands;
+  collect_operands(guard, operands);
+
+  if (operands.size()==1)
+  {
+    const exprt op=operands[0];
+    irep_idt identifier;
+
+    if (op.op0().id()==ID_symbol)
+   	  identifier=op.op0().get(ID_identifier);
+    else if (op.op1().id()==ID_symbol)
+   	  identifier=op.op1().get(ID_identifier);
+    else
+      return false;
+
+    const symbolt *symbol;
+    if(ns.lookup(identifier, symbol))
+      throw "failed to find symbol "+id2string(identifier);
+
+    if(symbol->is_static_lifetime)
+     result=true;
+  }
+  else if(operands.size()>=2)
+  {
+    for(unsigned i=0; i<operands.size(); i++)
+      result = has_global_variable(operands[i]);
+  }
+
+  return result;
+}
+
 /*******************************************************************\
 
 Function: static_simplifiert::simplify_guards
@@ -30,6 +88,7 @@ Function: static_simplifiert::simplify_guards
 void static_simplifiert::simplify_guards()
 {
   unsigned simplified[]={0,0,0}, unknown[]={0,0,0};
+  bool is_pthread=false;
 
   if (constant_propagation)
     propagate_constants();
@@ -42,10 +101,7 @@ void static_simplifiert::simplify_guards()
   Forall_goto_functions(f_it, goto_functions)
   {
 	if(f_it->first=="pthread_create")
-	{
-	  error() << "we do not support C/Pthreads yet" << eom;
-	  throw 0;
-	}
+	  is_pthread=true;
 
     if(f_it->first=="__actual_thread_spawn")
       continue;
@@ -56,6 +112,8 @@ void static_simplifiert::simplify_guards()
         || i_it->is_goto())
       {
         tvt r=eval(i_it);
+
+        if (is_pthread && has_global_variable(i_it->guard)) continue;
 
         if(r.is_true())
     	  i_it->guard=true_exprt();
