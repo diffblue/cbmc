@@ -416,32 +416,54 @@ exprt string_refinementt::convert_string_equal(const function_application_exprt 
   return tc_eq;
 }
 
+exprt character_equals_ignore_case(exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z) {
+  exprt is_upper_case_1 = and_exprt(binary_relation_exprt(char_A,ID_le,char1),
+				  binary_relation_exprt(char1,ID_le,char_Z));
+  exprt is_upper_case_2 = and_exprt(binary_relation_exprt(char_A,ID_le,char2),
+				  binary_relation_exprt(char2,ID_le,char_Z));
+  return or_exprt(or_exprt(equal_exprt(char1,char2),
+			   and_exprt(is_upper_case_1, equal_exprt(minus_exprt(plus_exprt(char_a,char1),char_A),char2))),
+		  and_exprt(is_upper_case_2, equal_exprt(minus_exprt(plus_exprt(char_a,char2),char_A),char1)));
+}
+
 exprt string_refinementt::convert_string_equals_ignore_case(const function_application_exprt &f) {
   assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   
-  symbol_exprt eq = fresh_boolean("equal");
+  symbol_exprt eq = fresh_boolean("equal_ignore_case");
   typecast_exprt tc_eq(eq,f.type());
 
-  debug() << "WARNING: implementation of convert_string_equals_ignore_case is incomplete" << eom;
-  assert(false);
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //bad args to string equal?
 
+  bool is_c_string = refined_string_typet::is_c_string_type(f.type());
+  exprt char_a;
+  exprt char_A;
+  exprt char_Z;
+  if(is_c_string) {
+    char_a = constant_of_nat(97,refined_string_typet::char_type());
+    char_A = constant_of_nat(65,refined_string_typet::char_type());
+    char_Z = constant_of_nat(90,refined_string_typet::char_type());
+  } else { 
+    char_a = constant_of_nat(97,refined_string_typet::java_char_type());
+    char_A = constant_of_nat(65,refined_string_typet::java_char_type());
+    char_Z = constant_of_nat(90,refined_string_typet::java_char_type());
+  }
+
   string_exprt s1 = make_string(args[0]);
   string_exprt s2 = make_string(args[1]);
-  symbol_exprt witness = fresh_index("witness_unequal");
-  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_equal", index_type);
+  symbol_exprt witness = fresh_index("witness_unequal_ignore_case");
+  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_equal_ignore_case", index_type);
 
   string_axioms.emplace_back(eq, equal_exprt(s1.length(), s2.length()));
 
   string_axioms.push_back
-    (string_constraintt(eq,equal_exprt(s1[qvar],s2[qvar])
+    (string_constraintt(eq,character_equals_ignore_case(s1[qvar],s2[qvar],char_a,char_A,char_Z)
 			).forall(qvar,zero,s1.length()));
 
   string_axioms.emplace_back
     (not_exprt(eq),
      or_exprt(notequal_exprt(s1.length(), s2.length()),
-	      string_constraintt(notequal_exprt(s1[witness],s2[witness])).exists(witness,zero,s1.length())));
+	      string_constraintt(not_exprt(character_equals_ignore_case(s1[witness],s2[witness],char_a,char_A,char_Z))).exists(witness,zero,s1.length())));
 
   return tc_eq;
 }

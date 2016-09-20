@@ -13,7 +13,7 @@ Date:   September 2016
 #define char_literal_func "__CPROVER_uninterpreted_char_literal"
 #define string_length_func "__CPROVER_uninterpreted_strlen"
 #define string_set_length_func "__CPROVER_uninterpreted_set_length"
-#define string_equal_func "__CPROVER_uninterpreted_string_equal"
+#define string_equal_func "__CPROVER_uninterpreted_string_equal_func"
 #define string_char_at_func "__CPROVER_uninterpreted_char_at"
 #define string_concat_func "__CPROVER_uninterpreted_strcat"
 #define string_concat_int_func "__CPROVER_uninterpreted_strcat_int"
