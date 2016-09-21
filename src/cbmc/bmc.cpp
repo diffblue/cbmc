@@ -35,6 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_pso.h>
 
 #include "counterexample_beautification.h"
+#include "fault_localization.h"
 #include "bmc.h"
 
 /*******************************************************************\
@@ -510,6 +511,13 @@ safety_checkert::resultt bmct::run(
       std::string criterion=options.get_option("cover");
       return cover(goto_functions, criterion)?
         safety_checkert::ERROR:safety_checkert::SAFE;
+    }
+
+    if(options.get_option("localize-faults")!="")
+    {
+      fault_localizationt fault_localization(
+        goto_functions, *this, options);
+      return fault_localization();
     }
 
     // any properties to check at all?

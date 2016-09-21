@@ -1018,7 +1018,7 @@ public:
 
   inline std::size_t get_width() const
   {
-    return get_unsigned_int(ID_width);
+    return get_size_t(ID_width);
   }
 
   inline void set_width(std::size_t width)

@@ -146,7 +146,43 @@ std::wstring widen(const std::string &s)
 
 /*******************************************************************\
 
-Function: 
+Function: utf32_to_utf8
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void utf32_to_utf8(unsigned int c, std::string &result)
+{
+  if(c<=0x7f)           
+    result+=char(c);
+  else if(c<=0x7ff)
+  {
+    result+=char((c >> 6)   | 0xc0);
+    result+=char((c & 0x3f) | 0x80);
+  }
+  else if(c<=0xffff)
+  {
+    result+=char((c >> 12)         | 0xe0);
+    result+=char(((c >> 6) & 0x3f) | 0x80);
+    result+=char((c & 0x3f)        | 0x80);
+  }
+  else
+  {         
+    result+=char((c >> 18)         | 0xf0);
+    result+=char(((c >> 12) & 0x3f)| 0x80);
+    result+=char(((c >> 6) & 0x3f) | 0x80);
+    result+=char((c & 0x3f)        | 0x80);
+  }
+}
+
+/*******************************************************************\
+
+Function: utf32_to_utf8
 
   Inputs:
 
@@ -162,34 +198,32 @@ std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
   
   result.reserve(s.size()); // at least that long
 
-  for(std::basic_string<unsigned int>::const_iterator
-      it=s.begin();
-      it!=s.end();
-      it++)
-  {  
-    unsigned int c=*it;
+  for(const auto it : s)
+    utf32_to_utf8(it, result);
+
+  return result;
+}
+
+/*******************************************************************\
+
+Function: utf16_to_utf8
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string utf16_to_utf8(const std::basic_string<unsigned short int> &s)
+{
+  std::string result;
   
-    if(c<=0x7f)           
-      result+=char(c);
-    else if(c<=0x7ff)
-    {
-      result+=char((c >> 6)   | 0xc0);
-      result+=char((c & 0x3f) | 0x80);
-    }
-    else if(c<=0xffff)
-    {
-      result+=char((c >> 12)         | 0xe0);
-      result+=char(((c >> 6) & 0x3f) | 0x80);
-      result+=char((c & 0x3f)        | 0x80);
-    }
-    else
-    {         
-      result+=char((c >> 18)         | 0xf0);
-      result+=char(((c >> 12) & 0x3f)| 0x80);
-      result+=char(((c >> 6) & 0x3f) | 0x80);
-      result+=char((c & 0x3f)        | 0x80);
-    }
-  }
+  result.reserve(s.size()); // at least that long
+
+  for(const auto it : s)
+    utf32_to_utf8(it, result);
 
   return result;
 }                                                                                                                                                                                                                                                                                        

@@ -45,7 +45,6 @@ goto_programt::targetst collect_pred_ops(jsa_programt &prog)
 }
 
 #define PRED_OPS "__CPROVER_JSA_PRED_OPS"
-#define PRED_RES_OPS "__CPROVER_JSA_PRED_RESULT_OPS"
 #define JSA_PRED_OP_COUNT "__CPROVER_JSA_PRED_OPS_COUNT"
 #define JSA_PRED_RESULT_OP_COUNT "__CPROVER_JSA_PRED_RESULT_OPS_COUNT"
 
@@ -74,7 +73,7 @@ void instrument_pred_ops(jsa_programt &prog, const goto_programt::targetst &ops,
   goto_functionst &gf=prog.gf;
   goto_programt &body=get_entry_body(gf);
   const symbol_exprt pred_ops(st.lookup(PRED_OPS).symbol_expr());
-  const symbol_exprt pred_res_ops(st.lookup(PRED_RES_OPS).symbol_expr());
+  const symbol_exprt pred_res_ops(st.lookup(JSA_PRED_RES_OPS).symbol_expr());
   const typet sz_type(signed_int_type());
   size_t op_index=0;
   size_t res_op_idx=0;

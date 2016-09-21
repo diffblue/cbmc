@@ -13,102 +13,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json.h>
 
 #include <solvers/sat/satcheck.h>
-#include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
 
-#include "bmc.h"
 #include "bv_cbmc.h"
 
-/*******************************************************************\
-
-   Class: bmc_all_propertiest
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-class bmc_all_propertiest:
-  public cover_goalst::observert,
-  public messaget
-{
-public:
-  bmc_all_propertiest(
-    const goto_functionst &_goto_functions,
-    prop_convt &_solver,
-    bmct &_bmc):
-    goto_functions(_goto_functions), solver(_solver), bmc(_bmc)
-  {
-  }
-
-  safety_checkert::resultt operator()();
-
-  virtual void goal_covered(const cover_goalst::goalt &);
-
-  struct goalt
-  {
-    // a property holds if all instances of it are true
-    typedef std::vector<symex_target_equationt::SSA_stepst::iterator> instancest;
-    instancest instances;
-    std::string description;
-    
-    // if failed, we compute a goto_trace for the first failing instance
-    enum statust { UNKNOWN, FAILURE, SUCCESS, ERROR } status;
-    goto_tracet goto_trace;
-    
-    std::string status_string() const
-    {
-      switch(status)
-      {
-      case UNKNOWN: return "UNKNOWN";
-      case FAILURE: return "FAILURE";
-      case SUCCESS: return "SUCCESS";
-      case ERROR: return "ERROR";
-      }
-
-      // make some poor compilers happy
-      assert(false);
-      return "";
-    }
-    
-    explicit goalt(
-      const goto_programt::instructiont &instruction):
-      status(statust::UNKNOWN)
-    {
-      description=id2string(instruction.source_location.get_comment());
-    }
-    
-    goalt():status(statust::UNKNOWN)
-    {
-    }
-    
-    exprt as_expr() const
-    {
-      std::vector<exprt> tmp;
-      for(instancest::const_iterator
-          it=instances.begin();
-          it!=instances.end();
-          it++)
-        tmp.push_back(literal_exprt((*it)->cond_literal));
-      return conjunction(tmp);
-    }
-  };
-
-  typedef std::map<irep_idt, goalt> goal_mapt;
-  goal_mapt goal_map;
-
-protected:
-  const goto_functionst &goto_functions;
-  prop_convt &solver;
-  bmct &bmc;
-};
+#include "all_properties_class.h"
 
 /*******************************************************************\
 
@@ -124,30 +37,23 @@ Function: bmc_all_propertiest::goal_covered
 
 void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
 {
-  for(goal_mapt::iterator
-      g_it=goal_map.begin();
-      g_it!=goal_map.end();
-      g_it++)
+  for(auto &g : goal_map)
   {
-    goalt &g=g_it->second;
-    
     // failed already?
-    if(g.status==goalt::statust::FAILURE) continue;
+    if(g.second.status==goalt::statust::FAILURE) continue;
   
     // check whether failed
-    for(goalt::instancest::const_iterator
-        c_it=g.instances.begin();
-        c_it!=g.instances.end();
-        c_it++)
+    for(auto &c : g.second.instances)
     {
-      literalt cond=(*c_it)->cond_literal;
+      literalt cond=c->cond_literal;
       
       if(solver.l_get(cond).is_false())
       {
-        g.status=goalt::statust::FAILURE;
-        symex_target_equationt::SSA_stepst::iterator next=*c_it;
+        g.second.status=goalt::statust::FAILURE;
+        symex_target_equationt::SSA_stepst::iterator next=c;
         next++; // include the assertion
-        build_goto_trace(bmc.equation, next, solver, bmc.ns, g.goto_trace);
+        build_goto_trace(bmc.equation, next, solver, bmc.ns, 
+                         g.second.goto_trace);
         break;
       }
     }
@@ -212,6 +118,8 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
     }
   }
   
+  do_before_solving();
+
   cover_goalst cover_goals(solver);
 
   cover_goals.set_message_handler(get_message_handler());  
@@ -254,6 +162,35 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   }
   
   // report
+  report(cover_goals);
+
+  if(error)
+    return safety_checkert::ERROR;
+
+  bool safe=(cover_goals.number_covered()==0);
+
+  if(safe)
+    bmc.report_success(); // legacy, might go away
+  else
+    bmc.report_failure(); // legacy, might go away
+  
+  return safe?safety_checkert::SAFE:safety_checkert::UNSAFE;
+}
+
+/*******************************************************************\
+
+Function: bmc_all_propertiest::report()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void bmc_all_propertiest::report(const cover_goalst &cover_goals)
+{
   switch(bmc.ui)
   {
   case ui_message_handlert::PLAIN:
@@ -321,18 +258,6 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
     break;
 
   }
-
-  if(error)
-    return safety_checkert::ERROR;
-
-  bool safe=(cover_goals.number_covered()==0);
-
-  if(safe)
-    bmc.report_success(); // legacy, might go away
-  else
-    bmc.report_failure(); // legacy, might go away
-  
-  return safe?safety_checkert::SAFE:safety_checkert::UNSAFE;
 }
 
 /*******************************************************************\

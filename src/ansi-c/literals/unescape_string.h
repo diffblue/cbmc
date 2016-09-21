@@ -11,12 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-void unescape_string(
-  const std::string &src,
-  std::string &dest);
+std::string unescape_string(const std::string &);
+std::basic_string<unsigned int> unescape_wide_string(const std::string &);
 
-void unescape_wide_string(
-  const std::string &src,
-  std::basic_string<unsigned int> &dest);
+unsigned hex_to_unsigned(const char *, unsigned digits);
+unsigned octal_to_unsigned(const char *, unsigned digits);
 
 #endif

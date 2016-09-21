@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/i2string.h>
 #include <util/prefix.h>
+#include <ansi-c/c_types.h>
+#include <ansi-c/string_constant.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -130,6 +132,128 @@ bool java_static_lifetime_init(
   }
   
   return false;
+}
+
+
+/*******************************************************************\
+
+Function: java_build_arguments
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt::operandst java_build_arguments(
+  const symbolt &function,
+  code_blockt &init_code,
+  symbol_tablet &symbol_table)
+{
+  const code_typet::parameterst &parameters=
+    to_code_type(function.type).parameters();
+
+  exprt::operandst main_arguments;
+  main_arguments.resize(parameters.size());
+
+  for(std::size_t param_number=0;
+      param_number<parameters.size();
+      param_number++)
+  {
+    bool is_this=param_number==0 &&
+                 parameters[param_number].get_this();
+    bool allow_null=config.main!="" && !is_this;
+
+    main_arguments[param_number]=
+      object_factory(parameters[param_number].type(), 
+                     init_code, allow_null, symbol_table);
+
+    const symbolt &p_symbol=
+      symbol_table.lookup(parameters[param_number].get_identifier());
+
+    // record as an input
+    codet input(ID_input);
+    input.operands().resize(2);
+    input.op0()=address_of_exprt(
+      index_exprt(string_constantt(p_symbol.base_name), 
+                  gen_zero(index_type())));
+    input.op1()=main_arguments[param_number];
+    input.add_source_location()=parameters[param_number].source_location();
+
+    init_code.move_to_operands(input);
+  }
+
+  return main_arguments;
+}
+
+/*******************************************************************\
+
+Function: java_record_outputs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_record_outputs(
+  const symbolt &function,
+  const exprt::operandst &main_arguments,
+  code_blockt &init_code, 
+  symbol_tablet &symbol_table)
+{
+  const code_typet::parameterst &parameters=
+    to_code_type(function.type).parameters();
+
+  exprt::operandst result;
+  result.reserve(parameters.size()+1);
+
+  bool has_return_value=
+    to_code_type(function.type).return_type()!=empty_typet();
+
+  if(has_return_value)
+  {
+    //record return value
+    codet output(ID_output);
+    output.operands().resize(2);
+
+    const symbolt &return_symbol=symbol_table.lookup("return'");
+
+    output.op0()=address_of_exprt(
+      index_exprt(string_constantt(return_symbol.base_name), 
+                  gen_zero(index_type())));
+    output.op1()=return_symbol.symbol_expr();
+    output.add_source_location()=
+      function.value.operands().back().source_location();
+
+    init_code.move_to_operands(output);
+  }
+
+  for(std::size_t param_number=0;
+      param_number<parameters.size();
+      param_number++)
+  {
+    const symbolt &p_symbol=
+      symbol_table.lookup(parameters[param_number].get_identifier());
+
+    if(p_symbol.type.id()==ID_pointer)
+    {
+      // record as an output
+      codet output(ID_output);
+      output.operands().resize(2);
+      output.op0()=address_of_exprt(
+        index_exprt(string_constantt(p_symbol.base_name), 
+                    gen_zero(index_type())));
+      output.op1()=main_arguments[param_number];
+      output.add_source_location()=parameters[param_number].source_location();
+
+      init_code.move_to_operands(output);
+    }
+  }
 }
 
 /*******************************************************************\
@@ -287,8 +411,6 @@ bool java_entry_point(
   assert(!symbol.value.is_nil());
   assert(symbol.type.id()==ID_code);
 
-  const code_typet &code_type=to_code_type(symbol.type);
-    
   create_initialize(symbol_table);
 
   if(java_static_lifetime_init(symbol_table, symbol.location, message_handler))
@@ -321,29 +443,26 @@ bool java_entry_point(
   code_function_callt call_main;
   call_main.add_source_location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
-
-  const code_typet::parameterst &parameters=
-    code_type.parameters();
-
-  exprt::operandst main_arguments;
-  main_arguments.resize(parameters.size());
-  
-  for(std::size_t param_number=0;
-      param_number<parameters.size();
-      param_number++)
+  if(to_code_type(symbol.type).return_type()!=empty_typet())
   {
-    bool is_this=param_number==0 &&
-                 parameters[param_number].get_this();
-    bool allow_null=config.main!="" && !is_this;
-    
-    main_arguments[param_number]=
-      object_factory(parameters[param_number].type(), 
-                     init_code, allow_null, symbol_table);
+    auxiliary_symbolt return_symbol;
+    return_symbol.mode=ID_C;
+    return_symbol.is_static_lifetime=false;
+    return_symbol.name="return'";
+    return_symbol.base_name="return";
+    return_symbol.type=to_code_type(symbol.type).return_type();
+
+    symbol_table.add(return_symbol);
+    call_main.lhs()=return_symbol.symbol_expr();
   }
 
+  exprt::operandst main_arguments=
+    java_build_arguments(symbol, init_code, symbol_table);
   call_main.arguments()=main_arguments;
 
   init_code.move_to_operands(call_main);
+
+  java_record_outputs(symbol, main_arguments, init_code, symbol_table);
 
   // add "main"
   symbolt new_symbol;

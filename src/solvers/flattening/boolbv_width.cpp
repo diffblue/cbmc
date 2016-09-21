@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/std_types.h>
-#include <util/bitvector.h>
 
 #include "boolbv_width.h"
 

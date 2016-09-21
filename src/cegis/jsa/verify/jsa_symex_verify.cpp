@@ -23,7 +23,7 @@ void jsa_symex_verifyt::process(const candidatet &cand)
   insert_jsa_constraint(program, false);
   assume_renondet_inputs_valid(program);
 
-  if (!cand.invariant.empty()) insert_jsa_solution(program, cand);
+  insert_jsa_solution(program, cand);
   remove_returns(program.st, program.gf);
   program.gf.update();
 }

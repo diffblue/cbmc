@@ -5,10 +5,15 @@
 #include <cegis/jsa/value/jsa_genetic_synthesis.h>
 #include <cegis/jsa/options/jsa_program_info.h>
 
+size_t to_size(const exprt &expr)
+{
+  const bv_arithmetict bv(expr);
+  return static_cast<size_t>(bv.to_integer().to_long());
+}
+
 size_t get_size(const symbol_tablet &st, const char * const id)
 {
-  const bv_arithmetict bv(to_array_type(st.lookup(id).type).size());
-  return bv.to_integer().to_long();
+  return to_size(to_array_type(st.lookup(id).type).size());
 }
 
 #define PRED_RELAY "__CPROVER_JSA_MAX_PRED_SIZE_RELAY"

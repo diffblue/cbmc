@@ -16,6 +16,8 @@ Author: Peter Schrammel
 
 #include <goto-programs/goto_model.h>
 
+#include "goto_diff_languages.h"
+
 class goto_modelt;
 class optionst;
 
@@ -28,7 +30,7 @@ class optionst;
 
 class goto_diff_parse_optionst:
   public parse_options_baset,
-  public language_uit
+  public goto_diff_languagest
 {
 public:
   virtual int doit();
@@ -41,14 +43,15 @@ public:
     const std::string &extra_options);
 
 protected:
-  virtual void register_languages();
+  ui_message_handlert ui_message_handler;
+  goto_diff_languagest languages2;
 
   virtual void get_command_line_options(optionst &options);
 
-  virtual int get_goto_programs(
+  virtual int get_goto_program(
     const optionst &options,
-    goto_modelt &goto_model1,
-    goto_modelt &goto_model2);
+    goto_diff_languagest &languages,
+    goto_modelt &goto_model);
 
   virtual bool process_goto_program(
     const optionst &options,

@@ -20,6 +20,7 @@ Date: June 2006
 class compilet:public language_uit
 {
 public:
+  ui_message_handlert ui_message_handler;
   namespacet ns;
   goto_functionst compiled_functions;
   bool echo_file_name;

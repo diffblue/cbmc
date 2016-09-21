@@ -73,8 +73,19 @@ const goto_programt &get_body(
  * @return
  */
 bool is_nondet(
-    const goto_programt::targett &target,
-    const goto_programt::targett &end);
+    goto_programt::const_targett target,
+    goto_programt::const_targett end);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param name
+ *
+ * @return
+ */
+bool is_return_value_name(const std::string &name);
 
 /**
  * @brief
@@ -175,6 +186,24 @@ symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
 goto_programt::targett cegis_assign(const symbol_tablet &st,
     goto_functionst &gf, const goto_programt::targett &insert_after_pos,
     const exprt &lhs, const exprt &rhs);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
+ * @param body
+ * @param insert_after_pos
+ * @param lhs
+ * @param rhs
+ * @param loc
+ *
+ * @return
+ */
+goto_programt::targett cegis_assign(const symbol_tablet &st,
+    goto_programt &body, const goto_programt::targett &insert_after_pos,
+    const exprt &lhs, const exprt &rhs, const source_locationt &loc);
 
 /**
  * @brief

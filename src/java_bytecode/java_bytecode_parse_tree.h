@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/std_types.h>
 
+#include "bytecode_info.h"
+
 class java_bytecode_parse_treet
 {
 public:
@@ -93,10 +95,44 @@ public:
       irep_idt name;
       std::string signature;
       std::size_t index;
+      std::size_t start_pc;
+      std::size_t length;
     };
-    
+
     typedef std::vector<local_variablet> local_variable_tablet;
     local_variable_tablet local_variable_table;
+
+    class verification_type_infot
+    {
+    public:
+      enum verification_type_info_type { TOP, INTEGER, FLOAT, LONG, DOUBLE,
+                                         ITEM_NULL, UNINITIALIZED_THIS,
+                                         OBJECT, UNINITIALIZED};
+      verification_type_info_type type;
+      u1 tag;
+      u2 cpool_index;
+      u2 offset;
+    };
+
+    class stack_map_table_entryt
+    {
+    public:
+      enum stack_frame_type { SAME, SAME_LOCALS_ONE_STACK, SAME_LOCALS_ONE_STACK_EXTENDED,
+                              CHOP, SAME_EXTENDED, APPEND, FULL};
+      stack_frame_type type;
+      size_t offset_delta;
+      size_t chops;
+      size_t appends;
+
+      typedef std::vector<verification_type_infot> local_verification_type_infot;
+      typedef std::vector<verification_type_infot> stack_verification_type_infot;
+
+      local_verification_type_infot locals;
+      stack_verification_type_infot stack;
+    };
+
+    typedef std::vector<stack_map_table_entryt> stack_map_tablet;
+    stack_map_tablet stack_map_table;
 
     virtual void output(std::ostream &out) const;
     

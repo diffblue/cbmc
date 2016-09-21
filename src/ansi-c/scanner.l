@@ -19,6 +19,8 @@
 static int isatty(int) { return 0; }
 #endif
 
+#include <util/unicode.h>
+
 #include "c_types.h"
 #include "preprocessor_line.h"
 #include "string_constant.h"
@@ -27,6 +29,7 @@ static int isatty(int) { return 0; }
 #include "literals/convert_integer_literal.h"
 #include "literals/convert_character_literal.h"
 #include "literals/convert_string_literal.h"
+#include "literals/unescape_string.h"
 
 #define PARSER ansi_c_parser
 #define YYSTYPE unsigned
@@ -45,23 +48,48 @@ extern int yyansi_cdebug;
 int make_identifier()
 {
   loc();
-
-  // this hashes the identifier
-  irep_idt base_name=yytext;
-
+  
+  // deal with universal charater names
+  std::string final_base_name;
+  final_base_name.reserve(yyleng);
+  
+  for(const char *p=yytext; *p!=0; p++)
+  {
+    if(p[0]=='\\' && (p[1]=='u' || p[1]=='U'))
+    {
+      p++;
+      unsigned digits=(*p=='u')?4:8;
+      p++;
+      unsigned letter=hex_to_unsigned(p, digits);
+      for(; *p!=0 && digits>0; digits--, p++);
+      p--; // go back for p++ later
+      
+      std::basic_string<unsigned> utf32;
+      utf32+=letter;
+      
+      // turn into utf-8
+      std::string utf8_value=utf32_to_utf8(utf32);
+      final_base_name+=utf8_value;
+    }
+    else
+      final_base_name+=*p;
+  }
+  
   if(PARSER.cpp98)
   {
     stack(yyansi_clval).id(ID_symbol);
-    stack(yyansi_clval).set(ID_C_base_name, base_name);
+    stack(yyansi_clval).set(ID_C_base_name, final_base_name);
     return TOK_IDENTIFIER;
   }
   else
   {
-    std::string identifier(id2string(base_name));
+    // this hashes the base name
+    irep_idt base_name=final_base_name;
 
     // figure out if this is a typedef or something else
+    irep_idt identifier;
     ansi_c_id_classt result=
-      PARSER.lookup(identifier, PARSER.tag_following, false);
+      PARSER.lookup(base_name, identifier, PARSER.tag_following, false);
 
     PARSER.tag_following=false;
 
@@ -150,7 +178,9 @@ digit           [0-9]
 bindigit        [01]
 octdigit        [0-7]
 hexdigit        [0-9a-fA-F]
-identifier      (({letter}|"_"|"$")({letter}|{digit}|"_"|"$")*)
+utf8letter      [\x80-\xff]
+universal_character	("\\u"{hexdigit}{4})|("\\U"{hexdigit}{8})
+identifier      (({letter}|"_"|"$"|{utf8letter}|{universal_character})({letter}|{digit}|"_"|"$"|{utf8letter}|{universal_character})*)
 integer         {digit}+
 binary          {bindigit}+
 msiw_suffix     ([iI]("8"|"16"|"32"|"64"|"128"))
@@ -160,16 +190,14 @@ decinteger      [1-9]({digit}|"'")*{int_suffix}
 octinteger      "0"({octdigit}|"'")*{int_suffix}
 hexinteger      "0"[xX]{hexdigit}({hexdigit}|"'")*{int_suffix}
 integer_s       {decinteger}|{bininteger}|{octinteger}|{hexinteger}
-octchar         "\\"{octdigit}{1,3}
-hexchar         "\\x"{hexdigit}+
 exponent        [eE][+-]?{integer}
 fraction        {integer}
 float1          {integer}"."{fraction}?({exponent})?
 float2          "."{fraction}({exponent})?
 float3          {integer}{exponent}
-hexfloat1       "0"[xX]{hexdigit}+"."{hexdigit}+[pP][+-]?{integer}
-hexfloat2       "0"[xX]{hexdigit}+"."[pP][+-]?{integer}
-hexfloat3       "0"[xX]{hexdigit}+[pP][+-]?{integer}
+hexfloat1       "0"[xX]{hexdigit}*"."{hexdigit}+[pP][+-]?{integer}
+hexfloat2       "0"[xX]{hexdigit}*"."[pP][+-]?{integer}
+hexfloat3       "0"[xX]{hexdigit}*[pP][+-]?{integer}
 float_suffix    [fFlLiIjJ]*
 gcc_ext_float_suffix    [wWqQ]|[dD][fFdDlL]?
 float           {float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}

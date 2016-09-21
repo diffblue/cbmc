@@ -18,7 +18,12 @@ cegis_symex_learnt<preproct, learn_configurationt>::cegis_symex_learnt(
 }
 
 template<class preproct, class learn_configurationt>
-cegis_symex_learnt<preproct, learn_configurationt>::~cegis_symex_learnt()
+cegis_symex_learnt<preproct, learn_configurationt>::cegis_symex_learnt(
+    const optionst &options, preproct &preproc, learn_configurationt &config,
+    const std::function<void(candidatet &)> &default_candidate) :
+    options(options), preproc(preproc), config(config), word_width(
+    CEGIS_DEFAULT_MIN_WORD_WIDTH), current_solution_size(1u), max_solution_size(
+        current_solution_size), default_candidate(default_candidate)
 {
 }
 
@@ -31,8 +36,10 @@ void cegis_symex_learnt<preproct, learn_configurationt>::seed(seedt &seed)
 
 template<class preproct, class learn_configurationt>
 const typename cegis_symex_learnt<preproct, learn_configurationt>::candidatet &cegis_symex_learnt<
-    preproct, learn_configurationt>::next_candidate() const
+    preproct, learn_configurationt>::next_candidate()
 {
+  if (default_candidate)
+    default_candidate(current_candidate);
   return current_candidate;
 }
 

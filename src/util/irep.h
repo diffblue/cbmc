@@ -206,6 +206,7 @@ public:
   bool get_bool(const irep_namet &name) const;
   signed int get_int(const irep_namet &name) const;
   unsigned int get_unsigned_int(const irep_namet &name) const;
+  std::size_t get_size_t(const irep_namet &name) const;
   long long get_long_long(const irep_namet &name) const;
 
   inline void set(const irep_namet &name, const irep_idt &value)

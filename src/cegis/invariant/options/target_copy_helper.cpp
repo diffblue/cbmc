@@ -11,10 +11,6 @@ target_copy_helpert::target_copy_helpert(const goto_programt &old_body,
 {
 }
 
-target_copy_helpert::~target_copy_helpert()
-{
-}
-
 goto_programt::targett target_copy_helpert::operator()(
     const goto_programt::targett &target) const
 {

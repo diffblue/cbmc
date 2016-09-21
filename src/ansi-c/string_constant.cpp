@@ -112,8 +112,6 @@ array_exprt string_constantt::to_array_expr() const
       if(ch=='\'' || ch=='\\') ch_str+='\\';
       ch_str+=(char)ch;
       ch_str+="'";
-
-      op.set(ID_C_cformat, ch_str);
     }
   }
   

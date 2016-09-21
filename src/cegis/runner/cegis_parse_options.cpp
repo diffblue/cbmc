@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cegis/danger/facade/danger_runner.h>
 #include <cegis/safety/facade/safety_runner.h>
 #include <cegis/jsa/facade/jsa_runner.h>
+#include <cegis/control/facade/control_runner.h>
 
 #include <cegis/runner/cegis_parse_options.h>
 
@@ -64,7 +65,9 @@ void cegis_parse_optionst::get_command_line_options(optionst &options)
 {
   cbmc_parse_optionst::get_command_line_options(options);
 
-  if(cmdline.isset("danger") || cmdline.isset("safety") || cmdline.isset("jsa"))
+  const bool configure_cegis=cmdline.isset("danger") || cmdline.isset("safety")
+      || cmdline.isset("jsa") || cmdline.isset(CEGIS_CONTROL);
+  if (configure_cegis)
   {
     set_integer_option(options, cmdline, "cegis-min-size", 1u);
     set_integer_option(options, cmdline, "cegis-max-size", 5u);
@@ -105,31 +108,44 @@ int cegis_parse_optionst::do_bmc(
   optionst options;
   get_command_line_options(options);
 
-  if(cmdline.isset("danger"))
+  if (cmdline.isset("danger"))
     return run_danger(options, result(), symbol_table, goto_functions);
-  if(cmdline.isset("safety"))
+  if (cmdline.isset("safety"))
     return run_safety(options, result(), symbol_table, goto_functions);
-  if(cmdline.isset("jsa"))
+  if (cmdline.isset("jsa"))
     return run_jsa(options, result(), symbol_table, goto_functions);
+  if (cmdline.isset(CEGIS_CONTROL))
+    return run_control(options, result(), symbol_table, goto_functions);
 
   return cbmc_parse_optionst::do_bmc(bmc, goto_functions);
 }
+
+/*******************************************************************\
+
+Function: cegis_parse_optionst::help
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: print help
+
+\*******************************************************************/
 
 void cegis_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* *   CEGIS " CBMC_VERSION " - Copyright (C) 2001-2016 ";
+    "* *   CEGIS " CBMC_VERSION " - Copyright (C) 2015-2016 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 
-  std::cout << "   * *\n";
+  std::cout << "  * *\n";
 
   std::cout <<
-    "* *              Daniel Kroening, Edmund Clarke             * *\n"
-    "* * Carnegie Mellon University, Computer Science Department * *\n"
+    "* *       Matt Lewis, Pascal Kesseli, Daniel Kroening       * *\n"
+    "* *    University of Oxford, Computer Science Department    * *\n"
     "* *                 kroening@kroening.com                   * *\n"
-    "* *        Protected in part by U.S. patent 7,225,417       * *\n"
     "\n"
     "Usage:                                Purpose:\n"
     "\n"

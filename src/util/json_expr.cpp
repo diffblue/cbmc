@@ -130,7 +130,7 @@ json_objectt json(
   else if(type.id()==ID_struct)
   {
     result["name"]=json_stringt("struct");
-    json_arrayt members=result["members"].make_array();
+    json_arrayt &members=result["members"].make_array();
     const union_typet::componentst &components=
       to_union_type(type).components();
     for(const auto & it : components)
@@ -143,7 +143,7 @@ json_objectt json(
   else if(type.id()==ID_union)
   {
     result["name"]=json_stringt("union");
-    json_arrayt members=result["members"].make_array();
+    json_arrayt &members=result["members"].make_array();
     const union_typet::componentst &components=
       to_union_type(type).components();
     for(const auto & it : components)
@@ -274,7 +274,7 @@ json_objectt json(
   else if(expr.id()==ID_array)
   {
     result["name"]=json_stringt("array");
-    json_arrayt elements=result["elements"].make_array();
+    json_arrayt &elements=result["elements"].make_array();
     
     unsigned index=0;
     
@@ -297,7 +297,7 @@ json_objectt json(
       const struct_typet::componentst &components=struct_type.components();
       assert(components.size()==expr.operands().size());
 
-      json_arrayt members=result["members"].make_array();
+      json_arrayt &members=result["members"].make_array();
       for(unsigned m=0; m<expr.operands().size(); m++)
       {
         json_objectt &e=members.push_back().make_object();

@@ -25,13 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bytecode_info.h"
 #include "java_types.h"
 
-#if 0
-#include <numeric>
-#include <set>
-#include <stack>
-
-#include "java_class_identifier.h"
-#endif
+#include <limits>
 
 namespace {
 class patternt
@@ -44,7 +38,7 @@ public:
   // match with '?'  
   friend bool operator==(const irep_idt &what, const patternt &pattern)
   {
-    for(unsigned i=0; i<what.size(); i++)
+    for(std::size_t i=0; i<what.size(); i++)
       if(pattern.p[i]==0)
         return false;
       else if(pattern.p[i]!='?' && pattern.p[i]!=what[i])
@@ -87,21 +81,55 @@ protected:
   {
   public:
     symbol_exprt symbol_expr;
+    size_t start_pc;
+    size_t length;
   };
-  
-  expanding_vector<variablet> variables;
+
+  typedef std::vector<variablet> variablest;
+  expanding_vector<variablest> variables;
   
   bool method_has_this;
 
+  typedef enum instruction_sizet
+  {
+    INST_INDEX = 2, INST_INDEX_CONST = 3
+  } instruction_sizet;
+
+  // return corresponding reference of variable
+  variablet &find_variable_for_slot(unsigned number_int, size_t address,
+                                    variablest &var_list, instruction_sizet inst_size)
+  {
+    for(variablet &var : var_list)
+    {
+      size_t start_pc = var.start_pc;
+      size_t length = var.length;
+      if (address + (size_t) inst_size >= start_pc && address < start_pc + length)
+        return var;
+    }
+    // add unnamed local variable to end of list at this index
+    // with scope from 0 to INT_MAX
+    // as it is at the end of the vector, it will only be taken into account
+    // if no other variable is valid
+    size_t list_length = var_list.size();
+    var_list.resize(list_length + 1);
+    var_list[list_length].start_pc = 0;
+    var_list[list_length].length = std::numeric_limits<size_t>::max();
+    return var_list[list_length];
+  }
+
   // JVM local variables
-  const exprt variable(const exprt &arg, char type_char)
+  const exprt variable(const exprt &arg, char type_char, size_t address, instruction_sizet inst_size)
   {
     irep_idt number=to_constant_expr(arg).get_value();
     
-    unsigned number_int=safe_string2unsigned(id2string(number));
+    std::size_t number_int=safe_string2size_t(id2string(number));
     typet t=java_type_from_char(type_char);
+    variablest &var_list = variables[number_int];
 
-    if(variables[number_int].symbol_expr.get_identifier().empty())
+    // search variable in list for correct frame / address if necessary
+    variablet &var = find_variable_for_slot(number_int, address, var_list, inst_size);
+
+    if(var.symbol_expr.get_identifier().empty())
     {
       // an un-named local variable
       irep_idt base_name="local"+id2string(number)+type_char;
@@ -114,7 +142,7 @@ protected:
     }
     else
     {
-      exprt result=variables[number_int].symbol_expr;
+      exprt result=var.symbol_expr;
       if(t!=result.type()) result=typecast_exprt(result, t);
       return result;
     }
@@ -153,7 +181,7 @@ protected:
   typedef std::vector<exprt> stackt;
   stackt stack;
 
-  exprt::operandst pop(unsigned n)
+  exprt::operandst pop(std::size_t n)
   {
     if(stack.size()<n)
     {
@@ -163,7 +191,7 @@ protected:
 
     exprt::operandst operands;
     operands.resize(n);
-    for(unsigned i=0; i<n; i++)
+    for(std::size_t i=0; i<n; i++)
       operands[i]=stack[stack.size()-n+i];
 
     stack.resize(stack.size()-n);
@@ -174,7 +202,7 @@ protected:
   {
     stack.resize(stack.size()+o.size());
 
-    for(unsigned i=0; i<o.size(); i++)
+    for(std::size_t i=0; i<o.size(); i++)
       stack[stack.size()-o.size()+i]=o[i];
   }
 
@@ -195,7 +223,7 @@ const size_t SLOTS_PER_INTEGER(1u);
 const size_t INTEGER_WIDTH(64u);
 size_t count_slots(const size_t value, const code_typet::parametert &param)
 {
-  const unsigned int width(param.type().get_unsigned_int(ID_width));
+  const std::size_t width(param.type().get_unsigned_int(ID_width));
   return value + SLOTS_PER_INTEGER + width / INTEGER_WIDTH;
 }
 
@@ -254,8 +282,8 @@ void java_bytecode_convert_methodt::convert(
   if(!m.is_static)
   {
     code_typet::parametert this_p;
-    const empty_typet empty;
-    const pointer_typet object_ref_type(empty);
+    const reference_typet object_ref_type(
+      symbol_typet(class_symbol.name));
     this_p.type()=object_ref_type;
     this_p.set_this();
     parameters.insert(parameters.begin(), this_p);
@@ -263,22 +291,32 @@ void java_bytecode_convert_methodt::convert(
 
   variables.clear();
 
-  // Do the parameters and locals in the variable table,
-  // which is only available when compiled with -g
+  // Do the parameters and locals in the variable table, which is available when
+  // compiled with -g or for methods with many local variables in the latter
+  // case, different variables can have the same index, depending on the
+  // context.
+  //
+  // to calculate which variable to use, one uses the address of the instruction
+  // that uses the variable, the size of the instruction and the start_pc /
+  // length values in the local variable table
   for(const auto & v : m.local_variable_table)
   {
     typet t=java_type_from_string(v.signature);
     irep_idt identifier=id2string(method_identifier)+"::"+id2string(v.name);
     symbol_exprt result(identifier, t);
     result.set(ID_C_base_name, v.name);
-    variables[v.index].symbol_expr=result;
+    size_t number_index_entries = variables[v.index].size();
+    variables[v.index].resize(number_index_entries + 1);
+    variables[v.index][number_index_entries].symbol_expr = result;
+    variables[v.index][number_index_entries].start_pc = v.start_pc;
+    variables[v.index][number_index_entries].length = v.length;
   }
 
   // set up variables array
   for(std::size_t i=0, param_index=0;
       i < parameters.size(); ++i)
   {
-    variables[param_index];
+    variables[param_index].resize(1);
     param_index+=get_variable_slots(parameters[i]);
   }
 
@@ -298,8 +336,8 @@ void java_bytecode_convert_methodt::convert(
     else
     {
       // in the variable table?
-      base_name=variables[param_index].symbol_expr.get(ID_C_base_name);
-      identifier=variables[param_index].symbol_expr.get(ID_identifier);
+      base_name=variables[param_index][0].symbol_expr.get(ID_C_base_name);
+      identifier=variables[param_index][0].symbol_expr.get(ID_identifier);
       
       if(base_name.empty())
       {
@@ -322,8 +360,10 @@ void java_bytecode_convert_methodt::convert(
     symbol_table.add(parameter_symbol);
 
     // add as a JVM variable
-    unsigned slots=get_variable_slots(parameters[i]);
-    variables[param_index].symbol_expr=parameter_symbol.symbol_expr();
+    std::size_t slots=get_variable_slots(parameters[i]);
+    variables[param_index][0].symbol_expr=parameter_symbol.symbol_expr();
+    variables[param_index][0].start_pc=0;
+    variables[param_index][0].length = std::numeric_limits<size_t>::max();
     param_index+=slots;
   }
 
@@ -418,7 +458,7 @@ irep_idt get_if_cmp_operator(const irep_idt &stmt)
 
 constant_exprt as_number(const mp_integer value, const typet &type)
 {
-  const unsigned int java_int_width(type.get_unsigned_int(ID_width));
+  const std::size_t java_int_width(type.get_unsigned_int(ID_width));
   const std::string significant_bits(integer2string(value, 2));
   std::string binary_width(java_int_width - significant_bits.length(), '0');
   return constant_exprt(binary_width += significant_bits, type);
@@ -476,7 +516,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     stackt stack;
     bool done;
   };
-  
+
   typedef std::map<unsigned, converted_instructiont> address_mapt;
   address_mapt address_map;
   std::set<unsigned> targets;
@@ -676,7 +716,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // do some type adjustment for the arguments,
       // as Java promotes arguments
 
-      for(unsigned i=0; i<parameters.size(); i++)
+      for(std::size_t i=0; i<parameters.size(); i++)
       {
         const typet &type=parameters[i].type();
         if(type==java_boolean_type() ||
@@ -773,7 +813,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
 
-      exprt var=variable(arg0, statement[0]);
+      exprt var=variable(arg0, statement[0], i_it->address, INST_INDEX);
       
       const bool is_array('a' == statement[0]);
       
@@ -805,7 +845,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg0, statement[0]);
+      results[0]=variable(arg0, statement[0], i_it->address, INST_INDEX);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -967,9 +1007,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0, 'i');
+      code_assign.lhs()=variable(arg0, 'i', i_it->address, INST_INDEX_CONST);
       code_assign.rhs()=plus_exprt(
-                          variable(arg0, 'i'),
+                                   variable(arg0, 'i', i_it->address, INST_INDEX_CONST),
                           typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
@@ -1003,7 +1043,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==2 && results.size()==1);
       const typet type=java_type_from_char(statement[0]);
 
-      const unsigned int width=type.get_unsigned_int(ID_width);
+      const std::size_t width=type.get_size_t(ID_width);
       typet target=unsignedbv_typet(width);
 
       const typecast_exprt lhs(op[0], target);
@@ -1253,7 +1293,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // The first argument is the type, the second argument is the dimension.
       // The size of each dimension is on the stack.
       irep_idt number=to_constant_expr(arg1).get_value();
-      unsigned dimension=safe_c_str2unsigned(number.c_str());
+      std::size_t dimension=safe_string2size_t(id2string(number));
 
       op=pop(dimension);
       assert(results.size()==1);
@@ -1350,11 +1390,32 @@ codet java_bytecode_convert_methodt::convert_instructions(
         binary_predicate_exprt(op[0], "java_instanceof", arg0);
     }
     else if(statement=="monitorenter")
-      warning() << "critical section with lock object is ignored ("
-                << i_it->source_location << ")" << eom;
-    else if(statement=="monitorexit")
-      // just skip, is always preceeded with "monitorenter"
     {
+      // becomes a function call
+      code_typet type;
+      type.return_type()=void_typet();
+      type.parameters().resize(1);
+      type.parameters()[0].type()=reference_typet(void_typet());
+      code_function_callt call;
+      call.function()=symbol_exprt("java::monitorenter", type);
+      call.lhs().make_nil();
+      call.arguments().push_back(op[0]);
+      call.add_source_location()=i_it->source_location;
+      c=call;
+    }
+    else if(statement=="monitorexit")
+    {
+      // becomes a function call
+      code_typet type;
+      type.return_type()=void_typet();
+      type.parameters().resize(1);
+      type.parameters()[0].type()=reference_typet(void_typet());
+      code_function_callt call;
+      call.function()=symbol_exprt("java::monitorexit", type);
+      call.lhs().make_nil();
+      call.arguments().push_back(op[0]);
+      call.add_source_location()=i_it->source_location;
+      c=call;
     }
     else
     {

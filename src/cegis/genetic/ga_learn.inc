@@ -26,6 +26,9 @@ void ga_learnt<selectt, mutatet, crosst, fitnesst, convertt>::seed(
   pop.resize(pop_size);
   for (individualt &ind : pop)
     havoc(ind);
+  typename populationt::iterator ind=pop.begin();
+  std::advance(ind, rand() % pop.size());
+  convert.convert(current_candidate, *ind);
 }
 
 template<class selectt, class mutatet, class crosst, class fitnesst,

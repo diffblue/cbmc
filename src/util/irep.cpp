@@ -380,6 +380,23 @@ unsigned int irept::get_unsigned_int(const irep_namet &name) const
 
 /*******************************************************************\
 
+Function: irept::get_size_t
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::size_t irept::get_size_t(const irep_namet &name) const
+{
+  return unsafe_string2size_t(get_string(name));
+}
+
+/*******************************************************************\
+
 Function: irept::get_long_long
 
   Inputs:
