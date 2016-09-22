@@ -1,24 +1,24 @@
-typedef __CPROVER_floatbv[16][11] control_floatt;
+typedef __CPROVER_floatbv[24][17] control_floatt;
 
 // tag-#anon#ST[ARR100{F64}$F64$'a'|S32'a_size'|U32'$pad0'|ARR100{F64}$F64$'b'|S32'b_size'|U32'$pad1'|F64'sample_time'|ARR100{F64}$F64$'a_uncertainty'|ARR100{F64}$F64$'b_uncertainty']
-// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 130
-struct anonymous$3;
-
-// tag-#anon#ST[ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'A'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'B'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'C'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'D'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'states'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'outputs'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'inputs'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'K'|U32'nStates'|U32'nInputs'|U32'nOutputs'|U32'$pad0']
-// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 142
+// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 136
 struct anonymous$1;
 
+// tag-#anon#ST[ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'A'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'B'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'C'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'D'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'states'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'outputs'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'inputs'|ARR20{ARR20{F64}$F64$}$ARR20{F64}$F64$$'K'|U32'nStates'|U32'nInputs'|U32'nOutputs'|U32'$pad0']
+// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 148
+struct anonymous;
+
 // tag-#anon#ST[S32'int_bits'|S32'frac_bits'|F64'max'|F64'min'|S32'default_realization'|U32'$pad0'|F64'delta'|S32'scale'|U32'$pad1'|F64'max_error']
-// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 157
+// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 163
 struct anonymous$0;
 
 // tag-#anon#ST[S32'push'|S32'in'|S32'sbiw'|S32'cli'|S32'out'|S32'std'|S32'ldd'|S32'subi'|S32'sbci'|S32'lsl'|S32'rol'|S32'add'|S32'adc'|S32'adiw'|S32'rjmp'|S32'mov'|S32'sbc'|S32'ld'|S32'rcall'|S32'cp'|S32'cpc'|S32'ldi'|S32'brge'|S32'pop'|S32'ret'|S32'st'|S32'brlt'|S32'cpi']
-// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 169
-struct anonymous$2;
+// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 175
+struct anonymous$3;
 
 // tag-#anon#ST[S64'clock'|S32'device'|U32'$pad0'|F64'cycle'|SYM#tag-#anon#ST[S32'push'|S32'in'|S32'sbiw'|S32'cli'|S32'out'|S32'std'|S32'ldd'|S32'subi'|S32'sbci'|S32'lsl'|S32'rol'|S32'add'|S32'adc'|S32'adiw'|S32'rjmp'|S32'mov'|S32'sbc'|S32'ld'|S32'rcall'|S32'cp'|S32'cpc'|S32'ldi'|S32'brge'|S32'pop'|S32'ret'|S32'st'|S32'brlt'|S32'cpi']#'assembly']
-// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 201
-struct anonymous;
+// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 207
+struct anonymous$2;
 
 #include <assert.h>
 
@@ -48,10 +48,10 @@ void binomial(signed int degree, control_floatt delta, control_floatt *out);
 // file /home/lucascordeiro/dsverifier/bmc/core/delta-operator.h line 22
 signed int binomial_coefficient(signed int n, signed int p);
 // call_closedloop_verification_task
-// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 296
+// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 303
 void call_closedloop_verification_task(void *closedloop_verification_task);
 // call_verification_task
-// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 245
+// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 252
 void call_verification_task(void *verification_task);
 // check_stability
 // file /home/lucascordeiro/dsverifier/bmc/core/util.h line 59
@@ -60,10 +60,10 @@ signed int check_stability(control_floatt *a, signed int n);
 // file /home/lucascordeiro/dsverifier/bmc/core/closed-loop.h line 70
 signed int check_stability_closedloop(control_floatt *a, signed int n, control_floatt *plant_num, signed int p_num_size, control_floatt *plant_den, signed int p_den_size);
 // determinant
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 499
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 498
 control_floatt determinant(control_floatt (*a)[20l], signed int n);
 // double_add_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 316
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 315
 void double_add_matrix(unsigned int lines, unsigned int columns, control_floatt (*m1)[20l], control_floatt (*m2)[20l], control_floatt (*result)[20l]);
 // double_check_limit_cycle
 // file /home/lucascordeiro/dsverifier/bmc/core/util.h line 218
@@ -90,16 +90,16 @@ control_floatt double_direct_form_2(control_floatt *w, control_floatt x, control
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 230
 control_floatt double_direct_form_2_MSP430(control_floatt *w, control_floatt x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb);
 // double_exp_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 429
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 428
 void double_exp_matrix(unsigned int lines, unsigned int columns, control_floatt (*m1)[20l], unsigned int expNumber, control_floatt (*result)[20l]);
 // double_matrix_multiplication
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 338
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 337
 void double_matrix_multiplication(unsigned int i1, unsigned int j1, unsigned int i2, unsigned int j2, control_floatt (*m1)[20l], control_floatt (*m2)[20l], control_floatt (*m3)[20l]);
 // double_state_space_representation
 // file /home/lucascordeiro/dsverifier/bmc/core/state-space.h line 23
 control_floatt double_state_space_representation(void);
 // double_sub_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 327
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 326
 void double_sub_matrix(unsigned int lines, unsigned int columns, control_floatt (*m1)[20l], control_floatt (*m2)[20l], control_floatt (*result)[20l]);
 // double_transposed_direct_form_2
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 122
@@ -113,15 +113,15 @@ extern void exit(signed int) _Noreturn;
 // fatorial
 // file /home/lucascordeiro/dsverifier/bmc/core/util.h line 54
 signed int fatorial(signed int n);
-// control_floatt_direct_form_1
+// float_direct_form_1
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 144
-control_floatt control_floatt_direct_form_1(control_floatt *y, control_floatt *x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb);
-// control_floatt_direct_form_2
+control_floatt float_direct_form_1(control_floatt *y, control_floatt *x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb);
+// float_direct_form_2
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 163
-control_floatt control_floatt_direct_form_2(control_floatt *w, control_floatt x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb);
-// control_floatt_transposed_direct_form_2
+control_floatt float_direct_form_2(control_floatt *w, control_floatt x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb);
+// float_transposed_direct_form_2
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 183
-control_floatt control_floatt_transposed_direct_form_2(control_floatt *w, control_floatt x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb);
+control_floatt float_transposed_direct_form_2(control_floatt *w, control_floatt x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb);
 // ft_closedloop_feedback
 // file /home/lucascordeiro/dsverifier/bmc/core/closed-loop.h line 57
 void ft_closedloop_feedback(control_floatt *c_num, signed int Nc_num, control_floatt *c_den, signed int Nc_den, control_floatt *model_num, signed int Nmodel_num, control_floatt *model_den, signed int Nmodel_den, control_floatt *ans_num, signed int Nans_num, control_floatt *ans_den, signed int Nans_den);
@@ -138,7 +138,7 @@ signed long int fxp_abs(signed long int a);
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 311
 signed long int fxp_add(signed long int aadd, signed long int badd);
 // fxp_add_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 468
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 467
 void fxp_add_matrix(unsigned int lines, unsigned int columns, signed long int (*m1)[20l], signed long int (*m2)[20l], signed long int (*result)[20l]);
 // fxp_check_limit_cycle
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 163
@@ -150,7 +150,7 @@ void fxp_check_oscillations(signed long int *y, signed int y_size);
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 201
 void fxp_check_persistent_limit_cycle(signed long int *y, signed int y_size);
 // fxp_determinant
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 530
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 529
 control_floatt fxp_determinant(signed long int (*a_fxp)[20l], signed int n);
 // fxp_direct_form_1
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 22
@@ -171,14 +171,14 @@ signed long int fxp_double_to_fxp(control_floatt value);
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 243
 void fxp_double_to_fxp_array(control_floatt *f, signed long int *r, signed int N);
 // fxp_exp_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 391
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 390
 void fxp_exp_matrix(unsigned int lines, unsigned int columns, signed long int (*m1)[20l], unsigned int expNumber, signed long int (*result)[20l]);
-// fxp_control_floatt_to_fxp
+// fxp_float_to_fxp
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 194
-signed long int fxp_control_floatt_to_fxp(control_floatt f);
-// fxp_control_floatt_to_fxp_array
+signed long int fxp_float_to_fxp(control_floatt f);
+// fxp_float_to_fxp_array
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 236
-void fxp_control_floatt_to_fxp_array(control_floatt *f, signed long int *r, signed int N);
+void fxp_float_to_fxp_array(control_floatt *f, signed long int *r, signed int N);
 // fxp_get_frac_part
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 121
 signed long int fxp_get_frac_part(signed long int in);
@@ -198,7 +198,7 @@ control_floatt fxp_log10(control_floatt x);
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 333
 control_floatt fxp_log10_low(control_floatt x);
 // fxp_matrix_multiplication
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 369
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 368
 void fxp_matrix_multiplication(unsigned int i1, unsigned int j1, unsigned int i2, unsigned int j2, signed long int (*m1)[20l], signed long int (*m2)[20l], signed long int (*m3)[20l]);
 // fxp_mult
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 335
@@ -206,12 +206,12 @@ signed long int fxp_mult(signed long int amult, signed long int bmult);
 // fxp_neg
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 363
 signed long int fxp_neg(signed long int aneg);
-// fxp_print_control_floatt
+// fxp_print_float
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 403
-void fxp_print_control_floatt(signed long int a);
-// fxp_print_control_floatt_array
+void fxp_print_float(signed long int a);
+// fxp_print_float_array
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 407
-void fxp_print_control_floatt_array(signed long int *a, signed int N);
+void fxp_print_float_array(signed long int *a, signed int N);
 // fxp_print_int
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 399
 void fxp_print_int(signed long int a);
@@ -234,7 +234,7 @@ control_floatt fxp_state_space_representation(void);
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 323
 signed long int fxp_sub(signed long int asub, signed long int bsub);
 // fxp_sub_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 475
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 474
 void fxp_sub_matrix(unsigned int lines, unsigned int columns, signed long int (*m1)[20l], signed long int (*m2)[20l], signed long int (*result)[20l]);
 // fxp_to_double
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 267
@@ -242,17 +242,17 @@ control_floatt fxp_to_double(signed long int fxp);
 // fxp_to_double_array
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 287
 void fxp_to_double_array(control_floatt *f, signed long int *r, signed int N);
-// fxp_to_control_floatt
+// fxp_to_float
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 260
-control_floatt fxp_to_control_floatt(signed long int fxp);
-// fxp_to_control_floatt_array
+control_floatt fxp_to_float(signed long int fxp);
+// fxp_to_float_array
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 280
-void fxp_to_control_floatt_array(control_floatt *f, signed long int *r, signed int N);
+void fxp_to_float_array(control_floatt *f, signed long int *r, signed int N);
 // fxp_to_int
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 178
 signed int fxp_to_int(signed long int fxp);
 // fxp_transpose
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 583
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 582
 void fxp_transpose(signed long int (*a)[20l], signed long int (*b)[20l], signed int n, signed int m);
 // fxp_transposed_direct_form_2
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 61
@@ -332,9 +332,9 @@ control_floatt internal_pow(control_floatt a, control_floatt b);
 // nondet_double
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_limit_cycle_closedloop.h line 27
 control_floatt nondet_double();
-// nondet_control_floatt
+// nondet_float
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_overflow.h line 18
-control_floatt nondet_control_floatt();
+control_floatt nondet_float();
 // nondet_int
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_overflow.h line 17
 signed int nondet_int();
@@ -348,13 +348,13 @@ void poly_mult(control_floatt *a, signed int Na, control_floatt *b, signed int N
 // file /home/lucascordeiro/dsverifier/bmc/core/util.h line 141
 void poly_sum(control_floatt *a, signed int Na, control_floatt *b, signed int Nb, control_floatt *ans, signed int Nans);
 // print_array_elements
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 306
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 305
 void print_array_elements(char *name, control_floatt *v, signed int n);
 // print_fxp_array_elements
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 415
 void print_fxp_array_elements(char *name, signed long int *v, signed int n);
 // print_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 482
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 481
 void print_matrix(control_floatt (*matrix)[20l], unsigned int lines, unsigned int columns);
 // printf
 // file /usr/include/stdio.h line 362
@@ -374,9 +374,9 @@ control_floatt shiftLDouble(control_floatt zIn, control_floatt *z, signed int N)
 // shiftLboth
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 130
 void shiftLboth(control_floatt zfIn, control_floatt *zf, signed long int zIn, signed long int *z, signed int N);
-// shiftLcontrol_floatt
+// shiftLfloat
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 75
-control_floatt shiftLcontrol_floatt(control_floatt zIn, control_floatt *z, signed int N);
+control_floatt shiftLfloat(control_floatt zIn, control_floatt *z, signed int N);
 // shiftR
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 64
 signed long int shiftR(signed long int zIn, signed long int *z, signed int N);
@@ -389,9 +389,9 @@ void shiftRboth(control_floatt zfIn, control_floatt *zf, signed long int zIn, si
 // shiftRdouble
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 108
 control_floatt shiftRdouble(control_floatt zIn, control_floatt *z, signed int N);
-// shiftRcontrol_floatt
+// shiftRfloat
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 86
-control_floatt shiftRcontrol_floatt(control_floatt zIn, control_floatt *z, signed int N);
+control_floatt shiftRfloat(control_floatt zIn, control_floatt *z, signed int N);
 // snrPoint
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 402
 control_floatt snrPoint(control_floatt *s, control_floatt *n, signed int blksz);
@@ -405,10 +405,10 @@ control_floatt snrVariance(control_floatt *s, control_floatt *n, signed int blks
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 423
 extern void srand(unsigned int seed);
 // transpose
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 572
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 571
 void transpose(control_floatt (*a)[20l], control_floatt (*b)[20l], signed int n, signed int m);
 // validation
-// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 118
+// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 125
 void validation();
 // verify_controllability
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_controllability.h line 16
@@ -462,28 +462,25 @@ signed int verify_zero_input_limit_cycle(void);
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 96
 signed long int wrap(signed long int kX, signed long int kLowerBound, signed long int kUpperBound);
 
-#define SOLUTION_A_SIZE 3l
-#define SOLUTION_B_SIZE 2l
-
-struct anonymous$3
+struct anonymous$1
 {
   // a
-  control_floatt a[SOLUTION_A_SIZE];
+  control_floatt a[3l];
   // a_size
   signed int a_size;
   // b
-  control_floatt b[SOLUTION_B_SIZE];
+  control_floatt b[2l];
   // b_size
   signed int b_size;
   // sample_time
   control_floatt sample_time;
   // a_uncertainty
-  control_floatt a_uncertainty[SOLUTION_A_SIZE];
+  control_floatt a_uncertainty[3l];
   // b_uncertainty
-  control_floatt b_uncertainty[SOLUTION_B_SIZE];
+  control_floatt b_uncertainty[2l];
 };
 
-struct anonymous$1
+struct anonymous
 {
   // A
   control_floatt A[20l][20l];
@@ -529,7 +526,7 @@ struct anonymous$0
   control_floatt max_error;
 };
 
-struct anonymous$2
+struct anonymous$3
 {
   // push
   signed int push;
@@ -589,7 +586,7 @@ struct anonymous$2
   signed int cpi;
 };
 
-struct anonymous
+struct anonymous$2
 {
   // clock
   signed long int clock;
@@ -598,22 +595,16 @@ struct anonymous
   // cycle
   control_floatt cycle;
   // assembly
-  struct anonymous$2 assembly;
+  struct anonymous$3 assembly;
 };
 
 
-// OVERFLOW_MODE
-// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 116
-signed int OVERFLOW_MODE=1;
-// ROUNDING_MODE
-// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 117
-signed int ROUNDING_MODE=0;
 // X_SIZE_VALUE
-// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 115
+// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 121
 signed int X_SIZE_VALUE=0;
 // _controller
 // file /home/lucascordeiro/dsverifier/bmc/core/state-space.h line 17
-extern struct anonymous$1 _controller;
+extern struct anonymous _controller;
 // _fxp_fmask
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 45
 signed long int _fxp_fmask;
@@ -637,20 +628,17 @@ signed long int _fxp_minus_one;
 // _fxp_one
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 38
 signed long int _fxp_one;
-// controller
-// file example-a.c line 27
-// XXX: Debug
 #define __CONTROLLER_A_SIZE 2
 #define __CONTROLLER_B_SIZE 2
-/*struct anonymous$3 controller={ .a={ 1.0, 3.63545078000333, 0.0 }, .a_size=2,
-    .b={ -18.7913011069951, 11.3839445828215 }, .b_size=2,
-    .sample_time=0.5, .a_uncertainty={ 0.000000, 0.000000, 0.0 }, .b_uncertainty={ 0.000000, 0.000000 } };*/
-struct anonymous$3 controller={ .a={ 6.669159e-1f, -2.368256e+0f, 0.000000f }, .a_size=2,
-    .b={ 7.999949e+0f, -4.448562e+0f }, .b_size=2,
-    .sample_time=0.000000f, .a_uncertainty={ 0.000000f, 0.000000f, 0.000000f }, .b_uncertainty={ 0.000000f, 0.000000f } };
+// controller
+// file example-a.c line 255
+struct anonymous$1 controller={ .a={ 1.000000, -1.235968e+0, 0.000000 }, .a_size=2,
+    .b={ 1.298917e+1, -1.261210e+1 }, .b_size=2,
+    .sample_time=3.000000e-2, .a_uncertainty={ 0.000000, 0.000000, 0.000000 },
+    .b_uncertainty={ 0.000000, 0.000000 } };
 // ds
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 17
-extern struct anonymous$3 ds;
+extern struct anonymous$1 ds;
 // error_limit
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_error_state_space.h line 18
 extern control_floatt error_limit;
@@ -659,10 +647,10 @@ extern control_floatt error_limit;
 signed int generic_timer=0;
 // hw
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 18
-extern struct anonymous hw;
+extern struct anonymous$2 hw;
 // impl
-// file example-a.c line 38
-struct anonymous$0 impl={ .int_bits=16, .frac_bits=4, .max=0.000000, .min=0.000000,
+// file example-a.c line 280
+struct anonymous$0 impl={ .int_bits=16, .frac_bits=12, .max=0.000000, .min=0.000000,
     .default_realization=0, .delta=0.000000,
     .scale=0, .max_error=0.000000 };
 // nInputs
@@ -677,20 +665,27 @@ extern signed int nStates;
 // next
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 416
 unsigned long int next=1ul;
+// overflow_mode
+// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 122
+signed int overflow_mode=1;
 // plant
-// file example-a.c line 11
-struct anonymous$3 plant={ .a={ 1.0, -3.32481248817168, 1.64872127070013 }, .a_size=3,
-    .b={ 0.548693198268086, -0.886738807003861 }, .b_size=2,
-    .sample_time=0.5, .a_uncertainty={ 0.000000, 0.000000, 0.00000 }, .b_uncertainty={ 0.000000, 0.000000 } };
+// file example-a.c line 239
+struct anonymous$1 plant={ .a={ 1.000000, -2.032282e+0, 1.030455e+0 }, .a_size=3,
+    .b={ 3.000907e-2, -3.092284e-2 }, .b_size=2,
+    .sample_time=3.000000e-2, .a_uncertainty={ 2.500000e-1, 2.500000e-1, 2.500000e-1 },
+    .b_uncertainty={ 2.500000e-1, 2.500000e-1 } };
 // plant_cbmc
 // file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 46
-struct anonymous$3 plant_cbmc;
+struct anonymous$1 plant_cbmc;
+// rounding_mode
+// file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 123
+signed int rounding_mode=0;
 // scale_factor
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 51
-static const control_floatt scale_factor[31l]={ 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0, 1024.0, 2048.0, 4096.0, 8192.0, 16384.0, 32768.0, 65536.0, 131072.0, 262144.0, 524288.0, 1048576.0, 2097152.0, 4194304.0, 8388608.0, 16777216.0, 33554432.0, 67108864.0, 134217728.0, 268435456.0, 536870912.0, 1073741824.0 };
+static const control_floatt scale_factor[31l]={ 1.000000, 2.000000, 4.000000, 8.000000, 16.000000, 32.000000, 64.000000, 128.000000, 256.000000, 512.000000, 1024.000000, 2048.000000, 4096.000000, 8192.000000, 16384.000000, 32768.000000, 65536.000000, 1.310720e+5, 2.621440e+5, 5.242880e+5, 1.048576e+6, 2.097152e+6, 4.194304e+6, 8.388608e+6, 1.677722e+7, 3.355443e+7, 6.710886e+7, 1.342177e+8, 2.684355e+8, 5.368709e+8, 1.073742e+9 };
 // scale_factor_inv
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 58
-static const control_floatt scale_factor_inv[31l]={ 1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125, 0.00390625, 0.001953125, 0.0009765625, 0.00048828125, 0.000244140625, 0.0001220703125, 0.00006103515625, 0.000030517578125, 0.000015258789063, 0.000007629394531, 0.000003814697266, 0.000001907348633, 0.000000953674316, 0.000000476837158, 0.000000238418579, 0.000000119209290, 0.000000059604645, 0.000000029802322, 0.000000014901161, 0.000000007450581, 0.000000003725290, 0.000000001862645, 0.000000000931323 };
+static const control_floatt scale_factor_inv[31l]={ 1.000000, 5.000000e-1, 2.500000e-1, 1.250000e-1, 6.250000e-2, 3.125000e-2, 1.562500e-2, 7.812500e-3, 3.906250e-3, 1.953125e-3, 9.765625e-4, 4.882813e-4, 2.441406e-4, 1.220703e-4, 6.103516e-5, 3.051758e-5, 1.525879e-5, 7.629395e-6, 3.814697e-6, 1.907349e-6, 9.536743e-7, 4.768372e-7, 2.384186e-7, 1.192093e-7, 5.960465e-8, 2.980232e-8, 1.490116e-8, 7.450581e-9, 3.725290e-9, 1.862645e-9, 9.313230e-10 };
 
 // __DSVERIFIER_assert
 // file /home/lucascordeiro/dsverifier/bmc/core/compatibility.h line 35
@@ -747,7 +742,7 @@ signed int binomial_coefficient(signed int n, signed int p)
 }
 
 // call_closedloop_verification_task
-// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 296
+// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 303
 void call_closedloop_verification_task(void *closedloop_verification_task)
 {
   _Bool base_case_executed=(_Bool)0;
@@ -820,7 +815,7 @@ void call_closedloop_verification_task(void *closedloop_verification_task)
 }
 
 // call_verification_task
-// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 245
+// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 252
 void call_verification_task(void *verification_task)
 {
   _Bool base_case_executed=(_Bool)0;
@@ -1054,7 +1049,7 @@ signed int check_stability_closedloop(control_floatt *a, signed int n, control_f
 }
 
 // determinant
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 499
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 498
 control_floatt determinant(control_floatt (*a)[20l], signed int n)
 {
   signed int i;
@@ -1095,7 +1090,7 @@ control_floatt determinant(control_floatt (*a)[20l], signed int n)
 
             }
           }
-          control_floatt return_value_internal_pow$1=internal_pow(-1.0, 1.0 + (double)j1 + 1.0);
+          control_floatt return_value_internal_pow$1=internal_pow(-1.000000, 1.000000 + (double)j1 + 1.000000);
           control_floatt return_value_determinant$2=determinant(m, n - 1);
           det = det + return_value_internal_pow$1 * a[0l][(signed long int)j1] * return_value_determinant$2;
         }
@@ -1106,7 +1101,7 @@ control_floatt determinant(control_floatt (*a)[20l], signed int n)
 }
 
 // double_add_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 316
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 315
 void double_add_matrix(unsigned int lines, unsigned int columns, control_floatt (*m1)[20l], control_floatt (*m2)[20l], control_floatt (*result)[20l])
 {
   unsigned int i;
@@ -1463,7 +1458,7 @@ control_floatt double_direct_form_2_MSP430(control_floatt *w, control_floatt x, 
 }
 
 // double_exp_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 429
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 428
 void double_exp_matrix(unsigned int lines, unsigned int columns, control_floatt (*m1)[20l], unsigned int expNumber, control_floatt (*result)[20l])
 {
   unsigned int i;
@@ -1479,10 +1474,10 @@ void double_exp_matrix(unsigned int lines, unsigned int columns, control_floatt 
       j = 0u;
       for( ; !(j >= columns); j = j + 1u)
         if(i == j)
-          result[(signed long int)i][(signed long int)j] = 1.0;
+          result[(signed long int)i][(signed long int)j] = 1.000000;
 
         else
-          result[(signed long int)i][(signed long int)j] = 0.0;
+          result[(signed long int)i][(signed long int)j] = 0.000000;
     }
   }
 
@@ -1532,7 +1527,7 @@ void double_exp_matrix(unsigned int lines, unsigned int columns, control_floatt 
 }
 
 // double_matrix_multiplication
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 338
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 337
 void double_matrix_multiplication(unsigned int i1, unsigned int j1, unsigned int i2, unsigned int j2, control_floatt (*m1)[20l], control_floatt (*m2)[20l], control_floatt (*m3)[20l])
 {
   unsigned int i;
@@ -1602,7 +1597,7 @@ control_floatt double_state_space_representation(void)
 }
 
 // double_sub_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 327
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 326
 void double_sub_matrix(unsigned int lines, unsigned int columns, control_floatt (*m1)[20l], control_floatt (*m2)[20l], control_floatt (*result)[20l])
 {
   unsigned int i;
@@ -1716,9 +1711,9 @@ signed int fatorial(signed int n)
   return tmp_if_expr$2;
 }
 
-// control_floatt_direct_form_1
+// float_direct_form_1
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 144
-control_floatt control_floatt_direct_form_1(control_floatt *y, control_floatt *x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb)
+control_floatt float_direct_form_1(control_floatt *y, control_floatt *x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb)
 {
   control_floatt *a_ptr;
   control_floatt *y_ptr;
@@ -1753,9 +1748,9 @@ control_floatt control_floatt_direct_form_1(control_floatt *y, control_floatt *x
   return sum;
 }
 
-// control_floatt_direct_form_2
+// float_direct_form_2
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 163
-control_floatt control_floatt_direct_form_2(control_floatt *w, control_floatt x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb)
+control_floatt float_direct_form_2(control_floatt *w, control_floatt x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb)
 {
   control_floatt *a_ptr;
   control_floatt *b_ptr;
@@ -1789,9 +1784,9 @@ control_floatt control_floatt_direct_form_2(control_floatt *w, control_floatt x,
   return sum;
 }
 
-// control_floatt_transposed_direct_form_2
+// float_transposed_direct_form_2
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 183
-control_floatt control_floatt_transposed_direct_form_2(control_floatt *w, control_floatt x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb)
+control_floatt float_transposed_direct_form_2(control_floatt *w, control_floatt x, control_floatt *a, control_floatt *b, signed int Na, signed int Nb)
 {
   control_floatt *a_ptr;
   control_floatt *b_ptr;
@@ -1886,7 +1881,7 @@ signed long int fxp_add(signed long int aadd, signed long int badd)
 }
 
 // fxp_add_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 468
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 467
 void fxp_add_matrix(unsigned int lines, unsigned int columns, signed long int (*m1)[20l], signed long int (*m2)[20l], signed long int (*result)[20l])
 {
   unsigned int i;
@@ -2043,7 +2038,7 @@ void fxp_check_persistent_limit_cycle(signed long int *y, signed int y_size)
 }
 
 // fxp_determinant
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 530
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 529
 control_floatt fxp_determinant(signed long int (*a_fxp)[20l], signed int n)
 {
   signed int i;
@@ -2092,7 +2087,7 @@ control_floatt fxp_determinant(signed long int (*a_fxp)[20l], signed int n)
 
             }
           }
-          control_floatt return_value_internal_pow$1=internal_pow(-1.0, 1.0 + (double)j1 + 1.0);
+          control_floatt return_value_internal_pow$1=internal_pow(-1.000000, 1.000000 + (double)j1 + 1.000000);
           control_floatt return_value_determinant$2=determinant(m, n - 1);
           det = det + return_value_internal_pow$1 * a[0l][(signed long int)j1] * return_value_determinant$2;
         }
@@ -2235,17 +2230,17 @@ signed long int fxp_double_to_fxp(control_floatt value)
 {
   signed long int tmp;
   control_floatt ftemp=value * scale_factor[(signed long int)impl.frac_bits];
-  if(ROUNDING_MODE == 0)
+  if(rounding_mode == 0)
   {
     if(value >= 0.000000)
-      tmp = (signed long int)(ftemp + 0.5);
+      tmp = (signed long int)(ftemp + 5.000000e-1);
 
     else
-      tmp = (signed long int)(ftemp - 0.5);
+      tmp = (signed long int)(ftemp - 5.000000e-1);
   }
 
   else
-    if(ROUNDING_MODE == 1)
+    if(rounding_mode == 1)
     {
       tmp = (signed long int)ftemp;
       control_floatt residue=ftemp - (double)tmp;
@@ -2258,7 +2253,7 @@ signed long int fxp_double_to_fxp(control_floatt value)
     }
 
     else
-      if(ROUNDING_MODE == 0)
+      if(rounding_mode == 0)
         tmp = (signed long int)ftemp;
 
   return tmp;
@@ -2274,7 +2269,7 @@ void fxp_double_to_fxp_array(control_floatt *f, signed long int *r, signed int N
 }
 
 // fxp_exp_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 391
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 390
 void fxp_exp_matrix(unsigned int lines, unsigned int columns, signed long int (*m1)[20l], unsigned int expNumber, signed long int (*result)[20l])
 {
   unsigned int i;
@@ -2290,7 +2285,7 @@ void fxp_exp_matrix(unsigned int lines, unsigned int columns, signed long int (*
       j = 0u;
       for( ; !(j >= columns); j = j + 1u)
         if(i == j)
-          result[(signed long int)i][(signed long int)j]=fxp_double_to_fxp(1.0);
+          result[(signed long int)i][(signed long int)j]=fxp_double_to_fxp(1.000000);
 
         else
           result[(signed long int)i][(signed long int)j] = 0l;
@@ -2345,27 +2340,27 @@ void fxp_exp_matrix(unsigned int lines, unsigned int columns, signed long int (*
   }
 }
 
-// fxp_control_floatt_to_fxp
+// fxp_float_to_fxp
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 194
-signed long int fxp_control_floatt_to_fxp(control_floatt f)
+signed long int fxp_float_to_fxp(control_floatt f)
 {
   signed long int tmp;
   control_floatt ftemp=(double)f * scale_factor[(signed long int)impl.frac_bits];
   if(f >= 0.000000f)
-    tmp = (signed long int)(ftemp + 0.5);
+    tmp = (signed long int)(ftemp + 5.000000e-1);
 
   else
-    tmp = (signed long int)(ftemp - 0.5);
+    tmp = (signed long int)(ftemp - 5.000000e-1);
   return tmp;
 }
 
-// fxp_control_floatt_to_fxp_array
+// fxp_float_to_fxp_array
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 236
-void fxp_control_floatt_to_fxp_array(control_floatt *f, signed long int *r, signed int N)
+void fxp_float_to_fxp_array(control_floatt *f, signed long int *r, signed int N)
 {
   signed int i=0;
   for( ; !(i >= N); i = i + 1)
-    r[(signed long int)i]=fxp_control_floatt_to_fxp(f[(signed long int)i]);
+    r[(signed long int)i]=fxp_float_to_fxp(f[(signed long int)i]);
 }
 
 // fxp_get_frac_part
@@ -2395,87 +2390,87 @@ signed long int fxp_int_to_fxp(signed int in)
 signed int fxp_ln(signed int x)
 {
   signed int t;
-  signed int y=0xa65af;
-  if(!(x >= 0x00008000))
+  signed int y=0xA65AF;
+  if(!(x >= 0x8000))
   {
     x = x << 16;
-    y = y - 0xb1721;
+    y = y - 0xB1721;
   }
 
-  if(!(x >= 0x00800000))
+  if(!(x >= 0x800000))
   {
     x = x << 8;
-    y = y - 0x58b91;
+    y = y - 0x58B91;
   }
 
-  if(!(x >= 0x08000000))
+  if(!(x >= 0x8000000))
   {
     x = x << 4;
-    y = y - 0x2c5c8;
+    y = y - 0x2C5C8;
   }
 
   if(!(x >= 0x20000000))
   {
     x = x << 2;
-    y = y - 0x162e4;
+    y = y - 0x162E4;
   }
 
   if(!(x >= 0x40000000))
   {
     x = x << 1;
-    y = y - 0x0b172;
+    y = y - 0xB172;
   }
 
   t = x + (x >> 1);
-  if((0x80000000 & (unsigned int)t) == 0u)
+  if((0x80000000u & (unsigned int)t) == 0u)
   {
     x = t;
-    y = y - 0x067cd;
+    y = y - 0x67CD;
   }
 
   t = x + (x >> 2);
-  if((0x80000000 & (unsigned int)t) == 0u)
+  if((0x80000000u & (unsigned int)t) == 0u)
   {
     x = t;
-    y = y - 0x03920;
+    y = y - 0x3920;
   }
 
   t = x + (x >> 3);
-  if((0x80000000 & (unsigned int)t) == 0u)
+  if((0x80000000u & (unsigned int)t) == 0u)
   {
     x = t;
-    y = y - 0x01e27;
+    y = y - 0x1E27;
   }
 
   t = x + (x >> 4);
-  if((0x80000000 & (unsigned int)t) == 0u)
+  if((0x80000000u & (unsigned int)t) == 0u)
   {
     x = t;
-    y = y - 0x00f85;
+    y = y - 0xF85;
   }
 
   t = x + (x >> 5);
-  if((0x80000000 & (unsigned int)t) == 0u)
+  if((0x80000000u & (unsigned int)t) == 0u)
   {
     x = t;
-    y = y - 0x007e1;
+    y = y - 0x7E1;
   }
 
   t = x + (x >> 6);
-  if((0x80000000 & (unsigned int)t) == 0u)
+  if((0x80000000u & (unsigned int)t) == 0u)
   {
     x = t;
-    y = y - 0x003f8;
+    y = y - 0x3F8;
   }
 
   t = x + (x >> 7);
-  if((0x80000000 & (unsigned int)t) == 0u)
+  if((0x80000000u & (unsigned int)t) == 0u)
   {
     x = t;
-    y = y - 0x001fe;
+    y = y - 0x1FE;
   }
 
-  x = (signed int)(0x80000000 - (unsigned int)x);
+  x = (signed int)(0x80000000u - (unsigned int)x);
   y = y - (x >> 15);
   return y;
 }
@@ -2484,18 +2479,18 @@ signed int fxp_ln(signed int x)
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 345
 control_floatt fxp_log10(control_floatt x)
 {
-  if(x > 32767.0)
+  if(x > 32767.000000)
   {
-    if(x > 1073676289.0)
+    if(x > 1.073676e+9)
     {
-      x = x / 1073676289.0;
+      x = x / 1.073676e+9;
       control_floatt return_value_fxp_log10_low$1=fxp_log10_low(x);
-      return return_value_fxp_log10_low$1 + 9.030873362;
+      return return_value_fxp_log10_low$1 + 9.030873e+0;
     }
 
-    x = x / 32767.0;
+    x = x / 32767.000000;
     control_floatt return_value_fxp_log10_low$2=fxp_log10_low(x);
-    return return_value_fxp_log10_low$2 + 4.515436681;
+    return return_value_fxp_log10_low$2 + 4.515437e+0;
   }
 
   else
@@ -2509,14 +2504,14 @@ control_floatt fxp_log10(control_floatt x)
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 333
 control_floatt fxp_log10_low(control_floatt x)
 {
-  signed int xint=(signed int)(x * 65536.0 + 0.5);
+  signed int xint=(signed int)(x * 65536.000000 + 5.000000e-1);
   signed int lnum=fxp_ln(xint);
   signed int lden=fxp_ln(655360);
   return (double)lnum / (double)lden;
 }
 
 // fxp_matrix_multiplication
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 369
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 368
 void fxp_matrix_multiplication(unsigned int i1, unsigned int j1, unsigned int i2, unsigned int j2, signed long int (*m1)[20l], signed long int (*m2)[20l], signed long int (*m3)[20l])
 {
   unsigned int i;
@@ -2574,23 +2569,23 @@ signed long int fxp_neg(signed long int aneg)
   return tmpneg;
 }
 
-// fxp_print_control_floatt
+// fxp_print_float
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 403
-void fxp_print_control_floatt(signed long int a)
+void fxp_print_float(signed long int a)
 {
-  control_floatt return_value_fxp_to_control_floatt$1=fxp_to_control_floatt(a);
-  printf("\n%f", return_value_fxp_to_control_floatt$1);
+  control_floatt return_value_fxp_to_float$1=fxp_to_float(a);
+  printf("\n%f", return_value_fxp_to_float$1);
 }
 
-// fxp_print_control_floatt_array
+// fxp_print_float_array
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 407
-void fxp_print_control_floatt_array(signed long int *a, signed int N)
+void fxp_print_float_array(signed long int *a, signed int N)
 {
   signed int i=0;
   for( ; !(i >= N); i = i + 1)
   {
-    control_floatt return_value_fxp_to_control_floatt$1=fxp_to_control_floatt(a[(signed long int)i]);
-    printf("\n%f", return_value_fxp_to_control_floatt$1);
+    control_floatt return_value_fxp_to_float$1=fxp_to_float(a[(signed long int)i]);
+    printf("\n%f", return_value_fxp_to_float$1);
   }
 }
 
@@ -2605,7 +2600,7 @@ void fxp_print_int(signed long int a)
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 132
 signed long int fxp_quantize(signed long int aquant)
 {
-  if(OVERFLOW_MODE == 2)
+  if(overflow_mode == 2)
   {
     if(!(aquant >= _fxp_min))
       return _fxp_min;
@@ -2617,7 +2612,7 @@ signed long int fxp_quantize(signed long int aquant)
   }
 
   else
-    if(OVERFLOW_MODE == 3)
+    if(overflow_mode == 3)
     {
       if(!(_fxp_max >= aquant) || !(aquant >= _fxp_min))
       {
@@ -2814,7 +2809,7 @@ signed long int fxp_sub(signed long int asub, signed long int bsub)
 }
 
 // fxp_sub_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 475
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 474
 void fxp_sub_matrix(unsigned int lines, unsigned int columns, signed long int (*m1)[20l], signed long int (*m2)[20l], signed long int (*result)[20l])
 {
   unsigned int i;
@@ -2847,23 +2842,23 @@ void fxp_to_double_array(control_floatt *f, signed long int *r, signed int N)
     f[(signed long int)i]=fxp_to_double(r[(signed long int)i]);
 }
 
-// fxp_to_control_floatt
+// fxp_to_float
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 260
-control_floatt fxp_to_control_floatt(signed long int fxp)
+control_floatt fxp_to_float(signed long int fxp)
 {
   control_floatt f;
   signed int f_int=(signed int)fxp;
-  f = (control_floatt)((double)f_int * scale_factor_inv[(signed long int)impl.frac_bits]);
+  f = (float)((double)f_int * scale_factor_inv[(signed long int)impl.frac_bits]);
   return f;
 }
 
-// fxp_to_control_floatt_array
+// fxp_to_float_array
 // file /home/lucascordeiro/dsverifier/bmc/core/fixed-point.h line 280
-void fxp_to_control_floatt_array(control_floatt *f, signed long int *r, signed int N)
+void fxp_to_float_array(control_floatt *f, signed long int *r, signed int N)
 {
   signed int i=0;
   for( ; !(i >= N); i = i + 1)
-    f[(signed long int)i]=fxp_to_control_floatt(r[(signed long int)i]);
+    f[(signed long int)i]=fxp_to_float(r[(signed long int)i]);
 }
 
 // fxp_to_int
@@ -2880,7 +2875,7 @@ signed int fxp_to_int(signed long int fxp)
 }
 
 // fxp_transpose
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 583
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 582
 void fxp_transpose(signed long int (*a)[20l], signed long int (*b)[20l], signed int n, signed int m)
 {
   signed int i;
@@ -3482,8 +3477,8 @@ control_floatt iirOutBothL(control_floatt *yf, control_floatt *xf, control_float
   }
 
   yf[(signed long int)(Na - 1)] = sumf;
-  control_floatt return_value_fxp_to_control_floatt$21=fxp_to_control_floatt(sum);
-  return return_value_fxp_to_control_floatt$21 - sumf;
+  control_floatt return_value_fxp_to_float$21=fxp_to_float(sum);
+  return return_value_fxp_to_float$21 - sumf;
 }
 
 // iirOutBothL2
@@ -3545,8 +3540,8 @@ control_floatt iirOutBothL2(control_floatt *yf, control_floatt *xf, control_floa
     sumf = sumf - af[(signed long int)(Na - j)] * yf[(signed long int)j];
 
   yf[(signed long int)(Na - 1)] = sumf;
-  control_floatt return_value_fxp_to_control_floatt$5=fxp_to_control_floatt(sum);
-  return return_value_fxp_to_control_floatt$5 - sumf;
+  control_floatt return_value_fxp_to_float$5=fxp_to_float(sum);
+  return return_value_fxp_to_float$5 - sumf;
 }
 
 // iirOutFixedL
@@ -3670,7 +3665,6 @@ control_floatt iirOutFloatL(control_floatt *y, control_floatt *x, control_floatt
 // file /home/lucascordeiro/dsverifier/bmc/core/initialization.h line 24
 void initialization()
 {
-
   if(impl.frac_bits >= 32)
     printf("impl.frac_bits must be less than word width!\n");
 
@@ -3685,17 +3679,17 @@ void initialization()
     _fxp_one = 2147483647l;
 
   else
-    _fxp_one = (signed long int)(0x00000001 << impl.frac_bits);
-  _fxp_half = (signed long int)(0x00000001 << impl.frac_bits - 1);
-  _fxp_minus_one = (signed long int)-(0x00000001 << impl.frac_bits);
-  _fxp_min = (signed long int)-(0x00000001 << (impl.frac_bits + impl.int_bits) - 1);
-  _fxp_max = (signed long int)((0x00000001 << (impl.frac_bits + impl.int_bits) - 1) - 1);
+    _fxp_one = (signed long int)(0x1 << impl.frac_bits);
+  _fxp_half = (signed long int)(0x1 << impl.frac_bits - 1);
+  _fxp_minus_one = (signed long int)-(0x1 << impl.frac_bits);
+  _fxp_min = (signed long int)-(0x1 << (impl.frac_bits + impl.int_bits) - 1);
+  _fxp_max = (signed long int)((0x1 << (impl.frac_bits + impl.int_bits) - 1) - 1);
   _dbl_min = _fxp_min;
   _dbl_min /= (1 << impl.frac_bits);
   _dbl_max = _fxp_max;
   _dbl_max /= (1 << impl.frac_bits);
   _fxp_fmask = (signed long int)((1 << impl.frac_bits) - 1);
-  _fxp_imask = (signed long int)(0x80000000 >> (32 - impl.frac_bits) - 1);
+  _fxp_imask = (signed long int)(0x80000000u >> (32 - impl.frac_bits) - 1);
   if(impl.scale == 0 || impl.scale == 1)
     impl.scale = 1;
 
@@ -3744,9 +3738,8 @@ signed int main()
 {
   initialization();
   validation();
-  ROUNDING_MODE = 1;
+  rounding_mode = 1;
   call_closedloop_verification_task((void *)verify_stability_closedloop_using_dslib);
-  __DSVERIFIER_assert(controller.a[0] == 1.0);
   return 0;
 }
 
@@ -3813,7 +3806,7 @@ void poly_sum(control_floatt *a, signed int Na, control_floatt *b, signed int Nb
 }
 
 // print_array_elements
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 306
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 305
 void print_array_elements(char *name, control_floatt *v, signed int n)
 {
   printf("%s = {", name);
@@ -3835,7 +3828,7 @@ void print_fxp_array_elements(char *name, signed long int *v, signed int n)
 }
 
 // print_matrix
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 482
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 481
 void print_matrix(control_floatt (*matrix)[20l], unsigned int lines, unsigned int columns)
 {
   printf("\nMatrix\n=====================\n\n");
@@ -3915,9 +3908,9 @@ void shiftLboth(control_floatt zfIn, control_floatt *zf, signed long int zIn, si
   zf[(signed long int)(N - 1)] = zfIn;
 }
 
-// shiftLcontrol_floatt
+// shiftLfloat
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 75
-control_floatt shiftLcontrol_floatt(control_floatt zIn, control_floatt *z, signed int N)
+control_floatt shiftLfloat(control_floatt zIn, control_floatt *z, signed int N)
 {
   signed int i;
   control_floatt zOut=z[0l];
@@ -3986,9 +3979,9 @@ control_floatt shiftRdouble(control_floatt zIn, control_floatt *z, signed int N)
   return zOut;
 }
 
-// shiftRcontrol_floatt
+// shiftRfloat
 // file /home/lucascordeiro/dsverifier/bmc/core/functions.h line 86
-control_floatt shiftRcontrol_floatt(control_floatt zIn, control_floatt *z, signed int N)
+control_floatt shiftRfloat(control_floatt zIn, control_floatt *z, signed int N)
 {
   signed int i;
   control_floatt zOut=z[(signed long int)(N - 1)];
@@ -4023,7 +4016,7 @@ control_floatt snrPoint(control_floatt *s, control_floatt *n, signed int blksz)
 
     }
 
-  return 9999.9f;
+  return 9.999900e+3f;
 }
 
 // snrPower
@@ -4048,11 +4041,11 @@ control_floatt snrPower(control_floatt *s, control_floatt *n, signed int blksz)
       (void)0;
 
     snr = sv / nv;
-    return (control_floatt)snr;
+    return (float)snr;
   }
 
   else
-    return 9999.9f;
+    return 9.999900e+3f;
 }
 
 // snrVariance
@@ -4087,11 +4080,11 @@ control_floatt snrVariance(control_floatt *s, control_floatt *n, signed int blks
       (void)0;
 
     snr = sv / nv;
-    return (control_floatt)snr;
+    return (float)snr;
   }
 
   else
-    return 9999.9f;
+    return 9.999900e+3f;
 }
 
 // srand
@@ -4102,7 +4095,7 @@ extern void srand(unsigned int seed)
 }
 
 // transpose
-// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 572
+// file /home/lucascordeiro/dsverifier/bmc/core/util.h line 571
 void transpose(control_floatt (*a)[20l], control_floatt (*b)[20l], signed int n, signed int m)
 {
   signed int i;
@@ -4117,7 +4110,7 @@ void transpose(control_floatt (*a)[20l], control_floatt (*b)[20l], signed int n,
 }
 
 // validation
-// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 118
+// file /home/lucascordeiro/dsverifier/bmc/dsverifier.h line 125
 void validation()
 {
   if(__CONTROLLER_A_SIZE == 0 || plant.b_size == 0 || impl.int_bits == 0)
@@ -4165,7 +4158,7 @@ signed int verify_controllability(void)
       controllabilityMatrix[(signed long int)i][(signed long int)j] = 0l;
       backup[(signed long int)i][(signed long int)j] = 0l;
       backupSecond[(signed long int)i][(signed long int)j] = 0l;
-      controllabilityMatrix_double[(signed long int)i][(signed long int)j] = 0.0;
+      controllabilityMatrix_double[(signed long int)i][(signed long int)j] = 0.000000;
     }
   }
   i = 0;
@@ -4286,7 +4279,7 @@ signed int verify_controllability_double(void)
     {
       j = 0;
       for( ; !(j >= nInputs * nStates); j = j + 1)
-        backup[(signed long int)i][(signed long int)j] = 0.0;
+        backup[(signed long int)i][(signed long int)j] = 0.000000;
     }
     transpose(controllabilityMatrix, backup, nStates, nStates * nInputs);
     control_floatt mimo_controllabilityMatrix_double[20l][20l];
@@ -4324,13 +4317,11 @@ signed int verify_controllability_double(void)
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_error.h line 20
 signed int verify_error(void)
 {
-  OVERFLOW_MODE = 2;
-  //control_floatt a_cascade[100l];
+  overflow_mode = 2;
+  control_floatt a_cascade[100l];
   signed int a_cascade_size;
-  control_floatt a_cascade[a_cascade_size];
-  //control_floatt b_cascade[100l];
+  control_floatt b_cascade[100l];
   signed int b_cascade_size;
-  control_floatt b_cascade[b_cascade_size];
   signed long int min_fxp=fxp_double_to_fxp(impl.min);
   signed long int max_fxp=fxp_double_to_fxp(impl.max);
   const signed long int max_fxp$array_size0=(signed long int)X_SIZE_VALUE;
@@ -4424,7 +4415,7 @@ signed int verify_error(void)
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_error_closedloop.h line 27
 signed int verify_error_closedloop(void)
 {
-  OVERFLOW_MODE = 3;
+  overflow_mode = 3;
   control_floatt *c_num=controller.b;
   signed int c_num_size=__CONTROLLER_B_SIZE;
   control_floatt *c_den=controller.a;
@@ -4445,16 +4436,12 @@ signed int verify_error_closedloop(void)
   signed int p_num_size=plant.b_size;
   control_floatt *p_den=plant_cbmc.a;
   signed int p_den_size=plant.a_size;
-  //control_floatt ans_num_double[100l];
-  //control_floatt ans_num_qtz[100l];
+  control_floatt ans_num_double[100l];
+  control_floatt ans_num_qtz[100l];
   signed int ans_num_size=(__CONTROLLER_B_SIZE + plant.b_size) - 1;
-  control_floatt ans_num_double[ans_num_size];
-  control_floatt ans_num_qtz[ans_num_size];
-  //control_floatt ans_den_qtz[100l];
-  //control_floatt ans_den_double[100l];
+  control_floatt ans_den_qtz[100l];
+  control_floatt ans_den_double[100l];
   signed int ans_den_size=(__CONTROLLER_A_SIZE + plant.a_size) - 1;
-  control_floatt ans_den_qtz[ans_den_size];
-  control_floatt ans_den_double[ans_den_size];
   ft_closedloop_series(c_num_qtz, c_num_size, c_den_qtz, c_den_size, p_num, p_num_size, p_den, p_den_size, ans_num_qtz, ans_num_size, ans_den_qtz, ans_den_size);
   ft_closedloop_series(c_num, c_num_size, c_den, c_den_size, p_num, p_num_size, p_den, p_den_size, ans_num_double, ans_num_size, ans_den_double, ans_den_size);
   signed int i;
@@ -4534,8 +4521,8 @@ signed int verify_error_closedloop(void)
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_error_state_space.h line 20
 signed int verify_error_state_space(void)
 {
-  OVERFLOW_MODE = 0;
-  struct anonymous$1 __backupController;
+  overflow_mode = 0;
+  struct anonymous __backupController;
   signed int i;
   signed int j;
   i = 0;
@@ -4587,7 +4574,7 @@ signed int verify_error_state_space(void)
     for( ; !(j >= 1); j = j + 1)
       __backupController.outputs[(signed long int)i][(signed long int)j] = _controller.outputs[(signed long int)i][(signed long int)j];
   }
-  control_floatt __quant_error=0.0;
+  control_floatt __quant_error=0.000000;
   control_floatt output_double=double_state_space_representation();
   i = 0;
   for( ; !(i >= nStates); i = i + 1)
@@ -4661,8 +4648,8 @@ signed int verify_generic_timing(void)
   for( ; !(i >= X_SIZE_VALUE); i = i + 1)
   {
     y[(signed long int)i] = 0.000000;
-    control_floatt return_value_nondet_control_floatt$1=nondet_control_floatt();
-    x[(signed long int)i] = (double)return_value_nondet_control_floatt$1;
+    control_floatt return_value_nondet_float$1=nondet_float();
+    x[(signed long int)i] = (double)return_value_nondet_float$1;
     _Bool tmp_if_expr$2;
     if(x[(signed long int)i] >= impl.min)
       tmp_if_expr$2 = x[(signed long int)i] <= impl.max ? (_Bool)1 : (_Bool)0;
@@ -4718,7 +4705,7 @@ signed int verify_generic_timing(void)
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_limit_cycle.h line 111
 signed int verify_limit_cycle(void)
 {
-  OVERFLOW_MODE = 3;
+  overflow_mode = 3;
   signed int i;
   signed int Set_xsize_at_least_two_times_Na=2 * ds.a_size;
   printf("X_SIZE must be at least 2 * ds.a_size");
@@ -4785,7 +4772,7 @@ signed int verify_limit_cycle(void)
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_limit_cycle_closedloop.h line 29
 signed int verify_limit_cycle_closed_loop(void)
 {
-  OVERFLOW_MODE = 3;
+  overflow_mode = 3;
   control_floatt *c_num=controller.b;
   signed int c_num_size=__CONTROLLER_B_SIZE;
   control_floatt *c_den=controller.a;
@@ -4806,12 +4793,10 @@ signed int verify_limit_cycle_closed_loop(void)
   signed int p_num_size=plant.b_size;
   control_floatt *p_den=plant_cbmc.a;
   signed int p_den_size=plant.a_size;
-  //control_floatt ans_num[100l];
+  control_floatt ans_num[100l];
   signed int ans_num_size=(__CONTROLLER_B_SIZE + plant.b_size) - 1;
-  control_floatt ans_num[ans_num_size];
-  //control_floatt ans_den[100l];
+  control_floatt ans_den[100l];
   signed int ans_den_size=(__CONTROLLER_A_SIZE + plant.a_size) - 1;
-  control_floatt ans_den[ans_den_size];
   ft_closedloop_series(c_num_qtz, c_num_size, c_den_qtz, c_den_size, p_num, p_num_size, p_den, p_den_size, ans_num, ans_num_size, ans_den, ans_den_size);
   signed int i;
   const signed long int i$array_size0=(signed long int)X_SIZE_VALUE;
@@ -4944,7 +4929,7 @@ signed int verify_limit_cycle_state_space(void)
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_minimum_phase.h line 24
 signed int verify_minimum_phase(void)
 {
-  OVERFLOW_MODE = 0;
+  overflow_mode = 0;
   return 0;
 }
 
@@ -5063,7 +5048,7 @@ signed int verify_observability(void)
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_overflow.h line 23
 signed int verify_overflow(void)
 {
-  OVERFLOW_MODE = 1;
+  overflow_mode = 1;
   signed long int min_fxp=fxp_double_to_fxp(impl.min);
   signed long int max_fxp=fxp_double_to_fxp(impl.max);
   const signed long int max_fxp$array_size0=(signed long int)X_SIZE_VALUE;
@@ -5120,7 +5105,7 @@ signed int verify_overflow(void)
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_stability.h line 24
 signed int verify_stability(void)
 {
-  OVERFLOW_MODE = 0;
+  overflow_mode = 0;
   return 0;
 }
 
@@ -5148,12 +5133,10 @@ signed int verify_stability_closedloop_using_dslib(void)
   signed int p_num_size=plant.b_size;
   control_floatt *p_den=plant_cbmc.a;
   signed int p_den_size=plant.a_size;
-  //control_floatt ans_num[100l];
+  control_floatt ans_num[100l];
   signed int ans_num_size=(__CONTROLLER_B_SIZE + plant.b_size) - 1;
-  control_floatt ans_num[ans_num_size];
-  //control_floatt ans_den[100l];
+  control_floatt ans_den[100l];
   signed int ans_den_size=(__CONTROLLER_A_SIZE + plant.a_size) - 1;
-  control_floatt ans_den[ans_den_size];
   ft_closedloop_series(c_num_qtz, c_num_size, c_den_qtz, c_den_size, p_num, p_num_size, p_den, p_den_size, ans_num, ans_num_size, ans_den, ans_den_size);
   printf("Verifying stability for closedloop function\n");
   signed int return_value_check_stability_closedloop$1=check_stability_closedloop(ans_den, ans_den_size, p_num, p_num_size, p_den, p_den_size);
@@ -5173,8 +5156,8 @@ signed int verify_timing_msp_430(void)
   for( ; !(i >= X_SIZE_VALUE); i = i + 1)
   {
     y[(signed long int)i] = 0.000000;
-    control_floatt return_value_nondet_control_floatt$1=nondet_control_floatt();
-    x[(signed long int)i] = (double)return_value_nondet_control_floatt$1;
+    control_floatt return_value_nondet_float$1=nondet_float();
+    x[(signed long int)i] = (double)return_value_nondet_float$1;
     _Bool tmp_if_expr$2;
     if(x[(signed long int)i] >= impl.min)
       tmp_if_expr$2 = x[(signed long int)i] <= impl.max ? (_Bool)1 : (_Bool)0;
@@ -5218,7 +5201,7 @@ signed int verify_timing_msp_430(void)
 // file /home/lucascordeiro/dsverifier/bmc/engine/verify_zero_input_limit_cycle.h line 16
 signed int verify_zero_input_limit_cycle(void)
 {
-  OVERFLOW_MODE = 3;
+  overflow_mode = 3;
   signed int i;
   signed int j;
   signed int Set_xsize_at_least_two_times_Na=2 * ds.a_size;
@@ -5293,3 +5276,4 @@ signed long int wrap(signed long int kX, signed long int kLowerBound, signed lon
 
   return kLowerBound + (kX - kLowerBound) % (signed long int)range_size;
 }
+
