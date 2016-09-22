@@ -30,7 +30,7 @@ exprt to_control_float_expr(const symbol_tablet &st, double value)
   {
     const fixedbv_spect spec(to_fixedbv_type(data_type));
     const bool is_neg=value < 0.0;
-    const mp_integer factor=pow(2, spec.width);
+    const mp_integer factor=pow(mp_integer(2), spec.width);
     double abs_value=is_neg ? -value : value;
     const mp_integer::llong_t converted=factor.to_long() * abs_value;
     fixedbvt bv;
