@@ -9,7 +9,7 @@ typedef unsigned char __CPROVER_char;
 #define __CPROVER_char_at(s, p) __CPROVER_uninterpreted_char_at(s, p)
 
 /* string equality */
-#define __CPROVER_string_equal(s1, s2) __CPROVER_uninterpreted_string_equal(s1, s2)
+#define __CPROVER_string_equal(s1, s2) __CPROVER_uninterpreted_string_equal_func(s1, s2)
 
 /* defines a string literal, e.g. __CPROVER_string_literal("foo") */
 #define __CPROVER_string_literal(s) __CPROVER_uninterpreted_string_literal(s)
@@ -55,7 +55,7 @@ typedef unsigned char __CPROVER_char;
  * don't use these directly
  ******************************************************************************/
 extern __CPROVER_char __CPROVER_uninterpreted_char_at(__CPROVER_string str, int pos);
-extern __CPROVER_bool __CPROVER_uninterpreted_string_equal(__CPROVER_string str1, __CPROVER_string str2);
+extern __CPROVER_bool __CPROVER_uninterpreted_string_equal_func(__CPROVER_string str1, __CPROVER_string str2);
 extern __CPROVER_string __CPROVER_uninterpreted_string_literal();
 extern __CPROVER_char __CPROVER_uninterpreted_char_literal();
 extern __CPROVER_string __CPROVER_uninterpreted_strcat(__CPROVER_string str1, __CPROVER_string str2);
