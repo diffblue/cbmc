@@ -32,6 +32,7 @@ struct procedure_local_cfg_baset<
 
   void operator()(const method_with_amapt& args)
   {
+    const auto &method=args.first;
     const auto& amap=args.second;
     for(const auto& inst : amap)
     {
@@ -47,6 +48,29 @@ struct procedure_local_cfg_baset<
     }
     // Add edges declared in the exception table, which don't figure
     // in the address map successors/predecessors as yet.
+    for(const auto& table_entry : method.exception_table)
+    {
+      auto findit=amap.find(table_entry.start_pc);
+      assert(findit!=amap.end() &&
+             "Exception table entry doesn't point to an instruction?");
+      for(; findit->first<table_entry.end_pc; ++findit)
+      {
+        // For now just assume any non-branch
+        // instruction could potentially throw.
+        auto succit=findit;
+        ++succit;
+        if(succit==amap.end())
+          continue;
+        const auto& thisinst=findit->second;
+        if(thisinst.successors.size()==1 &&
+           *thisinst.successors.begin()==succit->first)
+        {
+          this->add_edge(
+            entry_map.at(findit->first),
+            entry_map.at(table_entry.handler_pc));
+        }
+      }
+    }
   }
 
   unsigned get_first_node(const method_with_amapt& args) const
