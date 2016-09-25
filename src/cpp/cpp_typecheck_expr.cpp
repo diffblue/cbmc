@@ -3208,7 +3208,7 @@ void cpp_typecheckt::typecheck_expr_index(exprt &expr)
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::typecheck_expr_rel
+Function: cpp_typecheckt::typecheck_expr_comma
 
 Inputs:
 
