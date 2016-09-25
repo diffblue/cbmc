@@ -21,9 +21,10 @@ tests.log: ../test.pl
 clean:
 	@for dir in *; do \
                 if [ -d "$$dir" ]; then \
-                        rm $$dir/*.txt $$dir/*.dot $$dir/*.gb $$dir/*.out; \
+                        rm -f $$dir/*.txt $$dir/*.dot $$dir/*.gb $$dir/*.out; \
                 fi; \
-        done;
+  done;
+	rm -f tests.log
 
 show:
 	@for dir in *; do \

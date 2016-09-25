@@ -1,0 +1,8 @@
+CORE
+main.c
+--unwindset main.0:10,main.1:10,main.2:10 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring

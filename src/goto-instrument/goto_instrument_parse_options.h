@@ -31,7 +31,10 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nan-check)(no-nan-check)" \
   "(race-check)(scc)(one-event-per-cycle)" \
   "(minimum-interference)" \
-  "(mm):(my-events)(unwind):" \
+  "(mm):(my-events)" \
+  "(unwind):(unwindset):(unwindset-file):" \
+  "(unwinding-assertions)(partial-loops)(continue-as-loops)" \
+  "(log):" \
   "(max-var):(max-po-trans):(ignore-arrays)" \
   "(cfg-kill)(no-dependencies)(force-loop-duplication)" \
   "(call-graph)" \
