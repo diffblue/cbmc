@@ -552,8 +552,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
   exprt &new_expr)
 {
   if(type.id()!=ID_pointer ||
-     is_reference(type) ||
-     type.find("to-member").is_not_nil())
+     is_reference(type))
     return false;
 
   if(expr.get_bool(ID_C_lvalue))
@@ -568,6 +567,9 @@ bool cpp_typecheckt::standard_conversion_pointer(
     new_expr.type() = type;
     return true;
   }
+
+  if(type.find("to-member").is_not_nil())
+    return false;
   
   if(expr.type().id() != ID_pointer ||
      expr.type().find("to-member").is_not_nil())
