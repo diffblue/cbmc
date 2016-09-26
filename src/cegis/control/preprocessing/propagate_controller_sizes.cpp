@@ -16,6 +16,20 @@ const exprt &get_controller_comp(const namespacet &ns,
   assert(!"Solution component not found.");
 }
 
+const array_exprt &get_a_controller_comp(const namespacet &ns,
+    const struct_exprt &value)
+{
+  return to_array_expr(
+      get_controller_comp(ns, value, CEGIS_CONTROL_A_MEMBER_NAME));
+}
+
+const array_exprt &get_b_controller_comp(const namespacet &ns,
+    const struct_exprt &value)
+{
+  return to_array_expr(
+      get_controller_comp(ns, value, CEGIS_CONTROL_B_MEMBER_NAME));
+}
+
 namespace
 {
 const exprt &get_a_size(const namespacet &ns, const struct_exprt &value)

@@ -50,7 +50,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       control/preprocessing/control_preprocessing.cpp control/preprocessing/propagate_controller_sizes.cpp \
       control/options/control_program.cpp \
       control/learn/control_symex_learn.cpp control/learn/nondet_solution.cpp \
-      control/simplify/remove_unused_elements.cpp \
+      control/simplify/remove_unused_elements.cpp control/simplify/change_control_float_type.cpp \
       control/verify/control_symex_verify.cpp control/verify/insert_solution.cpp \
       control/value/float_helper.cpp control/value/control_types.cpp \
       wordsize/restrict_bv_size.cpp value/program_individual_serialisation.cpp value/assignments_printer.cpp \

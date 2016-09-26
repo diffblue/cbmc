@@ -1,3 +1,4 @@
+#include <ansi-c/expr2c.h>
 #include <goto-programs/goto_trace.h>
 
 #include <cegis/cegis-util/program_helper.h>
@@ -57,27 +58,6 @@ const struct_exprt &find_solution(const goto_tracet &trace)
   }
   assert(!"Control solution not found in trace.");
 }
-
-const array_exprt &get_a(const namespacet &ns, const struct_exprt &solution)
-{
-  return to_array_expr(
-      get_controller_comp(ns, solution, CEGIS_CONTROL_A_MEMBER_NAME));
-}
-
-const array_exprt &get_b(const namespacet &ns, const struct_exprt &solution)
-{
-  return to_array_expr(
-      get_controller_comp(ns, solution, CEGIS_CONTROL_B_MEMBER_NAME));
-}
-
-void extract(std::vector<double> &data, const array_exprt &array)
-{
-  const exprt::operandst &ops=array.operands();
-  const size_t size=ops.size();
-  data.resize(size);
-  for (size_t i=0; i < size; ++i)
-    data[i]=to_control_float(to_constant_expr(ops[i]));
-}
 }
 
 void control_symex_learnt::convert(candidatet &current_candidate,
@@ -85,20 +65,22 @@ void control_symex_learnt::convert(candidatet &current_candidate,
 {
   const struct_exprt &solution=find_solution(trace);
   const namespacet ns(current_program.st);
-  extract(current_candidate.a, get_a(ns, solution));
-  extract(current_candidate.b, get_b(ns, solution));
+  current_candidate.a=get_a_controller_comp(ns, solution);
+  current_candidate.b=get_b_controller_comp(ns, solution);
 }
 
 namespace
 {
-void print_array(messaget::mstreamt &os, const std::vector<double> &array,
-    const char * const name)
+void print_array(messaget::mstreamt &os, const array_exprt &array,
+    const char * const name, const symbol_tablet &st)
 {
+  const namespacet ns(st);
+  const array_exprt::operandst &ops=array.operands();
   os << '<' << name << '>' << messaget::endl;
-  for (const double value : array)
-    os << "<item>" << value << "</item>" << messaget::endl;
+  for (const array_exprt::operandst::value_type &value : ops)
+    os << "<item>" << expr2c(value, ns) << "</item>" << messaget::endl;
   os << "</" << name << '>' << messaget::endl;
-  os << '<' << name << "_size>" << array.size();
+  os << '<' << name << "_size>" << ops.size();
   os << "</" << name << "_size>" << messaget::endl;
 }
 }
@@ -106,6 +88,7 @@ void print_array(messaget::mstreamt &os, const std::vector<double> &array,
 void control_symex_learnt::show_candidate(messaget::mstreamt &os,
     const candidatet &candidate) const
 {
-  print_array(os, candidate.a, "a");
-  print_array(os, candidate.b, "b");
+  const symbol_tablet &st=current_program.st;
+  print_array(os, candidate.a, "a", st);
+  print_array(os, candidate.b, "b", st);
 }

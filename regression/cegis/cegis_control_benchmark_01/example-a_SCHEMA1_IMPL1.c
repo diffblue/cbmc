@@ -1,4 +1,12 @@
-typedef __CPROVER_floatbv[16][11] control_floatt;
+#ifndef _EXPONENT_WIDTH
+#define _EXPONENT_WIDTH 16
+#endif
+#ifndef _FRACTION_WIDTH
+#define _FRACTION_WIDTH 11
+#endif
+
+typedef __CPROVER_floatbv[_EXPONENT_WIDTH][_FRACTION_WIDTH] control_floatt;
+//typedef float control_floatt;
 
 // tag-#anon#ST[ARR100{F64}$F64$'a'|S32'a_size'|U32'$pad0'|ARR100{F64}$F64$'b'|S32'b_size'|U32'$pad1'|F64'sample_time'|ARR100{F64}$F64$'a_uncertainty'|ARR100{F64}$F64$'b_uncertainty']
 // file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 130

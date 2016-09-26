@@ -13,7 +13,6 @@ control_symex_verifyt::control_symex_verifyt(
 void control_symex_verifyt::process(const candidatet &candidate)
 {
   current_program=original_program;
-  symbol_tablet &st=current_program.st;
   goto_functionst &gf=current_program.gf;
   insert_solution(current_program, candidate);
   gf.update();
