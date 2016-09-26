@@ -391,7 +391,6 @@ C_volatile #volatile
 C_restricted #restricted
 C_identifier #identifier
 C_implicit #implicit
-C_qualifier #qualifier
 C_ptr32 #ptr32
 C_ptr64 #ptr64
 C_atomic #atomic
