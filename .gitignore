@@ -30,7 +30,12 @@ src/big-int/test-bigint.exe
 
 # files stored by editors
 *~
+
+# libs downloaded by make [name]-download
 libzip/
+zlib/
+minisat*/
+glucose-syrup/
 
 # flex/bison generated files
 src/ansi-c/ansi_c_lex.yy.cpp
