@@ -1,12 +1,21 @@
+#ifndef _FIXEDBV
+
 #ifndef _EXPONENT_WIDTH
 #define _EXPONENT_WIDTH 16
 #endif
 #ifndef _FRACTION_WIDTH
 #define _FRACTION_WIDTH 11
 #endif
-
 typedef __CPROVER_floatbv[_EXPONENT_WIDTH][_FRACTION_WIDTH] control_floatt;
-//typedef float control_floatt;
+
+#else
+
+#ifndef _CONTROL_FLOAT_WIDTH
+#define _CONTROL_FLOAT_WIDTH 16
+#endif
+typedef __CPROVER_fixedbv[_CONTROL_FLOAT_WIDTH][_CONTROL_FLOAT_WIDTH / 2] control_floatt;
+
+#endif
 
 // tag-#anon#ST[ARR100{F64}$F64$'a'|S32'a_size'|U32'$pad0'|ARR100{F64}$F64$'b'|S32'b_size'|U32'$pad1'|F64'sample_time'|ARR100{F64}$F64$'a_uncertainty'|ARR100{F64}$F64$'b_uncertainty']
 // file /home/lucascordeiro/dsverifier/bmc/core/definitions.h line 130
@@ -653,9 +662,9 @@ signed long int _fxp_one;
 /*struct anonymous$3 controller={ .a={ 1.0, 3.63545078000333, 0.0 }, .a_size=2,
     .b={ -18.7913011069951, 11.3839445828215 }, .b_size=2,
     .sample_time=0.5, .a_uncertainty={ 0.000000, 0.000000, 0.0 }, .b_uncertainty={ 0.000000, 0.000000 } };*/
-struct anonymous$3 controller={ .a={ 6.669159e-1f, -2.368256e+0f, 0.000000f }, .a_size=2,
-    .b={ 7.999949e+0f, -4.448562e+0f }, .b_size=2,
-    .sample_time=0.000000f, .a_uncertainty={ 0.000000f, 0.000000f, 0.000000f }, .b_uncertainty={ 0.000000f, 0.000000f } };
+struct anonymous$3 controller={ .a={ 6.669159e-1, -2.368256e+0, 0.000000 }, .a_size=2,
+    .b={ 7.999949e+0, -4.448562e+0 }, .b_size=2,
+    .sample_time=0.000000, .a_uncertainty={ 0.000000, 0.000000, 0.000000 }, .b_uncertainty={ 0.000000, 0.000000 } };
 // ds
 // file /home/lucascordeiro/dsverifier/bmc/core/realizations.h line 17
 extern struct anonymous$3 ds;
@@ -739,8 +748,8 @@ void binomial(signed int degree, control_floatt delta, control_floatt *out)
   for( ; degree >= i; i = i + 1)
   {
     signed int return_value_binomial_coefficient$1=binomial_coefficient(degree, i);
-    control_floatt return_value_internal_pow$2=internal_pow(delta, (double)(degree - i));
-    out[(signed long int)(degree - i)] = (double)return_value_binomial_coefficient$1 * return_value_internal_pow$2;
+    control_floatt return_value_internal_pow$2=internal_pow(delta, (control_floatt)(degree - i));
+    out[(signed long int)(degree - i)] = (control_floatt)return_value_binomial_coefficient$1 * return_value_internal_pow$2;
   }
 }
 
@@ -766,7 +775,7 @@ void call_closedloop_verification_task(void *closedloop_verification_task)
     if(plant.b_uncertainty[(signed long int)i] > 0.000000)
     {
       control_floatt call_closedloop_verification_task$$1$$1$$1$$1$$factor=(plant.b[(signed long int)i] * plant.b_uncertainty[(signed long int)i]) / 100.000000;
-      call_closedloop_verification_task$$1$$1$$1$$1$$factor = call_closedloop_verification_task$$1$$1$$1$$1$$factor < 0.000000 ? call_closedloop_verification_task$$1$$1$$1$$1$$factor * (double)-1 : call_closedloop_verification_task$$1$$1$$1$$1$$factor;
+      call_closedloop_verification_task$$1$$1$$1$$1$$factor = call_closedloop_verification_task$$1$$1$$1$$1$$factor < 0.000000 ? call_closedloop_verification_task$$1$$1$$1$$1$$factor * (control_floatt)-1 : call_closedloop_verification_task$$1$$1$$1$$1$$factor;
       control_floatt call_closedloop_verification_task$$1$$1$$1$$1$$min=plant.b[(signed long int)i] - call_closedloop_verification_task$$1$$1$$1$$1$$factor;
       control_floatt call_closedloop_verification_task$$1$$1$$1$$1$$max=plant.b[(signed long int)i] + call_closedloop_verification_task$$1$$1$$1$$1$$factor;
       if((signed int)base_case_executed == 1 && IEEE_FLOAT_EQUAL(call_closedloop_verification_task$$1$$1$$1$$1$$factor, 0.000000))
@@ -798,7 +807,7 @@ void call_closedloop_verification_task(void *closedloop_verification_task)
     if(plant.a_uncertainty[(signed long int)i] > 0.000000)
     {
       control_floatt factor=(plant.a[(signed long int)i] * plant.a_uncertainty[(signed long int)i]) / 100.000000;
-      factor = factor < 0.000000 ? factor * (double)-1 : factor;
+      factor = factor < 0.000000 ? factor * (control_floatt)-1 : factor;
       control_floatt min=plant.a[(signed long int)i] - factor;
       control_floatt max=plant.a[(signed long int)i] + factor;
       if((signed int)base_case_executed == 1 && IEEE_FLOAT_EQUAL(factor, 0.000000))
@@ -839,7 +848,7 @@ void call_verification_task(void *verification_task)
     if(ds.b_uncertainty[(signed long int)i] > 0.000000)
     {
       control_floatt factor=(ds.b[(signed long int)i] * ds.b_uncertainty[(signed long int)i]) / 100.000000;
-      factor = factor < 0.000000 ? factor * (double)-1 : factor;
+      factor = factor < 0.000000 ? factor * (control_floatt)-1 : factor;
       control_floatt call_verification_task$$1$$1$$1$$1$$min=ds.b[(signed long int)i] - factor;
       control_floatt call_verification_task$$1$$1$$1$$1$$max=ds.b[(signed long int)i] + factor;
       if((signed int)base_case_executed == 1 && IEEE_FLOAT_EQUAL(factor, 0.000000))
@@ -869,7 +878,7 @@ void call_verification_task(void *verification_task)
     if(ds.a_uncertainty[(signed long int)i] > 0.000000)
     {
       control_floatt call_verification_task$$1$$2$$1$$1$$factor=(ds.a[(signed long int)i] * ds.a_uncertainty[(signed long int)i]) / 100.000000;
-      call_verification_task$$1$$2$$1$$1$$factor = call_verification_task$$1$$2$$1$$1$$factor < 0.000000 ? call_verification_task$$1$$2$$1$$1$$factor * (double)-1 : call_verification_task$$1$$2$$1$$1$$factor;
+      call_verification_task$$1$$2$$1$$1$$factor = call_verification_task$$1$$2$$1$$1$$factor < 0.000000 ? call_verification_task$$1$$2$$1$$1$$factor * (control_floatt)-1 : call_verification_task$$1$$2$$1$$1$$factor;
       control_floatt min=ds.a[(signed long int)i] - call_verification_task$$1$$2$$1$$1$$factor;
       control_floatt max=ds.a[(signed long int)i] + call_verification_task$$1$$2$$1$$1$$factor;
       if((signed int)base_case_executed == 1 && IEEE_FLOAT_EQUAL(call_verification_task$$1$$2$$1$$1$$factor, 0.000000))
@@ -928,10 +937,10 @@ signed int check_stability(control_floatt *a, signed int n)
     i = 0;
     for( ; !(i >= n); i = i + 1)
     {
-      control_floatt return_value_internal_pow$1=internal_pow((double)-1, (double)((n - 1) - i));
+      control_floatt return_value_internal_pow$1=internal_pow((control_floatt)-1, (control_floatt)((n - 1) - i));
       sum = sum + a[(signed long int)i] * return_value_internal_pow$1;
     }
-    control_floatt return_value_internal_pow$2=internal_pow((double)-1, (double)(n - 1));
+    control_floatt return_value_internal_pow$2=internal_pow((control_floatt)-1, (control_floatt)(n - 1));
     sum = sum * return_value_internal_pow$2;
     if(sum <= 0.000000)
     {
@@ -1017,10 +1026,10 @@ signed int check_stability_closedloop(control_floatt *a, signed int n, control_f
   i = 0;
   for( ; !(i >= n); i = i + 1)
   {
-    control_floatt return_value_internal_pow$1=internal_pow((double)-1, (double)((n - 1) - i));
+    control_floatt return_value_internal_pow$1=internal_pow((control_floatt)-1, (control_floatt)((n - 1) - i));
     sum = sum + a[(signed long int)i] * return_value_internal_pow$1;
   }
-  control_floatt return_value_internal_pow$2=internal_pow((double)-1, (double)(n - 1));
+  control_floatt return_value_internal_pow$2=internal_pow((control_floatt)-1, (control_floatt)(n - 1));
   sum = sum * return_value_internal_pow$2;
   __DSVERIFIER_assert(sum > 0.000000);
   control_floatt return_value_internal_abs$3=internal_abs(a[(signed long int)(n - 1)]);
@@ -1103,7 +1112,7 @@ control_floatt determinant(control_floatt (*a)[20l], signed int n)
 
             }
           }
-          control_floatt return_value_internal_pow$1=internal_pow(-1.0, 1.0 + (double)j1 + 1.0);
+          control_floatt return_value_internal_pow$1=internal_pow(-1.0, 1.0 + (control_floatt)j1 + 1.0);
           control_floatt return_value_determinant$2=determinant(m, n - 1);
           det = det + return_value_internal_pow$1 * a[0l][(signed long int)j1] * return_value_determinant$2;
         }
@@ -1341,9 +1350,9 @@ control_floatt double_direct_form_1_MSP430(control_floatt *y, control_floatt *x,
     timer1 = timer1 + 57;
   }
   timer1 = timer1 + 3;
-  /* assertion (double) timer1 * hw.cycle <= ds.sample_time */
-  assert((double)timer1 * hw.cycle <= ds.sample_time);
-  if((double)timer1 * hw.cycle <= ds.sample_time)
+  /* assertion (control_floatt) timer1 * hw.cycle <= ds.sample_time */
+  assert((control_floatt)timer1 * hw.cycle <= ds.sample_time);
+  if((control_floatt)timer1 * hw.cycle <= ds.sample_time)
     (void)0;
 
   return sum;
@@ -1382,7 +1391,7 @@ void double_direct_form_1_impl2(control_floatt *x, signed int x_size, control_fl
       if(!(i >= j))
         break;
 
-      y[(signed long int)i] = y[(signed long int)i] + y[(signed long int)(i - j)] * (double)-1 * a[(signed long int)j];
+      y[(signed long int)i] = y[(signed long int)i] + y[(signed long int)(i - j)] * (control_floatt)-1 * a[(signed long int)j];
     }
   }
 }
@@ -1462,9 +1471,9 @@ control_floatt double_direct_form_2_MSP430(control_floatt *w, control_floatt x, 
     timer1 = timer1 + 46;
   }
   timer1 = timer1 + 38;
-  /* assertion (double) timer1 * hw.cycle <= ds.sample_time */
-  assert((double)timer1 * hw.cycle <= ds.sample_time);
-  if((double)timer1 * hw.cycle <= ds.sample_time)
+  /* assertion (control_floatt) timer1 * hw.cycle <= ds.sample_time */
+  assert((control_floatt)timer1 * hw.cycle <= ds.sample_time);
+  if((control_floatt)timer1 * hw.cycle <= ds.sample_time)
     (void)0;
 
   return sum;
@@ -1699,9 +1708,9 @@ control_floatt double_transposed_direct_form_2_MSP430(control_floatt *w, control
     timer1 = timer1 + 54;
   }
   timer1 = timer1 + 7;
-  /* assertion (double) timer1 * hw.cycle <= ds.sample_time */
-  assert((double)timer1 * hw.cycle <= ds.sample_time);
-  if((double)timer1 * hw.cycle <= ds.sample_time)
+  /* assertion (control_floatt) timer1 * hw.cycle <= ds.sample_time */
+  assert((control_floatt)timer1 * hw.cycle <= ds.sample_time);
+  if((control_floatt)timer1 * hw.cycle <= ds.sample_time)
     (void)0;
 
   return yout;
@@ -2100,7 +2109,7 @@ control_floatt fxp_determinant(signed long int (*a_fxp)[20l], signed int n)
 
             }
           }
-          control_floatt return_value_internal_pow$1=internal_pow(-1.0, 1.0 + (double)j1 + 1.0);
+          control_floatt return_value_internal_pow$1=internal_pow(-1.0, 1.0 + (control_floatt)j1 + 1.0);
           control_floatt return_value_determinant$2=determinant(m, n - 1);
           det = det + return_value_internal_pow$1 * a[0l][(signed long int)j1] * return_value_determinant$2;
         }
@@ -2256,7 +2265,7 @@ signed long int fxp_double_to_fxp(control_floatt value)
     if(ROUNDING_MODE == 1)
     {
       tmp = (signed long int)ftemp;
-      control_floatt residue=ftemp - (double)tmp;
+      control_floatt residue=ftemp - (control_floatt)tmp;
       if(value < 0.000000 && IEEE_FLOAT_NOTEQUAL(residue, 0.000000))
       {
         ftemp = ftemp - 1.000000;
@@ -2358,7 +2367,7 @@ void fxp_exp_matrix(unsigned int lines, unsigned int columns, signed long int (*
 signed long int fxp_control_floatt_to_fxp(control_floatt f)
 {
   signed long int tmp;
-  control_floatt ftemp=(double)f * scale_factor[(signed long int)impl.frac_bits];
+  control_floatt ftemp=(control_floatt)f * scale_factor[(signed long int)impl.frac_bits];
   if(f >= 0.000000f)
     tmp = (signed long int)(ftemp + 0.5);
 
@@ -2520,7 +2529,7 @@ control_floatt fxp_log10_low(control_floatt x)
   signed int xint=(signed int)(x * 65536.0 + 0.5);
   signed int lnum=fxp_ln(xint);
   signed int lden=fxp_ln(655360);
-  return (double)lnum / (double)lden;
+  return (control_floatt)lnum / (control_floatt)lden;
 }
 
 // fxp_matrix_multiplication
@@ -2842,7 +2851,7 @@ control_floatt fxp_to_double(signed long int fxp)
 {
   control_floatt f;
   signed int f_int=(signed int)fxp;
-  f = (double)f_int * scale_factor_inv[(signed long int)impl.frac_bits];
+  f = (control_floatt)f_int * scale_factor_inv[(signed long int)impl.frac_bits];
   return f;
 }
 
@@ -2861,7 +2870,7 @@ control_floatt fxp_to_control_floatt(signed long int fxp)
 {
   control_floatt f;
   signed int f_int=(signed int)fxp;
-  f = (control_floatt)((double)f_int * scale_factor_inv[(signed long int)impl.frac_bits]);
+  f = (control_floatt)((control_floatt)f_int * scale_factor_inv[(signed long int)impl.frac_bits]);
   return f;
 }
 
@@ -3233,9 +3242,9 @@ control_floatt iirIIOutTime(control_floatt *w, control_floatt x, control_floatt 
     timer1 = timer1 + 46;
   }
   timer1 = timer1 + 38;
-  /* assertion (double)timer1*CYCLE <= (double)DEADLINE */
-  assert(((double)timer1 * 1.000000) / 1.600000e+7 <= 1.000000 / 100.000000);
-  if((double)timer1 / 1.600000e+7 <= 1.000000 / 100.000000)
+  /* assertion (control_floatt)timer1*CYCLE <= (control_floatt)DEADLINE */
+  assert(((control_floatt)timer1 * 1.000000) / 1.600000e+7 <= 1.000000 / 100.000000);
+  if((control_floatt)timer1 / 1.600000e+7 <= 1.000000 / 100.000000)
     (void)0;
 
   return sum;
@@ -3280,9 +3289,9 @@ control_floatt iirIItOutTime(control_floatt *w, control_floatt x, control_floatt
     timer1 = timer1 + 54;
   }
   timer1 = timer1 + 7;
-  /* assertion (double)timer1*CYCLE <= (double)DEADLINE */
-  assert(((double)timer1 * 1.000000) / 1.600000e+7 <= 1.000000 / 100.000000);
-  if((double)timer1 / 1.600000e+7 <= 1.000000 / 100.000000)
+  /* assertion (control_floatt)timer1*CYCLE <= (control_floatt)DEADLINE */
+  assert(((control_floatt)timer1 * 1.000000) / 1.600000e+7 <= 1.000000 / 100.000000);
+  if((control_floatt)timer1 / 1.600000e+7 <= 1.000000 / 100.000000)
     (void)0;
 
   return yout;
@@ -3327,9 +3336,9 @@ control_floatt iirIItOutTime_double(control_floatt *w, control_floatt x, control
     timer1 = timer1 + 54;
   }
   timer1 = timer1 + 7;
-  /* assertion (double)timer1*CYCLE <= (double)DEADLINE */
-  assert(((double)timer1 * 1.000000) / 1.600000e+7 <= 1.000000 / 100.000000);
-  if((double)timer1 / 1.600000e+7 <= 1.000000 / 100.000000)
+  /* assertion (control_floatt)timer1*CYCLE <= (control_floatt)DEADLINE */
+  assert(((control_floatt)timer1 * 1.000000) / 1.600000e+7 <= 1.000000 / 100.000000);
+  if((control_floatt)timer1 / 1.600000e+7 <= 1.000000 / 100.000000)
     (void)0;
 
   return yout;
@@ -3710,10 +3719,10 @@ void initialization()
   else
   {
     if(IEEE_FLOAT_NOTEQUAL(impl.min, 0.000000))
-      impl.min = impl.min / (double)impl.scale;
+      impl.min = impl.min / (control_floatt)impl.scale;
 
     if(IEEE_FLOAT_NOTEQUAL(impl.max, 0.000000))
-      impl.max = impl.max / (double)impl.scale;
+      impl.max = impl.max / (control_floatt)impl.scale;
 
   }
 }
@@ -3741,7 +3750,7 @@ control_floatt internal_pow(control_floatt a, control_floatt b)
   signed int i;
   control_floatt acc=1.000000;
   i = 0;
-  for( ; (double)i < b; i = i + 1)
+  for( ; (control_floatt)i < b; i = i + 1)
     acc = acc * a;
   return acc;
 }
@@ -3754,7 +3763,6 @@ signed int main()
   validation();
   ROUNDING_MODE = 1;
   call_closedloop_verification_task((void *)verify_stability_closedloop_using_dslib);
-  __DSVERIFIER_assert(controller.a[0] == 1.0);
   return 0;
 }
 
@@ -4018,7 +4026,7 @@ control_floatt snrPoint(control_floatt *s, control_floatt *n, signed int blksz)
   for( ; !(i >= blksz); i = i + 1)
     if(!IEEE_FLOAT_EQUAL(n[(signed long int)i], 0.000000f))
     {
-      ratio = (double)(s[(signed long int)i] / n[(signed long int)i]);
+      ratio = (control_floatt)(s[(signed long int)i] / n[(signed long int)i]);
       if(!(ratio < -150.000000) && !(ratio > 150.000000))
       {
         power = ratio * ratio;
@@ -4045,8 +4053,8 @@ control_floatt snrPower(control_floatt *s, control_floatt *n, signed int blksz)
   i = 0;
   for( ; !(i >= blksz); i = i + 1)
   {
-    sv = sv + (double)(s[(signed long int)i] * s[(signed long int)i]);
-    nv = nv + (double)(n[(signed long int)i] * n[(signed long int)i]);
+    sv = sv + (control_floatt)(s[(signed long int)i] * s[(signed long int)i]);
+    nv = nv + (control_floatt)(n[(signed long int)i] * n[(signed long int)i]);
   }
   if(IEEE_FLOAT_NOTEQUAL(nv, 0.000000))
   {
@@ -4076,16 +4084,16 @@ control_floatt snrVariance(control_floatt *s, control_floatt *n, signed int blks
   i = 0;
   for( ; !(i >= blksz); i = i + 1)
   {
-    sm = sm + (double)s[(signed long int)i];
-    nm = nm + (double)n[(signed long int)i];
+    sm = sm + (control_floatt)s[(signed long int)i];
+    nm = nm + (control_floatt)n[(signed long int)i];
   }
-  sm = sm / (double)blksz;
-  nm = nm / (double)blksz;
+  sm = sm / (control_floatt)blksz;
+  nm = nm / (control_floatt)blksz;
   i = 0;
   for( ; !(i >= blksz); i = i + 1)
   {
-    sv = sv + ((double)s[(signed long int)i] - sm) * ((double)s[(signed long int)i] - sm);
-    nv = nv + ((double)n[(signed long int)i] - nm) * ((double)n[(signed long int)i] - nm);
+    sv = sv + ((control_floatt)s[(signed long int)i] - sm) * ((control_floatt)s[(signed long int)i] - sm);
+    nv = nv + ((control_floatt)n[(signed long int)i] - nm) * ((control_floatt)n[(signed long int)i] - nm);
   }
   if(IEEE_FLOAT_NOTEQUAL(nv, 0.000000))
   {
@@ -4422,7 +4430,7 @@ signed int verify_error(void)
   {
     control_floatt __quant_error;
     control_floatt return_value_fxp_to_double$3=fxp_to_double((signed long int)yf[(signed long int)i]);
-    __quant_error = ((return_value_fxp_to_double$3 - (double)y[(signed long int)i]) / (double)y[(signed long int)i]) * 100.000000;
+    __quant_error = ((return_value_fxp_to_double$3 - (control_floatt)y[(signed long int)i]) / (control_floatt)y[(signed long int)i]) * 100.000000;
     __DSVERIFIER_assert(__quant_error < impl.max_error && __quant_error > -impl.max_error);
   }
   return 0;
@@ -4670,7 +4678,7 @@ signed int verify_generic_timing(void)
   {
     y[(signed long int)i] = 0.000000;
     control_floatt return_value_nondet_control_floatt$1=nondet_control_floatt();
-    x[(signed long int)i] = (double)return_value_nondet_control_floatt$1;
+    x[(signed long int)i] = (control_floatt)return_value_nondet_control_floatt$1;
     _Bool tmp_if_expr$2;
     if(x[(signed long int)i] >= impl.min)
       tmp_if_expr$2 = x[(signed long int)i] <= impl.max ? (_Bool)1 : (_Bool)0;
@@ -4705,13 +4713,13 @@ signed int verify_generic_timing(void)
   control_floatt *wptr;
   signed int j;
   generic_timer = generic_timer + 2 * hw.assembly.std + 1 * hw.assembly.rjmp;
-  control_floatt initial_timer=(double)generic_timer;
+  control_floatt initial_timer=(control_floatt)generic_timer;
   i = 0;
   for( ; !(i >= X_SIZE_VALUE); i = i + 1)
   {
     generic_timer = generic_timer + 2 * hw.assembly.ldd + 1 * hw.assembly.adiw + 2 * hw.assembly.std;
     generic_timer = generic_timer + 2 * hw.assembly.ldd + 1 * hw.assembly.cpi + 1 * hw.assembly.cpc + 1 * hw.assembly.brlt;
-    control_floatt spent_time=(double)generic_timer * hw.cycle;
+    control_floatt spent_time=(control_floatt)generic_timer * hw.cycle;
     /* assertion spent_time <= ds.sample_time */
     assert(spent_time <= ds.sample_time);
     if(spent_time <= ds.sample_time)
@@ -4852,7 +4860,7 @@ signed int verify_limit_cycle_closed_loop(void)
   for( ; !(i >= Nw); i = i + 1)
   {
     signed int return_value_nondet_int$1=nondet_int();
-    waux[(signed long int)i] = (double)return_value_nondet_int$1;
+    waux[(signed long int)i] = (control_floatt)return_value_nondet_int$1;
     _Bool tmp_if_expr$2;
     if(waux[(signed long int)i] >= impl.min)
       tmp_if_expr$2 = waux[(signed long int)i] <= impl.max ? (_Bool)1 : (_Bool)0;
@@ -5182,7 +5190,7 @@ signed int verify_timing_msp_430(void)
   {
     y[(signed long int)i] = 0.000000;
     control_floatt return_value_nondet_control_floatt$1=nondet_control_floatt();
-    x[(signed long int)i] = (double)return_value_nondet_control_floatt$1;
+    x[(signed long int)i] = (control_floatt)return_value_nondet_control_floatt$1;
     _Bool tmp_if_expr$2;
     if(x[(signed long int)i] >= impl.min)
       tmp_if_expr$2 = x[(signed long int)i] <= impl.max ? (_Bool)1 : (_Bool)0;

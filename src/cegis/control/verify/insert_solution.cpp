@@ -33,9 +33,8 @@ void set_array(struct_exprt::operandst &ops, const symbol_tablet &st,
   const typet &size_type=control_runtime_array_size_type(st);
   const constant_exprt size(from_integer(array.operands().size(), size_type));
   const char * const sz_comp=
-  CEGIS_CONTROL_A_MEMBER_NAME ?
-  CEGIS_CONTROL_A_SIZE_MEMBER_NAME :
-                                CEGIS_CONTROL_B_SIZE_MEMBER_NAME;
+      std::string(CEGIS_CONTROL_A_MEMBER_NAME) == comp ?
+          CEGIS_CONTROL_A_SIZE_MEMBER_NAME : CEGIS_CONTROL_B_SIZE_MEMBER_NAME;
   get_comp(ops, struct_type, sz_comp)=size;
 }
 
