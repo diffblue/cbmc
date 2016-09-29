@@ -232,7 +232,7 @@ size_t get_variable_slots(const code_typet::parametert &param)
   return count_slots(0, param);
 }
 
-bool is_contructor(const class_typet::methodt &method)
+bool is_constructor(const class_typet::methodt &method)
 {
   const std::string &name(id2string(method.get_name()));
   const std::string::size_type &npos(std::string::npos);
@@ -382,7 +382,7 @@ void java_bytecode_convert_methodt::convert(
   method.set(ID_abstract, m.is_abstract);
   method.set(ID_is_virtual, is_virtual);
 
-  if(is_contructor(method))
+  if(is_constructor(method))
     method.set(ID_constructor, true);
 
   method.type()=member_type;

@@ -131,8 +131,8 @@ json_objectt json(
   {
     result["name"]=json_stringt("struct");
     json_arrayt &members=result["members"].make_array();
-    const union_typet::componentst &components=
-      to_union_type(type).components();
+    const struct_typet::componentst &components=
+      to_struct_type(type).components();
     for(const auto & it : components)
     {
       json_objectt &e=members.push_back().make_object();

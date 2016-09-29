@@ -343,7 +343,7 @@ protected:
   unsigned number_of_errors;
   irep_idt current_function;
 
-  void merge_types(typet &src, typet &dest);
+  void merge_types(const typet &src, typet &dest);
 
   void set_location(irept &dest, const cpp_tokent &token)
   {
@@ -355,12 +355,22 @@ protected:
       source_location.set_function(current_function);
   }
 
-  void make_subtype(typet &src, typet &dest)
+  void make_subtype(const typet &src, typet &dest)
   {
     typet *p=&dest;
+    
     while(p->id()!=irep_idt() && p->is_not_nil())
-      p=&p->subtype();
-    p->swap(src);
+    {
+      if(p->id()==ID_merged_type)
+      {
+        assert(!p->subtypes().empty());
+        p=&p->subtypes().back();
+      }
+      else
+        p=&p->subtype();
+    }
+    
+    *p=src;
   }
 
   unsigned int max_errors;
@@ -452,7 +462,7 @@ void Parser::make_sub_scope(const irep_idt &id, new_scopet::kindt kind)
 
 /*******************************************************************\
 
-Function:
+Function: Parser::rString
 
   Inputs:
 
@@ -472,7 +482,7 @@ bool Parser::rString(cpp_tokent &tk)
 
 /*******************************************************************\
 
-Function:
+Function: Parser::merge_types
 
   Inputs:
 
@@ -482,22 +492,22 @@ Function:
 
 \*******************************************************************/
 
-void Parser::merge_types(typet &src, typet &dest)
+void Parser::merge_types(const typet &src, typet &dest)
 {
   if(src.is_nil()) return;
 
   if(dest.is_nil())
-    dest.swap(src);
+    dest=src;
   else
   {
     if(dest.id()!=ID_merged_type)
     {
       typet tmp(ID_merged_type);
       tmp.move_to_subtypes(dest);
-      dest.swap(tmp);
+      dest=tmp;
     }
 
-    dest.move_to_subtypes(src);
+    dest.copy_to_subtypes(src);
   }
 }
 
@@ -3428,7 +3438,7 @@ bool Parser::rDeclarator(
 
 /*******************************************************************\
 
-Function:
+Function: Parser::optPtrOperator
 
   Inputs:
 
@@ -3461,17 +3471,21 @@ bool Parser::optPtrOperator(typet &ptrs)
 
     if(t=='*')
     {
-      typet op(ID_pointer);
+      pointer_typet op;
       cpp_tokent tk;
       lex.get_token(tk);
       set_location(op, tk);
 
       typet cv;
       cv.make_nil();
-      optCvQualify(cv);
-      op.add(ID_C_qualifier).swap(cv);
-
-      t_list.push_back(op);
+      optCvQualify(cv); // the qualifier is for the pointer
+      if(cv.is_not_nil())
+      {
+        merge_types(op, cv);
+        t_list.push_back(cv);
+      }
+      else
+        t_list.push_back(op);
     }
     else if(t=='^')
     {
@@ -3483,10 +3497,14 @@ bool Parser::optPtrOperator(typet &ptrs)
 
       typet cv;
       cv.make_nil();
-      optCvQualify(cv);
-      op.add(ID_C_qualifier).swap(cv);
-
-      t_list.push_back(op);
+      optCvQualify(cv); // the qualifier is for the pointer
+      if(cv.is_not_nil())
+      {
+        merge_types(op, cv);
+        t_list.push_back(cv);
+      }
+      else
+        t_list.push_back(op);
     }
     else if(isPtrToMember(0))
     {
@@ -3496,10 +3514,14 @@ bool Parser::optPtrOperator(typet &ptrs)
 
       typet cv;
       cv.make_nil();
-      optCvQualify(cv);
-      op.add(ID_C_qualifier).swap(cv);
-
-      t_list.push_back(op);
+      optCvQualify(cv); // the qualifier is for the pointer
+      if(cv.is_not_nil())
+      {
+        merge_types(op, cv);
+        t_list.push_back(cv);
+      }
+      else
+        t_list.push_back(op);
     }
     else
       break;
@@ -3533,7 +3555,17 @@ bool Parser::optPtrOperator(typet &ptrs)
       it!=t_list.rend();
       it++)
   {
-    it->subtype().swap(ptrs);
+    if(it->id()==ID_merged_type)
+    {
+      assert(!it->subtypes().empty());
+      it->subtypes().back().subtype().swap(ptrs);
+    }
+    else
+    {
+      assert(it->is_not_nil());
+      it->subtype().swap(ptrs);
+    }
+
     ptrs.swap(*it);
   }
 
@@ -3947,7 +3979,7 @@ bool Parser::rOperatorName(irept &name)
 
 /*******************************************************************\
 
-Function:
+Function: Parser::rCastOperatorName
 
   Inputs:
 
@@ -3991,33 +4023,12 @@ bool Parser::rCastOperatorName(irept &name)
 
   if(!optPtrOperator(ptr))
     return false;
+    
+  make_subtype(type_name, ptr);
+  merge_types(cv2, ptr);
+  name = ptr;
 
-  if(ptr.is_nil())
-  {
-    name=type_name;
-    return true;
-  }
-  else
-  {
-    std::list<typet> t_list;
-    do
-    {
-      t_list.push_back(ptr);
-      typet tmp = ptr.subtype();
-      ptr = tmp;
-    }while(ptr.is_not_nil());
-
-    ptr = type_name;
-    while(!t_list.empty())
-    {
-      t_list.back().subtype() = ptr;
-      ptr = t_list.back();
-      t_list.pop_back();
-    }
-    merge_types(cv2,ptr);
-    name = ptr;
-    return true;
-  }
+  return true;
 }
 
 /*******************************************************************\
@@ -6117,6 +6128,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
 
     if(!optPtrOperator(tname))
       return false;
+
     return true;
   }
 
@@ -7498,7 +7510,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_NULLPTR:
     lex.get_token(tk);
-    exp=constant_exprt(ID_nullptr, typet(ID_nullptr));
+    exp=constant_exprt(ID_NULL, pointer_typet(typet(ID_nullptr)));
     set_location(exp, tk);
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 6\n";

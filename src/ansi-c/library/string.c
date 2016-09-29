@@ -225,7 +225,7 @@ inline char *strcat(char *dst, const char *src)
   char ch;
   do
   {
-    char ch=src[j];
+    ch=src[j];
     dst[i]=ch;
     i++;
     j++;

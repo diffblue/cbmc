@@ -55,7 +55,7 @@ void climb_pid_run()
 
 int main()
 {
-  /** Random initialisation */ 
+  /** Non-deterministic initialisation */ 
   desired_climb=nondet_float();
   estimator_z_dot=nondet_float();
 

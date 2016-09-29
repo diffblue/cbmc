@@ -115,8 +115,7 @@ std::string cpp_type2name(const typet &type)
 {
   std::string result;
 
-  if(type.get_bool(ID_C_constant) ||
-     type.get(ID_C_qualifier)==ID_const)
+  if(type.get_bool(ID_C_constant))
     result+="const_";
   
   if(type.get_bool(ID_C_restricted))
