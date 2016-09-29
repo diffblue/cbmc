@@ -121,6 +121,28 @@ void call_grapht::output_dot(std::ostream &out) const
   out << "}\n";
 }
 
+
+void call_grapht::output_dot(
+    goto_functionst const&  functions,
+    std::ostream &out
+    ) const
+{
+  out << "digraph call_graph {\n";
+  for (auto const&  elem : functions.function_map)
+    out << "  \"" << elem.first << "\";\n";
+  for(grapht::const_iterator it=graph.begin();
+      it!=graph.end();
+      it++)
+  {
+    out << "  \"" << it->first << "\" -> "
+        << "\"" << it->second << "\" "
+        << " [arrowhead=\"vee\"];"
+        << "\n";
+  }
+  out << "}\n";
+}
+
+
 /*******************************************************************\
 
 Function: call_grapht::output
@@ -163,4 +185,34 @@ void call_grapht::output_xml(std::ostream &out) const
     xmlt::escape_attribute(id2string(edge.second), out);
     out << "\">\n";
   }
+}
+
+
+call_grapht::call_edges_ranget
+call_grapht::out_edges(irep_idt const&  caller) const
+{
+  return graph.equal_range(caller);
+}
+
+
+void  inverted_partial_topological_order(
+    call_grapht const&  call_graph,
+    irep_idt const&  start_function,
+    std::unordered_set<irep_idt,dstring_hash>&  processed_functions,
+    std::vector<irep_idt>&  output
+    )
+{
+  if (processed_functions.count(start_function) != 0ULL)
+    return;
+  processed_functions.insert(start_function);
+  call_grapht::call_edges_ranget const  range =
+      call_graph.out_edges(start_function);
+  for (auto  it = range.first; it != range.second; ++it)
+    inverted_partial_topological_order(
+          call_graph,
+          it->second,
+          processed_functions,
+          output
+          );
+  output.push_back(start_function);
 }
