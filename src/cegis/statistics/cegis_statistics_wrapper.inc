@@ -86,6 +86,7 @@ void cegis_statistics_wrappert<learnt, verifyt, mstreamt>::verify(
     }
     os << "</counterexamples>" << messaget::endl;
     show_candidate(os);
+    os << messaget::eom;
   }
 }
 

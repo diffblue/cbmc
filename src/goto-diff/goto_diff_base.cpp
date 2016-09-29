@@ -7,6 +7,7 @@ Author: Peter Schrammel
 \*******************************************************************/
 
 #include <util/i2string.h>
+#include <util/json_expr.h>
 
 #include "goto_diff.h"
 
@@ -126,7 +127,10 @@ void goto_difft::convert_function(
 {
   const goto_programt &program=
     goto_model2.goto_functions.function_map.at(function_name).body;
-  result["file"]=json_stringt(
-    id2string(program.instructions.begin()->source_location.get_file()));
+  if(!program.instructions.empty())
+  {
+    result["sourceLocation"]=
+      json(program.instructions.begin()->source_location);
+  }
   result["name"]=json_stringt(id2string(function_name));
 }

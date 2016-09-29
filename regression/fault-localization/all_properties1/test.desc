@@ -1,0 +1,9 @@
+CORE
+main.c
+--localize-faults
+^EXIT=10$
+^SIGNAL=0$
+line 7 function main$
+line 6 function main$
+^VERIFICATION FAILED$
+--

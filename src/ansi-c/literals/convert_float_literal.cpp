@@ -45,8 +45,6 @@ exprt convert_float_literal(const std::string &src)
 
   exprt result=exprt(ID_constant);
   
-  result.set(ID_C_cformat, src);
-  
   // In ANSI-C, float literals are double by default,
   // unless marked with 'f'.
   // All of these can be complex as well.

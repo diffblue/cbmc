@@ -23,8 +23,8 @@ public:
   symbol_tablet symbol_table;
   
   language_uit(
-    const std::string &program,
-    const cmdlinet &__cmdline);
+    const cmdlinet &__cmdline,
+    ui_message_handlert &ui_message_handler);
   virtual ~language_uit();
 
   virtual bool parse();
@@ -48,7 +48,7 @@ public:
     return ui_message_handler.get_ui();
   }
   
-  ui_message_handlert ui_message_handler;
+  ui_message_handlert &ui_message_handler;
 
 protected:
   const cmdlinet &_cmdline;

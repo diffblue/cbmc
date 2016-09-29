@@ -34,11 +34,14 @@ public:
 
   goto_fence_inserter_parse_optionst(int argc, const char **argv):
     parse_options_baset(GOTO_FENCE_INSERTER_OPTIONS, argc, argv),
-    language_uit("goto-instrument", cmdline)
+    language_uit(cmdline, ui_message_handler),
+    ui_message_handler(cmdline, "musketeer")
   {
   }
   
 protected:
+  ui_message_handlert ui_message_handler;
+
   virtual void register_languages();
 
   void get_goto_program(

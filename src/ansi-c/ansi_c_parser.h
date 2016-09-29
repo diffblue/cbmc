@@ -127,17 +127,18 @@ public:
   }
 
   ansi_c_id_classt lookup(
-    std::string &name,
+    const irep_idt &base_name, // in
+    irep_idt &identifier, // out
     bool tag,
     bool label);
 
   static ansi_c_id_classt get_class(const typet &type);
   
-  irep_idt lookup_label(const irep_idt id)
+  irep_idt lookup_label(const irep_idt base_name)
   {
-    std::string name=id2string(id);
-    lookup(name, false, true);
-    return name;
+    irep_idt identifier;
+    lookup(base_name, identifier, false, true);
+    return identifier;
   }
 };
 

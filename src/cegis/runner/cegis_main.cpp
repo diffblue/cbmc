@@ -1,18 +1,10 @@
 /*******************************************************************\
 
-Module: CBMC Main Module 
+Module: CEGIS Main Module 
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
-
-/*
-
-  CBMC
-  Bounded Model Checking for ANSI-C
-  Copyright (C) 2001-2014 Daniel Kroening <kroening@kroening.com>
-
-*/
 
 #include <util/unicode.h>
 

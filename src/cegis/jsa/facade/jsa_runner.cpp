@@ -12,6 +12,7 @@
 #include <cegis/genetic/learn_preprocess_seed.h>
 #include <cegis/learn/concurrent_learn.h>
 #include <cegis/jsa/value/jsa_genetic_solution.h>
+#include <cegis/jsa/value/default_solution.h>
 #include <cegis/jsa/genetic/jsa_source_provider.h>
 #include <cegis/jsa/genetic/jsa_random.h>
 #include <cegis/jsa/genetic/jsa_serialiser.h>
@@ -29,14 +30,22 @@ namespace
 {
 typedef messaget::mstreamt mstreamt;
 
+std::function<void(jsa_solutiont &)> get_default_solution(
+    const jsa_programt &prog)
+{
+  return [&prog](jsa_solutiont &solution)
+  { if (solution.invariant.empty()) solution=default_jsa_solution(prog);};
+}
+
 template<class oraclet, class prept>
 int run_with_ga(const symbol_tablet &st, const optionst &o, mstreamt &result,
     jsa_symex_learnt &l, oraclet &oracle, prept &prep)
 {
-  jsa_source_providert source_provider(o, l);
+  jsa_source_providert source_provider(l);
   dynamic_jsa_test_runnert test_runner(std::ref(source_provider));
-  typedef lazy_fitnesst<jsa_populationt, dynamic_jsa_test_runnert,
-      jsa_counterexamplet> fitnesst;
+  typedef lazy_fitnesst<jsa_populationt,
+                        dynamic_jsa_test_runnert,
+                        jsa_counterexamplet> fitnesst;
   fitnesst fitness(test_runner);
   typedef match_selectt<jsa_populationt> selectt;
   const selectt::test_case_datat &test_case_data=fitness.get_test_case_data();
@@ -71,7 +80,7 @@ int run_jsa(optionst &o, mstreamt &result, const symbol_tablet &st,
   jsa_preprocessingt prep(o, st, gf);
   const jsa_programt &prog=prep.get_jsa_program();
   jsa_symex_learnt lcfg(prog);
-  cegis_symex_learnt<jsa_preprocessingt, jsa_symex_learnt> learn(o, prep, lcfg);
+  cegis_symex_learnt<jsa_preprocessingt, jsa_symex_learnt> learn(o, prep, lcfg, get_default_solution(prog));
   jsa_symex_verifyt vcfg(prog);
   cegis_symex_verifyt<jsa_symex_verifyt> oracle(o, vcfg);
   if (o.get_bool_option(CEGIS_GENETIC))

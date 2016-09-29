@@ -44,8 +44,8 @@ extern jmp_buf __CPROVER_jsa_jump_buffer;
 #ifndef __CPROVER_JSA_MAX_LISTS
 #define __CPROVER_JSA_MAX_LISTS __CPROVER_JSA_MAX_ITERATORS
 #endif
-#ifndef __CPROVER_JSA_MAX_NODES_PER_LIST
-#define __CPROVER_JSA_MAX_NODES_PER_LIST __CPROVER_JSA_MAX_NODES
+#ifndef __CPROVER_JSA_MAX_NODES_PER_CE_LIST
+#define __CPROVER_JSA_MAX_NODES_PER_CE_LIST __CPROVER_JSA_MAX_NODES
 #endif
 #if __CPROVER_JSA_MAX_LISTS < 1
 #error "JSA needs at least one list variable for analysis."
@@ -299,6 +299,8 @@ __CPROVER_jsa_inline __CPROVER_jsa_node_id_t __CPROVER_jsa__internal_remove(
   }
   if (__CPROVER_jsa_null != next_node_id)
     __CPROVER_jsa__internal_set_previous(heap, next_node_id, previous_node_id);
+  heap->concrete_nodes[node_id_to_remove].value=__CPROVER_jsa_null;
+  heap->concrete_nodes[node_id_to_remove].list=__CPROVER_jsa_null;
   return next_node_id;
 }
 #else
@@ -354,11 +356,13 @@ __CPROVER_jsa_inline void __CPROVER_jsa__internal_assume_linking_correct(
   {
     __CPROVER_jsa_assume(node_id == __CPROVER_jsa__internal_get_next(heap, prev));
     __CPROVER_jsa_assume(prev < node_id);
+    __CPROVER_jsa_assume(__CPROVER_jsa__internal_get_list(heap, node_id) == __CPROVER_jsa__internal_get_list(heap, prev));
   }
   if (__CPROVER_jsa_null != next)
   {
     __CPROVER_jsa_assume(node_id == __CPROVER_jsa__internal_get_previous(heap, next));
     __CPROVER_jsa_assume(node_id < next);
+    __CPROVER_jsa_assume(__CPROVER_jsa__internal_get_list(heap, node_id) == __CPROVER_jsa__internal_get_list(heap, next));
   }
 }
 #else
@@ -442,6 +446,10 @@ __CPROVER_jsa_inline void __CPROVER_jsa__internal_assume_is_neighbour(
 }
 #else
 ;
+#endif
+
+#ifdef __CPROVER_JSA_DYNAMIC_TEST_RUNNER
+void __CPROVER_jsa_internal__clear_temps(void);
 #endif
 
 __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_list(
@@ -564,6 +572,16 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(const __CPROVER_jsa_ab
         __CPROVER_jsa__internal_assume_is_neighbour(h, next_node, next_index, prev_node, prev_index);
     }
   }
+  // Limit list sizes in counterexamples
+  for (__CPROVER_jsa__internal_index_t listc=0; listc < __CPROVER_JSA_MAX_LISTS; ++listc)
+  {
+    __CPROVER_jsa__internal_index_t count=0;
+    for (__CPROVER_jsa__internal_index_t cnodec=0; cnodec < __CPROVER_JSA_MAX_CONCRETE_NODES; ++cnodec)
+      if (h->concrete_nodes[cnodec].list == listc) ++count;
+    for (__CPROVER_jsa__internal_index_t anodec=0; anodec < __CPROVER_JSA_MAX_ABSTRACT_NODES; ++anodec)
+      if (h->abstract_nodes[anodec].list == listc) ++count;
+    __CPROVER_jsa_assume(count <= __CPROVER_JSA_MAX_NODES_PER_CE_LIST);
+  }
 }
 #else
 ;
@@ -596,13 +614,15 @@ __CPROVER_jsa_inline __CPROVER_jsa_iterator_id_t __CPROVER_jsa_iterator(
       /*.node_id=*/__CPROVER_jsa__internal_get_head_node(heap, list),
       /*.previous_node_id=*/__CPROVER_jsa_null,
       /*.index=*/0,
-      /*.previous_index=*/0 };
+      /*.previous_index=*/0,
+      /*.list=*/list };
 #else
   const __CPROVER_jsa_iteratort tmp = {
       .node_id=__CPROVER_jsa__internal_get_head_node(heap, list),
       .previous_node_id=__CPROVER_jsa_null,
       .index=0,
-      .previous_index=0 };
+      .previous_index=0,
+      .list=list };
 #endif
   heap->iterators[new_iterator]=tmp;
   return new_iterator;
@@ -665,16 +685,10 @@ __CPROVER_jsa_inline void __CPROVER_jsa_add(
     const __CPROVER_jsa_word_t value)
 #ifdef __CPROVER_JSA_DEFINE_TRANSFORMERS
 {
-#ifdef __CPROVER
-  const __CPROVER_jsa_node_id_t new_node;
-  __CPROVER_jsa_assume(new_node < __CPROVER_JSA_MAX_CONCRETE_NODES);
-  __CPROVER_jsa_assume(__CPROVER_jsa_null == heap->concrete_nodes[new_node].list);
-#else
   __CPROVER_jsa_node_id_t new_node;
   for (new_node=0; new_node < __CPROVER_JSA_MAX_CONCRETE_NODES; ++new_node)
     if (__CPROVER_jsa_null == heap->concrete_nodes[new_node].list) break;
   __CPROVER_jsa_assume(new_node < __CPROVER_JSA_MAX_CONCRETE_NODES);
-#endif
   heap->concrete_nodes[new_node].list=list;
   heap->concrete_nodes[new_node].next=__CPROVER_jsa_null;
   heap->concrete_nodes[new_node].value=value;
@@ -688,12 +702,13 @@ __CPROVER_jsa_inline void __CPROVER_jsa_add(
   {
 #ifdef __CPROVER
     const __CPROVER_jsa_node_id_t last_node;
+    __CPROVER_jsa_assume(last_node != new_node);
     __CPROVER_jsa_assume(__CPROVER_jsa__internal_is_valid_node_id(last_node));
     __CPROVER_jsa_assume(list == __CPROVER_jsa__internal_get_list(heap, last_node));
     __CPROVER_jsa_assume(__CPROVER_jsa_null == __CPROVER_jsa__internal_get_next(heap, last_node));
 #else
     __CPROVER_jsa_node_id_t last_node=head_node;
-    for (__CPROVER_jsa__internal_index_t i=0; i < __CPROVER_JSA_MAX_NODES_PER_LIST; ++i)
+    for (__CPROVER_jsa__internal_index_t i=0; i < __CPROVER_JSA_MAX_NODES; ++i)
     {
       const __CPROVER_jsa_node_id_t next_node=__CPROVER_jsa__internal_get_next(heap, last_node);
       if (__CPROVER_jsa_null == next_node) break;
@@ -760,6 +775,18 @@ __CPROVER_jsa_inline __CPROVER_jsa_word_t  __CPROVER_jsa_mult(
 ;
 #endif
 
+__CPROVER_jsa_inline __CPROVER_jsa_word_t  __CPROVER_jsa_div(
+    const __CPROVER_jsa_word_t lhs,
+    const __CPROVER_jsa_word_t rhs)
+#ifdef __CPROVER_JSA_DEFINE_TRANSFORMERS
+{
+  if (rhs == 0) return __CPROVER_jsa_word_max;
+  return lhs / rhs;
+}
+#else
+;
+#endif
+
 __CPROVER_jsa_inline __CPROVER_jsa_word_t  __CPROVER_jsa_ite(
     const __CPROVER_jsa_word_t res,
     const __CPROVER_jsa_word_t lhs,
@@ -819,7 +846,7 @@ __CPROVER_jsa_extern __CPROVER_jsa__internal_index_t __CPROVER_JSA_PRED_RESULT_O
 __CPROVER_jsa_extern const __CPROVER_jsa_pred_instructiont *__CPROVER_JSA_PREDICATES[__CPROVER_JSA_NUM_PREDS];
 __CPROVER_jsa_extern __CPROVER_jsa__internal_index_t __CPROVER_JSA_PREDICATE_SIZES[__CPROVER_JSA_NUM_PREDS];
 
-#define __CPROVER_JSA_NUM_PRED_INSTRUCTIONS 7u
+#define __CPROVER_JSA_NUM_PRED_INSTRUCTIONS 8u
 
 typedef __CPROVER_jsa_word_t __CPROVER_jsa_pred_id_t;
 
@@ -912,9 +939,16 @@ __CPROVER_jsa_inline __CPROVER_jsa_word_t __CPROVER_jsa_execute_pred(
       __CPROVER_jsa_pred_opcode_first_6: __CPROVER_jsa_execute_pred_result=__CPROVER_jsa_mult(__CPROVER_jsa_execute_pred_op0, __CPROVER_jsa_execute_pred_op1);
       __CPROVER_jsa_pred_opcode_last_6: __CPROVER_jsa_execute_pred_result=__CPROVER_jsa_execute_pred_result;
       break;
+    case 7:
+      __CPROVER_jsa_pred_opcode_first_7: __CPROVER_jsa_execute_pred_result=__CPROVER_jsa_div(__CPROVER_jsa_execute_pred_op0, __CPROVER_jsa_execute_pred_op1);
+      __CPROVER_jsa_pred_opcode_last_7: __CPROVER_jsa_execute_pred_result=__CPROVER_jsa_execute_pred_result;
+      break;
     }
     result=__CPROVER_jsa_execute_pred_result;
   }
+#ifdef __CPROVER_JSA_DYNAMIC_TEST_RUNNER
+  __CPROVER_jsa_internal__clear_temps();
+#endif
   return result;
 }
 
@@ -923,24 +957,51 @@ __CPROVER_jsa_inline __CPROVER_jsa_word_t __CPROVER_jsa_execute_pred(
 #define FILTER_QUERY_INSTR_ID 0
 typedef enum {
   FILTER = 0,
-  COPY_IF = 1,
-  MAP = 2,
-  MAP_IN_PLACE = 3
+  MAP = 1,
+  MAP_IN_PLACE = 2
 } __CPROVER_jsa_query_idt;
 
 __CPROVER_jsa_inline void __CPROVER_jsa_stream_op(
     __CPROVER_jsa_abstract_heapt * const heap,
     const __CPROVER_jsa_list_id_t list,
     const __CPROVER_jsa_iterator_id_t it,
-    const __CPROVER_jsa_list_id_t copy,
+    const __CPROVER_jsa_list_id_t source,
     const __CPROVER_jsa_pred_id_t pred_id,
     const __CPROVER_jsa__internal_index_t id)
 {
-  __CPROVER_jsa_node_id_t node=__CPROVER_jsa__internal_get_head_node(heap, list);
-  const __CPROVER_jsa_node_id_t end=heap->iterators[it].node_id;
-  for (__CPROVER_jsa__internal_index_t i=0; i < __CPROVER_JSA_MAX_NODES_PER_LIST; ++i)
+  const __CPROVER_jsa_list_id_t it_list=heap->iterators[it].list;
+  __CPROVER_jsa_node_id_t it_node=__CPROVER_jsa__internal_get_head_node(heap, it_list);
+  const __CPROVER_jsa_node_id_t it_range_end=heap->iterators[it].node_id;
+  __CPROVER_jsa__internal_index_t distance;
+  for (distance=0; distance < __CPROVER_JSA_MAX_NODES; ++distance)
+    if (it_node == it_range_end || it_node == __CPROVER_jsa_null) break;
+    else it_node=__CPROVER_jsa__internal_get_next(heap, it_node);
+
+  __CPROVER_jsa_node_id_t node;
+  if (__CPROVER_jsa_null == source)
   {
-    if (end == node || __CPROVER_jsa_null == node) break;
+    const __CPROVER_jsa_node_id_t head_node=__CPROVER_jsa__internal_get_head_node(heap, list);
+    node=head_node;
+    __CPROVER_jsa__internal_index_t node_count;
+    for (node_count=0; node_count < __CPROVER_JSA_MAX_NODES; ++node_count)
+    {
+      if (__CPROVER_jsa_null == node) { break; }
+      else { node=__CPROVER_jsa__internal_get_next(heap, node); }
+    }
+    node=head_node;
+    if (node_count > distance)
+    {
+      __CPROVER_jsa__internal_index_t skip_distance=node_count - distance;
+      for (node_count=0; node_count < __CPROVER_JSA_MAX_NODES; ++node_count)
+        if (node_count >= skip_distance) break;
+        else node=__CPROVER_jsa__internal_get_next(heap, node);
+    }
+  }
+  else
+    node=__CPROVER_jsa__internal_get_head_node(heap, source);
+  for (__CPROVER_jsa__internal_index_t i=0; i < __CPROVER_JSA_MAX_NODES; ++i)
+  {
+    if (i >= distance || __CPROVER_jsa_null == node) break;
     const _Bool is_concrete=__CPROVER_jsa__internal_is_concrete_node(node);
     if (is_concrete)
     {
@@ -954,13 +1015,9 @@ __CPROVER_jsa_inline void __CPROVER_jsa_stream_op(
           node=__CPROVER_jsa__internal_remove(heap, node);
         else
           node=__CPROVER_jsa__internal_get_next(heap, node);
-        break;
-      case COPY_IF:
-        if (pred_result != 0)
-          __CPROVER_jsa_add(heap, copy, value);
-        break;
+        continue;
       case MAP:
-        __CPROVER_jsa_add(heap, copy, pred_result);
+        __CPROVER_jsa_add(heap, list, pred_result);
         break;
       case MAP_IN_PLACE:
         heap->concrete_nodes[node].value=pred_result;
@@ -971,6 +1028,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa_stream_op(
     {
       // TODO: Implement filtering abstract nodes. (Maybe ignore and handle on whole query level?)
     }
+    node=__CPROVER_jsa__internal_get_next(heap, node);
   }
 }
 
@@ -981,7 +1039,7 @@ typedef struct __CPROVER_jsa_query_instruction
   __CPROVER_jsa_opt op1;
 } __CPROVER_jsa_query_instructiont;
 
-#define __CPROVER_JSA_NUM_QUERY_INSTRUCTIONS 4u
+#define __CPROVER_JSA_NUM_QUERY_INSTRUCTIONS 3u
 
 __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_query(
     const __CPROVER_jsa_abstract_heapt * const heap,
@@ -1003,9 +1061,6 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_query(
     {
       case FILTER:
         __CPROVER_jsa_assume(__CPROVER_jsa_null == instr.op1);
-        break;
-      case COPY_IF:
-        __CPROVER_jsa_assume_valid_list(heap, instr.op1);
         break;
       case MAP:
         __CPROVER_jsa_assume_valid_list(heap, instr.op1);

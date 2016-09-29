@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_PARSEOPTIONS_H
-#define CPROVER_CBMC_PARSEOPTIONS_H
+#ifndef CPROVER_GOTO_ANALYZER_PARSEOPTIONS_H
+#define CPROVER_GOTO_ANALYZER_PARSEOPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
@@ -49,6 +49,7 @@ public:
   goto_analyzer_parse_optionst(int argc, const char **argv);
 
 protected:
+  ui_message_handlert ui_message_handler;
   get_goto_modelt goto_model;
 
   virtual void register_languages();

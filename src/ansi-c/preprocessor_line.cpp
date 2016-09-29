@@ -79,7 +79,6 @@ void preprocessor_line(
     ptr++;
   }
 
-  std::string file_name_tmp2;
-  unescape_string(file_name_tmp, file_name_tmp2);
+  std::string file_name_tmp2=unescape_string(file_name_tmp);
   parser.set_file(file_name_tmp2);
 }

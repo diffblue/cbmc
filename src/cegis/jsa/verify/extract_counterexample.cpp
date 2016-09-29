@@ -7,17 +7,6 @@
 #include <cegis/jsa/options/jsa_program.h>
 #include <cegis/jsa/verify/extract_counterexample.h>
 
-#if 0
-namespace
-{
-const typet &get_type(const symbol_tablet &st,
-    const goto_programt::targett &pos)
-{
-  return st.lookup(get_affected_variable(*pos)).type;
-}
-}
-#endif
-
 void extract(const jsa_programt &prog, jsa_counterexamplet &ce,
     const goto_tracet &trace)
 {

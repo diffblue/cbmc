@@ -10,6 +10,8 @@
 #ifndef CEGIS_DANGER_CEGIS_SYMEX_LEARN_H_
 #define CEGIS_DANGER_CEGIS_SYMEX_LEARN_H_
 
+#include <functional>
+
 #include <goto-programs/safety_checker.h>
 
 /**
@@ -32,6 +34,7 @@ private:
   size_t current_solution_size;
   size_t max_solution_size;
   candidatet current_candidate;
+  const std::function<void(candidatet &)> default_candidate;
   counterexamplest counterexamples;
 
   safety_checkert::resultt run_bmc();
@@ -46,15 +49,26 @@ public:
    * @param preproc
    * @param config
    */
-  cegis_symex_learnt(const optionst &options, preproct &preproc,
+  cegis_symex_learnt(
+      const optionst &options,
+      preproct &preproc,
       learn_configurationt &config);
 
   /**
    * @brief
    *
    * @details
+   *
+   * @param options
+   * @param preproc
+   * @param config
+   * @param default_candidate
    */
-  ~cegis_symex_learnt();
+  cegis_symex_learnt(
+      const optionst &options,
+      preproct &preproc,
+      learn_configurationt &config,
+      const std::function<void(candidatet &)> &default_candidate);
 
   /**
    * @brief
@@ -73,7 +87,7 @@ public:
    *
    * @return The next candidate.
    */
-  const candidatet &next_candidate() const;
+  const candidatet &next_candidate();
 
   /**
    * @brief Generates a candidate solution.

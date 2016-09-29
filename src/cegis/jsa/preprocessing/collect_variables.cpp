@@ -1,6 +1,8 @@
 #include <util/cprover_prefix.h>
 
+#include <cegis/cegis-util/string_helper.h>
 #include <cegis/cegis-util/program_helper.h>
+#include <cegis/cegis-util/counterexample_vars.h>
 
 #include <cegis/jsa/options/jsa_program.h>
 #include <cegis/jsa/instrument/jsa_meta_data.h>
@@ -9,21 +11,11 @@
 
 namespace
 {
-bool contains(const std::string &haystack, const std::string &needle)
-{
-  return std::string::npos != haystack.find(needle);
-}
-
-bool is_return_value(const std::string &name)
-{
-  return contains(name, "return_value___") || contains(name, "#return_value");
-}
-
-bool is_meta(const goto_programt::targett pos)
+bool is_meta(const goto_programt::const_targett pos)
 {
   const std::string &name=id2string(get_affected_variable(*pos));
   if (is_jsa_list(name) || is_jsa_iterator(name)) return false;
-  return contains(name, CPROVER_PREFIX) || is_return_value(name);
+  return contains(name, CPROVER_PREFIX) || is_return_value_name(name);
 }
 
 bool is_const(const symbol_exprt &symbol_expr)
@@ -37,7 +29,6 @@ void add_inductive_step_renondets(jsa_programt &prog)
   const symbol_tablet &st=prog.st;
   goto_functionst &gf=prog.gf;
   goto_programt::instructionst &body=get_entry_body(gf).instructions;
-  //const goto_programt::targett first=body.begin();
   const goto_programt::targett last=prog.base_case;
   goto_programt::targett pos=prog.base_case;
   for (goto_programt::targett it=body.begin(); it != last; ++it)
@@ -57,15 +48,7 @@ void add_inductive_step_renondets(jsa_programt &prog)
 
 void collect_counterexample_vars(jsa_programt &prog)
 {
-  goto_programt::instructionst &body=get_entry_body(prog.gf).instructions;
-  const goto_programt::targett end(body.end());
-  const std::string marker_prefix(CE_MARKER_PREFIX);
-  size_t marker_index=0;
-  for (goto_programt::targett instr=body.begin(); instr != body.end(); ++instr)
-    if (is_nondet(instr, end) && !is_meta(instr))
-    {
-      assert(instr->labels.empty());
-      instr->labels.push_back(marker_prefix + std::to_string(marker_index++));
-      prog.counterexample_locations.push_back(instr);
-    }
+  goto_programt::targetst &locs=prog.counterexample_locations;
+  goto_programt &body=get_entry_body(prog.gf);
+  collect_counterexample_locations(locs, CE_MARKER_PREFIX, body, is_meta);
 }

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/hash_cont.h>
+#include <util/arith_tools.h>
 
 #include <ansi-c/expr2c_class.h>
 
@@ -238,6 +239,39 @@ std::string expr2javat::convert_constant(
     // Java writes 'null' for the null reference
     if(src.is_zero())
       return "null";
+  }
+  else if(src.type()==java_char_type())
+  {
+    std::string dest;
+    dest.reserve(10);
+
+    mp_integer int_value;
+    to_integer(src, int_value);
+
+    dest+='\'';
+
+    if(int_value>=' ' && int_value<127)
+      dest+=(char)(int_value.to_long());
+    else
+    {
+      std::string hex=integer2string(int_value, 16);
+      while(hex.size()<4) hex='0'+hex;
+      dest+='\\';
+      dest+='u';
+      dest+=hex;
+    }
+
+    dest+='\'';
+    return dest;
+  }
+  else if(src.type()==java_long_type())
+  {
+    // long integer literals must have 'L' at the end
+    mp_integer int_value;
+    to_integer(src, int_value);
+    std::string dest=integer2string(int_value);
+    dest+='L';
+    return dest;
   }
 
   return expr2ct::convert_constant(src, precedence);

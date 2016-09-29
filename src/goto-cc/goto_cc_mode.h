@@ -30,6 +30,7 @@ public:
   ~goto_cc_modet();
   
 protected:
+  ui_message_handlert ui_message_handler;
   void register_languages();
   goto_cc_cmdlinet &cmdline;
 };

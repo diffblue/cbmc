@@ -49,13 +49,6 @@ public:
    * @brief
    *
    * @details
-   */
-  ~jsa_symex_learnt();
-
-  /**
-   * @brief
-   *
-   * @details
    *
    * @param counterexamples
    * @param max_solution_size

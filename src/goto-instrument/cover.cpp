@@ -37,7 +37,7 @@ public:
         source_location_map[block_count]=it->source_location;
       
       next_is_target=
-        it->is_goto() || it->is_function_call();
+        it->is_goto() || it->is_function_call() || it->is_assume();
     }
   }
 
@@ -257,7 +257,7 @@ void collect_mcdc_controlling_rec(
           if(src.id()==ID_or)
           {
             std::vector<exprt> others1, others2;
-            if(not conditions.empty())
+            if(!conditions.empty())
             {
               others1.push_back(conjunction(conditions));
               others2.push_back(conjunction(conditions));
@@ -314,7 +314,7 @@ void collect_mcdc_controlling_rec(
   else if(src.id()==ID_not)
   {
     exprt e=to_not_expr(src).op();
-    if(not is_condition(e))
+    if(!is_condition(e))
       collect_mcdc_controlling_rec(e, conditions, result);
     else
     {
@@ -459,7 +459,7 @@ std::set<exprt> collect_mcdc_controlling_nested(
           if(operands[i].id()==ID_not)
           {
             exprt no=operands[i].op0();
-            if(not is_condition(no))
+            if(!is_condition(no))
             {
               changed=true;
               std::set<exprt> ctrl_no;
@@ -467,7 +467,7 @@ std::set<exprt> collect_mcdc_controlling_nested(
               res=collect_mcdc_controlling(ctrl_no);
             }
           }
-          else if(not is_condition(operands[i]))
+          else if(!is_condition(operands[i]))
           {
             changed=true;
             std::set<exprt> ctrl;
@@ -483,11 +483,11 @@ std::set<exprt> collect_mcdc_controlling_nested(
         }
         // if there is no change x.r.t current operands of ''x'',
         // i.e., they are all atomic, we reserve ''x''
-        if(not changed) s2.insert(x);
+        if(!changed) s2.insert(x);
       }
       // update ''s1'' and check if change happens
       s1=s2;
-      if(not changed) {break;}
+      if(!changed) {break;}
       s2.clear();
     }
 
@@ -549,13 +549,13 @@ std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
     {
       y.make_not();
       if(y==e) signs.insert(-1);
-      if(not is_condition(y))
+      if(!is_condition(y))
       {
         std::set<signed> re=sign_of_expr(e, y);
         signs.insert(re.begin(), re.end());
       }
     }
-    else if(not is_condition(y))
+    else if(!is_condition(y))
     {
       std::set<signed> re=sign_of_expr(e, y);
       signs.insert(re.begin(), re.end());
@@ -656,7 +656,7 @@ void remove_repetition(std::set<exprt> &exprs)
     }
     // an expr is added into ''new_exprs''
     // if it is not found repetitive
-    if(not red) new_exprs.insert(x);
+    if(!red) new_exprs.insert(x);
   }
 
   // update the original ''exprs''
@@ -685,7 +685,7 @@ bool eval_expr(
   if(src.id()==ID_and)
   {
     for(auto &x : operands)
-      if(not eval_expr(atomic_exprs, x))
+      if(!eval_expr(atomic_exprs, x))
         return false;
     return true;
   }
@@ -695,7 +695,7 @@ bool eval_expr(
     std::size_t fcount=0;
 
     for(auto &x : operands)
-      if(not eval_expr(atomic_exprs, x))
+      if(!eval_expr(atomic_exprs, x))
         fcount++;
 
     if(fcount<operands.size())
@@ -708,7 +708,7 @@ bool eval_expr(
   {
     exprt no_op(src);
     no_op.make_not();
-    return not eval_expr(atomic_exprs, no_op);
+    return !eval_expr(atomic_exprs, no_op);
   }
   else //if(is_condition(src))
   {
@@ -929,7 +929,7 @@ void minimize_mcdc_controlling(
          *  then ''x'' should not be removed from the original 
          *  ''controlling'' set
          **/
-        if(not cOK)
+        if(!cOK)
         {
           removing_x=false;
           break;

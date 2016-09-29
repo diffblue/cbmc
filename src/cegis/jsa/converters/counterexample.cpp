@@ -25,6 +25,7 @@
 #define ITERATOR_INDEX_COMP_INDEX 2
 #define PREV_ITERATOR_INDEX_COMP_INDEX 3
 #define ITERATOR_LIST_COMP_INDEX 4
+#define NUM_ABSTRACT_HEAP_MEMBERS 7
 
 namespace
 {
@@ -109,13 +110,52 @@ void read_element(__CPROVER_jsa_iteratort &e, const exprt &value)
   e.list=to_integer(ops[ITERATOR_LIST_COMP_INDEX]);
 }
 
+void fill_null(__CPROVER_jsa_concrete_nodet *array, size_t count)
+{
+  assert(__CPROVER_JSA_MAX_CONCRETE_NODES >= count);
+  const __CPROVER_jsa_concrete_nodet null_node={ __CPROVER_jsa_null,
+      __CPROVER_jsa_null, __CPROVER_jsa_null, __CPROVER_jsa_null };
+  while (count < __CPROVER_JSA_MAX_CONCRETE_NODES)
+    array[count++]=null_node;
+}
+
+void fill_null(__CPROVER_jsa_abstract_nodet *array, const size_t count)
+{
+  assert(__CPROVER_JSA_MAX_ABSTRACT_NODES >= count);
+  assert(count == 0);
+}
+
+void fill_null(__CPROVER_jsa_abstract_ranget *array, const size_t count)
+{
+  assert(__CPROVER_JSA_MAX_ABSTRACT_RANGES >= count);
+  assert(count == 0);
+}
+
+void fill_null(__CPROVER_jsa_iteratort *array, size_t count)
+{
+  assert(__CPROVER_JSA_MAX_ITERATORS >= count);
+  const __CPROVER_jsa_iteratort null_it={ __CPROVER_jsa_null,
+      __CPROVER_jsa_null, 0, 0, __CPROVER_jsa_null };
+  while (count < __CPROVER_JSA_MAX_ITERATORS)
+    array[count++]=null_it;
+}
+
+void fill_null(__CPROVER_jsa_node_id_t *array, size_t count)
+{
+  assert(__CPROVER_JSA_MAX_LISTS >= count);
+  while (count < __CPROVER_JSA_MAX_LISTS)
+    array[count++]=__CPROVER_jsa_null;
+}
+
 template<class wordt>
 void read_array(wordt *data, const exprt &value)
 {
   if (ID_array != value.id()) return;
   size_t index=0;
-  for (const exprt &op : value.operands())
+  const exprt::operandst &ops=value.operands();
+  for (const exprt &op : ops)
     read_element(data[index++], op);
+  fill_null(data, ops.size());
 }
 
 void remove_padding(struct_exprt::operandst &ops, const typet &type)
@@ -141,6 +181,7 @@ void retrieve_heaps(const jsa_counterexamplet &ce,
       __CPROVER_jsa_abstract_heapt &heap=heaps[index++];
       struct_exprt::operandst ops(value.operands());
       remove_padding(ops, value.type());
+      assert(NUM_ABSTRACT_HEAP_MEMBERS == ops.size());
       read_array(heap.concrete_nodes, ops[CONCRETE_NODES_COMP_INDEX]);
       read_array(heap.abstract_nodes, ops[ABSTRACT_NODES_COMP_INDEX]);
       read_array(heap.abstract_ranges, ops[ABSTRACT_RANGES_COMP_INDEX]);
