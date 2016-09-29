@@ -16,6 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <path-symex/path_symex_state.h>
 
+#include <json/json_parser.h>
+#include <path-symex/path_symex_taint_data.h>
+
 class path_searcht:public safety_checkert
 {
 public:
@@ -27,6 +30,7 @@ public:
     context_bound_set(false),
     unwind_limit_set(false),
     branch_bound_set(false),
+    taint_file(""),
     search_heuristic(search_heuristict::DFS)
   {
   }
@@ -57,6 +61,9 @@ public:
     unwind_limit_set=true;
     unwind_limit=limit;
   }
+
+
+  void set_taint(const bool enabled, std::string file, taint_enginet &_taint_engine);
 
   bool show_vcc;
   bool eager_infeasibility;
@@ -95,6 +102,11 @@ public:
   typedef std::map<irep_idt, property_entryt> property_mapt;
   property_mapt property_map;
 
+  taint_enginet *taint_engine;
+  // This is the taint engine that will be used throughout analysis.
+  taint_datat taint_data;
+  // This is the specified data provided in the JSON file.
+
 protected:
   typedef path_symex_statet statet;
 
@@ -132,8 +144,10 @@ protected:
   unsigned branch_bound;
   unsigned unwind_limit;
   bool depth_limit_set, context_bound_set, unwind_limit_set, branch_bound_set;
+  dstring taint_file;
 
   enum class search_heuristict { DFS, BFS, LOCS } search_heuristic;
+
 };
 
 #endif

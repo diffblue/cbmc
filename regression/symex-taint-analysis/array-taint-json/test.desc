@@ -1,0 +1,8 @@
+CORE
+main.c
+--taint simple --taint-file taint.json
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring

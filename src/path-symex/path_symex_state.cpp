@@ -42,9 +42,10 @@ Function: initial_state
 path_symex_statet initial_state(
   var_mapt &var_map,
   const locst &locs,
-  path_symex_historyt &path_symex_history)
+  path_symex_historyt &path_symex_history,
+  taint_enginet &taint_engine)
 {
-  path_symex_statet s(var_map, locs, path_symex_history);
+  path_symex_statet s(var_map, locs, path_symex_history, taint_engine);
   
   // create one new thread
   path_symex_statet::threadt &thread=s.add_thread();
@@ -95,6 +96,56 @@ void path_symex_statet::output(const threadt &thread, std::ostream &out) const
     out << " " << it->return_location << std::endl;
   out << std::endl;
 }
+
+
+/*******************************************************************
+   Function: path_symex_statet::is_enforced_taint_json
+
+	Inputs: Nothing.
+
+	Outputs: A bool that specifies whether json file enforces taint.
+
+	Purpose: Checks whether the json file enforces taint to a
+	variable.
+
+
+\*******************************************************************/
+
+bool path_symex_statet::is_enforced_taint_json()
+{
+  for (auto rule : taint_engine.taint_data->data[pc().loc_number])
+  {
+    if(!rule.symbol_flag)
+      return true;
+  }
+
+  // No set symbol flag has been found.
+  return false;
+}
+
+/*******************************************************************
+ Function: path_symex_statet::get_enforced_taint
+
+ Inputs: Nothing
+
+ Outputs: Returns the taint state to enforce.
+
+ Purpose: Gets the taint state to enforce.
+
+
+ \*******************************************************************/
+
+taintt path_symex_statet::get_enforced_taint()
+{
+  for (auto rule : taint_engine.taint_data->data[pc().loc_number])
+  {
+    if(!rule.symbol_flag)
+      return rule.taint;
+  }
+
+  throw "Taint not found.";
+}
+
 
 /*******************************************************************\
 

@@ -732,3 +732,6 @@ verilog_array
 low
 high
 bswap
+is_taint
+set_taint
+get_taint

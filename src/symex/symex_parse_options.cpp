@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cbmc/version.h>
 
 #include <path-symex/locs.h>
+#include <path-symex/path_symex_taint_parser.h>
 
 #include "path_search.h"
 #include "symex_parse_options.h"
@@ -283,6 +284,20 @@ int symex_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("taint") && cmdline.get_value("taint") != "none")
+    {
+
+      if(handle_taint_analysis_option(path_search))
+        return 0;
+
+    }
+    else
+    {
+      path_symex_no_taint_analysis_enginet taint_engine;
+      path_search.set_taint(false, cmdline.get_value("taint-file"),
+          taint_engine);
+    }
+
     path_search.eager_infeasibility=
       cmdline.isset("eager-infeasibility");
       
@@ -485,6 +500,69 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     return true;
   }
   
+  return false;
+}
+
+/*******************************************************************\
+
+Function:  symex_parse_optionst::handle_taint_analysis_option
+
+ Inputs: Takes Path Search object to initialise taint engine.
+
+ Outputs: Returns an exit flag
+
+ Purpose: Handles taint option set via command-line
+
+ \*******************************************************************/
+bool symex_parse_optionst::handle_taint_analysis_option(
+    path_searcht &path_search)
+{
+
+  // Find which taint engine has been selected
+  if(cmdline.get_value("taint") == "simple")
+  {
+    /*path_symex_simple_taint_analysis_enginet taint_engine;
+
+     path_search.set_taint(true, cmdline.get_value("taint-file"), taint_engine);
+     */
+
+    // QUICK FIX FOR NOW!
+    path_symex_simple_taint_analysis_enginet *taint_engine=
+        new path_symex_simple_taint_analysis_enginet();
+    path_search.set_taint(true, cmdline.get_value("taint-file"), *taint_engine);
+
+  }
+  else
+  {
+    throw "Taint engine type not recognised.";
+  }
+
+  // Parse JSON file if it has been specified.
+  if(cmdline.isset("taint-file"))
+  {
+    if(parse_taint_file(cmdline.get_value("taint-file"), *message_handler,
+        path_search.taint_data, *path_search.taint_engine))
+    {
+      throw "Taint file invalid.\n";
+    }
+  }
+
+  // Point the taint engine to the data.
+  (path_search.taint_engine)->taint_data=&path_search.taint_data;
+
+  status() << "Using taint engine: "
+      << path_search.taint_engine->get_taint_analysis_name() << "  Found "
+      << path_search.taint_data.data.size()
+      << ((path_search.taint_data.data.size() == 1) ? " rule." : " rules.")
+      << eom;
+
+  if(cmdline.isset("show-taint-data"))
+  {
+    std::cout << "Taint data from JSON file:\n";
+    path_search.taint_data.output(std::cout, *path_search.taint_engine);
+    return true;
+  }
+
   return false;
 }
 

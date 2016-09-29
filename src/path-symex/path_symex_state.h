@@ -13,15 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "var_map.h"
 #include "path_symex_history.h"
 
+#include <path-symex/path_symex_taint_data.h>
 struct path_symex_statet
 {
 public:
   inline path_symex_statet(
     var_mapt &_var_map,
     const locst &_locs,
-    path_symex_historyt &_path_symex_history):
+    path_symex_historyt &_path_symex_history,
+    taint_enginet &_taint_engine):
     var_map(_var_map),
     locs(_locs),
+    taint_engine(_taint_engine),
     inside_atomic_section(false),
     history(_path_symex_history),
     current_thread(0),
@@ -38,6 +41,8 @@ public:
   var_mapt &var_map;
   const locst &locs;
 
+  taint_enginet &taint_engine;
+
   // the value of a variable
   struct var_statet
   {
@@ -45,13 +50,22 @@ public:
     exprt value;
     symbol_exprt ssa_symbol;
     
+    // For recording taint.
+    taintt taint;
+
     // for uninterpreted functions or arrays we maintain an index set
     typedef std::set<exprt> index_sett;
     index_sett index_set;
 
+    // For recording taint in arrays.
+    typedef std::set<taintt> taint_index_sett;
+    taint_index_sett taint_index_set;
+
+    // taint value set to untaint by default.
     var_statet():
       value(nil_exprt()),
-      ssa_symbol(irep_idt())
+      ssa_symbol(irep_idt()),
+      taint(taint_enginet::get_top_elem())
     {
     }
   };
@@ -154,7 +168,11 @@ public:
   {
     threads[current_thread].pc=new_pc;
   }
-  
+
+  // Enforce taint functions
+  bool is_enforced_taint_json();
+  taintt get_enforced_taint();
+
   // output  
   void output(std::ostream &out) const;
   void output(const threadt &thread, std::ostream &out) const;
@@ -238,6 +256,7 @@ protected:
 path_symex_statet initial_state(
   var_mapt &var_map,
   const locst &locs,
-  path_symex_historyt &);
+  path_symex_historyt &,
+  taint_enginet &);
   
 #endif

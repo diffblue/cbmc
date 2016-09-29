@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_ui.h>
 
 #include "path_search.h"
+#include <path-symex/path_symex_taint_analysis.h>
 
 class goto_functionst;
 class optionst;
@@ -41,6 +42,7 @@ class optionst;
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(show-locs)(show-vcc)(show-properties)(show-goto-functions)" \
   "(property):(trace)(show-trace)(stop-on-fail)(eager-infeasibility)" \
+  "(taint):(show-taint-data)(taint-file):" \
   "(no-simplify)(no-unwinding-assertions)(no-propagation)"
   // the last line is for CBMC-regression testing only
 
@@ -69,6 +71,8 @@ protected:
   void show_counterexample(const class goto_tracet &);
             
   void eval_verbosity();
+
+  bool handle_taint_analysis_option(path_searcht &path_search);
 
   std::string get_test(const goto_tracet &goto_trace);
 };

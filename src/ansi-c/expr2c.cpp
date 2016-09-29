@@ -4759,6 +4759,15 @@ std::string expr2ct::convert(
   else if(src.id()==ID_type)
     return convert(src.type());
 
+  else if(src.id()==ID_set_taint)
+    return convert_function(src, "__CPROVER_set_taint", precedence=16);
+
+  else if(src.id()==ID_get_taint)
+      return convert_function(src, "__CPROVER_get_taint", precedence=16);
+
+  else if(src.id()==ID_is_taint)
+      return convert_function(src, "__CPROVER_is_taint", precedence=16);
+
   // no C language expression for internal representation
   return convert_norep(src, precedence);
 }

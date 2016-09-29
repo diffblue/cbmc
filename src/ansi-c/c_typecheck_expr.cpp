@@ -2375,6 +2375,57 @@ exprt c_typecheck_baset::do_special_functions(
 
     return get_may_expr;
   }
+  else if(identifier==CPROVER_PREFIX "is_taint")
+  {
+    if(expr.arguments().size()!=2)
+    {
+      err_location(f_op);
+      error() << "is_taint expects two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    exprt is_taint_expr=
+      binary_predicate_exprt(expr.arguments()[0], "is_taint", expr.arguments()[1]);
+    is_taint_expr.add_source_location()=source_location;
+
+    return is_taint_expr;
+  }
+  else if(identifier==CPROVER_PREFIX "set_taint")
+  {
+    if(expr.arguments().size()!=2)
+    {
+      err_location(f_op);
+      error() << "set_taint expects two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    exprt set_taint_expr=
+      binary_predicate_exprt(expr.arguments()[0], "set_taint", expr.arguments()[1]);
+    set_taint_expr.add_source_location()=source_location;
+
+    return set_taint_expr;
+  }
+  else if(identifier==CPROVER_PREFIX "get_taint")
+  {
+    if(expr.arguments().size()!=1)
+    {
+      err_location(f_op);
+      error() << "get_taint expects one operand" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    exprt get_taint_expr=
+      unary_predicate_exprt("get_taint", expr.arguments()[0]);
+    get_taint_expr.add_source_location()=source_location;
+
+    return get_taint_expr;
+  }
   else if(identifier==CPROVER_PREFIX "invalid_pointer")
   {
     if(expr.arguments().size()!=1)
