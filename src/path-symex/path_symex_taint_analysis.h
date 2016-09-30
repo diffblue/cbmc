@@ -73,10 +73,11 @@ public:
 
 typedef path_symex_taint_analysis_enginet taint_enginet;
 
+
+// A dummy implementation of a taint engine that performs no taint analysis.
 class path_symex_no_taint_analysis_enginet: public taint_enginet
 {
 
-// A dummy implementation of a taint engine that performs no taint analysis.
 public:
 
   inline ~path_symex_no_taint_analysis_enginet()

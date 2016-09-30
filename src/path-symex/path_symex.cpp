@@ -1131,7 +1131,7 @@ void path_symext::recursive_taint_extraction(const exprt &expr, taintt &taint,
 
  Inputs: Takes a path_symex state, which contains the taint engine.
 
- Outputs: Nothing.
+ Outputs: Returns nothing.
 
  Purpose: Checks each rule at a given pc for symbol taint, and
  propagates taint accordingly.
@@ -1175,7 +1175,7 @@ void path_symext::path_symex_set_taint_via_symbols(path_symex_statet &state,
 
  Inputs: Takes a path_symex state and codet.
 
- Outputs: Nothing.
+ Outputs: Returns nothing.
 
  Purpose: Responsible for setting taint via the CPROVER Special Function.
 

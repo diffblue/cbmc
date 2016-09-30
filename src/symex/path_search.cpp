@@ -248,12 +248,12 @@ void path_searcht::pick_state()
 
 Function: path_searcht::set_taint
 
- Inputs: The taint engine, name of JSON file, and a flag denoting
+ Inputs: Takes the taint engine, name of JSON file, and a flag denoting
  	 whether the taint engine is enabled.
 
- Outputs: Nothing
+ Outputs: Returns nothing.
 
- Purpose: Sets initial information to perform taint analysis
+ Purpose: Sets initial information to perform taint analysis.
 
 \*******************************************************************/
 void path_searcht::set_taint(const bool enabled, std::string file, taint_enginet &_taint_engine) {

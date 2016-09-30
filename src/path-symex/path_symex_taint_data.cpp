@@ -48,9 +48,9 @@ taint_datat::taint_datat()
 
  Function: taint_datat::add
 
- Inputs: The location where a given taint state is introduced.
+ Inputs: Takes the location where a given taint state is introduced.
 
- Outputs: Nothing
+ Outputs: Returns nothing
 
  Purpose: Registers a taint rule, normally parsed from the JSON file.
 
@@ -111,6 +111,7 @@ bool taint_datat::check_rules(locst &locs, std::ostream & warning,
         rule.output(taint_engine, warning);
         warning << "\n";
         return true;
+
       }
       else if(inst->is_function_call())
       {

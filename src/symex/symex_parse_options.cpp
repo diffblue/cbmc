@@ -522,7 +522,6 @@ bool symex_parse_optionst::handle_taint_analysis_option(
   if(cmdline.get_value("taint") == "simple")
   {
     /*path_symex_simple_taint_analysis_enginet taint_engine;
-
      path_search.set_taint(true, cmdline.get_value("taint-file"), taint_engine);
      */
 

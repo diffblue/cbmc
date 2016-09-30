@@ -101,7 +101,7 @@ void path_symex_statet::output(const threadt &thread, std::ostream &out) const
 /*******************************************************************
    Function: path_symex_statet::is_enforced_taint_json
 
-	Inputs: Nothing.
+	Inputs: Takes nothing.
 
 	Outputs: A bool that specifies whether json file enforces taint.
 
@@ -126,7 +126,7 @@ bool path_symex_statet::is_enforced_taint_json()
 /*******************************************************************
  Function: path_symex_statet::get_enforced_taint
 
- Inputs: Nothing
+ Inputs: Takes nothing
 
  Outputs: Returns the taint state to enforce.
 
