@@ -32,7 +32,8 @@ protected:
   void replace_ternary(
       goto_programt &goto_program,
       goto_programt::instructionst::iterator &i_it,
-          exprt &expr);
+          exprt &expr,
+          bool lhs);
 
   void contains_ternary(exprt &expr, bool &contains);
 
