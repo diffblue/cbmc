@@ -795,7 +795,7 @@ void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 {
   std::size_t a=pointer_logic.add_object(expr);
 
-  if(a==(std::size_t(1)>>object_bits))
+  if(a==(std::size_t(1)<<object_bits))
     throw "too many variables";
 
   encode(a, bv);
