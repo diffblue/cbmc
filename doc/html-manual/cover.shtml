@@ -53,7 +53,7 @@ is plotted in the Figure below.
 
 </center>
 
-<pre><code class="c numbered">01:  // CONSTANTS:
+<pre><code class="c numbered">01: // CONSTANTS:
 02: #define MAX_CLIMB_SUM_ERR 10
 03: #define MAX_CLIMB 1
 04:
@@ -187,11 +187,10 @@ T3: (desired_climb=0.000000f, estimator_z_dot=1.000000f)
 
 <p class="justified">
 The option <code>--unwind 6</code> unwinds the loop inside the main
-function body six times. In order to achieve the complete coverage on the instrumented goals,
-the loop must be unwound sufficient enough times.
-For example, the PID function <code>climb_pid_run</code> needs to be called at
-least six times for evaluating the condition 
-<code>climb_sum_err>MAX_CLIMB_SUM_ERR</code> in line 48 to <em>true</em>.
+function body six times. In order to achieve the complete coverage on all the instrumented goals 
+in the PID function <code>climb_pid_run</code>, the loop must be unwound sufficient enough times.
+For example, <code>climb_pid_run</code> needs to be called at least six times for evaluating the 
+condition <code>climb_sum_err>MAX_CLIMB_SUM_ERR</code> in line 48 to <em>true</em>.
 This corresponds to the test suite below.
 <pre><code>(desired_climb=-1.000000f, estimator_z_dot=1.000000f);
 (desired_climb=-1.000000f, estimator_z_dot=0.000000f);
