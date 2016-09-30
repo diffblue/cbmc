@@ -30,55 +30,6 @@ Purpose:
 
 \*******************************************************************/
 
-bool remove_ternaryt::contains_ternary(
-    exprt &expr)
-{
-  bool contains=false;
-  contains_ternary(expr, contains);
-  return contains;
-}
-
-/*******************************************************************\
-
-Function:
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
-void remove_ternaryt::contains_ternary(
-    exprt &expr,
-    bool &contains)
-{
-  if(contains || !expr.has_operands())
-    return;
-
-  if(expr.id() == ID_if) {
-    contains = true;
-    return;
-  }
-
-  Forall_operands(it, expr) {
-    contains_ternary(*it, contains);
-  }
-}
-
-/*******************************************************************\
-
-Function:
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void remove_ternaryt::replace_ternary(
     goto_programt &goto_program,
     goto_programt::instructionst::iterator &i_it,
@@ -97,14 +48,15 @@ void remove_ternaryt::replace_ternary(
     // Avoid ternary on LHS.  For now.  They are awfully unreadable anyway.
   }
 
+  Forall_operands(it, expr)
+  {
+      replace_ternary(goto_program, i_it, *it);
+      // Go through sub-tree first.
+  }
+
+  // If we are on an IF statement.
   if(expr.id() == ID_if)
   {
-    Forall_operands(it, expr)
-    {
-      if(contains_ternary(*it))
-        replace_ternary(goto_program, i_it, *it);
-    }
-
     if_exprt &if_expr=to_if_expr(expr); // Some short hands.
 
     /* 1  (...) cond : T : F (...)
@@ -169,13 +121,6 @@ void remove_ternaryt::replace_ternary(
     false_instruction->code=assign_false;
 
     expr=symbol_ptr->symbol_expr();
-
-    return; // We've handled operands.
-  }
-
-  /* If it isn't an IF statement, let's look at its operands. */
-  Forall_operands(it, expr) {
-    replace_ternary(goto_program, i_it, *it);
   }
 }
 
