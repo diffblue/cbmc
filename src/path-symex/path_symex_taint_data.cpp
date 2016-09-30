@@ -106,13 +106,11 @@ bool taint_datat::check_rules(locst &locs, std::ostream & warning,
       // Check that the instruction is supported.
       if(!inst->is_assign() && !inst->is_decl() && !inst->is_function_call())
       {
-
         warning << "Following rule refers to an unsupported op (" << inst->type
             << ")\n";
         rule.output(taint_engine, warning);
         warning << "\n";
         return true;
-
       }
       else if(inst->is_function_call())
       {
