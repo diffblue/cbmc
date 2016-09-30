@@ -192,6 +192,14 @@ the loop must be unwound sufficient enough times.
 For example, the PID function <code>climb_pid_run</code> needs to be called at
 least six times for evaluating the condition 
 <code>climb_sum_err>MAX_CLIMB_SUM_ERR</code> in line 48 to <em>true</em>.
+This corresponds to the test suite below.
+<pre><code>(desired_climb=-1.000000f, estimator_z_dot=1.000000f);
+(desired_climb=-1.000000f, estimator_z_dot=0.000000f);
+(desired_climb=-1.000000f, estimator_z_dot=1.000000f);
+(desired_climb=-1.000000f, estimator_z_dot=1.000000f);
+(desired_climb=-1.000000f, estimator_z_dot=1.000000f);
+(desired_climb=-1.000000f, estimator_z_dot=1.000000f).
+</code></pre>
 An introduction to the use of loop unwinding can be found
 in <a href="cbmc-loops.shtml">Understanding Loop Unwinding</a>.
 </p>
