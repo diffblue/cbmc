@@ -19,6 +19,7 @@ int main(){
 	assert(__CPROVER_is_taint("main::1::c", "tainted"));
 	assert(__CPROVER_is_taint("main::1::x", "tainted"));
 	assert(__CPROVER_is_taint("main::1::y", "untainted"));
+	assert(__CPROVER_is_taint("main::1::z", "untainted"));
 
     return 0;
 }
