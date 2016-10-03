@@ -21,8 +21,7 @@ public:
   {
   }
 
-  void operator()(
-    goto_functionst &goto_functions);
+  void operator()(goto_functionst &goto_functions);
 
 protected:
   symbol_tablet &symbol_table;
@@ -39,7 +38,6 @@ protected:
 
   bool contains_ternary(exprt &expr);
 };
-
 
 void remove_ternary(symbol_tablet &, goto_functionst &);
 

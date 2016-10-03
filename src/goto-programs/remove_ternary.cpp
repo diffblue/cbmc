@@ -40,7 +40,9 @@ void remove_ternaryt::replace_ternary(
     exprt &expr,
     bool lhs)
 {
-  if(!expr.has_operands()) // Ternary MUST have operands by definition.
+
+  // Ternary MUST have operands by definition.
+  if(!expr.has_operands())
     return;
 
   /* LHS handles ternary when used on the LHS of an assignment
@@ -57,7 +59,6 @@ void remove_ternaryt::replace_ternary(
       replace_ternary(goto_program, i_it, code_assign.rhs(), false);
       return;
     }
-    // Avoid ternary on LHS.  For now.  They are awfully unreadable anyway.
   }
 
   Forall_operands(it, expr)
@@ -148,7 +149,7 @@ void remove_ternaryt::replace_ternary(
 
 /*******************************************************************\
 
-Function: remove_returnst::operator()
+Function: remove_ternaryt::operator()(goto_functionst &goto_functions)
 
 Inputs:
 
@@ -172,13 +173,14 @@ void remove_ternaryt::operator()(goto_functionst &goto_functions)
 
 /*******************************************************************\
 
-Function: remove_returns
+Function: remove_ternary(symbol_tablet &symbol_table,
+goto_functionst &goto_functions)
 
 Inputs:
 
 Outputs:
 
-Purpose: removes returns
+Purpose:
 
 \*******************************************************************/
 
@@ -192,13 +194,13 @@ void remove_ternary(
 
 /*******************************************************************\
 
-Function: remove_returns
+Function: remove_ternary(goto_modelt &goto_model)
 
 Inputs:
 
 Outputs:
 
-Purpose: removes returns
+Purpose:
 
 \*******************************************************************/
 
