@@ -20,7 +20,7 @@ typedef unsigned char __CPROVER_char;
 #define __CPROVER_char_literal(c) __CPROVER_uninterpreted_char_literal(c)
 
 /* produces the concatenation of s1 and s2 */
-#define __CPROVER_string_concat(s1, s2) __CPROVER_uninterpreted_strcat(s1, s2)
+#define __CPROVER_string_concat(s1, s2) __CPROVER_uninterpreted_strcat_func(s1, s2)
 
 /* return the length of s */
 #define __CPROVER_string_length(s) __CPROVER_uninterpreted_strlen(s)
@@ -58,7 +58,7 @@ extern __CPROVER_char __CPROVER_uninterpreted_char_at(__CPROVER_string str, int 
 extern __CPROVER_bool __CPROVER_uninterpreted_string_equal_func(__CPROVER_string str1, __CPROVER_string str2);
 extern __CPROVER_string __CPROVER_uninterpreted_string_literal();
 extern __CPROVER_char __CPROVER_uninterpreted_char_literal();
-extern __CPROVER_string __CPROVER_uninterpreted_strcat(__CPROVER_string str1, __CPROVER_string str2);
+extern __CPROVER_string __CPROVER_uninterpreted_strcat_func(__CPROVER_string str1, __CPROVER_string str2);
 extern int __CPROVER_uninterpreted_strlen(__CPROVER_string str);
 extern __CPROVER_string __CPROVER_uninterpreted_substring(__CPROVER_string str, int i, int j);
 extern __CPROVER_bool __CPROVER_uninterpreted_strprefixof(__CPROVER_string pref, __CPROVER_string str);

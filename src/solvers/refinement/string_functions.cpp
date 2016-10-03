@@ -15,8 +15,13 @@ Date:   September 2016
 #define string_set_length_func "__CPROVER_uninterpreted_set_length"
 #define string_equal_func "__CPROVER_uninterpreted_string_equal_func"
 #define string_char_at_func "__CPROVER_uninterpreted_char_at"
-#define string_concat_func "__CPROVER_uninterpreted_strcat"
-#define string_concat_int_func "__CPROVER_uninterpreted_strcat_int"
+#define string_concat_func "__CPROVER_uninterpreted_strcat_func"
+#define string_concat_int_func "__CPROVER_uninterpreted_strcat_int_func"
+#define string_concat_long_func "__CPROVER_uninterpreted_strcat_long_func"
+#define string_concat_char_func "__CPROVER_uninterpreted_strcat_char_func"
+#define string_concat_bool_func "__CPROVER_uninterpreted_strcat_bool_func"
+#define string_concat_float_func "__CPROVER_uninterpreted_strcat_float_func"
+#define string_concat_double_func "__CPROVER_uninterpreted_strcat_double_func"
 #define string_substring_func "__CPROVER_uninterpreted_substring"
 #define string_is_prefix_func "__CPROVER_uninterpreted_strprefixof"
 #define string_is_suffix_func "__CPROVER_uninterpreted_strsuffixof"
@@ -69,6 +74,21 @@ bool is_string_concat_func(irep_idt id) {
 }
 bool is_string_concat_int_func(irep_idt id) {
   return (starts_with(id2string(id),string_concat_int_func));
+}
+bool is_string_concat_long_func(irep_idt id) {
+  return (starts_with(id2string(id),string_concat_long_func));
+}
+bool is_string_concat_char_func(irep_idt id) {
+  return (starts_with(id2string(id),string_concat_char_func));
+}
+bool is_string_concat_bool_func(irep_idt id) {
+  return (starts_with(id2string(id),string_concat_bool_func));
+}
+bool is_string_concat_float_func(irep_idt id) {
+  return (starts_with(id2string(id),string_concat_float_func));
+}
+bool is_string_concat_double_func(irep_idt id) {
+  return (starts_with(id2string(id),string_concat_double_func));
 }
 bool is_string_substring_func(irep_idt id) {
   return (starts_with(id2string(id),string_substring_func));

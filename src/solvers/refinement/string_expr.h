@@ -79,7 +79,14 @@ private:
   // Auxiliary functions for of_expr
   void of_function_application(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_literal(const function_application_exprt &f,axiom_vect &axioms);
+  void of_string_concat(string_exprt s1, string_exprt s2, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_concat(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_concat_int(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_concat_long(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_concat_bool(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_concat_char(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_concat_double(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_concat_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_substring(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_trim(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_to_lower_case(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
@@ -88,12 +95,16 @@ private:
   void of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_empty_string(const function_application_exprt &f, axiom_vect & axioms);
   void of_int(const function_application_exprt &f, axiom_vect & axioms);
+  void of_int(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
   void of_long(const function_application_exprt &f, axiom_vect & axioms);
+  void of_long(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
   // Warning the specifications of these functions is only partial:
   void of_float(const function_application_exprt &f, axiom_vect & axioms);
+  void of_float(const exprt &f, axiom_vect & axioms, bool is_c_string, int max_size);
   void of_double(const function_application_exprt &f, axiom_vect & axioms);
   void of_bool(const function_application_exprt &f, axiom_vect & axioms);
-  void of_int(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
+  void of_bool(const exprt &i, axiom_vect & axioms, bool is_c_string);
+  void of_char(const exprt &i, axiom_vect & axioms, bool is_c_string);
 
   void of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 

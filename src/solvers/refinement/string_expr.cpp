@@ -114,6 +114,18 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_literal(expr,axioms);
     } else if (is_string_concat_func(id)) {
       return of_string_concat(expr,symbol_to_string,axioms);
+    } else if (is_string_concat_int_func(id)) {
+      return of_string_concat_int(expr,symbol_to_string,axioms);
+    } else if (is_string_concat_long_func(id)) {
+      return of_string_concat_long(expr,symbol_to_string,axioms);
+    } else if (is_string_concat_bool_func(id)) {
+      return of_string_concat_bool(expr,symbol_to_string,axioms);
+    } else if (is_string_concat_char_func(id)) {
+      return of_string_concat_char(expr,symbol_to_string,axioms);
+    } else if (is_string_concat_double_func(id)) {
+      return of_string_concat_double(expr,symbol_to_string,axioms);
+    } else if (is_string_concat_float_func(id)) {
+      return of_string_concat_float(expr,symbol_to_string,axioms);
     } else if (is_string_substring_func(id)) {
       return of_string_substring(expr,symbol_to_string,axioms);
     } else if (is_string_trim_func(id)) {
@@ -212,14 +224,7 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
 }
 
 
-void string_exprt::of_string_concat(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
-{
-  const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 2); //bad args to string concat
-  
-  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2 = string_exprt::of_expr(args[1],symbol_to_string,axioms); 
-
+void string_exprt::of_string_concat(string_exprt s1, string_exprt s2, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms) {
   equal_exprt length_sum_lem(length(), plus_exprt(s1.length(), s2.length()));
   axioms.emplace_back(length_sum_lem);
 
@@ -233,8 +238,20 @@ void string_exprt::of_string_concat(const function_application_exprt &f, std::ma
 
   string_constraintt a2(equal_exprt(s2[idx2],(*this)[plus_exprt(idx2,s1.length())]));
   axioms.push_back(a2.forall(idx2, index_zero, s2.length()));
-  
 }
+
+void string_exprt::of_string_concat(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2); //bad args to string concat
+  
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2 = string_exprt::of_expr(args[1],symbol_to_string,axioms); 
+
+  of_string_concat(s1, s2, symbol_to_string, axioms);
+}
+
+
 
 void string_exprt::of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
@@ -312,9 +329,12 @@ void string_exprt::of_string_trim
   // forall n < |s1|, s[idx+n] = s1[n]
   string_constraintt a2(equal_exprt((*this)[n3], str[plus_exprt(n3, idx)]));
   axioms.push_back(a2.forall(n3,index_zero,length()));
-  // s[m] != ' ' && s[m+|s1|-1] != ' '
-  axioms.emplace_back(not_exprt(equal_exprt(str[idx],space_char)));
-  axioms.emplace_back(not_exprt(equal_exprt(str[minus_exprt(plus_exprt(idx,length()),refined_string_typet::index_of_int(1))],space_char)));
+  // (s[m] != ' ' && s[m+|s1|-1] != ' ') || m = |s|
+  or_exprt m_index_condition(equal_exprt(idx,str.length()),
+			     and_exprt
+			     (not_exprt(equal_exprt(str[idx],space_char)),
+			      not_exprt(equal_exprt(str[minus_exprt(plus_exprt(idx,length()),refined_string_typet::index_of_int(1))],space_char))));
+  axioms.push_back(m_index_condition);
 }
 
 void string_exprt::of_string_to_lower_case
@@ -408,13 +428,18 @@ void string_exprt::of_long
 
 
 void string_exprt::of_float
-(const function_application_exprt &expr,axiom_vect & axioms)
+(const function_application_exprt &f,axiom_vect & axioms)
+{
+  assert(f.arguments().size() == 1);
+  of_float(f.arguments()[0],axioms,refined_string_typet::is_c_string_type(f.type()),11);
+}
+
+void string_exprt::of_float
+(const exprt &f,axiom_vect & axioms, bool is_c_string, int max_size)
 {
   // Warning this is only a partial specification
-  assert(expr.arguments().size() == 1);
-  axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(11)));
+  axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(max_size)));
 
-  bool is_c_string = refined_string_typet::is_c_string_type(expr.type());
   exprt char_0;
   exprt char_9;
   exprt char_dot;
@@ -437,49 +462,28 @@ void string_exprt::of_float
 	     );
   string_constraintt a(is_digit);
   axioms.push_back(a.forall(idx,index_zero,length()));
-
 }
 
 void string_exprt::of_double
-(const function_application_exprt &expr,axiom_vect & axioms)
+(const function_application_exprt &f,axiom_vect & axioms)
 {
-  // Warning this is only a partial specification
-  assert(expr.arguments().size() == 1);
-  axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(20)));
+  assert(f.arguments().size() == 1);
+  of_float(f.arguments()[0],axioms,refined_string_typet::is_c_string_type(f.type()),20);
+}
 
-  exprt char_0;
-  exprt char_9;
-  exprt char_dot;
-  bool is_c_string = refined_string_typet::is_c_string_type(expr.type());
 
-  if(is_c_string) {
-    char_0 = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-    char_9 = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-    char_dot = constant_of_nat(46,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  } else { 
-    char_0 = constant_of_nat(48,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
-    char_9 = constant_of_nat(57,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
-    char_dot = constant_of_nat(46,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
-  }
-
-  symbol_exprt idx = fresh_symbol("QA_double",refined_string_typet::index_type());
-  exprt c = (*this)[idx];
-
-  exprt is_digit = 
-    or_exprt(and_exprt(binary_relation_exprt(char_0,ID_le,c),
-		       binary_relation_exprt(c,ID_le,char_9)),
-	     equal_exprt(c,char_dot)
-	     );
-  string_constraintt a(is_digit);
-  axioms.push_back(a.forall(idx,index_zero,length()));
+void string_exprt::of_bool
+(const function_application_exprt &f,axiom_vect & axioms)
+{
+  assert(f.arguments().size() == 1);
+  of_bool(f.arguments()[0],axioms,refined_string_typet::is_c_string_type(f.type()));
 
 }
 
 void string_exprt::of_bool
-(const function_application_exprt &expr,axiom_vect & axioms)
+(const exprt &i,axiom_vect & axioms,bool is_c_string)
 {
   // Warning this is only a partial specification
-  assert(expr.arguments().size() == 1);
   axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(5)));
   axioms.emplace_back(binary_relation_exprt(length(), ID_ge, refined_string_typet::index_of_int(4)));
 }
@@ -554,6 +558,15 @@ void string_exprt::of_int
   }
 }
 
+void string_exprt::of_char
+(const exprt &c, axiom_vect & axioms, bool is_c_string)
+{
+  and_exprt lemma(equal_exprt((*this)[refined_string_typet::index_of_int(0)], c),
+		  equal_exprt(length(), refined_string_typet::index_of_int(1)));
+  axioms.push_back(lemma);
+
+}
+
 void string_exprt::of_string_char_set
 (const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
@@ -571,3 +584,59 @@ void string_exprt::of_string_char_set
   axioms.push_back(lemma);
 
 }
+
+
+void string_exprt::of_string_concat_int(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2;
+  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),10);
+  of_string_concat(s1,s2,symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_concat_long(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2;
+  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),30);
+  of_string_concat(s1,s2,symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_concat_bool(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2;
+  s2.of_bool(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
+  of_string_concat(s1,s2,symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_concat_char(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2;
+  s2.of_char(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
+  of_string_concat(s1,s2,symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_concat_double(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2;
+  s2.of_float(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),30);
+  of_string_concat(s1,s2,symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_concat_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2;
+  s2.of_float(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),10);
+  of_string_concat(s1,s2,symbol_to_string,axioms);
+}
+
