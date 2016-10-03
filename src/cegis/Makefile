@@ -53,6 +53,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       control/simplify/remove_unused_elements.cpp \
       control/verify/control_symex_verify.cpp control/verify/insert_solution.cpp \
       control/value/float_helper.cpp control/value/control_types.cpp \
+      refactor/environment/instrument_state_vars.cpp refactor/instructionset/create_cegis_processor.cpp \
       wordsize/restrict_bv_size.cpp value/program_individual_serialisation.cpp value/assignments_printer.cpp \
       seed/literals_seed.cpp \
       genetic/instruction_set_info_factory.cpp genetic/random_mutate.cpp genetic/random_cross.cpp \
