@@ -483,9 +483,39 @@ void string_exprt::of_bool
 void string_exprt::of_bool
 (const exprt &i,axiom_vect & axioms,bool is_c_string)
 {
-  // Warning this is only a partial specification
-  axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(5)));
-  axioms.emplace_back(binary_relation_exprt(length(), ID_ge, refined_string_typet::index_of_int(4)));
+  unsignedbv_typet char_type;
+  int char_width;
+  if(is_c_string) {
+    char_type = refined_string_typet::char_type();
+    char_width = STRING_SOLVER_CHAR_WIDTH;
+  } else {
+    char_type = refined_string_typet::java_char_type();
+    char_width = JAVA_STRING_SOLVER_CHAR_WIDTH;
+  }
+
+  assert(i.type() == bool_typet() || i.type().id() == ID_c_bool);
+  
+  typecast_exprt eq(i,bool_typet());
+
+  string_exprt true_string(char_type);
+  string_exprt false_string(char_type);
+  true_string.of_string_constant("true",char_width,char_type,axioms);
+  false_string.of_string_constant("false",char_width,char_type,axioms);
+
+  axioms.emplace_back(eq, equal_exprt(length(),true_string.length()));
+  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_equal_true", refined_string_typet::index_type());
+  axioms.push_back
+    (string_constraintt(eq,equal_exprt((*this)[qvar],true_string[qvar])
+			).forall(qvar,index_zero,true_string.length()));
+
+  axioms.emplace_back(not_exprt(eq), equal_exprt(length(),false_string.length()));
+  symbol_exprt qvar1 = string_exprt::fresh_symbol("qvar_equal_false", refined_string_typet::index_type());
+  axioms.push_back
+    (string_constraintt(not_exprt(eq),equal_exprt((*this)[qvar1],false_string[qvar1])
+			).forall(qvar,index_zero,false_string.length()));
+
+
+
 }
 
 
