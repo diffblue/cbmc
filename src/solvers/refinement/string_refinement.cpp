@@ -95,13 +95,14 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
       make_string(sym,expr.rhs());
       return false;
     }
+    /*
     else if(refined_string_typet::is_java_deref_string_type(type)) {
       debug() << "string_refinementt::boolbv_set_equality_to_true: warning"
 	      << " non pointer string " << eom;
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       make_string(sym,expr.rhs());
       return false;
-    }
+      }*/
     else if(type == char_type) {
       const bvt &bv1=convert_bv(expr.rhs());
       symbol_exprt sym = to_symbol_expr(expr.lhs());

@@ -136,6 +136,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_to_upper_case(expr,symbol_to_string,axioms);
     } else if (is_string_char_set_func(id)) {
       return of_string_char_set(expr,symbol_to_string,axioms);
+    } else if (is_string_value_of_func(id)) {
+      return of_string_value_of(expr,symbol_to_string,axioms);
     } else if (is_string_empty_string_func(id)) {
       return of_empty_string(expr,axioms);
     } else if (is_string_copy_func(id)) {
@@ -150,6 +152,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_long(expr,axioms);
     } else if (is_string_of_bool_func(id)) {
       return of_bool(expr,axioms);
+    } else if (is_string_set_length_func(id)) {
+      return of_string_set_length(expr,symbol_to_string,axioms);
     } else {
       std::string msg("string_exprt::of_function_application: unknown symbol :");
       msg+=id.c_str();
@@ -263,6 +267,55 @@ void string_exprt::of_string_copy(const function_application_exprt &f, std::map<
   symbol_exprt idx = fresh_symbol("QA_index_copy",refined_string_typet::index_type());
   string_constraintt a1(equal_exprt(s1[idx],(*this)[idx]));
   axioms.push_back(a1.forall(idx, index_zero, s1.length()));  
+}
+
+void string_exprt::of_string_set_length(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2);
+
+  bool is_c_string = refined_string_typet::is_c_string_type(f.type());
+  exprt null_char;
+  if(is_c_string)
+    null_char = constant_of_nat(0,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+  else 
+    null_char = constant_of_nat(0,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+  
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  axioms.emplace_back(equal_exprt(length(), args[1]));
+  symbol_exprt idx = fresh_symbol("QA_index_set_length",refined_string_typet::index_type());
+  string_constraintt a1
+    (and_exprt(implies_exprt(s1 > idx, equal_exprt(s1[idx],(*this)[idx])),
+	       implies_exprt(s1 <= idx, equal_exprt(s1[idx],null_char))));
+  axioms.push_back(a1.forall(idx, index_zero, (*this).length()));  
+}
+
+
+
+//#include <iostream>
+void string_exprt::of_java_char_array(const exprt & char_array, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  // this is not yet implemented
+  //std::cout << "of_java_char_array : " << char_array.pretty() << std::endl;
+  assert(false);
+}
+ 
+
+void string_exprt::of_string_value_of(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 3);
+  
+  exprt char_array = args[0];
+  exprt offset = args[1];
+  exprt count = args[2];
+  string_exprt str(refined_string_typet::java_char_type());
+  str.of_java_char_array(args[0],symbol_to_string,axioms);
+  axioms.emplace_back(equal_exprt(length(), count));
+  
+  symbol_exprt idx = fresh_symbol("QA_index_value_of",refined_string_typet::index_type());
+  string_constraintt a1(equal_exprt(str[plus_exprt(idx,offset)],(*this)[idx]));
+  axioms.push_back(a1.forall(idx, index_zero, count));  
 }
 
 void string_exprt::of_string_substring

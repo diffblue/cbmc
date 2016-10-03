@@ -51,5 +51,7 @@ bool is_string_trim_func(irep_idt id);
 bool is_string_to_lower_case_func(irep_idt id);
 bool is_string_to_upper_case_func(irep_idt id);
 bool is_string_is_empty_func(irep_idt id);
+bool is_string_value_of_func(irep_idt id);
+bool is_string_set_length_func(irep_idt id);
 
 #endif

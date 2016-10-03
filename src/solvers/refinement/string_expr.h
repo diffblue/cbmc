@@ -92,6 +92,8 @@ private:
   void of_string_to_lower_case(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_to_upper_case(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_char_set(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_value_of(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_set_length(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_empty_string(const function_application_exprt &f, axiom_vect & axioms);
   void of_int(const function_application_exprt &f, axiom_vect & axioms);
@@ -105,6 +107,7 @@ private:
   void of_bool(const function_application_exprt &f, axiom_vect & axioms);
   void of_bool(const exprt &i, axiom_vect & axioms, bool is_c_string);
   void of_char(const exprt &i, axiom_vect & axioms, bool is_c_string);
+  void of_java_char_array(const exprt & char_array, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 
   void of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 

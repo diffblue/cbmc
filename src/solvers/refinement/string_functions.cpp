@@ -12,7 +12,6 @@ Date:   September 2016
 
 #define char_literal_func "__CPROVER_uninterpreted_char_literal"
 #define string_length_func "__CPROVER_uninterpreted_strlen"
-#define string_set_length_func "__CPROVER_uninterpreted_set_length"
 #define string_equal_func "__CPROVER_uninterpreted_string_equal_func"
 #define string_char_at_func "__CPROVER_uninterpreted_char_at"
 #define string_concat_func "__CPROVER_uninterpreted_strcat_func"
@@ -45,6 +44,8 @@ Date:   September 2016
 #define string_to_lower_case_func "__CPROVER_uninterpreted_string_to_lower_case"
 #define string_to_upper_case_func "__CPROVER_uninterpreted_string_to_upper_case"
 #define string_is_empty_func "__CPROVER_uninterpreted_string_is_empty"
+#define string_value_of_func "__CPROVER_uninterpreted_string_value_of"
+#define string_set_length_func "__CPROVER_uninterpreted_string_set_length"
 
 
 bool starts_with(std::string s, std::string t) {
@@ -155,6 +156,12 @@ bool is_string_to_upper_case_func(irep_idt id){
 }
 bool is_string_is_empty_func(irep_idt id){
   return (starts_with(id2string(id),string_is_empty_func));
+}
+bool is_string_value_of_func(irep_idt id){
+  return (starts_with(id2string(id),string_value_of_func));
+}
+bool is_string_set_length_func(irep_idt id){
+  return (starts_with(id2string(id),string_set_length_func));
 }
 
 
