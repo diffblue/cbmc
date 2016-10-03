@@ -503,7 +503,7 @@ void string_exprt::of_int
     minus_char = constant_of_nat(45,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
     zero_char = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
     nine_char = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  } else {     
+    } else {     
     minus_char = constant_of_nat(45,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
     zero_char = constant_of_nat(48,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
     nine_char = constant_of_nat(57,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
@@ -590,8 +590,8 @@ void string_exprt::of_string_concat_int(const function_application_exprt &f, std
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2;
-  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),10);
+  string_exprt s2(refined_string_typet::get_char_type(args[1]));
+  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(args[1].type()),10);
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
 
@@ -599,8 +599,9 @@ void string_exprt::of_string_concat_long(const function_application_exprt &f, st
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2;
-  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),30);
+  string_exprt s2(refined_string_typet::get_char_type(args[1]));
+  
+  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(args[1].type()),30);
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
 
@@ -608,7 +609,7 @@ void string_exprt::of_string_concat_bool(const function_application_exprt &f, st
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2;
+  string_exprt s2(refined_string_typet::get_char_type(args[1]));
   s2.of_bool(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
@@ -617,7 +618,7 @@ void string_exprt::of_string_concat_char(const function_application_exprt &f, st
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2;
+  string_exprt s2(refined_string_typet::get_char_type(args[1]));
   s2.of_char(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
@@ -626,7 +627,7 @@ void string_exprt::of_string_concat_double(const function_application_exprt &f, 
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2;
+  string_exprt s2(refined_string_typet::get_char_type(args[1]));
   s2.of_float(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),30);
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
