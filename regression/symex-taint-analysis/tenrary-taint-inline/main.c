@@ -1,9 +1,5 @@
 #include <assert.h>
 
-struct name{
-   int a;
-   float b;
-};
 int main(){
 
 	int x;

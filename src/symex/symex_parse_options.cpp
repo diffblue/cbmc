@@ -523,7 +523,7 @@ bool symex_parse_optionst::handle_taint_analysis_option(
 
 
     path_search.set_taint(true, cmdline.get_value("taint-file"),
-    		taint_engine_retrievert::dummy_taint_engine);
+    		taint_engine_retrievert::simple_taint_engine);
 
   }
   else
