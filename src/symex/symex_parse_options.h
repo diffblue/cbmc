@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_ui.h>
 
 #include "path_search.h"
-#include <path-symex/path_symex_taint_analysis.h>
 
 class goto_functionst;
 class optionst;

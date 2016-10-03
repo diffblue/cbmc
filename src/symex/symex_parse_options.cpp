@@ -293,9 +293,8 @@ int symex_parse_optionst::doit()
     }
     else
     {
-      path_symex_no_taint_analysis_enginet taint_engine;
       path_search.set_taint(false, cmdline.get_value("taint-file"),
-          taint_engine);
+    		  taint_engine_retrievert::dummy_taint_engine);
     }
 
     path_search.eager_infeasibility=
@@ -521,14 +520,10 @@ bool symex_parse_optionst::handle_taint_analysis_option(
   // Find which taint engine has been selected
   if(cmdline.get_value("taint") == "simple")
   {
-    /*path_symex_simple_taint_analysis_enginet taint_engine;
-     path_search.set_taint(true, cmdline.get_value("taint-file"), taint_engine);
-     */
 
-    // QUICK FIX FOR NOW!
-    path_symex_simple_taint_analysis_enginet *taint_engine=
-        new path_symex_simple_taint_analysis_enginet();
-    path_search.set_taint(true, cmdline.get_value("taint-file"), *taint_engine);
+
+    path_search.set_taint(true, cmdline.get_value("taint-file"),
+    		taint_engine_retrievert::dummy_taint_engine);
 
   }
   else

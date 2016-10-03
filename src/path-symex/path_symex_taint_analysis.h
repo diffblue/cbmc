@@ -121,4 +121,16 @@ public:
   std::string get_taint_name(const taintt taint) const;
 };
 
+// The retriever contains static engines.
+class path_symex_taint_analysis_engine_retrievert
+{
+
+public:
+	static path_symex_simple_taint_analysis_enginet simple_taint_engine;
+	static path_symex_no_taint_analysis_enginet dummy_taint_engine;
+
+};
+
+typedef path_symex_taint_analysis_engine_retrievert taint_engine_retrievert;
+
 #endif

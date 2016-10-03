@@ -90,10 +90,8 @@ protected:
 
   static bool propagate(const exprt &src);
 
-  void recursive_taint_extraction(
-      const exprt &expr,
-      taintt &taint,
-      path_symex_statet &state);
+  void recursive_taint_extraction( const exprt &expr,
+      taintt &taint, path_symex_statet &state);
 
   void path_symex_set_taint_via_symbols(path_symex_statet &state,
   		const loc_reft &pc);

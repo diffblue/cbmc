@@ -78,7 +78,7 @@ taintt path_symex_simple_taint_analysis_enginet::parse_taint(
     return UNTAINTED;
   if(taint_name == "tainted")
     return TAINTED;
-  throw "Taint type not recognised";
+  throw "Parse Exception (taint type is not recognised)";
 }
 
 std::string path_symex_simple_taint_analysis_enginet::get_taint_name(
@@ -92,5 +92,9 @@ std::string path_symex_simple_taint_analysis_enginet::get_taint_name(
     case TAINTED:
       return "tainted";
   }
-  throw "Taint type not recognised";
+  throw "Cannot get taint name (taint type is not recognised)";
 }
+
+// Init retriever engines.
+path_symex_simple_taint_analysis_enginet taint_engine_retrievert::simple_taint_engine;
+path_symex_no_taint_analysis_enginet taint_engine_retrievert::dummy_taint_engine;
