@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cegis/safety/facade/safety_runner.h>
 #include <cegis/jsa/facade/jsa_runner.h>
 #include <cegis/control/facade/control_runner.h>
+#include <cegis/refactor/facade/refactor_runner.h>
 
 #include <cegis/runner/cegis_parse_options.h>
 
@@ -66,7 +67,8 @@ void cegis_parse_optionst::get_command_line_options(optionst &options)
   cbmc_parse_optionst::get_command_line_options(options);
 
   const bool configure_cegis=cmdline.isset("danger") || cmdline.isset("safety")
-      || cmdline.isset("jsa") || cmdline.isset(CEGIS_CONTROL);
+      || cmdline.isset("jsa") || cmdline.isset(CEGIS_CONTROL)
+      || cmdline.isset(CEGIS_REFACTOR);
   if (configure_cegis)
   {
     set_integer_option(options, cmdline, "cegis-min-size", 1u);
@@ -116,6 +118,8 @@ int cegis_parse_optionst::do_bmc(
     return run_jsa(options, result(), symbol_table, goto_functions);
   if (cmdline.isset(CEGIS_CONTROL))
     return run_control(options, result(), symbol_table, goto_functions);
+  if (cmdline.isset(CEGIS_REFACTOR))
+    return run_refactor(options, result(), symbol_table, goto_functions);
 
   return cbmc_parse_optionst::do_bmc(bmc, goto_functions);
 }

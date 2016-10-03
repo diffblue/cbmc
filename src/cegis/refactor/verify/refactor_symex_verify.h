@@ -7,37 +7,32 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_SYMEX_VERIFY_H_
-#define CEGIS_CONTROL_SYMEX_VERIFY_H_
+#ifndef CEGIS_REFACTOR_VERIFY_REFACTOR_SYMEX_VERIFY_H_
+#define CEGIS_REFACTOR_VERIFY_REFACTOR_SYMEX_VERIFY_H_
 
 #include <util/message.h>
 
-#include <cegis/control/value/control_counterexample.h>
-#include <cegis/control/value/control_solution.h>
-#include <cegis/control/options/control_program.h>
+#include <cegis/refactor/value/refactor_counterexample.h>
+#include <cegis/refactor/value/refactor_solution.h>
 
 /**
  * @brief
  *
  * @details
  */
-class control_symex_verifyt
+class refactor_symex_verifyt
 {
-  const control_programt &original_program;
-  control_programt current_program;
 public:
-  typedef control_counterexamplet counterexamplet;
-  typedef control_counterexamplest counterexamplest;
-  typedef control_solutiont candidatet;
+  typedef refactor_counterexamplet counterexamplet;
+  typedef refactor_counterexamplest counterexamplest;
+  typedef refactor_solutiont candidatet;
 
   /**
    * @brief
    *
    * @details
-   *
-   * @param original_program
    */
-  explicit control_symex_verifyt(const control_programt &original_program);
+  explicit refactor_symex_verifyt();
 
   /**
    * @brief
@@ -91,4 +86,4 @@ public:
       const counterexamplet &counterexample) const;
 };
 
-#endif /* CEGIS_CONTROL_SYMEX_VERIFY_H_ */
+#endif /* CEGIS_REFACTOR_VERIFY_REFACTOR_SYMEX_VERIFY_H_ */
