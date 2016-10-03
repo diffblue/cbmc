@@ -109,6 +109,9 @@ bool ansi_c_languaget::parse(
 
   // preprocessing
 
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_CPP)
+    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
+
   std::ostringstream o_preprocessed;
 
   if(preprocess(instream, path, o_preprocessed))
