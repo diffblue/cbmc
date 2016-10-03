@@ -107,6 +107,7 @@ public:
   bool simplify_abs(exprt &expr);
   bool simplify_sign(exprt &expr);
   bool simplify_popcount(exprt &expr);
+  bool simplify_quantifier(exprt &expr);
 
   // auxiliary
   bool simplify_if_implies(exprt &expr, const exprt &cond, bool truth, bool &new_truth);
