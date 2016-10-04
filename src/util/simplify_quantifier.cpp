@@ -14,6 +14,27 @@ Author:
 
 /*******************************************************************\
 
+Function: expr_eq
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: A method to detect equivalence between exprts that can
+          contain typecast
+
+\*******************************************************************/
+
+bool expr_eq(const exprt &expr1, const exprt &expr2)
+{
+  exprt e1=expr1, e2=expr2;
+  if(expr1.id()==ID_typecast) e1=expr1.op0();
+  if(expr2.id()==ID_typecast) e2=expr2.op0();
+  return e1==e2;
+}
+
+/*******************************************************************\
+
 Function: get_quantifier_var_min
 
   Inputs:
@@ -37,7 +58,7 @@ exprt get_quantifier_var_min(
     if(x.id()!=ID_not) continue;
     exprt y=x.op0();
     if(y.id()!=ID_ge) continue;
-    if(var_expr==y.op0() && y.op1().id()==ID_constant)
+    if(expr_eq(var_expr, y.op0()) && y.op1().id()==ID_constant)
     {
       return y.op1();
     }
@@ -68,7 +89,7 @@ exprt get_quantifier_var_max(
   for(auto &x : quantifier_expr.operands())
   {
     if(x.id()!=ID_ge) continue;
-    if(var_expr==x.op0() && x.op1().id()==ID_constant)
+    if(expr_eq(var_expr, x.op0()) && x.op1().id()==ID_constant)
     {
       exprt over_expr=x.op1();
       mp_integer over_i;
@@ -111,14 +132,14 @@ exprt get_quantifier_body(
   {
     if(x.id()==ID_ge)
     {
-      if(x.op0()==var_expr and x.op1().id()==ID_constant)
+      if(expr_eq(x.op0(), var_expr) and x.op1().id()==ID_constant)
         continue;
     }
     if(x.id()==ID_not)
     {
       exprt y=x.op0();
       if(y.id()!=ID_ge) continue;
-      if(y.op0()==var_expr and y.op1().id()==ID_constant)
+      if(expr_eq(y.op0(), var_expr) and y.op1().id()==ID_constant)
         continue;
     }
     return x;    
