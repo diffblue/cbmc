@@ -288,10 +288,8 @@ int symex_parse_optionst::doit()
 
     if(cmdline.isset("taint") && cmdline.get_value("taint") != "none")
     {
-
       if(handle_taint_analysis_option(path_search))
         return 0;
-
     }
     else
     {
@@ -525,11 +523,8 @@ bool symex_parse_optionst::handle_taint_analysis_option(
   // Find which taint engine has been selected
   if(cmdline.get_value("taint") == "simple")
   {
-
-
     path_search.set_taint(true, cmdline.get_value("taint-file"),
-    		taint_engine_retrievert::simple_taint_engine);
-
+        taint_engine_retrievert::simple_taint_engine);
   }
   else
   {
