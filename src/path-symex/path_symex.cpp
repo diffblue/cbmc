@@ -387,19 +387,21 @@ void path_symext::assign_rec(
       path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
       var_state.value=propagate(ssa_rhs)?ssa_rhs:nil_exprt();
 
-      if (state.taint_engine.enabled) {
-
+      if(state.taint_engine.enabled)
+      {
         // Check if taint is enforced as specified in JSON file.
-        if (state.is_enforced_taint_json()){
-          var_state.taint = state.get_enforced_taint();
+        if(state.is_enforced_taint_json())
+        {
+          var_state.taint=state.get_enforced_taint();
         }
-        else{
-          taintt taint = state.taint_engine.get_top_elem();
+        else
+        {
+          taintt taint=state.taint_engine.get_top_elem();
 
           // Retrieve and propagate taint state.
           recursive_taint_extraction(state.read_no_propagate(rhs), taint,
               state);
-          var_state.taint = taint;
+          var_state.taint=taint;
         }
       }
     }
@@ -1107,7 +1109,6 @@ void path_symext::recursive_taint_extraction(const exprt &expr, taintt &taint,
   // Check if we reached a symbol.
   if(expr.id() == ID_symbol)
   {
-
     // Convert expression to symbol and perform look-up using var_map.
     symbol_exprt symbol=to_symbol_expr(expr);
     const irep_idt &full_identifier=symbol.get(ID_C_full_identifier);
@@ -1150,7 +1151,6 @@ void path_symext::path_symex_set_taint_via_symbols(path_symex_statet &state,
     // Loops through all symbols that need to be tainted at a given loc.
     for (auto rule : state.taint_engine.taint_data->data[pc.loc_number])
     {
-
       // Check if symbol flag is set. If false, next rule is considered.
       if(!rule.symbol_flag)
         continue;
