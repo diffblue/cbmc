@@ -10,7 +10,7 @@ Author:
 
 #include "simplify_expr_class.h"
 #include "std_expr.h"
-#include "util/arith_tools.h"
+#include "arith_tools.h"
 
 /*******************************************************************\
 
