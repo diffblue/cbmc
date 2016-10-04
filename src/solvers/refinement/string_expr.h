@@ -50,25 +50,25 @@ public:
   static exprt within_bounds(const exprt & idx, const exprt & bound);
 
   // Expression of the character at position idx in the string
-  inline index_exprt operator[] (exprt idx)
+  inline index_exprt operator[] (const exprt & idx) const 
   { return index_exprt(content(), idx);}
 
   // Comparison on the length of the strings
-  inline binary_relation_exprt operator< (string_exprt rhs)
+  inline binary_relation_exprt operator< (const string_exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_lt, rhs.length()); }
-  inline binary_relation_exprt operator> (string_exprt rhs)
+  inline binary_relation_exprt operator> (const string_exprt & rhs) const 
   { return binary_relation_exprt(rhs.length(), ID_lt, length()); }
-  inline binary_relation_exprt operator<= (string_exprt rhs)
+  inline binary_relation_exprt operator<= (const string_exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_le, rhs.length()); }
-  inline binary_relation_exprt operator>= (string_exprt rhs)
+  inline binary_relation_exprt operator>= (const string_exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_ge, rhs.length()); }
-  inline binary_relation_exprt operator< (const exprt & rhs)
+  inline binary_relation_exprt operator< (const exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_lt, rhs); }
-  inline binary_relation_exprt operator> (const exprt & rhs)
+  inline binary_relation_exprt operator> (const exprt & rhs) const 
   { return binary_relation_exprt(rhs, ID_lt, length()); }
-  inline binary_relation_exprt operator>= (const exprt & rhs)
+  inline binary_relation_exprt operator>= (const exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_ge, rhs); }
-  inline binary_relation_exprt operator<= (const exprt & rhs)
+  inline binary_relation_exprt operator<= (const exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_le, rhs); }
 
   static irep_idt extract_java_string(const symbol_exprt & s);
@@ -79,7 +79,7 @@ private:
   // Auxiliary functions for of_expr
   void of_function_application(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_literal(const function_application_exprt &f,axiom_vect &axioms);
-  void of_string_concat(string_exprt s1, string_exprt s2, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
+  void of_string_concat(const string_exprt & s1, const string_exprt & s2, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_concat(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_concat_int(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_concat_long(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
@@ -87,11 +87,13 @@ private:
   void of_string_concat_char(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_concat_double(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_concat_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_substring(const string_exprt & str, const exprt & start, const exprt & end, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_substring(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_trim(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_to_lower_case(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_to_upper_case(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_char_set(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_delete (const string_exprt &str, const exprt & start, const exprt & end, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_delete(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_delete_char_at(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_value_of(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);

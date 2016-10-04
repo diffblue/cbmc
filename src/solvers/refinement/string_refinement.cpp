@@ -266,7 +266,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 {
 
   debug() << "string_refinementt::post_process: warning update_index_set has to be checked" << eom;
-  update_index_set(universal_axioms);
+  initial_index_set(universal_axioms);
   update_index_set(cur); 
   cur.clear();
   add_instantiations();
@@ -1180,9 +1180,9 @@ bool find_qvar(const exprt index, const symbol_exprt & qvar) {
 }
 
 
-void string_refinementt::update_index_set(const axiom_vect & string_axioms) {
+void string_refinementt::initial_index_set(const axiom_vect & string_axioms) {
   for (size_t i = 0; i < string_axioms.size(); ++i) {
-    update_index_set(string_axioms[i]);
+    initial_index_set(string_axioms[i]);
   }
 }
 
@@ -1192,7 +1192,7 @@ void string_refinementt::update_index_set(const std::vector<exprt> & cur) {
   }
 }
 
-void string_refinementt::update_index_set(const string_constraintt &axiom)
+void string_refinementt::initial_index_set(const string_constraintt &axiom)
 {
   assert(axiom.is_univ_quant());
   std::vector<exprt> bounds;
@@ -1238,8 +1238,11 @@ void string_refinementt::update_index_set(const exprt &formula)
       const exprt &i = cur.op1();
       assert(s.type().id() == ID_array);
       const exprt &simplified = simplify_sum(i);
-      if(index_set[s].insert(simplified).second)
+      if(index_set[s].insert(simplified).second) {
+	debug() << "adding to index set of " << pretty_short(s)
+		<< ": " << pretty_short(simplified) << eom;
 	current_index_set[s].insert(simplified);
+      }
     } else {
       forall_operands(it, cur) {
         to_process.push_back(*it);

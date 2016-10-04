@@ -232,7 +232,7 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
 }
 
 
-void string_exprt::of_string_concat(string_exprt s1, string_exprt s2, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms) {
+void string_exprt::of_string_concat(const string_exprt & s1, const string_exprt & s2, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms) {
   equal_exprt length_sum_lem(length(), plus_exprt(s1.length(), s2.length()));
   axioms.emplace_back(length_sum_lem);
 
@@ -337,21 +337,27 @@ void string_exprt::of_string_substring
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
 
   exprt i(args[1]);
-  assert(i.type() == refined_string_typet::index_type());
 
   exprt j;
   if(args.size() == 3) j = args[2];
   else j = str.length();
-  assert(j.type() == refined_string_typet::index_type());
 
+  of_string_substring(str,i,j,symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_substring
+  (const string_exprt & str, const exprt & start, const exprt & end, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
   symbol_exprt idx = fresh_symbol("index_substring", refined_string_typet::index_type());
+  assert(start.type() == refined_string_typet::index_type());
+  assert(end.type() == refined_string_typet::index_type());
 
-  axioms.emplace_back(equal_exprt(length(), minus_exprt(j, i)));
-  axioms.emplace_back(binary_relation_exprt(i, ID_lt, j));
-  axioms.emplace_back(str >= j);
+  axioms.emplace_back(equal_exprt(length(), minus_exprt(end, start)));
+  axioms.emplace_back(binary_relation_exprt(start, ID_lt, end));
+  axioms.emplace_back(str >= end);
 
   // forall idx < str.length, str[idx] = arg_str[idx+i]
-  string_constraintt a(equal_exprt((*this)[idx], str[plus_exprt(i, idx)]));
+  string_constraintt a(equal_exprt((*this)[idx], str[plus_exprt(start, idx)]));
   
   axioms.push_back(a.forall(idx,index_zero,length()));
 }
@@ -684,22 +690,29 @@ void string_exprt::of_string_delete_char_at
   const function_application_exprt::argumentst &args = expr.arguments();  
   assert(args.size() == 2); 
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
-  exprt index = args[1];
   exprt index_one = refined_string_typet::index_of_int(1);
-  // s = deleteCharAt(str,index)
+  of_string_delete(str,args[1],plus_exprt(args[1],index_one),symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_delete
+(const string_exprt &str, const exprt & start, const exprt & end, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  // We should have these formulas:
   // (index < |str| ==> |s| = |str| - 1) && (index >= |str| ==> |s| = |str|)
-  // forall i < index. i < |s| ==> s[i] = str[i]
-  // forall i >= index. i < |s| ==> s[i] = str[i+1]
-  axioms.emplace_back(str > index, equal_exprt(length(), minus_exprt(str.length(),index_one)));
-  axioms.emplace_back(str <= index, equal_exprt(length(), str.length()));
+  // forall i < |s| (i < index  ==> s[i] = str[i]
+  //              && i >= index ==> s[i] = str[i+1])
+  // However this may make the index set computation loop because the same 
+  // index appears switched by one.
+  // It may be better to call two substrings functions
 
-  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_delete_char_at", refined_string_typet::index_type());
-  string_constraintt sc((*this) > qvar,equal_exprt((*this)[qvar],str[qvar]));
-  axioms.push_back(sc.forall(qvar,index_zero,index));
-
-  symbol_exprt qvar2 = string_exprt::fresh_symbol("qvar_delete_char_at", refined_string_typet::index_type());
-  string_constraintt sc2(equal_exprt((*this)[qvar2],str[plus_exprt(qvar2,index_one)]));
-  axioms.push_back(sc2.forall(qvar2,index,length()));
+  assert(start.type() == refined_string_typet::index_type());
+  assert(end.type() == refined_string_typet::index_type());
+  string_exprt str1(refined_string_typet::get_char_type(str));
+  string_exprt str2(refined_string_typet::get_char_type(str));
+  str1.of_string_substring(str,index_zero,start,symbol_to_string,axioms);
+  str2.of_string_substring(str,end,str.length(),symbol_to_string,axioms);
+  of_string_concat(str1,str2,symbol_to_string,axioms);
+  
 }
 
 void string_exprt::of_string_delete
@@ -707,27 +720,8 @@ void string_exprt::of_string_delete
 {
   const function_application_exprt::argumentst &args = expr.arguments();  
   assert(args.size() == 3); 
-
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
-  exprt start = args[1];
-  exprt end = args[2];
-  // s = delete(str,start,end)
-  // start >= |str| ==> |s| = |str|
-  // start < |str| && end >= |str| ==> |s| = start
-  // start < |str| && end < |str| ==> |s| = |str| - (end - start)
-  // forall i < start. i < |s| ==> s[i] = str[i]
-  // forall i >= start. i < |s| ==> s[i] = str[i + (end - start)]
-  axioms.emplace_back(str <= start, equal_exprt(length(), str.length()));
-  axioms.emplace_back(and_exprt(str > start, str <= end), equal_exprt(length(), start));
-  axioms.emplace_back(and_exprt(str > start, str > end), equal_exprt(length(), minus_exprt(str.length(),minus_exprt(end,start))));
-
-  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_delete", refined_string_typet::index_type());
-  string_constraintt sc((*this) > qvar,equal_exprt((*this)[qvar],str[qvar]));
-  axioms.push_back(sc.forall(qvar,index_zero,start));
-
-  symbol_exprt qvar2 = string_exprt::fresh_symbol("qvar_delete", refined_string_typet::index_type());
-  string_constraintt sc2((*this) > qvar2,equal_exprt((*this)[qvar2],str[plus_exprt(qvar2,minus_exprt(end,start))]));
-  axioms.push_back(sc2.forall(qvar2,start,length()));
+  of_string_delete(str,args[1],args[2],symbol_to_string,axioms);
 }
 
 

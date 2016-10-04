@@ -137,8 +137,8 @@ private:
   // Add to the index set all the indices that appear in the formula
   void update_index_set(const exprt &formula);
   void update_index_set(const std::vector<exprt> &cur);
-  void update_index_set(const string_constraintt &axiom);
-  void update_index_set(const axiom_vect &string_axioms);
+  void initial_index_set(const string_constraintt &axiom);
+  void initial_index_set(const axiom_vect &string_axioms);
 
   // Takes an universaly quantified formula [axiom], 
   // an array of char variable [s], and an index expression [val]. 
