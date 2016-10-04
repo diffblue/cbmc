@@ -4,7 +4,6 @@
 #include <goto-programs/goto_inline.h>
 
 #include <cegis/cegis-util/program_helper.h>
-#include <cegis/cegis-util/inline_user_program.h>
 
 namespace
 {

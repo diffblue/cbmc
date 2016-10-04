@@ -28,4 +28,6 @@ void print(ITaxCalculator calc, double price) {
   System.out.print(percentage);
   System.out.println('%');
 }
+static void main() {
+}
 }

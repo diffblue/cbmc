@@ -88,6 +88,7 @@ void cegis_parse_optionst::get_command_line_options(optionst &options)
     options.set_option(CEGIS_SHOW_ITERATIONS, cmdline.isset(CEGIS_SHOW_ITERATIONS));
     options.set_option(CEGIS_KEEP_GOTO_PROGRAMS, cmdline.isset(CEGIS_KEEP_GOTO_PROGRAMS));
     set_integer_option(options, cmdline, CEGIS_MAX_RUNTIME, 300u);
+    options.set_option(CEGIS_NULL_OBJECT_REFACTOR, cmdline.isset(CEGIS_NULL_OBJECT_REFACTOR));
   }
 }
 

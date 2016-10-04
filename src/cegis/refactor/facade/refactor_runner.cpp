@@ -9,7 +9,7 @@
 int run_refactor(optionst &options, messaget::mstreamt &result,
     const symbol_tablet &st, const goto_functionst &gf)
 {
-  refactor_preprocessingt preproc;
+  refactor_preprocessingt preproc(options, st, gf);
   refactor_symex_learnt learn_cfg;
   refactor_symex_verifyt verify_cfg;
   cegis_symex_learnt<refactor_preprocessingt, refactor_symex_learnt> learn(

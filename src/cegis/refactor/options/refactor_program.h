@@ -10,7 +10,11 @@
 #ifndef CEGIS_REFACTOR_OPTIONS_REFACTOR_PROGRAM_H_
 #define CEGIS_REFACTOR_OPTIONS_REFACTOR_PROGRAM_H_
 
+#include <deque>
+
 #include <goto-programs/goto_functions.h>
+
+#include <cegis/cegis-util/goto_range.h>
 
 /**
  * @brief
@@ -29,6 +33,20 @@ public:
    * @details All variable locations to be considered in counterexamples (including loop bodies).
    */
   goto_programt::targetst counterexample_locations;
+
+  /**
+   * @brief
+   *
+   * @details
+   */
+  std::deque<goto_ranget> input_ranges;
+
+  /**
+   * @brief
+   *
+   * @details
+   */
+  std::deque<goto_ranget> spec_ranges;
 
   /**
    * @brief

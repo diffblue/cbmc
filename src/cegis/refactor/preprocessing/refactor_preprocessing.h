@@ -19,13 +19,23 @@
  */
 class refactor_preprocessingt
 {
+  const class optionst &options;
+  refactor_programt original_program;
+  refactor_programt current_program;
 public:
   /**
    * @brief
    *
    * @details
+   *
+   * @param options
+   * @param st
+   * @param gf
    */
-  explicit refactor_preprocessingt();
+  explicit refactor_preprocessingt(
+      const optionst &options,
+      const symbol_tablet &st,
+      const goto_functionst &gf);
 
   /**
    * @brief
