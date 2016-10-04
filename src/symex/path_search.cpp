@@ -36,6 +36,8 @@ path_searcht::resultt path_searcht::operator()(
   
   locs.build(goto_functions);
 
+  assert(taint_engine != nullptr);
+
   // Perform a non-comprehensive check on JSON file.
   if(taint_engine->enabled &&
       taint_data.check_rules(locs, warning(), *taint_engine)) {
