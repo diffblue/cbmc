@@ -154,6 +154,10 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_bool(expr,axioms);
     } else if (is_string_set_length_func(id)) {
       return of_string_set_length(expr,symbol_to_string,axioms);
+    } else if (is_string_delete_func(id)) {
+      return of_string_delete(expr,symbol_to_string,axioms);
+    } else if (is_string_delete_char_at_func(id)) {
+      return of_string_delete_char_at(expr,symbol_to_string,axioms);
     } else {
       std::string msg("string_exprt::of_function_application: unknown symbol :");
       msg+=id.c_str();
@@ -282,8 +286,14 @@ void string_exprt::of_string_set_length(const function_application_exprt &f, std
     null_char = constant_of_nat(0,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
   
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+
+  // |s| = k 
+  // && forall i < |s|. (i < k ==> s[i] = s1[i]) && (i >= k ==> s[i] = 0)
+
   axioms.emplace_back(equal_exprt(length(), args[1]));
   symbol_exprt idx = fresh_symbol("QA_index_set_length",refined_string_typet::index_type());
+
+  
   string_constraintt a1
     (and_exprt(implies_exprt(s1 > idx, equal_exprt(s1[idx],(*this)[idx])),
 	       implies_exprt(s1 <= idx, equal_exprt(s1[idx],null_char))));
@@ -666,6 +676,58 @@ void string_exprt::of_string_char_set
                                 equal_exprt(length(), str.length())));
   axioms.push_back(lemma);
 
+}
+
+void string_exprt::of_string_delete_char_at
+(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = expr.arguments();  
+  assert(args.size() == 2); 
+  string_exprt str = of_expr(args[0],symbol_to_string,axioms);
+  exprt index = args[1];
+  exprt index_one = refined_string_typet::index_of_int(1);
+  // s = deleteCharAt(str,index)
+  // (index < |str| ==> |s| = |str| - 1) && (index >= |str| ==> |s| = |str|)
+  // forall i < index. i < |s| ==> s[i] = str[i]
+  // forall i >= index. i < |s| ==> s[i] = str[i+1]
+  axioms.emplace_back(str > index, equal_exprt(length(), minus_exprt(str.length(),index_one)));
+  axioms.emplace_back(str <= index, equal_exprt(length(), str.length()));
+
+  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_delete_char_at", refined_string_typet::index_type());
+  string_constraintt sc((*this) > qvar,equal_exprt((*this)[qvar],str[qvar]));
+  axioms.push_back(sc.forall(qvar,index_zero,index));
+
+  symbol_exprt qvar2 = string_exprt::fresh_symbol("qvar_delete_char_at", refined_string_typet::index_type());
+  string_constraintt sc2(equal_exprt((*this)[qvar2],str[plus_exprt(qvar2,index_one)]));
+  axioms.push_back(sc2.forall(qvar2,index,length()));
+}
+
+void string_exprt::of_string_delete
+(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = expr.arguments();  
+  assert(args.size() == 3); 
+
+  string_exprt str = of_expr(args[0],symbol_to_string,axioms);
+  exprt start = args[1];
+  exprt end = args[2];
+  // s = delete(str,start,end)
+  // start >= |str| ==> |s| = |str|
+  // start < |str| && end >= |str| ==> |s| = start
+  // start < |str| && end < |str| ==> |s| = |str| - (end - start)
+  // forall i < start. i < |s| ==> s[i] = str[i]
+  // forall i >= start. i < |s| ==> s[i] = str[i + (end - start)]
+  axioms.emplace_back(str <= start, equal_exprt(length(), str.length()));
+  axioms.emplace_back(and_exprt(str > start, str <= end), equal_exprt(length(), start));
+  axioms.emplace_back(and_exprt(str > start, str > end), equal_exprt(length(), minus_exprt(str.length(),minus_exprt(end,start))));
+
+  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_delete", refined_string_typet::index_type());
+  string_constraintt sc((*this) > qvar,equal_exprt((*this)[qvar],str[qvar]));
+  axioms.push_back(sc.forall(qvar,index_zero,start));
+
+  symbol_exprt qvar2 = string_exprt::fresh_symbol("qvar_delete", refined_string_typet::index_type());
+  string_constraintt sc2((*this) > qvar2,equal_exprt((*this)[qvar2],str[plus_exprt(qvar2,minus_exprt(end,start))]));
+  axioms.push_back(sc2.forall(qvar2,start,length()));
 }
 
 

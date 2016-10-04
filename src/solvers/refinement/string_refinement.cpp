@@ -1075,32 +1075,41 @@ std::map< exprt, int> string_refinementt::map_of_sum(const exprt &f) {
 
 
 exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
-  exprt sum = refined_string_typet::refined_string_typet::index_of_int(0);
+  exprt sum = refined_string_typet::index_of_int(0);
+  mp_integer constants = 0;
 
   for (std::map<exprt,int>::iterator it = m.begin();
        it != m.end(); it++) {
+    // We should group constants together...
     const exprt &t = it->first;
     int second = negated?(-it->second):it->second;
-    if (second != 0)
-      if (second == -1) 
-	if(sum == refined_string_typet::index_of_int(0)) sum = unary_minus_exprt(t);
-	else sum = minus_exprt(sum,t);
-      else if (second == 1)
-	if(sum == refined_string_typet::index_of_int(0)) sum = t;
-	else sum = plus_exprt(sum, t);
-      else {
-	debug() << "in string_refinementt::sum_of_map:"
-		<< " warning: several occurences of the same variable " << eom;
-	variable_with_multiple_occurence_in_index = true;
-	if(second > 1)
-	  for(int i = 0; i < second; i++)
-	    sum = plus_exprt(sum, t);
-	else
-	  for(int i = 0; i > second; i--)
-	    sum = minus_exprt(sum, t);
-      }
+    if(t.id() == ID_constant) {
+      std::string value(to_constant_expr(t).get_value().c_str());
+      constants += binary2integer(value,true) * second;
+    } else {
+      if (second != 0)
+	if (second == -1) 
+	  if(sum == refined_string_typet::index_of_int(0)) sum = unary_minus_exprt(t);
+	  else sum = minus_exprt(sum,t);
+	else if (second == 1)
+	  if(sum == refined_string_typet::index_of_int(0)) sum = t;
+	  else sum = plus_exprt(sum, t);
+	else {
+	  debug() << "in string_refinementt::sum_of_map:"
+		  << " warning: several occurences of the same variable: " 
+		  << t.pretty() << eom;
+	  variable_with_multiple_occurence_in_index = true;
+	  if(second > 1)
+	    for(int i = 0; i < second; i++)
+	      sum = plus_exprt(sum, t);
+	  else
+	    for(int i = 0; i > second; i--)
+	      sum = minus_exprt(sum, t);
+	}
+    }
   }
-  return sum;
+
+  return plus_exprt(sum,constant_exprt(integer2binary(constants, STRING_SOLVER_INDEX_WIDTH), refined_string_typet::index_type()));
 }
 
 exprt string_refinementt::simplify_sum(const exprt &f) {

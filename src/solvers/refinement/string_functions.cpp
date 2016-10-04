@@ -11,7 +11,6 @@ Date:   September 2016
 
 
 #define char_literal_func "__CPROVER_uninterpreted_char_literal"
-#define string_length_func "__CPROVER_uninterpreted_strlen"
 #define string_equal_func "__CPROVER_uninterpreted_string_equal_func"
 #define string_char_at_func "__CPROVER_uninterpreted_char_at"
 #define string_concat_func "__CPROVER_uninterpreted_strcat_func"
@@ -21,29 +20,33 @@ Date:   September 2016
 #define string_concat_bool_func "__CPROVER_uninterpreted_strcat_bool_func"
 #define string_concat_float_func "__CPROVER_uninterpreted_strcat_float_func"
 #define string_concat_double_func "__CPROVER_uninterpreted_strcat_double_func"
-#define string_substring_func "__CPROVER_uninterpreted_substring"
-#define string_is_prefix_func "__CPROVER_uninterpreted_strprefixof"
-#define string_is_suffix_func "__CPROVER_uninterpreted_strsuffixof"
-#define string_endswith_func "__CPROVER_uninterpreted_string_endswith"
-#define string_startswith_func "__CPROVER_uninterpreted_string_startswith"
 #define string_contains_func "__CPROVER_uninterpreted_strcontains"
 #define string_char_set_func "__CPROVER_uninterpreted_char_set"
+#define string_copy_func "__CPROVER_uninterpreted_string_copy"
+#define string_delete_func "__CPROVER_uninterpreted_string_delete_func"
+#define string_delete_char_at_func "__CPROVER_uninterpreted_string_delete_char_at_func"
+#define string_empty_string_func "__CPROVER_uninterpreted_empty_string"
+#define string_endswith_func "__CPROVER_uninterpreted_string_endswith"
+#define string_equals_ignore_case_func "__CPROVER_uninterpreted_string_equals_ignore_case"
+#define string_hash_code_func "__CPROVER_uninterpreted_string_hash_code_func"
 #define string_index_of_func "__CPROVER_uninterpreted_strindexof"
+#define string_is_prefix_func "__CPROVER_uninterpreted_strprefixof"
+#define string_is_suffix_func "__CPROVER_uninterpreted_strsuffixof"
+#define string_is_empty_func "__CPROVER_uninterpreted_string_is_empty"
 #define string_last_index_of_func "__CPROVER_uninterpreted_strlastindexof"
 #define string_literal_func "__CPROVER_uninterpreted_string_literal"
-#define string_copy_func "__CPROVER_uninterpreted_string_copy"
-#define string_empty_string_func "__CPROVER_uninterpreted_empty_string"
-#define string_parse_int_func "__CPROVER_uninterpreted_parse_int"
+#define string_length_func "__CPROVER_uninterpreted_strlen"
 #define string_of_int_func "__CPROVER_uninterpreted_string_of_int"
 #define string_of_long_func "__CPROVER_uninterpreted_string_of_long"
 #define string_of_bool_func "__CPROVER_uninterpreted_string_of_bool"
 #define string_of_float_func "__CPROVER_uninterpreted_string_of_float"
 #define string_of_double_func "__CPROVER_uninterpreted_string_of_double"
-#define string_equals_ignore_case_func "__CPROVER_uninterpreted_string_equals_ignore_case"
+#define string_substring_func "__CPROVER_uninterpreted_substring"
+#define string_startswith_func "__CPROVER_uninterpreted_string_startswith"
+#define string_parse_int_func "__CPROVER_uninterpreted_parse_int"
 #define string_trim_func "__CPROVER_uninterpreted_string_trim"
 #define string_to_lower_case_func "__CPROVER_uninterpreted_string_to_lower_case"
 #define string_to_upper_case_func "__CPROVER_uninterpreted_string_to_upper_case"
-#define string_is_empty_func "__CPROVER_uninterpreted_string_is_empty"
 #define string_value_of_func "__CPROVER_uninterpreted_string_value_of"
 #define string_set_length_func "__CPROVER_uninterpreted_string_set_length"
 
@@ -163,5 +166,15 @@ bool is_string_value_of_func(irep_idt id){
 bool is_string_set_length_func(irep_idt id){
   return (starts_with(id2string(id),string_set_length_func));
 }
+bool is_string_delete_func(irep_idt id){
+  return (starts_with(id2string(id),string_delete_func));
+}
+bool is_string_delete_char_at_func(irep_idt id){
+  return (starts_with(id2string(id),string_delete_char_at_func));
+}
+bool is_string_hash_code_func(irep_idt id){
+  return (starts_with(id2string(id),string_hash_code_func));
+}
+
 
 
