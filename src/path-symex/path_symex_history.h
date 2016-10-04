@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PATH_SYMEX_HISTORY_H
 #define CPROVER_PATH_SYMEX_HISTORY_H
 
-#include <limits>
 #include <cassert>
+#include <limits>
 
 #include <util/std_expr.h>
 

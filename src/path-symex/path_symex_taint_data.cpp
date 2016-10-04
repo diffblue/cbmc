@@ -8,14 +8,12 @@
 
 #include "path_symex_taint_data.h"
 
-taint_datat::taint_rulet::taint_rulet()
-{
-  loc=0;
-  // 0 = TOP element, always.
-  taint=0;
-  symbol_flag=false;
-  symbol_name="";
-}
+taint_datat::taint_rulet::taint_rulet():
+  loc(0),
+  taint(0),
+  symbol_flag(false),
+  symbol_name("")
+{}
 
 /*******************************************************************
 

@@ -51,7 +51,7 @@ void remove_ternaryt::replace_ternary(goto_programt &goto_program,
   if(expr.id() == ID_code)
   {
     codet &code=to_code(expr);
-    if(to_code(expr).get_statement() == ID_assign)
+    if(code.get_statement() == ID_assign)
     {
       code_assignt &code_assign=to_code_assign(code);
 
@@ -163,14 +163,14 @@ void remove_ternaryt::replace_ternary(goto_programt &goto_program,
 
 void remove_ternaryt::operator()(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(f_it, goto_functions){
-  goto_programt &goto_program=f_it->second.body;
+  Forall_goto_functions(f_it, goto_functions) {
+    goto_programt &goto_program=f_it->second.body;
 
-  Forall_goto_program_instructions(i_it, goto_program)
-  replace_ternary(goto_program, i_it, i_it->code, false);
-}
+    Forall_goto_program_instructions(i_it, goto_program)
+    replace_ternary(goto_program, i_it, i_it->code, false);
+  }
 
-goto_functions.update();
+  goto_functions.update();
 }
 
 /*******************************************************************

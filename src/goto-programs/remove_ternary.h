@@ -33,10 +33,6 @@ protected:
       goto_programt::instructionst::iterator &i_it,
           exprt &expr,
           bool lhs);
-
-  void contains_ternary(exprt &expr, bool &contains);
-
-  bool contains_ternary(exprt &expr);
 };
 
 void remove_ternary(symbol_tablet &, goto_functionst &);

@@ -12,8 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "locs.h"
 #include "var_map.h"
 #include "path_symex_history.h"
+#include "path_symex_taint_data.h"
 
-#include <path-symex/path_symex_taint_data.h>
 struct path_symex_statet
 {
 public:
@@ -260,3 +260,4 @@ path_symex_statet initial_state(
   taint_enginet &);
   
 #endif
+

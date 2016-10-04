@@ -1193,7 +1193,7 @@ void path_symext::path_symex_handle_taint_expr(path_symex_statet &state,
   if(code.op0().id() == ID_set_taint)
   {
     exprt src=code.op0();
-    assert(src.has_operands());
+    assert(src.operands().size() > 1);
 
     // Retrieve Symbol name.
     assert(src.op0().id() == ID_address_of);
@@ -1202,7 +1202,7 @@ void path_symext::path_symex_handle_taint_expr(path_symex_statet &state,
     assert(src.op0().op0().has_operands());
     assert(src.op0().op0().op0().id() == ID_string_constant);
 
-    dstring symbol_name=src.op0().op0().op0().get_string(ID_value);
+    irep_idt symbol_name=src.op0().op0().op0().get_string(ID_value);
 
     // Retrieve taint state (as string).
     assert(src.op1().id() == ID_address_of);

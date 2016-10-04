@@ -357,11 +357,12 @@ exprt path_symex_statet::instantiate_rec(
      *  Note that string constants are rewritten into:
      *    address_of -> index -> string_constant.
      */
+    assert(src.operands().size() == 2);
     assert(src.op0().id() == ID_address_of);
     assert(src.op0().op0().id() == ID_index);
     assert(src.op0().op0().op0().id() == ID_string_constant);
 
-    dstring symbol_name=src.op0().op0().op0().get_string(ID_value);
+    irep_idt symbol_name=src.op0().op0().op0().get_string(ID_value);
 
     // Fetch taint state query.
     assert(src.op0().id() == ID_address_of);
