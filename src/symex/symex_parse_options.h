@@ -42,6 +42,7 @@ class optionst;
   "(show-locs)(show-vcc)(show-properties)(show-goto-functions)" \
   "(property):(trace)(show-trace)(stop-on-fail)(eager-infeasibility)" \
   "(taint):(show-taint-data)(taint-file):" \
+  "(remove-ternary)" \
   "(no-simplify)(no-unwinding-assertions)(no-propagation)"
   // the last line is for CBMC-regression testing only
 
