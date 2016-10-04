@@ -18,6 +18,29 @@
 
 #include "remove_ternary.h"
 
+class remove_ternaryt
+{
+public:
+  explicit remove_ternaryt(symbol_tablet &_symbol_table):
+    symbol_table(_symbol_table)
+  {
+  }
+
+  void operator()(goto_functionst &goto_functions);
+
+protected:
+  symbol_tablet &symbol_table;
+
+  unsigned int replaced = 0;
+
+  void replace_ternary(
+      goto_programt &goto_program,
+      goto_programt::instructionst::iterator &i_it,
+          exprt &expr,
+          bool lhs);
+};
+
+
 /*******************************************************************
  Function:  Replace ternary
 
