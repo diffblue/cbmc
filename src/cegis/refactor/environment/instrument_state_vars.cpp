@@ -2,7 +2,7 @@
 
 void instrument_state_vars(goto_programt &body,
     const goto_programt::targett &first, const goto_programt::targett &last,
-    std::function<bool(const goto_programt::instructiont &)> predicate)
+    const std::function<bool(const typet &)> predicate)
 {
   // TODO: Implement
   assert(false);
@@ -10,7 +10,7 @@ void instrument_state_vars(goto_programt &body,
 
 namespace
 {
-bool yes(const goto_programt::instructiont &instr)
+bool yes(const typet &instr)
 {
   return true;
 }

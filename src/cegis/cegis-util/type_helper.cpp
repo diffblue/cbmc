@@ -1,7 +1,11 @@
+#include <algorithm>
+
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 #include <util/type_eq.h>
 #include <util/namespace.h>
+
+#include <cegis/cegis-util/type_helper.h>
 
 #define TAG_PREFIX "tag-"
 
@@ -41,4 +45,18 @@ bool instanceof(const symbol_tablet &st, const typet &lhs, const typet &rhs)
   if (ID_class != resolved_lhs.id() || ID_class != resolved_rhs.id())
     return type_eq(resolved_lhs, resolved_rhs, ns);
   return instanceof(resolved_lhs, resolved_rhs, ns);
+}
+
+instanceof_anyt::instanceof_anyt(const symbol_tablet &st,
+    const std::set<typet> &types) :
+    st(st), types(types)
+{
+}
+
+bool instanceof_anyt::operator ()(const typet &type) const
+{
+  return types.end()
+      != std::find_if(types.begin(), types.end(),
+          [this, &type](const typet &rhs)
+          { return instanceof(st, type, rhs);});
 }

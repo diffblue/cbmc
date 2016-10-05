@@ -5,6 +5,7 @@
 #include <cegis/options/parameters.h>
 #include <cegis/cegis-util/inline_user_program.h>
 #include <cegis/cegis-util/program_helper.h>
+#include <cegis/cegis-util/type_helper.h>
 #include <cegis/refactor/environment/instrument_state_vars.h>
 #include <cegis/refactor/nullobject/range_collector.h>
 #include <cegis/refactor/preprocessing/refactor_preprocessing.h>
@@ -27,9 +28,7 @@ void refactor_preprocessingt::operator()()
     {
       goto_ranget &input_range=sketch.input_range;
       goto_programt &body=get_body(gf, input_range.first);
-      const std::function<bool(const goto_programt::instructiont &)> pred=
-          [&st, &sketch](const goto_programt::instructiont &instr)
-          { return false;};
+      const instanceof_anyt pred(st, sketch.types);
       instrument_state_vars(body, input_range.first, input_range.second, pred);
     }
     // TODO: collect_

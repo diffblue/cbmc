@@ -13,21 +13,19 @@
 #include <set>
 
 #include <util/type.h>
-#include <goto-programs/goto_program.h>
+
+#include <cegis/cegis-util/goto_range.h>
 
 /**
  * @brief
  *
  * @details
  *
- * @param first
- * @param last
+ * @param range
  *
  * @return
  */
-std::set<typet> collect_context_types(
-    goto_programt::const_targett first,
-    const goto_programt::const_targett &last);
+std::set<typet> collect_context_types(const goto_ranget &range);
 
 /**
  * @brief

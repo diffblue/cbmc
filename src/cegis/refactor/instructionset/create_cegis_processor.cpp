@@ -16,17 +16,17 @@ public:
 };
 }
 
-std::set<typet> collect_context_types(goto_programt::const_targett first,
-    const goto_programt::const_targett &last)
+std::set<typet> collect_context_types(const goto_ranget &range)
 {
   type_collectort collector;
-  for (; first != last; ++first)
-    first->code.visit(collector);
+  for (goto_programt::const_targett it(range.first); it != range.second; ++it)
+    it->code.visit(collector);
   return collector.types;
 }
 
 void create_cegis_processor(const std::set<typet> &state_types,
     const size_t var_slots_per_state_type, const std::set<typet> &context_types)
 {
-
+  // TODO: Implement
+  assert(false);
 }

@@ -28,7 +28,7 @@ void instrument_state_vars(
     goto_programt &body,
     const goto_programt::targett &first,
     const goto_programt::targett &last,
-    std::function<bool(const goto_programt::instructiont &)> predicate);
+    std::function<bool(const typet &)> predicate);
 
 /**
  * @brief

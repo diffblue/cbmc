@@ -50,9 +50,8 @@ void collect_nullobject_ranges(refactor_programt &prog)
       sketch.spec_range=else_range;
       sketch.input_range=then_range;
     }
-    sketch.types=collect_context_types(then_range.first, then_range.second);
-    const std::set<typet> tmp(
-        collect_context_types(else_range.first, else_range.second));
+    sketch.types=collect_context_types(then_range);
+    const std::set<typet> tmp(collect_context_types(else_range));
     sketch.types.insert(tmp.begin(), tmp.end());
   }
 }
