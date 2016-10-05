@@ -70,6 +70,7 @@ protected:
   bvt convert_char_literal(const function_application_exprt &f);
   bvt convert_string_char_at(const function_application_exprt &f);
   exprt convert_string_parse_int(const function_application_exprt &f);
+  exprt convert_string_to_char_array(const function_application_exprt &f);
 
 private:
   // All constraints produced by the code

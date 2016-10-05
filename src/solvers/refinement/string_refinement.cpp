@@ -212,6 +212,8 @@ bvt string_refinementt::convert_function_application(
       return convert_bv(convert_string_last_index_of(expr));
     } else if (is_string_parse_int_func(id)) {
       return convert_bv(convert_string_parse_int(expr));
+    } else if (is_string_to_char_array_func(id)) {
+      return convert_bv(convert_string_to_char_array(expr));
     }
   }
 
@@ -866,6 +868,16 @@ void string_refinementt::add_instantiations()
   }
 }
 
+exprt string_refinementt::convert_string_to_char_array
+(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();  
+  assert(args.size() == 1);
+
+  string_exprt str = make_string(args[0]);
+
+  return str.content();
+}
 
 unsigned integer_of_expr(const constant_exprt & expr) {
   return integer2unsigned(string2integer(as_string(expr.get_value()),2));

@@ -158,6 +158,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_delete(expr,symbol_to_string,axioms);
     } else if (is_string_delete_char_at_func(id)) {
       return of_string_delete_char_at(expr,symbol_to_string,axioms);
+    } else if (is_string_replace_func(id)) {
+      return of_string_replace(expr,symbol_to_string,axioms);
     } else {
       std::string msg("string_exprt::of_function_application: unknown symbol :");
       msg+=id.c_str();
@@ -681,6 +683,29 @@ void string_exprt::of_string_char_set
                       and_exprt(equal_exprt(content(), sarrnew),
                                 equal_exprt(length(), str.length())));
   axioms.push_back(lemma);
+
+}
+
+void string_exprt::of_string_replace
+(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+{
+  const function_application_exprt::argumentst &args = f.arguments();  
+  assert(args.size() == 3); 
+  string_exprt str = of_expr(args[0],symbol_to_string,axioms);
+  exprt oldChar = args[1];
+  exprt newChar = args[2];
+
+  axioms.emplace_back(equal_exprt(length(), str.length()));
+  symbol_exprt qvar = string_exprt::fresh_symbol("QA_replace", refined_string_typet::index_type());
+
+  axioms.push_back
+    (string_constraintt
+     (and_exprt
+      (implies_exprt(equal_exprt(str[qvar],oldChar),equal_exprt((*this)[qvar],newChar)),
+       implies_exprt(not_exprt(equal_exprt(str[qvar],oldChar)),
+		     equal_exprt((*this)[qvar],str[qvar]))
+       )
+      ).forall(qvar,index_zero,length()));
 
 }
 
