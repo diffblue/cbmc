@@ -9,7 +9,15 @@ public class test_prefix {
 	//boolean c = s.startsWith("Wello");
 	//boolean b = s.startsWith(t);
 	boolean c = s.startsWith(u);
-	assert(b);	
-	assert(c);
+	boolean d = s.startsWith("lo",3);
+	if(argv.length == 1){
+	    assert(b);	
+	} else if(argv.length == 2){
+	    assert(c);
+	} else if(argv.length == 3){
+	    assert(d);
+	} else if(argv.length == 4){	
+	    assert(!d);
+	}
     }
 }

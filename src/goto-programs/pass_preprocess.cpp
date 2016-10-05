@@ -194,7 +194,11 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_equal_func");
 	} else if(function_id == irep_idt("java::java.lang.String.equalsIgnoreCase:(Ljava/lang/String;)Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_equals_ignore_case");
-	} else if(function_id == irep_idt("java::java.lang.String.startsWith:(Ljava/lang/String;)Z")) {
+	} else if(function_id == irep_idt
+		  ("java::java.lang.String.startsWith:(Ljava/lang/String;)Z")
+		  || function_id == irep_idt
+		  ("java::java.lang.String.startsWith:(Ljava/lang/String;I)Z")
+		  ) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_startswith");
 	} else if(function_id == irep_idt("java::java.lang.String.endsWith:(Ljava/lang/String;)Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_endswith");

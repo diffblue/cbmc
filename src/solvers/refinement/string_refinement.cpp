@@ -197,11 +197,11 @@ bvt string_refinementt::convert_function_application(
     } else if (is_string_char_at_func(id)) {
       return convert_string_char_at(expr);
     } else if (is_string_is_prefix_func(id)) {
-      return convert_string_is_prefix(expr);
+      return convert_bv(convert_string_is_prefix(expr));
     } else if (is_string_is_suffix_func(id)) {
       return convert_string_is_suffix(expr);
     } else if (is_string_startswith_func(id)) {
-      return convert_string_is_prefix(expr,true);
+      return convert_bv(convert_string_is_prefix(expr,true));
     } else if (is_string_endswith_func(id)) {
       return convert_string_is_suffix(expr,true);
     } else if (is_string_contains_func(id)) {
@@ -487,38 +487,43 @@ exprt string_refinementt::is_positive(const exprt & x)
 { return binary_relation_exprt(x, ID_ge, refined_string_typet::index_of_int(0)); }
 
 
-bvt string_refinementt::convert_string_is_prefix
-(const function_application_exprt &f, bool swap_arguments)
+exprt string_refinementt::convert_string_is_prefix(const string_exprt &prefix, const string_exprt &str, const exprt & offset)
 {
-  const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 2); //bad args to string isprefix
-  assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
-
   symbol_exprt isprefix = fresh_boolean("isprefix");
-  typecast_exprt tc_isprefix(isprefix,f.type());
-  string_exprt s0 = make_string(args[swap_arguments?1:0]);
-  string_exprt s1 = make_string(args[swap_arguments?0:1]);
+  string_axioms.emplace_back(isprefix, str >= plus_exprt(prefix.length(),offset));
 
-  string_axioms.emplace_back(isprefix, s1 >= s0);
-
+  // forall 0 <= witness < prefix.length. isprefix => s0[witness+offset] = s2[witness]
   symbol_exprt qvar = string_exprt::fresh_symbol("QA_isprefix", index_type);
   string_axioms.push_back
-    (string_constraintt(isprefix, equal_exprt(s0[qvar],s1[qvar])
-			).forall(qvar,zero,s0.length()));
+    (string_constraintt(isprefix, equal_exprt(str[plus_exprt(qvar,offset)],prefix[qvar])
+			).forall(qvar,zero,prefix.length()));
 	     
   symbol_exprt witness = fresh_index("witness_not_isprefix");
 
-  // forall witness < s0.length. isprefix => s0[witness] = s2[witness]
-
-  or_exprt s0_notpref_s1(not_exprt(s1 >= s0),
-			 and_exprt(is_positive(witness),
-				   and_exprt(s0 > witness, 
-					     notequal_exprt(s0[witness],s1[witness]))));
+  or_exprt s0_notpref_s1(not_exprt(str >= plus_exprt(prefix.length(),offset)),
+			 and_exprt
+			 (str >= plus_exprt(prefix.length(),offset),
+			  and_exprt(binary_relation_exprt(witness,ID_ge,zero),
+				    and_exprt(prefix > witness, 
+					      notequal_exprt(str[plus_exprt(witness,offset)],prefix[witness])))));
 		       
   string_axioms.emplace_back(implies_exprt (not_exprt(isprefix),s0_notpref_s1));
+  return isprefix; 
+}
 
+exprt string_refinementt::convert_string_is_prefix
+(const function_application_exprt &f, bool swap_arguments)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
+  string_exprt s0 = make_string(args[swap_arguments?1:0]);
+  string_exprt s1 = make_string(args[swap_arguments?0:1]);
+  exprt offset;
 
-  return convert_bv(tc_isprefix); 
+  if(args.size() == 2) offset = zero;
+  else if (args.size() == 3) offset = args[2];
+
+  return typecast_exprt(convert_string_is_prefix(s0,s1,offset),f.type());
 }
 
 exprt string_refinementt::convert_string_is_empty
