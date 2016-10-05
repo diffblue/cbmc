@@ -180,7 +180,7 @@ void string_exprt::of_string_constant(irep_idt sval, int char_width, unsignedbv_
     std::string sval_binary=integer2binary(unsigned(sval[i]), char_width);
     constant_exprt c(sval_binary,char_type);
     equal_exprt lemma(index_exprt(content(), idx), c);
-    axioms.emplace_back(lemma);
+    axioms.emplace_back(lemma,true);
   }
   
   std::string s_length_binary = integer2binary(unsigned(sval.size()),STRING_SOLVER_INDEX_WIDTH);

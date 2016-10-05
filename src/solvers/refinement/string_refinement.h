@@ -62,7 +62,8 @@ protected:
   bvt convert_string_is_prefix(const function_application_exprt &f, bool swap_arguments=false);
   bvt convert_string_is_suffix(const function_application_exprt &f, bool swap_arguments=false);
   bvt convert_string_contains(const function_application_exprt &f);
-  bvt convert_string_index_of(const function_application_exprt &f);
+  exprt convert_string_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
+  exprt convert_string_index_of(const function_application_exprt &f);
   bvt convert_string_last_index_of(const function_application_exprt &f);
   bvt convert_char_literal(const function_application_exprt &f);
   bvt convert_string_char_at(const function_application_exprt &f);
@@ -121,7 +122,7 @@ private:
   // Natural number expression corresponding to a constant integer
   constant_exprt constant_of_nat(int i,typet t);
 
-  void add_lemma(const exprt &lemma);
+  void add_lemma(const exprt &lemma, bool add_to_index_set=true);
 
   //void set_to(const exprt &expr, bool value);
   bool boolbv_set_equality_to_true(const equal_exprt &expr);

@@ -59,7 +59,7 @@ string_constraintt string_constraintt::not_contains(exprt univ_bound_inf, exprt 
 
 string_constraintt string_constraintt::exists(const symbol_exprt & exist, const exprt & bound_inf, const exprt & bound_sup)
 {
-  assert(form == SIMPLE);
+  assert(is_simple() || is_string_constant());
   return string_constraintt
     (and_exprt(*this, 
 	       and_exprt(binary_relation_exprt(exist, ID_ge, bound_inf),

@@ -207,7 +207,7 @@ bvt string_refinementt::convert_function_application(
     } else if (is_string_contains_func(id)) {
       return convert_string_contains(expr);
     } else if (is_string_index_of_func(id)) {
-      return convert_string_index_of(expr);
+      return convert_bv(convert_string_index_of(expr));
     } else if (is_string_last_index_of_func(id)) {
       return convert_string_last_index_of(expr);
     } else if (is_string_parse_int_func(id)) {
@@ -231,6 +231,8 @@ void string_refinementt::post_process()
   for(int i = 0; i < string_axioms.size(); i++)
     if(string_axioms[i].is_simple())
       add_lemma(string_axioms[i]);
+    else if(string_axioms[i].is_string_constant())
+      add_lemma(string_axioms[i]); //,false);
     else if(string_axioms[i].is_univ_quant())
       universal_axioms.push_back(string_axioms[i]);
     else {
@@ -337,7 +339,7 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
   return ret;
 }
 
-void string_refinementt::add_lemma(const exprt &lemma)
+void string_refinementt::add_lemma(const exprt &lemma, bool add_to_index_set)
 {
   if (!seen_instances.insert(lemma).second) return;
 
@@ -346,7 +348,8 @@ void string_refinementt::add_lemma(const exprt &lemma)
   debug() << "adding lemma " << pretty_short(lemma) << eom;
 
   prop.l_set_to_true(convert(lemma));
-  cur.push_back(lemma);
+  if(add_to_index_set)
+    cur.push_back(lemma);
 }
 
 
@@ -636,20 +639,38 @@ symbol_exprt string_refinementt::fresh_boolean(const irep_idt &prefix){
   return b;
 }
 
-bvt string_refinementt::convert_string_index_of(
+
+exprt string_refinementt::convert_string_index_of(const string_exprt &str, const exprt & c, const exprt & from_index){
+  symbol_exprt index = fresh_index("index_of");
+  symbol_exprt contains = fresh_boolean("contains_in_index_of");
+
+  // from_index <= i < |s| && (i = -1 <=> !contains) && (contains => i >= from_index && s[i] = c)
+  // && forall n. from_index <= n < i => s[n] != c 
+  
+  string_axioms.push_back(string_constraintt(equal_exprt(index,refined_string_typet::index_of_int(-1)),not_exprt(contains)).exists(index,refined_string_typet::index_of_int(-1),str.length()));
+  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,refined_string_typet::index_of_int(-1)));
+  string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(from_index,ID_le,index),equal_exprt(str[index],c)));
+
+  symbol_exprt n = string_exprt::fresh_symbol("QA_index_of",index_type);
+
+  string_axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,from_index,index));
+
+  symbol_exprt m = string_exprt::fresh_symbol("QA_index_of",index_type);
+
+  string_axioms.push_back(string_constraintt(not_exprt(contains),not_exprt(equal_exprt(str[m],c))).forall(m,from_index,str.length()));
+
+  return index;
+}
+
+
+exprt string_refinementt::convert_string_index_of(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 2); // bad args to string index of?
-  if(f.type() != index_type) {
-    debug() << "convert_string_index_of of the wrong type "<< f.type().pretty() << eom;
-    assert(false);
-  }
-    
-  symbol_exprt index = fresh_index("index_of");
-  symbol_exprt contains = fresh_boolean("contains_in_index_of");
+  assert(f.type() == index_type);
   string_exprt str = make_string(args[0]);
   exprt c = args[1];
+  exprt from_index;
 
   if(!(c.type() == char_type || c.type() == java_char_type)){
     debug() << "warning: argument to string_index_of does not have char type: " 
@@ -657,24 +678,11 @@ bvt string_refinementt::convert_string_index_of(
     c = typecast_exprt(c,java_char_type);
   }
 
-  // 0 <= i < |s| && (i = -1 <=> !contains) && (contains => s[i] = c)
-  // && forall n. 0 < n < i => s[n] != c 
-  
-  string_axioms.push_back(string_constraintt(equal_exprt(index,refined_string_typet::index_of_int(-1)),not_exprt(contains)).exists(index,refined_string_typet::index_of_int(-1),str.length()));
-  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,refined_string_typet::index_of_int(-1)));
-  string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(zero,ID_le,index),equal_exprt(str[index],c)));
+  if(args.size() == 2) from_index = zero;
+  else if (args.size() == 3) from_index = args[2];
+  else assert(false);
 
-
-  symbol_exprt n = string_exprt::fresh_symbol("QA_index_of",index_type);
-
-  string_axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,zero,index));
-
-  symbol_exprt m = string_exprt::fresh_symbol("QA_index_of",index_type);
-
-  string_axioms.push_back(string_constraintt(not_exprt(contains),not_exprt(equal_exprt(str[m],c))).forall(m,zero,str.length()));
-
-  bvt bv = convert_bv(index);
-  return bv;
+  return convert_string_index_of(str,c,from_index);    
 }
 
 bvt string_refinementt::convert_string_last_index_of(

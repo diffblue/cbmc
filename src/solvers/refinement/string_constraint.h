@@ -16,12 +16,13 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 class string_constraintt : public exprt 
 {
 private:
-  // String axioms can have 3 different forms:
+  // String axioms can have 4 different forms:
   // either a simple expression p, 
+  // or a string constant: forall x in [0,|s|[. s(x) = c(x)
   // or universally quantified expression: forall x in [lb,ub[. p(x)
   // or a expression for non containment:
   // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
-  enum {SIMPLE, UNIV_QUANT, NOT_CONTAINS} form;
+  enum {SIMPLE, STRING_CONSTANT, UNIV_QUANT, NOT_CONTAINS} form;
 
   // Universally quantified symbol
   symbol_exprt quantified_variable;
@@ -40,7 +41,7 @@ public:
   string_constraintt() : exprt(true_exprt()) { form = SIMPLE; }
 
   // Axiom with no quantification, and no premise
-  string_constraintt(exprt bod) : exprt(bod) { form = SIMPLE; }
+  string_constraintt(exprt bod, bool is_string_constant=false) : exprt(bod) { form = is_string_constant?SIMPLE:STRING_CONSTANT; }
 
   // Axiom with no quantification: prem => bod
   string_constraintt(exprt prem, exprt bod)  : exprt(implies_exprt(prem,bod))
@@ -57,6 +58,7 @@ public:
    exprt exists_bound_inf, exprt exists_bound_sup, exprt s0, exprt s1);
 
   bool is_simple() const { return (form == SIMPLE); };
+  bool is_string_constant() const { return (form == STRING_CONSTANT); };
   bool is_univ_quant() const { return (form == UNIV_QUANT); };
   bool is_not_contains() const { return (form == NOT_CONTAINS); };
   
