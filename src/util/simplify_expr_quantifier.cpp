@@ -109,46 +109,6 @@ exprt get_quantifier_var_max(
 
 /*******************************************************************\
 
-Function: get_quantifier_body
-
-  Inputs:
-
- Outputs:
-
- Purpose: To obtain the body constraint specified within
-          of the given forall/exists operator.
-
-\*******************************************************************/
-
-exprt get_quantifier_body(
-  const exprt &var_expr,
-  const exprt &quantifier_expr)
-{
-  exprt res;
-  res.make_false();
-  if (quantifier_expr.operands().size()!=3)
-    return res;
-  for(auto &x : quantifier_expr.operands())
-  {
-    if(x.id()==ID_ge)
-    {
-      if(expr_eq(x.op0(), var_expr) and x.op1().id()==ID_constant)
-        continue;
-    }
-    if(x.id()==ID_not)
-    {
-      exprt y=x.op0();
-      if(y.id()!=ID_ge) continue;
-      if(expr_eq(y.op0(), var_expr) and y.op1().id()==ID_constant)
-        continue;
-    }
-    return x;    
-  }
-  return res;
-}
-
-/*******************************************************************\
-
 Function: instantiate(var_expr, var_inst, expr)
 
   Inputs:
@@ -202,15 +162,14 @@ bool simplify_exprt::simplify_quantifier(exprt &expr)
   exprt var_expr=expr.op0();
   /**
    * We need to rewrite the forall/exists quantifier into
-   * an OR expr with 3 operands: min/max indices of array elements
-   * accessed and the constraint specified on array elements.
+   * an OR expr. 
    **/
   exprt re(expr);
   exprt tmp(re.op1());
   re.swap(tmp);
   exprt min_i=get_quantifier_var_min(var_expr, re);
   exprt max_i=get_quantifier_var_max(var_expr, re);
-  exprt body_expr=get_quantifier_body(var_expr, re);
+  exprt body_expr=re;
   if(var_expr.is_false() ||
      min_i.is_false() ||
      max_i.is_false() ||
