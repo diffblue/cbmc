@@ -3,12 +3,12 @@ test_index_of.class
 --pass
 ^EXIT=10$
 ^SIGNAL=0$
-^\[assertion.1\] assertion at file test_index_of.java line 10: SUCCESS$
-^\[assertion.2\] assertion at file test_index_of.java line 11: FAILURE$
-^\[assertion.3\] assertion at file test_index_of.java line 14: SUCCESS$
-^\[assertion.4\] assertion at file test_index_of.java line 15: FAILURE$
-^\[assertion.5\] assertion at file test_index_of.java line 18: SUCCESS$
-^\[assertion.6\] assertion at file test_index_of.java line 19: FAILURE$
+^\[assertion.1\] assertion at file test_index_of.java line 12: SUCCESS$
+^\[assertion.2\] assertion at file test_index_of.java line 13: FAILURE$
+^\[assertion.3\] assertion at file test_index_of.java line 16: SUCCESS$
+^\[assertion.4\] assertion at file test_index_of.java line 17: FAILURE$
+^\[assertion.5\] assertion at file test_index_of.java line 20: SUCCESS$
+^\[assertion.6\] assertion at file test_index_of.java line 21: FAILURE$
 ^\[assertion.7\] assertion at file test_index_of.java line 24: SUCCESS$
 ^\[assertion.8\] assertion at file test_index_of.java line 25: FAILURE$
 --
