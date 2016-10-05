@@ -79,7 +79,8 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t1-start_time).count();
 
-  debug() << "string_refinementt::boolbv_set_equality_to_true time in ms: " 
+  debug() << "string_refinementt::boolbv_set_equality_to_true "
+	  << expr.pretty() << " at time(ms): " 
 	  << (duration / 1000) << eom;
 
   if(!equality_propagation) return true;
@@ -133,6 +134,8 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
   const irep_idt &identifier = expr.get(ID_identifier);
   if(identifier.empty())
     throw "string_refinementt::convert_symbol got empty identifier";
+
+  debug() << "convert symbol " << expr << eom;
 
   if (refined_string_typet::is_unrefined_string_type(type)) {
     debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
@@ -206,6 +209,8 @@ bvt string_refinementt::convert_function_application(
       return convert_string_is_suffix(expr,true);
     } else if (is_string_contains_func(id)) {
       return convert_string_contains(expr);
+    } else if (is_string_hash_code_func(id)) {
+      return convert_bv(convert_string_hash_code(expr));
     } else if (is_string_index_of_func(id)) {
       return convert_bv(convert_string_index_of(expr));
     } else if (is_string_last_index_of_func(id)) {
@@ -646,6 +651,14 @@ symbol_exprt string_refinementt::fresh_boolean(const irep_idt &prefix){
   return b;
 }
 
+exprt string_refinementt::convert_string_hash_code(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  string_exprt str = make_string(args[0]);
+  exprt res = refined_string_typet::index_of_int(0);
+  throw "convert_string_hash_code: unimplemented";
+  return res;
+}
 
 exprt string_refinementt::convert_string_index_of(const string_exprt &str, const exprt & c, const exprt & from_index){
   symbol_exprt index = fresh_index("index_of");
@@ -669,6 +682,15 @@ exprt string_refinementt::convert_string_index_of(const string_exprt &str, const
   return index;
 }
 
+exprt string_refinementt::convert_string_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index){
+  symbol_exprt index = fresh_index("index_of");
+  
+  debug() << "warning: string_refinementt::convert_string_index_of_string:"
+	  << "not generating all requiered constraints" << eom;
+  string_axioms.push_back(string_constraintt(true_exprt()).exists(index,refined_string_typet::index_of_int(-1),str.length()));
+  return index;
+}
+
 
 exprt string_refinementt::convert_string_index_of(
   const function_application_exprt &f)
@@ -679,17 +701,23 @@ exprt string_refinementt::convert_string_index_of(
   exprt c = args[1];
   exprt from_index;
 
-  if(!(c.type() == char_type || c.type() == java_char_type)){
-    debug() << "warning: argument to string_index_of does not have char type: " 
-	    << c.type().pretty() << eom;    
-    c = typecast_exprt(c,java_char_type);
-  }
 
   if(args.size() == 2) from_index = zero;
   else if (args.size() == 3) from_index = args[2];
   else assert(false);
 
-  return convert_string_index_of(str,c,from_index);    
+  if(refined_string_typet::is_java_string_type(c.type())){
+    string_exprt sub = make_string(c);
+    return convert_string_index_of_string(str,sub,from_index);    
+  } else {
+    if(!(c.type() == char_type || c.type() == java_char_type)){
+      debug() << "warning: argument to string_index_of does not have char type: " 
+	      << c.type().pretty() << eom;    
+      c = typecast_exprt(c,java_char_type);
+    }
+    return convert_string_index_of(str,c,from_index);    
+  }
+
 }
 
 exprt string_refinementt::convert_string_last_index_of(const string_exprt &str, const exprt & c, const exprt & from_index) {
@@ -875,7 +903,7 @@ exprt string_refinementt::convert_string_to_char_array
   assert(args.size() == 1);
 
   string_exprt str = make_string(args[0]);
-
+  debug() << "convert_string_to_char_array returns: " << str.content().pretty() << eom;
   return str.content();
 }
 

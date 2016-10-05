@@ -63,7 +63,9 @@ protected:
   exprt convert_string_is_prefix(const function_application_exprt &f, bool swap_arguments=false);
   bvt convert_string_is_suffix(const function_application_exprt &f, bool swap_arguments=false);
   bvt convert_string_contains(const function_application_exprt &f);
+  exprt convert_string_hash_code(const function_application_exprt &f);
   exprt convert_string_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
+  exprt convert_string_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index);
   exprt convert_string_index_of(const function_application_exprt &f);
   exprt convert_string_last_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
   exprt convert_string_last_index_of(const function_application_exprt &f);

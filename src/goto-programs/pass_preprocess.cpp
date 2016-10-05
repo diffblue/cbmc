@@ -174,6 +174,8 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	   || function_id == irep_idt("java::java.lang.StringBuilder.charAt:(I)C")
 	   ) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_char_at");
+	} else if(function_id == irep_idt("java::java.lang.String.hashCode:()I")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_hash_code_func");
 	} else if(function_id == irep_idt("java::java.lang.String.indexOf:(I)I")
 		  || function_id == irep_idt("java::java.lang.String.indexOf:(II)I")
 		  ) {
@@ -267,9 +269,28 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function_call(symbol_table, goto_functions, i_it,
 				    "__CPROVER_uninterpreted_empty_string");
 	} else if(function_id == irep_idt
-		  ("java::java.lang.Integer.toString:(I)Ljava/lang/String;")) {
+		  ("java::java.lang.Integer.toString:(I)Ljava/lang/String;")
+		  || function_id == irep_idt
+		  ("java::java.lang.String.valueOf:(I)Ljava/lang/String;")
+		  ) {
 	  make_string_function(symbol_table, goto_functions, i_it,
 			       "__CPROVER_uninterpreted_string_of_int");
+	} else if(function_id == irep_idt
+		  ("java::java.lang.String.valueOf:(L)Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,
+			       "__CPROVER_uninterpreted_string_of_long");
+	} else if(function_id == irep_idt
+		  ("java::java.lang.String.valueOf:(F)Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,
+			       "__CPROVER_uninterpreted_string_of_float");
+	} else if(function_id == irep_idt
+		  ("java::java.lang.String.valueOf:(D)Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,
+			       "__CPROVER_uninterpreted_string_of_double");
+	} else if(function_id == irep_idt
+		  ("java::java.lang.String.valueOf:(Z)Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,
+			       "__CPROVER_uninterpreted_string_of_bool");
 	} else if(function_id == irep_idt
 		  ("java::java.lang.Integer.parseInt:(Ljava/lang/String;)I")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
