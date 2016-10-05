@@ -292,6 +292,10 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,
 			       "__CPROVER_uninterpreted_string_of_bool");
 	} else if(function_id == irep_idt
+		  ("java::java.lang.String.valueOf:(C)Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,
+			       "__CPROVER_uninterpreted_string_of_char_func");
+	} else if(function_id == irep_idt
 		  ("java::java.lang.Integer.parseInt:(Ljava/lang/String;)I")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
 			       "__CPROVER_uninterpreted_parse_int");

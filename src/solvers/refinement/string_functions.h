@@ -48,6 +48,7 @@ bool is_string_of_long_func(irep_idt id);
 bool is_string_of_bool_func(irep_idt id);
 bool is_string_of_float_func(irep_idt id);
 bool is_string_of_double_func(irep_idt id);
+bool is_string_of_char_func(irep_idt id);
 bool is_string_parse_int_func(irep_idt id);
 bool is_string_replace_func(irep_idt id);
 bool is_string_set_length_func(irep_idt id);

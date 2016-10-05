@@ -112,6 +112,7 @@ private:
   void of_double(const function_application_exprt &f, axiom_vect & axioms);
   void of_bool(const function_application_exprt &f, axiom_vect & axioms);
   void of_bool(const exprt &i, axiom_vect & axioms, bool is_c_string);
+  void of_char(const function_application_exprt &f, axiom_vect & axioms);
   void of_char(const exprt &i, axiom_vect & axioms, bool is_c_string);
   void of_java_char_array(const exprt & char_array, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 

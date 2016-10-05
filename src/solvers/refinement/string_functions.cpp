@@ -41,6 +41,7 @@ Date:   September 2016
 #define string_of_bool_func "__CPROVER_uninterpreted_string_of_bool"
 #define string_of_float_func "__CPROVER_uninterpreted_string_of_float"
 #define string_of_double_func "__CPROVER_uninterpreted_string_of_double"
+#define string_of_char_func "__CPROVER_uninterpreted_string_of_char_func"
 #define string_replace_func "__CPROVER_uninterpreted_string_replace_func"
 #define string_substring_func "__CPROVER_uninterpreted_substring"
 #define string_startswith_func "__CPROVER_uninterpreted_string_startswith"
@@ -146,6 +147,9 @@ bool is_string_of_float_func(irep_idt id){
 }
 bool is_string_of_double_func(irep_idt id){
   return (starts_with(id2string(id),string_of_double_func));
+}
+bool is_string_of_char_func(irep_idt id){
+  return (starts_with(id2string(id),string_of_char_func));
 }
 bool is_string_equals_ignore_case_func(irep_idt id){
   return (starts_with(id2string(id),string_equals_ignore_case_func));

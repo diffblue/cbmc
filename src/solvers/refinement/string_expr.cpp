@@ -152,6 +152,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_long(expr,axioms);
     } else if (is_string_of_bool_func(id)) {
       return of_bool(expr,axioms);
+    } else if (is_string_of_char_func(id)) {
+      return of_char(expr,axioms);
     } else if (is_string_set_length_func(id)) {
       return of_string_set_length(expr,symbol_to_string,axioms);
     } else if (is_string_delete_func(id)) {
@@ -657,6 +659,14 @@ void string_exprt::of_int
       axioms.emplace_back(premise,binary_relation_exprt(i,ID_ge,smallest_with_10_digits));
     }
   }
+}
+
+void string_exprt::of_char
+(const function_application_exprt &f,axiom_vect & axioms)
+{
+  assert(f.arguments().size() == 1);
+  of_char(f.arguments()[0],axioms,refined_string_typet::is_c_string_type(f.type()));
+
 }
 
 void string_exprt::of_char
