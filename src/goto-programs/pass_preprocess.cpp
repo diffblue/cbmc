@@ -221,6 +221,8 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strcontains");
 	} else if(function_id == irep_idt("java::java.lang.String.isEmpty:()Z")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_is_empty");
+	} else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_to_char_array_func");
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")) {
 	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_func",string_builders);
 	} else if(function_id == irep_idt
