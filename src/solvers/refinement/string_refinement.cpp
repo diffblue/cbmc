@@ -209,7 +209,7 @@ bvt string_refinementt::convert_function_application(
     } else if (is_string_index_of_func(id)) {
       return convert_bv(convert_string_index_of(expr));
     } else if (is_string_last_index_of_func(id)) {
-      return convert_string_last_index_of(expr);
+      return convert_bv(convert_string_last_index_of(expr));
     } else if (is_string_parse_int_func(id)) {
       return convert_bv(convert_string_parse_int(expr));
     }
@@ -685,34 +685,48 @@ exprt string_refinementt::convert_string_index_of(
   return convert_string_index_of(str,c,from_index);    
 }
 
-bvt string_refinementt::convert_string_last_index_of(
+exprt string_refinementt::convert_string_last_index_of(const string_exprt &str, const exprt & c, const exprt & from_index) {
+  symbol_exprt index = fresh_index("last_index_of");
+  symbol_exprt contains = fresh_boolean("contains_in_last_index_of");
+
+  // -1 <= i <= from_index && (i = -1 <=> !contains) && (contains => i <= from_index && s[i] = c)
+  // && forall n. i <= n <= from_index => s[n] != c 
+
+  exprt from_index_plus_one = plus_exprt(from_index,refined_string_typet::index_of_int(1));
+  string_axioms.push_back(string_constraintt(equal_exprt(index,refined_string_typet::index_of_int(-1)),not_exprt(contains)).exists(index,refined_string_typet::index_of_int(-1),from_index_plus_one));
+  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,refined_string_typet::index_of_int(-1)));
+  string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(zero,ID_le,index),and_exprt(binary_relation_exprt(from_index,ID_ge,index),equal_exprt(str[index],c))));
+  
+  symbol_exprt n = string_exprt::fresh_symbol("QA_last_index_of",index_type);
+  string_axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,plus_exprt(index,refined_string_typet::index_of_int(1)),from_index_plus_one));
+
+  symbol_exprt m = string_exprt::fresh_symbol("QA_last_index_of",index_type);
+  string_axioms.push_back(string_constraintt(not_exprt(contains),not_exprt(equal_exprt(str[m],c))).forall(m,zero,from_index_plus_one));
+
+  return index;
+
+}
+
+exprt string_refinementt::convert_string_last_index_of(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 2); // bad args to string last index of?
-
-  symbol_exprt index = fresh_index("last_index_of");
-  symbol_exprt contains = fresh_boolean("contains_in_index_of");
+  assert(f.type() == index_type);
   string_exprt str = make_string(args[0]);
   exprt c = args[1];
+  exprt from_index;
+
   if(!(c.type() == char_type || c.type() == java_char_type)){
     debug() << "warning: argument to string_index_of does not have char type: " 
 	    << c.type().pretty() << eom;    
     c = typecast_exprt(c,java_char_type);
   }
 
-  string_axioms.push_back(string_constraintt(equal_exprt(index,refined_string_typet::index_of_int(-1)),not_exprt(contains)).exists(index,refined_string_typet::index_of_int(-1),str.length()));
-  string_axioms.emplace_back(not_exprt(contains),equal_exprt(index,refined_string_typet::index_of_int(-1)));
-  string_axioms.emplace_back(contains,and_exprt(binary_relation_exprt(zero,ID_le,index),equal_exprt(str[index],c)));
-  
-  symbol_exprt n = string_exprt::fresh_symbol("QA_last_index_of",index_type);
-  string_axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,plus_exprt(index,refined_string_typet::index_of_int(1)),str.length()));
+  if(args.size() == 2) from_index = minus_exprt(str.length(),refined_string_typet::index_of_int(1));
+  else if (args.size() == 3) from_index = args[2];
+  else assert(false);
 
-  symbol_exprt m = string_exprt::fresh_symbol("QA_last_index_of",index_type);
-  string_axioms.push_back(string_constraintt(not_exprt(contains),not_exprt(equal_exprt(str[m],c))).forall(m,zero,str.length()));
-
-  bvt bv = convert_bv(index);
-  return bv;
+  return convert_string_last_index_of(str,c,from_index);
 }
 
 bvt string_refinementt::convert_char_literal(

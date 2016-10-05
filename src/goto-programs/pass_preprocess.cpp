@@ -178,7 +178,11 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 		  || function_id == irep_idt("java::java.lang.String.indexOf:(II)I")
 		  ) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strindexof");
-	} else if(function_id == irep_idt("java::java.lang.String.lastIndexOf:(I)I")) {
+	} else if(function_id == irep_idt
+		  ("java::java.lang.String.lastIndexOf:(I)I")
+		  || function_id == irep_idt
+		  ("java::java.lang.String.lastIndexOf:(II)I")
+		  ) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strlastindexof");
 	} else if(function_id == irep_idt("java::java.lang.String.concat:(Ljava/lang/String;)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strcat_func");

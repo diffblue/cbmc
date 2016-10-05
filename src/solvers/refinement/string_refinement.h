@@ -64,7 +64,8 @@ protected:
   bvt convert_string_contains(const function_application_exprt &f);
   exprt convert_string_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
   exprt convert_string_index_of(const function_application_exprt &f);
-  bvt convert_string_last_index_of(const function_application_exprt &f);
+  exprt convert_string_last_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
+  exprt convert_string_last_index_of(const function_application_exprt &f);
   bvt convert_char_literal(const function_application_exprt &f);
   bvt convert_string_char_at(const function_application_exprt &f);
   exprt convert_string_parse_int(const function_application_exprt &f);
