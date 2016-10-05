@@ -109,15 +109,6 @@ public:
    * @brief
    *
    * @details
-   *
-   * @return
-   */
-  goto_programt::targett body_end() const;
-
-  /**
-   * @brief
-   *
-   * @details
    */
   static const instr_iteratort end;
 };

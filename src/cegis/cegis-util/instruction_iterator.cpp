@@ -71,9 +71,4 @@ instr_iteratort::operator goto_programt::targett() const
   return prog_it;
 }
 
-goto_programt::targett instr_iteratort::body_end() const
-{
-  return func_it->second.body.instructions.end();
-}
-
 const instr_iteratort instr_iteratort::end;

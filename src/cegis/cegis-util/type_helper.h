@@ -22,4 +22,15 @@ const class typet &replace_struct_by_symbol_type(
     const class symbol_tablet &st,
     const typet &type);
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param lhs
+ * @param rhs
+ * @param st
+ */
+bool instanceof(const symbol_tablet &st, const typet &lhs, const typet &rhs);
+
 #endif /* CEGIS_UTIL_TYPE_HELPER_H_ */

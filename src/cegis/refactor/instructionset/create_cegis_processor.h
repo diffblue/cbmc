@@ -13,6 +13,21 @@
 #include <set>
 
 #include <util/type.h>
+#include <goto-programs/goto_program.h>
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param first
+ * @param last
+ *
+ * @return
+ */
+std::set<typet> collect_context_types(
+    goto_programt::const_targett first,
+    const goto_programt::const_targett &last);
 
 /**
  * @brief

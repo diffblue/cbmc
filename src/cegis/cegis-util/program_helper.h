@@ -44,9 +44,23 @@ const goto_programt &get_entry_body(const goto_functionst &gf);
  *
  * @return
  */
-class goto_programt &get_body(
-    class goto_functionst &gf,
+goto_programt &get_body(
+    goto_functionst &gf,
     const std::string &func_name);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param gf
+ * @param pos
+ *
+ * @return
+ */
+goto_programt &get_body(
+    goto_functionst &gf,
+    goto_programt::const_targett pos);
 
 /**
  * @brief

@@ -39,14 +39,20 @@ public:
    *
    * @details
    */
-  std::deque<goto_ranget> input_ranges;
+  class sketcht
+  {
+  public:
+    goto_ranget input_range;
+    goto_ranget spec_range;
+    std::set<typet> types;
+  };
 
   /**
    * @brief
    *
    * @details
    */
-  std::deque<goto_ranget> spec_ranges;
+  std::deque<sketcht> sketches;
 
   /**
    * @brief
