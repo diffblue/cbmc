@@ -55,6 +55,7 @@ instanceof_anyt::instanceof_anyt(const symbol_tablet &st,
 
 bool instanceof_anyt::operator ()(const typet &type) const
 {
+  if (types.empty()) return true;
   return types.end()
       != std::find_if(types.begin(), types.end(),
           [this, &type](const typet &rhs)

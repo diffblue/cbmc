@@ -58,7 +58,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       refactor/learn/refactor_symex_learn.cpp \
       refactor/verify/refactor_symex_verify.cpp \
       refactor/facade/refactor_runner.cpp \
-      refactor/options/refactor_program.cpp refactor/value/refactor_solution.cpp \
+      refactor/options/refactoring_type.cpp refactor/options/refactor_program.cpp refactor/value/refactor_solution.cpp \
       refactor/nullobject/range_collector.cpp \
       wordsize/restrict_bv_size.cpp value/program_individual_serialisation.cpp value/assignments_printer.cpp \
       seed/literals_seed.cpp \

@@ -42,8 +42,10 @@ public:
   class sketcht
   {
   public:
+    goto_programt::targett init;
     goto_ranget input_range;
     goto_ranget spec_range;
+    std::set<irep_idt> state_vars;
     std::set<typet> types;
   };
 

@@ -36,11 +36,12 @@ void collect_nullobject_ranges(refactor_programt &prog)
     if (goto_program_instruction_typet::GOTO != it->type) continue;
     const exprt &guard=it->guard;
     if (!is_null_comparison(guard)) continue;
+    prog.sketches.push_back(refactor_programt::sketcht());
+    refactor_programt::sketcht &sketch=prog.sketches.back();
+    sketch.init=it;
     const goto_programt::targett else_range_last(it->get_target());
     const goto_ranget else_range(++it, else_range_last);
     const goto_ranget then_range(get_then_range(else_range_last));
-    prog.sketches.push_back(refactor_programt::sketcht());
-    refactor_programt::sketcht &sketch=prog.sketches.back();
     if (ID_equal == guard.id())
     {
       sketch.spec_range=then_range;
