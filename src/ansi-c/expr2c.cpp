@@ -360,7 +360,12 @@ std::string expr2ct::convert_rec(
   {
     const struct_typet &struct_type=to_struct_type(src);
 
-    std::string dest=q+"struct";
+    std::string dest=q;
+
+    if(src.find(ID_typedef).is_not_nil())
+      dest+="typedef struct";
+    else
+      dest+="struct";
 
     const irep_idt &tag=struct_type.get_tag();
     if(tag!="") dest+=" "+id2string(tag);
@@ -378,7 +383,10 @@ std::string expr2ct::convert_rec(
 
     dest+=" }";
 
-    dest+=d;
+    if(src.find(ID_typedef).is_not_nil())
+      dest+=src.get_string(ID_typedef);
+    else
+      dest+=d;
 
     return dest;
   }
@@ -396,7 +404,12 @@ std::string expr2ct::convert_rec(
   {
     const union_typet &union_type=to_union_type(src);
 
-    std::string dest=q+"union";
+    std::string dest=q;
+
+    if(src.find(ID_typedef).is_not_nil())
+      dest+="typedef union";
+    else
+      dest+="union";
 
     const irep_idt &tag=union_type.get_tag();
     if(tag!="") dest+=" "+id2string(tag);
@@ -414,7 +427,10 @@ std::string expr2ct::convert_rec(
 
     dest+=" }";
 
-    dest+=d;
+    if(src.find(ID_typedef).is_not_nil())
+      dest+=src.get_string(ID_typedef);
+    else
+      dest+=d;
 
     return dest;
   }
@@ -542,6 +558,8 @@ std::string expr2ct::convert_rec(
 
     if(followed.id()==ID_struct)
     {
+      if(followed.find(ID_typedef).is_not_nil())
+        return followed.get_string(ID_typedef)+d;
       std::string dest=q+"struct";
       const irep_idt &tag=to_struct_type(followed).get_tag();
       if(tag!="") dest+=" "+id2string(tag);
@@ -550,6 +568,8 @@ std::string expr2ct::convert_rec(
     }
     else if(followed.id()==ID_union)
     {
+      if(followed.find(ID_typedef).is_not_nil())
+        return followed.get_string(ID_typedef)+d;
       std::string dest=q+"union";
       const irep_idt &tag=to_union_type(followed).get_tag();
       if(tag!="") dest+=" "+id2string(tag);
@@ -561,6 +581,8 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_struct_tag)
   {
+    if(src.find(ID_typedef).is_not_nil())
+      return src.get_string(ID_typedef)+d;
     const struct_tag_typet &struct_tag_type=
       to_struct_tag_type(src);
 
@@ -573,6 +595,8 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_union_tag)
   {
+    if(src.find(ID_typedef).is_not_nil())
+      return src.get_string(ID_typedef)+d;
     const union_tag_typet &union_tag_type=
       to_union_tag_type(src);
 

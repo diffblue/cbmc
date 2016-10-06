@@ -64,6 +64,8 @@ protected:
   std::string type_to_string(const typet &type);
   std::string expr_to_string(const exprt &expr);
 
+  std::set<std::string> ignored_symbols;
+  void ignored_symbol_rec(const symbolt &symbol);
   bool ignore(const symbolt &symbol);
 
   static std::string indent(const unsigned n)
