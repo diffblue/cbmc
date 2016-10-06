@@ -43,7 +43,7 @@ typedef unsigned char __CPROVER_char;
 #define __CPROVER_string_last_index_of(s, c) __CPROVER_uninterpreted_strlastindexof(s, c)
 
 /* returns a new string obtained from s by setting s[p] = c */
-#define __CPROVER_char_set(s, p, c) __CPROVER_uninterpreted_char_set(s, p, c)
+#define __CPROVER_char_set(s, p, c) __CPROVER_uninterpreted_string_char_set_func(s, p, c)
 
 
 #define __CPROVER_string_copy(s) __CPROVER_uninterpreted_string_copy(s)

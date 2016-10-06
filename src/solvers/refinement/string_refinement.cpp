@@ -80,7 +80,8 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t1-start_time).count();
 
   debug() << "string_refinementt::boolbv_set_equality_to_true "
-	  << expr.pretty() << " at time(ms): " 
+    //<< expr.pretty()
+	  << " at time(ms): " 
 	  << (duration / 1000) << eom;
 
   if(!equality_propagation) return true;
@@ -88,7 +89,8 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
   const typet &type=ns.follow(expr.lhs().type());
 
   if(expr.lhs().id()==ID_symbol &&
-     type==ns.follow(expr.rhs().type()) &&
+     // We can have affectation of string from StringBuilder or CharSequence
+     //type==ns.follow(expr.rhs().type()) && 
      type.id()!=ID_bool)
   {
     if(refined_string_typet::is_unrefined_string_type(type)) {
@@ -135,7 +137,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
   if(identifier.empty())
     throw "string_refinementt::convert_symbol got empty identifier";
 
-  debug() << "convert symbol " << expr << eom;
+  //debug() << "convert symbol " << expr << eom;
 
   if (refined_string_typet::is_unrefined_string_type(type)) {
     debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
@@ -376,14 +378,18 @@ string_exprt string_refinementt::string_of_symbol(const symbol_exprt & sym){
 
 void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
 {
+  //debug() << "string_refinementt::make_string of " << pretty_short(sym) << eom
+  // << " --> " << pretty_short(str) << eom;
   if(str.id()==ID_symbol) 
     assign_to_symbol(sym,string_of_symbol(to_symbol_expr(str)));
   else
     assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
+  debug() << "string = " << symbol_to_string[sym.get_identifier()].pretty() << eom;
 }
 
 string_exprt string_refinementt::make_string(const exprt & str) 
 {
+  //debug() << "string_refinementt::make_string of " << pretty_short(str) << eom;
   if(str.id()==ID_symbol) 
     return string_of_symbol(to_symbol_expr(str));
   else

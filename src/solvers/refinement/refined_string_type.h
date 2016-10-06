@@ -46,6 +46,8 @@ public:
 
   static bool is_java_string_builder_type(const typet & type);
 
+  static bool is_java_char_sequence_type(const typet & type);
+
   static inline unsignedbv_typet get_char_type(const exprt & expr) {
     if(is_c_string_type(expr.type())) return char_type();
     else return java_char_type();
@@ -54,7 +56,9 @@ public:
   static inline bool is_unrefined_string_type(const typet & type)
   {  return (is_c_string_type(type) 
           || is_java_string_type(type) 
-          || is_java_string_builder_type(type)); }
+          || is_java_string_builder_type(type)
+          || is_java_char_sequence_type(type)
+	     ); }
 
   static inline bool is_unrefined_string(const exprt & expr)
   {  return (is_unrefined_string_type(expr.type())); }

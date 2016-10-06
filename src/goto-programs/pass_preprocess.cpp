@@ -172,6 +172,7 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  
 	if(function_id == irep_idt("java::java.lang.String.charAt:(I)C")
 	   || function_id == irep_idt("java::java.lang.StringBuilder.charAt:(I)C")
+	   || function_id == irep_idt("java::java.lang.CharSequence.charAt:(I)C")
 	   ) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_char_at");
 	} else if(function_id == irep_idt("java::java.lang.String.hashCode:()I")) {
@@ -209,7 +210,9 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	} else if(function_id == irep_idt("java::java.lang.String.substring:(II)Ljava/lang/String;")
 		  || function_id == irep_idt("java::java.lang.String.substring:(I)Ljava/lang/String;")
 		  || function_id == irep_idt("java::java.lang.StringBuilder.substring:(II)Ljava/lang/String;")
-		  || function_id == irep_idt("java::java.lang.StringBuilder.substring:(I)Ljava/lang/String;")) {
+		  || function_id == irep_idt("java::java.lang.StringBuilder.substring:(I)Ljava/lang/String;")
+		  || function_id == irep_idt("java::java.lang.String.subSequence:(II)Ljava/lang/CharSequence;")
+		  ) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_substring");
 	} else if(function_id == irep_idt("java::java.lang.String.trim:()Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_trim");
