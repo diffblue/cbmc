@@ -21,7 +21,7 @@ Date:   September 2016
 #define string_concat_float_func "__CPROVER_uninterpreted_strcat_float_func"
 #define string_concat_double_func "__CPROVER_uninterpreted_strcat_double_func"
 #define string_contains_func "__CPROVER_uninterpreted_strcontains"
-#define string_char_set_func "__CPROVER_uninterpreted_char_set"
+#define string_char_set_func "__CPROVER_uninterpreted_string_char_set_func"
 #define string_copy_func "__CPROVER_uninterpreted_string_copy"
 #define string_delete_func "__CPROVER_uninterpreted_string_delete_func"
 #define string_delete_char_at_func "__CPROVER_uninterpreted_string_delete_char_at_func"

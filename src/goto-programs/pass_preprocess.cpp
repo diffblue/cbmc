@@ -251,6 +251,12 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.deleteCharAt:(I)Ljava/lang/StringBuilder;")) {
 	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,"__CPROVER_uninterpreted_string_delete_char_at_func",string_builders);
+	} else if(function_id == irep_idt
+		  ("java::java.lang.StringBuilder.setCharAt:(IC)V")) {
+	  // warning: this should return void type
+	  make_string_function_side_effect
+	    (symbol_table, goto_functions, goto_program, i_it,
+	     "__CPROVER_uninterpreted_string_char_set_func",string_builders);
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.toString:()Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
 			       "__CPROVER_uninterpreted_string_copy");

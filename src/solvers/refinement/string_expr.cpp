@@ -685,7 +685,7 @@ void string_exprt::of_string_char_set
   assert(args.size() == 3); //bad args to string_char_set?
 
   string_exprt str = of_expr(args[0],symbol_to_string,axioms);
-  symbol_exprt c = fresh_symbol("char", refined_string_typet::char_type());
+  symbol_exprt c = fresh_symbol("char", refined_string_typet::get_char_type(args[0]));
   
   axioms.emplace_back(equal_exprt(c,args[2]));
   with_exprt sarrnew(str.content(), args[1], c);
