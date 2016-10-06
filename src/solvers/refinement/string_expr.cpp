@@ -126,6 +126,20 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_concat_double(expr,symbol_to_string,axioms);
     } else if (is_string_concat_float_func(id)) {
       return of_string_concat_float(expr,symbol_to_string,axioms);
+    } else if (is_string_insert_func(id)) {
+      return of_string_insert(expr,symbol_to_string,axioms);
+    } else if (is_string_insert_int_func(id)) {
+      return of_string_insert_int(expr,symbol_to_string,axioms);
+    } else if (is_string_insert_long_func(id)) {
+      return of_string_insert_long(expr,symbol_to_string,axioms);
+    } else if (is_string_insert_bool_func(id)) {
+      return of_string_insert_bool(expr,symbol_to_string,axioms);
+    } else if (is_string_insert_char_func(id)) {
+      return of_string_insert_char(expr,symbol_to_string,axioms);
+    } else if (is_string_insert_double_func(id)) {
+      return of_string_insert_double(expr,symbol_to_string,axioms);
+    } else if (is_string_insert_float_func(id)) {
+      return of_string_insert_float(expr,symbol_to_string,axioms);
     } else if (is_string_substring_func(id)) {
       return of_string_substring(expr,symbol_to_string,axioms);
     } else if (is_string_trim_func(id)) {
@@ -764,8 +778,8 @@ void string_exprt::of_string_concat_int(const function_application_exprt &f, std
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2(refined_string_typet::get_char_type(args[1]));
-  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(args[1].type()),10);
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
+  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(args[0].type()),10);
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
 
@@ -773,9 +787,9 @@ void string_exprt::of_string_concat_long(const function_application_exprt &f, st
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2(refined_string_typet::get_char_type(args[1]));
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
   
-  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(args[1].type()),30);
+  s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(args[0].type()),30);
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
 
@@ -783,7 +797,7 @@ void string_exprt::of_string_concat_bool(const function_application_exprt &f, st
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2(refined_string_typet::get_char_type(args[1]));
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_bool(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
@@ -792,7 +806,7 @@ void string_exprt::of_string_concat_char(const function_application_exprt &f, st
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2(refined_string_typet::get_char_type(args[1]));
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_char(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
@@ -801,7 +815,7 @@ void string_exprt::of_string_concat_double(const function_application_exprt &f, 
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2(refined_string_typet::get_char_type(args[1]));
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_float(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),30);
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
@@ -815,3 +829,81 @@ void string_exprt::of_string_concat_float(const function_application_exprt &f, s
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
 
+void string_exprt::of_string_insert(const string_exprt & s1, const string_exprt & s2, 
+		      const exprt & offset, 
+		      std::map<irep_idt, string_exprt> & symbol_to_string, 
+		      axiom_vect & axioms) 
+{
+  assert(offset.type() == refined_string_typet::index_type());
+  unsignedbv_typet char_type = refined_string_typet::get_char_type(s1);
+  string_exprt pref(char_type);
+  string_exprt suf(char_type);
+  string_exprt concat1(char_type);
+  pref.of_string_substring(s1,index_zero,offset,symbol_to_string,axioms);
+  suf.of_string_substring(s1,offset,s1.length(),symbol_to_string,axioms);
+  concat1.of_string_concat(pref,s2,symbol_to_string,axioms);
+  of_string_concat(concat1,suf,symbol_to_string,axioms);
+}
+
+
+void string_exprt::of_string_insert(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 3); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2 = string_exprt::of_expr(args[2],symbol_to_string,axioms); 
+  of_string_insert(s1, s2, args[1],symbol_to_string, axioms);
+}
+
+void string_exprt::of_string_insert_int(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 3); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2(refined_string_typet::get_char_type(args[2]));
+  s2.of_int(args[2],axioms,refined_string_typet::is_c_string_type(args[0].type()),10);
+  of_string_insert(s1,s2,args[1],symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_insert_long(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 3); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2(refined_string_typet::get_char_type(args[2]));
+  s2.of_int(args[2],axioms,refined_string_typet::is_c_string_type(args[0].type()),30);
+  of_string_insert(s1,s2,args[1],symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_insert_bool(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 3); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
+  s2.of_bool(args[2],axioms,refined_string_typet::is_c_string_type(args[0].type()));
+  of_string_insert(s1,s2,args[1],symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_insert_char(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 3); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
+  s2.of_char(args[2],axioms,refined_string_typet::is_c_string_type(args[0].type()));
+  of_string_insert(s1,s2,args[1],symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_insert_double(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 3); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
+  s2.of_float(args[2],axioms,refined_string_typet::is_c_string_type(args[0].type()),30);
+  of_string_insert(s1,s2,args[1],symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_insert_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 3); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
+  s2.of_float(args[2],axioms,refined_string_typet::is_c_string_type(args[0].type()),10);
+  of_string_insert(s1,s2,args[1],symbol_to_string,axioms);
+}

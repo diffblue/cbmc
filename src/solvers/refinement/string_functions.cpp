@@ -30,6 +30,13 @@ Date:   September 2016
 #define string_equals_ignore_case_func "__CPROVER_uninterpreted_string_equals_ignore_case"
 #define string_hash_code_func "__CPROVER_uninterpreted_string_hash_code_func"
 #define string_index_of_func "__CPROVER_uninterpreted_strindexof"
+#define string_insert_func "__CPROVER_uninterpreted_string_insert_func"
+#define string_insert_int_func "__CPROVER_uninterpreted_string_insert_int_func"
+#define string_insert_long_func "__CPROVER_uninterpreted_string_insert_long_func"
+#define string_insert_bool_func "__CPROVER_uninterpreted_string_insert_bool_func"
+#define string_insert_char_func "__CPROVER_uninterpreted_string_insert_char_func"
+#define string_insert_float_func "__CPROVER_uninterpreted_string_insert_float_func"
+#define string_insert_double_func "__CPROVER_uninterpreted_string_insert_double_func"
 #define string_is_prefix_func "__CPROVER_uninterpreted_strprefixof"
 #define string_is_suffix_func "__CPROVER_uninterpreted_strsuffixof"
 #define string_is_empty_func "__CPROVER_uninterpreted_string_is_empty"
@@ -186,6 +193,27 @@ bool is_string_replace_func(irep_idt id){
 }
 bool is_string_to_char_array_func(irep_idt id){
   return (starts_with(id2string(id),string_to_char_array_func));
+}
+bool is_string_insert_func(irep_idt id){
+  return (starts_with(id2string(id),string_insert_func));
+}
+bool is_string_insert_int_func(irep_idt id){
+  return (starts_with(id2string(id),string_insert_int_func));
+}
+bool is_string_insert_long_func(irep_idt id){
+  return (starts_with(id2string(id),string_insert_long_func));
+}
+bool is_string_insert_bool_func(irep_idt id){
+  return (starts_with(id2string(id),string_insert_bool_func));
+}
+bool is_string_insert_char_func(irep_idt id){
+  return (starts_with(id2string(id),string_insert_char_func));
+}
+bool is_string_insert_float_func(irep_idt id){
+  return (starts_with(id2string(id),string_insert_float_func));
+}
+bool is_string_insert_double_func(irep_idt id){
+  return (starts_with(id2string(id),string_insert_double_func));
 }
 
 

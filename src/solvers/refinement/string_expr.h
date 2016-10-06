@@ -87,6 +87,17 @@ private:
   void of_string_concat_char(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_concat_double(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_concat_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+
+  // insert s2 in s1 at the given position
+  void of_string_insert(const string_exprt & s1, const string_exprt & s2, const exprt &offset, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
+  void of_string_insert(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_insert_int(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_insert_long(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_insert_bool(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_insert_char(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_insert_double(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_insert_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+
   void of_string_substring(const string_exprt & str, const exprt & start, const exprt & end, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_substring(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_trim(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
