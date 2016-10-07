@@ -9,6 +9,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_expr.h>
 #include <ansi-c/string_constant.h>
+#include <util/unicode.h>
 
 exprt index_zero = refined_string_typet::index_zero();
 unsigned string_exprt::next_symbol_id = 1;
@@ -185,9 +186,6 @@ void string_exprt::of_function_application(const function_application_exprt & ex
   throw "string_exprt::of_function_application: not a string function";
 }
 
-#include <iostream>
-#include <util/unicode.h>
-
 irep_idt string_exprt::extract_java_string(const symbol_exprt & s){
   std::string tmp(s.get(ID_identifier).c_str());
   std::string value = tmp.substr(31);
@@ -196,14 +194,7 @@ irep_idt string_exprt::extract_java_string(const symbol_exprt & s){
 
 void string_exprt::of_string_constant(irep_idt sval, int char_width, unsignedbv_typet char_type, axiom_vect &axioms){
 
-  std::cout << "string_exprt::of_string_constant " << std::endl
-	    << "original string: " << sval << std::endl;
-  
   std::string str = sval.c_str();
-  for (std::size_t i = 0; i < str.size(); ++i) {
-    std::cout << "utf8[" << i << "] = " << std::hex << (unsigned)((unsigned char)str[i]) << std::endl;
-  }
-
   // should only do this for java
   std::wstring utf16 = utf8_to_utf16(str);
   // warning: endianness should be used as a flag when using this function
@@ -213,7 +204,6 @@ void string_exprt::of_string_constant(irep_idt sval, int char_width, unsignedbv_
     constant_exprt idx(idx_binary, refined_string_typet::index_type());
     // warning: this should disappear if utf8_to_utf16 takes into account endianness
     wchar_t big_endian = ((utf16[i] << 8) & 0xFF00) | (utf16[i] >> 8);
-    std::cout << "utf16[" << i << "] = " << std::hex << (unsigned)big_endian << std::endl;
 
     std::string sval_binary=integer2binary((unsigned)big_endian, char_width);
     constant_exprt c(sval_binary,char_type);

@@ -899,8 +899,6 @@ exprt string_refinementt::convert_string_code_point_at(
   typet return_type = f.type();
   string_exprt str = make_string(args[0]);
   symbol_exprt result = string_exprt::fresh_symbol("char",return_type);
-  symbol_exprt low = fresh_boolean("low_surrogate");
-  symbol_exprt high = fresh_boolean("high_surrogate");
 
   exprt char1_as_int = typecast_exprt(str[args[1]],return_type);
   exprt char2_as_int = typecast_exprt(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))],return_type);
@@ -917,8 +915,6 @@ exprt string_refinementt::convert_string_code_point_at(
   exprt return_pair = and_exprt(is_high_surrogate(str[args[1]]),
 				is_low_surrogate(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))]));
 
-  string_axioms.emplace_back(equal_exprt(low,is_low_surrogate(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))])));
-  string_axioms.emplace_back(equal_exprt(high,is_high_surrogate(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))])));
   string_axioms.emplace_back(return_pair,equal_exprt(result,pair_value));
   string_axioms.emplace_back(not_exprt(return_pair),
 			     equal_exprt(result,char1_as_int));
@@ -929,14 +925,48 @@ exprt string_refinementt::convert_string_code_point_before(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
-  assert(false);
+  assert(args.size() == 2);
+  typet return_type = f.type();
+  symbol_exprt result = string_exprt::fresh_symbol("char",return_type);
+  string_exprt str = make_string(args[0]);
+
+  exprt char1 = str[minus_exprt(args[1],refined_string_typet::index_of_int(2))];
+  exprt char1_as_int = typecast_exprt(char1,return_type);
+  exprt char2 = str[minus_exprt(args[1],refined_string_typet::index_of_int(1))];
+  exprt char2_as_int = typecast_exprt(char2,return_type);
+
+  exprt pair_value = 
+    plus_exprt
+    (constant_of_nat(0x010000,return_type),
+     (plus_exprt
+      (mult_exprt
+       (mod_exprt(char1_as_int,constant_of_nat(0x0800,return_type)),
+	constant_of_nat(0x0400,return_type)),
+       mod_exprt(char2_as_int,constant_of_nat(0x0400,return_type)))));
+  
+  exprt return_pair = and_exprt(is_high_surrogate(char1),is_low_surrogate(char2));
+
+  string_axioms.emplace_back(return_pair,equal_exprt(result,pair_value));
+  string_axioms.emplace_back(not_exprt(return_pair),
+			     equal_exprt(result,char2_as_int));
+  return result;
 }
 
 exprt string_refinementt::convert_string_code_point_count(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
-  assert(false);
+  assert(args.size() == 3);
+  string_exprt str = make_string(args[0]);
+  exprt begin = args[1];
+  exprt end = args[2];
+  typet return_type = f.type();
+  symbol_exprt result = string_exprt::fresh_symbol("code_point_count",return_type);
+  exprt length = minus_exprt(end,begin);
+  string_axioms.emplace_back(binary_relation_exprt(result,ID_le,length));
+  string_axioms.emplace_back(binary_relation_exprt(result,ID_ge,div_exprt(length,refined_string_typet::index_of_int(2))));
+
+  return result;
 }
 
 exprt string_refinementt::convert_string_offset_by_code_point(

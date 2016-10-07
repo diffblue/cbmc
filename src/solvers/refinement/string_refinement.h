@@ -73,6 +73,8 @@ protected:
   bvt convert_string_char_at(const function_application_exprt &f);
   exprt convert_string_code_point_at(const function_application_exprt &f);
   exprt convert_string_code_point_before(const function_application_exprt &f);
+  
+  // warning this function is underspecified
   exprt convert_string_code_point_count(const function_application_exprt &f);
   exprt convert_string_offset_by_code_point(const function_application_exprt &f);
   exprt convert_string_parse_int(const function_application_exprt &f);

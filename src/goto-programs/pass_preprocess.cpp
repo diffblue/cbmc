@@ -177,6 +177,10 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_char_at");
 	} else if(function_id == irep_idt("java::java.lang.String.codePointAt:(I)I")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_code_point_at_func");
+	} else if(function_id == irep_idt("java::java.lang.String.codePointBefore:(I)I")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_code_point_before_func");
+	} else if(function_id == irep_idt("java::java.lang.String.codePointCount:(II)I")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_code_point_count_func");
 
 	} else if(function_id == irep_idt("java::java.lang.String.hashCode:()I")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_hash_code_func");
