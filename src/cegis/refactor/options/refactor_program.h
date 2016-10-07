@@ -47,6 +47,7 @@ public:
     goto_ranget spec_range;
     std::set<irep_idt> state_vars;
     std::set<typet> types;
+    std::string processor_function;
   };
 
   /**

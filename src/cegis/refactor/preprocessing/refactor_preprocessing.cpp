@@ -30,9 +30,11 @@ void refactor_preprocessingt::operator()()
     break;
   }
   for (refactor_programt::sketcht &s : original_program.sketches)
+  {
     s.state_vars=collect_state_vars(s.spec_range.first, s.spec_range.second);
+    // TODO: construct_instruction_set(original_program); // Multiple?
+  }
   // TODO: Insert extern programs.
-  // TODO: construct_instruction_set(original_program); // Multiple?
   switch (type)
   {
   case refactoring_typet::NULL_OBJECT:

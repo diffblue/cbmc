@@ -32,11 +32,17 @@ std::set<typet> collect_context_types(const goto_ranget &range);
  *
  * @details
  *
+ * @param st
+ * @param gf
  * @param state_types
  * @param var_slots_per_state_type
  * @param context_types
+ *
+ * @return
  */
-void create_cegis_processor(
+std::string create_cegis_processor(
+    symbol_tablet &st,
+    goto_functionst &gf,
     const std::set<typet> &state_types,
     size_t var_slots_per_state_type,
     const std::set<typet> &context_types);
