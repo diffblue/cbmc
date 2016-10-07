@@ -221,6 +221,14 @@ bvt string_refinementt::convert_function_application(
       return convert_bv(convert_string_parse_int(expr));
     } else if (is_string_to_char_array_func(id)) {
       return convert_bv(convert_string_to_char_array(expr));
+    } else if (is_string_code_point_at_func(id)) {
+      return convert_bv(convert_string_code_point_at(expr));
+    } else if (is_string_code_point_before_func(id)) {
+      return convert_bv(convert_string_code_point_before(expr));
+    } else if (is_string_code_point_count_func(id)) {
+      return convert_bv(convert_string_code_point_count(expr));
+    } else if (is_string_code_point_offset_by_code_point_func(id)) {
+      return convert_bv(convert_string_offset_by_code_point(expr));
     }
   }
 
@@ -384,7 +392,7 @@ void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str
     assign_to_symbol(sym,string_of_symbol(to_symbol_expr(str)));
   else
     assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
-  debug() << "string = " << symbol_to_string[sym.get_identifier()].pretty() << eom;
+  //debug() << "string = " << symbol_to_string[sym.get_identifier()].pretty() << eom;
 }
 
 string_exprt string_refinementt::make_string(const exprt & str) 
@@ -804,8 +812,6 @@ bvt string_refinementt::convert_string_char_at(
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //string_char_at expects 2 arguments
   string_exprt str = make_string(args[0]);
-  debug() << "in convert_string_char_at: we add the index to the"
-	  << " index set" << eom;
 
   if(f.type() == char_type) {
     symbol_exprt char_sym = string_exprt::fresh_symbol("char",char_type);
@@ -818,6 +824,8 @@ bvt string_refinementt::convert_string_char_at(
     return convert_bv(char_sym);
   }
 }
+
+
 
 constant_exprt string_refinementt::constant_of_nat(int i,typet t) {
   return constant_exprt(integer2binary(i, boolbv_width(t)), t);
@@ -869,6 +877,73 @@ exprt string_refinementt::convert_string_parse_int
     string_axioms.emplace_back(and_exprt(premise,starts_with_minus),equal_exprt(i,unary_minus_exprt(sum)));
   }
   return i;
+}
+
+
+exprt string_refinementt::is_high_surrogate(const exprt & chr) {
+  return and_exprt
+    (binary_relation_exprt(chr,ID_ge,constant_of_nat(0xD800,refined_string_typet::java_char_type())),
+     binary_relation_exprt(chr,ID_le,constant_of_nat(0xDBFF,refined_string_typet::java_char_type())));
+}
+exprt string_refinementt::is_low_surrogate(const exprt & chr) {
+  return and_exprt
+    (binary_relation_exprt(chr,ID_ge,constant_of_nat(0xDC00,refined_string_typet::java_char_type())),
+     binary_relation_exprt(chr,ID_le,constant_of_nat(0xDFFF,refined_string_typet::java_char_type())));
+}
+
+exprt string_refinementt::convert_string_code_point_at(
+  const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2);
+  typet return_type = f.type();
+  string_exprt str = make_string(args[0]);
+  symbol_exprt result = string_exprt::fresh_symbol("char",return_type);
+  symbol_exprt low = fresh_boolean("low_surrogate");
+  symbol_exprt high = fresh_boolean("high_surrogate");
+
+  exprt char1_as_int = typecast_exprt(str[args[1]],return_type);
+  exprt char2_as_int = typecast_exprt(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))],return_type);
+
+  exprt pair_value = 
+    plus_exprt
+    (constant_of_nat(0x010000,return_type),
+     (plus_exprt
+      (mult_exprt
+       (mod_exprt(char1_as_int,constant_of_nat(0x0800,return_type)),
+	constant_of_nat(0x0400,return_type)),
+       mod_exprt(char2_as_int,constant_of_nat(0x0400,return_type)))));
+  
+  exprt return_pair = and_exprt(is_high_surrogate(str[args[1]]),
+				is_low_surrogate(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))]));
+
+  string_axioms.emplace_back(equal_exprt(low,is_low_surrogate(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))])));
+  string_axioms.emplace_back(equal_exprt(high,is_high_surrogate(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))])));
+  string_axioms.emplace_back(return_pair,equal_exprt(result,pair_value));
+  string_axioms.emplace_back(not_exprt(return_pair),
+			     equal_exprt(result,char1_as_int));
+  return result;
+}
+
+exprt string_refinementt::convert_string_code_point_before(
+  const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(false);
+}
+
+exprt string_refinementt::convert_string_code_point_count(
+  const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(false);
+}
+
+exprt string_refinementt::convert_string_offset_by_code_point(
+  const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(false);
 }
 
 // We compute the index set for all formulas, instantiate the formulas

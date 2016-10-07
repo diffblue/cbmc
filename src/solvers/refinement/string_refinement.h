@@ -71,10 +71,19 @@ protected:
   exprt convert_string_last_index_of(const function_application_exprt &f);
   bvt convert_char_literal(const function_application_exprt &f);
   bvt convert_string_char_at(const function_application_exprt &f);
+  exprt convert_string_code_point_at(const function_application_exprt &f);
+  exprt convert_string_code_point_before(const function_application_exprt &f);
+  exprt convert_string_code_point_count(const function_application_exprt &f);
+  exprt convert_string_offset_by_code_point(const function_application_exprt &f);
   exprt convert_string_parse_int(const function_application_exprt &f);
   exprt convert_string_to_char_array(const function_application_exprt &f);
 
 private:
+
+  // Tells if a char value is in the high-surrogates or low surrogates ranges
+  exprt is_high_surrogate(const exprt & chr);
+  exprt is_low_surrogate(const exprt & chr);
+
   // All constraints produced by the code
   axiom_vect string_axioms;
 

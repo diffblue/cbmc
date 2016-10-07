@@ -13,6 +13,10 @@ Date:   September 2016
 #define char_literal_func "__CPROVER_uninterpreted_char_literal"
 #define string_equal_func "__CPROVER_uninterpreted_string_equal_func"
 #define string_char_at_func "__CPROVER_uninterpreted_char_at"
+#define string_code_point_at_func "__CPROVER_uninterpreted_string_code_point_at_func"
+#define string_code_point_before_func "__CPROVER_uninterpreted_string_code_point_before_func"
+#define string_code_point_count_func "__CPROVER_uninterpreted_string_code_point_count_func"
+#define string_code_point_offset_by_code_point_func "__CPROVER_uninterpreted_string_offset_by_code_point_func"
 #define string_concat_func "__CPROVER_uninterpreted_strcat_func"
 #define string_concat_int_func "__CPROVER_uninterpreted_strcat_int_func"
 #define string_concat_long_func "__CPROVER_uninterpreted_strcat_long_func"
@@ -215,6 +219,15 @@ bool is_string_insert_float_func(irep_idt id){
 bool is_string_insert_double_func(irep_idt id){
   return (starts_with(id2string(id),string_insert_double_func));
 }
-
-
-
+bool is_string_code_point_at_func(irep_idt id){
+  return (starts_with(id2string(id),string_code_point_at_func));
+}
+bool is_string_code_point_before_func(irep_idt id){
+  return (starts_with(id2string(id),string_code_point_before_func));
+}
+bool is_string_code_point_count_func(irep_idt id){
+  return (starts_with(id2string(id),string_code_point_count_func));
+}
+bool is_string_code_point_offset_by_code_point_func(irep_idt id){
+  return (starts_with(id2string(id),string_code_point_offset_by_code_point_func));
+}
