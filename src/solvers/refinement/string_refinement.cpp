@@ -973,7 +973,18 @@ exprt string_refinementt::convert_string_offset_by_code_point(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
-  assert(false);
+  assert(args.size() == 3);
+  string_exprt str = make_string(args[0]);
+  exprt index = args[1];
+  exprt offset = args[2];
+  typet return_type = f.type();
+  symbol_exprt result = string_exprt::fresh_symbol("offset_by_code_point",return_type);
+  exprt minimum = plus_exprt(index,plus_exprt(index,offset));
+  exprt maximum = plus_exprt(index,plus_exprt(index,mult_exprt(offset,refined_string_typet::index_of_int(2))));
+  string_axioms.emplace_back(binary_relation_exprt(result,ID_le,maximum));
+  string_axioms.emplace_back(binary_relation_exprt(result,ID_ge,minimum));
+
+  return result;
 }
 
 // We compute the index set for all formulas, instantiate the formulas

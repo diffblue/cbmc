@@ -74,8 +74,9 @@ protected:
   exprt convert_string_code_point_at(const function_application_exprt &f);
   exprt convert_string_code_point_before(const function_application_exprt &f);
   
-  // warning this function is underspecified
+  // Warning: this function is underspecified
   exprt convert_string_code_point_count(const function_application_exprt &f);
+  // Warning: this function is underspecified
   exprt convert_string_offset_by_code_point(const function_application_exprt &f);
   exprt convert_string_parse_int(const function_application_exprt &f);
   exprt convert_string_to_char_array(const function_application_exprt &f);

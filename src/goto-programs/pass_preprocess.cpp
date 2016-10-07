@@ -181,6 +181,8 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_code_point_before_func");
 	} else if(function_id == irep_idt("java::java.lang.String.codePointCount:(II)I")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_code_point_count_func");
+	} else if(function_id == irep_idt("java::java.lang.String.offsetByCodePoints:(II)I")) {
+	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_offset_by_code_point_func");
 
 	} else if(function_id == irep_idt("java::java.lang.String.hashCode:()I")) {
 	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_hash_code_func");
@@ -256,6 +258,9 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.append:(F)Ljava/lang/StringBuilder;")) {
 	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_float_func",string_builders);
+	} else if(function_id == irep_idt
+		  ("java::java.lang.StringBuilder.appendCodePoint:(I)Ljava/lang/StringBuilder;")) {
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_code_point_func",string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.delete:(II)Ljava/lang/StringBuilder;")) {
 	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,"__CPROVER_uninterpreted_string_delete_func",string_builders);

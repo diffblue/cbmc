@@ -32,6 +32,7 @@ bool is_string_concat_char_func(irep_idt id);
 bool is_string_concat_bool_func(irep_idt id);
 bool is_string_concat_double_func(irep_idt id);
 bool is_string_concat_float_func(irep_idt id);
+bool is_string_concat_code_point_func(irep_idt id);
 bool is_string_contains_func(irep_idt id);
 bool is_string_copy_func(irep_idt id);
 bool is_string_delete_func(irep_idt id);

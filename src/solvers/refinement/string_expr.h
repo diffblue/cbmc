@@ -87,6 +87,7 @@ private:
   void of_string_concat_char(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_concat_double(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_concat_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+  void of_string_concat_code_point(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
 
   // insert s2 in s1 at the given position
   void of_string_insert(const string_exprt & s1, const string_exprt & s2, const exprt &offset, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
@@ -125,6 +126,7 @@ private:
   void of_bool(const exprt &i, axiom_vect & axioms, bool is_c_string);
   void of_char(const function_application_exprt &f, axiom_vect & axioms);
   void of_char(const exprt &i, axiom_vect & axioms, bool is_c_string);
+  void of_code_point(const exprt &code_point, axiom_vect & axioms, bool is_c_string);
   void of_java_char_array(const exprt & char_array, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 
   void of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);

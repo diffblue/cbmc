@@ -127,6 +127,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_concat_double(expr,symbol_to_string,axioms);
     } else if (is_string_concat_float_func(id)) {
       return of_string_concat_float(expr,symbol_to_string,axioms);
+    } else if (is_string_concat_code_point_func(id)) {
+      return of_string_concat_code_point(expr,symbol_to_string,axioms);
     } else if (is_string_insert_func(id)) {
       return of_string_insert(expr,symbol_to_string,axioms);
     } else if (is_string_insert_int_func(id)) {
@@ -702,6 +704,35 @@ void string_exprt::of_char
 
 }
 
+
+void string_exprt::of_code_point(const exprt &code_point, axiom_vect & axioms, bool is_c_string)
+{
+  typet type = code_point.type();
+  binary_relation_exprt small(code_point,ID_lt,constant_of_nat(0x010000,32, type));
+  axioms.emplace_back(small,
+		      equal_exprt(length(), refined_string_typet::index_of_int(1)));
+  axioms.emplace_back(not_exprt(small),
+		      equal_exprt(length(), refined_string_typet::index_of_int(2)));
+  axioms.emplace_back(small,equal_exprt((*this)[refined_string_typet::index_of_int(0)],typecast_exprt(code_point,refined_string_typet::java_char_type())));
+
+  axioms.emplace_back(not_exprt(small),
+		      equal_exprt
+		      ((*this)[refined_string_typet::index_of_int(0)],
+		       typecast_exprt
+		       (plus_exprt(constant_of_nat(0xD800,32, type),
+				   div_exprt(minus_exprt(code_point,constant_of_nat(0x010000,32,type)),constant_of_nat(0x0400,32, type))),
+			refined_string_typet::java_char_type())));
+  axioms.emplace_back(not_exprt(small),
+		      equal_exprt
+		      ((*this)[refined_string_typet::index_of_int(1)],
+		       typecast_exprt
+		       (plus_exprt(constant_of_nat(0xDC00,32, type),
+				   mod_exprt(code_point,constant_of_nat(0x0400,32, type))),
+			refined_string_typet::java_char_type())));
+
+}
+
+
 void string_exprt::of_string_char_set
 (const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
@@ -834,8 +865,17 @@ void string_exprt::of_string_concat_float(const function_application_exprt &f, s
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
-  string_exprt s2;
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_float(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),10);
+  of_string_concat(s1,s2,symbol_to_string,axioms);
+}
+
+void string_exprt::of_string_concat_code_point(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  assert(args.size() == 2); 
+  string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
+  string_exprt s2(refined_string_typet::get_char_type(args[0]));
+  s2.of_code_point(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
   of_string_concat(s1,s2,symbol_to_string,axioms);
 }
 

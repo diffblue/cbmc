@@ -24,6 +24,7 @@ Date:   September 2016
 #define string_concat_bool_func "__CPROVER_uninterpreted_strcat_bool_func"
 #define string_concat_float_func "__CPROVER_uninterpreted_strcat_float_func"
 #define string_concat_double_func "__CPROVER_uninterpreted_strcat_double_func"
+#define string_concat_code_point_func "__CPROVER_uninterpreted_strcat_code_point_func"
 #define string_contains_func "__CPROVER_uninterpreted_strcontains"
 #define string_char_set_func "__CPROVER_uninterpreted_string_char_set_func"
 #define string_copy_func "__CPROVER_uninterpreted_string_copy"
@@ -230,4 +231,7 @@ bool is_string_code_point_count_func(irep_idt id){
 }
 bool is_string_code_point_offset_by_code_point_func(irep_idt id){
   return (starts_with(id2string(id),string_code_point_offset_by_code_point_func));
+}
+bool is_string_concat_code_point_func(irep_idt id){
+  return (starts_with(id2string(id),string_concat_code_point_func));
 }
