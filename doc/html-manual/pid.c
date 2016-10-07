@@ -22,12 +22,12 @@ float desired_climb;
 // Vertical speed of the UAV detected by GPS sensor
 float estimator_z_dot;
 
-/** PID funciton OUTPUTS */
+/** PID function OUTPUTS */
 float desired_gaz;
 float desired_pitch;
 
-/** Accumulated error in the control */
-float climb_sum_err;
+/** The state variable: accumulated error in the control */
+float climb_sum_err=0;
 
 /** Computes desired_gaz and desired_pitch */
 void climb_pid_run() 
@@ -63,7 +63,13 @@ int main()
     __CPROVER_assume(desired_climb>=-MAX_CLIMB && desired_climb<=MAX_CLIMB);
     __CPROVER_assume(estimator_z_dot>=-MAX_CLIMB && estimator_z_dot<=MAX_CLIMB);
 
+    __CPROVER_input("desired_climb", desired_climb);
+    __CPROVER_input("estimator_z_dot", estimator_z_dot);
+
     climb_pid_run(); 
+
+    __CPROVER_output("desired_gaz", desired_gaz);
+    __CPROVER_output("desired_pitch", desired_pitch);
 
   }
 

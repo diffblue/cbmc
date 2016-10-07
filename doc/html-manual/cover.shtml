@@ -77,12 +77,12 @@ is plotted in the Figure below.
 22: // Vertical speed of the UAV detected by GPS sensor
 23: float estimator_z_dot;
 24:
-25: /** PID funciton OUTPUTS */
+25: /** PID function OUTPUTS */
 26: float desired_gaz;
 27: float desired_pitch;
 28:
-29: /** Accumulated error in the control */
-30: float climb_sum_err;
+29: /** The state variable: accumulated error in the control */
+30: float climb_sum_err=0;
 31:
 32: /** Computes desired_gaz and desired_pitch */
 33: void climb_pid_run() 
@@ -118,26 +118,35 @@ is plotted in the Figure below.
 63:     __CPROVER_assume(desired_climb>=-MAX_CLIMB && desired_climb<=MAX_CLIMB);
 64:     __CPROVER_assume(estimator_z_dot>=-MAX_CLIMB && estimator_z_dot<=MAX_CLIMB);
 65:
-66:     climb_pid_run(); 
-67:
-68:   }
-69:
-70:   return 0;
-72: }
+66:     __CPROVER_input("desired_climb", desired_climb);
+67:     __CPROVER_input("estimator_z_dot", estimator_z_dot);
+68:
+69:     climb_pid_run();
+70:
+71:     __CPROVER_output("desired_gaz", desired_gaz);
+72:     __CPROVER_output("desired_pitch", desired_pitch);
+73:
+74:   }
+75:
+76:   return 0;
+77: }
 </code></pre>
 
 <p class="justified">
 In order to test the PID controller, we construct a main control loop,
-which repeatedly invokes the function <code>climb_pid_run</code> (line 66). 
-In the beginning of each loop iteration, the values of the desired speed <code>desired_climb</code>
-and the estimated speed <code>estimated_z_dot</code> are assigned non-deterministically.
+which repeatedly invokes the function <code>climb_pid_run</code> (line 69). 
+This PID function has two input variables: the desired speed <code>desired_climb</code>
+and the estimated speed <code>estimated_z_dot</code>.
+In the beginning of each loop iteration, values of the inputs are assigned non-deterministically.
 Subsequently, the <code>__CPROVER_assume</code> statement in lines 63 and 64 guarantees that
-their values are bounded within a valid range.
+both values are bounded within a valid range.
+The <code>__CPROVER_input</code> and <code>__CPROVER_output</code> will help clarify the inputs
+and outputs of interest for generating test suites.
 </p>
 
 <p class="justified">
 To demonstrate the automatic test suite generation in CBMC,
-we call the following command
+we call the following command and we are going to explain the command line options one by one.
 </p>
 
 <pre><code>cbmc pid.c --cover mcdc --unwind 6 --trace --xml-ui
@@ -172,16 +181,37 @@ goals at the same time.  Each trace corresponds to a test case.
 </p>
 
 <p class="justified">
-For the example above, the following test suites are generated.
+In the end, the following test suites are automatically generated for testing the PID controller.
 A test suite consists of a sequence of input parameters that are
 passed to the PID function <code>climb_pid_run</code> at each loop iteration. 
+For example, Test 1 covers the MC/DC goal with id="climb_pid_run.coverage.1".
 <pre><code>Test suite:
-T1: (desired_climb=-1.000000f, estimator_z_dot=-1.000000f)
-    <em>goal id: climb_pid_run.coverage.1</em>
-T2: (desired_climb=-1.000000f, estimator_z_dot=-1.000000f); (desired_climb=1.000000f, estimator_z_dot=1.000000f)
-    <em>goal id: climb_pid_run.coverage.2</em>
-T3: (desired_climb=0.000000f, estimator_z_dot=1.000000f)
-    <em>goal id: climb_pid_run.coverage.3</em>
+Test 1. 
+  (iteration 1) desired_climb=-1.000000f, estimator_z_dot=1.000000f
+
+Test 2.
+  (iteration 1) desired_climb=-1.000000f, estimator_z_dot=1.000000f 
+  (iteration 2) desired_climb=1.000000f, estimator_z_dot=-1.000000f 
+
+Test 3.
+  (iteration 1) desired_climb=0.000000f, estimator_z_dot=-1.000000f
+  (iteration 2) desired_climb=1.000000f, estimator_z_dot=-1.000000f
+
+Test 4.
+  (iteration 1) desired_climb=1.000000f, estimator_z_dot=-1.000000f
+  (iteration 2) desired_climb=1.000000f, estimator_z_dot=-1.000000f
+  (iteration 3) desired_climb=1.000000f, estimator_z_dot=-1.000000f
+  (iteration 4) desired_climb=1.000000f, estimator_z_dot=-1.000000f
+  (iteration 5) desired_climb=0.000000f, estimator_z_dot=-1.000000f
+  (iteration 6) desired_climb=1.000000f, estimator_z_dot=-1.000000f
+
+Test 5.
+  (iteration 1) desired_climb=-1.000000f, estimator_z_dot=1.000000f
+  (iteration 2) desired_climb=-1.000000f, estimator_z_dot=1.000000f
+  (iteration 3) desired_climb=-1.000000f, estimator_z_dot=1.000000f
+  (iteration 4) desired_climb=-1.000000f, estimator_z_dot=1.000000f
+  (iteration 5) desired_climb=-1.000000f, estimator_z_dot=1.000000f
+  (iteration 6) desired_climb=-1.000000f, estimator_z_dot=1.000000f
 </code></pre>
 </p>
 
@@ -191,14 +221,7 @@ function body six times. In order to achieve the complete coverage on all the in
 in the PID function <code>climb_pid_run</code>, the loop must be unwound sufficient enough times.
 For example, <code>climb_pid_run</code> needs to be called at least six times for evaluating the 
 condition <code>climb_sum_err>MAX_CLIMB_SUM_ERR</code> in line 48 to <em>true</em>.
-This corresponds to the test suite below.
-<pre><code>(desired_climb=-1.000000f, estimator_z_dot=1.000000f);
-(desired_climb=-1.000000f, estimator_z_dot=0.000000f);
-(desired_climb=-1.000000f, estimator_z_dot=1.000000f);
-(desired_climb=-1.000000f, estimator_z_dot=1.000000f);
-(desired_climb=-1.000000f, estimator_z_dot=1.000000f);
-(desired_climb=-1.000000f, estimator_z_dot=1.000000f).
-</code></pre>
+This corresponds to the Test 5.
 An introduction to the use of loop unwinding can be found
 in <a href="cbmc-loops.shtml">Understanding Loop Unwinding</a>.
 </p>
