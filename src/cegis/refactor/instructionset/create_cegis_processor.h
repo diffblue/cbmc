@@ -13,6 +13,7 @@
 #include <set>
 
 #include <util/type.h>
+#include <goto-programs/goto_functions.h>
 
 #include <cegis/cegis-util/goto_range.h>
 
