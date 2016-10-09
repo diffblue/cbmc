@@ -90,8 +90,8 @@ bool cpp_languaget::preprocess(
   const std::string &path,
   std::ostream &outstream)
 {
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_C)
-    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_CPP;
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_C)
+    config.ansi_c.mode=configt::ansi_ct::flavourt::GCC_CPP;
 
   if(path=="")
     return c_preprocess(instream, outstream, get_message_handler());
@@ -154,24 +154,24 @@ bool cpp_languaget::parse(
 
   switch(config.ansi_c.mode)
   {
-  case configt::ansi_ct::flavourt::MODE_CODEWARRIOR_C_CPP:
+  case configt::ansi_ct::flavourt::CODEWARRIOR_C_CPP:
     cpp_parser.mode=ansi_c_parsert::CW;
     break;
    
-  case configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP:
+  case configt::ansi_ct::flavourt::VISUAL_STUDIO_C_CPP:
     cpp_parser.mode=ansi_c_parsert::MSC;
     break;
     
-  case configt::ansi_ct::flavourt::MODE_ANSI_C_CPP:
+  case configt::ansi_ct::flavourt::ANSI_C_CPP:
     cpp_parser.mode=ansi_c_parsert::ANSI;
     break;
     
-  case configt::ansi_ct::flavourt::MODE_GCC_C:
-  case configt::ansi_ct::flavourt::MODE_GCC_CPP:
+  case configt::ansi_ct::flavourt::GCC_C:
+  case configt::ansi_ct::flavourt::GCC_CPP:
     cpp_parser.mode=ansi_c_parsert::GCC;
     break;
     
-  case configt::ansi_ct::flavourt::MODE_ARM_C_CPP:
+  case configt::ansi_ct::flavourt::ARM_C_CPP:
     cpp_parser.mode=ansi_c_parsert::ARM;
     break;
     

@@ -125,8 +125,8 @@ void add_library(
   // switch mode temporarily from gcc C++ to gcc C flavour
   configt::ansi_ct::flavourt old_mode=config.ansi_c.mode;
   
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_CPP)
-    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_CPP)
+    config.ansi_c.mode=configt::ansi_ct::flavourt::GCC_C;
   
   ansi_c_languaget ansi_c_language;
   ansi_c_language.set_message_handler(message_handler);

@@ -109,8 +109,8 @@ bool ansi_c_languaget::parse(
 
   // preprocessing
 
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_CPP)
-    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_CPP)
+    config.ansi_c.mode=configt::ansi_ct::flavourt::GCC_C;
 
   std::ostringstream o_preprocessed;
 
@@ -135,24 +135,24 @@ bool ansi_c_languaget::parse(
 
   switch(config.ansi_c.mode)
   {
-  case configt::ansi_ct::flavourt::MODE_CODEWARRIOR_C_CPP:
+  case configt::ansi_ct::flavourt::CODEWARRIOR_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::CW;
     break;
    
-  case configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP:
+  case configt::ansi_ct::flavourt::VISUAL_STUDIO_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::MSC;
     break;
     
-  case configt::ansi_ct::flavourt::MODE_ANSI_C_CPP:
+  case configt::ansi_ct::flavourt::ANSI_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::ANSI;
     break;
     
-  case configt::ansi_ct::flavourt::MODE_GCC_C:
-  case configt::ansi_ct::flavourt::MODE_GCC_CPP:
+  case configt::ansi_ct::flavourt::GCC_C:
+  case configt::ansi_ct::flavourt::GCC_CPP:
     ansi_c_parser.mode=ansi_c_parsert::GCC;
     break;
     
-  case configt::ansi_ct::flavourt::MODE_ARM_C_CPP:
+  case configt::ansi_ct::flavourt::ARM_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::ARM;
     break;
     

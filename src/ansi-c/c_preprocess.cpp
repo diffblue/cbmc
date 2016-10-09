@@ -911,7 +911,7 @@ bool c_preprocess_gcc_clang(
   case configt::ansi_ct::ost::OS_WIN:
     command+=" -D _WIN32";
 
-    if(config.ansi_c.mode!=configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP)
+    if(config.ansi_c.mode!=configt::ansi_ct::flavourt::VISUAL_STUDIO_C_CPP)
       command+=" -D _M_IX86=Blend";
 
     if(config.ansi_c.arch=="x86_64")
@@ -977,8 +977,8 @@ bool c_preprocess_gcc_clang(
   // the following forces the mode
   switch(config.ansi_c.mode)
   {
-  case configt::ansi_ct::flavourt::MODE_GCC_C: command+=" -x c"; break;
-  case configt::ansi_ct::flavourt::MODE_GCC_CPP: command+=" -x c++"; break;
+  case configt::ansi_ct::flavourt::GCC_C: command+=" -x c"; break;
+  case configt::ansi_ct::flavourt::GCC_CPP: command+=" -x c++"; break;
   default:;
   }
 
@@ -1226,7 +1226,7 @@ bool c_preprocess_none(
     return true;
   }
   
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_CODEWARRIOR_C_CPP)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::CODEWARRIOR_C_CPP)
   {
     // special treatment for "/* #line"
     postprocess_codewarrior(infile, outstream);
