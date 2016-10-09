@@ -104,8 +104,8 @@ public:
                           MODE_CODEWARRIOR_C_CPP, MODE_ARM_C_CPP };
     flavourt mode; // the syntax of source files
 
-    enum class preprocessort { NO_PP, PP_GCC, PP_CLANG, PP_VISUAL_STUDIO,
-                               PP_CODEWARRIOR, PP_ARM };
+    enum class preprocessort { NONE, GCC, CLANG, VISUAL_STUDIO,
+                               CODEWARRIOR, ARM };
     preprocessort preprocessor; // the preprocessor to use
 
     std::list<std::string> defines;

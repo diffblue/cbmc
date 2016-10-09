@@ -39,7 +39,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
 else
   CP_CXXFLAGS = -MMD -MP -std=c++11
 endif
-  #LINKFLAGS = -static
+  LINKFLAGS = -static
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   ifeq ($(BUILD_ENV_),OSX_Universal)
     # MacOS Fat Binaries

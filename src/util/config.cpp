@@ -1118,7 +1118,7 @@ bool configt::set(const cmdlinet &cmdline)
     {
       // There are gcc versions that target Windows (MinGW for example),
       // and we support that.
-      ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+      ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
       ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
 
       // enable Cygwin
@@ -1134,13 +1134,13 @@ bool configt::set(const cmdlinet &cmdline)
       // but we recognize the Visual Studio language,
       // which is somewhat inconsistent.
       #ifdef _WIN32
-      ansi_c.preprocessor=ansi_ct::preprocessort::PP_VISUAL_STUDIO;
+      ansi_c.preprocessor=ansi_ct::preprocessort::VISUAL_STUDIO;
       ansi_c.mode=ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
       #elif __FreeBSD__
-      ansi_c.preprocessor=ansi_ct::preprocessort::PP_CLANG;
+      ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
       ansi_c.mode=ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
       #else
-      ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+      ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
       ansi_c.mode=ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
       #endif
     }
@@ -1150,21 +1150,21 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_MACOS;
     ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+    ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
   }
   else if(os=="linux" || os=="solaris")
   {
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
     ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+    ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
   }
   else if(os=="freebsd")
   {
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
     ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::preprocessort::PP_CLANG;
+    ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
   }
   else
   {
@@ -1172,7 +1172,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
     ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+    ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
   }
 
   set_arch(arch);

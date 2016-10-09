@@ -436,22 +436,22 @@ bool c_preprocess(
 {
   switch(config.ansi_c.preprocessor)
   {
-  case configt::ansi_ct::preprocessort::PP_CODEWARRIOR:
+  case configt::ansi_ct::preprocessort::CODEWARRIOR:
     return c_preprocess_codewarrior(path, outstream, message_handler);
   
-  case configt::ansi_ct::preprocessort::PP_GCC:
+  case configt::ansi_ct::preprocessort::GCC:
     return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
   
-  case configt::ansi_ct::preprocessort::PP_CLANG:
+  case configt::ansi_ct::preprocessort::CLANG:
     return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
   
-  case configt::ansi_ct::preprocessort::PP_VISUAL_STUDIO:
+  case configt::ansi_ct::preprocessort::VISUAL_STUDIO:
     return c_preprocess_visual_studio(path, outstream, message_handler);
   
-  case configt::ansi_ct::preprocessort::PP_ARM:
+  case configt::ansi_ct::preprocessort::ARM:
     return c_preprocess_arm(path, outstream, message_handler);
   
-  case configt::ansi_ct::preprocessort::NO_PP:
+  case configt::ansi_ct::preprocessort::NONE:
     return c_preprocess_none(path, outstream, message_handler);
   }
 
@@ -762,7 +762,7 @@ bool c_preprocess_gcc_clang(
 
   std::string command;
   
-  if(preprocessor==configt::ansi_ct::preprocessort::PP_CLANG)
+  if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
     command="clang";
   else
     command="gcc";
@@ -855,7 +855,7 @@ bool c_preprocess_gcc_clang(
   command+=" -D__DEC128_MANT_DIG__=34";
   command+=" -D__LDBL_MIN_10_EXP__=\"(-4931)\"";
 
-  if(preprocessor==configt::ansi_ct::preprocessort::PP_CLANG)
+  if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
     command+=" -D_Noreturn=\"__attribute__((__noreturn__))\"";
 
   if(config.ansi_c.int_width==16)
