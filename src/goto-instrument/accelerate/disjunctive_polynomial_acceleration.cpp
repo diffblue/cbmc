@@ -68,7 +68,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
 
   if (loop_counter.is_nil()) {
     symbolt loop_sym = utils.fresh_symbol("polynomial::loop_counter",
-        unsignedbv_typet(POLY_WIDTH));
+        unsigned_poly_type());
     loop_counter = loop_sym.symbol_expr();
   }
 
@@ -238,7 +238,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   } else {
     // The path is not monotone, so we need to introduce a quantifier to ensure
     // that the condition held for all 0 <= k < n.
-    symbolt k_sym = utils.fresh_symbol("polynomial::k", unsignedbv_typet(POLY_WIDTH));
+    symbolt k_sym = utils.fresh_symbol("polynomial::k", unsigned_poly_type());
     exprt k = k_sym.symbol_expr();
 
     exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), "<=", k),
@@ -406,16 +406,16 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   for (std::vector<expr_listt>::iterator it = parameters.begin();
        it != parameters.end();
        ++it) {
-    symbolt coeff = utils.fresh_symbol("polynomial::coeff", signedbv_typet(POLY_WIDTH));
+    symbolt coeff = utils.fresh_symbol("polynomial::coeff", signed_poly_type());
     coefficients.insert(make_pair(*it, coeff.symbol_expr()));
 
     // XXX HACK HACK HACK
     // I'm just constraining these coefficients to prevent overflows messing things
     // up later...  Should really do this properly somehow.
-    program.assume(binary_relation_exprt(from_integer(-(1 << 10), signedbv_typet(POLY_WIDTH)),
+    program.assume(binary_relation_exprt(from_integer(-(1 << 10), signed_poly_type()),
             "<", coeff.symbol_expr()));
     program.assume(binary_relation_exprt(coeff.symbol_expr(), "<",
-        from_integer(1 << 10, signedbv_typet(POLY_WIDTH))));
+        from_integer(1 << 10, signed_poly_type())));
   }
 
   // Build a set of values for all the parameters that allow us to fit a

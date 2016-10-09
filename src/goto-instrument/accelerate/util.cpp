@@ -2,8 +2,19 @@
 #include <algorithm>
 
 #include <util/std_types.h>
+#include <util/config.h>
 
 #include "util.h"
+
+signedbv_typet signed_poly_type()
+{
+  return signedbv_typet(config.ansi_c.int_width);
+}
+
+unsignedbv_typet unsigned_poly_type()
+{
+  return unsignedbv_typet(config.ansi_c.int_width);
+}
 
 /**
  * Convenience function -- is the type a bitvector of some kind?
