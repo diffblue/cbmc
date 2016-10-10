@@ -17,6 +17,7 @@ Date:   September 2016
 #define string_code_point_before_func "__CPROVER_uninterpreted_string_code_point_before_func"
 #define string_code_point_count_func "__CPROVER_uninterpreted_string_code_point_count_func"
 #define string_code_point_offset_by_code_point_func "__CPROVER_uninterpreted_string_offset_by_code_point_func"
+#define string_compare_to_func "__CPROVER_uninterpreted_string_compare_to_func"
 #define string_concat_func "__CPROVER_uninterpreted_strcat_func"
 #define string_concat_int_func "__CPROVER_uninterpreted_strcat_int_func"
 #define string_concat_long_func "__CPROVER_uninterpreted_strcat_long_func"
@@ -234,4 +235,7 @@ bool is_string_code_point_offset_by_code_point_func(irep_idt id){
 }
 bool is_string_concat_code_point_func(irep_idt id){
   return (starts_with(id2string(id),string_concat_code_point_func));
+}
+bool is_string_compare_to_func(irep_idt id){
+  return (starts_with(id2string(id),string_compare_to_func));
 }

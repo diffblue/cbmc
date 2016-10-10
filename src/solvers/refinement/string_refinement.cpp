@@ -229,6 +229,8 @@ bvt string_refinementt::convert_function_application(
       return convert_bv(convert_string_code_point_count(expr));
     } else if (is_string_code_point_offset_by_code_point_func(id)) {
       return convert_bv(convert_string_offset_by_code_point(expr));
+    } else if (is_string_compare_to_func(id)) {
+      return convert_bv(convert_string_compare_to(expr));
     }
   }
 
@@ -1028,6 +1030,78 @@ exprt string_refinementt::convert_string_to_char_array
   debug() << "convert_string_to_char_array returns: " << str.content().pretty() << eom;
   return str.content();
 }
+
+
+
+exprt string_refinementt::convert_string_intern(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();  
+  assert(args.size() == 1);
+
+  string_exprt str = make_string(args[0]);
+
+  // intern(str) = s_0 || s_1 || ...
+  // for each string s. 
+  //    intern(str) = intern(s) || |str| != |s| || (|str| == |s| && exists i < |s|. s[i] != str[i])
+  
+  throw("string_refinementt::convert_string_intern : incomplete implementation");
+}
+
+
+exprt string_refinementt::convert_string_compare_to(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();  
+  assert(args.size() == 2);
+
+  string_exprt s1 = make_string(args[0]);
+  string_exprt s2 = make_string(args[1]);
+  typet return_type = f.type();
+  symbol_exprt res = string_exprt::fresh_symbol("compare_to",return_type);
+
+  // In the lexicographic comparison, x is the first point where the two strings differ.
+  // res == 0 => |s1| = |s2| && forall i < |s1|. s1[i] == s2[i]
+  // res != 0 => 
+  //   (|s1| <= |s2| && exists x < |s1|. res = s1[x] - s2[x] && forall i<x s1[i]=s2[i])
+  //   || (|s1| >= |s2| && exists x < |s2|. res = s1[x] - s2[x] && forall i<x s1[i]=s2[i])
+  //   || (|s1| < |s2| && res = |s1| - |s2| && forall i<|s1| s1[i]=s2[i])
+  //   || (|s1| > |s2| && res = |s1| - |s2| && forall i<|s2| s1[i]=s2[i])
+  
+  // The second part can be rewriten as:
+  // exists x. 
+  // res != 0 ==> x> 0 &&
+  // ((|s1| <= |s2| && x < |s1|) || (|s1| >= |s2| && x < |s2|) && res = s1[x] - s2[x] )
+  // || (|s1| < |s2| && x = |s1|) || (|s1| > |s2| && x = |s2|) && res = |s1| - |s2|
+  // && forall i < x. res != 0 => s1[i] = s2[i]
+
+  symbol_exprt i = string_exprt::fresh_symbol("QA_compare_to",index_type);
+  equal_exprt res_null = equal_exprt(res,constant_of_nat(0,return_type));
+  string_axioms.emplace_back(res_null, equal_exprt(s1.length(),s2.length()));
+  string_axioms.push_back(string_constraintt(res_null,equal_exprt(s1[i],s2[i])).forall(i,zero,s1.length()));
+  symbol_exprt x = fresh_index("index_compare_to");
+  string_axioms.push_back
+    (implies_exprt
+     (not_exprt(res_null),
+      and_exprt
+      (binary_relation_exprt(x,ID_ge,constant_of_nat(0,return_type)),
+       or_exprt
+       (and_exprt
+	(equal_exprt(res,typecast_exprt(minus_exprt(s1[x],s2[x]),return_type)),
+	 or_exprt
+	 (and_exprt(s1<=s2,s1 > x), and_exprt(s1>=s2,s2 > x))),
+	and_exprt
+	(equal_exprt(res,typecast_exprt(minus_exprt(s1.length(),s2.length()),return_type)),
+	 or_exprt
+	 (and_exprt(s1<s2,equal_exprt(x,s1.length())), and_exprt(s1>s2,equal_exprt(x,s2.length()))))))
+      ));
+
+  string_axioms.push_back(string_constraintt(not_exprt(res_null),equal_exprt(s1[i],s2[i])).forall(i,zero,x));
+
+  return res;
+}
+
+
+
+//// Pass algorithm
 
 unsigned integer_of_expr(const constant_exprt & expr) {
   return integer2unsigned(string2integer(as_string(expr.get_value()),2));

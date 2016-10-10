@@ -25,6 +25,7 @@ bool is_string_code_point_at_func(irep_idt id);
 bool is_string_code_point_before_func(irep_idt id);
 bool is_string_code_point_count_func(irep_idt id);
 bool is_string_code_point_offset_by_code_point_func(irep_idt id);
+bool is_string_compare_to_func(irep_idt id);
 bool is_string_concat_func(irep_idt id);
 bool is_string_concat_int_func(irep_idt id);
 bool is_string_concat_long_func(irep_idt id);
