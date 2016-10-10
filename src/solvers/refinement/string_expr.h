@@ -114,6 +114,8 @@ private:
 
   void of_int(const function_application_exprt &f, axiom_vect & axioms);
   void of_int(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
+  void of_int_hex(const exprt &i, axiom_vect & axioms, bool is_c_string);
+  void of_int_hex(const function_application_exprt &f,axiom_vect & axioms);
   void of_long(const function_application_exprt &f, axiom_vect & axioms);
   void of_long(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
   // Warning the specifications of these functions is only partial:

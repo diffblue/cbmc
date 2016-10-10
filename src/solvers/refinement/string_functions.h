@@ -58,6 +58,7 @@ bool is_string_is_empty_func(irep_idt id);
 bool is_string_last_index_of_func(irep_idt id);
 bool is_string_length_func(irep_idt id);
 bool is_string_of_int_func(irep_idt id);
+bool is_string_of_int_hex_func(irep_idt id);
 bool is_string_of_long_func(irep_idt id);
 bool is_string_of_bool_func(irep_idt id);
 bool is_string_of_float_func(irep_idt id);

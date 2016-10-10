@@ -50,7 +50,8 @@ Date:   September 2016
 #define string_last_index_of_func "__CPROVER_uninterpreted_strlastindexof"
 #define string_literal_func "__CPROVER_uninterpreted_string_literal"
 #define string_length_func "__CPROVER_uninterpreted_strlen"
-#define string_of_int_func "__CPROVER_uninterpreted_string_of_int"
+#define string_of_int_func "__CPROVER_uninterpreted_string_of_int_func"
+#define string_of_int_hex_func "__CPROVER_uninterpreted_string_of_int_hex_func"
 #define string_of_long_func "__CPROVER_uninterpreted_string_of_long"
 #define string_of_bool_func "__CPROVER_uninterpreted_string_of_bool"
 #define string_of_float_func "__CPROVER_uninterpreted_string_of_float"
@@ -149,6 +150,9 @@ bool is_string_parse_int_func(irep_idt id) {
 }
 bool is_string_of_int_func(irep_idt id) {
   return (starts_with(id2string(id),string_of_int_func));
+}
+bool is_string_of_int_hex_func(irep_idt id) {
+  return (starts_with(id2string(id),string_of_int_hex_func));
 }
 bool is_string_of_long_func(irep_idt id) {
   return (starts_with(id2string(id),string_of_int_func));

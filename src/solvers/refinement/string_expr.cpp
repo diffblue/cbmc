@@ -161,6 +161,8 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_copy(expr,symbol_to_string,axioms);
     } else if (is_string_of_int_func(id)) {
       return of_int(expr,axioms);
+    } else if (is_string_of_int_hex_func(id)) {
+      return of_int_hex(expr,axioms);
     } else if (is_string_of_float_func(id)) {
       return of_float(expr,axioms);
     } else if (is_string_of_double_func(id)) {
@@ -685,6 +687,81 @@ void string_exprt::of_int
       axioms.emplace_back(premise,binary_relation_exprt(i,ID_ge,smallest_with_10_digits));
     }
   }
+}
+
+
+exprt int_of_hex_char(exprt chr, unsigned char_width, typet char_type) {
+  exprt zero_char = constant_of_nat(48,char_width,char_type);
+  exprt nine_char = constant_of_nat(57,char_width,char_type);
+  exprt a_char = constant_of_nat(0x61,char_width,char_type);
+  return if_exprt(binary_relation_exprt(chr,ID_gt,nine_char),
+		  minus_exprt(chr,constant_of_nat(0x61 - 10,char_width,char_type)),
+		  minus_exprt(chr,zero_char));
+}
+
+
+void string_exprt::of_int_hex
+(const exprt &i,axiom_vect & axioms,bool is_c_string)
+{
+  typet type = i.type();
+  int width = type.get_unsigned_int(ID_width);
+  exprt sixteen = constant_of_nat(16,width,type);
+  typet char_type;
+  unsigned char_width;
+
+  if(is_c_string) {
+    char_type = refined_string_typet::char_type();
+    char_width = STRING_SOLVER_CHAR_WIDTH;
+  } else {
+    char_type = refined_string_typet::java_char_type();
+    char_width = JAVA_STRING_SOLVER_CHAR_WIDTH;
+  }
+
+  exprt minus_char = constant_of_nat(45,char_width,char_type);
+  exprt zero_char = constant_of_nat(48,char_width,char_type);
+  exprt nine_char = constant_of_nat(57,char_width,char_type);
+  exprt a_char = constant_of_nat(0x61,char_width,char_type);
+  exprt f_char = constant_of_nat(0x66,char_width,char_type);
+
+  int max_size = 8;
+  axioms.emplace_back(and_exprt(*this > index_zero,*this <= refined_string_typet::index_of_int(max_size)));
+
+  for(int size=1; size<=max_size;size++) {
+    exprt sum = constant_of_nat(0,width,type);
+    exprt all_numbers = true_exprt();
+    exprt chr = (*this)[refined_string_typet::index_of_int(0)];
+
+    for(int j=0; j<size; j++) {
+      chr = (*this)[refined_string_typet::index_of_int(j)];
+      sum = plus_exprt(mult_exprt(sum,sixteen),typecast_exprt(int_of_hex_char(chr,char_width,char_type),type));
+      all_numbers = and_exprt
+	(all_numbers,
+	 or_exprt(and_exprt
+		  (binary_relation_exprt(chr,ID_ge,zero_char),
+		   binary_relation_exprt(chr,ID_le,nine_char)),
+		  and_exprt
+		  (binary_relation_exprt(chr,ID_ge,a_char),
+		   binary_relation_exprt(chr,ID_le,f_char))));
+    }
+
+    equal_exprt premise(length(), refined_string_typet::index_of_int(size));
+    axioms.emplace_back(premise,
+    			and_exprt(equal_exprt(i,sum),all_numbers));
+    
+    //disallow 0s at the beggining
+    if(size>1) {
+      axioms.emplace_back(premise,
+			  not_exprt(equal_exprt((*this)[index_zero],zero_char)));
+    }
+
+  }
+}
+
+void string_exprt::of_int_hex
+(const function_application_exprt &f,axiom_vect & axioms)
+{
+  assert(f.arguments().size() == 1);
+  of_int_hex(f.arguments()[0],axioms,refined_string_typet::is_c_string_type(f.type()));
 }
 
 void string_exprt::of_char

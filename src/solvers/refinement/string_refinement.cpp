@@ -1162,17 +1162,19 @@ symbol_exprt string_refinementt::convert_string_intern(const function_applicatio
 
 
   // WARNING: the specification may be incomplete or incorrect
-  for(it = symbol_to_string.begin(); it != symbol_to_string.end(); it++) {
-    symbol_exprt i = string_exprt::fresh_symbol("index_intern", refined_string_typet::index_type());
-    string_axioms.emplace_back
-      (or_exprt
-       (equal_exprt(pool[it->second],pool[str]),
-	or_exprt
-	(not_exprt(equal_exprt(it->second.length(),str.length())),
-	 and_exprt(equal_exprt(it->second.length(),str.length()),
-		   and_exprt(str>i, not_exprt(equal_exprt(str[i],it->second[i]))))
-	 )));
-  }
+  for(it = symbol_to_string.begin(); it != symbol_to_string.end(); it++) 
+    if(it->second != str) {
+      symbol_exprt i = string_exprt::fresh_symbol("index_intern", refined_string_typet::index_type());
+      string_axioms.emplace_back
+	(or_exprt
+	 (equal_exprt(pool[it->second],pool[str]),
+	  or_exprt
+	  (not_exprt(equal_exprt(it->second.length(),str.length())),
+	   and_exprt(equal_exprt(it->second.length(),str.length()),
+		     and_exprt(not_exprt(equal_exprt(str[i],it->second[i])),
+			       and_exprt(str>i,binary_relation_exprt(i,ID_ge,zero)))
+		     ))));
+    }
 			
 
   return pool[str];

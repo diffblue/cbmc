@@ -317,8 +317,11 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 		  ("java::java.lang.String.valueOf:(I)Ljava/lang/String;")
 		  ) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_of_int");
-
+			       "__CPROVER_uninterpreted_string_of_int_func");
+	} else if(function_id == irep_idt
+		  ("java::java.lang.Integer.toHexString:(I)Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,
+			       "__CPROVER_uninterpreted_string_of_int_hex_func");
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.valueOf:(L)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,

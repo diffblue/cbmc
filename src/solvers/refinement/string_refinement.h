@@ -82,6 +82,8 @@ protected:
   exprt convert_string_to_char_array(const function_application_exprt &f);
 
   exprt convert_string_compare_to(const function_application_exprt &f);
+
+  // Warning: this does not work at the moment because of the way we treat string pointers
   symbol_exprt convert_string_intern(const function_application_exprt &f);
 
 

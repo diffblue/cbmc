@@ -1,7 +1,6 @@
 public class test_int {
 
     public static void main(String[] argv) {
-
 	String s = Integer.toString(2345);
 	char c = s.charAt(1);
 	char d = s.charAt(2);
@@ -18,6 +17,9 @@ public class test_int {
 	int j = Integer.parseInt("-4231");
 	assert(j == -4231);
 
-	assert(e == '2' || i < 1234 || t.charAt(0) != '-' || j != -4231);
+	String u = Integer.toHexString(43981);
+	assert(u.equals("abcd"));
+
+	assert(e == '2' || i < 1234 || t.charAt(0) != '-' || j != -4231 || !u.equals("abcd"));
     }
 }
