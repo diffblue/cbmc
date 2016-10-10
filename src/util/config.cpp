@@ -264,13 +264,13 @@ void configt::ansi_ct::set_arch_spec_i386()
       defines.push_back("__LITTLE_ENDIAN__");
     break;
 
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_IX86");
     break;
 
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
 
   case flavourt::NONE:
@@ -311,13 +311,13 @@ void configt::ansi_ct::set_arch_spec_x86_64()
     if(os==ost::OS_MACOS)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_X64");
     defines.push_back("_M_AMD64");
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -383,13 +383,13 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
     }
     break;
 
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_PPC");
     break;
 
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
 
   case flavourt::NONE:
@@ -437,12 +437,12 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
     if(subarch=="armhf")
       defines.push_back("__ARM_PCS_VFP");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_ARM");
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -475,12 +475,12 @@ void configt::ansi_ct::set_arch_spec_alpha()
   case flavourt::GCC_CPP:
     defines.push_back("__alpha__");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_ALPHA");
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -533,12 +533,12 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
     defines.push_back("mips");
     defines.push_back("_MIPS_SZPTR="+i2string(config.ansi_c.pointer_width));
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -571,12 +571,12 @@ void configt::ansi_ct::set_arch_spec_s390()
   case flavourt::GCC_CPP:
     defines.push_back("__s390__");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -608,12 +608,12 @@ void configt::ansi_ct::set_arch_spec_s390x()
   case flavourt::GCC_CPP:
     defines.push_back("__s390x__");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -657,12 +657,12 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
     if(subarch=="sparc64")
       defines.push_back("__arch64__");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -697,12 +697,12 @@ void configt::ansi_ct::set_arch_spec_ia64()
     defines.push_back("_IA64");
     defines.push_back("__IA64__");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_IA64");
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -741,12 +741,12 @@ void configt::ansi_ct::set_arch_spec_x32()
     defines.push_back("__amd64__");
     defines.push_back("__amd64");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -814,12 +814,12 @@ void configt::ansi_ct::set_arch_spec_hppa()
   case flavourt::GCC_CPP:
     defines.push_back("__hppa__");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -853,12 +853,12 @@ void configt::ansi_ct::set_arch_spec_sh4()
     defines.push_back("__sh__");
     defines.push_back("__SH4__");
     break;
-  case flavourt::VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::CODEWARRIOR_C_CPP:
-  case flavourt::ARM_C_CPP:
-  case flavourt::ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
   case flavourt::NONE:
     assert(false);
@@ -1135,13 +1135,13 @@ bool configt::set(const cmdlinet &cmdline)
       // which is somewhat inconsistent.
       #ifdef _WIN32
       ansi_c.preprocessor=ansi_ct::preprocessort::VISUAL_STUDIO;
-      ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO_C_CPP;
+      ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
       #elif __FreeBSD__
       ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
-      ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO_C_CPP;
+      ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
       #else
       ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
-      ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO_C_CPP;
+      ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
       #endif
     }
   }

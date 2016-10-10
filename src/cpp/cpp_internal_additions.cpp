@@ -127,7 +127,7 @@ void cpp_internal_additions(std::ostream &out)
   // GCC stuff, but also for ARM
   if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_C ||
      config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_CPP ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::ARM_C_CPP)
+     config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
   {
     out << "extern \"C\" {" << '\n';
     out << c2cpp(gcc_builtin_headers_generic);
@@ -148,7 +148,7 @@ void cpp_internal_additions(std::ostream &out)
   out << "}" << '\n';
   
   // Microsoft stuff
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO_C_CPP)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
     // type_info infrastructure -- the standard wants this to be in the
     // std:: namespace, but MS has it in the root namespace

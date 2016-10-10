@@ -235,7 +235,7 @@ int gcc_modet::doit()
      cmdline.isset("winx64"))
   {
     // We may wish to reconsider the below.
-    config.ansi_c.mode=configt::ansi_ct::flavourt::VISUAL_STUDIO_C_CPP;
+    config.ansi_c.mode=configt::ansi_ct::flavourt::VISUAL_STUDIO;
     debug() << "Enabling Visual Studio syntax" << eom;
   }
   else

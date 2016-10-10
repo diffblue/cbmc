@@ -4334,7 +4334,7 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_popcount)
   {
-    if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO_C_CPP)
+    if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
       return convert_function(src, "__popcnt", precedence=16);
     else
       return convert_function(src, "__builtin_popcount", precedence=16);

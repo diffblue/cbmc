@@ -135,15 +135,15 @@ bool ansi_c_languaget::parse(
 
   switch(config.ansi_c.mode)
   {
-  case configt::ansi_ct::flavourt::CODEWARRIOR_C_CPP:
+  case configt::ansi_ct::flavourt::CODEWARRIOR:
     ansi_c_parser.mode=ansi_c_parsert::CW;
     break;
    
-  case configt::ansi_ct::flavourt::VISUAL_STUDIO_C_CPP:
+  case configt::ansi_ct::flavourt::VISUAL_STUDIO:
     ansi_c_parser.mode=ansi_c_parsert::MSC;
     break;
     
-  case configt::ansi_ct::flavourt::ANSI_C_CPP:
+  case configt::ansi_ct::flavourt::ANSI:
     ansi_c_parser.mode=ansi_c_parsert::ANSI;
     break;
     
@@ -152,7 +152,7 @@ bool ansi_c_languaget::parse(
     ansi_c_parser.mode=ansi_c_parsert::GCC;
     break;
     
-  case configt::ansi_ct::flavourt::ARM_C_CPP:
+  case configt::ansi_ct::flavourt::ARM:
     ansi_c_parser.mode=ansi_c_parsert::ARM;
     break;
     

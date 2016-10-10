@@ -99,9 +99,9 @@ public:
     void set_arch_spec_hppa();
     void set_arch_spec_sh4();
     
-    enum class flavourt { NONE, ANSI_C_CPP, GCC_C, GCC_CPP,
-                          VISUAL_STUDIO_C_CPP,
-                          CODEWARRIOR_C_CPP, ARM_C_CPP };
+    enum class flavourt { NONE, ANSI, GCC_C, GCC_CPP,
+                          VISUAL_STUDIO,
+                          CODEWARRIOR, ARM };
     flavourt mode; // the syntax of source files
 
     enum class preprocessort { NONE, GCC, CLANG, VISUAL_STUDIO,

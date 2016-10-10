@@ -183,7 +183,7 @@ void ansi_c_declarationt::to_symbol(
       symbol.type.set(ID_C_inlined, true);
 
     if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_C ||
-       config.ansi_c.mode==configt::ansi_ct::flavourt::ARM_C_CPP)
+       config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
     {
       // GCC extern inline cleanup, to enable remove_internal_symbols
       // do its full job
