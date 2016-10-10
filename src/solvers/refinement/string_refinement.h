@@ -81,8 +81,9 @@ protected:
   exprt convert_string_parse_int(const function_application_exprt &f);
   exprt convert_string_to_char_array(const function_application_exprt &f);
 
-  exprt convert_string_intern(const function_application_exprt &f);
   exprt convert_string_compare_to(const function_application_exprt &f);
+  symbol_exprt convert_string_intern(const function_application_exprt &f);
+
 
 private:
 
@@ -130,6 +131,10 @@ private:
   }  
 
   string_exprt string_of_symbol(const symbol_exprt & sym);
+
+
+  std::map<string_exprt, symbol_exprt> pool;
+  std::map<string_exprt, symbol_exprt> hash;
 
   // Create a new string expression and add the necessary lemma
   // to ensure its equal to the given string expression.

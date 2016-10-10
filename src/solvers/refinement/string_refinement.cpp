@@ -73,6 +73,46 @@ literalt string_refinementt::convert_rest(const exprt &expr)
     return SUB::convert_rest(expr);
 }
 
+
+void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
+{
+  debug() << "string_refinementt::make_string of " << pretty_short(sym) << eom;
+  //<< " --> " << pretty_short(str) << eom;
+  if(str.id()==ID_symbol) 
+    assign_to_symbol(sym,string_of_symbol(to_symbol_expr(str)));
+  else {
+    // assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
+    if (str.id() == ID_function_application && 
+	is_string_intern_func(to_symbol_expr(to_function_application_expr(str).function()).get_identifier())) {
+      symbol_exprt sym1 = convert_string_intern(to_function_application_expr(str));
+      string_exprt s(refined_string_typet::java_char_type());
+      assign_to_symbol(sym1,s);
+      assign_to_symbol(sym,s);
+    }
+    else 
+      assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
+  }
+  debug() << "string = " << symbol_to_string[sym.get_identifier()].pretty() << eom;
+}
+
+string_exprt string_refinementt::make_string(const exprt & str) 
+{
+  debug() << "string_refinementt::make_string of " << pretty_short(str) << eom;
+  if(str.id()==ID_symbol) 
+    return string_of_symbol(to_symbol_expr(str));
+  else
+    if (str.id() == ID_function_application && 
+	is_string_intern_func(to_symbol_expr(to_function_application_expr(str).function()).get_identifier())){
+      symbol_exprt sym1 = convert_string_intern(to_function_application_expr(str));
+      string_exprt s(refined_string_typet::java_char_type());
+      assign_to_symbol(sym1,s);
+      return s;
+    }
+    else
+      return string_exprt::of_expr(str,symbol_to_string,string_axioms);
+}
+
+
 bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
   std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
@@ -135,7 +175,8 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
   const typet &type = expr.type();
   const irep_idt &identifier = expr.get(ID_identifier);
   if(identifier.empty())
-    throw "string_refinementt::convert_symbol got empty identifier";
+    //throw "string_refinementt::convert_symbol got empty identifier";
+    assert(false);
 
   //debug() << "convert symbol " << expr << eom;
 
@@ -182,6 +223,7 @@ bvt string_refinementt::convert_function_application(
     const irep_idt &id = to_symbol_expr(name).get_identifier();
     debug() << "string_refinementt::convert_function_application(" 
 	    << id << ")" << eom;
+
     if (is_string_literal_func(id)
 	|| is_string_concat_func(id)
 	|| is_string_substring_func(id)
@@ -386,25 +428,6 @@ string_exprt string_refinementt::string_of_symbol(const symbol_exprt & sym){
 }  
 
 
-void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
-{
-  //debug() << "string_refinementt::make_string of " << pretty_short(sym) << eom
-  // << " --> " << pretty_short(str) << eom;
-  if(str.id()==ID_symbol) 
-    assign_to_symbol(sym,string_of_symbol(to_symbol_expr(str)));
-  else
-    assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
-  //debug() << "string = " << symbol_to_string[sym.get_identifier()].pretty() << eom;
-}
-
-string_exprt string_refinementt::make_string(const exprt & str) 
-{
-  //debug() << "string_refinementt::make_string of " << pretty_short(str) << eom;
-  if(str.id()==ID_symbol) 
-    return string_of_symbol(to_symbol_expr(str));
-  else
-    return string_exprt::of_expr(str,symbol_to_string,string_axioms);
-}
 
 exprt string_refinementt::convert_string_equal(const function_application_exprt &f) {
   assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
@@ -671,9 +694,34 @@ exprt string_refinementt::convert_string_hash_code(const function_application_ex
 {
   const function_application_exprt::argumentst &args = f.arguments();
   string_exprt str = make_string(args[0]);
-  exprt res = refined_string_typet::index_of_int(0);
-  throw "convert_string_hash_code: unimplemented";
-  return res;
+  typet return_type = f.type();
+
+  // initialisation of the missing pool variable
+  std::map<irep_idt, string_exprt>::iterator it;
+  for(it = symbol_to_string.begin(); it != symbol_to_string.end(); it++) 
+    if(hash.find(it->second) == hash.end())
+      hash[it->second] = string_exprt::fresh_symbol("hash", return_type);
+
+  // for each string s. 
+  //    hash(str) = hash(s) || |str| != |s| || (|str| == |s| && exists i < |s|. s[i] != str[i])
+
+  // WARNING: the specification may be incomplete 
+  for(it = symbol_to_string.begin(); it != symbol_to_string.end(); it++) {
+    symbol_exprt i = string_exprt::fresh_symbol("index_hash", refined_string_typet::index_type());
+    string_axioms.emplace_back
+      (or_exprt
+       (equal_exprt(hash[it->second],hash[str]),
+	or_exprt
+	(not_exprt(equal_exprt(it->second.length(),str.length())),
+	 and_exprt(equal_exprt(it->second.length(),str.length()),
+		   and_exprt
+		   (not_exprt(equal_exprt(str[i],it->second[i])),
+		    and_exprt(str>i,binary_relation_exprt(i,ID_ge,zero )))
+		   ))));
+  }
+			
+
+  return hash[str];
 }
 
 exprt string_refinementt::convert_string_index_of(const string_exprt &str, const exprt & c, const exprt & from_index){
@@ -1033,19 +1081,6 @@ exprt string_refinementt::convert_string_to_char_array
 
 
 
-exprt string_refinementt::convert_string_intern(const function_application_exprt &f)
-{
-  const function_application_exprt::argumentst &args = f.arguments();  
-  assert(args.size() == 1);
-
-  string_exprt str = make_string(args[0]);
-
-  // intern(str) = s_0 || s_1 || ...
-  // for each string s. 
-  //    intern(str) = intern(s) || |str| != |s| || (|str| == |s| && exists i < |s|. s[i] != str[i])
-  
-  throw("string_refinementt::convert_string_intern : incomplete implementation");
-}
 
 
 exprt string_refinementt::convert_string_compare_to(const function_application_exprt &f)
@@ -1091,7 +1126,7 @@ exprt string_refinementt::convert_string_compare_to(const function_application_e
 	and_exprt
 	(equal_exprt(res,typecast_exprt(minus_exprt(s1.length(),s2.length()),return_type)),
 	 or_exprt
-	 (and_exprt(s1<s2,equal_exprt(x,s1.length())), and_exprt(s1>s2,equal_exprt(x,s2.length()))))))
+	 (and_exprt(s2>s1,equal_exprt(x,s1.length())), and_exprt(s1>s2,equal_exprt(x,s2.length()))))))
       ));
 
   string_axioms.push_back(string_constraintt(not_exprt(res_null),equal_exprt(s1[i],s2[i])).forall(i,zero,x));
@@ -1099,6 +1134,49 @@ exprt string_refinementt::convert_string_compare_to(const function_application_e
   return res;
 }
 
+symbol_exprt string_refinementt::convert_string_intern(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();  
+  assert(args.size() == 1);
+  string_exprt str = make_string(args[0]);
+  typet return_type = f.type();
+
+
+  // initialisation of the missing pool variable
+  std::map<irep_idt, string_exprt>::iterator it;
+  for(it = symbol_to_string.begin(); it != symbol_to_string.end(); it++) 
+    if(pool.find(it->second) == pool.end())
+      pool[it->second] = string_exprt::fresh_symbol("pool", return_type);
+
+  // intern(str) = s_0 || s_1 || ...
+  // for each string s. 
+  //    intern(str) = intern(s) || |str| != |s| || (|str| == |s| && exists i < |s|. s[i] != str[i])
+  
+  //symbol_exprt intern = string_exprt::fresh_symbol("intern",return_type);
+
+  exprt disj = false_exprt();
+  for(it = symbol_to_string.begin(); it != symbol_to_string.end(); it++) 
+    disj = or_exprt(disj, equal_exprt(pool[str], symbol_exprt(it->first,return_type)));
+  
+  string_axioms.emplace_back(disj);
+
+
+  // WARNING: the specification may be incomplete or incorrect
+  for(it = symbol_to_string.begin(); it != symbol_to_string.end(); it++) {
+    symbol_exprt i = string_exprt::fresh_symbol("index_intern", refined_string_typet::index_type());
+    string_axioms.emplace_back
+      (or_exprt
+       (equal_exprt(pool[it->second],pool[str]),
+	or_exprt
+	(not_exprt(equal_exprt(it->second.length(),str.length())),
+	 and_exprt(equal_exprt(it->second.length(),str.length()),
+		   and_exprt(str>i, not_exprt(equal_exprt(str[i],it->second[i]))))
+	 )));
+  }
+			
+
+  return pool[str];
+}
 
 
 //// Pass algorithm

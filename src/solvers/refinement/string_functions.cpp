@@ -43,6 +43,7 @@ Date:   September 2016
 #define string_insert_char_func "__CPROVER_uninterpreted_string_insert_char_func"
 #define string_insert_float_func "__CPROVER_uninterpreted_string_insert_float_func"
 #define string_insert_double_func "__CPROVER_uninterpreted_string_insert_double_func"
+#define string_intern_func "__CPROVER_uninterpreted_string_intern_func"
 #define string_is_prefix_func "__CPROVER_uninterpreted_strprefixof"
 #define string_is_suffix_func "__CPROVER_uninterpreted_strsuffixof"
 #define string_is_empty_func "__CPROVER_uninterpreted_string_is_empty"
@@ -238,4 +239,7 @@ bool is_string_concat_code_point_func(irep_idt id){
 }
 bool is_string_compare_to_func(irep_idt id){
   return (starts_with(id2string(id),string_compare_to_func));
+}
+bool is_string_intern_func(irep_idt id){
+  return (starts_with(id2string(id),string_intern_func));
 }

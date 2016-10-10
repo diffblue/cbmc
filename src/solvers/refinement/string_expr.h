@@ -54,22 +54,20 @@ public:
   { return index_exprt(content(), idx);}
 
   // Comparison on the length of the strings
-  inline binary_relation_exprt operator< (const string_exprt & rhs) const 
-  { return binary_relation_exprt(length(), ID_lt, rhs.length()); }
   inline binary_relation_exprt operator> (const string_exprt & rhs) const 
   { return binary_relation_exprt(rhs.length(), ID_lt, length()); }
   inline binary_relation_exprt operator<= (const string_exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_le, rhs.length()); }
   inline binary_relation_exprt operator>= (const string_exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_ge, rhs.length()); }
-  inline binary_relation_exprt operator< (const exprt & rhs) const 
-  { return binary_relation_exprt(length(), ID_lt, rhs); }
   inline binary_relation_exprt operator> (const exprt & rhs) const 
   { return binary_relation_exprt(rhs, ID_lt, length()); }
   inline binary_relation_exprt operator>= (const exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_ge, rhs); }
   inline binary_relation_exprt operator<= (const exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_le, rhs); }
+  //this one is used by maps: inline binary_relation_exprt operator< (const string_exprt & rhs) const  { return binary_relation_exprt(length(), ID_lt, rhs.length()); }
+  //   inline binary_relation_exprt operator< (const exprt & rhs) const  { return binary_relation_exprt(length(), ID_lt, rhs); }
 
   static irep_idt extract_java_string(const symbol_exprt & s);
 

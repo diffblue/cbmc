@@ -957,3 +957,5 @@ void string_exprt::of_string_insert_float(const function_application_exprt &f, s
   s2.of_float(args[2],axioms,refined_string_typet::is_c_string_type(args[0].type()),10);
   of_string_insert(s1,s2,args[1],symbol_to_string,axioms);
 }
+
+

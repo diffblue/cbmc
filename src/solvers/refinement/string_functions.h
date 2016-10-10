@@ -44,6 +44,7 @@ bool is_string_empty_string_func(irep_idt id);
 bool is_string_endswith_func(irep_idt id);
 bool is_string_hash_code_func(irep_idt id);
 bool is_string_index_of_func(irep_idt id);
+bool is_string_intern_func(irep_idt id);
 bool is_string_insert_func(irep_idt id);
 bool is_string_insert_int_func(irep_idt id);
 bool is_string_insert_long_func(irep_idt id);
