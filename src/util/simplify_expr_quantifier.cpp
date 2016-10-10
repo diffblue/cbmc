@@ -179,6 +179,8 @@ bool simplify_exprt::simplify_quantifier(exprt &expr)
   mp_integer lb, ub;
   to_integer(min_i, lb);
   to_integer(max_i, ub);
+
+  if(lb>ub) return true;
   
   std::vector<exprt> expr_insts;
   for(mp_integer i=lb; i<=ub; ++i)
