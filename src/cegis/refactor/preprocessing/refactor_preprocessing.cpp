@@ -7,6 +7,7 @@
 #include <cegis/cegis-util/type_helper.h>
 #include <cegis/refactor/options/refactoring_type.h>
 #include <cegis/refactor/environment/instrument_state_vars.h>
+#include <cegis/refactor/instructionset/create_cegis_processor.h>
 #include <cegis/refactor/nullobject/range_collector.h>
 #include <cegis/refactor/preprocessing/refactor_preprocessing.h>
 
@@ -18,7 +19,7 @@ refactor_preprocessingt::refactor_preprocessingt(const optionst &options,
 
 void refactor_preprocessingt::operator()()
 {
-  const symbol_tablet &st=original_program.st;
+  symbol_tablet &st=original_program.st;
   goto_functionst &gf=original_program.gf;
   inline_user_program(st, gf);
   const refactoring_typet type(get_refactoring_type(options));
@@ -32,7 +33,8 @@ void refactor_preprocessingt::operator()()
   for (refactor_programt::sketcht &s : original_program.sketches)
   {
     s.state_vars=collect_state_vars(s.spec_range.first, s.spec_range.second);
-    // TODO: construct_instruction_set(original_program); // Multiple?
+    const std::map<typet, size_t> slots(slots_per_type(st, s.state_vars));
+    s.processor_function=create_cegis_processor(st, gf, slots);
   }
   // TODO: Insert extern programs.
   switch (type)

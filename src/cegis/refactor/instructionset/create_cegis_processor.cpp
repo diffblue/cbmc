@@ -26,10 +26,29 @@ std::set<typet> collect_context_types(const goto_ranget &range)
   return collector.types;
 }
 
+std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
+    const std::set<irep_idt> &state_vars)
+{
+  const namespacet ns(st);
+  std::map<typet, size_t> result;
+  for (const irep_idt &state_var : state_vars)
+    ++result[ns.follow(st.lookup(state_var).type)];
+  return result;
+}
+
 #define CEGIS_PROCESSOR_FUNCTION_PREFIX CEGIS_PREFIX "processor_"
 
-std::string create_cegis_processor(const std::set<typet> &state_types,
-    const size_t var_slots_per_state_type, const std::set<typet> &context_types)
+std::string get_next_processor_name(const symbol_tablet &st)
+{
+  size_t index=0;
+  std::string name(CEGIS_PROCESSOR_FUNCTION_PREFIX);
+  while (st.has_symbol(name + std::to_string(index)))
+    ++index;
+  return name+=std::to_string(index);
+}
+
+std::string create_cegis_processor(symbol_tablet &st, goto_functionst &gf,
+    const std::map<typet, size_t> &variable_slots_per_context_type)
 {
   std::string processor_name(CEGIS_PROCESSOR_FUNCTION_PREFIX);
   // TODO: Implement
