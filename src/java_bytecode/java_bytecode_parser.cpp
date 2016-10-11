@@ -774,24 +774,24 @@ void java_bytecode_parsert::rbytecode(
       
     case 'b': // a signed byte
       {
-        signed char c=read_u1();
+        s1 c=read_u1();
         instruction.args.push_back(from_integer(c, integer_typet()));
       }
       address+=1;
       
       break;
 
-    case 'o': // two byte branch offset
+    case 'o': // two byte branch offset, signed
       {
-        signed short offset=read_u2();
+        s2 offset=read_u2();
         instruction.args.push_back(from_integer(address+offset, integer_typet()));
       }
       address+=2;
       break;
 
-    case 'O': // four byte branch offset
+    case 'O': // four byte branch offset, signed
       {
-        signed int offset=read_u4();
+        s4 offset=read_u4();
         instruction.args.push_back(from_integer(address+offset, integer_typet()));
       }
       address+=4;
@@ -810,7 +810,7 @@ void java_bytecode_parsert::rbytecode(
       {
         u2 v=read_u2();
         instruction.args.push_back(from_integer(v, integer_typet()));
-        signed short c=read_u2();
+        s2 c=read_u2();
         instruction.args.push_back(from_integer(c, integer_typet()));
         address+=4;
       }
@@ -818,7 +818,7 @@ void java_bytecode_parsert::rbytecode(
       {
         u1 v=read_u1();
         instruction.args.push_back(from_integer(v, integer_typet()));
-        signed char c=read_u1();
+        s1 c=read_u1();
         instruction.args.push_back(from_integer(c, integer_typet()));
         address+=2;
       }
@@ -926,7 +926,7 @@ void java_bytecode_parsert::rbytecode(
       
     case 's': // a signed short
       {
-        signed short s=read_u2();
+        s2 s=read_u2();
         instruction.args.push_back(from_integer(s, integer_typet()));
       }
       address+=2;
