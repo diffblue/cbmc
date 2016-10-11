@@ -8,7 +8,6 @@ void nondet_control_solution(const symbol_tablet &st, goto_functionst &gf)
 {
   const std::string name(CEGIS_CONTROL_SOLUTION_VAR_NAME);
   const symbolt &symbol=st.lookup(name);
-  propagate_controller_sizes(st, gf);
   const side_effect_expr_nondett value(symbol.type);
   const symbol_exprt solution_var(symbol.symbol_expr());
   goto_programt &body=get_entry_body(gf);

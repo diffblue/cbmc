@@ -4,6 +4,7 @@
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/control/value/control_vars.h>
 #include <cegis/control/simplify/remove_unused_elements.h>
+#include <cegis/control/preprocessing/propagate_controller_sizes.h>
 #include <cegis/control/preprocessing/control_preprocessing.h>
 
 control_preprocessingt::control_preprocessingt(const symbol_tablet &st,
@@ -43,6 +44,7 @@ void control_preprocessingt::operator ()()
   goto_programt::targetst &locs=control_program.counterexample_locations;
   goto_programt &body=get_entry_body(gf);
   collect_counterexample_locations(locs, body, is_meta);
+  propagate_controller_sizes(st, gf);
 }
 
 void control_preprocessingt::operator ()(const size_t max_length) const
