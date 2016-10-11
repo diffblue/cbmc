@@ -92,7 +92,7 @@ void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str
     else 
       assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
   }
-  debug() << "string = " << symbol_to_string[sym.get_identifier()].pretty() << eom;
+  //debug() << "string = " << symbol_to_string[sym.get_identifier()].pretty() << eom;
 }
 
 string_exprt string_refinementt::make_string(const exprt & str) 
@@ -288,24 +288,6 @@ void string_refinementt::print_time(std::string s) {
 // We add instantiations before launching the solver
 void string_refinementt::post_process()
 {  
-  print_time("post_process");
-  for(int i = 0; i < string_axioms.size(); i++)
-    if(string_axioms[i].is_simple())
-      add_lemma(string_axioms[i]);
-    else if(string_axioms[i].is_string_constant())
-      add_lemma(string_axioms[i]); //,false);
-    else if(string_axioms[i].is_univ_quant())
-      universal_axioms.push_back(string_axioms[i]);
-    else {
-      assert(string_axioms[i].is_not_contains());
-      string_axioms[i].witness = string_exprt::fresh_symbol
-	("not_contains_witness",
-	 array_typet(refined_string_typet::index_type(),
-		     infinity_exprt(refined_string_typet::index_type())));
-      not_contains_axioms.push_back(string_axioms[i]);
-    }
-
-  string_axioms.clear();
 
   /*
   debug() << not_contains_axioms.size() << " not_contains constraints" << eom;
@@ -328,8 +310,27 @@ void string_refinementt::post_process()
 decision_proceduret::resultt string_refinementt::dec_solve()
 {
 
-  debug() << "string_refinementt::post_process: warning update_index_set has to be checked" << eom;
+  print_time("string_refinementt::dec_solve");
+  for(int i = 0; i < string_axioms.size(); i++)
+    if(string_axioms[i].is_simple())
+      add_lemma(string_axioms[i]);
+    else if(string_axioms[i].is_string_constant())
+      add_lemma(string_axioms[i]); //,false);
+    else if(string_axioms[i].is_univ_quant())
+      universal_axioms.push_back(string_axioms[i]);
+    else {
+      assert(string_axioms[i].is_not_contains());
+      string_axioms[i].witness = string_exprt::fresh_symbol
+	("not_contains_witness",
+	 array_typet(refined_string_typet::index_type(),
+		     infinity_exprt(refined_string_typet::index_type())));
+      not_contains_axioms.push_back(string_axioms[i]);
+    }
+
+  string_axioms.clear();
+  
   initial_index_set(universal_axioms);
+  debug() << "string_refinementt::dec_solve: warning update_index_set has to be checked" << eom;
   update_index_set(cur); 
   cur.clear();
   add_instantiations();
@@ -1367,6 +1368,7 @@ bool string_refinementt::check_axioms()
 
 
 // Gets the upper bounds that are applied to [qvar], in the expression [expr]
+/* Shouldn't be necessary with the new way string constraints are encoded
 void get_bounds(const exprt &qvar, const exprt &expr, std::vector<exprt> & out)
   {
     std::vector<exprt> to_treat;
@@ -1386,7 +1388,7 @@ void get_bounds(const exprt &qvar, const exprt &expr, std::vector<exprt> & out)
       }
     }
   }
-
+*/
 
 
 std::map< exprt, int> string_refinementt::map_of_sum(const exprt &f) {
@@ -1538,27 +1540,31 @@ void string_refinementt::update_index_set(const std::vector<exprt> & cur) {
 void string_refinementt::initial_index_set(const string_constraintt &axiom)
 {
   assert(axiom.is_univ_quant());
-  std::vector<exprt> bounds;
-  get_bounds(axiom.get_univ_var(), axiom.premise(), bounds);
-
+  symbol_exprt qvar = axiom.get_univ_var();
   std::vector<exprt> to_process;
   to_process.push_back(axiom.body());
+
   while (!to_process.empty()) {
     exprt cur = to_process.back();
     to_process.pop_back();
     if (cur.id() == ID_index) {
       const exprt &s = cur.op0();
       const exprt &i = cur.op1();
-
-      bool has_quant_var = find_qvar(i,axiom.get_univ_var());
+      
+      bool has_quant_var = find_qvar(i,qvar);
 
       // if cur is of the form s[i] and no quantified variable appears in i
       if(!has_quant_var){
-	current_index_set[s].insert(bounds.begin(), bounds.end());
 	current_index_set[s].insert(i);
-	index_set[s].insert(bounds.begin(), bounds.end());
 	index_set[s].insert(i);
+      } else {
+	// otherwise we add k-1
+	exprt e(i);
+	replace_expr(qvar,minus_exprt(axiom.univ_bound_sup(),refined_string_typet::index_of_int(1)),e);
+	current_index_set[s].insert(e);
+	index_set[s].insert(e);
       }
+	
     } else {
       forall_operands(it, cur) {
         to_process.push_back(*it);

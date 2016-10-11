@@ -10,7 +10,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_expr.h>
 #include <ansi-c/string_constant.h>
 #include <util/unicode.h>
-
+#include <solvers/floatbv/float_bv.h>
 exprt index_zero = refined_string_typet::index_zero();
 unsigned string_exprt::next_symbol_id = 1;
 
@@ -100,7 +100,7 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
   }
   else 
     throw ("string_exprt of:\n" + unrefined_string.pretty() 
-	   + "\nwhich is not a function application, a symbol of an if expression");
+	   + "\nwhich is not a function application, a symbol or an if expression");
 
   axioms.emplace_back(s >= index_zero);
   return s;
@@ -264,7 +264,7 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
 }
 
 
-void string_exprt::of_string_concat(const string_exprt & s1, const string_exprt & s2, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms) {
+void string_exprt::of_string_concat(const string_exprt & s1, const string_exprt & s2, axiom_vect & axioms) {
   equal_exprt length_sum_lem(length(), plus_exprt(s1.length(), s2.length()));
   axioms.emplace_back(length_sum_lem);
 
@@ -288,7 +288,7 @@ void string_exprt::of_string_concat(const function_application_exprt &f, std::ma
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
   string_exprt s2 = string_exprt::of_expr(args[1],symbol_to_string,axioms); 
 
-  of_string_concat(s1, s2, symbol_to_string, axioms);
+  of_string_concat(s1, s2, axioms);
 }
 
 
@@ -532,27 +532,84 @@ void string_exprt::of_float
 (const function_application_exprt &f,axiom_vect & axioms)
 {
   assert(f.arguments().size() == 1);
-  of_float(f.arguments()[0],axioms,refined_string_typet::is_c_string_type(f.type()),11);
+  of_float(f.arguments()[0],axioms,refined_string_typet::is_c_string_type(f.type()),false);
 }
 
 void string_exprt::of_float
-(const exprt &f,axiom_vect & axioms, bool is_c_string, int max_size)
+(const exprt &f, axiom_vect & axioms, bool is_c_string, bool double_precision)
 {
-  // Warning this is only a partial specification
-  axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(max_size)));
-
-  exprt char_0;
-  exprt char_9;
-  exprt char_dot;
+  // Warning: we currently only have partial specification
+  unsignedbv_typet char_type;
+  int char_width;
   if(is_c_string) {
-    char_0 = constant_of_nat(48,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-    char_9 = constant_of_nat(57,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-    char_dot = constant_of_nat(46,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
-  } else { 
-    char_0 = constant_of_nat(48,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
-    char_9 = constant_of_nat(57,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
-    char_dot = constant_of_nat(46,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    char_type = refined_string_typet::char_type();
+    char_width = STRING_SOLVER_CHAR_WIDTH;
+  } else {
+    char_type = refined_string_typet::java_char_type();
+    char_width = JAVA_STRING_SOLVER_CHAR_WIDTH;
   }
+
+  axioms.emplace_back(binary_relation_exprt(length(), ID_le, refined_string_typet::index_of_int(24)));
+
+
+  string_exprt magnitude(char_type);
+
+  //     If the argument is NaN, the result is the string "NaN".
+  string_exprt nan_string(char_type);
+  nan_string.of_string_constant("NaN",char_width,char_type,axioms);
+
+  ieee_float_spect fspec = double_precision?ieee_float_spect::double_precision():ieee_float_spect::single_precision();
+
+
+  exprt isnan = float_bvt().isnan(f,fspec);
+  axioms.emplace_back(isnan, equal_exprt(magnitude.length(),nan_string.length()));
+  symbol_exprt qvar = string_exprt::fresh_symbol("qvar_equal_nan", refined_string_typet::index_type());
+  axioms.push_back
+    (string_constraintt(isnan,equal_exprt(magnitude[qvar],nan_string[qvar])
+			).forall(qvar,index_zero,nan_string.length()));
+
+  // If the argument is not NaN, the result is a string that represents the sign and magnitude (absolute value) of the argument. If the sign is negative, the first character of the result is '-' ('\u002D'); if the sign is positive, no sign character appears in the result. 
+
+  // Not sure this can distinguish between 0.0 and -0.0
+  exprt isneg = 
+    and_exprt
+    (not_exprt(isnan),
+     float_bvt().relation(f,float_bvt().LT,float_bvt().from_signed_integer(refined_string_typet::index_of_int(0),refined_string_typet::index_of_int(0),fspec),fspec));
+  string_exprt sign_string(char_type);
+  axioms.emplace_back(isneg, equal_exprt(sign_string.length(),refined_string_typet::index_of_int(1)));
+  axioms.emplace_back(not_exprt(isneg), equal_exprt(sign_string.length(),refined_string_typet::index_of_int(0)));
+  axioms.emplace_back(isneg,equal_exprt(sign_string[refined_string_typet::index_of_int(0)], constant_of_nat(0x2D,char_width,char_type)));
+
+
+  // If m is infinity, it is represented by the characters "Infinity"; thus, positive infinity produces the result "Infinity" and negative infinity produces the result "-Infinity".
+
+  string_exprt infinity_string(char_type);
+  infinity_string.of_string_constant("Infinity",char_width,char_type,axioms);
+
+
+  exprt isinf = false_exprt(); //float_bvt().isinf(f,fspec);
+  axioms.emplace_back(isinf, equal_exprt(magnitude.length(),infinity_string.length()));
+  symbol_exprt qvar_inf = string_exprt::fresh_symbol("qvar_equal_infinity", refined_string_typet::index_type());
+  axioms.push_back
+    (string_constraintt(isinf,equal_exprt(magnitude[qvar_inf],infinity_string[qvar_inf])
+			).forall(qvar_inf,index_zero,infinity_string.length()));
+
+
+  //of_string_concat(sign_string,magnitude,axioms);
+
+
+  /* Here is the remainder of the specification of Float.toString, for the magnitude m : 
+        If m is zero, it is represented by the characters "0.0"; thus, negative zero produces the result "-0.0" and positive zero produces the result "0.0".
+        If m is greater than or equal to 10-3 but less than 107, then it is represented as the integer part of m, in decimal form with no leading zeroes, followed by '.' ('\u002E'), followed by one or more decimal digits representing the fractional part of m.
+        If m is less than 10^-3 or greater than or equal to 10^7, then it is represented in so-called "computerized scientific notation." Let n be the unique integer such that 10n ≤ m < 10n+1; then let a be the mathematically exact quotient of m and 10n so that 1 ≤ a < 10. The magnitude is then represented as the integer part of a, as a single decimal digit, followed by '.' ('\u002E'), followed by decimal digits representing the fractional part of a, followed by the letter 'E' ('\u0045'), followed by a representation of n as a decimal integer, as produced by the method Integer.toString(int). 
+
+	How many digits must be printed for the fractional part of m or a? There must be at least one digit to represent the fractional part, and beyond that as many, but only as many, more digits as are needed to uniquely distinguish the argument value from adjacent values of type float. That is, suppose that x is the exact mathematical value represented by the decimal representation produced by this method for a finite nonzero argument f. Then f must be the float value nearest to x; or, if two float values are equally close to x, then f must be one of them and the least significant bit of the significand of f must be 0.  */
+
+
+
+  exprt char_0 = constant_of_nat(48,char_width,char_type);
+  exprt char_9 = constant_of_nat(57,char_width,char_type);
+  exprt char_dot = constant_of_nat(46,char_width,char_type);
 
   symbol_exprt idx = fresh_symbol("QA_float",refined_string_typet::index_type());
   exprt c = (*this)[idx];
@@ -562,14 +619,16 @@ void string_exprt::of_float
 	     equal_exprt(c,char_dot)
 	     );
   string_constraintt a(is_digit);
-  axioms.push_back(a.forall(idx,index_zero,length()));
+  //axioms.push_back(a.forall(idx,index_zero,length()));
+
+
 }
 
 void string_exprt::of_double
 (const function_application_exprt &f,axiom_vect & axioms)
 {
   assert(f.arguments().size() == 1);
-  of_float(f.arguments()[0],axioms,refined_string_typet::is_c_string_type(f.type()),20);
+  of_float(f.arguments()[0],axioms,refined_string_typet::is_c_string_type(f.type()),true);
 }
 
 
@@ -878,7 +937,7 @@ void string_exprt::of_string_delete
   string_exprt str2(refined_string_typet::get_char_type(str));
   str1.of_string_substring(str,index_zero,start,symbol_to_string,axioms);
   str2.of_string_substring(str,end,str.length(),symbol_to_string,axioms);
-  of_string_concat(str1,str2,symbol_to_string,axioms);
+  of_string_concat(str1,str2,axioms);
   
 }
 
@@ -898,7 +957,7 @@ void string_exprt::of_string_concat_int(const function_application_exprt &f, std
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
   string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(args[0].type()),10);
-  of_string_concat(s1,s2,symbol_to_string,axioms);
+  of_string_concat(s1,s2,axioms);
 }
 
 void string_exprt::of_string_concat_long(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
@@ -908,7 +967,7 @@ void string_exprt::of_string_concat_long(const function_application_exprt &f, st
   string_exprt s2(refined_string_typet::get_char_type(args[0]));
   
   s2.of_int(args[1],axioms,refined_string_typet::is_c_string_type(args[0].type()),30);
-  of_string_concat(s1,s2,symbol_to_string,axioms);
+  of_string_concat(s1,s2,axioms);
 }
 
 void string_exprt::of_string_concat_bool(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
@@ -917,7 +976,7 @@ void string_exprt::of_string_concat_bool(const function_application_exprt &f, st
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
   string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_bool(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
-  of_string_concat(s1,s2,symbol_to_string,axioms);
+  of_string_concat(s1,s2,axioms);
 }
 
 void string_exprt::of_string_concat_char(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
@@ -926,7 +985,7 @@ void string_exprt::of_string_concat_char(const function_application_exprt &f, st
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
   string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_char(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
-  of_string_concat(s1,s2,symbol_to_string,axioms);
+  of_string_concat(s1,s2,axioms);
 }
 
 void string_exprt::of_string_concat_double(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
@@ -935,7 +994,7 @@ void string_exprt::of_string_concat_double(const function_application_exprt &f, 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
   string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_float(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),30);
-  of_string_concat(s1,s2,symbol_to_string,axioms);
+  of_string_concat(s1,s2,axioms);
 }
 
 void string_exprt::of_string_concat_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
@@ -944,7 +1003,7 @@ void string_exprt::of_string_concat_float(const function_application_exprt &f, s
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
   string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_float(args[1],axioms,refined_string_typet::is_c_string_type(f.type()),10);
-  of_string_concat(s1,s2,symbol_to_string,axioms);
+  of_string_concat(s1,s2,axioms);
 }
 
 void string_exprt::of_string_concat_code_point(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
@@ -953,7 +1012,7 @@ void string_exprt::of_string_concat_code_point(const function_application_exprt 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
   string_exprt s2(refined_string_typet::get_char_type(args[0]));
   s2.of_code_point(args[1],axioms,refined_string_typet::is_c_string_type(f.type()));
-  of_string_concat(s1,s2,symbol_to_string,axioms);
+  of_string_concat(s1,s2,axioms);
 }
 
 void string_exprt::of_string_insert(const string_exprt & s1, const string_exprt & s2, 
@@ -968,8 +1027,8 @@ void string_exprt::of_string_insert(const string_exprt & s1, const string_exprt 
   string_exprt concat1(char_type);
   pref.of_string_substring(s1,index_zero,offset,symbol_to_string,axioms);
   suf.of_string_substring(s1,offset,s1.length(),symbol_to_string,axioms);
-  concat1.of_string_concat(pref,s2,symbol_to_string,axioms);
-  of_string_concat(concat1,suf,symbol_to_string,axioms);
+  concat1.of_string_concat(pref,s2,axioms);
+  of_string_concat(concat1,suf,axioms);
 }
 
 

@@ -327,7 +327,9 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,
 			       "__CPROVER_uninterpreted_string_of_long");
 	} else if(function_id == irep_idt
-		  ("java::java.lang.String.valueOf:(F)Ljava/lang/String;")) {
+		  ("java::java.lang.String.valueOf:(F)Ljava/lang/String;")
+		  ||function_id == irep_idt
+		  ("java::java.lang.Float.toString:(F)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
 			       "__CPROVER_uninterpreted_string_of_float");
 	} else if(function_id == irep_idt
