@@ -507,8 +507,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
     if(has_volatile(method_qualifier))
       virtual_name+="$virtual";
       
-    if(component.type().get(ID_return_type) == ID_destructor)
-      virtual_name= "@dtor";
+    if(component.type().get(ID_return_type)==ID_destructor)
+      virtual_name="@dtor";
     
     // The method may be virtual implicitly.
     std::set<irep_idt> virtual_bases;
