@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -1473,12 +1474,12 @@ void cpp_typecheckt::add_this_to_method_type(
   typet &type,
   const typet &method_qualifier)
 {
-  irept &parameters=type.add(ID_parameters);
+  code_typet::parameterst &parameters=to_code_type(type).parameters();
 
-  parameters.get_sub().insert(
-    parameters.get_sub().begin(), irept(ID_parameter));
+  parameters.insert(
+    parameters.begin(), code_typet::parametert());
 
-  exprt &parameter=static_cast<exprt &>(parameters.get_sub().front());
+  code_typet::parametert &parameter=parameters.front();
   parameter.type()=typet(ID_pointer);
 
   parameter.type().subtype()=typet(ID_symbol);
