@@ -1480,19 +1480,19 @@ void cpp_typecheckt::add_this_to_method_type(
     parameters.begin(), code_typet::parametert());
 
   code_typet::parametert &parameter=parameters.front();
-  parameter.type()=typet(ID_pointer);
+  
+  parameter.set_identifier(ID_this); // check? Not qualified
+  parameter.set_base_name(ID_this);
 
-  parameter.type().subtype()=typet(ID_symbol);
-  parameter.type().subtype().set(ID_identifier, compound_symbol);
-
-  parameter.set(ID_C_identifier, ID_this);
-  parameter.set(ID_C_base_name, ID_this);
-
+  typet subtype=symbol_typet(compound_symbol);
+  
   if(has_const(method_qualifier))
-    parameter.type().subtype().set(ID_C_constant, true);
+    subtype.set(ID_C_constant, true);
   
   if(has_volatile(method_qualifier))
-    parameter.type().subtype().set(ID_C_volatile, true);
+    subtype.set(ID_C_volatile, true);
+
+  parameter.type()=pointer_typet(subtype);
 }
 
 /*******************************************************************\
