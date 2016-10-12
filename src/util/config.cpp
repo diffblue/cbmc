@@ -256,10 +256,11 @@ void configt::ansi_ct::set_arch_spec_i386()
   switch(mode)
   {
   case flavourt::GCC:
+  case flavourt::APPLE:
     defines.push_back("i386");
     defines.push_back("__i386");
     defines.push_back("__i386__");
-    if(os==ost::OS_MACOS)
+    if(mode==flavourt::APPLE)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
 
@@ -300,13 +301,14 @@ void configt::ansi_ct::set_arch_spec_x86_64()
   switch(mode)
   {
   case flavourt::GCC:
+  case flavourt::APPLE:
     defines.push_back("__LP64__");
     defines.push_back("__x86_64");
     defines.push_back("__x86_64__");
     defines.push_back("_LP64");
     defines.push_back("__amd64__");
     defines.push_back("__amd64");
-    if(os==ost::OS_MACOS)
+    if(mode==flavourt::APPLE)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
 
@@ -356,12 +358,13 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
   switch(mode)
   {
   case flavourt::GCC:
+  case flavourt::APPLE:
     defines.push_back("__powerpc");
     defines.push_back("__powerpc__");
     defines.push_back("__POWERPC__");
     defines.push_back("__ppc__");
 
-    if(os==ost::OS_MACOS)
+    if(mode==flavourt::APPLE)
       defines.push_back("__BIG_ENDIAN__");
 
     if(subarch!="powerpc")
@@ -429,6 +432,7 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
   switch(mode)
   {
   case flavourt::GCC:
+  case flavourt::APPLE:
     if(subarch=="arm64")
       defines.push_back("__aarch64__");
     else
@@ -481,6 +485,7 @@ void configt::ansi_ct::set_arch_spec_alpha()
     defines.push_back("_M_ALPHA");
     break;
 
+  case flavourt::APPLE:
   case flavourt::CODEWARRIOR:
   case flavourt::ARM:
   case flavourt::ANSI:
@@ -541,6 +546,7 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
     assert(false); // not supported by Visual Studio
     break;
 
+  case flavourt::APPLE:
   case flavourt::CODEWARRIOR:
   case flavourt::ARM:
   case flavourt::ANSI:
@@ -581,6 +587,7 @@ void configt::ansi_ct::set_arch_spec_s390()
     assert(false); // not supported by Visual Studio
     break;
 
+  case flavourt::APPLE:
   case flavourt::CODEWARRIOR:
   case flavourt::ARM:
   case flavourt::ANSI:
@@ -620,6 +627,7 @@ void configt::ansi_ct::set_arch_spec_s390x()
     assert(false); // not supported by Visual Studio
     break;
 
+  case flavourt::APPLE:
   case flavourt::CODEWARRIOR:
   case flavourt::ARM:
   case flavourt::ANSI:
@@ -671,6 +679,7 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
     assert(false); // not supported by Visual Studio
     break;
 
+  case flavourt::APPLE:
   case flavourt::CODEWARRIOR:
   case flavourt::ARM:
   case flavourt::ANSI:
@@ -713,6 +722,7 @@ void configt::ansi_ct::set_arch_spec_ia64()
     defines.push_back("_M_IA64");
     break;
 
+  case flavourt::APPLE:
   case flavourt::CODEWARRIOR:
   case flavourt::ARM:
   case flavourt::ANSI:
@@ -759,6 +769,7 @@ void configt::ansi_ct::set_arch_spec_x32()
     assert(false); // not supported by Visual Studio
     break;
 
+  case flavourt::APPLE:
   case flavourt::CODEWARRIOR:
   case flavourt::ARM:
   case flavourt::ANSI:
@@ -834,6 +845,7 @@ void configt::ansi_ct::set_arch_spec_hppa()
     assert(false); // not supported by Visual Studio
     break;
 
+  case flavourt::APPLE:
   case flavourt::CODEWARRIOR:
   case flavourt::ARM:
   case flavourt::ANSI:
@@ -875,6 +887,7 @@ void configt::ansi_ct::set_arch_spec_sh4()
     assert(false); // not supported by Visual Studio
     break;
 
+  case flavourt::APPLE:
   case flavourt::CODEWARRIOR:
   case flavourt::ARM:
   case flavourt::ANSI:
@@ -1169,8 +1182,8 @@ bool configt::set(const cmdlinet &cmdline)
   {
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_MACOS;
-    ansi_c.mode=ansi_ct::flavourt::GCC;
-    ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
+    ansi_c.mode=ansi_ct::flavourt::APPLE;
+    ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
   }
   else if(os=="linux" || os=="solaris")
   {

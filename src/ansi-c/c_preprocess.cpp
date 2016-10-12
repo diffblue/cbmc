@@ -856,7 +856,11 @@ bool c_preprocess_gcc_clang(
   command+=" -D__LDBL_MIN_10_EXP__=\"(-4931)\"";
 
   if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
+  {
     command+=" -D_Noreturn=\"__attribute__((__noreturn__))\"";
+    command+=" -D__llvm__";
+    command+=" -D__clang__";
+  }
 
   if(config.ansi_c.int_width==16)
     command+=GCC_DEFINES_16;

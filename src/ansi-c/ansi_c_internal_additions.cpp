@@ -229,8 +229,9 @@ void ansi_c_internal_additions(std::string &code)
 
     "\n";
     
-  // GCC junk stuff, also for ARM
+  // GCC junk stuff, also for CLANG and ARM
   if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
+     config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
      config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
   {
     code+=gcc_builtin_headers_generic;
@@ -243,6 +244,9 @@ void ansi_c_internal_additions(std::string &code)
        config.ansi_c.arch=="x86_64" ||
        config.ansi_c.arch=="x32")
     {
+      if(config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE)
+        code+="typedef double __float128;\n"; // clang doesn't do __float128
+    
       code+=gcc_builtin_headers_ia32;
       code+=gcc_builtin_headers_ia32_2;
     }

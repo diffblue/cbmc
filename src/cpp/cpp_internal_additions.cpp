@@ -126,10 +126,15 @@ void cpp_internal_additions(std::ostream &out)
             
   // GCC stuff, but also for ARM
   if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
+     config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
      config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
   {
     out << "extern \"C\" {" << '\n';
     out << c2cpp(gcc_builtin_headers_generic);
+
+     if(config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE)
+       out << "typedef double __float128;\n"; // clang doesn't do __float128
+    
     out << c2cpp(gcc_builtin_headers_ia32);
     out << "}" << '\n';
   }
