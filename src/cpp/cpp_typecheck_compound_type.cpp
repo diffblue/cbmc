@@ -1483,6 +1483,7 @@ void cpp_typecheckt::add_this_to_method_type(
   
   parameter.set_identifier(ID_this); // check? Not qualified
   parameter.set_base_name(ID_this);
+  parameter.set_this();
 
   typet subtype=symbol_typet(compound_symbol);
   
