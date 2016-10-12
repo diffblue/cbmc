@@ -33,16 +33,16 @@ void cpp_typecheckt::convert_parameter(
   const irep_idt &mode,
   code_typet::parametert &parameter)
 {
-  std::string identifier=id2string(parameter.get_identifier());
+  irep_idt base_name=id2string(parameter.get_base_name());
 
-  if(identifier.empty())
+  if(base_name.empty())
   {
-    identifier="#anon_arg"+i2string(anon_counter++);
-    parameter.set_base_name(identifier);
+    base_name="#anon_arg"+i2string(anon_counter++);
+    parameter.set_base_name(base_name);
   }
 
-  identifier=cpp_scopes.current_scope().prefix+
-             id2string(identifier);
+  irep_idt identifier=cpp_scopes.current_scope().prefix+
+                      id2string(base_name);
 
   parameter.set_identifier(identifier);
 
