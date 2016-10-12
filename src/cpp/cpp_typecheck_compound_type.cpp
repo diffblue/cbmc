@@ -1396,7 +1396,7 @@ void cpp_typecheckt::typecheck_member_function(
   }
   else
   {
-    adjust_method_type(
+    add_this_to_method_type(
       compound_identifier,
       type,
       method_qualifier);
@@ -1458,7 +1458,7 @@ void cpp_typecheckt::typecheck_member_function(
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::adjust_method_type
+Function: cpp_typecheckt::add_this_to_method_type
 
 Inputs:
 
@@ -1468,7 +1468,7 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::adjust_method_type(
+void cpp_typecheckt::add_this_to_method_type(
   const irep_idt &compound_symbol,
   typet &type,
   const typet &method_qualifier)
