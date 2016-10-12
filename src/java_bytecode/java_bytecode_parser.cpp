@@ -886,7 +886,7 @@ void java_bytecode_parsert::rbytecode(
         // there are high-low+1 offsets
         for(signed int i=low_value; i<=high_value; i++)
         {
-          u4 offset=read_u4();
+          int32_t offset=read_u4();
           instruction.args.push_back(from_integer(i, integer_typet()));
           instruction.args.push_back(from_integer(base_offset+offset, integer_typet()));
           address+=4;
