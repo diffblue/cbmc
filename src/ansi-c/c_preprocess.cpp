@@ -973,7 +973,8 @@ bool c_preprocess_gcc_clang(
     command+=" "+*it;
     
   int result;
-  
+
+  #if 0  
   // the following forces the mode
   switch(config.ansi_c.mode)
   {
@@ -981,6 +982,7 @@ bool c_preprocess_gcc_clang(
   case configt::ansi_ct::flavourt::GCC_CPP: command+=" -x c++"; break;
   default:;
   }
+  #endif
 
   #ifdef _WIN32
   std::string tmpi=get_temporary_file("tmp.gcc", "");

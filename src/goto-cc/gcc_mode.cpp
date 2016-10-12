@@ -239,7 +239,7 @@ int gcc_modet::doit()
     debug() << "Enabling Visual Studio syntax" << eom;
   }
   else
-    config.ansi_c.mode=configt::ansi_ct::flavourt::GCC_C;
+    config.ansi_c.mode=configt::ansi_ct::flavourt::GCC;
 
   if(compiler.mode==compilet::ASSEMBLE_ONLY)
     compiler.object_file_extension="s";

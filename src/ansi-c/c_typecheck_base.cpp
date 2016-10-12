@@ -426,7 +426,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         // definition is marked as "extern inline"
         
         if(old_symbol.type.get_bool(ID_C_inlined) &&
-           (config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_C ||
+           (config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
             config.ansi_c.mode==configt::ansi_ct::flavourt::ARM))
         {
           // overwrite "extern inline" properties

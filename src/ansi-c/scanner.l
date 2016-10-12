@@ -107,7 +107,7 @@ int make_identifier()
 
 int MSC_Keyword(int token)
 {
-  if(PARSER.mode==ansi_c_parsert::MSC)
+  if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
     loc();
     PARSER.tag_following=false;
@@ -141,7 +141,7 @@ int cpp11_keyword(int token)
 
 int MSC_cpp_keyword(int token)
 {
-  if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::MSC)
+  if(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
     loc();
     return token;
@@ -432,43 +432,43 @@ void ansi_c_scanner_init()
 "volatile"      { loc(); return TOK_VOLATILE; }
 "while"         { loc(); return TOK_WHILE; }
 
-"__auto_type"   { if(PARSER.mode==ansi_c_parsert::GCC && !PARSER.cpp98)
+"__auto_type"   { if(PARSER.mode==configt::ansi_ct::flavourt::GCC && !PARSER.cpp98)
                   { loc(); return TOK_GCC_AUTO_TYPE; }
                   else
                     return make_identifier();
                 }
 
-"__float80"     { if(PARSER.mode==ansi_c_parsert::GCC)
+"__float80"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                   { loc(); return TOK_GCC_FLOAT80; }
                   else
                     return make_identifier();
                 }
 
-"__float128"    { if(PARSER.mode==ansi_c_parsert::GCC)
+"__float128"    { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                   { loc(); return TOK_GCC_FLOAT128; }
                   else
                     return make_identifier();
                 }
 
-"__int128"      { if(PARSER.mode==ansi_c_parsert::GCC)
+"__int128"      { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                   { loc(); return TOK_GCC_INT128; }
                   else
                     return make_identifier();
                 }
 
-"_Decimal32"    { if(PARSER.mode==ansi_c_parsert::GCC)
+"_Decimal32"    { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                     { loc(); return TOK_GCC_DECIMAL32; }
                   else
                     return make_identifier();
                 }
 
-"_Decimal64"    { if(PARSER.mode==ansi_c_parsert::GCC)
+"_Decimal64"    { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                     { loc(); return TOK_GCC_DECIMAL64; }
                   else
                     return make_identifier();
                 }
 
-"_Decimal128"   { if(PARSER.mode==ansi_c_parsert::GCC)
+"_Decimal128"   { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                     { loc(); return TOK_GCC_DECIMAL128; }
                   else
                     return make_identifier();
@@ -478,9 +478,9 @@ void ansi_c_scanner_init()
 "__int16"       { return MSC_Keyword(TOK_INT16); }
 "__int32"       { return MSC_Keyword(TOK_INT32); }
 
-"__int64"       { if(PARSER.mode==ansi_c_parsert::MSC ||
-                     PARSER.mode==ansi_c_parsert::ARM ||
-                     PARSER.mode==ansi_c_parsert::CW)
+"__int64"       { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM ||
+                     PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
                     { loc(); return TOK_INT64; }
                   else
                     return make_identifier();
@@ -497,24 +497,24 @@ void ansi_c_scanner_init()
 %}
 
 "__complex__" |
-"__complex"     { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__complex"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_COMPLEX; }
                   else
                     return make_identifier();
                 }
 
 "__real__" |
-"__real"        { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__real"        { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_REAL; }
                   else
                     return make_identifier();
                 }
 
 "__imag__" |
-"__imag"        { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__imag"        { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_IMAG; }
                   else
                     return make_identifier();
@@ -525,14 +525,14 @@ void ansi_c_scanner_init()
 /*       because it is a 'typedef' in some standard header files   */
 %}
 
-"_var_arg_typeof" { if(PARSER.mode==ansi_c_parsert::CW)
+"_var_arg_typeof" { if(PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
                     { loc(); return TOK_CW_VAR_ARG_TYPEOF; }
                   else
                     return make_identifier();
                 }
 
-"__builtin_va_arg" { if(PARSER.mode==ansi_c_parsert::GCC ||
-                        PARSER.mode==ansi_c_parsert::ARM)
+"__builtin_va_arg" { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                        PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_BUILTIN_VA_ARG; }
                   else
                     return make_identifier();
@@ -540,23 +540,23 @@ void ansi_c_scanner_init()
 
 "__builtin_offsetof" |
 "__offsetof__" |
-"offsetof"      { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"offsetof"      { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_OFFSETOF; }
                   else
                     return make_identifier();
                 }
 
 "__builtin_types_compatible_p" {
-                  if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P; }
                   else
                     return make_identifier();
                 }
 
-"__alignof__"   { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__alignof__"   { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_ALIGNOF; }
                   else
                     return make_identifier();
@@ -564,15 +564,15 @@ void ansi_c_scanner_init()
 
 "__alignof"     { // MS supports __alignof:
                   // http://msdn.microsoft.com/en-us/library/45t0s5f4%28v=vs.71%29.aspx
-                  if(PARSER.mode==ansi_c_parsert::MSC ||
-                     PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+                     PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_ALIGNOF; }
                   else
                     return make_identifier();
                 }
 
-"__ALIGNOF__"   { if(PARSER.mode==ansi_c_parsert::ARM)
+"__ALIGNOF__"   { if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_ALIGNOF; }
                   else
                     return make_identifier();
@@ -581,14 +581,14 @@ void ansi_c_scanner_init()
 "__builtin_alignof" {
                   // interestingly, gcc doesn't support this,
                   // but Visual Studio does!
-                  if(PARSER.mode==ansi_c_parsert::MSC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_ALIGNOF; }
                   else
                     return make_identifier();
                 }
 
-"__asm"         { if(PARSER.mode==ansi_c_parsert::MSC)
+"__asm"         { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                   {
                     loc();
                     BEGIN(MSC_ASM);
@@ -603,8 +603,8 @@ void ansi_c_scanner_init()
                     BEGIN(GCC_ASM);
                 }
 
-"asm"           { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::CW)
+"asm"           { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
                   {
                     if(PARSER.cpp98)
                     {
@@ -618,9 +618,9 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__asm__"       { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::CW ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__asm__"       { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     if(PARSER.cpp98)
                     {
@@ -634,19 +634,19 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__based"       { if(PARSER.mode==ansi_c_parsert::MSC)
+"__based"       { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                     { loc(); return TOK_MSC_BASED; }
                   else
                     return make_identifier();
                 }
 
-"__unaligned"   { if(PARSER.mode==ansi_c_parsert::MSC)
+"__unaligned"   { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                     { /* ignore for now */ }
                   else
                     return make_identifier();
                 }
 
-"__wchar_t"     { if(PARSER.mode==ansi_c_parsert::MSC)
+"__wchar_t"     { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                     { loc(); return TOK_WCHAR_T; }
                   else
                     return make_identifier();
@@ -698,7 +698,7 @@ using               { return cpp98_keyword(TOK_USING); }
 virtual             { return cpp98_keyword(TOK_VIRTUAL); }
 wchar_t             { // CodeWarrior doesn't have wchar_t built in,
                       // and MSC has a command-line option to turn it off
-                      if(PARSER.mode==ansi_c_parsert::CW)
+                      if(PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
                         return make_identifier();
                       else
                         return cpp98_keyword(TOK_WCHAR_T);
@@ -718,7 +718,7 @@ xor_eq              { return cpp98_keyword(TOK_XORASSIGN); }
                       }
                     }
 
-__decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
+__decltype          { if(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::GCC)
                         return cpp98_keyword(TOK_DECLTYPE);
                       else
                         return make_identifier();
@@ -774,7 +774,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 "["{ws}"uuid" |
 "["{ws}"emitidl" |
 "["{ws}"module" |
-"["{ws}"export"  { if(PARSER.mode==ansi_c_parsert::MSC)
+"["{ws}"export"  { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                      BEGIN(MSC_ANNOTATION);
                    else
                    {
@@ -785,25 +785,25 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                    }
                  }
 
-"__char16_t"     { if(PARSER.mode==ansi_c_parsert::GCC)
+"__char16_t"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                      return cpp98_keyword(TOK_CHAR16_T); // GNU extension
                    else
                      return make_identifier();
                  }
 
-"__nullptr"     { if(PARSER.mode==ansi_c_parsert::GCC)
+"__nullptr"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                      return cpp98_keyword(TOK_NULLPTR); // GNU extension
                    else
                      return make_identifier();
                  }
 
-"__null"         { if(PARSER.mode==ansi_c_parsert::GCC)
+"__null"         { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                      return cpp98_keyword(TOK_NULLPTR); // GNU extension
                    else
                      return make_identifier();
                  }
 
-"__char32_t"     { if(PARSER.mode==ansi_c_parsert::GCC)
+"__char32_t"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                      return cpp98_keyword(TOK_CHAR32_T); // GNU extension
                    else
                      return make_identifier();
@@ -814,13 +814,13 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   {
                     BEGIN(IGNORE_PARENS);
                   }
-                  else if(PARSER.mode==ansi_c_parsert::MSC ||
-                          PARSER.mode==ansi_c_parsert::CW ||
-                          PARSER.mode==ansi_c_parsert::ARM)
+                  else if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+                          PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR ||
+                          PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     loc(); return TOK_MSC_DECLSPEC;
                   }
-                  else if(PARSER.mode==ansi_c_parsert::GCC)
+                  else if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                   {
                     // GCC supports this on Windows as an exception!
                     // Should likely reject on other targets.
@@ -830,7 +830,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                     return make_identifier();
                 }
 
-"__pragma"      { if(PARSER.mode==ansi_c_parsert::MSC)
+"__pragma"      { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                   {
                     BEGIN(MSC_PRAGMA);
                     PARSER.parenthesis_counter=0;
@@ -840,9 +840,9 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__attribute__" |
-"__attribute"   { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::CW ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__attribute"   { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     if(PARSER.cpp98)
                       BEGIN(IGNORE_PARENS);
@@ -887,7 +887,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 "__volatile__"  { loc(); return TOK_VOLATILE; }
 
 "__pure"        { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     // ignore
                   }
@@ -896,7 +896,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__align"       { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
@@ -906,7 +906,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__smc"         { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
@@ -916,7 +916,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__INTADDR__"   { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     // ignore
                   }
@@ -925,7 +925,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__irq"         { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     // ignore
                   }
@@ -934,7 +934,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__packed"      { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     // ignore
                   }
@@ -943,7 +943,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__value_in_regs" { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     // ignore
                   }
@@ -952,7 +952,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__weak"        { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     // ignore
                   }
@@ -961,7 +961,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__writeonly"   { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     // ignore
                   }
@@ -970,7 +970,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__global_reg"  { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
@@ -980,7 +980,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__svc"         { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
@@ -990,7 +990,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__svc_indirect" { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
@@ -1000,7 +1000,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__svc_indirect_r7" { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
@@ -1010,7 +1010,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__softfp"      { /* an ARM extension */
-                  if(PARSER.mode==ansi_c_parsert::ARM)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
                     // ignore
                   }
@@ -1019,17 +1019,15 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "typeof"        { if(PARSER.cpp98 ||
-                     PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ICC ||
-                     PARSER.mode==ansi_c_parsert::CW ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+                     PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_TYPEOF; }
                   else
                     return make_identifier();
                 }
-"__typeof"      { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ICC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__typeof"      { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_TYPEOF; }
                   else
                     return make_identifier();
@@ -1037,15 +1035,15 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 
 "__typeof__"    { loc(); return TOK_TYPEOF; }
 
-"__forceinline" { if(PARSER.mode==ansi_c_parsert::MSC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__forceinline" { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_INLINE; }
                   else
                     return make_identifier();
                 }
 
 "_inline"       { // http://msdn.microsoft.com/en-us/library/z8y1yy88.aspx
-                  if(PARSER.mode==ansi_c_parsert::MSC)
+                  if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                     { loc(); return TOK_INLINE; }
                   else
                     return make_identifier();
@@ -1054,14 +1052,14 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
 "__inline"      { loc(); return TOK_INLINE; }
 "__inline__"    { loc(); return TOK_INLINE; }
 
-"__label__"     { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__label__"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_GCC_LABEL; }
                   else
                     return make_identifier();
                 }
 
-"__try"         { if(PARSER.mode==ansi_c_parsert::MSC)
+"__try"         { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                     { loc(); return TOK_MSC_TRY; }
                   else
                     return make_identifier();
@@ -1073,19 +1071,19 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                     return make_identifier();
                 }
 
-"__finally"     { if(PARSER.mode==ansi_c_parsert::MSC)
+"__finally"     { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                     { loc(); return TOK_MSC_FINALLY; }
                   else
                     return make_identifier();
                 }
 
-"__except"      { if(PARSER.mode==ansi_c_parsert::MSC)
+"__except"      { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                     { loc(); return TOK_MSC_EXCEPT; }
                   else
                     return make_identifier();
                 }
 
-"__leave"       { if(PARSER.mode==ansi_c_parsert::MSC)
+"__leave"       { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                     { loc(); return TOK_MSC_LEAVE; }
                   else
                     return make_identifier();
@@ -1152,8 +1150,8 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   loc(); return TOK_FALSE;
                 }
 
-"__thread"      { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"__thread"      { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_THREAD_LOCAL; }
                   else
                     return make_identifier();
@@ -1162,8 +1160,8 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
   /* This is a C11 keyword */
 
 "_Alignas"      { if(!PARSER.cpp98 &&
-                     (PARSER.mode==ansi_c_parsert::GCC ||
-                      PARSER.mode==ansi_c_parsert::ARM))
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::ARM))
                     { loc(); return TOK_ALIGNAS; }
                   else
                     return make_identifier();
@@ -1172,8 +1170,8 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
   /* This is a C11 keyword */
 
 "_Alignof"      { if(!PARSER.cpp98 &&
-                     (PARSER.mode==ansi_c_parsert::GCC ||
-                      PARSER.mode==ansi_c_parsert::ARM))
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::ARM))
                     { loc(); return TOK_ALIGNOF; }
                   else
                     return make_identifier();
@@ -1192,16 +1190,16 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                    yyless(7);
 
                    if(!PARSER.cpp98 &&
-                      (PARSER.mode==ansi_c_parsert::GCC ||
-                       PARSER.mode==ansi_c_parsert::ARM))
+                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                       PARSER.mode==configt::ansi_ct::flavourt::ARM))
                     { loc(); return TOK_ATOMIC_TYPE_SPECIFIER; }
                   else
                     return make_identifier();
                 }
 
 "_Atomic"       { if(!PARSER.cpp98 &&
-                     (PARSER.mode==ansi_c_parsert::GCC ||
-                      PARSER.mode==ansi_c_parsert::ARM))
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::ARM))
                     { loc(); return TOK_ATOMIC_TYPE_QUALIFIER; }
                   else
                     return make_identifier();
@@ -1210,8 +1208,8 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
   /* This is a C11 keyword */
 
 "_Generic"      { if(!PARSER.cpp98 &&
-                     (PARSER.mode==ansi_c_parsert::GCC ||
-                      PARSER.mode==ansi_c_parsert::ARM))
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::ARM))
                     { loc(); return TOK_GENERIC; }
                   else
                     return make_identifier();
@@ -1220,8 +1218,8 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
   /* This is a C11 keyword */
 
 "_Imaginary"    { if(!PARSER.cpp98 &&
-                     (PARSER.mode==ansi_c_parsert::GCC ||
-                      PARSER.mode==ansi_c_parsert::ARM))
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::ARM))
                     { loc(); return TOK_IMAGINARY; }
                   else
                     return make_identifier();
@@ -1230,8 +1228,8 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
   /* This is a C11 keyword */
 
 "_Noreturn"     { if(!PARSER.cpp98 &&
-                     (PARSER.mode==ansi_c_parsert::GCC ||
-                      PARSER.mode==ansi_c_parsert::ARM))
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::ARM))
                     { loc(); return TOK_NORETURN; }
                   else
                     return make_identifier();
@@ -1240,8 +1238,8 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
   /* This is a C11 keyword */
 
 "_Static_assert" { if(!PARSER.cpp98 &&
-                      (PARSER.mode==ansi_c_parsert::GCC ||
-                       PARSER.mode==ansi_c_parsert::ARM))
+                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                       PARSER.mode==configt::ansi_ct::flavourt::ARM))
                     { loc(); return TOK_STATIC_ASSERT; }
                   else
                     return make_identifier();
@@ -1250,8 +1248,8 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
   /* This is a C11 keyword */
 
 "_Thread_local" { if(!PARSER.cpp98 &&
-                     (PARSER.mode==ansi_c_parsert::GCC ||
-                      PARSER.mode==ansi_c_parsert::ARM))
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::ARM))
                     { loc(); return TOK_THREAD_LOCAL; }
                   else
                     return make_identifier();
@@ -1303,7 +1301,7 @@ __decltype          { if(PARSER.cpp98 && PARSER.mode==ansi_c_parsert::GCC)
                   return TOK_INTEGER;
                 }
 
-{gcc_ext_float_s} { if(PARSER.mode!=ansi_c_parsert::GCC)
+{gcc_ext_float_s} { if(PARSER.mode!=configt::ansi_ct::flavourt::GCC)
                     {
                       yyansi_cerror("Preprocessor directive found");
                       return TOK_SCANNER_ERROR;

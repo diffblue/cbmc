@@ -104,14 +104,9 @@ bool ansi_c_languaget::parse(
   const std::string &path)
 {
   // store the path
-
   parse_path=path;
 
   // preprocessing
-
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_CPP)
-    config.ansi_c.mode=configt::ansi_ct::flavourt::GCC_C;
-
   std::ostringstream o_preprocessed;
 
   if(preprocess(instream, path, o_preprocessed))
@@ -132,33 +127,7 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
   ansi_c_parser.cpp98=false; // it's not C++
   ansi_c_parser.cpp11=false; // it's not C++
-
-  switch(config.ansi_c.mode)
-  {
-  case configt::ansi_ct::flavourt::CODEWARRIOR:
-    ansi_c_parser.mode=ansi_c_parsert::CW;
-    break;
-   
-  case configt::ansi_ct::flavourt::VISUAL_STUDIO:
-    ansi_c_parser.mode=ansi_c_parsert::MSC;
-    break;
-    
-  case configt::ansi_ct::flavourt::ANSI:
-    ansi_c_parser.mode=ansi_c_parsert::ANSI;
-    break;
-    
-  case configt::ansi_ct::flavourt::GCC_C:
-  case configt::ansi_ct::flavourt::GCC_CPP:
-    ansi_c_parser.mode=ansi_c_parsert::GCC;
-    break;
-    
-  case configt::ansi_ct::flavourt::ARM:
-    ansi_c_parser.mode=ansi_c_parsert::ARM;
-    break;
-    
-  default:
-    assert(false);
-  }
+  ansi_c_parser.mode=config.ansi_c.mode;
 
   ansi_c_scanner_init();
 
@@ -359,7 +328,7 @@ bool ansi_c_languaget::to_expr(
   ansi_c_parser.set_file(irep_idt());
   ansi_c_parser.in=&i_preprocessed;
   ansi_c_parser.set_message_handler(get_message_handler());
-  ansi_c_parser.mode=ansi_c_parsert::GCC;
+  ansi_c_parser.mode=config.ansi_c.mode;
   ansi_c_scanner_init();
 
   bool result=ansi_c_parser.parse();

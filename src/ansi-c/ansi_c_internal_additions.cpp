@@ -230,7 +230,7 @@ void ansi_c_internal_additions(std::string &code)
     "\n";
     
   // GCC junk stuff, also for ARM
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_C ||
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
      config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
   {
     code+=gcc_builtin_headers_generic;

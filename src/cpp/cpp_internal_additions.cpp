@@ -125,8 +125,7 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __CPROVER::array_set(const void dest[], ...);" << '\n';
             
   // GCC stuff, but also for ARM
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_C ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::GCC_CPP ||
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
      config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
   {
     out << "extern \"C\" {" << '\n';
