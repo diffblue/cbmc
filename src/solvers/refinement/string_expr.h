@@ -107,7 +107,9 @@ private:
   void of_string_delete(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_delete_char_at(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
   void of_string_replace(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
-  void of_string_value_of(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms);
+
+  // Warning: not working correctly at the moment
+  void of_string_value_of(const function_application_exprt &f, axiom_vect &axioms);
   void of_string_set_length(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_empty_string(const function_application_exprt &f, axiom_vect & axioms);
@@ -118,16 +120,18 @@ private:
   void of_int_hex(const function_application_exprt &f,axiom_vect & axioms);
   void of_long(const function_application_exprt &f, axiom_vect & axioms);
   void of_long(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
-  // Warning the specifications of these functions is only partial:
-  void of_float(const function_application_exprt &f, axiom_vect & axioms);
-  void of_float(const exprt &f, axiom_vect & axioms, bool is_c_string, bool double_precision=false);
-  void of_double(const function_application_exprt &f, axiom_vect & axioms);
   void of_bool(const function_application_exprt &f, axiom_vect & axioms);
   void of_bool(const exprt &i, axiom_vect & axioms, bool is_c_string);
   void of_char(const function_application_exprt &f, axiom_vect & axioms);
   void of_char(const exprt &i, axiom_vect & axioms, bool is_c_string);
+
+  // Warning: the specifications of these functions is only partial:
+  void of_float(const function_application_exprt &f, axiom_vect & axioms);
+  void of_float(const exprt &f, axiom_vect & axioms, bool is_c_string, bool double_precision=false);
+  void of_double(const function_application_exprt &f, axiom_vect & axioms);
+
   void of_code_point(const exprt &code_point, axiom_vect & axioms, bool is_c_string);
-  void of_java_char_array(const exprt & char_array, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
+  void of_java_char_array(const exprt & char_array, axiom_vect & axioms);
 
   void of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
 
@@ -135,8 +139,6 @@ private:
 
   friend inline string_exprt &to_string_expr(exprt &expr);
 
-public:
-  exprt convert_string_equal(const function_application_exprt &f, axiom_vect & axioms);
 };
 
 

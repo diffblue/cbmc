@@ -69,10 +69,24 @@ literalt string_refinementt::convert_rest(const exprt &expr)
       assert(bv.size() == 1); 
       return bv[0];
     }
-  else
+  else {
+    //debug() << "string_refinementt::convert_rest("<< pretty_short(expr) << ")" << eom;
     return SUB::convert_rest(expr);
+  }
 }
 
+bvt string_refinementt::convert_pointer_type(const exprt &expr)
+{  
+  if(expr.id()==ID_function_application)
+    {
+      bvt bv = convert_function_application(to_function_application_expr(expr));
+      return bv;
+    }
+  else {
+    debug() << "string_refinementt::convert_pointer_type("<< pretty_short(expr) << ")" << eom;
+    return SUB::convert_pointer_type(expr);
+  }
+}
 
 void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
 {
@@ -120,7 +134,6 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t1-start_time).count();
 
   debug() << "string_refinementt::boolbv_set_equality_to_true "
-    //<< expr.pretty()
 	  << " at time(ms): " 
 	  << (duration / 1000) << eom;
 
@@ -133,19 +146,14 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      //type==ns.follow(expr.rhs().type()) && 
      type.id()!=ID_bool)
   {
+    debug() << "   " << pretty_short(expr.lhs()) << " <- " 
+	    << pretty_short(expr.rhs()) << eom;
+
     if(refined_string_typet::is_unrefined_string_type(type)) {
       symbol_exprt sym = to_symbol_expr(expr.lhs());
       make_string(sym,expr.rhs());
       return false;
     }
-    /*
-    else if(refined_string_typet::is_java_deref_string_type(type)) {
-      debug() << "string_refinementt::boolbv_set_equality_to_true: warning"
-	      << " non pointer string " << eom;
-      symbol_exprt sym = to_symbol_expr(expr.lhs());
-      make_string(sym,expr.rhs());
-      return false;
-      }*/
     else if(type == char_type) {
       const bvt &bv1=convert_bv(expr.rhs());
       symbol_exprt sym = to_symbol_expr(expr.lhs());
@@ -161,9 +169,21 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
       map.set_literals(identifier, java_char_type, bv1);
       if(freeze_all) set_frozen(bv1);
       return false;
-    } 
-    else { 
-      return SUB::boolbv_set_equality_to_true(expr);
+    }
+    else if(type==ns.follow(expr.rhs().type())) {
+      if(is_unbounded_array(type))
+	return true;
+
+      const bvt &bv1=convert_bv(expr.rhs());
+      
+      const irep_idt &identifier=
+	to_symbol_expr(expr.lhs()).get_identifier();
+      
+      map.set_literals(identifier, type, bv1);
+      
+      if(freeze_all) set_frozen(bv1);
+      
+      return false;
     }
   }
 
@@ -218,6 +238,7 @@ bvt string_refinementt::convert_function_application(
        const function_application_exprt &expr)
 {
   const exprt &name = expr.function();
+  debug() << "string_refinementt::convert_function_application"  << eom;
 
   if (name.id() == ID_symbol) {
     const irep_idt &id = to_symbol_expr(name).get_identifier();
@@ -316,8 +337,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       add_lemma(string_axioms[i]);
     else if(string_axioms[i].is_string_constant())
       add_lemma(string_axioms[i]); //,false);
-    else if(string_axioms[i].is_univ_quant())
+    else if(string_axioms[i].is_univ_quant()) {
+      debug() << "universaly quantified : " << pretty_short(string_axioms[i]) << eom;
       universal_axioms.push_back(string_axioms[i]);
+    }
     else {
       assert(string_axioms[i].is_not_contains());
       string_axioms[i].witness = string_exprt::fresh_symbol

@@ -27,10 +27,12 @@ void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_f
 
   auxiliary_symbolt tmp_symbol;
   //tmp_symbol.base_name=base_name;
+  //tmp_symbol.base_name=base_name;
   tmp_symbol.is_static_lifetime=false;
   tmp_symbol.mode=ID_java;
   tmp_symbol.name=function_name;
   // tmp_symbol.type=type;
+  tmp_symbol.type=old_type;
   symbol_table.add(tmp_symbol);
   // make sure it is in the function map
   goto_functions.function_map[irep_idt(function_name)];
@@ -350,7 +352,10 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	  make_string_function(symbol_table, goto_functions, i_it,
 			       "__CPROVER_uninterpreted_parse_int");
 	} else if(function_id == irep_idt
-		  ("java::java.lang.String.valueOf:([CII)Ljava/lang/String;")) {
+		  ("java::java.lang.String.valueOf:([CII)Ljava/lang/String;")
+		  ||function_id == irep_idt
+		  ("java::java.lang.String.valueOf:([C)Ljava/lang/String;")
+		  ) {
 	  make_string_function(symbol_table, goto_functions, i_it,
 			       "__CPROVER_uninterpreted_string_value_of");
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.setLength:(I)V")) {

@@ -154,7 +154,7 @@ void string_exprt::of_function_application(const function_application_exprt & ex
     } else if (is_string_char_set_func(id)) {
       return of_string_char_set(expr,symbol_to_string,axioms);
     } else if (is_string_value_of_func(id)) {
-      return of_string_value_of(expr,symbol_to_string,axioms);
+      return of_string_value_of(expr,axioms);
     } else if (is_string_empty_string_func(id)) {
       return of_empty_string(expr,axioms);
     } else if (is_string_copy_func(id)) {
@@ -334,30 +334,37 @@ void string_exprt::of_string_set_length(const function_application_exprt &f, std
 
 
 
-//#include <iostream>
-void string_exprt::of_java_char_array(const exprt & char_array, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+void string_exprt::of_java_char_array(const exprt & char_array, axiom_vect & axioms)
 {
-  // this is not yet implemented
-  //std::cout << "of_java_char_array : " << char_array.pretty() << std::endl;
-  assert(false);
+  exprt arr = to_address_of_expr(char_array).object();
+  exprt len = member_exprt(arr, "length",length().type());
+  exprt cont = member_exprt(arr, "data",content().type());
+  op0() = len;
+  op1() = cont;
 }
  
 
-void string_exprt::of_string_value_of(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+void string_exprt::of_string_value_of(const function_application_exprt &f, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 3);
-  
-  exprt char_array = args[0];
-  exprt offset = args[1];
-  exprt count = args[2];
-  string_exprt str(refined_string_typet::java_char_type());
-  str.of_java_char_array(args[0],symbol_to_string,axioms);
-  axioms.emplace_back(equal_exprt(length(), count));
-  
-  symbol_exprt idx = fresh_symbol("QA_index_value_of",refined_string_typet::index_type());
-  string_constraintt a1(equal_exprt(str[plus_exprt(idx,offset)],(*this)[idx]));
-  axioms.push_back(a1.forall(idx, index_zero, count));  
+  if(args.size() == 3)
+    {
+      exprt char_array = args[0];
+      exprt offset = args[1];
+      exprt count = args[2];
+      string_exprt str(refined_string_typet::java_char_type());
+      str.of_java_char_array(args[0],axioms);
+      axioms.emplace_back(equal_exprt(length(), count));
+      
+      symbol_exprt idx = fresh_symbol("QA_index_value_of",refined_string_typet::index_type());
+      string_constraintt a1(equal_exprt(str[plus_exprt(idx,offset)],(*this)[idx]));
+      axioms.push_back(a1.forall(idx, index_zero, count));  
+    }
+  else
+    {
+      assert(args.size() == 1);
+      of_java_char_array(args[0],axioms);
+    }
 }
 
 void string_exprt::of_string_substring
@@ -553,14 +560,14 @@ void string_exprt::of_float
 
 
   string_exprt magnitude(char_type);
+  string_exprt sign_string(char_type);
 
   //     If the argument is NaN, the result is the string "NaN".
   string_exprt nan_string(char_type);
   nan_string.of_string_constant("NaN",char_width,char_type,axioms);
 
   ieee_float_spect fspec = double_precision?ieee_float_spect::double_precision():ieee_float_spect::single_precision();
-
-
+  
   exprt isnan = float_bvt().isnan(f,fspec);
   axioms.emplace_back(isnan, equal_exprt(magnitude.length(),nan_string.length()));
   symbol_exprt qvar = string_exprt::fresh_symbol("qvar_equal_nan", refined_string_typet::index_type());
@@ -570,13 +577,12 @@ void string_exprt::of_float
 
   // If the argument is not NaN, the result is a string that represents the sign and magnitude (absolute value) of the argument. If the sign is negative, the first character of the result is '-' ('\u002D'); if the sign is positive, no sign character appears in the result. 
 
-  // Not sure this can distinguish between 0.0 and -0.0
-  exprt isneg = 
-    and_exprt
-    (not_exprt(isnan),
-     float_bvt().relation(f,float_bvt().LT,float_bvt().from_signed_integer(refined_string_typet::index_of_int(0),refined_string_typet::index_of_int(0),fspec),fspec));
-  string_exprt sign_string(char_type);
+  const bitvector_typet &bv_type=to_bitvector_type(f.type());
+  unsigned width=bv_type.get_width();
+  exprt isneg = extractbit_exprt(f, width-1);
+
   axioms.emplace_back(isneg, equal_exprt(sign_string.length(),refined_string_typet::index_of_int(1)));
+  
   axioms.emplace_back(not_exprt(isneg), equal_exprt(sign_string.length(),refined_string_typet::index_of_int(0)));
   axioms.emplace_back(isneg,equal_exprt(sign_string[refined_string_typet::index_of_int(0)], constant_of_nat(0x2D,char_width,char_type)));
 
@@ -585,28 +591,56 @@ void string_exprt::of_float
 
   string_exprt infinity_string(char_type);
   infinity_string.of_string_constant("Infinity",char_width,char_type,axioms);
-
-
-  exprt isinf = false_exprt(); //float_bvt().isinf(f,fspec);
+  exprt isinf = float_bvt().isinf(f,fspec);
   axioms.emplace_back(isinf, equal_exprt(magnitude.length(),infinity_string.length()));
   symbol_exprt qvar_inf = string_exprt::fresh_symbol("qvar_equal_infinity", refined_string_typet::index_type());
   axioms.push_back
     (string_constraintt(isinf,equal_exprt(magnitude[qvar_inf],infinity_string[qvar_inf])
 			).forall(qvar_inf,index_zero,infinity_string.length()));
 
+  //If m is zero, it is represented by the characters "0.0"; thus, negative zero produces the result "-0.0" and positive zero produces the result "0.0".
 
-  //of_string_concat(sign_string,magnitude,axioms);
+  string_exprt zero_string(char_type);
+  zero_string.of_string_constant("0.0",char_width,char_type,axioms);
+  exprt iszero = float_bvt().is_zero(f,fspec);
+  axioms.emplace_back(iszero, equal_exprt(magnitude.length(),zero_string.length()));
+  symbol_exprt qvar_zero = string_exprt::fresh_symbol("qvar_equal_zero", refined_string_typet::index_type());
+  axioms.push_back
+    (string_constraintt(iszero,equal_exprt(magnitude[qvar_zero],zero_string[qvar_zero])
+			).forall(qvar_zero,index_zero,zero_string.length()));
 
+  
+  /*
+  ieee_floatt milli(fspec);
+  milli.from_float(0.001);
+  ieee_floatt decamega(fspec);
+  decamega.from_float(1e7);
+  exprt scientific = or_exprt
+    (float_bvt().relation(f,float_bvt().LT,milli.to_expr(),fspec),
+     float_bvt().relation(f,float_bvt().GE,decamega.to_expr(),fspec));
+  */
+
+  //      If m is greater than or equal to 10^-3 but less than 10^7, then it is represented as the integer part of m, in decimal form with no leading zeroes, followed by '.' ('\u002E'), followed by one or more decimal digits representing the fractional part of m.
+  
+  //string_exprt integer_part(char_type);
+  //exprt integer = float_bvt().to_integer(float_bvt.abs(f,fspec),32,true,fspec);  
+  
+  //integer_part.of_int(integer);
+  //string_exprt dot_string(char_type);
+  //dot_string.of_string_constant(".",char_width,char_type,axioms);
+
+  //string_exprt fractional_part(char_type);
 
   /* Here is the remainder of the specification of Float.toString, for the magnitude m : 
-        If m is zero, it is represented by the characters "0.0"; thus, negative zero produces the result "-0.0" and positive zero produces the result "0.0".
-        If m is greater than or equal to 10-3 but less than 107, then it is represented as the integer part of m, in decimal form with no leading zeroes, followed by '.' ('\u002E'), followed by one or more decimal digits representing the fractional part of m.
+
         If m is less than 10^-3 or greater than or equal to 10^7, then it is represented in so-called "computerized scientific notation." Let n be the unique integer such that 10n ≤ m < 10n+1; then let a be the mathematically exact quotient of m and 10n so that 1 ≤ a < 10. The magnitude is then represented as the integer part of a, as a single decimal digit, followed by '.' ('\u002E'), followed by decimal digits representing the fractional part of a, followed by the letter 'E' ('\u0045'), followed by a representation of n as a decimal integer, as produced by the method Integer.toString(int). 
 
 	How many digits must be printed for the fractional part of m or a? There must be at least one digit to represent the fractional part, and beyond that as many, but only as many, more digits as are needed to uniquely distinguish the argument value from adjacent values of type float. That is, suppose that x is the exact mathematical value represented by the decimal representation produced by this method for a finite nonzero argument f. Then f must be the float value nearest to x; or, if two float values are equally close to x, then f must be one of them and the least significant bit of the significand of f must be 0.  */
 
+  of_string_concat(sign_string,magnitude,axioms);
 
 
+  /*
   exprt char_0 = constant_of_nat(48,char_width,char_type);
   exprt char_9 = constant_of_nat(57,char_width,char_type);
   exprt char_dot = constant_of_nat(46,char_width,char_type);
@@ -618,7 +652,7 @@ void string_exprt::of_float
 		       binary_relation_exprt(c,ID_le,char_9)),
 	     equal_exprt(c,char_dot)
 	     );
-  string_constraintt a(is_digit);
+	     string_constraintt a(is_digit);*/
   //axioms.push_back(a.forall(idx,index_zero,length()));
 
 

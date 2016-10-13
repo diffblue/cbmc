@@ -48,6 +48,8 @@ protected:
   virtual bvt convert_symbol(const exprt &expr);
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
+  virtual bvt convert_pointer_type(const exprt &expr);
+
   decision_proceduret::resultt dec_solve();
 
   // fills as many 0 as necessary in the bit vectors to have the right width
