@@ -11,8 +11,8 @@ public class test_compare {
 	assert(s3.hashCode() == s1.hashCode());
 	assert(s3.hashCode() == s2.hashCode());
 			  
-	/*String x = s1.intern();
+	String x = s1.intern();
 	String y = s3.intern();
-	assert(x == y);*/
+	assert(x == y);
     }
 }
