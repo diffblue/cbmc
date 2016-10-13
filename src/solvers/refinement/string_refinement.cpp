@@ -97,14 +97,14 @@ void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str
   else {
     // assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
     if (str.id() == ID_function_application && 
-	is_string_intern_func(to_symbol_expr(to_function_application_expr(str).function()).get_identifier())) {
-      symbol_exprt sym1 = convert_string_intern(to_function_application_expr(str));
-      string_exprt s(refined_string_typet::java_char_type());
-      assign_to_symbol(sym1,s);
-      assign_to_symbol(sym,s);
-    }
-    else 
-      assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
+	starts_with(to_symbol_expr(to_function_application_expr(str).function()).get_identifier(),cprover_string_intern_func)) {
+	  symbol_exprt sym1 = convert_string_intern(to_function_application_expr(str));
+	  string_exprt s(refined_string_typet::java_char_type());
+	  assign_to_symbol(sym1,s);
+	  assign_to_symbol(sym,s);
+	}
+	else 
+	  assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
   }
   //debug() << "string = " << symbol_to_string[sym.get_identifier()].pretty() << eom;
 }
@@ -115,8 +115,8 @@ string_exprt string_refinementt::make_string(const exprt & str)
   if(str.id()==ID_symbol) 
     return string_of_symbol(to_symbol_expr(str));
   else
-    if (str.id() == ID_function_application && 
-	is_string_intern_func(to_symbol_expr(to_function_application_expr(str).function()).get_identifier())){
+    if (str.id() == ID_function_application &&
+	starts_with(to_symbol_expr(to_function_application_expr(str).function()).get_identifier(),cprover_string_intern_func)) { 
       symbol_exprt sym1 = convert_string_intern(to_function_application_expr(str));
       string_exprt s(refined_string_typet::java_char_type());
       assign_to_symbol(sym1,s);
@@ -245,54 +245,54 @@ bvt string_refinementt::convert_function_application(
     debug() << "string_refinementt::convert_function_application(" 
 	    << id << ")" << eom;
 
-    if (is_string_literal_func(id)
-	|| is_string_concat_func(id)
-	|| is_string_substring_func(id)
-	|| is_string_char_set_func(id)) {
+    if (starts_with(id,cprover_string_literal_func)
+	|| starts_with(id,cprover_string_concat_func)
+	|| starts_with(id,cprover_string_substring_func)
+	|| starts_with(id,cprover_string_char_set_func)) {
       string_exprt str = make_string(expr);
       bvt bv = convert_bv(str);
       return bv;
-    } else if (is_char_literal_func(id)) {
+    } else if (starts_with(id,cprover_char_literal_func)) {
       return convert_char_literal(expr);
-    } else if (is_string_length_func(id)) {
+    } else if (starts_with(id,cprover_string_length_func)) {
       return convert_string_length(expr);
-    } else if (is_string_equal_func(id)) {
+    } else if (starts_with(id,cprover_string_equal_func)) {
       return convert_bv(convert_string_equal(expr));
-    } else if (is_string_equals_ignore_case_func(id)) {
+    } else if (starts_with(id,cprover_string_equals_ignore_case_func)) {
       return convert_bv(convert_string_equals_ignore_case(expr));
-    } else if (is_string_is_empty_func(id)) {
+    } else if (starts_with(id,cprover_string_is_empty_func)) {
       return convert_bv(convert_string_is_empty(expr));
-    } else if (is_string_char_at_func(id)) {
+    } else if (starts_with(id,cprover_string_char_at_func)) {
       return convert_string_char_at(expr);
-    } else if (is_string_is_prefix_func(id)) {
+    } else if (starts_with(id,cprover_string_is_prefix_func)) {
       return convert_bv(convert_string_is_prefix(expr));
-    } else if (is_string_is_suffix_func(id)) {
+    } else if (starts_with(id,cprover_string_is_suffix_func)) {
       return convert_string_is_suffix(expr);
-    } else if (is_string_startswith_func(id)) {
+    } else if (starts_with(id,cprover_string_startswith_func)) {
       return convert_bv(convert_string_is_prefix(expr,true));
-    } else if (is_string_endswith_func(id)) {
+    } else if (starts_with(id,cprover_string_endswith_func)) {
       return convert_string_is_suffix(expr,true);
-    } else if (is_string_contains_func(id)) {
+    } else if (starts_with(id,cprover_string_contains_func)) {
       return convert_string_contains(expr);
-    } else if (is_string_hash_code_func(id)) {
+    } else if (starts_with(id,cprover_string_hash_code_func)) {
       return convert_bv(convert_string_hash_code(expr));
-    } else if (is_string_index_of_func(id)) {
+    } else if (starts_with(id,cprover_string_index_of_func)) {
       return convert_bv(convert_string_index_of(expr));
-    } else if (is_string_last_index_of_func(id)) {
+    } else if (starts_with(id,cprover_string_last_index_of_func)) {
       return convert_bv(convert_string_last_index_of(expr));
-    } else if (is_string_parse_int_func(id)) {
+    } else if (starts_with(id,cprover_string_parse_int_func)) {
       return convert_bv(convert_string_parse_int(expr));
-    } else if (is_string_to_char_array_func(id)) {
+    } else if (starts_with(id,cprover_string_to_char_array_func)) {
       return convert_bv(convert_string_to_char_array(expr));
-    } else if (is_string_code_point_at_func(id)) {
+    } else if (starts_with(id,cprover_string_code_point_at_func)) {
       return convert_bv(convert_string_code_point_at(expr));
-    } else if (is_string_code_point_before_func(id)) {
+    } else if (starts_with(id,cprover_string_code_point_before_func)) {
       return convert_bv(convert_string_code_point_before(expr));
-    } else if (is_string_code_point_count_func(id)) {
+    } else if (starts_with(id,cprover_string_code_point_count_func)) {
       return convert_bv(convert_string_code_point_count(expr));
-    } else if (is_string_code_point_offset_by_code_point_func(id)) {
+    } else if (starts_with(id,cprover_string_offset_by_code_point_func)) {
       return convert_bv(convert_string_offset_by_code_point(expr));
-    } else if (is_string_compare_to_func(id)) {
+    } else if (starts_with(id,cprover_string_compare_to_func)) {
       return convert_bv(convert_string_compare_to(expr));
     }
   }

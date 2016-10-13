@@ -112,6 +112,8 @@ private:
   void of_string_value_of(const function_application_exprt &f, axiom_vect &axioms);
   void of_string_set_length(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
   void of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
+  void of_string_format(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms);
+
   void of_empty_string(const function_application_exprt &f, axiom_vect & axioms);
 
   void of_int(const function_application_exprt &f, axiom_vect & axioms);

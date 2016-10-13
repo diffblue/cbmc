@@ -14,7 +14,7 @@ Date:   September 2016
 
 #include "pass_preprocess.h"
 
-#include <iostream> // only for debugging
+#include <solvers/refinement/string_functions.h>
 #include <solvers/refinement/string_expr.h>
 
 void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_functions,
@@ -26,7 +26,6 @@ void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_f
   code_typet old_type=to_code_type(function_call.function().type());
 
   auxiliary_symbolt tmp_symbol;
-  //tmp_symbol.base_name=base_name;
   //tmp_symbol.base_name=base_name;
   tmp_symbol.is_static_lifetime=false;
   tmp_symbol.mode=ID_java;
@@ -104,7 +103,7 @@ void make_string_function_side_effect
 (symbol_tablet & symbol_table, goto_functionst & goto_functions, 
  goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
  irep_idt function_name, std::map<exprt, exprt> & string_builders){
-  // replace "s.append(x)" by "s=__CPROVER_uninterpreted_strcat(s,x)"
+  // replace "s.append(x)" by "s=__CPROVER_uninterpreted_string_concat(s,x)"
   code_function_callt &function_call=to_code_function_call(i_it->code);
   code_typet old_type=to_code_type(function_call.function().type());
 
@@ -176,18 +175,18 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 	   || function_id == irep_idt("java::java.lang.StringBuilder.charAt:(I)C")
 	   || function_id == irep_idt("java::java.lang.CharSequence.charAt:(I)C")
 	   ) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_char_at");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_char_at_func);
 	} else if(function_id == irep_idt("java::java.lang.String.codePointAt:(I)I")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_code_point_at_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_code_point_at_func);
 	} else if(function_id == irep_idt("java::java.lang.String.codePointBefore:(I)I")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_code_point_before_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_code_point_before_func);
 	} else if(function_id == irep_idt("java::java.lang.String.codePointCount:(II)I")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_code_point_count_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_code_point_count_func);
 	} else if(function_id == irep_idt("java::java.lang.String.offsetByCodePoints:(II)I")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_offset_by_code_point_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_offset_by_code_point_func);
 
 	} else if(function_id == irep_idt("java::java.lang.String.hashCode:()I")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_hash_code_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_hash_code_func);
 
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.indexOf:(I)I")
@@ -198,7 +197,7 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 		  || function_id == irep_idt
 		  ("java::java.lang.String.indexOf:(Ljava/lang/String;I)I")
 		  ) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strindexof");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_index_of_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.lastIndexOf:(I)I")
 		  || function_id == irep_idt
@@ -208,170 +207,172 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
 		  || function_id == irep_idt
 		  ("java::java.lang.String.lastIndexOf:(Ljava/lang/String;I)I")
 		  ) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strlastindexof");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_last_index_of_func);
 	} else if(function_id == irep_idt("java::java.lang.String.concat:(Ljava/lang/String;)Ljava/lang/String;")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strcat_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_concat_func);
 	} else if(function_id == irep_idt("java::java.lang.String.length:()I")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strlen");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_length_func);
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.length:()I")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strlen");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_length_func);
 	} else if(function_id == irep_idt("java::java.lang.String.equals:(Ljava/lang/Object;)Z")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_equal_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_equal_func);
 	} else if(function_id == irep_idt("java::java.lang.String.equalsIgnoreCase:(Ljava/lang/String;)Z")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_equals_ignore_case");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_equals_ignore_case_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.startsWith:(Ljava/lang/String;)Z")
 		  || function_id == irep_idt
 		  ("java::java.lang.String.startsWith:(Ljava/lang/String;I)Z")
 		  ) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_startswith");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_startswith_func);
 	} else if(function_id == irep_idt("java::java.lang.String.endsWith:(Ljava/lang/String;)Z")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_endswith");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_endswith_func);
 	} else if(function_id == irep_idt("java::java.lang.String.substring:(II)Ljava/lang/String;")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_substring");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_substring_func);
 	} else if(function_id == irep_idt("java::java.lang.String.substring:(II)Ljava/lang/String;")
 		  || function_id == irep_idt("java::java.lang.String.substring:(I)Ljava/lang/String;")
 		  || function_id == irep_idt("java::java.lang.StringBuilder.substring:(II)Ljava/lang/String;")
 		  || function_id == irep_idt("java::java.lang.StringBuilder.substring:(I)Ljava/lang/String;")
 		  || function_id == irep_idt("java::java.lang.String.subSequence:(II)Ljava/lang/CharSequence;")
 		  ) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_substring");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_substring_func);
 	} else if(function_id == irep_idt("java::java.lang.String.trim:()Ljava/lang/String;")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_trim");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_trim_func);
 	} else if(function_id == irep_idt("java::java.lang.String.toLowerCase:()Ljava/lang/String;")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_to_lower_case");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_to_lower_case_func);
 	} else if(function_id == irep_idt("java::java.lang.String.toUpperCase:()Ljava/lang/String;")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_to_upper_case");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_to_upper_case_func);
 	} else if(function_id == irep_idt("java::java.lang.String.replace:(CC)Ljava/lang/String;")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_replace_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_replace_func);
 	} else if(function_id == irep_idt("java::java.lang.String.contains:(Ljava/lang/CharSequence;)Z")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_strcontains");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_contains_func);
 	} else if(function_id == irep_idt("java::java.lang.String.compareTo:(Ljava/lang/String;)I")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_compare_to_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_compare_to_func);
 	} else if(function_id == irep_idt("java::java.lang.String.intern:()Ljava/lang/String;")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_intern_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_intern_func);
 	} else if(function_id == irep_idt("java::java.lang.String.isEmpty:()Z")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_is_empty");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_is_empty_func);
 	} else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) {
-	  make_string_function(symbol_table, goto_functions, i_it,"__CPROVER_uninterpreted_string_to_char_array_func");
+	  make_string_function(symbol_table, goto_functions, i_it,cprover_string_to_char_array_func);
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,cprover_string_concat_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.append:(I)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_int_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,cprover_string_concat_int_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.append:(J)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_long_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,cprover_string_concat_long_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.append:(Z)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_bool_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,cprover_string_concat_bool_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.append:(C)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_char_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,cprover_string_concat_char_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.append:(D)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_double_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,cprover_string_concat_double_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.append:(F)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_float_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,cprover_string_concat_float_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.appendCodePoint:(I)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,"__CPROVER_uninterpreted_strcat_code_point_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,cprover_string_concat_code_point_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.delete:(II)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,"__CPROVER_uninterpreted_string_delete_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,cprover_string_delete_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.deleteCharAt:(I)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,"__CPROVER_uninterpreted_string_delete_char_at_func",string_builders);
+	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,cprover_string_delete_char_at_func,string_builders);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.insert:(ILjava/lang/String;)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,"__CPROVER_uninterpreted_string_insert_func",string_builders);	  
+	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,cprover_string_insert_func,string_builders);	  
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.insert:(II)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,"__CPROVER_uninterpreted_string_insert_int_func",string_builders);	  
+	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,cprover_string_insert_int_func,string_builders);	  
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.insert:(IJ)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,"__CPROVER_uninterpreted_string_insert_long_func",string_builders);	  
+	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,cprover_string_insert_long_func,string_builders);	  
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.insert:(IC)Ljava/lang/StringBuilder;")) {
-	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,"__CPROVER_uninterpreted_string_insert_char_func",string_builders);	  
+	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,cprover_string_insert_char_func,string_builders);	  
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.insert:(IZ)Ljava/lang/StringBuilder;") ) {
-	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,"__CPROVER_uninterpreted_string_insert_bool_func",string_builders);	  
+	  make_string_function_side_effect(symbol_table, goto_functions, goto_program, i_it,cprover_string_insert_bool_func,string_builders);	  
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.setCharAt:(IC)V")) {
 	  // warning: this should return void type
 	  make_string_function_side_effect
 	    (symbol_table, goto_functions, goto_program, i_it,
-	     "__CPROVER_uninterpreted_string_char_set_func",string_builders);
+	     cprover_string_char_set_func,string_builders);
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.toString:()Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_copy");
+			       cprover_string_copy_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.<init>:(Ljava/lang/String;)V")
 		  || function_id == irep_idt
 		  ("java::java.lang.String.<init>:(Ljava/lang/StringBuilder;)V")) {
 	  make_string_function_call(symbol_table, goto_functions, i_it,
-				    "__CPROVER_uninterpreted_string_copy");
+				    cprover_string_copy_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.StringBuilder.<init>:(Ljava/lang/String;)V")) {
 	  make_string_function_call(symbol_table, goto_functions, i_it,
-				    "__CPROVER_uninterpreted_string_copy");
+				    cprover_string_copy_func);
 	} else if(function_id == irep_idt("java::java.lang.String.<init>:()V")) {
 	  make_string_function_call(symbol_table, goto_functions, i_it,
-				    "__CPROVER_uninterpreted_empty_string");
+				    cprover_string_empty_string_func);
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.<init>:()V")) {
 	  make_string_function_call(symbol_table, goto_functions, i_it,
-				    "__CPROVER_uninterpreted_empty_string");
+				    cprover_string_empty_string_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.Integer.toString:(I)Ljava/lang/String;")
 		  || function_id == irep_idt
 		  ("java::java.lang.String.valueOf:(I)Ljava/lang/String;")
 		  ) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_of_int_func");
+			       cprover_string_of_int_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.Integer.toHexString:(I)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_of_int_hex_func");
+			       cprover_string_of_int_hex_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.valueOf:(L)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_of_long");
+			       cprover_string_of_long_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.valueOf:(F)Ljava/lang/String;")
 		  ||function_id == irep_idt
 		  ("java::java.lang.Float.toString:(F)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_of_float");
+			       cprover_string_of_float_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.valueOf:(D)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_of_double");
+			       cprover_string_of_double_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.valueOf:(Z)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_of_bool");
+			       cprover_string_of_bool_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.valueOf:(C)Ljava/lang/String;")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_of_char_func");
+			       cprover_string_of_char_func);
 
 	} else if(function_id == irep_idt
 		  ("java::java.lang.Integer.parseInt:(Ljava/lang/String;)I")) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_parse_int");
+			       cprover_string_parse_int_func);
 	} else if(function_id == irep_idt
 		  ("java::java.lang.String.valueOf:([CII)Ljava/lang/String;")
 		  ||function_id == irep_idt
 		  ("java::java.lang.String.valueOf:([C)Ljava/lang/String;")
 		  ) {
 	  make_string_function(symbol_table, goto_functions, i_it,
-			       "__CPROVER_uninterpreted_string_value_of");
+			       cprover_string_value_of_func);
 	} else if(function_id == irep_idt("java::java.lang.StringBuilder.setLength:(I)V")) {
 	  make_string_function_side_effect(symbol_table, goto_functions,goto_program, i_it,
-					   "__CPROVER_uninterpreted_string_set_length",string_builders);
-
+					   cprover_string_set_length_func,string_builders);
+	} else if(function_id == irep_idt("java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;")) {
+	  make_string_function(symbol_table, goto_functions, i_it,
+			       cprover_string_format_func);
 	}
       } 
 
@@ -398,13 +399,13 @@ exprt replace_string_literals(symbol_tablet & symbol_table,goto_functionst & got
 	function_application_exprt rhs;
 	rhs.type()=expr.type();
 	rhs.add_source_location()=expr.source_location();
-	rhs.function()=symbol_exprt("__CPROVER_uninterpreted_string_literal");
-	goto_functions.function_map[irep_idt("__CPROVER_uninterpreted_string_literal")];
+	rhs.function()=symbol_exprt(cprover_string_literal_func);
+	goto_functions.function_map[cprover_string_literal_func];
 	rhs.arguments().push_back(address_of_exprt(expr.op0()));
 	auxiliary_symbolt tmp_symbol;
 	tmp_symbol.is_static_lifetime=false;
 	tmp_symbol.mode=ID_java;
-	tmp_symbol.name="__CPROVER_uninterpreted_string_literal";
+	tmp_symbol.name=cprover_string_literal_func;
 	symbol_table.add(tmp_symbol);
 	return rhs;
       }

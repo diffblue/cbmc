@@ -11,9 +11,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <ansi-c/string_constant.h>
 #include <util/unicode.h>
 #include <solvers/floatbv/float_bv.h>
+
 exprt index_zero = refined_string_typet::index_zero();
 unsigned string_exprt::next_symbol_id = 1;
-
 
 symbol_exprt string_exprt::fresh_symbol(const irep_idt &prefix,
 					  const typet &tp)
@@ -111,77 +111,79 @@ void string_exprt::of_function_application(const function_application_exprt & ex
   const exprt &name = expr.function();
   if (name.id() == ID_symbol) {
     const irep_idt &id = to_symbol_expr(name).get_identifier();
-    if (is_string_literal_func(id)) {
-      return of_string_literal(expr,axioms);
-    } else if (is_string_concat_func(id)) {
+    if(starts_with(id,cprover_string_literal_func))
+       return of_string_literal(expr,axioms);
+    else if(starts_with(id,cprover_string_concat_func))
       return of_string_concat(expr,symbol_to_string,axioms);
-    } else if (is_string_concat_int_func(id)) {
+    else if(starts_with(id,cprover_string_concat_int_func))
       return of_string_concat_int(expr,symbol_to_string,axioms);
-    } else if (is_string_concat_long_func(id)) {
+    else if(starts_with(id,cprover_string_concat_long_func))
       return of_string_concat_long(expr,symbol_to_string,axioms);
-    } else if (is_string_concat_bool_func(id)) {
+    else if(starts_with(id,cprover_string_concat_bool_func))
       return of_string_concat_bool(expr,symbol_to_string,axioms);
-    } else if (is_string_concat_char_func(id)) {
+    else if(starts_with(id,cprover_string_concat_char_func))
       return of_string_concat_char(expr,symbol_to_string,axioms);
-    } else if (is_string_concat_double_func(id)) {
+    else if(starts_with(id,cprover_string_concat_double_func))
       return of_string_concat_double(expr,symbol_to_string,axioms);
-    } else if (is_string_concat_float_func(id)) {
+    else if(starts_with(id,cprover_string_concat_float_func))
       return of_string_concat_float(expr,symbol_to_string,axioms);
-    } else if (is_string_concat_code_point_func(id)) {
+    else if(starts_with(id,cprover_string_concat_code_point_func))
       return of_string_concat_code_point(expr,symbol_to_string,axioms);
-    } else if (is_string_insert_func(id)) {
+    else if(starts_with(id,cprover_string_insert_func))
       return of_string_insert(expr,symbol_to_string,axioms);
-    } else if (is_string_insert_int_func(id)) {
+    else if(starts_with(id,cprover_string_insert_int_func))
       return of_string_insert_int(expr,symbol_to_string,axioms);
-    } else if (is_string_insert_long_func(id)) {
+    else if(starts_with(id,cprover_string_insert_long_func))
       return of_string_insert_long(expr,symbol_to_string,axioms);
-    } else if (is_string_insert_bool_func(id)) {
+    else if(starts_with(id,cprover_string_insert_bool_func))
       return of_string_insert_bool(expr,symbol_to_string,axioms);
-    } else if (is_string_insert_char_func(id)) {
+    else if(starts_with(id,cprover_string_insert_char_func))
       return of_string_insert_char(expr,symbol_to_string,axioms);
-    } else if (is_string_insert_double_func(id)) {
+    else if(starts_with(id,cprover_string_insert_double_func))
       return of_string_insert_double(expr,symbol_to_string,axioms);
-    } else if (is_string_insert_float_func(id)) {
+    else if(starts_with(id,cprover_string_insert_float_func))
       return of_string_insert_float(expr,symbol_to_string,axioms);
-    } else if (is_string_substring_func(id)) {
+    else if(starts_with(id,cprover_string_substring_func))
       return of_string_substring(expr,symbol_to_string,axioms);
-    } else if (is_string_trim_func(id)) {
+    else if(starts_with(id,cprover_string_trim_func))
       return of_string_trim(expr,symbol_to_string,axioms);
-    } else if (is_string_to_lower_case_func(id)) {
+    else if(starts_with(id,cprover_string_to_lower_case_func))
       return of_string_to_lower_case(expr,symbol_to_string,axioms);
-    } else if (is_string_to_upper_case_func(id)) {
+    else if(starts_with(id,cprover_string_to_upper_case_func))
       return of_string_to_upper_case(expr,symbol_to_string,axioms);
-    } else if (is_string_char_set_func(id)) {
+    else if(starts_with(id,cprover_string_char_set_func))
       return of_string_char_set(expr,symbol_to_string,axioms);
-    } else if (is_string_value_of_func(id)) {
+    else if(starts_with(id,cprover_string_value_of_func))
       return of_string_value_of(expr,axioms);
-    } else if (is_string_empty_string_func(id)) {
+    else if(starts_with(id,cprover_string_empty_string_func))
       return of_empty_string(expr,axioms);
-    } else if (is_string_copy_func(id)) {
+    else if(starts_with(id,cprover_string_copy_func))
       return of_string_copy(expr,symbol_to_string,axioms);
-    } else if (is_string_of_int_func(id)) {
+    else if(starts_with(id,cprover_string_of_int_func))
       return of_int(expr,axioms);
-    } else if (is_string_of_int_hex_func(id)) {
+    else if(starts_with(id,cprover_string_of_int_hex_func))
       return of_int_hex(expr,axioms);
-    } else if (is_string_of_float_func(id)) {
+    else if(starts_with(id,cprover_string_of_float_func))
       return of_float(expr,axioms);
-    } else if (is_string_of_double_func(id)) {
+    else if(starts_with(id,cprover_string_of_double_func))
       return of_double(expr,axioms);
-    } else if (is_string_of_long_func(id)) {
+    else if(starts_with(id,cprover_string_of_long_func))
       return of_long(expr,axioms);
-    } else if (is_string_of_bool_func(id)) {
+    else if(starts_with(id,cprover_string_of_bool_func))
       return of_bool(expr,axioms);
-    } else if (is_string_of_char_func(id)) {
+    else if(starts_with(id,cprover_string_of_char_func))
       return of_char(expr,axioms);
-    } else if (is_string_set_length_func(id)) {
+    else if(starts_with(id,cprover_string_set_length_func))
       return of_string_set_length(expr,symbol_to_string,axioms);
-    } else if (is_string_delete_func(id)) {
+    else if(starts_with(id,cprover_string_delete_func))
       return of_string_delete(expr,symbol_to_string,axioms);
-    } else if (is_string_delete_char_at_func(id)) {
+    else if(starts_with(id,cprover_string_delete_char_at_func))
       return of_string_delete_char_at(expr,symbol_to_string,axioms);
-    } else if (is_string_replace_func(id)) {
+    else if(starts_with(id,cprover_string_replace_func))
       return of_string_replace(expr,symbol_to_string,axioms);
-    } else {
+    else if(starts_with(id,cprover_string_format_func))
+      return of_string_format(expr,symbol_to_string,axioms);
+    else {
       std::string msg("string_exprt::of_function_application: unknown symbol :");
       msg+=id.c_str();
       throw msg;
@@ -1119,7 +1121,8 @@ void string_exprt::of_string_insert_double(const function_application_exprt &f, 
   of_string_insert(s1,s2,args[1],symbol_to_string,axioms);
 }
 
-void string_exprt::of_string_insert_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+void string_exprt::of_string_insert_float(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms)
+{
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 3); 
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
@@ -1129,3 +1132,69 @@ void string_exprt::of_string_insert_float(const function_application_exprt &f, s
 }
 
 
+#include <iostream>
+
+void string_exprt::of_string_format(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
+  const function_application_exprt::argumentst &args = f.arguments();
+  // warning this is right now only for java:
+  bool is_c_string = false;
+  unsignedbv_typet char_type = is_c_string?refined_string_typet::char_type():refined_string_typet::java_char_type();
+  size_t char_width = is_c_string?STRING_SOLVER_CHAR_WIDTH:JAVA_STRING_SOLVER_CHAR_WIDTH;
+
+  if(args.size() == 2) 
+    {
+
+      // Warning: this is not very clean:
+      irep_idt literal = extract_java_string(to_symbol_expr(args[0].op1().op0().op0()));
+      std::string format_string = id2string(literal);
+      std::cout << "string_exprt::of_string_format " << format_string << std::endl;
+      size_t position = format_string.find_first_of('%');
+      std::vector<string_exprt> strings;
+      int arg_counter = 0;
+
+      string_exprt begin(char_type);
+      begin.of_string_constant(format_string.substr(0,position),char_width,char_type,axioms);
+      strings.push_back(begin);
+
+      while(position != std::string::npos) 
+	{
+	  std::cout << "string format: position = " << position << std::endl;
+	  switch(format_string[position+1]) {
+	  case 'd' : 
+	    {
+	    string_exprt str(char_type);
+	    str.of_int(/*index_exprt(args[1],refined_string_typet::index_of_int(arg_counter++))*/args[++arg_counter],axioms,is_c_string,10);
+	    std::cout << "argument : " << args[arg_counter].pretty() << std::endl;
+	    strings.push_back(str);
+	    break;
+	    }
+
+	  default:
+	    {
+	      std::cout << "warning: unknown string format: " << format_string << std::endl;
+	      break;
+	    }
+	  }
+	  size_t new_position = format_string.find_first_of('%',position+2);
+	  if(new_position != std::string::npos) {
+	    string_exprt str(char_type);
+	    str.of_string_constant(format_string.substr(position+2,new_position),char_width,char_type,axioms);
+	    strings.push_back(str);
+	  }
+	  position = new_position;
+	}
+
+     
+      string_exprt * concatenation = &strings[0];
+      int i;
+      for(i = 1; i < strings.size() - 1; i++)
+	{
+	  string_exprt str(refined_string_typet::java_char_type());
+	  str.of_string_concat(*concatenation,strings[i],axioms);
+	  concatenation = &str;
+	}
+      
+      of_string_concat(*concatenation,strings[i],axioms);
+    }
+  
+}
