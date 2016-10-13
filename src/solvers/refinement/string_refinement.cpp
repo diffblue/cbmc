@@ -770,13 +770,27 @@ exprt string_refinementt::convert_string_index_of(const string_exprt &str, const
   return index;
 }
 
-exprt string_refinementt::convert_string_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index){
-  symbol_exprt index = fresh_index("index_of");
+exprt string_refinementt::convert_string_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index)
+{
+  symbol_exprt offset = fresh_index("index_of");
   
-  debug() << "warning: string_refinementt::convert_string_index_of_string:"
-	  << "not generating all requiered constraints" << eom;
-  string_axioms.push_back(string_constraintt(true_exprt()).exists(index,refined_string_typet::index_of_int(-1),str.length()));
-  return index;
+  symbol_exprt contains = fresh_boolean("contains_substring");
+  string_axioms.emplace_back(contains, and_exprt
+			     (str >= plus_exprt(substring.length(),offset),
+			      binary_relation_exprt(offset,ID_ge,from_index)));
+  string_axioms.emplace_back(not_exprt(contains), equal_exprt(offset,refined_string_typet::index_of_int(-1)));
+  
+  // forall 0 <= witness < substring.length. contains => str[witness+offset] = substring[witness]
+  symbol_exprt qvar = string_exprt::fresh_symbol("QA_index_of_string", index_type);
+  string_axioms.push_back
+    (string_constraintt(contains, equal_exprt(str[plus_exprt(qvar,offset)],substring[qvar])
+			).forall(qvar,zero,substring.length()));
+	     
+
+  debug() << "string_refinementt::convert_string_index_of_string : warning the stpecification is only partial" << eom;
+
+  return offset; 
+
 }
 
 
