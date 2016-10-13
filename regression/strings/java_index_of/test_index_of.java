@@ -8,8 +8,7 @@ public class test_index_of {
 	int k = s.indexOf(c,5);
 	int l = s.lastIndexOf(c,5);
 	int m = s.indexOf("lo");
-
-
+	int n = s.lastIndexOf("lo");
 	if(argv.length == 1){
 	    assert(i == 4);
 	    assert(i != 4);
@@ -27,6 +26,7 @@ public class test_index_of {
 	    assert(l != 4);
 	} else {
 	    assert(m != 2);
+	    assert(n != 2);
 	}
     }
 }

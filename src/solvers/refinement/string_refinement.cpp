@@ -790,7 +790,26 @@ exprt string_refinementt::convert_string_index_of_string(const string_exprt &str
   debug() << "string_refinementt::convert_string_index_of_string : warning the stpecification is only partial" << eom;
 
   return offset; 
+}
 
+exprt string_refinementt::convert_string_last_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index)
+{
+  symbol_exprt offset = fresh_index("index_of");
+  
+  symbol_exprt contains = fresh_boolean("contains_substring");
+  string_axioms.emplace_back(contains, and_exprt
+			     (str >= plus_exprt(substring.length(),offset),
+			      binary_relation_exprt(offset,ID_le,from_index)));
+  string_axioms.emplace_back(not_exprt(contains), equal_exprt(offset,refined_string_typet::index_of_int(-1)));
+  
+  // forall 0 <= witness < substring.length. contains => str[witness+offset] = substring[witness]
+  symbol_exprt qvar = string_exprt::fresh_symbol("QA_index_of_string", index_type);
+  string_axioms.push_back
+    (string_constraintt(contains, equal_exprt(str[plus_exprt(qvar,offset)],substring[qvar])
+			).forall(qvar,zero,substring.length()));
+
+  debug() << "string_refinementt::convert_string_last_index_of_string : warning the stpecification is only partial" << eom;
+  return offset; 
 }
 
 
@@ -802,7 +821,6 @@ exprt string_refinementt::convert_string_index_of(
   string_exprt str = make_string(args[0]);
   exprt c = args[1];
   exprt from_index;
-
 
   if(args.size() == 2) from_index = zero;
   else if (args.size() == 3) from_index = args[2];
@@ -853,17 +871,21 @@ exprt string_refinementt::convert_string_last_index_of(
   exprt c = args[1];
   exprt from_index;
 
-  if(!(c.type() == char_type || c.type() == java_char_type)){
-    debug() << "warning: argument to string_index_of does not have char type: " 
-	    << c.type().pretty() << eom;    
-    c = typecast_exprt(c,java_char_type);
-  }
-
   if(args.size() == 2) from_index = minus_exprt(str.length(),refined_string_typet::index_of_int(1));
   else if (args.size() == 3) from_index = args[2];
   else assert(false);
 
-  return convert_string_last_index_of(str,c,from_index);
+  if(refined_string_typet::is_java_string_type(c.type())){
+    string_exprt sub = make_string(c);
+    return convert_string_last_index_of_string(str,sub,from_index);    
+  } else {
+    if(!(c.type() == char_type || c.type() == java_char_type)){
+      debug() << "warning: argument to string_index_of does not have char type: " 
+	      << c.type().pretty() << eom;    
+      c = typecast_exprt(c,java_char_type);
+    }
+    return convert_string_last_index_of(str,c,from_index);
+  }
 }
 
 bvt string_refinementt::convert_char_literal(
