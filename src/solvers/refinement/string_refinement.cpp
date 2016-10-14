@@ -69,10 +69,10 @@ literalt string_refinementt::convert_rest(const exprt &expr)
       assert(bv.size() == 1); 
       return bv[0];
     }
-  else {
-    //debug() << "string_refinementt::convert_rest("<< pretty_short(expr) << ")" << eom;
-    return SUB::convert_rest(expr);
-  }
+  else
+    {
+      return SUB::convert_rest(expr);
+    }
 }
 
 bvt string_refinementt::convert_pointer_type(const exprt &expr)
@@ -82,20 +82,19 @@ bvt string_refinementt::convert_pointer_type(const exprt &expr)
       bvt bv = convert_function_application(to_function_application_expr(expr));
       return bv;
     }
-  else {
-    debug() << "string_refinementt::convert_pointer_type("<< pretty_short(expr) << ")" << eom;
-    return SUB::convert_pointer_type(expr);
-  }
+  else
+    {
+      debug() << "string_refinementt::convert_pointer_type("<< pretty_short(expr) << ")" << eom;
+      return SUB::convert_pointer_type(expr);
+    }
 }
 
 void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str) 
 {
   debug() << "string_refinementt::make_string of " << pretty_short(sym) << eom;
-  //<< " --> " << pretty_short(str) << eom;
   if(str.id()==ID_symbol) 
     assign_to_symbol(sym,string_of_symbol(to_symbol_expr(str)));
   else {
-    // assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
     if (str.id() == ID_function_application && 
 	starts_with(to_symbol_expr(to_function_application_expr(str).function()).get_identifier(),cprover_string_intern_func)) {
 	  symbol_exprt sym1 = convert_string_intern(to_function_application_expr(str));
@@ -106,7 +105,6 @@ void string_refinementt::make_string(const symbol_exprt & sym, const exprt & str
 	else 
 	  assign_to_symbol(sym,string_exprt::of_expr(str,symbol_to_string,string_axioms));
   }
-  //debug() << "string = " << symbol_to_string[sym.get_identifier()].pretty() << eom;
 }
 
 string_exprt string_refinementt::make_string(const exprt & str) 
@@ -194,11 +192,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 {
   const typet &type = expr.type();
   const irep_idt &identifier = expr.get(ID_identifier);
-  if(identifier.empty())
-    //throw "string_refinementt::convert_symbol got empty identifier";
-    assert(false);
-
-  //debug() << "convert symbol " << expr << eom;
+  assert(!identifier.empty());
 
   if (refined_string_typet::is_unrefined_string_type(type)) {
     debug() << "string_refinementt::convert_symbol of unrefined string" << eom;
@@ -306,25 +300,8 @@ void string_refinementt::print_time(std::string s) {
 	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
 }
 
-// We add instantiations before launching the solver
 void string_refinementt::post_process()
 {  
-
-  /*
-  debug() << not_contains_axioms.size() << " not_contains constraints" << eom;
-  nb_sat_iteration = 0;
-  debug() << "string_refinementt::post_process  at step" << step++ << " time in ms "
-	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
-
-  debug() << "string_refinementt::post_process: warning update_index_set has to be checked" << eom;
-  update_index_set(universal_axioms);
-  update_index_set(cur); 
-  cur.clear();
-  add_instantiations();
-  debug() << "string_refinementt::post_process  at step" << step++ << " time in ms "
-	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
-  */
-
   SUB::post_process();
 }
 

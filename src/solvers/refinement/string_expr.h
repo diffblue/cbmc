@@ -127,7 +127,7 @@ private:
   void of_char(const function_application_exprt &f, axiom_vect & axioms);
   void of_char(const exprt &i, axiom_vect & axioms, bool is_c_string);
 
-  // Warning: the specifications of these functions is only partial:
+  // Warning: the specifications of these functions are only partial:
   void of_float(const function_application_exprt &f, axiom_vect & axioms);
   void of_float(const exprt &f, axiom_vect & axioms, bool is_c_string, bool double_precision=false);
   void of_double(const function_application_exprt &f, axiom_vect & axioms);

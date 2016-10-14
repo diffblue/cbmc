@@ -26,20 +26,26 @@ symbol_exprt string_exprt::fresh_symbol(const irep_idt &prefix,
   return symbol_exprt(name, tp);
 }
 
-constant_exprt constant_of_nat(int i,int width, typet t) {
+constant_exprt constant_of_nat(int i,int width, typet t)
+{
   return constant_exprt(integer2binary(i,width), t);
 }
 
-string_exprt::string_exprt(unsignedbv_typet char_type) : struct_exprt(refined_string_typet(char_type))
+string_exprt::string_exprt(unsignedbv_typet char_type) 
+  : struct_exprt(refined_string_typet(char_type))
 {
   refined_string_typet t(char_type);
-  symbol_exprt length = fresh_symbol("string_length",refined_string_typet::index_type());
-  symbol_exprt content = fresh_symbol("string_content",t.get_content_type());
+  symbol_exprt length;
+  length = fresh_symbol("string_length",refined_string_typet::index_type());
+  symbol_exprt content;
+  content = fresh_symbol("string_content",t.get_content_type());
   move_to_operands(length,content);
 }
 
 
-void string_exprt::of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+void string_exprt::of_if
+(const if_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, 
+ axiom_vect & axioms)
 {
   assert(refined_string_typet::is_unrefined_string_type(expr.true_case().type()));
   string_exprt t = of_expr(expr.true_case(),symbol_to_string,axioms);
@@ -47,16 +53,21 @@ void string_exprt::of_if(const if_exprt &expr, std::map<irep_idt, string_exprt> 
   string_exprt f = of_expr(expr.false_case(),symbol_to_string,axioms);
 
   axioms.emplace_back(expr.cond(),equal_exprt(length(),t.length()));
-  symbol_exprt qvar = fresh_symbol("string_if_true",refined_string_typet::index_type());
-  axioms.push_back(string_constraintt(expr.cond(),equal_exprt((*this)[qvar],t[qvar])).forall(qvar,index_zero,t.length()));
+  symbol_exprt qvar;
+  qvar = fresh_symbol("string_if_true",refined_string_typet::index_type());
+  string_constraintt if_true(expr.cond(),equal_exprt((*this)[qvar],t[qvar]));
+  axioms.push_back(if_true.forall(qvar,index_zero,t.length()));
   
   axioms.emplace_back(not_exprt(expr.cond()),equal_exprt(length(),f.length()));
   symbol_exprt qvar2 = fresh_symbol("string_if_false",refined_string_typet::index_type());
-  axioms.push_back(string_constraintt(not_exprt(expr.cond()),equal_exprt((*this)[qvar2],f[qvar2])).forall(qvar2,index_zero,f.length()));
+  string_constraintt if_false(not_exprt(expr.cond()),equal_exprt((*this)[qvar2],f[qvar2]));
+  axioms.push_back(if_false.forall(qvar2,index_zero,f.length()));
 }
 
 
-string_exprt string_exprt::get_string_of_symbol(std::map<irep_idt, string_exprt> & symbol_to_string, const symbol_exprt & sym) {
+string_exprt string_exprt::get_string_of_symbol
+(std::map<irep_idt, string_exprt> & symbol_to_string, const symbol_exprt & sym) 
+{
   if(refined_string_typet::is_c_string_type(sym.type())) {
     irep_idt id = sym.get_identifier();
     std::map<irep_idt, string_exprt>::iterator f = symbol_to_string.find(id);
@@ -75,7 +86,9 @@ string_exprt string_exprt::get_string_of_symbol(std::map<irep_idt, string_exprt>
 
 }
 
-string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+string_exprt string_exprt::of_expr
+(const exprt & unrefined_string, 
+ std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   unsignedbv_typet char_type;
 
@@ -107,7 +120,9 @@ string_exprt string_exprt::of_expr(const exprt & unrefined_string, std::map<irep
   return s;
 }
 
-void string_exprt::of_function_application(const function_application_exprt & expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+void string_exprt::of_function_application
+(const function_application_exprt & expr, 
+ std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const exprt &name = expr.function();
   if (name.id() == ID_symbol) {
@@ -184,23 +199,26 @@ void string_exprt::of_function_application(const function_application_exprt & ex
       return of_string_replace(expr,symbol_to_string,axioms);
     else if(starts_with(id,cprover_string_format_func))
       return of_string_format(expr,symbol_to_string,axioms);
-    else {
-      std::string msg("string_exprt::of_function_application: unknown symbol :");
-      msg+=id.c_str();
-      throw msg;
-    }
+    else
+      {
+	std::string msg("string_exprt::of_function_application: unknown symbol :");
+	msg+=id.c_str();
+	throw msg;
+      }
   }
   throw "string_exprt::of_function_application: not a string function";
 }
 
-irep_idt string_exprt::extract_java_string(const symbol_exprt & s){
+irep_idt string_exprt::extract_java_string(const symbol_exprt & s)
+{
   std::string tmp(s.get(ID_identifier).c_str());
   std::string value = tmp.substr(31);
   return irep_idt(value);
 }
 
-void string_exprt::of_string_constant(irep_idt sval, int char_width, unsignedbv_typet char_type, axiom_vect &axioms){
-
+void string_exprt::of_string_constant
+(irep_idt sval, int char_width, unsignedbv_typet char_type, axiom_vect &axioms)
+{
   std::string str = sval.c_str();
   // should only do this for java
   std::wstring utf16 = utf8_to_utf16(str);
@@ -224,16 +242,18 @@ void string_exprt::of_string_constant(irep_idt sval, int char_width, unsignedbv_
   axioms.emplace_back(equal_exprt(length(),s_length));
 }
 				   
-void string_exprt::of_empty_string(const function_application_exprt &f, axiom_vect & axioms)
+void string_exprt::of_empty_string
+(const function_application_exprt &f, axiom_vect & axioms)
 {
   assert(f.arguments().size() == 0); 
   axioms.emplace_back(equal_exprt(length(),index_zero));
 }
 
-void string_exprt::of_string_literal(const function_application_exprt &f, axiom_vect & axioms)
+void string_exprt::of_string_literal
+(const function_application_exprt &f, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 1); //bad args to string literal?
+  assert(args.size() == 1);
   const exprt &arg = args[0];
 
   irep_idt sval; 
@@ -257,7 +277,8 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
     assert(refined_string_typet::is_unrefined_string_type(arg.type()));
     const exprt &s = arg.op0();
     
-    //it seems the value of the string is lost, we need to recover it from the identifier
+    // it seems the value of the string is lost, 
+    // we need to recover it from the identifier
     sval = extract_java_string(to_symbol_expr(s));
     char_width = JAVA_STRING_SOLVER_CHAR_WIDTH;
     char_type = refined_string_typet::java_char_type();
@@ -267,7 +288,9 @@ void string_exprt::of_string_literal(const function_application_exprt &f, axiom_
 }
 
 
-void string_exprt::of_string_concat(const string_exprt & s1, const string_exprt & s2, axiom_vect & axioms) {
+void string_exprt::of_string_concat
+(const string_exprt & s1, const string_exprt & s2, axiom_vect & axioms) 
+{
   equal_exprt length_sum_lem(length(), plus_exprt(s1.length(), s2.length()));
   axioms.emplace_back(length_sum_lem);
 
@@ -276,14 +299,15 @@ void string_exprt::of_string_concat(const string_exprt & s1, const string_exprt 
   string_constraintt a1(equal_exprt(s1[idx],(*this)[idx]));
   axioms.push_back(a1.forall(idx, index_zero, s1.length()));
 
-
   symbol_exprt idx2 = fresh_symbol("QA_index_concat2",refined_string_typet::index_type());
 
   string_constraintt a2(equal_exprt(s2[idx2],(*this)[plus_exprt(idx2,s1.length())]));
   axioms.push_back(a2.forall(idx2, index_zero, s2.length()));
 }
 
-void string_exprt::of_string_concat(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+void string_exprt::of_string_concat
+(const function_application_exprt &f, 
+ std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2); //bad args to string concat
@@ -296,7 +320,9 @@ void string_exprt::of_string_concat(const function_application_exprt &f, std::ma
 
 
 
-void string_exprt::of_string_copy(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+void string_exprt::of_string_copy
+(const function_application_exprt &f, 
+ std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 1);
@@ -308,17 +334,22 @@ void string_exprt::of_string_copy(const function_application_exprt &f, std::map<
   axioms.push_back(a1.forall(idx, index_zero, s1.length()));  
 }
 
-void string_exprt::of_string_set_length(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+void string_exprt::of_string_set_length
+(const function_application_exprt &f, 
+ std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2);
 
   bool is_c_string = refined_string_typet::is_c_string_type(f.type());
+  typet char_type = is_c_string?refined_string_typet::char_type():
+    refined_string_typet::java_char_type();
   exprt null_char;
+
   if(is_c_string)
-    null_char = constant_of_nat(0,STRING_SOLVER_CHAR_WIDTH,refined_string_typet::char_type());
+    null_char = constant_of_nat(0,STRING_SOLVER_CHAR_WIDTH,char_type);
   else 
-    null_char = constant_of_nat(0,JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    null_char = constant_of_nat(0,JAVA_STRING_SOLVER_CHAR_WIDTH,char_type);
   
   string_exprt s1 = string_exprt::of_expr(args[0],symbol_to_string,axioms);
 
@@ -327,7 +358,6 @@ void string_exprt::of_string_set_length(const function_application_exprt &f, std
 
   axioms.emplace_back(equal_exprt(length(), args[1]));
   symbol_exprt idx = fresh_symbol("QA_index_set_length",refined_string_typet::index_type());
-
   
   string_constraintt a1
     (and_exprt(implies_exprt(s1 > idx, equal_exprt(s1[idx],(*this)[idx])),
@@ -337,7 +367,8 @@ void string_exprt::of_string_set_length(const function_application_exprt &f, std
 
 
 
-void string_exprt::of_java_char_array(const exprt & char_array, axiom_vect & axioms)
+void string_exprt::of_java_char_array
+(const exprt & char_array, axiom_vect & axioms)
 {
   exprt arr = to_address_of_expr(char_array).object();
   exprt len = member_exprt(arr, "length",length().type());
@@ -347,7 +378,8 @@ void string_exprt::of_java_char_array(const exprt & char_array, axiom_vect & axi
 }
  
 
-void string_exprt::of_string_value_of(const function_application_exprt &f, axiom_vect & axioms)
+void string_exprt::of_string_value_of
+(const function_application_exprt &f, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   if(args.size() == 3)
@@ -405,7 +437,8 @@ void string_exprt::of_string_substring
 }
 
 void string_exprt::of_string_trim
-(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+(const function_application_exprt &expr, 
+ std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = expr.arguments();  
   assert(args.size() == 1);
@@ -424,8 +457,7 @@ void string_exprt::of_string_trim
   axioms.emplace_back(binary_relation_exprt(idx, ID_ge, index_zero));
   axioms.emplace_back(str >= idx);
   axioms.emplace_back(str >= length());
-  ///axioms.emplace_back(binary_relation_exprt(length(), ID_gt, index_zero));
-
+ 
   symbol_exprt n = fresh_symbol("QA_index_trim",refined_string_typet::index_type());
   // forall n < m, str[n] = ' '
   string_constraintt a(equal_exprt(str[n], space_char));
@@ -449,7 +481,8 @@ void string_exprt::of_string_trim
 }
 
 void string_exprt::of_string_to_lower_case
-(const function_application_exprt &expr, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
+(const function_application_exprt &expr, 
+ std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect & axioms)
 {
   const function_application_exprt::argumentst &args = expr.arguments();  
   assert(args.size() == 1);
@@ -1132,9 +1165,6 @@ void string_exprt::of_string_insert_float(const function_application_exprt &f, s
   of_string_insert(s1,s2,args[1],symbol_to_string,axioms);
 }
 
-
-#include <iostream>
-
 void string_exprt::of_string_format(const function_application_exprt &f, std::map<irep_idt, string_exprt> & symbol_to_string, axiom_vect &axioms){
   const function_application_exprt::argumentst &args = f.arguments();
   // warning this is right now only for java:
@@ -1148,7 +1178,6 @@ void string_exprt::of_string_format(const function_application_exprt &f, std::ma
       // Warning: this is not very clean:
       irep_idt literal = extract_java_string(to_symbol_expr(args[0].op1().op0().op0()));
       std::string format_string = id2string(literal);
-      std::cout << "string_exprt::of_string_format " << format_string << std::endl;
       size_t position = format_string.find_first_of('%');
       std::vector<string_exprt> strings;
       int arg_counter = 0;
@@ -1156,13 +1185,11 @@ void string_exprt::of_string_format(const function_application_exprt &f, std::ma
       string_exprt begin(char_type);
       begin.of_string_constant(format_string.substr(0,position),char_width,char_type,axioms);
       strings.push_back(begin);
-      std::cout << "string_exprt::of_string_format : " << f.pretty() << std::endl;
+
       typecast_exprt arg_tab(member_exprt(args[1].op0(),"data"),array_typet(java_type_from_string("Ljava/lang/Object;"),infinity_exprt(refined_string_typet::index_type())));
-      std::cout << "string_exprt::array_tab : " << arg_tab.pretty() << std::endl;
 
       while(position != std::string::npos) 
 	{
-	  std::cout << "string format: position = " << position << std::endl;
 	  switch(format_string[position+1]) {
 	  case 'd' : 
 	    {
@@ -1174,7 +1201,6 @@ void string_exprt::of_string_format(const function_application_exprt &f, std::ma
 
 	  default:
 	    {
-	      std::cout << "warning: unknown string format: " << format_string << std::endl;
 	      break;
 	    }
 	  }
