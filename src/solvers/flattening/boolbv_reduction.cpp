@@ -62,7 +62,7 @@ literalt boolbvt::convert_reduction(const unary_exprt &expr)
 
 /*******************************************************************\
 
-Function: boolbvt::convert_reduction
+Function: boolbvt::convert_bv_reduction
 
   Inputs:
 
@@ -72,7 +72,7 @@ Function: boolbvt::convert_reduction
 
 \*******************************************************************/
 
-void boolbvt::convert_reduction(const unary_exprt &expr, bvt &bv)
+bvt boolbvt::convert_bv_reduction(const unary_exprt &expr)
 {
   const bvt &op_bv=convert_bv(expr.op());
 
@@ -101,6 +101,7 @@ void boolbvt::convert_reduction(const unary_exprt &expr, bvt &bv)
         expr.type().id()==ID_verilog_unsignedbv) &&
         expr.type().get_int(ID_width)==1)
     {
+      bvt bv;
       bv.resize(2);
       
       literalt l0=op_bv[0], l1=op_bv[1];
@@ -132,10 +133,9 @@ void boolbvt::convert_reduction(const unary_exprt &expr, bvt &bv)
       bv[0]=l0;
       bv[1]=l1;
 
-      return;
+      return bv;
     }
   }
 
-
-  return conversion_failed(expr, bv);
+  return conversion_failed(expr);
 }

@@ -30,14 +30,14 @@ protected:
   
   void encode(unsigned object, bvt &bv);
   
-  virtual void convert_pointer_type(const exprt &expr, bvt &bv);
+  virtual bvt convert_pointer_type(const exprt &expr);
   
   virtual void add_addr(const exprt &expr, bvt &bv);
   
   // overloading
   virtual literalt convert_rest(const exprt &expr);
   
-  virtual void convert_bitvector(const exprt &expr, bvt &bv); // no cache
+  virtual bvt convert_bitvector(const exprt &expr); // no cache
 
   virtual exprt bv_get_rec(
     const bvt &bv,

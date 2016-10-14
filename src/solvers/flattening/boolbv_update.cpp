@@ -18,6 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+// for debugging
+#include <iostream>
+
 /*******************************************************************\
 
 Function: boolbvt::convert_update
@@ -30,7 +33,7 @@ Function: boolbvt::convert_update
 
 \*******************************************************************/
 
-void boolbvt::convert_update(const exprt &expr, bvt &bv)
+bvt boolbvt::convert_update(const exprt &expr)
 {
   const exprt::operandst &ops=expr.operands();
 
@@ -40,9 +43,9 @@ void boolbvt::convert_update(const exprt &expr, bvt &bv)
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
-  bv=convert_bv(ops[0]);
+  bvt bv=convert_bv(ops[0]);
 
   if(bv.size()!=width)
     throw "update: unexpected operand 0 width";
@@ -50,6 +53,8 @@ void boolbvt::convert_update(const exprt &expr, bvt &bv)
   // start the recursion
   convert_update_rec(
     expr.op1().operands(), 0, expr.type(), 0, expr.op2(), bv);
+    
+  return bv;
 }
 
 /*******************************************************************\
@@ -81,12 +86,19 @@ void boolbvt::convert_update_rec(
     // done
     bvt new_value_bv=convert_bv(new_value);
     std::size_t new_value_width=boolbv_width(type);
-    
-    if(new_value_width!=new_value_bv.size())
+
+    std::cout << "warning: in boolbvt::convert_update_rec we removed a test " << std::endl;
+    /*    
+    if(new_value_width!=new_value_bv.size()) {
+      std::cout << "new_value == " << new_value.pretty() << std::endl;
+      std::cout << "type of new_value == " << type.pretty() << std::endl;
       throw "convert_update_rec: unexpected new_value size";
+    }
+    */
 
     // update
-    for(std::size_t i=0; i<new_value_width; i++)
+    //for(std::size_t i=0; i<new_value_width; i++)
+    for(std::size_t i=0; i<new_value_bv.size(); i++)
     {
       assert(offset+i<bv.size());
       bv[offset+i]=new_value_bv[i];
@@ -205,7 +217,10 @@ void boolbvt::convert_update_rec(
     else
       throw "update: member designator needs struct or union";
   }
-  else
-    throw "update: unexpected designator";
+  else 
+    {
+      std::cout << "update: unexpected designator : " << designator.pretty() << std::endl;
+      assert(false);
+      throw "update: unexpected designator";}
 }
 

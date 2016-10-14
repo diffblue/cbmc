@@ -258,7 +258,12 @@ void cpp_typecheckt::typecheck_compound_type(
     symbolt *new_symbol;
  
     if(symbol_table.move(symbol, new_symbol))
-      throw "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed";
+    {
+      err_location(symbol.location);
+      error() << "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed"
+              << eom;
+      throw 0;
+    }
 
     // put into dest_scope
     cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol, *dest_scope);

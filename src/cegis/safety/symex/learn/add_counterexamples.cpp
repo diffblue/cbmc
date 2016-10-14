@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include <cegis/invariant/util/invariant_program_helper.h>
+#include <cegis/cegis-util/program_helper.h>
 #include <cegis/safety/options/safety_program.h>
 #include <cegis/safety/constraint/safety_constraint_factory.h>
 #include <cegis/safety/symex/learn/add_counterexamples.h>

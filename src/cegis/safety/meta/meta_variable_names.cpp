@@ -1,6 +1,6 @@
 #include <util/mp_arith.h>
 
-#include <cegis/invariant/meta/literals.h>
+#include <cegis/instrument/literals.h>
 #include <cegis/safety/meta/meta_variable_names.h>
 
 namespace

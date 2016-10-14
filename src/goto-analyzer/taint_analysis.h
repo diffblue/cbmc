@@ -12,11 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/namespace.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 bool taint_analysis(
-  const symbol_tablet &,
-  goto_functionst &,
+  goto_modelt &,
   const std::string &taint_file_name,
   message_handlert &,
   bool show_full,

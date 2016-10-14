@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/show_properties.h>
+#include <goto-programs/show_symbol_table.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/link_to_library.h>
@@ -255,15 +256,14 @@ int goto_analyzer_parse_optionst::doit()
            << config.this_operating_system() << eom;
 
   register_languages();
-  const namespacet ns(symbol_table);
   
-  goto_functionst goto_functions;
+  goto_model.set_message_handler(get_message_handler());
 
-  int get_goto_program_ret=
-    get_goto_program(options, goto_functions);
-
-  if(get_goto_program_ret!=-1)
-    return get_goto_program_ret;
+  if(goto_model(cmdline.args))
+    return 6;
+    
+  if(process_goto_program(options))
+    return 6;
 
   if(cmdline.isset("taint"))
   {
@@ -271,14 +271,14 @@ int goto_analyzer_parse_optionst::doit()
 
     if(cmdline.isset("show-taint"))
     {
-      taint_analysis(symbol_table, goto_functions, taint_file, get_message_handler(), true, "");
+      taint_analysis(goto_model, taint_file, get_message_handler(), true, "");
       return 0;
     }
     else
     {
       std::string json_file=cmdline.get_value("json");
       bool result=
-        taint_analysis(symbol_table, goto_functions, taint_file, get_message_handler(), false, json_file);
+        taint_analysis(goto_model, taint_file, get_message_handler(), false, json_file);
       return result?10:0;
     }
   }
@@ -288,9 +288,9 @@ int goto_analyzer_parse_optionst::doit()
     const std::string json_file=cmdline.get_value("json");
 
     if(json_file.empty())
-      unreachable_instructions(goto_functions, ns, false, std::cout);
+      unreachable_instructions(goto_model, false, std::cout);
     else if(json_file=="-")
-      unreachable_instructions(goto_functions, ns, true, std::cout);
+      unreachable_instructions(goto_model, true, std::cout);
     else
     {
       std::ofstream ofs(json_file);
@@ -301,7 +301,7 @@ int goto_analyzer_parse_optionst::doit()
         return 6;
       }
 
-      unreachable_instructions(goto_functions, ns, true, ofs);
+      unreachable_instructions(goto_model, true, ofs);
     }
 
     return 0;
@@ -309,9 +309,9 @@ int goto_analyzer_parse_optionst::doit()
 
   if(cmdline.isset("show-local-may-alias"))
   {
-    namespacet ns(symbol_table);
+    namespacet ns(goto_model.symbol_table);
   
-    forall_goto_functions(it, goto_functions)
+    forall_goto_functions(it, goto_model.goto_functions)
     {
       std::cout << ">>>>\n";
       std::cout << ">>>> " << it->first << '\n';
@@ -324,21 +324,20 @@ int goto_analyzer_parse_optionst::doit()
     return 0;
   }
 
-  label_properties(goto_functions);
+  label_properties(goto_model);
 
   if(cmdline.isset("show-properties"))
   {
-    const namespacet ns(symbol_table);
-    show_properties(ns, get_ui(), goto_functions);
+    show_properties(goto_model, get_ui());
     return 0;
   }
 
-  if(set_properties(goto_functions))
+  if(set_properties())
     return 7;
   
   if(cmdline.isset("show-intervals"))
   {
-    show_intervals(goto_functions, ns, std::cout);
+    show_intervals(goto_model, std::cout);
     return 0;
   }
 
@@ -349,7 +348,7 @@ int goto_analyzer_parse_optionst::doit()
     options.set_option("json", cmdline.get_value("json"));
     options.set_option("xml", cmdline.get_value("xml"));
     bool result=
-      static_analyzer(goto_functions, ns, options, get_message_handler());
+      static_analyzer(goto_model, options, get_message_handler());
     return result?10:0;
   }
 
@@ -370,12 +369,12 @@ Function: goto_analyzer_parse_optionst::set_properties
 
 \*******************************************************************/
 
-bool goto_analyzer_parse_optionst::set_properties(goto_functionst &goto_functions)
+bool goto_analyzer_parse_optionst::set_properties()
 {
   try
   {
     if(cmdline.isset("property"))
-      ::set_properties(goto_functions, cmdline.get_values("property"));
+      ::set_properties(goto_model, cmdline.get_values("property"));
   }
 
   catch(const char *e)
@@ -400,157 +399,6 @@ bool goto_analyzer_parse_optionst::set_properties(goto_functionst &goto_function
 
 /*******************************************************************\
 
-Function: goto_analyzer_parse_optionst::get_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-  
-int goto_analyzer_parse_optionst::get_goto_program(
-  const optionst &options,
-  goto_functionst &goto_functions)
-{
-  if(cmdline.args.empty())
-  {
-    error() << "Please provide a program to verify" << eom;
-    return 6;
-  }
-  
-  try
-  {
-    if(cmdline.isset("show-parse-tree"))
-    {
-      if(cmdline.args.size()!=1 ||
-         is_goto_binary(cmdline.args[0]))
-      {
-        error() << "Please give exactly one source file" << eom;
-        return 6;
-      }
-      
-      std::string filename=cmdline.args[0];
-      
-      #ifdef _MSC_VER
-      std::ifstream infile(widen(filename).c_str());
-      #else
-      std::ifstream infile(filename.c_str());
-      #endif
-                
-      if(!infile)
-      {
-        error() << "failed to open input file `" << filename << "'" << eom;
-        return 6;
-      }
-                              
-      languaget *language=get_language_from_filename(filename);
-      
-      if(language==NULL)
-      {
-        error() << "failed to figure out type of file `" <<  filename << "'" << eom;
-        return 6;
-      }
-      
-      language->set_message_handler(get_message_handler());
-                                                                
-      status("Parsing", filename);
-  
-      if(language->parse(infile, filename))
-      {
-        error() << "PARSING ERROR" << eom;
-        return 6;
-      }
-      
-      language->show_parse(std::cout);
-      return 0;
-    }
-
-    cmdlinet::argst binaries;
-    binaries.reserve(cmdline.args.size());
-
-    for(cmdlinet::argst::iterator
-        it=cmdline.args.begin();
-        it!=cmdline.args.end();
-        ) // no ++it
-    {
-      if(is_goto_binary(*it))
-      {
-        binaries.push_back(*it);
-        it=cmdline.args.erase(it);
-        continue;
-      }
-
-      ++it;
-    }
-
-    if(!cmdline.args.empty())
-    {
-      if(parse()) return 6;
-      if(typecheck()) return 6;
-      if(final()) return 6;
-
-      // we no longer need any parse trees or language files
-      clear_parse();
-    }
-
-    for(cmdlinet::argst::const_iterator
-        it=binaries.begin();
-        it!=binaries.end();
-        ++it)
-    {
-      status() << "Reading GOTO program from file " << eom;
-
-      if(read_object_and_link(*it, symbol_table, goto_functions, get_message_handler()))
-        return 6;
-    }
-
-    if(!binaries.empty())
-      config.set_from_symbol_table(symbol_table);
-
-    if(cmdline.isset("show-symbol-table"))
-    {
-      show_symbol_table();
-      return 0;
-    }
-
-    status() << "Generating GOTO Program" << eom;
-
-    goto_convert(symbol_table, goto_functions, ui_message_handler);
-
-    if(process_goto_program(options, goto_functions))
-      return 6;
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return 6;
-  }
-
-  catch(const std::string e)
-  {
-    error() << e << eom;
-    return 6;
-  }
-  
-  catch(int)
-  {
-    return 6;
-  }
-  
-  catch(std::bad_alloc)
-  {
-    error() << "Out of memory" << eom;
-    return 6;
-  }
-  
-  return -1; // no error, continue
-}
-
-/*******************************************************************\
-
 Function: goto_analyzer_parse_optionst::process_goto_program
 
   Inputs:
@@ -562,55 +410,60 @@ Function: goto_analyzer_parse_optionst::process_goto_program
 \*******************************************************************/
   
 bool goto_analyzer_parse_optionst::process_goto_program(
-  const optionst &options,
-  goto_functionst &goto_functions)
+  const optionst &options)
 {
   try
   {
-    namespacet ns(symbol_table);
-
     #if 0
     // Remove inline assembler; this needs to happen before
     // adding the library.
-    remove_asm(symbol_table, goto_functions);
+    remove_asm(goto_model);
 
     // add the library
     status() << "Adding CPROVER library (" 
              << config.ansi_c.arch << ")" << eom;
-    link_to_library(symbol_table, goto_functions, ui_message_handler);
+    link_to_library(goto_model, ui_message_handler);
     #endif
 
     // remove function pointers
     status() << "Removing function pointers and virtual functions" << eom;
-    remove_function_pointers(symbol_table, goto_functions,
-      cmdline.isset("pointer-check"));
-    remove_virtual_functions(symbol_table, goto_functions);
+    remove_function_pointers(goto_model, cmdline.isset("pointer-check"));
+    remove_virtual_functions(goto_model);
 
     // do partial inlining
     status() << "Partial Inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    goto_partial_inline(goto_model, ui_message_handler);
     
     // remove returns, gcc vectors, complex
-    remove_returns(symbol_table, goto_functions);
-    remove_vector(symbol_table, goto_functions);
-    remove_complex(symbol_table, goto_functions);
+    remove_returns(goto_model);
+    remove_vector(goto_model);
+    remove_complex(goto_model);
 
     #if 0
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
-    goto_check(ns, options, goto_functions);
+    goto_check(options, goto_model);
     #endif
     
     // recalculate numbers, etc.
-    goto_functions.update();
+    goto_model.goto_functions.update();
 
     // add loop ids
-    goto_functions.compute_loop_numbers();
+    goto_model.goto_functions.compute_loop_numbers();
     
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      goto_functions.output(ns, std::cout);
+      namespacet ns(goto_model.symbol_table);
+
+      goto_model.goto_functions.output(ns, std::cout);
+      return true;
+    }
+
+    // show it?
+    if(cmdline.isset("show-symbol-table"))
+    {
+      ::show_symbol_table(goto_model, get_ui());
       return true;
     }
   }

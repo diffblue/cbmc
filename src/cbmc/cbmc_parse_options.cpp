@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_preprocess.h>
 
 #include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/pass_preprocess.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
@@ -186,6 +187,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("stop-on-fail", false);
 
+  if(cmdline.isset("trace") ||
+     cmdline.isset("stop-on-fail") ||
+     cmdline.isset("property"))
+    options.set_option("trace", true);
+
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
 
@@ -326,6 +332,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine", true);
     options.set_option("refine-arrays", true);
     options.set_option("refine-arithmetic", true);
+  }
+
+  if(cmdline.isset("pass"))
+  {
+    options.set_option("pass", true);
   }
 
   if(cmdline.isset("max-node-refinement"))
@@ -737,6 +748,21 @@ int cbmc_parse_optionst::get_goto_program(
 
     if(process_goto_program(options, goto_functions))
       return 6;
+
+    // show it?
+    if(cmdline.isset("show-loops"))
+    {
+      show_loop_ids(get_ui(), goto_functions);
+      return 0;
+    }
+
+    // show it?
+    if(cmdline.isset("show-goto-functions"))
+    {
+      namespacet ns(symbol_table);
+      show_goto_functions(ns, get_ui(), goto_functions);
+      return 0;
+    }
   }
 
   catch(const char *e)
@@ -883,6 +909,12 @@ bool cbmc_parse_optionst::process_goto_program(
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
     
+
+    if(cmdline.isset("pass")) {
+      status() << "PASS Preprocessing " << eom;
+      pass_preprocess(symbol_table, goto_functions);
+    }
+
     // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
     remove_vector(symbol_table, goto_functions);
@@ -957,20 +989,6 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_skip(goto_functions);
     goto_functions.update();
 
-    // show it?
-    if(cmdline.isset("show-loops"))
-    {
-      show_loop_ids(get_ui(), goto_functions);
-      return true;
-    }
-
-    // show it?
-    if(cmdline.isset("show-goto-functions"))
-    {
-      namespacet ns(symbol_table);
-      show_goto_functions(ns, get_ui(), goto_functions);
-      return true;
-    }
   }
 
   catch(const char *e)
@@ -1067,6 +1085,7 @@ void cbmc_parse_optionst::help()
     " --show-properties            show the properties, but don't run analysis\n"
     " --property id                only check one specific property\n"
     " --stop-on-fail               stop analysis once a failed property is detected\n"
+    " --trace                      give a counterexample trace for failed properties\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -1160,6 +1179,7 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --pass                       use pass procedure (experimental)\n"
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n"
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n"

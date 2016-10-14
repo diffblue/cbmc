@@ -166,7 +166,6 @@ void remove_returnst::do_function_calls(
         if(function_call.lhs().is_not_nil())
         {
           exprt rhs;
-          
           if(f_it->second.body_available())
           {
             symbol_exprt return_value;

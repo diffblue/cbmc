@@ -16,6 +16,7 @@
 #include <cegis/genetic/genetic_preprocessing.h>
 #include <cegis/genetic/lazy_fitness.h>
 #include <cegis/genetic/concrete_test_runner.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/seed/null_seed.h>
 #include <cegis/seed/literals_seed.h>
 #include <cegis/symex/cegis_symex_learn.h>
@@ -28,7 +29,6 @@
 #include <cegis/invariant/fitness/concrete_fitness_source_provider.h>
 #include <cegis/invariant/constant/constant_strategy.h>
 #include <cegis/invariant/constant/default_constant_strategy.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/invariant/symex/learn/invariant_body_provider.h>
 #include <cegis/danger/meta/literals.h>
 #include <cegis/danger/options/danger_program_genetic_settings.h>
@@ -100,6 +100,7 @@ int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
     mutatet &mutate, crosst &cross, convertert &converter, preproct &preproc,
     symex_learnt &symex_learn)
 {
+  const size_t symex_head_start=opt.get_bool_option(CEGIS_SYMEX_HEAD_START);
   const individual_to_danger_solution_deserialisert deser(prog, info_fac);
   if (opt.get_bool_option(CEGIS_MATCH_SELECT))
   {
@@ -109,7 +110,7 @@ int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
     ga_learnt ga_learn(opt, select, mutate, cross, fitness, converter);
 #ifndef _WIN32
     concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
-        serialise, std::ref(deser), deserialise);
+        serialise, std::ref(deser), deserialise, symex_head_start);
 #else
     // TODO: Remove once task_pool supports Windows.
     ga_learnt &learn=ga_learn;
@@ -122,7 +123,7 @@ int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
   ga_learnt ga_learn(opt, select, mutate, cross, fitness, converter);
 #ifndef _WIN32
   concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
-      serialise, std::ref(deser), deserialise);
+      serialise, std::ref(deser), deserialise, symex_head_start);
 #else
   // TODO: Remove once task_pool supports Windows.
   ga_learnt &learn=ga_learn;
@@ -154,7 +155,7 @@ int run_genetic_and_symex(mstreamt &os, optionst &opt,
   const size_t rounds=opt.get_unsigned_int_option(CEGIS_ROUNDS);
 
   // Set-up genetic algorithm
-  const typet type=invariant_meta_type(); // XXX: Currently single user data type.
+  const typet type=cegis_default_integer_type(); // XXX: Currently single user data type.
   random_individualt rnd(type, info_fac, lazy);
   danger_fitness_configt converter(info_fac, prog);
   concrete_fitness_source_providert<danger_programt, danger_learn_configt> src(

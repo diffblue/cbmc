@@ -4,10 +4,11 @@ template<class learner1t, class learner2t>
 concurrent_learnt<learner1t, learner2t>::concurrent_learnt(learner1t &learner1,
     learner2t &learner2, const serialisert serialiser,
     const deserialisert deserialiser,
-    const encoded_deserialisert encoded_deserialiser) :
+    const encoded_deserialisert encoded_deserialiser,
+    const size_t learner1_head_start) :
     learner1(learner1), learner2(learner2), serialiser(serialiser), deserialiser(
         deserialiser), encoded_deserialiser(encoded_deserialiser), is_decoded_candidate(
-        false)
+        false), num_ces(0), num_symex_ces(learner1_head_start)
 {
 }
 
@@ -32,18 +33,12 @@ const typename concurrent_learnt<learner1t, learner2t>::candidatet &concurrent_l
   return learner1.next_candidate();
 }
 
-// XXX: Symex headstart for PLDI benchmarks
-namespace
-{
-size_t symex_count=2u;
-}
-// XXX: Symex headstart for PLDI benchmarks
-
 template<class learner1t, class learner2t>
 template<class itert>
 bool concurrent_learnt<learner1t, learner2t>::learn(itert first,
     const itert &last)
 {
+  num_ces += std::distance(first, last);
   bool symex_running=true;
   learner1.set_termination_condition([this, &symex_running]()
   {
@@ -86,13 +81,8 @@ bool concurrent_learnt<learner1t, learner2t>::learn(itert first,
       });
   irep_pipe.close_write();
   const bool genetic_success=learner1.learn(first, last);
-  // XXX: Symex headstart for PLDI benchmarks
-  if (symex_count)
-  {
-    --symex_count;
+  if (num_ces <= num_symex_ces)
     task_pool.join_all();
-  }
-  // XXX: Symex headstart for PLDI benchmarks
   if (symex_running) task_pool.cancel(symex_task);
   irep_pipe.close_read();
   if (genetic_success && !symex_success) is_decoded_candidate=false;

@@ -25,12 +25,12 @@ Function: boolbvt::convert_abs
 
 \*******************************************************************/
 
-void boolbvt::convert_abs(const exprt &expr, bvt &bv)
+bvt boolbvt::convert_abs(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   const exprt::operandst &operands=expr.operands();
 
@@ -42,7 +42,7 @@ void boolbvt::convert_abs(const exprt &expr, bvt &bv)
   const bvt &op_bv=convert_bv(op0);
 
   if(op0.type()!=expr.type())
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   bvtypet bvtype=get_bvtype(expr.type());
   
@@ -50,16 +50,14 @@ void boolbvt::convert_abs(const exprt &expr, bvt &bv)
      bvtype==IS_SIGNED ||
      bvtype==IS_UNSIGNED)
   {
-    bv=bv_utils.absolute_value(op_bv);
-    return;
+    return bv_utils.absolute_value(op_bv);
   }
   else if(bvtype==IS_FLOAT)
   {
     float_utilst float_utils(prop);
     float_utils.spec=to_floatbv_type(expr.type());
-    bv=float_utils.abs(op_bv);
-    return;
+    return float_utils.abs(op_bv);
   }
   
-  conversion_failed(expr, bv);
+  return conversion_failed(expr);
 }

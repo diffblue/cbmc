@@ -82,7 +82,12 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     symbol.type=typet(ID_namespace);
 
     if(symbol_table.move(symbol))
-      throw "cpp_typecheckt::convert_namespace: symbol_table.move() failed";
+    {
+      err_location(symbol.location);
+      error() << "cpp_typecheckt::convert_namespace: symbol_table.move() failed"
+              << eom;
+      throw 0;
+    }
 
     cpp_scopes.new_namespace(final_name);
   }

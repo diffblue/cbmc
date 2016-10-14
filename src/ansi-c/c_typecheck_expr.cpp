@@ -276,7 +276,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   else if(expr.id()==ID_initializer_list)
   {
     // already fine, just set some type
-    expr.type()=empty_typet();
+    expr.type()=void_type();
   }
   else if(expr.id()==ID_forall ||
           expr.id()==ID_exists)
@@ -299,7 +299,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id()==ID_label)
   {
-    expr.type()=empty_typet();
+    expr.type()=void_type();
   }
   else if(expr.id()==ID_array)
   {
@@ -469,12 +469,12 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   code_typet new_type;
   new_type.return_type().swap(arg_type);
   new_type.parameters().resize(1);
-  new_type.parameters()[0].type()=pointer_typet(empty_typet());
+  new_type.parameters()[0].type()=pointer_type(void_type());
 
   assert(expr.operands().size()==1);  
   exprt arg=expr.op0();
 
-  implicit_typecast(arg, pointer_typet(empty_typet()));
+  implicit_typecast(arg, pointer_type(void_type()));
 
   // turn into function call
   side_effect_expr_function_callt result;
@@ -492,7 +492,7 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   // types.
   
   code_typet symbol_type=new_type;
-  symbol_type.return_type()=empty_typet();
+  symbol_type.return_type()=void_type();
   
   symbolt symbol;
   symbol.base_name=ID_gcc_builtin_va_arg;
@@ -889,9 +889,8 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
 
     if(expr.type().id()==ID_code) // function designator
     { // special case: this is sugar for &f
-      exprt tmp(ID_address_of, pointer_typet());
+      exprt tmp(ID_address_of, pointer_type(expr.type()));
       tmp.set("#implicit", true);
-      tmp.type().subtype()=expr.type();
       tmp.add_source_location()=expr.source_location();
       tmp.move_to_operands(expr);
       expr.swap(tmp);
@@ -937,7 +936,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
     // arrays here turn into pointers (array decay)
     if(op.type().id()==ID_array)
-      implicit_typecast(op, pointer_typet(op.type().subtype()));
+      implicit_typecast(op, pointer_type(op.type().subtype()));
 
     expr.type()=op.type();    
   }
@@ -1043,7 +1042,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   // The type may contain side-effects.
   if(!clean_code.empty())
   {
-    side_effect_exprt side_effect_expr(ID_statement_expression, empty_typet());
+    side_effect_exprt side_effect_expr(ID_statement_expression, void_type());
     code_blockt decl_block(clean_code);
     decl_block.set_statement(ID_decl_block);
     side_effect_expr.copy_to_operands(decl_block);
@@ -1123,7 +1122,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   // The type may contain side-effects.
   if(!clean_code.empty())
   {
-    side_effect_exprt side_effect_expr(ID_statement_expression, empty_typet());
+    side_effect_exprt side_effect_expr(ID_statement_expression, void_type());
     code_blockt decl_block(clean_code);
     decl_block.set_statement(ID_decl_block);
     side_effect_expr.copy_to_operands(decl_block);
@@ -1804,7 +1803,7 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
   if(operands[1].type().id()==ID_empty ||
      operands[2].type().id()==ID_empty)
   {
-    expr.type()=empty_typet();
+    expr.type()=void_type();
     return;
   }
 
@@ -1906,7 +1905,7 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   // special case: address of label
   if(op.id()==ID_label)
   {
-    expr.type()=pointer_typet(empty_typet());
+    expr.type()=pointer_type(void_type());
     
     // remember the label
     labels_used[op.get(ID_identifier)]=op.source_location();
@@ -1928,8 +1927,6 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
     expr.swap(tmp);
     return;
   }
-
-  expr.type()=pointer_typet();
 
   if(op.id()==ID_struct ||
      op.id()==ID_union ||
@@ -1954,7 +1951,7 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
     throw 0;
   }
 
-  expr.type().subtype()=op.type();
+  expr.type()=pointer_type(op.type());
 }
 
 /*******************************************************************\
@@ -2028,9 +2025,8 @@ void c_typecheck_baset::typecheck_expr_function_identifier(exprt &expr)
 {
   if(expr.type().id()==ID_code)
   {
-    exprt tmp(ID_address_of, pointer_typet());
+    exprt tmp(ID_address_of, pointer_type(expr.type()));
     tmp.set(ID_C_implicit, true);
-    tmp.type().subtype()=expr.type();
     tmp.add_source_location()=expr.source_location();
     tmp.move_to_operands(expr);
     expr.swap(tmp);
@@ -2188,7 +2184,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
          identifier=="realloc" ||
          identifier=="reallocf" ||
          identifier=="valloc")
-        return_type=pointer_typet(empty_typet()); // void *
+        return_type=pointer_type(void_type()); // void *
 
       symbolt new_symbol;
 
@@ -2939,8 +2935,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
       const typet &type=follow(op.type());
       if(type.id()==ID_array)
       {
-        pointer_typet dest_type;
-        dest_type.subtype()=empty_typet();
+        typet dest_type=pointer_type(void_type());
         dest_type.subtype().set(ID_C_constant, ID_1);
         implicit_typecast(op, dest_type);
       }

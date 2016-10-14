@@ -20,7 +20,7 @@ Function: boolbvt::convert_not
 
 \*******************************************************************/
 
-void boolbvt::convert_not(const not_exprt &expr, bvt &bv)
+bvt boolbvt::convert_not(const not_exprt &expr)
 {
   const bvt &op_bv=convert_bv(expr.op());
 
@@ -40,16 +40,17 @@ void boolbvt::convert_not(const not_exprt &expr, bvt &bv)
       literalt normal_bits_zero=
         bv_utils.is_zero(bv_utils.verilog_bv_normal_bits(op_bv));
 
+      bvt bv;
       bv.resize(2);
 
       // this returns 'x' for 'z'      
       bv[0]=prop.lselect(has_x_or_z, const_literal(false), normal_bits_zero);
       bv[1]=has_x_or_z;
 
-      return;
+      return bv;
     }
   }
 
 
-  return conversion_failed(expr, bv);
+  return conversion_failed(expr);
 }

@@ -6,10 +6,11 @@ int foo(int a)
 }
 
 // this is a GCC extension
-
+#ifdef __GNUC__
 int bar(int b) __attribute__((alias("foo")));
 
 __typeof__(foo) bar2 __attribute__((alias("foo")));
+#endif
 
 int main()
 {

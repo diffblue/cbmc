@@ -22,6 +22,7 @@ public:
   explicit inline path_searcht(const namespacet &_ns):
     safety_checkert(_ns),
     show_vcc(false),
+    eager_infeasibility(false),
     depth_limit_set(false), // no limit
     context_bound_set(false),
     unwind_limit_set(false),
@@ -58,11 +59,14 @@ public:
   }
 
   bool show_vcc;
+  bool eager_infeasibility;
   
   // statistics
   unsigned number_of_dropped_states;
   unsigned number_of_paths;
   unsigned number_of_steps;
+  unsigned number_of_feasible_paths;
+  unsigned number_of_infeasible_paths;
   unsigned number_of_VCCs;
   unsigned number_of_VCCs_after_simplification;
   unsigned number_of_failed_properties;
@@ -70,13 +74,18 @@ public:
   absolute_timet start_time;
   time_periodt sat_time;
 
-  enum statust { NOT_REACHED, PASS, FAIL };
+  enum statust { NOT_REACHED, SUCCESS, FAILURE };
 
   struct property_entryt
   {
     statust status;
     irep_idt description;
     goto_tracet error_trace;
+    source_locationt source_location;
+    
+    inline bool is_success() const { return status==SUCCESS; }
+    inline bool is_failure() const { return status==FAILURE; }
+    inline bool is_not_reached() const { return status==NOT_REACHED; }
   };
   
   inline void set_dfs() { search_heuristic=search_heuristict::DFS; }
@@ -105,10 +114,11 @@ protected:
 
   expanding_vector<loc_datat> loc_data;
   
-  bool execute(queuet::iterator state, const namespacet &);
+  bool execute(queuet::iterator state);
   
-  void check_assertion(statet &state, const namespacet &);
-  void do_show_vcc(statet &state, const namespacet &);
+  void check_assertion(statet &state);
+  bool is_feasible(statet &state);
+  void do_show_vcc(statet &state);
   
   bool drop_state(const statet &state) const;
   

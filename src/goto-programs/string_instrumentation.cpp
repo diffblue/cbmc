@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/expr_util.h>
-#include <util/message_stream.h>
+#include <util/message.h>
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/symbol_table.h>
@@ -96,13 +96,13 @@ exprt buffer_size(const exprt &what)
 
 \*******************************************************************/
 
-class string_instrumentationt:public message_streamt
+class string_instrumentationt:public messaget
 {
 public:
   string_instrumentationt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
-    message_streamt(_message_handler),
+    messaget(_message_handler),
     symbol_table(_symbol_table),
     ns(_symbol_table)
   {
@@ -364,8 +364,9 @@ void string_instrumentationt::do_sprintf(
     
   if(arguments.size()<2)
   {
-    err_location(target->source_location);
-    throw "sprintf expected to have two or more arguments";
+    error().source_location=target->source_location;
+    error() << "sprintf expected to have two or more arguments" << eom;
+    throw 0;
   }
   
   goto_programt tmp;
@@ -417,8 +418,10 @@ void string_instrumentationt::do_snprintf(
   
   if(arguments.size()<3)
   {
-    err_location(target->source_location);
-    throw "snprintf expected to have three or more arguments";
+    error().source_location=target->source_location;
+    error() << "snprintf expected to have three or more arguments"
+            << eom;
+    throw 0;
   }
   
   goto_programt tmp;
@@ -469,8 +472,9 @@ void string_instrumentationt::do_fscanf(
   
   if(arguments.size()<2)
   {
-    err_location(target->source_location);
-    throw "fscanf expected to have two or more arguments";
+    error().source_location=target->source_location;
+    error() << "fscanf expected to have two or more arguments" << eom;
+    throw 0;
   }
   
   goto_programt tmp;
@@ -518,8 +522,8 @@ void string_instrumentationt::do_format_string_read(
      format_arg.op0().id()==ID_index &&
      format_arg.op0().op0().id()==ID_string_constant)
   {
-    format_token_listt token_list;
-    parse_format_string(format_arg.op0().op0(), token_list);
+    format_token_listt token_list=
+      parse_format_string(format_arg.op0().op0().get_string(ID_value));
     
     unsigned args=0;
     
@@ -632,8 +636,8 @@ void string_instrumentationt::do_format_string_write(
      format_arg.op0().id()==ID_index &&
      format_arg.op0().op0().id()==ID_string_constant) // constant format
   {
-    format_token_listt token_list;
-    parse_format_string(format_arg.op0().op0(), token_list);
+    format_token_listt token_list=
+      parse_format_string(format_arg.op0().op0().get_string(ID_value));
     
     unsigned args=0;
     
@@ -806,8 +810,9 @@ void string_instrumentationt::do_strchr(
 
   if(arguments.size()!=2)
   {
-    err_location(target->source_location);
-    throw "strchr expected to have two arguments";
+    error().source_location=target->source_location;
+    error() << "strchr expected to have two arguments" << eom;
+    throw 0;
   }
   
   goto_programt tmp;
@@ -843,8 +848,9 @@ void string_instrumentationt::do_strrchr(
 
   if(arguments.size()!=2)
   {
-    err_location(target->source_location);
-    throw "strrchr expected to have two arguments";
+    error().source_location=target->source_location;
+    error() << "strrchr expected to have two arguments" << eom;
+    throw 0;
   }
   
   goto_programt tmp;
@@ -880,8 +886,9 @@ void string_instrumentationt::do_strstr(
 
   if(arguments.size()!=2)
   {
-    err_location(target->source_location);
-    throw "strstr expected to have two arguments";
+    error().source_location=target->source_location;
+    error() << "strstr expected to have two arguments" << eom;
+    throw 0;
   }
   
   goto_programt tmp;
@@ -923,8 +930,9 @@ void string_instrumentationt::do_strtok(
 
   if(arguments.size()!=2)
   {
-    err_location(target->source_location);
-    throw "strtok expected to have two arguments";
+    error().source_location=target->source_location;
+    error() << "strtok expected to have two arguments" << eom;
+    throw 0;
   }
   
   goto_programt tmp;

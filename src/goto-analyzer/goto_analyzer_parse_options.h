@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_ui.h>
 
+#include <goto-programs/get_goto_model.h>
+
 class bmct;
 class goto_functionst;
 class optionst;
@@ -47,19 +49,14 @@ public:
   goto_analyzer_parse_optionst(int argc, const char **argv);
 
 protected:
+  get_goto_modelt goto_model;
+
   virtual void register_languages();
 
   virtual void get_command_line_options(optionst &options);
 
-  virtual int get_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
-
-  virtual bool process_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
-    
-  bool set_properties(goto_functionst &goto_functions);
+  virtual bool process_goto_program(const optionst &options);
+  bool set_properties();
   
   void eval_verbosity();
   

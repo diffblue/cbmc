@@ -3,6 +3,7 @@
 
 #include <util/expr_util.h>
 
+#include <cegis/cegis-util/program_helper.h>
 #include <cegis/invariant/util/invariant_constraint_variables.h>
 #include <cegis/invariant/util/invariant_program_helper.h>
 #include <cegis/seed/literals_seed.h>

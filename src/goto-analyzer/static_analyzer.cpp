@@ -20,13 +20,12 @@ class static_analyzert:public messaget
 {
 public:
   static_analyzert(
-    const goto_functionst &_goto_functions,
-    const namespacet &_ns,
+    const goto_modelt &_goto_model,
     const optionst &_options,
     message_handlert &_message_handler):
     messaget(_message_handler),
-    goto_functions(_goto_functions),
-    ns(_ns),
+    goto_functions(_goto_model.goto_functions),
+    ns(_goto_model.symbol_table),
     options(_options)
   {
   }
@@ -35,7 +34,7 @@ public:
 
 protected:
   const goto_functionst &goto_functions;
-  const namespacet &ns;
+  const namespacet ns;
   const optionst &options;
 
   // analyses
@@ -283,13 +282,12 @@ Function: static_analyzer
 \*******************************************************************/
 
 bool static_analyzer(
-  const goto_functionst &goto_functions,
-  const namespacet &ns,
+  const goto_modelt &goto_model,
   const optionst &options,
   message_handlert &message_handler)
 {
   return static_analyzert(
-    goto_functions, ns, options, message_handler)();
+    goto_model, options, message_handler)();
 }
 
 /*******************************************************************\
@@ -305,11 +303,10 @@ Function: show_intervals
 \*******************************************************************/
 
 void show_intervals(
-  const goto_functionst &goto_functions,
-  const namespacet &ns,
+  const goto_modelt &goto_model,
   std::ostream &out)
 {
   ait<interval_domaint> interval_analysis;
-  interval_analysis(goto_functions, ns);
-  interval_analysis.output(ns, goto_functions, out);
+  interval_analysis(goto_model);
+  interval_analysis.output(goto_model, out);
 }

@@ -190,6 +190,11 @@ public:
     return no_branches;
   }
   
+  inline bool last_was_branch() const
+  {
+    return !history.is_nil() && history->is_branch();
+  }
+  
   bool is_feasible(class decision_proceduret &) const;
 
   bool check_assertion(class decision_proceduret &);

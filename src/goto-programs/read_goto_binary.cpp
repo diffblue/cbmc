@@ -430,3 +430,27 @@ bool read_object_and_link(
   return false;
 }
 
+/*******************************************************************\
+
+Function: read_object_and_link
+
+  Inputs: a file_name
+
+ Outputs: true on error, false otherwise
+
+ Purpose: reads an object file
+
+\*******************************************************************/
+
+bool read_object_and_link(
+  const std::string &file_name,
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  return read_object_and_link(
+    file_name,
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    message_handler);
+}
+

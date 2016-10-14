@@ -441,8 +441,7 @@ Function: taint_analysis
 \*******************************************************************/
 
 bool taint_analysis(
-  const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   const std::string &taint_file_name,
   message_handlert &message_handler,
   bool show_full,
@@ -451,6 +450,6 @@ bool taint_analysis(
   taint_analysist taint_analysis;
   taint_analysis.set_message_handler(message_handler);
   return taint_analysis(
-    taint_file_name, symbol_table, goto_functions, show_full, json_file_name);
+    taint_file_name, goto_model.symbol_table, goto_model.goto_functions, show_full, json_file_name);
 }
 

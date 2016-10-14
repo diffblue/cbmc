@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/source_location.h>
 #include <util/time_stopping.h>
-#include <util/message_stream.h>
+#include <util/message.h>
 #include <util/json.h>
 
 #include <langapi/mode.h>
@@ -90,10 +90,18 @@ void bmct::error_trace()
   
   case ui_message_handlert::JSON_UI:
     {
-      json_objectt counterexample;
-      jsont &json_trace=counterexample["counterexample"];
+      json_objectt json_result;
+      json_arrayt &result_array=json_result["results"].make_array();
+      json_objectt &result=result_array.push_back().make_object();
+      const goto_trace_stept &step=goto_trace.steps.back();
+      result["property"]=
+        json_stringt(id2string(step.pc->source_location.get_property_id()));
+      result["description"]=
+        json_stringt(id2string(step.pc->source_location.get_comment()));
+      result["status"]=json_stringt("failed");
+      jsont &json_trace=result["trace"];
       convert(ns, goto_trace, json_trace);
-      std::cout << ",\n" << counterexample << "\n";
+      std::cout << ",\n" << json_result;
     }
     break;
   }
@@ -423,19 +431,19 @@ safety_checkert::resultt bmct::run(
 
   catch(const std::string &error_str)
   {
-    message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_source_location);
-    message_stream.str << error_str;
-    message_stream.error_msg();
+    messaget message(get_message_handler());
+    message.error().source_location=symex.last_source_location;
+    message.error() << error_str << messaget::eom;
+
     return safety_checkert::ERROR;
   }
 
   catch(const char *error_str)
   {
-    message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_source_location);
-    message_stream.str << error_str;
-    message_stream.error_msg();
+    messaget message(get_message_handler());
+    message.error().source_location=symex.last_source_location;
+    message.error() << error_str << messaget::eom;
+
     return safety_checkert::ERROR;
   }
 
@@ -587,11 +595,15 @@ safety_checkert::resultt bmct::stop_on_fail(
     return SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
-    if(options.get_bool_option("beautify"))
-      counterexample_beautificationt()(
-        dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
-  
-    error_trace();
+    if(options.get_bool_option("trace"))
+    {
+      if(options.get_bool_option("beautify"))
+        counterexample_beautificationt()(
+          dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
+
+      error_trace();
+    }
+    
     report_failure();
     return UNSAFE;
 

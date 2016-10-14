@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -61,7 +61,7 @@ void force_guard_violation(goto_functionst &gf, const size_t num_loops);
  * @param gf
  * @param num_loops
  */
-void force_invariant_and_guard_satisfaction(goto_functionst &gf,
+void force_ranking_error(goto_functionst &gf,
     const size_t num_loops);
 
 #endif /* CEGIS_DANGER_RESTRICT_COUNTEREXAMPLES_H_ */

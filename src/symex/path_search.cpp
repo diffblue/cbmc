@@ -46,6 +46,8 @@ path_searcht::resultt path_searcht::operator()(
   number_of_paths=0;
   number_of_VCCs=0;
   number_of_steps=0;
+  number_of_feasible_paths=0;
+  number_of_infeasible_paths=0;
   number_of_VCCs_after_simplification=0;
   number_of_failed_properties=0;
   number_of_locs=locs.size();
@@ -96,6 +98,15 @@ path_searcht::resultt path_searcht::operator()(
         number_of_paths++;
         continue;
       }
+
+      if(eager_infeasibility &&
+         state.last_was_branch() &&
+         !is_feasible(state))
+      {
+        number_of_infeasible_paths++;
+        number_of_paths++;
+        continue;
+      }
       
       if(number_of_steps%1000==0)
       {
@@ -109,17 +120,17 @@ path_searcht::resultt path_searcht::operator()(
       if(state.get_instruction()->is_assert())
       {
         if(show_vcc)
-          do_show_vcc(state, ns);
+          do_show_vcc(state);
         else
         {
-          check_assertion(state, ns);
+          check_assertion(state);
           
           // all assertions failed?
           if(number_of_failed_properties==property_map.size())
             break;
         }
       }
-      
+
       // execute
       path_symex(state, tmp_queue);
       
@@ -182,6 +193,9 @@ void path_searcht::report_statistics()
   status() << "Number of paths: "
            << number_of_paths << messaget::eom;
 
+  status() << "Number of infeasible paths: "
+           << number_of_infeasible_paths << messaget::eom;
+
   status() << "Generated " << number_of_VCCs << " VCC(s), "
            << number_of_VCCs_after_simplification
            << " remaining after simplification"
@@ -236,9 +250,7 @@ Function: path_searcht::do_show_vcc
 
 \*******************************************************************/
 
-void path_searcht::do_show_vcc(
-  statet &state,
-  const namespacet &ns)
+void path_searcht::do_show_vcc(statet &state)
 {
   // keep statistics
   number_of_VCCs++;
@@ -356,9 +368,7 @@ Function: path_searcht::check_assertion
 
 \*******************************************************************/
 
-void path_searcht::check_assertion(
-  statet &state,
-  const namespacet &ns)
+void path_searcht::check_assertion(statet &state)
 {
   // keep statistics
   number_of_VCCs++;
@@ -369,10 +379,10 @@ void path_searcht::check_assertion(
   irep_idt property_name=instruction.source_location.get_property_id();
   property_entryt &property_entry=property_map[property_name];
   
-  if(property_entry.status==FAIL)
+  if(property_entry.status==FAILURE)
     return; // already failed
   else if(property_entry.status==NOT_REACHED)
-    property_entry.status=PASS; // well, for now!
+    property_entry.status=SUCCESS; // well, for now!
 
   // the assertion in SSA
   exprt assertion=
@@ -397,11 +407,43 @@ void path_searcht::check_assertion(
   if(!state.check_assertion(bv_pointers))
   {
     build_goto_trace(state, bv_pointers, property_entry.error_trace);
-    property_entry.status=FAIL;
+    property_entry.status=FAILURE;
     number_of_failed_properties++;
   }
   
   sat_time+=current_time()-sat_start_time;
+}
+
+/*******************************************************************\
+
+Function: path_searcht::is_feasible
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool path_searcht::is_feasible(statet &state)
+{
+  status() << "Feasibility check" << eom;
+
+  // take the time
+  absolute_timet sat_start_time=current_time();
+
+  satcheckt satcheck;
+  bv_pointerst bv_pointers(ns, satcheck);
+  
+  satcheck.set_message_handler(get_message_handler());
+  bv_pointers.set_message_handler(get_message_handler());
+
+  bool result=state.is_feasible(bv_pointers);
+  
+  sat_time+=current_time()-sat_start_time;
+  
+  return result;
 }
 
 /*******************************************************************\
@@ -442,6 +484,7 @@ void path_searcht::initialize_property_map(
         property_entryt &property_entry=property_map[property_name];
         property_entry.status=NOT_REACHED;
         property_entry.description=source_location.get_comment();
+        property_entry.source_location=source_location;
       }
     }    
 }

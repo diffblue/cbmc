@@ -188,8 +188,9 @@ void add_padding(struct_typet &type, const namespacet &ns)
     }  
   }
 
-  // Is the struct packed?
-  if(type.get_bool(ID_C_packed))
+  // Is the struct packed, without any alignment specification?
+  if(type.get_bool(ID_C_packed) &&
+     type.find(ID_C_alignment).is_nil())
     return; // done
 
   mp_integer offset=0;
@@ -291,6 +292,9 @@ void add_padding(struct_typet &type, const namespacet &ns)
         max_alignment=tmp_i;
     }
   }
+  // Is the struct packed, without any alignment specification?
+  else if(type.get_bool(ID_C_packed))
+    return; // done
 
   // There may be a need for 'end of struct' padding.
   // We use 'max_alignment'.

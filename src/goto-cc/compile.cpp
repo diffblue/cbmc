@@ -94,7 +94,8 @@ bool compilet::doit()
       it++)
   {
     if(!find_library(*it))
-      warning() << "Library not found: " << *it << " (ignoring)" << eom;
+      // GCC is going to complain if this doesn't exist
+      debug() << "Library not found: " << *it << " (ignoring)" << eom;
   }
 
   statistics() << "No. of source files: " << source_files.size() << eom;
@@ -684,8 +685,8 @@ bool compilet::write_bin_object_file(
 
   unsigned cnt=function_body_count(functions);
 
-  debug() << "Functions: " << functions.function_map.size()
-          << "; " << cnt << " have a body." << eom;
+  statistics() << "Functions: " << functions.function_map.size()
+               << "; " << cnt << " have a body." << eom;
 
   outfile.close();
 

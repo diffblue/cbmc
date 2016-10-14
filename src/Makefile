@@ -1,9 +1,15 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
        assembler analyses java_bytecode aa-path-symex path-symex musketeer \
+<<<<<<< HEAD
        json cegis goto-analyzer jsil symex
 
 all: cbmc.dir goto-cc.dir goto-instrument.dir symex.dir goto-analyzer.dir
+=======
+       json cegis goto-analyzer jsil symex goto-diff
+
+all: cbmc.dir goto-cc.dir goto-instrument.dir symex.dir goto-analyzer.dir goto-diff.dir
+>>>>>>> origin/sat-strings
 
 ###############################################################################
 
@@ -34,11 +40,18 @@ cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
 goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
                    json.dir goto-instrument.dir
 
+goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
+               linking.dir analyses.dir solvers.dir json.dir
+
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 
 symex.dir: languages goto-programs.dir pointer-analysis.dir \
            goto-symex.dir linking.dir analyses.dir solvers.dir \
+<<<<<<< HEAD
            path-symex.dir
+=======
+           path-symex.dir goto-instrument.dir
+>>>>>>> origin/sat-strings
 
 # building for a particular directory
 

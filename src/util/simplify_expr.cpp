@@ -415,7 +415,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   }
 
   // Push a numerical typecast into pointer arithmetic
-  // (T)(x + y) ---> (T)((size_t)x + (size_t)y)
+  // (T)(ptr + int) ---> (T)((size_t)ptr + sizeof(subtype)*(size_t)int)
   //
   if((expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
      op_type.id()==ID_pointer &&
@@ -428,13 +428,18 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       const unsignedbv_typet size_t_type(config.ansi_c.pointer_width);
       expr.op0().type()=size_t_type;
 
-      Forall_operands(it, expr.op0())
+      for(auto & it : expr.op0().operands())
       {
-        it->make_typecast(size_t_type);
-
-        if(step>1 &&
-           it->type().id()!=ID_pointer)
-          *it=mult_exprt(from_integer(step, size_t_type), *it);
+        if(it.type().id()==ID_pointer)
+        {
+          it.make_typecast(size_t_type);
+        }
+        else
+        {
+          it.make_typecast(size_t_type);
+          if(step>1)
+            it=mult_exprt(from_integer(step, size_t_type), it);
+        }
       }
 
       simplify_rec(expr);
@@ -2504,6 +2509,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_bitwise(expr) && result;
   else if(expr.id()==ID_ashr || expr.id()==ID_lshr || expr.id()==ID_shl)
     result=simplify_shifts(expr) && result;
+  else if(expr.id()==ID_power)
+    result=simplify_power(expr) && result;
   else if(expr.id()==ID_plus)
     result=simplify_plus(expr) && result;
   else if(expr.id()==ID_minus)

@@ -1,7 +1,9 @@
 #include <util/simplify_expr.h>
 
+#include <cegis/cegis-util/program_helper.h>
 #include <cegis/invariant/options/invariant_program.h>
 #include <cegis/invariant/util/invariant_program_helper.h>
+#include <cegis/invariant/preprocess/remove_loops_and_assertion.h>
 
 namespace
 {
@@ -24,33 +26,46 @@ bool handle_assertion_removal(invariant_programt &program,
   return true;
 }
 
-void handle_loop_removal(invariant_programt &program,
-    goto_programt::instructionst &instrs, goto_programt::targett &target)
+goto_programt::targett handle_loop_removal(invariant_programt &program,
+    goto_programt::instructionst &instrs, goto_programt::targett target)
+{
+  if (!target->is_backwards_goto()) return target;
+  invariant_programt::invariant_loopt &loop=program.add_loop();
+  const goto_programt::targett next_in_loop=std::prev(target);
+  invariant_remove_loop(program.st, instrs, target, loop.guard, loop.body.begin,
+      loop.body.end);
+  return next_in_loop;
+}
+}
+
+void invariant_remove_loop(const symbol_tablet &st,
+    goto_programt::instructionst &instrs, const goto_programt::targett &target,
+    exprt &guard, goto_programt::targett &body_begin,
+    goto_programt::targett &body_end)
 {
   const goto_programt::instructiont &instr=*target;
-  if (!instr.is_backwards_goto()) return;
-  const namespacet ns(program.st);
+  const namespacet ns(st);
   const goto_programt::targett goto_target=instr.get_target();
-  invariant_programt::invariant_loopt &loop=program.add_loop();
   if (instr.guard.is_true())
   {
-    exprt guard=goto_target->guard;
-    if (ID_not == guard.id()) loop.guard=to_not_expr(guard).op();
-    else loop.guard=simplify_expr(not_exprt(guard), ns);
-    loop.body.begin=goto_target;
-    ++loop.body.begin;
-    erase_target(instrs, goto_target);
+    goto_programt::targett guard_instr=goto_target;
+    const goto_programt::targett end=instrs.end();
+    while (end != guard_instr && guard_instr->guard.is_true())
+      ++guard_instr;
+    assert(end != guard_instr);
+    if (ID_not == guard.id()) guard=to_not_expr(guard_instr->guard).op();
+    else guard=simplify_expr(not_exprt(guard_instr->guard), ns);
+    body_begin=std::next(guard_instr);
+    erase_target(instrs, guard_instr);
   } else
   {
-    loop.guard=simplify_expr(instr.guard, ns);
-    loop.body.begin=goto_target;
+    guard=simplify_expr(instr.guard, ns);
+    body_begin=goto_target;
   }
-  assert(!loop.guard.id().empty());
-  loop.body.end=target;
-  --loop.body.end;
-  erase_target(instrs, target--);
-  ++loop.body.end;
-}
+  assert(!guard.id().empty());
+  body_end=std::prev(target);
+  erase_target(instrs, target);
+  ++body_end;
 }
 
 void invariant_remove_loops_and_assertion(invariant_programt &program)
@@ -61,6 +76,6 @@ void invariant_remove_loops_and_assertion(invariant_programt &program)
   for (goto_programt::targett it=instrs.begin(); it != instrs.end(); ++it)
   {
     if (handle_assertion_removal(program, instrs, it)) break;
-    handle_loop_removal(program, instrs, it);
+    it=handle_loop_removal(program, instrs, it);
   }
 }

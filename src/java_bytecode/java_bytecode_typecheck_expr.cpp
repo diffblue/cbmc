@@ -108,8 +108,8 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
 
   symbol_tablet::symbolst::const_iterator s_it=
     symbol_table.symbols.find(identifier);
-    
-  const typet string_type=expr.type().subtype();
+
+  const symbol_typet string_type("java::java.lang.String");
   
   if(s_it==symbol_table.symbols.end())
   {
@@ -124,7 +124,10 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
     new_symbol.is_lvalue=true;
     
     if(symbol_table.add(new_symbol))
-      throw "failed to add string literal symbol to symbol table";
+    {
+      error() << "failed to add string literal symbol to symbol table" << eom;
+      throw 0;
+    }
   }
   
   expr=address_of_exprt(
@@ -153,7 +156,6 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
   
   if(s_it==symbol_table.symbols.end())
   {
-    #if 1
     assert(has_prefix(id2string(identifier), "java::"));
   
     // no, create the symbol
@@ -175,13 +177,10 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
     }
     
     if(symbol_table.add(new_symbol))
-      throw "failed to add expression symbol to symbol table";
-    #else
-    str << "failed to find expression symbol `"
-        << identifier << "' in symbol table";
-    throw 0;
-    
-    #endif
+    {
+      error() << "failed to add expression symbol to symbol table" << eom;
+      throw 0;
+    }
   }
   else
   {

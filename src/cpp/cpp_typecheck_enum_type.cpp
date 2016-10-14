@@ -191,7 +191,12 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     // move early, must be visible before doing body
     symbolt *new_symbol;
     if(symbol_table.move(symbol, new_symbol))
-      throw "cpp_typecheckt::typecheck_enum_type: symbol_table.move() failed";    
+    {
+      err_location(symbol.location);
+      error() << "cpp_typecheckt::typecheck_enum_type: symbol_table.move() failed"
+              << eom;
+      throw 0;
+    }
 
     // put into scope
     cpp_idt &scope_identifier=

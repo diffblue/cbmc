@@ -24,18 +24,19 @@ Function: boolbvt::convert_union
 
 \*******************************************************************/
 
-void boolbvt::convert_union(const union_exprt &expr, bvt &bv)
+bvt boolbvt::convert_union(const union_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   const bvt &op_bv=convert_bv(expr.op());
 
   if(width<op_bv.size())
     throw "union: unexpected operand op width";
 
+  bvt bv;
   bv.resize(width);
   
   if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN)
@@ -61,4 +62,6 @@ void boolbvt::convert_union(const union_exprt &expr, bvt &bv)
     for(std::size_t i=op_bv.size(); i<bv.size(); i++)
       bv[map_u.map_bit(i)]=prop.new_variable();
   }
+  
+  return bv;
 }

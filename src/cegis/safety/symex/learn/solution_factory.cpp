@@ -5,10 +5,10 @@
 #include <cegis/danger/meta/literals.h>
 #include <cegis/genetic/instruction_set_info_factory.h>
 
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/value/program_individual_serialisation.h>
 #include <cegis/instructions/instruction_set_factory.h>
 #include <cegis/invariant/meta/meta_variable_names.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/invariant/util/copy_instructions.h>
 #include <cegis/invariant/symex/learn/replace_operators.h>
 #include <cegis/safety/meta/meta_variable_names.h>
@@ -86,7 +86,7 @@ void extract_program(goto_programt::instructionst &prog,
 size_t create_temps(invariant_variable_namest &rnames, const size_t num_tmp)
 {
   for (size_t i=0; i < num_tmp; ++i)
-    rnames.insert(std::make_pair(i, get_invariant_meta_name(get_tmp(i))));
+    rnames.insert(std::make_pair(i, get_cegis_meta_name(get_tmp(i))));
   return num_tmp;
 }
 
@@ -94,18 +94,18 @@ void set_result_var(invariant_variable_namest &result_var_names,
     const size_t var_idx, const size_t loop_idx)
 {
   result_var_names.erase(var_idx);
-  const std::string result_name(get_invariant_meta_name(get_Ix(loop_idx)));
+  const std::string result_name(get_cegis_meta_name(get_Ix(loop_idx)));
   result_var_names.insert(std::make_pair(var_idx, result_name));
 }
 }
 
 void create_safety_solution(safety_goto_solutiont &solution,
     const safety_programt &prog, const goto_tracet &trace,
-    const invariant_variable_idst &var_ids, const size_t max_sz)
+    const operand_variable_idst &var_ids, const size_t max_sz)
 {
   solution.clear();
-  instruction_sett instr_set;
-  extract_instruction_set(instr_set, get_execute_body(prog.gf));
+  const goto_programt &execute_body=get_execute_body(prog.gf);
+  const instruction_sett instr_set(extract_instruction_set(execute_body));
   invariant_variable_namest var_names;
   reverse_invariant_var_ids(var_names, var_ids);
   invariant_variable_namest result_var_names;
@@ -127,7 +127,7 @@ namespace
 {
 void create_safety_solution(safety_goto_solutiont &solution,
     const symbol_tablet &st, const goto_functionst &gf,
-    const program_individualt &ind, const invariant_variable_idst &var_ids,
+    const program_individualt &ind, const operand_variable_idst &var_ids,
     const instruction_sett &instr_set)
 {
   solution.clear();
@@ -148,16 +148,16 @@ void create_safety_solution(safety_goto_solutiont &solution,
 
 void create_safety_solution(safety_goto_solutiont &solution,
     const symbol_tablet &st, const goto_functionst &gf,
-    const program_individualt &ind, const invariant_variable_idst &var_ids)
+    const program_individualt &ind, const operand_variable_idst &var_ids)
 {
-  instruction_sett instr_set;
-  extract_instruction_set(instr_set, get_execute_body(gf));
+  const goto_programt &execute_body=get_execute_body(gf);
+  const instruction_sett instr_set(extract_instruction_set(execute_body));
   create_safety_solution(solution, st, gf, ind, var_ids, instr_set);
 }
 
 void create_safety_solution(safety_goto_solutiont &solution,
     const symbol_tablet &st, const goto_functionst &gf,
-    const program_individualt &ind, const invariant_variable_idst &var_ids,
+    const program_individualt &ind, const operand_variable_idst &var_ids,
     instruction_set_info_factoryt &info_fac)
 {
   const instruction_sett &instr_set=info_fac.get_instructions();

@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/expr_util.h>
 #include <util/prefix.h>
+#include <util/expanding_vector.h>
 
 #include <ansi-c/c_types.h>
 
@@ -94,7 +95,7 @@ protected:
     symbol_exprt symbol_expr;
   };
   
-  std::vector<variablet> variables;
+  expanding_vector<variablet> variables;
   
   bool method_has_this;
 
@@ -106,20 +107,21 @@ protected:
     unsigned number_int=safe_string2unsigned(id2string(number));
     typet t=java_type_from_char(type_char);
 
-    if(number_int<variables.size())
+    if(variables[number_int].symbol_expr.get_identifier().empty())
     {
-      exprt result=variables[number_int].symbol_expr;
-      if(t!=result.type()) result=typecast_exprt(result, t);
-      return result;
-    }
-    else
-    {
+      // an un-named local variable
       irep_idt base_name="local"+id2string(number)+type_char;
       irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
 
       symbol_exprt result(identifier, t);
       result.set(ID_C_base_name, base_name);
 
+      return result;
+    }
+    else
+    {
+      exprt result=variables[number_int].symbol_expr;
+      if(t!=result.type()) result=typecast_exprt(result, t);
       return result;
     }
   }
@@ -160,7 +162,10 @@ protected:
   exprt::operandst pop(unsigned n)
   {
     if(stack.size()<n)
-      throw "malformed bytecode (pop too high)";
+    {
+      error() << "malformed bytecode (pop too high)" << eom;
+      throw 0;
+    }
 
     exprt::operandst operands;
     operands.resize(n);
@@ -188,7 +193,7 @@ protected:
   codet convert_instructions(
     const instructionst &, const code_typet &);
 
-  static const bytecode_infot &get_bytecode_info(const irep_idt &statement);
+  const bytecode_infot &get_bytecode_info(const irep_idt &statement);
   
   void generate_class_stub(const irep_idt &class_name);
   void add_array_types();
@@ -249,7 +254,10 @@ void java_bytecode_convertt::convert(const classt &c)
   
   // add before we do members
   if(symbol_table.move(new_symbol, class_symbol))
-    throw "failed to add class symbol "+id2string(new_symbol.name);
+  {
+    error() << "failed to add class symbol " << new_symbol.name << eom;
+    throw 0;
+  }
 
   // now do members  
   for(const auto & it : c.fields)
@@ -378,15 +386,34 @@ void java_bytecode_convertt::convert(
     this_p.set_this();
     parameters.insert(parameters.begin(), this_p);
   }
-  
+
   variables.clear();
-  
+
+  // Do the parameters and locals in the variable table,
+  // which is only available when compiled with -g
+  for(const auto & v : m.local_variable_table)
+  {
+    typet t=java_type_from_string(v.signature);
+    irep_idt identifier=id2string(method_identifier)+"::"+id2string(v.name);
+    symbol_exprt result(identifier, t);
+    result.set(ID_C_base_name, v.name);
+    variables[v.index].symbol_expr=result;
+  }
+
+  // set up variables array
+  for(std::size_t i=0, param_index=0;
+      i < parameters.size(); ++i)
+  {
+    variables[param_index];
+    param_index+=get_variable_slots(parameters[i]);
+  }
+
   // assign names to parameters
   for(std::size_t i=0, param_index=0;
       i < parameters.size(); ++i)
   {
     irep_idt base_name, identifier;
-    
+
     if(i==0 && parameters[i].get_this())
     {
       base_name="this";
@@ -397,22 +424,21 @@ void java_bytecode_convertt::convert(
     else
     {
       // in the variable table?
-      for(const auto & v : m.local_variable_table)
-        if(v.index==param_index)
-          base_name=v.name;
-
+      base_name=variables[param_index].symbol_expr.get(ID_C_base_name);
+      identifier=variables[param_index].symbol_expr.get(ID_identifier);
+      
       if(base_name.empty())
       {
         const typet &type=parameters[i].type();
         char suffix=java_char_from_type(type);
         base_name="arg"+i2string(param_index)+suffix;
+        identifier=id2string(method_identifier)+"::"+id2string(base_name);
       }
-    
-      identifier=id2string(method_identifier)+"::"+id2string(base_name);
+      
       parameters[i].set_base_name(base_name);
       parameters[i].set_identifier(identifier);
     }
-    
+
     // add to symbol table
     parameter_symbolt parameter_symbol;
     parameter_symbol.base_name=base_name;
@@ -423,24 +449,8 @@ void java_bytecode_convertt::convert(
 
     // add as a JVM variable
     unsigned slots=get_variable_slots(parameters[i]);
-    variables.resize(param_index+slots);
     variables[param_index].symbol_expr=parameter_symbol.symbol_expr();
     param_index+=slots;
-  }
-
-  // Do the locals in the variable table
-  for(const auto & v : m.local_variable_table)
-  {
-    if(v.index>=variables.size()) variables.resize(v.index+1);
-
-    if(variables[v.index].symbol_expr.get_identifier().empty())    
-    {
-      typet t=java_type_from_string(v.signature);
-      irep_idt identifier=id2string(current_method)+"::"+id2string(v.name);
-      symbol_exprt result(identifier, t);
-      result.set(ID_C_base_name, v.name);
-      variables[v.index].symbol_expr=result;
-    }
   }
 
   class_type.methods().push_back(class_typet::methodt());
@@ -458,34 +468,36 @@ void java_bytecode_convertt::convert(
     method.set(ID_constructor, true);
 
   method.type()=member_type;
-  
-  // do we have the method symbol already?
-  const auto s_it=symbol_table.symbols.find(method.get_name());
-  if(s_it!=symbol_table.symbols.end())
-  {
-    // erase if blank, we stubbed it
-    if(s_it->second.value.is_nil())
-      symbol_table.symbols.erase(s_it);
-  }
 
-  // create method symbol
+  // we add the symbol for the method
+
   symbolt method_symbol;
+
+  method_symbol.name=method.get_name();
+  method_symbol.base_name=method.get_base_name();
   method_symbol.mode=ID_java;
   method_symbol.name=method.get_name();
   method_symbol.base_name=method.get_base_name();
-  
+
   if(method.get_base_name()=="<init>")
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
                               id2string(class_symbol.base_name)+"()";
   else
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
                               id2string(method.get_base_name())+"()";
-  
+
   method_symbol.type=member_type;
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
+
   tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
+  
+  // do we have the method symbol already?
+  const auto s_it=symbol_table.symbols.find(method.get_name());
+  if(s_it!=symbol_table.symbols.end())
+    symbol_table.symbols.erase(s_it); // erase, we stubbed it
+    
   symbol_table.add(method_symbol);
 }
 
@@ -542,7 +554,10 @@ void java_bytecode_convertt::convert(
     new_symbol.value=gen_zero(member_type);
 
     if(symbol_table.add(new_symbol))
-      throw "failed to add static field symbol";
+    {
+      error() << "failed to add static field symbol" << eom;
+      throw 0;
+    }
   }
 }
 
@@ -564,8 +579,9 @@ const bytecode_infot &java_bytecode_convertt::get_bytecode_info(
   for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
     if(statement==p->mnemonic) return *p;
 
-  throw std::string("failed to find bytecode mnemonic `")+
-        id2string(statement)+"'";
+  error() << "failed to find bytecode mnemonic `"
+          << statement << '\'' << eom;
+  throw 0;
 }
 
 namespace {
@@ -781,6 +797,9 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="checkcast")
     {
+      // checkcast throws an exception in case a cast of object
+      // on stack to given type fails.
+      // The stack isn't modified.
       assert(op.size()==1 && results.size()==1);
       results[0]=op[0];
     }
@@ -828,26 +847,31 @@ codet java_bytecode_convertt::convert_instructions(
       code_function_callt call;
       call.add_source_location()=i_it->source_location;
       call.arguments() = pop(parameters.size());
-      
+
+      // double-check a bit      
       if(use_this)
       {
-        // 'this' may be a class type, which is the run-time
-        // info for that type, and are instances of java.lang.Class
-        assert(!call.arguments().empty());
-        
-        exprt &this_arg=call.arguments().front();
-        
-        if(this_arg.id()==ID_type)
-        {
-          irep_idt class_id=this_arg.type().get(ID_identifier);
-          symbol_typet java_lang_Class("java::java.lang.Class");
-          symbol_exprt symbol_expr(id2string(class_id)+"@class_model", java_lang_Class);
-          address_of_exprt address_of_expr(symbol_expr);
-          this_arg=address_of_expr;
-        }
-
+        const exprt &this_arg=call.arguments().front();
         assert(this_arg.type().id()==ID_pointer);
       }
+      
+      // do some type adjustment for the arguments,
+      // as Java promotes arguments
+
+      for(unsigned i=0; i<parameters.size(); i++)
+      {
+        const typet &type=parameters[i].type();
+        if(type==java_boolean_type() ||
+           type==java_char_type() ||
+           type==java_byte_type() ||
+           type==java_short_type())
+        {
+          assert(i<call.arguments().size());
+          call.arguments()[i].make_typecast(type);
+        }
+      }
+      
+      // do some type adjustment for return values
 
       const typet &return_type=code_type.return_type();
 
@@ -864,6 +888,7 @@ codet java_bytecode_convertt::convert_instructions(
 
       // does the function symbol exist?
       irep_idt id=arg0.get(ID_identifier);
+
       if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
       {
         // no, create stub
@@ -886,11 +911,16 @@ codet java_bytecode_convertt::convert_instructions(
       else
       {
         // static binding
-        call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
+	/*if(id == "java::java.lang.String.charAt:(I)C")
+	  call.function()=symbol_exprt("java::__CPROVER_uninterpreted_char_at", arg0.type());
+	  else*/
+	  call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
+
       }
 
       call.function().add_source_location()=i_it->source_location;
       c = call;
+      
     }
     else if(statement=="return")
     {
@@ -932,7 +962,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.empty());
 
       exprt var=variable(arg0, statement[0]);
-
+      
       const bool is_array('a' == statement[0]);
       
       if(is_array)
@@ -969,7 +999,41 @@ codet java_bytecode_convertt::convert_instructions(
             statement=="ldc2" || statement=="ldc2_w")
     {
       assert(op.empty() && results.size()==1);
-      results[0]=arg0;
+      
+      // 1) Pushing a String causes a reference to a java.lang.String object
+      // to be constructed and pushed onto the operand stack.
+
+      // 2) Pushing an int or a float causes a primitive value to be pushed
+      // onto the stack.
+      
+      // 3) Pushing a Class constant causes a reference to a java.lang.Class
+      // to be pushed onto the operand stack
+      
+      if(arg0.id()==ID_java_string_literal)
+      {
+        // these need to be references to java.lang.String
+        results[0]=arg0;
+        symbol_typet string_type("java::java.lang.String");
+        results[0].type()=pointer_typet(string_type);
+      }
+      else if(arg0.id()==ID_type)
+      {
+        irep_idt class_id=arg0.type().get(ID_identifier);
+        symbol_typet java_lang_Class("java::java.lang.Class");
+        symbol_exprt symbol_expr(id2string(class_id)+"@class_model", java_lang_Class);
+        address_of_exprt address_of_expr(symbol_expr);
+        results[0]=address_of_expr;
+      }
+      else if(arg0.id()==ID_constant)
+      {
+        results[0]=arg0;
+      }
+      else
+      {
+        error() << "unexpected ldc argument" << eom;
+        throw 0;
+      }
+      
     }
     else if(statement=="goto" || statement=="goto_w")
     {
@@ -1466,6 +1530,13 @@ codet java_bytecode_convertt::convert_instructions(
       if(statement=="pop2" &&
          op[0].type().get_unsigned_int(ID_width)==32)
         pop(1);
+    }
+    else if(statement=="instanceof")
+    {
+      assert(op.size()==1 && results.size()==1);
+
+      results[0]=
+        binary_predicate_exprt(op[0], "java_instanceof", arg0);
     }
     else
     {

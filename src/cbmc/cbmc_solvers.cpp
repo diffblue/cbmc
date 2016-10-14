@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/bv_refinement.h>
+#include <solvers/refinement/string_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
@@ -324,6 +325,29 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
 
 /*******************************************************************\
 
+Function: cbmc_solverst::get_string_refinement
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+ 
+cbmc_solverst::solvert* cbmc_solverst::get_string_refinement()
+{
+  propt *prop;
+  prop=new satcheck_no_simplifiert();
+  prop->set_message_handler(get_message_handler());
+
+  string_refinementt *string_refinement = new string_refinementt(ns, *prop);
+  string_refinement->set_ui(ui);
+  return new cbmc_solver_with_propt(string_refinement, prop);
+}
+
+/*******************************************************************\
+
 Function: cbmc_solverst::get_smt1
 
   Inputs:
@@ -344,7 +368,10 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
   if(filename=="")
   {
     if(solver==smt1_dect::GENERIC)
-      throw "please use --outfile";
+    {
+      error() << "please use --outfile" << eom;
+      throw 0;
+    }
 
     smt1_dect* smt1_dec = new smt1_dect(
       ns,
@@ -378,7 +405,10 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
     #endif
     
     if(!out)
-      throw "failed to open "+filename;
+    {
+      error() << "failed to open " << filename << eom;
+      throw 0;
+    }
 
     smt1_convt* smt1_conv = new smt1_convt(
       ns,
@@ -415,7 +445,10 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
   if(filename=="")
   {
     if(solver==smt2_dect::GENERIC)
-      throw "please use --outfile";
+    {
+      error() << "please use --outfile" << eom;
+      throw 0;
+    }
   
     smt2_dect* smt2_dec = new smt2_dect(
       ns,
@@ -455,7 +488,10 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
     #endif
     
     if(!*out)
-      throw "failed to open "+filename;
+    {
+      error() << "failed to open " << filename << eom;
+      throw 0;
+    }
 
     smt2_convt* smt2_conv = new smt2_convt(
       ns,
@@ -489,7 +525,10 @@ Function: cbmc_solverst::no_beautification
 void cbmc_solverst::no_beautification()
 {
   if(options.get_bool_option("beautify"))
-    throw "sorry, this solver does not support beautification";
+  {
+    error() << "sorry, this solver does not support beautification" << eom;
+    throw 0;
+  }
 }
 
 /*******************************************************************\
@@ -509,5 +548,8 @@ void cbmc_solverst::no_incremental_check()
   if(options.get_bool_option("all-properties") ||
      options.get_option("cover")!="" ||
      options.get_option("incremental-check")!="")
-    throw "sorry, this solver does not support incremental solving";
+  {
+    error() << "sorry, this solver does not support incremental solving" << eom;
+    throw 0;
+  }
 }

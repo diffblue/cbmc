@@ -57,7 +57,7 @@ public:
 
   // build a forward-traversible version of the history  
   void build_history(std::vector<path_symex_step_reft> &dest) const;
-
+  
 protected:
   // we use a vector to store all steps
   std::size_t index;

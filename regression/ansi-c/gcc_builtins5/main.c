@@ -1,3 +1,5 @@
+#ifdef __GNUC__
+
 typedef unsigned long int uintptr_t;
 typedef unsigned long int uint64_t;
 typedef long int __intptr_t;
@@ -54,3 +56,11 @@ int main()
               ) 0))) (stack_chk_guard))),
   "i" (__builtin_offsetof (struct pthread, header.stack_guard)));
 }
+
+#else
+
+int main()
+{
+}
+
+#endif

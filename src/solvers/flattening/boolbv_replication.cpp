@@ -22,17 +22,18 @@ Function: boolbvt::convert_replication
 
 \*******************************************************************/
 
-void boolbvt::convert_replication(const replication_exprt &expr, bvt &bv)
+bvt boolbvt::convert_replication(const replication_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
-    return conversion_failed(expr, bv);
+    return conversion_failed(expr);
 
   mp_integer times;
   if(to_integer(expr.op0(), times))
     throw "replication takes constant as first parameter";
 
+  bvt bv;
   bv.resize(width);
 
   const std::size_t u_times=integer2unsigned(times);
@@ -52,4 +53,6 @@ void boolbvt::convert_replication(const replication_exprt &expr, bvt &bv)
 
   if(offset!=bv.size())
     throw "replication operand width too small";
+    
+  return bv;
 }

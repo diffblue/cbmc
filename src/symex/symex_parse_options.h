@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 
+#include <goto-programs/get_goto_model.h>
+
 #include <langapi/language_ui.h>
 
 #include "path_search.h"
@@ -32,12 +34,13 @@ class optionst;
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
   "(bfs)(dfs)(locs)" \
+  "(cover):" \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \
   "(ppc-macos)(unsigned-char)" \
   "(string-abstraction)(no-arch)(arch):(floatbv)(fixedbv)" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(show-locs)(show-vcc)(show-properties)(show-trace)(show-goto-functions)" \
-  "(property):(stop-on-fail)" \
+  "(show-locs)(show-vcc)(show-properties)(show-goto-functions)" \
+  "(property):(trace)(show-trace)(stop-on-fail)(eager-infeasibility)" \
   "(no-simplify)(no-unwinding-assertions)(no-propagation)"
   // the last line is for CBMC-regression testing only
 
@@ -50,30 +53,23 @@ public:
   virtual void help();
 
   symex_parse_optionst(int argc, const char **argv);
-  symex_parse_optionst(
-    int argc,
-    const char **argv,
-    const std::string &extra_options);
 
 protected:
+  get_goto_modelt goto_model;
+
   void get_command_line_options(optionst &options);
-
-  bool get_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
-
-  bool process_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
-    
-  bool set_properties(goto_functionst &goto_functions);
+  bool process_goto_program(const optionst &options);
+  bool set_properties();
 
   void report_success();
   void report_failure();
   void report_properties(const path_searcht::property_mapt &);
+  void report_cover(const path_searcht::property_mapt &);
   void show_counterexample(const class goto_tracet &);
             
   void eval_verbosity();
+
+  std::string get_test(const goto_tracet &goto_trace);
 };
 
 #endif

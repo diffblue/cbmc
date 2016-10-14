@@ -3,7 +3,7 @@
  Module: Counterexample-Guided Inductive Synthesis
 
  Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseil@cs.ox.ac.uk
+         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -49,6 +49,20 @@ public:
    * @return
    */
   goto_programt::targett operator()(const goto_programt::targett &target) const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param target_targets
+   * @param src_targets
+   *
+   * @return
+   */
+  void operator()(
+      goto_programt::targetst &target_targets,
+      const goto_programt::targetst &src_targets) const;
 
   /**
    * @brief

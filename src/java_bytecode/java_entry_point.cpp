@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 
 #include "java_entry_point.h"
+#include "java_object_factory.h"
 
 //#include "zero_initializer.h"
 
@@ -68,229 +69,6 @@ void create_initialize(symbol_tablet &symbol_table)
   
   if(symbol_table.add(initialize))
     throw "failed to add "+std::string(INITIALIZE);
-}
-}
-
-/*******************************************************************\
-
-Function: gen_nondet_init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-namespace {
-void gen_nondet_init(
-  const exprt &expr,
-  code_blockt &init_code,
-  const namespacet &ns,
-  std::set<irep_idt> &recursion_set,
-  bool is_sub,
-  irep_idt class_identifier)
-{
-  const typet &type=ns.follow(expr.type());
-  
-  if(type.id()==ID_pointer)
-  {
-    #if 0
-    // dereferenced type
-    const pointer_typet &pointer_type=to_pointer_type(type);
-    const typet &subtype=ns.follow(pointer_type.subtype());
-
-    if(subtype.id()==ID_struct)
-    {
-      const struct_typet &struct_type=to_struct_type(subtype);
-      const irep_idt struct_tag=struct_type.get_tag();
-
-      if(recursion_set.find(struct_tag)!=recursion_set.end())
-      {
-        // make null
-        null_pointer_exprt null_pointer_expr(pointer_type);
-        code_assignt code(expr, null_pointer_expr);
-        init_code.copy_to_operands(code);
-
-        return;
-      }
-    }
-
-    // build size expression
-    exprt object_size=size_of_expr(subtype, ns);
-
-    if(subtype.id()!=ID_empty && !object_size.is_nil())
-    {
-      // malloc expression
-      side_effect_exprt malloc_expr(ID_malloc);
-      malloc_expr.copy_to_operands(object_size);
-      malloc_expr.type()=pointer_type;
-
-      code_assignt code(expr, malloc_expr);
-      init_code.copy_to_operands(code);
-
-      // dereference expression
-      dereference_exprt deref_expr(expr, subtype);
-
-      gen_nondet_init(deref_expr, init_code, ns, recursion_set, false, "");
-    }
-    else
-    {
-      // make null
-      null_pointer_exprt null_pointer_expr(pointer_type);
-      code_assignt code(expr, null_pointer_expr);
-      init_code.copy_to_operands(code);
-    }
-    #endif
-  }
-  else if(type.id()==ID_struct)
-  {
-    typedef struct_typet::componentst componentst;
-
-    const struct_typet &struct_type=to_struct_type(type);
-    const irep_idt struct_tag=struct_type.get_tag();
-
-    const componentst &components=struct_type.components();
-    
-    recursion_set.insert(struct_tag);
-    assert(!recursion_set.empty());
-    
-    for(const auto & component : components)
-    {
-      const typet &component_type=component.type();
-      irep_idt name=component.get_name();
-
-      member_exprt me(expr, name, component_type);
-
-      if(name=="@class_identifier")
-      {
-        constant_exprt ci(class_identifier, string_typet());
-
-        code_assignt code(me, ci);
-        init_code.copy_to_operands(code);
-      }
-      else
-      {
-        assert(!name.empty());
-
-        bool _is_sub = name[0]=='@';
-        irep_idt _class_identifier=
-          _is_sub?(class_identifier.empty()?struct_tag:class_identifier):"";
-
-        gen_nondet_init(
-          me, init_code, ns, recursion_set, _is_sub, _class_identifier);
-      }
-    }
-
-    recursion_set.erase(struct_tag);
-  }
-  else
-  {
-    side_effect_expr_nondett se=side_effect_expr_nondett(type);
-
-    code_assignt code(expr, se);
-    init_code.copy_to_operands(code);
-  }
-}
-}
-
-/*******************************************************************\
-
-Function: gen_nondet_init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-namespace {
-void gen_nondet_init(
-  const exprt &expr,
-  code_blockt &init_code,
-  const namespacet &ns)
-{
-  std::set<irep_idt> recursion_set;
-  gen_nondet_init(expr, init_code, ns, recursion_set, false, "");
-}
-}
-
-/*******************************************************************\
-
-Function: gen_nondet_init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-namespace {
-symbolt &new_tmp_symbol(symbol_tablet &symbol_table)
-{
-  static int temporary_counter=0;
-
-  auxiliary_symbolt new_symbol;
-  symbolt *symbol_ptr;
-
-  do
-  {
-    new_symbol.name="tmp_struct_init$"+i2string(++temporary_counter);
-    new_symbol.base_name=new_symbol.name;
-    new_symbol.mode=ID_java;
-  } while(symbol_table.move(new_symbol, symbol_ptr));
-
-  return *symbol_ptr;
-}
-}
-
-/*******************************************************************\
-
-Function: gen_argument
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-namespace {
-exprt gen_argument(
-  const typet &type,
-  code_blockt &init_code,
-  bool is_this,
-  bool allow_null,
-  symbol_tablet &symbol_table)
-{
-  if(type.id()==ID_pointer)
-  {
-    symbolt &aux_symbol=new_tmp_symbol(symbol_table);
-    aux_symbol.type=type.subtype();
-    aux_symbol.is_static_lifetime=true;
-
-    exprt object=aux_symbol.symbol_expr();
-    
-    const namespacet ns(symbol_table);
-    gen_nondet_init(object, init_code, ns);
-
-    // todo: need to pass null, possibly
-    return address_of_exprt(object);
-  }
-  else if(type.id()==ID_c_bool)
-  {
-    // We force this to 0 and 1 and won't consider
-    // other values.
-    return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
-  }
-  else
-    return side_effect_expr_nondett(type);
 }
 }
 
@@ -556,11 +334,11 @@ bool java_entry_point(
   {
     bool is_this=param_number==0 &&
                  parameters[param_number].get_this();
-    bool allow_null=config.main!="";
+    bool allow_null=config.main!="" && !is_this;
     
     main_arguments[param_number]=
-      gen_argument(parameters[param_number].type(), 
-                   init_code, is_this, allow_null, symbol_table);
+      object_factory(parameters[param_number].type(), 
+                     init_code, allow_null, symbol_table);
   }
 
   call_main.arguments()=main_arguments;

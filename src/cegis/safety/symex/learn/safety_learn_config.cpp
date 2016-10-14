@@ -4,11 +4,11 @@
 
 #include <cegis/danger/meta/literals.h>
 
+#include <cegis/cegis-util/program_helper.h>
+#include <cegis/instrument/cegis_library.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/invariant/util/invariant_constraint_variables.h>
-#include <cegis/invariant/util/invariant_program_helper.h>
-#include <cegis/invariant/instrument/meta_variables.h>
 #include <cegis/invariant/symex/learn/instrument_vars.h>
-#include <cegis/invariant/symex/learn/invariant_library.h>
 #include <cegis/invariant/symex/learn/add_invariant_programs_to_learn.h>
 #include <cegis/safety/symex/learn/add_counterexamples.h>
 #include <cegis/safety/value/safety_goto_ce.h>
@@ -32,14 +32,14 @@ void safety_learn_configt::process(const counterexamplest &ces,
 {
   program=original_program;
   var_ids.clear();
-  const symbol_tablet &st=program.st;
+  symbol_tablet &st=program.st;
   num_consts=get_invariant_variable_ids(st, var_ids);
   const size_t num_vars=var_ids.size();
   null_message_handlert msg;
   const std::string name(DANGER_EXECUTE);
-  add_invariant_library(program, msg, num_vars, num_consts, max_sz, name);
-  add_safety_learning_variable_refs(program, var_ids, max_sz);
   goto_functionst &gf=program.gf;
+  add_cegis_library(st, gf, msg, num_vars, num_consts, max_sz, name);
+  add_safety_learning_variable_refs(program, var_ids, max_sz);
   link_result_var(st, gf, var_ids.size(), max_sz, program.Ix0);
   add_invariant_progs_to_learn(program, max_sz);
   const invariant_programt &prog=program;
@@ -55,7 +55,7 @@ void safety_learn_configt::process(const size_t max_solution_size)
 {
   constraint_varst ce_vars;
   get_invariant_constraint_vars(ce_vars, original_program);
-  const typet type(invariant_meta_type());  // XXX: Currently single data type
+  const typet type(cegis_default_integer_type());  // XXX: Currently single data type
   const exprt zero(gen_zero(type));
   counterexamplet dummy_ce;
   dummy_ce.x.push_back(counterexamplet::assignmentst());

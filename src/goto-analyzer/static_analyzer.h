@@ -15,17 +15,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/options.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 bool static_analyzer(
-  const goto_functionst &,
-  const namespacet &,
+  const goto_modelt &,
   const optionst &,
   message_handlert &);
 
 void show_intervals(
-  const goto_functionst &,
-  const namespacet &,
+  const goto_modelt &,
   std::ostream &);
 
 #endif

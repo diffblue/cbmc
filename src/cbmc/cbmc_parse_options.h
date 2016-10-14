@@ -36,13 +36,13 @@ class optionst;
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
   "(fixedbv)" \
-  "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)(aig)" \
+  "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)(aig)(pass)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
   "(show-claims)(claim):(show-properties)(show-reachable-properties)(property):" \
-  "(stop-on-fail)" \
+  "(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
   "(cover):" \

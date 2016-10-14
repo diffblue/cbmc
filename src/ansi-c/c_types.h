@@ -37,6 +37,8 @@ typet gcc_signed_int128_type();
 typet size_type();
 typet signed_size_type();
 typet pointer_diff_type();
+typet pointer_type(const typet &);
+typet void_type();
 
 // Turns an ID_C_c_type into a string, e.g.,
 // ID_signed_int gets "signed int".

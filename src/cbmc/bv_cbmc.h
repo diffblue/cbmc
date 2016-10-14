@@ -21,10 +21,10 @@ public:
 
 protected:
   // overloading
-  virtual void convert_bitvector(const exprt &expr, bvt &bv); // no cache
+  virtual bvt convert_bitvector(const exprt &expr); // no cache
 
-  virtual void convert_waitfor(const exprt &expr, bvt &bv);
-  virtual void convert_waitfor_symbol(const exprt &expr, bvt &bv);
+  virtual bvt convert_waitfor(const exprt &expr);
+  virtual bvt convert_waitfor_symbol(const exprt &expr);
 };
 
 #endif
