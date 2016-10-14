@@ -1,0 +1,7 @@
+CORE
+easychair.class
+--pass
+^EXIT=10$
+^SIGNAL=0$
+^\[assertion.1\] assertion at file easychair.java line 29: FAILURE$
+--

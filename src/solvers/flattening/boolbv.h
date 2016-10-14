@@ -169,6 +169,7 @@ protected:
   virtual bvt convert_bv_reduction(const unary_exprt &expr);
   virtual bvt convert_not(const not_exprt &expr);
   virtual bvt convert_power(const binary_exprt &expr);
+  virtual bvt convert_function_application(const function_application_exprt &expr);
 
   virtual void make_bv_expr(const typet &type, const bvt &bv, exprt &dest);
   virtual void make_free_bv_expr(const typet &type, exprt &dest);
