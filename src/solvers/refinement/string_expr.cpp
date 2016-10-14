@@ -11,6 +11,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <ansi-c/string_constant.h>
 #include <util/unicode.h>
 #include <solvers/floatbv/float_bv.h>
+#include <java_bytecode/java_types.h>
 
 exprt index_zero = refined_string_typet::index_zero();
 unsigned string_exprt::next_symbol_id = 1;
@@ -1155,6 +1156,9 @@ void string_exprt::of_string_format(const function_application_exprt &f, std::ma
       string_exprt begin(char_type);
       begin.of_string_constant(format_string.substr(0,position),char_width,char_type,axioms);
       strings.push_back(begin);
+      std::cout << "string_exprt::of_string_format : " << f.pretty() << std::endl;
+      typecast_exprt arg_tab(member_exprt(args[1].op0(),"data"),array_typet(java_type_from_string("Ljava/lang/Object;"),infinity_exprt(refined_string_typet::index_type())));
+      std::cout << "string_exprt::array_tab : " << arg_tab.pretty() << std::endl;
 
       while(position != std::string::npos) 
 	{
@@ -1163,8 +1167,7 @@ void string_exprt::of_string_format(const function_application_exprt &f, std::ma
 	  case 'd' : 
 	    {
 	    string_exprt str(char_type);
-	    str.of_int(/*index_exprt(args[1],refined_string_typet::index_of_int(arg_counter++))*/args[++arg_counter],axioms,is_c_string,10);
-	    std::cout << "argument : " << args[arg_counter].pretty() << std::endl;
+	    str.of_int(typecast_exprt(index_exprt(arg_tab,refined_string_typet::index_of_int(arg_counter++)),  signedbv_typet(32)),axioms,is_c_string,10);
 	    strings.push_back(str);
 	    break;
 	    }

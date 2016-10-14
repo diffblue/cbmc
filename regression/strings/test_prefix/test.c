@@ -4,7 +4,7 @@
 
 int main()
 {
-  __CPROVER_string s = __CPROVER_uninterpreted_string_literal("Hello World!");
+  __CPROVER_string s = __CPROVER_string_literal("Hello World!");
 
   //__CPROVER_assume(__CPROVER_string_equal(s, __CPROVER_string_literal("Hello World!")));
 

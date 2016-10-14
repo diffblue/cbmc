@@ -547,7 +547,7 @@ bvt string_refinementt::convert_string_length(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 1); //bad args to string length?
+  assert(args.size() == 1); 
   string_exprt str = make_string(args[0]);
   exprt length = str.length();
   return convert_bv(length);

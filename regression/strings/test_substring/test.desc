@@ -3,8 +3,8 @@ test.c
 --pass
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal(\"cd\")): SUCCESS$
-^\[main.assertion.2\] assertion __CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal(\"cc\")): FAILURE$
-^\[main.assertion.3\] assertion !__CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal(\"bc\")): SUCCESS$
-^\[main.assertion.4\] assertion !__CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal(\"cd\")): FAILURE$
+^\[main.assertion.1\] assertion __CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal_func(\"cd\")): SUCCESS$
+^\[main.assertion.2\] assertion __CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal_func(\"cc\")): FAILURE$
+^\[main.assertion.3\] assertion !__CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal_func(\"bc\")): SUCCESS$
+^\[main.assertion.4\] assertion !__CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal_func(\"cd\")): FAILURE$
 --

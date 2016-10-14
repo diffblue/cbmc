@@ -3,8 +3,8 @@ test.c
 --pass
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_uninterpreted_strlen(s) == i + 5: SUCCESS$
-^\[main.assertion.2\] assertion __CPROVER_uninterpreted_strsuffixof(__CPROVER_uninterpreted_string_literal(\"po\"), s): SUCCESS$
-^\[main.assertion.3\] assertion __CPROVER_uninterpreted_char_at(s, i) == __CPROVER_uninterpreted_char_literal(\"p\"): SUCCESS$
-^\[main.assertion.4\] assertion __CPROVER_uninterpreted_strsuffixof(__CPROVER_uninterpreted_string_literal(\"p!o\"), s): FAILURE$
+^\[main.assertion.1\] assertion __CPROVER_uninterpreted_string_length_func(s) == i + 5: SUCCESS$
+^\[main.assertion.2\] assertion __CPROVER_uninterpreted_string_is_suffix_func(__CPROVER_uninterpreted_string_literal_func(\"po\"), s): SUCCESS$
+^\[main.assertion.3\] assertion __CPROVER_uninterpreted_string_char_at_func(s, i) == __CPROVER_uninterpreted_char_literal_func(\"p\"): SUCCESS$
+^\[main.assertion.4\] assertion __CPROVER_uninterpreted_string_is_suffix_func(__CPROVER_uninterpreted_string_literal_func(\"p!o\"), s): FAILURE$
 --
