@@ -383,8 +383,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 	  
 	  if(variable_with_multiple_occurence_in_index) {
 	    debug() << "WARNING: some variable appears multiple times" << eom;
-	    return D_SATISFIABLE;
-	    //return D_ERROR;
+	    return D_ERROR;
 	  }
 	  
 	  if(current_index_set.empty()){
