@@ -18,9 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-// for debugging
-#include <iostream>
-
 /*******************************************************************\
 
 Function: boolbvt::convert_update
@@ -87,18 +84,11 @@ void boolbvt::convert_update_rec(
     bvt new_value_bv=convert_bv(new_value);
     std::size_t new_value_width=boolbv_width(type);
 
-    std::cout << "warning: in boolbvt::convert_update_rec we removed a test " << std::endl;
-    /*    
-    if(new_value_width!=new_value_bv.size()) {
-      std::cout << "new_value == " << new_value.pretty() << std::endl;
-      std::cout << "type of new_value == " << type.pretty() << std::endl;
+    if(new_value_width!=new_value_bv.size())
       throw "convert_update_rec: unexpected new_value size";
-    }
-    */
 
     // update
-    //for(std::size_t i=0; i<new_value_width; i++)
-    for(std::size_t i=0; i<new_value_bv.size(); i++)
+    for(std::size_t i=0; i<new_value_width; i++)
     {
       assert(offset+i<bv.size());
       bv[offset+i]=new_value_bv[i];
@@ -218,9 +208,6 @@ void boolbvt::convert_update_rec(
       throw "update: member designator needs struct or union";
   }
   else 
-    {
-      std::cout << "update: unexpected designator : " << designator.pretty() << std::endl;
-      assert(false);
-      throw "update: unexpected designator";}
+    throw "update: unexpected designator";
 }
 
