@@ -15,10 +15,11 @@ control_preprocessingt::control_preprocessingt(const symbol_tablet &st,
 
 namespace
 {
-const char * const excluded_functions[]={
-    "verify_stability_closedloop_using_dslib", "check_stability_closedloop",
-    "fxp_double_to_fxp", "fxp_to_double", "ft_closedloop_series", "poly_mult",
-    "poly_sum", "internal_pow", "fxp_check", "fxp_control_floatt_to_fxp" };
+const char * const excluded_functions[]=
+    { "verify_stability_closedloop_using_dslib", "check_stability_closedloop",
+        "fxp_double_to_fxp", "fxp_to_double", "ft_closedloop_series",
+        "poly_mult", "poly_sum", "internal_pow", "fxp_check",
+        "fxp_control_floatt_to_fxp", "main", "validation" };
 
 bool is_meta(const goto_programt::const_targett pos)
 {
