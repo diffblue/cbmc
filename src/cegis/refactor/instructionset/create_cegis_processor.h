@@ -45,6 +45,56 @@ std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
  * @brief
  *
  * @details
+ * @code
+ * int lhs_int;
+ * int rhs_int;
+ * int result_int;
+ * double lhs_double;
+ * double rhs_double;
+ * double result_double;
+ *
+ * switch(instr_code)
+ * {
+ *   case 0:
+ *   case 1:
+ *     lhs_int=*__CPROVER_cegis_variable_array_int[op0];
+ *     rhs_int=*__CPROVER_cegis_variable_array_int[op1];
+ *     break;
+ *   case 2:
+ *   case 3:
+ *     lhs_double=*__CPROVER_cegis_variable_array_double[op0];
+ *     rhs_double=*__CPROVER_cegis_variable_array_double[op1];
+ *     break;
+ * }
+ *
+ * switch(instr_code)
+ * {
+ *   case 0:
+ *     result_int=lhs_int + rhs_int;
+ *     break;
+ *   case 1:
+ *     result_int=lhs_int - rhs_int;
+ *     break;
+ *   case 2:
+ *     result_double=lhs_double + rhs_double;
+ *     break;
+ *   case 3:
+ *     result_double=lhs_double - rhs_double;
+ *     break;
+ * }
+ *
+ * switch(instr_code)
+ * {
+ *   case 0:
+ *   case 1:
+ *     *__CPROVER_cegis_variable_array_int[rop]=result_int;
+ *     break;
+ *   case 2:
+ *   case 3:
+ *     *__CPROVER_cegis_variable_array_double[rop]=result_double;
+ *     break;
+ * }
+ * @endcode
  *
  * @param st
  * @param gf

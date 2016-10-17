@@ -36,6 +36,7 @@ void refactor_preprocessingt::operator()()
     const std::map<typet, size_t> slots(slots_per_type(st, s.state_vars));
     s.processor_function=create_cegis_processor(st, gf, slots);
   }
+  assert(false);
   // TODO: Insert extern programs.
   switch (type)
   {
