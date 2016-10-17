@@ -83,7 +83,7 @@ void boolbvt::convert_update_rec(
     // done
     bvt new_value_bv=convert_bv(new_value);
     std::size_t new_value_width=boolbv_width(type);
-
+    
     if(new_value_width!=new_value_bv.size())
       throw "convert_update_rec: unexpected new_value size";
 
@@ -207,7 +207,7 @@ void boolbvt::convert_update_rec(
     else
       throw "update: member designator needs struct or union";
   }
-  else 
+  else
     throw "update: unexpected designator";
 }
 
