@@ -6,6 +6,7 @@
 #include <cegis/instrument/literals.h>
 #include <cegis/instrument/instrument_var_ops.h>
 #include <cegis/cegis-util/program_helper.h>
+#include <cegis/cegis-util/type_helper.h>
 #include <cegis/refactor/instructionset/create_cegis_processor.h>
 
 // XXX: Debug
@@ -48,6 +49,7 @@ std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
 
 #define MAX_PROCESSORS 128u
 #define CEGIS_PROCESSOR_FUNCTION_PREFIX CEGIS_PREFIX "processor_"
+#define INSTR_TYPE_SUFFIX "_instructiont"
 #define VARIABLE_ARRAY_PREFIX CEGIS_PREFIX "variable_array_"
 
 namespace
@@ -104,19 +106,46 @@ std::string get_next_processor_name(const symbol_tablet &st)
   assert(!"Exceeded maximum number of CEGIS processors.");
   return "";
 }
+
+const symbol_typet &create_instruction_type(symbol_tablet &st,
+    const std::map<typet, size_t> &variable_slots_per_context_type,
+    const std::string &func_name)
+{
+  std::string instr_type_name(func_name);
+  instr_type_name+= INSTR_TYPE_SUFFIX;
+  struct_typet type;
+  std::string tag(TAG_PREFIX);
+  tag+=instr_type_name;
+  type.set_tag(tag);
+  symbolt new_symbol;
+  new_symbol.name=instr_type_name;
+  new_symbol.type=type;
+  new_symbol.base_name=instr_type_name;
+  new_symbol.pretty_name=instr_type_name;
+  new_symbol.location=default_cegis_source_location();
+  new_symbol.mode=ID_C;
+  new_symbol.module=CEGIS_MODULE;
+  new_symbol.is_type=true;
+  assert(!st.add(new_symbol));
+  // TODO: Implement
+  assert(false);
+}
 }
 
 std::string create_cegis_processor(symbol_tablet &st, goto_functionst &gf,
-    const std::map<typet, size_t> &variable_slots_per_context_type)
+    const std::map<typet, size_t> &slots)
 {
-  for (const std::pair<typet, size_t> &slot_with_type : variable_slots_per_context_type)
-    create_variable_array(st, gf, slot_with_type.first, slot_with_type.second);
-  const std::string processor_name(get_next_processor_name(st));
+  for (const std::pair<typet, size_t> &var_slot : slots)
+    create_variable_array(st, gf, var_slot.first, var_slot.second);
+  const std::string func_name(get_next_processor_name(st));
+  const symbol_typet &instr_type=create_instruction_type(st, slots, func_name);
+  goto_functionst::function_mapt::mapped_type &func=gf.function_map[func_name];
+  goto_programt &body=func.body;
   // TODO: Implement
   // XXX: Debug
   std::cout << "<create_cegis_processor>" << std::endl;
   gf.output(namespacet(st), std::cout);
   std::cout << "</create_cegis_processor>" << std::endl;
   // XXX: Debug
-  return processor_name;
+  return func_name;
 }
