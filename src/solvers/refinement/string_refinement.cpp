@@ -14,7 +14,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <sstream>
 #include <solvers/refinement/string_refinement.h>
 
-
 // This is mostly for debugging:
 #include <langapi/languages.h>
 #include <ansi-c/ansi_c_language.h>
@@ -129,83 +128,17 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 }
 
 
-bvt string_refinementt::convert_function_application(
-       const function_application_exprt &expr)
+bvt string_refinementt::convert_function_application(const function_application_exprt &expr)
 {
   const exprt &name = expr.function();
-  debug() << "string_refinementt::convert_function_application"  << eom;
-
-  if (name.id() == ID_symbol) {
-    const irep_idt &id = to_symbol_expr(name).get_identifier();
-    debug() << "string_refinementt::convert_function_application(" 
-	    << id << ")" << eom;
-
-    if (starts_with(id,cprover_string_literal_func)
-	|| starts_with(id,cprover_string_concat_func)
-	|| starts_with(id,cprover_string_substring_func)
-	|| starts_with(id,cprover_string_char_set_func)) {
-      string_exprt str = generator.make_string(expr);
-      bvt bv = string_constraint_generatort::bv(str);
-      return bv;
-    } else if (starts_with(id,cprover_char_literal_func)) {
-      return string_constraint_generatort::char_literal(expr);
-    } else if (starts_with(id,cprover_string_length_func)) {
-      return string_constraint_generatort::string_length(expr);
-    } else if (starts_with(id,cprover_string_equal_func)) {
-      return convert_bv(string_constraint_generatort::string_equal(expr));
-    } else if (starts_with(id,cprover_string_equals_ignore_case_func)) {
-      return convert_bv(string_constraint_generatort::string_equals_ignore_case(expr));
-    } else if (starts_with(id,cprover_string_is_empty_func)) {
-      return convert_bv(string_constraint_generatort::string_is_empty(expr));
-    } else if (starts_with(id,cprover_string_char_at_func)) {
-      return string_constraint_generatort::string_char_at(expr);
-    } else if (starts_with(id,cprover_string_is_prefix_func)) {
-      return convert_bv(string_constraint_generatort::string_is_prefix(expr));
-    } else if (starts_with(id,cprover_string_is_suffix_func)) {
-      return string_constraint_generatort::string_is_suffix(expr);
-    } else if (starts_with(id,cprover_string_startswith_func)) {
-      return convert_bv(string_constraint_generatort::string_is_prefix(expr,true));
-    } else if (starts_with(id,cprover_string_endswith_func)) {
-      return string_constraint_generatort::string_is_suffix(expr,true);
-    } else if (starts_with(id,cprover_string_contains_func)) {
-      return string_constraint_generatort::string_contains(expr);
-    } else if (starts_with(id,cprover_string_hash_code_func)) {
-      return convert_bv(string_constraint_generatort::string_hash_code(expr));
-    } else if (starts_with(id,cprover_string_index_of_func)) {
-      return convert_bv(string_constraint_generatort::string_index_of(expr));
-    } else if (starts_with(id,cprover_string_last_index_of_func)) {
-      return convert_bv(string_constraint_generatort::string_last_index_of(expr));
-    } else if (starts_with(id,cprover_string_parse_int_func)) {
-      return convert_bv(string_constraint_generatort::string_parse_int(expr));
-    } else if (starts_with(id,cprover_string_to_char_array_func)) {
-      return convert_bv(string_constraint_generatort::string_to_char_array(expr));
-    } else if (starts_with(id,cprover_string_code_point_at_func)) {
-      return convert_bv(string_constraint_generatort::string_code_point_at(expr));
-    } else if (starts_with(id,cprover_string_code_point_before_func)) {
-      return convert_bv(string_constraint_generatort::string_code_point_before(expr));
-    } else if (starts_with(id,cprover_string_code_point_count_func)) {
-      return convert_bv(string_constraint_generatort::string_code_point_count(expr));
-    } else if (starts_with(id,cprover_string_offset_by_code_point_func)) {
-      return convert_bv(string_constraint_generatort::string_offset_by_code_point(expr));
-    } else if (starts_with(id,cprover_string_compare_to_func)) {
-      return convert_bv(string_constraint_generatort::string_compare_to(expr));
-    }
-  }
-
-  //return SUB::string_constraint_generatort::function_application(expr);
-  throw "string_constraint_generatort::string_constraint_generatort::function_application: not a string function";
+  debug() << "string_refinementt::convert_function_application "  << name << eom;
+  exprt f = generator.function_application(expr);
+  return convert_bv(f);
 }
-
-
 
 bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
-  std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t1-start_time).count();
-
   if(!equality_propagation) return true;
-
   const typet &type=ns.follow(expr.lhs().type());
 
   if(expr.lhs().id()==ID_symbol &&
@@ -213,46 +146,34 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      //type==ns.follow(expr.rhs().type()) && 
      type.id()!=ID_bool)
   {
-    debug() << "string_refinementt(" << (duration / 1000) << "ms)";
-    debug() << "  " << pretty_short(expr.lhs()) << " <- " 
+    debug() << "string_refinementt " << pretty_short(expr.lhs()) << " <- " 
 	    << pretty_short(expr.rhs()) << eom;
-
-    if(refined_string_typet::is_unrefined_string_type(type)) {
-      symbol_exprt sym = to_symbol_expr(expr.lhs());
-      make_string(sym,expr.rhs());
-      return false;
-    }
-    else if(type == char_type) {
-      const bvt &bv1=convert_bv(expr.rhs());
-      symbol_exprt sym = to_symbol_expr(expr.lhs());
-      const irep_idt &identifier = sym.get_identifier();
-      map.set_literals(identifier, char_type, bv1);
-      if(freeze_all) set_frozen(bv1);
-      return false;
-    } 
-    else if(type == java_char_type) {
-      const bvt &bv1=convert_bv(expr.rhs());
-      symbol_exprt sym = to_symbol_expr(expr.lhs());
-      const irep_idt &identifier = sym.get_identifier();
-      map.set_literals(identifier, java_char_type, bv1);
-      if(freeze_all) set_frozen(bv1);
-      return false;
-    }
-    else if(type==ns.follow(expr.rhs().type())) {
-      if(is_unbounded_array(type))
-	return true;
-
-      const bvt &bv1=convert_bv(expr.rhs());
-      
-      const irep_idt &identifier=
-	to_symbol_expr(expr.lhs()).get_identifier();
-      
-      map.set_literals(identifier, type, bv1);
-      
-      if(freeze_all) set_frozen(bv1);
-      
-      return false;
-    }
+    
+    if(refined_string_typet::is_unrefined_string_type(type)) 
+      {
+	symbol_exprt sym = to_symbol_expr(expr.lhs());
+	generator.make_string(sym,expr.rhs());
+	return false;
+      }
+    else if(type == generator.get_char_type()) 
+      {
+	const bvt &bv1=convert_bv(expr.rhs());
+	symbol_exprt sym = to_symbol_expr(expr.lhs());
+	const irep_idt &identifier = sym.get_identifier();
+	map.set_literals(identifier, generator.get_char_type(), bv1);
+	if(freeze_all) set_frozen(bv1);
+	return false;
+      } 
+    else if(type==ns.follow(expr.rhs().type()))
+      {
+	if(is_unbounded_array(type)) return true;
+	const bvt &bv1=convert_bv(expr.rhs());
+	const irep_idt &identifier=
+	  to_symbol_expr(expr.lhs()).get_identifier();
+	map.set_literals(identifier, type, bv1);
+	if(freeze_all) set_frozen(bv1);
+	return false;
+      }
   }
 
   return true;
@@ -260,56 +181,40 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
 
 
-void string_refinementt::print_time(std::string s) {
+void string_refinementt::print_time(std::string s)
+{
   debug() << s << " TIME == "
-	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
+	  << (std::chrono::duration_cast<std::chrono::microseconds>
+	      (std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) 
+	  << eom;
 }
 
-// We add instantiations before launching the solver
 void string_refinementt::post_process()
-{  
+{  SUB::post_process(); }
 
-  /*
-  debug() << not_contains_axioms.size() << " not_contains constraints" << eom;
-  nb_sat_iteration = 0;
-  debug() << "string_refinementt::post_process  at step" << step++ << " time in ms "
-	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
-
-  debug() << "string_refinementt::post_process: warning update_index_set has to be checked" << eom;
-  update_index_set(universal_axioms);
-  update_index_set(cur); 
-  cur.clear();
-  add_instantiations();
-  debug() << "string_refinementt::post_process  at step" << step++ << " time in ms "
-	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
-  */
-
-  SUB::post_process();
-}
-
-decision_proceduret::resultt dec_solve()
+decision_proceduret::resultt string_refinementt::dec_solve()
 {
 
   print_time("string_refinementt::dec_solve");
-  for(int i = 0; i < string_axioms.size(); i++)
-    if(string_axioms[i].is_simple())
-      add_lemma(string_axioms[i]);
-    else if(string_axioms[i].is_string_constant())
-      add_lemma(string_axioms[i]); //,false);
-    else if(string_axioms[i].is_univ_quant()) {
-      debug() << "universaly quantified : " << pretty_short(string_axioms[i]) << eom;
-      universal_axioms.push_back(string_axioms[i]);
+  for(unsigned i = 0; i < generator.axioms.size(); i++)
+    if(generator.axioms[i].is_simple())
+      add_lemma(generator.axioms[i]);
+    else if(generator.axioms[i].is_string_constant())
+      add_lemma(generator.axioms[i]); //,false);
+    else if(generator.axioms[i].is_univ_quant()) {
+      debug() << "universaly quantified : " << pretty_short(generator.axioms[i]) << eom;
+      universal_axioms.push_back(generator.axioms[i]);
     }
     else {
-      assert(string_axioms[i].is_not_contains());
-      string_axioms[i].witness = string_exprt::fresh_symbol
+      assert(generator.axioms[i].is_not_contains());
+      generator.axioms[i].witness = string_exprt::fresh_symbol
 	("not_contains_witness",
 	 array_typet(refined_string_typet::index_type(),
 		     infinity_exprt(refined_string_typet::index_type())));
-      not_contains_axioms.push_back(string_axioms[i]);
+      not_contains_axioms.push_back(generator.axioms[i]);
     }
 
-  string_axioms.clear();
+  //string_axioms.clear(); should not be necessary
   
   initial_index_set(universal_axioms);
   debug() << "string_refinementt::dec_solve: warning update_index_set has to be checked" << eom;
@@ -351,11 +256,11 @@ decision_proceduret::resultt dec_solve()
 
 	  display_index_set();
 	  debug()<< "instantiating NOT_CONTAINS constraints" << eom;
-	  for(int i=0; i<not_contains_axioms.size(); i++) {
+	  for(unsigned i=0; i<not_contains_axioms.size(); i++) {
 	    debug()<< "constraint " << i << eom;
 	    std::vector<exprt> lemmas;
 	    instantiate_not_contains(not_contains_axioms[i],lemmas);
-	    for(int j=0; j<lemmas.size(); j++) {
+	    for(unsigned j=0; j<lemmas.size(); j++) {
 	      add_lemma(lemmas[j]);
 	    }
 	  }
@@ -403,24 +308,8 @@ void string_refinementt::add_lemma(const exprt &lemma, bool add_to_index_set)
     cur.push_back(lemma);
 }
 
-
-
-string_exprt string_refinementt::string_of_symbol(const symbol_exprt & sym){
-  if(refined_string_typet::is_java_string_type(sym.type()) 
-     && starts_with(std::string(sym.get(ID_identifier).c_str()),"java::java.lang.String.Literal.")) {
-    string_exprt s;
-    s.of_string_constant(string_exprt::extract_java_string(sym),JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type(),string_axioms);
-    return s;
-  }
-  else {
-    return string_exprt::get_string_of_symbol(symbol_to_string,sym);
-  }
-}  
-
-
-//// Pass algorithm
-
-unsigned integer_of_expr(const constant_exprt & expr) {
+unsigned integer_of_expr(const constant_exprt & expr) 
+{
   return integer2unsigned(string2integer(as_string(expr.get_value()),2));
 }
 
@@ -463,22 +352,24 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 {
   exprt val = get(arr);
   unsignedbv_typet chart;
-  if(arr.type().subtype() == char_type)
-    chart = char_type;
+  if(arr.type().subtype() == generator.get_char_type())
+    chart = generator.get_char_type();
   else { 
-    assert(arr.type().subtype() == java_char_type);
-    chart = java_char_type;
+    assert(false);
+    //assert(arr.type().subtype() == java_char_type);
+    //chart = java_char_type;
   }
 
   if(val.id() == "array-list") {
     exprt ret =
-      array_of_exprt(chart.zero_expr(), array_typet(chart, infinity_exprt(index_type)));
+      array_of_exprt(chart.zero_expr(), array_typet(chart, infinity_exprt(generator.get_index_type())));
     
     for (size_t i = 0; i < val.operands().size()/2; i++) {  
       exprt index = val.operands()[i*2];
-      assert(index.type() == index_type);
+      assert(index.type() == generator.get_index_type());
       exprt value = val.operands()[i*2+1];
-      assert(value.type() == char_type || value.type() == java_char_type);
+      //assert(value.type() == char_type || value.type() == java_char_type);
+      assert(value.type() == generator.get_char_type());
       ret = with_exprt(ret, index, value);
     }
     return ret;
@@ -502,7 +393,7 @@ bool string_refinementt::check_axioms()
   replace_mapt fmodel;
 
   std::map<irep_idt, string_exprt>::iterator it;
-  for (it = symbol_to_string.begin(); it != symbol_to_string.end(); ++it) 
+  for (it = generator.symbol_to_string.begin(); it != generator.symbol_to_string.end(); ++it) 
     {
       string_exprt refined = it->second;
       const exprt &econtent = refined.content();
@@ -519,14 +410,14 @@ bool string_refinementt::check_axioms()
 	      << string_of_array(econtent,len) << eom;
     }
 
-  for(std::vector<symbol_exprt>::iterator it = boolean_symbols.begin();
-      it != boolean_symbols.end(); it++) {
+  for(std::vector<symbol_exprt>::iterator it = generator.boolean_symbols.begin();
+      it != generator.boolean_symbols.end(); it++) {
     debug() << "" << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;  
     fmodel[*it] = get(*it);
   }
 
-  for(std::vector<symbol_exprt>::iterator it = index_symbols.begin();
-      it != index_symbols.end(); it++) {
+  for(std::vector<symbol_exprt>::iterator it = generator.index_symbols.begin();
+      it != generator.index_symbols.end(); it++) {
     debug() << "" << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;  
     fmodel[*it] = get(*it);
   }
@@ -562,7 +453,7 @@ bool string_refinementt::check_axioms()
 
   debug() << "there are " << not_contains_axioms.size() << " not_contains axioms" << eom;
   for (size_t i = 0; i < not_contains_axioms.size(); ++i) {
-    exprt val = get(not_contains_axioms[i].witness_of(zero));
+    exprt val = get(not_contains_axioms[i].witness_of(refined_string_typet::index_zero()));
     violated.push_back(std::make_pair(i, val));
   }
 
@@ -664,32 +555,42 @@ exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
     // We should group constants together...
     const exprt &t = it->first;
     int second = negated?(-it->second):it->second;
-    if(t.id() == ID_constant) {
-      std::string value(to_constant_expr(t).get_value().c_str());
-      constants += binary2integer(value,true) * second;
-    } else {
-      if(second != 0)
-	if(second == -1) 
-	  if(sum == refined_string_typet::index_of_int(0)) sum = unary_minus_exprt(t);
-	  else sum = minus_exprt(sum,t);
-	else if(second == 1)
-	  if(sum == refined_string_typet::index_of_int(0)) sum = t;
-	  else sum = plus_exprt(sum, t);
-	else {
-	  debug() << "in string_refinementt::sum_of_map:"
-		  << " warning: several occurences of the same variable: " 
-		  << t.pretty() << eom;
-	  variable_with_multiple_occurence_in_index = true;
-	  if(second > 1)
-	    for(int i = 0; i < second; i++)
-	      sum = plus_exprt(sum, t);
-	  else
-	    for(int i = 0; i > second; i--)
-	      sum = minus_exprt(sum, t);
-	}
-    }
+    if(t.id() == ID_constant) 
+      {
+	std::string value(to_constant_expr(t).get_value().c_str());
+	constants += binary2integer(value,true) * second;
+      } 
+    else
+      {
+	if(second != 0)
+	  {
+	    if(second == -1) 
+	      {
+		if(sum == refined_string_typet::index_of_int(0)) sum = unary_minus_exprt(t);
+		else sum = minus_exprt(sum,t);
+	      }
+	    else if(second == 1)
+	      { 
+		if(sum == refined_string_typet::index_of_int(0)) sum = t;
+		else sum = plus_exprt(sum, t);
+	      }
+	  }
+	else
+	  {
+	    debug() << "in string_refinementt::sum_of_map:"
+		    << " warning: several occurences of the same variable: " 
+		    << t.pretty() << eom;
+	    variable_with_multiple_occurence_in_index = true;
+	    if(second > 1)
+	      for(int i = 0; i < second; i++)
+		sum = plus_exprt(sum, t);
+	    else
+	      for(int i = 0; i > second; i--)
+		sum = minus_exprt(sum, t);
+	  }
+      }
   }
-
+  
   return plus_exprt(sum,constant_exprt(integer2binary(constants, STRING_SOLVER_INDEX_WIDTH), refined_string_typet::index_type()));
 }
 
@@ -879,7 +780,7 @@ string_constraintt string_refinementt::instantiate(const string_constraintt &axi
   exprt instance(axiom);
   replace_expr(axiom.get_univ_var(), r, instance);
   // We are not sure the index set contains only positive numbers
-  exprt bounds = and_exprt(axiom.univ_within_bounds(),binary_relation_exprt(zero,ID_le,val));
+  exprt bounds = and_exprt(axiom.univ_within_bounds(),binary_relation_exprt(refined_string_typet::index_zero(),ID_le,val));
   replace_expr(axiom.get_univ_var(), r, bounds);
   return string_constraintt(bounds,instance);     
 }
@@ -903,11 +804,11 @@ void string_refinementt::instantiate_not_contains(const string_constraintt & axi
 	new_lemmas.push_back(lemma);
 	// we put bounds on the witnesses: 0 <= v <= |s0| - |s1| ==> 0 <= v+w[v] < |s0| && 0 <= w[v] < |s1|
 	exprt witness_bounds = implies_exprt
-	  (and_exprt(binary_relation_exprt(zero,ID_le,val), binary_relation_exprt(minus_exprt(to_string_expr(s0).length(),to_string_expr(s1).length()),ID_ge,val)),
-	   and_exprt(binary_relation_exprt(zero,ID_le,plus_exprt(val,axiom.witness_of(val))),
+	  (and_exprt(binary_relation_exprt(refined_string_typet::index_zero(),ID_le,val), binary_relation_exprt(minus_exprt(to_string_expr(s0).length(),to_string_expr(s1).length()),ID_ge,val)),
+	   and_exprt(binary_relation_exprt(refined_string_typet::index_zero(),ID_le,plus_exprt(val,axiom.witness_of(val))),
 		     and_exprt(binary_relation_exprt(to_string_expr(s0).length(),ID_gt,plus_exprt(val,axiom.witness_of(val))), 
 			       and_exprt(binary_relation_exprt(to_string_expr(s1).length(),ID_gt,axiom.witness_of(val)), 
-					 binary_relation_exprt(zero,ID_le,axiom.witness_of(val))))));
+					 binary_relation_exprt(refined_string_typet::index_zero(),ID_le,axiom.witness_of(val))))));
 	new_lemmas.push_back(witness_bounds);
       }
 }

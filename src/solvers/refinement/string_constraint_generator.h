@@ -20,7 +20,9 @@ public:
   constant_exprt constant_char(int i); 
   unsignedbv_typet get_char_type();
   size_t get_char_width(); 
+  inline signedbv_typet get_index_type() {return refined_string_typet::index_type();};
 
+  std::vector<string_constraintt> axioms;
 
   // Create a new string expression and add the necessary lemma
   // to ensure its equal to the given string expression.
@@ -29,6 +31,20 @@ public:
   // Same thing but associates the string to the given symbol instead 
   // of returning it.
   void make_string(const symbol_exprt & sym, const exprt &str);
+
+
+  // Boolean symbols that are used to know whether the results 
+  // of some functions should be true.
+  std::vector<symbol_exprt> boolean_symbols;
+
+  // Symbols used in existential quantifications
+  std::vector<symbol_exprt> index_symbols;
+
+  std::map<irep_idt, string_exprt> symbol_to_string;
+  inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr){
+    symbol_to_string[sym.get_identifier()]= expr;
+  }  
+
 
   string_exprt string_of_expr(const exprt & expr);
   string_exprt string_of_symbol(const symbol_exprt & sym);
@@ -68,31 +84,31 @@ public:
   string_exprt string_replace(const function_application_exprt &f);
 
   // Warning: not working correctly at the moment
-  string_exprt string_value_of(const function_application_exprt &f, axiom_vect &axioms);
+  string_exprt string_value_of(const function_application_exprt &f);
   string_exprt string_set_length(const function_application_exprt &f);
   string_exprt string_copy(const function_application_exprt &f);
   string_exprt string_format(const function_application_exprt &f);
 
-  string_exprt empty_string(const function_application_exprt &f, axiom_vect & axioms);
+  string_exprt empty_string(const function_application_exprt &f);
 
   string_exprt of_int(const function_application_exprt &f);
-  string_exprt of_int(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
-  string_exprt of_int_hex(const exprt &i, axiom_vect & axioms, bool is_c_string);
+  string_exprt of_int(const exprt &i, bool is_c_string, int max_size);
+  string_exprt of_int_hex(const exprt &i, bool is_c_string);
   string_exprt of_int_hex(const function_application_exprt &f,axiom_vect & axioms);
-  string_exprt of_long(const function_application_exprt &f, axiom_vect & axioms);
-  string_exprt of_long(const exprt &i, axiom_vect & axioms, bool is_c_string, int max_size);
-  string_exprt of_bool(const function_application_exprt &f, axiom_vect & axioms);
-  string_exprt of_bool(const exprt &i, axiom_vect & axioms, bool is_c_string);
-  string_exprt of_char(const function_application_exprt &f, axiom_vect & axioms);
-  string_exprt of_char(const exprt &i, axiom_vect & axioms, bool is_c_string);
+  string_exprt of_long(const function_application_exprt &f);
+  string_exprt of_long(const exprt &i, bool is_c_string, int max_size);
+  string_exprt of_bool(const function_application_exprt &f);
+  string_exprt of_bool(const exprt &i, bool is_c_string);
+  string_exprt of_char(const function_application_exprt &f);
+  string_exprt of_char(const exprt &i, bool is_c_string);
 
   // Warning: the specifications of these functions is only partial:
-  string_exprt of_float(const function_application_exprt &f, axiom_vect & axioms);
-  string_exprt of_float(const exprt &f, axiom_vect & axioms, bool is_c_string, bool double_precision=false);
-  string_exprt of_double(const function_application_exprt &f, axiom_vect & axioms);
+  string_exprt of_float(const function_application_exprt &f);
+  string_exprt of_float(const exprt &f, bool is_c_string, bool double_precision=false);
+  string_exprt of_double(const function_application_exprt &f);
 
-  string_exprt code_point(const exprt &code_point, axiom_vect & axioms, bool is_c_string);
-  string_exprt java_char_array(const exprt & char_array, axiom_vect & axioms);
+  string_exprt code_point(const exprt &code_point, bool is_c_string);
+  string_exprt java_char_array(const exprt & char_array);
 
   string_exprt string_if(const if_exprt &expr);
 
@@ -138,18 +154,6 @@ private:
   // Check that the given string is from the right language
   void check_char_type(const exprt & str);
   
-  std::vector<string_constraintt> axioms;
-  // Boolean symbols that are used to know whether the results 
-  // of some functions should be true.
-  std::vector<symbol_exprt> boolean_symbols;
-
-  // Symbols used in existential quantifications
-  std::vector<symbol_exprt> index_symbols;
-
-  std::map<irep_idt, string_exprt> symbol_to_string;
-  inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr){
-    symbol_to_string[sym.get_identifier()]= expr;
-  }  
 
 
 };

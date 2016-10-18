@@ -126,13 +126,78 @@ string_exprt string_constraint_generatort::get_string_of_symbol(std::map<irep_id
 
 }
 
+string_exprt string_constraint_generatort::string_of_symbol(const symbol_exprt & sym)
+{
+  if(refined_string_typet::is_java_string_type(sym.type()) 
+     && starts_with(std::string(sym.get(ID_identifier).c_str()),"java::java.lang.String.Literal.")) 
+    {
+      assert(false); // is this branch used ?
+      string_exprt s;
+      s = generator.of_string_constant(string_exprt::extract_java_string(sym),JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
+    return s;
+  }
+  else {
+    return string_exprt::get_string_of_symbol(symbol_to_string,sym);
+  }
+}  
 
-string_exprt string_constraint_generatort::of_function_application(const function_application_exprt & expr)
+
+string_exprt string_constraint_generatort::function_application(const function_application_exprt & expr)
 {
   const exprt &name = expr.function();
+
   if (name.id() == ID_symbol) {
     const irep_idt &id = to_symbol_expr(name).get_identifier();
-    if(starts_with(id,cprover_string_literal_func))
+    if (starts_with(id,cprover_string_literal_func)
+	|| starts_with(id,cprover_string_concat_func)
+	|| starts_with(id,cprover_string_substring_func)
+	|| starts_with(id,cprover_string_char_set_func)) {
+      string_exprt str = generator.make_string(expr);
+      bvt bv = convert_bv(str);
+      return bv;
+    } else if (starts_with(id,cprover_char_literal_func)) {
+      return char_literal(expr);
+    } else if (starts_with(id,cprover_string_length_func)) {
+      return generator.string_length(expr);
+    } else if (starts_with(id,cprover_string_equal_func)) {
+      return generator.string_equal(expr);
+    } else if (starts_with(id,cprover_string_equals_ignore_case_func)) {
+      return generator.string_equals_ignore_case(expr);
+    } else if (starts_with(id,cprover_string_is_empty_func)) {
+      return generator.string_is_empty(expr);
+    } else if (starts_with(id,cprover_string_char_at_func)) {
+      return generator.string_char_at(expr);
+    } else if (starts_with(id,cprover_string_is_prefix_func)) {
+      return generator.string_is_prefix(expr);
+    } else if (starts_with(id,cprover_string_is_suffix_func)) {
+      return generator.string_is_suffix(expr);
+    } else if (starts_with(id,cprover_string_startswith_func)) {
+      return generator.string_is_prefix(expr,true);
+    } else if (starts_with(id,cprover_string_endswith_func)) {
+      return generator.string_is_suffix(expr,true);
+    } else if (starts_with(id,cprover_string_contains_func)) {
+      return generator.string_contains(expr);
+    } else if (starts_with(id,cprover_string_hash_code_func)) {
+      return generator.string_hash_code(expr);
+    } else if (starts_with(id,cprover_string_index_of_func)) {
+      return generator.string_index_of(expr);
+    } else if (starts_with(id,cprover_string_last_index_of_func)) {
+      return generator.string_last_index_of(expr);
+    } else if (starts_with(id,cprover_string_parse_int_func)) {
+      return generator.string_parse_int(expr);
+    } else if (starts_with(id,cprover_string_to_char_array_func)) {
+      return generator.string_to_char_array(expr);
+    } else if (starts_with(id,cprover_string_code_point_at_func)) {
+      return generator.string_code_point_at(expr);
+    } else if (starts_with(id,cprover_string_code_point_before_func)) {
+      return generator.string_code_point_before(expr);
+    } else if (starts_with(id,cprover_string_code_point_count_func)) {
+      return generator.string_code_point_count(expr);
+    } else if (starts_with(id,cprover_string_offset_by_code_point_func)) {
+      return generator.string_offset_by_code_point(expr);
+    } else if (starts_with(id,cprover_string_compare_to_func)) {
+      return generator.string_compare_to(expr);
+    } else if(starts_with(id,cprover_string_literal_func))
        return of_string_literal(expr,axioms);
     else if(starts_with(id,cprover_string_concat_func))
       return of_string_concat(expr,symbol_to_string,axioms);
@@ -210,7 +275,7 @@ string_exprt string_constraint_generatort::of_function_application(const functio
       throw msg;
     }
   }
-  throw "string_exprt::of_function_application: not a string function";
+  throw "string_constraint_generator::function_application: not a string function";
 }
 
 
