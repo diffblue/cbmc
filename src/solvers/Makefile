@@ -123,6 +123,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       refinement/refined_string_type.cpp \
       refinement/string_expr.cpp \
       refinement/string_refinement.cpp \
+      refinement/string_constraint_generator.cpp \
       miniBDD/miniBDD.cpp
 
 INCLUDES= -I .. \
