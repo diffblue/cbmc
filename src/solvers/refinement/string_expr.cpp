@@ -1156,19 +1156,26 @@ void string_exprt::of_string_format(const function_application_exprt &f, std::ma
       string_exprt begin(char_type);
       begin.of_string_constant(format_string.substr(0,position),char_width,char_type,axioms);
       strings.push_back(begin);
-      std::cout << "string_exprt::of_string_format : " << f.pretty() << std::endl;
-      typecast_exprt arg_tab(member_exprt(args[1].op0(),"data"),array_typet(java_type_from_string("Ljava/lang/Object;"),infinity_exprt(refined_string_typet::index_type())));
-      std::cout << "string_exprt::array_tab : " << arg_tab.pretty() << std::endl;
+      //std::cout << "string_exprt::of_string_format : " << f.pretty() << std::endl;
+      //typecast_exprt arg_tab(member_exprt(args[1].op0(),"data"),array_typet(java_type_from_string("Ljava/lang/Object;"),infinity_exprt(refined_string_typet::index_type())));
+      member_exprt arg_tab(args[1].op0(),"data",array_typet(java_type_from_string("Ljava/lang/Object;"),infinity_exprt(refined_string_typet::index_type())));
+      std::cout << "string_exprt::arg_tab : " << arg_tab.type().pretty() << std::endl;
 
       while(position != std::string::npos) 
 	{
-	  std::cout << "string format: position = " << position << std::endl;
 	  switch(format_string[position+1]) {
 	  case 'd' : 
 	    {
 	    string_exprt str(char_type);
-	    str.of_int(typecast_exprt(index_exprt(arg_tab,refined_string_typet::index_of_int(arg_counter++)),  signedbv_typet(32)),axioms,is_c_string,10);
+	    index_exprt arg_object(arg_tab,refined_string_typet::index_of_int(arg_counter++)); 
+	    typecast_exprt arg_int(arg_object, signedbv_typet(32));
+	    symbol_exprt var_arg_int = string_exprt::fresh_symbol("format_arg_int", signedbv_typet(32));
+	    axioms.push_back(equal_exprt(arg_int,var_arg_int));
+	    axioms.push_back(equal_exprt(var_arg_int,refined_string_typet::index_of_int(12)));
+	    str.of_int(var_arg_int,axioms,is_c_string,10);
+
 	    strings.push_back(str);
+	    std::cout << "string format: position " << position << " int arg: " << arg_int.pretty() << std::endl;
 	    break;
 	    }
 

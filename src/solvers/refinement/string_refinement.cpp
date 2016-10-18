@@ -83,8 +83,27 @@ bvt string_refinementt::convert_pointer_type(const exprt &expr)
       return bv;
     }
   else {
-    debug() << "string_refinementt::convert_pointer_type("<< pretty_short(expr) << ")" << eom;
-    return SUB::convert_pointer_type(expr);
+    if(expr.id()==ID_typecast)
+      {
+	if(expr.operands().size()!=1)
+	  throw "typecast takes one operand";
+	
+	const exprt &op=expr.op0();
+	const typet &op_type=ns.follow(op.type());
+	
+	if(op_type.id()==ID_pointer)
+	  return convert_pointer_type(op);
+	else if(op_type.id()==ID_signedbv ||
+		op_type.id()==ID_unsignedbv)
+	  {
+	    debug() << "string_refinementt::convert_pointer_type("<< pretty_short(expr) << ")" << eom;
+	    debug() << "details:"<< op.pretty() << ")" << eom;
+	    return convert_bv(typecast_exprt(op,unsignedbv_typet(64)));
+	  }
+      }
+    else{
+      return SUB::convert_pointer_type(expr);
+    }
   }
 }
 
@@ -133,10 +152,6 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t1-start_time).count();
 
-  debug() << "string_refinementt::boolbv_set_equality_to_true "
-	  << " at time(ms): " 
-	  << (duration / 1000) << eom;
-
   if(!equality_propagation) return true;
 
   const typet &type=ns.follow(expr.lhs().type());
@@ -146,7 +161,8 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      //type==ns.follow(expr.rhs().type()) && 
      type.id()!=ID_bool)
   {
-    debug() << "   " << pretty_short(expr.lhs()) << " <- " 
+    debug() << "string_refinementt(" << (duration / 1000) << "ms)";
+    debug() << "  " << pretty_short(expr.lhs()) << " <- " 
 	    << pretty_short(expr.rhs()) << eom;
 
     if(refined_string_typet::is_unrefined_string_type(type)) {
@@ -426,9 +442,17 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 
 void string_refinementt::add_lemma(const exprt &lemma, bool add_to_index_set)
 {
-  if (!seen_instances.insert(lemma).second) return;
+  if (!seen_instances.insert(lemma).second)
+    { 
+      debug() << "string_refinementt::add_lemma : already seen" << eom; 
+      return; 
+    }
 
-  if(lemma == true_exprt()) { debug() << "string_refinementt::add_lemma : tautology" << eom; return; }
+  if(lemma == true_exprt()) 
+    { 
+      debug() << "string_refinementt::add_lemma : tautology" << eom; 
+      return; 
+    }
 
   debug() << "adding lemma " << pretty_short(lemma) << eom;
 
