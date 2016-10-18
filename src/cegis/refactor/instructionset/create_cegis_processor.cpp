@@ -51,6 +51,9 @@ std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
 #define CEGIS_PROCESSOR_FUNCTION_PREFIX CEGIS_PREFIX "processor_"
 #define INSTR_TYPE_SUFFIX "_instructiont"
 #define VARIABLE_ARRAY_PREFIX CEGIS_PREFIX "variable_array_"
+#define NUM_PRIMITIVE_OPERANDS 2u
+#define OPCODE_MEMBER_NAME "opcode"
+#define OPERAND_ID_MEMBER_NAME_PREFIX "op_"
 
 namespace
 {
@@ -107,7 +110,34 @@ std::string get_next_processor_name(const symbol_tablet &st)
   return "";
 }
 
-const symbol_typet &create_instruction_type(symbol_tablet &st,
+bool is_primitive(const typet &type)
+{
+  const irep_idt &id=type.id();
+  return ID_c_bool == id || ID_floatbv == id || ID_unsignedbv == id
+      || ID_signedbv == id;
+}
+
+size_t get_max_operands(const typet &type)
+{
+  if (is_primitive(type)) return NUM_PRIMITIVE_OPERANDS;
+  assert(!"Class type operand generation not supported.");
+  return 0;
+}
+
+size_t get_max_operands(const std::map<typet, size_t> &slots)
+{
+  size_t max=0;
+  for (const std::pair<typet, size_t> &slot : slots)
+    max=std::max(max, get_max_operands(slot.first));
+  return max;
+}
+
+typet get_member_type()
+{
+  return unsigned_char_type();
+}
+
+symbol_typet create_instruction_type(symbol_tablet &st,
     const std::map<typet, size_t> &variable_slots_per_context_type,
     const std::string &func_name)
 {
@@ -117,6 +147,17 @@ const symbol_typet &create_instruction_type(symbol_tablet &st,
   std::string tag(TAG_PREFIX);
   tag+=instr_type_name;
   type.set_tag(tag);
+  struct_union_typet::componentst &comps=type.components();
+  const typet member_type(get_member_type());
+  comps.push_back(struct_typet::componentt(OPCODE_MEMBER_NAME, member_type));
+  const size_t max_operands=get_max_operands(variable_slots_per_context_type);
+  for (size_t i=0; i < max_operands; ++i)
+  {
+    std::string name(OPERAND_ID_MEMBER_NAME_PREFIX);
+    name+=std::to_string(i);
+    struct_union_typet::componentt comp(name, member_type);
+    comps.push_back(comp);
+  }
   symbolt new_symbol;
   new_symbol.name=instr_type_name;
   new_symbol.type=type;
@@ -127,10 +168,37 @@ const symbol_typet &create_instruction_type(symbol_tablet &st,
   new_symbol.module=CEGIS_MODULE;
   new_symbol.is_type=true;
   assert(!st.add(new_symbol));
-  // TODO: Implement
-  assert(false);
+  return symbol_typet(instr_type_name);
+}
+
+const mp_integer get_width(const typet &type)
+{
+  const irep_idt &id_width=type.get(ID_width);
+  assert(!id_width.empty());
+  return string2integer(id2string(id_width));
+}
+
+code_typet create_func_type(const symbol_tablet &st,
+    const symbol_typet &instruction_type)
+{
+  code_typet code_type;
+  code_type.return_type()=empty_typet();
+  const typet &followed_type=namespacet(st).follow(instruction_type);
+  const struct_union_typet &struct_type=to_struct_union_type(followed_type);
+  const struct_union_typet::componentst &comps=struct_type.components();
+  mp_integer width(0);
+  for (const struct_union_typet::componentt &comp : comps)
+    width+=get_width(comp.type());
+  const pointer_typet instr_ref_type(instruction_type, width.to_ulong());
+  code_type.parameters().push_back(code_typet::parametert(instr_ref_type));
+  const typet size_type(unsigned_char_type());
+  code_type.parameters().push_back(code_typet::parametert(size_type));
+  return code_type;
 }
 }
+
+#define PROGRAM_PARAM_ID "program"
+#define PROGRAM_SIZE_PARAM_ID "size"
 
 std::string create_cegis_processor(symbol_tablet &st, goto_functionst &gf,
     const std::map<typet, size_t> &slots)
@@ -138,8 +206,11 @@ std::string create_cegis_processor(symbol_tablet &st, goto_functionst &gf,
   for (const std::pair<typet, size_t> &var_slot : slots)
     create_variable_array(st, gf, var_slot.first, var_slot.second);
   const std::string func_name(get_next_processor_name(st));
-  const symbol_typet &instr_type=create_instruction_type(st, slots, func_name);
+  const symbol_typet instr_type(create_instruction_type(st, slots, func_name));
   goto_functionst::function_mapt::mapped_type &func=gf.function_map[func_name];
+  func.parameter_identifiers.push_back(PROGRAM_PARAM_ID);
+  func.parameter_identifiers.push_back(PROGRAM_SIZE_PARAM_ID);
+  func.type=create_func_type(st, instr_type);
   goto_programt &body=func.body;
   // TODO: Implement
   // XXX: Debug
