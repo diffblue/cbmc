@@ -15,6 +15,10 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_constraint.h>
 #include <solvers/refinement/string_expr.h>
+#include <solvers/refinement/string_constraint_generator.h>
+
+// This is to analyse the performances of the different steps
+#include <chrono>
 
 class string_refinementt: public bv_refinementt
 {
@@ -38,6 +42,8 @@ public:
 
 private:  
   typedef bv_refinementt SUB;
+  std::chrono::high_resolution_clock::time_point start_time;
+
 
 protected:
 
@@ -55,39 +61,6 @@ protected:
   // fills as many 0 as necessary in the bit vectors to have the right width
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
 
-  // The following functions convert different string functions 
-  // and add the corresponding lemmas to a list of properties to be checked  
-  exprt convert_string_equal(const function_application_exprt &f);
-  exprt convert_string_equals_ignore_case(const function_application_exprt &f);
-  exprt convert_string_is_empty(const function_application_exprt &f);
-  bvt convert_string_length(const function_application_exprt &f);
-  exprt convert_string_is_prefix(const string_exprt &prefix, const string_exprt &str, const exprt & offset);
-  exprt convert_string_is_prefix(const function_application_exprt &f, bool swap_arguments=false);
-  bvt convert_string_is_suffix(const function_application_exprt &f, bool swap_arguments=false);
-  bvt convert_string_contains(const function_application_exprt &f);
-  exprt convert_string_hash_code(const function_application_exprt &f);
-  exprt convert_string_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
-  exprt convert_string_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index);
-  exprt convert_string_last_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index);
-  exprt convert_string_index_of(const function_application_exprt &f);
-  exprt convert_string_last_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
-  exprt convert_string_last_index_of(const function_application_exprt &f);
-  bvt convert_char_literal(const function_application_exprt &f);
-  bvt convert_string_char_at(const function_application_exprt &f);
-  exprt convert_string_code_point_at(const function_application_exprt &f);
-  exprt convert_string_code_point_before(const function_application_exprt &f);
-  
-  // Warning: this function is underspecified
-  exprt convert_string_code_point_count(const function_application_exprt &f);
-  // Warning: this function is underspecified
-  exprt convert_string_offset_by_code_point(const function_application_exprt &f);
-  exprt convert_string_parse_int(const function_application_exprt &f);
-  exprt convert_string_to_char_array(const function_application_exprt &f);
-
-  exprt convert_string_compare_to(const function_application_exprt &f);
-
-  // Warning: this does not work at the moment because of the way we treat string pointers
-  symbol_exprt convert_string_intern(const function_application_exprt &f);
 
 
 private:
@@ -96,8 +69,7 @@ private:
   exprt is_high_surrogate(const exprt & chr);
   exprt is_low_surrogate(const exprt & chr);
 
-  // All constraints produced by the code
-  axiom_vect string_axioms;
+  string_constraint_generatort generator;
 
   // Simple constraints that have been given to the solver
   expr_sett seen_instances;
@@ -107,14 +79,6 @@ private:
   axiom_vect not_contains_axioms;
 
   int nb_sat_iteration;
-
-  // Boolean symbols that are used to know whether the results 
-  // of some functions should be true.
-  std::vector<symbol_exprt> boolean_symbols;
-
-  // Symbols used in existential quantifications
-  std::vector<symbol_exprt> index_symbols;
-
 
   // Unquantified lemmas that have newly been added
   std::vector<exprt> cur;
@@ -130,24 +94,10 @@ private:
   // Tells if there is a index in the index set where the same variable occurs several time.
   bool variable_with_multiple_occurence_in_index;
 
-  std::map<irep_idt, string_exprt> symbol_to_string;
-  inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr){
-    symbol_to_string[sym.get_identifier()]= expr;
-  }  
-
-  string_exprt string_of_symbol(const symbol_exprt & sym);
-
 
   std::map<string_exprt, symbol_exprt> pool;
   std::map<string_exprt, symbol_exprt> hash;
 
-  // Create a new string expression and add the necessary lemma
-  // to ensure its equal to the given string expression.
-  string_exprt make_string(const exprt &str);
-
-  // Same thing but associates the string to the given symbol instead 
-  // of returning it.
-  void make_string(const symbol_exprt & sym, const exprt &str);
 
   // Natural number expression corresponding to a constant integer
   constant_exprt constant_of_nat(int i,typet t);
