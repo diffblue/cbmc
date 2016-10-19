@@ -19,4 +19,4 @@ void main() {
   pthread_join(tid2, NULL); 
   // deadlock in the threads; assertion should not be reachable
   assert(0);
-} 
+}
