@@ -1,0 +1,11 @@
+CORE
+main.c
+--inline
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+y = 1;
+y = 2;
+y = 3;
+--
+^warning: ignoring

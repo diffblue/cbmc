@@ -1,0 +1,12 @@
+CORE
+main.c
+--inline
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\s*x;$
+^\s*c;$
+^\s*a;$
+no body.*[`]f
+--
+^warning: ignoring

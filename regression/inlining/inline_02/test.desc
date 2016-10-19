@@ -1,0 +1,11 @@
+CORE
+main.c
+--partial-inline
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+f[(].*[)];$
+g[(].*[)];$
+h[(].*[)];$
+--
+^warning: ignoring
