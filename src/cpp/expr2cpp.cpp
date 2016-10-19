@@ -331,6 +331,10 @@ std::string expr2cppt::convert_rec(
     dest+="> "+convert(src.subtype());
     return dest;
   }
+  else if(src.id()==ID_pointer && src.subtype().id()==ID_nullptr)
+  {
+    return "std::nullptr_t";
+  }
   else if(src.id()==ID_pointer &&
           src.find("to-member").is_not_nil())
   {
@@ -411,10 +415,6 @@ std::string expr2cppt::convert_rec(
     dest+=" -> "+convert(return_type);
 
     return dest;
-  }
-  else if(src.id()==ID_nullptr)
-  {
-    return "std::nullptr_t";
   }
   else if(src.id()==ID_initializer_list)
   {

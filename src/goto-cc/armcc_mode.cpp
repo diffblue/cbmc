@@ -67,7 +67,7 @@ int armcc_modet::doit()
   // get configuration
   config.set(cmdline);
 
-  config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_ARM_C_CPP;
+  config.ansi_c.mode=configt::ansi_ct::flavourt::ARM;
   config.ansi_c.arch="arm";
   
   // determine actions to be taken

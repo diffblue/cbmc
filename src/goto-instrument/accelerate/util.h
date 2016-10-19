@@ -2,9 +2,9 @@
 #define ACCELERATE_UTIL_H
 
 #include <util/std_types.h>
-#include <util/config.h>
 
-#define POLY_WIDTH config.ansi_c.int_width
+signedbv_typet signed_poly_type();
+unsignedbv_typet unsigned_poly_type();
 
 bool is_bitvector(const typet &t);
 typet join_types(const typet &t1, const typet &t2);

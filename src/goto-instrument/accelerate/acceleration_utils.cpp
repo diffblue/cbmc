@@ -533,7 +533,7 @@ bool acceleration_utilst::do_arrays(
 
   exprt arrays_expr=conjunction(array_operands);
 
-  symbolt k_sym = fresh_symbol("polynomial::k", unsignedbv_typet(POLY_WIDTH));
+  symbolt k_sym = fresh_symbol("polynomial::k", unsigned_poly_type());
   exprt k = k_sym.symbol_expr();
 
   exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), ID_le, k),
@@ -579,7 +579,7 @@ bool acceleration_utilst::do_arrays(
     }
 
     exprt idx_never_touched = nil_exprt();
-    symbolt idx_sym = fresh_symbol("polynomial::idx", signedbv_typet(POLY_WIDTH));
+    symbolt idx_sym = fresh_symbol("polynomial::idx", signed_poly_type());
     exprt idx = idx_sym.symbol_expr();
 
 
@@ -644,7 +644,7 @@ bool acceleration_utilst::do_arrays(
       // OK, we have an expression saying idx is not touched by the
       // loop_counter'th iteration.  Let's quantify that to say that idx is not
       // touched at all.
-      symbolt l_sym = fresh_symbol("polynomial::l", signedbv_typet(POLY_WIDTH));
+      symbolt l_sym = fresh_symbol("polynomial::l", signed_poly_type());
       exprt l = l_sym.symbol_expr();
 
       replace_expr(loop_counter, l, idx_not_touched);
@@ -925,7 +925,7 @@ bool acceleration_utilst::assign_array(const exprt &lhs,
   exprt changed = equal_exprt(lhs, rhs);
   replace_expr(arr, fresh_array, changed);
 
-  symbolt k_sym = fresh_symbol("polynomial::k", unsignedbv_typet(POLY_WIDTH));
+  symbolt k_sym = fresh_symbol("polynomial::k", unsigned_poly_type());
   exprt k = k_sym.symbol_expr();
 
   exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), ID_le, k),

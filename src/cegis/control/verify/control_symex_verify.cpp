@@ -1,4 +1,6 @@
 #include <cegis/cegis-util/counterexample_vars.h>
+#include <cegis/cegis-util/program_helper.h>
+#include <cegis/control/preprocessing/propagate_controller_sizes.h>
 #include <cegis/control/verify/insert_solution.h>
 #include <cegis/control/verify/control_symex_verify.h>
 
@@ -11,8 +13,9 @@ control_symex_verifyt::control_symex_verifyt(
 void control_symex_verifyt::process(const candidatet &candidate)
 {
   current_program=original_program;
+  goto_functionst &gf=current_program.gf;
   insert_solution(current_program, candidate);
-  current_program.gf.update();
+  gf.update();
 }
 
 const symbol_tablet &control_symex_verifyt::get_symbol_table() const

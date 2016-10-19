@@ -436,22 +436,22 @@ bool c_preprocess(
 {
   switch(config.ansi_c.preprocessor)
   {
-  case configt::ansi_ct::preprocessort::PP_CODEWARRIOR:
+  case configt::ansi_ct::preprocessort::CODEWARRIOR:
     return c_preprocess_codewarrior(path, outstream, message_handler);
   
-  case configt::ansi_ct::preprocessort::PP_GCC:
+  case configt::ansi_ct::preprocessort::GCC:
     return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
   
-  case configt::ansi_ct::preprocessort::PP_CLANG:
+  case configt::ansi_ct::preprocessort::CLANG:
     return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
   
-  case configt::ansi_ct::preprocessort::PP_VISUAL_STUDIO:
+  case configt::ansi_ct::preprocessort::VISUAL_STUDIO:
     return c_preprocess_visual_studio(path, outstream, message_handler);
   
-  case configt::ansi_ct::preprocessort::PP_ARM:
+  case configt::ansi_ct::preprocessort::ARM:
     return c_preprocess_arm(path, outstream, message_handler);
   
-  case configt::ansi_ct::preprocessort::NO_PP:
+  case configt::ansi_ct::preprocessort::NONE:
     return c_preprocess_none(path, outstream, message_handler);
   }
 
@@ -762,7 +762,7 @@ bool c_preprocess_gcc_clang(
 
   std::string command;
   
-  if(preprocessor==configt::ansi_ct::preprocessort::PP_CLANG)
+  if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
     command="clang";
   else
     command="gcc";
@@ -855,8 +855,12 @@ bool c_preprocess_gcc_clang(
   command+=" -D__DEC128_MANT_DIG__=34";
   command+=" -D__LDBL_MIN_10_EXP__=\"(-4931)\"";
 
-  if(preprocessor==configt::ansi_ct::preprocessort::PP_CLANG)
+  if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
+  {
     command+=" -D_Noreturn=\"__attribute__((__noreturn__))\"";
+    command+=" -D__llvm__";
+    command+=" -D__clang__";
+  }
 
   if(config.ansi_c.int_width==16)
     command+=GCC_DEFINES_16;
@@ -911,7 +915,7 @@ bool c_preprocess_gcc_clang(
   case configt::ansi_ct::ost::OS_WIN:
     command+=" -D _WIN32";
 
-    if(config.ansi_c.mode!=configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP)
+    if(config.ansi_c.mode!=configt::ansi_ct::flavourt::VISUAL_STUDIO)
       command+=" -D _M_IX86=Blend";
 
     if(config.ansi_c.arch=="x86_64")
@@ -973,14 +977,16 @@ bool c_preprocess_gcc_clang(
     command+=" "+*it;
     
   int result;
-  
+
+  #if 0  
   // the following forces the mode
   switch(config.ansi_c.mode)
   {
-  case configt::ansi_ct::flavourt::MODE_GCC_C: command+=" -x c"; break;
-  case configt::ansi_ct::flavourt::MODE_GCC_CPP: command+=" -x c++"; break;
+  case configt::ansi_ct::flavourt::GCC_C: command+=" -x c"; break;
+  case configt::ansi_ct::flavourt::GCC_CPP: command+=" -x c++"; break;
   default:;
   }
+  #endif
 
   #ifdef _WIN32
   std::string tmpi=get_temporary_file("tmp.gcc", "");
@@ -1226,7 +1232,7 @@ bool c_preprocess_none(
     return true;
   }
   
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_CODEWARRIOR_C_CPP)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
   {
     // special treatment for "/* #line"
     postprocess_codewarrior(infile, outstream);

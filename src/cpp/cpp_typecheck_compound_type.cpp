@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -497,7 +498,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
     // the 'virtual' name of the function
     std::string virtual_name=
-    component.get_string(ID_base_name)+
+      component.get_string(ID_base_name)+
       id2string(
         function_identifier(static_cast<const typet &>(component.find(ID_type))));
         
@@ -507,8 +508,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
     if(has_volatile(method_qualifier))
       virtual_name+="$virtual";
       
-    if(component.type().get(ID_return_type) == ID_destructor)
-      virtual_name= "@dtor";
+    if(component.type().get(ID_return_type)==ID_destructor)
+      virtual_name="@dtor";
     
     // The method may be virtual implicitly.
     std::set<irep_idt> virtual_bases;
@@ -1396,7 +1397,7 @@ void cpp_typecheckt::typecheck_member_function(
   }
   else
   {
-    adjust_method_type(
+    add_this_to_method_type(
       compound_identifier,
       type,
       method_qualifier);
@@ -1458,7 +1459,7 @@ void cpp_typecheckt::typecheck_member_function(
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::adjust_method_type
+Function: cpp_typecheckt::add_this_to_method_type
 
 Inputs:
 
@@ -1468,30 +1469,31 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::adjust_method_type(
+void cpp_typecheckt::add_this_to_method_type(
   const irep_idt &compound_symbol,
   typet &type,
   const typet &method_qualifier)
 {
-  irept &parameters=type.add(ID_parameters);
+  code_typet::parameterst &parameters=to_code_type(type).parameters();
 
-  parameters.get_sub().insert(
-    parameters.get_sub().begin(), irept(ID_parameter));
+  parameters.insert(
+    parameters.begin(), code_typet::parametert());
 
-  exprt &parameter=static_cast<exprt &>(parameters.get_sub().front());
-  parameter.type()=typet(ID_pointer);
+  code_typet::parametert &parameter=parameters.front();
+  
+  parameter.set_identifier(ID_this); // check? Not qualified
+  parameter.set_base_name(ID_this);
+  parameter.set_this();
 
-  parameter.type().subtype()=typet(ID_symbol);
-  parameter.type().subtype().set(ID_identifier, compound_symbol);
-
-  parameter.set(ID_C_identifier, ID_this);
-  parameter.set(ID_C_base_name, ID_this);
-
+  typet subtype=symbol_typet(compound_symbol);
+  
   if(has_const(method_qualifier))
-    parameter.type().subtype().set(ID_C_constant, true);
+    subtype.set(ID_C_constant, true);
   
   if(has_volatile(method_qualifier))
-    parameter.type().subtype().set(ID_C_volatile, true);
+    subtype.set(ID_C_volatile, true);
+
+  parameter.type()=pointer_typet(subtype);
 }
 
 /*******************************************************************\

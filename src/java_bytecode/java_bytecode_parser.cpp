@@ -124,9 +124,9 @@ protected:
   void get_class_refs();
   void get_class_refs_rec(const typet &);
   
-  void skip_bytes(unsigned bytes)
+  void skip_bytes(std::size_t bytes)
   {
-    for(unsigned i=0; i<bytes; i++)
+    for(std::size_t i=0; i<bytes; i++)
     {
       if(!*in)
       {
@@ -311,7 +311,7 @@ void java_bytecode_parsert::rClassFile()
   
   u2 attributes_count=read_u2();
 
-  for(unsigned j=0; j<attributes_count; j++)
+  for(std::size_t j=0; j<attributes_count; j++)
     rclass_attribute(parsed_class);
 
   get_class_refs();
@@ -663,7 +663,7 @@ void java_bytecode_parsert::rinterfaces(classt &parsed_class)
 {
   u2 interfaces_count=read_u2();
 
-  for(unsigned i=0; i<interfaces_count; i++)
+  for(std::size_t i=0; i<interfaces_count; i++)
     parsed_class.implements.push_back(constant(read_u2()).type().get(ID_C_base_name));
 }
 
@@ -683,7 +683,7 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
 {
   u2 fields_count=read_u2();
 
-  for(unsigned i=0; i<fields_count; i++)
+  for(std::size_t i=0; i<fields_count; i++)
   {
     fieldt &field=parsed_class.add_field();
     
@@ -697,7 +697,7 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
     field.is_final=(access_flags&ACC_FINAL)!=0;
     field.signature=id2string(pool_entry(descriptor_index).s);
 
-    for(unsigned j=0; j<attributes_count; j++)
+    for(std::size_t j=0; j<attributes_count; j++)
       rfield_attribute(field);
   }
 }
@@ -727,13 +727,12 @@ void java_bytecode_parsert::rbytecode(
   methodt::instructionst &instructions)
 {
   u4 code_length=read_u4();
-  
-  unsigned address;
+  u4 address;
 
   for(address=0; address<code_length; address++)
   {
     bool wide_instruction=false;
-    unsigned start_of_instruction=address;
+    u4 start_of_instruction=address;
     
     u1 bytecode=read_u1();
     
@@ -774,24 +773,24 @@ void java_bytecode_parsert::rbytecode(
       
     case 'b': // a signed byte
       {
-        signed char c=read_u1();
+        s1 c=read_u1();
         instruction.args.push_back(from_integer(c, integer_typet()));
       }
       address+=1;
       
       break;
 
-    case 'o': // two byte branch offset
+    case 'o': // two byte branch offset, signed
       {
-        signed short offset=read_u2();
+        s2 offset=read_u2();
         instruction.args.push_back(from_integer(address+offset, integer_typet()));
       }
       address+=2;
       break;
 
-    case 'O': // four byte branch offset
+    case 'O': // four byte branch offset, signed
       {
-        signed int offset=read_u4();
+        s4 offset=read_u4();
         instruction.args.push_back(from_integer(address+offset, integer_typet()));
       }
       address+=4;
@@ -810,7 +809,7 @@ void java_bytecode_parsert::rbytecode(
       {
         u2 v=read_u2();
         instruction.args.push_back(from_integer(v, integer_typet()));
-        signed short c=read_u2();
+        s2 c=read_u2();
         instruction.args.push_back(from_integer(c, integer_typet()));
         address+=4;
       }
@@ -818,7 +817,7 @@ void java_bytecode_parsert::rbytecode(
       {
         u1 v=read_u1();
         instruction.args.push_back(from_integer(v, integer_typet()));
-        signed char c=read_u1();
+        s1 c=read_u1();
         instruction.args.push_back(from_integer(c, integer_typet()));
         address+=2;
       }
@@ -838,13 +837,13 @@ void java_bytecode_parsert::rbytecode(
       
     case 'L': // lookupswitch
       {
-        unsigned base_offset=address;
+        u4 base_offset=address;
       
         // first a pad to 32-bit align
         while(((address+1)&3)!=0) { read_u1(); address++; }
         
         // now default value
-        signed int default_value=read_u4();
+        s4 default_value=read_u4();
         instruction.args.push_back(from_integer(base_offset+default_value, integer_typet()));
         address+=4;
         
@@ -852,10 +851,10 @@ void java_bytecode_parsert::rbytecode(
         u4 npairs=read_u4();
         address+=4;
         
-        for(unsigned i=0; i<npairs; i++)
+        for(std::size_t i=0; i<npairs; i++)
         {
-          signed int match=read_u4();
-          signed int offset=read_u4();
+          s4 match=read_u4();
+          s4 offset=read_u4();
           instruction.args.push_back(from_integer(match, integer_typet()));
           instruction.args.push_back(from_integer(base_offset+offset, integer_typet()));
           address+=8;
@@ -871,22 +870,22 @@ void java_bytecode_parsert::rbytecode(
         while(((address+1)&3)!=0) { read_u1(); address++; }
         
         // now default value
-        signed int default_value=read_u4();
+        s4 default_value=read_u4();
         instruction.args.push_back(from_integer(base_offset+default_value, integer_typet()));
         address+=4;
         
         // now low value
-        signed int low_value=read_u4();
+        s4 low_value=read_u4();
         address+=4;
         
         // now high value
-        signed int high_value=read_u4();
+        s4 high_value=read_u4();
         address+=4;
 
-        // there are high-low+1 offsets
-        for(signed int i=low_value; i<=high_value; i++)
+        // there are high-low+1 offsets, and they are signed
+        for(s4 i=low_value; i<=high_value; i++)
         {
-          u4 offset=read_u4();
+          s4 offset=read_u4();
           instruction.args.push_back(from_integer(i, integer_typet()));
           instruction.args.push_back(from_integer(base_offset+offset, integer_typet()));
           address+=4;
@@ -926,7 +925,7 @@ void java_bytecode_parsert::rbytecode(
       
     case 's': // a signed short
       {
-        signed short s=read_u2();
+        s2 s=read_u2();
         instruction.args.push_back(from_integer(s, integer_typet()));
       }
       address+=2;
@@ -971,7 +970,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     
     u2 exception_table_length=read_u2();
 
-    for(unsigned e=0; e<exception_table_length; e++)
+    for(std::size_t e=0; e<exception_table_length; e++)
     {
       u2 UNUSED start_pc=read_u2();
       u2 UNUSED end_pc=read_u2();
@@ -981,7 +980,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
 
     u2 attributes_count=read_u2();
     
-    for(unsigned j=0; j<attributes_count; j++)
+    for(std::size_t j=0; j<attributes_count; j++)
       rcode_attribute(method);
       
     irep_idt line_number;
@@ -1071,7 +1070,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
 
     u2 line_number_table_length=read_u2();
 
-    for(unsigned i=0; i<line_number_table_length; i++)
+    for(std::size_t i=0; i<line_number_table_length; i++)
     {
       u2 start_pc=read_u2();
       u2 line_number=read_u2();
@@ -1090,7 +1089,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
 
     method.local_variable_table.resize(local_variable_table_length);
 
-    for(unsigned i=0; i<local_variable_table_length; i++)
+    for(std::size_t i=0; i<local_variable_table_length; i++)
     {
       u2 start_pc=read_u2();
       u2 length=read_u2();
@@ -1357,7 +1356,7 @@ void java_bytecode_parsert::relement_value_pair(
   case '[':
     {
       u2 num_values=read_u2();
-      for(unsigned i=0; i<num_values; i++)
+      for(std::size_t i=0; i<num_values; i++)
       {
         annotationt::element_value_pairt element_value;
         relement_value_pair(element_value); // recursive call
@@ -1445,7 +1444,7 @@ void java_bytecode_parsert::rmethods(classt &parsed_class)
 {
   u2 methods_count=read_u2();
 
-  for(unsigned j=0; j<methods_count; j++)
+  for(std::size_t j=0; j<methods_count; j++)
     rmethod(parsed_class);
 }
 
@@ -1497,7 +1496,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   
   u2 attributes_count=read_u2();
   
-  for(unsigned j=0; j<attributes_count; j++)
+  for(std::size_t j=0; j<attributes_count; j++)
     rmethod_attribute(method);
 }
 

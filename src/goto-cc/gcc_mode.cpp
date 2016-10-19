@@ -235,11 +235,13 @@ int gcc_modet::doit()
      cmdline.isset("winx64"))
   {
     // We may wish to reconsider the below.
-    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
+    config.ansi_c.mode=configt::ansi_ct::flavourt::VISUAL_STUDIO;
     debug() << "Enabling Visual Studio syntax" << eom;
   }
+  else if(config.this_operating_system()=="macos")
+    config.ansi_c.mode=configt::ansi_ct::flavourt::APPLE;
   else
-    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_C;
+    config.ansi_c.mode=configt::ansi_ct::flavourt::GCC;
 
   if(compiler.mode==compilet::ASSEMBLE_ONLY)
     compiler.object_file_extension="s";

@@ -421,9 +421,9 @@ void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t, exprt init) 
 
 void acceleratet::insert_automaton(trace_automatont &automaton) {
   symbolt state_sym = make_symbol("trace_automaton::state",
-      unsignedbv_typet(POLY_WIDTH));
+      unsigned_poly_type());
   symbolt next_state_sym = make_symbol("trace_automaton::next_state",
-      unsignedbv_typet(POLY_WIDTH));
+      unsigned_poly_type());
   symbol_exprt state = state_sym.symbol_expr();
   symbol_exprt next_state = next_state_sym.symbol_expr();
 

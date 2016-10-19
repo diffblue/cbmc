@@ -270,7 +270,6 @@ void cpp_typecheckt::default_cpctor(
   parameter_tor.set(ID_name, cpp_parameter);
   parameter_tor.type()=reference_typet();
   parameter_tor.type().subtype().make_nil();
-  parameter_tor.type().add(ID_C_qualifier).make_nil();
   parameter_tor.add_source_location() = source_location;
 
   // Parameter declaration
@@ -473,7 +472,6 @@ void cpp_typecheckt::default_assignop(
 
   args_decl_declor.type().id(ID_pointer);
   args_decl_declor.type().set(ID_C_reference, true);
-  args_decl_declor.type().add(ID_C_qualifier).make_nil();
   args_decl_declor.type().subtype().make_nil();
   args_decl_declor.value().make_nil();
 }
