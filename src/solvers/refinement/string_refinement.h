@@ -35,9 +35,6 @@ public:
   virtual std::string decision_procedure_text() const
   { return "string refinement loop with "+prop.solver_text(); }
 
-  symbol_exprt fresh_index(const irep_idt &prefix);
-  symbol_exprt fresh_boolean(const irep_idt &prefix);
-
   static exprt is_positive(const exprt & x);
 
 private:  
@@ -74,9 +71,9 @@ private:
   // Simple constraints that have been given to the solver
   expr_sett seen_instances;
   // 
-  axiom_vect universal_axioms;
+  std::vector<string_constraintt> universal_axioms;
   //
-  axiom_vect not_contains_axioms;
+  std::vector<string_constraintt> not_contains_axioms;
 
   int nb_sat_iteration;
 
@@ -93,11 +90,6 @@ private:
 
   // Tells if there is a index in the index set where the same variable occurs several time.
   bool variable_with_multiple_occurence_in_index;
-
-
-  std::map<string_exprt, symbol_exprt> pool;
-  std::map<string_exprt, symbol_exprt> hash;
-
 
   // Natural number expression corresponding to a constant integer
   constant_exprt constant_of_nat(int i,typet t);
@@ -119,7 +111,7 @@ private:
   void update_index_set(const exprt &formula);
   void update_index_set(const std::vector<exprt> &cur);
   void initial_index_set(const string_constraintt &axiom);
-  void initial_index_set(const axiom_vect &string_axioms);
+  void initial_index_set(const std::vector<string_constraintt> &string_axioms);
 
   // Takes an universaly quantified formula [axiom], 
   // an array of char variable [s], and an index expression [val]. 

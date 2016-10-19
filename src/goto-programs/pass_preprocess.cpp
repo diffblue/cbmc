@@ -40,7 +40,7 @@ void make_string_function(symbol_tablet & symbol_table, goto_functionst & goto_f
   rhs.type()=old_type.return_type();
   rhs.add_source_location()=function_call.source_location();
   rhs.function()=symbol_exprt(function_name);
-  for(int i = 0; i < function_call.arguments().size(); i++)
+  for(unsigned i = 0; i < function_call.arguments().size(); i++)
     rhs.arguments().push_back(replace_string_literals(symbol_table,goto_functions,function_call.arguments()[i]));
   code_assignt assignment(function_call.lhs(), rhs);
   assignment.add_source_location()=function_call.source_location();
@@ -89,7 +89,7 @@ void make_string_function_call(symbol_tablet & symbol_table, goto_functionst & g
   rhs.type()=function_call.arguments()[0].type();
   rhs.add_source_location()=function_call.source_location();
   rhs.function()=symbol_exprt(function_name);
-  for(int i = 1; i < function_call.arguments().size(); i++)
+  for(unsigned i = 1; i < function_call.arguments().size(); i++)
     rhs.arguments().push_back(replace_string_literals(symbol_table,goto_functions,function_call.arguments()[i]));
   code_assignt assignment(function_call.arguments()[0], rhs);
   assignment.add_source_location()=function_call.source_location();
@@ -118,7 +118,7 @@ void make_string_function_side_effect
   rhs.type()=return_type;//to_pointer_type(return_type).subtype();
   rhs.add_source_location()=function_call.source_location();
   rhs.function()=symbol_exprt(function_name);
-  for(int i = 0; i < function_call.arguments().size(); i++)
+  for(unsigned i = 0; i < function_call.arguments().size(); i++)
     rhs.arguments().push_back(replace_string_literals(symbol_table,goto_functions,function_call.arguments()[i]));
   //code_assignt assignment(dereference_exprt(function_call.arguments()[0]), rhs);
   code_assignt assignment(function_call.arguments()[0], rhs);
@@ -163,7 +163,7 @@ void replace_string_calls(symbol_tablet & symbol_table,goto_functionst & goto_fu
     if(i_it->is_function_call()) {
 
       code_function_callt &function_call=to_code_function_call(i_it->code);
-      for(int i = 0; i < function_call.arguments().size(); i++)
+      for(unsigned i = 0; i < function_call.arguments().size(); i++)
 	if(string_builders.find(function_call.arguments()[i]) != string_builders.end())
 	  function_call.arguments()[i]= string_builders[function_call.arguments()[i]];
 

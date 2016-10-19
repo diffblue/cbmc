@@ -8,9 +8,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 \*******************************************************************/
 
 #include <solvers/refinement/string_expr.h>
-#include <ansi-c/string_constant.h>
-#include <solvers/floatbv/float_bv.h>
-#include <java_bytecode/java_types.h>
+//#include <ansi-c/string_constant.h>
+//#include <java_bytecode/java_types.h>
 
 exprt index_zero = refined_string_typet::index_zero();
 unsigned string_exprt::next_symbol_id = 1;

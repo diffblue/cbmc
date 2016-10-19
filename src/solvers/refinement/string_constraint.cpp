@@ -70,3 +70,8 @@ string_constraintt string_constraintt::exists(const symbol_exprt & exist, const 
 	       and_exprt(binary_relation_exprt(exist, ID_ge, bound_inf),
 			 binary_relation_exprt(exist, ID_lt, bound_sup))));
 }
+
+string_constraintt string_constraintt::exists(const symbol_exprt & univ, const exprt & bound_sup)
+{
+  return exists(univ,refined_string_typet::index_zero(),bound_sup);
+}

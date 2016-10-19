@@ -49,6 +49,37 @@ void string_refinementt::display_index_set() {
   }
 }
 
+// We compute the index set for all formulas, instantiate the formulas
+// with the found indexes, and add them as lemmas.
+void string_refinementt::add_instantiations()
+{
+  debug() << "string_constraint_generatort::add_instantiations: "
+	  << "going through the current index set:" << eom;
+  for (std::map<exprt, expr_sett>::iterator i = current_index_set.begin(),
+	 end = current_index_set.end(); i != end; ++i) {
+    const exprt &s = i->first;
+    debug() << "IS(" << pretty_short(s) << ") == {";
+
+    for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
+         j != end; ++j) 
+      debug() << pretty_short (*j) << "; ";
+    debug() << "}"  << eom;
+
+
+    for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
+         j != end; ++j) {
+      const exprt &val = *j;
+
+      for (size_t k = 0; k < universal_axioms.size(); ++k) {
+	assert(universal_axioms[k].is_univ_quant());
+	string_constraintt lemma = instantiate(universal_axioms[k], s, val);
+	assert(lemma.is_simple());
+	add_lemma(lemma);
+      }
+    }
+  }
+}
+
 literalt string_refinementt::convert_rest(const exprt &expr)
 {
   if(expr.id()==ID_function_application)
@@ -130,8 +161,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 
 bvt string_refinementt::convert_function_application(const function_application_exprt &expr)
 {
-  const exprt &name = expr.function();
-  debug() << "string_refinementt::convert_function_application "  << name << eom;
+  debug() << "string_refinementt::convert_function_application "  << pretty_short(expr) << eom;
   exprt f = generator.function_application(expr);
   return convert_bv(f);
 }
@@ -152,7 +182,7 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
     if(refined_string_typet::is_unrefined_string_type(type)) 
       {
 	symbol_exprt sym = to_symbol_expr(expr.lhs());
-	generator.make_string(sym,expr.rhs());
+	generator.string_of_expr(sym,expr.rhs());
 	return false;
       }
     else if(type == generator.get_char_type()) 
@@ -662,7 +692,7 @@ bool find_qvar(const exprt index, const symbol_exprt & qvar) {
 }
 
 
-void string_refinementt::initial_index_set(const axiom_vect & string_axioms) {
+void string_refinementt::initial_index_set(const std::vector<string_constraintt>  & string_axioms) {
   for (size_t i = 0; i < string_axioms.size(); ++i) {
     initial_index_set(string_axioms[i]);
   }
