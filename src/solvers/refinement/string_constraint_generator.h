@@ -164,13 +164,13 @@ public:
   // Warning: this does not work at the moment because of the way we treat string pointers
   symbol_exprt string_intern(const function_application_exprt &f);
 
+  // Check that the given string is from the right language
+  void check_char_type(const exprt & str);
 
 private:
 
   enum {C, JAVA, UNKNOWN} language;
 
-  // Check that the given string is from the right language
-  void check_char_type(const exprt & str);
   
   inline bool use_c_string() {return (language == C);}
 

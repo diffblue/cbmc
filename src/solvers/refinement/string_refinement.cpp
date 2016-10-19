@@ -181,10 +181,12 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
     
     if(refined_string_typet::is_unrefined_string_type(type)) 
       {
+	generator.check_char_type(expr.lhs());
 	symbol_exprt sym = to_symbol_expr(expr.lhs());
 	generator.string_of_expr(sym,expr.rhs());
 	return false;
       }
+    /*
     else if(type == generator.get_char_type()) 
       {
 	const bvt &bv1=convert_bv(expr.rhs());
@@ -193,7 +195,7 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 	map.set_literals(identifier, generator.get_char_type(), bv1);
 	if(freeze_all) set_frozen(bv1);
 	return false;
-      } 
+	} */
     else if(type==ns.follow(expr.rhs().type()))
       {
 	if(is_unbounded_array(type)) return true;

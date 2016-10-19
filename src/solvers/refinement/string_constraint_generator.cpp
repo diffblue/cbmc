@@ -13,6 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/floatbv/float_bv.h>
 #include <java_bytecode/java_types.h>
 
+
 constant_exprt string_constraint_generatort::constant_char(int i)
 {
   switch(language) 
@@ -25,8 +26,6 @@ constant_exprt string_constraint_generatort::constant_char(int i)
     default: assert(false);
     }
 }
-
-
 
 
 constant_exprt string_constraint_generatort::constant_unsigned(int i, size_t width)
@@ -88,6 +87,8 @@ string_exprt string_constraint_generatort::string_of_expr(const exprt & unrefine
 {
   string_exprt s;
     
+  check_char_type(unrefined_string);
+
   if(unrefined_string.id() == ID_function_application)
     {
       exprt res = function_application(to_function_application_expr(unrefined_string));
@@ -167,136 +168,130 @@ string_exprt string_constraint_generatort::string_of_symbol(const symbol_exprt &
 exprt string_constraint_generatort::function_application(const function_application_exprt & expr)
 {
   const exprt &name = expr.function();
+  assert(name.id() == ID_symbol);
 
-  if (name.id() == ID_symbol) {
-    const irep_idt &id = to_symbol_expr(name).get_identifier();
-    if (starts_with(id,cprover_string_literal_func)
-	|| starts_with(id,cprover_string_concat_func)
-	|| starts_with(id,cprover_string_substring_func)
-	|| starts_with(id,cprover_string_char_set_func)) {
-      string_exprt str = string_of_expr(expr);
-      return str;
-    } else if (starts_with(id,cprover_char_literal_func)) 
-      return char_literal(expr);
-    else if (starts_with(id,cprover_string_length_func)) 
-      return string_length(expr);
-    else if (starts_with(id,cprover_string_equal_func)) 
-      return string_equal(expr);
-    else if (starts_with(id,cprover_string_equals_ignore_case_func)) 
-      return string_equals_ignore_case(expr);
-    else if (starts_with(id,cprover_string_is_empty_func)) 
-      return string_is_empty(expr);
-    else if (starts_with(id,cprover_string_char_at_func)) 
-      return string_char_at(expr);
-    else if (starts_with(id,cprover_string_is_prefix_func)) 
-      return string_is_prefix(expr);
-    else if (starts_with(id,cprover_string_is_suffix_func)) 
-      return string_is_suffix(expr);
-    else if (starts_with(id,cprover_string_startswith_func)) 
-      return string_is_prefix(expr,true);
-    else if (starts_with(id,cprover_string_endswith_func)) 
-      return string_is_suffix(expr,true);
-    else if (starts_with(id,cprover_string_contains_func)) 
-      return string_contains(expr);
-    else if (starts_with(id,cprover_string_hash_code_func)) 
-      return string_hash_code(expr);
-    else if (starts_with(id,cprover_string_index_of_func)) 
-      return string_index_of(expr);
-    else if (starts_with(id,cprover_string_last_index_of_func)) 
-      return string_last_index_of(expr);
-    else if (starts_with(id,cprover_string_parse_int_func)) 
-      return string_parse_int(expr);
-    else if (starts_with(id,cprover_string_to_char_array_func)) 
-      return string_to_char_array(expr);
-    else if (starts_with(id,cprover_string_code_point_at_func)) 
-      return string_code_point_at(expr);
-    else if (starts_with(id,cprover_string_code_point_before_func)) 
-      return string_code_point_before(expr);
-    else if (starts_with(id,cprover_string_code_point_count_func)) 
-      return string_code_point_count(expr);
-    else if (starts_with(id,cprover_string_offset_by_code_point_func)) 
-      return string_offset_by_code_point(expr);
-    else if (starts_with(id,cprover_string_compare_to_func)) 
-      return string_compare_to(expr);
-    else if(starts_with(id,cprover_string_literal_func))
-      return string_literal(expr);
-    else if(starts_with(id,cprover_string_concat_func))
-      return string_concat(expr);
-    else if(starts_with(id,cprover_string_concat_int_func))
-      return string_concat_int(expr);
-    else if(starts_with(id,cprover_string_concat_long_func))
-      return string_concat_long(expr);
-    else if(starts_with(id,cprover_string_concat_bool_func))
+  const irep_idt &id = to_symbol_expr(name).get_identifier();
+  if (starts_with(id,cprover_char_literal_func)) 
+    return char_literal(expr);
+  else if (starts_with(id,cprover_string_length_func)) 
+    return string_length(expr);
+  else if (starts_with(id,cprover_string_equal_func)) 
+    return string_equal(expr);
+  else if (starts_with(id,cprover_string_equals_ignore_case_func)) 
+    return string_equals_ignore_case(expr);
+  else if (starts_with(id,cprover_string_is_empty_func)) 
+    return string_is_empty(expr);
+  else if (starts_with(id,cprover_string_char_at_func)) 
+    return string_char_at(expr);
+  else if (starts_with(id,cprover_string_is_prefix_func)) 
+    return string_is_prefix(expr);
+  else if (starts_with(id,cprover_string_is_suffix_func)) 
+    return string_is_suffix(expr);
+  else if (starts_with(id,cprover_string_startswith_func)) 
+    return string_is_prefix(expr,true);
+  else if (starts_with(id,cprover_string_endswith_func)) 
+    return string_is_suffix(expr,true);
+  else if (starts_with(id,cprover_string_contains_func)) 
+    return string_contains(expr);
+  else if (starts_with(id,cprover_string_hash_code_func)) 
+    return string_hash_code(expr);
+  else if (starts_with(id,cprover_string_index_of_func)) 
+    return string_index_of(expr);
+  else if (starts_with(id,cprover_string_last_index_of_func)) 
+    return string_last_index_of(expr);
+  else if (starts_with(id,cprover_string_parse_int_func)) 
+    return string_parse_int(expr);
+  else if (starts_with(id,cprover_string_to_char_array_func)) 
+    return string_to_char_array(expr);
+  else if (starts_with(id,cprover_string_code_point_at_func)) 
+    return string_code_point_at(expr);
+  else if (starts_with(id,cprover_string_code_point_before_func)) 
+    return string_code_point_before(expr);
+  else if (starts_with(id,cprover_string_code_point_count_func)) 
+    return string_code_point_count(expr);
+  else if (starts_with(id,cprover_string_offset_by_code_point_func)) 
+    return string_offset_by_code_point(expr);
+  else if (starts_with(id,cprover_string_compare_to_func)) 
+    return string_compare_to(expr);
+  else if(starts_with(id,cprover_string_literal_func))
+    return string_literal(expr);
+  else if(starts_with(id,cprover_string_concat_func))
+    return string_concat(expr);
+  else if(starts_with(id,cprover_string_concat_int_func))
+    return string_concat_int(expr);
+  else if(starts_with(id,cprover_string_concat_long_func))
+    return string_concat_long(expr);
+  else if(starts_with(id,cprover_string_concat_bool_func))
       return string_concat_bool(expr);
-    else if(starts_with(id,cprover_string_concat_char_func))
-      return string_concat_char(expr);
-    else if(starts_with(id,cprover_string_concat_double_func))
-      return string_concat_double(expr);
-    else if(starts_with(id,cprover_string_concat_float_func))
-      return string_concat_float(expr);
-    else if(starts_with(id,cprover_string_concat_code_point_func))
-      return string_concat_code_point(expr);
-    else if(starts_with(id,cprover_string_insert_func))
-      return string_insert(expr);
-    else if(starts_with(id,cprover_string_insert_int_func))
-      return string_insert_int(expr);
-    else if(starts_with(id,cprover_string_insert_long_func))
-      return string_insert_long(expr);
-    else if(starts_with(id,cprover_string_insert_bool_func))
-      return string_insert_bool(expr);
-    else if(starts_with(id,cprover_string_insert_char_func))
-      return string_insert_char(expr);
-    else if(starts_with(id,cprover_string_insert_double_func))
-      return string_insert_double(expr);
-    else if(starts_with(id,cprover_string_insert_float_func))
-      return string_insert_float(expr);
-    else if(starts_with(id,cprover_string_substring_func))
+  else if(starts_with(id,cprover_string_concat_char_func))
+    return string_concat_char(expr);
+  else if(starts_with(id,cprover_string_concat_double_func))
+    return string_concat_double(expr);
+  else if(starts_with(id,cprover_string_concat_float_func))
+    return string_concat_float(expr);
+  else if(starts_with(id,cprover_string_concat_code_point_func))
+    return string_concat_code_point(expr);
+  else if(starts_with(id,cprover_string_insert_func))
+    return string_insert(expr);
+  else if(starts_with(id,cprover_string_insert_int_func))
+    return string_insert_int(expr);
+  else if(starts_with(id,cprover_string_insert_long_func))
+    return string_insert_long(expr);
+  else if(starts_with(id,cprover_string_insert_bool_func))
+    return string_insert_bool(expr);
+  else if(starts_with(id,cprover_string_insert_char_func))
+    return string_insert_char(expr);
+  else if(starts_with(id,cprover_string_insert_double_func))
+    return string_insert_double(expr);
+  else if(starts_with(id,cprover_string_insert_float_func))
+    return string_insert_float(expr);
+  else if(starts_with(id,cprover_string_substring_func))
       return string_substring(expr);
-    else if(starts_with(id,cprover_string_trim_func))
-      return string_trim(expr);
-    else if(starts_with(id,cprover_string_to_lower_case_func))
-      return string_to_lower_case(expr);
-    else if(starts_with(id,cprover_string_to_upper_case_func))
-      return string_to_upper_case(expr);
-    else if(starts_with(id,cprover_string_char_set_func))
+  else if(starts_with(id,cprover_string_trim_func))
+    return string_trim(expr);
+  else if(starts_with(id,cprover_string_to_lower_case_func))
+    return string_to_lower_case(expr);
+  else if(starts_with(id,cprover_string_to_upper_case_func))
+    return string_to_upper_case(expr);
+  else if(starts_with(id,cprover_string_char_set_func))
       return string_char_set(expr);
-    else if(starts_with(id,cprover_string_value_of_func))
-      return string_value_of(expr);
-    else if(starts_with(id,cprover_string_empty_string_func))
-      return empty_string(expr);
-    else if(starts_with(id,cprover_string_copy_func))
-      return string_copy(expr);
-    else if(starts_with(id,cprover_string_of_int_func))
-      return of_int(expr);
-    else if(starts_with(id,cprover_string_of_int_hex_func))
-      return of_int_hex(expr);
-    else if(starts_with(id,cprover_string_of_float_func))
+  else if(starts_with(id,cprover_string_value_of_func))
+    return string_value_of(expr);
+  else if(starts_with(id,cprover_string_empty_string_func))
+    return empty_string(expr);
+  else if(starts_with(id,cprover_string_copy_func))
+    return string_copy(expr);
+  else if(starts_with(id,cprover_string_of_int_func))
+    return of_int(expr);
+  else if(starts_with(id,cprover_string_of_int_hex_func))
+    return of_int_hex(expr);
+  else if(starts_with(id,cprover_string_of_float_func))
       return of_float(expr);
-    else if(starts_with(id,cprover_string_of_double_func))
-      return of_double(expr);
-    else if(starts_with(id,cprover_string_of_long_func))
-      return of_long(expr);
-    else if(starts_with(id,cprover_string_of_bool_func))
-      return of_bool(expr);
-    else if(starts_with(id,cprover_string_of_char_func))
-      return of_char(expr);
-    else if(starts_with(id,cprover_string_set_length_func))
-      return string_set_length(expr);
-    else if(starts_with(id,cprover_string_delete_func))
-      return string_delete(expr);
-    else if(starts_with(id,cprover_string_delete_char_at_func))
-      return string_delete_char_at(expr);
-    else if(starts_with(id,cprover_string_replace_func))
-      return string_replace(expr);
-    else if(starts_with(id,cprover_string_format_func))
-      return string_format(expr);
-    else {
+  else if(starts_with(id,cprover_string_of_double_func))
+    return of_double(expr);
+  else if(starts_with(id,cprover_string_of_long_func))
+    return of_long(expr);
+  else if(starts_with(id,cprover_string_of_bool_func))
+    return of_bool(expr);
+  else if(starts_with(id,cprover_string_of_char_func))
+    return of_char(expr);
+  else if(starts_with(id,cprover_string_set_length_func))
+    return string_set_length(expr);
+  else if(starts_with(id,cprover_string_delete_func))
+    return string_delete(expr);
+  else if(starts_with(id,cprover_string_delete_char_at_func))
+    return string_delete_char_at(expr);
+  else if(starts_with(id,cprover_string_replace_func))
+    return string_replace(expr);
+  else if(starts_with(id,cprover_string_format_func))
+    return string_format(expr);
+  else
+    {
       std::string msg("string_exprt::function_application: unknown symbol :");
       msg+=id.c_str();
       throw msg;
     }
-  }
-  throw "string_constraint_generator::function_application: not a string function";
+
 }
 
 
