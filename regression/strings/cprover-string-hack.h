@@ -68,6 +68,6 @@ extern int __CPROVER_uninterpreted_string_index_of_func(__CPROVER_string str, __
 extern int __CPROVER_uninterpreted_string_last_index_of_func(__CPROVER_string str, __CPROVER_char c);
 extern __CPROVER_string __CPROVER_uninterpreted_string_char_set_func(__CPROVER_string str, int pos, __CPROVER_char c);
 extern __CPROVER_string __CPROVER_uninterpreted_string_copy_func(__CPROVER_string str);
-extern unsigned __CPROVER_uninterpreted_string_parse_int_func(__CPROVER_string str);
-extern __CPROVER_string __CPROVER_uninterpreted_string_of_int_func(unsigned i);
+extern int __CPROVER_uninterpreted_string_parse_int_func(__CPROVER_string str);
+extern __CPROVER_string __CPROVER_uninterpreted_string_of_int_func(int i);
 

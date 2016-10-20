@@ -383,8 +383,9 @@ string_exprt string_constraint_generatort::string_concat(const string_exprt & s1
 {
   // |res| = |s1| + |s2|
   string_exprt res(get_char_type());
-  equal_exprt length_sum_lem = res.has_length(plus_exprt(s1.length(), s2.length()));
-  axioms.emplace_back(length_sum_lem);
+  axioms.emplace_back(res.has_length(plus_exprt(s1.length(), s2.length())));
+  axioms.emplace_back(s1.shorter(res)); // we have to be careful about very long strings
+  axioms.emplace_back(s2.shorter(res));
 
   // forall i<|s1|. res[i] = s1[i]
   symbol_exprt idx = fresh_univ_index("QA_index_concat");

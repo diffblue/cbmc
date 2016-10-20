@@ -84,7 +84,7 @@ literalt string_refinementt::convert_rest(const exprt &expr)
 {
   if(expr.id()==ID_function_application)
     {
-      assert(false); // can this occur?
+      // can occur in __CPROVER_assume
       bvt bv = convert_function_application(to_function_application_expr(expr));
       assert(bv.size() == 1); 
       return bv[0];
