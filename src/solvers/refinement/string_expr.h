@@ -55,10 +55,14 @@ public:
   { return binary_relation_exprt(rhs, ID_lt, length()); }
   inline binary_relation_exprt strictly_longer (const string_exprt & rhs) const 
   { return binary_relation_exprt(rhs.length(), ID_lt, length()); }
+  inline binary_relation_exprt strictly_longer (int i) const 
+  { return strictly_longer(refined_string_typet::index_of_int(i)); }
   inline binary_relation_exprt shorter (const string_exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_le, rhs.length()); }
   inline binary_relation_exprt shorter (const exprt & rhs) const 
   { return binary_relation_exprt(length(), ID_le, rhs); }
+  inline binary_relation_exprt shorter (int i) const 
+  { return shorter(refined_string_typet::index_of_int(i)); }
   inline binary_relation_exprt strictly_shorter (const string_exprt & rhs) const
   { return binary_relation_exprt(length(), ID_lt, rhs.length()); }
   inline binary_relation_exprt strictly_shorter (const exprt & rhs) const

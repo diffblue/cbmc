@@ -522,6 +522,7 @@ string_exprt string_constraint_generatort::string_trim
   axioms.emplace_back(binary_relation_exprt(idx, ID_ge, refined_string_typet::index_zero()));
   axioms.emplace_back(str.longer(idx));
   axioms.emplace_back(res.longer(refined_string_typet::index_zero()));
+  axioms.emplace_back(res.shorter(str)); // necessary to prevent exceeding the biggest integer
 
   symbol_exprt n = fresh_univ_index("QA_index_trim");
   // forall n < m, str[n] = ' '
@@ -642,10 +643,10 @@ string_exprt string_constraint_generatort::of_float
   unsigned width=bv_type.get_width();
   exprt isneg = extractbit_exprt(f, width-1);
 
-  axioms.emplace_back(isneg, sign_string.has_length(refined_string_typet::index_of_int(1)));
+  axioms.emplace_back(isneg, sign_string.has_length(1));
   
-  axioms.emplace_back(not_exprt(isneg), sign_string.has_length(refined_string_typet::index_of_int(0)));
-  axioms.emplace_back(isneg,equal_exprt(sign_string[refined_string_typet::index_of_int(0)], constant_char(0x2D)));
+  axioms.emplace_back(not_exprt(isneg), sign_string.has_length(0));
+  axioms.emplace_back(isneg,equal_exprt(sign_string[0], constant_char(0x2D)));
 
   // If m is infinity, it is represented by the characters "Infinity"; thus, positive infinity produces the result "Infinity" and negative infinity produces the result "-Infinity".
   
@@ -756,12 +757,12 @@ string_exprt string_constraint_generatort::of_int
 {
   string_exprt res(get_char_type());
   typet type = i.type();
-  int width = type.get_unsigned_int(ID_width);
-  exprt ten = constant_unsigned(10,width);
-  exprt zero_char = constant_char(48);
-  exprt nine_char = constant_char(57);
-  exprt minus_char = constant_char(45);
-
+  assert(type.id() == ID_signedbv);
+  size_t width = to_bitvector_type(type).get_width();
+  exprt ten = constant_signed(10,width);
+  exprt zero_char = constant_char('0'); 
+  exprt nine_char = constant_char('9'); 
+  exprt minus_char = constant_char('-');
 
   axioms.emplace_back(and_exprt(res.strictly_longer(refined_string_typet::index_zero()),
 				res.shorter(refined_string_typet::index_of_int(max_size))));
@@ -775,7 +776,7 @@ string_exprt string_constraint_generatort::of_int
 
   for(size_t size=1; size<=max_size;size++) 
     {
-      exprt sum = constant_unsigned(0,width);
+      exprt sum = constant_signed(0,width);
       exprt all_numbers = true_exprt();
       chr = res[0];
       exprt first_value = typecast_exprt(minus_exprt(chr,zero_char),type);
@@ -811,7 +812,7 @@ string_exprt string_constraint_generatort::of_int
       // Warning this should be different depending on max size
       if(size == max_size)
 	{
-	  exprt smallest_with_10_digits = constant_unsigned(1000000000,width);
+	  exprt smallest_with_10_digits = constant_signed(1000000000,width);
 	  axioms.emplace_back(premise,binary_relation_exprt(i,ID_ge,smallest_with_10_digits));
 	}
     }
@@ -834,8 +835,9 @@ string_exprt string_constraint_generatort::of_int_hex(const exprt &i)
 {
   string_exprt res(get_char_type());
   typet type = i.type();
-  int width = type.get_unsigned_int(ID_width);
-  exprt sixteen = constant_unsigned(16,width);
+  assert(type.id() == ID_signedbv);
+  size_t width = to_bitvector_type(type).get_width();
+  exprt sixteen = constant_signed(16,width);
   exprt minus_char = constant_char(45);
   exprt zero_char = constant_char(48);
   exprt nine_char = constant_char(57);
@@ -843,12 +845,12 @@ string_exprt string_constraint_generatort::of_int_hex(const exprt &i)
   exprt f_char = constant_char(0x66);
 
   size_t max_size = 8;
-  axioms.emplace_back(and_exprt(res.strictly_longer(refined_string_typet::index_zero()),
-				res.shorter(refined_string_typet::index_of_int(max_size))));
+  axioms.emplace_back(and_exprt(res.strictly_longer(0),
+				res.shorter(max_size)));
 
   for(size_t size=1; size<=max_size;size++)
     {
-      exprt sum = constant_unsigned(0,width);
+      exprt sum = constant_signed(0,width);
       exprt all_numbers = true_exprt();
       exprt chr = res[0];
 
@@ -1370,17 +1372,21 @@ exprt string_constraint_generatort::string_index_of
   // from_index <= i < |s| && (i = -1 <=> !contains) && (contains => i >= from_index && s[i] = c)
   // && forall n. from_index <= n < i => s[n] != c 
   
-  axioms.push_back(string_constraintt(equal_exprt(index,refined_string_typet::index_of_int(-1)),not_exprt(contains)).exists(index,refined_string_typet::index_of_int(-1),str.length()));
+  axioms.push_back(string_constraintt
+		   (equal_exprt(index,refined_string_typet::index_of_int(-1)),not_exprt(contains)
+		    ).exists(index,refined_string_typet::index_of_int(-1),str.length()));
   axioms.emplace_back(not_exprt(contains),equal_exprt(index,refined_string_typet::index_of_int(-1)));
   axioms.emplace_back(contains,and_exprt(binary_relation_exprt(from_index,ID_le,index),equal_exprt(str[index],c)));
 
   symbol_exprt n = fresh_univ_index("QA_index_of");
-
-  axioms.push_back(string_constraintt(contains,not_exprt(equal_exprt(str[n],c))).forall(n,from_index,index));
+  axioms.push_back(string_constraintt
+		   (contains,not_exprt(equal_exprt(str[n],c))).forall(n,from_index,index));
 
   symbol_exprt m = fresh_univ_index("QA_index_of");
 
-  axioms.push_back(string_constraintt(not_exprt(contains),not_exprt(equal_exprt(str[m],c))).forall(m,from_index,str.length()));
+  axioms.push_back(string_constraintt
+		   (not_exprt(contains),not_exprt(equal_exprt(str[m],c))
+		    ).forall(m,from_index,str.length()));
 
   return index;
 }
@@ -1441,16 +1447,7 @@ exprt string_constraint_generatort::string_index_of
       return string_index_of_string(str,sub,from_index);    
     } 
   else
-    {
-      if(!(c.type() == get_char_type()))
-	{
-	  std::string msg("argument to string_index_of does not have char type ");
-	  msg += c.type().pretty();
-	  throw msg;
-	  c = typecast_exprt(c,get_char_type());
-	}
-      return string_index_of(str,c,from_index);    
-    }
+    return string_index_of(str,typecast_exprt(c,get_char_type()),from_index);    
 }
 
 exprt string_constraint_generatort::string_last_index_of
@@ -1495,16 +1492,7 @@ exprt string_constraint_generatort::string_last_index_of
       return string_last_index_of_string(str,sub,from_index);    
     } 
   else
-    {
-      if(!(c.type() == get_char_type()))
-	{
-	  std::string msg("warning: argument to string_index_of does not have char type: ");
-	  msg += c.type().pretty();
-	  throw msg;
-	  c = typecast_exprt(c,get_char_type());
-	}
-      return string_last_index_of(str,c,from_index);
-    }
+    return string_last_index_of(str,typecast_exprt(c,get_char_type()),from_index);
 }
 
 exprt string_constraint_generatort::char_literal
