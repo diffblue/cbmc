@@ -205,76 +205,18 @@ void pass_preprocesst::replace_string_calls
 	const irep_idt function_id=
 	  to_symbol_expr(function_call.function()).get_identifier();
 	  
-	// Warning: this serie of tests should be reimplemented using a
-	// map<irep_idt,irep_idt>
-
-	if(function_id == irep_idt("java::java.lang.String.charAt:(I)C")
-	   || function_id == irep_idt("java::java.lang.StringBuilder.charAt:(I)C")
-	   || function_id == irep_idt("java::java.lang.CharSequence.charAt:(I)C")
-	   ) {
-	  make_string_function(i_it,cprover_string_char_at_func);
-
-	} else if(string_functions.find(function_id) != string_functions.end())
-	  make_string_function(i_it,string_function[function_id]);
-	else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
-	  make_array_function(i_it,cprover_string_to_char_array_func);
+	if(string_functions.find(function_id) != string_functions.end())
+	  make_string_function(i_it,string_functions[function_id]);
 	else if(side_effect_functions.find(function_id) != side_effect_functions.end()) 
 	  make_string_function_side_effect(goto_program, i_it,side_effect_functions[function_id]);
-	else if(function_id == irep_idt
-		("java::java.lang.String.<init>:(Ljava/lang/String;)V")
-		|| function_id == irep_idt
-		("java::java.lang.String.<init>:(Ljava/lang/StringBuilder;)V")) {
-	  make_string_function_call(i_it, cprover_string_copy_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.StringBuilder.<init>:(Ljava/lang/String;)V")) {
-	  make_string_function_call(i_it, cprover_string_copy_func);
-	} else if(function_id == irep_idt("java::java.lang.String.<init>:()V")) {
-	  make_string_function_call(i_it, cprover_string_empty_string_func);
-	} else if(function_id == irep_idt("java::java.lang.StringBuilder.<init>:()V")) {
-	  make_string_function_call(i_it, cprover_string_empty_string_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.Integer.toString:(I)Ljava/lang/String;")
-		  || function_id == irep_idt
-		  ("java::java.lang.String.valueOf:(I)Ljava/lang/String;")
-		  ) {
-	  make_string_function(i_it, cprover_string_of_int_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.Integer.toHexString:(I)Ljava/lang/String;")) {
-	  make_string_function(i_it,  cprover_string_of_int_hex_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.String.valueOf:(L)Ljava/lang/String;")) {
-	  make_string_function(i_it, cprover_string_of_long_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.String.valueOf:(F)Ljava/lang/String;")
-		  ||function_id == irep_idt
-		  ("java::java.lang.Float.toString:(F)Ljava/lang/String;")) {
-	  make_string_function(i_it, cprover_string_of_float_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.String.valueOf:(D)Ljava/lang/String;")) {
-	  make_string_function(i_it, cprover_string_of_double_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.String.valueOf:(Z)Ljava/lang/String;")) {
-	  make_string_function(i_it, cprover_string_of_bool_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.String.valueOf:(C)Ljava/lang/String;")) {
-	  make_string_function(i_it, cprover_string_of_char_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.Integer.parseInt:(Ljava/lang/String;)I")) {
-	  make_string_function(i_it, cprover_string_parse_int_func);
-	} else if(function_id == irep_idt
-		  ("java::java.lang.String.valueOf:([CII)Ljava/lang/String;")
-		  ||function_id == irep_idt
-		  ("java::java.lang.String.valueOf:([C)Ljava/lang/String;")
-		  ) {
-	  make_string_function(i_it, cprover_string_value_of_func);
-	} else if(function_id == irep_idt("java::java.lang.StringBuilder.toString:()Ljava/lang/String;")) {
-	  make_string_function(i_it, cprover_string_copy_func);
-	} else if(function_id == irep_idt("java::java.lang.StringBuilder.setLength:(I)V")) {
-	  make_string_function_side_effect(goto_program, i_it,
-					   cprover_string_set_length_func);
-	} else if(function_id == irep_idt("java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;")) {
-	  make_string_function(i_it, cprover_string_format_func);
-	}
+	else if(string_function_calls.find(function_id) != string_function_calls.end()) 
+	  make_string_function_call(i_it, string_function_calls[function_id]);
+
+	// Warning: this serie of tests should be reimplemented using a
+	// map<irep_idt,irep_idt>
+	else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
+	  make_array_function(i_it,cprover_string_to_char_array_func);
+
       } 
 
     } else {
@@ -356,7 +298,11 @@ exprt pass_preprocesst::replace_string_literals(const exprt & expr)
    string_functions[irep_idt("java::java.lang.String.compareTo:(Ljava/lang/String;)I")] = cprover_string_compare_to_func;
    string_functions[irep_idt("java::java.lang.String.intern:()Ljava/lang/String;")] = cprover_string_intern_func;
    string_functions[irep_idt("java::java.lang.String.isEmpty:()Z")] = cprover_string_is_empty_func;
- 
+   string_functions[irep_idt("java::java.lang.String.charAt:(I)C")] = cprover_string_char_at_func;
+   string_functions[irep_idt("java::java.lang.StringBuilder.charAt:(I)C")] = cprover_string_char_at_func;
+   string_functions[irep_idt("java::java.lang.CharSequence.charAt:(I)C")] = cprover_string_char_at_func;
+   string_functions[irep_idt("java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;")] = cprover_string_format_func;
+   string_functions[irep_idt("java::java.lang.StringBuilder.toString:()Ljava/lang/String;")] = cprover_string_copy_func;
 
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")] = cprover_string_concat_func;
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.setCharAt:(IC)V")] = cprover_string_char_set_func;
@@ -374,6 +320,25 @@ exprt pass_preprocesst::replace_string_literals(const exprt & expr)
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.insert:(IJ)Ljava/lang/StringBuilder;")] = cprover_string_insert_long_func;
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.insert:(IC)Ljava/lang/StringBuilder;")] = cprover_string_insert_char_func;
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.insert:(IZ)Ljava/lang/StringBuilder;") ] = cprover_string_insert_bool_func;
+   side_effect_functions[irep_idt("java::java.lang.StringBuilder.setLength:(I)V")] = cprover_string_set_length_func;
+
+   string_function_calls[irep_idt("java::java.lang.String.<init>:(Ljava/lang/String;)V")] = cprover_string_copy_func;
+   string_function_calls[irep_idt("java::java.lang.String.<init>:(Ljava/lang/StringBuilder;)V")] = cprover_string_copy_func;
+   string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:(Ljava/lang/String;)V")] = cprover_string_copy_func;
+   string_function_calls[irep_idt("java::java.lang.String.<init>:()V")] = cprover_string_empty_string_func;
+   string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:()V")] = cprover_string_empty_string_func;
+   string_function_calls[irep_idt("java::java.lang.Integer.toString:(I)Ljava/lang/String;")] = cprover_string_of_int_func;
+   string_function_calls[irep_idt("java::java.lang.String.valueOf:(I)Ljava/lang/String;")] = cprover_string_of_int_func;
+   string_function_calls[irep_idt("java::java.lang.Integer.toHexString:(I)Ljava/lang/String;")] = cprover_string_of_int_hex_func;
+   string_function_calls[irep_idt("java::java.lang.String.valueOf:(L)Ljava/lang/String;")] = cprover_string_of_long_func;
+   string_function_calls[irep_idt("java::java.lang.String.valueOf:(F)Ljava/lang/String;")] = cprover_string_of_float_func;
+   string_function_calls[irep_idt("java::java.lang.Float.toString:(F)Ljava/lang/String;")] = cprover_string_of_float_func;
+   string_function_calls[irep_idt("java::java.lang.String.valueOf:(D)Ljava/lang/String;")] = cprover_string_of_double_func;
+   string_function_calls[irep_idt("java::java.lang.String.valueOf:(Z)Ljava/lang/String;")] = cprover_string_of_bool_func;
+   string_function_calls[irep_idt("java::java.lang.String.valueOf:(C)Ljava/lang/String;")] = cprover_string_of_char_func;
+   string_function_calls[irep_idt("java::java.lang.Integer.parseInt:(Ljava/lang/String;)I")] = cprover_string_parse_int_func;
+   string_function_calls[irep_idt("java::java.lang.String.valueOf:([CII)Ljava/lang/String;)")] = cprover_string_value_of_func;
+   string_function_calls[irep_idt("java::java.lang.String.valueOf:([C)Ljava/lang/String;")] = cprover_string_value_of_func;
 
   Forall_goto_functions(it, goto_functions)
   {

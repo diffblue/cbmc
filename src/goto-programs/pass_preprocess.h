@@ -27,6 +27,7 @@ class pass_preprocesst:public messaget
   std::map<exprt, exprt> string_builders;
   std::map<irep_idt, irep_idt> side_effect_functions;
   std::map<irep_idt, irep_idt> string_functions;
+  std::map<irep_idt, irep_idt> string_function_calls;
 
   exprt replace_string_literals(const exprt & );
 
