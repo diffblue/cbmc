@@ -1,4 +1,3 @@
-
 #ifdef __CPROVER
 #define __CPROVER_JSA_MAX_CONCRETE_NODES 1u
 #define __CPROVER_JSA_MAX_ABSTRACT_NODES 0u
@@ -25,7 +24,7 @@ int main(void)
   while (__CPROVER_jsa_hasNext(&heap, __CPROVER_jsa_iterator_it))
   {
     const __CPROVER_jsa_data_t i=__CPROVER_jsa_next(&heap, __CPROVER_jsa_iterator_it);
-    if (i % 2 == 0)
+    if (__CPROVER_jsa_mod(i, 2) == 0)
     {
       __CPROVER_jsa_remove(&heap, __CPROVER_jsa_iterator_it);
     }

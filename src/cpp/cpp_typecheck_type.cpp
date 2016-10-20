@@ -36,17 +36,17 @@ void cpp_typecheckt::typecheck_type(typet &type)
     cpp_convert_plain_type(type);
   }
 
-  catch(const char *error)
+  catch(const char *err)
   {
-    err_location(type);
-    str << error;
+    error().source_location=type.source_location();
+    error() << err << eom;
     throw 0;
   }
 
-  catch(const std::string &error)
+  catch(const std::string &err)
   {
-    err_location(type);
-    str << error;
+    error().source_location=type.source_location();
+    error() << err << eom;
     throw 0;
   }
 
@@ -64,8 +64,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     if(symbol_expr.id()!=ID_type)
     {
-      err_location(type);
-      str << "error: expected type";
+      error().source_location=type.source_location();
+      error() << "error: expected type" << eom;
       throw 0;
     }
     
@@ -120,17 +120,6 @@ void cpp_typecheckt::typecheck_type(typet &type)
         }
       }
     }
-
-    // now do qualifier
-    if(type.find(ID_C_qualifier).is_not_nil())
-    {
-      typet &t=static_cast<typet &>(type.add(ID_C_qualifier));
-      cpp_convert_plain_type(t);
-      c_qualifierst q(t);
-      q.write(type);
-    }
-
-    type.remove(ID_C_qualifier);
   }
   else if(type.id()==ID_array)
   {
@@ -263,8 +252,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else
   {
-    err_location(type);
-    str << "unexpected cpp type: " << type.pretty();
+    error().source_location=type.source_location();
+    error() << "unexpected cpp type: " << type.pretty() << eom;
     throw 0;
   }
   

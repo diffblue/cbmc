@@ -151,14 +151,11 @@ void convert(
         if(xml_location.name!="")
           xml_output.new_element().swap(xml_location);
 
-        for(std::list<exprt>::const_iterator
-            l_it=it.io_args.begin();
-            l_it!=it.io_args.end();
-            l_it++)
+        for(const auto l_it : it.io_args)
         {
-          xml_output.new_element("value").data=from_expr(ns, "", *l_it);
+          xml_output.new_element("value").data=from_expr(ns, "", l_it);
           xml_output.new_element("value_expression").
-            new_element(xml(*l_it, ns));
+            new_element(xml(l_it, ns));
         }
       }
       break;
@@ -172,14 +169,11 @@ void convert(
         xml_input.set_attribute("thread", i2string(it.thread_nr));
         xml_input.set_attribute("step_nr", i2string(it.step_nr));
         
-        for(std::list<exprt>::const_iterator
-            l_it=it.io_args.begin();
-            l_it!=it.io_args.end();
-            l_it++)
+        for(const auto & l_it : it.io_args)
         {
-          xml_input.new_element("value").data=from_expr(ns, "", *l_it);
+          xml_input.new_element("value").data=from_expr(ns, "", l_it);
           xml_input.new_element("value_expression").
-            new_element(xml(*l_it, ns));
+            new_element(xml(l_it, ns));
         }
             
         if(xml_location.name!="")

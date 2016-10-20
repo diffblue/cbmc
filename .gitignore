@@ -30,7 +30,12 @@ src/big-int/test-bigint.exe
 
 # files stored by editors
 *~
+
+# libs downloaded by make [name]-download
 libzip/
+zlib/
+minisat*/
+glucose-syrup/
 
 # flex/bison generated files
 src/ansi-c/ansi_c_lex.yy.cpp
@@ -54,6 +59,8 @@ src/xmllang/xml_y.tab.h
 # binaries
 src/cbmc/cbmc
 src/cbmc/cbmc.exe
+src/cegis/cegis
+src/cegis/cegis.exe
 src/goto-analyzer/goto-analyzer
 src/goto-analyzer/goto-analyzer.exe
 src/goto-cc/goto-cc

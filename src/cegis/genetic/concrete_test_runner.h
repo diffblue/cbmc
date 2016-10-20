@@ -41,7 +41,7 @@ public:
    *
    * @param source_code_provider
    */
-  concrete_test_runnert(std::function<std::string(void)> source_code_provider);
+  explicit concrete_test_runnert(std::function<std::string(void)> source_code_provider);
 
   /**
    * @brief

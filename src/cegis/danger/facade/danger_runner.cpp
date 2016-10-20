@@ -15,7 +15,6 @@
 #include <cegis/genetic/genetic_constant_strategy.h>
 #include <cegis/genetic/genetic_preprocessing.h>
 #include <cegis/genetic/lazy_fitness.h>
-#include <cegis/genetic/concrete_test_runner.h>
 #include <cegis/instrument/meta_variables.h>
 #include <cegis/seed/null_seed.h>
 #include <cegis/seed/literals_seed.h>
@@ -52,16 +51,16 @@ bool is_genetic(const optionst &opt)
 typedef messaget::mstreamt mstreamt;
 
 template<class learnt, class verifyt, class preproct>
-int run_statistics(mstreamt &os, const optionst &options,
+int run_statistics(mstreamt &os, const optionst &opt,
     const danger_programt &prog, learnt &learn, verifyt &verify,
     preproct &preproc)
 {
   null_seedt seed;
   //danger_literals_seedt seed(prog);  // XXX: Benchmark performance
-  const size_t max_prog_size=options.get_unsigned_int_option(CEGIS_MAX_SIZE);
-  if (!options.get_bool_option(CEGIS_STATISTICS))
+  const size_t max_prog_size=opt.get_unsigned_int_option(CEGIS_MAX_SIZE);
+  if (!opt.get_bool_option(CEGIS_STATISTICS))
     return run_cegis(learn, verify, preproc, seed, max_prog_size, os);
-  cegis_statistics_wrappert<learnt, verifyt, mstreamt> stat(learn, verify, os);
+  cegis_statistics_wrappert<learnt, verifyt, mstreamt> stat(learn, verify, os, opt);
   return run_cegis(stat, stat, preproc, seed, max_prog_size, os);
 }
 
@@ -96,18 +95,17 @@ template<class fitnesst, class mutatet, class crosst, class convertert,
     class preproct, class symex_learnt>
 int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
     random_individualt &rnd, instruction_set_info_factoryt &info_fac,
-    const size_t pop_size, const size_t rounds, fitnesst &fitness,
-    mutatet &mutate, crosst &cross, convertert &converter, preproct &preproc,
-    symex_learnt &symex_learn)
+    const size_t rounds, fitnesst &fitness, mutatet &mutate, crosst &cross,
+    convertert &converter, preproct &preproc, symex_learnt &symex_learn)
 {
-  const size_t symex_head_start=opt.get_bool_option(CEGIS_SYMEX_HEAD_START);
+  const size_t symex_head_start=opt.get_unsigned_int_option(CEGIS_SYMEX_HEAD_START);
   const individual_to_danger_solution_deserialisert deser(prog, info_fac);
   if (opt.get_bool_option(CEGIS_MATCH_SELECT))
   {
-    match_selectt select(fitness.get_test_case_data(), rnd, pop_size, rounds);
-    typedef ga_learnt<match_selectt, mutatet, crosst, fitnesst,
-        danger_fitness_configt> ga_learnt;
-    ga_learnt ga_learn(opt, select, mutate, cross, fitness, converter);
+    typedef match_selectt<program_populationt> selectt;
+    selectt select(fitness.get_test_case_data(), rnd, rounds);
+    typedef ga_learnt<selectt, mutatet, crosst, fitnesst, danger_fitness_configt> ga_learnt;
+    ga_learnt ga_learn(opt, rnd, select, mutate, cross, fitness, converter);
 #ifndef _WIN32
     concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
         serialise, std::ref(deser), deserialise, symex_head_start);
@@ -117,10 +115,11 @@ int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
 #endif
     return run_parallel(os, opt, prog, learn, preproc);
   }
-  tournament_selectt select(rnd, pop_size, rounds);
-  typedef ga_learnt<tournament_selectt, random_mutatet, random_crosst, fitnesst,
+  typedef tournament_selectt<program_populationt> selectt;
+  selectt select(rounds);
+  typedef ga_learnt<selectt, random_mutatet, random_crosst, fitnesst,
       danger_fitness_configt> ga_learnt;
-  ga_learnt ga_learn(opt, select, mutate, cross, fitness, converter);
+  ga_learnt ga_learn(opt, rnd, select, mutate, cross, fitness, converter);
 #ifndef _WIN32
   concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
       serialise, std::ref(deser), deserialise, symex_head_start);
@@ -129,7 +128,7 @@ int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
   ga_learnt &learn=ga_learn;
 #endif
   return run_parallel(os, opt, prog, learn, preproc);
-
+  return 0;
 }
 
 template<class preproct>
@@ -151,7 +150,6 @@ int run_genetic_and_symex(mstreamt &os, optionst &opt,
   lazy_genetic_settingst<danger_program_genetic_settingst<preproct> > lazy(set);
   invariant_exec_body_providert<danger_programt> body(DANGER_EXECUTE, prog);
   instruction_set_info_factoryt info_fac(std::ref(body));
-  const size_t pop_size=opt.get_unsigned_int_option(CEGIS_POPSIZE);
   const size_t rounds=opt.get_unsigned_int_option(CEGIS_ROUNDS);
 
   // Set-up genetic algorithm
@@ -162,11 +160,13 @@ int run_genetic_and_symex(mstreamt &os, optionst &opt,
       prog, lazy.max_prog_sz_provider(), DANGER_EXECUTE);
   dynamic_danger_test_runnert test_runner(std::ref(src),
       lazy.max_prog_sz_per_index_provider());
-  lazy_fitnesst<dynamic_danger_test_runnert, danger_learn_configt::counterexamplet> fitness(test_runner);
+  typedef lazy_fitnesst<program_populationt, dynamic_danger_test_runnert,
+      danger_learn_configt::counterexamplet> fitnesst;
+  fitnesst fitness(test_runner);
   random_mutatet mutate(rnd, lazy.num_consts_provder());
   random_crosst cross(rnd);
-  return run_match(os, opt, prog, rnd, info_fac, pop_size, rounds, fitness,
-      mutate, cross, converter, prep, learn);
+  return run_match(os, opt, prog, rnd, info_fac, rounds, fitness, mutate, cross,
+      converter, prep, learn);
 }
 }
 

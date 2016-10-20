@@ -186,7 +186,7 @@ void goto_program_dereferencet::dereference_rec(
     {
       std::string msg=
         "first argument of if must be boolean, but got "
-        +expr.op0().to_string();
+        +expr.op0().pretty();
       throw msg;
     }
 

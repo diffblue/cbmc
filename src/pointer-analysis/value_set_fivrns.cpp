@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com,
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
+#include <ostream>
 
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
@@ -118,7 +118,7 @@ void value_set_fivrnst::output_entry(
   const object_mapt &object_map=e.object_map;
   
   out << display_name << " = { ";
-  if(object_map.read().size()!=0) out << std::endl << "      ";
+  if(object_map.read().size()!=0) out << "\n      ";
   
   unsigned width=0;
   
@@ -174,7 +174,7 @@ void value_set_fivrnst::output_entry(
       result+='>';
     }
 
-    out << result << std::endl;
+    out << result << '\n';
 
     #if 0
     object_map_dt::validity_rangest::const_iterator vr =
@@ -216,7 +216,7 @@ void value_set_fivrnst::output_entry(
     }
   }
 
-  out << " } " << std::endl;  
+  out << " } \n";
 }
 
 /*******************************************************************\
@@ -970,12 +970,9 @@ void value_set_fivrnst::assign(
       else
       {
         if (!base_type_eq(rhs.type(), type, ns))
-        {
-          std::cout << "RHS: " << rhs.type() << std::endl;
-          std::cout << "LHS: " << type << std::endl;
-        }
-        
-        assert(base_type_eq(rhs.type(), type, ns));
+          throw
+            "type mismatch:\nRHS: "+rhs.type().pretty()+"\n"+
+            "LHS: "+type.pretty();
       
         if(rhs.id()==ID_struct ||
            rhs.id()==ID_constant)
@@ -1522,8 +1519,9 @@ void value_set_fivrnst::apply_code(
   }
   else
   {
-    std::cerr << code.pretty() << std::endl;
-    throw "value_set_fivrnst: unexpected statement: "+id2string(statement);
+    throw
+      code.pretty()+"\n"+
+      "value_set_fivrnst: unexpected statement: "+id2string(statement);
   }
 }
 

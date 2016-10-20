@@ -130,13 +130,13 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
       if(to_integer(array_type.size(), size))
         throw "failed to convert array size";
         
-      unsigned long long size_int=integer2unsigned(size);
+      std::size_t size_int=integer2size_t(size);
         
       array_exprt result(array_type);
       result.operands().resize(size_int);
     
       // split it up into elements
-      for(unsigned long long i=0; i<size_int; ++i)
+      for(std::size_t i=0; i<size_int; ++i)
       {
         exprt index=from_integer(i, array_type.size().type());
         exprt new_src=index_exprt(src, index, subtype);
@@ -168,14 +168,14 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
     if(to_integer(vector_type.size(), size))
       throw "failed to convert vector size";
       
-    unsigned long long int size_int=integer2unsigned(size);
+    std::size_t size_int=integer2size_t(size);
     
     vector_exprt result(vector_type);
     exprt::operandst &operands=result.operands();
     operands.resize(size_int);
   
     // split it up into elements
-    for(unsigned long long i=0; i<size_int; ++i)
+    for(std::size_t i=0; i<size_int; ++i)
     {
       exprt index=from_integer(i, vector_type.size().type());
       exprt new_src=index_exprt(src, index, subtype);
@@ -227,12 +227,12 @@ exprt path_symex_statet::array_theory(const exprt &src, bool propagate)
         if(to_integer(array_type.size(), size))
           throw "failed to convert array size";
           
-        unsigned long long size_int=integer2unsigned(size);
+        std::size_t size_int=integer2size_t(size);
         
         exprt result=nil_exprt();
         
         // split it up
-        for(unsigned long long i=0; i<size_int; ++i)
+        for(std::size_t i=0; i<size_int; ++i)
         {
           exprt index=from_integer(i, index_expr.index().type());
           exprt new_src=index_exprt(index_expr.array(), index, subtype);

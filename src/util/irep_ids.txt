@@ -198,7 +198,7 @@ false
 address_of
 dereference
 C_lvalue #lvalue
-C_cformat #cformat
+C_base #base
 destination
 main
 expression
@@ -391,7 +391,6 @@ C_volatile #volatile
 C_restricted #restricted
 C_identifier #identifier
 C_implicit #implicit
-C_qualifier #qualifier
 C_ptr32 #ptr32
 C_ptr64 #ptr64
 C_atomic #atomic
@@ -725,3 +724,11 @@ virtual_function
 C_element_type #element_type
 working_directory
 section
+msb
+lsb
+verilog_signed_vector
+verilog_unsigned_vector
+verilog_array
+low
+high
+bswap

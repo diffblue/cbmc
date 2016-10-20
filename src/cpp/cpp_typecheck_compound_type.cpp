@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -225,11 +226,11 @@ void cpp_typecheckt::typecheck_compound_type(
       }
       else
       {
-        err_location(type);
-        str << "error: compound tag `" << base_name
-            << "' declared previously" << std::endl;
-        str << "location of previous definition: "
-            << symbol.location;
+        error().source_location=type.source_location();
+        error() << "error: compound tag `" << base_name
+                << "' declared previously\n"
+                << "location of previous definition: "
+                << symbol.location << eom;
         throw 0;
       }
     }
@@ -259,7 +260,7 @@ void cpp_typecheckt::typecheck_compound_type(
  
     if(symbol_table.move(symbol, new_symbol))
     {
-      err_location(symbol.location);
+      error().source_location=symbol.location;
       error() << "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed"
               << eom;
       throw 0;
@@ -355,8 +356,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
   }
   else
   {
-    err_location(cpp_name.source_location());
-    str << "declarator in compound needs to be simple name";
+    error().source_location=cpp_name.source_location();
+    error() << "declarator in compound needs to be simple name"
+            << eom;
     throw 0;
   }
 
@@ -373,59 +375,59 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   if(is_virtual && !is_method)
   {
-    err_location(cpp_name.source_location());
-    str << "only methods can be virtual";
+    error().source_location=cpp_name.source_location();
+    error() << "only methods can be virtual" << eom;
     throw 0;
   }
 
   if(is_inline && !is_method)
   {
-    err_location(cpp_name.source_location());
-    str << "only methods can be inlined";
+    error().source_location=cpp_name.source_location();
+    error() << "only methods can be inlined" << eom;
     throw 0;
   }
 
   if(is_virtual && is_static)
   {
-    err_location(cpp_name.source_location());
-    str << "static methods cannot be virtual";
+    error().source_location=cpp_name.source_location();
+    error() << "static methods cannot be virtual" << eom;
     throw 0;
   }
 
   if(is_cast_operator && is_static)
   {
-    err_location(cpp_name.source_location());
-    str << "cast operators cannot be static`";
+    error().source_location=cpp_name.source_location();
+    error() << "cast operators cannot be static`" << eom;
     throw 0;
   }
 
   if(is_constructor && is_virtual)
   {
-    err_location(cpp_name.source_location());
-    str << "constructors cannot be virtual";
+    error().source_location=cpp_name.source_location();
+    error() << "constructors cannot be virtual" << eom;
     throw 0;
   }
 
   if(!is_constructor && is_explicit)
   {
-    err_location(cpp_name.source_location());
-    str << "only constructors can be explicit";
+    error().source_location=cpp_name.source_location();
+    error() << "only constructors can be explicit" << eom;
     throw 0;
   }
 
   if(is_constructor &&
      base_name!=id2string(symbol.base_name))
   {
-    err_location(cpp_name.source_location());
-    str << "member function must return a value or void";
+    error().source_location=cpp_name.source_location();
+    error() << "member function must return a value or void" << eom;
     throw 0;
   }
 
   if(is_destructor &&
      base_name!="~"+id2string(symbol.base_name))
   {
-    err_location(cpp_name.source_location());
-    str << "destructor with wrong name";
+    error().source_location=cpp_name.source_location();
+    error() << "destructor with wrong name" << eom;
     throw 0;
   }
 
@@ -496,7 +498,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
     // the 'virtual' name of the function
     std::string virtual_name=
-    component.get_string(ID_base_name)+
+      component.get_string(ID_base_name)+
       id2string(
         function_identifier(static_cast<const typet &>(component.find(ID_type))));
         
@@ -506,8 +508,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
     if(has_volatile(method_qualifier))
       virtual_name+="$virtual";
       
-    if(component.type().get(ID_return_type) == ID_destructor)
-      virtual_name= "@dtor";
+    if(component.type().get(ID_return_type)==ID_destructor)
+      virtual_name="@dtor";
     
     // The method may be virtual implicitly.
     std::set<irep_idt> virtual_bases;
@@ -539,8 +541,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
       if(!value.is_nil() && !is_static)
       {
-        err_location(cpp_name.source_location());
-        str << "no initialization allowed here";
+        error().source_location=cpp_name.source_location();
+        error() << "no initialization allowed here" << eom;
         throw 0;
       }
     }
@@ -558,8 +560,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
           to_integer(value, i);
           if(i!=0)
           {
-            err_location(declarator.name().source_location());
-            str << "expected 0 to mark pure virtual method, got " << i;
+            error().source_location=declarator.name().source_location();
+            error() << "expected 0 to mark pure virtual method, got "
+                    << i << eom;
+            throw 0;
           }
           component.set("is_pure_virtual", true);
           value.make_nil();
@@ -754,10 +758,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
     symbolt *new_symbol;
     if(symbol_table.move(static_symbol, new_symbol))
     {
-      err_location(cpp_name.source_location());
-        str << "redeclaration of static member `" 
-            << static_symbol.base_name
-            << "'";
+      error().source_location=cpp_name.source_location();
+      error() << "redeclaration of static member `"
+              << static_symbol.base_name
+              << "'" << eom;
       throw 0;
     }
 
@@ -892,9 +896,9 @@ void cpp_typecheckt::put_compound_into_scope(
       // this is ok if they belong to different categories
       if(!id.is_class() && !id.is_enum())
       {
-        err_location(compound);
-        str << "`" << base_name
-            << "' already in compound scope";
+        error().source_location=compound.source_location();
+        error() << "`" << base_name
+                << "' already in compound scope" << eom;
         throw 0;
       }
     }
@@ -932,8 +936,8 @@ void cpp_typecheckt::typecheck_friend_declaration(
   if(declaration.is_template())
   {
     return; // TODO
-    err_location(declaration.type());
-    str << "friend template not supported";
+    error().source_location=declaration.type().source_location();
+    error() << "friend template not supported" << eom;
     throw 0;
   }
   
@@ -945,15 +949,15 @@ void cpp_typecheckt::typecheck_friend_declaration(
     // must be struct or union
     if(ftype.id()!=ID_struct && ftype.id()!=ID_union)
     {
-      err_location(declaration.type());
-      str << "unexpected friend";
+      error().source_location=declaration.type().source_location();
+      error() << "unexpected friend" << eom;
       throw 0;
     }
        
     if(ftype.find(ID_body).is_not_nil())
     {
-      err_location(declaration.type());
-      str << "friend declaration must not have compound body";
+      error().source_location=declaration.type().source_location();
+      error() << "friend declaration must not have compound body" << eom;
       throw 0;
     }
 
@@ -1036,8 +1040,9 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   {
     if(type.id()==ID_union)
     {
-      err_location(symbol.location);
-      throw "union types must not have bases";
+      error().source_location=symbol.location;
+      error() << "union types must not have bases" << eom;
+      throw 0;
     }
     
     typecheck_compound_bases(to_struct_type(type));
@@ -1100,8 +1105,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
          declaration.storage_spec().is_auto() ||
          declaration.storage_spec().is_register())
       {
-        err_location(declaration.storage_spec());
-        str << "invalid storage class specified for field";
+        error().source_location=declaration.storage_spec().location();
+        error() << "invalid storage class specified for field" << eom;
         throw 0;
       }
 
@@ -1115,8 +1120,10 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         if(final_type.id()!=ID_union &&
            final_type.id()!=ID_struct)
         {
-          err_location(declaration.type());
-          throw "member declaration does not declare anything";
+          error().source_location=declaration.type().source_location();
+          error() << "member declaration does not declare anything"
+                  << eom;
+          throw 0;
         }
 
         convert_anon_struct_union_member(
@@ -1325,19 +1332,23 @@ void cpp_typecheckt::move_member_initializers(
   // see if we have initializers
   if(!initializers.get_sub().empty())
   {
+    const source_locationt &location=
+      static_cast<const source_locationt &>(
+        initializers.find(ID_C_source_location));
+
     if(!is_constructor)
     {
-      err_location(initializers);
-      str << "only constructors are allowed to "
-             "have member initializers";
+      error().source_location=location;
+      error() << "only constructors are allowed to "
+              << "have member initializers" << eom;
       throw 0;
     }
 
     if(value.is_nil())
     {
-      err_location(initializers);
-      str << "only constructors with body are allowed to "
-             "have member initializers";
+      error().source_location=location;
+      error() << "only constructors with body are allowed to "
+              << "have member initializers" << eom;
       throw 0;
     }
 
@@ -1379,13 +1390,14 @@ void cpp_typecheckt::typecheck_member_function(
   {
     if(method_qualifier.id()!=irep_idt())
     {
-      err_location(component);
-      throw "method is static -- no qualifiers allowed";
+      error().source_location=component.source_location();
+      error() << "method is static -- no qualifiers allowed" << eom;
+      throw 0;
     }
   }
   else
   {
-    adjust_method_type(
+    add_this_to_method_type(
       compound_identifier,
       type,
       method_qualifier);
@@ -1425,14 +1437,13 @@ void cpp_typecheckt::typecheck_member_function(
 
   if(symbol_table.move(symbol, new_symbol))
   {
-    err_location(symbol.location);
-    str << "failed to insert new method symbol: "
-        << symbol.name << "\n";
-
-    str << "name of previous symbol: "
-        << new_symbol->name << "\n";
-    str << "location of previous symbol: "
-        << new_symbol->location;
+    error().source_location=symbol.location;
+    error() << "failed to insert new method symbol: "
+            << symbol.name << "\n"
+            << "name of previous symbol: "
+            << new_symbol->name << "\n"
+            << "location of previous symbol: "
+            << new_symbol->location << eom;
 
     throw 0;
   }
@@ -1448,7 +1459,7 @@ void cpp_typecheckt::typecheck_member_function(
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::adjust_method_type
+Function: cpp_typecheckt::add_this_to_method_type
 
 Inputs:
 
@@ -1458,30 +1469,31 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::adjust_method_type(
+void cpp_typecheckt::add_this_to_method_type(
   const irep_idt &compound_symbol,
   typet &type,
   const typet &method_qualifier)
 {
-  irept &parameters=type.add(ID_parameters);
+  code_typet::parameterst &parameters=to_code_type(type).parameters();
 
-  parameters.get_sub().insert(
-    parameters.get_sub().begin(), irept(ID_parameter));
+  parameters.insert(
+    parameters.begin(), code_typet::parametert());
 
-  exprt &parameter=static_cast<exprt &>(parameters.get_sub().front());
-  parameter.type()=typet(ID_pointer);
+  code_typet::parametert &parameter=parameters.front();
+  
+  parameter.set_identifier(ID_this); // check? Not qualified
+  parameter.set_base_name(ID_this);
+  parameter.set_this();
 
-  parameter.type().subtype()=typet(ID_symbol);
-  parameter.type().subtype().set(ID_identifier, compound_symbol);
-
-  parameter.set(ID_C_identifier, ID_this);
-  parameter.set(ID_C_base_name, ID_this);
-
+  typet subtype=symbol_typet(compound_symbol);
+  
   if(has_const(method_qualifier))
-    parameter.type().subtype().set(ID_C_constant, true);
+    subtype.set(ID_C_constant, true);
   
   if(has_volatile(method_qualifier))
-    parameter.type().subtype().set(ID_C_volatile, true);
+    subtype.set(ID_C_volatile, true);
+
+  parameter.type()=pointer_typet(subtype);
 }
 
 /*******************************************************************\
@@ -1516,10 +1528,10 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
   {
     if(it->type().id()==ID_code)
     {
-      err_location(struct_union_symbol.type.source_location());
-      str << "anonymous struct/union member `"
-          << struct_union_symbol.base_name
-          << "' shall not have function members";
+      error().source_location=struct_union_symbol.type.source_location();
+      error() << "anonymous struct/union member `"
+              << struct_union_symbol.base_name
+              << "' shall not have function members" << eom;
       throw 0;
     }
 
@@ -1535,8 +1547,8 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
 
       if(cpp_scopes.current_scope().contains(base_name))
       {
-        err_location(*it);
-        str << "`" << base_name << "' already in scope";
+        error().source_location=it->source_location();
+        error() << "`" << base_name << "' already in scope" << eom;
         throw 0;
       }
       
@@ -1572,14 +1584,15 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   if(declaration.storage_spec().is_static() ||
      declaration.storage_spec().is_mutable())
   {
-    err_location(struct_union_symbol.type.source_location());
-    throw "storage class is not allowed here";
+    error().source_location=struct_union_symbol.type.source_location();
+    error() << "storage class is not allowed here" << eom;
+    throw 0;
   }
 
   if(!cpp_is_pod(struct_union_symbol.type))
   {
-    err_location(struct_union_symbol.type.source_location());
-    str << "anonymous struct/union member is not POD";
+    error().source_location=struct_union_symbol.type.source_location();
+    error() << "anonymous struct/union member is not POD" << eom;
     throw 0;
   }
 
@@ -1667,7 +1680,7 @@ bool cpp_typecheckt::get_component(
         else
         {
           #if 0
-          err_location(source_location);
+          error().source_location=source_location;
           str << "error: member `" << component_name
               << "' is not accessible (" << component.get(ID_access) << ")";
           str << std::endl
@@ -1704,7 +1717,7 @@ bool cpp_typecheckt::get_component(
           if(check_component_access(component, final_type))
           {
             #if 0
-            err_location(source_location);
+            error().source_location=source_location;
             str << "error: member `" << component_name
                 << "' is not accessible";
             throw 0;

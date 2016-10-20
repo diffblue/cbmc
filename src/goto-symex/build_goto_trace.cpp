@@ -258,18 +258,14 @@ void build_goto_trace(
       simplify(goto_trace_step.full_lhs_value, ns);
     }
     
-    for(std::list<exprt>::const_iterator
-        j=SSA_step.converted_io_args.begin();
-        j!=SSA_step.converted_io_args.end();
-        j++)
+    for(const auto & j : SSA_step.converted_io_args)
     {
-      const exprt &arg=*j;
-      if(arg.is_constant() ||
-         arg.id()==ID_string_constant)
-        goto_trace_step.io_args.push_back(arg);
+      if(j.is_constant() ||
+         j.id()==ID_string_constant)
+        goto_trace_step.io_args.push_back(j);
       else
       {
-        exprt tmp=prop_conv.get(arg);
+        exprt tmp=prop_conv.get(j);
         goto_trace_step.io_args.push_back(tmp);
       }
     }
@@ -287,20 +283,14 @@ void build_goto_trace(
   
   // Now assemble into a single goto_trace.
   // This expoits sorted-ness of the map.
-  for(time_mapt::iterator t_it=time_map.begin();
-      t_it!=time_map.end(); t_it++)
-  {
-    goto_trace.steps.splice(goto_trace.steps.end(), t_it->second);
-  }
+  for(auto & t_it : time_map)
+    goto_trace.steps.splice(goto_trace.steps.end(), t_it.second);
 
   // produce the step numbers
   unsigned step_nr=0;
   
-  for(goto_tracet::stepst::iterator
-      s_it=goto_trace.steps.begin();
-      s_it!=goto_trace.steps.end();
-      s_it++)
-    s_it->step_nr=++step_nr;
+  for(auto & s_it : goto_trace.steps)
+    s_it.step_nr=++step_nr;
 }
 
 /*******************************************************************\

@@ -9,13 +9,10 @@
 #include <cegis/jsa/options/jsa_program.h>
 #include <cegis/jsa/value/jsa_solution.h>
 #include <cegis/jsa/value/jsa_types.h>
+#include <cegis/jsa/instrument/temps_helper.h>
 #include <cegis/jsa/preprocessing/add_constraint_meta_variables.h>
 #include <cegis/jsa/preprocessing/clone_heap.h>
 #include <cegis/jsa/verify/insert_solution.h>
-
-// XXX: Debug
-#include <iostream>
-// XXX: Debug
 
 #define JSA_PRED_RESULT JSA_PREFIX "pred_result"
 #define SYNC_IT "__CPROVER_jsa_verify_synchronise_iterator"
@@ -39,10 +36,7 @@ void add_predicates(jsa_programt &prog, const jsa_solutiont::predicatest &preds)
   const std::string result(get_cegis_meta_name(JSA_PRED_RESULT));
   const symbol_exprt ret_val(st.lookup(result).symbol_expr());
   const goto_programt::targett first=pos;
-  pos=body.insert_after(pos);
-  pos->source_location=jsa_builtin_source_location();
-  pos->type=goto_program_instruction_typet::RETURN;
-  pos->code=code_returnt(ret_val);
+  pos=add_return_assignment(body, pos, JSA_PRED_EXEC, ret_val);
   const goto_programt::targett end=pos;
   pos=body.insert_after(pos);
   pos->source_location=jsa_builtin_source_location();
@@ -78,6 +72,7 @@ void add_predicates(jsa_programt &prog, const jsa_solutiont::predicatest &preds)
     pos->targets.push_back(*std::next(it));
   }
   pred_begins.back()->targets.push_back(end);
+  add_zero_jsa_temps_to_pred_exec(prog);
 
   body.compute_incoming_edges();
   body.compute_target_numbers();
@@ -98,6 +93,7 @@ void insert_invariant(const symbol_tablet &st, const goto_functionst &gf, goto_p
   args.push_back(address_of_exprt(get_user_heap(gf)));
   args.push_back(address_of_exprt(get_queried_heap(st)));
   pos->code=call;
+  remove_return(body, pos);
 }
 
 const exprt &get_iterator_arg(const codet &code)
@@ -143,12 +139,13 @@ void make_full_query_call(const symbol_tablet &st, const goto_functionst &gf,
   pos->code=call;
 }
 
-void insert_before(goto_programt &body, const goto_programt::targett &pos,
-    const goto_programt::instructionst &prog)
+void insert_before(jsa_programt &jsa_prog, goto_programt &body,
+    const goto_programt::targett &pos, const goto_programt::instructionst &prog)
 {
   if (prog.empty()) return;
   const goto_programt::targett insert_after=std::prev(pos);
   copy_instructions(body.instructions, insert_after, prog);
+  zero_jsa_temps(jsa_prog, insert_after);
   move_labels(body, pos, std::next(insert_after));
 }
 }
@@ -160,29 +157,15 @@ void insert_jsa_solution(jsa_programt &prog, const jsa_solutiont &solution)
   goto_functionst &gf=prog.gf;
   goto_programt &body=get_entry_body(gf);
 
-  // XXX: Debug
-  const namespacet ns(st);
-  goto_programt tmp;
-  for (const auto &pred : solution.predicates)
-  {
-    tmp.instructions=pred;
-    tmp.compute_incoming_edges();
-    tmp.compute_target_numbers();
-    std::cout << "<pred>" << std::endl;
-    tmp.output(ns, "", std::cout);
-    std::cout << "</pred>" << std::endl;
-  }
-  // XXX: Debug
-
-  insert_before(body, prog.base_case, solution.query);
+  insert_before(prog, body, prog.base_case, solution.query);
   insert_invariant(st, gf, body, prog.base_case, solution.invariant);
-  insert_before(body, prog.inductive_assumption, solution.query);
+  insert_before(prog, body, prog.inductive_assumption, solution.query);
   insert_invariant(st, gf, body, prog.inductive_assumption, solution.invariant);
   insert_sync_call(st, gf, body, prog.inductive_step, solution.query);
-  insert_before(body, prog.inductive_step, solution.query);
+  insert_before(prog, body, prog.inductive_step, solution.query);
   insert_invariant(st, gf, body, prog.inductive_step, solution.invariant);
   make_full_query_call(st, gf, body, prog.property_entailment, solution.query);
-  insert_before(body, prog.property_entailment, solution.query);
+  insert_before(prog, body, prog.property_entailment, solution.query);
   insert_sync_call(st, gf, body, prog.property_entailment, solution.query);
   insert_invariant(st, gf, body, prog.property_entailment, solution.invariant);
 

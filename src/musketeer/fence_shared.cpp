@@ -208,7 +208,7 @@ bool fence_volatilet::is_volatile (const typet &src) const
       it!=src.subtypes().end();
       ++it)
     {
-      std::cout << *it << std::endl;
+      //std::cout << *it << std::endl;
       vol|=is_volatile(*it);
       if(vol)
         break;

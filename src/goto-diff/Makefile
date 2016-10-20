@@ -3,6 +3,7 @@ SRC = goto_diff_main.cpp goto_diff_parse_options.cpp \
       unified_diff.cpp change_impact.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
+      ../cpp/cpp$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -24,11 +25,6 @@ include ../common
 CLEANFILES = goto-diff$(EXEEXT)
 
 all: goto-diff$(EXEEXT)
-
-ifneq ($(wildcard ../cpp/Makefile),)
-  OBJ += ../cpp/cpp$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_CPP
-endif
 
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)

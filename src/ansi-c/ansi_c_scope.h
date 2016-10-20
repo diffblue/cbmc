@@ -19,7 +19,7 @@ class ansi_c_identifiert
 {
 public:
   ansi_c_id_classt id_class;
-  irep_idt base_name;
+  irep_idt base_name, prefixed_name;
   
   ansi_c_identifiert():id_class(ANSI_C_UNKNOWN)
   {
@@ -29,10 +29,15 @@ public:
 class ansi_c_scopet
 {
 public:
+  // This maps "scope names" (tag-X, label-X, X) to
+  // ansi_c_identifiert.
   typedef hash_map_cont<irep_idt, ansi_c_identifiert, irep_id_hash> name_mapt;
   name_mapt name_map;
   
   std::string prefix;
+  
+  // We remember the last declarator for the benefit
+  // of function argument scoping.
   irep_idt last_declarator;
   
   // for(;;) and { } scopes are numbered

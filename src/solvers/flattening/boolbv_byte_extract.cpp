@@ -100,7 +100,10 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   else if(expr.id()==ID_byte_extract_big_endian)
     little_endian=false;
   else
+  {
+    little_endian=false;
     assert(false);
+  }
 
   // first do op0
   

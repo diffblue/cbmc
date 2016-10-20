@@ -23,7 +23,7 @@
  *
  * @return
  */
-bool is_program_indivdual_decl(const class goto_trace_stept &step);
+bool is_program_individual_decl(const class goto_trace_stept &step);
 
 /**
  * @brief

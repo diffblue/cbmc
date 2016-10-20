@@ -2,36 +2,24 @@
 
 #include <util/type_eq.h>
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/remove_returns.h>
 
 #include <cegis/instrument/literals.h>
 #include <cegis/instrument/instrument_var_ops.h>
+#include <cegis/cegis-util/string_helper.h>
 #include <cegis/cegis-util/program_helper.h>
 
 goto_programt &get_entry_body(goto_functionst &gf)
 {
-  const irep_idt id(goto_functionst::entry_point());
-  goto_functionst::function_mapt &function_map=gf.function_map;
-  const goto_functionst::function_mapt::iterator it=function_map.find(id);
-  assert(function_map.end() != it && "Danger program function missing.");
-  goto_function_templatet<goto_programt> &f=it->second;
-  assert(f.body_available() && "Danger program function body missing.");
-  return f.body;
+  return get_body(gf, id2string(goto_functionst::entry_point()));
 }
 
 const goto_programt &get_entry_body(const goto_functionst &gf)
 {
-  const irep_idt id(goto_functionst::entry_point());
-  const goto_functionst::function_mapt &function_map=gf.function_map;
-  const goto_functionst::function_mapt::const_iterator it=function_map.find(id);
-  assert(function_map.end() != it && "Danger program function missing.");
-  const goto_function_templatet<goto_programt> &f=it->second;
-  assert(f.body_available() && "Danger program function body missing.");
-  return f.body;
+  return get_body(gf, id2string(goto_functionst::entry_point()));
 }
 
-class goto_programt &get_body(
-    class goto_functionst &gf,
-    const std::string &func_name)
+goto_programt &get_body(goto_functionst &gf, const std::string &func_name)
 {
   const irep_idt id(func_name);
   goto_functionst::function_mapt &function_map=gf.function_map;
@@ -42,8 +30,12 @@ class goto_programt &get_body(
   return f.body;
 }
 
-const goto_programt &get_body(
-    const goto_functionst &gf,
+goto_programt &get_body(goto_functionst &gf, const goto_programt::const_targett pos)
+{
+  return get_body(gf, id2string(pos->function));
+}
+
+const goto_programt &get_body(const goto_functionst &gf,
     const std::string &func_name)
 {
   const irep_idt id(func_name);
@@ -91,15 +83,15 @@ bool contains(const exprt &rhs, const irep_idt &id)
 }
 }
 
-bool is_nondet(const goto_programt::targett &target,
-    const goto_programt::targett &end)
+bool is_nondet(goto_programt::const_targett target,
+    goto_programt::const_targett end)
 {
   const goto_programt::instructiont &instr=*target;
   switch (instr.type)
   {
   case goto_program_instruction_typet::DECL:
   {
-    goto_programt::targett next=std::next(target);
+    goto_programt::const_targett next=std::next(target);
     if (next == end) return true;
     if (goto_program_instruction_typet::FUNCTION_CALL == next->type)
     {
@@ -126,6 +118,11 @@ bool is_nondet(const goto_programt::targett &target,
   default:
     return false;
   }
+}
+
+bool is_return_value_name(const std::string &name)
+{
+  return contains(name, "return_value___") || contains(name, RETURN_VALUE_SUFFIX);
 }
 
 const typet &get_affected_type(const goto_programt::instructiont &instr)
@@ -215,10 +212,9 @@ symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
 }
 
 goto_programt::targett cegis_assign(const symbol_tablet &st,
-    goto_functionst &gf, const goto_programt::targett &insert_after_pos,
+    goto_programt &body, const goto_programt::targett &insert_after_pos,
     const exprt &lhs, const exprt &rhs, const source_locationt &loc)
 {
-  goto_programt &body=get_entry_body(gf);
   goto_programt::targett assign=body.insert_after(insert_after_pos);
   assign->type=goto_program_instruction_typet::ASSIGN;
   assign->source_location=loc;
@@ -227,6 +223,14 @@ goto_programt::targett cegis_assign(const symbol_tablet &st,
   if (type_eq(type, rhs.type(), ns)) assign->code=code_assignt(lhs, rhs);
   else assign->code=code_assignt(lhs, typecast_exprt(rhs, type));
   return assign;
+}
+
+goto_programt::targett cegis_assign(const symbol_tablet &st,
+    goto_functionst &gf, const goto_programt::targett &insert_after_pos,
+    const exprt &lhs, const exprt &rhs, const source_locationt &loc)
+{
+  goto_programt &body=get_entry_body(gf);
+  return cegis_assign(st, body, insert_after_pos, lhs, rhs, loc);
 }
 
 goto_programt::targett cegis_assign(const symbol_tablet &st,
@@ -243,4 +247,38 @@ goto_programt::targett cegis_assign_user_variable(const symbol_tablet &st,
 {
   const symbol_exprt lhs(st.lookup(name).symbol_expr());
   return cegis_assign(st, gf, insert_after_pos, lhs, value);
+}
+
+symbol_exprt get_ret_val_var(const irep_idt &func_id, const typet &type)
+{
+  return symbol_exprt(id2string(func_id) + RETURN_VALUE_SUFFIX, type);
+}
+
+void remove_return(goto_programt &body, const goto_programt::targett pos)
+{
+  code_function_callt &call=to_code_function_call(pos->code);
+  const irep_idt &id=to_symbol_expr(call.function()).get_identifier();
+  const typet &type=call.lhs().type();
+  const source_locationt &loc=pos->source_location;
+  const irep_idt &func=pos->function;
+  const goto_programt::targett assign=body.insert_after(pos);
+  assign->make_assignment();
+  assign->source_location=loc;
+  assign->code=code_assignt(call.lhs(), get_ret_val_var(id, type));
+  assign->function=func;
+  call.lhs().make_nil();
+}
+
+goto_programt::targett add_return_assignment(
+    goto_programt &body,
+    goto_programt::targett pos,
+    const irep_idt &func_id,
+    const exprt &value)
+{
+  const source_locationt &loc=pos->source_location;
+  pos=body.insert_after(pos);
+  pos->make_assignment();
+  pos->source_location=loc;
+  pos->code=code_assignt(get_ret_val_var(func_id, value.type()), value);
+  return pos;
 }

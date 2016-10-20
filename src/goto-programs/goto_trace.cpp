@@ -350,6 +350,18 @@ void show_goto_trace(
       break;
       
     case goto_trace_stept::ASSUME:
+      if(!it->cond_value)
+      {
+        out << "\n";
+        out << "Violated assumption:" << "\n";
+        if(!it->pc->source_location.is_nil())
+          out << "  " << it->pc->source_location << "\n";
+
+        if(it->pc->is_assume())
+          out << "  " << from_expr(ns, "", it->pc->guard) << "\n";
+        
+        out << "\n";
+      }
       break;
       
     case goto_trace_stept::LOCATION:

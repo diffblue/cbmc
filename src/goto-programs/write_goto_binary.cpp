@@ -86,20 +86,17 @@ bool write_goto_binary_v3(
 
   write_gb_word(out, cnt);
 
-  for(goto_functionst::function_mapt::const_iterator
-      it=functions.function_map.begin();
-      it!=functions.function_map.end();
-      it++)
+  for(const auto & it : functions.function_map)
   {
-    if(it->second.body_available())
+    if(it.second.body_available())
     {      
       // Since version 2, goto functions are not converted to ireps,
       // instead they are saved in a custom binary format      
       
-      write_gb_string(out, id2string(it->first)); // name      
-      write_gb_word(out, it->second.body.instructions.size()); // # instructions
+      write_gb_string(out, id2string(it.first)); // name      
+      write_gb_word(out, it.second.body.instructions.size()); // # instructions
       
-      forall_goto_program_instructions(i_it, it->second.body)
+      forall_goto_program_instructions(i_it, it.second.body)
       {
         const goto_programt::instructiont &instruction = *i_it;
         
@@ -113,19 +110,13 @@ bool write_goto_binary_v3(
                 
         write_gb_word(out, instruction.targets.size());
 
-        for(goto_programt::targetst::const_iterator
-            t_it=instruction.targets.begin();
-            t_it!=instruction.targets.end();
-            t_it++)
-          write_gb_word(out, (*t_it)->target_number);
+        for(const auto & t_it : instruction.targets)
+          write_gb_word(out, t_it->target_number);
           
         write_gb_word(out, instruction.labels.size());
 
-        for(goto_programt::instructiont::labelst::const_iterator
-            l_it=instruction.labels.begin();
-            l_it!=instruction.labels.end();
-            l_it++)
-          irepconverter.write_string_ref(out, *l_it);
+        for(const auto & l_it : instruction.labels)
+          irepconverter.write_string_ref(out, l_it);
       }
     }
   }

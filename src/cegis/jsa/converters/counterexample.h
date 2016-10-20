@@ -7,11 +7,60 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_CONVERT_COUNTEREXAMPLE_H_
-#define CEGIS_JSA_CONVERT_COUNTEREXAMPLE_H_
+#ifndef CEGIS_JSA_CONVERTERS_COUNTEREXAMPLE_H_
+#define CEGIS_JSA_CONVERTERS_COUNTEREXAMPLE_H_
 
-// TODO: Extract CE from trace
+#include <cegis/jsa/value/jsa_genetic_synthesis.h>
+#include <cegis/jsa/value/jsa_counterexample.h>
 
-// TODO: Convert symex CE to genetic CE
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param counterexample
+ *
+ * @return
+ */
+size_t count_heaps(const jsa_counterexamplet &counterexample);
 
-#endif /* CEGIS_JSA_CONVERT_COUNTEREXAMPLE_H_ */
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param counterexample
+ * @param heaps
+ *
+ * @return
+ */
+void retrieve_heaps(
+    const jsa_counterexamplet &counterexample,
+    __CPROVER_jsa_abstract_heapt *heaps);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param counterexample
+ *
+ * @return
+ */
+size_t count_words(const jsa_counterexamplet &counterexample);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param counterexample
+ * @param words
+ *
+ * @return
+ */
+void retrieve_words(
+    const jsa_counterexamplet &counterexample,
+    __CPROVER_jsa_word_t *words);
+
+#endif /* CEGIS_JSA_CONVERTERS_COUNTEREXAMPLE_H_ */

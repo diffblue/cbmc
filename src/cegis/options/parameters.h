@@ -20,5 +20,11 @@
 #define CEGIS_PARALLEL_VERIFY "cegis-parallel-verify"
 #define CEGIS_MATCH_SELECT "cegis-match-select"
 #define CEGIS_SYMEX_HEAD_START "cegis-symex-head-start"
+#define CEGIS_SHOW_ITERATIONS "cegis-show-iterations"
+#define CEGIS_KEEP_GOTO_PROGRAMS "cegis-keep-goto-programs"
+#define CEGIS_MAX_RUNTIME "cegis-max-runtime"
+#define CEGIS_CONTROL "cegis-control"
+#define CEGIS_REFACTOR "cegis-refactor"
+#define CEGIS_NULL_OBJECT_REFACTOR "cegis-refactor-null-object"
 
 #endif /* CEGIS_INVARIANT_PARAMETERS_H_ */

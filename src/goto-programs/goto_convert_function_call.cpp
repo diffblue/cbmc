@@ -103,8 +103,10 @@ void goto_convertt::do_function_call(
   }
   else
   {
-    err_location(function);
-    throw "unexpected function argument: "+new_function.id_string();
+    error().source_location=function.find_source_location();
+    error() << "unexpected function argument: " << new_function.id()
+            << eom;
+    throw 0;
   }
 }
 

@@ -1,11 +1,14 @@
 #line 2 "main.ii"
-template<typename T> struct member_fkt_ptr { };
 
-// the two below are different
-//template<typename R, typename A> struct member_fkt_ptr<R (A::*)()> { };
-template<typename R, typename A> struct member_fkt_ptr<R (A::*)() const> { };
+template <class _Tp> struct remove_pointer;
+
+// the below are different
+template <class _Tp> struct remove_pointer       {typedef _Tp type;};
+template <class _Tp> struct remove_pointer<_Tp*> {typedef _Tp type;};
+template <class _Tp> struct remove_pointer<_Tp* const>          {typedef _Tp type;};
+template <class _Tp> struct remove_pointer<_Tp* volatile>       {typedef _Tp type;};
+template <class _Tp> struct remove_pointer<_Tp* const volatile> {typedef _Tp type;};
 
 int main()
 {
-  __CPROVER::dump_scopes;
 }

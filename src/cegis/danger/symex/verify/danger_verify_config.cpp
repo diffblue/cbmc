@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iterator>
 
+#include <cegis/value/assignments_printer.h>
 #include <cegis/wordsize/restrict_bv_size.h>
 #include <cegis/invariant/symex/verify/extract_counterexample.h>
 #include <cegis/invariant/symex/verify/insert_constraint.h>
@@ -70,4 +71,12 @@ void danger_verify_configt::set_max_ce_width(const size_t size)
 {
   limit_ce=true;
   max_ce_width=size;
+}
+
+void danger_verify_configt::show_counterexample(messaget::mstreamt &os,
+    const counterexamplet &counterexample) const
+{
+  os << "<danger_counterexample>" << messaget::endl;
+  print_assignments(os, get_symbol_table(), counterexample);
+  os << "</danger_counterexample>" << messaget::endl << messaget::eom;
 }

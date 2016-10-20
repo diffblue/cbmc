@@ -44,9 +44,23 @@ const goto_programt &get_entry_body(const goto_functionst &gf);
  *
  * @return
  */
-class goto_programt &get_body(
-    class goto_functionst &gf,
+goto_programt &get_body(
+    goto_functionst &gf,
     const std::string &func_name);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param gf
+ * @param pos
+ *
+ * @return
+ */
+goto_programt &get_body(
+    goto_functionst &gf,
+    goto_programt::const_targett pos);
 
 /**
  * @brief
@@ -73,8 +87,19 @@ const goto_programt &get_body(
  * @return
  */
 bool is_nondet(
-    const goto_programt::targett &target,
-    const goto_programt::targett &end);
+    goto_programt::const_targett target,
+    goto_programt::const_targett end);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param name
+ *
+ * @return
+ */
+bool is_return_value_name(const std::string &name);
 
 /**
  * @brief
@@ -182,6 +207,24 @@ goto_programt::targett cegis_assign(const symbol_tablet &st,
  * @details
  *
  * @param st
+ * @param body
+ * @param insert_after_pos
+ * @param lhs
+ * @param rhs
+ * @param loc
+ *
+ * @return
+ */
+goto_programt::targett cegis_assign(const symbol_tablet &st,
+    goto_programt &body, const goto_programt::targett &insert_after_pos,
+    const exprt &lhs, const exprt &rhs, const source_locationt &loc);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
  * @param gf
  * @param insert_after_pos
  * @param lhs
@@ -210,5 +253,35 @@ goto_programt::targett cegis_assign(const symbol_tablet &st,
 goto_programt::targett cegis_assign_user_variable(const symbol_tablet &st,
     goto_functionst &gf, const goto_programt::targett &insert_after_pos,
     const irep_idt &name, const exprt &value);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param pos
+ */
+void remove_return(
+    goto_programt &body,
+    goto_programt::targett pos);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param pos
+ * @param func_id
+ * @param value
+ *
+ * @return
+ */
+goto_programt::targett add_return_assignment(
+    goto_programt &body,
+    goto_programt::targett pos,
+    const irep_idt &func_id,
+    const exprt &value);
 
 #endif /* CEGIS_PROGRAM_HELPER_H_ */

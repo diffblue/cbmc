@@ -53,7 +53,8 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-cex):" \
-  "(floatbv)(all-claims)(all-properties)(decide)" // legacy, and will eventually disappear
+  "(localize-faults)(localize-faults-method):" \
+  "(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear
 
 class cbmc_parse_optionst:
   public parse_options_baset,
@@ -71,6 +72,7 @@ public:
     const std::string &extra_options);
 
 protected:
+  ui_message_handlert ui_message_handler;
   virtual void register_languages();
 
   virtual void get_command_line_options(optionst &options);

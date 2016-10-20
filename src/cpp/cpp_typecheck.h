@@ -136,10 +136,12 @@ protected:
     const template_typet &old_type,
     template_typet &new_type);
 
+  #if 0
   void check_template_restrictions(
     const irept &cpp_name,
     const irep_idt &final_identifier,
     const typet &final_type);
+  #endif
 
   void convert_template_declaration(cpp_declarationt &declaration);
 
@@ -403,7 +405,7 @@ protected:
     const typet &method_qualifier,
     exprt &value);
 
-  void adjust_method_type(
+  void add_this_to_method_type(
     const irep_idt &compound_identifier,
     typet &method_type,
     const typet &method_qualifier);

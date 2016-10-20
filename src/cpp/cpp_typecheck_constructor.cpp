@@ -270,7 +270,6 @@ void cpp_typecheckt::default_cpctor(
   parameter_tor.set(ID_name, cpp_parameter);
   parameter_tor.type()=reference_typet();
   parameter_tor.type().subtype().make_nil();
-  parameter_tor.type().add(ID_C_qualifier).make_nil();
   parameter_tor.add_source_location() = source_location;
 
   // Parameter declaration
@@ -473,7 +472,6 @@ void cpp_typecheckt::default_assignop(
 
   args_decl_declor.type().id(ID_pointer);
   args_decl_declor.type().set(ID_C_reference, true);
-  args_decl_declor.type().add(ID_C_qualifier).make_nil();
   args_decl_declor.type().subtype().make_nil();
   args_decl_declor.value().make_nil();
 }
@@ -542,7 +540,7 @@ void cpp_typecheckt::default_assignop_value(
 
       if(size_expr.id()==ID_infinity)
       {
-        // err_location(object);
+        // error().source_location=object);
         // err << "cannot copy array of infinite size" << std::endl;
         // throw 0;
         continue;
@@ -629,8 +627,9 @@ void cpp_typecheckt::check_member_initializers(
 
       if(!ok)
       {
-        err_location(member_name.source_location());
-        str << "invalid initializer `" << member_name.to_string() << "'";
+        error().source_location=member_name.source_location();
+        error() << "invalid initializer `" << member_name.to_string()
+                << "'" << eom;
         throw 0;
       }
       return;
@@ -707,8 +706,8 @@ void cpp_typecheckt::check_member_initializers(
 
     if(!ok)
     {
-      err_location(member_name.source_location());
-      str << "invalid initializer `" << base_name << "'";
+      error().source_location=member_name.source_location();
+      error() << "invalid initializer `" << base_name << "'" << eom;
       throw 0;
     }
   }
@@ -969,8 +968,8 @@ void cpp_typecheckt::full_member_initialization(
        mem_it->find(ID_type).id()==ID_pointer &&
        mem_it->find(ID_type).get_bool(ID_C_reference))
     {
-      err_location(*mem_it);
-      str << "reference must be explicitly initialized";
+      error().source_location=mem_it->source_location();
+      error() << "reference must be explicitly initialized" << eom;
       throw 0;
     }
 

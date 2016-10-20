@@ -552,8 +552,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
   exprt &new_expr)
 {
   if(type.id()!=ID_pointer ||
-     is_reference(type) ||
-     type.find("to-member").is_not_nil())
+     is_reference(type))
     return false;
 
   if(expr.get_bool(ID_C_lvalue))
@@ -568,6 +567,9 @@ bool cpp_typecheckt::standard_conversion_pointer(
     new_expr.type() = type;
     return true;
   }
+
+  if(type.find("to-member").is_not_nil())
+    return false;
   
   if(expr.type().id() != ID_pointer ||
      expr.type().find("to-member").is_not_nil())
@@ -892,9 +894,10 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
     else if(type.id()==ID_pointer)
     {
-      if(follow(expr.type()).id()==ID_nullptr)
+      if(expr.type().subtype().id()==ID_nullptr)
       {
         // std::nullptr_t to _any_ pointer type is ok
+        new_expr.make_typecast(type);
       }
       else if(!standard_conversion_pointer(curr_expr, type, new_expr))
       {
@@ -908,6 +911,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
     {
       if(!standard_conversion_boolean(curr_expr,new_expr))
         return false;
+
       rank += 3;
     }
     else
@@ -915,7 +919,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
   }
   else
     new_expr = curr_expr;
-
+    
   curr_expr.swap(new_expr);
 
   if(curr_expr.type().id()==ID_pointer)
@@ -1729,11 +1733,11 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 
   if(!implicit_conversion_sequence(e, type, expr))
   {
-    show_instantiation_stack(str);
-    err_location(e);
-    str << "invalid implicit conversion from `"
-        << to_string(e.type()) << "' to `"
-        << to_string(type) << "'";
+    show_instantiation_stack(error());
+    error().source_location=e.find_source_location();
+    error() << "invalid implicit conversion from `"
+            << to_string(e.type()) << "' to `"
+            << to_string(type) << "'" << eom;
     #if 0
     str << "\n " << follow(e.type()).pretty() << std::endl;
     str << "\n " << type.pretty() << std::endl;
@@ -1812,8 +1816,8 @@ void cpp_typecheckt::reference_initializer(
     return;
   }
 
-  err_location(expr);
-  str << "bad reference initializer";
+  error().source_location=expr.find_source_location();
+  error() << "bad reference initializer" << eom;
   throw 0;
 }
 

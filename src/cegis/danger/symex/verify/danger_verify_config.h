@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <deque>
 
+#include <util/message.h>
+
 #include <cegis/danger/options/danger_program.h>
 
 /**
@@ -50,7 +52,7 @@ public:
    *
    * @param program
    */
-  danger_verify_configt(const danger_programt &program);
+  explicit danger_verify_configt(const danger_programt &program);
 
   /**
    * @brief
@@ -132,6 +134,17 @@ public:
    * @param size
    */
   void set_max_ce_width(size_t size);
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param counterexample
+   */
+  void show_counterexample(
+      messaget::mstreamt &os,
+      const counterexamplet &counterexample) const;
 };
 
 #endif /* CEGIS_DANGER_VERIFY_CONFIG_H_ */

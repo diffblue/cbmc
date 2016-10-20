@@ -10,6 +10,7 @@ Author:
 #include <istream>
 #include <vector>
 
+#include "unicode.h"
 #include "pipe_stream.h"
 
 #ifdef _WIN32
@@ -108,7 +109,7 @@ int pipe_stream::run()
     return -1;
 
   // now execute the child process
-  STARTUPINFO si;
+  STARTUPINFOW si;
   
   ZeroMemory (&si, sizeof(STARTUPINFO));
   si.cb=sizeof(STARTUPINFO);
@@ -117,16 +118,21 @@ int pipe_stream::run()
   si.hStdInput=hInputRead;
   si.hStdError=hErrorWrite;
 
-  std::string command = executable;
-  std::list<std::string>::const_iterator s_it=args.begin();
-  for(; s_it!=args.end(); ++s_it)
-    command += " " + (*s_it);
+  std::wstring command = ::widen(executable);
 
-  LPSTR lpCommandLine = new char[command.length()+1];
-  strcpy(lpCommandLine, command.c_str());
+  for(const auto &s : args)
+        command += L" " + ::widen(s);
 
-  BOOL ret=CreateProcess(NULL, lpCommandLine, NULL, NULL, TRUE,
-                         CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
+  LPWSTR lpCommandLine = new wchar_t[command.length()+1];
+  
+  #ifdef _MSC_VER
+  wcscpy_s(lpCommandLine, command.length()+1, command.c_str());
+  #else
+  wcsncpy(lpCommandLine, command.c_str(), command.length()+1);
+  #endif
+
+  BOOL ret=CreateProcessW(NULL, lpCommandLine, NULL, NULL, TRUE,
+                          CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
 
   delete lpCommandLine; // clean up
 

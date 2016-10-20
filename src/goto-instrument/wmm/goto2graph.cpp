@@ -122,7 +122,7 @@ unsigned instrumentert::goto2graph_cfg(
   visitor.visit_cfg(value_sets, model, no_dependencies, duplicate_body, 
     goto_functions.entry_point());
 
-  std::vector<unsigned> subgraph_index;
+  std::vector<std::size_t> subgraph_index;
   num_sccs = egraph_alt.SCCs(subgraph_index);
   assert(egraph_SCCs.empty());
   egraph_SCCs.resize(num_sccs, std::set<unsigned>());

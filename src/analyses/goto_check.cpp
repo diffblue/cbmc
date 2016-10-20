@@ -69,6 +69,7 @@ protected:
   void mod_by_zero_check(const mod_exprt &expr, const guardt &guard);
   void undefined_shift_check(const shift_exprt &expr, const guardt &guard);
   void pointer_rel_check(const exprt &expr, const guardt &guard);
+  void pointer_overflow_check(const exprt &expr, const guardt &guard);
   void pointer_validity_check(const dereference_exprt &expr, const guardt &guard);
   void integer_overflow_check(const exprt &expr, const guardt &guard);
   void float_overflow_check(const exprt &expr, const guardt &guard);
@@ -855,8 +856,11 @@ void goto_checkt::pointer_rel_check(
   const exprt &expr,
   const guardt &guard)
 {
+  if(!enable_pointer_check)
+    return;
+
   if(expr.operands().size()!=2)
-    throw expr.id_string()+" takes one argument";
+    throw expr.id_string()+" takes two arguments";
 
   if(expr.op0().type().id()==ID_pointer &&
      expr.op1().type().id()==ID_pointer)
@@ -871,6 +875,44 @@ void goto_checkt::pointer_rel_check(
         same_object,
         "same object violation",
         "pointer",
+        expr.find_source_location(),
+        expr,
+        guard);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: goto_checkt::pointer_overflow_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_checkt::pointer_overflow_check(
+  const exprt &expr,
+  const guardt &guard)
+{
+  if(!enable_pointer_check)
+    return;
+
+  if(expr.id()==ID_plus ||
+     expr.id()==ID_minus)
+  {
+    if(expr.operands().size()==2)
+    {
+      exprt overflow("overflow-"+expr.id_string(), bool_typet());
+      overflow.operands()=expr.operands();
+
+      add_guarded_claim(
+        not_exprt(overflow),
+        "pointer arithmetic overflow on "+expr.id_string(),
+        "overflow",
         expr.find_source_location(),
         expr,
         guard);
@@ -1335,7 +1377,7 @@ void goto_checkt::check_rec(
     {
       std::string msg=
         "first argument of if must be boolean, but got "
-        +expr.op0().to_string();
+        +expr.op0().pretty();
       throw msg;
     }
 
@@ -1393,12 +1435,20 @@ void goto_checkt::check_rec(
     if(expr.type().id()==ID_signedbv ||
        expr.type().id()==ID_unsignedbv)
     {
-      integer_overflow_check(expr, guard);
+      if(expr.operands().size()==2 &&
+         expr.op0().type().id()==ID_pointer)
+        pointer_overflow_check(expr, guard);
+      else
+        integer_overflow_check(expr, guard);
     }
     else if(expr.type().id()==ID_floatbv)
     {
       nan_check(expr, guard);
       float_overflow_check(expr, guard);
+    }
+    else if(expr.type().id()==ID_pointer)
+    {
+      pointer_overflow_check(expr, guard);
     }
   }
   else if(expr.id()==ID_le || expr.id()==ID_lt ||

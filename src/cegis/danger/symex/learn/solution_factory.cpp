@@ -181,7 +181,7 @@ public:
 
   void operator()(const goto_trace_stept &step)
   {
-    if (!is_program_indivdual_decl(step)) return;
+    if (!is_program_individual_decl(step)) return;
     for (const exprt &prog_array_member : step.full_lhs_value.operands())
       read_instr(prog_array_member);
   }

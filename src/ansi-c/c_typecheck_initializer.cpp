@@ -52,7 +52,8 @@ void c_typecheck_baset::do_initializer(
     if(result.id()!=ID_array)
     {
       err_location(result);
-      str << "invalid array initializer " << to_string(result);
+      error() << "invalid array initializer " << to_string(result)
+              << eom;
       throw 0;
     }
   }
@@ -83,8 +84,8 @@ exprt c_typecheck_baset::do_initializer_rec(
   if(full_type.id()==ID_incomplete_struct)
   {
     err_location(value);
-    str << "type `"
-        << to_string(full_type) << "' is still incomplete -- cannot initialize";
+    error() << "type `" << to_string(full_type)
+            << "' is still incomplete -- cannot initialize" << eom;
     throw 0;
   }
   
@@ -114,22 +115,22 @@ exprt c_typecheck_baset::do_initializer_rec(
       if(to_integer(to_array_type(full_type).size(), array_size))
       {
         err_location(value);
-        str << "array size needs to be constant, got "
-            << to_string(to_array_type(full_type).size());
+        error() << "array size needs to be constant, got "
+                << to_string(to_array_type(full_type).size()) << eom;
         throw 0;
       }
       
       if(array_size<0)
       {
         err_location(value);
-        str << "array size must not be negative";
+        error() << "array size must not be negative" << eom;
         throw 0;
       }
 
       if(mp_integer(tmp.operands().size())>array_size)
       {
         // cut off long strings. gcc does a warning for this
-        tmp.operands().resize(integer2long(array_size));
+        tmp.operands().resize(integer2size_t(array_size));
         tmp.type()=type;
       }
       else if(mp_integer(tmp.operands().size())<array_size)
@@ -138,7 +139,7 @@ exprt c_typecheck_baset::do_initializer_rec(
         tmp.type()=type;
         exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
                                     *this, get_message_handler());
-        tmp.operands().resize(integer2long(array_size), zero);
+        tmp.operands().resize(integer2size_t(array_size), zero);
       }
     }
     
@@ -167,22 +168,22 @@ exprt c_typecheck_baset::do_initializer_rec(
       if(to_integer(to_array_type(full_type).size(), array_size))
       {
         err_location(value);
-        str << "array size needs to be constant, got "
-            << to_string(to_array_type(full_type).size());
+        error() << "array size needs to be constant, got "
+                << to_string(to_array_type(full_type).size()) << eom;
         throw 0;
       }
       
       if(array_size<0)
       {
         err_location(value);
-        str << "array size must not be negative";
+        error() << "array size must not be negative" << eom;
         throw 0;
       }
 
       if(mp_integer(tmp2.operands().size())>array_size)
       {
         // cut off long strings. gcc does a warning for this
-        tmp2.operands().resize(integer2long(array_size));
+        tmp2.operands().resize(integer2size_t(array_size));
         tmp2.type()=type;
       }
       else if(mp_integer(tmp2.operands().size())<array_size)
@@ -191,7 +192,7 @@ exprt c_typecheck_baset::do_initializer_rec(
         tmp2.type()=type;
         exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
                                     *this, get_message_handler());
-        tmp2.operands().resize(integer2long(array_size), zero);
+        tmp2.operands().resize(integer2size_t(array_size), zero);
       }
     }
     
@@ -202,18 +203,18 @@ exprt c_typecheck_baset::do_initializer_rec(
      to_array_type(full_type).size().is_nil())
   {
     err_location(value);
-    str << "type `"
-        << to_string(full_type) << "' cannot be initialized with `"
-        << to_string(value) << "'";
+    error() << "type `" << to_string(full_type)
+            << "' cannot be initialized with `" << to_string(value)
+            << "'" << eom;
     throw 0;
   }
 
   if(value.id()==ID_designated_initializer)
   {
     err_location(value);
-    str << "type `"
-        << to_string(full_type)
-        << "' cannot be initialized with designated initializer";
+    error() << "type `" << to_string(full_type)
+            << "' cannot be initialized with designated initializer"
+            << eom;
     throw 0;
   }
 
@@ -354,12 +355,12 @@ void c_typecheck_baset::designator_enter(
       if(to_integer(array_type.size(), array_size))
       {
         err_location(array_type.size());
-        str << "array has non-constant size `"
-            << to_string(array_type.size()) << "'";
+        error() << "array has non-constant size `"
+                << to_string(array_type.size()) << "'" << eom;
         throw 0;
       }
 
-      entry.size=integer2long(array_size);
+      entry.size=integer2size_t(array_size);
       entry.subtype=array_type.subtype();
     }
   }
@@ -372,12 +373,12 @@ void c_typecheck_baset::designator_enter(
     if(to_integer(vector_type.size(), vector_size))
     {
       err_location(vector_type.size());
-      str << "vector has non-constant size `"
-          << to_string(vector_type.size()) << "'";
+      error() << "vector has non-constant size `"
+              << to_string(vector_type.size()) << "'" << eom;
       throw 0;
     }
 
-    entry.size=integer2long(vector_size);
+    entry.size=integer2size_t(vector_size);
     entry.subtype=vector_type.subtype();
   }
   else
@@ -442,20 +443,21 @@ void c_typecheck_baset::do_designated_initializer(
         {
           // we are willing to grow an incomplete or zero-sized array
           exprt zero=zero_initializer(full_type.subtype(), value.source_location(), *this, get_message_handler());
-          dest->operands().resize(integer2long(index)+1, zero);
+          dest->operands().resize(integer2size_t(index)+1, zero);
           
           // todo: adjust type!
         }
         else
         {
           err_location(value);
-          str << "array index designator " << index
-              << " out of bounds (" << dest->operands().size() << ")";
+          error() << "array index designator " << index
+                  << " out of bounds (" << dest->operands().size()
+                  << ")" << eom;
           throw 0;
         }
       }
 
-      dest=&(dest->operands()[integer2long(index)]);
+      dest=&(dest->operands()[integer2size_t(index)]);
     }
     else if(full_type.id()==ID_struct)
     {
@@ -465,8 +467,9 @@ void c_typecheck_baset::do_designated_initializer(
       if(index>=dest->operands().size())
       {
         err_location(value);
-        str << "structure member designator " << index
-            << " out of bounds (" << dest->operands().size() << ")";
+        error() << "structure member designator " << index
+                << " out of bounds (" << dest->operands().size()
+                << ")" << eom;
         throw 0;
       }
 
@@ -608,9 +611,9 @@ void c_typecheck_baset::do_designated_initializer(
     if(dest->operands().empty())
     {
       err_location(value);
-      str << "cannot initialize type `"
-          << to_string(dest_type) << "' using value `"
-          << to_string(value) << "'";
+      error() << "cannot initialize type `"
+              << to_string(dest_type) << "' using value `"
+              << to_string(value) << "'" << eom;
       throw 0;
     }
 
@@ -711,7 +714,7 @@ designatort c_typecheck_baset::make_designator(
       if(d_op.id()!=ID_index)
       {
         err_location(d_op);
-        str << "expected array index designator";
+        error() << "expected array index designator" << eom;
         throw 0;
       }
 
@@ -724,7 +727,7 @@ designatort c_typecheck_baset::make_designator(
       if(to_integer(tmp_index, index))
       {
         err_location(d_op.op0());
-        str << "expected constant array index designator";
+        error() << "expected constant array index designator" << eom;
         throw 0;
       }
 
@@ -733,12 +736,12 @@ designatort c_typecheck_baset::make_designator(
       else if(to_integer(to_array_type(full_type).size(), size))
       {
         err_location(d_op.op0());
-        str << "expected constant array size";
+        error() << "expected constant array size" << eom;
         throw 0;
       }
       
-      entry.index=integer2long(index);
-      entry.size=integer2long(size);
+      entry.index=integer2size_t(index);
+      entry.size=integer2size_t(size);
       entry.subtype=full_type.subtype();
     }
     else if(full_type.id()==ID_struct ||
@@ -749,7 +752,7 @@ designatort c_typecheck_baset::make_designator(
       if(d_op.id()!=ID_member)
       {
         err_location(d_op);
-        str << "expected member designator";
+        error() << "expected member designator" << eom;
         throw 0;
       }
 
@@ -812,8 +815,9 @@ designatort c_typecheck_baset::make_designator(
         if(!found)
         {
           err_location(d_op);
-          str << "failed to find struct component `" << component_name 
-              << "' in initialization of `" << to_string(struct_union_type) << "'";
+          error() << "failed to find struct component `"
+                  << component_name << "' in initialization of `"
+                  << to_string(struct_union_type) << "'" << eom;
           throw 0;
         }
       }
@@ -821,8 +825,8 @@ designatort c_typecheck_baset::make_designator(
     else
     {
       err_location(d_op);
-      str << "designated initializers cannot initialize `"
-          << to_string(full_type) << "'";
+      error() << "designated initializers cannot initialize `"
+              << to_string(full_type) << "'" << eom;
       throw 0;
     }
 
@@ -888,9 +892,8 @@ exprt c_typecheck_baset::do_initializer_list(
     {
       if(value.operands().size()>1)
       {
-        err_location(value);
-        str << "ignoring excess initializers";
-        warning_msg();
+        warning().source_location=value.find_source_location();
+        warning() << "ignoring excess initializers" << eom;
       }
 
       return do_initializer_rec(value.op0(), type, force_constant);
@@ -905,8 +908,8 @@ exprt c_typecheck_baset::do_initializer_list(
       return do_initializer_rec(value.op0(), type, force_constant);
     
     err_location(value);
-    str << "cannot initialize `" << to_string(full_type)
-        << "' with an initializer list";
+    error() << "cannot initialize `" << to_string(full_type)
+            << "' with an initializer list" << eom;
     throw 0;
   }
 

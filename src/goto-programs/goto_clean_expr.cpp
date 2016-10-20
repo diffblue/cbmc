@@ -146,8 +146,12 @@ void goto_convertt::rewrite_boolean(exprt &expr)
   assert(expr.id()==ID_and || expr.id()==ID_or);
   
   if(!expr.is_boolean())
-    throw "`"+expr.id_string()+"' "
-          "must be Boolean, but got "+expr.pretty();
+  {
+    error().source_location=expr.find_source_location();
+    error() << "`" << expr.id() << "' must be Boolean, but got "
+            << expr.pretty() << eom;
+    throw 0;
+  }
 
   // re-write "a && b" into nested a?b:0
   // re-write "a || b" into nested a?1:b
@@ -167,8 +171,12 @@ void goto_convertt::rewrite_boolean(exprt &expr)
     exprt &op=ops[i];
 
     if(!op.is_boolean())
-     throw "`"+expr.id_string()+"' takes Boolean "
-           "operands only, but got "+op.pretty();
+    {
+      error().source_location=expr.find_source_location();
+      error() << "`" << expr.id() << "' takes Boolean "
+              << "operands only, but got " << op.pretty() << eom;
+      throw 0;
+    }
 
     if(expr.id()==ID_and)
     {
@@ -235,8 +243,12 @@ void goto_convertt::clean_expr(
     if_exprt if_expr=to_if_expr(expr);
     
     if(!if_expr.cond().is_boolean())
-      throw "first argument of `if' must be boolean, but got "
-        +if_expr.cond().to_string();
+    {
+      error().source_location=if_expr.find_source_location();
+      error() << "first argument of `if' must be boolean, but got "
+              << if_expr.cond().pretty() << eom;
+      throw 0;
+    }
 
     const source_locationt source_location=expr.find_source_location();
   
@@ -357,7 +369,11 @@ void goto_convertt::clean_expr(
   else if(expr.id()==ID_typecast)
   {
     if(expr.operands().size()!=1)
-      throw "typecast takes one argument";
+    {
+      error().source_location=expr.find_source_location();
+      error() << "typecast takes one argument" << eom;
+      throw 0;
+    }
 
     // preserve 'result_is_used'
     clean_expr(expr.op0(), dest, result_is_used);
@@ -428,7 +444,12 @@ void goto_convertt::clean_expr(
     goto_programt tmp;
     clean_expr(expr.op1(), tmp, true);
     if(tmp.instructions.empty())
-      throw "no side-effects in quantified expressions allowed";
+    {
+      error().source_location=expr.find_source_location();
+      error() << "no side-effects in quantified expressions allowed"
+              << eom;
+      throw 0;
+    }
     return;
   }
   else if(expr.id()==ID_address_of)
@@ -547,7 +568,11 @@ void goto_convertt::remove_gcc_conditional_expression(
   goto_programt &dest)
 {
   if(expr.operands().size()!=2)
-    throw "conditional_expression takes two operands";
+  {
+    error().source_location=expr.find_source_location();
+    error() << "conditional_expression takes two operands" << eom;
+    throw 0;
+  }
 
   // first remove side-effects from condition
   clean_expr(expr.op0(), dest);

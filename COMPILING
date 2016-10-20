@@ -10,12 +10,13 @@ environments:
 
 - Solaris 11
 
-- FreeBSD 10
+- FreeBSD 10 or 11
 
 - Cygwin
   (We recommend the i686-pc-mingw32-g++ cross compiler, version 4.7 or above.)
 
-- Microsoft's Visual Studio 2012, 2013 or 2015 (older versions won't work)
+- Microsoft's Visual Studio version 12 (2013), version 14 (2015),
+  or version 15 (older versions won't work)
 
 The rest of this document is split up into three parts: compilation on
 Linux, MacOS, Windows.  Please read the section appropriate for your
@@ -46,20 +47,17 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    cd cbmc-git/src
    make minisat2-download
    make libzip-download zlib-download
+   make libzip-build
    make
 
 
 COMPILATION ON SOLARIS 11
 -------------------------
 
-0) We recommend you get OpenCSW. Follow the instructions at
-
-   http://www.opencsw.org/manual/for-administrators/getting-started.html
-
 1) As root, get the necessary development tools:
 
-   pkg install system/header
-   /opt/csw/bin/pkgutil -i gzip coreutils wget CSWpm-libwww-perl git flex bison CSWgcc4g++
+   pkg install system/header developer/lexer/flex developer/parser/bison developer/versioning/git
+   pkg install --accept developer/gcc-49
 
 2) As a user, get the CBMC source via
 
@@ -70,20 +68,23 @@ COMPILATION ON SOLARIS 11
    cd cbmc-git
    wget http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
    gtar xfz minisat_2.2.1.orig.tar.gz
+   mv minisat2-2.2.1 minisat-2.2.1
    (cd minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
 
 4) Type
 
-   cd src; gmake CXX=/opt/csw/bin/g++
+   cd src; gmake
 
-   That should do it.
+   That should do it. To run, you will need
+
+   export LD_LIBRARY_PATH=/usr/gcc/4.9/lib
 
    Do not attempt to compile with gcc-45 that comes with Solaris 11.
    It will mis-optimize MiniSat2.
 
 
-COMPILATION ON FREEBSD 10
--------------------------
+COMPILATION ON FREEBSD 10/11
+----------------------------
 
 1) As root, get the necessary tools:
 
@@ -165,7 +166,7 @@ Follow these instructions:
    BUILD_ENV = MinGW
 
 3B) To compile with Visual Studio, make sure you have at least Visual
-   Studio 2012, and adjust the second line of config.inc to say
+   Studio version 12 (2013), and adjust the second line of config.inc to say
 
    BUILD_ENV = MSVC
 

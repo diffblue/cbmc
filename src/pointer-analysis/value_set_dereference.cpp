@@ -714,7 +714,7 @@ void value_set_dereferencet::bounds_check(
 
       if(zero.is_nil())
         throw "no zero constant of index type "+
-          expr.index().type().to_string();
+          expr.index().type().pretty();
 
       binary_relation_exprt
         inequality(expr.index(), ID_lt, zero);

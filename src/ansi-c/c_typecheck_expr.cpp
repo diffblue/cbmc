@@ -62,6 +62,52 @@ void c_typecheck_baset::typecheck_expr(exprt &expr)
 
 /*******************************************************************\
 
+Function: c_typecheck_baset::add_rounding_mode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::add_rounding_mode(exprt &expr)
+{
+  for(auto & op : expr.operands())
+    add_rounding_mode(op);
+
+  if(expr.id()==ID_div ||
+     expr.id()==ID_mult ||
+     expr.id()==ID_plus ||
+     expr.id()==ID_minus)
+  {
+    if(expr.type().id()==ID_floatbv &&
+       expr.operands().size()==2)
+    {
+      // The rounding mode to be used at compile time is non-obvious.
+      // We'll simply use round to even (0), which is suggested
+      // by Sec. F.7.2 Translation, ISO-9899:1999.
+      expr.operands().resize(3);
+
+      if(expr.id()==ID_div)
+        expr.id(ID_floatbv_div);
+      else if(expr.id()==ID_mult)
+        expr.id(ID_floatbv_mult);
+      else if(expr.id()==ID_plus)
+        expr.id(ID_floatbv_plus);
+      else if(expr.id()==ID_minus)
+        expr.id(ID_floatbv_minus);
+      else
+        assert(false);
+
+      expr.op2()=gen_zero(unsigned_int_type());
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: c_typecheck_baset::gcc_types_compatible_p
 
   Inputs:
@@ -846,15 +892,17 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   if(symbol.is_macro)
   {
     // preserve enum key
-    irep_idt base_name=expr.get(ID_C_base_name);
+    //irep_idt base_name=expr.get(ID_C_base_name);
 
     follow_macros(expr);
 
+    #if 0
     if(expr.id()==ID_constant &&
        !base_name.empty())
       expr.set(ID_C_cformat, base_name);
     else
-      typecheck_expr(expr);
+    #endif
+    typecheck_expr(expr);
 
     // preserve location
     expr.add_source_location()=source_location;
@@ -2200,9 +2248,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       symbolt *symbol_ptr;
       move_symbol(new_symbol, symbol_ptr);
 
-      err_location(f_op);
-      error() << "function `" << identifier << "' is not declared" << eom;
-      warning_msg();
+      warning().source_location=f_op.find_source_location();
+      warning() << "function `" << identifier << "' is not declared" << eom;
     }
   }
 
@@ -2434,6 +2481,25 @@ exprt c_typecheck_baset::do_special_functions(
     pointer_object_expr.add_source_location()=source_location;
 
     return pointer_object_expr;
+  }
+  else if(identifier=="__builtin_bswap16" ||
+          identifier=="__builtin_bswap32" ||
+          identifier=="__builtin_bswap64")
+  {
+    typecheck_function_call_arguments(expr);
+
+    if(expr.arguments().size()!=1)
+    {
+      err_location(f_op);
+      error() << identifier << " expects one operand" << eom;
+      throw 0;
+    }
+    
+    exprt bswap_expr(ID_bswap, expr.type());
+    bswap_expr.operands()=expr.arguments();
+    bswap_expr.add_source_location()=source_location;
+    
+    return bswap_expr;
   }
   else if(identifier==CPROVER_PREFIX "isnanf" || 
           identifier==CPROVER_PREFIX "isnand" ||
@@ -2921,9 +2987,8 @@ void c_typecheck_baset::typecheck_function_call_arguments(
          op.get(ID_statement)==ID_assign &&
          op.type().id()!=ID_bool)
       {
-        err_location(expr);
-        str << "assignment where Boolean argument is expected" << eom;
-        warning_msg();
+        warning().source_location=expr.find_source_location();
+        warning() << "assignment where Boolean argument is expected" << eom;
       }
 
       implicit_typecast(op, op_type);
@@ -3365,7 +3430,10 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
       int_op=&op0;
     }
     else
+    {
+      p_op=int_op=nullptr;
       assert(false);
+    }
 
     const typet &int_op_type=follow(int_op->type());
 
@@ -3656,7 +3724,7 @@ void c_typecheck_baset::make_constant(exprt &expr)
   if(!expr.is_constant() &&
      expr.id()!=ID_infinity)
   {
-    err_location(expr.find_source_location());
+    error().source_location=expr.find_source_location();
     error() << "expected constant expression, but got `"
             << to_string(expr) << "'" << eom;
     throw 0;
@@ -3684,7 +3752,7 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
   if(!expr.is_constant() &&
      expr.id()!=ID_infinity)
   {
-    err_location(expr.find_source_location());
+    error().source_location=expr.find_source_location();
     error() << "conversion to integer constant failed" << eom;
     throw 0;
   }

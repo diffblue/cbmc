@@ -19,11 +19,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/java_bytecode_language.h>
 #endif
 
-#include "goto_diff_parse_options.h"
+#include "goto_diff_languages.h"
 
 /*******************************************************************\
 
-Function: goto_diff_parse_optionst::register_languages
+Function: goto_diff_languagest::register_languages
 
   Inputs:
 
@@ -33,7 +33,7 @@ Function: goto_diff_parse_optionst::register_languages
 
 \*******************************************************************/
 
-void goto_diff_parse_optionst::register_languages()
+void goto_diff_languagest::register_languages()
 {
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);

@@ -62,9 +62,15 @@ typet cpp_declaratort::merge_type(const typet &declaration_type) const
       t=declaration_type;
       break;
     }
+    else if(t.id()==ID_merged_type)
+    {
+      // the chain continues with the last one
+      assert(!t.subtypes().empty());
+      p=&t.subtypes().back();
+    }
     else
     {
-      assert(t.id()!="");
+      assert(t.id()!=irep_idt());
       p=&t.subtype();
     }
   }

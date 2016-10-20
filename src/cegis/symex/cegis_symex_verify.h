@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CEGIS_SYMEX_CEGIS_SYMEX_VERIFY_H_
 
 #include <deque>
+#include <util/message.h>
 
 /**
  * @brief
@@ -93,6 +94,17 @@ public:
    * @return <code>true</code> if the last solution holds, <code>false</code> otherwise.
    */
   bool success() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @param counterexample
+   */
+  void show_counterexample(
+      messaget::mstreamt &os,
+      const counterexamplet &counterexample) const;
 };
 
 #include "cegis_symex_verify.inc"

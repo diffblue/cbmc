@@ -1,16 +1,18 @@
 public class monitorenter1
 {
-  public boolean doIt(boolean b)
+  public int doIt(int what)
   {
-    boolean a;
+    int some;
+    
     synchronized(this) {
-      a = !b;
+      some=what;
     }
-    return a;
+
+    return some;
   }
 
   public void test()
   {
-    assert doIt(false);
+    assert doIt(1)==1;
   }
 }

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_UI_LANGUAGE_H
-#define CPROVER_UI_LANGUAGE_H
+#ifndef CPROVER_UI_MESSAGE_H
+#define CPROVER_UI_MESSAGE_H
 
 #include "message.h"
 
@@ -16,12 +16,19 @@ class ui_message_handlert:public message_handlert
 public:
   typedef enum { PLAIN, XML_UI, JSON_UI } uit;
   
-  ui_message_handlert(uit __ui, const std::string &program);   
+  ui_message_handlert(uit, const std::string &program);   
+  ui_message_handlert(const class cmdlinet &, const std::string &program);   
+
   virtual ~ui_message_handlert();
 
-  uit get_ui() const
+  inline uit get_ui() const
   {
     return _ui;
+  }
+
+  inline void set_ui(uit __ui)
+  {
+    _ui=__ui;
   }
 
 protected:

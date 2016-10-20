@@ -32,6 +32,7 @@ Author: Peter Schrammel
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/remove_returns.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -61,7 +62,9 @@ Function: goto_diff_parse_optionst::goto_diff_parse_optionst
 
 goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv):
   parse_options_baset(GOTO_DIFF_OPTIONS, argc, argv),
-  language_uit("GOTO_DIFF " CBMC_VERSION, cmdline)
+  goto_diff_languagest(cmdline, ui_message_handler),
+  ui_message_handler(cmdline, "GOTO-DIFF " CBMC_VERSION),
+  languages2(cmdline, ui_message_handler)
 {
 }
 
@@ -82,7 +85,9 @@ Function: goto_diff_parse_optionst::goto_diff_parse_optionst
   const char **argv,
   const std::string &extra_options):
   parse_options_baset(GOTO_DIFF_OPTIONS+extra_options, argc, argv),
-  language_uit("GOTO_DIFF " CBMC_VERSION, cmdline)
+  goto_diff_languagest(cmdline, ui_message_handler),
+  ui_message_handler(cmdline, "GOTO-DIFF " CBMC_VERSION),
+  languages2(cmdline, ui_message_handler)
 {
 }
 
@@ -308,20 +313,27 @@ int goto_diff_parse_optionst::doit()
   //
   // Print a banner
   //
-  status() << "GOTO_DIFF version " CBMC_VERSION " "
+  status() << "GOTO-DIFF version " CBMC_VERSION " "
            << sizeof(void *)*8 << "-bit "
            << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
-  register_languages();
+  if(cmdline.args.size()!=2)
+  {
+    error() << "Please provide two programs to compare" << eom;
+    return 6;
+  }
 
   goto_modelt goto_model1, goto_model2;
 
-  int get_goto_programs_ret=
-    get_goto_programs(options, goto_model1, goto_model2);
-
-  if(get_goto_programs_ret!=-1)
-    return get_goto_programs_ret;
+  int get_goto_program_ret=
+    get_goto_program(options, *this, goto_model1);
+  if(get_goto_program_ret!=-1)
+    return get_goto_program_ret;
+  get_goto_program_ret=
+    get_goto_program(options, languages2, goto_model2);
+  if(get_goto_program_ret!=-1)
+    return get_goto_program_ret;
 
   if(cmdline.isset("show-goto-functions"))
   {
@@ -330,14 +342,24 @@ int goto_diff_parse_optionst::doit()
     namespacet ns1(goto_model1.symbol_table);
     goto_model1.goto_functions.output(ns1, std::cout);
     std::cout << "*******************************************************\n";
-    namespacet ns2(goto_model1.symbol_table);
+    namespacet ns2(goto_model2.symbol_table);
     goto_model2.goto_functions.output(ns2, std::cout);
     return 0;
   }
 
-  if(cmdline.isset("change-impact"))
+  if(cmdline.isset("change-impact") ||
+     cmdline.isset("forward-impact")||
+	 cmdline.isset("backward-impact"))
   {
-    change_impact(goto_model1, goto_model2);
+    //Workaround to avoid deps not propagating between return and end_func
+    remove_returns(goto_model1);
+    remove_returns(goto_model2);
+
+    impact_modet impact_mode =
+        cmdline.isset("forward-impact") ?
+            FORWARD : (cmdline.isset("backward-impact") ? BACKWARD : BOTH);
+    change_impact(goto_model1, goto_model2, impact_mode,
+          cmdline.isset("compact-output"));
     return 0;
   }
 
@@ -365,7 +387,7 @@ int goto_diff_parse_optionst::doit()
 
 /*******************************************************************\
 
-Function: goto_diff_parse_optionst::get_goto_programs
+Function: goto_diff_parse_optionst::get_goto_program
 
   Inputs:
 
@@ -375,33 +397,54 @@ Function: goto_diff_parse_optionst::get_goto_programs
 
 \*******************************************************************/
 
-int goto_diff_parse_optionst::get_goto_programs(
+int goto_diff_parse_optionst::get_goto_program(
   const optionst &options,
-  goto_modelt &goto_model1,
-  goto_modelt &goto_model2)
+  goto_diff_languagest &languages,
+  goto_modelt &goto_model)
 {
-  if(cmdline.args.size()!=2)
+  status() << "Reading program from `" << cmdline.args[0] << "'" << eom;
+
+  if(is_goto_binary(cmdline.args[0]))
   {
-    error() << "Please provide two programs to compare" << eom;
-    return 6;
+    if(read_goto_binary(cmdline.args[0],
+                        goto_model.symbol_table, goto_model.goto_functions,
+                        languages.get_message_handler()))
+      return 6;
+
+    config.set(cmdline);
+    config.set_from_symbol_table(goto_model.symbol_table);
+
+    // This one is done.
+    cmdline.args.erase(cmdline.args.begin());
   }
+  else
+  {
+    // This is a a workaround to make parse() think that there is only 
+    // one source file.
+    std::string arg2("");
+    if(cmdline.args.size()==2)
+    {
+      arg2 = cmdline.args[1];
+      cmdline.args.erase(--cmdline.args.end());
+    }
 
-  status() << "Reading GOTO program from `" << cmdline.args[0] << "'" << eom;
+    if(languages.parse()) return 6;
+    if(languages.typecheck()) return 6;
+    if(languages.final()) return 6;
 
-  if(read_goto_binary(cmdline.args[0],
-                      goto_model1.symbol_table, goto_model1.goto_functions,
-                      get_message_handler()))
-    throw 0;
+    // we no longer need any parse trees or language files
+    languages.clear_parse();
 
-  status() << "Reading GOTO program from `" << cmdline.args[1] << "'" << eom;
+    status() << "Generating GOTO Program" << eom;
 
-  if(read_goto_binary(cmdline.args[1],
-                      goto_model2.symbol_table, goto_model2.goto_functions,
-                      get_message_handler()))
-    throw 0;
+    goto_model.symbol_table=languages.symbol_table;
+    goto_convert(goto_model.symbol_table, goto_model.goto_functions,
+                 ui_message_handler);
 
-  config.set(cmdline);
-  config.set_from_symbol_table(goto_model2.symbol_table);
+    // if we had a second argument then we will handle it next
+    if(arg2!="")
+      cmdline.args[0]=arg2;
+  }
 
   return -1; // no error, continue
 }
@@ -536,7 +579,10 @@ void goto_diff_parse_optionst::help()
     " --show-functions             show functions (default)\n"
     " --syntactic                  do syntactic diff (default)\n"
     " -u | --unified               output unified diff\n"
-    " --change-impact              output unified diff with dependencies\n"
+    " --change-impact | \n"
+    "  --forward-impact |\n"
+    "  --backward-impact           output unified diff with forward&backward/forward/backward dependencies\n"
+    " --compact-output             output dependencies in compact mode\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

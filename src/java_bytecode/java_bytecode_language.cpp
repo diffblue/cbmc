@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 
 #include "java_bytecode_language.h"
-#include "java_bytecode_convert.h"
+#include "java_bytecode_convert_class.h"
 #include "java_bytecode_internal_additions.h"
 #include "java_bytecode_typecheck.h"
 #include "java_entry_point.h"
@@ -171,7 +171,7 @@ bool java_bytecode_languaget::typecheck(
 
     debug() << "Converting class " << c_it->first << eom;
 
-    if(java_bytecode_convert(
+    if(java_bytecode_convert_class(
          c_it->second, symbol_table, get_message_handler()))
       return true;
   }

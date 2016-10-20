@@ -36,13 +36,6 @@ public:
    * @brief
    *
    * @details
-   */
-  ~target_copy_helpert();
-
-  /**
-   * @brief
-   *
-   * @details
    *
    * @param target
    *

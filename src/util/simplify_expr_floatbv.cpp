@@ -264,7 +264,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         if(dest_type.id()==ID_floatbv) // float to float
         {
           ieee_floatt result(to_constant_expr(op0));
-          result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+          result.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
           result.change_spec(to_floatbv_type(dest_type));
           expr=result.to_expr();
           return false;
@@ -275,7 +275,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
           if(rounding_mode==ieee_floatt::ROUND_TO_ZERO)
           {
             ieee_floatt result(to_constant_expr(op0));
-            result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+            result.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
             mp_integer value=result.to_integer();
             expr=from_integer(value, dest_type);
             return false;
@@ -291,7 +291,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
           if(dest_type.id()==ID_floatbv) // int to float
           {
             ieee_floatt result;
-            result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+            result.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
             result.spec=to_floatbv_type(dest_type);
             result.from_integer(value);
             expr=result.to_expr();
@@ -360,7 +360,7 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
     mp_integer rounding_mode;
     if(!to_integer(op2, rounding_mode))
     {
-      v0.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+      v0.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
       v1.rounding_mode=v0.rounding_mode;
       
       ieee_floatt result=v0;

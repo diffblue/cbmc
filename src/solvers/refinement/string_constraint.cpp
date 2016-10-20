@@ -41,6 +41,11 @@ string_constraintt string_constraintt::forall(const symbol_exprt & univ, const e
   return sc;
 }
 
+string_constraintt string_constraintt::forall(const symbol_exprt & univ, const exprt & bound_sup)
+{
+  return forall(univ,refined_string_typet::index_zero(),bound_sup);
+}
+
 string_constraintt string_constraintt::not_contains(exprt univ_bound_inf, exprt univ_bound_sup, 
 				 exprt premise, exprt exists_bound_inf, 
 				 exprt exists_bound_sup, exprt s0, exprt s1)
@@ -64,4 +69,9 @@ string_constraintt string_constraintt::exists(const symbol_exprt & exist, const 
     (and_exprt(*this, 
 	       and_exprt(binary_relation_exprt(exist, ID_ge, bound_inf),
 			 binary_relation_exprt(exist, ID_lt, bound_sup))));
+}
+
+string_constraintt string_constraintt::exists(const symbol_exprt & univ, const exprt & bound_sup)
+{
+  return exists(univ,refined_string_typet::index_zero(),bound_sup);
 }

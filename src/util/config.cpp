@@ -255,25 +255,25 @@ void configt::ansi_ct::set_arch_spec_i386()
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
+  case flavourt::APPLE:
     defines.push_back("i386");
     defines.push_back("__i386");
     defines.push_back("__i386__");
-    if(os==ost::OS_MACOS)
+    if(mode==flavourt::APPLE)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
 
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_IX86");
     break;
 
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
 
-  case flavourt::NO_MODE:
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -300,26 +300,29 @@ void configt::ansi_ct::set_arch_spec_x86_64()
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
+  case flavourt::APPLE:
     defines.push_back("__LP64__");
     defines.push_back("__x86_64");
     defines.push_back("__x86_64__");
     defines.push_back("_LP64");
     defines.push_back("__amd64__");
     defines.push_back("__amd64");
-    if(os==ost::OS_MACOS)
+    if(mode==flavourt::APPLE)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_X64");
     defines.push_back("_M_AMD64");
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -354,14 +357,14 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
+  case flavourt::APPLE:
     defines.push_back("__powerpc");
     defines.push_back("__powerpc__");
     defines.push_back("__POWERPC__");
     defines.push_back("__ppc__");
 
-    if(os==ost::OS_MACOS)
+    if(mode==flavourt::APPLE)
       defines.push_back("__BIG_ENDIAN__");
 
     if(subarch!="powerpc")
@@ -383,16 +386,16 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
     }
     break;
 
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_PPC");
     break;
 
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
 
-  case flavourt::NO_MODE:
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -428,8 +431,8 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
+  case flavourt::APPLE:
     if(subarch=="arm64")
       defines.push_back("__aarch64__");
     else
@@ -437,14 +440,17 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
     if(subarch=="armhf")
       defines.push_back("__ARM_PCS_VFP");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_ARM");
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -471,18 +477,21 @@ void configt::ansi_ct::set_arch_spec_alpha()
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
     defines.push_back("__alpha__");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_ALPHA");
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::APPLE:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -527,20 +536,23 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
     defines.push_back("__mips__");
     defines.push_back("mips");
     defines.push_back("_MIPS_SZPTR="+i2string(config.ansi_c.pointer_width));
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::APPLE:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -567,18 +579,21 @@ void configt::ansi_ct::set_arch_spec_s390()
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
     defines.push_back("__s390__");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::APPLE:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -604,18 +619,21 @@ void configt::ansi_ct::set_arch_spec_s390x()
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
     defines.push_back("__s390x__");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::APPLE:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -651,20 +669,23 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
     defines.push_back("__sparc__");
     if(subarch=="sparc64")
       defines.push_back("__arch64__");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::APPLE:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -691,20 +712,23 @@ void configt::ansi_ct::set_arch_spec_ia64()
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
     defines.push_back("__ia64__");
     defines.push_back("_IA64");
     defines.push_back("__IA64__");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     defines.push_back("_M_IA64");
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::APPLE:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -733,22 +757,25 @@ void configt::ansi_ct::set_arch_spec_x32()
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
     defines.push_back("__ILP32__");
     defines.push_back("__x86_64");
     defines.push_back("__x86_64__");
     defines.push_back("__amd64__");
     defines.push_back("__amd64");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::APPLE:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -810,18 +837,21 @@ void configt::ansi_ct::set_arch_spec_hppa()
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
     defines.push_back("__hppa__");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::APPLE:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -848,19 +878,22 @@ void configt::ansi_ct::set_arch_spec_sh4()
 
   switch(mode)
   {
-  case flavourt::MODE_GCC_C:
-  case flavourt::MODE_GCC_CPP:
+  case flavourt::GCC:
     defines.push_back("__sh__");
     defines.push_back("__SH4__");
     break;
-  case flavourt::MODE_VISUAL_STUDIO_C_CPP:
+
+  case flavourt::VISUAL_STUDIO:
     assert(false); // not supported by Visual Studio
     break;
-  case flavourt::MODE_CODEWARRIOR_C_CPP:
-  case flavourt::MODE_ARM_C_CPP:
-  case flavourt::MODE_ANSI_C_CPP:
+
+  case flavourt::APPLE:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
     break;
-  case flavourt::NO_MODE:
+
+  case flavourt::NONE:
     assert(false);
   }
 }
@@ -1118,8 +1151,8 @@ bool configt::set(const cmdlinet &cmdline)
     {
       // There are gcc versions that target Windows (MinGW for example),
       // and we support that.
-      ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
-      ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
+      ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
+      ansi_c.mode=ansi_ct::flavourt::GCC;
 
       // enable Cygwin
       #ifdef _WIN32
@@ -1134,14 +1167,14 @@ bool configt::set(const cmdlinet &cmdline)
       // but we recognize the Visual Studio language,
       // which is somewhat inconsistent.
       #ifdef _WIN32
-      ansi_c.preprocessor=ansi_ct::preprocessort::PP_VISUAL_STUDIO;
-      ansi_c.mode=ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
+      ansi_c.preprocessor=ansi_ct::preprocessort::VISUAL_STUDIO;
+      ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
       #elif __FreeBSD__
-      ansi_c.preprocessor=ansi_ct::preprocessort::PP_CLANG;
-      ansi_c.mode=ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
+      ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
+      ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
       #else
-      ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
-      ansi_c.mode=ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP;
+      ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
+      ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
       #endif
     }
   }
@@ -1149,30 +1182,30 @@ bool configt::set(const cmdlinet &cmdline)
   {
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_MACOS;
-    ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+    ansi_c.mode=ansi_ct::flavourt::APPLE;
+    ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
   }
   else if(os=="linux" || os=="solaris")
   {
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
-    ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+    ansi_c.mode=ansi_ct::flavourt::GCC;
+    ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
   }
   else if(os=="freebsd")
   {
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
-    ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::preprocessort::PP_CLANG;
+    ansi_c.mode=ansi_ct::flavourt::GCC;
+    ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
   }
   else
   {
     // give up, but use reasonable defaults
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
-    ansi_c.mode=ansi_ct::flavourt::MODE_GCC_C;
-    ansi_c.preprocessor=ansi_ct::preprocessort::PP_GCC;
+    ansi_c.mode=ansi_ct::flavourt::GCC;
+    ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
   }
 
   set_arch(arch);

@@ -7,7 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
+#include <ostream>
 
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
@@ -141,7 +141,7 @@ void value_set_fit::output(
       }
     }
 
-    out << " } " << std::endl;
+    out << " } \n";
   }
 }
 
@@ -1719,9 +1719,12 @@ void value_set_fit::apply_code(
   else if(statement==ID_fence)
   {
   }
-  else
+  else if(statement==ID_input)
   {
-    std::cerr << code.pretty() << std::endl;
-    throw "value_set_fit: unexpected statement: "+id2string(statement);
+	  // doesn't do anything
   }
+  else
+    throw
+      code.pretty()+"\n"+
+      "value_set_fit: unexpected statement: "+id2string(statement);
 }

@@ -88,8 +88,10 @@ Function: symbolt::to_irep
 
 \*******************************************************************/
 
-void symbolt::to_irep(irept &dest) const
+irept symbolt::to_irep() const
 {
+  irept dest;
+
   dest.clear();
   dest.add(ID_type)=type;
   dest.add(ID_value)=value;
@@ -116,6 +118,8 @@ void symbolt::to_irep(irept &dest) const
   if(is_file_local) dest.set("is_file_local", true);
   if(is_extern) dest.set("is_extern", true);
   if(is_volatile) dest.set("is_volatile", true);       
+
+  return dest;
 }
 
 /*******************************************************************\

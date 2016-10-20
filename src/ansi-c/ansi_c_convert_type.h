@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_CONVERT_TYPE_H
 #define CPROVER_ANSI_C_CONVERT_TYPE_H
 
-#include <util/message_stream.h>
+#include <util/message.h>
 
 #include "c_types.h"
 #include "c_qualifiers.h"
 #include "c_storage_spec.h"
 
-class ansi_c_convert_typet:public message_streamt
+class ansi_c_convert_typet:public messaget
 {
 public:
   unsigned unsigned_cnt, signed_cnt, char_cnt,
@@ -50,7 +50,7 @@ public:
   std::list<typet> other;
   
   ansi_c_convert_typet(message_handlert &_message_handler):
-    message_streamt(_message_handler)
+    messaget(_message_handler)
   {
   }
   

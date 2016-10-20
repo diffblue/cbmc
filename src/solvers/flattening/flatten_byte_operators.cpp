@@ -117,7 +117,10 @@ exprt flatten_byte_extract(
       for(mp_integer i=0; i<num_elements; ++i)
       {
         // the most significant byte comes first in the concatenation!
-        plus_exprt index(first_index, from_integer(i, offset_type));
+        mp_integer index_offset=
+          little_endian?(num_elements-i-1):i;
+        
+        plus_exprt index(first_index, from_integer(index_offset, offset_type));
         concat.copy_to_operands(index_exprt(root, index));
       }
 
@@ -320,7 +323,7 @@ exprt flatten_byte_update(
           t.id()==ID_pointer)
   {
     // do a shift, mask and OR
-    std::size_t width=integer2long(pointer_offset_size(t, ns)*8);
+    std::size_t width=integer2size_t(pointer_offset_size(t, ns)*8);
     
     assert(width!=0);
     

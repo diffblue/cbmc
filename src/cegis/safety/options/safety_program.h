@@ -37,7 +37,7 @@ public:
    *
    * @param other
    */
-  safety_programt(const safety_programt &other);
+  explicit safety_programt(const safety_programt &other);
 
   /**
    * @brief

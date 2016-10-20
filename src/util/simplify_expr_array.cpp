@@ -140,7 +140,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
     else
     {
       // ok
-      exprt tmp=array.operands()[integer2long(i)];
+      exprt tmp=array.operands()[integer2size_t(i)];
       expr.swap(tmp);
       return false;
     }
@@ -161,7 +161,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
     else
     {
       // terminating zero?
-      char v=(i==value.size())?0:value[integer2long(i)];
+      char v=(i==value.size())?0:value[integer2size_t(i)];
       exprt tmp=from_integer(v, expr.type());
       expr.swap(tmp);
       return false;

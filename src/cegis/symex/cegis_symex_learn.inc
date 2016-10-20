@@ -18,7 +18,12 @@ cegis_symex_learnt<preproct, learn_configurationt>::cegis_symex_learnt(
 }
 
 template<class preproct, class learn_configurationt>
-cegis_symex_learnt<preproct, learn_configurationt>::~cegis_symex_learnt()
+cegis_symex_learnt<preproct, learn_configurationt>::cegis_symex_learnt(
+    const optionst &options, preproct &preproc, learn_configurationt &config,
+    const std::function<void(candidatet &)> &default_candidate) :
+    options(options), preproc(preproc), config(config), word_width(
+    CEGIS_DEFAULT_MIN_WORD_WIDTH), current_solution_size(1u), max_solution_size(
+        current_solution_size), default_candidate(default_candidate)
 {
 }
 
@@ -31,8 +36,10 @@ void cegis_symex_learnt<preproct, learn_configurationt>::seed(seedt &seed)
 
 template<class preproct, class learn_configurationt>
 const typename cegis_symex_learnt<preproct, learn_configurationt>::candidatet &cegis_symex_learnt<
-    preproct, learn_configurationt>::next_candidate() const
+    preproct, learn_configurationt>::next_candidate()
 {
+  if (default_candidate)
+    default_candidate(current_candidate);
   return current_candidate;
 }
 
@@ -41,11 +48,11 @@ safety_checkert::resultt cegis_symex_learnt<preproct, learn_configurationt>::run
 {
   const symbol_tablet &st=config.get_symbol_table();
   const goto_functionst &gf=config.get_goto_functions();
-  goto_tracet trace;
-  const safety_checkert::resultt bmc_result=run_cbmc(st, gf, trace);
+  cbmc_resultt result;
+  const safety_checkert::resultt bmc_result=run_cbmc(st, gf, result, options);
   if (safety_checkert::UNSAFE != bmc_result) return bmc_result;
   config.process(counterexamples, current_solution_size);
-  config.convert(current_candidate, trace, current_solution_size);
+  config.convert(current_candidate, result.trace, current_solution_size);
   return safety_checkert::UNSAFE;
 }
 
@@ -70,7 +77,7 @@ bool cegis_symex_learnt<preproct, learn_configurationt>::learn_at_current_size()
   const symbol_tablet &st=config.get_symbol_table();
   const goto_functionst &gf=config.get_goto_functions();
   safety_checkert::resultt full_width_result=safety_checkert::ERROR;
-  goto_tracet full_width_trace;
+  cbmc_resultt full_width_cbmc_result;
   for (; word_width < FULL_WIDTH; word_width*=2)
   {
     config.process(counterexamples, current_solution_size);
@@ -81,15 +88,15 @@ bool cegis_symex_learnt<preproct, learn_configurationt>::learn_at_current_size()
     if (safety_checkert::ERROR == full_width_result)
     {
       config.process(counterexamples, current_solution_size);
-      full_width_result=run_cbmc(st, gf, full_width_trace);
+      full_width_result=run_cbmc(st, gf, full_width_cbmc_result, options);
       if (safety_checkert::UNSAFE != full_width_result) return false;
     }
   }
   config.process(counterexamples, current_solution_size);
   if (safety_checkert::ERROR == full_width_result) full_width_result=
-      run_cbmc(st, gf, full_width_trace);
+      run_cbmc(st, gf, full_width_cbmc_result, options);
   if (safety_checkert::UNSAFE != full_width_result) return false;
-  config.convert(current_candidate, full_width_trace, current_solution_size);
+  config.convert(current_candidate, full_width_cbmc_result.trace, current_solution_size);
   return true;
 }
 

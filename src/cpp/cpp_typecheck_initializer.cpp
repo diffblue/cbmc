@@ -39,9 +39,9 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     if(symbol.value.id()!=ID_type)
     {
-      err_location(symbol.location);
-      str << "expected type as initializer for `"
-          << symbol.base_name << "'";
+      error().source_location=symbol.location;
+      error() << "expected type as initializer for `"
+              << symbol.base_name << "'" << eom;
       throw 0;
     }
 
@@ -56,9 +56,10 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     // do we need one?
     if(is_reference(symbol.type))
     {
-      err_location(symbol.location);
-      str << "`" << symbol.base_name
-          << "' is declared as reference but is not initialized";
+      error().source_location=symbol.location;
+      error() << "`" << symbol.base_name
+              << "' is declared as reference but is not initialized"
+              << eom;
       throw 0;
     }
 
@@ -131,10 +132,10 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       
       if(symbol.type != symbol.value.type())
       {
-        err_location(symbol.location);
-        str << "conversion from `"
-            << to_string(symbol.value.type()) << "' to `"
-            << to_string(symbol.type) << "' ";
+        error().source_location=symbol.location;
+        error() << "conversion from `"
+                << to_string(symbol.value.type()) << "' to `"
+                << to_string(symbol.type) << "' " << eom;
         throw 0;
       }
 
@@ -314,8 +315,8 @@ void cpp_typecheckt::zero_initializer(
   else if(final_type.id()==ID_incomplete_struct ||
           final_type.id()==ID_incomplete_union)
   {
-    err_location(source_location);
-    str << "cannot zero-initialize incomplete compound";
+    error().source_location=source_location;
+    error() << "cannot zero-initialize incomplete compound" << eom;
     throw 0;
   }
   else

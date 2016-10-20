@@ -141,11 +141,9 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
       }
 
       if(array.back().is_object())
-        out << '\n';
+        out << '\n' << std::string(indent*2, ' ');
       else
         out << ' ';
-
-      out << std::string(indent*2, ' ');
     }
 
     out << ']';

@@ -16,15 +16,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 typedef BigInt mp_integer;
 
-std::ostream& operator<<(std::ostream& out, const mp_integer &n);
-mp_integer operator>>(const mp_integer &a, const mp_integer &b);
-mp_integer operator<<(const mp_integer &a, const mp_integer &b);
+std::ostream& operator<<(std::ostream &, const mp_integer &);
+mp_integer operator>>(const mp_integer &, const mp_integer &);
+mp_integer operator<<(const mp_integer &, const mp_integer &);
 
-const std::string integer2string(const mp_integer &n, unsigned base=10);
-const mp_integer string2integer(const std::string &n, unsigned base=10);
-const std::string integer2binary(const mp_integer &n, std::size_t width);
-const mp_integer binary2integer(const std::string &n, bool is_signed);
-mp_integer::ullong_t integer2long(const mp_integer &n);
-unsigned integer2unsigned(const mp_integer &n);
+const std::string integer2string(const mp_integer &, unsigned base=10);
+const mp_integer string2integer(const std::string &, unsigned base=10);
+const std::string integer2binary(const mp_integer &, std::size_t width);
+const mp_integer binary2integer(const std::string &, bool is_signed);
+mp_integer::ullong_t integer2ulong(const mp_integer &);
+std::size_t integer2size_t(const mp_integer &);
+unsigned integer2unsigned(const mp_integer &);
 
 #endif

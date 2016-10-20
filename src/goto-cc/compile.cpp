@@ -736,7 +736,8 @@ Function: compilet::compilet
 \*******************************************************************/
 
 compilet::compilet(cmdlinet &_cmdline):
-  language_uit("goto-cc " CBMC_VERSION, _cmdline),
+  language_uit(_cmdline, ui_message_handler),
+  ui_message_handler(_cmdline, "goto-cc " CBMC_VERSION),
   ns(symbol_table),
   cmdline(_cmdline)
 {

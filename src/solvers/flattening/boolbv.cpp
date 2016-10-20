@@ -720,7 +720,6 @@ Function: boolbvt::boolbv_set_equality_to_true
 
 bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
-
   if(!equality_propagation) return true;
 
   const typet &type=ns.follow(expr.lhs().type());
@@ -762,8 +761,6 @@ Function: boolbvt::set_to
 
 void boolbvt::set_to(const exprt &expr, bool value)
 {
-  
-
   if(expr.type().id()!=ID_bool)
   {
     error() << "boolbvt::set_to got non-boolean operand: "

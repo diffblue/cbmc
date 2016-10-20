@@ -223,7 +223,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     }
     else
     {
-      err_location(type);
+      error().source_location=type.source_location();
       error() << "attribute mode `" << mode
               << "' applied to inappropriate type `"
               << to_string(type) << "'" << eom;
@@ -237,7 +237,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
      type.id()!=ID_pointer &&
      type.id()!=ID_array)
   {
-    err_location(type);
+    error().source_location=type.source_location();
     error() << "only a pointer can be 'restrict'" << eom;
     throw 0;
   }
@@ -269,14 +269,14 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
   mp_integer size_int;
   if(to_integer(size_expr, size_int))
   {
-    err_location(source_location);
+    error().source_location=source_location;
     error() << "failed to convert bit vector width to constant" << eom;
     throw 0;
   }
 
   if(size_int<1)
   {
-    err_location(source_location);
+    error().source_location=source_location;
     error() << "bit vector width invalid" << eom;
     throw 0;
   }
@@ -306,14 +306,14 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(f_expr, f_int))
     {
-      err_location(source_location);
+      error().source_location=source_location;
       error() << "failed to convert number of fraction bits to constant" << eom;
       throw 0;
     }
 
     if(f_int<0 || f_int>size_int)
     {
-      err_location(source_location);
+      error().source_location=source_location;
       error() << "fixedbv fraction width invalid" << eom;
       throw 0;
     }
@@ -337,14 +337,14 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(f_expr, f_int))
     {
-      err_location(source_location);
+      error().source_location=source_location;
       error() << "failed to convert number of fraction bits to constant" << eom;
       throw 0;
     }
 
     if(f_int<1 || f_int+1>=size_int)
     {
-      err_location(source_location);
+      error().source_location=source_location;
       error() << "floatbv fraction width invalid" << eom;
       throw 0;
     }
@@ -455,14 +455,14 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
   
   if(return_type.id()==ID_array)
   {
-    err_location(type);
+    error().source_location=type.source_location();
     error() << "function must not return array" << eom;
     throw 0;
   }
   
   if(return_type.id()==ID_code)
   {
-    err_location(type);
+    error().source_location=type.source_location();
     error() << "function must not return function type" << eom;
     throw 0;
   }
@@ -491,7 +491,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   // we don't allow void as subtype
   if(follow(type.subtype()).id()==ID_empty)
   {
-    err_location(type);
+    error().source_location=type.source_location();
     error() << "array of voids" << eom;
     throw 0;
   }
@@ -507,14 +507,15 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     // We simplify it, for the benefit of array initialisation.
     
     exprt tmp_size=size;
+    add_rounding_mode(tmp_size);
     simplify(tmp_size, *this);
-
+    
     if(tmp_size.is_constant())
     {
       mp_integer s;
       if(to_integer(tmp_size, s))
       {
-        err_location(source_location);
+        error().source_location=source_location;
         error() << "failed to convert constant: "
                 << tmp_size.pretty() << eom;
         throw 0;
@@ -522,7 +523,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
 
       if(s<0)
       {
-        err_location(source_location);
+        error().source_location=source_location;
         error() << "array size must not be negative, "
                    "but got " << s << eom;
         throw 0;
@@ -638,7 +639,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
      subtype.id()!=ID_floatbv &&
      subtype.id()!=ID_fixedbv)
   {
-    err_location(source_location);
+    error().source_location=source_location;
     error() << "cannot make a vector of subtype "
             << to_string(subtype) << eom;
     throw 0;
@@ -649,7 +650,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   mp_integer s;
   if(to_integer(size, s))
   {
-    err_location(source_location);
+    error().source_location=source_location;
     error() << "failed to convert constant: "
             << size.pretty() << eom;
     throw 0;
@@ -657,7 +658,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   if(s<=0)
   {
-    err_location(source_location);
+    error().source_location=source_location;
     error() << "vector size must be positive, "
                "but got " << s << eom;
     throw 0;
@@ -672,7 +673,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   
   if(to_integer(size_expr, sub_size))
   {
-    err_location(source_location);
+    error().source_location=source_location;
     error() << "failed to determine size of vector base type `"
             << to_string(type.subtype()) << "'" << eom;
     throw 0;
@@ -680,7 +681,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   if(sub_size==0)
   {
-    err_location(source_location);
+    error().source_location=source_location;
     error() << "type had size 0: `"
             << to_string(type.subtype()) << "'" << eom;
     throw 0;
@@ -689,7 +690,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   // adjust by width of base type
   if(s%sub_size!=0)
   {
-    err_location(source_location);
+    error().source_location=source_location;
     error() << "vector size (" << s
             << ") expected to be multiple of base type size (" << sub_size
             << ")" << eom;
@@ -808,7 +809,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       }
       else if(have_body)
       {
-        err_location(type);
+        error().source_location=type.source_location();
         error() << "redefinition of body of `"
                 << s_it->second.pretty_name << "'" << eom;
         throw 0;
@@ -888,7 +889,7 @@ void c_typecheck_baset::typecheck_compound_body(
            (new_component.type().id()!=ID_array ||
             !to_array_type(new_component.type()).is_incomplete()))
         {
-          err_location(new_component.type().source_location());
+          error().source_location=new_component.type().source_location();
           error() << "incomplete type not permitted here" << eom;
           throw 0;
         }
@@ -948,7 +949,7 @@ void c_typecheck_baset::typecheck_compound_body(
         // needs to be last member
         if(type.id()==ID_struct && it!=--components.end())
         {
-          err_location(*it);
+          error().source_location=it->source_location();
           error() << "flexible struct member must be last member" << eom;
           throw 0;
         }
@@ -1000,7 +1001,7 @@ void c_typecheck_baset::typecheck_compound_body(
       
       if(assertion.is_false())
       {
-        err_location(*it);
+        error().source_location=it->source_location();
         error() << "failed _Static_assert" << eom;
         throw 0;
       }
@@ -1040,7 +1041,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   // error messages.  
   if(as_expr.operands().empty())
   {
-    err_location(source_location);
+    error().source_location=source_location;
     error() << "empty enum" << eom;
     throw 0;
   }
@@ -1210,14 +1211,14 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       // different types.
       if(!base_name.empty())
       {
-        err_location(type);
+        error().source_location=type.source_location();
         error() << "redeclaration of enum tag" << eom;
         throw 0;
       }
     }
     else
     {
-      err_location(source_location);
+      error().source_location=source_location;
       error() << "use of tag that does not match previous declaration" << eom;
       throw 0;
     }
@@ -1252,7 +1253,7 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
 
   if(type.find(ID_tag).is_nil())
   {
-    err_location(type);
+    error().source_location=type.source_location();
     error() << "anonymous enum tag without members" << eom;
     throw 0;
   }
@@ -1275,7 +1276,7 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     if(symbol.type.id()!=ID_c_enum &&
        symbol.type.id()!=ID_incomplete_c_enum)
     {
-      err_location(source_location);
+      error().source_location=source_location;
       error() << "use of tag that does not match previous declaration" << eom;
       throw 0;
     }
@@ -1331,19 +1332,19 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 
     if(to_integer(width_expr, i))
     {
-      err_location(type);
+      error().source_location=type.source_location();
       error() << "failed to convert bit field width" << eom;
       throw 0;
     }
 
     if(i<0)
     {
-      err_location(type);
+      error().source_location=type.source_location();
       error() << "bit field width is negative" << eom; 
       throw 0;
     }
   
-    type.set_width(integer2long(i));
+    type.set_width(integer2size_t(i));
     type.remove(ID_size);
   }
   
@@ -1372,7 +1373,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 
     if(c_enum_type.id()==ID_incomplete_c_enum)
     {
-      err_location(type);
+      error().source_location=type.source_location();
       error() << "bit field has incomplete enum type" << eom;
       throw 0;
     }
@@ -1381,7 +1382,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
   }
   else
   {
-    err_location(type);
+    error().source_location=type.source_location();
     error() << "bit field with non-integer type: "
             << to_string(subtype) << eom;
     throw 0;
@@ -1389,7 +1390,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 
   if(i>sub_width)
   {
-    err_location(type);
+    error().source_location=type.source_location();
     error() << "bit field (" << i
             << " bits) larger than type (" << sub_width << " bits)"
             << eom;
@@ -1468,7 +1469,7 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
 
   if(s_it==symbol_table.symbols.end())
   {
-    err_location(type);
+    error().source_location=type.source_location();
     error() << "type symbol `" << identifier << "' not found"
             << eom;
     throw 0;
@@ -1478,7 +1479,7 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
 
   if(!symbol.is_type)
   {
-    err_location(type);
+    error().source_location=type.source_location();
     error() << "expected type symbol" << eom;
     throw 0;
   }

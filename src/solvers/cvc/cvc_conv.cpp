@@ -327,8 +327,8 @@ literalt cvc_convt::convert(const exprt &expr)
   if(expr.type().id()!=ID_bool)
   {
     std::string msg="cvc_convt::convert got "
-                    "non-boolean expression:\n";
-    msg+=expr.to_string();
+                    "non-boolean expression: ";
+    msg+=expr.pretty();
     throw msg;
   }
 

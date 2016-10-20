@@ -49,11 +49,6 @@ public:
   
   java_bytecode_parse_treet parse_tree;
 
-  typedef unsigned char u1;
-  typedef unsigned short u2;
-  typedef unsigned int u4;
-  typedef unsigned long long u8;
-  
   struct pool_entryt
   {
     u1 tag;
@@ -124,13 +119,14 @@ protected:
   void rmethod_attribute(methodt &method);
   void rfield_attribute(fieldt &);
   void rcode_attribute(methodt &method);
+  void read_verification_type_info(methodt::verification_type_infot &);
   void rbytecode(methodt::instructionst &);
   void get_class_refs();
   void get_class_refs_rec(const typet &);
   
-  void skip_bytes(unsigned bytes)
+  void skip_bytes(std::size_t bytes)
   {
-    for(unsigned i=0; i<bytes; i++)
+    for(std::size_t i=0; i<bytes; i++)
     {
       if(!*in)
       {
@@ -192,6 +188,16 @@ protected:
 #define CONSTANT_MethodHandle        15
 #define CONSTANT_MethodType          16
 #define CONSTANT_InvokeDynamic       18
+
+#define VTYPE_INFO_TOP         0
+#define VTYPE_INFO_INTEGER     1
+#define VTYPE_INFO_FLOAT       2
+#define VTYPE_INFO_LONG        3
+#define VTYPE_INFO_DOUBLE      4
+#define VTYPE_INFO_ITEM_NULL   5
+#define VTYPE_INFO_UNINIT_THIS 6
+#define VTYPE_INFO_OBJECT      7
+#define VTYPE_INFO_UNINIT      8
 
 /*******************************************************************\
 
@@ -305,7 +311,7 @@ void java_bytecode_parsert::rClassFile()
   
   u2 attributes_count=read_u2();
 
-  for(unsigned j=0; j<attributes_count; j++)
+  for(std::size_t j=0; j<attributes_count; j++)
     rclass_attribute(parsed_class);
 
   get_class_refs();
@@ -359,6 +365,11 @@ void java_bytecode_parsert::get_class_refs()
   {
     typet t=java_type_from_string(m.signature);
     get_class_refs_rec(t);
+    for(const auto & var : m.local_variable_table)
+    {
+      typet var_type=java_type_from_string(var.signature);
+      get_class_refs_rec(var_type);
+    }
   } 
 }
 
@@ -652,7 +663,7 @@ void java_bytecode_parsert::rinterfaces(classt &parsed_class)
 {
   u2 interfaces_count=read_u2();
 
-  for(unsigned i=0; i<interfaces_count; i++)
+  for(std::size_t i=0; i<interfaces_count; i++)
     parsed_class.implements.push_back(constant(read_u2()).type().get(ID_C_base_name));
 }
 
@@ -672,7 +683,7 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
 {
   u2 fields_count=read_u2();
 
-  for(unsigned i=0; i<fields_count; i++)
+  for(std::size_t i=0; i<fields_count; i++)
   {
     fieldt &field=parsed_class.add_field();
     
@@ -686,7 +697,7 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
     field.is_final=(access_flags&ACC_FINAL)!=0;
     field.signature=id2string(pool_entry(descriptor_index).s);
 
-    for(unsigned j=0; j<attributes_count; j++)
+    for(std::size_t j=0; j<attributes_count; j++)
       rfield_attribute(field);
   }
 }
@@ -716,13 +727,12 @@ void java_bytecode_parsert::rbytecode(
   methodt::instructionst &instructions)
 {
   u4 code_length=read_u4();
-  
-  unsigned address;
+  u4 address;
 
   for(address=0; address<code_length; address++)
   {
     bool wide_instruction=false;
-    unsigned start_of_instruction=address;
+    u4 start_of_instruction=address;
     
     u1 bytecode=read_u1();
     
@@ -763,24 +773,24 @@ void java_bytecode_parsert::rbytecode(
       
     case 'b': // a signed byte
       {
-        signed char c=read_u1();
+        s1 c=read_u1();
         instruction.args.push_back(from_integer(c, integer_typet()));
       }
       address+=1;
       
       break;
 
-    case 'o': // two byte branch offset
+    case 'o': // two byte branch offset, signed
       {
-        signed short offset=read_u2();
+        s2 offset=read_u2();
         instruction.args.push_back(from_integer(address+offset, integer_typet()));
       }
       address+=2;
       break;
 
-    case 'O': // four byte branch offset
+    case 'O': // four byte branch offset, signed
       {
-        signed int offset=read_u4();
+        s4 offset=read_u4();
         instruction.args.push_back(from_integer(address+offset, integer_typet()));
       }
       address+=4;
@@ -799,7 +809,7 @@ void java_bytecode_parsert::rbytecode(
       {
         u2 v=read_u2();
         instruction.args.push_back(from_integer(v, integer_typet()));
-        signed short c=read_u2();
+        s2 c=read_u2();
         instruction.args.push_back(from_integer(c, integer_typet()));
         address+=4;
       }
@@ -807,7 +817,7 @@ void java_bytecode_parsert::rbytecode(
       {
         u1 v=read_u1();
         instruction.args.push_back(from_integer(v, integer_typet()));
-        signed char c=read_u1();
+        s1 c=read_u1();
         instruction.args.push_back(from_integer(c, integer_typet()));
         address+=2;
       }
@@ -827,13 +837,13 @@ void java_bytecode_parsert::rbytecode(
       
     case 'L': // lookupswitch
       {
-        unsigned base_offset=address;
+        u4 base_offset=address;
       
         // first a pad to 32-bit align
         while(((address+1)&3)!=0) { read_u1(); address++; }
         
         // now default value
-        signed int default_value=read_u4();
+        s4 default_value=read_u4();
         instruction.args.push_back(from_integer(base_offset+default_value, integer_typet()));
         address+=4;
         
@@ -841,10 +851,10 @@ void java_bytecode_parsert::rbytecode(
         u4 npairs=read_u4();
         address+=4;
         
-        for(unsigned i=0; i<npairs; i++)
+        for(std::size_t i=0; i<npairs; i++)
         {
-          signed int match=read_u4();
-          signed int offset=read_u4();
+          s4 match=read_u4();
+          s4 offset=read_u4();
           instruction.args.push_back(from_integer(match, integer_typet()));
           instruction.args.push_back(from_integer(base_offset+offset, integer_typet()));
           address+=8;
@@ -860,22 +870,22 @@ void java_bytecode_parsert::rbytecode(
         while(((address+1)&3)!=0) { read_u1(); address++; }
         
         // now default value
-        signed int default_value=read_u4();
+        s4 default_value=read_u4();
         instruction.args.push_back(from_integer(base_offset+default_value, integer_typet()));
         address+=4;
         
         // now low value
-        signed int low_value=read_u4();
+        s4 low_value=read_u4();
         address+=4;
         
         // now high value
-        signed int high_value=read_u4();
+        s4 high_value=read_u4();
         address+=4;
 
-        // there are high-low+1 offsets
-        for(signed int i=low_value; i<=high_value; i++)
+        // there are high-low+1 offsets, and they are signed
+        for(s4 i=low_value; i<=high_value; i++)
         {
-          u4 offset=read_u4();
+          s4 offset=read_u4();
           instruction.args.push_back(from_integer(i, integer_typet()));
           instruction.args.push_back(from_integer(base_offset+offset, integer_typet()));
           address+=4;
@@ -915,7 +925,7 @@ void java_bytecode_parsert::rbytecode(
       
     case 's': // a signed short
       {
-        signed short s=read_u2();
+        s2 s=read_u2();
         instruction.args.push_back(from_integer(s, integer_typet()));
       }
       address+=2;
@@ -960,7 +970,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     
     u2 exception_table_length=read_u2();
 
-    for(unsigned e=0; e<exception_table_length; e++)
+    for(std::size_t e=0; e<exception_table_length; e++)
     {
       u2 UNUSED start_pc=read_u2();
       u2 UNUSED end_pc=read_u2();
@@ -970,7 +980,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
 
     u2 attributes_count=read_u2();
     
-    for(unsigned j=0; j<attributes_count; j++)
+    for(std::size_t j=0; j<attributes_count; j++)
       rcode_attribute(method);
       
     irep_idt line_number;
@@ -1041,9 +1051,9 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
 {
   u2 attribute_name_index=read_u2();
   u4 attribute_length=read_u4();
-  
+
   irep_idt attribute_name=pool_entry(attribute_name_index).s;
-  
+
   if(attribute_name=="LineNumberTable")
   {
     // address -> instructiont
@@ -1051,24 +1061,24 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
     instruction_mapt instruction_map;
 
     for(methodt::instructionst::iterator
-        it=method.instructions.begin(); 
+        it=method.instructions.begin();
         it!=method.instructions.end();
         it++)
     {
       instruction_map[it->address]=it;
     }
-  
+
     u2 line_number_table_length=read_u2();
 
-    for(unsigned i=0; i<line_number_table_length; i++)
+    for(std::size_t i=0; i<line_number_table_length; i++)
     {
       u2 start_pc=read_u2();
       u2 line_number=read_u2();
 
-      // annotate the bytecode program      
+      // annotate the bytecode program
       instruction_mapt::const_iterator it=
         instruction_map.find(start_pc);
-      
+
       if(it!=instruction_map.end())
         it->second->source_location.set_line(line_number);
     }
@@ -1076,24 +1086,157 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
   else if(attribute_name=="LocalVariableTable")
   {
     u2 local_variable_table_length=read_u2();
-    
+
     method.local_variable_table.resize(local_variable_table_length);
 
-    for(unsigned i=0; i<local_variable_table_length; i++)
+    for(std::size_t i=0; i<local_variable_table_length; i++)
     {
-      UNUSED u2 start_pc=read_u2();
-      UNUSED u2 length=read_u2();
+      u2 start_pc=read_u2();
+      u2 length=read_u2();
       u2 name_index=read_u2();
       u2 descriptor_index=read_u2();
       u2 index=read_u2();
-      
+
       method.local_variable_table[i].index=index;
       method.local_variable_table[i].name=pool_entry(name_index).s;
       method.local_variable_table[i].signature=id2string(pool_entry(descriptor_index).s);
+      method.local_variable_table[i].start_pc=start_pc;
+      method.local_variable_table[i].length=length;
+    }
+  }
+  else if(attribute_name=="StackMapTable")
+  {
+    u2 stack_map_entries=read_u2();
+
+    method.stack_map_table.resize(stack_map_entries);
+
+    for(size_t i=0; i<stack_map_entries; i++)
+    {
+      u1 frame_type=read_u1();
+      if(0 <= frame_type && frame_type <= 63)
+      {
+        method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME;
+        method.stack_map_table[i].locals.resize(0);
+        method.stack_map_table[i].stack.resize(0);
+      }
+      else if(64 <= frame_type && frame_type <= 127)
+      {
+        method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK;
+        method.stack_map_table[i].locals.resize(0);
+        method.stack_map_table[i].stack.resize(1);
+        methodt::verification_type_infot verification_type_info;
+        read_verification_type_info(verification_type_info);
+        method.stack_map_table[i].stack[0] = verification_type_info;
+      }
+      else if(frame_type == 247)
+      {
+        method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK_EXTENDED;
+        method.stack_map_table[i].locals.resize(0);
+        method.stack_map_table[i].stack.resize(1);
+        methodt::verification_type_infot verification_type_info;
+        u2 offset_delta = read_u2();
+        read_verification_type_info(verification_type_info);
+        method.stack_map_table[i].stack[0] = verification_type_info;
+        method.stack_map_table[i].offset_delta = offset_delta;
+      }
+      else if(248 <= frame_type && frame_type <= 250)
+      {
+        method.stack_map_table[i].type = methodt::stack_map_table_entryt::CHOP;
+        method.stack_map_table[i].locals.resize(0);
+        method.stack_map_table[i].stack.resize(0);
+        u2 offset_delta = read_u2();
+        method.stack_map_table[i].offset_delta = offset_delta;
+      }
+      else if(frame_type == 251)
+      {
+        method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_EXTENDED;
+        method.stack_map_table[i].locals.resize(0);
+        method.stack_map_table[i].stack.resize(0);
+        u2 offset_delta = read_u2();
+        method.stack_map_table[i].offset_delta = offset_delta;
+      }
+      else if(252 <= frame_type && frame_type <= 254)
+      {
+        size_t new_locals = (size_t) (frame_type - 251);
+        method.stack_map_table[i].type = methodt::stack_map_table_entryt::APPEND;
+        method.stack_map_table[i].locals.resize(new_locals);
+        method.stack_map_table[i].stack.resize(0);
+        u2 offset_delta = read_u2();
+        method.stack_map_table[i].offset_delta = offset_delta;
+        for(size_t k = 0; k < new_locals; k++)
+        {
+          method.stack_map_table[i].locals.push_back(methodt::verification_type_infot());
+          methodt::verification_type_infot &v = method.stack_map_table[i].locals.back();
+          read_verification_type_info(v);
+        }
+      }
+      else if(frame_type == 255)
+      {
+        method.stack_map_table[i].type = methodt::stack_map_table_entryt::FULL;
+        u2 offset_delta = read_u2();
+        method.stack_map_table[i].offset_delta = offset_delta;
+        u2 number_locals = read_u2();
+        method.stack_map_table[i].locals.resize(number_locals);
+        for (size_t k = 0; k < (size_t) number_locals; k++)
+        {
+          method.stack_map_table[i].locals.push_back(methodt::verification_type_infot());
+          methodt::verification_type_infot &v = method.stack_map_table[i].locals.back();
+          read_verification_type_info(v);
+        }
+        u2 number_stack_items = read_u2();
+        method.stack_map_table[i].stack.resize(number_stack_items);
+        for (size_t k = 0; k < (size_t) number_stack_items; k++)
+        {
+          method.stack_map_table[i].stack.push_back(methodt::verification_type_infot());
+          methodt::verification_type_infot &v = method.stack_map_table[i].stack.back();
+          read_verification_type_info(v);
+        }
+      }
+      else
+        throw "ERROR: unknown stack frame type encountered";
     }
   }
   else
     skip_bytes(attribute_length);
+}
+
+void java_bytecode_parsert::read_verification_type_info(methodt::verification_type_infot& v)
+{
+  u1 tag = read_u1();
+  switch(tag)
+  {
+  case VTYPE_INFO_TOP:
+    v.type=methodt::verification_type_infot::TOP;
+    break;
+  case VTYPE_INFO_INTEGER:
+    v.type=methodt::verification_type_infot::INTEGER;
+    break;
+  case VTYPE_INFO_FLOAT:
+    v.type=methodt::verification_type_infot::FLOAT;
+    break;
+  case VTYPE_INFO_LONG:
+    v.type=methodt::verification_type_infot::LONG;
+    break;
+  case VTYPE_INFO_DOUBLE:
+    v.type=methodt::verification_type_infot::DOUBLE;
+    break;
+  case VTYPE_INFO_ITEM_NULL:
+    v.type=methodt::verification_type_infot::ITEM_NULL;
+    break;
+  case VTYPE_INFO_UNINIT_THIS:
+    v.type=methodt::verification_type_infot::UNINITIALIZED_THIS;
+    break;
+  case VTYPE_INFO_OBJECT:
+    v.type=methodt::verification_type_infot::OBJECT;
+    v.cpool_index=read_u2();
+    break;
+  case VTYPE_INFO_UNINIT:
+    v.type=methodt::verification_type_infot::UNINITIALIZED;
+    v.offset=read_u2();
+    break;
+  default:
+    throw "ERROR: unknown verification type info encountered";
+  }
 }
 
 /*******************************************************************\
@@ -1213,7 +1356,7 @@ void java_bytecode_parsert::relement_value_pair(
   case '[':
     {
       u2 num_values=read_u2();
-      for(unsigned i=0; i<num_values; i++)
+      for(std::size_t i=0; i<num_values; i++)
       {
         annotationt::element_value_pairt element_value;
         relement_value_pair(element_value); // recursive call
@@ -1301,7 +1444,7 @@ void java_bytecode_parsert::rmethods(classt &parsed_class)
 {
   u2 methods_count=read_u2();
 
-  for(unsigned j=0; j<methods_count; j++)
+  for(std::size_t j=0; j<methods_count; j++)
     rmethod(parsed_class);
 }
 
@@ -1353,7 +1496,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   
   u2 attributes_count=read_u2();
   
-  for(unsigned j=0; j<attributes_count; j++)
+  for(std::size_t j=0; j<attributes_count; j++)
     rmethod_attribute(method);
 }
 

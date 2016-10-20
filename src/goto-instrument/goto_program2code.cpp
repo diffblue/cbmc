@@ -1398,7 +1398,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   if(target->get_target()==next)
   {
     dest.copy_to_operands(code_skipt());
-    return target;
+    // skip over all dead instructions
+    return --next;
   }
 
   goto_programt::const_targett loop_end=loop_last_stack.back().first;

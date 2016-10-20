@@ -360,11 +360,13 @@ inline int fgetc(FILE *stream)
   // it's a byte or EOF (-1)
   __CPROVER_assume(return_value>=-1 && return_value<=255);
 
+  __CPROVER_input("fgetc", return_value);
+  
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(stream, "open"),
                    "fgetc file must be open");
   #endif
-
+  
   return return_value;
 }
 
@@ -388,6 +390,9 @@ inline int getc(FILE *stream)
 
   // It's a byte or EOF, which we fix to -1.
   __CPROVER_assume(return_value>=-1 && return_value<=255);
+  
+  __CPROVER_input("getc", return_value);
+  
   return return_value;
 }
 
@@ -404,6 +409,7 @@ inline int getchar()
   int return_value;
   // it's a byte or EOF
   __CPROVER_assume(return_value>=-1 && return_value<=255);
+  __CPROVER_input("getchar", return_value);
   return return_value;
 }
 
@@ -424,6 +430,8 @@ inline int getw(FILE *stream)
   __CPROVER_assert(__CPROVER_get_must(stream, "open"),
                    "getw file must be open");
   #endif
+
+  __CPROVER_input("getw", return_value);
 
   // it's any int, no restriction
   return return_value;

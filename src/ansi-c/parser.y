@@ -2376,6 +2376,7 @@ gcc_local_label_statement:
             irep_idt id="label-"+id2string(base_name);
             ansi_c_parsert::identifiert &i=PARSER.current_scope().name_map[id];
             i.id_class=ANSI_C_LOCAL_LABEL;
+            i.prefixed_name=PARSER.current_scope().prefix+id2string(id);
             i.base_name=base_name;
           }
 

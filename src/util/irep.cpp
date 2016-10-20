@@ -380,6 +380,23 @@ unsigned int irept::get_unsigned_int(const irep_namet &name) const
 
 /*******************************************************************\
 
+Function: irept::get_size_t
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::size_t irept::get_size_t(const irep_namet &name) const
+{
+  return unsafe_string2size_t(get_string(name));
+}
+
+/*******************************************************************\
+
 Function: irept::get_long_long
 
   Inputs:
@@ -636,46 +653,6 @@ bool full_eq(const irept &i1, const irept &i2)
   }
 
   return true;
-}
-
-/*******************************************************************\
-
-Function: irept::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#include "lispirep.h"
-#include "lispexpr.h"
-
-std::string irept::to_string() const
-{
-  lispexprt lispexpr;
-  irep2lisp(*this, lispexpr);
-  return lispexpr.expr2string();
-}
-
-/*******************************************************************\
-
-Function: operator<<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::ostream& operator<< (std::ostream& out, const irept &irep)
-{
-  out << irep.to_string();
-  return out;
 }
 
 /*******************************************************************\

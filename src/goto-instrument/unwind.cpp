@@ -7,8 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/std_expr.h>
-
+#include <goto-programs/goto_functions.h>
 #include "unwind.h"
+#include "loop_utils.h"
 
 /*******************************************************************\
 
@@ -170,3 +171,61 @@ void unwind(
   // update it all
   goto_program.update();
 }
+
+/*******************************************************************\
+
+Function: goto_unwind
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_unwind(
+  goto_functionst &goto_functions,
+  const unsigned k)
+{
+  // Here we unwind all loops in the program.
+  // Each loop body is simply repeated k times (if condition holds) 
+  Forall_goto_functions(it, goto_functions)
+  {
+    goto_functionst::goto_functiont &goto_function=it->second;
+    if(!goto_function.body_available())
+    {
+      continue;
+    }
+    goto_programt &goto_program=goto_function.body;
+
+    // the unwinding continues until there is no loop in the function
+    while(true)
+    {
+      natural_loops_mutablet natural_loops(goto_program);
+      // if there is no loop anymore in the current function,
+      // then go to the next function for unwinding
+      if(natural_loops.loop_map.size()==0)
+      {
+        break;
+      }
+      typedef const natural_loops_mutablet::natural_loopt loopt;
+      for(natural_loops_mutablet::loop_mapt::const_iterator
+          l_it=natural_loops.loop_map.begin();
+          l_it!=natural_loops.loop_map.end();
+          l_it++)
+      {
+        // save a copy of the loop guard
+        const exprt loop_guard=l_it->first->guard;
+
+        const loopt &loop=l_it->second;
+        assert(!loop.empty());
+        goto_programt::targett loop_exit=get_loop_exit(loop);
+
+        unwind(goto_program, l_it->first, loop_exit, k);
+
+      }
+    }
+  }
+}
+

@@ -648,11 +648,10 @@ Function: symex_target_equationt::convert_assignments
 void symex_target_equationt::convert_assignments(
   decision_proceduret &decision_procedure) const
 {
-  for(SSA_stepst::const_iterator it=SSA_steps.begin();
-      it!=SSA_steps.end(); it++)
+  for(const auto & it : SSA_steps)
   {
-    if(it->is_assignment() && !it->ignore)
-      decision_procedure.set_to_true(it->cond_expr);
+    if(it.is_assignment() && !it.ignore)
+      decision_procedure.set_to_true(it.cond_expr);
   }
 }
 
@@ -671,14 +670,13 @@ Function: symex_target_equationt::convert_decls
 void symex_target_equationt::convert_decls(
   prop_convt &prop_conv) const
 {
-  for(SSA_stepst::const_iterator it=SSA_steps.begin();
-      it!=SSA_steps.end(); it++)
+  for(const auto & it : SSA_steps)
   {
-    if(it->is_decl() && !it->ignore)
+    if(it.is_decl() && !it.ignore)
     {
       // The result is not used, these have no impact on
       // the satisfiability of the formula.
-      prop_conv.convert(it->cond_expr);
+      prop_conv.convert(it.cond_expr);
     }
   }
 }
@@ -698,13 +696,12 @@ Function: symex_target_equationt::convert_guards
 void symex_target_equationt::convert_guards(
   prop_convt &prop_conv)
 {
-  for(SSA_stepst::iterator it=SSA_steps.begin();
-      it!=SSA_steps.end(); it++)
+  for(auto & it : SSA_steps)
   {
-    if(it->ignore)
-      it->guard_literal=const_literal(false);
+    if(it.ignore)
+      it.guard_literal=const_literal(false);
     else
-      it->guard_literal=prop_conv.convert(it->guard);
+      it.guard_literal=prop_conv.convert(it.guard);
   }
 }
 
@@ -723,15 +720,14 @@ Function: symex_target_equationt::convert_assumptions
 void symex_target_equationt::convert_assumptions(
   prop_convt &prop_conv)
 {
-  for(SSA_stepst::iterator it=SSA_steps.begin();
-      it!=SSA_steps.end(); it++)
+  for(auto & it : SSA_steps)
   {
-    if(it->is_assume())
+    if(it.is_assume())
     {
-      if(it->ignore)
-        it->cond_literal=const_literal(true);
+      if(it.ignore)
+        it.cond_literal=const_literal(true);
       else
-        it->cond_literal=prop_conv.convert(it->cond_expr);
+        it.cond_literal=prop_conv.convert(it.cond_expr);
     }
   }
 }
@@ -751,15 +747,14 @@ Function: symex_target_equationt::convert_goto_instructions
 void symex_target_equationt::convert_goto_instructions(
   prop_convt &prop_conv)
 {
-  for(SSA_stepst::iterator it=SSA_steps.begin();
-      it!=SSA_steps.end(); it++)
+  for(auto & it : SSA_steps)
   {
-    if(it->is_goto())
+    if(it.is_goto())
     {
-      if(it->ignore)
-        it->cond_literal=const_literal(true);
+      if(it.ignore)
+        it.cond_literal=const_literal(true);
       else
-        it->cond_literal=prop_conv.convert(it->cond_expr);
+        it.cond_literal=prop_conv.convert(it.cond_expr);
     }
   }
 }
@@ -779,16 +774,14 @@ Function: symex_target_equationt::convert_constraints
 void symex_target_equationt::convert_constraints(
   decision_proceduret &decision_procedure) const
 {
-  for(SSA_stepst::const_iterator it=SSA_steps.begin();
-      it!=SSA_steps.end();
-      it++)
+  for(const auto & it : SSA_steps)
   {
-    if(it->is_constraint())
+    if(it.is_constraint())
     {
-      if(it->ignore)
+      if(it.ignore)
         continue;
 
-      decision_procedure.set_to_true(it->cond_expr);
+      decision_procedure.set_to_true(it.cond_expr);
     }
   }
 }
@@ -818,17 +811,16 @@ void symex_target_equationt::convert_assertions(
 
   if(number_of_assertions==1)
   {
-    for(SSA_stepst::iterator it=SSA_steps.begin();
-        it!=SSA_steps.end(); it++)
+    for(auto & it : SSA_steps)
     {
-      if(it->is_assert())
+      if(it.is_assert())
       {
-        prop_conv.set_to_false(it->cond_expr);
-        it->cond_literal=const_literal(false);
+        prop_conv.set_to_false(it.cond_expr);
+        it.cond_literal=const_literal(false);
         return; // prevent further assumptions!
       }
-      else if(it->is_assume())
-        prop_conv.set_to_true(it->cond_expr);
+      else if(it.is_assume())
+        prop_conv.set_to_true(it.cond_expr);
     }
 
     assert(false); // unreachable
@@ -841,30 +833,29 @@ void symex_target_equationt::convert_assertions(
 
   exprt assumption=true_exprt();
 
-  for(SSA_stepst::iterator it=SSA_steps.begin();
-      it!=SSA_steps.end(); it++)
+  for(auto & it : SSA_steps)
   {
-    if(it->is_assert())
+    if(it.is_assert())
     {
       implies_exprt implication(
         assumption,
-        it->cond_expr);
+        it.cond_expr);
       
       // do the conversion
-      it->cond_literal=prop_conv.convert(implication);
+      it.cond_literal=prop_conv.convert(implication);
 
       // store disjunct
-      disjuncts.push_back(literal_exprt(!it->cond_literal));
+      disjuncts.push_back(literal_exprt(!it.cond_literal));
     }
-    else if(it->is_assume())
+    else if(it.is_assume())
     {
       // the assumptions have been converted before
       // avoid deep nesting of ID_and expressions
       if(assumption.id()==ID_and)
-        assumption.copy_to_operands(literal_exprt(it->cond_literal));
+        assumption.copy_to_operands(literal_exprt(it.cond_literal));
       else
         assumption=
-          and_exprt(assumption, literal_exprt(it->cond_literal));
+          and_exprt(assumption, literal_exprt(it.cond_literal));
     }
   }
 
@@ -889,20 +880,16 @@ void symex_target_equationt::convert_io(
 {
   unsigned io_count=0;
 
-  for(SSA_stepst::iterator it=SSA_steps.begin();
-      it!=SSA_steps.end(); it++)
-    if(!it->ignore)
+  for(auto & it : SSA_steps)
+    if(!it.ignore)
     {
-      for(std::list<exprt>::const_iterator
-          o_it=it->io_args.begin();
-          o_it!=it->io_args.end();
-          o_it++)
+      for(const auto & o_it : it.io_args)
       {
-        exprt tmp=*o_it;
+        exprt tmp=o_it;
         
         if(tmp.is_constant() ||
            tmp.id()==ID_string_constant)
-          it->converted_io_args.push_back(tmp);
+          it.converted_io_args.push_back(tmp);
         else
         {
           symbol_exprt symbol;
@@ -913,7 +900,7 @@ void symex_target_equationt::convert_io(
           merge_irep(eq);
 
           dec_proc.set_to(eq, true);
-          it->converted_io_args.push_back(symbol);
+          it.converted_io_args.push_back(symbol);
         }
       }
     }
@@ -943,11 +930,9 @@ void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
 
   merge_irep(SSA_step.cond_expr);
 
-  for(std::list<exprt>::iterator
-      it=SSA_step.io_args.begin();
-      it!=SSA_step.io_args.end();
-      ++it)
-    merge_irep(*it);
+  for(auto & it : SSA_step.io_args)
+    merge_irep(it);
+
   // converted_io_args is merged in convert_io
 }
 
@@ -965,13 +950,10 @@ Function: symex_target_equationt::output
 
 void symex_target_equationt::output(std::ostream &out) const
 {
-  for(SSA_stepst::const_iterator
-      it=SSA_steps.begin();
-      it!=SSA_steps.end();
-      it++)
+  for(const auto & it : SSA_steps)
   {
-    it->output(ns, out);    
-    out << "--------------" << std::endl;
+    it.output(ns, out);    
+    out << "--------------\n";
   }
 }
 
