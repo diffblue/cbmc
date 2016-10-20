@@ -49,9 +49,9 @@ public:
     remaining_vccs(0),
     constant_propagation(true),
     new_symbol_table(_new_symbol_table),
+    mode(),
     ns(_ns),
     target(_target),
-    mode(),
     atomic_section_counter(0),
     guard_identifier("goto_symex::\\guard")
   {
