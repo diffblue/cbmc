@@ -13,12 +13,12 @@ Date:   September 2016
 #define CPROVER_PASS_PREPROCESS_H
 
 #include <goto-programs/goto_model.h>
-#include <util/message.h>
+#include <util/ui_message.h>
 
 class pass_preprocesst:public messaget
 {
  public:
-  pass_preprocesst(symbol_tablet &, goto_functionst &, const namespacet &);
+  pass_preprocesst(symbol_tablet &, goto_functionst &, const namespacet &, message_handlert &);
   
  private:
   symbol_tablet & symbol_table;

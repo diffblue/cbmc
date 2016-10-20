@@ -55,29 +55,44 @@ void pass_preprocesst::make_array_function
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
   // replace "lhs=s.toCharArray()" by "lhs=MALLOC(struct java::array[char],s->length)"
+
+  if(function_call.lhs().type().id()!=ID_pointer)
+  {
+    debug() << "the function call should return a pointer" << eom;
+  }
+
   // we produce a malloc side-effect, which stays
-  typet object_type = function_call.type();
+  typet object_type = function_call.lhs().type().subtype();
   exprt object_size = size_of_expr(object_type, ns);
+  debug() << "doing malloc of size " << object_size.pretty()
+	  << " for type " << object_type.pretty() << eom;
+
 
   if(object_size.is_nil())
   {
-    error().source_location=function_call.lhs().find_source_location();
-    error() << "do_java_new got nil object_size" << eom;
-    throw 0;
+    debug() << "do_java_new got nil object_size" << eom;
   }
 
   side_effect_exprt malloc_expr(ID_malloc);
   malloc_expr.copy_to_operands(object_size);
+  debug() << "object size moved to operands" << eom;
   malloc_expr.type()=pointer_typet(object_type);
+  malloc_expr.add_source_location()=function_call.source_location();
 
   //i_it = goto_program.insert_after(i_it);
   //i_it->make_assignment();
   //i_it->code=assignment2;
   //goto_programt::targett t_n=i_it.add_instruction(ASSIGN);
+  debug() << "making assignement for "  << function_call.lhs().pretty() << " <- " << malloc_expr.pretty() << eom;
   i_it->make_assignment();
-  i_it->code=code_assignt(function_call.lhs(), malloc_expr);
+  debug() << "assign code : " << eom;
+  symbol_exprt lhs("tmp_assign",object_type);
+  code_assignt assign(lhs, malloc_expr);
+  debug() << assign.pretty()<< eom;
+  i_it->code=assign;
+  debug() << "location" << eom;
   i_it->source_location=function_call.source_location();
-  
+  debug() << "finished" << eom;
 }
 
 void pass_preprocesst::make_string_function_of_assign(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
@@ -212,8 +227,6 @@ void pass_preprocesst::replace_string_calls
 	else if(string_function_calls.find(function_id) != string_function_calls.end()) 
 	  make_string_function_call(i_it, string_function_calls[function_id]);
 
-	// Warning: this serie of tests should be reimplemented using a
-	// map<irep_idt,irep_idt>
 	else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
 	  make_array_function(i_it,cprover_string_to_char_array_func);
 
@@ -258,8 +271,8 @@ exprt pass_preprocesst::replace_string_literals(const exprt & expr)
 }
 
 
- pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_functionst & _goto_functions, const namespacet & _ns)
-   : symbol_table(_symbol_table),goto_functions(_goto_functions), ns(_ns)
+pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_functionst & _goto_functions, const namespacet & _ns, message_handlert &_message_handler):
+  messaget(_message_handler), symbol_table(_symbol_table),goto_functions(_goto_functions), ns(_ns)
  {
 
    // initialiasing the function maps
