@@ -214,16 +214,12 @@ void pass_preprocesst::replace_string_calls
 	   ) {
 	  make_string_function(i_it,cprover_string_char_at_func);
 
-	} else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) {
+	} else if(string_functions.find(function_id) != string_functions.end())
+	  make_string_function(i_it,string_function[function_id]);
+	else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
 	  make_array_function(i_it,cprover_string_to_char_array_func);
-	} else if(string_functions.find(function_id) != string_functions.end()) 
-	  {
-	    make_string_function(i_it,string_function[function_id]);
-	  }
-	} else if(side_effect_functions.find(function_id) != side_effect_functions.end()) 
-	  {
-	    make_string_function_side_effect(goto_program, i_it,side_effect_functions[function_id]);
-	  }
+	else if(side_effect_functions.find(function_id) != side_effect_functions.end()) 
+	  make_string_function_side_effect(goto_program, i_it,side_effect_functions[function_id]);
 	else if(function_id == irep_idt
 		("java::java.lang.String.<init>:(Ljava/lang/String;)V")
 		|| function_id == irep_idt
@@ -339,34 +335,27 @@ exprt pass_preprocesst::replace_string_literals(const exprt & expr)
    string_functions[irep_idt("java::java.lang.String.lastIndexOf:(Ljava/lang/String;)I")]=cprover_string_last_index_of_func;
    string_functions[irep_idt("java::java.lang.String.lastIndexOf:(Ljava/lang/String;I)I")]=cprover_string_last_index_of_func;
    string_functions[irep_idt("java::java.lang.String.concat:(Ljava/lang/String;)Ljava/lang/String;")] = cprover_string_concat_func;
- string_functions[irep_idt("java::java.lang.String.length:()I")] = cprover_string_length_func;
- string_functions[irep_idt("java::java.lang.StringBuilder.length:()I")] = cprover_string_length_func;
- string_functions[irep_idt("java::java.lang.String.equals:(Ljava/lang/Object;)Z")] =
-	  make_st cprover_string_equal_func;
- string_functions[irep_idt("java::java.lang.String.equalsIgnoreCase:(Ljava/lang/String;)Z")] = cprover_string_equals_ignore_case_func;
- } else if(function_id == irep_idt
-		  ("java::java.lang.String.startsWith:(Ljava/lang/String;)Z")
-		  || function_id == irep_idt
-		  ("java::java.lang.String.startsWith:(Ljava/lang/String;I)Z")
-		  ) {
-	  make_string_function(i_it,cprover_string_startswith_func);
- string_functions[irep_idt("java::java.lang.String.endsWith:(Ljava/lang/String;)Z")] = cprover_string_endswith_func;
- string_functions[irep_idt("java::java.lang.String.substring:(II)Ljava/lang/String;")] = cprover_string_substring_func;
- } else if(function_id == irep_idt("java::java.lang.String.substring:(II)Ljava/lang/String;")
-		  || function_id == irep_idt("java::java.lang.String.substring:(I)Ljava/lang/String;")
-		  || function_id == irep_idt("java::java.lang.StringBuilder.substring:(II)Ljava/lang/String;")
-		  || function_id == irep_idt("java::java.lang.StringBuilder.substring:(I)Ljava/lang/String;")
-		  || function_id == irep_idt("java::java.lang.String.subSequence:(II)Ljava/lang/CharSequence;")
-		  ) {
-	  make_string_function(i_it,cprover_string_substring_func);
- string_functions[irep_idt("java::java.lang.String.trim:()Ljava/lang/String;")] = cprover_string_trim_func;
- string_functions[irep_idt("java::java.lang.String.toLowerCase:()Ljava/lang/String;")] = cprover_string_to_lower_case_func;
- string_functions[irep_idt("java::java.lang.String.toUpperCase:()Ljava/lang/String;")] = cprover_string_to_upper_case_func;
- string_functions[irep_idt("java::java.lang.String.replace:(CC)Ljava/lang/String;")] = cprover_string_replace_func;
- string_functions[irep_idt("java::java.lang.String.contains:(Ljava/lang/CharSequence;)Z")] = cprover_string_contains_func;
- string_functions[irep_idt("java::java.lang.String.compareTo:(Ljava/lang/String;)I")] = cprover_string_compare_to_func;
- string_functions[irep_idt("java::java.lang.String.intern:()Ljava/lang/String;")] = cprover_string_intern_func;
- string_functions[irep_idt("java::java.lang.String.isEmpty:()Z")] = cprover_string_is_empty_func;
+   string_functions[irep_idt("java::java.lang.String.length:()I")] = cprover_string_length_func;
+   string_functions[irep_idt("java::java.lang.StringBuilder.length:()I")] = cprover_string_length_func;
+   string_functions[irep_idt("java::java.lang.String.equals:(Ljava/lang/Object;)Z")] = cprover_string_equal_func;
+   string_functions[irep_idt("java::java.lang.String.equalsIgnoreCase:(Ljava/lang/String;)Z")] = cprover_string_equals_ignore_case_func;
+   string_functions[irep_idt("java::java.lang.String.startsWith:(Ljava/lang/String;)Z")] = cprover_string_startswith_func;
+   string_functions[irep_idt ("java::java.lang.String.startsWith:(Ljava/lang/String;I)Z")] = cprover_string_startswith_func;
+   string_functions[irep_idt("java::java.lang.String.endsWith:(Ljava/lang/String;)Z")] = cprover_string_endswith_func;
+   string_functions[irep_idt("java::java.lang.String.substring:(II)Ljava/lang/String;")] = cprover_string_substring_func;
+   string_functions[irep_idt("java::java.lang.String.substring:(II)Ljava/lang/String;")] = cprover_string_substring_func;
+   string_functions[irep_idt("java::java.lang.String.substring:(I)Ljava/lang/String;")] = cprover_string_substring_func;
+   string_functions[irep_idt("java::java.lang.StringBuilder.substring:(II)Ljava/lang/String;")] = cprover_string_substring_func;
+   string_functions[irep_idt("java::java.lang.StringBuilder.substring:(I)Ljava/lang/String;")] = cprover_string_substring_func;
+   string_functions[irep_idt("java::java.lang.String.subSequence:(II)Ljava/lang/CharSequence;")] = cprover_string_substring_func;
+   string_functions[irep_idt("java::java.lang.String.trim:()Ljava/lang/String;")] = cprover_string_trim_func;
+   string_functions[irep_idt("java::java.lang.String.toLowerCase:()Ljava/lang/String;")] = cprover_string_to_lower_case_func;
+   string_functions[irep_idt("java::java.lang.String.toUpperCase:()Ljava/lang/String;")] = cprover_string_to_upper_case_func;
+   string_functions[irep_idt("java::java.lang.String.replace:(CC)Ljava/lang/String;")] = cprover_string_replace_func;
+   string_functions[irep_idt("java::java.lang.String.contains:(Ljava/lang/CharSequence;)Z")] = cprover_string_contains_func;
+   string_functions[irep_idt("java::java.lang.String.compareTo:(Ljava/lang/String;)I")] = cprover_string_compare_to_func;
+   string_functions[irep_idt("java::java.lang.String.intern:()Ljava/lang/String;")] = cprover_string_intern_func;
+   string_functions[irep_idt("java::java.lang.String.isEmpty:()Z")] = cprover_string_is_empty_func;
  
 
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")] = cprover_string_concat_func;
