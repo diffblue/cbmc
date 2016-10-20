@@ -97,6 +97,7 @@ literalt string_refinementt::convert_rest(const exprt &expr)
 
 bvt string_refinementt::convert_pointer_type(const exprt &expr)
 {  
+  /*
   if(expr.id()==ID_function_application)
     {
       assert(false); // can this occur?
@@ -123,10 +124,12 @@ bvt string_refinementt::convert_pointer_type(const exprt &expr)
 	    return convert_bv(typecast_exprt(op,unsignedbv_typet(64)));
 	  }
       }
-    else{
-      return SUB::convert_pointer_type(expr);
-    }
+    else
+  */
+  {
+    return SUB::convert_pointer_type(expr);
   }
+  //}
 }
 
 bvt string_refinementt::convert_symbol(const exprt &expr)

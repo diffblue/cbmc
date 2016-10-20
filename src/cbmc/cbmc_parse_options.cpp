@@ -920,7 +920,7 @@ bool cbmc_parse_optionst::process_goto_program(
 
     if(cmdline.isset("pass")) {
       status() << "PASS Preprocessing " << eom;
-      pass_preprocess(symbol_table, goto_functions);
+      pass_preprocesst(symbol_table, goto_functions,ns);
     }
 
     // remove returns, gcc vectors, complex
