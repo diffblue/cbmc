@@ -31,6 +31,9 @@ constant_exprt string_constraint_generatort::constant_char(int i)
 constant_exprt string_constraint_generatort::constant_unsigned(int i, size_t width)
 { return constant_exprt(integer2binary(i,width),unsignedbv_typet(width)); }
 
+constant_exprt string_constraint_generatort::constant_signed(int i, size_t width)
+{ return constant_exprt(integer2binary(i,width),signedbv_typet(width)); }
+
 void string_constraint_generatort::check_char_type(const exprt & str) 
 {
   if(language == C)
@@ -80,7 +83,6 @@ symbol_exprt string_constraint_generatort::fresh_boolean(const irep_idt &prefix)
   boolean_symbols.push_back(b);
   return b;
 }
-
 
 
 string_exprt string_constraint_generatort::string_of_expr(const exprt & unrefined_string)
@@ -165,7 +167,8 @@ string_exprt string_constraint_generatort::string_of_symbol(const symbol_exprt &
 }  
 
 
-exprt string_constraint_generatort::function_application(const function_application_exprt & expr)
+exprt string_constraint_generatort::function_application
+(const function_application_exprt & expr)
 {
   const exprt &name = expr.function();
   assert(name.id() == ID_symbol);
@@ -894,7 +897,9 @@ string_exprt string_constraint_generatort::code_point(const exprt &code_point)
 {
   string_exprt res(get_char_type());
   typet type = code_point.type();
-  binary_relation_exprt small(code_point,ID_lt,constant_unsigned(0x010000,32));
+  assert(type.id() == ID_signedbv);
+  size_t width = to_bitvector_type(type).get_width();
+  binary_relation_exprt small(code_point,ID_lt,constant_signed(0x010000,width));
   axioms.emplace_back(small, res.has_length(1));
   axioms.emplace_back(not_exprt(small),res.has_length(2));
   axioms.emplace_back(small,equal_exprt(res[0],typecast_exprt(code_point,get_char_type())));
@@ -903,15 +908,15 @@ string_exprt string_constraint_generatort::code_point(const exprt &code_point)
 		      equal_exprt
 		      (res[0],
 		       typecast_exprt
-		       (plus_exprt(constant_unsigned(0xD800,32),
-				   div_exprt(minus_exprt(code_point,constant_unsigned(0x010000,32)),constant_unsigned(0x0400,32))),
+		       (plus_exprt(constant_signed(0xD800,width),
+				   div_exprt(minus_exprt(code_point,constant_signed(0x010000,width)),constant_signed(0x0400,width))),
 			get_char_type())));
   axioms.emplace_back(not_exprt(small),
 		      equal_exprt
 		      (res[1],
 		       typecast_exprt
-		       (plus_exprt(constant_unsigned(0xDC00,32),
-				   mod_exprt(code_point,constant_unsigned(0x0400,32))),
+		       (plus_exprt(constant_signed(0xDC00,width),
+				   mod_exprt(code_point,constant_signed(0x0400,width))),
 			get_char_type())));
   return res;
 }
@@ -1550,8 +1555,8 @@ exprt string_constraint_generatort::string_parse_int
   exprt zero_char = constant_char(48);
   exprt minus_char = constant_char(45);
   exprt plus_char = constant_char(43);
-  // Not sure about the size
-  size_t width = 64;
+  assert(type.id() == ID_signedbv);
+  size_t width = to_bitvector_type(type).get_width();
   constant_exprt ten(integer2binary(10,width),type);
   
   exprt chr = str[0];
@@ -1599,29 +1604,27 @@ exprt string_constraint_generatort::is_low_surrogate(const exprt & chr)
 exprt string_constraint_generatort::string_code_point_at
 ( const function_application_exprt &f)
 {
-  const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 2);
   typet return_type = f.type();
-  string_exprt str = string_of_expr(args[0]);
+  string_exprt str = string_of_expr(args(f,2)[0]);
+  exprt pos = args(f,2)[1];
   symbol_exprt result = string_exprt::fresh_symbol("char",return_type);
+  assert(return_type.id() == ID_signedbv);
+  size_t width = to_bitvector_type(return_type).get_width();
 
-  exprt char1_as_int = typecast_exprt(str[args[1]],return_type);
-  exprt char2_as_int = typecast_exprt(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))],return_type);
-
-  // Not sure about the width
-  size_t width = 64;
-
+  exprt char1_as_int = typecast_exprt(str[pos],return_type);
+  exprt char2_as_int = typecast_exprt(str[plus_exprt(pos,refined_string_typet::index_of_int(1))],return_type);
+  
   exprt pair_value = 
     plus_exprt
-    (constant_unsigned(0x010000,width),
+    (constant_signed(0x010000,width),
      (plus_exprt
       (mult_exprt
-       (mod_exprt(char1_as_int,constant_unsigned(0x0800,width)),
-	constant_unsigned(0x0400,width)),
-       mod_exprt(char2_as_int,constant_unsigned(0x0400,width)))));
+       (mod_exprt(char1_as_int,constant_signed(0x0800,width)),
+	constant_signed(0x0400,width)),
+       mod_exprt(char2_as_int,constant_signed(0x0400,width)))));
   
-  exprt return_pair = and_exprt(is_high_surrogate(str[args[1]]),
-				is_low_surrogate(str[plus_exprt(args[1],refined_string_typet::index_of_int(1))]));
+  exprt return_pair = and_exprt(is_high_surrogate(str[pos]),
+				is_low_surrogate(str[plus_exprt(pos,refined_string_typet::index_of_int(1))]));
 
   axioms.emplace_back(return_pair,equal_exprt(result,pair_value));
   axioms.emplace_back(not_exprt(return_pair), equal_exprt(result,char1_as_int));
@@ -1642,17 +1645,17 @@ exprt string_constraint_generatort::string_code_point_before
   exprt char2 = str[minus_exprt(args[1],refined_string_typet::index_of_int(1))];
   exprt char2_as_int = typecast_exprt(char2,return_type);
 
-  // Not sure about the width
-  size_t width = 64;
+  assert(return_type.id() == ID_signedbv);
+  size_t width = to_bitvector_type(return_type).get_width();
 
   exprt pair_value = 
     plus_exprt
-    (constant_unsigned(0x010000,width),
+    (constant_signed(0x010000,width),
      (plus_exprt
       (mult_exprt
-       (mod_exprt(char1_as_int,constant_unsigned(0x0800,width)),
-	constant_unsigned(0x0400,width)),
-       mod_exprt(char2_as_int,constant_unsigned(0x0400,width)))));
+       (mod_exprt(char1_as_int,constant_signed(0x0800,width)),
+	constant_signed(0x0400,width)),
+       mod_exprt(char2_as_int,constant_signed(0x0400,width)))));
   
   exprt return_pair = and_exprt(is_high_surrogate(char1),is_low_surrogate(char2));
 
@@ -1665,11 +1668,9 @@ exprt string_constraint_generatort::string_code_point_before
 exprt string_constraint_generatort::string_code_point_count
 ( const function_application_exprt &f)
 {
-  const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 3);
-  string_exprt str = string_of_expr(args[0]);
-  exprt begin = args[1];
-  exprt end = args[2];
+  string_exprt str = string_of_expr(args(f,3)[0]);
+  exprt begin = args(f,3)[1];
+  exprt end = args(f,3)[2];
   typet return_type = f.type();
   symbol_exprt result = string_exprt::fresh_symbol("code_point_count",return_type);
   exprt length = minus_exprt(end,begin);
@@ -1682,11 +1683,9 @@ exprt string_constraint_generatort::string_code_point_count
 exprt string_constraint_generatort::string_offset_by_code_point
 ( const function_application_exprt &f)
 {
-  const function_application_exprt::argumentst &args = f.arguments();
-  assert(args.size() == 3);
-  string_exprt str = string_of_expr(args[0]);
-  exprt index = args[1];
-  exprt offset = args[2];
+  string_exprt str = string_of_expr(args(f,3)[0]);
+  exprt index = args(f,3)[1];
+  exprt offset = args(f,3)[2];
   typet return_type = f.type();
   symbol_exprt result = string_exprt::fresh_symbol("offset_by_code_point",return_type);
   exprt minimum = plus_exprt(index,plus_exprt(index,offset));
@@ -1729,31 +1728,36 @@ exprt string_constraint_generatort::string_compare_to
   // || (|s1| < |s2| && x = |s1|) || (|s1| > |s2| && x = |s2|) && res = |s1| - |s2|
   // && forall i < x. res != 0 => s1[i] = s2[i]
 
-  // Not sure about the width
-  size_t width = 64;
+  assert(return_type.id() == ID_signedbv);
+  size_t width = to_bitvector_type(return_type).get_width();
 
   symbol_exprt i = fresh_univ_index("QA_compare_to");
-  equal_exprt res_null = equal_exprt(res,constant_unsigned(0,width));
+  equal_exprt res_null = equal_exprt(res,constant_signed(0,width));
   axioms.emplace_back(res_null, s1.same_length(s2));
-  axioms.push_back(string_constraintt(res_null,equal_exprt(s1[i],s2[i])).forall(i,s1.length()));
+  axioms.push_back(string_constraintt
+		   (res_null,equal_exprt(s1[i],s2[i])).forall(i,s1.length()));
+
   symbol_exprt x = fresh_exist_index("index_compare_to");
   axioms.push_back
     (implies_exprt
      (not_exprt(res_null),
       and_exprt
-      (binary_relation_exprt(x,ID_ge,constant_unsigned(0,width)),
+      (binary_relation_exprt(x,ID_ge,constant_signed(0,width)),
        or_exprt
        (and_exprt
 	(equal_exprt(res,typecast_exprt(minus_exprt(s1[x],s2[x]),return_type)),
 	 or_exprt
-	 (and_exprt(s1.shorter(s2),s1.strictly_longer(x)), and_exprt(s1.longer(s2),s2.strictly_longer(x)))),
+	 (and_exprt(s1.shorter(s2),s1.strictly_longer(x)), 
+	  and_exprt(s1.longer(s2),s2.strictly_longer(x)))),
 	and_exprt
-	(equal_exprt(res,typecast_exprt(minus_exprt(s1.length(),s2.length()),return_type)),
+	(equal_exprt(res,typecast_exprt(minus_exprt(s1.length(),s2.length()),
+					return_type)),
 	 or_exprt
 	 (and_exprt(s2.strictly_longer(s1),s1.has_length(x)), 
 	  and_exprt(s1.strictly_longer(s2),s2.has_length(x))))))));
 
-  axioms.push_back(string_constraintt(not_exprt(res_null),equal_exprt(s1[i],s2[i])).forall(i,x));
+  axioms.push_back(string_constraintt
+		   (not_exprt(res_null),equal_exprt(s1[i],s2[i])).forall(i,x));
 
   return res;
 }

@@ -137,10 +137,12 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 
   if (refined_string_typet::is_unrefined_string_type(type))
     {
+      generator.check_char_type(expr);
       string_exprt str = generator.string_of_symbol(to_symbol_expr(expr));
       bvt bv = convert_bv(str);
       return bv;
     } 
+  /*
   else if (expr.type() == generator.get_char_type()) 
     {
       bvt bv;
@@ -154,7 +156,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 	    assert(false);
 	  }
       return bv;
-    } 
+      } */
   else return SUB::convert_symbol(expr);
 }
 
@@ -256,6 +258,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   while(initial_loop_bound-- > 0)
     {
+
       print_time("string_refinementt::dec_solve");
       decision_proceduret::resultt res = SUB::dec_solve();
       
@@ -275,11 +278,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 	  update_index_set(cur); 
 	  cur.clear();
 	  add_instantiations();
-	  
-	  if(variable_with_multiple_occurence_in_index) {
-	    debug() << "WARNING: some variable appears multiple times" << eom;
-	    return D_ERROR;
-	  }
+
+	  if(variable_with_multiple_occurence_in_index) 
+	    {
+	      debug() << "WARNING: some variable appears multiple times" << eom;
+	    }
 	  
 	  if(current_index_set.empty()){
 	    debug() << "current index set is empty" << eom;
