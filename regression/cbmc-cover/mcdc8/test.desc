@@ -1,0 +1,13 @@
+CORE
+main.c
+--cover mcdc
+^EXIT=0$
+^SIGNAL=0$
+^a=TRUE, b=FALSE, c=TRUE$
+^a=TRUE, b=FALSE, c=FALSE$
+^a=FALSE, b=FALSE, c=FALSE$
+^a=FALSE, b=TRUE, c=FALSE$
+^a=FALSE, b=TRUE, c=TRUE$
+^a=FALSE, b=FALSE, c=TRUE$
+--
+^warning: ignoring
