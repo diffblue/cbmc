@@ -64,6 +64,9 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_gcc_switch_case_range(code);
   else if(statement==ID_block)
     typecheck_block(code);
+  else if(statement==ID_decl_block)
+  {
+  }
   else if(statement==ID_ifthenelse)
     typecheck_ifthenelse(to_code_ifthenelse(code));
   else if(statement==ID_while)

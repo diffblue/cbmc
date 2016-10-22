@@ -37,7 +37,7 @@ public:
   }
   
   cpp_parsert():
-    mode(ansi_c_parsert::ANSI),
+    mode(configt::ansi_ct::flavourt::ANSI),
     recognize_wchar_t(true),
     asm_block_following(false)    
   {
@@ -45,14 +45,7 @@ public:
 
 public:
   // internal state
-
   ansi_c_parsert::modet mode;  
-  // ANSI is strict ANSI-C
-  // GCC is, well, gcc
-  // MSC is Microsoft Visual Studio
-  // ICC is Intel's C compiler
-  // CW is CodeWarrior (with GCC extensions enabled)
-  // ARM is ARM's RealView
   
   // We can furthermore twiddle the recognition of various
   // keywords. This is honored in particular modes.

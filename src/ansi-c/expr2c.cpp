@@ -276,24 +276,19 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_fixedbv)
   {
-    std::size_t width=to_fixedbv_type(src).get_width();
+    const std::size_t width=to_fixedbv_type(src).get_width();
 
     if(config.ansi_c.use_fixed_for_float)
     {
       if(width==config.ansi_c.single_width)
         return q+"float"+d;
-      else if(width==config.ansi_c.double_width)
+      if(width==config.ansi_c.double_width)
         return q+"double"+d;
-      else if(width==config.ansi_c.long_double_width)
+      if(width==config.ansi_c.long_double_width)
         return q+"long double"+d;
-      else
-        assert(false);
     }
-    else
-    {
-      std::size_t fraction_bits=to_fixedbv_type(src).get_fraction_bits();
-      return q+"__CPROVER_fixedbv["+i2string(width)+"]["+i2string(fraction_bits)+"]";
-    }
+    const std::size_t fraction_bits=to_fixedbv_type(src).get_fraction_bits();
+    return q+"__CPROVER_fixedbv["+i2string(width)+"]["+i2string(fraction_bits)+"]"+d;
   }
   else if(src.id()==ID_c_bit_field)
   {
@@ -4339,7 +4334,7 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_popcount)
   {
-    if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP)
+    if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
       return convert_function(src, "__popcnt", precedence=16);
     else
       return convert_function(src, "__builtin_popcount", precedence=16);

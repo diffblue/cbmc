@@ -19,9 +19,7 @@ const goto_programt &get_entry_body(const goto_functionst &gf)
   return get_body(gf, id2string(goto_functionst::entry_point()));
 }
 
-class goto_programt &get_body(
-    class goto_functionst &gf,
-    const std::string &func_name)
+goto_programt &get_body(goto_functionst &gf, const std::string &func_name)
 {
   const irep_idt id(func_name);
   goto_functionst::function_mapt &function_map=gf.function_map;
@@ -32,8 +30,12 @@ class goto_programt &get_body(
   return f.body;
 }
 
-const goto_programt &get_body(
-    const goto_functionst &gf,
+goto_programt &get_body(goto_functionst &gf, const goto_programt::const_targett pos)
+{
+  return get_body(gf, id2string(pos->function));
+}
+
+const goto_programt &get_body(const goto_functionst &gf,
     const std::string &func_name)
 {
   const irep_idt id(func_name);

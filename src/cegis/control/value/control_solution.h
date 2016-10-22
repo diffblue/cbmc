@@ -10,7 +10,7 @@
 #ifndef CEGIS_CONTROL_SOLUTION_H_
 #define CEGIS_CONTROL_SOLUTION_H_
 
-#include <vector>
+#include <util/std_expr.h>
 
 /**
  * @brief
@@ -25,14 +25,14 @@ public:
    *
    * @details
    */
-  std::vector<double> a;
+  array_exprt a;
 
   /**
    * @brief
    *
    * @details
    */
-  std::vector<double> b;
+  array_exprt b;
 };
 
 #endif /* CEGIS_CONTROL_SOLUTION_H_ */

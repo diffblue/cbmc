@@ -36,7 +36,7 @@ std::string get_next_goto_file_name()
 const char * ARGV[]= { "cbmc", "--stop-on-fail" };
 const char * GCC_ARGV[]= { "cbmc", "--stop-on-fail", "-gcc" };
 
-bool is_gcc() { return configt::ansi_ct::flavourt::MODE_GCC_C == config.ansi_c.mode; }
+bool is_gcc() { return configt::ansi_ct::flavourt::GCC == config.ansi_c.mode; }
 int get_argc() { return is_gcc() ? 3 : 2; }
 const char ** get_argv() { return is_gcc() ? GCC_ARGV : ARGV; }
 

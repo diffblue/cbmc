@@ -1,0 +1,17 @@
+#line 2 "main.ii"
+
+template <class T>
+struct __member_pointer_traits_imp
+{
+};
+
+template <class _Rp, class _Class>
+struct __member_pointer_traits_imp<_Rp (_Class::*)()>
+{
+};
+
+template <class _Rp, class _Class>
+struct __member_pointer_traits_imp<_Rp (_Class::*)() const>
+{
+};
+

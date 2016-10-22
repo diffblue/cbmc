@@ -46,11 +46,20 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       jsa/genetic/jsa_source_provider.cpp jsa/genetic/dynamic_jsa_test_runner.cpp jsa/genetic/random_jsa_mutate.cpp \
       jsa/genetic/random_jsa_cross.cpp jsa/genetic/jsa_genetic_convert.cpp jsa/genetic/jsa_random.cpp \
       jsa/genetic/solution_helper.cpp jsa/genetic/jsa_serialiser.cpp jsa/genetic/jsa_paragon_wrapper.cpp \
-      control/facade/control_runner.cpp control/preprocessing/control_preprocessing.cpp \
+      control/facade/control_runner.cpp \
+      control/preprocessing/control_preprocessing.cpp control/preprocessing/propagate_controller_sizes.cpp \
       control/options/control_program.cpp \
       control/learn/control_symex_learn.cpp control/learn/nondet_solution.cpp \
+      control/simplify/remove_unused_elements.cpp \
       control/verify/control_symex_verify.cpp control/verify/insert_solution.cpp \
-      control/value/control_types.cpp \
+      control/value/float_helper.cpp control/value/control_types.cpp \
+      refactor/environment/instrument_state_vars.cpp refactor/instructionset/create_cegis_processor.cpp \
+      refactor/preprocessing/refactor_preprocessing.cpp \
+      refactor/learn/refactor_symex_learn.cpp \
+      refactor/verify/refactor_symex_verify.cpp \
+      refactor/facade/refactor_runner.cpp \
+      refactor/options/refactoring_type.cpp refactor/options/refactor_program.cpp refactor/value/refactor_solution.cpp \
+      refactor/nullobject/range_collector.cpp \
       wordsize/restrict_bv_size.cpp value/program_individual_serialisation.cpp value/assignments_printer.cpp \
       seed/literals_seed.cpp \
       genetic/instruction_set_info_factory.cpp genetic/random_mutate.cpp genetic/random_cross.cpp \
@@ -60,7 +69,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       cegis-util/task_pool.cpp cegis-util/constant_width.cpp cegis-util/irep_pipe.cpp cegis-util/program_helper.cpp \
       cegis-util/temporary_output_block.cpp cegis-util/cbmc_runner.cpp cegis-util/module_helper.cpp \
       cegis-util/inline_user_program.cpp cegis-util/counterexample_vars.cpp cegis-util/string_helper.cpp \
-      cegis-util/type_helper.cpp \
+      cegis-util/instruction_iterator.cpp cegis-util/type_helper.cpp \
       learn/insert_counterexample.cpp learn/constraint_helper.cpp \
       constant/add_constant.cpp constant/literals_collector.cpp constant/default_cegis_constant_strategy.cpp \
       instrument/cegis_library.cpp instrument/instrument_var_ops.cpp instrument/meta_variables.cpp \

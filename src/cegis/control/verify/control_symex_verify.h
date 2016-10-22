@@ -39,7 +39,6 @@ public:
    */
   explicit control_symex_verifyt(const control_programt &original_program);
 
-
   /**
    * @brief
    *

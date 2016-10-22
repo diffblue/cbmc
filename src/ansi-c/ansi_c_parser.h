@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_hash.h>
 #include <util/i2string.h>
 #include <util/mp_arith.h>
+#include <util/config.h>
 
 #include "ansi_c_parse_tree.h"
 #include "ansi_c_scope.h"
@@ -62,15 +63,9 @@ public:
   unsigned parenthesis_counter;
   std::string string_literal;
   std::list<exprt> pragma_pack;
-  
-  typedef enum { ANSI, GCC, MSC, ICC, CW, ARM } modet;
+
+  typedef configt::ansi_ct::flavourt modet;
   modet mode;
-  // ANSI is strict ANSI-C
-  // GCC is, well, gcc
-  // MSC is Microsoft Visual Studio
-  // ICC is Intel's C compiler
-  // CW is CodeWarrior (with GCC extensions enabled)
-  // ARM is ARM's RealView
 
   // recognize C++98 and C++11 keywords  
   bool cpp98, cpp11;

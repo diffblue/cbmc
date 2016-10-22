@@ -53,7 +53,7 @@ void *prepare_fitness_tester_library(fitness_lib_handlet &handle,
   const std::string source_file_name(source_file());
   write_file(source_file_name.c_str(), source_code_provider());
   std::string compile_command;
-  if (configt::ansi_ct::preprocessort::PP_CLANG == config.ansi_c.preprocessor)
+  if (configt::ansi_ct::preprocessort::CLANG == config.ansi_c.preprocessor)
     compile_command+=CLANG_COMPILE_COMMAND;
   else
     compile_command+=COMPILE_COMMAND;

@@ -22,7 +22,7 @@ class cpp_convert_typet
 {
 public:
   unsigned unsigned_cnt, signed_cnt, char_cnt, int_cnt, short_cnt,
-           long_cnt, const_cnt, constexpr_cnt, volatile_cnt,
+           long_cnt, const_cnt, restrict_cnt, constexpr_cnt, volatile_cnt,
            double_cnt, float_cnt, complex_cnt, cpp_bool_cnt, proper_bool_cnt,
            extern_cnt, wchar_t_cnt, char16_t_cnt, char32_t_cnt,
            int8_cnt, int16_cnt, int32_cnt, int64_cnt, ptr32_cnt, ptr64_cnt,
@@ -57,7 +57,7 @@ Function: cpp_convert_typet::read
 void cpp_convert_typet::read(const typet &type)
 {
   unsigned_cnt=signed_cnt=char_cnt=int_cnt=short_cnt=
-  long_cnt=const_cnt=constexpr_cnt=volatile_cnt=
+  long_cnt=const_cnt=restrict_cnt=constexpr_cnt=volatile_cnt=
   double_cnt=float_cnt=complex_cnt=cpp_bool_cnt=proper_bool_cnt=
   extern_cnt=wchar_t_cnt=char16_t_cnt=char32_t_cnt=
   int8_cnt=int16_cnt=int32_cnt=int64_cnt=
@@ -144,6 +144,8 @@ void cpp_convert_typet::read_rec(const typet &type)
     ptr64_cnt++;
   else if(type.id()==ID_const)
     const_cnt++;
+  else if(type.id()==ID_restrict)
+    restrict_cnt++;
   else if(type.id()==ID_constexpr)
     constexpr_cnt++;
   else if(type.id()==ID_extern)

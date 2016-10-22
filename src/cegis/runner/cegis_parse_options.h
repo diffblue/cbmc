@@ -20,7 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(cegis-genetic-mutation-rate):(cegis-genetic-replace-rate):" \
   "(cegis-limit-wordsize)(cegis-parallel-verify)(cegis-symex-head-start):" \
   "(safety)(danger)(jsa)(danger-max-size):(danger-no-ranking)" \
-  "(cegis-control)"
+  "(cegis-control)" \
+  "(cegis-refactor)(cegis-refactor-null-object)"
 
 class cegis_parse_optionst: public cbmc_parse_optionst
 {

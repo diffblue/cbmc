@@ -120,17 +120,6 @@ void cpp_typecheckt::typecheck_type(typet &type)
         }
       }
     }
-
-    // now do qualifier
-    if(type.find(ID_C_qualifier).is_not_nil())
-    {
-      typet &t=static_cast<typet &>(type.add(ID_C_qualifier));
-      cpp_convert_plain_type(t);
-      c_qualifierst q(t);
-      q.write(type);
-    }
-
-    type.remove(ID_C_qualifier);
   }
   else if(type.id()==ID_array)
   {
