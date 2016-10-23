@@ -51,51 +51,77 @@ void pass_preprocesst::make_string_function
 }
 
 void pass_preprocesst::make_array_function
-(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
+(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
+ irep_idt function_name)
 {
-  code_function_callt &function_call=to_code_function_call(i_it->code);
-  // replace "lhs=s.toCharArray()" by "lhs=MALLOC(struct java::array[char],s->length)"
+  // replace "lhs=s.toCharArray()" with:
+  // tmp_assign = MALLOC(struct java::array[char],s->length)
+  // *tmp_assign = "function_name"()
+  // return_tmp1 = tmp_assign
 
+  code_function_callt &function_call=to_code_function_call(i_it->code);
   if(function_call.lhs().type().id()!=ID_pointer)
-  {
     debug() << "the function call should return a pointer" << eom;
-  }
 
   // we produce a malloc side-effect, which stays
   typet object_type = function_call.lhs().type().subtype();
   exprt object_size = size_of_expr(object_type, ns);
-  debug() << "doing malloc of size " << object_size.pretty()
-	  << " for type " << object_type.pretty() << eom;
-
 
   if(object_size.is_nil())
-  {
     debug() << "do_java_new got nil object_size" << eom;
-  }
+
+  debug() << "adding the name " << function_name << " to the symbols" << eom;
+  goto_functions.function_map[irep_idt(function_name)];
+  auxiliary_symbolt tmp_symbol;
+  tmp_symbol.base_name=function_name;
+  tmp_symbol.is_static_lifetime=false;
+  tmp_symbol.mode=ID_java;
+  tmp_symbol.name=function_name;
+  tmp_symbol.type=pointer_typet(object_type);
+  symbol_table.add(tmp_symbol);
 
   side_effect_exprt malloc_expr(ID_malloc);
   malloc_expr.copy_to_operands(object_size);
-  debug() << "object size moved to operands" << eom;
   malloc_expr.type()=pointer_typet(object_type);
   malloc_expr.add_source_location()=function_call.source_location();
+  
+  function_application_exprt function_app;
+  function_app.type()=object_type;
+  function_app.add_source_location()=function_call.source_location();
+  function_app.function()=symbol_exprt(function_name);
+  for(unsigned i = 0; i < function_call.arguments().size(); i++)
+    function_app.arguments().push_back(replace_string_literals(function_call.arguments()[i]));
 
-  //i_it = goto_program.insert_after(i_it);
-  //i_it->make_assignment();
-  //i_it->code=assignment2;
-  //goto_programt::targett t_n=i_it.add_instruction(ASSIGN);
-  debug() << "making assignement for "  << function_call.lhs().pretty() << " <- " << malloc_expr.pretty() << eom;
+  auxiliary_symbolt tmp_assign_symbol;
+  tmp_assign_symbol.base_name="tmp_assign";
+  tmp_assign_symbol.is_static_lifetime=false;
+  tmp_assign_symbol.mode=ID_java;
+  tmp_assign_symbol.name="tmp_assign";
+  tmp_assign_symbol.type=pointer_typet(object_type);
+  symbol_table.add(tmp_assign_symbol);
+
+  symbol_exprt tmp_assign("tmp_assign",pointer_typet(object_type));
+  code_assignt assign1(tmp_assign, malloc_expr);
+  code_assignt assign2(dereference_exprt(tmp_assign,object_type), function_app);
+  code_assignt assign3(function_call.lhs(), tmp_assign);
+  auto location = function_call.source_location();
+
   i_it->make_assignment();
-  debug() << "assign code : " << eom;
-  symbol_exprt lhs("tmp_assign",object_type);
-  code_assignt assign(lhs, malloc_expr);
-  debug() << assign.pretty()<< eom;
-  i_it->code=assign;
-  debug() << "location" << eom;
-  i_it->source_location=function_call.source_location();
-  debug() << "finished" << eom;
+  i_it->code=assign1;
+  i_it->source_location = location;
+  i_it=goto_program.insert_after(i_it);
+  i_it->make_assignment();
+  i_it->code=assign2;
+  i_it->source_location = location;
+  i_it=goto_program.insert_after(i_it);
+  i_it->make_assignment();
+  i_it->code=assign3;
+  i_it->source_location = location;
+  
 }
 
-void pass_preprocesst::make_string_function_of_assign(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
+void pass_preprocesst::make_string_function_of_assign
+(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   assert(i_it->is_assign());
   code_assignt &assign=to_code_assign(i_it->code);
@@ -228,7 +254,7 @@ void pass_preprocesst::replace_string_calls
 	  make_string_function_call(i_it, string_function_calls[function_id]);
 
 	else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
-	  make_array_function(i_it,cprover_string_to_char_array_func);
+	  make_array_function(goto_program,i_it,cprover_string_to_char_array_func);
 
       } 
 
