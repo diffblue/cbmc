@@ -192,14 +192,14 @@ bool is_builtin(const source_locationt &loc)
   return file.empty() || file.at(0) == '<';
 }
 
-symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
-    const typet &type)
+symbolt &create_local_cegis_symbol(symbol_tablet &st, const std::string &full_name,
+    const std::string &base_name, const typet &type)
 {
   symbolt new_symbol;
   new_symbol.name=full_name;
   new_symbol.type=type;
-  new_symbol.base_name=full_name;
-  new_symbol.pretty_name=new_symbol.base_name;
+  new_symbol.base_name=base_name;
+  new_symbol.pretty_name=base_name;
   new_symbol.location=default_cegis_source_location();
   new_symbol.mode=ID_C;
   new_symbol.module=CEGIS_MODULE;
@@ -209,6 +209,12 @@ symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
   new_symbol.is_lvalue=true;
   assert(!st.add(new_symbol));
   return st.lookup(new_symbol.name);
+}
+
+symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
+    const typet &type)
+{
+  return create_local_cegis_symbol(st, full_name, full_name, type);
 }
 
 goto_programt::targett cegis_assign(const symbol_tablet &st,
@@ -247,6 +253,19 @@ goto_programt::targett cegis_assign_user_variable(const symbol_tablet &st,
 {
   const symbol_exprt lhs(st.lookup(name).symbol_expr());
   return cegis_assign(st, gf, insert_after_pos, lhs, value);
+}
+
+goto_programt::targett cegis_assign_local_variable(const symbol_tablet &st,
+    goto_programt &body, const goto_programt::targett &insert_after_pos,
+    const std::string &func_name, const std::string &var_name,
+    const exprt &value)
+{
+  std::string name(func_name);
+  name+=NS_SEP;
+  name+=var_name;
+  const symbol_exprt lhs(st.lookup(name).symbol_expr());
+  const source_locationt loc(default_cegis_source_location());
+  return cegis_assign(st, body, insert_after_pos, lhs, value, loc);
 }
 
 symbol_exprt get_ret_val_var(const irep_idt &func_id, const typet &type)

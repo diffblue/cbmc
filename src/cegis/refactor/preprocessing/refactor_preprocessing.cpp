@@ -21,7 +21,7 @@ void refactor_preprocessingt::operator()()
 {
   symbol_tablet &st=original_program.st;
   goto_functionst &gf=original_program.gf;
-  inline_user_program(st, gf);
+  //inline_user_program(st, gf);
   const refactoring_typet type(get_refactoring_type(options));
   switch (type)
   {

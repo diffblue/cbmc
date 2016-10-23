@@ -28,6 +28,18 @@ std::string get_cegis_meta_name(const std::string &base_name);
  *
  * @details
  *
+ * @param func
+ * @param var
+ *
+ * @return
+ */
+std::string get_local_meta_name(const std::string &func, const std::string &var);
+
+/**
+ * @brief
+ *
+ * @details
+ *
  * @param st
  * @param gf
  * @param insert_after_pos
@@ -39,6 +51,53 @@ std::string get_cegis_meta_name(const std::string &base_name);
 goto_programt::targett declare_cegis_meta_variable(symbol_tablet &st,
     class goto_functionst &gf, const goto_programt::targett &insert_after_pos,
     const std::string &base_name, const typet &type);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
+ * @param func_name
+ * @param body
+ * @param insert_after_pos
+ * @param base_name
+ * @param type
+ */
+goto_programt::targett declare_local_meta_variable(symbol_tablet &st,
+    const std::string &func_name, goto_programt &body,
+    const goto_programt::targett &insert_after_pos,
+    const std::string &base_name, const typet &type);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
+ * @param name
+ * @param type
+ */
+const symbolt &declare_global_meta_variable(
+    symbol_tablet &st,
+    const std::string &name,
+    const typet &type);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
+ * @param gf
+ * @param name
+ * @param value
+ */
+const symbolt &declare_global_meta_variable(
+    symbol_tablet &st,
+    goto_functionst &gf,
+    const std::string &name,
+    const exprt &value);
 
 /**
  * @brief

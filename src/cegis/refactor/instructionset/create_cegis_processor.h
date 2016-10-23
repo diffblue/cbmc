@@ -46,6 +46,12 @@ std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
  *
  * @details
  * @code
+ * execute_next_instr:
+ * int opcode=program[i].opcode;
+ * int op0=program[i].op0;
+ * int op1=program[i].op1;
+ * int result_op=program[i].result_op;
+ *
  * int lhs_int;
  * int rhs_int;
  * int result_int;
