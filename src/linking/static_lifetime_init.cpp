@@ -156,9 +156,9 @@ bool static_lifetime_init(
 
   // call designated "initialization" functions
 
+  #if 0
   for(const std::string &id : symbols)
   {
-    #if 0
     const symbolt &symbol=ns.lookup(id);
 
     if(symbol.type.id()==ID_code &&
@@ -169,8 +169,8 @@ bool static_lifetime_init(
       function_call.add_source_location()=source_location;
       dest.move_to_operands(function_call);
     }
-    #endif
   }
+  #endif
 
   return false;
 }
