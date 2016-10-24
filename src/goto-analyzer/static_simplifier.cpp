@@ -151,9 +151,16 @@ void static_simplifiert<analyzerT>::simplify_program()
       else if (i_it->is_assign())
       {
 	code_assignt assign(to_code_assign(i_it->code));
+
+	/*
+	** Simplification needs to be aware of which side of the
+	** expression it is handling as:
+	**   <i = 0, j = 1>  i = j
+	** should simplify to i = 1, not to 0 = 1.
+	*/
 	
-	exprt simplified_lhs = domain[i_it].domain_simplify(assign.lhs(), ns);
-	exprt simplified_rhs = domain[i_it].domain_simplify(assign.rhs(), ns);
+	exprt simplified_lhs = domain[i_it].domain_simplify(assign.lhs(), ns, true);
+	exprt simplified_rhs = domain[i_it].domain_simplify(assign.rhs(), ns, false);
 
 	unsigned result = (simplified_lhs == assign.lhs() &&
 			   simplified_rhs == assign.rhs()) ? 0 : 1;

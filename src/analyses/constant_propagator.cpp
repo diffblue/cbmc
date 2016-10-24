@@ -334,7 +334,7 @@ void constant_propagator_domaint::assign(
 
 /*******************************************************************\
 
-Function: constant_propagator_domaint::assign
+Function: constant_propagator_domaint::domain_simplify
 
   Inputs: The condition to simplify and its namespace.
 
@@ -345,11 +345,17 @@ Function: constant_propagator_domaint::assign
 \*******************************************************************/
 
 exprt constant_propagator_domaint::domain_simplify (const exprt &condition,
-						    const namespacet &ns)
+						    const namespacet &ns,
+						    const bool lhs)
 {
-  exprt e(condition);
-  values.replace_const(e);
-  return simplify_expr(e, ns);
+  if (lhs) {
+    // For now do not simplify the left hand sides of assignments
+    return condition;
+  } else {
+    exprt e(condition);
+    values.replace_const(e);
+    return simplify_expr(e, ns);
+  }
 }
 
 /*******************************************************************\

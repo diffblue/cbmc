@@ -19,7 +19,7 @@ public:
   virtual void transform(locationt, locationt, ai_baset &, const namespacet &);
   virtual void output(std::ostream &, const ai_baset &, const namespacet &) const;
   bool merge(const constant_propagator_domaint &, locationt, locationt);
-  virtual exprt domain_simplify (const exprt &condition, const namespacet &ns);
+  virtual exprt domain_simplify (const exprt &condition, const namespacet &ns, const bool lhs = false);
 
   struct valuest
   {
