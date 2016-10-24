@@ -60,6 +60,7 @@ void pass_preprocesst::make_array_function
   // return_tmp1 = tmp_assign
 
   code_function_callt &function_call=to_code_function_call(i_it->code);
+  debug() << "function_call = " << function_call.pretty() << eom;
   if(function_call.lhs().type().id()!=ID_pointer)
     debug() << "the function call should return a pointer" << eom;
 
@@ -84,13 +85,19 @@ void pass_preprocesst::make_array_function
   malloc_expr.copy_to_operands(object_size);
   malloc_expr.type()=pointer_typet(object_type);
   malloc_expr.add_source_location()=function_call.source_location();
+
+  side_effect_exprt malloc_expr_data(ID_malloc);
+  exprt array_size = constant_exprt(integer2binary(12,32),signedbv_typet(32));
+  exprt char_size = constant_exprt(integer2binary(32,32),signedbv_typet(32));
+  // this may not be correct
+  malloc_expr_data.copy_to_operands(mult_exprt(array_size,char_size));
+  malloc_expr_data.type()=pointer_typet(object_type.subtype());
+  malloc_expr_data.add_source_location()=function_call.source_location();
   
-  function_application_exprt function_app;
-  function_app.type()=object_type;
-  function_app.add_source_location()=function_call.source_location();
-  function_app.function()=symbol_exprt(function_name);
-  for(unsigned i = 0; i < function_call.arguments().size(); i++)
-    function_app.arguments().push_back(replace_string_literals(function_call.arguments()[i]));
+
+  assert(function_call.arguments().size() >= 1);
+  exprt string_argument = function_call.arguments()[0];
+  typet string_argument_type = string_argument.type();
 
   auxiliary_symbolt tmp_assign_symbol;
   tmp_assign_symbol.base_name="tmp_assign";
@@ -100,22 +107,86 @@ void pass_preprocesst::make_array_function
   tmp_assign_symbol.type=pointer_typet(object_type);
   symbol_table.add(tmp_assign_symbol);
 
+  auxiliary_symbolt tmp_string_symbol;
+  tmp_string_symbol.base_name="tmp_string";
+  tmp_string_symbol.is_static_lifetime=false;
+  tmp_string_symbol.mode=ID_java;
+  tmp_string_symbol.name="tmp_string";
+  tmp_string_symbol.type=string_argument_type.subtype();
+  symbol_table.add(tmp_string_symbol);
+
+  auxiliary_symbolt tmp_data_symbol;
+  tmp_data_symbol.base_name="tmp_data";
+  tmp_data_symbol.is_static_lifetime=false;
+  tmp_data_symbol.mode=ID_java;
+  tmp_data_symbol.name="tmp_data";
+  tmp_data_symbol.type=string_argument_type.subtype();
+  symbol_table.add(tmp_data_symbol);
+
   symbol_exprt tmp_assign("tmp_assign",pointer_typet(object_type));
   code_assignt assign1(tmp_assign, malloc_expr);
-  code_assignt assign2(dereference_exprt(tmp_assign,object_type), function_app);
-  code_assignt assign3(function_call.lhs(), tmp_assign);
+  code_assignt assign2(member_exprt(dereference_exprt(tmp_assign,object_type),"data"), malloc_expr_data);
+  symbol_exprt tmp_string("tmp_string",string_argument_type.subtype());
+  code_assignt assign3aux(tmp_string, dereference_exprt(function_call.arguments()[0]));
+  symbol_exprt tmp_data("tmp_data",string_argument_type.subtype());
+
+  // geting the length
+  auxiliary_symbolt tmp_length_symbol;
+  //tmp_symbol.base_name=base_name;
+  tmp_length_symbol.is_static_lifetime=false;
+  tmp_length_symbol.mode=ID_java;
+  tmp_length_symbol.name=cprover_string_length_func;
+  // tmp_symbol.type=type;
+  tmp_length_symbol.type=unsignedbv_typet(32);
+  symbol_table.add(tmp_length_symbol);
+  // make sure it is in the function map
+  goto_functions.function_map[cprover_string_length_func];
+  
+  function_application_exprt rhs;
+  rhs.type()=unsignedbv_typet(32);
+  rhs.add_source_location()=function_call.source_location();
+  rhs.function()=symbol_exprt(cprover_string_length_func);
+  rhs.arguments().push_back(replace_string_literals(function_call.arguments()[0]));
+
+
+  //code_assignt assign3aux2(tmp_data, ;
+  code_assignt assign3(member_exprt
+		       (dereference_exprt
+			(tmp_assign,object_type)
+			,"length",signedbv_typet(32)),
+		       //constant_exprt(integer2binary(12,32),signedbv_typet(32)));
+		       typecast_exprt(rhs,signedbv_typet(32)));
+  //member_exprt(tmp_string,"length",signedbv_typet(32)));
+		       //function_app);
+  code_assignt assign4(function_call.lhs(), tmp_assign);
   auto location = function_call.source_location();
+
+  debug() << " ------------ ASSIGN1 ---------------" << eom;
+  debug() << tmp_assign.pretty() << eom << " <-- " << malloc_expr.pretty() << eom;
+
 
   i_it->make_assignment();
   i_it->code=assign1;
   i_it->source_location = location;
   i_it=goto_program.insert_after(i_it);
-  i_it->make_assignment();
+  
+  /*i_it->make_assignment();
   i_it->code=assign2;
   i_it->source_location = location;
+  i_it=goto_program.insert_after(i_it);*/
+  
+  i_it->make_assignment();
+  i_it->code=assign3aux;
+  i_it->source_location = location;
   i_it=goto_program.insert_after(i_it);
+
   i_it->make_assignment();
   i_it->code=assign3;
+  i_it->source_location = location;
+  i_it=goto_program.insert_after(i_it);
+
+  i_it->make_assignment();
+  i_it->code=assign4;
   i_it->source_location = location;
   
 }
@@ -235,6 +306,8 @@ void pass_preprocesst::replace_string_calls
   std::map<exprt, exprt> string_builders;
   
   Forall_goto_program_instructions(i_it, goto_program) {  
+    debug() << "instruction: " << i_it->code.pretty() << eom;
+
     if(i_it->is_function_call()) {
 
       code_function_callt &function_call=to_code_function_call(i_it->code);
