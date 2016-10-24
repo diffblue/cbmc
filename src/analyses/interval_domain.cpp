@@ -514,8 +514,14 @@ Function: interval_domaint::domain_simplify
 \*******************************************************************/
 
 exprt interval_domaint::domain_simplify (const exprt &condition,
-					 const namespacet &ns) const
+					 const namespacet &ns,
+					 const bool lhs) const
 {
+  if (lhs) {
+    // For now do not simplify the left hand side of assignments
+    return condition;
+  }
+  
   interval_domaint d(*this);
   
   //merge intervals to properly handle conjunction

@@ -103,7 +103,8 @@ public:
 
   // Used to evaluate or simplify conditions with respect to the domain
   virtual exprt domain_simplify (const exprt &condition,
-				 const namespacet &ns) const {
+				 const namespacet &ns,
+				 const bool lhs = false) const {
     return condition;
   }
 };
