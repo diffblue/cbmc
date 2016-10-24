@@ -38,7 +38,7 @@ bool static_show_domain(
 {
   ai_baset *domain = NULL;
   
-  if (options.get_bool_option("sequential"))
+  if (options.get_bool_option("flow-sensitive"))
   {
     if (options.get_bool_option("constants"))
       domain = new ait<constant_propagator_domaint>();

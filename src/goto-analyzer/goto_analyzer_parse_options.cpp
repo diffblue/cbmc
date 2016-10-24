@@ -277,11 +277,11 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 
   
   // Abstract interpreter choice
-  options.set_option("sequential", false);
+  options.set_option("flow-sensitive", false);
   options.set_option("concurrent", false);
 
-  if (cmdline.isset("sequential"))
-    options.set_option("sequential", true);
+  if (cmdline.isset("flow-sensitive"))
+    options.set_option("flow-sensitive", true);
   else if (cmdline.isset("concurrent"))
     options.set_option("concurrent", true);
   else
@@ -289,7 +289,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     is_threadedt is_threaded(goto_model.goto_functions);
     bool contains_concurrent_code = is_threaded();
 
-    options.set_option("sequential", !contains_concurrent_code);
+    options.set_option("flow-sensitive", !contains_concurrent_code);
     options.set_option("concurrent",  contains_concurrent_code);
   }
 
@@ -654,7 +654,7 @@ void goto_analyzer_parse_optionst::help()
     " --simplify file_name         run abstract interpreter and simplify program\n"
     "\n"
     "Abstract interpreter options:\n"
-    " --sequential                 use sequential abstract interpreter\n"
+    " --flow-sensitive             use flow-sensitive abstract interpreter\n"
     " --concurrent                 use concurrent abstract interpreter\n"
     "\n"
     "Domain options:\n"
