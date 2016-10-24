@@ -230,3 +230,52 @@ void get_inverted_topological_order(
       processed,
       output);
 }
+
+bool  exists_direct_call(
+    call_grapht const&  call_graph,
+    irep_idt const&  caller,
+    irep_idt const&  callee
+    )
+{
+  call_grapht::call_edges_ranget const  range =
+      call_graph.out_edges(caller);
+  for (auto  it = range.first; it != range.second; ++it)
+    if (callee == it->second)
+      return true;
+  return false;
+}
+
+bool  exists_direct_or_indirect_call(
+    call_grapht const&  call_graph,
+    irep_idt const&  caller,
+    irep_idt const&  callee,
+    std::unordered_set<irep_idt,dstring_hash>&  ignored_functions
+    )
+{
+  if (ignored_functions.count(caller) != 0UL)
+    return false;
+  ignored_functions.insert(caller);
+  if (exists_direct_call(call_graph,caller,callee))
+    return ignored_functions.count(callee) == 0UL;
+  call_grapht::call_edges_ranget const  range =
+      call_graph.out_edges(caller);
+  for (auto  it = range.first; it != range.second; ++it)
+    if (exists_direct_or_indirect_call(
+          call_graph,
+          it->second,
+          callee,
+          ignored_functions
+          ))
+      return true;
+  return false;
+}
+
+bool  exists_direct_or_indirect_call(
+    call_grapht const&  call_graph,
+    irep_idt const&  caller,
+    irep_idt const&  callee
+    )
+{
+  std::unordered_set<irep_idt,dstring_hash>  ignored;
+  return exists_direct_or_indirect_call(call_graph,caller,callee,ignored);
+}
