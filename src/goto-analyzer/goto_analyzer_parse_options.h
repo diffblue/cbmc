@@ -39,7 +39,7 @@ class optionst;
   "(non-null)(show-non-null)" \
   "(constants)" \
   "(show)(verify)(simplify):" \
-  "(sequential)(concurrent)"
+  "(flow-sensitive)(concurrent)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,

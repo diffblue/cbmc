@@ -235,7 +235,7 @@ bool static_simplifier(
   message_handlert &message_handler,
   std::ostream &out)
 {
-  if (options.get_bool_option("sequential"))
+  if (options.get_bool_option("flow-sensitive"))
   {
     if (options.get_bool_option("constants"))
       return static_simplifiert<ait<constant_propagator_domaint> >
