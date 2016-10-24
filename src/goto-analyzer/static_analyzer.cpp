@@ -120,7 +120,7 @@ void static_analyzert<analyzerT>::plain_text_report()
       if(simplified.is_true())
         { result() << "SUCCESS"; pass++; }
       else if(simplified.is_false())
-        { result() << "FAILURE"; fail++; }
+        { result() << "FAILURE (if reachable)"; fail++; }
       else
         { result() << "UNKNOWN"; unknown++; }
       result() << eom;
@@ -169,7 +169,7 @@ void static_analyzert<analyzerT>::json_report()
       if(simplified.is_true())
         j["status"]=json_stringt("SUCCESS");
       else if(simplified.is_false())
-        j["status"]=json_stringt("FAILURE");
+        j["status"]=json_stringt("FAILURE (if reachable)");
       else 
         j["status"]=json_stringt("UNKNOWN");
 
@@ -219,7 +219,7 @@ void static_analyzert<analyzerT>::xml_report()
       if(simplified.is_true())
         x.set_attribute("status", "SUCCESS");
       else if(simplified.is_false())
-        x.set_attribute("status", "FAILURE");
+        x.set_attribute("status", "FAILURE (if reachable)");
       else 
         x.set_attribute("status", "UNKNOWN");
 
