@@ -1,6 +1,6 @@
-CORE
+FUTURE
 constant_propagation_08.c
---constants --intervals --verify
+--intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file constant_propagation_08.c line 12 function main, assertion i<50: UNKNOWN$
