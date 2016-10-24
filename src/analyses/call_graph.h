@@ -119,4 +119,24 @@ void get_inverted_topological_order(
   goto_functionst const& functions,
   std::vector<irep_idt>& output);
 
+bool  exists_direct_call(
+    call_grapht const&  call_graph,
+    irep_idt const&  caller,
+    irep_idt const&  callee
+    );
+
+bool  exists_direct_or_indirect_call(
+    call_grapht const&  call_graph,
+    irep_idt const&  caller,
+    irep_idt const&  callee,
+    std::unordered_set<irep_idt,dstring_hash>&  ignored_functions
+    );
+
+bool  exists_direct_or_indirect_call(
+    call_grapht const&  call_graph,
+    irep_idt const&  caller,
+    irep_idt const&  callee
+    );
+
+
 #endif // CPROVER_ANALYSES_CALL_GRAPH_H
