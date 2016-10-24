@@ -75,6 +75,13 @@ Function: java_bytecode_convert_classt::convert
 
 void java_bytecode_convert_classt::convert(const classt &c)
 {
+  std::string qualified_classname="java::"+id2string(c.name);
+  if(symbol_table.has_symbol(qualified_classname))
+  {
+    debug() << "Skip class " << c.name << " (already loaded)" << eom;
+    return;
+  }
+  
   class_typet class_type;
 
   class_type.set_tag(c.name);
@@ -107,7 +114,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
   symbolt new_symbol;
   new_symbol.base_name=c.name;
   new_symbol.pretty_name=c.name;
-  new_symbol.name="java::"+id2string(c.name);
+  new_symbol.name=qualified_classname;
   class_type.set(ID_name, new_symbol.name);
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
