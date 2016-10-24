@@ -1,3 +1,4 @@
+#include <util/arith_tools.h>
 #include <util/expr_util.h>
 
 #include <cegis/instrument/instrument_var_ops.h>
@@ -23,7 +24,8 @@ void declare_cegis_program(symbol_tablet &st, goto_functionst &gf,
   declare_global_meta_variable(st, program_name, type);
   const typet size_type(cegis_size_type());
   const std::string program_size(get_size_name(program_name));
-  declare_global_meta_variable(st, gf, program_size, gen_zero(size_type));
+  const constant_exprt sz_expr(from_integer(size, size_type));
+  declare_global_meta_variable(st, gf, program_size, sz_expr);
 }
 
 goto_programt::targett call_processor(const symbol_tablet &st,

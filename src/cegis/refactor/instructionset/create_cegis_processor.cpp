@@ -57,8 +57,10 @@ std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
 #define INSTR_TYPE_SUFFIX "_instructiont"
 #define VARIABLE_ARRAY_PREFIX CEGIS_PREFIX "variable_array_"
 #define NUM_PRIMITIVE_OPERANDS 2u
+#define NUM_PRIMITIVE_OPCODES 4u
 #define OPCODE_MEMBER_NAME "opcode"
 #define OPERAND_ID_MEMBER_NAME_PREFIX "op_"
+#define OPERAND_TMP_RESULT_PREFIX "result_op_"
 #define INSTR_INDEX "i"
 #define PROGRAM_PARAM_ID "program"
 #define PROGRAM_SIZE_PARAM_ID "size"
@@ -69,6 +71,12 @@ std::string get_variable_array_name(const symbol_tablet &st, const typet &type)
 {
   std::string result(VARIABLE_ARRAY_PREFIX);
   return result+=type2c(type, namespacet(st));
+}
+
+symbol_exprt get_variable_array_symbol(const symbol_tablet &st,
+    const typet &type)
+{
+  return st.lookup(get_variable_array_name(st, type)).symbol_expr();
 }
 
 void create_variable_array(symbol_tablet &st, goto_functionst &gf,
@@ -127,9 +135,16 @@ bool is_primitive(const typet &type)
 
 size_t get_max_operands(const typet &type)
 {
-  if (is_primitive(type)) return NUM_PRIMITIVE_OPERANDS;
+  if (!is_primitive(type))
   assert(!"Class type operand generation not supported.");
-  return 0;
+  return NUM_PRIMITIVE_OPERANDS;
+}
+
+size_t get_num_instructions(const typet &type)
+{
+  if (!is_primitive(type))
+  assert(!"Class type operand generation not supported.");
+  return NUM_PRIMITIVE_OPCODES;
 }
 
 size_t get_max_operands(const std::map<typet, size_t> &slots)
@@ -243,7 +258,10 @@ class body_factoryt
   symbol_tablet &st;
   goto_programt &body;
   const std::string &func_name;
+  const goto_programt::targett end;
   goto_programt::targett dummy;
+  goto_programt::targett last_case;
+  goto_programt::targett switch_end;
 public:
   goto_programt::targett pos;
 private:
@@ -258,7 +276,8 @@ private:
   }
 public:
   body_factoryt(symbol_tablet &st, goto_programt &body, const std::string &name) :
-      st(st), body(body), func_name(name), dummy(body.add_instruction(SKIP))
+      st(st), body(body), func_name(name), end(body.instructions.end()), dummy(
+          body.add_instruction(SKIP)), last_case(end), switch_end(end)
   {
     pos=dummy;
   }
@@ -268,15 +287,19 @@ public:
     body.instructions.erase(dummy);
   }
 
-  void decl(const std::string &name, const exprt &value)
+  void decl(const std::string &name, const typet &type)
   {
-    const typet &type=value.type();
     pos=declare_local_meta_variable(st, func_name, body, pos, name, type);
-    pos=cegis_assign_local_variable(st, body, pos, func_name, name, value);
     dead(name);
   }
 
-  void decl(const std::string &name)
+  void decl(const std::string &name, const exprt &value)
+  {
+    decl(name, value.type());
+    pos=cegis_assign_local_variable(st, body, pos, func_name, name, value);
+  }
+
+  void decl_instr_member(const std::string &name)
   {
     const std::string prog(get_local_meta_name(func_name, PROGRAM_PARAM_ID));
     const symbol_exprt prog_expr(st.lookup(prog).symbol_expr());
@@ -315,26 +338,92 @@ public:
     add_goto(guard, target);
   }
 
-  void add_conditional_instr_goto()
+  goto_programt::targett add_conditional_instr_goto(const size_t opcode)
   {
+    const source_locationt loc(default_cegis_source_location());
+    if (end == switch_end)
+    {
+      switch_end=body.insert_after(pos);
+      switch_end->type=goto_program_instruction_typet::SKIP;
+      switch_end->source_location=loc;
+    }
+    pos=body.insert_after(pos);
+    pos->type=goto_program_instruction_typet::GOTO;
+    pos->source_location=loc;
+    const constant_exprt rhs(from_integer(opcode, cegis_size_type()));
+    const std::string name(get_local_meta_name(func_name, OPCODE_MEMBER_NAME));
+    const symbol_exprt lhs(st.lookup(name).symbol_expr());
+    pos->guard=equal_exprt(lhs, rhs);
+    if (end != last_case) last_case->targets.push_back(pos);
+    last_case=pos;
+    pos=body.insert_after(pos);
+    pos->type=goto_program_instruction_typet::SKIP;
+    pos->source_location=loc;
+    const goto_programt::targett result(pos);
+    pos=body.insert_after(pos);
+    pos->type=goto_program_instruction_typet::GOTO;
+    pos->source_location=loc;
+    pos->targets.push_back(switch_end);
+    return result;
+  }
 
+  void finalise_conditional_instr_gotos()
+  {
+    last_case->targets.push_back(switch_end);
+    last_case=end;
+    switch_end=end;
   }
 };
+
+std::string get_tmp_op(const symbol_tablet &st, const size_t op,
+    const typet &type)
+{
+  std::string result(OPERAND_ID_MEMBER_NAME_PREFIX);
+  result+=std::to_string(op);
+  result+='_';
+  return result+=type2c(type, namespacet(st));
+}
+
+std::string get_tmp_result_op(const symbol_tablet &st, const typet &type)
+{
+  std::string result(OPERAND_TMP_RESULT_PREFIX);
+  return result+=type2c(type, namespacet(st));
+}
 
 void generate_processor_body(symbol_tablet &st, goto_programt &body,
     const std::string &name, const std::map<typet, size_t> &slots)
 {
   body_factoryt factory(st, body, name);
   factory.decl(INSTR_INDEX, gen_zero(cegis_size_type()));
-  factory.decl(OPCODE_MEMBER_NAME);
+  factory.decl_instr_member(OPCODE_MEMBER_NAME);
   const goto_programt::targett loop_head=std::prev(factory.pos);
-  for (size_t i=0; i < get_max_operands(slots); ++i)
+  const size_t global_max_operands=get_max_operands(slots);
+  for (size_t i=0; i < global_max_operands; ++i)
   {
     std::string op_member(OPERAND_ID_MEMBER_NAME_PREFIX);
-    factory.decl(op_member+=std::to_string(i));
+    factory.decl_instr_member(op_member+=std::to_string(i));
   }
-  // TODO: Declare temps (lhs, rhs, result) per type
-  // TODO: Declare temp-init per type
+  for (const std::pair<typet, size_t> &slot : slots)
+  {
+    const typet &type=slot.first;
+    const size_t max_operands=get_max_operands(type);
+    for (size_t i=0; i < max_operands; ++i)
+      factory.decl(get_tmp_op(st, i, type), type);
+    factory.decl(get_tmp_result_op(st, type), type);
+  }
+  size_t opcode=0;
+  for (const std::pair<typet, size_t> &slot : slots)
+  {
+    // TODO: Declare temp-init per type
+    const typet &type=slot.first;
+    const size_t num_instrs=opcode + get_num_instructions(type);
+    assert(num_instrs);
+    goto_programt::targett init;
+    for (; opcode < num_instrs; ++opcode)
+      init=factory.add_conditional_instr_goto(opcode);
+    // TODO: assign value from var array.
+  }
+  factory.finalise_conditional_instr_gotos();
   // TODO: Declare operation per type
   // TODO: Declare result assign per type
   factory.add_index_increment();
