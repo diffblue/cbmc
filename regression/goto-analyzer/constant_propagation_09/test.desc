@@ -1,6 +1,6 @@
 CORE
 constant_propagation_09.c
---constants --intervals --verify
+--intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ******** Function main
