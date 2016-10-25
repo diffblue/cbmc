@@ -251,7 +251,8 @@ void goto_convertt::clean_expr(
     }
 
     const source_locationt source_location=expr.find_source_location();
-  
+    
+    #if 0
     // We do some constant-folding here, to mimic
     // what typical compilers do.
     {
@@ -270,6 +271,7 @@ void goto_convertt::clean_expr(
         return;
       }
     }
+    #endif
 
     goto_programt tmp_true;
     clean_expr(if_expr.true_case(), tmp_true, result_is_used);
