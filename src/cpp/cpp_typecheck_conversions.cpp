@@ -1880,9 +1880,9 @@ bool cpp_typecheckt::cast_away_constness(
   q2.write(newnt2);
   snt2.back() = newnt2;
 
-  const int k = snt1.size() < snt2.size() ? snt1.size() : snt2.size();
+  const std::size_t k = snt1.size() < snt2.size() ? snt1.size() : snt2.size();
 
-  for(int i = k; i > 1; i--)
+  for(std::size_t i = k; i > 1; i--)
   {
     snt1[snt1.size()-2].subtype() = snt1[snt1.size()-1];
     snt1.pop_back();
