@@ -54,15 +54,13 @@ void pass_preprocesst::make_to_char_array_function
 (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it)
 {
   // replace "return_tmp0 = s.toCharArray()" with:
-  // tmp_assign = MALLOC(struct java::array[reference],sizeof(s))
+  // tmp_assign = MALLOC(struct java::array[reference], 17L);
   // tmp_assign->length = (int)__CPROVER_uninterpreted_string_length_func(s);
-  // tmp_assign->data = __CPROVER_uninterpreted_string_data_func(s);
-  // return_tmp0 = tmp_assign
+  // tmp_assign->data = MALLOC(void **, tmp_assign->length);
+  // tmp_nil = __CPROVER_uninterpreted_string_data_func(s, tmp_assign->data);
+  // return_tmp0 = tmp_assign;
 
   code_function_callt &function_call=to_code_function_call(i_it->code);
-
-  debug() << "==== CALL === " << function_call.pretty() << eom;
-  debug() << "==== RETURN TYPE === " << function_call.lhs().type().pretty() << eom;
   if(function_call.lhs().type().id()!=ID_pointer)
     debug() << "the function call should return a pointer" << eom;
 
@@ -135,20 +133,23 @@ void pass_preprocesst::make_to_char_array_function
   void_star_star.move_to_subtypes(tmp_void_star);
 
   malloc_expr_data.type()=pointer_typet(void_star_star);
-  debug() << "malloc_expr_data.type():" << malloc_expr_data.type().pretty() << eom;
-    //pointer_typet(pointer_typet(refined_string_typet::java_char_type(),32),32);
-  //exprt char_size = //size_of_expr(malloc_expr_data.type().subtype(), ns);
   exprt array_size = member_exprt(dereference_exprt(tmp_assign,object_type)
 				  ,"length",signedbv_typet(32));
   malloc_expr_data.copy_to_operands(array_size);
   malloc_expr_data.add_source_location()=location;
 
-  exprt data_pointer = member_exprt(dereference_exprt(tmp_assign,object_type),"data", void_star_star);
-			
-  new_code.push_back(code_assignt(data_pointer, malloc_expr_data));
+  auxiliary_symbolt tmp_malloc_symbol;
+  tmp_malloc_symbol.base_name="tmp_malloc";
+  tmp_malloc_symbol.is_static_lifetime=false;
+  tmp_malloc_symbol.mode=ID_java;
+  tmp_malloc_symbol.name="tmp_malloc";
+  tmp_malloc_symbol.type=void_star_star;
+  symbol_table.add(tmp_malloc_symbol);
 
-  debug() << "-- assigning " << malloc_expr_data.pretty() << eom
-	  << "--------- to " << data_pointer.pretty() << eom;
+  symbol_exprt tmp_malloc("tmp_malloc",void_star_star);
+  exprt data_pointer = member_exprt(dereference_exprt(tmp_assign,object_type),"data", void_star_star);
+  new_code.push_back(code_assignt(tmp_malloc, malloc_expr_data));
+  new_code.push_back(code_assignt(data_pointer, tmp_malloc));
 
   // tmp_assing->data = __CPROVER_uninterpreted_string_data_func(s,tmp_assing->data);
   auxiliary_symbolt tmp_data_symbol;
@@ -156,32 +157,43 @@ void pass_preprocesst::make_to_char_array_function
   tmp_data_symbol.is_static_lifetime=false;
   tmp_data_symbol.mode=ID_java;
   tmp_data_symbol.name=cprover_string_data_func;
-  tmp_data_symbol.type=//pointer_typet(
-    pointer_typet(void_typet());
-//pointer_typet(refined_string_typet(refined_string_typet::java_char_type()).get_content_type());
+  tmp_data_symbol.type=void_typet();
   symbol_table.add(tmp_data_symbol);
   goto_functions.function_map[cprover_string_data_func];
 
   function_application_exprt call_to_data;
-  call_to_data.type()=void_star_star;
+  call_to_data.type()=void_typet();
   call_to_data.add_source_location()=location;
   call_to_data.function()=symbol_exprt(cprover_string_data_func);
   call_to_data.arguments().push_back(string_argument);
-  call_to_data.arguments().push_back(data_pointer);
-  new_code.push_back(code_assignt(data_pointer,call_to_data));
+  call_to_data.arguments().push_back(data_pointer);//dereference_exprt(tmp_assign,object_type));
+  call_to_data.arguments().push_back(dereference_exprt(tmp_malloc));
+  
+  auxiliary_symbolt tmp_nil_symbol;
+  tmp_nil_symbol.base_name="tmp_nil";
+  tmp_nil_symbol.is_static_lifetime=false;
+  tmp_nil_symbol.mode=ID_java;
+  tmp_nil_symbol.name="tmp_nil";
+  tmp_nil_symbol.type=void_typet();
+  symbol_table.add(tmp_nil_symbol);
+
+  new_code.push_back(code_assignt(symbol_exprt("tmp_nil",void_typet()),call_to_data));
+
 
   // return_tmp0 = tmp_assign
   new_code.push_back(code_assignt(function_call.lhs(), tmp_assign));
-
+  
 
   //  putting the assignements into the program
   for(int i=0; i<new_code.size(); i++) 
     {
+      assert(new_code[i].get_statement() == ID_assign);
       i_it->make_assignment();
       i_it->code=new_code[i];
       i_it->source_location=location;
       if(i<new_code.size()-1)
 	i_it=goto_program.insert_after(i_it);
+
     }
 }
 
@@ -345,28 +357,30 @@ void pass_preprocesst::replace_string_calls
 
 exprt pass_preprocesst::replace_string_literals(const exprt & expr) 
 {
-  if(has_java_string_type(expr) ) {
-    if(expr.operands().size() == 1 && expr.op0().id() ==ID_symbol) {
-      std::string id(to_symbol_expr(expr.op0()).get_identifier().c_str());
-      if(id.substr(0,31) == "java::java.lang.String.Literal."){
-	function_application_exprt rhs;
-	rhs.type()=expr.type();
-	rhs.add_source_location()=expr.source_location();
-	rhs.function()=symbol_exprt(cprover_string_literal_func);
-	goto_functions.function_map[cprover_string_literal_func];
-	rhs.arguments().push_back(address_of_exprt(expr.op0()));
-	auxiliary_symbolt tmp_symbol;
-	tmp_symbol.is_static_lifetime=false;
-	tmp_symbol.mode=ID_java;
-	tmp_symbol.name=cprover_string_literal_func;
-	symbol_table.add(tmp_symbol);
-	return rhs;
-      }
+  if(has_java_string_type(expr) ) 
+    {
+      if(expr.operands().size() == 1 && expr.op0().id() ==ID_symbol) 
+	{
+	  std::string id(to_symbol_expr(expr.op0()).get_identifier().c_str());
+	  if(id.substr(0,31) == "java::java.lang.String.Literal.")
+	    {
+	      function_application_exprt rhs;
+	      rhs.type()=expr.type();
+	      rhs.add_source_location()=expr.source_location();
+	      rhs.function()=symbol_exprt(cprover_string_literal_func);
+	      goto_functions.function_map[cprover_string_literal_func];
+	      rhs.arguments().push_back(address_of_exprt(expr.op0()));
+	      auxiliary_symbolt tmp_symbol;
+	      tmp_symbol.is_static_lifetime=false;
+	      tmp_symbol.mode=ID_java;
+	      tmp_symbol.name=cprover_string_literal_func;
+	      symbol_table.add(tmp_symbol);
+	      return rhs;
+	    }
+	}
     }
-  }
   return expr;
 }
-
 
 pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_functionst & _goto_functions, const namespacet & _ns, message_handlert &_message_handler):
   messaget(_message_handler), symbol_table(_symbol_table),goto_functions(_goto_functions), ns(_ns)

@@ -50,6 +50,10 @@ public:
   inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr)
   { symbol_to_string[sym.get_identifier()]= expr; }  
 
+
+  // member expressions that needs to be converted to something else during conversion
+  std::map<exprt, exprt> member_substitutions;
+
   // We maintain a map from symbols to strings. If a symbol is not yet present we will create a new one with the correct type depending on whether this is a java or c string
   string_exprt get_string_of_symbol(const symbol_exprt & sym);
 

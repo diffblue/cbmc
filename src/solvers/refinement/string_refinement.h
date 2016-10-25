@@ -45,13 +45,13 @@ private:
 protected:
 
   typedef std::set<exprt> expr_sett;
-  typedef std::map<exprt, exprt> expr_mapt;
   
   virtual void post_process();
   virtual bvt convert_symbol(const exprt &expr);
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
   virtual bvt convert_pointer_type(const exprt &expr);
+  virtual bvt convert_member(const member_exprt &expr);
 
   decision_proceduret::resultt dec_solve();
 
@@ -59,14 +59,13 @@ protected:
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
 
 
-
 private:
+  
+  string_constraint_generatort generator;
 
   // Tells if a char value is in the high-surrogates or low surrogates ranges
   exprt is_high_surrogate(const exprt & chr);
   exprt is_low_surrogate(const exprt & chr);
-
-  string_constraint_generatort generator;
 
   // Simple constraints that have been given to the solver
   expr_sett seen_instances;

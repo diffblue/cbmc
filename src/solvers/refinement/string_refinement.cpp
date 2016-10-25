@@ -89,10 +89,11 @@ literalt string_refinementt::convert_rest(const exprt &expr)
       assert(bv.size() == 1); 
       return bv[0];
     }
-  else {
-    //debug() << "string_refinementt::convert_rest("<< pretty_short(expr) << ")" << eom;
-    return SUB::convert_rest(expr);
-  }
+  else 
+    {
+      //debug() << "string_refinementt::convert_rest("<< pretty_short(expr) << ")" << eom;
+      return SUB::convert_rest(expr);
+    }
 }
 
 bvt string_refinementt::convert_pointer_type(const exprt &expr)
@@ -130,6 +131,22 @@ bvt string_refinementt::convert_pointer_type(const exprt &expr)
     return SUB::convert_pointer_type(expr);
   }
   //}
+}
+
+
+bvt string_refinementt::convert_member(const member_exprt &expr)
+{
+  //debug() << "string_refinementt::convert_member( " << expr.pretty() << ");" << eom;
+  // DOES NOT SEEM TO BE USEFULL
+  std::map<exprt,exprt>::iterator it = generator.member_substitutions.find(expr);
+  if(it!=generator.member_substitutions.end())
+    {
+      debug() << "substituting : " << expr.pretty() << eom << "for : " 
+	      << it->second.pretty() << eom;
+      return SUB::convert_bv(it->second);
+    }
+  else 
+    return SUB::convert_member(expr);
 }
 
 bvt string_refinementt::convert_symbol(const exprt &expr)

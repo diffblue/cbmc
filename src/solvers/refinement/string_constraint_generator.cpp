@@ -12,7 +12,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <ansi-c/string_constant.h>
 #include <solvers/floatbv/float_bv.h>
 #include <java_bytecode/java_types.h>
-
+#include <util/pointer_predicates.h>
 
 constant_exprt string_constraint_generatort::constant_char(int i)
 {
@@ -448,8 +448,8 @@ string_exprt string_constraint_generatort::java_char_array(const exprt & char_ar
 {
   string_exprt res(get_char_type());
   exprt arr = to_address_of_expr(char_array).object();
-  exprt len = member_exprt(arr, "length",res.length().type());
-  exprt cont = member_exprt(arr, "data",res.content().type());
+  exprt len = member_exprt(arr, "length", res.length().type());
+  exprt cont = member_exprt(arr, "data", res.content().type());
   res.op0() = len;
   res.op1() = cont;
   return res;
@@ -1199,8 +1199,31 @@ exprt string_constraint_generatort::string_length
 exprt string_constraint_generatort::string_data
 (const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,2)[0]);
-  return address_of_exprt(str.content());
+  string_exprt str = string_of_expr(args(f,3)[0]);
+  exprt tab_data = args(f,3)[1];
+  exprt data = args(f,3)[2];
+  //axioms.push_back(equal_exprt(str.content(),data));
+  //member_substitutions[data]=str;
+  symbol_exprt qvar = fresh_univ_index("QA_string_data");
+  // translating data[qvar]  to the correct expression
+  // which is (signed int)byte_extract_little_endian(tab?data?, (2l*qvar) + POINTER_OFFSET(byte_extract_little_endian(tab.data, 0l, unsigned short int *)), unsigned short int)
+  exprt char_in_tab =  typecast_exprt  
+    (byte_extract_exprt(ID_byte_extract_little_endian,data,
+			plus_exprt
+			(mult_exprt(constant_signed(2,64),typecast_exprt(qvar,signedbv_typet(64))),
+			 pointer_offset(byte_extract_exprt
+					(ID_byte_extract_little_endian,
+					 tab_data
+					 ,constant_signed(0,64),pointer_typet(unsignedbv_typet(16))))),unsignedbv_typet(16)),
+     get_char_type());
+
+  string_constraintt eq(equal_exprt(str[qvar],char_in_tab));
+  //string_constraintt eq(equal_exprt(constant_char('b'),char_in_tab));
+  axioms.push_back(eq.forall(qvar,str.length()));
+
+  exprt void_expr;
+  void_expr.type() = void_typet();
+  return void_expr;
 }
 
 exprt is_positive(const exprt & x)
