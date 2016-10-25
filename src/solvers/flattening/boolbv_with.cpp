@@ -287,6 +287,9 @@ void boolbvt::convert_with_struct(
       if(!base_type_eq(subtype, op2.type(), ns))
       {
         error().source_location=type.source_location();
+	error() << "solvers/flattening/boolbv_with.cpp:" << eom;
+	error() << "expected gobal type = " << type.pretty() << eom;
+	error() << "op2 = " << op2.pretty() << eom;
         error() << "with/struct: component `" << component_name
                 << "' type does not match: "
                 << subtype.pretty() << " vs. "

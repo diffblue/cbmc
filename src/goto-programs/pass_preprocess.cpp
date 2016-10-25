@@ -50,53 +50,39 @@ void pass_preprocesst::make_string_function
   i_it->code=assignment;
 }
 
-void pass_preprocesst::make_array_function
-(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
- irep_idt function_name)
+void pass_preprocesst::make_to_char_array_function
+(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it)
 {
-  // replace "lhs=s.toCharArray()" with:
-  // tmp_assign = MALLOC(struct java::array[char],s->length)
-  // *tmp_assign = "function_name"()
-  // return_tmp1 = tmp_assign
+  // replace "return_tmp0 = s.toCharArray()" with:
+  // tmp_assign = MALLOC(struct java::array[reference],sizeof(s))
+  // tmp_assign->length = (int)__CPROVER_uninterpreted_string_length_func(s);
+  // tmp_assign->data = __CPROVER_uninterpreted_string_data_func(s);
+  // return_tmp0 = tmp_assign
 
   code_function_callt &function_call=to_code_function_call(i_it->code);
-  debug() << "function_call = " << function_call.pretty() << eom;
+
+  debug() << "==== CALL === " << function_call.pretty() << eom;
+  debug() << "==== RETURN TYPE === " << function_call.lhs().type().pretty() << eom;
   if(function_call.lhs().type().id()!=ID_pointer)
     debug() << "the function call should return a pointer" << eom;
 
-  // we produce a malloc side-effect, which stays
   typet object_type = function_call.lhs().type().subtype();
   exprt object_size = size_of_expr(object_type, ns);
 
   if(object_size.is_nil())
     debug() << "do_java_new got nil object_size" << eom;
 
-  debug() << "adding the name " << function_name << " to the symbols" << eom;
-  goto_functions.function_map[irep_idt(function_name)];
-  auxiliary_symbolt tmp_symbol;
-  tmp_symbol.base_name=function_name;
-  tmp_symbol.is_static_lifetime=false;
-  tmp_symbol.mode=ID_java;
-  tmp_symbol.name=function_name;
-  tmp_symbol.type=pointer_typet(object_type);
-  symbol_table.add(tmp_symbol);
+  auto location = function_call.source_location();
+  std::vector<codet> new_code;
+
 
   side_effect_exprt malloc_expr(ID_malloc);
   malloc_expr.copy_to_operands(object_size);
   malloc_expr.type()=pointer_typet(object_type);
-  malloc_expr.add_source_location()=function_call.source_location();
-
-  side_effect_exprt malloc_expr_data(ID_malloc);
-  exprt array_size = constant_exprt(integer2binary(12,32),signedbv_typet(32));
-  exprt char_size = constant_exprt(integer2binary(32,32),signedbv_typet(32));
-  // this may not be correct
-  malloc_expr_data.copy_to_operands(mult_exprt(array_size,char_size));
-  malloc_expr_data.type()=pointer_typet(object_type.subtype());
-  malloc_expr_data.add_source_location()=function_call.source_location();
-  
+  malloc_expr.add_source_location()=location;
 
   assert(function_call.arguments().size() >= 1);
-  exprt string_argument = function_call.arguments()[0];
+  exprt string_argument = replace_string_literals(function_call.arguments()[0]);
   typet string_argument_type = string_argument.type();
 
   auxiliary_symbolt tmp_assign_symbol;
@@ -115,80 +101,88 @@ void pass_preprocesst::make_array_function
   tmp_string_symbol.type=string_argument_type.subtype();
   symbol_table.add(tmp_string_symbol);
 
-  auxiliary_symbolt tmp_data_symbol;
-  tmp_data_symbol.base_name="tmp_data";
-  tmp_data_symbol.is_static_lifetime=false;
-  tmp_data_symbol.mode=ID_java;
-  tmp_data_symbol.name="tmp_data";
-  tmp_data_symbol.type=string_argument_type.subtype();
-  symbol_table.add(tmp_data_symbol);
-
+  // tmp_assign = MALLOC(struct java::array[reference],sizeof(s))
   symbol_exprt tmp_assign("tmp_assign",pointer_typet(object_type));
-  code_assignt assign1(tmp_assign, malloc_expr);
-  code_assignt assign2(member_exprt(dereference_exprt(tmp_assign,object_type),"data"), malloc_expr_data);
-  symbol_exprt tmp_string("tmp_string",string_argument_type.subtype());
-  code_assignt assign3aux(tmp_string, dereference_exprt(function_call.arguments()[0]));
-  symbol_exprt tmp_data("tmp_data",string_argument_type.subtype());
+  code_assignt assign_malloc(tmp_assign, malloc_expr);
+  new_code.push_back(assign_malloc);
 
-  // geting the length
+  // tmp_assign->length = (int)__CPROVER_uninterpreted_string_length_func(s);
   auxiliary_symbolt tmp_length_symbol;
-  //tmp_symbol.base_name=base_name;
+  tmp_length_symbol.base_name=cprover_string_length_func;
   tmp_length_symbol.is_static_lifetime=false;
   tmp_length_symbol.mode=ID_java;
   tmp_length_symbol.name=cprover_string_length_func;
-  // tmp_symbol.type=type;
   tmp_length_symbol.type=unsignedbv_typet(32);
   symbol_table.add(tmp_length_symbol);
-  // make sure it is in the function map
   goto_functions.function_map[cprover_string_length_func];
-  
-  function_application_exprt rhs;
-  rhs.type()=unsignedbv_typet(32);
-  rhs.add_source_location()=function_call.source_location();
-  rhs.function()=symbol_exprt(cprover_string_length_func);
-  rhs.arguments().push_back(replace_string_literals(function_call.arguments()[0]));
+
+  function_application_exprt call_to_length;
+  call_to_length.type()=unsignedbv_typet(32);
+  call_to_length.add_source_location()=location;
+  call_to_length.function()=symbol_exprt(cprover_string_length_func);
+  call_to_length.arguments().push_back(string_argument);
+
+  code_assignt assign_length(member_exprt(dereference_exprt(tmp_assign,object_type)
+					  ,"length",signedbv_typet(32)),
+			     typecast_exprt(call_to_length,signedbv_typet(32)));
+  new_code.push_back(assign_length);
+
+  // tmp_assign->data = MALLOC(length)
+  side_effect_exprt malloc_expr_data(ID_malloc);
+  pointer_typet tmp_void_star = pointer_typet(void_typet());
+  tmp_void_star.set(ID_C_reference,true);
+  typet void_star_star=pointer_typet();
+  void_star_star.move_to_subtypes(tmp_void_star);
+
+  malloc_expr_data.type()=pointer_typet(void_star_star);
+  debug() << "malloc_expr_data.type():" << malloc_expr_data.type().pretty() << eom;
+    //pointer_typet(pointer_typet(refined_string_typet::java_char_type(),32),32);
+  //exprt char_size = //size_of_expr(malloc_expr_data.type().subtype(), ns);
+  exprt array_size = member_exprt(dereference_exprt(tmp_assign,object_type)
+				  ,"length",signedbv_typet(32));
+  malloc_expr_data.copy_to_operands(array_size);
+  malloc_expr_data.add_source_location()=location;
+
+  exprt data_pointer = member_exprt(dereference_exprt(tmp_assign,object_type),"data", void_star_star);
+			
+  new_code.push_back(code_assignt(data_pointer, malloc_expr_data));
+
+  debug() << "-- assigning " << malloc_expr_data.pretty() << eom
+	  << "--------- to " << data_pointer.pretty() << eom;
+
+  // tmp_assing->data = __CPROVER_uninterpreted_string_data_func(s,tmp_assing->data);
+  auxiliary_symbolt tmp_data_symbol;
+  tmp_data_symbol.base_name=cprover_string_data_func;
+  tmp_data_symbol.is_static_lifetime=false;
+  tmp_data_symbol.mode=ID_java;
+  tmp_data_symbol.name=cprover_string_data_func;
+  tmp_data_symbol.type=//pointer_typet(
+    pointer_typet(void_typet());
+//pointer_typet(refined_string_typet(refined_string_typet::java_char_type()).get_content_type());
+  symbol_table.add(tmp_data_symbol);
+  goto_functions.function_map[cprover_string_data_func];
+
+  function_application_exprt call_to_data;
+  call_to_data.type()=void_star_star;
+  call_to_data.add_source_location()=location;
+  call_to_data.function()=symbol_exprt(cprover_string_data_func);
+  call_to_data.arguments().push_back(string_argument);
+  call_to_data.arguments().push_back(data_pointer);
+  new_code.push_back(code_assignt(data_pointer,call_to_data));
+
+  // return_tmp0 = tmp_assign
+  new_code.push_back(code_assignt(function_call.lhs(), tmp_assign));
 
 
-  //code_assignt assign3aux2(tmp_data, ;
-  code_assignt assign3(member_exprt
-		       (dereference_exprt
-			(tmp_assign,object_type)
-			,"length",signedbv_typet(32)),
-		       //constant_exprt(integer2binary(12,32),signedbv_typet(32)));
-		       typecast_exprt(rhs,signedbv_typet(32)));
-  //member_exprt(tmp_string,"length",signedbv_typet(32)));
-		       //function_app);
-  code_assignt assign4(function_call.lhs(), tmp_assign);
-  auto location = function_call.source_location();
-
-  debug() << " ------------ ASSIGN1 ---------------" << eom;
-  debug() << tmp_assign.pretty() << eom << " <-- " << malloc_expr.pretty() << eom;
-
-
-  i_it->make_assignment();
-  i_it->code=assign1;
-  i_it->source_location = location;
-  i_it=goto_program.insert_after(i_it);
-  
-  /*i_it->make_assignment();
-  i_it->code=assign2;
-  i_it->source_location = location;
-  i_it=goto_program.insert_after(i_it);*/
-  
-  i_it->make_assignment();
-  i_it->code=assign3aux;
-  i_it->source_location = location;
-  i_it=goto_program.insert_after(i_it);
-
-  i_it->make_assignment();
-  i_it->code=assign3;
-  i_it->source_location = location;
-  i_it=goto_program.insert_after(i_it);
-
-  i_it->make_assignment();
-  i_it->code=assign4;
-  i_it->source_location = location;
-  
+  //  putting the assignements into the program
+  for(int i=0; i<new_code.size(); i++) 
+    {
+      i_it->make_assignment();
+      i_it->code=new_code[i];
+      i_it->source_location=location;
+      if(i<new_code.size()-1)
+	i_it=goto_program.insert_after(i_it);
+    }
 }
 
 void pass_preprocesst::make_string_function_of_assign
@@ -305,43 +299,45 @@ void pass_preprocesst::replace_string_calls
   // map several names of a string builder to a unique one
   std::map<exprt, exprt> string_builders;
   
-  Forall_goto_program_instructions(i_it, goto_program) {  
-    debug() << "instruction: " << i_it->code.pretty() << eom;
-
-    if(i_it->is_function_call()) {
-
-      code_function_callt &function_call=to_code_function_call(i_it->code);
-      for(unsigned i = 0; i < function_call.arguments().size(); i++)
-	if(string_builders.find(function_call.arguments()[i]) != string_builders.end())
-	  function_call.arguments()[i]= string_builders[function_call.arguments()[i]];
-
-      if(function_call.function().id()==ID_symbol){
-	const irep_idt function_id=
-	  to_symbol_expr(function_call.function()).get_identifier();
+  Forall_goto_program_instructions(i_it, goto_program) 
+    {  
+      if(i_it->is_function_call()) 
+	{
 	  
-	if(string_functions.find(function_id) != string_functions.end())
-	  make_string_function(i_it,string_functions[function_id]);
-	else if(side_effect_functions.find(function_id) != side_effect_functions.end()) 
-	  make_string_function_side_effect(goto_program, i_it,side_effect_functions[function_id]);
-	else if(string_function_calls.find(function_id) != string_function_calls.end()) 
-	  make_string_function_call(i_it, string_function_calls[function_id]);
-
-	else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
-	  make_array_function(goto_program,i_it,cprover_string_to_char_array_func);
-
-      } 
-
-    } else {
-      if(i_it->is_assign()) {
-	code_assignt assignment = to_code_assign(i_it->code);
-	exprt new_rhs = replace_string_literals(assignment.rhs());
-	code_assignt new_assignment(assignment.lhs(),new_rhs);
-	new_assignment.add_source_location()=assignment.source_location();
-	i_it->make_assignment();
-	i_it->code=new_assignment;
-      }
+	  code_function_callt &function_call=to_code_function_call(i_it->code);
+	  for(unsigned i = 0; i < function_call.arguments().size(); i++)
+	    if(string_builders.find(function_call.arguments()[i]) != string_builders.end())
+	      function_call.arguments()[i]= string_builders[function_call.arguments()[i]];
+	  
+	  if(function_call.function().id()==ID_symbol)
+	    {
+	      const irep_idt function_id=
+		to_symbol_expr(function_call.function()).get_identifier();
+	      
+	      if(string_functions.find(function_id) != string_functions.end())
+		make_string_function(i_it,string_functions[function_id]);
+	      else if(side_effect_functions.find(function_id) != side_effect_functions.end()) 
+		make_string_function_side_effect(goto_program, i_it,side_effect_functions[function_id]);
+	      else if(string_function_calls.find(function_id) != string_function_calls.end()) 
+		make_string_function_call(i_it, string_function_calls[function_id]);
+	      
+	      else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
+		make_to_char_array_function(goto_program,i_it);
+	    } 
+	} 
+      else
+	{
+	  if(i_it->is_assign()) 
+	    {
+	      code_assignt assignment = to_code_assign(i_it->code);
+	      exprt new_rhs = replace_string_literals(assignment.rhs());
+	      code_assignt new_assignment(assignment.lhs(),new_rhs);
+	      new_assignment.add_source_location()=assignment.source_location();
+	      i_it->make_assignment();
+	      i_it->code=new_assignment;
+	    }
+	}
     }
-  }
   return;
 }
 

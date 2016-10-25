@@ -55,6 +55,7 @@ const irep_idt cprover_string_is_suffix_func("__CPROVER_uninterpreted_string_is_
 const irep_idt cprover_string_is_empty_func("__CPROVER_uninterpreted_string_is_empty_func");
 const irep_idt cprover_string_last_index_of_func("__CPROVER_uninterpreted_string_last_index_of_func");
 const irep_idt cprover_string_length_func("__CPROVER_uninterpreted_string_length_func");
+const irep_idt cprover_string_data_func("__CPROVER_uninterpreted_string_data_func");
 const irep_idt cprover_string_of_int_func("__CPROVER_uninterpreted_string_of_int_func");
 const irep_idt cprover_string_of_int_hex_func("__CPROVER_uninterpreted_string_of_int_hex_func");
 const irep_idt cprover_string_of_long_func("__CPROVER_uninterpreted_string_of_long_func");

@@ -46,12 +46,9 @@ public:
   symbol_exprt fresh_univ_index(const irep_idt &prefix);
   symbol_exprt fresh_boolean(const irep_idt &prefix);
 
-
-
   std::map<irep_idt, string_exprt> symbol_to_string;
-  inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr){
-    symbol_to_string[sym.get_identifier()]= expr;
-  }  
+  inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr)
+  { symbol_to_string[sym.get_identifier()]= expr; }  
 
   // We maintain a map from symbols to strings. If a symbol is not yet present we will create a new one with the correct type depending on whether this is a java or c string
   string_exprt get_string_of_symbol(const symbol_exprt & sym);
@@ -87,6 +84,7 @@ public:
   exprt string_contains(const function_application_exprt &f);
   exprt string_equal(const function_application_exprt &f);
   exprt string_equals_ignore_case(const function_application_exprt &f);
+  exprt string_data(const function_application_exprt &f);
   string_exprt string_delete (const string_exprt &str, const exprt & start, const exprt & end);
   string_exprt string_delete(const function_application_exprt &expr);
   string_exprt string_delete_char_at(const function_application_exprt &expr);

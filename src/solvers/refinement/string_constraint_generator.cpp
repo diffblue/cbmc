@@ -249,7 +249,7 @@ exprt string_constraint_generatort::function_application
   else if(starts_with(id,cprover_string_insert_float_func))
     return string_insert_float(expr);
   else if(starts_with(id,cprover_string_substring_func))
-      return string_substring(expr);
+    return string_substring(expr);
   else if(starts_with(id,cprover_string_trim_func))
     return string_trim(expr);
   else if(starts_with(id,cprover_string_to_lower_case_func))
@@ -257,7 +257,7 @@ exprt string_constraint_generatort::function_application
   else if(starts_with(id,cprover_string_to_upper_case_func))
     return string_to_upper_case(expr);
   else if(starts_with(id,cprover_string_char_set_func))
-      return string_char_set(expr);
+    return string_char_set(expr);
   else if(starts_with(id,cprover_string_value_of_func))
     return string_value_of(expr);
   else if(starts_with(id,cprover_string_empty_string_func))
@@ -269,7 +269,7 @@ exprt string_constraint_generatort::function_application
   else if(starts_with(id,cprover_string_of_int_hex_func))
     return of_int_hex(expr);
   else if(starts_with(id,cprover_string_of_float_func))
-      return of_float(expr);
+    return of_float(expr);
   else if(starts_with(id,cprover_string_of_double_func))
     return of_double(expr);
   else if(starts_with(id,cprover_string_of_long_func))
@@ -288,15 +288,15 @@ exprt string_constraint_generatort::function_application
     return string_replace(expr);
   else if(starts_with(id,cprover_string_format_func))
     return string_format(expr);
+  else if(starts_with(id,cprover_string_data_func))
+    return string_data(expr);
   else
     {
       std::string msg("string_exprt::function_application: unknown symbol :");
       msg+=id.c_str();
       throw msg;
     }
-
 }
-
 
 
 irep_idt extract_java_string(const symbol_exprt & s)
@@ -1194,6 +1194,13 @@ exprt string_constraint_generatort::string_length
 {
   string_exprt str = string_of_expr(args(f,1)[0]);
   return str.length();
+}
+
+exprt string_constraint_generatort::string_data
+(const function_application_exprt &f)
+{
+  string_exprt str = string_of_expr(args(f,2)[0]);
+  return address_of_exprt(str.content());
 }
 
 exprt is_positive(const exprt & x)
