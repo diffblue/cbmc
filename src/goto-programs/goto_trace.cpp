@@ -65,6 +65,7 @@ void goto_trace_stept::output(
   case goto_trace_stept::ASSIGNMENT: out << "ASSIGNMENT"; break;
   case goto_trace_stept::GOTO: out << "GOTO"; break;
   case goto_trace_stept::DECL: out << "DECL"; break;
+  case goto_trace_stept::DEAD: out << "DEAD"; break;
   case goto_trace_stept::OUTPUT: out << "OUTPUT"; break;
   case goto_trace_stept::INPUT: out << "INPUT"; break;
   case goto_trace_stept::ATOMIC_BEGIN: out << "ATOMC_BEGIN"; break;
@@ -73,7 +74,9 @@ void goto_trace_stept::output(
   case goto_trace_stept::SHARED_WRITE: out << "SHARED WRITE"; break;
   case goto_trace_stept::FUNCTION_CALL: out << "FUNCTION CALL"; break;
   case goto_trace_stept::FUNCTION_RETURN: out << "FUNCTION RETURN"; break;
-  default: assert(false);
+  default:
+    out << "unknown type: " << type << std::endl;
+    assert(false);
   }
 
   if(type==ASSERT || type==ASSUME || type==GOTO)
