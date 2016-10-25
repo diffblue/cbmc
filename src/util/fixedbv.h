@@ -18,20 +18,20 @@ class fixedbv_typet;
 class fixedbv_spect
 {
 public:
-  unsigned integer_bits, width;
+  std::size_t integer_bits, width;
 
   fixedbv_spect():integer_bits(0), width(0)
   {
   }
   
-  fixedbv_spect(unsigned _width, unsigned _integer_bits):
+  fixedbv_spect(std::size_t _width, std::size_t _integer_bits):
     integer_bits(_integer_bits), width(_width)
   {
   }
   
   fixedbv_spect(const fixedbv_typet &type);
 
-  inline unsigned get_fraction_bits() const
+  inline std::size_t get_fraction_bits() const
   {
     return width-integer_bits;
   }

@@ -112,7 +112,7 @@ void goto_convertt::convert_msc_leave(
   }
   
   // need to process destructor stack
-  for(unsigned d=targets.destructor_stack.size();
+  for(std::size_t d=targets.destructor_stack.size();
       d!=targets.leave_stack_size;
       d--)
   {

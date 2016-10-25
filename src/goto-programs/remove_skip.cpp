@@ -90,7 +90,7 @@ void remove_skip(goto_programt &goto_program)
 {
   // This needs to be a fixed-point, as
   // removing a skip can turn a goto into a skip.
-  unsigned old_size;
+  std::size_t old_size;
   
   do
   {

@@ -267,7 +267,7 @@ Function: hex_to_unsigned
 
 \*******************************************************************/
 
-unsigned hex_to_unsigned(const char *hex, unsigned digits)
+unsigned hex_to_unsigned(const char *hex, std::size_t digits)
 {
   unsigned value=0;
   
@@ -301,7 +301,7 @@ Function: octal_to_unsigned
 
 \*******************************************************************/
 
-unsigned octal_to_unsigned(const char *octal, unsigned digits)
+unsigned octal_to_unsigned(const char *octal, std::size_t digits)
 {
   unsigned value=0;
   

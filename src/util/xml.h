@@ -45,6 +45,10 @@ public:
 
   void set_attribute(
     const std::string &attribute,
+    unsigned long value);
+
+  void set_attribute(
+    const std::string &attribute,
     const std::string &value);
 
   std::string get_attribute(
