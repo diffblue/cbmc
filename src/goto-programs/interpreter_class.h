@@ -47,7 +47,7 @@ protected:
   typedef std::vector<memory_cellt> memoryt;
   memoryt memory;
   
-  unsigned stack_pointer;
+  std::size_t stack_pointer;
   
   void build_memory_map();
   void build_memory_map(const symbolt &symbol);
