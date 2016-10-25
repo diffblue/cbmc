@@ -218,6 +218,8 @@ void pass_preprocesst::make_string_function_call
   code_function_callt &function_call=to_code_function_call(i_it->code);
   code_typet old_type=to_code_type(function_call.function().type());
 
+  debug() << "make_string_function_call of : " << function_call.pretty() << eom;
+
   auxiliary_symbolt tmp_symbol;
   tmp_symbol.is_static_lifetime=false;
   tmp_symbol.mode=ID_java;
@@ -412,6 +414,19 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    string_functions[irep_idt("java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;")] = cprover_string_format_func;
    string_functions[irep_idt("java::java.lang.StringBuilder.toString:()Ljava/lang/String;")] = cprover_string_copy_func;
 
+   string_functions[irep_idt("java::java.lang.String.valueOf:(F)Ljava/lang/String;")] = cprover_string_of_float_func;
+   string_functions[irep_idt("java::java.lang.Float.toString:(F)Ljava/lang/String;")] = cprover_string_of_float_func;
+   string_functions[irep_idt("java::java.lang.Integer.toString:(I)Ljava/lang/String;")] = cprover_string_of_int_func;
+   string_functions[irep_idt("java::java.lang.String.valueOf:(I)Ljava/lang/String;")] = cprover_string_of_int_func;
+   string_functions[irep_idt("java::java.lang.Integer.toHexString:(I)Ljava/lang/String;")] = cprover_string_of_int_hex_func;
+   string_functions[irep_idt("java::java.lang.String.valueOf:(L)Ljava/lang/String;")] = cprover_string_of_long_func;
+   string_functions[irep_idt("java::java.lang.String.valueOf:(D)Ljava/lang/String;")] = cprover_string_of_double_func;
+   string_functions[irep_idt("java::java.lang.String.valueOf:(Z)Ljava/lang/String;")] = cprover_string_of_bool_func;
+   string_functions[irep_idt("java::java.lang.String.valueOf:(C)Ljava/lang/String;")] = cprover_string_of_char_func;
+   string_functions[irep_idt("java::java.lang.Integer.parseInt:(Ljava/lang/String;)I")] = cprover_string_parse_int_func;
+   string_functions[irep_idt("java::java.lang.String.valueOf:([CII)Ljava/lang/String;)")] = cprover_string_value_of_func;
+   string_functions[irep_idt("java::java.lang.String.valueOf:([C)Ljava/lang/String;")] = cprover_string_value_of_func;
+
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")] = cprover_string_concat_func;
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.setCharAt:(IC)V")] = cprover_string_char_set_func;
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.append:(I)Ljava/lang/StringBuilder;")] = cprover_string_concat_int_func;
@@ -435,18 +450,6 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:(Ljava/lang/String;)V")] = cprover_string_copy_func;
    string_function_calls[irep_idt("java::java.lang.String.<init>:()V")] = cprover_string_empty_string_func;
    string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:()V")] = cprover_string_empty_string_func;
-   string_function_calls[irep_idt("java::java.lang.Integer.toString:(I)Ljava/lang/String;")] = cprover_string_of_int_func;
-   string_function_calls[irep_idt("java::java.lang.String.valueOf:(I)Ljava/lang/String;")] = cprover_string_of_int_func;
-   string_function_calls[irep_idt("java::java.lang.Integer.toHexString:(I)Ljava/lang/String;")] = cprover_string_of_int_hex_func;
-   string_function_calls[irep_idt("java::java.lang.String.valueOf:(L)Ljava/lang/String;")] = cprover_string_of_long_func;
-   string_function_calls[irep_idt("java::java.lang.String.valueOf:(F)Ljava/lang/String;")] = cprover_string_of_float_func;
-   string_function_calls[irep_idt("java::java.lang.Float.toString:(F)Ljava/lang/String;")] = cprover_string_of_float_func;
-   string_function_calls[irep_idt("java::java.lang.String.valueOf:(D)Ljava/lang/String;")] = cprover_string_of_double_func;
-   string_function_calls[irep_idt("java::java.lang.String.valueOf:(Z)Ljava/lang/String;")] = cprover_string_of_bool_func;
-   string_function_calls[irep_idt("java::java.lang.String.valueOf:(C)Ljava/lang/String;")] = cprover_string_of_char_func;
-   string_function_calls[irep_idt("java::java.lang.Integer.parseInt:(Ljava/lang/String;)I")] = cprover_string_parse_int_func;
-   string_function_calls[irep_idt("java::java.lang.String.valueOf:([CII)Ljava/lang/String;)")] = cprover_string_value_of_func;
-   string_function_calls[irep_idt("java::java.lang.String.valueOf:([C)Ljava/lang/String;")] = cprover_string_value_of_func;
 
   Forall_goto_functions(it, goto_functions)
   {
