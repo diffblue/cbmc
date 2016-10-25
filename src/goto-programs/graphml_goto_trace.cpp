@@ -149,7 +149,7 @@ void convert(
   const goto_tracet &goto_trace,
   graphmlt &graphml)
 {
-  const unsigned sink=graphml.add_node();
+  const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
   graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
@@ -190,7 +190,7 @@ void convert(
       continue;
     }
 
-    const unsigned node=graphml.add_node();
+    const graphmlt::node_indext node=graphml.add_node();
     graphml[node].node_name=
       i2string(it->pc->location_number)+"."+i2string(it->step_nr);
     graphml[node].file=source_location.get_file();
