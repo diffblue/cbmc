@@ -51,9 +51,10 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::SHARED_READ: out << "SHARED_READ"; break;
   case goto_trace_stept::typet::SHARED_WRITE: out << "SHARED WRITE"; break;
   case goto_trace_stept::typet::FUNCTION_CALL: out << "FUNCTION CALL"; break;
-  case goto_trace_stept::typet::FUNCTION_RETURN:
-    out << "FUNCTION RETURN"; break;
-  default: assert(false);
+  case goto_trace_stept::typet::FUNCTION_RETURN: out << "FUNCTION RETURN"; break;
+  default:
+    out << "unknown type: " << type << std::endl;
+    assert(false);
   }
 
   if(type==typet::ASSERT || type==typet::ASSUME || type==typet::GOTO)
