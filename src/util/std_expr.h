@@ -3287,6 +3287,17 @@ public:
   {
     return op0();
   }
+
+  // Retrieves the object(symbol) this member corresponds to
+  inline const symbol_exprt &symbol() const
+  {
+    const exprt &op=op0();
+    if(op.id()==ID_member)
+    {
+      return static_cast<const member_exprt &>(op).symbol();
+    }
+    return to_symbol_expr(op);
+  }
 };
 
 /*! \brief Cast a generic exprt to a \ref member_exprt
