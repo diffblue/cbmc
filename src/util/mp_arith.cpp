@@ -18,6 +18,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 
+
+typedef BigInt::ullong_t ullong_t; // NOLINT(readability/identifiers)
+typedef BigInt::llong_t llong_t; // NOLINT(readability/identifiers)
+
 mp_integer operator>>(const mp_integer &a, const mp_integer &b)
 {
   mp_integer power=::power(2, b);
@@ -206,4 +210,145 @@ unsigned integer2unsigned(const mp_integer &n)
   mp_integer::ullong_t ull=integer2ulong(n);
   assert(ull <= std::numeric_limits<unsigned>::max());
   return (unsigned)ull;
+}
+
+/// bitwise or bitwise operations only make sense on native objects, hence the
+/// largest object size should be the largest available c++ integer size
+/// (currently long long)
+mp_integer bitwise_or(const mp_integer &a, const mp_integer &b)
+{
+  ullong_t result=a.to_ulong()|b.to_ulong();
+  return result;
+}
+
+/// bitwise and bitwise operations only make sense on native objects, hence the
+/// largest object size should be the largest available c++ integer size
+/// (currently long long)
+mp_integer bitwise_and(const mp_integer &a, const mp_integer &b)
+{
+  ullong_t result=a.to_ulong()&b.to_ulong();
+  return result;
+}
+
+/// bitwise xor bitwise operations only make sense on native objects, hence the
+/// largest object size should be the largest available c++ integer size
+/// (currently long long)
+mp_integer bitwise_xor(const mp_integer &a, const mp_integer &b)
+{
+  ullong_t result=a.to_ulong()^b.to_ulong();
+  return result;
+}
+
+/// bitwise negation bitwise operations only make sense on native objects, hence
+/// the largest object size should be the largest available c++ integer size
+/// (currently long long)
+mp_integer bitwise_neg(const mp_integer &a)
+{
+  ullong_t result=~a.to_ulong();
+  return result;
+}
+
+/// arithmetic left shift bitwise operations only make sense on native objects,
+/// hence the largest object size should be the largest available c++ integer
+/// size (currently long long)
+mp_integer arith_left_shift(
+  const mp_integer &a,
+  const mp_integer &b,
+  std::size_t true_size)
+{
+  ullong_t shift=b.to_ulong();
+  if(shift>true_size && a!=mp_integer(0))
+    throw "shift value out of range";
+
+  ullong_t result=a.to_ulong()<<shift;
+  return result;
+}
+
+/// arithmetic right shift (loads sign on MSB) bitwise operations only make
+/// sense on native objects, hence the largest object size should be the largest
+/// available c++ integer size (currently long long)
+mp_integer arith_right_shift(
+  const mp_integer &a,
+  const mp_integer &b,
+  std::size_t true_size)
+{
+  ullong_t number=a.to_ulong();
+  ullong_t shift=b.to_ulong();
+  if(shift>true_size)
+    throw "shift value out of range";
+
+  ullong_t sign=(1<<(true_size-1))&number;
+  ullong_t pad=(sign==0) ? 0 : ~((1<<(true_size-shift))-1);
+  ullong_t result=(number>>shift)|pad;
+  return result;
+}
+
+/// logic left shift bitwise operations only make sense on native objects, hence
+/// the largest object size should be the largest available c++ integer size
+/// (currently long long)
+mp_integer logic_left_shift(
+  const mp_integer &a,
+  const mp_integer &b,
+  std::size_t true_size)
+{
+  ullong_t shift=b.to_ulong();
+  if(shift>true_size && a!=mp_integer(0))
+    throw "shift value out of range";
+
+  ullong_t result=a.to_ulong()<<shift;
+  return result;
+}
+
+/// logic right shift (loads 0 on MSB) bitwise operations only make sense on
+/// native objects, hence the largest object size should be the largest
+/// available c++ integer size (currently long long)
+mp_integer logic_right_shift(
+  const mp_integer &a,
+  const mp_integer &b,
+  std::size_t true_size)
+{
+  ullong_t shift=b.to_ulong();
+  if(shift>true_size)
+    throw "shift value out of range";
+
+  ullong_t result=a.to_ulong()>>shift;
+  return result;
+}
+
+/// rotates right (MSB=LSB) bitwise operations only make sense on native
+/// objects, hence the largest object size should be the largest available c++
+/// integer size (currently long long)
+mp_integer rotate_right(
+  const mp_integer &a,
+  const mp_integer &b,
+  std::size_t true_size)
+{
+  ullong_t number=a.to_ulong();
+  ullong_t shift=b.to_ulong();
+  if(shift>true_size)
+    throw "shift value out of range";
+
+  ullong_t revShift=true_size-shift;
+  ullong_t filter=1<<(true_size-1);
+  ullong_t result=(number>>shift)|((number<<revShift)&filter);
+  return result;
+}
+
+/// rotate left (LSB=MSB) bitwise operations only make sense on native objects,
+/// hence the largest object size should be the largest available c++ integer
+/// size (currently long long)
+mp_integer rotate_left(
+  const mp_integer &a,
+  const mp_integer &b,
+  std::size_t true_size)
+{
+  ullong_t number=a.to_ulong();
+  ullong_t shift=b.to_ulong();
+  if(shift>true_size)
+    throw "shift value out of range";
+
+  ullong_t revShift=true_size-shift;
+  ullong_t filter=1<<(true_size-1);
+  ullong_t result=((number<<shift)&filter)|((number&filter)>>revShift);
+  return result;
 }
