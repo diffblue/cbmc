@@ -65,7 +65,7 @@ public:
 
   const irep_idt get_l1_object_identifier() const
   {
-    #if 0
+    #if 1
     return get_l1_object().get_identifier();
     #else
     // the above is the clean version, this is the fast one, using
@@ -135,6 +135,10 @@ public:
     const irep_idt &l0,
     const irep_idt &l1,
     const irep_idt &l2);
+
+  /* Used to determine whether or not an identifier can be built
+   * before trying and getting an exception */
+  static bool can_build_identifier(const exprt &src);
 };
 
 /*! \brief Cast a generic exprt to an \ref ssa_exprt
