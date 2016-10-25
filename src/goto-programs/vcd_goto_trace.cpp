@@ -132,7 +132,7 @@ void output_vcd(
       irep_idt identifier=it.lhs_object.get_identifier();
       const typet &type=it.lhs_object.type();
         
-      unsigned number=n.number(identifier);
+      const auto number=n.number(identifier);
 
       mp_integer width;
 
@@ -164,7 +164,7 @@ void output_vcd(
         out << '#' << timestamp << "\n";
         timestamp++;
 
-        unsigned number=n.number(identifier);
+        const auto number=n.number(identifier);
         
         // booleans are special in VCD
         if(type.id()==ID_bool)
