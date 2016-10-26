@@ -278,6 +278,8 @@ exprt string_constraint_generatort::function_application
     return of_bool(expr);
   else if(starts_with(id,cprover_string_of_char_func))
     return of_char(expr);
+  else if(starts_with(id,cprover_string_of_char_array_func))
+    return of_char_array(expr);
   else if(starts_with(id,cprover_string_set_length_func))
     return string_set_length(expr);
   else if(starts_with(id,cprover_string_delete_func))
@@ -1202,11 +1204,9 @@ exprt string_constraint_generatort::string_data
   string_exprt str = string_of_expr(args(f,3)[0]);
   exprt tab_data = args(f,3)[1];
   exprt data = args(f,3)[2];
-  //axioms.push_back(equal_exprt(str.content(),data));
-  //member_substitutions[data]=str;
   symbol_exprt qvar = fresh_univ_index("QA_string_data");
   // translating data[qvar]  to the correct expression
-  // which is (signed int)byte_extract_little_endian(tab?data?, (2l*qvar) + POINTER_OFFSET(byte_extract_little_endian(tab.data, 0l, unsigned short int *)), unsigned short int)
+  // which is (signed int)byte_extract_little_endian(data, (2l*qvar) + POINTER_OFFSET(byte_extract_little_endian(tab.data, 0l, unsigned short int *)), unsigned short int)
   exprt char_in_tab =  typecast_exprt  
     (byte_extract_exprt(ID_byte_extract_little_endian,data,
 			plus_exprt
@@ -1218,13 +1218,41 @@ exprt string_constraint_generatort::string_data
      get_char_type());
 
   string_constraintt eq(equal_exprt(str[qvar],char_in_tab));
-  //string_constraintt eq(equal_exprt(constant_char('b'),char_in_tab));
   axioms.push_back(eq.forall(qvar,str.length()));
 
   exprt void_expr;
   void_expr.type() = void_typet();
   return void_expr;
 }
+
+
+string_exprt string_constraint_generatort::of_char_array
+(const function_application_exprt &f)
+{
+  string_exprt str(get_char_type());
+  exprt tab = string_of_expr(args(f,1)[0]);
+  exprt tab_data = member_exprt(tab,"data");
+  exprt tab_length = member_exprt(tab,"length");
+  exprt data = dereference_exprt(tab_data);
+  symbol_exprt qvar = fresh_univ_index("QA_string_of_char_array");
+  exprt char_in_tab =  typecast_exprt  
+    (byte_extract_exprt(ID_byte_extract_little_endian,data,
+			plus_exprt
+			(mult_exprt(constant_signed(2,64),typecast_exprt(qvar,signedbv_typet(64))),
+			 pointer_offset(byte_extract_exprt
+					(ID_byte_extract_little_endian,
+					 tab_data
+					 ,constant_signed(0,64),pointer_typet(unsignedbv_typet(16))))),unsignedbv_typet(16)),
+     get_char_type());
+
+  string_constraintt eq(equal_exprt(str[qvar],char_in_tab));
+  axioms.push_back(eq.forall(qvar,str.length()));
+  axioms.emplace_back(equal_exprt(str.length(),tab_length));
+
+  return str;
+}
+
+
 
 exprt is_positive(const exprt & x)
 { return binary_relation_exprt(x, ID_ge, refined_string_typet::index_of_int(0)); }

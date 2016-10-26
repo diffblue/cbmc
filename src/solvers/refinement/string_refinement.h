@@ -48,10 +48,10 @@ protected:
   
   virtual void post_process();
   virtual bvt convert_symbol(const exprt &expr);
-  virtual bvt convert_function_application(
-    const function_application_exprt &expr);
+  virtual bvt convert_function_application
+  (const function_application_exprt &expr);
+  
   virtual bvt convert_pointer_type(const exprt &expr);
-  virtual bvt convert_member(const member_exprt &expr);
 
   decision_proceduret::resultt dec_solve();
 

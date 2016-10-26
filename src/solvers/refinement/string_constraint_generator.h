@@ -51,9 +51,6 @@ public:
   { symbol_to_string[sym.get_identifier()]= expr; }  
 
 
-  // member expressions that needs to be converted to something else during conversion
-  std::map<exprt, exprt> member_substitutions;
-
   // We maintain a map from symbols to strings. If a symbol is not yet present we will create a new one with the correct type depending on whether this is a java or c string
   string_exprt get_string_of_symbol(const symbol_exprt & sym);
 
@@ -127,6 +124,7 @@ public:
   string_exprt of_bool(const exprt &i);
   string_exprt of_char(const function_application_exprt &f);
   string_exprt of_char(const exprt &i);
+  string_exprt of_char_array(const function_application_exprt &f);
 
   // Warning: the specifications of these functions is only partial:
   string_exprt of_float(const function_application_exprt &f);

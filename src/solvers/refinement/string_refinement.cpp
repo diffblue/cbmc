@@ -133,10 +133,12 @@ bvt string_refinementt::convert_pointer_type(const exprt &expr)
   //}
 }
 
+  /*
 
 bvt string_refinementt::convert_member(const member_exprt &expr)
 {
   //debug() << "string_refinementt::convert_member( " << expr.pretty() << ");" << eom;
+
   // DOES NOT SEEM TO BE USEFULL
   std::map<exprt,exprt>::iterator it = generator.member_substitutions.find(expr);
   if(it!=generator.member_substitutions.end())
@@ -145,9 +147,9 @@ bvt string_refinementt::convert_member(const member_exprt &expr)
 	      << it->second.pretty() << eom;
       return SUB::convert_bv(it->second);
     }
-  else 
+    else 
     return SUB::convert_member(expr);
-}
+}*/
 
 bvt string_refinementt::convert_symbol(const exprt &expr)
 {
@@ -708,7 +710,8 @@ public:
 };
 
 // Look for the given symbol in the index expression
-bool find_qvar(const exprt index, const symbol_exprt & qvar) {
+bool find_qvar(const exprt index, const symbol_exprt & qvar) 
+{
   find_qvar_visitor v2(qvar);
   try {
     index.visit(v2);
@@ -717,10 +720,11 @@ bool find_qvar(const exprt index, const symbol_exprt & qvar) {
 }
 
 
-void string_refinementt::initial_index_set(const std::vector<string_constraintt>  & string_axioms) {
-  for (size_t i = 0; i < string_axioms.size(); ++i) {
+void string_refinementt::initial_index_set
+(const std::vector<string_constraintt>  & string_axioms) 
+{
+  for (size_t i = 0; i < string_axioms.size(); ++i) 
     initial_index_set(string_axioms[i]);
-  }
 }
 
 void string_refinementt::update_index_set(const std::vector<exprt> & cur) {
@@ -736,34 +740,39 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
   std::vector<exprt> to_process;
   to_process.push_back(axiom.body());
 
-  while (!to_process.empty()) {
-    exprt cur = to_process.back();
-    to_process.pop_back();
-    if (cur.id() == ID_index) {
-      const exprt &s = cur.op0();
-      const exprt &i = cur.op1();
+  while (!to_process.empty())
+    {
+      exprt cur = to_process.back();
+      to_process.pop_back();
+      if (cur.id() == ID_index) 
+	{
+	  const exprt &s = cur.op0();
+	  const exprt &i = cur.op1();
       
-      bool has_quant_var = find_qvar(i,qvar);
+	  bool has_quant_var = find_qvar(i,qvar);
 
-      // if cur is of the form s[i] and no quantified variable appears in i
-      if(!has_quant_var){
-	current_index_set[s].insert(i);
-	index_set[s].insert(i);
-      } else {
-	// otherwise we add k-1
-	exprt e(i);
-	replace_expr(qvar,minus_exprt(axiom.univ_bound_sup(),refined_string_typet::index_of_int(1)),e);
-	current_index_set[s].insert(e);
-	index_set[s].insert(e);
-      }
+	  // if cur is of the form s[i] and no quantified variable appears in i
+	  if(!has_quant_var)
+	    {
+	      current_index_set[s].insert(i);
+	      index_set[s].insert(i);
+	    }
+	  else
+	    {
+	      // otherwise we add k-1
+	      exprt e(i);
+	      replace_expr(qvar,minus_exprt(axiom.univ_bound_sup(),refined_string_typet::index_of_int(1)),e);
+	      current_index_set[s].insert(e);
+	      index_set[s].insert(e);
+	    }
 	
-    } else {
-      forall_operands(it, cur) {
-        to_process.push_back(*it);
-      }
+	} 
+      else
+	forall_operands(it, cur) 
+	  to_process.push_back(*it);
     }
-  }
 }
+
 
 
 void string_refinementt::update_index_set(const exprt &formula)

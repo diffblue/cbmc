@@ -256,7 +256,7 @@ void pass_preprocesst::make_string_function_side_effect
 (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
  irep_idt function_name)
 {
-  // replace "s.append(x)" by "s=__CPROVER_uninterpreted_string_concat(s,x)"
+  // replace "r = s.append(x)" by "s=__CPROVER_uninterpreted_string_concat(s,x); r = s"
   code_function_callt &function_call=to_code_function_call(i_it->code);
   code_typet old_type=to_code_type(function_call.function().type());
 
@@ -268,14 +268,16 @@ void pass_preprocesst::make_string_function_side_effect
   
   function_application_exprt rhs;
   typet return_type = function_call.arguments()[0].type();
-  rhs.type()=return_type;//to_pointer_type(return_type).subtype();
+  rhs.type()=return_type;
   rhs.add_source_location()=function_call.source_location();
   rhs.function()=symbol_exprt(function_name);
+
   for(unsigned i = 0; i < function_call.arguments().size(); i++)
     rhs.arguments().push_back(replace_string_literals(function_call.arguments()[i]));
-  //code_assignt assignment(dereference_exprt(function_call.arguments()[0]), rhs);
+
   code_assignt assignment(function_call.arguments()[0], rhs);
   //code_assignt assignment2(function_call.lhs(), function_call.arguments()[0]);
+  
   // add a mapping from the left hand side to the first argument
   string_builders[function_call.lhs()]=function_call.arguments()[0]; 
   assignment.add_source_location()=function_call.source_location();
@@ -310,8 +312,6 @@ void pass_preprocesst::replace_string_calls
 (goto_functionst::function_mapt::iterator f_it)
 {
   goto_programt &goto_program=f_it->second.body;
-  // map several names of a string builder to a unique one
-  std::map<exprt, exprt> string_builders;
   
   Forall_goto_program_instructions(i_it, goto_program) 
     {  
@@ -464,6 +464,7 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:(Ljava/lang/String;)V")] = cprover_string_copy_func;
    string_function_calls[irep_idt("java::java.lang.String.<init>:()V")] = cprover_string_empty_string_func;
    string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:()V")] = cprover_string_empty_string_func;
+   string_function_calls[irep_idt("java::java.lang.String.<init>:([C)V")] = cprover_string_of_char_array_func;
 
   Forall_goto_functions(it, goto_functions)
   {

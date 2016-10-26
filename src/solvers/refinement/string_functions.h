@@ -63,6 +63,7 @@ const irep_idt cprover_string_of_bool_func("__CPROVER_uninterpreted_string_of_bo
 const irep_idt cprover_string_of_float_func("__CPROVER_uninterpreted_string_of_float_func");
 const irep_idt cprover_string_of_double_func("__CPROVER_uninterpreted_string_of_double_func");
 const irep_idt cprover_string_of_char_func("__CPROVER_uninterpreted_string_of_char_func");
+const irep_idt cprover_string_of_char_array_func("__CPROVER_uninterpreted_string_of_char_array_func");
 const irep_idt cprover_string_parse_int_func("__CPROVER_uninterpreted_string_parse_int_func");
 const irep_idt cprover_string_replace_func("__CPROVER_uninterpreted_string_replace_func");
 const irep_idt cprover_string_set_length_func("__CPROVER_uninterpreted_string_set_length_func");
