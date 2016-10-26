@@ -15,11 +15,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 
+#include <util/json.h>
+#include <util/json_expr.h>
+
 #include "bmc.h"
 
 /*******************************************************************\
 
-Function: bmct::show_vcc
+Function: bmct::show_vcc_plain
 
   Inputs:
 
@@ -29,21 +32,8 @@ Function: bmct::show_vcc
 
 \*******************************************************************/
 
-void bmct::show_vcc(std::ostream &out)
+void bmct::show_vcc_plain(std::ostream &out)
 {
-  switch(ui)
-  {
-  case ui_message_handlert::XML_UI:
-    error() << "not supported" << eom;
-    return;
-    
-  case ui_message_handlert::PLAIN:
-    break;
-    
-  default:
-    assert(false);
-  }   
-    
   out << "\n" << "VERIFICATION CONDITIONS:" << "\n" << "\n";
 
   languagest languages(ns, new_ansi_c_language());
@@ -99,6 +89,75 @@ void bmct::show_vcc(std::ostream &out)
 
 /*******************************************************************\
 
+Function: bmct::show_vcc_json
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void bmct::show_vcc_json(std::ostream &out)
+{
+  json_objectt json_result;
+
+  json_arrayt &json_vccs=json_result["vccs"].make_array();
+
+  languagest languages(ns, new_ansi_c_language());
+
+  bool has_threads=equation.has_threads();
+
+  for(symex_target_equationt::SSA_stepst::iterator
+      s_it=equation.SSA_steps.begin();
+      s_it!=equation.SSA_steps.end();
+      s_it++)
+  {
+    if(!s_it->is_assert()) continue;
+
+    // vcc object
+    json_objectt &object=json_vccs.push_back(jsont()).make_object();
+
+    const source_locationt &source_location=s_it->source.pc->source_location;
+    if(source_location.is_not_nil())
+      object["sourceLocation"]=json(source_location);
+
+    const std::string &s=s_it->comment;
+    if(!s.empty())
+      object["comment"]=json_stringt(s);
+
+    // we show everything in case there are threads
+    symex_target_equationt::SSA_stepst::const_iterator
+      last_it=has_threads?equation.SSA_steps.end():s_it;
+
+    json_arrayt &json_constraints=object["constraints"].make_array();
+
+    for(symex_target_equationt::SSA_stepst::const_iterator p_it
+          =equation.SSA_steps.begin();
+        p_it!=last_it; p_it++)
+    {
+      if((p_it->is_assume() ||
+         p_it->is_assignment() ||
+         p_it->is_constraint()) &&
+         !p_it->ignore)
+      {
+        std::string string_value;
+        languages.from_expr(p_it->cond_expr, string_value);
+        json_constraints.push_back(json_stringt(string_value));
+      }
+    }
+
+    std::string string_value;
+    languages.from_expr(s_it->cond_expr, string_value);
+    object["expression"]=json_stringt(string_value);
+  }
+
+  out << ",\n" << json_result;
+}
+
+/*******************************************************************\
+
 Function: bmct::show_vcc
 
   Inputs:
@@ -112,16 +171,34 @@ Function: bmct::show_vcc
 void bmct::show_vcc()
 {
   const std::string &filename=options.get_option("outfile");
-  
-  if(filename.empty() || filename=="-")
-    show_vcc(std::cout);
-  else
-  {
-    std::ofstream out(filename.c_str());
-    if(!out)
-      std::cerr << "failed to open " << filename << std::endl;
-    else
-      show_vcc(out);
-  }
-}
+  bool have_file=!filename.empty() && filename!="-";
 
+  std::ofstream of;
+
+  if(have_file)
+  {
+    of.open(filename);
+    if(!of)
+      throw "failed to open file "+filename;
+  }
+
+  std::ostream &out=have_file?of:std::cout;
+
+  switch(ui)
+  {
+  case ui_message_handlert::XML_UI:
+    error() << "XML UI not supported" << eom;
+    return;
+
+  case ui_message_handlert::JSON_UI:
+    show_vcc_json(out);
+    break;
+
+  case ui_message_handlert::PLAIN:
+    show_vcc_plain(out);
+    break;
+  }
+
+  if(have_file)
+    of.close();
+}
