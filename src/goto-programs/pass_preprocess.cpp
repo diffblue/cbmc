@@ -73,7 +73,6 @@ void pass_preprocesst::make_to_char_array_function
   auto location = function_call.source_location();
   std::vector<codet> new_code;
 
-
   side_effect_exprt malloc_expr(ID_malloc);
   malloc_expr.copy_to_operands(object_size);
   malloc_expr.type()=pointer_typet(object_type);
@@ -166,7 +165,7 @@ void pass_preprocesst::make_to_char_array_function
   call_to_data.add_source_location()=location;
   call_to_data.function()=symbol_exprt(cprover_string_data_func);
   call_to_data.arguments().push_back(string_argument);
-  call_to_data.arguments().push_back(data_pointer);//dereference_exprt(tmp_assign,object_type));
+  call_to_data.arguments().push_back(data_pointer);
   call_to_data.arguments().push_back(dereference_exprt(tmp_malloc));
   
   auxiliary_symbolt tmp_nil_symbol;
@@ -195,6 +194,37 @@ void pass_preprocesst::make_to_char_array_function
 	i_it=goto_program.insert_after(i_it);
 
     }
+}
+
+
+void pass_preprocesst::make_of_char_array_function
+(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, irep_idt function_name)
+{
+  // replace "return_tmp0 = String.ofCharArray(arr)" with:
+  // return_tmp0 = __CPROVER_uninterpreted_string_of_char_array_func(arr.length,arr.data);
+  code_function_callt &function_call=to_code_function_call(i_it->code);
+  exprt lhs = function_call.arguments()[0];
+  exprt arg = function_call.arguments()[1];
+  auto location = function_call.source_location();
+  typet object_type = arg.type().subtype();
+
+  pointer_typet tmp_void_star = pointer_typet(void_typet());
+  tmp_void_star.set(ID_C_reference,true);
+  typet void_star_star=pointer_typet();
+  void_star_star.move_to_subtypes(tmp_void_star);
+
+  exprt array_size = member_exprt(dereference_exprt(arg,object_type)
+				  ,"length",signedbv_typet(32));
+  exprt data_pointer = member_exprt(dereference_exprt(arg,object_type),"data",
+				    pointer_typet(pointer_typet(unsignedbv_typet(16))));
+  exprt data = dereference_exprt(data_pointer, pointer_typet(unsignedbv_typet(16)));
+
+  function_call.arguments().clear();
+  function_call.arguments().push_back(lhs);
+  function_call.arguments().push_back(array_size);
+  function_call.arguments().push_back(data_pointer);
+  function_call.arguments().push_back(data);
+  make_string_function_call(i_it,function_name);
 }
 
 void pass_preprocesst::make_string_function_of_assign
@@ -229,8 +259,6 @@ void pass_preprocesst::make_string_function_call
   // replace "s.init(x)" by "s=__CPROVER_uninterpreted_string_literal(x)"
   code_function_callt &function_call=to_code_function_call(i_it->code);
   code_typet old_type=to_code_type(function_call.function().type());
-
-  debug() << "make_string_function_call of : " << function_call.pretty() << eom;
 
   auxiliary_symbolt tmp_symbol;
   tmp_symbol.is_static_lifetime=false;
@@ -337,6 +365,9 @@ void pass_preprocesst::replace_string_calls
 	      
 	      else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
 		make_to_char_array_function(goto_program,i_it);
+	      else if(function_id == irep_idt("java::java.lang.String.<init>:([C)V"))
+		make_of_char_array_function(goto_program,i_it,cprover_string_of_char_array_func);
+
 	    } 
 	} 
       else
@@ -464,7 +495,6 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:(Ljava/lang/String;)V")] = cprover_string_copy_func;
    string_function_calls[irep_idt("java::java.lang.String.<init>:()V")] = cprover_string_empty_string_func;
    string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:()V")] = cprover_string_empty_string_func;
-   string_function_calls[irep_idt("java::java.lang.String.<init>:([C)V")] = cprover_string_of_char_array_func;
 
   Forall_goto_functions(it, goto_functions)
   {

@@ -9,11 +9,12 @@ public class test_char_array {
 	str[3] = 'l';
 	str[4] = 'o';
 	String s = new String(str);
+	char c = str[2];
 	assert(s.equals("Hello"));
 	assert(!s.equals("Hello"));
     }
 
-
+    /*
     public static void test_to_array(String t)
     {
 	String s = "abc";
@@ -26,7 +27,7 @@ public class test_char_array {
 	assert(c == 'c');
 	assert(c == d || d < 'a' || d > 'z' );
     }
-    
+    */
     public static void main(String[] argv) 
     {
 	test_init();

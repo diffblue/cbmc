@@ -32,14 +32,26 @@ class pass_preprocesst:public messaget
   exprt replace_string_literals(const exprt & );
 
   void make_string_function(goto_programt::instructionst::iterator &, irep_idt);
-  void make_to_char_array_function(goto_programt & goto_program, goto_programt::instructionst::iterator &);
-  void make_string_function_of_assign(goto_programt::instructionst::iterator & i_it, irep_idt function_name);
-  void make_string_function_call(goto_programt::instructionst::iterator & i_it, irep_idt function_name);
+
+  void make_to_char_array_function
+    (goto_programt & goto_program, goto_programt::instructionst::iterator &);
+
+  void make_of_char_array_function
+    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
+     irep_idt);
+
+  void make_string_function_of_assign
+    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
+
+  void make_string_function_call
+    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
+
   void make_string_function_side_effect
     (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
      irep_idt function_name);
 
   bool has_java_string_type(const exprt &expr);
+
   void replace_string_calls(goto_functionst::function_mapt::iterator f_it);
   
 };
