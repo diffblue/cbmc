@@ -58,6 +58,8 @@ std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
  * double op0_double;
  * double op1_double;
  * double result_double;
+ * IObject op0_iobject;
+ * IObject op1_iobject;
  *
  * switch(instr_code)
  * {
@@ -69,6 +71,13 @@ std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
  *   case 2:
  *   case 3:
  *     op0_double=*__CPROVER_cegis_variable_array_double[op0];
+ *     op1_double=*__CPROVER_cegis_variable_array_double[op1];
+ *     break;
+ *   case 4:
+ *     op0_iobject=*__CPROVER_cegis_variable_array_iobject[op0];
+ *     op1_int=*__CPROVER_cegis_variable_array_int[op1];
+ *   case 5:
+ *     op0_iobject=*__CPROVER_cegis_variable_array_iobject[op0];
  *     op1_double=*__CPROVER_cegis_variable_array_double[op1];
  *     break;
  * }
@@ -87,6 +96,12 @@ std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
  *   case 3:
  *     result_double=op0_double - op1_double;
  *     break;
+ *   case 4:
+ *     result_double=op0_iobject.someMethod(op1_int);
+ *     break;
+ *   case 5:
+ *     op0_iobject.someOtherMethod(op1_double);
+ *     break;
  * }
  *
  * switch(instr_code)
@@ -98,6 +113,12 @@ std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
  *   case 2:
  *   case 3:
  *     *__CPROVER_cegis_variable_array_double[rop]=result_double;
+ *     break;
+ *   case 4:
+ *     *__CPROVER_cegis_variable_array_double[rop]=result_double;
+ *     break;
+ *   case 5:
+ *     // void method
  *     break;
  * }
  * @endcode
