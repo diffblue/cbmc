@@ -5,6 +5,7 @@
 #include "java_types.h"
 
 #include <climits>
+#include <iostream>
 
 // Specialise the CFG representation to work over Java instead of GOTO programs.
 // This must be done at global scope due to template resolution rules.
@@ -159,9 +160,10 @@ static void populate_predecessor_map(
   local_variable_table_with_holest::iterator varlimit,
   const std::vector<local_variable_with_holest*>& live_variable_at_address,
   const address_mapt& amap,
-  predecessor_mapt& predecessor_map)
+  predecessor_mapt& predecessor_map,
+  message_handlert& msg_handler)
 {
-
+  messaget msg(msg_handler);
   for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
   {
     // Parameters are irrelevant to us and shouldn't be changed:
@@ -197,7 +199,11 @@ static void populate_predecessor_map(
           auto inst_before_this=amapit;
           --inst_before_this;
           if(amapit->first!=it->var.start_pc || inst_before_this->first!=pred)
-            throw "Local variable table: unexpected flow from out of range";
+          {
+            msg.warning() << "Local variable table: ignoring flow from out of range for " <<
+              it->var.name << " " << pred << " -> " << amapit->first << "\n";
+            continue;
+          }
           if(!is_store_to_slot(*(inst_before_this->second.source),it->var.index))
             throw "Local variable table: didn't find expected initialising store";
           new_start_pc=pred;
@@ -333,10 +339,24 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
   // Now find variables that flow together by walking backwards to find initialisers
   // or branches from other live ranges:
   predecessor_mapt predecessor_map;
-  populate_predecessor_map(firstvar,varlimit,live_variable_at_address,amap,predecessor_map);
+  populate_predecessor_map(
+    firstvar,
+    varlimit,
+    live_variable_at_address,
+    amap,
+    predecessor_map,
+    get_message_handler());
 
   // OK, we've established the flows all seem sensible. Now merge vartable entries
   // according to the predecessor_map:
+
+  // Take the transitive closure of the predecessor map:
+  for(auto& kv : predecessor_map)
+  {
+    std::set<local_variable_with_holest*> closed_preds;
+    gather_transitive_predecessors(kv.first,predecessor_map,closed_preds);
+    kv.second=std::move(closed_preds);
+  }
 
   // Top-sort so that we get the bottom variables first:
   is_predecessor_of comp(predecessor_map);
@@ -353,11 +373,13 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
     if(merge_into->var.length==0)
       continue;
 
-    std::set<local_variable_with_holest*> merge_vars;
-    gather_transitive_predecessors(merge_into,predecessor_map,merge_vars);
+    auto findit=predecessor_map.find(merge_into);
     // Nothing to do?
-    if(merge_vars.size()==1)
+    if(findit==predecessor_map.end())
       continue;
+
+    const auto& merge_vars=findit->second;
+    assert(merge_vars.size()>=2);
 
     merge_variable_table_entries(*merge_into,merge_vars,dominator_analysis,status());
   }
