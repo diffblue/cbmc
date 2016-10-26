@@ -456,6 +456,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("graphml-cex"))
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
+
+  if(cmdline.isset("existing-coverage"))
+    options.set_option("existing-coverage", cmdline.get_value("existing-coverage"));
+
 }
 
 /*******************************************************************\
@@ -943,7 +947,7 @@ bool cbmc_parse_optionst::process_goto_program(
     
     // add loop ids
     goto_functions.compute_loop_numbers();
-    
+
     // instrument cover goals
     
     if(cmdline.isset("cover"))
@@ -973,9 +977,21 @@ bool cbmc_parse_optionst::process_goto_program(
         error() << "unknown coverage criterion" << eom;
         return true;
       }
-          
+
+
+      // check existing test goals
+      coverage_goalst goals;
+      if(cmdline.isset("existing-coverage"))
+      {
+        status() << "Check existing coverage goals" << eom;
+        //get file with covered test goals
+        const std::string coverage=cmdline.get_value("existing-coverage");
+        //get a coverage_goalst object
+        goals = coverage_goalst::get_coverage_goals(coverage,get_message_handler());;
+      }
+
       status() << "Instrumenting coverage goals" << eom;
-      instrument_cover_goals(symbol_table, goto_functions, c);
+      instrument_cover_goals(symbol_table, goto_functions, c, goals);
       goto_functions.update();
     }
 
@@ -1138,6 +1154,7 @@ void cbmc_parse_optionst::help()
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n"
+    " --existing-coverage file     instrument non-covered test goals\n"
     " --mm MM                      memory consistency model for concurrent programs\n"
     "\n"
     "Java Bytecode frontend options:\n"

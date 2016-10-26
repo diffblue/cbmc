@@ -1,0 +1,9 @@
+CORE
+if_expr1.class
+--cover location --existing-coverage if_expr1.json
+^EXIT=0$
+^SIGNAL=0$
+^\[coverage.1\] file if_expr1.java line 11 block 14: SATISFIED$
+^\*\* 1 of 1 covered (100.0%)
+--
+^warning: ignoring

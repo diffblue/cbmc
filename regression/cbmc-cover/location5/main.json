@@ -1,0 +1,7 @@
+[ { "file": "<builtin-library-free>", "function": "free", "lines": [ {"number": 22} ] },
+{ "file": "main.c", "function": "main", "lines": [ {"number": 8}, {"number": 12}, {"number": 13}, {"number": 16}, {"number": 19}, {"number": 21}, {"number": 24}, {"number": 26}, {"number": 30}, {"number": 32}, {"number": 35}, {"number": 37}, {"number": 40} ] },
+{"file": "single-linked-list.c", "function": "search_list", "lines": [ {"number": 9}, {"number": 10}, {"number": 15} ] },
+{"file": "single-linked-list.c", "function": "delete_list", "lines": [ {"number": 19}, {"number": 23}, {"number": 24}, {"number": 25}, {"number": 29}, {"number": 31}, {"number": 37}, {"number": 40}, {"number": 45}, {"number": 48} ] },
+{"file": "single-linked-list.c", "function": "insert_list", "lines": [ {"number": 37}, {"number": 40}, {"number": 45}, {"number": 48} ] }
+]
+
