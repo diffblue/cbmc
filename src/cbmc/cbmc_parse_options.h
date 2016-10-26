@@ -44,6 +44,7 @@ class optionst;
   "(show-claims)(claim):(show-properties)(show-reachable-properties)(property):" \
   "(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
+  "(nondet-static)" \
   "(version)" \
   "(cover):" \
   "(mm):" \
