@@ -3,7 +3,7 @@
 int foo (int iX, int iY)
 {
   return iX + iY;
-  assume(0);
+  __CPROVER_assume(0);
 }
 
 int main(void)

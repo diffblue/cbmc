@@ -17,7 +17,7 @@ int main(void)
   if (y)
     y=0;
   else 
-    assume(0);
+    __CPROVER_assume(0);
 
   assert(y==1);
 }
