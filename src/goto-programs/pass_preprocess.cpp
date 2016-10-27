@@ -17,6 +17,18 @@ Date:   September 2016
 #include <solvers/refinement/string_functions.h>
 #include <solvers/refinement/string_expr.h>
 
+symbol_exprt pass_preprocesst::new_tmp_symbol
+(const std::string &name, const typet &type)
+{
+  auxiliary_symbolt tmp_symbol;
+  tmp_symbol.base_name=name;
+  tmp_symbol.is_static_lifetime=false;
+  tmp_symbol.mode=ID_java;
+  tmp_symbol.name=name;
+  tmp_symbol.type=type;
+  symbol_table.add(tmp_symbol);
+  return symbol_exprt(name,type);
+}
 
 void pass_preprocesst::make_string_function
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name) 
@@ -124,7 +136,9 @@ void pass_preprocesst::make_to_char_array_function
 			     typecast_exprt(call_to_length,signedbv_typet(32)));
   new_code.push_back(assign_length);
 
-  // tmp_assign->data = MALLOC(length)
+  // tmp_malloc = MALLOC(length)  
+  // tmp_assign->data = tmp_malloc
+  /*
   side_effect_exprt malloc_expr_data(ID_malloc);
   pointer_typet tmp_void_star = pointer_typet(void_typet());
   tmp_void_star.set(ID_C_reference,true);
@@ -146,27 +160,59 @@ void pass_preprocesst::make_to_char_array_function
   symbol_table.add(tmp_malloc_symbol);
 
   symbol_exprt tmp_malloc("tmp_malloc",void_star_star);
+
   exprt data_pointer = member_exprt(dereference_exprt(tmp_assign,object_type),"data", void_star_star);
   new_code.push_back(code_assignt(tmp_malloc, malloc_expr_data));
   new_code.push_back(code_assignt(data_pointer, tmp_malloc));
+  */
 
-  // tmp_assing->data = __CPROVER_uninterpreted_string_data_func(s,tmp_assing->data);
+  assert(ns.follow(object_type).id()==ID_struct);
+  const struct_typet &struct_type=to_struct_type(ns.follow(object_type));
+  dereference_exprt deref(tmp_assign, object_type);
+  member_exprt data(deref, "data",
+		    //struct_type.components()[2].get_name(), 
+		    struct_type.components()[2].type());
+  exprt array_size = member_exprt(dereference_exprt(tmp_assign,object_type)
+				  ,"length",signedbv_typet(32));
+  side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
+  debug() << "data_cpp_new_expr : " << data_cpp_new_expr.pretty() << eom;
+  data_cpp_new_expr.set(ID_size, array_size);
+
+  /*goto_programt dest;
+  symbol_exprt tmp_data_symbol=
+      new_tmp_symbol(void_typet(), "tmp_data", dest, location).symbol_expr();
+  goto_program.instructions.insert(i_it,dest.instructions);
+  */
+  /*
   auxiliary_symbolt tmp_data_symbol;
-  tmp_data_symbol.base_name=cprover_string_data_func;
+  tmp_data_symbol.base_name="tmp_data";
   tmp_data_symbol.is_static_lifetime=false;
   tmp_data_symbol.mode=ID_java;
-  tmp_data_symbol.name=cprover_string_data_func;
+  tmp_data_symbol.name="tmp_data";
   tmp_data_symbol.type=void_typet();
   symbol_table.add(tmp_data_symbol);
-  goto_functions.function_map[cprover_string_data_func];
+  */
+  symbol_exprt tmp_data = new_tmp_symbol("tmp_data", struct_type.components()[2].type());
+  new_code.push_back(code_assignt(tmp_data, data_cpp_new_expr));
+  new_code.push_back(code_assignt(data, tmp_data));
 
+  // tmp_assing->data = __CPROVER_uninterpreted_string_data_func(s,tmp_assing->data);
+
+  auxiliary_symbolt string_data_func_symbol;
+  string_data_func_symbol.base_name=cprover_string_data_func;
+  string_data_func_symbol.is_static_lifetime=false;
+  string_data_func_symbol.mode=ID_java;
+  string_data_func_symbol.name=cprover_string_data_func;
+  string_data_func_symbol.type=void_typet();
+  symbol_table.add(string_data_func_symbol);
+  goto_functions.function_map[cprover_string_data_func];
   function_application_exprt call_to_data;
   call_to_data.type()=void_typet();
   call_to_data.add_source_location()=location;
   call_to_data.function()=symbol_exprt(cprover_string_data_func);
   call_to_data.arguments().push_back(string_argument);
-  call_to_data.arguments().push_back(data_pointer);
-  call_to_data.arguments().push_back(dereference_exprt(tmp_malloc));
+  call_to_data.arguments().push_back(data);
+  call_to_data.arguments().push_back(dereference_exprt(tmp_data));
   
   auxiliary_symbolt tmp_nil_symbol;
   tmp_nil_symbol.base_name="tmp_nil";
@@ -413,8 +459,11 @@ exprt pass_preprocesst::replace_string_literals(const exprt & expr)
   return expr;
 }
 
-pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_functionst & _goto_functions, const namespacet & _ns, message_handlert &_message_handler):
-  messaget(_message_handler), symbol_table(_symbol_table),goto_functions(_goto_functions), ns(_ns)
+pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_functionst & _goto_functions, //const namespacet & _ns, 
+				    message_handlert &_message_handler):
+  messaget(_message_handler), symbol_table(_symbol_table), ns(_symbol_table),
+  //goto_convertt(_symbol_table,_message_handler), 
+  goto_functions(_goto_functions)
  {
 
    // initialiasing the function maps

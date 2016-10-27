@@ -14,20 +14,27 @@ Date:   September 2016
 
 #include <goto-programs/goto_model.h>
 #include <util/ui_message.h>
+//#include "goto_convert_class.h"
 
-class pass_preprocesst:public messaget
+class pass_preprocesst:public messaget 
 {
- public:
-  pass_preprocesst(symbol_tablet &, goto_functionst &, const namespacet &, message_handlert &);
-  
  private:
+  namespacet ns;
   symbol_tablet & symbol_table;
   goto_functionst & goto_functions;
-  const namespacet & ns;
   std::map<exprt, exprt> string_builders;
   std::map<irep_idt, irep_idt> side_effect_functions;
   std::map<irep_idt, irep_idt> string_functions;
   std::map<irep_idt, irep_idt> string_function_calls;
+
+ public:
+  pass_preprocesst(symbol_tablet &, goto_functionst &, //const namespacet &, 
+		   message_handlert &);
+  
+ private:
+
+
+  symbol_exprt new_tmp_symbol(const std::string &name, const typet &type);
 
   exprt replace_string_literals(const exprt & );
 

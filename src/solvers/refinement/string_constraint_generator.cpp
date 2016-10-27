@@ -1237,15 +1237,14 @@ string_exprt string_constraint_generatort::of_char_array
 
   symbol_exprt qvar = fresh_univ_index("QA_string_of_char_array");
   exprt char_in_tab = 
-    typecast_exprt  
-    (byte_extract_exprt(ID_byte_extract_little_endian,data,
+    byte_extract_exprt(ID_byte_extract_little_endian,data,
 			//plus_exprt
-			(mult_exprt(constant_signed(2,64),typecast_exprt(qvar,signedbv_typet(64)))),
-			 /*pointer_offset(byte_extract_exprt
+			mult_exprt(constant_signed(2,64),typecast_exprt(qvar,signedbv_typet(64))),
+			/*pointer_offset(byte_extract_exprt
 					(ID_byte_extract_little_endian,
 					 data
 					 ,constant_signed(0,64),pointer_typet(unsignedbv_typet(16))))),unsignedbv_typet(16)),*/
-			get_char_type()));
+		       get_char_type());
 
 
   string_constraintt eq(equal_exprt(str[qvar],char_in_tab));

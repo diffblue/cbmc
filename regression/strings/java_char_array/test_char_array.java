@@ -1,5 +1,6 @@
 public class test_char_array {
 
+    /*
     public static void test_init() 
     {
 	char [] str = new char[10];
@@ -13,8 +14,8 @@ public class test_char_array {
 	assert(s.equals("Hello"));
 	assert(!s.equals("Hello"));
     }
-
-    /*
+    */
+    
     public static void test_to_array(String t)
     {
 	String s = "abc";
@@ -27,10 +28,10 @@ public class test_char_array {
 	assert(c == 'c');
 	assert(c == d || d < 'a' || d > 'z' );
     }
-    */
+    
     public static void main(String[] argv) 
     {
-	test_init();
-	// test_to_array(argv[0]);
+	//test_init();
+	test_to_array(argv[0]);
     }
 }
