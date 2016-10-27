@@ -1,0 +1,8 @@
+CORE
+test.c
+--pass
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] assertion c == __CPROVER_uninterpreted_char_literal_func(\"p\"): SUCCESS$
+^\[main.assertion.2\] assertion __CPROVER_uninterpreted_string_char_at_func(u, 2) == __CPROVER_uninterpreted_char_literal_func(\"p\"): FAILURE$
+--
