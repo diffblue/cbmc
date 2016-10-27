@@ -1,14 +1,10 @@
 int main()
 {
-  _Bool A, B, C;
+  int altitude;
 
-  __CPROVER_input("A", A);
-  __CPROVER_input("B", B);
-  __CPROVER_output("C", C);
+  __CPROVER_input("altitude", altitude);
 
-  C = (A || B);
-
-  if (C)
+  if (altitude > 2500)
   {
     /* instructions */  
   }
