@@ -30,6 +30,18 @@ symbol_exprt pass_preprocesst::new_tmp_symbol
   return symbol_exprt(name,type);
 }
 
+void pass_preprocesst::declare_function(irep_idt function_name, const typet &type)
+{
+  auxiliary_symbolt func_symbol;
+  func_symbol.base_name=function_name;
+  func_symbol.is_static_lifetime=false;
+  func_symbol.mode=ID_java;
+  func_symbol.name=function_name;
+  func_symbol.type=type;
+  symbol_table.add(func_symbol);
+  goto_functions.function_map[function_name];
+}
+
 void pass_preprocesst::make_string_function
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name) 
 {
@@ -116,14 +128,7 @@ void pass_preprocesst::make_to_char_array_function
   new_code.push_back(assign_malloc);
 
   // tmp_assign->length = (int)__CPROVER_uninterpreted_string_length_func(s);
-  auxiliary_symbolt tmp_length_symbol;
-  tmp_length_symbol.base_name=cprover_string_length_func;
-  tmp_length_symbol.is_static_lifetime=false;
-  tmp_length_symbol.mode=ID_java;
-  tmp_length_symbol.name=cprover_string_length_func;
-  tmp_length_symbol.type=unsignedbv_typet(32);
-  symbol_table.add(tmp_length_symbol);
-  goto_functions.function_map[cprover_string_length_func];
+  declare_function(cprover_string_length_func,unsignedbv_typet(32));
 
   function_application_exprt call_to_length;
   call_to_length.type()=unsignedbv_typet(32);
@@ -173,8 +178,8 @@ void pass_preprocesst::make_to_char_array_function
   member_exprt length(deref,struct_type.components()[1].get_name(), struct_type.components()[1].type());
   //"length",signedbv_typet(32));
   side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
-  debug() << "data_cpp_new_expr : " << data_cpp_new_expr.pretty() << eom;
   data_cpp_new_expr.set(ID_size, length);
+  debug() << "data_cpp_new_expr : " << data_cpp_new_expr.pretty() << eom;
 
   symbol_exprt tmp_data = new_tmp_symbol("tmp_data", struct_type.components()[2].type());
   //new_code.push_back(code_assignt(tmp_data, data_cpp_new_expr));
@@ -182,14 +187,7 @@ void pass_preprocesst::make_to_char_array_function
 
   // tmp_assing->data = __CPROVER_uninterpreted_string_data_func(s,tmp_assing->data);
 
-  auxiliary_symbolt string_data_func_symbol;
-  string_data_func_symbol.base_name=cprover_string_data_func;
-  string_data_func_symbol.is_static_lifetime=false;
-  string_data_func_symbol.mode=ID_java;
-  string_data_func_symbol.name=cprover_string_data_func;
-  string_data_func_symbol.type=void_typet();
-  symbol_table.add(string_data_func_symbol);
-  goto_functions.function_map[cprover_string_data_func];
+  declare_function(cprover_string_data_func,void_typet());
   function_application_exprt call_to_data;
   call_to_data.type()=void_typet();
   call_to_data.add_source_location()=location;

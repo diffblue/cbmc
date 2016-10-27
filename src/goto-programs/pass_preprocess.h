@@ -36,6 +36,8 @@ class pass_preprocesst:public messaget
 
   symbol_exprt new_tmp_symbol(const std::string &name, const typet &type);
 
+  void declare_function(irep_idt function_name, const typet &type);
+
   exprt replace_string_literals(const exprt & );
 
   void make_string_function(goto_programt::instructionst::iterator &, irep_idt);
