@@ -21,12 +21,12 @@ public class test_char_array {
 	String s = "abc";
 	char [] str = s.toCharArray();
 	char c = str[2];
-	char d = t.charAt(0);
+	//char d = t.charAt(0);
 
 
-	assert(str.length == 3);
+	//assert(str.length == 3);
 	assert(c == 'c');
-	assert(c == d || d < 'a' || d > 'z' );
+	//assert(c == d || d < 'a' || d > 'z' );
     }
     
     public static void main(String[] argv) 

@@ -1,7 +1,7 @@
 /** -*- C++ -*- *****************************************************\
 
 Module: String constraints
-        (see the PASS paper at HVC'13)
+        (see the PASS paper at HVC'13 and chapter 7 on arrays of ???)
 
 Author: Romain Brenguier, romain.brenguier@diffblue.com
 
@@ -27,14 +27,19 @@ private:
 
   // Universally quantified symbol
   symbol_exprt quantified_variable;
+
   // Bounds on the quantified variables (alternate between inf and sup)
   std::vector<exprt> bounds;
+
   // Only for NOT_CONTAINS constraints (represent s1 and s2)
   std::vector<exprt> compared_strings;
+  
+  // we should change the structure of the class to adopt the notations of chapter 7
+  //  exprt index_guard;
 
 public:
 
-// used to store information about witnesses for not_contains constraints
+  // used to store information about witnesses for not_contains constraints
   symbol_exprt witness;
 
 

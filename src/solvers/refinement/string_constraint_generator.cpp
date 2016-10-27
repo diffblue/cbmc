@@ -313,16 +313,19 @@ string_exprt string_constraint_generatort::string_constant(irep_idt sval, int ch
   string_exprt res(char_type);
   std::string str = sval.c_str();
   // should only do this for java
-  std::wstring utf16 = utf8_to_utf16(str);
+  std::wstring utf16 = utf8_to_utf16le(str);
   // warning: endianness should be used as a flag when using this function
   
   for (std::size_t i = 0; i < utf16.size(); ++i) {
     std::string idx_binary = integer2binary(i,STRING_SOLVER_INDEX_WIDTH);
     constant_exprt idx(idx_binary, refined_string_typet::index_type());
     // warning: this should disappear if utf8_to_utf16 takes into account endianness
+    /*
     wchar_t big_endian = ((utf16[i] << 8) & 0xFF00) | (utf16[i] >> 8);
-
+    
     std::string sval_binary=integer2binary((unsigned)big_endian, char_width);
+    */
+    std::string sval_binary=integer2binary((unsigned)utf16[i], char_width);
     constant_exprt c(sval_binary,char_type);
     equal_exprt lemma(res[idx], c);
     axioms.emplace_back(lemma,true);

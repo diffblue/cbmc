@@ -169,32 +169,16 @@ void pass_preprocesst::make_to_char_array_function
   assert(ns.follow(object_type).id()==ID_struct);
   const struct_typet &struct_type=to_struct_type(ns.follow(object_type));
   dereference_exprt deref(tmp_assign, object_type);
-  member_exprt data(deref, "data",
-		    //struct_type.components()[2].get_name(), 
-		    struct_type.components()[2].type());
-  exprt array_size = member_exprt(dereference_exprt(tmp_assign,object_type)
-				  ,"length",signedbv_typet(32));
+  member_exprt data(deref,struct_type.components()[2].get_name(), struct_type.components()[2].type());
+  member_exprt length(deref,struct_type.components()[1].get_name(), struct_type.components()[1].type());
+  //"length",signedbv_typet(32));
   side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
   debug() << "data_cpp_new_expr : " << data_cpp_new_expr.pretty() << eom;
-  data_cpp_new_expr.set(ID_size, array_size);
+  data_cpp_new_expr.set(ID_size, length);
 
-  /*goto_programt dest;
-  symbol_exprt tmp_data_symbol=
-      new_tmp_symbol(void_typet(), "tmp_data", dest, location).symbol_expr();
-  goto_program.instructions.insert(i_it,dest.instructions);
-  */
-  /*
-  auxiliary_symbolt tmp_data_symbol;
-  tmp_data_symbol.base_name="tmp_data";
-  tmp_data_symbol.is_static_lifetime=false;
-  tmp_data_symbol.mode=ID_java;
-  tmp_data_symbol.name="tmp_data";
-  tmp_data_symbol.type=void_typet();
-  symbol_table.add(tmp_data_symbol);
-  */
   symbol_exprt tmp_data = new_tmp_symbol("tmp_data", struct_type.components()[2].type());
-  new_code.push_back(code_assignt(tmp_data, data_cpp_new_expr));
-  new_code.push_back(code_assignt(data, tmp_data));
+  //new_code.push_back(code_assignt(tmp_data, data_cpp_new_expr));
+  new_code.push_back(code_assignt(data, data_cpp_new_expr));
 
   // tmp_assing->data = __CPROVER_uninterpreted_string_data_func(s,tmp_assing->data);
 
@@ -212,7 +196,7 @@ void pass_preprocesst::make_to_char_array_function
   call_to_data.function()=symbol_exprt(cprover_string_data_func);
   call_to_data.arguments().push_back(string_argument);
   call_to_data.arguments().push_back(data);
-  call_to_data.arguments().push_back(dereference_exprt(tmp_data));
+  call_to_data.arguments().push_back(dereference_exprt(data));
   
   auxiliary_symbolt tmp_nil_symbol;
   tmp_nil_symbol.base_name="tmp_nil";

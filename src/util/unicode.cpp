@@ -256,8 +256,33 @@ const char **narrow_argv(int argc, const wchar_t **argv_wide)
   return argv_narrow;
 }
 
-std::wstring utf8_to_utf16(const std::string& in)
+std::wstring utf8_to_utf16be(const std::string& in)
 {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
   return converter.from_bytes(in);
+}
+
+std::wstring utf8_to_utf16le(const std::string& in)
+{
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t,0x10ffffUL,std::codecvt_mode::little_endian> > converter;
+  return converter.from_bytes(in);
+}
+
+std::string utf16le_to_ascii(const std::wstring& in)
+{
+  std::string result;
+  std::locale loc;
+  for(const auto c : in)
+  {
+    if(c <= 255 && isprint(c,loc))
+      result+=(unsigned char)c;
+    else
+    {
+      result+="\\u";
+      char hex[5];
+      sprintf(hex,"%04x",(wchar_t)c);
+      result+=hex;
+    }
+  }
+  return result;
 }
