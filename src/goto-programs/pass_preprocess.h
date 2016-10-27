@@ -33,14 +33,20 @@ class pass_preprocesst:public messaget
   
  private:
 
-
+  // add a temporary symbol to the symbol table
   symbol_exprt new_tmp_symbol(const std::string &name, const typet &type);
 
   void declare_function(irep_idt function_name, const typet &type);
 
   exprt replace_string_literals(const exprt & );
 
-  void make_string_function(goto_programt::instructionst::iterator &, irep_idt);
+  // replace "lhs=s.some_function(x,...)" by "lhs=function_name(s,x,...)"
+  void make_string_function
+    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
+
+  // replace "s.some_function(x,...)" by "s=function_name(x,...)"
+  void make_string_function_call
+    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
   void make_to_char_array_function
     (goto_programt & goto_program, goto_programt::instructionst::iterator &);
@@ -49,11 +55,6 @@ class pass_preprocesst:public messaget
     (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
      irep_idt);
 
-  void make_string_function_of_assign
-    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
-
-  void make_string_function_call
-    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
   void make_string_function_side_effect
     (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 

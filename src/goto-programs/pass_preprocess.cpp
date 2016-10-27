@@ -45,30 +45,57 @@ void pass_preprocesst::declare_function(irep_idt function_name, const typet &typ
 void pass_preprocesst::make_string_function
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name) 
 {
-  // replace "lhs=s.charAt(x)" by "lhs=__CPROVER_uninterpreted_string_char_at(s,i)"
-  // Warning: in pass_preprocess::make_string_function: 
-  // we should introduce an intermediary variable for each argument
   code_function_callt &function_call=to_code_function_call(i_it->code);
-  code_typet old_type=to_code_type(function_call.function().type());
-
-  auxiliary_symbolt tmp_symbol;
-  //tmp_symbol.base_name=base_name;
-  tmp_symbol.is_static_lifetime=false;
-  tmp_symbol.mode=ID_java;
-  tmp_symbol.name=function_name;
-  // tmp_symbol.type=type;
-  tmp_symbol.type=old_type;
-  symbol_table.add(tmp_symbol);
-  // make sure it is in the function map
-  goto_functions.function_map[irep_idt(function_name)];
-  
+  code_typet function_type=to_code_type(function_call.function().type());
+  declare_function(function_name,function_type);
   function_application_exprt rhs;
-  rhs.type()=old_type.return_type();
+  rhs.type()=function_type.return_type();
   rhs.add_source_location()=function_call.source_location();
   rhs.function()=symbol_exprt(function_name);
   for(unsigned i = 0; i < function_call.arguments().size(); i++)
     rhs.arguments().push_back(replace_string_literals(function_call.arguments()[i]));
   code_assignt assignment(function_call.lhs(), rhs);
+  assignment.add_source_location()=function_call.source_location();
+  i_it->make_assignment();
+  i_it->code=assignment;
+}
+
+void pass_preprocesst::make_string_function_call
+(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
+{
+  code_function_callt &function_call=to_code_function_call(i_it->code);
+  code_typet function_type=to_code_type(function_call.function().type());
+  declare_function(function_name,function_type);
+  function_application_exprt rhs;
+  rhs.type()=function_call.arguments()[0].type();
+  rhs.add_source_location()=function_call.source_location();
+  rhs.function()=symbol_exprt(function_name);
+  for(unsigned i = 1; i < function_call.arguments().size(); i++)
+    rhs.arguments().push_back(replace_string_literals(function_call.arguments()[i]));
+  code_assignt assignment(function_call.arguments()[0], rhs);
+  assignment.add_source_location()=function_call.source_location();
+  i_it->make_assignment();
+  i_it->code=assignment;
+}
+
+void pass_preprocesst::make_string_function_side_effect
+(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
+ irep_idt function_name)
+{
+  code_function_callt &function_call=to_code_function_call(i_it->code);
+  code_typet function_type=to_code_type(function_call.function().type());
+  declare_function(function_name,function_type);
+  function_application_exprt rhs;
+  typet return_type = function_call.arguments()[0].type();
+  rhs.type()=return_type;
+  rhs.add_source_location()=function_call.source_location();
+  rhs.function()=symbol_exprt(function_name);
+  for(unsigned i = 0; i < function_call.arguments().size(); i++)
+    rhs.arguments().push_back(replace_string_literals(function_call.arguments()[i]));
+  code_assignt assignment(function_call.arguments()[0], rhs);
+  
+  // add a mapping from the left hand side to the first argument
+  string_builders[function_call.lhs()]=function_call.arguments()[0]; 
   assignment.add_source_location()=function_call.source_location();
   i_it->make_assignment();
   i_it->code=assignment;
@@ -255,113 +282,6 @@ void pass_preprocesst::make_of_char_array_function
   make_string_function_call(i_it,function_name);
 }
 
-void pass_preprocesst::make_string_function_of_assign
-(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
-{
-  assert(i_it->is_assign());
-  code_assignt &assign=to_code_assign(i_it->code);
-  typet old_type=assign.rhs().type();
-
-  auxiliary_symbolt tmp_symbol;
-  tmp_symbol.is_static_lifetime=false;
-  tmp_symbol.mode=ID_java;
-  tmp_symbol.name=function_name;
-  symbol_table.add(tmp_symbol);
-  
-  exprt rhs = replace_string_literals(assign.rhs().op0());
-  /*function_application_exprt rhs;
-  rhs.type()=old_type;
-  rhs.add_source_location()=assign.source_location();
-  rhs.function()=symbol_exprt(function_name);
-  rhs.arguments().push_back(address_of_exprt(assign.rhs().op0()));*/
-  code_assignt assignment(assign.lhs(), rhs);
-  assignment.add_source_location()=assign.source_location();
-  i_it->make_assignment();
-  i_it->code=assignment;
-  goto_functions.function_map[irep_idt(function_name)];
-}
-
-void pass_preprocesst::make_string_function_call
-(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
-{
-  // replace "s.init(x)" by "s=__CPROVER_uninterpreted_string_literal(x)"
-  code_function_callt &function_call=to_code_function_call(i_it->code);
-  code_typet old_type=to_code_type(function_call.function().type());
-
-  auxiliary_symbolt tmp_symbol;
-  tmp_symbol.is_static_lifetime=false;
-  tmp_symbol.mode=ID_java;
-  tmp_symbol.name=function_name;
-  symbol_table.add(tmp_symbol);
-  
-  function_application_exprt rhs;
-  rhs.type()=function_call.arguments()[0].type();
-  rhs.add_source_location()=function_call.source_location();
-  rhs.function()=symbol_exprt(function_name);
-  for(unsigned i = 1; i < function_call.arguments().size(); i++)
-    rhs.arguments().push_back(replace_string_literals(function_call.arguments()[i]));
-  code_assignt assignment(function_call.arguments()[0], rhs);
-  assignment.add_source_location()=function_call.source_location();
-  i_it->make_assignment();
-  i_it->code=assignment;
-  // make sure it is in the function map
-  goto_functions.function_map[irep_idt(function_name)];
-}
-
-void pass_preprocesst::make_string_function_side_effect
-(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
- irep_idt function_name)
-{
-  // replace "r = s.append(x)" by "s=__CPROVER_uninterpreted_string_concat(s,x); r = s"
-  code_function_callt &function_call=to_code_function_call(i_it->code);
-  code_typet old_type=to_code_type(function_call.function().type());
-
-  auxiliary_symbolt tmp_symbol;
-  tmp_symbol.is_static_lifetime=false;
-  tmp_symbol.mode=ID_java;
-  tmp_symbol.name=function_name;
-  symbol_table.add(tmp_symbol);
-  
-  function_application_exprt rhs;
-  typet return_type = function_call.arguments()[0].type();
-  rhs.type()=return_type;
-  rhs.add_source_location()=function_call.source_location();
-  rhs.function()=symbol_exprt(function_name);
-
-  for(unsigned i = 0; i < function_call.arguments().size(); i++)
-    rhs.arguments().push_back(replace_string_literals(function_call.arguments()[i]));
-
-  code_assignt assignment(function_call.arguments()[0], rhs);
-  //code_assignt assignment2(function_call.lhs(), function_call.arguments()[0]);
-  
-  // add a mapping from the left hand side to the first argument
-  string_builders[function_call.lhs()]=function_call.arguments()[0]; 
-  assignment.add_source_location()=function_call.source_location();
-  i_it->make_assignment();
-  i_it->code=assignment;
-  // make sure it is in the function map
-  goto_functions.function_map[irep_idt(function_name)];
-
-  //i_it = goto_program.insert_after(i_it);
-  //i_it->make_assignment();
-  //i_it->code=assignment2;
-  // add a mapping from the left hand side to the first argument
-  //string_builders[function_call.lhs()]=function_call.arguments()[0]; 
-}
-
-
-bool pass_preprocesst::has_java_string_type(const exprt &expr)
-{
-  const typet type = expr.type();
-  if(type.id() == ID_pointer) {
-    pointer_typet pt = to_pointer_type(type);
-    typet subtype = pt.subtype();
-    if(subtype.id() == ID_symbol) {
-      irep_idt tag = to_symbol_type(subtype).get_identifier();
-      return (tag == irep_idt("java::java.lang.String"));
-    } else return false;
-  } else return false;
-}
 
 
 void pass_preprocesst::replace_string_calls
@@ -414,6 +334,19 @@ void pass_preprocesst::replace_string_calls
   return;
 }
 
+bool pass_preprocesst::has_java_string_type(const exprt &expr)
+{
+  const typet type = expr.type();
+  if(type.id() == ID_pointer) {
+    pointer_typet pt = to_pointer_type(type);
+    typet subtype = pt.subtype();
+    if(subtype.id() == ID_symbol) {
+      irep_idt tag = to_symbol_type(subtype).get_identifier();
+      return (tag == irep_idt("java::java.lang.String"));
+    } else return false;
+  } else return false;
+}
+
 exprt pass_preprocesst::replace_string_literals(const exprt & expr) 
 {
   if(has_java_string_type(expr) ) 
@@ -441,10 +374,9 @@ exprt pass_preprocesst::replace_string_literals(const exprt & expr)
   return expr;
 }
 
-pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_functionst & _goto_functions, //const namespacet & _ns, 
+pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_functionst & _goto_functions,
 				    message_handlert &_message_handler):
   messaget(_message_handler), symbol_table(_symbol_table), ns(_symbol_table),
-  //goto_convertt(_symbol_table,_message_handler), 
   goto_functions(_goto_functions)
  {
 
