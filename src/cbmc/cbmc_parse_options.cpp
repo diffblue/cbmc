@@ -906,7 +906,16 @@ bool cbmc_parse_optionst::process_goto_program(
       remove_function_pointers(symbol_table,goto_functions,false);
       remove_returns(symbol_table,goto_functions);
       goto_functions.update();
-      full_slicer(goto_functions, ns);
+      try
+      {
+        full_slicer(goto_functions, ns);
+      }
+
+      catch(const char *error_msg)
+      {
+        error() << error_msg << eom;
+        return 1;
+      }
     }
   
     // do partial inlining
