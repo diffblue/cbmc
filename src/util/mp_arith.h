@@ -27,6 +27,5 @@ const mp_integer binary2integer(const std::string &, bool is_signed);
 mp_integer::ullong_t integer2ulong(const mp_integer &);
 std::size_t integer2size_t(const mp_integer &);
 unsigned integer2unsigned(const mp_integer &);
-const mp_integer mp_zero=string2integer("0");
 
 #endif

@@ -253,7 +253,7 @@ bool exprt::is_true() const
     {
       mp_integer i;
       to_integer(*this,i);
-      return i!=mp_zero;
+      return i!=mp_integer(0);
     }
   }
   return false;
