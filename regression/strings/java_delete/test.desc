@@ -1,0 +1,8 @@
+KNOWNBUG
+test_delete.class
+--pass
+^EXIT=10$
+^SIGNAL=0$
+^\[assertion.1\] assertion at file test_delete.java line 11: SUCCESS$
+^\[assertion.2\] assertion at file test_delete.java line 12: FAILURE$
+--
