@@ -7,6 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cstring>
+#include <locale>
+#include <codecvt>
 
 #include "unicode.h"
 
@@ -252,4 +254,10 @@ const char **narrow_argv(int argc, const wchar_t **argv_wide)
     argv_narrow[i]=strdup(narrow(argv_wide[i]).c_str());
   
   return argv_narrow;
+}
+
+std::wstring utf8_to_utf16(const std::string& in)
+{
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
+  return converter.from_bytes(in);
 }
