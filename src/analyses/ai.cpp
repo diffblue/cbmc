@@ -179,7 +179,7 @@ xmlt ai_baset::output_xml(
   {
     xmlt function("function");
     function.set_attribute("name", as_string(f_it->first));
-    function.set_attribute("body_available", f_it->second.body_available());
+    function.set_attribute("body_available", f_it->second.body_available() ? "true" : "false");
     
     if(f_it->second.body_available())
     {
