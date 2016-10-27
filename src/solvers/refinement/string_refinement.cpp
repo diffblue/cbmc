@@ -69,10 +69,8 @@ literalt string_refinementt::convert_rest(const exprt &expr)
       assert(bv.size() == 1); 
       return bv[0];
     }
-  else {
-    //debug() << "string_refinementt::convert_rest("<< pretty_short(expr) << ")" << eom;
+  else
     return SUB::convert_rest(expr);
-  }
 }
 
 bvt string_refinementt::convert_pointer_type(const exprt &expr)
@@ -323,25 +321,8 @@ void string_refinementt::print_time(std::string s) {
 	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
 }
 
-// We add instantiations before launching the solver
 void string_refinementt::post_process()
 {  
-
-  /*
-  debug() << not_contains_axioms.size() << " not_contains constraints" << eom;
-  nb_sat_iteration = 0;
-  debug() << "string_refinementt::post_process  at step" << step++ << " time in ms "
-	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
-
-  debug() << "string_refinementt::post_process: warning update_index_set has to be checked" << eom;
-  update_index_set(universal_axioms);
-  update_index_set(cur); 
-  cur.clear();
-  add_instantiations();
-  debug() << "string_refinementt::post_process  at step" << step++ << " time in ms "
-	  << (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) << eom;
-  */
-
   SUB::post_process();
 }
 
@@ -1450,32 +1431,9 @@ bool string_refinementt::check_axioms()
 }
 
 
-// Gets the upper bounds that are applied to [qvar], in the expression [expr]
-/* Shouldn't be necessary with the new way string constraints are encoded
-void get_bounds(const exprt &qvar, const exprt &expr, std::vector<exprt> & out)
-  {
-    std::vector<exprt> to_treat;
-    to_treat.push_back(expr);
-    while(!to_treat.empty()) {
-      exprt e = to_treat.back();
-      to_treat.pop_back();
-      if (e.id() == ID_lt && e.op0() == qvar) {
-	assert(e.op1().type() == index_type || e.op1().type() == integer_typet());
-	out.push_back(minus_exprt(e.op1(), refined_string_typet::index_of_int(1)));
-      } else if (e.id() == ID_le && e.op0() == qvar) {
-	out.push_back(e.op1());
-      } else {
-	forall_operands(it, e) {
-	  to_treat.push_back(*it);
-	}
-      }
-    }
-  }
-*/
-
 
 std::map< exprt, int> string_refinementt::map_of_sum(const exprt &f) {
-  // number of time the element should be added (can be negative)
+  // number of times the element should be added (can be negative)
   std::map< exprt, int> elems;
 
   std::vector< std::pair<exprt, bool> > to_process;
