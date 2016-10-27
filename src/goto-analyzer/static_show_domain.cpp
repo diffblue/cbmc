@@ -66,7 +66,11 @@ bool static_show_domain(
   }
 
   if (domain == NULL)
+  {
+    messaget m(message_handler);
+    m.status() << "Task / Interpreter / Domain combination not supported" << messaget::eom;
     return true;
+  }
 
   //status() << "performing analysis" << eom;
   (*domain)(goto_model);
