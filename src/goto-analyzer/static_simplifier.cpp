@@ -257,7 +257,7 @@ bool static_simplifier(
     //    (goto_model, options, message_handler, out)();
     
     else
-      return true;
+      goto fail;
   }
   else if (options.get_bool_option("concurrent"))
   {
@@ -277,8 +277,13 @@ bool static_simplifier(
     
     else
 #endif
-      return true;
+      goto fail;
   }
   else
-    return true;
+    goto fail;
+
+ fail :
+  messaget m(message_handler);
+  m.status() << "Task / Interpreter / Domain combination not supported" << messaget::eom;
+  return true;
 }
