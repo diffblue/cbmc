@@ -279,3 +279,42 @@ bool  exists_direct_or_indirect_call(
   std::unordered_set<irep_idt,dstring_hash>  ignored;
   return exists_direct_or_indirect_call(call_graph,caller,callee,ignored);
 }
+
+void compute_inverted_call_graph(
+    call_grapht const&  original_call_graph,
+    call_grapht&  output_inverted_call_graph
+    )
+{
+  assert(output_inverted_call_graph.graph.empty());
+  for (auto const&  elem : original_call_graph.graph)
+    output_inverted_call_graph.add(elem.second,elem.first);
+}
+
+void find_leaves_bellow_function(
+    call_grapht const&  call_graph,
+    irep_idt const&  function,
+    std::unordered_set<irep_idt,dstring_hash>&  to_avoid,
+    std::unordered_set<irep_idt,dstring_hash>&  output
+    )
+{
+  if (to_avoid.count(function) != 0UL)
+    return;
+  to_avoid.insert(function);
+  call_grapht::call_edges_ranget const  range =
+      call_graph.out_edges(function);
+  if (range.first == range.second)
+    output.insert(function);
+  else
+    for (auto  it = range.first; it != range.second; ++it)
+      find_leaves_bellow_function(call_graph,it->second,to_avoid,output);
+}
+
+void find_leaves_bellow_function(
+    call_grapht const&  call_graph,
+    irep_idt const&  function,
+    std::unordered_set<irep_idt,dstring_hash>&  output
+    )
+{
+  std::unordered_set<irep_idt,dstring_hash>  to_avoid;
+  find_leaves_bellow_function(call_graph,function,to_avoid,output);
+}

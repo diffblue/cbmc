@@ -138,5 +138,22 @@ bool  exists_direct_or_indirect_call(
     irep_idt const&  callee
     );
 
+void compute_inverted_call_graph(
+    call_grapht const&  original_call_graph,
+    call_grapht&  output_inverted_call_graph
+    );
+
+void find_leaves_bellow_function(
+    call_grapht const&  call_graph,
+    irep_idt const&  function,
+    std::unordered_set<irep_idt,dstring_hash>&  to_avoid,
+    std::unordered_set<irep_idt,dstring_hash>&  output
+    );
+
+void find_leaves_bellow_function(
+    call_grapht const&  call_graph,
+    irep_idt const&  function,
+    std::unordered_set<irep_idt,dstring_hash>&  output
+    );
 
 #endif // CPROVER_ANALYSES_CALL_GRAPH_H
