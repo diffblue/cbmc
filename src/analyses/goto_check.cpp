@@ -1193,6 +1193,8 @@ void goto_checkt::bounds_check(
     }
   }
 
+  exprt type_matches_size=true_exprt();
+
   if(ode.root_object().id()==ID_dereference)
   {
     const exprt &pointer=
@@ -1218,13 +1220,18 @@ void goto_checkt::bounds_check(
 
     add_guarded_claim(
       precond,
-      name+" upper bound",
+      name+" dynamic object upper bound",
       "array bounds",
       expr.find_source_location(),
       expr,
       guard);
 
-    return;
+    exprt type_size=size_of_expr(ode.root_object().type(), ns);
+    if(type_size.is_not_nil())
+      type_matches_size=
+        equal_exprt(
+          size,
+          typecast_exprt(type_size, size.type()));
   }
 
   const exprt &size=array_type.id()==ID_array ?
@@ -1257,7 +1264,7 @@ void goto_checkt::bounds_check(
       inequality.op1().make_typecast(inequality.op0().type());
 
     add_guarded_claim(
-      inequality,
+      implies_exprt(type_matches_size, inequality),
       name+" upper bound",
       "array bounds",
       expr.find_source_location(),
