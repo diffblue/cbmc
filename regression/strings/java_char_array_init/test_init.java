@@ -17,5 +17,8 @@ public class test_init {
 	assert(s.length() == 10);
 	assert(t.equals("el"));
 	assert(s.equals("Hello") || !t.equals("el"));
+	String u = String.valueOf(str,3,2);
+	//assert(u.equals("lo"));
+	//assert(!u.equals("lo"));
     }
 }

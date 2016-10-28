@@ -255,8 +255,8 @@ void pass_preprocesst::make_to_char_array_function
 void pass_preprocesst::make_of_char_array_function
 (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
-  // replace "return_tmp0 = String.ofCharArray(arr)" with:
-  // return_tmp0 = __CPROVER_uninterpreted_string_of_char_array_func(arr.length,arr.data);
+  // replace "return_tmp0 = some_function(arr,...)" with:
+  // return_tmp0 = function_name(arr.length,arr.data,...);
   code_function_callt &function_call=to_code_function_call(i_it->code);
   exprt lhs = function_call.arguments()[0];
   exprt arg = function_call.arguments()[1];
@@ -277,11 +277,6 @@ void pass_preprocesst::make_of_char_array_function
   std::vector<exprt>::iterator it = function_call.arguments().begin();
   it++; *it = array_size; it++;
   function_call.arguments().insert(it,data);
-  /*  function_call.arguments().push_back(lhs);
-  function_call.arguments().push_back(array_size);
-  function_call.arguments().push_back(data);
-  for(int i = 2; i < function_call.arguments().size(); i++)
-  function_call.arguments().push_back(function_call.arguments()[i]);*/
   make_string_function_call(i_it,function_name);
 }
 
@@ -314,12 +309,11 @@ void pass_preprocesst::replace_string_calls
 	      else if(string_function_calls.find(function_id) != string_function_calls.end()) 
 		make_string_function_call(i_it, string_function_calls[function_id]);
 	      
+	      else if(string_of_char_array_functions.find(function_id) != string_of_char_array_functions.end())
+		make_of_char_array_function(goto_program,i_it,string_of_char_array_functions[function_id]);
 	      else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
 		make_to_char_array_function(goto_program,i_it);
-	      else if(function_id == irep_idt("java::java.lang.String.<init>:([C)V")
-		      || function_id == irep_idt("java::java.lang.String.<init>:([CII)V")
-		      )
-		make_of_char_array_function(goto_program,i_it,cprover_string_of_char_array_func);
+
 
 	    } 
 	} 
@@ -437,8 +431,8 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    string_functions[irep_idt("java::java.lang.String.valueOf:(Z)Ljava/lang/String;")] = cprover_string_of_bool_func;
    string_functions[irep_idt("java::java.lang.String.valueOf:(C)Ljava/lang/String;")] = cprover_string_of_char_func;
    string_functions[irep_idt("java::java.lang.Integer.parseInt:(Ljava/lang/String;)I")] = cprover_string_parse_int_func;
-   string_functions[irep_idt("java::java.lang.String.valueOf:([CII)Ljava/lang/String;)")] = cprover_string_value_of_func;
-   string_functions[irep_idt("java::java.lang.String.valueOf:([C)Ljava/lang/String;")] = cprover_string_value_of_func;
+   //string_functions[irep_idt("java::java.lang.String.valueOf:([CII)Ljava/lang/String;)")] = cprover_string_value_of_func;
+   //string_functions[irep_idt("java::java.lang.String.valueOf:([C)Ljava/lang/String;")] = cprover_string_value_of_func;
 
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")] = cprover_string_concat_func;
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.setCharAt:(IC)V")] = cprover_string_char_set_func;
@@ -463,6 +457,12 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:(Ljava/lang/String;)V")] = cprover_string_copy_func;
    string_function_calls[irep_idt("java::java.lang.String.<init>:()V")] = cprover_string_empty_string_func;
    string_function_calls[irep_idt("java::java.lang.StringBuilder.<init>:()V")] = cprover_string_empty_string_func;
+   
+   string_of_char_array_functions[irep_idt("java::java.lang.String.<init>:([C)V")] = cprover_string_of_char_array_func;
+   string_of_char_array_functions[irep_idt("java::java.lang.String.<init>:([CII)V")] = cprover_string_of_char_array_func;
+   string_of_char_array_functions[irep_idt("java::java.lang.String.valueOf:([CII)Ljava/lang/String;")] = cprover_string_of_char_array_func;
+   string_of_char_array_functions[irep_idt("java::java.lang.String.valueOf:([C)Ljava/lang/String;")] = cprover_string_of_char_array_func;
+
 
   Forall_goto_functions(it, goto_functions)
   {
