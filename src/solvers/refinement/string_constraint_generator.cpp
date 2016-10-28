@@ -1233,9 +1233,8 @@ string_exprt string_constraint_generatort::of_char_array
 {
   string_exprt str(get_char_type());
 
-  exprt tab_length = args(f,3)[0];
-  exprt tab_data = args(f,3)[1];
-  exprt data = args(f,3)[2];
+  exprt tab_length = args(f,2)[0];
+  exprt data = args(f,2)[1];
 
   symbol_exprt qvar = fresh_univ_index("QA_string_of_char_array");
   exprt char_in_tab = data;

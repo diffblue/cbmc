@@ -277,7 +277,6 @@ void pass_preprocesst::make_of_char_array_function
   function_call.arguments().clear();
   function_call.arguments().push_back(lhs);
   function_call.arguments().push_back(array_size);
-  function_call.arguments().push_back(data_pointer);
   function_call.arguments().push_back(data);
   make_string_function_call(i_it,function_name);
 }
