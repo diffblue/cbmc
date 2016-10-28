@@ -3,8 +3,8 @@ main.c
 --floatbv --full-slice
 ^EXIT=0$
 ^SIGNAL=0$
-^size of program expression: 63 steps$
-^simple slicing removed 5 assignments$
+^size of program expression: 62 steps$
+^simple slicing removed 4 assignments$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
