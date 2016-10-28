@@ -95,6 +95,7 @@ public:
   typedef goto_programt::const_targett locationt;
 
   explicit static_analysis_baset(const namespacet &_ns):
+    nsteps(0),
     ns(_ns),
     initialized(false)
   {
@@ -165,6 +166,8 @@ public:
   // get lhs that return value is assigned to
   // for an edge that returns from a function
   static exprt get_return_lhs(locationt to);
+
+  size_t nsteps;
 
 protected:
   const namespacet &ns;
