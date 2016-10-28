@@ -3,7 +3,8 @@ main.c
 --pointer-check --full-slice
 ^EXIT=0$
 ^SIGNAL=0$
-^size of program expression: 6 steps$
+^size of program expression: 759 steps$
+^simple slicing removed 25 assignments$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
