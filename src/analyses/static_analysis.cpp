@@ -323,6 +323,7 @@ bool static_analysis_baset::fixedpoint(
 
   while(!working_set.empty())
   {
+    ++nsteps;
     locationt l=get_next(working_set);
 
     if(visit(l, working_set, goto_program, goto_functions))
