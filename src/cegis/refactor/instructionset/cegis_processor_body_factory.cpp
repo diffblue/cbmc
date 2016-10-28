@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <numeric>
 
 #include <ansi-c/expr2c.h>
 #include <util/arith_tools.h>
@@ -12,7 +13,6 @@
 #include <cegis/refactor/instructionset/cegis_processor_body_factory.h>
 
 #define OPERAND_ID_MEMBER_NAME_PREFIX "op_"
-#define OPERAND_TMP_RESULT_PREFIX "result_op_"
 #define INSTR_INDEX "i"
 
 // XXX: Debug
@@ -33,7 +33,7 @@ std::string cegis_operand_array_name(const symbol_tablet &st, const typet &type)
   return result+=type2c(type, namespacet(st));
 }
 
-#define NUM_PRIMITIVE_OPERANDS 2u
+#define NUM_PRIMITIVE_OPERANDS 3u
 
 namespace
 {
@@ -55,7 +55,7 @@ size_t cegis_max_operands(const typet &type)
 size_t cegis_max_operands(const cegis_operand_datat &slots)
 {
   size_t max=0;
-  for (const std::pair<typet, size_t> &slot : slots)
+  for (const cegis_operand_datat::value_type &slot : slots)
     max=std::max(max, cegis_max_operands(slot.first));
   return max;
 }
@@ -71,18 +71,19 @@ size_t get_num_instructions(const typet &type)
   return NUM_PRIMITIVE_OPCODES;
 }
 
+size_t get_num_instructions(const cegis_operand_datat &data)
+{
+  return std::accumulate(data.begin(), data.end(), 0,
+      [](const size_t lhs, const cegis_operand_datat::value_type &entry)
+      { return lhs + get_num_instructions(entry.first);});
+}
+
 std::string get_tmp_op(const symbol_tablet &st, const size_t op,
     const typet &type)
 {
   std::string result(OPERAND_ID_MEMBER_NAME_PREFIX);
   result+=std::to_string(op);
   result+='_';
-  return result+=type2c(type, namespacet(st));
-}
-
-std::string get_tmp_result_op(const symbol_tablet &st, const typet &type)
-{
-  std::string result(OPERAND_TMP_RESULT_PREFIX);
   return result+=type2c(type, namespacet(st));
 }
 
@@ -192,11 +193,11 @@ class body_factoryt
     if (!is_primitive(t))
     assert(!"Class type operand generation not supported.");
     pos->type=goto_program_instruction_typet::ASSIGN;
-    const symbol_exprt res(get_tmp_result_expr(t));
+    const symbol_exprt res(get_tmp_op_expr(t, 0));
     pos->code=code_assignt(res, nil_exprt());
     code_assignt &assign=to_code_assign(pos->code);
-    const symbol_exprt lhs(get_tmp_op_expr(t, 0));
-    const symbol_exprt rhs(get_tmp_op_expr(t, 1));
+    const symbol_exprt lhs(get_tmp_op_expr(t, 1));
+    const symbol_exprt rhs(get_tmp_op_expr(t, 2));
     switch (op)
     {
     case 0:
@@ -225,21 +226,26 @@ class body_factoryt
     return st.lookup(name).symbol_expr();
   }
 
-  symbol_exprt get_tmp_result_expr(const typet &type)
-  {
-    const std::string base_name(get_tmp_result_op(st, type));
-    const std::string name(meta_name(base_name));
-    return st.lookup(name).symbol_expr();
-  }
-
-  dereference_exprt get_variable_array_element(const typet &type,
-      const std::string index_var_base_name)
+  index_exprt get_variable_array_ref(const typet &type,
+      const std::string &index_var_base_name)
   {
     const std::string name(meta_name(index_var_base_name));
     const symbol_exprt index(st.lookup(name).symbol_expr());
     const std::string array_name(cegis_operand_array_name(st, type));
     const symbol_exprt array(st.lookup(array_name).symbol_expr());
-    return dereference_exprt(index_exprt(array, index));
+    return index_exprt(array, index);
+  }
+
+  dereference_exprt get_variable_array_element(const typet &type,
+      const std::string index_var_base_name)
+  {
+    const index_exprt ref(get_variable_array_ref(type, index_var_base_name));
+    return dereference_exprt(ref);
+  }
+
+  index_exprt get_op_variable_array_ref(const typet &type, const size_t op_id)
+  {
+    return get_variable_array_ref(type, cegis_operand_base_name(op_id));
   }
 
   dereference_exprt get_op_variable_array_element(const typet &type,
@@ -248,10 +254,33 @@ class body_factoryt
     return get_variable_array_element(type, cegis_operand_base_name(op_id));
   }
 
-  dereference_exprt get_result_variable_array_element(const typet &type)
+  static void assume(const goto_programt::targett pos, const exprt &condition)
   {
-    const std::string base_name(get_tmp_result_op(st, type));
-    return get_variable_array_element(type, base_name);
+    pos->type=goto_program_instruction_typet::ASSUME;
+    pos->source_location=default_cegis_source_location();
+    pos->guard=condition;
+  }
+
+  void assume_less(const goto_programt::targett pos,
+      const std::string &base_name, const size_t value)
+  {
+    const symbol_exprt lhs(st.lookup(meta_name(base_name)).symbol_expr());
+    const constant_exprt rhs(from_integer(value, cegis_opcode_type()));
+    assume(pos, binary_relation_exprt(lhs, ID_lt, rhs));
+  }
+
+  void assume_less(const std::string &base_name, const size_t value)
+  {
+    assume_less(pos=body.insert_after(pos), base_name, value);
+  }
+
+  void assume_valid_operand(const goto_programt::targett pos, const typet &type,
+      const size_t op_id)
+  {
+    const index_exprt element(get_op_variable_array_ref(type, op_id));
+    const pointer_typet ptr_type(type);
+    const null_pointer_exprt null_ptr(ptr_type);
+    assume(pos, notequal_exprt(element, null_ptr));
   }
 public:
   body_factoryt(symbol_tablet &st, goto_programt &body, const std::string &name,
@@ -273,6 +302,7 @@ public:
     decl(INSTR_INDEX, gen_zero(cegis_size_type()));
     decl_instr_member(CEGIS_PROC_OPCODE_MEMBER_NAME);
     loop_head=std::prev(pos);
+    assume_less(CEGIS_PROC_OPCODE_MEMBER_NAME, get_num_instructions(slots));
     const size_t global_max_operands=cegis_max_operands(slots);
     for (size_t i=0; i < global_max_operands; ++i)
       decl_instr_member(cegis_operand_base_name(i));
@@ -280,13 +310,12 @@ public:
 
   void declare_temp_vars()
   {
-    for (const std::pair<typet, size_t> &slot : slots)
+    for (const cegis_operand_datat::value_type &slot : slots)
     {
       const typet &type=slot.first;
       const size_t max_operands=cegis_max_operands(type);
       for (size_t i=0; i < max_operands; ++i)
         decl(get_tmp_op(st, i, type), type);
-      decl(get_tmp_result_op(st, type), type);
     }
   }
 
@@ -294,7 +323,7 @@ public:
   {
     const source_locationt loc(default_cegis_source_location());
     size_t opcode=0;
-    for (const std::pair<typet, size_t> &slot : slots)
+    for (const cegis_operand_datat::value_type &slot : slots)
     {
       const typet &type=slot.first;
       opcode+=get_num_instructions(type);
@@ -310,6 +339,9 @@ public:
         const symbol_exprt lhs(get_tmp_op_expr(type, i));
         const dereference_exprt rhs(get_op_variable_array_element(type, i));
         pos->code=code_assignt(lhs, rhs);
+        const std::string operand_base_name(cegis_operand_base_name(i));
+        assume_less(body.insert_before(pos), operand_base_name, slot.second);
+        assume_valid_operand(body.insert_before(pos), type, i);
       }
     }
     finalise_conditional_instr_gotos();
@@ -319,27 +351,28 @@ public:
   {
     const source_locationt loc(default_cegis_source_location());
     size_t opcode=0;
-    for (const std::pair<typet, size_t> &slot : slots)
+    for (const cegis_operand_datat::value_type &slot : slots)
     {
       const typet &type=slot.first;
       opcode+=get_num_instructions(type);
       assert(opcode);
       const size_t max_operands=cegis_max_operands(type);
       assert(max_operands);
-      goto_programt::targett pos=add_conditional_instr_goto(opcode, ID_ge);
+      /*goto_programt::targett pos=add_conditional_instr_goto(opcode, ID_ge);
       pos->type=goto_program_instruction_typet::ASSIGN;
       pos->source_location=loc;
       const dereference_exprt lhs(get_result_variable_array_element(type));
       const symbol_exprt rhs(get_tmp_result_expr(type));
-      pos->code=code_assignt(lhs, rhs);
+      pos->code=code_assignt(lhs, rhs);*/
+      // XXX: assume_less(body.insert_before(pos), )
     }
-    finalise_conditional_instr_gotos();
+    //finalise_conditional_instr_gotos();
   }
 
   void add_instructions()
   {
     size_t opcode=0;
-    for (const std::pair<typet, size_t> &slot : slots)
+    for (const cegis_operand_datat::value_type &slot : slots)
     {
       const typet &type=slot.first;
       const size_t num_instrs=get_num_instructions(type);
