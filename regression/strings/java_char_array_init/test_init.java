@@ -9,11 +9,13 @@ public class test_init {
 	str[3] = 'l';
 	str[4] = 'o';
 	String s = new String(str);
+	String t = new String(str,1,2);
 	char c = str[2];
 	System.out.println(s);
 	System.out.println(s.length());
 	assert(s.startsWith("Hello"));
 	assert(s.length() == 10);
-	assert(s.equals("Hello"));
+	assert(t.equals("el"));
+	assert(s.equals("Hello") || !t.equals("el"));
     }
 }

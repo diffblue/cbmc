@@ -1232,18 +1232,32 @@ string_exprt string_constraint_generatort::of_char_array
 (const function_application_exprt &f)
 {
   string_exprt str(get_char_type());
+  
+  exprt offset;
+  exprt count;
+  if(f.arguments().size() == 4) 
+    {
+      offset = f.arguments()[2];
+      count = f.arguments()[3];
+    }
+  else
+    {
+      assert(f.arguments().size() == 2);
+      count = f.arguments()[0];
+      offset = constant_signed(0,32);
+    }
 
-  exprt tab_length = args(f,2)[0];
-  exprt data = args(f,2)[1];
+  exprt tab_length = f.arguments()[0];
+  exprt data = f.arguments()[1];
 
   symbol_exprt qvar = fresh_univ_index("QA_string_of_char_array");
   exprt char_in_tab = data;
   assert(char_in_tab.id() == ID_index);
-  char_in_tab.op1() = qvar;
+  char_in_tab.op1() = plus_exprt(qvar,offset);
   
   string_constraintt eq(equal_exprt(str[qvar],char_in_tab));
-  axioms.push_back(eq.forall(qvar,str.length()));
-  axioms.emplace_back(equal_exprt(str.length(),tab_length));
+  axioms.push_back(eq.forall(qvar,count));
+  axioms.emplace_back(equal_exprt(str.length(),count));
 
   return str;
 }

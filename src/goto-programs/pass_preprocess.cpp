@@ -274,10 +274,14 @@ void pass_preprocesst::make_of_char_array_function
 				    pointer_typet(pointer_typet(unsignedbv_typet(16))));
   exprt data = dereference_exprt(data_pointer, pointer_typet(unsignedbv_typet(16)));
 
-  function_call.arguments().clear();
-  function_call.arguments().push_back(lhs);
+  std::vector<exprt>::iterator it = function_call.arguments().begin();
+  it++; *it = array_size; it++;
+  function_call.arguments().insert(it,data);
+  /*  function_call.arguments().push_back(lhs);
   function_call.arguments().push_back(array_size);
   function_call.arguments().push_back(data);
+  for(int i = 2; i < function_call.arguments().size(); i++)
+  function_call.arguments().push_back(function_call.arguments()[i]);*/
   make_string_function_call(i_it,function_name);
 }
 
@@ -312,7 +316,9 @@ void pass_preprocesst::replace_string_calls
 	      
 	      else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
 		make_to_char_array_function(goto_program,i_it);
-	      else if(function_id == irep_idt("java::java.lang.String.<init>:([C)V"))
+	      else if(function_id == irep_idt("java::java.lang.String.<init>:([C)V")
+		      || function_id == irep_idt("java::java.lang.String.<init>:([CII)V")
+		      )
 		make_of_char_array_function(goto_program,i_it,cprover_string_of_char_array_func);
 
 	    } 
