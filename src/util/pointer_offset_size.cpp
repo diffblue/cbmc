@@ -632,3 +632,66 @@ exprt build_sizeof_expr(
 
   return result;
 }
+
+bool get_subexpression_at_offset(
+  exprt& result,
+  mp_integer offset,
+  const typet& target_type,
+  const namespacet& ns)
+{
+  if(offset==0 && result.type()==target_type)
+    return true;
+
+  const typet& source_type=result.type();
+  
+  if(source_type.id()==ID_struct)
+  {
+    const auto& st=to_struct_type(source_type);
+    const struct_typet::componentst &components=st.components();
+    member_offset_iterator offsets(st,ns);
+    while(offsets->first<components.size() && offsets->second!=-1 && offsets->second<=offset)
+    {
+      auto nextit=offsets;
+      ++nextit;
+      if((offsets->first+1)==components.size() || offset<nextit->second)
+      {
+	// This field might be, or might contain, the answer.
+	result=member_exprt(result,
+			    components[offsets->first].get_name(),
+			    components[offsets->first].type());
+	return get_subexpression_at_offset(result, offset - offsets->second, target_type, ns);
+      }
+      ++offsets;
+    }
+    return false;
+  }
+  else if(source_type.id()==ID_array)
+  {
+    // A cell of the array might be, or contain, the subexpression we're looking for.
+    const auto& at=to_array_type(source_type);
+    mp_integer elem_size=pointer_offset_size(at.subtype(),ns);
+    if(elem_size==-1)
+      return false;
+    mp_integer cellidx=offset / elem_size;
+    if(cellidx < 0 || !cellidx.is_long())
+      return false;
+    offset=offset % elem_size;
+    result=index_exprt(result,from_integer(cellidx,unsignedbv_typet(64)));
+    return get_subexpression_at_offset(result,offset,target_type,ns);
+  }
+  else
+    return false;
+  
+}
+
+bool get_subexpression_at_offset(
+  exprt& result,
+  const exprt& offset,
+  const typet& target_type,
+  const namespacet& ns)
+{
+  mp_integer offset_const;
+  if(to_integer(offset,offset_const))
+    return false;
+  return get_subexpression_at_offset(result,offset_const,target_type,ns);
+}
