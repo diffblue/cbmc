@@ -23,10 +23,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 member_offset_iterator::member_offset_iterator(const struct_typet& _type,
                                                const namespacet& _ns) :
+  current({0,0}),
   type(_type),
   ns(_ns),
-  bit_field_bits(0),
-  current({0,0})
+  bit_field_bits(0)
 {
 }
 
@@ -636,13 +636,14 @@ exprt build_sizeof_expr(
 bool get_subexpression_at_offset(
   exprt& result,
   mp_integer offset,
-  const typet& target_type,
+  const typet& target_type_raw,
   const namespacet& ns)
 {
-  if(offset==0 && result.type()==target_type)
-    return true;
+  const typet& source_type=ns.follow(result.type());
+  const typet& target_type=ns.follow(target_type_raw);
 
-  const typet& source_type=result.type();
+  if(offset==0 && source_type==target_type)
+    return true;
   
   if(source_type.id()==ID_struct)
   {
