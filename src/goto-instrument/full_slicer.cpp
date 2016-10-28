@@ -333,7 +333,13 @@ static bool implicit(goto_programt::const_targett target)
 
   const symbol_exprt &s=to_symbol_expr(a.lhs());
 
-  return s.get_identifier()==CPROVER_PREFIX "rounding_mode";
+  if (s.get_identifier()==CPROVER_PREFIX "rounding_mode")
+    return true;
+
+  if (s.source_location().get_function().empty())
+    return true;
+
+  return false;
 }
 
 /*******************************************************************\
