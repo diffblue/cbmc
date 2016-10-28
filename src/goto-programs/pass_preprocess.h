@@ -48,6 +48,12 @@ class pass_preprocesst:public messaget
   void make_string_function_call
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
+  // replace "r = s.some_function(x,...)" by "s=function_name(s,x)" 
+  // and add a correspondance from r to s in the string_builders map
+  void make_string_function_side_effect
+    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
+     irep_idt function_name);
+
   void make_to_char_array_function
     (goto_programt & goto_program, goto_programt::instructionst::iterator &);
 
@@ -55,10 +61,6 @@ class pass_preprocesst:public messaget
     (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
      irep_idt);
 
-
-  void make_string_function_side_effect
-    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
-     irep_idt function_name);
 
   bool has_java_string_type(const exprt &expr);
 

@@ -1228,7 +1228,6 @@ exprt string_constraint_generatort::string_data
   return void_expr;
 }
 
-
 string_exprt string_constraint_generatort::of_char_array
 (const function_application_exprt &f)
 {
@@ -1239,17 +1238,10 @@ string_exprt string_constraint_generatort::of_char_array
   exprt data = args(f,3)[2];
 
   symbol_exprt qvar = fresh_univ_index("QA_string_of_char_array");
-  exprt char_in_tab = 
-    byte_extract_exprt(ID_byte_extract_little_endian,data,
-			//plus_exprt
-			mult_exprt(constant_signed(2,64),typecast_exprt(qvar,signedbv_typet(64))),
-			/*pointer_offset(byte_extract_exprt
-					(ID_byte_extract_little_endian,
-					 data
-					 ,constant_signed(0,64),pointer_typet(unsignedbv_typet(16))))),unsignedbv_typet(16)),*/
-		       get_char_type());
-
-
+  exprt char_in_tab = data;
+  assert(char_in_tab.id() == ID_index);
+  char_in_tab.op1() = qvar;
+  
   string_constraintt eq(equal_exprt(str[qvar],char_in_tab));
   axioms.push_back(eq.forall(qvar,str.length()));
   axioms.emplace_back(equal_exprt(str.length(),tab_length));
