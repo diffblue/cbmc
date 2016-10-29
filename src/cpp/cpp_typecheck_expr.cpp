@@ -2475,7 +2475,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           symbol_tablet::symbolst::iterator s_it=
             symbol_table.symbols.find(it->get(ID_name));
           assert(s_it!=symbol_table.symbols.end());
-          add_function_body(&(s_it->second));
+          add_method_body(&(s_it->second));
           break;
         }
       }
@@ -2677,7 +2677,7 @@ void cpp_typecheckt::typecheck_method_application(
   member_expr.swap(expr.function());
 
   const symbolt &symbol=lookup(member_expr.get(ID_component_name));
-  add_function_body(&(symbol_table.symbols.find(symbol.name)->second));
+  add_method_body(&(symbol_table.symbols.find(symbol.name)->second));
 
   // build new function expression
   exprt new_function(cpp_symbol_expr(symbol));

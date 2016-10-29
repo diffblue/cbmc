@@ -400,7 +400,7 @@ void cpp_declarator_convertert::handle_initializer(
     symbol.value.swap(value);
 
     if(is_code && declarator.type().id()!=ID_template)
-      cpp_typecheck.add_function_body(&symbol);
+      cpp_typecheck.add_method_body(&symbol);
 
     if(!is_code)
       cpp_typecheck.convert_initializer(symbol);
@@ -623,7 +623,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   if(!new_symbol->is_type)
   {
     if(is_code && declarator.type().id()!=ID_template)
-      cpp_typecheck.add_function_body(new_symbol);
+      cpp_typecheck.add_method_body(new_symbol);
 
     if(!is_code)
       cpp_typecheck.convert_initializer(*new_symbol);

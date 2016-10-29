@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::typecheck_function_bodies
+Function: cpp_typecheckt::typecheck_method_bodies
 
   Inputs:
 
@@ -22,30 +22,30 @@ Function: cpp_typecheckt::typecheck_function_bodies
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_function_bodies()
+void cpp_typecheckt::typecheck_method_bodies()
 {
   instantiation_stackt old_instantiation_stack;
   old_instantiation_stack.swap(instantiation_stack);
 
-  while(!function_bodies.empty())
+  while(!method_bodies.empty())
   {
-    symbolt &function_symbol=*function_bodies.front().function_symbol;
-    template_map.swap(function_bodies.front().template_map);
-    instantiation_stack.swap(function_bodies.front().instantiation_stack);
+    symbolt &method_symbol=*method_bodies.front().method_symbol;
+    template_map.swap(method_bodies.front().template_map);
+    instantiation_stack.swap(method_bodies.front().instantiation_stack);
     
-    function_bodies.pop_front();
+    method_bodies.pop_front();
 
-    if(function_symbol.name==ID_main)
-      add_argc_argv(function_symbol);
+    if(method_symbol.name==ID_main)
+      add_argc_argv(method_symbol);
 
-    exprt &body=function_symbol.value;
+    exprt &body=method_symbol.value;
     if(body.id()=="cpp_not_typechecked")
       continue;
 
     if(body.is_not_nil() &&
        !body.is_zero())
     {
-      convert_function(function_symbol);
+      convert_function(method_symbol);
     }
   }
 

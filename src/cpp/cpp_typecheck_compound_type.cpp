@@ -1454,7 +1454,7 @@ void cpp_typecheckt::typecheck_member_function(
   {
   }
   else // remember for later typechecking of body
-    add_function_body(new_symbol);
+    add_method_body(new_symbol);
 }
 
 /*******************************************************************\

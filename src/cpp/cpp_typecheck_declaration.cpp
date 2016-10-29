@@ -119,8 +119,8 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
 
   // Record the function bodies so we can check them later.
   // This function is used recursively, so we save them.
-  function_bodiest old_function_bodies=function_bodies;
-  function_bodies.clear();
+  method_bodiest old_method_bodies=method_bodies;
+  method_bodies.clear();
 
   // templates are done in a dedicated function
   if(declaration.is_template())
@@ -128,8 +128,8 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
   else
     convert_non_template_declaration(declaration);
 
-  typecheck_function_bodies();
-  function_bodies=old_function_bodies;
+  typecheck_method_bodies();
+  method_bodies=old_method_bodies;
 }
 
 /*******************************************************************\
