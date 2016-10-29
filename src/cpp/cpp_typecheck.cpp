@@ -395,6 +395,7 @@ void cpp_typecheckt::clean_up()
 
     symbolt &symbol = cur_it->second;
 
+    // erase templates
     if(symbol.type.get_bool(ID_is_template))
     {
       symbol_table.symbols.erase(cur_it);
@@ -403,6 +404,7 @@ void cpp_typecheckt::clean_up()
     else if(symbol.type.id()==ID_struct ||
             symbol.type.id()==ID_union)
     {
+      // remove methods from 'components'
       struct_union_typet &struct_union_type=
         to_struct_union_type(symbol.type);
 
