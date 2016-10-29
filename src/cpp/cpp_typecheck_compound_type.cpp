@@ -117,11 +117,9 @@ cpp_scopet &cpp_typecheckt::tag_scope(
   cpp_scopet::id_sett id_set;
   cpp_scopes.current_scope().lookup(base_name, cpp_scopet::RECURSIVE, id_set);
 
-  for(cpp_scopet::id_sett::const_iterator it=id_set.begin();
-      it!=id_set.end();
-      it++)
-    if((*it)->is_class())
-      return static_cast<cpp_scopet &>((*it)->get_parent());
+  for(const auto & it : id_set)
+    if(it->is_class())
+      return static_cast<cpp_scopet &>(it->get_parent());
     
   // Tags without body that we don't have already
   // and that are not a tag-only declaration go into
@@ -514,17 +512,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
     // The method may be virtual implicitly.
     std::set<irep_idt> virtual_bases;
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto & it : components)
     {
-      if(it->get_bool("is_virtual"))
+      if(it.get_bool(ID_is_virtual))
       {
-        if(it->get("virtual_name")==virtual_name)
+        if(it.get("virtual_name")==virtual_name)
         {
           is_virtual=true;
-          const code_typet& code_type = to_code_type(it->type());
+          const code_typet& code_type = to_code_type(it.type());
           assert(code_type.parameters().size()>0);
           const typet& pointer_type = code_type.parameters()[0].type();
           assert(pointer_type.id() == ID_pointer);
@@ -885,12 +880,9 @@ void cpp_typecheckt::put_compound_into_scope(
     
     cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY, id_set);
     
-    for(cpp_scopest::id_sett::const_iterator
-        id_it=id_set.begin();
-        id_it!=id_set.end();
-        id_it++)
+    for(const auto & id_it : id_set)
     {
-      const cpp_idt &id=**id_it;
+      const cpp_idt &id=*id_it;
 
       // the name is already in the scope
       // this is ok if they belong to different categories
@@ -1521,12 +1513,9 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
   // should be visible in the containing struct/union,
   // and that recursively!
 
-  for(struct_union_typet::componentst::const_iterator
-      it=struct_union_components.begin();
-      it!=struct_union_components.end();
-      it++)
+  for(const auto & it : struct_union_components)
   {
-    if(it->type().id()==ID_code)
+    if(it.type().id()==ID_code)
     {
       error().source_location=struct_union_symbol.type.source_location();
       error() << "anonymous struct/union member `"
@@ -1535,26 +1524,26 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
       throw 0;
     }
 
-    if(it->get_anonymous())
+    if(it.get_anonymous())
     {
-      const symbolt &symbol=lookup(it->type().get(ID_identifier));
+      const symbolt &symbol=lookup(it.type().get(ID_identifier));
       // recrusive call
       add_anonymous_members_to_scope(symbol);
     }
     else
     {
-      const irep_idt &base_name=it->get_base_name();
+      const irep_idt &base_name=it.get_base_name();
 
       if(cpp_scopes.current_scope().contains(base_name))
       {
-        error().source_location=it->source_location();
+        error().source_location=it.source_location();
         error() << "`" << base_name << "' already in scope" << eom;
         throw 0;
       }
       
       cpp_idt &id=cpp_scopes.current_scope().insert(base_name);
       id.id_class=cpp_idt::SYMBOL;
-      id.identifier=it->get(ID_name);
+      id.identifier=it.get(ID_name);
       id.class_identifier=struct_union_symbol.name;
       id.is_member=true;
     }
@@ -1653,12 +1642,9 @@ bool cpp_typecheckt::get_component(
   const struct_union_typet::componentst &components=
     final_type.components();
 
-  for(struct_union_typet::componentst::const_iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
+  for(const auto & it : components)
   {
-    const struct_union_typet::componentt &component = *it;
+    const struct_union_typet::componentt &component = it;
 
     exprt tmp(ID_member, component.type());
     tmp.set(ID_component_name, component.get_name());

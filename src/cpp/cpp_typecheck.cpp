@@ -123,7 +123,7 @@ Function: cpp_typecheckt::typecheck
 
  Outputs:
 
- Purpose:
+ Purpose: typechecking main method
 
 \*******************************************************************/
 
@@ -132,11 +132,8 @@ void cpp_typecheckt::typecheck()
   // default linkage is "automatic"
   current_linkage_spec=ID_auto;
   
-  for(cpp_parse_treet::itemst::iterator
-      it=cpp_parse_tree.items.begin();
-      it!=cpp_parse_tree.items.end();
-      it++)
-    convert(*it);
+  for(auto & item : cpp_parse_tree.items)
+    convert(item);
 
   static_and_dynamic_initialization();
 
@@ -244,12 +241,9 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   disable_access_control = true;
 
-  for(dynamic_initializationst::const_iterator
-      d_it=dynamic_initializations.begin();
-      d_it!=dynamic_initializations.end();
-      d_it++)
+  for(const auto & d_it : dynamic_initializations)
   {
-    symbolt &symbol=symbol_table.symbols.find(*d_it)->second;
+    symbolt &symbol=symbol_table.symbols.find(d_it)->second;
 
     if(symbol.is_extern)
       continue;
@@ -420,23 +414,20 @@ void cpp_typecheckt::clean_up()
         
       function_members.reserve(components.size());
 
-      for(struct_typet::componentst::const_iterator
-          compo_it=components.begin();
-          compo_it!=components.end();
-          compo_it++)
+      for(const auto & compo_it : components)
       {
-        if(compo_it->get_bool(ID_is_static) ||
-           compo_it->get_bool(ID_is_type))
+        if(compo_it.get_bool(ID_is_static) ||
+           compo_it.get_bool(ID_is_type))
         {
           // skip it
         }
-        else if(compo_it->type().id()==ID_code)
+        else if(compo_it.type().id()==ID_code)
         {
-          function_members.push_back(*compo_it);
+          function_members.push_back(compo_it);
         }
         else
         {
-          data_members.push_back(*compo_it);
+          data_members.push_back(compo_it);
         }
       }
 
