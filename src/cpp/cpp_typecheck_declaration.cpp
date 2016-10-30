@@ -31,8 +31,8 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
 
   // Record the function bodies so we can check them later.
   // This function is used recursively, so we save them.
-  method_bodiest old_method_bodies=method_bodies;
-  method_bodies.clear();
+  method_bodiest old_method_bodies;
+  old_method_bodies.swap(method_bodies);
 
   // templates are done in a dedicated function
   if(declaration.is_template())
@@ -40,8 +40,10 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
   else
     convert_non_template_declaration(declaration);
 
-  typecheck_method_bodies();
-  method_bodies=old_method_bodies;
+  method_bodiest b;
+  b.swap(method_bodies);
+  typecheck_method_bodies(b);
+  method_bodies.swap(old_method_bodies);
 }
 
 /*******************************************************************\
@@ -151,7 +153,10 @@ void cpp_typecheckt::convert_non_template_declaration(
   typet &declaration_type=declaration.type();
   bool is_typedef=declaration.is_typedef();
 
+  // the name anonymous tag types
   declaration.name_anon_struct_union();
+  
+  // do the type of the declaration
   typecheck_type(declaration_type);
   
   // Elaborate any class template instance _unless_ we do a typedef.
@@ -182,7 +187,7 @@ void cpp_typecheckt::convert_non_template_declaration(
   {
     // copy the declarator (we destroy the original)
     cpp_declaratort declarator=*it;
-
+    
     cpp_declarator_convertert cpp_declarator_converter(*this);
 
     cpp_declarator_converter.is_typedef=is_typedef;

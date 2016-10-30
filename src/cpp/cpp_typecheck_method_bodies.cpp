@@ -22,19 +22,18 @@ Function: cpp_typecheckt::typecheck_method_bodies
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_method_bodies()
+void cpp_typecheckt::typecheck_method_bodies(
+  method_bodiest &bodies)
 {
   instantiation_stackt old_instantiation_stack;
   old_instantiation_stack.swap(instantiation_stack);
 
-  while(!method_bodies.empty())
+  for(auto & b : bodies)
   {
-    symbolt &method_symbol=*method_bodies.front().method_symbol;
-    template_map.swap(method_bodies.front().template_map);
-    instantiation_stack.swap(method_bodies.front().instantiation_stack);
+    symbolt &method_symbol=*b.method_symbol;
+    template_map.swap(b.template_map);
+    instantiation_stack.swap(b.instantiation_stack);
     
-    method_bodies.pop_front();
-
     if(method_symbol.name==ID_main)
       add_argc_argv(method_symbol);
 

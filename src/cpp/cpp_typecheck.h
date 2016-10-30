@@ -386,7 +386,7 @@ protected:
   void typecheck_compound_body(symbolt &symbol);
   void typecheck_compound_body(struct_union_typet &type) { assert(false); };
   void typecheck_enum_body(symbolt &symbol);
-  void typecheck_method_bodies();
+  void typecheck_method_bodies(method_bodiest &);
   void typecheck_compound_bases(struct_typet &type);
   void add_anonymous_members_to_scope(const symbolt &struct_union_symbol);
 
