@@ -442,7 +442,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("interpreter"))
     {
       status() << "Starting interpreter" << eom;
-      interpreter(symbol_table, goto_functions);
+      interpreter(symbol_table, goto_functions, this);
       return 0;
     }
 

@@ -21,6 +21,39 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_offset_size.h"
 
+member_offset_iterator::member_offset_iterator(const struct_typet& _type,
+                                               const namespacet& _ns) :
+  type(_type),
+  ns(_ns),
+  bit_field_bits(0),
+  current({0,0})
+{
+}
+
+member_offset_iterator& member_offset_iterator::operator++()
+{
+  if(current.second!=-1) // Already failed?
+  {
+    const auto& comp=type.components()[current.first];
+    if(comp.type().id()==ID_c_bit_field)
+    {
+      // take the extra bytes needed
+      std::size_t w=to_c_bit_field_type(comp.type()).get_width();
+      for(; w>bit_field_bits; ++current.second, bit_field_bits+=8);
+      bit_field_bits-=w;
+    }
+    else
+    {
+      const typet &subtype=comp.type();
+      mp_integer sub_size=pointer_offset_size(subtype, ns);
+      if(sub_size==-1) current.second=-1; // give up
+      else current.second+=sub_size;
+    }
+  }
+  ++current.first;
+  return *this;
+}
+
 /*******************************************************************\
 
 Function: member_offset
@@ -39,35 +72,18 @@ mp_integer member_offset(
   const namespacet &ns)
 {
   const struct_typet::componentst &components=type.components();
-  
-  mp_integer result=0;
-  std::size_t bit_field_bits=0;
+  member_offset_iterator offsets(type,ns);
   
   for(struct_typet::componentst::const_iterator
       it=components.begin();
-      it!=components.end();
-      it++)
+      it!=components.end() && offsets->second!=-1;
+      ++it, ++offsets)
   {
     if(it->get_name()==member)
       break;
-
-    if(it->type().id()==ID_c_bit_field)
-    {
-      // take the extra bytes needed
-      std::size_t w=to_c_bit_field_type(it->type()).get_width();
-      for(; w>bit_field_bits; ++result, bit_field_bits+=8);
-      bit_field_bits-=w;
-    }
-    else
-    {
-      const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_size(subtype, ns);
-      if(sub_size==-1) return -1; // give up
-      result+=sub_size;
-    }
   }
 
-  return result;
+  return offsets->second;
 }
 
 /*******************************************************************\
