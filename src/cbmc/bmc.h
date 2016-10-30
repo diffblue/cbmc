@@ -104,7 +104,7 @@ protected:
   
   bool cover(
     const goto_functionst &goto_functions,
-    const std::string &criterion);
+    const optionst::value_listt &criteria);
 
   friend class bmc_all_propertiest;
   friend class bmc_covert;
