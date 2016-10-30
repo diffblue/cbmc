@@ -1069,6 +1069,8 @@ void instrument_cover_goals(
      has_prefix(id2string(goto_program.instructions.front().source_location.get_file()),
                 "<builtin-library-"))
     return;
+    
+  irep_idt property_class="coverage";
   
   Forall_goto_program_instructions(i_it, goto_program)
   {
@@ -1079,7 +1081,7 @@ void instrument_cover_goals(
       if(i_it->is_assert())
       {
         i_it->guard=false_exprt();
-        i_it->source_location.set_property_class("coverage");
+        i_it->source_location.set_property_class(property_class);
       }
       break;
       
@@ -1100,7 +1102,7 @@ void instrument_cover_goals(
           i_it->type=ASSERT;
           i_it->code.clear();
           i_it->source_location.set_comment(comment);
-          i_it->source_location.set_property_class("coverage");
+          i_it->source_location.set_property_class(property_class);
         }
       }
       else if(i_it->is_assert())
@@ -1128,7 +1130,7 @@ void instrument_cover_goals(
             i_it->make_assertion(false_exprt());
             i_it->source_location=source_location;
             i_it->source_location.set_comment(comment);
-            i_it->source_location.set_property_class("coverage");
+            i_it->source_location.set_property_class(property_class);
             
             i_it++;
           }
@@ -1153,7 +1155,7 @@ void instrument_cover_goals(
         t->make_assertion(false_exprt());
         t->source_location=source_location;
         t->source_location.set_comment(comment);
-        t->source_location.set_property_class("coverage");
+        t->source_location.set_property_class(property_class);
       }
     
       if(i_it->is_goto() && !i_it->guard.is_true())
@@ -1171,13 +1173,13 @@ void instrument_cover_goals(
         i_it->make_assertion(not_exprt(guard));
         i_it->source_location=source_location;
         i_it->source_location.set_comment(true_comment);
-        i_it->source_location.set_property_class("coverage");
+        i_it->source_location.set_property_class(property_class);
 
         goto_program.insert_before_swap(i_it);
         i_it->make_assertion(guard);
         i_it->source_location=source_location;
         i_it->source_location.set_comment(false_comment);
-        i_it->source_location.set_property_class("coverage");
+        i_it->source_location.set_property_class(property_class);
         
         i_it++;
         i_it++;
@@ -1203,14 +1205,14 @@ void instrument_cover_goals(
           i_it->make_assertion(c);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
-          i_it->source_location.set_property_class("coverage");
+          i_it->source_location.set_property_class(property_class);
 
           const std::string comment_f="condition `"+c_string+"' false";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(not_exprt(c));
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_f);
-          i_it->source_location.set_property_class("coverage");
+          i_it->source_location.set_property_class(property_class);
         }
         
         for(std::size_t i=0; i<conditions.size()*2; i++)
@@ -1237,14 +1239,14 @@ void instrument_cover_goals(
           i_it->make_assertion(d);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
-          i_it->source_location.set_property_class("coverage");
+          i_it->source_location.set_property_class(property_class);
 
           const std::string comment_f="decision `"+d_string+"' false";
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(not_exprt(d));
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_f);
-          i_it->source_location.set_property_class("coverage");
+          i_it->source_location.set_property_class(property_class);
         }
         
         for(std::size_t i=0; i<decisions.size()*2; i++)
@@ -1289,7 +1291,7 @@ void instrument_cover_goals(
           i_it->make_assertion(not_exprt(p));
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
-          i_it->source_location.set_property_class("coverage");
+          i_it->source_location.set_property_class(property_class);
 
           std::string comment_f=description+" `"+p_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -1297,7 +1299,7 @@ void instrument_cover_goals(
           i_it->make_assertion(p);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_f);
-          i_it->source_location.set_property_class("coverage");
+          i_it->source_location.set_property_class(property_class);
         }
         
         std::set<exprt> controlling;
@@ -1320,7 +1322,7 @@ void instrument_cover_goals(
           //i_it->make_assertion(p);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(description);
-          i_it->source_location.set_property_class("coverage");
+          i_it->source_location.set_property_class(property_class);
         }
         
         for(std::size_t i=0; i<both.size()*2+controlling.size(); i++)
