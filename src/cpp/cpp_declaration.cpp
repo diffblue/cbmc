@@ -31,9 +31,9 @@ void cpp_declarationt::output(std::ostream &out) const
 
   out << "Declarators:" << "\n";
 
-  forall_cpp_declarators(it, *this)
+  for(const auto &it : declarators())
   {
-    it->output(out);
+    it.output(out);
     out << "\n";
   }
 }

@@ -463,10 +463,9 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   codet new_code(ID_decl_block);
   new_code.reserve_operands(declaration.declarators().size());
 
-  // Do the declarators (optional).
-  Forall_cpp_declarators(it, declaration)
+  // Do the declarators (if any)
+  for(auto & declarator : declaration.declarators())
   {
-    cpp_declaratort &declarator=*it;
     cpp_declarator_convertert cpp_declarator_converter(*this);
     cpp_declarator_converter.is_typedef=is_typedef;
 
@@ -493,7 +492,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     // is there a constructor to be called?
     if(symbol.value.is_not_nil())
     {
-      assert(it->find("init_args").is_nil());
+      assert(declarator.find("init_args").is_nil());
       if(symbol.value.id()==ID_code)
         new_code.copy_to_operands(symbol.value);
     }

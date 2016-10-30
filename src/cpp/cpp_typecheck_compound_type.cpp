@@ -966,9 +966,9 @@ void cpp_typecheckt::typecheck_friend_declaration(
   // It should be a friend function.
   // Do the declarators.
   
-  Forall_cpp_declarators(sub_it, declaration)
+  for(auto & sub_it : declaration.declarators())
   {
-    bool has_value = sub_it->value().is_not_nil();
+    bool has_value = sub_it.value().is_not_nil();
 
     if(!has_value)
     {
@@ -980,7 +980,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
       cpp_declarator_convertert cpp_declarator_converter(*this);
       const symbolt &conv_symb = cpp_declarator_converter.convert(
           declaration.type(), declaration.storage_spec(),
-          declaration.member_spec(), *sub_it);
+          declaration.member_spec(), sub_it);
       exprt symb_expr = cpp_symbol_expr(conv_symb);
       symbol.type.add("#friends").move_to_sub(symb_expr);
     }
@@ -993,7 +993,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
       const symbolt &conv_symb = cpp_declarator_converter.convert(
         declaration.type(), declaration.storage_spec(),
-        declaration.member_spec(), *sub_it);
+        declaration.member_spec(), sub_it);
 
       exprt symb_expr = cpp_symbol_expr(conv_symb);
 
@@ -1125,10 +1125,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       }
 
       // declarators
-      Forall_cpp_declarators(d_it, declaration)
+      for(auto & declarator : declaration.declarators())
       {
-        cpp_declaratort &declarator=*d_it;
-
         // Skip the constructors until all the data members
         // are discovered
         if(declaration.is_destructor())
@@ -1205,10 +1203,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       if(!declaration.is_constructor())
         continue;
       
-      Forall_cpp_declarators(d_it, declaration)
+      for(auto & declarator : declaration.declarators())
       {
-        cpp_declaratort &declarator=*d_it;
-
         #if 0
         irep_idt ctor_base_name=
           declarator.name().get_base_name();
