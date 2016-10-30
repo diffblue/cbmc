@@ -24,65 +24,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::this_struct_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-const struct_typet &cpp_typecheckt::this_struct_type()
-{
-  const exprt &this_expr=
-    cpp_scopes.current_scope().this_expr;
-
-  assert(this_expr.is_not_nil());
-  assert(this_expr.type().id()==ID_pointer);
-
-  const typet &t=follow(this_expr.type().subtype());
-  assert(t.id()==ID_struct);
-  return to_struct_type(t);
-}
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string cpp_typecheckt::to_string(const exprt &expr)
-{
-  return expr2cpp(expr, *this);
-}
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string cpp_typecheckt::to_string(const typet &type)
-{
-  return type2cpp(type, *this);
-}
-
-/*******************************************************************\
-
 Function: cpp_typecheckt::convert
 
   Inputs:
@@ -138,6 +79,65 @@ void cpp_typecheckt::typecheck()
   do_not_typechecked();
 
   clean_up();
+}
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::this_struct_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const struct_typet &cpp_typecheckt::this_struct_type()
+{
+  const exprt &this_expr=
+    cpp_scopes.current_scope().this_expr;
+
+  assert(this_expr.is_not_nil());
+  assert(this_expr.type().id()==ID_pointer);
+
+  const typet &t=follow(this_expr.type().subtype());
+  assert(t.id()==ID_struct);
+  return to_struct_type(t);
+}
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::to_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string cpp_typecheckt::to_string(const exprt &expr)
+{
+  return expr2cpp(expr, *this);
+}
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::to_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string cpp_typecheckt::to_string(const typet &type)
+{
+  return type2cpp(type, *this);
 }
 
 /*******************************************************************\

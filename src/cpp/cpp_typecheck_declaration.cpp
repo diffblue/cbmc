@@ -14,6 +14,40 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
+Function: cpp_typecheckt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cpp_typecheckt::convert(cpp_declarationt &declaration)
+{
+  // see if the declaration is empty
+  if(declaration.find(ID_type).is_nil() &&
+     !declaration.has_operands())
+    return;
+
+  // Record the function bodies so we can check them later.
+  // This function is used recursively, so we save them.
+  method_bodiest old_method_bodies=method_bodies;
+  method_bodies.clear();
+
+  // templates are done in a dedicated function
+  if(declaration.is_template())
+    convert_template_declaration(declaration);
+  else
+    convert_non_template_declaration(declaration);
+
+  typecheck_method_bodies();
+  method_bodies=old_method_bodies;
+}
+
+/*******************************************************************\
+
 Function: cpp_typecheckt::convert_anonymous_union
 
   Inputs:
@@ -96,40 +130,6 @@ void cpp_typecheckt::convert_anonymous_union(
     "#unnamed_object", symbol.base_name);
 
   code.swap(new_code);
-}
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void cpp_typecheckt::convert(cpp_declarationt &declaration)
-{
-  // see if the declaration is empty
-  if(declaration.find(ID_type).is_nil() &&
-     !declaration.has_operands())
-    return;
-
-  // Record the function bodies so we can check them later.
-  // This function is used recursively, so we save them.
-  method_bodiest old_method_bodies=method_bodies;
-  method_bodies.clear();
-
-  // templates are done in a dedicated function
-  if(declaration.is_template())
-    convert_template_declaration(declaration);
-  else
-    convert_non_template_declaration(declaration);
-
-  typecheck_method_bodies();
-  method_bodies=old_method_bodies;
 }
 
 /*******************************************************************\
