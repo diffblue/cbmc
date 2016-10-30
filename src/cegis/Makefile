@@ -56,6 +56,8 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       refactor/environment/instrument_state_vars.cpp \
       refactor/instructionset/create_cegis_processor.cpp refactor/instructionset/execute_cegis_program.cpp \
       refactor/instructionset/processor_types.cpp refactor/instructionset/cegis_processor_body_factory.cpp \
+      refactor/instructionset/instruction_description.cpp refactor/instructionset/cegis_instruction_factory.cpp \
+      refactor/instructionset/processor_symbols.cpp \
       refactor/preprocessing/refactor_preprocessing.cpp \
       refactor/learn/refactor_symex_learn.cpp \
       refactor/verify/refactor_symex_verify.cpp \

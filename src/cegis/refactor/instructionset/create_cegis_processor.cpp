@@ -8,6 +8,7 @@
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/cegis-util/type_helper.h>
 #include <cegis/refactor/instructionset/processor_types.h>
+#include <cegis/refactor/instructionset/processor_symbols.h>
 #include <cegis/refactor/instructionset/cegis_processor_body_factory.h>
 #include <cegis/refactor/instructionset/create_cegis_processor.h>
 
@@ -57,12 +58,6 @@ cegis_operand_datat slots_per_type(const symbol_tablet &st,
 
 namespace
 {
-symbol_exprt get_variable_array_symbol(const symbol_tablet &st,
-    const typet &type)
-{
-  return st.lookup(cegis_operand_array_name(st, type)).symbol_expr();
-}
-
 void create_variable_array(symbol_tablet &st, goto_functionst &gf,
     const typet &type, const size_t size)
 {

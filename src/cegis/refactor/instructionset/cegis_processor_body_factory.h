@@ -16,45 +16,12 @@
  * @brief
  *
  * @details
- */
-#define CEGIS_PROC_PROGRAM_PARAM_ID "program"
-
-/**
- * @brief
- *
- * @details
- */
-#define CEGIS_PROC_PROGRAM_SIZE_PARAM_ID "size"
-
-/**
- * @brief
- *
- * @details
- */
-#define CEGIS_PROC_OPCODE_MEMBER_NAME "opcode"
-
-/**
- * @brief
- *
- * @details
  *
  * @param op
  *
  * @return
  */
 std::string cegis_operand_base_name(size_t op);
-
-/**
- * @brief
- *
- * @details
- *
- * @param st
- * @param type
- *
- * @return
- */
-std::string cegis_operand_array_name(const symbol_tablet &st, const typet &type);
 
 /**
  * @brief

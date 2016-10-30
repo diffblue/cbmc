@@ -16,3 +16,10 @@ typet cegis_size_type()
 {
   return cegis_opcode_type();
 }
+
+bool is_cegis_primitive(const typet &type)
+{
+  const irep_idt &id=type.id();
+  return ID_c_bool == id || ID_floatbv == id || ID_unsignedbv == id
+      || ID_signedbv == id;
+}
