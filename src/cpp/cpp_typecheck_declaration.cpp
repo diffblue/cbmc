@@ -27,9 +27,7 @@ Function: cpp_typecheckt::convert
 void cpp_typecheckt::convert(cpp_declarationt &declaration)
 {
   // see if the declaration is empty
-  if(declaration.find(ID_type).is_nil() &&
-     !declaration.has_operands())
-    return;
+  if(declaration.is_empty()) return;
 
   // Record the function bodies so we can check them later.
   // This function is used recursively, so we save them.
