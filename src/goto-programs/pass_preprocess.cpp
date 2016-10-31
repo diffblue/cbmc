@@ -446,8 +446,6 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    string_functions[irep_idt("java::java.lang.String.valueOf:(Z)Ljava/lang/String;")] = cprover_string_of_bool_func;
    string_functions[irep_idt("java::java.lang.String.valueOf:(C)Ljava/lang/String;")] = cprover_string_of_char_func;
    string_functions[irep_idt("java::java.lang.Integer.parseInt:(Ljava/lang/String;)I")] = cprover_string_parse_int_func;
-   //string_functions[irep_idt("java::java.lang.String.valueOf:([CII)Ljava/lang/String;)")] = cprover_string_value_of_func;
-   //string_functions[irep_idt("java::java.lang.String.valueOf:([C)Ljava/lang/String;")] = cprover_string_value_of_func;
 
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;")] = cprover_string_concat_func;
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.setCharAt:(IC)V")] = cprover_string_char_set_func;
@@ -477,6 +475,8 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    string_of_char_array_function_calls[irep_idt("java::java.lang.String.<init>:([CII)V")] = cprover_string_of_char_array_func;
    string_of_char_array_functions[irep_idt("java::java.lang.String.valueOf:([CII)Ljava/lang/String;")] = cprover_string_of_char_array_func;
    string_of_char_array_functions[irep_idt("java::java.lang.String.valueOf:([C)Ljava/lang/String;")] = cprover_string_of_char_array_func;
+   string_of_char_array_functions[irep_idt("java::java.lang.String.copyValueOf:([CII)Ljava/lang/String;")] = cprover_string_of_char_array_func;
+   string_of_char_array_functions[irep_idt("java::java.lang.String.copyValueOf:([C)Ljava/lang/String;")] = cprover_string_of_char_array_func;
 
 
   Forall_goto_functions(it, goto_functions)
