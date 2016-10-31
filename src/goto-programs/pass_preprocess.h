@@ -29,6 +29,7 @@ class pass_preprocesst:public messaget
   std::map<irep_idt, irep_idt> string_of_char_array_functions;
   std::map<irep_idt, irep_idt> string_of_char_array_function_calls;
   std::map<irep_idt, irep_idt> side_effect_char_array_functions;
+  std::map<irep_idt, int> identity_functions;
 
  public:
   pass_preprocesst(symbol_tablet &, goto_functionst &, //const namespacet &, 
@@ -77,6 +78,14 @@ class pass_preprocesst:public messaget
   void make_of_char_array_side_effect
     (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
      irep_idt function_name);
+
+  // replace "r = some_function(s,arr)" by "r=function_name(s,arr.length,arr.data)" 
+  void make_format_function
+    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
+     irep_idt function_name);
+
+  // replace "lhs=some_function(x,...)" by "lhs=x"
+  void make_identity_function(goto_programt::instructionst::iterator & i_it);
 
   bool has_java_string_type(const exprt &expr);
 
