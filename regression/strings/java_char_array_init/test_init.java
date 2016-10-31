@@ -10,15 +10,14 @@ public class test_init {
 	str[4] = 'o';
 	String s = new String(str);
 	String t = new String(str,1,2);
-	char c = str[2];
+
 	System.out.println(s);
 	System.out.println(s.length());
 	assert(s.startsWith("Hello"));
 	assert(s.length() == 10);
 	assert(t.equals("el"));
-	assert(s.equals("Hello") || !t.equals("el"));
 	String u = String.valueOf(str,3,2);
-	//assert(u.equals("lo"));
-	//assert(!u.equals("lo"));
+	assert(u.equals("lo"));
+	assert(s.equals("Hello") || !t.equals("el") || !u.equals("lo"));
     }
 }

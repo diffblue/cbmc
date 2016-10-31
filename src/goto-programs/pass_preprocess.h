@@ -27,6 +27,7 @@ class pass_preprocesst:public messaget
   std::map<irep_idt, irep_idt> string_functions;
   std::map<irep_idt, irep_idt> string_function_calls;
   std::map<irep_idt, irep_idt> string_of_char_array_functions;
+  std::map<irep_idt, irep_idt> string_of_char_array_function_calls;
 
  public:
   pass_preprocesst(symbol_tablet &, goto_functionst &, //const namespacet &, 
@@ -57,6 +58,12 @@ class pass_preprocesst:public messaget
 
   void make_to_char_array_function
     (goto_programt & goto_program, goto_programt::instructionst::iterator &);
+
+  // replace "r.some_function(arr,...)" by 
+  // "r = function_name(arr.length,arr.data,...);
+  void make_of_char_array_function_call
+    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
+     irep_idt);
 
   // replace "r = some_function(arr,...)" by 
   // "r = function_name(arr.length,arr.data,...);
