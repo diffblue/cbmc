@@ -84,8 +84,8 @@ class pass_preprocesst:public messaget
     (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
      irep_idt function_name);
 
-  // replace "lhs=some_function(x,...)" by "lhs=x"
-  void make_identity_function(goto_programt::instructionst::iterator & i_it);
+  // replace "lhs=some_function(x,...)" by "lhs=&x"
+  void make_pointer(goto_programt::instructionst::iterator & i_it);
 
   bool has_java_string_type(const exprt &expr);
 
