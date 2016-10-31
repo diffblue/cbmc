@@ -334,11 +334,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   }
   else if(expr.id()==ID_function_application)
   {
-    // record
-    functions.record(to_function_application_expr(expr));
-
-    // make it free bits
-    return prop.new_variables(boolbv_width(expr.type()));
+    return convert_function_application(to_function_application_expr(expr));
   }
   else if(expr.id()==ID_reduction_or  || expr.id()==ID_reduction_and  ||
           expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
@@ -502,6 +498,30 @@ bvt boolbvt::convert_symbol(const exprt &expr)
   
   return bv;
 }
+
+
+/*******************************************************************\
+
+Function: boolbvt::convert_function_application
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bvt boolbvt::convert_function_application(
+  const function_application_exprt &expr)
+{
+  // record
+  functions.record(expr);
+
+  // make it free bits
+  return prop.new_variables(boolbv_width(expr.type()));
+}
+
    
 /*******************************************************************\
 
