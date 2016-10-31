@@ -276,8 +276,6 @@ void pass_preprocesst::make_of_char_array_function_call
 (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
-  debug() << "function call " << function_call.pretty() << eom;
-
   exprt arg = function_call.arguments()[1];
   auto location = function_call.source_location();
   typet object_type = arg.type().subtype();
@@ -293,6 +291,25 @@ void pass_preprocesst::make_of_char_array_function_call
   make_string_function_call(i_it,function_name);
 }
 
+void pass_preprocesst::make_of_char_array_side_effect
+(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
+ irep_idt function_name)
+{
+  code_function_callt &function_call=to_code_function_call(i_it->code);
+  exprt arg = function_call.arguments()[2];
+  auto location = function_call.source_location();
+  typet object_type = arg.type().subtype();
+  exprt array_size = member_exprt(dereference_exprt(arg,object_type)
+				  ,"length",signedbv_typet(32));
+  exprt data_pointer = member_exprt(dereference_exprt(arg,object_type),"data",
+				    pointer_typet(pointer_typet(unsignedbv_typet(16))));
+  exprt data = dereference_exprt(data_pointer, pointer_typet(unsignedbv_typet(16)));
+
+  std::vector<exprt>::iterator it = std::next(std::next(function_call.arguments().begin()));
+  *it = array_size; 
+  function_call.arguments().insert(++it,data);
+  make_string_function_side_effect(goto_program,i_it,function_name);
+}
 
 
 void pass_preprocesst::replace_string_calls
@@ -326,10 +343,11 @@ void pass_preprocesst::replace_string_calls
 		make_of_char_array_function(goto_program,i_it,string_of_char_array_functions[function_id]);
 	      else if(string_of_char_array_function_calls.find(function_id) != string_of_char_array_function_calls.end())
 		make_of_char_array_function_call(goto_program,i_it,string_of_char_array_function_calls[function_id]);
+	      else if(side_effect_char_array_functions.find(function_id) != side_effect_char_array_functions.end())
+		make_of_char_array_side_effect(goto_program,i_it,side_effect_char_array_functions[function_id]);
 	      else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
 		make_to_char_array_function(goto_program,i_it);
-
-
+	      
 	    } 
 	} 
       else
@@ -464,6 +482,10 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.insert:(IC)Ljava/lang/StringBuilder;")] = cprover_string_insert_char_func;
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.insert:(IZ)Ljava/lang/StringBuilder;") ] = cprover_string_insert_bool_func;
    side_effect_functions[irep_idt("java::java.lang.StringBuilder.setLength:(I)V")] = cprover_string_set_length_func;
+
+
+   side_effect_char_array_functions[irep_idt("java::java.lang.StringBuilder.insert:(I[CII)Ljava/lang/StringBuilder;")] =  cprover_string_insert_char_array_func;
+   side_effect_char_array_functions[irep_idt("java::java.lang.StringBuilder.insert:(I[C)Ljava/lang/StringBuilder;")] =  cprover_string_insert_char_array_func;
 
    string_function_calls[irep_idt("java::java.lang.String.<init>:(Ljava/lang/String;)V")] = cprover_string_copy_func;
    string_function_calls[irep_idt("java::java.lang.String.<init>:(Ljava/lang/StringBuilder;)V")] = cprover_string_copy_func;

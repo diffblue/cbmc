@@ -108,6 +108,7 @@ public:
   string_exprt string_insert_char(const function_application_exprt &f);
   string_exprt string_insert_double(const function_application_exprt &f);
   string_exprt string_insert_float(const function_application_exprt &f);
+  string_exprt string_insert_char_array(const function_application_exprt &f);
   exprt string_is_empty(const function_application_exprt &f);
   exprt string_is_prefix(const string_exprt &prefix, const string_exprt &str, const exprt & offset);
   exprt string_is_prefix(const function_application_exprt &f, bool swap_arguments=false);
@@ -125,6 +126,8 @@ public:
   string_exprt of_char(const function_application_exprt &f);
   string_exprt of_char(const exprt &i);
   string_exprt of_char_array(const function_application_exprt &f);
+  string_exprt of_char_array
+  (const exprt & length, const exprt & data, const exprt & offset, const exprt & count);
 
   // Warning: the specifications of these functions is only partial:
   string_exprt of_float(const function_application_exprt &f);

@@ -248,6 +248,8 @@ exprt string_constraint_generatort::function_application
     return string_insert_double(expr);
   else if(starts_with(id,cprover_string_insert_float_func))
     return string_insert_float(expr);
+  else if(starts_with(id,cprover_string_insert_char_array_func))
+    return string_insert_char_array(expr);
   else if(starts_with(id,cprover_string_substring_func))
     return string_substring(expr);
   else if(starts_with(id,cprover_string_trim_func))
@@ -1229,10 +1231,24 @@ exprt string_constraint_generatort::string_data
 }
 
 string_exprt string_constraint_generatort::of_char_array
-(const function_application_exprt &f)
+(const exprt & length, const exprt & data, const exprt & offset, const exprt & count)
 {
   string_exprt str(get_char_type());
+  symbol_exprt qvar = fresh_univ_index("QA_string_of_char_array");
+  exprt char_in_tab = data;
+  assert(char_in_tab.id() == ID_index);
+  char_in_tab.op1() = plus_exprt(qvar,offset);
   
+  string_constraintt eq(equal_exprt(str[qvar],char_in_tab));
+  axioms.push_back(eq.forall(qvar,count));
+  axioms.emplace_back(equal_exprt(str.length(),count));
+  
+  return str;
+}
+
+string_exprt string_constraint_generatort::of_char_array
+(const function_application_exprt &f)
+{
   exprt offset;
   exprt count;
   if(f.arguments().size() == 4) 
@@ -1246,20 +1262,33 @@ string_exprt string_constraint_generatort::of_char_array
       count = f.arguments()[0];
       offset = constant_signed(0,32);
     }
-
   exprt tab_length = f.arguments()[0];
   exprt data = f.arguments()[1];
+  return of_char_array(tab_length,data,offset,count);
+}
 
-  symbol_exprt qvar = fresh_univ_index("QA_string_of_char_array");
-  exprt char_in_tab = data;
-  assert(char_in_tab.id() == ID_index);
-  char_in_tab.op1() = plus_exprt(qvar,offset);
-  
-  string_constraintt eq(equal_exprt(str[qvar],char_in_tab));
-  axioms.push_back(eq.forall(qvar,count));
-  axioms.emplace_back(equal_exprt(str.length(),count));
+string_exprt string_constraint_generatort::string_insert_char_array
+(const function_application_exprt &f)
+{
+  exprt offset;
+  exprt count;
+  if(f.arguments().size() == 6) 
+    {
+      offset = f.arguments()[4];
+      count = f.arguments()[5];
+    }
+  else
+    {
+      assert(f.arguments().size() == 4);
+      count = f.arguments()[2];
+      offset = constant_signed(0,32);
+    }
 
-  return str;
+  string_exprt str = string_of_expr(f.arguments()[0]);
+  exprt length = f.arguments()[2];
+  exprt data = f.arguments()[3];
+  string_exprt arr = of_char_array(length,data,offset,count);
+  return string_insert(str,arr,f.arguments()[1]);
 }
 
 
