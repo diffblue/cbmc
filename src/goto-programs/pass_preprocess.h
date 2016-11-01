@@ -55,8 +55,7 @@ class pass_preprocesst:public messaget
   // replace "r = s.some_function(x,...)" by "s=function_name(s,x,...)" 
   // and add a correspondance from r to s in the string_builders map
   void make_string_function_side_effect
-    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
-     irep_idt function_name);
+    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
   void make_to_char_array_function
     (goto_programt & goto_program, goto_programt::instructionst::iterator &);
@@ -64,28 +63,25 @@ class pass_preprocesst:public messaget
   // replace "r.some_function(arr,...)" by 
   // "r = function_name(arr.length,arr.data,...);
   void make_of_char_array_function_call
-    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
-     irep_idt);
+    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
   // replace "r = some_function(arr,...)" by 
   // "r = function_name(arr.length,arr.data,...);
   void make_of_char_array_function
-    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
-     irep_idt);
+    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
   // replace "r = s.some_function(i,arr,...)" by "s=function_name(s,i,arr.length,arr.data)" 
   // and add a correspondance from r to s in the string_builders map
   void make_of_char_array_side_effect
-    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
-     irep_idt function_name);
+    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
   // replace "r = some_function(s,arr)" by "r=function_name(s,arr.length,arr.data)" 
   void make_format_function
     (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
      irep_idt function_name);
 
-  // replace "lhs=some_function(x,...)" by "lhs=&x"
-  void make_pointer(goto_programt::instructionst::iterator & i_it);
+  // replace "lhs=some_function(x,...)" by "lhs=malloc(sizeof(x)); *lhs = x"
+  void make_pointer(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it);
 
   bool has_java_string_type(const exprt &expr);
 

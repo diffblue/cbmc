@@ -79,8 +79,7 @@ void pass_preprocesst::make_string_function_call
 }
 
 void pass_preprocesst::make_string_function_side_effect
-(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
- irep_idt function_name)
+(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
   code_typet function_type=to_code_type(function_call.function().type());
@@ -195,7 +194,7 @@ void pass_preprocesst::make_to_char_array_function
 
 
 void pass_preprocesst::make_of_char_array_function
-(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, irep_idt function_name)
+(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
   exprt arg = function_call.arguments()[0];
@@ -215,7 +214,7 @@ void pass_preprocesst::make_of_char_array_function
 }
 
 void pass_preprocesst::make_of_char_array_function_call
-(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, irep_idt function_name)
+(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
   exprt arg = function_call.arguments()[1];
@@ -234,8 +233,7 @@ void pass_preprocesst::make_of_char_array_function_call
 }
 
 void pass_preprocesst::make_of_char_array_side_effect
-(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, 
- irep_idt function_name)
+(goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
   exprt arg = function_call.arguments()[2];
@@ -250,7 +248,7 @@ void pass_preprocesst::make_of_char_array_side_effect
   std::vector<exprt>::iterator it = std::next(std::next(function_call.arguments().begin()));
   *it = array_size; 
   function_call.arguments().insert(++it,data);
-  make_string_function_side_effect(goto_program,i_it,function_name);
+  make_string_function_side_effect(i_it,function_name);
 }
 
 void pass_preprocesst::make_format_function
@@ -274,7 +272,7 @@ void pass_preprocesst::make_format_function
 }
 
 void pass_preprocesst::make_pointer
-(goto_programt::instructionst::iterator & i_it) 
+(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it) 
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
   typet object_type = function_call.lhs().type().subtype();
@@ -290,11 +288,16 @@ void pass_preprocesst::make_pointer
   malloc_expr.type()=pointer_typet(object_type);
   malloc_expr.add_source_location()=location;
 
-  symbol_exprt tmp_assign("tmp_assign",pointer_typet(object_type));
-  code_assignt assign_malloc(tmp_assign, malloc_expr);
-
-  code_assignt assignment(function_call.lhs(), function_call.arguments()[0]);
+  code_assignt assign_malloc(function_call.lhs(), malloc_expr);
   assign_malloc.add_source_location() = location;
+
+  code_assignt assignment(dereference_exprt(function_call.lhs(),object_type), 
+			  function_call.arguments()[0]);
+  assignment.add_source_location() = location;
+
+  i_it->make_assignment();
+  i_it->code=assign_malloc;
+  i_it=goto_program.insert_after(i_it);
   i_it->make_assignment();
   i_it->code=assignment;
 }
@@ -322,22 +325,21 @@ void pass_preprocesst::replace_string_calls
 	      if(string_functions.find(function_id) != string_functions.end())
 		make_string_function(i_it,string_functions[function_id]);
 	      else if(side_effect_functions.find(function_id) != side_effect_functions.end()) 
-		make_string_function_side_effect(goto_program, i_it,side_effect_functions[function_id]);
+		make_string_function_side_effect(i_it,side_effect_functions[function_id]);
 	      else if(string_function_calls.find(function_id) != string_function_calls.end()) 
 		make_string_function_call(i_it, string_function_calls[function_id]);
-	      
 	      else if(string_of_char_array_functions.find(function_id) != string_of_char_array_functions.end())
-		make_of_char_array_function(goto_program,i_it,string_of_char_array_functions[function_id]);
+		make_of_char_array_function(i_it,string_of_char_array_functions[function_id]);
 	      else if(string_of_char_array_function_calls.find(function_id) != string_of_char_array_function_calls.end())
-		make_of_char_array_function_call(goto_program,i_it,string_of_char_array_function_calls[function_id]);
+		make_of_char_array_function_call(i_it,string_of_char_array_function_calls[function_id]);
 	      else if(side_effect_char_array_functions.find(function_id) != side_effect_char_array_functions.end())
-		make_of_char_array_side_effect(goto_program,i_it,side_effect_char_array_functions[function_id]);
+		make_of_char_array_side_effect(i_it,side_effect_char_array_functions[function_id]);
 	      else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
 		make_to_char_array_function(goto_program,i_it);
 	      else if(function_id == irep_idt("java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"))
 		make_format_function(goto_program,i_it,cprover_string_format_func);
 	      else if(identity_functions.find(function_id) != identity_functions.end())
-		make_pointer(i_it);
+		make_pointer(goto_program,i_it);
 	    } 
 	} 
       else
