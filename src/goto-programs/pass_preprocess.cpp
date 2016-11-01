@@ -107,19 +107,20 @@ void pass_preprocesst::make_to_char_array_function
   // replace "return_tmp0 = s.toCharArray()" with:
   // tmp_assign = MALLOC(struct java::array[reference], 17L);
   // tmp_assign->length = (int)__CPROVER_uninterpreted_string_length_func(s);
-  // tmp_assign->data = MALLOC(void **, tmp_assign->length);
+  // tmp_assign->data = new (void **)[tmp_assign->length];
   // tmp_nil = __CPROVER_uninterpreted_string_data_func(s, tmp_assign->data);
   // return_tmp0 = tmp_assign;
 
   code_function_callt &function_call=to_code_function_call(i_it->code);
   if(function_call.lhs().type().id()!=ID_pointer)
-    debug() << "the function call should return a pointer" << eom;
+    debug() << "pass_preprocesst::make_to_char_array_function: " 
+	    << "the function call should return a pointer" << eom;
 
   typet object_type = function_call.lhs().type().subtype();
   exprt object_size = size_of_expr(object_type, ns);
 
   if(object_size.is_nil())
-    debug() << "do_java_new got nil object_size" << eom;
+    debug() << "pass_preprocesst::make_to_char_array_function got nil object_size" << eom;
 
   auto location = function_call.source_location();
   std::vector<codet> new_code;
@@ -133,24 +134,8 @@ void pass_preprocesst::make_to_char_array_function
   exprt string_argument = replace_string_literals(function_call.arguments()[0]);
   typet string_argument_type = string_argument.type();
 
-  auxiliary_symbolt tmp_assign_symbol;
-  tmp_assign_symbol.base_name="tmp_assign";
-  tmp_assign_symbol.is_static_lifetime=false;
-  tmp_assign_symbol.mode=ID_java;
-  tmp_assign_symbol.name="tmp_assign";
-  tmp_assign_symbol.type=pointer_typet(object_type);
-  symbol_table.add(tmp_assign_symbol);
-
-  auxiliary_symbolt tmp_string_symbol;
-  tmp_string_symbol.base_name="tmp_string";
-  tmp_string_symbol.is_static_lifetime=false;
-  tmp_string_symbol.mode=ID_java;
-  tmp_string_symbol.name="tmp_string";
-  tmp_string_symbol.type=string_argument_type.subtype();
-  symbol_table.add(tmp_string_symbol);
-
   // tmp_assign = MALLOC(struct java::array[reference],sizeof(s))
-  symbol_exprt tmp_assign("tmp_assign",pointer_typet(object_type));
+  symbol_exprt tmp_assign = new_tmp_symbol("tmp_assign", pointer_typet(object_type));
   code_assignt assign_malloc(tmp_assign, malloc_expr);
   new_code.push_back(assign_malloc);
 
@@ -163,57 +148,23 @@ void pass_preprocesst::make_to_char_array_function
   call_to_length.function()=symbol_exprt(cprover_string_length_func);
   call_to_length.arguments().push_back(string_argument);
 
-  code_assignt assign_length(member_exprt(dereference_exprt(tmp_assign,object_type)
-					  ,"length",signedbv_typet(32)),
-			     typecast_exprt(call_to_length,signedbv_typet(32)));
-  new_code.push_back(assign_length);
-
-  // tmp_malloc = MALLOC(length)  
-  // tmp_assign->data = tmp_malloc
-  /*
-  side_effect_exprt malloc_expr_data(ID_malloc);
-  pointer_typet tmp_void_star = pointer_typet(void_typet());
-  tmp_void_star.set(ID_C_reference,true);
-  typet void_star_star=pointer_typet();
-  void_star_star.move_to_subtypes(tmp_void_star);
-
-  malloc_expr_data.type()=pointer_typet(void_star_star);
-  exprt array_size = member_exprt(dereference_exprt(tmp_assign,object_type)
-				  ,"length",signedbv_typet(32));
-  malloc_expr_data.copy_to_operands(array_size);
-  malloc_expr_data.add_source_location()=location;
-
-  auxiliary_symbolt tmp_malloc_symbol;
-  tmp_malloc_symbol.base_name="tmp_malloc";
-  tmp_malloc_symbol.is_static_lifetime=false;
-  tmp_malloc_symbol.mode=ID_java;
-  tmp_malloc_symbol.name="tmp_malloc";
-  tmp_malloc_symbol.type=void_star_star;
-  symbol_table.add(tmp_malloc_symbol);
-
-  symbol_exprt tmp_malloc("tmp_malloc",void_star_star);
-
-  exprt data_pointer = member_exprt(dereference_exprt(tmp_assign,object_type),"data", void_star_star);
-  new_code.push_back(code_assignt(tmp_malloc, malloc_expr_data));
-  new_code.push_back(code_assignt(data_pointer, tmp_malloc));
-  */
-
-  assert(ns.follow(object_type).id()==ID_struct);
   const struct_typet &struct_type=to_struct_type(ns.follow(object_type));
   dereference_exprt deref(tmp_assign, object_type);
-  member_exprt data(deref,struct_type.components()[2].get_name(), struct_type.components()[2].type());
-  member_exprt length(deref,struct_type.components()[1].get_name(), struct_type.components()[1].type());
-  //"length",signedbv_typet(32));
+  member_exprt length(deref,struct_type.components()[1].get_name(), 
+		      struct_type.components()[1].type());
+  code_assignt assign_length(length,typecast_exprt(call_to_length,signedbv_typet(32)));
+  new_code.push_back(assign_length);
+
+  // tmp_assign->data = new data.type[length];
+  assert(ns.follow(object_type).id()==ID_struct);
+  member_exprt data(deref,struct_type.components()[2].get_name(), 
+		    struct_type.components()[2].type());
   side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
   data_cpp_new_expr.set(ID_size, length);
-  debug() << "data_cpp_new_expr : " << data_cpp_new_expr.pretty() << eom;
-
   symbol_exprt tmp_data = new_tmp_symbol("tmp_data", struct_type.components()[2].type());
-  //new_code.push_back(code_assignt(tmp_data, data_cpp_new_expr));
   new_code.push_back(code_assignt(data, data_cpp_new_expr));
 
-  // tmp_assing->data = __CPROVER_uninterpreted_string_data_func(s,tmp_assing->data);
-
+  // tmp_assign->data = __CPROVER_uninterpreted_string_data_func(s,tmp_assing->data);
   declare_function(cprover_string_data_func,void_typet());
   function_application_exprt call_to_data;
   call_to_data.type()=void_typet();
@@ -223,20 +174,11 @@ void pass_preprocesst::make_to_char_array_function
   call_to_data.arguments().push_back(data);
   call_to_data.arguments().push_back(dereference_exprt(data));
   
-  auxiliary_symbolt tmp_nil_symbol;
-  tmp_nil_symbol.base_name="tmp_nil";
-  tmp_nil_symbol.is_static_lifetime=false;
-  tmp_nil_symbol.mode=ID_java;
-  tmp_nil_symbol.name="tmp_nil";
-  tmp_nil_symbol.type=void_typet();
-  symbol_table.add(tmp_nil_symbol);
-
-  new_code.push_back(code_assignt(symbol_exprt("tmp_nil",void_typet()),call_to_data));
-
+  exprt tmp_nil = new_tmp_symbol("tmp_nil", void_typet());
+  new_code.push_back(code_assignt(tmp_nil,call_to_data));
 
   // return_tmp0 = tmp_assign
   new_code.push_back(code_assignt(function_call.lhs(), tmp_assign));
-  
 
   //  putting the assignements into the program
   for(int i=0; i<new_code.size(); i++) 
@@ -335,8 +277,24 @@ void pass_preprocesst::make_pointer
 (goto_programt::instructionst::iterator & i_it) 
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
+  typet object_type = function_call.lhs().type().subtype();
+  exprt object_size = size_of_expr(object_type, ns);
+
+  if(object_size.is_nil())
+    debug() << "pass_preprocesst::make_pointer got nil object_size" << eom;
+  
+  auto location = function_call.source_location();
+
+  side_effect_exprt malloc_expr(ID_malloc);
+  malloc_expr.copy_to_operands(object_size);
+  malloc_expr.type()=pointer_typet(object_type);
+  malloc_expr.add_source_location()=location;
+
+  symbol_exprt tmp_assign("tmp_assign",pointer_typet(object_type));
+  code_assignt assign_malloc(tmp_assign, malloc_expr);
+
   code_assignt assignment(function_call.lhs(), function_call.arguments()[0]);
-  assignment.add_source_location()=function_call.source_location();
+  assign_malloc.add_source_location() = location;
   i_it->make_assignment();
   i_it->code=assignment;
 }
