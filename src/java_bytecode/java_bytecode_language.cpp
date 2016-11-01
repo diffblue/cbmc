@@ -389,8 +389,6 @@ static void initialize_needed_classes(
   lazy_methods.add_needed_class("java::java.lang.Object");
 }
 
-
-
 bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
@@ -483,12 +481,16 @@ bool java_bytecode_languaget::typecheck(
 
   for(const auto& sym : symbol_table.symbols)
   {
+    if(sym.second.is_static_lifetime)
+      continue;
     if(lazy_methods.count(sym.first) && !already_populated.count(sym.first))
       continue;
+    if(sym.second.type.id()==ID_code)
+      gather_needed_globals(sym.second.value,symbol_table,keep_symbols);
     keep_symbols.add(sym.second);
   }
 
-  debug() << "Lazy methods: removed " << symbol_table.symbols.size() - keep_symbols.symbols.size() << " unreachable methods" << eom;
+  debug() << "Lazy methods: removed " << symbol_table.symbols.size() - keep_symbols.symbols.size() << " unreachable methods and globals" << eom;
 
   symbol_table.swap(keep_symbols);
 
