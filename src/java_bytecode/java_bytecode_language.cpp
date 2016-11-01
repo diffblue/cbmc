@@ -14,8 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cmdline.h>
 #include <util/string2int.h>
 
+#include <goto-programs/class_hierarchy.h>
+
 #include "java_bytecode_language.h"
 #include "java_bytecode_convert_class.h"
+#include "java_bytecode_convert_method.h"
 #include "java_bytecode_internal_additions.h"
 #include "java_bytecode_typecheck.h"
 #include "java_entry_point.h"
@@ -180,10 +183,15 @@ Function: java_bytecode_languaget::typecheck
 
 \*******************************************************************/
 
+
+
 bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
+  std::map<irep_idt, std::pair<const symbolt*, const java_bytecode_parse_treet::methodt*> >
+    lazy_methods;
+
   // first convert all
   for(java_class_loadert::class_mapt::const_iterator
       c_it=java_class_loader.class_map.begin();
@@ -200,9 +208,72 @@ bool java_bytecode_languaget::typecheck(
          symbol_table,
          get_message_handler(),
          disable_runtime_checks,
-         max_user_array_length))
+         max_user_array_length,
+         lazy_methods))
       return true;
   }
+
+  // Now incrementally elaborate methods that are reachable from this entry point:
+
+  // Convert-method will need this to find virtual function targets.
+  class_hierarchyt ch;
+  ch(symbol_table);
+
+  std::vector<irep_idt> worklist1;
+  std::vector<irep_idt> worklist2;
+
+  auto main_function=get_main_symbol(symbol_table,main_class,get_message_handler(),true);
+  if(main_function.stop_convert)
+  {
+    // Failed, mark all functions in the given main class reachable.
+    const auto& methods=java_class_loader.class_map.at(main_class).parsed_class.methods;
+    for(const auto& method : methods)
+    {
+      const irep_idt methodid="java::"+id2string(main_class)+"."+
+        id2string(method.name)+":"+
+        id2string(method.signature);
+      worklist2.push_back(methodid);
+    }
+  }
+  else
+    worklist2.push_back(main_function.main_function.name);
+
+  std::set<irep_idt> already_populated;
+  while(worklist2.size()!=0)
+  {
+    std::swap(worklist1,worklist2);
+    for(const auto& mname : worklist1)
+    {
+      if(!already_populated.insert(mname).second)
+        continue;
+      auto findit=lazy_methods.find(mname);
+      if(findit==lazy_methods.end())
+      {
+        debug() << "Skip " << mname << eom;
+        continue;
+      }
+      debug() << "Lazy methods: elaborate " << mname << eom;
+      const auto& parsed_method=findit->second;
+      java_bytecode_convert_method(*parsed_method.first,*parsed_method.second,
+				   symbol_table,get_message_handler(),
+				   disable_runtime_checks,max_user_array_length,worklist2,ch);
+    }
+    worklist1.clear();
+  }
+
+  // Remove symbols for methods that were declared but never used:
+  symbol_tablet keep_symbols;
+
+  for(const auto& sym : symbol_table.symbols)
+  {
+    if(lazy_methods.count(sym.first) && !already_populated.count(sym.first))
+      continue;
+    keep_symbols.add(sym.second);
+  }
+
+  debug() << "Lazy methods: removed " << symbol_table.symbols.size() - keep_symbols.symbols.size() << " unreachable methods" << eom;
+
+  symbol_table.swap(keep_symbols);
 
   // now typecheck all
   if(java_bytecode_typecheck(

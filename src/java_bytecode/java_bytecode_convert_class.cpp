@@ -27,11 +27,13 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     bool _disable_runtime_checks,
-    size_t _max_array_length):
+    size_t _max_array_length,
+    lazy_methodst& _lm):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     disable_runtime_checks(_disable_runtime_checks),
-    max_array_length(_max_array_length)
+    max_array_length(_max_array_length),
+    lazy_methods(_lm)
   {
   }
 
@@ -52,6 +54,7 @@ protected:
   symbol_tablet &symbol_table;
   const bool disable_runtime_checks;
   const size_t max_array_length;
+  lazy_methodst &lazy_methods;
 
   // conversion
   void convert(const classt &c);
@@ -81,7 +84,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
     debug() << "Skip class " << c.name << " (already loaded)" << eom;
     return;
   }
-  
+
   class_typet class_type;
 
   class_type.set_tag(c.name);
@@ -135,13 +138,19 @@ void java_bytecode_convert_classt::convert(const classt &c)
 
   // now do methods
   for(const auto &method : c.methods)
-    java_bytecode_convert_method(
-      *class_symbol,
-      method,
-      symbol_table,
-      get_message_handler(),
-      disable_runtime_checks,
-      max_array_length);
+  {
+    const irep_idt method_identifier=
+      id2string(qualified_classname)+
+      "."+id2string(method.name)+
+      ":"+method.signature;
+    java_bytecode_convert_method_lazy(
+      *class_symbol,method_identifier,method,symbol_table);
+    lazy_methods[method_identifier]=
+      std::make_pair(class_symbol,&method);
+  }
+  //java_bytecode_convert_method(
+  //  *class_symbol, method, symbol_table, get_message_handler(),
+  //  disable_runtime_checks, max_array_length);
 
   // is this a root class?
   if(c.extends.empty())
@@ -329,13 +338,15 @@ bool java_bytecode_convert_class(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   bool disable_runtime_checks,
-  size_t max_array_length)
+  size_t max_array_length,
+  lazy_methodst &lazy_methods)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table,
     message_handler,
     disable_runtime_checks,
-    max_array_length);
+    max_array_length,
+    lazy_methods);
 
   try
   {

@@ -14,11 +14,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_parse_tree.h"
 
+typedef std::map<irep_idt, std::pair<const symbolt*, const java_bytecode_parse_treet::methodt*> >
+  lazy_methodst;
+
 bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   bool disable_runtime_checks,
-  size_t max_array_length);
+  size_t max_array_length,
+  lazy_methodst &);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_CLASS_H
