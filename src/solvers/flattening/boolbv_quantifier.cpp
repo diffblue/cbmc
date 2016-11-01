@@ -111,33 +111,6 @@ exprt get_quantifier_var_max(
 
 /*******************************************************************\
 
-Function: instantiate(var_expr, var_inst, expr)
-
-  Inputs:
-
- Outputs:
-
- Purpose: Replace all "var_expr"s inside "expr" with "var_inst"
-
-\*******************************************************************/
-void instantiate(
-  const exprt &var_expr,
-  const mp_integer &var_inst,
-  exprt &expr)
-{
-  if(expr==var_expr)
-  {
-    expr=from_integer(var_inst, expr.type()); 
-    return;
-  }
-  for(auto &x: expr.operands())
-  {
-    instantiate(var_expr, var_inst, x);
-  }
-}
-
-/*******************************************************************\
-
 Function: instantiate_quantifier
 
   Inputs:
@@ -192,7 +165,9 @@ bool instantiate_quantifier(exprt &expr,
   for(mp_integer i=lb; i<=ub; ++i)
   {
     exprt constraint_expr=body_expr;
-    instantiate(var_expr, i, constraint_expr);
+    replace_expr(var_expr,
+                 from_integer(i, var_expr.type()),
+                 constraint_expr);
     constraint_expr=simplify_expr(constraint_expr, ns);
     expr_insts.push_back(constraint_expr);
   }
