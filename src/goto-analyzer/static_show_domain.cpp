@@ -90,7 +90,9 @@ bool static_show_domain(
     dependence_grapht *d = dynamic_cast<dependence_grapht*>(domain);
     assert(d != NULL);
 
+    out << "digraph g {\n";
     d->output_dot(out);
+    out << "}\n";
   }
   else
     domain->output(goto_model, out);
