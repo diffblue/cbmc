@@ -43,6 +43,10 @@ public:
       const ai_baset &ai,
       const namespacet &ns) const;
 
+  virtual jsont output_json(
+    const ai_baset &ai,
+    const namespacet &ns) const;
+
   void set_node_id(unsigned id)
   {
     node_id=id;
