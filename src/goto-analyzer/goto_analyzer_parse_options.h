@@ -38,12 +38,13 @@ class optionst;
   "(gcc)(arch):" \
   "(taint):(show-taint)" \
   "(show-local-may-alias)" \
-  "(json):(xml):(text):" \
+  "(json):(xml):(text):(dot):" \
   "(unreachable-instructions)(unreachable-functions)" \
   "(reachable-functions)" \
   "(intervals)(show-intervals)" \
   "(non-null)(show-non-null)" \
   "(constants)" \
+  "(dependence-graph)" \
   "(show)(verify)(simplify):" \
   "(flow-sensitive)(concurrent)"
 
