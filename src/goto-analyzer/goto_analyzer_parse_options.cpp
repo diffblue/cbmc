@@ -179,6 +179,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   options.set_option("text", false);
   options.set_option("json", false);
   options.set_option("xml", false);
+  options.set_option("dot", false);
   options.set_option("outfile", "-");
 
   if(cmdline.isset("text"))
@@ -195,6 +196,11 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   {
     options.set_option("xml", true);
     options.set_option("outfile", cmdline.get_value("xml"));
+  }
+  else if (cmdline.isset("dot"))
+  {
+    options.set_option("dot", true);
+    options.set_option("outfile", cmdline.get_value("dot"));
   }
   else
   {
@@ -250,6 +256,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   options.set_option("constants", false);
   options.set_option("intervals", false);
   options.set_option("non-null", false);
+  options.set_option("dependence-graph", false);
 
   if(cmdline.isset("intervals") ||
      cmdline.isset("show-intervals"))
@@ -259,10 +266,13 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("non-null", true);
   else if(cmdline.isset("constants"))
     options.set_option("constants", true);
-
-  if(!(options.get_bool_option("constants")  ||
-     options.get_bool_option("intervals")  ||
-     options.get_bool_option("non-null")))
+  else if (cmdline.isset("dependence-graph"))
+    options.set_option("dependence-graph", true);
+    
+  if (!(options.get_bool_option("constants")  ||
+        options.get_bool_option("intervals")  ||
+        options.get_bool_option("non-null") ||
+        options.get_bool_option("dependence-graph")))
   {
     status() << "Domain defaults to --constants" << eom;
     options.set_option("constants", true);
@@ -616,11 +626,13 @@ void goto_analyzer_parse_optionst::help()
     " --constants                  constant abstraction\n"
     " --intervals                  interval abstraction\n"
     " --non-null                   non-null abstraction\n"
+    " --dependence-graph           dependency relation between instructions\n"
     "\n"
     "Output options:\n"
     " --text file_name             output results in plain text to given file\n"
     " --json file_name             output results in JSON format to given file\n"
     " --xml file_name              output results in XML format to given file\n"
+    " --dot file_name              output results in DOT format to given file\n"
     "\n"
     "Other analyses:\n"
     " --taint file_name            perform taint analysis using rules in given file\n"

@@ -33,12 +33,13 @@ class optionst;
   "(gcc)(arch):" \
   "(taint):(show-taint)" \
   "(show-local-may-alias)" \
-  "(json):(xml):(text):" \
+  "(json):(xml):(text):(dot):" \
   "(unreachable-instructions)" \
   "(intervals)(show-intervals)" \
   "(non-null)(show-non-null)" \
   "(constants)" \
-  "(show)(verify)(simplify):" \
+  "(dependence-graph)" \
+  "(show)(verify)(simplify):"			\
   "(flow-sensitive)(concurrent)"
 
 class goto_analyzer_parse_optionst:
