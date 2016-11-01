@@ -171,6 +171,19 @@ bool java_bytecode_languaget::parse(
   return false;
 }
 
+static void gather_needed_globals(const exprt& e, const symbol_tablet& symbol_table, symbol_tablet& needed)
+{
+  if(e.id()==ID_symbol)
+  {
+    const auto& sym=symbol_table.lookup(to_symbol_expr(e).get_identifier());
+    if(sym.is_static_lifetime)
+      needed.add(sym);
+  }
+  else
+    forall_operands(opit,e)
+      gather_needed_globals(*opit,symbol_table,needed);
+}
+
 /*******************************************************************\
 
 Function: java_bytecode_languaget::typecheck
@@ -182,8 +195,6 @@ Function: java_bytecode_languaget::typecheck
  Purpose:
 
 \*******************************************************************/
-
-
 
 bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
@@ -266,12 +277,16 @@ bool java_bytecode_languaget::typecheck(
 
   for(const auto& sym : symbol_table.symbols)
   {
+    if(sym.second.is_static_lifetime)
+      continue;
     if(lazy_methods.count(sym.first) && !already_populated.count(sym.first))
       continue;
+    if(sym.second.type.id()==ID_code)
+      gather_needed_globals(sym.second.value,symbol_table,keep_symbols);
     keep_symbols.add(sym.second);
   }
 
-  debug() << "Lazy methods: removed " << symbol_table.symbols.size() - keep_symbols.symbols.size() << " unreachable methods" << eom;
+  debug() << "Lazy methods: removed " << symbol_table.symbols.size() - keep_symbols.symbols.size() << " unreachable methods and globals" << eom;
 
   symbol_table.swap(keep_symbols);
 
