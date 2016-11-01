@@ -15,12 +15,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <analyses/cfg_dominators.h>
 #include "java_bytecode_parse_tree.h"
+#include "java_bytecode_convert_class.h"
 
 #include <vector>
 #include <list>
 
 class symbol_tablet;
 class symbolt;
+class class_hierarchyt;
 
 class java_bytecode_convert_methodt:public messaget
 {
@@ -29,11 +31,15 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     bool _disable_runtime_checks,
-    size_t _max_array_length):
+    size_t _max_array_length,
+    std::vector<irep_idt>& _needed_methods,
+    const class_hierarchyt& _ch):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     disable_runtime_checks(_disable_runtime_checks),
-    max_array_length(_max_array_length)
+    max_array_length(_max_array_length),
+    needed_methods(_needed_methods),
+    class_hierarchy(_ch)
   {
   }
 
@@ -52,6 +58,8 @@ protected:
   symbol_tablet &symbol_table;
   const bool disable_runtime_checks;
   const size_t max_array_length;
+  std::vector<irep_idt>& needed_methods;
+  const class_hierarchyt& class_hierarchy;
 
   irep_idt method_id;
   irep_idt current_method;
