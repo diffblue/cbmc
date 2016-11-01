@@ -103,12 +103,6 @@ void pass_preprocesst::make_string_function_side_effect
 void pass_preprocesst::make_to_char_array_function
 (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it)
 {
-  // replace "return_tmp0 = s.toCharArray()" with:
-  // tmp_assign = MALLOC(struct java::array[reference], 17L);
-  // tmp_assign->length = (int)__CPROVER_uninterpreted_string_length_func(s);
-  // tmp_assign->data = new (void **)[tmp_assign->length];
-  // tmp_nil = __CPROVER_uninterpreted_string_data_func(s, tmp_assign->data);
-  // return_tmp0 = tmp_assign;
 
   code_function_callt &function_call=to_code_function_call(i_it->code);
   if(function_call.lhs().type().id()!=ID_pointer)
@@ -188,7 +182,6 @@ void pass_preprocesst::make_to_char_array_function
       i_it->source_location=location;
       if(i<new_code.size()-1)
 	i_it=goto_program.insert_after(i_it);
-
     }
 }
 
@@ -251,56 +244,6 @@ void pass_preprocesst::make_of_char_array_side_effect
   make_string_function_side_effect(i_it,function_name);
 }
 
-void pass_preprocesst::make_format_function
-(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it, irep_idt function_name)
-{
-  code_function_callt &function_call=to_code_function_call(i_it->code);
-  exprt arg = function_call.arguments()[1];
-  auto location = function_call.source_location();
-  typet object_type = arg.type().subtype();
-  debug() << "format of " << arg.pretty() << eom;
-  exprt array_size = member_exprt(dereference_exprt(arg,object_type)
-				  ,"length",signedbv_typet(32));
-  exprt data_pointer = member_exprt(dereference_exprt(arg,object_type),"data",
-				    pointer_typet(pointer_typet(unsignedbv_typet(16))));
-  exprt data = dereference_exprt(data_pointer, pointer_typet(unsignedbv_typet(16)));
-
-  std::vector<exprt>::iterator it = std::next(function_call.arguments().begin());
-  *it = array_size; 
-  function_call.arguments().insert(++it,data);
-  make_string_function(i_it,function_name);
-}
-
-void pass_preprocesst::make_pointer
-(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it) 
-{
-  code_function_callt &function_call=to_code_function_call(i_it->code);
-  typet object_type = function_call.lhs().type().subtype();
-  exprt object_size = size_of_expr(object_type, ns);
-
-  if(object_size.is_nil())
-    debug() << "pass_preprocesst::make_pointer got nil object_size" << eom;
-  
-  auto location = function_call.source_location();
-
-  side_effect_exprt malloc_expr(ID_malloc);
-  malloc_expr.copy_to_operands(object_size);
-  malloc_expr.type()=pointer_typet(object_type);
-  malloc_expr.add_source_location()=location;
-
-  code_assignt assign_malloc(function_call.lhs(), malloc_expr);
-  assign_malloc.add_source_location() = location;
-
-  code_assignt assignment(dereference_exprt(function_call.lhs(),object_type), 
-			  function_call.arguments()[0]);
-  assignment.add_source_location() = location;
-
-  i_it->make_assignment();
-  i_it->code=assign_malloc;
-  i_it=goto_program.insert_after(i_it);
-  i_it->make_assignment();
-  i_it->code=assignment;
-}
 
 void pass_preprocesst::replace_string_calls
 (goto_functionst::function_mapt::iterator f_it)
@@ -336,10 +279,6 @@ void pass_preprocesst::replace_string_calls
 		make_of_char_array_side_effect(i_it,side_effect_char_array_functions[function_id]);
 	      else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C")) 
 		make_to_char_array_function(goto_program,i_it);
-	      else if(function_id == irep_idt("java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"))
-		make_format_function(goto_program,i_it,cprover_string_format_func);
-	      else if(identity_functions.find(function_id) != identity_functions.end())
-		make_pointer(goto_program,i_it);
 	    } 
 	} 
       else
@@ -491,14 +430,8 @@ pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_function
    string_of_char_array_functions[irep_idt("java::java.lang.String.copyValueOf:([CII)Ljava/lang/String;")] = cprover_string_of_char_array_func;
    string_of_char_array_functions[irep_idt("java::java.lang.String.copyValueOf:([C)Ljava/lang/String;")] = cprover_string_of_char_array_func;
 
-
-   identity_functions[irep_idt("java::java.lang.Integer.valueOf:(I)Ljava/lang/Integer;")] = true;
-
-
   Forall_goto_functions(it, goto_functions)
-  {
     replace_string_calls(it);
-  }
-}
+ }
 
 

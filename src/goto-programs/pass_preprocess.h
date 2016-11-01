@@ -14,7 +14,6 @@ Date:   September 2016
 
 #include <goto-programs/goto_model.h>
 #include <util/ui_message.h>
-//#include "goto_convert_class.h"
 
 class pass_preprocesst:public messaget 
 {
@@ -29,11 +28,9 @@ class pass_preprocesst:public messaget
   std::map<irep_idt, irep_idt> string_of_char_array_functions;
   std::map<irep_idt, irep_idt> string_of_char_array_function_calls;
   std::map<irep_idt, irep_idt> side_effect_char_array_functions;
-  std::map<irep_idt, int> identity_functions;
 
  public:
-  pass_preprocesst(symbol_tablet &, goto_functionst &, //const namespacet &, 
-		   message_handlert &);
+  pass_preprocesst(symbol_tablet &, goto_functionst &, message_handlert &);
   
  private:
 
@@ -57,6 +54,12 @@ class pass_preprocesst:public messaget
   void make_string_function_side_effect
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
+  // replace "return_tmp0 = s.toCharArray()" with:
+  // tmp_assign = MALLOC(struct java::array[reference], 17L);
+  // tmp_assign->length = (int)__CPROVER_uninterpreted_string_length_func(s);
+  // tmp_assign->data = new (void **)[tmp_assign->length];
+  // tmp_nil = __CPROVER_uninterpreted_string_data_func(s, tmp_assign->data);
+  // return_tmp0 = tmp_assign;
   void make_to_char_array_function
     (goto_programt & goto_program, goto_programt::instructionst::iterator &);
 
@@ -74,14 +77,6 @@ class pass_preprocesst:public messaget
   // and add a correspondance from r to s in the string_builders map
   void make_of_char_array_side_effect
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
-
-  // replace "r = some_function(s,arr)" by "r=function_name(s,arr.length,arr.data)" 
-  void make_format_function
-    (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it,
-     irep_idt function_name);
-
-  // replace "lhs=some_function(x,...)" by "lhs=malloc(sizeof(x)); *lhs = x"
-  void make_pointer(goto_programt & goto_program, goto_programt::instructionst::iterator & i_it);
 
   bool has_java_string_type(const exprt &expr);
 

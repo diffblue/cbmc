@@ -91,65 +91,9 @@ literalt string_refinementt::convert_rest(const exprt &expr)
     }
   else 
     {
-      //debug() << "string_refinementt::convert_rest("<< pretty_short(expr) << ")" << eom;
       return SUB::convert_rest(expr);
     }
 }
-
-bvt string_refinementt::convert_pointer_type(const exprt &expr)
-{  
-  /*
-  if(expr.id()==ID_function_application)
-    {
-      assert(false); // can this occur?
-      bvt bv = convert_function_application(to_function_application_expr(expr));
-      return bv;
-    }
-  else {
-    if(expr.id()==ID_typecast)
-      {
-	assert(false); // can this occur?
-	if(expr.operands().size()!=1)
-	  throw "typecast takes one operand";
-	
-	const exprt &op=expr.op0();
-	const typet &op_type=ns.follow(op.type());
-	
-	if(op_type.id()==ID_pointer)
-	  return convert_pointer_type(op);
-	else if(op_type.id()==ID_signedbv ||
-		op_type.id()==ID_unsignedbv)
-	  {
-	    debug() << "string_refinementt::convert_pointer_type("<< pretty_short(expr) << ")" << eom;
-	    debug() << "details:"<< op.pretty() << ")" << eom;
-	    return convert_bv(typecast_exprt(op,unsignedbv_typet(64)));
-	  }
-      }
-    else
-  */
-  {
-    return SUB::convert_pointer_type(expr);
-  }
-  //}
-}
-
-  /*
-
-bvt string_refinementt::convert_member(const member_exprt &expr)
-{
-  //debug() << "string_refinementt::convert_member( " << expr.pretty() << ");" << eom;
-
-  // DOES NOT SEEM TO BE USEFULL
-  std::map<exprt,exprt>::iterator it = generator.member_substitutions.find(expr);
-  if(it!=generator.member_substitutions.end())
-    {
-      debug() << "substituting : " << expr.pretty() << eom << "for : " 
-	      << it->second.pretty() << eom;
-      return SUB::convert_bv(it->second);
-    }
-    else 
-    return SUB::convert_member(expr);
-}*/
 
 bvt string_refinementt::convert_symbol(const exprt &expr)
 {
@@ -164,21 +108,6 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
       bvt bv = convert_bv(str);
       return bv;
     } 
-  /*
-  else if (expr.type() == generator.get_char_type()) 
-    {
-      bvt bv;
-      bv.resize(generator.get_char_width());
-      map.get_literals(identifier, generator.get_char_type(), generator.get_char_width(), bv);
-      
-      forall_literals(it, bv)
-	if(it->var_no()>=prop.no_variables() && !it->is_constant())
-	  {
-	    error() << identifier << eom;
-	    assert(false);
-	  }
-      return bv;
-      } */
   else return SUB::convert_symbol(expr);
 }
 
@@ -210,16 +139,6 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 	generator.string_of_expr(sym,expr.rhs());
 	return false;
       }
-    /*
-    else if(type == generator.get_char_type()) 
-      {
-	const bvt &bv1=convert_bv(expr.rhs());
-	symbol_exprt sym = to_symbol_expr(expr.lhs());
-	const irep_idt &identifier = sym.get_identifier();
-	map.set_literals(identifier, generator.get_char_type(), bv1);
-	if(freeze_all) set_frozen(bv1);
-	return false;
-	} */
     else if(type==ns.follow(expr.rhs().type()))
       {
 	if(is_unbounded_array(type)) return true;
@@ -244,9 +163,6 @@ void string_refinementt::print_time(std::string s)
 	      (std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) 
 	  << eom;
 }
-
-void string_refinementt::post_process()
-{  SUB::post_process(); }
 
 decision_proceduret::resultt string_refinementt::dec_solve()
 {
@@ -549,30 +465,6 @@ bool string_refinementt::check_axioms()
   }
   
 }
-
-
-// Gets the upper bounds that are applied to [qvar], in the expression [expr]
-/* Shouldn't be necessary with the new way string constraints are encoded
-void get_bounds(const exprt &qvar, const exprt &expr, std::vector<exprt> & out)
-  {
-    std::vector<exprt> to_treat;
-    to_treat.push_back(expr);
-    while(!to_treat.empty()) {
-      exprt e = to_treat.back();
-      to_treat.pop_back();
-      if (e.id() == ID_lt && e.op0() == qvar) {
-	assert(e.op1().type() == index_type || e.op1().type() == integer_typet());
-	out.push_back(minus_exprt(e.op1(), refined_string_typet::index_of_int(1)));
-      } else if (e.id() == ID_le && e.op0() == qvar) {
-	out.push_back(e.op1());
-      } else {
-	forall_operands(it, e) {
-	  to_treat.push_back(*it);
-	}
-      }
-    }
-  }
-*/
 
 
 std::map< exprt, int> string_refinementt::map_of_sum(const exprt &f) {
