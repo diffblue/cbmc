@@ -14,6 +14,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include <analyses/interval_domain.h>
 #include <analyses/constant_propagator.h>
+#include <analyses/dependence_graph.h>
 
 #include "static_show_domain.h"
 
@@ -37,6 +38,7 @@ bool static_show_domain(
   std::ostream &out)
 {
   ai_baset *domain = NULL;
+  namespacet ns(goto_model.symbol_table);
   
   if (options.get_bool_option("flow-sensitive"))
   {
@@ -48,7 +50,10 @@ bool static_show_domain(
     
     //else if (options.get_bool_option("non-null"))
     //  domain = new ait<non_null_domaint>();
-    
+
+    else if (options.get_bool_option("dependence-graph"))
+      domain = new dependence_grapht(ns);
+
   }
   else if (options.get_bool_option("concurrent"))
   {
@@ -75,10 +80,18 @@ bool static_show_domain(
   //status() << "performing analysis" << eom;
   (*domain)(goto_model);
 
+
   if(options.get_bool_option("json"))
     out << domain->output_json(goto_model);
   else if(options.get_bool_option("xml"))
     out << domain->output_xml(goto_model);
+  else if(options.get_bool_option("dot") && options.get_bool_option("dependence-graph"))
+  {
+    dependence_grapht *d = dynamic_cast<dependence_grapht*>(domain);
+    assert(d != NULL);
+
+    d->output_dot(out);
+  }
   else
     domain->output(goto_model, out);
 
