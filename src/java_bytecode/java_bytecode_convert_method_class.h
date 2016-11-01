@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class symbol_tablet;
 class symbolt;
+class class_hierarchyt;
 
 class java_bytecode_convert_methodt:public messaget
 {
