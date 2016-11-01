@@ -131,11 +131,14 @@ string_exprt string_constraint_generatort::string_if(const if_exprt &expr)
 
   axioms.emplace_back(expr.cond(),res.same_length(t));
   symbol_exprt qvar = fresh_univ_index("QA_string_if_true");
-  axioms.push_back(string_constraintt(expr.cond(),equal_exprt(res[qvar],t[qvar])).forall(qvar,t.length()));
+  axioms.push_back(string_constraintt(expr.cond(),equal_exprt(res[qvar],t[qvar])
+				      ).forall(qvar,t.length()));
   
   axioms.emplace_back(not_exprt(expr.cond()),res.same_length(f));
   symbol_exprt qvar2 = fresh_univ_index("QA_string_if_false");
-  axioms.push_back(string_constraintt(not_exprt(expr.cond()),equal_exprt(res[qvar2],f[qvar2])).forall(qvar2,f.length()));
+  axioms.push_back(string_constraintt(not_exprt(expr.cond()),
+				      equal_exprt(res[qvar2],f[qvar2])
+				      ).forall(qvar2,f.length()));
   return res;
 }
 
@@ -152,19 +155,7 @@ string_exprt string_constraint_generatort::get_string_of_symbol(const symbol_exp
 }
 
 string_exprt string_constraint_generatort::string_of_symbol(const symbol_exprt & sym)
-{
-  if(refined_string_typet::is_java_string_type(sym.type()) 
-     && starts_with(std::string(sym.get(ID_identifier).c_str()),"java::java.lang.String.Literal.")) 
-    {
-      assert(false); // is this branch used ?
-      string_exprt s;
-      s = string_constant(string_exprt::extract_java_string(sym),JAVA_STRING_SOLVER_CHAR_WIDTH,refined_string_typet::java_char_type());
-    return s;
-  }
-  else {
-    return get_string_of_symbol(sym);
-  }
-}  
+{ return get_string_of_symbol(sym); }  
 
 
 exprt string_constraint_generatort::function_application
@@ -290,8 +281,6 @@ exprt string_constraint_generatort::function_application
     return string_delete_char_at(expr);
   else if(starts_with(id,cprover_string_replace_func))
     return string_replace(expr);
-  else if(starts_with(id,cprover_string_format_func))
-    return string_format(expr);
   else if(starts_with(id,cprover_string_data_func))
     return string_data(expr);
   else
@@ -316,17 +305,10 @@ string_exprt string_constraint_generatort::string_constant(irep_idt sval, int ch
   std::string str = sval.c_str();
   // should only do this for java
   std::wstring utf16 = utf8_to_utf16le(str);
-  // warning: endianness should be used as a flag when using this function
   
   for (std::size_t i = 0; i < utf16.size(); ++i) {
     std::string idx_binary = integer2binary(i,STRING_SOLVER_INDEX_WIDTH);
     constant_exprt idx(idx_binary, refined_string_typet::index_type());
-    // warning: this should disappear if utf8_to_utf16 takes into account endianness
-    /*
-    wchar_t big_endian = ((utf16[i] << 8) & 0xFF00) | (utf16[i] >> 8);
-    
-    std::string sval_binary=integer2binary((unsigned)big_endian, char_width);
-    */
     std::string sval_binary=integer2binary((unsigned)utf16[i], char_width);
     constant_exprt c(sval_binary,char_type);
     equal_exprt lemma(res[idx], c);
@@ -362,25 +344,28 @@ string_exprt string_constraint_generatort::string_literal(const function_applica
   if (arg.operands().size() == 1 &&
       arg.op0().operands().size() == 1 &&
       arg.op0().op0().operands().size() == 2 &&
-      arg.op0().op0().op0().id() == ID_string_constant) {
-    // C string constant
+      arg.op0().op0().op0().id() == ID_string_constant) 
+    {
+      // C string constant
       
-    const exprt &s = arg.op0().op0().op0();
-    sval = to_string_constant(s).get_value();
-    char_width = STRING_SOLVER_CHAR_WIDTH;
-    char_type = refined_string_typet::char_type();
-
-  } else {
-    // Java string constant
-    assert (arg.operands().size() == 1); 
-    assert(refined_string_typet::is_unrefined_string_type(arg.type()));
-    const exprt &s = arg.op0();
-    
-    //it seems the value of the string is lost, we need to recover it from the identifier
-    sval = extract_java_string(to_symbol_expr(s));
-    char_width = JAVA_STRING_SOLVER_CHAR_WIDTH;
-    char_type = refined_string_typet::java_char_type();
-  }
+      const exprt &s = arg.op0().op0().op0();
+      sval = to_string_constant(s).get_value();
+      char_width = STRING_SOLVER_CHAR_WIDTH;
+      char_type = refined_string_typet::char_type();
+      
+    } 
+  else
+    {
+      // Java string constant
+      assert (arg.operands().size() == 1); 
+      assert(refined_string_typet::is_unrefined_string_type(arg.type()));
+      const exprt &s = arg.op0();
+      
+      //it seems the value of the string is lost, we need to recover it from the identifier
+      sval = extract_java_string(to_symbol_expr(s));
+      char_width = JAVA_STRING_SOLVER_CHAR_WIDTH;
+      char_type = refined_string_typet::java_char_type();
+    }
 
   return string_constant(sval,char_width,char_type);
 }
@@ -677,58 +662,12 @@ string_exprt string_constraint_generatort::of_float
 			).forall(qvar_zero,zero_string.length()));
 
   return string_concat(sign_string,magnitude);
-  
-  /*
-  ieee_floatt milli(fspec);
-  milli.from_float(0.001);
-  ieee_floatt decamega(fspec);
-  decamega.from_float(1e7);
-  exprt scientific = or_exprt
-    (float_bvt().relation(f,float_bvt().LT,milli.to_expr(),fspec),
-     float_bvt().relation(f,float_bvt().GE,decamega.to_expr(),fspec));
-  */
-
-  //      If m is greater than or equal to 10^-3 but less than 10^7, then it is represented as the integer part of m, in decimal form with no leading zeroes, followed by '.' ('\u002E'), followed by one or more decimal digits representing the fractional part of m.
-  
-  //string_exprt integer_part(char_type);
-  //exprt integer = float_bvt().to_integer(float_bvt.abs(f,fspec),32,true,fspec);  
-  
-  //integer_part.of_int(integer);
-  //string_exprt dot_string(char_type);
-  //dot_string.of_string_constant(".",char_width,char_type,axioms);
-
-  //string_exprt fractional_part(char_type);
-
-  /* Here is the remainder of the specification of Float.toString, for the magnitude m : 
-
-        If m is less than 10^-3 or greater than or equal to 10^7, then it is represented in so-called "computerized scientific notation." Let n be the unique integer such that 10n ≤ m < 10n+1; then let a be the mathematically exact quotient of m and 10n so that 1 ≤ a < 10. The magnitude is then represented as the integer part of a, as a single decimal digit, followed by '.' ('\u002E'), followed by decimal digits representing the fractional part of a, followed by the letter 'E' ('\u0045'), followed by a representation of n as a decimal integer, as produced by the method Integer.toString(int). 
-
-	How many digits must be printed for the fractional part of m or a? There must be at least one digit to represent the fractional part, and beyond that as many, but only as many, more digits as are needed to uniquely distinguish the argument value from adjacent values of type float. That is, suppose that x is the exact mathematical value represented by the decimal representation produced by this method for a finite nonzero argument f. Then f must be the float value nearest to x; or, if two float values are equally close to x, then f must be one of them and the least significant bit of the significand of f must be 0.  */
-
-  /*
-  exprt char_0 = constant_of_nat(48,char_width,char_type);
-  exprt char_9 = constant_of_nat(57,char_width,char_type);
-  exprt char_dot = constant_of_nat(46,char_width,char_type);
-
-  symbol_exprt idx = fresh_symbol("QA_float",refined_string_typet::index_type());
-  exprt c = (*this)[idx];
-  exprt is_digit = 
-    or_exprt(and_exprt(binary_relation_exprt(char_0,ID_le,c),
-		       binary_relation_exprt(c,ID_le,char_9)),
-	     equal_exprt(c,char_dot)
-	     );
-	     string_constraintt a(is_digit);*/
-  //axioms.push_back(a.forall(idx,index_zero,length()));
 }
-
-
 
 
 string_exprt string_constraint_generatort::of_bool
 (const function_application_exprt &f)
-{
-  return of_bool(args(f,1)[0]);
-}
+{ return of_bool(args(f,1)[0]); }
 
 
 string_exprt string_constraint_generatort::of_bool(const exprt &i)
@@ -937,8 +876,6 @@ string_exprt string_constraint_generatort::string_char_set
 {
   string_exprt res(get_char_type());
   string_exprt str = string_of_expr(args(f,3)[0]);
-  //symbol_exprt c = fresh_symbol("char", refined_string_typet::get_char_type(args[0]));
-  //axioms.emplace_back(equal_exprt(c,args(f,3)[2]));
   with_exprt sarrnew(str.content(), args(f,3)[1], args(f,3)[2]);
   implies_exprt lemma(binary_relation_exprt(args(f,3)[1], ID_lt, str.length()),
                       and_exprt(equal_exprt(res.content(), sarrnew),
@@ -1445,19 +1382,20 @@ exprt string_constraint_generatort::string_hash_code(const function_application_
   //    hash(str) = hash(s) || |str| != |s| || (|str| == |s| && exists i < |s|. s[i] != str[i])
 
   // WARNING: the specification may be incomplete 
-  for(it = symbol_to_string.begin(); it != symbol_to_string.end(); it++) {
-    symbol_exprt i = fresh_exist_index("index_hash");
-    axioms.emplace_back
-      (or_exprt
-       (equal_exprt(hash[it->second],hash[str]),
-	or_exprt
-	(not_exprt(equal_exprt(it->second.length(),str.length())),
-	 and_exprt(equal_exprt(it->second.length(),str.length()),
-		   and_exprt
-		   (not_exprt(equal_exprt(str[i],it->second[i])),
-		    and_exprt(str.strictly_longer(i),is_positive(i))
+  for(it = symbol_to_string.begin(); it != symbol_to_string.end(); it++)
+    {
+      symbol_exprt i = fresh_exist_index("index_hash");
+      axioms.emplace_back
+	(or_exprt
+	 (equal_exprt(hash[it->second],hash[str]),
+	  or_exprt
+	  (not_exprt(equal_exprt(it->second.length(),str.length())),
+	   and_exprt(equal_exprt(it->second.length(),str.length()),
+		     and_exprt
+		     (not_exprt(equal_exprt(str[i],it->second[i])),
+		      and_exprt(str.strictly_longer(i),is_positive(i))
 		    )))));
-  }
+    }
   return hash[str];
 }
 
@@ -1891,73 +1829,6 @@ symbol_exprt string_constraint_generatort::string_intern(const function_applicat
   return pool[str];
 }
 
-// #include <iostream> for debugging
-
-string_exprt string_constraint_generatort::string_format(const function_application_exprt &f)
-{
-  const function_application_exprt::argumentst &args = f.arguments();
-  unsignedbv_typet char_type = get_char_type();
-
-  if(args.size() == 2) 
-    {
-      // Warning: this is not very clean:
-      irep_idt literal = extract_java_string(to_symbol_expr(args[0].op1().op0().op0()));
-      std::string format_string = id2string(literal);
-      //std::cout << "string_exprt::of_string_format " << format_string << std::endl;
-      size_t position = format_string.find_first_of('%');
-      std::vector<string_exprt> strings;
-      int arg_counter = 0;
-
-      string_exprt begin = string_constant(format_string.substr(0,position),get_char_width(),char_type);
-      strings.push_back(begin);
-      //std::cout << "string_exprt::of_string_format : " << f.pretty() << std::endl;
-      //typecast_exprt arg_tab(member_exprt(args[1].op0(),"data"),array_typet(java_type_from_string("Ljava/lang/Object;"),infinity_exprt(refined_string_typet::index_type())));
-      member_exprt arg_tab(args[1].op0(),"data",array_typet(java_type_from_string("Ljava/lang/Object;"),infinity_exprt(refined_string_typet::index_type())));
-      //std::cout << "string_exprt::arg_tab : " << arg_tab.type().pretty() << std::endl;
-
-      while(position != std::string::npos) 
-	{
-	  switch(format_string[position+1]) {
-	  case 'd' : 
-	    {
-	    index_exprt arg_object(arg_tab,refined_string_typet::index_of_int(arg_counter++)); 
-	    typecast_exprt arg_int(arg_object, signedbv_typet(32));
-	    symbol_exprt var_arg_int = string_exprt::fresh_symbol("format_arg_int", signedbv_typet(32));
-	    axioms.push_back(equal_exprt(arg_int,var_arg_int));
-	    axioms.push_back(equal_exprt(var_arg_int,refined_string_typet::index_of_int(12)));
-	    string_exprt str = of_int(var_arg_int,10);
-	    strings.push_back(str);
-	    //    std::cout << "string format: position " << position << " int arg: " << arg_int.pretty() << std::endl;
-	    break;
-	    }
-
-	  default:
-	    {
-	      //std::cout << "warning: unknown string format: " << format_string << std::endl;
-	      break;
-	    }
-	  }
-	  size_t new_position = format_string.find_first_of('%',position+2);
-	  if(new_position != std::string::npos) {
-	    string_exprt str = string_constant(format_string.substr(position+2,new_position),
-					       get_char_width(),char_type);
-	    strings.push_back(str);
-	  }
-	  position = new_position;
-	}
-
-      string_exprt * concatenation = &strings[0];
-      unsigned i;
-      for(i = 1; i < strings.size() - 1; i++)
-	{
-	  string_exprt str = string_concat(*concatenation,strings[i]);
-	  concatenation = &str;
-	}
-      
-      return string_concat(*concatenation,strings[i]);
-    }
-  else assert(false);
-}
 
 void string_constraint_generatort::string_of_expr(const symbol_exprt & sym, const exprt & str) 
 {
@@ -1966,25 +1837,4 @@ void string_constraint_generatort::string_of_expr(const symbol_exprt & sym, cons
   else 
     assign_to_symbol(sym,string_of_expr(str));
 }
-
-/*
-
-string_exprt string_constraint_generator::string_of_expr(const exprt & str) 
-{
-  //debug() << "string_constraint_generatort::string_of_expr of " << pretty_short(str) << eom;
-  if(str.id()==ID_symbol) 
-    return string_of_symbol(to_symbol_expr(str));
-  else
-    if (str.id() == ID_function_application &&
-	starts_with(to_symbol_expr(to_function_application_expr(str).function()).get_identifier(),cprover_string_intern_func)) { 
-      symbol_exprt sym1 = string_intern(to_function_application_expr(str));
-      string_exprt s(refined_string_typet::java_char_type());
-      assign_to_symbol(sym1,s);
-      return s;
-    }
-    else
-      return string_exprt::of_expr(str,symbol_to_string,axioms);
-}
-*/
-
 

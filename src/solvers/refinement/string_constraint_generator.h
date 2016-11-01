@@ -89,7 +89,6 @@ public:
   string_exprt string_delete (const string_exprt &str, const exprt & start, const exprt & end);
   string_exprt string_delete(const function_application_exprt &expr);
   string_exprt string_delete_char_at(const function_application_exprt &expr);
-  string_exprt string_format(const function_application_exprt &f);
   exprt string_hash_code(const function_application_exprt &f);
 
   // Warning: the specifications are only partial for some of the "index_of" functions
