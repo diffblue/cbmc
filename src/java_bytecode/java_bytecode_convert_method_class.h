@@ -33,12 +33,14 @@ public:
     bool _disable_runtime_checks,
     size_t _max_array_length,
     std::vector<irep_idt>& _needed_methods,
+    std::set<irep_idt>& _needed_classes,
     const class_hierarchyt& _ch):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     disable_runtime_checks(_disable_runtime_checks),
     max_array_length(_max_array_length),
     needed_methods(_needed_methods),
+    needed_classes(_needed_classes),
     class_hierarchy(_ch)
   {
   }
@@ -59,6 +61,7 @@ protected:
   const bool disable_runtime_checks;
   const size_t max_array_length;
   std::vector<irep_idt>& needed_methods;
+  std::set<irep_idt>& needed_classes;
   const class_hierarchyt& class_hierarchy;
 
   irep_idt method_id;

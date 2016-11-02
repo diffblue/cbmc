@@ -24,6 +24,7 @@ void java_bytecode_convert_method(
   bool disable_runtime_checks,
   size_t max_array_length,
   std::vector<irep_idt>& needed_methods,
+  std::set<irep_idt>& needed_classes,  
   const class_hierarchyt&);
 
 void java_bytecode_convert_method_lazy(
