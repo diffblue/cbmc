@@ -434,8 +434,8 @@ bool java_bytecode_languaget::typecheck(
   class_hierarchyt ch;
   ch(symbol_table);
 
-  std::vector<irep_idt> worklist1;
-  std::vector<irep_idt> worklist2;
+  std::vector<irep_idt> method_worklist1;
+  std::vector<irep_idt> method_worklist2;
 
   auto main_function=get_main_symbol(symbol_table,main_class,get_message_handler(),true);
   if(main_function.stop_convert)
@@ -447,34 +447,60 @@ bool java_bytecode_languaget::typecheck(
       const irep_idt methodid="java::"+id2string(main_class)+"."+
         id2string(method.name)+":"+
         id2string(method.signature);
-      worklist2.push_back(methodid);
+      method_worklist2.push_back(methodid);
     }
   }
   else
-    worklist2.push_back(main_function.main_function.name);
+    method_worklist2.push_back(main_function.main_function.name);
 
-  std::set<irep_idt> already_populated;
-  while(worklist2.size()!=0)
-  {
-    std::swap(worklist1,worklist2);
-    for(const auto& mname : worklist1)
+  std::set<irep_idt> needed_classes;
+  initialise_needed_classes(method_worklist2,namespacet(symbol_table),needed_classes);
+
+  std::set<irep_idt> methods_already_populated;
+  std::vector<const code_function_callt*> virtual_callsites;
+
+  bool any_new_methods;
+  do {
+
+    any_new_methods=false;
+    while(method_worklist2.size()!=0)
     {
-      if(!already_populated.insert(mname).second)
-        continue;
-      auto findit=lazy_methods.find(mname);
-      if(findit==lazy_methods.end())
+      std::swap(method_worklist1,method_worklist2);
+      for(const auto& mname : method_worklist1)
       {
-        debug() << "Skip " << mname << eom;
-        continue;
+        if(!methods_already_populated.insert(mname).second)
+          continue;
+        auto findit=lazy_methods.find(mname);
+        if(findit==lazy_methods.end())
+        {
+          debug() << "Skip " << mname << eom;
+          continue;
+        }
+        debug() << "Lazy methods: elaborate " << mname << eom;
+        const auto& parsed_method=findit->second;
+        java_bytecode_convert_method(*parsed_method.first,*parsed_method.second,
+                                     symbol_table,get_message_handler(),
+                                     disable_runtime_checks,max_user_array_length,
+                                     method_worklist2,needed_classes,ch);
+        gather_virtual_callsites(symbol_table.lookup(mname).value,virtual_callsites);
+        any_new_methods=true;
       }
-      debug() << "Lazy methods: elaborate " << mname << eom;
-      const auto& parsed_method=findit->second;
-      java_bytecode_convert_method(*parsed_method.first,*parsed_method.second,
-				   symbol_table,get_message_handler(),
-				   disable_runtime_checks,max_user_array_length,worklist2,ch);
+      method_worklist1.clear();
     }
-    worklist1.clear();
-  }
+
+    // Given the object types we now know may be created, populate more
+    // possible virtual function call targets:
+
+    debug() << "Lazy methods: add virtual method targets (" << virtual_callsites.size() <<
+      " callsites)" << eom;
+
+    for(const auto& callsite : virtual_callsites)
+    {
+      get_virtual_method_targets(*callsite,needed_classes,method_worklist2,
+				 symbol_table,ch);
+    }
+
+  } while(any_new_methods);
 
   // Remove symbols for methods that were declared but never used:
   symbol_tablet keep_symbols;
@@ -483,7 +509,7 @@ bool java_bytecode_languaget::typecheck(
   {
     if(sym.second.is_static_lifetime)
       continue;
-    if(lazy_methods.count(sym.first) && !already_populated.count(sym.first))
+    if(lazy_methods.count(sym.first) && !methods_already_populated.count(sym.first))
       continue;
     if(sym.second.type.id()==ID_code)
       gather_needed_globals(sym.second.value,symbol_table,keep_symbols);

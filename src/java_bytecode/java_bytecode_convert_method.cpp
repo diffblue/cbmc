@@ -1184,8 +1184,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
         symbol_table.add(symbol);
       }
 
-      needed_methods.push_back(arg0.get(ID_identifier));
-
       if(is_virtual)
       {
         // dynamic binding
@@ -2468,25 +2466,6 @@ void java_bytecode_convert_methodt::save_stack_entries(
     // remove typecasts if existing
     while(stack_entry.id()==ID_typecast)
       stack_entry=to_typecast_expr(stack_entry).op();
-=======
-void java_bytecode_convert_method(
-  const symbolt &class_symbol,
-  const java_bytecode_parse_treet::methodt &method,
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  bool disable_runtime_checks,
-  size_t max_array_length,
-  std::vector<irep_idt>& needed_methods,
-  const class_hierarchyt& ch)
-{
-  java_bytecode_convert_methodt java_bytecode_convert_method(
-    symbol_table,
-    message_handler,
-    disable_runtime_checks,
-    max_array_length,
-    needed_methods,
-    ch);
->>>>>>> Convert Java methods only when they have a caller
 
     // variables or static fields and symbol -> save symbols with same id
     if((write_type==bytecode_write_typet::VARIABLE ||
