@@ -1723,6 +1723,10 @@ void value_set_fit::apply_code(
   {
 	  // doesn't do anything
   }
+  else if(statement==ID_output)
+  {
+    // doesn't do anything
+  }
   else
     throw
       code.pretty()+"\n"+
