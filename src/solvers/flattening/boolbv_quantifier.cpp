@@ -53,16 +53,40 @@ exprt get_quantifier_var_min(
   const exprt &var_expr,
   const exprt &quantifier_expr)
 {
+  assert(quantifier_expr.id()==ID_or 
+         or quantifier_expr.id()==ID_and);
   exprt res;
   res.make_false();
-  for(auto &x : quantifier_expr.operands())
+  if(quantifier_expr.id()==ID_or)
   {
-    if(x.id()!=ID_not) continue;
-    exprt y=x.op0();
-    if(y.id()!=ID_ge) continue;
-    if(expr_eq(var_expr, y.op0()) && y.op1().id()==ID_constant)
+    /**
+     * The min variable
+     * is in the form of "!(var_expr >= constant)".
+     */
+    for(auto &x : quantifier_expr.operands())
     {
-      return y.op1();
+      if(x.id()!=ID_not) continue;
+      exprt y=x.op0();
+      if(y.id()!=ID_ge) continue;
+      if(expr_eq(var_expr, y.op0()) && y.op1().id()==ID_constant)
+      {
+        return y.op1();
+      }
+    }
+  }
+  else
+  {
+    /**
+     * The min variable
+     * is in the form of "var_expr >= constant".
+     */
+    for(auto &x : quantifier_expr.operands())
+    {
+      if(x.id()!=ID_ge) continue;
+      if(expr_eq(var_expr, x.op0()) && x.op1().id()==ID_constant)
+      {
+        return x.op1();
+      }
     }
   }
   return res;
@@ -77,8 +101,7 @@ Function: get_quantifier_var_max
  Outputs:
 
  Purpose: To obtain the max value for the quantifier variable
-          of the specified forall/exists operator. The max variable 
-          is in the form of "var_expr >= constant".
+          of the specified forall/exists operator.
 
 \*******************************************************************/
 
@@ -86,24 +109,55 @@ exprt get_quantifier_var_max(
   const exprt &var_expr,
   const exprt &quantifier_expr)
 {
+  assert(quantifier_expr.id()==ID_or 
+         or quantifier_expr.id()==ID_and);
   exprt res;
   res.make_false();
-  for(auto &x : quantifier_expr.operands())
+  if(quantifier_expr.id()==ID_or)
   {
-    if(x.id()!=ID_ge) continue;
-    if(expr_eq(var_expr, x.op0()) && x.op1().id()==ID_constant)
+    /**
+     * The max variable
+     * is in the form of "var_expr >= constant".
+     */
+    for(auto &x : quantifier_expr.operands())
     {
-      exprt over_expr=x.op1();
-      mp_integer over_i;
-      to_integer(over_expr, over_i);
-      /**
-       * Due to the ''simplify'',
-       * the ''over_i'' value we obtain here is not the exact
-       * maximum index as specified in the original code.
-       **/
-      over_i-=1;
-      res=from_integer(over_i, x.op1().type());
-      return res;
+      if(x.id()!=ID_ge) continue;
+      if(expr_eq(var_expr, x.op0()) && x.op1().id()==ID_constant)
+      {
+        exprt over_expr=x.op1();
+        mp_integer over_i;
+        to_integer(over_expr, over_i);
+        /**
+         * Due to the ''simplify'',
+         * the ''over_i'' value we obtain here is not the exact
+         * maximum index as specified in the original code.
+         **/
+        over_i-=1;
+        res=from_integer(over_i, x.op1().type());
+        return res;
+      }
+    }
+  }
+  else
+  {
+    /**
+     * The max variable
+     * is in the form of "!(var_expr >= constant)".
+     */
+    for(auto &x : quantifier_expr.operands())
+    {
+      if(x.id()!=ID_not) continue;
+      exprt y=x.op0();
+      if(y.id()!=ID_ge) continue;
+      if(expr_eq(var_expr, y.op0()) && y.op1().id()==ID_constant)
+      {
+        exprt over_expr=y.op1();
+        mp_integer over_i;
+        to_integer(over_expr, over_i);
+        over_i-=1;
+        res=from_integer(over_i, y.op1().type());
+        return res;
+      }
     }
   }
   return res;
@@ -132,11 +186,12 @@ bool instantiate_quantifier(exprt &expr,
   exprt var_expr=expr.op0();
   /**
    * We need to rewrite the forall/exists quantifier into
-   * an OR expr. 
+   * an OR/AND expr. 
    **/
   exprt re(expr);
   exprt tmp(re.op1());
   re.swap(tmp);
+  re=simplify_expr(re, ns);
   if(re.is_true()
      or re.is_false())
   {
@@ -168,7 +223,6 @@ bool instantiate_quantifier(exprt &expr,
     replace_expr(var_expr,
                  from_integer(i, var_expr.type()),
                  constraint_expr);
-    constraint_expr=simplify_expr(constraint_expr, ns);
     expr_insts.push_back(constraint_expr);
   }
   if(expr.id()==ID_forall)
