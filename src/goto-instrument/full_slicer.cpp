@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/find_symbols.h>
 #include <util/cprover_prefix.h>
+#include <util/prefix.h>
+
 #ifdef DEBUG_FULL_SLICERT
 #include <util/i2string.h>
 #endif
@@ -322,7 +324,7 @@ Function: implicit
 
 \*******************************************************************/
 
-static bool implicit(goto_programt::const_targett target)
+static bool implicit(const namespacet &ns, goto_programt::const_targett target)
 {
   // some variables are used during symbolic execution only
 
@@ -333,7 +335,18 @@ static bool implicit(goto_programt::const_targett target)
 
   const symbol_exprt &s=to_symbol_expr(a.lhs());
 
-  return s.get_identifier()==CPROVER_PREFIX "rounding_mode";
+  if (s.source_location().get_function().empty())
+  {
+    // is it a __CPROVER_* variable?
+    if(has_prefix(id2string(s.get_identifier()), CPROVER_PREFIX))
+	  return true;
+
+    // static lifetime?
+    if(ns.lookup(s.get_identifier()).is_static_lifetime)
+      return true;
+  }
+
+  return false;
 }
 
 /*******************************************************************\
@@ -370,7 +383,7 @@ void full_slicert::operator()(
   {
     if(criterion(e_it->first))
       add_to_queue(queue, e_it->second, e_it->first);
-    else if(implicit(e_it->first))
+    else if(implicit(ns,e_it->first))
       add_to_queue(queue, e_it->second, e_it->first);
     else if((e_it->first->is_goto() && e_it->first->guard.is_true()) ||
             e_it->first->is_throw())
@@ -400,6 +413,9 @@ void full_slicert::operator()(
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->second.body_available())
     {
+   	  if(f_it->first=="pthread_create")
+   		throw "--full-slice does not support C/Pthreads yet";
+
       Forall_goto_program_instructions(i_it, f_it->second.body)
       {
         const cfgt::entryt &e=cfg.entry_map[i_it];
