@@ -684,6 +684,7 @@ Function: eval_expr
           the atomic expr values
 
 \*******************************************************************/
+
 bool eval_expr(
   const std::map<exprt, signed> &atomic_exprs,
   const exprt &src)
@@ -1141,7 +1142,7 @@ void instrument_cover_goals(
             basic_blocks.source_location_map[block_nr];
 
           if(!source_location.get_file().empty() &&
-             source_location.get_file()[0]!='<')
+             !source_location.is_built_in())
           {
             std::string comment="block "+b;
             goto_program.insert_before_swap(i_it);
@@ -1179,7 +1180,8 @@ void instrument_cover_goals(
         t->source_location.set_property_class(property_class);
       }
 
-      if(i_it->is_goto() && !i_it->guard.is_true())
+      if(i_it->is_goto() && !i_it->guard.is_true() &&
+         !i_it->source_location.is_built_in())
       {
         std::string b=std::to_string(basic_blocks[i_it]);
         std::string true_comment=
@@ -1214,6 +1216,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Conditions are all atomic predicates in the programs.
+      if(!i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
 
@@ -1250,6 +1253,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Decisions are maximal Boolean combinations of conditions.
+      if(!i_it->source_location.is_built_in())
       {
         const std::set<exprt> decisions=collect_decisions(i_it);
 
@@ -1290,6 +1294,7 @@ void instrument_cover_goals(
       // 3. Each condition in a decision takes every possible outcome
       // 4. Each condition in a decision is shown to independently
       //    affect the outcome of the decision.
+      if(!i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
         const std::set<exprt> decisions=collect_decisions(i_it);
@@ -1392,7 +1397,8 @@ void instrument_cover_goals(
   Forall_goto_functions(f_it, goto_functions)
   {
     if(f_it->first==goto_functions.entry_point() ||
-       f_it->first=="__CPROVER_initialize")
+       f_it->first=="__CPROVER_initialize" ||
+       f_it->second.is_hidden())
       continue;
 
     instrument_cover_goals(symbol_table, f_it->second.body, criterion);
