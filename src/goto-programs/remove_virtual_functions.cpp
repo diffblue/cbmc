@@ -121,8 +121,11 @@ void remove_virtual_functionst::remove_virtual_function(
   if(functions.size()==1)
   {
     assert(target->is_function_call());
-    to_code_function_call(target->code).function()=
-      functions.begin()->symbol_expr;
+    if(functions.begin()->symbol_expr==symbol_exprt())
+      target->make_skip();
+    else
+      to_code_function_call(target->code).function()=
+        functions.begin()->symbol_expr;
     return;
   }
 
