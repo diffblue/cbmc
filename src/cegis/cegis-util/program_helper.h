@@ -145,6 +145,19 @@ const irep_idt &get_affected_variable(const goto_programt::instructiont &instr);
  */
 bool is_global_const(const irep_idt &name, const typet &type);
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param from
+ * @param to
+ */
+void move_labels(
+    goto_programt::instructionst &body,
+    const goto_programt::targett &from,
+    const goto_programt::targett &to);
 
 /**
  * @brief
@@ -155,8 +168,24 @@ bool is_global_const(const irep_idt &name, const typet &type);
  * @param from
  * @param to
  */
-void move_labels(goto_programt &body, const goto_programt::targett &from,
+void move_labels(
+    goto_programt &body,
+    const goto_programt::targett &from,
     const goto_programt::targett &to);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param target
+ *
+ * @return
+ */
+goto_programt::targett insert_before_preserve_labels(
+    goto_programt &body,
+    const goto_programt::targett &target);
 
 /**
  * @brief

@@ -30,7 +30,8 @@ goto_programt &get_body(goto_functionst &gf, const std::string &func_name)
   return f.body;
 }
 
-goto_programt &get_body(goto_functionst &gf, const goto_programt::const_targett pos)
+goto_programt &get_body(goto_functionst &gf,
+    const goto_programt::const_targett pos)
 {
   return get_body(gf, id2string(pos->function));
 }
@@ -122,7 +123,8 @@ bool is_nondet(goto_programt::const_targett target,
 
 bool is_return_value_name(const std::string &name)
 {
-  return contains(name, "return_value___") || contains(name, RETURN_VALUE_SUFFIX);
+  return contains(name, "return_value___")
+      || contains(name, RETURN_VALUE_SUFFIX);
 }
 
 const typet &get_affected_type(const goto_programt::instructiont &instr)
@@ -177,12 +179,26 @@ bool is_global_const(const irep_idt &name, const typet &type)
   return std::string::npos == n.find(NS_SEP);
 }
 
+void move_labels(goto_programt::instructionst &body,
+    const goto_programt::targett &from, const goto_programt::targett &to)
+{
+  for (goto_programt::instructiont &instr : body)
+    for (goto_programt::targett &target : instr.targets)
+      if (from == target) target=to;
+}
+
 void move_labels(goto_programt &body, const goto_programt::targett &from,
     const goto_programt::targett &to)
 {
-  for (goto_programt::instructiont &instr : body.instructions)
-    for (goto_programt::targett &target : instr.targets)
-      if (from == target) target=to;
+  move_labels(body.instructions, from, to);
+}
+
+goto_programt::targett insert_before_preserve_labels(goto_programt &body,
+    const goto_programt::targett &target)
+{
+  const goto_programt::targett result=body.insert_before(target);
+  move_labels(body, target, result);
+  return result;
 }
 
 bool is_builtin(const source_locationt &loc)
@@ -192,8 +208,9 @@ bool is_builtin(const source_locationt &loc)
   return file.empty() || file.at(0) == '<';
 }
 
-symbolt &create_local_cegis_symbol(symbol_tablet &st, const std::string &full_name,
-    const std::string &base_name, const typet &type)
+symbolt &create_local_cegis_symbol(symbol_tablet &st,
+    const std::string &full_name, const std::string &base_name,
+    const typet &type)
 {
   symbolt new_symbol;
   new_symbol.name=full_name;
@@ -288,11 +305,8 @@ void remove_return(goto_programt &body, const goto_programt::targett pos)
   call.lhs().make_nil();
 }
 
-goto_programt::targett add_return_assignment(
-    goto_programt &body,
-    goto_programt::targett pos,
-    const irep_idt &func_id,
-    const exprt &value)
+goto_programt::targett add_return_assignment(goto_programt &body,
+    goto_programt::targett pos, const irep_idt &func_id, const exprt &value)
 {
   const source_locationt &loc=pos->source_location;
   pos=body.insert_after(pos);

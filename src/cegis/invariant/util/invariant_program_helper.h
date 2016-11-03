@@ -28,17 +28,6 @@ void erase_target(goto_programt::instructionst &body,
  *
  * @details
  *
- * @param body
- * @param target
- */
-goto_programt::targett insert_before_preserve_labels(goto_programt &body,
-    const goto_programt::targett &target);
-
-/**
- * @brief
- *
- * @details
- *
  * @param prog
  * @param width_in_bits
  */

@@ -11,18 +11,13 @@
 #include <cegis/refactor/instructionset/cegis_instruction_factory.h>
 #include <cegis/refactor/instructionset/cegis_processor_body_factory.h>
 
-// XXX: Debug
-#include <iostream>
-// XXX: Debug
-
 #define NUM_PRIMITIVE_OPERANDS 3u
 
 namespace
 {
 size_t cegis_max_operands(const typet &type)
 {
-  if (!is_cegis_primitive(type))
-  assert(!"Class type operand generation not supported.");
+  if (!is_cegis_primitive(type)) return 0;  // TODO: Add support for class types
   return NUM_PRIMITIVE_OPERANDS;
 }
 }
@@ -251,9 +246,7 @@ void remove_skips(goto_programt::instructionst &instrs)
   {
     if (!pos->is_skip()) continue;
     const goto_programt::targett successor(std::next(pos));
-    for (goto_programt::instructiont &instr : instrs)
-      for (goto_programt::targett &target : instr.targets)
-        if (target == pos) target=successor;
+    move_labels(instrs, pos, successor);
     pos=instrs.erase(pos);
   }
 }
@@ -273,8 +266,8 @@ void generate_processor_body(symbol_tablet &st, goto_programt &body,
   }
   body.add_instruction(goto_program_instruction_typet::END_FUNCTION);
   //remove_singleton_switch_cases(body);
-  remove_goto_next(body);
-  remove_skips(body.instructions);
+  //remove_goto_next(body);
+  //remove_skips(body.instructions);
   body.compute_loop_numbers();
   body.update();
 }
