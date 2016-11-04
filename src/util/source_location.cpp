@@ -31,6 +31,7 @@ std::string source_locationt::as_string(bool print_cwd) const
   const irep_idt &line=get_line();
   const irep_idt &column=get_column();
   const irep_idt &function=get_function();
+  const irep_idt &bytecode=get_java_bytecode_index();
 
   if(!file.empty())
   {
@@ -45,6 +46,7 @@ std::string source_locationt::as_string(bool print_cwd) const
   if(!line.empty())     { if(dest!="") dest+=' '; dest+="line "+id2string(line); }
   if(!column.empty())   { if(dest!="") dest+=' '; dest+="column "+id2string(column); }
   if(!function.empty()) { if(dest!="") dest+=' '; dest+="function "+id2string(function); }
+  if(!bytecode.empty()) { if(dest!="") dest+=' '; dest+="bytecode_index "+id2string(bytecode); }
 
   return dest;
 }

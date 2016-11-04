@@ -68,6 +68,11 @@ public:
     return get(ID_comment);
   }
 
+  inline const irep_idt &get_java_bytecode_index() const
+  {
+    return get(ID_java_bytecode_index);
+  }
+
   inline void set_file(const irep_idt &file)
   {
     set(ID_file, file);
@@ -116,6 +121,11 @@ public:
   inline void set_comment(const irep_idt &comment)
   {
     set(ID_comment, comment);
+  }
+
+  inline void set_java_bytecode_index(const irep_idt &index)
+  {
+    set(ID_java_bytecode_index, index);
   }
 
   inline void set_hide()

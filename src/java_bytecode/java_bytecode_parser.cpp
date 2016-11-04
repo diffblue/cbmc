@@ -746,6 +746,7 @@ void java_bytecode_parsert::rbytecode(
     instructiont &instruction=instructions.back();
     instruction.statement=bytecodes[bytecode].mnemonic;
     instruction.address=start_of_instruction;
+    instruction.source_location.set_java_bytecode_index(std::to_string(bytecodeIndex));
 
     switch(bytecodes[bytecode].format)
     {
@@ -1001,8 +1002,16 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
         line_number=it->source_location.get_line();
       else if(!line_number.empty())
         it->source_location.set_line(line_number);
+      it->source_location.set_function("java::"+
+                                       id2string(parse_tree.parsed_class.name)+"."+
+                                       id2string(method.name)+":"+
+                                       method.signature);
     }
 
+    // line number of method
+    if(!method.instructions.empty())
+      method.source_location.set_line(
+        method.instructions.begin()->source_location.get_line());
   }
   else if(attribute_name=="RuntimeInvisibleAnnotations" ||
           attribute_name=="RuntimeVisibleAnnotations")
@@ -1416,6 +1425,7 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
         m_it!=parsed_class.methods.end();
         m_it++)
     {
+      m_it->source_location.set_file(sourcefile_name);
       for(instructionst::iterator i_it=m_it->instructions.begin();
           i_it!=m_it->instructions.end();
           i_it++)

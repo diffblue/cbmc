@@ -336,8 +336,8 @@ void java_bytecode_convert_methodt::convert(
   method_symbol.name=method.get_name();
   method_symbol.base_name=method.get_base_name();
   method_symbol.mode=ID_java;
-  method_symbol.name=method.get_name();
-  method_symbol.base_name=method.get_base_name();
+  method_symbol.location=m.source_location;
+  method_symbol.location.set_function(method_identifier);
 
   if(method.get_base_name()=="<init>")
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
@@ -985,7 +985,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
 
       code_function_callt call;
-      call.add_source_location()=i_it->source_location;
+      source_locationt loc;
+      loc=i_it->source_location;
+      loc.set_function(method_id);
+      source_locationt &dloc = loc;
+
+      call.add_source_location()=dloc;
       call.arguments()=pop(parameters.size());
 
       // double-check a bit
@@ -1057,7 +1062,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
       }
 
-      call.function().add_source_location()=i_it->source_location;
+      call.function().add_source_location()=dloc;
       c=call;
     }
     else if(statement=="return")
@@ -1292,6 +1297,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       cast_if_necessary(condition);
       code_branch.cond()=condition;
+      code_branch.cond().add_source_location()=i_it->source_location;
       code_branch.then_case()=code_gotot(label(number));
       code_branch.then_case().add_source_location()=i_it->source_location;
       code_branch.add_source_location()=i_it->source_location;
@@ -1316,9 +1322,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_branch.cond()=
         binary_relation_exprt(op[0], id, gen_zero(op[0].type()));
       code_branch.cond().add_source_location()=i_it->source_location;
+      code_branch.cond().add_source_location().set_function(method_id);
       code_branch.then_case()=code_gotot(label(number));
       code_branch.then_case().add_source_location()=i_it->source_location;
+      code_branch.then_case().add_source_location().set_function(method_id);
       code_branch.add_source_location()=i_it->source_location;
+      code_branch.add_source_location().set_function(method_id);
 
       c=code_branch;
     }

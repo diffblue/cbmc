@@ -16,7 +16,7 @@ Author: Peter Schrammel
 #include "config.h"
 
 #include "json_expr.h"
-
+#include <java_bytecode/expr2java.h>
 /*******************************************************************\
 
 Function: json
@@ -44,6 +44,9 @@ json_objectt json(const source_locationt &location)
 
   if(!location.get_function().empty())
     result["function"]=json_stringt(id2string(location.get_function()));
+
+  if(!location.get_java_bytecode_index().empty())
+    result["bytecode_index"]=json_stringt(id2string(location.get_java_bytecode_index()));
 
   return result;
 }
@@ -259,7 +262,7 @@ json_objectt json(
       if(expr.get(ID_value)==ID_NULL)
         result["data"]=json_stringt("NULL");
     }
-    else if(type.id()==ID_bool)
+    else if(type.id()==ID_bool || type.id()==ID_c_bool)
     {
       result["name"]=json_stringt("boolean");
       result["binary"]=json_stringt(expr.is_true()?"1":"0");

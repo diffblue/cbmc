@@ -123,6 +123,7 @@ bool java_static_lifetime_init(
       code_function_callt function_call;
       function_call.lhs()=nil_exprt();
       function_call.function()=it->second.symbol_expr();
+      function_call.add_source_location()=source_location;
       code_block.add(function_call);
     }
   }
@@ -176,7 +177,7 @@ exprt::operandst java_build_arguments(
       index_exprt(string_constantt(p_symbol.base_name),
                   gen_zero(index_type())));
     input.op1()=main_arguments[param_number];
-    input.add_source_location()=parameters[param_number].source_location();
+    input.add_source_location()=function.location;
 
     init_code.move_to_operands(input);
   }
@@ -223,8 +224,7 @@ void java_record_outputs(
       index_exprt(string_constantt(return_symbol.base_name),
                   gen_zero(index_type())));
     output.op1()=return_symbol.symbol_expr();
-    output.add_source_location()=
-      function.value.operands().back().source_location();
+    output.add_source_location()=function.location;
 
     init_code.move_to_operands(output);
   }
@@ -245,7 +245,7 @@ void java_record_outputs(
         index_exprt(string_constantt(p_symbol.base_name),
                     gen_zero(index_type())));
       output.op1()=main_arguments[param_number];
-      output.add_source_location()=parameters[param_number].source_location();
+      output.add_source_location()=function.location;
 
       init_code.move_to_operands(output);
     }
@@ -437,8 +437,15 @@ bool java_entry_point(
   // build call to the main method
 
   code_function_callt call_main;
-  call_main.add_source_location()=symbol.location;
+
+  source_locationt loc = symbol.location;
+  loc.set_function(symbol.name);
+  source_locationt &dloc = loc;
+
+  call_main.add_source_location()=dloc;
   call_main.function()=symbol.symbol_expr();
+  call_main.function().add_source_location()=dloc;
+
   if(to_code_type(symbol.type).return_type()!=empty_typet())
   {
     auxiliary_symbolt return_symbol;
