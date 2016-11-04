@@ -1066,9 +1066,18 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
     if(v.is_nil()) // no value given
       v=from_integer(value, signed_int_type());
+    else
+    {
+      exprt tmp_v=v;
+      typecheck_expr(tmp_v);
+      add_rounding_mode(tmp_v);
+      simplify(tmp_v, *this);
+      if(tmp_v.is_constant())
+        v=tmp_v;
+    }
 
     typecheck_declaration(declaration);
-    
+
     irep_idt base_name=
       declaration.declarator().get_base_name();
     
