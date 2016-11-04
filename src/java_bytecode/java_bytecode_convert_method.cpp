@@ -895,11 +895,23 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="checkcast")
     {
-      // checkcast throws an exception in case a cast of object
-      // on stack to given type fails.
-      // The stack isn't modified.
-      assert(op.size()==1 && results.size()==1);
-      results[0]=op[0];
+      if(!disable_runtime_checks)
+      {
+        // checkcast throws an exception in case a cast of object
+        // on stack to given type fails.
+        // The stack isn't modified.
+        // TODO: convert assertions to exceptions.
+        assert(op.size()==1 && results.size()==1);
+        binary_predicate_exprt check(op[0], "java_instanceof", arg0);
+        c=code_assertt(check);
+        c.add_source_location().set_comment("Dynamic cast check");
+        c.add_source_location().set_property_class("bad-dynamic-cast");
+        results[0]=op[0];
+      }
+      else
+      {
+        c=code_skipt();
+      }
     }
     else if(statement=="invokedynamic")
     {
@@ -938,8 +950,17 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         if(parameters.empty() || !parameters[0].get_this())
         {
-          const empty_typet empty;
-          pointer_typet object_ref_type(empty);
+          irep_idt classname = arg0.get(ID_C_class);
+          typet thistype = symbol_typet(classname);          
+          // Note invokespecial is used for super-method calls as well as constructors.
+          if(statement=="invokespecial")
+          {
+            if(as_string(arg0.get(ID_identifier)).find("<init>")!=std::string::npos)
+              code_type.set(ID_constructor, true);
+            else
+              code_type.set("java_super_method_call", true);
+          }
+          pointer_typet object_ref_type(thistype);
           code_typet::parametert this_p(object_ref_type);
           this_p.set_this();
           this_p.set_base_name("this");
@@ -1055,7 +1076,18 @@ codet java_bytecode_convert_methodt::convert_instructions(
       typet element_type=data_ptr.type().subtype();
       const dereference_exprt element(data_plus_offset, element_type);
 
-      c=code_assignt(element, op[2]);
+      code_blockt assert_and_put;
+      if(!disable_runtime_checks)
+      {
+        codet bounds_check=get_array_bounds_check(deref,op[1],i_it->source_location);
+        bounds_check.add_source_location()=i_it->source_location;
+        assert_and_put.move_to_operands(bounds_check);
+      }
+      code_assignt array_put(element, op[2]);
+      array_put.add_source_location()=i_it->source_location;
+      assert_and_put.move_to_operands(array_put);
+      c=std::move(assert_and_put);
+      c.add_source_location()=i_it->source_location;
     }
     else if(statement==patternt("?store"))
     {
@@ -1088,6 +1120,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       typet element_type=data_ptr.type().subtype();
       dereference_exprt element(data_plus_offset, element_type);
 
+      if(!disable_runtime_checks)
+      {
+        codet bounds_check=get_array_bounds_check(deref,op[1],i_it->source_location);
+        bounds_check.add_source_location()=i_it->source_location;
+        c=std::move(bounds_check);
+      }
       results[0]=java_bytecode_promotion(element);
     }
     else if(statement==patternt("?load"))
@@ -1613,6 +1651,25 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(!i_it->source_location.get_line().empty())
         java_new_array.add_source_location()=i_it->source_location;
 
+      code_blockt checkandcreate;
+      if(!disable_runtime_checks)
+      {
+        // TODO make this throw NegativeArrayIndexException instead.
+        constant_exprt intzero=as_number(0,java_int_type());
+        binary_relation_exprt gezero(op[0],ID_ge,intzero);
+        code_assertt check(gezero);
+        check.add_source_location().set_comment("Array size < 0");
+        check.add_source_location().set_property_class("array-create-negative-size");      
+        checkandcreate.move_to_operands(check);
+
+        if(max_array_length!=0)
+        {
+          constant_exprt size_limit=as_number(max_array_length,java_int_type());
+          binary_relation_exprt le_max_size(op[0],ID_le,size_limit);
+          code_assumet assume_le_max_size(le_max_size);
+          checkandcreate.move_to_operands(assume_le_max_size);
+        }
+      }
       const exprt tmp=tmp_variable("newarray", ref_type);
       c=code_assignt(tmp, java_new_array);
       results[0]=tmp;
