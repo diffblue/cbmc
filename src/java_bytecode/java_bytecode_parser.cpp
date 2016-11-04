@@ -6,8 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <algorithm>
 #include <fstream>
 #include <map>
+#include <string>
 
 #include <util/parser.h>
 #include <util/std_expr.h>
@@ -136,10 +138,10 @@ protected:
     }
   }
 
-  u8 read_bytes(unsigned bytes)
+  u8 read_bytes(size_t bytes)
   {
     u8 result=0;
-    for(unsigned i=0; i<bytes; i++)
+    for(size_t i=0; i<bytes; i++)
     {
       if(!*in)
       {
@@ -726,7 +728,9 @@ void java_bytecode_parsert::rbytecode(
   methodt::instructionst &instructions)
 {
   u4 code_length=read_u4();
+
   u4 address;
+  size_t bytecode_index=0; // index of bytecode instruction
 
   for(address=0; address<code_length; address++)
   {
@@ -746,7 +750,7 @@ void java_bytecode_parsert::rbytecode(
     instructiont &instruction=instructions.back();
     instruction.statement=bytecodes[bytecode].mnemonic;
     instruction.address=start_of_instruction;
-    instruction.source_location.set_java_bytecode_index(std::to_string(bytecodeIndex));
+    instruction.source_location.set_java_bytecode_index(std::to_string(bytecode_index));
 
     switch(bytecodes[bytecode].format)
     {
@@ -864,7 +868,7 @@ void java_bytecode_parsert::rbytecode(
 
     case 'T': // tableswitch
       {
-        unsigned base_offset=address;
+        size_t base_offset=address;
 
         // first a pad to 32-bit align
         while(((address+1)&3)!=0) { read_u1(); address++; }
@@ -931,8 +935,10 @@ void java_bytecode_parsert::rbytecode(
       address+=2;
       break;
 
-    default:;
+    default:
+      assert(false && "unknown instruction");
     }
+    bytecode_index++;
   }
 
   if(address!=code_length)
@@ -1419,7 +1425,20 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
   if(attribute_name=="SourceFile")
   {
     u2 sourcefile_index=read_u2();
-    irep_idt sourcefile_name=pool_entry(sourcefile_index).s;
+    irep_idt sourcefile_name;
+
+    std::string fqn=std::string(id2string(parsed_class.name));
+    size_t last_index=fqn.find_last_of(".");
+    if(last_index==std::string::npos)
+      sourcefile_name=pool_entry(sourcefile_index).s;
+    else
+    {
+      std::string packageName=fqn.substr(0, last_index+1);
+      std::replace(packageName.begin(), packageName.end(), '.', '/');
+      const std::string &fullFileName=
+        std::string(packageName+id2string(pool_entry(sourcefile_index).s));
+      sourcefile_name=fullFileName;
+    }
 
     for(methodst::iterator m_it=parsed_class.methods.begin();
         m_it!=parsed_class.methods.end();
