@@ -346,4 +346,32 @@ goto_programt::targett add_return_assignment(
     const irep_idt &func_id,
     const exprt &value);
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param pos
+ *
+ * @return
+ */
+goto_programt::targett insert_after_preserving_source_location(
+    goto_programt &body,
+    goto_programt::targett pos);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param pos
+ *
+ * @return
+ */
+goto_programt::targett insert_before_preserving_source_location(
+    goto_programt &body,
+    goto_programt::targett pos);
+
 #endif /* CEGIS_PROGRAM_HELPER_H_ */

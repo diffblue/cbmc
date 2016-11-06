@@ -1,6 +1,7 @@
 #include <ansi-c/c_types.h>
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
+#include <util/bv_arithmetic.h>
 
 #include <cegis/cegis-util/string_helper.h>
 #include <cegis/instrument/instrument_var_ops.h>
@@ -8,6 +9,10 @@
 #include <cegis/refactor/instructionset/processor_types.h>
 #include <cegis/refactor/instructionset/processor_symbols.h>
 #include <cegis/refactor/instructionset/execute_cegis_program.h>
+
+// XXX: Debug
+#include <iostream>
+// XXX: Debug
 
 void declare_cegis_program(symbol_tablet &st, goto_functionst &gf,
     const std::string &processor, const std::string &program_name)
@@ -45,8 +50,12 @@ void call_processor(const symbol_tablet &st, goto_programt::instructiont &instr,
   call.function()=st.lookup(processor).symbol_expr();
   code_function_callt::argumentst &args=call.arguments();
   const symbolt &prog_symbol=st.lookup(program_name);
-  args.push_back(prog_symbol.symbol_expr());
-  args.push_back(get_size(prog_symbol));
+  const symbol_exprt prog(prog_symbol.symbol_expr());
+  const index_exprt first_instr(prog, gen_zero(signed_int_type()));
+  args.push_back(address_of_exprt(first_instr));
+  const bv_arithmetict bv(get_size(prog_symbol));
+  const mp_integer sz_val(bv.to_integer());
+  args.push_back(from_integer(sz_val, cegis_size_type()));
   instr.code=call;
   instr.source_location=default_cegis_source_location();
 }
@@ -82,7 +91,7 @@ void set_cegis_processor_sizes(const symbol_tablet &st,
     goto_programt::targett first, const goto_programt::const_targett last,
     const size_t size)
 {
-  const constant_exprt sz_expr(from_integer(size, signed_int_type()));
+  const constant_exprt sz_expr(from_integer(size, cegis_size_type()));
   for (; first != last; ++first)
   {
     if (goto_program_instruction_typet::FUNCTION_CALL != first->type) continue;
@@ -95,10 +104,12 @@ void set_cegis_processor_sizes(const symbol_tablet &st,
     const code_typet &code_type=to_code_type(symbol.type);
     const code_typet::parameterst &params=code_type.parameters();
     if (params.size() != NUM_PROC_CALL_ARGS) continue;
-    const typet &param_type=params.front().type();
+    const typet &param_ptr_type=params.front().type();
+    if (ID_pointer != param_ptr_type.id()) continue;
+    const typet &param_type=param_ptr_type.subtype();
     if (ID_symbol != param_type.id()) continue;
     const irep_idt &param_id=to_symbol_type(param_type).get_identifier();
-    if (ends_with(id2string(param_id), INSTR_TYPE_SUFFIX)) continue;
+    if (!ends_with(id2string(param_id), INSTR_TYPE_SUFFIX)) continue;
     assert(call.arguments().size() == NUM_PROC_CALL_ARGS);
     call.arguments().back()=sz_expr;
   }

@@ -139,7 +139,7 @@ const mp_integer get_width(const typet &type)
 }
 
 code_typet create_func_type(const symbol_tablet &st,
-    const symbol_typet &instruction_type)
+    const symbol_typet &instruction_type, const std::string &func_name)
 {
   code_typet code_type;
   code_type.return_type()=empty_typet();
@@ -147,9 +147,14 @@ code_typet create_func_type(const symbol_tablet &st,
   const struct_union_typet &struct_type=to_struct_union_type(followed_type);
   const struct_union_typet::componentst &comps=struct_type.components();
   const pointer_typet instr_ref_type(instruction_type);
-  code_type.parameters().push_back(code_typet::parametert(instr_ref_type));
-  const typet size_type(unsigned_char_type());
-  code_type.parameters().push_back(code_typet::parametert(size_type));
+  code_typet::parametert prog(instr_ref_type);
+  const char * const prog_base_name=CEGIS_PROC_PROGRAM_PARAM_ID;
+  prog.set_identifier(get_local_meta_name(func_name, prog_base_name));
+  code_type.parameters().push_back(prog);
+  code_typet::parametert size(cegis_size_type());
+  const char * const size_base_name=CEGIS_PROC_PROGRAM_SIZE_PARAM_ID;
+  size.set_identifier(get_local_meta_name(func_name, size_base_name));
+  code_type.parameters().push_back(size);
   return code_type;
 }
 
@@ -202,7 +207,7 @@ std::string create_cegis_processor(symbol_tablet &st, goto_functionst &gf,
   goto_functionst::function_mapt::mapped_type &func=gf.function_map[func_name];
   func.parameter_identifiers.push_back(CEGIS_PROC_PROGRAM_PARAM_ID);
   func.parameter_identifiers.push_back(CEGIS_PROC_PROGRAM_SIZE_PARAM_ID);
-  func.type=create_func_type(st, instr_type);
+  func.type=create_func_type(st, instr_type, func_name);
   add_to_symbol_table(st, func_name, func);
   goto_programt &body=func.body;
   generate_processor_body(st, body, func_name, slots);

@@ -26,15 +26,6 @@ void create_constraint_function_caller(class refactor_programt &prog);
  *
  * @param prog
  */
-void link_refactoring_ranges(refactor_programt &prog);
-
-/**
- * @brief
- *
- * @details
- *
- * @param prog
- */
 void create_refactoring_constraint(refactor_programt &prog);
 
 #endif /* CEGIS_REFACTOR_CONSTRAINT_CONSTRAINT_FACTORY_H_ */

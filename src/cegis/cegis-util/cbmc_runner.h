@@ -61,6 +61,6 @@ safety_checkert::resultt run_cbmc(
     const class symbol_tablet &st,
     const class goto_functionst &gf,
     cbmc_resultt &result,
-    const optionst &options);
+    const class optionst &options);
 
 #endif /* CEGIS_UTIL_CBMC_RUNNER_H_ */

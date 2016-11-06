@@ -30,9 +30,16 @@ public:
   /**
    * @brief
    *
+   * @details
+   */
+  typedef std::map<const irep_idt, goto_programt::targetst> counterexample_locationst;
+
+  /**
+   * @brief
+   *
    * @details All variable locations to be considered in counterexamples (including loop bodies).
    */
-  goto_programt::targetst counterexample_locations;
+  counterexample_locationst counterexample_locations;
 
   /**
    * @brief

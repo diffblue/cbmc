@@ -23,5 +23,6 @@
 #define CEGIS_CONSTANT_PREFIX "CEGIS_CONSTANT_"
 #define CEGIS_FITNESS_TEST_FUNC "__CPROVER_cegis_test_fitness"
 #define CPROVER_INIT CPROVER_PREFIX "initialize"
+#define CONSTRAINT_CALLER_NAME CEGIS_PREFIX "constraint_caller"
 
 #endif /* CEGIS_LITERALS_H_ */

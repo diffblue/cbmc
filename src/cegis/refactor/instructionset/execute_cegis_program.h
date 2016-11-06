@@ -103,7 +103,7 @@ void set_cegis_processor_sizes(symbol_tablet &st, size_t size);
 void set_cegis_processor_sizes(
     const symbol_tablet &st,
     goto_programt::targett first,
-    goto_programt::targett last,
+    goto_programt::const_targett last,
     size_t size);
 
 /**

@@ -52,11 +52,17 @@ class body_factoryt
     return get_local_meta_name(func_name, base_name);
   }
 
+  void src_loc(const goto_programt::targett pos)
+  {
+    pos->source_location=loc;
+    pos->function=func_name;
+  }
+
   goto_programt::targett dead(const std::string &name)
   {
     goto_programt::targett pos=body.insert_after(this->pos);
     pos->type=goto_program_instruction_typet::DEAD;
-    pos->source_location=loc;
+    src_loc(pos);
     const std::string symbol_name(meta_name(name));
     pos->code=code_deadt(st.lookup(symbol_name).symbol_expr());
     return pos;
@@ -78,7 +84,7 @@ class body_factoryt
   {
     pos=body.insert_after(pos);
     pos->type=goto_program_instruction_typet::GOTO;
-    pos->source_location=loc;
+    src_loc(pos);
     pos->set_target(target);
     pos->guard=guard;
   }
@@ -94,7 +100,7 @@ class body_factoryt
     }
     pos=body.insert_after(pos);
     pos->type=goto_program_instruction_typet::GOTO;
-    pos->source_location=loc;
+    src_loc(pos);
     const constant_exprt rhs(from_integer(opcode, cegis_size_type()));
     const member_exprt lhs(cegis_opcode(st, func_name));
     pos->guard=binary_relation_exprt(lhs, relation, rhs);
@@ -102,11 +108,11 @@ class body_factoryt
     last_case=pos;
     pos=body.insert_after(pos);
     pos->type=goto_program_instruction_typet::SKIP;
-    pos->source_location=loc;
+    src_loc(pos);
     const goto_programt::targett result(pos);
     pos=body.insert_after(pos);
     pos->type=goto_program_instruction_typet::GOTO;
-    pos->source_location=loc;
+    src_loc(pos);
     pos->set_target(switch_end);
     return result;
   }
@@ -126,7 +132,7 @@ class body_factoryt
   {
     const constant_exprt rhs(from_integer(value, cegis_opcode_type()));
     pos->type=goto_program_instruction_typet::ASSUME;
-    pos->source_location=loc;
+    src_loc(pos);
     pos->guard=binary_relation_exprt(lhs, ID_lt, rhs);
   }
 public:

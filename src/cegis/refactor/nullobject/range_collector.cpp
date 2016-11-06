@@ -45,6 +45,14 @@ goto_ranget get_then_range(const goto_programt::targett &else_range_last)
     return goto_ranget(then_range_first, then_range_first);
   return goto_ranget(then_range_first, last_else_instr->get_target());
 }
+
+goto_programt::targett get_else_range_last(const goto_programt::targett pos)
+{
+  const goto_programt::targett prev=std::prev(pos);
+  if (goto_program_instruction_typet::GOTO != prev->type
+      || prev->is_backwards_goto()) return pos;
+  return prev;
+}
 }
 
 void collect_nullobject_ranges(refactor_programt &prog)
@@ -58,9 +66,10 @@ void collect_nullobject_ranges(refactor_programt &prog)
     prog.sketches.push_back(refactor_programt::sketcht());
     refactor_programt::sketcht &sketch=prog.sketches.back();
     sketch.init=it;
-    const goto_programt::targett else_range_last(it->get_target());
-    const goto_ranget else_range(++it, else_range_last);
-    const goto_ranget then_range(get_then_range(else_range_last));
+    const goto_programt::targett then_target=it->get_target();
+    const goto_programt::targett else_last=get_else_range_last(then_target);
+    const goto_ranget else_range(++it, else_last);
+    const goto_ranget then_range(get_then_range(then_target));
     if (ID_equal == guard.id())
     {
       sketch.spec_range=then_range;

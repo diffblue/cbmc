@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 
 #include <util/type_eq.h>
 #include <goto-programs/goto_functions.h>
@@ -314,4 +315,33 @@ goto_programt::targett add_return_assignment(goto_programt &body,
   pos->source_location=loc;
   pos->code=code_assignt(get_ret_val_var(func_id, value.type()), value);
   return pos;
+}
+
+namespace
+{
+goto_programt::targett insert_preserving_source_location(
+    goto_programt::targett pos,
+    const std::function<goto_programt::targett(goto_programt::targett)> &inserter)
+{
+  const source_locationt &loc=pos->source_location;
+  const irep_idt &func_name=pos->function;
+  pos=inserter(pos);
+  pos->source_location=loc;
+  pos->function=func_name;
+  return pos;
+}
+}
+
+goto_programt::targett insert_after_preserving_source_location(
+    goto_programt &body, goto_programt::targett pos)
+{
+  const auto op=std::bind1st(std::mem_fun(goto_programt::insert_after), &body);
+  return insert_preserving_source_location(pos, op);
+}
+
+goto_programt::targett insert_before_preserving_source_location(
+    goto_programt &body, goto_programt::targett pos)
+{
+  const auto op=std::bind1st(std::mem_fun(goto_programt::insert_before), &body);
+  return insert_preserving_source_location(pos, op);
 }

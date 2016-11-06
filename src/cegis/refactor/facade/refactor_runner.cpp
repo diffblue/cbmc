@@ -10,11 +10,10 @@ int run_refactor(optionst &options, messaget::mstreamt &result,
     const symbol_tablet &st, const goto_functionst &gf)
 {
   refactor_preprocessingt preproc(options, st, gf);
-  refactor_symex_learnt learn_cfg;
-  refactor_symex_verifyt verify_cfg;
+  refactor_symex_learnt learn_cfg(preproc.get_program());
+  refactor_symex_verifyt verify_cfg(preproc.get_program());
   cegis_symex_learnt<refactor_preprocessingt, refactor_symex_learnt> learn(
       options, preproc, learn_cfg);
-  refactor_symex_verifyt vcfg;
   cegis_symex_verifyt<refactor_symex_verifyt> oracle(options, verify_cfg);
   return run_cegis_with_statistics_wrapper(
       result, options, learn, oracle, preproc);
