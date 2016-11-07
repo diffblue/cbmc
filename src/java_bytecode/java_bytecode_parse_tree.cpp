@@ -28,6 +28,8 @@ void java_bytecode_parse_treet::classt::swap(
   std::swap(other.is_public, is_public);
   std::swap(other.is_protected, is_protected);
   std::swap(other.is_private, is_private);
+  std::swap(other.has_signature, has_signature);
+  std::swap(other.signature, signature);
   other.implements.swap(implements);
   other.fields.swap(fields);
   other.methods.swap(methods);
@@ -151,7 +153,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
     out << "synchronized ";
 
   out << name;
-  out << " : " << signature;
+  out << " : " << descriptor;
 
   out << '\n';
 
@@ -188,7 +190,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   for(const auto &v : local_variable_table)
   {
     out << "    " << v.index << ": " << v.name << ' '
-        << v.signature << '\n';
+        << v.descriptor << '\n';
   }
 
   out << '\n';
@@ -212,7 +214,7 @@ void java_bytecode_parse_treet::fieldt::output(std::ostream &out) const
     out << "static ";
 
   out << name;
-  out << " : " << signature << ';';
+  out << " : " << descriptor << ';';
 
   out << '\n';
 }

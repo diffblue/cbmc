@@ -182,3 +182,51 @@ dereference_exprt checked_dereference(const exprt &expr, const typet &type)
   result.set(ID_java_member_access, true);
   return result;
 }
+
+/// Finds the corresponding closing delimiter to the given opening delimiter. It
+/// is assumed that \p open_pos points to the opening delimiter \p open_char in
+/// the \p src string. The depth of nesting is counted to identify the correct
+/// closing delimiter.
+///
+/// A typical use case is for example Java generic types, e.g., List<List<T>>
+///
+/// \param src: the source string to scan
+/// \param open_pos: the initial position of the opening delimiter from where to
+/// start the search
+/// \param open_char: the opening delimiter
+/// \param close_char: the closing delimiter
+/// \returns the index of the matching corresponding closing delimiter in \p src
+size_t find_closing_delimiter(
+  const std::string &src,
+  size_t open_pos,
+  char open_char,
+  char close_char)
+{
+  // having the same opening and closing delimiter does not allow for hierarchic
+  // structuring
+  PRECONDITION(open_char!=close_char);
+  PRECONDITION(src[open_pos]==open_char);
+  size_t c_pos=open_pos+1;
+  const size_t end_pos=src.size()-1;
+  size_t depth=0;
+
+  while(c_pos<=end_pos)
+  {
+    if(src[c_pos]=='<')
+      depth++;
+    else if(src[c_pos]=='>')
+    {
+      if(depth==0)
+        return c_pos;
+      depth--;
+    }
+    c_pos++;
+    // limit depth to sensible values
+    INVARIANT(
+      depth<=(src.size()-open_pos),
+      "No closing \'"+std::to_string(close_char)+
+      "\' found in signature to parse.");
+  }
+  // did not find corresponding closing '>'
+  return std::string::npos;
+}

@@ -252,7 +252,7 @@ const exprt java_bytecode_convert_methodt::variable(
 /// method conversion just yet. The caller should call
 /// java_bytecode_convert_method later to give the symbol/method a body.
 /// \par parameters: `class_symbol`: class this method belongs to
-/// `method_identifier`: fully qualified method name, including type signature
+/// `method_identifier`: fully qualified method name, including type descriptor
 ///   (e.g. "x.y.z.f:(I)")
 /// `m`: parsed method object to convert
 /// `symbol_table`: global symbol table (will be modified)
@@ -263,7 +263,18 @@ void java_bytecode_convert_method_lazy(
   symbol_tablet &symbol_table)
 {
   symbolt method_symbol;
-  typet member_type=java_type_from_string(m.signature);
+  typet member_type;
+  if(m.has_signature)
+  {
+#ifdef DEBUG
+    std::cout << "method " << m.name
+              << " has signature " << m.signature << "\n";
+#endif
+    member_type=
+      java_type_from_string(m.signature, id2string(class_symbol.name));
+  }
+  else
+    member_type=java_type_from_string(m.descriptor);
 
   method_symbol.name=method_identifier;
   method_symbol.base_name=m.base_name;
@@ -317,7 +328,7 @@ void java_bytecode_convert_methodt::convert(
   // to retrieve the symbol (constructed by java_bytecode_convert_method_lazy)
   // associated to the method
   const irep_idt method_identifier=
-    id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
+    id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.descriptor;
   method_id=method_identifier;
 
   const auto &old_sym=symbol_table.lookup(method_identifier);
@@ -350,7 +361,12 @@ void java_bytecode_convert_methodt::convert(
     // Construct a fully qualified name for the parameter v,
     // e.g. my.package.ClassName.myMethodName:(II)I::anIntParam, and then a
     // symbol_exprt with the parameter and its type
-    typet t=java_type_from_string(v.signature);
+    typet t;
+    if(v.has_signature)
+      t=java_type_from_string(v.signature, id2string(class_symbol.name));
+    else
+      t=java_type_from_string(v.descriptor);
+
     std::ostringstream id_oss;
     id_oss << method_id << "::" << v.name;
     irep_idt identifier(id_oss.str());
