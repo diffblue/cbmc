@@ -79,10 +79,9 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       constant/add_constant.cpp constant/literals_collector.cpp constant/default_cegis_constant_strategy.cpp \
       instrument/cegis_library.cpp instrument/instrument_var_ops.cpp instrument/meta_variables.cpp \
       instrument/find_cprover_initialize.cpp \
-      runner/cegis_parse_options.cpp runner/cegis_main.cpp
+      runner/cegis_parse_options.cpp runner/cegis_main.cpp runner/cegis_languages.cpp
  
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
-      ../jsil/jsil$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
       ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
@@ -110,7 +109,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cbmc/cbmc_parse_options$(OBJEXT) ../cbmc/bmc$(OBJEXT) ../cbmc/cbmc_solvers$(OBJEXT) \
       ../cbmc/symex_bmc$(OBJEXT) ../cbmc/xml_interface$(OBJEXT) ../cbmc/bmc_cover$(OBJEXT) \
       ../cbmc/bv_cbmc$(OBJEXT) ../cbmc/counterexample_beautification$(OBJEXT) \
-      ../cbmc/cbmc_languages$(OBJEXT) ../cbmc/show_vcc$(OBJEXT) \
+      ../cbmc/show_vcc$(OBJEXT) \
       ../cbmc/cbmc_dimacs$(OBJEXT) ../cbmc/all_properties$(OBJEXT) \
       ../cbmc/fault_localization$(OBJEXT)
 
