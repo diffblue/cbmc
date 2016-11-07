@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <numeric>
 
 #include <cegis/instrument/instrument_var_ops.h>
 #include <cegis/refactor/instructionset/processor_types.h>
