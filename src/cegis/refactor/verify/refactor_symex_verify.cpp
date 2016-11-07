@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 
 #include <linking/zero_initializer.h>
 

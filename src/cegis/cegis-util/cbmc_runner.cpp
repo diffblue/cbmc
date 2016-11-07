@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 
 #include <util/config.h>
 #include <util/substitute.h>

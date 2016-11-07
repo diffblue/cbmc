@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
