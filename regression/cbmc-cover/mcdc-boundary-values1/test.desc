@@ -1,0 +1,14 @@
+CORE
+main.c
+--cover boundary-values
+^EXIT=0$
+^SIGNAL=0$
+^\[main.coverage.1\] file main.c line 7 function main MC/DC independence condition `x > (unsigned int)3.* SATISFIED$
+^\[main.coverage.2\] file main.c line 7 function main MC/DC independence condition `x == (unsigned int)3.* SATISFIED$
+^\[main.coverage.3\] file main.c line 7 function main MC/DC independence condition `x < (unsigned int)3.* SATISFIED$
+^\[main.coverage.4\] file main.c line 7 function main decision/condition `x < (unsigned int)3.*: SATISFIED$
+^\[main.coverage.5\] file main.c line 7 function main decision/condition `x < (unsigned int)3.*: SATISFIED$
+^\*\* .* of .* covered (100.0%)$
+^\*\* Used 3 iterations$
+--
+^warning: ignoring
