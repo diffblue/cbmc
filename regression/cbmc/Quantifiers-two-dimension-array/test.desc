@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^\*\* Results:$
+^\[main.assertion.1\] assertion a\[(signed long int)0\]\[(signed long int)0\] == 0: SUCCESS$
+^\[main.assertion.2\] assertion a\[(signed long int)0\]\[(signed long int)1\] == 1: SUCCESS$
+^\[main.assertion.3\] assertion a\[(signed long int)1\]\[(signed long int)0\] == 1: SUCCESS$
+^\[main.assertion.4\] assertion a\[(signed long int)1\]\[(signed long int)1\] == 2: SUCCESS$
+^\[main.assertion.5\] assertion tmp_if_expr$3: SUCCESS$
+
+^\*\* 0 of 5 failed (1 iteration)$
+^VERIFICATION SUCCESSFUL$

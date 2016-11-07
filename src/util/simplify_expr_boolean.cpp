@@ -258,6 +258,16 @@ bool simplify_exprt::simplify_not(exprt &expr)
     expr.id(ID_equal);
     return false;
   }
+  else if(op.id()==ID_exists) // !(exists: a) <-> forall: not a
+  {
+    assert(op.operands().size()==2);
+    exprt tmp;
+    tmp.swap(op);
+    expr.swap(tmp);
+    expr.id(ID_forall);
+    expr.op1().make_not();
+    return false;
+  }
   
   return true;
 }
