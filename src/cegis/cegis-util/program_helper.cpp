@@ -335,13 +335,13 @@ goto_programt::targett insert_preserving_source_location(
 goto_programt::targett insert_after_preserving_source_location(
     goto_programt &body, goto_programt::targett pos)
 {
-  const auto op=std::bind1st(std::mem_fun(goto_programt::insert_after), &body);
+  const auto op=std::bind1st(std::mem_fun(&goto_programt::insert_after), &body);
   return insert_preserving_source_location(pos, op);
 }
 
 goto_programt::targett insert_before_preserving_source_location(
     goto_programt &body, goto_programt::targett pos)
 {
-  const auto op=std::bind1st(std::mem_fun(goto_programt::insert_before), &body);
+  const auto op=std::bind1st(std::mem_fun(&goto_programt::insert_before), &body);
   return insert_preserving_source_location(pos, op);
 }

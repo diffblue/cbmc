@@ -228,7 +228,7 @@ void remove_singleton_switch_cases(goto_programt &body)
   for (goto_programt::targett pos=instrs.begin(); pos != end; ++pos)
   {
     if (!is_forward_goto(*pos)) continue;
-    const auto pred(std::mem_fun_ref(goto_programt::instructiont::is_skip));
+    const auto pred(std::mem_fun_ref(&goto_programt::instructiont::is_skip));
     const goto_programt::targett tail=std::find_if(pos, end, pred);
     assert(end != tail);
     if (pos->get_target() == tail) instrs.erase(pos);

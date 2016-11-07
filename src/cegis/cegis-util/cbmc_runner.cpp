@@ -58,7 +58,7 @@ std::vector<const char *> get_argv(const std::vector<std::string> &args)
 {
   std::vector<const char *> result;
   std::transform(args.begin(), args.end(), std::back_inserter(result),
-      std::mem_fun_ref(std::string::c_str));
+      std::mem_fun_ref(&std::string::c_str));
   return result;
 }
 

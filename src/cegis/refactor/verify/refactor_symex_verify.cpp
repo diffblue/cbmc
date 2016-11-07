@@ -20,7 +20,7 @@ void init_value(goto_functionst &gf, symbolt &symbol, const exprt &value)
   symbol.value=value;
   goto_programt &body=get_body(gf, CPROVER_INIT);
   goto_programt::instructionst &instrs=body.instructions;
-  const auto op(std::mem_fun_ref(goto_programt::instructiont::is_end_function));
+  const auto op(std::mem_fun_ref(&goto_programt::instructiont::is_end_function));
   goto_programt::targett pos=std::find_if(instrs.begin(), instrs.end(), op);
   assert(instrs.end() != pos);
   pos=insert_before_preserving_source_location(body, pos);
