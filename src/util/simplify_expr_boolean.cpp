@@ -266,6 +266,7 @@ bool simplify_exprt::simplify_not(exprt &expr)
     expr.swap(tmp);
     expr.id(ID_forall);
     expr.op1().make_not();
+    simplify_node(expr.op1());
     return false;
   }
   
