@@ -178,7 +178,7 @@ Function: instantiate_quantifier
 bool instantiate_quantifier(exprt &expr,
                             const namespacet &ns)
 {
-  if(not(expr.id()==ID_forall || expr.id()==ID_exists))
+  if(!(expr.id()==ID_forall || expr.id()==ID_exists))
     return true;
 
   assert(expr.operands().size()==2);
