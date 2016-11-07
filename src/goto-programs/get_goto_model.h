@@ -16,7 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class get_goto_modelt:public goto_modelt, public messaget
 {
 public:
+  get_goto_modelt() : generate_start_function(true) {}
   bool operator()(const std::vector<std::string> &);
+  bool generate_start_function;
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_GET_GOTO_MODEL_H

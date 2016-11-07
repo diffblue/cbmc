@@ -41,7 +41,8 @@ public:
     class replace_symbolt &replace_symbol) const;
 
   bool final(
-    symbol_tablet &symbol_table) override;
+    symbol_tablet &symbol_table,
+    bool generate_start_function) override;
 
   void show_parse(std::ostream &out) override;
 

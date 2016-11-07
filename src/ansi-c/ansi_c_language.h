@@ -35,7 +35,8 @@ public:
     const std::string &module) override;
 
   bool final(
-    symbol_tablet &symbol_table) override;
+    symbol_tablet &symbol_table,
+    bool generate_start_function) override;
 
   void show_parse(std::ostream &out) override;
 

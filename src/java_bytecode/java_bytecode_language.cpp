@@ -744,13 +744,17 @@ Function: java_bytecode_languaget::final
 
 \*******************************************************************/
 
-bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
+bool java_bytecode_languaget::final(
+  symbol_tablet &symbol_table,
+  bool generate_start_function)
 {
   /*
   if(c_final(symbol_table, message_handler)) return true;
   */
   java_internal_additions(symbol_table);
 
+  if(!generate_start_function)
+    return false;
 
   main_function_resultt res=
     get_main_symbol(symbol_table, main_class, get_message_handler());

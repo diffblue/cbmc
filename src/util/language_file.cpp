@@ -235,7 +235,8 @@ Function: language_filest::final
 \*******************************************************************/
 
 bool language_filest::final(
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  bool generate_start_function)
 {
   std::set<std::string> languages;
 
@@ -243,7 +244,7 @@ bool language_filest::final(
       it!=file_map.end(); it++)
   {
     if(languages.insert(it->second.language->id()).second)
-      if(it->second.language->final(symbol_table))
+      if(it->second.language->final(symbol_table, generate_start_function))
         return true;
   }
 

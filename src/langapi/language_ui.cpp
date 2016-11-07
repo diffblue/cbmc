@@ -34,7 +34,8 @@ language_uit::language_uit(
   const cmdlinet &__cmdline,
   ui_message_handlert &_ui_message_handler):
   ui_message_handler(_ui_message_handler),
-  _cmdline(__cmdline)
+  _cmdline(__cmdline),
+  generate_start_function(true)
 {
   set_message_handler(ui_message_handler);
 }
@@ -183,7 +184,7 @@ bool language_uit::final()
 {
   language_files.set_message_handler(*message_handler);
 
-  if(language_files.final(symbol_table))
+  if(language_files.final(symbol_table, generate_start_function))
   {
     if(get_ui()==ui_message_handlert::PLAIN)
       std::cerr << "CONVERSION ERROR" << std::endl;
