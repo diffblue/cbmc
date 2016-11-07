@@ -514,6 +514,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     const typet &object_type=ns.follow(object.type());
     const exprt &root_object=o.root_object();
     const typet &root_object_type=ns.follow(root_object.type());
+
+    exprt root_object_subexpression=root_object;
     
     if(dereference_type_compare(object_type, dereference_type) && 
        o.offset().is_zero())
@@ -572,6 +574,13 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
       if(ns.follow(result.value.type())!=ns.follow(dereference_type))
         result.value.make_typecast(dereference_type);
+    }
+    else if(get_subexpression_at_offset(root_object_subexpression, o.offset(),
+					dereference_type, ns))
+    {
+      // Successfully found a member, array index, or combination thereof
+      // that matches the desired type and offset:
+      result.value=root_object_subexpression;
     }
     else
     {
