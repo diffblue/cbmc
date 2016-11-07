@@ -11,18 +11,13 @@
 #include <cegis/refactor/instructionset/cegis_instruction_factory.h>
 #include <cegis/refactor/instructionset/cegis_processor_body_factory.h>
 
-// XXX: Debug
-#include <iostream>
-// XXX: Debug
-
 #define NUM_PRIMITIVE_OPERANDS 3u
 
 namespace
 {
 size_t cegis_max_operands(const typet &type)
 {
-  if (!is_cegis_primitive(type))
-  assert(!"Class type operand generation not supported.");
+  if (!is_cegis_primitive(type)) return 0;  // TODO: Add support for class types
   return NUM_PRIMITIVE_OPERANDS;
 }
 }
@@ -57,11 +52,17 @@ class body_factoryt
     return get_local_meta_name(func_name, base_name);
   }
 
+  void src_loc(const goto_programt::targett pos)
+  {
+    pos->source_location=loc;
+    pos->function=func_name;
+  }
+
   goto_programt::targett dead(const std::string &name)
   {
     goto_programt::targett pos=body.insert_after(this->pos);
     pos->type=goto_program_instruction_typet::DEAD;
-    pos->source_location=loc;
+    src_loc(pos);
     const std::string symbol_name(meta_name(name));
     pos->code=code_deadt(st.lookup(symbol_name).symbol_expr());
     return pos;
@@ -83,7 +84,7 @@ class body_factoryt
   {
     pos=body.insert_after(pos);
     pos->type=goto_program_instruction_typet::GOTO;
-    pos->source_location=loc;
+    src_loc(pos);
     pos->set_target(target);
     pos->guard=guard;
   }
@@ -99,7 +100,7 @@ class body_factoryt
     }
     pos=body.insert_after(pos);
     pos->type=goto_program_instruction_typet::GOTO;
-    pos->source_location=loc;
+    src_loc(pos);
     const constant_exprt rhs(from_integer(opcode, cegis_size_type()));
     const member_exprt lhs(cegis_opcode(st, func_name));
     pos->guard=binary_relation_exprt(lhs, relation, rhs);
@@ -107,11 +108,11 @@ class body_factoryt
     last_case=pos;
     pos=body.insert_after(pos);
     pos->type=goto_program_instruction_typet::SKIP;
-    pos->source_location=loc;
+    src_loc(pos);
     const goto_programt::targett result(pos);
     pos=body.insert_after(pos);
     pos->type=goto_program_instruction_typet::GOTO;
-    pos->source_location=loc;
+    src_loc(pos);
     pos->set_target(switch_end);
     return result;
   }
@@ -131,7 +132,7 @@ class body_factoryt
   {
     const constant_exprt rhs(from_integer(value, cegis_opcode_type()));
     pos->type=goto_program_instruction_typet::ASSUME;
-    pos->source_location=loc;
+    src_loc(pos);
     pos->guard=binary_relation_exprt(lhs, ID_lt, rhs);
   }
 public:
@@ -251,9 +252,7 @@ void remove_skips(goto_programt::instructionst &instrs)
   {
     if (!pos->is_skip()) continue;
     const goto_programt::targett successor(std::next(pos));
-    for (goto_programt::instructiont &instr : instrs)
-      for (goto_programt::targett &target : instr.targets)
-        if (target == pos) target=successor;
+    move_labels(instrs, pos, successor);
     pos=instrs.erase(pos);
   }
 }
@@ -273,8 +272,8 @@ void generate_processor_body(symbol_tablet &st, goto_programt &body,
   }
   body.add_instruction(goto_program_instruction_typet::END_FUNCTION);
   //remove_singleton_switch_cases(body);
-  remove_goto_next(body);
-  remove_skips(body.instructions);
+  //remove_goto_next(body);
+  //remove_skips(body.instructions);
   body.compute_loop_numbers();
   body.update();
 }

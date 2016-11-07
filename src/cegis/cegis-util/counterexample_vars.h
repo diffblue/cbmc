@@ -80,6 +80,24 @@ void collect_counterexample_locations(
  *
  * @details
  *
+ * @param locs
+ * @param prog
+ * @param is_meta
+ * @param marker_index_offset
+ *
+ * @return
+ */
+size_t collect_counterexample_locations(
+    goto_programt::targetst &locs,
+    goto_programt &prog,
+    const std::function<bool(goto_programt::const_targett target)> is_meta,
+    size_t marker_index_offset);
+
+/**
+ * @brief
+ *
+ * @details
+ *
  * @param pos
  *
  * @return

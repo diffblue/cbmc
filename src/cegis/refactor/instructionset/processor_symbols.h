@@ -44,6 +44,13 @@
  * @brief
  *
  * @details
+ */
+#define INSTR_TYPE_SUFFIX "_instructiont"
+
+/**
+ * @brief
+ *
+ * @details
  *
  * @param st
  * @param type

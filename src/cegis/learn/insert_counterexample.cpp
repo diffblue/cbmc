@@ -189,8 +189,7 @@ plus_exprt increment(const symbol_exprt &symbol)
   return plus_exprt(symbol, one);
 }
 
-void add_ce_goto(symbol_tablet &st, goto_functionst &gf,
-    const std::set<irep_idt> &ce_keys, const size_t num_ces,
+void add_ce_goto(symbol_tablet &st, goto_functionst &gf, const size_t num_ces,
     const goto_programt::targett &begin)
 {
   goto_programt &body=get_entry_body(gf);
@@ -267,6 +266,6 @@ void insert_counterexamples(symbol_tablet &st, goto_functionst &gf,
   const goto_programt::targett begin(find_cprover_initialize(body));
   add_array_declarations(st, gf, ces, begin);
   add_array_indexes(ce_keys, st, gf);
-  add_ce_goto(st, gf, ce_keys, ces.size(), begin);
+  add_ce_goto(st, gf, ces.size(), begin);
   assign_ce_values(st, gf, ce_locs);
 }

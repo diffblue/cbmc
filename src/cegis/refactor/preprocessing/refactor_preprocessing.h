@@ -51,7 +51,7 @@ public:
    *
    * @param max_length
    */
-  void operator()(size_t max_length) const;
+  void operator()(size_t max_length);
 
   /**
    * @brief
@@ -61,6 +61,15 @@ public:
    * @return
    */
   size_t get_min_solution_size() const;
+
+  /**
+   * @brief
+   *
+   * @details
+   *
+   * @return
+   */
+  const refactor_programt &get_program() const;
 };
 
 #endif /* CEGIS_REFACTOR_PREPROCESSING_REFACTOR_PREPROCESSING_H_ */

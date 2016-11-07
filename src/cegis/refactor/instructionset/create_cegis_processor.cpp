@@ -12,14 +12,15 @@
 #include <cegis/refactor/instructionset/cegis_processor_body_factory.h>
 #include <cegis/refactor/instructionset/create_cegis_processor.h>
 
-// XXX: Debug
-#include <iostream>
-
-#include <cegis/refactor/instructionset/execute_cegis_program.h>
-// XXX: Debug
-
 namespace
 {
+bool is_empty(const typet &type)
+{
+  const irep_idt &id=type.id();
+  if (ID_pointer == id) return is_empty(type.subtype());
+  return ID_empty == id || id.empty();
+}
+
 class type_collectort: public const_expr_visitort
 {
 public:
@@ -29,7 +30,9 @@ public:
 
   virtual void operator()(const exprt &expr)
   {
-    types.insert(expr.type());
+    const typet &type=expr.type();
+    const irep_idt &type_id=type.id();
+    if (ID_code != type.id() && !is_empty(type)) types.insert(expr.type());
   }
 };
 }
@@ -42,19 +45,7 @@ std::set<typet> collect_context_types(const goto_ranget &range)
   return collector.types;
 }
 
-cegis_operand_datat slots_per_type(const symbol_tablet &st,
-    const std::set<irep_idt> &state_vars)
-{
-  const namespacet ns(st);
-  cegis_operand_datat result;
-  for (const irep_idt &state_var : state_vars)
-    ++result[ns.follow(st.lookup(state_var).type)];
-  return result;
-}
-
 #define MAX_PROCESSORS 128u
-#define CEGIS_PROCESSOR_FUNCTION_PREFIX CEGIS_PREFIX "processor_"
-#define INSTR_TYPE_SUFFIX "_instructiont"
 
 namespace
 {
@@ -89,6 +80,8 @@ void create_variable_array(symbol_tablet &st, goto_functionst &gf,
   pos->code=code_assignt(lhs, rhs);
   body.update();
 }
+
+#define CEGIS_PROCESSOR_FUNCTION_PREFIX CEGIS_PREFIX "processor_"
 
 std::string get_next_processor_name(const symbol_tablet &st)
 {
@@ -146,7 +139,7 @@ const mp_integer get_width(const typet &type)
 }
 
 code_typet create_func_type(const symbol_tablet &st,
-    const symbol_typet &instruction_type)
+    const symbol_typet &instruction_type, const std::string &func_name)
 {
   code_typet code_type;
   code_type.return_type()=empty_typet();
@@ -154,9 +147,14 @@ code_typet create_func_type(const symbol_tablet &st,
   const struct_union_typet &struct_type=to_struct_union_type(followed_type);
   const struct_union_typet::componentst &comps=struct_type.components();
   const pointer_typet instr_ref_type(instruction_type);
-  code_type.parameters().push_back(code_typet::parametert(instr_ref_type));
-  const typet size_type(unsigned_char_type());
-  code_type.parameters().push_back(code_typet::parametert(size_type));
+  code_typet::parametert prog(instr_ref_type);
+  const char * const prog_base_name=CEGIS_PROC_PROGRAM_PARAM_ID;
+  prog.set_identifier(get_local_meta_name(func_name, prog_base_name));
+  code_type.parameters().push_back(prog);
+  code_typet::parametert size(cegis_size_type());
+  const char * const size_base_name=CEGIS_PROC_PROGRAM_SIZE_PARAM_ID;
+  size.set_identifier(get_local_meta_name(func_name, size_base_name));
+  code_type.parameters().push_back(size);
   return code_type;
 }
 
@@ -209,29 +207,9 @@ std::string create_cegis_processor(symbol_tablet &st, goto_functionst &gf,
   goto_functionst::function_mapt::mapped_type &func=gf.function_map[func_name];
   func.parameter_identifiers.push_back(CEGIS_PROC_PROGRAM_PARAM_ID);
   func.parameter_identifiers.push_back(CEGIS_PROC_PROGRAM_SIZE_PARAM_ID);
-  func.type=create_func_type(st, instr_type);
+  func.type=create_func_type(st, instr_type, func_name);
   add_to_symbol_table(st, func_name, func);
   goto_programt &body=func.body;
   generate_processor_body(st, body, func_name, slots);
-  // TODO: Implement
-  // XXX: Debug
-  goto_programt &entry_body=get_entry_body(gf);
-  std::string prog(func_name);
-  prog+="_prog";
-  declare_cegis_program(st, gf, func_name, prog, 3);
-  call_processor(st, entry_body, std::prev(entry_body.instructions.end(), 2),
-      func_name, prog);
-  try
-  {
-    std::cout << "<create_cegis_processor>" << std::endl;
-    st.show(std::cout);
-    gf.output(namespacet(st), std::cout);
-    std::cout << "</create_cegis_processor>" << std::endl;
-  } catch (const std::string &ex)
-  {
-    std::cout << "<ex>" << ex << "</ex>" << std::endl;
-    throw;
-  }
-  // XXX: Debug
   return func_name;
 }

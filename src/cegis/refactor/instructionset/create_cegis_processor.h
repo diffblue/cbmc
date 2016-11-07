@@ -32,19 +32,6 @@ std::set<typet> collect_context_types(const goto_ranget &range);
  * @brief
  *
  * @details
- *
- * @param st
- * @param state_vars
- *
- * @return
- */
-std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
-    const std::set<irep_idt> &state_vars);
-
-/**
- * @brief
- *
- * @details
  * @code
  * execute_next_instr:
  * #define program[i].opcode opcode
