@@ -316,26 +316,29 @@ bool remove_returnst::restore_returns(
       // replace "fkt#return_value=x;" by "return x;"
       code_returnt return_code(assign.rhs());
 
-      // now turn the `return' into `assignment'
-      i_it->type=RETURN;
-      i_it->code=return_code;
+      // the assignment might be a goto target
+      i_it->make_skip();
+      i_it++;
 
-      // remove the subsequent goto (and possibly dead)
-      goto_programt::instructionst::iterator next=i_it;
-      ++next;
-      assert(next!=goto_program.instructions.end());
-
-      if(next->is_dead())
+      while(!i_it->is_goto() && !i_it->is_end_function())
       {
-        assert(to_code_dead(next->code).symbol()==
-               return_code.return_value());
-        next=goto_program.instructions.erase(next);
-        assert(next!=goto_program.instructions.end());
+        assert(i_it->is_dead());
+        i_it++;
       }
 
-      assert(next->is_goto());
-      // i_it remains valid
-      goto_program.instructions.erase(next);
+      if(i_it->is_goto())
+      {
+        goto_programt::const_targett target=i_it->get_target();
+        assert(target->is_end_function());
+      }
+      else
+      {
+        assert(i_it->is_end_function());
+        i_it=goto_program.instructions.insert(i_it, *i_it);
+      }
+
+      i_it->make_return();
+      i_it->code=return_code;
     }
   }
 
