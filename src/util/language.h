@@ -61,7 +61,8 @@ public:
   // final adjustments, e.g., initialization and call to main()
 
   virtual bool final(
-    symbol_tablet &symbol_table);
+    symbol_tablet &symbol_table,
+    bool generate_start_function);
 
   // type check interfaces of currently parsed file
 

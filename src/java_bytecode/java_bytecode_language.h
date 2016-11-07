@@ -49,7 +49,8 @@ public:
     const std::string &module) override;
 
   bool final(
-    symbol_tablet &context) override;
+    symbol_tablet &context,
+    bool generate_start_function) override;
 
   void show_parse(std::ostream &out) override;
 

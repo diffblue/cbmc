@@ -165,12 +165,17 @@ Function: jsil_languaget::final
 
 \*******************************************************************/
 
-bool jsil_languaget::final(symbol_tablet &symbol_table)
+bool jsil_languaget::final(
+  symbol_tablet &symbol_table,
+  bool generate_start_function)
 {
-  if(jsil_entry_point(
-      symbol_table,
-      get_message_handler()))
-    return true;
+  if(generate_start_function)
+  {
+    if(jsil_entry_point(
+         symbol_table,
+         get_message_handler()))
+      return true;
+  }
 
   return false;
 }

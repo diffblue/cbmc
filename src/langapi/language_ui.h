@@ -52,6 +52,7 @@ public:
 
 protected:
   const cmdlinet &_cmdline;
+  bool generate_start_function;
 };
 
 #endif // CPROVER_LANGAPI_LANGUAGE_UI_H

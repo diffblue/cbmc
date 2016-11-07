@@ -201,10 +201,15 @@ Function: cpp_languaget::final
 
 \*******************************************************************/
 
-bool cpp_languaget::final(symbol_tablet &symbol_table)
+bool cpp_languaget::final(
+  symbol_tablet &symbol_table,
+  bool generate_start_function)
 {
-  if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
-    return true;
+  if(generate_start_function)
+  {
+    if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
+      return true;
+  }
 
   return false;
 }

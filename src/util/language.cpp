@@ -21,7 +21,7 @@ Function: languaget::final
 
 \*******************************************************************/
 
-bool languaget::final(symbol_tablet &symbol_table)
+bool languaget::final(symbol_tablet &symbol_table, bool generate_start_function)
 {
   return false;
 }

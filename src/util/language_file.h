@@ -81,7 +81,7 @@ public:
 
   bool typecheck(symbol_tablet &symbol_table);
 
-  bool final(symbol_tablet &symbol_table);
+  bool final(symbol_tablet &symbol_table, bool generate_start_function);
 
   bool interfaces(symbol_tablet &symbol_table);
 

@@ -114,7 +114,7 @@ bool get_goto_modelt::operator()(const std::vector<std::string> &files)
 
       if(binaries.empty())
       {
-        if(language_files.final(symbol_table))
+        if(language_files.final(symbol_table, generate_start_function))
         {
           error() << "CONVERSION ERROR" << eom;
           return true;

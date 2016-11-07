@@ -30,7 +30,8 @@ public:
     const std::string &module);
 
   virtual bool final(
-    symbol_tablet &context);
+    symbol_tablet &context,
+    bool generate_start_function);
 
   virtual void show_parse(std::ostream &out);
 
