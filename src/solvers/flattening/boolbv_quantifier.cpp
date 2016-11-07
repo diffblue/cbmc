@@ -53,8 +53,8 @@ exprt get_quantifier_var_min(
   const exprt &var_expr,
   const exprt &quantifier_expr)
 {
-  assert(quantifier_expr.id()==ID_or 
-         or quantifier_expr.id()==ID_and);
+  assert(quantifier_expr.id()==ID_or ||
+         quantifier_expr.id()==ID_and);
   exprt res;
   res.make_false();
   if(quantifier_expr.id()==ID_or)
@@ -109,8 +109,8 @@ exprt get_quantifier_var_max(
   const exprt &var_expr,
   const exprt &quantifier_expr)
 {
-  assert(quantifier_expr.id()==ID_or 
-         or quantifier_expr.id()==ID_and);
+  assert(quantifier_expr.id()==ID_or ||
+         quantifier_expr.id()==ID_and);
   exprt res;
   res.make_false();
   if(quantifier_expr.id()==ID_or)
@@ -178,12 +178,14 @@ Function: instantiate_quantifier
 bool instantiate_quantifier(exprt &expr,
                             const namespacet &ns)
 {
-  if(not(expr.id()==ID_forall or expr.id()==ID_exists))
+  if(not(expr.id()==ID_forall || expr.id()==ID_exists))
     return true;
+
   assert(expr.operands().size()==2);
   assert(expr.op0().id()==ID_symbol);
 
   exprt var_expr=expr.op0();
+
   /**
    * We need to rewrite the forall/exists quantifier into
    * an OR/AND expr. 
@@ -192,8 +194,8 @@ bool instantiate_quantifier(exprt &expr,
   exprt tmp(re.op1());
   re.swap(tmp);
   re=simplify_expr(re, ns);
-  if(re.is_true()
-     or re.is_false())
+
+  if(re.is_true() || re.is_false())
   {
     expr=re;
     return true;
@@ -252,7 +254,7 @@ Function: boolbvt::convert_quantifier
 literalt boolbvt::convert_quantifier(const exprt &src)
 {
   exprt expr(src);
-  if(not instantiate_quantifier(expr, ns))
+  if(!instantiate_quantifier(expr, ns))
     return SUB::convert_rest(src);
     
   quantifiert quantifier;
