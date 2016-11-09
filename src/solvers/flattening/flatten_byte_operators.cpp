@@ -365,7 +365,7 @@ exprt flatten_byte_update(
   else
   {
     throw "flatten_byte_update can only do array and scalars "
-          "right now, but "+t.id_string();
+          "right now, but got "+t.id_string();
   }
 }
 
