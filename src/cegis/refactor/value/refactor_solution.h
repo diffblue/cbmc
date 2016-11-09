@@ -10,6 +10,8 @@
 #ifndef CEGIS_REFACTOR_VALUE_REFACTOR_SOLUTION_H_
 #define CEGIS_REFACTOR_VALUE_REFACTOR_SOLUTION_H_
 
-typedef int refactor_solutiont;
+#include <util/std_expr.h>
+
+typedef std::map<const irep_idt, array_exprt> refactor_solutiont;
 
 #endif /* CEGIS_REFACTOR_VALUE_REFACTOR_SOLUTION_H_ */

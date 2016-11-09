@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ERROR_HANDLER_H
-#define CPROVER_ERROR_HANDLER_H
+#ifndef CPROVER_MESSAGE_STREAM_H
+#define CPROVER_MESSAGE_STREAM_H
 
 #include <sstream>
 
@@ -16,10 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // deprecated; use warning(), error(), etc. streams in messaget
 
-class message_streamt:public message_clientt
+class legacy_message_streamt:public message_clientt
 {
 public:
-  message_streamt(message_handlert &_message_handler):
+  legacy_message_streamt(message_handlert &_message_handler):
     message_clientt(_message_handler),
     error_found(false),
     saved_error_location(static_cast<const source_locationt &>(get_nil_irep())),
@@ -27,7 +27,7 @@ public:
   {
   }
 
-  virtual ~message_streamt() { }
+  virtual ~legacy_message_streamt() { }
 
   // overload to use language specific syntax
   virtual std::string to_string(const exprt &expr) { return expr.pretty(); }

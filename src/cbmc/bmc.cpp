@@ -484,7 +484,7 @@ safety_checkert::resultt bmct::run(
       }
       else
       {
-        if(options.get_option("cover")=="")
+        if(options.get_list_option("cover").empty())
         {
           simple_slice(equation);
           statistics() << "simple slicing removed "
@@ -506,10 +506,11 @@ safety_checkert::resultt bmct::run(
       return safety_checkert::SAFE; // to indicate non-error
     }
     
-    if(options.get_option("cover")!="")
+    if(!options.get_list_option("cover").empty())
     {
-      std::string criterion=options.get_option("cover");
-      return cover(goto_functions, criterion)?
+      const optionst::value_listt criteria=
+        options.get_list_option("cover");
+      return cover(goto_functions, criteria)?
         safety_checkert::ERROR:safety_checkert::SAFE;
     }
 

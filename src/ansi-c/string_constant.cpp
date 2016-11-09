@@ -148,8 +148,8 @@ bool string_constantt::from_array_expr(const array_exprt &src)
   {
     mp_integer int_value=0;
     if(to_integer(*it, int_value)) return true;
-    unsigned long unsigned_long_value=integer2ulong(int_value);
-    value+=(char)unsigned_long_value;
+    unsigned unsigned_value=integer2unsigned(int_value);
+    value+=(char)unsigned_value;
   }
   
   // Drop the implicit zero at the end.

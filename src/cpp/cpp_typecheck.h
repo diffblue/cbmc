@@ -321,33 +321,33 @@ protected:
   void do_virtual_table(const symbolt& symbol);
 
   // we need to be able to delay the typechecking
-  // of function bodies to handle methods with
+  // of method bodies to handle methods with
   // bodies in the class definition
-  struct function_bodyt
+  struct method_bodyt
   {
   public:
-    function_bodyt(
-      symbolt *_function_symbol,
+    method_bodyt(
+      symbolt *_method_symbol,
       const template_mapt &_template_map,
       const instantiation_stackt &_instantiation_stack):
-      function_symbol(_function_symbol),
+      method_symbol(_method_symbol),
       template_map(_template_map),
       instantiation_stack(_instantiation_stack)
     {
     }
     
-    symbolt *function_symbol;
+    symbolt *method_symbol;
     template_mapt template_map;
     instantiation_stackt instantiation_stack;
   };
   
-  typedef std::list<function_bodyt> function_bodiest;
-  function_bodiest function_bodies;
+  typedef std::list<method_bodyt> method_bodiest;
+  method_bodiest method_bodies;
   
-  void add_function_body(symbolt *_function_symbol)
+  void add_method_body(symbolt *_method_symbol)
   {
-    function_bodies.push_back(function_bodyt(
-      _function_symbol, template_map, instantiation_stack));
+    method_bodies.push_back(method_bodyt(
+      _method_symbol, template_map, instantiation_stack));
   }
 
   // types
@@ -386,7 +386,7 @@ protected:
   void typecheck_compound_body(symbolt &symbol);
   void typecheck_compound_body(struct_union_typet &type) { assert(false); };
   void typecheck_enum_body(symbolt &symbol);
-  void typecheck_function_bodies();
+  void typecheck_method_bodies(method_bodiest &);
   void typecheck_compound_bases(struct_typet &type);
   void add_anonymous_members_to_scope(const symbolt &struct_union_symbol);
 

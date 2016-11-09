@@ -1,3 +1,5 @@
+#include <assert.h>
+
 struct inner_struct {
   char *GUARDp;
 };

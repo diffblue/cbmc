@@ -89,13 +89,15 @@ protected:
   void do_conversion();
   
   virtual void show_vcc();
+  virtual void show_vcc_plain(std::ostream &out);
+  virtual void show_vcc_json(std::ostream &out);
+
   virtual resultt all_properties(
     const goto_functionst &goto_functions,
     prop_convt &solver);
   virtual resultt stop_on_fail(
     const goto_functionst &goto_functions,
     prop_convt &solver);
-  virtual void show_vcc(std::ostream &out);
   virtual void show_program();
   virtual void report_success();
   virtual void report_failure();
@@ -104,7 +106,7 @@ protected:
   
   bool cover(
     const goto_functionst &goto_functions,
-    const std::string &criterion);
+    const optionst::value_listt &criteria);
 
   friend class bmc_all_propertiest;
   friend class bmc_covert;

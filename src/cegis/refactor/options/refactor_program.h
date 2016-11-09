@@ -30,9 +30,16 @@ public:
   /**
    * @brief
    *
+   * @details
+   */
+  typedef std::map<const irep_idt, goto_programt::targetst> counterexample_locationst;
+
+  /**
+   * @brief
+   *
    * @details All variable locations to be considered in counterexamples (including loop bodies).
    */
-  goto_programt::targetst counterexample_locations;
+  counterexample_locationst counterexample_locations;
 
   /**
    * @brief
@@ -46,8 +53,8 @@ public:
     goto_ranget input_range;
     goto_ranget spec_range;
     std::set<irep_idt> state_vars;
-    std::set<typet> types;
-    std::string processor_function;
+    typedef std::set<typet> typest;
+    typest types;
   };
 
   /**
@@ -55,7 +62,21 @@ public:
    *
    * @details
    */
-  std::deque<sketcht> sketches;
+  typedef std::deque<sketcht> sketchest;
+
+  /**
+   * @brief
+   *
+   * @details
+   */
+  sketchest sketches;
+
+  /**
+   * @brief
+   *
+   * @details
+   */
+  std::set<irep_idt> programs;
 
   /**
    * @brief

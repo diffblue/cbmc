@@ -14,6 +14,40 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
+Function: cpp_typecheckt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cpp_typecheckt::convert(cpp_declarationt &declaration)
+{
+  // see if the declaration is empty
+  if(declaration.is_empty()) return;
+
+  // Record the function bodies so we can check them later.
+  // This function is used recursively, so we save them.
+  method_bodiest old_method_bodies;
+  old_method_bodies.swap(method_bodies);
+
+  // templates are done in a dedicated function
+  if(declaration.is_template())
+    convert_template_declaration(declaration);
+  else
+    convert_non_template_declaration(declaration);
+
+  method_bodiest b;
+  b.swap(method_bodies);
+  typecheck_method_bodies(b);
+  method_bodies.swap(old_method_bodies);
+}
+
+/*******************************************************************\
+
 Function: cpp_typecheckt::convert_anonymous_union
 
   Inputs:
@@ -100,40 +134,6 @@ void cpp_typecheckt::convert_anonymous_union(
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void cpp_typecheckt::convert(cpp_declarationt &declaration)
-{
-  // see if the declaration is empty
-  if(declaration.find(ID_type).is_nil() &&
-     !declaration.has_operands())
-    return;
-
-  // Record the function bodies so we can check them later.
-  // This function is used recursively, so we save them.
-  function_bodiest old_function_bodies=function_bodies;
-  function_bodies.clear();
-
-  // templates are done in a dedicated function
-  if(declaration.is_template())
-    convert_template_declaration(declaration);
-  else
-    convert_non_template_declaration(declaration);
-
-  typecheck_function_bodies();
-  function_bodies=old_function_bodies;
-}
-
-/*******************************************************************\
-
 Function: cpp_typecheckt::convert_non_template_declaration
 
   Inputs:
@@ -153,7 +153,10 @@ void cpp_typecheckt::convert_non_template_declaration(
   typet &declaration_type=declaration.type();
   bool is_typedef=declaration.is_typedef();
 
+  // the name anonymous tag types
   declaration.name_anon_struct_union();
+  
+  // do the type of the declaration
   typecheck_type(declaration_type);
   
   // Elaborate any class template instance _unless_ we do a typedef.
@@ -180,11 +183,11 @@ void cpp_typecheckt::convert_non_template_declaration(
   }
 
   // do the declarators (optional)
-  Forall_cpp_declarators(it, declaration)
+  for(auto & it : declaration.declarators())
   {
     // copy the declarator (we destroy the original)
-    cpp_declaratort declarator=*it;
-
+    cpp_declaratort declarator=it;
+    
     cpp_declarator_convertert cpp_declarator_converter(*this);
 
     cpp_declarator_converter.is_typedef=is_typedef;
@@ -202,7 +205,7 @@ void cpp_typecheckt::convert_non_template_declaration(
 
     // replace declarator by symbol expression
     exprt tmp=cpp_symbol_expr(symbol);
-    it->swap(tmp);
+    it.swap(tmp);
 
     // is there a constructor to be called for the declarator?
     if(symbol.is_lvalue &&

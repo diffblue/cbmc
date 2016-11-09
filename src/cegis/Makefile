@@ -55,13 +55,16 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       control/value/float_helper.cpp control/value/control_types.cpp \
       refactor/environment/instrument_state_vars.cpp \
       refactor/instructionset/create_cegis_processor.cpp refactor/instructionset/execute_cegis_program.cpp \
-      refactor/instructionset/processor_types.cpp \
-      refactor/preprocessing/refactor_preprocessing.cpp \
+      refactor/instructionset/processor_types.cpp refactor/instructionset/cegis_processor_body_factory.cpp \
+      refactor/instructionset/instruction_description.cpp refactor/instructionset/cegis_instruction_factory.cpp \
+      refactor/instructionset/processor_symbols.cpp \
+      refactor/constraint/constraint_factory.cpp \
+      refactor/preprocessing/refactor_preprocessing.cpp refactor/preprocessing/collect_counterexamples.cpp \
       refactor/learn/refactor_symex_learn.cpp \
       refactor/verify/refactor_symex_verify.cpp \
       refactor/facade/refactor_runner.cpp \
-      refactor/options/refactoring_type.cpp refactor/options/refactor_program.cpp refactor/value/refactor_solution.cpp \
-      refactor/nullobject/range_collector.cpp \
+      refactor/options/refactoring_type.cpp refactor/options/refactor_program.cpp \
+      refactor/nullobject/range_collector.cpp refactor/nullobject/nullable_analysis.cpp \
       wordsize/restrict_bv_size.cpp value/program_individual_serialisation.cpp value/assignments_printer.cpp \
       seed/literals_seed.cpp \
       genetic/instruction_set_info_factory.cpp genetic/random_mutate.cpp genetic/random_cross.cpp \
@@ -76,10 +79,9 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       constant/add_constant.cpp constant/literals_collector.cpp constant/default_cegis_constant_strategy.cpp \
       instrument/cegis_library.cpp instrument/instrument_var_ops.cpp instrument/meta_variables.cpp \
       instrument/find_cprover_initialize.cpp \
-      runner/cegis_parse_options.cpp runner/cegis_main.cpp
+      runner/cegis_parse_options.cpp runner/cegis_main.cpp runner/cegis_languages.cpp
  
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
-      ../jsil/jsil$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
       ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
@@ -107,7 +109,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cbmc/cbmc_parse_options$(OBJEXT) ../cbmc/bmc$(OBJEXT) ../cbmc/cbmc_solvers$(OBJEXT) \
       ../cbmc/symex_bmc$(OBJEXT) ../cbmc/xml_interface$(OBJEXT) ../cbmc/bmc_cover$(OBJEXT) \
       ../cbmc/bv_cbmc$(OBJEXT) ../cbmc/counterexample_beautification$(OBJEXT) \
-      ../cbmc/cbmc_languages$(OBJEXT) ../cbmc/show_vcc$(OBJEXT) \
+      ../cbmc/show_vcc$(OBJEXT) \
       ../cbmc/cbmc_dimacs$(OBJEXT) ../cbmc/all_properties$(OBJEXT) \
       ../cbmc/fault_localization$(OBJEXT)
 

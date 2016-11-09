@@ -10,7 +10,7 @@ SRC = cpp_id.cpp cpp_language.cpp expr2cpp.cpp cpp_parser.cpp \
       cpp_scopes.cpp cpp_declarator.cpp cpp_instantiate_template.cpp \
       cpp_internal_additions.cpp cpp_type2name.cpp \
       cpp_typecheck_linkage_spec.cpp \
-      cpp_typecheck_template.cpp cpp_typecheck_function_bodies.cpp \
+      cpp_typecheck_template.cpp cpp_typecheck_method_bodies.cpp \
       cpp_typecheck_initializer.cpp cpp_typecheck_compound_type.cpp \
       cpp_constructor.cpp cpp_destructor.cpp \
       cpp_typecheck_conversions.cpp\

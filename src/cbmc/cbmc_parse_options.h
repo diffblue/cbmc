@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_PARSEOPTIONS_H
-#define CPROVER_CBMC_PARSEOPTIONS_H
+#ifndef CPROVER_CBMC_PARSE_OPTIONS_H
+#define CPROVER_CBMC_PARSE_OPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
@@ -44,6 +44,7 @@ class optionst;
   "(show-claims)(claim):(show-properties)(show-reachable-properties)(property):" \
   "(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
+  "(nondet-static)" \
   "(version)" \
   "(cover):" \
   "(mm):" \

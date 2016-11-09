@@ -11,11 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "message_stream.h"
 
-class legacy_typecheckt:public message_streamt
+class legacy_typecheckt:public legacy_message_streamt
 {
 public:
   legacy_typecheckt(message_handlert &_message_handler):
-    message_streamt(_message_handler) { }
+    legacy_message_streamt(_message_handler) { }
   virtual ~legacy_typecheckt() { }
   
 protected:

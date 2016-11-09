@@ -32,72 +32,48 @@ std::set<typet> collect_context_types(const goto_ranget &range);
  * @brief
  *
  * @details
- *
- * @param st
- * @param state_vars
- *
- * @return
- */
-std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
-    const std::set<irep_idt> &state_vars);
-
-/**
- * @brief
- *
- * @details
  * @code
  * execute_next_instr:
- * int opcode=program[i].opcode;
- * int op0=program[i].op0;
- * int op1=program[i].op1;
- * int result_op=program[i].result_op;
+ * #define program[i].opcode opcode
+ * #define program[i].op0 op0
+ * #define program[i].op1 op1
+ * #define program[i].op2 op2
  *
- * int op0_int;
- * int op1_int;
- * int result_int;
- * double op0_double;
- * double op1_double;
- * double result_double;
- *
- * switch(instr_code)
+ * if (instr_code < 2)
  * {
- *   case 0:
- *   case 1:
- *     op0_int=*__CPROVER_cegis_variable_array_int[op0];
- *     op1_int=*__CPROVER_cegis_variable_array_int[op1];
- *     break;
- *   case 2:
- *   case 3:
- *     op0_double=*__CPROVER_cegis_variable_array_double[op0];
- *     op1_double=*__CPROVER_cegis_variable_array_double[op1];
- *     break;
+ *   __CPROVER_assume(op0 < __CPROVER_cegis_variable_array_int_size);
+ *   __CPROVER_assume(op1 < __CPROVER_cegis_variable_array_int_size);
+ *   __CPROVER_assume(op2 < __CPROVER_cegis_variable_array_int_size);
+ * } else if (instr_code < 4)
+ * {
+ *   __CPROVER_assume(op0 < __CPROVER_cegis_variable_array_double_size);
+ *   __CPROVER_assume(op1 < __CPROVER_cegis_variable_array_double_size);
+ *   __CPROVER_assume(op2 < __CPROVER_cegis_variable_array_double_size);
+ * } else if (instr_code < 5)
+ * {
+ *   __CPROVER_assume(op0 < __CPROVER_cegis_variable_array_iobject_size);
+ *   __CPROVER_assume(op1 < __CPROVER_cegis_variable_array_double_size);
  * }
  *
  * switch(instr_code)
  * {
  *   case 0:
- *     result_int=op0_int + op1_int;
+ *     *__CPROVER_cegis_variable_array_int[op0]=*__CPROVER_cegis_variable_array_int[op1] + *__CPROVER_cegis_variable_array_int[op2];
  *     break;
  *   case 1:
- *     result_int=op0_int - op1_int;
+ *     *__CPROVER_cegis_variable_array_int[op0]=*__CPROVER_cegis_variable_array_int[op1] - *__CPROVER_cegis_variable_array_int[op2];
  *     break;
  *   case 2:
- *     result_double=op0_double + op1_double;
+ *     *__CPROVER_cegis_variable_array_double[op0]=*__CPROVER_cegis_variable_array_double[op1] + *__CPROVER_cegis_variable_array_double[op2];
  *     break;
  *   case 3:
- *     result_double=op0_double - op1_double;
+ *     *__CPROVER_cegis_variable_array_double[op0]=*__CPROVER_cegis_variable_array_double[op1] - *__CPROVER_cegis_variable_array_double[op2];
  *     break;
- * }
- *
- * switch(instr_code)
- * {
- *   case 0:
- *   case 1:
- *     *__CPROVER_cegis_variable_array_int[rop]=result_int;
+ *   case 4:
+ *     *__CPROVER_cegis_variable_array_double[op0]=(*__CPROVER_cegis_variable_array_iobject[op1]).someMethod(*__CPROVER_cegis_variable_array_int[op2]);
  *     break;
- *   case 2:
- *   case 3:
- *     *__CPROVER_cegis_variable_array_double[rop]=result_double;
+ *   case 5:
+ *     (*__CPROVER_cegis_variable_array_iobject[op0]).someOtherMethod(*__CPROVER_cegis_variable_array_double[op1]);
  *     break;
  * }
  * @endcode

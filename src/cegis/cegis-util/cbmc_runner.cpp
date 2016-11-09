@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <functional>
+
 #include <util/config.h>
 #include <util/substitute.h>
 
@@ -10,6 +13,12 @@
 #include <cegis/options/parameters.h>
 #include <cegis/cegis-util/temporary_output_block.h>
 #include <cegis/cegis-util/cbmc_runner.h>
+
+// XXX: Debug
+#include <iostream>
+// XXX: Debug
+
+#define ARGV_MAX_SIZE 5u
 
 namespace
 {
@@ -33,14 +42,48 @@ std::string get_next_goto_file_name()
   return get_goto_file_name(index);
 }
 
-const char * ARGV[]= { "cbmc", "--stop-on-fail" };
-const char * GCC_ARGV[]= { "cbmc", "--stop-on-fail", "-gcc" };
+bool is_gcc()
+{
+  return configt::ansi_ct::flavourt::GCC == config.ansi_c.mode;
+}
 
-bool is_gcc() { return configt::ansi_ct::flavourt::GCC == config.ansi_c.mode; }
-int get_argc() { return is_gcc() ? 3 : 2; }
-const char ** get_argv() { return is_gcc() ? GCC_ARGV : ARGV; }
+std::vector<std::string> get_args()
+{
+  std::vector<std::string> result= { "cbmc", "--stop-on-fail" };
+  if (is_gcc()) result.push_back("--gcc");
+  return result;
+}
 
-class cbmc_runnert: public cbmc_parse_optionst
+std::vector<const char *> get_argv(const std::vector<std::string> &args)
+{
+  std::vector<const char *> result;
+  std::transform(args.begin(), args.end(), std::back_inserter(result),
+      std::mem_fun_ref(&std::string::c_str));
+  return result;
+}
+
+class args_providert
+{
+  const std::vector<std::string> args;
+  std::vector<const char *> arg_ref;
+public:
+  args_providert() :
+      args(get_args()), arg_ref(get_argv(args))
+  {
+  }
+
+  int argc()
+  {
+    return arg_ref.size();
+  }
+
+  const char * *argv()
+  {
+    return arg_ref.data();
+  }
+};
+
+class cbmc_runnert: public args_providert, public cbmc_parse_optionst
 {
   const symbol_tablet &st;
   const goto_functionst &gf;
@@ -49,30 +92,24 @@ class cbmc_runnert: public cbmc_parse_optionst
   const bool keep_goto_programs;
 
 public:
-  cbmc_runnert(
-    const symbol_tablet &st,
-    const goto_functionst &gf,
-    cbmc_resultt &result,
-    const bool keep_goto_programs) :
-    cbmc_parse_optionst(get_argc(), get_argv()), st(st), gf(gf), result(
-          result), bmc_result(safety_checkert::UNSAFE), keep_goto_programs(
-          keep_goto_programs)
+  cbmc_runnert(const symbol_tablet &st, const goto_functionst &gf,
+      cbmc_resultt &result, const bool keep_goto_programs) :
+      cbmc_parse_optionst(argc(), argv()), st(st), gf(gf), result(result), bmc_result(
+          safety_checkert::UNSAFE), keep_goto_programs(keep_goto_programs)
   {
   }
 
   virtual ~cbmc_runnert()=default;
 
-  virtual int get_goto_program(
-    const optionst &options,
-    bmct &bmc,
-    goto_functionst &goto_functions)
+  virtual int get_goto_program(const optionst &options, bmct &bmc,
+      goto_functionst &goto_functions)
   {
     symbol_table.clear();
     symbol_table=st;
     goto_functions.clear();
     goto_functions.copy_from(gf);
-    if(process_goto_program(options, goto_functions)) return 6;
-    if(keep_goto_programs)
+    if (process_goto_program(options, goto_functions)) return 6;
+    if (keep_goto_programs)
     {
       const std::string path(get_next_goto_file_name());
       message_handlert &msg=get_message_handler();
@@ -101,11 +138,9 @@ public:
 };
 }
 
-safety_checkert::resultt run_cbmc(
-  const symbol_tablet &st,
-  const goto_functionst &gf,
-  cbmc_resultt &cbmc_result,
-  const bool keep_goto_programs)
+safety_checkert::resultt run_cbmc(const symbol_tablet &st,
+    const goto_functionst &gf, cbmc_resultt &cbmc_result,
+    const bool keep_goto_programs)
 {
   const temporary_output_blockt disable_output;
   cbmc_runnert runner(st, gf, cbmc_result, keep_goto_programs);
@@ -116,11 +151,9 @@ safety_checkert::resultt run_cbmc(
   return runner.get_bmc_result();
 }
 
-safety_checkert::resultt run_cbmc(
-  const symbol_tablet &st,
-  const goto_functionst &gf,
-  cbmc_resultt &cbmc_result,
-  const optionst &o)
+safety_checkert::resultt run_cbmc(const symbol_tablet &st,
+    const goto_functionst &gf, cbmc_resultt &cbmc_result, const optionst &o)
 {
-  return run_cbmc(st, gf, cbmc_result, o.get_bool_option(CEGIS_KEEP_GOTO_PROGRAMS));
+  return run_cbmc(st, gf, cbmc_result,
+      o.get_bool_option(CEGIS_KEEP_GOTO_PROGRAMS));
 }

@@ -25,7 +25,7 @@ bvt boolbvt::convert_if(const if_exprt &expr)
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
-    return conversion_failed(expr);
+    return bvt(); // An empty bit-vector if.
 
   literalt cond=convert(expr.cond());
   

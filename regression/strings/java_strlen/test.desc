@@ -1,0 +1,8 @@
+CORE
+test_length.class
+--pass
+^EXIT=10$
+^SIGNAL=0$
+^\[assertion.1\] assertion at file test_length.java line 10: SUCCESS$
+^\[assertion.2\] assertion at file test_length.java line 11: FAILURE$
+--

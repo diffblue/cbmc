@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^\*\* Results:$
+^\[main.assertion.1\] forall a\[\]: SUCCESS$
+^\[main.assertion.2\] assertion a\[(signed long int)9\] > a\[(signed long int)1\]: SUCCESS$
+^\[main.assertion.3\] assertion a\[(signed long int)2\] > a\[(signed long int)3\]: FAILURE$
+^\[main.assertion.4\] forall c\[\]: SUCCESS$
+^\[main.assertion.5\] assertion c\[(signed long int)3\] >= c\[(signed long int)1\]: SUCCESS$
+
+^\*\* 1 of 5 failed (2 iterations)$
+^VERIFICATION FAILED$

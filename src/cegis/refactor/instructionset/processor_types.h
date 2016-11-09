@@ -39,4 +39,15 @@ typet cegis_operand_type();
  */
 typet cegis_size_type();
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param type
+ *
+ * @return
+ */
+bool is_cegis_primitive(const typet &type);
+
 #endif /* CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_TYPES_H_ */

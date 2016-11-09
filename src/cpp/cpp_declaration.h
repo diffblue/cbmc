@@ -26,6 +26,11 @@ public:
   {
   }
   
+  inline bool is_empty() const
+  {
+    return type().is_nil() && !has_operands();
+  }
+
   inline bool is_constructor() const
   {
     return type().id()==ID_constructor;

@@ -152,7 +152,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-vcc", true);
 
   if(cmdline.isset("cover"))
-    options.set_option("cover", cmdline.get_value("cover"));
+    options.set_option("cover", cmdline.get_values("cover"));
 
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
@@ -948,34 +948,45 @@ bool cbmc_parse_optionst::process_goto_program(
     
     if(cmdline.isset("cover"))
     {
-      std::string criterion=cmdline.get_value("cover");
-      
-      coverage_criteriont c;
+      std::list<std::string> criteria_strings=
+        cmdline.get_values("cover");
+     
+      std::set<coverage_criteriont> criteria;
+     
+      for(const auto & criterion_string : criteria_strings)
+      { 
+        coverage_criteriont c;
 
-      if(criterion=="assertion" || criterion=="assertions")
-        c=coverage_criteriont::ASSERTION;
-      else if(criterion=="path" || criterion=="paths")
-        c=coverage_criteriont::PATH;
-      else if(criterion=="branch" || criterion=="branches")
-        c=coverage_criteriont::BRANCH;
-      else if(criterion=="location" || criterion=="locations")
-        c=coverage_criteriont::LOCATION;
-      else if(criterion=="decision" || criterion=="decisions")
-        c=coverage_criteriont::DECISION;
-      else if(criterion=="condition" || criterion=="conditions")
-        c=coverage_criteriont::CONDITION;
-      else if(criterion=="mcdc")
-        c=coverage_criteriont::MCDC;
-      else if(criterion=="cover")
-        c=coverage_criteriont::COVER;
-      else
-      {
-        error() << "unknown coverage criterion" << eom;
-        return true;
+        if(criterion_string=="assertion" || criterion_string=="assertions")
+          c=coverage_criteriont::ASSERTION;
+        else if(criterion_string=="path" || criterion_string=="paths")
+          c=coverage_criteriont::PATH;
+        else if(criterion_string=="branch" || criterion_string=="branches")
+          c=coverage_criteriont::BRANCH;
+        else if(criterion_string=="location" || criterion_string=="locations")
+          c=coverage_criteriont::LOCATION;
+        else if(criterion_string=="decision" || criterion_string=="decisions")
+          c=coverage_criteriont::DECISION;
+        else if(criterion_string=="condition" || criterion_string=="conditions") 
+          c=coverage_criteriont::CONDITION;
+        else if(criterion_string=="mcdc")
+          c=coverage_criteriont::MCDC;
+        else if(criterion_string=="cover")
+          c=coverage_criteriont::COVER;
+        else
+        {
+          error() << "unknown coverage criterion" << eom;
+          return true;
+        }
+        
+        criteria.insert(c);
       }
-          
+
       status() << "Instrumenting coverage goals" << eom;
-      instrument_cover_goals(symbol_table, goto_functions, c);
+
+      for(const auto & criterion : criteria)
+        instrument_cover_goals(symbol_table, goto_functions, criterion);
+
       goto_functions.update();
     }
 
