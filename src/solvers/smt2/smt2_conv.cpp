@@ -763,7 +763,7 @@ void smt2_convt::convert_byte_update(const byte_update_exprt &expr)
 
   mp_integer i;
   if(to_integer(expr.op1(), i))
-    INVALIDEXPR("byte_extract takes constant as second parameter");
+    INVALIDEXPR("byte_update takes constant as second parameter");
 
   std::size_t total_width=boolbv_width(expr.op().type());
   std::size_t value_width=boolbv_width(expr.value().type());
