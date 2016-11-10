@@ -2562,6 +2562,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_sign(expr) && result;
   else if(expr.id()==ID_popcount)
     result=simplify_popcount(expr) && result;
+  else if(expr.id()==ID_forall or expr.id()==ID_exists)
+    result=simplify_quantifier(expr) && result;
 
   #ifdef DEBUGX
   if(!result

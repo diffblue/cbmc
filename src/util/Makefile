@@ -8,6 +8,7 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       simplify_expr.cpp simplify_expr_floatbv.cpp simplify_expr_int.cpp \
       simplify_expr_array.cpp simplify_expr_struct.cpp \
       simplify_expr_boolean.cpp simplify_expr_pointer.cpp \
+      simplify_expr_quantifier.cpp \
       get_module.cpp string_hash.cpp string_container.cpp identifier.cpp \
       rational.cpp options.cpp c_misc.cpp dstring.cpp \
       find_symbols.cpp rational_tools.cpp ui_message.cpp simplify_utils.cpp \

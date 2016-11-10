@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^\*\* Results:$
+^\[main.assertion.1\] forall a\[\]: SUCCESS$
+^\[main.assertion.2\] 1st exists b\[\]: SUCCESS$
+^\[main.assertion.3\] 2nd exists b\[\]: SUCCESS$
+^\[main.assertion.4\] 1st forall c\[\]: SUCCESS$
+^\[main.assertion.5\] 2nd forall c\[\]: FAILURE$
+^\[main.assertion.6\] exists d\[\]: SUCCESS$
+
+^\*\* 1 of 6 failed (2 iterations)$
+^VERIFICATION FAILED$
