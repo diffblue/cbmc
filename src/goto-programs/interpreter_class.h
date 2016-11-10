@@ -1,3 +1,6 @@
+#ifndef INTERPRETER_CLASSH
+#define INTERPRETER_CLASSH
+
 #include <stack>
 
 #include <util/arith_tools.h>
@@ -206,3 +209,5 @@ public:
   const input_var_functionst& get_input_first_assignments() { return input_first_assignments; }
   const dynamic_typest& get_dynamic_types() { return dynamic_types; }
 };
+
+#endif

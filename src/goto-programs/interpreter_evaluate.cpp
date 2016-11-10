@@ -959,6 +959,14 @@ void interpretert::evaluate(
     dest.push_back(0);
     return;
   }
+  else if(expr.id()==ID_infinity)
+  {
+    if(expr.type().id()==ID_signedbv)
+    {
+      message->error() << "Infinite size arrays not supported" << messaget::eom;
+      return;
+    }
+  }
 //  if (!show) return;
   message->error() << "!! failed to evaluate expression: "
             << from_expr(ns, function->first, expr)
