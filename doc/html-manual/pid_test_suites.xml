@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cprover>
+<program>CBMC 5.5</program>
+<message type="STATUS-MESSAGE">
+  <text>CBMC version 5.5 64-bit x86_64 macos</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Parsing pid.c</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Converting</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Type-checking pid</text>
+</message>
+
+<message type="WARNING">
+  <location file="pid.c" function="main" line="59"/>
+  <text>function `nondet_float' is not declared</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Generating GOTO Program</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Adding CPROVER library (x86_64)</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Removal of function pointers and virtual functions</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Partial Inlining</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Generic Property Instrumentation</text>
+</message>
+
+criterion: mcdc
+
+<message type="STATUS-MESSAGE">
+  <text>Instrumenting coverage goals</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Starting Bounded Model Checking</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Unwinding loop main.0 iteration 1 (6 max) file pid.c line 56 function main thread 0</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Unwinding loop main.0 iteration 2 (6 max) file pid.c line 56 function main thread 0</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Unwinding loop main.0 iteration 3 (6 max) file pid.c line 56 function main thread 0</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Unwinding loop main.0 iteration 4 (6 max) file pid.c line 56 function main thread 0</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Unwinding loop main.0 iteration 5 (6 max) file pid.c line 56 function main thread 0</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Not unwinding loop main.0 iteration 6 (6 max) file pid.c line 56 function main thread 0</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>size of program expression: 416 steps</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Generated 114 VCC(s), 108 remaining after simplification</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Passing problem to propositional reduction</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>converting SSA</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Aiming to cover 19 goal(s)</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Running propositional reduction</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Post-processing</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Solving with MiniSAT 2.2.1 with simplifier</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>131818 variables, 553801 clauses</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>SAT checker: instance is SATISFIABLE</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision/condition `1 != 0' true</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Solving with MiniSAT 2.2.1 with simplifier</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>131818 variables, 395675 clauses</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>SAT checker: instance is SATISFIABLE</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered MC/DC independence condition `!(pprz &gt;= (float)0) &amp;&amp; pprz &lt;= (float)(16 * 600)'</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision `pprz &gt;= (float)0 &amp;&amp; pprz &lt;= (float)(16 * 600)' false</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered condition `pprz &gt;= (float)0' false</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision/condition `pprz &gt; (float)(16 * 600)' false</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered condition `pprz &lt;= (float)(16 * 600)' true</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision/condition `desired_climb &gt; (float)0' false</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision/condition `climb_sum_err &gt; (float)10' false</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision/condition `climb_sum_err &lt; (float)-10' false</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Solving with MiniSAT 2.2.1 with simplifier</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>131818 variables, 393279 clauses</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>SAT checker: instance is SATISFIABLE</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered MC/DC independence condition `pprz &gt;= (float)0 &amp;&amp; !(pprz &lt;= (float)(16 * 600))'</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered condition `pprz &gt;= (float)0' true</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision/condition `pprz &gt; (float)(16 * 600)' true</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered condition `pprz &lt;= (float)(16 * 600)' false</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision/condition `desired_climb &gt; (float)0' true</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Solving with MiniSAT 2.2.1 with simplifier</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>131818 variables, 391285 clauses</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>SAT checker: instance is SATISFIABLE</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered MC/DC independence condition `pprz &gt;= (float)0 &amp;&amp; pprz &lt;= (float)(16 * 600)'</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision `pprz &gt;= (float)0 &amp;&amp; pprz &lt;= (float)(16 * 600)' true</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Solving with MiniSAT 2.2.1 with simplifier</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>131818 variables, 390122 clauses</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>SAT checker: instance is SATISFIABLE</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision/condition `climb_sum_err &lt; (float)-10' true</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Solving with MiniSAT 2.2.1 with simplifier</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>131818 variables, 390121 clauses</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>SAT checker: instance is SATISFIABLE</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Covered decision/condition `climb_sum_err &gt; (float)10' true</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Solving with MiniSAT 2.2.1 with simplifier</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>131818 variables, 387493 clauses</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>SAT checker inconsistent: instance is UNSATISFIABLE</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>Runtime decision procedure: 3.806s</text>
+</message>
+
+<goal description="decision/condition `1 != 0' false" id="main.coverage.1" status="FAILED">
+  <location file="pid.c" function="main" line="56"/>
+</goal>
+
+<goal description="decision/condition `1 != 0' true" id="main.coverage.2" status="SATISFIED">
+  <location file="pid.c" function="main" line="56"/>
+</goal>
+
+<goal description="MC/DC independence condition `!(pprz &gt;= (float)0) &amp;&amp; pprz &lt;= (float)(16 * 600)'" id="climb_pid_run.coverage.1" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="MC/DC independence condition `pprz &gt;= (float)0 &amp;&amp; !(pprz &lt;= (float)(16 * 600))'" id="climb_pid_run.coverage.2" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="MC/DC independence condition `pprz &gt;= (float)0 &amp;&amp; pprz &lt;= (float)(16 * 600)'" id="climb_pid_run.coverage.3" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="decision `pprz &gt;= (float)0 &amp;&amp; pprz &lt;= (float)(16 * 600)' false" id="climb_pid_run.coverage.4" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="decision `pprz &gt;= (float)0 &amp;&amp; pprz &lt;= (float)(16 * 600)' true" id="climb_pid_run.coverage.5" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="condition `pprz &gt;= (float)0' false" id="climb_pid_run.coverage.6" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="condition `pprz &gt;= (float)0' true" id="climb_pid_run.coverage.7" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="decision/condition `pprz &gt; (float)(16 * 600)' false" id="climb_pid_run.coverage.8" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="decision/condition `pprz &gt; (float)(16 * 600)' true" id="climb_pid_run.coverage.9" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="condition `pprz &lt;= (float)(16 * 600)' false" id="climb_pid_run.coverage.10" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="condition `pprz &lt;= (float)(16 * 600)' true" id="climb_pid_run.coverage.11" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="41"/>
+</goal>
+
+<goal description="decision/condition `desired_climb &gt; (float)0' false" id="climb_pid_run.coverage.12" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="44"/>
+</goal>
+
+<goal description="decision/condition `desired_climb &gt; (float)0' true" id="climb_pid_run.coverage.13" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="44"/>
+</goal>
+
+<goal description="decision/condition `climb_sum_err &gt; (float)10' false" id="climb_pid_run.coverage.14" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="48"/>
+</goal>
+
+<goal description="decision/condition `climb_sum_err &gt; (float)10' true" id="climb_pid_run.coverage.15" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="48"/>
+</goal>
+
+<goal description="decision/condition `climb_sum_err &lt; (float)-10' false" id="climb_pid_run.coverage.16" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="49"/>
+</goal>
+
+<goal description="decision/condition `climb_sum_err &lt; (float)-10' true" id="climb_pid_run.coverage.17" status="SATISFIED">
+  <location file="pid.c" function="climb_pid_run" line="49"/>
+</goal>
+
+<test>
+  <inputs/>
+  <goal id="main.coverage.2"/>
+</test>
+
+<test>
+  <inputs>
+    <input id="desired_climb">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+  </inputs>
+  <goal id="climb_pid_run.coverage.1"/>
+  <goal id="climb_pid_run.coverage.4"/>
+  <goal id="climb_pid_run.coverage.6"/>
+  <goal id="climb_pid_run.coverage.8"/>
+  <goal id="climb_pid_run.coverage.11"/>
+  <goal id="climb_pid_run.coverage.12"/>
+  <goal id="climb_pid_run.coverage.14"/>
+  <goal id="climb_pid_run.coverage.16"/>
+</test>
+
+<test>
+  <inputs>
+    <input id="desired_climb">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+  </inputs>
+  <goal id="climb_pid_run.coverage.2"/>
+  <goal id="climb_pid_run.coverage.7"/>
+  <goal id="climb_pid_run.coverage.9"/>
+  <goal id="climb_pid_run.coverage.10"/>
+  <goal id="climb_pid_run.coverage.13"/>
+</test>
+
+<test>
+  <inputs>
+    <input id="desired_climb">
+      <float binary="00000000000000000000000000000000" width="32">0.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+  </inputs>
+  <goal id="climb_pid_run.coverage.3"/>
+  <goal id="climb_pid_run.coverage.5"/>
+</test>
+
+<test>
+  <inputs>
+    <input id="desired_climb">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="00000000000000000000000000000000" width="32">0.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+  </inputs>
+  <goal id="climb_pid_run.coverage.17"/>
+</test>
+
+<test>
+  <inputs>
+    <input id="desired_climb">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+    <input id="desired_climb">
+      <float binary="10111111100000000000000000000000" width="32">-1.000000</float>
+    </input>
+    <input id="estimator_z_dot">
+      <float binary="00111111100000000000000000000000" width="32">1.000000</float>
+    </input>
+  </inputs>
+  <goal id="climb_pid_run.coverage.15"/>
+</test>
+
+<message type="STATUS-MESSAGE">
+  <text>** 18 of 19 covered (94.7%)</text>
+</message>
+
+<message type="STATUS-MESSAGE">
+  <text>** Used 7 iterations</text>
+</message>
+
+</cprover>
