@@ -35,12 +35,12 @@ public:
   {
   }
   
-  virtual bool parse()
+  virtual bool parse() override
   {
     return yyansi_cparse()!=0;
   }
 
-  virtual void clear()
+  virtual void clear() override 
   {
     parsert::clear();
     parse_tree.clear();

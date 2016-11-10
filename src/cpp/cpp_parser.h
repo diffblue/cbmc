@@ -26,9 +26,9 @@ class cpp_parsert:public parsert
 public:
   cpp_parse_treet parse_tree;
 
-  virtual bool parse();
+  virtual bool parse() override;
 
-  virtual void clear()
+  virtual void clear() override
   {
     parsert::clear();
     parse_tree.clear();

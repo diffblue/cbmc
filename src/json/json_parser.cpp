@@ -36,7 +36,7 @@ bool parse_json(
   json_parser.in=&in;
   json_parser.set_message_handler(message_handler);
 
-  bool result=yyjsonparse()!=0;
+  bool result=json_parser.parse();
 
   // save result
   if(json_parser.stack.size()==1)

@@ -43,8 +43,8 @@ class goto_analyzer_parse_optionst:
   public language_uit
 {
 public:
-  virtual int doit();
-  virtual void help();
+  virtual int doit() override;
+  virtual void help() override;
 
   goto_analyzer_parse_optionst(int argc, const char **argv);
 

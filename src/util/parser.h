@@ -48,10 +48,7 @@ public:
     return true;
   }
    
-  virtual bool parse()
-  {
-    return true;
-  }
+  virtual bool parse()=0;
 
   inline bool eof()
   {
