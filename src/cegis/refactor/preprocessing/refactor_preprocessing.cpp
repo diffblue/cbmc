@@ -52,8 +52,7 @@ void refactor_preprocessingt::operator()()
       {
         const goto_programt::targett first=s.input_range.first;
         const goto_programt::targett last=s.input_range.second;
-        goto_programt &body=get_body(gf, first);
-        replace_method_call_by_processor(st, body, first, last, m, proc, prog);
+        replace_method_call_by_processor(st, gf, first, last, m, proc, prog);
       }
     }
     break;

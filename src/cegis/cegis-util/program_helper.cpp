@@ -235,17 +235,23 @@ symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
   return create_local_cegis_symbol(st, full_name, full_name, type);
 }
 
+void cegis_assign(const symbol_tablet &st, goto_programt::instructiont &instr,
+    const exprt &lhs, const exprt &rhs, const source_locationt &loc)
+{
+  instr.type=goto_program_instruction_typet::ASSIGN;
+  instr.source_location=loc;
+  const namespacet ns(st);
+  const typet &type=lhs.type();
+  if (type_eq(type, rhs.type(), ns)) instr.code=code_assignt(lhs, rhs);
+  else instr.code=code_assignt(lhs, typecast_exprt(rhs, type));
+}
+
 goto_programt::targett cegis_assign(const symbol_tablet &st,
     goto_programt &body, const goto_programt::targett &insert_after_pos,
     const exprt &lhs, const exprt &rhs, const source_locationt &loc)
 {
-  goto_programt::targett assign=body.insert_after(insert_after_pos);
-  assign->type=goto_program_instruction_typet::ASSIGN;
-  assign->source_location=loc;
-  const namespacet ns(st);
-  const typet &type=lhs.type();
-  if (type_eq(type, rhs.type(), ns)) assign->code=code_assignt(lhs, rhs);
-  else assign->code=code_assignt(lhs, typecast_exprt(rhs, type));
+  const goto_programt::targett assign=body.insert_after(insert_after_pos);
+  cegis_assign(st, *assign, lhs, rhs, loc);
   return assign;
 }
 

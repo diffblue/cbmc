@@ -10,10 +10,6 @@
 #include <cegis/refactor/instructionset/processor_symbols.h>
 #include <cegis/refactor/instructionset/execute_cegis_program.h>
 
-// XXX: Debug
-#include <iostream>
-// XXX: Debug
-
 void declare_cegis_program(symbol_tablet &st, goto_functionst &gf,
     const std::string &processor, const std::string &program_name)
 {

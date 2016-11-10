@@ -75,6 +75,21 @@ goto_programt::targett declare_local_meta_variable(symbol_tablet &st,
  * @details
  *
  * @param st
+ * @param func_name
+ * @param instr
+ * @param base_name
+ * @param type
+ */
+void declare_local_meta_variable(symbol_tablet &st,
+    const std::string &func_name, goto_programt::instructiont &instr,
+    const std::string &base_name, const typet &type);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
  * @param name
  * @param type
  */

@@ -14,10 +14,6 @@
 #include <cegis/cegis-util/temporary_output_block.h>
 #include <cegis/cegis-util/cbmc_runner.h>
 
-// XXX: Debug
-#include <iostream>
-// XXX: Debug
-
 #define ARGV_MAX_SIZE 5u
 
 namespace

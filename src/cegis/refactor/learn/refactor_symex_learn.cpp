@@ -1,4 +1,6 @@
 #include <cegis/cegis-util/counterexample_vars.h>
+#include <cegis/learn/constraint_helper.h>
+#include <cegis/refactor/learn/instrument_counterexamples.h>
 #include <cegis/refactor/learn/refactor_symex_learn.h>
 
 refactor_symex_learnt::refactor_symex_learnt(
@@ -10,8 +12,9 @@ refactor_symex_learnt::refactor_symex_learnt(
 void refactor_symex_learnt::process(const counterexamplest &counterexamples,
     const size_t max_solution_size)
 {
-  // TODO: Implement
-  assert(false);
+  current_program=original_program;
+  transform_asserts_to_assumes(current_program.gf);
+  instrument_counterexamples(current_program, counterexamples);
 }
 
 const symbol_tablet &refactor_symex_learnt::get_symbol_table() const

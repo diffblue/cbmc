@@ -14,18 +14,12 @@
 #include <cegis/learn/insert_counterexample.h>
 
 #define CE_ARRAY_PREFIX CPROVER_PREFIX "ce_array_"
-#define CE_ARRAY_INDEX CPROVER_PREFIX "ce_array_index"
 #define CE_VALUES_INDEX_PREFIX CPROVER_PREFIX "ce_values_index_"
 
-namespace
-{
-typedef std::map<const irep_idt, exprt> zero_valuest;
-
-zero_valuest get_zero_values(const symbol_tablet &st, const goto_functionst &gf,
+zero_valuest get_zero_values(const symbol_tablet &st,
     const goto_programt::targetst &ce_locs)
 {
   std::map<const irep_idt, exprt> zero_values;
-  const goto_programt::instructionst &body=get_entry_body(gf).instructions;
   const source_locationt loc(default_cegis_source_location());
   const namespacet ns(st);
   null_message_handlert msg;
@@ -39,16 +33,7 @@ zero_valuest get_zero_values(const symbol_tablet &st, const goto_functionst &gf,
   return zero_values;
 }
 
-std::set<irep_idt> get_all_keys(const zero_valuest &zv)
-{
-  std::set<irep_idt> result;
-  std::transform(zv.begin(), zv.end(), std::inserter(result, result.end()),
-      [](const zero_valuest::value_type &v)
-      { return v.first;});
-  return result;
-}
-
-void normalise(const std::set<irep_idt> ce_keys, const zero_valuest &zv,
+void normalise(const std::set<irep_idt> &ce_keys, const zero_valuest &zv,
     labelled_counterexamplest &ces)
 {
   const exprt::operandst no_values;
@@ -89,7 +74,16 @@ void normalise(const std::set<irep_idt> ce_keys, const zero_valuest &zv,
     }
 }
 
-typedef std::map<labelled_assignmentst::key_type, array_exprt> array_valuest;
+namespace
+{
+std::set<irep_idt> get_all_keys(const zero_valuest &zv)
+{
+  std::set<irep_idt> result;
+  std::transform(zv.begin(), zv.end(), std::inserter(result, result.end()),
+      [](const zero_valuest::value_type &v)
+      { return v.first;});
+  return result;
+}
 
 array_exprt to_values(const exprt::operandst &ops)
 {
@@ -100,6 +94,7 @@ array_exprt to_values(const exprt::operandst &ops)
   array_exprt result(array_type);
   copy(ops.begin(), ops.end(), std::back_inserter(result.operands()));
   return result;
+}
 }
 
 array_valuest get_array_values(const labelled_counterexamplest &ces)
@@ -123,12 +118,20 @@ array_valuest get_array_values(const labelled_counterexamplest &ces)
   return result;
 }
 
-std::string get_array_name(const irep_idt &loc_id)
+std::string get_ce_array_name(const irep_idt &loc_id)
 {
   std::string base_name(CE_ARRAY_PREFIX);
   return base_name+=id2string(loc_id);
 }
 
+std::string get_ce_value_index_name(const irep_idt &loc)
+{
+  std::string label(CE_VALUES_INDEX_PREFIX);
+  return label+=id2string(loc);
+}
+
+namespace
+{
 void add_array_declarations(symbol_tablet &st, goto_functionst &gf,
     const labelled_counterexamplest &ces, const goto_programt::targett &begin)
 {
@@ -141,23 +144,14 @@ void add_array_declarations(symbol_tablet &st, goto_functionst &gf,
   for (const labelled_counterexamplest::value_type::value_type &value : prototype)
   {
     const labelled_assignmentst::value_type::first_type loc_id=value.first;
-    const typet &org_type=value.second.front().type();
     const array_valuest::const_iterator array_val=array_values.find(loc_id);
     assert(array_values.end() != array_val);
     const array_exprt &array_expr=array_val->second;
-    const typet &array_type=array_expr.type();
-    const typet &element_type=array_type.subtype();
-    const std::string base_name(get_array_name(loc_id));
-    pos=declare_cegis_meta_variable(st, gf, pos, base_name, array_type);
+    const std::string base_name(get_ce_array_name(loc_id));
+    pos=declare_cegis_meta_variable(st, gf, pos, base_name, array_expr.type());
     assert(array_expr.operands().size() == ces.size());
-    pos=assign_cegis_meta_variable(st, gf, pos, base_name, array_val->second);
+    pos=assign_cegis_meta_variable(st, gf, pos, base_name, array_expr);
   }
-}
-
-std::string get_value_index(const irep_idt &loc)
-{
-  std::string label(CE_VALUES_INDEX_PREFIX);
-  return label+=id2string(loc);
 }
 
 void add_array_indexes(const std::set<irep_idt> &ce_keys, symbol_tablet &st,
@@ -176,7 +170,7 @@ void add_array_indexes(const std::set<irep_idt> &ce_keys, symbol_tablet &st,
   pos=cprover_init;
   for (const irep_idt &key : ce_keys)
   {
-    const std::string label(get_value_index(key));
+    const std::string label(get_ce_value_index_name(key));
     pos=declare_cegis_meta_variable(st, gf, pos, label, type);
     pos=assign_cegis_meta_variable(st, gf, pos, label, zero);
   }
@@ -218,10 +212,10 @@ const index_exprt get_array_val_expr(const symbol_tablet &st,
 {
   const std::string index_name(get_cegis_meta_name(CE_ARRAY_INDEX));
   const symbol_exprt index(st.lookup(index_name).symbol_expr());
-  const std::string array_name(get_cegis_meta_name(get_array_name(loc)));
+  const std::string array_name(get_cegis_meta_name(get_ce_array_name(loc)));
   const symbol_exprt array(st.lookup(array_name).symbol_expr());
   const index_exprt ce(array, index);
-  const std::string value_index(get_cegis_meta_name(get_value_index(loc)));
+  const std::string value_index(get_cegis_meta_name(get_ce_value_index_name(loc)));
   const symbol_exprt value_index_expr(st.lookup(value_index).symbol_expr());
   return index_exprt(ce, value_index_expr);
 }
@@ -247,7 +241,7 @@ void assign_ce_values(symbol_tablet &st, goto_functionst &gf,
     default:
       assert(!"Unsupported counterexample location type.");
     }
-    const std::string value_index(get_cegis_meta_name(get_value_index(label)));
+    const std::string value_index(get_cegis_meta_name(get_ce_value_index_name(label)));
     const symbol_exprt value_index_expr(st.lookup(value_index).symbol_expr());
     const plus_exprt inc(increment(value_index_expr));
     cegis_assign(st, gf, pos, value_index_expr, inc);
@@ -259,7 +253,7 @@ void insert_counterexamples(symbol_tablet &st, goto_functionst &gf,
     labelled_counterexamplest ces, const goto_programt::targetst &ce_locs)
 {
   assert(!ces.empty());
-  const zero_valuest zero_values(get_zero_values(st, gf, ce_locs));
+  const zero_valuest zero_values(get_zero_values(st, ce_locs));
   const std::set<irep_idt> ce_keys(get_all_keys(zero_values));
   normalise(ce_keys, zero_values, ces);
   goto_programt &body=get_entry_body(gf);

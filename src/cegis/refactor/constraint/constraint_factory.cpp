@@ -10,11 +10,9 @@
 #include <cegis/instrument/instrument_var_ops.h>
 #include <cegis/instrument/literals.h>
 #include <cegis/instrument/meta_variables.h>
+#include <cegis/refactor/instructionset/processor_symbols.h>
 #include <cegis/refactor/instructionset/processor_types.h>
 #include <cegis/refactor/options/refactor_program.h>
-
-#define CONSTRAINT_CALLER CONSTRAINT_CALLER_NAME ":()V"
-#define CONSTRAINT_CALLER_ID "java::" CONSTRAINT_CALLER
 
 namespace
 {
@@ -133,7 +131,7 @@ goto_programt::targett nondet_init(const symbol_tablet &st, goto_programt &body,
     goto_programt::targett pos, const irep_idt &state_var)
 {
   const symbolt &symbol=st.lookup(state_var);
-  if (!is_cegis_primitive(symbol.type)) return pos; // TODO: Allow class types
+  if (!is_cegis_primitive(symbol.type)) return pos; // TODO: Handle class types
   pos=insert_after_preserving_source_location(body, pos);
   pos->type=goto_program_instruction_typet::ASSIGN;
   const symbol_exprt lhs(symbol.symbol_expr());
@@ -169,10 +167,9 @@ goto_programt::targett create_snapshot(symbol_tablet &st, goto_programt &body,
 {
   for (const irep_idt &state_var : state_vars)
   {
-    // TODO: Clone objects
     const symbolt &symbol=st.lookup(state_var);
     const typet &type=symbol.type;
-    if (!is_cegis_primitive(type)) continue; // TODO: Handle class types
+    if (!is_cegis_primitive(type)) continue; // TODO: Handle class types (clone)
     const std::string clone_name(get_clone_name(symbol.base_name, suffix));
     pos=declare_local_meta_variable(st, func_name, body, pos, clone_name, type);
     const symbol_exprt rhs(symbol.symbol_expr());
@@ -226,7 +223,7 @@ equal_exprt equal_to_clone(const symbol_tablet &st, const irep_idt &func_name,
   return equal_exprt(lhs, rhs);
 }
 
-void insert_assertion(const symbol_tablet &st, goto_programt &body,
+void insert_assertion(/*const */symbol_tablet &st, goto_programt &body,
     const refactor_programt::sketcht &sketch)
 {
   const irep_idt &func_name=sketch.init->function;
@@ -234,6 +231,7 @@ void insert_assertion(const symbol_tablet &st, goto_programt &body,
   for (const irep_idt &var : sketch.state_vars)
   {
     if (!is_cegis_primitive(st.lookup(var).type)) continue; // TODO: Handle class types
+    if (is_refactor_meta_var(var)) continue;
     clauses.push_back(equal_to_clone(st, func_name, var));
   }
   goto_programt::targett pos=get_second_range(sketch).second;
@@ -243,31 +241,20 @@ void insert_assertion(const symbol_tablet &st, goto_programt &body,
 }
 }
 
-// XXX: Debug
-#include <iostream>
-// XXX: Debug
-
 void create_refactoring_constraint(refactor_programt &prog)
 {
-  try
+  symbol_tablet &st=prog.st;
+  goto_functionst &gf=prog.gf;
+  for (const refactor_programt::sketcht &sketch : prog.sketches)
   {
-    symbol_tablet &st=prog.st;
-    goto_functionst &gf=prog.gf;
-    for (const refactor_programt::sketcht &sketch : prog.sketches)
-    {
-      goto_programt &body=get_body(gf, sketch.init);
-      link_refactoring_ranges(body, sketch);
-      goto_programt::targett pos=havoc_inputs(st, body, sketch);
-      create_init_snapshot(st, body, sketch, pos);
-      pos=create_baseline_snapshot(st, body, sketch);
-      assign_init_snapshot(st, body, sketch, pos);
-      insert_assertion(st, body, sketch);
-      body.update();
-      body.compute_loop_numbers();
-    }
-  } catch (const std::string &ex)
-  {
-    std::cout << "<ex>" << ex << "</ex>" << std::endl;
-    throw;
+    goto_programt &body=get_body(gf, sketch.init);
+    link_refactoring_ranges(body, sketch);
+    goto_programt::targett pos=havoc_inputs(st, body, sketch);
+    create_init_snapshot(st, body, sketch, pos);
+    pos=create_baseline_snapshot(st, body, sketch);
+    assign_init_snapshot(st, body, sketch, pos);
+    insert_assertion(st, body, sketch);
+    body.update();
+    body.compute_loop_numbers();
   }
 }

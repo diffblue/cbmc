@@ -60,7 +60,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       refactor/instructionset/processor_symbols.cpp \
       refactor/constraint/constraint_factory.cpp \
       refactor/preprocessing/refactor_preprocessing.cpp refactor/preprocessing/collect_counterexamples.cpp \
-      refactor/learn/refactor_symex_learn.cpp \
+      refactor/learn/refactor_symex_learn.cpp refactor/learn/instrument_counterexamples.cpp \
       refactor/verify/refactor_symex_verify.cpp \
       refactor/facade/refactor_runner.cpp \
       refactor/options/refactoring_type.cpp refactor/options/refactor_program.cpp \

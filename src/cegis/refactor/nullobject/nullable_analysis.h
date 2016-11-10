@@ -56,7 +56,7 @@ cegis_operand_datat get_operand_signature(
  * @details
  *
  * @param st
- * @param body
+ * @param gf
  * @param first
  * @param last
  * @param method
@@ -64,8 +64,8 @@ cegis_operand_datat get_operand_signature(
  * @param prog
  */
 void replace_method_call_by_processor(
-    const symbol_tablet &st,
-    goto_programt &body,
+    symbol_tablet &st,
+    goto_functionst &gf,
     goto_programt::targett first,
     goto_programt::targett last,
     const irep_idt &method,

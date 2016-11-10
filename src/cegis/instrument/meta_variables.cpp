@@ -32,13 +32,19 @@ std::string get_local_meta_name(const std::string &func, const std::string &var)
 
 namespace
 {
+void declare_local_var(goto_programt::instructiont &instr,
+    const symbolt &symbol)
+{
+  instr.type=goto_program_instruction_typet::DECL;
+  instr.code=code_declt(symbol.symbol_expr());
+  instr.source_location=default_cegis_source_location();
+}
+
 goto_programt::targett declare_local_var(goto_programt &body,
     goto_programt::targett pos, const symbolt &symbol)
 {
   pos=body.insert_after(pos);
-  pos->type=goto_program_instruction_typet::DECL;
-  pos->code=code_declt(symbol.symbol_expr());
-  pos->source_location=default_cegis_source_location();
+  declare_local_var(*pos, symbol);
   return pos;
 }
 }
@@ -53,13 +59,19 @@ goto_programt::targett declare_cegis_meta_variable(symbol_tablet &st,
 }
 
 goto_programt::targett declare_local_meta_variable(symbol_tablet &st,
-    const std::string &func_name, goto_programt &body,
-    const goto_programt::targett &insert_after_pos,
-    const std::string &base_name, const typet &type)
+    const std::string &fn, goto_programt &body,
+    const goto_programt::targett &insert_after_pos, const std::string &bn,
+    const typet &t)
 {
-  const std::string symbol_name(get_local_meta_name(func_name, base_name));
-  const symbolt &symbol=create_cegis_symbol(st, symbol_name, type);
-  return declare_local_var(body, insert_after_pos, symbol);
+  const symbolt &smb=create_cegis_symbol(st, get_local_meta_name(fn, bn), t);
+  return declare_local_var(body, insert_after_pos, smb);
+}
+
+void declare_local_meta_variable(symbol_tablet &st, const std::string &fn,
+    goto_programt::instructiont &instr, const std::string &bn, const typet &t)
+{
+  const symbolt &smb=create_cegis_symbol(st, get_local_meta_name(fn, bn), t);
+  declare_local_var(instr, smb);
 }
 
 goto_programt::targett assign_cegis_meta_variable(const symbol_tablet &st,

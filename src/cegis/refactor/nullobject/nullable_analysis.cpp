@@ -3,6 +3,8 @@
 
 #include <goto-programs/remove_returns.h>
 
+#include <cegis/instrument/literals.h>
+#include <cegis/instrument/meta_variables.h>
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/cegis-util/string_helper.h>
 #include <cegis/refactor/options/refactor_program.h>
@@ -103,36 +105,60 @@ bool calls_method(const goto_programt::instructiont &instr,
   return method == to_symbol_expr(func).get_identifier();
 }
 
-std::vector<irep_idt> get_operands(const symbol_tablet &st,
-    const irep_idt &method)
+std::vector<irep_idt> prepare_ops(symbol_tablet &st, const goto_functionst &gf,
+    const irep_idt &method, goto_programt &body,
+    const goto_programt::targett first)
 {
-  const code_typet &code_type=to_code_type(st.lookup(method).type);
-  const typet &return_type=code_type.return_type();
+  typedef goto_functionst::function_mapt fmapt;
+  const fmapt &fmap=gf.function_map;
+  const fmapt::const_iterator it=fmap.find(method);
+  assert(fmap.end() != it);
   std::vector<irep_idt> result;
-  // TODO: Add globals
   const std::string ret_val_name(get_return_value_name(method));
   if (st.has_symbol(ret_val_name)) result.push_back(ret_val_name);
-  for (const code_typet::parameterst::value_type &param : code_type.parameters())
-    if (!param.get_this()) result.push_back(param.get_identifier());
+  const code_function_callt &call=to_code_function_call(first->code);
+  const symbol_exprt &func=to_symbol_expr(call.function());
+  const code_function_callt::argumentst &args=call.arguments();
+  const code_typet &code_type=to_code_type(func.type());
+  const code_typet::parameterst &params=code_type.parameters();
+  const size_t size=args.size();
+  assert(size == params.size());
+  const source_locationt &loc=first->source_location;
+  goto_programt::targett pos=first;
+  for (size_t i=0; i < size; ++i)
+    if (!params[i].get_this())
+    {
+      const symbolt &lhs=st.lookup(params[i].get_identifier());
+      if (first == pos)
+      {
+        pos=insert_before_preserve_labels(body, pos);
+        pos->source_location=loc;
+        pos->function=first->function;
+      } else pos=insert_after_preserving_source_location(body, pos);
+      cegis_assign(st, *pos, lhs.symbol_expr(), args[i], loc);
+      result.push_back(lhs.name);
+    }
+  // TODO: Add globals
   return result;
 }
 }
 
-void replace_method_call_by_processor(const symbol_tablet &st,
-    goto_programt &body, goto_programt::targett first,
-    const goto_programt::targett last, const irep_idt &method,
-    const std::string &processor, const std::string &prog)
+void replace_method_call_by_processor(symbol_tablet &st, goto_functionst &gf,
+    goto_programt::targett first, const goto_programt::targett last,
+    const irep_idt &meth, const std::string &processor, const std::string &prog)
 {
+  // TODO: Find topmost class for "method" to uniquely identify it.
+  goto_programt &body=get_body(gf, first);
   for (; first != last; ++first)
-    if (calls_method(*first, method))
+    if (calls_method(*first, meth))
     {
-      const std::vector<irep_idt> operands(get_operands(st, method));
-      if (!operands.empty())
+      const std::vector<irep_idt> ops(prepare_ops(st, gf, meth, body, first));
+      if (!ops.empty())
       {
         goto_programt::targett pos=insert_before_preserve_labels(body, first);
-        instrument_cegis_operand(st, *pos, 0, operands.front());
-        for (size_t i=1; i < operands.size(); ++i)
-          pos=instrument_cegis_operand(st, body, pos, i, operands[i]);
+        instrument_cegis_operand(st, *pos, 0, ops.front());
+        for (size_t i=1; i < ops.size(); ++i)
+          pos=instrument_cegis_operand(st, body, pos, i, ops[i]);
       }
       call_processor(st, *first, processor, prog);
     }

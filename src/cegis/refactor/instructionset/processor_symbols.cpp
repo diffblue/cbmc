@@ -1,7 +1,9 @@
 #include <ansi-c/expr2c.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
+#include <goto-programs/remove_returns.h>
 
+#include <cegis/cegis-util/string_helper.h>
 #include <cegis/instrument/literals.h>
 #include <cegis/instrument/meta_variables.h>
 #include <cegis/refactor/instructionset/processor_types.h>
@@ -61,4 +63,17 @@ dereference_exprt cegis_operand(const symbol_tablet &st,
   const std::string array_name(cegis_operand_array_name(st, type));
   const symbol_exprt array(st.lookup(array_name).symbol_expr());
   return dereference_exprt(index_exprt(array, operand_id), type);
+}
+
+namespace
+{
+#define JAVA_TMP_RETURN "::return_tmp"
+}
+
+bool is_refactor_meta_var(const irep_idt &var)
+{
+  const std::string &var_name=id2string(var);
+  return starts_with(var_name, CPROVER_PREFIX)
+      || contains(var_name, RETURN_VALUE_SUFFIX)
+      || contains(var_name, JAVA_TMP_RETURN);
 }
