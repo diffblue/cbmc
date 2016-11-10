@@ -1,6 +1,6 @@
 CORE
 main.c
---cover boundary-values
+--cover mcdc --cover boundary-values
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.1\] file main.c line 7 function main MC/DC independence condition `altitude > 2500.* SATISFIED$

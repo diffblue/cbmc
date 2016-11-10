@@ -218,7 +218,7 @@ std::set<exprt> non_ordered_expr_expansion(const exprt &src)
     {
       std::vector<exprt> operands;
       collect_operands(x, operands);
-      for(int i=0; i<operands.size(); i++)
+      for(size_t i=0; i<operands.size(); i++)
       {
         std::set<exprt> res;
         if(operands[i].id()==ID_not)

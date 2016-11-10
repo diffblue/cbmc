@@ -15,16 +15,16 @@ Date: May 2016
 
 enum class coverage_criteriont {
   LOCATION, BRANCH, DECISION, CONDITION,
-  PATH, MCDC, ASSERTION, COVER, BOUNDARY };
+  PATH, MCDC, BOUNDARY, ASSERTION, COVER};
 
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  coverage_criteriont);
+  const std::set<coverage_criteriont> &criteria);
 
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  coverage_criteriont);
+  const std::set<coverage_criteriont> &criteria);
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_H

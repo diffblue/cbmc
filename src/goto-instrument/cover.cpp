@@ -1089,7 +1089,7 @@ void instrument_cover_goals(
           i_it->source_location.set_property_class(property_class);
         }
         break;
-
+        
       case coverage_criteriont::COVER:
         // turn __CPROVER_cover(x) into 'assert(!x)'
         if(i_it->is_function_call())
@@ -1114,7 +1114,7 @@ void instrument_cover_goals(
         else if(i_it->is_assert())
           i_it->make_skip();
         break;
-
+        
       case coverage_criteriont::LOCATION:
         if(i_it->is_assert())
           i_it->make_skip();
@@ -1138,13 +1138,13 @@ void instrument_cover_goals(
               i_it->source_location.set_comment(comment);
               i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
               i_it->source_location.set_property_class(property_class);
-
+              
               i_it++;
             }
           }
         }
         break;
-
+      
       case coverage_criteriont::BRANCH:
         if(i_it->is_assert())
           i_it->make_skip();
@@ -1165,7 +1165,7 @@ void instrument_cover_goals(
           t->source_location.set(ID_coverage_criterion, coverage_criterion);
           t->source_location.set_property_class(property_class);
         }
-
+      
         if(i_it->is_goto() && !i_it->guard.is_true())
         {
           std::string b=i2string(basic_blocks[i_it]);
@@ -1190,12 +1190,12 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(false_comment);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
-
+          
           i_it++;
           i_it++;
         }
         break;
-
+        
       case coverage_criteriont::CONDITION:
         if(i_it->is_assert())
           i_it->make_skip();
@@ -1209,7 +1209,7 @@ void instrument_cover_goals(
           for(const auto & c : conditions)
           {
             const std::string c_string=from_expr(ns, "", c);
-
+          
             const std::string comment_t="condition `"+c_string+"' true";
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(c);
@@ -1226,12 +1226,12 @@ void instrument_cover_goals(
             i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
             i_it->source_location.set_property_class(property_class);
           }
-
+          
           for(std::size_t i=0; i<conditions.size()*2; i++)
             i_it++;
         }
         break;
-
+      
       case coverage_criteriont::DECISION:
         if(i_it->is_assert())
           i_it->make_skip();
@@ -1245,7 +1245,7 @@ void instrument_cover_goals(
           for(const auto & d : decisions)
           {
             const std::string d_string=from_expr(ns, "", d);
-
+          
             const std::string comment_t="decision `"+d_string+"' true";
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(d);
@@ -1262,7 +1262,7 @@ void instrument_cover_goals(
             i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
             i_it->source_location.set_property_class(property_class);
           }
-
+          
           for(std::size_t i=0; i<decisions.size()*2; i++)
             i_it++;
         }
@@ -1280,7 +1280,7 @@ void instrument_cover_goals(
         {
           const std::set<exprt> conditions=collect_conditions(i_it);
           const std::set<exprt> decisions=collect_decisions(i_it);
-
+          
           std::set<exprt> both;
           std::set_union(conditions.begin(), conditions.end(),
                          decisions.begin(), decisions.end(),
@@ -1292,13 +1292,13 @@ void instrument_cover_goals(
           {
             bool is_decision=decisions.find(p)!=decisions.end();
             bool is_condition=conditions.find(p)!=conditions.end();
-
+            
             std::string description=
               (is_decision && is_condition)?"decision/condition":
               is_decision?"decision":"condition";
-
+              
             std::string p_string=from_expr(ns, "", p);
-
+          
             std::string comment_t=description+" `"+p_string+"' true";
             goto_program.insert_before_swap(i_it);
             //i_it->make_assertion(p);
@@ -1317,7 +1317,7 @@ void instrument_cover_goals(
             i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
             i_it->source_location.set_property_class(property_class);
           }
-
+          
           bool boundary_values_analysis=
                criteria.find(coverage_criteriont::BOUNDARY)!=criteria.end();
           std::set<exprt> controlling;
@@ -1353,7 +1353,7 @@ void instrument_cover_goals(
 
             std::string description=
               "MC/DC independence condition `"+p_string+"'";
-
+              
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(not_exprt(p));
             //i_it->make_assertion(p);
@@ -1362,7 +1362,7 @@ void instrument_cover_goals(
             i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
             i_it->source_location.set_property_class(property_class);
           }
-
+          
           for(std::size_t i=0; i<both.size()*2+controlling.size(); i++)
             i_it++;
         }
@@ -1372,7 +1372,7 @@ void instrument_cover_goals(
         if(i_it->is_assert())
           i_it->make_skip();
         break;
-
+      
       default:;
       }
     }
@@ -1394,14 +1394,19 @@ Function: instrument_cover_goals
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  coverage_criteriont criterion)
+  const std::set<coverage_criteriont> &criteria)
 {
   Forall_goto_functions(f_it, goto_functions)
   {
     if(f_it->first==ID__start ||
        f_it->first=="__CPROVER_initialize")
       continue;
+<<<<<<< ed57692cda52670fb84c6a282155f7d6e6bd6923
 
     instrument_cover_goals(symbol_table, f_it->second.body, criterion);
+=======
+      
+    instrument_cover_goals(symbol_table, f_it->second.body, criteria);
+>>>>>>> add boundary values to mcdc coverage by Youcheng
   }
 }

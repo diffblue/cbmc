@@ -943,8 +943,7 @@ bool cbmc_parse_optionst::process_goto_program(
 
       status() << "Instrumenting coverage goals" << eom;
 
-      for(const auto & criterion : criteria)
-        instrument_cover_goals(symbol_table, goto_functions, criterion);
+      instrument_cover_goals(symbol_table, goto_functions, criteria);
 
       goto_functions.update();
     }
