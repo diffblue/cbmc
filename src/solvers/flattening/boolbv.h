@@ -47,17 +47,17 @@ public:
   virtual bvt convert_bitvector(const exprt &expr); // no cache
 
   // overloading
-  virtual exprt get(const exprt &expr) const;
-  virtual void set_to(const exprt &expr, bool value);
-  virtual void print_assignment(std::ostream &out) const;
+  virtual exprt get(const exprt &expr) const override;
+  virtual void set_to(const exprt &expr, bool value) override;
+  virtual void print_assignment(std::ostream &out) const override;
   
-  virtual void clear_cache()
+  virtual void clear_cache() override
   {
     SUB::clear_cache();
     bv_cache.clear();
   }
 
-  virtual void post_process()
+  virtual void post_process() override
   {
     post_process_quantifiers();
     functions.post_process();
@@ -99,7 +99,7 @@ protected:
   boolbv_mapt map;  
   
   // overloading
-  virtual literalt convert_rest(const exprt &expr);
+  virtual literalt convert_rest(const exprt &expr) override;
   virtual bool boolbv_set_equality_to_true(const equal_exprt &expr);
   
   typedef arrayst SUB;
@@ -229,8 +229,7 @@ protected:
   exprt bv_get_cache(const exprt &expr) const;
                           
   // unbounded arrays
-
-  bool is_unbounded_array(const typet &type) const;
+  bool is_unbounded_array(const typet &type) const override;
   
   // quantifier instantiations
   class quantifiert
