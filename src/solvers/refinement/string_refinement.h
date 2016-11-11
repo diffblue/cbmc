@@ -43,7 +43,7 @@ private:
 
 
 protected:
-
+  
   typedef std::set<exprt> expr_sett;
   
   virtual bvt convert_symbol(const exprt &expr);
