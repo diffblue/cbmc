@@ -1,0 +1,11 @@
+CORE
+main.c
+-Wall
+^EXIT=0$
+^SIGNAL=0$
+main.c:13:
+main.c:29:
+--
+main.c:20:
+^warning: ignoring
+^CONVERSION ERROR$

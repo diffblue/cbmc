@@ -16,11 +16,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
+#include <util/file_util.h>
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -2813,6 +2815,36 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
 
   // promote!
 
+  // warn about an implicit 0-extension of bitand operands
+  // expect an explicit cast to avoid this warning
+  if((expr.id()==ID_bitand) &&
+     (op0.type().id()==ID_signedbv || op0.type().id()==ID_unsignedbv) &&
+     (op1.type().id()==ID_signedbv || op1.type().id()==ID_unsignedbv))
+  {
+    bool unintentional=false;
+    // do not apply, if we are working with constants and the & operator
+    if(op0.id()!=ID_constant && op1.id()!=ID_constant)
+    {
+      // mismatch occurs only, if we have "&" with two different width,
+      // where the side with the smaller width has to use the "~" operator
+      const size_t width0=to_bitvector_type(op0.type()).get_width();
+      const size_t width1=to_bitvector_type(op1.type()).get_width();
+      unintentional=(width0<width1 && has_subexpr(op0, ID_bitnot)) ||
+                    (width0>width1 && has_subexpr(op1, ID_bitnot));
+    }
+
+    // is all conditions are met for an unintended combination
+    // of the operators ~ and &, print a warning
+    if(unintentional)
+    {
+      warning().source_location=expr.find_source_location();
+      warning() << "Implicit zero extension of bitwise operand"
+                << " in combination with bitwise negation may"
+                << " cause unexpected results"
+                << eom;
+    }
+  }
+
   implicit_typecast_arithmetic(op0, op1);
 
   const typet &type0=follow(op0.type());
@@ -3205,6 +3237,22 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
             o_type0.id()==ID_signedbv ||
             o_type0.id()==ID_c_bit_field)
     {
+      // check whether an implicit cast might be dangerous,
+      // i.e. it involves the & and ~ operator
+      if((o_type0.id()==ID_unsignedbv || o_type0.id()==ID_signedbv) &&
+         (o_type1.id()==ID_unsignedbv || o_type1.id()==ID_signedbv) &&
+         op1.id()!=ID_constant &&
+         (to_bitvector_type(o_type0).get_width()>
+           to_bitvector_type(o_type1).get_width()) &&
+         has_subexpr(op1, ID_bitnot))
+      {
+        warning().source_location=expr.find_source_location();
+        warning() << "Implicit zero extension of bitwise operand"
+                  << " in combination with bitwise negation may"
+                  << " cause unexpected results"
+                  << eom;
+      }
+      // perform the cast
       implicit_typecast(op1, o_type0);
       return;
     }
