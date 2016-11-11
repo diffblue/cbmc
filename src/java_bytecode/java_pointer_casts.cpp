@@ -1,3 +1,10 @@
+/*******************************************************************\
+
+Module: JAVA Pointer Casts
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
 
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -115,7 +122,7 @@ exprt make_clean_pointer_cast(const exprt &rawptr,const typet &target_type,
          "Non-pointer target in make_clean_pointer_cast?");
 
   const exprt &ptr=look_through_casts(rawptr);
- 
+
   if(ptr.type()==target_type)
     return ptr;
 
@@ -146,5 +153,3 @@ exprt make_clean_pointer_cast(const exprt &rawptr,const typet &target_type,
 
   return typecast_exprt(bare_ptr,target_type);
 }
-
-
