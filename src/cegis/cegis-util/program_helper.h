@@ -388,4 +388,18 @@ goto_programt::targett insert_before_preserving_source_location(
     goto_programt &body,
     goto_programt::targett pos);
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param gf
+ * @param symbol
+ * @param value
+ */
+void assign_in_cprover_init(
+    goto_functionst &gf,
+    symbolt &symbol,
+    const exprt &value);
+
 #endif /* CEGIS_PROGRAM_HELPER_H_ */

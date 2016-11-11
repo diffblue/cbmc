@@ -25,7 +25,7 @@ std::string declare_cegis_program(symbol_tablet &st, goto_functionst &gf,
     const std::string &processor)
 {
   std::string prog_name(processor);
-  prog_name+="_prog";
+  prog_name+=CEGIS_REFACTOR_PROG_SUFFIX;
   declare_cegis_program(st, gf, processor, prog_name);
   return prog_name;
 }

@@ -12,6 +12,8 @@
 
 #include <goto-programs/goto_program.h>
 
+#define CEGIS_REFACTOR_PROG_SUFFIX "_prog"
+
 /**
  * @brief
  *

@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include <cegis/cegis-util/string_helper.h>
 
 bool contains(const std::string &haystack, const std::string &needle)
@@ -16,4 +18,11 @@ bool ends_with(const std::string &haystack, const std::string &suffix)
   const std::string::size_type suffix_sz=suffix.size();
   if (haystack_sz < suffix_sz) return false;
   return haystack.substr(haystack_sz - suffix_sz) == suffix;
+}
+
+void remove_suffix(std::string &haystack, const std::string &suffix)
+{
+  assert(ends_with(haystack, suffix));
+  const size_t new_size=haystack.size() - suffix.size();
+  haystack=haystack.substr(0, new_size);
 }

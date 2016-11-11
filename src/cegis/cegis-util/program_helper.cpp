@@ -348,6 +348,22 @@ goto_programt::targett insert_after_preserving_source_location(
 goto_programt::targett insert_before_preserving_source_location(
     goto_programt &body, goto_programt::targett pos)
 {
-  const auto op=std::bind1st(std::mem_fun(&goto_programt::insert_before), &body);
+  const auto op=std::bind1st(std::mem_fun(&goto_programt::insert_before),
+      &body);
   return insert_preserving_source_location(pos, op);
+}
+
+void assign_in_cprover_init(goto_functionst &gf, symbolt &symbol,
+    const exprt &value)
+{
+  symbol.value=value;
+  goto_programt &body=get_body(gf, CPROVER_INIT);
+  goto_programt::instructionst &instrs=body.instructions;
+  const auto p(std::mem_fun_ref(&goto_programt::instructiont::is_end_function));
+  goto_programt::targett pos=std::find_if(instrs.begin(), instrs.end(), p);
+  assert(instrs.end() != pos);
+  pos=insert_before_preserving_source_location(body, pos);
+  pos->type=goto_program_instruction_typet::ASSIGN;
+  const symbol_exprt lhs(symbol.symbol_expr());
+  pos->code=code_assignt(lhs, value);
 }
