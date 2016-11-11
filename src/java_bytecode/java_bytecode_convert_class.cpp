@@ -27,8 +27,8 @@ public:
   java_bytecode_convert_classt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
-    const bool &_disable_runtime_checks,
-    int _max_array_length):
+    const bool _disable_runtime_checks,
+    size_t _max_array_length):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     disable_runtime_checks(_disable_runtime_checks),
@@ -51,8 +51,8 @@ public:
 
 protected:
   symbol_tablet &symbol_table;
-  const bool &disable_runtime_checks;
-  int max_array_length;
+  const bool disable_runtime_checks;
+  size_t max_array_length;
 
   // conversion
   void convert(const classt &c);
@@ -127,8 +127,12 @@ void java_bytecode_convert_classt::convert(const classt &c)
   // now do methods
   for(const auto &method : c.methods)
     java_bytecode_convert_method(
-      *class_symbol, method, symbol_table, get_message_handler(),
-      disable_runtime_checks, max_array_length);
+      *class_symbol,
+      method,
+      symbol_table,
+      get_message_handler(),
+      disable_runtime_checks,
+      max_array_length);
 
   // is this a root class?
   if(c.extends.empty())
@@ -271,9 +275,6 @@ void java_bytecode_convert_classt::add_array_types()
     // we have the base class, java.lang.Object, length and data
     // of appropriate type
     struct_type.set_tag(symbol_type.get_identifier());
-<<<<<<< d8b7f7885387d26f7031f56b237aa96e25733f6d
-
-    struct_type.components().reserve(3);
     struct_typet::componentt
       comp0("@java.lang.Object", symbol_typet("java::java.lang.Object"));
     struct_type.components().push_back(comp0);
@@ -284,18 +285,6 @@ void java_bytecode_convert_classt::add_array_types()
     struct_typet::componentt
       comp2("data", pointer_typet(java_type_from_char(l)));
     struct_type.components().push_back(comp2);
-=======
-    struct_type.components().resize(3);
-    struct_type.components()[0].set_name("@java.lang.Object");
-    struct_type.components()[0].type()=symbol_typet("java::java.lang.Object");
-    struct_type.components()[1].set_name("length");
-    struct_type.components()[1].set_pretty_name("length");
-    struct_type.components()[1].type()=java_int_type();
-    struct_type.components()[2].set_name("data");
-    struct_type.components()[2].set_pretty_name("data");
-    struct_type.components()[2].type()=
-      pointer_typet(java_type_from_char(letters[i]));
->>>>>>> class conversion runtime checks / array handling
 
     symbolt symbol;
     symbol.name=symbol_type.get_identifier();
@@ -320,16 +309,16 @@ Function: java_bytecode_convert_class
 
 bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
-  const bool &disable_runtime_checks,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  int max_array_length)
+  const bool disable_runtime_checks,
+  size_t max_array_length)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
-                   symbol_table,
-                   message_handler,
-                   disable_runtime_checks,
-                   max_array_length);
+    symbol_table,
+    message_handler,
+    disable_runtime_checks,
+    max_array_length);
 
   try
   {

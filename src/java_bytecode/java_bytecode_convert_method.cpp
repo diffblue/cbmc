@@ -55,6 +55,245 @@ protected:
   const char *p;
 };
 
+class java_bytecode_convert_methodt:public messaget
+{
+public:
+  java_bytecode_convert_methodt(
+    symbol_tablet &_symbol_table,
+    message_handlert &_message_handler,
+    bool _disable_runtime_checks,
+    size_t _max_array_length):
+    messaget(_message_handler),
+    symbol_table(_symbol_table),
+    disable_runtime_checks(_disable_runtime_checks),
+    max_array_length(_max_array_length)
+  {
+  }
+
+  typedef java_bytecode_parse_treet::methodt methodt;
+  typedef java_bytecode_parse_treet::instructiont instructiont;
+  typedef methodt::instructionst instructionst;
+
+  void operator()(const symbolt &class_symbol, const methodt &method)
+  {
+    convert(class_symbol, method);
+  }
+
+protected:
+  symbol_tablet &symbol_table;
+  const bool disable_runtime_checks;
+  size_t max_array_length;
+
+  irep_idt method_id;
+  irep_idt current_method;
+  typet method_return_type;
+
+  class variablet
+  {
+  public:
+    symbol_exprt symbol_expr;
+    size_t start_pc;
+    size_t length;
+    bool is_parameter=false;
+  };
+
+  typedef std::vector<variablet> variablest;
+  expanding_vector<variablest> variables;
+  std::set<symbol_exprt> used_local_names;
+  bool method_has_this;
+
+  typedef enum instruction_sizet
+  {
+    INST_INDEX=2,
+    INST_INDEX_CONST=3
+  } instruction_sizet;
+
+  // return corresponding reference of variable
+  const variablet &find_variable_for_slot(
+    size_t address,
+    variablest &var_list,
+    instruction_sizet inst_size)
+  {
+    for(const variablet &var : var_list)
+    {
+      size_t start_pc=var.start_pc;
+      size_t length=var.length;
+      if(address+(size_t)inst_size>=start_pc &&
+         address<start_pc+length)
+        return var;
+    }
+    // add unnamed local variable to end of list at this index
+    // with scope from 0 to INT_MAX
+    // as it is at the end of the vector, it will only be taken into account
+    // if no other variable is valid
+    size_t list_length=var_list.size();
+    var_list.resize(list_length+1);
+    var_list[list_length].start_pc=0;
+    var_list[list_length].length=std::numeric_limits<size_t>::max();
+    return var_list[list_length];
+  }
+
+  // JVM local variables
+  enum variable_cast_argumentt
+  {
+    CAST_AS_NEEDED,
+    NO_CAST
+  };
+
+  const exprt variable(
+    const exprt &arg,
+    char type_char,
+    size_t address,
+    instruction_sizet inst_size,
+    variable_cast_argumentt do_cast)
+  {
+    irep_idt number=to_constant_expr(arg).get_value();
+
+    std::size_t number_int=safe_string2size_t(id2string(number));
+    typet t=java_type_from_char(type_char);
+    variablest &var_list=variables[number_int];
+
+    // search variable in list for correct frame / address if necessary
+    const variablet &var=
+      find_variable_for_slot(address, var_list, inst_size);
+
+    if(var.symbol_expr.get_identifier().empty())
+    {
+      // an un-named local variable
+      irep_idt base_name="anonlocal::"+id2string(number)+type_char;
+      irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+
+      symbol_exprt result(identifier, t);
+      result.set(ID_C_base_name, base_name);
+      used_local_names.insert(result);
+
+      return result;
+    }
+    else
+    {
+      exprt result=var.symbol_expr;
+      if(do_cast==CAST_AS_NEEDED && t!=result.type())
+        result=typecast_exprt(result, t);
+      return result;
+    }
+  }
+
+  // temporary variables
+  std::list<symbol_exprt> tmp_vars;
+
+  symbol_exprt tmp_variable(const std::string &prefix, const typet &type)
+  {
+    irep_idt base_name=prefix+"_tmp"+std::to_string(tmp_vars.size());
+    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+
+    auxiliary_symbolt tmp_symbol;
+    tmp_symbol.base_name=base_name;
+    tmp_symbol.is_static_lifetime=false;
+    tmp_symbol.mode=ID_java;
+    tmp_symbol.name=identifier;
+    tmp_symbol.type=type;
+    symbol_table.add(tmp_symbol);
+
+    symbol_exprt result(identifier, type);
+    result.set(ID_C_base_name, base_name);
+    tmp_vars.push_back(result);
+
+    return result;
+  }
+
+  // JVM program locations
+  irep_idt label(const irep_idt &address)
+  {
+    return "pc"+id2string(address);
+  }
+
+  // JVM Stack
+  typedef std::vector<exprt> stackt;
+  stackt stack;
+
+  exprt::operandst pop(std::size_t n)
+  {
+    if(stack.size()<n)
+    {
+      error() << "malformed bytecode (pop too high)" << eom;
+      throw 0;
+    }
+
+    exprt::operandst operands;
+    operands.resize(n);
+    for(std::size_t i=0; i<n; i++)
+      operands[i]=stack[stack.size()-n+i];
+
+    stack.resize(stack.size()-n);
+    return operands;
+  }
+
+  void push(const exprt::operandst &o)
+  {
+    stack.resize(stack.size()+o.size());
+
+    for(std::size_t i=0; i<o.size(); i++)
+      stack[stack.size()-o.size()+i]=o[i];
+  }
+
+  struct converted_instructiont
+  {
+    converted_instructiont(
+      const instructionst::const_iterator &it,
+      const codet &_code):source(it), code(_code), done(false)
+      {}
+
+    instructionst::const_iterator source;
+    std::list<unsigned> successors;
+    std::set<unsigned> predecessors;
+    codet code;
+    stackt stack;
+    bool done;
+  };
+
+  typedef std::map<unsigned, converted_instructiont> address_mapt;
+
+  struct block_tree_nodet
+  {
+    bool leaf;
+    std::vector<unsigned> branch_addresses;
+    std::vector<block_tree_nodet> branch;
+    block_tree_nodet():leaf(false) {}
+    explicit block_tree_nodet(bool l):leaf(l) {}
+    static block_tree_nodet get_leaf() { return block_tree_nodet(true); }
+  };
+
+  static void replace_goto_target(
+    codet &repl,
+    const irep_idt &old_label,
+    const irep_idt &new_label);
+
+  code_blockt &get_block_for_pcrange(
+    block_tree_nodet &tree,
+    code_blockt &this_block,
+    unsigned address_start,
+    unsigned address_limit,
+    unsigned next_block_start_address);
+
+  code_blockt &get_or_create_block_for_pcrange(
+    block_tree_nodet &tree,
+    code_blockt &this_block,
+    unsigned address_start,
+    unsigned address_limit,
+    unsigned next_block_start_address,
+    const address_mapt &amap,
+    bool allow_merge=true);
+
+  // conversion
+  void convert(const symbolt &class_symbol, const methodt &);
+  void convert(const instructiont &);
+
+  codet convert_instructions(
+    const instructionst &, const code_typet &);
+
+  const bytecode_infot &get_bytecode_info(const irep_idt &statement);
+};
+
 const size_t SLOTS_PER_INTEGER(1u);
 const size_t INTEGER_WIDTH(64u);
 static size_t count_slots(
@@ -302,6 +541,7 @@ void java_bytecode_convert_methodt::convert(
     // add as a JVM variable
     std::size_t slots=get_variable_slots(param);
     variables[param_index][0].symbol_expr=parameter_symbol.symbol_expr();
+    variables[param_index][0].is_parameter=true;
     variables[param_index][0].start_pc=0;
     variables[param_index][0].length=std::numeric_limits<size_t>::max();
     variables[param_index][0].is_parameter=true;
@@ -347,6 +587,8 @@ void java_bytecode_convert_methodt::convert(
                               id2string(method.get_base_name())+"()";
 
   method_symbol.type=member_type;
+  if(is_constructor(method))
+    method_symbol.type.set(ID_constructor,true);
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
 
@@ -416,6 +658,27 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 
   return member_exprt(
     obj_deref, fieldref.get(ID_component_name), fieldref.type());
+}
+
+codet get_array_bounds_check(const exprt &arraystruct, const exprt &idx, const source_locationt& original_sloc)
+{
+  constant_exprt intzero=as_number(0,java_int_type());
+  binary_relation_exprt gezero(idx,ID_ge,intzero);
+  const member_exprt length_field(
+    arraystruct, "length", java_int_type());
+  binary_relation_exprt ltlength(idx,ID_lt,length_field);
+  code_blockt boundschecks;
+  boundschecks.add(code_assertt(gezero));
+  boundschecks.operands().back().add_source_location()=original_sloc;
+  boundschecks.operands().back().add_source_location().set_comment("Array index < 0");
+  boundschecks.operands().back().add_source_location().set_property_class("array-index-oob-low");
+  boundschecks.add(code_assertt(ltlength));
+  boundschecks.operands().back().add_source_location()=original_sloc;
+  boundschecks.operands().back().add_source_location().set_comment("Array index >= length");
+  boundschecks.operands().back().add_source_location().set_property_class("array-index-oob-high");
+
+  // TODO make this throw ArrayIndexOutOfBoundsException instead of asserting.
+  return boundschecks;
 }
 
 /*******************************************************************\
@@ -834,6 +1097,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
   setup_local_variables(method,address_map);
 
   std::set<unsigned> working_set;
+  bool assertion_failure = false;
+
   if(!instructions.empty())
     working_set.insert(instructions.front().address);
 
@@ -919,9 +1184,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         results[0]=op[0];
       }
       else
-      {
         c=code_skipt();
-      }
     }
     else if(statement=="invokedynamic")
     {
@@ -988,10 +1251,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       source_locationt loc;
       loc=i_it->source_location;
       loc.set_function(method_id);
-      source_locationt &dloc = loc;
+      source_locationt &source_loc=loc;
 
-      call.add_source_location()=dloc;
-      call.arguments()=pop(parameters.size());
+      call.add_source_location()=source_loc;
+      call.arguments() = pop(parameters.size());
 
       // double-check a bit
       if(use_this)
@@ -1037,6 +1300,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       // does the function symbol exist?
       irep_idt id=arg0.get(ID_identifier);
+
       if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
       {
         // no, create stub
@@ -1062,8 +1326,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
         call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
       }
 
-      call.function().add_source_location()=dloc;
-      c=call;
+      call.function().add_source_location()=source_loc;
+      c = call;
     }
     else if(statement=="return")
     {
@@ -1275,7 +1539,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
       else
       {
-        const unsigned int value(arg0.get_unsigned_int(ID_value));
+        const size_t value(arg0.get_unsigned_int(ID_value));
         const typet type=java_type_from_char(statement[0]);
         results[0]=as_number(value, type);
       }
@@ -1404,7 +1668,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const typecast_exprt lhs(op[0], target);
       const typecast_exprt rhs(op[1], target);
 
-      results[0]=lshr_exprt(lhs, rhs);
+      results[0]=typecast_exprt(lshr_exprt(lhs, rhs),op[0].type());
     }
     else if(statement==patternt("?add"))
     {
@@ -1575,8 +1839,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.empty() && results.size()==1);
       symbol_exprt symbol_expr(arg0.type());
-      symbol_expr.set_identifier(
-        arg0.get_string(ID_class)+"."+arg0.get_string(ID_component_name));
+      const auto& fieldname=arg0.get_string(ID_component_name);
+      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+fieldname);
       results[0]=java_bytecode_promotion(symbol_expr);
 
       // set $assertionDisabled to false
@@ -1586,7 +1850,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
         e.make_false();
         c=code_assignt(symbol_expr, e);
       }
-
     }
     else if(statement=="putfield")
     {
@@ -1597,8 +1860,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.size()==1 && results.empty());
       symbol_exprt symbol_expr(arg0.type());
-      symbol_expr.set_identifier(
-        arg0.get_string(ID_class)+"."+arg0.get_string(ID_component_name));
+      const auto& fieldname=arg0.get_string(ID_component_name);
+      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+fieldname);
       c=code_assignt(symbol_expr, op[0]);
     }
     else if(statement==patternt("?2?")) // i2c etc.
@@ -1662,13 +1925,32 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(!i_it->source_location.get_line().empty())
         java_new_array.add_source_location()=i_it->source_location;
 
+      code_blockt checkandcreate;
+      if(!disable_runtime_checks)
+      {
+        // TODO make this throw NegativeArrayIndexException instead.
+        constant_exprt intzero=as_number(0,java_int_type());
+        binary_relation_exprt gezero(op[0],ID_ge,intzero);
+        code_assertt check(gezero);
+        check.add_source_location().set_comment("Array size < 0");
+        check.add_source_location().set_property_class("array-create-negative-size");
+        checkandcreate.move_to_operands(check);
+      }
+      if(max_array_length!=0)
+      {
+        constant_exprt size_limit=as_number(max_array_length,java_int_type());
+        binary_relation_exprt le_max_size(op[0],ID_le,size_limit);
+        code_assumet assume_le_max_size(le_max_size);
+        checkandcreate.move_to_operands(assume_le_max_size);
+      }
       const exprt tmp=tmp_variable("newarray", ref_type);
-      c=code_assignt(tmp, java_new_array);
+      checkandcreate.copy_to_operands(code_assignt(tmp, java_new_array));
+      c=std::move(checkandcreate);
       results[0]=tmp;
     }
     else if(statement=="multianewarray")
     {
-      // The first argument is the type, the second argument is the dimension.
+      // The first argument is the type, the second argument is the number of dimensions.
       // The size of each dimension is on the stack.
       irep_idt number=to_constant_expr(arg1).get_value();
       std::size_t dimension=safe_string2size_t(id2string(number));
@@ -1676,8 +1958,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       op=pop(dimension);
       assert(results.size()==1);
 
-      // arg0.type()
-      const pointer_typet ref_type=java_array_type('a');
+      const pointer_typet ref_type=pointer_typet(arg0.type());
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.operands()=op;
@@ -2028,10 +2309,15 @@ void java_bytecode_convert_method(
   const symbolt &class_symbol,
   const java_bytecode_parse_treet::methodt &method,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  bool disable_runtime_checks,
+  size_t max_array_length)
 {
   java_bytecode_convert_methodt java_bytecode_convert_method(
-    symbol_table, message_handler);
+    symbol_table,
+    message_handler,
+    disable_runtime_checks,
+    max_array_length);
 
   java_bytecode_convert_method(class_symbol, method);
 }

@@ -193,11 +193,11 @@ bool java_bytecode_languaget::typecheck(
     debug() << "Converting class " << c_it->first << eom;
 
     if(java_bytecode_convert_class(
-         c_it->second, 
-	 disable_runtime_checks,
-	 symbol_table, 
-	 get_message_handler(),
-	 max_user_array_length))
+         c_it->second,
+         symbol_table,
+         get_message_handler(),
+         disable_runtime_checks,
+         max_user_array_length))
       return true;
   }
 
