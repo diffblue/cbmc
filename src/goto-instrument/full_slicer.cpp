@@ -346,7 +346,7 @@ static bool implicit(const namespacet &ns, goto_programt::const_targett target)
       return true;
   }
 
-  return false;
+  return s.get_identifier()==CPROVER_PREFIX "rounding_mode";
 }
 
 /*******************************************************************\
