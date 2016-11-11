@@ -317,6 +317,25 @@ Function: xmlt::set_attribute
 
 void xmlt::set_attribute(
   const std::string &attribute,
+  unsigned long long value)
+{
+  set_attribute(attribute, i2string(value));
+}
+
+/*******************************************************************\
+
+Function: xmlt::set_attribute
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void xmlt::set_attribute(
+  const std::string &attribute,
   const std::string &value)
 {
   if ((value[0]=='\"' && value[value.size()-1]=='\"') ||
