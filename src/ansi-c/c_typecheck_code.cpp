@@ -911,7 +911,16 @@ void c_typecheck_baset::typecheck_return(codet &code)
     {
       // gcc doesn't actually complain, it just warns!
       if(follow(code.op0().type()).id()!=ID_empty)
+      {
+        warning().source_location=code.source_location();
+
+        warning() << "function has return void ";
+        warning() << "but a return statement returning ";
+        warning() << to_string(follow(code.op0().type()));
+        warning() << eom;
+
         code.op0().make_typecast(return_type);
+      }
     }
     else
       implicit_typecast(code.op0(), return_type);
