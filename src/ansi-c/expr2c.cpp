@@ -4306,21 +4306,30 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_floatbv_typecast)
   {
-    #if 1
-    return convert_function(src, "FLOAT_TYPECAST", precedence=16);
-    #else
+    precedence=16;
+    std::string dest="FLOAT_TYPECAST(";
+
+    unsigned p0;
+    std::string tmp0=convert(src.op0(), p0);
+
+    if(p0<=1) dest+='(';
+    dest+=tmp0;
+    if(p0<=1) dest+=')';
+
     const typet &to_type=ns.follow(src.type());
-    std::string dest="("+convert(to_type)+")";
+    dest+=", ";
+    dest+=convert(to_type);
+    dest+=", ";
 
-    unsigned p;
-    std::string tmp=convert(src.op0(), p);
+    unsigned p1;
+    std::string tmp1=convert(src.op1(), p1);
 
-    if(precedence>p) dest+='(';
-    dest+=tmp;
-    if(precedence>p) dest+=')';
+    if(p1<=1) dest+='(';
+    dest+=tmp1;
+    if(p1<=1) dest+=')';
 
+    dest+=')';
     return dest;
-    #endif
   }
 
   else if(src.id()==ID_sign)
