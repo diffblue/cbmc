@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <util/find_symbols.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
@@ -331,6 +333,7 @@ static bool implicit(const namespacet &ns, goto_programt::const_targett target)
   if(!target->is_assign()) return false;
 
   const code_assignt &a=to_code_assign(target->code);
+  if(a.lhs().id()==ID_dereference) return true;
   if(a.lhs().id()!=ID_symbol) return false;
 
   const symbol_exprt &s=to_symbol_expr(a.lhs());
@@ -346,7 +349,11 @@ static bool implicit(const namespacet &ns, goto_programt::const_targett target)
       return true;
   }
 
-  return s.get_identifier()==CPROVER_PREFIX "rounding_mode";
+  if (s.get_identifier()==CPROVER_PREFIX "rounding_mode" ||
+      s.get_identifier()==CPROVER_PREFIX "deallocated")
+    return true;
+
+  return false;
 }
 
 /*******************************************************************\
