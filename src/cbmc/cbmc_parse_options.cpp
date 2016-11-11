@@ -459,6 +459,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("graphml-cex"))
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
+
+  options.set_option("pass", cmdline.isset("pass"));
 }
 
 /*******************************************************************\
