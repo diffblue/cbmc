@@ -1359,7 +1359,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
   
   const typet &subtype=follow(type.subtype());
   
-  unsigned sub_width=0;
+  std::size_t sub_width=0;
 
   if(subtype.id()==ID_bool)
   {
