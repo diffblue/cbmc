@@ -52,10 +52,10 @@ Function: pointer_logict::get_dynamic_objects
 
 \*******************************************************************/
 
-void pointer_logict::get_dynamic_objects(std::vector<unsigned> &o) const
+void pointer_logict::get_dynamic_objects(std::vector<std::size_t> &o) const
 {
   o.clear();
-  unsigned nr=0;
+  std::size_t nr=0;
   
   for(pointer_logict::objectst::const_iterator
       it=objects.begin();
@@ -77,7 +77,7 @@ Function: pointer_logict::add_object
 
 \*******************************************************************/
 
-unsigned pointer_logict::add_object(const exprt &expr)
+std::size_t pointer_logict::add_object(const exprt &expr)
 {
   // remove any index/member
   
@@ -108,7 +108,7 @@ Function: pointer_logict::pointer_expr
 \*******************************************************************/
 
 exprt pointer_logict::pointer_expr(
-  unsigned object,
+  std::size_t object,
   const typet &type) const
 {
   pointert pointer(object, 0);

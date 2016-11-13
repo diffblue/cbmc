@@ -220,7 +220,7 @@ Function: bv_refinementt::get_values
 
 void bv_refinementt::get_values(approximationt &a)
 {
-  unsigned o=a.expr.operands().size();
+  std::size_t o=a.expr.operands().size();
 
   if(o==1)
     a.op0_value=get_value(a.op0_bv);
@@ -495,10 +495,10 @@ void bv_refinementt::check_UNSAT(approximationt &a)
       // we first set sign and exponent free,
       // but keep the fraction zero
 
-      for(unsigned i=0; i<fraction0.size(); i++)
+      for(std::size_t i=0; i<fraction0.size(); i++)
         a.add_under_assumption(!fraction0[i]);
 
-      for(unsigned i=0; i<fraction1.size(); i++)
+      for(std::size_t i=0; i<fraction1.size(); i++)
         a.add_under_assumption(!fraction1[i]);
     }
     else
@@ -516,10 +516,10 @@ void bv_refinementt::check_UNSAT(approximationt &a)
         // need to start with most-significant bits
 
         #if 0
-        for(unsigned i=x; i<fraction0.size(); i++)
+        for(std::size_t i=x; i<fraction0.size(); i++)
           a.add_under_assumption(!fraction0[fraction0.size()-i-1]);
 
-        for(unsigned i=x; i<fraction1.size(); i++)
+        for(std::size_t i=x; i<fraction1.size(); i++)
           a.add_under_assumption(!fraction1[fraction1.size()-i-1]);
         #endif
       }
@@ -538,10 +538,10 @@ void bv_refinementt::check_UNSAT(approximationt &a)
       // set x least-significant bits free
       a.under_assumptions.reserve(a.op0_bv.size()+a.op1_bv.size());
 
-      for(unsigned i=x; i<a.op0_bv.size(); i++)
+      for(std::size_t i=x; i<a.op0_bv.size(); i++)
         a.add_under_assumption(!a.op0_bv[i]);
 
-      for(unsigned i=x; i<a.op1_bv.size(); i++)
+      for(std::size_t i=x; i<a.op1_bv.size(); i++)
         a.add_under_assumption(!a.op1_bv[i]);
     }
   }
@@ -564,7 +564,7 @@ Function: bv_refinementt::is_in_conflict
 
 bool bv_refinementt::is_in_conflict(approximationt &a)
 {
-  for(unsigned i=0; i<a.under_assumptions.size(); i++)
+  for(std::size_t i=0; i<a.under_assumptions.size(); i++)
     if(prop.is_in_conflict(a.under_assumptions[i]))
       return true;
 
@@ -591,10 +591,10 @@ void bv_refinementt::initialize(approximationt &a)
 
   // initially, we force the operands to be all zero
 
-  for(unsigned i=0; i<a.op0_bv.size(); i++)
+  for(std::size_t i=0; i<a.op0_bv.size(); i++)
     a.add_under_assumption(!a.op0_bv[i]);
 
-  for(unsigned i=0; i<a.op1_bv.size(); i++)
+  for(std::size_t i=0; i<a.op1_bv.size(); i++)
     a.add_under_assumption(!a.op1_bv[i]);
 }
 
@@ -617,7 +617,7 @@ bv_refinementt::add_approximation(
   approximations.push_back(approximationt(approximations.size()));
   approximationt &a=approximations.back(); // stable!
 
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   assert(width!=0);
 
   a.expr=expr;

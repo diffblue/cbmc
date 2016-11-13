@@ -2149,7 +2149,7 @@ void smt1_convt::convert_is_dynamic_object(
   const exprt &expr,
   bool bool_as_bv)
 {
-  std::vector<unsigned> dynamic_objects;
+  std::vector<std::size_t> dynamic_objects;
   pointer_logic.get_dynamic_objects(dynamic_objects);
 
   assert(expr.operands().size()==1);
@@ -2180,11 +2180,8 @@ void smt1_convt::convert_is_dynamic_object(
     {
       out << "(or";
 
-      for(std::vector<unsigned>::const_iterator
-          it=dynamic_objects.begin();
-          it!=dynamic_objects.end();
-          it++)
-        out << " (= bv" << *it
+      for(const auto & it : dynamic_objects)
+        out << " (= bv" << it
             << "[" << BV_ADDR_BITS << "] ?obj)";
 
       out << ")"; // or

@@ -605,7 +605,7 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   const unbiased_floatt unpacked1=unpack(src1);
   const unbiased_floatt unpacked2=unpack(src2);
   
-  unsigned div_width=unpacked1.fraction.size()*2+1;
+  std::size_t div_width=unpacked1.fraction.size()*2+1;
 
   // pad fraction1 with zeros
   bvt fraction1=unpacked1.fraction;
@@ -1294,7 +1294,7 @@ literalt float_utilst::fraction_rounding_decision(
   assert(dest_bits<fraction.size());
 
   // we have too many fraction bits
-  unsigned extra_bits=fraction.size()-dest_bits;
+  std::size_t extra_bits=fraction.size()-dest_bits;
 
   // more than two extra bits are superflus, and are
   // turned into a sticky bit
@@ -1363,7 +1363,7 @@ void float_utilst::round_fraction(unbiased_floatt &result)
   if(result.fraction.size()<fraction_size)
   {
     // pad with zeros at bottom
-    unsigned padding=fraction_size-result.fraction.size();
+    std::size_t padding=fraction_size-result.fraction.size();
 
     result.fraction=bv_utils.concatenate(
       bv_utils.zeros(padding),
@@ -1377,7 +1377,7 @@ void float_utilst::round_fraction(unbiased_floatt &result)
   }
   else // fraction gets smaller -- rounding
   {
-    unsigned extra_bits=result.fraction.size()-fraction_size;
+    std::size_t extra_bits=result.fraction.size()-fraction_size;
     assert(extra_bits>=1);
 
     // this computes the rounding decision    

@@ -216,7 +216,7 @@ exprt float_bvt::is_zero(
 {
   // we mask away the sign bit, which is the most significand bit
   const floatbv_typet &type=to_floatbv_type(src.type());
-  unsigned width=type.get_width();
+  std::size_t width=type.get_width();
   
   std::string mask_str;
   mask_str.resize(width, '1');
@@ -333,7 +333,7 @@ Function: float_bvt::sign_bit
 exprt float_bvt::sign_bit(const exprt &op)
 {
   const bitvector_typet &bv_type=to_bitvector_type(op.type());
-  unsigned width=bv_type.get_width();
+  std::size_t width=bv_type.get_width();
   return extractbit_exprt(op, width-1);
 }
 
@@ -354,7 +354,7 @@ exprt float_bvt::from_signed_integer(
   const exprt &rm,
   const ieee_float_spect &spec)
 {
-  unsigned src_width=to_signedbv_type(src.type()).get_width();
+  std::size_t src_width=to_signedbv_type(src.type()).get_width();
 
   unbiased_floatt result;
 
@@ -394,7 +394,7 @@ exprt float_bvt::from_unsigned_integer(
 
   result.fraction=src;
 
-  unsigned src_width=to_unsignedbv_type(src.type()).get_width();
+  std::size_t src_width=to_unsignedbv_type(src.type()).get_width();
 
   // build an exponent (unbiased) -- this is signed!
   result.exponent=
@@ -421,7 +421,7 @@ Function: float_bvt::to_signed_integer
 
 exprt float_bvt::to_signed_integer(
   const exprt &src,
-  unsigned dest_width,
+  std::size_t dest_width,
   const exprt &rm,
   const ieee_float_spect &spec)
 {
@@ -442,7 +442,7 @@ Function: float_bvt::to_unsigned_integer
 
 exprt float_bvt::to_unsigned_integer(
   const exprt &src,
-  unsigned dest_width,
+  std::size_t dest_width,
   const exprt &rm,
   const ieee_float_spect &spec)
 {
@@ -463,7 +463,7 @@ Function: float_bvt::to_integer
 
 exprt float_bvt::to_integer(
   const exprt &src,
-  unsigned dest_width,
+  std::size_t dest_width,
   bool is_signed,
   const exprt &rm,
   const ieee_float_spect &spec)
@@ -553,7 +553,7 @@ exprt float_bvt::conversion(
     unbiased_floatt result;
     
     // the fraction gets zero-padded
-    unsigned padding=dest_spec.f-src_spec.f;
+    std::size_t padding=dest_spec.f-src_spec.f;
     result.fraction=
       concatenation_exprt(
         unpacked_src.fraction,                  
@@ -624,8 +624,8 @@ exprt float_bvt::subtract_exponents(
   const unbiased_floatt &src2)
 {
   // extend both by one bit
-  unsigned old_width1=to_signedbv_type(src1.exponent.type()).get_width();
-  unsigned old_width2=to_signedbv_type(src2.exponent.type()).get_width();
+  std::size_t old_width1=to_signedbv_type(src1.exponent.type()).get_width();
+  std::size_t old_width2=to_signedbv_type(src2.exponent.type()).get_width();
   assert(old_width1==old_width2);
   
   exprt extended_exponent1=typecast_exprt(src1.exponent, signedbv_typet(old_width1+1));
@@ -720,7 +720,7 @@ exprt float_bvt::add_sub(
       plus_exprt(fraction1_ext, fraction2_ext));
 
   // sign of result
-  unsigned width = to_bitvector_type(result.fraction.type()).get_width();
+  std::size_t width = to_bitvector_type(result.fraction.type()).get_width();
   exprt fraction_sign=sign_exprt(typecast_exprt(result.fraction, signedbv_typet(width)));
   result.fraction=typecast_exprt(abs_exprt(typecast_exprt(result.fraction, signedbv_typet(width))),
                                 unsignedbv_typet(width));
@@ -802,8 +802,8 @@ exprt float_bvt::limit_distance(
   const exprt &dist,
   mp_integer limit)
 {
-  unsigned nb_bits=integer2unsigned(address_bits(limit));
-  unsigned dist_width=to_unsignedbv_type(dist.type()).get_width();
+  std::size_t nb_bits=integer2unsigned(address_bits(limit));
+  std::size_t dist_width=to_unsignedbv_type(dist.type()).get_width();
 
   if(dist_width<=nb_bits)
     return dist;
@@ -911,9 +911,9 @@ exprt float_bvt::div(
   const unbiased_floatt unpacked1=unpack(src1, spec);
   const unbiased_floatt unpacked2=unpack(src2, spec);
   
-  unsigned fraction_width=
+  std::size_t fraction_width=
     to_unsignedbv_type(unpacked1.fraction.type()).get_width();
-  unsigned div_width=fraction_width*2+1;
+  std::size_t div_width=fraction_width*2+1;
 
   // pad fraction1 with zeros
   exprt fraction1=
@@ -1212,8 +1212,8 @@ void float_bvt::normalization_shift(
   // n-log-n alignment shifter.
   // The worst-case shift is the number of fraction
   // bits minus one, in case the faction is one exactly.
-  unsigned fraction_bits=to_unsignedbv_type(fraction.type()).get_width();
-  unsigned exponent_bits=to_signedbv_type(exponent.type()).get_width();
+  std::size_t fraction_bits=to_unsignedbv_type(fraction.type()).get_width();
+  std::size_t exponent_bits=to_signedbv_type(exponent.type()).get_width();
   assert(fraction_bits!=0);  
   
   unsigned depth=integer2unsigned(address_bits(fraction_bits-1));
@@ -1280,7 +1280,7 @@ void float_bvt::denormalization_shift(
   // i.e. the exponent of the smallest normal number and thus the 'base'
   // exponent for subnormal numbers.
   
-  unsigned exponent_bits=to_signedbv_type(exponent.type()).get_width();
+  std::size_t exponent_bits=to_signedbv_type(exponent.type()).get_width();
   assert(exponent_bits>=spec.e);
 
 #if 1
@@ -1303,7 +1303,7 @@ void float_bvt::denormalization_shift(
 #if 1
   // Care must be taken to not loose information required for the
   // guard and sticky bits.  +3 is for the hidden, guard and sticky bits.
-  unsigned fraction_bits=to_unsignedbv_type(fraction.type()).get_width();
+  std::size_t fraction_bits=to_unsignedbv_type(fraction.type()).get_width();
   
   if(fraction_bits < spec.f+3) 
   { 
@@ -1413,18 +1413,18 @@ Function: float_bvt::fraction_rounding_decision
 \*******************************************************************/
 
 exprt float_bvt::fraction_rounding_decision(
-  const unsigned dest_bits,
+  const std::size_t dest_bits,
   const exprt sign,
   const exprt &fraction,
   const rounding_mode_bitst &rounding_mode_bits)
 {
-  unsigned fraction_bits=
+  std::size_t fraction_bits=
     to_unsignedbv_type(fraction.type()).get_width();
 
   assert(dest_bits<fraction_bits);
 
   // we have too many fraction bits
-  unsigned extra_bits=fraction_bits-dest_bits;
+  std::size_t extra_bits=fraction_bits-dest_bits;
 
   // more than two extra bits are superflus, and are
   // turned into a sticky bit
@@ -1492,15 +1492,15 @@ void float_bvt::round_fraction(
   const rounding_mode_bitst &rounding_mode_bits,
   const ieee_float_spect &spec)
 {
-  unsigned fraction_size=spec.f+1;
-  unsigned result_fraction_size=
+  std::size_t fraction_size=spec.f+1;
+  std::size_t result_fraction_size=
     to_unsignedbv_type(result.fraction.type()).get_width();
 
   // do we need to enlarge the fraction?
   if(result_fraction_size<fraction_size)
   {
     // pad with zeros at bottom
-    unsigned padding=fraction_size-result_fraction_size;
+    std::size_t padding=fraction_size-result_fraction_size;
 
     result.fraction=concatenation_exprt(
       result.fraction,
@@ -1513,7 +1513,7 @@ void float_bvt::round_fraction(
   }
   else // fraction gets smaller -- rounding
   {
-    unsigned extra_bits=result_fraction_size-fraction_size;
+    std::size_t extra_bits=result_fraction_size-fraction_size;
     assert(extra_bits>=1);
 
     // this computes the rounding decision    
@@ -1612,7 +1612,7 @@ void float_bvt::round_exponent(
   const rounding_mode_bitst &rounding_mode_bits,
   const ieee_float_spect &spec)
 {
-  unsigned result_exponent_size=
+  std::size_t result_exponent_size=
     to_signedbv_type(result.exponent.type()).get_width();
 
   // do we need to enlarge the exponent?
@@ -1877,13 +1877,13 @@ exprt float_bvt::sticky_right_shift(
   const exprt &dist,
   exprt &sticky)
 {
-  unsigned d=1, width=to_unsignedbv_type(op.type()).get_width();
+  std::size_t d=1, width=to_unsignedbv_type(op.type()).get_width();
   exprt result=op;
   sticky=false_exprt();
 
-  unsigned dist_width=to_bitvector_type(dist.type()).get_width();
+  std::size_t dist_width=to_bitvector_type(dist.type()).get_width();
 
-  for(unsigned stage=0; stage<dist_width; stage++)
+  for(std::size_t stage=0; stage<dist_width; stage++)
   {
     exprt tmp=lshr_exprt(result, d);
 

@@ -52,9 +52,9 @@ public:
   // conversion
   exprt from_unsigned_integer(const exprt &, const exprt &rm, const ieee_float_spect &);
   exprt from_signed_integer(const exprt &, const exprt &rm, const ieee_float_spect &);
-  exprt to_signed_integer(const exprt &src, unsigned dest_width, const exprt &rm, const ieee_float_spect &);
-  exprt to_unsigned_integer(const exprt &src, unsigned dest_width, const exprt &rm, const ieee_float_spect &);
-  exprt to_integer(const exprt &src, unsigned dest_width, bool is_signed, const exprt &rm, const ieee_float_spect &);
+  exprt to_signed_integer(const exprt &src, std::size_t dest_width, const exprt &rm, const ieee_float_spect &);
+  exprt to_unsigned_integer(const exprt &src, std::size_t dest_width, const exprt &rm, const ieee_float_spect &);
+  exprt to_integer(const exprt &src, std::size_t dest_width, bool is_signed, const exprt &rm, const ieee_float_spect &);
   exprt conversion(const exprt &src, const exprt &rm, const ieee_float_spect &src_spec, const ieee_float_spect &dest_spec);
 
   // relations
@@ -132,7 +132,7 @@ protected:
   
   // rounding decision for fraction
   exprt fraction_rounding_decision(
-    const unsigned dest_bits,
+    const std::size_t dest_bits,
     const exprt sign,
     const exprt &fraction,
     const rounding_mode_bitst &);

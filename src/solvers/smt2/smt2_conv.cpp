@@ -201,9 +201,9 @@ void smt2_convt::define_object_size(
   const exprt &ptr = expr.op0();
   std::size_t size_width = boolbv_width(expr.type());
   std::size_t pointer_width = boolbv_width(ptr.type());
-  unsigned int number = 0;
-  unsigned int h = pointer_width - 1;
-  unsigned int l = pointer_width - BV_ADDR_BITS;
+  std::size_t number = 0;
+  std::size_t h = pointer_width - 1;
+  std::size_t l = pointer_width - BV_ADDR_BITS;
 
   for(pointer_logict::objectst::const_iterator it = pointer_logic.objects.begin();
       it != pointer_logic.objects.end();
@@ -2649,7 +2649,7 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   {
     if(use_FPA_theory)
     {
-      unsigned dest_width=to_signedbv_type(dest_type).get_width();
+      std::size_t dest_width=to_signedbv_type(dest_type).get_width();
       out << "((_ fp.to_sbv " << dest_width << ") ";
       convert_rounding_mode_FPA(expr.op1());
       out << " ";
@@ -2663,7 +2663,7 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   {
     if(use_FPA_theory)
     {
-      unsigned dest_width=to_unsignedbv_type(dest_type).get_width();
+      std::size_t dest_width=to_unsignedbv_type(dest_type).get_width();
       out << "((_ fp.to_ubv " << dest_width << ") ";
       convert_rounding_mode_FPA(expr.op1());
       out << " ";
@@ -3037,7 +3037,7 @@ Function: smt2_convt::convert_is_dynamic_object
 
 void smt2_convt::convert_is_dynamic_object(const exprt &expr)
 {
-  std::vector<unsigned> dynamic_objects;
+  std::vector<std::size_t> dynamic_objects;
   pointer_logic.get_dynamic_objects(dynamic_objects);
 
   assert(expr.operands().size()==1);
@@ -3063,11 +3063,8 @@ void smt2_convt::convert_is_dynamic_object(const exprt &expr)
     {
       out << "(or";
 
-      for(std::vector<unsigned>::const_iterator
-          it=dynamic_objects.begin();
-          it!=dynamic_objects.end();
-          it++)
-        out << " (= (_ bv" << *it
+      for(const auto & it : dynamic_objects)
+        out << " (= (_ bv" << it
             << " " << BV_ADDR_BITS << ") ?obj)";
 
       out << ")"; // or
@@ -3579,7 +3576,7 @@ void smt2_convt::convert_div(const div_exprt &expr)
   else if(expr.type().id()==ID_fixedbv)
   {
     fixedbv_spect spec(to_fixedbv_type(expr.type()));
-    unsigned fraction_bits=spec.get_fraction_bits();
+    std::size_t fraction_bits=spec.get_fraction_bits();
 
     out << "((_ extract " << spec.width-1 << " 0) ";
     out << "(bvsdiv ";
@@ -3687,7 +3684,7 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
   else if(expr.type().id()==ID_fixedbv)
   {
     fixedbv_spect spec(to_fixedbv_type(expr.type()));
-    unsigned fraction_bits=spec.get_fraction_bits();
+    std::size_t fraction_bits=spec.get_fraction_bits();
 
     out << "((_ extract "
         << spec.width+fraction_bits-1 << " "
