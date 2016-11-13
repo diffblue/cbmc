@@ -136,8 +136,8 @@ Function: fixedbvt::round
 
 void fixedbvt::round(const fixedbv_spect &dest_spec)
 {
-  unsigned old_fraction_bits=spec.width-spec.integer_bits;
-  unsigned new_fraction_bits=dest_spec.width-dest_spec.integer_bits;
+  std::size_t old_fraction_bits=spec.width-spec.integer_bits;
+  std::size_t new_fraction_bits=dest_spec.width-dest_spec.integer_bits;
 
   mp_integer result;
 
@@ -259,7 +259,7 @@ std::string fixedbvt::format(
   const format_spect &format_spec) const
 {
   std::string dest;
-  unsigned fraction_bits=spec.get_fraction_bits();
+  std::size_t fraction_bits=spec.get_fraction_bits();
 
   mp_integer int_value=v;
   mp_integer factor=power(2, fraction_bits);
