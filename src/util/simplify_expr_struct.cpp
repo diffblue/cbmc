@@ -143,7 +143,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
       const struct_typet &struct_type=to_struct_type(op_type);
       if(struct_type.has_component(component_name))
       {
-        unsigned number=struct_type.component_number(component_name);
+        std::size_t number=struct_type.component_number(component_name);
         exprt tmp;
         tmp.swap(op.operands()[number]);
         expr.swap(tmp);
