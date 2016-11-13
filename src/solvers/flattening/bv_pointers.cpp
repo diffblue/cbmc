@@ -678,7 +678,7 @@ Function: bv_pointerst::encode
 
 \*******************************************************************/
 
-void bv_pointerst::encode(unsigned addr, bvt &bv)
+void bv_pointerst::encode(std::size_t addr, bvt &bv)
 {
   bv.resize(bits);
 
@@ -795,9 +795,9 @@ Function: bv_pointerst::add_addr
 
 void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 {
-  unsigned a=pointer_logic.add_object(expr);
+  std::size_t a=pointer_logic.add_object(expr);
 
-  if(a==(unsigned(1)>>object_bits))
+  if(a==(std::size_t(1)>>object_bits))
     throw "too many variables";
 
   encode(a, bv);

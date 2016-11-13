@@ -969,7 +969,7 @@ bool goto_program2codet::set_block_end_points(
   cases_listt &cases,
   std::set<unsigned> &processed_locations)
 {
-  std::map<goto_programt::const_targett, unsigned> targets_done;
+  std::map<goto_programt::const_targett, std::size_t> targets_done;
 
   for(cases_listt::iterator it=cases.begin();
       it!=cases.end();

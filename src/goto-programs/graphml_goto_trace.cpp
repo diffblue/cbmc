@@ -155,7 +155,7 @@ void convert(
   graphml[sink].is_violation=false;
 
   // step numbers start at 1
-  std::vector<unsigned> step_to_node(goto_trace.steps.size()+1, 0);
+  std::vector<std::size_t> step_to_node(goto_trace.steps.size()+1, 0);
 
   for(goto_tracet::stepst::const_iterator
       it=goto_trace.steps.begin();

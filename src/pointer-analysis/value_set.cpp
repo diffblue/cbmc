@@ -181,7 +181,7 @@ void value_sett::output(
 
     const object_map_dt &object_map=e.object_map.read();
     
-    unsigned width=0;
+    std::size_t width=0;
     
     for(object_map_dt::const_iterator
         o_it=object_map.begin();
@@ -1878,7 +1878,7 @@ exprt value_sett::make_member(
   if(src.id()==ID_struct ||
      src.id()==ID_constant)
   {
-    unsigned no=struct_union_type.component_number(component_name);
+    std::size_t no=struct_union_type.component_number(component_name);
     assert(no<src.operands().size());
     return src.operands()[no];
   }

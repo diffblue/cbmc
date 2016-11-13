@@ -117,7 +117,7 @@ void value_set_fivrt::output(
     out << display_name << " = { ";
     if(object_map.read().size()!=0) out << "\n      ";
     
-    unsigned width=0;
+    std::size_t width=0;
     
     forall_objects(o_it, object_map.read())
     {

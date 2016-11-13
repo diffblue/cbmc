@@ -1294,7 +1294,7 @@ public:
     return get_size_t(ID_component_number);
   }
 
-  inline void set_component_number(unsigned component_number)
+  inline void set_component_number(std::size_t component_number)
   {
     set(ID_component_number, component_number);
   }

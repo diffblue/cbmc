@@ -109,7 +109,9 @@ Function: float_utilst::to_signed_integer
 
 \*******************************************************************/
 
-bvt float_utilst::to_signed_integer(const bvt &src, unsigned dest_width)
+bvt float_utilst::to_signed_integer(
+  const bvt &src,
+  std::size_t dest_width)
 {
   return to_integer(src, dest_width, true);
 }
@@ -126,7 +128,9 @@ Function: float_utilst::to_unsigned_integer
 
 \*******************************************************************/
 
-bvt float_utilst::to_unsigned_integer(const bvt &src, unsigned dest_width)
+bvt float_utilst::to_unsigned_integer(
+  const bvt &src,
+  std::size_t dest_width)
 {
   return to_integer(src, dest_width, false);
 }
@@ -145,7 +149,7 @@ Function: float_utilst::to_integer
 
 bvt float_utilst::to_integer(
   const bvt &src,
-  unsigned dest_width,
+  std::size_t dest_width,
   bool is_signed)
 {
   assert(src.size()==spec.width());
@@ -164,7 +168,7 @@ bvt float_utilst::to_integer(
     bvt result=shift_result;
     literalt exponent_sign=unpacked.exponent[unpacked.exponent.size()-1];
 
-    for(unsigned i=0; i<result.size(); i++)
+    for(std::size_t i=0; i<result.size(); i++)
       result[i]=prop.land(result[i], !exponent_sign);
 
     // chop out the right number of bits from the result
@@ -265,7 +269,7 @@ bvt float_utilst::conversion(
     unbiased_floatt result;
     
     // the fraction gets zero-padded
-    unsigned padding=dest_spec.f-spec.f;
+    std::size_t padding=dest_spec.f-spec.f;
     result.fraction=
       bv_utils.concatenate(bv_utils.zeros(padding), unpacked_src.fraction);
     
@@ -480,10 +484,10 @@ bvt float_utilst::add_sub(
   result.exponent.resize(spec.e, const_literal(false));
   result.NaN=const_literal(false);
   result.infinity=const_literal(false);
-  //for(unsigned i=0; i<result.fraction.size(); i++)
+  //for(std::size_t i=0; i<result.fraction.size(); i++)
   //  result.fraction[i]=const_literal(true);
 
-  for(unsigned i=0; i<result.fraction.size(); i++)
+  for(std::size_t i=0; i<result.fraction.size(); i++)
     result.fraction[i]=new_fraction2[i];
 
   return pack(bias(result));
@@ -505,10 +509,10 @@ Function: float_utilst::limit_distance
 \*******************************************************************/
 
 bvt float_utilst::limit_distance(
-    const bvt &dist,
-    mp_integer limit)
+  const bvt &dist,
+  mp_integer limit)
 {
-  unsigned nb_bits=integer2unsigned(address_bits(limit));
+  std::size_t nb_bits=integer2unsigned(address_bits(limit));
 
   bvt upper_bits=dist;
   upper_bits.erase(upper_bits.begin(), upper_bits.begin()+nb_bits);
@@ -521,7 +525,7 @@ bvt float_utilst::limit_distance(
   result.resize(lower_bits.size());
 
   // bitwise or with or_upper_bits
-  for(unsigned int i=0; i<result.size(); i++)
+  for(std::size_t i=0; i<result.size(); i++)
     result[i]=prop.lor(lower_bits[i], or_upper_bits);
 
   return result;
@@ -1066,12 +1070,12 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   bvt new_exponent=prop.new_variables(exponent.size());
 
   // i is the shift distance
-  for(unsigned i=0; i<fraction.size(); i++)
+  for(std::size_t i=0; i<fraction.size(); i++)
   {
     bvt equal;
 
     // the bits above need to be zero
-    for(unsigned j=0; j<i; j++)
+    for(std::size_t j=0; j<i; j++)
       equal.push_back(
         !fraction[fraction.size()-1-j]);
 
@@ -1116,7 +1120,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   
   for(int d=depth-1; d>=0; d--)
   {
-    unsigned distance=(1<<d);
+    std::size_t distance=(1<<d);
     assert(fraction.size()>distance);
     
     // check if first 'distance'-many bits are zeros
@@ -1287,7 +1291,7 @@ Function: float_utilst::fraction_rounding_decision
 \*******************************************************************/
 
 literalt float_utilst::fraction_rounding_decision(
-  const unsigned dest_bits,
+  const std::size_t dest_bits,
   const literalt sign,
   const bvt &fraction)
 {
@@ -1357,7 +1361,7 @@ Function: float_utilst::round_fraction
 
 void float_utilst::round_fraction(unbiased_floatt &result)
 {
-  unsigned fraction_size=spec.f+1;
+  std::size_t fraction_size=spec.f+1;
 
   // do we need to enlarge the fraction?
   if(result.fraction.size()<fraction_size)
@@ -1559,7 +1563,7 @@ float_utilst::biased_floatt float_utilst::bias(const unbiased_floatt &src)
 
   // make exponent zero if its denormal
   // (includes zero)
-  for(unsigned i=0; i<result.exponent.size(); i++)
+  for(std::size_t i=0; i<result.exponent.size(); i++)
     result.exponent[i]=
       prop.land(result.exponent[i], !denormal);
 
@@ -1678,13 +1682,13 @@ bvt float_utilst::pack(const biased_floatt &src)
     prop.lor(src.NaN, src.infinity);
 
   // just copy fraction
-  for(unsigned i=0; i<spec.f; i++)
+  for(std::size_t i=0; i<spec.f; i++)
     result[i]=prop.land(src.fraction[i], !infinity_or_NaN);
 
   result[0]=prop.lor(result[0], src.NaN);
 
   // do exponent
-  for(unsigned i=0; i<spec.e; i++)
+  for(std::size_t i=0; i<spec.e; i++)
     result[i+spec.f]=prop.lor(
       src.exponent[i],
       infinity_or_NaN);
@@ -1708,7 +1712,7 @@ ieee_floatt float_utilst::get(const bvt &src) const
 {
   mp_integer int_value=0;
 
-  for(unsigned i=0; i<src.size(); i++)
+  for(std::size_t i=0; i<src.size(); i++)
     int_value+=power(2, i)*prop.l_get(src[i]).is_true();
 
   ieee_floatt result;
@@ -1735,11 +1739,11 @@ bvt float_utilst::sticky_right_shift(
   const bvt &dist,
   literalt &sticky)
 {
-  unsigned d=1;
+  std::size_t d=1;
   bvt result=op;
   sticky=const_literal(false);
 
-  for(unsigned stage=0; stage<dist.size(); stage++)
+  for(std::size_t stage=0; stage<dist.size(); stage++)
   {
     if(dist[stage]!=const_literal(false))
     {

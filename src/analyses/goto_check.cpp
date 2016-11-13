@@ -342,11 +342,11 @@ void goto_checkt::integer_overflow_check(
     
     if(type.id()==ID_signedbv)
     {
-      unsigned new_width=to_signedbv_type(type).get_width();
+      std::size_t new_width=to_signedbv_type(type).get_width();
 
       if(old_type.id()==ID_signedbv) // signed -> signed
       {
-        unsigned old_width=to_signedbv_type(old_type).get_width();
+        std::size_t old_width=to_signedbv_type(old_type).get_width();
         if(new_width>=old_width) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -367,7 +367,7 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_unsignedbv) // unsigned -> signed
       {
-        unsigned old_width=to_unsignedbv_type(old_type).get_width();
+        std::size_t old_width=to_unsignedbv_type(old_type).get_width();
         if(new_width>=old_width+1) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -408,11 +408,11 @@ void goto_checkt::integer_overflow_check(
     }
     else if(type.id()==ID_unsignedbv)
     {
-      unsigned new_width=to_unsignedbv_type(type).get_width();
+      std::size_t new_width=to_unsignedbv_type(type).get_width();
 
       if(old_type.id()==ID_signedbv) // signed -> unsigned
       {
-        unsigned old_width=to_signedbv_type(old_type).get_width();
+        std::size_t old_width=to_signedbv_type(old_type).get_width();
 
         if(new_width>=old_width-1)
         {
@@ -451,7 +451,7 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_unsignedbv) // unsigned -> unsigned
       {
-        unsigned old_width=to_unsignedbv_type(old_type).get_width();
+        std::size_t old_width=to_unsignedbv_type(old_type).get_width();
         if(new_width>=old_width) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);

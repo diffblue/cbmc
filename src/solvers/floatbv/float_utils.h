@@ -111,9 +111,9 @@ public:
   // conversion
   bvt from_unsigned_integer(const bvt &);
   bvt from_signed_integer(const bvt &);
-  bvt to_integer(const bvt &src, unsigned int_width, bool is_signed);
-  bvt to_signed_integer(const bvt &src, unsigned int_width);
-  bvt to_unsigned_integer(const bvt &src, unsigned int_width);
+  bvt to_integer(const bvt &src, std::size_t int_width, bool is_signed);
+  bvt to_signed_integer(const bvt &src, std::size_t int_width);
+  bvt to_unsigned_integer(const bvt &src, std::size_t int_width);
   bvt conversion(const bvt &src, const ieee_float_spect &dest_spec);
 
   // relations
@@ -183,7 +183,7 @@ protected:
   
   // rounding decision for fraction
   literalt fraction_rounding_decision(
-    const unsigned dest_bits,
+    const std::size_t dest_bits,
     const literalt sign,
     const bvt &fraction);
 

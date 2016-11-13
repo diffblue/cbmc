@@ -89,7 +89,7 @@ void value_set_fit::output(
     object_mapt object_map;
     flatten(e, object_map);
     
-    unsigned width=0;    
+    std::size_t width=0;    
     
     forall_objects(o_it, object_map.read())
     {

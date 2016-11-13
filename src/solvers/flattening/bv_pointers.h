@@ -28,7 +28,7 @@ protected:
 
   unsigned object_bits, offset_bits, bits;
   
-  void encode(unsigned object, bvt &bv);
+  void encode(std::size_t object, bvt &bv);
   
   virtual bvt convert_pointer_type(const exprt &expr);
   
