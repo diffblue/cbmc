@@ -688,7 +688,7 @@ void cvc_convt::convert_expr(const exprt &expr)
          value.size()==32 ||
          value.size()==64)
       {
-        unsigned w=value.size()/4;
+        std::size_t w=value.size()/4;
       
         mp_integer i=binary2integer(id2string(value), false);
         std::string hex=integer2string(i, 16);
@@ -1466,7 +1466,7 @@ void cvc_convt::convert_type(const typet &type)
   }
   else if(type.id()==ID_signedbv)
   {
-    unsigned width=to_signedbv_type(type).get_width();
+    std::size_t width=to_signedbv_type(type).get_width();
       
     if(width==0)
       throw "zero-width vector type: "+type.id_string();
@@ -1475,7 +1475,7 @@ void cvc_convt::convert_type(const typet &type)
   }
   else if(type.id()==ID_unsignedbv)
   {
-    unsigned width=to_unsignedbv_type(type).get_width();
+    std::size_t width=to_unsignedbv_type(type).get_width();
       
     if(width==0)
       throw "zero-width vector type: "+type.id_string();
