@@ -31,12 +31,12 @@ Function: add_node
 
 \*******************************************************************/
 
-static unsigned add_node(
+static std::size_t add_node(
   const std::string &name,
-  std::map<std::string, unsigned> &name_to_node,
+  std::map<std::string, std::size_t> &name_to_node,
   graphmlt &graph)
 {
-  std::pair<std::map<std::string, unsigned>::iterator, bool> entry=
+  std::pair<std::map<std::string, std::size_t>::iterator, bool> entry=
     name_to_node.insert(std::make_pair(name, 0));
   if(entry.second)
     entry.first->second=graph.add_node();
@@ -58,7 +58,7 @@ Function: build_graph_rec
 
 static bool build_graph_rec(
   const xmlt &xml,
-  std::map<std::string, unsigned> &name_to_node,
+  std::map<std::string, std::size_t> &name_to_node,
   std::map<std::string, std::map<std::string, std::string> > &defaults,
   graphmlt &dest,
   std::string &entrynode)
@@ -67,7 +67,7 @@ static bool build_graph_rec(
   {
     const std::string node_name=xml.get_attribute("id");
 
-    const unsigned n=add_node(node_name, name_to_node, dest);
+    const std::size_t n=add_node(node_name, name_to_node, dest);
 
     graphmlt::nodet &node=dest[n];
     node.node_name=node_name;
@@ -184,7 +184,7 @@ static bool build_graph(
 {
   assert(dest.size()==0);
 
-  std::map<std::string, unsigned> name_to_node;
+  std::map<std::string, std::size_t> name_to_node;
   std::map<std::string, std::map<std::string, std::string> > defaults;
   std::string entrynode;
 
@@ -196,7 +196,7 @@ static bool build_graph(
       dest,
       entrynode);
 
-  for(unsigned i=0; !err && i<dest.size(); ++i)
+  for(std::size_t i=0; !err && i<dest.size(); ++i)
   {
     const graphmlt::nodet &n=dest[i];
 
@@ -204,7 +204,7 @@ static bool build_graph(
   }
 
   assert(!entrynode.empty());
-  std::map<std::string, unsigned>::const_iterator it=
+  std::map<std::string, std::size_t>::const_iterator it=
     name_to_node.find(entrynode);
   assert(it!=name_to_node.end());
   entry=it->second;

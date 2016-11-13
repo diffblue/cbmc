@@ -45,12 +45,12 @@ protected:
   struct approximationt
   {
   public:
-    explicit approximationt(unsigned _id_nr):id_nr(_id_nr)
+    explicit approximationt(std::size_t _id_nr):id_nr(_id_nr)
     {
     }
   
     exprt expr;
-    unsigned no_operands;
+    std::size_t no_operands;
 
     bvt op0_bv, op1_bv, op2_bv, result_bv;
     mp_integer op0_value, op1_value, op2_value, result_value;
@@ -70,7 +70,7 @@ protected:
     void add_over_assumption(literalt l);
     void add_under_assumption(literalt l);
     
-    unsigned id_nr;
+    std::size_t id_nr;
   };
   
   typedef std::list<approximationt> approximationst;

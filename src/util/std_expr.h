@@ -2005,7 +2005,7 @@ public:
   {
   }
 
-  shift_exprt(const exprt &_src, const irep_idt &_id, const unsigned _distance);
+  shift_exprt(const exprt &_src, const irep_idt &_id, const std::size_t _distance);
 
   inline exprt &op()
   {
@@ -2066,7 +2066,7 @@ public:
   {
   }
 
-  shl_exprt(const exprt &_src, const unsigned _distance):shift_exprt(_src, ID_shl, _distance)
+  shl_exprt(const exprt &_src, const std::size_t _distance):shift_exprt(_src, ID_shl, _distance)
   {
   }
 };
@@ -2084,7 +2084,7 @@ public:
   {
   }
 
-  inline ashr_exprt(const exprt &_src, const unsigned _distance):shift_exprt(_src, ID_ashr, _distance)
+  inline ashr_exprt(const exprt &_src, const std::size_t _distance):shift_exprt(_src, ID_ashr, _distance)
   {
   }
 };
@@ -2102,7 +2102,7 @@ public:
   {
   }
 
-  inline lshr_exprt(const exprt &_src, const unsigned _distance):shift_exprt(_src, ID_lshr, _distance)
+  inline lshr_exprt(const exprt &_src, const std::size_t _distance):shift_exprt(_src, ID_lshr, _distance)
   {
   }
 };
@@ -2190,7 +2190,7 @@ public:
 
   extractbit_exprt(
     const exprt &_src,
-    const unsigned _index);
+    const std::size_t _index);
 
   exprt &src()
   {
@@ -2260,8 +2260,8 @@ public:
   
   extractbits_exprt(
     const exprt &_src,
-    const unsigned _upper,
-    const unsigned _lower,
+    const std::size_t _upper,
+    const std::size_t _lower,
     const typet &_type);
 
   exprt &src()
@@ -2936,7 +2936,7 @@ public:
     return get_size_t(ID_component_number);
   }
 
-  inline void set_component_number(unsigned component_number)
+  inline void set_component_number(std::size_t component_number)
   {
     set(ID_component_number, component_number);
   }

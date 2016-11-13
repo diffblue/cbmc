@@ -688,7 +688,7 @@ void bv_pointerst::encode(std::size_t addr, bvt &bv)
 
   // set variable part
   for(std::size_t i=0; i<object_bits; i++)
-    bv[offset_bits+i]=const_literal((addr&(1<<i))!=0);
+    bv[offset_bits+i]=const_literal((addr&(std::size_t(1)<<i))!=0);
 }
 
 /*******************************************************************\

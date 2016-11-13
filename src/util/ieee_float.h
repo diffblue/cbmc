@@ -20,9 +20,9 @@ class floatbv_typet;
 class ieee_float_spect
 {
 public:
-  // Bits for fraction (excluding hidden bit) and exponent,
-  // respectively
-  unsigned f, e;
+  // Number of bits for fraction (excluding hidden bit)
+  // and exponent, respectively
+  std::size_t f, e;
   
   // x86 has an extended precision format with an explicit
   // integer bit.
@@ -41,11 +41,11 @@ public:
   {
   }
 
-  ieee_float_spect(unsigned _f, unsigned _e):f(_f), e(_e), x86_extended(false)
+  ieee_float_spect(std::size_t _f, std::size_t _e):f(_f), e(_e), x86_extended(false)
   {
   }
 
-  inline unsigned width() const
+  inline std::size_t width() const
   {
     // Add one for the sign bit.
     // Add one if x86 explicit integer bit is used.
@@ -241,8 +241,8 @@ public:
     return format(format_spect());
   }
   
-  std::string to_string_decimal(unsigned precision) const;
-  std::string to_string_scientific(unsigned precision) const;  
+  std::string to_string_decimal(std::size_t precision) const;
+  std::string to_string_scientific(std::size_t precision) const;  
   std::string format(const format_spect &format_spec) const;
   
   friend inline std::ostream& operator << (std::ostream &out, const ieee_floatt &f)

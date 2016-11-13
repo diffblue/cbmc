@@ -106,7 +106,7 @@ Function: ieee_float_spect::from_type
 
 void ieee_float_spect::from_type(const floatbv_typet &type)
 {
-  unsigned width=type.get_width();
+  std::size_t width=type.get_width();
   f=type.get_f();
   assert(f!=0);
   assert(f<width);
@@ -223,7 +223,7 @@ Function: ieee_floatt::to_string_decimal
 
 \*******************************************************************/
 
-std::string ieee_floatt::to_string_decimal(unsigned precision) const
+std::string ieee_floatt::to_string_decimal(std::size_t precision) const
 {
   std::string result;
 
@@ -244,7 +244,7 @@ std::string ieee_floatt::to_string_decimal(unsigned precision) const
     if(precision>0)
     {
       result+='.';
-      for(unsigned i=0; i<precision; i++)
+      for(std::size_t i=0; i<precision; i++)
         result+='0';
     }
   }
@@ -262,7 +262,7 @@ std::string ieee_floatt::to_string_decimal(unsigned precision) const
       if(precision>0)
       {
         result+='.';
-        for(unsigned i=0; i<precision; i++)
+        for(std::size_t i=0; i<precision; i++)
           result+='0';
       }
     }
@@ -325,7 +325,7 @@ Function: ieee_floatt::to_string_scientific
 
 \*******************************************************************/
 
-std::string ieee_floatt::to_string_scientific(unsigned precision) const
+std::string ieee_floatt::to_string_scientific(std::size_t precision) const
 {
   std::string result;
 
@@ -346,7 +346,7 @@ std::string ieee_floatt::to_string_scientific(unsigned precision) const
     if(precision>0)
     {
       result+='.';
-      for(unsigned i=0; i<precision; i++)
+      for(std::size_t i=0; i<precision; i++)
         result+='0';
     }
     
@@ -747,7 +747,7 @@ void ieee_floatt::align()
   mp_integer f_power=power(2, spec.f);
   mp_integer f_power_next=power(2, spec.f+1);
 
-  unsigned lowPower2 = fraction.floorPow2();
+  std::size_t lowPower2 = fraction.floorPow2();
   mp_integer exponent_offset=0;
 
   if (lowPower2 < spec.f) // too small

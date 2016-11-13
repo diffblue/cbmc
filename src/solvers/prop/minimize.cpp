@@ -136,7 +136,8 @@ void prop_minimizet::operator()()
   // we need to use assumptions
   assert(prop_conv.has_set_assumptions());
 
-  _iterations=_number_satisfied=0;
+  _iterations=0;
+  _number_satisfied=0;
   _value=0;
   bool last_was_SAT=false;
   

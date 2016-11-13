@@ -218,7 +218,7 @@ Function: shift_exprt::shift_exprt
 shift_exprt::shift_exprt(
   const exprt &_src,
   const irep_idt &_id,
-  const unsigned _distance):
+  const std::size_t _distance):
   binary_exprt(_src, _id, constant_exprt::integer_constant(_distance))
 {
 }
@@ -237,7 +237,7 @@ Function: extractbit_exprt::extractbit_exprt
 
 extractbit_exprt::extractbit_exprt(
   const exprt &_src,
-  const unsigned _index):
+  const std::size_t _index):
   binary_predicate_exprt(
     _src, ID_extractbit, constant_exprt::integer_constant(_index))
 {
@@ -257,8 +257,8 @@ Function: extractbit_exprt::extractbits_exprt
 
 extractbits_exprt::extractbits_exprt(
   const exprt &_src,
-  const unsigned _upper,
-  const unsigned _lower,
+  const std::size_t _upper,
+  const std::size_t _lower,
   const typet &_type):
   exprt(ID_extractbits, _type)
 {
