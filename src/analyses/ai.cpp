@@ -110,7 +110,7 @@ jsont ai_baset::output_json(
     {
       result[as_string(f_it->first)] = output_json(ns, f_it->second.body, f_it->first);
     } else {
-      result[as_string(f_it->first)] = json_stringt("no body");
+      result[as_string(f_it->first)] = json_arrayt();
     }
   }
 
