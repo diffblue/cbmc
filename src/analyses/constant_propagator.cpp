@@ -346,7 +346,7 @@ Function: constant_propagator_domaint::domain_simplify
 
 exprt constant_propagator_domaint::domain_simplify (const exprt &condition,
 						    const namespacet &ns,
-						    const bool lhs)
+						    const bool lhs) const
 {
   if (lhs) {
     // For now do not simplify the left hand sides of assignments
