@@ -22,7 +22,7 @@ void *foo1(void *arg1)
 void *foo2(void *arg2)
 {
   st.y = 1;
-  my_array[2]=2;
+  my_array[2]=1;
   done2 = 1;
 }
 
