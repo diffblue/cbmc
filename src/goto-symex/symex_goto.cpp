@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/std_expr.h>
 
+#include <analyses/dirty.h>
+
 #include "goto_symex.h"
 
 /*******************************************************************\
@@ -324,7 +326,8 @@ void goto_symext::phi_function(
 
     // shared?
     if(dest_state.atomic_section_id==0 &&
-       dest_state.threads.size()>=2 && symbol.is_shared())
+       dest_state.threads.size()>=2 &&
+       (symbol.is_shared() || (*dest_state.dirty)(symbol.name)))
       continue; // no phi nodes for shared stuff
 
     // don't merge (thread-)locals across different threads, which

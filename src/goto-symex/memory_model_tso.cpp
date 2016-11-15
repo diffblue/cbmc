@@ -72,8 +72,8 @@ bool memory_model_tsot::program_order_is_relaxed(
   partial_order_concurrencyt::event_it e1,
   partial_order_concurrencyt::event_it e2) const
 {
-  assert(is_shared_read(e1) || is_shared_write(e1));
-  assert(is_shared_read(e2) || is_shared_write(e2));
+  assert(e1->is_shared_read() || e1->is_shared_write());
+  assert(e2->is_shared_read() || e2->is_shared_write());
 
   // no po relaxation within atomic sections
   if(e1->atomic_section_id!=0 &&
@@ -81,7 +81,7 @@ bool memory_model_tsot::program_order_is_relaxed(
     return false;
 
   // write to read program order is relaxed
-  return is_shared_write(e1) && is_shared_read(e2);
+  return e1->is_shared_write() && e2->is_shared_read();
 }
 
 /*******************************************************************\
@@ -120,7 +120,7 @@ void memory_model_tsot::program_order(
         e_it!=events.end();
         e_it++)
     {
-      if(is_memory_barrier(*e_it))
+      if((*e_it)->is_memory_barrier())
         continue;
 
       event_listt::const_iterator next=e_it;
@@ -135,8 +135,8 @@ void memory_model_tsot::program_order(
           e_it2!=events.end();
           e_it2++)
       {
-        if((is_spawn(*e_it) && !is_memory_barrier(*e_it2)) ||
-           is_spawn(*e_it2))
+        if(((*e_it)->is_spawn() && !(*e_it2)->is_memory_barrier()) ||
+           (*e_it2)->is_spawn())
         {
           add_constraint(
             equation,
@@ -144,21 +144,21 @@ void memory_model_tsot::program_order(
             "po",
             (*e_it)->source);
 
-          if(is_spawn(*e_it2))
+          if((*e_it2)->is_spawn())
             break;
           else
             continue;
         }
 
-        if(is_memory_barrier(*e_it2))
+        if((*e_it2)->is_memory_barrier())
         {
           const codet &code=to_code((*e_it2)->source.pc->code);
 
-          if(is_shared_read(*e_it) &&
+          if((*e_it)->is_shared_read() &&
              !code.get_bool(ID_RRfence) &&
              !code.get_bool(ID_RWfence))
             continue;
-          else if(is_shared_write(*e_it) &&
+          else if((*e_it)->is_shared_write() &&
              !code.get_bool(ID_WRfence) &&
              !code.get_bool(ID_WWfence))
             continue;
@@ -184,7 +184,7 @@ void memory_model_tsot::program_order(
         }
         else if(program_order_is_relaxed(*e_it, *e_it2))
         {
-          if(is_shared_read(*e_it2))
+          if((*e_it2)->is_shared_read())
             cond=mb_guard_r;
           else
             cond=mb_guard_w;

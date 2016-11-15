@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_target.h"
 
+class dirtyt;
+
 // central data structure: state
 class goto_symex_statet
 {
@@ -331,6 +333,7 @@ public:
 
   void switch_to_thread(unsigned t);
   bool record_events;
+  const dirtyt * dirty;
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H

@@ -69,8 +69,8 @@ bool memory_model_sct::program_order_is_relaxed(
   partial_order_concurrencyt::event_it e1,
   partial_order_concurrencyt::event_it e2) const
 {
-  assert(is_shared_read(e1) || is_shared_write(e1));
-  assert(is_shared_read(e2) || is_shared_write(e2));
+  assert(e1->is_shared_read() || e1->is_shared_write());
+  assert(e2->is_shared_read() || e2->is_shared_write());
 
   return false;
 }
@@ -99,10 +99,10 @@ void memory_model_sct::build_per_thread_map(
       e_it++)
   {
     // concurreny-related?
-    if(!is_shared_read(e_it) &&
-       !is_shared_write(e_it) &&
-       !is_spawn(e_it) &&
-       !is_memory_barrier(e_it)) continue;
+    if(!e_it->is_shared_read() &&
+       !e_it->is_shared_write() &&
+       !e_it->is_spawn() &&
+       !e_it->is_memory_barrier()) continue;
 
     dest[e_it->source.thread_nr].push_back(e_it);
   }
@@ -133,7 +133,7 @@ void memory_model_sct::thread_spawn(
       e_it!=equation.SSA_steps.end();
       e_it++)
   {
-    if(is_spawn(e_it))
+    if(e_it->is_spawn())
     {
       per_thread_mapt::const_iterator next_thread=
         per_thread_map.find(++next_thread_id);
@@ -238,7 +238,7 @@ void memory_model_sct::program_order(
         e_it!=events.end();
         e_it++)
     {
-      if(is_memory_barrier(*e_it))
+      if((*e_it)->is_memory_barrier())
          continue;
 
       if(previous==equation.SSA_steps.end())
