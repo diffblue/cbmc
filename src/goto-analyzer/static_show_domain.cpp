@@ -77,7 +77,7 @@ bool static_show_domain(
     return true;
   }
 
-  //status() << "performing analysis" << eom;
+  //status() << "Performing analysis" << eom;
   (*domain)(goto_model);
 
 

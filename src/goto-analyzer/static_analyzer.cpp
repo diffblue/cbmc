@@ -64,7 +64,7 @@ Function: static_analyzert<analyzerT>::operator()
 template <class analyzerT>
 bool static_analyzert<analyzerT>::operator()()
 {
-  status() << "performing analysis" << eom;
+  status() << "Performing analysis" << eom;
   domain(goto_functions, ns);
 
   

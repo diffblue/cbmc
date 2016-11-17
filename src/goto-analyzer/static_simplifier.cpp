@@ -71,10 +71,10 @@ Function: static_simplifiert<analyzerT>::operator()
 template <class analyzerT>
 bool static_simplifiert<analyzerT>::operator()(void)
 {
-  status() << "performing analysis" << eom;
+  status() << "Performing analysis" << eom;
   domain(goto_functions, ns);
 
-  status() << "simplifying program" << eom;
+  status() << "Simplifying program" << eom;
   simplify_program();
 
   // Remove obviously unreachable things and (now) unconditional branches
@@ -92,7 +92,7 @@ bool static_simplifiert<analyzerT>::operator()(void)
     goto_functions.update();
   }
 
-  status() << "writing goto binary" << eom;
+  status() << "Writing goto binary" << eom;
   return write_goto_binary(out, ns.get_symbol_table(), goto_functions);
 }
 
