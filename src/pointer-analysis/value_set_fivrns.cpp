@@ -1517,6 +1517,10 @@ void value_set_fivrnst::apply_code(
       assign(lhs, code.op0(), ns);
     }
   }
+  else if(statement==ID_input || statement==ID_output)
+  {
+	  // doesn't do anything
+  }
   else
   {
     throw
