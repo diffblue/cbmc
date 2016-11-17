@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/language.h>
 #include <util/unicode.h>
 #include <util/memory_info.h>
+#include <util/overlay_map.h>
 
 #include <ansi-c/c_preprocess.h>
 
@@ -141,6 +142,8 @@ Function: cbmc_parse_optionst::get_command_line_options
 
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
 {
+  overlay_map<int, int> omap;
+
   if(config.set(cmdline))
   {
     usage_error();
