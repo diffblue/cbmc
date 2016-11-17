@@ -283,7 +283,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 
   // For development allow slicing to be disabled in the simplify task
   options.set_option("simplify-slicing", !(cmdline.isset("no-simplify-slicing")));
-  options.set_option("simplify-slicing", false); // Disable for now
 
   
   // Abstract interpreter choice

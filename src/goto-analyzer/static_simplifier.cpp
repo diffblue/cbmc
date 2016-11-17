@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/interval_domain.h>
 #include <analyses/constant_propagator.h>
 
-#include <goto-instrument/reachability_slicer.h>
+#include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unreachable.h>
 
 #include "static_simplifier.h"
 
@@ -79,9 +80,15 @@ bool static_simplifiert<analyzerT>::operator()(void)
   // Remove obviously unreachable things and (now) unconditional branches
   if (options.get_bool_option("simplify-slicing"))
   {
-    status() << "Performing a reachability slice" << eom;
-    reachability_slicer(goto_functions);
+    status() << "Removing unreachable instructions" << eom;
 
+    remove_skip(goto_functions);  // Remove goto false
+    goto_functions.update();
+
+    remove_unreachable(goto_functions);  // Unconvert unreachable to skips
+    goto_functions.update();
+
+    remove_skip(goto_functions);  // Remove all of the new skips
     goto_functions.update();
   }
 
