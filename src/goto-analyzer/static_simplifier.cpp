@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/interval_domain.h>
 #include <analyses/constant_propagator.h>
 
+#include <goto-instrument/reachability_slicer.h>
+
 #include "static_simplifier.h"
 
 template <class analyzerT>
@@ -73,6 +75,15 @@ bool static_simplifiert<analyzerT>::operator()(void)
 
   status() << "simplifying program" << eom;
   simplify_program();
+
+  // Remove obviously unreachable things and (now) unconditional branches
+  if (options.get_bool_option("simplify-slicing"))
+  {
+    status() << "Performing a reachability slice" << eom;
+    reachability_slicer(goto_functions);
+
+    goto_functions.update();
+  }
 
   status() << "writing goto binary" << eom;
   return write_goto_binary(out, ns.get_symbol_table(), goto_functions);

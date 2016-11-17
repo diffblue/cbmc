@@ -39,8 +39,9 @@ class optionst;
   "(non-null)(show-non-null)" \
   "(constants)" \
   "(dependence-graph)" \
-  "(show)(verify)(simplify):"			\
-  "(flow-sensitive)(concurrent)"
+  "(show)(verify)(simplify):" \
+  "(flow-sensitive)(concurrent)" \
+  "(no-simplify-slicing)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,
