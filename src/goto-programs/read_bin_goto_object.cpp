@@ -160,6 +160,8 @@ bool read_bin_goto_object_v3(
     if(hidden) f.make_hidden();
   }
   
+  functions.compute_location_numbers();
+
   return false;
 }
 
