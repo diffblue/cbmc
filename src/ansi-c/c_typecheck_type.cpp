@@ -1019,6 +1019,48 @@ void c_typecheck_baset::typecheck_compound_body(
 
 /*******************************************************************\
 
+Function: c_typecheck_baset::fitting_int_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet c_typecheck_baset::fitting_int_type(
+  const mp_integer &min_value,
+  const mp_integer &max_value,
+  bool at_least_int) const
+{
+  if(max_value<(mp_integer(1)<<(config.ansi_c.char_width-1)) &&
+     min_value>=-(mp_integer(1)<<(config.ansi_c.char_width-1)))
+    return at_least_int?signed_int_type():signed_char_type();
+  else if(max_value<(mp_integer(1)<<config.ansi_c.char_width) &&
+          min_value>=0)
+    return at_least_int?signed_int_type():unsigned_char_type();
+  else if(max_value<(mp_integer(1)<<(config.ansi_c.short_int_width-1)) &&
+          min_value>=-(mp_integer(1)<<(config.ansi_c.short_int_width-1)))
+    return at_least_int?signed_int_type():signed_short_int_type();
+  else if(max_value<(mp_integer(1)<<config.ansi_c.short_int_width) &&
+          min_value>=0)
+    return at_least_int?signed_int_type():unsigned_short_int_type();
+  else if(max_value<(mp_integer(1)<<(config.ansi_c.int_width-1)) &&
+          min_value>=-(mp_integer(1)<<(config.ansi_c.int_width-1)))
+    return signed_int_type();
+  else if(max_value<(mp_integer(1)<<config.ansi_c.int_width) &&
+          min_value>=0)
+    return unsigned_int_type();
+  else if(max_value<(mp_integer(1)<<(config.ansi_c.long_long_int_width-1)) &&
+          min_value>=-(mp_integer(1)<<(config.ansi_c.long_long_int_width-1)))
+    return signed_long_long_int_type();
+  else
+    return unsigned_long_long_int_type();
+}
+
+/*******************************************************************\
+
 Function: c_typecheck_baset::typecheck_c_enum_type
 
   Inputs:
@@ -1046,36 +1088,54 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     throw 0;
   }
   
-  // enums start at zero
-  mp_integer value=0;
-  
-  // track min and max to find a nice base type
-  mp_integer min_value=0, max_value=0;
-  
+  // enums start at zero;
+  // we also track min and max to find a nice base type
+  mp_integer value=0, min_value=0, max_value=0;
+
   std::list<c_enum_typet::c_enum_membert> enum_members;
   
-  Forall_operands(it, as_expr)
-  {
-    ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
-    
-    // In C, enum constants always have type "int". They do not
-    // have the enum type.
-    declaration.type()=typet(ID_int);
+  // We need to determine a width, and a signedness
+  // to obtain an 'underlying type'.
+  // We just do int, but gcc might pick smaller widths
+  // if the type is marked as 'packed'.
+  // gcc/clang may also pick a larger width. Visual Studio doesn't.
 
+  for(auto & it : as_expr.operands())
+  {
+    ansi_c_declarationt &declaration=to_ansi_c_declaration(it);
     exprt &v=declaration.declarator().value();
 
-    if(v.is_nil()) // no value given
-      v=from_integer(value, signed_int_type());
-    else
+    if(v.is_not_nil()) // value given?
     {
       exprt tmp_v=v;
       typecheck_expr(tmp_v);
       add_rounding_mode(tmp_v);
       simplify(tmp_v, *this);
-      if(tmp_v.is_constant())
-        v=tmp_v;
+      if(tmp_v.is_true())
+        value=1;
+      else if(tmp_v.is_false())
+        value=0;
+      else if(!to_integer(tmp_v, value))
+      {
+      }
+      else
+      {
+        error().source_location=v.source_location();
+        error() << "enum is not a constant";
+        throw 0;
+      }
     }
 
+    if(value<min_value) min_value=value;
+    if(value>max_value) max_value=value;
+
+    // The type of the enum constant is 'int', unless it it's larger.
+    typet underlying_type=
+      fitting_int_type(min_value, max_value, true);
+    
+    v=from_integer(value, underlying_type);
+
+    declaration.type()=underlying_type;    
     typecheck_declaration(declaration);
 
     irep_idt base_name=
@@ -1084,70 +1144,23 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     irep_idt identifier=
       declaration.declarator().get_name();
       
-    // get value
-    const symbolt &symbol=lookup(identifier);
-
-    to_integer(symbol.value, value);
-
     // store      
     c_enum_typet::c_enum_membert member;
     member.set_identifier(identifier);
     member.set_base_name(base_name);
     member.set_value(integer2string(value));
     enum_members.push_back(member);
-    
-    if(value<min_value) min_value=value;
-    if(value>max_value) max_value=value;
-    
+
     // produce value for next constant
     ++value;
   }
-  
+
   // Remove these now; we add them to the
   // c_enum symbol later.
-  #ifdef OPERANDS_IN_GETSUB
   as_expr.operands().clear();
-  #else
-  type.remove(ID_operands);
-  #endif
 
-  // We need to determine a width, and a signedness.
-  // We just do int, but gcc might pick smaller widths
-  // if the type is marked as 'packed'.
+  bool is_packed=type.get_bool(ID_C_packed);
 
-  unsigned bits=0;
-  bool is_signed=min_value<0;
-  
-  if(is_signed)
-  {
-    if(max_value<(1<<7) && min_value>=-(1<<7))
-      bits=1*8;
-    else if(max_value<(1<<15) && min_value>=-(1<<15))
-      bits=2*8;
-    else if(max_value<(mp_integer(1)<<31) && min_value>=-(mp_integer(1)<<31))
-      bits=4*8;
-    else
-      bits=8*8;
-  }
-  else // unsigned
-  {
-    if(max_value<(1<<8))
-      bits=1*8;
-    else if(max_value<(1<<16))
-      bits=2*8;
-    else if(max_value<(mp_integer(1)<<32))
-      bits=4*8;
-    else
-      bits=8*8;
-  }
-
-  if(!type.get_bool(ID_C_packed))
-  {
-    // If it's not packed we do int as a minimum.
-    if(bits<config.ansi_c.int_width)
-      bits=config.ansi_c.int_width;
-  }
-  
   // tag?
   if(type.find(ID_tag).is_nil())
   {
@@ -1165,7 +1178,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       anon_identifier+=id2string(it->get_value());
     }
     
-    if(type.get_bool(ID_C_packed))
+    if(is_packed)
       anon_identifier+="#packed";
 
     type.add(ID_tag).set(ID_identifier, anon_identifier);
@@ -1194,9 +1207,16 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       it++)
     body.push_back(*it);
 
-  // We use a subtype to store signed and width
-  enum_tag_symbol.type.subtype().id(is_signed?ID_signedbv:ID_unsignedbv);
-  enum_tag_symbol.type.subtype().set(ID_width, bits);
+  // We use a subtype to store the underlying type.
+  // This is at least 'int' unless packed if negative,
+  // and at least 'unsigned int' otherwise.
+  typet underlying_type=
+    fitting_int_type(min_value, max_value, !is_packed);
+  if(underlying_type==signed_int_type() &&
+     min_value>=0)
+    underlying_type=unsigned_int_type();
+  
+  enum_tag_symbol.type.subtype()=underlying_type;
 
   // is it in the symbol table already?
   symbol_tablet::symbolst::iterator s_it=

@@ -48,6 +48,7 @@ STATIC_ASSERT(sizeof(long)!=4 || __builtin_types_compatible_p(uint64_t, unsigned
 STATIC_ASSERT(__builtin_types_compatible_p(int, const int));
 STATIC_ASSERT(__builtin_types_compatible_p(int, signed));
 STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot), int));
+STATIC_ASSERT(__builtin_types_compatible_p(typeof (dingos), unsigned)); // ha!
 STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot), typeof (laura)));
 STATIC_ASSERT(__builtin_types_compatible_p(int[5], int[]));
 STATIC_ASSERT(__builtin_types_compatible_p(same1, same2));

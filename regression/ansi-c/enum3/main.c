@@ -9,14 +9,20 @@ enum __attribute__((packed)) { E3v1=1000, E3v2 } e3;
 enum { E4v1=-1, E4v2 } e4; // not packed
 enum { E5v0=10, E5v1=0x100000000ll } e5;
 enum { E6 = E3v1 | 1 };
+enum { E7v1=0, E7v2=sizeof(E7v1), E7v3=0x100000000ll };
 
-STATIC_ASSERT(sizeof(e1) == 1);
-STATIC_ASSERT(sizeof(e2) == 1);
-STATIC_ASSERT(sizeof(e3) == 2);
-STATIC_ASSERT(sizeof(E1v1) == sizeof(int));
-STATIC_ASSERT(sizeof(e4) == sizeof(int));
-// STATIC_ASSERT(sizeof(e5) == 8); // todo
+STATIC_ASSERT(sizeof e1 == 1);
+STATIC_ASSERT(sizeof E1v1 == sizeof(int)); // but the constant is still at least int
+STATIC_ASSERT(sizeof e2 == 1);
+STATIC_ASSERT(sizeof e3 == 2);
+STATIC_ASSERT(sizeof E4v1 == sizeof(int));
+STATIC_ASSERT(sizeof e4 == sizeof(int));
+STATIC_ASSERT(sizeof e5 == 8);
+STATIC_ASSERT(E5v1 == 0x100000000ll);
+STATIC_ASSERT(E3v1 == 1000);
 STATIC_ASSERT(E6 == 1001);
+STATIC_ASSERT(E7v2 == sizeof(int));
+STATIC_ASSERT(sizeof E7v3 == sizeof(long long));
 
 int main()
 {

@@ -11,6 +11,7 @@ enum help_format {
   HELP_FORMAT_WEB,
 };
 
+// The enums are 'unsigned int'
 enum help_format help_format = HELP_FORMAT_MAN;
 STATIC_ASSERT(__builtin_types_compatible_p(typeof(&help_format), unsigned int*));
 
