@@ -340,6 +340,9 @@ void objects_read(
   else if(src.id()==ID_address_of)
   {
     // don't traverse!
+    assert(src.operands().size() == 1);
+    dest.push_back(src);
+    objects_read(src.op0(), dest);
   }
   else if(src.id()==ID_dereference)
   {
