@@ -1803,6 +1803,10 @@ void value_sett::apply_code(
   else if(statement==ID_fence)
   {
   }
+  else if(statement==ID_input || statement==ID_output)
+  {
+	  // doesn't do anything
+  }
   else
   {
     //std::cerr << code.pretty() << std::endl;
