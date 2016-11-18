@@ -51,6 +51,10 @@ void _rw_set_loct::compute()
     assert(target->code.operands().size()==2);
     assign(target->code.op0(), target->code.op1());
   }
+  else if(target->is_return())
+  {
+    read(to_code_return(target->code));
+  }
   else if(target->is_goto() ||
           target->is_assume() ||
           target->is_assert())
@@ -73,6 +77,10 @@ void _rw_set_loct::compute()
 
     if(code_function_call.lhs().is_not_nil())
       write(code_function_call.lhs());
+  }
+  else if(target->is_other())
+  {
+    read(target->code);
   }
 }
 

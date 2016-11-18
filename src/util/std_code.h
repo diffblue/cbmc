@@ -933,12 +933,18 @@ template<> inline bool can_cast_expr<code_returnt>(const exprt &base)
 inline const code_returnt &to_code_return(const codet &code)
 {
   assert(code.get_statement()==ID_return);
+  assert(
+    code.operands().size() <= 1 &&
+    "there should be at most one operand in an return statement");
   return static_cast<const code_returnt &>(code);
 }
 
 inline code_returnt &to_code_return(codet &code)
 {
   assert(code.get_statement()==ID_return);
+  assert(
+    code.operands().size() <= 1 &&
+    "there should be at most one operand in an return statement");
   return static_cast<code_returnt &>(code);
 }
 
