@@ -2,7 +2,7 @@ CORE
 main.c
 
 ^\*\* Results:$
-^\[main.assertion.1\] assertion a\[(signed long int)0\]\[(signed long int)0\] > 10: SUCCESS$
+^\[main.assertion.1\] assertion a\[.*\]\[.*\] > 10: SUCCESS$
 ^\[main.assertion.2\] assertion tmp_if_expr$3: SUCCESS$
 ^\[main.assertion.3\] assertion tmp_if_expr$6: SUCCESS$
 ^\[main.assertion.4\] assertion tmp_if_expr$9: SUCCESS$
