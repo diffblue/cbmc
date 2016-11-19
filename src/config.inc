@@ -23,4 +23,4 @@ LIBZIPINC = ../../libzip/lib
 
 # Signing identity for MacOS Gatekeeper
 
-OSX_IDENTITY="3rd Party Mac Developer Application: Daniel Kroening"
+OSX_IDENTITY="Developer ID Application: Daniel Kroening"
