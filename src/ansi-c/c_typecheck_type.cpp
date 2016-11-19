@@ -1019,7 +1019,7 @@ void c_typecheck_baset::typecheck_compound_body(
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::fitting_int_type
+Function: c_typecheck_baset::enum_constant_type
 
   Inputs:
 
@@ -1029,34 +1029,92 @@ Function: c_typecheck_baset::fitting_int_type
 
 \*******************************************************************/
 
-typet c_typecheck_baset::fitting_int_type(
+typet c_typecheck_baset::enum_constant_type(
   const mp_integer &min_value,
-  const mp_integer &max_value,
-  bool at_least_int) const
+  const mp_integer &max_value) const
 {
-  if(max_value<(mp_integer(1)<<(config.ansi_c.char_width-1)) &&
-     min_value>=-(mp_integer(1)<<(config.ansi_c.char_width-1)))
-    return at_least_int?signed_int_type():signed_char_type();
-  else if(max_value<(mp_integer(1)<<config.ansi_c.char_width) &&
-          min_value>=0)
-    return at_least_int?signed_int_type():unsigned_char_type();
-  else if(max_value<(mp_integer(1)<<(config.ansi_c.short_int_width-1)) &&
-          min_value>=-(mp_integer(1)<<(config.ansi_c.short_int_width-1)))
-    return at_least_int?signed_int_type():signed_short_int_type();
-  else if(max_value<(mp_integer(1)<<config.ansi_c.short_int_width) &&
-          min_value>=0)
-    return at_least_int?signed_int_type():unsigned_short_int_type();
-  else if(max_value<(mp_integer(1)<<(config.ansi_c.int_width-1)) &&
-          min_value>=-(mp_integer(1)<<(config.ansi_c.int_width-1)))
+  // enum constants are at least 'int', but may be made larger.
+  // 'Packing' has no influence.
+  if(max_value<(mp_integer(1)<<(config.ansi_c.int_width-1)) &&
+     min_value>=-(mp_integer(1)<<(config.ansi_c.int_width-1)))
     return signed_int_type();
   else if(max_value<(mp_integer(1)<<config.ansi_c.int_width) &&
           min_value>=0)
     return unsigned_int_type();
-  else if(max_value<(mp_integer(1)<<(config.ansi_c.long_long_int_width-1)) &&
-          min_value>=-(mp_integer(1)<<(config.ansi_c.long_long_int_width-1)))
-    return signed_long_long_int_type();
-  else
+  else if(max_value<(mp_integer(1)<<config.ansi_c.long_int_width) &&
+          min_value>=0)
+    return unsigned_long_int_type();
+  else if(max_value<(mp_integer(1)<<config.ansi_c.long_long_int_width) &&
+          min_value>=0)
     return unsigned_long_long_int_type();
+  else if(max_value<(mp_integer(1)<<(config.ansi_c.long_int_width-1)) &&
+          min_value>=-(mp_integer(1)<<(config.ansi_c.long_int_width-1)))
+    return signed_long_int_type();
+  else
+    return signed_long_long_int_type();
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::enum_underlying_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet c_typecheck_baset::enum_underlying_type(
+  const mp_integer &min_value,
+  const mp_integer &max_value,
+  bool is_packed) const
+{
+  if(min_value<0)
+  {
+    // We'll want a signed type.
+
+    if(is_packed)
+    {
+      // If packed, there are smaller options.
+      if(max_value<(mp_integer(1)<<(config.ansi_c.char_width-1)) &&
+         min_value>=-(mp_integer(1)<<(config.ansi_c.char_width-1)))
+        return signed_char_type();
+      else if(max_value<(mp_integer(1)<<(config.ansi_c.short_int_width-1)) &&
+              min_value>=-(mp_integer(1)<<(config.ansi_c.short_int_width-1)))
+        return signed_short_int_type();
+    }
+      
+    if(max_value<(mp_integer(1)<<(config.ansi_c.int_width-1)) &&
+       min_value>=-(mp_integer(1)<<(config.ansi_c.int_width-1)))
+      return signed_int_type();
+    else if(max_value<(mp_integer(1)<<(config.ansi_c.long_int_width-1)) &&
+            min_value>=-(mp_integer(1)<<(config.ansi_c.long_int_width-1)))
+      return signed_long_int_type();
+    else
+      return signed_long_long_int_type();
+  }
+  else
+  {
+    // We'll want an unsigned type.
+    
+    if(is_packed)
+    {
+      // If packed, there are smaller options.
+      if(max_value<(mp_integer(1)<<config.ansi_c.char_width))
+        return unsigned_char_type();
+      else if(max_value<(mp_integer(1)<<config.ansi_c.short_int_width))
+        return unsigned_short_int_type();
+    }
+      
+    if(max_value<(mp_integer(1)<<config.ansi_c.int_width))
+      return unsigned_int_type();
+    else if(max_value<(mp_integer(1)<<config.ansi_c.long_int_width))
+      return unsigned_long_int_type();
+    else
+      return unsigned_long_long_int_type();
+  }
 }
 
 /*******************************************************************\
@@ -1129,13 +1187,12 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     if(value<min_value) min_value=value;
     if(value>max_value) max_value=value;
 
-    // The type of the enum constant is 'int', unless it it's larger.
-    typet underlying_type=
-      fitting_int_type(min_value, max_value, true);
+    typet constant_type=
+      enum_constant_type(min_value, max_value);
     
-    v=from_integer(value, underlying_type);
+    v=from_integer(value, constant_type);
 
-    declaration.type()=underlying_type;    
+    declaration.type()=constant_type;    
     typecheck_declaration(declaration);
 
     irep_idt base_name=
@@ -1208,14 +1265,9 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     body.push_back(*it);
 
   // We use a subtype to store the underlying type.
-  // This is at least 'int' unless packed if negative,
-  // and at least 'unsigned int' otherwise.
   typet underlying_type=
-    fitting_int_type(min_value, max_value, !is_packed);
-  if(underlying_type==signed_int_type() &&
-     min_value>=0)
-    underlying_type=unsigned_int_type();
-  
+    enum_underlying_type(min_value, max_value, is_packed);
+
   enum_tag_symbol.type.subtype()=underlying_type;
 
   // is it in the symbol table already?
