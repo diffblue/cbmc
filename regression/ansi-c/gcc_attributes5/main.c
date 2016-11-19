@@ -16,7 +16,7 @@ STATIC_ASSERT(__alignof(var2)==8);
 STATIC_ASSERT(__alignof(var3)==8);
 STATIC_ASSERT(__alignof(var4)==8);
 STATIC_ASSERT(__alignof(var5)==8);
-STATIC_ASSERT(__alignof(var6)==8);
+STATIC_ASSERT(__alignof(var6)==__alignof(void *));
 STATIC_ASSERT(__alignof(var7)==8);
 
 void (__attribute__((aligned)) *****f1)(void);

@@ -37,13 +37,17 @@ STATIC_ASSERT(__builtin_types_compatible_p(typeof(enum unsigned_enum), unsigned 
 
 // The enum gets bigger as required, but note that the constant is now unsigned.
 enum large_enum1 { LARGE_CONSTANT1=0x100000000 };
-STATIC_ASSERT(__builtin_types_compatible_p(typeof(LARGE_CONSTANT1), unsigned long));
-STATIC_ASSERT(__builtin_types_compatible_p(typeof(enum large_enum1), unsigned long));
+STATIC_ASSERT(__builtin_types_compatible_p(typeof(LARGE_CONSTANT1), unsigned long) ||
+              __builtin_types_compatible_p(typeof(LARGE_CONSTANT1), unsigned long long));
+STATIC_ASSERT(__builtin_types_compatible_p(typeof(enum large_enum1), unsigned long) ||
+              __builtin_types_compatible_p(typeof(enum large_enum1), unsigned long long));
 
 // Also works when signed
 enum large_enum2 { NEG=-1, LARGE_CONSTANT2=0x100000000 };
-STATIC_ASSERT(__builtin_types_compatible_p(typeof(LARGE_CONSTANT2), signed long));
-STATIC_ASSERT(__builtin_types_compatible_p(typeof(enum large_enum2), signed long));
+STATIC_ASSERT(__builtin_types_compatible_p(typeof(LARGE_CONSTANT2), signed long) || 
+              __builtin_types_compatible_p(typeof(LARGE_CONSTANT2), signed long long));
+STATIC_ASSERT(__builtin_types_compatible_p(typeof(enum large_enum2), signed long) || 
+              __builtin_types_compatible_p(typeof(enum large_enum2), signed long long));
 
 // 'Packed' is interesting.
 enum __attribute__((packed)) packed_enum1 { POS_PACKED=1 };
