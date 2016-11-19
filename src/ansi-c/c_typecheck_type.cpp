@@ -1033,25 +1033,32 @@ typet c_typecheck_baset::enum_constant_type(
   const mp_integer &min_value,
   const mp_integer &max_value) const
 {
-  // enum constants are at least 'int', but may be made larger.
-  // 'Packing' has no influence.
-  if(max_value<(mp_integer(1)<<(config.ansi_c.int_width-1)) &&
-     min_value>=-(mp_integer(1)<<(config.ansi_c.int_width-1)))
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  {
     return signed_int_type();
-  else if(max_value<(mp_integer(1)<<config.ansi_c.int_width) &&
-          min_value>=0)
-    return unsigned_int_type();
-  else if(max_value<(mp_integer(1)<<config.ansi_c.long_int_width) &&
-          min_value>=0)
-    return unsigned_long_int_type();
-  else if(max_value<(mp_integer(1)<<config.ansi_c.long_long_int_width) &&
-          min_value>=0)
-    return unsigned_long_long_int_type();
-  else if(max_value<(mp_integer(1)<<(config.ansi_c.long_int_width-1)) &&
-          min_value>=-(mp_integer(1)<<(config.ansi_c.long_int_width-1)))
-    return signed_long_int_type();
+  }
   else
-    return signed_long_long_int_type();
+  {
+    // enum constants are at least 'int', but may be made larger.
+    // 'Packing' has no influence.
+    if(max_value<(mp_integer(1)<<(config.ansi_c.int_width-1)) &&
+       min_value>=-(mp_integer(1)<<(config.ansi_c.int_width-1)))
+      return signed_int_type();
+    else if(max_value<(mp_integer(1)<<config.ansi_c.int_width) &&
+            min_value>=0)
+      return unsigned_int_type();
+    else if(max_value<(mp_integer(1)<<config.ansi_c.long_int_width) &&
+            min_value>=0)
+      return unsigned_long_int_type();
+    else if(max_value<(mp_integer(1)<<config.ansi_c.long_long_int_width) &&
+            min_value>=0)
+      return unsigned_long_long_int_type();
+    else if(max_value<(mp_integer(1)<<(config.ansi_c.long_int_width-1)) &&
+            min_value>=-(mp_integer(1)<<(config.ansi_c.long_int_width-1)))
+      return signed_long_int_type();
+    else
+      return signed_long_long_int_type();
+  }
 }
 
 /*******************************************************************\
@@ -1071,49 +1078,56 @@ typet c_typecheck_baset::enum_underlying_type(
   const mp_integer &max_value,
   bool is_packed) const
 {
-  if(min_value<0)
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
-    // We'll want a signed type.
-
-    if(is_packed)
-    {
-      // If packed, there are smaller options.
-      if(max_value<(mp_integer(1)<<(config.ansi_c.char_width-1)) &&
-         min_value>=-(mp_integer(1)<<(config.ansi_c.char_width-1)))
-        return signed_char_type();
-      else if(max_value<(mp_integer(1)<<(config.ansi_c.short_int_width-1)) &&
-              min_value>=-(mp_integer(1)<<(config.ansi_c.short_int_width-1)))
-        return signed_short_int_type();
-    }
-      
-    if(max_value<(mp_integer(1)<<(config.ansi_c.int_width-1)) &&
-       min_value>=-(mp_integer(1)<<(config.ansi_c.int_width-1)))
-      return signed_int_type();
-    else if(max_value<(mp_integer(1)<<(config.ansi_c.long_int_width-1)) &&
-            min_value>=-(mp_integer(1)<<(config.ansi_c.long_int_width-1)))
-      return signed_long_int_type();
-    else
-      return signed_long_long_int_type();
+    return signed_int_type();
   }
   else
   {
-    // We'll want an unsigned type.
-    
-    if(is_packed)
+    if(min_value<0)
     {
-      // If packed, there are smaller options.
-      if(max_value<(mp_integer(1)<<config.ansi_c.char_width))
-        return unsigned_char_type();
-      else if(max_value<(mp_integer(1)<<config.ansi_c.short_int_width))
-        return unsigned_short_int_type();
+      // We'll want a signed type.
+
+      if(is_packed)
+      {
+        // If packed, there are smaller options.
+        if(max_value<(mp_integer(1)<<(config.ansi_c.char_width-1)) &&
+           min_value>=-(mp_integer(1)<<(config.ansi_c.char_width-1)))
+          return signed_char_type();
+        else if(max_value<(mp_integer(1)<<(config.ansi_c.short_int_width-1)) &&
+                min_value>=-(mp_integer(1)<<(config.ansi_c.short_int_width-1)))
+          return signed_short_int_type();
+      }
+        
+      if(max_value<(mp_integer(1)<<(config.ansi_c.int_width-1)) &&
+         min_value>=-(mp_integer(1)<<(config.ansi_c.int_width-1)))
+        return signed_int_type();
+      else if(max_value<(mp_integer(1)<<(config.ansi_c.long_int_width-1)) &&
+              min_value>=-(mp_integer(1)<<(config.ansi_c.long_int_width-1)))
+        return signed_long_int_type();
+      else
+        return signed_long_long_int_type();
     }
-      
-    if(max_value<(mp_integer(1)<<config.ansi_c.int_width))
-      return unsigned_int_type();
-    else if(max_value<(mp_integer(1)<<config.ansi_c.long_int_width))
-      return unsigned_long_int_type();
     else
-      return unsigned_long_long_int_type();
+    {
+      // We'll want an unsigned type.
+      
+      if(is_packed)
+      {
+        // If packed, there are smaller options.
+        if(max_value<(mp_integer(1)<<config.ansi_c.char_width))
+          return unsigned_char_type();
+        else if(max_value<(mp_integer(1)<<config.ansi_c.short_int_width))
+          return unsigned_short_int_type();
+      }
+        
+      if(max_value<(mp_integer(1)<<config.ansi_c.int_width))
+        return unsigned_int_type();
+      else if(max_value<(mp_integer(1)<<config.ansi_c.long_int_width))
+        return unsigned_long_int_type();
+      else
+        return unsigned_long_long_int_type();
+    }
   }
 }
 
