@@ -375,9 +375,9 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
   else
   {
     #ifdef _MSC_VER
-    std::ofstream *out=new std::ofstream(widen(filename).c_str());
+    std::ofstream *out=new std::ofstream(widen(filename));
     #else
-    std::ofstream *out=new std::ofstream(filename.c_str());
+    std::ofstream *out=new std::ofstream(filename);
     #endif
     
     if(!out)
@@ -458,9 +458,9 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
   else
   {
     #ifdef _MSC_VER
-    std::ofstream *out=new std::ofstream(widen(filename).c_str());
+    std::ofstream *out=new std::ofstream(widen(filename));
     #else
-    std::ofstream *out=new std::ofstream(filename.c_str());
+    std::ofstream *out=new std::ofstream(filename);
     #endif
     
     if(!*out)

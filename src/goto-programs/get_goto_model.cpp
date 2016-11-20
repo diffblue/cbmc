@@ -63,9 +63,9 @@ bool get_goto_modelt::operator()(const std::vector<std::string> &files)
       for(const auto & filename : sources)
       {
         #ifdef _MSC_VER
-        std::ifstream infile(widen(filename).c_str());
+        std::ifstream infile(widen(filename));
         #else
-        std::ifstream infile(filename.c_str());
+        std::ifstream infile(filename);
         #endif
 
         if(!infile)

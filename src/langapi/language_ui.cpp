@@ -94,9 +94,9 @@ Function: language_uit::parse()
 bool language_uit::parse(const std::string &filename)
 {
   #ifdef _MSC_VER
-  std::ifstream infile(widen(filename).c_str());
+  std::ifstream infile(widen(filename));
   #else
-  std::ifstream infile(filename.c_str());
+  std::ifstream infile(filename);
   #endif
 
   if(!infile)

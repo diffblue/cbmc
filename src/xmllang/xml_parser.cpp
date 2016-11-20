@@ -67,7 +67,7 @@ bool parse_xml(
   message_handlert &message_handler,
   xmlt &dest)
 {
-  std::ifstream in(filename.c_str());
+  std::ifstream in(filename);
   
   if(!in) return true;
  

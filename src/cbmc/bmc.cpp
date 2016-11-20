@@ -117,7 +117,7 @@ void bmct::error_trace()
       write_graphml(cex_graph, std::cout);
     else
     {
-      std::ofstream out(graphml.c_str());
+      std::ofstream out(graphml);
       write_graphml(cex_graph, out);
     }
   }

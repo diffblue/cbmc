@@ -190,7 +190,7 @@ bool write_goto_binary(
   const goto_functionst &goto_functions,
   message_handlert &message_handler)
 {
-  std::ofstream out(filename.c_str(), std::ios::binary);
+  std::ofstream out(filename, std::ios::binary);
 
   if(!out)
   {

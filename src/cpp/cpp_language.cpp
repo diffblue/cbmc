@@ -98,7 +98,7 @@ bool cpp_languaget::preprocess(
   const char *ext=strrchr(path.c_str(), '.');
   if(ext!=NULL && std::string(ext)==".ipp")
   {
-    std::ifstream infile(path.c_str());
+    std::ifstream infile(path);
 
     char ch;
 

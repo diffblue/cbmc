@@ -364,9 +364,9 @@ bool clobber_parse_optionst::get_goto_program(
       std::string filename=cmdline.args[0];
       
       #ifdef _MSC_VER
-      std::ifstream infile(widen(filename).c_str());
+      std::ifstream infile(widen(filename));
       #else
-      std::ifstream infile(filename.c_str());
+      std::ifstream infile(filename);
       #endif
                 
       if(!infile)

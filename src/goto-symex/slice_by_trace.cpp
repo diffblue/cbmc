@@ -135,7 +135,7 @@ Function: read_trace
 void symex_slice_by_tracet::read_trace(std::string filename)
 {
   std::cout << "Reading trace from file " << filename << std::endl;
-  std::ifstream file(filename.c_str());
+  std::ifstream file(filename);
   if (file.fail())
     throw "Failed to read from trace file.";
 

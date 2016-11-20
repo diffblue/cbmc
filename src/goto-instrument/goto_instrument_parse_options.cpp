@@ -525,9 +525,9 @@ int goto_instrument_parse_optionst::doit()
       if(cmdline.args.size()==2)
       {
         #ifdef _MSC_VER
-        std::ofstream out(widen(cmdline.args[1]).c_str());
+        std::ofstream out(widen(cmdline.args[1]));
         #else
-        std::ofstream out(cmdline.args[1].c_str());
+        std::ofstream out(cmdline.args[1]);
         #endif
         if(!out)
         {
@@ -563,9 +563,9 @@ int goto_instrument_parse_optionst::doit()
       if(cmdline.args.size()==2)
       {
         #ifdef _MSC_VER
-        std::ofstream out(widen(cmdline.args[1]).c_str());
+        std::ofstream out(widen(cmdline.args[1]));
         #else
-        std::ofstream out(cmdline.args[1].c_str());
+        std::ofstream out(cmdline.args[1]);
         #endif
         if(!out)
         {
@@ -604,9 +604,9 @@ int goto_instrument_parse_optionst::doit()
       if(cmdline.args.size()==2)
       {
         #ifdef _MSC_VER
-        std::ofstream out(widen(cmdline.args[1]).c_str());
+        std::ofstream out(widen(cmdline.args[1]));
         #else
-        std::ofstream out(cmdline.args[1].c_str());
+        std::ofstream out(cmdline.args[1]);
         #endif
         
         if(!out)

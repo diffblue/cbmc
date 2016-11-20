@@ -214,7 +214,7 @@ void document_propertiest::get_code(
 
   if(file=="" || line=="") return;
 
-  std::ifstream in(file.c_str());
+  std::ifstream in(id2string(file));
 
   if(!in)
   {

@@ -73,9 +73,9 @@ bool read_goto_binary(
   message_handlert &message_handler)
 {
   #ifdef _MSC_VER
-  std::ifstream in(widen(filename).c_str(), std::ios::binary);
+  std::ifstream in(widen(filename), std::ios::binary);
   #else
-  std::ifstream in(filename.c_str(), std::ios::binary);
+  std::ifstream in(filename, std::ios::binary);
   #endif
 
   if(!in)
@@ -138,7 +138,7 @@ bool read_goto_binary(
         tempname=get_temporary_file("tmp.goto-binary", ".gb");
         osx_fat_reader.extract_gb(filename, tempname);
 
-        std::ifstream temp_in(tempname.c_str(), std::ios::binary);
+        std::ifstream temp_in(tempname, std::ios::binary);
         if(!temp_in)
           messaget(message_handler).error() << "failed to read temp binary" << messaget::eom;
         const bool read_err=read_bin_goto_object(
@@ -185,9 +185,9 @@ Function: is_goto_binary
 bool is_goto_binary(const std::string &filename)
 {
   #ifdef _MSC_VER
-  std::ifstream in(widen(filename).c_str(), std::ios::binary);
+  std::ifstream in(widen(filename), std::ios::binary);
   #else
-  std::ifstream in(filename.c_str(), std::ios::binary);
+  std::ifstream in(filename, std::ios::binary);
   #endif
   
   if(!in) return false;

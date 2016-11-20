@@ -151,7 +151,7 @@ bool compilet::add_input_file(const std::string &file_name)
 {
   // first of all, try to open the file
   {
-    std::ifstream in(file_name.c_str());
+    std::ifstream in(file_name);
     if(!in)
     {
       error() << "failed to open file `" << file_name << "'" << eom;
@@ -314,7 +314,7 @@ bool compilet::find_library(const std::string &name)
     tmp = *it + "/lib";
     #endif
 
-    std::ifstream in((tmp+name+".a").c_str());
+    std::ifstream in(tmp+name+".a");
 
     if(in.is_open())
       return !add_input_file(tmp+name+".a");
@@ -352,7 +352,7 @@ bool compilet::is_elf_file(const std::string &file_name)
 {
   std::fstream in;
 
-  in.open(file_name.c_str(), std::ios::in);
+  in.open(file_name, std::ios::in);
   if(in.is_open())
   {
     char buf[4];
@@ -490,9 +490,9 @@ bool compilet::parse(const std::string &file_name)
   if(file_name=="-") return parse_stdin();
 
   #ifdef _MSC_VER
-  std::ifstream infile(widen(file_name).c_str());
+  std::ifstream infile(widen(file_name));
   #else
-  std::ifstream infile(file_name.c_str());
+  std::ifstream infile(file_name);
   #endif
 
   if(!infile)
@@ -544,7 +544,7 @@ bool compilet::parse(const std::string &file_name)
 
     if(cmdline.isset('o'))
     {
-      ofs.open(cmdline.get_value('o').c_str());
+      ofs.open(cmdline.get_value('o'));
       os = &ofs;
 
       if(!ofs.is_open())
@@ -600,7 +600,7 @@ bool compilet::parse_stdin()
 
     if(cmdline.isset('o'))
     {
-      ofs.open(cmdline.get_value('o').c_str());
+      ofs.open(cmdline.get_value('o'));
       os = &ofs;
 
       if(!ofs.is_open())
@@ -672,7 +672,7 @@ bool compilet::write_bin_object_file(
   statistics() << "Symbols in table: "
                << lsymbol_table.symbols.size() << eom;
 
-  std::ofstream outfile(file_name.c_str(), std::ios::binary);
+  std::ofstream outfile(file_name, std::ios::binary);
 
   if(!outfile.is_open())
   {

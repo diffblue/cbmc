@@ -488,7 +488,7 @@ bool c_preprocess_visual_studio(
   std::string command_file_name=get_temporary_file("tmp.cl-cmd", "");
 
   {
-    std::ofstream command_file(command_file_name.c_str());
+    std::ofstream command_file(command_file_name);
 
     // This marks the file as UTF-8, which Visual Studio
     // understands.
@@ -576,7 +576,7 @@ bool c_preprocess_visual_studio(
   unlink(command_file_name.c_str());
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file.c_str());
+  std::ifstream stderr_stream(stderr_file);
   error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
@@ -700,7 +700,7 @@ bool c_preprocess_codewarrior(
 
   result=system(command.c_str());
 
-  std::ifstream stream_i(tmpi.c_str());
+  std::ifstream stream_i(tmpi);
 
   if(stream_i)
   {
@@ -719,7 +719,7 @@ bool c_preprocess_codewarrior(
   }
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file.c_str());
+  std::ifstream stderr_stream(stderr_file);
   error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
@@ -1001,7 +1001,7 @@ bool c_preprocess_gcc_clang(
   FILE *stream=fopen(tmpi.c_str(), "r");
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file.c_str());
+  std::ifstream stderr_stream(stderr_file);
   error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
@@ -1044,7 +1044,7 @@ bool c_preprocess_gcc_clang(
   }
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file.c_str());
+  std::ifstream stderr_stream(stderr_file);
   error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
@@ -1188,7 +1188,7 @@ bool c_preprocess_arm(
   #endif
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file.c_str());
+  std::ifstream stderr_stream(stderr_file);
   error_parse(stderr_stream, result==0, message);
 
   unlink(stderr_file.c_str());
@@ -1220,9 +1220,9 @@ bool c_preprocess_none(
   message_handlert &message_handler)
 {
   #ifdef _MSC_VER
-  std::ifstream infile(widen(file).c_str());
+  std::ifstream infile(widen(file));
   #else
-  std::ifstream infile(file.c_str());
+  std::ifstream infile(file);
   #endif
   
   if(!infile)

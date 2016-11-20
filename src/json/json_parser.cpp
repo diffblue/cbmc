@@ -66,7 +66,7 @@ bool parse_json(
   message_handlert &message_handler,
   jsont &dest)
 {
-  std::ifstream in(filename.c_str());
+  std::ifstream in(filename);
   
   if(!in) return true;
  

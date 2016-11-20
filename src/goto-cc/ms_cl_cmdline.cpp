@@ -216,7 +216,7 @@ Function: ms_cl_cmdlinet::process_response_file
 
 void ms_cl_cmdlinet::process_response_file(const std::string &file)
 {
-  std::ifstream infile(file.c_str());
+  std::ifstream infile(file);
   
   if(!infile)
   {
@@ -237,7 +237,7 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
     #if 1
     // Re-open -- should be using wifstream,
     // but this isn't available everywhere.
-    std::ifstream infile2(file.c_str(), std::ios::binary);
+    std::ifstream infile2(file, std::ios::binary);
     infile2.seekg(2);
     std::wstring wline;
     
@@ -246,7 +246,7 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
 
     #else
     
-    std::wifstream infile2(file.c_str(), std::ios::binary);
+    std::wifstream infile2(file, std::ios::binary);
     std::wstring wline;
     
     while(std::getline(infile2, wline))

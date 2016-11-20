@@ -103,7 +103,7 @@ bool language_filest::parse()
   {
     // open file
 
-    std::ifstream infile(it->first.c_str());
+    std::ifstream infile(it->first);
 
     if(!infile)
     {
