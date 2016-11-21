@@ -107,28 +107,28 @@ int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
     typedef ga_learnt<selectt, mutatet, crosst, fitnesst, danger_fitness_configt> ga_learnt;
     ga_learnt ga_learn(opt, rnd, select, mutate, cross, fitness, converter);
 #ifndef _WIN32
-    concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
-        serialise, std::ref(deser), deserialise, symex_head_start);
-#else
-    // TODO: Remove once task_pool supports Windows.
-    ga_learnt &learn=ga_learn;
+    if (!opt.get_bool_option(CEGIS_GENETIC_ONLY))
+    {
+      concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
+          serialise, std::ref(deser), deserialise, symex_head_start);
+      return run_parallel(os, opt, prog, learn, preproc);
+    }
 #endif
-    return run_parallel(os, opt, prog, learn, preproc);
+    return run_parallel(os, opt, prog, ga_learn, preproc);
   }
   typedef tournament_selectt<program_populationt> selectt;
   selectt select(rounds);
-  typedef ga_learnt<selectt, random_mutatet, random_crosst, fitnesst,
-      danger_fitness_configt> ga_learnt;
+  typedef ga_learnt<selectt, mutatet, crosst, fitnesst, danger_fitness_configt> ga_learnt;
   ga_learnt ga_learn(opt, rnd, select, mutate, cross, fitness, converter);
 #ifndef _WIN32
-  concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
-      serialise, std::ref(deser), deserialise, symex_head_start);
-#else
-  // TODO: Remove once task_pool supports Windows.
-  ga_learnt &learn=ga_learn;
+  if (!opt.get_bool_option(CEGIS_GENETIC_ONLY))
+  {
+    concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
+        serialise, std::ref(deser), deserialise, symex_head_start);
+    return run_parallel(os, opt, prog, learn, preproc);
+  }
 #endif
-  return run_parallel(os, opt, prog, learn, preproc);
-  return 0;
+  return run_parallel(os, opt, prog, ga_learn, preproc);
 }
 
 template<class preproct>
