@@ -172,7 +172,7 @@ void static_analysis_baset::output(
 
     get_state(i_it).output(ns, out);
     out << "\n";
-    #if 0
+    #if 1
     goto_program.output_instruction(ns, identifier, out, i_it);
     out << "\n";
     #endif
@@ -425,8 +425,9 @@ void static_analysis_baset::do_function_call(
 
   if((!goto_function.body_available()) || !should_enter_function(f_it->first))
   {
-    // Per default do nothing, but a subclass might transform across the stubbed callsite.
-    transform_function_stub(f_it->first,new_state,l_call,l_return);
+    // Per default do nothing,
+    // but a subclass might transform across the stubbed callsite.
+    transform_function_stub(f_it->first, new_state, l_call, l_return);
     return;
   }
 
@@ -515,7 +516,13 @@ void static_analysis_baset::do_function_call_rec(
     {
       auto fid=function.get(ID_identifier);
       if(!should_enter_function(fid))
-        transform_function_stub(function.get(ID_identifier),new_state,l_call,l_return);
+      {
+        transform_function_stub(
+          function.get(ID_identifier),
+          new_state,
+          l_call,
+          l_return);
+      }
     }
     return;
   }

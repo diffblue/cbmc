@@ -248,8 +248,13 @@ protected:
     const exprt::operandst &arguments,
     statet &new_state);
 
-  virtual bool should_enter_function(const irep_idt&) { return true; }
-  virtual void transform_function_stub(const irep_idt&, statet& state, locationt l_call, locationt l_return) {}
+  virtual bool should_enter_function(const irep_idt &) { return true; }
+  virtual void transform_function_stub(
+    const irep_idt &,
+    statet &state,
+    locationt l_call,
+    locationt l_return)
+  {}
 
   // abstract methods
 
@@ -267,7 +272,6 @@ protected:
 
   bool ignore_recursion;
   virtual bool get_ignore_recursion() { return true; }
-  
 };
 
 // T is expected to be derived from domain_baset
