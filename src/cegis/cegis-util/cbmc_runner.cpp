@@ -20,7 +20,7 @@ namespace
 {
 bool exists(const std::string &name)
 {
-  return std::ifstream(name.c_str()).good();
+  return std::ifstream(name).good();
 }
 
 std::string get_goto_file_name(const size_t index)
