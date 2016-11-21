@@ -37,7 +37,6 @@ public:
 
   jar_poolt jar_pool;
 
-protected:
   class jar_map_entryt
   {
   public:
