@@ -96,14 +96,15 @@ int configure_backend(mstreamt &os, const optionst &o,
             safety_goto_cet>, safety_fitness_configt> ga_learnt;
     ga_learnt ga_learn(o, rnd, select, mutate, cross, fit, safety_fitness_config);
 #ifndef _WIN32
-    const individual_to_safety_solution_deserialisert deser(prog, info_fac);
-    concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn,
-        serialise, deser, deserialise, symex_head_start);
-#else
-    // TODO: Remove once task_pool supports Windows.
-    ga_learnt &learner=ga_learn;
+    if (!o.get_bool_option(CEGIS_GENETIC_ONLY))
+    {
+      const individual_to_safety_solution_deserialisert deser(prog, info_fac);
+      concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn,
+          serialise, deser, deserialise, symex_head_start);
+      return configure_ui_and_run(os, o, learner, verify, pre);
+    }
 #endif
-    return configure_ui_and_run(os, o, learner, verify, pre);
+    return configure_ui_and_run(os, o, ga_learn, verify, pre);
   }
   typedef tournament_selectt<program_populationt> selectt;
   selectt select(rounds);
@@ -112,14 +113,15 @@ int configure_backend(mstreamt &os, const optionst &o,
           safety_goto_cet>, safety_fitness_configt> ga_learnt;
   ga_learnt ga_learn(o, rnd, select, mutate, cross, fit, safety_fitness_config);
 #ifndef _WIN32
-  const individual_to_safety_solution_deserialisert deser(prog, info_fac);
-  concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn, serialise,
-      std::ref(deser), deserialise, symex_head_start);
-#else
-  // TODO: Remove once task_pool supports Windows.
-  ga_learnt &learner=ga_learn;
+  if (!o.get_bool_option(CEGIS_GENETIC_ONLY))
+  {
+    const individual_to_safety_solution_deserialisert deser(prog, info_fac);
+    concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn,
+        serialise, std::ref(deser), deserialise, symex_head_start);
+    return configure_ui_and_run(os, o, learner, verify, pre);
+  }
 #endif
-  return configure_ui_and_run(os, o, learner, verify, pre);
+  return configure_ui_and_run(os, o, ga_learn, verify, pre);
 }
 
 constant_strategyt get_constant_strategy(const optionst &opt)

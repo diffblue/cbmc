@@ -34,7 +34,7 @@ void print_instr(messaget::mstreamt &os, const namespacet &ns,
           [opcode](const goto_programt::instructiont &instr)
           { return matches_opcode(instr, opcode);}));
   const goto_programt::const_targett last=std::find_if(first, end,
-      std::mem_fun_ref(goto_programt::instructiont::is_goto));
+      std::mem_fun_ref(&goto_programt::instructiont::is_goto));
   for (; first != last; ++first)
     body.output_instruction(ns, func_name, oss, first);
   std::string result(oss.str());
