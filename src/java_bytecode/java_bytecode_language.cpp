@@ -440,14 +440,22 @@ bool java_bytecode_languaget::typecheck(
   auto main_function=get_main_symbol(symbol_table,main_class,get_message_handler(),true);
   if(main_function.stop_convert)
   {
-    // Failed, mark all functions in the given main class reachable.
-    const auto& methods=java_class_loader.class_map.at(main_class).parsed_class.methods;
-    for(const auto& method : methods)
+    // Failed, mark all functions in the given main class(es) reachable.
+    std::vector<irep_idt> reachable_classes;
+    if(!main_class.empty())
+      reachable_classes.push_back(main_class);
+    else
+      reachable_classes=main_jar_classes;
+    for(const auto& classname : reachable_classes)
     {
-      const irep_idt methodid="java::"+id2string(main_class)+"."+
-        id2string(method.name)+":"+
-        id2string(method.signature);
-      method_worklist2.push_back(methodid);
+      const auto& methods=java_class_loader.class_map.at(classname).parsed_class.methods;
+      for(const auto& method : methods)
+      {
+        const irep_idt methodid="java::"+id2string(classname)+"."+
+          id2string(method.name)+":"+
+          id2string(method.signature);
+        method_worklist2.push_back(methodid);
+      }
     }
   }
   else
