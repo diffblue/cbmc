@@ -203,6 +203,18 @@ void java_bytecode_convert_method_lazy(
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
       id2string(m.base_name)+"()";
 
+  // do we need to add 'this' as a parameter?
+  if(!m.is_static)
+  {
+    code_typet &code_type=to_code_type(member_type);
+    code_typet::parameterst &parameters=code_type.parameters();
+    code_typet::parametert this_p;
+    const reference_typet object_ref_type(symbol_typet(class_symbol.name));
+    this_p.type()=object_ref_type;
+    this_p.set_this();
+    parameters.insert(parameters.begin(), this_p);
+  }
+
   method_symbol.type=member_type;
   symbol_table.add(method_symbol);
 }
@@ -223,28 +235,16 @@ void java_bytecode_convert_methodt::convert(
   const symbolt &class_symbol,
   const methodt &m)
 {
-  typet member_type=java_type_from_string(m.signature);
-
-  assert(member_type.id()==ID_code);
-
   const irep_idt method_identifier=
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
   method_id=method_identifier;
 
+  const auto& old_sym=symbol_table.lookup(method_identifier);
+
+  typet member_type=old_sym.type;
   code_typet &code_type=to_code_type(member_type);
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
-
-  // do we need to add 'this' as a parameter?
-  if(!m.is_static)
-  {
-    code_typet::parametert this_p;
-    const reference_typet object_ref_type(
-      symbol_typet(class_symbol.name));
-    this_p.type()=object_ref_type;
-    this_p.set_this();
-    parameters.insert(parameters.begin(), this_p);
-  }
 
   variables.clear();
 
