@@ -112,6 +112,37 @@ void interpretert::initialise(bool init) {
 
 /*******************************************************************\
 
+/*******************************************************************\
+
+Function: interpretert::get_is_variable_cprover
+
+  Inputs: The cell to check for a CPROVER variable
+
+ Outputs: True if the variable stored in the given cell is a CPROVER variable
+
+ Purpose: To check a given cell for being a CPROVER variable
+
+\*******************************************************************/
+bool interpretert::get_is_variable_cprover(
+    const irep_idt &variable_id)
+{
+  constexpr char const *cprover_variable_prefix = "__CPROVER";
+  constexpr int cprover_prefix_len = strlen(cprover_variable_prefix);
+
+  const char *cell_identifier = variable_id.c_str();
+
+  if(strncmp(cell_identifier, cprover_variable_prefix, cprover_prefix_len) == 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/*******************************************************************\
+
 Function: interpretert::show_state
 
   Inputs:
@@ -490,6 +521,10 @@ void interpretert::execute_other()
     {
       assign(address, rhs);
     }
+  }
+  else if(statement==ID_output)
+  {
+    return;
   }
   else
     throw "unexpected OTHER statement: "+id2string(statement);
@@ -1352,8 +1387,10 @@ void interpretert::list_inputs(bool use_non_det) {
     const memory_cellt &cell=memory[i];
     if(cell.initialised>=0)
       continue;
-    if(strncmp(cell.identifier.c_str(), "__CPROVER", 9)==0)
+    if(get_is_variable_cprover(cell.identifier))
+    {
       continue;
+    }
 
     try {
       typet symbol_type=get_type(cell.identifier);
@@ -1400,7 +1437,12 @@ void interpretert::list_inputs(input_varst &inputs) {
   for(unsigned long i=0;i<memory.size();i++) {
     const memory_cellt &cell=memory[i];
     if(cell.initialised>=0) continue;
-    if (strncmp(cell.identifier.c_str(), "__CPROVER", 9)==0) continue;
+
+    if(get_is_variable_cprover(cell.identifier))
+    {
+      continue;
+    }
+
     if(inputs.find(cell.identifier)!=inputs.end())
     {
       input_vars[cell.identifier]=inputs[cell.identifier];
@@ -1440,10 +1482,16 @@ void interpretert::list_inputs(input_varst &inputs) {
 void interpretert::print_inputs() {
   if(input_vars.size()<=0)
     list_inputs();
-  for(input_varst::iterator it=input_vars.begin();it!=input_vars.end();
+
+  print_inputs(input_vars);
+}
+
+void interpretert::print_inputs(const interpretert::input_varst &inputs) const
+{
+  for(input_varst::const_iterator it=inputs.begin();it!=inputs.end();
       it++) {
-    message->result() << it->first << "=" 
-                      << from_expr(ns, it->first, it->second) << "[" 
+    message->result() << it->first << "="
+                      << from_expr(ns, it->first, it->second) << "["
                       << it->second.type().id() << "]" << messaget::eom;
   }
   message->result() << messaget::eom;
@@ -1539,6 +1587,7 @@ void interpretert::prune_inputs(input_varst &inputs,
   }
   input_vars=inputs;
   function_input_vars=function_inputs;
+
   if(filter)
   {
     try
@@ -1970,7 +2019,7 @@ interpretert::input_varst& interpretert::load_counter_example_inputs(
   const code_typet::parameterst &params=
                     to_code_type(func_expr.type()).parameters();
 
-  std::map<std::string, const irep_idt &> parameterSet;
+  std::map<std::string, const irep_idt &> parameter_set;
 
   // mapping <structure, field> -> value
   std::map<std::pair<const irep_idt,const irep_idt>,const exprt> valuesBefore;
@@ -1978,7 +2027,7 @@ interpretert::input_varst& interpretert::load_counter_example_inputs(
   namespacet ns(symbol_table);
 
   for(const auto &p : params)
-    parameterSet.insert({id2string(p.get_identifier()), p.get_identifier()});
+    parameter_set.insert({id2string(p.get_identifier()), p.get_identifier()});
   
   for(auto it=trace.steps.begin(),itend=trace.steps.end();it!=itend;++it)
   {
@@ -2064,10 +2113,10 @@ interpretert::input_varst& interpretert::load_counter_example_inputs(
 
       /********* 8< **********/
       irep_idt identifier=step.lhs_object.get_identifier();
-      auto param = parameterSet.find(id2string(identifier));
-      if(param != parameterSet.end())
+      auto param = parameter_set.find(id2string(identifier));
+      if(param != parameter_set.end())
       {
-        const exprt &expr = step.full_lhs_value;
+        //const exprt &expr = step.full_lhs_value;
         interpretert::function_assignmentst input_assigns;
         get_value_tree(identifier, input_assigns);
         for(const auto &assign : input_assigns)
@@ -2101,17 +2150,18 @@ interpretert::input_varst& interpretert::load_counter_example_inputs(
     {
       irep_idt called, capture_symbol;
       bool is_cons=is_constructor_call(step,symbol_table);
+      const code_function_callt &function_call=
+          to_code_function_call(step.pc->code);
+
       // No need to intercept j.l.O's constructor since we know it doesn't do
       // anything visible to the object's state.
       // TODO: consider just supplying a constructor for it?
-      auto is_stub=calls_opaque_stub(to_code_function_call(step.pc->code),
+      auto is_stub=calls_opaque_stub(function_call,
                                      symbol_table,called,capture_symbol);
       bool is_jlo_cons=is_cons &&
            as_string(called).find("java.lang.Object")!=std::string::npos;
 
-      mp_integer this_address=
-                 get_this_address(to_code_function_call(step.pc->code));
-
+      mp_integer this_address=get_this_address(function_call);
       trace_stack.push_back({called,this_address,irep_idt(),false,{}});
 
       assert(expect_parameter_assignments==0 &&
@@ -2119,6 +2169,24 @@ interpretert::input_varst& interpretert::load_counter_example_inputs(
       // Capture upcoming parameter assignments:
       expect_parameter_assignments=
         to_code_type(to_code_function_call(step.pc->code).function().type()).parameters().size();
+
+      // function to be called
+      mp_integer a=evaluate_address(function_call.function());
+
+      if((expect_parameter_assignments>0) && (a>0) && (a<memory.size()))
+      {
+        const memory_cellt &cell=memory[integer2size_t(a)];
+        const goto_functionst::function_mapt::const_iterator f_it=
+          goto_functions.function_map.find(cell.identifier);
+        if (!f_it->second.body_available())
+        {
+          message->warning() << "Call to non-bodied function expecting parameters ignored"
+                             << messaget::eom;
+          expect_parameter_assignments=0;
+        }
+      }
+
+
       
       bool is_super=(!is_cons) && trace_stack.size()!=0 &&
            is_super_call(trace_stack.back(),trace_stack[trace_stack.size()-2]);
@@ -2126,44 +2194,44 @@ interpretert::input_varst& interpretert::load_counter_example_inputs(
       
       if((!is_stub) || is_jlo_cons)
       {
-    if(is_cons)
-    {
-      if(outermost_constructor_depth==-1)
-        outermost_constructor_depth=trace_stack.size()-1;
-    }
-    else
-      outermost_constructor_depth=-1;
+        if(is_cons)
+        {
+          if(outermost_constructor_depth==-1)
+            outermost_constructor_depth=trace_stack.size()-1;
+        }
+        else
+         outermost_constructor_depth=-1;
       }
       else
       {
-    /* Capture the value of capture_symbol instead of whatever happened
-     * to have been defined most recently. Also capture any other referenced
-     * objects.
-     * Capture after the stub finishes, or in the particular case of a
-     * constructor that makes opaque super-calls, after the outermost
-     * constructor finishes.*/
-    if(is_cons && outermost_constructor_depth!=-1)
-    {
-      assert(outermost_constructor_depth < trace_stack.size());
-      trace_stack[outermost_constructor_depth].capture_symbol=capture_symbol;
-    }
-    else if(trace_stack.back().is_super_call)
-    {
-      /* When a method calls the overridden method, capture the return value
-       * of the child method, as replacing the supercall is tricky using
-       * mocking tools.
-       * We could also consider generating a new method that can be stubbed.*/
-      auto findit=trace_stack.rbegin();
-      while(findit!=trace_stack.rend() && findit->is_super_call)
-        ++findit;
-      assert(findit!=trace_stack.rend());
-      assert(findit->capture_symbol==irep_idt() 
+        /* Capture the value of capture_symbol instead of whatever happened
+         * to have been defined most recently. Also capture any other referenced
+         * objects.
+         * Capture after the stub finishes, or in the particular case of a
+         * constructor that makes opaque super-calls, after the outermost
+         * constructor finishes.*/
+        if(is_cons && outermost_constructor_depth!=-1)
+        {
+          assert(outermost_constructor_depth < trace_stack.size());
+          trace_stack[outermost_constructor_depth].capture_symbol=capture_symbol;
+        }
+        else if(trace_stack.back().is_super_call)
+        {
+          /* When a method calls the overridden method, capture the return value
+           * of the child method, as replacing the supercall is tricky using
+           * mocking tools.
+           * We could also consider generating a new method that can be stubbed.*/
+          auto findit=trace_stack.rbegin();
+          while(findit!=trace_stack.rend() && findit->is_super_call)
+            ++findit;
+          assert(findit!=trace_stack.rend());
+          assert(findit->capture_symbol==irep_idt()
              && "Stub somehow called a super-method?");
-      findit->capture_symbol=as_string(findit->func_name)+RETURN_VALUE_SUFFIX;
-    }
-    else
-      trace_stack.back().capture_symbol=capture_symbol;
-    outermost_constructor_depth=-1;
+          findit->capture_symbol=as_string(findit->func_name)+RETURN_VALUE_SUFFIX;
+        }
+        else
+          trace_stack.back().capture_symbol=capture_symbol;
+        outermost_constructor_depth=-1;
       }
     }
     else if(step.is_function_return())
@@ -2176,21 +2244,21 @@ interpretert::input_varst& interpretert::load_counter_example_inputs(
       if(ret_func.capture_symbol!=irep_idt())
       {
         assert(trace_stack.size()>=2);
-    // We must record the value of stub_capture_symbol now.
-    function_assignmentst defined;
-    get_value_tree_bu(ret_func.capture_symbol,defined);
-    if(defined.size()!=0) // Definition found?
-    {
-      const auto& caller=trace_stack[trace_stack.size()-2].func_name;
-      function_inputs[ret_func.func_name].push_back({
-        caller,std::move(defined),std::move(trace_stack.back().param_values)});
-    }
+        // We must record the value of stub_capture_symbol now.
+        function_assignmentst defined;
+        get_value_tree_bu(ret_func.capture_symbol,defined);
+        if(defined.size()!=0) // Definition found?
+        {
+          const auto& caller=trace_stack[trace_stack.size()-2].func_name;
+          function_inputs[ret_func.func_name].push_back({
+            caller,std::move(defined),std::move(trace_stack.back().param_values)});
+        }
       }
       trace_stack.pop_back();
     }
     else if(step.type==goto_trace_stept::OUTPUT)
     {
-      for(const auto &inputParam : parameterSet)
+      for(const auto &inputParam : parameter_set)
       {
         std::size_t found = (inputParam.first).rfind(id2string(step.io_id));
         if(found!=std::string::npos)
@@ -2199,7 +2267,6 @@ interpretert::input_varst& interpretert::load_counter_example_inputs(
            * side effects*/
           interpretert::function_assignmentst output_assigns;
           get_value_tree(inputParam.second, output_assigns);
-          const typet &typ = symbol_table.lookup(inputParam.second).type;
           for(const auto &assign : output_assigns)
           {
             const typet &tree_typ = ns.follow(assign.value.type());
