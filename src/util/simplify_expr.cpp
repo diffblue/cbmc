@@ -261,7 +261,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   }
 
   // eliminate redundant typecasts
-  if(base_type_eq(expr.type(), expr.op0().type(), ns))
+  if((!keep_identical_structs) &&
+     base_type_eq(expr.type(), expr.op0().type(), ns))
   {
     exprt tmp;
     tmp.swap(expr.op0());
