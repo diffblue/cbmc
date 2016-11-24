@@ -38,6 +38,7 @@ class simplify_exprt
 public:
   explicit simplify_exprt(const namespacet &_ns):
     do_simplify_if(true),
+    keep_identical_structs(false),
     ns(_ns)
 #ifdef DEBUG_ON_DEMAND
     , debug_on(false)
@@ -54,6 +55,7 @@ public:
   }
 
   bool do_simplify_if;
+  bool keep_identical_structs;
 
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
